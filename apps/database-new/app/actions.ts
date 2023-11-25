@@ -30,13 +30,16 @@ export async function deleteThread(prevState: any, formData: FormData) {
   const supabase = createClient(cookieStore)
 
   try {
-    // @ts-expect-error
-    const thread_id: string = formData.get('thread_id')
+    const schema = z.object({
+      thread_id: z.string(),
+    })
 
-    if (!thread_id) throw new Error('thread_id is required')
+    const data = schema.parse({
+      thread_id: formData.get('thread_id'),
+    })
 
-    const { data } = await supabase.from('threads').delete().eq('thread_id', thread_id)
-    await openai.beta.threads.del(thread_id)
+    await supabase.from('threads').delete().eq('thread_id', data.thread_id)
+    await openai.beta.threads.del(data.thread_id)
 
     revalidatePath('/profile')
 
@@ -45,10 +48,11 @@ export async function deleteThread(prevState: any, formData: FormData) {
       data,
     }
   } catch (error: any) {
+    console.error(error)
     return {
       success: false,
-      message: error.message,
-      error,
+      message: 'Failed to delete the thread',
+      data: undefined,
     }
   }
 }
@@ -56,8 +60,6 @@ export async function deleteThread(prevState: any, formData: FormData) {
 export async function updateThreadName(prevState: any, formData: FormData) {
   const cookieStore = cookies()
   const supabase = createClient(cookieStore)
-
-  console.log('running')
 
   try {
     const schema = z.object({
@@ -70,12 +72,7 @@ export async function updateThreadName(prevState: any, formData: FormData) {
       row_id: formData.get('row_id'),
     })
 
-    const { data: supabaseData } = await supabase
-      .from('threads')
-      .update({ thread_title: data.thread_title })
-      .eq('id', data.row_id)
-
-    console.log('supabaseData', supabaseData)
+    await supabase.from('threads').update({ thread_title: data.thread_title }).eq('id', data.row_id)
 
     revalidatePath('/profile')
 

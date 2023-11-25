@@ -47,7 +47,13 @@ const Thread = ({ thread }: { thread: ThreadType }) => {
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-32" align="end">
-              <DropdownMenuItem className="space-x-2" onClick={() => setEditOpen(true)}>
+              <DropdownMenuItem
+                className="space-x-2"
+                onClick={() => {
+                  console.log('trying to edit thread')
+                  setEditOpen(true)
+                }}
+              >
                 <IconEdit2 size={14} />
                 <p>Edit name</p>
               </DropdownMenuItem>
@@ -59,7 +65,6 @@ const Thread = ({ thread }: { thread: ThreadType }) => {
           </DropdownMenu>
         </div>
       </div>
-
       <ConfirmDeleteThreadModal
         key={`${thread.id}-delete-dialog`}
         thread={thread}

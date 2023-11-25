@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, createRef } from 'react'
 // @ts-expect-error
 import { useFormState, useFormStatus } from 'react-dom'
-import { Button, Input_Shadcn_, Label_Shadcn_, Modal } from 'ui'
+import { Button, Input_Shadcn_, Label_Shadcn_, Modal, formatPageUrl } from 'ui'
 import { updateThreadName } from './../../app/actions'
 import { ThreadType } from './Threads'
 
@@ -16,17 +16,26 @@ const EditThreadModal = ({
   onClose: () => void
   visible: boolean
 }) => {
+  const formRef = createRef<HTMLFormElement>()
+
   const initialState = {
     message: null,
+    success: undefined,
+    data: {
+      row_id: thread.id,
+      thread_title: thread.thread_title,
+    },
   }
 
   const [state, formAction] = useFormState(updateThreadName, initialState)
 
   useEffect(() => {
-    if (state?.success) {
+    if (state?.success === true) {
       onClose()
+      formRef.current?.reset()
+      state.success = undefined
     }
-  }, [state?.success, onClose])
+  }, [state, onClose, formRef])
 
   function SubmitButton() {
     const { pending } = useFormStatus()
@@ -48,16 +57,16 @@ const EditThreadModal = ({
       header="Edit thread name"
       className="pb-2"
     >
-      <form action={formAction} key={`${thread.id}-update-thread-title-form`}>
+      <form ref={formRef} action={formAction} key={`${thread.id}-update-thread-title-form`}>
         <Modal.Content className="py-4">
           <Label_Shadcn_ htmlFor="thread_title">Provide a name for your thread</Label_Shadcn_>
           <Input_Shadcn_
             placeholder="Type in a name for the thread..."
             type="text"
             name="thread_title"
-            defaultValue={thread.thread_title}
+            defaultValue={state.data.thread_title}
           />
-          <Input_Shadcn_ name="row_id" type="hidden" value={thread.id} />
+          <Input_Shadcn_ name="row_id" value={state.data.row_id} type="hidden" />
         </Modal.Content>
         <Modal.Separator />
         <Modal.Content className="flex flex-row gap-3 justify-end">
