@@ -27,11 +27,11 @@ interface Props {
   ogImageUrl: string
 }
 
-export default function UsernamePage({ user, users, ogImageUrl }: Props) {
+export default function UsernamePage({ user, ogImageUrl }: Props) {
   const { username, ticketNumber, name } = user
 
   const TITLE = `${name ? name + '’s' : 'Get your'} #SupaLaunchWeek Ticket`
-  const DESCRIPTION = `Supabase Launch Week X | 11-15 December 2023 | Claim your ticket and join ${name} for a chance to win Supabase swag.`
+  const DESCRIPTION = `Claim your Supabase Launch Week X ticket for a chance to win Supabase swag on December 15th.`
   const OG_URL = `${SITE_URL}/tickets/${username}`
 
   const [session, setSession] = useState<Session | null>(null)
@@ -85,7 +85,7 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
           <div className="-mt-[65px]">
             <SectionContainer className="relative z-10 flex flex-col justify-around items-center gap-2 md:gap-10 !px-2 !mx-auto md:min-h-[auto]">
               <div className="w-full min-h-[400px] pt-24 flex items-center">
-                <LWXTicketContainer supabase={supabase} />
+                <LWXTicketContainer />
               </div>
               <div className="flex flex-col items-center justify-center text-center gap-2 max-w-lg">
                 <h1 className="text-2xl">
