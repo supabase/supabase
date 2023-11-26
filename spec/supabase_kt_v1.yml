@@ -2106,7 +2106,7 @@ functions:
         - If **Confirm email** is enabled in [your project](https://supabase.com/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
         - If **Confirm email** is disabled, the error message, `User already registered` is returned.
     examples:
-      - id: sign-up-phone
+      - id: sign-up-email
         name: Sign up with email
         isSpotlight: true
         code: |
