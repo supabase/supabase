@@ -153,6 +153,7 @@ const LWXBackground = ({ className }: Props) => {
         className="absolute w-full !h-[400px] md:!h-full inset-0 mt-10 object-cover object-center overflow-visible"
         role="presentation"
         fill
+        priority
         ref={containerRef}
       />
     </div>
