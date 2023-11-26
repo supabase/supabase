@@ -34,7 +34,8 @@
       "reference_python_v2",
       "reference_csharp_v0",
       "reference_swift_v1",
-      "reference_kotlin_v0"
+      "reference_kotlin_v1",
+      "reference_kotlin_v2"
     ]
   },
   {
@@ -48,7 +49,8 @@
       "reference_python_v2",
       "reference_csharp_v0",
       "reference_swift_v1",
-      "reference_kotlin_v0"
+      "reference_kotlin_v1",
+      "reference_kotlin_v2"
     ]
   },
   {
@@ -943,7 +945,8 @@
       "reference_python_v2",
       "reference_csharp_v0",
       "reference_swift_v1",
-      "reference_kotlin_v0"
+      "reference_kotlin_v1",
+      "reference_kotlin_v2"
     ],
     "items": [
       {
