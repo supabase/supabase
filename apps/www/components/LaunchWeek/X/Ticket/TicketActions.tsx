@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import Link from 'next/link'
 import { SITE_URL, TWEET_TEXT, TWEET_TEXT_GOLDEN } from '~/lib/constants'
 import { Button, IconLinkedinSolid, IconTwitterX, cn } from 'ui'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
@@ -50,10 +51,10 @@ export default function TicketActions({ username, golden = false }: Props) {
     setTimeout(async () => {
       if (social === 'twitter') {
         await supabase.from(LW_TABLE).update({ sharedOnTwitter: 'now' }).eq('username', username)
-        window.open(tweetUrl, '_blank')
+        // window.open(tweetUrl, '_blank')
       } else if (social === 'linkedin') {
         await supabase.from(LW_TABLE).update({ sharedOnLinkedIn: 'now' }).eq('username', username)
-        window.open(linkedInUrl, '_blank')
+        // window.open(linkedInUrl, '_blank')
       }
     })
   }
@@ -73,16 +74,22 @@ export default function TicketActions({ username, golden = false }: Props) {
             type={userData.sharedOnTwitter ? 'secondary' : 'default'}
             icon={<IconTwitterX className="text-light w-3" />}
             size="tiny"
+            asChild
           >
-            Share on X
+            <Link href={tweetUrl} target="_blank">
+              Share on X
+            </Link>
           </Button>
           <Button
             onClick={() => handleShare('linkedin')}
             type={userData.sharedOnLinkedIn ? 'secondary' : 'default'}
             icon={<IconLinkedinSolid className="text-light w-3" />}
             size="tiny"
+            asChild
           >
-            Share on Linkedin
+            <Link href={linkedInUrl} target="_blank">
+              Share on Linkedin
+            </Link>
           </Button>
         </div>
       )}
