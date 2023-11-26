@@ -47,6 +47,7 @@ export default function Ticket() {
           'absolute inset-0 object-cover object-right opacity-0 transition-opacity duration-1000',
           imageHasLoaded && 'opacity-100'
         )}
+        priority
         quality={100}
       />
     </Panel>

@@ -25,6 +25,8 @@ export default function TicketFooter() {
         width="30"
         height="30"
         className="mb-1"
+        priority
+        quality={100}
       />
       <TicketNumber number={ticketNumber} />
       <span>Launch Week X</span>
