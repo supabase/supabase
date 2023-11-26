@@ -630,7 +630,7 @@ functions:
           ```js
           const { data, error } = await supabase.auth.resend({
             type: 'signup',
-            email: 'email@example.com'
+            email: 'email@example.com',
             options: {
               emailRedirectTo: 'https://example.com/welcome'
             }
