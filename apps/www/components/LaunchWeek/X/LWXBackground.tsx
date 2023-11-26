@@ -52,7 +52,7 @@ const LWXBackground = ({ className }: Props) => {
   const gradientTransformStroke = `translate(${gradientPos?.x} ${gradientPos?.y})  rotate(71.6455) scale(105.635)`
 
   return (
-    <div className={cn('w-full h-[150px] md:h-full absolute', className)}>
+    <div className={cn('w-full h-[620px] md:!h-[720px] !min-h-[350px] absolute', className)}>
       <svg
         ref={ref}
         width="100%"
@@ -61,7 +61,8 @@ const LWXBackground = ({ className }: Props) => {
           `
           hidden m-auto
           
-          w-[153px] h-[153px] mt-[172px] 
+          w-[136px] h-[136px] mt-[157px] 
+          sm:w-[142px] sm:h-[142px] sm:mt-[153px] 
           md:w-[247px] md:h-[247px] md:translate-y-3 md:mt-auto
           xl:w-[285px] xl:h-[285px] xl:translate-y-2
           2xl:w-[342px] 2xl:h-[342px] 2xl:translate-y-px
@@ -149,7 +150,7 @@ const LWXBackground = ({ className }: Props) => {
       <Image
         src="/images/launchweek/lwx/lwx_bg.svg"
         alt=""
-        className="absolute w-full !h-[450px] md:!h-full inset-0 mt-10 object-cover object-center overflow-visible"
+        className="absolute w-full !h-[400px] md:!h-full inset-0 mt-10 object-cover object-center overflow-visible"
         role="presentation"
         fill
         ref={containerRef}

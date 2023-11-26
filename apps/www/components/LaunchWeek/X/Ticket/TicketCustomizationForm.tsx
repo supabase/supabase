@@ -89,14 +89,14 @@ const TicketCustomizationForm = () => {
           />
         }
       />
-      <div className="flex items-center justify-end gap-2">
+      <div className="flex items-center order-first md:order-last justify-center md:justify-end gap-2">
         {IS_SAVED && <span className="opacity-0 animate-fade-in text-xs text-brand">Saved</span>}
         {HAS_ERROR && (
           <span className="opacity-0 animate-fade-in text-xs text-foreground">
             Something went wrong
           </span>
         )}
-        <Badge color="brand" className="hidden md:block truncate lg:max-w-sm">
+        <Badge color="brand" className="truncate lg:max-w-sm">
           @{user.username}
         </Badge>
       </div>

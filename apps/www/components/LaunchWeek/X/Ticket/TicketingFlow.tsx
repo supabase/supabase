@@ -51,18 +51,25 @@ const TicketingFlow = () => {
                   initial={exit}
                   animate={animate}
                   exit={exit}
-                  className="relative w-full -mt-5 md:mt-3 xl:mt-0 lg:h-20 pb-64 flex flex-col items-center gap-6 text-foreground"
+                  className="relative w-full -mt-5 md:mt-3 lg:mt-10 xl:mt-8 2xl:mt-6 pb-64 flex flex-col items-center gap-6 text-foreground"
                 >
                   <div className="hidden">
                     <TicketForm />
                   </div>
-                  <Image
-                    src="/images/launchweek/lwx/loading-circle.svg"
-                    alt="Supabase Launch Week X icon"
-                    width="30"
-                    height="30"
-                    className="animate-spinner opacity-50"
-                  />
+                  <svg
+                    className="animate-spinner opacity-50 w-5 h-5 md:w-6 md:h-6"
+                    width="100%"
+                    height="100%"
+                    viewBox="0 0 62 61"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M61 31C61 14.4315 47.5685 1 31 1C14.4315 1 1 14.4315 1 31"
+                      stroke="white"
+                      strokeWidth="2"
+                    />
+                  </svg>
                 </m.div>
               )}
               {isRegistering && (
@@ -134,7 +141,7 @@ const TicketingFlow = () => {
 
         <LWXBackground
           className={cn(
-            'absolute z-0 top-0 left-0 right-0 w-full h-[620px] md:h-[720px] !min-h-[350px] flex items-center justify-center opacity-100 transition-opacity',
+            'absolute z-0 top-0 left-0 right-0 w-full flex items-center justify-center opacity-100 transition-opacity',
             hasTicket && 'opacity-40'
           )}
         />
