@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useEffect } from 'react'
 // @ts-ignore
 import ModalStyles from './Modal.module.css'

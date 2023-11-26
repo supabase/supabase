@@ -163,7 +163,7 @@ Update your `src/routes/+layout.svelte`:
 
 	export let data
 
-	const { supabase, session } = data
+	let { supabase, session } = data
 	$: ({ supabase, session } = data)
 
 	onMount(() => {
@@ -314,7 +314,7 @@ Create a new `src/routes/account/+page.svelte` file with the content below.
 	export let data
 	export let form
 
-	const { session, supabase, profile } = data
+	let { session, supabase, profile } = data
 	$: ({ session, supabase, profile } = data)
 
 	let profileForm: HTMLFormElement
