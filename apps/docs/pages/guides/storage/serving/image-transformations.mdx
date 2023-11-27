@@ -225,7 +225,48 @@ const MyImage = (props) => {
 
 ## Transformation options
 
-We currently support a few transformation options focusing on resizing and cropping images.
+We currently support a few transformation options focusing on optimizing, resizing, and cropping images.
+
+### Optimizing
+
+You can set the quality of the returned image by passing a value from 20 to 100 (with 100 being the highest quality) to the `quality` parameter. This parameter defaults to 80.
+
+Example:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```ts
+supabase.storage.from('bucket').download('image.jpg', {
+  transform: {
+    quality: 50,
+  },
+})
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val data = supabase.storage["bucket"].downloadAuthenticated("image.jpg") {
+    quality = 50
+}
+
+//Or on JVM stream directly to a file
+val file = File("image.jpg")
+supabase.storage["bucket"].downloadAuthenticatedTo("image.jpg", file) {
+    quality = 50
+}
+```
+
+</TabPanel>
+</Tabs>
 
 ### Resizing
 
