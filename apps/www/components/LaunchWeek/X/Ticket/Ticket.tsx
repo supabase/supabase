@@ -38,8 +38,11 @@ export default function Ticket() {
       shimmerToColor="hsl(var(--background-default))"
     >
       {/* Edit hover button */}
-      <button className="absolute z-40 inset-0 w-full h-full" onClick={handleCustomizeTicket} />
-      <div className="hidden md:flex opacity-0 translate-y-3 group-hover/ticket:opacity-100 group-hover/ticket:translate-y-0 transition-all absolute z-30 inset-0 m-auto w-10 h-10 rounded-full items-center justify-center bg-[#020405] border shadow-lg">
+      <button
+        className="absolute z-40 inset-0 w-full h-full outline-none"
+        onClick={handleCustomizeTicket}
+      />
+      <div className="hidden md:flex opacity-0 translate-y-3 group-hover/ticket:opacity-100 group-hover/ticket:translate-y-0 transition-all absolute z-30 inset-0 m-auto w-10 h-10 rounded-full items-center justify-center bg-[#020405] border shadow-lg text-foreground">
         {!showCustomizationForm ? <IconEdit2 className="w-4" /> : <IconX className="w-4" />}
       </div>
 

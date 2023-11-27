@@ -36,18 +36,20 @@ const TicketingFlow = () => {
     <>
       <SectionContainer className="relative flex flex-col !pt-8 lg:!pt-20 items-center gap-5 text-center h-auto lg:min-h-[886px]">
         <h1 className="sr-only">Supabase Launch Week X | {LWX_DATE}</h1>
-        <div className="flex flex-col items-center gap-1 text-light font-mono uppercase ">
-          <p className="flex items-center gap-3 leading-none">
-            <span className="text-lg text-foreground tracking-[2px]">Launch Week</span>{' '}
-            <Image
-              src="/images/launchweek/lwx/logos/lwx_logo.svg"
-              alt="Supabase Launch Week X icon"
-              width={16}
-              height={16}
-            />
-          </p>
-          <CountdownComponent date={LWX_LAUNCH_DATE} showCard={false} />
-        </div>
+        {!hasTicket && (
+          <div className="flex flex-col items-center gap-1 text-light font-mono uppercase ">
+            <p className="flex items-center gap-3 leading-none">
+              <span className="text-lg text-foreground tracking-[2px]">Launch Week</span>{' '}
+              <Image
+                src="/images/launchweek/lwx/logos/lwx_logo.svg"
+                alt="Supabase Launch Week X icon"
+                width={16}
+                height={16}
+              />
+            </p>
+            <CountdownComponent date={LWX_LAUNCH_DATE} showCard={false} />
+          </div>
+        )}
         <div className="relative min-h-[500px] md:min-h-[634px] z-10 w-full flex flex-col justify-center items-center gap-5 md:gap-10 text-center">
           <LazyMotion features={domAnimation}>
             <AnimatePresence exitBeforeEnter key={ticketState}>
@@ -128,7 +130,23 @@ const TicketingFlow = () => {
                       </p>
                     )}
                     {!hasPlatinumTicket && <TicketPresence />}
-                    <div className="w-full h-auto border border-muted rounded-lg bg-[#060809] mt-8 overflow-hidden">
+                    <div className="mt-4 w-full">
+                      <TicketActions />
+                    </div>
+                    {hasPlatinumTicket ? (
+                      <p className="my-4 text-foreground-lighter">
+                        Stay tuned after Launch Week X to know if you won.
+                      </p>
+                    ) : (
+                      <p className="my-4 text-foreground-lighter">
+                        Win a keyboard and other{' '}
+                        <Link href="#prizes" className="underline">
+                          Launch Week X awards
+                        </Link>
+                        .
+                      </p>
+                    )}
+                    {/* <div className="w-full h-auto border border-muted rounded-lg bg-[#060809] mt-8 overflow-hidden">
                       {hasPlatinumTicket ? (
                         <p className="p-6">Stay tuned after Launch Week X to know if you won.</p>
                       ) : (
@@ -151,7 +169,7 @@ const TicketingFlow = () => {
                           height={500}
                         />
                       </div>
-                    </div>
+                    </div> */}
                   </div>
                 </m.div>
               )}
