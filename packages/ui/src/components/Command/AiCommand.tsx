@@ -1,8 +1,4 @@
-import type {
-  ChatCompletionResponseMessage,
-  CreateChatCompletionResponse,
-  CreateChatCompletionResponseChoicesInner,
-} from 'openai'
+import OpenAI from 'openai'
 import {
   Dispatch,
   SetStateAction,
@@ -24,15 +20,15 @@ import {
   Input,
   markdownComponents,
 } from 'ui'
-import { AiIcon, AiIconChat } from './Command.icons'
+import { AiIconChat } from './Command.icons'
 import { CommandGroup, CommandItem, useAutoInputFocus, useHistoryKeys } from './Command.utils'
 
 import { AiWarning } from './Command.alerts'
 import { useCommandMenu } from './CommandMenuProvider'
 
 import ReactMarkdown from 'react-markdown'
-import { cn } from './../../lib/utils'
 import remarkGfm from 'remark-gfm'
+import { cn } from './../../lib/utils'
 
 const questions = [
   'How do I get started with Supabase?',
@@ -44,10 +40,10 @@ const questions = [
 ]
 
 type CreateChatCompletionResponseChoicesInnerDelta = Omit<
-  CreateChatCompletionResponseChoicesInner,
+  OpenAI.Chat.Completions.ChatCompletion.Choice,
   'message'
 > & {
-  delta: Partial<ChatCompletionResponseMessage>
+  delta: Partial<OpenAI.Chat.Completions.ChatCompletionMessage>
 }
 
 function getEdgeFunctionUrl() {
@@ -236,12 +232,14 @@ export function useAiChat({
 
           setIsResponding(true)
 
-          const completionResponse: CreateChatCompletionResponse = JSON.parse(e.data)
+          const completionResponse: OpenAI.Chat.Completions.ChatCompletion = JSON.parse(e.data)
+          completionResponse.choices[0].message
           const [
             {
               delta: { content },
             },
-          ] = completionResponse.choices as CreateChatCompletionResponseChoicesInnerDelta[]
+          ] =
+            completionResponse.choices as unknown as CreateChatCompletionResponseChoicesInnerDelta[]
 
           if (content) {
             dispatchMessage({
@@ -328,12 +326,12 @@ export function queryAi(messages: Message[], timeout = 0) {
           return
         }
 
-        const completionResponse: CreateChatCompletionResponse = JSON.parse(e.data)
+        const completionResponse: OpenAI.Chat.Completions.ChatCompletion = JSON.parse(e.data)
         const [
           {
             delta: { content },
           },
-        ] = completionResponse.choices as CreateChatCompletionResponseChoicesInnerDelta[]
+        ] = completionResponse.choices as unknown as CreateChatCompletionResponseChoicesInnerDelta[]
 
         if (content) {
           answer += content
