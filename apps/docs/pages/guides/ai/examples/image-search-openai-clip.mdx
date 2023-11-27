@@ -97,7 +97,7 @@ def seed():
 
     # add records to the *images* collection
     images.upsert(
-        [
+        records=[
             (
                 "one.jpg",        # the vector's identifier
                 img_emb1,          # the vector. list or np.array
