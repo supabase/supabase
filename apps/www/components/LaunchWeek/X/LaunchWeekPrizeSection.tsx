@@ -80,7 +80,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
                     <Link
                       href="https://supabase.store/"
                       target="_blank"
-                      className="inline hover:underline text-brand"
+                      className="inline hover:underline text-foreground-light"
                     >
                       Supabase Store
                     </Link>

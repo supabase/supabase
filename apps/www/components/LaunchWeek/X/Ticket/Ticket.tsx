@@ -6,11 +6,14 @@ import Panel from '~/components/Panel'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import TicketProfile from './TicketProfile'
 import TicketFooter from './TicketFooter'
+import { useParams } from 'common'
 
 export default function Ticket() {
   const { userData: user, showCustomizationForm, setShowCustomizationForm } = useConfData()
   const { golden = false, bg_image_id: bgImageId = '1' } = user
   const [imageHasLoaded, setImageHasLoaded] = useState(false)
+  const params = useParams()
+  const sharePage = !!params.username
 
   const fallbackImg = `/images/launchweek/lwx/tickets/lwx_ticket_bg_${
     golden ? 'platinum' : 'regular'
@@ -38,13 +41,17 @@ export default function Ticket() {
       shimmerToColor="hsl(var(--background-default))"
     >
       {/* Edit hover button */}
-      <button
-        className="absolute z-40 inset-0 w-full h-full outline-none"
-        onClick={handleCustomizeTicket}
-      />
-      <div className="hidden md:flex opacity-0 translate-y-3 group-hover/ticket:opacity-100 group-hover/ticket:translate-y-0 transition-all absolute z-30 inset-0 m-auto w-10 h-10 rounded-full items-center justify-center bg-[#020405] border shadow-lg text-foreground">
-        {!showCustomizationForm ? <IconEdit2 className="w-4" /> : <IconX className="w-4" />}
-      </div>
+      {!sharePage && (
+        <>
+          <button
+            className="absolute z-40 inset-0 w-full h-full outline-none"
+            onClick={handleCustomizeTicket}
+          />
+          <div className="hidden md:flex opacity-0 translate-y-3 group-hover/ticket:opacity-100 group-hover/ticket:translate-y-0 transition-all absolute z-30 inset-0 m-auto w-10 h-10 rounded-full items-center justify-center bg-[#020405] border shadow-lg text-foreground">
+            {!showCustomizationForm ? <IconEdit2 className="w-4" /> : <IconX className="w-4" />}
+          </div>
+        </>
+      )}
 
       <div className="absolute inset-0 h-full p-6 md:p-12 z-30 flex flex-col justify-between w-full md:h-full flex-1 overflow-hidden">
         <TicketProfile />
