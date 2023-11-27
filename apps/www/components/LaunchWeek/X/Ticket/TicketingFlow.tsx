@@ -34,7 +34,7 @@ const TicketingFlow = () => {
 
   return (
     <>
-      <SectionContainer className="relative flex flex-col pt-8 lg:pt-20 items-center gap-5 text-center h-auto lg:min-h-[886px]">
+      <SectionContainer className="relative flex flex-col !pt-8 lg:!pt-20 items-center gap-5 text-center h-auto lg:min-h-[886px]">
         <h1 className="sr-only">Supabase Launch Week X | {LWX_DATE}</h1>
         <div className="flex flex-col items-center gap-1 text-light font-mono uppercase ">
           <p className="flex items-center gap-3 leading-none">
@@ -107,7 +107,7 @@ const TicketingFlow = () => {
                   exit={exit}
                   className="w-full flex flex-col xl:flex-row items-center xl:justify-center xl:items-start gap-8 md:gap-10 xl:gap-20 text-foreground"
                 >
-                  <div className="w-full ld:w-auto min-h-[400px] max-w-2xl flex flex-col items-center">
+                  <div className="w-full ld:w-auto min-h-[400px] mt-3 md:mt-12 xl:mt-0 max-w-2xl flex flex-col items-center">
                     <TicketContainer />
                   </div>
                   <div className="order-last xl:order-first xl:h-full max-w-md gap-3 flex flex-col items-center justify-center xl:items-start xl:justify-start xl:text-left">

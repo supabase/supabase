@@ -30,8 +30,8 @@ export default function TicketProfile() {
           {HAS_ROLE && <span>{metadata?.role}</span>}
           {HAS_COMPANY && (
             <span>
-              {HAS_ROLE && ' '}
-              <span>at</span> {metadata?.company}
+              {HAS_ROLE && <span> at </span>}
+              {metadata?.company}
             </span>
           )}
         </div>

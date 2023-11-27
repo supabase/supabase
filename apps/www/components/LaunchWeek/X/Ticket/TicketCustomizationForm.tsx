@@ -1,10 +1,16 @@
 import React, { useState } from 'react'
-import { Badge, IconCheck, Input, cn } from 'ui'
-import useConfData from '../../hooks/use-conf-data'
-import { useDebounce } from 'common'
+import { Badge, Button, IconCheck, Input, cn } from 'ui'
+import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
+import { useBreakpoint, useDebounce } from 'common'
 
-const TicketCustomizationForm = () => {
-  const { supabase, userData: user } = useConfData()
+const TicketCustomizationForm = ({ className }: { className?: string }) => {
+  const isMobile = useBreakpoint()
+  const {
+    supabase,
+    userData: user,
+    showCustomizationForm,
+    setShowCustomizationForm,
+  } = useConfData()
   const defaultFormValues = {
     role: user.metadata?.role,
     company: user.metadata?.company,
@@ -42,7 +48,12 @@ const TicketCustomizationForm = () => {
 
   return (
     <form
-      className="w-full grid grid-cols-1 md:grid-cols-3 gap-2 max-w-[300px] md:max-w-none mx-auto"
+      className={cn(
+        'w-full grid grid-cols-1 md:grid-cols-3 gap-2 max-w-[300px] md:max-w-none mx-auto -mt-10 transition-all opacity-0 translate-y-3',
+        (isMobile || showCustomizationForm) && 'opacity-100 translate-y-0',
+        isMobile && 'mt-2',
+        className
+      )}
       onChange={() => debouncedChangeHandler()}
     >
       <Input
@@ -89,16 +100,28 @@ const TicketCustomizationForm = () => {
           />
         }
       />
-      <div className="flex items-center order-first md:order-last justify-center md:justify-end gap-2">
-        {IS_SAVED && <span className="opacity-0 animate-fade-in text-xs text-brand">Saved</span>}
+      <div className="flex items-center justify-center md:justify-end gap-2">
+        {IS_SAVED && (
+          <span className="hidden md:inline opacity-0 animate-fade-in text-xs text-foreground-light">
+            Saved
+          </span>
+        )}
         {HAS_ERROR && (
-          <span className="opacity-0 animate-fade-in text-xs text-foreground">
+          <span className="hidden md:inline opacity-0 animate-fade-in text-xs text-foreground">
             Something went wrong
           </span>
         )}
-        <Badge color="brand" className="truncate lg:max-w-sm">
+        {/* <Badge color="brand" className="truncate lg:max-w-sm">
           @{user.username}
-        </Badge>
+        </Badge> */}
+        <Button
+          type="outline"
+          size="tiny"
+          block={isMobile}
+          onClick={() => setShowCustomizationForm && setShowCustomizationForm(false)}
+        >
+          Done
+        </Button>
       </div>
     </form>
   )

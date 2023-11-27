@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import Image from 'next/image'
-import { cn } from 'ui'
+import { IconEdit, IconEdit2, IconX, cn } from 'ui'
 
 import Panel from '~/components/Panel'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
@@ -8,7 +8,7 @@ import TicketProfile from './TicketProfile'
 import TicketFooter from './TicketFooter'
 
 export default function Ticket() {
-  const { userData: user } = useConfData()
+  const { userData: user, showCustomizationForm, setShowCustomizationForm } = useConfData()
   const { golden = false, bg_image_id: bgImageId = '1' } = user
   const [imageHasLoaded, setImageHasLoaded] = useState(false)
 
@@ -25,14 +25,24 @@ export default function Ticket() {
     },
   }
 
+  function handleCustomizeTicket() {
+    setShowCustomizationForm && setShowCustomizationForm(!showCustomizationForm)
+  }
+
   return (
     <Panel
       hasShimmer
       outerClassName="flex relative flex-col w-[300px] h-auto max-h-[480px] md:w-full md:max-w-none rounded-3xl !shadow-xl"
-      innerClassName="flex relative flex-col justify-between w-full transition-colors aspect-[1/1.6] md:aspect-[1.967/1] rounded-3xl bg-[#020405] text-left text-sm"
+      innerClassName="flex relative flex-col justify-between w-full transition-colors aspect-[1/1.6] md:aspect-[1.967/1] rounded-3xl bg-[#020405] text-left text-sm group/ticket"
       shimmerFromColor="hsl(var(--border-strong))"
       shimmerToColor="hsl(var(--background-default))"
     >
+      {/* Edit hover button */}
+      <button className="absolute z-40 inset-0 w-full h-full" onClick={handleCustomizeTicket} />
+      <div className="hidden md:flex opacity-0 translate-y-3 group-hover/ticket:opacity-100 group-hover/ticket:translate-y-0 transition-all absolute z-30 inset-0 m-auto w-10 h-10 rounded-full items-center justify-center bg-[#020405] border shadow-lg">
+        {!showCustomizationForm ? <IconEdit2 className="w-4" /> : <IconX className="w-4" />}
+      </div>
+
       <div className="absolute inset-0 h-full p-6 md:p-12 z-30 flex flex-col justify-between w-full md:h-full flex-1 overflow-hidden">
         <TicketProfile />
         <TicketFooter />

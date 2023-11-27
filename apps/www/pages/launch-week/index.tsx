@@ -21,6 +21,7 @@ export default function TicketHome() {
   const ticketNumber = query.ticketNumber?.toString()
   const bgImageId = query.bgImageId?.toString()
   const [session, setSession] = useState<Session | null>(null)
+  const [showCustomizationForm, setShowCustomizationForm] = useState<boolean>(false)
 
   const defaultUserData = {
     id: query.id?.toString(),
@@ -97,6 +98,8 @@ export default function TicketHome() {
           setUserData,
           ticketState,
           setTicketState,
+          showCustomizationForm,
+          setShowCustomizationForm,
         }}
       >
         <DefaultLayout>

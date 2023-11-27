@@ -28,6 +28,8 @@ type ConfDataContextType = {
   setUserData: React.Dispatch<React.SetStateAction<UserData>>
   ticketState: TicketState
   setTicketState: React.Dispatch<React.SetStateAction<TicketState>>
+  showCustomizationForm?: boolean
+  setShowCustomizationForm?: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export const ConfDataContext = createContext<ConfDataContextType | null>(null)
