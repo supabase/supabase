@@ -8,18 +8,19 @@ import TicketCopy from './TicketCopy'
 
 type Props = {
   username: string
-  golden?: boolean
 }
 
-export default function TicketActions({ username, golden = false }: Props) {
+export default function TicketActions({ username }: Props) {
+  const { userData, supabase } = useConfData()
+  const { golden } = userData
   const [_imgReady, setImgReady] = useState(false)
   const [_loading, setLoading] = useState(false)
   const downloadLink = useRef<HTMLAnchorElement>()
+  console.log('golden', golden)
   const link = `${SITE_URL}/tickets/${username}?lw=x${golden ? `&platinum=true` : ''}`
   const permalink = encodeURIComponent(link)
   const text = golden ? TWEET_TEXT_GOLDEN : TWEET_TEXT
   const encodedText = encodeURIComponent(text)
-  const { userData, supabase } = useConfData()
   const tweetUrl = `https://twitter.com/intent/tweet?url=${permalink}&via=supabase&text=${encodedText}`
   const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${permalink}`
   const downloadUrl = `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lwx-ticket?username=${encodeURIComponent(
