@@ -73,29 +73,30 @@ const UtilityActions = ({
           />
         )}
 
-        <div className="mx-2">
-          <RoleImpersonationPopover serviceRoleLabel="postgres" />
-        </div>
+        <div className="flex items-center">
+          <RoleImpersonationPopover serviceRoleLabel="postgres" variant="connected-on-right" />
 
-        <Button
-          onClick={() => executeQuery()}
-          disabled={isDisabled || isExecuting}
-          loading={isExecuting}
-          type="default"
-          size="tiny"
-          iconRight={
-            <div className="flex items-center space-x-1">
-              {os === 'macos' ? (
-                <IconCommand size={10} strokeWidth={1.5} />
-              ) : (
-                <p className="text-xs text-foreground-light">CTRL</p>
-              )}
-              <IconCornerDownLeft size={10} strokeWidth={1.5} />
-            </div>
-          }
-        >
-          {hasSelection ? 'Run selected' : 'Run'}
-        </Button>
+          <Button
+            onClick={() => executeQuery()}
+            disabled={isDisabled || isExecuting}
+            loading={isExecuting}
+            type="default"
+            size="tiny"
+            iconRight={
+              <div className="flex items-center space-x-1">
+                {os === 'macos' ? (
+                  <IconCommand size={10} strokeWidth={1.5} />
+                ) : (
+                  <p className="text-xs text-foreground-light">CTRL</p>
+                )}
+                <IconCornerDownLeft size={10} strokeWidth={1.5} />
+              </div>
+            }
+            className="rounded-l-none"
+          >
+            {hasSelection ? 'Run selected' : 'Run'}
+          </Button>
+        </div>
       </div>
     </>
   )

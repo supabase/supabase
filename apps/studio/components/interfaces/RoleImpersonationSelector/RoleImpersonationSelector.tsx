@@ -48,10 +48,6 @@ const RoleImpersonationSelector = ({ serviceRoleLabel }: RoleImpersonationSelect
     setSelectedOption(value)
   }
 
-  function onStopImpersonatingUser() {
-    setSelectedOption('service_role')
-  }
-
   return (
     <div className="flex flex-col gap-5">
       <h2 className="text-foreground text-base">Database connection settings</h2>
@@ -115,7 +111,7 @@ const RoleImpersonationSelector = ({ serviceRoleLabel }: RoleImpersonationSelect
 
             <hr />
 
-            <UserImpersonationSelector onStopImpersonatingUser={onStopImpersonatingUser} />
+            <UserImpersonationSelector />
           </div>
         )}
       </div>

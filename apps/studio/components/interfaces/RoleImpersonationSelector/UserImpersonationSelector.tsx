@@ -8,11 +8,7 @@ import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-stat
 import { Button, IconLoader, IconSearch, IconUser, IconX, Input } from 'ui'
 import { getAvatarUrl, getDisplayName } from '../Auth/Users/UserListItem.utils'
 
-export interface UserImpersonationSelectorProps {
-  onStopImpersonatingUser?: () => void
-}
-
-const UserImpersonationSelector = ({ onStopImpersonatingUser }: UserImpersonationSelectorProps) => {
+const UserImpersonationSelector = () => {
   const [searchText, setSearchText] = useState('')
   const debouncedSearchText = useDebounce(searchText, 300)
 
@@ -44,8 +40,6 @@ const UserImpersonationSelector = ({ onStopImpersonatingUser }: UserImpersonatio
 
   function stopImpersonating() {
     state.setRole(undefined)
-
-    onStopImpersonatingUser?.()
   }
 
   return (
@@ -112,7 +106,7 @@ const UserImpersonationSelector = ({ onStopImpersonatingUser }: UserImpersonatio
 
           {isSuccess &&
             (data.users.length > 0 ? (
-              <ul className="divide-y">
+              <ul className="divide-y max-h-[192px] overflow-y-scroll">
                 {data.users.map((user) => (
                   <li key={user.id}>
                     <UserRow user={user} onClick={impersonateUser} />
