@@ -130,7 +130,7 @@ const TicketingFlow = () => {
                       </p>
                     )}
                     {!hasPlatinumTicket && <TicketPresence />}
-                    <div className="w-full h-auto text-center md:text-left border border-muted flex flex-col md:flex-row items-stretch rounded-lg bg-[#060809] mt-8 overflow-hidden">
+                    <div className="w-full h-auto text-center md:text-left border border-muted flex flex-col md:flex-row items-stretch rounded-lg bg-[#060809] mt-2 md:mt-8 overflow-hidden">
                       <div className="flex flex-col md:w-2/3 gap-1 pb-6">
                         {hasPlatinumTicket ? (
                           <p className="p-6 pb-3">
@@ -169,7 +169,7 @@ const TicketingFlow = () => {
         <LWXBackground
           className={cn(
             'absolute z-0 top-0 left-0 right-0 bottom-0 w-full flex items-center justify-center opacity-100 transition-opacity',
-            hasTicket && 'opacity-10'
+            hasTicket && 'opacity-20'
           )}
         />
       </SectionContainer>
