@@ -143,7 +143,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
           </Button>
         )}
 
-        <RoleImpersonationPopover />
+        <RoleImpersonationPopover serviceRoleLabel="postgres" />
 
         {realtimeEnabled && (
           <Button

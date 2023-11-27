@@ -1,6 +1,6 @@
 import { User } from 'data/auth/users-query'
 
-export function getDisplayName(user: User, fallback = '-') {
+export function getDisplayName(user: User, fallback = '-'): string {
   const {
     displayName,
     display_name,
@@ -27,5 +27,35 @@ export function getDisplayName(user: User, fallback = '-') {
     full_name ||
     (first && last && `${first} ${last}`) ||
     fallback
+  )
+}
+
+export function getAvatarUrl(user: User): string | undefined {
+  const {
+    avatarUrl,
+    avatarURL,
+    avatar_url,
+    profileUrl,
+    profileURL,
+    profile_url,
+    profileImage,
+    profile_image,
+    profileImageUrl,
+    profileImageURL,
+    profile_image_url,
+  } = user.raw_user_meta_data ?? {}
+
+  return (
+    avatarUrl ||
+    avatarURL ||
+    avatar_url ||
+    profileImage ||
+    profile_image ||
+    profileUrl ||
+    profileURL ||
+    profile_url ||
+    profileImageUrl ||
+    profileImageURL ||
+    profile_image_url
   )
 }

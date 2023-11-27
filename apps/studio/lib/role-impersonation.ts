@@ -18,6 +18,8 @@ export type PostgrestImpersonationRole =
       user: User
     }
 
+export type PostgrestRole = PostgrestImpersonationRole['role']
+
 export type CustomImpersonationRole = {
   type: 'custom'
   role: string

@@ -36,7 +36,7 @@ import clsx from 'clsx'
 import { MouseEventHandler, useCallback, useEffect, useState } from 'react'
 
 import { useCheckPermissions } from 'hooks'
-import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
+import { RoleImpersonationSelector } from '../RoleImpersonationSelector'
 import styles from './graphiql.module.css'
 
 export interface GraphiQLProps {
@@ -359,11 +359,11 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                       {canReadJWTSecret && (
                         <div
                           className={clsx(
-                            'graphiql-editor',
+                            'graphiql-editor px-1',
                             activeSecondaryEditor !== 'role-impersonation' && 'hidden'
                           )}
                         >
-                          <RoleImpersonationPopover />
+                          <RoleImpersonationSelector />
                         </div>
                       )}
                     </section>

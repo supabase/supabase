@@ -74,7 +74,7 @@ const UtilityActions = ({
         )}
 
         <div className="mx-2">
-          <RoleImpersonationPopover />
+          <RoleImpersonationPopover serviceRoleLabel="postgres" />
         </div>
 
         <Button

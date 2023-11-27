@@ -5,7 +5,11 @@ import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-stat
 import { getDisplayName } from '../Auth/Users/UserListItem.utils'
 import RoleImpersonationSelector from './RoleImpersonationSelector'
 
-const RoleImpersonationPopover = () => {
+export interface RoleImpersonationPopoverProps {
+  serviceRoleLabel?: string
+}
+
+const RoleImpersonationPopover = ({ serviceRoleLabel }: RoleImpersonationPopoverProps) => {
   const state = useRoleImpersonationStateSnapshot()
   const isImpersonatingRole = state.role !== undefined
 
@@ -25,8 +29,12 @@ const RoleImpersonationPopover = () => {
           </div>
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-full overflow-hidden" side="bottom" align="end">
-        <RoleImpersonationSelector />
+      <PopoverContent_Shadcn_
+        className="p-5 w-full overflow-hidden bg-background"
+        side="bottom"
+        align="end"
+      >
+        <RoleImpersonationSelector serviceRoleLabel={serviceRoleLabel} />
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>
   )

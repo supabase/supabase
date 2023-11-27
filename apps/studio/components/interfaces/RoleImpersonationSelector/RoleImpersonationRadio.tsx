@@ -1,18 +1,20 @@
-import { IconCheck, cn } from 'ui'
+import { IconCheck, IconMinus, cn } from 'ui'
 
-export interface RoleImpersonationRadioProps {
-  value: string
-  isSelected: boolean
-  onSelectedChange: (value: string) => void
+export interface RoleImpersonationRadioProps<T extends string> {
+  label?: string
+  value: T
+  isSelected: boolean | 'partially'
+  onSelectedChange: (value: T) => void
   icon?: React.ReactNode
 }
 
-const RoleImpersonationRadio = ({
+function RoleImpersonationRadio<T extends string>({
+  label,
   value,
   isSelected,
   onSelectedChange,
   icon,
-}: RoleImpersonationRadioProps) => {
+}: RoleImpersonationRadioProps<T>) {
   return (
     <label
       className={cn(
@@ -30,11 +32,14 @@ const RoleImpersonationRadio = ({
         {icon && <div>{icon}</div>}
 
         {isSelected && (
-          <IconCheck
-            size="tiny"
-            strokeWidth="3"
-            className="bg-foreground text-background rounded-full"
-          />
+          <div className="flex items-center justify-center p-0.5 bg-foreground text-background rounded-full">
+            {typeof isSelected === 'boolean' && (
+              <IconCheck size={12} strokeWidth="4" className="text-background" />
+            )}
+            {isSelected === 'partially' && (
+              <IconMinus size={12} strokeWidth="4" className="text-background" />
+            )}
+          </div>
         )}
       </div>
 
@@ -42,9 +47,9 @@ const RoleImpersonationRadio = ({
         type="radio"
         name="role"
         value={value}
-        checked={isSelected}
+        checked={Boolean(isSelected)}
         onChange={(e) => {
-          onSelectedChange(e.target.value)
+          onSelectedChange(e.target.value as T)
         }}
         className="invisible h-0 w-0 border-0"
       />
@@ -54,7 +59,7 @@ const RoleImpersonationRadio = ({
           isSelected && 'text-foreground'
         )}
       >
-        {value} role
+        {label ?? value} role
       </span>
     </label>
   )
