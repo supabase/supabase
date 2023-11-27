@@ -4,7 +4,7 @@ import { TextArea_Shadcn_, cn } from 'ui'
 
 export interface TextAreaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   loading: boolean
-  handleSubmit: () => void
+  handleSubmit: (event: FormDataEvent) => void
 }
 
 const ChatInputAtom = ({ className, loading, handleSubmit, ...props }: TextAreaProps) => {

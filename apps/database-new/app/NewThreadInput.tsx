@@ -1,9 +1,11 @@
 'use client'
 import { ChatInputAtom } from '@/components/Chat/ChatInput'
 import { CHAT_EXAMPLES } from '@/data/chat-examples'
+import { useAppStateSnapshot } from '@/lib/state'
+import { createClient } from '@/lib/supabase/client'
 import { useMutation } from '@tanstack/react-query'
 import { ExternalLink } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import { cn } from 'ui'
 
@@ -15,7 +17,21 @@ const suggestions = CHAT_EXAMPLES
 
 const NewThreadInput = ({ userID }: ChatInputParams) => {
   const router = useRouter()
-  const [value, setValue] = useState('')
+  const searchParams = useSearchParams()!
+
+  const [value, setValue] = useState(() => {
+    const localPrompt = localStorage.getItem('prompt')
+    if (localPrompt) {
+      localStorage.removeItem('prompt')
+      return localPrompt
+    } else {
+      return ''
+    }
+  })
+
+  const supabase = createClient()
+
+  const snap = useAppStateSnapshot()
 
   const { mutate, isPending, isSuccess } = useMutation({
     mutationFn: async (prompt: string) => {
@@ -39,8 +55,22 @@ const NewThreadInput = ({ userID }: ChatInputParams) => {
     <>
       <div className="relative w-10/12 xl:w-11/12 max-w-xl">
         <ChatInputAtom
-          handleSubmit={() => {
-            if (value.length > 0) mutate(value)
+          handleSubmit={async (event) => {
+            const {
+              data: { user },
+            } = await supabase.auth.getUser()
+
+            console.log(user)
+
+            if (!user) {
+              localStorage.setItem('prompt', value)
+              snap.setLoginDialogOpen(true)
+              event.preventDefault()
+              return
+            }
+            if (value.length > 0) {
+              mutate(value)
+            }
           }}
           autoFocus
           value={value}
