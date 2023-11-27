@@ -23,6 +23,7 @@ import {
   Input,
 } from 'ui'
 import ProjectUpgradeAlert from '../General/Infrastructure/ProjectUpgradeAlert'
+import InstanceConfiguration from './InfrastructureConfiguration/InstanceConfiguration'
 
 const InfrastructureInfo = () => {
   const { ref } = useParams()
@@ -45,6 +46,7 @@ const InfrastructureInfo = () => {
   const latestPgVersion = (latest_app_version ?? '').split('supabase-postgres-')[1]
 
   const showDbUpgrades = useFlag('databaseUpgrades')
+  const readReplicasEnabled = useFlag('readReplicas')
   const subject = 'Request%20for%20Postgres%20upgrade%20for%20project'
   const message = `Upgrade information:%0A• Manual intervention reason: ${requires_manual_intervention}`
 
@@ -60,19 +62,30 @@ const InfrastructureInfo = () => {
           </div>
         </div>
       </ScaffoldContainer>
+
       <ScaffoldDivider />
+
+      {readReplicasEnabled && (
+        <>
+          <InstanceConfiguration />
+          <ScaffoldDivider />
+        </>
+      )}
+
       <ScaffoldContainer>
+        {!readReplicasEnabled && (
+          <ScaffoldSection>
+            <ScaffoldSectionDetail>
+              <p>Configuration</p>
+              <p className="text-foreground-light text-sm">Information on your server provider</p>
+            </ScaffoldSectionDetail>
+            <ScaffoldSectionContent>
+              <Input readOnly disabled value={project?.cloud_provider} label="Cloud provider" />
+              <Input readOnly disabled value={project?.region} label="Region" />
+            </ScaffoldSectionContent>
+          </ScaffoldSection>
+        )}
         <ScaffoldSection>
-          <ScaffoldSectionDetail>
-            <p>Configuration</p>
-            <p className="text-foreground-light text-sm">Information on your server provider</p>
-          </ScaffoldSectionDetail>
-          <ScaffoldSectionContent>
-            <Input readOnly disabled value={project?.cloud_provider} label="Cloud provider" />
-            <Input readOnly disabled value={project?.region} label="Region" />
-          </ScaffoldSectionContent>
-        </ScaffoldSection>
-        <ScaffoldSection className="!pt-0">
           <ScaffoldSectionDetail>
             <p>Service Versions</p>
             <p className="text-foreground-light text-sm">
