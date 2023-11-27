@@ -20,8 +20,10 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   ScrollArea,
+  cn,
 } from 'ui'
 import { getDisplayName } from '../Auth/Users/UserListItem.utils'
+import RoleImpersonationRadio from './RoleImpersonationRadio'
 
 export interface RoleImpersonationSelectorProps {}
 
@@ -42,55 +44,104 @@ const RoleImpersonationSelector = ({}: RoleImpersonationSelectorProps) => {
     }
   )
 
-  const [selectedOption, setSelectedOption] = useState<string | undefined>(state.role?.role)
+  const [selectedOption, setSelectedOption] = useState<string | undefined>(() => {
+    if (
+      state.role?.type === 'postgrest' &&
+      (state.role.role === 'anon' || state.role.role === 'authenticated')
+    ) {
+      return state.role.role
+    }
+
+    return 'postgres'
+  })
 
   return (
-    <div>
-      <h2>Database connection settings</h2>
+    <div className="flex flex-col gap-5 bg-background p-5">
+      <h2 className="text-foreground">Database connection settings</h2>
 
-      <form>
-        <label>
-          <input
-            type="radio"
-            name="role"
-            value="postgres"
-            checked={selectedOption === 'postgres'}
-            onChange={(e) => {
-              setSelectedOption(e.target.value)
-            }}
-            className=""
-          />
-          <span>postgres role</span>
-        </label>
+      <form
+        className="flex gap-4"
+        onSubmit={(e) => {
+          // don't allow form submission
+          e.preventDefault()
+        }}
+      >
+        <RoleImpersonationRadio
+          value="postgres"
+          isSelected={selectedOption === 'postgres'}
+          onSelectedChange={setSelectedOption}
+          icon={
+            <svg width="53" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g opacity={selectedOption === 'postgres' ? '1' : '.5'}>
+                <rect x="37.161" y=".5" width="15" height="15" rx="5.5" stroke="#EDEDED" />
+                <path
+                  d="M1 10.5h32.214"
+                  stroke="#33A7E9"
+                  stroke-linecap="round"
+                  stroke-dasharray="2 2"
+                />
+                <rect x="15.964" y=".5" width="9" height="15" rx="4.5" stroke="#7E7E7E" />
+                <path
+                  d="M1 5.5h32.214"
+                  stroke="#33A7E9"
+                  stroke-linecap="round"
+                  stroke-dasharray="2 2"
+                />
+              </g>
+            </svg>
+          }
+        />
 
-        <label>
-          <input
-            type="radio"
-            name="role"
-            value="anon"
-            checked={selectedOption === 'option2'}
-            onChange={(e) => {
-              setSelectedOption(e.target.value)
-            }}
-            className=""
-          />
-          <span>anon role</span>
-        </label>
+        <RoleImpersonationRadio
+          value="anon"
+          isSelected={selectedOption === 'anon'}
+          onSelectedChange={setSelectedOption}
+          icon={
+            <svg width="53" height="17" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g opacity={selectedOption === 'anon' ? '1' : '.5'}>
+                <path
+                  d="M1 5a.5.5 0 0 0 0 1V5Zm16.218 1h.5V5h-.5v1ZM1 6h1.014V5H1v1Zm3.04 0h2.028V5H4.041v1Zm4.056 0h2.027V5H8.096v1Zm4.054 0h2.027V5H12.15v1Zm4.055 0h1.013V5h-1.013v1Z"
+                  fill="#7E7E7E"
+                />
+                <path d="m15.92 12.566 9.04-9.04" stroke="#EDEDED" />
+                <rect x="15.964" y=".5" width="9" height="15" rx="4.5" stroke="#EDEDED" />
+                <rect x="37.161" y=".75" width="15" height="15" rx="5.5" stroke="#EDEDED" />
+                <path
+                  d="M1 10.5h32.214"
+                  stroke="#33A7E9"
+                  stroke-linecap="round"
+                  stroke-dasharray="2 2"
+                />
+                <path d="M15.96 7.566 22.568.96M19.049 14.89l5.957-5.957" stroke="#EDEDED" />
+              </g>
+            </svg>
+          }
+        />
 
-        <label>
-          <input
-            type="radio"
-            name="role"
-            value="authenticated"
-            checked={selectedOption === 'option3'}
-            onChange={(e) => {
-              setSelectedOption(e.target.value)
-            }}
-            className=""
-          />
-          <span>authenticated role</span>
-        </label>
+        <RoleImpersonationRadio
+          value="authenticated"
+          isSelected={selectedOption === 'authenticated'}
+          onSelectedChange={setSelectedOption}
+        />
       </form>
+
+      <div className="text-foreground-light text-sm">
+        {selectedOption === 'postgres' && (
+          <p>
+            The default Postgres role. This has admin privileges.
+            <br />
+            It will bypass Row Level Security (RLS) policies.
+          </p>
+        )}
+
+        {selectedOption === 'anon' && (
+          <p>
+            For "anonymous access". This is the role which the API (PostgREST) will use when a user
+            <br />
+            is not logged in. It will respect Row Level Security (RLS) policies.
+          </p>
+        )}
+      </div>
     </div>
   )
 }
