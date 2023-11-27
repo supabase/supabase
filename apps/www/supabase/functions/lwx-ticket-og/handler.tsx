@@ -14,27 +14,28 @@ export async function handler(req: Request) {
   try {
     if (req.method !== 'POST') throw new Error('method not supported')
     const {
-      username,
+      username = 'fsansalvadore',
       platinum = false,
     }: {
-      username?: string
+      username: string
       platinum?: boolean
     } = await req.json()
+
+    console.log('lwx-ticket-og username', username)
+    console.log('lwx-ticket-og platinum?', platinum)
 
     const timestamp = encodeURI(new Date().toISOString())
     const ticketImg = `${STORAGE_URL}/tickets/${
       platinum ? 'platinum' : 'regular'
     }/${BUCKET_FOLDER_VERSION}/${username}.png?t=${timestamp}`
 
+    console.log('ticketImg', ticketImg)
+
     const ticketWidth = 1100
     const ticketHeight = ticketWidth / 2
-    const STYLE_CONFIG = {
-      REG: {
-        BG: '#040404',
-      },
-      PLATINUM: {
-        BG: 'radial-gradient(100% 150% at 80% 0%, #757575, #ffffff)',
-      },
+    const BG = {
+      REG: `${STORAGE_URL}/assets/og_bg_regular.png`,
+      PLATINUM: `${STORAGE_URL}/assets/og_bg_platinum.png`,
     }
 
     const geneartedOGImage = new ImageResponse(
@@ -44,7 +45,9 @@ export async function handler(req: Request) {
             width: '1200px',
             height: '628px',
             position: 'relative',
-            background: STYLE_CONFIG[platinum ? 'PLATINUM' : 'REG'].BG,
+            backgroundImage: BG[platinum ? 'PLATINUM' : 'REG'],
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
             overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column',
@@ -60,7 +63,7 @@ export async function handler(req: Request) {
             src={ticketImg}
             style={{
               borderRadius: '26px',
-              boxShadow: '0px 4px 20px 0px rgba(0, 0, 0, 0.15)',
+              boxShadow: '0px 4px 25px rgba(0, 0, 0, 0.2)',
             }}
           />
         </div>
@@ -76,6 +79,8 @@ export async function handler(req: Request) {
       }
     )
 
+    console.log('geneartedOGImage', geneartedOGImage)
+
     // Upload image to storage.
     const supabaseAdminClient = createClient(
       // Supabase API URL - env var exported by default when deployed.
@@ -84,6 +89,7 @@ export async function handler(req: Request) {
       Deno.env.get('MISC_USE_ANON_KEY') ?? ''
     )
 
+    // return geneartedOGImage
     const { error: storageError } = await supabaseAdminClient.storage
       .from('images')
       .upload(
@@ -95,6 +101,8 @@ export async function handler(req: Request) {
           upsert: true,
         }
       )
+
+    console.log('storageError?', storageError)
     if (storageError) throw new Error(`storageError: ${storageError.message}`)
 
     return new Response(JSON.stringify({ success: true }), {

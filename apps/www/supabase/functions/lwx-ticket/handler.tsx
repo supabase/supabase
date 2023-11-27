@@ -32,7 +32,6 @@ const STYLING_CONGIF = {
 }
 
 export async function handler(req: Request) {
-  console.log
   const url = new URL(req.url)
   const username = url.searchParams.get('username') ?? url.searchParams.get('amp;username')
   const assumePlatinum = url.searchParams.get('platinum') ?? url.searchParams.get('amp;platinum')
@@ -76,17 +75,20 @@ export async function handler(req: Request) {
     const { name, ticketNumber, metadata } = data
 
     const platinum = (!!data?.sharedOnTwitter && !!data?.sharedOnLinkedIn) ?? false
+    console.log('assumePlatinum??', assumePlatinum)
+    console.log('platinum??', platinum)
     if (assumePlatinum && !platinum) return await fetch(`${STORAGE_URL}/assets/golden_no_meme.png`)
+    console.log('no meme??')
 
     // Else, generate image and upload to storage.
     const BACKGROUND = {
       REG: {
-        BG: `${STORAGE_URL}/assets/lwx_ticket_bg_regular.png?t=2023-11-24T12%3A52%3A28.581Z`,
-        LOGO: `${STORAGE_URL}/assets/logos/supabase_lwx_logo_dark.png?t=2023-11-23T09%3A37%3A36.974Z`,
+        BG: `${STORAGE_URL}/assets/lwx_ticket_bg_platinum.png?t=2023-11-27T12%3A35%3A58.316Z`,
+        LOGO: `${STORAGE_URL}/assets/logos/supabase_lwx_logo_dark.png`,
       },
       PLATINUM: {
-        BG: `${STORAGE_URL}/assets/lwx_ticket_bg_platinum.png?t=2023-11-24T12%3A52%3A51.031Z`,
-        LOGO: `${STORAGE_URL}/assets/logos/supabase_lwx_logo_light.png?t=2023-11-24T10%3A37%3A36.974Z`,
+        BG: `${STORAGE_URL}/assets/lwx_ticket_bg_platinum.png?t=2023-11-27T12%3A35%3A58.316Z`,
+        LOGO: `${STORAGE_URL}/assets/logos/supabase_lwx_logo_light.png`,
       },
     }
 
@@ -129,7 +131,7 @@ export async function handler(req: Request) {
                 right: '-1px',
                 zIndex: '0',
               }}
-              src={platinum ? BACKGROUND['PLATINUM']['BG'] : BACKGROUND['REG']['BG']}
+              src={platinum ? BACKGROUND['PLATINUM'].BG : BACKGROUND['REG'].BG}
             />
 
             {/* Name & username */}
@@ -228,7 +230,7 @@ export async function handler(req: Request) {
                   margin: '0',
                 }}
               >
-                DEC 11-15 / 10AM PT
+                DEC 11-15 / 8AM PT
               </p>
             </div>
           </div>
@@ -271,8 +273,12 @@ export async function handler(req: Request) {
           upsert: true,
         }
       )
+
+    console.log('storageError?', storageError)
     if (storageError) throw new Error(`storageError: ${storageError.message}`)
 
+    console.log('lwx-ticket username', username)
+    console.log('lwx-ticket platinum?', platinum)
     // Generate og image
     fetch('https://obuldanrptloktxcffvn.supabase.co/functions/v1/lwx-ticket-og', {
       method: 'POST',
