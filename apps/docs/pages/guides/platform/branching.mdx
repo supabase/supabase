@@ -39,6 +39,7 @@ Supabase projects can consist of multiple Preview Branches. All Preview Branches
               alt="Each branch has a separate Supabase instance."
               src="/docs/img/guides/platform/branching/github-workflow-without-branching.jpg"
             />
+
   <Image
           className="dark:hidden"
           alt="Each branch has a separate Supabase instance."
@@ -69,7 +70,6 @@ To facilitate Supabase Branching, your Supabase project will be connected to a G
 
 Supabase Branching works with [GitHub](#branching-with-github). Future iterations may support other Git providers. If you are interested in other Git providers or a non-Git-based workflow, join the discussions for [GitLab Branching, BitBucket Branching, and non-Git based Branching](https://github.com/orgs/supabase/discussions/18936).
 
-
 ### Branching with GitHub
 
 Supabase Branching uses the Supabase GitHub integration to read files from your GitHub repository. With this integration, Supabase watches all commits, branches, and pull requests of your GitHub repository.
@@ -86,6 +86,7 @@ The Preview Branch is also seeded with sample data based on `./supabase/seed.sql
               alt="Each GitHub branch can have its own Supabase preview branch."
               src="/docs/img/guides/platform/branching/github-workflow.jpg"
             />
+
   <Image
           className="dark:hidden"
           alt="Each GitHub branch can have its own Supabase preview branch."
@@ -102,6 +103,7 @@ Each time a commit is pushed with new migrations in the `./supabase/migrations` 
               alt="New migration files trigger migrations on the preview instance."
               src="/docs/img/guides/platform/branching/github-workflow-commit-migration.jpg"
             />
+
   <Image
           className="dark:hidden"
           alt="New migration files trigger migrations on the preview instance."
@@ -109,7 +111,6 @@ Each time a commit is pushed with new migrations in the `./supabase/migrations` 
         />
   <figcaption>New migration files trigger migrations on the preview instance.</figcaption>
       </figure>
-
 
 ## Alternatives to branching
 
@@ -209,6 +210,7 @@ Once your repository is [correctly prepared](#set-up-an-existing-project-for-bra
     <Admonition type="note" label="Branching is invite-only">
 
     Branching is only available to alpha testers.
+
 If you’re not in the alpha testing group, you can join the waitlist.
 
     </Admonition>
@@ -314,6 +316,7 @@ Preview branches are automatically created for each pull request, but you can al
     <Admonition type="note">
 
         **Only branches from the repository can be used to create a Preview Branch**
+
     Git branches from external contributors currently can’t support a Preview Branch
 
         </Admonition>
@@ -395,8 +398,8 @@ Dashboard changes aren’t automatically reflected in your repository. If you’
 1. Click on the active branch in the top bar to open the dropdown menu. Select the branch you want to use.
 
    <figure className="max-w-[520px]">
-         <Image src="/docs/img/guides/platform/branching/develop-your-app-develop-remotely.jpg" />
-          </figure>
+     <Image src="/docs/img/guides/platform/branching/develop-your-app-develop-remotely.jpg" />
+   </figure>
 
 2. Make changes to your database schema from the Supabase dashboard.
 3. In your terminal, navigate to the directory for your Supabase project. Use the Supabase client to pull changes from your branch to your local migrations directory. Make sure to use the database URL for your branch.
@@ -415,7 +418,9 @@ A comment is added to your PR with the deployment status of your preview branch.
 
     <figure className="max-w-[700px] mx-auto">
           <Image src="/docs/img/guides/platform/branching/develop-your-app-open-pull-request-github.jpg" />
-  {/* prettier-ignore */}
+
+{/* prettier-ignore */}
+
   <figcaption>
 
         </figcaption>
@@ -431,7 +436,9 @@ This prevents PRs from being merged when migration checks fail, and stops invali
 
     <figure className="max-w-[700px] mx-auto">
           <Image src="/docs/img/guides/platform/branching/github-required-check.jpg" />
-  {/* prettier-ignore */}
+
+{/* prettier-ignore */}
+
   <figcaption>
 
         </figcaption>
@@ -506,8 +513,6 @@ Install the Vercel integration:
 
     <Admonition type="note">
 
-
-
         </Admonition>
 
 Supabase automatically updates your Vercel project with the correct environment variables for the corresponding preview branches.
@@ -522,6 +527,6 @@ Supabase branching is a new and exciting new part of the Supabase development ec
 
 You can join the [conversation over in GitHub discussions](https://github.com/orgs/supabase/discussions/18937).
 
-export const Page = ( { children } ) => <Layout meta={meta} children={children} />
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
 export default Page
