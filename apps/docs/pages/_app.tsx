@@ -164,7 +164,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
             <TabsProvider>
               <SiteLayout>
                 <PortalToast />
-                {/* <PromoToast /> */}
+                <PromoToast />
                 <Component {...pageProps} />
               </SiteLayout>
             </TabsProvider>
