@@ -98,7 +98,7 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
                 </span>
               </div>
               <Button type="secondary" asChild>
-                <Link href={`${SITE_URL}/${username ? '?referral=' + username : ''}`}>
+                <Link href={`${SITE_URL}${username ? '?referral=' + username : ''}`}>
                   Join Launch Week X
                 </Link>
               </Button>
@@ -126,7 +126,9 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lwx-ticket?username=${encodeURIComponent(
       username ?? ''
     )}`
-  ).catch((_) => {})
+  ).catch((error) => {
+    console.log('error', error)
+  })
 
   // fetch a specific user
   if (username) {
