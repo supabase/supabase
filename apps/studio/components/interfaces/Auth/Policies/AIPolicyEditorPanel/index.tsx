@@ -255,7 +255,7 @@ export const AIPolicyEditorPanel = memo(function ({
             <div className="px-5 py-3 flex justify-between gap-3 bg-muted">
               <div className="flex gap-2 items-center text-foreground-light">
                 <FileDiff className="h-4 w-4" />
-                <span className="text-sm">Replace code</span>
+                <span className="text-sm">Apply changes from assistant</span>
               </div>
               <div className="flex gap-3">
                 <Button type="default" onClick={() => setIncomingChange(undefined)}>

@@ -4,6 +4,7 @@ import { Copy, FileDiff } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import { format } from 'sql-formatter'
 import { Badge, Button } from 'ui'
+import * as Tooltip from '@radix-ui/react-tooltip'
 
 import CodeEditor from 'components/ui/CodeEditor'
 
@@ -63,16 +64,50 @@ const Message = ({
                   options={{ scrollBeyondLastLine: false }}
                 />
                 <div className="absolute top-3 right-3 bg-surface-100 border-muted border rounded-lg h-[28px] hidden group-hover:block">
-                  <Button type="text" size="tiny" onClick={() => onDiff(formatted)}>
-                    <FileDiff className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    type="text"
-                    size="tiny"
-                    onClick={() => navigator.clipboard.writeText(formatted).then()}
-                  >
-                    <Copy className="h-4 w-4" />
-                  </Button>
+                  <Tooltip.Root delayDuration={0}>
+                    <Tooltip.Trigger>
+                      <Button type="text" size="tiny" onClick={() => onDiff(formatted)}>
+                        <FileDiff className="h-4 w-4" />
+                      </Button>
+                    </Tooltip.Trigger>
+                    <Tooltip.Portal>
+                      <Tooltip.Content side="bottom">
+                        <Tooltip.Arrow className="radix-tooltip-arrow" />
+                        <div
+                          className={[
+                            'rounded bg-alternative py-1 px-2 leading-none shadow',
+                            'border border-background',
+                          ].join(' ')}
+                        >
+                          <span className="text-xs text-foreground">Apply changes</span>
+                        </div>
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
+                  </Tooltip.Root>
+                  <Tooltip.Root delayDuration={0}>
+                    <Tooltip.Trigger>
+                      <Button
+                        type="text"
+                        size="tiny"
+                        onClick={() => navigator.clipboard.writeText(formatted).then()}
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                    </Tooltip.Trigger>
+                    <Tooltip.Portal>
+                      <Tooltip.Content side="bottom">
+                        <Tooltip.Arrow className="radix-tooltip-arrow" />
+                        <div
+                          className={[
+                            'rounded bg-alternative py-1 px-2 leading-none shadow',
+                            'border border-background',
+                          ].join(' ')}
+                        >
+                          <span className="text-xs text-foreground">Copy code</span>
+                        </div>
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
+                  </Tooltip.Root>
                 </div>
               </div>
             )
