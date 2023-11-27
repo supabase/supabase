@@ -35,7 +35,7 @@ export async function handler(req: Request) {
   const url = new URL(req.url)
   const username = url.searchParams.get('username') ?? url.searchParams.get('amp;username')
   const assumePlatinum = url.searchParams.get('platinum') ?? url.searchParams.get('amp;platinum')
-  // const userAgent = req.headers.get('user-agent')
+  const userAgent = req.headers.get('user-agent')
 
   try {
     if (!username) throw new Error('missing username param')
@@ -48,19 +48,19 @@ export async function handler(req: Request) {
     )
 
     // Track social shares
-    // if (userAgent?.toLocaleLowerCase().includes('twitter')) {
-    //   await supabaseAdminClient
-    //     .from(LW_TABLE)
-    //     .update({ sharedOnTwitter: 'now' })
-    //     .eq('username', username)
-    //     .is('sharedOnTwitter', null)
-    // } else if (userAgent?.toLocaleLowerCase().includes('linkedin')) {
-    //   await supabaseAdminClient
-    //     .from(LW_TABLE)
-    //     .update({ sharedOnLinkedIn: 'now' })
-    //     .eq('username', username)
-    //     .is('sharedOnLinkedIn', null)
-    // }
+    if (userAgent?.toLocaleLowerCase().includes('twitter')) {
+      await supabaseAdminClient
+        .from(LW_TABLE)
+        .update({ sharedOnTwitter: 'now' })
+        .eq('username', username)
+        .is('sharedOnTwitter', null)
+    } else if (userAgent?.toLocaleLowerCase().includes('linkedin')) {
+      await supabaseAdminClient
+        .from(LW_TABLE)
+        .update({ sharedOnLinkedIn: 'now' })
+        .eq('username', username)
+        .is('sharedOnLinkedIn', null)
+    }
 
     // Get ticket data
     const { data, error } = await supabaseAdminClient
