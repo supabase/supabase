@@ -47,8 +47,8 @@
     "url": "git+https://github.com/supabase/supabase.git"
   },
   "engines": {
-    "npm": ">=9.0.0 <10.0.0",
-    "node": ">=18.0.0 <21"
+    "npm": ">=9.0.0",
+    "node": ">=18.0.0"
   },
   "keywords": [
     "postgres",
