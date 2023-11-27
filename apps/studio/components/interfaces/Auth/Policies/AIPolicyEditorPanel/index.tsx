@@ -1,6 +1,7 @@
 import { FileDiff } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { memo, useCallback, useEffect, useRef, useState } from 'react'
+import toast from 'react-hot-toast'
 import { Button, Modal, SidePanel } from 'ui'
 
 import {
@@ -29,7 +30,6 @@ const DiffEditor = dynamic(
 interface AIPolicyEditorPanelProps {
   visible: boolean
   onSelectCancel: () => void
-  onSaveSuccess: () => void
 }
 
 /**
@@ -38,7 +38,6 @@ interface AIPolicyEditorPanelProps {
 export const AIPolicyEditorPanel = memo(function ({
   visible,
   onSelectCancel,
-  onSaveSuccess,
 }: AIPolicyEditorPanelProps) {
   const { meta } = useStore()
   const selectedProject = useSelectedProject()
@@ -89,7 +88,8 @@ export const AIPolicyEditorPanel = memo(function ({
     onSuccess: () => {
       // refresh all policies
       meta.policies.load()
-      onSaveSuccess()
+      toast.success('Successfully created new policy')
+      onSelectCancel()
     },
     onError: (error) => {
       setError(error)
@@ -234,6 +234,8 @@ export const AIPolicyEditorPanel = memo(function ({
   }, [visible])
 
   const messages = [...(isSuccess ? data.messages : []), ...debugThread]
+  const errorLines =
+    error?.formattedError.split('\n').filter((x: string) => x.length > 0).length ?? 0
 
   return (
     <SidePanel
@@ -287,7 +289,9 @@ export const AIPolicyEditorPanel = memo(function ({
               // for now, till we can find a better solution
               style={{
                 height:
-                  error === undefined ? 'calc(100vh - 67px - 59px)' : 'calc(100vh - 67px - 216px)',
+                  error === undefined
+                    ? 'calc(100vh - 67px - 59px)'
+                    : `calc(100vh - 67px - 155px - ${20 * errorLines}px)`,
               }}
             >
               <RLSCodeEditor
@@ -302,14 +306,14 @@ export const AIPolicyEditorPanel = memo(function ({
           <div className="flex flex-col gap-y-4 p-4 bg-overlay border-t border-overlay w-full">
             {error !== undefined && <QueryError error={error} onSelectDebug={onSelectDebug} />}
             <div className="flex justify-end gap-x-2">
-              <Button type="default" onClick={() => onSelectCancel()}>
+              <Button type="default" disabled={isExecuting} onClick={() => onSelectCancel()}>
                 Cancel
               </Button>
               <Button
                 loading={isExecuting}
                 htmlType="submit"
                 // disable the submit button when in diff mode
-                disabled={incomingChange !== undefined}
+                disabled={isExecuting || incomingChange !== undefined}
                 onClick={() => createNewPolicy()}
               >
                 Save policy

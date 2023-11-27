@@ -1,3 +1,4 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
@@ -14,11 +15,12 @@ import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useFlag, useStore } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { NextPageWithLayout } from 'types'
 import { Button, IconExternalLink, IconSearch, Input } from 'ui'
+import { AIPolicyEditorPanel } from 'components/interfaces/Auth/Policies/AIPolicyEditorPanel'
 
 /**
  * Filter tables by table name and policy name
@@ -61,6 +63,9 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   const { meta } = useStore()
   const { search } = useParams()
   const [searchString, setSearchString] = useState<string>('')
+  const canCreatePolicyWithAi = useFlag('policyEditorWithAi')
+
+  const [showPolicyAiEditor, setShowPolicyAiEditor] = useState(false)
 
   useEffect(() => {
     if (search) setSearchString(search)
@@ -92,6 +97,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 
   const filteredTables = onFilterTables(tables ?? [], policies, searchString)
   const canReadPolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'policies')
+  const canCreatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
 
   if (!canReadPolicies) {
     return <NoPermission isFullPage resourceText="view this project's RLS policies" />
@@ -121,22 +127,62 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
               icon={<IconSearch size="tiny" />}
             />
           </div>
-          <a
-            target="_blank"
-            rel="noreferrer"
-            href="https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security"
-          >
-            <Button type="link" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
-              What is RLS?
-            </Button>
-          </a>
+          <div className="flex items-center gap-x-2">
+            <a
+              target="_blank"
+              rel="noreferrer"
+              href="https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security"
+            >
+              <Button type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
+                Documentation
+              </Button>
+            </a>
+            {canCreatePolicyWithAi && (
+              <Tooltip.Root delayDuration={0}>
+                <Tooltip.Trigger>
+                  <Button
+                    type="default"
+                    disabled={!canCreatePolicies}
+                    onClick={() => setShowPolicyAiEditor(true)}
+                  >
+                    Create a new policy
+                  </Button>
+                </Tooltip.Trigger>
+                {!canCreatePolicies && (
+                  <Tooltip.Portal>
+                    <Tooltip.Content side="bottom">
+                      <Tooltip.Arrow className="radix-tooltip-arrow" />
+                      <div
+                        className={[
+                          'rounded bg-alternative py-1 px-2 leading-none shadow',
+                          'border border-background',
+                        ].join(' ')}
+                      >
+                        <span className="text-xs text-foreground">
+                          You need additional permissions to create RLS policies
+                        </span>
+                      </div>
+                    </Tooltip.Content>
+                  </Tooltip.Portal>
+                )}
+              </Tooltip.Root>
+            )}
+          </div>
         </div>
       </div>
+
       {isLoading && <GenericSkeletonLoader />}
+
       {isError && <AlertError error={error} subject="Failed to retrieve tables" />}
+
       {isSuccess && (
         <Policies tables={filteredTables} hasTables={tables.length > 0} isLocked={isLocked} />
       )}
+
+      <AIPolicyEditorPanel
+        visible={showPolicyAiEditor}
+        onSelectCancel={() => setShowPolicyAiEditor(false)}
+      />
     </div>
   )
 }

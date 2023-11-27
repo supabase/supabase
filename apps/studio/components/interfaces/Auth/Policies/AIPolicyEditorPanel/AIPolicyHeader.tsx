@@ -10,7 +10,7 @@ export const AIPolicyHeader = ({
   return (
     <div className="space-y-1 py-4 px-4 bg-overlay sm:px-6 border-b border-overlay">
       <div className="flex flex-row justify-between items-center">
-        <span className="text-sm">Create Row Level Security policy</span>
+        <span className="text-sm">Create a new row level security policy</span>
         <Button
           size="tiny"
           type="default"

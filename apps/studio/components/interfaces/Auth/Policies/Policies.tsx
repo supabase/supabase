@@ -14,7 +14,6 @@ import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import InformationBox from 'components/ui/InformationBox'
 import { tableKeys } from 'data/tables/keys'
-import { AIPolicyEditorPanel } from './AIPolicyEditorPanel'
 
 interface PoliciesProps {
   tables: PostgresTable[]
@@ -55,10 +54,6 @@ const Policies = ({ tables, hasTables, isLocked }: PoliciesProps) => {
 
   const onSelectCreatePolicy = (table: any) => {
     setSelectedSchemaAndTable({ schema: table.schema, table: table.name })
-  }
-
-  const onSelectCreatePolicyWithAI = (shown: boolean) => {
-    showRLSEditorWithAI(shown)
   }
 
   const onSelectEditPolicy = (policy: any) => {
@@ -141,7 +136,6 @@ const Policies = ({ tables, hasTables, isLocked }: PoliciesProps) => {
               isLocked={isLocked}
               onSelectToggleRLS={onSelectToggleRLS}
               onSelectCreatePolicy={onSelectCreatePolicy}
-              onSelectCreatePolicyWithAI={onSelectCreatePolicyWithAI}
               onSelectEditPolicy={onSelectEditPolicy}
               onSelectDeletePolicy={onSelectDeletePolicy}
             />
@@ -194,11 +188,6 @@ const Policies = ({ tables, hasTables, isLocked }: PoliciesProps) => {
         onCreatePolicy={onCreatePolicy}
         // @ts-ignore
         onUpdatePolicy={onUpdatePolicy}
-        onSaveSuccess={onSavePolicySuccess}
-      />
-      <AIPolicyEditorPanel
-        visible={RLSEditorWithAIShown}
-        onSelectCancel={closePolicyEditorModal}
         onSaveSuccess={onSavePolicySuccess}
       />
 
