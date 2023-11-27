@@ -171,6 +171,7 @@ async function generateEmbeddings() {
             type,
             source,
             meta,
+            content: sections.map(({ content }) => content).join(' '),
             parent_page_id: parentPage?.id,
             version: refreshVersion,
             last_refresh: refreshDate,
