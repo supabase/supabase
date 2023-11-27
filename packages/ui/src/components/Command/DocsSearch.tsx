@@ -237,7 +237,7 @@ const DocsSearch = () => {
 
       let sourcesLoaded = 0
 
-      const sources = ['search-fts', 'search-v2']
+      const sources = ['search-fts', 'search-embeddings']
       sources.forEach((source) => {
         supabaseClient.functions
           .invoke(source, { body: { query } })

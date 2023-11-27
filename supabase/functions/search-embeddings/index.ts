@@ -1,4 +1,3 @@
-import { serve } from 'https://deno.land/std@0.170.0/http/server.ts'
 import 'https://deno.land/x/xhr@0.2.1/mod.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.8.0'
 import { Configuration, OpenAIApi } from 'https://esm.sh/openai@3.1.0'
@@ -14,7 +13,7 @@ export const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   try {
     // Handle CORS
     if (req.method === 'OPTIONS') {
@@ -77,50 +76,16 @@ serve(async (req) => {
     }
 
     const [{ embedding }] = embeddingResponse.data.data
-    const { error: matchError, data: pageSections } = await supabaseClient
-      .rpc('match_page_sections_v2', {
-        embedding,
-        match_threshold: 0.78,
-        min_content_length: 50,
-      })
-      .select('slug, heading, page_id')
-      .limit(10)
+    const { error: matchError, data: pages } = await supabaseClient.rpc('docs_search_embeddings', {
+      embedding,
+      match_threshold: 0.78,
+    })
 
-    if (matchError || !pageSections) {
-      throw new ApplicationError('Failed to match page sections', matchError ?? undefined)
+    if (matchError) {
+      throw new ApplicationError('Failed to match page sections', matchError)
     }
 
-    const uniquePageIds = pageSections
-      .map<number>(({ page_id }) => page_id)
-      .filter((value, index, array) => array.indexOf(value) === index)
-
-    const { error: fetchPagesError, data: pages } = await supabaseClient
-      .from('page')
-      .select('id, type, path, meta')
-      .in('id', uniquePageIds)
-
-    if (fetchPagesError || !pages) {
-      throw new ApplicationError(`Failed to fetch pages`, fetchPagesError)
-    }
-
-    const combinedPages = pages
-      .map((page) => {
-        const sections = pageSections
-          .map((pageSection, index) => ({ ...pageSection, rank: index }))
-          .filter(({ page_id }) => page_id === page.id)
-
-        // Rank this page based on its highest-ranked page section
-        const rank = sections.reduce((min, { rank }) => Math.min(min, rank), Infinity)
-
-        return {
-          ...page,
-          sections,
-          rank,
-        }
-      })
-      .sort((a, b) => a.rank - b.rank)
-
-    return new Response(JSON.stringify(combinedPages), {
+    return new Response(JSON.stringify(pages), {
       headers: {
         ...corsHeaders,
         'Content-Type': 'application/json',
