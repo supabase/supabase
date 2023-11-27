@@ -1,12 +1,14 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
+import { Button, IconExternalLink, IconSearch, Input } from 'ui'
 
-import { useParams } from 'common/hooks'
 import { Policies } from 'components/interfaces/Auth/Policies'
+import { AIPolicyEditorPanel } from 'components/interfaces/Auth/Policies/AIPolicyEditorPanel'
 import { AuthLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
@@ -19,8 +21,6 @@ import { useCheckPermissions, useFlag, useStore } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { NextPageWithLayout } from 'types'
-import { Button, IconExternalLink, IconSearch, Input } from 'ui'
-import { AIPolicyEditorPanel } from 'components/interfaces/Auth/Policies/AIPolicyEditorPanel'
 
 /**
  * Filter tables by table name and policy name
@@ -141,7 +141,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger>
                   <Button
-                    type="default"
+                    type="primary"
                     disabled={!canCreatePolicies}
                     onClick={() => setShowPolicyAiEditor(true)}
                   >
