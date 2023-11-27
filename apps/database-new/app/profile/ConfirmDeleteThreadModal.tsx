@@ -1,35 +1,39 @@
-import { Modal } from 'ui'
+'use client'
+
+import { Button, Modal } from 'ui'
 import { ThreadType } from './Threads'
-import { deleteThread } from '@/lib/actions'
+import { deleteThread } from '../actions'
 
 const ConfirmDeleteThreadModal = ({
   thread,
   onClose,
+  visible,
 }: {
-  thread?: ThreadType
+  thread: ThreadType
   onClose: () => void
+  visible: boolean
 }) => {
-  const deleteCurrentThread = () => {
-    const threadID = thread?.thread_id
-    onClose()
-    deleteThread(threadID!)
-  }
-
   return (
     <Modal
-      variant="danger"
-      alignFooter="right"
       size="small"
-      visible={thread !== undefined}
+      visible={visible}
       onCancel={onClose}
-      onConfirm={async () => {
-        await deleteCurrentThread()
-      }}
+      hideFooter
       header="Confirm to delete thread?"
+      className="pb-2"
     >
-      <Modal.Content className="py-4">
-        <p className="text-sm">Once the thread is deleted, it cannot be recovered.</p>
-      </Modal.Content>
+      <form action={() => deleteThread(thread.thread_id)}>
+        <Modal.Content className="py-4">
+          <p className="text-sm">Once the thread is deleted, it cannot be recovered.</p>
+        </Modal.Content>
+        <Modal.Separator />
+        <Modal.Content className="flex flex-row gap-3 justify-end">
+          <Button type="default">Cancel</Button>
+          <Button type="warning" htmlType="submit">
+            Delete thread
+          </Button>
+        </Modal.Content>
+      </form>
     </Modal>
   )
 }

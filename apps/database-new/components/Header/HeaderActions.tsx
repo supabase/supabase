@@ -44,14 +44,14 @@ const HeaderActions = ({ user }: HeaderActionsProps) => {
       )}
 
       <Button type="default" className="hidden xl:block">
-        <Link href="/new">New conversation</Link>
+        <Link href="/">New conversation</Link>
       </Button>
 
-      {currentUser ? (
+      {/* {currentUser ? (
         <AvatarDropdown currentUser={currentUser} signout={signout} />
       ) : (
         <NoUserDropdown />
-      )}
+      )} */}
     </div>
   )
 }

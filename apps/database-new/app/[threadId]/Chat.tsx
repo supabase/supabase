@@ -10,6 +10,7 @@ import { useMessagesQuery } from '@/data/messages-query'
 import { AssistantMessage, UserMessage } from '@/lib/types'
 import BottomMarker from './BottomMarker'
 import UserChat from './UserChat'
+import { ChatInputAtom } from '@/components/Chat/ChatInput'
 
 export const Chat = () => {
   const router = useRouter()
@@ -60,6 +61,7 @@ export const Chat = () => {
     <div
       className={cn(
         'bg',
+        'h-full',
         'border-t xl:border-t-0 xl:border-r relative',
         'flex flex-col h-full border-r',
         'w-full xl:w-[400px] 2xl:w-[500px]'
@@ -94,30 +96,22 @@ export const Chat = () => {
         )}
 
         <div className="px-4 pb-4">
-          <Input
+          <ChatInputAtom
             value={value}
             disabled={loading || inputEntered}
-            inputClassName="rounded-full pl-8"
+            loading={loading || inputEntered}
             placeholder={
               loading
                 ? 'Generating reply to request...'
                 : 'Ask for some changes on the selected message'
             }
-            icon={<div className="ml-1 w-2 h-2 rounded-full bg-purple-900" />}
             onChange={(v) => setValue(v.target.value)}
-            onKeyDown={(e) => {
-              if (e.code === 'Enter' && value.length > 0) {
+            handleSubmit={() => {
+              if (value && value.length > 0) {
                 mutate(value)
                 setInputEntered(true)
               }
             }}
-            actions={
-              loading || inputEntered ? (
-                <div className="mr-2">
-                  <Loader2 size={16} className="animate-spin" />
-                </div>
-              ) : null
-            }
           />
         </div>
       </div>
