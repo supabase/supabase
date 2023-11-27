@@ -128,7 +128,7 @@ const TicketingFlow = () => {
                       </p>
                     )}
                     {!hasPlatinumTicket && <TicketPresence />}
-                    <div className="w-full border border-muted rounded-lg bg-[#060809] mt-8 overflow-hidden">
+                    <div className="w-full h-auto border border-muted rounded-lg bg-[#060809] mt-8 overflow-hidden">
                       {hasPlatinumTicket ? (
                         <p className="p-6">Stay tuned after Launch Week X to know if you won.</p>
                       ) : (

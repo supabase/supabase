@@ -51,7 +51,7 @@ export default function TicketForm() {
           new Image().src = `https://github.com/${username}.png`
 
           // Prefetch the twitter share URL to eagerly generate the page
-          fetch(`/launch-week/x/tickets/${username}`).catch((_) => {})
+          fetch(`/launch-week/tickets/${username}`).catch((_) => {})
 
           if (!realtimeChannel) {
             const channel = supabase
