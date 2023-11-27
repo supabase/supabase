@@ -57,7 +57,7 @@ Name your token based on the app its being used for and the environment. For exa
 
 Since we will be using this token for the inference API, choose the `read` role.
 
-<Admonition type="info">
+<Admonition type="note">
 
 Though it is possible to use the Hugging Face inference API today without an access token, [you may be rate limited](https://huggingface.co/docs/huggingface.js/inference/README#usage).
 
@@ -69,7 +69,7 @@ To ensure you don't experience any unexpected downtime or errors, we recommend c
 
 Edge Functions are server-side TypeScript functions that run on-demand. Since Edge Functions run on a server, you can safely give them access to your Hugging Face access token.
 
-<Admonition type="info">
+<Admonition type="note">
 
 You will need the `supabase` CLI [installed](/docs/guides/cli) for the following commands to work.
 
@@ -136,7 +136,7 @@ supabase functions serve --env-file .env.local --no-verify-jwt
 
 Remember to pass in the `.env.local` file using the `--env-file` parameter so that the Edge Function can access the `HUGGING_FACE_ACCESS_TOKEN`.
 
-<Admonition type="info">
+<Admonition type="note">
 
 For demo purposes we set `--no-verify-jwt` to make it easy to test the Edge Function without passing in a JWT token. In a real application you will need to pass the JWT as a `Bearer` token in the `Authorization` header.
 

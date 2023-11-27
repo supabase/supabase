@@ -4,9 +4,11 @@ import { detectOS } from 'lib/helpers'
 import { Button, IconAlignLeft, IconCommand, IconCornerDownLeft } from 'ui'
 
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
+import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { useFlag } from 'hooks'
+import { useState } from 'react'
 import FavoriteButton from './FavoriteButton'
 import SavingIndicator from './SavingIndicator'
-import SizeToggleButton from './SizeToggleButton'
 
 export type UtilityActionsProps = {
   id: string
@@ -26,13 +28,20 @@ const UtilityActions = ({
   executeQuery,
 }: UtilityActionsProps) => {
   const os = detectOS()
+  const readReplicasEnabled = useFlag('readReplicas')
+  const [selectedDatabaseId, setSelectedDatabaseId] = useState<string>('1')
 
   return (
     <>
       <SavingIndicator id={id} />
 
       {IS_PLATFORM && <FavoriteButton id={id} />}
-      <SizeToggleButton id={id} />
+
+      {/* [Joshen] Am opting to remove this - i don't think its useful? */}
+      {/* [Joshen] Keeping in mind to not sprawl controls everywhere */}
+      {/* [Joshen] There's eventually gonna be user impersonation here as well so let's see */}
+      {/* <SizeToggleButton id={id} /> */}
+
       <Tooltip.Root delayDuration={0}>
         <Tooltip.Trigger asChild>
           <Button
@@ -55,29 +64,39 @@ const UtilityActions = ({
           </Tooltip.Content>
         </Tooltip.Portal>
       </Tooltip.Root>
-      <div className="mx-2">
-        <RoleImpersonationPopover />
+
+      <div className="flex items-center justify-between gap-x-2 mx-2">
+        {readReplicasEnabled && (
+          <DatabaseSelector
+            selectedDatabaseId={selectedDatabaseId}
+            onChangeDatabaseId={setSelectedDatabaseId}
+          />
+        )}
+
+        <div className="mx-2">
+          <RoleImpersonationPopover />
+        </div>
+
+        <Button
+          onClick={() => executeQuery()}
+          disabled={isDisabled || isExecuting}
+          loading={isExecuting}
+          type="default"
+          size="tiny"
+          iconRight={
+            <div className="flex items-center space-x-1">
+              {os === 'macos' ? (
+                <IconCommand size={10} strokeWidth={1.5} />
+              ) : (
+                <p className="text-xs text-foreground-light">CTRL</p>
+              )}
+              <IconCornerDownLeft size={10} strokeWidth={1.5} />
+            </div>
+          }
+        >
+          {hasSelection ? 'Run selected' : 'Run'}
+        </Button>
       </div>
-      <Button
-        onClick={() => executeQuery()}
-        disabled={isDisabled || isExecuting}
-        loading={isExecuting}
-        type="default"
-        size="tiny"
-        className="mx-2"
-        iconRight={
-          <div className="flex items-center space-x-1">
-            {os === 'macos' ? (
-              <IconCommand size={10} strokeWidth={1.5} />
-            ) : (
-              <p className="text-xs text-foreground-light">CTRL</p>
-            )}
-            <IconCornerDownLeft size={10} strokeWidth={1.5} />
-          </div>
-        }
-      >
-        {hasSelection ? 'Run selected' : 'Run'}
-      </Button>
     </>
   )
 }
