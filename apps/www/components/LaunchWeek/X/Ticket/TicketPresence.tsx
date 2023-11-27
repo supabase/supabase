@@ -12,6 +12,7 @@ const TicketPresence = () => {
   > | null>(null)
   const [onlineUsers, setOnlineUsers] = useState<any[]>([])
   const isSingular = onlineUsers.length === 1
+  const lowTraffic = onlineUsers.length < 5
 
   useEffect(() => {
     // Listen to realtime presence
@@ -46,8 +47,9 @@ const TicketPresence = () => {
   return (
     <div
       className={cn(
-        'text-foreground-muted text-xs flex items-center',
+        'text-foreground-muted text-xs flex items-center transition-opacity',
         hasTicket && 'text-sm opacity-80'
+        // lowTraffic && 'opacity-0'
       )}
     >
       <svg
