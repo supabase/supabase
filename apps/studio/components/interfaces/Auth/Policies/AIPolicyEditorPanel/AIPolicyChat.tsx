@@ -75,7 +75,6 @@ export const AIPolicyChat = ({
           }, how can I help you? I'm powered by AI, so surprises and mistakes are possible.
         Make sure to verify any generated code or suggestions, and share feedback so that we can
         learn and improve.`}
-          onDiff={() => {}}
         />
 
         {sorted.map((m) => {

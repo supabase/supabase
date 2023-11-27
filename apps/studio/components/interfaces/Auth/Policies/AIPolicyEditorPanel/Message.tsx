@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { kebabCase, take } from 'lodash'
+import { kebabCase, noop, take } from 'lodash'
 import { Copy, FileDiff } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import { format } from 'sql-formatter'
@@ -13,7 +13,7 @@ const Message = ({
   postedBy,
   postedAt,
   message,
-  onDiff,
+  onDiff = noop,
   isDebug = false,
 }: {
   icon: React.ReactNode
@@ -21,7 +21,7 @@ const Message = ({
   postedAt?: number
   message: string
   isDebug?: boolean
-  onDiff: (s: string) => void
+  onDiff?: (s: string) => void
 }) => {
   return (
     <div className="flex flex-col py-4 gap-4 border-t px-5">
