@@ -121,7 +121,7 @@ const TicketingFlow = () => {
                     ) : winningChances !== 2 ? (
                       <p className="text-2xl lg:text-3xl">
                         <span className="text-foreground-lighter">You're in!</span>{' '}
-                        <span className="">Now share your ticket and win limited swag.</span>
+                        <span className="">Now share your ticket to win limited swag.</span>
                       </p>
                     ) : (
                       <p className="text-2xl lg:text-3xl">
@@ -130,7 +130,7 @@ const TicketingFlow = () => {
                       </p>
                     )}
                     {!hasPlatinumTicket && <TicketPresence />}
-                    <div className="w-full h-auto border border-muted flex flex-col md:flex-row items-stretch rounded-lg bg-[#060809] mt-8 overflow-hidden">
+                    <div className="w-full h-auto text-center md:text-left border border-muted flex flex-col md:flex-row items-stretch rounded-lg bg-[#060809] mt-8 overflow-hidden">
                       <div className="flex flex-col md:w-2/3 gap-1 pb-6">
                         {hasPlatinumTicket ? (
                           <p className="p-6 pb-3">
