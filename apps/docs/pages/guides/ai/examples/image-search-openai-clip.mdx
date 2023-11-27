@@ -97,7 +97,7 @@ def seed():
 
     # add records to the *images* collection
     images.upsert(
-        vectors=[
+        records=[
             (
                 "one.jpg",        # the vector's identifier
                 img_emb1,          # the vector. list or np.array
@@ -142,7 +142,7 @@ With Supabase Vector we can easily query our embeddings. We can use either an im
 def search():
     # create vector store client
     vx = vecs.create_client(DB_CONNECTION)
-    images = vx.get_collection(name="image_vectors")
+    images = vx.get_or_create_collection(name="image_vectors", dimension=512)
 
     # Load CLIP model
     model = SentenceTransformer('clip-ViT-B-32')
@@ -152,7 +152,7 @@ def search():
 
     # query the collection filtering metadata for "type" = "jpg"
     results = images.query(
-        query_vector=text_emb,              # required
+        data=text_emb,                      # required
         limit=1,                            # number of records to return
         filters={"type": {"$eq": "jpg"}},   # metadata filters
     )
