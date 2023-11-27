@@ -1,44 +1,9 @@
+import { FAQS, faq } from '@/data/faqs'
+import { slugify } from '@/lib/utils'
 import type { Metadata } from 'next'
-
-type faq = {
-  question: string
-  answer: string
-}
 
 export const metadata: Metadata = {
   title: 'database.design | Faq',
-}
-
-const FAQS = [
-  {
-    question: 'What is database.design?',
-    answer:
-      'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Doloremque molestias dicta nobis explicabo maiores officia blanditiis cupiditate, quibusdam debitis! Dignissimos ducimus aut temporibus ea, repellat consectetur quisquam molestiae recusandae rem.',
-  },
-  {
-    question: 'How does it work?',
-    answer:
-      'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Doloremque molestias dicta nobis explicabo maiores officia blanditiis cupiditate, quibusdam debitis! Dignissimos ducimus aut temporibus ea, repellat consectetur quisquam molestiae recusandae rem.',
-  },
-  {
-    question: 'Can I see the code?',
-    answer:
-      'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Doloremque molestias dicta nobis explicabo maiores officia blanditiis cupiditate, quibusdam debitis! Dignissimos ducimus aut temporibus ea, repellat consectetur quisquam molestiae recusandae rem.',
-  },
-  {
-    question: 'Can I use this for non-Postgres databases?',
-    answer:
-      'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Doloremque molestias dicta nobis explicabo maiores officia blanditiis cupiditate, quibusdam debitis! Dignissimos ducimus aut temporibus ea, repellat consectetur quisquam molestiae recusandae rem.',
-  },
-]
-
-function slugify(str: string) {
-  return str
-    .toLowerCase() // Convert to lowercase
-    .replace(/\s+/g, '-') // Replace spaces with hyphens
-    .replace(/[^\w-]+/g, '') // Remove non-word characters except hyphens
-    .replace(/--+/g, '-') // Replace multiple consecutive hyphens with a single hyphen
-    .replace(/^-+|-+$/g, '') // Remove leading and trailing hyphens
 }
 
 const FAQ = async () => {
@@ -58,7 +23,7 @@ const FAQ = async () => {
         {FAQS.map((faq: faq, index) => (
           <article
             key={index}
-            className="prose prose-headings:scroll-mt-20 prose-headings:font-display prose-headings:font-semibold"
+            className="prose prose-headings:scroll-mt-20 prose-headings:font-display prose-headings:font-semibold w-full"
           >
             <a href={`#${slugify(faq.question)}`} className="no-underline hover:underline">
               <h2 id={slugify(faq.question)}>{faq.question}</h2>
