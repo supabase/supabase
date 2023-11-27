@@ -1,4 +1,5 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
 
 import { isResponseOk, post } from 'lib/common/fetch'
 import { BASE_PATH } from 'lib/constants'
@@ -33,6 +34,7 @@ type RlsSuggestData = Awaited<ReturnType<typeof rlsSuggest>>
 
 export const useRlsSuggestMutation = ({
   onSuccess,
+  onError,
   ...options
 }: Omit<
   UseMutationOptions<RlsSuggestData, ResponseError, RlsSuggestVariables>,
@@ -43,6 +45,13 @@ export const useRlsSuggestMutation = ({
     {
       async onSuccess(data, variables, context) {
         await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to prompt suggestion: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
       },
       ...options,
     }
