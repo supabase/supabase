@@ -2,6 +2,7 @@ import { useDebounce } from '@uidotdev/usehooks'
 import { useState } from 'react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import AlertError from 'components/ui/AlertError'
 import { User, useUsersQuery } from 'data/auth/users-query'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { Button, IconLoader, IconSearch, IconUser, IconX, Input } from 'ui'
@@ -16,7 +17,7 @@ const UserImpersonationSelector = ({ onStopImpersonatingUser }: UserImpersonatio
   const debouncedSearchText = useDebounce(searchText, 300)
 
   const { project } = useProjectContext()
-  const { data, isSuccess, isLoading, isError, error, isFetching } = useUsersQuery(
+  const { data, isSuccess, isLoading, isError, error, isFetching, isPreviousData } = useUsersQuery(
     {
       projectRef: project?.ref,
       keywords: debouncedSearchText || undefined,
@@ -26,7 +27,7 @@ const UserImpersonationSelector = ({ onStopImpersonatingUser }: UserImpersonatio
     }
   )
 
-  const users = data?.users ?? []
+  const isSearching = isPreviousData && isFetching
 
   const state = useRoleImpersonationStateSnapshot()
 
@@ -77,7 +78,7 @@ const UserImpersonationSelector = ({ onStopImpersonatingUser }: UserImpersonatio
           <Input
             className="table-editor-search border-none"
             icon={
-              isFetching ? (
+              isSearching ? (
                 <IconLoader
                   className="animate-spin text-foreground-lighter"
                   size={16}
@@ -100,13 +101,29 @@ const UserImpersonationSelector = ({ onStopImpersonatingUser }: UserImpersonatio
             }
           />
 
-          <ul className="divide-y">
-            {users.map((user) => (
-              <li key={user.id}>
-                <UserRow user={user} onClick={impersonateUser} />
-              </li>
+          {isLoading && (
+            <div className="flex flex-col gap-2 items-center justify-center h-24">
+              <IconLoader className="animate-spin" size={24} />
+              <span>Loading users...</span>
+            </div>
+          )}
+
+          {isError && <AlertError error={error} subject="Failed to retrieve users" />}
+
+          {isSuccess &&
+            (data.users.length > 0 ? (
+              <ul className="divide-y">
+                {data.users.map((user) => (
+                  <li key={user.id}>
+                    <UserRow user={user} onClick={impersonateUser} />
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="flex flex-col gap-2 items-center justify-center h-24">
+                <p className="text-foreground-light">No users found</p>
+              </div>
             ))}
-          </ul>
         </div>
       ) : (
         <UserRow user={impersonatingUser} onClick={stopImpersonating} isImpersonating={true} />
