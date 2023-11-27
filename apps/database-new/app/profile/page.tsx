@@ -5,8 +5,12 @@ import { redirect } from 'next/navigation'
 import Threads from './Threads'
 import { Suspense } from 'react'
 import ShimmeringLoader from '@/components/Shimmer'
+import type { Metadata } from 'next'
 
 dayjs.extend(relativeTime)
+export const metadata: Metadata = {
+  title: 'database.design | Profile',
+}
 
 // revalidatePath not working in the create route handler
 // force-dynamic to refetch every time if needed

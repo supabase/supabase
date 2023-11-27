@@ -4,7 +4,7 @@ import { useEffect, createRef } from 'react'
 // @ts-expect-error
 import { useFormState, useFormStatus } from 'react-dom'
 import { Button, Input_Shadcn_, Modal } from 'ui'
-import { deleteThread } from './../../app/actions'
+import { deleteThread } from '@/app/actions'
 import { ThreadType } from './Threads'
 
 const ConfirmDeleteThreadModal = ({

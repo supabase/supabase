@@ -10,7 +10,7 @@ import { useMessagesQuery } from '@/data/messages-query'
 import { AssistantMessage, UserMessage } from '@/lib/types'
 import BottomMarker from './BottomMarker'
 import UserChat from './UserChat'
-import { ChatInputAtom } from '../../components/Chat/ChatInput'
+import { ChatInputAtom } from '@/components/Chat/ChatInput'
 
 export const Chat = () => {
   const router = useRouter()

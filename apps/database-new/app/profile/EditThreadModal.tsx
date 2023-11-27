@@ -3,8 +3,8 @@
 import { useEffect, createRef } from 'react'
 // @ts-expect-error
 import { useFormState, useFormStatus } from 'react-dom'
-import { Button, Input_Shadcn_, Label_Shadcn_, Modal, formatPageUrl } from 'ui'
-import { updateThreadName } from './../../app/actions'
+import { Button, Input_Shadcn_, Label_Shadcn_, Modal } from 'ui'
+import { updateThreadName } from '@/app/actions'
 import { ThreadType } from './Threads'
 
 const EditThreadModal = ({
