@@ -31,8 +31,8 @@ const GraphiQLPage: NextPageWithLayout = () => {
   const { data: settings, isFetched } = useProjectApiQuery({ projectRef })
 
   const apiService = settings?.autoApiService
-  const anonKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
-    ? apiService.defaultApiKey
+  const serviceRoleKey = apiService?.service_api_keys.find((x) => x.name === 'service_role key')
+    ? apiService.serviceApiKey
     : undefined
 
   const { data: config } = useProjectPostgrestConfigQuery({ projectRef })
@@ -72,13 +72,13 @@ const GraphiQLPage: NextPageWithLayout = () => {
             opts?.headers?.['Authorization'] ??
             opts?.headers?.['authorization'] ??
             userAuthorization ??
-            `Bearer ${anonKey}`,
+            `Bearer ${serviceRoleKey}`,
         },
       })
     }
 
     return customFetcher
-  }, [projectRef, jwtSecret, accessToken, anonKey])
+  }, [projectRef, jwtSecret, accessToken, serviceRoleKey])
 
   if ((IS_PLATFORM && !accessToken) || !isFetched || (isExtensionsLoading && !pgGraphqlExtension)) {
     return <Connecting />
