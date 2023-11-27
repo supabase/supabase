@@ -23,7 +23,7 @@ interface Props {
 
 const generateOgs = async (users: UserData[]) => {
   users?.map(async (user) => {
-    const ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lwx-ticket-og?username=${encodeURIComponent(
+    const ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lwx-og?username=${encodeURIComponent(
       user.username ?? ''
     )}${!!user.golden ? '&platinum=true' : ''}`
     return await fetch(ogImageUrl)

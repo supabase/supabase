@@ -6,7 +6,6 @@ import TicketCustomizationForm from './TicketCustomizationForm'
 import TicketCopy from './TicketCopy'
 
 export default function TicketContainer() {
-  const { showCustomizationForm, setShowCustomizationForm } = useConfData()
   const params = useParams()
   const sharePage = !!params.username
 

@@ -112,7 +112,7 @@ const TicketingFlow = () => {
                   <div className="w-full ld:w-auto min-h-[400px] mt-3 md:mt-12 xl:mt-0 max-w-2xl flex flex-col items-center">
                     <TicketContainer />
                   </div>
-                  <div className="order-last xl:order-first xl:h-full max-w-md gap-3 flex flex-col items-center justify-center xl:items-start xl:justify-start xl:text-left">
+                  <div className="order-first xl:h-full max-w-md gap-3 flex flex-col items-center justify-center xl:items-start xl:justify-start xl:text-left">
                     {hasPlatinumTicket ? (
                       <p className="text-2xl lg:text-3xl">
                         <span className="text-foreground-lighter">Congrats!</span> You've maximized
@@ -130,46 +130,35 @@ const TicketingFlow = () => {
                       </p>
                     )}
                     {!hasPlatinumTicket && <TicketPresence />}
-                    <div className="mt-4 w-full">
-                      <TicketActions />
-                    </div>
-                    {hasPlatinumTicket ? (
-                      <p className="my-4 text-foreground-lighter">
-                        Stay tuned after Launch Week X to know if you won.
-                      </p>
-                    ) : (
-                      <p className="my-4 text-foreground-lighter">
-                        Win a keyboard and other{' '}
-                        <Link href="#prizes" className="underline">
-                          Launch Week X awards
-                        </Link>
-                        .
-                      </p>
-                    )}
-                    {/* <div className="w-full h-auto border border-muted rounded-lg bg-[#060809] mt-8 overflow-hidden">
-                      {hasPlatinumTicket ? (
-                        <p className="p-6">Stay tuned after Launch Week X to know if you won.</p>
-                      ) : (
-                        <p className="p-6">
-                          Win a keyboard and other{' '}
-                          <Link href="#prizes" className="underline">
-                            Launch Week X awards
-                          </Link>
-                          .
-                        </p>
-                      )}
-                      <div className="w-full px-6 mb-6">
-                        <TicketActions />
+                    <div className="w-full h-auto border border-muted flex flex-col md:flex-row items-stretch rounded-lg bg-[#060809] mt-8 overflow-hidden">
+                      <div className="flex flex-col md:w-2/3 gap-1 pb-6">
+                        {hasPlatinumTicket ? (
+                          <p className="p-6 pb-3">
+                            Stay tuned after Launch Week X to know if you won.
+                          </p>
+                        ) : (
+                          <p className="p-6 pb-3">
+                            Win a keyboard and other{' '}
+                            <Link href="#prizes" className="underline">
+                              awards
+                            </Link>
+                            .
+                          </p>
+                        )}
+                        <div className="w-full px-6">
+                          <TicketActions />
+                        </div>
                       </div>
-                      <div className="relative w-full h-30 pl-6">
+                      <div className="hidden md:block relative h-auto w-full pl-6 pt-6">
                         <Image
                           src="/images/launchweek/lwx/swag/lwx_keyboard_preview.png"
                           alt="Supabase Launch Week X keyboard prize"
-                          width={500}
-                          height={500}
+                          width={300}
+                          height={300}
+                          className="object-cover object-left-top w-full h-full"
                         />
                       </div>
-                    </div> */}
+                    </div>
                   </div>
                 </m.div>
               )}

@@ -117,12 +117,10 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
   const username = params?.username?.toString() || null
-  console.log('params', params)
-  console.log('username', username)
   let user
 
   fetch(
-    `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lwx-ticket?username=${encodeURIComponent(
+    `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lwx-og?username=${encodeURIComponent(
       username ?? ''
     )}`
   )
@@ -138,11 +136,9 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     user = data
   }
 
-  const BUCKET_FOLDER_VERSION = 'v1'
-
   const ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lwx/og/${
     user?.golden ? 'platinum' : 'regular'
-  }/${BUCKET_FOLDER_VERSION}/${username}.png`
+  }/${username}.png`
 
   return {
     props: {
