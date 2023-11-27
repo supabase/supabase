@@ -287,6 +287,7 @@ export const AIPolicyEditorPanel = memo(function ({
             <div
               // [Joshen] Not the cleanest but its to force the editor to re-render its height
               // for now, till we can find a better solution
+              className="relative"
               style={{
                 height:
                   error === undefined
