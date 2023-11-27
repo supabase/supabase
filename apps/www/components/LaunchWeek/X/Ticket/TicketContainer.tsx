@@ -14,7 +14,10 @@ export default function TicketContainer() {
     <div className="flex flex-col w-full items-center mx-auto max-w-2xl gap-3">
       {/* {!sharePage && <TicketCustomizationForm />} */}
       <Ticket />
-      <TicketCopy sharePage={sharePage} />
+      <div className="w-full flex flex-col md:flex-row gap-2 items-center justify-between">
+        <TicketCopy sharePage={sharePage} />
+        {/* <span className="text-xs">@{userData.username}</span> */}
+      </div>
       {/* {userData.username && <TicketActions username={userData.username} />} */}
     </div>
   )

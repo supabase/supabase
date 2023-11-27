@@ -5,6 +5,7 @@ import { AnimatePresence, m, LazyMotion, domAnimation } from 'framer-motion'
 import { cn } from 'ui'
 import { DEFAULT_TRANSITION, INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
 import { LWX_DATE, LWX_LAUNCH_DATE } from '~/lib/constants'
+import useWinningChances from '../../hooks/useWinningChances'
 
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -15,7 +16,6 @@ import CountdownComponent from '../Countdown'
 import LaunchWeekPrizeSection from '../LaunchWeekPrizeSection'
 import TicketPresence from './TicketPresence'
 import TicketActions from './TicketActions'
-import useWinningChances from '../../hooks/useWinningChances'
 
 const TicketingFlow = () => {
   const { ticketState, userData } = useConfData()
@@ -31,7 +31,6 @@ const TicketingFlow = () => {
   const exit = { opacity: 0, transition: { ...transition, duration: 0.2 } }
 
   const winningChances = useWinningChances()
-  console.log('winningChances', winningChances)
 
   return (
     <>
@@ -129,12 +128,12 @@ const TicketingFlow = () => {
                       </p>
                     )}
                     {!hasPlatinumTicket && <TicketPresence />}
-                    <div className="w-full border rounded-lg bg-[#060809] mt-8 overflow-hidden">
+                    <div className="w-full border border-muted rounded-lg bg-[#060809] mt-8 overflow-hidden">
                       {hasPlatinumTicket ? (
                         <p className="p-6">Stay tuned after Launch Week X to know if you won.</p>
                       ) : (
                         <p className="p-6">
-                          Win a keyboard and other"
+                          Win a keyboard and other{' '}
                           <Link href="#prizes" className="underline">
                             Launch Week X awards
                           </Link>
@@ -153,15 +152,6 @@ const TicketingFlow = () => {
                         />
                       </div>
                     </div>
-                    {/* {hasPlatinumTicket ? (
-                      <span className="text-foreground-lighter">
-                        Winners will be announced on Dec 15th
-                      </span>
-                    ) : (
-                      <span className="text-foreground-lighter">
-                        Boost your chances of winning limited-edition swag by sharing your ticket.
-                      </span>
-                    )} */}
                   </div>
                 </m.div>
               )}
@@ -176,7 +166,7 @@ const TicketingFlow = () => {
           )}
         />
       </SectionContainer>
-      <SectionContainer className="lg:pb-40">
+      <SectionContainer className="!pt-4 lg:pb-40">
         <LaunchWeekPrizeSection />
       </SectionContainer>
     </>
