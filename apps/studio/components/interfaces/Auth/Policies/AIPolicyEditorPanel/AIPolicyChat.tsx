@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { compact, sortBy } from 'lodash'
+import { compact, last, sortBy } from 'lodash'
 import Image from 'next/image'
 import OpenAI from 'openai'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -52,9 +52,15 @@ export const AIPolicyChat = ({
     defaultValues: { chat: '' },
   })
 
+  const pendingReply = loading && last(sorted)?.role === 'user'
+
   useEffect(() => {
     // 👇️ scroll to bottom every time messages change
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (bottomRef.current) {
+      setTimeout(() => {
+        bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+      }, 500)
+    }
   }, [messages.length])
 
   useEffect(() => {
@@ -110,6 +116,14 @@ export const AIPolicyChat = ({
           )
         })}
 
+        {pendingReply && (
+          <Message
+            icon={<AiIcon className="[&>div>div]:border-white" />}
+            postedBy={'Assistant'}
+            message={'Thinking...'}
+          />
+        )}
+
         <div ref={bottomRef} className="h-1" />
       </div>
       <Form_Shadcn_ {...form}>
@@ -131,6 +145,7 @@ export const AIPolicyChat = ({
                     <AiIcon className="absolute top-2 left-3 [&>div>div]:border-white" />
                     <Input_Shadcn_
                       {...field}
+                      autoComplete="off"
                       disabled={isLoading}
                       className={`bg-black rounded-full pl-10 ${isLoading ? 'pr-10' : ''}`}
                       placeholder="Ask for some changes to your policy"

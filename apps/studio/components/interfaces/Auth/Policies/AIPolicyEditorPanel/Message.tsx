@@ -61,6 +61,7 @@ const Message = ({
                   className="h-80"
                   value={formatted}
                   isReadOnly
+                  autofocus={false}
                   options={{ scrollBeyondLastLine: false }}
                 />
                 <div className="absolute top-3 right-3 bg-surface-100 border-muted border rounded-lg h-[28px] hidden group-hover:block">
