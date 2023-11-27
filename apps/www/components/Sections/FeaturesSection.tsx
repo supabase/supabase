@@ -83,7 +83,7 @@ const Feature = ({
           >
             <path
               d={feature.icon}
-              stroke="var(--colors-scale12)"
+              stroke="hsl(var(--foreground-default))"
               strokeMiterlimit="10"
               strokeLinejoin="round"
               strokeLinecap="round"
@@ -94,7 +94,9 @@ const Feature = ({
       </div>
       <div className="text-sm lg:text-base">
         <h2 className="text-base">{feature.title}</h2>
-        <ReactMarkdown className="prose pt-1 text-sm text-muted">{feature.text}</ReactMarkdown>
+        <ReactMarkdown className="prose pt-1 text-sm text-foreground-muted">
+          {feature.text}
+        </ReactMarkdown>
       </div>
     </m.div>
   )

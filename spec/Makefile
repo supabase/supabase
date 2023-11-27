@@ -32,7 +32,7 @@ download.api.v1:
 # 	curl -sS https://supabase.github.io/gotrue/swagger.json > $(REPO_DIR)/auth_v1_openapi.json
 
 download.storage.v1:
-	curl -sS https://supabase.github.io/storage-api/api.json > $(REPO_DIR)/storage_v0_openapi.json
+	curl -sS https://supabase.github.io/storage/api.json > $(REPO_DIR)/storage_v0_openapi.json
 
 # No longer updated
 # download.tsdoc.v1:

@@ -39,7 +39,7 @@ export default function TicketCopy({ username, isGolden }: Props) {
             }, 2000)
           })
         }}
-        className="h-full flex items-center gap-3 w-full truncate relative pr-20 text-light hover:text-foreground"
+        className="h-full flex items-center gap-3 w-full truncate relative pr-20 text-foreground-light hover:text-foreground"
       >
         <div className="flex items-center truncate">
           <p

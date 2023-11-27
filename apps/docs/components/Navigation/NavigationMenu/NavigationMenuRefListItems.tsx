@@ -7,7 +7,7 @@ import * as NavItems from './NavigationMenu.constants'
 import Image from 'next/legacy/image'
 
 import RevVersionDropdown from '~/components/RefVersionDropdown'
-import { useMenuActiveRefId } from '~/hooks/useMenuState'
+import { menuState, useMenuActiveRefId } from '~/hooks/useMenuState'
 
 import React, { Fragment } from 'react'
 import { ICommonItem, ICommonSection } from '~/components/reference/Reference.types'
@@ -31,6 +31,7 @@ interface FunctionLinkProps {
   slug: string
   isParent?: boolean
   isSubItem?: boolean
+  onClick?: () => void
 }
 
 const FunctionLink = React.memo(function FunctionLink({
@@ -41,6 +42,7 @@ const FunctionLink = React.memo(function FunctionLink({
   slug,
   isParent = false,
   isSubItem = false,
+  onClick = () => {},
 }: FunctionLinkProps) {
   const router = useRouter()
   const activeAccordionItem = useMenuActiveRefId()
@@ -60,11 +62,12 @@ const FunctionLink = React.memo(function FunctionLink({
           e.preventDefault()
           history.pushState({}, '', url)
           document.getElementById(slug)?.scrollIntoView()
+          onClick()
         }}
         className={cn(
-          'cursor-pointer transition text-sm hover:text-scale-1200 gap-3 relative',
+          'cursor-pointer transition text-sm hover:text-foreground gap-3 relative',
           isParent ? 'flex justify-between' : 'leading-3',
-          active ? 'text-brand' : 'text-scale-1000'
+          active ? 'text-brand' : 'text-foreground-lighter'
         )}
       >
         {icon && <Image width={16} height={16} alt={icon} src={`${router.basePath}${icon}`} />}
@@ -103,6 +106,7 @@ const RenderLink = React.memo(function RenderLink({ section, basePath }: RenderL
         basePath={basePath}
         isParent={false}
         isSubItem
+        onClick={() => menuState.setMenuMobileOpen(false)}
       />
     )
   }
@@ -122,7 +126,7 @@ const RenderLink = React.memo(function RenderLink({ section, basePath }: RenderL
           isParent
           isSubItem
         />
-        <Accordion.Content className="transition data-open:animate-slide-down data-closed:animate-slide-up border-l border-scale-600 pl-3 ml-1 data-open:mt-2 grid gap-2.5">
+        <Accordion.Content className="transition data-open:animate-slide-down data-closed:animate-slide-up border-l border-control pl-3 ml-1 data-open:mt-2 grid gap-2.5">
           {section.items.map((item) => {
             return (
               <FunctionLink
@@ -133,6 +137,7 @@ const RenderLink = React.memo(function RenderLink({ section, basePath }: RenderL
                 basePath={basePath}
                 isParent={false}
                 isSubItem={false}
+                onClick={() => menuState.setMenuMobileOpen(false)}
               />
             )
           })}
@@ -144,14 +149,14 @@ const RenderLink = React.memo(function RenderLink({ section, basePath }: RenderL
 
 const SideMenuTitle = ({ title }: { title: string }) => {
   return (
-    <span className="font-mono text-xs uppercase text-scale-1200 font-medium tracking-wider">
+    <span className="font-mono text-xs uppercase text-foreground font-medium tracking-wider">
       {title}
     </span>
   )
 }
 
 const Divider = () => {
-  return <div className="h-px w-full bg-blackA-300 dark:bg-whiteA-300 my-3"></div>
+  return <div className="h-px w-full bg-control my-3"></div>
 }
 
 interface NavigationMenuRefListItemsProps {
@@ -180,7 +185,7 @@ const NavigationMenuRefListItems = ({
         href="/"
         className={[
           'flex items-center gap-1 text-xs group mb-3',
-          'text-base transition-all duration-200 text-scale-1100 hover:text-brand-600 hover:cursor-pointer ',
+          'text-base transition-all duration-200 text-foreground-light hover:text-brand-600 hover:cursor-pointer',
         ].join(' ')}
       >
         <div className="relative w-2">

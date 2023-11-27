@@ -202,13 +202,13 @@ export const REFERENCES: References = {
   swift: {
     name: 'Swift',
     library: 'supabase-swift',
-    versions: ['v0'],
+    versions: ['v1'],
     icon: '/docs/img/libraries/swift-icon.svg',
   },
   kotlin: {
     name: 'Kotlin',
     library: 'supabase-kt',
-    versions: ['v0'],
+    versions: ['v1'],
     icon: '/docs/img/libraries/kotlin-icon.svg',
   },
   cli: {
@@ -317,6 +317,10 @@ export const gettingstarted: NavMenuConstant = {
         {
           name: 'Ionic Angular',
           url: '/guides/getting-started/tutorials/with-ionic-angular',
+        },
+        {
+          name: 'Swift',
+          url: '/guides/getting-started/tutorials/with-swift',
         },
       ],
     },
@@ -490,6 +494,7 @@ export const auth = {
       items: [
         { name: 'Next.js', url: '/guides/auth/quickstarts/nextjs', items: [] },
         { name: 'React', url: '/guides/auth/quickstarts/react', items: [] },
+        { name: 'React Native', url: '/guides/auth/quickstarts/react-native', items: [] },
       ],
     },
     {
@@ -497,16 +502,30 @@ export const auth = {
       url: undefined,
       items: [
         { name: 'Email Login', url: '/guides/auth/auth-email' },
-        { name: 'Magic Link Login', url: '/guides/auth/auth-magic-link' },
+        {
+          name: 'Passwordless Login',
+          url: '/guides/auth/passwordless-login',
+          items: [
+            { name: 'Email Magic Link', url: '/guides/auth/passwordless-login/auth-magic-link' },
+            { name: 'Email OTP', url: '/guides/auth/passwordless-login/auth-email-otp' },
+            { name: 'Phone OTP', url: '/guides/auth/phone-login' },
+          ],
+        },
         {
           name: 'Phone Login',
           url: '/guides/auth/phone-login',
           items: [...PhoneLoginsItems],
         },
         {
-          name: 'Social Login',
+          name: 'Social Login (OAuth)',
           url: '/guides/auth/social-login',
-          items: [...SocialLoginItems],
+          items: [
+            {
+              name: 'Native Mobile OAuth',
+              url: '/guides/auth/native-mobile-deep-linking',
+            },
+            ...SocialLoginItems,
+          ],
         },
         {
           name: 'Native Mobile Login',
@@ -514,10 +533,14 @@ export const auth = {
           items: [
             ...NativeMobileLoginItems,
             {
-              name: 'Deep Linking',
+              name: 'OAuth Deep Linking',
               url: '/guides/auth/native-mobile-deep-linking',
             },
           ],
+        },
+        {
+          name: 'User Sessions',
+          url: '/guides/auth/sessions',
         },
         {
           name: 'Enterprise SSO',
@@ -608,12 +631,18 @@ export const database: NavMenuConstant = {
       items: [
         { name: 'Connecting to your database', url: '/guides/database/connecting-to-postgres' },
         { name: 'Managing tables, views, and data', url: '/guides/database/tables' },
+        {
+          name: 'Querying joins and nested tables',
+          url: '/guides/api/joins-and-nesting',
+        },
         { name: 'JSON and unstructured data', url: '/guides/database/json' },
         { name: 'Managing database functions', url: '/guides/database/functions' },
         { name: 'Managing indexes', url: '/guides/database/postgres/indexes' },
         { name: 'Managing database triggers', url: '/guides/database/postgres/triggers' },
+        { name: 'Managing enums', url: '/guides/database/postgres/enums' },
         { name: 'Managing database webhooks', url: '/guides/database/webhooks' },
         { name: 'Using Full Text Search', url: '/guides/database/full-text-search' },
+        { name: 'Importing large datasets', url: '/guides/database/large-datasets' },
       ],
     },
     {
@@ -623,7 +652,6 @@ export const database: NavMenuConstant = {
         { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
         { name: 'Managing Postgres Roles', url: '/guides/database/postgres/roles' },
         { name: 'Managing secrets with Vault', url: '/guides/database/vault' },
-        { name: 'Column encryption', url: '/guides/database/column-encryption' },
       ],
     },
     {
@@ -675,7 +703,7 @@ export const database: NavMenuConstant = {
         },
         {
           name: 'pg_cron: Job Scheduling',
-          url: '/guides/database/extensions/pgcron',
+          url: '/guides/database/extensions/pg_cron',
         },
         {
           name: 'pg_graphql: GraphQL Support',
@@ -787,20 +815,23 @@ export const api: NavMenuConstant = {
     { name: 'Quickstart', url: '/guides/api/quickstart', items: [] },
     { name: 'Client Libraries', url: '/guides/api/rest/client-libs', items: [] },
     { name: 'Auto-generated Docs', url: '/guides/api/rest/auto-generated-docs', items: [] },
-    { name: 'Generating Types', url: '/guides/api/rest/generating-types', items: [] },
+    { name: 'Generating TypeScript Types', url: '/guides/api/rest/generating-types', items: [] },
     {
       name: 'Guides',
       url: '/guides/api',
       items: [
-        { name: 'Creating API routes', url: '/guides/api/creating-routes', items: [] },
-        { name: 'How API Keys work', url: '/guides/api/api-keys', items: [] },
-        { name: 'Securing your API', url: '/guides/api/securing-your-api', items: [] },
+        { name: 'Creating API routes', url: '/guides/api/creating-routes' },
+        { name: 'How API Keys work', url: '/guides/api/api-keys' },
+        { name: 'Securing your API', url: '/guides/api/securing-your-api' },
+        {
+          name: 'Debugging performance issues',
+          url: '/guides/api/rest/debugging-performance',
+        },
         {
           name: 'Querying joins and nested tables',
           url: '/guides/api/joins-and-nesting',
-          items: [],
         },
-        { name: 'Using custom schemas', url: '/guides/api/using-custom-schemas', items: [] },
+        { name: 'Using custom schemas', url: '/guides/api/using-custom-schemas' },
       ],
     },
   ],
@@ -827,38 +858,73 @@ export const functions: NavMenuConstant = {
     },
     {
       name: 'Quickstart',
-      url: '/guides/functions/quickstart',
-    },
-    {
-      name: 'Features',
       url: undefined,
       items: [
-        { name: 'TypeScript Support', url: '/guides/functions/typescript-support' },
-        { name: 'Debugging Edge Functions', url: '/guides/functions/debugging' },
-        { name: 'Managing packages using Import Maps', url: '/guides/functions/import-maps' },
+        {
+          name: 'Getting started',
+          url: '/guides/functions/quickstart',
+        },
+        {
+          name: 'Deploy to Production',
+          url: '/guides/functions/deploy',
+        },
+        { name: 'Setting up your editor', url: '/guides/functions/local-development' },
       ],
     },
     {
       name: 'Guides',
       url: undefined,
       items: [
-        { name: 'Developing Functions locally', url: '/guides/functions/local-development' },
-        { name: 'Deploying with GitHub', url: '/guides/functions/cicd-workflow' },
-        { name: 'Managing Secrets and Environment Variables', url: '/guides/functions/secrets' },
-        { name: 'Integrating With Supabase Auth', url: '/guides/functions/auth' },
+        { name: 'Managing dependencies', url: '/guides/functions/import-maps' },
+        { name: 'Managing environment variables', url: '/guides/functions/secrets' },
+        { name: 'Integrating with Supabase Auth', url: '/guides/functions/auth' },
+        {
+          name: 'Integrating with Postgres',
+          url: '/guides/functions/connect-to-postgres',
+        },
         {
           name: 'Integrating with Supabase Storage',
           url: '/guides/functions/storage-caching',
         },
-        { name: 'CORS support for Invoking from the browser', url: '/guides/functions/cors' },
+        { name: 'Regional invocations', url: '/guides/functions/regional-invocation' },
+        { name: 'Deploying with GitHub Actions', url: '/guides/functions/cicd-workflow' },
+      ],
+    },
+    {
+      name: 'Debugging',
+      url: undefined,
+      items: [
+        { name: 'Debugging Edge Functions', url: '/guides/functions/debugging' },
+        { name: 'Testing your Edge Functions', url: '/guides/functions/unit-test' },
+      ],
+    },
+    {
+      name: 'Examples',
+      url: '/guides/functions/examples',
+      items: [
+        { name: 'CORS support for invoking from the browser', url: '/guides/functions/cors' },
         { name: 'Scheduling Functions', url: '/guides/functions/schedule-functions' },
         {
-          name: 'Connecting directly to Postgres',
-          url: '/guides/functions/connect-to-postgres',
+          name: 'Sending Push Notifications',
+          url: '/guides/functions/examples/push-notifications',
         },
-        { name: 'Testing your Edge Functions', url: '/guides/functions/unit-test' },
-        { name: 'Regional Invocation', url: '/guides/functions/regional-invocation' },
-        { name: 'Troubleshooting', url: '/guides/functions/troubleshooting' },
+        { name: 'Generating OG images ', url: '/guides/functions/examples/og-image' },
+        {
+          name: 'CAPTCHA support with Cloudflare Turnstile',
+          url: '/guides/functions/examples/cloudflare-turnstile',
+        },
+        { name: 'Building a Discord Bot', url: '/guides/functions/examples/discord-bot' },
+        { name: 'Building a Telegram Bot', url: '/guides/functions/examples/telegram-bot' },
+        { name: 'Handling Stripe Webhooks ', url: '/guides/functions/examples/stripe-webhooks' },
+        { name: 'Rate-limiting with Redis', url: '/guides/functions/examples/rate-limiting' },
+        {
+          name: 'Taking Screenshots with Puppeteer',
+          url: '/guides/functions/examples/screenshots',
+        },
+        {
+          name: 'Slack Bot responding to mentions',
+          url: '/guides/functions/examples/slack-bot-mention',
+        },
       ],
     },
     {
@@ -872,31 +938,6 @@ export const functions: NavMenuConstant = {
         { name: 'Sending Emails with Resend', url: '/guides/functions/examples/send-emails' },
         { name: 'Upstash Redis', url: '/guides/functions/examples/upstash-redis' },
         { name: 'Type-Safe SQL with Kysely', url: '/guides/functions/kysely-postgres' },
-      ],
-    },
-    {
-      name: 'Examples',
-      url: '/guides/functions/examples',
-      items: [
-        { name: 'Generating OpenAI GPT3 completions', url: '/guides/ai/examples/openai' },
-        { name: 'Generating OG images ', url: '/guides/functions/examples/og-image' },
-        {
-          name: 'CAPTCHA support with Cloudflare Turnstile',
-          url: '/guides/functions/examples/cloudflare-turnstile',
-        },
-        { name: 'Building a Discord Bot', url: '/guides/functions/examples/discord-bot' },
-        { name: 'Building a Telegram Bot', url: '/guides/functions/examples/telegram-bot' },
-        { name: 'Handling Stripe Webhooks ', url: '/guides/functions/examples/stripe-webhooks' },
-        { name: 'Integrating with Upstash Redis', url: '/guides/functions/examples/upstash-redis' },
-        { name: 'Rate Limiting Edge Functions', url: '/guides/functions/examples/rate-limiting' },
-        {
-          name: 'Taking Screenshots with Puppeteer',
-          url: '/guides/functions/examples/screenshots',
-        },
-        {
-          name: 'Slack Bot responding to mentions',
-          url: '/guides/functions/examples/slack-bot-mention',
-        },
       ],
     },
   ],
@@ -1248,6 +1289,7 @@ export const platform: NavMenuConstant = {
         { name: 'Performance Tuning', url: '/guides/platform/performance' },
         { name: 'Permissions', url: '/guides/platform/permissions' },
         { name: 'SSL Enforcement', url: '/guides/platform/ssl-enforcement' },
+        { name: 'Branching', url: '/guides/platform/branching' },
       ],
     },
     {
@@ -1560,7 +1602,7 @@ export const reference_python_v2 = {
   parent: '/reference',
 }
 
-export const reference_swift_v0 = {
+export const reference_swift_v1 = {
   icon: 'reference-swift',
   title: 'swift',
   url: 'guides/reference/swift',

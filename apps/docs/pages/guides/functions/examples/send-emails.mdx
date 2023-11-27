@@ -3,6 +3,7 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   title: 'Sending Emails',
   description: 'Sending emails from Edge Functions using the Resend API.',
+  tocVideo: 'Qf7XvL1fjvo',
 }
 
 Sending emails from Edge Functions using the [Resend API](https://resend.com/).
@@ -31,8 +32,6 @@ Store the `RESEND_API_KEY` in your `.env` file.
 Paste the following code into the `index.ts` file:
 
 ```tsx
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
 
 const handler = async (_request: Request): Promise<Response> => {
@@ -60,7 +59,7 @@ const handler = async (_request: Request): Promise<Response> => {
   })
 }
 
-serve(handler)
+Deno.serve(handler)
 ```
 
 ### 3. Deploy and send email

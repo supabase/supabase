@@ -7,7 +7,7 @@ function ExampleCard(props: any) {
     <>
       <div
         className="bg-surface-100
-          border-border
+          border-default
           flex
           h-40
           flex-col
@@ -20,7 +20,7 @@ function ExampleCard(props: any) {
           <h4 className="h6">{props.title}</h4>
           <p className="p text-sm">{props.description}</p>
           <div className="flex items-center">
-            <div className="relative border border-border inline !w-6 !h-6 rounded-full overflow-hidden">
+            <div className="relative border border-default inline !w-6 !h-6 rounded-full overflow-hidden">
               <Image
                 src={props.author_img}
                 alt={props.author + ' GitHub profile picture'}
@@ -37,7 +37,7 @@ function ExampleCard(props: any) {
         <div
           className="
           bg-surface-200
-          border-border flex
+          border-default flex
           flex-col justify-between rounded rounded-t-none
           border
           border-b border-r border-l
@@ -46,7 +46,7 @@ function ExampleCard(props: any) {
           <Link
             href={props.repo_url}
             as={props.repo_url}
-            className="text-light hover:text-foreground flex flex-row items-center text-sm"
+            className="text-foreground-light hover:text-foreground flex flex-row items-center text-sm"
             target="_blank"
           >
             <span>{props.repo_name}</span>

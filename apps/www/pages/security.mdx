@@ -21,7 +21,7 @@ export const meta = {
 export const Section = ({ children, icon, img }) => (
   <div>
     {icon && (
-      <div className="bordershadow-scale-500 not-prose dark:bg-scale-400 -mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-white">
+      <div className="border shadow-background-surface-300 not-prose bg-surface-100 -mb-4 flex h-10 w-10 items-center justify-center rounded-full">
         <figure className="w-5">{icon}</figure>
       </div>
     )}
@@ -33,7 +33,7 @@ export const Section = ({ children, icon, img }) => (
 <div className="container mx-auto px-8 sm:px-16 xl:px-20 grid grid-cols-12 items-center my-16">
   <div className="col-span-12 lg:col-span-6">
     <h1>Security at Supabase</h1>
-    <h2 className="text-xl text-light max-w-xl">
+    <h2 className="text-xl text-foreground-light max-w-xl">
       Supabase is trusted by thousands of developers for building and deploying secure applications.
     </h2>
   </div>
@@ -78,7 +78,7 @@ Enterprise and Teams customers can request to sign our BAA [on the dashboard](/d
 
 ### Data Encryption
 
-All customer data is encrypted at REST with AES-256 and in transit via TLS.
+All customer data is encrypted at rest with AES-256 and in transit via TLS.
 
 Sensitive information like access tokens and keys are encrypted at the application level before they are stored in the database.
 
@@ -104,7 +104,7 @@ Members of organizations in Supabase can be granted access to specific resources
 
 ### Backups
 
-All customer databases are backed up every day.
+All paid customer databases are backed up every day.
 
 Point in Time Recovery allows restoring the database to any point in time. Customers from the Pro plan have access to this feature as an add-on.
 
