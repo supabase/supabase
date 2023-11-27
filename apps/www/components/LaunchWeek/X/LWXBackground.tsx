@@ -1,19 +1,23 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { cn } from 'ui'
+import useConfData from '../hooks/use-conf-data'
 
 interface Props {
   className?: string
 }
 
 const LWXBackground = ({ className }: Props) => {
+  const { ticketState } = useConfData()
   const containerRef = useRef(null)
   const ref = useRef(null)
   const [isActive, setIsActive] = useState(false)
   const [gradientPos, setGradientPos] = useState({ x: 0, y: 0 })
 
+  const hasTicket = ticketState === 'ticket'
+
   const handleGlow = (event: any) => {
-    if (!ref.current || !containerRef.current) return null
+    if (!ref.current || !containerRef.current || hasTicket) return null
 
     const containerRefElement = containerRef.current as HTMLDivElement
 
@@ -44,7 +48,7 @@ const LWXBackground = ({ className }: Props) => {
 
     window.addEventListener('mousemove', handleGlow)
     return () => {
-      window.removeEventListener('mousemove', handleGlow)
+      if (hasTicket) window.removeEventListener('mousemove', handleGlow)
     }
   }, [])
 
@@ -67,7 +71,7 @@ const LWXBackground = ({ className }: Props) => {
           xl:w-[285px] xl:h-[285px] xl:translate-y-2
           2xl:w-[342px] 2xl:h-[342px] 2xl:translate-y-px
           `,
-          isActive && 'block'
+          isActive && !hasTicket && 'block'
         )}
         viewBox="0 0 186 185"
         fill="none"

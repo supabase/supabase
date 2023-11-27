@@ -2,6 +2,7 @@ import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { AnimatePresence, m, LazyMotion, domAnimation } from 'framer-motion'
+import { cn } from 'ui'
 import { DEFAULT_TRANSITION, INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
 import { LWX_DATE, LWX_LAUNCH_DATE } from '~/lib/constants'
 
@@ -12,7 +13,9 @@ import LWXBackground from '../LWXBackground'
 import TicketForm from './TicketForm'
 import CountdownComponent from '../Countdown'
 import LaunchWeekPrizeSection from '../LaunchWeekPrizeSection'
-import { cn } from 'ui'
+import TicketPresence from './TicketPresence'
+import TicketActions from './TicketActions'
+import useWinningChances from '../../hooks/useWinningChances'
 
 const TicketingFlow = () => {
   const { ticketState, userData } = useConfData()
@@ -20,11 +23,15 @@ const TicketingFlow = () => {
   const isLoading = ticketState === 'loading'
   const isRegistering = ticketState === 'registration'
   const hasTicket = ticketState === 'ticket'
+  const hasPlatinumTicket = userData.golden
 
   const transition = DEFAULT_TRANSITION
   const initial = INITIAL_BOTTOM
   const animate = getAnimation({ duration: 1 })
   const exit = { opacity: 0, transition: { ...transition, duration: 0.2 } }
+
+  const winningChances = useWinningChances()
+  console.log('winningChances', winningChances)
 
   return (
     <>
@@ -89,7 +96,8 @@ const TicketingFlow = () => {
                     <br className="hidden md:block" /> and find new ways to level up your
                     development.
                   </p>
-                  {!userData.username && <TicketForm />}
+                  <TicketForm />
+                  <TicketPresence />
                 </m.div>
               )}
               {hasTicket && (
@@ -98,16 +106,54 @@ const TicketingFlow = () => {
                   initial={initial}
                   animate={animate}
                   exit={exit}
-                  className="w-full flex flex-col items-center gap-4 md:gap-10 text-foreground"
+                  className="w-full flex flex-col xl:flex-row items-center xl:justify-center xl:items-start gap-8 md:gap-10 xl:gap-20 text-foreground"
                 >
-                  <div className="w-full min-h-[400px] flex flex-col items-center">
+                  <div className="w-full ld:w-auto min-h-[400px] max-w-2xl flex flex-col items-center">
                     <TicketContainer />
                   </div>
-                  <div className="flex flex-col items-center justify-center gap-2 max-w-xl">
-                    <span className="text-2xl">
-                      {userData.golden ? 'You have a platinum ticket now' : 'Share your ticket'}
-                    </span>
-                    {userData.golden ? (
+                  <div className="order-last xl:order-first xl:h-full max-w-md gap-3 flex flex-col items-center justify-center xl:items-start xl:justify-start xl:text-left">
+                    {hasPlatinumTicket ? (
+                      <p className="text-2xl lg:text-3xl">
+                        <span className="text-foreground-lighter">Congrats!</span> You've maximized
+                        your chances and have a platinum ticket now.
+                      </p>
+                    ) : winningChances !== 2 ? (
+                      <p className="text-2xl lg:text-3xl">
+                        <span className="text-foreground-lighter">You're in!</span>{' '}
+                        <span className="">Now share your ticket and win limited swag.</span>
+                      </p>
+                    ) : (
+                      <p className="text-2xl lg:text-3xl">
+                        <span className="text-foreground-lighter">Just one more.</span>{' '}
+                        <span className="">Keep sharing to increase your chances.</span>
+                      </p>
+                    )}
+                    {!hasPlatinumTicket && <TicketPresence />}
+                    <div className="w-full border rounded-lg bg-[#060809] mt-8 overflow-hidden">
+                      {hasPlatinumTicket ? (
+                        <p className="p-6">Stay tuned after Launch Week X to know if you won.</p>
+                      ) : (
+                        <p className="p-6">
+                          Win a keyboard and other"
+                          <Link href="#prizes" className="underline">
+                            Launch Week X awards
+                          </Link>
+                          .
+                        </p>
+                      )}
+                      <div className="w-full px-6 mb-6">
+                        <TicketActions />
+                      </div>
+                      <div className="relative w-full h-30 pl-6">
+                        <Image
+                          src="/images/launchweek/lwx/swag/lwx_keyboard_preview.png"
+                          alt="Supabase Launch Week X keyboard prize"
+                          width={500}
+                          height={500}
+                        />
+                      </div>
+                    </div>
+                    {/* {hasPlatinumTicket ? (
                       <span className="text-foreground-lighter">
                         Winners will be announced on Dec 15th
                       </span>
@@ -115,7 +161,7 @@ const TicketingFlow = () => {
                       <span className="text-foreground-lighter">
                         Boost your chances of winning limited-edition swag by sharing your ticket.
                       </span>
-                    )}
+                    )} */}
                   </div>
                 </m.div>
               )}
@@ -125,12 +171,12 @@ const TicketingFlow = () => {
 
         <LWXBackground
           className={cn(
-            'absolute z-0 top-0 left-0 right-0 w-full flex items-center justify-center opacity-100 transition-opacity',
-            hasTicket && 'opacity-40'
+            'absolute z-0 top-0 left-0 right-0 bottom-0 w-full flex items-center justify-center opacity-100 transition-opacity',
+            hasTicket && 'opacity-10'
           )}
         />
       </SectionContainer>
-      <SectionContainer className="!pt-4 lg:pb-40">
+      <SectionContainer className="lg:pb-40">
         <LaunchWeekPrizeSection />
       </SectionContainer>
     </>

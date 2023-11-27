@@ -3,6 +3,7 @@ import { useParams } from 'common'
 import Ticket from './Ticket'
 import TicketActions from './TicketActions'
 import TicketCustomizationForm from './TicketCustomizationForm'
+import TicketCopy from './TicketCopy'
 
 export default function TicketContainer() {
   const { userData } = useConfData()
@@ -11,9 +12,10 @@ export default function TicketContainer() {
 
   return (
     <div className="flex flex-col w-full items-center mx-auto max-w-2xl gap-3">
-      {!sharePage && <TicketCustomizationForm />}
+      {/* {!sharePage && <TicketCustomizationForm />} */}
       <Ticket />
-      {userData.username && <TicketActions username={userData.username} />}
+      <TicketCopy sharePage={sharePage} />
+      {/* {userData.username && <TicketActions username={userData.username} />} */}
     </div>
   )
 }

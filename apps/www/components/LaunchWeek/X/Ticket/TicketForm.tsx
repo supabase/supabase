@@ -133,8 +133,6 @@ export default function TicketForm() {
       >
         Claim your ticket
       </Button>
-
-      <TicketPresence />
     </div>
   )
 }

@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react'
 import { SupabaseClient } from '@supabase/supabase-js'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import solutions from '~/data/Solutions'
+import { cn } from 'ui'
 
 const TicketPresence = () => {
-  const { supabase } = useConfData()
+  const { supabase, ticketState } = useConfData()
+  const hasTicket = ticketState === 'ticket'
   const [realtimeChannel, setRealtimeChannel] = useState<ReturnType<
     SupabaseClient['channel']
   > | null>(null)
@@ -42,7 +44,12 @@ const TicketPresence = () => {
   }, [])
 
   return (
-    <div className="text-foreground-muted text-xs flex items-center">
+    <div
+      className={cn(
+        'text-foreground-muted text-xs flex items-center',
+        hasTicket && 'text-sm opacity-80'
+      )}
+    >
       <svg
         className="h-5 w-5 stroke-foreground-lighter animate-pulse mr-2"
         xmlns="http://www.w3.org/2000/svg"
@@ -58,7 +65,8 @@ const TicketPresence = () => {
           d={solutions.realtime.icon}
         />
       </svg>
-      {onlineUsers.length} {isSingular ? 'person is' : 'people are'} generating their ticket
+      {onlineUsers.length} {isSingular ? 'person is' : 'people are'}{' '}
+      {hasTicket ? 'customizing' : 'generating'} their ticket
     </div>
   )
 }

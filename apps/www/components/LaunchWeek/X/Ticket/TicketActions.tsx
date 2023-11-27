@@ -5,18 +5,15 @@ import { Button, IconLinkedinSolid, IconTwitterX, cn } from 'ui'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import { useParams } from '~/hooks/useParams'
 import TicketCopy from './TicketCopy'
+import { useBreakpoint } from 'common'
 
-type Props = {
-  username: string
-}
-
-export default function TicketActions({ username }: Props) {
+export default function TicketActions() {
   const { userData, supabase } = useConfData()
-  const { golden } = userData
+  const { golden, username } = userData
   const [_imgReady, setImgReady] = useState(false)
   const [_loading, setLoading] = useState(false)
+  const isTablet = useBreakpoint(1280)
   const downloadLink = useRef<HTMLAnchorElement>()
-  console.log('golden', golden)
   const link = `${SITE_URL}/tickets/${username}?lw=x${golden ? `&platinum=true` : ''}`
   const permalink = encodeURIComponent(link)
   const text = golden ? TWEET_TEXT_GOLDEN : TWEET_TEXT
@@ -24,7 +21,7 @@ export default function TicketActions({ username }: Props) {
   const tweetUrl = `https://twitter.com/intent/tweet?url=${permalink}&via=supabase&text=${encodedText}`
   const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${permalink}`
   const downloadUrl = `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lwx-ticket?username=${encodeURIComponent(
-    username
+    username ?? ''
   )}`
   const params = useParams()
   const sharePage = !!params.username
@@ -67,33 +64,32 @@ export default function TicketActions({ username }: Props) {
         sharePage ? 'justify-center' : 'justify-between'
       )}
     >
-      <TicketCopy sharePage={sharePage} />
-      {!sharePage && (
-        <div className="flex gap-1">
-          <Button
-            onClick={() => handleShare('twitter')}
-            type={userData.sharedOnTwitter ? 'secondary' : 'default'}
-            icon={<IconTwitterX className="text-light w-3" />}
-            size="tiny"
-            asChild
-          >
-            <Link href={tweetUrl} target="_blank">
-              Share on X
-            </Link>
-          </Button>
-          <Button
-            onClick={() => handleShare('linkedin')}
-            type={userData.sharedOnLinkedIn ? 'secondary' : 'default'}
-            icon={<IconLinkedinSolid className="text-light w-3" />}
-            size="tiny"
-            asChild
-          >
-            <Link href={linkedInUrl} target="_blank">
-              Share on Linkedin
-            </Link>
-          </Button>
-        </div>
-      )}
+      <div className="flex w-full gap-2">
+        <Button
+          onClick={() => handleShare('twitter')}
+          type={userData.sharedOnTwitter ? 'secondary' : 'default'}
+          icon={<IconTwitterX className="text-light w-3" />}
+          size={isTablet ? 'tiny' : 'tiny'}
+          block
+          asChild
+        >
+          <Link href={tweetUrl} target="_blank">
+            Share on X
+          </Link>
+        </Button>
+        <Button
+          onClick={() => handleShare('linkedin')}
+          type={userData.sharedOnLinkedIn ? 'secondary' : 'default'}
+          icon={<IconLinkedinSolid className="text-light w-3" />}
+          size={isTablet ? 'tiny' : 'tiny'}
+          block
+          asChild
+        >
+          <Link href={linkedInUrl} target="_blank">
+            Share on Linkedin
+          </Link>
+        </Button>
+      </div>
     </div>
   )
 }
