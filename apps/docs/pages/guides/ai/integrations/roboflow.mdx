@@ -1,0 +1,39 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'ai-integration-llamaindex',
+  title:
+    'Learn how to integrate Supabase with Roboflow, a tool for running fine-tuned and foundation vision models.'
+  subtitle:
+    'Learn how to integrate Supabase with Roboflow, a tool for running fine-tuned and foundation vision models.'
+  breadcrumb: 'AI Integrations',
+}
+
+This guide will walk you through a basic example using Roboflow Inference to run inference on fine-tuned and foundation models. We will run inference and save predictions using an object detection model and CLIP.
+
+<DatabaseSetup />
+
+## Save Computer Vision Predictions
+
+### Step #1: Install and Start Roboflow Inference
+
+### Step #2: Run Inference on an Image
+
+### Step #3: Save Results in Supabase
+
+## Calculate and Save CLIP Embeddings
+
+### Step #1: Install and Start Roboflow Inference
+
+### Step #2: Run CLIP on an Image
+
+### Step #3: Save Embeddings in Supabase
+
+## Resources
+
+- [Roboflow Inference documentation](https://inference.roboflow.com)
+- [Roboflow Getting Started guide](https://blog.roboflow.com/getting-started-with-roboflow/)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
