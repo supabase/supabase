@@ -1,11 +1,9 @@
 import { createClient } from '@supabase/supabase-js'
 import dotenv from 'dotenv'
-import 'openai'
-import { Configuration, OpenAIApi } from 'openai'
-import { inspect } from 'util'
+import { parseArgs } from 'node:util'
+import { OpenAI } from 'openai'
 import { v4 as uuidv4 } from 'uuid'
 import { fetchSources } from './sources'
-import { parseArgs } from 'node:util'
 
 dotenv.config()
 
@@ -193,19 +191,14 @@ async function generateEmbeddings() {
         const input = content.replace(/\n/g, ' ')
 
         try {
-          const configuration = new Configuration({ apiKey: process.env.OPENAI_KEY })
-          const openai = new OpenAIApi(configuration)
+          const openai = new OpenAI({ apiKey: process.env.OPENAI_KEY })
 
-          const embeddingResponse = await openai.createEmbedding({
+          const embeddingResponse = await openai.embeddings.create({
             model: 'text-embedding-ada-002',
             input,
           })
 
-          if (embeddingResponse.status !== 200) {
-            throw new Error(inspect(embeddingResponse.data, false, 2))
-          }
-
-          const [responseData] = embeddingResponse.data.data
+          const [responseData] = embeddingResponse.data
 
           const { error: insertPageSectionError, data: pageSection } = await supabaseClient
             .from('page_section')
@@ -214,7 +207,7 @@ async function generateEmbeddings() {
               slug,
               heading,
               content,
-              token_count: embeddingResponse.data.usage.total_tokens,
+              token_count: embeddingResponse.usage.total_tokens,
               embedding: responseData.embedding,
             })
             .select()
