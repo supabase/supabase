@@ -109,27 +109,11 @@ const TicketingFlow = () => {
                     </span>
                     {userData.golden ? (
                       <span className="text-foreground-lighter">
-                        Winners will be announced on Dec 15th on{' '}
-                        <Link
-                          href="https://twitter.com/supabase"
-                          target="_blank"
-                          className="underline hover:text-foreground"
-                        >
-                          twitter.com/supabase
-                        </Link>
+                        Winners will be announced on Dec 15th
                       </span>
                     ) : (
                       <span className="text-foreground-lighter">
                         Boost your chances of winning limited-edition swag by sharing your ticket.
-                        Winners will be announced on Dec 15th on{' '}
-                        <Link
-                          href="https://twitter.com/supabase"
-                          target="_blank"
-                          className="underline hover:text-foreground"
-                        >
-                          twitter.com/supabase
-                        </Link>
-                        .
                       </span>
                     )}
                   </div>

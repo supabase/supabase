@@ -1,7 +1,11 @@
 import React from 'https://esm.sh/react@18.2.0?deno-std=0.140.0'
 import { ImageResponse } from 'https://deno.land/x/og_edge@0.0.4/mod.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
-import { corsHeaders } from '../_shared/cors.ts'
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
 
 const STORAGE_URL = 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lwx'
 
@@ -12,7 +16,7 @@ const font = fetch(new URL(FONT_URL, import.meta.url)).then((res) => res.arrayBu
 const mono_font = fetch(new URL(MONO_FONT_URL, import.meta.url)).then((res) => res.arrayBuffer())
 const BUCKET_FOLDER_VERSION = 'v1'
 
-const LW_TABLE = 'lwx_tickets_golden'
+const LW_TABLE = 'lwx_tickets'
 
 const STYLING_CONGIF = {
   REG: {
@@ -20,7 +24,7 @@ const STYLING_CONGIF = {
     FOREGROUND: '#F8F9FA',
     FOREGROUND_LIGHT: '#707070',
   },
-  GOLD: {
+  PLATINUM: {
     BACKGROUND: '#f1f1f1',
     FOREGROUND: '#11181C',
     FOREGROUND_LIGHT: '#7E868C',
@@ -28,10 +32,11 @@ const STYLING_CONGIF = {
 }
 
 export async function handler(req: Request) {
+  console.log
   const url = new URL(req.url)
   const username = url.searchParams.get('username') ?? url.searchParams.get('amp;username')
   const assumePlatinum = url.searchParams.get('platinum') ?? url.searchParams.get('amp;platinum')
-  const userAgent = req.headers.get('user-agent')
+  // const userAgent = req.headers.get('user-agent')
 
   try {
     if (!username) throw new Error('missing username param')
@@ -44,19 +49,19 @@ export async function handler(req: Request) {
     )
 
     // Track social shares
-    if (userAgent?.toLocaleLowerCase().includes('twitter')) {
-      await supabaseAdminClient
-        .from(LW_TABLE)
-        .update({ sharedOnTwitter: 'now' })
-        .eq('username', username)
-        .is('sharedOnTwitter', null)
-    } else if (userAgent?.toLocaleLowerCase().includes('linkedin')) {
-      await supabaseAdminClient
-        .from(LW_TABLE)
-        .update({ sharedOnLinkedIn: 'now' })
-        .eq('username', username)
-        .is('sharedOnLinkedIn', null)
-    }
+    // if (userAgent?.toLocaleLowerCase().includes('twitter')) {
+    //   await supabaseAdminClient
+    //     .from(LW_TABLE)
+    //     .update({ sharedOnTwitter: 'now' })
+    //     .eq('username', username)
+    //     .is('sharedOnTwitter', null)
+    // } else if (userAgent?.toLocaleLowerCase().includes('linkedin')) {
+    //   await supabaseAdminClient
+    //     .from(LW_TABLE)
+    //     .update({ sharedOnLinkedIn: 'now' })
+    //     .eq('username', username)
+    //     .is('sharedOnLinkedIn', null)
+    // }
 
     // Get ticket data
     const { data, error } = await supabaseAdminClient
@@ -67,6 +72,7 @@ export async function handler(req: Request) {
 
     if (error) console.log('fetch error', error.message)
     if (!data) throw new Error(error?.message ?? 'user not found')
+    console.log('ticket data', data)
     const { name, ticketNumber, metadata } = data
 
     const platinum = (!!data?.sharedOnTwitter && !!data?.sharedOnLinkedIn) ?? false
@@ -78,7 +84,7 @@ export async function handler(req: Request) {
         BG: `${STORAGE_URL}/assets/lwx_ticket_bg_regular.png?t=2023-11-24T12%3A52%3A28.581Z`,
         LOGO: `${STORAGE_URL}/assets/logos/supabase_lwx_logo_dark.png?t=2023-11-23T09%3A37%3A36.974Z`,
       },
-      GOLD: {
+      PLATINUM: {
         BG: `${STORAGE_URL}/assets/lwx_ticket_bg_platinum.png?t=2023-11-24T12%3A52%3A51.031Z`,
         LOGO: `${STORAGE_URL}/assets/logos/supabase_lwx_logo_light.png?t=2023-11-24T10%3A37%3A36.974Z`,
       },
@@ -101,8 +107,8 @@ export async function handler(req: Request) {
               width: '1200px',
               height: '628px',
               position: 'relative',
-              backgroundColor: STYLING_CONGIF[platinum ? 'GOLD' : 'REG'].BACKGROUND,
-              color: STYLING_CONGIF[platinum ? 'GOLD' : 'REG'].FOREGROUND,
+              backgroundColor: STYLING_CONGIF[platinum ? 'PLATINUM' : 'REG'].BACKGROUND,
+              color: STYLING_CONGIF[platinum ? 'PLATINUM' : 'REG'].FOREGROUND,
               fontFamily: '"Circular"',
               overflow: 'hidden',
               display: 'flex',
@@ -123,7 +129,7 @@ export async function handler(req: Request) {
                 right: '-1px',
                 zIndex: '0',
               }}
-              src={platinum ? BACKGROUND['GOLD']['BG'] : BACKGROUND['REG']['BG']}
+              src={platinum ? BACKGROUND['PLATINUM']['BG'] : BACKGROUND['REG']['BG']}
             />
 
             {/* Name & username */}
@@ -146,7 +152,7 @@ export async function handler(req: Request) {
             >
               <p
                 style={{
-                  color: STYLING_CONGIF[platinum ? 'GOLD' : 'REG'].FOREGROUND,
+                  color: STYLING_CONGIF[platinum ? 'PLATINUM' : 'REG'].FOREGROUND,
                   margin: '0',
                   padding: '0',
                   fontSize: '44',
@@ -161,7 +167,7 @@ export async function handler(req: Request) {
               {/* Username */}
               <div
                 style={{
-                  color: STYLING_CONGIF[platinum ? 'GOLD' : 'REG'].FOREGROUND_LIGHT,
+                  color: STYLING_CONGIF[platinum ? 'PLATINUM' : 'REG'].FOREGROUND_LIGHT,
                   opacity: 0.8,
                   display: 'flex',
                   fontSize: '38',
@@ -192,7 +198,7 @@ export async function handler(req: Request) {
             >
               <div style={{ display: 'flex', marginBottom: '20' }}>
                 <img
-                  src={platinum ? BACKGROUND['GOLD']['LOGO'] : BACKGROUND['REG']['LOGO']}
+                  src={platinum ? BACKGROUND['PLATINUM']['LOGO'] : BACKGROUND['REG']['LOGO']}
                   width={60}
                   height={60}
                 />
@@ -200,7 +206,7 @@ export async function handler(req: Request) {
               {/* Ticket No  */}
               <p
                 style={{
-                  color: STYLING_CONGIF[platinum ? 'GOLD' : 'REG'].FOREGROUND_LIGHT,
+                  color: STYLING_CONGIF[platinum ? 'PLATINUM' : 'REG'].FOREGROUND_LIGHT,
                   margin: '0',
                   marginBottom: '5',
                   display: 'flex',
@@ -279,14 +285,14 @@ export async function handler(req: Request) {
         username,
         platinum,
       }),
-    })
+    }).catch((err) => console.log('generate og err', err))
 
-    const NEW_TIMESTAMP = new Date()
+    // const NEW_TIMESTAMP = new Date()
 
     return await fetch(
       `${STORAGE_URL}/tickets/${
         platinum ? 'platinum' : 'regular'
-      }/${BUCKET_FOLDER_VERSION}/${username}.png?t=${NEW_TIMESTAMP}`
+      }/${BUCKET_FOLDER_VERSION}/${username}.png`
     )
   } catch (error) {
     return new Response(JSON.stringify({ error: error.message }), {

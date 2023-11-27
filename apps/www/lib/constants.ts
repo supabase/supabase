@@ -38,8 +38,8 @@ export const TWITTER_USER_NAME = 'supabase'
 export const LW7_DATE = 'April 10th 2023'
 export const LW8_DATE = 'August 7-11'
 export const LW8_LAUNCH_DATE = '2023-08-07T09:00:00.000-07:00'
-export const LWX_DATE = 'Dec 11-15 / 10am PT'
-export const LWX_LAUNCH_DATE = '2023-12-11T09:00:00.000-07:00'
+export const LWX_DATE = 'Dec 11-15 / 8am PT'
+export const LWX_LAUNCH_DATE = '2023-12-11T08:00:00.000-07:00'
 export const TWEET_TEXT =
   '#SupaLaunchWeek 𝗫 is coming December 11-15 🚀\nClaim your ticket for a chance to win @supabase swag.\n\n'
 export const TWEET_TEXT_GOLDEN = `I turned my #SupaLaunchWeek X ticket Platinum! 🩶😎\n`

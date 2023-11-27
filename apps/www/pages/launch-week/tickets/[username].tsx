@@ -117,18 +117,15 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
   const username = params?.username?.toString() || null
+  console.log('params', params)
+  console.log('username', username)
   let user
-
-  // fetch users for the TicketBrickWall
-  const { data: users } = await supabase!.from('lwx_tickets_golden').select().limit(17)
 
   fetch(
     `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lwx-ticket?username=${encodeURIComponent(
       username ?? ''
     )}`
-  ).catch((error) => {
-    console.log('error', error)
-  })
+  )
 
   // fetch a specific user
   if (username) {
@@ -154,7 +151,6 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
         username,
       },
       ogImageUrl,
-      users,
       key: username,
     },
     revalidate: 5,

@@ -1,7 +1,11 @@
 import React from 'https://esm.sh/react@18.2.0?deno-std=0.140.0'
 import { ImageResponse } from 'https://deno.land/x/og_edge@0.0.4/mod.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
-import { corsHeaders } from '../_shared/cors.ts'
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
 
 const STORAGE_URL = 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lwx'
 const BUCKET_FOLDER_VERSION = 'v1'
@@ -56,7 +60,7 @@ export async function handler(req: Request) {
             src={ticketImg}
             style={{
               borderRadius: '26px',
-              boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.15)',
+              boxShadow: '0px 4px 20px 0px rgba(0, 0, 0, 0.15)',
             }}
           />
         </div>

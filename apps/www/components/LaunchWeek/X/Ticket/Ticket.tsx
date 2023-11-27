@@ -12,7 +12,9 @@ export default function Ticket() {
   const { golden = false, bg_image_id: bgImageId = '1' } = user
   const [imageHasLoaded, setImageHasLoaded] = useState(false)
 
-  const fallbackImg = `/images/launchweek/lwx/tickets/lwx_ticket_bg.svg`
+  const fallbackImg = `/images/launchweek/lwx/tickets/lwx_ticket_bg_${
+    golden ? 'platinum' : 'regular'
+  }.png`
 
   const ticketBg = {
     regular: {

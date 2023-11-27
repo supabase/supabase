@@ -16,11 +16,11 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
     >
       <h2 className="w-full text-sm font-mono uppercase tracking-[1px]">Awards</h2>
       <div className="grid md:grid-cols-2 text-lg">
-        <h3 className="text-4xl text-foreground">Get your winning ticket</h3>
-        <p>
+        <h3 className="text-4xl text-foreground">Share your ticket to win prizes</h3>
+        {/* <p>
           Mark your calendars for December 15th for Launch Week X final day to find out if you're
           one of the lucky winners.
-        </p>
+        </p> */}
       </div>
       <div className="w-full pt-8 md:pt-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mx-auto h-auto text-foreground">
