@@ -132,7 +132,7 @@ const SSLConfiguration = () => {
                 <IconLoader className="animate-spin" strokeWidth={1.5} size={16} />
               )}
               <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger>
+                <Tooltip.Trigger asChild>
                   <Toggle
                     checked={isEnforced}
                     disabled={
@@ -182,7 +182,7 @@ const SSLConfiguration = () => {
           </div>
           <div className="flex items-end justify-end">
             <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
+              <Tooltip.Trigger asChild>
                 <Button type="default" disabled={!hasSSLCertificate} icon={<IconDownload />}>
                   <a
                     href={`https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/${env}/ssl/${env}-ca-2021.crt`}
