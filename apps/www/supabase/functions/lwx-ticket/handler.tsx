@@ -83,7 +83,7 @@ export async function handler(req: Request) {
     // Else, generate image and upload to storage.
     const BACKGROUND = {
       REG: {
-        BG: `${STORAGE_URL}/assets/lwx_ticket_bg_platinum.png?t=2023-11-27T12%3A35%3A58.316Z`,
+        BG: `${STORAGE_URL}/assets/lwx_ticket_bg_regular.png?t=2023-11-27T12%3A35%3A58.316Z`,
         LOGO: `${STORAGE_URL}/assets/logos/supabase_lwx_logo_dark.png`,
       },
       PLATINUM: {
