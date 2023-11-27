@@ -20,6 +20,7 @@ function getCorsHeaders(req) {
 }
 
 Deno.serve(async (req) => {
+  performance.mark('very start')
   try {
     // Handle CORS
     if (req.method === 'OPTIONS') {
@@ -45,20 +46,37 @@ Deno.serve(async (req) => {
       throw new UserError('Missing query in request data')
     }
 
+    performance.mark('query log start')
     // Intentionally log the query
     console.log({ query })
+    console.log(
+      'time spent logging query',
+      performance.measure('log', { start: 'query log start' }).duration
+    )
 
     const sanitizedQuery = query.trim()
 
+    performance.mark('create supabase client start')
     const supabaseClient = createClient<Database>(supabaseUrl, supabaseServiceKey)
+    console.log(
+      'time spent creating client',
+      performance.measure('create client', { start: 'create supabase client start' }).duration
+    )
 
+    performance.mark('sql query')
     const { data: searchData, error: searchError } = await supabaseClient.rpc('docs_search_fts', {
       query: sanitizedQuery,
     })
+    console.log('sql query', performance.measure('sql query', { start: 'sql query' }).duration)
 
     if (searchError) {
       throw new ApplicationError('Failed to find search results', searchError)
     }
+
+    console.log(
+      'total duration',
+      performance.measure('total duration', { start: 'very start' }).duration
+    )
 
     return new Response(JSON.stringify(searchData), {
       headers: {
