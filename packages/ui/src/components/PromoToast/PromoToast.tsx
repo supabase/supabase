@@ -2,9 +2,10 @@ import { isBrowser } from 'common'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Button, CountdownWidget } from 'ui'
+import { Button } from 'ui'
 import announcement from '../../layout/banners/data/Announcement.json'
 import CountdownComponent from '../CountdownWidget/Countdown'
+import PromoBg from './PromoBg'
 
 const PromoToast = () => {
   const [visible, setVisible] = useState(true)
@@ -23,28 +24,27 @@ const PromoToast = () => {
   }
 
   return (
-    <div className="grid gap-4 fixed z-50 bottom-8 right-8 w-[300px] bg-alternative-200 hover:bg-alternative transition-colors border border-default rounded p-8 shadow-lg">
-      <div className="text-foreground flex flex-col text-base">
+    <div className="grid gap-4 fixed z-50 bottom-8 right-8 w-[80vw] sm:w-[350px] bg-alternative-200 hover:bg-alternative transition-colors border border-default rounded p-6 shadow-lg overflow-hidden">
+      <div className="realtive z-10 text-foreground flex flex-col text-base uppercase tracking-[1px]">
         <div className="flex gap-1.5 items-center">
           <p>Launch Week</p>
           <Image src={LWXLogo} alt="Supabase Launch Week X Logo" width={14} height={14} />
         </div>
-        <span className="font-mono text-sm">Dec 11-15</span>
-        <div className="hidden sm:block -ml-1">
-          <CountdownComponent date={new Date(announcement.launchDate)} showCard={false} />
-        </div>
+        <span className="font-mono text-sm">Dec 11-15 / 10am PT</span>
+        <CountdownComponent date={new Date(announcement.launchDate)} showCard={false} />
       </div>
 
-      <div className="flex items-center space-x-2">
-        <Button asChild type="alternative">
+      <div className="relative z-10 flex items-center space-x-2">
+        <Button asChild type="secondary">
           <Link target="_blank" rel="noreferrer" href="https://supabase.com/launch-week">
             Claim your ticket
           </Link>
         </Button>
-        <Button type="text" onClick={handleHide}>
+        <Button type="default" onClick={handleHide}>
           Dismiss
         </Button>
       </div>
+      <PromoBg className="absolute z-0 inset-0 w-full h-auto my-auto right-0 left-auto" />
     </div>
   )
 }
