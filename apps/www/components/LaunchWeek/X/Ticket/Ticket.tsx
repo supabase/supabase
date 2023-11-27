@@ -6,10 +6,11 @@ import Panel from '~/components/Panel'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import TicketProfile from './TicketProfile'
 import TicketFooter from './TicketFooter'
-import { useParams } from 'common'
+import { useBreakpoint, useParams } from 'common'
 
 export default function Ticket() {
   const { userData: user, showCustomizationForm, setShowCustomizationForm } = useConfData()
+  const isMobile = useBreakpoint()
   const { golden = false, bg_image_id: bgImageId = '1' } = user
   const [imageHasLoaded, setImageHasLoaded] = useState(false)
   const params = useParams()
@@ -22,9 +23,11 @@ export default function Ticket() {
   const ticketBg = {
     regular: {
       background: `/images/launchweek/lwx/tickets/lwx_ticket_bg_regular.png`,
+      background_mobile: `/images/launchweek/lwx/tickets/lwx_ticket_regular_mobile.png`,
     },
     platinum: {
       background: `/images/launchweek/lwx/tickets/lwx_ticket_bg_platinum.png`,
+      background_mobile: `/images/launchweek/lwx/tickets/lwx_ticket_platinum_mobile.png`,
     },
   }
 
@@ -58,7 +61,9 @@ export default function Ticket() {
         <TicketFooter />
       </div>
       <Image
-        src={ticketBg[golden ? 'platinum' : 'regular'].background}
+        src={
+          ticketBg[golden ? 'platinum' : 'regular'][!isMobile ? 'background' : 'background_mobile']
+        }
         alt={`Launch Week X ticket background #${bgImageId}`}
         placeholder="blur"
         blurDataURL={fallbackImg}
