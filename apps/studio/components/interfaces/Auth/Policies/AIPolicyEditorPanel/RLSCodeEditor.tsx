@@ -1,6 +1,6 @@
 import Editor, { OnChange, OnMount } from '@monaco-editor/react'
 import { editor } from 'monaco-editor'
-import { MutableRefObject } from 'react'
+import { MutableRefObject, useRef } from 'react'
 import { cn } from 'ui'
 
 import { alignEditor } from 'components/ui/CodeEditor'
@@ -19,13 +19,13 @@ interface RLSCodeEditorProps {
   editorRef: MutableRefObject<editor.IStandaloneCodeEditor | null>
 }
 
-const placeholder = `
+const placeholderText = `
 CREATE POLICY _name_ ON _table_name_\n
 [ AS { PERMISSIVE | RESTRICTIVE } ]\n
 [ FOR { ALL | SELECT | INSERT | UPDATE | DELETE } ]\n
 [ TO _role_name_ ]\n
 [ USING ( _using_expression_ ) ]\n
-[ WITH CHECK ( _check_expression_ ) ]
+[ WITH CHECK ( _check_expression_ ) ];
 `.trim()
 
 const RLSCodeEditor = ({
@@ -36,17 +36,38 @@ const RLSCodeEditor = ({
   value,
   editorRef,
 }: RLSCodeEditorProps) => {
-  const onMount: OnMount = async (editor) => {
+  const hasValue = useRef<any>()
+
+  const onMount: OnMount = async (editor, monaco) => {
     editorRef.current = editor
     alignEditor(editor)
+
+    hasValue.current = editor.createContextKey('hasValue', false)
 
     const placeholder = document.querySelector('.monaco-placeholder') as HTMLElement | null
     if (placeholder) placeholder.style.display = 'block'
 
-    editor?.focus()
+    editor.addCommand(
+      monaco.KeyCode.Tab,
+      () => {
+        editor.executeEdits('source', [
+          {
+            // @ts-ignore
+            identifier: 'add-placeholder',
+            range: new monaco.Range(1, 1, 1, 1),
+            text: placeholderText.split('\n\n').join('\n'),
+          },
+        ])
+      },
+      '!hasValue'
+    )
+
+    editor.focus()
   }
 
   const onChange: OnChange = (value) => {
+    hasValue.current.set((value ?? '').length > 0)
+
     const placeholder = document.querySelector('.monaco-placeholder') as HTMLElement | null
     if (placeholder) {
       if (!value) {
@@ -90,7 +111,7 @@ const RLSCodeEditor = ({
         className="monaco-placeholder absolute top-[3px] left-16 text-sm pointer-events-none font-mono [&>div>p]:text-foreground-lighter [&>div>p]:!m-0"
         style={{ display: 'none' }}
       >
-        <Markdown content={placeholder} />
+        <Markdown content={placeholderText} />
       </div>
     </>
   )
