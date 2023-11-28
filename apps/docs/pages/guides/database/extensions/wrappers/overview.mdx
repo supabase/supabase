@@ -15,7 +15,7 @@ Postgres includes several built-in foreign data wrappers, such as [`postgres_fdw
 
 Wrappers introduce some new terminology and different workflows.
 
-![FDW](/docs/img/database/fdw.png)
+![FDW](/docs/img/database/fdw-light.png)
 
 ### Remote Servers
 
@@ -107,7 +107,7 @@ select cron.schedule(
 );
 ```
 
-![FDW](/docs/img/database/fdw-qetl.png)
+![FDW](/docs/img/database/fdw-qetl-light.png)
 
 This process can be taxing on your database if you are moving large amounts of data. Often, it's better to use an external tool for batch ETL, such as [Fivetran](https://fivetran.com/) or [Airbyte](https://airbyte.io/).
 
