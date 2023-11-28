@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, createRef } from 'react'
-import { experimental_useFormState as useFormState } from 'react-dom'
+import { useFormState } from 'react-dom'
 import { useFormStatus } from 'react-dom'
 import { Button, Input_Shadcn_, Label_Shadcn_, Modal } from 'ui'
 import { updateThreadName } from '@/app/actions'
