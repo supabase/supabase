@@ -175,21 +175,90 @@ functions:
             channel: OtpChannel.whatsapp,  
           );
           ```
-  - id: sign-in-with-apple
-    title: 'signInWithApple()'
+  - id: sign-in-with-id-token
+    title: 'signInWithIdToken()'
     description: |
-      Signs in a user using native Apple login.
-    notes: |
-      - You need to [register your bundle ID](https://developer.apple.com/help/account/manage-identifiers/register-an-app-id/) and add it to Supabase dashboard.
-      - This method is only available in iOS and macOS
-      - For other platforms, [signInWithOAuth()](https://supabase.com/docs/reference/dart/auth-signinwithoauth) should be used.
+      Allows you to perform native Google and Apple sign in by combining it with [google_sign_in](https://pub.dev/packages/google_sign_in) [sign_in_with_apple](https://pub.dev/packages/sign_in_with_apple) packages.
     examples:
-      - id: sign-in-with-apple
-        name: Sign in with Apple
+      - id: sign-in-with-google
+        name: Native Google sign in
         isSpotlight: true
+        description: |
+          You can perform native Google sign in on Android and iOS using [google_sign_in](https://pub.dev/packages/google_sign_in).
+          For platform specific settings, follow the instructions on README of the package.
+
+          First, create client IDs for your app. You need to create a web client ID as well to perform Google sign-in with Supabase.
+
+          - [Steps to obtain web client ID](https://developers.google.com/identity/sign-in/android/start-integrating#configure_a_project)
+          - [Steps to obtain Android client ID](https://developers.google.com/identity/sign-in/android/start-integrating#configure_a_project)
+          - [Steps to obtain iOS client ID](https://developers.google.com/identity/sign-in/ios/start-integrating#get_an_oauth_client_id)
+
+          Add the web client ID to the `Authentication -> Providers -> Google -> Authorized Client IDs` section in your Supabase dashboard
         code: |
           ```dart
-          final AuthResponse res = await supabase.auth.signInWithApple();
+          import 'package:google_sign_in/google_sign_in.dart';
+          import 'package:supabase_flutter/supabase_flutter.dart';
+
+          /// Web Client ID that you registered with Google Cloud.
+          /// This will be used to perform Google sign in on Android.
+          const webClientId = 'my-web.apps.googleusercontent.com';
+
+          /// iOS Client ID that you registered with Google Cloud.
+          const iosClientId = 'my-ios.apps.googleusercontent.com';
+
+          final GoogleSignIn googleSignIn = GoogleSignIn(
+            clientId: iosClientId,
+            serverClientId: webClientId,
+          );
+          final googleUser = await googleSignIn.signIn();
+          final googleAuth = await googleUser!.authentication;
+          final accessToken = googleAuth.accessToken;
+          final idToken = googleAuth.idToken;
+
+          if (accessToken == null) {
+            throw 'No Access Token found.';
+          }
+          if (idToken == null) {
+            throw 'No ID Token found.';
+          }
+
+          final response = await supabase.auth.signInWithIdToken(
+            provider: OAuthProvider.google,
+            idToken: idToken,
+            accessToken: accessToken,
+          );
+          ```
+      - id: sign-in-with-apple
+        name: Native Apple Sign in
+        description: You need to [register your app ID with Apple](https://developer.apple.com/help/account/manage-identifiers/register-an-app-id/) with the `Sign In with Apple` capability selected, and add the bundle ID to your Supabase dashboard in `Authentication -> Providers -> Apple` before performing native Apple sign in.
+        code: |
+          ```dart
+          import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+          import 'package:supabase_flutter/supabase_flutter.dart';
+
+          /// Performs Apple sign in on iOS or macOS
+          final rawNonce = generateRawNonce();
+          final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
+
+          final credential = await SignInWithApple.getAppleIDCredential(
+            scopes: [
+              AppleIDAuthorizationScopes.email,
+              AppleIDAuthorizationScopes.fullName,
+            ],
+            nonce: hashedNonce,
+          );
+
+          final idToken = credential.identityToken;
+          if (idToken == null) {
+            throw const AuthException(
+                'Could not find ID Token from generated credential.');
+          }
+
+          final response = await signInWithIdToken(
+            provider: OAuthProvider.apple,
+            idToken: idToken,
+            nonce: rawNonce,
+          );
           ```
   - id: sign-in-with-oauth
     title: 'signInWithOAuth()'
