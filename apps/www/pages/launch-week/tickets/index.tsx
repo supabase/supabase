@@ -16,6 +16,7 @@ import { UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import CTABanner from '~/components/CTABanner'
 import TicketsGrid from '~/components/LaunchWeek/8/TicketsGrid'
 import supabase from '../../../lib/supabaseMisc'
+import Head from 'next/head'
 
 interface Props {
   users: UserData[]
@@ -23,7 +24,7 @@ interface Props {
 
 const generateOgs = async (users: UserData[]) => {
   users?.map(async (user) => {
-    const ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lwx-og?username=${encodeURIComponent(
+    const ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lwx-ticket?username=${encodeURIComponent(
       user.username ?? ''
     )}${!!user.golden ? '&platinum=true' : ''}`
     return await fetch(ogImageUrl)
@@ -35,7 +36,7 @@ export default function TicketsPage({ users }: Props) {
   const PAGE_COUNT = 20
   const TITLE = '#SupaLaunchWeek X Tickets'
   const DESCRIPTION = 'Supabase Launch Week X | 11-15 December 2023'
-  const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/8/lw8-og.jpg`
+  const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/lwx/lwx-og.jpg`
 
   const { resolvedTheme, setTheme } = useTheme()
   const [initialDarkMode] = useState(resolvedTheme?.includes('dark'))
@@ -110,6 +111,25 @@ export default function TicketsPage({ users }: Props) {
           ],
         }}
       />
+      <Head>
+        <link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href="/images/launchweek/lwx/favicon/apple-touch-icon.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="/images/launchweek/lwx/favicon/favicon-32x32.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="/images/launchweek/lwx/favicon/favicon-16x16.png"
+        />
+      </Head>
       <DefaultLayout>
         <div className="">
           <SectionContainer className="z-10">

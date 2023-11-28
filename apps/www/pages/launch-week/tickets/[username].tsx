@@ -14,6 +14,7 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import LWXBackground from '~/components/LaunchWeek/X/LWXBackground'
+import Head from 'next/head'
 
 const LWXTicketContainer = dynamic(() => import('~/components/LaunchWeek/X/Ticket/TicketContainer'))
 const LaunchWeekPrizeSection = dynamic(
@@ -71,6 +72,25 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
           ],
         }}
       />
+      <Head>
+        <link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href="/images/launchweek/lwx/favicon/apple-touch-icon.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="/images/launchweek/lwx/favicon/favicon-32x32.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="/images/launchweek/lwx/favicon/favicon-16x16.png"
+        />
+      </Head>
       <ConfDataContext.Provider
         value={{
           supabase,
