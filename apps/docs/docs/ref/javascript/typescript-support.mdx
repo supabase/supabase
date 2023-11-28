@@ -204,7 +204,7 @@ const { data } = await supabase.from('countries').select().returns<MyType>()
   <RefSubLayout.Examples>
 
     ```ts
-    import { QueryResult, QueryResultData, QueryResultError } from '@supabase/supabase-js'
+    import { QueryResult, QueryData, QueryError } from '@supabase/supabase-js'
 
     const countriesWithCitiesQuery = supabase
       .from("countries")
@@ -216,7 +216,7 @@ const { data } = await supabase.from('countries').select().returns<MyType>()
           name
         )
       `);
-    type CountriesWithCities = QueryResultData<typeof countriesWithCitiesQuery>;
+    type CountriesWithCities = QueryData<typeof countriesWithCitiesQuery>;
 
     const { data, error } = await countriesWithCitiesQuery;
     if (error) throw error;

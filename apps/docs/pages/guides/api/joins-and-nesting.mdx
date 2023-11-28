@@ -113,7 +113,7 @@ create table cities (
 We can get the nested `CountriesWithCities` type like this:
 
 ```ts
-import { QueryResult, QueryResultData, QueryResultError } from '@supabase/supabase-js'
+import { QueryResult, QueryData, QueryError } from '@supabase/supabase-js'
 
 const countriesWithCitiesQuery = supabase.from('countries').select(`
   id,
@@ -123,7 +123,7 @@ const countriesWithCitiesQuery = supabase.from('countries').select(`
     name
   )
 `)
-type CountriesWithCities = QueryResultData<typeof countriesWithCitiesQuery>
+type CountriesWithCities = QueryData<typeof countriesWithCitiesQuery>
 
 const { data, error } = await countriesWithCitiesQuery
 if (error) throw error
