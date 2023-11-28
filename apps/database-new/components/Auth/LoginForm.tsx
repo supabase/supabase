@@ -41,6 +41,10 @@ export default function LoginForm({ searchParams }: { searchParams?: { message?:
             <span>design</span>
           </div>
         </div>
+        <div className="grid gap-2 mb-4">
+          <p className="text-center text-sm ">You need to sign in to generate a schema</p>
+          <p className="text-center text-xs">Takes just a few seconds</p>
+        </div>
         <Button
           className="border text-sm bg-surface-100 rounded-md px-4 py-2 text-foreground mb-2 flex items-center justify-center gap-x-2"
           type="default"
