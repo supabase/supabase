@@ -1,15 +1,8 @@
 import { useState } from 'react'
-import {
-  Button,
-  IconChevronDown,
-  IconUser,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-  cn,
-} from 'ui'
+import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_, cn } from 'ui'
 
 import { User } from 'data/auth/users-query'
+import { ChevronDown, User as IconUser } from 'lucide-react'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { getAvatarUrl, getDisplayName } from '../Auth/Users/UserListItem.utils'
 import RoleImpersonationSelector from './RoleImpersonationSelector'
@@ -34,22 +27,24 @@ const RoleImpersonationPopover = ({
       <PopoverTrigger_Shadcn_ asChild>
         <Button
           size="tiny"
-          type="outline"
-          iconRight={<IconChevronDown />}
-          className={cn(variant === 'connected-on-right' && 'rounded-r-none border-r-0')}
+          type="default"
+          className={cn(
+            'h-[26px] pr-3 gap-0',
+            variant === 'connected-on-right' && 'rounded-r-none border-r-0'
+          )}
         >
           <div className="flex items-center gap-1">
-            <span className="text-foreground-light">role:</span>
+            <span className="text-foreground-muted">role</span>
             <span>{currentRole}</span>
-
             {state.role?.type === 'postgrest' && state.role.role === 'authenticated' && (
               <UserRoleButtonSection user={state.role.user} />
             )}
+            <ChevronDown className="text-muted" strokeWidth={1} size={12} />
           </div>
         </Button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_
-        className="p-5 w-full overflow-hidden bg-background"
+        className="p-0 w-full overflow-hidden bg-overlay"
         side="bottom"
         align="end"
       >
@@ -66,11 +61,11 @@ const UserRoleButtonSection = ({ user }: { user: User }) => {
   const displayName = getDisplayName(user, user.email ?? user.phone ?? user.id ?? 'Unknown')
 
   return (
-    <div className="flex gap-1 pr-1.5 bg-background-surface-300 rounded-full overflow-hidden">
+    <div className="flex gap-1 items-center pl-0.5 pr-1.5 h-[21px] bg-surface-200 rounded-full overflow-hidden">
       {avatarUrl ? (
-        <img className="rounded-full w-4 h-4" src={avatarUrl} alt={displayName} />
+        <img className="rounded-full w-[18px] h-[18px]" src={avatarUrl} alt={displayName} />
       ) : (
-        <div className="rounded-full w-4 h-4 bg-foreground-lighter flex items-center justify-center text-background">
+        <div className="rounded-full w-[18px] h-[18px] bg-surface-100 border flex items-center justify-center text-light">
           <IconUser size={12} strokeWidth={2} />
         </div>
       )}

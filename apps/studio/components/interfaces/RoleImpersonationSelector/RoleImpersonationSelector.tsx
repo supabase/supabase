@@ -5,6 +5,7 @@ import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-stat
 import { AnonIcon, AuthenticatedIcon, ServiceRoleIcon } from './Icons'
 import RoleImpersonationRadio from './RoleImpersonationRadio'
 import UserImpersonationSelector from './UserImpersonationSelector'
+import { DropdownMenuSeparator } from 'ui'
 
 export interface RoleImpersonationSelectorProps {
   serviceRoleLabel?: string
@@ -49,45 +50,46 @@ const RoleImpersonationSelector = ({ serviceRoleLabel }: RoleImpersonationSelect
   }
 
   return (
-    <div className="flex flex-col gap-5">
-      <h2 className="text-foreground text-base">Database connection settings</h2>
+    <>
+      <div className="flex flex-col py-5 px-5 gap-3">
+        <h2 className="text-foreground text-base">Database connection settings</h2>
 
-      <form
-        className="flex gap-4"
-        onSubmit={(e) => {
-          // don't allow form submission
-          e.preventDefault()
-        }}
-      >
-        <RoleImpersonationRadio
-          value="service_role"
-          isSelected={selectedOption === 'service_role'}
-          onSelectedChange={onSelectedChange}
-          label={serviceRoleLabel}
-          icon={<ServiceRoleIcon isSelected={selectedOption === 'service_role'} />}
-        />
+        <form
+          onSubmit={(e) => {
+            // don't allow form submission
+            e.preventDefault()
+          }}
+        >
+          <fieldset className="flex gap-3">
+            <RoleImpersonationRadio
+              value="service_role"
+              isSelected={selectedOption === 'service_role'}
+              onSelectedChange={onSelectedChange}
+              label={serviceRoleLabel}
+              icon={<ServiceRoleIcon isSelected={selectedOption === 'service_role'} />}
+            />
 
-        <RoleImpersonationRadio
-          value="anon"
-          isSelected={selectedOption === 'anon'}
-          onSelectedChange={onSelectedChange}
-          icon={<AnonIcon isSelected={selectedOption === 'anon'} />}
-        />
+            <RoleImpersonationRadio
+              value="anon"
+              isSelected={selectedOption === 'anon'}
+              onSelectedChange={onSelectedChange}
+              icon={<AnonIcon isSelected={selectedOption === 'anon'} />}
+            />
 
-        <RoleImpersonationRadio
-          value="authenticated"
-          isSelected={
-            selectedOption === 'authenticated' &&
-            (isAuthenticatedOptionFullySelected || 'partially')
-          }
-          onSelectedChange={onSelectedChange}
-          icon={<AuthenticatedIcon isSelected={selectedOption === 'authenticated'} />}
-        />
-      </form>
+            <RoleImpersonationRadio
+              value="authenticated"
+              isSelected={
+                selectedOption === 'authenticated' &&
+                (isAuthenticatedOptionFullySelected || 'partially')
+              }
+              onSelectedChange={onSelectedChange}
+              icon={<AuthenticatedIcon isSelected={selectedOption === 'authenticated'} />}
+            />
+          </fieldset>
+        </form>
 
-      <div className="text-foreground-light text-sm">
         {selectedOption === 'service_role' && (
-          <p>
+          <p className="text-foreground-light text-sm">
             The default Postgres/superuser role. This has admin privileges.
             <br />
             It will bypass Row Level Security (RLS) policies.
@@ -95,7 +97,7 @@ const RoleImpersonationSelector = ({ serviceRoleLabel }: RoleImpersonationSelect
         )}
 
         {selectedOption === 'anon' && (
-          <p>
+          <p className="text-foreground-light text-sm">
             For "anonymous access". This is the role which the API (PostgREST) will use when a user
             <br />
             is not logged in. It will respect Row Level Security (RLS) policies.
@@ -103,19 +105,22 @@ const RoleImpersonationSelector = ({ serviceRoleLabel }: RoleImpersonationSelect
         )}
 
         {selectedOption === 'authenticated' && (
-          <div className="flex flex-col gap-4">
-            <p>
-              For "authenticated access". This is the role which the API (PostgREST) will use when
-              <br /> a user is logged in. It will respect Row Level Security (RLS) policies.
-            </p>
-
-            <hr />
-
-            <UserImpersonationSelector />
-          </div>
+          <p className="text-foreground-light text-sm">
+            For "authenticated access". This is the role which the API (PostgREST) will use when
+            <br /> a user is logged in. It will respect Row Level Security (RLS) policies.
+          </p>
         )}
       </div>
-    </div>
+
+      {selectedOption === 'authenticated' && (
+        <>
+          <DropdownMenuSeparator />
+          <div className="py-5 px-5">
+            <UserImpersonationSelector />
+          </div>
+        </>
+      )}
+    </>
   )
 }
 

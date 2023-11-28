@@ -4,8 +4,9 @@ import { useState } from 'react'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import { User, useUsersQuery } from 'data/auth/users-query'
+import { User as IconUser, Loader2, Search, X } from 'lucide-react'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
-import { Button, IconLoader, IconSearch, IconUser, IconX, Input } from 'ui'
+import { Button, Input } from 'ui'
 import { getAvatarUrl, getDisplayName } from '../Auth/Users/UserListItem.utils'
 
 const UserImpersonationSelector = () => {
@@ -55,16 +56,10 @@ const UserImpersonationSelector = () => {
             )}`
           : 'Impersonate a User'}
       </h2>
-      <p>
-        {!impersonatingUser ? (
-          <>
-            Select a user or use a JWT token to respect your database's Row-Level Security
-            <br />
-            policies for that particular user.
-          </>
-        ) : (
-          "Results will respect your database's Row-Level Security policies for this user."
-        )}
+      <p className="text-sm text-foreground-light max-w-md">
+        {!impersonatingUser
+          ? "Select a user to respect your database's Row-Level Security policies for that particular user."
+          : "Results will respect your database's Row-Level Security policies for this user."}
       </p>
 
       {!impersonatingUser ? (
@@ -73,23 +68,23 @@ const UserImpersonationSelector = () => {
             className="table-editor-search border-none"
             icon={
               isSearching ? (
-                <IconLoader
+                <Loader2
                   className="animate-spin text-foreground-lighter"
                   size={16}
                   strokeWidth={1.5}
                 />
               ) : (
-                <IconSearch className="text-foreground-lighter" size={16} strokeWidth={1.5} />
+                <Search className="text-foreground-lighter" size={16} strokeWidth={1.5} />
               )
             }
-            placeholder="Search users"
+            placeholder="Search for a user.."
             onChange={(e) => setSearchText(e.target.value.trim())}
             value={searchText}
             size="small"
             actions={
               searchText && (
                 <Button size="tiny" type="text" onClick={() => setSearchText('')}>
-                  <IconX size={12} strokeWidth={2} />
+                  <X size={12} strokeWidth={2} />
                 </Button>
               )
             }
@@ -97,7 +92,7 @@ const UserImpersonationSelector = () => {
 
           {isLoading && (
             <div className="flex flex-col gap-2 items-center justify-center h-24">
-              <IconLoader className="animate-spin" size={24} />
+              <Loader2 className="animate-spin" size={24} />
               <span>Loading users...</span>
             </div>
           )}
@@ -106,27 +101,69 @@ const UserImpersonationSelector = () => {
 
           {isSuccess &&
             (data.users.length > 0 ? (
-              <ul className="divide-y max-h-[192px] overflow-y-scroll">
+              <ul className="divide-y max-h-[192px] overflow-y-scroll" role="list">
                 {data.users.map((user) => (
-                  <li key={user.id}>
+                  <li key={user.id} role="listitem">
                     <UserRow user={user} onClick={impersonateUser} />
                   </li>
                 ))}
               </ul>
             ) : (
               <div className="flex flex-col gap-2 items-center justify-center h-24">
-                <p className="text-foreground-light">No users found</p>
+                <p className="text-foreground-light" role="status">
+                  No users found
+                </p>
               </div>
             ))}
         </div>
       ) : (
-        <UserRow user={impersonatingUser} onClick={stopImpersonating} isImpersonating={true} />
+        <UserImpersonatingRow
+          user={impersonatingUser}
+          onClick={stopImpersonating}
+          isImpersonating={true}
+        />
       )}
     </div>
   )
 }
 
 export default UserImpersonationSelector
+
+interface UserRowProps {
+  user: User
+  onClick: (user: User) => void
+  isImpersonating?: boolean
+}
+
+const UserImpersonatingRow = ({ user, onClick, isImpersonating = false }: UserRowProps) => {
+  const avatarUrl = getAvatarUrl(user)
+  const displayName = getDisplayName(user, user.email ?? user.phone ?? user.id ?? 'Unknown')
+
+  return (
+    <div className="flex items-center gap-3 py-2 text-foreground">
+      <div className="flex items-center gap-4 bg-surface-200 pr-5 pl-0.5 py-0.5 border rounded-full max-w-l">
+        {avatarUrl ? (
+          <img className="rounded-full w-5 h-5" src={avatarUrl} alt={displayName} />
+        ) : (
+          <div className="rounded-full w-[21px] h-[21px] bg-surface-300 border border-strong flex items-center justify-center">
+            <IconUser size={12} strokeWidth={2} />
+          </div>
+        )}
+
+        <span className="text-sm truncate">{displayName}</span>
+      </div>
+
+      <Button
+        type="secondary"
+        onClick={() => {
+          onClick(user)
+        }}
+      >
+        {isImpersonating ? 'Stop Impersonating' : 'Impersonate'}
+      </Button>
+    </div>
+  )
+}
 
 interface UserRowProps {
   user: User
@@ -142,26 +179,24 @@ const UserRow = ({ user, onClick, isImpersonating = false }: UserRowProps) => {
     <div className="flex items-center justify-between py-2 text-foreground">
       <div className="flex items-center gap-4">
         {avatarUrl ? (
-          <img className="rounded-full w-8 h-8" src={avatarUrl} alt={displayName} />
+          <img className="rounded-full w-5 h-5" src={avatarUrl} alt={displayName} />
         ) : (
-          <div className="rounded-full w-8 h-8 bg-foreground-lighter flex items-center justify-center text-background">
-            <IconUser size={16} strokeWidth={2} />
+          <div className="rounded-full w-[21px] h-[21px] bg-surface-300 border text-muted flex items-center justify-center text-background">
+            <IconUser size={12} strokeWidth={2} />
           </div>
         )}
 
-        <span>{displayName}</span>
+        <span className="text-sm">{displayName}</span>
       </div>
 
-      <div>
-        <Button
-          type="secondary"
-          onClick={() => {
-            onClick(user)
-          }}
-        >
-          {isImpersonating ? 'Stop Impersonating' : 'Impersonate'}
-        </Button>
-      </div>
+      <Button
+        type="secondary"
+        onClick={() => {
+          onClick(user)
+        }}
+      >
+        {isImpersonating ? 'Stop Impersonating' : 'Impersonate'}
+      </Button>
     </div>
   )
 }

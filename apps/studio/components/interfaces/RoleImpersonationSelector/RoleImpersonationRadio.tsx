@@ -18,7 +18,7 @@ function RoleImpersonationRadio<T extends string>({
   return (
     <label
       className={cn(
-        'border border-default rounded-md bg-surface-100 px-4 py-3 w-44 cursor-pointer transition-colors',
+        'border border-default rounded-md bg-surface-200 hover:bg-overlay-hover hover:border-control px-4 py-3 w-44 cursor-pointer transition-colors',
         isSelected && 'border-stronger bg-surface-300'
       )}
       tabIndex={0}
@@ -27,6 +27,7 @@ function RoleImpersonationRadio<T extends string>({
           onSelectedChange(value)
         }
       }}
+      htmlFor={`role-${value}`}
     >
       <div className="flex justify-between items-center mb-2">
         {icon && <div>{icon}</div>}
@@ -44,6 +45,7 @@ function RoleImpersonationRadio<T extends string>({
       </div>
 
       <input
+        id={`role-${value}`}
         type="radio"
         name="role"
         value={value}

@@ -80,7 +80,7 @@ const UtilityActions = ({
             onClick={() => executeQuery()}
             disabled={isDisabled || isExecuting}
             loading={isExecuting}
-            type="default"
+            type="primary"
             size="tiny"
             iconRight={
               <div className="flex items-center space-x-1">
