@@ -124,17 +124,17 @@ const menus: Menu[] = [
     type: 'reference',
   },
   {
-    id: 'reference_dart_v0',
-    path: '/reference/dart/v0',
-    commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_dart_v0.yml',
-    type: 'reference',
-  },
-  {
     id: 'reference_dart_v1',
     path: '/reference/dart',
     commonSectionsFile: 'common-client-libs-sections.json',
     specFile: 'supabase_dart_v1.yml',
+    type: 'reference',
+  },
+  {
+    id: 'reference_dart_v2',
+    path: '/reference/dart',
+    commonSectionsFile: 'common-client-libs-sections.json',
+    specFile: 'supabase_dart_v2.yml',
     type: 'reference',
   },
   {
