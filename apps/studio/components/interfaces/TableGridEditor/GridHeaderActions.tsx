@@ -22,7 +22,6 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   const { meta, ui } = useStore()
   const { project } = useProjectContext()
   const realtimeEnabled = useIsFeatureEnabled('realtime:all')
-  console.log({ realtimeEnabled })
 
   const [isTogglingRealtime, setIsTogglingRealtime] = useState(false)
   const [showEnableRealtime, setShowEnableRealtime] = useState(false)
