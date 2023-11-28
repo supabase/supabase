@@ -285,6 +285,7 @@ export const AIPolicyEditorPanel = memo(function ({
                 options={{
                   renderSideBySide: false,
                   scrollBeyondLastLine: false,
+                  renderOverviewRuler: false,
                 }}
               />
             ) : null}
