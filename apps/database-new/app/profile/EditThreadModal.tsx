@@ -2,7 +2,7 @@
 
 import { updateThreadName } from '@/app/actions'
 import { createRef, useEffect } from 'react'
-import { experimental_useFormState as useFormState, useFormStatus } from 'react-dom'
+import { useFormState, useFormStatus } from 'react-dom'
 import { Button, Input_Shadcn_, Label_Shadcn_, Modal } from 'ui'
 import { ThreadType } from './Threads'
 
@@ -18,12 +18,9 @@ const EditThreadModal = ({
   const formRef = createRef<HTMLFormElement>()
 
   const initialState = {
-    message: null,
-    success: undefined,
-    data: {
-      row_id: thread.id,
-      thread_title: thread.thread_title,
-    },
+    message: '',
+    success: false,
+    data: undefined,
   }
 
   const [state, formAction] = useFormState(updateThreadName, initialState)
@@ -32,7 +29,7 @@ const EditThreadModal = ({
     if (state?.success === true) {
       onClose()
       formRef.current?.reset()
-      state.success = undefined
+      state.success = false
     }
   }, [state, onClose, formRef])
 
@@ -63,9 +60,9 @@ const EditThreadModal = ({
             placeholder="Type in a name for the thread..."
             type="text"
             name="thread_title"
-            defaultValue={state.data.thread_title}
+            defaultValue={state?.data?.thread_title}
           />
-          <Input_Shadcn_ name="row_id" value={state.data.row_id} type="hidden" />
+          <Input_Shadcn_ name="row_id" value={thread.id} type="hidden" />
         </Modal.Content>
         <Modal.Separator />
         <Modal.Content className="flex flex-row gap-3 justify-end">
