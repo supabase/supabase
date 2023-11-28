@@ -10,6 +10,11 @@ export const appState = proxy({
   setSelectedCode: (value: string) => {
     appState.selectedCode = value
   },
+
+  loginDialogOpen: false,
+  setLoginDialogOpen: (value: boolean) => {
+    appState.loginDialogOpen = value
+  },
 })
 
 export const getAppStateSnapshot = () => snapshot(appState)
