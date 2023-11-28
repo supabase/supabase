@@ -73,14 +73,10 @@ export async function handler(req: Request) {
 
     if (error) console.log('fetch error', error.message)
     if (!data) throw new Error(error?.message ?? 'user not found')
-    console.log('ticket data', data)
     const { name, ticketNumber, metadata } = data
 
     const platinum = (!!data?.sharedOnTwitter && !!data?.sharedOnLinkedIn) ?? false
-    console.log('assumePlatinum??', assumePlatinum)
-    console.log('platinum??', platinum)
     if (assumePlatinum && !platinum) return await fetch(`${STORAGE_URL}/assets/golden_no_meme.png`)
-    console.log('no meme??')
 
     // Else, generate image and upload to storage.
     const BACKGROUND = {
@@ -114,8 +110,6 @@ export async function handler(req: Request) {
     const TICKET_PADDING_Y = 60
     const OG_PADDING_X = (OG_WIDTH - TICKET_WIDTH) / 2
     const OG_PADDING_Y = (OG_HEIGHT - TICKET_HEIGHT) / 2
-
-    console.log(BACKGROUND)
 
     const generatedTicketImage = new ImageResponse(
       (
@@ -291,8 +285,6 @@ export async function handler(req: Request) {
       }
     )
 
-    console.log('generatedTicketImage', generatedTicketImage)
-
     // Upload image to storage.
     const { error: storageError } = await supabaseAdminClient.storage
       .from('images')
@@ -308,11 +300,8 @@ export async function handler(req: Request) {
         }
       )
 
-    console.log('storageError?', storageError)
     if (storageError) throw new Error(`storageError: ${storageError.message}`)
 
-    console.log('lwx-ticket username', username)
-    console.log('lwx-ticket platinum?', platinum)
     // Generate og image
     fetch('https://obuldanrptloktxcffvn.supabase.co/functions/v1/lwx-ticket-og', {
       method: 'POST',

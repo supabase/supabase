@@ -21,15 +21,10 @@ export async function handler(req: Request) {
       platinum?: boolean
     } = await req.json()
 
-    console.log('lwx-ticket-og username', username)
-    console.log('lwx-ticket-og platinum?', platinum)
-
     const timestamp = encodeURI(new Date().toISOString())
     const ticketImg = `${STORAGE_URL}/tickets/${
       platinum ? 'platinum' : 'regular'
     }/${BUCKET_FOLDER_VERSION}/${username}.png?t=${timestamp}`
-
-    console.log('ticketImg', ticketImg)
 
     const ticketWidth = 1100
     const ticketHeight = ticketWidth / 2
@@ -79,8 +74,6 @@ export async function handler(req: Request) {
       }
     )
 
-    console.log('geneartedOGImage', geneartedOGImage)
-
     // Upload image to storage.
     const supabaseAdminClient = createClient(
       // Supabase API URL - env var exported by default when deployed.
@@ -102,7 +95,6 @@ export async function handler(req: Request) {
         }
       )
 
-    console.log('storageError?', storageError)
     if (storageError) throw new Error(`storageError: ${storageError.message}`)
 
     return new Response(JSON.stringify({ success: true }), {
