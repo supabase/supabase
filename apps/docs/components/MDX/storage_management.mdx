@@ -64,7 +64,7 @@ declare
   avatar_name text;
 begin
   if coalesce(old.avatar_url, '') <> ''
-      and (tg_op = 'DELETE' or (old.avatar_url <> new.avatar_url)) then
+      and (tg_op = 'DELETE' or (old.avatar_url <> coalesce(new.avatar_url, ''))) then
     -- extract avatar name
     avatar_name := old.avatar_url;
     select
