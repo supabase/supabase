@@ -26,7 +26,7 @@ async function Threads() {
   return (
     <div className="flex flex-col gap-y-3">
       {threads.length > 0 ? (
-        threads.map((thread) => <Thread key={`thread-item-${thread.id}`} thread={thread} />)
+        threads.sort().map((thread) => <Thread key={`thread-item-${thread.id}`} thread={thread} />)
       ) : (
         <EmptyState />
       )}
