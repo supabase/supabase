@@ -10,11 +10,13 @@ import RoleImpersonationSelector from './RoleImpersonationSelector'
 export interface RoleImpersonationPopoverProps {
   serviceRoleLabel?: string
   variant?: 'regular' | 'connected-on-right'
+  align?: 'center' | 'start' | 'end'
 }
 
 const RoleImpersonationPopover = ({
   serviceRoleLabel,
   variant = 'regular',
+  align = 'end',
 }: RoleImpersonationPopoverProps) => {
   const state = useRoleImpersonationStateSnapshot()
 
@@ -46,7 +48,7 @@ const RoleImpersonationPopover = ({
       <PopoverContent_Shadcn_
         className="p-0 w-full overflow-hidden bg-overlay"
         side="bottom"
-        align="end"
+        align={align}
       >
         <RoleImpersonationSelector serviceRoleLabel={serviceRoleLabel} />
       </PopoverContent_Shadcn_>
