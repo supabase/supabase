@@ -91,12 +91,6 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/realtime</loc>
-    <changefreq>weekly</changefreq>
-    <changefreq>0.5</changefreq>
-  </url>
-
-  <url>
     <loc>https://supabase.com/storage</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
@@ -104,6 +98,12 @@
 
   <url>
     <loc>https://supabase.com/vector/Vector</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/realtime</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
@@ -1359,54 +1359,6 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/blog/postgres-dynamic-table-partitioning</loc>
-    <changefreq>weekly</changefreq>
-    <changefreq>0.5</changefreq>
-  </url>
-
-  <url>
-    <loc>https://supabase.com/blog/beta-update-september-2023</loc>
-    <changefreq>weekly</changefreq>
-    <changefreq>0.5</changefreq>
-  </url>
-
-  <url>
-    <loc>https://supabase.com/blog/react-native-offline-first-watermelon-db</loc>
-    <changefreq>weekly</changefreq>
-    <changefreq>0.5</changefreq>
-  </url>
-
-  <url>
-    <loc>https://supabase.com/blog/pgvector-vs-pinecone</loc>
-    <changefreq>weekly</changefreq>
-    <changefreq>0.5</changefreq>
-  </url>
-
-  <url>
-    <loc>https://supabase.com/blog/supabase-is-now-compatible-with-nextjs-14</loc>
-    <changefreq>weekly</changefreq>
-    <changefreq>0.5</changefreq>
-  </url>
-
-  <url>
-    <loc>https://supabase.com/blog/beta-update-october-2023</loc>
-    <changefreq>weekly</changefreq>
-    <changefreq>0.5</changefreq>
-  </url>
-
-  <url>
-    <loc>https://supabase.com/blog/react-native-authentication</loc>
-    <changefreq>weekly</changefreq>
-    <changefreq>0.5</changefreq>
-  </url>
-
-  <url>
-    <loc>https://supabase.com/blog/oauth2-login-python-flask-apps</loc>
-    <changefreq>weekly</changefreq>
-    <changefreq>0.5</changefreq>
-  </url>
-
-  <url>
     <loc>https://supabase.com/customers/berriai</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
@@ -1420,12 +1372,6 @@
 
   <url>
     <loc>https://supabase.com/customers/epsilon3</loc>
-    <changefreq>weekly</changefreq>
-    <changefreq>0.5</changefreq>
-  </url>
-
-  <url>
-    <loc>https://supabase.com/customers/good-tape</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
@@ -1455,18 +1401,6 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/customers/next-door-lending</loc>
-    <changefreq>weekly</changefreq>
-    <changefreq>0.5</changefreq>
-  </url>
-
-  <url>
-    <loc>https://supabase.com/customers/pebblely</loc>
-    <changefreq>weekly</changefreq>
-    <changefreq>0.5</changefreq>
-  </url>
-
-  <url>
     <loc>https://supabase.com/customers/quivr</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
@@ -1480,12 +1414,6 @@
 
   <url>
     <loc>https://supabase.com/customers/xendit</loc>
-    <changefreq>weekly</changefreq>
-    <changefreq>0.5</changefreq>
-  </url>
-
-  <url>
-    <loc>https://supabase.com/alternatives/supabase-vs-auth0</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
