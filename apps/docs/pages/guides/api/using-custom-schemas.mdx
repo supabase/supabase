@@ -3,10 +3,10 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'using-custom-schemas',
   title: 'Using Custom Schemas',
-  description: 'You need additional steps to use custom database schemas with Serverless APIs.',
+  description: 'You need additional steps to use custom database schemas with data APIs.',
 }
 
-By default, your database has a `public` schema which is automatically exposed on Serverless APIs. You can also expose custom database schemas - to do so you need to follow these steps:
+By default, your database has a `public` schema which is automatically exposed on data APIs. You can also expose custom database schemas - to do so you need to follow these steps:
 
 1. Go to [API settings](https://supabase.com/dashboard/project/_/settings/api) and add your custom schema to "Exposed schemas".
 2. Run the following SQL, substituting `myschema` with your schema name:
@@ -21,7 +21,7 @@ ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA myschema GRANT ALL ON ROUTI
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA myschema GRANT ALL ON SEQUENCES TO anon, authenticated, service_role;
 ```
 
-Now you can access these schemas from Serverless APIs:
+Now you can access these schemas from data APIs:
 
 <Tabs
   scrollable

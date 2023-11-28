@@ -47,7 +47,7 @@ from
 {/* prettier-ignore */}
 ```sql
 -- Enable the "wrappers" extension
-create extension wrappers;
+create extension wrappers with schema extensions;
 
 -- Disable the "wrappers" extension
 drop extension if exists wrappers;
