@@ -72,8 +72,13 @@ export async function updateThreadName(prevState: any, formData: FormData) {
       row_id: formData.get('row_id'),
     })
 
-    await supabase.from('threads').update({ thread_title: data.thread_title }).eq('id', data.row_id)
-
+    const { error } = await supabase
+      .from('threads')
+      .update({ thread_title: data.thread_title })
+      .eq('id', data.row_id)
+    if (error) {
+      throw error
+    }
     revalidatePath('/profile')
 
     return {
