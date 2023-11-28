@@ -65,7 +65,7 @@ const PromoBg = ({ className }: Props) => {
         stroke="hsl(var(--background-alternative-default))"
       />
       <defs>
-        <filter
+        {/* <filter
           id="filter0_d_558_2902"
           x="194.355"
           y="17.5438"
@@ -92,7 +92,7 @@ const PromoBg = ({ className }: Props) => {
             in2="effect1_dropShadow_558_2902"
             result="shape"
           />
-        </filter>
+        </filter> */}
         <radialGradient
           id="paint0_radial_558_2902"
           cx="0"

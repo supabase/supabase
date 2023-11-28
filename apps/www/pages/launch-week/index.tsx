@@ -15,7 +15,7 @@ export default function TicketHome() {
 
   const TITLE = 'Supabase Launch Week X | 11-15 December 2023'
   const DESCRIPTION =
-    'Claim your ticket for a chance to win Supabase swag and join us in a week of announcing new features.'
+    'Claim your ticket for a chance to win Supabase swag and join us for a week of announcing new features.'
   const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/lwx/lwx-og.jpg`
 
   const ticketNumber = query.ticketNumber?.toString()

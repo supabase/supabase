@@ -93,7 +93,7 @@ const TicketingFlow = () => {
                     <span>{LWX_DATE}</span>
                   </div>
                   <p className="text-foreground-lighter">
-                    Join us in a week of announcing new features,
+                    Join us for a week of announcing new features,
                     <br className="hidden md:block" /> and find new ways to level up your
                     development.
                   </p>
