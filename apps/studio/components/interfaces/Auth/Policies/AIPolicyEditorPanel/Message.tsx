@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { memo, useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { format } from 'sql-formatter'
-import { AiIcon, Badge, Button } from 'ui'
+import { AiIcon, AiIconAnimation, Badge, Button } from 'ui'
 
 import CodeEditor from 'components/ui/CodeEditor'
 import { useProfile } from 'lib/profile'
@@ -30,7 +30,10 @@ const Message = memo(function Message({
 
   const icon = useMemo(() => {
     return role === 'assistant' ? (
-      <AiIcon className="[&>div>div]:border-black dark:[&>div>div]:border-white" />
+      <AiIconAnimation
+        loading={content === 'Thinking...'}
+        className="[&>div>div]:border-black dark:[&>div>div]:border-white"
+      />
     ) : (
       <div className="relative border shadow-lg w-8 h-8 rounded-full overflow-hidden">
         <Image
