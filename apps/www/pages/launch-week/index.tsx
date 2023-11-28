@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react'
-import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { Session } from '@supabase/supabase-js'
 import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
 import supabase from '~/lib/supabaseMisc'
 
-import FaviconImports from '~/components/LaunchWeek/X/faviconImports'
+import FaviconImports from '~/components/LaunchWeek/X/FaviconImports'
 import DefaultLayout from '~/components/Layouts/Default'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import TicketingFlow from '~/components/LaunchWeek/X/Ticket/TicketingFlow'

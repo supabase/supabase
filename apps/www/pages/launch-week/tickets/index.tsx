@@ -9,7 +9,7 @@ import { debounce } from 'lodash'
 import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
 import { useTheme } from 'next-themes'
 
-import FaviconImports from '~/components/LaunchWeek/X/faviconImports'
+import FaviconImports from '~/components/LaunchWeek/X/FaviconImports'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
