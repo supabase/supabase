@@ -318,6 +318,10 @@ export const gettingstarted: NavMenuConstant = {
           name: 'Ionic Angular',
           url: '/guides/getting-started/tutorials/with-ionic-angular',
         },
+        {
+          name: 'Swift',
+          url: '/guides/getting-started/tutorials/with-swift',
+        },
       ],
     },
   ],
@@ -513,9 +517,15 @@ export const auth = {
           items: [...PhoneLoginsItems],
         },
         {
-          name: 'Social Login',
+          name: 'Social Login (OAuth)',
           url: '/guides/auth/social-login',
-          items: [...SocialLoginItems],
+          items: [
+            {
+              name: 'Native Mobile OAuth',
+              url: '/guides/auth/native-mobile-deep-linking',
+            },
+            ...SocialLoginItems,
+          ],
         },
         {
           name: 'Native Mobile Login',
@@ -523,10 +533,14 @@ export const auth = {
           items: [
             ...NativeMobileLoginItems,
             {
-              name: 'Deep Linking',
+              name: 'OAuth Deep Linking',
               url: '/guides/auth/native-mobile-deep-linking',
             },
           ],
+        },
+        {
+          name: 'User Sessions',
+          url: '/guides/auth/sessions',
         },
         {
           name: 'Enterprise SSO',
@@ -617,10 +631,15 @@ export const database: NavMenuConstant = {
       items: [
         { name: 'Connecting to your database', url: '/guides/database/connecting-to-postgres' },
         { name: 'Managing tables, views, and data', url: '/guides/database/tables' },
+        {
+          name: 'Querying joins and nested tables',
+          url: '/guides/api/joins-and-nesting',
+        },
         { name: 'JSON and unstructured data', url: '/guides/database/json' },
         { name: 'Managing database functions', url: '/guides/database/functions' },
         { name: 'Managing indexes', url: '/guides/database/postgres/indexes' },
         { name: 'Managing database triggers', url: '/guides/database/postgres/triggers' },
+        { name: 'Managing enums', url: '/guides/database/postgres/enums' },
         { name: 'Managing database webhooks', url: '/guides/database/webhooks' },
         { name: 'Using Full Text Search', url: '/guides/database/full-text-search' },
         { name: 'Importing large datasets', url: '/guides/database/large-datasets' },
@@ -796,7 +815,7 @@ export const api: NavMenuConstant = {
     { name: 'Quickstart', url: '/guides/api/quickstart', items: [] },
     { name: 'Client Libraries', url: '/guides/api/rest/client-libs', items: [] },
     { name: 'Auto-generated Docs', url: '/guides/api/rest/auto-generated-docs', items: [] },
-    { name: 'Generating Types', url: '/guides/api/rest/generating-types', items: [] },
+    { name: 'Generating TypeScript Types', url: '/guides/api/rest/generating-types', items: [] },
     {
       name: 'Guides',
       url: '/guides/api',
