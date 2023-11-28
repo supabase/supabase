@@ -8,6 +8,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useUrlState } from 'hooks'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   cleanupProps,
   formatFilterURLParams,
@@ -55,6 +56,7 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>(
     } = props
     const dispatch = useDispatch()
     const state = useTrackedState()
+    const snap = useTableEditorStateSnapshot()
 
     const gridRef = useRef<DataGridHandle>(null)
     const [mounted, setMounted] = useState(false)
@@ -76,8 +78,8 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>(
         table: props.table,
         sorts,
         filters,
-        page: state.page,
-        limit: state.rowsPerPage,
+        page: snap.page,
+        limit: snap.rowsPerPage,
         impersonatedRole: roleImpersonationState.role,
       },
       {

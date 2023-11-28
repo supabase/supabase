@@ -10,14 +10,7 @@ import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-stat
 import { Button, IconArrowLeft, IconArrowRight, IconLoader, InputNumber, Modal } from 'ui'
 import { useDispatch, useTrackedState } from '../../../store'
 import { DropdownControl } from '../../common'
-
-const updatePage = (payload: number, dispatch: (value: unknown) => void) => {
-  dispatch({
-    type: 'SET_PAGE',
-    payload: payload,
-  })
-}
-const updatePageDebounced = AwesomeDebouncePromise(updatePage, 550)
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 
 const rowsPerPageOptions = [
   { value: 100, label: '100 rows' },
@@ -32,7 +25,9 @@ export interface PaginationProps {
 const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
   const state = useTrackedState()
   const dispatch = useDispatch()
-  const [page, setPage] = useState<number | null>(state.page)
+
+  const snap = useTableEditorStateSnapshot()
+  const page = snap.page
 
   const [{ filter }] = useUrlState({
     arrayKeys: ['filter'],
@@ -63,13 +58,12 @@ const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
     }
   )
 
-  const maxPages = Math.ceil((data?.count ?? 0) / state.rowsPerPage)
+  const maxPages = Math.ceil((data?.count ?? 0) / snap.rowsPerPage)
   const totalPages = (data?.count ?? 0) > 0 ? maxPages : 1
 
   useEffect(() => {
     if (page && page > totalPages) {
-      setPage(totalPages)
-      dispatch({ type: 'SET_PAGE', payload: totalPages })
+      snap.setPage(totalPages)
     }
   }, [page, totalPages])
 
@@ -83,7 +77,7 @@ const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
   const [isConfirmPreviousModalOpen, setIsConfirmPreviousModalOpen] = useState(false)
 
   const onPreviousPage = () => {
-    if (state.page > 1) {
+    if (page > 1) {
       if (state.selectedRows.size >= 1) {
         setIsConfirmPreviousModalOpen(true)
       } else {
@@ -103,7 +97,7 @@ const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
   const [isConfirmNextModalOpen, setIsConfirmNextModalOpen] = useState(false)
 
   const onNextPage = () => {
-    if (state.page < maxPages) {
+    if (page < maxPages) {
       if (state.selectedRows.size >= 1) {
         setIsConfirmNextModalOpen(true)
       } else {
@@ -123,28 +117,25 @@ const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
   // TODO: look at aborting useTableRowsQuery if the user presses the button quickly
 
   const goToPreviousPage = () => {
-    const previousPage = state.page - 1
-    setPage(previousPage)
-    dispatch({ type: 'SET_PAGE', payload: previousPage })
+    const previousPage = page - 1
+    snap.setPage(previousPage)
   }
 
   const goToNextPage = () => {
-    const nextPage = state.page + 1
-    setPage(nextPage)
-    dispatch({ type: 'SET_PAGE', payload: nextPage })
+    const nextPage = page + 1
+    snap.setPage(nextPage)
   }
 
   function onPageChange(event: React.ChangeEvent<HTMLInputElement>) {
     const value = event.target.value
     const pageNum = Number(value) > maxPages ? maxPages : Number(value)
-    setPage(pageNum || null)
-    if (pageNum) {
-      updatePageDebounced(pageNum, dispatch)
-    }
+    snap.setPage(pageNum || 1)
   }
 
   function onRowsPerPageChange(value: string | number) {
-    dispatch({ type: 'SET_ROWS_PER_PAGE', payload: value })
+    const rowsPerPage = Number(value)
+
+    snap.setRowsPerPage(isNaN(rowsPerPage) ? 100 : rowsPerPage)
   }
 
   return (
@@ -156,7 +147,7 @@ const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
           <Button
             icon={<IconArrowLeft />}
             type="outline"
-            disabled={state.page <= 1 || isLoading}
+            disabled={page <= 1 || isLoading}
             onClick={onPreviousPage}
             style={{ padding: '3px 10px' }}
           />
@@ -179,7 +170,7 @@ const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
           <Button
             icon={<IconArrowRight />}
             type="outline"
-            disabled={state.page >= maxPages || isLoading}
+            disabled={page >= maxPages || isLoading}
             onClick={onNextPage}
             style={{ padding: '3px 10px' }}
           />
@@ -191,7 +182,7 @@ const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
             align="start"
           >
             <Button asChild type="outline" style={{ padding: '3px 10px' }}>
-              <span>{`${state.rowsPerPage} rows`}</span>
+              <span>{`${snap.rowsPerPage} rows`}</span>
             </Button>
           </DropdownControl>
           <p className="text-sm text-foreground-light">{`${data.count.toLocaleString()} ${
