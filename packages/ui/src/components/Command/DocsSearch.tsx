@@ -305,7 +305,7 @@ const DocsSearch = () => {
       key.current += 1
       dispatch({ type: 'reset', key: key.current })
     }
-  }, [search])
+  }, [search, handleSearch, debouncedSearch])
 
   // Immediately run search if user presses enter
   // and abort any debounced searches that are waiting
