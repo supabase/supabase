@@ -1,4 +1,5 @@
 'use client'
+
 import { ChatInputAtom } from '@/components/Chat/ChatInput'
 import { CHAT_EXAMPLES } from '@/data/chat-examples'
 import { useAppStateSnapshot } from '@/lib/state'
@@ -20,7 +21,10 @@ const NewThreadInput = ({ userID }: ChatInputParams) => {
   const searchParams = useSearchParams()!
 
   const [value, setValue] = useState(() => {
-    const localPrompt = localStorage.getItem('prompt')
+    let localPrompt = undefined
+    if (typeof window !== 'undefined') {
+      localPrompt = localStorage.getItem('prompt')
+    }
     if (localPrompt) {
       localStorage.removeItem('prompt')
       return localPrompt
@@ -55,17 +59,14 @@ const NewThreadInput = ({ userID }: ChatInputParams) => {
     <>
       <div className="relative w-10/12 xl:w-11/12 max-w-xl">
         <ChatInputAtom
-          handleSubmit={async (event) => {
+          handleSubmit={async () => {
             const {
               data: { user },
             } = await supabase.auth.getUser()
 
-            console.log(user)
-
             if (!user) {
               localStorage.setItem('prompt', value)
               snap.setLoginDialogOpen(true)
-              event.preventDefault()
               return
             }
             if (value.length > 0) {

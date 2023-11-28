@@ -31,9 +31,9 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@types/node": "20.5.1",
-    "@types/react": "^18.2.38",
-    "@types/react-dom": "^18.2.17",
+    "@types/node": "^18.11.9",
+    "@types/react": "^18.2.24",
+    "@types/react-dom": "^18.2.8",
     "autoprefixer": "10.4.14",
     "nextjs-node-loader": "^1.1.5-alpha.0",
     "postcss": "8.4.31",
