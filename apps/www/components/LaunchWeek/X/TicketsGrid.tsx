@@ -12,12 +12,9 @@ interface Props {
 }
 
 export default function TicketsGrid({ loadedUsers, isLoading, pageCount, offset }: Props) {
-  const STORAGE_URL = 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw8'
-  const BUCKET_FOLDER_VERSION = 'v1'
+  const STORAGE_URL = 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lwx'
   const getTicketImageUrl = (username: string, isGold: boolean) =>
-    `${STORAGE_URL}/tickets/${
-      isGold ? 'golden' : 'regular'
-    }/${BUCKET_FOLDER_VERSION}/${username}.png`
+    `${STORAGE_URL}/tickets/${isGold ? 'platinum' : 'regular'}/${username}.png`
   const isMobile = useBreakpoint(1024)
   const isTablet = useBreakpoint(1280)
   const horizontalOffset = isMobile ? 8 : 20
@@ -34,11 +31,13 @@ export default function TicketsGrid({ loadedUsers, isLoading, pageCount, offset 
         const recalculatedDelay = i >= pageCount * 2 ? (i - pageCount * (offset - 1)) / 15 : i / 15
         const imgUrl =
           getTicketImageUrl(user.username!, !!user.golden) ??
-          '/images/launchweek/8/lw8-ticket-empty.jpg'
+          '/images/launchweek/lwx/tickets/placeholder.png'
+
+        console.log(imgUrl)
 
         return (
           <Link
-            href={`/launch-week/8/tickets/${user.username}`}
+            href={`/launch-week/tickets/${user.username}`}
             key={`${user.username}-000${i}`}
             onClick={() => window.scrollTo(0, 0)}
             legacyBehavior
@@ -70,7 +69,7 @@ export default function TicketsGrid({ loadedUsers, isLoading, pageCount, offset 
                   objectFit="cover"
                   objectPosition="center"
                   placeholder="blur"
-                  blurDataURL="/images/launchweek/8/lw8-ticket-empty.jpg"
+                  blurDataURL="/images/launchweek/lwx/tickets/placeholder.png"
                 />
               </div>
             </motion.a>

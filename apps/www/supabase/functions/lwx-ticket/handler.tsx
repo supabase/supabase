@@ -84,11 +84,11 @@ export async function handler(req: Request) {
     const BACKGROUND = {
       REG: {
         BG: `${STORAGE_URL}/assets/lwx_ticket_bg_regular.png?t=2023-11-27T12%3A35%3A58.316Z`,
-        LOGO: `${STORAGE_URL}/assets/logos/supabase_lwx_logo_dark.png`,
+        LOGO: `${STORAGE_URL}/assets/logos/supabase_logo_reg.png`,
       },
       PLATINUM: {
         BG: `${STORAGE_URL}/assets/lwx_ticket_bg_platinum.png?t=2023-11-27T12%3A35%3A58.316Z`,
-        LOGO: `${STORAGE_URL}/assets/logos/supabase_lwx_logo_light.png`,
+        LOGO: `${STORAGE_URL}/assets/logos/supabase_logo_platinum.png`,
       },
     }
 
@@ -198,11 +198,11 @@ export async function handler(req: Request) {
                 lineHeight: '120%',
               }}
             >
-              <div style={{ display: 'flex', marginBottom: '20' }}>
+              <div style={{ display: 'flex', marginBottom: '10', marginLeft: '-10' }}>
                 <img
                   src={platinum ? BACKGROUND['PLATINUM']['LOGO'] : BACKGROUND['REG']['LOGO']}
-                  width={60}
-                  height={60}
+                  width={65}
+                  height={65}
                 />
               </div>
               {/* Ticket No  */}
@@ -263,7 +263,7 @@ export async function handler(req: Request) {
     const { error: storageError } = await supabaseAdminClient.storage
       .from('images')
       .upload(
-        `lwx/tickets/${platinum ? 'platinum' : 'regular'}/${BUCKET_FOLDER_VERSION}/${username}.png`,
+        `lwx/tickets/${platinum ? 'platinum' : 'regular'}/${username}.png`,
         generatedTicketImage.body!,
         {
           contentType: 'image/png',
@@ -280,25 +280,25 @@ export async function handler(req: Request) {
     console.log('lwx-ticket username', username)
     console.log('lwx-ticket platinum?', platinum)
     // Generate og image
-    fetch('https://obuldanrptloktxcffvn.supabase.co/functions/v1/lwx-ticket-og', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization:
-          'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9idWxkYW5ycHRsb2t0eGNmZnZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTIyNjkzMjYsImV4cCI6MjAwNzg0NTMyNn0.1S6qpBbHtEmGuMsIx5UOhRiFd4YbVv-yLTrLk6tVGmM',
-      },
-      body: JSON.stringify({
-        username,
-        platinum,
-      }),
-    }).catch((err) => console.log('generate og err', err))
+    // fetch('https://obuldanrptloktxcffvn.supabase.co/functions/v1/lwx-ticket-og', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     Authorization:
+    //       'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9idWxkYW5ycHRsb2t0eGNmZnZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTIyNjkzMjYsImV4cCI6MjAwNzg0NTMyNn0.1S6qpBbHtEmGuMsIx5UOhRiFd4YbVv-yLTrLk6tVGmM',
+    //   },
+    //   body: JSON.stringify({
+    //     username,
+    //     platinum,
+    //   }),
+    // }).catch((err) => console.log('generate og err', err))
 
-    // const NEW_TIMESTAMP = new Date()
+    const NEW_TIMESTAMP = new Date()
 
     return await fetch(
       `${STORAGE_URL}/tickets/${
         platinum ? 'platinum' : 'regular'
-      }/${BUCKET_FOLDER_VERSION}/${username}.png`
+      }/${username}.png?t=${NEW_TIMESTAMP}`
     )
   } catch (error) {
     return new Response(JSON.stringify({ error: error.message }), {

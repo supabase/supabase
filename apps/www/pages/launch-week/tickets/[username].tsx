@@ -32,7 +32,7 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
   const { username, ticketNumber, name } = user
 
   const TITLE = `${name ? name + '’s' : 'Get your'} #SupaLaunchWeek Ticket`
-  const DESCRIPTION = `Claim your Supabase Launch Week X ticket for a chance to win Supabase swag on December 15th.`
+  const DESCRIPTION = `Claim and share your Supabase Launch Week X ticket for a chance to win Supabase swag.`
   const OG_URL = `${SITE_URL}/tickets/${username}`
 
   const [session, setSession] = useState<Session | null>(null)
@@ -123,6 +123,11 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   fetch(
     `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lwx-og?username=${encodeURIComponent(
+      username ?? ''
+    )}`
+  )
+  fetch(
+    `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lwx-ticket?username=${encodeURIComponent(
       username ?? ''
     )}`
   )

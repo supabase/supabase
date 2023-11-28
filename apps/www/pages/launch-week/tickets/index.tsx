@@ -14,7 +14,7 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import CTABanner from '~/components/CTABanner'
-import TicketsGrid from '~/components/LaunchWeek/8/TicketsGrid'
+import TicketsGrid from '~/components/LaunchWeek/X/TicketsGrid'
 import supabase from '../../../lib/supabaseMisc'
 
 interface Props {
@@ -52,7 +52,7 @@ export default function TicketsPage({ users }: Props) {
   const loadUsers = async (offset: number) => {
     const from = offset * PAGE_COUNT
     return await supabase!
-      .from('lwx_tickets')
+      .from('lwx_tickets_golden')
       .select('*')
       .range(from, from + PAGE_COUNT - 1)
       .order('createdAt', { ascending: false })
@@ -124,9 +124,8 @@ export default function TicketsPage({ users }: Props) {
               >
                 <h2 className="text-4xl">Launch Week X tickets</h2>
                 <p className="text-foreground-light">
-                  Join us on December 15th for Launch Week X's final day{' '}
-                  <br className="hidden md:inline-block" /> and find out if you are one of the lucky
-                  winners.
+                  Join us on Launch Week X's final day <br className="hidden md:inline-block" /> and
+                  find out if you are one of the lucky winners.
                 </p>
                 <div className="mt-1">
                   <Button asChild type="outline" size="medium">
@@ -153,7 +152,7 @@ export default function TicketsPage({ users }: Props) {
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   let { data: lwx_tickets, error } = await supabase
-    .from('lwx_tickets')
+    .from('lwx_tickets_golden')
     .select('*')
 
     .order('createdAt', { ascending: false })
