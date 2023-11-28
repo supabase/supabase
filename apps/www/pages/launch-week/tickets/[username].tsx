@@ -1,22 +1,25 @@
 import { useEffect, useState } from 'react'
 import { NextSeo } from 'next-seo'
 import { GetStaticProps, GetStaticPaths } from 'next'
-import Image from 'next/image'
+import Link from 'next/link'
 import Error from 'next/error'
 import dynamic from 'next/dynamic'
-import { Session, SupabaseClient, createClient } from '@supabase/supabase-js'
 import { useTheme } from 'next-themes'
+import { Session } from '@supabase/supabase-js'
+import { Button } from 'ui'
+import { SITE_URL } from '~/lib/constants'
+import supabase from '~/lib/supabaseMisc'
 
+import FaviconImports from '~/components/LaunchWeek/X/FaviconImports'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import TicketContainer from '~/components/LaunchWeek/8/Ticket/TicketContainer'
-import { SITE_URL } from '~/lib/constants'
-import { PageState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
+import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
+import LWXBackground from '~/components/LaunchWeek/X/LWXBackground'
 
+const LWXTicketContainer = dynamic(() => import('~/components/LaunchWeek/X/Ticket/TicketContainer'))
 const LaunchWeekPrizeSection = dynamic(
-  () => import('~/components/LaunchWeek/8/LaunchWeekPrizeSection')
+  () => import('~/components/LaunchWeek/X/LaunchWeekPrizeSection')
 )
-const TicketBrickWall = dynamic(() => import('~/components/LaunchWeek/8/TicketBrickWall'))
 const CTABanner = dynamic(() => import('~/components/CTABanner'))
 
 interface Props {
@@ -25,39 +28,30 @@ interface Props {
   ogImageUrl: string
 }
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_MISC_USE_URL ?? 'http://localhost:54321',
-  // ANON KEY
-  process.env.NEXT_PUBLIC_MISC_USE_ANON_KEY!
-)
-
-export default function UsernamePage({ user, users, ogImageUrl }: Props) {
+export default function UsernamePage({ user, ogImageUrl }: Props) {
   const { username, ticketNumber, name } = user
 
   const TITLE = `${name ? name + '’s' : 'Get your'} #SupaLaunchWeek Ticket`
-  const DESCRIPTION =
-    'Supabase Launch Week 8 | 7–11 August 2023 | Generate your ticket & win awesome swag.'
+  const DESCRIPTION = `Claim and share your Supabase Launch Week X ticket for a chance to win Supabase swag.`
   const OG_URL = `${SITE_URL}/tickets/${username}`
 
-  const [supabase, setSupabase] = useState<SupabaseClient | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const { resolvedTheme, setTheme } = useTheme()
   const [initialDarkMode] = useState(resolvedTheme?.includes('dark'))
 
-  const [pageState, setPageState] = useState<PageState>('ticket')
+  const [ticketState, setTicketState] = useState<TicketState>('ticket')
 
   if (!ticketNumber) {
     return <Error statusCode={404} />
   }
 
   useEffect(() => {
-    if (!supabase) {
-      setSupabase(
-        createClient(
-          process.env.NEXT_PUBLIC_MISC_USE_URL!,
-          process.env.NEXT_PUBLIC_MISC_USE_ANON_KEY!
-        )
-      )
+    document.body.classList.add('bg-[#060809]')
+
+    return () => {
+      if (document.body.classList.contains('bg-[#060809]')) {
+        document.body.classList.remove('bg-[#060809]')
+      }
     }
   }, [])
 
@@ -78,50 +72,45 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
           ],
         }}
       />
+      <FaviconImports />
       <ConfDataContext.Provider
         value={{
           supabase,
           session,
           userData: user,
           setUserData: () => null,
-          setPageState,
+          ticketState,
+          setTicketState,
         }}
       >
         <DefaultLayout>
           <div className="-mt-[65px]">
-            <div className="relative">
-              <div className="relative z-10">
-                <SectionContainer className="relative z-10 flex flex-col justify-around items-center gap-2 lg:!pb-0 md:gap-4 !px-2 !mx-auto md:min-h-[auto]">
-                  <div className="pt-12 lg:pt-24">
-                    {supabase && (
-                      <TicketContainer
-                        user={user}
-                        referrals={user.referrals ?? 0}
-                        supabase={supabase}
-                        sharePage
-                      />
-                    )}
-                  </div>
-                </SectionContainer>
-                <div className="absolute w-full aspect-[1/1] md:aspect-[1.5/1] lg:aspect-[2.5/1] inset-0 z-0 pointer-events-none">
-                  <Image
-                    src="/images/launchweek/8/LW8-gradient.png"
-                    layout="fill"
-                    objectFit="cover"
-                    objectPosition="top"
-                    priority
-                    draggable={false}
-                    alt="Launch Week 8 gradient background"
-                  />
-                </div>
+            <SectionContainer className="relative z-10 flex flex-col justify-around items-center gap-2 md:gap-10 !px-2 !mx-auto md:min-h-[auto]">
+              <div className="w-full min-h-[400px] pt-24 flex items-center">
+                <LWXTicketContainer />
               </div>
-            </div>
-            <SectionContainer className="">
-              <LaunchWeekPrizeSection />
+              <div className="flex flex-col items-center justify-center text-center gap-2 max-w-lg">
+                <h1 className="text-2xl">
+                  {name}'s
+                  <br />
+                  Launch Week X Ticket
+                </h1>
+                <span className="text-foreground-lighter">
+                  Claim your own ticket and share it for a chance to win.
+                </span>
+              </div>
+              <Button type="secondary" asChild>
+                <Link href={`${SITE_URL}${username ? '?referral=' + username : ''}`}>
+                  Join Launch Week X
+                </Link>
+              </Button>
             </SectionContainer>
-            {users && <TicketBrickWall users={users.slice(0, 17)} />}
+            <LWXBackground className="absolute z-0 top-0 left-0 right-0 w-full flex items-center justify-center opacity-20" />
           </div>
-          <CTABanner className="!bg-[#020405] border-t-0" />
+          <SectionContainer className="!pt-4 !pb-0">
+            <LaunchWeekPrizeSection />
+          </SectionContainer>
+          <CTABanner className="!bg-[#060809] border-t-0" />
         </DefaultLayout>
       </ConfDataContext.Provider>
     </>
@@ -132,19 +121,21 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const username = params?.username?.toString() || null
   let user
 
-  // fetch users for the TicketBrickWall
-  const { data: users } = await supabaseAdmin!.from('lw8_tickets_golden').select().limit(17)
-
   fetch(
-    `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lw8-ticket?username=${encodeURIComponent(
+    `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lwx-og?username=${encodeURIComponent(
       username ?? ''
     )}`
-  ).catch((_) => {})
+  )
+  fetch(
+    `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lwx-ticket?username=${encodeURIComponent(
+      username ?? ''
+    )}`
+  )
 
   // fetch a specific user
   if (username) {
-    const { data } = await supabaseAdmin!
-      .from('lw8_tickets_golden')
+    const { data } = await supabase!
+      .from('lwx_tickets_golden')
       .select('name, username, ticketNumber, metadata, golden')
       .eq('username', username)
       .single()
@@ -152,11 +143,9 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     user = data
   }
 
-  const BUCKET_FOLDER_VERSION = 'v1'
-
-  const ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw8/og/${
-    user?.golden ? 'golden' : 'regular'
-  }/${BUCKET_FOLDER_VERSION}/${username}.png`
+  const ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lwx/og/${
+    user?.golden ? 'platinum' : 'regular'
+  }/${username}.png`
 
   return {
     props: {
@@ -165,7 +154,6 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
         username,
       },
       ogImageUrl,
-      users,
       key: username,
     },
     revalidate: 5,

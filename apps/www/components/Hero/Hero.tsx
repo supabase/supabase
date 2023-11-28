@@ -8,7 +8,7 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import HeroFrameworks from './HeroFrameworks'
 import styles from './hero.module.css'
 import Image from 'next/image'
-// import AnnouncementBadge from '../Announcement/Badge'
+import AnnouncementBadge from '../Announcement/Badge'
 
 const Hero = () => {
   const router = useRouter()
@@ -30,9 +30,13 @@ const Hero = () => {
                 ].join(' ')}
               >
                 <div className="flex flex-col items-center">
-                  {/* <div className="z-40 w-full flex justify-center mb-8 lg:mb-8">
-                    <AnnouncementBadge />
-                  </div> */}
+                  <div className="z-40 w-full flex justify-center mb-8 lg:mb-8">
+                    <AnnouncementBadge
+                      announcement="Launch Week X — 11-15 Dec"
+                      url="/launch-week"
+                      badge="Claim your ticket"
+                    />
+                  </div>
                   <h1 className="text-foreground text-4xl sm:text-5xl sm:leading-none lg:text-7xl">
                     <span className="block text-[#F4FFFA00] bg-clip-text bg-gradient-to-b from-foreground to-foreground-light">
                       Build in a weekend

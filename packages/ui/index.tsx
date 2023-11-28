@@ -44,6 +44,7 @@ export * from './src/components/ConsentToast'
 export * from './src/components/ContextMenu'
 export * from './src/components/ExpandableVideo'
 export * from './src/components/PrivacySettings'
+export * from './src/components/PromoToast'
 export * from './src/components/Popover'
 export * from './src/layout/PortalToast'
 

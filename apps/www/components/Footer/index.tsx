@@ -20,7 +20,8 @@ const Footer = (props: Props) => {
   const { resolvedTheme } = useTheme()
   const { pathname } = useRouter()
 
-  const forceDark = pathname.includes('launch-week') || pathname === '/'
+  const isLaunchWeek = pathname.includes('launch-week')
+  const forceDark = isLaunchWeek || pathname === '/'
 
   /**
    * Temporary fix for next-theme client side bug
@@ -38,7 +39,10 @@ const Footer = (props: Props) => {
   }
 
   return (
-    <footer className={cn('bg-alternative', props.className)} aria-labelledby="footerHeading">
+    <footer
+      className={cn('bg-alternative', isLaunchWeek && 'bg-[#060809]', props.className)}
+      aria-labelledby="footerHeading"
+    >
       <h2 id="footerHeading" className="sr-only">
         Footer
       </h2>
@@ -164,9 +168,7 @@ const Footer = (props: Props) => {
         </div>
         <div className="border-default mt-32 flex justify-between border-t pt-8">
           <small className="small">&copy; Supabase Inc</small>
-          <div
-            className={cn(forceDark && '[&>button]:opacity-50 [&>button]:hover:cursor-not-allowed')}
-          >
+          <div className={cn(forceDark && 'hidden')}>
             <ThemeToggle forceDark={forceDark} />
           </div>
         </div>

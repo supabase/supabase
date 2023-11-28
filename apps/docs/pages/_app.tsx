@@ -17,6 +17,7 @@ import Favicons from '~/components/Favicons'
 import SiteLayout from '~/layouts/SiteLayout'
 import { API_URL, IS_PLATFORM } from '~/lib/constants'
 import { post } from '~/lib/fetchWrappers'
+import PromoToast from 'ui/src/components/PromoToast'
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter()
@@ -163,6 +164,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
             <TabsProvider>
               <SiteLayout>
                 <PortalToast />
+                <PromoToast />
                 <Component {...pageProps} />
               </SiteLayout>
             </TabsProvider>
