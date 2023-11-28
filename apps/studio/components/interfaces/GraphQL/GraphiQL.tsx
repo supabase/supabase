@@ -38,6 +38,7 @@ import { MouseEventHandler, useCallback, useEffect, useState } from 'react'
 import { useCheckPermissions } from 'hooks'
 import { RoleImpersonationSelector } from '../RoleImpersonationSelector'
 import styles from './graphiql.module.css'
+import { Alert } from 'ui'
 
 export interface GraphiQLProps {
   fetcher: Fetcher
@@ -387,6 +388,24 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                 >
                   {executionContext.isFetching ? <Spinner /> : null}
                   <ResponseEditor />
+
+                  <Alert
+                    title={
+                      <p>
+                        Please note that queries and mutations run here in GraphiQL use the service
+                        role key by default.
+                        <br />
+                        RLS will be bypassed.
+                      </p>
+                    }
+                    variant="warning"
+                    withIcon={true}
+                    closable={true}
+                    className="mb-4 mr-4 ml-2 items-center"
+                  >
+                    You can send queries as a specific role/user by changing the "Authorization"
+                    header.
+                  </Alert>
                 </div>
               </div>
             </div>
