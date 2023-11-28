@@ -1,7 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { IS_PLATFORM } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
-import { Button, IconAlignLeft, IconCommand, IconCornerDownLeft } from 'ui'
+import { Button, IconAlignLeft, IconCommand, IconCornerDownLeft, cn } from 'ui'
 
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
@@ -29,6 +29,7 @@ const UtilityActions = ({
 }: UtilityActionsProps) => {
   const os = detectOS()
   const readReplicasEnabled = useFlag('readReplicas')
+  const roleImpersonationEnabledFlag = useFlag('roleImpersonation')
   const [selectedDatabaseId, setSelectedDatabaseId] = useState<string>('1')
 
   return (
@@ -74,7 +75,9 @@ const UtilityActions = ({
         )}
 
         <div className="flex items-center">
-          <RoleImpersonationPopover serviceRoleLabel="postgres" variant="connected-on-right" />
+          {roleImpersonationEnabledFlag && (
+            <RoleImpersonationPopover serviceRoleLabel="postgres" variant="connected-on-right" />
+          )}
 
           <Button
             onClick={() => executeQuery()}
@@ -92,7 +95,7 @@ const UtilityActions = ({
                 <IconCornerDownLeft size={10} strokeWidth={1.5} />
               </div>
             }
-            className="rounded-l-none"
+            className={cn(roleImpersonationEnabledFlag && 'rounded-l-none')}
           >
             {hasSelection ? 'Run selected' : 'Run'}
           </Button>

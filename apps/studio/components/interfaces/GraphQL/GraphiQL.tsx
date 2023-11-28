@@ -35,10 +35,10 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
 import { MouseEventHandler, useCallback, useEffect, useState } from 'react'
 
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions, useFlag } from 'hooks'
+import { Alert } from 'ui'
 import { RoleImpersonationSelector } from '../RoleImpersonationSelector'
 import styles from './graphiql.module.css'
-import { Alert } from 'ui'
 
 export interface GraphiQLProps {
   fetcher: Fetcher
@@ -74,6 +74,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
   const merge = useMergeQuery()
   const prettify = usePrettifyEditors()
 
+  const roleImpersonationEnabledFlag = useFlag('roleImpersonation')
   const canReadJWTSecret = useCheckPermissions(PermissionAction.READ, 'field.jwt_secret')
 
   const { setTheme } = useTheme()
@@ -302,7 +303,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                         Headers
                       </UnStyledButton>
 
-                      {canReadJWTSecret && (
+                      {canReadJWTSecret && roleImpersonationEnabledFlag && (
                         <UnStyledButton
                           type="button"
                           className={
@@ -357,7 +358,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
 
                       <HeaderEditor isHidden={activeSecondaryEditor !== 'headers'} />
 
-                      {canReadJWTSecret && (
+                      {canReadJWTSecret && roleImpersonationEnabledFlag && (
                         <div
                           className={clsx(
                             'graphiql-editor px-1',
@@ -403,8 +404,9 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                     closable={true}
                     className="mb-4 mr-4 ml-2 items-center"
                   >
-                    You can send queries as a specific role/user by changing the "Authorization"
-                    header.
+                    {roleImpersonationEnabledFlag
+                      ? 'You can send queries as a specific role/user by using the role impersonation selector tab.'
+                      : 'You can send queries as a specific role/user by changing the "Authorization" header.'}
                   </Alert>
                 </div>
               </div>
