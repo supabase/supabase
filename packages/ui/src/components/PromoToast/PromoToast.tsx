@@ -25,7 +25,7 @@ const PromoToast = () => {
 
   return (
     <div className="grid gap-4 fixed z-50 bottom-8 right-8 w-[80vw] sm:w-[350px] bg-alternative-200 hover:bg-alternative transition-colors border border-default rounded p-6 shadow-lg overflow-hidden">
-      <div className="realtive z-10 text-foreground flex flex-col text-base uppercase tracking-[1px]">
+      <div className="relative z-10 text-foreground flex flex-col text-base uppercase tracking-[1px]">
         <div className="flex gap-1.5 items-center">
           <p>Launch Week</p>
           <Image src={LWXLogo} alt="Supabase Launch Week X Logo" width={14} height={14} />
