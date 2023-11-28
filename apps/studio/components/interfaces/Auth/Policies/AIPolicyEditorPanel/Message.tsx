@@ -1,36 +1,58 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
 import dayjs from 'dayjs'
 import { kebabCase, noop, take } from 'lodash'
 import { Copy, FileDiff } from 'lucide-react'
+import Image from 'next/image'
+import { memo, useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { format } from 'sql-formatter'
-import { Badge, Button } from 'ui'
-import * as Tooltip from '@radix-ui/react-tooltip'
+import { AiIcon, Badge, Button } from 'ui'
 
 import CodeEditor from 'components/ui/CodeEditor'
+import { useProfile } from 'lib/profile'
 
-const Message = ({
-  icon,
-  postedBy,
-  postedAt,
-  message,
+const Message = memo(function Message({
+  name,
+  role,
+  content,
+  createdAt,
+  isDebug,
   onDiff = noop,
-  isDebug = false,
 }: {
-  icon: React.ReactNode
-  postedBy: string
-  postedAt?: number
-  message: string
+  name?: string
+  role: 'user' | 'assistant'
+  content?: string
+  createdAt?: number
   isDebug?: boolean
   onDiff?: (s: string) => void
-}) => {
+}) {
+  const { profile } = useProfile()
+
+  const icon = useMemo(() => {
+    return role === 'assistant' ? (
+      <AiIcon className="[&>div>div]:border-black dark:[&>div>div]:border-white" />
+    ) : (
+      <div className="relative border shadow-lg w-8 h-8 rounded-full overflow-hidden">
+        <Image
+          src={`https://github.com/${profile?.username}.png` || ''}
+          width={30}
+          height={30}
+          alt="avatar"
+          className="relative"
+        />
+      </div>
+    )
+  }, [role])
+
+  if (!content) return null
+
   return (
     <div className="flex flex-col py-4 gap-4 border-t px-5">
       <div className="flex flex-row gap-3 items-center">
         {icon}
-
-        <span className="text-sm">{postedBy}</span>
-        {postedAt && (
-          <span className="text-xs text-foreground-muted">{dayjs(postedAt * 1000).fromNow()}</span>
+        <span className="text-sm">{role === 'assistant' ? 'Assistant' : name ? name : 'You'}</span>
+        {createdAt && (
+          <span className="text-xs text-foreground-muted">{dayjs(createdAt * 1000).fromNow()}</span>
         )}
         {isDebug && <Badge color="amber">Debug request</Badge>}
       </div>
@@ -58,11 +80,14 @@ const Message = ({
                 <CodeEditor
                   id={`rls-sql_${key}`}
                   language="pgsql"
-                  className="h-80"
+                  className="h-48"
                   value={formatted}
-                  isReadOnly
                   autofocus={false}
-                  options={{ scrollBeyondLastLine: false }}
+                  options={{
+                    scrollBeyondLastLine: false,
+                    lineDecorationsWidth: 0,
+                    lineNumbersMinChars: 3,
+                  }}
                 />
                 <div className="absolute top-3 right-3 bg-surface-100 border-muted border rounded-lg h-[28px] hidden group-hover:block">
                   <Tooltip.Root delayDuration={0}>
@@ -115,10 +140,10 @@ const Message = ({
           },
         }}
       >
-        {message}
+        {content}
       </ReactMarkdown>
     </div>
   )
-}
+})
 
 export default Message

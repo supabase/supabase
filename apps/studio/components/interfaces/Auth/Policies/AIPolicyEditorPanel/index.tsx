@@ -66,6 +66,7 @@ export const AIPolicyEditorPanel = memo(function ({
         }
         return 5000
       },
+      keepPreviousData: true,
     }
   )
 
@@ -228,6 +229,8 @@ export const AIPolicyEditorPanel = memo(function ({
     setDebugThread([...debugThread, assistantMessageAfter])
   }
 
+  const onDiff = useCallback((v: string) => setIncomingChange(v), [])
+
   // when the panel is closed, reset all values
   useEffect(() => {
     if (!visible) {
@@ -333,7 +336,7 @@ export const AIPolicyEditorPanel = memo(function ({
             <AIPolicyChat
               messages={messages}
               onSubmit={(message: string) => addPrompt(message)}
-              onDiff={(v) => setIncomingChange(v)}
+              onDiff={onDiff}
               onChange={setIsAssistantChatInputEmpty}
               loading={data?.status === 'loading'}
             />

@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { compact, last, sortBy } from 'lodash'
-import Image from 'next/image'
+import { Loader2 } from 'lucide-react'
 import OpenAI from 'openai'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -15,7 +15,6 @@ import {
 import * as z from 'zod'
 
 import { useProfile } from 'lib/profile'
-import { Loader2 } from 'lucide-react'
 import Message from './Message'
 
 export const AIPolicyChat = ({
@@ -80,58 +79,33 @@ export const AIPolicyChat = ({
     <div className="flex flex-col h-full">
       <div className="overflow-auto flex-1">
         <Message
-          icon={<AiIcon className="[&>div>div]:border-white" />}
-          postedBy="Assistant"
-          message={`Hi${
+          role="assistant"
+          content={`Hi${
             name ? ' ' + name : ''
           }, how can I help you? I'm powered by AI, so surprises and mistakes are possible.
         Make sure to verify any generated code or suggestions, and share feedback so that we can
         learn and improve.`}
         />
 
-        {sorted.map((m) => {
-          const content = m.content[0]
-          if (content && content.type !== 'text') {
-            return null
-          }
-
-          return (
-            <Message
-              key={m.id}
-              icon={
-                m.role === 'assistant' ? (
-                  <AiIcon className="[&>div>div]:border-black dark:[&>div>div]:border-white" />
-                ) : (
-                  <div className="relative border shadow-lg w-8 h-8 rounded-full overflow-hidden">
-                    <Image
-                      src={`https://github.com/${profile?.username}.png` || ''}
-                      width={30}
-                      height={30}
-                      alt="avatar"
-                      className="relative"
-                    />
-                  </div>
-                )
-              }
-              postedBy={m.role === 'assistant' ? 'Assistant' : name ? name : 'You'}
-              postedAt={m.created_at}
-              message={content.text.value}
-              onDiff={onDiff}
-              isDebug={(m.metadata as any).type === 'debug'}
-            />
-          )
-        })}
-
-        {pendingReply && (
+        {sorted.map((m, idx) => (
           <Message
-            icon={<AiIcon className="[&>div>div]:border-white" />}
-            postedBy={'Assistant'}
-            message={'Thinking...'}
+            key={`message-${idx}`}
+            name={name}
+            role={m.role}
+            content={
+              m.content[0] && m.content[0].type === 'text' ? m.content[0].text.value : undefined
+            }
+            createdAt={m.created_at}
+            isDebug={(m.metadata as any).type === 'debug'}
+            onDiff={onDiff}
           />
-        )}
+        ))}
+
+        {pendingReply && <Message role="assistant" content="Thinking..." />}
 
         <div ref={bottomRef} className="h-1" />
       </div>
+
       <Form_Shadcn_ {...form}>
         <form
           id="rls-chat"
