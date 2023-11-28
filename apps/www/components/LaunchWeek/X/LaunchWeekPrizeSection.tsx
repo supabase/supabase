@@ -38,7 +38,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
                   </p>
                 </div>
                 <div className="px-4 mt-10 w-full">
-                  <div className="relative w-full aspect-[3.634/1]">
+                  <div className="relative w-full aspect-[3.078/1]">
                     <Image
                       src="/images/launchweek/lwx/swag/lwx_keyboard.png"
                       fill
