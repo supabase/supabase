@@ -83,7 +83,8 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
                       className="inline hover:underline text-foreground-light"
                     >
                       Supabase Store
-                    </Link>
+                    </Link>{' '}
+                    selection
                   </p>
                 </div>
               }

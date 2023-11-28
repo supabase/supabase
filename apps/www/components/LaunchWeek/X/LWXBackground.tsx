@@ -48,9 +48,9 @@ const LWXBackground = ({ className }: Props) => {
 
     window.addEventListener('mousemove', handleGlow)
     return () => {
-      if (hasTicket) window.removeEventListener('mousemove', handleGlow)
+      window.removeEventListener('mousemove', handleGlow)
     }
-  }, [])
+  }, [ticketState])
 
   const gradientTransformBg = `translate(${gradientPos?.x} ${gradientPos?.y}) rotate(67.9381) scale(182.424)`
   const gradientTransformStroke = `translate(${gradientPos?.x} ${gradientPos?.y})  rotate(71.6455) scale(105.635)`
@@ -159,6 +159,14 @@ const LWXBackground = ({ className }: Props) => {
         fill
         priority
         ref={containerRef}
+      />
+      <Image
+        src="/images/launchweek/lwx/lwx_bg.svg"
+        alt=""
+        className="absolute block md:hidden pointer-events-none w-full !h-[400px] md:!h-full inset-0 mt-10 object-cover object-center overflow-visible"
+        role="presentation"
+        fill
+        priority
       />
     </div>
   )
