@@ -46,10 +46,11 @@ export const AIPolicyEditorPanel = memo(function ({
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
 
   const [error, setError] = useState<QueryResponseError>()
+  const [keepPreviousData, setKeepPreviousData] = useState(false)
   const [debugThread, setDebugThread] = useState<ThreadMessage[]>([])
   const [assistantVisible, setAssistantPanel] = useState(false)
   const [ids, setIds] = useState<{ threadId: string; runId: string } | undefined>(undefined)
-  const [isAssistantChatInputEmpty, setIsAssistantChatInputEmpty] = useState(false)
+  const [isAssistantChatInputEmpty, setIsAssistantChatInputEmpty] = useState(true)
   const [incomingChange, setIncomingChange] = useState<string | undefined>(undefined)
   // used for confirmation when closing the panel with unsaved changes
   const [isClosingPolicyEditorPanel, setIsClosingPolicyEditorPanel] = useState(false)
@@ -66,7 +67,7 @@ export const AIPolicyEditorPanel = memo(function ({
         }
         return 5000
       },
-      keepPreviousData: true,
+      keepPreviousData,
     }
   )
 
@@ -242,6 +243,9 @@ export const AIPolicyEditorPanel = memo(function ({
       setIds(undefined)
       setError(undefined)
       setDebugThread([])
+      setKeepPreviousData(false)
+    } else {
+      setKeepPreviousData(true)
     }
   }, [visible])
 
