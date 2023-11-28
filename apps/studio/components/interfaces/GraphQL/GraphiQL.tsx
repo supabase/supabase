@@ -36,7 +36,7 @@ import clsx from 'clsx'
 import { MouseEventHandler, useCallback, useEffect, useState } from 'react'
 
 import { useCheckPermissions, useFlag } from 'hooks'
-import { Alert } from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, IconAlertTriangle } from 'ui'
 import { RoleImpersonationSelector } from '../RoleImpersonationSelector'
 import styles from './graphiql.module.css'
 
@@ -381,7 +381,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
               <div ref={editorResize.secondRef}>
                 <div
                   className={clsx(
-                    'graphiql-response text-sm',
+                    'graphiql-response text-sm relative',
                     hasSingleTab
                       ? styles.graphiqlResponseSingleTab
                       : styles.graphiqlResponseMultiTab
@@ -390,24 +390,20 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                   {executionContext.isFetching ? <Spinner /> : null}
                   <ResponseEditor />
 
-                  <Alert
-                    title={
-                      <p>
-                        Please note that queries and mutations run here in GraphiQL use the service
-                        role key by default.
-                        <br />
-                        RLS will be bypassed.
-                      </p>
-                    }
-                    variant="warning"
-                    withIcon={true}
-                    closable={true}
-                    className="mb-4 mr-4 ml-2 items-center"
-                  >
-                    {roleImpersonationEnabledFlag
-                      ? 'You can send queries as a specific role/user by using the role impersonation selector tab.'
-                      : 'You can send queries as a specific role/user by changing the "Authorization" header.'}
-                  </Alert>
+                  <Alert_Shadcn_ variant="warning" className="absolute bottom-[5px] right-[5px]">
+                    <IconAlertTriangle strokeWidth={2} />
+                    <AlertTitle_Shadcn_ className="leading-5">
+                      Please note that queries and mutations run in GraphiQL now use the service
+                      role key by default.
+                      <br />
+                      RLS will be bypassed.
+                    </AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_>
+                      {roleImpersonationEnabledFlag
+                        ? 'You can send queries as a specific role/user by using the role impersonation tab.'
+                        : 'You can send queries as a specific role/user by changing the "Authorization" header.'}
+                    </AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
                 </div>
               </div>
             </div>
