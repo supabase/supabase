@@ -885,7 +885,7 @@ functions:
         name: Switching schemas per-query
         description: |
           You can perform queries on custom schemas.
-          Make sure you've set up your [database privileges and API settings](https://supabase.com/docs/guides/api/using-custom-schemas).
+          Make sure you've set up your [database privileges and API settings](/docs/guides/api/using-custom-schemas).
         code: |
           ```dart
           final data = await supabase

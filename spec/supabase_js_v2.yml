@@ -1814,7 +1814,7 @@ functions:
           ```
         description: |
           In addition to setting the schema during initialization, you can also switch schemas on a per-query basis.
-          Make sure you've set up your [database privileges and API settings](https://supabase.com/docs/guides/api/using-custom-schemas).
+          Make sure you've set up your [database privileges and API settings](/docs/guides/api/using-custom-schemas).
         hideCodeBlock: true
 
   - id: insert
