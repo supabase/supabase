@@ -31,9 +31,6 @@ export const AIPolicyChat = ({
   onChange: (value: boolean) => void
 }) => {
   const { profile } = useProfile()
-  // [Joshen] Separate state here as there's a delay between submitting and the API updating the loading status
-  const [isLoading, setIsLoading] = useState(false)
-
   const bottomRef = useRef<HTMLDivElement>(null)
   const name = compact([profile?.first_name, profile?.last_name]).join(' ')
   const sorted = useMemo(() => {
@@ -67,7 +64,6 @@ export const AIPolicyChat = ({
   useEffect(() => {
     if (!loading) {
       form.setValue('chat', '')
-      setIsLoading(false)
     }
   }, [loading])
 
@@ -111,7 +107,6 @@ export const AIPolicyChat = ({
           id="rls-chat"
           className="sticky p-5 flex-0 border-t"
           onSubmit={form.handleSubmit((data: z.infer<typeof FormSchema>) => {
-            setIsLoading(true)
             onSubmit(data.chat)
           })}
         >
@@ -126,13 +121,13 @@ export const AIPolicyChat = ({
                     <Input_Shadcn_
                       {...field}
                       autoComplete="off"
-                      disabled={isLoading}
+                      disabled={loading}
                       className={`bg-surface-300 dark:bg-black rounded-full pl-10 ${
-                        isLoading ? 'pr-10' : ''
+                        loading ? 'pr-10' : ''
                       }`}
                       placeholder="Ask for some changes to your policy"
                     />
-                    {isLoading && <Loader2 className="absolute top-2 right-3 animate-spin" />}
+                    {loading && <Loader2 className="absolute top-2 right-3 animate-spin" />}
                   </div>
                 </FormControl_Shadcn_>
               </FormItem_Shadcn_>

@@ -1,5 +1,6 @@
 import { FileDiff } from 'lucide-react'
 import dynamic from 'next/dynamic'
+import { ThreadMessage } from 'openai/resources/beta/threads/messages/messages'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import { Button, Modal, SidePanel } from 'ui'
@@ -16,11 +17,11 @@ import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-quer
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useSelectedProject, useStore } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
-import { ThreadMessage } from 'openai/resources/beta/threads/messages/messages'
 import { AIPolicyChat } from './AIPolicyChat'
 import { AIPolicyHeader } from './AIPolicyHeader'
 import QueryError from './QueryError'
 import RLSCodeEditor from './RLSCodeEditor'
+import { generateThreadMessage } from './AIPolicyEditorPanel.utils'
 
 const DiffEditor = dynamic(
   () => import('@monaco-editor/react').then(({ DiffEditor }) => DiffEditor),
@@ -46,6 +47,8 @@ export const AIPolicyEditorPanel = memo(function ({
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
 
   const [error, setError] = useState<QueryResponseError>()
+  // [Joshen] Separate state here as there's a delay between submitting and the API updating the loading status
+  const [loading, setLoading] = useState(false)
   const [keepPreviousData, setKeepPreviousData] = useState(false)
   const [debugThread, setDebugThread] = useState<ThreadMessage[]>([])
   const [assistantVisible, setAssistantPanel] = useState(false)
@@ -55,7 +58,7 @@ export const AIPolicyEditorPanel = memo(function ({
   // used for confirmation when closing the panel with unsaved changes
   const [isClosingPolicyEditorPanel, setIsClosingPolicyEditorPanel] = useState(false)
 
-  const { data, isSuccess } = useRlsSuggestQuery(
+  const { data } = useRlsSuggestQuery(
     { thread_id: ids?.threadId!, run_id: ids?.runId! },
     {
       enabled: !!(ids?.runId && ids.threadId),
@@ -85,6 +88,17 @@ export const AIPolicyEditorPanel = memo(function ({
     onSuccess: (data) => {
       setIds({ threadId: data.threadId, runId: data.runId })
     },
+    onError: (error) => {
+      const threadMessage = generateThreadMessage({
+        threadId: ids?.threadId,
+        runId: ids?.runId,
+        content: error.message.includes('No OPENAI_KEY set')
+          ? `Seems like you haven't set an OPENAI_KEY in your environment variables of the dashboard. Update your .env file with that environment variable to use all the AI features of the dashboard!`
+          : error.message,
+      })
+      setDebugThread([...debugThread, threadMessage])
+      setLoading(false)
+    },
   })
 
   const { mutate: executeMutation, isLoading: isExecuting } = useExecuteSqlMutation({
@@ -103,6 +117,7 @@ export const AIPolicyEditorPanel = memo(function ({
 
   const addPrompt = useCallback(
     (message: string) => {
+      setLoading(true)
       if (ids?.threadId) {
         addPromptMutation({
           thread_id: ids?.threadId,
@@ -120,8 +135,8 @@ export const AIPolicyEditorPanel = memo(function ({
   )
 
   const messages = useMemo(
-    () => [...(isSuccess ? data.messages : []), ...debugThread],
-    [data?.messages, debugThread, isSuccess]
+    () => [...(data?.messages ?? []), ...debugThread],
+    [data?.messages, debugThread]
   )
 
   const errorLines =
@@ -187,19 +202,13 @@ export const AIPolicyEditorPanel = memo(function ({
     setAssistantPanel(true)
     const messageId = uuidv4()
 
-    const assistantMessageBefore: ThreadMessage = {
+    const assistantMessageBefore = generateThreadMessage({
       id: messageId,
-      object: 'thread.message',
-      role: 'assistant',
-      file_ids: [],
+      threadId: ids?.threadId,
+      runId: ids?.runId,
+      content: 'Thinking...',
       metadata: { type: 'debug' },
-      content: [{ type: 'text', text: { value: 'Thinking...', annotations: [] } }],
-      created_at: Math.floor(Number(new Date()) / 1000),
-      assistant_id: null,
-      thread_id: ids?.threadId ?? '',
-      run_id: ids?.runId ?? '',
-    }
-
+    })
     setDebugThread([...debugThread, assistantMessageBefore])
 
     const { solution, sql } = await debugSql({
@@ -208,25 +217,13 @@ export const AIPolicyEditorPanel = memo(function ({
       entityDefinitions,
     })
 
-    // Temporarily to make sure that debugSQL output matches messages from RLS suggest query
-    const assistantMessageAfter: ThreadMessage = {
+    const assistantMessageAfter = generateThreadMessage({
       id: messageId,
-      object: 'thread.message',
-      role: 'assistant',
-      file_ids: [],
+      threadId: ids?.threadId,
+      runId: ids?.runId,
+      content: `${solution}\n\`\`\`sql\n${sql}\n\`\`\``,
       metadata: { type: 'debug' },
-      content: [
-        {
-          type: 'text',
-          text: { value: `${solution}\n\`\`\`sql\n${sql}\n\`\`\``, annotations: [] },
-        },
-      ],
-      created_at: Math.floor(Number(new Date()) / 1000),
-      assistant_id: null,
-      thread_id: ids?.threadId ?? '',
-      run_id: ids?.runId ?? '',
-    }
-
+    })
     setDebugThread([...debugThread, assistantMessageAfter])
   }
 
@@ -248,6 +245,10 @@ export const AIPolicyEditorPanel = memo(function ({
       setKeepPreviousData(true)
     }
   }, [visible])
+
+  useEffect(() => {
+    if (data?.status === 'completed') setLoading(false)
+  }, [data?.status])
 
   return (
     <SidePanel
@@ -342,7 +343,7 @@ export const AIPolicyEditorPanel = memo(function ({
               onSubmit={(message: string) => addPrompt(message)}
               onDiff={onDiff}
               onChange={setIsAssistantChatInputEmpty}
-              loading={data?.status === 'loading'}
+              loading={loading || data?.status === 'loading'}
             />
           </div>
         )}
