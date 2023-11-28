@@ -66,9 +66,8 @@ export default function TicketsGrid({ loadedUsers, isLoading, pageCount, offset 
                 <Image
                   src={imgUrl}
                   alt={user.username ?? ''}
-                  layout="fill"
-                  objectFit="cover"
-                  objectPosition="center"
+                  fill
+                  className="object-cover object-center"
                   placeholder="blur"
                   blurDataURL="/images/launchweek/8/lw8-ticket-empty.jpg"
                 />

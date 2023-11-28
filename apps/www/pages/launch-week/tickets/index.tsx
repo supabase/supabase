@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { GetServerSideProps } from 'next'
 import { NextSeo } from 'next-seo'
-import Image from 'next/image'
 import { Button } from 'ui'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
@@ -10,13 +9,13 @@ import { debounce } from 'lodash'
 import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
 import { useTheme } from 'next-themes'
 
+import FaviconImports from '~/components/LaunchWeek/X/faviconImports'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import CTABanner from '~/components/CTABanner'
 import TicketsGrid from '~/components/LaunchWeek/8/TicketsGrid'
 import supabase from '../../../lib/supabaseMisc'
-import Head from 'next/head'
 
 interface Props {
   users: UserData[]
@@ -111,25 +110,7 @@ export default function TicketsPage({ users }: Props) {
           ],
         }}
       />
-      <Head>
-        <link
-          rel="apple-touch-icon"
-          sizes="180x180"
-          href="/images/launchweek/lwx/favicon/apple-touch-icon.png"
-        />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="32x32"
-          href="/images/launchweek/lwx/favicon/favicon-32x32.png"
-        />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="16x16"
-          href="/images/launchweek/lwx/favicon/favicon-16x16.png"
-        />
-      </Head>
+      <FaviconImports />
       <DefaultLayout>
         <div className="">
           <SectionContainer className="z-10">

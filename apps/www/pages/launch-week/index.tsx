@@ -6,6 +6,7 @@ import { Session } from '@supabase/supabase-js'
 import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
 import supabase from '~/lib/supabaseMisc'
 
+import FaviconImports from '~/components/LaunchWeek/X/faviconImports'
 import DefaultLayout from '~/components/Layouts/Default'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import TicketingFlow from '~/components/LaunchWeek/X/Ticket/TicketingFlow'
@@ -84,29 +85,7 @@ export default function TicketHome() {
           ],
         }}
       />
-      <Head>
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-        />
-        <link
-          rel="apple-touch-icon"
-          sizes="180x180"
-          href="/images/launchweek/lwx/favicon/apple-touch-icon.png"
-        />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="32x32"
-          href="/images/launchweek/lwx/favicon/favicon-32x32.png"
-        />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="16x16"
-          href="/images/launchweek/lwx/favicon/favicon-16x16.png"
-        />
-      </Head>
+      <FaviconImports />
       <ConfDataContext.Provider
         value={{
           supabase,
