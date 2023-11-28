@@ -3,10 +3,10 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'joins-and-nested-tables',
   title: 'Querying Joins and Nested tables',
-  description: 'The Serverless APIs automatically detect relationships between Postgres tables.',
+  description: 'The Data APIs automatically detect relationships between Postgres tables.',
 }
 
-The Serverless APIs automatically detect relationships between Postgres tables. Since Postgres is a relational database, this is a very common scenario.
+The data APIs automatically detect relationships between Postgres tables. Since Postgres is a relational database, this is a very common scenario.
 
 ## One-to-many joins
 
@@ -176,7 +176,7 @@ GET https://[REF].supabase.co/rest/v1/countries?select=id,name,cities(id,name)
 
 ## Many-to-many joins
 
-The Serverless APIs will detect many-to-many joins. For example, if you have a database which stored teams of users (where each user could belong to many teams):
+The data APIs will detect many-to-many joins. For example, if you have a database which stored teams of users (where each user could belong to many teams):
 
 ```sql
 create table users (
