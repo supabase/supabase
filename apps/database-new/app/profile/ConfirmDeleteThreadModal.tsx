@@ -20,7 +20,9 @@ const ConfirmDeleteThreadModal = ({
   const initialState = {
     message: '',
     success: false,
-    data: undefined,
+    data: {
+      thread_id: thread.thread_id,
+    },
   }
 
   const [state, formAction] = useFormState(deleteThread, initialState)
@@ -67,7 +69,7 @@ const ConfirmDeleteThreadModal = ({
           <p className="text-sm">Once the thread is deleted, it cannot be recovered.</p>
         </Modal.Content>
         <Modal.Separator />
-        <Input_Shadcn_ name="thread_id" required type="hidden" value={state?.data?.thread_id} />
+        <Input_Shadcn_ name="thread_id" required type="hidden" value={thread.thread_id} />
         <Modal.Content className="flex flex-row gap-3 justify-end">
           <Button type="default">Cancel</Button>
           <SubmitButton />
