@@ -1,5 +1,5 @@
-import { DataGridHandle } from 'react-data-grid'
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import { DataGridHandle } from 'react-data-grid'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { createPortal } from 'react-dom'
@@ -7,6 +7,7 @@ import { createPortal } from 'react-dom'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useUrlState } from 'hooks'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   cleanupProps,
   formatFilterURLParams,
@@ -21,7 +22,6 @@ import Header from './components/header'
 import { RowContextMenu } from './components/menu'
 import { StoreProvider, useDispatch, useTrackedState } from './store'
 import { Dictionary, SupabaseGridProps, SupabaseGridRef } from './types'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
 
 /** Supabase Grid: React component to render database table */
 
@@ -76,7 +76,7 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>(
         sorts,
         filters,
         page: snap.page,
-        limit: state.rowsPerPage,
+        limit: snap.rowsPerPage,
       },
       {
         keepPreviousData: true,

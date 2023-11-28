@@ -61,6 +61,10 @@ export const createTableEditorState = () => {
     setPage: (page: number) => {
       state.page = page
     },
+    rowsPerPage: 100,
+    setRowsPerPage: (rowsPerPage: number) => {
+      state.rowsPerPage = rowsPerPage
+    },
 
     ui: { open: 'none' } as UIState,
     get sidePanel() {

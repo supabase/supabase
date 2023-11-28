@@ -244,7 +244,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
     sorts,
     filters,
     page: snap.page,
-    limit: state.rowsPerPage,
+    limit: snap.rowsPerPage,
   })
 
   const { data: countData } = useTableRowsCountQuery(

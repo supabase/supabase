@@ -53,7 +53,7 @@ const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
     }
   )
 
-  const maxPages = Math.ceil((data?.count ?? 0) / state.rowsPerPage)
+  const maxPages = Math.ceil((data?.count ?? 0) / snap.rowsPerPage)
   const totalPages = (data?.count ?? 0) > 0 ? maxPages : 1
 
   useEffect(() => {
@@ -128,7 +128,9 @@ const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
   }
 
   function onRowsPerPageChange(value: string | number) {
-    dispatch({ type: 'SET_ROWS_PER_PAGE', payload: value })
+    const rowsPerPage = Number(value)
+
+    snap.setRowsPerPage(isNaN(rowsPerPage) ? 100 : rowsPerPage)
   }
 
   return (
@@ -175,7 +177,7 @@ const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
             align="start"
           >
             <Button asChild type="outline" style={{ padding: '3px 10px' }}>
-              <span>{`${state.rowsPerPage} rows`}</span>
+              <span>{`${snap.rowsPerPage} rows`}</span>
             </Button>
           </DropdownControl>
           <p className="text-sm text-foreground-light">{`${data.count.toLocaleString()} ${

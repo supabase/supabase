@@ -26,7 +26,6 @@ import {
   UpdateColumnPayload,
 } from './SidePanelEditor.types'
 import { ImportContent } from './TableEditor/TableEditor.types'
-import { uuidv4 } from 'lib/helpers'
 
 export interface SidePanelEditorProps {
   editable?: boolean
