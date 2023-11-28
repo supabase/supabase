@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react'
+import { compact, debounce, uniqBy } from 'lodash'
 
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import {
@@ -15,7 +16,7 @@ import {
 } from 'ui'
 import { CommandGroup, CommandItem, CommandLabel, TextHighlighter } from './Command.utils'
 
-import { debounce } from 'lodash'
+const NUMBER_SOURCES = 2
 
 const questions = [
   'How do I get started with Supabase?',
@@ -32,20 +33,18 @@ export enum PageType {
   GithubDiscussion = 'github-discussions',
 }
 
-export interface PageSection {
-  slug?: string
-  heading?: string
+interface PageSection {
+  heading: string
+  slug: string
 }
 
-export interface PageMetadata {
-  title: string
-  description?: string
-}
-
-export interface PageResult {
-  type: PageType
+export interface Page {
+  id: number
   path: string
-  meta: PageMetadata
+  type: PageType
+  title: string
+  subtitle: string | null
+  description: string | null
   sections: PageSection[]
 }
 
@@ -64,67 +63,264 @@ const getDocsUrl = () => {
   return isLocal ? 'http://localhost:3001/docs' : 'https://supabase.com/docs'
 }
 
+type SearchState =
+  | {
+      status: 'initial'
+      key: number
+    }
+  | {
+      status: 'loading'
+      key: number
+      staleResults: Page[]
+    }
+  | {
+      status: 'partialResults'
+      key: number
+      results: Page[]
+    }
+  | {
+      status: 'fullResults'
+      key: number
+      results: Page[]
+    }
+  | {
+      status: 'noResults'
+      key: number
+    }
+  | {
+      status: 'error'
+      key: number
+      message: string
+    }
+
+type Action =
+  | {
+      type: 'resultsReturned'
+      key: number
+      sourcesLoaded: number
+      results: unknown[]
+    }
+  | {
+      type: 'newSearchDispatched'
+      key: number
+    }
+  | {
+      type: 'reset'
+      key: number
+    }
+  | {
+      type: 'errored'
+      key: number
+      sourcesLoaded: number
+      message: string
+    }
+
+function reshapeResults(result: unknown): Page | null {
+  if (typeof result !== 'object' || result === null) {
+    return null
+  }
+  if (!('id' in result && 'path' in result && 'type' in result && 'title' in result)) {
+    return null
+  }
+
+  const sections: PageSection[] = []
+  if (
+    'headings' in result &&
+    Array.isArray(result.headings) &&
+    'slugs' in result &&
+    Array.isArray(result.slugs) &&
+    result.headings.length === result.slugs.length
+  ) {
+    result.headings.forEach((heading, idx) => {
+      const slug = (result.slugs as Array<string>)[idx]
+      if (heading && slug) {
+        sections.push({ heading, slug })
+      }
+    })
+  }
+
+  return {
+    id: result.id as number,
+    path: result.path as string,
+    type: result.type as PageType,
+    title: result.title as string,
+    subtitle: 'subtitle' in result ? (result.subtitle as string) : null,
+    description: 'description' in result ? (result.description as string) : null,
+    sections,
+  }
+}
+
+function reducer(state: SearchState, action: Action): SearchState {
+  // Ignore responses from outdated async functions
+  if (state.key > action.key) {
+    return state
+  }
+  switch (action.type) {
+    case 'resultsReturned':
+      const allSourcesLoaded = action.sourcesLoaded === NUMBER_SOURCES
+      const newResults = compact(action.results.map(reshapeResults))
+      // If the new responses are from the same request as the current responses,
+      // combine the responses.
+      // If the new responses are from a fresher request, replace the current responses.
+      const allResults =
+        state.status === 'partialResults' && state.key === action.key
+          ? uniqBy(state.results.concat(newResults), (res) => res.id)
+          : newResults
+      if (!allResults.length) {
+        return allSourcesLoaded
+          ? {
+              status: 'noResults',
+              key: action.key,
+            }
+          : {
+              status: 'loading',
+              key: action.key,
+              staleResults: [],
+            }
+      }
+      return allSourcesLoaded
+        ? {
+            status: 'fullResults',
+            key: action.key,
+            results: allResults,
+          }
+        : {
+            status: 'partialResults',
+            key: action.key,
+            results: allResults,
+          }
+    case 'newSearchDispatched':
+      return {
+        status: 'loading',
+        key: action.key,
+        staleResults: 'results' in state ? state.results : [],
+      }
+    case 'reset':
+      return {
+        status: 'initial',
+        key: action.key,
+      }
+    case 'errored':
+      // At least one search has failed and all non-failing searches have come back empty
+      if (action.sourcesLoaded === NUMBER_SOURCES && !('results' in state)) {
+        return {
+          status: 'error',
+          key: action.key,
+          message: action.message,
+        }
+      }
+      return state
+    default:
+      return state
+  }
+}
+
 const DocsSearch = () => {
-  const [results, setResults] = useState<PageResult[]>()
-  const [hasSearchError, setHasSearchError] = useState(false)
+  const [state, dispatch] = useReducer(reducer, { status: 'initial', key: 0 })
   const supabaseClient = useSupabaseClient()
-  const { isLoading, setIsLoading, search, setSearch } = useCommandMenu()
+  const { isLoading, setIsLoading, search, setSearch, inputRef } = useCommandMenu()
+  const key = useRef(0)
+  const initialLoad = useRef(true)
+
+  const hasResults =
+    state.status === 'fullResults' ||
+    state.status === 'partialResults' ||
+    (state.status === 'loading' && state.staleResults.length > 0)
 
   const handleSearch = useCallback(
     async (query: string) => {
-      setHasSearchError(false)
       setIsLoading(true)
 
-      const { error, data: pageResults } = await supabaseClient.functions.invoke<PageResult[]>(
-        'search-v2',
-        {
-          body: { query },
-        }
-      )
+      key.current += 1
+      const localKey = key.current
+      dispatch({ type: 'newSearchDispatched', key: localKey })
 
-      setIsLoading(false)
+      let sourcesLoaded = 0
 
-      if (error) {
-        setIsLoading(false)
-
-        setHasSearchError(true)
-        console.error(error)
-        return
-      }
-
-      if (!Array.isArray(pageResults)) {
-        setIsLoading(false)
-        setHasSearchError(true)
-        console.error('Malformed response')
-        return
-      }
-
-      setResults(pageResults)
+      const sources = ['search-fts', 'search-embeddings']
+      sources.forEach((source) => {
+        supabaseClient.functions
+          .invoke(source, { body: { query } })
+          .then(({ data: results, error }) => {
+            sourcesLoaded += 1
+            if (error) {
+              dispatch({
+                type: 'errored',
+                key: localKey,
+                sourcesLoaded,
+                message: error.message ?? '',
+              })
+            } else {
+              dispatch({
+                type: 'resultsReturned',
+                key: localKey,
+                sourcesLoaded,
+                results,
+              })
+            }
+            if (sourcesLoaded === NUMBER_SOURCES) {
+              setIsLoading(false)
+            }
+          })
+      })
     },
     [supabaseClient]
   )
 
   function handleResetPrompt() {
     setSearch('')
-    setResults(undefined)
-    setHasSearchError(false)
+
+    key.current += 1
+    dispatch({
+      type: 'reset',
+      key: key.current,
+    })
   }
 
   const debouncedSearch = useMemo(() => debounce(handleSearch, 1000), [handleSearch])
 
-  // Search initial query immediately (note - empty useEffect deps)
   useEffect(() => {
+    initialLoad.current = false
+    // search immediately if there is a search term on initial load
     if (search) {
       handleSearch(search)
     }
   }, [])
 
-  // TODO: can we do this w/o useEffect if query comes from context?
   useEffect(() => {
-    if (search) {
+    if (!search) {
+      // Clear search results if user deletes query
+      // and cancel any pending debounced searches
+      debouncedSearch.cancel()
+      key.current += 1
+      dispatch({ type: 'reset', key: key.current })
+    } else if (!initialLoad.current) {
       debouncedSearch(search)
     }
   }, [search])
+
+  // Immediately run search if user presses enter
+  // and abort any debounced searches that are waiting
+  useEffect(() => {
+    const handleEnter = (event: KeyboardEvent) => {
+      if (
+        event.key === 'Enter' &&
+        document.activeElement === inputRef.current &&
+        search &&
+        // If there are results, cmdk menu will trigger navigation to the highlighted
+        // result on Enter, even though the active element is the input
+        !hasResults
+      ) {
+        event.preventDefault()
+        debouncedSearch.cancel()
+        handleSearch(search)
+      }
+    }
+
+    inputRef.current?.addEventListener('keydown', handleEnter)
+
+    return () => inputRef.current?.removeEventListener('keydown', handleEnter)
+  }, [search, hasResults])
 
   const ChevronArrow = () => (
     <IconChevronRight
@@ -164,19 +360,19 @@ const DocsSearch = () => {
 
   return (
     <>
-      {results &&
-        results.length > 0 &&
-        results.map((page, i) => {
-          const pageSections = page.sections.filter((section) => !!section.heading)
+      {hasResults &&
+        ('results' in state ? state.results : state.staleResults).map((page, i) => {
           return (
             <CommandGroup
               heading=""
-              key={`${page.meta.title}-group-index-${i}`}
-              value={`${page.meta.title}-group-index-${i}`}
+              key={`${page.title}-group-index-${i}`}
+              // Adding the search term here is a hack to prevent the cmdk menu
+              // filter from filtering out search results
+              value={`${search}-${page.title}-group-index-${i}`}
             >
               <CommandItem
-                key={`${page.meta.title}-item-index-${i}`}
-                value={`${removeDoubleQuotes(page.meta.title)}-item-index-${i}`}
+                key={`${page.title}-item-index-${i}`}
+                value={`${search}-${removeDoubleQuotes(page.title)}-item-index-${i}`}
                 type="block-link"
                 onSelect={() => {
                   openLink(page.type, formatPageUrl(page))
@@ -186,11 +382,11 @@ const DocsSearch = () => {
                   <IconContainer>{getPageIcon(page)}</IconContainer>
                   <div className="flex flex-col gap-0">
                     <CommandLabel>
-                      <TextHighlighter text={page.meta.title} query={search} />
+                      <TextHighlighter text={page.title} query={search} />
                     </CommandLabel>
-                    {page.meta.description && (
+                    {page.description && (
                       <div className="text-xs text-foreground-muted">
-                        <TextHighlighter text={page.meta.description} query={search} />
+                        <TextHighlighter text={page.description} query={search} />
                       </div>
                     )}
                   </div>
@@ -198,16 +394,16 @@ const DocsSearch = () => {
 
                 <ChevronArrow />
               </CommandItem>
-              {pageSections.length > 0 && (
+              {page.sections.length > 0 && (
                 <div className="border-l border-default ml-3 pt-3">
-                  {pageSections.map((section, i) => (
+                  {page.sections.map((section, i) => (
                     <CommandItem
                       className="ml-3 mb-3"
                       onSelect={() => {
                         openLink(page.type, formatSectionUrl(page, section))
                       }}
-                      key={`${page.meta.title}__${section.heading}-item-index-${i}`}
-                      value={`${removeDoubleQuotes(page.meta.title)}__${removeDoubleQuotes(
+                      key={`${page.title}__${section.heading}-item-index-${i}`}
+                      value={`${search}-${removeDoubleQuotes(page.title)}__${removeDoubleQuotes(
                         section.heading ?? ''
                       )}-item-index-${i}`}
                       type="block-link"
@@ -218,7 +414,7 @@ const DocsSearch = () => {
                           <cite>
                             <TextHighlighter
                               className="not-italic text-xs rounded-full px-2 py-1 bg-overlay-hover text-foreground"
-                              text={page.meta.title}
+                              text={page.title}
                               query={search}
                             />
                           </cite>
@@ -237,7 +433,7 @@ const DocsSearch = () => {
             </CommandGroup>
           )
         })}
-      {!results && !hasSearchError && !isLoading && (
+      {state.status === 'initial' && (
         <CommandGroup>
           {questions.map((question) => {
             const key = question.replace(/\s+/g, '_')
@@ -260,12 +456,12 @@ const DocsSearch = () => {
           })}
         </CommandGroup>
       )}
-      {isLoading && !results && (
+      {state.status === 'loading' && state.staleResults.length === 0 && (
         <div className="p-6 grid gap-6 my-4">
           <p className="text-lg text-foreground-muted text-center">Searching for results</p>
         </div>
       )}
-      {results && results.length === 0 && (
+      {state.status === 'noResults' && (
         <div className="p-6 flex flex-col items-center gap-6 mt-4 text-foreground-light">
           <IconAlertTriangle strokeWidth={1.5} size={40} />
           <p className="text-lg text-center">No results found.</p>
@@ -274,7 +470,7 @@ const DocsSearch = () => {
           </Button>
         </div>
       )}
-      {hasSearchError && (
+      {state.status === 'error' && (
         <div className="p-6 flex flex-col items-center gap-6 mt-4">
           <IconAlertTriangle strokeWidth={1.5} size={40} />
           <p className="text-lg text-center">
@@ -292,7 +488,7 @@ const DocsSearch = () => {
 
 export default DocsSearch
 
-export function formatPageUrl(page: PageResult) {
+export function formatPageUrl(page: Page) {
   const docsUrl = getDocsUrl()
   switch (page.type) {
     case PageType.Markdown:
@@ -305,7 +501,7 @@ export function formatPageUrl(page: PageResult) {
   }
 }
 
-export function formatSectionUrl(page: PageResult, section: PageSection) {
+export function formatSectionUrl(page: Page, section: PageSection) {
   switch (page.type) {
     case PageType.Markdown:
     case PageType.GithubDiscussion:
@@ -317,7 +513,7 @@ export function formatSectionUrl(page: PageResult, section: PageSection) {
   }
 }
 
-export function getPageIcon(page: PageResult) {
+export function getPageIcon(page: Page) {
   switch (page.type) {
     case PageType.Markdown:
     case PageType.Reference:
@@ -329,7 +525,7 @@ export function getPageIcon(page: PageResult) {
   }
 }
 
-export function getPageSectionIcon(page: PageResult) {
+export function getPageSectionIcon(page: Page) {
   switch (page.type) {
     case PageType.Markdown:
     case PageType.Reference:
