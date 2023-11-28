@@ -6,6 +6,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
 import OpenAI from 'openai'
+import { z } from 'zod'
 
 const openai = new OpenAI()
 
@@ -24,30 +25,73 @@ export async function logout() {
   redirect('/')
 }
 
-export async function deleteThread(threadID: string) {
+export async function deleteThread(prevState: any, formData: FormData) {
   const cookieStore = cookies()
   const supabase = createClient(cookieStore)
 
   try {
-    await supabase.from('threads').delete().eq('thread_id', threadID)
-  } catch (error) {
-    if (error) console.error('Error deleting thread: ', error)
+    const schema = z.object({
+      thread_id: z.string(),
+    })
+
+    const data = schema.parse({
+      thread_id: formData.get('thread_id'),
+    })
+
+    await supabase.from('threads').delete().eq('thread_id', data.thread_id)
+    await openai.beta.threads.del(data.thread_id)
+
+    revalidatePath('/profile')
+
+    return {
+      success: true,
+      data,
+    }
+  } catch (error: any) {
+    console.error(error)
+    return {
+      success: false,
+      message: 'Failed to delete the thread',
+      data: undefined,
+    }
   }
-
-  await openai.beta.threads.del(threadID)
-
-  revalidatePath('/profile')
 }
 
-export async function updateThreadName(threadId: number, threadName: string) {
+export async function updateThreadName(prevState: any, formData: FormData) {
   const cookieStore = cookies()
   const supabase = createClient(cookieStore)
 
   try {
-    await supabase.from('threads').update({ thread_title: threadName }).eq('id', threadId)
-  } catch (error) {
-    if (error) console.error('Error updating thread: ', error)
-  }
+    const schema = z.object({
+      thread_title: z.string(),
+      row_id: z.string(),
+    })
 
-  revalidatePath('/profile')
+    const data = schema.parse({
+      thread_title: formData.get('thread_title'),
+      row_id: formData.get('row_id'),
+    })
+
+    const { error } = await supabase
+      .from('threads')
+      .update({ thread_title: data.thread_title })
+      .eq('id', data.row_id)
+    if (error) {
+      throw error
+    }
+    revalidatePath('/profile')
+
+    return {
+      message: 'Thread name updated to ' + data.thread_title,
+      success: true,
+      data,
+    }
+  } catch (error: any) {
+    console.error(error)
+    return {
+      success: false,
+      message: 'Failed to update title to update title',
+      data: undefined,
+    }
+  }
 }

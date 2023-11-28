@@ -20,14 +20,15 @@
     "eslint-config-next": "^14.0.3",
     "lodash": "^4.17.21",
     "lucide-react": "^0.292.0",
-    "next": "^14.0.3",
     "openai": "^4.17.0",
+    "next": "^14.0.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-flow": "^1.0.3",
     "sql-formatter": "^13.1.0",
     "ui": "*",
-    "valtio": "^1.12.0"
+    "valtio": "^1.12.0",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/node": "^18.11.9",

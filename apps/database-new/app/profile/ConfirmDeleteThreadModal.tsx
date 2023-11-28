@@ -1,8 +1,10 @@
 'use client'
 
-import { Button, Modal } from 'ui'
+import { useEffect, createRef } from 'react'
+import { useFormState, useFormStatus } from 'react-dom'
+import { Button, Input_Shadcn_, Modal } from 'ui'
+import { deleteThread } from '@/app/actions'
 import { ThreadType } from './Threads'
-import { deleteThread } from '../actions'
 
 const ConfirmDeleteThreadModal = ({
   thread,
@@ -13,6 +15,46 @@ const ConfirmDeleteThreadModal = ({
   onClose: () => void
   visible: boolean
 }) => {
+  const formRef = createRef<HTMLFormElement>()
+
+  const initialState = {
+    message: '',
+    success: false,
+    data: {
+      thread_id: thread.thread_id,
+    },
+  }
+
+  const [state, formAction] = useFormState(deleteThread, initialState)
+
+  useEffect(() => {
+    if (state?.success === true) {
+      onClose()
+      formRef.current?.reset()
+      state.success = false
+    }
+  }, [state, onClose, formRef])
+
+  useEffect(() => {
+    if (state?.success === true) {
+      onClose()
+      formRef.current?.reset()
+      state.success = false
+    }
+  }, [state, onClose, formRef])
+
+  function SubmitButton() {
+    const { pending } = useFormStatus()
+
+    return (
+      <Button type="warning" htmlType="submit" aria-disabled={pending} loading={pending}>
+        Delete thread
+      </Button>
+    )
+  }
+
+  console.log('thread', thread)
+
   return (
     <Modal
       size="small"
@@ -22,16 +64,15 @@ const ConfirmDeleteThreadModal = ({
       header="Confirm to delete thread?"
       className="pb-2"
     >
-      <form action={() => deleteThread(thread.thread_id)}>
+      <form action={formAction} key={`${thread.id}-delete-thread-form`}>
         <Modal.Content className="py-4">
           <p className="text-sm">Once the thread is deleted, it cannot be recovered.</p>
         </Modal.Content>
         <Modal.Separator />
+        <Input_Shadcn_ name="thread_id" required type="hidden" value={thread.thread_id} />
         <Modal.Content className="flex flex-row gap-3 justify-end">
           <Button type="default">Cancel</Button>
-          <Button type="warning" htmlType="submit">
-            Delete thread
-          </Button>
+          <SubmitButton />
         </Modal.Content>
       </form>
     </Modal>

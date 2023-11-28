@@ -4,6 +4,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import Threads from './Threads'
 import { Suspense } from 'react'
+import ShimmeringLoader from '@/components/Shimmer'
 import type { Metadata } from 'next'
 
 dayjs.extend(relativeTime)
@@ -45,7 +46,18 @@ const Profile = async () => {
 
         <div className="w-full h-px border-t" />
 
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense
+          fallback={
+            <div className="flex flex-col gap-4">
+              <ShimmeringLoader className="h-14 bg-surface-100 border rounded" />
+              <ShimmeringLoader className="h-14 bg-surface-100 border rounded" />
+              <ShimmeringLoader className="h-14 bg-surface-100 border rounded" />
+              <ShimmeringLoader className="h-14 bg-surface-100 border rounded opacity-50" />
+              <ShimmeringLoader className="h-14 bg-surface-100 border rounded opacity-25" />
+              <ShimmeringLoader className="h-14 bg-surface-100 border rounded opacity-10" />
+            </div>
+          }
+        >
           <Threads />
         </Suspense>
       </div>

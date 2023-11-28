@@ -2,8 +2,8 @@
 
 import { timeAgo } from '@/lib/utils'
 import Link from 'next/link'
+import { useState } from 'react'
 import {
-  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -15,10 +15,9 @@ import {
 import ConfirmDeleteThreadModal from './ConfirmDeleteThreadModal'
 import EditThreadModal from './EditThreadModal'
 import { ThreadType } from './Threads'
-import { useState } from 'react'
 
 const Thread = ({ thread }: { thread: ThreadType }) => {
-  const formattedTimeAgo = timeAgo(thread.created_at)
+  const formattedTimeAgo = timeAgo(thread.modified_at)
 
   const [editOpen, setEditOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
@@ -27,32 +26,45 @@ const Thread = ({ thread }: { thread: ThreadType }) => {
     <>
       <div
         key={thread.id}
-        className="group flex items-center justify-between border rounded w-full px-4 py-2 transition bg-surface-100 hover:bg-surface-200"
+        className="group w-full flex flex-row items-center gap-6  border rounded pl-5 pr-2 transition bg-surface-100 hover:bg-surface-200 h-14"
       >
-        <div className="flex flex-col gap-y-1">
-          <Link className="text-sm hover:underline" href={`/${thread.thread_id}/${thread.run_id}`}>
-            {thread.thread_title}
+        <div className="flex flex-col grow overflow-hidden">
+          <Link
+            className="flex text-sm group-hover:underline truncate"
+            href={`/${thread.thread_id}/${thread.run_id}`}
+          >
+            <span className="truncate">{thread.thread_title}</span>
           </Link>
-          <span className="text-xs text-foreground-light">Last updated {formattedTimeAgo}</span>
+          <span className="text-xs text-foreground-lighter font-mono">
+            Last updated {formattedTimeAgo}
+          </span>
         </div>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button type="text" icon={<IconMoreVertical />} className="px-1" />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-32" align="end">
-            <DropdownMenuItem className="space-x-2" onClick={() => setEditOpen(true)}>
-              <IconEdit2 size={14} />
-              <p>Edit name</p>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="space-x-2" onClick={() => setDeleteOpen(true)}>
-              <IconTrash2 size={14} />
-              <p>Delete thread</p>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex shrink">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="px-1 group">
+                <IconMoreVertical size={14} className="text-light group-hover:text" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-32" align="end">
+              <DropdownMenuItem
+                className="space-x-2"
+                onClick={() => {
+                  console.log('trying to edit thread')
+                  setEditOpen(true)
+                }}
+              >
+                <IconEdit2 size={14} />
+                <p>Edit name</p>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="space-x-2" onClick={() => setDeleteOpen(true)}>
+                <IconTrash2 size={14} />
+                <p>Delete thread</p>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
-
       <ConfirmDeleteThreadModal
         key={`${thread.id}-delete-dialog`}
         thread={thread}
