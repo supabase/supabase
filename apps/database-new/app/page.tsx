@@ -9,7 +9,11 @@ export const metadata: Metadata = {
   title: 'database.design | Create',
 }
 
-const NewThread = async ({ searchParams }: { searchParams: { prompt: string } }) => {
+const NewThread = async ({
+  searchParams,
+}: {
+  searchParams: { prompt: string; message: string }
+}) => {
   const cookieStore = cookies()
   const supabase = createClient(cookieStore)
 
