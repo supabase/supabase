@@ -48,10 +48,10 @@ export default function TicketActions() {
     setTimeout(async () => {
       if (social === 'twitter') {
         await supabase.from(LW_TABLE).update({ sharedOnTwitter: 'now' }).eq('username', username)
-        window.open(tweetUrl, '_blank')
+        // window.open(tweetUrl, '_blank')
       } else if (social === 'linkedin') {
         await supabase.from(LW_TABLE).update({ sharedOnLinkedIn: 'now' }).eq('username', username)
-        window.open(linkedInUrl, '_blank')
+        // window.open(linkedInUrl, '_blank')
       }
     })
   }
