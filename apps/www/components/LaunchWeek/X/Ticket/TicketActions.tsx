@@ -4,7 +4,6 @@ import { SITE_URL, TWEET_TEXT, TWEET_TEXT_GOLDEN } from '~/lib/constants'
 import { Button, IconLinkedinSolid, IconTwitterX, cn } from 'ui'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import { useParams } from '~/hooks/useParams'
-import TicketCopy from './TicketCopy'
 import { useBreakpoint } from 'common'
 
 export default function TicketActions() {
@@ -18,7 +17,7 @@ export default function TicketActions() {
   const permalink = encodeURIComponent(link)
   const text = golden ? TWEET_TEXT_GOLDEN : TWEET_TEXT
   const encodedText = encodeURIComponent(text)
-  const tweetUrl = `https://twitter.com/intent/tweet?url=${permalink}&via=supabase&text=${encodedText}`
+  const tweetUrl = `https://twitter.com/intent/tweet?url=${permalink}&text=${encodedText}`
   const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${permalink}`
   const downloadUrl = `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lwx-og?username=${encodeURIComponent(
     username ?? ''
@@ -49,10 +48,10 @@ export default function TicketActions() {
     setTimeout(async () => {
       if (social === 'twitter') {
         await supabase.from(LW_TABLE).update({ sharedOnTwitter: 'now' }).eq('username', username)
-        // window.open(tweetUrl, '_blank')
+        window.open(tweetUrl, '_blank')
       } else if (social === 'linkedin') {
         await supabase.from(LW_TABLE).update({ sharedOnLinkedIn: 'now' }).eq('username', username)
-        // window.open(linkedInUrl, '_blank')
+        window.open(linkedInUrl, '_blank')
       }
     })
   }
