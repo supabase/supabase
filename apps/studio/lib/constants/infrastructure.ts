@@ -22,12 +22,14 @@ export const AWS_REGIONS = {
   // SOUTH_AFRICA: 'South Africa (Cape Town)',
 } as const
 
+export type AWS_REGIONS_KEYS = keyof typeof AWS_REGIONS
+
 export const FLY_REGIONS = {
   SOUTHEAST_ASIA: 'Singapore',
 } as const
 
 export const AWS_REGIONS_DEFAULT =
-  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? AWS_REGIONS.SOUTHEAST_ASIA : AWS_REGIONS.EAST_US
+  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? AWS_REGIONS.SOUTHEAST_ASIA : AWS_REGIONS.WEST_US
 
 // TO DO, change default to US region for prod
 export const FLY_REGIONS_DEFAULT = FLY_REGIONS.SOUTHEAST_ASIA

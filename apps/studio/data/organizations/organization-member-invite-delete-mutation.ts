@@ -50,7 +50,7 @@ export const useOrganizationMemberInviteDeleteMutation = ({
 
       await Promise.all([
         ...(invalidateDetail ?? true
-          ? [queryClient.invalidateQueries(organizationKeys.detail(slug))]
+          ? [queryClient.invalidateQueries(organizationKeys.members(slug))]
           : []),
         queryClient.invalidateQueries(organizationKeys.roles(slug)),
       ])

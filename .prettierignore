@@ -14,3 +14,4 @@ apps/docs/pages/guides/auth/*.mdx
 apps/docs/pages/guides/integrations/*.mdx
 apps/studio/public
 apps/**/.turbo
+apps/docs/CONTRIBUTING.md

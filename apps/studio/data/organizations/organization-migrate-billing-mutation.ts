@@ -58,7 +58,7 @@ export const useOrganizationBillingMigrationMutation = ({
     async onSuccess(data, variables, context) {
       const { organizationSlug } = variables
       await Promise.all([
-        queryClient.invalidateQueries(organizationKeys.detail(organizationSlug)),
+        queryClient.invalidateQueries(organizationKeys.members(organizationSlug)),
         queryClient.invalidateQueries(organizationKeys.list()),
         queryClient.invalidateQueries(organizationKeys.freeProjectLimitCheck(organizationSlug)),
       ])

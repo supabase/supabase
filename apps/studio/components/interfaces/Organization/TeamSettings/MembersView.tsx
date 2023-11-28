@@ -1,26 +1,39 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
 import Image from 'next/legacy/image'
 import { Fragment, useState } from 'react'
+import {
+  Badge,
+  Button,
+  IconAlertCircle,
+  IconCheck,
+  IconLoader,
+  IconUser,
+  IconX,
+  Listbox,
+  Loading,
+  Modal,
+} from 'ui'
 
-import { useParams } from 'common/hooks'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useOrganizationDetailQuery } from 'data/organizations/organization-detail-query'
 import { useOrganizationMemberUpdateMutation } from 'data/organizations/organization-member-update-mutation'
+import {
+  OrganizationMember,
+  useOrganizationMembersQuery,
+} from 'data/organizations/organization-members-query'
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useSelectedOrganization, useStore } from 'hooks'
 import { useProfile } from 'lib/profile'
-import { Member } from 'types'
-import { Badge, Button, IconAlertCircle, IconLoader, IconUser, Listbox, Loading, Modal } from 'ui'
 import { getUserDisplayName, isInviteExpired } from '../Organization.utils'
 import MemberActions from './MemberActions'
 import RolesHelperModal from './RolesHelperModal/RolesHelperModal'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 
-interface SelectedMember extends Member {
+interface SelectedMember extends OrganizationMember {
   oldRoleId: number
   newRoleId: number
 }
@@ -37,12 +50,12 @@ const MembersView = ({ searchString }: MembersViewProps) => {
   const { profile } = useProfile()
   const { data: permissions } = usePermissionsQuery()
   const {
-    data: detailData,
-    error: detailError,
-    isLoading: isLoadingOrgDetails,
-    isError: isErrorOrgDetails,
-    isSuccess: isSuccessOrgDetails,
-  } = useOrganizationDetailQuery({ slug })
+    data: members,
+    error: membersError,
+    isLoading: isLoadingMembers,
+    isError: isErrorMembers,
+    isSuccess: isSuccessMembers,
+  } = useOrganizationMembersQuery({ slug })
   const {
     data: rolesData,
     error: rolesError,
@@ -67,21 +80,25 @@ const MembersView = ({ searchString }: MembersViewProps) => {
     },
   })
 
+  const allMembers = members ?? []
   const roles = rolesData?.roles ?? []
-  const members = detailData?.members ?? []
   const { rolesAddable, rolesRemovable } = useGetRolesManagementPermissions(
     selectedOrganization?.id,
     roles,
     permissions ?? []
   )
 
+  // [Joshen] Proactively adding this, can be removed once infra API changes are in
+  const showMfaEnabledColumn = allMembers.some(
+    (member) => member.gotrue_id !== undefined && member.mfa_enabled !== undefined
+  )
   const [selectedMember, setSelectedMember] = useState<SelectedMember>()
   const [userRoleChangeModalVisible, setUserRoleChangeModalVisible] = useState(false)
 
   const filteredMembers = (
     !searchString
-      ? members
-      : members.filter((x: any) => {
+      ? allMembers
+      : allMembers.filter((x: any) => {
           if (x.invited_at) {
             return x.primary_email.includes(searchString)
           }
@@ -109,23 +126,30 @@ const MembersView = ({ searchString }: MembersViewProps) => {
 
   return (
     <>
-      {isLoadingOrgDetails && <GenericSkeletonLoader />}
+      {isLoadingMembers && <GenericSkeletonLoader />}
 
-      {isErrorOrgDetails && (
-        <AlertError error={detailError} subject="Failed to retrieve organization members" />
+      {isErrorMembers && (
+        <AlertError error={membersError} subject="Failed to retrieve organization members" />
       )}
 
       {isErrorRoles && (
         <AlertError error={rolesError} subject="Failed to retrieve organization roles" />
       )}
 
-      {isSuccessOrgDetails && (
+      {isSuccessMembers && (
         <div className="rounded w-full">
           <Loading active={!filteredMembers}>
             <Table
               head={[
                 <Table.th key="header-user">User</Table.th>,
                 <Table.th key="header-status"></Table.th>,
+                ...(showMfaEnabledColumn
+                  ? [
+                      <Table.th key="header-mfa" className="text-center">
+                        Enabled MFA
+                      </Table.th>,
+                    ]
+                  : []),
                 <Table.th key="header-role" className="flex items-center space-x-2">
                   <span>Role</span>
                   <RolesHelperModal />
@@ -133,7 +157,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                 <Table.th key="header-action"></Table.th>,
               ]}
               body={[
-                ...filteredMembers.map((x: Member, i: number) => {
+                ...filteredMembers.map((x, i: number) => {
                   const [memberRoleId] = x.role_ids ?? []
                   const role = (roles || []).find((role) => role.id === memberRoleId)
                   const memberIsUser = x.primary_email == profile?.primary_email
@@ -202,6 +226,18 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                             </Badge>
                           )}
                         </Table.td>
+
+                        {showMfaEnabledColumn && (
+                          <Table.td>
+                            <div className="flex items-center justify-center">
+                              {x.mfa_enabled ? (
+                                <IconCheck className="text-brand" strokeWidth={2} />
+                              ) : (
+                                <IconX className="text-foreground-light" strokeWidth={1.5} />
+                              )}
+                            </div>
+                          </Table.td>
+                        )}
 
                         <Table.td>
                           {isLoadingRoles ? (
@@ -318,10 +354,10 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                     ]
                   : []),
                 <Table.tr key="footer" className="bg-panel-secondary-light">
-                  <Table.td colSpan={4}>
+                  <Table.td colSpan={12}>
                     <p className="text-foreground-light">
                       {searchString ? `${filteredMembers.length} of ` : ''}
-                      {members.length || '0'} {members.length == 1 ? 'user' : 'users'}
+                      {allMembers.length || '0'} {allMembers.length == 1 ? 'user' : 'users'}
                     </p>
                   </Table.td>
                 </Table.tr>,

@@ -190,7 +190,6 @@ const RowEditor = ({
                 </SidePanel.Content>
               </>
             )}
-
             <JsonEdit
               visible={isEditingJson}
               column={selectedValueForJsonEdit?.column ?? ''}
