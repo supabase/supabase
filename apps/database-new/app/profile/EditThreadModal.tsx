@@ -2,7 +2,7 @@
 
 import { updateThreadName } from '@/app/actions'
 import { createRef, useEffect } from 'react'
-import { experimental_useFormState as useFormState, useFormStatus } from 'react-dom'
+import { useFormState, useFormStatus } from 'react-dom'
 import { Button, Input_Shadcn_, Label_Shadcn_, Modal } from 'ui'
 import { ThreadType } from './Threads'
 
@@ -18,7 +18,7 @@ const EditThreadModal = ({
   const formRef = createRef<HTMLFormElement>()
 
   const initialState = {
-    message: null,
+    message: undefined,
     success: undefined,
     data: {
       row_id: thread.id,

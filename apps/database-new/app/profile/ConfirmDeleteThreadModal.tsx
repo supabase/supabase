@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, createRef } from 'react'
-import { experimental_useFormState as useFormState, useFormStatus } from 'react-dom'
+import { useFormState, useFormStatus } from 'react-dom'
 import { Button, Input_Shadcn_, Modal } from 'ui'
 import { deleteThread } from '@/app/actions'
 import { ThreadType } from './Threads'
@@ -18,8 +18,8 @@ const ConfirmDeleteThreadModal = ({
   const formRef = createRef<HTMLFormElement>()
 
   const initialState = {
-    message: null,
-    success: undefined,
+    message: '',
+    success: false,
     data: {
       thread_id: thread.thread_id,
     },
@@ -31,7 +31,7 @@ const ConfirmDeleteThreadModal = ({
     if (state?.success === true) {
       onClose()
       formRef.current?.reset()
-      state.success = undefined
+      state.success = false
     }
   }, [state, onClose, formRef])
 
@@ -39,7 +39,7 @@ const ConfirmDeleteThreadModal = ({
     if (state?.success === true) {
       onClose()
       formRef.current?.reset()
-      state.success = undefined
+      state.success = false
     }
   }, [state, onClose, formRef])
 
@@ -69,7 +69,7 @@ const ConfirmDeleteThreadModal = ({
           <p className="text-sm">Once the thread is deleted, it cannot be recovered.</p>
         </Modal.Content>
         <Modal.Separator />
-        <Input_Shadcn_ name="thread_id" required type="hidden" value={state.data.thread_id} />
+        <Input_Shadcn_ name="thread_id" required type="hidden" value={thread.thread_id} />
         <Modal.Content className="flex flex-row gap-3 justify-end">
           <Button type="default">Cancel</Button>
           <SubmitButton />

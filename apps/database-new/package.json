@@ -21,7 +21,7 @@
     "lodash": "^4.17.21",
     "lucide-react": "^0.292.0",
     "openai": "^4.17.0",
-    "next": "latest",
+    "next": "^14.0.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-flow": "^1.0.3",
@@ -36,7 +36,7 @@
     "@types/react-dom": "^18.2.17",
     "autoprefixer": "10.4.14",
     "nextjs-node-loader": "^1.1.5-alpha.0",
-    "postcss": "8.4.29",
+    "postcss": "8.4.31",
     "typescript": "^5.2.2"
   }
 }
