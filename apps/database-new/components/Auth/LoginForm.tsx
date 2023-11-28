@@ -25,8 +25,6 @@ export default function LoginForm({ searchParams }: { searchParams?: { message?:
     }
   }
 
-  console.log('searchParams', searchParams)
-
   return (
     <div className="flex flex-col justify-center h-full w-full px-8 sm:max-w-sm gap-2 mx-auto">
       <form

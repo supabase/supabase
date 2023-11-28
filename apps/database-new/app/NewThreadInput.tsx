@@ -18,19 +18,16 @@ const suggestions = CHAT_EXAMPLES
 
 const NewThreadInput = ({ userID }: ChatInputParams) => {
   const router = useRouter()
-  const searchParams = useSearchParams()!
 
   const [value, setValue] = useState(() => {
-    let localPrompt = undefined
     if (typeof window !== 'undefined') {
-      localPrompt = localStorage.getItem('prompt')
+      const localPrompt = localStorage.getItem('prompt')
+      if (localPrompt) {
+        localStorage.removeItem('prompt')
+        return localPrompt
+      }
     }
-    if (localPrompt) {
-      localStorage.removeItem('prompt')
-      return localPrompt
-    } else {
-      return ''
-    }
+    return ''
   })
 
   const supabase = createClient()
