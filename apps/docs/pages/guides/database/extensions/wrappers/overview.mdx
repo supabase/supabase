@@ -25,7 +25,7 @@ A Remote Server is an external database, API, or any system containing data that
 - A remote data warehouse, like ClickHouse, BigQuery, or Snowflake.
 - An API, like Stripe or GitHub.
 
-It's possible to connect to multiple remote servers of the “same type”. For example, you can connect to two different Firebase projects within the same Supabase database.
+It's possible to connect to multiple remote servers of the same type. For example, you can connect to two different Firebase projects within the same Supabase database.
 
 ### Foreign Tables
 
@@ -41,11 +41,11 @@ Although a Foreign Table behaves like any other table, the data is not stored in
 
 ### ETL with Wrappers
 
-ETL stands for Extract, Transform, Load. It's an establised process for moving data from one system to another. For example, it's common to move data from a production database to a data warehouse.
+ETL stands for Extract, Transform, Load. It's an established process for moving data from one system to another. For example, it's common to move data from a production database to a data warehouse.
 
 There are many popular ETL tools, such as [Fivetran](https://fivetran.com/) and [Airbyte](https://airbyte.io/).
 
-Wrappers provide an alternative to these tools, because you can simply move data from one table to another using SQL:
+Wrappers provide an alternative to these tools. You can use SQL to move data from one table to another:
 
 ```sql
 -- Copy data from your production database to your
@@ -62,7 +62,7 @@ This approach provides several benefits:
 1. **Save on time:** avoid setting up additional data pipelines.
 1. **Save on Data Engineering costs:** less infrastructure to be managed.
 
-On the flip-side, Wrappers are not as feature-rich as these tools, and they couple the ETL process to your database.
+One disadvantage is that Wrappers are not as feature-rich as ETL tools. They also couple the ETL process to your database.
 
 ### On-demand ETL with Wrappers
 
@@ -91,13 +91,13 @@ This approach has several benefits:
 
 ### Batch ETL with Wrappers
 
-A common use case for Wrappers is to extract data from a production database and load it into a data warehouse. This can be done within your database using [pg_cron](/docs/guides/database/extensions/pgcron). For example, you can schedule a job to run every night to extract data from your production database and load it into your data warehouse.
+A common use case for Wrappers is to extract data from a production database and load it into a data warehouse. This can be done within your database using [pg_cron](/docs/guides/database/extensions/pg_cron). For example, you can schedule a job to run every night to extract data from your production database and load it into your data warehouse.
 
 ```sql
 -- Every day at 3am, copy data from your
 -- production database to your data warehouse:
 select cron.schedule(
-  'nightly-vacuum',
+  'nightly-etl',
   '0 3 * * *',
   $$
     insert into warehouse.analytics
@@ -109,11 +109,11 @@ select cron.schedule(
 
 ![FDW](/docs/img/database/fdw-qetl.png)
 
-Be aware that this process can be taxing on your database if you are moving large amounts of data. Often it's better to use an external tool for batch ETL, such as [Fivetran](https://fivetran.com/) or [Airbyte](https://airbyte.io/).
+This process can be taxing on your database if you are moving large amounts of data. Often, it's better to use an external tool for batch ETL, such as [Fivetran](https://fivetran.com/) or [Airbyte](https://airbyte.io/).
 
 ## Security
 
-Foreign Data Wrappers do not provide Row Level Security and we do not advise exposing them via your API. Wrappers should _always_ be stored in a private schema. For example, if you are connecting to your Stripe account, then you should create a `stripe` schema to store all of your Foreign Tables inside. This schema should _not_ be added to the “Additional Schemas” setting in the API section.
+Foreign Data Wrappers do not provide Row Level Security. We do not advise exposing them via your API. Wrappers should _always_ be stored in a private schema. For example, if you are connecting to your Stripe account, you should create a `stripe` schema to store all of your Foreign Tables inside. This schema should _not_ be added to the “Additional Schemas” setting in the API section.
 
 If you want to expose any of the columns to your public API, create a [View](https://supabase.com/docs/guides/database/tables#views) in the `public` schema. You can also interact with your Foreign Tables inside a [Database Function](https://supabase.com/docs/guides/database/functions).
 
