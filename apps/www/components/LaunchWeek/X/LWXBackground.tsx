@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { cn } from 'ui'
 import useConfData from '../hooks/use-conf-data'
+import { useBreakpoint } from 'common'
 
 interface Props {
   className?: string
@@ -10,6 +11,7 @@ interface Props {
 const LWXBackground = ({ className }: Props) => {
   const { ticketState } = useConfData()
   const containerRef = useRef(null)
+  const isMobile = useBreakpoint()
   const ref = useRef(null)
   const [isActive, setIsActive] = useState(false)
   const [gradientPos, setGradientPos] = useState({ x: 0, y: 0 })
@@ -17,6 +19,7 @@ const LWXBackground = ({ className }: Props) => {
   const hasTicket = ticketState === 'ticket'
 
   const handleGlow = (event: any) => {
+    if (isMobile) return setGradientPos({ x: 70, y: 40 })
     if (!ref.current || !containerRef.current || hasTicket) return null
 
     const containerRefElement = containerRef.current as HTMLDivElement
@@ -40,6 +43,7 @@ const LWXBackground = ({ className }: Props) => {
     const { x: svgX, y: svgY } = svgElement.getBoundingClientRect()
     const x = event.clientX - svgX - 50
     const y = event.clientY - svgY - 50
+    console.log(x, y)
     setGradientPos({ x, y })
   }
 
@@ -50,7 +54,7 @@ const LWXBackground = ({ className }: Props) => {
     return () => {
       window.removeEventListener('mousemove', handleGlow)
     }
-  }, [ticketState])
+  }, [ticketState, isMobile])
 
   const gradientTransformBg = `translate(${gradientPos?.x} ${gradientPos?.y}) rotate(67.9381) scale(182.424)`
   const gradientTransformStroke = `translate(${gradientPos?.x} ${gradientPos?.y})  rotate(71.6455) scale(105.635)`
@@ -63,15 +67,14 @@ const LWXBackground = ({ className }: Props) => {
         height="100%"
         className={cn(
           `
-          hidden m-auto
+          m-auto
           
           w-[136px] h-[136px] mt-[157px] 
           sm:w-[142px] sm:h-[142px] sm:mt-[153px] 
           md:w-[247px] md:h-[247px] md:translate-y-3 md:mt-auto
           xl:w-[285px] xl:h-[285px] xl:translate-y-2
           2xl:w-[342px] 2xl:h-[342px] 2xl:translate-y-px
-          `,
-          isActive && !hasTicket && 'block'
+          `
         )}
         viewBox="0 0 186 185"
         fill="none"

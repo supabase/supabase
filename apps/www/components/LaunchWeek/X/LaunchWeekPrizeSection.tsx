@@ -1,5 +1,4 @@
 import React from 'react'
-import Link from 'next/link'
 import { cn } from 'ui'
 import LabelBadge from './LabelBadge'
 import LaunchWeekPrizeCard from './LaunchWeekPrizeCard'
