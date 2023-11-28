@@ -94,7 +94,7 @@ export const AIPolicyChat = ({
               key={m.id}
               icon={
                 m.role === 'assistant' ? (
-                  <AiIcon className="[&>div>div]:border-white" />
+                  <AiIcon className="[&>div>div]:border-black dark:[&>div>div]:border-white" />
                 ) : (
                   <div className="relative border shadow-lg w-8 h-8 rounded-full overflow-hidden">
                     <Image
@@ -142,12 +142,14 @@ export const AIPolicyChat = ({
               <FormItem_Shadcn_>
                 <FormControl_Shadcn_>
                   <div className="relative">
-                    <AiIcon className="absolute top-2 left-3 [&>div>div]:border-white" />
+                    <AiIcon className="absolute top-2 left-3 [&>div>div]:border-black dark:[&>div>div]:border-white" />
                     <Input_Shadcn_
                       {...field}
                       autoComplete="off"
                       disabled={isLoading}
-                      className={`bg-black rounded-full pl-10 ${isLoading ? 'pr-10' : ''}`}
+                      className={`bg-surface-300 dark:bg-black rounded-full pl-10 ${
+                        isLoading ? 'pr-10' : ''
+                      }`}
                       placeholder="Ask for some changes to your policy"
                     />
                     {isLoading && <Loader2 className="absolute top-2 right-3 animate-spin" />}
