@@ -1139,42 +1139,36 @@ functions:
       - Realtime is disabled by default for new tables. You can turn it on by [managing replication](/docs/guides/realtime/postgres-changes#replication-setup).
       - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
     examples:
-      - id: listen-to-all-database-changes
-        name: Listen to all database changes
+      - id: listen-to-database-changes
+        name: Listen to database changes
         isSpotlight: true
         code: |
           ```dart
-          supabase.channel('*').on(
-            RealtimeListenTypes.postgresChanges,
-            ChannelFilter(event: '*', schema: '*'),
-            (payload, [ref]) {
-              print('Change received: ${payload.toString()}');
-            },
-          ).subscribe();
-          ```
-      - id: listen-to-a-specific-table
-        name: Listen to a specific table
-        code: |
-          ```dart
-          supabase.channel('public:countries').on(
-            RealtimeListenTypes.postgresChanges,
-            ChannelFilter(event: '*', schema: 'public', table: 'countries'),
-            (payload, [ref]) {
-              print('Change received: ${payload.toString()}');
-            },
-          ).subscribe();
+          supabase
+              .channel('public:countries')
+              .onPostgresChanges(
+                  event: PostgresChangeEvent.all,
+                  schema: 'public',
+                  table: 'countries',
+                  callback: (payload) {
+                    print('Change received: ${payload.toString()}');
+                  })
+              .subscribe();
           ```
       - id: listen-to-inserts
         name: Listen to inserts
         code: |
           ```dart
-          supabase.channel('public:countries').on(
-            RealtimeListenTypes.postgresChanges,
-            ChannelFilter(event: 'INSERT', schema: 'public', table: 'countries'),
-            (payload, [ref]) {
-              print('Change received: ${payload.toString()}');
-            },
-          ).subscribe();
+          supabase
+              .channel('public:countries')
+              .onPostgresChanges(
+                  event: PostgresChangeEvent.insert,
+                  schema: 'public',
+                  table: 'countries',
+                  callback: (payload) {
+                    print('Change received: ${payload.toString()}');
+                  })
+              .subscribe();
           ```
       - id: listen-to-updates
         name: Listen to updates
@@ -1187,13 +1181,16 @@ functions:
           ```
         code: |
           ```dart
-          supabase.channel('public:countries').on(
-            RealtimeListenTypes.postgresChanges,
-            ChannelFilter(event: 'UPDATE', schema: 'public', table: 'countries'),
-            (payload, [ref]) {
-              print('Change received: ${payload.toString()}');
-            },
-          ).subscribe();
+          supabase
+              .channel('public:countries')
+              .onPostgresChanges(
+                  event: PostgresChangeEvent.update,
+                  schema: 'public',
+                  table: 'countries',
+                  callback: (payload) {
+                    print('Change received: ${payload.toString()}');
+                  })
+              .subscribe();
           ```
       - id: listen-to-deletes
         name: Listen to deletes
@@ -1206,46 +1203,101 @@ functions:
           ```
         code: |
           ```dart
-          supabase.channel('public:countries').on(
-            RealtimeListenTypes.postgresChanges,
-            ChannelFilter(event: 'DELETE', schema: 'public', table: 'countries'),
-            (payload, [ref]) {
-              print('Change received: ${payload.toString()}');
-            },
-          ).subscribe();
+          supabase
+              .channel('public:countries')
+              .onPostgresChanges(
+                  event: PostgresChangeEvent.delete,
+                  schema: 'public',
+                  table: 'countries',
+                  callback: (payload) {
+                    print('Change received: ${payload.toString()}');
+                  })
+              .subscribe();
           ```
       - id: listen-to-multiple-events
         name: Listen to multiple events
         description: You can chain listeners if you want to listen to multiple events for each table.
         code: |
           ```dart
-          supabase.channel('public:countries').on(RealtimeListenTypes.postgresChanges,
-              ChannelFilter(event: 'INSERT', schema: 'public', table: 'countries'),
-              (payload, [ref]) {
-            print('Change received: ${payload.toString()}');
-          }).on(RealtimeListenTypes.postgresChanges,
-              ChannelFilter(event: 'DELETE', schema: 'public', table: 'countries'),
-              (payload, [ref]) {
-            print('Change received: ${payload.toString()}');
-          }).subscribe();
+          supabase
+              .channel('public:countries')
+              .onPostgresChanges(
+                  event: PostgresChangeEvent.insert,
+                  schema: 'public',
+                  table: 'countries',
+                  callback: (payload) {
+                    print('Insert event received: ${payload.toString()}');
+                  })
+              .onPostgresChanges(
+                  event: PostgresChangeEvent.delete,
+                  schema: 'public',
+                  table: 'countries',
+                  callback: (payload) {
+                    print('Delete event received: ${payload.toString()}');
+                  })
+              .subscribe();
           ```
       - id: listening-to-row-level-changes
         name: Listen to row level changes
-        description: You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
+        description: You can listen to individual rows by using the `filter` parameter passing a `PostgresChangeFilter` object with `PostgresChangeFilterType.eq` as `type`.
         code: |
           ```dart
-          supabase.channel('public:countries:id=eq.200').on(
-              RealtimeListenTypes.postgresChanges,
-              ChannelFilter(
-                event: 'UPDATE',
-                schema: 'public',
-                table: 'countries',
-                filter: 'id=eq.200',
-              ), (payload, [ref]) {
-            print('Change received: ${payload.toString()}');
-          }).subscribe();
+          supabase
+              .channel('public:countries:id=eq.200')
+              .onPostgresChanges(
+                  event: PostgresChangeEvent.delete,
+                  schema: 'public',
+                  table: 'countries',
+                  filter: PostgresChangeFilter(
+                    type: PostgresChangeFilterType.eq,
+                    column: 'id',
+                    value: 200,
+                  ),
+                  callback: (payload) {
+                    print('Change received: ${payload.toString()}');
+                  })
+              .subscribe();
           ```
-
+      - id: listen-to-broadcast
+        name: Listen to broadcast messages
+        code: |
+          ```dart
+          supabase
+              .channel('room1')
+              .onBroadcast(
+                  event: 'cursor-pos',
+                  callback: (payload) {
+                    print('Cursor position received!: $payload');
+                  })
+              .subscribe();
+          ```
+      - id: listen-to-presence-events
+        name: Listen to presence events
+        code: |
+          ```dart
+          final channel = supabase.channel('room1');
+          channel
+              .onPresence(
+                  event: PresenceEvent.sync,
+                  callback: (payload) {
+                    print('Synced presence state: ${channel.presenceState()}');
+                  })
+              .onPresence(
+                  event: PresenceEvent.join,
+                  callback: (payload) {
+                    print('Newly joined presences $payload');
+                  })
+              .onPresence(
+                  event: PresenceEvent.leave,
+                  callback: (payload) {
+                    print('Newly left presences: $payload');
+                  })
+              .subscribe((status, error) async {
+            if (status == RealtimeSubscribeStatus.subscribed) {
+              await channel.track({'online_at': DateTime.now().toIso8601String()});
+            }
+          });
+          ```
   - id: remove-channel
     description: |
       Unsubscribes and removes Realtime channel from Realtime client.
