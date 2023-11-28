@@ -43,7 +43,7 @@ const LWXBackground = ({ className }: Props) => {
     const { x: svgX, y: svgY } = svgElement.getBoundingClientRect()
     const x = event.clientX - svgX - 50
     const y = event.clientY - svgY - 50
-    console.log(x, y)
+
     setGradientPos({ x, y })
   }
 

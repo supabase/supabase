@@ -33,8 +33,6 @@ export default function TicketsGrid({ loadedUsers, isLoading, pageCount, offset 
           getTicketImageUrl(user.username!, !!user.golden) ??
           '/images/launchweek/lwx/tickets/placeholder.png'
 
-        console.log(imgUrl)
-
         return (
           <Link
             href={`/launch-week/tickets/${user.username}`}
