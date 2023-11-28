@@ -18,9 +18,12 @@ const EditThreadModal = ({
   const formRef = createRef<HTMLFormElement>()
 
   const initialState = {
-    message: '',
-    success: false,
-    data: undefined,
+    message: undefined,
+    success: undefined,
+    data: {
+      row_id: thread.id,
+      thread_title: thread.thread_title,
+    },
   }
 
   const [state, formAction] = useFormState(updateThreadName, initialState)
@@ -29,7 +32,7 @@ const EditThreadModal = ({
     if (state?.success === true) {
       onClose()
       formRef.current?.reset()
-      state.success = false
+      state.success = undefined
     }
   }, [state, onClose, formRef])
 
@@ -60,9 +63,9 @@ const EditThreadModal = ({
             placeholder="Type in a name for the thread..."
             type="text"
             name="thread_title"
-            defaultValue={state?.data?.thread_title}
+            defaultValue={state.data.thread_title}
           />
-          <Input_Shadcn_ name="row_id" value={thread.id} type="hidden" />
+          <Input_Shadcn_ name="row_id" value={state.data.row_id} type="hidden" />
         </Modal.Content>
         <Modal.Separator />
         <Modal.Content className="flex flex-row gap-3 justify-end">
