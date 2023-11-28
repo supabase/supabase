@@ -14,7 +14,6 @@ const FONT_URL = `${STORAGE_URL}/font/CircularStd-Book.otf`
 const MONO_FONT_URL = `${STORAGE_URL}/font/SourceCodePro-Regular.ttf?t=2023-07-18T13%3A03%3A29.474Z`
 const font = fetch(new URL(FONT_URL, import.meta.url)).then((res) => res.arrayBuffer())
 const mono_font = fetch(new URL(MONO_FONT_URL, import.meta.url)).then((res) => res.arrayBuffer())
-const BUCKET_FOLDER_VERSION = 'v1'
 
 const LW_TABLE = 'lwx_tickets'
 
@@ -71,14 +70,11 @@ export async function handler(req: Request) {
 
     if (error) console.log('fetch error', error.message)
     if (!data) throw new Error(error?.message ?? 'user not found')
-    console.log('ticket data', data)
+
     const { name, ticketNumber, metadata } = data
 
     const platinum = (!!data?.sharedOnTwitter && !!data?.sharedOnLinkedIn) ?? false
-    console.log('assumePlatinum??', assumePlatinum)
-    console.log('platinum??', platinum)
     if (assumePlatinum && !platinum) return await fetch(`${STORAGE_URL}/assets/golden_no_meme.png`)
-    console.log('no meme??')
 
     // Else, generate image and upload to storage.
     const BACKGROUND = {
@@ -274,24 +270,7 @@ export async function handler(req: Request) {
         }
       )
 
-    console.log('storageError?', storageError)
     if (storageError) throw new Error(`storageError: ${storageError.message}`)
-
-    console.log('lwx-ticket username', username)
-    console.log('lwx-ticket platinum?', platinum)
-    // Generate og image
-    // fetch('https://obuldanrptloktxcffvn.supabase.co/functions/v1/lwx-ticket-og', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     Authorization:
-    //       'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9idWxkYW5ycHRsb2t0eGNmZnZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTIyNjkzMjYsImV4cCI6MjAwNzg0NTMyNn0.1S6qpBbHtEmGuMsIx5UOhRiFd4YbVv-yLTrLk6tVGmM',
-    //   },
-    //   body: JSON.stringify({
-    //     username,
-    //     platinum,
-    //   }),
-    // }).catch((err) => console.log('generate og err', err))
 
     const NEW_TIMESTAMP = new Date()
 
