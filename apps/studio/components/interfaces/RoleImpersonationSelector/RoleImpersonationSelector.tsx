@@ -2,16 +2,20 @@ import { useState } from 'react'
 
 import { PostgrestRole } from 'lib/role-impersonation'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
+import { DropdownMenuSeparator, cn } from 'ui'
 import { AnonIcon, AuthenticatedIcon, ServiceRoleIcon } from './Icons'
 import RoleImpersonationRadio from './RoleImpersonationRadio'
 import UserImpersonationSelector from './UserImpersonationSelector'
-import { DropdownMenuSeparator } from 'ui'
 
 export interface RoleImpersonationSelectorProps {
   serviceRoleLabel?: string
+  padded?: boolean
 }
 
-const RoleImpersonationSelector = ({ serviceRoleLabel }: RoleImpersonationSelectorProps) => {
+const RoleImpersonationSelector = ({
+  serviceRoleLabel,
+  padded = true,
+}: RoleImpersonationSelectorProps) => {
   const state = useRoleImpersonationStateSnapshot()
 
   const [selectedOption, setSelectedOption] = useState<PostgrestRole | undefined>(() => {
@@ -51,7 +55,7 @@ const RoleImpersonationSelector = ({ serviceRoleLabel }: RoleImpersonationSelect
 
   return (
     <>
-      <div className="flex flex-col py-5 px-5 gap-3">
+      <div className={cn('flex flex-col gap-3', padded ? 'p-5' : 'pb-5')}>
         <h2 className="text-foreground text-base">Database connection settings</h2>
 
         <form
@@ -115,7 +119,9 @@ const RoleImpersonationSelector = ({ serviceRoleLabel }: RoleImpersonationSelect
       {selectedOption === 'authenticated' && (
         <>
           <DropdownMenuSeparator />
-          <div className="py-5 px-5">
+          <div
+            className={cn('pt-5', isAuthenticatedOptionFullySelected && 'pb-5', padded && 'px-5')}
+          >
             <UserImpersonationSelector />
           </div>
         </>

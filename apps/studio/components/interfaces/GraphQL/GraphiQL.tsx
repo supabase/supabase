@@ -363,7 +363,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                             activeSecondaryEditor !== 'role-impersonation' && 'hidden'
                           )}
                         >
-                          <RoleImpersonationSelector />
+                          <RoleImpersonationSelector padded={false} />
                         </div>
                       )}
                     </section>
