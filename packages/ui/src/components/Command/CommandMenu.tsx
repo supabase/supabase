@@ -65,9 +65,18 @@ interface CommandMenuProps {
 const CommandMenu = ({ projectRef }: CommandMenuProps) => {
   const router = useRouter()
 
-  const commandInputRef = useRef<ElementRef<typeof CommandInput>>(null)
-  const { isOpen, setIsOpen, search, setSearch, pages, setPages, currentPage, site, project } =
-    useCommandMenu()
+  const {
+    isOpen,
+    setIsOpen,
+    search,
+    setSearch,
+    pages,
+    setPages,
+    currentPage,
+    site,
+    project,
+    inputRef: commandInputRef,
+  } = useCommandMenu()
   const showCommandInput = !currentPage || !CHAT_ROUTES.includes(currentPage)
 
   // This function has been added to prevent the use of double quotes in the search docs input due to an issue with the cmdk-supabase module. This function can be removed when we transition to using cmdk.
