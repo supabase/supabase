@@ -23,11 +23,13 @@ export const AIPolicyChat = ({
   loading,
   onSubmit,
   onDiff,
+  onChange,
 }: {
   messages: OpenAI.Beta.Threads.Messages.ThreadMessage[]
   loading: boolean
   onSubmit: (s: string) => void
   onDiff: (s: string) => void
+  onChange: (value: boolean) => void
 }) => {
   const { profile } = useProfile()
   // [Joshen] Separate state here as there's a delay between submitting and the API updating the loading status
@@ -51,7 +53,7 @@ export const AIPolicyChat = ({
     resolver: zodResolver(FormSchema),
     defaultValues: { chat: '' },
   })
-
+  const formChatValue = form.getValues().chat
   const pendingReply = loading && last(sorted)?.role === 'user'
 
   useEffect(() => {
@@ -69,6 +71,10 @@ export const AIPolicyChat = ({
       setIsLoading(false)
     }
   }, [loading])
+
+  useEffect(() => {
+    onChange(formChatValue.length === 0)
+  }, [formChatValue])
 
   return (
     <div className="flex flex-col h-full">

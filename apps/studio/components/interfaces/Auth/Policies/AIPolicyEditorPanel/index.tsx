@@ -1,6 +1,6 @@
 import { FileDiff } from 'lucide-react'
 import dynamic from 'next/dynamic'
-import { memo, useCallback, useEffect, useRef, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import { Button, Modal, SidePanel } from 'ui'
 
@@ -49,6 +49,7 @@ export const AIPolicyEditorPanel = memo(function ({
   const [debugThread, setDebugThread] = useState<ThreadMessage[]>([])
   const [assistantVisible, setAssistantPanel] = useState(false)
   const [ids, setIds] = useState<{ threadId: string; runId: string } | undefined>(undefined)
+  const [isAssistantChatInputEmpty, setIsAssistantChatInputEmpty] = useState(false)
   const [incomingChange, setIncomingChange] = useState<string | undefined>(undefined)
   // used for confirmation when closing the panel with unsaved changes
   const [isClosingPolicyEditorPanel, setIsClosingPolicyEditorPanel] = useState(false)
@@ -116,6 +117,14 @@ export const AIPolicyEditorPanel = memo(function ({
     [addPromptMutation, entityDefinitions, ids?.threadId]
   )
 
+  const messages = useMemo(
+    () => [...(isSuccess ? data.messages : []), ...debugThread],
+    [data?.messages, debugThread, isSuccess]
+  )
+
+  const errorLines =
+    error?.formattedError.split('\n').filter((x: string) => x.length > 0).length ?? 0
+
   const createNewPolicy = useCallback(() => {
     // clean up the sql before sending
     const policy = editorRef.current?.getValue().replaceAll('\n', ' ').replaceAll('  ', ' ')
@@ -162,12 +171,12 @@ export const AIPolicyEditorPanel = memo(function ({
 
   const onClosingPanel = useCallback(() => {
     const policy = editorRef.current?.getValue()
-    if (policy) {
+    if (policy || messages.length > 0 || !isAssistantChatInputEmpty) {
       setIsClosingPolicyEditorPanel(true)
     } else {
       onSelectCancel()
     }
-  }, [onSelectCancel])
+  }, [onSelectCancel, messages, isAssistantChatInputEmpty])
 
   const onSelectDebug = async () => {
     const policy = editorRef.current?.getValue().replaceAll('\n', ' ').replaceAll('  ', ' ')
@@ -233,10 +242,6 @@ export const AIPolicyEditorPanel = memo(function ({
     }
   }, [visible])
 
-  const messages = [...(isSuccess ? data.messages : []), ...debugThread]
-  const errorLines =
-    error?.formattedError.split('\n').filter((x: string) => x.length > 0).length ?? 0
-
   return (
     <SidePanel
       size={assistantVisible ? 'xxxxlarge' : 'large'}
@@ -251,6 +256,7 @@ export const AIPolicyEditorPanel = memo(function ({
             assistantVisible={assistantVisible}
             setAssistantVisible={setAssistantPanel}
           />
+
           {incomingChange ? (
             <div className="px-5 py-3 flex justify-between gap-3 bg-muted">
               <div className="flex gap-2 items-center text-foreground-light">
@@ -277,7 +283,6 @@ export const AIPolicyEditorPanel = memo(function ({
                 modified={incomingChange}
                 onMount={(editor) => (diffEditorRef.current = editor)}
                 options={{
-                  // render the diff inline
                   renderSideBySide: false,
                   scrollBeyondLastLine: false,
                 }}
@@ -313,7 +318,6 @@ export const AIPolicyEditorPanel = memo(function ({
               <Button
                 loading={isExecuting}
                 htmlType="submit"
-                // disable the submit button when in diff mode
                 disabled={isExecuting || incomingChange !== undefined}
                 onClick={() => createNewPolicy()}
               >
@@ -329,6 +333,7 @@ export const AIPolicyEditorPanel = memo(function ({
               messages={messages}
               onSubmit={(message: string) => addPrompt(message)}
               onDiff={(v) => setIncomingChange(v)}
+              onChange={setIsAssistantChatInputEmpty}
               loading={data?.status === 'loading'}
             />
           </div>
@@ -347,8 +352,8 @@ export const AIPolicyEditorPanel = memo(function ({
       >
         <Modal.Content>
           <p className="py-4 text-sm text-foreground-light">
-            There are unsaved changes. Are you sure you want to close the editor? Your changes will
-            be lost.
+            Are you sure you want to close the editor? Any unsaved changes on your policy and
+            conversations with the Assistant will be lost.
           </p>
         </Modal.Content>
       </ConfirmationModal>
