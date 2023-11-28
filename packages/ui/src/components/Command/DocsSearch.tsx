@@ -18,6 +18,8 @@ import { CommandGroup, CommandItem, CommandLabel, TextHighlighter } from './Comm
 
 const NUMBER_SOURCES = 2
 
+const FUNCTIONS_URL = '/functions/v1/'
+
 const questions = [
   'How do I get started with Supabase?',
   'How do I run Supabase locally?',
@@ -239,25 +241,29 @@ const DocsSearch = () => {
 
       const sources = ['search-fts', 'search-embeddings']
       sources.forEach((source) => {
-        supabaseClient.functions
-          .invoke(source, { body: { query } })
-          .then(({ data: results, error }) => {
+        fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}${FUNCTIONS_URL}${source}`, {
+          method: 'POST',
+          body: JSON.stringify({ query }),
+        })
+          .then((response) => response.json())
+          .then((results) => {
             sourcesLoaded += 1
-            if (error) {
-              dispatch({
-                type: 'errored',
-                key: localKey,
-                sourcesLoaded,
-                message: error.message ?? '',
-              })
-            } else {
-              dispatch({
-                type: 'resultsReturned',
-                key: localKey,
-                sourcesLoaded,
-                results,
-              })
-            }
+            dispatch({
+              type: 'resultsReturned',
+              key: localKey,
+              sourcesLoaded,
+              results,
+            })
+          })
+          .catch((error) => {
+            dispatch({
+              type: 'errored',
+              key: localKey,
+              sourcesLoaded,
+              message: error.message ?? '',
+            })
+          })
+          .finally(() => {
             if (sourcesLoaded === NUMBER_SOURCES) {
               setIsLoading(false)
             }
@@ -280,24 +286,19 @@ const DocsSearch = () => {
   const debouncedSearch = useMemo(() => debounce(handleSearch, 1000), [handleSearch])
 
   useEffect(() => {
-    initialLoad.current = false
-    // search immediately if there is a search term on initial load
-    if (search) {
-      handleSearch(search)
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!search) {
-      // Clear search results if user deletes query
-      // and cancel any pending debounced searches
+    if (initialLoad.current) {
+      if (search) {
+        handleSearch(search)
+      }
+      initialLoad.current = false
+    } else if (search) {
+      debouncedSearch(search)
+    } else {
       debouncedSearch.cancel()
       key.current += 1
       dispatch({ type: 'reset', key: key.current })
-    } else if (!initialLoad.current) {
-      debouncedSearch(search)
     }
-  }, [search])
+  }, [])
 
   // Immediately run search if user presses enter
   // and abort any debounced searches that are waiting
