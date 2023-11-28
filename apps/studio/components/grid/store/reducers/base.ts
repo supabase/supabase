@@ -1,12 +1,11 @@
 import { CalculatedColumn } from 'react-data-grid'
-import { GridProps, SavedState, SupaTable } from '../../types'
-import { REFRESH_PAGE_IMMEDIATELY, TOTAL_ROWS_RESET } from '../../constants'
+import { TOTAL_ROWS_RESET } from '../../constants'
 import { IRowService, SqlRowService } from '../../services/row'
+import { GridProps, SavedState, SupaTable } from '../../types'
 
 export interface BaseInitialState {
   table: SupaTable | null
   rowService: IRowService | null
-  refreshPageFlag: number
   isInitialComplete: boolean
   editable: boolean
   allRowsSelected: boolean
@@ -15,7 +14,6 @@ export interface BaseInitialState {
 export const baseInitialState: BaseInitialState = {
   table: null,
   rowService: null,
-  refreshPageFlag: 0,
   isInitialComplete: false,
   editable: false,
   allRowsSelected: false,
@@ -56,7 +54,6 @@ const BaseReducer = (state: BaseInitialState, action: BASE_ACTIONTYPE) => {
           action.payload.onSqlQuery,
           action.payload.onError
         ),
-        refreshPageFlag: REFRESH_PAGE_IMMEDIATELY,
         isInitialComplete: true,
         editable: action.payload.editable || false,
       }
@@ -68,15 +65,11 @@ const BaseReducer = (state: BaseInitialState, action: BASE_ACTIONTYPE) => {
     case 'UPDATE_FILTERS': {
       const newState: any = { ...state }
       newState.page = 1
-      // newState.refreshPageFlag = Date.now()
-      newState.refreshPageFlag = REFRESH_PAGE_IMMEDIATELY
       newState.totalRows = TOTAL_ROWS_RESET
       return newState
     }
     case 'UPDATE_SORTS': {
       const newState: any = { ...state }
-      // newState.refreshPageFlag = Date.now()
-      newState.refreshPageFlag = REFRESH_PAGE_IMMEDIATELY
       return newState
     }
     default:
