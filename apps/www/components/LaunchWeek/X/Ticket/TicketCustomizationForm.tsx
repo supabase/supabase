@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
-import { Badge, Button, IconCheck, Input, cn } from 'ui'
+import { Button, IconCheck, Input, cn } from 'ui'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import { useBreakpoint, useDebounce } from 'common'
+import { useKey } from 'react-use'
 
 const TicketCustomizationForm = ({ className }: { className?: string }) => {
   const isMobile = useBreakpoint()
@@ -20,6 +21,8 @@ const TicketCustomizationForm = ({ className }: { className?: string }) => {
   const IS_SAVING = formState === 'saving'
   const IS_SAVED = formState === 'saved'
   const HAS_ERROR = formState === 'error'
+
+  useKey('Escape', () => setShowCustomizationForm && setShowCustomizationForm(false))
 
   const handleInputChange = (name: string, value: string) => {
     setFormData((prev) => ({ ...prev, [name]: value }))
@@ -55,6 +58,7 @@ const TicketCustomizationForm = ({ className }: { className?: string }) => {
         className
       )}
       onChange={() => debouncedChangeHandler()}
+      onSubmit={(e) => e.preventDefault()}
     >
       <Input
         className="[&_input]:border-background"
@@ -111,12 +115,10 @@ const TicketCustomizationForm = ({ className }: { className?: string }) => {
             Something went wrong
           </span>
         )}
-        {/* <Badge color="brand" className="truncate lg:max-w-sm">
-          @{user.username}
-        </Badge> */}
         <Button
           type="outline"
           size="tiny"
+          htmlType="submit"
           block={isMobile}
           onClick={() => setShowCustomizationForm && setShowCustomizationForm(false)}
         >
