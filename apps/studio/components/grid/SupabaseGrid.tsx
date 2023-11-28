@@ -21,6 +21,7 @@ import Header from './components/header'
 import { RowContextMenu } from './components/menu'
 import { StoreProvider, useDispatch, useTrackedState } from './store'
 import { Dictionary, SupabaseGridProps, SupabaseGridRef } from './types'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 
 /** Supabase Grid: React component to render database table */
 
@@ -54,6 +55,7 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>(
     } = props
     const dispatch = useDispatch()
     const state = useTrackedState()
+    const snap = useTableEditorStateSnapshot()
 
     const gridRef = useRef<DataGridHandle>(null)
     const [mounted, setMounted] = useState(false)
@@ -73,7 +75,7 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>(
         table: props.table,
         sorts,
         filters,
-        page: state.page,
+        page: snap.page,
         limit: state.rowsPerPage,
       },
       {

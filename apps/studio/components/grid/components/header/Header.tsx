@@ -243,7 +243,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
     table,
     sorts,
     filters,
-    page: state.page,
+    page: snap.page,
     limit: state.rowsPerPage,
   })
 

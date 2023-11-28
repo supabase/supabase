@@ -57,6 +57,11 @@ export const createTableEditorState = () => {
       state.selectedSchemaName = schemaName
     },
 
+    page: 1,
+    setPage: (page: number) => {
+      state.page = page
+    },
+
     ui: { open: 'none' } as UIState,
     get sidePanel() {
       return state.ui.open === 'side-panel' ? state.ui.sidePanel : undefined

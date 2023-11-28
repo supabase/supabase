@@ -8,7 +8,6 @@ export interface RowInitialState {
   rows: SupaRow[]
   selectedRows: ReadonlySet<number>
   selectedCellPosition: { idx: number; rowIdx: number } | null
-  page: number
   rowsPerPage: number
   totalRows: number
 }
@@ -18,7 +17,6 @@ export const rowInitialState: RowInitialState = {
   rows: [],
   selectedRows: new Set(),
   selectedCellPosition: null,
-  page: 1,
   rowsPerPage: 100,
   totalRows: TOTAL_ROWS_INITIAL,
 }
@@ -33,7 +31,6 @@ type ROW_ACTIONTYPE =
       type: 'SELECTED_ROWS_CHANGE'
       payload: { selectedRows: ReadonlySet<number> }
     }
-  | { type: 'SET_PAGE'; payload: number }
   | { type: 'SET_ROWS_PER_PAGE'; payload: number }
   | {
       type: 'SET_ROWS'
@@ -56,7 +53,6 @@ const RowReducer = (state: RowInitialState, action: ROW_ACTIONTYPE) => {
     case 'INIT_TABLE': {
       return {
         ...state,
-        page: 1,
         selectedCellPosition: null,
         selectedRows: new Set(),
         totalRows: TOTAL_ROWS_RESET,
@@ -82,17 +78,9 @@ const RowReducer = (state: RowInitialState, action: ROW_ACTIONTYPE) => {
         selectedRows: action.payload.selectedRows,
       }
     }
-    case 'SET_PAGE': {
-      return {
-        ...state,
-        page: action.payload,
-        refreshPageFlag: REFRESH_PAGE_IMMEDIATELY,
-      }
-    }
     case 'SET_ROWS_PER_PAGE': {
       return {
         ...state,
-        page: 1,
         rowsPerPage: action.payload,
         refreshPageFlag: REFRESH_PAGE_IMMEDIATELY,
       }

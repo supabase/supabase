@@ -26,6 +26,7 @@ import {
   UpdateColumnPayload,
 } from './SidePanelEditor.types'
 import { ImportContent } from './TableEditor/TableEditor.types'
+import { uuidv4 } from 'lib/helpers'
 
 export interface SidePanelEditorProps {
   editable?: boolean
@@ -513,10 +514,34 @@ const SidePanelEditor = ({
     }
   }
 
+  // To force a re-rendering of the input fields in each side panel so that
+  // all the form fields are having the latest state
+  const rowEditorKey =
+    snap.sidePanel?.type === 'row' && snap.sidePanel.row
+      ? `row-editor-${snap.page}-${snap?.sidePanel.row?.idx}`
+      : undefined
+  const columnEditorKey =
+    snap.sidePanel?.type === 'column' && snap.sidePanel.column
+      ? `column-editor-${(snap.sidePanel.column as PostgresColumn).id}`
+      : undefined
+  const tableEditorKey =
+    snap.sidePanel?.type === 'table' && selectedTable !== undefined
+      ? `table-editor-${selectedTable.id}`
+      : undefined
+  const jsonEditorKey =
+    snap.sidePanel?.type === 'json'
+      ? `json-editor-${snap.page}-${snap.sidePanel.jsonValue.column}-${snap.sidePanel.jsonValue.row?.idx}`
+      : undefined
+  const foreignRowSelectorKey =
+    snap.sidePanel?.type === 'foreign-row-selector' && snap.sidePanel.foreignKey
+      ? `foreign-row-selector-${snap.sidePanel.foreignKey.foreignKey.id}`
+      : undefined
+
   return (
     <>
       {!isUndefined(selectedTable) && (
         <RowEditor
+          key={rowEditorKey}
           row={snap.sidePanel?.type === 'row' ? snap.sidePanel.row : undefined}
           selectedTable={selectedTable}
           visible={snap.sidePanel?.type === 'row'}
@@ -527,6 +552,7 @@ const SidePanelEditor = ({
       )}
       {!isUndefined(selectedTable) && (
         <ColumnEditor
+          key={columnEditorKey}
           column={
             snap.sidePanel?.type === 'column'
               ? (snap.sidePanel.column as PostgresColumn)
@@ -540,6 +566,7 @@ const SidePanelEditor = ({
         />
       )}
       <TableEditor
+        key={tableEditorKey}
         table={
           snap.sidePanel?.type === 'table' &&
           (snap.sidePanel.mode === 'edit' || snap.sidePanel.mode === 'duplicate')
@@ -558,6 +585,7 @@ const SidePanelEditor = ({
         saveChanges={() => {}}
       />
       <JsonEdit
+        key={jsonEditorKey}
         visible={snap.sidePanel?.type === 'json'}
         column={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.column) || ''}
         jsonString={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.jsonString) || ''}
@@ -568,11 +596,7 @@ const SidePanelEditor = ({
         onSaveJSON={onSaveJSON}
       />
       <ForeignRowSelector
-        key={`foreign-row-selector-${
-          (snap.sidePanel?.type === 'foreign-row-selector' &&
-            snap.sidePanel.foreignKey.foreignKey.id) ||
-          'null'
-        }`}
+        key={foreignRowSelectorKey}
         visible={snap.sidePanel?.type === 'foreign-row-selector'}
         foreignKey={
           snap.sidePanel?.type === 'foreign-row-selector'
