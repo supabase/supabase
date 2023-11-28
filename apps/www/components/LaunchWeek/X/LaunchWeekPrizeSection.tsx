@@ -67,8 +67,18 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
               className="flex-grow"
               content={
                 <div className="p-4 md:p-6 flex flex-col gap-2 text-sm items-start justify-between h-full">
-                  <LabelBadge text="50 stickers" />
-                  <p>Launch Week X Stickers</p>
+                  <LabelBadge text="50 codes" />
+                  <p>
+                    100% Discount on{' '}
+                    <Link
+                      href="https://supabase.store/"
+                      target="_blank"
+                      className="inline hover:underline text-foreground-light"
+                    >
+                      Supabase Store
+                    </Link>{' '}
+                    selection
+                  </p>
                 </div>
               }
             />
