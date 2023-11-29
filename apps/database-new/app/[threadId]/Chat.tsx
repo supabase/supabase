@@ -27,6 +27,7 @@ export const Chat = () => {
   }, [data?.messages, isSuccess])
 
   const selectedMessage = messageId
+  // this should prob use isLoading from rq instead of data.status
   const loading = isSuccess && data.status === 'loading'
   const userMessages = messages.filter((message) => message.role === 'user')
 
