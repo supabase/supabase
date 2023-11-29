@@ -3,6 +3,7 @@ import { get } from 'lib/common/fetch'
 import { BASE_PATH } from 'lib/constants'
 import OpenAI from 'openai'
 import { aiKeys } from './keys'
+import { ResponseError } from 'types'
 
 export type RlsSuggestVariables = {
   thread_id: string
@@ -16,19 +17,14 @@ export type RlsSuggestResponse = {
 }
 
 export async function rlsSuggest({ thread_id, run_id }: RlsSuggestVariables, signal?: AbortSignal) {
-  const response = await get<RlsSuggestResponse>(
-    `${BASE_PATH}/api/ai/sql/suggest/${thread_id}/${run_id}`,
-    { signal }
-  )
-  // if (response.error) {
-  //   throw response.error
-  // }
+  const response = await get(`${BASE_PATH}/api/ai/sql/suggest/${thread_id}/${run_id}`, { signal })
+  if (response.error) throw response.error
 
   return response as RlsSuggestResponse
 }
 
 export type RlsSuggestData = Awaited<ReturnType<typeof rlsSuggest>>
-export type RlsSuggestDataError = unknown
+export type RlsSuggestDataError = ResponseError
 
 export const useRlsSuggestQuery = <TData = RlsSuggestData>(
   { thread_id, run_id }: RlsSuggestVariables,

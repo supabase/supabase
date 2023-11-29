@@ -11,7 +11,7 @@ export const AIPolicyHeader = ({
   setAssistantVisible: (v: boolean) => void
 }) => {
   return (
-    <SheetHeader_Shadcn_ className="flex flex-row justify-between items-center">
+    <SheetHeader_Shadcn_ className="py-3 flex flex-row justify-between items-center">
       <div className="flex flex-row gap-3 items-center">
         <SheetClose_Shadcn_ className="text-light hover:text ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
           <X className="h-3 w-3" />

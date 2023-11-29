@@ -186,7 +186,6 @@ const Policies = ({ tables, hasTables, isLocked }: PoliciesProps) => {
         selectedPolicyToEdit={selectedPolicyToEdit}
         onSelectCancel={closePolicyEditorModal}
         onCreatePolicy={onCreatePolicy}
-        // @ts-ignore
         onUpdatePolicy={onUpdatePolicy}
         onSaveSuccess={onSavePolicySuccess}
       />

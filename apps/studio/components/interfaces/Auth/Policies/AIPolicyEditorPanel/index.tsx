@@ -3,15 +3,7 @@ import dynamic from 'next/dynamic'
 import { ThreadMessage } from 'openai/resources/beta/threads/messages/messages'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
-import {
-  Button,
-  Modal,
-  SheetContent_Shadcn_,
-  SheetFooter_Shadcn_,
-  Sheet_Shadcn_,
-  SidePanel,
-  cn,
-} from 'ui'
+import { Button, Modal, SheetContent_Shadcn_, SheetFooter_Shadcn_, Sheet_Shadcn_, cn } from 'ui'
 
 import {
   IStandaloneCodeEditor,
@@ -26,10 +18,10 @@ import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-
 import { useSelectedProject, useStore } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { AIPolicyChat } from './AIPolicyChat'
+import { generateThreadMessage } from './AIPolicyEditorPanel.utils'
 import { AIPolicyHeader } from './AIPolicyHeader'
 import QueryError from './QueryError'
 import RLSCodeEditor from './RLSCodeEditor'
-import { generateThreadMessage } from './AIPolicyEditorPanel.utils'
 
 const DiffEditor = dynamic(
   () => import('@monaco-editor/react').then(({ DiffEditor }) => DiffEditor),
@@ -262,14 +254,14 @@ export const AIPolicyEditorPanel = memo(function ({
     <>
       <Sheet_Shadcn_ open={visible} onOpenChange={() => onClosingPanel()}>
         <SheetContent_Shadcn_
-          size={assistantVisible ? 'lg' : 'default'}
+          size="lg"
           className={cn('p-0 flex flex-row', assistantVisible && '!min-w-[1024px]')}
         >
           <div className={cn('flex flex-col grow w-full', assistantVisible && 'w-[60%]')}>
             <AIPolicyHeader
               assistantVisible={assistantVisible}
               setAssistantVisible={setAssistantPanel}
-            ></AIPolicyHeader>
+            />
             <div className="flex flex-col h-full w-full justify-between">
               {incomingChange ? (
                 <div className="px-5 py-3 flex justify-between gap-3 bg-muted">
@@ -303,7 +295,6 @@ export const AIPolicyEditorPanel = memo(function ({
                   }}
                 />
               ) : null}
-              {/* this editor has to rendered at all times to not lose its editing history */}
               <div
                 // [Joshen] Not the cleanest but its to force the editor to re-render its height
                 // for now, till we can find a better solution
@@ -311,8 +302,8 @@ export const AIPolicyEditorPanel = memo(function ({
                 style={{
                   height:
                     error === undefined
-                      ? 'calc(100vh - 67px - 59px)'
-                      : `calc(100vh - 67px - 155px - ${20 * errorLines}px)`,
+                      ? 'calc(100vh - 58px - 54px)'
+                      : `calc(100vh - 58px - 151px - ${20 * errorLines}px)`,
                 }}
               >
                 <RLSCodeEditor

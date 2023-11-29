@@ -19,13 +19,24 @@ interface RLSCodeEditorProps {
   editorRef: MutableRefObject<editor.IStandaloneCodeEditor | null>
 }
 
+// const placeholderText = `
+// CREATE POLICY *name* ON *table_name*\n
+// [ AS { PERMISSIVE | RESTRICTIVE } ]\n
+// [ FOR { ALL | SELECT | INSERT | UPDATE | DELETE } ]\n
+// [ TO *role_name* ]\n
+// [ USING ( *using_expression* ) ]\n
+// [ WITH CHECK ( *check_expression* ) ];
+// `.trim()
+
 const placeholderText = `
-CREATE POLICY _name_ ON _table_name_\n
-[ AS { PERMISSIVE | RESTRICTIVE } ]\n
-[ FOR { ALL | SELECT | INSERT | UPDATE | DELETE } ]\n
-[ TO _role_name_ ]\n
-[ USING ( _using_expression_ ) ]\n
-[ WITH CHECK ( _check_expression_ ) ];
+CREATE POLICY *name* ON *table_name*\n
+AS PERMISSIVE -- PERMISSIVE | RESTRICTIVE\n
+FOR ALL -- ALL | SELECT | INSERT | UPDATE | DELETE\n
+TO *role_name* -- Default: public\n
+USING ( *using_expression* )\n
+WITH CHECK ( *check_expression* );\n
+&nbsp;\n
+-- Docs: https://www.postgresql.org/docs/current/sql-createpolicy.html
 `.trim()
 
 const RLSCodeEditor = ({
@@ -55,7 +66,11 @@ const RLSCodeEditor = ({
             // @ts-ignore
             identifier: 'add-placeholder',
             range: new monaco.Range(1, 1, 1, 1),
-            text: placeholderText.split('\n\n').join('\n'),
+            text: placeholderText
+              .split('\n\n')
+              .join('\n')
+              .replaceAll('*', '')
+              .replaceAll('&nbsp;', ''),
           },
         ])
       },
@@ -88,7 +103,7 @@ const RLSCodeEditor = ({
     contextmenu: true,
     lineNumbers: undefined,
     glyphMargin: undefined,
-    lineNumbersMinChars: undefined,
+    lineNumbersMinChars: 4,
     folding: undefined,
     scrollBeyondLastLine: false,
   }
@@ -108,7 +123,7 @@ const RLSCodeEditor = ({
         onChange={onChange}
       />
       <div
-        className="monaco-placeholder absolute top-[3px] left-16 text-sm pointer-events-none font-mono [&>div>p]:text-foreground-lighter [&>div>p]:!m-0"
+        className="monaco-placeholder absolute top-[3px] left-[57px] text-sm pointer-events-none font-mono [&>div>p]:text-foreground-lighter [&>div>p]:!m-0 tracking-tighter"
         style={{ display: 'none' }}
       >
         <Markdown content={placeholderText} />
