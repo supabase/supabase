@@ -177,6 +177,7 @@ export { Separator } from './src/components/shadcn/ui/separator'
 // patterns
 
 export { AssistantChatForm } from './src/patterns/AssistantChatForm'
+export { AssistantCommandsPopover } from './src/patterns/AssistantCommandsPopover'
 
 // links
 

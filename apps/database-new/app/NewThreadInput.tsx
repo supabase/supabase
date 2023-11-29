@@ -7,7 +7,7 @@ import { useMutation } from '@tanstack/react-query'
 import { ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { createRef, useState } from 'react'
-import { AssistantChatForm, cn } from 'ui'
+import { AssistantChatForm, AssistantCommandsPopover, cn } from 'ui'
 
 const suggestions = CHAT_EXAMPLES
 
@@ -51,34 +51,48 @@ const NewThreadInput = () => {
     },
   })
 
+  const [commandsOpen, setCommandsOpen] = useState<boolean>(false)
+  const textAreaRef = createRef<HTMLTextAreaElement>()
+
   return (
     <>
       <div className="relative w-10/12 xl:w-11/12 max-w-xl">
-        <AssistantChatForm
-          key={'new-thread-form'}
-          id={'new-thread-form'}
-          onSubmit={async (event) => {
-            event.preventDefault()
-
-            const {
-              data: { user },
-            } = await supabase.auth.getUser()
-
-            if (!user) {
-              localStorage.setItem('prompt', value)
-              snap.setLoginDialogOpen(true)
-              return
-            }
-            if (value.length > 0) {
-              mutate(value)
-            }
-          }}
+        <AssistantCommandsPopover
+          open={commandsOpen}
+          setOpen={setCommandsOpen}
+          textAreaRef={textAreaRef}
           value={value}
-          placeholder="e.g Create a Telegram-like chat application"
-          disabled={isPending || isSuccess}
-          loading={isPending || isSuccess}
-          onValueChange={(e) => setValue(e.target.value)}
-        />
+          setValue={(e) => setValue(e)}
+        >
+          <AssistantChatForm
+            textAreaRef={textAreaRef}
+            key={'new-thread-form'}
+            id={'new-thread-form'}
+            commandsOpen={commandsOpen}
+            setCommandsOpen={setCommandsOpen}
+            onSubmit={async (event) => {
+              event.preventDefault()
+
+              const {
+                data: { user },
+              } = await supabase.auth.getUser()
+
+              if (!user) {
+                localStorage.setItem('prompt', value)
+                snap.setLoginDialogOpen(true)
+                return
+              }
+              if (value.length > 0) {
+                mutate(value)
+              }
+            }}
+            value={value}
+            placeholder="e.g Create a Telegram-like chat application"
+            disabled={isPending || isSuccess}
+            loading={isPending || isSuccess}
+            onValueChange={(e) => setValue(e.target.value)}
+          />
+        </AssistantCommandsPopover>
       </div>
       <div className="flex gap-3">
         {suggestions.map((suggestion, idx) => (

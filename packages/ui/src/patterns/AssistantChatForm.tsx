@@ -4,17 +4,29 @@ import { TextArea } from '../components/shadcn/ui/text-area'
 import { cn } from '../lib/utils'
 
 export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
+  textAreaRef: React.RefObject<HTMLTextAreaElement>
   loading: boolean
   disabled?: boolean
   value?: string
   onValueChange: (value: ChangeEvent<HTMLTextAreaElement>) => void
+  commandsOpen?: boolean
+  setCommandsOpen?: (value: boolean) => void
 }
 
 const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
-  ({ loading, disabled, value, onValueChange, ...props }, ref) => {
-    const textAreaRef = createRef<HTMLTextAreaElement>()
-    const submitRef = createRef<HTMLButtonElement>()
-
+  (
+    {
+      loading,
+      disabled,
+      value,
+      onValueChange,
+      textAreaRef,
+      commandsOpen,
+      setCommandsOpen,
+      ...props
+    },
+    ref
+  ) => {
     useEffect(() => {
       if (textAreaRef) {
         console.log('needs to resize')
@@ -35,16 +47,25 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
       // Check if the pressed key is "Enter" (key code 13) without the "Shift" key
-      if (event.key === 'Enter' && !event.shiftKey) {
+      // also checks if the commands popover is open
+      if (event.key === 'Enter' && !event.shiftKey && !commandsOpen) {
         event.preventDefault()
         if (submitRef.current) {
           submitRef.current.click()
         }
       }
+
+      // handles closing the commands popover if open
+      if (event.key === 'Enter' && commandsOpen) {
+        if (setCommandsOpen) setCommandsOpen(false)
+      }
     }
 
+    const formRef = createRef<HTMLFormElement>()
+    const submitRef = createRef<HTMLButtonElement>()
+
     return (
-      <form ref={ref} className="relative" {...props}>
+      <form ref={formRef} className="relative" {...props}>
         <div className={cn('absolute', 'top-2 left-2', 'ml-1 w-6 h-6 rounded-full bg-dbnew')}></div>
         <TextArea
           ref={textAreaRef}
