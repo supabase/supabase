@@ -4,7 +4,7 @@ title: Upgrade to supabase_flutter v2
 description: 'Learn how to upgrade to supabase_flutter v2.'
 ---
 
-Although supabase_flutter v2 brings a few breaking changes, for the most part the public API should be the same. 
+Although supabase_flutter v2 brings a few breaking changes, for the most part the public API should be the same with a few minor exceptions. 
 We have brought numerous updates behind the scenes to make the SDK work more intuitively for Flutter and Dart developers. 
 
 ## Upgrade the client library
@@ -390,15 +390,13 @@ final initialSession = await supabase.auth.currentSession;
 
 ### Data methods
 
-`.insert()` / `.upsert()` / `.update()` / `.delete()` don't return rows by default: [PR](https://github.com/supabase/postgrest-js/pull/276).
-
-Previously, these methods return inserted/updated/deleted rows by default (which caused [some confusion](https://github.com/supabase/supabase/discussions/1548)), and you can opt to not return it by specifying `returning: 'minimal'`. Now the default behavior is to not return rows. To return inserted/updated/deleted rows, add a `.select()` call at the end.
-
 <RefSubLayout.EducationRow>
   <RefSubLayout.Details>
 
 #### Insert and return data
 
+We made the query builder immutable, which means you can reuse the same query object to chain multiple filters and get the expected outcome. 
+
   </RefSubLayout.Details>
   <RefSubLayout.Examples>
 
@@ -411,18 +409,25 @@ Previously, these methods return inserted/updated/deleted rows by default (which
 >
 <TabPanel id="1.0x" label="Before">
 ```dart
-const { data, error } = await supabase
-  .from('my_table')
-  .insert({ new_data })
+// If you declare a query and chain filters on it
+final myQuery = supabase.from('my_table').select();
+
+final foo = await myQuery.eq('some_col', 'foo');
+
+// The `eq` filter above is applied in addition to the following filter
+final bar = await myQuery.eq('another_col', 'bar');
 ```
 
 </TabPanel>
 <TabPanel id="2.0x" label="After">
 ```dart
-const { data, error } = await supabase
-  .from('my_table')
-  .insert({ new_data })
-  .select()
+// Now you can declare a query and reuse it.
+final myQuery = supabase.from('my_table').select();
+
+final foo = await myQuery.eq('some_col', 'foo');
+
+// The `eq` filter above is not applied to the following result
+final bar = await myQuery.eq('another_col', 'bar');
 ```
 
 </TabPanel>
@@ -434,7 +439,11 @@ const { data, error } = await supabase
 <RefSubLayout.EducationRow>
   <RefSubLayout.Details>
 
-#### Update and return data
+#### Renaming is and in filter
+
+PostgREST, the underlying open source tool that Supabase use to generate APIs, provides `is` and `in` filter.
+Because both `is` and `in` were [reserved keywords](https://dart.dev/language/keywords) in Dart, we had to rename them to `is_` and `in_` in v1.
+After hearing that the underscore suffix was confusing, we have renamed them to `isFilter` and `inFilter` in v2.
 
   </RefSubLayout.Details>
   <RefSubLayout.Examples>
@@ -448,20 +457,29 @@ const { data, error } = await supabase
 >
 <TabPanel id="1.0x" label="Before">
 ```dart
-const { data, error } = await supabase
-  .from('my_table')
-  .update({ new_data })
-  .eq('id', id)
+final data = await supabase
+    .from('users')
+    .select()
+    .is_('status', null);
+
+final data = await supabase
+    .from('users')
+    .select()
+    .in_('status', ['ONLINE', 'OFFLINE']);
 ```
 
 </TabPanel>
 <TabPanel id="2.0x" label="After">
 ```dart
-const { data, error } = await supabase
-  .from('my_table')
-  .update({ new_data })
-  .eq('id', id)
-  .select()
+final data = await supabase
+    .from('users')
+    .select()
+    .isFilter('status', null);
+
+final data = await supabase
+    .from('users')
+    .select()
+    .inFilter('status', ['ONLINE', 'OFFLINE']);
 ```
 
 </TabPanel>
@@ -473,7 +491,11 @@ const { data, error } = await supabase
 <RefSubLayout.EducationRow>
   <RefSubLayout.Details>
 
-#### Upsert and return data
+#### PostgREST error codes
+
+`PostgrestException` instance thrown by the API methods has a `code` property. In v1, the `code` property contained the http status code, which was not very useful.
+
+In v2, the `code` property contains the [PostgREST error code](https://postgrest.org/en/stable/references/errors.html), which is more useful for debugging.
 
   </RefSubLayout.Details>
   <RefSubLayout.Examples>
@@ -487,57 +509,21 @@ const { data, error } = await supabase
 >
 <TabPanel id="1.0x" label="Before">
 ```dart
-const { data, error } = await supabase
-  .from('my_table')
-  .upsert({ new_data })
+try {
+  await supabase.from('countries').select();
+} on PostgrestException catch (error) {
+  error.code; // Contains http status code
+}
 ```
 
 </TabPanel>
 <TabPanel id="2.0x" label="After">
 ```dart
-const { data, error } = await supabase
-  .from('my_table')
-  .upsert({ new_data })
-  .select()
-```
-
-</TabPanel>
-</Tabs>
-
-  </RefSubLayout.Examples>
-</RefSubLayout.EducationRow>
-
-<RefSubLayout.EducationRow>
-  <RefSubLayout.Details>
-
-#### Delete and return data
-
-  </RefSubLayout.Details>
-  <RefSubLayout.Examples>
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="1.0x"
-  queryGroup="version"
->
-<TabPanel id="1.0x" label="Before">
-```dart
-const { data, error } = await supabase
-  .from('my_table')
-  .delete()
-  .eq('id', id)
-```
-
-</TabPanel>
-<TabPanel id="2.0x" label="After">
-```dart
-const { data, error } = await supabase
-  .from('my_table')
-  .delete()
-  .eq('id', id)
-  .select()
+try {
+  await supabase.from('countries').select();
+} on PostgrestException catch (error) {
+  error.code; // Contains PostgREST error code
+}
 ```
 
 </TabPanel>
@@ -548,10 +534,21 @@ const { data, error } = await supabase
 
 ### Realtime methods
 
+Realtime methods contains the biggest breaking changes. Most of these changes are to make the interface more type safe. 
+
+We have removed the `.on()` method and replaced it with `.onPostgresChanges()`, `.onBroadcast()`, and `.onPresence()` for respective realtime functionalities.
+
 <RefSubLayout.EducationRow>
   <RefSubLayout.Details>
 
-#### Subscribe
+#### Postgres Changes
+
+Newly introduced `.onPostgresChanges()` method is used to listen to realtime changes in the database.
+
+Applying filters to the Postgres Changes was not streight forward in v1 as the `filter` property of `ChannelFilter` took a `String` type.
+With v2, the filter can be applied in a type safe way as well providing a more error prune interface.
+
+We also return the `payload` as a `PostgresChangePayload` object, which contains the `newRecord` and `oldRecord` properties as well as other properties that were all returned as `dynamic` in v1. 
 
   </RefSubLayout.Details>
   <RefSubLayout.Examples>
@@ -566,22 +563,37 @@ const { data, error } = await supabase
 <TabPanel id="1.0x" label="Before">
 
 ```dart
-const userListener = supabase
-  .from('users')
-  .on('*', (payload) => handleAllEventsPayload(payload.new))
-  .subscribe()
+  supabase.channel('my_channel').on(
+      RealtimeListenTypes.postgresChanges,
+      ChannelFilter(
+          event: '*',
+          schema: 'public',
+          table: 'messages',
+          filter: 'room_id=eq.200'), (dynamic payload, [ref]) {
+    final Map<String, dynamic> newRecord = payload['new'];
+    final Map<String, dynamic> oldRecord = payload['old'];
+  }).subscribe();
 ```
 
 </TabPanel>
 <TabPanel id="2.0x" label="After">
 
 ```dart
-const userListener = supabase
-  .channel('public:user')
-  .on('postgres_changes', { event: '*', schema: 'public', table: 'user' }, (payload) =>
-    handleAllEventsPayload()
-  )
-  .subscribe()
+supabase.channel('my_channel')
+    .onPostgresChanges(
+        event: PostgresChangeEvent.all,
+        schema: 'public',
+        table: 'messages',
+        filter: PostgresChangeFilter(
+          type: PostgresChangeFilterType.eq,
+          column: 'room_id',
+          value: 200,
+        ),
+        callback: (PostgresChangePayload payload) {
+          final Map<String, dynamic> newRecord = payload.newRecord;
+          final Map<String, dynamic> oldRecord = payload.oldRecord;
+        })
+    .subscribe();
 ```
 
 </TabPanel>
@@ -593,7 +605,10 @@ const userListener = supabase
 <RefSubLayout.EducationRow>
   <RefSubLayout.Details>
 
-#### Unsubscribe
+#### Broadcast
+
+Because realtime postgres changes, broadcast, and presence all shared the common interface, `.on()`, there were a lot of unnecessary properties that could be passed when using broadcast.
+With v2, we now have a dedicated method `.onBroadcast()` which slims down the public interface to what is only necessary.
 
   </RefSubLayout.Details>
   <RefSubLayout.Examples>
@@ -608,14 +623,76 @@ const userListener = supabase
 <TabPanel id="1.0x" label="Before">
 
 ```dart
-userListener.unsubscribe()
+supabase.channel('my_channel').on(
+    RealtimeListenTypes.broadcast,
+    ChannelFilter(
+      event: 'position',
+    ), (dynamic payload, [ref]) {
+  print(payload);
+}).subscribe();
 ```
 
 </TabPanel>
 <TabPanel id="2.0x" label="After">
 
 ```dart
-supabase.removeChannel(userListener)
+supabase
+    .channel('my_channel')
+    .onBroadcast(
+        event: 'position',
+        callback: (Map<String, dynamic> payload) {
+          print(payload);
+        })
+    .subscribe();
+```
+
+</TabPanel>
+</Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+#### Presence
+
+
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="1.0x"
+  queryGroup="version"
+>
+<TabPanel id="1.0x" label="Before">
+
+```dart
+supabase.channel('my_channel').on(
+    RealtimeListenTypes.broadcast,
+    ChannelFilter(
+      event: 'position',
+    ), (dynamic payload, [ref]) {
+  print(payload);
+}).subscribe();
+```
+
+</TabPanel>
+<TabPanel id="2.0x" label="After">
+
+```dart
+supabase
+    .channel('my_channel')
+    .onBroadcast(
+        event: 'position',
+        callback: (Map<String, dynamic> payload) {
+          print(payload);
+        })
+    .subscribe();
 ```
 
 </TabPanel>
