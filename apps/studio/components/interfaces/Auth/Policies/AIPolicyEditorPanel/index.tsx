@@ -3,7 +3,15 @@ import dynamic from 'next/dynamic'
 import { ThreadMessage } from 'openai/resources/beta/threads/messages/messages'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
-import { Button, Modal, SidePanel } from 'ui'
+import {
+  Button,
+  Modal,
+  SheetContent_Shadcn_,
+  SheetFooter_Shadcn_,
+  Sheet_Shadcn_,
+  SidePanel,
+  cn,
+} from 'ui'
 
 import {
   IStandaloneCodeEditor,
@@ -251,122 +259,122 @@ export const AIPolicyEditorPanel = memo(function ({
   }, [data?.status])
 
   return (
-    <SidePanel
-      size={assistantVisible ? 'xxxxlarge' : 'large'}
-      visible={visible}
-      disabled
-      hideFooter
-      onCancel={onClosingPanel}
-    >
-      <div className="flex flex-row h-full">
-        <div className="flex flex-col w-screen max-w-2xl h-full border max-h-screen">
-          <AIPolicyHeader
-            assistantVisible={assistantVisible}
-            setAssistantVisible={setAssistantPanel}
-          />
+    <>
+      <Sheet_Shadcn_ open={visible} onOpenChange={() => onClosingPanel()}>
+        <SheetContent_Shadcn_
+          size={assistantVisible ? 'lg' : 'default'}
+          className={cn('p-0 flex flex-row', assistantVisible && '!min-w-[1024px]')}
+        >
+          <div className={cn('flex flex-col grow w-full', assistantVisible && 'w-[60%]')}>
+            <AIPolicyHeader
+              assistantVisible={assistantVisible}
+              setAssistantVisible={setAssistantPanel}
+            ></AIPolicyHeader>
+            <div className="flex flex-col h-full w-full justify-between">
+              {incomingChange ? (
+                <div className="px-5 py-3 flex justify-between gap-3 bg-muted">
+                  <div className="flex gap-2 items-center text-foreground-light">
+                    <FileDiff className="h-4 w-4" />
+                    <span className="text-sm">Apply changes from assistant</span>
+                  </div>
+                  <div className="flex gap-3">
+                    <Button type="default" onClick={() => setIncomingChange(undefined)}>
+                      Discard
+                    </Button>
+                    <Button type="primary" onClick={() => acceptChange()}>
+                      Apply
+                    </Button>
+                  </div>
+                </div>
+              ) : null}
 
-          {incomingChange ? (
-            <div className="px-5 py-3 flex justify-between gap-3 bg-muted">
-              <div className="flex gap-2 items-center text-foreground-light">
-                <FileDiff className="h-4 w-4" />
-                <span className="text-sm">Apply changes from assistant</span>
-              </div>
-              <div className="flex gap-3">
-                <Button type="default" onClick={() => setIncomingChange(undefined)}>
-                  Discard
-                </Button>
-                <Button type="primary" onClick={() => acceptChange()}>
-                  Apply
-                </Button>
-              </div>
-            </div>
-          ) : null}
-
-          <div className="grow">
-            {incomingChange ? (
-              <DiffEditor
-                theme="supabase"
-                language="pgsql"
-                original={editorRef.current?.getValue()}
-                modified={incomingChange}
-                onMount={(editor) => (diffEditorRef.current = editor)}
-                options={{
-                  renderSideBySide: false,
-                  scrollBeyondLastLine: false,
-                  renderOverviewRuler: false,
+              {incomingChange ? (
+                <DiffEditor
+                  theme="supabase"
+                  language="pgsql"
+                  className="flex grow"
+                  original={editorRef.current?.getValue()}
+                  modified={incomingChange}
+                  onMount={(editor) => (diffEditorRef.current = editor)}
+                  options={{
+                    renderSideBySide: false,
+                    scrollBeyondLastLine: false,
+                    renderOverviewRuler: false,
+                  }}
+                />
+              ) : null}
+              {/* this editor has to rendered at all times to not lose its editing history */}
+              <div
+                // [Joshen] Not the cleanest but its to force the editor to re-render its height
+                // for now, till we can find a better solution
+                className={`relative ${incomingChange ? 'hidden' : 'block'}`}
+                style={{
+                  height:
+                    error === undefined
+                      ? 'calc(100vh - 67px - 59px)'
+                      : `calc(100vh - 67px - 155px - ${20 * errorLines}px)`,
                 }}
-              />
-            ) : null}
-            {/* this editor has to rendered at all times to not lose its editing history */}
-            <div
-              // [Joshen] Not the cleanest but its to force the editor to re-render its height
-              // for now, till we can find a better solution
-              className={`relative ${incomingChange ? 'hidden' : 'block'}`}
-              style={{
-                height:
-                  error === undefined
-                    ? 'calc(100vh - 67px - 59px)'
-                    : `calc(100vh - 67px - 155px - ${20 * errorLines}px)`,
-              }}
-            >
-              <RLSCodeEditor
-                id="rls-sql-policy"
-                wrapperClassName={incomingChange ? '!hidden' : ''}
-                defaultValue={''}
-                editorRef={editorRef}
-              />
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-y-4 p-4 bg-overlay border-t border-overlay w-full">
-            {error !== undefined && <QueryError error={error} onSelectDebug={onSelectDebug} />}
-            <div className="flex justify-end gap-x-2">
-              <Button type="default" disabled={isExecuting} onClick={() => onSelectCancel()}>
-                Cancel
-              </Button>
-              <Button
-                loading={isExecuting}
-                htmlType="submit"
-                disabled={isExecuting || incomingChange !== undefined}
-                onClick={() => createNewPolicy()}
               >
-                Save policy
-              </Button>
+                <RLSCodeEditor
+                  id="rls-sql-policy"
+                  wrapperClassName={incomingChange ? '!hidden' : ''}
+                  defaultValue={''}
+                  editorRef={editorRef}
+                />
+              </div>
+
+              <div className="flex flex-col">
+                {error !== undefined && <QueryError error={error} onSelectDebug={onSelectDebug} />}
+                <SheetFooter_Shadcn_ className="flex flex-col gap-12 px-5 py-4 w-full">
+                  <div className="flex justify-end gap-x-2">
+                    <Button type="default" disabled={isExecuting} onClick={() => onSelectCancel()}>
+                      Cancel
+                    </Button>
+                    <Button
+                      loading={isExecuting}
+                      htmlType="submit"
+                      disabled={isExecuting || incomingChange !== undefined}
+                      onClick={() => createNewPolicy()}
+                    >
+                      Save policy
+                    </Button>
+                  </div>
+                </SheetFooter_Shadcn_>
+              </div>
             </div>
           </div>
-        </div>
+          {assistantVisible && (
+            <div className={cn('flex border-l grow w-full', assistantVisible && 'w-[40%]')}>
+              <AIPolicyChat
+                messages={messages}
+                onSubmit={(message: string) => addPrompt(message)}
+                onDiff={onDiff}
+                onChange={setIsAssistantChatInputEmpty}
+                loading={loading || data?.status === 'loading'}
+              />
+            </div>
+          )}
 
-        {assistantVisible && (
-          <div className="w-full bg-surface-200">
-            <AIPolicyChat
-              messages={messages}
-              onSubmit={(message: string) => addPrompt(message)}
-              onDiff={onDiff}
-              onChange={setIsAssistantChatInputEmpty}
-              loading={loading || data?.status === 'loading'}
-            />
-          </div>
-        )}
-      </div>
-
-      <ConfirmationModal
-        visible={isClosingPolicyEditorPanel}
-        header="Discard changes"
-        buttonLabel="Discard"
-        onSelectCancel={() => setIsClosingPolicyEditorPanel(false)}
-        onSelectConfirm={() => {
-          onSelectCancel()
-          setIsClosingPolicyEditorPanel(false)
-        }}
-      >
-        <Modal.Content>
-          <p className="py-4 text-sm text-foreground-light">
-            Are you sure you want to close the editor? Any unsaved changes on your policy and
-            conversations with the Assistant will be lost.
-          </p>
-        </Modal.Content>
-      </ConfirmationModal>
-    </SidePanel>
+          <ConfirmationModal
+            visible={isClosingPolicyEditorPanel}
+            header="Discard changes"
+            buttonLabel="Discard"
+            onSelectCancel={() => setIsClosingPolicyEditorPanel(false)}
+            onSelectConfirm={() => {
+              onSelectCancel()
+              setIsClosingPolicyEditorPanel(false)
+            }}
+          >
+            <Modal.Content>
+              <p className="py-4 text-sm text-foreground-light">
+                Are you sure you want to close the editor? Any unsaved changes on your policy and
+                conversations with the Assistant will be lost.
+              </p>
+            </Modal.Content>
+          </ConfirmationModal>
+        </SheetContent_Shadcn_>
+      </Sheet_Shadcn_>
+    </>
   )
 })
 

@@ -72,7 +72,7 @@ export const AIPolicyChat = ({
   }, [formChatValue])
 
   return (
-    <div className="flex flex-col h-full">
+    <div id={'ai-chat-assistant'} className="flex flex-col h-full">
       <div className="overflow-auto flex-1">
         <Message
           role="assistant"
@@ -122,6 +122,7 @@ export const AIPolicyChat = ({
                       {...field}
                       autoComplete="off"
                       disabled={loading}
+                      autoFocus
                       className={`bg-surface-300 dark:bg-black rounded-full pl-10 ${
                         loading ? 'pr-10' : ''
                       }`}
