@@ -10,6 +10,7 @@ import { AssistantMessage, PostgresTable } from '@/lib/types'
 import { parseTables } from '@/lib/utils'
 import { useAppStateSnapshot } from '@/lib/state'
 import { cn } from 'ui'
+import { Loader2 } from 'lucide-react'
 
 export default function ThreadPage() {
   const router = useRouter()
@@ -66,8 +67,16 @@ export default function ThreadPage() {
         'flex grow max-h-screen items-center justify-between bg-alternative h-full'
       )}
     >
-      <SchemaGraph tables={tables} />
-      <CodeEditor content={content} threadIsLoading={threadIsLoading} />
+      {threadIsLoading ? (
+        <div className="flex items-center justify-center h-full">
+          <Loader2 className="animate-spin opacity-30" />
+        </div>
+      ) : (
+        <>
+          <SchemaGraph tables={tables} threadIsLoading={threadIsLoading} />
+          <CodeEditor content={content} threadIsLoading={threadIsLoading} />
+        </>
+      )}
     </div>
   )
 }
