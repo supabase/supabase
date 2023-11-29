@@ -9,24 +9,19 @@ export const meta = {
   breadcrumb: 'AI Integrations',
 }
 
-This guide will walk you through a basic example using [Roboflow Inference](https://inference.roboflow.com) to run inference on fine-tuned and foundation models. We will run inference and save predictions using an object detection model and [CLIP](https://github.com/openai/CLIP).
-
-For this tutorial, we have prepared two notebooks:
-
-1. Save computer vision model predictions in Supabase
-2. Calculate and save CLIP embeddings in Supabase
+In this guide, we will walk through two examples of using [Roboflow Inference](https://inference.roboflow.com) to run fine-tuned and foundation models. We will run inference and save predictions using an object detection model and [CLIP](https://github.com/openai/CLIP).
 
 <DatabaseSetup />
 
 ## Save Computer Vision Predictions
 
-Once you have a trained vision model, you need to create business logic for your application. In many cases, you may want to save inference results to a file. 
+Once you have a trained vision model, you need to create business logic for your application. In many cases, you want to save inference results to a file. 
 
-Let's talk through how to run a vision model locally and save predictions to Supabase.
+The steps below show you how to run a vision model locally and save predictions to Supabase.
 
 ### Preparation: Set up a Model
 
-Before we begin, you will need an object detection model trained on your data.
+Before you begin, you will need an object detection model trained on your data.
 
 You can [train a model on Roboflow](https://blog.roboflow.com/getting-started-with-roboflow/), leveraging end-to-end tools from data management and annotation to deployment, or [upload custom model weights](https://docs.roboflow.com/deploy/upload-custom-weights) for deployment.
 
@@ -36,7 +31,7 @@ For this guide, we will use a demo [rock, paper, scissors](https://universe.robo
 
 ### Step 1: Install and Start Roboflow Inference
 
-We will deploy our model locally using Roboflow Inference, a computer vision inference server.
+You will deploy our model locally using Roboflow Inference, a computer vision inference server.
 
 To install and start Roboflow Inference, first install Docker on your machine.
 
@@ -53,8 +48,6 @@ An inference server will be available at `http://localhost:9001`.
 You can run inference on images and videos. Let's run inference on an image.
 
 Create a new Python file and add the following code:
-
-from inference_sdk import InferenceHTTPClient
 
 ```python
 from inference_sdk import InferenceHTTPClient
