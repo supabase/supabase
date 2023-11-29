@@ -24,14 +24,9 @@ const BranchingWaitlistPopover = ({ isNewNav = false }: BranchingWaitlistPopover
           Enable branching
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_
-        align="start"
-        side="bottom"
-        className="space-y-4 w-80"
-        style={{ marginLeft: '-18px' }}
-      >
+      <PopoverContent_Shadcn_ align="start" side="bottom" className="flex flex-col gap-4 w-80">
         <Badge color="scale">Alpha Testing</Badge>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-2">
           <IconGitBranch strokeWidth={2} />
           <p>Database Branching</p>
         </div>
@@ -39,7 +34,7 @@ const BranchingWaitlistPopover = ({ isNewNav = false }: BranchingWaitlistPopover
           Register for early access and you'll be contacted by email when your organization is
           enrolled in database branching.
         </p>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-2">
           <Button asChild>
             <Link
               href="https://forms.supabase.com/branching-request"

@@ -13,8 +13,7 @@ const HamburgerButton = (props: HamburgerButtonProps) => (
   >
     <button
       className={cn(
-        'text-foreground-lighter focus:ring-brand bg-background hover:bg-surface-100 inline-flex items-center justify-center rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-inset',
-        props.showLaunchWeekNavMode && '!bg-transparent border border-[#be9eea]'
+        'text-foreground-lighter focus:ring-brand bg-background hover:bg-surface-100 inline-flex items-center justify-center rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-inset'
       )}
       aria-expanded="false"
     >
@@ -25,7 +24,7 @@ const HamburgerButton = (props: HamburgerButtonProps) => (
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
-        stroke={props.showLaunchWeekNavMode ? '#be9eea' : 'currentColor'}
+        stroke="currentColor"
         aria-hidden="true"
       >
         <path
