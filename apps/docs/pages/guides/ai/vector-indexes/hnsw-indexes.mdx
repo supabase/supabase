@@ -55,15 +55,12 @@ The hierarchical aspect of HNSW builds off of the idea of skip lists.
 Skip lists are multi-layer linked lists. The bottom layer is a regular linked list connecting an ordered sequence of elements. Each new layer above removes some elements from the underlying layer (based on a fixed probability), producing a sparser subsequence that “skips” over elements.
 
 <div>
-  <img
-    alt="visual of an example skip list (light)"
-    className="dark:hidden"
-    src="/docs/img/ai/vector-indexes/hnsw-indexes/skip-list--light.png"
-  />
-  <img
-    alt="visual of an example skip list (dark)"
-    className="hidden dark:block"
-    src="/docs/img/ai/vector-indexes/hnsw-indexes/skip-list--dark.png"
+  <Image
+    alt="visual of an example skip list"
+    src={{
+      light: '/docs/img/ai/vector-indexes/hnsw-indexes/skip-list--light.png',
+      dark: '/docs/img/ai/vector-indexes/hnsw-indexes/skip-list--dark.png',
+    }}
   />
 </div>
 

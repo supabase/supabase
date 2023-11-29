@@ -20,10 +20,14 @@ const ResourceContent = ({
 }: any) => {
   const { ref } = useParams()
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
+  const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
+
   const endpoint =
     customDomainData?.customDomain?.status === 'active'
       ? `https://${customDomainData.customDomain.hostname}`
       : autoApiService.endpoint
+
+  if (!paths || !definitions) return null
 
   const keyToShow = !!showApiKey ? showApiKey : 'SUPABASE_KEY'
   const resourcePaths = paths[`/${resourceId}`]
@@ -37,14 +41,10 @@ const ResourceContent = ({
     required: resourceDefinition?.required?.includes(id),
   }))
 
-  const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
-
-  if (!paths || !definitions) return null
-
   return (
     <>
       <h2 className="doc-section__table-name text-foreground mt-0 flex items-center px-6 gap-2">
-        <span className="bg-slate-300 dark:bg-slate-400 p-2 rounded-lg">
+        <span className="bg-slate-300 p-2 rounded-lg">
           <IconTable size="small" />
         </span>
         <span className="text-2xl font-bold">{resourceId}</span>

@@ -842,7 +842,7 @@ functions:
           }
         hideCodeBlock: true
       - id: query-foreign-tables
-        name: Query foreign tables
+        name: Query referenced tables
         description: |
           If your database has foreign key relationships, you can query related tables too.
         code: |
@@ -917,7 +917,7 @@ functions:
           }
 
       - id: query-foreign-tables-through-a-join-table
-        name: Query foreign tables through a join table
+        name: Query referenced tables through a join table
         data:
           sql: |
             create table
@@ -998,9 +998,9 @@ functions:
               `)
             ```
       - id: query-the-same-foreign-table-multiple-times
-        name: Query the same foreign table multiple times
+        name: Query the same referenced table multiple times
         description: |
-          If you need to query the same foreign table twice, use the name of the
+          If you need to query the same referenced table twice, use the name of the
           joined column to identify which join to use. You can also give each
           column an alias.
 
@@ -1068,9 +1068,9 @@ functions:
           </Tabs>
         hideCodeBlock: true
       - id: filtering-through-foreign-tables
-        name: Filtering through foreign tables
+        name: Filtering through referenced tables
         description: |
-          If the filter on a foreign table's column is not satisfied, the foreign
+          If the filter on a referenced table's column is not satisfied, the referenced
           table returns `[]` or `null` but the parent table is not filtered out.
 
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
@@ -2206,9 +2206,9 @@ functions:
       </TabPanel>
       </Tabs>
 
-      ### Filter Foreign Tables
+      ### Filter Referenced Tables
 
-      You can filter on foreign tables in your `select()` query using dot
+      You can filter on referenced tables in your `select()` query using dot
       notation:
 
       <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
@@ -4005,7 +4005,7 @@ functions:
           </Tabs>
         hideCodeBlock: true
       - id: use`or`on-foreign-tables
-        name: Use `or` on foreign tables
+        name: Use `or` on referenced tables
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -4137,7 +4137,7 @@ functions:
             .filter('name', 'in', '("Algeria","Japan")')
           ```
       - id: on-a-foreign-table
-        name: On a foreign table
+        name: On a referenced table
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">
@@ -4373,9 +4373,9 @@ functions:
             .order('id', { ascending: false })
           ```
       - id: on-a-foreign-table
-        name: On a foreign table
+        name: On a referenced table
         description: |
-          Ordering on foreign tables doesn't affect the ordering of
+          Ordering on referenced tables doesn't affect the ordering of
           the parent table.
 
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
@@ -4507,7 +4507,7 @@ functions:
             .limit(1)
           ```
       - id: on-a-foreign-table
-        name: On a foreign table
+        name: On a referenced table
         description: |
           <Tabs scrollable size="small" type="underlined" defaultActiveId="schema">
           <TabPanel id="schema" label="Schema">

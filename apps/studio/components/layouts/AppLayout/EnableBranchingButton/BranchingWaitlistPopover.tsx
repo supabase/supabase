@@ -3,6 +3,7 @@ import { useState } from 'react'
 import {
   Badge,
   Button,
+  IconExternalLink,
   IconGitBranch,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -23,14 +24,9 @@ const BranchingWaitlistPopover = ({ isNewNav = false }: BranchingWaitlistPopover
           Enable branching
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_
-        align="start"
-        side="bottom"
-        className="space-y-4 w-80"
-        style={{ marginLeft: '-18px' }}
-      >
+      <PopoverContent_Shadcn_ align="start" side="bottom" className="flex flex-col gap-4 w-80">
         <Badge color="scale">Alpha Testing</Badge>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-2">
           <IconGitBranch strokeWidth={2} />
           <p>Database Branching</p>
         </div>
@@ -38,7 +34,7 @@ const BranchingWaitlistPopover = ({ isNewNav = false }: BranchingWaitlistPopover
           Register for early access and you'll be contacted by email when your organization is
           enrolled in database branching.
         </p>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-2">
           <Button asChild>
             <Link
               href="https://forms.supabase.com/branching-request"
@@ -48,11 +44,15 @@ const BranchingWaitlistPopover = ({ isNewNav = false }: BranchingWaitlistPopover
               Join waitlist
             </Link>
           </Button>
-          {/* <Link passHref href={'/'}>
-            <a rel="noreferrer" target="_blank">
-              <Button type="default">View the docs</Button>
-            </a>
-          </Link> */}
+          <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+            <Link
+              target="_blank"
+              rel="noreferrer"
+              href="https://supabase.com/docs/guides/platform/branching"
+            >
+              View the docs
+            </Link>
+          </Button>
         </div>
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>

@@ -105,9 +105,7 @@ export const ResponseCodeFormatter = ({ value }: any) => {
 
             "
           >
-            <label className="block font-mono text-sm text-amber-1100 dark:text-amber-900">
-              {value}
-            </label>
+            <label className="block font-mono text-sm text-amber-1100">{value}</label>
           </div>
         </div>
       )

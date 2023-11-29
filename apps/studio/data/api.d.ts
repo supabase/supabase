@@ -168,9 +168,13 @@ export interface paths {
     /** Gets daily organization stats */
     get: operations['OrgDailyStatsController_getDailyStats']
   }
+  '/platform/organizations/{slug}/daily-stats/compute': {
+    /** Gets daily organization stats for compute */
+    get: operations['OrgDailyStatsController_getDailyStatsCompute']
+  }
   '/platform/organizations/{slug}/usage': {
     /** Gets usage stats */
-    get: operations['OrgUsageController_getDailyStats']
+    get: operations['OrgUsageController_getOrgUsage']
   }
   '/platform/organizations/{slug}/documents/standard-security-questionnaire': {
     /** Get standard security questionnaire URL */
@@ -888,7 +892,7 @@ export interface paths {
   }
   '/system/organizations/{slug}/usage': {
     /** Gets usage stats */
-    get: operations['OrgUsageSystemController_getDailyStats']
+    get: operations['OrgUsageSystemController_getOrgUsage']
   }
   '/system/organizations/{slug}/billing/subscription': {
     /** Gets the current subscription */
@@ -1668,10 +1672,6 @@ export interface paths {
     /** Starts Fly single sign on */
     get: operations['ExtensionController_startFlyioSSO']
   }
-  '/partners/flyio/extensions/{extension_id}/billing': {
-    /** Gets resource billing */
-    get: operations['ExtensionController_getResourceBilling']
-  }
   '/partners/flyio/extensions': {
     /** Creates a database */
     post: operations['ExtensionsController_provisionResource']
@@ -1683,6 +1683,10 @@ export interface paths {
   '/partners/flyio/organizations/{organization_id}/sso': {
     /** Starts Fly single sign on */
     get: operations['OrganizationsController_startFlyioSSO']
+  }
+  '/partners/flyio/organizations/{organization_id}/billing': {
+    /** Gets the organizations current unbilled charges */
+    get: operations['FlyBillingController_getResourceBilling']
   }
 }
 
@@ -1719,6 +1723,11 @@ export interface components {
       name: string
       data: Record<string, never>
       meta: Record<string, never>
+    }
+    UpdateNotificationBodyV2: {
+      id: string
+      /** @enum {string} */
+      status: 'new' | 'seen' | 'archived'
     }
     ResetPasswordBody: {
       email: string
@@ -1786,6 +1795,7 @@ export interface components {
       SMTP_MAX_FREQUENCY: number
       SMTP_SENDER_NAME?: string
       MAILER_AUTOCONFIRM: boolean
+      MAILER_ALLOW_UNVERIFIED_EMAIL_SIGN_INS: boolean
       MAILER_SUBJECTS_INVITE: string
       MAILER_SUBJECTS_CONFIRMATION: string
       MAILER_SUBJECTS_RECOVERY: string
@@ -1917,6 +1927,7 @@ export interface components {
       SMTP_PASS_ENCRYPTED?: string | null
       SMTP_MAX_FREQUENCY?: number
       SMTP_SENDER_NAME?: string
+      MAILER_ALLOW_UNVERIFIED_EMAIL_SIGN_INS?: boolean
       MAILER_AUTOCONFIRM?: boolean
       MAILER_SUBJECTS_INVITE?: string
       MAILER_SUBJECTS_CONFIRMATION?: string
@@ -2051,6 +2062,7 @@ export interface components {
       SMTP_MAX_FREQUENCY: number
       SMTP_SENDER_NAME?: string
       MAILER_AUTOCONFIRM: boolean
+      MAILER_ALLOW_UNVERIFIED_EMAIL_SIGN_INS: boolean
       MAILER_SUBJECTS_INVITE: string
       MAILER_SUBJECTS_CONFIRMATION: string
       MAILER_SUBJECTS_RECOVERY: string
@@ -2218,7 +2230,6 @@ export interface components {
       inserted_at: string
     }
     BackupsResponse: {
-      tierId: string
       tierKey: string
       region: string
       walg_enabled: boolean
@@ -4694,48 +4705,6 @@ export interface components {
         | 'UPGRADING'
         | 'PAUSING'
     }
-    ResourceBillingItem: {
-      /**
-       * @description Non-Unique identifier of the item
-       * @example usage_egress
-       */
-      itemIdentifier: string
-      /**
-       * @description Descriptive name of the billing item
-       * @example Pro Plan
-       */
-      itemName: string
-      /** @enum {string} */
-      type: 'usage' | 'plan' | 'addon' | 'proration'
-      /**
-       * @description In case of a usage item, the free usage included in the customers plan
-       * @example 100
-       */
-      freeUnitsInPlan?: number
-      /**
-       * @description In case of a usage item, the total usage
-       * @example 100
-       */
-      usageTotal?: number
-      /**
-       * @description In case of a usage item, the billable usage amount, free usage has been deducted
-       * @example 100
-       */
-      usageBillable?: number
-      /**
-       * @description Costs of the item in cents
-       * @example 100
-       */
-      costs: number
-    }
-    ResourceBillingResponse: {
-      /** @description Whether the user is exceeding the included quotas in the plan - only relevant for users on usage-capped plans. */
-      exceedsPlanLimits: boolean
-      /** @description Whether the user is can have over-usage, which will be billed - this will be false on usage-capped plans. */
-      overusageAllowed: boolean
-      extensionId: string
-      items: components['schemas']['ResourceBillingItem'][]
-    }
     ResourceProvisioningConfigResponse: {
       /**
        * @description PSQL connection string
@@ -4781,6 +4750,47 @@ export interface components {
         | 'RESTORING'
         | 'UPGRADING'
         | 'PAUSING'
+    }
+    ResourceBillingItem: {
+      /**
+       * @description Non-Unique identifier of the item
+       * @example usage_egress
+       */
+      itemIdentifier: string
+      /**
+       * @description Descriptive name of the billing item
+       * @example Pro Plan
+       */
+      itemName: string
+      /** @enum {string} */
+      type: 'usage' | 'plan' | 'addon' | 'proration'
+      /**
+       * @description In case of a usage item, the free usage included in the customers plan
+       * @example 100
+       */
+      freeUnitsInPlan?: number
+      /**
+       * @description In case of a usage item, the total usage
+       * @example 100
+       */
+      usageTotal?: number
+      /**
+       * @description In case of a usage item, the billable usage amount, free usage has been deducted
+       * @example 100
+       */
+      usageBillable?: number
+      /**
+       * @description Costs of the item in cents
+       * @example 100
+       */
+      costs: number
+    }
+    ResourceBillingResponse: {
+      /** @description Whether the user is exceeding the included quotas in the plan - only relevant for users on usage-capped plans. */
+      exceedsPlanLimits: boolean
+      /** @description Whether the user is can have over-usage, which will be billed - this will be false on usage-capped plans. */
+      overusageAllowed: boolean
+      items: components['schemas']['ResourceBillingItem'][]
     }
   }
   responses: never
@@ -4839,7 +4849,7 @@ export interface operations {
   NotificationsController_updateNotificationsV2: {
     requestBody: {
       content: {
-        'application/json': string[]
+        'application/json': components['schemas']['UpdateNotificationBodyV2'][]
       }
     }
     responses: {
@@ -5791,9 +5801,37 @@ export interface operations {
       }
     }
   }
-  /** Gets usage stats */
-  OrgUsageController_getDailyStats: {
+  /** Gets daily organization stats for compute */
+  OrgDailyStatsController_getDailyStatsCompute: {
     parameters: {
+      query: {
+        endDate: string
+        startDate: string
+        projectRef?: string
+      }
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to get daily organization stats for compute */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets usage stats */
+  OrgUsageController_getOrgUsage: {
+    parameters: {
+      query?: {
+        project_ref?: string
+        start?: string
+        end?: string
+      }
       path: {
         /** @description Organization slug */
         slug: string
@@ -10667,8 +10705,13 @@ export interface operations {
     }
   }
   /** Gets usage stats */
-  OrgUsageSystemController_getDailyStats: {
+  OrgUsageSystemController_getOrgUsage: {
     parameters: {
+      query?: {
+        project_ref?: string
+        start?: string
+        end?: string
+      }
       path: {
         /** @description Organization slug */
         slug: string
@@ -10754,6 +10797,7 @@ export interface operations {
     parameters: {
       header: {
         'x-github-delivery': string
+        'x-github-event': string
         'x-hub-signature-256': string
       }
     }
@@ -12236,21 +12280,6 @@ export interface operations {
       }
     }
   }
-  /** Gets resource billing */
-  ExtensionController_getResourceBilling: {
-    parameters: {
-      path: {
-        extension_id: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['ResourceBillingResponse']
-        }
-      }
-    }
-  }
   /** Creates a database */
   ExtensionsController_provisionResource: {
     responses: {
@@ -12286,6 +12315,21 @@ export interface operations {
     responses: {
       200: {
         content: never
+      }
+    }
+  }
+  /** Gets the organizations current unbilled charges */
+  FlyBillingController_getResourceBilling: {
+    parameters: {
+      path: {
+        organization_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ResourceBillingResponse']
+        }
       }
     }
   }

@@ -1,9 +1,16 @@
 import { PropsWithChildren } from 'react'
-import { IconAlertTriangle, IconHelpCircle, IconInfo } from 'ui'
-
+import { Alert, AlertVariant } from '../Alert'
 export interface AdmonitionProps {
-  type: 'note' | 'tip' | 'info' | 'caution' | 'danger'
+  type: 'note' | 'tip' | 'caution' | 'danger' | 'deprecation'
   label?: string
+}
+
+const admonitionToAlertMapping: Record<AdmonitionProps['type'], AlertVariant> = {
+  note: 'info',
+  tip: 'info',
+  caution: 'warning',
+  danger: 'danger',
+  deprecation: 'warning',
 }
 
 export const Admonition = ({
@@ -12,41 +19,18 @@ export const Admonition = ({
   children,
 }: PropsWithChildren<AdmonitionProps>) => {
   return (
-    <div
-      className={[
-        'shadow p-4 rounded border-l-[5px] space-y-2 my-4',
-        `${
-          type === 'note'
-            ? 'bg-surface-200 border-stronger'
-            : type === 'info'
-            ? 'bg-surface-300 border-stronger'
-            : type === 'tip'
-            ? 'bg-brand-300 border-brand-300'
-            : type === 'caution'
-            ? 'bg-yellow-400 border-yellow-800'
-            : type === 'danger'
-            ? 'bg-red-500 border-red-800'
-            : 'bg-surface-300 border-stronger'
-        }`,
-      ].join(' ')}
+    <Alert
+      className="not-prose"
+      variant={admonitionToAlertMapping[type]}
+      title={
+        <span className="flex gap-2">
+          <span className="uppercase">{`${type}${label ? ':' : ''}`}</span>
+          {label}
+        </span>
+      }
+      withIcon
     >
-      <div className="flex items-center space-x-2">
-        {type === 'note' ? (
-          <IconInfo className="text-foreground" size={18} strokeWidth={1.5} />
-        ) : type === 'info' ? (
-          <IconInfo className="text-foreground" size={18} strokeWidth={1.5} />
-        ) : type === 'tip' ? (
-          <IconHelpCircle className="text-foreground" size={18} strokeWidth={1.5} />
-        ) : type === 'caution' ? (
-          <IconAlertTriangle className="text-foreground" size={18} strokeWidth={1.5} />
-        ) : type === 'danger' ? (
-          <IconAlertTriangle className="text-foreground" size={18} strokeWidth={1.5} />
-        ) : (
-          <IconInfo className="text-foreground" size={18} strokeWidth={1.5} />
-        )}
-        <p className="text-sm text-foreground uppercase my-0 font-bold">{label || type}</p>
-      </div>
-      <div className="admonition-content text-foreground text-base space-y-1">{children}</div>
-    </div>
+      {children}
+    </Alert>
   )
 }

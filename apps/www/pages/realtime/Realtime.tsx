@@ -1,4 +1,4 @@
-import { Button, IconGrid, IconLayers, IconMenu } from 'ui'
+import { Button, IconGrid, IconLayers, IconMenu, ThemeImage } from 'ui'
 import ApiExamples from 'data/products/realtime/api-examples'
 import AppExamples from 'data/products/realtime/app-examples'
 import Solutions from 'data/Solutions'
@@ -21,7 +21,7 @@ const Cursor = ({ className = '', color = 'none' }) => {
       fill={color}
       viewBox="0 0 24 24"
       aria-hidden="true"
-      className={`h-10 w-10 stroke-black dark:stroke-white ${className}`}
+      className={`h-10 w-10 stroke-foreground ${className}`}
     >
       <path
         strokeLinecap="round"
@@ -66,7 +66,7 @@ function RealtimePage() {
             <div className="bg-surface-100 border-default relative flex h-[372px] w-[560px] items-center justify-center overflow-hidden rounded border drop-shadow-md">
               <div
                 className={[
-                  'border-brand-300 relative h-12 w-48 bg-[#34B27B]',
+                  'border-brand-300 relative h-12 w-48 bg-brand',
                   `flex items-center justify-center ${RealtimeStyles['shape']}`,
                 ].join(' ')}
               >
@@ -113,9 +113,9 @@ function RealtimePage() {
                   <IconLayers className="text-foreground mx-3" strokeWidth={1} size={15} />
                 </div>
                 <div className="mx-3 flex items-center">
-                  <div className="border-foreground bg-tomato-900 dark:bg-tomato-900 relative -right-4 h-5 w-5 rounded-full border" />
-                  <div className="border-foreground bg-yellow-900 dark:bg-yellow-900 relative -right-2 z-[2] h-5 w-5 rounded-full border" />
-                  <div className="border-foreground bg-indigo-900 dark:bg-indigo-900 z-[3] h-5 w-5 rounded-full border" />
+                  <div className="border-foreground bg-tomato-900 relative -right-4 h-5 w-5 rounded-full border" />
+                  <div className="border-foreground bg-yellow-900 relative -right-2 z-[2] h-5 w-5 rounded-full border" />
+                  <div className="border-foreground bg-indigo-900 z-[3] h-5 w-5 rounded-full border" />
                 </div>
               </div>
             </div>,
@@ -190,15 +190,15 @@ function RealtimePage() {
               return (
                 <>
                   <div className="flex flex-col gap-3">
-                    <img
-                      className="bg-surface-100 hidden rounded-lg dark:block"
-                      src={`/images/realtime/example-apps/dark/${example.img}?type=1`}
+                    <ThemeImage
                       alt={example.title}
-                    />
-                    <img
-                      className="bg-surface-100 block rounded-lg dark:hidden"
-                      src={`/images/realtime/example-apps/light/${example.img}`}
-                      alt={example.title}
+                      src={{
+                        light: `/images/realtime/example-apps/light/${example.img}?type=1`,
+                        dark: `/images/realtime/example-apps/dark/${example.img}`,
+                      }}
+                      className="bg-surface-100 rounded-lg"
+                      layout="fill"
+                      objectFit="contain"
                     />
                     <div className="prose">
                       <h4 className="">{example.title}</h4>

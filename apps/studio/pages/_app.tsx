@@ -1,6 +1,5 @@
 import 'ui/build/css/themes/dark.css'
 import 'ui/build/css/themes/light.css'
-
 import 'styles/code.scss'
 import 'styles/contextMenu.scss'
 import 'styles/date-picker.scss'
@@ -14,6 +13,7 @@ import 'styles/storage.scss'
 import 'styles/stripe.scss'
 import 'styles/toast.scss'
 import 'styles/ui.scss'
+import 'styles/reactflow.scss'
 
 import { loader } from '@monaco-editor/react'
 import { TooltipProvider } from '@radix-ui/react-tooltip'
@@ -161,12 +161,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                 <PageTelemetry>
                   <TooltipProvider>
                     <RouteValidationWrapper>
-                      <ThemeProvider
-                        attribute="class"
-                        defaultTheme="system"
-                        enableSystem
-                        disableTransitionOnChange
-                      >
+                      <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
                         <CommandMenuWrapper>
                           <AppBannerWrapper>
                             <FeaturePreviewContextProvider>

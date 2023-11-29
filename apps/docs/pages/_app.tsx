@@ -1,9 +1,6 @@
-import '../../../packages/ui/build/css/themes/dark.css'
-import '../../../packages/ui/build/css/themes/light.css'
-
 import '@code-hike/mdx/styles'
 import 'config/code-hike.scss'
-import '../styles/main.scss?v=1.0.0'
+import '../styles/main.scss'
 import '../styles/new-docs.scss'
 import '../styles/prism-okaidia.scss'
 
@@ -20,6 +17,7 @@ import Favicons from '~/components/Favicons'
 import SiteLayout from '~/layouts/SiteLayout'
 import { API_URL, IS_PLATFORM } from '~/lib/constants'
 import { post } from '~/lib/fetchWrappers'
+import PromoToast from 'ui/src/components/PromoToast'
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter()
@@ -161,16 +159,12 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     <>
       <Favicons />
       <AuthContainer>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
+        <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
           <CommandMenuProvider site="docs">
             <TabsProvider>
               <SiteLayout>
                 <PortalToast />
+                <PromoToast />
                 <Component {...pageProps} />
               </SiteLayout>
             </TabsProvider>
