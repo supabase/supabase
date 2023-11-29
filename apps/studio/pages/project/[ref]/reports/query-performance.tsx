@@ -218,7 +218,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                   }
                   body={
                     !isLoading && mostTimeConsuming && mostTimeConsuming?.data ? (
-                      mostTimeConsuming?.data!.map((item, i) => {
+                      mostTimeConsuming?.data?.map((item, i) => {
                         return (
                           <Table.tr key={i} hoverable className="relative">
                             <Table.td className="table-cell whitespace-nowrap w-36">
