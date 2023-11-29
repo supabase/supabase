@@ -164,7 +164,7 @@ export { Separator } from './src/components/shadcn/ui/separator'
 
 // patterns
 
-export { AssistantChatInput as AssistantChatInput } from './src/patterns/AssistantChatInput'
+export { AssistantChatForm } from './src/patterns/AssistantChatForm'
 
 // links
 

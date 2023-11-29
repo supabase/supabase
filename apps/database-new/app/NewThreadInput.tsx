@@ -5,9 +5,9 @@ import { useAppStateSnapshot } from '@/lib/state'
 import { createClient } from '@/lib/supabase/client'
 import { useMutation } from '@tanstack/react-query'
 import { ExternalLink } from 'lucide-react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { createRef, useState } from 'react'
-import { AssistantChatInput, cn } from 'ui'
+import { AssistantChatForm, cn } from 'ui'
 
 const suggestions = CHAT_EXAMPLES
 
@@ -51,29 +51,14 @@ const NewThreadInput = () => {
     },
   })
 
-  const textAreaRef = createRef<HTMLTextAreaElement>()
-  const submitRef = createRef<HTMLButtonElement>()
-
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    // Check if the pressed key is "Enter" (key code 13) without the "Shift" key
-    if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault()
-      if (submitRef.current) {
-        submitRef.current.click()
-      }
-    }
-  }
   return (
     <>
       <div className="relative w-10/12 xl:w-11/12 max-w-xl">
-        <form
+        <AssistantChatForm
           key={'new-thread-form'}
           id={'new-thread-form'}
           onSubmit={async (event) => {
             event.preventDefault()
-            console.log('Simple onSubmit')
-
-            console.log('submitting')
 
             const {
               data: { user },
@@ -88,22 +73,12 @@ const NewThreadInput = () => {
               mutate(value)
             }
           }}
-        >
-          <AssistantChatInput
-            ref={textAreaRef}
-            submitRef={submitRef}
-            autoFocus
-            value={value}
-            rows={1}
-            contentEditable
-            aria-expanded={false}
-            placeholder="e.g Create a Telegram-like chat application"
-            disabled={isPending || isSuccess}
-            loading={isPending || isSuccess}
-            onChange={(e) => setValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-          />
-        </form>
+          value={value}
+          placeholder="e.g Create a Telegram-like chat application"
+          disabled={isPending || isSuccess}
+          loading={isPending || isSuccess}
+          onValueChange={(e) => setValue(e.target.value)}
+        />
       </div>
       <div className="flex gap-3">
         {suggestions.map((suggestion, idx) => (

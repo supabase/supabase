@@ -1,10 +1,11 @@
 'use client'
+
 import { useMutation } from '@tanstack/react-query'
 import { sortBy } from 'lodash'
 import { Loader2 } from 'lucide-react'
 import { useParams, useRouter } from 'next/navigation'
-import { createRef, useEffect, useMemo, useState } from 'react'
-import { AssistantChatInput, Input, ScrollArea, cn } from 'ui'
+import { FormEventHandler, useEffect, useMemo, useState } from 'react'
+import { AssistantChatForm, ScrollArea, cn } from 'ui'
 
 import { useMessagesQuery } from '@/data/messages-query'
 import { AssistantMessage, UserMessage } from '@/lib/types'
@@ -56,19 +57,6 @@ export const Chat = () => {
     setValue('')
   }, [loading])
 
-  const textAreaRef = createRef<HTMLTextAreaElement>()
-  const submitRef = createRef<HTMLButtonElement>()
-
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    // Check if the pressed key is "Enter" (key code 13) without the "Shift" key
-    if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault()
-      if (submitRef.current) {
-        submitRef.current.click()
-      }
-    }
-  }
-
   return (
     <div
       className={cn(
@@ -108,29 +96,23 @@ export const Chat = () => {
         )}
 
         <div className="px-4 pb-4">
-          <form
+          <AssistantChatForm
             key={`chat-thread-form-${runId}`}
             id={`chat-thread-form-${runId}`}
             onSubmit={async (event) => {
               event.preventDefault()
               mutate(value)
             }}
-          >
-            <AssistantChatInput
-              ref={textAreaRef}
-              submitRef={submitRef}
-              value={value}
-              disabled={loading || inputEntered}
-              loading={loading || inputEntered}
-              placeholder={
-                loading
-                  ? 'Generating reply to request...'
-                  : 'Ask for some changes on the selected message'
-              }
-              onChange={(v) => setValue(v.target.value)}
-              onKeyDown={handleKeyDown}
-            />
-          </form>
+            value={value}
+            disabled={loading || inputEntered}
+            loading={loading || inputEntered}
+            placeholder={
+              loading
+                ? 'Generating reply to request...'
+                : 'Ask for some changes on the selected message'
+            }
+            onValueChange={(v) => setValue(v.target.value)}
+          />
         </div>
       </div>
     </div>
