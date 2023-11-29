@@ -85,7 +85,7 @@
     "react-hot-toast": "^2.4.1",
     "react-inlinesvg": "^4.0.4",
     "react-markdown": "^8.0.3",
-    "react-simple-maps": "^3.0.0",
+    "react-simple-maps": "4.0.0-beta.6",
     "react-split": "^2.0.13",
     "react-tracked": "^1.7.11",
     "react-virtualized-auto-sizer": "^1.0.20",
