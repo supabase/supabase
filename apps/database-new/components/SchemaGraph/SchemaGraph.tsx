@@ -38,7 +38,7 @@ const TablesGraph = ({ tables }: SchemaGraphProps) => {
 
   return (
     <>
-      <div className={cn('h-full grow')}>
+      <div className={cn('grow w-full h-1/2')}>
         <ReactFlow
           defaultNodes={[]}
           defaultEdges={[]}

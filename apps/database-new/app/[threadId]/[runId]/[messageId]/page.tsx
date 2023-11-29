@@ -15,9 +15,8 @@ export default function ThreadPage() {
     useParams()
   const [tables, setTables] = useState<PostgresTable[]>([])
 
-  const { data, isSuccess } = useMessagesQuery({ threadId, runId })
+  const { data, isSuccess, isLoading: threadIsLoading } = useMessagesQuery({ threadId, runId })
 
-  // [Joshen] Slightly hacky here, just so the useEffect triggers once - until we figure out something better
   const isLoadingPrev = useRef<boolean>(false)
   const isLoading = isSuccess && data.status === 'loading'
 
@@ -58,9 +57,9 @@ export default function ThreadPage() {
   }, [isLoading])
 
   return (
-    <div className="grow max-h-screen flex flex-row items-center justify-between bg-alternative h-full">
+    <div className="grow max-h-screen flex flex-col items-center justify-between bg-alternative h-full">
       <SchemaGraph tables={tables} />
-      <CodeEditor content={content} />
+      <CodeEditor content={content} threadIsLoading={threadIsLoading} />
     </div>
   )
 }

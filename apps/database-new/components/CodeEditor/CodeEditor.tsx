@@ -7,6 +7,7 @@ import { cn } from 'ui'
 
 import { useAppStateSnapshot } from '@/lib/state'
 import { getTheme } from './CodeEditor.utils'
+import SaveSchemaDropdown from '../Header/SaveSchemaDropdown'
 
 interface MonacoEditorProps {
   id: string
@@ -21,8 +22,11 @@ interface MonacoEditorProps {
   options?: EditorProps['options']
   value?: string
 }
-
-export const CodeEditor = ({ content = '' }: { content: string }) => {
+interface CodeEditorProps {
+  content: string
+  threadIsLoading?: boolean
+}
+export const CodeEditor = ({ content = '', threadIsLoading }: CodeEditorProps) => {
   const snap = useAppStateSnapshot()
   const code = format(content, { language: 'postgresql' })
 
@@ -33,11 +37,16 @@ export const CodeEditor = ({ content = '' }: { content: string }) => {
   return (
     <div
       className={cn(
-        snap.hideCode ? 'max-w-0' : 'max-w-lg 2xl:max-w-xl',
+        snap.hideCode ? 'h-0' : 'h-1/2 pt-2',
         'w-full xl:border-l',
-        'grow flex flex-col h-full'
+        'flex flex-col relative'
       )}
     >
+      {!snap.hideCode && !threadIsLoading && (
+        <div className="text-right mr-8 py-1">
+          <SaveSchemaDropdown />
+        </div>
+      )}
       <MonacoEditor id="sql-editor" language="pgsql" value={code} />
     </div>
   )
@@ -98,7 +107,10 @@ const MonacoEditor = ({
       lineNumbers: hideLineNumbers ? 'off' : undefined,
       glyphMargin: hideLineNumbers ? false : undefined,
       lineNumbersMinChars: hideLineNumbers ? 0 : undefined,
+      occurrencesHighlight: false,
       folding: hideLineNumbers ? false : undefined,
+      renderLineHighlight: 'none',
+      selectionHighlight: false,
     },
     options
   )

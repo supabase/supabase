@@ -9,7 +9,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <Chat />
       <div className="xl:hidden flex items-center gap-x-2 justify-end border-t py-2 px-2 bg-background">
         <ToggleCodeEditorButton />
-        <SaveSchemaDropdown />
       </div>
       {children}
     </div>

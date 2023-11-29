@@ -38,7 +38,6 @@ const HeaderActions = ({ user }: HeaderActionsProps) => {
       {segment && segment.includes('thread') && (
         <div className="hidden xl:flex items-center gap-x-2">
           <ToggleCodeEditorButton />
-          <SaveSchemaDropdown />
           <div className="border-r py-3" />
         </div>
       )}
