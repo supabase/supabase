@@ -1276,10 +1276,10 @@ class StorageExplorerStore {
     const files = await this.getAllItemsAlongFolder(folder)
     await this.deleteFiles(files, isDeleteFolder)
 
-    const isFolderRootOfOpen =
+    const isFolderOpen =
       this.openedFolders.filter((openedFolder) => openedFolder.name === folder.name).length > 0
 
-    if (isFolderRootOfOpen) {
+    if (isFolderOpen) {
       this.popColumnAtIndex(folder)
       this.popOpenedFoldersAtIndex(folder.columnIndex - 1)
     }
@@ -1297,7 +1297,6 @@ class StorageExplorerStore {
       message: `Successfully deleted ${folder.name}`,
     })
   }
-
 
   renameFolder = async (folder, newName, columnIndex) => {
     const originalName = folder.name
