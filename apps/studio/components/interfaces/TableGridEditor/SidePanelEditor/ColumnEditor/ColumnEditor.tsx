@@ -2,7 +2,7 @@ import type { PostgresColumn, PostgresTable, PostgresType } from '@supabase/post
 import { useParams } from 'common'
 import { isEmpty, noop } from 'lodash'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -94,13 +94,11 @@ const ColumnEditor = ({
     : undefined
 
   useEffect(() => {
-    if (visible) {
       setErrors({})
-      const columnFields = isNewRecord
-        ? { ...generateColumnField(), keyId: keys.length > 0 ? keys[0].id : 'create-new' }
-        : generateColumnFieldFromPostgresColumn(column!, selectedTable, foreignKeyMeta)
-      setColumnFields(columnFields)
-    }
+      const generateColumnFields = isNewRecord
+      ? { ...generateColumnField(), keyId: keys.length > 0 ? keys[0].id : 'create-new' }
+      : generateColumnFieldFromPostgresColumn(column!, selectedTable, foreignKeyMeta)
+      setColumnFields(generateColumnFields)
   }, [visible])
 
   if (!columnFields) return null
