@@ -242,8 +242,7 @@ const PITRSidePanel = () => {
             <Alert_Shadcn_ variant="warning">
               <AlertTriangleIcon strokeWidth={2} />
               <AlertTitle_Shadcn_>
-                Removing PITR entails a risk if you run a bad migration from merging your preview
-                branch
+                Are you sure you want to disable this while using Branching?
               </AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_>
                 Without PITR, you will not be able to restore your project to a healthy state in the
