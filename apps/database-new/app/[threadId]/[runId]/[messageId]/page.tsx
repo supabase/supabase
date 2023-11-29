@@ -8,6 +8,8 @@ import SchemaGraph from '@/components/SchemaGraph/SchemaGraph'
 import { useMessagesQuery } from '@/data/messages-query'
 import { AssistantMessage, PostgresTable } from '@/lib/types'
 import { parseTables } from '@/lib/utils'
+import { useAppStateSnapshot } from '@/lib/state'
+import { cn } from 'ui'
 
 export default function ThreadPage() {
   const router = useRouter()
@@ -19,6 +21,7 @@ export default function ThreadPage() {
 
   const isLoadingPrev = useRef<boolean>(false)
   const isLoading = isSuccess && data.status === 'loading'
+  const snap = useAppStateSnapshot()
 
   const messages = useMemo(() => {
     if (isSuccess) return sortBy(data.messages, (m) => m.created_at)
@@ -54,10 +57,15 @@ export default function ThreadPage() {
       if (latestMessage) router.push(`/${threadId}/${runId}/${latestMessage.id}`)
     }
     isLoadingPrev.current = isLoading
-  }, [isLoading])
+  }, [isLoading, router, runId, threadId, userMessages])
 
   return (
-    <div className="grow max-h-screen flex flex-col items-center justify-between bg-alternative h-full">
+    <div
+      className={cn(
+        snap.layout === 'two-col' ? 'flex-col' : 'flex-row',
+        'flex grow max-h-screen items-center justify-between bg-alternative h-full'
+      )}
+    >
       <SchemaGraph tables={tables} />
       <CodeEditor content={content} threadIsLoading={threadIsLoading} />
     </div>

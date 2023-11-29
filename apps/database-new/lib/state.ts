@@ -6,6 +6,16 @@ export const appState = proxy({
     appState.hideCode = value
   },
 
+  // check localStorage first
+  layout:
+    (typeof window !== 'undefined' && window.localStorage.getItem('supabase_db_design_layout')) ||
+    'two-col',
+
+  setLayout: (value: string) => {
+    appState.layout = value
+    localStorage.setItem('supabase_db_design_layout', value)
+  },
+
   selectedCode: '',
   setSelectedCode: (value: string) => {
     appState.selectedCode = value

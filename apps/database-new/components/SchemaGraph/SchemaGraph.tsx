@@ -10,9 +10,9 @@ import ReactFlow, {
 } from 'reactflow'
 import 'reactflow/dist/style.css'
 import { cn } from 'ui'
-
 import { getGraphDataFromTables } from './SchemaGraph.utils'
 import TableNode from './TableNode'
+import { useAppStateSnapshot } from '@/lib/state'
 
 interface SchemaGraphProps {
   tables: PostgresTable[]
@@ -23,6 +23,7 @@ const TablesGraph = ({ tables }: SchemaGraphProps) => {
   const [mounted, setMounted] = useState(false)
   const reactFlowInstance = useReactFlow()
   const nodeTypes = useMemo(() => ({ table: TableNode }), [])
+  const snap = useAppStateSnapshot()
 
   useEffect(() => {
     setMounted(true)
@@ -34,11 +35,11 @@ const TablesGraph = ({ tables }: SchemaGraphProps) => {
       reactFlowInstance.setEdges(edges)
       setTimeout(() => reactFlowInstance.fitView({}), 10)
     })
-  }, [tables, resolvedTheme])
+  }, [tables, resolvedTheme, reactFlowInstance, snap])
 
   return (
     <>
-      <div className={cn('grow w-full h-1/2')}>
+      <div className={cn('grow', snap.layout === 'two-col' ? 'h-1/2 w-full ' : 'h-full w-1/2 ')}>
         <ReactFlow
           defaultNodes={[]}
           defaultEdges={[]}

@@ -32,22 +32,23 @@ export const CodeEditor = ({ content = '', threadIsLoading }: CodeEditorProps) =
 
   useEffect(() => {
     snap.setSelectedCode(code)
-  }, [code])
+  }, [code, snap])
 
   return (
     <div
       className={cn(
-        snap.hideCode ? 'h-0' : 'h-1/2 pt-2',
-        'w-full xl:border-l',
-        'flex flex-col relative'
+        'xl:border-l border-t pt-2 ',
+        'flex flex-col relative z-50',
+        snap.layout === 'two-col' ? 'h-1/2 w-full' : 'h-full w-1/2 ',
+        snap.hideCode ? 'hidden' : ''
       )}
     >
-      {!snap.hideCode && !threadIsLoading && (
+      {!snap.hideCode && !threadIsLoading && !snap.hideCode && (
         <div className="text-right mr-8 py-1">
           <SaveSchemaDropdown />
         </div>
       )}
-      <MonacoEditor id="sql-editor" language="pgsql" value={code} />
+      {!snap.hideCode && <MonacoEditor id="sql-editor" language="pgsql" value={code} />}
     </div>
   )
 }

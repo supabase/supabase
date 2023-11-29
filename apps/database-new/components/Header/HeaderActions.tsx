@@ -6,11 +6,8 @@ import Link from 'next/link'
 import { useRouter, useSelectedLayoutSegment } from 'next/navigation'
 import { useState } from 'react'
 import { Button } from 'ui'
-import AvatarDropdown from './AvatarDropdown'
-import NoUserDropdown from './NoUserDropdown'
-import SaveSchemaDropdown from './SaveSchemaDropdown'
-import ThemeSwitcherButton from './ThemeSwitcher'
 import ToggleCodeEditorButton from './ToggleCodeEditorButton'
+import ToggleLayout from './ToggleLayout'
 
 interface HeaderActionsProps {
   user: User | null
@@ -37,6 +34,7 @@ const HeaderActions = ({ user }: HeaderActionsProps) => {
     <div className="flex items-center gap-x-2">
       {segment && segment.includes('thread') && (
         <div className="hidden xl:flex items-center gap-x-2">
+          <ToggleLayout />
           <ToggleCodeEditorButton />
           <div className="border-r py-3" />
         </div>
@@ -45,12 +43,6 @@ const HeaderActions = ({ user }: HeaderActionsProps) => {
       <Button type="default" className="hidden xl:block">
         <Link href="/">New conversation</Link>
       </Button>
-
-      {/* {currentUser ? (
-        <AvatarDropdown currentUser={currentUser} signout={signout} />
-      ) : (
-        <NoUserDropdown />
-      )} */}
     </div>
   )
 }
