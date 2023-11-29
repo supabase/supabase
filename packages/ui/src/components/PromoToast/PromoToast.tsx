@@ -48,7 +48,7 @@ const PromoToast = () => {
           Dismiss
         </Button>
       </div>
-      <PromoBg className="absolute z-0 inset-0 w-full h-auto my-auto -right-3 left-auto" />
+      <PromoBg className="absolute z-0 inset-0 w-full h-auto my-auto -right-6 left-auto" />
     </div>
   )
 }
