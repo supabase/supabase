@@ -85,7 +85,7 @@
 }
 
 .rdg-header-row .rdg-cell p {
-  @apply text-typography-body-light dark:text-typography-body-dark;
+  @apply text-typography-body-light [[data-theme*=dark]_&]:text-typography-body-dark;
 }
 .rdg-header-row .rdg-cell .react-contextmenu-wrapper {
   @apply flex h-full items-center px-2 transition duration-100 ease-in-out;
@@ -114,8 +114,8 @@
 */
 
 .rdg-row {
-  @apply bg-table-body-light dark:bg-table-body-dark transition-colors;
-  @apply hover:bg-table-header-light dark:hover:bg-table-header-dark;
+  @apply bg-table-body-light [[data-theme*=dark]_&]:bg-table-body-dark transition-colors;
+  @apply hover:bg-table-header-light [[data-theme*=dark]_&]:hover:bg-table-header-dark;
 }
 
 /* edit button */
@@ -174,7 +174,6 @@
   }
 
   [type='checkbox']:checked {
-    @apply dark:bg-brand;
     @apply bg-brand;
     border-color: transparent;
     background-size: 100% 100%;
@@ -188,8 +187,7 @@
     @apply text-brand-600 border-default transition-all;
     @apply hover:border-brand focus:ring-brand-300 focus:outline-none;
 
-    @apply dark:bg-transparent dark:text-white;
-    @apply dark:hover:border-green-900;
+    @apply bg-transparent;
 
     margin-top: 2px;
   }
@@ -491,7 +489,7 @@
 }
 
 .sb-grid-column-header__inner svg {
-  @apply border-brand text-brand dark:border-brand dark:text-brand;
+  @apply border-brand text-brand;
 }
 
 /*

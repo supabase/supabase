@@ -238,12 +238,14 @@ const HeaderLogo = memo(function HeaderLogo() {
     <Link href="/" className="px-10 flex items-center gap-2">
       <Image
         className="cursor-pointer"
-        src={resolvedTheme === 'dark' ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'}
+        src={
+          resolvedTheme?.includes('dark') ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'
+        }
         width={96}
         height={24}
         alt="Supabase Logo"
       />
-      <span className="font-mono text-sm font-medium text-brand">DOCS</span>
+      <span className="font-mono text-sm font-medium text-brand-link">DOCS</span>
     </Link>
   )
 })
@@ -259,9 +261,7 @@ const Container = memo(function Container(props: PropsWithChildren) {
         // 'overflow-x-auto',
         'w-full h-screen transition-all ease-out',
         // 'absolute lg:relative',
-        mobileMenuOpen
-          ? '!w-auto ml-[75%] sm:ml-[50%] md:ml-[33%] overflow-hidden'
-          : 'overflow-auto',
+        mobileMenuOpen ? 'ml-[75%] sm:ml-[50%] md:ml-[33%] overflow-hidden' : 'overflow-auto',
         // desktop override any margin styles
         'lg:ml-0',
       ].join(' ')}

@@ -5,7 +5,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import Clipboard from 'clipboard'
 import rangeParser from 'parse-numeric-range'
 import Highlight, { Language, defaultProps } from 'prism-react-renderer'
 import defaultTheme from 'prism-react-renderer/themes/palenight'
@@ -23,12 +22,14 @@ const prism = {
 interface SimpleCodeBlockProps {
   className?: string
   metastring?: string
+  showCopy?: boolean
 }
 
 const SimpleCodeBlock = ({
   children,
   className: languageClassName,
   metastring,
+  showCopy = true,
 }: PropsWithChildren<SimpleCodeBlockProps>) => {
   const [showCopied, setShowCopied] = useState(false)
   const target = useRef(null)
@@ -45,25 +46,6 @@ const SimpleCodeBlock = ({
     const timer = setTimeout(() => setShowCopied(false), 2000)
     return () => clearTimeout(timer)
   }, [showCopied])
-
-  useEffect(() => {
-    let clipboard: any
-
-    // @ts-ignore
-    if (button?.current?.button) {
-      // @ts-ignore
-      clipboard = new Clipboard(button.current.button, {
-        // @ts-ignore
-        target: () => target.current,
-      })
-    }
-
-    return () => {
-      if (clipboard) {
-        clipboard.destroy()
-      }
-    }
-  }, [button.current, target.current])
 
   let language = languageClassName && languageClassName.replace(/language-/, '')
 
@@ -102,11 +84,13 @@ const SimpleCodeBlock = ({
                 )
               })}
             </pre>
-            <div className="invisible absolute right-0 top-0 opacity-0 transition-opacity group-hover:visible group-hover:opacity-100">
-              <Button size="tiny" type="default" onClick={() => handleCopyCode(children)}>
-                {showCopied ? 'Copied' : 'Copy'}
-              </Button>
-            </div>
+            {showCopy && (
+              <div className="invisible absolute right-0 top-0 opacity-0 transition-opacity group-hover:visible group-hover:opacity-100">
+                <Button size="tiny" type="default" onClick={() => handleCopyCode(children)}>
+                  {showCopied ? 'Copied' : 'Copy'}
+                </Button>
+              </div>
+            )}
           </div>
         )
       }}

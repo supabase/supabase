@@ -33,8 +33,8 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
             log ? 'mt-0 scale-95 opacity-0' : 'mt-8 scale-100 opacity-100'
           )}
         >
-          <div className="relative flex h-4 w-32 items-center rounded border border-scale-600 px-2 dark:border-scale-400">
-            <div className="h-0.5 w-2/3 rounded-full bg-scale-600 dark:bg-scale-500"></div>
+          <div className="relative flex h-4 w-32 items-center rounded border border-default px-2">
+            <div className="h-0.5 w-2/3 rounded-full bg-overlay-hover"></div>
             <div className="absolute right-1 -bottom-4">
               <svg
                 xmlns="http://www.w3.org/2000/svg"

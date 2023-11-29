@@ -25,7 +25,7 @@ export const meta = {
       ## Products
     </div>
 
-    <div className="grid grid-cols-12 gap-6 not-prose [&_svg]:text-brand-600 [&_svg]dark:text-brand">
+    <div className="grid grid-cols-12 gap-6 not-prose [&_svg]:text-brand-600">
       {products.map((product) => {
         return (
           <Link href={product.href} key={product.title} passHref className={product.span ?? 'col-span-12 md:col-span-4'}>
@@ -42,7 +42,7 @@ export const meta = {
       <div className="col-span-4 flex flex-col gap-1 [&_h2]:m-0 [&_h3]:m-0">
 
         <div className="md:max-w-xs 2xl:max-w-none">
-          <div className="flex items-center gap-3 mb-3 text-brand-600 dark:text-brand">
+          <div className="flex items-center gap-3 mb-3 text-brand-600">
             {/* <IconBackground>
               <HomeMenuIconPicker icon="reference-cli" width={18} height={18} />
             </IconBackground> */}
@@ -141,7 +141,7 @@ export const meta = {
     <div className="col-span-4 flex flex-col gap-1 [&_h2]:m-0 [&_h3]:m-0">
 
       <div className="md:max-w-xs 2xl:max-w-none">
-        <div className="flex items-center gap-3 mb-3 text-brand-600 dark:text-brand">
+        <div className="flex items-center gap-3 mb-3 text-brand-600">
           <IconBackground>
             <HomeMenuIconPicker icon="self-hosting" width={18} height={18} />
           </IconBackground>

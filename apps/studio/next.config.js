@@ -293,7 +293,7 @@ const nextConfig = {
               source: '/',
               destination: process.env.NEXT_PUBLIC_BASE_PATH,
               basePath: false,
-              permanent: true,
+              permanent: false,
             },
           ]
         : []),
@@ -355,6 +355,10 @@ const nextConfig = {
       })
 
     return config
+  },
+  onDemandEntries: {
+    maxInactiveAge: 24 * 60 * 60 * 1000,
+    pagesBufferLength: 100,
   },
 }
 

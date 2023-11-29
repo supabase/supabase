@@ -1,3 +1,5 @@
+'use client'
+
 import * as React from 'react'
 
 // Providers
@@ -17,6 +19,7 @@ export * from './src/components/Icon/IconContext'
 export * from './src/components/GlassPanel'
 export * from './src/components/IconPanel'
 export * from './src/components/Icon/IconBackground'
+export * from './src/components/ThemeImage'
 
 // DISPLAYS
 
@@ -41,6 +44,7 @@ export * from './src/components/ConsentToast'
 export * from './src/components/ContextMenu'
 export * from './src/components/ExpandableVideo'
 export * from './src/components/PrivacySettings'
+export * from './src/components/PromoToast'
 export * from './src/components/Popover'
 export * from './src/layout/PortalToast'
 
@@ -83,6 +87,7 @@ export * from './src/lib/utils'
 
 // theme switcher
 export * from './src/components/ThemeProvider/ThemeToggle'
+export * from './src/components/ThemeProvider/themes'
 
 // animated ui
 
@@ -142,17 +147,37 @@ export {
 } from './src/components/shadcn/ui/accordion'
 
 export { Input as Input_Shadcn_ } from './src/components/shadcn/ui/input'
+
+export { TextArea as TextArea_Shadcn_ } from './src/components/shadcn/ui/text-area'
+
 export { Label as Label_Shadcn_ } from './src/components/shadcn/ui/label'
+
 export * from './src/components/shadcn/ui/switch'
+
 export { Checkbox as Checkbox_Shadcn_ } from './src/components/shadcn/ui/checkbox'
+
 export * from './src/components/shadcn/ui/scroll-area'
+
 export {
   Collapsible as Collapsible_Shadcn_,
   CollapsibleTrigger as CollapsibleTrigger_Shadcn_,
   CollapsibleContent as CollapsibleContent_Shadcn_,
 } from './src/components/shadcn/ui/collapsible'
 
+export {
+  Sheet as Sheet_Shadcn_,
+  SheetTrigger as SheetTrigger_Shadcn_,
+  SheetClose as SheetClose_Shadcn_,
+  SheetContent as SheetContent_Shadcn_,
+  SheetHeader as SheetHeader_Shadcn_,
+  SheetFooter as SheetFooter_Shadcn_,
+  SheetTitle as SheetTitle_Shadcn_,
+  SheetDescription as SheetDescription_Shadcn_,
+} from './src/components/shadcn/ui/sheet'
+
 export { ScrollArea, ScrollBar } from './src/components/shadcn/ui/scroll-area'
+
+export { Separator } from './src/components/shadcn/ui/separator'
 
 // links
 

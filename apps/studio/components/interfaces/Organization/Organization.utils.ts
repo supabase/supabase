@@ -1,4 +1,4 @@
-import { Member } from 'types'
+import { OrganizationMember } from 'data/organizations/organization-members-query'
 
 // Invite is expired if older than 24hrs
 export function isInviteExpired(timestamp: string) {
@@ -11,7 +11,7 @@ export function isInviteExpired(timestamp: string) {
   return true
 }
 
-export const getUserDisplayName = (user?: Member) => {
+export const getUserDisplayName = (user?: OrganizationMember) => {
   if (!user) return ''
 
   const { username, primary_email, invited_id } = user || {}
