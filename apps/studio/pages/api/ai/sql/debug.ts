@@ -9,7 +9,7 @@ import type {
   CreateChatCompletionRequest,
   CreateChatCompletionResponse,
   ErrorResponse,
-} from 'openai'
+} from 'openai-old'
 
 const openAiKey = process.env.OPENAI_KEY
 

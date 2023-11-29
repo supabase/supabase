@@ -879,6 +879,8 @@ export default {
       large: `w-screen max-w-2xl h-full`,
       xlarge: `w-screen max-w-3xl h-full`,
       xxlarge: `w-screen max-w-4xl h-full`,
+      xxxlarge: `w-screen max-w-5xl h-full`,
+      xxxxlarge: `w-screen max-w-6xl h-full`,
     },
     align: {
       left: `

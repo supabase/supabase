@@ -1,4 +1,4 @@
-import Editor, { EditorProps } from '@monaco-editor/react'
+import Editor, { EditorProps, OnMount } from '@monaco-editor/react'
 import { merge, noop } from 'lodash'
 import { useRef } from 'react'
 
@@ -36,9 +36,9 @@ const CodeEditor = ({
   options,
   value,
 }: CodeEditorProps) => {
-  const editorRef = useRef()
+  const editorRef = useRef<any>()
 
-  const onMount = async (editor: any, monaco: any) => {
+  const onMount: OnMount = async (editor, monaco) => {
     editorRef.current = editor
     alignEditor(editor)
 

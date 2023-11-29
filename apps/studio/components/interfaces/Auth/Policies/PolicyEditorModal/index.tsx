@@ -31,8 +31,8 @@ interface PolicyEditorModalProps {
   table: string
   selectedPolicyToEdit: any
   onSelectCancel: () => void
-  onCreatePolicy: (payload: PostgresPolicyCreatePayload) => boolean
-  onUpdatePolicy: (payload: PostgresPolicyUpdatePayload) => boolean
+  onCreatePolicy: (payload: PostgresPolicyCreatePayload) => Promise<boolean>
+  onUpdatePolicy: (payload: PostgresPolicyUpdatePayload) => Promise<boolean>
   onSaveSuccess: () => void
 }
 
@@ -43,8 +43,8 @@ const PolicyEditorModal = ({
   table = '',
   selectedPolicyToEdit = {},
   onSelectCancel = noop,
-  onCreatePolicy = () => false,
-  onUpdatePolicy = () => false,
+  onCreatePolicy,
+  onUpdatePolicy,
   onSaveSuccess = noop,
 }: PolicyEditorModalProps) => {
   const { ui } = useStore()

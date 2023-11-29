@@ -5,20 +5,22 @@ import { isResponseOk, post } from 'lib/common/fetch'
 import { BASE_PATH } from 'lib/constants'
 import { ResponseError } from 'types'
 
-export type SqlGenerateResponse = {
-  title: string
-  sql: string
+export type RlsSuggestResponse = {
+  threadId: string
+  runId: string
 }
 
-export type SqlGenerateVariables = {
-  prompt: string
+export type RlsSuggestVariables = {
+  thread_id?: string
   entityDefinitions?: string[]
+  prompt: string
 }
 
-export async function generateSql({ prompt, entityDefinitions }: SqlGenerateVariables) {
-  const response = await post<SqlGenerateResponse>(BASE_PATH + '/api/ai/sql/generate', {
-    prompt,
+export async function rlsSuggest({ thread_id, entityDefinitions, prompt }: RlsSuggestVariables) {
+  const response = await post<RlsSuggestResponse>(BASE_PATH + '/api/ai/sql/suggest', {
+    thread_id,
     entityDefinitions,
+    prompt,
   })
 
   if (!isResponseOk(response)) {
@@ -28,25 +30,25 @@ export async function generateSql({ prompt, entityDefinitions }: SqlGenerateVari
   return response
 }
 
-type SqlGenerateData = Awaited<ReturnType<typeof generateSql>>
+type RlsSuggestData = Awaited<ReturnType<typeof rlsSuggest>>
 
-export const useSqlGenerateMutation = ({
+export const useRlsSuggestMutation = ({
   onSuccess,
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<SqlGenerateData, ResponseError, SqlGenerateVariables>,
+  UseMutationOptions<RlsSuggestData, ResponseError, RlsSuggestVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<SqlGenerateData, ResponseError, SqlGenerateVariables>(
-    (vars) => generateSql(vars),
+  return useMutation<RlsSuggestData, ResponseError, RlsSuggestVariables>(
+    (vars) => rlsSuggest(vars),
     {
       async onSuccess(data, variables, context) {
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          toast.error(`Failed to generate SQL: ${data.message}`)
+          toast.error(`Failed to prompt suggestion: ${data.message}`)
         } else {
           onError(data, variables, context)
         }
