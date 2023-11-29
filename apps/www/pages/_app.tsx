@@ -35,6 +35,7 @@ export default function App({ Component, pageProps }: AppProps) {
   }
 
   useEffect(() => {
+    console.log('hasAcceptedConsent', hasAcceptedConsent)
     if (!hasAcceptedConsent) return
 
     function handleRouteChange(url: string) {
