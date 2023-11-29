@@ -1,4 +1,5 @@
 import Layout from '~/layouts/DefaultGuideLayout'
+import {CodeBlock, Admonition} from 'ui'
 
 export const meta = {
   id: 'auth-postgres-hooks',
@@ -7,32 +8,40 @@ export const meta = {
 }
 
 
-What are Auth Hooks?
+Supabase allows you to use PostgreSQL functions to alter the default Supabase Auth flow. Developers can use hooks to write custom behaviour when there are no built in ways of achieving the desired behaviour.
 
-Auth Hooks are PostgreSQL functions that can be used to alter the default Supabase Auth behaviour. These are synchronous functions which are executed along an Auth flow. Developers can use hooks to write custom behaviour when there are no built in ways of achieving the desired behaviour.
+Hooks might help you:
 
-Some examples of modifications you could make are:
-
-- Reducing costs by using a non-native SMS provider
-- Rewarding paid users by adding custom claims or metadata to distinguish between user groups
-- Tracking origin of user signups by introducing metadata
-- Supporting legacy systems by integrating with identity credentials from external authentication systems
+- Track the origin of user signups by adding metadata
+- Improve security by adding additional checks to password and multi-factor authentication
+- Support legacy systems by integrating with identity credentials from external authentication systems
+- Add additional custom claims to your JWT
 
 
-Hooks are used at specific points along an Auth flow known as extensibility points and can perform custom behaviour via functions which conform to the function signature specified by Supabase. PostgreSQL Hooks come bundled with the database and are available on Free Plan and up.
+You can use hooks at specific points along an Auth flow and you can perform custom behaviour via PostgreSQL Functions supplied which conform to the signature specified by Supabase.  Currently, the following hooks are available
+
+**Teams and** **Enterprise**
+
+- MFA Verification Attempt Hook
+- Password Verification Attempt Hook
+
+**Free**
+
+- Custom Access Token Hook
+
 
 <Mermaid
  chart={`flowchart TD
     subgraph Supabase Auth
     Start[Event Occurs] --> DecisionA{Is a Hook defined?}
 
-    ValidityCheck --Yes-->EndFlow[End  Flow]
+    ValidityCheck --Yes-->ContinueFlow[Continue with flow]
     ValidityCheck --No-->Error(Return Error)
 
     DecisionA -- No ---->H[Continue with Supabase Default Behaviour]
     H--> ValidityCheck{Is response valid?}
     DecisionA --Yes--->ValidateInput((Validate Inputs))
-        ValidateOutput -->EndFlow
+        ValidateOutput -->ContinueFlow
     end
 
 
@@ -48,12 +57,479 @@ Hooks are used at specific points along an Auth flow known as extensibility poin
 
 ## Use Cases
 
-We provide four extensibility points designed to fit a few commonly requested use cases.
+Based on user feedback, we decided on a few use cases which aim to illustrate how a hook. You can opt to write your own hook if you have a use case which doesn’t fit any of the examples below.
 
-### Custom SMS Sender
+## MFA Verification Attempt Hook
 
-### Before Sign Up
+You may wish to increase security beyond the requirements of the [Supabase MFA implementation](https://supabase.com/docs/guides/auth/auth-mfa). You may need to meet compliance requirements set out by your client or you might be working in a field where data is sensitive.
 
-### Custom JWT Claims
+For such scenarios, the MFA Verification Attempt hook can allow you to add additional checks to:
 
-### MFA Verification
+- Ask users to wait a set time between verification attempts, to limit the number of attempts that can be done in a period of time.
+- Force sign out users if they have too many invalid verification attempts.
+- Count, rate limit, ban or do other actions.
+
+### Inputs
+
+Supabase Auth will supply the following fields to your hook:
+
+- `factor_id` Unique identifier for the MFA factor the user is verifying. Correlate this to the `auth.mfa_factors` table.
+- `user_id` Unique identifier for the user. Correlate this with `auth.users`
+- `valid` Whether the verification attempt was valid, in the case for TOTP this means that the six digit code was correct (true) or incorrect (false). The hook will generally receive true once, and false many times for the same user and factor.
+
+Example payload:
+
+```json
+{
+	"factor_id": "6eab6a69-7766-48bf-95d8-bd8f606894db",
+	"user_id": "3919cb6e-4215-4478-a960-6d3454326cec",
+	"valid": true,
+}
+```
+
+### Outputs
+
+In exchange your hook should return back a JSON object with these fields set:
+
+********************************On Success********************************
+
+Return these only if your hook processed the input without errors.
+
+- `decision` A string containing the decision whether to allow authentication to move forward. Use `reject` to completely reject the verification attempt and log the user out of all active sessions. Use `continue` to use the default Supabase Auth behavior.
+- `message` The message to show the user if the decision was `reject`.
+
+Example output:
+
+```json
+{
+   "decision": "reject",
+   "message" : "You have exceeded maximum number of MFA attempts."
+}
+```
+
+****************On Error****************
+
+Return this if your hook processed the input with some error.
+
+- `error` An object that contains information about the error.
+    - `http_code` A number indicating the HTTP code to be returned. If not set, the code is HTTP 500 Internal Server Error.
+    - `message` A message to be returned in the HTTP response. Must be set.
+- In general all other fields attached to the returned JSON are ignored.
+
+Example output:
+
+```jsx
+{
+  "error": {
+    "http_code": 420,
+    "message": "You can only verify a factor once very 10 seconds."
+  }
+}
+```
+### Example
+
+****Scenario****
+
+You wish to limit the number of failed MFA verification attempts a user can have in an amount of time. A user can only input an incorrect code every 2 seconds and not more than that.
+
+****************************Database Setup****************************
+
+First you need to create a table that will record the last time a user had an incorrect MFA verification attempt for a factor.
+
+You can do this by creating a table such as:
+
+```sql
+create table public.mfa_failed_verification_attempts (
+	user_id uuid not null,
+  factor_id uuid not null,
+  last_failed_at timestamp not null default now(),
+  primary key (user_id, factor_id)
+);
+```
+
+Then you should create a hook which will read and enter information into this table. Example:
+
+```sql
+create function public.hook_mfa_verification_attempt(event jsonb)
+	returns jsonb
+  language plpgsql
+  as $$
+	declare
+		last_failed_at timestamp;
+	begin
+		if event->'valid' is true
+		then
+			-- code is valid, accept it
+			return jsonb_build_object('decision', 'continue');
+		end if;
+
+		select last_failed_at into last_failed_at
+			from public.mfa_failed_verification_attempts
+			where
+				user_id = event->'user_id'
+					and
+				factor_id = event->'factor_id';
+
+		if last_failed_at is not null and now() - last_failed_at < interval '2 seconds'
+		then
+			-- last attempt was done too quickly
+			return jsonb_build_object(
+				'error', jsonb_build_object(
+					'http_code', 420,
+					'message',   'Please wait a moment before trying again.'));
+		end if;
+
+		-- record this failed attempt
+		insert into public.mfa_failed_verification_attempts
+			(
+				user_id,
+				factor_id,
+				last_refreshed_at
+			)
+			values
+			(
+				event->'user_id',
+				event->'factor_id',
+				now()
+			)
+			on conflict
+        do update
+          set last_refreshed_at = now();
+
+		-- finally let Supabase Auth do the default behavior for a failed attempt
+		return jsonb_build_object('decision', 'continue');
+	end;
+	$$;
+```
+
+## Password Verification Attempts Hook
+
+As with the MFA Verification Hooks, you may wish to increase security beyond the requirements of the default password implementation. You may need to do so meet compliance requirements set out by your client or you might be working in a field where data is sensitive.
+
+This hook allows you to introduce additional constraints around password verification
+
+### Inputs
+
+- `user_id`Unique identifier for the user attempting to sign in. Correlate this to the `auth.users` table.
+- `valid` Whether the password verification attempt was valid.
+
+```json
+{
+	"user_id": "3919cb6e-4215-4478-a960-6d3454326cec",
+	"valid": true,
+}
+```
+
+### Outputs
+
+In exchange your hook should return back a JSON object with these fields set:
+
+********************************On Success********************************
+
+Return these only if your hook processed the input without errors.
+
+- `decision` A string containing the decision whether to allow authentication to move forward. Use `reject` to completely reject the verification attempt and log the user out of all active sessions. Use `continue` to use the default Supabase Auth behavior.
+- `message` The message to show the user if the decision was `reject`.
+- `should_logout_user` Whether to logout a user if a `reject` decision is issued. Has no effect when a `continue` decision is issued.
+
+Example output:
+
+```json
+{
+   "decision": "reject",
+   "message" : "You have exceeded maximum number of MFA attempts.",
+   "should_logout_user": "false"
+}
+```
+
+****************On Error****************
+
+Return this if your hook processed the input with some error.
+
+- `error` An object that contains information about the error.
+    - `http_code` A number indicating the HTTP code to be returned. If not set, the code is HTTP 500 Internal Server Error.
+    - `message` A message to be returned in the HTTP response. Must be set.
+- In general all other fields attached to the returned JSON are ignored.
+
+Example output:
+
+```jsx
+{
+  "error": {
+    "http_code": 420,
+    "message": "You can only verify a factor once very 10 seconds."
+  }
+}
+```
+
+### Example
+
+****Scenario****
+
+You wish to limit the number of failed password verification attempts a user can have in an amount of time. A user can only input an incorrect password every 10 seconds and not more than that.
+
+****************************Database Setup****************************
+
+First you need to create a table that will record the last time a user had an incorrect password verification attempt.
+
+You can do this by creating a table such as:
+
+```sql
+create table public.password_failed_verification_attempts (
+	user_id uuid not null,
+  last_failed_at timestamp not null default now(),
+  primary key (user_id, factor_id)
+);
+```
+
+Then you should create a hook which will read and enter information into this table. Example:
+
+```sql
+create function public.hook_password_verification_attempt(event jsonb)
+	returns jsonb
+  language plpgsql
+  as $$
+	declare
+		last_failed_at timestamp;
+	begin
+		if event->'valid' is true
+		then
+			-- code is valid, accept it
+			return jsonb_build_object('decision', 'continue');
+		end if;
+
+		select last_failed_at into last_failed_at
+			from public.password_failed_verification_attempts
+			where
+				user_id = event->'user_id'
+
+		if last_failed_at is not null and now() - last_failed_at < interval '10 seconds'
+		then
+			-- last attempt was done too quickly
+			return jsonb_build_object(
+				'error', jsonb_build_object(
+					'http_code', 420,
+					'message',   'Please wait a moment before trying again.'));
+		end if;
+
+		-- record this failed attempt
+		insert into public.password_failed_verification_attempts
+			(
+				user_id,
+				last_failed_at
+			)
+			values
+			(
+				event->'user_id',
+				now()
+			)
+			on conflict
+        do update
+          set last_failed_at = now();
+
+		-- finally let Supabase Auth do the default behavior for a failed attempt
+		return jsonb_build_object('decision', 'continue');
+	end;
+	$$;
+```
+
+Supabase Auth will invoke this function with the `supabase_auth_admin` role which does not have permissions to modify the `public` schema. So you should grant it appropriate permissions:
+
+```sql
+grant execute
+	on function public.hook_password_verification_attempt
+	to supabase_auth_admin;
+
+grant all
+	on table public.password_failed_verification_attempts
+	to supabase_auth_admin;
+```
+
+Finally to make sure this function and table are not accessible from Supabase Serverless APIs, revoke those permissions from the `authenticated` and `anon` roles:
+
+```sql
+revoke execute
+	on function public.hook_password_verification_attempt
+	from authenticated, anon;
+
+revoke all
+	on table public.password_failed_verification_attempts
+	from authenticated, anon;
+```
+
+## Custom Access Token Hook
+
+You may wish to add additional claims based on the authentication method used or add additional metadata to select users. The custom access token hook runs before a token is issued and allows you to add claims.
+
+### Inputs
+
+- `user_id`Unique identifier for the user attempting to sign in. Correlate this to the `auth.users` table.
+- `claims` Claims which are attached to the access token.
+- `authentication_method` the authentication method used to request for the access token. Possible values include:
+    - `oauth`
+    - `password`
+    - `otp`
+    - `totp`
+    - `recovery`
+    - `invite`
+    - `sso/saml`
+    - `magiclink`
+    - `email/signup`
+    - `email_change`
+    - `token_refresh`
+
+### Outputs
+
+In exchange your hook should return back a JSON object with these fields set:
+
+********************************On Success********************************
+
+Return these only if your hook processed the input without errors.
+
+- `claims` A json containing the updated claims after the hook has been run
+
+****************On Error****************
+
+Return this if your hook processed the input with some error.
+
+- `error` An object that contains information about the error.
+    - `http_code` A number indicating the HTTP code to be returned. If not set, the code is HTTP 500 Internal Server Error.
+    - `message` A message to be returned in the HTTP response. Must be set.
+- In general all other fields attached to the returned JSON are ignored.
+
+
+
+<Admonition type="warn">
+Claims returned must conform to our specification. While you are free to add claims, you can only remove the `user_metadata` and app_metadata claims as we rely on the rest  of the claims for proper functioning of the service.
+</Admonition>
+Example output:
+
+```jsx
+{
+  "error": {
+    "http_code": 420,
+    "message": "You can only verify a factor once very 10 seconds."
+  }
+}
+```
+
+### Example
+
+****Scenario****
+
+You wish to assign roles to users. In particular, you wish to assign users with a `@supabase.com` email account a role of admin so that they can perform restricted actions
+
+You create a hook which will read and enter information into this table. Example:
+
+```
+create or replace function public.custom_access_token_hook(event jsonb)
+returns jsonb
+language plpgsql
+as $$
+declare
+    claims jsonb;
+    user_email text;
+begin
+    -- Fetch the email based on user_id
+    select email into user_email from users where id = event->>'user_id';
+
+    -- Check if the email has suffix '@supabase.com'
+    if user_email like '%@supabase.com' then
+        claims := event->'claims';
+
+        -- check if 'user_metadata' exists in claims
+        if jsonb_typeof(claims->'user_metadata') is null then
+            -- if 'user_metadata' does not exist, create an empty object
+            claims := jsonb_set(claims, '{user_metadata}', '{}');
+        end if;
+
+        -- set a claim of 'admin'
+        claims := jsonb_set(claims, '{user_metadata, admin}', 'true');
+
+        -- update the 'claims' object in the original event
+        event := jsonb_set(event, '{claims}', claims);
+    end if;
+
+    -- return the modified or original event
+    return event;
+end;
+$$;
+```
+
+Supabase Auth will invoke this function with the `supabase_auth_admin` role which does not have permissions to modify the `public` schema. So you should grant it appropriate permissions:
+
+```sql
+grant execute
+	on function public.custom_access_token_hook
+	to supabase_auth_admin;
+```
+
+Finally to make sure this function and table are not accessible from Supabase Serverless APIs, revoke those permissions from the `authenticated` and `anon` roles:
+
+```sql
+revoke execute
+	on function public.custom_access_token_hook
+	from authenticated, anon;
+```
+
+## Creating a Hook
+
+Oftentimes, the examples above might not exactly fit your exact use case. In such scenarios, you can consider writing your own hook based off the examples above.
+
+### Writing the Hook
+
+Head to the `SQL Editor > Templates` and select the corresponding template (e.g. `MFA Verification Attempt` ). This will generate a function signature for the corresponding extensibility point.
+
+Here is an example for the *MFA Verification Attempt* Hook
+
+```sql
+create
+or replace function mfa_verification_attempt(event jsonb) returns jsonb as $$
+declare
+  -- Add your variables here
+begin
+
+	-- Add your logic here
+  return response
+end;
+$$ language plpgsql;
+```
+
+### Granting Hook Permissions
+
+<Admonition type="warn">
+Avoid adding a `security definer` tag to the function to avoid permission errors.
+
+</Admonition>
+
+By default, Postgres functions are tagged with `security invoker` and will run with the permissions of the user that calls it. In the case of Auth Hooks, `supabase_auth_admin`  is the invoker and it will run with the permissions of `supabase_auth_admin`.
+
+In contrast, the `security definer` tag specifies that the hook is to be executed with the privileges of the user that owns it.  In the case of functions created via the Supabase Dashboard this is `postgres` which does not have permissions over the Auth schema. As such, introducing a `security definer` tag could prevent Supabase Auth from having the appropriate permissions to access tables or execute functions.
+
+As with the specific case examples above you will need to grant appropriate permissions to the functions and tables involved.
+
+```sql
+grant execute
+	on function public.your_function_name
+	to supabase_auth_admin;
+
+revoke execute
+	on function public.your_function_name
+	from authenticated, anon;
+```
+
+### Timeouts
+
+Hook timeouts are controlled by a local statement timeout scoped to the Postgres Function Hook. Ensure that your hooks complete within **2 seconds** to avoid any errors
+
+### Testing the Hook
+
+We strongly recommend testing the hook prior to going into production via [PgTAP](https://supabase.com/docs/guides/database/extensions/pgtap) or similar.
+
+## Connecting the Hook to Supabase Auth
+
+Head over to `Authentication > Hooks (Beta)` and select the appropriate PostgreSQL function from the dropdown menu.
+![Hooks UI](/apps/docs/public/img/guides/auth-postgres-hooks/hooks-ui.png)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+export default Page
