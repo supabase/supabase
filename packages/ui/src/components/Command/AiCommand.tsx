@@ -1,4 +1,4 @@
-import OpenAI from 'openai'
+import type OpenAI from 'openai'
 import {
   Dispatch,
   SetStateAction,
@@ -233,7 +233,6 @@ export function useAiChat({
           setIsResponding(true)
 
           const completionResponse: OpenAI.Chat.Completions.ChatCompletion = JSON.parse(e.data)
-          completionResponse.choices[0].message
           const [
             {
               delta: { content },
