@@ -1,0 +1,625 @@
+---
+id: upgrade-guide
+title: Upgrade to supabase_flutter v2
+description: 'Learn how to upgrade to supabase_flutter v2.'
+---
+
+Although supabase_flutter v2 brings a few breaking changes, for the most part the public API should be the same. 
+We have brought numerous updates behind the scenes to make the SDK work more intuitively for Flutter and Dart developers. 
+
+## Upgrade the client library
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    Make sure you are using v2 of the client library in your `pubspec.yaml` file.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+```yaml
+supabase_flutter: ^2.0.0
+```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+_Optionally_ passing custom configuration to `Supabase.initialize()` is now organized into separate objects:
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="1.0x"
+  queryGroup="version"
+>
+<TabPanel id="1.0x" label="Before">
+
+```dart main.dart
+await Supabase.initialize(
+  url: supabaseUrl,
+  anonKey: supabaseKey,
+  authFlowType: AuthFlowType.pkce,
+  storageRetryAttempts: 10,
+  realtimeClientOptions: const RealtimeClientOptions(
+    logLevel: RealtimeLogLevel.info,
+  ),
+);
+```
+
+</TabPanel>
+<TabPanel id="2.0x" label="After">
+
+```dart main.dart
+await Supabase.initialize(
+  url: 'SUPABASE_URL',
+  anonKey: 'SUPABASE_ANON_KEY',
+  authOptions: const FlutterAuthClientOptions(
+    authFlowType: AuthFlowType.pkce,
+  ),
+  realtimeClientOptions: const RealtimeClientOptions(
+    logLevel: RealtimeLogLevel.info,
+  ),
+  storageOptions: const StorageClientOptions(
+    retryAttempts: 10,
+  ),
+);
+```
+
+</TabPanel>
+</Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+### Auth updates
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+#### Renaming Provider to OAuthProvider
+
+`Provider` enum is renamed to `OAuthProvider`.
+Previously the `Provider` synbol often collided with classes in [provider](https://pub.dev/packages/provider) package and developers needed to add import prefixes to avoid collisions.
+With the new update, developers can use Supabase and Provider in the same codebase without any import prefixes.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+ <Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="1.0x"
+  queryGroup="version"
+>
+<TabPanel id="1.0x" label="Before">
+```dart
+await supabase.auth.signInWithOAuth(Provider.google);
+```
+
+</TabPanel>
+<TabPanel id="2.0x" label="After">
+```dart
+await supabase.auth.signInWithOAuth(OAuthProvider.google);
+```
+
+</TabPanel>
+</Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+#### Sign in with Apple method deprecated
+
+We have removed the [sign_in_with_apple](https://pub.dev/packages/sign_in_with_apple) dependency in v2.
+This is because not every developer needs to sign in with Apple, and we want to reduce the number of dependencies in the library.
+
+With v2, you can import [sign_in_with_apple](https://pub.dev/packages/sign_in_with_apple) as a separate dependency if you need to sign in with Apple.
+We have also added `auth.generateRawNonce()` method to easily generate a secure nonce.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+ <Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="1.0x"
+  queryGroup="version"
+>
+<TabPanel id="1.0x" label="Before">
+```dart
+await supabase.auth.signInWithApple();
+```
+
+</TabPanel>
+<TabPanel id="2.0x" label="After">
+```dart
+Future<AuthResponse> signInWithApple() async {
+  final rawNonce = supabase.auth.generateRawNonce();
+  final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
+
+  final credential = await SignInWithApple.getAppleIDCredential(
+    scopes: [
+      AppleIDAuthorizationScopes.email,
+      AppleIDAuthorizationScopes.fullName,
+    ],
+    nonce: hashedNonce,
+  );
+
+  final idToken = credential.identityToken;
+  if (idToken == null) {
+    throw const AuthException(
+        'Could not find ID Token from generated credential.');
+  }
+
+  return signInWithIdToken(
+    provider: OAuthProvider.apple,
+    idToken: idToken,
+    nonce: rawNonce,
+  );
+}
+```
+
+</TabPanel>
+</Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+#### Initialization does not await for session refresh
+
+In v1, `Supabase.initialize()` would await for the session to be refreshed before returning.
+This caused delays in app's launch time especially when the app was opened in a poor network environment.
+
+In v2, `Supabase.initialize()` returns immediately after obtaining session from the local storage, which makes the app launch faster.
+Because of this, there is no guarantee that the session is valid when the app starts.
+
+If you need to make sure the session is valid, you can access the `isExpired` getter to check if the session is valid.
+If the session is expired, you can listen to `onAuthStateChange` event and wait for a new `tokenRefreshed` event to be fired. 
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+ <Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="1.0x"
+  queryGroup="version"
+>
+<TabPanel id="1.0x" label="Before">
+```dart
+// Session was 
+final session = supabase.auth.currentSession;
+```
+
+</TabPanel>
+<TabPanel id="2.0x" label="After">
+```dart
+final session = supabase.auth.currentSession;
+
+// Check if the session is valid.
+final isSessionExpired = session?.isExpired;
+```
+
+</TabPanel>
+</Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+#### Removing Flutter Webview dependency for OAuth sign in
+
+In v1, on iOS you could pass a `BuildContext` to the `signInWithOAuth()` method to launch the OAuth flow in a Flutter Webview. 
+
+In v2, we have dropped the [webview_flutter](https://pub.dev/packages/webview_flutter) dependency in v2 to allow you to have full control over the UI of the OAuth flow.
+Also with the [native support for Google and Apple sign in](/docs/reference/dart/auth-signinwithidtoken), opening an external browser is less longer needed on iOS.
+
+Because of this update, we no longer need the `context` parameter, so we have removed the `context` parameter from the `signInWithOAuth()` method.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="1.0x"
+  queryGroup="version"
+>
+<TabPanel id="1.0x" label="Before">
+```dart
+// Opens a webview on iOS.
+await supabase.auth.signInWithOAuth(
+  Provider.github,
+  authScreenLaunchMode: LaunchMode.inAppWebView,
+  context: context,
+);
+```
+
+</TabPanel>
+<TabPanel id="2.0x" label="After">
+```dart
+// Opens in app webview on iOS.
+await supabase.auth.signInWithOAuth(
+  OAuthProvider.github,
+  authScreenLaunchMode: LaunchMode.inAppWebView,
+);
+```
+
+</TabPanel>
+</Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+#### PKCE is the default auth flow type
+
+[PKCE flow](https://supabase.com/blog/supabase-auth-sso-pkce#introducing-pkce), which is a more secure method for obtaining sessions from deep links is now the default auth flow for any authentication involving deep links.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+ <Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="1.0x"
+  queryGroup="version"
+>
+<TabPanel id="1.0x" label="Before">
+```dart
+await Supabase.initialize(
+  url: 'SUPABASE_URL',
+  anonKey: 'SUPABASE_ANON_KEY',
+  authFlowType: AuthFlowType.implicit, // set to implicit by default
+);
+```
+
+</TabPanel>
+<TabPanel id="2.0x" label="After">
+```dart
+await Supabase.initialize(
+  url: 'SUPABASE_URL',
+  anonKey: 'SUPABASE_ANON_KEY',
+    authOptions: FlutterAuthClientOptions(
+    authFlowType: AuthFlowType.pkce, // set to pkce by default
+  )
+);
+```
+
+</TabPanel>
+</Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+#### Auth callback host name parameter removed
+
+`Supabase.initialize()` no longer has the `authCallbackUrlHostname` parameter.
+The supabase_flutter SDK will automatically detect auth callback URLs and handle them internally.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+ <Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="1.0x"
+  queryGroup="version"
+>
+<TabPanel id="1.0x" label="Before">
+```dart
+await Supabase.initialize(
+  url: 'SUPABASE_URL',
+  anonKey: 'SUPABASE_ANON_KEY',
+  authCallbackUrlHostname: 'auth-callback',
+);
+```
+
+</TabPanel>
+<TabPanel id="2.0x" label="After">
+```dart
+await Supabase.initialize(
+  url: 'SUPABASE_URL',
+  anonKey: 'SUPABASE_ANON_KEY',
+);
+```
+
+</TabPanel>
+</Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+#### SupabaseAuth class removed
+
+`SupabaseAuth` had `initialSession` member, which was used to obtain the initial session when the app starts.
+This is now removed, and `currentSession` should be used to access the session at any time.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+ <Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="1.0x"
+  queryGroup="version"
+>
+<TabPanel id="1.0x" label="Before">
+```dart
+// Use `initialSession` to obtain the initial session when the app starts.
+final initialSession = await SupabaseAuth.initialSession;
+```
+
+</TabPanel>
+<TabPanel id="2.0x" label="After">
+```dart
+// Use `currentSession` to access the session at any time.
+final initialSession = await supabase.auth.currentSession;
+```
+
+</TabPanel>
+</Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+### Data methods
+
+`.insert()` / `.upsert()` / `.update()` / `.delete()` don't return rows by default: [PR](https://github.com/supabase/postgrest-js/pull/276).
+
+Previously, these methods return inserted/updated/deleted rows by default (which caused [some confusion](https://github.com/supabase/supabase/discussions/1548)), and you can opt to not return it by specifying `returning: 'minimal'`. Now the default behavior is to not return rows. To return inserted/updated/deleted rows, add a `.select()` call at the end.
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+#### Insert and return data
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="1.0x"
+  queryGroup="version"
+>
+<TabPanel id="1.0x" label="Before">
+```dart
+const { data, error } = await supabase
+  .from('my_table')
+  .insert({ new_data })
+```
+
+</TabPanel>
+<TabPanel id="2.0x" label="After">
+```dart
+const { data, error } = await supabase
+  .from('my_table')
+  .insert({ new_data })
+  .select()
+```
+
+</TabPanel>
+</Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+#### Update and return data
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="1.0x"
+  queryGroup="version"
+>
+<TabPanel id="1.0x" label="Before">
+```dart
+const { data, error } = await supabase
+  .from('my_table')
+  .update({ new_data })
+  .eq('id', id)
+```
+
+</TabPanel>
+<TabPanel id="2.0x" label="After">
+```dart
+const { data, error } = await supabase
+  .from('my_table')
+  .update({ new_data })
+  .eq('id', id)
+  .select()
+```
+
+</TabPanel>
+</Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+#### Upsert and return data
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="1.0x"
+  queryGroup="version"
+>
+<TabPanel id="1.0x" label="Before">
+```dart
+const { data, error } = await supabase
+  .from('my_table')
+  .upsert({ new_data })
+```
+
+</TabPanel>
+<TabPanel id="2.0x" label="After">
+```dart
+const { data, error } = await supabase
+  .from('my_table')
+  .upsert({ new_data })
+  .select()
+```
+
+</TabPanel>
+</Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+#### Delete and return data
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="1.0x"
+  queryGroup="version"
+>
+<TabPanel id="1.0x" label="Before">
+```dart
+const { data, error } = await supabase
+  .from('my_table')
+  .delete()
+  .eq('id', id)
+```
+
+</TabPanel>
+<TabPanel id="2.0x" label="After">
+```dart
+const { data, error } = await supabase
+  .from('my_table')
+  .delete()
+  .eq('id', id)
+  .select()
+```
+
+</TabPanel>
+</Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+### Realtime methods
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+#### Subscribe
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="1.0x"
+  queryGroup="version"
+>
+<TabPanel id="1.0x" label="Before">
+
+```dart
+const userListener = supabase
+  .from('users')
+  .on('*', (payload) => handleAllEventsPayload(payload.new))
+  .subscribe()
+```
+
+</TabPanel>
+<TabPanel id="2.0x" label="After">
+
+```dart
+const userListener = supabase
+  .channel('public:user')
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'user' }, (payload) =>
+    handleAllEventsPayload()
+  )
+  .subscribe()
+```
+
+</TabPanel>
+</Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+#### Unsubscribe
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="1.0x"
+  queryGroup="version"
+>
+<TabPanel id="1.0x" label="Before">
+
+```dart
+userListener.unsubscribe()
+```
+
+</TabPanel>
+<TabPanel id="2.0x" label="After">
+
+```dart
+supabase.removeChannel(userListener)
+```
+
+</TabPanel>
+</Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
