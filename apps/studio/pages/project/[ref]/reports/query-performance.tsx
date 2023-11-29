@@ -273,7 +273,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                   }
                   body={
                     !isLoading && mostFrequentlyInvoked && mostFrequentlyInvoked?.data ? (
-                      mostFrequentlyInvoked.data!.map((item, i) => {
+                      mostFrequentlyInvoked.data?.map((item, i) => {
                         return (
                           <Table.tr key={i} hoverable className="relative">
                             <Table.td className="table-cell whitespace-nowrap w-28">
@@ -336,7 +336,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                   }
                   body={
                     !isLoading && slowestExecutionTime && slowestExecutionTime?.data ? (
-                      slowestExecutionTime.data!.map((item, i) => {
+                      slowestExecutionTime.data?.map((item, i) => {
                         return (
                           <Table.tr key={i} hoverable className="relative">
                             <Table.td className="table-cell whitespace-nowrap w-24">
