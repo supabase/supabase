@@ -64,6 +64,7 @@ export const AIPolicyChat = ({
   useEffect(() => {
     if (!loading) {
       form.setValue('chat', '')
+      form.setFocus('chat')
     }
   }, [loading])
 
