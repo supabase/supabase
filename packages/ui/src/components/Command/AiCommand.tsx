@@ -39,13 +39,6 @@ const questions = [
   'How do I set up authentication?',
 ]
 
-type CreateChatCompletionResponseChoicesInnerDelta = Omit<
-  OpenAI.Chat.Completions.ChatCompletion.Choice,
-  'message'
-> & {
-  delta: Partial<OpenAI.Chat.Completions.ChatCompletionMessage>
-}
-
 function getEdgeFunctionUrl() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '')
 
@@ -232,13 +225,12 @@ export function useAiChat({
 
           setIsResponding(true)
 
-          const completionResponse: OpenAI.Chat.Completions.ChatCompletion = JSON.parse(e.data)
+          const completionChunk: OpenAI.Chat.Completions.ChatCompletionChunk = JSON.parse(e.data)
           const [
             {
               delta: { content },
             },
-          ] =
-            completionResponse.choices as unknown as CreateChatCompletionResponseChoicesInnerDelta[]
+          ] = completionChunk.choices
 
           if (content) {
             dispatchMessage({
@@ -325,12 +317,12 @@ export function queryAi(messages: Message[], timeout = 0) {
           return
         }
 
-        const completionResponse: OpenAI.Chat.Completions.ChatCompletion = JSON.parse(e.data)
+        const completionChunk: OpenAI.Chat.Completions.ChatCompletionChunk = JSON.parse(e.data)
         const [
           {
             delta: { content },
           },
-        ] = completionResponse.choices as unknown as CreateChatCompletionResponseChoicesInnerDelta[]
+        ] = completionChunk.choices
 
         if (content) {
           answer += content
