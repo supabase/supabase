@@ -209,7 +209,7 @@ const EnableBranchingModal = () => {
                         You will not be able to use the dashboard to make changes to the database
                       </p>
                       <p className="text-sm text-foreground-light">
-                        Schema changes for database Preview Branches must be made using git. 
+                        Schema changes for database Preview Branches must be made using git.
                         Dashboard changes to Preview Branches are coming soon.
                       </p>
                     </div>
@@ -251,8 +251,9 @@ const EnableBranchingModal = () => {
                     Point in time recovery (PITR) is required for branching
                   </AlertTitle_Shadcn_>
                   <AlertDescription_Shadcn_>
-                    This is to ensure that you can always recover data if you make a "bad migration".
-                    For example, if you accidentally delete a column or some of your production data.
+                    This is to ensure that you can always recover data if you make a "bad
+                    migration". For example, if you accidentally delete a column or some of your
+                    production data.
                   </AlertDescription_Shadcn_>
                   {isFreePlan && (
                     <AlertDescription_Shadcn_ className="mt-2">

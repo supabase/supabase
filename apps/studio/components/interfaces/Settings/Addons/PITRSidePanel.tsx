@@ -245,8 +245,8 @@ const PITRSidePanel = () => {
                 Are you sure you want to disable this while using Branching?
               </AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_>
-                Without PITR, you might not be able to recover lost data if you accidentally
-                merge a branch that deletes a column or user data. We don't recommend this.
+                Without PITR, you might not be able to recover lost data if you accidentally merge a
+                branch that deletes a column or user data. We don't recommend this.
               </AlertDescription_Shadcn_>
             </Alert_Shadcn_>
           )}
