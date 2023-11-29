@@ -59,7 +59,7 @@ for insert
 to authenticated
 with check (
   bucket_id = 'my_bucket_id' and
-  storage.foldername(name)[1] = 'private'
+  (storage.foldername(name))[1] = 'private'
 );
 ```
 
@@ -72,7 +72,7 @@ for insert
 to authenticated
 with check (
   bucket_id = 'my_bucket_id' and
-  storage.foldername(name)[1] = auth.uid()
+  (storage.foldername(name))[1] = auth.uid()::text
 );
 ```
 

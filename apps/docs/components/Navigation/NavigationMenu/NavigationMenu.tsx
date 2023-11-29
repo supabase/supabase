@@ -59,6 +59,11 @@ const menus: Menu[] = [
     type: 'guide',
   },
   {
+    id: 'auth',
+    path: '/learn/auth-deep-dive',
+    type: 'guide',
+  },
+  {
     id: 'functions',
     path: '/guides/functions',
     type: 'guide',
@@ -147,17 +152,17 @@ const menus: Menu[] = [
     type: 'reference',
   },
   {
-    id: 'reference_swift_v0',
+    id: 'reference_swift_v1',
     path: '/reference/swift',
     commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_swift_v0.yml',
+    specFile: 'supabase_swift_v1.yml',
     type: 'reference',
   },
   {
     id: 'reference_kotlin_v0',
     path: '/reference/kotlin',
     commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_kt_v0.yml',
+    specFile: 'supabase_kt_v1.yml',
     type: 'reference',
   },
   {

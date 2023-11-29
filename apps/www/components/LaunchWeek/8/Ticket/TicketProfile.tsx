@@ -8,7 +8,7 @@ type Props = {
   golden?: boolean
 }
 
-export default function TicketProfile({ user, ticketGenerationState, golden = false }: Props) {
+export default function TicketProfile({ user }: Props) {
   const { username, name, metadata } = user
 
   const HAS_ROLE = !!metadata?.role
@@ -18,7 +18,7 @@ export default function TicketProfile({ user, ticketGenerationState, golden = fa
 
   return (
     <div className="relative z-10 flex gap-4 items-center px-2">
-      <div className="text-light text-sm md:text-base flex flex-col gap-2">
+      <div className="text-foreground-light text-sm md:text-base flex flex-col gap-2">
         <p className="text-3xl sm:text-4xl">{name || username || 'Your Name'}</p>
         {HAS_NO_META && username && <p>@{username}</p>}
         <div>

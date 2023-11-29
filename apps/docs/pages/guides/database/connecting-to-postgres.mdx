@@ -128,7 +128,7 @@ This is the most granular option. Connections are returned to the pool after eve
 
     <StepHikeCompact.Details title="Install">
 
-    Install Drizzle and releated dependencies.
+    Install Drizzle and related dependencies.
 
     </StepHikeCompact.Details>
 
@@ -183,7 +183,9 @@ This is the most granular option. Connections are returned to the pool after eve
     import { users } from './schema'
 
     const connectionString = process.env.DATABASE_URL
-    const client = postgres(connectionString)
+
+    // Disable prefetch as it is not supported for "Transaction" pool mode
+    const client = postgres(connectionString, { prepare: false })
     const db = drizzle(client);
 
     const allUsers = await db.select().from(users);
@@ -287,7 +289,7 @@ psql "sslmode=verify-full sslrootcert=$HOME/Downloads/prod-supabase.cer host=db.
 
     <StepHikeCompact.Details title="Install">
 
-    Install Postgres.js and releated dependencies.
+    Install Postgres.js and related dependencies.
 
     </StepHikeCompact.Details>
 

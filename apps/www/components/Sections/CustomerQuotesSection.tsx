@@ -41,7 +41,7 @@ const CustomerQuotesSection = (props: Props) => {
 
   const Card = ({ customer, index }: Card) => {
     const { resolvedTheme } = useTheme()
-    const logo = `/images/customers/logos/${resolvedTheme !== 'dark' ? '' : 'light/'}${
+    const logo = `/images/customers/logos/${!resolvedTheme?.includes('dark') ? '' : 'light/'}${
       customer.customer
     }.png`
 
@@ -67,12 +67,12 @@ const CustomerQuotesSection = (props: Props) => {
             </div>
           </div>
           <div className="border-t pt-4">
-            <blockquote className="text-light text-base">{customer.quote}</blockquote>
+            <blockquote className="text-foreground-light text-base">{customer.quote}</blockquote>
           </div>
         </div>
 
         <div>
-          <p className="text-muted mt-4">
+          <p className="text-foreground-lighter mt-4">
             {customer.author}, {customer.role}
           </p>
           {customer.url && (
