@@ -21,6 +21,7 @@ import { useCheckPermissions, useFlag, useStore } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { NextPageWithLayout } from 'types'
+import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 /**
  * Filter tables by table name and policy name
@@ -63,9 +64,9 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   const { meta } = useStore()
   const { search } = useParams()
   const [searchString, setSearchString] = useState<string>('')
-  const canCreatePolicyWithAi = useFlag('policyEditorWithAi')
 
   const [showPolicyAiEditor, setShowPolicyAiEditor] = useState(false)
+  const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
 
   useEffect(() => {
     if (search) setSearchString(search)
@@ -137,7 +138,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
                 Documentation
               </Button>
             </a>
-            {canCreatePolicyWithAi && (
+            {isAiAssistantEnabled && (
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger>
                   <Button
