@@ -209,9 +209,8 @@ const EnableBranchingModal = () => {
                         You will not be able to use the dashboard to make changes to the database
                       </p>
                       <p className="text-sm text-foreground-light">
-                        Schema changes for database preview branches must be done via Git. We are
-                        nonetheless working on allowing the dashboard to make schema changes for
-                        preview branches.
+                        Schema changes for database Preview Branches must be made using git. 
+                        Dashboard changes to Preview Branches are coming soon.
                       </p>
                     </div>
                   </div>
