@@ -1,22 +1,17 @@
 'use client'
 
-import { ChatInputAtom } from '@/components/Chat/ChatInput'
 import { CHAT_EXAMPLES } from '@/data/chat-examples'
 import { useAppStateSnapshot } from '@/lib/state'
 import { createClient } from '@/lib/supabase/client'
 import { useMutation } from '@tanstack/react-query'
 import { ExternalLink } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useState } from 'react'
-import { cn } from 'ui'
-
-interface ChatInputParams {
-  userID: string | undefined
-}
+import { createRef, useState } from 'react'
+import { AssistantChatInput, cn } from 'ui'
 
 const suggestions = CHAT_EXAMPLES
 
-const NewThreadInput = ({ userID }: ChatInputParams) => {
+const NewThreadInput = () => {
   const router = useRouter()
 
   const [value, setValue] = useState(() => {
@@ -36,7 +31,11 @@ const NewThreadInput = ({ userID }: ChatInputParams) => {
 
   const { mutate, isPending, isSuccess } = useMutation({
     mutationFn: async (prompt: string) => {
-      const body = { prompt, userID } // Include userID in the body object
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
+      const body = { prompt, userID: user?.id } // Include userID in the body object
 
       const response = await fetch('/api/ai/sql/threads/create', {
         method: 'POST',
@@ -52,11 +51,30 @@ const NewThreadInput = ({ userID }: ChatInputParams) => {
     },
   })
 
+  const textAreaRef = createRef<HTMLTextAreaElement>()
+  const submitRef = createRef<HTMLButtonElement>()
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Check if the pressed key is "Enter" (key code 13) without the "Shift" key
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault()
+      if (submitRef.current) {
+        submitRef.current.click()
+      }
+    }
+  }
   return (
     <>
       <div className="relative w-10/12 xl:w-11/12 max-w-xl">
-        <ChatInputAtom
-          handleSubmit={async () => {
+        <form
+          key={'new-thread-form'}
+          id={'new-thread-form'}
+          onSubmit={async (event) => {
+            event.preventDefault()
+            console.log('Simple onSubmit')
+
+            console.log('submitting')
+
             const {
               data: { user },
             } = await supabase.auth.getUser()
@@ -70,21 +88,28 @@ const NewThreadInput = ({ userID }: ChatInputParams) => {
               mutate(value)
             }
           }}
-          autoFocus
-          value={value}
-          rows={1}
-          contentEditable
-          aria-expanded={false}
-          placeholder="e.g Create a Telegram-like chat application"
-          disabled={isPending || isSuccess}
-          loading={isPending || isSuccess}
-          onChange={(e) => setValue(e.target.value)}
-        />
+        >
+          <AssistantChatInput
+            ref={textAreaRef}
+            submitRef={submitRef}
+            autoFocus
+            value={value}
+            rows={1}
+            contentEditable
+            aria-expanded={false}
+            placeholder="e.g Create a Telegram-like chat application"
+            disabled={isPending || isSuccess}
+            loading={isPending || isSuccess}
+            onChange={(e) => setValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
+        </form>
       </div>
       <div className="flex gap-3">
         {suggestions.map((suggestion, idx) => (
           <button
             key={idx}
+            type="button"
             className={cn(
               'text-xs',
               'flex items-center gap-3 !pr-3',

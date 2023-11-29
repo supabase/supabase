@@ -162,6 +162,10 @@ export { ScrollArea, ScrollBar } from './src/components/shadcn/ui/scroll-area'
 
 export { Separator } from './src/components/shadcn/ui/separator'
 
+// patterns
+
+export { AssistantChatInput as AssistantChatInput } from './src/patterns/AssistantChatInput'
+
 // links
 
 export * from './src/components/TextLink'
