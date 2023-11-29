@@ -252,9 +252,8 @@ const EnableBranchingModal = () => {
                     Point in time recovery (PITR) is required for branching
                   </AlertTitle_Shadcn_>
                   <AlertDescription_Shadcn_>
-                    This is to ensure that your project can always be restored to a healthy state in
-                    the event of a bad migration that might occur when merging a preview branch into
-                    your production branch.
+                    This is to ensure that you can always recover data if you make a "bad migration".
+                    For example, if you accidentally delete a column or some of your production data.
                   </AlertDescription_Shadcn_>
                   {isFreePlan && (
                     <AlertDescription_Shadcn_ className="mt-2">
