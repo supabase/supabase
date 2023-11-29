@@ -9,13 +9,23 @@ import { useTheme } from 'next-themes'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import Telemetry from 'lib/telemetry'
 
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
-import { Alert, Button, IconExternalLink, Radio, SidePanel } from 'ui'
+import {
+  Alert,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconExternalLink,
+  Radio,
+  SidePanel,
+} from 'ui'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { AlertTriangleIcon } from 'lucide-react'
 
 const PITR_CATEGORY_OPTIONS: {
   id: 'off' | 'on'
@@ -42,12 +52,15 @@ const PITRSidePanel = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const { resolvedTheme } = useTheme()
+  const project = useSelectedProject()
   const organization = useSelectedOrganization()
 
   const [selectedCategory, setSelectedCategory] = useState<'on' | 'off'>('off')
   const [selectedOption, setSelectedOption] = useState<string>('pitr_0')
 
   const canUpdatePitr = useCheckPermissions(PermissionAction.BILLING_WRITE, 'stripe.subscriptions')
+  const isBranchingEnabled =
+    project?.is_branch_enabled === true || project?.parent_project_ref !== undefined
 
   const snap = useSubscriptionPageStateSnapshot()
   const visible = snap.panelKey === 'pitr'
@@ -224,6 +237,19 @@ const PITRSidePanel = () => {
               })}
             </div>
           </div>
+
+          {selectedCategory === 'off' && subscriptionPitr !== undefined && isBranchingEnabled && (
+            <Alert_Shadcn_ variant="warning">
+              <AlertTriangleIcon strokeWidth={2} />
+              <AlertTitle_Shadcn_>
+                Are you sure you want to disable this while using Branching?
+              </AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_>
+                Without PITR, you might not be able to recover lost data if you accidentally merge a
+                branch that deletes a column or user data. We don't recommend this.
+              </AlertDescription_Shadcn_>
+            </Alert_Shadcn_>
+          )}
 
           {selectedCategory === 'on' && (
             <div className="!mt-8 pb-4">
