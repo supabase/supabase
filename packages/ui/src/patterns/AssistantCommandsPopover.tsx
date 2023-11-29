@@ -21,14 +21,15 @@ const AssistantCommandsPopover = ({
   value,
   open,
   setOpen,
+  suggestions,
 }: {
   children: React.ReactNode
   textAreaRef: React.RefObject<HTMLTextAreaElement>
   setValue: (value: string) => void
   value: string
-
   open: boolean
   setOpen: (value: boolean) => void
+  suggestions?: string[]
 }) => {
   const [command, setCommand] = useState<string>('')
 
@@ -96,7 +97,8 @@ const AssistantCommandsPopover = ({
 
   const resultArray = value.split(/(\s+)/).filter(Boolean)
 
-  console.log(resultArray)
+  const commands = ['fix', 'improve', 'explain', 'help']
+
   return (
     <>
       <Popover
@@ -106,27 +108,34 @@ const AssistantCommandsPopover = ({
           if (textAreaRef) textAreaRef?.current?.focus()
         }}
       >
-        <PopoverAnchor className="w-full">
-          <div
-            style={{
-              marginLeft: command && commandWidth ? `${48 + commandWidth + 12}px` : `${48}px`,
-            }}
-            className={cn('absolute flex items-center text-sm text-transparent')}
-          >
-            {resultArray.map((item, i) => (
-              <span
-                key={i}
-                className={
-                  item === '/fix' || item === '/improve' || item === '/explain' || item === '/help'
-                    ? 'bg-brand-400 border-brand-400 border border-9'
-                    : ''
-                }
-              >
-                {item === ' ' ? '\u00A0' : item}
-              </span>
-            ))}
-          </div>
-          {children}
+        <PopoverAnchor className="w-full relative">
+          <>
+            <div
+              style={{
+                left: '0px',
+                top: '10px',
+                marginLeft: command && commandWidth ? `${48 + commandWidth + 12}px` : `${48}px`,
+              }}
+              className={cn('z-0 absolute flex items-center text-sm text-transparent')}
+            >
+              {resultArray.map((item, i) => (
+                <span
+                  key={i}
+                  className={cn(
+                    item === '/fix' ||
+                      item === '/improve' ||
+                      item === '/explain' ||
+                      item === '/help'
+                      ? 'bg-surface-300'
+                      : ''
+                  )}
+                >
+                  {item === ' ' ? '\u00A0' : item}
+                </span>
+              ))}
+            </div>
+            {children}
+          </>
         </PopoverAnchor>
         <PopoverContent
           ref={ref}
@@ -149,75 +158,35 @@ const AssistantCommandsPopover = ({
             <CommandList>
               <CommandEmpty>No results found.</CommandEmpty>
               <CommandGroup heading="Suggestions">
-                <CommandItem
-                  value="/ Add policy for org Inserted User Access"
-                  className="text-sm text-default flex gap-3"
-                  onSelect={() => {
-                    setValue('Add policy for org Inserted User Access')
-                  }}
-                >
-                  <AiIcon className="scale-75" />
-                  Add policy for org Inserted User Access
-                </CommandItem>
-                <CommandItem
-                  value="/ Add policy for User-Specific Todo Access"
-                  className="text-sm text-default flex gap-3"
-                  onSelect={() => {
-                    setValue('Add policy for User-Specific Todo Access')
-                  }}
-                >
-                  <AiIcon className="scale-75" />
-                  Add policy for User-Specific Todo Access
-                </CommandItem>
-                <CommandItem
-                  value="/ Add policy for Org Update Restriction"
-                  className="text-sm text-default flex gap-3"
-                  onSelect={() => {
-                    setValue('Add policy for Org Update Restriction')
-                  }}
-                >
-                  <AiIcon className="scale-75" />
-                  Add policy for Org Update Restriction
-                </CommandItem>
+                {suggestions?.map((suggestion, idx) => (
+                  <CommandItem
+                    key={idx}
+                    value={'/ ' + suggestion}
+                    className="text-sm gap-0.5"
+                    onSelect={() => {
+                      setValue(`${suggestion}`)
+                      // closing of the popover is handled by the keydown event in AssistantChatForm
+                    }}
+                  >
+                    <span className="text-default">{suggestion}</span>
+                  </CommandItem>
+                ))}
               </CommandGroup>
               <CommandSeparator />
               <CommandGroup heading="Commands">
-                <CommandItem
-                  className="text-sm gap-0.5"
-                  onSelect={() => {
-                    setValue('/fix ')
-                  }}
-                >
-                  <span className="text-brand">/</span>
-                  <span className="text-default">fix</span>
-                </CommandItem>
-                <CommandItem
-                  className="text-sm gap-0.5"
-                  onSelect={() => {
-                    setValue('/improve ')
-                  }}
-                >
-                  <span className="text-brand">/</span>
-                  <span className="text-default">improve</span>
-                </CommandItem>
-                <CommandItem
-                  className="text-sm gap-0.5"
-                  onSelect={() => {
-                    setValue('/explain ')
-                  }}
-                >
-                  <span className="text-brand">/</span>
-                  <span className="text-default">explain</span>
-                </CommandItem>
-                <CommandItem
-                  className="text-sm gap-0.5"
-                  onSelect={() => {
-                    setValue('/help ')
-                  }}
-                >
-                  <span className="text-brand">/</span>
-                  <span className="text-default">help</span>
-                </CommandItem>
+                {commands.map((command, idx) => (
+                  <CommandItem
+                    key={idx}
+                    className="text-sm gap-0.5"
+                    onSelect={() => {
+                      setValue(`/${command} `)
+                      // closing of the popover is handled by the keydown event in AssistantChatForm
+                    }}
+                  >
+                    <span className="text-brand">/</span>
+                    <span className="text-default">{command}</span>
+                  </CommandItem>
+                ))}
               </CommandGroup>
             </CommandList>
           </Command>

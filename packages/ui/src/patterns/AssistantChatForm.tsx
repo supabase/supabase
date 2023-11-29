@@ -74,9 +74,10 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
           disabled={disabled}
           contentEditable
           aria-expanded={false}
-          className={
-            'transition-all text-sm pl-12 pr-10 rounded-[18px] resize-none box-border leading-6'
-          }
+          className={cn(
+            'transition-all text-sm pl-12 pr-10 rounded-[18px] resize-none box-border leading-6',
+            'bg-transparent'
+          )}
           placeholder={props.placeholder}
           spellCheck={false}
           value={value}

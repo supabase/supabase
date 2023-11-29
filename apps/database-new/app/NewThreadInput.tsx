@@ -54,6 +54,12 @@ const NewThreadInput = () => {
   const [commandsOpen, setCommandsOpen] = useState<boolean>(false)
   const textAreaRef = createRef<HTMLTextAreaElement>()
 
+  const suggestions = [
+    'Add policy for org Inserted User Access',
+    'Add policy for User-Specific Todo Access',
+    'Add policy for Org Update Restriction',
+  ]
+
   return (
     <>
       <div className="relative w-10/12 xl:w-11/12 max-w-xl">
@@ -63,6 +69,7 @@ const NewThreadInput = () => {
           textAreaRef={textAreaRef}
           value={value}
           setValue={(e) => setValue(e)}
+          suggestions={suggestions}
         >
           <AssistantChatForm
             textAreaRef={textAreaRef}
@@ -95,7 +102,7 @@ const NewThreadInput = () => {
         </AssistantCommandsPopover>
       </div>
       <div className="flex gap-3">
-        {suggestions.map((suggestion, idx) => (
+        {CHAT_EXAMPLES.map((suggestion, idx) => (
           <button
             key={idx}
             type="button"
