@@ -17,6 +17,7 @@ const mono_font = fetch(new URL(MONO_FONT_URL, import.meta.url)).then((res) => r
 const BUCKET_FOLDER_VERSION = 'v1'
 
 const LW_TABLE = 'lwx_tickets'
+const LW_MATERIALIZED_VIEW = 'lwx_tickets_golden'
 
 const STYLING_CONGIF = {
   REG: {
@@ -66,7 +67,7 @@ export async function handler(req: Request) {
 
     // Get ticket data
     const { data, error } = await supabaseAdminClient
-      .from(LW_TABLE)
+      .from(LW_MATERIALIZED_VIEW)
       .select('name, ticketNumber, sharedOnTwitter, sharedOnLinkedIn, metadata')
       .eq('username', username)
       .maybeSingle()
