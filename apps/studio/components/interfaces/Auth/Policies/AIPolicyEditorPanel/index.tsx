@@ -254,7 +254,7 @@ export const AIPolicyEditorPanel = memo(function ({
     <>
       <Sheet_Shadcn_ open={visible} onOpenChange={() => onClosingPanel()}>
         <SheetContent_Shadcn_
-          size="lg"
+          size={assistantVisible ? 'lg' : 'default'}
           className={cn('p-0 flex flex-row gap-0', assistantVisible && '!min-w-[1024px]')}
         >
           <div className={cn('flex flex-col grow w-full', assistantVisible && 'w-[60%]')}>
