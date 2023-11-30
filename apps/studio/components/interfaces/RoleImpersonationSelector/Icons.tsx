@@ -106,8 +106,8 @@ export const AuthenticatedIcon = ({ isSelected = false }: IconProps) => {
         <path
           d="M15.63 10.656h32.214"
           stroke="#33A7E9"
-          stroke-linecap="round"
-          stroke-dasharray="2 2"
+          strokeLinecap="round"
+          strokeDasharray="2 2"
         />
         <path
           d="m30.59 7.724 6.607-6.606M33.679 15.047l5.957-5.958"
