@@ -8,6 +8,7 @@ import { IconArrowRight, IconKey, IconLink, IconLock } from 'ui'
 import { useDispatch, useTrackedState } from '../../store'
 import { ColumnHeaderProps, ColumnType, DragItem, GridForeignKey } from '../../types'
 import { ColumnMenu } from '../menu'
+import { useEffect } from 'react'
 
 export function ColumnHeader<R>({
   column,
@@ -26,12 +27,14 @@ export function ColumnHeader<R>({
   const hoverValue = column.name as string
 
   // keep state.gridColumns' order in sync with data grid component
-  if (state.gridColumns[columnIdx].key != columnKey) {
-    dispatch({
-      type: 'UPDATE_COLUMN_IDX',
-      payload: { columnKey, columnIdx },
-    })
-  }
+  useEffect(() => {
+    if (state.gridColumns[columnIdx].key != columnKey) {
+      dispatch({
+        type: 'UPDATE_COLUMN_IDX',
+        payload: { columnKey, columnIdx },
+      })
+    }
+  }, [columnKey, columnIdx, state.gridColumns])
 
   const [{ isDragging }, drag] = useDrag({
     type: 'column-header',

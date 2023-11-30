@@ -22,12 +22,14 @@ const prism = {
 interface SimpleCodeBlockProps {
   className?: string
   metastring?: string
+  showCopy?: boolean
 }
 
 const SimpleCodeBlock = ({
   children,
   className: languageClassName,
   metastring,
+  showCopy = true,
 }: PropsWithChildren<SimpleCodeBlockProps>) => {
   const [showCopied, setShowCopied] = useState(false)
   const target = useRef(null)
@@ -82,11 +84,13 @@ const SimpleCodeBlock = ({
                 )
               })}
             </pre>
-            <div className="invisible absolute right-0 top-0 opacity-0 transition-opacity group-hover:visible group-hover:opacity-100">
-              <Button size="tiny" type="default" onClick={() => handleCopyCode(children)}>
-                {showCopied ? 'Copied' : 'Copy'}
-              </Button>
-            </div>
+            {showCopy && (
+              <div className="invisible absolute right-0 top-0 opacity-0 transition-opacity group-hover:visible group-hover:opacity-100">
+                <Button size="tiny" type="default" onClick={() => handleCopyCode(children)}>
+                  {showCopied ? 'Copied' : 'Copy'}
+                </Button>
+              </div>
+            )}
           </div>
         )
       }}

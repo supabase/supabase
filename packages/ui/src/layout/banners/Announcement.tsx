@@ -32,7 +32,7 @@ const Announcement = ({
   const isLaunchWeekSection = router.pathname.includes('launch-week')
 
   // override to hide announcement
-  if (!show || !announcement.show || isHomePage) return null
+  if (!show || !announcement.show || isHomePage || isLaunchWeekSection) return null
 
   // construct the key for the announcement, based on the title text
   const announcementKey = 'announcement_' + announcement.text.replace(/ /g, '')
@@ -59,7 +59,7 @@ const Announcement = ({
     return (
       <div
         onClick={() => window.location.assign(announcement.link)}
-        className={['relative z-40 w-full cursor-pointer', className].join(' ')}
+        className={['relative z-40 h-[55px] w-full cursor-pointer', className].join(' ')}
       >
         {!isLaunchWeekSection && (
           <div

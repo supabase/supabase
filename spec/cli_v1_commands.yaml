@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.112.0
+  version: 1.115.4
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -1501,9 +1501,22 @@ commands:
     tags:
       - local-dev
     links: []
-    usage: supabase login
+    usage: supabase login [flags]
     subcommands: []
-    flags: []
+    flags:
+      - id: name
+        name: --name <string>
+        description: |
+          Name that will be used to store token in your settings, defaults to built-in token name generator
+        default_value: ''
+      - id: no-browser
+        name: --no-browser
+        description: Do not open browser automatically
+        default_value: 'false'
+      - id: token
+        name: --token <string>
+        description: Use provided token instead of automatic login flow
+        default_value: ''
   - id: supabase-link
     title: supabase link
     summary: Link to a Supabase project
@@ -2272,6 +2285,10 @@ commands:
     usage: supabase init [flags]
     subcommands: []
     flags:
+      - id: use-orioledb
+        name: --use-orioledb
+        description: Use OrioleDB storage engine for Postgres
+        default_value: 'false'
       - id: with-vscode-workspace
         name: --with-vscode-workspace
         description: Generate VS Code workspace.
