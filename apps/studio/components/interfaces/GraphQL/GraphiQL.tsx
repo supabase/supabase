@@ -179,7 +179,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
     <Tooltip label="Add tab">
       <UnStyledButton
         type="button"
-        className="graphiql-tab-add"
+        className="graphiql-tab-add text-sm"
         onClick={handleAddTab}
         aria-label="Add tab"
       >
@@ -280,8 +280,8 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                         className={
                           activeSecondaryEditor === 'variables' &&
                           editorToolsResize.hiddenElement !== 'second'
-                            ? 'active'
-                            : ''
+                            ? 'active text-sm'
+                            : 'text-sm'
                         }
                         onClick={handleToolsTabClick}
                         data-name="variables"
@@ -294,8 +294,8 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                         className={
                           activeSecondaryEditor === 'headers' &&
                           editorToolsResize.hiddenElement !== 'second'
-                            ? 'active'
-                            : ''
+                            ? 'active text-sm'
+                            : 'text-sm'
                         }
                         onClick={handleToolsTabClick}
                         data-name="headers"
@@ -309,8 +309,8 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                           className={
                             activeSecondaryEditor === 'role-impersonation' &&
                             editorToolsResize.hiddenElement !== 'second'
-                              ? 'active'
-                              : ''
+                              ? 'active text-sm'
+                              : 'text-sm'
                           }
                           onClick={handleToolsTabClick}
                           data-name="role-impersonation"
@@ -334,7 +334,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                               ? 'Show editor tools'
                               : 'Hide editor tools'
                           }
-                          className="graphiql-toggle-editor-tools"
+                          className="graphiql-toggle-editor-tools text-sm"
                         >
                           {editorToolsResize.hiddenElement === 'second' ? (
                             <ChevronUpIcon className="graphiql-chevron-icon" aria-hidden="true" />
@@ -432,7 +432,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                 <Tooltip key={plugin.title} label={label}>
                   <UnStyledButton
                     type="button"
-                    className={isVisible ? 'active' : ''}
+                    className={isVisible ? 'active text-sm' : 'text-sm'}
                     onClick={handlePluginClick}
                     data-index={index}
                     aria-label={label}
@@ -447,6 +447,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
             <Tooltip label="Re-fetch GraphQL schema">
               <UnStyledButton
                 type="button"
+                className="text-sm"
                 disabled={schemaContext.isFetching}
                 onClick={handleRefetchSchema}
                 aria-label="Re-fetch GraphQL schema"
