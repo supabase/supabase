@@ -1,8 +1,4 @@
-import type {
-  ChatCompletionResponseMessage,
-  CreateChatCompletionResponse,
-  CreateChatCompletionResponseChoicesInner,
-} from 'openai'
+import type OpenAI from 'openai'
 import {
   Dispatch,
   SetStateAction,
@@ -24,15 +20,15 @@ import {
   Input,
   markdownComponents,
 } from 'ui'
-import { AiIcon, AiIconChat } from './Command.icons'
+import { AiIconChat } from './Command.icons'
 import { CommandGroup, CommandItem, useAutoInputFocus, useHistoryKeys } from './Command.utils'
 
 import { AiWarning } from './Command.alerts'
 import { useCommandMenu } from './CommandMenuProvider'
 
 import ReactMarkdown from 'react-markdown'
-import { cn } from './../../lib/utils'
 import remarkGfm from 'remark-gfm'
+import { cn } from './../../lib/utils'
 
 const questions = [
   'How do I get started with Supabase?',
@@ -42,13 +38,6 @@ const questions = [
   'How do I listen to changes in a table?',
   'How do I set up authentication?',
 ]
-
-type CreateChatCompletionResponseChoicesInnerDelta = Omit<
-  CreateChatCompletionResponseChoicesInner,
-  'message'
-> & {
-  delta: Partial<ChatCompletionResponseMessage>
-}
 
 function getEdgeFunctionUrl() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '')
@@ -236,12 +225,12 @@ export function useAiChat({
 
           setIsResponding(true)
 
-          const completionResponse: CreateChatCompletionResponse = JSON.parse(e.data)
+          const completionChunk: OpenAI.Chat.Completions.ChatCompletionChunk = JSON.parse(e.data)
           const [
             {
               delta: { content },
             },
-          ] = completionResponse.choices as CreateChatCompletionResponseChoicesInnerDelta[]
+          ] = completionChunk.choices
 
           if (content) {
             dispatchMessage({
@@ -328,12 +317,12 @@ export function queryAi(messages: Message[], timeout = 0) {
           return
         }
 
-        const completionResponse: CreateChatCompletionResponse = JSON.parse(e.data)
+        const completionChunk: OpenAI.Chat.Completions.ChatCompletionChunk = JSON.parse(e.data)
         const [
           {
             delta: { content },
           },
-        ] = completionResponse.choices as CreateChatCompletionResponseChoicesInnerDelta[]
+        ] = completionChunk.choices
 
         if (content) {
           answer += content
