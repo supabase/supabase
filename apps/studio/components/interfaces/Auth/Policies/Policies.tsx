@@ -1,18 +1,18 @@
-import type { PostgresRole, PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresPolicy, PostgresRole, PostgresTable } from '@supabase/postgres-meta'
 import { useParams } from 'common/hooks'
 import { PolicyEditorModal, PolicyTableRow } from 'components/interfaces/Auth/Policies'
 import { useStore } from 'hooks'
 import { isEmpty } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { IconHelpCircle } from 'ui'
 
+import { useQueryClient } from '@tanstack/react-query'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import InformationBox from 'components/ui/InformationBox'
-import { useQueryClient } from '@tanstack/react-query'
 import { tableKeys } from 'data/tables/keys'
 
 interface PoliciesProps {
@@ -31,13 +31,17 @@ const Policies = ({ tables, hasTables, isLocked }: PoliciesProps) => {
 
   const [selectedSchemaAndTable, setSelectedSchemaAndTable] = useState<any>({})
   const [selectedTableToToggleRLS, setSelectedTableToToggleRLS] = useState<any>({})
-  const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState<any>({})
+  const [RLSEditorWithAIShown, showRLSEditorWithAI] = useState(false)
+  const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState<PostgresPolicy | {}>({})
   const [selectedPolicyToDelete, setSelectedPolicyToDelete] = useState<any>({})
 
-  const closePolicyEditorModal = () => {
+  const closePolicyEditorModal = useCallback(() => {
     setSelectedPolicyToEdit({})
     setSelectedSchemaAndTable({})
-  }
+    if (RLSEditorWithAIShown) {
+      showRLSEditorWithAI(false)
+    }
+  }, [RLSEditorWithAIShown])
 
   const closeConfirmModal = () => {
     setSelectedPolicyToDelete({})
@@ -61,10 +65,10 @@ const Policies = ({ tables, hasTables, isLocked }: PoliciesProps) => {
     setSelectedPolicyToDelete(policy)
   }
 
-  const onSavePolicySuccess = async () => {
+  const onSavePolicySuccess = useCallback(async () => {
     ui.setNotification({ category: 'success', message: 'Policy successfully saved!' })
     closePolicyEditorModal()
-  }
+  }, [closePolicyEditorModal])
 
   // Methods that involve some API
   const onToggleRLS = async () => {
@@ -85,7 +89,7 @@ const Policies = ({ tables, hasTables, isLocked }: PoliciesProps) => {
     closeConfirmModal()
   }
 
-  const onCreatePolicy = async (payload: any) => {
+  const onCreatePolicy = useCallback(async (payload: any) => {
     const res = await meta.policies.create(payload)
     if (res.error) {
       ui.setNotification({
@@ -95,7 +99,7 @@ const Policies = ({ tables, hasTables, isLocked }: PoliciesProps) => {
       return true
     }
     return false
-  }
+  }, [])
 
   const onUpdatePolicy = async (payload: any) => {
     const res = await meta.policies.update(payload.id, payload)
@@ -181,9 +185,7 @@ const Policies = ({ tables, hasTables, isLocked }: PoliciesProps) => {
         table={selectedSchemaAndTable.table}
         selectedPolicyToEdit={selectedPolicyToEdit}
         onSelectCancel={closePolicyEditorModal}
-        // @ts-ignore
         onCreatePolicy={onCreatePolicy}
-        // @ts-ignore
         onUpdatePolicy={onUpdatePolicy}
         onSaveSuccess={onSavePolicySuccess}
       />
