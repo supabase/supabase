@@ -17,7 +17,6 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
 
     useEffect(() => {
       if (textAreaRef) {
-        console.log('needs to resize')
         if (!value && textAreaRef && textAreaRef.current) {
           textAreaRef.current.style.height = '40px'
         } else if (textAreaRef && textAreaRef.current) {
