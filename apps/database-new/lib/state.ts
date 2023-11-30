@@ -9,7 +9,7 @@ export const appState = proxy({
   // check localStorage first
   layout:
     (typeof window !== 'undefined' && window.localStorage.getItem('supabase_db_design_layout')) ||
-    'two-col',
+    'three-col',
 
   setLayout: (value: string) => {
     appState.layout = value
