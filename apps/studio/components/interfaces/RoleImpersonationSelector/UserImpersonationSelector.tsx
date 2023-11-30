@@ -110,7 +110,7 @@ const UserImpersonationSelector = () => {
               </ul>
             ) : (
               <div className="flex flex-col gap-2 items-center justify-center h-24">
-                <p className="text-foreground-light" role="status">
+                <p className="text-foreground-light text-xs" role="status">
                   No users found
                 </p>
               </div>
