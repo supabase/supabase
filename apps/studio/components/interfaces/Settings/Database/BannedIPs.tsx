@@ -64,11 +64,13 @@ const BannedIPs = () => {
 
   useEffect(() => {
     // Fetch user's IP address
-    fetch('https://httpbin.org/ip')
+    fetch('/api/get-ip-address')
       .then((response) => response.json())
-      .then((data) => setUserIPAddress(data.origin))
+      .then((data) => setUserIPAddress(data))
       .catch((error) => console.error('Error fetching user IP:', error))
   }, [])
+
+  console.log("IP match: ",userIPAddress);
 
   return (
     <div id="banned-ips">
@@ -91,19 +93,12 @@ const BannedIPs = () => {
       <FormPanel>
         {ipList && ipList.banned_ipv4_addresses.length > 0 ? (
           ipList.banned_ipv4_addresses.map((ip) => {
-            // Split the IP address into octets
-            const bannedOctets = ip.split('.')
-            const userOctets = userIPAddress?.split('.')
-
-            // Check if the first three octets match
-            const areOctetsMatching =
-              bannedOctets.slice(0, 3).join('.') === userOctets?.slice(0, 3).join('.')
 
             return (
               <div
                 key={ip}
                 className={`px-8 py-4 flex items-center justify-between ${
-                  areOctetsMatching ? 'text-foreground-lighter' : ''
+                  ip === userIPAddress ? 'text-foreground-lighter' : ''
                 }`}
               >
                 <div className="flex items-center space-x-5">
