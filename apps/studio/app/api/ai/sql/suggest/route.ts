@@ -1,5 +1,5 @@
 import { OpenAIStream, StreamingTextResponse } from 'ai'
-import { codeBlock, oneLine } from 'common-tags'
+import { codeBlock, oneLine, stripIndent } from 'common-tags'
 import { NextRequest } from 'next/server'
 import OpenAI from 'openai'
 
@@ -31,36 +31,33 @@ export async function POST(req: NextRequest) {
   const initMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
     {
       role: 'system',
-      content: codeBlock`
-          ${oneLine`
-          You're an Postgres expert in writing row level security policies. Your purpose is to 
-          generate a policy with the constraints given by the user. You will be provided a schema 
-          on which the policy should be applied.
+      content: stripIndent`
+        You're an Postgres expert in writing row level security policies. Your purpose is to 
+        generate a policy with the constraints given by the user. You will be provided a schema 
+        on which the policy should be applied.
 
-          The output should use the following instructions:
-          - The generated SQL must be valid SQL.
-          - Always use double apostrophe in SQL strings (eg. 'Night''s watch')
-          - You can use only CREATE POLICY queries, no other queries are allowed.
-          - You can add short explanations to your messages.
-          - The result should be a valid markdown. The SQL code should be wrapped in \`\`\`.
-          - Always use "auth.uid()" instead of "current_user".
-          - Only use "WITH CHECK" on INSERT or UPDATE policies.
-          - The policy name should be short text explaining the policy, enclosed in double quotes.
-          
-          The output should look like this: 
-          "CREATE POLICY user_policy ON users FOR INSERT USING (user_name = current_user) WITH (true);" 
-          `}
-        `,
+        The output should use the following instructions:
+        - The generated SQL must be valid SQL.
+        - Always use double apostrophe in SQL strings (eg. 'Night''s watch')
+        - You can use only CREATE POLICY queries, no other queries are allowed.
+        - You can add short explanations to your messages.
+        - The result should be a valid markdown. The SQL code should be wrapped in \`\`\`.
+        - Always use "auth.uid()" instead of "current_user".
+        - Only use "WITH CHECK" on INSERT or UPDATE policies.
+        - The policy name should be short text explaining the policy, enclosed in double quotes.
+        - Always make sure that every \`\`\` has a corresponding ending tag \`\`\`.
+        - Always put explanations as separate text. Don't use inline SQL comments. 
+        
+        The output should look like this: 
+        "CREATE POLICY user_policy ON users FOR INSERT USING (user_name = current_user) WITH (true);" 
+      `,
     },
   ]
 
   if (entityDefinitions) {
     initMessages.push({
       role: 'user',
-      content: codeBlock`
-            Here is my database schema for reference:
-            ${entityDefinitions.join('\n\n')}
-          `,
+      content: oneLine`Here is my database schema for reference: ${codeBlock`entityDefinitions.join('\n\n')`}`,
     })
   }
 
