@@ -2,7 +2,7 @@
 name: Shotgun
 title: 'Supabase migration delivers an 83% reduction in data infrastructure costs for Shotgun'
 # Use meta_title to add a custom meta title. Otherwise it defaults to '{name} | Supabase Customer Stories':
-meta_title: 'Supabase migration drives shotgun to an 83% reduction in data infrastructure costs'
+meta_title: 'Supabase migration delivers an 83% reduction in data infrastructure costs for Shotgun'
 description: Explore how Shotgun achieved remarkable database efficiency and reduced costs by 80% through their successful migration to Supabase's managed services.
 # Use meta_description to add a custom meta description. Otherwise it defaults to {description}:
 meta_description: Explore how Shotgun achieved remarkable database efficiency and reduced costs by 80% through their successful migration to Supabase's managed services.
