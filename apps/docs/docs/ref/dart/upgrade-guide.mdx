@@ -4,8 +4,8 @@ title: Upgrade to supabase_flutter v2
 description: 'Learn how to upgrade to supabase_flutter v2.'
 ---
 
-Although supabase_flutter v2 brings a few breaking changes, for the most part the public API should be the same with a few minor exceptions. 
-We have brought numerous updates behind the scenes to make the SDK work more intuitively for Flutter and Dart developers. 
+Although supabase_flutter v2 brings a few breaking changes, for the most part the public API should be the same with a few minor exceptions.
+We have brought numerous updates behind the scenes to make the SDK work more intuitively for Flutter and Dart developers.
 
 ## Upgrade the client library
 
@@ -148,26 +148,27 @@ Future<AuthResponse> signInWithApple() async {
   final rawNonce = supabase.auth.generateRawNonce();
   final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
 
-  final credential = await SignInWithApple.getAppleIDCredential(
-    scopes: [
-      AppleIDAuthorizationScopes.email,
-      AppleIDAuthorizationScopes.fullName,
-    ],
-    nonce: hashedNonce,
-  );
+final credential = await SignInWithApple.getAppleIDCredential(
+scopes: [
+AppleIDAuthorizationScopes.email,
+AppleIDAuthorizationScopes.fullName,
+],
+nonce: hashedNonce,
+);
 
-  final idToken = credential.identityToken;
-  if (idToken == null) {
-    throw const AuthException(
-        'Could not find ID Token from generated credential.');
-  }
-
-  return signInWithIdToken(
-    provider: OAuthProvider.apple,
-    idToken: idToken,
-    nonce: rawNonce,
-  );
+final idToken = credential.identityToken;
+if (idToken == null) {
+throw const AuthException(
+'Could not find ID Token from generated credential.');
 }
+
+return signInWithIdToken(
+provider: OAuthProvider.apple,
+idToken: idToken,
+nonce: rawNonce,
+);
+}
+
 ```
 
 </TabPanel>
@@ -188,7 +189,7 @@ In v2, `Supabase.initialize()` returns immediately after obtaining session from 
 Because of this, there is no guarantee that the session is valid when the app starts.
 
 If you need to make sure the session is valid, you can access the `isExpired` getter to check if the session is valid.
-If the session is expired, you can listen to `onAuthStateChange` event and wait for a new `tokenRefreshed` event to be fired. 
+If the session is expired, you can listen to `onAuthStateChange` event and wait for a new `tokenRefreshed` event to be fired.
 
   </RefSubLayout.Details>
   <RefSubLayout.Examples>
@@ -201,7 +202,7 @@ If the session is expired, you can listen to `onAuthStateChange` event and wait 
 >
 <TabPanel id="1.0x" label="Before">
 ```dart
-// Session was 
+// Session was
 final session = supabase.auth.currentSession;
 ```
 
@@ -212,6 +213,7 @@ final session = supabase.auth.currentSession;
 
 // Check if the session is valid.
 final isSessionExpired = session?.isExpired;
+
 ```
 
 </TabPanel>
@@ -225,7 +227,7 @@ final isSessionExpired = session?.isExpired;
 
 #### Removing Flutter Webview dependency for OAuth sign in
 
-In v1, on iOS you could pass a `BuildContext` to the `signInWithOAuth()` method to launch the OAuth flow in a Flutter Webview. 
+In v1, on iOS you could pass a `BuildContext` to the `signInWithOAuth()` method to launch the OAuth flow in a Flutter Webview.
 
 In v2, we have dropped the [webview_flutter](https://pub.dev/packages/webview_flutter) dependency in v2 to allow you to have full control over the UI of the OAuth flow.
 Also with the [native support for Google and Apple sign in](/docs/reference/dart/auth-signinwithidtoken), opening an external browser is less longer needed on iOS.
@@ -395,7 +397,7 @@ final initialSession = await supabase.auth.currentSession;
 
 #### Insert and return data
 
-We made the query builder immutable, which means you can reuse the same query object to chain multiple filters and get the expected outcome. 
+We made the query builder immutable, which means you can reuse the same query object to chain multiple filters and get the expected outcome.
 
   </RefSubLayout.Details>
   <RefSubLayout.Examples>
@@ -416,6 +418,7 @@ final foo = await myQuery.eq('some_col', 'foo');
 
 // The `eq` filter above is applied in addition to the following filter
 final bar = await myQuery.eq('another_col', 'bar');
+
 ```
 
 </TabPanel>
@@ -463,9 +466,10 @@ final data = await supabase
     .is_('status', null);
 
 final data = await supabase
-    .from('users')
-    .select()
-    .in_('status', ['ONLINE', 'OFFLINE']);
+.from('users')
+.select()
+.in\_('status', ['ONLINE', 'OFFLINE']);
+
 ```
 
 </TabPanel>
@@ -534,7 +538,7 @@ try {
 
 ### Realtime methods
 
-Realtime methods contains the biggest breaking changes. Most of these changes are to make the interface more type safe. 
+Realtime methods contains the biggest breaking changes. Most of these changes are to make the interface more type safe.
 
 We have removed the `.on()` method and replaced it with `.onPostgresChanges()`, `.onBroadcast()`, and `.onPresence()` for respective realtime functionalities.
 
@@ -548,7 +552,7 @@ Newly introduced `.onPostgresChanges()` method is used to listen to realtime cha
 Applying filters to the Postgres Changes was not streight forward in v1 as the `filter` property of `ChannelFilter` took a `String` type.
 With v2, the filter can be applied in a type safe way as well providing a more error prune interface.
 
-We also return the `payload` as a `PostgresChangePayload` object, which contains the `newRecord` and `oldRecord` properties as well as other properties that were all returned as `dynamic` in v1. 
+We also return the `payload` as a `PostgresChangePayload` object, which contains the `newRecord` and `oldRecord` properties as well as other properties that were all returned as `dynamic` in v1.
 
   </RefSubLayout.Details>
   <RefSubLayout.Examples>
@@ -656,8 +660,6 @@ supabase
   <RefSubLayout.Details>
 
 #### Presence
-
-
 
   </RefSubLayout.Details>
   <RefSubLayout.Examples>
