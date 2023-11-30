@@ -23,7 +23,6 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
         } else if (textAreaRef && textAreaRef.current) {
           // console.log('textAreaRef.current.scrollHeight', textAreaRef.current.scrollHeight)
           const newHeight = textAreaRef.current.scrollHeight + 'px'
-          // console.log('new height', newHeight)
           textAreaRef.current.style.height = newHeight
         }
       }
