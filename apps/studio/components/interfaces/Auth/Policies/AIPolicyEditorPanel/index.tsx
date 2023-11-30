@@ -43,6 +43,8 @@ export const AIPolicyEditorPanel = memo(function ({
   const { meta } = useStore()
   const selectedProject = useSelectedProject()
 
+  // use chat id because useChat doesn't have a reset function to clear all messages
+  const [chatId, setChatId] = useState(uuidv4())
   const editorRef = useRef<IStandaloneCodeEditor | null>(null)
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
 
@@ -67,6 +69,7 @@ export const AIPolicyEditorPanel = memo(function ({
   const entityDefinitions = entities?.map((def) => def.sql.trim())
 
   const { messages, append, isLoading } = useChat({
+    id: chatId,
     api: `${BASE_PATH}/api/ai/sql/suggest`,
     body: {
       entityDefinitions,
@@ -185,6 +188,7 @@ export const AIPolicyEditorPanel = memo(function ({
       setIds(undefined)
       setError(undefined)
       setDebugThread([])
+      setChatId(uuidv4())
     }
   }, [visible])
 
