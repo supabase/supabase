@@ -35,10 +35,17 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
 import { MouseEventHandler, useCallback, useEffect, useState } from 'react'
 
-import { useCheckPermissions, useFlag } from 'hooks'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, IconAlertTriangle } from 'ui'
+import { useCheckPermissions, useFlag, useLocalStorage } from 'hooks'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconAlertTriangle,
+} from 'ui'
 import { RoleImpersonationSelector } from '../RoleImpersonationSelector'
 import styles from './graphiql.module.css'
+import { XIcon } from 'lucide-react'
 
 export interface GraphiQLProps {
   fetcher: Fetcher
@@ -76,6 +83,11 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
 
   const roleImpersonationEnabledFlag = useFlag('roleImpersonation')
   const canReadJWTSecret = useCheckPermissions(PermissionAction.READ, 'field.jwt_secret')
+
+  const [rlsBypassedWarningDismissed, setRlsBypassedWarningDismissed] = useLocalStorage(
+    'graphiql-rls-bypass-warning-dismissed',
+    false
+  )
 
   const { setTheme } = useTheme()
   useEffect(() => {
@@ -390,20 +402,32 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                   {executionContext.isFetching ? <Spinner /> : null}
                   <ResponseEditor />
 
-                  <Alert_Shadcn_ variant="warning" className="absolute bottom-[5px] right-[5px]">
-                    <IconAlertTriangle strokeWidth={2} />
-                    <AlertTitle_Shadcn_ className="leading-5">
-                      Please note that queries and mutations run in GraphiQL now use the service
-                      role key by default.
-                      <br />
-                      RLS will be bypassed.
-                    </AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_>
-                      {roleImpersonationEnabledFlag
-                        ? 'You can send queries as a specific role/user by using the role impersonation tab.'
-                        : 'You can send queries as a specific role/user by changing the "Authorization" header.'}
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
+                  {!rlsBypassedWarningDismissed && (
+                    <Alert_Shadcn_ variant="warning" className="absolute bottom-[5px] right-[5px]">
+                      <IconAlertTriangle strokeWidth={2} />
+                      <AlertTitle_Shadcn_ className="leading-5">
+                        Please note that queries and mutations run in GraphiQL now use the service
+                        role key by default.
+                        <br />
+                        <span className="text-amber-900">RLS will be bypassed.</span>
+                      </AlertTitle_Shadcn_>
+                      <AlertDescription_Shadcn_>
+                        {roleImpersonationEnabledFlag
+                          ? 'You can send queries as a specific role/user by using the role impersonation tab.'
+                          : 'You can send queries as a specific role/user by changing the "Authorization" header.'}
+                      </AlertDescription_Shadcn_>
+                      <Button
+                        type="outline"
+                        aria-label="Dismiss"
+                        className="absolute top-2 right-2 p-1 !pl-1"
+                        onClick={() => {
+                          setRlsBypassedWarningDismissed(true)
+                        }}
+                      >
+                        <XIcon width={14} height={14} />
+                      </Button>
+                    </Alert_Shadcn_>
+                  )}
                 </div>
               </div>
             </div>
