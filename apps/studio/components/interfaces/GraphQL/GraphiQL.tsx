@@ -405,7 +405,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                   {!rlsBypassedWarningDismissed && (
                     <Alert_Shadcn_ variant="warning" className="absolute bottom-[5px] right-[5px]">
                       <IconAlertTriangle strokeWidth={2} />
-                      <AlertTitle_Shadcn_ className="leading-5">
+                      <AlertTitle_Shadcn_ className="leading-5 text-foreground">
                         Please note that queries and mutations run in GraphiQL now use the service
                         role key by default.
                         <br />
