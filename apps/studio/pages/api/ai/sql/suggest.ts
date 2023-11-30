@@ -7,7 +7,7 @@ export const runtime = 'edge'
 
 const openAiKey = process.env.OPENAI_KEY
 
-export async function POST(req: NextRequest) {
+export default async function POST(req: NextRequest) {
   if (!openAiKey) {
     return new Response(
       JSON.stringify({
