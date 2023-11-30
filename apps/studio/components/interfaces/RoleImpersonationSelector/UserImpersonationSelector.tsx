@@ -83,7 +83,7 @@ const UserImpersonationSelector = () => {
             size="small"
             actions={
               searchText && (
-                <Button size="tiny" type="text" onClick={() => setSearchText('')}>
+                <Button size="tiny" type="text" className="px-1" onClick={() => setSearchText('')}>
                   <X size={12} strokeWidth={2} />
                 </Button>
               )
