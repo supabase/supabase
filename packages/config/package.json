@@ -12,7 +12,7 @@
     "@tailwindcss/forms": "^0.5.0",
     "@tailwindcss/typography": "^0.5.9",
     "deepmerge": "^4.2.2",
-    "eslint-config-next": "^13.5.3",
+    "eslint-config-next": "^13.5.6",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-react": "7.28.0",
     "mini-svg-data-uri": "^1.4.3",

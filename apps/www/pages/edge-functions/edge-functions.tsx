@@ -139,7 +139,7 @@ function Database() {
 
                     <div>
                       <h3 className="text-foreground text-lg">{item.title}</h3>
-                      <p className="text-foreground-light text-sm">{item.description}</p>
+                      <div className="text-foreground-light text-sm">{item.description}</div>
                     </div>
                   </div>
                 )
@@ -260,9 +260,7 @@ serve(async (req) => {
             footer={[
               <div className="grid grid-cols-12" key={0}>
                 <div className="col-span-12 mt-0 flex lg:col-span-6 xl:col-span-12 xl:mb-8">
-                  <p>
-                    <p className="text-foreground-light m-0">Libraries coming soon:</p>
-                  </p>
+                  <p className="text-foreground-light m-0">Libraries coming soon:</p>
                   <div className="ml-1 space-x-1">
                     <Badge dot={false}>Python</Badge>
                     <Badge dot={false}>Dart</Badge>

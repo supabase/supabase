@@ -25,7 +25,9 @@ const BranchingWaitlistPopover = ({ isNewNav = false }: BranchingWaitlistPopover
         </Button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ align="start" side="bottom" className="flex flex-col gap-4 w-80">
-        <Badge color="scale">Alpha Testing</Badge>
+        <div>
+          <Badge color="scale">Alpha Testing</Badge>
+        </div>
         <div className="flex items-center gap-2">
           <IconGitBranch strokeWidth={2} />
           <p>Database Branching</p>
