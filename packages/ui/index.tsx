@@ -181,6 +181,8 @@ export { Separator } from './src/components/shadcn/ui/separator'
 
 // patterns
 
+
+export * from './src/patterns/SchemaTableNode'
 export { AssistantChatForm } from './src/patterns/AssistantChatForm'
 
 // links
