@@ -27,7 +27,7 @@ export const ServiceRoleIcon = ({ isSelected = false }: IconProps) => {
           rx="4.5"
           stroke={resolvedTheme === 'light' ? '#7E868C' : '#7E7E7E'}
         />
-        <path d="M1 5.53h32.214" stroke="#33A7E9" stroke-linecap="round" stroke-dasharray="2 2" />
+        <path d="M1 5.53h32.214" stroke="#33A7E9" strokeLinecap="round" strokeDasharray="2 2" />
       </g>
     </svg>
   )
