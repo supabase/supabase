@@ -63,7 +63,7 @@ export const AnonIcon = ({ isSelected = false }: IconProps) => {
           rx="5.5"
           stroke={resolvedTheme === 'light' ? '#11181C' : '#EDEDED'}
         />
-        <path d="M1 10.494h32.214" stroke="#33A7E9" stroke-linecap="round" stroke-dasharray="2 2" />
+        <path d="M1 10.494h32.214" stroke="#33A7E9" strokeLinecap="round" strokeDasharray="2 2" />
         <path
           d="M15.96 7.562 22.568.956M19.049 14.885l5.957-5.958"
           stroke={resolvedTheme === 'light' ? '#11181C' : '#EDEDED'}
