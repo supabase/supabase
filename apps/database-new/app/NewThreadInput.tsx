@@ -1,5 +1,6 @@
 'use client'
 
+import { ChatIcon } from '@/components/ChatIcon'
 import { CHAT_EXAMPLES } from '@/data/chat-examples'
 import { useAppStateSnapshot } from '@/lib/state'
 import { createClient } from '@/lib/supabase/client'
@@ -96,6 +97,7 @@ const NewThreadInput = () => {
             disabled={isPending || isSuccess}
             loading={isPending || isSuccess}
             onValueChange={(e) => setValue(e.target.value)}
+            icon={<ChatIcon />}
           />
         </AssistantCommandsPopover>
       </div>

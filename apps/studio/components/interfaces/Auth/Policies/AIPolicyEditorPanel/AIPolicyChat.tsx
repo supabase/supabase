@@ -1,12 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useProfile } from 'lib/profile'
 import { compact, last, sortBy } from 'lodash'
 import OpenAI from 'openai'
 import { createRef, useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { AssistantChatForm, AssistantCommandsPopover } from 'ui'
+import { AssistantChatForm } from 'ui'
 import * as z from 'zod'
-
-import { useProfile } from 'lib/profile'
 import Message from './Message'
 
 export const AIPolicyChat = ({
@@ -68,12 +67,6 @@ export const AIPolicyChat = ({
   const textAreaRef = createRef<HTMLTextAreaElement>()
   const [value, setValue] = useState('')
 
-  const suggestions = [
-    'Add policy for org Inserted User Access',
-    'Add policy for User-Specific Todo Access',
-    'Add policy for Org Update Restriction',
-  ]
-
   return (
     <div id={'ai-chat-assistant'} className="flex flex-col h-full">
       <div className="overflow-auto flex-1">
@@ -105,65 +98,22 @@ export const AIPolicyChat = ({
         <div ref={bottomRef} className="h-1" />
       </div>
       <div className="sticky p-5 flex-0 border-t">
-        <AssistantCommandsPopover
-          open={commandsOpen}
-          setOpen={setCommandsOpen}
+        <AssistantChatForm
           textAreaRef={textAreaRef}
-          value={value}
-          setValue={(e) => setValue(e)}
-          suggestions={suggestions}
-        >
-          <AssistantChatForm
-            textAreaRef={textAreaRef}
-            key={'new-thread-form'}
-            id={'new-thread-form'}
-            commandsOpen={commandsOpen}
-            setCommandsOpen={setCommandsOpen}
-            onSubmit={form.handleSubmit((data: z.infer<typeof FormSchema>) => {
-              onSubmit(data.chat)
-            })}
-            value={value}
-            placeholder="e.g Create a Telegram-like chat application"
-            disabled={loading}
-            loading={loading}
-            onValueChange={(e) => setValue(e.target.value)}
-          />
-        </AssistantCommandsPopover>
-      </div>
-      {/* <Form_Shadcn_ {...form}>
-        <form
-          id="rls-chat"
-          className="sticky p-5 flex-0 border-t"
+          key={'new-thread-form'}
+          id={'new-thread-form'}
+          commandsOpen={commandsOpen}
+          setCommandsOpen={setCommandsOpen}
           onSubmit={form.handleSubmit((data: z.infer<typeof FormSchema>) => {
             onSubmit(data.chat)
           })}
-        >
-          <FormField_Shadcn_
-            control={form.control}
-            name="chat"
-            render={({ field }) => (
-              <FormItem_Shadcn_>
-                <FormControl_Shadcn_>
-                  <div className="relative">
-                    <AiIcon className="absolute top-2 left-3 [&>div>div]:border-black dark:[&>div>div]:border-white" />
-                    <Input_Shadcn_
-                      {...field}
-                      autoComplete="off"
-                      disabled={loading}
-                      autoFocus
-                      className={`bg-surface-300 dark:bg-black rounded-full pl-10 ${
-                        loading ? 'pr-10' : ''
-                      }`}
-                      placeholder="Ask for some changes to your policy"
-                    />
-                    {loading && <Loader2 className="absolute top-2 right-3 animate-spin" />}
-                  </div>
-                </FormControl_Shadcn_>
-              </FormItem_Shadcn_>
-            )}
-          />
-        </form>
-      </Form_Shadcn_> */}
+          value={value}
+          placeholder="e.g Create a Telegram-like chat application"
+          disabled={loading}
+          loading={loading}
+          onValueChange={(e) => setValue(e.target.value)}
+        />
+      </div>
     </div>
   )
 }

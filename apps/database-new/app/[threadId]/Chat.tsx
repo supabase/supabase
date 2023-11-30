@@ -1,16 +1,17 @@
 'use client'
 
 import { useMutation } from '@tanstack/react-query'
-import { sortBy } from 'lodash'
+import { create, sortBy } from 'lodash'
 import { Loader2 } from 'lucide-react'
 import { useParams, useRouter } from 'next/navigation'
-import { FormEventHandler, useEffect, useMemo, useState } from 'react'
+import { FormEventHandler, createRef, useEffect, useMemo, useState } from 'react'
 import { AssistantChatForm, ScrollArea, cn } from 'ui'
 
 import { useMessagesQuery } from '@/data/messages-query'
 import { AssistantMessage, UserMessage } from '@/lib/types'
 import BottomMarker from './BottomMarker'
 import UserChat from './UserChat'
+import { ChatIcon } from '@/components/ChatIcon'
 
 export const Chat = () => {
   const router = useRouter()
@@ -57,6 +58,8 @@ export const Chat = () => {
     setValue('')
   }, [loading])
 
+  const textAreaRef = createRef<HTMLTextAreaElement>()
+
   return (
     <div
       className={cn(
@@ -97,6 +100,7 @@ export const Chat = () => {
 
         <div className="px-4 pb-4">
           <AssistantChatForm
+            textAreaRef={textAreaRef}
             key={`chat-thread-form-${runId}`}
             id={`chat-thread-form-${runId}`}
             onSubmit={async (event) => {
@@ -112,6 +116,7 @@ export const Chat = () => {
                 : 'Ask for some changes on the selected message'
             }
             onValueChange={(v) => setValue(v.target.value)}
+            icon={<ChatIcon />}
           />
         </div>
       </div>

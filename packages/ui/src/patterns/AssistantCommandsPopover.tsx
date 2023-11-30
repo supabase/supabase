@@ -22,6 +22,7 @@ const AssistantCommandsPopover = ({
   open,
   setOpen,
   suggestions,
+  usingIcon = false,
 }: {
   children: React.ReactNode
   textAreaRef: React.RefObject<HTMLTextAreaElement>
@@ -30,6 +31,7 @@ const AssistantCommandsPopover = ({
   open: boolean
   setOpen: (value: boolean) => void
   suggestions?: string[]
+  usingIcon?: boolean
 }) => {
   const [command, setCommand] = useState<string>('')
 
@@ -108,13 +110,16 @@ const AssistantCommandsPopover = ({
           if (textAreaRef) textAreaRef?.current?.focus()
         }}
       >
-        <PopoverAnchor className="w-full relative">
+        <PopoverAnchor className={cn('w-full relative', usingIcon && 'bg-control')}>
           <>
             <div
               style={{
                 left: '0px',
                 top: '10px',
-                marginLeft: command && commandWidth ? `${48 + commandWidth + 12}px` : `${48}px`,
+                marginLeft:
+                  command && commandWidth
+                    ? `${(usingIcon ? 48 : 12) + commandWidth + 12}px`
+                    : `${usingIcon ? 48 : 12}px`,
               }}
               className={cn('z-0 absolute flex items-center text-sm text-transparent')}
             >

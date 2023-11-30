@@ -11,6 +11,8 @@ export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
   onValueChange: (value: ChangeEvent<HTMLTextAreaElement>) => void
   commandsOpen?: boolean
   setCommandsOpen?: (value: boolean) => void
+  icon?: React.ReactNode
+  usingCommandPopover?: boolean
 }
 
 const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
@@ -23,6 +25,8 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
       textAreaRef,
       commandsOpen,
       setCommandsOpen,
+      icon = null,
+      usingCommandPopover = false,
       ...props
     },
     ref
@@ -66,7 +70,11 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
 
     return (
       <form ref={formRef} className="relative" {...props}>
-        <div className={cn('absolute', 'top-2 left-2', 'ml-1 w-6 h-6 rounded-full bg-dbnew')}></div>
+        {icon && (
+          <div
+            className={cn('absolute', 'top-2 left-2', 'ml-1 w-6 h-6 rounded-full bg-dbnew')}
+          ></div>
+        )}
         <TextArea
           ref={textAreaRef}
           autoFocus
@@ -75,8 +83,9 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
           contentEditable
           aria-expanded={false}
           className={cn(
-            'transition-all text-sm pl-12 pr-10 rounded-[18px] resize-none box-border leading-6',
-            'bg-transparent'
+            icon && 'pl-12',
+            usingCommandPopover && 'bg-transparent',
+            'transition-all text-sm pr-10 rounded-[18px] resize-none box-border leading-6'
           )}
           placeholder={props.placeholder}
           spellCheck={false}
