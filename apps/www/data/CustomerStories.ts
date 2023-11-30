@@ -12,7 +12,7 @@ export const data = [
     postMeta: {
       name: 'Paul Copplestone',
       avatarUrl: 'https://avatars0.githubusercontent.com/u/10214025?v=4',
-      publishDate: 'Oct 31, 2023',
+      publishDate: 'Nov 30, 2023',
       readLength: 3,
     },
     ctaText: 'View story',
