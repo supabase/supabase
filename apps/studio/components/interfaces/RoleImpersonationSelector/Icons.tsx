@@ -116,8 +116,8 @@ export const AuthenticatedIcon = ({ isSelected = false }: IconProps) => {
         <path
           d="M12.666 14.281v-1.333A2.667 2.667 0 0 0 10 10.28H6a2.667 2.667 0 0 0-2.667 2.667v1.333M8 7.615A2.667 2.667 0 1 0 8 2.28a2.667 2.667 0 0 0 0 5.334Z"
           stroke={resolvedTheme === 'light' ? '#11181C' : '#EDEDED'}
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
       </g>
     </svg>
