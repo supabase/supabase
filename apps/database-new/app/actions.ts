@@ -1,4 +1,8 @@
 'use server'
+import { last, sortBy } from 'lodash'
+
+import { AssistantMessage } from '@/lib/types'
+import { parseTables } from '@/lib/utils'
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
@@ -94,4 +98,30 @@ export async function updateThreadName(prevState: any, formData: FormData) {
       data: undefined,
     }
   }
+}
+
+export async function getThreadData(threadId: string, runId: string, messageId: string) {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/ai/sql/threads/${threadId}/read/${runId}`,
+    {
+      method: 'GET',
+    }
+  )
+  const data = await response.json()
+  const messages = sortBy(data.messages, (m) => m.created_at)
+
+  const userMessages = messages.filter((m) => m.role === 'user')
+
+  const selectedMessageIdx = messages.findIndex((m) => m.id === messageId)
+  const selectedMessageReply = (
+    selectedMessageIdx !== -1 ? messages[selectedMessageIdx + 1] : undefined
+  ) as AssistantMessage | undefined
+
+  const content = selectedMessageReply?.sql.replaceAll('```sql', '').replaceAll('```', '') || ''
+
+  const tables = await parseTables(content)
+  const latestMessage = last(userMessages)
+  //if (latestMessage) redirect(`/${threadId}/${runId}/${latestMessage.id}`)
+
+  return { content, tables }
 }
