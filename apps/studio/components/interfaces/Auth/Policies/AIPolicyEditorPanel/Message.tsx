@@ -51,7 +51,10 @@ const Message = memo(function Message({
   const PreRenderer = useMemo(() => {
     const component = ({ children }: { children: React.ReactNode[] }) => {
       const code = (children[0] as any).props.children[0] as string
-      return <Pre id={id} isLoading={isLoading || false} onDiff={onDiff} code={code} />
+      if (code.length > 0) {
+        return <Pre id={id} isLoading={isLoading || false} onDiff={onDiff} code={code} />
+      }
+      return null
     }
     return component
   }, [id, isLoading, onDiff])
