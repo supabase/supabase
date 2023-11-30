@@ -9,8 +9,6 @@ import { useRouter } from 'next/navigation'
 import { createRef, useState } from 'react'
 import { AssistantChatForm, AssistantCommandsPopover, cn } from 'ui'
 
-const suggestions = CHAT_EXAMPLES
-
 const NewThreadInput = () => {
   const router = useRouter()
 
