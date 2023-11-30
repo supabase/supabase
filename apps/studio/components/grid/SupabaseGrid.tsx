@@ -153,6 +153,7 @@ const SupabaseGridLayout = (props: SupabaseGridProps) => {
             ...(savedState.filters && { filter: savedState.filters }),
           }
         })
+        return null
       }
     }
 
