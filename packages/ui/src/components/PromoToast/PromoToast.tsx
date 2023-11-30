@@ -1,18 +1,23 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Button } from 'ui'
+import { Button, cn } from 'ui'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import announcement from '../../layout/banners/data/Announcement.json'
 import CountdownComponent from '../CountdownWidget/Countdown'
 import PromoBg from './PromoBg'
 
+const LWXLogo =
+  'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lwx/assets/lwx_logo.svg?t=2023-11-22T17%3A45%3A52.077Z'
+
 const PromoToast = () => {
   const [visible, setVisible] = useState(false)
-  const LWXLogo =
-    'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lwx/assets/lwx_logo.svg?t=2023-11-22T17%3A45%3A52.077Z'
 
   useEffect(() => {
-    const shouldHide = localStorage?.getItem('supabase-hide-promo-toast') === 'true'
+    const shouldHide =
+      !localStorage?.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT) ||
+      localStorage?.getItem(LOCAL_STORAGE_KEYS.HIDE_PROMO_TOAST) === 'true'
+
     if (!shouldHide) {
       setVisible(true)
     }
@@ -20,7 +25,7 @@ const PromoToast = () => {
 
   const handleHide = () => {
     setVisible(false)
-    localStorage?.setItem('supabase-hide-promo-toast', 'true')
+    localStorage?.setItem(LOCAL_STORAGE_KEYS.HIDE_PROMO_TOAST, 'true')
   }
 
   if (!visible) {
@@ -28,7 +33,12 @@ const PromoToast = () => {
   }
 
   return (
-    <div className="grid gap-4 fixed z-50 bottom-8 right-8 w-[80vw] sm:w-[350px] bg-alternative hover:bg-alternative transition-colors border border-default rounded p-6 shadow-lg overflow-hidden">
+    <div
+      className={cn(
+        'opacity-0 translate-y-3 transition-all grid gap-4 fixed z-50 bottom-8 right-8 w-[80vw] sm:w-[350px] bg-alternative hover:bg-alternative border border-default rounded p-6 shadow-lg overflow-hidden',
+        visible && 'opacity-100 translate-y-0'
+      )}
+    >
       <div className="relative z-10 text-foreground flex flex-col text-base uppercase tracking-[1px]">
         <div className="flex gap-1.5 items-center">
           <p>Launch Week</p>
@@ -48,7 +58,7 @@ const PromoToast = () => {
           Dismiss
         </Button>
       </div>
-      <PromoBg className="absolute z-0 inset-0 w-full h-auto my-auto -right-3 left-auto" />
+      <PromoBg className="absolute z-0 inset-0 w-full h-auto my-auto -right-5 left-auto" />
     </div>
   )
 }
