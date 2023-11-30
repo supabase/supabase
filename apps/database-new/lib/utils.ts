@@ -97,12 +97,13 @@ const parseQueryResultSchema = z.object({
  * TODO: consider running in WebWorker
  */
 export async function parseTables(sql: string) {
+  console.log('the sql', sql)
   // Parse SQL using the real Postgres parser (compiled to WASM)
   // See: https://github.com/pyramation/libpg-query-node/pull/34
 
   const result = await parseQuery(sql)
-
   const parsedSql = parseQueryResultSchema.safeParse(result)
+
   if (!parsedSql.success) {
     console.log(parsedSql.error)
     return []

@@ -1,3 +1,4 @@
+'use client'
 import Editor, { BeforeMount, EditorProps, OnMount } from '@monaco-editor/react'
 import { merge } from 'lodash'
 import { useTheme } from 'next-themes'

@@ -1,66 +1,52 @@
-'use client'
 import { last, sortBy } from 'lodash'
-import { useParams, useRouter } from 'next/navigation'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { redirect } from 'next/navigation'
 
 import { CodeEditor } from '@/components/CodeEditor/CodeEditor'
 import SchemaGraph from '@/components/SchemaGraph/SchemaGraph'
-import { useMessagesQuery } from '@/data/messages-query'
-import { AssistantMessage, PostgresTable } from '@/lib/types'
+
+import { AssistantMessage } from '@/lib/types'
 import { parseTables } from '@/lib/utils'
 
-export default function ThreadPage() {
-  const router = useRouter()
-  const { threadId, runId, messageId }: { threadId: string; runId: string; messageId: string } =
-    useParams()
-  const [tables, setTables] = useState<PostgresTable[]>([])
+interface ThreadPageProps {
+  params: {
+    threadId: string
+    runId: string
+    messageId: string
+  }
+}
 
-  const { data, isSuccess } = useMessagesQuery({ threadId, runId })
+export default async function ThreadPage({ params }: ThreadPageProps) {
+  const { threadId, runId, messageId } = params
 
-  // [Joshen] Slightly hacky here, just so the useEffect triggers once - until we figure out something better
-  const isLoadingPrev = useRef<boolean>(false)
-  const isLoading = isSuccess && data.status === 'loading'
-
-  const messages = useMemo(() => {
-    if (isSuccess) return sortBy(data.messages, (m) => m.created_at)
-    return []
-  }, [data?.messages, isSuccess])
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/ai/sql/threads/${threadId}/read/${runId}`,
+    {
+      method: 'GET',
+    }
+  )
+  const data = await response.json()
+  const messages = sortBy(data.messages, (m) => m.created_at)
+  console.log({ messages })
 
   const userMessages = messages.filter((m) => m.role === 'user')
 
-  const selectedMessageIdx = useMemo(() => {
-    return messages.findIndex((m) => m.id === messageId)
-  }, [messages, messageId])
+  const selectedMessageIdx = messages.findIndex((m) => m.id === messageId)
+  const selectedMessageReply = (
+    selectedMessageIdx !== -1 ? messages[selectedMessageIdx + 1] : undefined
+  ) as AssistantMessage | undefined
 
-  const selectedMessageReply = useMemo(
-    () =>
-      (selectedMessageIdx !== -1 ? messages[selectedMessageIdx + 1] : undefined) as
-        | AssistantMessage
-        | undefined,
-    [messages, selectedMessageIdx]
-  )
+  const content = selectedMessageReply?.sql.replaceAll('```sql', '').replaceAll('```', '') || ''
+  console.log({ content })
 
-  const content = useMemo(
-    () => selectedMessageReply?.sql.replaceAll('```sql', '').replaceAll('```', '') || '',
-    [selectedMessageReply?.sql]
-  )
-
-  useEffect(() => {
-    parseTables(content).then((t) => setTables(t))
-  }, [content])
-
-  useEffect(() => {
-    if (isLoadingPrev.current && !isLoading) {
-      const latestMessage = last(userMessages)
-      if (latestMessage) router.push(`/${threadId}/${runId}/${latestMessage.id}`)
-    }
-    isLoadingPrev.current = isLoading
-  }, [isLoading])
+  const tables = await parseTables(content)
+  // const latestMessage = last(userMessages)
+  // if (latestMessage) redirect(`/${threadId}/${runId}/${latestMessage.id}`)
 
   return (
     <div className="grow max-h-screen flex flex-row items-center justify-between bg-alternative h-full">
-      <SchemaGraph tables={tables} />
-      <CodeEditor content={content} />
+      hello there {threadId}
+      {/* <SchemaGraph tables={tables} />
+      <CodeEditor content={content} /> */}
     </div>
   )
 }
