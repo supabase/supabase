@@ -75,7 +75,7 @@ export function getPostgrestRoleImpersonationSql(
            set_config('request.method', 'POST', true),
            set_config('request.path', '/impersonation-example-request-path', true),
            set_config('request.headers', '{"accept": "*/*"}', true);
-  `
+  `.trim()
 }
 
 export function getCustomRoleImpersonationSql(roleName: string) {
