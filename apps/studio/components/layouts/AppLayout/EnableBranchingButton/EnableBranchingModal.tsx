@@ -262,6 +262,7 @@ const EnableBranchingModal = () => {
                       <Link
                         href={`/project/${ref}/settings/addons?panel=pitr`}
                         className="text-brand"
+                        onClick={() => snap.setShowEnableBranchingModal(false)}
                       >
                         project settings
                       </Link>
@@ -285,6 +286,7 @@ const EnableBranchingModal = () => {
                             ? `/org/${selectedOrg?.slug}/billing?panel=subscriptionPlan`
                             : `/project/${ref}/settings/addons?panel=pitr`
                         }
+                        onClick={() => snap.setShowEnableBranchingModal(false)}
                       >
                         {isFreePlan ? 'Upgrade to Pro' : 'Enable PITR'}
                       </Link>
