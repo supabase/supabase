@@ -19,7 +19,7 @@ export const Chat = () => {
   const { threadId, runId, messageId }: { threadId: string; runId: string; messageId: string } =
     useParams()
 
-  const { data, isSuccess } = useMessagesQuery({ threadId, runId })
+  const { data, isSuccess, isLoading } = useMessagesQuery({ threadId, runId })
 
   const messages = useMemo(() => {
     if (isSuccess) return sortBy(data.messages, (m) => m.created_at)
@@ -27,8 +27,8 @@ export const Chat = () => {
   }, [data?.messages, isSuccess])
 
   const selectedMessage = messageId
-  // this should prob use isLoading from rq instead of data.status
-  const loading = isSuccess && data.status === 'loading'
+
+  // const loading = isSuccess && data.status === 'loading'
   const userMessages = messages.filter((message) => message.role === 'user')
 
   const { mutate } = useMutation({
@@ -56,7 +56,7 @@ export const Chat = () => {
   useEffect(() => {
     setInputEntered(false)
     setValue('')
-  }, [loading])
+  }, [isLoading])
 
   return (
     <div
@@ -87,7 +87,7 @@ export const Chat = () => {
                     reply={reply}
                     isLatest={isLatest}
                     isSelected={selectedMessage === message?.id}
-                    isLoading={loading && isLatest}
+                    isLoading={isLoading && isLatest}
                   />
                 )
               })}
@@ -99,10 +99,10 @@ export const Chat = () => {
         <div className="px-4 pb-4">
           <ChatInputAtom
             value={value}
-            disabled={loading || inputEntered}
-            loading={loading || inputEntered}
+            disabled={isLoading || inputEntered}
+            loading={isLoading || inputEntered}
             placeholder={
-              loading
+              isLoading
                 ? 'Generating reply to request...'
                 : 'Ask for some changes on the selected message'
             }
