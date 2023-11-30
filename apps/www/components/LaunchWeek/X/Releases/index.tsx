@@ -11,7 +11,7 @@ import {
   SectionButtons,
 } from './components'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import days, { WeekDayProps } from './lw8_data'
+import days, { WeekDayProps } from './lwx_data'
 
 export default function LW8Releases() {
   const [preRelease, day1, day2, day3, day4, day5] = days

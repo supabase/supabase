@@ -8,10 +8,11 @@ import supabase from '~/lib/supabaseMisc'
 import FaviconImports from '~/components/LaunchWeek/X/FaviconImports'
 import DefaultLayout from '~/components/Layouts/Default'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
-import TicketingFlow from '~/components/LaunchWeek/X/Ticket/TicketingFlow'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import LWXReleases from '~/components/LaunchWeek/X/Releases'
 
 export default function TicketHome() {
-  const { basePath, query } = useRouter()
+  const { query } = useRouter()
 
   const TITLE = 'Supabase Launch Week X | 11-15 December 2023'
   const DESCRIPTION =
@@ -98,7 +99,9 @@ export default function TicketHome() {
         }}
       >
         <DefaultLayout>
-          <TicketingFlow />
+          <SectionContainer className="!pt-0">
+            <LWXReleases />
+          </SectionContainer>
         </DefaultLayout>
       </ConfDataContext.Provider>
     </>

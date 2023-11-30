@@ -13,7 +13,7 @@ export interface Meetup {
   start_at: string
 }
 
-const LW8Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
+const LWXMeetups = ({ meetups }: { meetups?: Meetup[] }) => {
   const { supabase } = useConfData()
   const [meets, setMeets] = useState<Meetup[]>(meetups ?? [])
   const [realtimeChannel, setRealtimeChannel] = useState<ReturnType<
@@ -99,4 +99,4 @@ const LW8Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
   )
 }
 
-export default LW8Meetups
+export default LWXMeetups
