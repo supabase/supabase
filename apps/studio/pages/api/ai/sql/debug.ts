@@ -4,12 +4,7 @@ import { isError } from 'data/utils/error-check'
 import { jsonrepair } from 'jsonrepair'
 import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
-import type {
-  ChatCompletionRequestMessage,
-  CreateChatCompletionRequest,
-  CreateChatCompletionResponse,
-  ErrorResponse,
-} from 'openai-old'
+import { OpenAI } from 'openai'
 
 const openAiKey = process.env.OPENAI_KEY
 
@@ -23,7 +18,10 @@ const debugSqlSchema = SchemaBuilder.emptySchema()
 
 type DebugSqlResult = typeof debugSqlSchema.T
 
-const completionFunctions = {
+const completionFunctions: Record<
+  string,
+  OpenAI.Chat.Completions.ChatCompletionCreateParams.Function
+> = {
   debugSql: {
     name: 'debugSql',
     description: stripIndent`
@@ -38,7 +36,7 @@ const completionFunctions = {
       - Use vector(384) data type for any embedding/vector related query
       - Always use double apostrophe in SQL strings (eg. 'Night''s watch')
     `,
-    parameters: debugSqlSchema.schema,
+    parameters: debugSqlSchema.schema as Record<string, unknown>,
   },
 }
 
@@ -61,6 +59,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
+  const openAI = new OpenAI({ apiKey: openAiKey })
   const {
     body: { errorMessage, sql, entityDefinitions },
   } = req
@@ -69,7 +68,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const maxCompletionTokenCount = 2048
   const hasEntityDefinitions = entityDefinitions !== undefined && entityDefinitions.length > 0
 
-  const completionMessages: ChatCompletionRequestMessage[] = []
+  const completionMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = []
 
   if (hasEntityDefinitions) {
     completionMessages.push({
@@ -98,7 +97,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     }
   )
 
-  const completionOptions: CreateChatCompletionRequest = {
+  const completionOptions: OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming = {
     model,
     messages: completionMessages,
     max_tokens: maxCompletionTokenCount,
@@ -110,20 +109,13 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     stream: false,
   }
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    headers: {
-      Authorization: `Bearer ${openAiKey}`,
-      'Content-Type': 'application/json',
-    },
-    method: 'POST',
-    body: JSON.stringify(completionOptions),
-  })
+  let completionResponse: OpenAI.Chat.Completions.ChatCompletion
+  try {
+    completionResponse = await openAI.chat.completions.create(completionOptions)
+  } catch (error: any) {
+    console.error(`AI SQL debugging failed: ${error.message}`)
 
-  if (!response.ok) {
-    const errorResponse: ErrorResponse = await response.json()
-    console.error(`AI SQL debugging failed: ${errorResponse.error.message}`)
-
-    if ('code' in errorResponse.error && errorResponse.error.code === 'context_length_exceeded') {
+    if ('code' in error && error.code === 'context_length_exceeded') {
       if (hasEntityDefinitions) {
         const definitionsLength = entityDefinitions.reduce(
           (sum: number, def: string) => sum + def.length,
@@ -148,8 +140,6 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       error: 'There was an unknown error debugging the SQL snippet. Please try again.',
     })
   }
-
-  const completionResponse: CreateChatCompletionResponse = await response.json()
 
   const [firstChoice] = completionResponse.choices
 
