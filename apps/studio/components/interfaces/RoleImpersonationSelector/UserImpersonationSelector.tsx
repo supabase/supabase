@@ -83,7 +83,7 @@ const UserImpersonationSelector = () => {
             size="small"
             actions={
               searchText && (
-                <Button size="tiny" type="text" onClick={() => setSearchText('')}>
+                <Button size="tiny" type="text" className="px-1" onClick={() => setSearchText('')}>
                   <X size={12} strokeWidth={2} />
                 </Button>
               )
@@ -110,7 +110,7 @@ const UserImpersonationSelector = () => {
               </ul>
             ) : (
               <div className="flex flex-col gap-2 items-center justify-center h-24">
-                <p className="text-foreground-light" role="status">
+                <p className="text-foreground-light text-xs" role="status">
                   No users found
                 </p>
               </div>

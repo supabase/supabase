@@ -18,7 +18,7 @@ export const ServiceRoleIcon = ({ isSelected = false }: IconProps) => {
           rx="5.5"
           stroke={resolvedTheme === 'light' ? '#11181C' : '#EDEDED'}
         />
-        <path d="M1 10.53h32.214" stroke="#33A7E9" stroke-linecap="round" stroke-dasharray="2 2" />
+        <path d="M1 10.53h32.214" stroke="#33A7E9" strokeLinecap="round" strokeDasharray="2 2" />
         <rect
           x="15.964"
           y=".53"
@@ -27,7 +27,7 @@ export const ServiceRoleIcon = ({ isSelected = false }: IconProps) => {
           rx="4.5"
           stroke={resolvedTheme === 'light' ? '#7E868C' : '#7E7E7E'}
         />
-        <path d="M1 5.53h32.214" stroke="#33A7E9" stroke-linecap="round" stroke-dasharray="2 2" />
+        <path d="M1 5.53h32.214" stroke="#33A7E9" strokeLinecap="round" strokeDasharray="2 2" />
       </g>
     </svg>
   )
@@ -63,7 +63,7 @@ export const AnonIcon = ({ isSelected = false }: IconProps) => {
           rx="5.5"
           stroke={resolvedTheme === 'light' ? '#11181C' : '#EDEDED'}
         />
-        <path d="M1 10.494h32.214" stroke="#33A7E9" stroke-linecap="round" stroke-dasharray="2 2" />
+        <path d="M1 10.494h32.214" stroke="#33A7E9" strokeLinecap="round" strokeDasharray="2 2" />
         <path
           d="M15.96 7.562 22.568.956M19.049 14.885l5.957-5.958"
           stroke={resolvedTheme === 'light' ? '#11181C' : '#EDEDED'}
@@ -106,8 +106,8 @@ export const AuthenticatedIcon = ({ isSelected = false }: IconProps) => {
         <path
           d="M15.63 10.656h32.214"
           stroke="#33A7E9"
-          stroke-linecap="round"
-          stroke-dasharray="2 2"
+          strokeLinecap="round"
+          strokeDasharray="2 2"
         />
         <path
           d="m30.59 7.724 6.607-6.606M33.679 15.047l5.957-5.958"
@@ -116,8 +116,8 @@ export const AuthenticatedIcon = ({ isSelected = false }: IconProps) => {
         <path
           d="M12.666 14.281v-1.333A2.667 2.667 0 0 0 10 10.28H6a2.667 2.667 0 0 0-2.667 2.667v1.333M8 7.615A2.667 2.667 0 1 0 8 2.28a2.667 2.667 0 0 0 0 5.334Z"
           stroke={resolvedTheme === 'light' ? '#11181C' : '#EDEDED'}
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
       </g>
     </svg>
