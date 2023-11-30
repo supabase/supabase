@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams } from 'common/hooks'
 import { useStore } from 'hooks'
 import { FormHeader, FormPanel } from 'components/ui/Forms'
@@ -60,6 +60,16 @@ const BannedIPs = () => {
     setShowUnban(true)
   }
 
+  const [userIPAddress, setUserIPAddress] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Fetch user's IP address
+    fetch('https://httpbin.org/ip')
+      .then((response) => response.json())
+      .then((data) => setUserIPAddress(data.origin))
+      .catch((error) => console.error('Error fetching user IP:', error));
+  }, []);
+
   return (
     <div id="banned-ips">
       <div className="flex items-center justify-between">
@@ -80,20 +90,35 @@ const BannedIPs = () => {
       </div>
       <FormPanel>
         {ipList && ipList.banned_ipv4_addresses.length > 0 ? (
-          ipList.banned_ipv4_addresses.map((ip) => (
-            <div key={ip} className="px-8 py-4 flex items-center justify-between">
-              <div className="flex items-center space-x-5">
-                <IconGlobe size={16} className="text-foreground-lighter" />
-                <p className="text-sm font-mono">{ip}</p>
-              </div>
-              <div>
-                <Button type="default" onClick={() => openConfirmationModal(ip)}>
-                  Unban IP
-                </Button>
-              </div>
-            </div>
-          ))
-        ) : (
+            ipList.banned_ipv4_addresses.map((ip) => {
+              // Split the IP address into octets
+              const bannedOctets = ip.split('.');
+              const userOctets = userIPAddress?.split('.');
+
+              // Check if the first three octets match
+              const areOctetsMatching =
+                bannedOctets.slice(0, 3).join('.') === userOctets?.slice(0, 3).join('.');
+
+              return (
+                <div
+                  key={ip}
+                  className={`px-8 py-4 flex items-center justify-between ${
+                    areOctetsMatching ? 'text-foreground-lighter' : ''
+                  }`}
+                >
+                  <div className="flex items-center space-x-5">
+                    <IconGlobe size={16} className="text-foreground-lighter" />
+                    <p className="text-sm font-mono">{ip}</p>
+                  </div>
+                  <div>
+                    <Button type="default" onClick={() => openConfirmationModal(ip)}>
+                      Unban IP
+                    </Button>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
           <p className="text-foreground-light text-sm px-8 py-4">
             There are no banned IP addresses for your project.
           </p>
