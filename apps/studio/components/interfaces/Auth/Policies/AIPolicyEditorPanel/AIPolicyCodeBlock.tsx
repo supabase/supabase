@@ -1,45 +1,29 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Copy, FileDiff } from 'lucide-react'
 import { format } from 'sql-formatter'
-import { Button } from 'ui'
+import { Button, CodeBlock, CodeBlockProps, cn } from 'ui'
 
-import CodeEditor from 'components/ui/CodeEditor'
-import { kebabCase, take } from 'lodash'
-
-export const Pre = ({
-  id,
-  isLoading,
-  onDiff,
-  code,
-}: {
-  id: string
-  isLoading: boolean
+interface AIPolicyCodeBlockProps extends CodeBlockProps {
   onDiff: (s: string) => void
-  code: string
-}) => {
-  let formatted = code
+}
+
+export const AIPolicyCodeBlock = ({ onDiff, ...props }: AIPolicyCodeBlockProps) => {
+  let formatted = (props.children || [''])[0]
   try {
-    formatted = format(code)
+    formatted = format(formatted)
   } catch {}
 
-  // create a key from the name of the generated policy so that we're sure it's unique
-  const key = kebabCase(take(code.split(' '), 3).join(' '))
-
   return (
-    <div className="rounded-md border border-control overflow-hidden relative group">
-      <CodeEditor
-        id={`rls-sql_${id}_${key}`}
-        language={isLoading ? undefined : 'pgsql'}
-        className="h-48"
-        isReadOnly
-        defaultValue=""
+    <div className="rounded-md relative group">
+      <CodeBlock
         value={formatted}
-        autofocus={false}
-        options={{
-          scrollBeyondLastLine: false,
-          lineDecorationsWidth: 0,
-          lineNumbersMinChars: 3,
-        }}
+        language="sql"
+        className={cn(
+          props.className,
+          '!bg-transparent !py-3 !px-3.5 prose dark:prose-dark [&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap'
+        )}
+        hideCopy
+        hideLineNumbers
       />
       <div className="absolute top-3 right-3 bg-surface-100 border-muted border rounded-lg h-[28px] hidden group-hover:block">
         <Tooltip.Root delayDuration={0}>

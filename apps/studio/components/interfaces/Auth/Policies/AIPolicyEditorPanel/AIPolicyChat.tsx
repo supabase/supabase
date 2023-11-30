@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { compact, last, sortBy } from 'lodash'
+import { compact, last } from 'lodash'
 import { Loader2 } from 'lucide-react'
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   AiIcon,
@@ -13,8 +13,8 @@ import {
 } from 'ui'
 import * as z from 'zod'
 
-import { Message as MessageType } from 'ai'
 import { useProfile } from 'lib/profile'
+import { MessageWithDebug } from './AIPolicyEditorPanel.utils'
 import Message from './Message'
 
 export const AIPolicyChat = ({
@@ -24,7 +24,7 @@ export const AIPolicyChat = ({
   onDiff,
   onChange,
 }: {
-  messages: MessageType[]
+  messages: MessageWithDebug[]
   loading: boolean
   onSubmit: (s: string) => void
   onDiff: (s: string) => void
@@ -33,11 +33,6 @@ export const AIPolicyChat = ({
   const { profile } = useProfile()
   const bottomRef = useRef<HTMLDivElement>(null)
   const name = compact([profile?.first_name, profile?.last_name]).join(' ')
-  const sorted = useMemo(() => {
-    return sortBy(messages, (m) => m.createdAt).filter((m) => {
-      return !m.content.startsWith('Here is my database schema for reference:')
-    })
-  }, [messages])
 
   const FormSchema = z.object({ chat: z.string() })
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -47,7 +42,7 @@ export const AIPolicyChat = ({
     defaultValues: { chat: '' },
   })
   const formChatValue = form.getValues().chat
-  const pendingReply = loading && last(sorted)?.role === 'user'
+  const pendingReply = loading && last(messages)?.role === 'user'
 
   // try to scroll on each rerender to the bottom
   useEffect(() => {
@@ -70,11 +65,10 @@ export const AIPolicyChat = ({
   }, [formChatValue])
 
   return (
-    <div id={'ai-chat-assistant'} className="flex flex-col h-full">
+    <div id={'ai-chat-assistant'} className="flex flex-col h-full max-w-full">
       <div className="overflow-auto flex-1">
         <Message
           key="zero"
-          id="zero"
           role="assistant"
           content={`Hi${
             name ? ' ' + name : ''
@@ -83,24 +77,19 @@ export const AIPolicyChat = ({
         learn and improve.`}
         />
 
-        {sorted.map((m) => (
+        {messages.map((m) => (
           <Message
             key={`message-${m.id}`}
-            id={m.id}
             name={m.name}
             role={m.role}
             content={m.content}
             createdAt={new Date(m.createdAt || new Date()).getTime()}
-            isDebug={false}
-            // only disable highlighting on the last message while loading
-            isLoading={last(sorted)?.id === m.id && loading}
+            isDebug={m.isDebug}
             onDiff={onDiff}
           />
         ))}
 
-        {pendingReply && (
-          <Message key="thinking" id="thinking" role="assistant" content="Thinking..." />
-        )}
+        {pendingReply && <Message key="thinking" role="assistant" content="Thinking..." />}
 
         <div ref={bottomRef} className="h-1" />
       </div>

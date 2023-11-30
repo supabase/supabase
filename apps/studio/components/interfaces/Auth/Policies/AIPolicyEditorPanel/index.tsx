@@ -1,8 +1,7 @@
 import { useChat } from 'ai/react'
 import { FileDiff } from 'lucide-react'
 import dynamic from 'next/dynamic'
-import { ThreadMessage } from 'openai/resources/beta/threads/messages/messages'
-import { memo, useCallback, useEffect, useRef, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import { Button, Modal, SheetContent_Shadcn_, SheetFooter_Shadcn_, Sheet_Shadcn_, cn } from 'ui'
 
@@ -17,8 +16,9 @@ import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-
 import { useSelectedProject, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
+import { sortBy, uniqBy } from 'lodash'
 import { AIPolicyChat } from './AIPolicyChat'
-import { generateThreadMessage } from './AIPolicyEditorPanel.utils'
+import { MessageWithDebug, generateThreadMessage } from './AIPolicyEditorPanel.utils'
 import { AIPolicyHeader } from './AIPolicyHeader'
 import QueryError from './QueryError'
 import RLSCodeEditor from './RLSCodeEditor'
@@ -50,7 +50,7 @@ export const AIPolicyEditorPanel = memo(function ({
 
   const [error, setError] = useState<QueryResponseError>()
   // [Joshen] Separate state here as there's a delay between submitting and the API updating the loading status
-  const [debugThread, setDebugThread] = useState<ThreadMessage[]>([])
+  const [debugThread, setDebugThread] = useState<MessageWithDebug[]>([])
   const [assistantVisible, setAssistantPanel] = useState(false)
   const [ids, setIds] = useState<{ threadId: string; runId: string } | undefined>(undefined)
   const [isAssistantChatInputEmpty, setIsAssistantChatInputEmpty] = useState(true)
@@ -68,13 +68,23 @@ export const AIPolicyEditorPanel = memo(function ({
 
   const entityDefinitions = entities?.map((def) => def.sql.trim())
 
-  const { messages, append, isLoading } = useChat({
+  const {
+    messages: chatMessages,
+    append,
+    isLoading,
+  } = useChat({
     id: chatId,
     api: `${BASE_PATH}/api/ai/sql/suggest`,
     body: {
       entityDefinitions,
     },
   })
+
+  const messages = useMemo(() => {
+    const merged = [...debugThread, ...chatMessages.map((m) => ({ ...m, isDebug: false }))]
+
+    return sortBy(merged, (m) => m.createdAt)
+  }, [chatMessages, debugThread])
 
   const { mutate: executeMutation, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess: () => {
@@ -155,10 +165,8 @@ export const AIPolicyEditorPanel = memo(function ({
 
     const assistantMessageBefore = generateThreadMessage({
       id: messageId,
-      threadId: ids?.threadId,
-      runId: ids?.runId,
       content: 'Thinking...',
-      metadata: { type: 'debug' },
+      isDebug: true,
     })
     setDebugThread([...debugThread, assistantMessageBefore])
 
@@ -170,12 +178,12 @@ export const AIPolicyEditorPanel = memo(function ({
 
     const assistantMessageAfter = generateThreadMessage({
       id: messageId,
-      threadId: ids?.threadId,
-      runId: ids?.runId,
       content: `${solution}\n\`\`\`sql\n${sql}\n\`\`\``,
-      metadata: { type: 'debug' },
+      isDebug: true,
     })
-    setDebugThread([...debugThread, assistantMessageAfter])
+    const cleanedMessages = uniqBy([...debugThread, assistantMessageAfter], (m) => m.id)
+
+    setDebugThread(cleanedMessages)
   }
 
   // when the panel is closed, reset all values
@@ -289,7 +297,7 @@ export const AIPolicyEditorPanel = memo(function ({
                 }
                 onDiff={setIncomingChange}
                 onChange={setIsAssistantChatInputEmpty}
-                loading={isLoading}
+                loading={isLoading || isDebugSqlLoading}
               />
             </div>
           )}
