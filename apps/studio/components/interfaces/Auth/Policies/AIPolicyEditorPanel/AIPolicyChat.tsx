@@ -1,17 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { compact, last, sortBy } from 'lodash'
-import { Loader2 } from 'lucide-react'
 import OpenAI from 'openai'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { createRef, useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import {
-  AiIcon,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  Form_Shadcn_,
-  Input_Shadcn_,
-} from 'ui'
+import { AssistantChatForm, AssistantCommandsPopover } from 'ui'
 import * as z from 'zod'
 
 import { useProfile } from 'lib/profile'
@@ -72,6 +64,16 @@ export const AIPolicyChat = ({
     onChange(formChatValue.length === 0)
   }, [formChatValue])
 
+  const [commandsOpen, setCommandsOpen] = useState<boolean>(false)
+  const textAreaRef = createRef<HTMLTextAreaElement>()
+  const [value, setValue] = useState('')
+
+  const suggestions = [
+    'Add policy for org Inserted User Access',
+    'Add policy for User-Specific Todo Access',
+    'Add policy for Org Update Restriction',
+  ]
+
   return (
     <div id={'ai-chat-assistant'} className="flex flex-col h-full">
       <div className="overflow-auto flex-1">
@@ -102,8 +104,33 @@ export const AIPolicyChat = ({
 
         <div ref={bottomRef} className="h-1" />
       </div>
-
-      <Form_Shadcn_ {...form}>
+      <div className="sticky p-5 flex-0 border-t">
+        <AssistantCommandsPopover
+          open={commandsOpen}
+          setOpen={setCommandsOpen}
+          textAreaRef={textAreaRef}
+          value={value}
+          setValue={(e) => setValue(e)}
+          suggestions={suggestions}
+        >
+          <AssistantChatForm
+            textAreaRef={textAreaRef}
+            key={'new-thread-form'}
+            id={'new-thread-form'}
+            commandsOpen={commandsOpen}
+            setCommandsOpen={setCommandsOpen}
+            onSubmit={form.handleSubmit((data: z.infer<typeof FormSchema>) => {
+              onSubmit(data.chat)
+            })}
+            value={value}
+            placeholder="e.g Create a Telegram-like chat application"
+            disabled={loading}
+            loading={loading}
+            onValueChange={(e) => setValue(e.target.value)}
+          />
+        </AssistantCommandsPopover>
+      </div>
+      {/* <Form_Shadcn_ {...form}>
         <form
           id="rls-chat"
           className="sticky p-5 flex-0 border-t"
@@ -136,7 +163,7 @@ export const AIPolicyChat = ({
             )}
           />
         </form>
-      </Form_Shadcn_>
+      </Form_Shadcn_> */}
     </div>
   )
 }
