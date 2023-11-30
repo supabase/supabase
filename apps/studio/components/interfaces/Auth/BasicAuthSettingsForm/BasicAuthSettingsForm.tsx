@@ -33,6 +33,10 @@ import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutati
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions, useSelectedOrganization, useStore, useFlag } from 'hooks'
 
+const LETTERS_AND_DIGITS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789'
+const LOWER_UPPER_DIGITS = 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789'
+const LOWER_UPPER_DIGITS_SYMBOLS = LOWER_UPPER_DIGITS + ':!@#$%^&*()_+-=[]{};\'\\\\:"|<>?,./`~'
+
 const schema = object({
   DISABLE_SIGNUP: boolean().required(),
   SITE_URL: string().required('Must have a Site URL'),
@@ -50,6 +54,8 @@ const schema = object({
   SESSIONS_TIMEBOX: number().min(0, 'Must be a positive number'),
   SESSIONS_INACTIVITY_TIMEOUT: number().min(0, 'Must be a positive number'),
   SESSIONS_SINGLE_PER_USER: boolean(),
+  PASSWORD_MIN_LENGTH: number().min(6, 'Must be greater or equal to 6.'),
+  PASSWORD_REQUIRED_CHARACTERS: string(),
 })
 
 function HoursOrNeverText({ value }: { value: number }) {
@@ -85,6 +91,7 @@ const BasicAuthSettingsForm = observer(() => {
 
   const isProPlanAndUp = isSuccessSubscription && subscription?.plan?.id !== 'free'
   const singlePerUserReleased = useFlag('authSingleSessionPerUserReleased')
+  const passwordStrengthReleased = useFlag('authPasswordStrengthReleased')
 
   const INITIAL_VALUES = {
     DISABLE_SIGNUP: !authConfig?.DISABLE_SIGNUP,
@@ -98,6 +105,13 @@ const BasicAuthSettingsForm = observer(() => {
     ...(singlePerUserReleased
       ? {
           SESSIONS_SINGLE_PER_USER: authConfig?.SESSIONS_SINGLE_PER_USER || false,
+        }
+      : null),
+
+    ...(passwordStrengthReleased
+      ? {
+          PASSWORD_MIN_LENGTH: authConfig?.PASSWORD_MIN_LENGTH || 6,
+          PASSWORD_REQUIRED_CHARACTERS: authConfig?.PASSWORD_REQUIRED_CHARACTERS || '',
         }
       : null),
   }
@@ -184,6 +198,55 @@ const BasicAuthSettingsForm = observer(() => {
                 </FormSectionContent>
               </FormSection>
               <div className="border-t border-muted"></div>
+              {passwordStrengthReleased && (
+                <>
+                  <FormSection header={<FormSectionLabel>Passwords</FormSectionLabel>}>
+                    <FormSectionContent loading={isLoading}>
+                      <InputNumber
+                        id="PASSWORD_MIN_LENGTH"
+                        size="small"
+                        label="Minimum password length"
+                        descriptionText="Passwords shorter than this value will be rejected as weak. Minimum 6, recommended 8 or more."
+                        actions={<span className="mr-3 text-foreground-lighter">characters</span>}
+                        disabled={!canUpdateConfig}
+                      />
+                      <>
+                        <Radio.Group
+                          id="PASSWORD_REQUIRED_CHARACTERS"
+                          name="PASSWORD_REQUIRED_CHARACTERS"
+                          label="Required characters"
+                          descriptionText="Passwords that do not have at least one of each will be rejected as weak."
+                          options={[
+                            {
+                              id: 'no-required',
+                              label: 'No required characters',
+                              value: '',
+                              description: '(default)',
+                            },
+                            {
+                              id: 'letters-digits',
+                              label: 'Letters and digits',
+                              value: LETTERS_AND_DIGITS,
+                            },
+                            {
+                              id: 'lower-upper-digits',
+                              label: 'Lowercase, uppercase letters and digits',
+                              value: LOWER_UPPER_DIGITS,
+                            },
+                            {
+                              id: 'lower-upper-digits-symbols',
+                              label: 'Lowercase, uppercase letters, digits and symbols',
+                              value: LOWER_UPPER_DIGITS_SYMBOLS,
+                              description: '(recommended)',
+                            },
+                          ]}
+                        />
+                      </>
+                    </FormSectionContent>
+                  </FormSection>
+                  <div className="border-t border-muted"></div>
+                </>
+              )}
               <FormSection header={<FormSectionLabel>User Sessions</FormSectionLabel>}>
                 <FormSectionContent loading={isLoading}>
                   {isProPlanAndUp ? (
