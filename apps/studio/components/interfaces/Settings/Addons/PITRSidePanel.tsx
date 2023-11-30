@@ -64,7 +64,10 @@ const PITRSidePanel = () => {
 
   const snap = useSubscriptionPageStateSnapshot()
   const visible = snap.panelKey === 'pitr'
-  const onClose = () => snap.setPanelKey(undefined)
+  const onClose = () => {
+    router.push(router.asPath.split('?')[0], undefined, { shallow: true })
+    snap.setPanelKey(undefined)
+  }
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })

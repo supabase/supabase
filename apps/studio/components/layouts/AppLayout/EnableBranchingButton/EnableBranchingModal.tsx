@@ -133,7 +133,7 @@ const EnableBranchingModal = () => {
         visible={snap.showEnableBranchingModal}
         onCancel={() => snap.setShowEnableBranchingModal(false)}
         className="!bg"
-        size="medium"
+        size="large"
       >
         <Form_Shadcn_ {...form}>
           <form
@@ -169,130 +169,111 @@ const EnableBranchingModal = () => {
               </>
             )}
 
-            {hasPitrEnabled ? (
+            {isErrorIntegrations && (
               <>
-                {isErrorIntegrations && (
-                  <>
-                    <Modal.Separator />
-                    <Modal.Content className="px-7 py-6">
-                      <AlertError
-                        error={integrationsError}
-                        subject="Failed to retrieve integrations"
-                      />
-                    </Modal.Content>
-                    <Modal.Separator />
-                  </>
-                )}
-
-                {isSuccessIntegrations && (
-                  <GithubRepositorySelection
-                    form={form}
-                    isChecking={isChecking}
-                    isValid={canSubmit}
-                    integration={githubIntegration}
-                    hasGithubIntegrationInstalled={hasGithubIntegrationInstalled}
-                  />
-                )}
-
-                <Modal.Content className="px-7 py-6 flex flex-col gap-3">
-                  <p className="text-sm text-foreground-light">
-                    Please keep in mind the following:
-                  </p>
-                  <div className="flex flex-row gap-4">
-                    <div>
-                      <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-300 flex items-center justify-center">
-                        <IconFileText className="text-amber-900" size={20} strokeWidth={2} />
-                      </figure>
-                    </div>
-                    <div>
-                      <p className="text-sm text-foreground">
-                        You will not be able to use the dashboard to make changes to the database
-                      </p>
-                      <p className="text-sm text-foreground-light">
-                        Schema changes for database Preview Branches must be made using git.
-                        Dashboard changes to Preview Branches are coming soon.
-                      </p>
-                    </div>
-                  </div>
-                </Modal.Content>
-
                 <Modal.Separator />
-
-                <Modal.Content className="px-7">
-                  <div className="flex items-center space-x-2 py-2 pb-4">
-                    <Button
-                      size="medium"
-                      block
-                      disabled={isCreating}
-                      type="default"
-                      onClick={() => snap.setShowEnableBranchingModal(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      block
-                      size="medium"
-                      form={formId}
-                      disabled={isCreating || !canSubmit}
-                      loading={isCreating}
-                      type="primary"
-                      htmlType="submit"
-                    >
-                      I understand, enable branching
-                    </Button>
-                  </div>
+                <Modal.Content className="px-7 py-6">
+                  <AlertError error={integrationsError} subject="Failed to retrieve integrations" />
                 </Modal.Content>
+                <Modal.Separator />
               </>
-            ) : (
-              <div className="">
-                <Alert_Shadcn_ className="rounded-none border-r-0 border-l-0 px-7 [&>svg]:left-6">
-                  <AlertCircleIcon strokeWidth={2} />
-                  <AlertTitle_Shadcn_>
-                    Point in time recovery (PITR) is required for branching
-                  </AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_>
-                    This is to ensure that you can always recover data if you make a "bad
-                    migration". For example, if you accidentally delete a column or some of your
-                    production data.
-                  </AlertDescription_Shadcn_>
-                  {isFreePlan && (
-                    <AlertDescription_Shadcn_ className="mt-2">
-                      To enable PITR, you may first upgrade your organization's plan to at least
-                      Pro, then purchase the PITR add on for your project via the{' '}
-                      <Link
-                        href={`/project/${ref}/settings/addons?panel=pitr`}
-                        className="text-brand"
-                      >
-                        project settings
-                      </Link>
-                      .
-                    </AlertDescription_Shadcn_>
-                  )}
-                </Alert_Shadcn_>
-                <Modal.Content className="px-7">
-                  <div className="flex items-center justify-end space-x-2 py-4 pb-4">
-                    <Button
-                      size="tiny"
-                      type="default"
+            )}
+
+            {isSuccessIntegrations && (
+              <GithubRepositorySelection
+                form={form}
+                isChecking={isChecking}
+                isValid={canSubmit}
+                integration={githubIntegration}
+                hasGithubIntegrationInstalled={hasGithubIntegrationInstalled}
+              />
+            )}
+
+            {!hasPitrEnabled && (
+              <Alert_Shadcn_ className="rounded-none px-7 py-6 [&>svg]:top-6 [&>svg]:left-6 !border-t-0 !border-l-0 !border-r-0">
+                {/* <AlertCircleIcon strokeWidth={2} /> */}
+                <AlertTitle_Shadcn_ className="text-base">
+                  We strongly encourage enabling Point in Time Recovery (PITR)
+                </AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_>
+                  This is to ensure that you can always recover data if you make a "bad migration".
+                  For example, if you accidentally delete a column or some of your production data.
+                </AlertDescription_Shadcn_>
+                {isFreePlan && (
+                  <AlertDescription_Shadcn_ className="mt-2">
+                    To enable PITR, you may first upgrade your organization's plan to at least Pro,
+                    then purchase the PITR add on for your project via the{' '}
+                    <Link
+                      href={`/project/${ref}/settings/addons?panel=pitr`}
+                      className="text-brand"
                       onClick={() => snap.setShowEnableBranchingModal(false)}
                     >
-                      Understood
-                    </Button>
-                    <Button size="tiny">
-                      <Link
-                        href={
-                          isFreePlan
-                            ? `/org/${selectedOrg?.slug}/billing?panel=subscriptionPlan`
-                            : `/project/${ref}/settings/addons?panel=pitr`
-                        }
-                      >
-                        {isFreePlan ? 'Upgrade to Pro' : 'Enable PITR'}
-                      </Link>
-                    </Button>
-                  </div>
-                </Modal.Content>
-              </div>
+                      project settings
+                    </Link>
+                    .
+                  </AlertDescription_Shadcn_>
+                )}
+                <Button size="tiny" type="default" className="mt-4">
+                  <Link
+                    href={
+                      isFreePlan
+                        ? `/org/${selectedOrg?.slug}/billing?panel=subscriptionPlan`
+                        : `/project/${ref}/settings/addons?panel=pitr`
+                    }
+                    onClick={() => snap.setShowEnableBranchingModal(false)}
+                  >
+                    {isFreePlan ? 'Upgrade to Pro' : 'Enable PITR add-on'}
+                  </Link>
+                </Button>
+              </Alert_Shadcn_>
             )}
+
+            <Modal.Content className="px-7 py-6 flex flex-col gap-3">
+              <p className="text-sm text-foreground-light">Please keep in mind the following:</p>
+              <div className="flex flex-row gap-4">
+                <div>
+                  <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-300 flex items-center justify-center">
+                    <IconFileText className="text-amber-900" size={20} strokeWidth={2} />
+                  </figure>
+                </div>
+                <div className="flex flex-col gap-y-1">
+                  <p className="text-sm text-foreground">
+                    You will not be able to make changes to the database via the dashboard
+                  </p>
+                  <p className="text-sm text-foreground-light">
+                    Schema changes for database Preview Branches must be made using Git. Dashboard
+                    changes to Preview Branches are coming soon.
+                  </p>
+                </div>
+              </div>
+            </Modal.Content>
+
+            <Modal.Separator />
+
+            <Modal.Content className="px-7">
+              <div className="flex items-center space-x-2 py-2 pb-4">
+                <Button
+                  size="medium"
+                  block
+                  disabled={isCreating}
+                  type="default"
+                  onClick={() => snap.setShowEnableBranchingModal(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  block
+                  size="medium"
+                  form={formId}
+                  disabled={isCreating || !canSubmit}
+                  loading={isCreating}
+                  type="primary"
+                  htmlType="submit"
+                >
+                  I understand, enable branching
+                </Button>
+              </div>
+            </Modal.Content>
           </form>
         </Form_Shadcn_>
       </Modal>

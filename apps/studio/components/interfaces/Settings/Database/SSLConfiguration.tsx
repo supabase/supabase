@@ -132,7 +132,7 @@ const SSLConfiguration = () => {
                 <IconLoader className="animate-spin" strokeWidth={1.5} size={16} />
               )}
               <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger asChild>
+                <Tooltip.Trigger>
                   <Toggle
                     checked={isEnforced}
                     disabled={
