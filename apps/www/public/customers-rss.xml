@@ -5,9 +5,16 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Tue, 07 Nov 2023 23:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Invalid Date</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/customers/shotgun</guid>
+  <title></title>
+  <link>https://supabase.com/customers/shotgun</link>
+  <description></description>
+  <pubDate>Invalid Date</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/customers/next-door-lending</guid>
   <title>How Next Door Lending leveraged Supabase to become a top 10 mortgage broker</title>
   <link>https://supabase.com/customers/next-door-lending</link>

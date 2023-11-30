@@ -39,6 +39,8 @@ function CustomerStoriesPage(props: any) {
       'See how Supabase empowers companies of all sizes to accelerate their growth and streamline their work.',
   }
 
+  console.log(props)
+
   const caseStudyThumbs = props.blogs?.map((blog: PostTypes, idx: number) => {
     return {
       logo: blog.logo,
