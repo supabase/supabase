@@ -4,12 +4,7 @@ import { isError } from 'data/utils/error-check'
 import { jsonrepair } from 'jsonrepair'
 import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
-import type {
-  ChatCompletionRequestMessage,
-  CreateChatCompletionRequest,
-  CreateChatCompletionResponse,
-  ErrorResponse,
-} from 'openai-old'
+import { OpenAI } from 'openai'
 
 const openAiKey = process.env.OPENAI_KEY
 
@@ -34,11 +29,14 @@ const generateSqlSchema = SchemaBuilder.emptySchema()
 
 type GenerateSqlResult = typeof generateSqlSchema.T
 
-const completionFunctions = {
+const completionFunctions: Record<
+  string,
+  OpenAI.Chat.Completions.ChatCompletionCreateParams.Function
+> = {
   generateSql: {
     name: 'generateSql',
     description: 'Generates Postgres SQL based on a natural language prompt',
-    parameters: generateSqlSchema.schema,
+    parameters: generateSqlSchema.schema as Record<string, unknown>,
   },
 }
 
@@ -61,6 +59,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
+  const openAI = new OpenAI({ apiKey: openAiKey })
   const {
     body: { prompt, entityDefinitions },
   } = req
@@ -69,7 +68,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const maxCompletionTokenCount = 1024
   const hasEntityDefinitions = entityDefinitions !== undefined && entityDefinitions.length > 0
 
-  const completionMessages: ChatCompletionRequestMessage[] = []
+  const completionMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = []
 
   if (hasEntityDefinitions) {
     completionMessages.push({
@@ -86,7 +85,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     content: prompt,
   })
 
-  const completionOptions: CreateChatCompletionRequest = {
+  const completionOptions: OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming = {
     model,
     messages: completionMessages,
     max_tokens: maxCompletionTokenCount,
@@ -98,24 +97,13 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     stream: false,
   }
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    headers: {
-      Authorization: `Bearer ${openAiKey}`,
-      'Content-Type': 'application/json',
-    },
-    method: 'POST',
-    body: JSON.stringify(completionOptions),
-  })
+  let completionResponse: OpenAI.Chat.Completions.ChatCompletion
+  try {
+    completionResponse = await openAI.chat.completions.create(completionOptions)
+  } catch (error: any) {
+    console.error(`AI SQL generation failed: ${error.message}`)
 
-  if (!response.ok) {
-    const errorResponse: ErrorResponse = await response.json()
-    console.error(`AI SQL generation failed: ${errorResponse.error.message}`)
-
-    if (
-      'code' in errorResponse.error &&
-      errorResponse.error.code === 'context_length_exceeded' &&
-      hasEntityDefinitions
-    ) {
+    if ('code' in error && error.code === 'context_length_exceeded' && hasEntityDefinitions) {
       return res.status(400).json({
         error:
           'Your database metadata is too large for Supabase AI to ingest. Try disabling database metadata in AI settings.',
@@ -126,8 +114,6 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       error: 'There was an unknown error generating the SQL snippet. Please try again.',
     })
   }
-
-  const completionResponse: CreateChatCompletionResponse = await response.json()
 
   const [firstChoice] = completionResponse.choices
 
