@@ -169,7 +169,7 @@ nonce: rawNonce,
 );
 }
 
-```
+````
 
 </TabPanel>
 </Tabs>
@@ -204,7 +204,7 @@ If the session is expired, you can listen to `onAuthStateChange` event and wait 
 ```dart
 // Session was
 final session = supabase.auth.currentSession;
-```
+````
 
 </TabPanel>
 <TabPanel id="2.0x" label="After">
@@ -214,7 +214,7 @@ final session = supabase.auth.currentSession;
 // Check if the session is valid.
 final isSessionExpired = session?.isExpired;
 
-```
+````
 
 </TabPanel>
 </Tabs>
@@ -252,7 +252,7 @@ await supabase.auth.signInWithOAuth(
   authScreenLaunchMode: LaunchMode.inAppWebView,
   context: context,
 );
-```
+````
 
 </TabPanel>
 <TabPanel id="2.0x" label="After">
@@ -419,7 +419,7 @@ final foo = await myQuery.eq('some_col', 'foo');
 // The `eq` filter above is applied in addition to the following filter
 final bar = await myQuery.eq('another_col', 'bar');
 
-```
+````
 
 </TabPanel>
 <TabPanel id="2.0x" label="After">
@@ -431,7 +431,7 @@ final foo = await myQuery.eq('some_col', 'foo');
 
 // The `eq` filter above is not applied to the following result
 final bar = await myQuery.eq('another_col', 'bar');
-```
+````
 
 </TabPanel>
 </Tabs>
@@ -470,7 +470,7 @@ final data = await supabase
 .select()
 .in\_('status', ['ONLINE', 'OFFLINE']);
 
-```
+````
 
 </TabPanel>
 <TabPanel id="2.0x" label="After">
@@ -484,7 +484,7 @@ final data = await supabase
     .from('users')
     .select()
     .inFilter('status', ['ONLINE', 'OFFLINE']);
-```
+````
 
 </TabPanel>
 </Tabs>
