@@ -4,8 +4,6 @@
  * (database/indexes for example). The only way is to have a dummy page which somehow calms Nextjs
  *  down. This solution was found in https://github.com/vercel/next.js/issues/54770.
  */
-const DummyPage = () => {
+export default function Page() {
   return <></>
 }
-
-export default DummyPage
