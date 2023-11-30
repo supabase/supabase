@@ -31,6 +31,7 @@ export const Pre = ({
         id={`rls-sql_${id}_${key}`}
         language={isLoading ? undefined : 'pgsql'}
         className="h-48"
+        isReadOnly
         defaultValue=""
         value={formatted}
         autofocus={false}
