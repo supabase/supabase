@@ -36,6 +36,23 @@ const client = createClient(SUPABASE_URL, SUPABASE_KEY)
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+void main() async {
+  Supabase.initialize(
+    url: 'https://<project>.supabase.co',
+    anonKey: '<your-anon-key>',
+  );
+  runApp(MyApp());
+}
+
+final supabase = Supabase.instance.client;
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
