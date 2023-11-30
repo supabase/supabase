@@ -7,6 +7,7 @@ import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
 import { Button, IconExternalLink, IconSearch, Input } from 'ui'
 
+import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Policies } from 'components/interfaces/Auth/Policies'
 import { AIPolicyEditorPanel } from 'components/interfaces/Auth/Policies/AIPolicyEditorPanel'
 import { AuthLayout } from 'components/layouts'
@@ -17,11 +18,10 @@ import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useCheckPermissions, useFlag, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { NextPageWithLayout } from 'types'
-import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 /**
  * Filter tables by table name and policy name
@@ -66,6 +66,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   const [searchString, setSearchString] = useState<string>('')
 
   const [showPolicyAiEditor, setShowPolicyAiEditor] = useState(false)
+  const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState<PostgresPolicy>()
   const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
 
   useEffect(() => {
@@ -177,12 +178,24 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
       {isError && <AlertError error={error} subject="Failed to retrieve tables" />}
 
       {isSuccess && (
-        <Policies tables={filteredTables} hasTables={tables.length > 0} isLocked={isLocked} />
+        <Policies
+          tables={filteredTables}
+          hasTables={tables.length > 0}
+          isLocked={isLocked}
+          onSelectEditPolicy={(policy) => {
+            setSelectedPolicyToEdit(policy)
+            setShowPolicyAiEditor(true)
+          }}
+        />
       )}
 
       <AIPolicyEditorPanel
         visible={showPolicyAiEditor}
-        onSelectCancel={() => setShowPolicyAiEditor(false)}
+        selectedPolicy={selectedPolicyToEdit}
+        onSelectCancel={() => {
+          setShowPolicyAiEditor(false)
+          setSelectedPolicyToEdit(undefined)
+        }}
       />
     </div>
   )
