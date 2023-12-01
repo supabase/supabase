@@ -31,7 +31,7 @@ async function waitForRunCompletion(params: {
       const supabase = createClient(cookieStore)
 
       const { data, error } = await supabase
-        .from('responses')
+        .from('responses_ai')
         .select('*')
         .eq('message_id', params.messageId)
         .single()
@@ -81,7 +81,7 @@ export async function SchemaFlow({ params }: { params: any }) {
 
     if (user) {
       try {
-        const { error } = await supabase.from('responses').insert({
+        const { error } = await supabase.from('responses_ai').insert({
           message_id: messageId,
           thread_id: threadId,
           text: content,
