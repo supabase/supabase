@@ -7,7 +7,7 @@ import remarkGfm from 'remark-gfm'
 import { AiIconAnimation, Badge, markdownComponents } from 'ui'
 
 import { useProfile } from 'lib/profile'
-import { AIPolicyCodeBlock } from './AIPolicyCodeBlock'
+import { AIPolicyPre } from './AIPolicyPre'
 
 interface MessageProps {
   name?: string
@@ -65,7 +65,9 @@ const Message = memo(function Message({
         remarkPlugins={[remarkGfm]}
         components={{
           ...markdownComponents,
-          code: (props: any) => <AIPolicyCodeBlock onDiff={onDiff} {...props} />,
+          pre: (props: any) => {
+            return <AIPolicyPre onDiff={onDiff}>{props.children[0].props.children}</AIPolicyPre>
+          },
         }}
       >
         {content}

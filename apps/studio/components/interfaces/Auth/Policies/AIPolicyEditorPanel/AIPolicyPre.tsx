@@ -1,25 +1,28 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Copy, FileDiff } from 'lucide-react'
 import { format } from 'sql-formatter'
-import { Button, CodeBlock, CodeBlockProps, cn } from 'ui'
+import { Button, CodeBlock, cn } from 'ui'
 
-interface AIPolicyCodeBlockProps extends CodeBlockProps {
+interface AAIPolicyPreProps {
   onDiff: (s: string) => void
+  children: string[]
 }
 
-export const AIPolicyCodeBlock = ({ onDiff, ...props }: AIPolicyCodeBlockProps) => {
-  let formatted = (props.children || [''])[0]
+export const AIPolicyPre = ({ onDiff, children }: AAIPolicyPreProps) => {
+  let formatted = (children || [''])[0]
   try {
-    formatted = format(formatted)
+    formatted = format(formatted, { language: 'postgresql' })
   } catch {}
 
+  if (formatted.length === 0) {
+    return null
+  }
   return (
-    <div className="rounded-md relative group">
+    <pre className="rounded-md relative group">
       <CodeBlock
         value={formatted}
         language="sql"
         className={cn(
-          props.className,
           '!bg-transparent !py-3 !px-3.5 prose dark:prose-dark',
           // change the look of the code block. The flex hack is so that the code is wrapping since
           // every word is a separate span
@@ -74,6 +77,6 @@ export const AIPolicyCodeBlock = ({ onDiff, ...props }: AIPolicyCodeBlockProps) 
           </Tooltip.Portal>
         </Tooltip.Root>
       </div>
-    </div>
+    </pre>
   )
 }
