@@ -72,7 +72,10 @@ const MonacoEditor = ({
       lineNumbers: hideLineNumbers ? 'off' : undefined,
       glyphMargin: hideLineNumbers ? false : undefined,
       lineNumbersMinChars: hideLineNumbers ? 0 : undefined,
+      occurrencesHighlight: false,
       folding: hideLineNumbers ? false : undefined,
+      renderLineHighlight: 'none',
+      selectionHighlight: false,
     },
     options
   )
