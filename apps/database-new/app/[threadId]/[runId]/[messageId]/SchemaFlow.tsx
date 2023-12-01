@@ -6,6 +6,8 @@ import { parseTables } from '@/lib/utils'
 import SchemaFlowHandler from './SchemaFlowHandler'
 
 export async function SchemaFlow({ params }: { params: any }) {
+  console.log('schemaFlow refetching')
+
   const { threadId, runId, messageId } = params
 
   const content = await getThread({ threadId, runId, messageId })

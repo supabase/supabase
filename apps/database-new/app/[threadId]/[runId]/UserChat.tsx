@@ -1,27 +1,33 @@
-import { AssistantMessage, UserMessage } from '@/lib/types'
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
-import { useParams, useRouter } from 'next/navigation'
-import { cn } from 'ui'
+'use client'
 
-dayjs.extend(relativeTime)
+import { AssistantMessage, UserMessage } from '@/lib/types'
+import { useParams, usePathname, useRouter } from 'next/navigation'
+import { cn } from 'ui'
 
 interface UserChatProps {
   message: UserMessage
   reply?: AssistantMessage
   isLatest: boolean
-  isSelected: boolean
   isLoading: boolean
+  times: {
+    hoursFromNow: number
+    formattedTimeFromNow: string
+    formattedCreatedAt: string
+    replyDuration: number | undefined
+  }
 }
 
-const UserChat = ({ message, reply, isLatest, isSelected, isLoading }: UserChatProps) => {
+const UserChat = ({ message, reply, isLatest, isLoading, times }: UserChatProps) => {
   const router = useRouter()
   const { threadId, runId } = useParams()
 
-  const hoursFromNow = dayjs().diff(dayjs(message.created_at * 1000), 'hours')
-  const formattedTimeFromNow = dayjs(message.created_at * 1000).fromNow()
-  const formattedCreatedAt = dayjs(message.created_at * 1000).format('DD MMM YYYY, HH:mm')
-  const replyDuration = reply !== undefined ? reply.created_at - message.created_at : undefined
+  console.log('message', message)
+
+  console.log(message.content[0].text.value)
+
+  const { hoursFromNow, formattedTimeFromNow, formattedCreatedAt, replyDuration } = times
+
+  const isSelected = usePathname().includes(message.id)
 
   return (
     <div
@@ -76,22 +82,22 @@ const UserChat = ({ message, reply, isLatest, isSelected, isLoading }: UserChatP
             </svg>
           </span>
           <div
-            title={message.text}
+            title={message.content[0].text.value}
             className={cn(
               'cursor-pointer transition relative overflow-hidden',
               'w-full rounded-lg rounded-tl-none',
               'bg-alternative',
-              'border'
-              // isSelected ? 'bg-surface-100' : 'bg-surface-100 group-hover:bg-surface-200'
+              'border',
+              isSelected ? 'bg-surface-100' : 'bg-surface-100 group-hover:bg-surface-200'
             )}
           >
             <p
               className={cn(
-                'transition p-4 text-sm',
+                'transition p-4 text-xs',
                 isSelected ? 'text-foreground' : 'text-light group-hover:text-foreground'
               )}
             >
-              {message.text}
+              {message.content[0].text.value}
             </p>
             {isLoading && <div className="chat-shimmering-loader w-full h-0.5 absolute bottom-0" />}
           </div>

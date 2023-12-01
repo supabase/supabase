@@ -10,6 +10,7 @@ export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
   value?: string
   onValueChange: (value: ChangeEvent<HTMLTextAreaElement>) => void
   message?: string
+  children?: React.ReactNode
 }
 
 const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
@@ -102,6 +103,7 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
           onChange={(event: ChangeEvent<HTMLTextAreaElement>) => onValueChange(event)}
           onKeyDown={handleKeyDown}
         />
+        {props.children}
         <SubmitButton />
         <p aria-live="polite" className="sr-only" role="status">
           {message}

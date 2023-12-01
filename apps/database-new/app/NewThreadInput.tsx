@@ -7,7 +7,7 @@ import { ExternalLink } from 'lucide-react'
 import { useState } from 'react'
 import { useFormState } from 'react-dom'
 import { AssistantChatForm, cn } from 'ui'
-import { updateThread } from './actions'
+import { createThread } from './actions'
 
 const suggestions = CHAT_EXAMPLES
 
@@ -23,6 +23,8 @@ const NewThreadInput = () => {
     return ''
   })
 
+  console.log('value', value)
+
   const initialState = {
     message: undefined,
     success: undefined,
@@ -31,7 +33,7 @@ const NewThreadInput = () => {
     },
   }
 
-  const [state, formAction] = useFormState(updateThread, initialState)
+  const [state, formAction] = useFormState(createThread, initialState)
   const supabase = createClient()
   const snap = useAppStateSnapshot()
 

@@ -101,7 +101,7 @@ export async function updateThreadName(prevState: any, formData: FormData) {
   }
 }
 
-export async function updateThread(prevState: any, formData: FormData) {
+export async function createThread(prevState: any, formData: FormData) {
   const cookieStore = cookies()
   const supabase = createClient(cookieStore)
 
@@ -179,5 +179,58 @@ export async function updateThread(prevState: any, formData: FormData) {
     }
   }
 
+  redirect(redirectUrl)
+}
+
+export async function updateThread(prevState: any, formData: FormData) {
+  const cookieStore = cookies()
+  const supabase = createClient(cookieStore)
+
+  let redirectUrl = ''
+
+  console.log('trying..')
+
+  try {
+    const schema = z.object({
+      value: z.string(),
+      threadId: z.string(),
+      runId: z.string(),
+    })
+
+    const data = schema.parse({
+      value: formData.get('value'),
+      threadId: formData.get('threadId'),
+      runId: formData.get('runId'),
+    })
+
+    const message = await openai.beta.threads.messages.create(data.threadId, {
+      content: data.value,
+      role: 'user',
+    })
+
+    revalidatePath(`/${data.threadId}/${data.runId}`, 'layout')
+
+    console.log('message', message)
+
+    const run = await openai.beta.threads.runs.create(message.thread_id, {
+      assistant_id: 'asst_oLWrK8lScZVNEpfjwUIvBAnq',
+    })
+
+    revalidatePath(`/${data.threadId}/${data.runId}/${message.id}`)
+
+    console.log('run', run)
+
+    redirectUrl = `/${message.thread_id}/${run.id}/${message.id}`
+  } catch (error: any) {
+    return {
+      success: false,
+      message: 'Failed to update schema with new prompt',
+      data: undefined,
+    }
+  }
+
+  console.log('redirectUrl', redirectUrl)
+
+  revalidatePath(redirectUrl)
   redirect(redirectUrl)
 }
