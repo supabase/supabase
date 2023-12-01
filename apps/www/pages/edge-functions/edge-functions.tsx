@@ -1,4 +1,5 @@
-import { Badge, IconCode, IconFastForward, IconGlobe, IconRefreshCcw, ThemeImage, cn } from 'ui'
+import { Badge, IconCode, IconFastForward, IconGlobe, IconRefreshCcw, cn } from 'ui'
+import { ThemeImage } from 'ui-patterns'
 import UseCaseExamples from 'data/products/functions/usecase-examples'
 import Solutions from 'data/Solutions'
 import { NextSeo } from 'next-seo'

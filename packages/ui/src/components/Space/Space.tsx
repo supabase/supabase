@@ -33,4 +33,4 @@ function Space({ direction, size = 2, className, block, style, minus, children }
   )
 }
 
-export default Space
+export { Space }

@@ -23,10 +23,8 @@ import {
   IconSearch,
   IconSettings,
   IconUser,
-  Theme,
-  themes,
 } from 'ui'
-import { useCommandMenu } from 'ui-patterns'
+import { useCommandMenu, Theme, themes } from 'ui-patterns'
 
 import { useFlag, useIsFeatureEnabled } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'

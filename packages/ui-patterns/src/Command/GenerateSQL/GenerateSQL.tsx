@@ -4,7 +4,6 @@ import { format } from 'sql-formatter'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   Button,
-  CodeBlock,
   IconAlertTriangle,
   IconCornerDownLeft,
   IconUser,
@@ -13,7 +12,7 @@ import {
   Tabs,
   cn,
 } from 'ui'
-
+import { CodeBlock } from '@ui-patterns/CodeBlock'
 import { AiIcon, AiIconChat } from '../Command.icons'
 import { CommandItem, useAutoInputFocus, useHistoryKeys } from '../Command.utils'
 import { useCommandMenu } from '../CommandMenuProvider'

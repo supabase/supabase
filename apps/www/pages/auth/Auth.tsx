@@ -1,13 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
-import {
-  Button,
-  IconArrowUpRight,
-  IconBriefcase,
-  IconEye,
-  IconLink,
-  IconShield,
-  ThemeImage,
-} from 'ui'
+import { Button, IconArrowUpRight, IconBriefcase, IconEye, IconLink, IconShield } from 'ui'
+import { ThemeImage } from 'ui-patterns'
 import ApiExamples from 'data/products/auth/auth-api-examples'
 import AuthSqlRulesExamples from 'data/products/auth/auth-sql-rules-examples'
 import Solutions from 'data/Solutions'

@@ -5,10 +5,11 @@ import { useRouter } from 'next/router'
 import { FC, useState } from 'react'
 import { Button, IconCommand, IconGitHub, IconSearch } from 'ui'
 
+import { ThemeToggle } from '@ui-patterns/ThemeToggle'
+import { SearchButton } from '@ui-patterns/Command'
+
 import { getPageType } from '~/lib/helpers'
 import { REFERENCES } from './NavigationMenu.constants'
-import ThemeToggle from '@ui/components/ThemeProvider/ThemeToggle'
-import { SearchButton } from 'ui-patterns'
 
 const TopNavBar: FC = () => {
   const { resolvedTheme } = useTheme()

@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { CodeBlock } from '../../components/CodeBlock/CodeBlock'
+import { CodeBlock } from '@ui-patterns/CodeBlock'
 import Image from 'next/image'
-import { cn } from '../utils'
+import { cn } from 'ui'
 
 const NextImageHandler = (props: any) => {
   return (

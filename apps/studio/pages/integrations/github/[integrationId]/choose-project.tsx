@@ -14,7 +14,8 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { BASE_PATH } from 'lib/constants'
 import { EMPTY_ARR } from 'lib/void'
 import { NextPageWithLayout } from 'types'
-import { IconBook, IconLifeBuoy, LoadingLine } from 'ui'
+import { IconBook, IconLifeBuoy } from 'ui'
+import { LoadingLine } from 'ui-patterns'
 
 const GITHUB_ICON = (
   <img

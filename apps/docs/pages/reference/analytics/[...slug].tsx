@@ -1,6 +1,7 @@
 import specFile from '~/../../spec/transforms/analytics_v0_openapi_deparsed.json' assert { type: 'json' }
 import { gen_v3, enrichedOperation } from '~/lib/refGenerator/helpers'
-import { Tabs, CodeBlock } from 'ui'
+import { Tabs } from 'ui'
+import { CodeBlock } from 'ui-patterns'
 
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
 

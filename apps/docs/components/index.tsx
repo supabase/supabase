@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { Alert, Button, CodeBlock, GlassPanel, markdownComponents, Tabs } from 'ui'
+import { Alert, Button, Tabs } from 'ui'
+import { CodeBlock, GlassPanel, markdownComponents, ThemeImage } from 'ui-patterns'
 import StepHikeCompact from '~/components/StepHikeCompact'
 // Common components
 import ButtonCard from './ButtonCard'
@@ -32,7 +33,7 @@ import CliGlobalFlagsHandler from '~/components/reference/enrichments/cli/CliGlo
 import Options from '~/components/Options'
 import Param from '~/components/Params'
 
-import { Admonition, ThemeImage } from 'ui'
+import { Admonition } from 'ui'
 import {
   IconMenuJavascript,
   IconMenuHome,

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/router'
-import { Button, IconMessageCircle, TweetCard } from 'ui'
+import { Button, IconMessageCircle } from 'ui'
+import { TweetCard } from 'ui-patterns'
 import Tweets from '../../data/tweets/Tweets.json'
 import Link from 'next/link'
 

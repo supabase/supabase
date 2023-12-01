@@ -4,7 +4,7 @@ import { useTheme } from 'next-themes'
 import { Badge, IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid, cn } from 'ui'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import ThemeToggle from '@ui/components/ThemeProvider/ThemeToggle'
+import { ThemeToggle } from '@ui-patterns/ThemeToggle'
 import { CheckIcon } from '@heroicons/react/outline'
 import SectionContainer from '../Layouts/SectionContainer'
 

@@ -8,6 +8,6 @@
       "@ui-patterns/*": ["./src/*"] // no other project in the monorepo uses this alias
     }
   },
-  "include": ["."],
+  "include": [".", "../ui/src/components/Loading"],
   "exclude": ["dist", "build", "node_modules"]
 }

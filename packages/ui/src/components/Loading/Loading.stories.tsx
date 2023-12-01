@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 
 import { Loading } from '.'
-import { Card } from '../Card'
 
 export default {
   title: 'Utilities/Loading',
@@ -12,7 +11,7 @@ export const Default = (args: any) => {
   return (
     <>
       <Loading {...args}>
-        <Card title={'This card can be set to loading'}></Card>
+        <div title={'This card can be set to loading'} className="w-96 h-96 background"></div>
       </Loading>
     </>
   )

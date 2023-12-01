@@ -2,7 +2,7 @@ import SectionHeader from 'components/UI/SectionHeader'
 import PostTypes from '~/types/post'
 import SectionContainer from '../Layouts/SectionContainer'
 import Link from 'next/link'
-import { GlassPanel } from 'ui'
+import { GlassPanel } from 'ui-patterns'
 import TextLink from '../TextLink'
 
 const CustomerStories = ({ customerStories }: any) => {

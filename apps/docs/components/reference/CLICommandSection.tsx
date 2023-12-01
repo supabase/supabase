@@ -1,5 +1,6 @@
 import ReactMarkdown from 'react-markdown'
-import { CodeBlock, IconChevronRight, Tabs } from 'ui'
+import { IconChevronRight, Tabs } from 'ui'
+import { CodeBlock } from 'ui-patterns'
 import spec from '~/../../spec/cli_v1_commands.yaml' assert { type: 'yml' }
 import Options from '~/components/Options'
 import Param from '~/components/Params'

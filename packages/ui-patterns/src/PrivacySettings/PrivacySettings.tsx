@@ -1,6 +1,7 @@
 import { PropsWithChildren, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Modal, Toggle, useConsentValue } from 'ui'
+import { Modal, Toggle } from 'ui'
+import { useConsentValue } from '@ui-patterns/lib/hooks'
 import { LOCAL_STORAGE_KEYS } from 'common'
 
 const PrivacySettings = ({ children, ...props }: PropsWithChildren<{ className?: string }>) => {

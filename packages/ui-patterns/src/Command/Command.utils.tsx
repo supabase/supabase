@@ -1,7 +1,8 @@
 import { Command as CommandPrimitive } from 'cmdk'
 import * as React from 'react'
 import { DetailedHTMLProps, HTMLAttributes, KeyboardEventHandler } from 'react'
-import { Modal, ModalProps, LoadingLine, cn } from 'ui'
+import { Modal, ModalProps, cn } from 'ui'
+import { LoadingLine } from 'ui-patterns'
 
 import { useCommandMenu } from './CommandMenuProvider'
 

@@ -7,7 +7,8 @@ import { useMutation } from '@tanstack/react-query'
 import { ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { createRef, useState } from 'react'
-import { AssistantChatForm, cn } from 'ui'
+import { cn } from 'ui'
+import { AssistantChatForm } from 'ui-patterns'
 
 const suggestions = CHAT_EXAMPLES
 

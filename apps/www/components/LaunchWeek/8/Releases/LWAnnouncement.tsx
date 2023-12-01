@@ -3,7 +3,7 @@ import { SmallCard } from './components'
 import Link from 'next/link'
 import Image from 'next/image'
 // import days from './lw8_data'
-// import { ExpandableVideo } from 'ui'
+// import { ExpandableVideo } from 'ui-patterns'
 
 const LWAnnouncement = ({
   title,

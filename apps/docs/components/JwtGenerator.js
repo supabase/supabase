@@ -1,6 +1,7 @@
 import KJUR from 'jsrsasign'
 import { useState } from 'react'
-import { Button, CodeBlock, Input, Select } from 'ui'
+import { Button, Input, Select } from 'ui'
+import { CodeBlock } from 'ui-patterns'
 
 const JWT_HEADER = { alg: 'HS256', typ: 'JWT' }
 const now = new Date()

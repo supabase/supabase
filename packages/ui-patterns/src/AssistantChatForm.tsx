@@ -1,7 +1,7 @@
 import { Loader2 } from 'lucide-react'
 import React, { ChangeEvent, createRef, useEffect } from 'react'
-import { TextArea } from '../components/shadcn/ui/text-area'
-import { cn } from '../lib/utils'
+import { TextArea } from 'ui/src/components/shadcn/ui/text-area'
+import { cn } from 'ui/src/lib/utils'
 
 export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
   loading: boolean

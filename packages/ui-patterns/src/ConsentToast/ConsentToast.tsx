@@ -32,4 +32,4 @@ const ConsentToast = ({ onAccept = noop, onOptOut = noop }: ConsentToastProps) =
   )
 }
 
-export default ConsentToast
+export { ConsentToast }

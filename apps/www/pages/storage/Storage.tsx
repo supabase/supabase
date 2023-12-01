@@ -1,4 +1,5 @@
-import { Button, IconArrowUpRight, IconShuffle, IconWifi, IconX, ThemeImage } from 'ui'
+import { Button, IconArrowUpRight, IconShuffle, IconWifi, IconX } from 'ui'
+import { ThemeImage } from 'ui-patterns'
 import ApiExamples from 'data/products/storage/api-examples'
 import DashboardViewData from 'data/products/storage/dashboard-carousel.json'
 import StoragePermissionsData from 'data/products/storage/permissions-examples'

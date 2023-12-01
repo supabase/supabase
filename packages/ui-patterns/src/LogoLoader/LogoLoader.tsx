@@ -9,4 +9,4 @@ const LogoLoader = () => (
   </div>
 )
 
-export default LogoLoader
+export { LogoLoader }

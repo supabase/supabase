@@ -16,15 +16,7 @@ interface CardProps {
   titleExtra?: React.ReactNode
 }
 
-function Card({
-  children,
-  className,
-  cover,
-  hoverable,
-  style,
-  title,
-  titleExtra,
-}: CardProps) {
+function Card({ children, className, cover, hoverable, style, title, titleExtra }: CardProps) {
   let __styles = styleHandler('card')
 
   let classes = [__styles.base]

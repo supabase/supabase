@@ -1,4 +1,5 @@
-import { Badge, ExpandableVideo } from 'ui'
+import { Badge } from 'ui'
+import { ExpandableVideo } from 'ui-patterns'
 
 import Link from 'next/link'
 import CountdownComponent from '../../Countdown'

@@ -2,92 +2,44 @@
 
 import * as React from 'react'
 
-// Providers
+// components
 
-export * from './src/providers'
-
-// Markdown components
-
-export * from './src/lib/Markdown'
-
-// // GENERAL
-
-export * from './src/components/Admonition'
-export * from './src/components/Button'
-export * from './src/components/Icon'
-export * from './src/components/Icon/IconContext'
-export * from './src/components/GlassPanel'
-export * from './src/components/IconPanel'
-export * from './src/components/Icon/IconBackground'
-export * from './src/components/ThemeImage'
-
-// DISPLAYS
-
-export * from './src/components/Card'
-export * from './src/components/TweetCard'
-export * from './src/components/Badge'
-export * from './src/components/Tabs'
-export * from './src/components/Alert'
 export * from './src/components/Accordion'
-export * from './src/components/Collapsible'
-export * from './src/components/CodeBlock'
-
-// NAV
-
-export * from './src/components/Menu'
-
-// OVERLAYS
-
-export * from './src/components/Modal'
-export * from './src/components/SidePanel'
-export * from './src/components/ConsentToast'
-export * from './src/components/ContextMenu'
-export * from './src/components/ExpandableVideo'
-export * from './src/components/PrivacySettings'
-export * from './src/components/PromoToast'
-export * from './src/components/Popover'
-export * from './src/layout/PortalToast'
-
-// UTILITIES
-
-export * from './src/components/Space'
-export * from './src/components/Loading'
-export * from './src/components/LogoLoader'
-export * from './src/components/Divider'
-
-// DATA ENTRY
-
-export * from './src/components/Select'
-export * from './src/components/Listbox'
+export * from './src/components/Admonition'
+export * from './src/components/Alert'
+export * from './src/components/Badge'
+export * from './src/components/Button'
+export * from './src/components/Card'
 export * from './src/components/Checkbox'
+export * from './src/components/Collapsible'
+export * from './src/components/ContextMenu'
+export * from './src/components/Divider'
+export * from './src/components/Form'
+export * from './src/components/Icon'
+export * from './src/components/Icon/IconBackground'
+export * from './src/components/Icon/IconContext'
 export * from './src/components/Input'
 export * from './src/components/InputNumber'
+export * from './src/components/Listbox'
+export * from './src/components/Loading'
+export * from './src/components/Menu'
+export * from './src/components/Modal'
+export * from './src/components/Popover'
 export * from './src/components/Radio'
+export * from './src/components/Select'
+export * from './src/components/SidePanel'
+export * from './src/components/Space'
+export * from './src/components/Tabs'
+export * from './src/components/TextLink'
 export * from './src/components/Toggle'
 export * from './src/components/Upload'
-export * from './src/components/Form'
-
-// Widgets
-export * from './src/components/CountdownWidget'
-
-// layout
-export * from './src/components/LoadingLine'
-
-// banners
-export * from './src/layout/banners'
 
 // utilities
 export * from './src/lib/utils'
 
-// theme switcher
-export * from './src/components/ThemeProvider/ThemeToggle'
-export * from './src/components/ThemeProvider/themes'
-
-// animated ui
-
 // shadcn
-export * from './src/components/shadcn/ui/dropdown-menu'
 
+export * from './src/components/shadcn/ui/dropdown-menu'
 export {
   Command as Command_Shadcn_,
   CommandDialog as CommandDialog_Shadcn_,
@@ -99,7 +51,6 @@ export {
   CommandShortcut as CommandShortcut_Shadcn_,
   CommandSeparator as CommandSeparator_Shadcn_,
 } from './src/components/shadcn/ui/command'
-
 export {
   Dialog as Dialog_Shadcn_,
   DialogTrigger as DialogTrigger_Shadcn_,
@@ -109,13 +60,11 @@ export {
   DialogTitle as DialogTitle_Shadcn_,
   DialogDescription as DialogDescription_Shadcn_,
 } from './src/components/shadcn/ui/dialog'
-
 export {
   Alert as Alert_Shadcn_,
   AlertTitle as AlertTitle_Shadcn_,
   AlertDescription as AlertDescription_Shadcn_,
 } from './src/components/shadcn/ui/alert'
-
 export {
   useFormField as useFormField_Shadcn_,
   Form as Form_Shadcn_,
@@ -126,38 +75,28 @@ export {
   FormMessage as FormMessage_Shadcn_,
   FormField as FormField_Shadcn_,
 } from './src/components/shadcn/ui/form'
-
 export {
   Popover as Popover_Shadcn_,
   PopoverTrigger as PopoverTrigger_Shadcn_,
   PopoverContent as PopoverContent_Shadcn_,
 } from './src/components/shadcn/ui/popover'
-
 export {
   Accordion as Accordion_Shadcn_,
   AccordionItem as AccordionItem_Shadcn_,
   AccordionTrigger as AccordionTrigger_Shadcn_,
   AccordionContent as AccordionContent_Shadcn_,
 } from './src/components/shadcn/ui/accordion'
-
 export { Input as Input_Shadcn_ } from './src/components/shadcn/ui/input'
-
 export { TextArea as TextArea_Shadcn_ } from './src/components/shadcn/ui/text-area'
-
 export { Label as Label_Shadcn_ } from './src/components/shadcn/ui/label'
-
 export * from './src/components/shadcn/ui/switch'
-
 export { Checkbox as Checkbox_Shadcn_ } from './src/components/shadcn/ui/checkbox'
-
 export * from './src/components/shadcn/ui/scroll-area'
-
 export {
   Collapsible as Collapsible_Shadcn_,
   CollapsibleTrigger as CollapsibleTrigger_Shadcn_,
   CollapsibleContent as CollapsibleContent_Shadcn_,
 } from './src/components/shadcn/ui/collapsible'
-
 export {
   Sheet as Sheet_Shadcn_,
   SheetTrigger as SheetTrigger_Shadcn_,
@@ -168,34 +107,11 @@ export {
   SheetTitle as SheetTitle_Shadcn_,
   SheetDescription as SheetDescription_Shadcn_,
 } from './src/components/shadcn/ui/sheet'
-
 export { ScrollArea, ScrollBar } from './src/components/shadcn/ui/scroll-area'
-
 export { Separator } from './src/components/shadcn/ui/separator'
 
-// patterns
+// Icons
 
-export * from './src/patterns/SchemaTableNode'
-export { AssistantChatForm } from './src/patterns/AssistantChatForm'
-
-// links
-
-export * from './src/components/TextLink'
-
-// config
-
-// export { default as Config } from './../ui.config'
-
-// ARCHIVE
-
-// export * from './src/components/Textarea'
-
-// AUTH
-
-// export * from './src/components/Auth'
-
-// ICONS
-// export icons
 export * from './src/components/Icon/icons/IconActivity'
 export * from './src/components/Icon/icons/IconAirplay'
 export * from './src/components/Icon/icons/IconAlertCircle'

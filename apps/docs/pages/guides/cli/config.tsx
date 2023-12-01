@@ -4,7 +4,7 @@ import ReactMarkdown from 'react-markdown'
 import GuidesTableOfContents from '~/components/GuidesTableOfContents'
 import { Heading } from '~/components/CustomHTMLElements'
 import Head from 'next/head'
-import { CodeBlock } from 'ui'
+import { CodeBlock } from 'ui-patterns'
 
 // Parameters are grouped on the page by tag
 const tocList = []

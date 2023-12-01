@@ -21,8 +21,8 @@ import {
   IconAlertTriangle,
   IconBook,
   IconLifeBuoy,
-  LoadingLine,
 } from 'ui'
+import { LoadingLine } from 'ui-patterns'
 import { useGitHubIntegrationAutoInstall } from 'lib/github-integration'
 
 const GitHubIntegration: NextPageWithLayout = () => {

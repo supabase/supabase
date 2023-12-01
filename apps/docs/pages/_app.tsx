@@ -10,7 +10,8 @@ import { AuthProvider, ThemeProvider, useTelemetryProps, useThemeSandbox } from 
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
 import { AppPropsWithLayout } from 'types'
-import { PortalToast, PromoToast, useConsent } from 'ui'
+import { PortalToast, PromoToast, useConsent } from 'ui-patterns'
+
 import { TabsProvider } from 'ui/src/components/Tabs'
 import Favicons from '~/components/Favicons'
 import SiteLayout from '~/layouts/SiteLayout'

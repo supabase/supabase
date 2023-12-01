@@ -32,8 +32,9 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 // @ts-ignore
 import Prism from 'prism-react-renderer/prism'
-import ConsentToast from 'ui/src/components/ConsentToast'
-import PortalToast from 'ui/src/layout/PortalToast'
+
+import { ConsentToast } from '@ui-patterns/ConsentToast'
+import { PortalToast } from '@ui-patterns/layout/PortalToast'
 
 import Favicons from 'components/head/Favicons'
 import {

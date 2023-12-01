@@ -1,5 +1,6 @@
 import { useTheme } from 'next-themes'
-import { IconMoon, IconSun, Listbox, Theme, themes } from 'ui'
+import { IconMoon, IconSun, Listbox } from 'ui'
+import { Theme, themes } from 'ui-patterns'
 
 import Panel from 'components/ui/Panel'
 

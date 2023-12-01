@@ -1,4 +1,5 @@
-import { CodeBlock, Tabs } from 'ui'
+import { Tabs } from 'ui'
+import { CodeBlock } from 'ui-patterns'
 import Param from '~/components/Params'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
 

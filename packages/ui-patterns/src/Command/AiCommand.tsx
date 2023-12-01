@@ -13,20 +13,13 @@ import {
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { SSE } from 'sse.js'
-import {
-  Button,
-  IconAlertTriangle,
-  IconCornerDownLeft,
-  IconUser,
-  Input,
-  cn,
-  markdownComponents,
-} from 'ui'
+import { Button, IconAlertTriangle, IconCornerDownLeft, IconUser, Input, cn } from 'ui'
 import { AiWarning } from './Command.alerts'
 import { AiIconChat } from './Command.icons'
 import { CommandGroup, CommandItem, useAutoInputFocus, useHistoryKeys } from './Command.utils'
 import { useCommandMenu } from './CommandMenuProvider'
 import { AiIconAnimation } from '../AiIconAnimation'
+import { markdownComponents } from '@ui-patterns/Markdown'
 
 const questions = [
   'How do I get started with Supabase?',

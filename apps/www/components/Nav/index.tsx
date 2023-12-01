@@ -5,7 +5,8 @@ import { useRouter } from 'next/router'
 import { useTheme } from 'next-themes'
 import { useWindowSize } from 'react-use'
 
-import { Announcement, Button, LWXCountdownBanner, cn } from 'ui'
+import { Button, cn } from 'ui'
+import { Announcement, LWXCountdownBanner } from 'ui-patterns'
 import {
   NavigationMenu,
   NavigationMenuContent,

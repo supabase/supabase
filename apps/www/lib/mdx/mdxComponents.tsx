@@ -14,8 +14,8 @@ import {
   CollapsibleContent_Shadcn_,
   IconTriangle,
   cn,
-  ThemeImage,
 } from 'ui'
+import { ThemeImage } from 'ui-patterns'
 import ImageFadeStack from '~/components/ImageFadeStack'
 import ZoomableImg from '~/components/ZoomableImg/ZoomableImg'
 

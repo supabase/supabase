@@ -9,15 +9,24 @@ import {
   DropdownMenuTrigger,
   IconMoon,
   IconSun,
-  Theme,
-  themes,
 } from 'ui'
 
 interface ThemeToggleProps {
   forceDark?: boolean
 }
 
-const ThemeToggle = ({ forceDark = false }: ThemeToggleProps) => {
+export interface Theme {
+  name: string
+  value: string
+}
+
+export const themes = [
+  { name: 'System', value: 'system' }, // Switches between dark and light
+  { name: 'Dark', value: 'dark' }, // Classic Supabase dark
+  { name: 'Light', value: 'light' }, // Classic Supabase light
+]
+
+export const ThemeToggle = ({ forceDark = false }: ThemeToggleProps) => {
   const { theme, setTheme } = useTheme()
   const [open, setOpen] = useState(false)
 
@@ -55,5 +64,3 @@ const ThemeToggle = ({ forceDark = false }: ThemeToggleProps) => {
     </DropdownMenu>
   )
 }
-
-export default ThemeToggle

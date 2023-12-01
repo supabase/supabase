@@ -1,4 +1,4 @@
-import { PrivacySettings } from 'ui'
+import { PrivacySettings } from 'ui-patterns'
 
 const footerData = [
   {

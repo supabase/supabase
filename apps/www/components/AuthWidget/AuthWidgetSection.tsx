@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
-import { Button, ThemeImage } from 'ui'
+import { Button } from 'ui'
+import { ThemeImage } from 'ui-patterns'
 import { useState } from 'react'
 // Import Swiper React components
 import { useRouter } from 'next/router'

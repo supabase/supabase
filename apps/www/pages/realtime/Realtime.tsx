@@ -1,4 +1,5 @@
-import { Button, IconGrid, IconLayers, IconMenu, ThemeImage } from 'ui'
+import { Button, IconGrid, IconLayers, IconMenu } from 'ui'
+import { ThemeImage } from 'ui-patterns'
 import ApiExamples from 'data/products/realtime/api-examples'
 import AppExamples from 'data/products/realtime/app-examples'
 import Solutions from 'data/Solutions'
