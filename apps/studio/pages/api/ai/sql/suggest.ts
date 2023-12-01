@@ -7,7 +7,12 @@ export const runtime = 'edge'
 
 const openAiKey = process.env.OPENAI_KEY
 
-export default async function POST(req: NextRequest) {
+/**
+ * This route has to be with an edge runtime to support streaming. This route is not using the
+ * apiWrapper because it's not working with edge API routes (different params) but it also doesn't
+ * require authentication.
+ */
+export default function handler(request: NextRequest) {
   if (!openAiKey) {
     return new Response(
       JSON.stringify({
@@ -20,6 +25,25 @@ export default async function POST(req: NextRequest) {
     )
   }
 
+  const { method } = request
+
+  switch (method) {
+    case 'POST':
+      return handlePost(request)
+    default:
+      return new Response(
+        JSON.stringify({
+          error: 'No OPENAI_KEY set. Create this environment variable to use AI features.',
+        }),
+        {
+          status: 405,
+          headers: { Allow: 'POST' },
+        }
+      )
+  }
+}
+
+async function handlePost(req: NextRequest) {
   const openai = new OpenAI({ apiKey: openAiKey })
 
   let body = await (req.json() as Promise<{
