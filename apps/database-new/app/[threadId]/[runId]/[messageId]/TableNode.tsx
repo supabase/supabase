@@ -1,7 +1,7 @@
 import { DiamondIcon, Fingerprint, Hash, Key, Table2 } from 'lucide-react'
 import { Handle, NodeProps } from 'reactflow'
 import { cn } from 'ui'
-import { NODE_WIDTH } from './SchemaGraph.constants'
+import { NODE_WIDTH } from './SchemaFlow.constants'
 
 export type TableNodeData = {
   name: string

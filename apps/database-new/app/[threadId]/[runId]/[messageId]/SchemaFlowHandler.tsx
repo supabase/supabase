@@ -11,14 +11,14 @@ import ReactFlow, {
 import 'reactflow/dist/style.css'
 import { cn } from 'ui'
 
-import { getGraphDataFromTables } from './SchemaGraph.utils'
+import { getGraphDataFromTables } from './SchemaFlow.utils'
 import TableNode from './TableNode'
 
 interface SchemaGraphProps {
   tables: PostgresTable[]
 }
 
-const TablesGraph = ({ tables }: SchemaGraphProps) => {
+const SchemaFlowHandler = ({ tables }: SchemaGraphProps) => {
   const { resolvedTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const reactFlowInstance = useReactFlow()
@@ -73,12 +73,12 @@ const TablesGraph = ({ tables }: SchemaGraphProps) => {
   )
 }
 
-const SchemaGraph = ({ tables }: SchemaGraphProps) => {
+const ExportedSchemaGraph = ({ tables }: SchemaGraphProps) => {
   return (
     <ReactFlowProvider>
-      <TablesGraph tables={tables} />
+      <SchemaFlowHandler tables={tables} />
     </ReactFlowProvider>
   )
 }
 
-export default SchemaGraph
+export default ExportedSchemaGraph

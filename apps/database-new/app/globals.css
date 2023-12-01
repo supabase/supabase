@@ -78,10 +78,10 @@
 html,
 body,
 main {
-  @apply bg-background;
+  /* @apply bg-background;
   @apply text-foreground;
   height: 100%;
-  width: 100%;
+  width: 100%; */
   padding: 0;
   margin: 0;
   -moz-osx-font-smoothing: grayscale;

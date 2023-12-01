@@ -1,10 +1,9 @@
 'use client'
+
 import { last, sortBy } from 'lodash'
 import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useMemo } from 'react'
 
-import { CodeEditor } from '@/components/CodeEditor/CodeEditor'
-import SchemaGraph from '@/components/SchemaGraph/SchemaGraph'
 import { useMessagesQuery } from '@/data/messages-query'
 
 export default function ThreadPage() {
@@ -27,8 +26,8 @@ export default function ThreadPage() {
 
   return (
     <div className="grow max-h-screen flex flex-row items-center justify-between bg-alternative h-full">
-      <SchemaGraph tables={[]} />
-      <CodeEditor content="" />
+      {/* <SchemaGraph tables={[]} />
+      <CodeEditor content="" /> */}
     </div>
   )
 }
