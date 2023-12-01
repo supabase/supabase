@@ -9,14 +9,22 @@ import {
   FormField_Shadcn_,
   FormItem_Shadcn_,
   Form_Shadcn_,
+  IconSettings,
   Input_Shadcn_,
 } from 'ui'
+import { AiIconAnimation } from 'ui-patterns'
 import * as z from 'zod'
-
 import { useProfile } from 'lib/profile'
 import Message from './Message'
+import { useAppStateSnapshot } from 'state/app-state'
 
-import { AiIconAnimation } from 'ui-patterns'
+interface AIPolicyChatProps {
+  messages: OpenAI.Beta.Threads.Messages.ThreadMessage[]
+  loading: boolean
+  onSubmit: (s: string) => void
+  onDiff: (s: string) => void
+  onChange: (value: boolean) => void
+}
 
 export const AIPolicyChat = ({
   messages,
@@ -24,15 +32,11 @@ export const AIPolicyChat = ({
   onSubmit,
   onDiff,
   onChange,
-}: {
-  messages: OpenAI.Beta.Threads.Messages.ThreadMessage[]
-  loading: boolean
-  onSubmit: (s: string) => void
-  onDiff: (s: string) => void
-  onChange: (value: boolean) => void
-}) => {
+}: AIPolicyChatProps) => {
   const { profile } = useProfile()
+  const snap = useAppStateSnapshot()
   const bottomRef = useRef<HTMLDivElement>(null)
+
   const name = compact([profile?.first_name, profile?.last_name]).join(' ')
   const sorted = useMemo(() => {
     return sortBy(messages, (m) => m.created_at).filter((m) => {
@@ -83,7 +87,17 @@ export const AIPolicyChat = ({
           }, how can I help you? I'm powered by AI, so surprises and mistakes are possible.
         Make sure to verify any generated code or suggestions, and share feedback so that we can
         learn and improve.`}
-        />
+        >
+          <div>
+            <Button
+              type="default"
+              icon={<IconSettings strokeWidth={1.5} />}
+              onClick={() => snap.setShowAiSettingsModal(true)}
+            >
+              AI Settings
+            </Button>
+          </div>
+        </Message>
 
         {sorted.map((m, idx) => (
           <Message
