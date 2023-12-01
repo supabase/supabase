@@ -48,7 +48,7 @@ const Message = memo(function Message({
   if (!content) return null
 
   return (
-    <div className="flex flex-col py-4 gap-4 border-t px-5">
+    <div className="flex flex-col py-4 gap-4 border-t px-5 text-foreground-light text-sm">
       <div className="flex flex-row gap-3 items-center">
         {icon}
         <span className="text-sm">{role === 'assistant' ? 'Assistant' : name ? name : 'You'}</span>
@@ -62,7 +62,6 @@ const Message = memo(function Message({
         remarkPlugins={[remarkGfm]}
         components={{
           ...markdownComponents,
-          p: ({ children }) => <div className="text-foreground-light text-sm">{children}</div>,
           code: (props: any) => <AIPolicyCodeBlock onDiff={onDiff} {...props} />,
         }}
       >

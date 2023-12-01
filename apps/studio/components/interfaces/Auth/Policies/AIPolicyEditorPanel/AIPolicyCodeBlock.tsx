@@ -20,7 +20,10 @@ export const AIPolicyCodeBlock = ({ onDiff, ...props }: AIPolicyCodeBlockProps) 
         language="sql"
         className={cn(
           props.className,
-          '!bg-transparent !py-3 !px-3.5 prose dark:prose-dark [&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap'
+          '!bg-transparent !py-3 !px-3.5 prose dark:prose-dark',
+          // change the look of the code block. The flex hack is so that the code is wrapping since
+          // every word is a separate span
+          '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap'
         )}
         hideCopy
         hideLineNumbers
