@@ -11,7 +11,7 @@ const RLSAIAssistantPreview = () => {
       <div className="mb-4 flex flex-col gap-y-2">
         <Markdown
           className="text-foreground-light max-w-full"
-          content={`[Postgres Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security) (RLS) is a feature of Postgres that allows you to control which users are allowed to perform operations on specific rows within tables and views.`}
+          content={`[Postgres Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security) (RLS) is a feature of Postgres that allows you to control which users are allowed to perform operations on specific rows within tables, views, and functions.`}
         />
         <Markdown
           className="text-foreground-light max-w-full"
