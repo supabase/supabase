@@ -1,5 +1,7 @@
 # Supabase UI Package
 
+This is for atom based components. such as, Input, Button, Dialog, and so on.
+
 ## Figma-tokens setup
 
 Tokens setup is based partly on blogpost on the [Mirahi Digital Garden](https://garden.mirahi.io/how-to-use-the-color-tokens-from-your-design-system-directly-in-tailwind-css/).
