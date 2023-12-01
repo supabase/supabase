@@ -1,24 +1,17 @@
 'use client'
 
-import { ChatInputAtom } from '@/components/Chat/ChatInput'
 import { CHAT_EXAMPLES } from '@/data/chat-examples'
 import { useAppStateSnapshot } from '@/lib/state'
 import { createClient } from '@/lib/supabase/client'
-import { useMutation } from '@tanstack/react-query'
 import { ExternalLink } from 'lucide-react'
-import { useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
-import { cn } from 'ui'
-
-interface ChatInputParams {
-  userID: string | undefined
-}
+import { useFormState } from 'react-dom'
+import { AssistantChatForm, cn } from 'ui'
+import { updateThread } from './actions'
 
 const suggestions = CHAT_EXAMPLES
 
-const NewThreadInput = ({ userID }: ChatInputParams) => {
-  const router = useRouter()
-
+const NewThreadInput = () => {
   const [value, setValue] = useState(() => {
     if (typeof window !== 'undefined') {
       const localPrompt = localStorage.getItem('prompt')
@@ -30,61 +23,48 @@ const NewThreadInput = ({ userID }: ChatInputParams) => {
     return ''
   })
 
+  const initialState = {
+    message: undefined,
+    success: undefined,
+    data: {
+      value,
+    },
+  }
+
+  const [state, formAction] = useFormState(updateThread, initialState)
   const supabase = createClient()
-
   const snap = useAppStateSnapshot()
-
-  const { mutate, isPending, isSuccess } = useMutation({
-    mutationFn: async (prompt: string) => {
-      const body = { prompt, userID } // Include userID in the body object
-
-      const response = await fetch('/api/ai/sql/threads/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      })
-      const result = await response.json()
-      return result
-    },
-    onSuccess(data) {
-      const url = `/${data.threadId}/${data.runId}`
-      router.push(url)
-    },
-  })
 
   return (
     <>
       <div className="relative w-10/12 xl:w-11/12 max-w-xl">
-        <ChatInputAtom
-          handleSubmit={async () => {
+        <AssistantChatForm
+          action={formAction}
+          key={'new-thread-form'}
+          id={'new-thread-form'}
+          onSubmit={async (event) => {
+            console.log('hello')
             const {
               data: { user },
             } = await supabase.auth.getUser()
-
             if (!user) {
+              event.preventDefault()
               localStorage.setItem('prompt', value)
               snap.setLoginDialogOpen(true)
               return
             }
-            if (value.length > 0) {
-              mutate(value)
-            }
           }}
-          autoFocus
           value={value}
-          rows={1}
-          contentEditable
-          aria-expanded={false}
           placeholder="e.g Create a Telegram-like chat application"
-          disabled={isPending || isSuccess}
-          loading={isPending || isSuccess}
-          onChange={(e) => setValue(e.target.value)}
+          onValueChange={(e) => setValue(e.target.value)}
+          message={state.message}
         />
       </div>
       <div className="flex gap-3">
         {suggestions.map((suggestion, idx) => (
           <button
             key={idx}
+            type="button"
             className={cn(
               'text-xs',
               'flex items-center gap-3 !pr-3',
