@@ -13,7 +13,7 @@ export const generateThreadMessage = ({
   content: string
   isDebug: boolean
 }) => {
-  const message: Message & { isDebug: boolean } = {
+  const message: MessageWithDebug = {
     id: id ?? uuidv4(),
     role: 'assistant',
     content,

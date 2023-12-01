@@ -60,7 +60,6 @@ export const AIPolicyEditorPanel = memo(function ({
   // [Joshen] Separate state here as there's a delay between submitting and the API updating the loading status
   const [debugThread, setDebugThread] = useState<MessageWithDebug[]>([])
   const [assistantVisible, setAssistantPanel] = useState(false)
-  const [ids, setIds] = useState<{ threadId: string; runId: string } | undefined>(undefined)
   const [isAssistantChatInputEmpty, setIsAssistantChatInputEmpty] = useState(true)
   const [incomingChange, setIncomingChange] = useState<string | undefined>(undefined)
   // used for confirmation when closing the panel with unsaved changes
@@ -201,7 +200,6 @@ export const AIPolicyEditorPanel = memo(function ({
       setIncomingChange(undefined)
       setAssistantPanel(false)
       setIsClosingPolicyEditorPanel(false)
-      setIds(undefined)
       setError(undefined)
       setDebugThread([])
       setChatId(uuidv4())
