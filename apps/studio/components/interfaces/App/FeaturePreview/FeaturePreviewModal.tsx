@@ -28,7 +28,7 @@ const FeaturePreviewModal = () => {
       ? [
           {
             key: LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT,
-            name: 'AI Assistant for RLS',
+            name: 'AI Assistant for RLS policies',
             content: <RLSAIAssistantPreview />,
             discussionsUrl: '/', // Need to update
           },

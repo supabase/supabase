@@ -8,25 +8,37 @@ const RLSAIAssistantPreview = () => {
 
   return (
     <div className="space-y-2">
-      <p className="text-foreground-light text-sm mb-4">Something</p>
-      {/* <Image
-        src={`${BASE_PATH}/img/previews/api-docs-preview.png`}
+      <div className="mb-4 flex flex-col gap-y-2">
+        <Markdown
+          className="text-foreground-light max-w-full"
+          content={`[Postgres Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security) (RLS) is a feature of Postgres that allows you to control which users are allowed to perform operations on specific rows within tables and views.`}
+        />
+        <Markdown
+          className="text-foreground-light max-w-full"
+          content={`Let our AI assistant handle the SQL while you focus on building the rules for your policies.`}
+        />
+      </div>
+      <Image
+        src={`${BASE_PATH}/img/previews/rls-ai-assistant-preview.png`}
         width={1860}
         height={970}
         alt="api-docs-side-panel-preview"
         className="rounded border"
-      /> */}
+      />
       <div className="space-y-2 !mt-4">
         <p className="text-sm">Enabling this preview will:</p>
         <ul className="list-disc pl-6 text-sm text-foreground-light space-y-1">
           <li>
-            Replace the original API documentation page with a global API documentation side panel
-            that can be accessed anywhere while in a project.
+            <Markdown
+              className="text-foreground-light"
+              content={`Replace the existing wizard-like UI for creating/updating RLS policies [here](/project/${ref}/auth/policies) with a code
+              editor accompanied an AI assistant chat interface`}
+            />
           </li>
           <li>
             <Markdown
               className="text-foreground-light"
-              content={`Move the GraphiQL interface the Database section of the dashboard [here](/project/${ref}/database/graphiql).`}
+              content={`Freely explain the scopes of your intended policy, and the AI assistant will generate SQL snippets for you iteratively`}
             />
           </li>
         </ul>
