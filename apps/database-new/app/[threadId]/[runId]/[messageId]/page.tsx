@@ -26,8 +26,8 @@ export default async function ThreadPage({ params }: ThreadPageProps) {
 
 const Loader = () => {
   return (
-    <div className="flex items-center justify-center w-full">
-      <Loader2 className="animate-spin opacity-30" />
+    <div className="flex items-center justify-center w-full h-full text-muted">
+      <Loader2 className="animate-spin opacity-100" size={96} strokeWidth={1} />
     </div>
   )
 }

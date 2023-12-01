@@ -10,7 +10,7 @@ export async function SchemaFlow({ params }: { params: any }) {
 
   const content = await getThread({ threadId, runId, messageId })
 
-  const code = format(content, { language: 'postgresql' })
+  // const code = format(content, { language: 'postgresql' })
 
   const tables = await parseTables(content)
 

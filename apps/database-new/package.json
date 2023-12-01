@@ -24,7 +24,7 @@
     "openai": "^4.17.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "reactflow": "^11.10.1",
+    "react-flow": "^1.0.3",
     "sql-formatter": "^13.1.0",
     "ui": "*",
     "valtio": "^1.12.0",
