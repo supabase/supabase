@@ -4,8 +4,6 @@ import { last, sortBy } from 'lodash'
 import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useMemo } from 'react'
 
-import { CodeEditor } from '@/app/[threadId]/[runId]/[messageId]/CodeEditor'
-import SchemaGraph from '@/app/[threadId]/[runId]/[messageId]/SchemaGraph'
 import { useMessagesQuery } from '@/data/messages-query'
 
 export default function ThreadPage() {
