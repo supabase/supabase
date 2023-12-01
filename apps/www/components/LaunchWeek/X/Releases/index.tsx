@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { Accordion } from 'ui'
+import { Accordion, cn } from 'ui'
 import { useBreakpoint } from 'common/hooks/useBreakpoint'
 
 import {
@@ -21,7 +21,7 @@ export default function LW8Releases() {
   const publishedSections =
     days
       .filter(
-        (day: WeekDayProps) => Date.parse(day.publishedAt) <= Date.now() || day.shipped || showAll
+        (day: WeekDayProps) => Date.parse(day.published_at) <= Date.now() || day.shipped || showAll
       )
       .map((day: WeekDayProps) => day.d.toString()) ?? []
 
@@ -47,7 +47,7 @@ export default function LW8Releases() {
                   title={preRelease.title}
                   shipped={true}
                   shippable={false}
-                  publishedAt={preRelease.publishedAt}
+                  published_at={preRelease.published_at}
                 />
               }
               key={preRelease.dd}
@@ -85,12 +85,10 @@ export default function LW8Releases() {
                                     : layer.img
                                 }
                                 className={`
-                                  absolute opacity-90
+                                  absolute opacity-90 object-cover object-bottom
                                   w-full h-full -z-10 transition-all duration-300
                                 `}
-                                layout="fill"
-                                objectPosition="100%"
-                                objectFit="cover"
+                                fill
                                 alt=""
                               />
                             </div>
@@ -129,12 +127,10 @@ export default function LW8Releases() {
                                     : layer.img
                                 }
                                 className={`
-                                  absolute opacity-90
+                                  absolute opacity-90 object-cover object-[20%_50%]
                                   w-full h-full -z-10 transition-all duration-300
                                 `}
-                                layout="fill"
-                                objectPosition="20% 50%"
-                                objectFit="cover"
+                                fill
                                 alt=""
                               />
                             </div>
@@ -166,15 +162,18 @@ export default function LW8Releases() {
                             <div className="absolute opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100">
                               <Image
                                 src={layer.img}
-                                className={`
-                                  absolute opacity-90
+                                className={cn(
+                                  `
+                                  absolute opacity-90 object-contain
                                   w-full h-full -z-10 transition-all duration-300
-                                `}
-                                layout="fill"
-                                objectPosition={
-                                  isTablet ? '50%' : isDesktop ? '100% 50%' : '30% 50%'
-                                }
-                                objectFit="contain"
+                                `,
+                                  isTablet
+                                    ? 'object-center'
+                                    : isDesktop
+                                    ? 'object-[100%_50%]'
+                                    : 'object-[30%_50%]'
+                                )}
+                                fill
                                 alt=""
                               />
                             </div>
@@ -192,8 +191,7 @@ export default function LW8Releases() {
               weekDay={day1.dd}
               title={day1.title}
               shipped={day1.shipped}
-              publishedAt={day1.publishedAt}
-              youtube_id={day1.youtube_id}
+              published_at={day1.published_at}
               videoThumbnail={day1.videoThumbnail}
             />
 
@@ -228,12 +226,11 @@ export default function LW8Releases() {
                                 !!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img
                               }
                               className={`
-                                  absolute opacity-90
+                                  absolute opacity-90 object-contain
                                   w-full h-full -z-10 transition-all duration-300
                                 `}
-                              layout="fill"
+                              fill
                               objectPosition={isTablet ? '50%' : '90% 50%'}
-                              objectFit="contain"
                               alt=""
                             />
                           </div>
@@ -250,8 +247,7 @@ export default function LW8Releases() {
               weekDay={day2.dd}
               title={day2.title}
               shipped={day2.shipped}
-              publishedAt={day2.publishedAt}
-              youtube_id={day2.youtube_id}
+              published_at={day2.published_at}
               videoThumbnail={day2.videoThumbnail}
             />
 
@@ -289,7 +285,7 @@ export default function LW8Releases() {
                                   absolute opacity-90
                                   w-full h-full -z-10 transition-all duration-300
                                 `}
-                              layout="fill"
+                              fill
                               objectFit="cover"
                               alt=""
                             />
@@ -307,8 +303,7 @@ export default function LW8Releases() {
               weekDay={day3.dd}
               title={day3.title}
               shipped={day3.shipped}
-              publishedAt={day3.publishedAt}
-              youtube_id={day3.youtube_id}
+              published_at={day3.published_at}
               videoThumbnail={day3.videoThumbnail}
             />
 
@@ -357,7 +352,7 @@ export default function LW8Releases() {
                                 !!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img
                               }
                               className="absolute opacity-90 w-full h-full -z-10 transition-all duration-300"
-                              layout="fill"
+                              fill
                               objectPosition={isTablet ? '50%' : '100% 50%'}
                               objectFit={i == 1 && isTablet ? 'contain' : 'cover'}
                               alt=""
@@ -376,8 +371,7 @@ export default function LW8Releases() {
               weekDay={day4.dd}
               title={day4.title}
               shipped={day4.shipped}
-              publishedAt={day4.publishedAt}
-              youtube_id={day4.youtube_id}
+              published_at={day4.published_at}
               videoThumbnail={day4.videoThumbnail}
             />
 
@@ -412,7 +406,7 @@ export default function LW8Releases() {
                                 !!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img
                               }
                               className="absolute opacity-90 w-full h-full -z-10 transition-all duration-300"
-                              layout="fill"
+                              fill
                               objectPosition={isTablet ? '50%' : '100% 50%'}
                               objectFit={i == 1 && isTablet ? 'contain' : 'cover'}
                               alt=""
@@ -450,7 +444,7 @@ export default function LW8Releases() {
                                 !!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img
                               }
                               className="absolute opacity-90 w-full h-full -z-10 transition-all duration-300"
-                              layout="fill"
+                              fill
                               objectFit="cover"
                               alt=""
                             />
@@ -468,8 +462,7 @@ export default function LW8Releases() {
               weekDay={day5.dd}
               title={day5.title}
               shipped={day5.shipped}
-              publishedAt={day5.publishedAt}
-              youtube_id={day5.youtube_id}
+              published_at={day5.published_at}
               videoThumbnail={day5.videoThumbnail}
             />
 
@@ -504,7 +497,7 @@ export default function LW8Releases() {
                                 !!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img
                               }
                               className="absolute opacity-90 w-full h-full -z-10 transition-all duration-300"
-                              layout="fill"
+                              fill
                               objectFit="cover"
                               alt=""
                             />
@@ -542,7 +535,7 @@ export default function LW8Releases() {
                                 !!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img
                               }
                               className="absolute opacity-90 w-full h-full -z-10 transition-all duration-300"
-                              layout="fill"
+                              fill
                               objectFit="cover"
                               alt=""
                             />
@@ -580,7 +573,7 @@ export default function LW8Releases() {
                                 !!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img
                               }
                               className="absolute opacity-90 w-full h-full -z-10 transition-all duration-300"
-                              layout="fill"
+                              fill
                               objectFit="cover"
                               objectPosition={isTablet ? '50%' : '100% 50%'}
                               alt=""

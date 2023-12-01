@@ -1,4 +1,4 @@
-import { Badge, ExpandableVideo } from 'ui'
+import { Badge, ExpandableVideo, cn } from 'ui'
 
 import Link from 'next/link'
 import CountdownComponent from '../../Countdown'
@@ -136,17 +136,17 @@ export const SmallCard = ({
   children: any
 }) => (
   <div
-    className={[
+    className={cn(
       'group relative p-[1px] bg-gradient-to-b from-[#11171890] to-[#1C1C1C60] rounded-2xl overflow-hidden shadow-lg',
-      className,
-    ].join(' ')}
+      className
+    )}
   >
     <div
-      className={[
+      className={cn(
         'rounded-2xl text-sm text-[#9296AA] p-2 flex flex-row justify-between items-center backdrop-blur-md h-full',
         'bg-[#030A0C]',
-        innerClassName,
-      ].join(' ')}
+        innerClassName
+      )}
     >
       {children}
     </div>
@@ -160,11 +160,7 @@ export const StyledArticleBadge = ({
   className?: string
   children: any
 }) => (
-  <div
-    className={['relative bg-transparent border border-[#F4FFFA90] rounded-full', className].join(
-      ' '
-    )}
-  >
+  <div className={cn('relative bg-transparent border border-[#F4FFFA90] rounded-full', className)}>
     <div className="!bg-transparent rounded-full !py-1 !px-4 w-full inset-[1px] text-sm border-none from-foreground to-[#6453C5]">
       <span className="text-sm text-[#F4FFFA80] bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#7E7AAD]">
         {children}
@@ -180,7 +176,7 @@ export const AccordionHeader = ({
   weekDay,
   title,
   shipped,
-  publishedAt,
+  published_at,
   shippable = true,
   youtube_id,
   videoThumbnail,
@@ -190,30 +186,23 @@ export const AccordionHeader = ({
   weekDay: string
   title: string
   shipped?: boolean
-  publishedAt: string
+  published_at: string
   shippable?: boolean
   youtube_id?: string
   videoThumbnail?: string
 }) => (
   <div
-    className={[
-      'h-[79px] hover:cursor-default flex flex-1 items-center scroll-mt-20 text-muted',
-    ].join(' ')}
+    className={cn('h-[79px] hover:cursor-default flex flex-1 items-center scroll-mt-20 text-muted')}
   >
     <div
-      className={[
+      className={cn(
         'flex flex-1 sm:flex-none',
-        shippable && shipped ? 'items-stretch' : 'flex-row items-center',
-      ].join(' ')}
+        shippable && shipped ? 'items-stretch' : 'flex-row items-center'
+      )}
     >
       <div className="flex gap-4 w-full sm:w-auto sm:min-w-[240px] md:min-w-[380px] items-center">
-        <span className="text-sm">
-          <span className="inline sm:hidden md:inline">{weekDay} </span>
-          {date && (
-            <span>
-              <span className="inline sm:hidden md:inline">・</span> {date}
-            </span>
-          )}
+        <span className="text-xs inline sm:hidden md:inline uppercase font-mono text-foreground">
+          {weekDay}, {date}
         </span>
         {shippable && shipped && (
           <Badge
@@ -225,7 +214,7 @@ export const AccordionHeader = ({
           </Badge>
         )}
         {shippable && shipped && youtube_id && (
-          <div className={['hover:cursor-pointer hover:!opacity-100'].join(' ')}>
+          <div className={cn('hover:cursor-pointer hover:!opacity-100')}>
             <ExpandableVideo
               videoId={youtube_id}
               trigger={
@@ -257,7 +246,7 @@ export const AccordionHeader = ({
             </g>
           </svg>
 
-          {day === 5 && <CountdownComponent date={publishedAt} showCard={false} />}
+          {day === 5 && <CountdownComponent date={published_at} showCard={false} />}
         </span>
       )} */}
     </div>
@@ -320,10 +309,10 @@ export const ChipLink = ({
 }) =>
   uiOnly ? (
     <span
-      className={[
+      className={cn(
         'flex flex-auto justify-center sm:justify-between w-full text-center sm:text-left min-h-[43px] sm:w-auto items-center border border-[#232323] bg-gradient-to-r text-white from-[#46444460] to-[#19191980] hover:from-[#4e4e4e90] hover:to-[#19191990] hover:border-stronger backdrop-blur-xl rounded-full text-sm py-2 px-3 sm:pr-2',
-        className,
-      ].join(' ')}
+        className
+      )}
     >
       {children}
     </span>
@@ -332,10 +321,10 @@ export const ChipLink = ({
       href={href}
       target={target ?? '_self'}
       rel="noopener"
-      className={[
+      className={cn(
         'flex flex-auto justify-center sm:justify-between w-full text-center sm:text-left min-h-[43px] sm:w-auto items-center border border-[#232323] bg-gradient-to-r text-white from-[#46444460] to-[#19191980] hover:from-[#4e4e4e90] hover:to-[#19191990] hover:border-stronger backdrop-blur-xl rounded-full text-sm py-2 px-3 sm:pr-2',
-        className,
-      ].join(' ')}
+        className
+      )}
     >
       {children}
     </Link>
@@ -364,10 +353,10 @@ export const SectionButtons = ({
 }) => {
   return (
     <div
-      className={[
+      className={cn(
         'flex w-full max-w-full md:w-auto justify-center gap-2 z-10',
-        mobileGrid && 'grid grid-cols-2 gap-2 sm:flex',
-      ].join(' ')}
+        mobileGrid && 'grid grid-cols-2 gap-2 sm:flex'
+      )}
     >
       {!!blog && (
         <ChipLink href={blog}>
@@ -439,10 +428,10 @@ export const SectionButtons = ({
 
 export const CartTitle = ({ children, className }: { children: any; className?: string }) => (
   <span
-    className={[
+    className={cn(
       'z-0 relative text-[#F4FFFA90] bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#675FA7] tracking-[-.5px] text-xl',
-      className,
-    ].join(' ')}
+      className
+    )}
   >
     {children}
     <div className="absolute -z-10 inset-0 w-full h-full bg-[#1C1C1C90] rounded-full blur-xl" />
