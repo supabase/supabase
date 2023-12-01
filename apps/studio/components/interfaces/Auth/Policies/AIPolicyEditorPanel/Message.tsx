@@ -1,13 +1,22 @@
 import dayjs from 'dayjs'
 import { noop } from 'lodash'
 import Image from 'next/image'
-import { memo, useMemo } from 'react'
+import { PropsWithChildren, memo, useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { AiIconAnimation, Badge, markdownComponents } from 'ui'
 
 import { useProfile } from 'lib/profile'
 import { AIPolicyCodeBlock } from './AIPolicyCodeBlock'
+
+interface MessageProps {
+  name?: string
+  role: 'function' | 'user' | 'assistant' | 'system'
+  content?: string
+  createdAt?: number
+  isDebug?: boolean
+  onDiff?: (s: string) => void
+}
 
 const Message = memo(function Message({
   name,
@@ -16,14 +25,8 @@ const Message = memo(function Message({
   createdAt,
   isDebug,
   onDiff = noop,
-}: {
-  name?: string
-  role: 'function' | 'user' | 'assistant' | 'system'
-  content?: string
-  createdAt?: number
-  isDebug?: boolean
-  onDiff?: (s: string) => void
-}) {
+  children,
+}: PropsWithChildren<MessageProps>) {
   const { profile } = useProfile()
 
   const icon = useMemo(() => {
@@ -67,6 +70,7 @@ const Message = memo(function Message({
       >
         {content}
       </ReactMarkdown>
+      {children}
     </div>
   )
 })

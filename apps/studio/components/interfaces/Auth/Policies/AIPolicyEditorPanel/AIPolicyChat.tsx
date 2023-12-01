@@ -5,17 +5,28 @@ import { useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   AiIcon,
+  Button,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   Form_Shadcn_,
+  IconSettings,
   Input_Shadcn_,
 } from 'ui'
 import * as z from 'zod'
 
 import { useProfile } from 'lib/profile'
+import { useAppStateSnapshot } from 'state/app-state'
 import { MessageWithDebug } from './AIPolicyEditorPanel.utils'
 import Message from './Message'
+
+interface AIPolicyChatProps {
+  messages: MessageWithDebug[]
+  loading: boolean
+  onSubmit: (s: string) => void
+  onDiff: (s: string) => void
+  onChange: (value: boolean) => void
+}
 
 export const AIPolicyChat = ({
   messages,
@@ -23,15 +34,11 @@ export const AIPolicyChat = ({
   onSubmit,
   onDiff,
   onChange,
-}: {
-  messages: MessageWithDebug[]
-  loading: boolean
-  onSubmit: (s: string) => void
-  onDiff: (s: string) => void
-  onChange: (value: boolean) => void
-}) => {
+}: AIPolicyChatProps) => {
   const { profile } = useProfile()
+  const snap = useAppStateSnapshot()
   const bottomRef = useRef<HTMLDivElement>(null)
+
   const name = compact([profile?.first_name, profile?.last_name]).join(' ')
 
   const FormSchema = z.object({ chat: z.string() })
@@ -75,7 +82,17 @@ export const AIPolicyChat = ({
           }, how can I help you? I'm powered by AI, so surprises and mistakes are possible.
         Make sure to verify any generated code or suggestions, and share feedback so that we can
         learn and improve.`}
-        />
+        >
+          <div>
+            <Button
+              type="default"
+              icon={<IconSettings strokeWidth={1.5} />}
+              onClick={() => snap.setShowAiSettingsModal(true)}
+            >
+              AI Settings
+            </Button>
+          </div>
+        </Message>
 
         {messages.map((m) => (
           <Message
