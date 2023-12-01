@@ -8,7 +8,7 @@ import SchemaFlowHandler from './SchemaFlowHandler'
 export async function SchemaFlow({ params }: { params: any }) {
   const { threadId, runId, messageId } = params
 
-  const content = await getThread({ threadId, runId, messageId })
+  const { content } = await getThread({ threadId, runId, messageId })
 
   // const code = format(content, { language: 'postgresql' })
 

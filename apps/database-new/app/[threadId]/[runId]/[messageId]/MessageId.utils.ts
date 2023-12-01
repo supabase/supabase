@@ -60,7 +60,7 @@ async function getThread({
 
   const content = selectedMessageReply?.sql.replaceAll('```sql', '').replaceAll('```', '') || ''
 
-  return content
+  return { content, messages }
 }
 
 export { getThread }
