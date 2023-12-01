@@ -42,32 +42,6 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
       }
     }
 
-    const TextAreaElement = () => {
-      const { pending } = useFormStatus()
-
-      return (
-        <TextArea
-          name="value"
-          ref={textAreaRef}
-          autoFocus
-          rows={1}
-          disabled={disabled || pending}
-          contentEditable
-          aria-expanded={false}
-          aria-required={true}
-          required
-          className={
-            'transition-all text-sm pl-12 pr-10 rounded-[18px] resize-none box-border leading-6'
-          }
-          placeholder={props.placeholder}
-          spellCheck={false}
-          value={value}
-          onChange={(event: ChangeEvent<HTMLTextAreaElement>) => onValueChange(event)}
-          onKeyDown={handleKeyDown}
-        />
-      )
-    }
-
     const SubmitButton = () => {
       const { pending } = useFormStatus()
 
@@ -80,6 +54,7 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
           <button
             ref={submitRef}
             type="submit"
+            disabled={pending}
             className={cn(
               'transition-all',
               'flex items-center justify-center w-7 h-7 border border-control rounded-full mr-0.5 p-1.5 background-alternative',
@@ -109,7 +84,24 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
     return (
       <form ref={ref} className="relative" {...props}>
         <div className={cn('absolute', 'top-2 left-2', 'ml-1 w-6 h-6 rounded-full bg-dbnew')}></div>
-        <TextAreaElement />
+        <TextArea
+          name="value"
+          ref={textAreaRef}
+          autoFocus
+          rows={1}
+          disabled={disabled || submitRef.current?.disabled}
+          contentEditable
+          aria-expanded={false}
+          required
+          className={
+            'transition-all text-sm pl-12 pr-10 rounded-[18px] resize-none box-border leading-6'
+          }
+          placeholder={props.placeholder}
+          spellCheck={false}
+          value={value}
+          onChange={(event: ChangeEvent<HTMLTextAreaElement>) => onValueChange(event)}
+          onKeyDown={handleKeyDown}
+        />
         <SubmitButton />
         <p aria-live="polite" className="sr-only" role="status">
           {message}
