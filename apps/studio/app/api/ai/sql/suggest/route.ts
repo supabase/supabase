@@ -9,10 +9,10 @@ const openAiKey = process.env.OPENAI_KEY
 
 /**
  * This route has to be with an edge runtime to support streaming. This route is not using the
- * apiWrapper because it's not working with edge API routes (different params) but it also doesn't
+ * apiWrapper because it's not working with edge API routes (different params) but the route doesn't
  * require authentication.
  */
-export default function handler(request: NextRequest) {
+export async function POST(request: NextRequest) {
   if (!openAiKey) {
     return new Response(
       JSON.stringify({
