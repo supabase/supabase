@@ -1,3 +1,5 @@
+import * as React from 'react'
+
 import type OpenAI from 'openai'
 import {
   Dispatch,
@@ -8,27 +10,23 @@ import {
   useRef,
   useState,
 } from 'react'
-
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { SSE } from 'sse.js'
-
 import {
-  AiIconAnimation,
   Button,
   IconAlertTriangle,
   IconCornerDownLeft,
   IconUser,
   Input,
+  cn,
   markdownComponents,
 } from 'ui'
+import { AiWarning } from './Command.alerts'
 import { AiIconChat } from './Command.icons'
 import { CommandGroup, CommandItem, useAutoInputFocus, useHistoryKeys } from './Command.utils'
-
-import { AiWarning } from './Command.alerts'
 import { useCommandMenu } from './CommandMenuProvider'
-
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
-import { cn } from './../../lib/utils'
+import { AiIconAnimation } from '../AiIconAnimation'
 
 const questions = [
   'How do I get started with Supabase?',

@@ -1,3 +1,5 @@
+import * as React from 'react'
+
 import { CommandGroup } from './Command.utils'
 import SearchOnlyItem from './SearchOnlyItem'
 

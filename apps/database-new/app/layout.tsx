@@ -1,4 +1,4 @@
-import '@ui/layout/ai-icon-animation/ai-icon-animation-style.module.css'
+import '@ui-patterns/AiIconAnimation/AiIconAnimation.module.css'
 import './globals.css'
 
 import Header from '@/components/Header/Header'

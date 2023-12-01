@@ -1,4 +1,6 @@
-import { IconArrowLeft } from '../Icon/icons/IconArrowLeft'
+import * as React from 'react'
+
+import { IconArrowLeft } from 'ui'
 
 import { BadgeExperimental } from './Command.Badges'
 import { COMMAND_ROUTES } from './Command.constants'

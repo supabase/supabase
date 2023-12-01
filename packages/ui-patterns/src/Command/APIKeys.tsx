@@ -1,9 +1,10 @@
+import * as React from 'react'
+
 import { CommandGroup } from 'cmdk'
-import { useCommandMenu } from './CommandMenuProvider'
-import { Badge } from '../Badge'
-import { CommandItem, copyToClipboard } from './Command.utils'
-import { IconAlertCircle } from './../Icon/icons/IconAlertCircle'
+import { Badge, IconAlertCircle } from 'ui'
 import ChildItem from './ChildItem'
+import { CommandItem, copyToClipboard } from './Command.utils'
+import { useCommandMenu } from './CommandMenuProvider'
 
 const APIKeys = ({ isSubItem = false }) => {
   const { setIsOpen, project } = useCommandMenu()

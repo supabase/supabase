@@ -1,0 +1,23 @@
+{
+  "name": "ui-patterns",
+  "main": "./index.tsx",
+  "types": "./index.tsx",
+  "license": "MIT",
+  "sideEffects": false,
+  "dependencies": {
+    "typescript": "^5.2.2",
+    "cmdk": "^0.2.0",
+    "react-copy-to-clipboard": "^5.1.0",
+    "ui": "*"
+  },
+  "devDependencies": {
+    "react-markdown": "^8.0.3",
+    "@types/react": "^18.2.24",
+    "@types/react-dom": "^18.2.8"
+  },
+  "peerDependencies": {
+    "next": "*",
+    "react": "*",
+    "react-dom": "*"
+  }
+}

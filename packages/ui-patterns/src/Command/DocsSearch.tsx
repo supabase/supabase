@@ -12,9 +12,9 @@ import {
   IconHash,
   IconMessageSquare,
   IconSearch,
-  useCommandMenu,
 } from 'ui'
 import { CommandGroup, CommandItem, CommandLabel, TextHighlighter } from './Command.utils'
+import { useCommandMenu } from './CommandMenuProvider'
 
 const NUMBER_SOURCES = 2
 

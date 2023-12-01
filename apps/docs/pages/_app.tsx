@@ -10,12 +10,13 @@ import { AuthProvider, ThemeProvider, useTelemetryProps, useThemeSandbox } from 
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
 import { AppPropsWithLayout } from 'types'
-import { CommandMenuProvider, PortalToast, PromoToast, useConsent } from 'ui'
+import { PortalToast, PromoToast, useConsent } from 'ui'
 import { TabsProvider } from 'ui/src/components/Tabs'
 import Favicons from '~/components/Favicons'
 import SiteLayout from '~/layouts/SiteLayout'
 import { API_URL, IS_PLATFORM } from '~/lib/constants'
 import { post } from '~/lib/fetchWrappers'
+import { CommandMenuProvider } from 'ui-patterns'
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter()

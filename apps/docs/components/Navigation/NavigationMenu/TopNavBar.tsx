@@ -3,11 +3,12 @@ import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FC, useState } from 'react'
-import { Button, IconCommand, IconGitHub, IconSearch, SearchButton } from 'ui'
+import { Button, IconCommand, IconGitHub, IconSearch } from 'ui'
 
 import { getPageType } from '~/lib/helpers'
 import { REFERENCES } from './NavigationMenu.constants'
 import ThemeToggle from '@ui/components/ThemeProvider/ThemeToggle'
+import { SearchButton } from 'ui-patterns'
 
 const TopNavBar: FC = () => {
   const { resolvedTheme } = useTheme()

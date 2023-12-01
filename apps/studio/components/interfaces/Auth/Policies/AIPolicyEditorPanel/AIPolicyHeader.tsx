@@ -1,6 +1,7 @@
-import { AiIcon, Button, SheetClose_Shadcn_, SheetHeader_Shadcn_, SheetTitle_Shadcn_, cn } from 'ui'
+import { Button, SheetClose_Shadcn_, SheetHeader_Shadcn_, SheetTitle_Shadcn_, cn } from 'ui'
+import { AiIconAnimation } from 'ui-patterns'
 
-import styles from '@ui/layout/ai-icon-animation/ai-icon-animation-style.module.css'
+import styles from '@ui-patterns/src/AiIconAnimation/AiIconAnimation.module.css'
 import { X } from 'lucide-react'
 
 export const AIPolicyHeader = ({
@@ -28,7 +29,7 @@ export const AIPolicyHeader = ({
         className={cn('group', styles['ai-icon__container--allow-hover-effect'], 'px-3 py-0.5')}
         rounded
         icon={
-          <AiIcon className="scale-75 [&>div>div]:border-foreground-light [&>div>div]:group-hover:border-foreground -mr-0.5" />
+          <AiIconAnimation className="scale-75 [&>div>div]:border-foreground-light [&>div>div]:group-hover:border-foreground -mr-0.5" />
         }
         onClick={() => setAssistantVisible(!assistantVisible)}
       >

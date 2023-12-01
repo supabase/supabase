@@ -64,7 +64,7 @@ const nextConfig = {
       'weweb-changelog.ghost.io',
       'img.youtube.com',
       'archbee-image-uploads.s3.amazonaws.com',
-      'obuldanrptloktxcffvn.supabase.co'
+      'obuldanrptloktxcffvn.supabase.co',
     ],
   },
   // TODO: @next/mdx ^13.0.2 only supports experimental mdxRs flag. next ^13.0.2 will stop warning about this being unsupported.
@@ -74,7 +74,15 @@ const nextConfig = {
       transform: 'lodash/{{member}}',
     },
   },
-  transpilePackages: ['ui', 'common', 'mermaid', 'mdx-mermaid', 'dayjs', 'shared-data'],
+  transpilePackages: [
+    'ui',
+    'ui-patterns',
+    'common',
+    'mermaid',
+    'mdx-mermaid',
+    'dayjs',
+    'shared-data',
+  ],
   async headers() {
     return [
       {

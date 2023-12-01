@@ -1,5 +1,7 @@
-import { AiIconAnimation } from '@ui/layout/ai-icon-animation'
-import { cn } from '@ui/lib/utils'
+import * as React from 'react'
+
+import { AiIconAnimation } from './../AiIconAnimation'
+import { cn } from 'ui'
 
 interface AiIconProps {
   className?: string

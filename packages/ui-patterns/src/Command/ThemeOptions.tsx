@@ -1,3 +1,5 @@
+import * as React from 'react'
+
 import { CommandGroup } from 'cmdk'
 import { useCommandMenu } from './CommandMenuProvider'
 import ChildItem from './ChildItem'

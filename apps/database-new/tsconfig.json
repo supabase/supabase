@@ -21,7 +21,8 @@
     "paths": {
       "@/*": ["./*"],
       // handle ui package paths
-      "@ui/*": ["./../../packages/ui/src/*"]
+      "@ui/*": ["./../../packages/ui/src/*"],
+      "@ui-patterns/*": ["./../../packages/ui-patterns/src/*"] // handle ui-patterns package paths
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

@@ -1,0 +1,13 @@
+{
+  "extends": "tsconfig/react-library.json",
+  "compilerOptions": {
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "jsx": "react-jsx",
+    "paths": {
+      "@ui-patterns/*": ["./src/*"] // no other project in the monorepo uses this alias
+    }
+  },
+  "include": ["."],
+  "exclude": ["dist", "build", "node_modules"]
+}

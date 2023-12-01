@@ -1,21 +1,24 @@
 import { useRouter } from 'next/router'
 import * as React from 'react'
-import { ElementRef, useRef } from 'react'
-import { IconHome } from '../Icon/icons/IconHome'
-
-import { IconArrowRight } from './../Icon/icons/IconArrowRight'
-import { IconBook } from './../Icon/icons/IconBook'
-import { IconColumns } from './../Icon/icons/IconColumns'
-import { IconInbox } from './../Icon/icons/IconInbox'
-import { IconLifeBuoy } from './../Icon/icons/IconLifeBuoy'
-import { IconMonitor } from './../Icon/icons/IconMonitor'
-import { IconPhone } from './../Icon/icons/IconPhone'
-import { IconUser } from './../Icon/icons/IconUser'
-import { IconKey } from './../Icon/icons/IconKey'
-import { IconLink } from './../Icon/icons/IconLink'
-
+import {
+  IconArrowRight,
+  IconBook,
+  IconColumns,
+  IconHome,
+  IconInbox,
+  IconKey,
+  IconLifeBuoy,
+  IconLink,
+  IconMonitor,
+  IconPhone,
+  IconUser,
+} from 'ui'
+import { AiIconAnimation } from '../AiIconAnimation'
+import APIKeys from './APIKeys'
 import AiCommand from './AiCommand'
-import sharedItems from './utils/shared-nav-items.json'
+import ChildItem from './ChildItem'
+import { BadgeExperimental } from './Command.Badges'
+import { COMMAND_ROUTES } from './Command.constants'
 import { AiIcon } from './Command.icons'
 import {
   CommandDialog,
@@ -26,18 +29,13 @@ import {
   CommandList,
   copyToClipboard,
 } from './Command.utils'
-import { COMMAND_ROUTES } from './Command.constants'
 import { useCommandMenu } from './CommandMenuProvider'
-
+import CommandMenuShortcuts from './CommandMenuShortcuts'
 import DocsSearch from './DocsSearch'
 import GenerateSQL from './GenerateSQL'
-import ThemeOptions from './ThemeOptions'
-import APIKeys from './APIKeys'
 import SearchableStudioItems from './SearchableStudioItems'
-import CommandMenuShortcuts from './CommandMenuShortcuts'
-import { BadgeExperimental } from './Command.Badges'
-import { AiIconAnimation } from '@ui/layout/ai-icon-animation'
-import ChildItem from './ChildItem'
+import ThemeOptions from './ThemeOptions'
+import sharedItems from './utils/shared-nav-items.json'
 
 export const CHAT_ROUTES = [
   COMMAND_ROUTES.AI, // this one is temporary

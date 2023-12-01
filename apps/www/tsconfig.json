@@ -3,7 +3,8 @@
     "baseUrl": ".",
     "paths": {
       "~/*": ["./*"],
-      "@ui/*": ["./../../packages/ui/src/*"] // handle ui package paths
+      "@ui/*": ["./../../packages/ui/src/*"], // handle ui package paths
+      "@ui-patterns/*": ["./../../packages/ui-patterns/src/*"] // handle ui-patterns package paths
     },
     "downlevelIteration": true,
     "target": "es5",

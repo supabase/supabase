@@ -2,7 +2,6 @@ import styles from '@ui/layout/ai-icon-animation/ai-icon-animation-style.module.
 import { QueryResponseError } from 'data/sql/execute-sql-mutation'
 import { useState } from 'react'
 import {
-  AiIcon,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
@@ -66,7 +65,7 @@ const QueryError = ({
                   styles['ai-icon__container--allow-hover-effect h-[21px] !py-0']
                 )}
                 // icon={
-                //   <AiIcon className="scale-50 [&>div>div]:border-warning/50 [&>div>div]:group-hover:border-warning" />
+                //   <AiIconAnimation className="scale-50 [&>div>div]:border-warning/50 [&>div>div]:group-hover:border-warning" />
                 // }
                 onClick={() => onSelectDebug()}
               >

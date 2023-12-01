@@ -5,7 +5,6 @@ import OpenAI from 'openai'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
-  AiIcon,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
@@ -16,6 +15,8 @@ import * as z from 'zod'
 
 import { useProfile } from 'lib/profile'
 import Message from './Message'
+
+import { AiIconAnimation } from 'ui-patterns'
 
 export const AIPolicyChat = ({
   messages,
@@ -118,7 +119,7 @@ export const AIPolicyChat = ({
               <FormItem_Shadcn_>
                 <FormControl_Shadcn_>
                   <div className="relative">
-                    <AiIcon className="absolute top-2 left-3 [&>div>div]:border-black dark:[&>div>div]:border-white" />
+                    <AiIconAnimation className="absolute top-2 left-3 [&>div>div]:border-black dark:[&>div>div]:border-white" />
                     <Input_Shadcn_
                       {...field}
                       autoComplete="off"

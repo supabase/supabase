@@ -67,9 +67,6 @@ export * from './src/components/Toggle'
 export * from './src/components/Upload'
 export * from './src/components/Form'
 
-// CMD+K
-export * from './src/components/Command'
-
 // Widgets
 export * from './src/components/CountdownWidget'
 
@@ -78,9 +75,6 @@ export * from './src/components/LoadingLine'
 
 // banners
 export * from './src/layout/banners'
-
-// ai icon
-export * from './src/layout/ai-icon-animation'
 
 // utilities
 export * from './src/lib/utils'
@@ -180,7 +174,6 @@ export { ScrollArea, ScrollBar } from './src/components/shadcn/ui/scroll-area'
 export { Separator } from './src/components/shadcn/ui/separator'
 
 // patterns
-
 
 export * from './src/patterns/SchemaTableNode'
 export { AssistantChatForm } from './src/patterns/AssistantChatForm'

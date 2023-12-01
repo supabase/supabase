@@ -1,12 +1,8 @@
 import { Command as CommandPrimitive } from 'cmdk'
 import * as React from 'react'
-
-import { cn } from './../../lib/utils'
-
 import { DetailedHTMLProps, HTMLAttributes, KeyboardEventHandler } from 'react'
-import { LoadingLine } from '../LoadingLine/LoadingLine'
-import { Modal } from '../Modal'
-import { ModalProps } from '../Modal/Modal'
+import { Modal, ModalProps, LoadingLine, cn } from 'ui'
+
 import { useCommandMenu } from './CommandMenuProvider'
 
 type CommandPrimitiveElement = React.ElementRef<typeof CommandPrimitive>

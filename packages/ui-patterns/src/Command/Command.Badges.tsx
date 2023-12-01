@@ -1,3 +1,5 @@
+import * as React from 'react'
+
 import { Badge } from 'ui'
 import { Microscope } from 'lucide-react'
 

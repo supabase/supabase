@@ -97,6 +97,7 @@
     "sql-formatter": "^12.2.0",
     "sqlstring": "^2.3.2",
     "ui": "*",
+    "ui-patterns": "*",
     "uniforms-bootstrap4": "^3.6.2",
     "uniforms-bridge-json-schema": "^3.6.2",
     "uuid": "^9.0.1",

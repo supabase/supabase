@@ -3,13 +3,14 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import Typed from 'typed.js'
-import { Button, ButtonProps, cn, IconCommand, IconSearch, SearchButton } from 'ui'
+import { Button, ButtonProps, cn, IconCommand, IconSearch } from 'ui'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import Panel from '~/components/Panel'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { questions } from 'shared-data'
 import data from '~/data/support'
+import { SearchButton } from 'ui-patterns'
 
 const Index = () => {
   const router = useRouter()

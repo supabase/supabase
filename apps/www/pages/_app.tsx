@@ -10,10 +10,11 @@ import { AppProps } from 'next/app'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-import { CommandMenuProvider, PortalToast, themes, useConsent } from 'ui'
+import { PortalToast, themes, useConsent } from 'ui'
 import Meta from '~/components/Favicons'
 import { post } from '~/lib/fetchWrapper'
 import supabase from '~/lib/supabase'
+import { CommandMenuProvider } from 'ui-patterns'
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
