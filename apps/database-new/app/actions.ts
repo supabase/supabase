@@ -208,18 +208,13 @@ export async function updateThread(prevState: any, formData: FormData) {
       role: 'user',
     })
 
-    console.log('message', message)
-    console.log('message', message.content)
     revalidatePath(`/${data.threadId}/${data.runId}`, 'layout')
 
     const run = await openai.beta.threads.runs.create(message.thread_id, {
       assistant_id: 'asst_oLWrK8lScZVNEpfjwUIvBAnq',
     })
 
-    console.log('run', run)
-    console.log('run', run.status)
-
-    revalidatePath(`/${data.threadId}/${data.runId}/${message.id}`)
+    revalidatePath(`/${data.threadId}/${data.runId}/${message.id}`, 'layout')
 
     redirectUrl = `/${message.thread_id}/${run.id}/${message.id}`
   } catch (error: any) {
@@ -229,8 +224,6 @@ export async function updateThread(prevState: any, formData: FormData) {
       data: undefined,
     }
   }
-
-  console.log('redirectUrl', redirectUrl)
 
   revalidatePath(redirectUrl)
   redirect(redirectUrl)
