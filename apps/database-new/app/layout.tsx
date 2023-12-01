@@ -5,6 +5,7 @@ import Header from '@/components/Header/Header'
 import { ReactQueryProvider, ThemeProvider } from '@/components/providers'
 import type { Metadata } from 'next'
 import Footer from '@/components/Footer'
+import { MainWrapper } from './MainWrapper'
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -23,9 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
           <ReactQueryProvider>
             <Header />
-            <main role="main" className="h-full w-full flex flex-col grow">
-              {children}
-            </main>
+            <MainWrapper>{children}</MainWrapper>
             <Footer />
           </ReactQueryProvider>
         </ThemeProvider>
