@@ -8,8 +8,9 @@ import supabase from '~/lib/supabaseMisc'
 import FaviconImports from '~/components/LaunchWeek/X/FaviconImports'
 import DefaultLayout from '~/components/Layouts/Default'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import LWXReleases from '~/components/LaunchWeek/X/Releases'
+import MainStage from '~/components/LaunchWeek/X/Releases/MainStage'
+import BuildStage from '~/components/LaunchWeek/X/Releases/BuildStage'
+import LWXHeader from '../../components/LaunchWeek/X/Releases/LWXHeader'
 
 export default function TicketHome() {
   const { query } = useRouter()
@@ -99,9 +100,9 @@ export default function TicketHome() {
         }}
       >
         <DefaultLayout>
-          <SectionContainer className="!pt-0">
-            <LWXReleases />
-          </SectionContainer>
+          <LWXHeader />
+          <MainStage />
+          <BuildStage />
         </DefaultLayout>
       </ConfDataContext.Provider>
     </>

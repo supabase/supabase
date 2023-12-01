@@ -1,9 +1,8 @@
 import { IconDocumentation, IconMicSolid, IconProductHunt, IconYoutubeSolid, cn } from 'ui'
 
 import Link from 'next/link'
-import CountdownComponent from '../../Countdown'
 import Image from 'next/image'
-import { StepLink } from '../lwx_data'
+import { StepLink } from '../data/lwx_data'
 
 export const CheckCircleSolidIcon = () => (
   <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -83,16 +82,24 @@ export const DayLink = ({ type, icon, text, href = '', className }: DayLink) => 
       text: 'X Space',
     },
   }
+  const isTargetBlank = () => {
+    switch (type) {
+      case 'productHunt':
+      case 'docs':
+        return true
+    }
+  }
   const Icon = icon ?? linkTypes[type].icon
-  const Text = () => <span>{text ?? linkTypes[type]?.text}</span>
+  const Text = () => <>{text ?? linkTypes[type]?.text}</>
 
   return (
     <Link
       href={href}
       className={cn(
-        'py-2 flex gap-2 items-center hover:text-foreground transition-colors text-xs',
+        'py-1 flex gap-2 items-center hover:text-foreground transition-colors text-sm',
         className
       )}
+      target={isTargetBlank() ? '_blank' : '_self'}
     >
       <span className="w-4 h-4 flex items-center justify-center">
         <Icon />
@@ -162,14 +169,8 @@ export const ChipLink = ({
   ) : null
 
 export const CartTitle = ({ children, className }: { children: any; className?: string }) => (
-  <span
-    className={cn(
-      'z-0 relative text-[#F4FFFA90] bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#675FA7] tracking-[-.5px] text-xl',
-      className
-    )}
-  >
+  <span className={cn('z-0 relative text-[#F4FFFA90] tracking-[-.5px] text-xl', className)}>
     {children}
-    {/* <div className="absolute -z-10 inset-0 w-full h-full bg-[#1C1C1C90] rounded-full blur-xl" /> */}
   </span>
 )
 

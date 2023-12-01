@@ -29,6 +29,7 @@ export interface StepProps {
   bg_layers?: {
     img?: string
     mobileImg?: string
+    className?: string
   }[]
   steps: StepProps[] | []
 }
@@ -53,17 +54,18 @@ export const endOfLW8 = '2023-12-15T23:59:59.999-08:00'
 
 const days: WeekDayProps[] = [
   {
-    title: 'Lorem ipsum',
+    title: 'Read Replicas',
     shipped: true,
     isToday: true,
+    blog: '',
     hasCountdown: true,
     date: '11 Dec',
     published_at: '2023-12-11T08:00:00.000-08:00',
     description: (
       <>
         Read Replicas Placeholder title for blog post for{' '}
-        <strong className="text-foreground">the first day of Launch Week</strong>, can be a bit
-        longer and then few things highlighted
+        <span className="text-foreground">the first day of Launch Week</span>, can be a bit longer
+        and then few things highlighted
       </>
     ),
     d: 1,
@@ -71,19 +73,19 @@ const days: WeekDayProps[] = [
     links: [
       {
         type: 'productHunt',
-        href: '',
+        href: 'https://www.producthunt.com/',
       },
       {
         type: 'video',
-        href: '',
+        href: 'https://www.youtube.com/',
       },
       {
         type: 'xSpace',
-        href: '',
+        href: 'https://twitter.com/home',
       },
       {
         type: 'docs',
-        href: '',
+        href: 'https://supabase.com/docs',
       },
     ],
     steps: [
@@ -98,6 +100,8 @@ const days: WeekDayProps[] = [
   {
     title: '',
     shipped: false,
+    blog: '',
+    hasCountdown: true,
     date: '12 Dec',
     published_at: '2023-12-12T08:00:00.000-08:00',
     description: '',
@@ -108,6 +112,7 @@ const days: WeekDayProps[] = [
   {
     title: '',
     shipped: false,
+    blog: '',
     date: '13 Dec',
     published_at: '2023-12-13T08:00:00.000-08:00',
     description: '',
@@ -118,6 +123,7 @@ const days: WeekDayProps[] = [
   {
     title: '',
     shipped: false,
+    blog: '',
     date: '14 Dec',
     published_at: '2023-12-14T08:00:00.000-08:00',
     description: '',
@@ -128,6 +134,7 @@ const days: WeekDayProps[] = [
   {
     title: '',
     shipped: false,
+    blog: '',
     date: '15 Dec',
     published_at: '2023-12-15T08:00:00.000-08:00',
     description: '',
