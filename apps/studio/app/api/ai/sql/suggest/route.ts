@@ -55,9 +55,10 @@ export async function POST(req: NextRequest) {
   ]
 
   if (entityDefinitions) {
+    const definitions = codeBlock`${entityDefinitions.join('\n\n')}`
     initMessages.push({
       role: 'user',
-      content: oneLine`Here is my database schema for reference: ${codeBlock`entityDefinitions.join('\n\n')`}`,
+      content: oneLine`Here is my database schema for reference: ${definitions}`,
     })
   }
 
