@@ -6,7 +6,9 @@ import Image from 'next/image'
 import { memo, useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { format } from 'sql-formatter'
-import { AiIcon, AiIconAnimation, Badge, Button } from 'ui'
+import { Badge, Button } from 'ui'
+
+import { AiIconAnimation } from 'ui-patterns'
 
 import CodeEditor from 'components/ui/CodeEditor'
 import { useProfile } from 'lib/profile'

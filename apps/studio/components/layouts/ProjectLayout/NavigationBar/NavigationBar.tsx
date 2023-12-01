@@ -25,8 +25,8 @@ import {
   IconUser,
   Theme,
   themes,
-  useCommandMenu,
 } from 'ui'
+import { useCommandMenu } from 'ui-patterns'
 
 import { useFlag, useIsFeatureEnabled } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'

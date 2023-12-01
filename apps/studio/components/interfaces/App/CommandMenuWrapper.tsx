@@ -1,8 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { PropsWithChildren, useMemo } from 'react'
-import { CommandMenuProvider } from 'ui'
-
+import { CommandMenuProvider } from 'ui-patterns'
 import { codeBlock } from 'common-tags'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useProjectApiQuery } from 'data/config/project-api-query'

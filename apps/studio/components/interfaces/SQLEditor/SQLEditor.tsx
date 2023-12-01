@@ -7,7 +7,6 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import Split from 'react-split'
 import { format } from 'sql-formatter'
 import {
-  AiIconAnimation,
   Button,
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +21,7 @@ import {
   Input_Shadcn_,
   cn,
 } from 'ui'
+import { AiIconAnimation } from 'ui-patterns'
 
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useSqlEditMutation } from 'data/ai/sql-edit-mutation'
