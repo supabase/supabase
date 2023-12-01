@@ -16,9 +16,11 @@ export const metadata: Metadata = {
   description: 'Generate schemas from your ideas',
 }
 
+// supressHydrationWarning:
+// https://github.com/pacocoursey/next-themes#with-app
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark" suppressHydrationWarning>
       <body className="flex flex-col">
         <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
           <ReactQueryProvider>
