@@ -1,34 +1,26 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-import { readOnly } from './supabaseClient'
-import { SupaResponse, User } from 'types'
 import { getAuth0Id, getAuthUser, getIdentity } from 'lib/gotrue'
+import type { NextApiRequest } from 'next'
+import { SupaResponse, User } from 'types'
+import { readOnly } from './supabaseClient'
 
 /**
  * Use this method on api routes to check if user is authenticated and having required permissions.
  * This method can only be used from the server side.
  * Member permission is mandatory whenever orgSlug/projectRef query param exists
  * @param {NextApiRequest}    req
- * @param {NextApiResponse}   res
  * @param {Object}            config      requireUserDetail: bool, requireOwner: bool
  *
  * @returns {Object<user, error, description>}
  *   user null, with error and description if not authenticated or not enough permissions
  */
-export async function apiAuthenticate(
-  req: NextApiRequest,
-  res: NextApiResponse
-): Promise<SupaResponse<User>> {
+export async function apiAuthenticate(req: NextApiRequest): Promise<SupaResponse<User>> {
   if (!req) {
     return { error: new Error('Request is not available') } as unknown as SupaResponse<User>
   }
 
-  if (!res) {
-    return { error: new Error('Response is not available') } as unknown as SupaResponse<User>
-  }
-
   const { slug: orgSlug, ref: projectRef } = req.query
   try {
-    const user = await fetchUser(req, res)
+    const user = await fetchUser(req)
     if (!user) {
       return { error: new Error('The user does not exist') } as unknown as SupaResponse<User>
     }
@@ -46,7 +38,7 @@ export async function apiAuthenticate(
  * @returns
  *  user with only id prop or detail object. It depends on requireUserDetail config
  */
-async function fetchUser(req: NextApiRequest, res: NextApiResponse): Promise<any> {
+async function fetchUser(req: NextApiRequest): Promise<any> {
   let user_id_supabase = null
   let user_id_auth0 = null
   let gotrue_id = null
