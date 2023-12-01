@@ -13,12 +13,12 @@ const DaySection = ({ day }: { day: WeekDayProps }) => {
 
   return (
     <section
-      id={day.isToday ? 'today' : undefined}
-      className="border-b py-8 first:border-t border-[#111718] text-[#575E61] scroll-mt-20 grid grid-cols-1 gap-4 md:grid-cols-3"
+      id={day.isToday ? 'today' : day.id}
+      className="border-b py-8 first:border-t border-[#111718] text-[#575E61] scroll-mt-16 grid grid-cols-1 gap-4 md:grid-cols-3"
     >
       {/* Day title and links */}
       <div className="flex h-full flex-col gap-4 items-between">
-        <div className="text-sm inline sm:hidden md:inline uppercase font-mono text-foreground">
+        <div className="text-sm inline sm:hidden md:inline uppercase font-mono text-foreground tracking-[0.1rem]">
           {day.dd}, {day.date}
         </div>
         {day.shipped && (

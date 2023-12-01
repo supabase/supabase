@@ -11,6 +11,7 @@ import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/
 import MainStage from '~/components/LaunchWeek/X/Releases/MainStage'
 import BuildStage from '~/components/LaunchWeek/X/Releases/BuildStage'
 import LWXHeader from '../../components/LaunchWeek/X/Releases/LWXHeader'
+import LWXStickyNav from '../../components/LaunchWeek/X/Releases/LWXStickyNav'
 
 export default function TicketHome() {
   const { query } = useRouter()
@@ -100,6 +101,7 @@ export default function TicketHome() {
         }}
       >
         <DefaultLayout>
+          <LWXStickyNav />
           <LWXHeader />
           <MainStage />
           <BuildStage />

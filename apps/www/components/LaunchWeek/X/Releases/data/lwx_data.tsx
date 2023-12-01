@@ -35,6 +35,7 @@ export interface StepProps {
 }
 
 export interface WeekDayProps {
+  id: string
   title: string
   shipped: boolean
   date: string
@@ -54,6 +55,7 @@ export const endOfLW8 = '2023-12-15T23:59:59.999-08:00'
 
 const days: WeekDayProps[] = [
   {
+    id: 'day-1',
     title: 'Read Replicas',
     shipped: true,
     isToday: true,
@@ -98,6 +100,7 @@ const days: WeekDayProps[] = [
     ],
   },
   {
+    id: 'day-2',
     title: '',
     shipped: false,
     blog: '',
@@ -110,6 +113,7 @@ const days: WeekDayProps[] = [
     steps: [],
   },
   {
+    id: 'day-3',
     title: '',
     shipped: false,
     blog: '',
@@ -121,6 +125,7 @@ const days: WeekDayProps[] = [
     steps: [],
   },
   {
+    id: 'day-4',
     title: '',
     shipped: false,
     blog: '',
@@ -132,6 +137,7 @@ const days: WeekDayProps[] = [
     steps: [],
   },
   {
+    id: 'day-5',
     title: '',
     shipped: false,
     blog: '',

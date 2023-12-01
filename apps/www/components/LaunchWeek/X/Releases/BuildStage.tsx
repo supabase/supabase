@@ -1,26 +1,16 @@
-import * as React from 'react'
+import React, { FC } from 'react'
 import { buildDays as days } from '~/components/LaunchWeek/X/Releases/data'
 
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import AdventCard from './components/AdventCard'
 import { motion, useInView } from 'framer-motion'
 
-export default function BuildStage() {
+const BuildStage: FC = () => {
   const ref = React.useRef(null)
   const isInView = useInView(ref, { margin: '-25%', once: true })
 
-  React.useEffect(() => {
-    console.log('isInView', isInView)
-  }, [isInView])
-
   const variants = {
-    initial: {
-      // rotateY: -90,
-      // opacity: 0,
-    },
     reveal: {
-      // rotateY: 0,
-      // opacity: 1,
       transition: {
         type: 'spring',
         damping: 10,
@@ -33,7 +23,7 @@ export default function BuildStage() {
 
   return (
     <>
-      <SectionContainer className="!max-w-none lg:!container">
+      <SectionContainer className="!max-w-none lg:!container" id="build-stage">
         <h3 className="text-foreground uppercase font-mono pb-4 md:pb-8 text-sm tracking-[0.1rem]">
           Build Stage
         </h3>
@@ -57,3 +47,5 @@ export default function BuildStage() {
     </>
   )
 }
+
+export default BuildStage
