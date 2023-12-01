@@ -78,6 +78,8 @@ export function getPostgrestRoleImpersonationSql(
   `.trim()
 }
 
+// Includes getPostgrestRoleImpersonationSql() and wrapWithRoleImpersonation()
+export const ROLE_IMPERSONATION_SQL_LINE_COUNT = 11
 export const ROLE_IMPERSONATION_NO_RESULTS = 'ROLE_IMPERSONATION_NO_RESULTS'
 
 export function getCustomRoleImpersonationSql(roleName: string) {
