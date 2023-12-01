@@ -1,4 +1,5 @@
 'use server'
+
 import { last, sortBy } from 'lodash'
 
 import { AssistantMessage } from '@/lib/types'
@@ -98,40 +99,4 @@ export async function updateThreadName(prevState: any, formData: FormData) {
       data: undefined,
     }
   }
-}
-
-export async function getThreadData(threadId: string, runId: string, messageId: string) {
-  let data
-
-  while (true) {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/ai/sql/threads/${threadId}/read/${runId}`,
-      {
-        method: 'GET',
-      }
-    )
-    data = await response.json()
-
-    // exit the loop when data.status is 'completed'
-    if (data.status === 'completed') {
-      break
-    }
-  }
-
-  const messages = sortBy(data.messages, (m) => m.created_at)
-
-  const userMessages = messages.filter((m) => m.role === 'user')
-
-  const selectedMessageIdx = messages.findIndex((m) => m.id === messageId)
-  const selectedMessageReply = (
-    selectedMessageIdx !== -1 ? messages[selectedMessageIdx + 1] : undefined
-  ) as AssistantMessage | undefined
-
-  const content = selectedMessageReply?.sql.replaceAll('```sql', '').replaceAll('```', '') || ''
-
-  const tables = await parseTables(content)
-  const latestMessage = last(userMessages)
-  //if (latestMessage) redirect(`/${threadId}/${runId}/${latestMessage.id}`)
-
-  return { content, tables }
 }

@@ -1,13 +1,7 @@
 'use client'
-import Editor, { BeforeMount, EditorProps, OnMount } from '@monaco-editor/react'
-import { merge } from 'lodash'
-import { useTheme } from 'next-themes'
-import { useEffect, useRef } from 'react'
-import { format } from 'sql-formatter'
-import { cn } from 'ui'
 
-import { useAppStateSnapshot } from '@/lib/state'
-import { getTheme } from './CodeEditor.utils'
+import Editor, { BeforeMount, EditorProps } from '@monaco-editor/react'
+import { merge } from 'lodash'
 
 interface MonacoEditorProps {
   id: string
@@ -23,27 +17,6 @@ interface MonacoEditorProps {
   value?: string
 }
 
-export const CodeEditor = ({ content = '' }: { content: string }) => {
-  const snap = useAppStateSnapshot()
-  const code = format(content, { language: 'postgresql' })
-
-  useEffect(() => {
-    snap.setSelectedCode(code)
-  }, [code])
-
-  return (
-    <div
-      className={cn(
-        snap.hideCode ? 'max-w-0' : 'max-w-lg 2xl:max-w-xl',
-        'w-full xl:border-l',
-        'grow flex flex-col h-full'
-      )}
-    >
-      <MonacoEditor id="sql-editor" language="pgsql" value={code} />
-    </div>
-  )
-}
-
 const MonacoEditor = ({
   id,
   language,
@@ -52,11 +25,11 @@ const MonacoEditor = ({
   options,
   value,
 }: MonacoEditorProps) => {
-  const monacoRef = useRef<any>()
-  const { resolvedTheme } = useTheme()
+  // const monacoRef = useRef<any>()
+  // const { resolvedTheme } = useTheme()
 
   const beforeMount: BeforeMount = (monaco) => {
-    monacoRef.current = monaco
+    // monacoRef.current = monaco
     monaco.editor.defineTheme('supabase', {
       base: 'vs-dark',
       inherit: true,
@@ -71,21 +44,21 @@ const MonacoEditor = ({
     })
   }
 
-  const onMount: OnMount = async (editor) => {
-    // Add margin above first line
-    editor.changeViewZones((accessor) => {
-      accessor.addZone({
-        afterLineNumber: 0,
-        heightInPx: 4,
-        domNode: document.createElement('div'),
-      })
-    })
+  // const onMount: OnMount = async (editor) => {
+  //   // Add margin above first line
+  //   editor.changeViewZones((accessor) => {
+  //     accessor.addZone({
+  //       afterLineNumber: 0,
+  //       heightInPx: 4,
+  //       domNode: document.createElement('div'),
+  //     })
+  //   })
 
-    if (resolvedTheme) {
-      const mode: any = getTheme(resolvedTheme)
-      monacoRef.current.editor.defineTheme('supabase', mode)
-    }
-  }
+  //   if (resolvedTheme) {
+  //     const mode: any = getTheme(resolvedTheme)
+  //     monacoRef.current.editor.defineTheme('supabase', mode)
+  //   }
+  // }
 
   const optionsMerged = merge(
     {
@@ -110,14 +83,16 @@ const MonacoEditor = ({
     <Editor
       path={id}
       theme="supabase"
-      className={cn('bg-alternative [&>div]:p-0')}
+      className={'bg-alternative [&>div]:p-0'}
       value={value ?? undefined}
       defaultLanguage={language}
       defaultValue={defaultValue ?? undefined}
       loading={false}
       options={optionsMerged}
       beforeMount={beforeMount}
-      onMount={onMount}
+      // onMount={onMount}
     />
   )
 }
+
+export { MonacoEditor }
