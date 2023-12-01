@@ -1,10 +1,13 @@
+import { ReactNode } from 'react'
+
 const images = {}
 
-type StepIconType = 'productHunt' | 'video' | 'docs' | 'xSpace'
+type StepLinkType = 'productHunt' | 'video' | 'docs' | 'xSpace'
 
 export interface StepLink {
-  icon: StepIconType
-  text: string
+  type: StepLinkType
+  text?: string
+  icon?: any
   href: string
 }
 
@@ -17,7 +20,6 @@ export interface StepProps {
   github?: string
   hackernews?: string
   product_hunt?: string
-  isNew?: boolean
   thumb?: string
   url?: string
   video?: string
@@ -36,7 +38,9 @@ export interface WeekDayProps {
   shipped: boolean
   date: string
   published_at: string
-  description: string
+  isToday?: boolean
+  hasCountdown?: boolean
+  description: string | ReactNode
   d: number
   dd: string
   links?: StepLink[]
@@ -49,25 +53,47 @@ export const endOfLW8 = '2023-12-15T23:59:59.999-08:00'
 
 const days: WeekDayProps[] = [
   {
-    title: '',
-    shipped: false,
-    date: '08 Dec',
-    published_at: '2023-12-08T08:00:00.000-08:00',
-    description: '',
-    d: 0,
-    dd: 'Pre-release',
-    blog: '',
-    steps: [],
-  },
-  {
-    title: '',
-    shipped: false,
+    title: 'Lorem ipsum',
+    shipped: true,
+    isToday: true,
+    hasCountdown: true,
     date: '11 Dec',
     published_at: '2023-12-11T08:00:00.000-08:00',
-    description: '',
+    description: (
+      <>
+        Read Replicas Placeholder title for blog post for{' '}
+        <strong className="text-foreground">the first day of Launch Week</strong>, can be a bit
+        longer and then few things highlighted
+      </>
+    ),
     d: 1,
     dd: 'Mon',
-    steps: [],
+    links: [
+      {
+        type: 'productHunt',
+        href: '',
+      },
+      {
+        type: 'video',
+        href: '',
+      },
+      {
+        type: 'xSpace',
+        href: '',
+      },
+      {
+        type: 'docs',
+        href: '',
+      },
+    ],
+    steps: [
+      {
+        title: "Why we'll stay remote",
+        blog: '/blog/why-supabase-remote',
+        // bg_layers: [{ img: images['00-stay-remote'] }],
+        steps: [],
+      },
+    ],
   },
   {
     title: '',
