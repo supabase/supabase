@@ -1,32 +1,37 @@
-import { OpenAIStream, StreamingTextResponse } from 'ai'
+import { OpenAIStream, streamToResponse } from 'ai'
 import { codeBlock, oneLine, stripIndent } from 'common-tags'
-import { NextRequest } from 'next/server'
+import apiWrapper from 'lib/api/apiWrapper'
+import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next'
 import OpenAI from 'openai'
-
-export const runtime = 'edge'
 
 const openAiKey = process.env.OPENAI_KEY
 
-export default async function POST(req: NextRequest) {
+const handler: NextApiHandler = (req, res) => {
   if (!openAiKey) {
-    return new Response(
-      JSON.stringify({
-        error: 'No OPENAI_KEY set. Create this environment variable to use AI features.',
-      }),
-      {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      }
-    )
+    return res.status(500).json({
+      error: 'No OPENAI_KEY set. Create this environment variable to use AI features.',
+    })
   }
 
-  const openai = new OpenAI({ apiKey: openAiKey })
+  const { method } = req
 
-  let body = await (req.json() as Promise<{
+  switch (method) {
+    case 'POST':
+      return handlePost(req, res)
+    default:
+      res.setHeader('Allow', ['POST'])
+      res.status(405).json({ error: `Method ${method} Not Allowed` })
+  }
+}
+
+async function handlePost(req: NextApiRequest, res: NextApiResponse) {
+  const openai = new OpenAI({ apiKey: openAiKey })
+  const { body } = req
+
+  const { messages, entityDefinitions } = body as {
     messages: { content: string; role: 'user' | 'assistant' }[]
     entityDefinitions: string[]
-  }>)
-  let { messages, entityDefinitions } = body
+  }
 
   const initMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
     {
@@ -76,21 +81,17 @@ export default async function POST(req: NextRequest) {
 
   try {
     const response = await openai.chat.completions.create(completionOptions)
-    // Proxy the streamed SSE response from OpenAI
     const stream = OpenAIStream(response)
-
-    return new StreamingTextResponse(stream)
+    return streamToResponse(stream, res)
   } catch (error: any) {
     console.error(error)
 
-    return new Response(
-      JSON.stringify({
-        error: 'There was an error processing your request',
-      }),
-      {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      }
-    )
+    return res.status(500).json({
+      error: 'There was an error processing your request',
+    })
   }
 }
+
+const wrapper = (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
+
+export default wrapper
