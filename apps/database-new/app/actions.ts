@@ -168,6 +168,20 @@ export async function createThread(prevState: any, formData: FormData) {
       console.error(error)
     }
 
+    // insert into supabase
+    try {
+      const { error } = await supabase.from('messages_user').insert({
+        message_id: message.id,
+        thread_id: thread.id,
+        text: message.content[0].text.value,
+        run_id: run.id,
+        user_id: user.id,
+      })
+      if (error) throw error
+    } catch (error) {
+      console.error(error)
+    }
+
     redirectUrl = `/${thread.id}/${run.id}/${message.id}`
   } catch (error: any) {
     console.error(error)
@@ -206,6 +220,34 @@ export async function updateThread(prevState: any, formData: FormData) {
     })
 
     revalidatePath(`/${data.threadId}/${data.runId}`, 'layout')
+
+    // insert into supabase
+
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser()
+
+    if (userError || !user) {
+      return {
+        success: false,
+        message: 'Failed to get user',
+        data: undefined,
+      }
+    }
+
+    try {
+      const { error } = await supabase.from('messages_user').insert({
+        message_id: message.id,
+        thread_id: data.threadId,
+        text: message.content[0].text.value,
+        run_id: data.runId,
+        user_id: user.id,
+      })
+      if (error) throw error
+    } catch (error) {
+      console.error(error)
+    }
 
     const run = await openai.beta.threads.runs.create(message.thread_id, {
       assistant_id: 'asst_oLWrK8lScZVNEpfjwUIvBAnq',

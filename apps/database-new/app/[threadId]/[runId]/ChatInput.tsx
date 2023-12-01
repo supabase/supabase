@@ -23,7 +23,7 @@ function ChatInput({ params }: { params: { threadId: string; runId: string } }) 
   const Message = () => {
     const { pending } = useFormStatus()
 
-    console.log(pending)
+    // console.log(pending)
 
     return !state.success && state.success !== undefined && !pending ? (
       <p className="text-xs text-warning text-center w-full p-3">{state.message}</p>

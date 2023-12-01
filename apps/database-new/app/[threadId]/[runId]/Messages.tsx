@@ -51,11 +51,11 @@ async function Messages({ params }: { params: { threadId: string; runId: string 
 
   const messagesSorted = sortBy(messages, (m) => m.created_at)
 
-  console.log('messagesSorted', messagesSorted)
+  // console.log('messagesSorted', messagesSorted)
 
   const userMessages = messagesSorted.filter((message) => message.role === 'user')
 
-  console.log('userMessages', userMessages)
+  // console.log('userMessages', userMessages)
 
   return (
     <div className="flex flex-col py-2 xl:py-6">
