@@ -14,19 +14,27 @@ import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import InformationBox from 'components/ui/InformationBox'
 import { tableKeys } from 'data/tables/keys'
+import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 interface PoliciesProps {
   tables: PostgresTable[]
   hasTables: boolean
   isLocked: boolean
+  onSelectEditPolicy: (policy: PostgresPolicy) => void
 }
 
-const Policies = ({ tables, hasTables, isLocked }: PoliciesProps) => {
+const Policies = ({
+  tables,
+  hasTables,
+  isLocked,
+  onSelectEditPolicy: onSelectEditPolicyAI,
+}: PoliciesProps) => {
   const router = useRouter()
   const { ref } = useParams()
 
   const { ui, meta } = useStore()
   const queryClient = useQueryClient()
+  const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
   const roles = meta.roles.list((role: PostgresRole) => !meta.roles.systemRoles.includes(role.name))
 
   const [selectedSchemaAndTable, setSelectedSchemaAndTable] = useState<any>({})
@@ -57,8 +65,12 @@ const Policies = ({ tables, hasTables, isLocked }: PoliciesProps) => {
   }
 
   const onSelectEditPolicy = (policy: any) => {
-    setSelectedPolicyToEdit(policy)
-    setSelectedSchemaAndTable({ schema: policy.schema, table: policy.table })
+    if (isAiAssistantEnabled) {
+      onSelectEditPolicyAI(policy)
+    } else {
+      setSelectedPolicyToEdit(policy)
+      setSelectedSchemaAndTable({ schema: policy.schema, table: policy.table })
+    }
   }
 
   const onSelectDeletePolicy = (policy: any) => {

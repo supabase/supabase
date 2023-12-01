@@ -1,13 +1,13 @@
-import { ModalProps } from '@ui/components/Modal/Modal'
-import { useLocalStorageQuery, useSelectedOrganization, useStore } from 'hooks'
-import { IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
 import Link from 'next/link'
 import { Alert, IconExternalLink, Modal, Toggle } from 'ui'
-export interface AISettingsModalProps {
-  visible: boolean
-}
 
-const AISettingsModal = (props: ModalProps) => {
+import { useLocalStorageQuery, useSelectedOrganization, useStore } from 'hooks'
+import { IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
+import { useAppStateSnapshot } from 'state/app-state'
+
+const AISettingsModal = () => {
+  const snap = useAppStateSnapshot()
+
   const selectedOrganization = useSelectedOrganization()
   const isOptedInToAI = selectedOrganization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
   const [hasEnabledAISchema, setHasEnabledAISchema] = useLocalStorageQuery(
@@ -24,7 +24,12 @@ const AISettingsModal = (props: ModalProps) => {
   }
 
   return (
-    <Modal header="SQL Editor AI Settings" hideFooter closable {...props}>
+    <Modal
+      header="Supabase AI Settings"
+      hideFooter
+      visible={snap.showAiSettingsModal}
+      onCancel={() => snap.setShowAiSettingsModal(false)}
+    >
       <div className="flex flex-col items-start justify-between gap-4 px-6 py-3">
         {IS_PLATFORM && !isOptedInToAI && selectedOrganization && (
           <Alert

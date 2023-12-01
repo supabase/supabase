@@ -10,24 +10,32 @@ import Telemetry from 'lib/telemetry'
 import { useAppStateSnapshot } from 'state/app-state'
 import APISidePanelPreview from './APISidePanelPreview'
 import { useFeaturePreviewContext } from './FeaturePreviewContext'
-
-// [Ivan] We should probably move this to a separate file, together with LOCAL_STORAGE_KEYS. We should make adding new feature previews as simple as possible.
-
-const FEATURE_PREVIEWS: { key: string; name: string; content: any; discussionsUrl?: string }[] = [
-  // {
-  //   key: LOCAL_STORAGE_KEYS.UI_PREVIEW_NAVIGATION_LAYOUT,
-  //   name: 'Global navigation update',
-  //   content: null,
-  // },
-  {
-    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
-    name: 'Project API documentation',
-    content: <APISidePanelPreview />,
-    discussionsUrl: 'https://github.com/orgs/supabase/discussions/18038',
-  },
-]
+import RLSAIAssistantPreview from './RLSAIAssistantPreview'
+import { useFlag } from 'hooks'
 
 const FeaturePreviewModal = () => {
+  const isAiAssistantEnabled = useFlag('policyEditorWithAi')
+
+  // [Ivan] We should probably move this to a separate file, together with LOCAL_STORAGE_KEYS. We should make adding new feature previews as simple as possible.
+  const FEATURE_PREVIEWS: { key: string; name: string; content: any; discussionsUrl?: string }[] = [
+    {
+      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
+      name: 'Project API documentation',
+      content: <APISidePanelPreview />,
+      discussionsUrl: 'https://github.com/orgs/supabase/discussions/18038',
+    },
+    ...(isAiAssistantEnabled
+      ? [
+          {
+            key: LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT,
+            name: 'AI Assistant for RLS policies',
+            content: <RLSAIAssistantPreview />,
+            discussionsUrl: '/', // Need to update
+          },
+        ]
+      : []),
+  ]
+
   const router = useRouter()
   const snap = useAppStateSnapshot()
   const telemetryProps = useTelemetryProps()
