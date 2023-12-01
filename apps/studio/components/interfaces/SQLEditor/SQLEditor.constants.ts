@@ -1295,6 +1295,19 @@ create extension "supabase-dbdev";
   ORDER BY table_size DESC
   LIMIT 25`.trim(),
   },
+  {
+    id: 26,
+    type: 'template',
+    title: 'Add Auth Hooks (MFA Verification Attempt)',
+    description: 'Write a PostgreSQL Hook to customize MFA Verification Flow',
+    sql: `create or replace function public.track_mfa_verification(event jsonb)
+      returns jsonb as $$
+      declare
+        recent_attempts int;
+      begin
+    end;
+   $$ language plpgsql;`.trim(),
+  },
 ]
 
 export const SQL_SNIPPET_SCHEMA_VERSION = '1.0'
