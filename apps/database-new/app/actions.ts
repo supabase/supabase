@@ -131,7 +131,7 @@ export async function createThread(prevState: any, formData: FormData) {
 
     const thread = await openai.beta.threads.create()
 
-    await openai.beta.threads.messages.create(thread.id, {
+    const message = await openai.beta.threads.messages.create(thread.id, {
       role: 'user',
       content: data.value,
     })
@@ -156,7 +156,6 @@ export async function createThread(prevState: any, formData: FormData) {
       .find((text) => text !== undefined)
 
     try {
-      console.log('inserting thread')
       const { error } = await supabase.from('threads').insert({
         thread_id: thread.id,
         run_id: run.id,
@@ -169,7 +168,7 @@ export async function createThread(prevState: any, formData: FormData) {
       console.error(error)
     }
 
-    redirectUrl = `/${thread.id}/${run.id}`
+    redirectUrl = `/${thread.id}/${run.id}/${message.id}`
   } catch (error: any) {
     console.error(error)
     return {
@@ -187,8 +186,6 @@ export async function updateThread(prevState: any, formData: FormData) {
   const supabase = createClient(cookieStore)
 
   let redirectUrl = ''
-
-  console.log('trying..')
 
   try {
     const schema = z.object({

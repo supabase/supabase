@@ -23,8 +23,6 @@ const NewThreadInput = () => {
     return ''
   })
 
-  console.log('value', value)
-
   const initialState = {
     message: undefined,
     success: undefined,
