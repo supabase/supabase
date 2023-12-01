@@ -358,5 +358,13 @@
     "position": "Engineering",
     "author_url": "https://twitter.com/beertocode",
     "author_image_url": "https://github.com/loong.png"
+  },
+  {
+    "author_id": "kamil_ogorek",
+    "author": "Kamil Ogórek",
+    "username": "kamil",
+    "position": "Integrations Lead",
+    "author_url": "https://twitter.com/kamilogorek",
+    "author_image_url": "https://github.com/kamilogorek.png"
   }
 ]
