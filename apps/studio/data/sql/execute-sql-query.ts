@@ -6,8 +6,11 @@ import {
   UseQueryOptions,
 } from '@tanstack/react-query'
 import md5 from 'blueimp-md5'
-import { post } from 'data/fetchers'
 import { useCallback } from 'react'
+
+import { post } from 'data/fetchers'
+import { ROLE_IMPERSONATION_NO_RESULTS } from 'lib/role-impersonation'
+import { getRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { sqlKeys } from './keys'
 
 export type Error = { code: number; message: string; requestId: string }
@@ -38,6 +41,8 @@ export async function executeSql(
   let headers = new Headers()
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
+  const isRoleImpersonationEnabled = getRoleImpersonationStateSnapshot().role?.type === 'postgrest'
+
   const { data, error } = await post('/platform/pg-meta/{ref}/query', {
     signal,
     params: {
@@ -54,6 +59,15 @@ export async function executeSql(
     if (handleError !== undefined) return handleError(error)
     else throw error
   }
+
+  if (
+    isRoleImpersonationEnabled &&
+    Array.isArray(data) &&
+    data?.[0]?.[ROLE_IMPERSONATION_NO_RESULTS] === 1
+  ) {
+    return { result: [] }
+  }
+
   return { result: data }
 }
 

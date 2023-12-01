@@ -78,9 +78,11 @@ export function getPostgrestRoleImpersonationSql(
   `.trim()
 }
 
+export const ROLE_IMPERSONATION_NO_RESULTS = 'ROLE_IMPERSONATION_NO_RESULTS'
+
 export function getCustomRoleImpersonationSql(roleName: string) {
   return /* SQL */ `
-    set role '${roleName}';
+    set local role '${roleName}';
   `
 }
 
@@ -104,6 +106,11 @@ export function wrapWithRoleImpersonation(
 
   return /* SQL */ `
     ${impersonationSql}
+
+    -- If the users sql returns no rows, pg-meta will
+    -- fallback to returning the result of the impersonation sql.
+    select 1 as "${ROLE_IMPERSONATION_NO_RESULTS}";
+
     ${sql}
   `
 }
