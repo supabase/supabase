@@ -7,6 +7,7 @@ import { useRouter } from 'next/router'
 import { Badge, Button, IconLock } from 'ui'
 
 import { useCheckPermissions } from 'hooks'
+import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 interface PolicyTableRowHeaderProps {
   table: PostgresTable
@@ -23,6 +24,7 @@ const PolicyTableRowHeader = ({
 }: PolicyTableRowHeaderProps) => {
   const router = useRouter()
   const { ref } = router.query
+  const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
   const canToggleRLS = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
   const canCreatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
 
@@ -46,36 +48,7 @@ const PolicyTableRowHeader = ({
       </div>
       {!isLocked && (
         <div className="flex-1">
-          <div className="flex flex-row-reverse">
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
-                <Button
-                  type="outline"
-                  disabled={!canCreatePolicies}
-                  className="ml-2"
-                  onClick={() => onSelectCreatePolicy(table)}
-                >
-                  New Policy
-                </Button>
-              </Tooltip.Trigger>
-              {!canCreatePolicies && (
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-alternative py-1 px-2 leading-none shadow',
-                        'border border-background',
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-foreground">
-                        You need additional permissions to create RLS policies
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              )}
-            </Tooltip.Root>
+          <div className="flex flex-row justify-end gap-x-2">
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger>
                 <Button
@@ -104,6 +77,36 @@ const PolicyTableRowHeader = ({
                 </Tooltip.Portal>
               )}
             </Tooltip.Root>
+            {!isAiAssistantEnabled && (
+              <Tooltip.Root delayDuration={0}>
+                <Tooltip.Trigger>
+                  <Button
+                    type="outline"
+                    disabled={!canCreatePolicies}
+                    onClick={() => onSelectCreatePolicy(table)}
+                  >
+                    New Policy
+                  </Button>
+                </Tooltip.Trigger>
+                {!canCreatePolicies && (
+                  <Tooltip.Portal>
+                    <Tooltip.Content side="bottom">
+                      <Tooltip.Arrow className="radix-tooltip-arrow" />
+                      <div
+                        className={[
+                          'rounded bg-alternative py-1 px-2 leading-none shadow',
+                          'border border-background',
+                        ].join(' ')}
+                      >
+                        <span className="text-xs text-foreground">
+                          You need additional permissions to create RLS policies
+                        </span>
+                      </div>
+                    </Tooltip.Content>
+                  </Tooltip.Portal>
+                )}
+              </Tooltip.Root>
+            )}
           </div>
         </div>
       )}
