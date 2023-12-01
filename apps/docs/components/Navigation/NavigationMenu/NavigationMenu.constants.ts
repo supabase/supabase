@@ -501,7 +501,6 @@ export const auth = {
       name: 'Authentication',
       url: undefined,
       items: [
-        { name: 'User Management', url: '/guides/auth/auth-user-management' },
         { name: 'Email Login', url: '/guides/auth/auth-email' },
         {
           name: 'Passwordless Login',
@@ -542,6 +541,16 @@ export const auth = {
         {
           name: 'User Sessions',
           url: '/guides/auth/sessions',
+        },
+        {
+          name: 'User Management',
+          url: '/guides/auth/auth-user-management',
+          items: [
+            {
+              name: 'Identity Linking',
+              url: '/guides/auth/auth-identity-linking',
+            },
+          ],
         },
         {
           name: 'Enterprise SSO',

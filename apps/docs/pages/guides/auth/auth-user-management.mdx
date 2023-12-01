@@ -8,122 +8,79 @@ export const meta = {
 }
 
 ## The User Object
+
 The user object stores all the information related to a user in your application. The user object can be retrieved using one of these methods:
-1. [`supabase.auth.getUser()`](/docs/reference/javascript/auth-getuser) 
+
+1. [`supabase.auth.getUser()`](/docs/reference/javascript/auth-getuser)
 2. Retrieve a user object as an admin using [`supabase.auth.admin.getUserById()`](/docs/reference/javascript/auth-admin-listusers)
 
 A user can sign in with one of the following methods:
+
 - Password-based method (with email or phone)
 - Passwordless method (with email or phone)
 - OAuth
-- SAML SSO 
+- SAML SSO
 
 An identity describes the authentication method that a user can use to sign in. A user can have multiple identities. These are the types of identities supported:
-- Email 
+
+- Email
 - Phone
 - OAuth
-- SAML 
+- SAML
 
 <Admonition type="note">
 
-A user with an email or phone identity will be able to sign in with either a password or passwordless method (e.g. use a one-time password (OTP) or magiclink). By default, a user with an unverified email or phone number will not be able to sign in. 
+A user with an email or phone identity will be able to sign in with either a password or passwordless method (e.g. use a one-time password (OTP) or magiclink). By default, a user with an unverified email or phone number will not be able to sign in.
 
 </Admonition>
 
-A user that uses Google OAuth and Email to sign-in will have a user object that contains the following attributes:
-```json
-{
-  "id": "00000000-0000-0000-0000-000000000000",
-  "aud": "authenticated",
-  "role": "authenticated", // the role used by Postgres to perform Role Level Security (RLS) checks 
-  "email": "foo@example.com",
-  "email_confirmed_at": "2023-11-03T16:36:32.25225-04:00",
-  "phone": "",
-  "confirmed_at": "2023-11-03T16:36:32.25225-04:00",
-  "last_sign_in_at": "2023-11-06T17:02:38.286339-05:00",
-  "app_metadata": {
-    "provider": "google", // the first provider the user used to sign up with
-    "providers": [        // the other providers used by the user
-      "google",
-      "email"
-    ]
-  },
-  "user_metadata": {      // defaults to the first provider's identity data but can contain additional custom user metadata
-    "avatar_url": "",
-    "email": "foo@example.com",
-    "email_verified": true,
-    "full_name": "Foo Bar",
-    "iss": "https://projectref.supabase.com",
-    "name": "Foo",
-    "picture": "",
-    "sub": "000000000000000000000" // the id returned by the provider
-  },
-  "identities": [ // the identities linked to a user
-    {
-      "id": "000000000000000000000",
-      "user_id": "00000000-0000-0000-0000-000000000000",
-      "identity_data": {
-        "avatar_url": "",
-        "email": "foo@example.com",
-        "email_verified": true,
-        "full_name": "Foo Bar",
-        "iss": "https://projectref.supabase.com",
-        "name": "Foo",
-        "picture": "",
-        "sub": "000000000000000000000"
-      },
-      "provider": "google",
-      "last_sign_in_at": "2023-11-03T16:36:32.247986-04:00", // the time that the identity was last used to sign in 
-      "created_at": "2023-11-03T16:36:32.248001-04:00", // the time that the identity was created
-      "updated_at": "2023-11-06T17:02:38.271966-05:00" // the time that the identity was last updated
-    },
-    {
-      "id": "00000000-0000-0000-0000-000000000000",
-      "user_id": "00000000-0000-0000-0000-000000000000",
-      "identity_data": {
-        "email": "foo@example.com",
-        "sub": "00000000-0000-0000-0000-000000000000"
-      },
-      "provider": "email",
-      "last_sign_in_at": "2023-11-03T16:42:50.928343-04:00",
-      "created_at": "2023-11-03T16:42:50.928367-04:00", 
-      "updated_at": "2023-11-03T16:42:50.928367-04:00"
-    }
-  ],
-  "created_at": "2023-11-03T16:36:32.238822-04:00", // the time that the user signed up 
-  "updated_at": "2023-11-06T17:02:38.295236-05:00" // the time that the user object was last updated
-}
-```
+The user object contains the following attributes:
+
+| Attributes         | Type             | Description                                                                                                                                                                                                                                          |
+| ------------------ | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| id                 | `string`         | The unique id of the identity of the user.                                                                                                                                                                                                           |
+| aud                | `string`         | The audience claim.                                                                                                                                                                                                                                  |
+| role               | `string`         | The role claim used by Postgres to perform Role Level Security (RLS) checks.                                                                                                                                                                         |
+| email              | `string`         | The user's email address.                                                                                                                                                                                                                            |
+| email_confirmed_at | `string`         | The timestamp that the user's email was confirmed. If null, it means that the user's email is not confirmed.                                                                                                                                         |
+| phone              | `string`         | The user's phone number.                                                                                                                                                                                                                             |
+| phone_confirmed_at | `string`         | The timestamp that the user's phone was confirmed. If null, it means that the user's phone is not confirmed.                                                                                                                                         |
+| confirmed_at       | `string`         | The timestamp that either the user's email or phone was confirmed. If null, it means that the user does not have a confirmed email address and phone number.                                                                                         |
+| last_sign_in_at    | `string`         | The timestamp that the user last signed in.                                                                                                                                                                                                          |
+| app_metadata       | `object`         | The `provider` attribute indicates the first provider that the user used to sign up with. The `providers` attribute indicates the list of providers that the user can use to login with.                                                             |
+| user_metadata      | `object`         | Defaults to the first provider's identity data but can contain additional custom user metadata if specified. Refer to [**User Identity**](/docs/guides/auth/auth-identity-linking#the-user-identity) for more information about the identity object. |
+| identities         | `UserIdentity[]` | Contains an object array of identities linked to the user.                                                                                                                                                                                           |
+| created_at         | `string`         | The timestamp that the user was created.                                                                                                                                                                                                             |
+| updated_at         | `string`         | The timestamp that the user was last updated.                                                                                                                                                                                                        |
 
 ## Configuration
+
 Supabase Auth provides these [configuration options](/dashboard/project/_/settings/auth) to control user access to your application:
+
 - **Allow new users to sign up**: Users will be able to sign up. If this config is disabled, only existing users can sign in.
 - **Allow unverified email sign in**: Users will not need to have a verified email address to sign in.
-    - If enabled, you can structure your RLS policies to provide different access controls to a user with an unverified email and a user with a verified email. For example, 
-    ```sql
-    -- Allows a user to read all posts regardless of whether they have a verified email address
-    create policy "policy_name"
-    ON public.posts
-    for select to authenticated using (
-        true
-    );
 
-    -- Only allow users with a verified email address to insert posts
-    create policy "policy_name"
-    ON public.posts
-    for insert to authenticated with check (
-        auth.jwt()->>'email_verified' is true
-    );
-    ```
+  - If enabled, you can structure your RLS policies to provide different access controls to a user with an unverified email and a user with a verified email. For example,
+
+  ```sql
+  -- Allows a user to read all posts regardless of whether they have a verified email address
+  create policy "policy_name"
+  ON public.posts
+  for select to authenticated using (
+      true
+  );
+
+  -- Only allow users with a verified email address to insert posts
+  create policy "policy_name"
+  ON public.posts
+  for insert to authenticated with check (
+      auth.jwt()->>'email_verified' is true
+  );
+  ```
+
 - **Confirm Email (Deprecated)**: Users will need to confirm their email address before signing in for the first time.
-    - Having **Confirm Email** disabled assumes that the user's email does not need to be verified in order to login and implicitly confirms the user's email in the database.
-    - If you previously relied on this config to autoconfirm a user's email address, you can switch to use **Allow unverified email sign in** instead. This new option allows the user to sign in with an unverified email which you can keep track of through the user object. It provides more versatility if you require your users to verify their email address in the future since you can structure your RLS policies to check the user's `email_verified` field.
-
-## Linking user identities
-Currently, Supabase Auth only supports automatic linking through verified emails. This means that an identity will only be linked to a user if it has a verified email address. For example, when a user tries to sign-in with OAuth, Supabase Auth does the following checks:
-1. Check if the OAuth identity contains a verified email address
-2. Check if there exists another user with the same email address 
-3. Link the OAuth identity to the user with the same email address 
+  - Having **Confirm Email** disabled assumes that the user's email does not need to be verified in order to login and implicitly confirms the user's email in the database.
+  - If you previously relied on this config to autoconfirm a user's email address, you can switch to use **Allow unverified email sign in** instead. This new option allows the user to sign in with an unverified email which you can keep track of through the user object. It provides more versatility if you require your users to verify their email address in the future since you can structure your RLS policies to check the user's `email_verified` field.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
