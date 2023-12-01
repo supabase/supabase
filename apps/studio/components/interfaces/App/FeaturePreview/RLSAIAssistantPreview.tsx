@@ -15,7 +15,7 @@ const RLSAIAssistantPreview = () => {
         />
         <Markdown
           className="text-foreground-light max-w-full"
-          content={`Let our AI assistant handle the SQL while you focus on building the rules for your policies.`}
+          content={`Let our AI Assistant handle the SQL while you focus on building the rules for your policies.`}
         />
       </div>
       <Image
