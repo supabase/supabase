@@ -979,6 +979,7 @@ commands:
         name: --db-password <string>
         description: Database password of the project.
         default_value: ''
+        required: true
       - id: interactive
         name: -i, --interactive
         description: Enables interactive mode.
