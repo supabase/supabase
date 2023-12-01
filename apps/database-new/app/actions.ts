@@ -170,16 +170,6 @@ export async function updateThread(prevState: any, formData: FormData) {
     }
 
     redirectUrl = `/${thread.id}/${run.id}`
-    console.log('threadid:', thread.id)
-    console.log('runid:', run.id)
-
-    // return {
-    //   success: true,
-    //   message: 'New schema being created with prompt: ' + prompt,
-    //   data: {
-    //     value: data.value,
-    //   },
-    // }
   } catch (error: any) {
     console.error(error)
     return {
@@ -189,6 +179,5 @@ export async function updateThread(prevState: any, formData: FormData) {
     }
   }
 
-  console.log('url:', redirectUrl)
   redirect(redirectUrl)
 }
