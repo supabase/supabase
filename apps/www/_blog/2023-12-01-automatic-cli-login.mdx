@@ -40,7 +40,7 @@ With your identity confirmed, the CLI sends the provided session data to our man
 
 The Management API generates a new access token for your account, creates its pair of ECDH keys, and encrypts the token using your public key and the server's private key. This encrypted token, alongside the server's public key, your session ID, and expiration date, is then stored in our database.
 
-The Management API generates a new access token for your account. To send it back to your CLI it needs to be stored in a database.
+To send it back to your CLI it needs to be stored in a database.
 
 ## Securely exchanging the token using ECDH
 
