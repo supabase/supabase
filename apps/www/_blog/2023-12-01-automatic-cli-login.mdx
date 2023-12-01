@@ -23,7 +23,16 @@ But what if logging in were as simple as typing `supabase login` and, if you wer
 
 When you type `supabase login`, several things occur. First, a random UUID is generated to represent your unique login attempt. Next, a token name is created using your username, machine name, and the current timestamp. Most importantly, a pair of private/public P-256 elliptic curve Diffie-Hellman (ECDH) keys is generated. These keys remain valid only for the duration of the process; once you log in or cancel the CLI process, they become unusable.
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/lNgsIITU3pc?si=X6KE7X819Hk_yMT0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+<div className="video-container">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/lNgsIITU3pc?si=X6KE7X819Hk"
+    title="YouTube video player"
+    frameBorder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+  ></iframe>
+</div>
 
 After gathering all this data, a unique URL is generated containing the session ID, token name, and your public key. The CLI then attempts to open this URL in your current environment's default browser. Once it opens, it verifies your authentication. If you're not authenticated, you're redirected to the login page, prompted to log into the dashboard, and upon successful authentication, redirected back to the originally requested page.
 
