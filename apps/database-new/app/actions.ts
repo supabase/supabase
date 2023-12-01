@@ -101,13 +101,23 @@ export async function updateThreadName(prevState: any, formData: FormData) {
 }
 
 export async function getThreadData(threadId: string, runId: string, messageId: string) {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/ai/sql/threads/${threadId}/read/${runId}`,
-    {
-      method: 'GET',
+  let data
+
+  while (true) {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/ai/sql/threads/${threadId}/read/${runId}`,
+      {
+        method: 'GET',
+      }
+    )
+    data = await response.json()
+
+    // exit the loop when data.status is 'completed'
+    if (data.status === 'completed') {
+      break
     }
-  )
-  const data = await response.json()
+  }
+
   const messages = sortBy(data.messages, (m) => m.created_at)
 
   const userMessages = messages.filter((m) => m.role === 'user')
