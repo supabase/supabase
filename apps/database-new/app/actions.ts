@@ -121,7 +121,7 @@ export async function updateThread(prevState: any, formData: FormData) {
       error: userError,
     } = await supabase.auth.getUser()
 
-    if (userError) {
+    if (userError || !user) {
       return {
         success: false,
         message: 'Failed to get user',
