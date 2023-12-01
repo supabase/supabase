@@ -93,7 +93,7 @@ Let's set up a Svelte component to manage logins and sign ups. We'll use Magic L
   <div class="col-6 form-widget" aria-live="polite">
     <h1 class="header">Supabase + Svelte</h1>
     <p class="description">Sign in via magic link with your email below</p>
-    <form class="form-widget" on:submit|preventDefault="{handleLogin}">
+    <form class="form-widget" on:submit|preventDefault={handleLogin}>
       <div>
         <label for="email">Email</label>
         <input
@@ -101,11 +101,11 @@ Let's set up a Svelte component to manage logins and sign ups. We'll use Magic L
           class="inputField"
           type="email"
           placeholder="Your email"
-          bind:value="{email}"
+          bind:value={email}
         />
       </div>
       <div>
-        <button type="submit" class="button block" aria-live="polite" disabled="{loading}">
+        <button type="submit" class="button block" aria-live="polite" disabled={loading}>
           <span>{loading ? 'Loading' : 'Send magic link'}</span>
         </button>
       </div>
@@ -272,9 +272,9 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
   import { supabase } from '../supabaseClient'
 
   export let size: number
-  export let url: string
+  export let url: string | null = null
 
-  let avatarUrl: string = null
+  let avatarUrl: string | null = nul
   let uploading = false
   let files: FileList
 
@@ -344,8 +344,8 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
         id="single"
         accept="image/*"
         bind:files
-        on:change="{uploadAvatar}"
-        disabled="{uploading}"
+        on:change={uploadAvatar}
+        disabled={uploading}
       />
     </span>
   </div>
@@ -358,13 +358,17 @@ And then we can add the widget to the Account page:
 
 ```html src/lib/Account.svelte
 <script lang="ts">
+  // Other import elements
+
   // Import the new component
   import Avatar from './Avatar.svelte'
+
+  // Other elements
 </script>
 
-<form on:submit|preventDefault="{updateProfile}" class="form-widget">
+<form on:submit|preventDefault={updateProfile} class="form-widget">
   <!-- Add to body -->
-  <Avatar bind:url="{avatarUrl}" size="{150}" on:upload="{updateProfile}" />
+  <Avatar bind:url={avatarUrl} size={150} on:upload={updateProfile} />
 
   <!-- Other form elements -->
 </form>
