@@ -53,8 +53,6 @@ const ConfirmDeleteThreadModal = ({
     )
   }
 
-  console.log('thread', thread)
-
   return (
     <Modal
       size="small"
