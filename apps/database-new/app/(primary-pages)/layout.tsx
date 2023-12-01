@@ -1,7 +1,8 @@
 'use client'
-import { Chat } from '@/app/[threadId]/Chat'
+
 import SaveSchemaDropdown from '@/components/Header/SaveSchemaDropdown'
 import ToggleCodeEditorButton from '@/components/Header/ToggleCodeEditorButton'
+import { Chat } from './[threadId]/Chat'
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (

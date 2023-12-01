@@ -1,7 +1,7 @@
-import { CodeEditor } from '@/app/[threadId]/[runId]/[messageId]/CodeEditor'
-import { SchemaFlow } from '@/app/[threadId]/[runId]/[messageId]/SchemaFlow'
 import { Loader2 } from 'lucide-react'
 import { Suspense } from 'react'
+import { SchemaFlow } from './SchemaFlow'
+import { CodeEditor } from './CodeEditor'
 
 interface ThreadPageProps {
   params: {
