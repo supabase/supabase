@@ -1,32 +1,24 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
+import { last } from 'lodash'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  Form_Shadcn_,
-  IconFileText,
-  IconGitBranch,
-  Modal,
-} from 'ui'
+import { Button, Form_Shadcn_, IconFileText, IconGitBranch, Modal } from 'ui'
 import * as z from 'zod'
 
 import SidePanelGitHubRepoLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelGitHubRepoLinker'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
+import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
 import { useCheckGithubBranchValidity } from 'data/integrations/integrations-github-branch-check'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization, useStore } from 'hooks'
 import { useAppStateSnapshot } from 'state/app-state'
+import BranchingPITRNotice from './BranchingPITRNotice'
+import BranchingPostgresVersionNotice from './BranchingPostgresVersionNotice'
 import GithubRepositorySelection from './GithubRepositorySelection'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { AlertCircleIcon } from 'lucide-react'
-import Link from 'next/link'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 const EnableBranchingModal = () => {
   const { ui } = useStore()
@@ -49,15 +41,19 @@ const EnableBranchingModal = () => {
     orgSlug: selectedOrg?.slug,
   })
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
-  const isFreePlan = subscription?.plan.id === 'free'
-
   const {
-    data: addons,
-    error: addonsError,
-    isLoading: isLoadingAddons,
-    isError: isErrorAddons,
-  } = useProjectAddonsQuery({ projectRef: ref })
+    data,
+    error: upgradeEligibilityError,
+    isLoading: isLoadingUpgradeEligibility,
+    isError: isErrorUpgradeEligibility,
+    isSuccess: isSuccessUpgradeEligibility,
+  } = useProjectUpgradeEligibilityQuery({
+    projectRef: ref,
+  })
+  const hasMinimumPgVersion =
+    Number(last(data?.current_app_version.split('-') ?? [])?.split('.')[0] ?? 0) >= 15
+
+  const { data: addons } = useProjectAddonsQuery({ projectRef: ref })
   const hasPitrEnabled =
     (addons?.selected_addons ?? []).find((addon) => addon.type === 'pitr') !== undefined
 
@@ -113,6 +109,10 @@ const EnableBranchingModal = () => {
     defaultValues: { branchName: '' },
   })
 
+  const isLoading = isLoadingIntegrations || isLoadingUpgradeEligibility
+  const isError = isErrorIntegrations || isErrorUpgradeEligibility
+  const isSuccess = isSuccessIntegrations && isSuccessUpgradeEligibility
+
   const canSubmit = form.getValues('branchName').length > 0 && !isChecking && isValid
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     if (!ref) return console.error('Project ref is required')
@@ -149,7 +149,7 @@ const EnableBranchingModal = () => {
               </div>
             </Modal.Content>
 
-            {(isLoadingIntegrations || isLoadingAddons) && (
+            {isLoading && (
               <>
                 <Modal.Separator />
                 <Modal.Content className="px-7 py-6">
@@ -159,94 +159,65 @@ const EnableBranchingModal = () => {
               </>
             )}
 
-            {isErrorAddons && (
+            {isError && (
               <>
                 <Modal.Separator />
                 <Modal.Content className="px-7 py-6">
-                  <AlertError error={addonsError} subject="Failed to retrieve project addons" />
+                  {isErrorIntegrations ? (
+                    <AlertError
+                      error={integrationsError}
+                      subject="Failed to retrieve integrations"
+                    />
+                  ) : isErrorUpgradeEligibility ? (
+                    <AlertError
+                      error={upgradeEligibilityError}
+                      subject="Failed to retrieve Postgres version"
+                    />
+                  ) : null}
                 </Modal.Content>
                 <Modal.Separator />
               </>
             )}
 
-            {isErrorIntegrations && (
+            {isSuccess && (
               <>
-                <Modal.Separator />
-                <Modal.Content className="px-7 py-6">
-                  <AlertError error={integrationsError} subject="Failed to retrieve integrations" />
-                </Modal.Content>
-                <Modal.Separator />
-              </>
-            )}
-
-            {isSuccessIntegrations && (
-              <GithubRepositorySelection
-                form={form}
-                isChecking={isChecking}
-                isValid={canSubmit}
-                integration={githubIntegration}
-                hasGithubIntegrationInstalled={hasGithubIntegrationInstalled}
-              />
-            )}
-
-            {!hasPitrEnabled && (
-              <Alert_Shadcn_ className="rounded-none px-7 py-6 [&>svg]:top-6 [&>svg]:left-6 !border-t-0 !border-l-0 !border-r-0">
-                {/* <AlertCircleIcon strokeWidth={2} /> */}
-                <AlertTitle_Shadcn_ className="text-base">
-                  We strongly encourage enabling Point in Time Recovery (PITR)
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
-                  This is to ensure that you can always recover data if you make a "bad migration".
-                  For example, if you accidentally delete a column or some of your production data.
-                </AlertDescription_Shadcn_>
-                {isFreePlan && (
-                  <AlertDescription_Shadcn_ className="mt-2">
-                    To enable PITR, you may first upgrade your organization's plan to at least Pro,
-                    then purchase the PITR add on for your project via the{' '}
-                    <Link
-                      href={`/project/${ref}/settings/addons?panel=pitr`}
-                      className="text-brand"
-                      onClick={() => snap.setShowEnableBranchingModal(false)}
-                    >
-                      project settings
-                    </Link>
-                    .
-                  </AlertDescription_Shadcn_>
+                {hasMinimumPgVersion ? (
+                  <>
+                    <GithubRepositorySelection
+                      form={form}
+                      isChecking={isChecking}
+                      isValid={canSubmit}
+                      integration={githubIntegration}
+                      hasGithubIntegrationInstalled={hasGithubIntegrationInstalled}
+                    />
+                    {!hasPitrEnabled && <BranchingPITRNotice />}
+                  </>
+                ) : (
+                  <BranchingPostgresVersionNotice />
                 )}
-                <Button size="tiny" type="default" className="mt-4">
-                  <Link
-                    href={
-                      isFreePlan
-                        ? `/org/${selectedOrg?.slug}/billing?panel=subscriptionPlan`
-                        : `/project/${ref}/settings/addons?panel=pitr`
-                    }
-                    onClick={() => snap.setShowEnableBranchingModal(false)}
-                  >
-                    {isFreePlan ? 'Upgrade to Pro' : 'Enable PITR add-on'}
-                  </Link>
-                </Button>
-              </Alert_Shadcn_>
-            )}
-
-            <Modal.Content className="px-7 py-6 flex flex-col gap-3">
-              <p className="text-sm text-foreground-light">Please keep in mind the following:</p>
-              <div className="flex flex-row gap-4">
-                <div>
-                  <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-300 flex items-center justify-center">
-                    <IconFileText className="text-amber-900" size={20} strokeWidth={2} />
-                  </figure>
-                </div>
-                <div className="flex flex-col gap-y-1">
-                  <p className="text-sm text-foreground">
-                    You will not be able to make changes to the database via the dashboard
-                  </p>
+                <Modal.Content className="px-7 py-6 flex flex-col gap-3">
                   <p className="text-sm text-foreground-light">
-                    Schema changes for database Preview Branches must be made using Git. Dashboard
-                    changes to Preview Branches are coming soon.
+                    Please keep in mind the following:
                   </p>
-                </div>
-              </div>
-            </Modal.Content>
+                  <div className="flex flex-row gap-4">
+                    <div>
+                      <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-300 flex items-center justify-center">
+                        <IconFileText className="text-amber-900" size={20} strokeWidth={2} />
+                      </figure>
+                    </div>
+                    <div className="flex flex-col gap-y-1">
+                      <p className="text-sm text-foreground">
+                        You will not be able to make changes to the database via the dashboard
+                      </p>
+                      <p className="text-sm text-foreground-light">
+                        Schema changes for database Preview Branches must be made using Git.
+                        Dashboard changes to Preview Branches are coming soon.
+                      </p>
+                    </div>
+                  </div>
+                </Modal.Content>
+              </>
+            )}
 
             <Modal.Separator />
 
@@ -265,7 +236,7 @@ const EnableBranchingModal = () => {
                   block
                   size="medium"
                   form={formId}
-                  disabled={isCreating || !canSubmit}
+                  disabled={!isSuccess || isCreating || !canSubmit}
                   loading={isCreating}
                   type="primary"
                   htmlType="submit"
