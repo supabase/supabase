@@ -73,12 +73,16 @@ const columnDefinitionSchema = z.object({
 })
 
 const tableDefinitionSchema = z.object({
-  CreateStmt: z.object({
-    relation: z.object({
-      relname: z.string(),
-    }),
-    tableElts: z.array(z.union([columnDefinitionSchema, constraintDefinitionSchema])),
-  }),
+  CreateStmt: z
+    .object({
+      relation: z.object({
+        relname: z.string(),
+      }),
+      tableElts: z.array(z.union([columnDefinitionSchema, constraintDefinitionSchema])),
+    })
+    // the optional() allows other types of statements, but only CreateStmt will be type-safe, we
+    // don't care for the other ones.
+    .optional(),
 })
 
 const parseQueryResultSchema = z.object({
@@ -117,9 +121,12 @@ export async function parseTables(sql: string) {
   }
 
   // This code generates all columns with their constraints
-  const pgTables: PostgresTable[] = parsedSql.data.stmts
-    .filter(({ stmt }) => 'CreateStmt' in stmt)
-    .map(({ stmt }) => {
+  const pgTables: PostgresTable[] = compact(
+    parsedSql.data.stmts.map(({ stmt }) => {
+      if (!stmt.CreateStmt) {
+        return
+      }
+
       const statement = stmt.CreateStmt
 
       const columns = compact(
@@ -250,6 +257,7 @@ export async function parseTables(sql: string) {
 
       return table
     })
+  )
 
   return pgTables
 }
