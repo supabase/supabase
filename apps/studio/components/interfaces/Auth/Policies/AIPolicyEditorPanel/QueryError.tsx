@@ -1,4 +1,4 @@
-import styles from '@ui/layout/ai-icon-animation/ai-icon-animation-style.module.css'
+import styles from '@ui-patterns/AiIconAnimation/AiIconAnimation.module.css'
 import { QueryResponseError } from 'data/sql/execute-sql-mutation'
 import { useState } from 'react'
 import {

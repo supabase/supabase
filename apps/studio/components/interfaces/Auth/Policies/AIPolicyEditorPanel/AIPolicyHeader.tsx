@@ -1,7 +1,7 @@
 import { Button, SheetClose_Shadcn_, SheetHeader_Shadcn_, SheetTitle_Shadcn_, cn } from 'ui'
 import { AiIconAnimation } from 'ui-patterns'
 
-import styles from '@ui-patterns/src/AiIconAnimation/AiIconAnimation.module.css'
+import styles from '@ui-patterns/AiIconAnimation/AiIconAnimation.module.css'
 import { X } from 'lucide-react'
 
 export const AIPolicyHeader = ({
