@@ -1,7 +1,10 @@
 import { DiamondIcon, Fingerprint, Hash, Key, Table2 } from 'lucide-react'
 import { Handle, NodeProps } from 'reactflow'
 import { cn } from 'ui'
-import { NODE_WIDTH } from './SchemaGraph.constants'
+
+// ReactFlow is scaling everything by the factor of 2
+const TABLE_NODE_WIDTH = 320
+const TABLE_NODE_ROW_HEIGHT = 40
 
 export type TableNodeData = {
   name: string
@@ -27,23 +30,21 @@ const TableNode = ({ data, targetPosition, sourcePosition }: NodeProps<TableNode
   return (
     <>
       {data.isForeign ? (
-        <div className="rounded-lg">
-          <header className="text-[0.5rem] leading-5 font-bold px-2 text-center bg-brand text-gray-300">
-            {data.name}
-            {targetPosition && (
-              <Handle
-                type="target"
-                id={data.name}
-                position={targetPosition}
-                className={cn(hiddenNodeConnector, '!left-0')}
-              />
-            )}
-          </header>
-        </div>
+        <header className="text-[0.55rem] px-2 py-1 border-[0.5px] rounded-[4px] bg-alternative text-default flex gap-1 items-center">
+          {data.name}
+          {targetPosition && (
+            <Handle
+              type="target"
+              id={data.name}
+              position={targetPosition}
+              className={cn(hiddenNodeConnector)}
+            />
+          )}
+        </header>
       ) : (
         <div
-          className="border border-[0.5px] overflow-hidden rounded-[4px] shadow-sm"
-          style={{ width: NODE_WIDTH / 2 }}
+          className="border-[0.5px] overflow-hidden rounded-[4px] shadow-sm"
+          style={{ width: TABLE_NODE_WIDTH / 2 }}
         >
           <header
             className={cn(
@@ -131,4 +132,4 @@ const TableNode = ({ data, targetPosition, sourcePosition }: NodeProps<TableNode
   )
 }
 
-export default TableNode
+export { TableNode, TABLE_NODE_WIDTH, TABLE_NODE_ROW_HEIGHT }
