@@ -14,12 +14,14 @@ const NewThread = async ({
 }) => {
   return (
     <>
-      <div className="h-full flex items-center justify-center w-full flex-col gap-y-4">
-        <NewThreadInput />
-      </div>
-      <LoginDialog>
-        <LoginForm searchParams={searchParams} />
-      </LoginDialog>
+      <main role="main" className="h-[calc(100vh-115px)] w-full flex flex-col grow">
+        <div className="h-full flex items-center justify-center w-full flex-col gap-y-4">
+          <NewThreadInput />
+        </div>
+        <LoginDialog>
+          <LoginForm searchParams={searchParams} />
+        </LoginDialog>
+      </main>
     </>
   )
 }

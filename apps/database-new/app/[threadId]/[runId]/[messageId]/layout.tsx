@@ -1,6 +1,6 @@
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <main role="main" className="px-4 xl:px-0 xl:max-w-4xl mx-auto h-full bg-orange-300">
+    <main role="main" className="h-[calc(100vh-115px)] w-full flex flex-col grow">
       {children}
     </main>
   )

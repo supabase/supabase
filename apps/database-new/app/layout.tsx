@@ -20,14 +20,12 @@ export const metadata: Metadata = {
 // https://github.com/pacocoursey/next-themes#with-app
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark h-full bg-background" suppressHydrationWarning>
-      <body className="flex flex-col h-full">
+    <html lang="en" className="dark bg-background" suppressHydrationWarning>
+      <body className="flex flex-col grow h-full">
         <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
           <ReactQueryProvider>
             <Header />
-            <main role="main" className="h-full w-full flex flex-col grow">
-              {children}
-            </main>
+            {children}
             <Footer />
           </ReactQueryProvider>
         </ThemeProvider>
