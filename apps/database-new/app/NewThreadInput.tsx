@@ -41,7 +41,11 @@ const NewThreadInput = () => {
   useEffect(() => {
     if (state.success && state.data.threadId && state.data.runId && state.data.messageId) {
       console.log(state.data)
-      router.push(`/${state.data.threadId}/${state.data.runId}/${state.data.messageId}`)
+      const { threadId, runId, messageId } = state.data
+      console.log('threadId', threadId)
+      console.log('runId', runId)
+      console.log('messageId', messageId)
+      // router.push(`/${state.data.threadId}/${state.data.runId}/${state.data.messageId}`)
     }
   }, [state.success])
 
