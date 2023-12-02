@@ -129,12 +129,12 @@ export async function createThread(prevState: any, formData: FormData) {
       }
     }
 
-    // const thread = await openai.beta.threads.create()
+    const thread = await openai.beta.threads.create()
 
-    // const message = await openai.beta.threads.messages.create(thread.id, {
-    //   role: 'user',
-    //   content: data.value,
-    // })
+    const message = await openai.beta.threads.messages.create(thread.id, {
+      role: 'user',
+      content: data.value,
+    })
 
     // const createRun = await openai.beta.threads.runs.create(thread.id, {
     //   assistant_id: 'asst_oLWrK8lScZVNEpfjwUIvBAnq',
