@@ -1,8 +1,8 @@
 'use client'
 
 import { useParams } from 'next/navigation'
-import { useMessagesQuery } from '@/data/messages-query'
-import { UserMessage } from '@/lib/types'
+// import { useMessagesQuery } from '@/data/messages-query'
+// import { UserMessage } from '@/lib/types'
 
 const CurrentThreadName = () => {
   // const { threadId, runId, messageId }: { threadId: string; runId: string; messageId: string } =

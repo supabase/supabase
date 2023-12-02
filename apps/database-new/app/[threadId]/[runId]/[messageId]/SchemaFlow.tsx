@@ -1,13 +1,9 @@
-import { format } from 'sql-formatter'
-
 import { getThread } from './MessageId.utils'
 
 import { parseTables } from '@/lib/utils'
 import SchemaFlowHandler from './SchemaFlowHandler'
 
 import OpenAI from 'openai'
-import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
 
 const openai = new OpenAI()
 
