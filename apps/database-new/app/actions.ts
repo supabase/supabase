@@ -177,7 +177,7 @@ export async function createThread(prevState: any, formData: FormData) {
     //   },
     // }
 
-    // redirectUrl = `/${thread.id}/${run.id}/${message.id}`
+    redirectUrl = `/${thread.id}/${run.id}/${message.id}`
   } catch (error: any) {
     console.error(error)
     return {
