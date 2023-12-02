@@ -129,46 +129,55 @@ export async function createThread(prevState: any, formData: FormData) {
       }
     }
 
-    const thread = await openai.beta.threads.create()
+    // const thread = await openai.beta.threads.create()
 
-    const message = await openai.beta.threads.messages.create(thread.id, {
-      role: 'user',
-      content: data.value,
-    })
+    // const message = await openai.beta.threads.messages.create(thread.id, {
+    //   role: 'user',
+    //   content: data.value,
+    // })
 
-    const createRun = await openai.beta.threads.runs.create(thread.id, {
-      assistant_id: 'asst_oLWrK8lScZVNEpfjwUIvBAnq',
-    })
+    // const createRun = await openai.beta.threads.runs.create(thread.id, {
+    //   assistant_id: 'asst_oLWrK8lScZVNEpfjwUIvBAnq',
+    // })
 
-    const [run, { data: messages }] = await Promise.all([
-      openai.beta.threads.runs.retrieve(thread.id, createRun.id),
-      openai.beta.threads.messages.list(thread.id),
-    ])
+    // const [run, { data: messages }] = await Promise.all([
+    //   openai.beta.threads.runs.retrieve(thread.id, createRun.id),
+    //   openai.beta.threads.messages.list(thread.id),
+    // ])
 
-    const threadTitle = messages
-      .filter((m) => m.role === 'user' && m.content[0]?.type === 'text')
-      .map((m) => {
-        if (m.content[0]?.type === 'text') {
-          return m.content[0]?.text?.value
-        }
-        return undefined
-      })
-      .find((text) => text !== undefined)
+    // const threadTitle = messages
+    //   .filter((m) => m.role === 'user' && m.content[0]?.type === 'text')
+    //   .map((m) => {
+    //     if (m.content[0]?.type === 'text') {
+    //       return m.content[0]?.text?.value
+    //     }
+    //     return undefined
+    //   })
+    //   .find((text) => text !== undefined)
 
-    try {
-      const { error } = await supabase.from('threads').insert({
-        thread_id: thread.id,
-        run_id: run.id,
-        user_id: user.id,
-        thread_title: threadTitle as string,
-      })
-      revalidatePath('/profile')
-      if (error) throw error
-    } catch (error) {
-      console.error(error)
+    // try {
+    //   const { error } = await supabase.from('threads').insert({
+    //     thread_id: thread.id,
+    //     run_id: run.id,
+    //     user_id: user.id,
+    //     thread_title: threadTitle as string,
+    //   })
+    //   revalidatePath('/profile')
+    //   if (error) throw error
+    // } catch (error) {
+    //   console.error(error)
+    // }
+
+    return {
+      success: false,
+      message: 'Managed to run action',
+      data: {
+        ...data,
+        user,
+      },
     }
 
-    redirectUrl = `/${thread.id}/${run.id}/${message.id}`
+    // redirectUrl = `/${thread.id}/${run.id}/${message.id}`
   } catch (error: any) {
     console.error(error)
     return {

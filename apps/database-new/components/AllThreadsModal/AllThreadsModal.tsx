@@ -75,7 +75,7 @@ const AllThreads = ({ visible, onClose, onSelectMessage }: AllThreadsProps) => {
         reactFlowInstance.setViewport({ x: viewport.x - 70, y: 150, zoom: 1 })
       })
     }
-  }, [reactFlowInstance, userMessages])
+  }, [reactFlowInstance, userMessages, messages, onSelectMessage])
 
   useEffect(() => {
     if (reactFlowInstance !== undefined && visible) {

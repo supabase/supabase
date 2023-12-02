@@ -58,6 +58,7 @@ const NewThreadInput = () => {
           onValueChange={(e) => setValue(e.target.value)}
           message={state.message}
         />
+        {state.message && <p>{state.message}</p>}
       </div>
       <div className="flex gap-3">
         {suggestions.map((suggestion, idx) => (
