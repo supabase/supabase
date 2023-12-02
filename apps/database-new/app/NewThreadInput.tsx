@@ -43,7 +43,6 @@ const NewThreadInput = () => {
           key={'new-thread-form'}
           id={'new-thread-form'}
           onSubmit={async (event) => {
-            console.log('hello')
             const {
               data: { user },
             } = await supabase.auth.getUser()

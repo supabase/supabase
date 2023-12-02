@@ -43,6 +43,10 @@ async function Messages({ params }: { params: { threadId: string; runId: string 
     )
   )
 
+  // console.log('mappedMessages', mappedMessages)
+  // console.log('messages', messages)
+  // console.log('run', run)
+
   const result = {
     id: params.threadId,
     status: run.status === 'completed' ? 'completed' : 'loading',
@@ -51,18 +55,22 @@ async function Messages({ params }: { params: { threadId: string; runId: string 
 
   const messagesSorted = sortBy(messages, (m) => m.created_at)
 
-  console.log('messagesSorted', messagesSorted)
+  // console.log('messagesSorted', messagesSorted)
 
   const userMessages = messagesSorted.filter((message) => message.role === 'user')
 
-  console.log('userMessages', userMessages)
+  // console.log('userMessages', userMessages)
 
   return (
     <div className="flex flex-col py-2 xl:py-6">
       {userMessages.map((message, idx) => {
         const index = messages.indexOf(message)
-        const reply = messages[index + 1] as AssistantMessage
+        // const run_index = run.indexOf(message.id)
+
+        const reply = messages[index + 1]
         const isLatest = idx === userMessages.length - 1
+
+        // console.log('i am latest', isLatest)
 
         const hoursFromNow = dayjs().diff(dayjs(message.created_at * 1000), 'hours')
         const formattedTimeFromNow = dayjs(message.created_at * 1000).fromNow()
@@ -77,14 +85,17 @@ async function Messages({ params }: { params: { threadId: string; runId: string 
           replyDuration,
         }
 
+        // console.log('message', message)
+
+        const LOADING_STATUSES = ['loading', 'queued', 'running']
+
         return (
           <UserChat
             key={message.id}
-            message={message as UserMessage}
-            reply={reply}
+            message={message}
+            run={run}
             isLatest={isLatest}
-            // isSelected={selectedMessage === message?.id}
-            // isLoading={loading && isLatest}
+            isLoading={LOADING_STATUSES.includes(result.status)}
             times={times}
           />
         )

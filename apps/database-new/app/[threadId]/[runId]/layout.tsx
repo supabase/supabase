@@ -10,6 +10,8 @@ export default function Layout({
   children: React.ReactNode
   params: { threadId: string; runId: string }
 }) {
+  console.log('revalidating layout of runid')
+
   return (
     <div className="flex flex-col-reverse items-between xl:flex-row xl:items-center xl:justify-between bg-alternative h-full">
       <Chat params={params} />
