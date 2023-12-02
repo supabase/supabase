@@ -172,14 +172,11 @@ export async function createThread(prevState: any, formData: FormData) {
       success: true,
       message: 'Managed to run action',
       data: {
-        value: data.value,
         messageId: message.id,
         runId: run.id,
         threadId: thread.id,
       },
     }
-
-    // redirectUrl = `/${thread.id}/${run.id}/${message.id}`
   } catch (error: any) {
     console.error(error)
     return {
@@ -188,8 +185,6 @@ export async function createThread(prevState: any, formData: FormData) {
       data: undefined,
     }
   }
-
-  // redirect('/thread-id/run-id/message-id', RedirectType.push)
 }
 
 export async function updateThread(prevState: any, formData: FormData) {
