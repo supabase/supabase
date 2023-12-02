@@ -17,9 +17,9 @@ export default async function ThreadPage({ params }: ThreadPageProps) {
       <Suspense fallback={<Loader />}>
         <SchemaFlow params={params} />
       </Suspense>
-      {/* <Suspense fallback={<Loader />}>
+      <Suspense fallback={<Loader />}>
         <CodeEditor params={params} />
-      </Suspense> */}
+      </Suspense>
     </div>
   )
 }
