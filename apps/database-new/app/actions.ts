@@ -136,14 +136,14 @@ export async function createThread(prevState: any, formData: FormData) {
       content: data.value,
     })
 
-    // const createRun = await openai.beta.threads.runs.create(thread.id, {
-    //   assistant_id: 'asst_oLWrK8lScZVNEpfjwUIvBAnq',
-    // })
+    const createRun = await openai.beta.threads.runs.create(thread.id, {
+      assistant_id: 'asst_oLWrK8lScZVNEpfjwUIvBAnq',
+    })
 
-    // const [run, { data: messages }] = await Promise.all([
-    //   openai.beta.threads.runs.retrieve(thread.id, createRun.id),
-    //   openai.beta.threads.messages.list(thread.id),
-    // ])
+    const [run, { data: messages }] = await Promise.all([
+      openai.beta.threads.runs.retrieve(thread.id, createRun.id),
+      openai.beta.threads.messages.list(thread.id),
+    ])
 
     // const threadTitle = messages
     //   .filter((m) => m.role === 'user' && m.content[0]?.type === 'text')
