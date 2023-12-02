@@ -187,7 +187,7 @@ export async function createThread(prevState: any, formData: FormData) {
     }
   }
 
-  redirect(redirectUrl, RedirectType.push)
+  redirect('/thread-id/run-id/message-id', RedirectType.push)
 }
 
 export async function updateThread(prevState: any, formData: FormData) {
