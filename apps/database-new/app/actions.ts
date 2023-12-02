@@ -155,18 +155,18 @@ export async function createThread(prevState: any, formData: FormData) {
       })
       .find((text) => text !== undefined)
 
-    // try {
-    //   const { error } = await supabase.from('threads').insert({
-    //     thread_id: thread.id,
-    //     run_id: run.id,
-    //     user_id: user.id,
-    //     thread_title: threadTitle as string,
-    //   })
-    //   revalidatePath('/profile')
-    //   if (error) throw error
-    // } catch (error) {
-    //   console.error(error)
-    // }
+    try {
+      const { error } = await supabase.from('threads').insert({
+        thread_id: thread.id,
+        run_id: run.id,
+        user_id: user.id,
+        thread_title: threadTitle as string,
+      })
+      revalidatePath('/profile')
+      if (error) throw error
+    } catch (error) {
+      console.error(error)
+    }
 
     return {
       success: false,
