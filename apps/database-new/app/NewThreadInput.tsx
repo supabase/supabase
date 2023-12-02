@@ -4,14 +4,16 @@ import { CHAT_EXAMPLES } from '@/data/chat-examples'
 import { useAppStateSnapshot } from '@/lib/state'
 import { createClient } from '@/lib/supabase/client'
 import { ExternalLink } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useFormState } from 'react-dom'
 import { AssistantChatForm, cn } from 'ui'
 import { createThread } from './actions'
+import { useRouter } from 'next/navigation'
 
 const suggestions = CHAT_EXAMPLES
 
 const NewThreadInput = () => {
+  const router = useRouter()
   const [value, setValue] = useState(() => {
     if (typeof window !== 'undefined') {
       const localPrompt = localStorage.getItem('prompt')
@@ -32,6 +34,14 @@ const NewThreadInput = () => {
   }
 
   const [state, formAction] = useFormState(createThread, initialState)
+
+  useEffect(() => {
+    if (state.success) {
+      console.log(state.data)
+      router.push(`/${state.data.thread.id}/${state.data.run.id}/${state.data.message.id}`)
+    }
+  }, [state.success, state.data, state.message, state.run, router])
+
   const supabase = createClient()
   const snap = useAppStateSnapshot()
 
