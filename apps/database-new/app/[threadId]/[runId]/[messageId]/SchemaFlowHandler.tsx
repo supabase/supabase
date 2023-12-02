@@ -1,4 +1,5 @@
 'use client'
+
 import { PostgresTable } from '@/lib/types'
 import { useTheme } from 'next-themes'
 import { useEffect, useMemo, useState } from 'react'

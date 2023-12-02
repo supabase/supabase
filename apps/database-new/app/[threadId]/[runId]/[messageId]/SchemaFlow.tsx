@@ -32,7 +32,9 @@ export async function SchemaFlow({ params }: { params: any }) {
   // await waitForRunCompletion(params)
 
   const content = await getThread({ threadId, runId, messageId })
-  const tables = await parseTables(content)
+
+  console.log('content', content)
+  // const tables = await parseTables(content)
 
   // const code = format(content, { language: 'postgresql' })
 
@@ -40,5 +42,6 @@ export async function SchemaFlow({ params }: { params: any }) {
   //   snap.setSelectedCode(code)
   // }, [code])
 
+  return <div></div>
   return <SchemaFlowHandler tables={tables} />
 }
