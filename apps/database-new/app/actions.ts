@@ -105,7 +105,7 @@ export async function createThread(prevState: any, formData: FormData) {
   const cookieStore = cookies()
   const supabase = createClient(cookieStore)
 
-  let redirectUrl = ''
+  // let redirectUrl = ''
 
   try {
     const schema = z.object({
@@ -172,11 +172,10 @@ export async function createThread(prevState: any, formData: FormData) {
       success: true,
       message: 'Managed to run action',
       data: {
-        ...data,
-        user,
-        message,
-        run,
-        thread,
+        value: data.value,
+        messageId: message.id,
+        runId: run.id,
+        threadId: thread.id,
       },
     }
 
