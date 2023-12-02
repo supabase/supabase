@@ -76,20 +76,20 @@ const SchemaFlowHandler = ({ tables }: SchemaGraphProps) => {
 }
 
 const ExportedSchemaGraph = ({ tables }: SchemaGraphProps) => {
-  const snap = useAppStateSnapshot()
-  const params = useParams()
+  // const snap = useAppStateSnapshot()
+  // const params = useParams()
 
-  const runId = params.runId as string
+  // const runId = params.runId as string
 
-  useEffect(() => {
-    const runIsLoading = snap.runsLoading.includes(runId)
-    if (runIsLoading) {
-      // let currentRunsLoading = snap.runsLoading
-      const payload = [...snap.runsLoading.filter((item) => item !== runId)]
-      snap.setRunsLoading([...payload])
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [runId]) // Intentionally left snap out of the dependency array
+  // useEffect(() => {
+  //   const runIsLoading = snap.runsLoading.includes(runId)
+  //   if (runIsLoading) {
+  //     // let currentRunsLoading = snap.runsLoading
+  //     const payload = [...snap.runsLoading.filter((item) => item !== runId)]
+  //     snap.setRunsLoading([...payload])
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [runId]) // Intentionally left snap out of the dependency array
 
   return (
     <ReactFlowProvider>
