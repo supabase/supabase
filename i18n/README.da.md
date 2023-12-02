@@ -247,7 +247,7 @@ Vores tilgang til klientbiblioteker er modulær. Hvert delbibliotek er en selvst
 - [Forenklet kinesisk / 简体中文](/i18n/README.zh-cn.md)
 - [Svensk / Svenska](/i18n/README.sv.md)
 - [Thai / ไทย](/i18n/README.th.md)
-- [Traditionelt kinesisk / 繁体中文](/i18n/README.zh-tw.md)
+- [Traditionelt kinesisk / 繁體中文](/i18n/README.zh-tw.md)
 - [tyrkisk / Türkçe](/i18n/README.tr.md)
 - [Ukrainsk / Українська](/i18n/README.uk.md)
 - [Vietnamesisk / Tiếng Việt](/i18n/README.vi-vn.md)
