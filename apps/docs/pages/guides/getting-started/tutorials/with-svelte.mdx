@@ -224,7 +224,7 @@ Now that we have all the components in place, let's update `App.svelte`:
   import Account from './lib/Account.svelte'
   import Auth from './lib/Auth.svelte'
 
-  let session: AuthSession
+  let session: AuthSession | null
 
   onMount(() => {
     supabase.auth.getSession().then(({ data }) => {
