@@ -43,5 +43,5 @@ export async function SchemaFlow({ params }: { params: any }) {
   // }, [code])
 
   return <div></div>
-  return <SchemaFlowHandler tables={tables} />
+  // return <SchemaFlowHandler tables={tables} />
 }
