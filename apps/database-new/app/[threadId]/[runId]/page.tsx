@@ -1,7 +1,7 @@
 import * as React from 'react'
 
-const RunId = async ({ children }: { children: React.ReactNode }) => {
+const RunIdPage = async ({ children }: { children: React.ReactNode }) => {
   return <></>
 }
 
-export default RunId
+export default RunIdPage
