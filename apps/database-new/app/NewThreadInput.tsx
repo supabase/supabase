@@ -38,16 +38,16 @@ const NewThreadInput = () => {
 
   const [state, formAction] = useFormState(createThread, initialState)
 
-  useEffect(() => {
-    if (state.success && state.data.threadId && state.data.runId && state.data.messageId) {
-      console.log(state.data)
-      const { threadId, runId, messageId } = state.data
-      console.log('threadId', threadId)
-      console.log('runId', runId)
-      console.log('messageId', messageId)
-      // router.push(`/${state.data.threadId}/${state.data.runId}/${state.data.messageId}`)
-    }
-  }, [state.success])
+  // useEffect(() => {
+  //   if (state.success && state.data.threadId && state.data.runId && state.data.messageId) {
+  //     console.log(state.data)
+  //     const { threadId, runId, messageId } = state.data
+  //     console.log('threadId', threadId)
+  //     console.log('runId', runId)
+  //     console.log('messageId', messageId)
+  //     // router.push(`/${state.data.threadId}/${state.data.runId}/${state.data.messageId}`)
+  //   }
+  // }, [state.success])
 
   const supabase = createClient()
   const snap = useAppStateSnapshot()
@@ -73,9 +73,9 @@ const NewThreadInput = () => {
           value={value}
           placeholder="e.g Create a Telegram-like chat application"
           onValueChange={(e) => setValue(e.target.value)}
-          message={state.message}
+          message={state?.message}
         />
-        {state.message && <p>{state.message}</p>}
+        {state?.message && <p>{state?.message}</p>}
       </div>
       <div className="flex gap-3">
         {suggestions.map((suggestion, idx) => (

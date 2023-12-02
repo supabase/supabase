@@ -187,7 +187,7 @@ export async function createThread(prevState: any, formData: FormData) {
     }
   }
 
-  revalidatePath(redirectUrl)
+  redirect(redirectUrl)
 }
 
 export async function updateThread(prevState: any, formData: FormData) {
