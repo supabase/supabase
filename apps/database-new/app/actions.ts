@@ -105,7 +105,7 @@ export async function createThread(prevState: any, formData: FormData) {
   const cookieStore = cookies()
   const supabase = createClient(cookieStore)
 
-  // let redirectUrl = ''
+  let redirectUrl = ''
 
   try {
     const schema = z.object({
@@ -168,15 +168,16 @@ export async function createThread(prevState: any, formData: FormData) {
       console.error(error)
     }
 
-    return {
-      success: true,
-      message: 'Managed to run action',
-      data: {
-        messageId: message.id,
-        runId: run.id,
-        threadId: thread.id,
-      },
-    }
+    redirectUrl = `/${thread.id}/${run.id}/${message.id}`
+    // return {
+    //   success: true,
+    //   message: 'Managed to run action',
+    //   data: {
+    //     messageId: message.id,
+    //     runId: run.id,
+    //     threadId: thread.id,
+    //   },
+    // }
   } catch (error: any) {
     console.error(error)
     return {
@@ -185,6 +186,8 @@ export async function createThread(prevState: any, formData: FormData) {
       data: undefined,
     }
   }
+
+  revalidatePath(redirectUrl)
 }
 
 export async function updateThread(prevState: any, formData: FormData) {
