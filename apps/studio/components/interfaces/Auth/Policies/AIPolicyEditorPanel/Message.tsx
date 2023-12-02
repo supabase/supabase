@@ -3,13 +3,22 @@ import dayjs from 'dayjs'
 import { kebabCase, noop, take } from 'lodash'
 import { Copy, FileDiff } from 'lucide-react'
 import Image from 'next/image'
-import { memo, useMemo } from 'react'
+import { PropsWithChildren, memo, useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { format } from 'sql-formatter'
-import { AiIcon, AiIconAnimation, Badge, Button } from 'ui'
+import { AiIconAnimation, Badge, Button, IconSettings } from 'ui'
 
 import CodeEditor from 'components/ui/CodeEditor'
 import { useProfile } from 'lib/profile'
+
+interface MessageProps {
+  name?: string
+  role: 'user' | 'assistant'
+  content?: string
+  createdAt?: number
+  isDebug?: boolean
+  onDiff?: (s: string) => void
+}
 
 const Message = memo(function Message({
   name,
@@ -18,14 +27,8 @@ const Message = memo(function Message({
   createdAt,
   isDebug,
   onDiff = noop,
-}: {
-  name?: string
-  role: 'user' | 'assistant'
-  content?: string
-  createdAt?: number
-  isDebug?: boolean
-  onDiff?: (s: string) => void
-}) {
+  children,
+}: PropsWithChildren<MessageProps>) {
   const { profile } = useProfile()
 
   const icon = useMemo(() => {
@@ -145,6 +148,7 @@ const Message = memo(function Message({
       >
         {content}
       </ReactMarkdown>
+      {children}
     </div>
   )
 })
