@@ -145,15 +145,15 @@ export async function createThread(prevState: any, formData: FormData) {
       openai.beta.threads.messages.list(thread.id),
     ])
 
-    // const threadTitle = messages
-    //   .filter((m) => m.role === 'user' && m.content[0]?.type === 'text')
-    //   .map((m) => {
-    //     if (m.content[0]?.type === 'text') {
-    //       return m.content[0]?.text?.value
-    //     }
-    //     return undefined
-    //   })
-    //   .find((text) => text !== undefined)
+    const threadTitle = messages
+      .filter((m) => m.role === 'user' && m.content[0]?.type === 'text')
+      .map((m) => {
+        if (m.content[0]?.type === 'text') {
+          return m.content[0]?.text?.value
+        }
+        return undefined
+      })
+      .find((text) => text !== undefined)
 
     // try {
     //   const { error } = await supabase.from('threads').insert({
