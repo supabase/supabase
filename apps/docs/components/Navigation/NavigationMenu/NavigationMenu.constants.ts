@@ -1185,6 +1185,10 @@ export const ai = {
           name: 'LlamaIndex',
           url: '/guides/ai/integrations/llamaindex',
         },
+        {
+          name: 'Roboflow',
+          url: '/guides/ai/integrations/roboflow',
+        },
       ],
     },
   ],
