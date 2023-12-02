@@ -10,7 +10,6 @@ import { useEffect } from 'react'
 
 interface UserChatProps {
   message: OpenAI.Beta.Threads.Messages.ThreadMessage
-  reply?: AssistantMessage
   isLatest: boolean
   times: {
     hoursFromNow: number
@@ -21,7 +20,7 @@ interface UserChatProps {
   run: OpenAI.Beta.Threads.Run
 }
 
-const UserChat = ({ message, reply, isLatest, times, run }: UserChatProps) => {
+const UserChat = ({ message, isLatest, times, run }: UserChatProps) => {
   const router = useRouter()
   const snap = useAppStateSnapshot()
   const { threadId, runId } = useParams()
@@ -46,7 +45,7 @@ const UserChat = ({ message, reply, isLatest, times, run }: UserChatProps) => {
   }, [runIsInProgressRemotely, run.id]) // Intentionally left snap out of the dependency array
 
   // using the local state for run loading
-  const isLoading = snap.runsLoading.includes(run.id)
+  const isLoading = snap.runsLoading.includes(run.id) && isLatest
 
   const { hoursFromNow, formattedTimeFromNow, formattedCreatedAt, replyDuration } = times
 
@@ -127,7 +126,7 @@ const UserChat = ({ message, reply, isLatest, times, run }: UserChatProps) => {
             >
               {text}
             </p>
-            {isLoading && <div className="chat-shimmering-loader w-full h-0.5 absolute bottom-0" />}
+            {/* {isLoading && <div className="chat-shimmering-loader w-full h-0.5 absolute bottom-0" />} */}
           </div>
         </div>
         {isSelected && (
