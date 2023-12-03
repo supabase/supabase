@@ -225,7 +225,7 @@ security definer set search_path = public
 as $$
 begin
   insert into public.profiles (id, first_name, age)
-  values (new.id, new.raw_user_meta_data['first_name']#>>'{}', cast(new.raw_user_meta_data['age'] as int));
+  values (new.id, new.raw_user_meta_data ->> 'first_name', new.raw_user_meta_data['age']::integer);
   return new;
 end;
 $$;
