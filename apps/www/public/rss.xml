@@ -5,9 +5,16 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Thu, 30 Nov 2023 16:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Mon, 04 Dec 2023 16:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/supabase-hackathon-lwx</guid>
+  <title>Supabase Launch Week X Hackathon</title>
+  <link>https://supabase.com/blog/supabase-hackathon-lwx</link>
+  <description>Build an Open Source Project over 10 days. 5 prize categories.</description>
+  <pubDate>Mon, 04 Dec 2023 16:00:00 GMT</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/automatic-cli-login</guid>
   <title>Automatic CLI login</title>
   <link>https://supabase.com/blog/automatic-cli-login</link>
