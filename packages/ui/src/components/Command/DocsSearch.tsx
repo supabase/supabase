@@ -256,6 +256,7 @@ const DocsSearch = () => {
             })
           })
           .catch((error) => {
+            sourcesLoaded += 1
             dispatch({
               type: 'errored',
               key: localKey,
@@ -287,18 +288,21 @@ const DocsSearch = () => {
 
   useEffect(() => {
     if (initialLoad.current) {
+      // On first navigation into 'docs search' page, search immediately
       if (search) {
         handleSearch(search)
       }
       initialLoad.current = false
     } else if (search) {
+      // Else if user is typing, debounce search
       debouncedSearch(search)
     } else {
+      // If user clears search, reset results
       debouncedSearch.cancel()
       key.current += 1
       dispatch({ type: 'reset', key: key.current })
     }
-  }, [])
+  }, [search])
 
   // Immediately run search if user presses enter
   // and abort any debounced searches that are waiting
