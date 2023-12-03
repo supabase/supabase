@@ -96,6 +96,25 @@ Options are available via `queryParams`:
 />
 ```
 
+### Provider Scopes
+
+Provider Scopes can be requested through `providerScope`;
+
+```jsx
+<Auth
+  supabaseClient={supabase}
+  providers={['google']}
+  queryParams={{
+    access_type: 'offline',
+    prompt: 'consent',
+    hd: 'domain.com',
+  }}
+  providerScopes={{
+    google: 'https://www.googleapis.com/auth/calendar.readonly',
+  }}
+/>
+```
+
 ### Supported Views
 
 The Auth component is currently shipped with the following views:
@@ -142,7 +161,7 @@ const App = () => (
 )
 ```
 
-<Admonition type="info">
+<Admonition type="note">
 
 Currently there is only one predefined theme available, but we plan to add more.
 

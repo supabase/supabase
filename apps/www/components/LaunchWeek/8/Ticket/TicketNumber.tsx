@@ -12,7 +12,7 @@ export default function TicketNumber({ number, golden = false }: Props) {
 
   return (
     <>
-      <div className="z-10 mt-2 md:mt-0 md:absolute md:flex inset-0 items-center justify-center top-auto md:left-auto md:right-0 md:top-0 md:w-[90px] md:h-100% dark:text-white">
+      <div className="z-10 mt-2 md:mt-0 md:absolute md:flex inset-0 items-center justify-center top-auto md:left-auto md:right-0 md:top-0 md:w-[90px] md:h-100% text-foreground">
         <span
           className={[
             `

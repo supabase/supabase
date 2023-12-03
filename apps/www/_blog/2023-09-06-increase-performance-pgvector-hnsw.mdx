@@ -49,15 +49,13 @@ The hierarchical aspect of HNSW builds off of the idea of skip lists.
 Skip lists are multi-layer linked lists. The bottom layer is a regular linked list connecting an ordered sequence of elements. Each new layer above removes some elements from the underlying layer (based on a fixed probability), producing a sparser subsequence that “skips” over elements.
 
 <div>
-  <img
-    alt="visual of an example skip list (light)"
-    className="dark:hidden"
-    src="/images/blog/2023-09-06-increase-performance-pgvector-hnsw/pgvector-v0-5-0-skip-list--light.png"
-  />
-  <img
-    alt="visual of an example skip list (dark)"
-    className="hidden dark:block"
-    src="/images/blog/2023-09-06-increase-performance-pgvector-hnsw/pgvector-v0-5-0-skip-list--dark.png"
+  <Img
+    alt="visual of an example skip list"
+    src={{
+      light:
+        '/images/blog/2023-09-06-increase-performance-pgvector-hnsw/pgvector-v0-5-0-skip-list--light.png',
+      dark: '/images/blog/2023-09-06-increase-performance-pgvector-hnsw/pgvector-v0-5-0-skip-list--dark.png',
+    }}
   />
 </div>
 
@@ -94,15 +92,13 @@ In this test, we used a Supabase project with a large compute add-on (2-core CPU
 - `ef_construction`: 64
 
 <div>
-  <img
-    alt="wikipedia embeddings comparing ivfflat and hnsw queries-per-second (light)"
-    className="dark:hidden"
-    src="/images/blog/2023-09-06-increase-performance-pgvector-hnsw/wikipedia-ivfflat-vs-hnsw--light.png"
-  />
-  <img
-    alt="wikipedia embeddings comparing ivfflat and hnsw queries-per-second (dark)"
-    className="hidden dark:block"
-    src="/images/blog/2023-09-06-increase-performance-pgvector-hnsw/wikipedia-ivfflat-vs-hnsw--dark.png"
+  <Img
+    alt="wikipedia embeddings comparing ivfflat and hnsw queries-per-second"
+    src={{
+      light:
+        '/images/blog/2023-09-06-increase-performance-pgvector-hnsw/wikipedia-ivfflat-vs-hnsw--light.png',
+      dark: '/images/blog/2023-09-06-increase-performance-pgvector-hnsw/wikipedia-ivfflat-vs-hnsw--dark.png',
+    }}
   />
 </div>
 
@@ -118,30 +114,26 @@ Here we used the Supabase project with a 2XL compute add-on (8-core CPU and 32GB
 - `ef_construction`: 56
 
 <div>
-  <img
-    alt="dbpedia embeddings comparing ivfflat and hnsw queries-per-second (light)"
-    className="dark:hidden"
-    src="/images/blog/2023-09-06-increase-performance-pgvector-hnsw/dbpedia-ivfflat-vs-hnsw--light.png"
-  />
-  <img
-    alt="dbpedia embeddings comparing ivfflat and hnsw queries-per-second (dark)"
-    className="hidden dark:block"
-    src="/images/blog/2023-09-06-increase-performance-pgvector-hnsw/dbpedia-ivfflat-vs-hnsw--dark.png"
+  <Img
+    alt="dbpedia embeddings comparing ivfflat and hnsw queries-per-second"
+    src={{
+      light:
+        '/images/blog/2023-09-06-increase-performance-pgvector-hnsw/dbpedia-ivfflat-vs-hnsw--light.png',
+      dark: '/images/blog/2023-09-06-increase-performance-pgvector-hnsw/dbpedia-ivfflat-vs-hnsw--dark.png',
+    }}
   />
 </div>
 
 When we maintain fixed HNSW build parameters, we can adjust the select query parameter `ef_search` to balance query speed and accuracy. To achieve accuracy@10 of 0.98, we increased it from the default 40 to 100. For accuracy@10 of 0.99, we further raised it to 250. Remarkably, HNSW demonstrated over six times better performance while maintaining the same level of accuracy. With higher accuracy@10 of 0.99 HNSW even outperforms [qdrant](https://nirantk.com/writing/pgvector-vs-qdrant/) on equivalent compute resources.
 
 <div>
-  <img
-    alt="dbpedia embeddings comparing qdrant and hnsw queries-per-second (light)"
-    className="dark:hidden"
-    src="/images/blog/2023-09-06-increase-performance-pgvector-hnsw/dbpedia-qdrant-vs-hnsw--light.png"
-  />
-  <img
-    alt="dbpedia embeddings comparing qdrant and hnsw queries-per-second (dark)"
-    className="hidden dark:block"
-    src="/images/blog/2023-09-06-increase-performance-pgvector-hnsw/dbpedia-qdrant-vs-hnsw--dark.png"
+  <Img
+    alt="dbpedia embeddings comparing qdrant and hnsw queries-per-second"
+    src={{
+      light:
+        '/images/blog/2023-09-06-increase-performance-pgvector-hnsw/dbpedia-qdrant-vs-hnsw--light.png',
+      dark: '/images/blog/2023-09-06-increase-performance-pgvector-hnsw/dbpedia-qdrant-vs-hnsw--dark.png',
+    }}
   />
 </div>
 
@@ -150,30 +142,26 @@ When we maintain fixed HNSW build parameters, we can adjust the select query par
 Performance scales predictably with the size of the database for the HNSW index, just as [it does for the IVFFlat index](https://supabase.com/blog/pgvector-performance#scaling-the-database). The difference in performance between IVFFlat and HNSW remains consistent after a compute upgrade.
 
 <div>
-  <img
-    alt="dbpedia embeddings comparing ivfflat and hnsw queries-per-second using the 4XL compute addon (light)"
-    className="dark:hidden"
-    src="/images/blog/2023-09-06-increase-performance-pgvector-hnsw/dbpedia-ivfflat-vs-hnsw-4xl--light.png"
-  />
-  <img
-    alt="dbpedia embeddings comparing ivfflat and hnsw queries-per-second using the 4XL compute addon (dark)"
-    className="hidden dark:block"
-    src="/images/blog/2023-09-06-increase-performance-pgvector-hnsw/dbpedia-ivfflat-vs-hnsw-4xl--dark.png"
+  <Img
+    alt="dbpedia embeddings comparing ivfflat and hnsw queries-per-second using the 4XL compute addon"
+    src={{
+      light:
+        '/images/blog/2023-09-06-increase-performance-pgvector-hnsw/dbpedia-ivfflat-vs-hnsw-4xl--light.png',
+      dark: '/images/blog/2023-09-06-increase-performance-pgvector-hnsw/dbpedia-ivfflat-vs-hnsw-4xl--dark.png',
+    }}
   />
 </div>
 
 Switching to a 4XL compute add-on (with a 16-core CPU and 64GB of RAM) resulted in a 69% increase in QPS for an accuracy@10 of 0.99 compared to the 2XL instance.
 
 <div>
-  <img
-    alt="dbpedia embeddings comparing hnsw queries-per-second using the 2XL vs 4XL compute addon (light)"
-    className="dark:hidden"
-    src="/images/blog/2023-09-06-increase-performance-pgvector-hnsw/dbpedia-hnsw-2xl-vs-4xl--light.png"
-  />
-  <img
-    alt="dbpedia embeddings comparing hnsw queries-per-second using the 2XL vs 4XL compute addon (dark)"
-    className="hidden dark:block"
-    src="/images/blog/2023-09-06-increase-performance-pgvector-hnsw/dbpedia-hnsw-2xl-vs-4xl--dark.png"
+  <Img
+    alt="dbpedia embeddings comparing hnsw queries-per-second using the 2XL vs 4XL compute addon"
+    src={{
+      light:
+        '/images/blog/2023-09-06-increase-performance-pgvector-hnsw/dbpedia-hnsw-2xl-vs-4xl--light.png',
+      dark: '/images/blog/2023-09-06-increase-performance-pgvector-hnsw/dbpedia-hnsw-2xl-vs-4xl--dark.png',
+    }}
   />
 </div>
 
@@ -189,15 +177,13 @@ We conducted a small experiment to assess the impact of HNSW index parameters on
 This adjustment enabled us to achieve the same level of accuracy@10 of 0.99 with an `ef_search` = 100 instead of the previous 250, resulting in a 35% increase in QPS.
 
 <div>
-  <img
-    alt="dbpedia embeddings comparing hnsw queries-per-second using different build parameters (light)"
-    className="dark:hidden"
-    src="/images/blog/2023-09-06-increase-performance-pgvector-hnsw/dbpedia-hnsw-build-parameters--light.png"
-  />
-  <img
-    alt="dbpedia embeddings comparing hnsw queries-per-second using different build parameters (dark)"
-    className="hidden dark:block"
-    src="/images/blog/2023-09-06-increase-performance-pgvector-hnsw/dbpedia-hnsw-build-parameters--dark.png"
+  <Img
+    alt="dbpedia embeddings comparing hnsw queries-per-second using different build parameters"
+    src={{
+      light:
+        '/images/blog/2023-09-06-increase-performance-pgvector-hnsw/dbpedia-hnsw-build-parameters--light.png',
+      dark: '/images/blog/2023-09-06-increase-performance-pgvector-hnsw/dbpedia-hnsw-build-parameters--dark.png',
+    }}
   />
 </div>
 
@@ -221,30 +207,26 @@ Below we compare the index build times between v0.4.0 and v0.5.0 for the inner p
 - `lists = 1000`
 
 <div>
-  <img
-    alt="dbpedia embeddings comparing ivfflat index build time between v0.4.0 and v0.5.0 using 1000 lists (light)"
-    className="dark:hidden"
-    src="/images/blog/2023-09-06-increase-performance-pgvector-hnsw/dbpedia-ivfflat-0-4-0-vs-0-5-0-lists-1000--light.png"
-  />
-  <img
-    alt="dbpedia embeddings comparing ivfflat index build time between v0.4.0 and v0.5.0 using 1000 lists (dark)"
-    className="hidden dark:block"
-    src="/images/blog/2023-09-06-increase-performance-pgvector-hnsw/dbpedia-ivfflat-0-4-0-vs-0-5-0-lists-1000--dark.png"
+  <Img
+    alt="dbpedia embeddings comparing ivfflat index build time between v0.4.0 and v0.5.0 using 1000 lists"
+    src={{
+      light:
+        '/images/blog/2023-09-06-increase-performance-pgvector-hnsw/dbpedia-ivfflat-0-4-0-vs-0-5-0-lists-1000--light.png',
+      dark: '/images/blog/2023-09-06-increase-performance-pgvector-hnsw/dbpedia-ivfflat-0-4-0-vs-0-5-0-lists-1000--dark.png',
+    }}
   />
 </div>
 
 - `lists = 5000`
 
 <div>
-  <img
-    alt="dbpedia embeddings comparing ivfflat index build time between v0.4.0 and v0.5.0 using 5000 lists (light)"
-    className="dark:hidden"
-    src="/images/blog/2023-09-06-increase-performance-pgvector-hnsw/dbpedia-ivfflat-0-4-0-vs-0-5-0-lists-5000--light.png"
-  />
-  <img
-    alt="dbpedia embeddings comparing ivfflat index build time between v0.4.0 and v0.5.0 using 5000 lists (dark)"
-    className="hidden dark:block"
-    src="/images/blog/2023-09-06-increase-performance-pgvector-hnsw/dbpedia-ivfflat-0-4-0-vs-0-5-0-lists-5000--dark.png"
+  <Img
+    alt="dbpedia embeddings comparing ivfflat index build time between v0.4.0 and v0.5.0 using 5000 lists"
+    src={{
+      light:
+        '/images/blog/2023-09-06-increase-performance-pgvector-hnsw/dbpedia-ivfflat-0-4-0-vs-0-5-0-lists-5000--light.png',
+      dark: '/images/blog/2023-09-06-increase-performance-pgvector-hnsw/dbpedia-ivfflat-0-4-0-vs-0-5-0-lists-5000--dark.png',
+    }}
   />
 </div>
 

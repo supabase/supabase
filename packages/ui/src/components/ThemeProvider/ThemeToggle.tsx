@@ -9,6 +9,8 @@ import {
   DropdownMenuTrigger,
   IconMoon,
   IconSun,
+  Theme,
+  themes,
 } from 'ui'
 
 interface ThemeToggleProps {
@@ -42,9 +44,11 @@ const ThemeToggle = ({ forceDark = false }: ThemeToggleProps) => {
               setTheme(value)
             }}
           >
-            <DropdownMenuRadioItem value={'system'}>System</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value={'dark'}>Dark</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value={'light'}>Light</DropdownMenuRadioItem>
+            {themes.map((theme: Theme) => (
+              <DropdownMenuRadioItem key={theme.value} value={theme.value}>
+                {theme.name}
+              </DropdownMenuRadioItem>
+            ))}
           </DropdownMenuRadioGroup>
         </DropdownMenuGroup>
       </DropdownMenuContent>

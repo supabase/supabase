@@ -101,15 +101,12 @@ With Project-based billing, you have different quotas for each service. For exam
 In an effort to provide a more fair egress quota for all users, we are unifying egress to be a single usage-based item. You get a total quota, i.e. 250GB on the Pro plan, that you can use for anything - Storage, Realtime, Auth or Database. You can still see a breakdown of the different types of egress on your organization usage page.
 
 <div>
-  <img
+  <Img
     alt="Unified Egress"
-    className="dark:hidden"
-    src="/images/blog/2023-08-31-org-billing/unified-egress--light.png"
-  />
-  <img
-    alt="Unified Egress"
-    className="hidden dark:block"
-    src="/images/blog/2023-08-31-org-billing/unified-egress.png"
+    src={{
+      light: '/images/blog/2023-08-31-org-billing/unified-egress--light.png',
+      dark: '/images/blog/2023-08-31-org-billing/unified-egress.png',
+    }}
   />
 </div>
 
@@ -124,15 +121,12 @@ With Organization-based Billing, you receive a single invoice. Launching a new p
 A [highly requested feature](https://github.com/orgs/supabase/discussions/6681) since we first launched Supabase has been the ability to transfer projects between organizations. This hasn't been possible due to subscriptions being tied to specific projects. We know a lot of users need to transfer projects and are happy to say that Organization-based Billing will finally make this possible without a manual project migration via pgdump or the CLI.
 
 <div>
-  <img
+  <Img
     alt="Project Transfer Overview"
-    className="dark:hidden"
-    src="/images/blog/2023-08-31-org-billing/project-transfer-overview--light.png"
-  />
-  <img
-    alt="Project Transfer Overview"
-    className="hidden dark:block"
-    src="/images/blog/2023-08-31-org-billing/project-transfer-overview.png"
+    src={{
+      light: '/images/blog/2023-08-31-org-billing/project-transfer-overview--light.png',
+      dark: '/images/blog/2023-08-31-org-billing/project-transfer-overview.png',
+    }}
   />
 </div>
 
@@ -168,15 +162,12 @@ For existing customers, we'll be rolling out Organization-based Billing over the
 Shortly after the launch, during the first week of September, you'll be able to initiate the migration to Organization-based Billing yourself. Everyone will be migrated to the new billing eventually, this is just a way to speed things up.
 
 <div>
-  <img
+  <Img
     alt="Self-Serve migration for organization-based billing"
-    className="dark:hidden"
-    src="/images/blog/2023-08-31-org-billing/org-billing-migration--light.png"
-  />
-  <img
-    alt="Self-Serve migration for organization-based billing"
-    className="hidden dark:block"
-    src="/images/blog/2023-08-31-org-billing/org-billing-migration.png"
+    src={{
+      light: '/images/blog/2023-08-31-org-billing/org-billing-migration--light.png',
+      dark: '/images/blog/2023-08-31-org-billing/org-billing-migration.png',
+    }}
   />
 </div>
 
