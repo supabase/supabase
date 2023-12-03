@@ -1,16 +1,16 @@
 'use client'
+
 import { useMutation } from '@tanstack/react-query'
 import { sortBy } from 'lodash'
 import { Loader2 } from 'lucide-react'
 import { useParams, useRouter } from 'next/navigation'
-import { useEffect, useMemo, useState } from 'react'
-import { Input, ScrollArea, cn } from 'ui'
+import { FormEventHandler, useEffect, useMemo, useState } from 'react'
+import { AssistantChatForm, ScrollArea, cn } from 'ui'
 
 import { useMessagesQuery } from '@/data/messages-query'
 import { AssistantMessage, UserMessage } from '@/lib/types'
 import BottomMarker from './BottomMarker'
 import UserChat from './UserChat'
-import { ChatInputAtom } from '@/components/Chat/ChatInput'
 
 export const Chat = () => {
   const router = useRouter()
@@ -96,7 +96,13 @@ export const Chat = () => {
         )}
 
         <div className="px-4 pb-4">
-          <ChatInputAtom
+          <AssistantChatForm
+            key={`chat-thread-form-${runId}`}
+            id={`chat-thread-form-${runId}`}
+            onSubmit={async (event) => {
+              event.preventDefault()
+              mutate(value)
+            }}
             value={value}
             disabled={loading || inputEntered}
             loading={loading || inputEntered}
@@ -105,13 +111,7 @@ export const Chat = () => {
                 ? 'Generating reply to request...'
                 : 'Ask for some changes on the selected message'
             }
-            onChange={(v) => setValue(v.target.value)}
-            handleSubmit={() => {
-              if (value && value.length > 0) {
-                mutate(value)
-                setInputEntered(true)
-              }
-            }}
+            onValueChange={(v) => setValue(v.target.value)}
           />
         </div>
       </div>

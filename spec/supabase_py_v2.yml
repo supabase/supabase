@@ -1940,6 +1940,21 @@ functions:
           with open(filepath, 'rb') as f:
               supabase.storage.from_("testbucket").upload(file=f,path=path_on_supastorage, file_options={"content-type": "audio/mpeg"})
           ```
+  - id: from-update
+    title: from_.update()
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `update` and `select`
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    examples:
+      - id: update-file
+        name: Update file
+        code: |
+          ```python
+          with open(filepath, 'rb') as f:
+            supabase.storage.from_("bucket_name").update(file=f, path=path_on_supastorage, file_options={"cache-control": "3600", "upsert": "true"})
+          ```
   - id: from-move
     title: 'from_.move()'
     notes: |

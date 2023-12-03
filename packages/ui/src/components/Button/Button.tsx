@@ -115,6 +115,9 @@ const buttonVariants = cva(
       disabled: {
         true: 'opacity-50 cursor-default',
       },
+      rounded: {
+        true: 'rounded-full',
+      },
       defaultVariants: {
         //   variant: 'default',
         //   size: 'default',
@@ -146,6 +149,7 @@ export interface ButtonProps
   icon?: React.ReactNode
   iconLeft?: React.ReactNode
   iconRight?: React.ReactNode
+  rounded?: boolean
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -161,6 +165,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       iconRight,
       iconLeft,
       htmlType = 'button',
+      rounded,
       ...props
     },
     ref
@@ -178,7 +183,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         type={htmlType}
         {...props}
-        className={cn(buttonVariants({ type, size, disabled, block }), className)}
+        className={cn(buttonVariants({ type, size, disabled, block, rounded }), className)}
       >
         {asChild ? (
           React.isValidElement(children) ? (
