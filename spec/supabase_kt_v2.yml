@@ -2662,7 +2662,7 @@ functions:
     notes: |
       - Resends a signup confirmation, email change or phone change email to the user.
       - Passwordless sign-ins can be resent by calling the `signInWith(OTP)` method again.
-      - Password recovery emails can be resent by calling the `sendRecoveryEmail()` method again.
+      - Password recovery emails can be resent by calling the `resetPasswordForEmail()` method again.
       - This method will only resend an email or phone OTP to the user if there was an initial signup, email change or phone change request being made.
     examples:
       - id: resend-email-signup-confirmation
@@ -2840,7 +2840,7 @@ functions:
     notes: |
       Sends a password reset request to the given email address.
       - The password reset flow consist of 2 broad steps: (i) Allow the user to login via the password reset link; (ii) Update the user's password.
-      - The `sendRecoveryEmail()` only sends a password reset link to the user's email.
+      - The `resetPasswordForEmail()` only sends a password reset link to the user's email.
       To update the user's password, see [`modifyUser()`](/docs/reference/kotlin/auth-updateuser).
       - The user gets redirected back to your app, assuming you setup [OTP handling](/docs/reference/kotlin/initializing)
       - After the user has been redirected successfully, prompt them for a new password and call `modifyUser()`:
@@ -2855,7 +2855,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.auth.sendRecoveryEmail(email = "example@email.com")
+          supabase.auth.resetPasswordForEmail(email = "example@email.com")
           ```
   - id: exchange-code-for-session
     title: 'exchangeCodeForSession()'
