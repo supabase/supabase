@@ -284,7 +284,7 @@ const DocsSearch = () => {
     })
   }
 
-  const debouncedSearch = useMemo(() => debounce(handleSearch, 1000), [handleSearch])
+  const debouncedSearch = useMemo(() => debounce(handleSearch, 300), [handleSearch])
 
   useEffect(() => {
     if (initialLoad.current) {
