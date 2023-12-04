@@ -49,7 +49,7 @@ const LWXGame = ({ setIsGameMode }: Props) => {
   const { supabase, userData: user, setTicketState } = useConfData()
   const winningWord = 'database'.split('')
   const [currentWord, setCurrentWord] = useState<string[]>(Array(winningWord.length))
-  const [gameState, setGameState] = useState<'playing' | 'winner'>('playing')
+  const [gameState, setGameState] = useState<'playing' | 'winner' | 'loading'>('playing')
   const [hasKeyDown, setHasKeyDown] = useState(false)
   const [attempts, setAttempts] = useState(1)
   const hasWon = currentWord.join('') === winningWord.join('')
@@ -101,7 +101,7 @@ const LWXGame = ({ setIsGameMode }: Props) => {
   const handleClaimTicket = async (e: any) => {
     e.preventDefault()
 
-    setTicketState('loading')
+    setGameState('loading')
 
     if (supabase) {
       if (user.id) {
@@ -126,6 +126,26 @@ const LWXGame = ({ setIsGameMode }: Props) => {
       }
     }
   }
+
+  if (gameState === 'loading')
+    return (
+      <div className="relative w-full mt-[100px] md:mt-44 lg:mt-32 xl:mt-32 2xl:mt-[120px] flex flex-col items-center gap-6 text-foreground">
+        <svg
+          className="animate-spinner opacity-50 w-5 h-5 md:w-6 md:h-6"
+          width="100%"
+          height="100%"
+          viewBox="0 0 62 61"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M61 31C61 14.4315 47.5685 1 31 1C14.4315 1 1 14.4315 1 31"
+            stroke="white"
+            strokeWidth="2"
+          />
+        </svg>
+      </div>
+    )
 
   return (
     <div className="flex flex-col items-center text-center gap-12 md:gap-16">
