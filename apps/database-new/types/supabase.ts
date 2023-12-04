@@ -1,10 +1,4 @@
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[]
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
 export interface Database {
   public: {
@@ -42,16 +36,16 @@ export interface Database {
         }
         Relationships: [
           {
-            foreignKeyName: "messages_user_thread_id_fkey"
-            columns: ["thread_id"]
-            referencedRelation: "threads"
-            referencedColumns: ["thread_id"]
+            foreignKeyName: 'messages_user_thread_id_fkey'
+            columns: ['thread_id']
+            referencedRelation: 'threads'
+            referencedColumns: ['thread_id']
           },
           {
-            foreignKeyName: "messages_user_user_id_fkey"
-            columns: ["user_id"]
-            referencedRelation: "users"
-            referencedColumns: ["id"]
+            foreignKeyName: 'messages_user_user_id_fkey'
+            columns: ['user_id']
+            referencedRelation: 'users'
+            referencedColumns: ['id']
           }
         ]
       }
@@ -88,16 +82,16 @@ export interface Database {
         }
         Relationships: [
           {
-            foreignKeyName: "responses_ai_thread_id_fkey"
-            columns: ["thread_id"]
-            referencedRelation: "threads"
-            referencedColumns: ["thread_id"]
+            foreignKeyName: 'responses_ai_thread_id_fkey'
+            columns: ['thread_id']
+            referencedRelation: 'threads'
+            referencedColumns: ['thread_id']
           },
           {
-            foreignKeyName: "responses_ai_user_id_fkey"
-            columns: ["user_id"]
-            referencedRelation: "users"
-            referencedColumns: ["id"]
+            foreignKeyName: 'responses_ai_user_id_fkey'
+            columns: ['user_id']
+            referencedRelation: 'users'
+            referencedColumns: ['id']
           }
         ]
       }
@@ -134,10 +128,10 @@ export interface Database {
         }
         Relationships: [
           {
-            foreignKeyName: "threads_user_id_fkey"
-            columns: ["user_id"]
-            referencedRelation: "users"
-            referencedColumns: ["id"]
+            foreignKeyName: 'threads_user_id_fkey'
+            columns: ['user_id']
+            referencedRelation: 'users'
+            referencedColumns: ['id']
           }
         ]
       }
@@ -156,4 +150,3 @@ export interface Database {
     }
   }
 }
-
