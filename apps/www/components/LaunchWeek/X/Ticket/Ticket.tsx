@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import Image from 'next/image'
-import { IconEdit, IconEdit2, IconX, cn } from 'ui'
+import { IconEdit2, IconX, cn } from 'ui'
 
 import Panel from '~/components/Panel'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
@@ -11,14 +11,13 @@ import { useBreakpoint, useParams } from 'common'
 export default function Ticket() {
   const { userData: user, showCustomizationForm, setShowCustomizationForm } = useConfData()
   const isMobile = useBreakpoint()
-  const { golden = false, bg_image_id: bgImageId = '1' } = user
+  const { golden = false, bg_image_id: bgImageId = '1', metadata } = user
   const [imageHasLoaded, setImageHasLoaded] = useState(false)
   const params = useParams()
   const sharePage = !!params.username
+  const ticketType = metadata?.hasSecretTicket ? 'secret' : golden ? 'platinum' : 'regular'
 
-  const fallbackImg = `/images/launchweek/lwx/tickets/lwx_ticket_bg_${
-    golden ? 'platinum' : 'regular'
-  }.png`
+  const fallbackImg = `/images/launchweek/lwx/tickets/lwx_ticket_bg_${ticketType}.png`
 
   const ticketBg = {
     regular: {
@@ -28,6 +27,10 @@ export default function Ticket() {
     platinum: {
       background: `/images/launchweek/lwx/tickets/lwx_ticket_bg_platinum.png`,
       background_mobile: `/images/launchweek/lwx/tickets/lwx_ticket_platinum_mobile.png`,
+    },
+    secret: {
+      background: `/images/launchweek/lwx/tickets/lwx_ticket_bg_secret.png`,
+      background_mobile: `/images/launchweek/lwx/tickets/lwx_ticket_secret_mobile.png`,
     },
   }
 
@@ -61,9 +64,7 @@ export default function Ticket() {
         <TicketFooter />
       </div>
       <Image
-        src={
-          ticketBg[golden ? 'platinum' : 'regular'][!isMobile ? 'background' : 'background_mobile']
-        }
+        src={ticketBg[ticketType][!isMobile ? 'background' : 'background_mobile']}
         alt={`Launch Week X ticket background #${bgImageId}`}
         placeholder="blur"
         blurDataURL={fallbackImg}

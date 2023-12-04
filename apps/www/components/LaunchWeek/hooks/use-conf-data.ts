@@ -16,6 +16,7 @@ export type UserData = {
     role?: string
     company?: string
     location?: string
+    hasSecretTicket?: boolean
   }
   sharedOnTwitter?: string
   sharedOnLinkedIn?: string

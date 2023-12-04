@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react'
+import useConfData from '../../hooks/use-conf-data'
 import { Button, cn } from 'ui'
 
 const VALID_KEYS = [
@@ -39,7 +40,18 @@ const COMPLIMENTS = [
   "That's right!",
 ]
 
-const LWXGame = () => {
+interface Props {
+  setIsGameMode: Dispatch<SetStateAction<boolean>>
+}
+
+const LWXGame = ({ setIsGameMode }: Props) => {
+  const {
+    supabase,
+    userData: user,
+    setTicketState,
+    showCustomizationForm,
+    setShowCustomizationForm,
+  } = useConfData()
   const winningWord = 'database'.split('')
   const [currentWord, setCurrentWord] = useState<string[]>(Array(winningWord.length))
   const [gameState, setGameState] = useState<'playing' | 'winner'>('playing')
@@ -91,9 +103,24 @@ const LWXGame = () => {
     window.addEventListener('keydown', onKeyDown)
   }, [onKeyDown])
 
-  const handleClaimTicket = (e: any) => {
+  const handleClaimTicket = async (e: any) => {
     e.preventDefault()
-    alert('claiming ticket!')
+
+    setTicketState('loading')
+
+    if (supabase && user) {
+      await supabase
+        .from('lwx_tickets')
+        .update({ metadata: { ...user.metadata, hasSecretTicket: hasWon } })
+        .eq('username', user.username)
+        .then((res) => {
+          if (res.error) return console.log('error', res.error)
+          setIsGameMode(false)
+          // setTimeout(() => {
+          //   setFormState('idle')
+          // }, 1200)
+        })
+    }
   }
 
   return (
@@ -147,7 +174,7 @@ const LWXGame = () => {
             hasWon && 'opacity-100 translate-y-0'
           )}
         >
-          Claim ticket
+          Claim secret ticket
         </Button>
       </form>
       <div className="flex gap-4 md:gap-10 items-center h-10 text-xs text-foreground-lighter">

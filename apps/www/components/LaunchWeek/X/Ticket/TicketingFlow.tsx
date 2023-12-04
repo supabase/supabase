@@ -22,12 +22,13 @@ import LWXGame from './LWXGame'
 const TicketingFlow = () => {
   const { ticketState, userData } = useConfData()
 
-  const { isGameMode } = useLwxGame()
+  const { isGameMode, setIsGameMode } = useLwxGame()
 
   const isLoading = !isGameMode && ticketState === 'loading'
   const isRegistering = !isGameMode && ticketState === 'registration'
   const hasTicket = !isGameMode && ticketState === 'ticket'
   const hasPlatinumTicket = userData.golden
+  const hasSecretTicket = userData.metadata?.hasSecretTicket
 
   const transition = DEFAULT_TRANSITION
   const initial = INITIAL_BOTTOM
@@ -121,7 +122,14 @@ const TicketingFlow = () => {
                     <TicketContainer />
                   </div>
                   <div className="order-first xl:h-full max-w-md gap-3 flex flex-col items-center justify-center xl:items-start xl:justify-start xl:text-left">
-                    {hasPlatinumTicket ? (
+                    {hasSecretTicket ? (
+                      <p className="text-2xl lg:text-3xl">
+                        <span className="text-foreground-lighter">
+                          You found the secret ticket.
+                        </span>{' '}
+                        Share it to increase your chances of winning even more.
+                      </p>
+                    ) : hasPlatinumTicket ? (
                       <p className="text-2xl lg:text-3xl">
                         <span className="text-foreground-lighter">Congrats!</span> You've maximized
                         your chances and have a platinum ticket now.
@@ -137,6 +145,7 @@ const TicketingFlow = () => {
                         <span className="">Keep sharing to increase your chances.</span>
                       </p>
                     )}
+                    <CountdownComponent date={LWX_LAUNCH_DATE} showCard={false} />
                     {!hasPlatinumTicket && <TicketPresence />}
                     <div className="w-full h-auto text-center md:text-left border border-muted flex flex-col md:flex-row items-stretch rounded-lg bg-[#060809] mt-2 md:mt-8 overflow-hidden">
                       <div className="flex flex-col md:w-2/3 gap-1 pb-6">
@@ -178,7 +187,7 @@ const TicketingFlow = () => {
                   exit={exit}
                   className="w-full flex justify-center text-foreground !h-[500px]"
                 >
-                  <LWXGame />
+                  <LWXGame setIsGameMode={setIsGameMode} />
                 </m.div>
               )}
             </AnimatePresence>
