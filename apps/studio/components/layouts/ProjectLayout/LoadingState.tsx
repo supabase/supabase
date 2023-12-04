@@ -21,14 +21,8 @@ const LoadingState = () => {
         )}
       </div>
 
-      <div className="mx-6 space-y-4">
-        <ShimmeringLoader className="w-40 h-7" />
-        <div className="flex md:gap-4 lg:gap-8">
-          <ShimmeringLoader className="w-full h-[304px]" />
-          <ShimmeringLoader className="w-full h-[304px]" />
-          <ShimmeringLoader className="w-full h-[304px]" />
-          <ShimmeringLoader className="w-full h-[304px]" />
-        </div>
+      <div className="mx-6">
+        <ProjectUsageLoadingState />
       </div>
 
       <div className="mx-6 space-y-4">
@@ -40,3 +34,17 @@ const LoadingState = () => {
 }
 
 export default LoadingState
+
+export const ProjectUsageLoadingState = () => {
+  return (
+    <div className="space-y-4">
+      <ShimmeringLoader className="w-40 h-7" />
+      <div className="flex md:gap-4 lg:gap-8">
+        <ShimmeringLoader className="w-full h-[304px]" />
+        <ShimmeringLoader className="w-full h-[304px]" />
+        <ShimmeringLoader className="w-full h-[304px]" />
+        <ShimmeringLoader className="w-full h-[304px]" />
+      </div>
+    </div>
+  )
+}
