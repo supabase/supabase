@@ -1,8 +1,8 @@
 'use client'
 
 import { useAppStateSnapshot } from '@/lib/state'
-import { usePathname, useParams } from 'next/navigation'
-import { LoadingLine as LoadingLineComponent } from 'ui'
+import { useParams, usePathname } from 'next/navigation'
+import { LoadingLine as LoadingLineComponent } from 'ui-patterns'
 
 function LoadingLine() {
   const snap = useAppStateSnapshot()

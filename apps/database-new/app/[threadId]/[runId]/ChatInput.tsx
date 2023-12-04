@@ -3,7 +3,8 @@
 import { updateThread } from '@/app/actions'
 import { useState } from 'react'
 import { useFormState, useFormStatus } from 'react-dom'
-import { AssistantChatForm, Input } from 'ui'
+import { Input } from 'ui'
+import { AssistantChatForm } from 'ui-patterns'
 
 function ChatInput({ params }: { params: { threadId: string; runId: string } }) {
   const [value, setValue] = useState('')
