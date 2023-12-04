@@ -2,9 +2,10 @@ import '@ui/layout/ai-icon-animation/ai-icon-animation-style.module.css'
 import './globals.css'
 
 import Header from '@/components/Header/Header'
-import { ReactQueryProvider, ThemeProvider } from '@/components/providers'
+import { ThemeProvider } from '@/components/providers'
 import type { Metadata } from 'next'
 import Footer from '@/components/Footer'
+import { LoadingLine } from './LoadingLine'
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -23,13 +24,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className="dark h-full bg-background" suppressHydrationWarning>
       <body className="flex flex-col h-full">
         <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
-          <ReactQueryProvider>
-            <Header />
-            <main role="main" className="h-full w-full flex flex-col grow">
-              {children}
-            </main>
-            <Footer />
-          </ReactQueryProvider>
+          <Header />
+          <LoadingLine />
+          <main role="main" className="h-full w-full flex flex-col grow">
+            {children}
+          </main>
+          <Footer />
         </ThemeProvider>
       </body>
     </html>

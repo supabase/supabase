@@ -8,7 +8,7 @@ import { parseTables } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { cookies } from 'next/headers'
-import { redirect } from 'next/navigation'
+import { RedirectType, redirect } from 'next/navigation'
 
 import OpenAI from 'openai'
 import { z } from 'zod'
@@ -101,7 +101,7 @@ export async function updateThreadName(prevState: any, formData: FormData) {
   }
 }
 
-export async function updateThread(prevState: any, formData: FormData) {
+export async function createThread(prevState: any, formData: FormData) {
   const cookieStore = cookies()
   const supabase = createClient(cookieStore)
 
@@ -131,7 +131,7 @@ export async function updateThread(prevState: any, formData: FormData) {
 
     const thread = await openai.beta.threads.create()
 
-    await openai.beta.threads.messages.create(thread.id, {
+    const message = await openai.beta.threads.messages.create(thread.id, {
       role: 'user',
       content: data.value,
     })
@@ -156,7 +156,6 @@ export async function updateThread(prevState: any, formData: FormData) {
       .find((text) => text !== undefined)
 
     try {
-      console.log('inserting thread')
       const { error } = await supabase.from('threads').insert({
         thread_id: thread.id,
         run_id: run.id,
@@ -169,7 +168,16 @@ export async function updateThread(prevState: any, formData: FormData) {
       console.error(error)
     }
 
-    redirectUrl = `/${thread.id}/${run.id}`
+    redirectUrl = `/${thread.id}/${run.id}/${message.id}`
+    // return {
+    //   success: true,
+    //   message: 'Managed to run action',
+    //   data: {
+    //     messageId: message.id,
+    //     runId: run.id,
+    //     threadId: thread.id,
+    //   },
+    // }
   } catch (error: any) {
     console.error(error)
     return {
@@ -179,5 +187,50 @@ export async function updateThread(prevState: any, formData: FormData) {
     }
   }
 
+  redirect(redirectUrl)
+}
+
+export async function updateThread(prevState: any, formData: FormData) {
+  const cookieStore = cookies()
+  const supabase = createClient(cookieStore)
+
+  let redirectUrl = ''
+
+  try {
+    const schema = z.object({
+      value: z.string(),
+      threadId: z.string(),
+      runId: z.string(),
+    })
+
+    const data = schema.parse({
+      value: formData.get('value'),
+      threadId: formData.get('threadId'),
+      runId: formData.get('runId'),
+    })
+
+    const message = await openai.beta.threads.messages.create(data.threadId, {
+      content: data.value,
+      role: 'user',
+    })
+
+    revalidatePath(`/${data.threadId}/${data.runId}`, 'layout')
+
+    const run = await openai.beta.threads.runs.create(message.thread_id, {
+      assistant_id: 'asst_oLWrK8lScZVNEpfjwUIvBAnq',
+    })
+
+    revalidatePath(`/${data.threadId}/${data.runId}/${message.id}`, 'layout')
+
+    redirectUrl = `/${message.thread_id}/${run.id}/${message.id}`
+  } catch (error: any) {
+    return {
+      success: false,
+      message: 'Failed to update schema with new prompt',
+      data: undefined,
+    }
+  }
+
+  revalidatePath(redirectUrl)
   redirect(redirectUrl)
 }
