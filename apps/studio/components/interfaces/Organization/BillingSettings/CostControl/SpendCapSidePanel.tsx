@@ -301,7 +301,7 @@ const SpendCapSidePanel = () => {
               <p className="text-sm">
                 {selectedOption === 'on'
                   ? 'Upon clicking confirm, spend cap will be enabled for your organization and you will no longer be charged any extra for usage.'
-                  : 'Upon clicking confirm, spend cap will be disabled for your organization and you will be charged for any usage beyong the included quota.'}
+                  : 'Upon clicking confirm, spend cap will be disabled for your organization and you will be charged for any usage beyond the included quota.'}
               </p>
             </>
           )}
