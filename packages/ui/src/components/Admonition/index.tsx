@@ -48,22 +48,12 @@ const WarningIcon = () => (
   </svg>
 )
 
-const admonitionTypeLabelVariants = cva('uppercase font-mono inline px-2 py-0.5 border rounded', {
-  variants: {
-    type: {
-      default: `bg-surface-100 text-foreground`,
-      warning: `bg-surface-100 text-foreground`,
-      destructive: `bg-surface-100 text-foreground`,
-    },
-  },
-})
-
 const admonitionSVG = cva('', {
   variants: {
     type: {
       default: `[&_svg]:bg-foreground-muted [&_svg]:text-background-muted`,
       warning: `[&_svg]:bg-warning [&_svg]:text-warning-100`,
-      destructive: `[&_svg]:bg-surface-100 [&_svg]:text-foreground`,
+      destructive: `[&_svg]:bg-destructive [&_svg]:text-white`,
     },
   },
 })
@@ -72,8 +62,8 @@ const admonitionBase = cva('', {
   variants: {
     type: {
       default: `bg-surface-200/25 border`,
-      warning: `bg-alternative ![&_p]:text-background-muted border`,
-      destructive: `bg-surface-300 border`,
+      warning: `bg-alternative border border-default ![&_p]:text-background-muted border`,
+      destructive: `bg-alternative border border-default`,
     },
   },
 })
@@ -92,7 +82,7 @@ export const Admonition = ({
         admonitionSVG({ type: typeMapped }),
         admonitionBase({ type: typeMapped })
       )}
-      variant={'default'}
+      variant={typeMapped}
     >
       {typeMapped === 'warning' || typeMapped === 'destructive' ? <WarningIcon /> : <InfoIcon />}
       {label ? (
