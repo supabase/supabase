@@ -1,7 +1,7 @@
 import { Session, SupabaseClient } from '@supabase/supabase-js'
 import { createContext, useContext } from 'react'
 
-export type TicketState = 'registration' | 'ticket' | 'loading'
+export type TicketState = 'registration' | 'ticket' | 'loading' | 'game'
 
 export type UserData = {
   id?: string

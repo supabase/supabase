@@ -16,13 +16,17 @@ import CountdownComponent from '../Countdown'
 import LaunchWeekPrizeSection from '../LaunchWeekPrizeSection'
 import TicketPresence from './TicketPresence'
 import TicketActions from './TicketActions'
+import useLwxGame from '../../hooks/useLwxGame'
+import LWXGame from './LWXGame'
 
 const TicketingFlow = () => {
   const { ticketState, userData } = useConfData()
 
-  const isLoading = ticketState === 'loading'
-  const isRegistering = ticketState === 'registration'
-  const hasTicket = ticketState === 'ticket'
+  const { isGameMode } = useLwxGame()
+
+  const isLoading = !isGameMode && ticketState === 'loading'
+  const isRegistering = !isGameMode && ticketState === 'registration'
+  const hasTicket = !isGameMode && ticketState === 'ticket'
   const hasPlatinumTicket = userData.golden
 
   const transition = DEFAULT_TRANSITION
@@ -36,20 +40,24 @@ const TicketingFlow = () => {
     <>
       <SectionContainer className="relative flex flex-col !pt-8 lg:!pt-20 items-center gap-5 text-center h-auto lg:min-h-[886px]">
         <h1 className="sr-only">Supabase Launch Week X | {LWX_DATE}</h1>
-        {!hasTicket && (
-          <div className="flex flex-col items-center gap-1 text-light font-mono uppercase ">
-            <p className="flex items-center gap-3 leading-none">
-              <span className="text-lg text-foreground tracking-[2px]">Launch Week</span>{' '}
-              <Image
-                src="/images/launchweek/lwx/logos/lwx_logo.svg"
-                alt="Supabase Launch Week X icon"
-                width={16}
-                height={16}
-              />
-            </p>
-            <CountdownComponent date={LWX_LAUNCH_DATE} showCard={false} />
-          </div>
-        )}
+
+        <div
+          className={cn(
+            'flex flex-col items-center gap-1 text-light font-mono uppercase transition-all opacity-0 invisible',
+            !isGameMode && !hasTicket && 'opacity-100 visible'
+          )}
+        >
+          <p className="flex items-center gap-3 leading-none">
+            <span className="text-lg text-foreground tracking-[2px]">Launch Week</span>{' '}
+            <Image
+              src="/images/launchweek/lwx/logos/lwx_logo.svg"
+              alt="Supabase Launch Week X icon"
+              width={16}
+              height={16}
+            />
+          </p>
+          <CountdownComponent date={LWX_LAUNCH_DATE} showCard={false} />
+        </div>
         <div className="relative min-h-[500px] md:min-h-[634px] z-10 w-full flex flex-col justify-center items-center gap-5 md:gap-10 text-center">
           <LazyMotion features={domAnimation}>
             <AnimatePresence exitBeforeEnter key={ticketState}>
@@ -162,6 +170,17 @@ const TicketingFlow = () => {
                   </div>
                 </m.div>
               )}
+              {isGameMode && (
+                <m.div
+                  key="ticket"
+                  initial={initial}
+                  animate={animate}
+                  exit={exit}
+                  className="w-full flex justify-center text-foreground !h-[500px]"
+                >
+                  <LWXGame />
+                </m.div>
+              )}
             </AnimatePresence>
           </LazyMotion>
         </div>
@@ -171,6 +190,7 @@ const TicketingFlow = () => {
             'absolute z-0 top-0 left-0 right-0 bottom-0 w-full flex items-center justify-center opacity-100 transition-opacity',
             hasTicket && 'opacity-20'
           )}
+          isGameMode={isGameMode as boolean}
         />
       </SectionContainer>
       <SectionContainer className="!pt-4 lg:pb-40">
