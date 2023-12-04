@@ -15,7 +15,7 @@ export default function TicketForm() {
     SupabaseClient['channel']
   > | null>(null)
   const [errorMsg] = useState('')
-  const { supabase, session, setUserData, ticketState, setTicketState, userData } = useConfData()
+  const { supabase, session, setUserData, setTicketState, userData } = useConfData()
   const router = useRouter()
 
   // Triggered on session
@@ -24,7 +24,7 @@ export default function TicketForm() {
       const username = session.user.user_metadata.user_name
       const name = session.user.user_metadata.full_name
       const email = session.user.email
-      const hasSecretTicket = localStorage.getItem('hasSecretTicket') === 'true'
+      const hasSecretTicket = localStorage.getItem('lwx_hasSecretTicket') === 'true'
 
       await supabase
         .from('lwx_tickets')

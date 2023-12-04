@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import useConfData from './use-conf-data'
 
 const VALID_KEYS = [
   'a',
@@ -29,10 +30,14 @@ const VALID_KEYS = [
   'z',
 ]
 
-const useLwxGame = () => {
+const useLwxGame = (showCustomizationForm?: boolean) => {
   const [isGameMode, setIsGameMode] = useState(false)
+  const { ticketState } = useConfData()
 
   function onKeyDown(event: KeyboardEvent) {
+    console.log('showCustomizationForm', showCustomizationForm, ticketState)
+    if (showCustomizationForm) return
+
     if (event.key === 'Escape') {
       setIsGameMode(false)
     }
@@ -45,12 +50,12 @@ const useLwxGame = () => {
   }
 
   useEffect(() => {
-    window.addEventListener('keydown', onKeyDown)
+    if (!showCustomizationForm) window.addEventListener('keydown', onKeyDown)
 
     return () => {
       window.removeEventListener('keydown', onKeyDown)
     }
-  }, [])
+  }, [showCustomizationForm])
 
   return { isGameMode, setIsGameMode }
 }

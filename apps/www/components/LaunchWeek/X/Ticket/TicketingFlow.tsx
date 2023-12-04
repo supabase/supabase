@@ -20,9 +20,8 @@ import useLwxGame from '../../hooks/useLwxGame'
 import LWXGame from './LWXGame'
 
 const TicketingFlow = () => {
-  const { ticketState, userData } = useConfData()
-
-  const { isGameMode, setIsGameMode } = useLwxGame()
+  const { ticketState, userData, showCustomizationForm } = useConfData()
+  const { isGameMode, setIsGameMode } = useLwxGame(showCustomizationForm)
 
   const isLoading = !isGameMode && ticketState === 'loading'
   const isRegistering = !isGameMode && ticketState === 'registration'
@@ -177,7 +176,7 @@ const TicketingFlow = () => {
                   </div>
                 </m.div>
               )}
-              {isGameMode && (
+              {!showCustomizationForm && isGameMode && (
                 <m.div
                   key="ticket"
                   initial={initial}

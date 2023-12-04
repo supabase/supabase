@@ -46,8 +46,9 @@ interface Props {
 }
 
 const LWXGame = ({ setIsGameMode }: Props) => {
-  const { supabase, userData: user, setTicketState } = useConfData()
-  const winningWord = 'database'.split('')
+  const { supabase, userData: user } = useConfData()
+  const word = process.env.NEXT_PUBLIC_LWX_GAME_WORD ?? 'database'
+  const winningWord = word?.split('')
   const [currentWord, setCurrentWord] = useState<string[]>(Array(winningWord.length))
   const [gameState, setGameState] = useState<'playing' | 'winner' | 'loading'>('playing')
   const [hasKeyDown, setHasKeyDown] = useState(false)
@@ -85,10 +86,6 @@ const LWXGame = ({ setIsGameMode }: Props) => {
       searchAndAddToCurrentWord(newKey)
     }
 
-    if (hasWon && newKey === 'Enter') {
-      handleClaimTicket(null)
-    }
-
     setTimeout(() => {
       setHasKeyDown(false)
     }, 100)
@@ -96,8 +93,22 @@ const LWXGame = ({ setIsGameMode }: Props) => {
 
   useEffect(() => {
     window.addEventListener('keydown', onKeyDown)
+
+    // return window.removeEventListener('keydown', onKeyDown)
   }, [onKeyDown])
 
+  async function handleGithubSignIn() {
+    const redirectTo = `${SITE_ORIGIN}/launch-week/${
+      user.username ? '?referral=' + user.username : ''
+    }`
+
+    supabase?.auth.signInWithOAuth({
+      provider: 'github',
+      options: {
+        redirectTo,
+      },
+    })
+  }
   const handleClaimTicket = async (e: any) => {
     e.preventDefault()
 
@@ -115,14 +126,8 @@ const LWXGame = ({ setIsGameMode }: Props) => {
           })
       } else {
         localStorage.setItem('lwx_hasSecretTicket', 'true')
-        const redirectTo = `${SITE_ORIGIN}/launch-week`
 
-        supabase?.auth.signInWithOAuth({
-          provider: 'github',
-          options: {
-            redirectTo,
-          },
-        })
+        handleGithubSignIn()
       }
     }
   }

@@ -30,7 +30,12 @@ const TicketCustomizationForm = ({ className }: { className?: string }) => {
 
   const handleFormSubmit = async () => {
     setFormState('saving')
-    const payload = { metadata: formData }
+    const payload = {
+      metadata: {
+        ...user.metadata,
+        ...formData,
+      },
+    }
 
     if (supabase) {
       await supabase
