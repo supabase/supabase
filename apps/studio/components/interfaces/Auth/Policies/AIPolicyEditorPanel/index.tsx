@@ -234,7 +234,7 @@ export const AIPolicyEditorPanel = memo(function ({
                       Discard
                     </Button>
                     <Button type="primary" onClick={() => acceptChange()}>
-                      Apply
+                      Accept
                     </Button>
                   </div>
                 </div>
