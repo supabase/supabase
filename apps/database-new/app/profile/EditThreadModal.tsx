@@ -1,10 +1,10 @@
 'use client'
 
-import { Button, Input, Modal } from 'ui'
-
+import { updateThreadName } from '@/app/actions'
+import { createRef, useEffect } from 'react'
+import { useFormState, useFormStatus } from 'react-dom'
+import { Button, Input_Shadcn_, Label_Shadcn_, Modal } from 'ui'
 import { ThreadType } from './Threads'
-import { useState } from 'react'
-import { updateThreadName } from '../actions'
 
 const EditThreadModal = ({
   thread,
@@ -15,7 +15,36 @@ const EditThreadModal = ({
   onClose: () => void
   visible: boolean
 }) => {
-  const [value, setValue] = useState(thread.thread_title)
+  const formRef = createRef<HTMLFormElement>()
+
+  const initialState = {
+    message: undefined,
+    success: undefined,
+    data: {
+      row_id: thread.id,
+      thread_title: thread.thread_title,
+    },
+  }
+
+  const [state, formAction] = useFormState(updateThreadName, initialState)
+
+  useEffect(() => {
+    if (state?.success === true) {
+      onClose()
+      formRef.current?.reset()
+      state.success = undefined
+    }
+  }, [state, onClose, formRef])
+
+  function SubmitButton() {
+    const { pending } = useFormStatus()
+
+    return (
+      <Button type="secondary" htmlType="submit" aria-disabled={pending} loading={pending}>
+        Update thread name
+      </Button>
+    )
+  }
 
   return (
     <Modal
@@ -27,31 +56,24 @@ const EditThreadModal = ({
       header="Edit thread name"
       className="pb-2"
     >
-      <form
-        action={(formData: FormData) => {
-          const threadNameEntry: FormDataEntryValue | null = formData.get('threadName')
-
-          // Check if threadNameEntry is not null and is of type string
-          if (threadNameEntry !== null && typeof threadNameEntry === 'string') {
-            const threadName: string = threadNameEntry
-            updateThreadName(thread.id, threadName)
-          }
-        }}
-      >
+      <form ref={formRef} action={formAction} key={`${thread.id}-update-thread-title-form`}>
         <Modal.Content className="py-4">
-          <Input
-            label="Provide a name for your thread"
-            value={value}
-            name="threadName"
-            onChange={(e) => setValue(e.target.value)}
+          <Label_Shadcn_ htmlFor="thread_title">Provide a name for your thread</Label_Shadcn_>
+          <Input_Shadcn_
+            placeholder="Type in a name for the thread..."
+            type="text"
+            name="thread_title"
+            defaultValue={state.data.thread_title}
           />
+          <Input_Shadcn_ name="row_id" value={state.data.row_id} type="hidden" />
         </Modal.Content>
         <Modal.Separator />
         <Modal.Content className="flex flex-row gap-3 justify-end">
           <Button type="default">Cancel</Button>
-          <Button type="secondary" htmlType="submit">
-            Update thread name
-          </Button>
+          <SubmitButton />
+          <p aria-live="polite" className="sr-only" role="status">
+            {state?.message}
+          </p>
         </Modal.Content>
       </form>
     </Modal>

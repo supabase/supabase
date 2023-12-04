@@ -1,4 +1,6 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
+
 import { isResponseOk, post } from 'lib/common/fetch'
 import { BASE_PATH } from 'lib/constants'
 import { ResponseError } from 'types'
@@ -26,6 +28,7 @@ type SqlTitleGenerateData = Awaited<ReturnType<typeof generateSqlTitle>>
 
 export const useSqlTitleGenerateMutation = ({
   onSuccess,
+  onError,
   ...options
 }: Omit<
   UseMutationOptions<SqlTitleGenerateData, ResponseError, SqlTitleGenerateVariables>,
@@ -36,6 +39,13 @@ export const useSqlTitleGenerateMutation = ({
     {
       async onSuccess(data, variables, context) {
         await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to generate title: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
       },
       ...options,
     }

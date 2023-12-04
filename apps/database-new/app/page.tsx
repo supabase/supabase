@@ -1,24 +1,27 @@
-import { createClient } from '@/lib/supabase/server'
+// import LoginForm from '@/components/Auth/LoginForm'
 import type { Metadata } from 'next'
-import { cookies } from 'next/headers'
+import { LoginDialog } from './LoginDialog'
 import NewThreadInput from './NewThreadInput'
+import LoginForm from '@/components/Auth/LoginForm'
 
 export const metadata: Metadata = {
   title: 'database.design | Create',
 }
 
-const NewThread = async () => {
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore)
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
+const NewThread = async ({
+  searchParams,
+}: {
+  searchParams: { prompt: string; message: string }
+}) => {
   return (
-    <div className="h-full flex items-center justify-center w-full flex-col gap-y-4">
-      <NewThreadInput userID={user?.id} />
-    </div>
+    <>
+      <div className="h-full flex items-center justify-center w-full flex-col gap-y-4">
+        <NewThreadInput />
+      </div>
+      <LoginDialog>
+        <LoginForm searchParams={searchParams} />
+      </LoginDialog>
+    </>
   )
 }
 

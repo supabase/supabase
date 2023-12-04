@@ -1,19 +1,30 @@
 import { toast } from 'react-hot-toast'
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { executeSql, ExecuteSqlData, ExecuteSqlVariables } from './execute-sql-query'
-import { ResponseError } from 'types'
 
-/* Execute Query */
+export type QueryResponseError = {
+  code: string
+  message: string
+  error: string
+  formattedError: string
+  file: string
+  length: number
+  line: string
+  name: string
+  position: string
+  routine: string
+  severity: string
+}
 
 export const useExecuteSqlMutation = ({
   onSuccess,
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ExecuteSqlData, ResponseError, ExecuteSqlVariables>,
+  UseMutationOptions<ExecuteSqlData, QueryResponseError, ExecuteSqlVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<ExecuteSqlData, ResponseError, ExecuteSqlVariables>(
+  return useMutation<ExecuteSqlData, QueryResponseError, ExecuteSqlVariables>(
     (args) => executeSql(args),
     {
       async onSuccess(data, variables, context) {

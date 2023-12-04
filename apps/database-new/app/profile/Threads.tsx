@@ -1,9 +1,6 @@
 import { Database } from '@/types/supabase'
 import EmptyState from './EmptyState'
 import Thread from './Thread'
-// import { useState, useEffect } from 'react'
-import ConfirmDeleteThreadModal from './ConfirmDeleteThreadModal'
-import EditThreadModal from './EditThreadModal'
 import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 
@@ -19,14 +16,18 @@ async function Threads() {
 
   if (!user) return <p>Error fetching user details</p>
 
-  const { data } = await supabase.from('threads').select().eq('user_id', user.id)
+  const { data } = await supabase
+    .from('threads')
+    .select()
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
 
   const threads = data ?? []
 
   return (
     <div className="flex flex-col gap-y-3">
       {threads.length > 0 ? (
-        threads.map((thread) => <Thread key={`thread-item-${thread.id}`} thread={thread} />)
+        threads.sort().map((thread) => <Thread key={`thread-item-${thread.id}`} thread={thread} />)
       ) : (
         <EmptyState />
       )}

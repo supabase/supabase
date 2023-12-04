@@ -66,7 +66,7 @@ export default function TicketContainer({ user, sharePage, referrals, supabase }
           isMobile && styles['ticket-hero'],
         ].join(' ')}
       >
-        <div className="text-foreground flex flex-col w-full items-center text-white text-center lg:text-left lg:items-start gap-3">
+        <div className="text-foreground flex flex-col w-full items-center text-center lg:text-left lg:items-start gap-3">
           <h1 className={cn('text-2xl tracking-[-0.02rem] leading-7 block text-white')}>
             {!sharePage ? (
               name ? (
