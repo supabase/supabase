@@ -44,8 +44,10 @@ import {
 import { IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
+import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import Telemetry from 'lib/telemetry'
 import { useAppStateSnapshot } from 'state/app-state'
+import { getImpersonatedRole } from 'state/role-impersonation-state'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
@@ -311,7 +313,10 @@ const SQLEditor = () => {
         execute({
           projectRef: project.ref,
           connectionString: project.connectionString,
-          sql,
+          sql: wrapWithRoleImpersonation(sql, {
+            projectRef: project.ref,
+            role: getImpersonatedRole(),
+          }),
         })
       }
     },
