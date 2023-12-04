@@ -247,7 +247,7 @@ Pendekatan kami untuk pustaka klien bersifat modular. Setiap sub-pustaka adalah 
 - [Bahasa Mandarin / 简体中文](/i18n/README.zh-cn.md)
 - [Bahasa Swedia / Svenska](/i18n/README.sv.md)
 - [Bahasa Thai / ไทย](/i18n/README.th.md)
-- [Bahasa Tionghoa Tradisional / 繁体中文](/i18n/README.zh-tw.md)
+- [Bahasa Tionghoa Tradisional / 繁體中文](/i18n/README.zh-tw.md)
 - [Bahasa Turki / Türkçe](/i18n/README.tr.md)
 - [Bahasa Ukraina / Українська](/i18n/README.uk.md)
 - [Bahasa Vietnam / Tiếng Việt](/i18n/README.vi-vn.md)

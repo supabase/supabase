@@ -247,7 +247,7 @@ Nasze podejście do bibliotek klienckich jest modułowe. Każda pod-biblioteka j
 - [Chiński uproszczony / 简体中文](/i18n/README.zh-cn.md)
 - [Szwedzki / Svenska](/i18n/README.sv.md)
 - [Tajski / ไทย](/i18n/README.th.md)
-- [Chiński tradycyjny / 繁体中文](/i18n/README.zh-tw.md)
+- [Chiński tradycyjny / 繁體中文](/i18n/README.zh-tw.md)
 - [Turecki /ürkçe](/i18n/README.tr.md)
 - [Ukraiński / Українська](/i18n/README.uk.md)
 - [Wietnamski / Tiếng Việt](/i18n/README.vi-vn.md)
