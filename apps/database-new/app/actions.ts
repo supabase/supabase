@@ -12,6 +12,7 @@ import { RedirectType, redirect } from 'next/navigation'
 
 import OpenAI from 'openai'
 import { z } from 'zod'
+import { threadId } from 'worker_threads'
 
 const openai = new OpenAI()
 
@@ -257,6 +258,19 @@ export async function updateThread(prevState: any, formData: FormData) {
       if (error) throw error
     } catch (error) {
       console.error(error)
+    }
+    console.log('message.id', message.id)
+    // update existing thread with latest messageID
+    try {
+      const { error } = await supabase
+        .from('threads')
+        .update({
+          latest_message_id: message.id,
+        })
+        .eq('thread_id', data.threadId)
+      if (error) throw error
+    } catch (error) {
+      console.error('Update error:', error)
     }
 
     const run = await openai.beta.threads.runs.create(message.thread_id, {

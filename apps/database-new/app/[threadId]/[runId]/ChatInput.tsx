@@ -39,7 +39,7 @@ function ChatInput({ params }: { params: { threadId: string; runId: string } }) 
           // loading
           // ? 'Generating reply to request...'
           // :
-          'Ask for some changes on the selected message'
+          'Any changes to make?'
         }
         onValueChange={(v) => setValue(v.target.value)}
         message={state.message}
