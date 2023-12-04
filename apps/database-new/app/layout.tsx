@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   description: 'Generate schemas from your ideas',
 }
 
-// supressHydrationWarning:
+// suppressHydrationWarning:
 // https://github.com/pacocoursey/next-themes#with-app
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
