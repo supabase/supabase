@@ -4,6 +4,7 @@ import { toast } from 'react-hot-toast'
 import { Query, SupaTable } from 'components/grid'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
+import { ImpersonationRole, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { ResponseError } from 'types'
 
 export type TableRowUpdateVariables = {
@@ -13,6 +14,7 @@ export type TableRowUpdateVariables = {
   configuration: { identifiers: any }
   payload: any
   enumArrayColumns: string[]
+  impersonatedRole?: ImpersonationRole
 }
 
 export function getTableRowUpdateSql({
@@ -35,8 +37,15 @@ export async function updateTableRow({
   payload,
   configuration,
   enumArrayColumns,
+  impersonatedRole,
 }: TableRowUpdateVariables) {
-  const sql = getTableRowUpdateSql({ table, configuration, payload, enumArrayColumns })
+  const sql = wrapWithRoleImpersonation(
+    getTableRowUpdateSql({ table, configuration, payload, enumArrayColumns }),
+    {
+      projectRef,
+      role: impersonatedRole,
+    }
+  )
 
   const { result } = await executeSql({ projectRef, connectionString, sql })
 
