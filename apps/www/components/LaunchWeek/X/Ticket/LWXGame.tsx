@@ -178,7 +178,7 @@ const LWXGame = ({ setIsGameMode }: Props) => {
               key={`${currentWord[i]}-${i}`}
               className={cn(
                 'w-6 md:w-14 aspect-square bg-[#06080930] backdrop-blur-sm flex items-center hover:border-strong justify-center uppercase border rounded-sm md:rounded-lg transition-colors',
-                isMatch && 'border-stronger',
+                isMatch && 'border-stronger bg-foreground text-[#060809]',
                 hasWon && 'animate-pulse !border-foreground',
                 hasKeyDown && 'border-strong'
               )}
