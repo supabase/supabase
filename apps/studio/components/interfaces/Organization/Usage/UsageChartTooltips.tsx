@@ -4,7 +4,7 @@ import { Attribute, COLOR_MAP } from './Usage.constants'
 
 export interface SingleAttributeTooltipContentProps {
   name: string
-  unit: 'bytes' | 'percentage' | 'absolute'
+  unit: 'bytes' | 'percentage' | 'absolute' | 'hours'
   value: any
   isAfterToday: boolean
   tooltipFormatter?: (value: any) => any
@@ -37,6 +37,7 @@ export interface MultiAttributeTooltipContentProps {
   values: Payload<ValueType, string | number>[]
   isAfterToday: boolean
   tooltipFormatter?: (value: any) => any
+  unit: 'bytes' | 'percentage' | 'absolute' | 'hours'
 }
 
 const AttributeContent = ({
@@ -44,11 +45,13 @@ const AttributeContent = ({
   attributeMeta,
   sumValue,
   tooltipFormatter,
+  unit,
 }: {
   attribute: Attribute
   attributeMeta?: Payload<ValueType, string | number>
   sumValue: number
   tooltipFormatter?: (value: any) => any
+  unit: 'bytes' | 'percentage' | 'absolute' | 'hours'
 }) => {
   const attrValue = Number(attributeMeta?.value ?? 0)
   const percentageContribution = ((attrValue / sumValue) * 100).toFixed(1)
@@ -62,7 +65,9 @@ const AttributeContent = ({
         </p>
       </div>
       <p className="text-xs tabular-nums">
-        {tooltipFormatter !== undefined ? tooltipFormatter(attrValue) : attrValue}
+        {tooltipFormatter !== undefined
+          ? tooltipFormatter(attrValue)
+          : `${attrValue}${unit === 'hours' ? ' H' : ''}`}
       </p>
     </div>
   )
@@ -73,6 +78,7 @@ export const MultiAttributeTooltipContent = ({
   values,
   isAfterToday,
   tooltipFormatter,
+  unit,
 }: MultiAttributeTooltipContentProps) => {
   const sumValue = values.reduce((a, b) => a + Number(b.value), 0)
   return (
@@ -84,6 +90,8 @@ export const MultiAttributeTooltipContent = ({
           {attributes.flatMap((attr) => {
             const attributeMeta = values.find((x) => x.dataKey === attr.key)
 
+            console.log(attributeMeta)
+
             // Filter out empty attributes
             if (Number(attributeMeta?.value ?? 0) === 0) return []
 
@@ -94,6 +102,7 @@ export const MultiAttributeTooltipContent = ({
                 attributeMeta={attributeMeta}
                 sumValue={sumValue}
                 tooltipFormatter={tooltipFormatter}
+                unit={unit}
               />
             )
           })}
