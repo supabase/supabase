@@ -116,9 +116,6 @@ const LWXGame = ({ setIsGameMode }: Props) => {
         .then((res) => {
           if (res.error) return console.log('error', res.error)
           setIsGameMode(false)
-          // setTimeout(() => {
-          //   setFormState('idle')
-          // }, 1200)
         })
     }
   }
@@ -179,13 +176,25 @@ const LWXGame = ({ setIsGameMode }: Props) => {
       </form>
       <div className="flex gap-4 md:gap-10 items-center h-10 text-xs text-foreground-lighter">
         <div className="flex items-center gap-2">
-          <Button type="outline" onClick={() => null} disabled>
+          <Button
+            type="outline"
+            onClick={() => null}
+            disabled
+            className="pointer-events-none"
+            size="tiny"
+          >
             A-Z
           </Button>
           <span>Play</span>
         </div>
-        <div className="flex items-center gap-2">
-          <Button type="outline" onClick={() => null} disabled>
+        <div className="flex items-center gap-2 text-foreground-muted">
+          <Button
+            type="outline"
+            onClick={() => null}
+            disabled
+            className="pointer-events-none"
+            size="tiny"
+          >
             Esc
           </Button>
           <span>Exit</span>

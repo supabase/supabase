@@ -59,7 +59,7 @@ export default function Ticket() {
         </>
       )}
 
-      <div className="absolute inset-0 h-full p-6 md:p-12 z-30 flex flex-col justify-between w-full md:h-full flex-1 overflow-hidden">
+      <div className="absolute inset-0 h-full p-6 md:p-10 z-30 flex flex-col justify-between w-full md:h-full flex-1 overflow-hidden">
         <TicketProfile />
         <TicketFooter />
       </div>
