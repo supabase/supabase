@@ -1,6 +1,7 @@
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react'
-import useConfData from '../../hooks/use-conf-data'
 import { Button, cn } from 'ui'
+import useConfData from '../../hooks/use-conf-data'
+import { SITE_ORIGIN } from '~/lib/constants'
 
 const VALID_KEYS = [
   'a',
@@ -45,13 +46,7 @@ interface Props {
 }
 
 const LWXGame = ({ setIsGameMode }: Props) => {
-  const {
-    supabase,
-    userData: user,
-    setTicketState,
-    showCustomizationForm,
-    setShowCustomizationForm,
-  } = useConfData()
+  const { supabase, userData: user, setTicketState } = useConfData()
   const winningWord = 'database'.split('')
   const [currentWord, setCurrentWord] = useState<string[]>(Array(winningWord.length))
   const [gameState, setGameState] = useState<'playing' | 'winner'>('playing')
@@ -108,15 +103,27 @@ const LWXGame = ({ setIsGameMode }: Props) => {
 
     setTicketState('loading')
 
-    if (supabase && user) {
-      await supabase
-        .from('lwx_tickets')
-        .update({ metadata: { ...user.metadata, hasSecretTicket: hasWon } })
-        .eq('username', user.username)
-        .then((res) => {
-          if (res.error) return console.log('error', res.error)
-          setIsGameMode(false)
+    if (supabase) {
+      if (user.id) {
+        await supabase
+          .from('lwx_tickets')
+          .update({ metadata: { ...user.metadata, hasSecretTicket: hasWon } })
+          .eq('username', user.username)
+          .then((res) => {
+            if (res.error) return console.log('error', res.error)
+            setIsGameMode(false)
+          })
+      } else {
+        localStorage.setItem('lwx_hasSecretTicket', 'true')
+        const redirectTo = `${SITE_ORIGIN}/launch-week`
+
+        supabase?.auth.signInWithOAuth({
+          provider: 'github',
+          options: {
+            redirectTo,
+          },
         })
+      }
     }
   }
 

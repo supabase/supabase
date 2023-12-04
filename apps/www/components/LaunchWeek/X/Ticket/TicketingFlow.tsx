@@ -124,9 +124,7 @@ const TicketingFlow = () => {
                   <div className="order-first xl:h-full max-w-md gap-3 flex flex-col items-center justify-center xl:items-start xl:justify-start xl:text-left">
                     {hasSecretTicket ? (
                       <p className="text-2xl lg:text-3xl">
-                        <span className="text-foreground-lighter">
-                          You found the secret ticket.
-                        </span>{' '}
+                        <span className="text-foreground-lighter">You got the secret ticket.</span>{' '}
                         Share it to increase your chances of winning even more.
                       </p>
                     ) : hasPlatinumTicket ? (

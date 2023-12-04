@@ -24,9 +24,17 @@ export default function TicketForm() {
       const username = session.user.user_metadata.user_name
       const name = session.user.user_metadata.full_name
       const email = session.user.email
+      const hasSecretTicket = localStorage.getItem('hasSecretTicket') === 'true'
+
       await supabase
         .from('lwx_tickets')
-        .insert({ email, name, username, referred_by: router.query?.referral ?? null })
+        .insert({
+          email,
+          name,
+          username,
+          referred_by: router.query?.referral ?? null,
+          ...(hasSecretTicket && { metadata: { hasSecretTicket: true } }),
+        })
         .eq('email', email)
         .select()
         .single()
