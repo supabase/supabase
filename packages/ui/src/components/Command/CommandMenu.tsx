@@ -134,7 +134,6 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                 </CommandItem>
                 <CommandItem
                   type="command"
-                  badge={<BadgeExperimental />}
                   value={site === 'docs' ? `${FORCE_MOUNT_ITEM}--ai-info` : undefined}
                   onSelect={() => {
                     setPages([...pages, COMMAND_ROUTES.AI])
