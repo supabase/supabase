@@ -168,9 +168,13 @@ export interface paths {
     /** Gets daily organization stats */
     get: operations['OrgDailyStatsController_getDailyStats']
   }
+  '/platform/organizations/{slug}/daily-stats/compute': {
+    /** Gets daily organization stats for compute */
+    get: operations['OrgDailyStatsController_getDailyStatsCompute']
+  }
   '/platform/organizations/{slug}/usage': {
     /** Gets usage stats */
-    get: operations['OrgUsageController_getDailyStats']
+    get: operations['OrgUsageController_getOrgUsage']
   }
   '/platform/organizations/{slug}/documents/standard-security-questionnaire': {
     /** Get standard security questionnaire URL */
@@ -238,7 +242,7 @@ export interface paths {
   }
   '/platform/organizations/{slug}/billing/subscription/preview': {
     /** Preview subscription changes */
-    post: operations['SubscriptionController_previewSubscriptionChange']
+    post: operations['SubscriptionController_previewSubscriptionChangeV2']
   }
   '/platform/organizations/{slug}/billing/subscription/schedule': {
     /** Deletes any upcoming subscription schedule */
@@ -250,7 +254,7 @@ export interface paths {
   }
   '/platform/organizations/{slug}/billing/invoices/upcoming': {
     /** Gets the upcoming invoice */
-    get: operations['OrgInvoicesController_getUpcomingInvoice']
+    get: operations['OrgInvoicesController_getUpcomingInvoiceV2']
   }
   '/platform/pg-meta/{ref}/column-privileges': {
     /** Retrieve column privileges */
@@ -888,7 +892,7 @@ export interface paths {
   }
   '/system/organizations/{slug}/usage': {
     /** Gets usage stats */
-    get: operations['OrgUsageSystemController_getDailyStats']
+    get: operations['OrgUsageSystemController_getOrgUsage']
   }
   '/system/organizations/{slug}/billing/subscription': {
     /** Gets the current subscription */
@@ -1668,13 +1672,13 @@ export interface paths {
     /** Starts Fly single sign on */
     get: operations['ExtensionController_startFlyioSSO']
   }
-  '/partners/flyio/extensions/{extension_id}/billing': {
-    /** Gets resource billing */
-    get: operations['ExtensionController_getResourceBilling']
-  }
   '/partners/flyio/extensions': {
     /** Creates a database */
     post: operations['ExtensionsController_provisionResource']
+  }
+  '/partners/flyio/organizations/{organization_id}': {
+    /** Gets information about the organization */
+    get: operations['OrganizationsController_getOrganization']
   }
   '/partners/flyio/organizations/{organization_id}/extensions': {
     /** Gets all databases that belong to the Fly organization */
@@ -1683,6 +1687,10 @@ export interface paths {
   '/partners/flyio/organizations/{organization_id}/sso': {
     /** Starts Fly single sign on */
     get: operations['OrganizationsController_startFlyioSSO']
+  }
+  '/partners/flyio/organizations/{organization_id}/billing': {
+    /** Gets the organizations current unbilled charges */
+    get: operations['FlyBillingController_getResourceBilling']
   }
 }
 
@@ -1813,13 +1821,15 @@ export interface components {
       SESSIONS_TIMEBOX?: number
       SESSIONS_INACTIVITY_TIMEOUT?: number
       SESSIONS_SINGLE_PER_USER?: boolean
+      SESSIONS_TAGS?: string
       RATE_LIMIT_EMAIL_SENT: number
       RATE_LIMIT_SMS_SENT: number
       RATE_LIMIT_VERIFY?: number
       RATE_LIMIT_TOKEN_REFRESH?: number
       MAILER_SECURE_EMAIL_CHANGE_ENABLED: boolean
       REFRESH_TOKEN_ROTATION_ENABLED: boolean
-      PASSWORD_MIN_LENGTH: number
+      PASSWORD_MIN_LENGTH?: number
+      PASSWORD_REQUIRED_CHARACTERS?: string
       SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: boolean
       SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: number
       MAILER_OTP_EXP: number
@@ -1947,6 +1957,7 @@ export interface components {
       SESSIONS_TIMEBOX?: number | null
       SESSIONS_INACTIVITY_TIMEOUT?: number | null
       SESSIONS_SINGLE_PER_USER?: boolean
+      SESSIONS_TAGS?: string | null
       RATE_LIMIT_EMAIL_SENT?: number
       RATE_LIMIT_SMS_SENT?: number
       RATE_LIMIT_VERIFY?: number
@@ -1954,6 +1965,12 @@ export interface components {
       MAILER_SECURE_EMAIL_CHANGE_ENABLED?: boolean
       REFRESH_TOKEN_ROTATION_ENABLED?: boolean
       PASSWORD_MIN_LENGTH?: number
+      /** @enum {string} */
+      PASSWORD_REQUIRED_CHARACTERS?:
+        | 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789'
+        | 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789'
+        | 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789:!@#$%^&*()_+-=[]{};\'\\:"|<>?,./`~'
+        | ''
       SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION?: boolean
       SECURITY_REFRESH_TOKEN_REUSE_INTERVAL?: number
       MAILER_OTP_EXP?: number
@@ -2082,13 +2099,15 @@ export interface components {
       SESSIONS_TIMEBOX?: number
       SESSIONS_INACTIVITY_TIMEOUT?: number
       SESSIONS_SINGLE_PER_USER?: boolean
+      SESSIONS_TAGS?: string
       RATE_LIMIT_EMAIL_SENT: number
       RATE_LIMIT_SMS_SENT: number
       RATE_LIMIT_VERIFY?: number
       RATE_LIMIT_TOKEN_REFRESH?: number
       MAILER_SECURE_EMAIL_CHANGE_ENABLED: boolean
       REFRESH_TOKEN_ROTATION_ENABLED: boolean
-      PASSWORD_MIN_LENGTH: number
+      PASSWORD_MIN_LENGTH?: number
+      PASSWORD_REQUIRED_CHARACTERS?: string
       SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: boolean
       SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: number
       MAILER_OTP_EXP: number
@@ -2426,18 +2445,22 @@ export interface components {
       member_id: number
       org_id: number
     }
+    ProjectAllocation: {
+      ref: string
+      usage: number
+    }
     OrgMetricUsage: {
       usage: number
+      usage_original: number
       cost: number
+      unit_price_desc: string
       available_in_plan: boolean
       unlimited: boolean
       capped: boolean
       /** @enum {string} */
       metric:
         | 'EGRESS'
-        | 'DATABASE_EGRESS'
         | 'DATABASE_SIZE'
-        | 'STORAGE_EGRESS'
         | 'STORAGE_SIZE'
         | 'MONTHLY_ACTIVE_USERS'
         | 'MONTHLY_ACTIVE_SSO_USERS'
@@ -2463,6 +2486,7 @@ export interface components {
       pricing_package_price?: number
       pricing_package_size?: number
       pricing_per_unit_price?: number
+      project_allocations: components['schemas']['ProjectAllocation'][]
     }
     OrgUsageResponse: {
       usage_billing_enabled: boolean
@@ -2708,9 +2732,7 @@ export interface components {
       /** @enum {string} */
       metric:
         | 'EGRESS'
-        | 'DATABASE_EGRESS'
         | 'DATABASE_SIZE'
-        | 'STORAGE_EGRESS'
         | 'STORAGE_SIZE'
         | 'MONTHLY_ACTIVE_USERS'
         | 'MONTHLY_ACTIVE_SSO_USERS'
@@ -2775,6 +2797,7 @@ export interface components {
       /** @enum {string} */
       tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
     }
+    UpcomingInvoice: Record<string, never>
     ColumnPrivilege: {
       grantor: string
       grantee: string
@@ -4703,6 +4726,74 @@ export interface components {
         | 'RESTORING'
         | 'UPGRADING'
         | 'PAUSING'
+      /**
+       * @description Supabase organization id
+       * @example fly_123456789
+       */
+      supabase_org_id: string
+    }
+    ResourceProvisioningConfigResponse: {
+      /**
+       * @description PSQL connection string
+       * @example postgresql://postgres:dbpass@db.abcdefghijklmnop.supabase.co:5432/postgres
+       */
+      DATABASE_URL: string
+    }
+    ResourceProvisioningResponse: {
+      /** @description Supabase envs config */
+      config: components['schemas']['ResourceProvisioningConfigResponse']
+      /**
+       * @description The target Fly application for internal traffic
+       * @example ext-db-pgshhamktpsgnptvcadw
+       */
+      fly_app_name: string
+      /**
+       * @description Supabase project id
+       * @example pgshhamktpsgnptvcadw
+       */
+      id: string
+      /** @description Welcome message */
+      message: string
+      /**
+       * @description Supabase organization id
+       * @example fly_123456789
+       */
+      supabase_org_id: string
+    }
+    FlyOrganization: {
+      /** @enum {string} */
+      plan: 'free' | 'pro' | 'team' | 'enterprise'
+      id: string
+      supabase_org_id: string
+      name: string
+    }
+    OrganizationExtensionStatus: {
+      /** @description Supabase project instance compute size */
+      compute: string
+      /** @description Unique ID representing the fly extension */
+      id: string
+      /**
+       * @description Supabase project status
+       * @example ACTIVE_HEALTHY
+       * @enum {string}
+       */
+      status:
+        | 'REMOVED'
+        | 'COMING_UP'
+        | 'INACTIVE'
+        | 'ACTIVE_HEALTHY'
+        | 'ACTIVE_UNHEALTHY'
+        | 'UNKNOWN'
+        | 'GOING_DOWN'
+        | 'INIT_FAILED'
+        | 'RESTORING'
+        | 'UPGRADING'
+        | 'PAUSING'
+      /**
+       * @description Supabase organization id
+       * @example fly_123456789
+       */
+      supabase_org_id: string
     }
     ResourceBillingItem: {
       /**
@@ -4743,54 +4834,7 @@ export interface components {
       exceedsPlanLimits: boolean
       /** @description Whether the user is can have over-usage, which will be billed - this will be false on usage-capped plans. */
       overusageAllowed: boolean
-      extensionId: string
       items: components['schemas']['ResourceBillingItem'][]
-    }
-    ResourceProvisioningConfigResponse: {
-      /**
-       * @description PSQL connection string
-       * @example postgresql://postgres:dbpass@db.abcdefghijklmnop.supabase.co:5432/postgres
-       */
-      POSTGRES_URL: string
-    }
-    ResourceProvisioningResponse: {
-      /** @description Supabase envs config */
-      config: components['schemas']['ResourceProvisioningConfigResponse']
-      /**
-       * @description The target Fly application for internal traffic
-       * @example ext-db-pgshhamktpsgnptvcadw
-       */
-      fly_app_name: string
-      /**
-       * @description Supabase project id
-       * @example pgshhamktpsgnptvcadw
-       */
-      id: string
-      /** @description Welcome message */
-      message: string
-    }
-    OrganizationExtensionStatus: {
-      /** @description Supabase project instance compute size */
-      compute: string
-      /** @description Unique ID representing the fly extension */
-      id: string
-      /**
-       * @description Supabase project status
-       * @example ACTIVE_HEALTHY
-       * @enum {string}
-       */
-      status:
-        | 'REMOVED'
-        | 'COMING_UP'
-        | 'INACTIVE'
-        | 'ACTIVE_HEALTHY'
-        | 'ACTIVE_UNHEALTHY'
-        | 'UNKNOWN'
-        | 'GOING_DOWN'
-        | 'INIT_FAILED'
-        | 'RESTORING'
-        | 'UPGRADING'
-        | 'PAUSING'
     }
   }
   responses: never
@@ -5757,9 +5801,7 @@ export interface operations {
       query: {
         metric:
           | 'EGRESS'
-          | 'DATABASE_EGRESS'
           | 'DATABASE_SIZE'
-          | 'STORAGE_EGRESS'
           | 'STORAGE_SIZE'
           | 'MONTHLY_ACTIVE_USERS'
           | 'MONTHLY_ACTIVE_SSO_USERS'
@@ -5801,9 +5843,37 @@ export interface operations {
       }
     }
   }
-  /** Gets usage stats */
-  OrgUsageController_getDailyStats: {
+  /** Gets daily organization stats for compute */
+  OrgDailyStatsController_getDailyStatsCompute: {
     parameters: {
+      query: {
+        endDate: string
+        startDate: string
+        projectRef?: string
+      }
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to get daily organization stats for compute */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets usage stats */
+  OrgUsageController_getOrgUsage: {
+    parameters: {
+      query?: {
+        project_ref?: string
+        start?: string
+        end?: string
+      }
       path: {
         /** @description Organization slug */
         slug: string
@@ -6228,7 +6298,7 @@ export interface operations {
     }
   }
   /** Preview subscription changes */
-  SubscriptionController_previewSubscriptionChange: {
+  SubscriptionController_previewSubscriptionChangeV2: {
     parameters: {
       path: {
         /** @description Organization slug */
@@ -6298,7 +6368,7 @@ export interface operations {
     }
   }
   /** Gets the upcoming invoice */
-  OrgInvoicesController_getUpcomingInvoice: {
+  OrgInvoicesController_getUpcomingInvoiceV2: {
     parameters: {
       path: {
         /** @description Organization slug */
@@ -6308,7 +6378,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': Record<string, never>
+          'application/json': components['schemas']['UpcomingInvoice']
         }
       }
       403: {
@@ -10677,8 +10747,13 @@ export interface operations {
     }
   }
   /** Gets usage stats */
-  OrgUsageSystemController_getDailyStats: {
+  OrgUsageSystemController_getOrgUsage: {
     parameters: {
+      query?: {
+        project_ref?: string
+        start?: string
+        end?: string
+      }
       path: {
         /** @description Organization slug */
         slug: string
@@ -12247,27 +12322,27 @@ export interface operations {
       }
     }
   }
-  /** Gets resource billing */
-  ExtensionController_getResourceBilling: {
-    parameters: {
-      path: {
-        extension_id: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['ResourceBillingResponse']
-        }
-      }
-    }
-  }
   /** Creates a database */
   ExtensionsController_provisionResource: {
     responses: {
       201: {
         content: {
           'application/json': components['schemas']['ResourceProvisioningResponse']
+        }
+      }
+    }
+  }
+  /** Gets information about the organization */
+  OrganizationsController_getOrganization: {
+    parameters: {
+      path: {
+        organization_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['FlyOrganization']
         }
       }
     }
@@ -12297,6 +12372,21 @@ export interface operations {
     responses: {
       200: {
         content: never
+      }
+    }
+  }
+  /** Gets the organizations current unbilled charges */
+  FlyBillingController_getResourceBilling: {
+    parameters: {
+      path: {
+        organization_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ResourceBillingResponse']
+        }
       }
     }
   }
