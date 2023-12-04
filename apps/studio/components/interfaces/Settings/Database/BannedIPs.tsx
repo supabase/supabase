@@ -66,11 +66,11 @@ const BannedIPs = () => {
     // Fetch user's IP address
     fetch('/api/get-ip-address')
       .then((response) => response.json())
-      .then((data) => setUserIPAddress(data))
+      .then((data) => setUserIPAddress(data.ipAddress))
       .catch((error) => console.error('Error fetching user IP:', error))
   }, [])
 
-  console.log("IP match: ",userIPAddress);
+  console.log('IP match: ', userIPAddress)
 
   return (
     <div id="banned-ips">
@@ -93,7 +93,6 @@ const BannedIPs = () => {
       <FormPanel>
         {ipList && ipList.banned_ipv4_addresses.length > 0 ? (
           ipList.banned_ipv4_addresses.map((ip) => {
-
             return (
               <div
                 key={ip}
