@@ -161,6 +161,7 @@ export async function createThread(prevState: any, formData: FormData) {
         run_id: run.id,
         user_id: user.id,
         thread_title: threadTitle as string,
+        latest_message_id: message.id,
       })
       revalidatePath('/profile')
       if (error) throw error

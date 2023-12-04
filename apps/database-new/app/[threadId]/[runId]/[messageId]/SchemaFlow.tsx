@@ -20,7 +20,7 @@ async function waitForRunCompletion(params: {
   console.log('waiting for run completion')
 
   let realRun = await openai.beta.threads.runs.retrieve(params.threadId, params.runId)
-
+  //console.log({ realRun })
   // Check if the initial status is 'in_progress'
   if (realRun.status !== 'in_progress') {
     console.log('Run is not in progress. Exiting without running anything.')
@@ -48,20 +48,20 @@ async function waitForRunCompletion(params: {
   }
 
   while (realRun.status === 'in_progress') {
-    console.log('while..')
+    //console.log('while..')
     await new Promise((resolve) => setTimeout(resolve, 2000))
     realRun = await openai.beta.threads.runs.retrieve(params.threadId, params.runId)
-    console.log('realRun', realRun.status)
+    //console.log('realRun', realRun.status)
   }
 
-  console.log('Run completed:', realRun.status)
+  //console.log('Run completed:', realRun.status)
   return {
     newMessage: true,
   }
 }
 
 export async function SchemaFlow({ params }: { params: any }) {
-  console.log('schemaFlow refetching')
+  //console.log('schemaFlow refetching')
 
   const { threadId, runId, messageId } = params
 
