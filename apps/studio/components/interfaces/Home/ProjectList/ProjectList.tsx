@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Button, IconPlus } from 'ui'
 
 import AlertError from 'components/ui/AlertError'
+import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import {
   OverdueInvoicesResponse,
   useOverdueInvoicesQuery,
@@ -12,20 +13,19 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { ResourceWarning, useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
+import { useSelectedOrganization } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { makeRandomString } from 'lib/helpers'
 import { Organization, Project, ResponseError } from 'types'
 import ProjectCard from './ProjectCard'
 import ShimmeringCard from './ShimmeringCard'
-import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
-import { useSelectedOrganization } from 'hooks'
 
 export interface ProjectListProps {
   rewriteHref?: (projectRef: string) => string
 }
 
 const ProjectList = ({ rewriteHref }: ProjectListProps) => {
-  const { data: organizations, isSuccess } = useOrganizationsQuery()
+  const { data: organizations, isLoading, isSuccess } = useOrganizationsQuery()
   const {
     data: allProjects,
     isLoading: isLoadingProjects,
@@ -41,6 +41,15 @@ const ProjectList = ({ rewriteHref }: ProjectListProps) => {
   const { data: allOverdueInvoices } = useOverdueInvoicesQuery({ enabled: IS_PLATFORM })
   const projectsByOrg = groupBy(allProjects, 'organization_id')
   const isLoadingPermissions = IS_PLATFORM ? _isLoadingPermissions : false
+
+  if (isLoading) {
+    return (
+      <ul className="mx-auto grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+        <ShimmeringCard />
+        <ShimmeringCard />
+      </ul>
+    )
+  }
 
   return isSuccess && organizations && organizations?.length > 0 ? (
     <>
