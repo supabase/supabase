@@ -247,6 +247,9 @@ const DocsSearch = () => {
         })
           .then((response) => response.json())
           .then((results) => {
+            if (!results) {
+              throw Error('no results')
+            }
             sourcesLoaded += 1
             dispatch({
               type: 'resultsReturned',
