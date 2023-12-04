@@ -20,13 +20,19 @@ const LW_TABLE = 'lwx_tickets'
 const LW_MATERIALIZED_VIEW = 'lwx_tickets_golden'
 
 const STYLING_CONGIF = {
-  REG: {
+  regular: {
     BACKGROUND: '#303030',
     FOREGROUND: '#F8F9FA',
     FOREGROUND_LIGHT: '#8B9092',
     BORDER: '#303030',
   },
-  PLATINUM: {
+  platinum: {
+    BACKGROUND: '#f1f1f1',
+    FOREGROUND: '#11181C',
+    FOREGROUND_LIGHT: '#6c7277',
+    BORDER: '#CFCFCF',
+  },
+  secret: {
     BACKGROUND: '#f1f1f1',
     FOREGROUND: '#11181C',
     FOREGROUND_LIGHT: '#6c7277',
