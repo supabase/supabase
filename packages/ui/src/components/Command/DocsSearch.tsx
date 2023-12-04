@@ -247,8 +247,8 @@ const DocsSearch = () => {
         })
           .then((response) => response.json())
           .then((results) => {
-            if (!results) {
-              throw Error('no results')
+            if (!Array.isArray(results)) {
+              throw Error("didn't get expected results array")
             }
             sourcesLoaded += 1
             dispatch({
