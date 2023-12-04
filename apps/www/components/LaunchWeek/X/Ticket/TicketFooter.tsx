@@ -24,7 +24,7 @@ export default function TicketFooter() {
         alt="Supabase Logo for Launch Week X"
         width="30"
         height="30"
-        className="mb-1"
+        className="mb-1 hidden md:block"
         priority
         quality={100}
       />

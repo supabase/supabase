@@ -59,7 +59,7 @@ export default function Ticket() {
         </>
       )}
 
-      <div className="absolute inset-0 h-full p-6 md:p-10 z-30 flex flex-col justify-between w-full md:h-full flex-1 overflow-hidden">
+      <div className="absolute inset-0 h-full p-6 md:p-10 z-30 flex flex-col justify-end md:justify-between w-full md:h-full flex-1 overflow-hidden">
         <TicketProfile />
         <TicketFooter />
       </div>
@@ -73,7 +73,8 @@ export default function Ticket() {
         fill
         className={cn(
           'absolute inset-0 object-cover object-right opacity-0 transition-opacity duration-1000',
-          imageHasLoaded && 'opacity-100'
+          imageHasLoaded && 'opacity-100',
+          isMobile && 'object-left-top'
         )}
         priority
         quality={100}

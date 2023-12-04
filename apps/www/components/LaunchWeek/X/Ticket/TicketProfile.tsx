@@ -13,7 +13,7 @@ export default function TicketProfile() {
     <div className="relative z-10 flex gap-4">
       <div
         className={cn(
-          'text-foreground-light flex flex-col gap-1 text-left text-xl md:max-w-[300px]',
+          'text-foreground-light flex flex-col gap-1 text-left text-xl md:max-w-[300px] mb-8',
           golden ? 'text-[#7E868C]' : 'text-[#8B9092]'
         )}
       >
