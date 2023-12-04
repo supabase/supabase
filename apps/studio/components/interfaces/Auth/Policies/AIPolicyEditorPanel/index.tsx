@@ -19,7 +19,11 @@ import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-
 import { useSelectedProject, useStore } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { AIPolicyChat } from './AIPolicyChat'
-import { generatePlaceholder, generateThreadMessage } from './AIPolicyEditorPanel.utils'
+import {
+  generatePlaceholder,
+  generatePolicyDefinition,
+  generateThreadMessage,
+} from './AIPolicyEditorPanel.utils'
 import { AIPolicyHeader } from './AIPolicyHeader'
 import QueryError from './QueryError'
 import RLSCodeEditor from './RLSCodeEditor'
@@ -132,6 +136,8 @@ export const AIPolicyEditorPanel = memo(function ({
           thread_id: ids?.threadId,
           entityDefinitions,
           prompt: message,
+          policyDefinition:
+            selectedPolicy !== undefined ? generatePolicyDefinition(selectedPolicy) : undefined,
         })
       }
     },
@@ -275,14 +281,14 @@ export const AIPolicyEditorPanel = memo(function ({
                 <div className="px-5 py-3 flex justify-between gap-3 bg-muted">
                   <div className="flex gap-2 items-center text-foreground-light">
                     <FileDiff className="h-4 w-4" />
-                    <span className="text-sm">Apply changes from assistant</span>
+                    <span className="text-sm">Accept changes from assistant</span>
                   </div>
                   <div className="flex gap-3">
                     <Button type="default" onClick={() => setIncomingChange(undefined)}>
                       Discard
                     </Button>
                     <Button type="primary" onClick={() => acceptChange()}>
-                      Apply
+                      Accept
                     </Button>
                   </div>
                 </div>
@@ -292,7 +298,7 @@ export const AIPolicyEditorPanel = memo(function ({
                 <DiffEditor
                   theme="supabase"
                   language="pgsql"
-                  className="flex grow"
+                  className="grow"
                   original={editorRef.current?.getValue()}
                   modified={incomingChange}
                   onMount={(editor) => (diffEditorRef.current = editor)}
