@@ -4,6 +4,9 @@
   "types": "./index.tsx",
   "license": "MIT",
   "sideEffects": false,
+  "scripts": {
+    "typecheck_CURRENTLY_IGNORED": "tsc --noEmit"
+  },
   "dependencies": {
     "typescript": "^5.2.2",
     "cmdk": "^0.2.0",
