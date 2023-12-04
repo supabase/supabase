@@ -1854,6 +1854,8 @@ export interface components {
       SMS_TEMPLATE: string
       SMS_TEST_OTP: string
       SMS_TEST_OTP_VALID_UNTIL: string
+      HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED?: boolean
+      HOOK_MFA_VERIFICATION_ATTEMPT_URI?: string
       EXTERNAL_APPLE_ENABLED: boolean
       EXTERNAL_APPLE_CLIENT_ID: string
       EXTERNAL_APPLE_SECRET: string
@@ -1996,6 +1998,8 @@ export interface components {
       SMS_VONAGE_API_SECRET?: string
       SMS_VONAGE_FROM?: string
       SMS_TEMPLATE?: string
+      HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED?: boolean
+      HOOK_MFA_VERIFICATION_ATTEMPT_URI?: string
       EXTERNAL_APPLE_ENABLED?: boolean
       EXTERNAL_APPLE_CLIENT_ID?: string
       EXTERNAL_APPLE_SECRET?: string
@@ -2132,6 +2136,8 @@ export interface components {
       SMS_TEMPLATE: string
       SMS_TEST_OTP: string
       SMS_TEST_OTP_VALID_UNTIL: string
+      HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED?: boolean
+      HOOK_MFA_VERIFICATION_ATTEMPT_URI?: string
       EXTERNAL_APPLE_ENABLED: boolean
       EXTERNAL_APPLE_CLIENT_ID: string
       EXTERNAL_APPLE_SECRET: string
@@ -2448,6 +2454,7 @@ export interface components {
     ProjectAllocation: {
       ref: string
       usage: number
+      name: string
     }
     OrgMetricUsage: {
       usage: number
