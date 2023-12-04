@@ -7,10 +7,5 @@
       "@ui/*": ["./src/*"] // no other project in the monorepo uses this alias
     }
   },
-  "include": [
-    ".",
-    "../ui-patterns/src/AssistantChatForm.tsx",
-    "../ui-patterns/src/SchemaTableNode.tsx"
-  ],
   "exclude": ["dist", "build", "node_modules"]
 }
