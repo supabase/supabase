@@ -127,11 +127,12 @@ Open the `AndroidManifest.xml` file, update name property of Application tag:
 
 ```
 
-Add annotation for the `MainActivity`:
+Create the `MainActivity`:
 
 ```kotlin
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    //This will come later
 }
 ```
 
@@ -370,6 +371,47 @@ class AuthenticationRepositoryImpl @Inject constructor(
 ```
 
 ### Implement screens
+
+For navigating our screens, we use the AndroidX navigation library. For the routes, we implement our own `Destination` interface:
+```kotlin
+
+interface Destination {
+    val route: String
+    val title: String
+}
+
+
+object ProductListDestination : Destination {
+    override val route = "product_list"
+    override val title = "Product List"
+}
+
+object ProductDetailsDestination : Destination {
+    override val route = "product_details"
+    override val title = "Product Details"
+    const val productId = "product_id"
+    val arguments = listOf(navArgument(name = productId) {
+        type = NavType.StringType
+    })
+    fun createRouteWithParam(productId: String) = "$route/${productId}"
+}
+
+object AddProductDestination : Destination {
+    override val route = "add_product"
+    override val title = "Add Product"
+}
+
+object AuthenticationDestination: Destination {
+    override val route = "authentication"
+    override val title = "Authentication"
+}
+
+object SignUpDestination: Destination {
+    override val route = "signup"
+    override val title = "Sign Up"
+}
+```
+This will help later for navigating between screens.
 
 Create a `ProductListViewModel`:
 
@@ -1029,7 +1071,7 @@ class SignInViewModel @Inject constructor(
         _password.value = password
     }
 
-    fun onLogin() {
+    fun onSignIn() {
         viewModelScope.launch {
             authenticationRepository.signIn(
                 email = _email.value,
@@ -1162,10 +1204,76 @@ fun SignInScreen(
 }
 ```
 
+### Implement the `MainActivity`
+
+We created the `MainActivity` earlier, but now we have to actually show our newly created screens:
+```kotlin
+@AndroidEntryPoint
+class MainActivity : ComponentActivity() {
+    @Inject
+    lateinit var supabaseClient: SupabaseClient
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            ManageProductsTheme {
+                // A surface container using the 'background' color from the theme
+                val navController = rememberNavController()
+                val currentBackStack by navController.currentBackStackEntryAsState()
+                val currentDestination = currentBackStack?.destination
+                Scaffold { innerPadding ->
+                    NavHost(
+                        navController,
+                        startDestination = ProductListDestination.route,
+                        Modifier.padding(innerPadding)
+                    ) {
+                        composable(ProductListDestination.route) {
+                            ProductListScreen(
+                                navController = navController
+                            )
+                        }
+
+                        composable(AuthenticationDestination.route) {
+                            SignInScreen(
+                                navController = navController
+                            )
+                        }
+
+                        composable(SignUpDestination.route) {
+                            SignUpScreen(
+                                navController = navController
+                            )
+                        }
+
+                        composable(AddProductDestination.route) {
+                            AddProductScreen(
+                                navController = navController
+                            )
+                        }
+
+                        composable(
+                            route = "${ProductDetailsDestination.route}/{${ProductDetailsDestination.productId}}",
+                            arguments = ProductDetailsDestination.arguments
+                        ) { navBackStackEntry ->
+                            val productId =
+                                navBackStackEntry.arguments?.getString(ProductDetailsDestination.productId)
+                            ProductDetailsScreen(
+                                productId = productId,
+                                navController = navController,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
 ### Create the success screen
 
-Implement a "Sign In" success screen. Create new "Empty Activity" and in `AndroidManifest.xml`, add a deep link, make sure `scheme` and `host` are the same as the ones set in the Auth instance.
-
+If we sign in via OAuth or receive an OTP, we need to handle this in our app. To do this, we create a new activity which gets used when the app opens using the deeplink we set in our `AndroidManifest.xml`:
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
@@ -1208,6 +1316,8 @@ Implement a "Sign In" success screen. Create new "Empty Activity" and in `Androi
     </application>
 </manifest>
 ```
+
+Then we create the `DeepLinkHandlerActivity`:
 
 ```kotlin
 @AndroidEntryPoint
