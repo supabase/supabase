@@ -62,7 +62,7 @@ const admonitionBase = cva('', {
   variants: {
     type: {
       default: `bg-surface-200/25 border`,
-      warning: `bg-alternative border border-default ![&_p]:text-background-muted border`,
+      warning: `bg-alternative border border-default ![&_p]:text-background-muted`,
       destructive: `bg-alternative border border-default`,
     },
   },
