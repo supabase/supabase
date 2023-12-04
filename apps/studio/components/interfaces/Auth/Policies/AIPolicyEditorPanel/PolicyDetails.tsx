@@ -12,7 +12,7 @@ interface PolicyDetailsProps {
   policy?: PostgresPolicy
 }
 
-// [Joshen] Scaffold midway
+// [Joshen] Scaffold midway - to chagne to use collapsible
 const PolicyDetails = ({ policy }: PolicyDetailsProps) => {
   if (!policy) return null
 
