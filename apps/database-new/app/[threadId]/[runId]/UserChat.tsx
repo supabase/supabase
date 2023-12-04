@@ -1,33 +1,59 @@
 'use client'
 
-import { AssistantMessage, UserMessage } from '@/lib/types'
+import { useAppStateSnapshot } from '@/lib/state'
+import { pull } from 'lodash'
 import { useParams, usePathname, useRouter } from 'next/navigation'
+import OpenAI from 'openai'
+import { useEffect } from 'react'
 import { cn } from 'ui'
 
 interface UserChatProps {
-  message: UserMessage
-  reply?: AssistantMessage
+  message: OpenAI.Beta.Threads.Messages.ThreadMessage
   isLatest: boolean
-  isLoading: boolean
   times: {
     hoursFromNow: number
     formattedTimeFromNow: string
     formattedCreatedAt: string
     replyDuration: number | undefined
   }
+  run: OpenAI.Beta.Threads.Run
 }
 
-const UserChat = ({ message, reply, isLatest, isLoading, times }: UserChatProps) => {
+const UserChat = ({ message, isLatest, times, run }: UserChatProps) => {
   const router = useRouter()
+  const snap = useAppStateSnapshot()
   const { threadId, runId } = useParams()
 
-  console.log('message', message)
+  // console.log(run)
 
-  console.log(message.content[0].text.value)
+  const LOADING_STATUSES = ['in_progress', 'queued']
+
+  const runIsInProgressRemotely = LOADING_STATUSES.includes(run.status)
+
+  useEffect(() => {
+    if (runIsInProgressRemotely) {
+      // set a local state for run loading
+      // this state will be updated via other client components when completing a run
+      // remove current message id from array if it exists
+      let currentRunsLoading = [...snap.runsLoading]
+      pull(currentRunsLoading, run.id)
+      const payload = [...currentRunsLoading, run.id]
+      snap.setRunsLoading([...payload])
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [runIsInProgressRemotely, run.id]) // Intentionally left snap out of the dependency array
+
+  // using the local state for run loading
+  const isLoading = snap.runsLoading.includes(run.id) && isLatest
 
   const { hoursFromNow, formattedTimeFromNow, formattedCreatedAt, replyDuration } = times
 
+  // chat shown as selected when url matches
   const isSelected = usePathname().includes(message.id)
+
+  // extract the text from the assistant message
+  const message_content = message.content[0]
+  const text = message_content.type === 'text' ? message_content.text.value : ''
 
   return (
     <div
@@ -82,7 +108,7 @@ const UserChat = ({ message, reply, isLatest, isLoading, times }: UserChatProps)
             </svg>
           </span>
           <div
-            title={message.content[0].text.value}
+            title={text}
             className={cn(
               'cursor-pointer transition relative overflow-hidden',
               'w-full rounded-lg rounded-tl-none',
@@ -97,9 +123,9 @@ const UserChat = ({ message, reply, isLatest, isLoading, times }: UserChatProps)
                 isSelected ? 'text-foreground' : 'text-light group-hover:text-foreground'
               )}
             >
-              {message.content[0].text.value}
+              {text}
             </p>
-            {isLoading && <div className="chat-shimmering-loader w-full h-0.5 absolute bottom-0" />}
+            {/* {isLoading && <div className="chat-shimmering-loader w-full h-0.5 absolute bottom-0" />} */}
           </div>
         </div>
         {isSelected && (

@@ -247,7 +247,7 @@ Vårt tillvägagångssätt för klientbibliotek är modulärt. Varje delbibliote
 - [Förenklad kinesiska / 简体中文](/i18n/README.zh-cn.md)
 - [Swedish / Svenska](/i18n/README.sv.md)
 - [Thai / ไทย](/i18n/README.th.md)
-- [Traditionell kinesiska / 繁体中文](/i18n/README.zh-tw.md)
+- [Traditionell kinesiska / 繁體中文](/i18n/README.zh-tw.md)
 - [Turkiska / Türkçe](/i18n/README.tr.md)
 - [Ukrainska / Українська](/i18n/README.uk.md)
 - [Vietnamesiska / Tiếng Việt](/i18n/README.vi-vn.md)

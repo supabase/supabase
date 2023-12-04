@@ -4,6 +4,7 @@ import { CHAT_EXAMPLES } from '@/data/chat-examples'
 import { useAppStateSnapshot } from '@/lib/state'
 import { createClient } from '@/lib/supabase/client'
 import { ExternalLink } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useFormState } from 'react-dom'
 import { AssistantChatForm, cn } from 'ui'
@@ -12,6 +13,7 @@ import { createThread } from './actions'
 const suggestions = CHAT_EXAMPLES
 
 const NewThreadInput = () => {
+  const router = useRouter()
   const [value, setValue] = useState(() => {
     if (typeof window !== 'undefined') {
       const localPrompt = localStorage.getItem('prompt')
@@ -28,10 +30,25 @@ const NewThreadInput = () => {
     success: undefined,
     data: {
       value,
+      runId: undefined,
+      threadId: undefined,
+      messageId: undefined,
     },
   }
 
   const [state, formAction] = useFormState(createThread, initialState)
+
+  // useEffect(() => {
+  //   if (state.success && state.data.threadId && state.data.runId && state.data.messageId) {
+  //     console.log(state.data)
+  //     const { threadId, runId, messageId } = state.data
+  //     console.log('threadId', threadId)
+  //     console.log('runId', runId)
+  //     console.log('messageId', messageId)
+  //     // router.push(`/${state.data.threadId}/${state.data.runId}/${state.data.messageId}`)
+  //   }
+  // }, [state.success])
+
   const supabase = createClient()
   const snap = useAppStateSnapshot()
 
@@ -43,7 +60,6 @@ const NewThreadInput = () => {
           key={'new-thread-form'}
           id={'new-thread-form'}
           onSubmit={async (event) => {
-            console.log('hello')
             const {
               data: { user },
             } = await supabase.auth.getUser()
@@ -57,8 +73,9 @@ const NewThreadInput = () => {
           value={value}
           placeholder="e.g Create a Telegram-like chat application"
           onValueChange={(e) => setValue(e.target.value)}
-          message={state.message}
+          message={state?.message}
         />
+        {state?.message && <p>{state?.message}</p>}
       </div>
       <div className="flex gap-3">
         {suggestions.map((suggestion, idx) => (

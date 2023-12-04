@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { Github } from 'lucide-react'
 import { cookies, headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { Button } from 'ui'
+import { Button } from '@ui/components/Button'
 
 export default function LoginForm({ searchParams }: { searchParams?: { message?: string } }) {
   const signUp = async (formData: FormData) => {
