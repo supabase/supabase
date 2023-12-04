@@ -13,6 +13,7 @@ import { RedirectType, redirect } from 'next/navigation'
 import OpenAI from 'openai'
 import { z } from 'zod'
 import { threadId } from 'worker_threads'
+import { MessageContentText } from 'openai/resources/beta/threads/index.mjs'
 
 const openai = new OpenAI()
 
@@ -175,7 +176,7 @@ export async function createThread(prevState: any, formData: FormData) {
       const { error } = await supabase.from('messages_user').insert({
         message_id: message.id,
         thread_id: thread.id,
-        text: message.content[0].text.value,
+        text: (message.content[0] as MessageContentText).text.value,
         run_id: run.id,
         user_id: user.id,
       })
@@ -209,7 +210,6 @@ export async function createThread(prevState: any, formData: FormData) {
 export async function updateThread(prevState: any, formData: FormData) {
   const cookieStore = cookies()
   const supabase = createClient(cookieStore)
-
   let redirectUrl = ''
 
   try {
@@ -246,12 +246,12 @@ export async function updateThread(prevState: any, formData: FormData) {
         data: undefined,
       }
     }
-
+    console.log('message.content[0]', message.content[0])
     try {
       const { error } = await supabase.from('messages_user').insert({
         message_id: message.id,
         thread_id: data.threadId,
-        text: message.content[0].text.value,
+        text: (message.content[0] as MessageContentText).text.value,
         run_id: data.runId,
         user_id: user.id,
       })
