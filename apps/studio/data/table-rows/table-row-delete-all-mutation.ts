@@ -4,6 +4,7 @@ import { toast } from 'react-hot-toast'
 import { Filter, Query, SupaTable } from 'components/grid'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
+import { ImpersonationRole, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { ResponseError } from 'types'
 import { formatFilterValue } from './utils'
 
@@ -12,6 +13,7 @@ export type TableRowDeleteAllVariables = {
   connectionString?: string
   table: SupaTable
   filters: Filter[]
+  impersonatedRole?: ImpersonationRole
 }
 
 export function getTableRowDeleteAllSql({
@@ -35,8 +37,12 @@ export async function deleteAllTableRow({
   connectionString,
   table,
   filters,
+  impersonatedRole,
 }: TableRowDeleteAllVariables) {
-  const sql = getTableRowDeleteAllSql({ table, filters })
+  const sql = wrapWithRoleImpersonation(getTableRowDeleteAllSql({ table, filters }), {
+    projectRef,
+    role: impersonatedRole,
+  })
 
   const { result } = await executeSql({ projectRef, connectionString, sql })
 

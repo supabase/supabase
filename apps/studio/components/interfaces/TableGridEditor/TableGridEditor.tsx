@@ -32,6 +32,7 @@ import { TableLike } from 'hooks/misc/useTable'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { EMPTY_ARR } from 'lib/void'
 import { useAppStateSnapshot } from 'state/app-state'
+import { getImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { SchemaView } from 'types'
 import GridHeaderActions from './GridHeaderActions'
@@ -294,6 +295,7 @@ const TableGridEditor = ({
       configuration,
       payload: updatedData,
       enumArrayColumns,
+      impersonatedRole: getImpersonatedRole(),
     })
   }
 

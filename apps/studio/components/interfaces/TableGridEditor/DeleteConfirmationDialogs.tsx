@@ -17,6 +17,7 @@ import { useGetTables } from 'data/tables/tables-query'
 import { useStore, useUrlState } from 'hooks'
 import { TableLike } from 'hooks/misc/useTable'
 import { noop } from 'lib/void'
+import { getImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 
 export type DeleteConfirmationDialogsProps = {
@@ -207,6 +208,7 @@ const DeleteConfirmationDialogs = ({
           projectRef: project.ref,
           connectionString: project.connectionString,
           table: selectedTable as any,
+          impersonatedRole: getImpersonatedRole(),
         })
       } else {
         deleteAllRows({
@@ -214,6 +216,7 @@ const DeleteConfirmationDialogs = ({
           connectionString: project.connectionString,
           table: selectedTable as any,
           filters,
+          impersonatedRole: getImpersonatedRole(),
         })
       }
     } else {
@@ -222,6 +225,7 @@ const DeleteConfirmationDialogs = ({
         connectionString: project.connectionString,
         table: selectedTable as any,
         rows: selectedRowsToDelete as SupaRow[],
+        impersonatedRole: getImpersonatedRole(),
       })
     }
   }

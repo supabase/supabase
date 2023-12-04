@@ -7,6 +7,7 @@ import { createPortal } from 'react-dom'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useUrlState } from 'hooks'
+import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   cleanupProps,
@@ -66,6 +67,8 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>(
     const sorts = formatSortURLParams(sort as string[])
     const filters = formatFilterURLParams(filter as string[])
 
+    const roleImpersonationState = useRoleImpersonationStateSnapshot()
+
     const { project } = useProjectContext()
     const { data, error, isSuccess, isError, isLoading, isRefetching } = useTableRowsQuery(
       {
@@ -77,6 +80,7 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>(
         filters,
         page: snap.page,
         limit: snap.rowsPerPage,
+        impersonatedRole: roleImpersonationState.role,
       },
       {
         keepPreviousData: true,
