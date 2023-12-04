@@ -28,6 +28,7 @@ import { AIPolicyHeader } from './AIPolicyHeader'
 import QueryError from './QueryError'
 import RLSCodeEditor from './RLSCodeEditor'
 import { OPT_IN_TAGS } from 'lib/constants'
+import PolicyDetails from './PolicyDetails'
 
 const DiffEditor = dynamic(
   () => import('@monaco-editor/react').then(({ DiffEditor }) => DiffEditor),
@@ -279,6 +280,9 @@ export const AIPolicyEditorPanel = memo(function ({
               assistantVisible={assistantVisible}
               setAssistantVisible={setAssistantPanel}
             />
+
+            {/* <PolicyDetails policy={selectedPolicy} /> */}
+
             <div className="flex flex-col h-full w-full justify-between">
               {incomingChange ? (
                 <div className="px-5 py-3 flex justify-between gap-3 bg-muted">
