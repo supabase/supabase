@@ -1,11 +1,13 @@
 import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
-import { IconAlertCircle, IconLoader } from 'ui'
+import { IconAlertCircle } from 'ui'
 
 import { NewProjectPanel } from 'components/interfaces/Home'
+import { ProjectUsageLoadingState } from 'components/layouts/ProjectLayout/LoadingState'
 import InformationBox from 'components/ui/InformationBox'
-import ProjectUsage from './ProjectUsage'
 import { useProjectLogRequestsCountQuery } from 'data/analytics/project-log-requests-count-query'
+import { useProjectLogStatsQuery } from 'data/analytics/project-log-stats-query'
+import ProjectUsage from './ProjectUsage'
 
 const ProjectUsageSection = observer(() => {
   const { ref: projectRef } = useParams()
@@ -14,6 +16,13 @@ const ProjectUsageSection = observer(() => {
     error: usageError,
     isLoading,
   } = useProjectLogRequestsCountQuery({ projectRef })
+
+  // wait for the stats to load before showing the usage section
+  // to eliminate multiple spinners
+  const { isLoading: isLogsStatsLoading } = useProjectLogStatsQuery({
+    projectRef,
+    interval: 'hourly',
+  })
 
   if (usageError) {
     return (
@@ -31,11 +40,8 @@ const ProjectUsageSection = observer(() => {
 
   return (
     <>
-      {isLoading ? (
-        <div className="flex w-full items-center justify-center space-x-2">
-          <IconLoader className="animate-spin" size={14} />
-          <p className="text-sm">Retrieving project usage statistics</p>
-        </div>
+      {isLoading || isLogsStatsLoading ? (
+        <ProjectUsageLoadingState />
       ) : hasProjectData ? (
         <ProjectUsage />
       ) : (

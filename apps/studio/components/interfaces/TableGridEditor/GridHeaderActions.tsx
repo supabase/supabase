@@ -9,9 +9,10 @@ import { Button, IconAlertCircle, IconLock, Modal } from 'ui'
 
 import { rlsAcknowledgedKey } from 'components/grid/constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
-import { useCheckPermissions, useStore, useIsFeatureEnabled } from 'hooks'
 import APIDocsButton from 'components/ui/APIDocsButton'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { useCheckPermissions, useFlag, useIsFeatureEnabled, useStore } from 'hooks'
+import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
 
 export interface GridHeaderActionsProps {
   table: PostgresTable
@@ -22,7 +23,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   const { meta, ui } = useStore()
   const { project } = useProjectContext()
   const realtimeEnabled = useIsFeatureEnabled('realtime:all')
-  console.log({ realtimeEnabled })
+  const roleImpersonationEnabledFlag = useFlag('roleImpersonation')
 
   const [isTogglingRealtime, setIsTogglingRealtime] = useState(false)
   const [showEnableRealtime, setShowEnableRealtime] = useState(false)
@@ -142,6 +143,8 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
             </Link>
           </Button>
         )}
+
+        {roleImpersonationEnabledFlag && <RoleImpersonationPopover serviceRoleLabel="postgres" />}
 
         {realtimeEnabled && (
           <Button

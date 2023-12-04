@@ -4,6 +4,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import Threads from './Threads'
 import { Suspense } from 'react'
+import ShimmeringLoader from '@/components/Shimmer'
 import type { Metadata } from 'next'
 
 dayjs.extend(relativeTime)
@@ -17,19 +18,6 @@ export const metadata: Metadata = {
 // export const dynamic = 'force-dynamic'
 
 const Profile = async () => {
-  // async function handleThreadActions(formData: FormData) {
-  //   'use server'
-
-  //   const action = formData.get('action') as string
-  //   const threadID = formData.get('threadID') as string
-
-  //   if (!threadID) return
-
-  //   if (action === 'delete') {
-  //     deleteThread(threadID)
-  //   }
-  // }
-
   return (
     <div className="grid grid-cols-4 gap-x-8 py-6 xl:py-12 gap-y-6 xl:gap-y-0">
       <div className="col-span-4 xl:col-span-1 flex flex-col gap-y-6">
@@ -45,7 +33,18 @@ const Profile = async () => {
 
         <div className="w-full h-px border-t" />
 
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense
+          fallback={
+            <div className="flex flex-col gap-4">
+              <ShimmeringLoader className="h-14 bg-surface-100 border rounded" />
+              <ShimmeringLoader className="h-14 bg-surface-100 border rounded" />
+              <ShimmeringLoader className="h-14 bg-surface-100 border rounded" />
+              <ShimmeringLoader className="h-14 bg-surface-100 border rounded opacity-50" />
+              <ShimmeringLoader className="h-14 bg-surface-100 border rounded opacity-25" />
+              <ShimmeringLoader className="h-14 bg-surface-100 border rounded opacity-10" />
+            </div>
+          }
+        >
           <Threads />
         </Suspense>
       </div>

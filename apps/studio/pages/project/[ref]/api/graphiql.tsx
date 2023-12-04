@@ -11,8 +11,11 @@ import { DocsLayout } from 'components/layouts'
 import Connecting from 'components/ui/Loading/Loading'
 import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query'
 import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useStore } from 'hooks'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
+import { getRoleImpersonationJWT } from 'lib/role-impersonation'
+import { getImpersonatedRole } from 'state/role-impersonation-state'
 import { NextPageWithLayout } from 'types'
 
 const GraphiQLPage: NextPageWithLayout = () => {
@@ -28,9 +31,12 @@ const GraphiQLPage: NextPageWithLayout = () => {
   const { data: settings, isFetched } = useProjectApiQuery({ projectRef })
 
   const apiService = settings?.autoApiService
-  const anonKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
-    ? apiService.defaultApiKey
+  const serviceRoleKey = apiService?.service_api_keys.find((x) => x.name === 'service_role key')
+    ? apiService.serviceApiKey
     : undefined
+
+  const { data: config } = useProjectPostgrestConfigQuery({ projectRef })
+  const jwtSecret = config?.jwt_secret
 
   useEffect(() => {
     if (ui.selectedProjectRef) {
@@ -39,24 +45,40 @@ const GraphiQLPage: NextPageWithLayout = () => {
     }
   }, [ui.selectedProjectRef])
 
-  const graphqlUrl = `${API_URL}/projects/${projectRef}/api/graphql`
-
   const fetcher = useMemo(() => {
-    const fetcherFn = createGraphiQLFetcher({ url: graphqlUrl, fetch })
+    const fetcherFn = createGraphiQLFetcher({
+      url: `${API_URL}/projects/${projectRef}/api/graphql`,
+      fetch,
+    })
     const customFetcher: Fetcher = (graphqlParams, opts) => {
+      let userAuthorization: string | undefined
+
+      const role = getImpersonatedRole()
+      if (
+        projectRef !== undefined &&
+        jwtSecret !== undefined &&
+        role !== undefined &&
+        role.type === 'postgrest'
+      ) {
+        userAuthorization = `Bearer ${getRoleImpersonationJWT(projectRef, jwtSecret, role)}`
+      }
+
       return fetcherFn(graphqlParams, {
         ...opts,
         headers: {
           ...opts?.headers,
           Authorization: `Bearer ${accessToken}`,
           'x-graphql-authorization':
-            opts?.headers?.['Authorization'] ?? opts?.headers?.['authorization'],
+            opts?.headers?.['Authorization'] ??
+            opts?.headers?.['authorization'] ??
+            userAuthorization ??
+            `Bearer ${serviceRoleKey}`,
         },
       })
     }
 
     return customFetcher
-  }, [graphqlUrl, accessToken])
+  }, [projectRef, jwtSecret, accessToken, serviceRoleKey])
 
   if ((IS_PLATFORM && !accessToken) || !isFetched || (isExtensionsLoading && !pgGraphqlExtension)) {
     return <Connecting />
@@ -80,7 +102,7 @@ const GraphiQLPage: NextPageWithLayout = () => {
     )
   }
 
-  return <GraphiQL fetcher={fetcher} theme={currentTheme} accessToken={anonKey} />
+  return <GraphiQL fetcher={fetcher} theme={currentTheme} />
 }
 
 GraphiQLPage.getLayout = (page) => <DocsLayout title="GraphiQL">{page}</DocsLayout>

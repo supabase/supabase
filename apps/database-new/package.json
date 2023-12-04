@@ -27,7 +27,8 @@
     "react-flow": "^1.0.3",
     "sql-formatter": "^13.1.0",
     "ui": "*",
-    "valtio": "^1.12.0"
+    "valtio": "^1.12.0",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/node": "^18.11.9",
@@ -35,7 +36,7 @@
     "@types/react-dom": "^18.2.8",
     "autoprefixer": "10.4.14",
     "nextjs-node-loader": "^1.1.5-alpha.0",
-    "postcss": "8.4.29",
+    "postcss": "8.4.31",
     "typescript": "^5.2.2"
   }
 }

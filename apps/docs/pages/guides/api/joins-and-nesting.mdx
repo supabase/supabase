@@ -3,10 +3,10 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'joins-and-nested-tables',
   title: 'Querying Joins and Nested tables',
-  description: 'The Serverless APIs automatically detect relationships between Postgres tables.',
+  description: 'The Data APIs automatically detect relationships between Postgres tables.',
 }
 
-The Serverless APIs automatically detect relationships between Postgres tables. Since Postgres is a relational database, this is a very common scenario.
+The data APIs automatically detect relationships between Postgres tables. Since Postgres is a relational database, this is a very common scenario.
 
 ## One-to-many joins
 
@@ -113,22 +113,17 @@ create table cities (
 We can get the nested `CountriesWithCities` type like this:
 
 ```ts
-import { PostgrestError } from '@supabase/supabase-js'
+import { QueryResult, QueryData, QueryError } from '@supabase/supabase-js'
 
-export type DbResult<T> = T extends PromiseLike<infer U> ? U : never
-export type DbResultOk<T> = T extends PromiseLike<{ data: infer U }> ? Exclude<U, null> : never
-export type DbResultErr = PostgrestError
-```
-
-```ts
-const countriesWithCitiesQuery = supabase.from('countries').select(
-  `
+const countriesWithCitiesQuery = supabase.from('countries').select(`
   id,
   name,
-  cities ( id, name )
-`
-)
-type CountriesWithCities = DbResultOk<typeof countriesWithCitiesQuery>
+  cities (
+    id,
+    name
+  )
+`)
+type CountriesWithCities = QueryData<typeof countriesWithCitiesQuery>
 
 const { data, error } = await countriesWithCitiesQuery
 if (error) throw error
@@ -176,7 +171,7 @@ GET https://[REF].supabase.co/rest/v1/countries?select=id,name,cities(id,name)
 
 ## Many-to-many joins
 
-The Serverless APIs will detect many-to-many joins. For example, if you have a database which stored teams of users (where each user could belong to many teams):
+The data APIs will detect many-to-many joins. For example, if you have a database which stored teams of users (where each user could belong to many teams):
 
 ```sql
 create table users (

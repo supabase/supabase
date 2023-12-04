@@ -1,5 +1,5 @@
 import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
-import { QueryKey, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import { isEmpty, isUndefined, noop } from 'lodash'
 import { useState } from 'react'
 import { toast } from 'react-hot-toast'
@@ -14,6 +14,7 @@ import { useTableRowCreateMutation } from 'data/table-rows/table-row-create-muta
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
 import { tableKeys } from 'data/tables/keys'
 import { useStore, useUrlState } from 'hooks'
+import { getImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { ColumnEditor, RowEditor, SpreadsheetImport, TableEditor } from '.'
 import ForeignRowSelector from './RowEditor/ForeignRowSelector/ForeignRowSelector'
@@ -62,59 +63,8 @@ const SidePanelEditor = ({
   const { project } = useProjectContext()
   const { mutateAsync: createTableRows } = useTableRowCreateMutation()
   const { mutateAsync: updateTableRow } = useTableRowUpdateMutation({
-    async onMutate({ projectRef, table, configuration, payload }) {
-      snap.closeSidePanel()
-
-      const primaryKeyColumns = new Set(Object.keys(configuration.identifiers))
-      const queryKey = sqlKeys.query(projectRef, [
-        table.schema,
-        table.name,
-        { table: { name: table.name, schema: table.schema } },
-      ])
-
-      await queryClient.cancelQueries(queryKey)
-      const previousRowsQueries = queryClient.getQueriesData<{ result: any[] }>(queryKey)
-      queryClient.setQueriesData<{ result: any[] }>(queryKey, (old) => {
-        return {
-          result:
-            old?.result.map((row) => {
-              // match primary keys
-              if (
-                Object.entries(row)
-                  .filter(([key]) => primaryKeyColumns.has(key))
-                  .every(([key, value]) => value === configuration.identifiers[key])
-              ) {
-                return { ...row, ...payload }
-              }
-
-              return row
-            }) ?? [],
-        }
-      })
-
-      return { previousRowsQueries }
-    },
-    onError(error, _variables, context) {
-      const { previousRowsQueries } = context as {
-        previousRowsQueries: [
-          QueryKey,
-          (
-            | {
-                result: any[]
-              }
-            | undefined
-          )
-        ][]
-      }
-
-      previousRowsQueries.forEach(([queryKey, previousRows]) => {
-        if (previousRows) {
-          queryClient.setQueriesData(queryKey, previousRows)
-        }
-        queryClient.invalidateQueries(queryKey)
-      })
-
-      ui.setNotification({ error, category: 'error', message: error.message })
+    onSuccess() {
+      ui.setNotification({ category: 'success', message: 'Successfully updated row' })
     },
   })
 
@@ -137,6 +87,7 @@ const SidePanelEditor = ({
           table: selectedTable as any,
           payload,
           enumArrayColumns,
+          impersonatedRole: getImpersonatedRole(),
         })
         onRowCreated(result[0])
       } catch (error: any) {
@@ -154,6 +105,7 @@ const SidePanelEditor = ({
               configuration,
               payload,
               enumArrayColumns,
+              impersonatedRole: getImpersonatedRole(),
             })
             onRowUpdated(result[0], configuration.rowIdx)
           } catch (error: any) {
@@ -568,11 +520,6 @@ const SidePanelEditor = ({
         onSaveJSON={onSaveJSON}
       />
       <ForeignRowSelector
-        key={`foreign-row-selector-${
-          (snap.sidePanel?.type === 'foreign-row-selector' &&
-            snap.sidePanel.foreignKey.foreignKey.id) ||
-          'null'
-        }`}
         visible={snap.sidePanel?.type === 'foreign-row-selector'}
         foreignKey={
           snap.sidePanel?.type === 'foreign-row-selector'

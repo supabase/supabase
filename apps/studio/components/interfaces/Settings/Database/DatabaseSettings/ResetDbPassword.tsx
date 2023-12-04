@@ -112,7 +112,7 @@ const ResetDbPassword = ({ disabled = false }) => {
             </div>
             <div className="flex items-end justify-end">
               <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger>
+                <Tooltip.Trigger asChild>
                   <Button
                     type="default"
                     disabled={!canResetDbPassword || !isProjectActive || disabled}
