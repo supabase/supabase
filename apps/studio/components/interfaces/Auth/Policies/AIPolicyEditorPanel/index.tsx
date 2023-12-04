@@ -16,7 +16,7 @@ import { useRlsSuggestQuery } from 'data/ai/rls-suggest-query'
 import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { useSelectedProject, useStore } from 'hooks'
+import { useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { AIPolicyChat } from './AIPolicyChat'
 import {
@@ -27,6 +27,7 @@ import {
 import { AIPolicyHeader } from './AIPolicyHeader'
 import QueryError from './QueryError'
 import RLSCodeEditor from './RLSCodeEditor'
+import { OPT_IN_TAGS } from 'lib/constants'
 
 const DiffEditor = dynamic(
   () => import('@monaco-editor/react').then(({ DiffEditor }) => DiffEditor),
@@ -49,10 +50,12 @@ export const AIPolicyEditorPanel = memo(function ({
 }: AIPolicyEditorPanelProps) {
   const { meta } = useStore()
   const selectedProject = useSelectedProject()
+  const selectedOrganization = useSelectedOrganization()
 
   const editorRef = useRef<IStandaloneCodeEditor | null>(null)
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
   const placeholder = generatePlaceholder(selectedPolicy)
+  const isOptedInToAI = selectedOrganization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
 
   const [error, setError] = useState<QueryResponseError>()
   // [Joshen] Separate state here as there's a delay between submitting and the API updating the loading status
@@ -134,8 +137,8 @@ export const AIPolicyEditorPanel = memo(function ({
       } else {
         addPromptMutation({
           thread_id: ids?.threadId,
-          entityDefinitions,
           prompt: message,
+          entityDefinitions: isOptedInToAI ? entityDefinitions : undefined,
           policyDefinition:
             selectedPolicy !== undefined ? generatePolicyDefinition(selectedPolicy) : undefined,
         })
