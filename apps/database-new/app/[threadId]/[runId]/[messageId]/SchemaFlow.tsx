@@ -97,11 +97,11 @@ export async function SchemaFlow({ params }: { params: any }) {
 
   // const code = format(content, { language: 'postgresql' })
 
-  const tables = await parseTables(content)
+  // const tables = await parseTables(content)
 
   // useEffect(() => {
   //   snap.setSelectedCode(code)
   // }, [code])
 
-  return <SchemaFlowHandler tables={tables} />
+  return <SchemaFlowHandler content={content} />
 }

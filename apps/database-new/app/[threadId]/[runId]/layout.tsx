@@ -1,7 +1,6 @@
 import { Chat } from '@/app/[threadId]/[runId]/Chat'
 import SaveSchemaDropdown from '@/components/Header/SaveSchemaDropdown'
 import ToggleCodeEditorButton from '@/components/Header/ToggleCodeEditorButton'
-import { threadId } from 'worker_threads'
 
 export default function Layout({
   children,

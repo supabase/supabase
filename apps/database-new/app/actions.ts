@@ -8,7 +8,7 @@ import { parseTables } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { cookies } from 'next/headers'
-import { redirect } from 'next/navigation'
+import { RedirectType, redirect } from 'next/navigation'
 
 import OpenAI from 'openai'
 import { z } from 'zod'
@@ -183,6 +183,15 @@ export async function createThread(prevState: any, formData: FormData) {
     }
 
     redirectUrl = `/${thread.id}/${run.id}/${message.id}`
+    // return {
+    //   success: true,
+    //   message: 'Managed to run action',
+    //   data: {
+    //     messageId: message.id,
+    //     runId: run.id,
+    //     threadId: thread.id,
+    //   },
+    // }
   } catch (error: any) {
     console.error(error)
     return {

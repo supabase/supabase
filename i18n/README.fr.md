@@ -247,7 +247,7 @@ Notre approche des bibliothèques clientes est modulaire. Chaque sous-bibliothè
 - [Chinois simplifié / 简体中文](/i18n/README.zh-cn.md)
 - [Suédois / Svenska](/i18n/README.sv.md)
 - [Thai / ไทย](/i18n/README.th.md)
-- [Chinois traditionnel / 繁体中文](/i18n/README.zh-tw.md)
+- [Chinois traditionnel / 繁體中文](/i18n/README.zh-tw.md)
 - [Turc / Türkçe](/i18n/README.tr.md)
 - [Ukrainien / Українська](/i18n/README.uk.md)
 - [Vietnamien / Tiếng Việt](/i18n/README.vi-vn.md)

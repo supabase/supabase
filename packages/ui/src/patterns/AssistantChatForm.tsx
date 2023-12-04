@@ -53,6 +53,7 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
           ) : null}
 
           <button
+            title="Send AI prompt"
             ref={submitRef}
             type="submit"
             disabled={pending}
@@ -92,7 +93,6 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
           rows={1}
           disabled={disabled || submitRef.current?.disabled}
           contentEditable
-          aria-expanded={false}
           required
           className={
             'transition-all text-sm pl-12 pr-10 rounded-[18px] resize-none box-border leading-6'
