@@ -16,6 +16,8 @@ async function getThread({
   runId: string
   messageId: string
 }) {
+  console.log('getting thread..', threadId, runId, messageId)
+
   const [run, { data: _messages }] = await Promise.all([
     openai.beta.threads.runs.retrieve(threadId, runId),
     openai.beta.threads.messages.list(threadId),
@@ -51,7 +53,7 @@ async function getThread({
 
   messages = sortBy(messages, (m) => m.created_at)
 
-  const userMessages = messages.filter((m) => m.role === 'user')
+  // const userMessages = messages.filter((m) => m.role === 'user')
 
   const selectedMessageIdx = messages.findIndex((m) => m.id === messageId)
   const selectedMessageReply = (

@@ -1,7 +1,9 @@
-import { useEffect, useRef } from 'react'
+'use client'
+
+import { createRef, useEffect } from 'react'
 
 const BottomMarker = () => {
-  const ref = useRef<HTMLDivElement>(null)
+  const ref = createRef<HTMLDivElement>()
 
   useEffect(() => {
     if (ref.current) {
@@ -14,4 +16,4 @@ const BottomMarker = () => {
   return <div ref={ref} />
 }
 
-export default BottomMarker
+export { BottomMarker }
