@@ -31,8 +31,10 @@ import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions, useSelectedOrganization, useStore, useFlag } from 'hooks'
+import { useCheckPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
 
+// Use a const string to represent no chars option. Represented as empty string on the backend side.
+const NO_REQUIRED_CHARACTERS = 'NO_REQUIRED_CHARS'
 const LETTERS_AND_DIGITS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789'
 const LOWER_UPPER_DIGITS = 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789'
 const LOWER_UPPER_DIGITS_SYMBOLS = LOWER_UPPER_DIGITS + ':!@#$%^&*()_+-=[]{};\'\\\\:"|<>?,./`~'
@@ -111,7 +113,8 @@ const BasicAuthSettingsForm = observer(() => {
     ...(passwordStrengthReleased
       ? {
           PASSWORD_MIN_LENGTH: authConfig?.PASSWORD_MIN_LENGTH || 6,
-          PASSWORD_REQUIRED_CHARACTERS: authConfig?.PASSWORD_REQUIRED_CHARACTERS || '',
+          PASSWORD_REQUIRED_CHARACTERS:
+            authConfig?.PASSWORD_REQUIRED_CHARACTERS || NO_REQUIRED_CHARACTERS,
         }
       : null),
   }
@@ -119,6 +122,10 @@ const BasicAuthSettingsForm = observer(() => {
   const onSubmit = (values: any, { resetForm }: any) => {
     const payload = { ...values }
     payload.DISABLE_SIGNUP = !values.DISABLE_SIGNUP
+    // The backend uses empty string to represent no required characters in the password
+    if (payload.PASSWORD_REQUIRED_CHARACTERS === NO_REQUIRED_CHARACTERS) {
+      payload.PASSWORD_REQUIRED_CHARACTERS = ''
+    }
 
     updateAuthConfig(
       { projectRef: projectRef!, config: payload },
@@ -216,31 +223,32 @@ const BasicAuthSettingsForm = observer(() => {
                           name="PASSWORD_REQUIRED_CHARACTERS"
                           label="Required characters"
                           descriptionText="Passwords that do not have at least one of each will be rejected as weak."
-                          options={[
-                            {
-                              id: 'no-required',
-                              label: 'No required characters',
-                              value: '',
-                              description: '(default)',
-                            },
-                            {
-                              id: 'letters-digits',
-                              label: 'Letters and digits',
-                              value: LETTERS_AND_DIGITS,
-                            },
-                            {
-                              id: 'lower-upper-digits',
-                              label: 'Lowercase, uppercase letters and digits',
-                              value: LOWER_UPPER_DIGITS,
-                            },
-                            {
-                              id: 'lower-upper-digits-symbols',
-                              label: 'Lowercase, uppercase letters, digits and symbols',
-                              value: LOWER_UPPER_DIGITS_SYMBOLS,
-                              description: '(recommended)',
-                            },
-                          ]}
-                        />
+                        >
+                          <Radio
+                            label="No required characters"
+                            value={NO_REQUIRED_CHARACTERS}
+                            checked={values.PASSWORD_REQUIRED_CHARACTERS === NO_REQUIRED_CHARACTERS}
+                            description="(default)"
+                          />
+                          <Radio
+                            label="Letters and digits"
+                            value={LETTERS_AND_DIGITS}
+                            checked={values.PASSWORD_REQUIRED_CHARACTERS === LETTERS_AND_DIGITS}
+                          />
+                          <Radio
+                            label="Lowercase, uppercase letters and digits"
+                            value={LOWER_UPPER_DIGITS}
+                            checked={values.PASSWORD_REQUIRED_CHARACTERS === LOWER_UPPER_DIGITS}
+                          />
+                          <Radio
+                            label="Lowercase, uppercase letters, digits and symbols"
+                            value={LOWER_UPPER_DIGITS_SYMBOLS}
+                            checked={
+                              values.PASSWORD_REQUIRED_CHARACTERS === LOWER_UPPER_DIGITS_SYMBOLS
+                            }
+                            description="(recommended)"
+                          />
+                        </Radio.Group>
                       </>
                     </FormSectionContent>
                   </FormSection>

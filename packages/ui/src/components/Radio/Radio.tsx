@@ -81,16 +81,8 @@ function RadioGroup({
   }, [])
 
   useEffect(() => {
-    if (Array.isArray(options)) {
-      const id = options.find((o) => o.value === value)?.id
-      if (id) {
-        setActiveId(id)
-        return
-      }
-    }
-
     setActiveId(value)
-  }, [value, options])
+  }, [value])
 
   function parentCallback(e: React.ChangeEvent<HTMLInputElement>) {
     if (onChange) onChange(e)
@@ -100,7 +92,6 @@ function RadioGroup({
     }
     // run field level validation
     if (validation) fieldLevelValidation(id, validation(e.target.value))
-    console.log(e.target.id)
     setActiveId(e.target.id)
   }
 
@@ -252,7 +243,7 @@ function Radio({
               ].join(' ')}
               checked={active}
               disabled={disabled}
-              value={value}
+              value={value ? value : markupId}
               onChange={(e) => onInputChange(e)}
               onBlur={handleBlurEvent}
             />
