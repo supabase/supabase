@@ -1,6 +1,5 @@
 import { useRouter } from 'next/router'
 import * as React from 'react'
-import { ElementRef, useRef } from 'react'
 import { IconHome } from '../Icon/icons/IconHome'
 
 import { IconArrowRight } from './../Icon/icons/IconArrowRight'
@@ -24,6 +23,7 @@ import {
   CommandItem,
   CommandLabel,
   CommandList,
+  FORCE_MOUNT_ITEM,
   copyToClipboard,
 } from './Command.utils'
 import { COMMAND_ROUTES } from './Command.constants'
@@ -115,6 +115,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
               <CommandGroup heading="Documentation">
                 <CommandItem
                   type="command"
+                  value={site === 'docs' ? `${FORCE_MOUNT_ITEM}--docs-search` : undefined}
                   onSelect={() => setPages([...pages, COMMAND_ROUTES.DOCS_SEARCH])}
                 >
                   <IconBook className="" />
@@ -134,6 +135,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                 <CommandItem
                   type="command"
                   badge={<BadgeExperimental />}
+                  value={site === 'docs' ? `${FORCE_MOUNT_ITEM}--ai-info` : undefined}
                   onSelect={() => {
                     setPages([...pages, COMMAND_ROUTES.AI])
                   }}

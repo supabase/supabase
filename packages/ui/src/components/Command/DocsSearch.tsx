@@ -14,7 +14,13 @@ import {
   IconSearch,
   useCommandMenu,
 } from 'ui'
-import { CommandGroup, CommandItem, CommandLabel, TextHighlighter } from './Command.utils'
+import {
+  CommandGroup,
+  CommandItem,
+  CommandLabel,
+  FORCE_MOUNT_ITEM,
+  TextHighlighter,
+} from './Command.utils'
 
 const NUMBER_SOURCES = 2
 
@@ -366,13 +372,11 @@ const DocsSearch = () => {
             <CommandGroup
               heading=""
               key={`${page.title}-group-index-${i}`}
-              // Adding the search term here is a hack to prevent the cmdk menu
-              // filter from filtering out search results
-              value={`${search}-${page.title}-group-index-${i}`}
+              value={`${FORCE_MOUNT_ITEM}--${page.title}-group-index-${i}`}
             >
               <CommandItem
                 key={`${page.title}-item-index-${i}`}
-                value={`${search}-${removeDoubleQuotes(page.title)}-item-index-${i}`}
+                value={`${FORCE_MOUNT_ITEM}--${page.title}-item-index-${i}`}
                 type="block-link"
                 onSelect={() => {
                   openLink(page.type, formatPageUrl(page))
@@ -403,9 +407,7 @@ const DocsSearch = () => {
                         openLink(page.type, formatSectionUrl(page, section))
                       }}
                       key={`${page.title}__${section.heading}-item-index-${i}`}
-                      value={`${search}-${removeDoubleQuotes(page.title)}__${removeDoubleQuotes(
-                        section.heading ?? ''
-                      )}-item-index-${i}`}
+                      value={`${FORCE_MOUNT_ITEM}--${page.title}__${section.heading}-item-index-${i}`}
                       type="block-link"
                     >
                       <div className="grow flex gap-3 items-center">
