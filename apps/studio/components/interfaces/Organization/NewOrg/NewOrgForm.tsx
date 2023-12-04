@@ -3,7 +3,7 @@ import type { PaymentMethod } from '@stripe/stripe-js'
 import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Button,
   IconEdit2,
@@ -58,11 +58,13 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
   const stripe = useStripe()
   const elements = useElements()
 
-  const { plan } = useParams()
+  const { plan, name, kind, size, spend_cap } = useParams()
 
-  const [orgName, setOrgName] = useState('')
-  const [orgKind, setOrgKind] = useState(ORG_KIND_DEFAULT)
-  const [orgSize, setOrgSize] = useState(ORG_SIZE_DEFAULT)
+  const [orgName, setOrgName] = useState(name || '')
+  const [orgKind, setOrgKind] = useState(
+    kind && Object.keys(ORG_KIND_TYPES).includes(kind) ? kind : ORG_KIND_DEFAULT
+  )
+  const [orgSize, setOrgSize] = useState(size || ORG_SIZE_DEFAULT)
   // [Joshen] Separate loading state here as there's 2 async processes
   const [newOrgLoading, setNewOrgLoading] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>()
@@ -73,7 +75,18 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
   )
 
   const [showSpendCapHelperModal, setShowSpendCapHelperModal] = useState(false)
-  const [isSpendCapEnabled, setIsSpendCapEnabled] = useState(true)
+  const [isSpendCapEnabled, setIsSpendCapEnabled] = useState(spend_cap ? Boolean(spend_cap) : true)
+
+  useEffect(() => {
+    const query: Record<string, string> = {}
+    query.plan = dbPricingTierKey.toLowerCase()
+    if (orgName) query.name = orgName
+    if (orgKind) query.kind = orgKind
+    if (orgSize) query.size = orgSize
+    if (isSpendCapEnabled) query.spend_cap = isSpendCapEnabled.toString()
+
+    router.push({ query })
+  }, [dbPricingTierKey, orgName, orgKind, orgSize, isSpendCapEnabled])
 
   const { mutateAsync: createOrganization } = useOrganizationCreateMutation({
     onSuccess: async (org: any) => {
@@ -119,6 +132,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
         payment_method: paymentMethodId,
       })
     } catch (error) {
+      resetPaymentMethod()
       setNewOrgLoading(false)
     }
   }
