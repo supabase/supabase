@@ -1779,7 +1779,7 @@ functions:
           Like `.select('name, countries!inner()')`.
         hideCodeBlock: true
       - id: switching-schemas-per-query
-        name: Switching schemas per-query
+        name: Switching schemas per query
         code: |
           ```ts
           const { data, error } = await supabase
