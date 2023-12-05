@@ -50,7 +50,9 @@ const LWXMeetups = ({ meetups }: { meetups?: Meetup[] }) => {
           },
           async () => {
             const { data: newMeets } = await supabase.from('lwx_meetups').select('*')
-            setMeets(newMeets!)
+            setMeets(
+              newMeets?.sort((a, b) => (new Date(a.start_at) > new Date(b.start_at) ? 1 : -1))!
+            )
           }
         )
         .subscribe(async (status) => {
