@@ -103,7 +103,7 @@ const LWXMeetups = ({ meetups }: { meetups?: Meetup[] }) => {
                   onMouseOver={() => handleSelectMeetup(meetup)}
                   title={liveNow ? 'Live now' : undefined}
                   className={cn(
-                    'group py-1 flex items-center flex-wrap text-lg sm:text-2xl xl:text-4xl',
+                    'group py-1 flex items-center flex-wrap text-4xl',
                     'hover:text-foreground transition-colors',
                     meetup.id === activeMeetup.id ? 'text-foreground' : 'text-foreground-muted',
                     liveNow && 'text-foreground-light'
