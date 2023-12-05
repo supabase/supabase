@@ -1,27 +1,60 @@
-import { AssistantMessage, UserMessage } from '@/lib/types'
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
-import { useParams, useRouter } from 'next/navigation'
-import { cn } from 'ui'
+'use client'
 
-dayjs.extend(relativeTime)
+import { useAppStateSnapshot } from '@/lib/state'
+import { AssistantMessage, UserMessage } from '@/lib/types'
+import { useParams, usePathname, useRouter } from 'next/navigation'
+import OpenAI from 'openai'
+import { cn } from 'ui'
+import { pull } from 'lodash'
+import { useEffect } from 'react'
 
 interface UserChatProps {
-  message: UserMessage
-  reply?: AssistantMessage
+  message: OpenAI.Beta.Threads.Messages.ThreadMessage
   isLatest: boolean
-  isSelected: boolean
-  isLoading: boolean
+  times: {
+    hoursFromNow: number
+    formattedTimeFromNow: string
+    formattedCreatedAt: string
+    replyDuration: number | undefined
+  }
+  run: OpenAI.Beta.Threads.Run
 }
 
-const UserChat = ({ message, reply, isLatest, isSelected, isLoading }: UserChatProps) => {
+const UserChat = ({ message, isLatest, times, run }: UserChatProps) => {
   const router = useRouter()
+  const snap = useAppStateSnapshot()
   const { threadId, runId } = useParams()
 
-  const hoursFromNow = dayjs().diff(dayjs(message.created_at * 1000), 'hours')
-  const formattedTimeFromNow = dayjs(message.created_at * 1000).fromNow()
-  const formattedCreatedAt = dayjs(message.created_at * 1000).format('DD MMM YYYY, HH:mm')
-  const replyDuration = reply !== undefined ? reply.created_at - message.created_at : undefined
+  // console.log(run)
+
+  const LOADING_STATUSES = ['in_progress', 'queued']
+
+  const runIsInProgressRemotely = LOADING_STATUSES.includes(run.status)
+
+  useEffect(() => {
+    if (runIsInProgressRemotely) {
+      // set a local state for run loading
+      // this state will be updated via other client components when completing a run
+      // remove current message id from array if it exists
+      let currentRunsLoading = [...snap.runsLoading]
+      pull(currentRunsLoading, run.id)
+      const payload = [...currentRunsLoading, run.id]
+      snap.setRunsLoading([...payload])
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [runIsInProgressRemotely, run.id]) // Intentionally left snap out of the dependency array
+
+  // using the local state for run loading
+  const isLoading = snap.runsLoading.includes(run.id) && isLatest
+
+  const { hoursFromNow, formattedTimeFromNow, formattedCreatedAt, replyDuration } = times
+
+  // chat shown as selected when url matches
+  const isSelected = usePathname().includes(message.id)
+
+  // extract the text from the assistant message
+  const message_content = message.content[0]
+  const text = message_content.type === 'text' ? message_content.text.value : ''
 
   return (
     <div
@@ -76,24 +109,24 @@ const UserChat = ({ message, reply, isLatest, isSelected, isLoading }: UserChatP
             </svg>
           </span>
           <div
-            title={message.text}
+            title={text}
             className={cn(
               'cursor-pointer transition relative overflow-hidden',
               'w-full rounded-lg rounded-tl-none',
               'bg-alternative',
-              'border'
-              // isSelected ? 'bg-surface-100' : 'bg-surface-100 group-hover:bg-surface-200'
+              'border',
+              isSelected ? 'bg-surface-100' : 'bg-surface-100 group-hover:bg-surface-200'
             )}
           >
             <p
               className={cn(
-                'transition p-4 text-sm',
+                'transition p-4 text-xs',
                 isSelected ? 'text-foreground' : 'text-light group-hover:text-foreground'
               )}
             >
-              {message.text}
+              {text}
             </p>
-            {isLoading && <div className="chat-shimmering-loader w-full h-0.5 absolute bottom-0" />}
+            {/* {isLoading && <div className="chat-shimmering-loader w-full h-0.5 absolute bottom-0" />} */}
           </div>
         </div>
         {isSelected && (

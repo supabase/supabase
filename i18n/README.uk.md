@@ -247,7 +247,7 @@ Supabase - це [хостингова платформа](https://supabase.com/d
 - [Спрощена китайська / 简体中文](/i18n/README.zh-cn.md)
 - [Шведська / Svenska](/i18n/README.sv.md)
 - [Тайська / ไทย](/i18n/README.th.md)
-- [Традиційна китайська / 繁体中文](/i18n/README.zh-tw.md)
+- [Традиційна китайська / 繁體中文](/i18n/README.zh-tw.md)
 - [Турецька / Türkçe](/i18n/README.tr.md)
 - [Українська / Ukrainian](/i18n/README.uk.md)
 - [В'єтнамська / Tiếng Việt](/i18n/README.vi-vn.md)

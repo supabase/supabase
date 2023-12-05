@@ -18,19 +18,6 @@ export const metadata: Metadata = {
 // export const dynamic = 'force-dynamic'
 
 const Profile = async () => {
-  // async function handleThreadActions(formData: FormData) {
-  //   'use server'
-
-  //   const action = formData.get('action') as string
-  //   const threadID = formData.get('threadID') as string
-
-  //   if (!threadID) return
-
-  //   if (action === 'delete') {
-  //     deleteThread(threadID)
-  //   }
-  // }
-
   return (
     <div className="grid grid-cols-4 gap-x-8 py-6 xl:py-12 gap-y-6 xl:gap-y-0">
       <div className="col-span-4 xl:col-span-1 flex flex-col gap-y-6">
