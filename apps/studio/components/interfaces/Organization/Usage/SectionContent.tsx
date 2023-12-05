@@ -36,7 +36,7 @@ const SectionContent = ({
                     ))}
                   </div>
                 </div>
-                {links && links.length && (
+                {links && links.length > 0 && (
                   <div className="space-y-2">
                     <p className="text-sm text-foreground mb-2">More information</p>
                     {links.map((link) => (
