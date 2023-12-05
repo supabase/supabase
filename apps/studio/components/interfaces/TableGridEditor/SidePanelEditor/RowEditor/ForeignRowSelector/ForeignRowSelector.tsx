@@ -142,7 +142,7 @@ const ForeignRowSelector = ({
                       setParams(...args)
                     }}
                   />
-                  <DndProvider backend={HTML5Backend}>
+                  <DndProvider backend={HTML5Backend} context={window}>
                     <SortPopover
                       table={supaTable}
                       sorts={params.sort ?? []}
