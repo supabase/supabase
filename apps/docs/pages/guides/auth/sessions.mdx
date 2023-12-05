@@ -74,7 +74,7 @@ To make sure that users are required to re-authenticate periodically, you can se
 
 To make sure that sessions expire after a period of inactivity, you can set a positive duration for the _Inactivity timeout_ option in the [Auth settings](/dashboard/project/_/settings/auth).
 
-You can also configure to have only one active session per user per device or browser. When this is enabled, the session from the most recent sign in will remain active, while the rest are terminated. Enable this via the _Single session per user_ option in the [Auth settings](/dashboard/project/_/settings/auth).
+You can also enforce only one active session per user per device or browser. When this is enabled, the session from the most recent sign in will remain active, while the rest are terminated. Enable this via the _Single session per user_ option in the [Auth settings](/dashboard/project/_/settings/auth).
 
 Sessions are not proactively destroyed when you change these settings, but rather the check is enforced whenever a session is refreshed next. Otherwise sessions are progressively cleaned up 24 hours after they expire, which prevents you from causing a high load on your database by accident and allows you some freedom to undo changes without adversely affecting all users.
 
