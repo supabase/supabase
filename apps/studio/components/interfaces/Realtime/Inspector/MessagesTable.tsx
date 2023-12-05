@@ -45,7 +45,7 @@ const NoResultAlert = ({
                 <p className="text-foreground-lighter text-xs">Send a message in the channel</p>
               </div>
               <Button type="default" onClick={showSendMessage}>
-                Send a test message
+                Broadcast a message
               </Button>
             </div>
             <div className="w-full px-5 py-4 items-center gap-4 inline-flex border-b">

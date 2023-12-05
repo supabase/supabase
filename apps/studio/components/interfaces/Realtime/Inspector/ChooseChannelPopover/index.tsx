@@ -44,7 +44,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
 
   const onSubmit = () => {
     setOpen(false)
-    onChangeConfig({ ...config, channelName: form.getValues('channel') })
+    onChangeConfig({ ...config, channelName: form.getValues('channel'), enabled: true })
   }
 
   return (
@@ -64,7 +64,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
           </p>
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0" align="start">
+      <PopoverContent_Shadcn_ className="p-0 w-[320px]" align="start">
         <div className="p-4 flex flex-col text-sm">
           {config.channelName.length === 0 ? (
             <>
@@ -86,12 +86,12 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
                             />
                           </FormControl_Shadcn_>
                           <Button
-                            type="default"
+                            type="primary"
                             className="rounded-l-none"
                             disabled={form.getValues().channel.length === 0}
                             onClick={() => onSubmit()}
                           >
-                            Join channel
+                            Listen to channel
                           </Button>
                         </div>
                       </FormItem_Shadcn_>
@@ -114,7 +114,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
           ) : (
             <div className="space-y-2">
               <div className="flex items-center gap-x-2">
-                <p className="text-foreground text-xs">Currently joining channel</p>
+                <p className="text-foreground text-xs">Currently joined channel:</p>
                 <p className="text-xs border border-scale-600  py-0.5 px-1 rounded-md bg-surface-200">
                   {config.channelName}
                 </p>
