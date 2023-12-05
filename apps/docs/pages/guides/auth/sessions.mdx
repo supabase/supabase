@@ -26,6 +26,7 @@ A session terminates, depending on configuration, when:
 - The user changes their password or performs a security sensitive action.
 - It times out due to inactivity.
 - It reaches its maximum lifetime.
+- A user signs in on another device.
 
 ## Access token (JWT) claims
 
@@ -52,7 +53,7 @@ Upon sign out, all refresh tokens and potentially other database objects related
 
 Be aware that access tokens of revoked sessions remain valid until their expiry time, encoded in the `exp` claim.
 
-## Controlling the lifetime of a session
+## Limiting session lifetime and number of allowed sessions per user
 
 <Admonition type="note">
 
@@ -72,6 +73,8 @@ There are two ways to limit the lifetime of a session:
 To make sure that users are required to re-authenticate periodically, you can set a positive value for the _Time-box user sessions_ option in the [Auth settings](/dashboard/project/_/settings/auth) for your project.
 
 To make sure that sessions expire after a period of inactivity, you can set a positive duration for the _Inactivity timeout_ option in the [Auth settings](/dashboard/project/_/settings/auth).
+
+You can also enforce only one active session per user per device or browser. When this is enabled, the session from the most recent sign in will remain active, while the rest are terminated. Enable this via the _Single session per user_ option in the [Auth settings](/dashboard/project/_/settings/auth).
 
 Sessions are not proactively destroyed when you change these settings, but rather the check is enforced whenever a session is refreshed next. Otherwise sessions are progressively cleaned up 24 hours after they expire, which prevents you from causing a high load on your database by accident and allows you some freedom to undo changes without adversely affecting all users.
 
