@@ -104,24 +104,14 @@ final supabase = Supabase.instance.client;
 
 final roomOne = supabase.channel('room_01');
 
-roomOne
-    .onPresence(
-        event: PresenceEvent.sync,
-        callback: (_) {
-          final newState = roomOne.presenceState();
-          print('sync: $newState');
-        })
-    .onPresence(
-        event: PresenceEvent.join,
-        callback: (payload) {
-          print('join: $payload');
-        })
-    .onPresence(
-        event: PresenceEvent.leave,
-        callback: (payload) {
-          print('leave: $payload');
-        })
-    .subscribe();
+roomOne.onPresenceSync((_) {
+  final newState = roomOne.presenceState();
+  print('sync: $newState');
+}).onPresenceJoin((payload) {
+  print('join: $payload');
+}).onPresenceLeave((payload) {
+  print('leave: $payload');
+}).subscribe();
 ```
 
 </TabPanel>
