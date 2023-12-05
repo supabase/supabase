@@ -69,7 +69,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
         </PopoverTrigger_Shadcn_>
         <PopoverContent_Shadcn_ className="p-0 w-full" align="start">
           <div className="border-b border-overlay text-xs px-4 py-3 text-foreground">
-            Filter incoming messages
+            Filter messages from database changes
           </div>
           <div className="flex border-b border-overlay p-4 gap-y-2 flex-col">
             <FilterSchema

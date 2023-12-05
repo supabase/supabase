@@ -42,7 +42,7 @@ const NoResultAlert = ({
               <IconBroadcast size="xlarge" className="bg-brand-400 rounded w-6 text-brand-600" />
               <div className="grow flex-col flex">
                 <p className="text-foreground">Create a Broadcast message</p>
-                <p className="text-foreground-lighter text-xs">Start developing in preview</p>
+                <p className="text-foreground-lighter text-xs">Send a message in the channel</p>
               </div>
               <Button type="default" onClick={showSendMessage}>
                 Send a test message
@@ -53,7 +53,7 @@ const NoResultAlert = ({
               <div className="grow flex-col flex">
                 <p className="text-foreground">Join from another browser tab</p>
                 <p className="text-foreground-lighter text-xs">
-                  Experiment with presence messages between multiple clients
+                  Send messages between multiple clients
                 </p>
               </div>
               <Link href={`/project/${ref}/realtime/inspector`} target="_blank" rel="noreferrer">
@@ -70,7 +70,7 @@ const NoResultAlert = ({
               />
               <div className="grow flex-col flex">
                 <p className="text-foreground">Listen to a table for changes</p>
-                <p className="text-foreground-lighter text-xs">Start developing in preview</p>
+                <p className="text-foreground-lighter text-xs">Tables must have realtime enabled</p>
               </div>
               <Link href={`/project/${ref}/database/replication`} target="_blank" rel="noreferrer">
                 <Button type="default" iconRight={<IconExternalLink />}>
