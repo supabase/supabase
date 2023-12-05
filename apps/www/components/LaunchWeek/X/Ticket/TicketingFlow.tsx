@@ -128,7 +128,7 @@ const TicketingFlow = () => {
                       </p>
                     ) : hasPlatinumTicket ? (
                       <p className="text-2xl lg:text-3xl">
-                        <span className="text-foreground-lighter">Congrats!</span> You've maximized
+                        <span className="text-foreground-lighter">Congrats!</span> You maximized
                         your chances and have a platinum ticket now.
                       </p>
                     ) : winningChances !== 2 ? (
