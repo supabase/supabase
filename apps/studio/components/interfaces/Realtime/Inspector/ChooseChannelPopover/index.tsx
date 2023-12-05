@@ -64,7 +64,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
             className="max-w-[120px] truncate"
             title={config.channelName.length > 0 ? config.channelName : ''}
           >
-            {config.channelName.length > 0 ? `Channel: ${config.channelName}` : 'Choose channel'}
+            {config.channelName.length > 0 ? `Channel: ${config.channelName}` : 'Join a channel'}
           </p>
         </Button>
       </PopoverTrigger_Shadcn_>
@@ -95,7 +95,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
                             disabled={form.getValues().channel.length === 0}
                             onClick={() => onSubmit()}
                           >
-                            Set channel
+                            Join channel
                           </Button>
                         </div>
                       </FormItem_Shadcn_>
@@ -118,19 +118,19 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
           ) : (
             <div className="space-y-2">
               <div className="flex items-center gap-x-2">
-                <p className="text-foreground text-xs">Currently using channel</p>
+                <p className="text-foreground text-xs">Currently joining channel</p>
                 <p className="text-xs border border-scale-600  py-0.5 px-1 rounded-md bg-surface-200">
                   {config.channelName}
                 </p>
               </div>
               <p className="text-xs text-foreground-lighter mt-2">
-                If you unset this channel, all of the messages populated on this page will disappear
+                If you leave this channel, all of the messages populated on this page will disappear
               </p>
               <Button
                 type="default"
                 onClick={() => onChangeConfig({ ...config, channelName: '', enabled: false })}
               >
-                Unset channel
+                Leave channel
               </Button>
             </div>
           )}

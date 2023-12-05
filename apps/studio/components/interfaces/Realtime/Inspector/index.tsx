@@ -36,6 +36,7 @@ export const RealtimeInspector = () => {
       <div className="relative flex flex-col flex-grow h-full">
         <div className="flex h-full">
           <MessagesTable
+            hasChannelSet={realtimeConfig.channelName.length > 0}
             enabled={realtimeConfig.enabled}
             data={logData}
             showSendMessage={() => setSendMessageShown(true)}
