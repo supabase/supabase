@@ -72,7 +72,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
 
       {isSuccess && (
         <div>
-          {feesWithBreakdown.length && (
+          {feesWithBreakdown.length > 0 && (
             <div className="mb-2">
               <Button size="tiny" type="default" onClick={toggleAllFees}>
                 {allFeesExpanded ? 'Collapse All' : 'Expand All'}
