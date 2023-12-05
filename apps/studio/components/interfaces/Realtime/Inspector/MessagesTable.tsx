@@ -159,7 +159,7 @@ const MessagesTable = ({
             )}
 
             <DataGrid
-              className="data-grid--simple-logs h-full"
+              className="data-grid--simple-logs h-full border-b-0"
               rowHeight={40}
               headerRowHeight={0}
               onSelectedCellChange={({ rowIdx }) => {
