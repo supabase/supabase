@@ -21,8 +21,6 @@ const ComputeUsageMetric = ({ slug, metric, usage }: ComputeUsageMetricProps) =>
 
   const usageLabel = usageMeta?.cost && usageMeta.cost > 0 ? usageCurrentLabel : usageCurrentLabel2
 
-  // TODO sort metrics so the ones with higher usage show up first
-
   return (
     <div className="flex items-center justify-between">
       <div>
