@@ -46,5 +46,5 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
     }
   }, [config.projectRef, jwtSecret, serviceRoleKey, snap.role])
 
-  return <RoleImpersonationPopover align="start" />
+  return <RoleImpersonationPopover align="start" variant="connected-on-both" />
 }

@@ -18,7 +18,7 @@ export const Header = ({ config, onChangeConfig }: HeaderProps) => {
     <div className="flex flex-row h-14 gap-2.5 items-center px-4">
       <div className="flex flex-row">
         <ChooseChannelPopover config={config} onChangeConfig={onChangeConfig} />
-
+        <RealtimeTokensPopover config={config} onChangeConfig={onChangeConfig} />
         <Tooltip.Root delayDuration={0}>
           <Tooltip.Trigger asChild>
             <Button
@@ -51,7 +51,6 @@ export const Header = ({ config, onChangeConfig }: HeaderProps) => {
           )}
         </Tooltip.Root>
       </div>
-      <RealtimeTokensPopover config={config} onChangeConfig={onChangeConfig} />
       <RealtimeFilterPopover config={config} onChangeConfig={onChangeConfig} />
     </div>
   )
