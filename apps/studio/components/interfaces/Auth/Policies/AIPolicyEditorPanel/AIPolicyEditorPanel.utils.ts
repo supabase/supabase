@@ -74,3 +74,14 @@ COMMIT;
 `.trim()
   }
 }
+
+export const generatePolicyDefinition = (policy: PostgresPolicy) => {
+  return `
+CREATE POLICY "${policy.name}" on "${policy.schema}"."${policy.table}"
+AS ${policy.action} FOR ${policy.command}
+TO ${policy.roles.join(', ')}
+${policy.definition ? `USING (${policy.definition})` : ''}
+${policy.check ? `WITH CHECK (${policy.check})` : ''}
+;
+`.trim()
+}

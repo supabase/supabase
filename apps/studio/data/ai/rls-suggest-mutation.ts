@@ -4,6 +4,7 @@ import toast from 'react-hot-toast'
 import { isResponseOk, post } from 'lib/common/fetch'
 import { BASE_PATH } from 'lib/constants'
 import { ResponseError } from 'types'
+import { PostgresPolicy } from '@supabase/postgres-meta'
 
 export type RlsSuggestResponse = {
   threadId: string
@@ -12,15 +13,22 @@ export type RlsSuggestResponse = {
 
 export type RlsSuggestVariables = {
   thread_id?: string
-  entityDefinitions?: string[]
   prompt: string
+  entityDefinitions?: string[]
+  policyDefinition?: string
 }
 
-export async function rlsSuggest({ thread_id, entityDefinitions, prompt }: RlsSuggestVariables) {
+export async function rlsSuggest({
+  thread_id,
+  prompt,
+  entityDefinitions,
+  policyDefinition,
+}: RlsSuggestVariables) {
   const response = await post<RlsSuggestResponse>(BASE_PATH + '/api/ai/sql/suggest', {
     thread_id,
-    entityDefinitions,
     prompt,
+    entityDefinitions,
+    policyDefinition,
   })
 
   if (!isResponseOk(response)) {
