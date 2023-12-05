@@ -13,9 +13,11 @@ export default function TicketActions() {
   const [_loading, setLoading] = useState(false)
   const isTablet = useBreakpoint(1280)
   const downloadLink = useRef<HTMLAnchorElement>()
-  const link = `${SITE_URL}/tickets/${username}?lw=x${golden ? `&platinum=true` : ''}`
-  const permalink = encodeURIComponent(link)
   const hasSecretTicket = metadata?.hasSecretTicket
+  const link = `${SITE_URL}/tickets/${username}?lw=x${
+    hasSecretTicket ? '&secret=true' : golden ? `&platinum=true` : ''
+  }`
+  const permalink = encodeURIComponent(link)
   const text = hasSecretTicket ? TWEET_TEXT_SECRET : golden ? TWEET_TEXT_GOLDEN : TWEET_TEXT
   const encodedText = encodeURIComponent(text)
   const tweetUrl = `https://twitter.com/intent/tweet?url=${permalink}&text=${encodedText}`
