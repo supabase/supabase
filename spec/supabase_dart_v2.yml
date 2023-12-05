@@ -1276,23 +1276,14 @@ functions:
         code: |
           ```dart
           final channel = supabase.channel('room1');
-          channel
-              .onPresence(
-                  event: PresenceEvent.sync,
-                  callback: (payload) {
-                    print('Synced presence state: ${channel.presenceState()}');
-                  })
-              .onPresence(
-                  event: PresenceEvent.join,
-                  callback: (payload) {
-                    print('Newly joined presences $payload');
-                  })
-              .onPresence(
-                  event: PresenceEvent.leave,
-                  callback: (payload) {
-                    print('Newly left presences: $payload');
-                  })
-              .subscribe((status, error) async {
+
+          channel.onPresenceSync((payload) {
+            print('Synced presence state: ${channel.presenceState()}');
+          }).onPresenceJoin((payload) {
+            print('Newly joined presences $payload');
+          }).onPresenceLeave((payload) {
+            print('Newly left presences: $payload');
+          }).subscribe((status, error) async {
             if (status == RealtimeSubscribeStatus.subscribed) {
               await channel.track({'online_at': DateTime.now().toIso8601String()});
             }
