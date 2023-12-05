@@ -13,7 +13,6 @@ import {
 import Link from 'next/link'
 import { IS_PLATFORM } from 'common'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
 
 const OrganizationDropdown = ({
   organizations = EMPTY_ARR,
@@ -24,10 +23,6 @@ const OrganizationDropdown = ({
 
   const organizationCreationEnabled = useIsFeatureEnabled('organizations:create')
   const { isSuccess: orgsLoaded } = useOrganizationsQuery()
-
-  const { data: allProjects } = useProjectsQuery()
-
-  const hasProjects = allProjects && allProjects.length > 0
 
   return (
     <div className="flex gap-4">
@@ -51,17 +46,13 @@ const OrganizationDropdown = ({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {IS_PLATFORM &&
-        hasProjects &&
-        organizationCreationEnabled &&
-        orgsLoaded &&
-        organizations.length !== 0 && (
-          <Button type="default" asChild>
-            <Link href="/new" className="flex items-center gap-2 w-full">
-              New organization
-            </Link>
-          </Button>
-        )}
+      {IS_PLATFORM && organizationCreationEnabled && orgsLoaded && organizations.length !== 0 && (
+        <Button type="default" asChild>
+          <Link href="/new" className="flex items-center gap-2 w-full">
+            New organization
+          </Link>
+        </Button>
+      )}
     </div>
   )
 }
