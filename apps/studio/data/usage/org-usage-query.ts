@@ -38,7 +38,7 @@ export const useOrgUsageQuery = <TData = OrgUsageData>(
   { enabled = true, ...options }: UseQueryOptions<OrgUsageData, OrgUsageError, TData> = {}
 ) =>
   useQuery<OrgUsageData, OrgUsageError, TData>(
-    usageKeys.orgUsage(orgSlug),
+    usageKeys.orgUsage(orgSlug, projectRef, start?.toISOString(), end?.toISOString()),
     ({ signal }) => getOrgUsage({ orgSlug, projectRef, start, end }, signal),
     {
       enabled: enabled && typeof orgSlug !== 'undefined',

@@ -3,10 +3,11 @@ import Link from 'next/link'
 
 import { OrgSubscription } from 'data/subscriptions/org-subscription-query'
 import { OrgUsageResponse } from 'data/usage/org-usage-query'
-import { Button, IconChevronRight } from 'ui'
+import { Button, IconChevronRight, IconPieChart } from 'ui'
 import { Metric, USAGE_APPROACHING_THRESHOLD } from './BillingBreakdown.constants'
 import { billingMetricUnit, formatUsage } from '../helpers'
 import { PricingMetric } from 'data/analytics/org-daily-stats-query'
+import { useMemo } from 'react'
 
 export interface BillingMetricProps {
   idx: number
@@ -14,10 +15,34 @@ export interface BillingMetricProps {
   metric: Metric
   usage: OrgUsageResponse
   subscription: OrgSubscription
+  relativeToSubscription: boolean
 }
 
-const BillingMetric = ({ slug, metric, usage, subscription }: BillingMetricProps) => {
+const BillingMetric = ({
+  slug,
+  metric,
+  usage,
+  subscription,
+  relativeToSubscription,
+}: BillingMetricProps) => {
   const usageMeta = usage.usages.find((x) => x.metric === metric.key)
+
+  const usageLabel = useMemo(() => {
+    if (!usageMeta) return ''
+
+    if (relativeToSubscription && usageMeta.available_in_plan === false) {
+      return 'Unavailable in plan'
+    } else if ((usageMeta.cost && usageMeta.cost > 0) || !relativeToSubscription) {
+      return metric.units === 'bytes'
+        ? `${usageMeta.usage.toLocaleString() ?? 0} GB`
+        : usageMeta.usage.toLocaleString()
+    } else {
+      return metric.units === 'bytes'
+        ? `${usageMeta.usage.toLocaleString() ?? 0} / ${usageMeta.pricing_free_units ?? 0} GB`
+        : `${usageMeta.usage.toLocaleString()} / ${usageMeta.pricing_free_units?.toLocaleString()}`
+    }
+  }, [usageMeta, relativeToSubscription, metric])
+
   if (!usageMeta) return null
 
   const usageRatio = usageMeta.usage / (usageMeta.pricing_free_units ?? 0)
@@ -26,29 +51,12 @@ const BillingMetric = ({ slug, metric, usage, subscription }: BillingMetricProps
 
   const hasLimit = !!usageMeta.unlimited === false
   const isApproachingLimit = hasLimit && usageRatio >= USAGE_APPROACHING_THRESHOLD
-  const isExceededLimit = hasLimit && usageRatio >= 1
+  const isExceededLimit = relativeToSubscription && hasLimit && usageRatio >= 1
 
   const unit = billingMetricUnit(usageMeta.metric as PricingMetric)
 
-  const usageCurrentLabel =
-    metric.units === 'bytes'
-      ? `${usageMeta.usage.toLocaleString() ?? 0} GB`
-      : usageMeta.usage.toLocaleString()
-
-  const usageCurrentLabel2 =
-    metric.units === 'bytes'
-      ? `${usageMeta.usage.toLocaleString() ?? 0} / ${usageMeta.pricing_free_units ?? 0} GB`
-      : `${usageMeta.usage.toLocaleString()} / ${usageMeta.pricing_free_units?.toLocaleString()}`
-
   const percentageLabel =
     usageRatio < 0.01 ? '<1%' : `${(+(usageRatio * 100).toFixed(0)).toLocaleString()}%`
-
-  const usageLabel =
-    usageMeta.available_in_plan === false
-      ? 'Unavailable in plan'
-      : usageMeta.cost && usageMeta.cost > 0
-      ? usageCurrentLabel
-      : usageCurrentLabel2
 
   return (
     <div className="flex items-center justify-between">
@@ -64,7 +72,7 @@ const BillingMetric = ({ slug, metric, usage, subscription }: BillingMetricProps
         <span className="text-sm">{usageLabel}</span>&nbsp;
         {usageMeta.cost && usageMeta.cost > 0 ? (
           <span className="text-sm">(${usageMeta.cost})</span>
-        ) : usageMeta.available_in_plan ? (
+        ) : usageMeta.available_in_plan && relativeToSubscription ? (
           <span className="text-sm">({percentageLabel})</span>
         ) : null}
       </div>
@@ -73,38 +81,42 @@ const BillingMetric = ({ slug, metric, usage, subscription }: BillingMetricProps
         <div>
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger>
-              <svg className="h-8 w-8 -rotate-90 transform">
-                <circle
-                  cx={15}
-                  cy={15}
-                  r={12}
-                  fill="transparent"
-                  stroke="currentColor"
-                  strokeWidth={4}
-                  className="text-background-surface-300"
-                />
-                <circle
-                  cx={15}
-                  cy={15}
-                  r={12}
-                  fill="transparent"
-                  stroke="currentColor"
-                  strokeDasharray={75.398}
-                  strokeDashoffset={`calc(75.39822 - ${
-                    usageRatio < 1 ? usageRatio * 100 : 100
-                  } / 100 * 75.39822)`}
-                  strokeWidth={4}
-                  className={
-                    isUsageBillingEnabled
-                      ? 'text-gray-dark-800'
-                      : isExceededLimit
-                      ? 'text-red-900'
-                      : isApproachingLimit
-                      ? 'text-yellow-1000'
-                      : 'text-gray-dark-800'
-                  }
-                />
-              </svg>
+              {relativeToSubscription ? (
+                <svg className="h-8 w-8 -rotate-90 transform">
+                  <circle
+                    cx={15}
+                    cy={15}
+                    r={12}
+                    fill="transparent"
+                    stroke="currentColor"
+                    strokeWidth={4}
+                    className="text-background-surface-300"
+                  />
+                  <circle
+                    cx={15}
+                    cy={15}
+                    r={12}
+                    fill="transparent"
+                    stroke="currentColor"
+                    strokeDasharray={75.398}
+                    strokeDashoffset={`calc(75.39822 - ${
+                      usageRatio < 1 ? usageRatio * 100 : 100
+                    } / 100 * 75.39822)`}
+                    strokeWidth={4}
+                    className={
+                      isUsageBillingEnabled
+                        ? 'text-gray-dark-800'
+                        : isExceededLimit
+                        ? 'text-red-900'
+                        : isApproachingLimit
+                        ? 'text-yellow-1000'
+                        : 'text-gray-dark-800'
+                    }
+                  />
+                </svg>
+              ) : (
+                <IconPieChart />
+              )}
             </Tooltip.Trigger>
             <Tooltip.Portal>
               <Tooltip.Content side="bottom">
@@ -153,6 +165,7 @@ const BillingMetric = ({ slug, metric, usage, subscription }: BillingMetricProps
                     )}
 
                     {subscription.usage_billing_enabled === false &&
+                      relativeToSubscription &&
                       (isApproachingLimit || isExceededLimit) && (
                         <div className="mt-2">
                           <p className="text-xs">

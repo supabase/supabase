@@ -6,8 +6,9 @@ import { useMemo } from 'react'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import BillingMetric from '../BillingSettings/BillingBreakdown/BillingMetric'
 import { BILLING_BREAKDOWN_METRICS } from '../BillingSettings/BillingBreakdown/BillingBreakdown.constants'
-import ComputeUsageMetric from '../BillingSettings/BillingBreakdown/ComputeUsageMetric'
+import ComputeMetric from '../BillingSettings/BillingBreakdown/ComputeUsageMetric'
 import clsx from 'clsx'
+import { ComputeUsageMetric, computeUsageMetricLabel } from 'data/analytics/org-daily-stats-query'
 
 export interface ComputeProps {
   orgSlug: string
@@ -41,11 +42,16 @@ const TotalUsage = ({
     end: !currentBillingCycleSelected && endDate ? new Date(endDate) : undefined,
   })
 
-  const hasExceededAnyLimits = Boolean(
-    usage?.usages.find(
-      (metric) => !metric.unlimited && metric.usage > (metric?.pricing_free_units ?? 0)
+  // When the user filters by project ref or selects a custom timeframe, we only display usage+project breakdown, but no costs/limits
+  const showRelationToSubscription = currentBillingCycleSelected && !projectRef
+
+  const hasExceededAnyLimits =
+    showRelationToSubscription &&
+    Boolean(
+      usage?.usages.find(
+        (metric) => !metric.unlimited && metric.usage > (metric?.pricing_free_units ?? 0)
+      )
     )
-  )
 
   const sortedBillingMetrics = useMemo(() => {
     if (!usage) return BILLING_BREAKDOWN_METRICS
@@ -74,7 +80,7 @@ const TotalUsage = ({
 
   const computeMetrics = (usage?.usages || [])
     .filter((it) => it.metric.startsWith('COMPUTE'))
-    .map((it) => it.metric)
+    .map((it) => it.metric) as ComputeUsageMetric[]
 
   return (
     <div id="summary">
@@ -108,42 +114,45 @@ const TotalUsage = ({
 
         {isSuccessUsage && subscription && (
           <div>
-            <p className="text-sm">
-              {!hasExceededAnyLimits ? (
-                <span>
-                  You have not exceeded your{' '}
-                  <span className="font-medium">{subscription?.plan.name}</span> plan quota in this
-                  billing cycle.
-                </span>
-              ) : hasExceededAnyLimits && subscription?.plan?.id === 'free' ? (
-                <span>
-                  You have exceeded your{' '}
-                  <span className="font-medium">{subscription?.plan.name}</span> plan quota in this
-                  billing cycle. Upgrade your plan to continue using Supabase without restrictions.
-                </span>
-              ) : hasExceededAnyLimits &&
-                subscription?.usage_billing_enabled === false &&
-                subscription?.plan?.id === 'pro' ? (
-                <span>
-                  You have exceeded your{' '}
-                  <span className="font-medium">{subscription?.plan.name}</span> plan quota in this
-                  billing cycle. Disable your spend cap to continue using Supabase without
-                  restrictions.
-                </span>
-              ) : hasExceededAnyLimits && subscription?.usage_billing_enabled === true ? (
-                <span>
-                  You have exceeded your{' '}
-                  <span className="font-medium">{subscription?.plan.name}</span> plan quota in this
-                  billing cycle and will be charged for over-usage.
-                </span>
-              ) : (
-                <span>
-                  You have not exceeded your{' '}
-                  <span className="font-medium">{subscription?.plan.name}</span> plan quota in this
-                  billing cycle.
-                </span>
-              )}
-            </p>
+            {showRelationToSubscription && (
+              <p className="text-sm">
+                {!hasExceededAnyLimits ? (
+                  <span>
+                    You have not exceeded your{' '}
+                    <span className="font-medium">{subscription?.plan.name}</span> plan quota in
+                    this billing cycle.
+                  </span>
+                ) : hasExceededAnyLimits && subscription?.plan?.id === 'free' ? (
+                  <span>
+                    You have exceeded your{' '}
+                    <span className="font-medium">{subscription?.plan.name}</span> plan quota in
+                    this billing cycle. Upgrade your plan to continue using Supabase without
+                    restrictions.
+                  </span>
+                ) : hasExceededAnyLimits &&
+                  subscription?.usage_billing_enabled === false &&
+                  subscription?.plan?.id === 'pro' ? (
+                  <span>
+                    You have exceeded your{' '}
+                    <span className="font-medium">{subscription?.plan.name}</span> plan quota in
+                    this billing cycle. Disable your spend cap to continue using Supabase without
+                    restrictions.
+                  </span>
+                ) : hasExceededAnyLimits && subscription?.usage_billing_enabled === true ? (
+                  <span>
+                    You have exceeded your{' '}
+                    <span className="font-medium">{subscription?.plan.name}</span> plan quota in
+                    this billing cycle and will be charged for over-usage.
+                  </span>
+                ) : (
+                  <span>
+                    You have not exceeded your{' '}
+                    <span className="font-medium">{subscription?.plan.name}</span> plan quota in
+                    this billing cycle.
+                  </span>
+                )}
+              </p>
+            )}
             <div className="grid grid-cols-12 mt-3">
               {sortedBillingMetrics.map((metric, i) => {
                 return (
@@ -161,6 +170,7 @@ const TotalUsage = ({
                       metric={metric}
                       usage={usage}
                       subscription={subscription!}
+                      relativeToSubscription={showRelationToSubscription}
                     />
                   </div>
                 )
@@ -174,14 +184,14 @@ const TotalUsage = ({
                   )}
                   key={metric}
                 >
-                  <ComputeUsageMetric
+                  <ComputeMetric
                     slug={orgSlug}
                     metric={{
-                      key: 'COMPUTE_HOURS_XS',
-                      name: 'Compute Hours XS',
-                      units: 'bytes',
-                      anchor: 'dbSize',
-                      category: 'Database',
+                      key: metric,
+                      name: computeUsageMetricLabel(metric) || metric,
+                      units: 'hours',
+                      anchor: 'compute',
+                      category: 'Compute',
                       unitName: 'GB',
                     }}
                     usage={usage}

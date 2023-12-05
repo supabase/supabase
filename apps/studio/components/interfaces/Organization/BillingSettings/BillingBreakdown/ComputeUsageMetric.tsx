@@ -4,13 +4,13 @@ import { OrgUsageResponse } from 'data/usage/org-usage-query'
 import { IconChevronRight } from 'ui'
 import { Metric } from './BillingBreakdown.constants'
 
-export interface ComputeUsageMetricProps {
+export interface ComputeMetricProps {
   slug?: string
   metric: Metric
   usage: OrgUsageResponse
 }
 
-const ComputeUsageMetric = ({ slug, metric, usage }: ComputeUsageMetricProps) => {
+const ComputeMetric = ({ slug, metric, usage }: ComputeMetricProps) => {
   const usageMeta = usage.usages.find((x) => x.metric === metric.key)
 
   const usageCurrentLabel = `${usageMeta?.usage?.toLocaleString() ?? 0} hours`
@@ -41,4 +41,4 @@ const ComputeUsageMetric = ({ slug, metric, usage }: ComputeUsageMetricProps) =>
   )
 }
 
-export default ComputeUsageMetric
+export default ComputeMetric
