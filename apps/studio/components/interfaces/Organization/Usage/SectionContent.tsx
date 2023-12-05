@@ -5,7 +5,7 @@ import { Badge, IconExternalLink } from 'ui'
 import { CategoryAttribute } from './Usage.constants'
 
 export interface SectionContent {
-  section: CategoryAttribute
+  section: Pick<CategoryAttribute, 'name' | 'description' | 'links'>
   includedInPlan?: boolean
 }
 
