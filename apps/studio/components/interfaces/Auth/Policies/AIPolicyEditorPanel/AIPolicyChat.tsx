@@ -1,7 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { compact, last } from 'lodash'
+import { compact, last, sortBy } from 'lodash'
 import { Loader2 } from 'lucide-react'
-import { useEffect, useRef } from 'react'
+import OpenAI from 'openai'
+import { useEffect, useMemo, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   AiIcon,
@@ -17,11 +18,10 @@ import * as z from 'zod'
 
 import { useProfile } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
-import { MessageWithDebug } from './AIPolicyEditorPanel.utils'
 import Message from './Message'
 
 interface AIPolicyChatProps {
-  messages: MessageWithDebug[]
+  messages: OpenAI.Beta.Threads.Messages.ThreadMessage[]
   loading: boolean
   onSubmit: (s: string) => void
   onDiff: (s: string) => void
@@ -40,6 +40,14 @@ export const AIPolicyChat = ({
   const bottomRef = useRef<HTMLDivElement>(null)
 
   const name = compact([profile?.first_name, profile?.last_name]).join(' ')
+  const sorted = useMemo(() => {
+    return sortBy(messages, (m) => m.created_at).filter((m) => {
+      if (m.content[0].type === 'text') {
+        return !m.content[0].text.value.startsWith('Here is my database schema for reference:')
+      }
+      return false
+    })
+  }, [messages])
 
   const FormSchema = z.object({ chat: z.string() })
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -49,16 +57,16 @@ export const AIPolicyChat = ({
     defaultValues: { chat: '' },
   })
   const formChatValue = form.getValues().chat
-  const pendingReply = loading && last(messages)?.role === 'user'
+  const pendingReply = loading && last(sorted)?.role === 'user'
 
-  // try to scroll on each rerender to the bottom
   useEffect(() => {
-    if (loading && bottomRef.current) {
+    // 👇️ scroll to bottom every time messages change
+    if (bottomRef.current) {
       setTimeout(() => {
         bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
       }, 500)
     }
-  })
+  }, [messages.length])
 
   useEffect(() => {
     if (!loading) {
@@ -72,10 +80,9 @@ export const AIPolicyChat = ({
   }, [formChatValue])
 
   return (
-    <div id={'ai-chat-assistant'} className="flex flex-col h-full max-w-full">
+    <div id={'ai-chat-assistant'} className="flex flex-col h-full">
       <div className="overflow-auto flex-1">
         <Message
-          key="zero"
           role="assistant"
           content={`Hi${
             name ? ' ' + name : ''
@@ -94,19 +101,21 @@ export const AIPolicyChat = ({
           </div>
         </Message>
 
-        {messages.map((m) => (
+        {sorted.map((m, idx) => (
           <Message
-            key={`message-${m.id}`}
-            name={m.name}
+            key={`message-${idx}`}
+            name={name}
             role={m.role}
-            content={m.content}
-            createdAt={new Date(m.createdAt || new Date()).getTime()}
-            isDebug={m.isDebug}
+            content={
+              m.content[0] && m.content[0].type === 'text' ? m.content[0].text.value : undefined
+            }
+            createdAt={m.created_at}
+            isDebug={(m.metadata as any).type === 'debug'}
             onDiff={onDiff}
           />
         ))}
 
-        {pendingReply && <Message key="thinking" role="assistant" content="Thinking..." />}
+        {pendingReply && <Message role="assistant" content="Thinking..." />}
 
         <div ref={bottomRef} className="h-1" />
       </div>

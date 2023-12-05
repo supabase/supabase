@@ -1,16 +1,15 @@
 import Editor, { EditorProps, OnMount } from '@monaco-editor/react'
 import { merge, noop } from 'lodash'
-import { editor } from 'monaco-editor'
 import { useRef } from 'react'
-import { cn } from 'ui'
 
 import { timeout } from 'lib/helpers'
 import Connecting from '../Loading'
 import { alignEditor } from './CodeEditor.utils'
+import { cn } from 'ui'
 
 interface CodeEditorProps {
   id: string
-  language: 'pgsql' | 'json' | 'html' | undefined
+  language: 'pgsql' | 'json' | 'html'
   autofocus?: boolean
   defaultValue?: string
   isReadOnly?: boolean
@@ -37,7 +36,7 @@ const CodeEditor = ({
   options,
   value,
 }: CodeEditorProps) => {
-  const editorRef = useRef<editor.IStandaloneCodeEditor>()
+  const editorRef = useRef<any>()
 
   const onMount: OnMount = async (editor, monaco) => {
     editorRef.current = editor
@@ -86,7 +85,7 @@ const CodeEditor = ({
       theme="supabase"
       className={cn(className, 'monaco-editor')}
       value={value ?? undefined}
-      language={language}
+      defaultLanguage={language}
       defaultValue={defaultValue ?? undefined}
       loading={loading || <Connecting />}
       options={optionsMerged}

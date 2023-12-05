@@ -1,24 +1,36 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
-import { Message } from 'ai/react'
 import { uuidv4 } from 'lib/helpers'
-
-export type MessageWithDebug = Message & { isDebug: boolean }
+import { ThreadMessage } from 'openai/resources/beta/threads/messages/messages'
 
 export const generateThreadMessage = ({
   id,
+  threadId,
+  runId,
   content,
-  isDebug,
+  metadata = {},
 }: {
   id?: string
+  threadId?: string
+  runId?: string
   content: string
-  isDebug: boolean
+  metadata?: any
 }) => {
-  const message: MessageWithDebug = {
+  const message: ThreadMessage = {
     id: id ?? uuidv4(),
+    object: 'thread.message',
     role: 'assistant',
-    content,
-    createdAt: new Date(),
-    isDebug: isDebug,
+    file_ids: [],
+    metadata,
+    content: [
+      {
+        type: 'text',
+        text: { value: content, annotations: [] },
+      },
+    ],
+    created_at: Math.floor(Number(new Date()) / 1000),
+    assistant_id: null,
+    thread_id: threadId ?? '',
+    run_id: runId ?? '',
   }
   return message
 }

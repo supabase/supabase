@@ -38,7 +38,6 @@
     "@tanstack/react-query-devtools": "^4.35.7",
     "@uidotdev/usehooks": "^2.4.1",
     "@zip.js/zip.js": "^2.7.29",
-    "ai": "^2.2.26",
     "ajv": "^8.6.3",
     "awesome-debounce-promise": "^2.1.0",
     "blueimp-md5": "^2.19.0",
