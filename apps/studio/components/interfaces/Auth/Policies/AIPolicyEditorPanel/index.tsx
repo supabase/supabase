@@ -22,6 +22,7 @@ import { AIPolicyChat } from './AIPolicyChat'
 import {
   MessageWithDebug,
   generatePlaceholder,
+  generatePolicyDefinition,
   generateThreadMessage,
 } from './AIPolicyEditorPanel.utils'
 import { AIPolicyHeader } from './AIPolicyHeader'
