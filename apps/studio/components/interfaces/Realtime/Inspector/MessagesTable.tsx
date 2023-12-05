@@ -56,7 +56,7 @@ const NoResultAlert = ({
               Experiment with presence messages between multiple clients
             </p>
           </div>
-          <Link href={`${router.basePath}${router.asPath}`} target="_blank">
+          <Link href={`/project/${ref}/realtime/inspector`} target="_blank" rel="noreferrer">
             <Button type="default" iconRight={<IconExternalLink />}>
               Open inspector
             </Button>
@@ -69,11 +69,7 @@ const NoResultAlert = ({
             <p className="text-foreground">Listen to a table for changes</p>
             <p className="text-foreground-lighter text-xs">Start developing in preview</p>
           </div>
-          <Link
-            href={`${router.basePath}/project/${ref}/database/replication`}
-            target="_blank"
-            rel="noreferrer"
-          >
+          <Link href={`/project/${ref}/database/replication`} target="_blank" rel="noreferrer">
             <Button type="default" iconRight={<IconExternalLink />}>
               Replication settings
             </Button>
