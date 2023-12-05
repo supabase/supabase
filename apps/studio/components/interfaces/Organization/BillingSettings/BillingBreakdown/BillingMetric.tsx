@@ -85,7 +85,7 @@ const BillingMetric = ({
         <div>
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger>
-              {relativeToSubscription ? (
+              {relativeToSubscription && !usageMeta.unlimited ? (
                 <svg className="h-8 w-8 -rotate-90 transform">
                   <circle
                     cx={15}
