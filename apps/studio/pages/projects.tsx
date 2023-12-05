@@ -10,23 +10,15 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
 import { useFlag, useIsFeatureEnabled } from 'hooks'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { useProfile } from 'lib/profile'
 import { NextPageWithLayout } from 'types'
 
 const ProjectsPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const {
-    data: organizations,
-    isLoading: isOrganizationLoading,
-    isError,
-    isSuccess,
-  } = useOrganizationsQuery()
+  const { data: organizations, isError, isSuccess } = useOrganizationsQuery()
   useAutoProjectsPrefetch()
 
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
 
-  const { isLoading: isProfileLoading } = useProfile()
-  const isLoading = isOrganizationLoading || isProfileLoading
   const navLayoutV2 = useFlag('navigationLayoutV2')
   const hasWindowLoaded = typeof window !== 'undefined'
 
@@ -45,12 +37,6 @@ const ProjectsPage: NextPageWithLayout = () => {
 
   return (
     <>
-      {(navLayoutV2 || isLoading) && (
-        <div className={`flex items-center justify-center h-full`}>
-          <Connecting />
-        </div>
-      )}
-
       {isError && (
         <div
           className={`py-4 px-5 ${navLayoutV2 ? 'h-full flex items-center justify-center' : ''}`}
@@ -59,9 +45,15 @@ const ProjectsPage: NextPageWithLayout = () => {
         </div>
       )}
 
-      {!navLayoutV2 && isSuccess && (
+      {navLayoutV2 && (
+        <div className={`flex items-center justify-center h-full`}>
+          <Connecting />
+        </div>
+      )}
+
+      {!navLayoutV2 && (
         <div className="py-4 px-5">
-          {IS_PLATFORM && projectCreationEnabled && organizations.length !== 0 && (
+          {IS_PLATFORM && projectCreationEnabled && isSuccess && organizations.length !== 0 && (
             <div className="my-2">
               <div className="flex">
                 <div className="">

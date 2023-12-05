@@ -18,6 +18,8 @@ import { CommandGroup, CommandItem, CommandLabel, TextHighlighter } from './Comm
 
 const NUMBER_SOURCES = 2
 
+const FUNCTIONS_URL = '/functions/v1/'
+
 const questions = [
   'How do I get started with Supabase?',
   'How do I run Supabase locally?',
@@ -239,25 +241,33 @@ const DocsSearch = () => {
 
       const sources = ['search-fts', 'search-embeddings']
       sources.forEach((source) => {
-        supabaseClient.functions
-          .invoke(source, { body: { query } })
-          .then(({ data: results, error }) => {
-            sourcesLoaded += 1
-            if (error) {
-              dispatch({
-                type: 'errored',
-                key: localKey,
-                sourcesLoaded,
-                message: error.message ?? '',
-              })
-            } else {
-              dispatch({
-                type: 'resultsReturned',
-                key: localKey,
-                sourcesLoaded,
-                results,
-              })
+        fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}${FUNCTIONS_URL}${source}`, {
+          method: 'POST',
+          body: JSON.stringify({ query }),
+        })
+          .then((response) => response.json())
+          .then((results) => {
+            if (!Array.isArray(results)) {
+              throw Error("didn't get expected results array")
             }
+            sourcesLoaded += 1
+            dispatch({
+              type: 'resultsReturned',
+              key: localKey,
+              sourcesLoaded,
+              results,
+            })
+          })
+          .catch((error) => {
+            sourcesLoaded += 1
+            dispatch({
+              type: 'errored',
+              key: localKey,
+              sourcesLoaded,
+              message: error.message ?? '',
+            })
+          })
+          .finally(() => {
             if (sourcesLoaded === NUMBER_SOURCES) {
               setIsLoading(false)
             }
@@ -277,25 +287,23 @@ const DocsSearch = () => {
     })
   }
 
-  const debouncedSearch = useMemo(() => debounce(handleSearch, 1000), [handleSearch])
+  const debouncedSearch = useMemo(() => debounce(handleSearch, 300), [handleSearch])
 
   useEffect(() => {
-    initialLoad.current = false
-    // search immediately if there is a search term on initial load
-    if (search) {
-      handleSearch(search)
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!search) {
-      // Clear search results if user deletes query
-      // and cancel any pending debounced searches
+    if (initialLoad.current) {
+      // On first navigation into 'docs search' page, search immediately
+      if (search) {
+        handleSearch(search)
+      }
+      initialLoad.current = false
+    } else if (search) {
+      // Else if user is typing, debounce search
+      debouncedSearch(search)
+    } else {
+      // If user clears search, reset results
       debouncedSearch.cancel()
       key.current += 1
       dispatch({ type: 'reset', key: key.current })
-    } else if (!initialLoad.current) {
-      debouncedSearch(search)
     }
   }, [search])
 

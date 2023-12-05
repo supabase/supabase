@@ -1,3 +1,4 @@
+import { PostgresPolicy } from '@supabase/postgres-meta'
 import { FileDiff } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { ThreadMessage } from 'openai/resources/beta/threads/messages/messages'
@@ -18,7 +19,7 @@ import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-
 import { useSelectedProject, useStore } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { AIPolicyChat } from './AIPolicyChat'
-import { generateThreadMessage } from './AIPolicyEditorPanel.utils'
+import { generatePlaceholder, generateThreadMessage } from './AIPolicyEditorPanel.utils'
 import { AIPolicyHeader } from './AIPolicyHeader'
 import QueryError from './QueryError'
 import RLSCodeEditor from './RLSCodeEditor'
@@ -30,6 +31,7 @@ const DiffEditor = dynamic(
 
 interface AIPolicyEditorPanelProps {
   visible: boolean
+  selectedPolicy?: PostgresPolicy
   onSelectCancel: () => void
 }
 
@@ -38,6 +40,7 @@ interface AIPolicyEditorPanelProps {
  */
 export const AIPolicyEditorPanel = memo(function ({
   visible,
+  selectedPolicy,
   onSelectCancel,
 }: AIPolicyEditorPanelProps) {
   const { meta } = useStore()
@@ -45,6 +48,7 @@ export const AIPolicyEditorPanel = memo(function ({
 
   const editorRef = useRef<IStandaloneCodeEditor | null>(null)
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
+  const placeholder = generatePlaceholder(selectedPolicy)
 
   const [error, setError] = useState<QueryResponseError>()
   // [Joshen] Separate state here as there's a delay between submitting and the API updating the loading status
@@ -142,9 +146,9 @@ export const AIPolicyEditorPanel = memo(function ({
   const errorLines =
     error?.formattedError.split('\n').filter((x: string) => x.length > 0).length ?? 0
 
-  const createNewPolicy = useCallback(() => {
+  const onExecuteSQL = useCallback(() => {
     // clean up the sql before sending
-    const policy = editorRef.current?.getValue().replaceAll('\n', ' ').replaceAll('  ', ' ')
+    const policy = editorRef.current?.getValue().replaceAll('  ', ' ')
 
     if (policy) {
       setError(undefined)
@@ -255,10 +259,14 @@ export const AIPolicyEditorPanel = memo(function ({
       <Sheet_Shadcn_ open={visible} onOpenChange={() => onClosingPanel()}>
         <SheetContent_Shadcn_
           size={assistantVisible ? 'lg' : 'default'}
-          className={cn('p-0 flex flex-row gap-0', assistantVisible && '!min-w-[1024px]')}
+          className={cn(
+            'p-0 flex flex-row gap-0',
+            assistantVisible ? '!min-w-[1024px]' : '!min-w-[600px]'
+          )}
         >
           <div className={cn('flex flex-col grow w-full', assistantVisible && 'w-[60%]')}>
             <AIPolicyHeader
+              selectedPolicy={selectedPolicy}
               assistantVisible={assistantVisible}
               setAssistantVisible={setAssistantPanel}
             />
@@ -311,6 +319,7 @@ export const AIPolicyEditorPanel = memo(function ({
                   wrapperClassName={incomingChange ? '!hidden' : ''}
                   defaultValue={''}
                   editorRef={editorRef}
+                  placeholder={placeholder}
                 />
               </div>
 
@@ -325,7 +334,7 @@ export const AIPolicyEditorPanel = memo(function ({
                       loading={isExecuting}
                       htmlType="submit"
                       disabled={isExecuting || incomingChange !== undefined}
-                      onClick={() => createNewPolicy()}
+                      onClick={() => onExecuteSQL()}
                     >
                       Save policy
                     </Button>
