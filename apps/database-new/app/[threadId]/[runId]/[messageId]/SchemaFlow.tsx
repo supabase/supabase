@@ -84,7 +84,7 @@ export async function SchemaFlow({ params }: { params: any }) {
   } catch (error) {
     console.error(error)
   }
-
+  console.log({ content })
   //const code = format(content, { language: 'postgresql' })
 
   //const tables = await parseTables(content)
