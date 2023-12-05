@@ -115,18 +115,13 @@ const BillingMetric = ({
                   />
                 </svg>
               ) : (
-                <IconPieChart />
+                <IconPieChart className="h-8 w-8 p-1" />
               )}
             </Tooltip.Trigger>
             <Tooltip.Portal>
               <Tooltip.Content side="bottom">
                 <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                    'border border-background',
-                  ].join(' ')}
-                >
+                <div className="rounded bg-alternative py-1 px-2 leading-none shadow border border-background min-w-[250px]">
                   <div className="text-xs text-foreground max-w-sm space-y-2">
                     <p className="font-medium">{usageMeta.unit_price_desc}</p>
 
@@ -150,14 +145,15 @@ const BillingMetric = ({
                           <tr></tr>
                         </tbody>
                         <tfoot>
-                          <tr className="">
-                            <td className="py-2 border-t text-left">Total</td>
+                          <tr>
+                            <td className="py-2 border-t text-left">
+                              Total{unit && <span> ({unit})</span>}
+                            </td>
                             <td className="py-2 border-t text-right">
                               {formatUsage(
                                 usageMeta.metric as PricingMetric,
                                 usageMeta.usage_original
                               )}{' '}
-                              {unit}
                             </td>
                           </tr>
                         </tfoot>

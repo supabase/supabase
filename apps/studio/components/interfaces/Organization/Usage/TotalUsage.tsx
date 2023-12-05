@@ -6,7 +6,7 @@ import { useMemo } from 'react'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import BillingMetric from '../BillingSettings/BillingBreakdown/BillingMetric'
 import { BILLING_BREAKDOWN_METRICS } from '../BillingSettings/BillingBreakdown/BillingBreakdown.constants'
-import ComputeMetric from '../BillingSettings/BillingBreakdown/ComputeUsageMetric'
+import ComputeMetric from '../BillingSettings/BillingBreakdown/ComputeMetric'
 import clsx from 'clsx'
 import { ComputeUsageMetric, computeUsageMetricLabel } from 'data/analytics/org-daily-stats-query'
 
@@ -188,12 +188,13 @@ const TotalUsage = ({
                     slug={orgSlug}
                     metric={{
                       key: metric,
-                      name: computeUsageMetricLabel(metric) || metric,
+                      name: computeUsageMetricLabel(metric) + ' Compute Hours' || metric,
                       units: 'hours',
                       anchor: 'compute',
                       category: 'Compute',
                       unitName: 'GB',
                     }}
+                    relativeToSubscription={showRelationToSubscription}
                     usage={usage}
                   />
                 </div>
