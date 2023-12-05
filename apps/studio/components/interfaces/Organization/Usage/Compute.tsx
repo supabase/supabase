@@ -89,11 +89,13 @@ const Compute = ({ orgSlug, projectRef, startDate, endDate }: ComputeProps) => {
         {isSuccess && (
           <>
             <div className="space-y-1">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <p className="text-sm">Compute Hours usage</p>
+              {chartData.length > 0 && (
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <p className="text-sm">Compute Hours usage</p>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {attributeKeysWithData.map((key) => (
                 <div
