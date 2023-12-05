@@ -466,10 +466,9 @@ final data = await supabase
     .is_('status', null);
 
 final data = await supabase
-.from('users')
-.select()
-.in\_('status', ['ONLINE', 'OFFLINE']);
-
+    .from('users')
+    .select()
+    .in_('status', ['ONLINE', 'OFFLINE']);
 ````
 
 </TabPanel>
@@ -611,7 +610,7 @@ supabase.channel('my_channel')
 
 #### Broadcast
 
-Because realtime postgres changes, broadcast, and presence all shared the common interface, `.on()`, there were a lot of unnecessary properties that could be passed when using broadcast.
+Because realtime postgres changes, broadcast, and presence all shared the common interface `.on()`, there were a lot of unnecessary properties that could be passed when using broadcast.
 With v2, we now have a dedicated method `.onBroadcast()` which slims down the public interface to what is only necessary.
 
   </RefSubLayout.Details>
@@ -661,6 +660,9 @@ supabase
 
 #### Presence
 
+Realtime Presence gets three different methods for listening to three different presence events, `sync`, `join`, and `leave`. 
+This allows the callback to be strictly typed and more error prune.
+
   </RefSubLayout.Details>
   <RefSubLayout.Examples>
 
@@ -674,27 +676,41 @@ supabase
 <TabPanel id="1.0x" label="Before">
 
 ```dart
-supabase.channel('my_channel').on(
-    RealtimeListenTypes.broadcast,
-    ChannelFilter(
-      event: 'position',
-    ), (dynamic payload, [ref]) {
-  print(payload);
-}).subscribe();
+final channel = supabase.channel('room1');
+
+channel.on(RealtimeListenTypes.presence, ChannelFilter(event: 'sync'),
+    (payload, [ref]) {
+  print('Synced presence state: ${channel.presenceState()}');
+}).on(RealtimeListenTypes.presence, ChannelFilter(event: 'join'), (payload,
+    [ref]) {
+  print('Newly joined presences $payload');
+}).on(RealtimeListenTypes.presence, ChannelFilter(event: 'leave'), (payload,
+    [ref]) {
+  print('Newly left presences: $payload');
+}).subscribe((status, [error]) async {
+  if (status == 'SUBSCRIBED') {
+    await channel.track({'online_at': DateTime.now().toIso8601String()});
+  }
+});
 ```
 
 </TabPanel>
 <TabPanel id="2.0x" label="After">
 
 ```dart
-supabase
-    .channel('my_channel')
-    .onBroadcast(
-        event: 'position',
-        callback: (Map<String, dynamic> payload) {
-          print(payload);
-        })
-    .subscribe();
+final channel = supabase.channel('room1');
+
+channel.onPresenceSync((payload) {
+  print('Synced presence state: ${channel.presenceState()}');
+}).onPresenceJoin((payload) {
+  print('Newly joined presences $payload');
+}).onPresenceLeave((payload) {
+  print('Newly left presences: $payload');
+}).subscribe((status, error) async {
+  if (status == RealtimeSubscribeStatus.subscribed) {
+    await channel.track({'online_at': DateTime.now().toIso8601String()});
+  }
+});
 ```
 
 </TabPanel>
