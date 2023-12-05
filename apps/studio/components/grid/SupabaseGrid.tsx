@@ -31,7 +31,7 @@ export const SupabaseGrid = forwardRef<SupabaseGridRef, SupabaseGridProps>((prop
 
   return (
     <StoreProvider>
-      <DndProvider backend={HTML5Backend}>
+      <DndProvider backend={HTML5Backend} context={window}>
         <SupabaseGridLayout ref={ref} {..._props} />
       </DndProvider>
     </StoreProvider>
