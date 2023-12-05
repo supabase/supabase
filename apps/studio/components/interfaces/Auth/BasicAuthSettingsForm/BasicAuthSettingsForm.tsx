@@ -58,6 +58,7 @@ const schema = object({
   SESSIONS_SINGLE_PER_USER: boolean(),
   PASSWORD_MIN_LENGTH: number().min(6, 'Must be greater or equal to 6.'),
   PASSWORD_REQUIRED_CHARACTERS: string(),
+  PASSWORD_HIBP_ENABLED: boolean(),
 })
 
 function HoursOrNeverText({ value }: { value: number }) {
@@ -94,6 +95,7 @@ const BasicAuthSettingsForm = observer(() => {
   const isProPlanAndUp = isSuccessSubscription && subscription?.plan?.id !== 'free'
   const singlePerUserReleased = useFlag('authSingleSessionPerUserReleased')
   const passwordStrengthReleased = useFlag('authPasswordStrengthReleased')
+  const hibpReleased = useFlag('authHIBPReleased')
 
   const INITIAL_VALUES = {
     DISABLE_SIGNUP: !authConfig?.DISABLE_SIGNUP,
@@ -115,6 +117,12 @@ const BasicAuthSettingsForm = observer(() => {
           PASSWORD_MIN_LENGTH: authConfig?.PASSWORD_MIN_LENGTH || 6,
           PASSWORD_REQUIRED_CHARACTERS:
             authConfig?.PASSWORD_REQUIRED_CHARACTERS || NO_REQUIRED_CHARACTERS,
+
+          ...(hibpReleased
+            ? {
+                PASSWORD_HIBP_ENABLED: authConfig?.PASSWORD_HIBP_ENABLED || false,
+              }
+            : null),
         }
       : null),
   }
@@ -204,7 +212,6 @@ const BasicAuthSettingsForm = observer(() => {
                   />
                 </FormSectionContent>
               </FormSection>
-              <div className="border-t border-muted"></div>
               {passwordStrengthReleased && (
                 <>
                   <FormSection header={<FormSectionLabel>Passwords</FormSectionLabel>}>
@@ -249,10 +256,29 @@ const BasicAuthSettingsForm = observer(() => {
                             description="(recommended)"
                           />
                         </Radio.Group>
+                        <div className="border-t border-muted"></div>
+                        {isProPlanAndUp ? (
+                          <></>
+                        ) : (
+                          <UpgradeToPro
+                            primaryText="Upgrade to Pro"
+                            secondaryText="Leaked password protection available on Pro plans and up."
+                            projectRef={projectRef!}
+                            organizationSlug={organization!.slug}
+                          />
+                        )}
+                        <Toggle
+                          id="PASSWORD_HIBP_ENABLED"
+                          size="small"
+                          label="Prevent use of leaked passwords"
+                          afterLabel=" (recommended)"
+                          layout="flex"
+                          descriptionText="Rejects the use of known or easy to guess passwords on sign up or password change. Powered by the HaveIBeenPwned.org Pwned Passwords API."
+                          disabled={!canUpdateConfig || !isProPlanAndUp}
+                        />
                       </>
                     </FormSectionContent>
                   </FormSection>
-                  <div className="border-t border-muted"></div>
                 </>
               )}
               <FormSection header={<FormSectionLabel>User Sessions</FormSectionLabel>}>
@@ -303,7 +329,6 @@ const BasicAuthSettingsForm = observer(() => {
                   />
                 </FormSectionContent>
               </FormSection>
-              <div className="border-t border-scale-400"></div>
               <FormSection header={<FormSectionLabel>Bot and Abuse Protection</FormSectionLabel>}>
                 <FormSectionContent loading={isLoading}>
                   <Toggle
