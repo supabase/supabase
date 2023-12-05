@@ -129,9 +129,9 @@ const MessagesTable = ({ enabled, data = [], showSendMessage }: MessagesTablePro
                       : `No message found yet...`}
                   </div>
                 </div>
-                <Button type="link" onClick={showSendMessage}>
-                  <span className="underline text-foreground-light hover:text-brand-600">
-                    Send test message
+                <Button type="text" onClick={showSendMessage} className="group">
+                  <span className="text-foreground-light group-hover:text-foreground transition">
+                    Broadcast a message
                   </span>
                 </Button>
               </div>
