@@ -57,6 +57,29 @@ export const analyticsKeys = {
       },
     ] as const,
 
+  orgDailyComputeStats: (
+    orgSlug: string | undefined,
+    {
+      startDate,
+      endDate,
+      projectRef,
+    }: {
+      startDate?: string
+      endDate?: string
+      projectRef?: string
+    }
+  ) =>
+    [
+      'organizations',
+      orgSlug,
+      'daily-stats-compute',
+      {
+        startDate: isoDateStringToDate(startDate),
+        endDate: isoDateStringToDate(endDate),
+        projectRef,
+      },
+    ] as const,
+
   orgDailyStats: (
     orgSlug: string | undefined,
     {
