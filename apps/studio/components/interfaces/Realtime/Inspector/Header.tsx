@@ -17,6 +17,7 @@ export const Header = ({ config, onChangeConfig }: HeaderProps) => {
     <div className="flex flex-row h-14 gap-2.5 items-center px-4">
       <div className="flex flex-row">
         <ChooseChannelPopover config={config} onChangeConfig={onChangeConfig} />
+        <RealtimeTokensPopover config={config} onChangeConfig={onChangeConfig} />
         <Button
           size="tiny"
           type={config.enabled ? 'warning' : 'primary'}
@@ -28,7 +29,6 @@ export const Header = ({ config, onChangeConfig }: HeaderProps) => {
           {config.enabled ? `Stop listening` : `Start listening`}
         </Button>
       </div>
-      <RealtimeTokensPopover config={config} onChangeConfig={onChangeConfig} />
       <RealtimeFilterPopover config={config} onChangeConfig={onChangeConfig} />
     </div>
   )
