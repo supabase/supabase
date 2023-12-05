@@ -103,7 +103,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                   </td>
                   {!item.proration && (
                     <td className="py-2 text-sm text-right pr-4">
-                      {item.quantity.toLocaleString()}
+                      {item.quantity?.toLocaleString()}
                     </td>
                   )}
                   {!item.proration && (

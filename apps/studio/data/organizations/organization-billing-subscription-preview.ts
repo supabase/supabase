@@ -14,7 +14,7 @@ export type OrganizationBillingSubscriptionPreviewResponse = {
     description: string
     unit_price: number
     unit_price_desc?: string
-    quantity: number
+    quantity?: number
     total_price: number
     breakdown: {
       project_name: string

@@ -20,7 +20,7 @@ export type UpcomingInvoiceResponse = {
     description: string
     proration: boolean
     period: { start: string; end: string }
-    quantity: number
+    quantity?: number
     unit_price: number
     unit_price_desc: string
     usage_based: boolean

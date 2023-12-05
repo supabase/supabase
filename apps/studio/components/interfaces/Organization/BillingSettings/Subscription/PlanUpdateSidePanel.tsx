@@ -389,7 +389,7 @@ const PlanUpdateSidePanel = () => {
                             {item.description.endsWith('Compute') && ` (Hours)`}
                           </Table.td>
                           <Table.td className="text-right pr-4 tabular-nums">
-                            {item.quantity.toLocaleString()}
+                            {item.quantity?.toLocaleString()}
                           </Table.td>
                           <Table.td>
                             {item.unit_price_desc
