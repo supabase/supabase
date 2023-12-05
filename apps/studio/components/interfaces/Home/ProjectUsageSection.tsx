@@ -42,7 +42,7 @@ const ProjectUsageSection = observer(() => {
   const hasProjectData =
     usage?.result && usage.result.length > 0 ? usage.result[0].count > 25 : false
 
-  const isNewProject = dayjs(project?.inserted_at).isAfter(dayjs().subtract(1, 'day'))
+  const isNewProject = dayjs(project?.inserted_at).isAfter(dayjs().subtract(2, 'day'))
 
   return (
     <>
