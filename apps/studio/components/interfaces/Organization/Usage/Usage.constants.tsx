@@ -77,7 +77,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
     description: 'Amount of data transmitted over all network connections',
     attributes: [
       {
-        anchor: 'dbEgress',
+        anchor: 'egress',
         key: PricingMetric.EGRESS,
         attributes: [
           { key: EgressType.AUTH, name: 'Auth Egress', color: 'yellow' },
@@ -250,7 +250,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         ],
       },
       {
-        anchor: 'functionInvocations',
+        anchor: 'funcInvocations',
         key: PricingMetric.FUNCTION_INVOCATIONS,
         attributes: [{ key: PricingMetric.FUNCTION_INVOCATIONS.toLowerCase(), color: 'white' }],
         name: 'Edge Function Invocations',
@@ -282,7 +282,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         ],
       },
       {
-        anchor: 'realtimePeakConnection',
+        anchor: 'realtimePeakConnections',
         key: PricingMetric.REALTIME_PEAK_CONNECTIONS,
         attributes: [
           { key: PricingMetric.REALTIME_PEAK_CONNECTIONS.toLowerCase(), color: 'white' },

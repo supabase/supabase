@@ -16,7 +16,7 @@ export const BILLING_BREAKDOWN_METRICS = [
     key: 'db_egress',
     name: 'Database egress',
     units: 'bytes',
-    anchor: 'dbEgress',
+    anchor: 'egress',
     metric: 'DATABASE_EGRESS',
     category: 'Database',
     unitName: 'GB',

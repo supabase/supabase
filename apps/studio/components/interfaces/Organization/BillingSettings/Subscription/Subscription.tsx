@@ -3,6 +3,7 @@ import Link from 'next/link'
 
 import { useParams } from 'common'
 import {
+  ScaffoldContainer,
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
@@ -25,6 +26,7 @@ import {
 import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
 import PlanUpdateSidePanel from './PlanUpdateSidePanel'
 import { useOrganizationBillingSubscriptionCancelSchedule } from 'data/subscriptions/org-subscription-cancel-schedule-mutation'
+import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 
 const Subscription = () => {
   const { slug } = useParams()
@@ -39,6 +41,8 @@ const Subscription = () => {
     isSuccess,
   } = useOrgSubscriptionQuery({ orgSlug: slug })
 
+  const { data: usage } = useOrgUsageQuery({ orgSlug: slug })
+
   const { mutate: cancelSubscriptionSchedule, isLoading: cancelSubscriptionScheduleLoading } =
     useOrganizationBillingSubscriptionCancelSchedule()
 
@@ -51,8 +55,49 @@ const Subscription = () => {
 
   const canChangeTier = !projectUpdateDisabled && !['enterprise'].includes(currentPlan?.id ?? '')
 
+  const hasExceededAnyLimits = Boolean(
+    usage?.usages.find(
+      (metric) =>
+        !metric.unlimited && metric.capped && metric.usage > (metric?.pricing_free_units ?? 0)
+    )
+  )
+
   return (
     <>
+      {subscription && hasExceededAnyLimits && (
+        <div className="mt-5">
+          <Alert
+            withIcon
+            variant="danger"
+            title="Your organization's usage has exceeded its included quota"
+            actions={[
+              <div key="upgrade-buttons" className="space-x-3">
+                <Button asChild type="outline">
+                  <Link href={`/org/${slug}/usage`}>View usage</Link>
+                </Button>
+
+                <Button asChild type="default">
+                  <Link
+                    href={`/org/${slug}/billing?panel=${
+                      subscription.plan.id === 'free' ? 'subscriptionPlan' : 'costControl'
+                    }`}
+                  >
+                    {subscription.plan.id === 'free' ? 'Upgrade plan' : 'Change spend cap'}
+                  </Link>
+                </Button>
+              </div>,
+            ]}
+          >
+            <p>
+              Your projects can become unresponsive or enter read-only mode.{' '}
+              {subscription.plan.id === 'free'
+                ? 'Please upgrade to the Pro plan to ensure that your projects remain available.'
+                : 'Please disable Spend Cap to ensure that your projects remain available.'}
+            </p>
+          </Alert>
+        </div>
+      )}
+
       <ScaffoldSection>
         <ScaffoldSectionDetail>
           <div className="sticky space-y-6 top-12">
@@ -185,7 +230,7 @@ const Subscription = () => {
                   <div className="text-sm text-foreground-light mr-2">
                     When this organization exceeds its{' '}
                     <Link
-                      href="#breakdown"
+                      href={`/org/${slug}/usage`}
                       className="text-sm text-green-900 transition hover:text-green-1000"
                     >
                       included usage quotas
