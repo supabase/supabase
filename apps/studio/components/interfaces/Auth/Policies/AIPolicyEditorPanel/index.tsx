@@ -29,6 +29,7 @@ import QueryError from './QueryError'
 import RLSCodeEditor from './RLSCodeEditor'
 import { OPT_IN_TAGS } from 'lib/constants'
 import PolicyDetails from './PolicyDetails'
+import { create } from 'lodash'
 
 const DiffEditor = dynamic(
   () => import('@monaco-editor/react').then(({ DiffEditor }) => DiffEditor),
@@ -59,6 +60,7 @@ export const AIPolicyEditorPanel = memo(function ({
   const isOptedInToAI = selectedOrganization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
 
   const [error, setError] = useState<QueryResponseError>()
+  const [showDetails, setShowDetails] = useState(false)
   // [Joshen] Separate state here as there's a delay between submitting and the API updating the loading status
   const [loading, setLoading] = useState(false)
   const [keepPreviousData, setKeepPreviousData] = useState(false)
@@ -255,6 +257,7 @@ export const AIPolicyEditorPanel = memo(function ({
       setError(undefined)
       setDebugThread([])
       setKeepPreviousData(false)
+      setShowDetails(false)
     } else {
       setKeepPreviousData(true)
     }
@@ -263,6 +266,24 @@ export const AIPolicyEditorPanel = memo(function ({
   useEffect(() => {
     if (data?.status === 'completed') setLoading(false)
   }, [data?.status])
+
+  // [Joshen] Problem with monaco is that it's height cannot be dynamically updated once its initialized
+  // So this is sort of a hacky way to do so, until we find a better solution at least
+  const footerHeight = 58
+  const createPolicyEditorHeight =
+    error === undefined
+      ? `calc(100vh - ${footerHeight}px - 54px)`
+      : `calc(100vh - ${footerHeight}px - 151px - ${20 * errorLines}px)`
+  const updatePolicyEditorHeight =
+    showDetails && error === undefined
+      ? `calc(100vh - ${footerHeight}px - 172px)`
+      : showDetails && error !== undefined
+      ? `calc(100vh - ${footerHeight}px - 172px - 122px - ${16 * errorLines}px)`
+      : !showDetails && error === undefined
+      ? `calc(100vh - ${footerHeight}px - 72px)`
+      : !showDetails && error !== undefined
+      ? `calc(100vh - ${footerHeight}px - 72px  - 122px - ${16 * errorLines}px)`
+      : '0'
 
   return (
     <>
@@ -281,7 +302,11 @@ export const AIPolicyEditorPanel = memo(function ({
               setAssistantVisible={setAssistantPanel}
             />
 
-            {/* <PolicyDetails policy={selectedPolicy} /> */}
+            <PolicyDetails
+              policy={selectedPolicy}
+              showDetails={showDetails}
+              toggleShowDetails={() => setShowDetails(!showDetails)}
+            />
 
             <div className="flex flex-col h-full w-full justify-between">
               {incomingChange ? (
@@ -322,9 +347,9 @@ export const AIPolicyEditorPanel = memo(function ({
                 className={`relative ${incomingChange ? 'hidden' : 'block'}`}
                 style={{
                   height:
-                    error === undefined
-                      ? 'calc(100vh - 58px - 54px)'
-                      : `calc(100vh - 58px - 151px - ${20 * errorLines}px)`,
+                    selectedPolicy !== undefined
+                      ? updatePolicyEditorHeight
+                      : createPolicyEditorHeight,
                 }}
               >
                 <RLSCodeEditor
