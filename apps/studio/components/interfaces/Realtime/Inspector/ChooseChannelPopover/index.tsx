@@ -1,18 +1,25 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import Link from 'next/link'
 import { Dispatch, SetStateAction, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import {
   Button,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  Form_Shadcn_,
   IconBroadcast,
   IconChevronDown,
   IconDatabaseChanges,
   IconPresence,
-  Input,
+  Input_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   Toggle,
 } from 'ui'
+import * as z from 'zod'
 
-import Link from 'next/link'
 import { RealtimeConfig } from '../useRealtimeMessages'
 
 interface ChooseChannelPopoverProps {
@@ -22,14 +29,26 @@ interface ChooseChannelPopoverProps {
 
 export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPopoverProps) => {
   const [open, setOpen] = useState(false)
-  const [channelName, setChannelName] = useState(config.channelName)
+
+  const FormSchema = z.object({ channel: z.string() })
+  const form = useForm<z.infer<typeof FormSchema>>({
+    mode: 'onBlur',
+    reValidateMode: 'onBlur',
+    resolver: zodResolver(FormSchema),
+    defaultValues: { channel: '' },
+  })
 
   const onOpen = (v: boolean) => {
     // when opening, copy the outside config into the intermediate one
     if (v === true) {
-      setChannelName(config.channelName)
+      form.setValue('channel', config.channelName)
     }
     setOpen(v)
+  }
+
+  const onSubmit = () => {
+    setOpen(false)
+    onChangeConfig({ ...config, channelName: form.getValues('channel') })
   }
 
   return (
@@ -53,30 +72,37 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
         <div className="border-b border-overlay p-4 flex flex-col text-sm">
           {config.channelName.length === 0 ? (
             <>
-              <label className="text-foreground text-xs mb-2">Name of channel</label>
-              <div className="flex flex-row">
-                <Input
-                  size="tiny"
-                  className="w-full"
-                  inputClassName="rounded-r-none"
-                  placeholder="Enter a channel name"
-                  value={channelName}
-                  onChange={(e) => {
-                    setChannelName(e.target.value)
-                  }}
-                />
-                <Button
-                  type="default"
-                  className="rounded-l-none"
-                  disabled={channelName.length === 0}
-                  onClick={() => {
-                    setOpen(false)
-                    onChangeConfig({ ...config, channelName })
-                  }}
-                >
-                  Set channel
-                </Button>
-              </div>
+              <Form_Shadcn_ {...form}>
+                <form id="realtime-channel" onSubmit={form.handleSubmit(() => onSubmit())}>
+                  <FormField_Shadcn_
+                    name="channel"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem_Shadcn_>
+                        <label className="text-foreground text-xs mb-2">Name of channel</label>
+                        <div className="flex">
+                          <FormControl_Shadcn_>
+                            <Input_Shadcn_
+                              {...field}
+                              autoComplete="off"
+                              className="rounded-r-none text-xs px-2.5 py-1 h-auto"
+                              placeholder="Enter a channel name"
+                            />
+                          </FormControl_Shadcn_>
+                          <Button
+                            type="default"
+                            className="rounded-l-none"
+                            disabled={form.getValues().channel.length === 0}
+                            onClick={() => onSubmit()}
+                          >
+                            Set channel
+                          </Button>
+                        </div>
+                      </FormItem_Shadcn_>
+                    )}
+                  />
+                </form>
+              </Form_Shadcn_>
               <p className="text-xs text-foreground-lighter mt-2">
                 The channel you initialize with the Supabase Realtime client. Learn more in{' '}
                 <Link
