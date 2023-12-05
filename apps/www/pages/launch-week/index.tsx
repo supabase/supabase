@@ -48,7 +48,7 @@ export default function LaunchWeekIndex({ meetups }: Props) {
       supabase.auth.getSession().then(({ data: { session } }) => setSession(session))
       const {
         data: { subscription },
-      } = supabase.auth.onAuthStateChange((event, session) => {
+      } = supabase.auth.onAuthStateChange((_event, session) => {
         setSession(session)
       })
 
