@@ -19,7 +19,7 @@ export const RealtimeInspector = () => {
     channelName: '',
     logLevel: 'info',
     token: '', // will be filled out by RealtimeTokensPopover
-    schema: '*',
+    schema: 'public',
     table: '*',
     filter: undefined,
     bearer: null,
@@ -31,11 +31,12 @@ export const RealtimeInspector = () => {
   const { logData, sendMessage } = useRealtimeMessages(realtimeConfig)
 
   return (
-    <div className="flex flex-col flex-grow h-full">
+    <div className="flex flex-col grow h-full">
       <Header config={realtimeConfig} onChangeConfig={setRealtimeConfig} />
-      <div className="relative flex flex-col flex-grow h-full">
-        <div className="flex h-full">
+      <div className="relative flex flex-col grow">
+        <div className="flex grow">
           <MessagesTable
+            hasChannelSet={realtimeConfig.channelName.length > 0}
             enabled={realtimeConfig.enabled}
             data={logData}
             showSendMessage={() => setSendMessageShown(true)}

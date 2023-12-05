@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { compact, last, sortBy } from 'lodash'
 import { Loader2 } from 'lucide-react'
 import OpenAI from 'openai'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   AiIcon,
@@ -17,8 +17,8 @@ import {
 import * as z from 'zod'
 
 import { useProfile } from 'lib/profile'
-import Message from './Message'
 import { useAppStateSnapshot } from 'state/app-state'
+import Message from './Message'
 
 interface AIPolicyChatProps {
   messages: OpenAI.Beta.Threads.Messages.ThreadMessage[]

@@ -25,6 +25,7 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 
 interface SchemaSelectorProps {
   className?: string
+  disabled?: boolean
   size?: 'tiny' | 'small'
   showError?: boolean
   selectedSchemaName: string
@@ -35,6 +36,7 @@ interface SchemaSelectorProps {
 
 const SchemaSelector = ({
   className,
+  disabled = false,
   size = 'tiny',
   showError = true,
   selectedSchemaName,
@@ -92,6 +94,7 @@ const SchemaSelector = ({
           <PopoverTrigger_Shadcn_ asChild>
             <Button
               size={size}
+              disabled={disabled}
               type="outline"
               className={`w-full [&>span]:w-full ${size === 'small' ? 'py-1.5' : ''}`}
               iconRight={

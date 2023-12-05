@@ -11,86 +11,91 @@ import ShimmerLine from 'components/ui/ShimmerLine'
 import MessageSelection from './MessageSelection'
 import { LogData } from './Messages.types'
 import { ColumnRenderer } from './RealtimeMessageColumnRenderer'
+import NoChannelEmptyState from './NoChannelEmptyState'
 
 export const isErrorLog = (l: LogData) => {
   return l.message === 'SYSTEM' && l.metadata?.status === 'error'
 }
 
-interface MessagesTableProps {
-  enabled: boolean
-  data?: LogData[]
-  showSendMessage: () => void
-}
-
 const NoResultAlert = ({
   enabled,
+  hasChannelSet,
   showSendMessage,
 }: {
   enabled: boolean
+  hasChannelSet: boolean
   showSendMessage: () => void
 }) => {
-  const router = useRouter()
   const { ref } = useParams()
 
   return (
     <div className="w-full max-w-md flex items-center flex-col">
-      {enabled ? <p>No Realtime messages found</p> : null}
-      <p className="text-foreground-lighter">Realtime message logs will be shown here</p>
+      {!hasChannelSet ? (
+        <NoChannelEmptyState />
+      ) : (
+        <>
+          {enabled ? <p>No Realtime messages found</p> : null}
+          <p className="text-foreground-lighter">Realtime message logs will be shown here</p>
 
-      <div className="mt-4 border bg-surface-100 border-border rounded-md justify-start items-center flex flex-col w-full">
-        <div className="w-full px-5 py-4 items-center gap-4 inline-flex border-b">
-          <IconBroadcast size="xlarge" className="bg-brand-400 rounded w-6 text-brand-600" />
-          <div className="grow flex-col flex">
-            <p className="text-foreground">Create a Broadcast message</p>
-            <p className="text-foreground-lighter text-xs">Start developing in preview</p>
-          </div>
-          <Button type="default" onClick={showSendMessage}>
-            Send a test message
-          </Button>
-        </div>
-        <div className="w-full px-5 py-4 items-center gap-4 inline-flex border-b">
-          <IconPresence size="xlarge" className="bg-brand-400 rounded w-6 text-brand-600" />
-          <div className="grow flex-col flex">
-            <p className="text-foreground">Join from another browser tab</p>
-            <p className="text-foreground-lighter text-xs">
-              Experiment with presence messages between multiple clients
-            </p>
-          </div>
-          <Link href={`${router.basePath}${router.asPath}`} target="_blank">
-            <Button type="default" iconRight={<IconExternalLink />}>
-              Open inspector
-            </Button>
-          </Link>
-        </div>
+          <div className="mt-4 border bg-surface-100 border-border rounded-md justify-start items-center flex flex-col w-full">
+            <div className="w-full px-5 py-4 items-center gap-4 inline-flex border-b">
+              <IconBroadcast size="xlarge" className="bg-brand-400 rounded w-6 text-brand-600" />
+              <div className="grow flex-col flex">
+                <p className="text-foreground">Create a Broadcast message</p>
+                <p className="text-foreground-lighter text-xs">Send a message in the channel</p>
+              </div>
+              <Button type="default" onClick={showSendMessage}>
+                Broadcast a message
+              </Button>
+            </div>
+            <div className="w-full px-5 py-4 items-center gap-4 inline-flex border-b">
+              <IconPresence size="xlarge" className="bg-brand-400 rounded w-6 text-brand-600" />
+              <div className="grow flex-col flex">
+                <p className="text-foreground">Join from another browser tab</p>
+                <p className="text-foreground-lighter text-xs">
+                  Send messages between multiple clients
+                </p>
+              </div>
+              <Link href={`/project/${ref}/realtime/inspector`} target="_blank" rel="noreferrer">
+                <Button type="default" iconRight={<IconExternalLink />}>
+                  Open inspector
+                </Button>
+              </Link>
+            </div>
 
-        <div className="w-full px-5 py-4 items-center gap-4 inline-flex border-b">
-          <IconDatabaseChanges size="xlarge" className="bg-brand-400 rounded w-6 text-brand-600" />
-          <div className="grow flex-col flex">
-            <p className="text-foreground">Listen to a table for changes</p>
-            <p className="text-foreground-lighter text-xs">Start developing in preview</p>
+            <div className="w-full px-5 py-4 items-center gap-4 inline-flex border-b">
+              <IconDatabaseChanges
+                size="xlarge"
+                className="bg-brand-400 rounded w-6 text-brand-600"
+              />
+              <div className="grow flex-col flex">
+                <p className="text-foreground">Listen to a table for changes</p>
+                <p className="text-foreground-lighter text-xs">Tables must have realtime enabled</p>
+              </div>
+              <Link href={`/project/${ref}/database/replication`} target="_blank" rel="noreferrer">
+                <Button type="default" iconRight={<IconExternalLink />}>
+                  Replication settings
+                </Button>
+              </Link>
+            </div>
+            <div className="w-full px-5 py-4 items-center gap-4 inline-flex rounded-b-md bg-background">
+              <div className="grow flex-col flex">
+                <p className="text-foreground">Not sure what to do?</p>
+                <p className="text-foreground-lighter text-xs">Browse our documentation</p>
+              </div>
+              <Button type="default" iconRight={<IconExternalLink />}>
+                <a
+                  href="https://supabase.com/docs/guides/realtime"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Documentation
+                </a>
+              </Button>
+            </div>
           </div>
-          <Link
-            href={`${router.basePath}/project/${ref}/database/replication`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <Button type="default" iconRight={<IconExternalLink />}>
-              Replication settings
-            </Button>
-          </Link>
-        </div>
-        <div className="w-full px-5 py-4 items-center gap-4 inline-flex rounded-b-md bg-background">
-          <div className="grow flex-col flex">
-            <p className="text-foreground">Not sure what to do?</p>
-            <p className="text-foreground-lighter text-xs">Browse our documentation</p>
-          </div>
-          <Button type="default" iconRight={<IconExternalLink />}>
-            <a href="https://supabase.com/docs/guides/realtime" target="_blank" rel="noreferrer">
-              Documentation
-            </a>
-          </Button>
-        </div>
-      </div>
+        </>
+      )}
     </div>
   )
 }
@@ -99,7 +104,19 @@ const RowRenderer = (key: Key, props: RenderRowProps<LogData, unknown>) => {
   return <Row key={key} {...props} isRowSelected={false} selectedCellIdx={undefined} />
 }
 
-const MessagesTable = ({ enabled, data = [], showSendMessage }: MessagesTableProps) => {
+interface MessagesTableProps {
+  enabled: boolean
+  data?: LogData[]
+  hasChannelSet: boolean
+  showSendMessage: () => void
+}
+
+const MessagesTable = ({
+  enabled,
+  hasChannelSet,
+  data = [],
+  showSendMessage,
+}: MessagesTableProps) => {
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
   const stringData = JSON.stringify(data)
 
@@ -133,16 +150,16 @@ const MessagesTable = ({ enabled, data = [], showSendMessage }: MessagesTablePro
                       : `No message found yet...`}
                   </div>
                 </div>
-                <Button type="link" onClick={showSendMessage}>
-                  <span className="underline text-foreground-light hover:text-brand-600">
-                    Send test message
+                <Button type="text" onClick={showSendMessage} className="group">
+                  <span className="text-foreground-light group-hover:text-foreground transition">
+                    Broadcast a message
                   </span>
                 </Button>
               </div>
             )}
 
             <DataGrid
-              className="data-grid--simple-logs h-full"
+              className="data-grid--simple-logs h-full border-b-0"
               rowHeight={40}
               headerRowHeight={0}
               onSelectedCellChange={({ rowIdx }) => {
@@ -165,7 +182,11 @@ const MessagesTable = ({ enabled, data = [], showSendMessage }: MessagesTablePro
                 renderRow: RowRenderer,
                 noRowsFallback: (
                   <div className="mx-auto flex h-full w-full items-center justify-center space-y-12 py-4 transition-all delay-200 duration-500">
-                    <NoResultAlert enabled={enabled} showSendMessage={showSendMessage} />
+                    <NoResultAlert
+                      enabled={enabled}
+                      hasChannelSet={hasChannelSet}
+                      showSendMessage={showSendMessage}
+                    />
                   </div>
                 ),
               }}
