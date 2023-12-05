@@ -9,6 +9,7 @@ import { useFormState } from 'react-dom'
 import { createThread } from './actions'
 import { useRouter } from 'next/navigation'
 import { AssistantChatForm } from '@/components/AssistantChatForm'
+import { cn } from 'ui'
 
 const suggestions = CHAT_EXAMPLES
 
