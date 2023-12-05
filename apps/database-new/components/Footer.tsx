@@ -9,10 +9,10 @@ export const links = [
 ]
 
 const Footer = () => (
-  <footer role="menu" className="border-t py-4 w-full px-4 flex justify-between">
-    <ul className="flex items-center gap-4 text-xs">
+  <footer className="border-t py-4 w-full px-4 flex justify-between" role="contentinfo">
+    <ul className="flex items-center gap-4 text-xs" role="menu">
       {links.map((link, index) => (
-        <li key={index}>
+        <li key={index} role="menuitem">
           <Link href={link.url}>{link.title}</Link>
         </li>
       ))}
