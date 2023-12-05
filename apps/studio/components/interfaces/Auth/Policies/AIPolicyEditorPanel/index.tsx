@@ -97,7 +97,11 @@ export const AIPolicyEditorPanel = memo(function ({
   const messages = useMemo(() => {
     const merged = [...debugThread, ...chatMessages.map((m) => ({ ...m, isDebug: false }))]
 
-    return sortBy(merged, (m) => m.createdAt)
+    return merged.sort(
+      (a, b) =>
+        (a.createdAt?.getTime() ?? 0) - (b.createdAt?.getTime() ?? 0) ||
+        a.role.localeCompare(b.role)
+    )
   }, [chatMessages, debugThread])
 
   const { mutate: executeMutation, isLoading: isExecuting } = useExecuteSqlMutation({

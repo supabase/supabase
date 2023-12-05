@@ -25,34 +25,15 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const { method } = request
-
-  switch (method) {
-    case 'POST':
-      return handlePost(request)
-    default:
-      return new Response(
-        JSON.stringify({
-          error: 'No OPENAI_KEY set. Create this environment variable to use AI features.',
-        }),
-        {
-          status: 405,
-          headers: { Allow: 'POST' },
-        }
-      )
-  }
-}
-
-async function handlePost(req: NextRequest) {
   const openai = new OpenAI({ apiKey: openAiKey })
 
-  let body = await (req.json() as Promise<{
+  const body = await (request.json() as Promise<{
     messages: { content: string; role: 'user' | 'assistant' }[]
     entityDefinitions: string[]
     policyDefinition: string
   }>)
 
-  let { messages, entityDefinitions, policyDefinition } = body
+  const { messages, entityDefinitions, policyDefinition } = body
 
   const initMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
     {
