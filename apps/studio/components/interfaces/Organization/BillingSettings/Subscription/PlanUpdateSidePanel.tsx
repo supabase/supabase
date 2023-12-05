@@ -389,7 +389,7 @@ const PlanUpdateSidePanel = () => {
                             {item.description.endsWith('Compute') && ` (Hours)`}
                           </Table.td>
                           <Table.td className="text-right pr-4 tabular-nums">
-                            {item.quantity}
+                            {item.quantity.toLocaleString()}
                           </Table.td>
                           <Table.td>
                             {item.unit_price_desc
@@ -450,8 +450,8 @@ const PlanUpdateSidePanel = () => {
                     <p className="text-sm mt-2">
                       Each project is a dedicated server and database. Paid plans come with $10 of
                       Compute Credits to cover one project on the default Starter Compute size or
-                      parts of any compute addon. Additional unpaused projects on paid plans at
-                      least incur compute usage costs starting at $10 per month, billed hourly.
+                      parts of any compute addon. Additional unpaused projects on paid plans will
+                      incur compute usage costs starting at $10 per month, billed hourly.
                     </p>
 
                     {subscription?.plan?.id === 'free' && (
@@ -483,7 +483,7 @@ const PlanUpdateSidePanel = () => {
                             target="_blank"
                             rel="noreferrer"
                           >
-                            Project Transfers
+                            Project transfers
                           </Link>
                         </Button>
                       )}
