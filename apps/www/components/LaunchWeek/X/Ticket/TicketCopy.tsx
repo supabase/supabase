@@ -5,11 +5,14 @@ import { IconCheck, IconCopy, cn } from 'ui'
 
 export default function TicketCopy({ sharePage }: { sharePage: boolean }) {
   const { userData } = useConfData()
-  const { username, golden } = userData
+  const { username, golden, metadata } = userData
   const [copyEnabled, setCopyEnabled] = useState(false)
   const [copied, setCopied] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
-  const url = `${SITE_URL}/tickets/${username}?lw=x${golden ? `&platinum=true` : ''}`
+  const hasSecretTicket = metadata?.hasSecretTicket
+  const url = `${SITE_URL}/tickets/${username}?lw=x${
+    hasSecretTicket ? '&secret=true' : golden ? `&platinum=true` : ''
+  }`
 
   useEffect(() => {
     if (navigator.clipboard) {

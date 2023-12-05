@@ -143,9 +143,13 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     user = data
   }
 
-  const ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lwx/og/${
-    user?.golden ? 'platinum' : 'regular'
-  }/${username}.png`
+  const ticketType = user?.metadata?.hasSecretTicket
+    ? 'secret'
+    : user?.golden
+    ? 'platinum'
+    : 'regular'
+
+  const ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lwx/og/${ticketType}/${username}.png`
 
   return {
     props: {

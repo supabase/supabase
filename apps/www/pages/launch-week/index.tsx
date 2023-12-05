@@ -11,7 +11,7 @@ import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/
 import TicketingFlow from '~/components/LaunchWeek/X/Ticket/TicketingFlow'
 
 export default function TicketHome() {
-  const { basePath, query } = useRouter()
+  const { query } = useRouter()
 
   const TITLE = 'Supabase Launch Week X | 11-15 December 2023'
   const DESCRIPTION =
@@ -40,7 +40,7 @@ export default function TicketHome() {
       supabase.auth.getSession().then(({ data: { session } }) => setSession(session))
       const {
         data: { subscription },
-      } = supabase.auth.onAuthStateChange((event, session) => {
+      } = supabase.auth.onAuthStateChange((_event, session) => {
         setSession(session)
       })
 
