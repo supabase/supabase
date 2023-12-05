@@ -133,7 +133,9 @@ const LWXGame = ({ setIsGameMode }: Props) => {
             hasWon && 'opacity-100 translate-y-0'
           )}
         >
-          <p className="tracking-wider text-foreground font-mono uppercase">{winningCompliment}</p>
+          <p className="tracking-wider text-foreground text-lg font-mono uppercase">
+            {winningCompliment}
+          </p>
           <p className="text-foreground-lighter font-san text-sm">
             Claim and share the secret ticket to boost your chances of winning swag.
           </p>
