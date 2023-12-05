@@ -79,7 +79,7 @@ const AttributeUsage = ({
   }, [attribute.attributes, chartData])
 
   return (
-    <div id={attribute.anchor} className='scroll-my-12'>
+    <div id={attribute.anchor} className="scroll-my-12">
       <SectionContent section={attribute}>
         {isLoading && (
           <div className="space-y-2">

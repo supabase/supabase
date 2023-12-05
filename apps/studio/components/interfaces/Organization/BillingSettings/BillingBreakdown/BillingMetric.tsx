@@ -138,7 +138,7 @@ const BillingMetric = ({ slug, metric, usage, subscription }: BillingMetricProps
                           <tr></tr>
                         </tbody>
                         <tfoot>
-                          <tr className=''>
+                          <tr className="">
                             <td className="py-2 border-t text-left">Total</td>
                             <td className="py-2 border-t text-right">
                               {formatUsage(

@@ -35,8 +35,6 @@ import MembersExceedLimitModal from './MembersExceedLimitModal'
 import PaymentMethodSelection from './PaymentMethodSelection'
 import InformationBox from 'components/ui/InformationBox'
 
-// [Joshen TODO] Need to remove all contexts of "projects"
-
 const PlanUpdateSidePanel = () => {
   const { ui } = useStore()
   const router = useRouter()

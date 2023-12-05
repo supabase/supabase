@@ -18,7 +18,6 @@ export interface ComputeProps {
   currentBillingCycleSelected: boolean
 }
 
-// [Joshen TODO] Needs to take in org slug and eventually use daily stats org query
 const TotalUsage = ({
   orgSlug,
   projectRef,
