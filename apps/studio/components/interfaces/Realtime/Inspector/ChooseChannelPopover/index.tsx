@@ -8,15 +8,11 @@ import {
   FormField_Shadcn_,
   FormItem_Shadcn_,
   Form_Shadcn_,
-  IconBroadcast,
   IconChevronDown,
-  IconDatabaseChanges,
-  IconPresence,
   Input_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
-  Toggle,
 } from 'ui'
 import * as z from 'zod'
 
@@ -69,7 +65,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
         </Button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="p-0" align="start">
-        <div className="border-b border-overlay p-4 flex flex-col text-sm">
+        <div className="p-4 flex flex-col text-sm">
           {config.channelName.length === 0 ? (
             <>
               <Form_Shadcn_ {...form}>
@@ -134,67 +130,6 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
               </Button>
             </div>
           )}
-        </div>
-        <div className="border-b border-overlay p-4">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex gap-2.5 items-center">
-              <IconPresence size="xlarge" className="bg-brand-400 rounded text-brand-600" />
-              <label htmlFor="toggle-presence" className="text-sm">
-                Presence
-              </label>
-            </div>
-            <Toggle
-              id="toggle-presence"
-              size="tiny"
-              checked={config.enablePresence}
-              onChange={() => onChangeConfig({ ...config, enablePresence: !config.enablePresence })}
-            />
-          </div>
-          <p className="text-xs text-foreground-light pt-1">
-            Store and synchronize user state consistently across clients
-          </p>
-        </div>
-        <div className="border-b border-overlay p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex gap-2.5 items-center">
-              <IconBroadcast size="xlarge" className="bg-brand-400 rounded text-brand-600" />
-              <label htmlFor="toggle-broadcast" className="text-sm">
-                Broadcast
-              </label>
-            </div>
-            <Toggle
-              id="toggle-broadcast"
-              size="tiny"
-              checked={config.enableBroadcast}
-              onChange={() =>
-                onChangeConfig({ ...config, enableBroadcast: !config.enableBroadcast })
-              }
-            />
-          </div>
-          <p className="text-xs  text-foreground-light pt-1">
-            Send any data to any client subscribed to the same channel
-          </p>
-        </div>
-        <div className="border-b border-overlay p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex gap-2.5 items-center">
-              <IconDatabaseChanges size="xlarge" className="bg-brand-400 rounded text-brand-600" />
-              <label htmlFor="toggle-db-changes" className="text-sm">
-                Database changes
-              </label>
-            </div>
-            <Toggle
-              id="toggle-db-changes"
-              size="tiny"
-              checked={config.enableDbChanges}
-              onChange={() =>
-                onChangeConfig({ ...config, enableDbChanges: !config.enableDbChanges })
-              }
-            />
-          </div>
-          <p className="text-xs text-foreground-light pt-1">
-            Listen for Database inserts, updates, deletes and more
-          </p>
         </div>
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>
