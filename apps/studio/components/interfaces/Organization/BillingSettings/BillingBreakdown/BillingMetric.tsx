@@ -32,7 +32,11 @@ const BillingMetric = ({
 
     if (relativeToSubscription && usageMeta.available_in_plan === false) {
       return 'Unavailable in plan'
-    } else if ((usageMeta.cost && usageMeta.cost > 0) || !relativeToSubscription) {
+    } else if (
+      (usageMeta.cost && usageMeta.cost > 0) ||
+      !relativeToSubscription ||
+      usageMeta.unlimited
+    ) {
       return metric.units === 'bytes'
         ? `${usageMeta.usage.toLocaleString() ?? 0} GB`
         : usageMeta.usage.toLocaleString()
@@ -72,7 +76,7 @@ const BillingMetric = ({
         <span className="text-sm">{usageLabel}</span>&nbsp;
         {usageMeta.cost && usageMeta.cost > 0 ? (
           <span className="text-sm">(${usageMeta.cost})</span>
-        ) : usageMeta.available_in_plan && relativeToSubscription ? (
+        ) : usageMeta.available_in_plan && !usageMeta.unlimited && relativeToSubscription ? (
           <span className="text-sm">({percentageLabel})</span>
         ) : null}
       </div>
