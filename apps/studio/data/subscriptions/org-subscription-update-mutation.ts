@@ -6,6 +6,7 @@ import { ResponseError } from 'types/base'
 import { subscriptionKeys } from './keys'
 import { usageKeys } from 'data/usage/keys'
 import { SubscriptionTier } from './types'
+import { invoicesKeys } from 'data/invoices/keys'
 
 export type OrgSubscriptionUpdateVariables = {
   slug: string
@@ -58,6 +59,7 @@ export const useOrgSubscriptionUpdateMutation = ({
           queryClient.invalidateQueries(subscriptionKeys.orgSubscription(slug)),
           queryClient.invalidateQueries(subscriptionKeys.orgPlans(slug)),
           queryClient.invalidateQueries(usageKeys.orgUsage(slug)),
+          queryClient.invalidateQueries(invoicesKeys.orgUpcomingPreview(slug)),
         ])
 
         await onSuccess?.(data, variables, context)
