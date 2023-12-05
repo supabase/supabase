@@ -230,7 +230,7 @@ const Subscription = () => {
                   <div className="text-sm text-foreground-light mr-2">
                     When this organization exceeds its{' '}
                     <Link
-                      href="#breakdown"
+                      href={`/org/${slug}/usage`}
                       className="text-sm text-green-900 transition hover:text-green-1000"
                     >
                       included usage quotas
