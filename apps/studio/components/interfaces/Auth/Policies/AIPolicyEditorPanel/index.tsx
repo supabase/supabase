@@ -17,6 +17,7 @@ import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
+import { OPT_IN_TAGS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { AIPolicyChat } from './AIPolicyChat'
 import {
@@ -25,11 +26,9 @@ import {
   generateThreadMessage,
 } from './AIPolicyEditorPanel.utils'
 import { AIPolicyHeader } from './AIPolicyHeader'
+import PolicyDetails from './PolicyDetails'
 import QueryError from './QueryError'
 import RLSCodeEditor from './RLSCodeEditor'
-import { OPT_IN_TAGS } from 'lib/constants'
-import PolicyDetails from './PolicyDetails'
-import { create } from 'lodash'
 
 const DiffEditor = dynamic(
   () => import('@monaco-editor/react').then(({ DiffEditor }) => DiffEditor),
@@ -151,7 +150,12 @@ export const AIPolicyEditorPanel = memo(function ({
   )
 
   const messages = useMemo(
-    () => [...(data?.messages ?? []), ...debugThread],
+    () => [
+      ...(data?.messages ?? []).sort(
+        (a, b) => b.created_at - a.created_at || a.role.localeCompare(b.role)
+      ),
+      ...debugThread,
+    ],
     [data?.messages, debugThread]
   )
 
