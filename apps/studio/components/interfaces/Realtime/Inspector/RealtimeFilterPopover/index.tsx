@@ -88,7 +88,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
                 size="tiny"
                 checked={tempConfig.enablePresence}
                 onChange={() =>
-                  setTempConfig({ ...config, enablePresence: !tempConfig.enablePresence })
+                  setTempConfig({ ...tempConfig, enablePresence: !tempConfig.enablePresence })
                 }
               />
             </div>
@@ -109,7 +109,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
                 size="tiny"
                 checked={tempConfig.enableBroadcast}
                 onChange={() =>
-                  setTempConfig({ ...config, enableBroadcast: !tempConfig.enableBroadcast })
+                  setTempConfig({ ...tempConfig, enableBroadcast: !tempConfig.enableBroadcast })
                 }
               />
             </div>
@@ -133,7 +133,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
                 size="tiny"
                 checked={tempConfig.enableDbChanges}
                 onChange={() =>
-                  setTempConfig({ ...config, enableDbChanges: !tempConfig.enableDbChanges })
+                  setTempConfig({ ...tempConfig, enableDbChanges: !tempConfig.enableDbChanges })
                 }
               />
             </div>
