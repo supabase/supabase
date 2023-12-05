@@ -19,10 +19,10 @@ const NoChannelEmptyState = () => {
         <div className="bg-surface-100 border w-full p-4 rounded-md flex flex-col gap-y-2">
           <p className="text-xs">Name of channel</p>
           <div className="flex w-full bg-surface-100 border rounded-md">
-            <div className="w-full text-xs text-foreground-light py-1.5 px-2">
+            <div className="w-full text-xs text-foreground-light py-1.5 px-2 cursor-default">
               Enter a channel name
             </div>
-            <div className="w-[140px] flex items-center justify-center text-xs bg-surface-300 py-1.5 px-2 border-l">
+            <div className="w-[140px] flex items-center justify-center text-xs bg-surface-300 py-1.5 px-2 border-l cursor-default">
               Join channel
             </div>
           </div>
