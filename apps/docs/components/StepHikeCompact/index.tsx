@@ -32,7 +32,7 @@ const StepHikeCompact: FC<PropsWithChildren<IStepHikeCompact>> & IStepHikeCompac
 
 const Step: FC<PropsWithChildren<IStep>> = ({ children, title, step }) => {
   return (
-    <div className="relative pb-8 [&_div]:[&_div]:last:bg-transparent">
+    <div className="relative pb-8 group">
       <div
         className="
           absolute
@@ -48,7 +48,8 @@ const Step: FC<PropsWithChildren<IStep>> = ({ children, title, step }) => {
           w-full
           h-full
           py-1
-          bg-overlay
+          bg-border-control
+          group-last:bg-transparent
         "
         ></div>
       </div>

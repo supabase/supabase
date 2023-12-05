@@ -1,8 +1,7 @@
-import { createClient } from '@/lib/supabase/server'
+// import LoginForm from '@/components/Auth/LoginForm'
 import type { Metadata } from 'next'
-import { cookies } from 'next/headers'
-import NewThreadInput from './NewThreadInput'
 import { LoginDialog } from './LoginDialog'
+import NewThreadInput from './NewThreadInput'
 import LoginForm from '@/components/Auth/LoginForm'
 
 export const metadata: Metadata = {
@@ -14,19 +13,10 @@ const NewThread = async ({
 }: {
   searchParams: { prompt: string; message: string }
 }) => {
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore)
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  console.log('searchParams on page level', searchParams)
-
   return (
     <>
       <div className="h-full flex items-center justify-center w-full flex-col gap-y-4">
-        <NewThreadInput userID={user?.id} />
+        <NewThreadInput />
       </div>
       <LoginDialog>
         <LoginForm searchParams={searchParams} />
