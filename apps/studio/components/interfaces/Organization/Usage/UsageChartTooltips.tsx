@@ -90,8 +90,6 @@ export const MultiAttributeTooltipContent = ({
           {attributes.flatMap((attr) => {
             const attributeMeta = values.find((x) => x.dataKey === attr.key)
 
-            console.log(attributeMeta)
-
             // Filter out empty attributes
             if (Number(attributeMeta?.value ?? 0) === 0) return []
 

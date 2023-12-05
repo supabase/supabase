@@ -2,7 +2,7 @@ import { DataPoint } from 'data/analytics/constants'
 import { ComputeUsageMetric, computeUsageMetricLabel } from 'data/analytics/org-daily-stats-query'
 import { OrgSubscription } from 'data/subscriptions/org-subscription-query'
 import SectionContent from './SectionContent'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
 import { IconBarChart2 } from 'ui'
@@ -82,77 +82,63 @@ const Compute = ({ orgSlug, projectRef, startDate, endDate }: ComputeProps) => {
           ],
         }}
       >
-        {isLoading && (
-          <div className="space-y-2">
-            <ShimmeringLoader />
-            <ShimmeringLoader className="w-3/4" />
-            <ShimmeringLoader className="w-1/2" />
-          </div>
-        )}
+        {isLoading && <GenericSkeletonLoader />}
 
         {error != null && <AlertError subject="Failed to retrieve usage data" error={error} />}
 
         {isSuccess && (
           <>
-            <>
-              <div className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <p className="text-sm">Compute Hours usage</p>
-                  </div>
+            <div className="space-y-1">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <p className="text-sm">Compute Hours usage</p>
                 </div>
-
-                {attributeKeysWithData.map((key) => (
-                  <div
-                    key={key}
-                    className="flex items-center justify-between border-b last:border-b-0 py-1 last:py-0"
-                  >
-                    <p className="text-sm text-foreground-light">
-                      <span className="font-medium">
-                        {computeUsageMetricLabel(key.toUpperCase() as ComputeUsageMetric)}
-                      </span>{' '}
-                      Compute Hours usage in period
-                    </p>
-                    <p className="text-sm">
-                      {chartData.reduce((prev, cur) => prev + ((cur[key] as number) ?? 0), 0)} hours
-                    </p>
-                  </div>
-                ))}
               </div>
 
-              <div className="space-y-1">
-                <p className="text-sm">Compute Hours usage per day</p>
-                <p className="text-sm text-foreground-light">The data refreshes every hour.</p>
-              </div>
-
-              {isLoading ? (
-                <div className="space-y-2">
-                  <ShimmeringLoader />
-                  <ShimmeringLoader className="w-3/4" />
-                  <ShimmeringLoader className="w-1/2" />
+              {attributeKeysWithData.map((key) => (
+                <div
+                  key={key}
+                  className="flex items-center justify-between border-b last:border-b-0 py-1 last:py-0"
+                >
+                  <p className="text-sm text-foreground-light">
+                    <span className="font-medium">
+                      {computeUsageMetricLabel(key.toUpperCase() as ComputeUsageMetric)}
+                    </span>{' '}
+                    Compute Hours usage in period
+                  </p>
+                  <p className="text-sm">
+                    {chartData.reduce((prev, cur) => prev + ((cur[key] as number) ?? 0), 0)} hours
+                  </p>
                 </div>
-              ) : chartData.length > 0 && notAllValuesZero ? (
-                <UsageBarChart
-                  name={`Compute Hours usage`}
-                  unit={'hours'}
-                  attributes={attributes}
-                  data={chartData}
-                  yMin={24}
-                />
-              ) : (
-                <Panel>
-                  <Panel.Content>
-                    <div className="flex flex-col items-center justify-center">
-                      <IconBarChart2 className="text-foreground-light mb-2" />
-                      <p className="text-sm">No data in period</p>
-                      <p className="text-sm text-foreground-light">
-                        May take up to one hour to show
-                      </p>
-                    </div>
-                  </Panel.Content>
-                </Panel>
-              )}
-            </>
+              ))}
+            </div>
+
+            <div className="space-y-1">
+              <p className="text-sm">Compute Hours usage per day</p>
+              <p className="text-sm text-foreground-light">The data refreshes every hour.</p>
+            </div>
+
+            {isLoading ? (
+              <GenericSkeletonLoader />
+            ) : chartData.length > 0 && notAllValuesZero ? (
+              <UsageBarChart
+                name={`Compute Hours usage`}
+                unit={'hours'}
+                attributes={attributes}
+                data={chartData}
+                yMin={24}
+              />
+            ) : (
+              <Panel>
+                <Panel.Content>
+                  <div className="flex flex-col items-center justify-center">
+                    <IconBarChart2 className="text-foreground-light mb-2" />
+                    <p className="text-sm">No data in period</p>
+                    <p className="text-sm text-foreground-light">May take up to one hour to show</p>
+                  </div>
+                </Panel.Content>
+              </Panel>
+            )}
           </>
         )}
       </SectionContent>

@@ -269,7 +269,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         anchor: 'realtimeMessageCount',
         key: PricingMetric.REALTIME_MESSAGE_COUNT,
         attributes: [{ key: PricingMetric.REALTIME_MESSAGE_COUNT.toLowerCase(), color: 'white' }],
-        name: 'Realtime Message',
+        name: 'Realtime Messages',
         unit: 'absolute',
         description:
           "Count of messages going through Realtime.\nUsage example: If you do a database change and 5 clients listen to that change via Realtime, that's 5 messages. If you broadcast a message and 4 clients listen to that, that's 5 messages (1 message sent, 4 received).\nBilling is based on the total amount of messages throughout your billing period.",
