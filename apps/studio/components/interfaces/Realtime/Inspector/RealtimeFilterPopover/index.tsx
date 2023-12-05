@@ -34,7 +34,9 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
     setOpen(v)
   }
 
-  const isFiltered = config.schema !== '*'
+  // [Joshen] Restricting the schemas to only public as any other schema won’t work out of the box due to missing permissions
+  // Consequently, SchemaSelector here will also be disabled
+  const isFiltered = config.schema !== 'public'
 
   return (
     <>
