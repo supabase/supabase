@@ -10,18 +10,23 @@ interface SendMessageModalProps {
   onSelectConfirm: (v: { message: string; payload: string }) => void
 }
 
+const defaultPayload = {
+  message: 'Test message',
+  payload: '{ "message": "Hello World" }',
+}
+
 export const SendMessageModal = ({
   visible,
   onSelectCancel,
   onSelectConfirm,
 }: SendMessageModalProps) => {
   const [error, setError] = useState<string>()
-  const [values, setValues] = useState({ message: 'test', payload: '{}' })
+  const [values, setValues] = useState(defaultPayload)
 
   useEffect(() => {
     if (visible) {
       setError(undefined)
-      setValues({ message: 'test', payload: '{}' })
+      setValues(defaultPayload)
     }
   }, [visible])
 
@@ -38,7 +43,7 @@ export const SendMessageModal = ({
         if (payload === undefined) {
           setError('Please provide a valid JSON')
         } else {
-          onSelectConfirm(values)
+          onSelectConfirm({ ...values, payload })
         }
       }}
     >
