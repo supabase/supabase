@@ -29,7 +29,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
   try {
     let {
-      body: { thread_id, entityDefinitions, prompt },
+      body: { thread_id, prompt, entityDefinitions, policyDefinition },
     } = req
 
     if (!thread_id) {
@@ -37,17 +37,34 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       thread_id = thread.id
     }
 
+    const prerequisites = []
+
     if (entityDefinitions) {
-      const one = await openai.beta.threads.messages.create(thread_id, {
+      prerequisites.push(
+        codeBlock`
+          Here is my database schema for reference:
+          ${entityDefinitions.join('\n\n')}
+        `.trim()
+      )
+    }
+
+    if (policyDefinition !== undefined) {
+      prerequisites.push(
+        codeBlock`
+          Here is my policy definition for reference:
+          ${policyDefinition}
+        `.trim()
+      )
+    }
+
+    if (prerequisites.length > 0) {
+      await openai.beta.threads.messages.create(thread_id, {
         role: 'user',
-        content: codeBlock`
-            Here is my database schema for reference:
-            ${entityDefinitions.join('\n\n')}
-          `,
+        content: prerequisites.join('\n'),
       })
     }
 
-    const two = await openai.beta.threads.messages.create(thread_id, {
+    await openai.beta.threads.messages.create(thread_id, {
       role: 'user',
       content: prompt,
     })
