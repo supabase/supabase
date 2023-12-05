@@ -366,5 +366,13 @@
     "position": "Integrations Lead",
     "author_url": "https://twitter.com/kamilogorek",
     "author_image_url": "https://github.com/kamilogorek.png"
+  },
+  {
+    "author_id": "yuri",
+    "author": "Yuri Santana",
+    "username": "yuri",
+    "position": "DevRel Social Media and Community",
+    "author_url": "https://twitter.com/yuricodesbot",
+    "author_image_url": "https://github.com/YuriCodes.png"
   }
 ]
