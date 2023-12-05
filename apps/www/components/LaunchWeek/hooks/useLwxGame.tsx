@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import useConfData from './use-conf-data'
 
-const VALID_KEYS = [
+export const VALID_KEYS = [
   'a',
   'b',
   'c',
@@ -35,7 +35,6 @@ const useLwxGame = (showCustomizationForm?: boolean) => {
   const { ticketState } = useConfData()
 
   function onKeyDown(event: KeyboardEvent) {
-    console.log('showCustomizationForm', showCustomizationForm, ticketState)
     if (showCustomizationForm) return
 
     if (event.key === 'Escape') {
@@ -52,9 +51,7 @@ const useLwxGame = (showCustomizationForm?: boolean) => {
   useEffect(() => {
     if (!showCustomizationForm) window.addEventListener('keydown', onKeyDown)
 
-    return () => {
-      window.removeEventListener('keydown', onKeyDown)
-    }
+    return () => window.removeEventListener('keydown', onKeyDown)
   }, [showCustomizationForm])
 
   return { isGameMode, setIsGameMode }

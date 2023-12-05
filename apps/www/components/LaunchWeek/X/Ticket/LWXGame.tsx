@@ -1,36 +1,8 @@
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react'
 import { Button, cn } from 'ui'
-import useConfData from '../../hooks/use-conf-data'
 import { SITE_ORIGIN } from '~/lib/constants'
-
-const VALID_KEYS = [
-  'a',
-  'b',
-  'c',
-  'd',
-  'e',
-  'f',
-  'g',
-  'h',
-  'i',
-  'j',
-  'k',
-  'l',
-  'm',
-  'n',
-  'o',
-  'p',
-  'q',
-  'r',
-  's',
-  't',
-  'u',
-  'v',
-  'w',
-  'x',
-  'y',
-  'z',
-]
+import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
+import { VALID_KEYS } from '~/components/LaunchWeek/hooks/useLwxGame'
 
 const COMPLIMENTS = [
   'Congratulations!',
@@ -94,7 +66,7 @@ const LWXGame = ({ setIsGameMode }: Props) => {
   useEffect(() => {
     window.addEventListener('keydown', onKeyDown)
 
-    // return window.removeEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
   }, [onKeyDown])
 
   async function handleGithubSignIn() {
@@ -163,7 +135,7 @@ const LWXGame = ({ setIsGameMode }: Props) => {
         >
           <p className="tracking-wider text-foreground font-mono uppercase">{winningCompliment}</p>
           <p className="text-foreground-lighter font-san text-sm">
-            Claim and share the secret ticket to increase your chances of winning swag.
+            Claim and share the secret ticket to boost your chances of winning swag.
           </p>
         </div>
         <div
