@@ -106,7 +106,7 @@ const LWXMeetups = ({ meetups }: { meetups?: Meetup[] }) => {
                   title={liveNow ? 'Live now' : undefined}
                   className={cn(
                     'group py-1 flex items-center flex-wrap text-4xl',
-                    'hover:text-foreground transition-colors',
+                    'hover:text-foreground transition-coaddlors',
                     meetup.id === activeMeetup.id ? 'text-foreground' : 'text-foreground-muted',
                     liveNow && 'text-foreground-light'
                   )}
