@@ -15,6 +15,7 @@ import {
   useCommandMenu,
 } from 'ui'
 import { CommandGroup, CommandItem, CommandLabel, TextHighlighter } from './Command.utils'
+import { useRouter } from 'next/router'
 
 const NUMBER_SOURCES = 2
 
@@ -223,6 +224,19 @@ const DocsSearch = () => {
   const { isLoading, setIsLoading, search, setSearch, inputRef } = useCommandMenu()
   const key = useRef(0)
   const initialLoad = useRef(true)
+  const router = useRouter()
+
+  function openLink(pageType: PageType, link: string) {
+    switch (pageType) {
+      case PageType.Markdown:
+      case PageType.Reference:
+        return router.push(link)
+      case PageType.GithubDiscussion:
+        return window.open(link, '_blank')
+      default:
+        throw new Error(`Unknown page type '${pageType}'`)
+    }
+  }
 
   const hasResults =
     state.status === 'fullResults' ||
@@ -392,9 +406,12 @@ const DocsSearch = () => {
                     <CommandLabel>
                       <TextHighlighter text={page.title} query={search} />
                     </CommandLabel>
-                    {page.description && (
+                    {(page.description || page.subtitle) && (
                       <div className="text-xs text-foreground-muted">
-                        <TextHighlighter text={page.description} query={search} />
+                        <TextHighlighter
+                          text={page.description! || page.subtitle!}
+                          query={search}
+                        />
                       </div>
                     )}
                   </div>
@@ -497,11 +514,9 @@ const DocsSearch = () => {
 export default DocsSearch
 
 export function formatPageUrl(page: Page) {
-  const docsUrl = getDocsUrl()
   switch (page.type) {
     case PageType.Markdown:
     case PageType.Reference:
-      return `${docsUrl}${page.path}`
     case PageType.GithubDiscussion:
       return page.path
     default:
@@ -542,17 +557,5 @@ export function getPageSectionIcon(page: Page) {
       return <IconMessageSquare strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
     default:
       throw new Error(`Unknown page type '${page.type}'`)
-  }
-}
-
-export function openLink(pageType: PageType, link: string) {
-  switch (pageType) {
-    case PageType.Markdown:
-    case PageType.Reference:
-      return window.location.assign(link)
-    case PageType.GithubDiscussion:
-      return window.open(link, '_blank')
-    default:
-      throw new Error(`Unknown page type '${pageType}'`)
   }
 }
