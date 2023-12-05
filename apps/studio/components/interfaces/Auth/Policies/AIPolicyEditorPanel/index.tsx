@@ -86,7 +86,7 @@ export const AIPolicyEditorPanel = memo(function ({
     isLoading,
   } = useChat({
     id: chatId,
-    api: `${BASE_PATH}/api/ai/sql/suggest`,
+    api: `${BASE_PATH}/api/ai/sql/assistant`,
     body: {
       entityDefinitions: isOptedInToAI ? entityDefinitions : undefined,
       policyDefinition:
