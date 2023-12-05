@@ -79,14 +79,14 @@ const LWXMeetups = ({ meetups }: { meetups?: Meetup[] }) => {
 
   return (
     <div className="max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-12 gap-8 xl:gap-8">
-      <div className="col-span-1 xl:col-span-4 flex flex-col justify-center max-w-lg">
-        <h2 className="text-sm tracking-[.5px] font-mono uppercase">Community meetups</h2>
-        <p className="text-foreground-lighter text-base py-3 xl:max-w-md">
-          Celebrate LWX with us at our live community-driven meetups. Join the fun, grab some swag
-          and meet the community.
+      <div className="col-span-1 xl:col-span-4 flex flex-col justify-center max-w-lg text-foreground-lighter">
+        <h2 className="text-sm font-mono uppercase tracking-[1px] mb-4">Community meetups</h2>
+        <p className="text-base xl:max-w-md">
+          Celebrate Launch Week 🆇 at our live community-driven meetups. Network with the community,
+          listen to tech talks and grab some swag.
         </p>
       </div>
-      <div className="col-span-1 xl:col-span-7 xl:col-start-6 w-full max-w-4xl flex flex-wrap gap-x-3">
+      <div className="col-span-1 xl:col-span-7 xl:col-start-6 w-full max-w-4xl flex flex-wrap gap-x-3 mt-4">
         {meets &&
           meets
             ?.sort((a, b) => (new Date(a.start_at) > new Date(b.start_at) ? 1 : -1))
