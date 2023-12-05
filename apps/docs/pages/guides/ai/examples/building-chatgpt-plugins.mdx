@@ -121,7 +121,7 @@ The plugin will split your data and documents into smaller chunks automatically.
 
 ```sql
 create index on documents
-using ivfflat (embedding vector_ip_ops)
+using hnsw (embedding vector_ip_ops)
 with (lists = 10);
 ```
 

@@ -40,6 +40,7 @@ const UsersList = ({
       <Table
         head={
           <>
+            <Table.th>Display Name</Table.th>
             <Table.th>Email</Table.th>
             <Table.th>Phone</Table.th>
             <Table.th className="table-cell">Provider</Table.th>
@@ -55,7 +56,7 @@ const UsersList = ({
               <Table.tr>
                 {/* @ts-ignore */}
                 <Table.td
-                  colSpan={7}
+                  colSpan={8}
                   className="h-14 whitespace-nowrap border-t p-4 text-sm leading-5 text-gray-300"
                 >
                   <div className="flex items-center space-x-3 opacity-75">
@@ -80,7 +81,7 @@ const UsersList = ({
                 />
               ))}
             <Table.tr>
-              <Table.td colSpan={7}>
+              <Table.td colSpan={8}>
                 <UsersPagination total={total} page={page} setPage={setPage} />
               </Table.td>
             </Table.tr>

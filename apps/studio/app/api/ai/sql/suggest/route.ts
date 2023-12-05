@@ -49,8 +49,10 @@ async function handlePost(req: NextRequest) {
   let body = await (req.json() as Promise<{
     messages: { content: string; role: 'user' | 'assistant' }[]
     entityDefinitions: string[]
+    policyDefinition: string
   }>)
-  let { messages, entityDefinitions } = body
+
+  let { messages, entityDefinitions, policyDefinition } = body
 
   const initMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
     {
@@ -83,6 +85,16 @@ async function handlePost(req: NextRequest) {
     initMessages.push({
       role: 'user',
       content: oneLine`Here is my database schema for reference: ${definitions}`,
+    })
+  }
+
+  if (policyDefinition !== undefined) {
+    initMessages.push({
+      role: 'user',
+      content: codeBlock`
+        Here is my policy definition for reference:
+        ${policyDefinition}
+      `.trim(),
     })
   }
 
