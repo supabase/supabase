@@ -173,9 +173,6 @@ const TicketingFlow = () => {
           )}
         />
       </SectionContainer>
-      <SectionContainer className="!pt-4 lg:pb-40">
-        <LaunchWeekPrizeSection />
-      </SectionContainer>
     </>
   )
 }
