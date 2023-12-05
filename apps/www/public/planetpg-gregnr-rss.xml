@@ -5,28 +5,28 @@
       <link>https://supabase.com/blog</link>
       <description>Latest Postgres news from Greg Richardson at Supabase</description>
       <language>en</language>
-      <lastBuildDate>Tue, 05 Sep 2023 16:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Tue, 05 Sep 2023 22:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/planetpg-gregnr-rss.xml" rel="self" type="application/rss+xml"/>
       <item>
   <guid>https://supabase.com/blog/increase-performance-pgvector-hnsw</guid>
   <title>pgvector v0.5.0: Faster semantic search with HNSW indexes</title>
   <link>https://supabase.com/blog/increase-performance-pgvector-hnsw</link>
   <description>Increase performance in pgvector using HNSW indexes</description>
-  <pubDate>Tue, 05 Sep 2023 16:00:00 GMT</pubDate>
+  <pubDate>Tue, 05 Sep 2023 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/fewer-dimensions-are-better-pgvector</guid>
   <title>pgvector: Fewer dimensions are better</title>
   <link>https://supabase.com/blog/fewer-dimensions-are-better-pgvector</link>
   <description>Increase performance in pgvector by using embedding vectors with fewer dimensions</description>
-  <pubDate>Wed, 02 Aug 2023 16:00:00 GMT</pubDate>
+  <pubDate>Wed, 02 Aug 2023 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/openai-embeddings-postgres-vector</guid>
   <title>Storing OpenAI embeddings in Postgres with pgvector</title>
   <link>https://supabase.com/blog/openai-embeddings-postgres-vector</link>
   <description>An example of how to build an AI-powered search engine using OpenAI&apos;s embeddings and PostgreSQL.</description>
-  <pubDate>Sun, 05 Feb 2023 16:00:00 GMT</pubDate>
+  <pubDate>Sun, 05 Feb 2023 23:00:00 GMT</pubDate>
 </item>
 
     </channel>

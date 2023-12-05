@@ -1828,8 +1828,10 @@ export interface components {
       RATE_LIMIT_TOKEN_REFRESH?: number
       MAILER_SECURE_EMAIL_CHANGE_ENABLED: boolean
       REFRESH_TOKEN_ROTATION_ENABLED: boolean
+      PASSWORD_HIBP_ENABLED?: boolean
       PASSWORD_MIN_LENGTH?: number
       PASSWORD_REQUIRED_CHARACTERS?: string
+      SECURITY_MANUAL_LINKING_ENABLED: boolean
       SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: boolean
       SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: number
       MAILER_OTP_EXP: number
@@ -1854,6 +1856,8 @@ export interface components {
       SMS_TEMPLATE: string
       SMS_TEST_OTP: string
       SMS_TEST_OTP_VALID_UNTIL: string
+      HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED?: boolean
+      HOOK_MFA_VERIFICATION_ATTEMPT_URI?: string
       EXTERNAL_APPLE_ENABLED: boolean
       EXTERNAL_APPLE_CLIENT_ID: string
       EXTERNAL_APPLE_SECRET: string
@@ -1964,6 +1968,7 @@ export interface components {
       RATE_LIMIT_TOKEN_REFRESH?: number
       MAILER_SECURE_EMAIL_CHANGE_ENABLED?: boolean
       REFRESH_TOKEN_ROTATION_ENABLED?: boolean
+      PASSWORD_HIBP_ENABLED?: boolean
       PASSWORD_MIN_LENGTH?: number
       /** @enum {string} */
       PASSWORD_REQUIRED_CHARACTERS?:
@@ -1971,6 +1976,7 @@ export interface components {
         | 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789'
         | 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789:!@#$%^&*()_+-=[]{};\'\\:"|<>?,./`~'
         | ''
+      SECURITY_MANUAL_LINKING_ENABLED?: boolean
       SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION?: boolean
       SECURITY_REFRESH_TOKEN_REUSE_INTERVAL?: number
       MAILER_OTP_EXP?: number
@@ -1996,6 +2002,8 @@ export interface components {
       SMS_VONAGE_API_SECRET?: string
       SMS_VONAGE_FROM?: string
       SMS_TEMPLATE?: string
+      HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED?: boolean
+      HOOK_MFA_VERIFICATION_ATTEMPT_URI?: string
       EXTERNAL_APPLE_ENABLED?: boolean
       EXTERNAL_APPLE_CLIENT_ID?: string
       EXTERNAL_APPLE_SECRET?: string
@@ -2106,8 +2114,10 @@ export interface components {
       RATE_LIMIT_TOKEN_REFRESH?: number
       MAILER_SECURE_EMAIL_CHANGE_ENABLED: boolean
       REFRESH_TOKEN_ROTATION_ENABLED: boolean
+      PASSWORD_HIBP_ENABLED?: boolean
       PASSWORD_MIN_LENGTH?: number
       PASSWORD_REQUIRED_CHARACTERS?: string
+      SECURITY_MANUAL_LINKING_ENABLED: boolean
       SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: boolean
       SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: number
       MAILER_OTP_EXP: number
@@ -2132,6 +2142,8 @@ export interface components {
       SMS_TEMPLATE: string
       SMS_TEST_OTP: string
       SMS_TEST_OTP_VALID_UNTIL: string
+      HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED?: boolean
+      HOOK_MFA_VERIFICATION_ATTEMPT_URI?: string
       EXTERNAL_APPLE_ENABLED: boolean
       EXTERNAL_APPLE_CLIENT_ID: string
       EXTERNAL_APPLE_SECRET: string
@@ -2448,6 +2460,7 @@ export interface components {
     ProjectAllocation: {
       ref: string
       usage: number
+      name: string
     }
     OrgMetricUsage: {
       usage: number
@@ -3585,6 +3598,7 @@ export interface components {
       services: (
         | 'adminapi'
         | 'api-gateway'
+        | 'envoy'
         | 'functions'
         | 'gotrue'
         | 'kong'

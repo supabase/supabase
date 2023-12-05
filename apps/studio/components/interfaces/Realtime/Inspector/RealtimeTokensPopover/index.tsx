@@ -20,6 +20,10 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
     ? apiService.serviceApiKey
     : undefined
 
+  const anonServiceRoleKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
+    ? apiService.serviceApiKey
+    : undefined
+
   const { data: postgrestConfig } = useProjectPostgrestConfigQuery({
     projectRef: config.projectRef,
   })
@@ -29,6 +33,7 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
 
   useEffect(() => {
     let token: string | undefined
+    let bearer: string | null = null
 
     if (
       config.projectRef !== undefined &&
@@ -36,15 +41,16 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
       snap.role !== undefined &&
       snap.role.type === 'postgrest'
     ) {
-      token = getRoleImpersonationJWT(config.projectRef, jwtSecret, snap.role)
+      token = anonServiceRoleKey
+      bearer = getRoleImpersonationJWT(config.projectRef, jwtSecret, snap.role)
     } else {
       token = serviceRoleKey
     }
 
     if (token) {
-      onChangeConfig({ ...config, token })
+      onChangeConfig({ ...config, token, bearer })
     }
   }, [config.projectRef, jwtSecret, serviceRoleKey, snap.role])
 
-  return <RoleImpersonationPopover align="start" />
+  return <RoleImpersonationPopover align="start" variant="connected-on-both" />
 }
