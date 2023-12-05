@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
-import { cn } from 'ui'
+import { TextLink, cn } from 'ui'
 import useConfData from '../hooks/use-conf-data'
 import { SupabaseClient } from '@supabase/supabase-js'
 
@@ -59,8 +59,6 @@ const LWXMeetups = ({ meetups }: { meetups?: Meetup[] }) => {
           if (status !== 'SUBSCRIBED') {
             return null
           }
-          console.log('subscribed', channel)
-          // await channel.track(meets)
         })
       setRealtimeChannel(channel)
     }
@@ -81,10 +79,11 @@ const LWXMeetups = ({ meetups }: { meetups?: Meetup[] }) => {
     <div className="max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-12 gap-8">
       <div className="mb-4 col-span-1 xl:col-span-4 flex flex-col max-w-lg text-foreground-lighter">
         <h2 className="text-sm font-mono uppercase tracking-[1px] mb-4">Community meetups</h2>
-        <p className="text-base xl:max-w-md">
-          Celebrate Launch Week 🆇 at our live community-driven meetups. Network with the community,
+        <p className="text-base xl:max-w-md mb-2">
+          Celebrate Launch Week X at our live community-driven meetups. Network with the community,
           listen to tech talks and grab some swag.
         </p>
+        <TextLink label="Read more about meetups" hasChevron url="/blog/community-meetups-lwx" />
       </div>
       <div className="col-span-1 xl:col-span-7 xl:col-start-6 w-full max-w-4xl flex flex-wrap gap-x-3">
         {meets &&
