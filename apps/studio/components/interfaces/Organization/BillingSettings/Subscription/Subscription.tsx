@@ -89,10 +89,10 @@ const Subscription = () => {
             ]}
           >
             <p>
-              Your projects can become unresponsive or enter read only mode.{' '}
+              Your projects can become unresponsive or enter read-only mode.{' '}
               {subscription.plan.id === 'free'
                 ? 'Please upgrade to the Pro plan to ensure that your projects remain available.'
-                : 'Please disable spend cap to ensure that your projects remain available.'}
+                : 'Please disable Spend Cap to ensure that your projects remain available.'}
             </p>
           </Alert>
         </div>

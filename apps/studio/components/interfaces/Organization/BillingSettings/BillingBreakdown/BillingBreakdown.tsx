@@ -61,7 +61,7 @@ const BillingBreakdown = () => {
               <span className="text-foreground-light whitespace-nowrap">
                 {billingCycleEnd.format('MMM DD, YYYY')}
               </span>
-              . See&nbsp;
+              . See{' '}
               <Link
                 className="text-green-900 transition hover:text-green-1000"
                 href={`/org/${orgSlug}/usage`}

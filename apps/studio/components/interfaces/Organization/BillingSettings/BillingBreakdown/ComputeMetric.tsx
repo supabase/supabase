@@ -92,8 +92,8 @@ const ComputeMetric = ({ slug, metric, usage, relativeToSubscription }: ComputeM
                   <div className="mt-2">
                     <p className="text-xs">
                       Every project is a dedicated server and database. For every hour your project
-                      is active, it incurs compute costs depending on the instance size of your
-                      project. Paused projects do not incur compute costs.
+                      is active, it incurs compute costs based on the instance size of your project.
+                      Paused projects do not incur compute costs.
                     </p>
                   </div>
                 </div>
