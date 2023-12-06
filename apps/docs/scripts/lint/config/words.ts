@@ -18,16 +18,28 @@ type ExceptionList = Map<string, string[]>
 
 export const capitalizedWords: ExceptionList = new Map([
   plural('API'),
+  multiword('ChatGPT', ...pluralize('ChatGPT Retrieval Plugin')),
+  single('CLIP'),
   single('Firebase'),
+  single('HNSW'),
+  multiword('Hugging Face'),
   single('I'),
+  single('IVFFlat'),
   multiword('JSON', ...pluralize('JSON Web Token')),
   plural('JWT'),
   single('Next.js'),
   single('OAuth'),
+  single('OpenAI'),
+  single('Poetry'),
   single('Postgres'),
+  single('Python'),
+  single('Roboflow'),
   single('Supabase'),
+  single('Transformers.js'),
+  single('TypeScript'),
   plural('URL'),
   single('WebP'),
+  plural('Wrapper'),
 ])
 
 function isMultiword(word: string) {
