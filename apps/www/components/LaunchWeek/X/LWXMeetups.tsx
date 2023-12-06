@@ -113,7 +113,7 @@ const LWXMeetups = ({ meetups }: { meetups?: Meetup[] }) => {
                   {liveNow && (
                     <div className="w-2 h-2 rounded-full bg-brand mr-2 mb-4 animate-pulse" />
                   )}
-                  <span className="!leading-none">{meetup.title}</span>
+                  <span>{meetup.title}</span>
                   {i !== meets.length - 1 && ', '}
                 </Link>
               )
