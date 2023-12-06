@@ -7,17 +7,29 @@ export const RowLayout = ({ children }: PropsWithChildren<{}>) => (
   <div className="flex h-full w-full items-center gap-4">{children}</div>
 )
 // renders a timestamp (either unix microsecond or iso timestamp)
-export const SelectionDetailedTimestampRow = ({ value }: { value: string | number }) => (
-  <SelectionDetailedRow label="Timestamp" value={unixMicroToIsoTimestamp(value)} />
+export const SelectionDetailedTimestampRow = ({
+  value,
+  hideCopy = false,
+}: {
+  value: string | number
+  hideCopy?: boolean
+}) => (
+  <SelectionDetailedRow
+    label="Timestamp"
+    value={unixMicroToIsoTimestamp(value)}
+    hideCopy={hideCopy}
+  />
 )
 export const SelectionDetailedRow = ({
   label,
   value,
   valueRender,
+  hideCopy = false,
 }: {
   label: string
   value: string
   valueRender?: React.ReactNode
+  hideCopy?: boolean
 }) => {
   return (
     <div className="grid grid-cols-12 group">
@@ -25,13 +37,15 @@ export const SelectionDetailedRow = ({
       <span className="text-scale-1200 text-sm col-span-6 whitespace-pre-wrap break-all">
         {valueRender ?? value}
       </span>
-      <CopyButton
-        bounceIconOnCopy
-        text={value}
-        className="group-hover:opacity-100 opacity-0 my-auto transition col-span-2  h-4 w-4 px-0 py-0"
-        type="text"
-        title="Copy to clipboard"
-      />
+      {!hideCopy && (
+        <CopyButton
+          bounceIconOnCopy
+          text={value}
+          className="group-hover:opacity-100 opacity-0 my-auto transition col-span-2  h-4 w-4 px-0 py-0"
+          type="text"
+          title="Copy to clipboard"
+        />
+      )}
     </div>
   )
 }

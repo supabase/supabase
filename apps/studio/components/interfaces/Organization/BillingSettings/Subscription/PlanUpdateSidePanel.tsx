@@ -6,7 +6,6 @@ import { useEffect, useState } from 'react'
 
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
-import InformationBox from 'components/ui/InformationBox'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useOrganizationBillingSubscriptionPreview } from 'data/organizations/organization-billing-subscription-preview'
@@ -20,14 +19,21 @@ import Telemetry from 'lib/telemetry'
 import { useRouter } from 'next/router'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
-import { Button, IconCheck, IconExternalLink, Modal, SidePanel } from 'ui'
+import {
+  Button,
+  IconCheck,
+  IconChevronRight,
+  IconExternalLink,
+  IconInfo,
+  Modal,
+  SidePanel,
+} from 'ui'
 import DowngradeModal from './DowngradeModal'
 import EnterpriseCard from './EnterpriseCard'
 import ExitSurveyModal from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import PaymentMethodSelection from './PaymentMethodSelection'
-
-// [Joshen TODO] Need to remove all contexts of "projects"
+import InformationBox from 'components/ui/InformationBox'
 
 const PlanUpdateSidePanel = () => {
   const { ui } = useStore()
@@ -39,6 +45,7 @@ const PlanUpdateSidePanel = () => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>()
   const [showDowngradeError, setShowDowngradeError] = useState(false)
   const [selectedTier, setSelectedTier] = useState<'tier_free' | 'tier_pro' | 'tier_team'>()
+  const [usageFeesExpanded, setUsageFeesExpanded] = useState<string[]>([])
 
   const canUpdateSubscription = useCheckPermissions(
     PermissionAction.BILLING_WRITE,
@@ -86,6 +93,14 @@ const PlanUpdateSidePanel = () => {
   const availablePlans = plans ?? []
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
   const subscriptionPlanMeta = subscriptionsPlans.find((tier) => tier.id === selectedTier)
+
+  const expandUsageFee = (fee: string) => {
+    setUsageFeesExpanded([...usageFeesExpanded, fee])
+  }
+
+  const collapseUsageFee = (fee: string) => {
+    setUsageFeesExpanded(usageFeesExpanded.filter((item) => item !== fee))
+  }
 
   useEffect(() => {
     if (visible) {
@@ -304,7 +319,7 @@ const PlanUpdateSidePanel = () => {
       <Modal
         loading={isUpdating}
         alignFooter="right"
-        size="large"
+        size="xlarge"
         visible={selectedTier !== undefined && selectedTier !== 'tier_free'}
         onCancel={() => setSelectedTier(undefined)}
         onConfirm={onUpdateSubscription}
@@ -321,73 +336,159 @@ const PlanUpdateSidePanel = () => {
             />
           )}
           {subscriptionPreviewIsLoading && (
-            <span className="text-sm">Estimating monthly costs...</span>
+            <div className="space-y-2">
+              <span className="text-sm">Estimating monthly costs...</span>
+              <ShimmeringLoader />
+              <ShimmeringLoader className="w-3/4" />
+              <ShimmeringLoader className="w-1/2" />
+            </div>
           )}
           {subscriptionPreviewInitialized && (
             <div>
-              <InformationBox
-                defaultVisibility={false}
-                title={
-                  <span>
-                    Estimated monthly price is $
-                    {Math.round(
-                      subscriptionPreview.breakdown.reduce((prev, cur) => prev + cur.total_price, 0)
-                    )}{' '}
-                    + usage
-                  </span>
-                }
-                hideCollapse={false}
-                description={
-                  <Table
-                    borderless={true}
-                    head={[
-                      <Table.th key="header-item">Item</Table.th>,
-                      <Table.th key="header-count">Count</Table.th>,
-                      <Table.th key="header-unit-price">Unit Price</Table.th>,
-                      <Table.th key="header-price" className="text-right">
-                        Price
-                      </Table.th>,
-                    ]}
-                    body={
+              <Table
+                className="mt-2"
+                borderless={true}
+                head={[
+                  <Table.th key="header-item">Item</Table.th>,
+                  <Table.th key="header-count" className="text-right pr-4">
+                    Usage
+                  </Table.th>,
+                  <Table.th key="header-unit-price">Unit Price</Table.th>,
+                  <Table.th key="header-price" className="text-right">
+                    Cost
+                  </Table.th>,
+                ]}
+                body={
+                  <>
+                    {subscriptionPreview.breakdown.map((item) => (
                       <>
-                        {subscriptionPreview.breakdown.map((item) => (
-                          <Table.tr key={item.description}>
-                            <Table.td>{item.description ?? 'Unknown'}</Table.td>
-                            <Table.td>{item.quantity}</Table.td>
-                            <Table.td>
-                              {item.unit_price === 0 ? 'FREE' : `$${item.unit_price}`}
-                            </Table.td>
-                            <Table.td className="text-right">${item.total_price}</Table.td>
-                          </Table.tr>
-                        ))}
-
-                        <Table.tr>
-                          <Table.td>Total</Table.td>
-                          <Table.td />
-                          <Table.td />
-                          <Table.td className=" text-right">
-                            $
-                            {Math.round(
-                              subscriptionPreview.breakdown.reduce(
-                                (prev, cur) => prev + cur.total_price,
-                                0
-                              )
-                            ) ?? 0}
+                        <Table.tr key={item.description}>
+                          <Table.td>
+                            {item.breakdown && item.breakdown.length > 0 && (
+                              <Button
+                                type="text"
+                                className="!pl-0 !pr-1"
+                                icon={
+                                  <IconChevronRight
+                                    className={clsx(
+                                      'transition',
+                                      usageFeesExpanded.includes(item.description) && 'rotate-90'
+                                    )}
+                                  />
+                                }
+                                onClick={() =>
+                                  usageFeesExpanded.includes(item.description)
+                                    ? collapseUsageFee(item.description)
+                                    : expandUsageFee(item.description)
+                                }
+                              />
+                            )}
+                            {item.description ?? 'Unknown'}{' '}
+                            {item.description.endsWith('Compute') && ` (Hours)`}
                           </Table.td>
+                          <Table.td className="text-right pr-4 tabular-nums">
+                            {item.quantity?.toLocaleString()}
+                          </Table.td>
+                          <Table.td>
+                            {item.unit_price_desc
+                              ? item.unit_price_desc
+                              : item.unit_price === 0
+                              ? 'FREE'
+                              : item.unit_price
+                              ? `$${item.unit_price}`
+                              : ''}
+                          </Table.td>
+                          <Table.td className="text-right">${item.total_price}</Table.td>
                         </Table.tr>
+
+                        {usageFeesExpanded.includes(item.description) &&
+                          item.breakdown &&
+                          item.breakdown.length > 0 &&
+                          item.breakdown.map((project) => (
+                            <Table.tr key={project.project_ref}>
+                              <Table.td className="!pl-12">{project.project_name}</Table.td>
+                              <Table.td className="text-right pr-4 tabular-nums">
+                                {project.usage}
+                              </Table.td>
+                              <Table.td />
+                              <Table.td />
+                            </Table.tr>
+                          ))}
                       </>
-                    }
-                  ></Table>
+                    ))}
+
+                    <Table.tr>
+                      <Table.td className="font-medium">
+                        Monthly Costs (excluding over-usage and credits)
+                      </Table.td>
+                      <Table.td />
+                      <Table.td />
+                      <Table.td className="text-right font-medium">
+                        $
+                        {Math.round(
+                          subscriptionPreview.breakdown.reduce(
+                            (prev, cur) => prev + cur.total_price,
+                            0
+                          )
+                        ) ?? 0}
+                      </Table.td>
+                    </Table.tr>
+                  </>
+                }
+              ></Table>
+
+              <InformationBox
+                className="mt-4"
+                title="Usage-billing for Compute"
+                icon={<IconInfo />}
+                defaultVisibility={true}
+                hideCollapse={true}
+                description={
+                  <div>
+                    <p className="text-sm mt-2">
+                      Each project is a dedicated server and database. Paid plans come with $10 of
+                      Compute Credits to cover one project on the default Starter Compute size or
+                      parts of any compute addon. Additional unpaused projects on paid plans will
+                      incur compute usage costs starting at $10 per month, billed hourly.
+                    </p>
+
+                    {subscription?.plan?.id === 'free' && (
+                      <p className="text-sm mt-2">
+                        Mixing paid and non-paid projects in a single organization is not possible.
+                        If you want projects to be on the free plan, use self-serve project
+                        transfers.
+                      </p>
+                    )}
+
+                    <div className="space-x-3 mt-2">
+                      <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                        <Link
+                          href="https://supabase.com/docs/guides/platform/org-based-billing"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          How billing works
+                        </Link>
+                      </Button>
+                      {subscription?.plan?.id === 'free' && (
+                        <Button
+                          asChild
+                          type="default"
+                          icon={<IconExternalLink strokeWidth={1.5} />}
+                        >
+                          <Link
+                            href="https://supabase.com/docs/guides/platform/project-transfer"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Project transfers
+                          </Link>
+                        </Button>
+                      )}
+                    </div>
+                  </div>
                 }
               />
-
-              {subscriptionPreview.number_of_projects !== undefined &&
-                subscriptionPreview.number_of_projects > 1 && (
-                  <p className="text-sm mt-2">
-                    All {subscriptionPreview.number_of_projects} projects from your organization "
-                    {selectedOrganization?.name}" will use the new {planMeta?.name} plan.
-                  </p>
-                )}
             </div>
           )}
         </Modal.Content>

@@ -7,8 +7,10 @@ import { cn } from 'ui'
 
 export default function TicketFooter() {
   const { userData: user } = useConfData()
-  const { ticketNumber, golden } = user
-  const SupabaseLogo = golden
+  const { ticketNumber, golden, metadata } = user
+  const hasLightTicket = golden || metadata?.hasSecretTicket
+
+  const SupabaseLogo = hasLightTicket
     ? '/images/launchweek/lwx/logos/supabase_lwx_logo_light.png'
     : '/images/launchweek/lwx/logos/supabase_lwx_logo_dark.png'
 
@@ -16,7 +18,7 @@ export default function TicketFooter() {
     <div
       className={cn(
         'relative z-10 w-full flex flex-col gap-2 font-mono text-foreground leading-none uppercase tracking-[3px]',
-        golden ? 'text-[#11181C]' : 'text-white'
+        hasLightTicket ? 'text-[#11181C]' : 'text-white'
       )}
     >
       <Image
@@ -24,7 +26,7 @@ export default function TicketFooter() {
         alt="Supabase Logo for Launch Week X"
         width="30"
         height="30"
-        className="mb-1"
+        className="mb-1 hidden md:block"
         priority
         quality={100}
       />
