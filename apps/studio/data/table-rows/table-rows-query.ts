@@ -159,7 +159,6 @@ export const useTableRowsQuery = <TData extends TableRowsData = TableRowsData>(
       ],
     },
     {
-      staleTime: 0,
       select(data) {
         const rows = data.result.map((x: any, index: number) => {
           return { idx: index, ...x } as SupaRow

@@ -114,7 +114,7 @@ export const useExecuteSqlQuery = <TData = ExecuteSqlData>(
     sqlKeys.query(projectRef, queryKey ?? [md5(sql)]),
     ({ signal }) =>
       executeSql({ projectRef, connectionString, sql, queryKey, handleError }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
+    { enabled: enabled && typeof projectRef !== 'undefined', staleTime: 0, ...options }
   )
 
 export const prefetchExecuteSql = (
