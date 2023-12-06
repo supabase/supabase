@@ -1298,15 +1298,66 @@ create extension "supabase-dbdev";
   {
     id: 26,
     type: 'template',
-    title: 'Add Auth Hooks (MFA Verification Attempt)',
-    description: 'Write a PostgreSQL Hook to customize MFA Verification Flow',
-    sql: `create or replace function public.track_mfa_verification(event jsonb)
-      returns jsonb as $$
-      declare
-        recent_attempts int;
-      begin
-    end;
-   $$ language plpgsql;`.trim(),
+    title: 'Add Auth Hook (MFA Verification Attempt)',
+    description: 'Write a PostgreSQL Hook to limit failed MFA Verification attempts',
+    sql: `
+create table public.mfa_failed_verification_attempts (
+	user_id uuid not null,
+  factor_id uuid not null,
+  last_failed_at timestamp not null default now(),
+  primary key (user_id, factor_id)
+);
+
+create function public.hook_mfa_verification_attempt(event jsonb)
+	returns jsonb
+  language plpgsql
+  as $$
+	declare
+		last_failed_at timestamp;
+	begin
+		if event->'valid' is true
+		then
+			-- code is valid, accept it
+			return jsonb_build_object('decision', 'continue');
+		end if;
+
+		select last_failed_at into last_failed_at
+			from public.mfa_failed_verification_attempts
+			where
+				user_id = event->'user_id'
+					and
+				factor_id = event->'factor_id';
+
+		if last_failed_at is not null and now() - last_failed_at < interval '2 seconds'
+		then
+			-- last attempt was done too quickly
+			return jsonb_build_object(
+				'error', jsonb_build_object(
+					'http_code', 420,
+					'message',   'Please wait a moment before trying again.'));
+		end if;
+
+		-- record this failed attempt
+		insert into public.mfa_failed_verification_attempts
+			(
+				user_id,
+				factor_id,
+				last_refreshed_at
+			)
+			values
+			(
+				event->'user_id',
+				event->'factor_id',
+				now()
+			)
+			on conflict
+        do update
+          set last_refreshed_at = now();
+
+		-- finally let Supabase Auth do the default behavior for a failed attempt
+		return jsonb_build_object('decision', 'continue');
+	end;
+	$$;`.trim(),
   },
 ]
 
