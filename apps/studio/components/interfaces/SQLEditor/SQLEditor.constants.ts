@@ -1342,7 +1342,7 @@ create function public.hook_mfa_verification_attempt(event jsonb)
 			(
 				user_id,
 				factor_id,
-				last_refreshed_at
+				last_failed_at
 			)
 			values
 			(
@@ -1352,12 +1352,132 @@ create function public.hook_mfa_verification_attempt(event jsonb)
 			)
 			on conflict
         do update
-          set last_refreshed_at = now();
+          set last_failed_at = now();
 
 		-- finally let Supabase Auth do the default behavior for a failed attempt
 		return jsonb_build_object('decision', 'continue');
 	end;
 	$$;`.trim(),
+  },
+  {
+    id: 27,
+    type: 'template',
+    title: 'Add Auth Hook (Password Verification Attempt)',
+    description: 'Write a PostgreSQL Hook to limit failed password Verification attempts',
+    sql: `
+create table public.password_failed_verification_attempts (
+	        user_id uuid not null,
+          last_failed_at timestamp not null default now(),
+          primary key (user_id, factor_id)
+        );
+create function public.hook_password_verification_attempt(event jsonb)
+	returns jsonb
+  language plpgsql
+  as $$
+	declare
+		last_failed_at timestamp;
+	begin
+		if event->'valid' is true
+		then
+			-- code is valid, accept it
+			return jsonb_build_object('decision', 'continue');
+		end if;
+
+		select last_failed_at into last_failed_at
+			from public.password_failed_verification_attempts
+			where
+				user_id = event->'user_id'
+
+		if last_failed_at is not null and now() - last_failed_at < interval '10 seconds'
+		then
+			-- last attempt was done too quickly
+			return jsonb_build_object(
+				'error', jsonb_build_object(
+					'http_code', 420,
+					'message',   'Please wait a moment before trying again.'));
+		end if;
+
+		-- record this failed attempt
+		insert into public.password_failed_verification_attempts
+			(
+				user_id,
+				last_failed_at
+			)
+			values
+			(
+				event->'user_id',
+				now()
+			)
+			on conflict
+        do update
+          set last_failed_at = now();
+
+		-- finally let Supabase Auth do the default behavior for a failed attempt
+		return jsonb_build_object('decision', 'continue');
+	end;
+	  $$;
+    `.trim(),
+  },
+  {
+    id: 28,
+    type: 'template',
+    title: 'Add Auth Hook (Custom Access Token)',
+    description: 'Write a PostgreSQL Hook to add custom claims to your Auth Token',
+    sql: `
+create or replace function public.custom_access_token_hook(event jsonb)
+returns jsonb
+language plpgsql
+as $$
+declare
+    claims jsonb;
+    user_email text;
+begin
+    -- Fetch the email based on user_id
+    select email into user_email from users where id = event->>'user_id';
+
+    -- Check if the email has suffix '@supabase.com'
+    if user_email like '%@supabase.com' then
+        claims := event->'claims';
+
+        -- check if 'user_metadata' exists in claims
+        if jsonb_typeof(claims->'user_metadata') is null then
+            -- if 'user_metadata' does not exist, create an empty object
+            claims := jsonb_set(claims, '{user_metadata}', '{}');
+        end if;
+
+        -- set a claim of 'admin'
+        claims := jsonb_set(claims, '{user_metadata, admin}', 'true');
+
+        -- update the 'claims' object in the original event
+        event := jsonb_set(event, '{claims}', claims);
+    end if;
+
+    -- return the modified or original event
+    return event;
+end;
+$$;
+        `.trim(),
+  },
+
+  {
+    id: 29,
+    type: 'template',
+    title: 'Add Auth Hook (General)',
+    description: 'Write a PostgreSQL Hook to add custom claims to your Auth Token',
+    sql: `
+create or replace function public.custom_access_token_hook(event jsonb)
+returns jsonb
+language plpgsql
+as $$
+declare
+    -- Insert variables here
+begin
+    -- Insert logic here
+
+    return event;
+end;
+  $$;
+  `,
   },
 ]
 
