@@ -2480,11 +2480,9 @@ functions:
           ```
 
   - id: is
-    title: is_()
+    title: isFilter()
     description: |
       A check for exact equality (null, true, false), finds all rows whose value on the stated `column` exactly match the specified `value`.
-
-      `is_` and `in_` filter methods are suffixed with `_` to avoid collisions with reserved keywords.
     examples:
       - id: with-select
         name: With `select()`
@@ -2494,7 +2492,7 @@ functions:
           final data = await supabase
             .from('cities')
             .select('name, country_id')
-            .is_('name', null);
+            .isFilter('name', null);
           ```
       - id: with-update
         name: With `update()`
@@ -2503,7 +2501,7 @@ functions:
           final data = await supabase
             .from('cities')
             .update({ 'name': 'Mordor' })
-            .is_('name', null);
+            .isFilter('name', null);
           ```
       - id: with-delete
         name: With `delete()`
@@ -2512,7 +2510,7 @@ functions:
           final data = await supabase
             .from('cities')
             .delete()
-            .is_('name', null);
+            .isFilter('name', null);
           ```
       - id: with-rpc
         name: With `rpc()`
@@ -2521,15 +2519,13 @@ functions:
           // Only valid if the Stored Procedure returns a table type.
           final data = await supabase
             .rpc('echo_all_cities')
-            .is_('name', null);
+            .isFilter('name', null);
           ```
 
   - id: in
-    title: in_()
+    title: inFilter()
     description: |
       Finds all rows whose value on the stated `column` is found on the specified `values`.
-
-      `is_` and `in_` filter methods are suffixed with `_` to avoid collisions with reserved keywords.
     examples:
       - id: with-select
         name: With `select()`
@@ -2539,7 +2535,7 @@ functions:
           final data = await supabase
             .from('cities')
             .select('name, country_id')
-            .in_('name', ['Rio de Janeiro', 'San Francisco']);
+            .inFilter('name', ['Rio de Janeiro', 'San Francisco']);
           ```
       - id: with-update
         name: With `update()`
@@ -2548,7 +2544,7 @@ functions:
           final data = await supabase
             .from('cities')
             .update({ 'name': 'Mordor' })
-            .in_('name', ['Rio de Janeiro', 'San Francisco']);
+            .inFilter('name', ['Rio de Janeiro', 'San Francisco']);
           ```
       - id: with-delete
         name: With `delete()`
@@ -2557,7 +2553,7 @@ functions:
           final data = await supabase
             .from('cities')
             .delete()
-            .in_('name', ['Rio de Janeiro', 'San Francisco']);
+            .inFilter('name', ['Rio de Janeiro', 'San Francisco']);
           ```
       - id: with-rpc
         name: With `rpc()`
@@ -2566,7 +2562,7 @@ functions:
           // Only valid if the Stored Procedure returns a table type.
           final data = await supabase
             .rpc('echo_all_cities')
-            .in_('name', ['Rio de Janeiro', 'San Francisco']);
+            .inFilter('name', ['Rio de Janeiro', 'San Francisco']);
           ```
 
   - id: contains
