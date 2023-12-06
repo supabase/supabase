@@ -15,7 +15,6 @@ export const SUPABASE_ROLES = [
   'pgsodium_keyiduser',
   'pgsodium_keymaker',
   'pgtle_admin',
-  'postgres',
 ]
 
 export const ROLE_PERMISSIONS: any = {
