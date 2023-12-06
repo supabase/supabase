@@ -1,5 +1,5 @@
 import { Content, Text } from 'mdast'
-import { capitalizedWords } from '../config/words'
+import { capitalizedWords, isException } from '../config/words'
 import { ErrorSeverity, FixReplace, LintError, LintRule, error } from '.'
 
 function headingsSentenceCaseCheck(node: Content, file: string) {
@@ -46,7 +46,15 @@ function headingsSentenceCaseCheck(node: Content, file: string) {
     const currWord = currMatch[0]
     const index = textNode.position.start.column + currMatch.index
 
-    if (/[A-Z]/.test(currWord[0]) && !capitalizedWords.has(currWord)) {
+    if (
+      /[A-Z]/.test(currWord[0]) &&
+      !isException({
+        list: capitalizedWords,
+        word: currWord,
+        fullString: text,
+        index: currMatch.index,
+      })
+    ) {
       errors.push(
         error({
           message: 'Heading should be in sentence case.',
