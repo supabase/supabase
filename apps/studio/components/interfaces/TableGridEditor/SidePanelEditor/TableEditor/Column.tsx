@@ -93,7 +93,7 @@ const Column = ({
       </div>
       <div className="w-[5%] mr-2.5">
         <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger>
+          <Tooltip.Trigger asChild>
             <Button
               type={column.foreignKey !== undefined ? 'secondary' : 'default'}
               onClick={() => onEditRelation(column)}

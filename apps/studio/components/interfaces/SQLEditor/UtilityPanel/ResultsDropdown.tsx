@@ -106,8 +106,8 @@ const ResultsDropdown = ({ id, isExecuting }: ResultsDropdownProps) => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
-        <Button asChild type="text" iconRight={<IconChevronDown />}>
+      <DropdownMenuTrigger asChild>
+        <Button type="text" iconRight={<IconChevronDown />}>
           <span>
             Results
             {!isExecuting &&
