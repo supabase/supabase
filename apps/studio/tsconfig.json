@@ -19,8 +19,13 @@
     "paths": {
       "@ui/*": ["./../../packages/ui/src/*"] // handle ui package paths
     },
-    "useDefineForClassFields": true
+    "useDefineForClassFields": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
 }
