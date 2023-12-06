@@ -69,12 +69,27 @@ function headingsSentenceCaseCheck(node: Content, file: string) {
       )
     } else if (
       /[A-Z]/.test(currWord[0]) &&
+      isException({
+        list: capitalizedWords,
+        word: currWord,
+        fullString: text,
+        index: currMatch.index,
+      }).exception
+    ) {
+      wordRegex.lastIndex += isException({
+        list: capitalizedWords,
+        word: currWord,
+        fullString: text,
+        index: currMatch.index,
+      }).advanceIndexBy
+    } else if (
+      /[A-Z]/.test(currWord[0]) &&
       !isException({
         list: capitalizedWords,
         word: currWord,
         fullString: text,
         index: currMatch.index,
-      })
+      }).exception
     ) {
       errors.push(
         error({

@@ -3,15 +3,16 @@ function single(word: string): [string, [string]] {
 }
 
 function plural(word: string): [string, [string, string]] {
-  return [word, [word, `${word}s`]]
+  return [word, [`${word}s`, word]]
 }
 
 function pluralize(word: string): [string, string] {
   return plural(word)[1]
 }
 
+// Words are sorted in reverse so that longer potential matches are exhausted first
 function multiword(...words: [string, ...string[]]): [string, string[]] {
-  return [words[0].split(/\s+/)[0], [...words]]
+  return [words[0].split(/\s+/)[0], [...words].sort((a, b) => b.length - a.length)]
 }
 
 type ExceptionList = Map<string, string[]>
@@ -56,21 +57,22 @@ export function isException({
   word: string
   fullString: string
   index: number
-}): boolean {
+}): { exception: boolean; advanceIndexBy?: number } {
   if (list.has(word)) {
-    // If word directly matches, then it's on the exception list
-    if (list.get(word).includes(word)) {
-      return true
-    }
-
     // If the exception list contains multiword terms, check for the multiword term
     const multiwords = list.get(word).filter(isMultiword)
     for (const term of multiwords) {
       if (fullString.indexOf(term, index) === index) {
-        return true
+        return { exception: true, advanceIndexBy: term.length - word.length }
       }
+    }
+
+    // If word directly matches, then it's on the exception list
+    if (list.get(word).includes(word)) {
+      return { exception: true, advanceIndexBy: 0 }
     }
   }
 
-  return false
+  // 0 beause it means the cursor doesn't need to move
+  return { exception: false }
 }
