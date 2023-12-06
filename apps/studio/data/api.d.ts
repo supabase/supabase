@@ -467,6 +467,14 @@ export interface paths {
     /** Gets daily project stats */
     get: operations['DailyStatsController_getDailyStats']
   }
+  '/platform/projects/{ref}/databases': {
+    /** Gets non-removed databases of a specified project */
+    get: operations['DatabasesController_getDatabases']
+  }
+  '/platform/projects/{ref}/databases-statuses': {
+    /** Gets status of all databases within a project */
+    get: operations['DatabasesStatusesController_getStatus']
+  }
   '/platform/projects/{ref}/db-password': {
     /** Updates the database password */
     patch: operations['DbPasswordController_updatePassword']
@@ -1213,6 +1221,14 @@ export interface paths {
     /** Gets daily project stats */
     get: operations['DailyStatsController_getDailyStats']
   }
+  '/v0/projects/{ref}/databases': {
+    /** Gets non-removed databases of a specified project */
+    get: operations['DatabasesController_getDatabases']
+  }
+  '/v0/projects/{ref}/databases-statuses': {
+    /** Gets status of all databases within a project */
+    get: operations['DatabasesStatusesController_getStatus']
+  }
   '/v0/projects/{ref}/db-password': {
     /** Updates the database password */
     patch: operations['DbPasswordController_updatePassword']
@@ -1547,6 +1563,14 @@ export interface paths {
     /** Disables project's readonly mode for the next 15 minutes */
     post: operations['ReadOnlyController_temporarilyDisableReadonlyMode']
   }
+  '/v1/projects/{ref}/read-replicas/setup': {
+    /** Set up a read replica */
+    post: operations['ReadReplicaController_setUpReadReplica']
+  }
+  '/v1/projects/{ref}/read-replicas/remove': {
+    /** Remove a read replica */
+    post: operations['ReadReplicaController_removeReadReplica']
+  }
   '/v1/projects/{ref}/health': {
     /** Gets project's service health status */
     get: operations['ServiceHealthController_checkServiceHealth']
@@ -1858,6 +1882,10 @@ export interface components {
       SMS_TEST_OTP_VALID_UNTIL: string
       HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED?: boolean
       HOOK_MFA_VERIFICATION_ATTEMPT_URI?: string
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED?: boolean
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI?: string
+      HOOK_CUSTOM_ACCESS_TOKEN_ENABLED?: boolean
+      HOOK_CUSTOM_ACCESS_TOKEN_URI?: string
       EXTERNAL_APPLE_ENABLED: boolean
       EXTERNAL_APPLE_CLIENT_ID: string
       EXTERNAL_APPLE_SECRET: string
@@ -2004,6 +2032,10 @@ export interface components {
       SMS_TEMPLATE?: string
       HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED?: boolean
       HOOK_MFA_VERIFICATION_ATTEMPT_URI?: string
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED?: boolean
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI?: string
+      HOOK_CUSTOM_ACCESS_TOKEN_ENABLED?: boolean
+      HOOK_CUSTOM_ACCESS_TOKEN_URI?: string
       EXTERNAL_APPLE_ENABLED?: boolean
       EXTERNAL_APPLE_CLIENT_ID?: string
       EXTERNAL_APPLE_SECRET?: string
@@ -2144,6 +2176,10 @@ export interface components {
       SMS_TEST_OTP_VALID_UNTIL: string
       HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED?: boolean
       HOOK_MFA_VERIFICATION_ATTEMPT_URI?: string
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED?: boolean
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI?: string
+      HOOK_CUSTOM_ACCESS_TOKEN_ENABLED?: boolean
+      HOOK_CUSTOM_ACCESS_TOKEN_URI?: string
       EXTERNAL_APPLE_ENABLED: boolean
       EXTERNAL_APPLE_CLIENT_ID: string
       EXTERNAL_APPLE_SECRET: string
@@ -4501,6 +4537,31 @@ export interface components {
       override_enabled: boolean
       override_active_until: string
     }
+    SetUpReadReplicaBody: {
+      /**
+       * @description Region you want your read replica to reside in
+       * @example us-east-1
+       * @enum {string}
+       */
+      read_replica_region:
+        | 'us-east-1'
+        | 'us-west-1'
+        | 'us-west-2'
+        | 'ap-southeast-1'
+        | 'ap-northeast-1'
+        | 'ap-northeast-2'
+        | 'ap-southeast-2'
+        | 'eu-west-1'
+        | 'eu-west-2'
+        | 'eu-west-3'
+        | 'eu-central-1'
+        | 'ca-central-1'
+        | 'ap-south-1'
+        | 'sa-east-1'
+    }
+    RemoveReadReplicaBody: {
+      database_identifier: string
+    }
     AuthHealthResponse: {
       name: string
       version: string
@@ -4518,6 +4579,8 @@ export interface components {
       /** @enum {string} */
       name: 'auth' | 'db' | 'realtime' | 'rest' | 'storage'
       healthy: boolean
+      /** @enum {string} */
+      status: 'COMING_UP' | 'ACTIVE_HEALTHY' | 'UNHEALTHY'
       error?: string
     }
     V1PgbouncerConfigResponse: {
@@ -8361,6 +8424,42 @@ export interface operations {
       }
     }
   }
+  /** Gets non-removed databases of a specified project */
+  DatabasesController_getDatabases: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': Record<string, never>[]
+        }
+      }
+    }
+  }
+  /** Gets status of all databases within a project */
+  DatabasesStatusesController_getStatus: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': Record<string, never>
+        }
+      }
+      /** @description Failed to get project's status */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Updates the database password */
   DbPasswordController_updatePassword: {
     parameters: {
@@ -11717,6 +11816,52 @@ export interface operations {
         content: never
       }
       /** @description Failed to disable project's readonly mode */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Set up a read replica */
+  ReadReplicaController_setUpReadReplica: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SetUpReadReplicaBody']
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to set up read replica */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Remove a read replica */
+  ReadReplicaController_removeReadReplica: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RemoveReadReplicaBody']
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to remove read replica */
       500: {
         content: never
       }

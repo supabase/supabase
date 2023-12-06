@@ -13,8 +13,9 @@ import {
   IconMoreVertical,
 } from 'ui'
 
-import { BASE_PATH } from 'lib/constants'
+import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
 import { NODE_SEP, NODE_WIDTH, Region } from './InstanceConfiguration.constants'
+import { formatDatabaseID, formatDatabaseRegion } from 'data/read-replicas/replicas.utils'
 
 interface NodeData {
   id: string
@@ -22,6 +23,7 @@ interface NodeData {
   provider: string
   region: Region
   computeSize: string
+  status: string
   inserted_at: string
 }
 
@@ -71,8 +73,13 @@ export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
         {numReplicas > 0 && (
           <div className="border-t p-3 py-2">
             <p className="text-sm text-foreground-light">
-              <span className="text-foreground">{numReplicas} replicas</span> deployed across{' '}
-              <span className="text-foreground">{numRegions} regions</span>
+              <span className="text-foreground">
+                {numReplicas} replica{numReplicas > 1 ? 's' : ''}
+              </span>{' '}
+              deployed across{' '}
+              <span className="text-foreground">
+                {numRegions} region{numRegions > 1 ? 's' : ''}
+              </span>
             </p>
           </div>
         )}
@@ -94,6 +101,7 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
     provider,
     region,
     computeSize,
+    status,
     inserted_at,
     onSelectRestartReplica,
     onSelectResizeReplica,
@@ -120,16 +128,17 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
           </div>
           <div className="flex flex-col gap-y-0.5">
             <div className="flex items-center gap-x-2">
-              <p className="text-sm">
-                {label} {id}
-              </p>
-              {/* [Joshen] Some status indication perhaps */}
-              <Badge color="green">Healthy</Badge>
+              <p className="text-sm truncate">Replica (ID: {formatDatabaseID(id)})</p>
+              {status === PROJECT_STATUS.ACTIVE_HEALTHY ? (
+                <Badge color="green">Healthy</Badge>
+              ) : status === PROJECT_STATUS.COMING_UP ? (
+                <Badge color="slate">Coming up</Badge>
+              ) : (
+                <Badge color="amber">Unhealthy</Badge>
+              )}
             </div>
             <div className="my-0.5">
-              <p className="flex text-xs text-foreground-light items-center gap-x-1">
-                {region.name}
-              </p>
+              <p className="text-xs text-foreground-light">{region.name}</p>
               <p className="flex text-xs text-foreground-light items-center gap-x-1">
                 <span>{provider}</span>
                 <span>•</span>
@@ -150,12 +159,12 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                   View connection string
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem className="gap-x-2" onClick={() => onSelectRestartReplica()}>
+              {/* <DropdownMenuItem className="gap-x-2" onClick={() => onSelectRestartReplica()}>
                 Restart replica
-              </DropdownMenuItem>
-              <DropdownMenuItem className="gap-x-2" onClick={() => onSelectResizeReplica()}>
+              </DropdownMenuItem> */}
+              {/* <DropdownMenuItem className="gap-x-2" onClick={() => onSelectResizeReplica()}>
                 Resize replica
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
               <div className="border-t" />
               <DropdownMenuItem className="gap-x-2" onClick={() => onSelectDropReplica()}>
                 Drop replica

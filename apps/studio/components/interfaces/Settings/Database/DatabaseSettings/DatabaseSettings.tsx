@@ -17,13 +17,12 @@ import AlertError from 'components/ui/AlertError'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useFlag, useSelectedOrganization } from 'hooks'
 import { pluckObjectFields } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
-import { MOCK_DATABASES } from '../../Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import ConfirmDisableReadOnlyModeModal from './ConfirmDisableReadOnlyModal'
 import ResetDbPassword from './ResetDbPassword'
 
@@ -40,24 +39,26 @@ const DatabaseSettings = () => {
   const [selectedDatabaseId, setSelectedDatabaseId] = useState<string>('1')
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
 
-  // [Joshen] Read replicas mock UI stuff
-  const [open, setOpen] = useState(false)
-  const databases = MOCK_DATABASES
-  const selectedDatabase = databases.find((db) => db.id.toString() === selectedDatabaseId)
-
-  const { data, error, isLoading, isError, isSuccess } = useProjectSettingsQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { data: resourceWarnings } = useResourceWarningsQuery()
+  const {
+    data: databases,
+    error,
+    isLoading,
+    isError,
+    isSuccess,
+  } = useReadReplicasQuery({ projectRef })
+
+  const selectedDatabase = (databases ?? []).find((db) => db.identifier === selectedDatabaseId)
 
   const isReadOnlyMode =
     (resourceWarnings ?? [])?.find((warning) => warning.project === projectRef)
       ?.is_readonly_mode_enabled ?? false
 
-  const { project } = data ?? {}
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
   const connectionInfo =
-    project !== undefined
-      ? pluckObjectFields(project, DB_FIELDS)
+    selectedDatabase !== undefined
+      ? pluckObjectFields(selectedDatabase, DB_FIELDS)
       : { db_user: '', db_host: '', db_port: '', db_name: '' }
 
   const handleCopy = (labelValue?: string) =>
@@ -169,9 +170,7 @@ const DatabaseSettings = () => {
                     <ShimmeringLoader className="h-8 w-full col-span-8" delayIndex={i} />
                   </div>
                 ))}
-              {isError && (
-                <AlertError error={error} subject="Failed to retrieve database settings" />
-              )}
+              {isError && <AlertError error={error} subject="Failed to retrieve databases" />}
               {isSuccess && (
                 <>
                   <Input

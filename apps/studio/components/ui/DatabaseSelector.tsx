@@ -1,18 +1,21 @@
-import { MOCK_DATABASES } from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
+import { useParams } from 'common'
 import { useState } from 'react'
 import {
-  Popover_Shadcn_,
-  PopoverTrigger_Shadcn_,
   Button,
+  CommandGroup_Shadcn_,
+  CommandItem_Shadcn_,
+  CommandList_Shadcn_,
+  Command_Shadcn_,
+  IconCheck,
   IconChevronDown,
   PopoverContent_Shadcn_,
-  Command_Shadcn_,
-  CommandList_Shadcn_,
-  CommandGroup_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
   ScrollArea,
-  CommandItem_Shadcn_,
-  IconCheck,
 } from 'ui'
+
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { formatDatabaseID, formatDatabaseRegion } from 'data/read-replicas/replicas.utils'
 
 interface DatabaseSelectorProps {
   selectedDatabaseId: string
@@ -20,9 +23,13 @@ interface DatabaseSelectorProps {
 }
 
 const DatabaseSelector = ({ selectedDatabaseId, onChangeDatabaseId }: DatabaseSelectorProps) => {
+  const { ref: projectRef } = useParams()
   const [open, setOpen] = useState(false)
-  const databases = MOCK_DATABASES.sort((a, b) => (a.id > b.id ? 1 : -1))
-  const selectedDatabase = databases.find((db) => db.id.toString() === selectedDatabaseId)
+  const { data } = useReadReplicasQuery({ projectRef })
+  const databases = data ?? []
+  const selectedDatabase = databases.find((db) => db.identifier === selectedDatabaseId)
+  const selectedDatabaseRegion = formatDatabaseRegion(selectedDatabase?.region ?? '')
+  const formattedDatabaseId = formatDatabaseID(selectedDatabaseId)
 
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
@@ -37,40 +44,46 @@ const DatabaseSelector = ({ selectedDatabaseId, onChangeDatabaseId }: DatabaseSe
           >
             Source:{' '}
             <span className="capitalize">
-              {(selectedDatabase?.type ?? '').split('_').join(' ').toLowerCase()}
-              {selectedDatabase?.type === 'PRIMARY' && ' database'}
+              {selectedDatabase?.identifier === projectRef ? 'Primary database' : 'Read replica'}
             </span>{' '}
-            {selectedDatabase?.type === 'READ_REPLICA' && <span>(ID: {selectedDatabase?.id})</span>}
+            {selectedDatabase?.identifier !== projectRef && (
+              <span>
+                ({selectedDatabaseRegion} - {formattedDatabaseId})
+              </span>
+            )}
           </Button>
         </div>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-48" side="bottom" align="end">
+      <PopoverContent_Shadcn_ className="p-0 w-64" side="bottom" align="end">
         <Command_Shadcn_>
           <CommandList_Shadcn_>
             <CommandGroup_Shadcn_>
               <ScrollArea className={(databases || []).length > 7 ? 'h-[210px]' : ''}>
                 {databases?.map((database) => {
+                  const region = formatDatabaseRegion(database.region)
+                  const id = formatDatabaseID(database.identifier)
+
                   return (
                     <CommandItem_Shadcn_
-                      key={database.id}
-                      value={database.id.toString()}
+                      key={database.identifier}
+                      value={database.identifier}
                       className="cursor-pointer w-full"
                       onSelect={() => {
-                        onChangeDatabaseId(database.id.toString())
+                        onChangeDatabaseId(database.identifier)
                         setOpen(false)
                       }}
                       onClick={() => {
-                        onChangeDatabaseId(database.id.toString())
+                        onChangeDatabaseId(database.identifier)
                         setOpen(false)
                       }}
                     >
                       <div className="w-full flex items-center justify-between">
                         <p>
-                          {database.type === 'PRIMARY'
+                          {database.identifier === projectRef
                             ? 'Primary database'
-                            : `Read replica (ID: ${database.id})`}
+                            : `Read replica (${region} - ${id})`}
                         </p>
-                        {database.id.toString() === selectedDatabaseId && <IconCheck />}
+                        {database.identifier === selectedDatabaseId && <IconCheck />}
                       </div>
                     </CommandItem_Shadcn_>
                   )
