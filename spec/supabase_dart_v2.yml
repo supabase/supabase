@@ -533,6 +533,8 @@ functions:
       Currently, we only support time-based one-time password (TOTP) as the 2nd factor. We don't support recovery codes but we allow users to enroll more than 1 TOTP factor, with an upper limit of 10.
 
       Having a 2nd TOTP factor for recovery means the user doesn't have to store their recovery codes. It also reduces the attack surface since the recovery factor is usually time-limited and not a single static code.
+
+      Learn more about implementing MFA on your application on our guide [here](https://supabase.com/docs/guides/auth/auth-mfa#overview).
   - id: mfa-enroll
     title: 'mfa.enroll()'
     notes: |
@@ -606,7 +608,9 @@ functions:
   - id: mfa-unenroll
     title: 'mfa.unenroll()'
     notes: |
-      Unenroll removes a MFA factor. A user has to have an aal2 authenticator level in order to unenroll a verified factor.
+      Unenroll removes a MFA factor.
+      A user has to have an `aal2` authenticator level in order to unenroll a `verified` factor.
+
     examples:
       - id: unenroll-a-factor
         name: Unenroll a factor
@@ -674,6 +678,7 @@ functions:
         isSpotlight: true
         code: |
           ```dart
+          // Returns the first 50 users.
           final List<User> users = await supabase.auth.admin.listUsers();
           ```
       - id: get-paginated-list-of-users
@@ -681,8 +686,9 @@ functions:
         isSpotlight: false
         code: |
           ```dart
+          // Returns the 101th - 200th users.
           final List<User> res = await supabase.auth.admin.listUsers(
-            page: 1,
+            page: 2,
             perPage: 100,
           );
           ```
@@ -864,8 +870,8 @@ functions:
               )
             ''');
           ```
-      - id: query-foreign-tables
-        name: Query foreign tables
+      - id: query-referenced-tables
+        name: Query referenced tables
         description: If your database has relationships, you can query related tables too.
         code: |
           ```dart
@@ -877,10 +883,10 @@ functions:
               purchaser:purchaser_id ( name )
             ''');
           ```
-      - id: query-the-same-foreign-table-multiple-times
-        name: Query the same foreign table multiple times
+      - id: query-the-same-referenced-table-multiple-times
+        name: Query the same referenced table multiple times
         description: |
-          Sometimes you will need to query the same foreign table twice.
+          Sometimes you will need to query the same referenced table twice.
           In this case, you can use the name of the joined column to identify
           which join you intend to use. For convenience, you can also give an
           alias for each column. For example, if we had a shop of products,
@@ -890,8 +896,11 @@ functions:
           ```dart
           final data = await supabase
             .from('messages')
-            .select('*, users!inner(*)')
-            .eq('users.username', 'Jane');
+            .select('''
+              content,
+              from:sender_id(name),
+              to:receiver_id(name)
+            ''');
           ```
       - id: filtering-with-inner-joins
         name: Filtering with inner joins
@@ -1786,7 +1795,7 @@ functions:
             .from('countries')
             .select('name, cities(name)')
             .eq('name', 'United States')
-            .limit(1,  foreignTable: 'cities' );
+            .limit(1,  referencedTable: 'cities' );
           ```
 
   - id: order
@@ -1812,7 +1821,7 @@ functions:
             .from('countries')
             .select('name, cities(name)')
             .eq('name', 'United States')
-            .order('name', foreignTable: 'cities');
+            .order('name', referencedTable: 'cities');
           ```
 
   - id: range
@@ -1951,8 +1960,8 @@ functions:
             .select()
             .eq('address->postcode', 90210);
           ```
-      - id: filter-foreign-tables
-        name: Filter Foreign Tables
+      - id: filter-referenced-tables
+        name: Filter Referenced Tables
         code: |
           ```dart
           final data = await supabase
