@@ -11,7 +11,7 @@ interface AAIPolicyPreProps {
 export const AIPolicyPre = ({ onDiff, children }: AAIPolicyPreProps) => {
   let formatted = (children || [''])[0]
   try {
-    formatted = format(formatted, { language: 'postgresql' })
+    formatted = format(formatted, { language: 'postgresql', keywordCase: 'upper' })
   } catch {}
 
   if (formatted.length === 0) {
