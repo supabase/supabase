@@ -2343,4 +2343,9 @@ module.exports = [
     source: '/docs/guides/auth/auth-magic-link',
     destination: '/docs/guides/auth/passwordless-login/auth-magic-link',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-password-reset',
+    destination: '/docs/guides/auth/passwords',
+  },
 ]
