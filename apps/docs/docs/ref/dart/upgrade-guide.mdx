@@ -4,7 +4,7 @@ title: Upgrade to supabase_flutter v2
 description: 'Learn how to upgrade to supabase_flutter v2.'
 ---
 
-Although supabase_flutter v2 brings a few breaking changes, for the most part the public API should be the same with a few minor exceptions.
+Although `supabase_flutter` v2 brings a few breaking changes, for the most part the public API should be the same with a few minor exceptions.
 We have brought numerous updates behind the scenes to make the SDK work more intuitively for Flutter and Dart developers.
 
 ## Upgrade the client library
@@ -86,7 +86,7 @@ await Supabase.initialize(
 #### Renaming Provider to OAuthProvider
 
 `Provider` enum is renamed to `OAuthProvider`.
-Previously the `Provider` synbol often collided with classes in [provider](https://pub.dev/packages/provider) package and developers needed to add import prefixes to avoid collisions.
+Previously the `Provider` symbol often collided with classes in the [provider](https://pub.dev/packages/provider) package and developers needed to add import prefixes to avoid collisions.
 With the new update, developers can use Supabase and Provider in the same codebase without any import prefixes.
 
   </RefSubLayout.Details>
@@ -183,13 +183,13 @@ nonce: rawNonce,
 #### Initialization does not await for session refresh
 
 In v1, `Supabase.initialize()` would await for the session to be refreshed before returning.
-This caused delays in app's launch time especially when the app was opened in a poor network environment.
+This caused delays in the app's launch time, especially when the app is opened in a poor network environment.
 
-In v2, `Supabase.initialize()` returns immediately after obtaining session from the local storage, which makes the app launch faster.
+In v2, `Supabase.initialize()` returns immediately after obtaining the session from the local storage, which makes the app launch faster.
 Because of this, there is no guarantee that the session is valid when the app starts.
 
 If you need to make sure the session is valid, you can access the `isExpired` getter to check if the session is valid.
-If the session is expired, you can listen to `onAuthStateChange` event and wait for a new `tokenRefreshed` event to be fired.
+If the session is expired, you can listen to the `onAuthStateChange` event and wait for a new `tokenRefreshed` event to be fired.
 
   </RefSubLayout.Details>
   <RefSubLayout.Examples>
@@ -202,7 +202,7 @@ If the session is expired, you can listen to `onAuthStateChange` event and wait 
 >
 <TabPanel id="1.0x" label="Before">
 ```dart
-// Session was
+// Session is valid, no check required
 final session = supabase.auth.currentSession;
 ````
 
@@ -230,7 +230,7 @@ final isSessionExpired = session?.isExpired;
 In v1, on iOS you could pass a `BuildContext` to the `signInWithOAuth()` method to launch the OAuth flow in a Flutter Webview.
 
 In v2, we have dropped the [webview_flutter](https://pub.dev/packages/webview_flutter) dependency in v2 to allow you to have full control over the UI of the OAuth flow.
-Also with the [native support for Google and Apple sign in](/docs/reference/dart/auth-signinwithidtoken), opening an external browser is less longer needed on iOS.
+We now have [native support for Google and Apple sign in](/docs/reference/dart/auth-signinwithidtoken), so opening an external browser is no longer needed on iOS.
 
 Because of this update, we no longer need the `context` parameter, so we have removed the `context` parameter from the `signInWithOAuth()` method.
 
@@ -275,7 +275,7 @@ await supabase.auth.signInWithOAuth(
 
 #### PKCE is the default auth flow type
 
-[PKCE flow](https://supabase.com/blog/supabase-auth-sso-pkce#introducing-pkce), which is a more secure method for obtaining sessions from deep links is now the default auth flow for any authentication involving deep links.
+[PKCE flow](https://supabase.com/blog/supabase-auth-sso-pkce#introducing-pkce), which is a more secure method for obtaining sessions from deep links, is now the default auth flow for any authentication involving deep links.
 
   </RefSubLayout.Details>
   <RefSubLayout.Examples>
@@ -301,7 +301,7 @@ await Supabase.initialize(
 await Supabase.initialize(
   url: 'SUPABASE_URL',
   anonKey: 'SUPABASE_ANON_KEY',
-    authOptions: FlutterAuthClientOptions(
+  authOptions: FlutterAuthClientOptions(
     authFlowType: AuthFlowType.pkce, // set to pkce by default
   )
 );
@@ -319,7 +319,7 @@ await Supabase.initialize(
 #### Auth callback host name parameter removed
 
 `Supabase.initialize()` no longer has the `authCallbackUrlHostname` parameter.
-The supabase_flutter SDK will automatically detect auth callback URLs and handle them internally.
+The `supabase_flutter` SDK will automatically detect auth callback URLs and handle them internally.
 
   </RefSubLayout.Details>
   <RefSubLayout.Examples>
@@ -359,7 +359,7 @@ await Supabase.initialize(
 
 #### SupabaseAuth class removed
 
-`SupabaseAuth` had `initialSession` member, which was used to obtain the initial session when the app starts.
+The `SupabaseAuth` had an `initialSession` member, which was used to obtain the initial session upon app start.
 This is now removed, and `currentSession` should be used to access the session at any time.
 
   </RefSubLayout.Details>
@@ -444,9 +444,8 @@ final bar = await myQuery.eq('another_col', 'bar');
 
 #### Renaming is and in filter
 
-PostgREST, the underlying open source tool that Supabase use to generate APIs, provides `is` and `in` filter.
-Because both `is` and `in` were [reserved keywords](https://dart.dev/language/keywords) in Dart, we had to rename them to `is_` and `in_` in v1.
-After hearing that the underscore suffix was confusing, we have renamed them to `isFilter` and `inFilter` in v2.
+Because `is` and `in` are [reserved keywords](https://dart.dev/languages/keywords) in Dart, v1 used `is_` and `in_` as query filter names.
+Users found the underscore confusing, so the query filters are now renamed to `isFilter` and `inFilter`.
 
   </RefSubLayout.Details>
   <RefSubLayout.Examples>
@@ -496,7 +495,7 @@ final data = await supabase
 
 #### PostgREST error codes
 
-`PostgrestException` instance thrown by the API methods has a `code` property. In v1, the `code` property contained the http status code, which was not very useful.
+The `PostgrestException` instance thrown by the API methods has a `code` property. In v1, the `code` property contained the http status code.
 
 In v2, the `code` property contains the [PostgREST error code](https://postgrest.org/en/stable/references/errors.html), which is more useful for debugging.
 
@@ -546,10 +545,9 @@ We have removed the `.on()` method and replaced it with `.onPostgresChanges()`, 
 
 #### Postgres Changes
 
-Newly introduced `.onPostgresChanges()` method is used to listen to realtime changes in the database.
+Use the new `.onPostgresChanges()` method to listen to realtime changes in the database.
 
-Applying filters to the Postgres Changes was not streight forward in v1 as the `filter` property of `ChannelFilter` took a `String` type.
-With v2, the filter can be applied in a type safe way as well providing a more error prune interface.
+In v1, filters were not strongly typed because they took a `String` type. In v2, `filter` takes an object. Its properties are strictly typed to catch type errors.
 
 We also return the `payload` as a `PostgresChangePayload` object, which contains the `newRecord` and `oldRecord` properties as well as other properties that were all returned as `dynamic` in v1.
 
@@ -609,9 +607,8 @@ supabase.channel('my_channel')
   <RefSubLayout.Details>
 
 #### Broadcast
-
-Because realtime postgres changes, broadcast, and presence all shared the common interface `.on()`, there were a lot of unnecessary properties that could be passed when using broadcast.
-With v2, we now have a dedicated method `.onBroadcast()` which slims down the public interface to what is only necessary.
+Broadcast now uses the dedicated `.onBroadcast()` method, rather than the generic `.on()` method.
+Because the method is specific to broadcast, it takes fewer properties.
 
   </RefSubLayout.Details>
   <RefSubLayout.Examples>
@@ -660,8 +657,8 @@ supabase
 
 #### Presence
 
-Realtime Presence gets three different methods for listening to three different presence events, `sync`, `join`, and `leave`. 
-This allows the callback to be strictly typed and more error prune.
+Realtime Presence gets three different methods for listening to three different presence events: `sync`, `join`, and `leave`. 
+This allows the callback to be strictly typed.
 
   </RefSubLayout.Details>
   <RefSubLayout.Examples>

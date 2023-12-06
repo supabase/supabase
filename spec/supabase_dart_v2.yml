@@ -19,7 +19,7 @@ functions:
   - id: initializing
     title: 'Initializing'
     description: |
-      You can initialize Supabase with the static `initialize()` method of `Supabase` class.
+      You can initialize Supabase with the static `initialize()` method of the `Supabase` class.
 
       The Supabase client is your entrypoint to the rest of the Supabase functionality
       and is the easiest way to interact with everything we offer within the Supabase ecosystem.
@@ -137,17 +137,17 @@ functions:
     title: 'signInWithOtp()'
     notes: |
       - Requires either an email or phone number.
-      - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
-      - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
-      - If you're using phone, you can configure whether you want the user to receive a OTP.
+      - This method is used for passwordless sign-ins where an OTP is sent to the user's email or phone number.
+      - If you're using an email, you can configure whether you want the user to receive a magiclink or an OTP.
+      - If you're using phone, you can configure whether you want the user to receive an OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). You can modify the `SITE_URL` or add additional redirect urls in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
     examples:
       - id: sign-in-with-email
         name: Sign in with email.
         isSpotlight: true
         description: |
-          The user will be sent an email which contains either a magiclink or a OTP or both. By default, a given user can only request a OTP once every 60 seconds.
-          You can pass `emailRedirectTo` with dynamic link to bring the users back to your app after they click on the magic link.
+          The user will be sent an email which contains either a magiclink or an OTP or both. By default, a given user can only request an OTP once every 60 seconds.
+          You can pass `emailRedirectTo` with a dynamic link to bring the users back to your app after they click on the magic link.
         code: |
           ```dart
           await supabase.auth.signInWithOtp(
@@ -157,7 +157,7 @@ functions:
           ```
       - id: sign-in-with-sms-otp
         name: Sign in with SMS OTP.
-        description: The user will be sent a SMS which contains a OTP. By default, a given user can only request a OTP once every 60 seconds.
+        description: The user will be sent a SMS which contains an OTP. By default, a given user can only request an OTP once every 60 seconds.
         code: |
           ```dart
           await supabase.auth.signInWithOtp(
@@ -167,7 +167,7 @@ functions:
       - id: sign-in-with-whatsapp-otp
         name: Sign in with WhatsApp OTP
         isSpotlight: false
-        description: The user will be sent a WhatsApp message which contains a OTP. By default, a given user can only request a OTP once every 60 seconds. Note that a user will need to have a valid WhatsApp account that is linked to Twilio in order to use this feature.
+        description: The user will be sent a WhatsApp message which contains an OTP. By default, a given user can only request an OTP once every 60 seconds. Note that a user will need to have a valid WhatsApp account that is linked to Twilio in order to use this feature.
         code: |
           ```dart
           await supabase.auth.signInWithOtp(
@@ -178,14 +178,14 @@ functions:
   - id: sign-in-with-id-token
     title: 'signInWithIdToken()'
     description: |
-      Allows you to perform native Google and Apple sign in by combining it with [google_sign_in](https://pub.dev/packages/google_sign_in) [sign_in_with_apple](https://pub.dev/packages/sign_in_with_apple) packages.
+      Allows you to perform native Google and Apple sign in by combining it with [google_sign_in](https://pub.dev/packages/google_sign_in) or [sign_in_with_apple](https://pub.dev/packages/sign_in_with_apple) packages.
     examples:
       - id: sign-in-with-google
         name: Native Google sign in
         isSpotlight: true
         description: |
           You can perform native Google sign in on Android and iOS using [google_sign_in](https://pub.dev/packages/google_sign_in).
-          For platform specific settings, follow the instructions on README of the package.
+          For platform specific settings, follow the instructions in the package README.
 
           First, create client IDs for your app. You need to create a web client ID as well to perform Google sign-in with Supabase.
 
@@ -263,7 +263,7 @@ functions:
   - id: sign-in-with-oauth
     title: 'signInWithOAuth()'
     description: |
-      Signs the user in using third party OAuth providers.
+      Signs the user in using third-party OAuth providers.
     notes: |
       - This method is used for signing in using a third-party provider.
       - Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
@@ -322,10 +322,10 @@ functions:
     title: 'verifyOtp()'
     notes: |
       - The `verifyOtp` method takes in different verification types. If a phone number is used, the type can either be `sms` or `phone_change`. If an email address is used, the type can be one of the following: `signup`, `magiclink`, `recovery`, `invite` or `email_change`.
-      - The verification type used should be determined based on the corresponding auth method called before `verifyOtp` to sign up / sign-in a user.
+      - The verification type used should be determined based on the corresponding auth method called before `verifyOtp` to sign up or sign in a user.
     examples:
       - id: verify-sms-one-time-password(otp)
-        name: Verify Sms One-Time Password (OTP)
+        name: Verify SMS One-Time Password (OTP)
         isSpotlight: true
         code: |
           ```dart
@@ -379,7 +379,7 @@ functions:
       Updates user data for a logged in user.
     notes: |
       - In order to use the `updateUser()` method, the user needs to be signed in first.
-      - By Default, email updates sends a confirmation link to both the user's current and new email.
+      - By default, email updates sends a confirmation link to both the user's current and new email.
       To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://supabase.com/dashboard/project/_/auth/providers).
     examples:
       - id: update-the-email-for-an-authenticated-user
@@ -421,7 +421,7 @@ functions:
           ```
       - id: update-password-with-reauthentication
         name: Update the user's password with a nonce
-        description: If "Secure password change" is enabled, updating the user's password would require a nonce. The nonce is sent to the user's email or phone number.
+        description: If "Secure password change" is enabled, updating the user's password requires a nonce. The nonce is sent to the user's email or phone number.
         isSpotlight: true
         code: |
           ```dart
@@ -434,7 +434,7 @@ functions:
     title: 'reauthenticate()'
     notes: |
       - This method is used together with `updateUser()` when a user's password needs to be updated.
-      - This method will send a nonce to the user's email. If the user doesn't have a confirmed email address, the method will send the nonce to the user's confirmed phone number instead.
+      - This method sends a nonce to the user's email. If the user doesn't have a confirmed email address, the method sends the nonce to the user's confirmed phone number instead.
     examples:
       - id: send-reauthentication-nonce
         name: Send reauthentication nonce
@@ -447,10 +447,10 @@ functions:
   - id: resend-email-or-phone-otps
     title: 'resend()'
     notes: |
-      - Resends a signup confirmation, email change or phone change email to the user.
+      - Resends a signup confirmation, email change, or phone change email to the user.
       - Passwordless sign-ins can be resent by calling the `signInWithOtp()` method again.
       - Password recovery emails can be resent by calling the `resetPassswordForEmail()` method again.
-      - This method will only resend an email or phone OTP to the user if there was an initial signup, email change or phone change request being made.
+      - This method only resend an email or phone OTP to the user if an initial signup, email change, or phone change request was made.
     examples:
       - id: resend-email-signup-confirmation
         name: Resend an email signup confirmation
@@ -480,7 +480,7 @@ functions:
             final Session? session = data.session;
           });
           ```
-      - id: list-to-a-specific-event
+      - id: listen-to-a-specific-event
         name: Listen to a specific event
         code: |
           ```dart
@@ -531,7 +531,7 @@ functions:
 
       Currently, we only support time-based one-time password (TOTP) as the 2nd factor. We don't support recovery codes but we allow users to enroll more than 1 TOTP factor, with an upper limit of 10.
 
-      Having a 2nd TOTP factor for recovery frees the user of the burden of having to store their recovery codes somewhere. It also reduces the attack surface since multiple recovery codes are usually generated compared to just having 1 backup TOTP factor.
+      Having a 2nd TOTP factor for recovery means the user doesn't have to store their recovery codes. It also reduces the attack surface since the recovery factor is usually time-limited and not a single static code.
   - id: mfa-enroll
     title: 'mfa.enroll()'
     notes: |
@@ -621,8 +621,8 @@ functions:
     notes: |
       Returns the Authenticator Assurance Level (AAL) for the active session.
       - Authenticator Assurance Level (AAL) is the measure of the strength of an authentication mechanism.
-      - In Supabase, having an AAL of `aal1` refers to having the 1st factor of authentication such as an email and password or OAuth sign-in while `aal2` refers to the 2nd factor of authentication such as a time-based, one-time-password (TOTP).
-      - If the user has a verified factor, the `nextLevel` field will return `aal2`, else, it will return `aal1`.
+      - In Supabase, having an AAL of `aal1` means the user has signed in with their first factor, such as email, password, or OAuth sign-in. An AAL of `aal2` means the user has also signed in with their second factor, such as a time-based, one-time-password (TOTP).
+      - If the user has a verified factor, the `nextLevel` field returns `aal2`. Otherwise, it returns `aal1`.
     examples:
       - id: get-aal
         name: Get the AAL details of a session
@@ -1753,7 +1753,7 @@ functions:
   - id: using-modifiers
     title: Using Modifiers
     description: |
-      Filters work on the row level—they allow you to return rows that
+      Filters work on the row level. That is, they allow you to return rows that
       only match certain conditions without changing the shape of the rows.
       Modifiers are everything that don't fit that definition—allowing you to
       change the format of the response (e.g., returning a CSV string).
@@ -2012,7 +2012,7 @@ functions:
       - `.or()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
 
         ```dart
-        .or('id.in.(6,7),arraycol.cs.{"a","b"}')  // Use Postgres list () and 'in' for in_ filter. Array {} and 'cs' for contains.
+        .or('id.in.(6,7),arraycol.cs.{"a","b"}')  // Use Postgres list () and 'in' instead of `inFilter`. Array {} and 'cs' for contains.
         .or('id.in.(${mylist.join(',')}),arraycol.cs.{${mylistArray.join(',')}}')	// You can insert a Dart list for list or array column.
         .or('id.in.(${mylist.join(',')}),rangecol.cs.(${mylistRange.join(',')}]')	// You can insert a Dart list for list or range column.
         ```
@@ -2048,7 +2048,7 @@ functions:
         .not('name','eq','Paris')
         .not('arraycol','cs','{"a","b"}') // Use Postgres array {} for array column and 'cs' for contains.
         .not('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
-        .not('id','in','(6,7)')  // Use Postgres list () and 'in' for in_ filter.
+        .not('id','in','(6,7)')  // Use Postgres list () and 'in' instead of `inFilter`.
         .not('id','in','(${mylist.join(',')})')  // You can insert a Dart list array.
         ```
     examples:
@@ -2086,7 +2086,7 @@ functions:
           ```dart
           // Only valid if the Stored Procedure returns a table type.
           final data = await supabase
-            .rpc('echo_all_cities)
+            .rpc('echo_all_cities')
             .not('name', 'eq', 'Paris');
           ```
 
