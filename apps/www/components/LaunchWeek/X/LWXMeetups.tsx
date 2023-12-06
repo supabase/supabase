@@ -76,8 +76,8 @@ const LWXMeetups = ({ meetups }: { meetups?: Meetup[] }) => {
   if (!isMounted) return null
 
   return (
-    <div className="max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-12 gap-8">
-      <div className="mb-4 col-span-1 xl:col-span-4 flex flex-col max-w-lg text-foreground-lighter">
+    <div className="max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-12 gap-8 text-[#EDEDED]">
+      <div className="mb-4 col-span-1 xl:col-span-4 flex flex-col max-w-lg text-[#575E61]">
         <h2 className="text-sm font-mono uppercase tracking-[1px] mb-4">Community meetups</h2>
         <p className="text-base xl:max-w-md mb-2">
           Celebrate Launch Week X at our live community-driven meetups. Network with the community,
@@ -85,7 +85,7 @@ const LWXMeetups = ({ meetups }: { meetups?: Meetup[] }) => {
         </p>
         <TextLink label="Read more about meetups" hasChevron url="/blog/community-meetups-lwx" />
       </div>
-      <div className="col-span-1 xl:col-span-7 xl:col-start-6 w-full max-w-4xl flex flex-wrap gap-x-3">
+      <div className="col-span-1 xl:col-span-6 xl:col-start-7 w-full max-w-4xl flex flex-wrap gap-x-3 gap-y-1">
         {meets &&
           meets
             ?.sort((a, b) => (new Date(a.start_at) > new Date(b.start_at) ? 1 : -1))
@@ -105,9 +105,9 @@ const LWXMeetups = ({ meetups }: { meetups?: Meetup[] }) => {
                   title={liveNow ? 'Live now' : undefined}
                   className={cn(
                     'h-10 group inline-flex items-center flex-wrap text-4xl',
-                    'hover:text-foreground !leading-none transition-colors',
-                    meetup.id === activeMeetup.id ? 'text-foreground' : 'text-foreground-muted',
-                    liveNow && 'text-foreground-light'
+                    'hover:text-[#EDEDED] !leading-none transition-colors',
+                    meetup.id === activeMeetup.id ? 'text-[#EDEDED]' : 'text-[#575E61]',
+                    liveNow && 'text-[#B0B0B0]'
                   )}
                 >
                   {liveNow && (
@@ -119,7 +119,7 @@ const LWXMeetups = ({ meetups }: { meetups?: Meetup[] }) => {
               )
             })}
       </div>
-      <div className="col-span-1 xl:col-span-7 xl:col-start-6 w-full max-w-4xl text-sm flex-1">
+      <div className="col-span-1 xl:col-span-6 xl:col-start-7 w-full max-w-4xl text-sm flex-1">
         {activeMeetup?.display_info}
       </div>
     </div>
