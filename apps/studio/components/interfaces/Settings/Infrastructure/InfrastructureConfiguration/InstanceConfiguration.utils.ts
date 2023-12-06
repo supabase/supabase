@@ -39,7 +39,6 @@ export const generateNodes = (
     data: {
       id: primary.identifier,
       region: primaryRegion,
-      label: 'Primary Database',
       provider: primary.cloud_provider,
       inserted_at: primary.inserted_at,
       computeSize: primary.size,
@@ -63,7 +62,6 @@ export const generateNodes = (
         data: {
           id: database.identifier,
           region,
-          label: 'Read Replica',
           provider: database.cloud_provider,
           inserted_at: database.inserted_at,
           computeSize: database.size,

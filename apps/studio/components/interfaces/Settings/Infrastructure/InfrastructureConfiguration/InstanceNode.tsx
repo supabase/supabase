@@ -19,7 +19,6 @@ import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 
 interface NodeData {
   id: string
-  label: string
   provider: string
   region: Region
   computeSize: string
@@ -39,7 +38,7 @@ interface ReplicaNodeData extends NodeData {
 }
 
 export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
-  const { label, provider, region, computeSize, numReplicas, numRegions } = data
+  const { provider, region, computeSize, numReplicas, numRegions } = data
 
   return (
     <>
@@ -53,7 +52,7 @@ export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
               <Database size={16} />
             </div>
             <div className="flex flex-col gap-y-0.5">
-              <p className="text-sm">{label}</p>
+              <p className="text-sm">Primary Database</p>
               <p className="flex items-center gap-x-1">
                 <span className="text-xs text-foreground-light">{region.name}</span>
               </p>
@@ -84,12 +83,14 @@ export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
           </div>
         )}
       </div>
-      <Handle
-        type="source"
-        id="handle-b"
-        position={Position.Bottom}
-        style={{ background: 'transparent' }}
-      />
+      {numReplicas > 0 && (
+        <Handle
+          type="source"
+          id="handle-b"
+          position={Position.Bottom}
+          style={{ background: 'transparent' }}
+        />
+      )}
     </>
   )
 }
@@ -97,7 +98,6 @@ export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
 export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
   const {
     id,
-    label,
     provider,
     region,
     computeSize,
