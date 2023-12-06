@@ -17,7 +17,7 @@ import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-
 import { useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
 import { BASE_PATH, OPT_IN_TAGS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
-import { sortBy, uniqBy } from 'lodash'
+import { uniqBy } from 'lodash'
 import { AIPolicyChat } from './AIPolicyChat'
 import {
   MessageWithDebug,
@@ -86,7 +86,7 @@ export const AIPolicyEditorPanel = memo(function ({
     isLoading,
   } = useChat({
     id: chatId,
-    api: `${BASE_PATH}/api/ai/sql/assistant`,
+    api: `${BASE_PATH}/api/ai/sql/suggest`,
     body: {
       entityDefinitions: isOptedInToAI ? entityDefinitions : undefined,
       policyDefinition:
