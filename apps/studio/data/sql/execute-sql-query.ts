@@ -38,7 +38,7 @@ export async function executeSql(
     'projectRef' | 'connectionString' | 'sql' | 'queryKey' | 'handleError'
   >,
   signal?: AbortSignal
-) {
+): Promise<{ result: any }> {
   if (!projectRef) throw new Error('projectRef is required')
 
   let headers = new Headers()

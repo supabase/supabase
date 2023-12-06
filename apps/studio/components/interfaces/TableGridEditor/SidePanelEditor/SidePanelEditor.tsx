@@ -31,8 +31,6 @@ import { ImportContent } from './TableEditor/TableEditor.types'
 export interface SidePanelEditorProps {
   editable?: boolean
   selectedTable?: PostgresTable
-  onRowCreated?: (row: Dictionary<any>) => void
-  onRowUpdated?: (row: Dictionary<any>, idx: number) => void
 
   // Because the panel is shared between grid editor and database pages
   // Both require different responses upon success of these events
@@ -42,8 +40,6 @@ export interface SidePanelEditorProps {
 const SidePanelEditor = ({
   editable = true,
   selectedTable,
-  onRowCreated = noop,
-  onRowUpdated = noop,
   onTableCreated = noop,
 }: SidePanelEditorProps) => {
   const snap = useTableEditorStateSnapshot()
@@ -81,7 +77,7 @@ const SidePanelEditor = ({
     let saveRowError: Error | undefined
     if (isNewRecord) {
       try {
-        const result = await createTableRows({
+        await createTableRows({
           projectRef: project.ref,
           connectionString: project.connectionString,
           table: selectedTable as any,
@@ -89,7 +85,6 @@ const SidePanelEditor = ({
           enumArrayColumns,
           impersonatedRole: getImpersonatedRole(),
         })
-        onRowCreated(result[0])
       } catch (error: any) {
         saveRowError = error
       }
@@ -98,7 +93,7 @@ const SidePanelEditor = ({
       if (hasChanges) {
         if (selectedTable.primary_keys.length > 0) {
           try {
-            const result = await updateTableRow({
+            await updateTableRow({
               projectRef: project.ref,
               connectionString: project.connectionString,
               table: selectedTable as any,
@@ -107,7 +102,6 @@ const SidePanelEditor = ({
               enumArrayColumns,
               impersonatedRole: getImpersonatedRole(),
             })
-            onRowUpdated(result[0], configuration.rowIdx)
           } catch (error: any) {
             saveRowError = error
           }

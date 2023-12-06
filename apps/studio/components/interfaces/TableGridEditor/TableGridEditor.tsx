@@ -5,15 +5,9 @@ import { useParams } from 'common'
 import { find, isUndefined } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 
-import {
-  Dictionary,
-  parseSupaTable,
-  SupabaseGrid,
-  SupabaseGridRef,
-  SupaTable,
-} from 'components/grid'
+import { Dictionary, parseSupaTable, SupabaseGrid, SupaTable } from 'components/grid'
 import { ERROR_PRIMARY_KEY_NOTFOUND } from 'components/grid/constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Connecting from 'components/ui/Loading/Loading'
@@ -31,7 +25,6 @@ import useEntityType from 'hooks/misc/useEntityType'
 import { TableLike } from 'hooks/misc/useTable'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { EMPTY_ARR } from 'lib/void'
-import { useAppStateSnapshot } from 'state/app-state'
 import { getImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { SchemaView } from 'types'
@@ -58,9 +51,7 @@ const TableGridEditor = ({
   const { ref: projectRef, id } = useParams()
 
   const { project } = useProjectContext()
-  const appSnap = useAppStateSnapshot()
   const snap = useTableEditorStateSnapshot()
-  const gridRef = useRef<SupabaseGridRef>(null)
 
   const [encryptedColumns, setEncryptedColumns] = useState([])
 
@@ -208,14 +199,6 @@ const TableGridEditor = ({
 
   const gridKey = `${selectedTable.schema}_${selectedTable.name}`
 
-  const onRowCreated = (row: Dictionary<any>) => {
-    if (gridRef.current) gridRef.current.rowAdded(row)
-  }
-
-  const onRowUpdated = (row: Dictionary<any>, idx: number) => {
-    if (gridRef.current) gridRef.current.rowEdited(row, idx)
-  }
-
   const onTableCreated = (table: PostgresTable) => {
     router.push(`/project/${projectRef}/editor/${table.id}`)
   }
@@ -308,7 +291,6 @@ const TableGridEditor = ({
     <>
       <SupabaseGrid
         key={gridKey}
-        ref={gridRef}
         theme={theme}
         gridProps={{ height: '100%' }}
         storageRef={projectRef}
@@ -372,8 +354,6 @@ const TableGridEditor = ({
         <SidePanelEditor
           editable={!isReadOnly && canEditViaTableEditor}
           selectedTable={selectedTable as PostgresTable}
-          onRowCreated={onRowCreated}
-          onRowUpdated={onRowUpdated}
           onTableCreated={onTableCreated}
         />
       )}
