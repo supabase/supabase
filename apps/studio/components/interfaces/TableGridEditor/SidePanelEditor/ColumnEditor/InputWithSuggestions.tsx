@@ -103,6 +103,7 @@ const InputWithSuggestions = ({
                     </Button>
                   </Tooltip.Trigger>
                 </DropdownMenuTrigger>
+
                 <Tooltip.Portal>
                   <Tooltip.Content side="bottom">
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
