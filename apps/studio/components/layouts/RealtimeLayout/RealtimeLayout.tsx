@@ -23,7 +23,7 @@ const RealtimeLayout = ({ children }: PropsWithChildren<RealtimeLayoutProps>) =>
       product="Realtime"
       productMenu={<ProductMenu page={page} menu={generateRealtimeMenu(project)} />}
     >
-      <main className="h-screen">{children}</main>
+      {children}
     </ProjectLayout>
   )
 }

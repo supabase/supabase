@@ -1,7 +1,7 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
+import { useChat } from 'ai/react'
 import { FileDiff } from 'lucide-react'
 import dynamic from 'next/dynamic'
-import { ThreadMessage } from 'openai/resources/beta/threads/messages/messages'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import { Button, Modal, SheetContent_Shadcn_, SheetFooter_Shadcn_, Sheet_Shadcn_, cn } from 'ui'
@@ -11,16 +11,22 @@ import {
   IStandaloneDiffEditor,
 } from 'components/interfaces/SQLEditor/SQLEditor.types'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
-import { useRlsSuggestMutation } from 'data/ai/rls-suggest-mutation'
-import { useRlsSuggestQuery } from 'data/ai/rls-suggest-query'
 import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { useSelectedProject, useStore } from 'hooks'
+import { useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
+import { BASE_PATH, OPT_IN_TAGS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
+import { uniqBy } from 'lodash'
 import { AIPolicyChat } from './AIPolicyChat'
-import { generatePlaceholder, generateThreadMessage } from './AIPolicyEditorPanel.utils'
+import {
+  MessageWithDebug,
+  generatePlaceholder,
+  generatePolicyDefinition,
+  generateThreadMessage,
+} from './AIPolicyEditorPanel.utils'
 import { AIPolicyHeader } from './AIPolicyHeader'
+import PolicyDetails from './PolicyDetails'
 import QueryError from './QueryError'
 import RLSCodeEditor from './RLSCodeEditor'
 
@@ -45,38 +51,24 @@ export const AIPolicyEditorPanel = memo(function ({
 }: AIPolicyEditorPanelProps) {
   const { meta } = useStore()
   const selectedProject = useSelectedProject()
+  const selectedOrganization = useSelectedOrganization()
 
+  // use chat id because useChat doesn't have a reset function to clear all messages
+  const [chatId, setChatId] = useState(uuidv4())
   const editorRef = useRef<IStandaloneCodeEditor | null>(null)
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
   const placeholder = generatePlaceholder(selectedPolicy)
+  const isOptedInToAI = selectedOrganization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
 
   const [error, setError] = useState<QueryResponseError>()
+  const [showDetails, setShowDetails] = useState(false)
   // [Joshen] Separate state here as there's a delay between submitting and the API updating the loading status
-  const [loading, setLoading] = useState(false)
-  const [keepPreviousData, setKeepPreviousData] = useState(false)
-  const [debugThread, setDebugThread] = useState<ThreadMessage[]>([])
+  const [debugThread, setDebugThread] = useState<MessageWithDebug[]>([])
   const [assistantVisible, setAssistantPanel] = useState(false)
-  const [ids, setIds] = useState<{ threadId: string; runId: string } | undefined>(undefined)
   const [isAssistantChatInputEmpty, setIsAssistantChatInputEmpty] = useState(true)
   const [incomingChange, setIncomingChange] = useState<string | undefined>(undefined)
   // used for confirmation when closing the panel with unsaved changes
   const [isClosingPolicyEditorPanel, setIsClosingPolicyEditorPanel] = useState(false)
-
-  const { data } = useRlsSuggestQuery(
-    { thread_id: ids?.threadId!, run_id: ids?.runId! },
-    {
-      enabled: !!(ids?.runId && ids.threadId),
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      refetchInterval: (data) => {
-        if (data && data.status === 'completed') {
-          return Infinity
-        }
-        return 5000
-      },
-      keepPreviousData,
-    }
-  )
 
   const { data: entities } = useEntityDefinitionsQuery(
     {
@@ -88,22 +80,29 @@ export const AIPolicyEditorPanel = memo(function ({
 
   const entityDefinitions = entities?.map((def) => def.sql.trim())
 
-  const { mutate: addPromptMutation } = useRlsSuggestMutation({
-    onSuccess: (data) => {
-      setIds({ threadId: data.threadId, runId: data.runId })
-    },
-    onError: (error) => {
-      const threadMessage = generateThreadMessage({
-        threadId: ids?.threadId,
-        runId: ids?.runId,
-        content: error.message.includes('No OPENAI_KEY set')
-          ? `Seems like you haven't set an OPENAI_KEY in your environment variables of the dashboard. Update your .env file with that environment variable to use all the AI features of the dashboard!`
-          : error.message,
-      })
-      setDebugThread([...debugThread, threadMessage])
-      setLoading(false)
+  const {
+    messages: chatMessages,
+    append,
+    isLoading,
+  } = useChat({
+    id: chatId,
+    api: `${BASE_PATH}/api/ai/sql/suggest`,
+    body: {
+      entityDefinitions: isOptedInToAI ? entityDefinitions : undefined,
+      policyDefinition:
+        selectedPolicy !== undefined ? generatePolicyDefinition(selectedPolicy) : undefined,
     },
   })
+
+  const messages = useMemo(() => {
+    const merged = [...debugThread, ...chatMessages.map((m) => ({ ...m, isDebug: false }))]
+
+    return merged.sort(
+      (a, b) =>
+        (a.createdAt?.getTime() ?? 0) - (b.createdAt?.getTime() ?? 0) ||
+        a.role.localeCompare(b.role)
+    )
+  }, [chatMessages, debugThread])
 
   const { mutate: executeMutation, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess: () => {
@@ -118,30 +117,6 @@ export const AIPolicyEditorPanel = memo(function ({
   })
 
   const { mutateAsync: debugSql, isLoading: isDebugSqlLoading } = useSqlDebugMutation()
-
-  const addPrompt = useCallback(
-    (message: string) => {
-      setLoading(true)
-      if (ids?.threadId) {
-        addPromptMutation({
-          thread_id: ids?.threadId,
-          prompt: message,
-        })
-      } else {
-        addPromptMutation({
-          thread_id: ids?.threadId,
-          entityDefinitions,
-          prompt: message,
-        })
-      }
-    },
-    [addPromptMutation, entityDefinitions, ids?.threadId]
-  )
-
-  const messages = useMemo(
-    () => [...(data?.messages ?? []), ...debugThread],
-    [data?.messages, debugThread]
-  )
 
   const errorLines =
     error?.formattedError.split('\n').filter((x: string) => x.length > 0).length ?? 0
@@ -208,10 +183,8 @@ export const AIPolicyEditorPanel = memo(function ({
 
     const assistantMessageBefore = generateThreadMessage({
       id: messageId,
-      threadId: ids?.threadId,
-      runId: ids?.runId,
       content: 'Thinking...',
-      metadata: { type: 'debug' },
+      isDebug: true,
     })
     setDebugThread([...debugThread, assistantMessageBefore])
 
@@ -223,36 +196,45 @@ export const AIPolicyEditorPanel = memo(function ({
 
     const assistantMessageAfter = generateThreadMessage({
       id: messageId,
-      threadId: ids?.threadId,
-      runId: ids?.runId,
       content: `${solution}\n\`\`\`sql\n${sql}\n\`\`\``,
-      metadata: { type: 'debug' },
+      isDebug: true,
     })
-    setDebugThread([...debugThread, assistantMessageAfter])
-  }
+    const cleanedMessages = uniqBy([...debugThread, assistantMessageAfter], (m) => m.id)
 
-  const onDiff = useCallback((v: string) => setIncomingChange(v), [])
+    setDebugThread(cleanedMessages)
+  }
 
   // when the panel is closed, reset all values
   useEffect(() => {
     if (!visible) {
-      const policy = editorRef.current?.getValue()
-      if (policy) editorRef.current?.setValue('')
-      if (incomingChange) setIncomingChange(undefined)
-      if (assistantVisible) setAssistantPanel(false)
+      editorRef.current?.setValue('')
+      setIncomingChange(undefined)
+      setAssistantPanel(false)
       setIsClosingPolicyEditorPanel(false)
-      setIds(undefined)
       setError(undefined)
       setDebugThread([])
-      setKeepPreviousData(false)
-    } else {
-      setKeepPreviousData(true)
+      setChatId(uuidv4())
+      setShowDetails(false)
     }
   }, [visible])
 
-  useEffect(() => {
-    if (data?.status === 'completed') setLoading(false)
-  }, [data?.status])
+  // [Joshen] Problem with monaco is that it's height cannot be dynamically updated once its initialized
+  // So this is sort of a hacky way to do so, until we find a better solution at least
+  const footerHeight = 58
+  const createPolicyEditorHeight =
+    error === undefined
+      ? `calc(100vh - ${footerHeight}px - 54px)`
+      : `calc(100vh - ${footerHeight}px - 151px - ${20 * errorLines}px)`
+  const updatePolicyEditorHeight =
+    showDetails && error === undefined
+      ? `calc(100vh - ${footerHeight}px - 172px)`
+      : showDetails && error !== undefined
+      ? `calc(100vh - ${footerHeight}px - 172px - 122px - ${16 * errorLines}px)`
+      : !showDetails && error === undefined
+      ? `calc(100vh - ${footerHeight}px - 72px)`
+      : !showDetails && error !== undefined
+      ? `calc(100vh - ${footerHeight}px - 72px  - 122px - ${16 * errorLines}px)`
+      : '0'
 
   return (
     <>
@@ -270,19 +252,26 @@ export const AIPolicyEditorPanel = memo(function ({
               assistantVisible={assistantVisible}
               setAssistantVisible={setAssistantPanel}
             />
+
+            <PolicyDetails
+              policy={selectedPolicy}
+              showDetails={showDetails}
+              toggleShowDetails={() => setShowDetails(!showDetails)}
+            />
+
             <div className="flex flex-col h-full w-full justify-between">
               {incomingChange ? (
                 <div className="px-5 py-3 flex justify-between gap-3 bg-muted">
                   <div className="flex gap-2 items-center text-foreground-light">
                     <FileDiff className="h-4 w-4" />
-                    <span className="text-sm">Apply changes from assistant</span>
+                    <span className="text-sm">Accept changes from assistant</span>
                   </div>
                   <div className="flex gap-3">
                     <Button type="default" onClick={() => setIncomingChange(undefined)}>
                       Discard
                     </Button>
                     <Button type="primary" onClick={() => acceptChange()}>
-                      Apply
+                      Accept
                     </Button>
                   </div>
                 </div>
@@ -292,7 +281,7 @@ export const AIPolicyEditorPanel = memo(function ({
                 <DiffEditor
                   theme="supabase"
                   language="pgsql"
-                  className="flex grow"
+                  className="grow"
                   original={editorRef.current?.getValue()}
                   modified={incomingChange}
                   onMount={(editor) => (diffEditorRef.current = editor)}
@@ -309,9 +298,9 @@ export const AIPolicyEditorPanel = memo(function ({
                 className={`relative ${incomingChange ? 'hidden' : 'block'}`}
                 style={{
                   height:
-                    error === undefined
-                      ? 'calc(100vh - 58px - 54px)'
-                      : `calc(100vh - 58px - 151px - ${20 * errorLines}px)`,
+                    selectedPolicy !== undefined
+                      ? updatePolicyEditorHeight
+                      : createPolicyEditorHeight,
                 }}
               >
                 <RLSCodeEditor
@@ -347,10 +336,16 @@ export const AIPolicyEditorPanel = memo(function ({
             <div className={cn('flex border-l grow w-full', assistantVisible && 'w-[40%]')}>
               <AIPolicyChat
                 messages={messages}
-                onSubmit={(message: string) => addPrompt(message)}
-                onDiff={onDiff}
+                onSubmit={(message) =>
+                  append({
+                    content: message,
+                    role: 'user',
+                    createdAt: new Date(),
+                  })
+                }
+                onDiff={setIncomingChange}
                 onChange={setIsAssistantChatInputEmpty}
-                loading={loading || data?.status === 'loading'}
+                loading={isLoading || isDebugSqlLoading}
               />
             </div>
           )}

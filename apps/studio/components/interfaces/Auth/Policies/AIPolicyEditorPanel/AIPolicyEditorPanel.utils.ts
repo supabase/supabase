@@ -1,36 +1,24 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
+import { Message } from 'ai/react'
 import { uuidv4 } from 'lib/helpers'
-import { ThreadMessage } from 'openai/resources/beta/threads/messages/messages'
+
+export type MessageWithDebug = Message & { isDebug: boolean }
 
 export const generateThreadMessage = ({
   id,
-  threadId,
-  runId,
   content,
-  metadata = {},
+  isDebug,
 }: {
   id?: string
-  threadId?: string
-  runId?: string
   content: string
-  metadata?: any
+  isDebug: boolean
 }) => {
-  const message: ThreadMessage = {
+  const message: MessageWithDebug = {
     id: id ?? uuidv4(),
-    object: 'thread.message',
     role: 'assistant',
-    file_ids: [],
-    metadata,
-    content: [
-      {
-        type: 'text',
-        text: { value: content, annotations: [] },
-      },
-    ],
-    created_at: Math.floor(Number(new Date()) / 1000),
-    assistant_id: null,
-    thread_id: threadId ?? '',
-    run_id: runId ?? '',
+    content,
+    createdAt: new Date(),
+    isDebug: isDebug,
   }
   return message
 }
@@ -73,4 +61,15 @@ RENAME TO "*New Policy Name*";\n
 COMMIT;
 `.trim()
   }
+}
+
+export const generatePolicyDefinition = (policy: PostgresPolicy) => {
+  return `
+CREATE POLICY "${policy.name}" on "${policy.schema}"."${policy.table}"
+AS ${policy.action} FOR ${policy.command}
+TO ${policy.roles.join(', ')}
+${policy.definition ? `USING (${policy.definition})` : ''}
+${policy.check ? `WITH CHECK (${policy.check})` : ''}
+;
+`.trim()
 }

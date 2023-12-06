@@ -1,18 +1,15 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import { useCallback } from 'react'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { get } from 'data/fetchers'
 import { invoicesKeys } from './keys'
 import { ResponseError } from 'types'
-
-// [Joshen] This can eventually superseded and overwrite invoice-upcoming-query once we completely move to org billing
+import { PricingMetric } from 'data/analytics/org-daily-stats-query'
 
 export type UpcomingInvoiceVariables = {
   orgSlug?: string
 }
 
 export type UpcomingInvoiceResponse = {
-  amount_total: number
+  amount_projected: number
   currency: string
   customer_balance: number
   subscription_id: string
@@ -21,10 +18,19 @@ export type UpcomingInvoiceResponse = {
   lines: {
     amount: number
     description: string
+    proration: boolean
     period: { start: string; end: string }
-    quantity: number
+    quantity?: number
     unit_price: number
+    unit_price_desc: string
     usage_based: boolean
+    usage_metric?: PricingMetric
+    usage_original?: number
+    breakdown: {
+      project_ref: string
+      project_name: string
+      usage: number
+    }[]
   }[]
 }
 
@@ -34,11 +40,16 @@ export async function getUpcomingInvoice(
 ) {
   if (!orgSlug) throw new Error('orgSlug is required')
 
-  const response = await get(`${API_URL}/organizations/${orgSlug}/billing/invoices/upcoming`, {
+  const { data, error } = await get(`/platform/organizations/{slug}/billing/invoices/upcoming`, {
+    params: { path: { slug: orgSlug } },
+    headers: {
+      Version: '2',
+    },
     signal,
   })
-  if (response.error) throw response.error
-  return response as UpcomingInvoiceResponse
+
+  if (error) throw error
+  return data as unknown as UpcomingInvoiceResponse
 }
 
 export type UpcomingInvoiceData = Awaited<ReturnType<typeof getUpcomingInvoice>>
@@ -59,15 +70,3 @@ export const useOrgUpcomingInvoiceQuery = <TData = UpcomingInvoiceData>(
       ...options,
     }
   )
-
-export const useOrgUpcomingInvoicePrefetch = ({ orgSlug }: UpcomingInvoiceVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (orgSlug) {
-      client.prefetchQuery(invoicesKeys.orgUpcomingPreview(orgSlug), ({ signal }) =>
-        getUpcomingInvoice({ orgSlug }, signal)
-      )
-    }
-  }, [client, orgSlug])
-}

@@ -214,7 +214,7 @@ val metadata = user?.userMetadata
 If you want to add a row to your `public.profiles` table every time a user signs up, you can use triggers.
 If the trigger fails however, it could block the user sign ups - so make sure that the code is well-tested.
 
-For example:
+Example:
 
 ```sql
 -- inserts a row into public.profiles
@@ -224,8 +224,8 @@ language plpgsql
 security definer set search_path = public
 as $$
 begin
-  insert into public.profiles (id)
-  values (new.id);
+  insert into public.profiles (id, first_name, age)
+  values (new.id, new.raw_user_meta_data ->> 'first_name', new.raw_user_meta_data['age']::integer);
   return new;
 end;
 $$;

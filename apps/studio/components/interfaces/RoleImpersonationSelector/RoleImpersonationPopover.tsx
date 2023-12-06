@@ -9,7 +9,7 @@ import RoleImpersonationSelector from './RoleImpersonationSelector'
 
 export interface RoleImpersonationPopoverProps {
   serviceRoleLabel?: string
-  variant?: 'regular' | 'connected-on-right'
+  variant?: 'regular' | 'connected-on-right' | 'connected-on-left' | 'connected-on-both'
   align?: 'center' | 'start' | 'end'
 }
 
@@ -32,7 +32,9 @@ const RoleImpersonationPopover = ({
           type="default"
           className={cn(
             'h-[26px] pr-3 gap-0',
-            variant === 'connected-on-right' && 'rounded-r-none border-r-0'
+            variant === 'connected-on-right' && 'rounded-r-none border-r-0',
+            variant === 'connected-on-left' && 'rounded-l-none border-l-0',
+            variant === 'connected-on-both' && 'rounded-none border-x-0'
           )}
         >
           <div className="flex items-center gap-1">
