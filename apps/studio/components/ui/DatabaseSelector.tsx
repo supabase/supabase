@@ -18,7 +18,7 @@ import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { formatDatabaseID, formatDatabaseRegion } from 'data/read-replicas/replicas.utils'
 
 interface DatabaseSelectorProps {
-  selectedDatabaseId: string
+  selectedDatabaseId?: string
   onChangeDatabaseId: (id: string) => void
 }
 
@@ -29,7 +29,7 @@ const DatabaseSelector = ({ selectedDatabaseId, onChangeDatabaseId }: DatabaseSe
   const databases = data ?? []
   const selectedDatabase = databases.find((db) => db.identifier === selectedDatabaseId)
   const selectedDatabaseRegion = formatDatabaseRegion(selectedDatabase?.region ?? '')
-  const formattedDatabaseId = formatDatabaseID(selectedDatabaseId)
+  const formattedDatabaseId = formatDatabaseID(selectedDatabaseId ?? '')
 
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
