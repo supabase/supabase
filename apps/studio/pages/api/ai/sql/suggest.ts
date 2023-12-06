@@ -66,7 +66,6 @@ async function handlePost(request: NextRequest) {
         - The policy name should be short text explaining the policy, enclosed in double quotes.
         - Always make sure that every \`\`\` has a corresponding ending tag \`\`\`.
         - Always put explanations as separate text. Don't use inline SQL comments. 
-        - You should generate only one policy per message.
         
         The output should look like this: 
         "CREATE POLICY user_policy ON users FOR INSERT USING (user_name = current_user) WITH (true);" 
