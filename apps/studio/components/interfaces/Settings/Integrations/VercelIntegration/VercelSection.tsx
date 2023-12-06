@@ -197,7 +197,12 @@ You can change the scope of the access for Supabase by configuring
             </div>
           ) : (
             <div>
-              <Button asChild type="default" disabled={isBranch} iconRight={<IconExternalLink />}>
+              <Button
+                asChild={!isBranch}
+                type="default"
+                disabled={isBranch}
+                iconRight={<IconExternalLink />}
+              >
                 {isBranch ? (
                   <p>Install Vercel Integration</p>
                 ) : (
