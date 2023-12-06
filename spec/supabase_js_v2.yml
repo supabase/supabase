@@ -26,7 +26,7 @@ functions:
 
     examples:
       - id: create-client
-        name: createClient()
+        name: Creating a client
         code: |
           ```js
           import { createClient } from '@supabase/supabase-js'
@@ -34,7 +34,7 @@ functions:
           // Create a single supabase client for interacting with your database
           const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
           ```
-      - id: create-client
+      - id: with-custom-domain
         name: With a custom domain
         code: |
           ```js
@@ -65,13 +65,13 @@ functions:
           const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key", options)
           ```
       - id: api-schemas
-        name: API schemas
+        name: With custom schemas
         code: |
           ```js
           import { createClient } from '@supabase/supabase-js'
 
-          // Provide a custom schema. Defaults to "public".
           const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
+            // Provide a custom schema. Defaults to "public".
             db: { schema: 'other_schema' }
           })
           ```
@@ -81,7 +81,7 @@ functions:
 
           Note: each client connection can only access a single schema, so the code above can access the `other_schema` schema but cannot access the `public` schema.
       - id: custom-fetch-implementation
-        name: Custom `fetch` implementation
+        name: Custom fetch implementation
         code: |
           ```js
           import { createClient } from '@supabase/supabase-js'
@@ -1777,6 +1777,44 @@ functions:
         description: |
           If you don't want to return the referenced table contents, you can leave the parenthesis empty.
           Like `.select('name, countries!inner()')`.
+        hideCodeBlock: true
+      - id: switching-schemas-per-query
+        name: Switching schemas per query
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .schema('myschema')
+            .from('mytable')
+            .select()
+          ```
+        data:
+          sql: |
+            ```sql
+            create schema myschema;
+
+            create table myschema.mytable (
+              id uuid primary key default gen_random_uuid(),
+              data text
+            );
+
+            insert into myschema.mytable (data) values ('mydata');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": "4162e008-27b0-4c0f-82dc-ccaeee9a624d",
+                "data": "mydata"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          In addition to setting the schema during initialization, you can also switch schemas on a per-query basis.
+          Make sure you've set up your [database privileges and API settings](/docs/guides/api/using-custom-schemas).
         hideCodeBlock: true
 
   - id: insert

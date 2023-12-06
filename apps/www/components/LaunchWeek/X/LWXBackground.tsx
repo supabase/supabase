@@ -6,9 +6,10 @@ import { useBreakpoint } from 'common'
 
 interface Props {
   className?: string
+  isGameMode?: boolean
 }
 
-const LWXBackground = ({ className }: Props) => {
+const LWXBackground = ({ className, isGameMode = false }: Props) => {
   const { ticketState } = useConfData()
   const containerRef = useRef(null)
   const isMobile = useBreakpoint()
@@ -20,7 +21,7 @@ const LWXBackground = ({ className }: Props) => {
 
   const handleGlow = (event: any) => {
     if (isMobile) return setGradientPos({ x: 70, y: 40 })
-    if (!ref.current || !containerRef.current || hasTicket) return null
+    if (!ref.current || !containerRef.current || hasTicket || isGameMode) return null
 
     const containerRefElement = containerRef.current as HTMLDivElement
 
@@ -74,7 +75,8 @@ const LWXBackground = ({ className }: Props) => {
           md:w-[247px] md:h-[247px] md:translate-y-3 md:mt-auto
           xl:w-[285px] xl:h-[285px] xl:translate-y-2
           2xl:w-[342px] 2xl:h-[342px] 2xl:translate-y-px
-          `
+          `,
+          isGameMode && 'hidden'
         )}
         viewBox="0 0 186 185"
         fill="none"
@@ -157,7 +159,10 @@ const LWXBackground = ({ className }: Props) => {
       <Image
         src="/images/launchweek/lwx/lwx_bg.svg"
         alt=""
-        className="absolute w-full !h-[400px] md:!h-full inset-0 mt-10 object-cover object-center overflow-visible"
+        className={cn(
+          'absolute w-full !h-[400px] md:!h-full inset-0 mt-10 object-cover object-center overflow-visible',
+          isGameMode && 'opacity-30'
+        )}
         role="presentation"
         fill
         priority

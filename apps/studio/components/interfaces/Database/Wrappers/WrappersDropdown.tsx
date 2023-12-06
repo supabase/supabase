@@ -30,7 +30,7 @@ const WrapperDropdown = ({ buttonText = 'Add wrapper', align = 'end' }: WrapperD
   if (!canManageWrappers) {
     return (
       <Tooltip.Root delayDuration={0}>
-        <Tooltip.Trigger>
+        <Tooltip.Trigger asChild>
           <Button disabled type="primary" icon={<IconPlus strokeWidth={1.5} />}>
             {buttonText}
           </Button>
@@ -56,7 +56,7 @@ const WrapperDropdown = ({ buttonText = 'Add wrapper', align = 'end' }: WrapperD
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
+      <DropdownMenuTrigger asChild>
         <Button type="primary" icon={<IconPlus strokeWidth={1.5} />}>
           {buttonText}
         </Button>

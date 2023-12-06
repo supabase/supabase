@@ -1,3 +1,5 @@
+'use client'
+
 import { getAppStateSnapshot, useAppStateSnapshot } from '@/lib/state'
 import Image from 'next/image'
 import {

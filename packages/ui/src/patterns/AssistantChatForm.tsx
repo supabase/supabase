@@ -2,16 +2,19 @@ import { Loader2 } from 'lucide-react'
 import React, { ChangeEvent, createRef, useEffect } from 'react'
 import { TextArea } from '../components/shadcn/ui/text-area'
 import { cn } from '../lib/utils'
+import { useFormStatus } from 'react-dom'
 
 export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
-  loading: boolean
+  loading?: boolean
   disabled?: boolean
   value?: string
   onValueChange: (value: ChangeEvent<HTMLTextAreaElement>) => void
+  message?: string
+  children?: React.ReactNode
 }
 
 const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
-  ({ loading, disabled, value, onValueChange, ...props }, ref) => {
+  ({ loading, disabled, value, onValueChange, message, ...props }, ref) => {
     const textAreaRef = createRef<HTMLTextAreaElement>()
     const submitRef = createRef<HTMLButtonElement>()
 
@@ -40,38 +43,25 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
       }
     }
 
-    return (
-      <form ref={ref} className="relative" {...props}>
-        <div className={cn('absolute', 'top-2 left-2', 'ml-1 w-6 h-6 rounded-full bg-dbnew')}></div>
-        <TextArea
-          ref={textAreaRef}
-          autoFocus
-          rows={1}
-          disabled={disabled}
-          contentEditable
-          aria-expanded={false}
-          className={
-            'transition-all text-sm pl-12 pr-10 rounded-[18px] resize-none box-border leading-6'
-          }
-          placeholder={props.placeholder}
-          spellCheck={false}
-          value={value}
-          onChange={(event: ChangeEvent<HTMLTextAreaElement>) => onValueChange(event)}
-          onKeyDown={handleKeyDown}
-        />
+    const SubmitButton = () => {
+      const { pending } = useFormStatus()
+
+      return (
         <div className="absolute right-1.5 top-1.5 flex gap-3 items-center">
-          {loading && (
+          {loading || pending ? (
             <Loader2 size={22} className="animate-spin w-7 h-7 text-muted" strokeWidth={1} />
-          )}
+          ) : null}
 
           <button
+            title="Send AI prompt"
             ref={submitRef}
             type="submit"
+            disabled={pending}
             className={cn(
               'transition-all',
               'flex items-center justify-center w-7 h-7 border border-control rounded-full mr-0.5 p-1.5 background-alternative',
               !value ? 'text-muted opacity-50' : 'text-default opacity-100',
-              loading && 'hidden'
+              loading || pending ? 'hidden' : ''
             )}
           >
             <svg
@@ -90,6 +80,34 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
             </svg>
           </button>
         </div>
+      )
+    }
+
+    return (
+      <form ref={ref} className="relative" {...props}>
+        <div className={cn('absolute', 'top-2 left-2', 'ml-1 w-6 h-6 rounded-full bg-dbnew')}></div>
+        <TextArea
+          name="value"
+          ref={textAreaRef}
+          autoFocus
+          rows={1}
+          disabled={disabled || submitRef.current?.disabled}
+          contentEditable
+          required
+          className={
+            'transition-all text-sm pl-12 pr-10 rounded-[18px] resize-none box-border leading-6'
+          }
+          placeholder={props.placeholder}
+          spellCheck={false}
+          value={value}
+          onChange={(event: ChangeEvent<HTMLTextAreaElement>) => onValueChange(event)}
+          onKeyDown={handleKeyDown}
+        />
+        {props.children}
+        <SubmitButton />
+        <p aria-live="polite" className="sr-only" role="status">
+          {message}
+        </p>
       </form>
     )
   }

@@ -5,7 +5,7 @@ import { Badge, IconExternalLink } from 'ui'
 import { CategoryAttribute } from './Usage.constants'
 
 export interface SectionContent {
-  section: CategoryAttribute
+  section: Pick<CategoryAttribute, 'name' | 'description' | 'links'>
   includedInPlan?: boolean
 }
 
@@ -36,7 +36,7 @@ const SectionContent = ({
                     ))}
                   </div>
                 </div>
-                {links && links.length && (
+                {links && links.length > 0 && (
                   <div className="space-y-2">
                     <p className="text-sm text-foreground mb-2">More information</p>
                     {links.map((link) => (
