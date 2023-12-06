@@ -38,7 +38,7 @@ export const SupabaseGrid = (props: SupabaseGridProps) => {
   )
 }
 
-const SupabaseGridLayout = function SupabaseGridLayout(props: SupabaseGridProps) {
+const SupabaseGridLayout = (props: SupabaseGridProps) => {
   const {
     editable,
     storageRef,
