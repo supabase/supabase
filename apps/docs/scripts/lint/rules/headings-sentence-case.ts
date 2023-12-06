@@ -7,8 +7,9 @@ function headingsSentenceCaseCheck(node: Content, file: string) {
     return []
   }
 
-  const textNode = node.children.find((child) => child.type === 'text') as Text
-  if (!textNode) {
+  const textNode = node.children[0]
+  // need to account for `inlineCode` children, in initial, middle, and final positions
+  if (textNode?.type !== 'text') {
     return []
   }
   const text = textNode.value
