@@ -22,6 +22,8 @@ Fly Postgres databases are deployed on the Fly.io edge network. Fly Postgres is 
 4. Once the provisioning is complete, the database connection string is displayed. Add this as an environment variable to connect to the database from your Fly applications.
 5. Access the Supabase dashboard by running `flyctl extensions supabase dashboard <app-name>`
 
+The full list of CLI commands for Fly Postgres are documented in the [Fly docs](https://fly.io/docs/flyctl/extensions-supabase/).
+
 ## Connecting to your database
 
 If your network supports IPv6, connect directly to your Fly Postgres database, as its domain name resolves to an IPv6 address which can be directly used from within your Fly applications.
@@ -55,6 +57,8 @@ Upon launching a Fly Postgres database, the initiating user is granted the owner
 Each Fly user is entitled to one free Fly Postgres database. To create additional databases, upgrade your Supabase organization to a paid plan.
 
 Fly Postgres databases are priced exactly the same as projects launched via Supabase. For detailed pricing information, visit the [Supabase pricing page](https://supabase.com/pricing).
+
+The [usage page](https://supabase.com/dashboard/org/_/usage) details the usage of your Fly Postgres databases. The usage information is sent to Fly and the billing is added to your Fly invoice.
 
 ## Limitations
 
