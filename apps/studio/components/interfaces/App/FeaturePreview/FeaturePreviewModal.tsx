@@ -30,7 +30,7 @@ const FeaturePreviewModal = () => {
             key: LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT,
             name: 'AI Assistant for RLS policies',
             content: <RLSAIAssistantPreview />,
-            discussionsUrl: '/', // Need to update
+            discussionsUrl: undefined,
           },
         ]
       : []),
@@ -82,7 +82,7 @@ const FeaturePreviewModal = () => {
                     onClick={() => setSelectedFeatureKey(feature.key)}
                     className={cn(
                       'flex items-center space-x-3 p-4 border-b cursor-pointer bg transition',
-                      selectedFeatureKey === feature.key ? 'bg-surface-200' : ''
+                      selectedFeatureKey === feature.key ? 'bg-surface-300' : 'bg-surface-100'
                     )}
                   >
                     {isEnabled ? (
