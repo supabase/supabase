@@ -208,28 +208,29 @@ const TableEditorMenu = () => {
 
             <div className="flex gap-3 items-center">
               <DropdownMenu>
-                <DropdownMenuTrigger>
-                  <Tooltip.Root delayDuration={0}>
+                <Tooltip.Root delayDuration={0}>
+                  <DropdownMenuTrigger asChild>
                     <Tooltip.Trigger>
                       <div className="text-foreground-lighter transition-colors hover:text-foreground">
                         <IconChevronsDown size={18} strokeWidth={1} />
                       </div>
                     </Tooltip.Trigger>
-                    <Tooltip.Portal>
-                      <Tooltip.Content side="bottom">
-                        <Tooltip.Arrow className="radix-tooltip-arrow" />
-                        <div
-                          className={[
-                            'rounded bg-alternative py-1 px-2 leading-none shadow',
-                            'border border-background',
-                          ].join(' ')}
-                        >
-                          <span className="text-xs">Sort By</span>
-                        </div>
-                      </Tooltip.Content>
-                    </Tooltip.Portal>
-                  </Tooltip.Root>
-                </DropdownMenuTrigger>
+                  </DropdownMenuTrigger>
+                  <Tooltip.Portal>
+                    <Tooltip.Content side="bottom">
+                      <Tooltip.Arrow className="radix-tooltip-arrow" />
+                      <div
+                        className={[
+                          'rounded bg-alternative py-1 px-2 leading-none shadow',
+                          'border border-background',
+                        ].join(' ')}
+                      >
+                        <span className="text-xs">Sort By</span>
+                      </div>
+                    </Tooltip.Content>
+                  </Tooltip.Portal>
+                </Tooltip.Root>
+
                 <DropdownMenuContent side="bottom" align="start" className="w-48">
                   <DropdownMenuRadioGroup
                     value={sort}
