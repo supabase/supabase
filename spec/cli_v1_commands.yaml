@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.115.4
+  version: 1.115.5
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -979,7 +979,6 @@ commands:
         name: --db-password <string>
         description: Database password of the project.
         default_value: ''
-        required: true
       - id: interactive
         name: -i, --interactive
         description: Enables interactive mode.
