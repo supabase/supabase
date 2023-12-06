@@ -1,8 +1,7 @@
 import { Loader2 } from 'lucide-react'
 import React, { ChangeEvent, createRef, useEffect } from 'react'
-import { TextArea } from '../components/shadcn/ui/text-area'
-import { cn } from '../lib/utils'
 import { useFormStatus } from 'react-dom'
+import { TextArea_Shadcn_, cn } from 'ui'
 
 export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
   loading?: boolean
@@ -86,7 +85,7 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
     return (
       <form ref={ref} className="relative" {...props}>
         <div className={cn('absolute', 'top-2 left-2', 'ml-1 w-6 h-6 rounded-full bg-dbnew')}></div>
-        <TextArea
+        <TextArea_Shadcn_
           name="value"
           ref={textAreaRef}
           autoFocus
