@@ -68,16 +68,17 @@ const UtilityActions = ({
       </Tooltip.Root>
 
       <div className="flex items-center justify-between gap-x-2 mx-2">
-        {readReplicasEnabled && (
-          <DatabaseSelector
-            selectedDatabaseId={snap.selectedDatabaseId}
-            onChangeDatabaseId={snap.setSelectedDatabaseId}
-          />
-        )}
-
         <div className="flex items-center">
+          {readReplicasEnabled && (
+            <DatabaseSelector
+              variant="connected-on-right"
+              selectedDatabaseId={snap.selectedDatabaseId}
+              onChangeDatabaseId={snap.setSelectedDatabaseId}
+            />
+          )}
+
           {roleImpersonationEnabledFlag && (
-            <RoleImpersonationPopover serviceRoleLabel="postgres" variant="connected-on-right" />
+            <RoleImpersonationPopover serviceRoleLabel="postgres" variant="connected-on-both" />
           )}
 
           <Button

@@ -12,6 +12,7 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   ScrollArea,
+  cn,
 } from 'ui'
 
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
@@ -19,10 +20,15 @@ import { formatDatabaseID, formatDatabaseRegion } from 'data/read-replicas/repli
 
 interface DatabaseSelectorProps {
   selectedDatabaseId?: string
+  variant?: 'regular' | 'connected-on-right' | 'connected-on-left' | 'connected-on-both'
   onChangeDatabaseId: (id: string) => void
 }
 
-const DatabaseSelector = ({ selectedDatabaseId, onChangeDatabaseId }: DatabaseSelectorProps) => {
+const DatabaseSelector = ({
+  selectedDatabaseId,
+  variant = 'regular',
+  onChangeDatabaseId,
+}: DatabaseSelectorProps) => {
   const { ref: projectRef } = useParams()
   const [open, setOpen] = useState(false)
   const { data } = useReadReplicasQuery({ projectRef })
@@ -37,7 +43,12 @@ const DatabaseSelector = ({ selectedDatabaseId, onChangeDatabaseId }: DatabaseSe
         <div className="flex items-center space-x-2 cursor-pointer">
           <Button
             type="default"
-            className="pr-2"
+            className={cn(
+              'pr-2',
+              variant === 'connected-on-right' && 'rounded-r-none',
+              variant === 'connected-on-left' && 'rounded-l-none border-l-0',
+              variant === 'connected-on-both' && 'rounded-none border-x-0'
+            )}
             iconRight={
               <IconChevronDown className="text-foreground-light" strokeWidth={2} size={12} />
             }
