@@ -98,11 +98,17 @@ export abstract class ReferenceSource<SpecSection> extends BaseSource {
     return {
       checksum,
       sections,
-      meta: { ...this.meta, subtitle: this.meta.title, title: this.refSection.title },
+      meta: {
+        ...this.meta,
+        subtitle: this.extractSubtitle(),
+        title: this.extractTitle(),
+      },
     }
   }
 
   abstract formatSection(specSection: SpecSection, refSection: ICommonItem): string
+  abstract extractTitle(): string
+  abstract extractSubtitle(): string
 }
 
 export class OpenApiReferenceLoader extends ReferenceLoader<enrichedOperation> {
@@ -143,9 +149,19 @@ export class OpenApiReferenceSource extends ReferenceSource<enrichedOperation> {
     })
   }
 
+  extractSubtitle() {
+    return typeof this.specSection.description === 'string' ? this.specSection.description : ''
+  }
+
+  extractTitle() {
+    return `${this.meta.title}: ${this.specSection.operation}`
+  }
+
   extractIndexedContent(): string {
     const { summary, description, operation, tags } = this.specSection
-    return `${summary}\n\n${description}\n\n${operation}\n\n${tags.join(', ')}`
+    return `${this.meta.title}\n\n${summary}\n\n${description}\n\n${operation}\n\n${tags.join(
+      ', '
+    )}`
   }
 }
 
@@ -183,9 +199,17 @@ export class ClientLibReferenceSource extends ReferenceSource<IFunctionDefinitio
     })
   }
 
+  extractTitle(): string {
+    return this.specSection.title
+  }
+
+  extractSubtitle(): string {
+    return `${this.meta.title}: ${this.refSection.title}`
+  }
+
   extractIndexedContent(): string {
     const { title, description } = this.specSection
-    return `${title}\n\n${description}`
+    return `${this.meta.title}\n\n${title}\n\n${description}`
   }
 }
 
@@ -221,8 +245,16 @@ export class CliReferenceSource extends ReferenceSource<CliCommand> {
     })
   }
 
+  extractSubtitle(): string {
+    return `${this.meta.title}: ${this.specSection.title}`
+  }
+
+  extractTitle(): string {
+    return this.specSection.summary
+  }
+
   extractIndexedContent(): string {
     const { summary, description, usage } = this.specSection
-    return `${summary}\n\n${description}\n\n${usage}`
+    return `${this.meta.title}\n\n${summary}\n\n${description}\n\n${usage}`
   }
 }

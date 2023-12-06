@@ -1,6 +1,5 @@
 import { useRouter } from 'next/router'
 import * as React from 'react'
-import { ElementRef, useRef } from 'react'
 import { IconHome } from '../Icon/icons/IconHome'
 
 import { IconArrowRight } from './../Icon/icons/IconArrowRight'
@@ -85,6 +84,9 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
     setSearch(newValue)
   }
 
+  const commandListMaxHeight =
+    currentPage === COMMAND_ROUTES.DOCS_SEARCH ? 'min(600px, 50vh)' : '300px'
+
   return (
     <>
       <CommandDialog
@@ -109,7 +111,13 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
             onValueChange={handleInputChange}
           />
         )}
-        <CommandList className={['my-2', showCommandInput && 'max-h-[300px]'].join(' ')}>
+        <CommandList
+          style={{
+            maxHeight: commandListMaxHeight,
+            height: currentPage === COMMAND_ROUTES.DOCS_SEARCH ? commandListMaxHeight : 'auto',
+          }}
+          className="my-2"
+        >
           {!currentPage && (
             <>
               <CommandGroup heading="Documentation">

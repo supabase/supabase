@@ -56,16 +56,6 @@ function removeDoubleQuotes(inputString: string): string {
   return inputString.replace(/"/g, '')
 }
 
-const getDocsUrl = () => {
-  if (!process.env.NEXT_PUBLIC_SITE_URL || !process.env.NEXT_PUBLIC_LOCAL_SUPABASE) {
-    return 'https://supabase.com/docs'
-  }
-
-  const isLocal =
-    process.env.NEXT_PUBLIC_SITE_URL.includes('localhost') || process.env.NEXT_PUBLIC_LOCAL_SUPABASE
-  return isLocal ? 'http://localhost:3001/docs' : 'https://supabase.com/docs'
-}
-
 type SearchState =
   | {
       status: 'initial'
@@ -178,7 +168,12 @@ function reducer(state: SearchState, action: Action): SearchState {
           : {
               status: 'loading',
               key: action.key,
-              staleResults: [],
+              staleResults:
+                'results' in state
+                  ? state.results
+                  : 'staleResults' in state
+                  ? state.staleResults
+                  : [],
             }
       }
       return allSourcesLoaded
@@ -196,7 +191,8 @@ function reducer(state: SearchState, action: Action): SearchState {
       return {
         status: 'loading',
         key: action.key,
-        staleResults: 'results' in state ? state.results : [],
+        staleResults:
+          'results' in state ? state.results : 'staleResults' in state ? state.staleResults : [],
       }
     case 'reset':
       return {
@@ -221,7 +217,7 @@ function reducer(state: SearchState, action: Action): SearchState {
 const DocsSearch = () => {
   const [state, dispatch] = useReducer(reducer, { status: 'initial', key: 0 })
   const supabaseClient = useSupabaseClient()
-  const { isLoading, setIsLoading, search, setSearch, inputRef } = useCommandMenu()
+  const { isLoading, search, setSearch, inputRef } = useCommandMenu()
   const key = useRef(0)
   const initialLoad = useRef(true)
   const router = useRouter()
@@ -245,8 +241,6 @@ const DocsSearch = () => {
 
   const handleSearch = useCallback(
     async (query: string) => {
-      setIsLoading(true)
-
       key.current += 1
       const localKey = key.current
       dispatch({ type: 'newSearchDispatched', key: localKey })
@@ -281,11 +275,6 @@ const DocsSearch = () => {
               message: error.message ?? '',
             })
           })
-          .finally(() => {
-            if (sourcesLoaded === NUMBER_SOURCES) {
-              setIsLoading(false)
-            }
-          })
       })
     },
     [supabaseClient]
@@ -301,7 +290,7 @@ const DocsSearch = () => {
     })
   }
 
-  const debouncedSearch = useMemo(() => debounce(handleSearch, 300), [handleSearch])
+  const debouncedSearch = useMemo(() => debounce(handleSearch, 150), [handleSearch])
 
   useEffect(() => {
     if (initialLoad.current) {
@@ -387,13 +376,13 @@ const DocsSearch = () => {
           return (
             <CommandGroup
               heading=""
-              key={`${page.title}-group-index-${i}`}
+              key={`${page.path}-group`}
               // Adding the search term here is a hack to prevent the cmdk menu
               // filter from filtering out search results
               value={`${search}-${page.title}-group-index-${i}`}
             >
               <CommandItem
-                key={`${page.title}-item-index-${i}`}
+                key={`${page.path}-item`}
                 value={`${search}-${removeDoubleQuotes(page.title)}-item-index-${i}`}
                 type="block-link"
                 onSelect={() => {
@@ -427,7 +416,7 @@ const DocsSearch = () => {
                       onSelect={() => {
                         openLink(page.type, formatSectionUrl(page, section))
                       }}
-                      key={`${page.title}__${section.heading}-item-index-${i}`}
+                      key={`${page.path}__${section.heading}-item`}
                       value={`${search}-${removeDoubleQuotes(page.title)}__${removeDoubleQuotes(
                         section.heading ?? ''
                       )}-item-index-${i}`}
@@ -464,7 +453,7 @@ const DocsSearch = () => {
             const key = question.replace(/\s+/g, '_')
             return (
               <CommandItem
-                disabled={isLoading}
+                disabled={hasResults}
                 onSelect={() => {
                   if (!search) {
                     handleSearch(question)
