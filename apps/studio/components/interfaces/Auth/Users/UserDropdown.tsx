@@ -125,15 +125,9 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
   return (
     <>
       <DropdownMenu>
-        <DropdownMenuTrigger>
-          <Button
-            asChild
-            type="text"
-            icon={<IconMoreHorizontal />}
-            loading={isLoading}
-            className="hover:border-gray-500 flex"
-          >
-            <span />
+        <DropdownMenuTrigger asChild>
+          <Button type="text" loading={isLoading} className="hover:border-gray-500 flex">
+            <IconMoreHorizontal />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>

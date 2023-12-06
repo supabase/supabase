@@ -95,32 +95,31 @@ const InputWithSuggestions = ({
         actions={
           showSuggestions && (
             <DropdownMenu>
-              <DropdownMenuTrigger>
-                <Tooltip.Root delayDuration={0}>
+              <Tooltip.Root delayDuration={0}>
+                <DropdownMenuTrigger asChild>
                   <Tooltip.Trigger asChild>
-                    <Button
-                      type="default"
-                      className="!px-1 mr-1"
-                      icon={<IconList strokeWidth={1.5} />}
-                    />
+                    <Button type="default" className="!px-1 mr-1">
+                      <IconList strokeWidth={1.5} />
+                    </Button>
                   </Tooltip.Trigger>
-                  <Tooltip.Portal>
-                    <Tooltip.Content side="bottom">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'bg-alternative rounded py-1 px-2 leading-none shadow',
-                          'border-background border',
-                        ].join(' ')}
-                      >
-                        <span className="text-foreground text-xs">
-                          {suggestionsTooltip || 'Suggestions'}
-                        </span>
-                      </div>
-                    </Tooltip.Content>
-                  </Tooltip.Portal>
-                </Tooltip.Root>
-              </DropdownMenuTrigger>
+                </DropdownMenuTrigger>
+                <Tooltip.Portal>
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'bg-alternative rounded py-1 px-2 leading-none shadow',
+                        'border-background border',
+                      ].join(' ')}
+                    >
+                      <span className="text-foreground text-xs">
+                        {suggestionsTooltip || 'Suggestions'}
+                      </span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
+              </Tooltip.Root>
+
               <DropdownMenuContent align="end" side="bottom">
                 <DropdownMenuLabel>{suggestionsHeader || 'Suggestions'}</DropdownMenuLabel>
                 <DropdownMenuSeparator />

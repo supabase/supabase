@@ -8,10 +8,11 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconPlus,
 } from 'ui'
+import Link from 'next/link'
+import { IS_PLATFORM } from 'common'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 
 const OrganizationDropdown = ({
   organizations = EMPTY_ARR,
@@ -21,36 +22,38 @@ const OrganizationDropdown = ({
   const router = useRouter()
 
   const organizationCreationEnabled = useIsFeatureEnabled('organizations:create')
+  const { isSuccess: orgsLoaded } = useOrganizationsQuery()
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger>
-        <Button asChild>
-          <span>New project</span>
+    <div className="flex gap-4">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button type="primary">
+            <span>New project</span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent side="bottom" align="center">
+          <>
+            <DropdownMenuLabel>Choose organization</DropdownMenuLabel>
+            {organizations
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .map((x) => (
+                <DropdownMenuItem key={x.slug} onClick={() => router.push(`/new/${x.slug}`)}>
+                  {x.name}
+                </DropdownMenuItem>
+              ))}
+          </>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {IS_PLATFORM && organizationCreationEnabled && orgsLoaded && organizations.length !== 0 && (
+        <Button type="default" asChild>
+          <Link href="/new" className="flex items-center gap-2 w-full">
+            New organization
+          </Link>
         </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent side="bottom" align="center">
-        <>
-          <DropdownMenuLabel>Choose organization</DropdownMenuLabel>
-          {organizations
-            .sort((a, b) => a.name.localeCompare(b.name))
-            .map((x) => (
-              <DropdownMenuItem key={x.slug} onClick={() => router.push(`/new/${x.slug}`)}>
-                {x.name}
-              </DropdownMenuItem>
-            ))}
-          {organizationCreationEnabled && (
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="space-x-2" onClick={() => router.push(`/new`)}>
-                <IconPlus size="tiny" />
-                <p>New organization</p>
-              </DropdownMenuItem>
-            </>
-          )}
-        </>
-      </DropdownMenuContent>
-    </DropdownMenu>
+      )}
+    </div>
   )
 }
 export default OrganizationDropdown

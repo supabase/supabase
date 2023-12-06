@@ -6,9 +6,10 @@ import { createClient } from '@/lib/supabase/client'
 import { ExternalLink } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useFormState } from 'react-dom'
-import { AssistantChatForm, cn } from 'ui'
 import { createThread } from './actions'
 import { useRouter } from 'next/navigation'
+import { AssistantChatForm } from '@/components/AssistantChatForm'
+import { cn } from 'ui'
 
 const suggestions = CHAT_EXAMPLES
 
