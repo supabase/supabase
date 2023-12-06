@@ -27,8 +27,8 @@ const OrganizationDropdown = ({
   return (
     <div className="flex gap-4">
       <DropdownMenu>
-        <DropdownMenuTrigger>
-          <Button asChild>
+        <DropdownMenuTrigger asChild>
+          <Button type="primary">
             <span>New project</span>
           </Button>
         </DropdownMenuTrigger>
@@ -46,7 +46,7 @@ const OrganizationDropdown = ({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {IS_PLATFORM && organizationCreationEnabled && orgsLoaded && organizations.length === 0 && (
+      {IS_PLATFORM && organizationCreationEnabled && orgsLoaded && organizations.length !== 0 && (
         <Button type="default" asChild>
           <Link href="/new" className="flex items-center gap-2 w-full">
             New organization

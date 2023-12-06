@@ -101,9 +101,9 @@ const FunctionList = ({
                 <div className="flex items-center justify-end">
                   {canUpdateFunctions ? (
                     <DropdownMenu>
-                      <DropdownMenuTrigger>
-                        <Button asChild type="default" icon={<IconMoreVertical />} className="px-1">
-                          <span></span>
+                      <DropdownMenuTrigger asChild>
+                        <Button type="default" className="px-1">
+                          <IconMoreVertical />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent side="left">
