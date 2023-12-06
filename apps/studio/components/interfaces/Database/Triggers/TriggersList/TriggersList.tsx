@@ -98,7 +98,7 @@ const TriggersList = ({
 
             {!isLocked && (
               <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger>
+                <Tooltip.Trigger asChild>
                   <Button disabled={!canCreateTriggers} onClick={() => createTrigger()}>
                     Create a new trigger
                   </Button>

@@ -281,6 +281,7 @@ const uiConfig = {
         'panel-slide-right-in': 'panelSlideRightIn 250ms cubic-bezier(0.87, 0, 0.13, 1)',
 
         'line-loading': 'lineLoading 1.8s infinite',
+        'line-loading-slower': 'lineLoading 2.3s infinite',
 
         // tailwind class for this is `animate-dropdownFadeIn`
         dropdownFadeIn: 'dropdownFadeIn 0.1s ease-out',

@@ -113,22 +113,17 @@ create table cities (
 We can get the nested `CountriesWithCities` type like this:
 
 ```ts
-import { PostgrestError } from '@supabase/supabase-js'
+import { QueryResult, QueryData, QueryError } from '@supabase/supabase-js'
 
-export type DbResult<T> = T extends PromiseLike<infer U> ? U : never
-export type DbResultOk<T> = T extends PromiseLike<{ data: infer U }> ? Exclude<U, null> : never
-export type DbResultErr = PostgrestError
-```
-
-```ts
-const countriesWithCitiesQuery = supabase.from('countries').select(
-  `
+const countriesWithCitiesQuery = supabase.from('countries').select(`
   id,
   name,
-  cities ( id, name )
-`
-)
-type CountriesWithCities = DbResultOk<typeof countriesWithCitiesQuery>
+  cities (
+    id,
+    name
+  )
+`)
+type CountriesWithCities = QueryData<typeof countriesWithCitiesQuery>
 
 const { data, error } = await countriesWithCitiesQuery
 if (error) throw error

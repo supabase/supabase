@@ -153,15 +153,9 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
     <>
       <div className="flex items-center justify-end">
         <DropdownMenu>
-          <DropdownMenuTrigger>
-            <Button
-              asChild
-              type="text"
-              disabled={isLoading}
-              loading={isLoading}
-              icon={<IconMoreHorizontal />}
-            >
-              <span></span>
+          <DropdownMenuTrigger asChild>
+            <Button type="text" disabled={isLoading} loading={isLoading}>
+              <IconMoreHorizontal />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom" align="end">
