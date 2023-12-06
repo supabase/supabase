@@ -47,7 +47,7 @@ Supabase Auth allows a user to initiate identity linking with a different email 
 const { data, error } = await supabase.auth.linkIdentity({ provider: 'google' })
 ```
 
-In the example above, the user will be redirected to Google to complete the OAuth2.0 flow. Once the OAuth2.0 flow has completed successfully, the user will be redirected back to the application and the google identity will be linked to the user. You can enable manual linking from your project's authentication [configuration options](/dashboard/project/_/settings/auth).
+In the example above, the user will be redirected to Google to complete the OAuth2.0 flow. Once the OAuth2.0 flow has completed successfully, the user will be redirected back to the application and the Google identity will be linked to the user. You can enable manual linking from your project's authentication [configuration options](/dashboard/project/_/settings/auth).
 
 ## Unlink an identity
 
