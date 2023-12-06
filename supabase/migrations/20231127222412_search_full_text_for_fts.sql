@@ -56,13 +56,13 @@ begin
 	  page.meta ->> 'subtitle' as subtitle,
 	  page.meta ->> 'description' as description
 	from page
-	where
-		title_tokens @@ websearch_to_tsquery(query)
-		or fts_tokens @@ websearch_to_tsquery(query)
+	where title_tokens @@ websearch_to_tsquery(query) or fts_tokens @@ websearch_to_tsquery(query)
 	order by greatest(
-		ts_rank(title_tokens, websearch_to_tsquery(query)),
+		-- Title is more important than body, so use 10 as the weighting factor
+		-- Cut off at max rank of 1
+		least(10 * ts_rank(title_tokens, websearch_to_tsquery(query)), 1),
 		ts_rank(fts_tokens, websearch_to_tsquery(query))
-	) desc
+	  ) desc
 	limit 10;
 end;
 $$;

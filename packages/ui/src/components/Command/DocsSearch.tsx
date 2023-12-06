@@ -169,7 +169,12 @@ function reducer(state: SearchState, action: Action): SearchState {
           : {
               status: 'loading',
               key: action.key,
-              staleResults: [],
+              staleResults:
+                'results' in state
+                  ? state.results
+                  : 'staleResults' in state
+                  ? state.staleResults
+                  : [],
             }
       }
       return allSourcesLoaded
@@ -187,7 +192,8 @@ function reducer(state: SearchState, action: Action): SearchState {
       return {
         status: 'loading',
         key: action.key,
-        staleResults: 'results' in state ? state.results : [],
+        staleResults:
+          'results' in state ? state.results : 'staleResults' in state ? state.staleResults : [],
       }
     case 'reset':
       return {
@@ -212,7 +218,7 @@ function reducer(state: SearchState, action: Action): SearchState {
 const DocsSearch = () => {
   const [state, dispatch] = useReducer(reducer, { status: 'initial', key: 0 })
   const supabaseClient = useSupabaseClient()
-  const { isLoading, setIsLoading, search, setSearch, inputRef } = useCommandMenu()
+  const { search, setSearch, inputRef } = useCommandMenu()
   const key = useRef(0)
   const initialLoad = useRef(true)
   const router = useRouter()
@@ -236,8 +242,6 @@ const DocsSearch = () => {
 
   const handleSearch = useCallback(
     async (query: string) => {
-      setIsLoading(true)
-
       key.current += 1
       const localKey = key.current
       dispatch({ type: 'newSearchDispatched', key: localKey })
@@ -272,11 +276,6 @@ const DocsSearch = () => {
               message: error.message ?? '',
             })
           })
-          .finally(() => {
-            if (sourcesLoaded === NUMBER_SOURCES) {
-              setIsLoading(false)
-            }
-          })
       })
     },
     [supabaseClient]
@@ -292,7 +291,7 @@ const DocsSearch = () => {
     })
   }
 
-  const debouncedSearch = useMemo(() => debounce(handleSearch, 300), [handleSearch])
+  const debouncedSearch = useMemo(() => debounce(handleSearch, 150), [handleSearch])
 
   useEffect(() => {
     if (initialLoad.current) {
@@ -378,11 +377,11 @@ const DocsSearch = () => {
           return (
             <CommandGroup
               heading=""
-              key={`${page.title}-group-index-${i}`}
+              key={`${page.path}-group`}
               value={`${FORCE_MOUNT_ITEM}--${page.title}-group-index-${i}`}
             >
               <CommandItem
-                key={`${page.title}-item-index-${i}`}
+                key={`${page.path}-item`}
                 value={`${FORCE_MOUNT_ITEM}--${page.title}-item-index-${i}`}
                 type="block-link"
                 onSelect={() => {
@@ -416,7 +415,7 @@ const DocsSearch = () => {
                       onSelect={() => {
                         openLink(page.type, formatSectionUrl(page, section))
                       }}
-                      key={`${page.title}__${section.heading}-item-index-${i}`}
+                      key={`${page.path}__${section.heading}-item`}
                       value={`${FORCE_MOUNT_ITEM}--${page.title}__${section.heading}-item-index-${i}`}
                       type="block-link"
                     >
@@ -451,7 +450,7 @@ const DocsSearch = () => {
             const key = question.replace(/\s+/g, '_')
             return (
               <CommandItem
-                disabled={isLoading}
+                disabled={hasResults}
                 onSelect={() => {
                   if (!search) {
                     handleSearch(question)
