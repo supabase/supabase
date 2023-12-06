@@ -41,7 +41,7 @@ const client = createClient(SUPABASE_URL, SUPABASE_KEY)
 ```kotlin
 val supabaseUrl = "https://<project>.supabase.co"
 val supabaseKey = "<your-anon-key>"
-val client = createSupabaseClient(supabaseUrl, supabaseKey) {
+val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
     install(Realtime)
 }
 ```
@@ -86,7 +86,7 @@ channelA
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-val channelA = clientA.realtime.createChannel("room-1")
+val channelA = clientA.channel("room-1")
 
 //Listen for broadcast messages
 val broadcastFlow: Flow<JsonObject> = channelA.broadcastFlow<JsonObject>("test")
@@ -95,8 +95,7 @@ val broadcastFlow: Flow<JsonObject> = channelA.broadcastFlow<JsonObject>("test")
     }
     .launchIn(yourCoroutineScope) //you can also use .collect { } here
 
-clientA.realtime.connect()
-channelA.join()
+channelA.subscribe()
 ```
 
 </TabPanel>
@@ -141,11 +140,9 @@ channelB.subscribe((status) => {
 We can send Broadcast messages using `channelB.broadcast()`. Let's set up another client to send messages.
 
 ```kotlin
-val channelB = clientA.realtime.createChannel("room-1")
+val channelB = clientA.channel("room-1")
 
-clientA.realtime.connect()
-
-channelB.join(blockUntilJoined = true) //You can also use the channelA.status flow instead, but this parameter will block the coroutine until the status is joined.
+channelB.subscribe(blockUntilSubscribed = true) //You can also use the channelA.status flow instead, but this parameter will block the coroutine until the status is joined.
 
 channelB.broadcast(
     event = "test",
@@ -205,7 +202,7 @@ myChannel.subscribe((status) => {
 By default, broadcast messages are only sent to other clients. You can broadcast messages back to the sender by setting Broadcast's `receiveOwnBroadcasts` parameter to `true`.
 
 ```kotlin
-val myChannel = supabase.realtime.createChannel("room-2") {
+val myChannel = supabase.channel("room-2") {
     broadcast {
         receiveOwnBroadcasts = true
     }
@@ -217,8 +214,7 @@ val broadcastFlow: Flow<JsonObject> = myChannel.broadcastFlow<JsonObject>("test-
     }
     .launchIn(yourCoroutineScope)
 
-clientA.realtime.connect()
-myChannel.join(blockUntilJoined = true) //You can also use the myChannel.status flow instead, but this parameter will block the coroutine until the status is joined.
+myChannel.subscribe(blockUntilSubscribed = true) //You can also use the myChannel.status flow instead, but this parameter will block the coroutine until the status is joined.
 
 myChannel.broadcast(
     event = "test-my-messages",
@@ -271,16 +267,15 @@ myChannel.subscribe(async (status) => {
 By default, broadcast messages are only sent to other clients. You can broadcast messages back to the sender by setting Broadcast's `acknowledgeBroadcasts` parameter to `true`.
 
 ```kotlin
- val myChannel = supabase.realtime.createChannel("room-2") {
-     broadcast {
-         acknowledgeBroadcasts = true
-     }
- }
+val myChannel = supabase.channel("room-2") {
+    broadcast {
+        acknowledgeBroadcasts = true
+    }
+}
 
- supabase.realtime.connect()
- myChannel.join(blockUntilJoined = true) //You can also use the myChannel.status flow instead, but this parameter will block the coroutine until the status is joined.
+myChannel.subscribe(blockUntilSubscribed = true) //You can also use the myChannel.status flow instead, but this parameter will block the coroutine until the status is joined.
 
- myChannel.broadcast(event = "acknowledge", buildJsonObject {  })
+myChannel.broadcast(event = "acknowledge", buildJsonObject {  })
 ```
 
 </TabPanel>
@@ -340,6 +335,22 @@ final resp = await channel.send(
 );
 print(resp);
 ````
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+```kotlin
+val myChannel = supabase.channel("room-2") {
+    broadcast {
+        acknowledgeBroadcasts = true
+    }
+}
+
+// No need to subscribe to channel
+
+myChannel.broadcast(event = "test", buildJsonObject {
+    put("message", "Hi")
+})
+```
 
 </TabPanel>
 </Tabs>

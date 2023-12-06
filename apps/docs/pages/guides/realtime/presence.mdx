@@ -42,7 +42,7 @@ const client = createClient(SUPABASE_URL, SUPABASE_KEY)
 ```kotlin
 val supabaseUrl = "https://<project>.supabase.co"
 val supabaseKey = "<your-anon-key>"
-val client = createSupabaseClient(supabaseUrl, supabaseKey) {
+val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
     install(Realtime)
 }
 ```
@@ -86,7 +86,7 @@ roomOne
 Listen to the presence change flow, emitting new a new `PresenceAction` whenever someone joins or leaves:
 
 ```kotlin
-val roomOne = supabase.realtime.createChannel("room_01")
+val roomOne = supabase.channel("room_01")
 val presenceFlow: Flow<PresenceAction> = roomOne.presenceChangeFlow()
 presenceFlow
     .onEach {
@@ -94,8 +94,8 @@ presenceFlow
         println(it.leaves) //You can also use it.decodeLeavesAs<YourType>()
     }
     .launchIn(yourCoroutineScope) //You can also use .collect { } here
-supabase.realtime.connect()
-roomOne.join()
+
+roomOne.subscribe()
 ```
 
 </TabPanel>
@@ -135,15 +135,14 @@ roomOne.subscribe(async (status) => {
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-val roomOne = supabase.realtime.createChannel("room_01")
+val roomOne = supabase.channel("room_01")
 
 val userStatus = UserStatus( //Your custom class
     user = "user-1",
     onlineAt = Clock.System.now().toEpochMilliseconds()
 )
 
-supabase.realtime.connect()
-roomOne.join(blockUntilJoined = true) //You can also use the roomOne.status flow instead, but this parameter will block the coroutine until the status is joined.
+roomOne.subscribe(blockUntilSubscribed = true) //You can also use the roomOne.status flow instead, but this parameter will block the coroutine until the status is joined.
 
 roomOne.track(userStatus)
 ```
@@ -222,7 +221,7 @@ const channelC = supabase.channel('test', {
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-val channelC = supabase.realtime.createChannel("test") {
+val channelC = supabase.channel("test") {
     presence {
         key = "userId-123"
     }
