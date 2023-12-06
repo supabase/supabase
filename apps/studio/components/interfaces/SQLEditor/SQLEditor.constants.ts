@@ -1298,8 +1298,8 @@ create extension "supabase-dbdev";
   {
     id: 26,
     type: 'template',
-    title: 'Add Auth Hook (MFA Verification Attempt)',
-    description: 'Write a PostgreSQL Hook to limit failed MFA Verification attempts',
+    title: 'Limit MFA verification attempts to one in 2 seconds',
+    description: 'Create an Auth hook that limits the number of failed MFA verification attempts to one in 2 seconds.',
     sql: `
 create table public.mfa_failed_verification_attempts (
 	user_id uuid not null,
