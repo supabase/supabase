@@ -2,12 +2,12 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 import { RenderCellProps } from 'react-data-grid'
-import { Button, IconArrowRight } from 'ui'
 
 import { useParams } from 'common/hooks'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableQuery } from 'data/tables/table-query'
 import { useTablesQuery } from 'data/tables/tables-query'
+import { Button, IconArrowRight } from 'ui'
 import { SupaRow } from '../../types'
 import { NullValue } from '../common'
 
@@ -51,19 +51,21 @@ export const ForeignKeyFormatter = (
       </span>
       {relationship !== undefined && targetTable !== undefined && value !== null && (
         <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger>
-            <Link
-              href={`/project/${projectRef}/editor/${targetTable?.id}?filter=${relationship?.target_column_name}%3Aeq%3A${value}`}
+          <Tooltip.Trigger asChild>
+            <Button
+              type="default"
+              size="tiny"
+              className="translate-y-[2px]"
+              onClick={() => {}}
+              style={{ padding: '3px' }}
+              asChild
             >
-              <Button
-                type="default"
-                size="tiny"
-                className="translate-y-[2px]"
-                onClick={() => {}}
-                icon={<IconArrowRight size="tiny" />}
-                style={{ padding: '3px' }}
-              />
-            </Link>
+              <Link
+                href={`/project/${projectRef}/editor/${targetTable?.id}?filter=${relationship?.target_column_name}%3Aeq%3A${value}`}
+              >
+                <IconArrowRight size="tiny" />
+              </Link>
+            </Button>
           </Tooltip.Trigger>
           <Tooltip.Portal>
             <Tooltip.Portal>
