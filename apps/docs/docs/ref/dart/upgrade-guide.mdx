@@ -101,13 +101,17 @@ With the new update, developers can use Supabase and Provider in the same codeba
 >
 <TabPanel id="1.0x" label="Before">
 ```dart
-await supabase.auth.signInWithOAuth(Provider.google);
+await supabase.auth.signInWithOAuth(
+  Provider.google,
+);
 ```
 
 </TabPanel>
 <TabPanel id="2.0x" label="After">
 ```dart
-await supabase.auth.signInWithOAuth(OAuthProvider.google);
+await supabase.auth.signInWithOAuth(
+  OAuthProvider.google,
+);
 ```
 
 </TabPanel>
@@ -148,27 +152,26 @@ Future<AuthResponse> signInWithApple() async {
   final rawNonce = supabase.auth.generateRawNonce();
   final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
 
-final credential = await SignInWithApple.getAppleIDCredential(
-scopes: [
-AppleIDAuthorizationScopes.email,
-AppleIDAuthorizationScopes.fullName,
-],
-nonce: hashedNonce,
-);
+  final credential = await SignInWithApple.getAppleIDCredential(
+    scopes: [
+      AppleIDAuthorizationScopes.email,
+      AppleIDAuthorizationScopes.fullName,
+    ],
+    nonce: hashedNonce,
+  );
 
-final idToken = credential.identityToken;
-if (idToken == null) {
-throw const AuthException(
-'Could not find ID Token from generated credential.');
+  final idToken = credential.identityToken;
+  if (idToken == null) {
+    throw const AuthException(
+        'Could not find ID Token from generated credential.');
+  }
+
+  return signInWithIdToken(
+    provider: OAuthProvider.apple,
+    idToken: idToken,
+    nonce: rawNonce,
+  );
 }
-
-return signInWithIdToken(
-provider: OAuthProvider.apple,
-idToken: idToken,
-nonce: rawNonce,
-);
-}
-
 ````
 
 </TabPanel>
@@ -680,20 +683,31 @@ This allows the callback to be strictly typed.
 ```dart
 final channel = supabase.channel('room1');
 
-channel.on(RealtimeListenTypes.presence, ChannelFilter(event: 'sync'),
-    (payload, [ref]) {
-  print('Synced presence state: ${channel.presenceState()}');
-}).on(RealtimeListenTypes.presence, ChannelFilter(event: 'join'), (payload,
-    [ref]) {
-  print('Newly joined presences $payload');
-}).on(RealtimeListenTypes.presence, ChannelFilter(event: 'leave'), (payload,
-    [ref]) {
-  print('Newly left presences: $payload');
-}).subscribe((status, [error]) async {
-  if (status == 'SUBSCRIBED') {
-    await channel.track({'online_at': DateTime.now().toIso8601String()});
-  }
-});
+channel.on(
+  RealtimeListenTypes.presence,
+  ChannelFilter(event: 'sync'),
+  (payload, [ref]) {
+    print('Synced presence state: ${channel.presenceState()}');
+  },
+).on(
+  RealtimeListenTypes.presence,
+  ChannelFilter(event: 'join'),
+  (payload, [ref]) {
+    print('Newly joined presences $payload');
+  },
+).on(
+  RealtimeListenTypes.presence,
+  ChannelFilter(event: 'leave'),
+  (payload, [ref]) {
+    print('Newly left presences: $payload');
+  },
+).subscribe(
+  (status, [error]) async {
+    if (status == 'SUBSCRIBED') {
+      await channel.track({'online_at': DateTime.now().toIso8601String()});
+    }
+  },
+);
 ```
 
 </TabPanel>
@@ -702,17 +716,26 @@ channel.on(RealtimeListenTypes.presence, ChannelFilter(event: 'sync'),
 ```dart
 final channel = supabase.channel('room1');
 
-channel.onPresenceSync((payload) {
-  print('Synced presence state: ${channel.presenceState()}');
-}).onPresenceJoin((payload) {
-  print('Newly joined presences $payload');
-}).onPresenceLeave((payload) {
-  print('Newly left presences: $payload');
-}).subscribe((status, error) async {
-  if (status == RealtimeSubscribeStatus.subscribed) {
-    await channel.track({'online_at': DateTime.now().toIso8601String()});
-  }
-});
+channel.onPresenceSync(
+  (payload) {
+    print('Synced presence state: ${channel.presenceState()}');
+  },
+).onPresenceJoin(
+  (payload) {
+    print('Newly joined presences $payload');
+  },
+).onPresenceLeave(
+  (payload) {
+    print('Newly left presences: $payload');
+  },
+).subscribe(
+  (status, error) async {
+    if (status == RealtimeSubscribeStatus.subscribed) {
+      await channel
+          .track({'online_at': DateTime.now().toIso8601String()});
+    }
+  },
+);
 ```
 
 </TabPanel>
