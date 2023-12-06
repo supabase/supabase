@@ -1299,7 +1299,8 @@ create extension "supabase-dbdev";
     id: 26,
     type: 'template',
     title: 'Limit MFA verification attempts to one in 2 seconds',
-    description: 'Create an Auth hook that limits the number of failed MFA verification attempts to one in 2 seconds.',
+    description:
+      'Create an Auth hook that limits the number of failed MFA verification attempts to one in 2 seconds.',
     sql: `
 create table public.mfa_failed_verification_attempts (
 	user_id uuid not null,
@@ -1357,18 +1358,27 @@ create function public.hook_mfa_verification_attempt(event jsonb)
 		-- finally let Supabase Auth do the default behavior for a failed attempt
 		return jsonb_build_object('decision', 'continue');
 	end;
-	$$;`.trim(),
+	$$;
+-- Configure appropriate permissions
+grant execute on function public.hook_mfa_verification_attempt to supabase_auth_admin;
+grant all on table public.mfa_failed_verification_attempts to supabase_auth_admin;
+
+revoke execute on function public.hook_mfa_verification_attempt from authenticated, anon;
+revoke all on table public.mfa_failed_verification_attempts from authenticated, anon;
+
+    `.trim(),
   },
   {
     id: 27,
     type: 'template',
     title: 'Add Auth Hook (Password Verification Attempt)',
-    description: 'Write a PostgreSQL Hook to limit failed password Verification attempts',
+    description:
+      'Create an Auth Hook that limits number of failed password verification attempts to one in 10 seconds',
     sql: `
-create table public.password_failed_verification_attempts (
-	        user_id uuid not null,
-          last_failed_at timestamp not null default now(),
-          primary key (user_id, factor_id)
+    create table public.password_failed_verification_attempts (
+	    user_id uuid not null,
+      last_failed_at timestamp not null default now(),
+      primary key (user_id, factor_id)
         );
 create function public.hook_password_verification_attempt(event jsonb)
 	returns jsonb
@@ -1416,19 +1426,25 @@ create function public.hook_password_verification_attempt(event jsonb)
 		return jsonb_build_object('decision', 'continue');
 	end;
 	  $$;
+-- Configure appropriate permissions
+grant execute on function public.hook_password_verification_attempt to supabase_auth_admin;
+grant all on table public.password_failed_verification_attempts to supabase_auth_admin;
+
+revoke execute on function public.hook_password_verification_attempt from authenticated, anon;
+revoke all on table public.password_failed_verification_attempts from authenticated, anon;
     `.trim(),
   },
   {
     id: 28,
     type: 'template',
     title: 'Add Auth Hook (Custom Access Token)',
-    description: 'Write a PostgreSQL Hook to add custom claims to your Auth Token',
+    description: 'Create an Auth Hook to add custom claims to your Auth Token',
     sql: `
-create or replace function public.custom_access_token_hook(event jsonb)
-returns jsonb
-language plpgsql
-as $$
-declare
+    create or replace function public.custom_access_token_hook(event jsonb)
+    returns jsonb
+    language plpgsql
+    as $$
+    declare
     claims jsonb;
     user_email text;
 begin
@@ -1456,28 +1472,34 @@ begin
     return event;
 end;
 $$;
-        `.trim(),
+-- Permissions for the hook
+grant execute on function public.custom_access_token_hook to supabase_auth_admin;
+revoke execute on function public.custom_access_token_hook from authenticated, anon;
+    `.trim(),
   },
 
   {
     id: 29,
     type: 'template',
     title: 'Add Auth Hook (General)',
-    description: 'Write a PostgreSQL Hook to add custom claims to your Auth Token',
+    description: 'Create an Auth Hook',
     sql: `
-create or replace function public.custom_access_token_hook(event jsonb)
-returns jsonb
-language plpgsql
-as $$
-declare
+    create or replace function public.custom_access_token_hook(event jsonb)
+    returns jsonb
+    language plpgsql
+    as $$
+    declare
     -- Insert variables here
-begin
+    begin
     -- Insert logic here
 
     return event;
 end;
   $$;
-  `,
+-- Permissions for the hook
+grant execute on function public.custom_access_token_hook to supabase_auth_admin;
+revoke execute on function public.custom_access_token_hook from authenticated, anon;
+    `,
   },
 ]
 
