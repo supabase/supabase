@@ -45,5 +45,5 @@ export const useViewsQuery = <TData = ViewsData>(
   useQuery<ViewsData, ViewsError, TData>(
     viewKeys.list(projectRef),
     ({ signal }) => getViews({ projectRef, connectionString }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
+    { enabled: enabled && typeof projectRef !== 'undefined', staleTime: 0, ...options }
   )

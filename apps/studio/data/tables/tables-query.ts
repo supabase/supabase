@@ -55,7 +55,7 @@ export const useTablesQuery = <TData = TablesData>(
   useQuery<TablesData, TablesError, TData>(
     tableKeys.list(projectRef, schema),
     ({ signal }) => getTables({ projectRef, connectionString, schema }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
+    { enabled: enabled && typeof projectRef !== 'undefined', staleTime: 0, ...options }
   )
 
 /**

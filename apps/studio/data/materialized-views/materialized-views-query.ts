@@ -48,5 +48,5 @@ export const useMaterializedViewsQuery = <TData = MaterializedViewsData>(
   useQuery<MaterializedViewsData, MaterializedViewsError, TData>(
     materializedViewKeys.list(projectRef),
     ({ signal }) => getMaterializedViews({ projectRef, connectionString }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
+    { enabled: enabled && typeof projectRef !== 'undefined', staleTime: 0, ...options }
   )

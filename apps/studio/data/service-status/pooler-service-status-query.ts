@@ -47,6 +47,7 @@ export const usePoolerServiceStatusQuery = <TData = PoolerServiceStatusData>(
     {
       enabled:
         enabled && typeof projectRef !== 'undefined' && typeof connectionString !== 'undefined',
+      staleTime: 0,
       ...options,
     }
   )
