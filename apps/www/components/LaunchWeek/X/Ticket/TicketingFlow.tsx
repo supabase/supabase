@@ -16,14 +16,18 @@ import CountdownComponent from '../Countdown'
 import LaunchWeekPrizeSection from '../LaunchWeekPrizeSection'
 import TicketPresence from './TicketPresence'
 import TicketActions from './TicketActions'
+import useLwxGame from '../../hooks/useLwxGame'
+import LWXGame from './LWXGame'
 
 const TicketingFlow = () => {
-  const { ticketState, userData } = useConfData()
+  const { ticketState, userData, showCustomizationForm } = useConfData()
+  const { isGameMode, setIsGameMode } = useLwxGame(showCustomizationForm)
 
-  const isLoading = ticketState === 'loading'
-  const isRegistering = ticketState === 'registration'
-  const hasTicket = ticketState === 'ticket'
+  const isLoading = !isGameMode && ticketState === 'loading'
+  const isRegistering = !isGameMode && ticketState === 'registration'
+  const hasTicket = !isGameMode && ticketState === 'ticket'
   const hasPlatinumTicket = userData.golden
+  const hasSecretTicket = userData.metadata?.hasSecretTicket
 
   const transition = DEFAULT_TRANSITION
   const initial = INITIAL_BOTTOM
@@ -36,20 +40,24 @@ const TicketingFlow = () => {
     <>
       <SectionContainer className="relative flex flex-col !pt-8 lg:!pt-20 items-center gap-5 text-center h-auto lg:min-h-[886px]">
         <h1 className="sr-only">Supabase Launch Week X | {LWX_DATE}</h1>
-        {!hasTicket && (
-          <div className="flex flex-col items-center gap-1 text-light font-mono uppercase ">
-            <p className="flex items-center gap-3 leading-none">
-              <span className="text-lg text-foreground tracking-[2px]">Launch Week</span>{' '}
-              <Image
-                src="/images/launchweek/lwx/logos/lwx_logo.svg"
-                alt="Supabase Launch Week X icon"
-                width={16}
-                height={16}
-              />
-            </p>
-            <CountdownComponent date={LWX_LAUNCH_DATE} showCard={false} />
-          </div>
-        )}
+
+        <div
+          className={cn(
+            'flex flex-col items-center gap-1 text-light font-mono uppercase transition-all opacity-0 invisible',
+            !isGameMode && !hasTicket && 'opacity-100 visible'
+          )}
+        >
+          <p className="flex items-center gap-3 leading-none">
+            <span className="text-lg text-foreground tracking-[2px]">Launch Week</span>{' '}
+            <Image
+              src="/images/launchweek/lwx/logos/lwx_logo.svg"
+              alt="Supabase Launch Week X icon"
+              width={16}
+              height={16}
+            />
+          </p>
+          <CountdownComponent date={LWX_LAUNCH_DATE} showCard={false} />
+        </div>
         <div className="relative min-h-[500px] md:min-h-[634px] z-10 w-full flex flex-col justify-center items-center gap-5 md:gap-10 text-center">
           <LazyMotion features={domAnimation}>
             <AnimatePresence exitBeforeEnter key={ticketState}>
@@ -113,9 +121,14 @@ const TicketingFlow = () => {
                     <TicketContainer />
                   </div>
                   <div className="order-first xl:h-full max-w-md gap-3 flex flex-col items-center justify-center xl:items-start xl:justify-start xl:text-left">
-                    {hasPlatinumTicket ? (
+                    {hasSecretTicket ? (
                       <p className="text-2xl lg:text-3xl">
-                        <span className="text-foreground-lighter">Congrats!</span> You've maximized
+                        <span className="text-foreground-lighter">You got the secret ticket.</span>{' '}
+                        Share it to increase your chances of winning even more.
+                      </p>
+                    ) : hasPlatinumTicket ? (
+                      <p className="text-2xl lg:text-3xl">
+                        <span className="text-foreground-lighter">Congrats!</span> You maximized
                         your chances and have a platinum ticket now.
                       </p>
                     ) : winningChances !== 2 ? (
@@ -129,6 +142,7 @@ const TicketingFlow = () => {
                         <span className="">Keep sharing to increase your chances.</span>
                       </p>
                     )}
+                    <CountdownComponent date={LWX_LAUNCH_DATE} showCard={false} />
                     {!hasPlatinumTicket && <TicketPresence />}
                     <div className="w-full h-auto text-center md:text-left border border-muted flex flex-col md:flex-row items-stretch rounded-lg bg-[#060809] mt-2 md:mt-8 overflow-hidden">
                       <div className="flex flex-col md:w-2/3 gap-1 pb-6">
@@ -162,6 +176,17 @@ const TicketingFlow = () => {
                   </div>
                 </m.div>
               )}
+              {!showCustomizationForm && isGameMode && (
+                <m.div
+                  key="ticket"
+                  initial={initial}
+                  animate={animate}
+                  exit={exit}
+                  className="w-full flex justify-center text-foreground !h-[500px]"
+                >
+                  <LWXGame setIsGameMode={setIsGameMode} />
+                </m.div>
+              )}
             </AnimatePresence>
           </LazyMotion>
         </div>
@@ -171,10 +196,8 @@ const TicketingFlow = () => {
             'absolute z-0 top-0 left-0 right-0 bottom-0 w-full flex items-center justify-center opacity-100 transition-opacity',
             hasTicket && 'opacity-20'
           )}
+          isGameMode={isGameMode as boolean}
         />
-      </SectionContainer>
-      <SectionContainer className="!pt-4 lg:pb-40">
-        <LaunchWeekPrizeSection />
       </SectionContainer>
     </>
   )

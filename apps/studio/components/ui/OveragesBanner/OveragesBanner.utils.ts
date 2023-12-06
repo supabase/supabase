@@ -1,6 +1,6 @@
-import { UsageMetric } from 'data/usage/org-usage-query'
+import { OrgMetricsUsage } from 'data/usage/org-usage-query'
 
-export const getResourcesExceededLimitsOrg = (usageMetrics: UsageMetric[]): string[] => {
+export const getResourcesExceededLimitsOrg = (usageMetrics: OrgMetricsUsage[]): string[] => {
   if (!usageMetrics.length) return []
 
   return usageMetrics
