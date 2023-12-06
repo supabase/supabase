@@ -269,7 +269,7 @@ const TableEditorMenu = () => {
           {isSuccess && (
             <>
               {searchText.length === 0 && (entityTypes?.length ?? 0) <= 0 && (
-                <div className="mx-4 space-y-1 rounded-md border border-muted bg-surface-100 py-3 px-4">
+                <div className="mx-2 my-2 space-y-1 rounded-md border border-muted bg-surface-100 py-3 px-4">
                   <p className="text-xs">No entities available</p>
                   <p className="text-xs text-foreground-light">
                     This schema has no entities available yet
@@ -277,7 +277,7 @@ const TableEditorMenu = () => {
                 </div>
               )}
               {searchText.length > 0 && (entityTypes?.length ?? 0) <= 0 && (
-                <div className="mx-4 space-y-1 rounded-md border border-muted bg-surface-100 py-3 px-4">
+                <div className="mx-2 my-2 space-y-1 rounded-md border border-muted bg-surface-100 py-3 px-4">
                   <p className="text-xs">No results found</p>
                   <p className="text-xs text-foreground-light">
                     There are no entities that match your search
