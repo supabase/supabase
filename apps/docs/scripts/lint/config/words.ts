@@ -2,6 +2,7 @@ function single(word: string): [string, [string]] {
   return [word, [word]]
 }
 
+// Something is wrong with catching of plurals, see URLs, APIs
 function plural(word: string): [string, [string, string]] {
   return [word, [`${word}s`, word]]
 }
@@ -18,23 +19,38 @@ function multiword(...words: [string, ...string[]]): [string, string[]] {
 type ExceptionList = Map<string, string[]>
 
 export const capitalizedWords: ExceptionList = new Map([
+  multiword('Auth', 'Auth UI'),
   plural('API'),
+  single('Captcha'),
   multiword('ChatGPT', ...pluralize('ChatGPT Retrieval Plugin')),
+  single('CLI'),
   single('CLIP'),
+  single('CSS'),
+  multiword('Edge Function'),
   single('Firebase'),
+  single('Flutter'),
+  multiword('GitHub Actions'),
   single('HNSW'),
+  single('HTML'),
   multiword('Hugging Face'),
   single('I'),
   single('IVFFlat'),
   multiword('JSON', ...pluralize('JSON Web Token')),
   plural('JWT'),
+  single('L2'),
+  multiword('Navigable Small World'),
   single('Next.js'),
   single('OAuth'),
   single('OpenAI'),
+  single('PKCE'),
   single('Poetry'),
   single('Postgres'),
   single('Python'),
-  single('Roboflow'),
+  single('REST'),
+  single('RLS'),
+  multiword('Roboflow', 'Roboflow Inference'),
+  multiword('Row Level Security'),
+  single('SSR'),
   single('Supabase'),
   single('Transformers.js'),
   single('TypeScript'),
