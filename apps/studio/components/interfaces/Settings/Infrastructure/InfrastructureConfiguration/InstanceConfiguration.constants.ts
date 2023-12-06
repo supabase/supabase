@@ -8,7 +8,7 @@ export interface Region {
 }
 
 // ReactFlow is scaling everything by the factor of 2
-export const NODE_WIDTH = 640
+export const NODE_WIDTH = 660
 export const NODE_ROW_HEIGHT = 50
 export const NODE_SEP = 20
 

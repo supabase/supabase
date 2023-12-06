@@ -134,7 +134,7 @@ export const addRegionNodes = (nodes: Node[], edges: Edge[]) => {
     const regionNode: Node = {
       id: key,
       position: { x: minX - 10, y: minY - 10 },
-      width: maxX - minX,
+      width: maxX - minX + NODE_WIDTH / 2,
       type: 'REGION',
       data: { region, numReplicas: value.length },
     }

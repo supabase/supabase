@@ -26,6 +26,7 @@ import { AWS_REGIONS_KEYS, BASE_PATH, PROJECT_STATUS } from 'lib/constants'
 import { AVAILABLE_REPLICA_REGIONS } from './InstanceConfiguration.constants'
 import GeographyData from './MapData.json'
 import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 
 // [Joshen] Foresee that we'll skip this view for initial launch
 
@@ -152,7 +153,7 @@ const MapView = ({
                 onMouseEnter={(event) =>
                   setTooltip({
                     x: event.clientX,
-                    y: event.clientY,
+                    y: event.clientY + 20,
                     region: {
                       key: region.key,
                       country: region.name,
@@ -255,7 +256,9 @@ const MapView = ({
                     >
                       <div className="flex flex-col gap-y-1">
                         <p className="flex items-center gap-x-2">
-                          {database.identifier === ref ? 'Primary Database' : `Read Replica`}
+                          {database.identifier === ref
+                            ? 'Primary Database'
+                            : `Read Replica (ID: ${formatDatabaseID(database.identifier)})`}
                           {database.status === PROJECT_STATUS.ACTIVE_HEALTHY ? (
                             <Badge color="green">Healthy</Badge>
                           ) : database.status === PROJECT_STATUS.COMING_UP ? (
@@ -282,7 +285,7 @@ const MapView = ({
                                 View connection string
                               </Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem
+                            {/* <DropdownMenuItem
                               className="gap-x-2"
                               onClick={() => onSelectRestartReplica(database)}
                             >
@@ -293,7 +296,7 @@ const MapView = ({
                               onClick={() => onSelectResizeReplica(database)}
                             >
                               Resize replica
-                            </DropdownMenuItem>
+                            </DropdownMenuItem> */}
                             <div className="border-t" />
                             <DropdownMenuItem
                               className="gap-x-2"

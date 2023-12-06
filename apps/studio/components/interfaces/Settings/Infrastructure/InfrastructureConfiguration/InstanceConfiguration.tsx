@@ -2,19 +2,20 @@ import { useParams } from 'common'
 import { partition } from 'lodash'
 import { Globe2, Loader2, Network } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import ReactFlow, { Background, Edge, ReactFlowProvider, useReactFlow } from 'reactflow'
 import 'reactflow/dist/style.css'
 import { Button } from 'ui'
 
+import AlertError from 'components/ui/AlertError'
+import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { useReadReplicasStatusesQuery } from 'data/read-replicas/replicas-status-query'
 import { AWS_REGIONS_KEYS } from 'lib/constants'
 import DeployNewReplicaPanel from './DeployNewReplicaPanel'
+import DropReplicaConfirmationModal from './DropReplicaConfirmationModal'
 import { addRegionNodes, generateNodes, getDagreGraphLayout } from './InstanceConfiguration.utils'
 import { PrimaryNode, RegionNode, ReplicaNode } from './InstanceNode'
 import MapView from './MapView'
-import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import DropReplicaConfirmationModal from './DropReplicaConfirmationModal'
-import AlertError from 'components/ui/AlertError'
 
 // [Joshen] Just FYI, UI assumes single provider for primary + replicas
 // [Joshen] Idea to visualize grouping based on region: https://reactflow.dev/examples/layout/sub-flows
@@ -27,25 +28,49 @@ const InstanceConfigurationUI = () => {
 
   const [view, setView] = useState<'flow' | 'map'>('flow')
   const [showNewReplicaPanel, setShowNewReplicaPanel] = useState(false)
+  const [refetchInterval, setRefetchInterval] = useState<number | boolean>(5000)
   const [newReplicaRegion, setNewReplicaRegion] = useState<AWS_REGIONS_KEYS>()
   const [selectedReplicaToResize, setSelectedReplicaToResize] = useState<Database>()
   const [selectedReplicaToDrop, setSelectedReplicaToDrop] = useState<Database>()
   const [selectedReplicaToRestart, setSelectedReplicaToRestart] = useState<Database>()
 
-  const { data, error, isLoading, isError, isSuccess } = useReadReplicasQuery({ projectRef })
-  const databases = data ?? []
-  const [[primary], replicas] = partition(databases, (db) => db.identifier === projectRef)
+  const { data, error, refetch, isLoading, isError, isSuccess } = useReadReplicasQuery({
+    projectRef,
+  })
+  const [[primary], replicas] = useMemo(
+    () => partition(data ?? [], (db) => db.identifier === projectRef),
+    [data, projectRef]
+  )
+
+  useReadReplicasStatusesQuery(
+    { projectRef },
+    {
+      refetchInterval: refetchInterval as any,
+      refetchOnWindowFocus: false,
+      onSuccess: (data) => {
+        const hasTransientStatus = data.some((db) => db.status === 'COMING_UP')
+        if (!hasTransientStatus) {
+          setRefetchInterval(false)
+          refetch()
+        }
+      },
+    }
+  )
 
   const backgroundPatternColor =
     resolvedTheme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.4)'
 
-  const nodes = isSuccess
-    ? generateNodes(primary, replicas, {
-        onSelectRestartReplica: setSelectedReplicaToRestart,
-        onSelectResizeReplica: setSelectedReplicaToResize,
-        onSelectDropReplica: setSelectedReplicaToDrop,
-      })
-    : []
+  const nodes = useMemo(
+    () =>
+      isSuccess
+        ? generateNodes(primary, replicas, {
+            onSelectRestartReplica: setSelectedReplicaToRestart,
+            onSelectResizeReplica: setSelectedReplicaToResize,
+            onSelectDropReplica: setSelectedReplicaToDrop,
+          })
+        : [],
+    [isSuccess, primary, replicas]
+  )
 
   const edges: Edge[] = replicas.map((database) => {
     return {
@@ -69,6 +94,17 @@ const InstanceConfigurationUI = () => {
   const onConfirmRestartReplica = () => {
     console.log('Restart replica', selectedReplicaToRestart)
   }
+
+  // [Joshen] Just FYI this block is oddly triggering whenever we refocus on the viewport
+  // even if I change the dependency array to just data. Not blocker, just an area to optimize
+  useEffect(() => {
+    if (replicas.length > 0) {
+      const graph = getDagreGraphLayout(nodes, edges)
+      const { nodes: updatedNodes } = addRegionNodes(graph.nodes, graph.edges)
+      reactFlow.setNodes(updatedNodes)
+      reactFlow.setEdges(graph.edges)
+    }
+  }, [replicas])
 
   return (
     <>
@@ -120,8 +156,8 @@ const InstanceConfigurationUI = () => {
                 nodeTypes={nodeTypes}
                 onInit={() => {
                   const graph = getDagreGraphLayout(nodes, edges)
-                  const xxx = addRegionNodes(graph.nodes, graph.edges)
-                  reactFlow.setNodes(xxx.nodes)
+                  const { nodes: updatedNodes } = addRegionNodes(graph.nodes, graph.edges)
+                  reactFlow.setNodes(updatedNodes)
                   reactFlow.setEdges(graph.edges)
                 }}
                 proOptions={{ hideAttribution: true }}

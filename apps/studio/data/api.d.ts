@@ -3565,6 +3565,45 @@ export interface components {
       content?: Record<string, never>
       owner_id?: number
     }
+    DatabaseDetailResponse: {
+      db_port: number
+      db_name: string
+      db_user: string
+      restUrl: string
+      db_host: string
+      connectionString: string
+      identifier: string
+      inserted_at: string
+      /** @enum {string} */
+      status:
+        | 'ACTIVE_HEALTHY'
+        | 'ACTIVE_UNHEALTHY'
+        | 'COMING_UP'
+        | 'GOING_DOWN'
+        | 'INIT_FAILED'
+        | 'REMOVED'
+        | 'RESTORING'
+        | 'UNKNOWN'
+        | 'UPGRADING'
+      size: string
+      region: string
+      /** @enum {string} */
+      cloud_provider: 'AWS' | 'FLY'
+    }
+    DatabaseStatusResponse: {
+      identifier: string
+      /** @enum {string} */
+      status:
+        | 'ACTIVE_HEALTHY'
+        | 'ACTIVE_UNHEALTHY'
+        | 'COMING_UP'
+        | 'GOING_DOWN'
+        | 'INIT_FAILED'
+        | 'REMOVED'
+        | 'RESTORING'
+        | 'UNKNOWN'
+        | 'UPGRADING'
+    }
     UpdatePasswordBody: {
       password: string
     }
@@ -8435,7 +8474,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': Record<string, never>[]
+          'application/json': components['schemas']['DatabaseDetailResponse'][]
         }
       }
     }
@@ -8451,7 +8490,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': Record<string, never>
+          'application/json': components['schemas']['DatabaseStatusResponse'][]
         }
       }
       /** @description Failed to get project's status */
