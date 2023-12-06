@@ -542,6 +542,7 @@ export const auth = {
           name: 'User Sessions',
           url: '/guides/auth/sessions',
         },
+        { name: 'Passwords', url: '/guides/auth/passwords' },
         {
           name: 'Enterprise SSO',
           url: '/guides/auth/enterprise-sso',
@@ -552,7 +553,6 @@ export const auth = {
             },
           ],
         },
-        { name: 'Password Reset', url: '/guides/auth/auth-password-reset' },
         { name: 'Email Templates', url: '/guides/auth/auth-email-templates' },
       ],
     },
