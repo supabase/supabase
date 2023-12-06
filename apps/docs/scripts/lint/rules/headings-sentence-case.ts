@@ -18,8 +18,21 @@ function headingsSentenceCaseCheck(node: Content, file: string) {
 
   const wordRegex = /\b\S+\b/g
 
-  const firstWord = wordRegex.exec(text)?.[0]
-  if (firstWord?.[0] && /[a-z]/.test(firstWord[0])) {
+  const firstMatch = wordRegex.exec(text)
+  const firstWord = firstMatch?.[0]
+  if (
+    capitalizedWords.matchException({
+      word: firstWord,
+      fullString: text,
+      index: firstMatch.index,
+    }).exception
+  ) {
+    wordRegex.lastIndex += capitalizedWords.matchException({
+      word: firstWord,
+      fullString: text,
+      index: wordRegex.lastIndex,
+    }).advanceIndexBy
+  } else if (firstWord?.[0] && /[a-z]/.test(firstWord[0])) {
     errors.push(
       error({
         message: 'First word in heading should be capitalized.',
@@ -72,6 +85,7 @@ function headingsSentenceCaseCheck(node: Content, file: string) {
       }
     } else if (
       /[A-Z]/.test(currWord[0]) &&
+      /[a-z]/.test(currWord) &&
       capitalizedWords.matchException({
         word: currWord,
         fullString: text,
@@ -85,6 +99,7 @@ function headingsSentenceCaseCheck(node: Content, file: string) {
       }).advanceIndexBy
     } else if (
       /[A-Z]/.test(currWord[0]) &&
+      /[a-z]/.test(currWord) &&
       !capitalizedWords.matchException({
         word: currWord,
         fullString: text,
