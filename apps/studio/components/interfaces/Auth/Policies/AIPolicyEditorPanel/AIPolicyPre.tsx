@@ -33,7 +33,7 @@ export const AIPolicyPre = ({ onDiff, children }: AAIPolicyPreProps) => {
       />
       <div className="absolute top-3 right-3 bg-surface-100 border-muted border rounded-lg h-[28px] hidden group-hover:block">
         <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger>
+          <Tooltip.Trigger asChild>
             <Button type="text" size="tiny" onClick={() => onDiff(formatted)}>
               <FileDiff className="h-4 w-4" />
             </Button>
@@ -53,7 +53,7 @@ export const AIPolicyPre = ({ onDiff, children }: AAIPolicyPreProps) => {
           </Tooltip.Portal>
         </Tooltip.Root>
         <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger>
+          <Tooltip.Trigger asChild>
             <Button
               type="text"
               size="tiny"

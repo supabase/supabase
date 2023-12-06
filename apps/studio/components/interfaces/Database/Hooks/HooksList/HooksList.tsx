@@ -97,7 +97,7 @@ const HooksList = ({
                   </Link>
                 </Button>
                 <Tooltip.Root delayDuration={0}>
-                  <Tooltip.Trigger>
+                  <Tooltip.Trigger asChild>
                     <Button disabled={!canCreateWebhooks} onClick={() => createHook()}>
                       Create a new hook
                     </Button>

@@ -23,7 +23,7 @@ interface AccessButtonProps {
 
 const AllowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
   <Tooltip.Root delayDuration={0}>
-    <Tooltip.Trigger>
+    <Tooltip.Trigger asChild>
       <Button type="default" disabled={disabled} onClick={() => onClick(true)}>
         Allow all access
       </Button>
@@ -50,7 +50,7 @@ const AllowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
 
 const DisallowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
   <Tooltip.Root delayDuration={0}>
-    <Tooltip.Trigger>
+    <Tooltip.Trigger asChild>
       <Button type="default" disabled={disabled} onClick={() => onClick(true)}>
         Restrict all access
       </Button>
@@ -120,7 +120,7 @@ const NetworkRestrictions = ({}) => {
               </Link>
             </Button>
             <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
+              <Tooltip.Trigger asChild>
                 <Button
                   disabled={!canUpdateNetworkRestrictions}
                   onClick={() => setIsAddingAddress(true)}
