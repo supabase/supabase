@@ -115,7 +115,7 @@ const TriggerList = ({
                 {canUpdateTriggers ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button asChild type="default" className="px-1">
+                      <Button type="default" className="px-1">
                         <IconMoreVertical />
                       </Button>
                     </DropdownMenuTrigger>
