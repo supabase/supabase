@@ -1,5 +1,5 @@
 import { Content, Text } from 'mdast'
-import { capitalizedWords, isException } from '../config/words'
+import { capitalizedWords } from '../config/words'
 import { ErrorSeverity, FixReplace, LintError, LintRule, error } from '.'
 
 function headingsSentenceCaseCheck(node: Content, file: string) {
@@ -71,23 +71,20 @@ function headingsSentenceCaseCheck(node: Content, file: string) {
       }
     } else if (
       /[A-Z]/.test(currWord[0]) &&
-      isException({
-        list: capitalizedWords,
+      capitalizedWords.matchException({
         word: currWord,
         fullString: text,
         index: currMatch.index,
       }).exception
     ) {
-      wordRegex.lastIndex += isException({
-        list: capitalizedWords,
+      wordRegex.lastIndex += capitalizedWords.matchException({
         word: currWord,
         fullString: text,
         index: currMatch.index,
       }).advanceIndexBy
     } else if (
       /[A-Z]/.test(currWord[0]) &&
-      !isException({
-        list: capitalizedWords,
+      !capitalizedWords.matchException({
         word: currWord,
         fullString: text,
         index: currMatch.index,

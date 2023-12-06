@@ -1,94 +1,105 @@
-function single(word: string): [string, [string]] {
-  return [word, [word]]
-}
+class ExceptionList {
+  private map: Map<string, string[]>
 
-// Something is wrong with catching of plurals, see URLs, APIs
-function plural(word: string): [string, [string, string]] {
-  return [word, [`${word}s`, word]]
-}
+  static isMultiword(word: string) {
+    return /\s+/.test(word)
+  }
 
-function pluralize(word: string): [string, string] {
-  return plural(word)[1]
-}
+  constructor() {
+    this.map = new Map()
+  }
 
-// Words are sorted in reverse so that longer potential matches are exhausted first
-function multiword(...words: [string, ...string[]]): [string, string[]] {
-  return [words[0].split(/\s+/)[0], [...words].sort((a, b) => b.length - a.length)]
-}
+  addSingle(word: string) {
+    const subWord = word.split(/\s+/)[0]
+    if (!this.map.has(subWord)) {
+      this.map.set(subWord, [])
+    }
+    this.map.get(subWord).push(word)
+    return this
+  }
 
-type ExceptionList = Map<string, string[]>
+  addPlural(word: string) {
+    this.addSingle(word)
+    this.addSingle(`${word}s`)
+    return this
+  }
 
-export const capitalizedWords: ExceptionList = new Map([
-  multiword('Auth', 'Auth UI'),
-  plural('API'),
-  single('Captcha'),
-  multiword('ChatGPT', ...pluralize('ChatGPT Retrieval Plugin')),
-  single('CLI'),
-  single('CLIP'),
-  single('CSS'),
-  multiword('Edge Function'),
-  single('Firebase'),
-  single('Flutter'),
-  multiword('GitHub Actions'),
-  single('HNSW'),
-  single('HTML'),
-  multiword('Hugging Face'),
-  single('I'),
-  single('IVFFlat'),
-  multiword('JSON', ...pluralize('JSON Web Token')),
-  plural('JWT'),
-  single('L2'),
-  multiword('Navigable Small World'),
-  single('Next.js'),
-  single('OAuth'),
-  single('OpenAI'),
-  single('PKCE'),
-  single('Poetry'),
-  single('Postgres'),
-  single('Python'),
-  single('REST'),
-  single('RLS'),
-  multiword('Roboflow', 'Roboflow Inference'),
-  multiword('Row Level Security'),
-  single('SSR'),
-  single('Supabase'),
-  single('Transformers.js'),
-  single('TypeScript'),
-  plural('URL'),
-  single('WebP'),
-  plural('Wrapper'),
-])
+  matchException({
+    word,
+    fullString,
+    index,
+  }: {
+    word: string
+    fullString: string
+    index: number
+  }): {
+    exception: boolean
+    advanceIndexBy?: number
+  } {
+    if (this.map.has(word)) {
+      // If the exception list contains multiword terms, check for the multiword term
+      const multiwords = this.map.get(word).filter(ExceptionList.isMultiword)
+      for (const term of multiwords) {
+        if (fullString.indexOf(term, index) === index) {
+          return { exception: true, advanceIndexBy: term.length - word.length }
+        }
+      }
 
-function isMultiword(word: string) {
-  return /\s+/.test(word)
-}
-
-export function isException({
-  list,
-  word,
-  fullString,
-  index,
-}: {
-  list: ExceptionList
-  word: string
-  fullString: string
-  index: number
-}): { exception: boolean; advanceIndexBy?: number } {
-  if (list.has(word)) {
-    // If the exception list contains multiword terms, check for the multiword term
-    const multiwords = list.get(word).filter(isMultiword)
-    for (const term of multiwords) {
-      if (fullString.indexOf(term, index) === index) {
-        return { exception: true, advanceIndexBy: term.length - word.length }
+      // If word directly matches, then it's on the exception list
+      if (this.map.get(word).includes(word)) {
+        return { exception: true, advanceIndexBy: 0 }
       }
     }
 
-    // If word directly matches, then it's on the exception list
-    if (list.get(word).includes(word)) {
-      return { exception: true, advanceIndexBy: 0 }
-    }
+    // 0 beause it means the cursor doesn't need to move
+    return { exception: false }
   }
-
-  // 0 beause it means the cursor doesn't need to move
-  return { exception: false }
 }
+
+const capitalizedWords = new ExceptionList()
+capitalizedWords
+  .addSingle('Auth')
+  .addSingle('Auth UI')
+  .addPlural('API')
+  .addSingle('Captcha')
+  .addSingle('ChatGPT')
+  .addPlural('ChatGPT Retrieval Plugin')
+  .addSingle('CLI')
+  .addSingle('CLIP')
+  .addSingle('CSS')
+  .addSingle('Edge Function')
+  .addSingle('Firebase')
+  .addSingle('Flutter')
+  .addPlural('Foreign Data Wrapper')
+  .addSingle('GitHub Actions')
+  .addSingle('HNSW')
+  .addSingle('HTML')
+  .addSingle('Hugging Face')
+  .addSingle('I')
+  .addSingle('IVFFlat')
+  .addSingle('JSON')
+  .addPlural('JSON Web Token')
+  .addPlural('JWT')
+  .addSingle('L2')
+  .addSingle('Navigabel Small World')
+  .addSingle('Next.js')
+  .addSingle('OAuth')
+  .addSingle('OpenAI')
+  .addSingle('PKCE')
+  .addSingle('Poetry')
+  .addSingle('Postgres')
+  .addSingle('Python')
+  .addSingle('REST')
+  .addSingle('RLS')
+  .addSingle('Roboflow')
+  .addSingle('Roboflow Inference')
+  .addSingle('Row Level Security')
+  .addSingle('SSR')
+  .addSingle('Supabase')
+  .addSingle('Transformers.js')
+  .addSingle('TypeScript')
+  .addPlural('URL')
+  .addSingle('WebP')
+  .addPlural('Wrapper')
+
+export { capitalizedWords }
