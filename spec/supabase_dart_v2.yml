@@ -237,7 +237,7 @@ functions:
           import 'package:supabase_flutter/supabase_flutter.dart';
 
           /// Performs Apple sign in on iOS or macOS
-          final rawNonce = generateRawNonce();
+          final rawNonce = supabase.auth.generateRawNonce();
           final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
 
           final credential = await SignInWithApple.getAppleIDCredential(
@@ -251,7 +251,8 @@ functions:
           final idToken = credential.identityToken;
           if (idToken == null) {
             throw const AuthException(
-                'Could not find ID Token from generated credential.');
+              'Could not find ID Token from generated credential.',
+            );
           }
 
           final response = await signInWithIdToken(

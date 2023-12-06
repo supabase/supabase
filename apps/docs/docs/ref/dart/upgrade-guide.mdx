@@ -538,7 +538,7 @@ try {
 
 Realtime methods contains the biggest breaking changes. Most of these changes are to make the interface more type safe.
 
-We have removed the `.on()` method and replaced it with `.onPostgresChanges()`, `.onBroadcast()`, and `.onPresence()` for respective realtime functionalities.
+We have removed the `.on()` method and replaced it with `.onPostgresChanges()`, `.onBroadcast()`, and three different presence methods.
 
 <RefSubLayout.EducationRow>
   <RefSubLayout.Details>
@@ -549,7 +549,7 @@ Use the new `.onPostgresChanges()` method to listen to realtime changes in the d
 
 In v1, filters were not strongly typed because they took a `String` type. In v2, `filter` takes an object. Its properties are strictly typed to catch type errors.
 
-We also return the `payload` as a `PostgresChangePayload` object, which contains the `newRecord` and `oldRecord` properties as well as other properties that were all returned as `dynamic` in v1.
+The payload of the callback is now typed as well. In `v1`, the payload was returned as `dynamic`. It is now returned as a `PostgresChangePayload` object. The object contains the `oldRecord` and `newRecord` properties for accessing the data before and after the change.
 
   </RefSubLayout.Details>
   <RefSubLayout.Examples>
@@ -564,16 +564,19 @@ We also return the `payload` as a `PostgresChangePayload` object, which contains
 <TabPanel id="1.0x" label="Before">
 
 ```dart
-  supabase.channel('my_channel').on(
-      RealtimeListenTypes.postgresChanges,
-      ChannelFilter(
-          event: '*',
-          schema: 'public',
-          table: 'messages',
-          filter: 'room_id=eq.200'), (dynamic payload, [ref]) {
+supabase.channel('my_channel').on(
+  RealtimeListenTypes.postgresChanges,
+  ChannelFilter(
+    event: '*',
+    schema: 'public',
+    table: 'messages',
+    filter: 'room_id=eq.200',
+  ),
+  (dynamic payload, [ref]) {
     final Map<String, dynamic> newRecord = payload['new'];
     final Map<String, dynamic> oldRecord = payload['old'];
-  }).subscribe();
+  },
+).subscribe();
 ```
 
 </TabPanel>
@@ -624,12 +627,14 @@ Because the method is specific to broadcast, it takes fewer properties.
 
 ```dart
 supabase.channel('my_channel').on(
-    RealtimeListenTypes.broadcast,
-    ChannelFilter(
-      event: 'position',
-    ), (dynamic payload, [ref]) {
-  print(payload);
-}).subscribe();
+  RealtimeListenTypes.broadcast,
+  ChannelFilter(
+    event: 'position',
+  ),
+  (dynamic payload, [ref]) {
+    print(payload);
+  },
+).subscribe();
 ```
 
 </TabPanel>
