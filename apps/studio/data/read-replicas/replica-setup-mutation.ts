@@ -4,6 +4,7 @@ import { toast } from 'react-hot-toast'
 import { post } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { replicaKeys } from './keys'
+import { Database } from './replicas-query'
 
 export type Region =
   | 'us-east-1'
@@ -24,6 +25,7 @@ export type Region =
 export type ReadReplicaSetUpVariables = {
   projectRef: string
   region: Region
+  size: string // Not used in API yet, purely for UI atm
 }
 
 export async function setUpReadReplica({ projectRef, region }: ReadReplicaSetUpVariables) {
@@ -35,7 +37,6 @@ export async function setUpReadReplica({ projectRef, region }: ReadReplicaSetUpV
       read_replica_region: region,
     },
   })
-
   if (error) throw error
   return data
 }
@@ -55,8 +56,30 @@ export const useReadReplicaSetUpMutation = ({
     (vars) => setUpReadReplica(vars),
     {
       async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(replicaKeys.list(projectRef))
+        const { projectRef, region, size } = variables
+
+        queryClient.setQueriesData<any>(replicaKeys.list(projectRef), (old: any) => {
+          const scaffoldNewDatabase: Database = {
+            db_port: 5432,
+            db_name: 'postgres',
+            db_user: 'postgres',
+            restUrl: '',
+            db_host: '',
+            connectionString: '',
+            identifier: `${projectRef}-rr-${region}-None`,
+            size,
+            region,
+            inserted_at: new Date().toISOString(),
+            status: 'COMING_UP',
+            cloud_provider: 'AWS',
+          }
+          return [...old, scaffoldNewDatabase]
+        })
+
+        setTimeout(async () => {
+          await queryClient.invalidateQueries(replicaKeys.list(projectRef))
+        }, 5000)
+
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

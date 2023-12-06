@@ -15,7 +15,7 @@ import {
 
 import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
 import { NODE_SEP, NODE_WIDTH, Region } from './InstanceConfiguration.constants'
-import { formatDatabaseID, formatDatabaseRegion } from 'data/read-replicas/replicas.utils'
+import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 
 interface NodeData {
   id: string
@@ -128,7 +128,9 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
           </div>
           <div className="flex flex-col gap-y-0.5">
             <div className="flex items-center gap-x-2">
-              <p className="text-sm truncate">Replica (ID: {formatDatabaseID(id)})</p>
+              <p className="text-sm truncate">
+                Replica {id.length > 0 && `(ID: ${formatDatabaseID(id)})`}
+              </p>
               {status === PROJECT_STATUS.ACTIVE_HEALTHY ? (
                 <Badge color="green">Healthy</Badge>
               ) : status === PROJECT_STATUS.COMING_UP ? (

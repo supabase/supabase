@@ -258,7 +258,10 @@ const MapView = ({
                         <p className="flex items-center gap-x-2">
                           {database.identifier === ref
                             ? 'Primary Database'
-                            : `Read Replica (ID: ${formatDatabaseID(database.identifier)})`}
+                            : `Read Replica ${
+                                database.identifier.length > 0 &&
+                                `(ID: ${formatDatabaseID(database.identifier)})`
+                              }`}
                           {database.status === PROJECT_STATUS.ACTIVE_HEALTHY ? (
                             <Badge color="green">Healthy</Badge>
                           ) : database.status === PROJECT_STATUS.COMING_UP ? (

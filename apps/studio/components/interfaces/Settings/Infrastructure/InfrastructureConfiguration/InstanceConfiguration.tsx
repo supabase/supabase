@@ -1,8 +1,8 @@
 import { useParams } from 'common'
-import { partition } from 'lodash'
+import { isEqual, partition } from 'lodash'
 import { Globe2, Loader2, Network } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import ReactFlow, { Background, Edge, ReactFlowProvider, useReactFlow } from 'reactflow'
 import 'reactflow/dist/style.css'
 import { Button } from 'ui'
@@ -25,10 +25,11 @@ const InstanceConfigurationUI = () => {
   const reactFlow = useReactFlow()
   const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
+  const numComingUp = useRef<number>()
 
   const [view, setView] = useState<'flow' | 'map'>('flow')
   const [showNewReplicaPanel, setShowNewReplicaPanel] = useState(false)
-  const [refetchInterval, setRefetchInterval] = useState<number | boolean>(5000)
+  const [refetchInterval, setRefetchInterval] = useState<number | boolean>(10000)
   const [newReplicaRegion, setNewReplicaRegion] = useState<AWS_REGIONS_KEYS>()
   const [selectedReplicaToResize, setSelectedReplicaToResize] = useState<Database>()
   const [selectedReplicaToDrop, setSelectedReplicaToDrop] = useState<Database>()
@@ -48,10 +49,18 @@ const InstanceConfigurationUI = () => {
       refetchInterval: refetchInterval as any,
       refetchOnWindowFocus: false,
       onSuccess: (data) => {
-        const hasTransientStatus = data.some((db) => db.status === 'COMING_UP')
+        const comingUpReplicas = data.filter((db) => db.status === 'COMING_UP')
+        const hasTransientStatus = comingUpReplicas.length > 0
+
+        // If any replica's status has changed, refetch databases
+        if (numComingUp.current !== comingUpReplicas.length) {
+          numComingUp.current = comingUpReplicas.length
+          refetch()
+        }
+
+        // If all replicas are active healthy, stop fetching statuses
         if (!hasTransientStatus) {
           setRefetchInterval(false)
-          refetch()
         }
       },
     }

@@ -4,6 +4,7 @@ import { toast } from 'react-hot-toast'
 import { post } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { replicaKeys } from './keys'
+import { Database } from './replicas-query'
 
 export type ReadReplicaRemoveVariables = {
   projectRef: string
@@ -39,8 +40,16 @@ export const useReadReplicaRemoveMutation = ({
     (vars) => removeReadReplica(vars),
     {
       async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(replicaKeys.list(projectRef))
+        const { projectRef, identifier } = variables
+
+        queryClient.setQueriesData<any>(replicaKeys.list(projectRef), (old: any) => {
+          return old.filter((db: Database) => db.identifier !== identifier)
+        })
+
+        setTimeout(async () => {
+          await queryClient.invalidateQueries(replicaKeys.list(projectRef))
+        }, 5000)
+
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

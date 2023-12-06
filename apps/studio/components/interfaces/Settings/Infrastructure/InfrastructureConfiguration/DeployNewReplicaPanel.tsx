@@ -7,6 +7,7 @@ import { Region, useReadReplicaSetUpMutation } from 'data/read-replicas/replica-
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { AWS_REGIONS, AWS_REGIONS_DEFAULT, AWS_REGIONS_KEYS, BASE_PATH } from 'lib/constants'
 import { AVAILABLE_REPLICA_REGIONS, AWS_REGIONS_VALUES } from './InstanceConfiguration.constants'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 
 // [Joshen] FYI this is purely for AWS only, need to update to support Fly eventually
 
@@ -22,6 +23,7 @@ const DeployNewReplicaPanel = ({
   onClose,
 }: DeployNewReplicaPanelProps) => {
   const { ref: projectRef } = useParams()
+  const { data } = useReadReplicasQuery({ projectRef })
   const { data: addons, isSuccess } = useProjectAddonsQuery({ projectRef })
   const { mutate: setUpReplica, isLoading: isSettingUp } = useReadReplicaSetUpMutation({
     onSuccess: () => {
@@ -52,7 +54,8 @@ const DeployNewReplicaPanel = ({
     if (!projectRef) return console.error('Project is required')
     if (!regionKey) return toast.error('Unable to deploy replica: Unsupported region selected')
 
-    setUpReplica({ projectRef, region: regionKey as Region })
+    const primary = data?.find((db) => db.identifier === projectRef)
+    setUpReplica({ projectRef, region: regionKey as Region, size: primary?.size ?? 't4g.small' })
   }
 
   useEffect(() => {
