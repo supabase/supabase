@@ -46,27 +46,29 @@ function headingsSentenceCaseCheck(node: Content, file: string) {
     const currWord = currMatch[0]
     const index = textNode.position.start.column + currMatch.index
 
-    if (text[currMatch.index - 2] === ':' && currWord[0] && /[a-z]/.test(currWord[0])) {
-      errors.push(
-        error({
-          message: 'First word after colon should be capitalized.',
-          severity: ErrorSeverity.Error,
-          file,
-          line: textNode.position.start.line,
-          column: textNode.position.start.column,
-          fix: new FixReplace({
-            start: {
-              line: textNode.position.start.line,
-              column: textNode.position.start.column,
-            },
-            end: {
-              line: textNode.position.start.line,
-              column: textNode.position.start.column + 1,
-            },
-            text: firstWord[0].toUpperCase(),
-          }),
-        })
-      )
+    if (text[currMatch.index - 2] === ':') {
+      if (currWord[0] && /[a-z]/.test(currWord[0])) {
+        errors.push(
+          error({
+            message: 'First word after colon should be capitalized.',
+            severity: ErrorSeverity.Error,
+            file,
+            line: textNode.position.start.line,
+            column: textNode.position.start.column,
+            fix: new FixReplace({
+              start: {
+                line: textNode.position.start.line,
+                column: textNode.position.start.column,
+              },
+              end: {
+                line: textNode.position.start.line,
+                column: textNode.position.start.column + 1,
+              },
+              text: firstWord[0].toUpperCase(),
+            }),
+          })
+        )
+      }
     } else if (
       /[A-Z]/.test(currWord[0]) &&
       isException({
