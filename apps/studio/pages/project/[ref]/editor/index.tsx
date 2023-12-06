@@ -25,7 +25,7 @@ const TableEditorPage: NextPageWithLayout = () => {
 
 TableEditorPage.getLayout = (page) => (
   <ProjectContextFromParamsProvider>
-    <TableEditorLayout isBlocking={false}>{page}</TableEditorLayout>
+    <TableEditorLayout>{page}</TableEditorLayout>
   </ProjectContextFromParamsProvider>
 )
 

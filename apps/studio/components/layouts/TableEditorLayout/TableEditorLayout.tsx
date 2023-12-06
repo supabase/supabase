@@ -7,12 +7,7 @@ import { useCheckPermissions, usePermissionsLoaded, useStore } from 'hooks'
 import { ProjectLayoutWithAuth } from '../'
 import TableEditorMenu from './TableEditorMenu'
 
-const TableEditorLayout = ({
-  children,
-  isBlocking = true,
-}: PropsWithChildren<{
-  isBlocking?: boolean
-}>) => {
+const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
   const { vault, meta, ui } = useStore()
 
   const canReadTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'tables')
@@ -41,18 +36,14 @@ const TableEditorLayout = ({
   if (isPermissionsLoaded && !canReadTables) {
     debugger
     return (
-      <ProjectLayoutWithAuth isBlocking={isBlocking}>
+      <ProjectLayoutWithAuth isBlocking={false}>
         <NoPermission isFullPage resourceText="view tables from this project" />
       </ProjectLayoutWithAuth>
     )
   }
 
   return (
-    <ProjectLayoutWithAuth
-      product="Table Editor"
-      productMenu={tableEditorMenu}
-      isBlocking={isBlocking}
-    >
+    <ProjectLayoutWithAuth product="Table Editor" productMenu={tableEditorMenu} isBlocking={false}>
       {children}
     </ProjectLayoutWithAuth>
   )
