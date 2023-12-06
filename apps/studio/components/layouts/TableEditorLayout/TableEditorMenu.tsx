@@ -280,7 +280,7 @@ const TableEditorMenu = () => {
                 <div className="mx-2 my-2 space-y-1 rounded-md border border-muted bg-surface-100 py-3 px-4">
                   <p className="text-xs">No results found</p>
                   <p className="text-xs text-foreground-light">
-                    There are no entities that match your search
+                    Your search for "{searchText}" did not return any results
                   </p>
                 </div>
               )}
