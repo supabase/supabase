@@ -73,7 +73,7 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
           </div>
           {props.params && (
             <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
+              <Tooltip.Trigger asChild>
                 <Button
                   type="default"
                   icon={<IconExternalLink strokeWidth={1.5} />}

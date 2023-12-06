@@ -206,11 +206,9 @@ const NavigationBar = () => {
             </Tooltip.Root>
           )}
           <DropdownMenu>
-            <DropdownMenuTrigger>
-              <Button asChild type="text" size="tiny">
-                <span className="py-1 h-10 border-none">
-                  <IconUser size={18} strokeWidth={2} className="text-foreground-lighter" />
-                </span>
+            <DropdownMenuTrigger asChild>
+              <Button type="text" size="tiny" className="py-1 h-10 border-none">
+                <IconUser size={18} strokeWidth={2} className="text-foreground-lighter" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent side="right" align="start">

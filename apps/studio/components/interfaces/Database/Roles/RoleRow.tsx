@@ -132,9 +132,9 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
                   </p>
                   {!disabled && (
                     <DropdownMenu>
-                      <DropdownMenuTrigger>
-                        <Button asChild type="default" className="px-1" icon={<IconMoreVertical />}>
-                          <span></span>
+                      <DropdownMenuTrigger asChild>
+                        <Button type="default" className="px-1">
+                          <IconMoreVertical />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent side="bottom" className="w-[120px]">

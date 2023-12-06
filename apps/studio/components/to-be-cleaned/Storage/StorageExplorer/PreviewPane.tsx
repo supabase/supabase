@@ -210,7 +210,7 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
                 </Button>
               ) : (
                 <DropdownMenu>
-                  <DropdownMenuTrigger>
+                  <DropdownMenuTrigger asChild>
                     <Button
                       type="outline"
                       icon={<IconClipboard size={16} strokeWidth={2} />}
@@ -256,7 +256,7 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
               )}
             </div>
             <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
+              <Tooltip.Trigger asChild>
                 <Button
                   type="outline"
                   disabled={!canUpdateFiles}

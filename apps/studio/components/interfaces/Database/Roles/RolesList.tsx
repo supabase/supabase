@@ -150,7 +150,7 @@ const RolesList = ({}) => {
               </Tooltip.Content>
             </Tooltip.Root>
             <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
+              <Tooltip.Trigger asChild>
                 <Button
                   type="primary"
                   disabled={!canUpdateRoles}

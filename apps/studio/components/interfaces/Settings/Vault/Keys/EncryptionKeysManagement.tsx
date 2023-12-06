@@ -150,7 +150,7 @@ const EncryptionKeysManagement = () => {
               </Link>
             </Button>
             <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
+              <Tooltip.Trigger asChild>
                 <Button
                   type="primary"
                   disabled={!canManageKeys}
@@ -217,7 +217,7 @@ const EncryptionKeysManagement = () => {
                           Added on {dayjs(key.created).format('MMM D, YYYY')}
                         </p>
                         <Tooltip.Root delayDuration={0}>
-                          <Tooltip.Trigger>
+                          <Tooltip.Trigger asChild>
                             <Button
                               type="default"
                               className="py-2"

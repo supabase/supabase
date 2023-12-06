@@ -361,8 +361,8 @@ const Reports = () => {
 
           {canUpdateReport ? (
             <DropdownMenu>
-              <DropdownMenuTrigger>
-                <Button asChild type="default" iconRight={<IconSettings />}>
+              <DropdownMenuTrigger asChild>
+                <Button type="default" iconRight={<IconSettings />}>
                   <span>Add / Remove charts</span>
                 </Button>
               </DropdownMenuTrigger>
@@ -401,8 +401,8 @@ const Reports = () => {
         <div className="flex min-h-full items-center justify-center rounded border-2 border-dashed p-16 border-default">
           {canUpdateReport ? (
             <DropdownMenu>
-              <DropdownMenuTrigger>
-                <Button asChild type="default" iconRight={<IconPlus />}>
+              <DropdownMenuTrigger asChild>
+                <Button type="default" iconRight={<IconPlus />}>
                   <span>
                     {config.layout.length <= 0 ? 'Add your first chart' : 'Add another chart'}
                   </span>

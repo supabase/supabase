@@ -116,7 +116,7 @@ const VaultToggle = () => {
                 </Link>
               </Button>
               <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger>
+                <Tooltip.Trigger asChild>
                   <Button
                     type="primary"
                     loading={isEnabling}

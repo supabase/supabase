@@ -91,9 +91,9 @@ const HookList = ({ schema, filterString, editHook = noop, deleteHook = noop }: 
               <div className="flex justify-end gap-4">
                 {canUpdateWebhook ? (
                   <DropdownMenu>
-                    <DropdownMenuTrigger>
-                      <Button asChild type="default" icon={<IconMoreVertical />} className="px-1">
-                        <span></span>
+                    <DropdownMenuTrigger asChild>
+                      <Button type="default" className="px-1">
+                        <IconMoreVertical />
                       </Button>
                     </DropdownMenuTrigger>
 

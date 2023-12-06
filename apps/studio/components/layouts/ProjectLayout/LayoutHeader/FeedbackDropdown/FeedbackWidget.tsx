@@ -173,16 +173,14 @@ const FeedbackWidget = ({
               </div>
             ) : (
               <DropdownMenu>
-                <DropdownMenuTrigger>
+                <DropdownMenuTrigger asChild>
                   <Button
-                    asChild
                     type="default"
                     disabled={isSavingScreenshot}
                     loading={isSavingScreenshot}
                     className="px-2 py-1.5"
-                    icon={<IconImage size={14} />}
                   >
-                    <span></span>
+                    <IconImage size={14} />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="bottom" align="end">

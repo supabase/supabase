@@ -24,8 +24,8 @@ const OrganizationDropdown = ({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
-        <Button asChild>
+      <DropdownMenuTrigger asChild>
+        <Button type="primary">
           <span>New project</span>
         </Button>
       </DropdownMenuTrigger>

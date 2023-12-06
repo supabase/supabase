@@ -116,7 +116,7 @@ const TableList = ({
         {!isLocked && (
           <div>
             <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
+              <Tooltip.Trigger asChild>
                 <Button
                   disabled={!canUpdateTables}
                   icon={<IconPlus />}
@@ -268,14 +268,9 @@ const TableList = ({
 
                             {!isLocked && (
                               <DropdownMenu>
-                                <DropdownMenuTrigger>
-                                  <Button
-                                    asChild
-                                    type="default"
-                                    icon={<IconMoreVertical />}
-                                    className="px-1"
-                                  >
-                                    <span />
+                                <DropdownMenuTrigger asChild>
+                                  <Button type="default" className="px-1">
+                                    <IconMoreVertical />
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent side="bottom" align="end" className="w-32">

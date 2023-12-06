@@ -215,13 +215,14 @@ const PaymentMethods = () => {
                               </Tooltip.Root>
                             ) : (
                               <DropdownMenu>
-                                <DropdownMenuTrigger>
+                                <DropdownMenuTrigger asChild>
                                   <Button
                                     type="outline"
-                                    icon={<IconMoreHorizontal />}
                                     loading={isLoadingPaymentMethods}
                                     className="hover:border-gray-500"
-                                  />
+                                  >
+                                    <IconMoreHorizontal />
+                                  </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent>
                                   <DropdownMenuItem

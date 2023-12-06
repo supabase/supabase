@@ -104,7 +104,7 @@ const FunctionsList = ({
 
             {!isLocked && (
               <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger>
+                <Tooltip.Trigger asChild>
                   <Button disabled={!canCreateFunctions} onClick={() => createFunction()}>
                     Create a new function
                   </Button>

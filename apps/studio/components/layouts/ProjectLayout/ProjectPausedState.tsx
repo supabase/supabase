@@ -119,7 +119,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
               <div className="flex items-center justify-center gap-4">
                 <Tooltip.Root delayDuration={0}>
-                  <Tooltip.Trigger>
+                  <Tooltip.Trigger asChild>
                     <Button
                       size="tiny"
                       type="primary"
