@@ -7,7 +7,12 @@ export const meta = {
   subtitle: 'Use Supabase Branches to test and preview changes',
 }
 
-<Admonition type="note" label="Branching is only available on the Pro Plan and above.">
+
+<Admonition type="caution" label="Do not use Branching in prod">
+
+Branching is an early access only feature, which must not be used in a production setting.
+
+To try out branching for non-production experiments, [request access here](https://forms.supabase.com/branching-request).
 
 </Admonition>
 
@@ -19,11 +24,7 @@ When you're ready to ship your changes, merge your branch to update your product
 
 If you understand Git, you already understand Supabase Branching.
 
-<Admonition type="caution" label="Branching is in Alpha">
-
-It is not recommended to use Branching in a production environment.
-
-Branching is an Alpha feature. To try out branching for non-production experiments, [request access here](https://forms.supabase.com/branching-request).
+<Admonition type="note" label="Branching is only available on the Pro Plan and above.">
 
 </Admonition>
 
