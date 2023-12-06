@@ -5,10 +5,7 @@ import DatabaseLayout from './DatabaseLayout/DatabaseLayout'
 import DocsLayout from './DocsLayout/DocsLayout'
 import LogsLayout from './LogsLayout/LogsLayout'
 import OrganizationLayout from './OrganizationLayout'
-import ProjectLayout, {
-  ProjectLayoutNonBlocking,
-  ProjectLayoutWithAuth,
-} from './ProjectLayout/ProjectLayout'
+import ProjectLayout, { ProjectLayoutWithAuth } from './ProjectLayout/ProjectLayout'
 import SettingsLayout from './ProjectSettingsLayout/SettingsLayout'
 import ReportsLayout from './ReportsLayout/ReportsLayout'
 import SQLEditorLayout from './SQLEditorLayout/SQLEditorLayout'
@@ -29,7 +26,6 @@ export {
   ForgotPasswordLayout,
   LogsLayout,
   OrganizationLayout,
-  ProjectLayoutNonBlocking,
   ProjectLayoutWithAuth,
   ReportsLayout,
   SQLEditorLayout,
