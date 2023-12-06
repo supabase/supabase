@@ -163,7 +163,8 @@ Future<AuthResponse> signInWithApple() async {
   final idToken = credential.identityToken;
   if (idToken == null) {
     throw const AuthException(
-        'Could not find ID Token from generated credential.');
+        'Could not find ID Token from generated credential.',
+    );
   }
 
   return signInWithIdToken(
@@ -172,7 +173,7 @@ Future<AuthResponse> signInWithApple() async {
     nonce: rawNonce,
   );
 }
-````
+```
 
 </TabPanel>
 </Tabs>
@@ -207,7 +208,7 @@ If the session is expired, you can listen to the `onAuthStateChange` event and w
 ```dart
 // Session is valid, no check required
 final session = supabase.auth.currentSession;
-````
+```
 
 </TabPanel>
 <TabPanel id="2.0x" label="After">
@@ -216,8 +217,7 @@ final session = supabase.auth.currentSession;
 
 // Check if the session is valid.
 final isSessionExpired = session?.isExpired;
-
-````
+```
 
 </TabPanel>
 </Tabs>
@@ -255,7 +255,7 @@ await supabase.auth.signInWithOAuth(
   authScreenLaunchMode: LaunchMode.inAppWebView,
   context: context,
 );
-````
+```
 
 </TabPanel>
 <TabPanel id="2.0x" label="After">
@@ -421,8 +421,7 @@ final foo = await myQuery.eq('some_col', 'foo');
 
 // The `eq` filter above is applied in addition to the following filter
 final bar = await myQuery.eq('another_col', 'bar');
-
-````
+```
 
 </TabPanel>
 <TabPanel id="2.0x" label="After">
@@ -434,7 +433,7 @@ final foo = await myQuery.eq('some_col', 'foo');
 
 // The `eq` filter above is not applied to the following result
 final bar = await myQuery.eq('another_col', 'bar');
-````
+```
 
 </TabPanel>
 </Tabs>
@@ -463,29 +462,29 @@ Users found the underscore confusing, so the query filters are now renamed to `i
 <TabPanel id="1.0x" label="Before">
 ```dart
 final data = await supabase
-    .from('users')
-    .select()
-    .is_('status', null);
+  .from('users')
+  .select()
+  .is_('status', null);
 
 final data = await supabase
-    .from('users')
-    .select()
-    .in_('status', ['ONLINE', 'OFFLINE']);
-````
+  .from('users')
+  .select()
+  .in_('status', ['ONLINE', 'OFFLINE']);
+```
 
 </TabPanel>
 <TabPanel id="2.0x" label="After">
 ```dart
 final data = await supabase
-    .from('users')
-    .select()
-    .isFilter('status', null);
+  .from('users')
+  .select()
+  .isFilter('status', null);
 
 final data = await supabase
-    .from('users')
-    .select()
-    .inFilter('status', ['ONLINE', 'OFFLINE']);
-````
+  .from('users')
+  .select()
+  .inFilter('status', ['ONLINE', 'OFFLINE']);
+```
 
 </TabPanel>
 </Tabs>
@@ -587,20 +586,20 @@ supabase.channel('my_channel').on(
 
 ```dart
 supabase.channel('my_channel')
-    .onPostgresChanges(
-        event: PostgresChangeEvent.all,
-        schema: 'public',
-        table: 'messages',
-        filter: PostgresChangeFilter(
-          type: PostgresChangeFilterType.eq,
-          column: 'room_id',
-          value: 200,
-        ),
-        callback: (PostgresChangePayload payload) {
-          final Map<String, dynamic> newRecord = payload.newRecord;
-          final Map<String, dynamic> oldRecord = payload.oldRecord;
-        })
-    .subscribe();
+  .onPostgresChanges(
+    event: PostgresChangeEvent.all,
+    schema: 'public',
+    table: 'messages',
+    filter: PostgresChangeFilter(
+      type: PostgresChangeFilterType.eq,
+      column: 'room_id',
+      value: 200,
+    ),
+    callback: (PostgresChangePayload payload) {
+      final Map<String, dynamic> newRecord = payload.newRecord;
+      final Map<String, dynamic> oldRecord = payload.oldRecord;
+    })
+  .subscribe();
 ```
 
 </TabPanel>
@@ -613,6 +612,7 @@ supabase.channel('my_channel')
   <RefSubLayout.Details>
 
 #### Broadcast
+
 Broadcast now uses the dedicated `.onBroadcast()` method, rather than the generic `.on()` method.
 Because the method is specific to broadcast, it takes fewer properties.
 
@@ -645,13 +645,13 @@ supabase.channel('my_channel').on(
 
 ```dart
 supabase
-    .channel('my_channel')
-    .onBroadcast(
-        event: 'position',
-        callback: (Map<String, dynamic> payload) {
-          print(payload);
-        })
-    .subscribe();
+  .channel('my_channel')
+  .onBroadcast(
+    event: 'position',
+    callback: (Map<String, dynamic> payload) {
+      print(payload);
+    })
+  .subscribe();
 ```
 
 </TabPanel>
@@ -665,7 +665,7 @@ supabase
 
 #### Presence
 
-Realtime Presence gets three different methods for listening to three different presence events: `sync`, `join`, and `leave`. 
+Realtime Presence gets three different methods for listening to three different presence events: `sync`, `join`, and `leave`.
 This allows the callback to be strictly typed.
 
   </RefSubLayout.Details>
