@@ -74,6 +74,7 @@ export const useTableRowsCountQuery = <TData extends TableRowsCountData = TableR
       ],
     },
     {
+      staleTime: 0,
       select(data) {
         return {
           count: data.result[0].count,
