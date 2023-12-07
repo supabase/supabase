@@ -558,7 +558,7 @@
       {
         "id": "get-user-identities",
         "title": "Retrieve identities linked to a user",
-        "slug": "auth-linkidentity",
+        "slug": "auth-getuseridentities",
         "product": "auth",
         "type": "function"
       },
