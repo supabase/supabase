@@ -33,7 +33,23 @@ import { createClient } from '@supabase/supabase-js'
 const SUPABASE_URL = 'https://<project>.supabase.co'
 const SUPABASE_KEY = '<your-anon-key>'
 
-const client = createClient(SUPABASE_URL, SUPABASE_KEY)
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+void main() {
+  Supabase.initialize(
+    url: 'https://<project>.supabase.co',
+    anonKey: '<your-anon-key>',
+  );
+
+  runApp(MyApp());
+}
+
+final supabase = Supabase.instance.client;
 ```
 
 </TabPanel>
@@ -78,6 +94,24 @@ roomOne
     console.log('leave', key, leftPresences)
   })
   .subscribe()
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final supabase = Supabase.instance.client;
+
+final roomOne = supabase.channel('room_01');
+
+roomOne.onPresenceSync((_) {
+  final newState = roomOne.presenceState();
+  print('sync: $newState');
+}).onPresenceJoin((payload) {
+  print('join: $payload');
+}).onPresenceLeave((payload) {
+  print('leave: $payload');
+}).subscribe();
 ```
 
 </TabPanel>
@@ -132,6 +166,25 @@ roomOne.subscribe(async (status) => {
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final roomOne = supabase.channel('room_01');
+
+final userStatus = {
+  'user': 'user-1',
+  'online_at': DateTime.now().toIso8601String(),
+};
+
+roomOne.subscribe((status, error) async {
+  if (status != RealtimeSubscribeStatus.subscribed) return;
+
+  final presenceTrackStatus = await roomOne.track(userStatus);
+  print(presenceTrackStatus);
+});
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -176,6 +229,20 @@ untrackPresence()
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final roomOne = supabase.channel('room_01');
+
+untrackPresence() async {
+  final presenceUntrackStatus = await roomOne.untrack();
+  print(presenceUntrackStatus);
+}
+
+untrackPresence();
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -216,6 +283,16 @@ const channelC = supabase.channel('test', {
     },
   },
 })
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final channelC = supabase.channel(
+  'test',
+  opts: const RealtimeChannelConfig(key: 'userId-123'),
+);
 ```
 
 </TabPanel>
