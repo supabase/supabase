@@ -632,7 +632,7 @@ functions:
       - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
       - The user needs to be signed in to call `unlinkIdentity()`.
       - The user must have at least 2 identities in order to unlink an identity.
-      - The target identity to be unlinked must belong to the user.
+      - The identity to be unlinked must belong to the user.
     examples:
       - id: unlink-identity
         name: Unlink an identity
