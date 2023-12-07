@@ -31,14 +31,13 @@ const RLSAIAssistantPreview = () => {
           <li>
             <Markdown
               className="text-foreground-light"
-              content={`Replace the existing wizard-like UI for creating/updating RLS policies [here](/project/${ref}/auth/policies) with a code
-              editor accompanied an AI assistant chat interface`}
+              content={`Replace the existing wizard-like UI for creating/updating RLS policies [here](/project/${ref}/auth/policies). Create policies in code with Supabase Assistant`}
             />
           </li>
           <li>
             <Markdown
               className="text-foreground-light"
-              content={`Freely explain the scopes of your intended policy, and the AI assistant will generate SQL snippets for you iteratively`}
+              content={`Supabase Assistant will iteratively generate SQL from your natural language prompts`}
             />
           </li>
         </ul>

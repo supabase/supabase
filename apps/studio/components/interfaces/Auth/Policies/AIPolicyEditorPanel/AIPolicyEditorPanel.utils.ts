@@ -26,6 +26,8 @@ export const generateThreadMessage = ({
 export const generatePlaceholder = (policy?: PostgresPolicy) => {
   if (policy === undefined) {
     return `
+-- Press tab to use this code\n
+&nbsp;\n
 CREATE POLICY *name* ON *table_name*\n
 AS PERMISSIVE -- PERMISSIVE | RESTRICTIVE\n
 FOR ALL -- ALL | SELECT | INSERT | UPDATE | DELETE\n
@@ -45,6 +47,8 @@ WITH CHECK ( *check_expression* );
     }
 
     return `
+-- Press tab to use this code\n
+&nbsp;\n
 BEGIN;\n
 &nbsp;\n
 -- To update your policy definition\n

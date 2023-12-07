@@ -286,6 +286,7 @@ export const AIPolicyEditorPanel = memo(function ({
                   modified={incomingChange}
                   onMount={(editor) => (diffEditorRef.current = editor)}
                   options={{
+                    wordWrap: 'on',
                     renderSideBySide: false,
                     scrollBeyondLastLine: false,
                     renderOverviewRuler: false,
