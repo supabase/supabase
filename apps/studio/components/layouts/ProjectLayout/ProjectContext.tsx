@@ -1,4 +1,4 @@
-import { createContext, memo, PropsWithChildren, useContext, useEffect, useMemo } from 'react'
+import { createContext, PropsWithChildren, useContext, useMemo } from 'react'
 
 import { useParams } from 'common/hooks'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
