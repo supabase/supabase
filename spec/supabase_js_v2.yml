@@ -615,7 +615,7 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueClient.linkIdentity'
     notes: |
       - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
-      - The user needs to be signed in in order to call `linkIdentity()`.
+      - The user needs to be signed in to call `linkIdentity()`.
       - If the candidate identity is already linked to the existing user or another user, `linkIdentity()` will fail.
     examples:
       - id: link-identity
