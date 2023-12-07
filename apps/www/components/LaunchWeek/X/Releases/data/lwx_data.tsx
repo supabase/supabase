@@ -57,19 +57,13 @@ const days: WeekDayProps[] = [
   {
     id: 'day-1',
     title: 'Read Replicas',
-    shipped: true,
-    isToday: true,
+    shipped: false,
+    // isToday: true,
     blog: '',
     hasCountdown: true,
     date: '11 Dec',
     published_at: '2023-12-11T08:00:00.000-08:00',
-    description: (
-      <>
-        Read Replicas Placeholder title for blog post for{' '}
-        <span className="text-foreground">the first day of Launch Week</span>, can be a bit longer
-        and then few things highlighted
-      </>
-    ),
+    description: null,
     d: 1,
     dd: 'Mon',
     links: [
@@ -104,7 +98,7 @@ const days: WeekDayProps[] = [
     title: '',
     shipped: false,
     blog: '',
-    hasCountdown: true,
+    hasCountdown: false,
     date: '12 Dec',
     published_at: '2023-12-12T08:00:00.000-08:00',
     description: '',

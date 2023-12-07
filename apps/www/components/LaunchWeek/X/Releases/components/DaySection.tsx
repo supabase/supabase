@@ -18,7 +18,7 @@ const DaySection = ({ day }: { day: WeekDayProps }) => {
     >
       {/* Day title and links */}
       <div className="flex h-full flex-col gap-4 items-between">
-        <div className="text-sm inline sm:hidden md:inline uppercase font-mono text-foreground tracking-[0.1rem]">
+        <div className="text-sm inline uppercase font-mono text-foreground tracking-[0.1rem]">
           {day.dd}, {day.date}
         </div>
         {day.shipped && (
@@ -34,7 +34,7 @@ const DaySection = ({ day }: { day: WeekDayProps }) => {
 
       {/* Day Countdown */}
       {!day.shipped && day.hasCountdown && (
-        <div className="flex items-center gap-2 h-4">
+        <div className="flex items-center gap-2 h-5">
           <svg
             width="17"
             height="17"
