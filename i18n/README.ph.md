@@ -39,7 +39,7 @@ Upang malaman kung paano makatulong, bisitahin ang [Paano mag simula](./DEVELOPE
 ## Komunidad at Suporta
 
 - [Komunidad na Forum](https://github.com/supabase/supabase/discussions) Pinakamabuti para sa: tulong sa pagbuo, diskusyon tungkol sa mga pinakamahusay na praktika sa database.
-- [Mga Isyu sa GitHub](https://github.com/supabase/supabase/issues) Pinakamabuti para sa: mga bug at error na iyong nae-encounter gamit ang Supabase.
+- [Mga Isyu sa GitHub](https://github.com/supabase/supabase/issues) Pinakamabuti para sa: mga bug at error na iyong nae-encounter gamit ng Supabase.
 - [Suporta sa Email](https://supabase.com/docs/support#business-support) Pinakamabuti para sa: mga problema sa iyong database o infrastructure.
 - [Discord](https://discord.supabase.com) Pinakamabuti para sa: pagbabahagi ng iyong mga aplikasyon at pakikipag-ugnayan sa komunidad.
 
@@ -73,7 +73,7 @@ Ang aming pamamaraan para sa mga aklatang kliyente ay modular. Bawat sub-aklatan
 <table style="table-layout:fixed; white-space: nowrap;">
   <tr>
     <th>Language</th>
-    <th>Kliyente</th>
+    <th>Client</th>
     <th colspan="5">Feature-Clients (bundled in Supabase client)</th>
   </tr>
   <!-- notranslate -->
