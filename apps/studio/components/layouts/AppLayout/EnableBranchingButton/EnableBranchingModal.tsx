@@ -210,9 +210,10 @@ const EnableBranchingModal = () => {
                         Branching uses your GitHub repository to apply migrations
                       </p>
                       <p className="text-sm text-foreground-light">
-                        Database migrations are handled via the <code>./supabase</code> directory in
-                        your GitHub repo. Migration files will run on both Preview Branches and
-                        Production when pushing to and merging git branches.
+                        Database migrations are handled via the{' '}
+                        <code className="text-xs">./supabase</code> directory in your GitHub repo.
+                        Migration files will run on both Preview Branches and Production when
+                        pushing to and merging git branches.
                       </p>
                     </div>
                   </div>
