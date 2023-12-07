@@ -202,17 +202,40 @@ When developing with Expo, you can test Sign in with Apple via the Expo Go app, 
 
     ## Using Native Sign in with Apple in Flutter
 
-    Unlike the OAuth flow which requires the use of a web browser, the native Sign in with Apple flow on iOS, macOS, watchOS or tvOS uses the [operating system's built-in functionalities](https://developer.apple.com/documentation/authenticationservices) to prompt the user for consent.
+    You can perform Apple sign in using the [sign_in_with_apple](https://pub.dev/packages/sign_in_with_apple) package on Flutter.
+    Follow the instructions in the package README to set up native Apple sign in on iOS and macOS.
 
-    When the user provides consent, Apple issues an identity token (commonly abbreviated as ID token) that is then sent to your project's Supabase Auth server. When valid, a new user session is started by issuing an access and refresh token from Supabase Auth.
-
-    If you are building an iOS or macOS app using Flutter, you can use the [signInWithApple()](/docs/reference/dart/sign-in-with-apple) method to perform Apple sign in:
+    Once the setup is complete on the Flutter app, add the bundle ID of your app to your Supabase dashboard in `Authentication -> Providers -> Apple` in order to register your app with Supabase.
 
     ```dart
+    import 'package:sign_in_with_apple/sign_in_with_apple.dart';
     import 'package:supabase_flutter/supabase_flutter.dart';
 
-    final AuthResponse res = await supabase.auth.signInWithApple();
-    final User? user = res.user;
+    /// Performs Apple sign in on iOS or macOS
+    Future<AuthResponse> signInWithApple() async {
+      final rawNonce = supabase.auth.generateRawNonce();
+      final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
+
+      final credential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+        nonce: hashedNonce,
+      );
+
+      final idToken = credential.identityToken;
+      if (idToken == null) {
+        throw const AuthException(
+            'Could not find ID Token from generated credential.');
+      }
+
+      return signInWithIdToken(
+        provider: OAuthProvider.apple,
+        idToken: idToken,
+        nonce: rawNonce,
+      );
+    }
     ```
 
     ### Configuration [#flutter-configuration-native-app]
