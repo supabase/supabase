@@ -195,33 +195,10 @@ const EnableBranchingModal = () => {
                 ) : (
                   <BranchingPostgresVersionNotice />
                 )}
-                <Modal.Content className="px-7 py-6 flex flex-col gap-3">
-                  <p className="text-sm text-foreground-light">
-                    Please keep in mind the following:
-                  </p>
-                  <div className="flex flex-row gap-4">
-                    <div>
-                      <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-300 flex items-center justify-center">
-                        <IconFileText className="text-amber-900" size={20} strokeWidth={2} />
-                      </figure>
-                    </div>
-                    <div className="flex flex-col gap-y-1">
-                      <p className="text-sm text-foreground">
-                        You will not be able to make changes to the database via the dashboard
-                      </p>
-                      <p className="text-sm text-foreground-light">
-                        Schema changes for database Preview Branches must be made using Git.
-                        Dashboard changes to Preview Branches are coming soon.
-                      </p>
-                    </div>
-                  </div>
-                </Modal.Content>
               </>
             )}
 
-            <Modal.Separator />
-
-            <Modal.Content className="px-7">
+            <Modal.Content className="pt-2 px-7">
               <div className="flex items-center space-x-2 py-2 pb-4">
                 <Button
                   size="medium"
