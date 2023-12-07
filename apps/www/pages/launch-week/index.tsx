@@ -115,7 +115,7 @@ export default function LaunchWeekIndex({ meetups }: Props) {
           <MainStage />
           <BuildStage />
           {/* <TicketingFlow /> */}
-          <SectionContainer id="meetups" className="!pt-4 scroll-mt-[66px]">
+          <SectionContainer id="meetups" className="scroll-mt-[66px]">
             <LWXMeetups meetups={meetups} />
           </SectionContainer>
           <SectionContainer className="lg:pb-40">
