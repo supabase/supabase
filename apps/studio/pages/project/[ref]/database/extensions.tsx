@@ -5,7 +5,7 @@ import { Extensions } from 'components/interfaces/Database'
 import { DatabaseLayout } from 'components/layouts'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
 import { NextPageWithLayout } from 'types'
 
 const DatabaseExtensions: NextPageWithLayout = () => {
@@ -13,7 +13,9 @@ const DatabaseExtensions: NextPageWithLayout = () => {
     PermissionAction.TENANT_SQL_ADMIN_READ,
     'extensions'
   )
-  if (!canReadExtensions) {
+  const isPermissionsLoaded = usePermissionsLoaded()
+
+  if (isPermissionsLoaded && !canReadExtensions) {
     return <NoPermission isFullPage resourceText="view database extensions" />
   }
 
