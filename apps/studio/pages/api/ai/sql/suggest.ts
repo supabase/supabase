@@ -65,7 +65,8 @@ async function handlePost(request: NextRequest) {
         - Only use "WITH CHECK" on INSERT or UPDATE policies.
         - The policy name should be short text explaining the policy, enclosed in double quotes.
         - Always put explanations as separate text. Never use inline SQL comments. 
-        - If the user asks for something else than SQL policies, reply with "I'm afraid I can't do that, Dave.".
+        - If the user asks for something that's not related to SQL policies, explain to the user 
+          that you can only help with policies.
         
         The output should look like this: 
         "CREATE POLICY user_policy ON users FOR INSERT USING (user_name = current_user) WITH (true);" 
@@ -82,11 +83,12 @@ async function handlePost(request: NextRequest) {
   }
 
   if (policyDefinition !== undefined) {
+    const definitionBlock = codeBlock`${policyDefinition}`
     initMessages.push({
       role: 'user',
       content: codeBlock`
         Here is my policy definition for reference:
-        ${policyDefinition}
+        ${definitionBlock}
       `.trim(),
     })
   }
