@@ -68,6 +68,7 @@ const SchemaSelector = ({
           type="outline"
           className="w-full [&>span]:w-full"
           icon={<IconLoader className="animate-spin" size={12} />}
+          disabled={!!disabled}
         >
           <div className="w-full flex space-x-3 py-0.5">
             <p className="text-xs text-foreground-light">Loading schemas...</p>

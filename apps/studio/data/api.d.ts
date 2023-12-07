@@ -1547,6 +1547,14 @@ export interface paths {
     /** Disables project's readonly mode for the next 15 minutes */
     post: operations['ReadOnlyController_temporarilyDisableReadonlyMode']
   }
+  '/v1/projects/{ref}/read-replicas/setup': {
+    /** Set up a read replica */
+    post: operations['ReadReplicaController_setUpReadReplica']
+  }
+  '/v1/projects/{ref}/read-replicas/remove': {
+    /** Remove a read replica */
+    post: operations['ReadReplicaController_removeReadReplica']
+  }
   '/v1/projects/{ref}/health': {
     /** Gets project's service health status */
     get: operations['ServiceHealthController_checkServiceHealth']
@@ -1858,6 +1866,10 @@ export interface components {
       SMS_TEST_OTP_VALID_UNTIL: string
       HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED?: boolean
       HOOK_MFA_VERIFICATION_ATTEMPT_URI?: string
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED?: boolean
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI?: string
+      HOOK_CUSTOM_ACCESS_TOKEN_ENABLED?: boolean
+      HOOK_CUSTOM_ACCESS_TOKEN_URI?: string
       EXTERNAL_APPLE_ENABLED: boolean
       EXTERNAL_APPLE_CLIENT_ID: string
       EXTERNAL_APPLE_SECRET: string
@@ -2004,6 +2016,10 @@ export interface components {
       SMS_TEMPLATE?: string
       HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED?: boolean
       HOOK_MFA_VERIFICATION_ATTEMPT_URI?: string
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED?: boolean
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI?: string
+      HOOK_CUSTOM_ACCESS_TOKEN_ENABLED?: boolean
+      HOOK_CUSTOM_ACCESS_TOKEN_URI?: string
       EXTERNAL_APPLE_ENABLED?: boolean
       EXTERNAL_APPLE_CLIENT_ID?: string
       EXTERNAL_APPLE_SECRET?: string
@@ -2144,6 +2160,10 @@ export interface components {
       SMS_TEST_OTP_VALID_UNTIL: string
       HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED?: boolean
       HOOK_MFA_VERIFICATION_ATTEMPT_URI?: string
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED?: boolean
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI?: string
+      HOOK_CUSTOM_ACCESS_TOKEN_ENABLED?: boolean
+      HOOK_CUSTOM_ACCESS_TOKEN_URI?: string
       EXTERNAL_APPLE_ENABLED: boolean
       EXTERNAL_APPLE_CLIENT_ID: string
       EXTERNAL_APPLE_SECRET: string
@@ -4501,6 +4521,31 @@ export interface components {
       override_enabled: boolean
       override_active_until: string
     }
+    SetUpReadReplicaBody: {
+      /**
+       * @description Region you want your read replica to reside in
+       * @example us-east-1
+       * @enum {string}
+       */
+      read_replica_region:
+        | 'us-east-1'
+        | 'us-west-1'
+        | 'us-west-2'
+        | 'ap-southeast-1'
+        | 'ap-northeast-1'
+        | 'ap-northeast-2'
+        | 'ap-southeast-2'
+        | 'eu-west-1'
+        | 'eu-west-2'
+        | 'eu-west-3'
+        | 'eu-central-1'
+        | 'ca-central-1'
+        | 'ap-south-1'
+        | 'sa-east-1'
+    }
+    RemoveReadReplicaBody: {
+      database_identifier: string
+    }
     AuthHealthResponse: {
       name: string
       version: string
@@ -4516,8 +4561,10 @@ export interface components {
         | components['schemas']['AuthHealthResponse']
         | components['schemas']['RealtimeHealthResponse']
       /** @enum {string} */
-      name: 'auth' | 'db' | 'realtime' | 'rest' | 'storage'
+      name: 'auth' | 'db' | 'pooler' | 'realtime' | 'rest' | 'storage'
       healthy: boolean
+      /** @enum {string} */
+      status: 'COMING_UP' | 'ACTIVE_HEALTHY' | 'UNHEALTHY'
       error?: string
     }
     V1PgbouncerConfigResponse: {
@@ -11722,12 +11769,58 @@ export interface operations {
       }
     }
   }
+  /** Set up a read replica */
+  ReadReplicaController_setUpReadReplica: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SetUpReadReplicaBody']
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to set up read replica */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Remove a read replica */
+  ReadReplicaController_removeReadReplica: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RemoveReadReplicaBody']
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to remove read replica */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Gets project's service health status */
   ServiceHealthController_checkServiceHealth: {
     parameters: {
       query: {
         timeout_ms?: number
-        services: ('auth' | 'db' | 'realtime' | 'rest' | 'storage')[]
+        services: ('auth' | 'db' | 'pooler' | 'realtime' | 'rest' | 'storage')[]
       }
       path: {
         /** @description Project ref */
