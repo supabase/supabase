@@ -5,13 +5,13 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { Button, IconExternalLink, IconEye, IconEyeOff, Modal, ScrollArea, cn } from 'ui'
 
+import { useFlag } from 'hooks'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import Telemetry from 'lib/telemetry'
 import { useAppStateSnapshot } from 'state/app-state'
 import APISidePanelPreview from './APISidePanelPreview'
 import { useFeaturePreviewContext } from './FeaturePreviewContext'
 import RLSAIAssistantPreview from './RLSAIAssistantPreview'
-import { useFlag } from 'hooks'
 
 const FeaturePreviewModal = () => {
   const isAiAssistantEnabled = useFlag('policyEditorWithAi')
@@ -28,9 +28,9 @@ const FeaturePreviewModal = () => {
       ? [
           {
             key: LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT,
-            name: 'AI Assistant for RLS policies',
+            name: 'Supabase Assistant for RLS policies',
             content: <RLSAIAssistantPreview />,
-            discussionsUrl: '/', // Need to update
+            discussionsUrl: undefined,
           },
         ]
       : []),
@@ -82,7 +82,7 @@ const FeaturePreviewModal = () => {
                     onClick={() => setSelectedFeatureKey(feature.key)}
                     className={cn(
                       'flex items-center space-x-3 p-4 border-b cursor-pointer bg transition',
-                      selectedFeatureKey === feature.key ? 'bg-surface-200' : ''
+                      selectedFeatureKey === feature.key ? 'bg-surface-300' : 'bg-surface-100'
                     )}
                   >
                     {isEnabled ? (

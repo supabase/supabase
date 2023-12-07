@@ -36,6 +36,23 @@ const client = createClient(SUPABASE_URL, SUPABASE_KEY)
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+void main() async {
+  Supabase.initialize(
+    url: 'https://<project>.supabase.co',
+    anonKey: '<your-anon-key>',
+  );
+  runApp(MyApp());
+}
+
+final supabase = Supabase.instance.client;
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -80,6 +97,22 @@ channelA
     (payload) => messageReceived(payload)
   )
   .subscribe()
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+// Simple function to log any messages we receive
+void messageReceived(payload) {
+  print(payload);
+}
+
+// Subscribe to the Channel
+channelA
+    .onBroadcast(
+        event: 'test', callback: (payload) => messageReceived(payload))
+    .subscribe();
 ```
 
 </TabPanel>
@@ -133,6 +166,27 @@ channelB.subscribe((status) => {
     payload: { message: 'hello, world' },
   })
 })
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+// Join a room/topic. Can be anything except for 'realtime'.
+final channelB = supabase.channel('room-1');
+
+channelB.subscribe((status, error) {
+  // Wait for successful connection
+  if (status != RealtimeSubscribeStatus.subscribed) {
+    return;
+  }
+
+  // Send a message once the client is subscribed
+  channelB.sendBroadcastMessage(
+    event: 'test',
+    payload: {'message': 'hello, world'},
+  );
+});
 ```
 
 </TabPanel>
@@ -197,6 +251,32 @@ myChannel.subscribe((status) => {
     payload: { message: 'talking to myself' },
   })
 })
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final myChannel = supabase.channel(
+  'room-2',
+  opts: const RealtimeChannelConfig(
+    self: true,
+  ),
+);
+
+myChannel.onBroadcast(
+  event: 'test-my-messages',
+  callback: (payload) => print(payload),
+);
+
+myChannel.subscribe((status, error) {
+  if (status != RealtimeSubscribeStatus.subscribed) return;
+  // channelC.send({
+  myChannel.sendBroadcastMessage(
+    event: 'test-my-messages',
+    payload: {'message': 'talking to myself'},
+  );
+});
 ```
 
 </TabPanel>
@@ -266,6 +346,29 @@ myChannel.subscribe(async (status) => {
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final myChannel = supabase.channel('room-3',opts: const RealtimeChannelConfig(
+  ack: true,
+),
+
+);
+
+myChannel.subscribe( (status, error) async {
+  if (status != RealtimeSubscribeStatus.subscribed) return;
+
+  final serverResponse = await myChannel.sendBroadcastMessage(
+
+    event: 'acknowledge',
+    payload: {},
+  );
+
+  print('serverResponse: $serverResponse');
+});
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 By default, broadcast messages are only sent to other clients. You can broadcast messages back to the sender by setting Broadcast's `acknowledgeBroadcasts` parameter to `true`.
@@ -330,15 +433,14 @@ client.removeChannel(channel)
 ```dart
 // No need to subscribe to channel
 
-channel = client.channel('test-channel');
-final resp = await channel.send(
-  type: RealtimeListenTypes.broadcast,
+final channel = supabase.channel('test-channel');
+final res = await channel.sendBroadcastMessage(
+  event: "test",
   payload: {
     'message': 'Hi',
   },
-  event: "test"
 );
-print(resp);
+print(res);
 ````
 
 </TabPanel>

@@ -94,7 +94,7 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
   return (
     <>
       <Tooltip.Root delayDuration={0}>
-        <Tooltip.Trigger>
+        <Tooltip.Trigger asChild>
           <Button onClick={toggle} type={type} disabled={!canDeleteProject}>
             Delete project
           </Button>

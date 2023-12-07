@@ -141,7 +141,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
             </a>
             {isAiAssistantEnabled && (
               <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger>
+                <Tooltip.Trigger asChild>
                   <Button
                     type="primary"
                     disabled={!canCreatePolicies}

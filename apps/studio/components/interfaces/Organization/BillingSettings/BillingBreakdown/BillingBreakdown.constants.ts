@@ -15,7 +15,7 @@ export interface Metric {
 export const BILLING_BREAKDOWN_METRICS: Metric[] = [
   {
     key: PricingMetric.DATABASE_SIZE,
-    name: 'Database space',
+    name: 'Database Size',
     units: 'bytes',
     anchor: 'dbSize',
     category: 'Database',
@@ -31,7 +31,7 @@ export const BILLING_BREAKDOWN_METRICS: Metric[] = [
   },
   {
     key: PricingMetric.MONTHLY_ACTIVE_USERS,
-    name: 'Active users',
+    name: 'Monthly Active Users',
     units: 'absolute',
     anchor: 'mau',
     // metric: 'MONTHLY_ACTIVE_USERS',
@@ -40,7 +40,7 @@ export const BILLING_BREAKDOWN_METRICS: Metric[] = [
   },
   {
     key: PricingMetric.MONTHLY_ACTIVE_SSO_USERS,
-    name: 'Active SSO users',
+    name: 'Monthly Active SSO Users',
     units: 'absolute',
     anchor: 'mauSso',
     // metric: 'MONTHLY_ACTIVE_SSO_USERS',
@@ -49,7 +49,7 @@ export const BILLING_BREAKDOWN_METRICS: Metric[] = [
   },
   {
     key: PricingMetric.STORAGE_SIZE,
-    name: 'Storage space',
+    name: 'Storage Size',
     units: 'bytes',
     anchor: 'storageSize',
     // metric: 'STORAGE_SIZE',
@@ -67,7 +67,7 @@ export const BILLING_BREAKDOWN_METRICS: Metric[] = [
   },
   {
     key: PricingMetric.REALTIME_PEAK_CONNECTIONS,
-    name: 'Realtime peak connections',
+    name: 'Realtime Peak Connections',
     units: 'absolute',
     anchor: 'realtimePeakConnections',
     // metric: 'REALTIME_PEAK_CONNECTIONS',
@@ -76,7 +76,7 @@ export const BILLING_BREAKDOWN_METRICS: Metric[] = [
   },
   {
     key: PricingMetric.REALTIME_MESSAGE_COUNT,
-    name: 'Realtime messages',
+    name: 'Realtime Messages',
     units: 'absolute',
     anchor: 'realtimeMessageCount',
     // metric: 'REALTIME_MESSAGE_COUNT',
@@ -85,7 +85,7 @@ export const BILLING_BREAKDOWN_METRICS: Metric[] = [
   },
   {
     key: PricingMetric.FUNCTION_INVOCATIONS,
-    name: 'Edge Function invocations',
+    name: 'Edge Function Invocations',
     units: 'absolute',
     anchor: 'funcInvocations',
     // metric: 'FUNCTION_INVOCATIONS',
@@ -94,7 +94,7 @@ export const BILLING_BREAKDOWN_METRICS: Metric[] = [
   },
   {
     key: PricingMetric.FUNCTION_COUNT,
-    name: 'Edge Functions',
+    name: 'Edge Function Count',
     units: 'absolute',
     anchor: 'funcCount',
     // metric: 'FUNCTION_COUNT',

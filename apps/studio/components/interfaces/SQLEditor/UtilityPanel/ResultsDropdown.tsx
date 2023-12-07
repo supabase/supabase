@@ -106,8 +106,8 @@ const ResultsDropdown = ({ id, isExecuting }: ResultsDropdownProps) => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
-        <Button asChild type="text" iconRight={<IconChevronDown />}>
+      <DropdownMenuTrigger asChild>
+        <Button type="text" iconRight={<IconChevronDown />}>
           <span>
             Results
             {!isExecuting &&
@@ -116,14 +116,16 @@ const ResultsDropdown = ({ id, isExecuting }: ResultsDropdownProps) => {
               ` (${result.rows.length.toLocaleString()})`}
           </span>
         </Button>
-        <CSVLink
-          ref={csvRef}
-          className="hidden"
-          headers={headers}
-          data={csvData}
-          filename={`supabase_${project?.ref}_${snap.snippets[id]?.snippet.name}`}
-        />
       </DropdownMenuTrigger>
+
+      <CSVLink
+        ref={csvRef}
+        className="hidden"
+        headers={headers}
+        data={csvData}
+        filename={`supabase_${project?.ref}_${snap.snippets[id]?.snippet.name}`}
+      />
+
       <DropdownMenuContent side="bottom" align="start">
         <>
           <DropdownMenuItem onClick={onDownloadCSV} className="space-x-2">
