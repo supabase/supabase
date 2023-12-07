@@ -3382,13 +3382,6 @@ functions:
       - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
       - When using a method with a generic type like `track`, `broadcast` or `broadcastFlow`, you have to provide a [serializable class](/docs/reference/kotlin/installing#serialization) as the type parameter.
     examples:
-      - id: connect-to-realtime-client
-        name: Connect to Realtime
-        isSpotlight: true
-        code: |
-          ```kotlin
-          supabase.realtime.connect()
-          ```
       - id: liste-to-broadcasts
         name: Listen to broadcasts
         code: |
