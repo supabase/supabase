@@ -1,6 +1,6 @@
 ---
-title: 'WIP'
-description: WIP
+title: 'Postgres Language Server: implementing the Parser'
+description: A detailed analysys of our iterations to implement a Parser for Postgres
 launchweek: X
 categories:
   - product
@@ -10,7 +10,7 @@ tags:
 date: '2023-12-08'
 published_at: '2023-12-08T09:00:00.000-07:00'
 toc_depth: 3
-author: WIP
+author: philipp
 image: WIP
 thumb: WIP
 ---
@@ -42,7 +42,7 @@ On the highest level, a language server is a thing which
 3. and provides language-specific smarts back to the client. 
 - [ ]  TODO - simple diagram
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/165a3c21-8e38-4d4b-831a-f9bb88a3262b/f5c3f3e6-2f60-48e4-be27-4727fcd4b18b/Untitled.png)
+DIAGRAM GOES HERE
 
 The parser is the core of every language server. It takes the raw string, turns it into a stream of tokens, and builds a syntax tree. This syntax tree can then be used to extract structural information. 
 

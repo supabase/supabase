@@ -374,5 +374,13 @@
     "position": "DevRel Social Media and Community",
     "author_url": "https://twitter.com/yuricodesbot",
     "author_image_url": "https://github.com/YuriCodes.png"
+  },
+  {
+    "author_id": "philipp",
+    "author": "Philipp Steinrötter",
+    "username": "yuri",
+    "position": "Guest Author",
+    "author_url": "https://twitter.com/psteinroe",
+    "author_image_url": "apps/www/public/images/philipp-steinrose.jpg"
   }
 ]
