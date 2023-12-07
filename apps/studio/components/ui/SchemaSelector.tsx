@@ -66,7 +66,8 @@ const SchemaSelector = ({
       {isSchemasLoading && (
         <Button
           type="outline"
-          className="w-full [&>span]:w-full"
+          className={`w-full [&>span]:w-full ${size === 'small' ? 'py-1.5' : ''}`}
+          size={size}
           icon={<IconLoader className="animate-spin" size={12} />}
         >
           <div className="w-full flex space-x-3 py-0.5">
