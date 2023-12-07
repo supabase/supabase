@@ -20,10 +20,12 @@ import {
   Alert_Shadcn_,
   Badge,
   Button,
+  IconAlertTriangle,
   Input,
 } from 'ui'
 import ProjectUpgradeAlert from '../General/Infrastructure/ProjectUpgradeAlert'
 import InstanceConfiguration from './InfrastructureConfiguration/InstanceConfiguration'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 
 const InfrastructureInfo = () => {
   const { ref } = useParams()
@@ -40,6 +42,7 @@ const InfrastructureInfo = () => {
   } = useProjectUpgradeEligibilityQuery({
     projectRef: ref,
   })
+  const { data: databases } = useReadReplicasQuery({ projectRef: ref })
   const { current_app_version, latest_app_version, requires_manual_intervention } = data || {}
   const isOnLatestVersion = current_app_version === latest_app_version
   const currentPgVersion = (current_app_version ?? '').split('supabase-postgres-')[1]
@@ -47,6 +50,7 @@ const InfrastructureInfo = () => {
 
   const showDbUpgrades = useFlag('databaseUpgrades')
   const readReplicasEnabled = useFlag('readReplicas')
+  const hasReadReplicas = (databases ?? []).length > 1
   const subject = 'Request%20for%20Postgres%20upgrade%20for%20project'
   const message = `Upgrade information:%0A• Manual intervention reason: ${requires_manual_intervention}`
 
@@ -145,7 +149,18 @@ const InfrastructureInfo = () => {
                     ),
                   ]}
                 />
-                {showDbUpgrades && data?.eligible && <ProjectUpgradeAlert />}
+                {showDbUpgrades && data?.eligible && !hasReadReplicas && <ProjectUpgradeAlert />}
+                {showDbUpgrades && data.eligible && hasReadReplicas && (
+                  <Alert_Shadcn_>
+                    <AlertTitle_Shadcn_>
+                      A new version of Postgres is available for your project
+                    </AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_>
+                      You will need to remove all read replicas first prior to upgrading your
+                      Postgrest version to the latest available ({latestPgVersion}).
+                    </AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
+                )}
                 {showDbUpgrades && !data?.eligible && data?.requires_manual_intervention && (
                   <Alert_Shadcn_ title="A new version of Postgres is available for your project">
                     <AlertTitle_Shadcn_>
