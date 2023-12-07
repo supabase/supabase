@@ -1,8 +1,18 @@
 // for internal supabase use only
 const fs = require('fs/promises')
 const { SecretsManagerClient, GetSecretValueCommand } = require('@aws-sdk/client-secrets-manager')
+const { parseArgs } = require('node:util')
+const assert = require('assert')
 
-const secretName = 'local/studio'
+const args = parseArgs({
+  options: {
+    secretName: { type: 'string', short: 'n' },
+  },
+})
+
+const secretName = args.values.secretName
+assert(secretName, 'secretName is required')
+
 const region = 'ap-southeast-2'
 
 const getSecrets = async (name, region) => {
