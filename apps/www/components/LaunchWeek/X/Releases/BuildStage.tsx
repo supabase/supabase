@@ -4,6 +4,7 @@ import { buildDays as days } from '~/components/LaunchWeek/X/Releases/data'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import AdventCard from './components/AdventCard'
 import { motion, useInView } from 'framer-motion'
+import { cn } from 'ui'
 
 const BuildStage: FC = () => {
   const ref = React.useRef(null)
@@ -36,7 +37,10 @@ const BuildStage: FC = () => {
           {days.map((day, i) => (
             <li
               key={day.id}
-              className="relative flex flex-col w-full aspect-square rounded-xl border border-muted/50 bg-surface-100/10"
+              className={cn(
+                'relative flex flex-col w-full aspect-square rounded-xl border border-muted/50 bg-surface-100/10 col-span-1',
+                day.className
+              )}
               data-delay={i}
             >
               <AdventCard day={day} index={i} />
