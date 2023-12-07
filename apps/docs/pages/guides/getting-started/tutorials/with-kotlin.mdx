@@ -373,6 +373,7 @@ class AuthenticationRepositoryImpl @Inject constructor(
 ### Implement screens
 
 For navigating our screens, we use the AndroidX navigation library. For the routes, we implement our own `Destination` interface:
+
 ```kotlin
 
 interface Destination {
@@ -411,6 +412,7 @@ object SignUpDestination: Destination {
     override val title = "Sign Up"
 }
 ```
+
 This will help later for navigating between screens.
 
 Create a `ProductListViewModel`:
@@ -1207,6 +1209,7 @@ fun SignInScreen(
 ### Implement the `MainActivity`
 
 We created the `MainActivity` earlier, but now we have to actually show our newly created screens:
+
 ```kotlin
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -1274,6 +1277,7 @@ class MainActivity : ComponentActivity() {
 ### Create the success screen
 
 If we sign in via OAuth or receive an OTP, we need to handle this in our app. To do this, we create a new activity which gets used when the app opens using the deeplink we set in our `AndroidManifest.xml`:
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
