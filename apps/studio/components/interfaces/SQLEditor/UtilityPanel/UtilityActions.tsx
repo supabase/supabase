@@ -78,7 +78,10 @@ const UtilityActions = ({
           )}
 
           {roleImpersonationEnabledFlag && (
-            <RoleImpersonationPopover serviceRoleLabel="postgres" variant="connected-on-both" />
+            <RoleImpersonationPopover
+              serviceRoleLabel="postgres"
+              variant={readReplicasEnabled ? 'connected-on-both' : 'connected-on-right'}
+            />
           )}
 
           <Button

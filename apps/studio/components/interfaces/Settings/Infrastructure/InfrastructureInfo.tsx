@@ -13,6 +13,7 @@ import {
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useFlag, useIsFeatureEnabled } from 'hooks'
 import {
   AlertDescription_Shadcn_,
@@ -20,12 +21,10 @@ import {
   Alert_Shadcn_,
   Badge,
   Button,
-  IconAlertTriangle,
   Input,
 } from 'ui'
 import ProjectUpgradeAlert from '../General/Infrastructure/ProjectUpgradeAlert'
 import InstanceConfiguration from './InfrastructureConfiguration/InstanceConfiguration'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 
 const InfrastructureInfo = () => {
   const { ref } = useParams()
