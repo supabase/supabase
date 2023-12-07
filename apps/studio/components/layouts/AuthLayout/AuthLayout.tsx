@@ -5,7 +5,7 @@ import { PropsWithChildren, useEffect } from 'react'
 import { useParams } from 'common'
 import ProductMenu from 'components/ui/ProductMenu'
 import { useAuthConfigPrefetch } from 'data/auth/auth-config-query'
-import { useStore, withAuth } from 'hooks'
+import { useStore, withAuth, useFlag } from 'hooks'
 import ProjectLayout from '../'
 import { generateAuthMenu } from './AuthLayout.utils'
 
@@ -16,6 +16,8 @@ export interface AuthLayoutProps {
 const AuthLayout = ({ title, children }: PropsWithChildren<AuthLayoutProps>) => {
   const { ref: projectRef = 'default' } = useParams()
   const { ui, meta } = useStore()
+
+  const hooksReleased = useFlag('authHooksReleased')
 
   useAuthConfigPrefetch({ projectRef })
 
@@ -33,7 +35,12 @@ const AuthLayout = ({ title, children }: PropsWithChildren<AuthLayoutProps>) => 
     <ProjectLayout
       title={title || 'Authentication'}
       product="Authentication"
-      productMenu={<ProductMenu page={page} menu={generateAuthMenu(projectRef ?? 'default')} />}
+      productMenu={
+        <ProductMenu
+          page={page}
+          menu={generateAuthMenu(projectRef ?? 'default', { hooksReleased })}
+        />
+      }
     >
       <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
         {children}

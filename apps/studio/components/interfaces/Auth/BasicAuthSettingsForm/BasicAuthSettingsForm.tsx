@@ -71,6 +71,8 @@ function HoursOrNeverText({ value }: { value: number }) {
   }
 }
 
+const formId = 'auth-config-basic-settings'
+
 const BasicAuthSettingsForm = observer(() => {
   const { ui } = useStore()
   const { ref: projectRef } = useParams()
@@ -83,7 +85,6 @@ const BasicAuthSettingsForm = observer(() => {
   } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
-  const formId = 'auth-config-basic-settings'
   const [hidden, setHidden] = useState(true)
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
@@ -105,7 +106,6 @@ const BasicAuthSettingsForm = observer(() => {
     SECURITY_CAPTCHA_PROVIDER: authConfig?.SECURITY_CAPTCHA_PROVIDER || 'hcaptcha',
     SESSIONS_TIMEBOX: authConfig?.SESSIONS_TIMEBOX || 0,
     SESSIONS_INACTIVITY_TIMEOUT: authConfig?.SESSIONS_INACTIVITY_TIMEOUT || 0,
-
     ...(singlePerUserReleased
       ? {
           SESSIONS_SINGLE_PER_USER: authConfig?.SESSIONS_SINGLE_PER_USER || false,
