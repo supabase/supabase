@@ -47,7 +47,7 @@ import { useProfile } from 'lib/profile'
 import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import Telemetry from 'lib/telemetry'
 import { useAppStateSnapshot } from 'state/app-state'
-import { getImpersonatedRole } from 'state/role-impersonation-state'
+import { isRoleImpersonationEnabled, useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
@@ -276,6 +276,8 @@ const SQLEditor = () => {
     }
   }, [formatQuery, id, isDiffOpen, project, snap])
 
+  const getImpersonatedRole = useGetImpersonatedRole()
+
   const executeQuery = useCallback(
     async (force: boolean = false) => {
       if (isDiffOpen) return
@@ -310,17 +312,30 @@ const SQLEditor = () => {
           setLineHighlights([])
         }
 
+        const impersonatedRole = getImpersonatedRole()
+
         execute({
           projectRef: project.ref,
           connectionString: project.connectionString,
           sql: wrapWithRoleImpersonation(sql, {
             projectRef: project.ref,
-            role: getImpersonatedRole(),
+            role: impersonatedRole,
           }),
+          isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
         })
       }
     },
-    [isDiffOpen, id, isExecuting, project, execute, setAiTitle, hasHipaaAddon, supabaseAIEnabled]
+    [
+      isDiffOpen,
+      id,
+      isExecuting,
+      project,
+      supabaseAIEnabled,
+      hasHipaaAddon,
+      execute,
+      getImpersonatedRole,
+      setAiTitle,
+    ]
   )
 
   const handleNewQuery = useCallback(

@@ -13,7 +13,7 @@ import {
   ROLE_IMPERSONATION_NO_RESULTS,
   ROLE_IMPERSONATION_SQL_LINE_COUNT,
 } from 'lib/role-impersonation'
-import { getRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
+import { useIsRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import { sqlKeys } from './keys'
 
 export type Error = { code: number; message: string; requestId: string }
@@ -24,6 +24,7 @@ export type ExecuteSqlVariables = {
   sql: string
   queryKey?: QueryKey
   handleError?: (error: { code: number; message: string; requestId: string }) => any
+  isRoleImpersonationEnabled?: boolean
 }
 
 export async function executeSql(
@@ -33,9 +34,15 @@ export async function executeSql(
     sql,
     queryKey,
     handleError,
+    isRoleImpersonationEnabled = false,
   }: Pick<
     ExecuteSqlVariables,
-    'projectRef' | 'connectionString' | 'sql' | 'queryKey' | 'handleError'
+    | 'projectRef'
+    | 'connectionString'
+    | 'sql'
+    | 'queryKey'
+    | 'handleError'
+    | 'isRoleImpersonationEnabled'
   >,
   signal?: AbortSignal
 ) {
@@ -43,8 +50,6 @@ export async function executeSql(
 
   let headers = new Headers()
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
-
-  const isRoleImpersonationEnabled = getRoleImpersonationStateSnapshot().role?.type === 'postgrest'
 
   let { data, error } = await post('/platform/pg-meta/{ref}/query', {
     signal,
@@ -109,13 +114,19 @@ export type ExecuteSqlError = unknown
 export const useExecuteSqlQuery = <TData = ExecuteSqlData>(
   { projectRef, connectionString, sql, queryKey, handleError }: ExecuteSqlVariables,
   { enabled = true, ...options }: UseQueryOptions<ExecuteSqlData, ExecuteSqlError, TData> = {}
-) =>
-  useQuery<ExecuteSqlData, ExecuteSqlError, TData>(
+) => {
+  const isRoleImpersonationEnabled = useIsRoleImpersonationEnabled()
+
+  return useQuery<ExecuteSqlData, ExecuteSqlError, TData>(
     sqlKeys.query(projectRef, queryKey ?? [md5(sql)]),
     ({ signal }) =>
-      executeSql({ projectRef, connectionString, sql, queryKey, handleError }, signal),
+      executeSql(
+        { projectRef, connectionString, sql, queryKey, handleError, isRoleImpersonationEnabled },
+        signal
+      ),
     { enabled: enabled && typeof projectRef !== 'undefined', ...options }
   )
+}
 
 export const prefetchExecuteSql = (
   client: QueryClient,
