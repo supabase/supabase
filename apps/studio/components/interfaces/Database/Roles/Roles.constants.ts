@@ -6,6 +6,7 @@ export const SUPABASE_ROLES = [
   'dashboard_user',
   'supabase_admin',
   'supabase_auth_admin',
+  'supabase_read_only_user',
   'supabase_replication_admin',
   'supabase_storage_admin',
   'supabase_functions_admin',
@@ -13,6 +14,7 @@ export const SUPABASE_ROLES = [
   'pgsodium_keyholder',
   'pgsodium_keyiduser',
   'pgsodium_keymaker',
+  'pgtle_admin',
 ]
 
 export const ROLE_PERMISSIONS: any = {
