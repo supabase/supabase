@@ -57,10 +57,11 @@ const TableSelector = ({
       {isLoading && (
         <Button
           type="outline"
-          className="w-full [&>span]:w-full text-xs text-light"
+          size={size}
+          className={`w-full [&>span]:w-full ${size === 'small' ? 'py-1.5' : ''}`}
           icon={<IconLoader className="animate-spin" size={12} />}
         >
-          <p className="flex">Loading tables...</p>
+          <p className="flex text-xs text-light">Loading tables...</p>
         </Button>
       )}
 

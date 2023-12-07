@@ -150,11 +150,14 @@ export class OpenApiReferenceSource extends ReferenceSource<enrichedOperation> {
   }
 
   extractSubtitle() {
-    return typeof this.specSection.description === 'string' ? this.specSection.description : ''
+    return `${this.meta.title}: ${this.specSection.description}`
   }
 
   extractTitle() {
-    return `${this.meta.title}: ${this.specSection.operation}`
+    return (
+      this.specSection.summary ||
+      (typeof this.meta.title === 'string' ? this.meta.title : this.specSection.operation)
+    )
   }
 
   extractIndexedContent(): string {
