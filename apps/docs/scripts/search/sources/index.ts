@@ -47,7 +47,7 @@ export async function fetchSources() {
     'dart-lib',
     '/reference/dart',
     { title: 'Dart Reference' },
-    '../../spec/supabase_dart_v1.yml',
+    '../../spec/supabase_dart_v2.yml',
     '../../spec/common-client-libs-sections.json'
   ).load()
 
