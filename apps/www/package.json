@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "next --port 3000",
-    "dev:secrets:pull": "AWS_PROFILE=supabase-dev node ../../internals/getSecrets.js -n local/www",
+    "dev:secrets:pull": "AWS_PROFILE=supabase-dev node ../../scripts/getSecrets.js -n local/www",
     "build": "next build",
     "export": "next export",
     "start": "next start",
