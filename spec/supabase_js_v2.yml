@@ -601,7 +601,7 @@ functions:
     title: 'getUserIdentities()'
     $ref: '@supabase/gotrue-js.GoTrueClient.getUserIdentities'
     notes: |
-      - The user needs to be signed in in order to call `getUserIdentities()`.
+      - The user needs to be signed in to call `getUserIdentities()`.
     examples:
       - id: get-user-identities
         name: Returns a list of identities linked to the user
