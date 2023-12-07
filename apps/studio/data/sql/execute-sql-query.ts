@@ -13,7 +13,6 @@ import {
   ROLE_IMPERSONATION_NO_RESULTS,
   ROLE_IMPERSONATION_SQL_LINE_COUNT,
 } from 'lib/role-impersonation'
-import { useIsRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import { sqlKeys } from './keys'
 
 export type Error = { code: number; message: string; requestId: string }
@@ -112,12 +111,17 @@ export type ExecuteSqlData = Awaited<ReturnType<typeof executeSql>>
 export type ExecuteSqlError = unknown
 
 export const useExecuteSqlQuery = <TData = ExecuteSqlData>(
-  { projectRef, connectionString, sql, queryKey, handleError }: ExecuteSqlVariables,
+  {
+    projectRef,
+    connectionString,
+    sql,
+    queryKey,
+    handleError,
+    isRoleImpersonationEnabled,
+  }: ExecuteSqlVariables,
   { enabled = true, ...options }: UseQueryOptions<ExecuteSqlData, ExecuteSqlError, TData> = {}
-) => {
-  const isRoleImpersonationEnabled = useIsRoleImpersonationEnabled()
-
-  return useQuery<ExecuteSqlData, ExecuteSqlError, TData>(
+) =>
+  useQuery<ExecuteSqlData, ExecuteSqlError, TData>(
     sqlKeys.query(projectRef, queryKey ?? [md5(sql)]),
     ({ signal }) =>
       executeSql(
@@ -126,7 +130,6 @@ export const useExecuteSqlQuery = <TData = ExecuteSqlData>(
       ),
     { enabled: enabled && typeof projectRef !== 'undefined', ...options }
   )
-}
 
 export const prefetchExecuteSql = (
   client: QueryClient,

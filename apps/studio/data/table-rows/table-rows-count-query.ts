@@ -3,6 +3,7 @@ import { useCallback } from 'react'
 
 import { Filter, Query, SupaTable } from 'components/grid'
 import { ImpersonationRole, wrapWithRoleImpersonation } from 'lib/role-impersonation'
+import { useIsRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import { ExecuteSqlData, useExecuteSqlPrefetch, useExecuteSqlQuery } from '../sql/execute-sql-query'
 import { formatFilterValue } from './utils'
 
@@ -55,8 +56,10 @@ export const useTableRowsCountQuery = <TData extends TableRowsCountData = TableR
     ...args
   }: TableRowsCountVariables,
   options: UseQueryOptions<ExecuteSqlData, TableRowsCountError, TData> = {}
-) =>
-  useExecuteSqlQuery(
+) => {
+  const isRoleImpersonationEnabled = useIsRoleImpersonationEnabled()
+
+  return useExecuteSqlQuery(
     {
       projectRef,
       connectionString,
@@ -72,6 +75,7 @@ export const useTableRowsCountQuery = <TData extends TableRowsCountData = TableR
           ...args,
         },
       ],
+      isRoleImpersonationEnabled,
     },
     {
       select(data) {
@@ -83,6 +87,7 @@ export const useTableRowsCountQuery = <TData extends TableRowsCountData = TableR
       ...options,
     }
   )
+}
 
 /**
  * useTableRowsCountPrefetch is used for prefetching the table rows count. For example, starting a query loading before a page is navigated to.

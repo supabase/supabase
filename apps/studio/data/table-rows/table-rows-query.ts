@@ -2,6 +2,7 @@ import { QueryKey, UseQueryOptions } from '@tanstack/react-query'
 import { Filter, Query, Sort, SupaRow, SupaTable } from 'components/grid'
 import { ImpersonationRole, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { useCallback } from 'react'
+import { useIsRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import {
   ExecuteSqlData,
   executeSql,
@@ -140,8 +141,10 @@ export type TableRowsError = unknown
 export const useTableRowsQuery = <TData extends TableRowsData = TableRowsData>(
   { projectRef, connectionString, queryKey, table, impersonatedRole, ...args }: TableRowsVariables,
   options: UseQueryOptions<ExecuteSqlData, TableRowsError, TData> = {}
-) =>
-  useExecuteSqlQuery(
+) => {
+  const isRoleImpersonationEnabled = useIsRoleImpersonationEnabled()
+
+  return useExecuteSqlQuery(
     {
       projectRef,
       connectionString,
@@ -157,6 +160,7 @@ export const useTableRowsQuery = <TData extends TableRowsData = TableRowsData>(
           ...args,
         },
       ],
+      isRoleImpersonationEnabled,
     },
     {
       select(data) {
@@ -172,6 +176,7 @@ export const useTableRowsQuery = <TData extends TableRowsData = TableRowsData>(
       ...options,
     }
   )
+}
 
 /**
  * useTableRowsPrefetch is used for prefetching table rows. For example, starting a query loading before a page is navigated to.
