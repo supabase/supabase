@@ -83,8 +83,8 @@ const LogsQueryPanel = ({
         <div className="flex w-full flex-row items-center justify-between gap-x-4">
           <div className="flex items-center gap-2">
             <DropdownMenu>
-              <DropdownMenuTrigger>
-                <Button asChild type="default" iconRight={<IconChevronDown />}>
+              <DropdownMenuTrigger asChild>
+                <Button type="default" iconRight={<IconChevronDown />}>
                   <span>Insert source</span>
                 </Button>
               </DropdownMenuTrigger>
@@ -105,8 +105,8 @@ const LogsQueryPanel = ({
             </DropdownMenu>
 
             <DropdownMenu>
-              <DropdownMenuTrigger>
-                <Button asChild type="default" iconRight={<IconChevronDown />}>
+              <DropdownMenuTrigger asChild>
+                <Button type="default" iconRight={<IconChevronDown />}>
                   <span>Templates</span>
                 </Button>
               </DropdownMenuTrigger>
@@ -166,7 +166,7 @@ const LogsQueryPanel = ({
                 </Button>
                 {IS_PLATFORM && onSave && (
                   <Tooltip.Root delayDuration={0}>
-                    <Tooltip.Trigger>
+                    <Tooltip.Trigger asChild>
                       <Button
                         type="default"
                         onClick={() => onSave()}

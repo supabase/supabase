@@ -60,7 +60,7 @@ const PITRStatus = ({
               </span>
             </div>
             <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
+              <Tooltip.Trigger asChild>
                 <Button
                   disabled={hasReadReplicas || !canTriggerPhysicalBackup}
                   onClick={() => onSetConfiguration()}

@@ -50,8 +50,12 @@ const UpgradeToPro = ({
             </div>
           </div>
           <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger>
-              <Button type="primary" disabled={!canUpdateSubscription || projectUpdateDisabled}>
+            <Tooltip.Trigger asChild>
+              <Button
+                type="primary"
+                disabled={!canUpdateSubscription || projectUpdateDisabled}
+                asChild
+              >
                 <Link
                   href={
                     plan === 'free'
@@ -63,35 +67,34 @@ const UpgradeToPro = ({
                 </Link>
               </Button>
             </Tooltip.Trigger>
-            {!canUpdateSubscription || projectUpdateDisabled ? (
-              <Tooltip.Portal>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'border border-background text-center', //border
-                      'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-foreground">
-                      {projectUpdateDisabled ? (
-                        <>
-                          Subscription changes are currently disabled.
-                          <br />
-                          Our engineers are working on a fix.
-                        </>
-                      ) : !canUpdateSubscription ? (
-                        'You need additional permissions to amend subscriptions'
-                      ) : (
-                        ''
-                      )}
-                    </span>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            ) : (
-              <></>
-            )}
+            {!canUpdateSubscription ||
+              (projectUpdateDisabled && (
+                <Tooltip.Portal>
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'border border-background text-center', //border
+                        'rounded bg-alternative py-1 px-2 leading-none shadow', // background
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-foreground">
+                        {projectUpdateDisabled ? (
+                          <>
+                            Subscription changes are currently disabled.
+                            <br />
+                            Our engineers are working on a fix.
+                          </>
+                        ) : !canUpdateSubscription ? (
+                          'You need additional permissions to amend subscriptions'
+                        ) : (
+                          ''
+                        )}
+                      </span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
+              ))}
           </Tooltip.Root>
         </div>
       </div>

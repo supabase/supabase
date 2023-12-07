@@ -95,7 +95,7 @@ const RestartServerButton = () => {
   return (
     <>
       <Tooltip.Root delayDuration={0}>
-        <Tooltip.Trigger>
+        <Tooltip.Trigger asChild>
           <div className="flex items-center">
             <Button
               type="default"
