@@ -43,7 +43,7 @@ const TicketingFlow = () => {
 
         <div
           className={cn(
-            'flex flex-col items-center gap-1 text-light font-mono uppercase transition-all opacity-0 invisible',
+            'flex flex-col items-center gap-1 text-[#B0B0B0] font-mono uppercase transition-all opacity-0 invisible',
             !isGameMode && !hasTicket && 'opacity-100 visible'
           )}
         >
@@ -100,7 +100,7 @@ const TicketingFlow = () => {
                   <div className="flex flex-col items-center justify-center font-mono uppercase gap-0 leading-0">
                     <span>{LWX_DATE}</span>
                   </div>
-                  <p className="text-foreground-lighter">
+                  <p className="text-[#8B9092]">
                     Join us for a week of announcing new features,
                     <br className="hidden md:block" /> and find new ways to level up your
                     development.
@@ -123,22 +123,22 @@ const TicketingFlow = () => {
                   <div className="order-first xl:h-full max-w-md gap-3 flex flex-col items-center justify-center xl:items-start xl:justify-start xl:text-left">
                     {hasSecretTicket ? (
                       <p className="text-2xl lg:text-3xl">
-                        <span className="text-foreground-lighter">You got the secret ticket.</span>{' '}
-                        Share it to increase your chances of winning even more.
+                        <span className="text-[#8B9092]">You got the secret ticket.</span> Share it
+                        to increase your chances of winning even more.
                       </p>
                     ) : hasPlatinumTicket ? (
                       <p className="text-2xl lg:text-3xl">
-                        <span className="text-foreground-lighter">Congrats!</span> You maximized
-                        your chances and have a platinum ticket now.
+                        <span className="text-[#8B9092]">Congrats!</span> You maximized your chances
+                        and have a platinum ticket now.
                       </p>
                     ) : winningChances !== 2 ? (
                       <p className="text-2xl lg:text-3xl">
-                        <span className="text-foreground-lighter">You're in!</span>{' '}
+                        <span className="text-[#8B9092]">You're in!</span>{' '}
                         <span className="">Now share your ticket to win limited swag.</span>
                       </p>
                     ) : (
                       <p className="text-2xl lg:text-3xl">
-                        <span className="text-foreground-lighter">Just one more.</span>{' '}
+                        <span className="text-[#8B9092]">Just one more.</span>{' '}
                         <span className="">Keep sharing to increase your chances.</span>
                       </p>
                     )}

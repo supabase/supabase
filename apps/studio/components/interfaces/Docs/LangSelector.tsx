@@ -67,7 +67,7 @@ const LangSelector = ({
               <span>Project API key :</span>
             </div>
             <DropdownMenu>
-              <DropdownMenuTrigger>
+              <DropdownMenuTrigger asChild>
                 <Button type="default">{showApiKey.name}</Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" side="bottom">
