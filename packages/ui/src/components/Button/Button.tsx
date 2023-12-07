@@ -2,11 +2,11 @@
 
 import { Slot } from '@radix-ui/react-slot'
 import { VariantProps, cva } from 'class-variance-authority'
-import React from 'react'
 import { IconContext } from '@ui/components/Icon/IconContext'
 import { IconLoader } from '@ui/components/Icon/icons/IconLoader'
 import { sizes } from '@ui/lib/commonCva'
 import { cn } from '@ui/lib/utils'
+import { cloneElement, forwardRef, isValidElement } from 'react'
 
 export type ButtonVariantProps = VariantProps<typeof buttonVariants>
 const buttonVariants = cva(
@@ -115,6 +115,9 @@ const buttonVariants = cva(
       disabled: {
         true: 'opacity-50 cursor-default',
       },
+      rounded: {
+        true: 'rounded-full',
+      },
       defaultVariants: {
         //   variant: 'default',
         //   size: 'default',
@@ -146,9 +149,10 @@ export interface ButtonProps
   icon?: React.ReactNode
   iconLeft?: React.ReactNode
   iconRight?: React.ReactNode
+  rounded?: boolean
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
       asChild = false,
@@ -161,6 +165,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       iconRight,
       iconLeft,
       htmlType = 'button',
+      rounded,
       ...props
     },
     ref
@@ -178,11 +183,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         type={htmlType}
         {...props}
-        className={cn(buttonVariants({ type, size, disabled, block }), className)}
+        className={cn(buttonVariants({ type, size, disabled, block, rounded }), className)}
       >
         {asChild ? (
-          React.isValidElement(children) ? (
-            React.cloneElement(
+          isValidElement(children) ? (
+            cloneElement(
               children,
               undefined,
               showIcon &&

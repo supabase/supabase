@@ -31,6 +31,7 @@ import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useFormatQueryMutation } from 'data/sql/format-sql-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { isError } from 'data/utils/error-check'
 import {
   useFlag,
@@ -43,11 +44,13 @@ import {
 import { IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
+import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import Telemetry from 'lib/telemetry'
+import { useAppStateSnapshot } from 'state/app-state'
+import { getImpersonatedRole } from 'state/role-impersonation-state'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
-import AISettingsModal from './AISettingsModal'
 import { sqlAiDisclaimerComment, untitledSnippetTitle } from './SQLEditor.constants'
 import {
   ContentDiff,
@@ -63,7 +66,6 @@ import {
   getDiffTypeDropdownLabel,
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
@@ -99,6 +101,7 @@ const SQLEditor = () => {
   const { profile } = useProfile()
   const project = useSelectedProject()
   const organization = useSelectedOrganization()
+  const appSnap = useAppStateSnapshot()
   const snap = useSqlEditorStateSnapshot()
 
   const { mutate: formatQuery } = useFormatQueryMutation()
@@ -121,8 +124,6 @@ const SQLEditor = () => {
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
   const [isAiOpen, setIsAiOpen] = useLocalStorageQuery('supabase_sql-editor-ai-open', true)
-
-  const [isAISettingsOpen, setIsAISettingsOpen] = useState(false)
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
 
   const selectedOrganization = useSelectedOrganization()
@@ -312,7 +313,10 @@ const SQLEditor = () => {
         execute({
           projectRef: project.ref,
           connectionString: project.connectionString,
-          sql,
+          sql: wrapWithRoleImpersonation(sql, {
+            projectRef: project.ref,
+            role: getImpersonatedRole(),
+          }),
         })
       }
     },
@@ -514,7 +518,6 @@ const SQLEditor = () => {
         setDebugSolution,
       }}
     >
-      <AISettingsModal visible={isAISettingsOpen} onCancel={() => setIsAISettingsOpen(false)} />
       <ConfirmModal
         visible={isConfirmModalOpen}
         title="Destructive operation"
@@ -533,7 +536,7 @@ const SQLEditor = () => {
         {isAiOpen && supabaseAIEnabled && !hasHipaaAddon && (
           <AISchemaSuggestionPopover
             onClickSettings={() => {
-              setIsAISettingsOpen(true)
+              appSnap.setShowAiSettingsModal(true)
             }}
           >
             <motion.div
@@ -797,7 +800,7 @@ const SQLEditor = () => {
                       <button
                         onClick={() => {
                           setIsSchemaSuggestionDismissed(true)
-                          setIsAISettingsOpen(true)
+                          appSnap.setShowAiSettingsModal(true)
                         }}
                         className="text-brand-600 hover:text-brand-600 transition"
                       >

@@ -158,21 +158,13 @@ const { data } = await supabase.from('countries').select().returns<MyType>()
 <RefSubLayout.EducationRow>
   <RefSubLayout.Details>
 
-    It's convenient to have shorthands for your most-used types.
+    The generated types provide shorthands for accessing tables and enums.
 
   </RefSubLayout.Details>
   <RefSubLayout.Examples>
-    ```ts ./database.types.ts
-    import { Database } from "./database-generated.types.ts";
-    export type { Database } from "./database-generated.types.ts";
-
-    export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row']
-    export type Enums<T extends keyof Database['public']['Enums']> = Database['public']['Enums'][T]
-    // etc.
-    ```
 
     ```ts ./index.ts
-    import { Database, Tables } from "./database.types.ts";
+    import { Database, Tables, Enums } from "./database.types.ts";
 
     // Before 😕
     let movie: Database['public']['Tables']['movies']['Row'] = // ...
@@ -210,23 +202,21 @@ const { data } = await supabase.from('countries').select().returns<MyType>()
 
   </RefSubLayout.Details>
   <RefSubLayout.Examples>
-    ```ts
-    import { PostgrestError } from '@supabase/supabase-js'
-
-    export type DbResult<T> = T extends PromiseLike<infer U> ? U : never
-    export type DbResultOk<T> = T extends PromiseLike<{ data: infer U }> ? Exclude<U, null> : never
-    export type DbResultErr = PostgrestError
-    ```
 
     ```ts
-    const countriesWithCitiesQuery = supabase.from("countries").select(
-      `
-      id,
-      name,
-      cities ( id, name )
-    `
-    );
-    type CountriesWithCities = DbResultOk<typeof countriesWithCitiesQuery>;
+    import { QueryResult, QueryData, QueryError } from '@supabase/supabase-js'
+
+    const countriesWithCitiesQuery = supabase
+      .from("countries")
+      .select(`
+        id,
+        name,
+        cities (
+          id,
+          name
+        )
+      `);
+    type CountriesWithCities = QueryData<typeof countriesWithCitiesQuery>;
 
     const { data, error } = await countriesWithCitiesQuery;
     if (error) throw error;

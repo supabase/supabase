@@ -247,7 +247,7 @@ Supabase는 [호스팅 플랫폼](https://supabase.com/dashboard)입니다. 가�
 - [중국어 간체 / 简体中文](/i18n/README.zh-cn.md)
 - [스웨덴어 / 스벤스카르어](/i18n/README.sv.md)
 - [태국어 / ไทย](/i18n/README.th.md)
-- [중국어 번체 / 繁体中文](/i18n/README.zh-tw.md)
+- [중국어 번체 / 繁體中文](/i18n/README.zh-tw.md)
 - [터키어 / Türkçe](/i18n/README.tr.md)
 - [우크라이나어 / Українська](/i18n/README.uk.md)
 - [베트남어 / Tiếng Việt](/i18n/README.vi-vn.md)

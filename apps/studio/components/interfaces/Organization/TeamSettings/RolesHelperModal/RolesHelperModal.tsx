@@ -60,7 +60,7 @@ const RolesHelperModal = () => {
               <div className="flex items-center border-b border-control">
                 <div className={permissionColumnClassName}>Permissions</div>
                 <div className={roleColumnClassName}>Owner</div>
-                <div className={roleColumnClassName}>Adminstrator</div>
+                <div className={roleColumnClassName}>Administrator</div>
                 <div className={roleColumnClassName}>Developer</div>
                 <div className={roleColumnClassName}>Read-only&nbsp;{accessTooltip}</div>
                 <div className={roleColumnClassName}>Billing-only&nbsp;{accessTooltip}</div>

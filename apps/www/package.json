@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "next --port 3000",
+    "dev:secrets:pull": "AWS_PROFILE=supabase-dev node ../../scripts/getSecrets.js -n local/www",
     "build": "next build",
     "export": "next export",
     "start": "next start",
@@ -16,8 +17,8 @@
     "@code-hike/mdx": "^0.9.0",
     "@heroicons/react": "^1.0.6",
     "@mdx-js/react": "^2.3.0",
-    "@next/bundle-analyzer": "^13.5.3",
-    "@next/mdx": "^13.5.3",
+    "@next/bundle-analyzer": "^13.5.6",
+    "@next/mdx": "^13.5.6",
     "@react-three/fiber": "^7.0.29",
     "@supabase/auth-helpers-react": "^0.4.2",
     "@supabase/auth-ui-react": "^0.4.5",
@@ -33,7 +34,7 @@
     "gray-matter": "^4.0.3",
     "lottie-light-react": "^2.4.0",
     "markdown-toc": "^1.2.0",
-    "next": "^13.5.3",
+    "next": "^13.5.6",
     "next-mdx-remote": "^4.4.1",
     "next-seo": "^5.14.1",
     "next-themes": "^0.2.1",
@@ -65,6 +66,7 @@
     "yup": "^0.32.11"
   },
   "devDependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.468.0",
     "@types/classnames": "^2.3.1",
     "@types/dat.gui": "^0.7.10",
     "@types/mdx-js__react": "^1.5.6",
@@ -77,9 +79,7 @@
     "@types/three": "^0.136.0",
     "autoprefixer": "^10.4.14",
     "config": "*",
-    "file-loader": "^6.2.0",
     "postcss": "^8.4.31",
-    "postcss-preset-env": "^6.7.0",
     "tsconfig": "*"
   },
   "license": "MIT"

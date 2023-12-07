@@ -5,29 +5,37 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { Button, IconExternalLink, IconEye, IconEyeOff, Modal, ScrollArea, cn } from 'ui'
 
+import { useFlag } from 'hooks'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import Telemetry from 'lib/telemetry'
 import { useAppStateSnapshot } from 'state/app-state'
 import APISidePanelPreview from './APISidePanelPreview'
 import { useFeaturePreviewContext } from './FeaturePreviewContext'
-
-// [Ivan] We should probably move this to a separate file, together with LOCAL_STORAGE_KEYS. We should make adding new feature previews as simple as possible.
-
-const FEATURE_PREVIEWS: { key: string; name: string; content: any; discussionsUrl?: string }[] = [
-  // {
-  //   key: LOCAL_STORAGE_KEYS.UI_PREVIEW_NAVIGATION_LAYOUT,
-  //   name: 'Global navigation update',
-  //   content: null,
-  // },
-  {
-    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
-    name: 'Project API documentation',
-    content: <APISidePanelPreview />,
-    discussionsUrl: 'https://github.com/orgs/supabase/discussions/18038',
-  },
-]
+import RLSAIAssistantPreview from './RLSAIAssistantPreview'
 
 const FeaturePreviewModal = () => {
+  const isAiAssistantEnabled = useFlag('policyEditorWithAi')
+
+  // [Ivan] We should probably move this to a separate file, together with LOCAL_STORAGE_KEYS. We should make adding new feature previews as simple as possible.
+  const FEATURE_PREVIEWS: { key: string; name: string; content: any; discussionsUrl?: string }[] = [
+    {
+      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
+      name: 'Project API documentation',
+      content: <APISidePanelPreview />,
+      discussionsUrl: 'https://github.com/orgs/supabase/discussions/18038',
+    },
+    ...(isAiAssistantEnabled
+      ? [
+          {
+            key: LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT,
+            name: 'Supabase Assistant for RLS policies',
+            content: <RLSAIAssistantPreview />,
+            discussionsUrl: undefined,
+          },
+        ]
+      : []),
+  ]
+
   const router = useRouter()
   const snap = useAppStateSnapshot()
   const telemetryProps = useTelemetryProps()
@@ -74,7 +82,7 @@ const FeaturePreviewModal = () => {
                     onClick={() => setSelectedFeatureKey(feature.key)}
                     className={cn(
                       'flex items-center space-x-3 p-4 border-b cursor-pointer bg transition',
-                      selectedFeatureKey === feature.key ? 'bg-surface-200' : ''
+                      selectedFeatureKey === feature.key ? 'bg-surface-300' : 'bg-surface-100'
                     )}
                   >
                     {isEnabled ? (

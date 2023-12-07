@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
+import { last } from 'lodash'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Button, Form_Shadcn_, IconFileText, IconGitBranch, Modal } from 'ui'
@@ -9,10 +10,14 @@ import SidePanelGitHubRepoLinker from 'components/interfaces/Organization/Integr
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
+import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
 import { useCheckGithubBranchValidity } from 'data/integrations/integrations-github-branch-check'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization, useStore } from 'hooks'
 import { useAppStateSnapshot } from 'state/app-state'
+import BranchingPITRNotice from './BranchingPITRNotice'
+import BranchingPostgresVersionNotice from './BranchingPostgresVersionNotice'
 import GithubRepositorySelection from './GithubRepositorySelection'
 
 const EnableBranchingModal = () => {
@@ -35,6 +40,22 @@ const EnableBranchingModal = () => {
   } = useOrgIntegrationsQuery({
     orgSlug: selectedOrg?.slug,
   })
+
+  const {
+    data,
+    error: upgradeEligibilityError,
+    isLoading: isLoadingUpgradeEligibility,
+    isError: isErrorUpgradeEligibility,
+    isSuccess: isSuccessUpgradeEligibility,
+  } = useProjectUpgradeEligibilityQuery({
+    projectRef: ref,
+  })
+  const hasMinimumPgVersion =
+    Number(last(data?.current_app_version.split('-') ?? [])?.split('.')[0] ?? 0) >= 15
+
+  const { data: addons } = useProjectAddonsQuery({ projectRef: ref })
+  const hasPitrEnabled =
+    (addons?.selected_addons ?? []).find((addon) => addon.type === 'pitr') !== undefined
 
   const hasGithubIntegrationInstalled =
     integrations?.some((integration) => integration.integration.name === 'GitHub') ?? false
@@ -88,6 +109,10 @@ const EnableBranchingModal = () => {
     defaultValues: { branchName: '' },
   })
 
+  const isLoading = isLoadingIntegrations || isLoadingUpgradeEligibility
+  const isError = isErrorIntegrations || isErrorUpgradeEligibility
+  const isSuccess = isSuccessIntegrations && isSuccessUpgradeEligibility
+
   const canSubmit = form.getValues('branchName').length > 0 && !isChecking && isValid
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     if (!ref) return console.error('Project ref is required')
@@ -108,7 +133,7 @@ const EnableBranchingModal = () => {
         visible={snap.showEnableBranchingModal}
         onCancel={() => snap.setShowEnableBranchingModal(false)}
         className="!bg"
-        size="medium"
+        size="large"
       >
         <Form_Shadcn_ {...form}>
           <form
@@ -124,7 +149,7 @@ const EnableBranchingModal = () => {
               </div>
             </Modal.Content>
 
-            {isLoadingIntegrations && (
+            {isLoading && (
               <>
                 <Modal.Separator />
                 <Modal.Content className="px-7 py-6">
@@ -134,46 +159,67 @@ const EnableBranchingModal = () => {
               </>
             )}
 
-            {isErrorIntegrations && (
+            {isError && (
               <>
                 <Modal.Separator />
                 <Modal.Content className="px-7 py-6">
-                  <AlertError error={integrationsError} subject="Failed to retrieve integrations" />
+                  {isErrorIntegrations ? (
+                    <AlertError
+                      error={integrationsError}
+                      subject="Failed to retrieve integrations"
+                    />
+                  ) : isErrorUpgradeEligibility ? (
+                    <AlertError
+                      error={upgradeEligibilityError}
+                      subject="Failed to retrieve Postgres version"
+                    />
+                  ) : null}
                 </Modal.Content>
                 <Modal.Separator />
               </>
             )}
 
-            {isSuccessIntegrations && (
-              <GithubRepositorySelection
-                form={form}
-                isChecking={isChecking}
-                isValid={canSubmit}
-                integration={githubIntegration}
-                hasGithubIntegrationInstalled={hasGithubIntegrationInstalled}
-              />
-            )}
-
-            <Modal.Content className="px-7 py-6 flex flex-col gap-3">
-              <p className="text-sm text-foreground-light">Please keep in mind the following:</p>
-              <div className="flex flex-row gap-4">
-                <div>
-                  <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-300 flex items-center justify-center">
-                    <IconFileText className="text-amber-900" size={20} strokeWidth={2} />
-                  </figure>
-                </div>
-                <div>
-                  <p className="text-sm text-foreground">
-                    You will not be able to use the dashboard to make changes to the database
-                  </p>
+            {isSuccess && (
+              <>
+                {hasMinimumPgVersion ? (
+                  <>
+                    <GithubRepositorySelection
+                      form={form}
+                      isChecking={isChecking}
+                      isValid={canSubmit}
+                      integration={githubIntegration}
+                      hasGithubIntegrationInstalled={hasGithubIntegrationInstalled}
+                    />
+                    {!hasPitrEnabled && <BranchingPITRNotice />}
+                  </>
+                ) : (
+                  <BranchingPostgresVersionNotice />
+                )}
+                <Modal.Content className="px-7 py-6 flex flex-col gap-3">
                   <p className="text-sm text-foreground-light">
-                    Schema changes for database preview branches must be done via Git. We are
-                    nonetheless working on allowing the dashboard to make schema changes for preview
-                    branches.
+                    Please keep in mind the following:
                   </p>
-                </div>
-              </div>
-            </Modal.Content>
+                  <div className="flex flex-row gap-4">
+                    <div>
+                      <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-300 flex items-center justify-center">
+                        <IconFileText className="text-amber-900" size={20} strokeWidth={2} />
+                      </figure>
+                    </div>
+                    <div className="flex flex-col gap-y-1">
+                      <p className="text-sm text-foreground">
+                        Branching uses your GitHub repository to apply migrations
+                      </p>
+                      <p className="text-sm text-foreground-light">
+                        Database migrations are handled via the{' '}
+                        <code className="text-xs">./supabase</code> directory in your GitHub repo.
+                        Migration files will run on both Preview Branches and Production when
+                        pushing to and merging git branches.
+                      </p>
+                    </div>
+                  </div>
+                </Modal.Content>
+              </>
+            )}
 
             <Modal.Separator />
 
@@ -192,7 +238,7 @@ const EnableBranchingModal = () => {
                   block
                   size="medium"
                   form={formId}
-                  disabled={isCreating || !canSubmit}
+                  disabled={!isSuccess || isCreating || !canSubmit}
                   loading={isCreating}
                   type="primary"
                   htmlType="submit"

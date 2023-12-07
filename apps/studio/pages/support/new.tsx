@@ -43,7 +43,7 @@ const SupportPage = () => {
                 </Link>
               </Button>
               <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger>
+                <Tooltip.Trigger asChild>
                   <Button
                     asChild
                     type="default"
