@@ -168,12 +168,10 @@ const HTTPRequestFields = ({
               </Button>
               {type === 'supabase_function' && (
                 <DropdownMenu>
-                  <DropdownMenuTrigger>
-                    <Button
-                      type="default"
-                      className="rounded-l-none px-[4px] py-[5px]"
-                      icon={<IconChevronDown />}
-                    />
+                  <DropdownMenuTrigger asChild>
+                    <Button type="default" className="rounded-l-none px-[4px] py-[5px]">
+                      <IconChevronDown />
+                    </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" side="bottom">
                     <DropdownMenuItem

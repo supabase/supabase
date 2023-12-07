@@ -247,7 +247,7 @@ Ayrıca [self-host](https://supabase.com/docs/guides/hosting/overview) ve [yerel
 - [Basitleştirilmiş Çince / 简体中文](/i18n/README.zh-cn.md)
 - [İsveççe / Svenska](/i18n/README.sv.md)
 - [Thai / ไทย](/i18n/README.th.md)
-- [Geleneksel Çince / 繁体中文](/i18n/README.zh-tw.md)
+- [Geleneksel Çince / 繁體中文](/i18n/README.zh-tw.md)
 - [Türkçe / Turkish](/i18n/README.tr.md)
 - [Ukraynaca / Українська](/i18n/README.uk.md)
 - [Vietnamca / Tiếng Việt](/i18n/README.vi-vn.md)

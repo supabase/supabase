@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
-import { Badge } from 'ui'
+import { TextLink, cn } from 'ui'
 import useConfData from '../hooks/use-conf-data'
 import { SupabaseClient } from '@supabase/supabase-js'
 
@@ -13,31 +13,53 @@ export interface Meetup {
   start_at: string
 }
 
+function addHours(date: Date, hours: number) {
+  const dateCopy = new Date(date)
+
+  dateCopy.setHours(dateCopy.getHours() + hours)
+
+  return dateCopy
+}
+
 const LWXMeetups = ({ meetups }: { meetups?: Meetup[] }) => {
   const { supabase } = useConfData()
+  const now = new Date(Date.now())
   const [meets, setMeets] = useState<Meetup[]>(meetups ?? [])
   const [realtimeChannel, setRealtimeChannel] = useState<ReturnType<
     SupabaseClient['channel']
   > | null>(null)
+  const [activeMeetup, setActiveMeetup] = useState<Meetup>(meets[0])
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   useEffect(() => {
     // Listen to realtime changes
     if (supabase && !realtimeChannel) {
       const channel = supabase
-        .channel('changes')
+        .channel('lwx_meetups')
         .on(
           'postgres_changes',
           {
-            event: 'UPDATE',
+            event: '*',
             schema: 'public',
-            table: 'lw8_meetups',
+            table: 'lwx_meetups',
+            filter: undefined,
           },
           async () => {
-            const { data: newMeets } = await supabase.from('lw8_meetups').select('*')
-            setMeets(newMeets!)
+            const { data: newMeets } = await supabase.from('lwx_meetups').select('*')
+            setMeets(
+              newMeets?.sort((a, b) => (new Date(a.start_at) > new Date(b.start_at) ? 1 : -1))!
+            )
           }
         )
-        .subscribe()
+        .subscribe(async (status) => {
+          if (status !== 'SUBSCRIBED') {
+            return null
+          }
+        })
       setRealtimeChannel(channel)
     }
 
@@ -47,53 +69,58 @@ const LWXMeetups = ({ meetups }: { meetups?: Meetup[] }) => {
     }
   }, [])
 
+  function handleSelectMeetup(meetup: Meetup) {
+    setActiveMeetup(meetup)
+  }
+
+  if (!isMounted) return null
+
   return (
-    <div className="max-w-6xl mx-auto grid grid-cols-1 xl:grid-cols-12 gap-8 xl:gap-8">
-      <div className="col-span-1 xl:col-span-4 flex flex-col justify-center max-w-lg">
-        <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-.5px]">Community meetups</h2>
-        <p className="text-[#9296AA] text-base py-3 xl:max-w-md">
-          We celebrated LW8 with our first-ever live community meetups across various locations.
+    <div className="max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-12 gap-8 text-[#EDEDED]">
+      <div className="mb-4 col-span-1 xl:col-span-4 flex flex-col max-w-lg text-[#575E61]">
+        <h2 className="text-sm font-mono uppercase tracking-[1px] mb-4">Community meetups</h2>
+        <p className="text-base xl:max-w-md mb-2">
+          Celebrate Launch Week X at our live community-driven meetups. Network with the community,
+          listen to tech talks and grab some swag.
         </p>
+        <TextLink label="Read more about meetups" hasChevron url="/blog/community-meetups-lwx" />
       </div>
-      <div className="col-span-1 xl:col-span-7 xl:col-start-6 w-full max-w-4xl flex flex-col justify-between items-stretch">
+      <div className="col-span-1 xl:col-span-6 xl:col-start-7 w-full max-w-4xl flex flex-wrap gap-x-3 gap-y-1">
         {meets &&
           meets
             ?.sort((a, b) => (new Date(a.start_at) > new Date(b.start_at) ? 1 : -1))
-            .map(({ display_info, link, isLive, title }: Meetup) => (
-              <Link
-                href={link ?? '#'}
-                target="_blank"
-                className={[
-                  'w-full group py-0 flex items-center gap-2 md:gap-4 text-lg sm:text-2xl xl:text-4xl border-b border-[#111718]',
-                  'hover:text-foreground',
-                  isLive ? 'text-foreground-light' : 'text-[#56646B]',
-                  !link && 'pointer-events-none',
-                ].join(' ')}
-              >
-                <div className="flex items-center gap-2 md:gap-4 py-2 md:py-0">
-                  <span>{title}</span>
-                  {isLive && <Badge>Live now</Badge>}
-                  <span className="hidden md:inline opacity-0 -translate-x-2 transition-all md:group-hover:opacity-100 group-hover:translate-x-0">
-                    <svg
-                      width="47"
-                      height="47"
-                      viewBox="0 0 47 47"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M33.0387 16.2422L40.6691 23.8727M40.6691 23.8727L33.0387 31.5031M40.6691 23.8727L6.33203 23.8727"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </span>
-                </div>
-                {display_info && <span className="text-sm text-right flex-1">{display_info}</span>}
-              </Link>
-            ))}
+            .map((meetup: Meetup, i: number) => {
+              const startAt = new Date(meetup.start_at)
+              const endAt = addHours(new Date(meetup.start_at), 3)
+              const after = now > startAt
+              const before3H = now < endAt
+              const liveNow = after && before3H
+
+              return (
+                <Link
+                  href={meetup.link ?? ''}
+                  target="_blank"
+                  onClick={() => handleSelectMeetup(meetup)}
+                  onMouseOver={() => handleSelectMeetup(meetup)}
+                  title={liveNow ? 'Live now' : undefined}
+                  className={cn(
+                    'h-10 group inline-flex items-center flex-wrap text-4xl',
+                    'hover:text-[#EDEDED] !leading-none transition-colors',
+                    meetup.id === activeMeetup.id ? 'text-[#EDEDED]' : 'text-[#575E61]',
+                    liveNow && 'text-[#B0B0B0]'
+                  )}
+                >
+                  {liveNow && (
+                    <div className="w-2 h-2 rounded-full bg-brand mr-2 mb-4 animate-pulse" />
+                  )}
+                  <span>{meetup.title}</span>
+                  {i !== meets.length - 1 && ', '}
+                </Link>
+              )
+            })}
+      </div>
+      <div className="col-span-1 xl:col-span-6 xl:col-start-7 w-full max-w-4xl text-sm flex-1">
+        {activeMeetup?.display_info}
       </div>
     </div>
   )

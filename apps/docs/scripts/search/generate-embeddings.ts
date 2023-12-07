@@ -4,6 +4,7 @@ import { parseArgs } from 'node:util'
 import { OpenAI } from 'openai'
 import { v4 as uuidv4 } from 'uuid'
 import { fetchSources } from './sources'
+import { Json, Section } from './sources/base'
 
 dotenv.config()
 
@@ -63,15 +64,19 @@ async function generateEmbeddings() {
   }
 
   for (const embeddingSource of embeddingSources) {
-    const { type, source, path, parentPath } = embeddingSource
+    const { type, source, path } = embeddingSource
 
     try {
-      const { checksum, meta, sections } = await embeddingSource.load()
+      const {
+        checksum,
+        sections,
+        meta = {},
+      }: { checksum: string; sections: Section[]; meta?: Json } = embeddingSource.process()
 
       // Check for existing page in DB and compare checksums
       const { error: fetchPageError, data: existingPage } = await supabaseClient
         .from('page')
-        .select('id, path, checksum, parentPage:parent_page_id(id, path)')
+        .select('id, path, checksum')
         .filter('path', 'eq', path)
         .limit(1)
         .maybeSingle()
@@ -82,34 +87,6 @@ async function generateEmbeddings() {
 
       // We use checksum to determine if this page & its sections need to be regenerated
       if (!shouldRefresh && existingPage?.checksum === checksum) {
-        const existingParentPage = Array.isArray(existingPage?.parentPage)
-          ? existingPage?.parentPage[0]
-          : existingPage?.parentPage
-
-        // If parent page changed, update it
-        if (existingParentPage?.path !== parentPath) {
-          console.log(`[${path}] Parent page has changed. Updating to '${parentPath}'...`)
-          const { error: fetchParentPageError, data: parentPage } = await supabaseClient
-            .from('page')
-            .select()
-            .filter('path', 'eq', parentPath)
-            .limit(1)
-            .maybeSingle()
-
-          if (fetchParentPageError) {
-            throw fetchParentPageError
-          }
-
-          const { error: updatePageError } = await supabaseClient
-            .from('page')
-            .update({ parent_page_id: parentPage?.id })
-            .filter('id', 'eq', existingPage.id)
-
-          if (updatePageError) {
-            throw updatePageError
-          }
-        }
-
         // No content/embedding update required on this page
         // Update other meta info
         const { error: updatePageError } = await supabaseClient
@@ -149,17 +126,6 @@ async function generateEmbeddings() {
         }
       }
 
-      const { error: fetchParentPageError, data: parentPage } = await supabaseClient
-        .from('page')
-        .select()
-        .filter('path', 'eq', parentPath)
-        .limit(1)
-        .maybeSingle()
-
-      if (fetchParentPageError) {
-        throw fetchParentPageError
-      }
-
       // Create/update page record. Intentionally clear checksum until we
       // have successfully generated all page sections.
       const { error: upsertPageError, data: page } = await supabaseClient
@@ -171,7 +137,7 @@ async function generateEmbeddings() {
             type,
             source,
             meta,
-            parent_page_id: parentPage?.id,
+            content: embeddingSource.extractIndexedContent(),
             version: refreshVersion,
             last_refresh: refreshDate,
           },
@@ -200,7 +166,7 @@ async function generateEmbeddings() {
 
           const [responseData] = embeddingResponse.data
 
-          const { error: insertPageSectionError, data: pageSection } = await supabaseClient
+          const { error: insertPageSectionError } = await supabaseClient
             .from('page_section')
             .insert({
               page_id: page.id,

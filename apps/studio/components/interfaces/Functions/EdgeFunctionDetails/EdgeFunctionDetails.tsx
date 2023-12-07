@@ -261,7 +261,7 @@ const EdgeFunctionDetails = () => {
                   Make sure you have made a backup if you want to restore your edge function
                 </p>
                 <Tooltip.Root delayDuration={0}>
-                  <Tooltip.Trigger>
+                  <Tooltip.Trigger asChild>
                     <Button
                       type="danger"
                       disabled={!canUpdateEdgeFunction}

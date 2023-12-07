@@ -171,8 +171,8 @@ const JWTSettings = () => {
                             </Tooltip.Root>
                           ) : (
                             <DropdownMenu>
-                              <DropdownMenuTrigger>
-                                <Button asChild type="default" iconRight={<IconChevronDown />}>
+                              <DropdownMenuTrigger asChild>
+                                <Button type="default" iconRight={<IconChevronDown />}>
                                   <span>Generate a new secret</span>
                                 </Button>
                               </DropdownMenuTrigger>

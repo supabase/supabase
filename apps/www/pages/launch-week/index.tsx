@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { Session } from '@supabase/supabase-js'
@@ -8,12 +9,20 @@ import supabase from '~/lib/supabaseMisc'
 import FaviconImports from '~/components/LaunchWeek/X/FaviconImports'
 import DefaultLayout from '~/components/Layouts/Default'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
-import MainStage from '~/components/LaunchWeek/X/Releases/MainStage'
-import BuildStage from '~/components/LaunchWeek/X/Releases/BuildStage'
-import LWXHeader from '../../components/LaunchWeek/X/Releases/LWXHeader'
+import TicketingFlow from '~/components/LaunchWeek/X/Ticket/TicketingFlow'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import LaunchWeekPrizeSection from '~/components/LaunchWeek/X/LaunchWeekPrizeSection'
+import LWXMeetups, { Meetup } from '~/components/LaunchWeek/X/LWXMeetups'
 import LWXStickyNav from '../../components/LaunchWeek/X/Releases/LWXStickyNav'
+import LWXHeader from '../../components/LaunchWeek/X/Releases/LWXHeader'
+import MainStage from '../../components/LaunchWeek/X/Releases/MainStage'
+import BuildStage from '../../components/LaunchWeek/X/Releases/BuildStage'
 
-export default function TicketHome() {
+interface Props {
+  meetups?: Meetup[]
+}
+
+export default function LaunchWeekIndex({ meetups }: Props) {
   const { query } = useRouter()
 
   const TITLE = 'Supabase Launch Week X | 11-15 December 2023'
@@ -43,7 +52,7 @@ export default function TicketHome() {
       supabase.auth.getSession().then(({ data: { session } }) => setSession(session))
       const {
         data: { subscription },
-      } = supabase.auth.onAuthStateChange((event, session) => {
+      } = supabase.auth.onAuthStateChange((_event, session) => {
         setSession(session)
       })
 
@@ -105,8 +114,25 @@ export default function TicketHome() {
           <LWXHeader />
           <MainStage />
           <BuildStage />
+          {/* <TicketingFlow /> */}
+          <SectionContainer id="meetups" className="!pt-4 scroll-mt-[66px]">
+            <LWXMeetups meetups={meetups} />
+          </SectionContainer>
+          <SectionContainer className="lg:pb-40">
+            <LaunchWeekPrizeSection />
+          </SectionContainer>
         </DefaultLayout>
       </ConfDataContext.Provider>
     </>
   )
+}
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const { data: meetups } = await supabase!.from('lwx_meetups').select('*')
+
+  return {
+    props: {
+      meetups: meetups?.sort((a, b) => (new Date(a.start_at) > new Date(b.start_at) ? 1 : -1)),
+    },
+  }
 }
