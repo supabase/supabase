@@ -9,17 +9,17 @@
 
 [Supabase](https://supabase.com) Ay isang alternatibong bukas na mapagkukunan ng Firebase. Binubuo namin ang mga tampok ng Firebase gamit ang mga tool na pangnegosyo at bukas na mapagkukunan.
 
-[x] In-host na Postgres Database. [Docs](https://supabase.com/docs/guides/database)
-- [x] Authentication at Authorization. [Docs](https://supabase.com/docs/guides/auth)
-- [x] Auto-generated na mga API.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/api)
+[x] In-host na Postgres Database [Docs](https://supabase.com/docs/guides/database)
+- [x] Authentication at Authorization [Docs](https://supabase.com/docs/guides/auth)
+- [x] Auto-generated na mga API
+  - [x] REST [Docs](https://supabase.com/docs/guides/api)
   - [x] GraphQL. [Docs](https://supabase.com/docs/guides/graphql)
-  - [x] Realtime na mga subscription. [Docs](https://supabase.com/docs/guides/realtime)
-- [x] Mga Function.
-  - [x] Mga Function ng Database. [Docs](https://supabase.com/docs/guides/database/functions)
+  - [x] Realtime na mga subscription [Docs](https://supabase.com/docs/guides/realtime)
+- [x] Mga Function
+  - [x] Mga Function ng Database [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Mga Edge functions [Docs](https://supabase.com/docs/guides/functions)
-- [x] Imbakan ng File. [Docs](https://supabase.com/docs/guides/storage)
-- [x] AI + Vector/Embeddings Toolkit. [Docs](https://supabase.com/docs/guides/ai)
+- [x] Imbakan ng File [Docs](https://supabase.com/docs/guides/storage)
+- [x] AI + Vector/Embeddings Toolkit [Docs](https://supabase.com/docs/guides/ai)
 - [x] Dashboard
 
 
@@ -38,10 +38,10 @@ Upang malaman kung paano makatulong, bisitahin ang [Paano mag simula](./DEVELOPE
 
 ## Komunidad at Suporta
 
-- [Komunidad na Forum](https://github.com/supabase/supabase/discussions). Pinakamabuti para sa: tulong sa pagbuo, diskusyon tungkol sa mga pinakamahusay na praktika sa database.
-- [Mga Isyu sa GitHub](https://github.com/supabase/supabase/issues). Pinakamabuti para sa: mga bug at error na iyong nae-encounter gamit ang Supabase.
-- [Suporta sa Email](https://supabase.com/docs/support#business-support). Pinakamabuti para sa: mga problema sa iyong database o infrastructure.
-- [Discord](https://discord.supabase.com). Pinakamabuti para sa: pagbabahagi ng iyong mga aplikasyon at pakikipag-ugnayan sa komunidad.
+- [Komunidad na Forum](https://github.com/supabase/supabase/discussions) Pinakamabuti para sa: tulong sa pagbuo, diskusyon tungkol sa mga pinakamahusay na praktika sa database.
+- [Mga Isyu sa GitHub](https://github.com/supabase/supabase/issues) Pinakamabuti para sa: mga bug at error na iyong nae-encounter gamit ang Supabase.
+- [Suporta sa Email](https://supabase.com/docs/support#business-support) Pinakamabuti para sa: mga problema sa iyong database o infrastructure.
+- [Discord](https://discord.supabase.com) Pinakamabuti para sa: pagbabahagi ng iyong mga aplikasyon at pakikipag-ugnayan sa komunidad.
 
 
 ## Paano ito gumagana 
@@ -57,7 +57,7 @@ Ang Supabase ay isang [hosted platform](https://supabase.com/dashboard). Pwedeng
 ![Arkitektura ng Supabase](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
 
 - [**Postgres**](https://www.postgresql.org/): Isang object-relational database system na may mahigit 30 taon ng aktibong development, na kumita ng malakas na reputasyon sa reliability, robustness ng features, at performance.
-- [**Realtime**](https://github.com/supabase/realtime): Isang Elixir server na nagbibigay-daan sa iyo na makinig sa PostgreSQL inserts, updates, at deletes gamit ang websockets. Ang Realtime ay humihingi ng database changes mula sa built-in replication functionality ng Postgres, binabago ang mga changes sa JSON, at itinatapon ang JSON gamit ang websockets sa mga autorisadong clients.
+- [**Realtime**](https://github.com/supabase/realtime): Isang Elixir server na nagbibigay-daan sa iyo na makinig sa PostgreSQL inserts, updates, at deletes gamit ang websockets. Ang Realtime ay humihingi ng database changes mula sa built-in replication functionality ng Postgres, binabago ang mga changes sa JSON, at itinatapon ang JSON gamit ang websockets sa mga autorisadong cliente.
 - [**PostgREST**](http://postgrest.org/): Isang web server na direktang nagpapabago sa iyong PostgreSQL database tungo sa isang RESTful API.
 - [**GoTrue**](https://github.com/supabase/gotrue): Isang JWT based na API para sa pamamahala ng mga users at paglalabas ng JWT tokens.
 - [**Storage**](https://github.com/supabase/storage-api): Nagbibigay ng isang RESTful interface para sa pamamahala ng mga files na naka-store sa S3, gamit ang Postgres para pamahalaan ang mga pahintulot.
@@ -98,7 +98,7 @@ Ang aming pamamaraan para sa mga aklatang kliyente ay modular. Bawat sub-aklatan
   </tr>
   END ROW -->
   <!-- /notranslate -->
-  <th colspan="7">⚡️ Opisyal ⚡️</th>
+  <th colspan="7">⚡️ Official ⚡️</th>
   <!-- notranslate -->
   <tr>
     <td>JavaScript (TypeScript)</td>
@@ -119,7 +119,7 @@ Ang aming pamamaraan para sa mga aklatang kliyente ay modular. Bawat sub-aklatan
     <td><a href="https://github.com/supabase/functions-dart" target="_blank" rel="noopener noreferrer">functions-dart</a></td>
   </tr>
   <!-- /notranslate -->
-  <th colspan="7">💚 Komunidad  💚</th>
+  <th colspan="7">💚 Community  💚</th>
   <!-- notranslate -->
   <tr>
     <td>C#</td>
