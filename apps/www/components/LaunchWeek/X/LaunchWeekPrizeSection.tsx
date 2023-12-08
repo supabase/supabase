@@ -14,6 +14,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
       )}
     >
       <h2 className="w-full text-sm font-mono uppercase tracking-[1px]">Awards</h2>
+      <p>Stay tuned on Launch Week X's final day to find out if you're one of the lucky winners.</p>
       <div className="w-full pt-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mx-auto h-auto text-[#EDEDED]">
           <LaunchWeekPrizeCard
@@ -24,9 +25,8 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
                 <div className="p-4 md:p-6 flex flex-col flex-shrink gap-2 text-sm items-start">
                   <LabelBadge text="10 keyboards" />
                   <p className="text-lg text-[#8B9092] max-w-lg">
-                    Increase your chances of winning a limited-edition{' '}
-                    <span className="text-[#EDEDED]">62-Key ISO Mechanical Keyboard</span> by
-                    sharing your ticket on X and LinkedIn.
+                    Limited-edition{' '}
+                    <span className="text-[#EDEDED]">62-Key ISO Mechanical Keyboard</span>
                   </p>
                 </div>
                 <div className="px-4 mt-10 w-full">
