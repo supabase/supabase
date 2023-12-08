@@ -20,7 +20,7 @@ interface DropReplicaConfirmationModalProps {
 
 const DropReplicaConfirmationModal = ({
   selectedReplica,
-  ,onSuccess
+  onSuccess,
   onCancel,
 }: DropReplicaConfirmationModalProps) => {
   const { ref: projectRef } = useParams()
