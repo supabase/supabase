@@ -62,7 +62,8 @@ async function handlePost(request: NextRequest) {
         - You can add short explanations to your messages.
         - The result should be a valid markdown. The SQL code should be wrapped in \`\`\`.
         - Always use "auth.uid()" instead of "current_user".
-        - Only use "WITH CHECK" on INSERT or UPDATE policies.
+        - You can't use "USING" expression on INSERT policies.
+        - Only use "WITH CHECK" expression on INSERT or UPDATE policies.
         - The policy name should be short text explaining the policy, enclosed in double quotes.
         - Always put explanations as separate text. Never use inline SQL comments. 
         - If the user asks for something that's not related to SQL policies, explain to the user 
