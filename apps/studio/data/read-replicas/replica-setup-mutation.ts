@@ -58,6 +58,7 @@ export const useReadReplicaSetUpMutation = ({
       async onSuccess(data, variables, context) {
         const { projectRef, region, size } = variables
 
+        // [Joshen] Just FYI, will remove this once API changes to remove the need for optimistic rendering
         queryClient.setQueriesData<any>(replicaKeys.list(projectRef), (old: any) => {
           const scaffoldNewDatabase: Database = {
             db_port: 5432,

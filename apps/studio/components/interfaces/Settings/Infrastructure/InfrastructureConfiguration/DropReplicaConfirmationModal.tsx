@@ -14,11 +14,13 @@ import {
 
 interface DropReplicaConfirmationModalProps {
   selectedReplica?: Database
+  onSuccess: () => void
   onCancel: () => void
 }
 
 const DropReplicaConfirmationModal = ({
   selectedReplica,
+  ,onSuccess
   onCancel,
 }: DropReplicaConfirmationModalProps) => {
   const { ref: projectRef } = useParams()
@@ -26,6 +28,7 @@ const DropReplicaConfirmationModal = ({
   const { mutateAsync: removeReadReplica } = useReadReplicaRemoveMutation({
     onSuccess: () => {
       toast.success(`Successfully removed read replica (ID: ${formattedId})`)
+      onSuccess()
       onCancel()
     },
   })

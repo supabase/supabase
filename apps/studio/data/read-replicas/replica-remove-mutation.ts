@@ -42,6 +42,7 @@ export const useReadReplicaRemoveMutation = ({
       async onSuccess(data, variables, context) {
         const { projectRef, identifier } = variables
 
+        // [Joshen] Just FYI, will remove this once API changes to remove the need for optimistic rendering
         queryClient.setQueriesData<any>(replicaKeys.list(projectRef), (old: any) => {
           return old.filter((db: Database) => db.identifier !== identifier)
         })

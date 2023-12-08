@@ -25,12 +25,14 @@ import { useSelectedOrganization } from 'hooks'
 interface DeployNewReplicaPanelProps {
   visible: boolean
   selectedDefaultRegion?: AWS_REGIONS_KEYS
+  onSuccess: () => void
   onClose: () => void
 }
 
 const DeployNewReplicaPanel = ({
   visible,
   selectedDefaultRegion,
+  onSuccess,
   onClose,
 }: DeployNewReplicaPanelProps) => {
   const { ref: projectRef } = useParams()
@@ -42,6 +44,7 @@ const DeployNewReplicaPanel = ({
     onSuccess: () => {
       const region = AVAILABLE_REPLICA_REGIONS.find((r) => r.key === selectedRegion)?.name
       toast.success(`Spinning up new replica in ${region ?? ' Unknown'}...`)
+      onSuccess()
       onClose()
     },
   })
