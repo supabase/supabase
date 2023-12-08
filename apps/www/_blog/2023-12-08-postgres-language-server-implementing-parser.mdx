@@ -323,7 +323,7 @@ message A_Expr
 
 We introspect that definition to generate code at build time using [procedural macros](https://doc.rust-lang.org/reference/procedural-macros.html).
 
-Leveraging the powerful repetition feature of the `[quote](https://github.com/dtolnay/quote)` crate, the `match` statement of a `get_location` function can be implemented with just a few lines of code.
+Leveraging the powerful repetition feature of the [`quote`](https://github.com/dtolnay/quote) crate, the `match` statement of a `get_location` function can be implemented with just a few lines of code.
 
 ```rust
 pub fn get_location_mod(_item: proc_macro2::TokenStream) -> proc_macro2::TokenStream {
