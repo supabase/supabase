@@ -66,7 +66,11 @@ const Message = memo(function Message({
         components={{
           ...markdownComponents,
           pre: (props: any) => {
-            return <AIPolicyPre onDiff={onDiff}>{props.children[0].props.children}</AIPolicyPre>
+            return (
+              <AIPolicyPre onDiff={onDiff} className="pt-3">
+                {props.children[0].props.children}
+              </AIPolicyPre>
+            )
           },
         }}
       >

@@ -12,7 +12,6 @@
     "type": "markdown",
     "excludes": [
       "reference_javascript_v1",
-      "reference_dart_v0",
       "reference_swift_v1"
     ]
   },
@@ -29,8 +28,8 @@
     "type": "markdown",
     "excludes": [
       "reference_javascript_v1",
-      "reference_dart_v0",
       "reference_dart_v1",
+      "reference_dart_v2",
       "reference_python_v2",
       "reference_csharp_v0",
       "reference_swift_v1",
@@ -556,6 +555,27 @@
         "type": "function"
       },
       {
+        "id": "get-user-identities",
+        "title": "Retrieve identities linked to a user",
+        "slug": "auth-getuseridentities",
+        "product": "auth",
+        "type": "function"
+      },
+      {
+        "id": "link-identity",
+        "title": "Link an identity to a user",
+        "slug": "auth-linkidentity",
+        "product": "auth",
+        "type": "function"
+      },
+      {
+        "id": "unlink-identity",
+        "title": "Unlink an identity from a user",
+        "slug": "auth-unlinkidentity",
+        "product": "auth",
+        "type": "function"
+      },
+      {
         "id": "send-password-reauthentication",
         "title": "Send a password reauthentication nonce",
         "slug": "auth-reauthentication",
@@ -939,7 +959,7 @@
     "title": "Misc",
     "excludes": [
       "reference_dart_v1",
-      "reference_dart_v0",
+      "reference_dart_v2",
       "reference_python_v2",
       "reference_csharp_v0",
       "reference_swift_v1",

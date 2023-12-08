@@ -4616,7 +4616,7 @@ export interface components {
         | components['schemas']['AuthHealthResponse']
         | components['schemas']['RealtimeHealthResponse']
       /** @enum {string} */
-      name: 'auth' | 'db' | 'realtime' | 'rest' | 'storage'
+      name: 'auth' | 'db' | 'pooler' | 'realtime' | 'rest' | 'storage'
       healthy: boolean
       /** @enum {string} */
       status: 'COMING_UP' | 'ACTIVE_HEALTHY' | 'UNHEALTHY'
@@ -11911,7 +11911,7 @@ export interface operations {
     parameters: {
       query: {
         timeout_ms?: number
-        services: ('auth' | 'db' | 'realtime' | 'rest' | 'storage')[]
+        services: ('auth' | 'db' | 'pooler' | 'realtime' | 'rest' | 'storage')[]
       }
       path: {
         /** @description Project ref */
