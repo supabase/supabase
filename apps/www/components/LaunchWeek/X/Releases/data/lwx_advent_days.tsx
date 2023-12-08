@@ -123,7 +123,7 @@ export const days: AdventDay[] = [
     is_shipped: true,
     links: [
       {
-        url: '',
+        url: '/blog/how-design-works-at-supabase',
         label: 'Blog post',
       },
     ],
