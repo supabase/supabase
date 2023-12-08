@@ -15,7 +15,7 @@ image: launch-week-7/day-5-supabase-studio-2.0/day-5-supabase-studio-2.0-og.jpg
 thumb: launch-week-7/day-5-supabase-studio-2.0/day-5-supabase-studio-2.0-thumb.jpg
 ---
 
-We adding an AI Assistant to Studio during Launch Week 8. This was our first step towards bringing the power of AI into your development workflow. With the Assistant embedded right into the SQL Editor, you could get help right where you needed it. Today, we’re happy to release our next big step with our Assistant, as well as a couple of huge new features that will help get your ideas into code even faster.
+We added an AI Assistant to Studio during Launch Week 8. This was our first step towards bringing the power of AI into your development workflow. With the Assistant embedded right into the SQL Editor, you could get help right where you needed it. Today, we’re happy to release our next big step with our Assistant, as well as a couple of huge new features that will help get your ideas into code even faster.
 
 <div className="video-container">
   <iframe
@@ -31,18 +31,18 @@ We adding an AI Assistant to Studio during Launch Week 8. This was our first ste
 Here's the birds-eye-view:
 
 <ul>
-  <li>[**Row Level Security Policies**](#row-level-security-policies): made easy with Ai</li>
+  <li>[**Row Level Security Policies**](#easy-rls-policies-with-ai): made easy with Ai</li>
   <li>
-    [**Postgres Roles and User Impersonation**](#postgres-roles-and-user-impersonation): visualize
-    the impact of your security policies
+    [**Postgres Roles and User Impersonation**](#postgres-roles): visualize the impact of your
+    security policies
   </li>
   <li>[**Realtime Inspector**](#realtime-inspector): inspect and debug Realtime requests</li>
-  <li>[**Feature Previews**](#feature-previews): see what’s hot off the press in the Studio</li>
+  <li>[**Feature Previews**](#feature-previews): see what’s hot off the press in Studio</li>
 </ul>
 
 ## Introducing AI / Supabase / the / etc Assistant
 
-We're excited to expand Studio’s AI capabilities with Assistant. If you use the SQL Editor or our ⌘K menu today, you’re already seeing how AI can help speed up your workflows. But, this is just the beginning. Today, we’re rolling out Assistant support in our Row Level Security editor, and soon will expand to other places in Studio. The Table Editor, Postgres functions, serverless functions, and more are all on the roadmap. Let’s jump in to Row Level Security.
+We're excited to expand Studio’s AI capabilities with Assistant. If you use the SQL Editor or our ⌘K menu today, you’re already seeing how AI can help speed up your workflows. But, this is just the beginning. Today, we’re rolling out Assistant support in our Row Level Security editor, and soon will expand to other places in Studio. The Table Editor, Postgres functions, serverless functions, and more are all on the roadmap. Let’s jump in to Row Level Security first.
 
 ![Supabase AI](/images/blog/launch-week-8/day-2/supabase-ai-loading-animation.gif)
 
@@ -53,6 +53,7 @@ Of all the feature requests we get (and we get many!), a easier way to write RLS
 In-line with our commitment to a SQL-first approach, the new RLS editor brings SQL front and center. We believe in giving developers access to the full potential of Postgres, rather than abstracting it away.
 
 The new RLS editor is really two tools in one. If you know SQL really well, there’s a new editor for you to quickly drop your policies in. If you’re new to RLS and need some help, you can use the Assistant and chat your way through it.
+
 ![Supabase AI](/images/blog/launch-week-x/day-1/1.png)
 
 The Assistant has been fine-tuned to produce SQL for Row Level Security policies, making it fast and easy to get your policies setup the way you need them.
@@ -64,9 +65,9 @@ The Assistant has been fine-tuned to produce SQL for Row Level Security policies
   />
 </video>
 
-We've done several iterations of our RLS Policy editor, exploring various approaches and designs. This SQL-first approach, with assistance from Ai, now feels like the solution we've been seeking. If you’ve got feedback, we’d love to hear from you. [GitHub discussion link](https://chat.openai.com/c/link).
+We've done several iterations of our RLS policy editor, exploring various approaches and designs. This SQL-first approach, with assistance from Ai, now feels like the solution we've been seeking. If you’ve got feedback, we’d love to hear from you. [GitHub discussion link](https://chat.openai.com/c/link).
 
-In the next couple of months, we’re hoping to extend what we’ve learned with the RLS Policy editor to database functions editor. We also get a lot of requests to improve the that editor, and we think we can use a similar pattern there. Stay tuned!
+In the next couple of months, we’re hoping to extend what we’ve learned with the RLS Policy editor to database functions editor. We also get a lot of requests for enhancements to that editor, and we think we can use a similar pattern there. Stay tuned!
 
 The new RLS Editor can be enabled today via Feature Previews (more on that below).
 
@@ -80,7 +81,7 @@ What if you could use the same Postgres roles you use in your applications, but 
 
 ![Supabase AI](/images/blog/launch-week-x/day-1/3.png)
 
-An example app will help illustrate this for use. Let's build a Twitter/X clone as an example. In a Twitter clone, you:
+An example app will help illustrate this for us. Let's build a Twitter/X clone as an example. In a Twitter clone, you:
 
 - have a `tweets` table with columns like `user_id` and `content`.
 - can set up Row Level Security so that only the author of a tweet can access and modify their own tweets.
@@ -95,23 +96,21 @@ Here’s our tweets table. Watch the table react when we change roles:
   />
 </video>
 
----
-
 Moving from the `postgres` role to the `anon` role removes all of the records from the table. This makes sense as we haven’t yet created a policy to allow for `anon` access to this table.
 
-Exposing Postgres Roles in the Studio allows you to pretend to use the `anon` or `authenticated` roles. Roles also unlocks another handy capability: not only can we have Studio pretend to be different role, it can pretend to be a different _user_.
+Exposing Postgres roles in the Studio allows you to pretend to use the `anon` or `authenticated` roles. Roles also unlocks another handy capability: not only can we have Studio pretend to be different role, it can pretend to be a different _user_.
 
 ## User Impersonation
 
 Remember we said value of the API keys we use in our applications are actually JWTs? That means you can impersonate a user by swapping the JWT the Studio uses for theirs. Let’s see that in action.
 
-We’ve written an RLS policy to allow for users to view their own tweets. Here, we can choose the `authenticated` role, and select a specific user to see just their tweets. Here’s all of our user’s tweets:
+We’ve written an RLS policy to allow users to view their own tweets. Here, we can choose the `authenticated` role, and select a specific user to see just their tweets. Here’s all of our user’s tweets:
 
-![Supabase AI](/images/blog/launch-week-x/day-1/8.png)
+![Supabase AI](/images/blog/launch-week-x/day-1/7.png)
 
-The table editor is now impersonating our user.
+The Table Editor is now impersonating our user.
 
-You can now impersonate any user in your project and see things exactly as they would. Any conditions in your RLS policies will be automatically reflected here in the table.
+You can impersonate any user in your project and see things exactly as they would. Any conditions in your RLS policies will be automatically reflected here in the table.
 
 Magic.
 
@@ -139,7 +138,9 @@ If you use Realtime, you’re going to find the new inspector very handy. If you
 
 ## Feature Previews
 
-Last, a quick introduction to Feature Previews, our tool for unveiling and rolling out new features. You can use Previews to see new tools or features that are available in beta. You can see a list of features that are available along with a screenshot and a brief description. Each feature includes a link to a Github Discussion for feedback. We have a couple of goals with Feature Previews. We want to:
+Last, a quick introduction to Feature Previews, our tool for unveiling and rolling out new features. We release beta features as Previews before making them generally available. You can see a list of features that are available for preview along with a screenshot and a brief description. Each feature includes a link to a Github Discussion for feedback.
+
+We have a couple of goals with Feature Previews. We want to:
 
 - get features out to you faster
 - make it easier for you to give us feedback on them
@@ -171,8 +172,8 @@ In this update, we've taken huge strides in enhancing your experience with Supab
 
 **Postgres Roles and User Impersonation**: Our new roles selector allows you to visualize the impact of your security policies directly within the Studio. This lets you to see how different roles interact with your data, offering a powerful tool for testing access control.
 
-**Realtime Inspector**: With the Realtime Inspector, you can prototype, inspect, and debug real-time messages. This tool will be very useful for those who use Supabase Realtime.
+**Realtime Inspector**: With the Realtime Inspector, you can prototype, inspect, and debug Realtime messages. This tool will be very useful for those who use Supabase Realtime.
 
 **Feature Previews**: We've introduced Feature Previews to bring you new tools and features in the beta stage, making it easier for you to provide feedback and shape the development process.
 
-These updates reflect our commitment to a SQL-first approach and a user-centric development experience. We look forward to your feedback as we continue to work hard making Supabase faster and easier for you to get your ideas out into the wild.
+These updates reflect our commitment to a SQL-first approach and a user-centric development. We look forward to your feedback as we continue to work hard making Supabase faster and easier for you to get your ideas out into the wild.
