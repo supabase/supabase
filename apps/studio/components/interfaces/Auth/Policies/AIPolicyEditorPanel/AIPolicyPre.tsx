@@ -6,19 +6,20 @@ import { Button, CodeBlock, cn } from 'ui'
 interface AAIPolicyPreProps {
   onDiff: (s: string) => void
   children: string[]
+  className?: string
 }
 
-export const AIPolicyPre = ({ onDiff, children }: AAIPolicyPreProps) => {
+export const AIPolicyPre = ({ onDiff, children, className }: AAIPolicyPreProps) => {
   let formatted = (children || [''])[0]
   try {
-    formatted = format(formatted, { language: 'postgresql' })
+    formatted = format(formatted, { language: 'postgresql', keywordCase: 'upper' })
   } catch {}
 
   if (formatted.length === 0) {
     return null
   }
   return (
-    <pre className="rounded-md relative group">
+    <pre className={cn('rounded-md relative group', className)}>
       <CodeBlock
         value={formatted}
         language="sql"

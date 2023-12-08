@@ -14,6 +14,7 @@ interface UpgradeToProProps {
   organizationSlug: string
   secondaryText: string
   addon?: 'pitr' | 'customDomain' | 'computeInstance'
+  buttonText?: string
 }
 
 const UpgradeToPro = ({
@@ -23,6 +24,7 @@ const UpgradeToPro = ({
   organizationSlug,
   secondaryText,
   addon,
+  buttonText,
 }: UpgradeToProProps) => {
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organizationSlug })
   const plan = subscription?.plan?.id
@@ -63,7 +65,7 @@ const UpgradeToPro = ({
                       : `/project/${projectRef}/settings/addons?panel=${addon}`
                   }
                 >
-                  {plan === 'free' ? 'Upgrade to Pro' : 'Enable Addon'}
+                  {buttonText || (plan === 'free' ? 'Upgrade to Pro' : 'Enable Addon')}
                 </Link>
               </Button>
             </Tooltip.Trigger>
