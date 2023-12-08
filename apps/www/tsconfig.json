@@ -2,12 +2,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "~/*": [
-        "./*"
-      ],
-      "@ui/*": [
-        "./../../packages/ui/src/*"
-      ] // handle ui package paths
+      "~/*": ["./*"],
+      "@ui/*": ["./../../packages/ui/src/*"] // handle ui package paths
     },
     "downlevelIteration": true,
     "target": "es5",
@@ -17,11 +13,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "noEmit": true,
     "moduleResolution": "node",
@@ -34,14 +26,6 @@
       }
     ]
   },
-  "exclude": [
-    "node_modules",
-    "supabase"
-  ],
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts"
-  ]
+  "exclude": ["node_modules", "supabase"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"]
 }
