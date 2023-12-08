@@ -1,32 +1,32 @@
 [
   {
     "type": "Announcement",
-    "title": "Supabase Beta August 2023",
-    "description": "Launch Week 8 review and more things we shipped 🚀",
-    "imgUrl": "/images/blog/2023-09-07-beta-update-august-2023/monthly-update-august-2023.jpg",
-    "logoUrl": "/images/blog/2023-09-07-beta-update-august-2023/monthly-update-august-2023.jpg",
+    "title": "Postgres Language Server: implementing the Parser",
+    "description": "A detailed analysis of our iterations to implement a Parser for Postgres",
+    "imgUrl": "/images/blog/lwx-postgres-language-server/postgres-language-server-thumb.jpg",
+    "logoUrl": "/images/blog/lwx-postgres-language-server/postgres-language-server-thumb.jpg",
     "organization": "Supabase",
-    "url": "/blog/beta-update-august-2023",
+    "url": "/blog/postgres-language-server-implementing-parser",
     "postMeta": {
-      "name": "Ant Wilson",
-      "publishDate": "Sep 08, 2023",
-      "readLength": 5
+      "name": "philipp",
+      "publishDate": "Dec 08, 2023",
+      "readLength": 10
     },
     "ctaText": "Learn more"
   },
   {
     "type": "Announcement",
-    "title": "Launch Week 8 Hackathon Winners",
-    "description": "Announcing the winners of the Launch Week 8 Hackathon!",
-    "imgUrl": "/images/blog/lw8-hackathon-winners/hackathon-winners.png",
-    "logoUrl": "/images/blog/lw8-hackathon-winners/hackathon-winners.png",
+    "title": "Supabase Launch Week X Hackathon",
+    "description": "Build an Open Source Project over 10 days. 5 prize categories",
+    "imgUrl": "/images/blog/lwx-hackathon/ogimage.png",
+    "logoUrl": "/images/blog/lwx-hackathon/ogimage.png",
     "organization": "Supabase",
-    "url": "/blog/launch-week-8-hackathon-winners",
+    "url": "/blog/supabase-hackathon-lwx",
     "postMeta": {
-      "name": "Andrew Smith",
-      "publishDate": "August 28, 2023",
+      "name": "ant_wilson",
+      "publishDate": "Dec 05, 2023",
       "readLength": 3
     },
-    "ctaText": "See the winners"
+    "ctaText": "Learn more"
   }
 ]
