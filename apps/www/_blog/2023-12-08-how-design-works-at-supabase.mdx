@@ -30,13 +30,17 @@ The emphasis is on the daily gains, unblocking problems with design work so that
 
 Let’s take an example, our LWX ticket page:
 
-![something](/images/blog/lwx-how-design-works-at-supabase/aesthetic-moodboard.png)
+![something](/images/blog/lwx-how-design-works-at-supabase/lwx-tickets-iterations.png)
 
 Late the in build process an idea was floated to try and integrate a _Wordle_ type easter egg into the site. We build some designs to help the discussion:
 
-< image >
+<div className="grid grid-cols-2 gap-3">
 
-< image >
+![something](/images/blog/lwx-how-design-works-at-supabase/lwx-ticket-1.png)
+
+![something](/images/blog/lwx-how-design-works-at-supabase/lwx-ticket-2.png)
+
+</div>
 
 The designs are not pixel-perfect. It’s not _exactly_ what we shipped, but it allowed a few people in the team to align quickly on an outcome and aesthetic.
 
@@ -52,7 +56,7 @@ We took some inspiration from Linear’s approach - taking screenshots of what i
 
 Here’s an example where we are making changes to the table editor:
 
-< image >
+![something](/images/blog/lwx-how-design-works-at-supabase/screenshots-in-mockups.png)
 
 A screenshot of the table editor from prod in a mockup
 
@@ -75,7 +79,7 @@ The Design Team adopted and maintain two principle sets:
 
 We needed to agree on what we collectively like and dislike on an emotional level. Aligning on a common aesthetic avoids debates on individual elements.
 
-< image >
+![something](/images/blog/lwx-how-design-works-at-supabase/aesthetic-moodboard.png)
 
 Aesthetic mood board of what Design Team like externally
 
@@ -83,14 +87,17 @@ After the team voted on their likes and dislikes, patterns begin to emerge: colo
 
 We used these preference to build higher-level alignment, leading to our founding principles such as:
 
-- **Timelessness**
-  - We always ask critically: will this still feel good in a few years?
-  - Are we following a trend we’ve recently seen?
-  - _We buck trends, not follow them._
-- **Less is more**
-  - Always remove the fluff
-  - Remove overbearing information
-  - [Dieter Rams](https://en.wikipedia.org/wiki/Dieter_Rams#Less_and_More_exhibition) ftw
+#### Timelessness
+
+- We always ask critically: will this still feel good in a few years?
+- Are we following a trend we’ve recently seen?
+- _We buck trends, not follow them._
+
+#### Less is more
+
+- Always remove the fluff
+- Remove overbearing information
+- [Dieter Rams](https://en.wikipedia.org/wiki/Dieter_Rams#Less_and_More_exhibition) ftw
 
 We enforce these principles by following agreed tactics - mantras such as “be more subtle”, “simplify simplify simplify”, “use brand green only for CTA”.
 
@@ -100,31 +107,31 @@ This has helped the team push in a unified direction. Perhaps you have already n
 
 Product Principles are about collaborating with Product teams. We came up with a list of principles that we think are important for effective velocity. To share just a few of our favorites:
 
-**Design for the “Postgres developer”**
+#### Design for the "Postgres developer"
 
 We are moving towards a SQL first experience in the dashboard. You’ll see some LWX announcements that lean more into empowering developers to learn SQL rather.
 
-**Consolidation follows kaizen**
+#### Consolidation follows kaizen
 
 Product Teams must ship _[kaizen](https://en.wikipedia.org/wiki/Kaizen)_ improvements. But It’s Design Team’s role to consolidate after. This helps with velocity - we are not a blocker in the development process.
 
 For example, yesterday the Frontend team added a “New organization” button in the dashboard based on a message from Kevin (see below). They skipped Design Team input, shipped a quick solution, then the Design team will do a more refined layout update after LWX, improving the page as whole.
 
-< image >
+![something](/images/blog/lwx-how-design-works-at-supabase/kaizen-before-consildation.png)
 
-**80/20**
+#### 80/20
 
 We bias towards the 80% of developers using Supabase. This follows the [Pareto Principle](https://www.investopedia.com/terms/1/80-20-rule), we focus on the smallest changes that have the largest impact on our userbase.
 
 This isn’t always easy, since there is usually a vocal minority.
 
-**Build patterns**
+#### Build patterns
 
 Repeatable actions that enforce muscle memory will always be preferred. When adding new features, (or, most likely nowadays; _overhauling features_) we always consider how the same UI patterns can work in other areas.
 
 You will start to notice these principles being applied more throughout the LWX features announced this week.
 
-# Tools and Tactics
+## Tools and Tactics
 
 We use very few tools (across the entire org), and we build good processes and practices around them. Let’s review a few for the design team:
 
@@ -134,17 +141,20 @@ No introduction required. We’ve used Figma since the beginning and will contin
 
 We’ve organized our Figma library into quarterly files, that are clearly labelled as “in progress” or “archived” so anyone can easily find the latest and greatest. [tweet link, give credit]
 
-< image >
+<figure>
+  ![something](/images/blog/lwx-how-design-works-at-supabase/figma-organization.png)
+  <figurecaption>files are organized so we can easily check what is current</figurecaption>
+</figure>
 
-files are organized so we can easily check what is current
-
-### D**esign system**
+### Design system
 
 We started maintaining a library during LW5, but only recently started using it in earnest. We’ve kept the system deliberately small, only adding what we’ve used more than a few times. The library then doesn’t spread into unique use-cases and suffer from content bloat.
 
-< image >
-
-Most of the main _general_ components
+<figure>
+  ![supabase design system in
+  figma](/images/blog/lwx-how-design-works-at-supabase/figma-design-system.png)
+  <figurecaption>Most of the main general components</figurecaption>
+</figure>
 
 Luckily, Figma features such as [nested components](https://www.figma.com/best-practices/component-architecture/#nested-components) came out while we were revamping this set of components. This meant we could reduce the footprint of the design system significantly. Figma libraries previously required every permutation of a component, but it’s now easy to contain things like swappable “icons” or pseudo states like “active” within components.
 
