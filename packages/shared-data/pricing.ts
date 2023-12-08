@@ -87,14 +87,12 @@ export const pricing: Pricing = {
         title: 'Point in time recovery',
         tooltips: {
           main: 'PITR cannot be applied retroactively, projects can only be rolled back to the point from which PITR has been applied.',
-          pro: '$100 per 7 days. If > 28 day rollback period, contact enterprise',
-          team: '$100 per 7 days. If > 28 day rollback period, contact enterprise',
         },
         plans: {
           free: false,
           pro: '$100 per 7 days',
           team: '$100 per 7 days',
-          enterprise: true,
+          enterprise: '$100 per 7 days, >28 days available',
         },
         usage_based: false,
       },
@@ -300,7 +298,7 @@ export const pricing: Pricing = {
       {
         title: 'Script size',
         plans: {
-          free: '2 MB',
+          free: '10 MB',
           pro: '10 MB',
           team: '10 MB',
           enterprise: 'Custom',
@@ -600,7 +598,7 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
-        title: 'Designated customer success engineer ',
+        title: 'Designated customer success Team',
         plans: {
           free: false,
           pro: false,
