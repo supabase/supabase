@@ -99,7 +99,7 @@ export const days: AdventDay[] = [
   {
     type: '',
     title: 'Design at Supabase',
-    description: 'Our approach to design',
+    description: "The transformative journey of Supabase's Design team",
     className: '',
     icon: (
       <svg
