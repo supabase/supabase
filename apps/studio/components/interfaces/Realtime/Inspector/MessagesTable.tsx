@@ -2,7 +2,6 @@ import { useParams } from 'common'
 import { isEqual } from 'lodash'
 import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { Key, useEffect, useState } from 'react'
 import DataGrid, { RenderRowProps, Row } from 'react-data-grid'
 import { Button, IconBroadcast, IconDatabaseChanges, IconExternalLink, IconPresence, cn } from 'ui'
@@ -10,8 +9,8 @@ import { Button, IconBroadcast, IconDatabaseChanges, IconExternalLink, IconPrese
 import ShimmerLine from 'components/ui/ShimmerLine'
 import MessageSelection from './MessageSelection'
 import { LogData } from './Messages.types'
-import { ColumnRenderer } from './RealtimeMessageColumnRenderer'
 import NoChannelEmptyState from './NoChannelEmptyState'
+import { ColumnRenderer } from './RealtimeMessageColumnRenderer'
 
 export const isErrorLog = (l: LogData) => {
   return l.message === 'SYSTEM' && l.metadata?.status === 'error'
@@ -39,7 +38,7 @@ const NoResultAlert = ({
 
           <div className="mt-4 border bg-surface-100 border-border rounded-md justify-start items-center flex flex-col w-full">
             <div className="w-full px-5 py-4 items-center gap-4 inline-flex border-b">
-              <IconBroadcast size="xlarge" className="bg-brand-400 rounded w-6 text-brand-600" />
+              <IconBroadcast size="xlarge" className="text-background bg-foreground rounded w-6" />
               <div className="grow flex-col flex">
                 <p className="text-foreground">Create a Broadcast message</p>
                 <p className="text-foreground-lighter text-xs">Send a message in the channel</p>
@@ -49,7 +48,7 @@ const NoResultAlert = ({
               </Button>
             </div>
             <div className="w-full px-5 py-4 items-center gap-4 inline-flex border-b">
-              <IconPresence size="xlarge" className="bg-brand-400 rounded w-6 text-brand-600" />
+              <IconPresence size="xlarge" className="text-background bg-foreground rounded w-6" />
               <div className="grow flex-col flex">
                 <p className="text-foreground">Join from another browser tab</p>
                 <p className="text-foreground-lighter text-xs">
@@ -66,7 +65,7 @@ const NoResultAlert = ({
             <div className="w-full px-5 py-4 items-center gap-4 inline-flex border-b">
               <IconDatabaseChanges
                 size="xlarge"
-                className="bg-brand-400 rounded w-6 text-brand-600"
+                className="text-background bg-foreground rounded w-6"
               />
               <div className="grow flex-col flex">
                 <p className="text-foreground">Listen to a table for changes</p>
