@@ -467,6 +467,14 @@ export interface paths {
     /** Gets daily project stats */
     get: operations['DailyStatsController_getDailyStats']
   }
+  '/platform/projects/{ref}/databases': {
+    /** Gets non-removed databases of a specified project */
+    get: operations['DatabasesController_getDatabases']
+  }
+  '/platform/projects/{ref}/databases-statuses': {
+    /** Gets status of all databases within a project */
+    get: operations['DatabasesStatusesController_getStatus']
+  }
   '/platform/projects/{ref}/db-password': {
     /** Updates the database password */
     patch: operations['DbPasswordController_updatePassword']
@@ -1212,6 +1220,14 @@ export interface paths {
   '/v0/projects/{ref}/daily-stats': {
     /** Gets daily project stats */
     get: operations['DailyStatsController_getDailyStats']
+  }
+  '/v0/projects/{ref}/databases': {
+    /** Gets non-removed databases of a specified project */
+    get: operations['DatabasesController_getDatabases']
+  }
+  '/v0/projects/{ref}/databases-statuses': {
+    /** Gets status of all databases within a project */
+    get: operations['DatabasesStatusesController_getStatus']
   }
   '/v0/projects/{ref}/db-password': {
     /** Updates the database password */
@@ -3548,6 +3564,45 @@ export interface components {
       visibility?: 'user' | 'project' | 'org' | 'public'
       content?: Record<string, never>
       owner_id?: number
+    }
+    DatabaseDetailResponse: {
+      db_port: number
+      db_name: string
+      db_user: string
+      restUrl: string
+      db_host: string
+      connectionString: string
+      identifier: string
+      inserted_at: string
+      /** @enum {string} */
+      status:
+        | 'ACTIVE_HEALTHY'
+        | 'ACTIVE_UNHEALTHY'
+        | 'COMING_UP'
+        | 'GOING_DOWN'
+        | 'INIT_FAILED'
+        | 'REMOVED'
+        | 'RESTORING'
+        | 'UNKNOWN'
+        | 'UPGRADING'
+      size: string
+      region: string
+      /** @enum {string} */
+      cloud_provider: 'AWS' | 'FLY'
+    }
+    DatabaseStatusResponse: {
+      identifier: string
+      /** @enum {string} */
+      status:
+        | 'ACTIVE_HEALTHY'
+        | 'ACTIVE_UNHEALTHY'
+        | 'COMING_UP'
+        | 'GOING_DOWN'
+        | 'INIT_FAILED'
+        | 'REMOVED'
+        | 'RESTORING'
+        | 'UNKNOWN'
+        | 'UPGRADING'
     }
     UpdatePasswordBody: {
       password: string
@@ -8403,6 +8458,42 @@ export interface operations {
         }
       }
       /** @description Failed to get daily project stats */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets non-removed databases of a specified project */
+  DatabasesController_getDatabases: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['DatabaseDetailResponse'][]
+        }
+      }
+    }
+  }
+  /** Gets status of all databases within a project */
+  DatabasesStatusesController_getStatus: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['DatabaseStatusResponse'][]
+        }
+      }
+      /** @description Failed to get project's status */
       500: {
         content: never
       }

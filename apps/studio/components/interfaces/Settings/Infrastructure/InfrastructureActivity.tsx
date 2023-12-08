@@ -35,8 +35,9 @@ const InfrastructureActivity = () => {
   const { ref: projectRef } = useParams()
   const organization = useSelectedOrganization()
   const [dateRange, setDateRange] = useState<any>()
-  const [selectedDatabaseId, setSelectedDatabaseId] = useState<string>('1')
 
+  // [Joshen] Not for first iteration of read replicas
+  const [selectedDatabaseId, setSelectedDatabaseId] = useState<string>('1')
   const readReplicasEnabled = useFlag('readReplicas')
 
   const { data: subscription, isLoading: isLoadingSubscription } = useOrgSubscriptionQuery({
@@ -187,12 +188,12 @@ const InfrastructureActivity = () => {
       </ScaffoldContainer>
       <ScaffoldContainer className="sticky top-0 py-6 border-b bg-background z-10">
         <div className="flex items-center gap-x-4">
-          {readReplicasEnabled && (
+          {/* {readReplicasEnabled && (
             <DatabaseSelector
               selectedDatabaseId={selectedDatabaseId}
               onChangeDatabaseId={setSelectedDatabaseId}
             />
-          )}
+          )} */}
           {!isLoadingSubscription && (
             <>
               <DateRangePicker

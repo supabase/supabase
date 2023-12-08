@@ -3,14 +3,15 @@ import { useEffect, useState } from 'react'
 import { Listbox, SidePanel } from 'ui'
 
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { AVAILABLE_REPLICA_REGIONS, DatabaseConfiguration } from './InstanceConfiguration.constants'
+import { AVAILABLE_REPLICA_REGIONS } from './InstanceConfiguration.constants'
 import { AWS_REGIONS, AWS_REGIONS_DEFAULT, AWS_REGIONS_KEYS, BASE_PATH } from 'lib/constants'
+import { Database } from 'data/read-replicas/replicas-query'
 
 // [Joshen] FYI this is purely for AWS only, need to update to support Fly eventually
 
 interface ResizeReplicaPanelProps {
   visible: boolean
-  selectedReplica?: DatabaseConfiguration
+  selectedReplica?: Database
   onClose: () => void
 }
 
@@ -43,7 +44,7 @@ const ResizeReplicaPanel = ({ visible, selectedReplica, onClose }: ResizeReplica
       visible={visible}
       onCancel={onClose}
       onConfirm={() => onSubmit()}
-      header={`Resize read replica (ID: ${selectedReplica?.id})`}
+      header={`Resize read replica (ID: ${selectedReplica?.identifier})`}
     >
       <SidePanel.Content className="flex flex-col py-4 gap-y-8">
         <div className="flex flex-col gap-y-1">

@@ -3,33 +3,52 @@ import { Edge, Node, Position } from 'reactflow'
 
 import {
   AVAILABLE_REPLICA_REGIONS,
-  DatabaseConfiguration,
   NODE_ROW_HEIGHT,
   NODE_SEP,
   NODE_WIDTH,
 } from './InstanceConfiguration.constants'
 import { groupBy } from 'lodash'
+import { Database } from 'data/read-replicas/replicas-query'
 
 export const generateNodes = (
-  databases: DatabaseConfiguration[],
+  primary: Database,
+  replicas: Database[],
   {
     onSelectRestartReplica,
     onSelectResizeReplica,
     onSelectDropReplica,
   }: {
-    onSelectRestartReplica: (database: DatabaseConfiguration) => void
-    onSelectResizeReplica: (database: DatabaseConfiguration) => void
-    onSelectDropReplica: (database: DatabaseConfiguration) => void
+    onSelectRestartReplica: (database: Database) => void
+    onSelectResizeReplica: (database: Database) => void
+    onSelectDropReplica: (database: Database) => void
   }
 ): Node[] => {
   const position = { x: 0, y: 0 }
-  const replicas = databases.filter((d) => d.type === 'READ_REPLICA')
   const regions = groupBy(replicas, (d) => {
     const region = AVAILABLE_REPLICA_REGIONS.find((region) => d.region.includes(region.region))
     return region?.key
   })
 
-  const databaseNodes: Node[] = databases
+  const primaryRegion = AVAILABLE_REPLICA_REGIONS.find((region) =>
+    primary.region.includes(region.region)
+  )
+  const primaryNode: Node = {
+    position,
+    id: primary.identifier,
+    type: 'PRIMARY',
+    data: {
+      id: primary.identifier,
+      region: primaryRegion,
+      provider: primary.cloud_provider,
+      inserted_at: primary.inserted_at,
+      computeSize: primary.size,
+      status: primary.status,
+      numReplicas: replicas.length,
+      numRegions: Object.keys(regions).length,
+    },
+  }
+
+  const replicaNodes: Node[] = replicas
     .sort((a, b) => (a.region > b.region ? 1 : -1))
     .map((database) => {
       const region = AVAILABLE_REPLICA_REGIONS.find((region) =>
@@ -38,33 +57,23 @@ export const generateNodes = (
 
       return {
         position,
-        id: `database-${database.id}`,
-        type: database.type,
+        id: database.identifier,
+        type: 'READ_REPLICA',
         data: {
-          id: database.id,
+          id: database.identifier,
           region,
-          label: database.type === 'PRIMARY' ? 'Primary Database' : 'Read Replica',
           provider: database.cloud_provider,
           inserted_at: database.inserted_at,
           computeSize: database.size,
-          ...(database.type === 'READ_REPLICA'
-            ? {
-                onSelectRestartReplica: () => onSelectRestartReplica(database),
-                onSelectResizeReplica: () => onSelectResizeReplica(database),
-                onSelectDropReplica: () => onSelectDropReplica(database),
-              }
-            : {}),
-          ...(database.type === 'PRIMARY'
-            ? {
-                numReplicas: replicas.length,
-                numRegions: Object.keys(regions).length,
-              }
-            : {}),
+          status: database.status,
+          onSelectRestartReplica: () => onSelectRestartReplica(database),
+          onSelectResizeReplica: () => onSelectResizeReplica(database),
+          onSelectDropReplica: () => onSelectDropReplica(database),
         },
       }
     })
 
-  return [...databaseNodes]
+  return [primaryNode, ...replicaNodes]
 }
 
 export const getDagreGraphLayout = (nodes: Node[], edges: Edge[]) => {
@@ -123,7 +132,7 @@ export const addRegionNodes = (nodes: Node[], edges: Edge[]) => {
     const regionNode: Node = {
       id: key,
       position: { x: minX - 10, y: minY - 10 },
-      width: maxX - minX,
+      width: maxX - minX + NODE_WIDTH / 2,
       type: 'REGION',
       data: { region, numReplicas: value.length },
     }

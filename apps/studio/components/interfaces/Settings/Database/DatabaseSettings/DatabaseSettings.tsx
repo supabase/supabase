@@ -18,12 +18,12 @@ import DatabaseSelector from 'components/ui/DatabaseSelector'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useFlag, useSelectedOrganization } from 'hooks'
 import { pluckObjectFields } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
-import { MOCK_DATABASES } from '../../Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import ConfirmDisableReadOnlyModeModal from './ConfirmDisableReadOnlyModal'
 import ResetDbPassword from './ResetDbPassword'
 
@@ -37,17 +37,31 @@ const DatabaseSettings = () => {
   const readReplicasEnabled = useFlag('readReplicas')
   const connectionStringsRef = useRef<HTMLDivElement>(null)
 
-  const [selectedDatabaseId, setSelectedDatabaseId] = useState<string>('1')
+  const [selectedDatabaseId, setSelectedDatabaseId] = useState<string>(projectRef ?? '')
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
 
-  // [Joshen] Read replicas mock UI stuff
-  const [open, setOpen] = useState(false)
-  const databases = MOCK_DATABASES
-  const selectedDatabase = databases.find((db) => db.id.toString() === selectedDatabaseId)
-
-  const { data, error, isLoading, isError, isSuccess } = useProjectSettingsQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
+  const {
+    data,
+    error: projectSettingsError,
+    isLoading: isLoadingProjectSettings,
+    isError: isErrorProjectSettings,
+    isSuccess: isSuccessProjectSettings,
+  } = useProjectSettingsQuery({ projectRef })
   const { data: resourceWarnings } = useResourceWarningsQuery()
+  const {
+    data: databases,
+    error: readReplicasError,
+    isLoading: isLoadingReadReplicas,
+    isError: isErrorReadReplicas,
+    isSuccess: isSuccessReadReplicas,
+  } = useReadReplicasQuery({ projectRef })
+  const error = readReplicasEnabled ? readReplicasError : projectSettingsError
+  const isLoading = readReplicasEnabled ? isLoadingReadReplicas : isLoadingProjectSettings
+  const isError = readReplicasEnabled ? isErrorReadReplicas : isErrorProjectSettings
+  const isSuccess = readReplicasEnabled ? isSuccessReadReplicas : isSuccessProjectSettings
+
+  const selectedDatabase = (databases ?? []).find((db) => db.identifier === selectedDatabaseId)
 
   const isReadOnlyMode =
     (resourceWarnings ?? [])?.find((warning) => warning.project === projectRef)
@@ -55,10 +69,10 @@ const DatabaseSettings = () => {
 
   const { project } = data ?? {}
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
-  const connectionInfo =
-    project !== undefined
-      ? pluckObjectFields(project, DB_FIELDS)
-      : { db_user: '', db_host: '', db_port: '', db_name: '' }
+  const emptyState = { db_user: '', db_host: '', db_port: '', db_name: '' }
+  const connectionInfo = readReplicasEnabled
+    ? pluckObjectFields(selectedDatabase || emptyState, DB_FIELDS)
+    : pluckObjectFields(project || emptyState, DB_FIELDS)
 
   const handleCopy = (labelValue?: string) =>
     Telemetry.sendEvent(
@@ -152,9 +166,17 @@ const DatabaseSettings = () => {
 
           <Panel
             title={
-              <h5 key="panel-title" className="mb-0">
-                Connection info
-              </h5>
+              <div className="w-full flex items-center justify-between">
+                <h5 key="panel-title" className="mb-0">
+                  Connection info
+                </h5>
+                {readReplicasEnabled && (
+                  <DatabaseSelector
+                    selectedDatabaseId={selectedDatabaseId}
+                    onChangeDatabaseId={setSelectedDatabaseId}
+                  />
+                )}
+              </div>
             }
             className="!m-0"
           >
@@ -169,9 +191,7 @@ const DatabaseSettings = () => {
                     <ShimmeringLoader className="h-8 w-full col-span-8" delayIndex={i} />
                   </div>
                 ))}
-              {isError && (
-                <AlertError error={error} subject="Failed to retrieve database settings" />
-              )}
+              {isError && <AlertError error={error} subject="Failed to retrieve databases" />}
               {isSuccess && (
                 <>
                   <Input
@@ -222,7 +242,11 @@ const DatabaseSettings = () => {
                     layout="horizontal"
                     disabled
                     readOnly
-                    value={'[The password you provided when you created this project]'}
+                    value={
+                      selectedDatabaseId !== projectRef
+                        ? '[The password for your primary database]'
+                        : '[The password you provided when you created this project]'
+                    }
                     label="Password"
                   />
                 </>
@@ -230,8 +254,6 @@ const DatabaseSettings = () => {
             </Panel.Content>
           </Panel>
         </section>
-
-        <ResetDbPassword disabled={isLoading || isError} />
 
         <section className="space-y-6">
           <Panel
@@ -374,6 +396,8 @@ const DatabaseSettings = () => {
             </Panel.Content>
           </Panel>
         </section>
+
+        <ResetDbPassword disabled={isLoading || isError} />
       </div>
 
       <ConfirmDisableReadOnlyModeModal
