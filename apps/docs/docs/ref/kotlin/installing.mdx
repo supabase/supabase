@@ -277,7 +277,7 @@ By default, [KotlinX Serialization](https://github.com/Kotlin/kotlinx.serializat
         val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
             //Already the default serializer, but you can provide a custom Json instance (optional):
             defaultSerializer = KotlinXSerializer(Json {
-                ignoreDefaults = true
+                //apply your custom config
             })
         }
         ```
