@@ -1,13 +1,15 @@
-import { IS_PLATFORM } from 'lib/constants'
 import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
+import { IS_PLATFORM } from 'lib/constants'
 
-export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
+export const generateAuthMenu = (
+  ref: string,
+  options: { hooksReleased?: boolean } = {}
+): ProductMenuGroup[] => {
   return [
     {
       title: 'Manage',
       items: [{ name: 'Users', key: 'users', url: `/project/${ref}/auth/users`, items: [] }],
     },
-
     {
       title: 'Configuration',
       items: [
@@ -37,13 +39,23 @@ export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
                 url: `/project/${ref}/auth/templates`,
                 items: [],
               },
-
               {
                 name: 'URL Configuration',
                 key: 'url-configuration',
                 url: `/project/${ref}/auth/url-configuration`,
                 items: [],
               },
+              ...(options?.hooksReleased
+                ? [
+                    {
+                      name: 'Hooks',
+                      key: 'hooks',
+                      url: `/project/${ref}/auth/hooks`,
+                      items: [],
+                      label: 'BETA',
+                    },
+                  ]
+                : []),
             ]
           : []),
       ],

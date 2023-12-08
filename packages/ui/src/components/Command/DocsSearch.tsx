@@ -248,35 +248,51 @@ const DocsSearch = () => {
 
       let sourcesLoaded = 0
 
-      const sources = ['search-fts', 'search-embeddings']
-      sources.forEach((source) => {
-        fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}${FUNCTIONS_URL}${source}`, {
-          method: 'POST',
-          body: JSON.stringify({ query }),
-        })
-          .then((response) => response.json())
-          .then((results) => {
-            if (!Array.isArray(results)) {
-              throw Error("didn't get expected results array")
-            }
-            sourcesLoaded += 1
-            dispatch({
-              type: 'resultsReturned',
-              key: localKey,
-              sourcesLoaded,
-              results,
-            })
+      supabaseClient.rpc('docs_search_fts', { query: query.trim() }).then(({ data, error }) => {
+        sourcesLoaded += 1
+        if (error || !Array.isArray(data)) {
+          dispatch({
+            type: 'errored',
+            key: localKey,
+            sourcesLoaded,
+            message: error?.message ?? '',
           })
-          .catch((error) => {
-            sourcesLoaded += 1
-            dispatch({
-              type: 'errored',
-              key: localKey,
-              sourcesLoaded,
-              message: error.message ?? '',
-            })
+        } else {
+          dispatch({
+            type: 'resultsReturned',
+            key: localKey,
+            sourcesLoaded,
+            results: data,
           })
+        }
       })
+
+      fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}${FUNCTIONS_URL}search-embeddings`, {
+        method: 'POST',
+        body: JSON.stringify({ query }),
+      })
+        .then((response) => response.json())
+        .then((results) => {
+          if (!Array.isArray(results)) {
+            throw Error("didn't get expected results array")
+          }
+          sourcesLoaded += 1
+          dispatch({
+            type: 'resultsReturned',
+            key: localKey,
+            sourcesLoaded,
+            results,
+          })
+        })
+        .catch((error) => {
+          sourcesLoaded += 1
+          dispatch({
+            type: 'errored',
+            key: localKey,
+            sourcesLoaded,
+            message: error.message ?? '',
+          })
+        })
     },
     [supabaseClient]
   )
