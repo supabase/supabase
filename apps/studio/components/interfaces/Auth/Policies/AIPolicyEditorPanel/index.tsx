@@ -290,6 +290,13 @@ export const AIPolicyEditorPanel = memo(function ({
                     renderSideBySide: false,
                     scrollBeyondLastLine: false,
                     renderOverviewRuler: false,
+                    renderLineHighlight: 'none',
+                    minimap: { enabled: false },
+                    occurrencesHighlight: false,
+                    folding: false,
+                    selectionHighlight: false,
+                    lineHeight: 20,
+                    padding: { top: 10, bottom: 10 },
                   }}
                 />
               ) : null}
