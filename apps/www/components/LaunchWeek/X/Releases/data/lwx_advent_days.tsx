@@ -88,7 +88,7 @@ export const days: AdventDay[] = [
     is_shipped: true,
     links: [
       {
-        url: '',
+        url: '/blog/postgres-language-server-implementing-parser',
         label: 'Blog post',
       },
     ],
