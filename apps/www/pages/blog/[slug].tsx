@@ -119,15 +119,10 @@ export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async (
 }
 
 function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
-  const [isMounted, setIsMounted] = useState(false)
   const content = props.blog.content
   const authorArray = props.blog.author.split(',')
   useActiveAnchors('h2, h3, h4', '.prose-toc a')
   const isLaunchWeek7 = props.blog.launchweek === 7
-
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
 
   const author = authorArray
     .map((authorId) => {
@@ -190,8 +185,6 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
     description: props.blog.meta_description ?? props.blog.description,
     url: `https://supabase.com/blog/${props.blog.slug}`,
   }
-
-  if (!isMounted) return null
 
   return (
     <>
