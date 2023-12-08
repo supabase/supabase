@@ -22,21 +22,19 @@ import {
   ScrollArea,
 } from 'ui'
 
-import { AWS_REGIONS_KEYS, BASE_PATH } from 'lib/constants'
-import {
-  AVAILABLE_REPLICA_REGIONS,
-  DatabaseConfiguration,
-  MOCK_DATABASES,
-} from './InstanceConfiguration.constants'
+import { AWS_REGIONS_KEYS, BASE_PATH, PROJECT_STATUS } from 'lib/constants'
+import { AVAILABLE_REPLICA_REGIONS } from './InstanceConfiguration.constants'
 import GeographyData from './MapData.json'
+import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 
 // [Joshen] Foresee that we'll skip this view for initial launch
 
 interface MapViewProps {
   onSelectDeployNewReplica: (region: AWS_REGIONS_KEYS) => void
-  onSelectRestartReplica: (database: DatabaseConfiguration) => void
-  onSelectResizeReplica: (database: DatabaseConfiguration) => void
-  onSelectDropReplica: (database: DatabaseConfiguration) => void
+  onSelectRestartReplica: (database: Database) => void
+  onSelectResizeReplica: (database: Database) => void
+  onSelectDropReplica: (database: Database) => void
 }
 
 const MapView = ({
@@ -47,7 +45,7 @@ const MapView = ({
 }: MapViewProps) => {
   const { ref } = useParams()
   const [mount, setMount] = useState(false)
-  const [zoom, setZoom] = useState<number>(1)
+  const [zoom, setZoom] = useState<number>(1.5)
   const [center, setCenter] = useState<[number, number]>([14, 7])
   const [tooltip, setTooltip] = useState<{
     x: number
@@ -56,7 +54,10 @@ const MapView = ({
     network?: any
   }>()
 
-  const [[primary], replicas] = partition(MOCK_DATABASES, (database) => database.type === 'PRIMARY')
+  const { data } = useReadReplicasQuery({ projectRef: ref })
+  const databases = data ?? []
+  const [[primary], replicas] = partition(databases, (db) => db.identifier === ref)
+
   const primaryCoordinates = AVAILABLE_REPLICA_REGIONS.find((region) =>
     primary.region.includes(region.region)
   )?.coordinates ?? [0, 0]
@@ -66,16 +67,17 @@ const MapView = ({
 
   const selectedRegionKey =
     AVAILABLE_REPLICA_REGIONS.find((region) => region.coordinates === center)?.region ?? ''
-  const showRegionDetails = zoom === 1.5 && selectedRegionKey !== undefined
+  const showRegionDetails = zoom === 2.0 && selectedRegionKey !== undefined
   const selectedRegion = AVAILABLE_REPLICA_REGIONS.find(
     (region) => region.region === selectedRegionKey
   )
   const databasesInSelectedRegion = useMemo(
     () =>
-      MOCK_DATABASES.filter((database) => database.region.includes(selectedRegionKey))
-        .sort((a, b) => (a.id > b.id ? 1 : 0))
-        .sort((database) => (database.type === 'PRIMARY' ? -1 : 0)),
-    [selectedRegionKey]
+      databases
+        .filter((database) => database.region.includes(selectedRegionKey))
+        .sort((a, b) => (a.inserted_at > b.inserted_at ? 1 : 0))
+        .sort((database) => (database.identifier === ref ? -1 : 0)),
+    [ref, selectedRegionKey]
   )
 
   useEffect(() => {
@@ -83,14 +85,14 @@ const MapView = ({
   }, [])
 
   return (
-    <div className="bg-background">
-      <ComposableMap projectionConfig={{ scale: 140 }} height={354}>
+    <div className="bg-background h-[500px]">
+      <ComposableMap projectionConfig={{ scale: 155 }} className="w-full h-full">
         <ZoomableGroup
           className={mount ? 'transition-all duration-300' : ''}
           center={center}
           zoom={zoom}
-          minZoom={1}
-          maxZoom={1.5}
+          minZoom={1.5}
+          maxZoom={2.0}
           filterZoomEvent={({ constructor: { name } }) =>
             !['MouseEvent', 'WheelEvent'].includes(name)
           }
@@ -117,7 +119,7 @@ const MapView = ({
             if (coordinates !== primaryCoordinates) {
               return (
                 <Line
-                  key={`line-${database.id}-${primary.id}`}
+                  key={`line-${database.identifier}-${primary.identifier}`}
                   from={coordinates}
                   to={primaryCoordinates}
                   stroke="white"
@@ -134,15 +136,15 @@ const MapView = ({
           })}
 
           {AVAILABLE_REPLICA_REGIONS.map((region) => {
-            const databases =
-              MOCK_DATABASES.filter((database) => database.region.includes(region.region)) ?? []
+            const dbs =
+              databases.filter((database) => database.region.includes(region.region)) ?? []
             const coordinates = AVAILABLE_REPLICA_REGIONS.find(
               (r) => r.region === region.region
             )?.coordinates
 
-            const hasNoDatabases = databases.length === 0
-            const hasPrimary = databases.some((database) => database.type === 'PRIMARY')
-            const replicas = databases.filter((database) => database.type === 'READ_REPLICA') ?? []
+            const hasNoDatabases = dbs.length === 0
+            const hasPrimary = dbs.some((database) => database.identifier === ref)
+            const replicas = dbs.filter((database) => database.identifier !== ref) ?? []
 
             return (
               <Marker
@@ -151,7 +153,7 @@ const MapView = ({
                 onMouseEnter={(event) =>
                   setTooltip({
                     x: event.clientX,
-                    y: event.clientY,
+                    y: event.clientY + 20,
                     region: {
                       key: region.key,
                       country: region.name,
@@ -159,7 +161,9 @@ const MapView = ({
                         ? undefined
                         : hasPrimary
                         ? `Primary Database${
-                            replicas.length > 0 ? ` + ${replicas.length} replicas` : ''
+                            replicas.length > 0
+                              ? ` + ${replicas.length} replica${replicas.length > 1 ? 's' : ''} `
+                              : ''
                           }`
                         : `${replicas.length} Read Replica${
                             replicas.length > 1 ? 's' : ''
@@ -171,7 +175,7 @@ const MapView = ({
                 onClick={() => {
                   if (coordinates) {
                     setCenter(coordinates)
-                    setZoom(1.5)
+                    setZoom(2.0)
                   }
                 }}
               >
@@ -247,22 +251,31 @@ const MapView = ({
 
                   return (
                     <li
-                      key={database.id}
+                      key={database.identifier}
                       className="text-sm px-4 py-2 flex items-center justify-between"
                     >
                       <div className="flex flex-col gap-y-1">
                         <p className="flex items-center gap-x-2">
-                          {database.type === 'PRIMARY'
+                          {database.identifier === ref
                             ? 'Primary Database'
-                            : `Read Replica (ID: ${database.id})`}
-                          {database.type === 'READ_REPLICA' && <Badge color="green">Healthy</Badge>}
+                            : `Read Replica ${
+                                database.identifier.length > 0 &&
+                                `(ID: ${formatDatabaseID(database.identifier)})`
+                              }`}
+                          {database.status === PROJECT_STATUS.ACTIVE_HEALTHY ? (
+                            <Badge color="green">Healthy</Badge>
+                          ) : database.status === PROJECT_STATUS.COMING_UP ? (
+                            <Badge color="slate">Coming up</Badge>
+                          ) : (
+                            <Badge color="amber">Unhealthy</Badge>
+                          )}
                         </p>
                         <p className="text-xs text-foreground-light">AWS • {database.size}</p>
-                        {database.type === 'READ_REPLICA' && (
+                        {database.identifier !== ref && (
                           <p className="text-xs text-foreground-light">Created on: {created}</p>
                         )}
                       </div>
-                      {database.type === 'READ_REPLICA' && (
+                      {database.identifier !== ref && (
                         <DropdownMenu modal={false}>
                           <DropdownMenuTrigger asChild>
                             <Button type="text" icon={<IconMoreVertical />} className="px-1" />
@@ -270,12 +283,12 @@ const MapView = ({
                           <DropdownMenuContent className="p-0 w-40" side="bottom" align="end">
                             <DropdownMenuItem className="gap-x-2">
                               <Link
-                                href={`/project/${ref}/settings/database?connectionString=${database.id}`}
+                                href={`/project/${ref}/settings/database?connectionString=${database.identifier}`}
                               >
                                 View connection string
                               </Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem
+                            {/* <DropdownMenuItem
                               className="gap-x-2"
                               onClick={() => onSelectRestartReplica(database)}
                             >
@@ -286,7 +299,7 @@ const MapView = ({
                               onClick={() => onSelectResizeReplica(database)}
                             >
                               Resize replica
-                            </DropdownMenuItem>
+                            </DropdownMenuItem> */}
                             <div className="border-t" />
                             <DropdownMenuItem
                               className="gap-x-2"
@@ -316,7 +329,7 @@ const MapView = ({
               type="default"
               onClick={() => {
                 setCenter([14, 7])
-                setZoom(1)
+                setZoom(1.5)
               }}
             >
               Close

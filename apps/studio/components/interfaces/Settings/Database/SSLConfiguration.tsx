@@ -131,41 +131,43 @@ const SSLConfiguration = () => {
               {(isLoading || isSubmitting) && (
                 <IconLoader className="animate-spin" strokeWidth={1.5} size={16} />
               )}
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger>
-                  <Toggle
-                    checked={isEnforced}
-                    disabled={
-                      isLoading ||
-                      isSubmitting ||
-                      !canUpdateSSLEnforcement ||
-                      !hasAccessToSSLEnforcement
-                    }
-                    onChange={toggleSSLEnforcement}
-                  />
-                </Tooltip.Trigger>
-                {(!canUpdateSSLEnforcement || !hasAccessToSSLEnforcement) && (
-                  <Tooltip.Portal>
-                    <Tooltip.Content align="center" side="bottom">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-alternative py-1 px-2 leading-none shadow',
-                          'border border-background w-[250px]',
-                        ].join(' ')}
-                      >
-                        <span className="text-xs text-foreground text-center flex items-center justify-center">
-                          {!canUpdateSSLEnforcement
-                            ? 'You need additional permissions to update SSL enforcement for your project'
-                            : !hasAccessToSSLEnforcement
-                            ? 'Your project does not have access to SSL enforcement'
-                            : ''}
-                        </span>
-                      </div>
-                    </Tooltip.Content>
-                  </Tooltip.Portal>
-                )}
-              </Tooltip.Root>
+              {isSuccess && (
+                <Tooltip.Root delayDuration={0}>
+                  <Tooltip.Trigger>
+                    <Toggle
+                      checked={isEnforced}
+                      disabled={
+                        isLoading ||
+                        isSubmitting ||
+                        !canUpdateSSLEnforcement ||
+                        !hasAccessToSSLEnforcement
+                      }
+                      onChange={toggleSSLEnforcement}
+                    />
+                  </Tooltip.Trigger>
+                  {(!canUpdateSSLEnforcement || !hasAccessToSSLEnforcement) && (
+                    <Tooltip.Portal>
+                      <Tooltip.Content align="center" side="bottom">
+                        <Tooltip.Arrow className="radix-tooltip-arrow" />
+                        <div
+                          className={[
+                            'rounded bg-alternative py-1 px-2 leading-none shadow',
+                            'border border-background w-[250px]',
+                          ].join(' ')}
+                        >
+                          <span className="text-xs text-foreground text-center flex items-center justify-center">
+                            {!canUpdateSSLEnforcement
+                              ? 'You need additional permissions to update SSL enforcement for your project'
+                              : !hasAccessToSSLEnforcement
+                              ? 'Your project does not have access to SSL enforcement'
+                              : ''}
+                          </span>
+                        </div>
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
+                  )}
+                </Tooltip.Root>
+              )}
             </div>
           </FormSectionContent>
         </FormSection>
