@@ -218,7 +218,7 @@ function reducer(state: SearchState, action: Action): SearchState {
 const DocsSearch = () => {
   const [state, dispatch] = useReducer(reducer, { status: 'initial', key: 0 })
   const supabaseClient = useSupabaseClient()
-  const { search, setSearch, inputRef } = useCommandMenu()
+  const { search, setSearch, inputRef, site } = useCommandMenu()
   const key = useRef(0)
   const initialLoad = useRef(true)
   const router = useRouter()
@@ -227,7 +227,8 @@ const DocsSearch = () => {
     switch (pageType) {
       case PageType.Markdown:
       case PageType.Reference:
-        return router.push(link)
+        const docsLink = site === 'docs' ? link : `https://supabase.com/docs${link}`
+        return router.push(docsLink)
       case PageType.GithubDiscussion:
         return window.open(link, '_blank')
       default:
