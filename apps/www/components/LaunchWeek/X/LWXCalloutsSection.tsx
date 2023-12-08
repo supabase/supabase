@@ -4,7 +4,7 @@ import { SmallCard } from '../8/Releases/components'
 import Link from 'next/link'
 import Image from 'next/image'
 
-const LW8CalloutsSection = () => {
+const LWXCalloutsSection = () => {
   return (
     <SectionContainer className="!py-0 w-full !px-0 !max-w-none">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 scroll-mt-[105px]" id="hackathon">
@@ -58,4 +58,4 @@ const LW8CalloutsSection = () => {
   )
 }
 
-export default LW8CalloutsSection
+export default LWXCalloutsSection
