@@ -71,8 +71,5 @@ redirect_uri = ""
 # or any other third-party OIDC providers.
 url = ""
 
-[functions.search-fts]
-verify_jwt = false
-
 [functions.search-embeddings]
 verify_jwt = false
