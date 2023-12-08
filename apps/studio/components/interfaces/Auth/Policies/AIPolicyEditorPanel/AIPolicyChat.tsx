@@ -1,15 +1,19 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { compact, last } from 'lodash'
-import { Loader2 } from 'lucide-react'
-import { useEffect, useRef } from 'react'
+import { ArrowDownRight, Loader2 } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   AiIcon,
   Button,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
+  Collapsible_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   Form_Shadcn_,
+  IconChevronDown,
   IconSettings,
   Input_Shadcn_,
 } from 'ui'
@@ -17,8 +21,9 @@ import * as z from 'zod'
 
 import { useProfile } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
-import { MessageWithDebug } from './AIPolicyEditorPanel.utils'
+import { HELP_PRESETS, MessageWithDebug } from './AIPolicyEditorPanel.utils'
 import Message from './Message'
+import { m } from 'framer-motion'
 
 interface AIPolicyChatProps {
   messages: MessageWithDebug[]
@@ -38,6 +43,8 @@ export const AIPolicyChat = ({
   const { profile } = useProfile()
   const snap = useAppStateSnapshot()
   const bottomRef = useRef<HTMLDivElement>(null)
+
+  const [showDetails, setShowDetails] = useState(false)
 
   const name = compact([profile?.first_name, profile?.last_name]).join(' ')
 
@@ -110,6 +117,47 @@ export const AIPolicyChat = ({
 
         <div ref={bottomRef} className="h-1" />
       </div>
+
+      <Collapsible_Shadcn_
+        className="-mt-1.5 pb-1.5"
+        open={showDetails}
+        onOpenChange={() => setShowDetails(!showDetails)}
+      >
+        <CollapsibleTrigger_Shadcn_ className="group pl-6 font-normal p-0 [&[data-state=open]>div>svg]:!-rotate-180">
+          <div className="flex items-center gap-x-2 w-full">
+            <p className="text-xs text-foreground-light group-hover:text-foreground transition">
+              Not sure where to start?
+            </p>
+            <IconChevronDown
+              className="transition-transform duration-200"
+              strokeWidth={1.5}
+              size={14}
+            />
+          </div>
+        </CollapsibleTrigger_Shadcn_>
+        <CollapsibleContent_Shadcn_ className="pl-6 my-2 grid gap-1.5">
+          {HELP_PRESETS.map((text: string) => (
+            <Button
+              type="text"
+              key={text}
+              className="flex justify-start p-0 hover:bg-transparent hover:underline text-foreground-light"
+              onClick={() => {
+                form.setValue('chat', text)
+                form.setFocus('chat')
+              }}
+            >
+              <div className="text-sm flex items-center gap-2">
+                {text}
+                <ArrowDownRight
+                  className="transition-transform duration-200"
+                  strokeWidth={1.5}
+                  size={14}
+                />
+              </div>
+            </Button>
+          ))}
+        </CollapsibleContent_Shadcn_>
+      </Collapsible_Shadcn_>
 
       <Form_Shadcn_ {...form}>
         <form

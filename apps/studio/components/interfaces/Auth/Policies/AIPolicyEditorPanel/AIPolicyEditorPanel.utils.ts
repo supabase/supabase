@@ -77,3 +77,8 @@ ${policy.check ? `WITH CHECK (${policy.check})` : ''}
 ;
 `.trim()
 }
+
+export const HELP_PRESETS = [
+  'Allow anon access to my countries table',
+  'Allow only authenticated access to my posts table',
+]
