@@ -2,6 +2,7 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { replicaKeys } from './keys'
+import { useFlag } from 'hooks'
 
 export type ReadReplicasStatusesVariables = {
   projectRef?: string
@@ -31,9 +32,11 @@ export const useReadReplicasStatusesQuery = <TData = ReadReplicasStatusesData>(
     enabled = true,
     ...options
   }: UseQueryOptions<ReadReplicasStatusesData, ReadReplicasStatusesError, TData> = {}
-) =>
+) => {
+  const readReplicasEnabled = useFlag('readReplicas')
   useQuery<ReadReplicasStatusesData, ReadReplicasStatusesError, TData>(
     replicaKeys.statuses(projectRef),
     ({ signal }) => getReadReplicasStatuses({ projectRef }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
+    { enabled: enabled && readReplicasEnabled && typeof projectRef !== 'undefined', ...options }
   )
+}
