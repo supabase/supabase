@@ -20,7 +20,7 @@ During our previous Launch Week we [announced](https://news.ycombinator.com/item
 This is an update on the Parser, which is the fundamental primitive of a Language Server. We’ve been through several iterations of the parser and we want to detail our explorations.
 
 <details>
-  <summary>Want to learn some more acronyms?</summary>
+  <summary>**Want to learn some more acronyms?**</summary>
   
     There will be a few acronyms in this post. We don’t want this post to be “inside baseball” so here are a few concepts that you need to know:
     
@@ -46,13 +46,13 @@ On the highest level, a language server is a thing which
 <img
 className="dark:hidden !m-0"
 alt="Diagram explaining how a Language server works and the role of the parser"
-src="/images/blog/lwx-postgres-language-server/language-server-diagram-dark-mode.png"
+src="/images/blog/lwx-postgres-language-server/language-server-diagram-light-mode.png"
 />
 
 <img
 className="hidden dark:block !m-0"
 alt="Diagram explaining how a Language server works and the role of the parser"
-src="/images/blog/lwx-postgres-language-server/language-server-diagram-light-mode.png"
+src="/images/blog/lwx-postgres-language-server/language-server-diagram-dark-mode.png"
 />
 
 The parser is the core of every language server. It takes the raw string, turns it into a stream of tokens, and builds a syntax tree. This syntax tree can then be used to extract structural information. 
