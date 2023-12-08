@@ -33,32 +33,36 @@ const PolicyDetails = ({ policy, showDetails, toggleShowDetails }: PolicyDetails
           />
         </div>
       </CollapsibleTrigger_Shadcn_>
-      <CollapsibleContent_Shadcn_ className="pl-[3.6rem] mt-1">
-        <div className="text-xs flex items-start space-x-2">
-          <p className="w-[110px] text-foreground-light">Name:</p>
-          <p className="">{policy.name}</p>
-        </div>
-        <div className="text-xs flex items-start space-x-2">
-          <p className="w-[110px] text-foreground-light">Action:</p>
-          <p className="font-mono">{policy.action}</p>
-        </div>
-        <div className="text-xs flex items-start space-x-2">
-          <p className="w-[110px] text-foreground-light">Command:</p>
-          <p className="font-mono">{policy.command}</p>
-        </div>
-        <div className="text-xs flex items-start space-x-2">
-          <p className="w-[110px] text-foreground-light">Target roles:</p>
-          <p className="font-mono">{policy.roles.join(', ')}</p>
-        </div>
-        <div className="text-xs flex items-start space-x-2">
-          <p className="w-[110px] text-foreground-light">USING expression:</p>
-          <p className="font-mono">{policy.definition}</p>
-        </div>
-        <div className="text-xs flex items-start space-x-2">
-          <p className="w-[110px] text-foreground-light">CHECK expression:</p>
-          <p className={`${policy.check ? '' : 'text-foreground-light'} font-mono`}>
-            {policy.check ?? 'None'}
-          </p>
+      <CollapsibleContent_Shadcn_ className="pl-[3.6rem] my-2 grid gap-1.5">
+        <div className="flex">
+          <div>
+            <div className="text-xs flex items-start space-x-2 border-b py-1.5">
+              <p className="w-[110px] text-foreground-light">Name:</p>
+              <p className="pr-4">{policy.name}</p>
+            </div>
+            <div className="text-xs flex items-start space-x-2 border-b py-1.5">
+              <p className="w-[110px] text-foreground-light">Action:</p>
+              <p className="font-mono pr-4">{policy.action}</p>
+            </div>
+            <div className="text-xs flex items-start space-x-2 border-b py-1.5">
+              <p className="w-[110px] text-foreground-light">Command:</p>
+              <p className="font-mono pr-4">{policy.command}</p>
+            </div>
+            <div className="text-xs flex items-start space-x-2 border-b py-1.5">
+              <p className="w-[110px] text-foreground-light">Target roles:</p>
+              <p className="font-mono pr-4">{policy.roles.join(', ')}</p>
+            </div>
+            <div className="text-xs flex items-start space-x-2 border-b py-1.5">
+              <p className="w-[110px] text-foreground-light">USING expression:</p>
+              <p className="font-mono pr-4">{policy.definition}</p>
+            </div>
+            <div className="text-xs flex items-start space-x-2 pt-1.5">
+              <p className="w-[110px] text-foreground-light">CHECK expression:</p>
+              <p className={`${policy.check ? '' : 'text-foreground-light'} font-mono pr-4`}>
+                {policy.check ?? 'None'}
+              </p>
+            </div>
+          </div>
         </div>
       </CollapsibleContent_Shadcn_>
     </Collapsible_Shadcn_>
