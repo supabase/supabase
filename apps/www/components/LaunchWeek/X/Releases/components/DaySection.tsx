@@ -18,7 +18,12 @@ const DaySection = ({ day }: { day: WeekDayProps }) => {
     >
       {/* Day title and links */}
       <div className="flex h-full flex-col gap-4 items-between">
-        <div className="text-sm inline uppercase font-mono text-foreground tracking-[0.1rem]">
+        <div
+          className={cn(
+            'text-sm inline uppercase font-mono text-foreground-muted tracking-[0.1rem]',
+            day.shipped || (day.hasCountdown && 'text-foreground')
+          )}
+        >
           {day.dd}, {day.date}
         </div>
         {day.shipped && (
