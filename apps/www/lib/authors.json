@@ -374,5 +374,13 @@
     "position": "DevRel Social Media and Community",
     "author_url": "https://twitter.com/yuricodesbot",
     "author_image_url": "https://github.com/YuriCodes.png"
+  },
+  {
+    "author_id": "ivasilov",
+    "author": "Ivan Vasilov",
+    "username": "ivasilov",
+    "position": "Engineering",
+    "author_url": "https://twitter.com/ivasilov",
+    "author_image_url": "https://github.com/ivasilov.png"
   }
 ]
