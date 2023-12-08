@@ -40,9 +40,18 @@ On the highest level, a language server is a thing which
 1. accepts input source code from the client
 2. turns it into a semantic model of the code 
 3. and provides language-specific smarts back to the client. 
-- [ ]  TODO - simple diagram
 
-DIAGRAM GOES HERE
+<img
+className="dark:hidden !m-0"
+alt="Diagram explaining how a Language server works and the role of the parser"
+src="/images/blog/lwx-postgres-language-server/language-server-diagram-dark-mode.png"
+/>
+
+<img
+className="hidden dark:block !m-0"
+alt="Diagram explaining how a Language server works and the role of the parser"
+src="/images/blog/lwx-postgres-language-server/language-server-diagram-light-mode.png"
+/>
 
 The parser is the core of every language server. It takes the raw string, turns it into a stream of tokens, and builds a syntax tree. This syntax tree can then be used to extract structural information. 
 
