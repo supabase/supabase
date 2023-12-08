@@ -30,9 +30,11 @@ The emphasis is on the daily gains, unblocking problems with design work so that
 
 Let’s take an example, our LWX ticket page:
 
-<figure className="[&_img]:border-0">
-  ![something](/images/blog/lwx-how-design-works-at-supabase/lwx-tickets-iterations.png)
-</figure>
+<Img
+  src="/images/blog/lwx-how-design-works-at-supabase/lwx-tickets-iterations.png"
+  wide
+  className="[&_img]:border-0"
+/>
 
 Late in the build process an idea was floated to try and integrate a _Wordle_ type easter egg into the site. We build some designs to help the discussion:
 
@@ -56,7 +58,7 @@ We took some inspiration from [Linear’s approach](https://x.com/karrisaarinen/
 
 Here’s an example where we are making changes to the table editor:
 
-![something](/images/blog/lwx-how-design-works-at-supabase/screenshots-in-mockups.png)
+<Img src="/images/blog/lwx-how-design-works-at-supabase/screenshots-in-mockups.png" wide />
 
 A screenshot of the table editor from prod in a mockup
 
@@ -79,7 +81,7 @@ The Design Team adopted and maintain two principle sets:
 
 We needed to agree on what we collectively like and dislike on an emotional level. Aligning on a common aesthetic avoids debates on individual elements.
 
-![something](/images/blog/lwx-how-design-works-at-supabase/aesthetic-moodboard.png)
+<Img src="/images/blog/lwx-how-design-works-at-supabase/aesthetic-moodboard.png" wide />
 
 Aesthetic mood board of what Design Team like externally
 
@@ -141,20 +143,17 @@ No introduction required. We’ve used Figma since the beginning and will contin
 
 We’ve organized our Figma library into quarterly files, that are clearly labelled as “in progress” or “archived” so anyone can easily find the latest and greatest. [tweet link, give credit]
 
-<figure>
-  ![something](/images/blog/lwx-how-design-works-at-supabase/figma-organization.png)
-  <figurecaption>files are organized so we can easily check what is current</figurecaption>
-</figure>
+<Img src="/images/blog/lwx-how-design-works-at-supabase/figma-organization.png" wide={true} />
 
 ### Design system
 
 We started maintaining a library during LW5, but only recently started using it in earnest. We’ve kept the system deliberately small, only adding what we’ve used more than a few times. The library then doesn’t spread into unique use-cases and suffer from content bloat.
 
-<figure>
-  ![supabase design system in
-  figma](/images/blog/lwx-how-design-works-at-supabase/figma-design-system.png)
-  <figurecaption>Most of the main general components</figurecaption>
-</figure>
+<Img
+  src="/images/blog/lwx-how-design-works-at-supabase/figma-design-system.png"
+  wide
+  className="[&_img]:border-0"
+/>
 
 Luckily, Figma features such as [nested components](https://www.figma.com/best-practices/component-architecture/#nested-components) came out while we were revamping this set of components. This meant we could reduce the footprint of the design system significantly. Figma libraries previously required every permutation of a component, but it’s now easy to contain things like swappable “icons” or pseudo states like “active” within components.
 
