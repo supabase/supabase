@@ -101,43 +101,44 @@ const DeployNewReplicaPanel = ({
       header="Deploy a new read replica"
     >
       <SidePanel.Content className="flex flex-col py-4 gap-y-8">
-        <Alert_Shadcn_>
-          <IconAlertCircle strokeWidth={2} />
-          <AlertTitle_Shadcn_>
-            Point in time recovery is required to deploy replicas
-          </AlertTitle_Shadcn_>
-          {isFreePlan ? (
-            <AlertDescription_Shadcn_>
-              To enable PITR, you may first upgrade your organization's plan to at least Pro, then
-              purchase the PITR add on for your project via the{' '}
-              <Link
-                href={`/project/${projectRef}/settings/addons?panel=pitr`}
-                className="text-brand"
-              >
-                project settings
-              </Link>
-              .
+        {!canDeployReplica && (
+          <Alert_Shadcn_>
+            <IconAlertCircle strokeWidth={2} />
+            <AlertTitle_Shadcn_>
+              Point in time recovery is required to deploy replicas
+            </AlertTitle_Shadcn_>
+            {isFreePlan ? (
+              <AlertDescription_Shadcn_>
+                To enable PITR, you may first upgrade your organization's plan to at least Pro, then
+                purchase the PITR add on for your project via the{' '}
+                <Link
+                  href={`/project/${projectRef}/settings/addons?panel=pitr`}
+                  className="text-brand"
+                >
+                  project settings
+                </Link>
+                .
+              </AlertDescription_Shadcn_>
+            ) : (
+              <AlertDescription_Shadcn_>
+                Enable the add-on in your project's settings first before deploying read replicas.
+              </AlertDescription_Shadcn_>
+            )}
+            <AlertDescription_Shadcn_ className="mt-2">
+              <Button type="default">
+                <Link
+                  href={
+                    isFreePlan
+                      ? `/org/${org?.slug}/billing?panel=subscriptionPlan`
+                      : `/project/${projectRef}/settings/addons?panel=pitr`
+                  }
+                >
+                  {isFreePlan ? 'Upgrade to Pro' : 'Enable PITR add-on'}
+                </Link>
+              </Button>
             </AlertDescription_Shadcn_>
-          ) : (
-            <AlertDescription_Shadcn_>
-              Enable the add-on in your project's settings page first before deploying read
-              replicas.
-            </AlertDescription_Shadcn_>
-          )}
-          <AlertDescription_Shadcn_ className="mt-2">
-            <Button type="default">
-              <Link
-                href={
-                  isFreePlan
-                    ? `/org/${org?.slug}/billing?panel=subscriptionPlan`
-                    : `/project/${projectRef}/settings/addons?panel=pitr`
-                }
-              >
-                {isFreePlan ? 'Upgrade to Pro' : 'Enable PITR add-on'}
-              </Link>
-            </Button>
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
+          </Alert_Shadcn_>
+        )}
         <Listbox
           size="small"
           id="region"
