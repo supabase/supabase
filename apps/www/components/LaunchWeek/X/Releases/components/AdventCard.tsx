@@ -52,7 +52,6 @@ const AdventCard = ({ day, index }: { day: AdventDay; index: number }) => {
       className="absolute -inset-px group"
       style={{
         perspective: '1000px',
-        // transformStyle: 'preserve-3d',
       }}
     >
       <motion.div
@@ -72,6 +71,11 @@ const AdventCard = ({ day, index }: { day: AdventDay; index: number }) => {
           <div
             ref={hiddenRef}
             className="relative z-10 !ease-[.25,.25,0,1] duration-300 transition-opacity opacity-100 lg:opacity-0 group-hover:opacity-100"
+            style={{
+              backfaceVisibility: 'hidden',
+              transform: 'translateZ(0)',
+              WebkitFontSmoothing: 'subpixel-antialiased',
+            }}
           >
             <p className="text-[#575E61] text-sm">{day.description}</p>
             <div className="flex gap-1 mt-3 flex-wrap">
