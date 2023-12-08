@@ -1,13 +1,24 @@
 import { useParams } from 'common'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import { Listbox, SidePanel } from 'ui'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconAlertCircle,
+  Listbox,
+  SidePanel,
+} from 'ui'
 
 import { Region, useReadReplicaSetUpMutation } from 'data/read-replicas/replica-setup-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { AWS_REGIONS, AWS_REGIONS_DEFAULT, AWS_REGIONS_KEYS, BASE_PATH } from 'lib/constants'
 import { AVAILABLE_REPLICA_REGIONS, AWS_REGIONS_VALUES } from './InstanceConfiguration.constants'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import Link from 'next/link'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganization } from 'hooks'
 
 // [Joshen] FYI this is purely for AWS only, need to update to support Fly eventually
 
@@ -23,8 +34,10 @@ const DeployNewReplicaPanel = ({
   onClose,
 }: DeployNewReplicaPanelProps) => {
   const { ref: projectRef } = useParams()
+  const org = useSelectedOrganization()
   const { data } = useReadReplicasQuery({ projectRef })
   const { data: addons, isSuccess } = useProjectAddonsQuery({ projectRef })
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
   const { mutate: setUpReplica, isLoading: isSettingUp } = useReadReplicaSetUpMutation({
     onSuccess: () => {
       const region = AVAILABLE_REPLICA_REGIONS.find((r) => r.key === selectedRegion)?.name
@@ -32,6 +45,14 @@ const DeployNewReplicaPanel = ({
       onClose()
     },
   })
+
+  const isFreePlan = subscription?.plan.id === 'free'
+  const currentComputeAddon = addons?.selected_addons.find(
+    (addon) => addon.type === 'compute_instance'
+  )
+  const currentPitrAddon = addons?.selected_addons.find((addon) => addon.type === 'pitr')
+  const canDeployReplica =
+    !isFreePlan && currentComputeAddon !== undefined && currentPitrAddon !== undefined
 
   const computeAddons =
     addons?.available_addons.find((addon) => addon.type === 'compute_instance')?.variants ?? []
@@ -76,13 +97,52 @@ const DeployNewReplicaPanel = ({
       onCancel={onClose}
       onConfirm={() => onSubmit()}
       confirmText="Deploy replica"
+      disabled={!canDeployReplica}
       header="Deploy a new read replica"
     >
       <SidePanel.Content className="flex flex-col py-4 gap-y-8">
+        <Alert_Shadcn_>
+          <IconAlertCircle strokeWidth={2} />
+          <AlertTitle_Shadcn_>
+            Point in time recovery is required to deploy replicas
+          </AlertTitle_Shadcn_>
+          {isFreePlan ? (
+            <AlertDescription_Shadcn_>
+              To enable PITR, you may first upgrade your organization's plan to at least Pro, then
+              purchase the PITR add on for your project via the{' '}
+              <Link
+                href={`/project/${projectRef}/settings/addons?panel=pitr`}
+                className="text-brand"
+              >
+                project settings
+              </Link>
+              .
+            </AlertDescription_Shadcn_>
+          ) : (
+            <AlertDescription_Shadcn_>
+              Enable the add-on in your project's settings page first before deploying read
+              replicas.
+            </AlertDescription_Shadcn_>
+          )}
+          <AlertDescription_Shadcn_ className="mt-2">
+            <Button type="default">
+              <Link
+                href={
+                  isFreePlan
+                    ? `/org/${org?.slug}/billing?panel=subscriptionPlan`
+                    : `/project/${projectRef}/settings/addons?panel=pitr`
+                }
+              >
+                {isFreePlan ? 'Upgrade to Pro' : 'Enable PITR add-on'}
+              </Link>
+            </Button>
+          </AlertDescription_Shadcn_>
+        </Alert_Shadcn_>
         <Listbox
           size="small"
           id="region"
           name="region"
+          disabled={!canDeployReplica}
           value={selectedRegion}
           onChange={setSelectedRegion}
           label="Select a region to deploy your read replica in"
