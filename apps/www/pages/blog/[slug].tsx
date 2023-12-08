@@ -18,6 +18,7 @@ import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
+import { useEffect, useState } from 'react'
 
 type Post = ReturnType<typeof getSortedPosts>[number]
 
@@ -118,10 +119,15 @@ export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async (
 }
 
 function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
+  const [isMounted, setIsMounted] = useState(false)
   const content = props.blog.content
   const authorArray = props.blog.author.split(',')
   useActiveAnchors('h2, h3, h4', '.prose-toc a')
   const isLaunchWeek7 = props.blog.launchweek === 7
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   const author = authorArray
     .map((authorId) => {
@@ -184,6 +190,8 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
     description: props.blog.meta_description ?? props.blog.description,
     url: `https://supabase.com/blog/${props.blog.slug}`,
   }
+
+  if (!isMounted) return null
 
   return (
     <>
@@ -275,7 +283,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                                   <div className="w-10">
                                     <Image
                                       src={author.author_image_url}
-                                      className="border-default rounded-full border"
+                                      className="border-default rounded-full border w-full aspect-square object-cover"
                                       alt={`${author.author} avatar`}
                                       width={40}
                                       height={40}
