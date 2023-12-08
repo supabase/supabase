@@ -118,6 +118,7 @@ const SQLEditor = () => {
   const [pendingTitle, setPendingTitle] = useState<string>()
   const [hasSelection, setHasSelection] = useState<boolean>(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const readReplicasEnabled = useFlag('readReplicas')
   const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
@@ -322,9 +323,9 @@ const SQLEditor = () => {
           setLineHighlights([])
         }
 
-        const connectionString = databases?.find(
-          (db) => db.identifier === snap.selectedDatabaseId
-        )?.connectionString
+        const connectionString = !readReplicasEnabled
+          ? project.connectionString
+          : databases?.find((db) => db.identifier === snap.selectedDatabaseId)?.connectionString
         if (!connectionString) {
           return toast.error('Unable to run query: Connection string is missing')
         }
