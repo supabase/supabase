@@ -19,7 +19,7 @@ export interface AdventLink {
 export const days: AdventDay[] = [
   {
     title: 'Supabase Album',
-    description: 'Best soundtrack to build your app in a weekend',
+    description: 'The best soundtrack to build your app in a weekend',
     type: '',
     className: '',
     icon: (
