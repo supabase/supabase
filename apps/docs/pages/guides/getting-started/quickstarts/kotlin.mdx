@@ -148,6 +148,8 @@ export const meta = {
       Use `LaunchedEffect` to fetch data from the database and display it in a `LazyColumn`.
 
       Replace the default `MainActivity` class with the following code.
+
+      Note that we are making a network request from our UI code. In production, you should probably use a `ViewModel` to separate the UI and data fetching logic. 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
@@ -172,7 +174,7 @@ export const meta = {
       @Composable
       fun CountriesList() {
           var countries by rememberSaveable { mutableStateOf<List<Country>>(mutableListOf()) }
-          LaunchedEffect(null) { // only launch once whenever cardId change
+          LaunchedEffect(null) {
               countries = supabase.from("countries")
                   .select().decodeList<Country>()
           }
