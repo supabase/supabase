@@ -13,6 +13,7 @@ export interface AdventDay {
 export interface AdventLink {
   url: string
   label: string
+  target?: '_blank'
 }
 
 export const days: AdventDay[] = [
@@ -55,6 +56,7 @@ export const days: AdventDay[] = [
       {
         url: 'https://supabase.productions/',
         label: 'Listen now',
+        target: '_blank',
       },
     ],
     image: '',
