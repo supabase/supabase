@@ -1,6 +1,6 @@
 ---
-title: 'Introducing Supabase Assistant / AI Assistant / Supabase AI Assistant / something'
-description: We're releasing our next big step with our Assistant, and a couple of huge new features that will help get your ideas into code even faster.
+title: 'Supabase Studio: AI Assistant and User Impersonation'
+description: We're introducing the next generation of our AI Assistant and some features that will help get your ideas into code even faster.
 launchweek: x
 categories:
   - product
@@ -15,7 +15,9 @@ image: launch-week-7/day-5-supabase-studio-2.0/day-5-supabase-studio-2.0-og.jpg
 thumb: launch-week-7/day-5-supabase-studio-2.0/day-5-supabase-studio-2.0-thumb.jpg
 ---
 
-We've added an AI Assistant to Studio during Launch Week 8. This was our first step towards bringing the power of AI into your development workflow. With the Assistant embedded right into the SQL Editor, you could get help right where you needed it. Today, we're happy to release our next big step with our Assistant, as well as a couple of huge new features that will help get your ideas into code even faster.
+During the previous Launch Week we introduced text-to-sql in the SQL Editor within Supabase Studio. This was our first step towards a full AI Assistant. 
+
+Today, we're introducing Supabase Assistant, the next iteration of our AI Assistant and a few new features that take you from idea to production even faster.
 
 <div className="video-container">
   <iframe
@@ -38,23 +40,32 @@ Here's the birds-eye-view:
   <li>[**Feature Previews**](#feature-previews): see what's hot off the press in Studio</li>
 </ul>
 
-## Introducing AI / Supabase / the / etc Assistant
+## Introducing the Supabase Assistant
 
-We're excited to expand Studio's AI capabilities with Assistant. If you use the SQL Editor or our ⌘K menu today, you're already seeing how AI can help speed up your workflows. But this is just the beginning. Today, we're rolling out Assistant support in our Row Level Security editor, and soon will expand to other places in Studio. The Table Editor, Postgres Functions, Serverless Functions, and more are all on the roadmap. Let's jump in to Row Level Security first.
+We're excited to expand Studio's AI capabilities with our new **Supabase Assistant**. 
 
-![Supabase AI](/images/blog/launch-week-8/day-2/supabase-ai-loading-animation.gif)
+Developers have been telling us that the text-to-sql feature inside the SQL Editor has dramatically increased their velocity (and their SQL abilities). AI is extremely powerful when combined with a schema-based database, like Postgres, because it can infer so much context from the schema and the database provides stricter guarantees with generated code. Our previous release solidified our belief that AI will be a key part of the future of database development.
+
+Today, we're rolling out Assistant support in our Row Level Security editor and soon will expand to other places in Studio: the Table Editor, Postgres Functions, Serverless Functions, and more. 
+
+Let's jump in to Row Level Security first.
+
+![Supabase AI Assistant](/images/blog/launch-week-8/day-2/supabase-ai-loading-animation.gif)
 
 ## Easy RLS Policies with AI
 
-Of all the feature requests we get (and we get many!), an easier way to write RLS Policies is always near the top. [Row Level Security](https://supabase.com/docs/guides/auth/row-level-security) is a powerful Postgres feature that lets you grant fine-grained access to tables at the row level. But while RLS is powerful, writing policies can be a chore. Today, we're releasing a new AI-powered RLS editor to make it easy to write security policies.
+Of all the feature requests we get (and we get many!), an easier way to write [Row Level Security](https://supabase.com/docs/guides/auth/row-level-security) Policies is one of the most frequent. 
 
-In-line with our commitment to a SQL-first approach, the new RLS editor brings SQL front and center. We believe in giving developers access to the full potential of Postgres, rather than abstracting it away.
+Row Level Security (RLS) is a Postgres feature that provides fine-grained access to your database. While RLS is powerful, writing Policies can be a chore. Today, we're releasing an AI-powered RLS Editor that makes it simple to write security policies.
 
-The new RLS editor is really two tools in one. If you know SQL really well, there's a new editor for you to quickly drop your policies in. If you're new to RLS and need some help, you can use the Assistant and chat your way through it.
+The new RLS Editor brings SQL front-and-center. We want to give developers access to the full potential of Postgres, rather than abstracting it away. This editor is really two tools:
+
+1. A SQL Editor: if you know SQL really well, there's a new editor for you to quickly write your policies. 
+2. An Assistant: if you're new to RLS and need some help, you can use the Assistant and chat your way through it.
 
 ![Supabase AI](/images/blog/launch-week-x/day-1/1.png)
 
-The Assistant has been fine-tuned to produce SQL for Row Level Security policies, making it fast and easy to get your policies setup the way you need them.
+The Assistant has been tuned to produce SQL for Row Level Security, making it fast and easy to get your policies setup the way you need them.
 
 <video width="99%" autoPlay loop muted playsInline controls={true}>
   <source
