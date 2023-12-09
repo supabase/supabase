@@ -69,7 +69,7 @@ The new RLS Editor can be enabled today via Feature Previews (more on that below
 
 ## Postgres Roles
 
-You may never have thought about this, but Studio connects to your database just like any other client or app. It connects to your database using a single Postgres role, referred to as `postgres`. This role functions much like your `service role` key, granting it admin privileges to your database. It has admin read and write privileges, and will override Row Level Security.
+You may never have thought about this, but Studio connects to your database just like any other client or app. It connects to your database using a single Postgres role, referred to as `postgres`. This role functions much like your `service role` key, granting it admin privileges to your database. It has admin read and write privileges, and will bypass Row Level Security.
 
 Most of you use API keys for Supabase APIs or client libs already: the `anon` and `service_role` keys. These keys actually resolve into Postgres roles, called `anon` and `service_role`. These keys are actually JWT tokens, but we’ll come back to that in a minute.
 
