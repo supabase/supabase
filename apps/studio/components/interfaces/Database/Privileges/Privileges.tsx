@@ -50,13 +50,15 @@ const Privileges = ({
           </div>
         </div>
         <div className="flex items-center space-x-2">
-          <Link href="https://supabase.com/docs/guides/guides/auth/column-level-security">
-            <a target="_blank" rel="noreferrer">
-              <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                Documentation
-              </Button>
-            </a>
-          </Link>
+          <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+            <Link
+              href="https://supabase.com/docs/guides/guides/auth/column-level-security"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Documentation
+            </Link>
+          </Button>
         </div>
       </div>
       <PrivilegesHead
