@@ -230,7 +230,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
           ],
         }}
       />
-      <DefaultLayout>
+      <DefaultLayout className="overflow-x-hidden">
         <div
           className="
             container mx-auto px-6 py-4 md:py-8 xl:py-16 sm:px-16
