@@ -18,6 +18,8 @@ import { useStore } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { NextPageWithLayout } from 'types'
 
+const EDITABLE_ROLES = ['authenticated', 'anon', 'service_role']
+
 const PrivilegesPage: NextPageWithLayout = () => {
   const { meta } = useStore()
 
@@ -34,9 +36,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
     connectionString: project?.connectionString,
   })
 
-  const rolesList = meta.roles.list(
-    (role: PostgresRole) => !meta.roles.systemRoles.includes(role.name)
-  )
+  const rolesList = meta.roles.list((role: PostgresRole) => EDITABLE_ROLES.includes(role.name))
 
   const [selectedSchema, setSelectedSchema] = useState<string>('public')
   const [selectedRole, setSelectedRole] = useState<string>('anon')
