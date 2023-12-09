@@ -173,12 +173,14 @@ export const meta = {
 
       @Composable
       fun CountriesList() {
-          var countries by rememberSaveable { mutableStateOf<List<Country>>(mutableListOf()) }
-          LaunchedEffect(null) {
-              countries = supabase.from("countries")
-                  .select().decodeList<Country>()
+          var countries by remember { mutableStateOf<List<Country>>(listOf()) }
+          LaunchedEffect(Unit) {
+              withContext(Dispatchers.IO) {
+                  countries = supabase.from("countries")
+                                    .select().decodeList<Country>()
+              }
           }
-          LazyColumn() {
+          LazyColumn {
               items(
                   countries,
                   key = { country -> country.id },
