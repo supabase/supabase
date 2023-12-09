@@ -58,7 +58,7 @@ function Listbox({
   validation,
   disabled,
   optionsWidth,
-  isNewRecord,
+  isNewRecord = false,
 }: Props) {
   const [selected, setSelected] = useState(undefined)
   const [selectedNode, setSelectedNode] = useState<any>({})

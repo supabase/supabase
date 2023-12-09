@@ -49,7 +49,7 @@ const ColumnType = ({
   description,
   showRecommendation = false,
   onOptionSelect = noop,
-  isNewRecord,
+  isNewRecord = false,
 }: ColumnTypeProps) => {
   // @ts-ignore
   const availableTypes = POSTGRES_DATA_TYPES.concat(enumTypes.map((type) => type.name))
