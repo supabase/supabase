@@ -120,8 +120,11 @@ const schemas = [
       { path: 'metadata.req.url', type: 'string' },
       { path: 'metadata.reqId', type: 'string' },
       { path: 'metadata.res.statusCode', type: 'number' },
+      { path: 'metadata.res.headers.content_length', type: 'number' },
+      { path: 'metadata.res.headers.content_type', type: 'string' },
       { path: 'metadata.responseTime', type: 'number' },
       { path: 'metadata.tenantId', type: 'string' },
+      { path: 'metadata.rawError', type: 'string' },
     ],
   },
   {

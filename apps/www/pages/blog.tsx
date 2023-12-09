@@ -2,7 +2,7 @@ import fs from 'fs'
 import { useEffect, useState } from 'react'
 
 import { useRouter } from 'next/router'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 import Link from 'next/link'
 
 import { NextSeo } from 'next-seo'
@@ -116,8 +116,8 @@ function Blog(props: any) {
       />
       <DefaultLayout>
         <h1 className="sr-only">Supabase blog</h1>
-        <div className="overflow-hidden py-12">
-          <div className="container mx-auto mt-16 px-8 sm:px-16 xl:px-20">
+        <div className="overflow-hidden py-12 lg:py-20">
+          <div className="container mx-auto px-8 sm:px-16 xl:px-20">
             <div className="mx-auto ">
               {props.blogs.slice(0, 1).map((blog: any, i: number) => (
                 <FeaturedThumb key={i} {...blog} />
@@ -126,8 +126,8 @@ function Blog(props: any) {
           </div>
         </div>
 
-        <div className="border-scale-600 border-t">
-          <div className="container mx-auto mt-16 px-8 sm:px-16 xl:px-20">
+        <div className="border-default border-t">
+          <div className="container mx-auto mt-10 lg:mt-16 px-8 sm:px-16 xl:px-20">
             <BlogFilters
               posts={blogs}
               setPosts={setBlogs}
@@ -136,7 +136,7 @@ function Blog(props: any) {
               handlePosts={handlePosts}
             />
 
-            <ol className="grid grid-cols-12 py-16 lg:gap-16">
+            <ol className="grid grid-cols-12 py-10 lg:py-16 lg:gap-16">
               {blogs?.length ? (
                 blogs?.map((blog: PostTypes, idx: number) => (
                   <div
@@ -147,7 +147,7 @@ function Blog(props: any) {
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-scale-800 col-span-full">No results</p>
+                <p className="text-sm text-light col-span-full">No results</p>
               )}
             </ol>
           </div>
@@ -174,53 +174,50 @@ function FeaturedThumb(blog: PostTypes) {
 
   return (
     <div key={blog.slug} className="w-full cursor-pointer">
-      <Link href={`${blog.path}`}>
-        <a className="grid gap-8 lg:grid-cols-2 lg:gap-16">
-          <div className="relative h-96 w-full overflow-auto rounded-lg border">
-            <Image
-              src={`/images/blog/` + (blog.thumb ? blog.thumb : blog.image)}
-              layout="fill"
-              objectFit="cover"
-              alt="blog thumbnail"
-            />
+      <Link href={`${blog.path}`} className="grid gap-8 lg:grid-cols-2 lg:gap-16">
+        <div className="relative w-full aspect-[2/1] lg:aspect-[3/2] overflow-auto rounded-lg border">
+          <Image
+            src={`/images/blog/` + (blog.thumb ? blog.thumb : blog.image)}
+            layout="fill"
+            className="object-cover"
+            alt="blog thumbnail"
+          />
+        </div>
+        <div className="flex flex-col space-y-2">
+          <div className="text-light flex space-x-2 text-sm">
+            <span>{blog.date}</span>
+            <span>•</span>
+            <span>{blog.readingTime}</span>
           </div>
-          <div className="flex flex-col space-y-2">
-            <div className="text-scale-900 flex space-x-2 text-sm">
-              <p>{blog.date}</p>
-              <p>•</p>
-              <p>{blog.readingTime}</p>
-            </div>
 
-            <div>
-              <h2 className="h2">{blog.title}</h2>
-              <p className="p text-xl">{blog.description}</p>
-            </div>
+          <div>
+            <h2 className="h2">{blog.title}</h2>
+            <p className="p text-xl">{blog.description}</p>
+          </div>
 
-            <div className="grid w-max grid-flow-col grid-rows-4 gap-4">
-              {author.map((author: any, i: number) => {
-                return (
-                  <div className="flex items-center space-x-3" key={i}>
-                    {author.author_image_url && (
-                      <div className="relative h-10 w-10 overflow-auto">
-                        <Image
-                          src={author.author_image_url}
-                          alt={`${author.author} avatar`}
-                          className="rounded-full"
-                          layout="fill"
-                          objectFit="cover"
-                        />
-                      </div>
-                    )}
-                    <div className="flex flex-col">
-                      <span className="text-scale-1200 m-0 text-sm">{author.author}</span>
-                      <span className="text-scale-900 m-0 text-xs">{author.position}</span>
+          <div className="flex flex-col w-max gap-2">
+            {author.map((author: any, i: number) => {
+              return (
+                <div className="flex items-center space-x-3" key={i}>
+                  {author.author_image_url && (
+                    <div className="relative h-10 w-10 overflow-auto">
+                      <Image
+                        src={author.author_image_url}
+                        alt={`${author.author} avatar`}
+                        className="rounded-full object-cover"
+                        layout="fill"
+                      />
                     </div>
+                  )}
+                  <div className="flex flex-col">
+                    <span className="text-foreground m-0 text-sm">{author.author}</span>
+                    <span className="text-light m-0 text-xs">{author.position}</span>
                   </div>
-                )
-              })}
-            </div>
+                </div>
+              )
+            })}
           </div>
-        </a>
+        </div>
       </Link>
     </div>
   )

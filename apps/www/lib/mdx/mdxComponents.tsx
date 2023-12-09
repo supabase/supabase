@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react'
 import Image from 'next/image'
 import Avatar from '~/components/Avatar'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
@@ -13,6 +14,7 @@ import {
   CollapsibleContent_Shadcn_,
   IconTriangle,
   cn,
+  ThemeImage,
 } from 'ui'
 import ImageFadeStack from '~/components/ImageFadeStack'
 import ZoomableImg from '~/components/ZoomableImg/ZoomableImg'
@@ -42,7 +44,7 @@ const BlogCollapsible = ({ title, ...props }: { title: string }) => {
       <CollapsibleTrigger_Shadcn_
         className="    
         data-[state=open]:text
-        hover:text-light
+        hover:text-foreground-light
         flex items-center gap-3
         [&>svg]:fill-current
         [&>svg]:rotate-90
@@ -84,8 +86,8 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
           <span className={['next-image--dynamic-fill'].join(' ')}>
             <Image
               {...props}
-              className={[type === 'blog' ? 'rounded-md border' : ''].join(' ')}
-              layout="fill"
+              className={[type === 'blog' ? 'm-0 object-cover rounded-md border' : ''].join(' ')}
+              fill
             />
           </span>
         )
@@ -102,7 +104,7 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
               props.wide && 'wide',
             ].join(' ')}
           >
-            <Image layout="fill" {...props} />
+            <ThemeImage fill className="m-0 object-cover" {...props} />
           </span>
         </ZoomableImg>
         {props.caption && (
@@ -112,7 +114,7 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
         )}
       </figure>
     ),
-    Link: (props: HTMLAnchorElement) => (
+    Link: (props: PropsWithChildren<HTMLAnchorElement>) => (
       <a href={props.href} target={props.target}>
         {props.children}
       </a>
@@ -121,5 +123,5 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
     BlogCollapsible: (props: any) => <BlogCollapsible {...props} />,
   }
 
-  return components
+  return components as any
 }

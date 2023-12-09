@@ -39,7 +39,10 @@ After all the services have started you can see them running in the background:
 ```sh
 docker compose ps
 ```
+
 Please [secure your services](#securing-your-services) as soon as possible using the instructions below.
+
+For security reasons, we "pin" the versions of each service in the docker-compose file (these versions are updated ~monthly). If you want to update any services immediately, you can do so by updating the version number in the docker compose file and then running `docker compose pull`. You can find all the latest docker images in the [Supabase Docker Hub](https://hub.docker.com/u/supabase).
 
 ### Accessing Supabase Studio
 
@@ -72,7 +75,7 @@ You can add new Functions as `volumes/functions/<FUNCTION_NAME>/index.ts`. Resta
 You can connect to the Postgres database locally on port `5432`. For example, if you have `psql` on your local machine you can run:
 
 ```bash
-psql -h localhost -p 5432 -d postgres -U postgres
+psql -h 127.0.0.1 -p 5432 -d postgres -U postgres
 ```
 
 The default password is `your-super-secret-and-long-postgres-password`. You should change this as soon as possible using the [instructions below](#update-secrets). By default the database is not accessible from outside the local machine. You can [change this](#exposing-your-postgres-database) by updating the `docker-compose.yml` file.
@@ -186,14 +189,14 @@ If the tool doesn't exist, we build and open source it ourselves.
 ![Supabase Architecture](/docs/img/supabase-architecture.png)
 
 - [Kong](https://github.com/Kong/kong) is a cloud-native API gateway.
-- [GoTrue](https://github.com/supabase/gotrue) is an SWT based API for managing users and issuing SWT tokens.
+- [GoTrue](https://github.com/supabase/gotrue) is an JWT based API for managing users and issuing JWT tokens.
 - [PostgREST](http://postgrest.org/) is a web server that turns your PostgreSQL database directly into a RESTful API
 - [Realtime](https://github.com/supabase/realtime) is an Elixir server that allows you to listen to PostgreSQL inserts, updates, and deletes using websockets. Realtime polls Postgres' built-in replication functionality for database changes, converts changes to JSON, then broadcasts the JSON over websockets to authorized clients.
 - [Storage](https://github.com/supabase/storage-api) provides a RESTful interface for managing Files stored in S3, using Postgres to manage permissions.
 - [postgres-meta](https://github.com/supabase/postgres-meta) is a RESTful API for managing your Postgres, allowing you to fetch tables, add roles, and run queries, etc.
 - [PostgreSQL](https://www.postgresql.org/) is an object-relational database system with over 30 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance.
 
-For the system to work cohesively, some services require additional configuration within the Postgres database. For example, the APIs and Auth system require several [default roles](/docs/guides/database/postgres-roles) amd the `pgjwt` Postgres extension. 
+For the system to work cohesively, some services require additional configuration within the Postgres database. For example, the APIs and Auth system require several [default roles](/docs/guides/database/postgres-roles) and the `pgjwt` Postgres extension. 
 
 You can find all the default extensions inside the [schema migration scripts repo](https://github.com/supabase/postgres/tree/develop/migrations). These scripts are mounted at `/docker-entrypoint-initdb.d` to run automatically when starting the database container.
 
@@ -291,7 +294,7 @@ Due to the changes in the Analytics server, you will need to run the following c
 
 <Admonition type="warning">
 
-- All data in analytics will be deleted when you run the commands below.
+All data in analytics will be deleted when you run the commands below.
 
 </Admonition>
 

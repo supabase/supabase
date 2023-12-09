@@ -178,7 +178,7 @@ export default {
     {
       name: 'Open Collective Profile',
       description: 'We have contributed with more than $250,000 on paying sponsorships.',
-      url: 'https://github.com/PostgREST/postgrest',
+      url: 'https://opencollective.com/supabase',
     },
     {
       name: 'OrioleDB',

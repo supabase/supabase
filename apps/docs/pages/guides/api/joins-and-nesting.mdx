@@ -3,10 +3,10 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'joins-and-nested-tables',
   title: 'Querying Joins and Nested tables',
-  description: 'The Serverless APIs automatically detect relationships between Postgres tables.',
+  description: 'The Data APIs automatically detect relationships between Postgres tables.',
 }
 
-The Serverless APIs automatically detect relationships between Postgres tables. Since Postgres is a relational database, this is a very common scenario.
+The data APIs automatically detect relationships between Postgres tables. Since Postgres is a relational database, this is a very common scenario.
 
 ## One-to-many joins
 
@@ -17,6 +17,7 @@ Let's use an example database that stores `countries` and `cities`:
   size="small"
   type="underlined"
   defaultActiveId="table"
+  queryGroup="output-format"
 >
 <TabPanel id="table" label="Tables">
 
@@ -76,6 +77,7 @@ The APIs will automatically detect relationships based on the foreign keys:
   size="small"
   type="underlined"
   defaultActiveId="js"
+  queryGroup="language"
 >
 <TabPanel id="js" label="JavaScript">
 
@@ -85,6 +87,47 @@ const { data, error } = await supabase.from('countries').select(`
   name, 
   cities ( id, name )
 `)
+```
+
+### TypeScript Types for Joins
+
+`supabase-js` always returns a `data` object (for success), and an `error` object (for unsuccessful requests).
+
+These helper types provide the result types from any query, including nested types for database joins.
+
+Given the following schema with a relation between cities and countries:
+
+```sql
+create table countries (
+  "id" serial primary key,
+  "name" text
+);
+
+create table cities (
+  "id" serial primary key,
+  "name" text,
+  "country_id" int references "countries"
+);
+```
+
+We can get the nested `CountriesWithCities` type like this:
+
+```ts
+import { QueryResult, QueryData, QueryError } from '@supabase/supabase-js'
+
+const countriesWithCitiesQuery = supabase.from('countries').select(`
+  id,
+  name,
+  cities (
+    id,
+    name
+  )
+`)
+type CountriesWithCities = QueryData<typeof countriesWithCitiesQuery>
+
+const { data, error } = await countriesWithCitiesQuery
+if (error) throw error
+const countriesWithCities: CountriesWithCities = data
 ```
 
 </TabPanel>
@@ -128,7 +171,7 @@ GET https://[REF].supabase.co/rest/v1/countries?select=id,name,cities(id,name)
 
 ## Many-to-many joins
 
-The Serverless APIs will detect many-to-many joins. For example, if you have a database which stored teams of users (where each user could belong to many teams):
+The data APIs will detect many-to-many joins. For example, if you have a database which stored teams of users (where each user could belong to many teams):
 
 ```sql
 create table users (
@@ -155,6 +198,7 @@ In these cases you don't need to explicitly define the joining table (members). 
   size="small"
   type="underlined"
   defaultActiveId="js"
+  queryGroup="language"
 >
 <TabPanel id="js" label="JavaScript">
 

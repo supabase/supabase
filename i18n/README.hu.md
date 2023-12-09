@@ -247,7 +247,7 @@ Az ügyfélkönyvtárakra vonatkozó megközelítésünk moduláris. Minden egye
 - [Egyszerűsített kínai / 简体中文](/i18n/README.zh-cn.md)
 - [Svéd / Svenska](/i18n/README.sv.md)
 - [Thai / ไทย](/i18n/README.th.md)
-- [Hagyományos kínai / 繁体中文](/i18n/README.zh-tw.md)
+- [Hagyományos kínai / 繁體中文](/i18n/README.zh-tw.md)
 - [Török / Türkçe](/i18n/README.tr.md)
 - [Ukrán / Українська](/i18n/README.uk.md)
 - [Vietnámi / Tiếng Việt](/i18n/README.vi-vn.md)

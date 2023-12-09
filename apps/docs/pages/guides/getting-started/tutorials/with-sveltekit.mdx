@@ -10,8 +10,9 @@ export const meta = {
 ![Supabase User Management example](/docs/img/user-management-demo.png)
 
 <Admonition type="note">
-  If you get stuck while working through this guide, refer to the [full example on
-  GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/sveltekit-user-management).
+
+If you get stuck while working through this guide, refer to the [full example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/sveltekit-user-management).
+
 </Admonition>
 
 <ProjectSetup />
@@ -130,7 +131,6 @@ Create a new `src/routes/+layout.ts` file to handle the session and the supabase
 
 ```ts src/routes/+layout.ts
 // src/routes/+layout.ts
-import { invalidate } from '$app/navigation'
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
 import { createSupabaseLoadClient } from '@supabase/auth-helpers-sveltekit'
 
@@ -260,6 +260,7 @@ In the following code snippet, we perform the following steps:
   size="small"
   type="underlined"
   defaultActiveId="js"
+  queryGroup="language"
 >
 <TabPanel id="js" label="JavaScript">
 
@@ -307,7 +308,8 @@ Create a new `src/routes/account/+page.svelte` file with the content below.
 ```svelte src/routes/account/+page.svelte
 <!-- src/routes/account/+page.svelte -->
 <script lang="ts">
-	import { enhance, type SubmitFunction } from '$app/forms'
+	import { enhance } from '$app/forms';
+	import type { SubmitFunction } from '@sveltejs/kit';
 
 	export let data
 	export let form
@@ -516,7 +518,7 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
 			const fileExt = file.name.split('.').pop()
 			const filePath = `${Math.random()}.${fileExt}`
 
-			let { error } = await supabase.storage.from('avatars').upload(filePath, file)
+			const { error } = await supabase.storage.from('avatars').upload(filePath, file)
 
 			if (error) {
 				throw error

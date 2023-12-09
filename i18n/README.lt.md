@@ -247,7 +247,7 @@ Mūsų požiūris į klientų bibliotekas yra modulinis. Kiekviena dalinė bibli
 - [Supaprastinta kinų kalba / 简体中文](/i18n/README.zh-cn.md)
 - [švedų kalba / Svenska](/i18n/README.sv.md)
 - [Thai / ไทย](/i18n/README.th.md)
-- [Tradicinė kinų kalba / 繁体中文](/i18n/README.zh-tw.md)
+- [Tradicinė kinų kalba / 繁體中文](/i18n/README.zh-tw.md)
 - [Turkų kalba](/i18n/README.tr.md)
 - [Ukrainiečių kalba / Українська](/i18n/README.uk.md)
 - [Vietnamiečių kalba / Tiếng Việt](/i18n/README.vi-vn.md)

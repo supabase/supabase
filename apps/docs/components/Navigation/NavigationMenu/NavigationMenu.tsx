@@ -49,8 +49,18 @@ const menus: Menu[] = [
     type: 'guide',
   },
   {
+    id: 'graphql',
+    path: '/guides/graphql',
+    type: 'guide',
+  },
+  {
     id: 'auth',
     path: '/guides/auth',
+    type: 'guide',
+  },
+  {
+    id: 'auth',
+    path: '/learn/auth-deep-dive',
     type: 'guide',
   },
   {
@@ -114,17 +124,17 @@ const menus: Menu[] = [
     type: 'reference',
   },
   {
-    id: 'reference_dart_v0',
-    path: '/reference/dart/v0',
+    id: 'reference_dart_v1',
+    path: '/reference/dart/v1',
     commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_dart_v0.yml',
+    specFile: 'supabase_dart_v1.yml',
     type: 'reference',
   },
   {
-    id: 'reference_dart_v1',
+    id: 'reference_dart_v2',
     path: '/reference/dart',
     commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_dart_v1.yml',
+    specFile: 'supabase_dart_v2.yml',
     type: 'reference',
   },
   {
@@ -142,17 +152,17 @@ const menus: Menu[] = [
     type: 'reference',
   },
   {
-    id: 'reference_swift_v0',
+    id: 'reference_swift_v1',
     path: '/reference/swift',
     commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_swift_v0.yml',
+    specFile: 'supabase_swift_v1.yml',
     type: 'reference',
   },
   {
     id: 'reference_kotlin_v0',
     path: '/reference/kotlin',
     commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_kt_v0.yml',
+    specFile: 'supabase_kt_v1.yml',
     type: 'reference',
   },
   {
