@@ -31,9 +31,9 @@ functions:
       [supabase-kt](https://github.com/supabase-community/supabase-kt) provides several platform implementations for OAuth and OTP link verification. \
       **On JVM**, it uses a HTTP Callback Server to receive the session data from a successful OAuth login.
 
-      *Note: OTP link verification such as sign ups are not supported on JVM. You may have to send a verification token rather than a url in your E-Mail. To send the token, rather than a redirect url, you have to change `{{ .ConfirmationURL }}` in your sign up email to `{{ .Token }}`*
+      *Note: OTP link verification such as sign ups are not supported on JVM. You may have to send a verification token rather than a url in your email. To send the token, rather than a redirect url, change `{{ .ConfirmationURL }}` in your sign up email to `{{ .Token }}`*
 
-      **On Android, IOS & MacOS**, it uses deeplinks. Refer to the guide below on how to setup deeplinks. Alternatively you could use Native Google Auth or a WebView for OAuth. Refer to our [demo](https://github.com/supabase-community/supabase-kt/tree/master/demos/android-login) to learn more.
+      **On Android, iOS & MacOS**, OAuth and OTP verification use deeplinks. Refer to the guide below on how to setup deeplinks. Alternatively you can use Native Google Auth or a WebView for OAuth. Refer to the [demo](https://github.com/supabase-community/supabase-kt/tree/master/demos/android-login) to learn more.
       **On JS**, it uses the website origin as the callback url. Session importing gets handled automatically.
       **Windows, tvOS, watchOS & Linux** currently have no default implementation. Feel free to create a PR.
 
@@ -42,28 +42,28 @@ functions:
 
       ### Configure deeplink callbacks for Authentication
 
-      Deeplinks are supported on Android, IOS and MacOS.
-      1. **Setup a deeplink for you app** \
-      On Android you may setup a [deeplink](https://developer.android.com/training/app-links/deep-linking) in your Android manifest. \
-      On IOS & MacOS you may setup a [url scheme](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app).
+      Deeplinks are supported on Android, iOS and MacOS.
+      1. **Set up a deeplink** \
+      On Android, set up a [deeplink](https://developer.android.com/training/app-links/deep-linking) in your Android manifest. \
+      On iOS and MacOS, set up a [url scheme](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app).
       2. **Add your deeplink to the [redirect URLs](https://supabase.com/dashboard/project/_/auth/url-configuration)** \
       **Pattern**: scheme://host
       3. **Configure the Auth plugin**
-      You have to set the `host` and the `scheme` in the Auth config:
+      Set the `host` and `scheme` in the Auth config:
           ```kotlin
           install(Auth) {
              host = "deeplink host" // this can be anything, eg. your package name or app/company url (not your Supabase url)
              scheme = "deeplink scheme"
 
-             //Android only, you can also change that OAuth/SSO logins open in a custom tab, rather than an external browser:
+             // On Android only, you can set OAuth and SSO logins to open in a custom tab, rather than an external browser:
              defaultExternalAuthAction = ExternalAuthAction.CUSTOM_TABS //defaults to EXTERNAL_BROWSER
           }
           ```
       4. **Call platform specific function on startup** \
       On Android: `supabase.handleDeeplinks(intent)` \
-      On IOS/MacOS: `supabase.handleDeeplinks(url)`
+      On iOS/MacOS: `supabase.handleDeeplinks(url)`
 
-      Then you can just login using OAuth:
+      Then you can log in using OAuth:
       ```kotlin
       supabase.auth.signInWith(Google)
       ```
@@ -71,7 +71,7 @@ functions:
 
       ### PKCE Authentication flow
       supabase-kt supports the [PKCE authentication flow](https://supabase.com/blog/supabase-auth-sso-pkce).
-      To use it, you just have to change the `flowType` in the Auth configuration:
+      To use it, change the `flowType` in the Auth configuration:
       ```kotlin
       install(Auth) {
         flowType = FlowType.PKCE
@@ -128,7 +128,7 @@ functions:
 
           `sessionManager` - Interface for saving and loading the user session. Default: `SettingsSessionManager`
 
-          **Android & IOS:**
+          **Android & iOS:**
 
           `scheme` - The scheme for the redirect url, when using deep linking. Default: `supabase`
 
@@ -164,7 +164,7 @@ functions:
           }
           ```
         description: |
-          `propertyConversionMethod` - The method to use to convert the property names to the column names when applying filters & using the update method. Default: `PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE`
+          `propertyConversionMethod` - The method to use to convert the property names to the column names when applying filters and using the update method. Default: `PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE`
 
           `defaultSchema` - The default schema to use for database requests. Default: `public`
 
@@ -309,7 +309,7 @@ functions:
           ```
         note: |
           What about join tables
-          If you're in a situation where your tables are **NOT** directly related, but instead are joined by a _join table_,
+          If your tables are **NOT** directly related, but instead are joined by a _join table_,
           you can still use the `select()` method to query the related data. The PostgREST engine detects the relationship automatically.
           For more details, [follow the link](https://postgrest.org/en/latest/api.html#embedding-through-join-tables).
       - id: query-the-same-foreign-table-multiple-times
@@ -455,7 +455,7 @@ functions:
             insert into
               countries (id, name)
             values
-              (1, 'Taiwan');
+              (1, 'Australia');
             ```
         response: |
           ```json
@@ -2028,7 +2028,7 @@ functions:
           ) {
               order(column = "id", order = Order.ASCENDING, foreignTable = "cities")
           }
-            ```
+          ```
         data:
           sql: |
             ```sql
@@ -2092,7 +2092,7 @@ functions:
         code: |
           ```kotlin
           supabase.from("countries").select {
-              limit(count = 20)
+              limit(count = 1)
           }
           ```
         data:
@@ -2135,7 +2135,7 @@ functions:
           supabase.from("countries").select(
               columns = columns
           ) {
-              limit(count = 20, foreignTable = "cities")
+              limit(count = 1, foreignTable = "cities")
           }
           ```
         data:
