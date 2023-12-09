@@ -26,10 +26,27 @@ const PrivilegesPage: NextPageWithLayout = () => {
   const pathParams = useParams()
   const { project } = useProjectContext()
 
-  const { data: tableList, isLoading: isLoadingTables } = useTablesQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const [selectedSchema, setSelectedSchema] = useState<string>('public')
+  const [selectedTable, setSelectedTable] = useState<string | undefined>(pathParams.table)
+  const [selectedRole, setSelectedRole] = useState<string>('authenticated')
+
+  const { data: tableList, isLoading: isLoadingTables } = useTablesQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    {
+      onSuccess(data) {
+        const tables = data
+          .filter((table) => table.schema === selectedSchema)
+          .map((table) => table.name)
+
+        if (tables[0] && selectedTable === undefined) {
+          setSelectedTable(tables[0])
+        }
+      },
+    }
+  )
 
   const { data: allSchemas } = useSchemasQuery({
     projectRef: project?.ref,
@@ -38,14 +55,9 @@ const PrivilegesPage: NextPageWithLayout = () => {
 
   const rolesList = meta.roles.list((role: PostgresRole) => EDITABLE_ROLES.includes(role.name))
 
-  const [selectedSchema, setSelectedSchema] = useState<string>('public')
-  const [selectedRole, setSelectedRole] = useState<string>('anon')
-
   const tables = tableList
     ?.filter((table) => table.schema === selectedSchema)
     .map((table) => table.name)
-
-  const [selectedTable, setSelectedTable] = useState<string>(pathParams.table ?? tables?.[0] ?? '')
 
   const {
     data: allTablePrivileges,
@@ -106,6 +118,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
   }
 
   const table = tableList?.find((table) => table.name === selectedTable)
+
   return (
     <ScaffoldContainer>
       <ScaffoldSection>

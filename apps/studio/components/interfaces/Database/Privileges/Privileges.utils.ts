@@ -8,7 +8,7 @@ import { PrivilegeColumnUI } from './Privileges.types'
 export function mapDataToPrivilegeColumnUI(
   data: ColumnPrivilegesData | undefined,
   schema: string,
-  table: string,
+  table: string | undefined,
   role: string
 ): PrivilegeColumnUI[] {
   if (data === undefined) return []

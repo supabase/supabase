@@ -12,7 +12,12 @@ export interface PrivilegesBodyProps {
 }
 
 const PrivilegesBody = ({ tablePrivileges, table, columns, role }: PrivilegesBodyProps) => {
-  if (table === undefined) return <NoSearchResults />
+  if (table === undefined)
+    return (
+      <div className="flex flex-col items-center justify-center h-64 ">
+        <p className="text-foreground-light">Select a table to edit privileges</p>
+      </div>
+    )
 
   return (
     <section>
