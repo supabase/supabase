@@ -1,16 +1,13 @@
 import { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
-import { IconLock, Listbox } from 'ui'
+import { Listbox } from 'ui'
 
 export interface PrivilegesHeadProps {
   selectedSchema: string
   selectedRole: string
   selectedTable?: PostgresTable
   tables: string[]
-  availableSchemas: string[]
-  openSchemas: PostgresSchema[]
-  protectedSchemas: PostgresSchema[]
+  schemas: PostgresSchema[]
   roles: string[]
-  isSchemaLocked: boolean
   onChangeSchema: (schema: string) => void
   onChangeRole: (role: string) => void
   onChangeTable: (table: string) => void
@@ -18,10 +15,7 @@ export interface PrivilegesHeadProps {
 
 const PrivilegesHead = ({
   selectedSchema,
-  availableSchemas,
-  protectedSchemas,
-  openSchemas,
-  isSchemaLocked,
+  schemas,
   onChangeSchema,
   selectedRole,
   roles,
@@ -37,10 +31,7 @@ const PrivilegesHead = ({
           <div className="w-[230px]">
             <SchemasListbox
               selectedSchema={selectedSchema}
-              availableSchemas={availableSchemas}
-              openSchemas={openSchemas}
-              protectedSchemas={protectedSchemas}
-              isSchemaLocked={isSchemaLocked}
+              schemas={schemas}
               onChangeSchema={onChangeSchema}
             />
           </div>
@@ -63,61 +54,28 @@ const PrivilegesHead = ({
 
 const SchemasListbox = ({
   selectedSchema,
-  availableSchemas,
-  openSchemas,
-  protectedSchemas,
-  isSchemaLocked,
+  schemas,
   onChangeSchema,
 }: {
   selectedSchema: string
-  availableSchemas: string[]
-  openSchemas: PostgresSchema[]
-  protectedSchemas: PostgresSchema[]
-  isSchemaLocked: boolean
+  schemas: PostgresSchema[]
   onChangeSchema: (schema: string) => void
 }) => {
   return (
-    <Listbox
-      size="small"
-      value={selectedSchema}
-      onChange={onChangeSchema}
-      icon={isSchemaLocked && <IconLock size={14} strokeWidth={2} />}
-    >
+    <Listbox size="small" value={selectedSchema} onChange={onChangeSchema}>
       <Listbox.Option disabled key="normal-schemas" value="normal-schemas" label="Schemas">
         <p className="text-sm">Schemas</p>
       </Listbox.Option>
-      {openSchemas
-        .filter((schema) => availableSchemas.includes(schema.name))
-        .map((schema) => (
-          <Listbox.Option
-            key={schema.id}
-            value={schema.name}
-            label={schema.name}
-            addOnBefore={() => <span className="text-scale-900">schema</span>}
-          >
-            <span className="text-scale-1200 text-sm">{schema.name}</span>
-          </Listbox.Option>
-        ))}
-      <Listbox.Option
-        disabled
-        key="protected-schemas"
-        value="protected-schemas"
-        label="Protected schemas"
-      >
-        <p className="text-sm">Protected schemas</p>
-      </Listbox.Option>
-      {protectedSchemas
-        .filter((schema) => availableSchemas.includes(schema.name))
-        .map((schema) => (
-          <Listbox.Option
-            key={schema.id}
-            value={schema.name}
-            label={schema.name}
-            addOnBefore={() => <span className="text-scale-900">schema</span>}
-          >
-            <span className="text-scale-1200 text-sm">{schema.name}</span>
-          </Listbox.Option>
-        ))}
+      {schemas.map((schema) => (
+        <Listbox.Option
+          key={schema.id}
+          value={schema.name}
+          label={schema.name}
+          addOnBefore={() => <span className="text-scale-900">schema</span>}
+        >
+          <span className="text-scale-1200 text-sm">{schema.name}</span>
+        </Listbox.Option>
+      ))}
     </Listbox>
   )
 }

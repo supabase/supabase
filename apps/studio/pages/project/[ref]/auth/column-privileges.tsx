@@ -1,5 +1,4 @@
 import { PostgresRole } from '@supabase/postgres-meta'
-import { partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useMemo, useState } from 'react'
 
@@ -15,27 +14,22 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useColumnPrivilegesQuery } from 'data/privileges/column-privileges-query'
 import { useTablePrivilegesQuery } from 'data/privileges/table-privileges-query'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useFlag, useStore } from 'hooks'
+import { useStore } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { useRouter } from 'next/router'
 import { NextPageWithLayout } from 'types'
 
 const PrivilegesPage: NextPageWithLayout = () => {
   const { meta } = useStore()
 
   const pathParams = useParams()
-  const { ref } = useParams()
   const { project } = useProjectContext()
-  const router = useRouter()
-  console.log(project)
 
   const { data: tableList, isLoading: isLoadingTables } = useTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
-  //const schemaList = meta.schemas.list()
-  const { data: schemas } = useSchemasQuery({
+  const { data: allSchemas } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -43,7 +37,6 @@ const PrivilegesPage: NextPageWithLayout = () => {
   const rolesList = meta.roles.list(
     (role: PostgresRole) => !meta.roles.systemRoles.includes(role.name)
   )
-  const columnLevelPrivileges = useFlag('columnLevelPrivileges')
 
   const [selectedSchema, setSelectedSchema] = useState<string>('public')
   const [selectedRole, setSelectedRole] = useState<string>('anon')
@@ -59,15 +52,10 @@ const PrivilegesPage: NextPageWithLayout = () => {
     isLoading: isLoadingTablePrivileges,
     isError: isErrorTablePrivileges,
     error: errorTablePrivileges,
-  } = useTablePrivilegesQuery(
-    {
-      projectRef: ref,
-      connectionString: project?.connectionString,
-    },
-    {
-      enabled: !!project,
-    }
-  )
+  } = useTablePrivilegesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
   const tablePrivileges = useMemo(
     () =>
@@ -85,21 +73,12 @@ const PrivilegesPage: NextPageWithLayout = () => {
     isLoading: isLoadingColumnPrivileges,
     isError: isErrorColumnPrivileges,
     error: errorColumnPrivileges,
-  } = useColumnPrivilegesQuery(
-    {
-      projectRef: ref,
-      connectionString: project?.connectionString,
-    },
-    {
-      enabled: !!project,
-    }
-  )
+  } = useColumnPrivilegesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
-  const [protectedSchemas, openSchemas] = partition(schemas ?? [], (schema) =>
-    EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
-  )
-  const schema = schemas?.find((schema) => schema.name === selectedSchema)
-  const isSchemaLocked = protectedSchemas.some((s) => s.id === schema?.id)
+  const schemas = allSchemas?.filter((schema) => !EXCLUDED_SCHEMAS.includes(schema.name)) ?? []
 
   const roles = rolesList.map((role: PostgresRole) => role.name)
 
@@ -126,38 +105,25 @@ const PrivilegesPage: NextPageWithLayout = () => {
     return <Connecting />
   }
 
-  if (!columnLevelPrivileges) {
-    router.push(`/project/${ref}/database/tables`)
-  }
-
   const table = tableList?.find((table) => table.name === selectedTable)
   return (
-    <>
-      {columnLevelPrivileges ? (
-        <ScaffoldContainer>
-          <ScaffoldSection>
-            <Privileges
-              tablePrivileges={tablePrivileges}
-              columns={columnsState}
-              tables={tables || []}
-              selectedSchema={selectedSchema}
-              selectedRole={selectedRole}
-              selectedTable={table}
-              availableSchemas={schemas?.map((s) => s.name) || []}
-              openSchemas={openSchemas}
-              protectedSchemas={protectedSchemas}
-              roles={roles}
-              isSchemaLocked={isSchemaLocked}
-              onChangeSchema={handleChangeSchema}
-              onChangeRole={handleChangeRole}
-              onChangeTable={setSelectedTable}
-            />
-          </ScaffoldSection>
-        </ScaffoldContainer>
-      ) : (
-        <Connecting />
-      )}
-    </>
+    <ScaffoldContainer>
+      <ScaffoldSection>
+        <Privileges
+          tablePrivileges={tablePrivileges}
+          columns={columnsState}
+          tables={tables || []}
+          selectedSchema={selectedSchema}
+          selectedRole={selectedRole}
+          selectedTable={table}
+          schemas={schemas}
+          roles={roles}
+          onChangeSchema={handleChangeSchema}
+          onChangeRole={handleChangeRole}
+          onChangeTable={setSelectedTable}
+        />
+      </ScaffoldSection>
+    </ScaffoldContainer>
   )
 }
 

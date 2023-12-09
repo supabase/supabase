@@ -11,11 +11,8 @@ export interface PrivilegesProps {
   tablePrivileges: TablePrivilegesUI[]
   selectedSchema: string
   selectedRole: string
-  availableSchemas: string[]
-  openSchemas: PostgresSchema[]
-  protectedSchemas: PostgresSchema[]
+  schemas: PostgresSchema[]
   roles: string[]
-  isSchemaLocked: boolean
   selectedTable?: PostgresTable
   onChangeSchema: (schema: string) => void
   onChangeRole: (role: string) => void
@@ -28,11 +25,8 @@ const Privileges = ({
   selectedTable,
   tables,
   tablePrivileges,
-  availableSchemas,
-  openSchemas,
-  protectedSchemas,
+  schemas,
   roles,
-  isSchemaLocked,
   columns,
   onChangeSchema,
   onChangeRole,
@@ -66,11 +60,8 @@ const Privileges = ({
         selectedRole={selectedRole}
         selectedTable={selectedTable}
         tables={tables}
-        availableSchemas={availableSchemas}
-        openSchemas={openSchemas}
-        protectedSchemas={protectedSchemas}
+        schemas={schemas}
         roles={roles}
-        isSchemaLocked={isSchemaLocked}
         onChangeSchema={onChangeSchema}
         onChangeRole={onChangeRole}
         onChangeTable={onChangeTable}
