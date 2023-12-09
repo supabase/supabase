@@ -34,7 +34,7 @@ interface ColumnTypeProps {
   description?: ReactNode
   showRecommendation?: boolean
   onOptionSelect: (value: string) => void
-  isNewRecord: boolean
+  isNewRecord?: boolean
 }
 
 const ColumnType = ({
