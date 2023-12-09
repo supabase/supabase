@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --port 3001",
-    "dev:secrets:pull": "AWS_PROFILE=supabase-dev node internals/getSecrets.js",
+    "dev:secrets:pull": "AWS_PROFILE=supabase-dev node ../../scripts/getSecrets.js -n local/docs",
     "build": "next build",
     "build:analyze": "ANALYZE=true next build",
     "start": "next start",

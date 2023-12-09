@@ -66,6 +66,8 @@ import {
   getDiffTypeDropdownLabel,
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import toast from 'react-hot-toast'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
@@ -116,9 +118,13 @@ const SQLEditor = () => {
   const [pendingTitle, setPendingTitle] = useState<string>()
   const [hasSelection, setHasSelection] = useState<boolean>(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const readReplicasEnabled = useFlag('readReplicas')
   const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
+  const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery({
+    projectRef: ref,
+  })
 
   // Customers on HIPAA plans should not have access to Supabase AI
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
@@ -149,6 +155,13 @@ const SQLEditor = () => {
   useEffect(() => {
     setIsFirstRender(false)
   }, [])
+
+  useEffect(() => {
+    if (isSuccessReadReplicas) {
+      const primaryDatabase = databases.find((db) => db.identifier === ref)
+      snap.setSelectedDatabaseId(primaryDatabase?.identifier)
+    }
+  }, [isSuccessReadReplicas])
 
   const { data, refetch: refetchEntityDefinitions } = useEntityDefinitionsQuery(
     {
@@ -310,9 +323,16 @@ const SQLEditor = () => {
           setLineHighlights([])
         }
 
+        const connectionString = !readReplicasEnabled
+          ? project.connectionString
+          : databases?.find((db) => db.identifier === snap.selectedDatabaseId)?.connectionString
+        if (!connectionString) {
+          return toast.error('Unable to run query: Connection string is missing')
+        }
+
         execute({
           projectRef: project.ref,
-          connectionString: project.connectionString,
+          connectionString: connectionString,
           sql: wrapWithRoleImpersonation(sql, {
             projectRef: project.ref,
             role: getImpersonatedRole(),
