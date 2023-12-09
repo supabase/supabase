@@ -33,6 +33,7 @@ export interface Props extends Omit<React.InputHTMLAttributes<HTMLButtonElement>
   // override the button prop for onchange we only return a single value
   // rather than a ChangeEvent<HTMLButtonElement>
   onChange?: (x: any) => void
+  isNewRecord?: boolean
 }
 
 function Listbox({
@@ -57,6 +58,7 @@ function Listbox({
   validation,
   disabled,
   optionsWidth,
+  isNewRecord,
 }: Props) {
   const [selected, setSelected] = useState(undefined)
   const [selectedNode, setSelectedNode] = useState<any>({})
@@ -84,7 +86,7 @@ function Listbox({
   }
 
   useEffect(() => {
-    if (value) {
+    if (value && !isNewRecord) {
       setSelected(value)
     }
   }, [value])
@@ -125,7 +127,7 @@ function Listbox({
     /*
      * value prop overrides everything
      */
-    if (value) {
+    if (value && !isNewRecord) {
       setSelected(value)
       const node: any = findNode(value)
       setSelectedNode(node?.props ? node.props : undefined)

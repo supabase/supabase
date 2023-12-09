@@ -276,6 +276,7 @@ const ColumnEditor = ({
             error={errors.format}
             disabled={columnFields?.foreignKey !== undefined}
             onOptionSelect={(format: string) => onUpdateField({ format, defaultValue: null })}
+            isNewRecord={isNewRecord}
           />
           {columnFields.foreignKey === undefined && (
             <div className="space-y-4">

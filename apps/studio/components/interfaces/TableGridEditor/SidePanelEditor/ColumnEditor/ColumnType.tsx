@@ -34,6 +34,7 @@ interface ColumnTypeProps {
   description?: ReactNode
   showRecommendation?: boolean
   onOptionSelect: (value: string) => void
+  isNewRecord: boolean
 }
 
 const ColumnType = ({
@@ -48,6 +49,7 @@ const ColumnType = ({
   description,
   showRecommendation = false,
   onOptionSelect = noop,
+  isNewRecord
 }: ColumnTypeProps) => {
   // @ts-ignore
   const availableTypes = POSTGRES_DATA_TYPES.concat(enumTypes.map((type) => type.name))
@@ -108,6 +110,7 @@ const ColumnType = ({
         className={`${className} ${disabled ? 'column-type-disabled' : ''} rounded-md`}
         onChange={(value: string) => onOptionSelect(value)}
         optionsWidth={480}
+        isNewRecord={isNewRecord}
       >
         <Listbox.Option key="empty" value="" label="---">
           ---
