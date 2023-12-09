@@ -6,11 +6,10 @@ export const generateDatabaseMenu = (
   project?: Project,
   flags?: {
     pgNetExtensionExists: boolean
-    columnLevelPrivileges: boolean
   }
 ): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
-  const { pgNetExtensionExists, columnLevelPrivileges } = flags || {}
+  const { pgNetExtensionExists } = flags || {}
 
   return [
     {
@@ -42,17 +41,6 @@ export const generateDatabaseMenu = (
           items: [],
         },
         { name: 'Roles', key: 'roles', url: `/project/${ref}/database/roles`, items: [] },
-        ...(columnLevelPrivileges
-          ? [
-              {
-                name: 'Privileges',
-                key: 'privileges',
-                url: `/project/${ref}/database/privileges`,
-                items: [],
-                label: 'ALPHA',
-              },
-            ]
-          : []),
         {
           name: 'Replication',
           key: 'replication',

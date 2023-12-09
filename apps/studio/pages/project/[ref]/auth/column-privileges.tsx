@@ -6,20 +6,19 @@ import { useMemo, useState } from 'react'
 import { useParams } from 'common/hooks'
 import Privileges from 'components/interfaces/Database/Privileges/Privileges'
 import { mapDataToPrivilegeColumnUI } from 'components/interfaces/Database/Privileges/Privileges.utils'
-import { DatabaseLayout } from 'components/layouts'
+import { AuthLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import EmptyPageState from 'components/ui/Error'
 import Connecting from 'components/ui/Loading/Loading'
-import { useColumnPrivilegesQuery } from 'data/privileges/column-privileges-query'
-import { useStore } from 'hooks'
-import { NextPageWithLayout } from 'types'
-import { useTablePrivilegesQuery } from 'data/privileges/table-privileges-query'
-import { useFlag } from 'hooks'
-import { useRouter } from 'next/router'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { useColumnPrivilegesQuery } from 'data/privileges/column-privileges-query'
+import { useTablePrivilegesQuery } from 'data/privileges/table-privileges-query'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import { useFlag, useStore } from 'hooks'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { useRouter } from 'next/router'
+import { NextPageWithLayout } from 'types'
 
 const PrivilegesPage: NextPageWithLayout = () => {
   const { meta } = useStore()
@@ -163,9 +162,9 @@ const PrivilegesPage: NextPageWithLayout = () => {
 }
 
 PrivilegesPage.getLayout = (page) => (
-  <DatabaseLayout title="Database">
+  <AuthLayout title="Column Privileges">
     <div>{page}</div>
-  </DatabaseLayout>
+  </AuthLayout>
 )
 
 export default observer(PrivilegesPage)

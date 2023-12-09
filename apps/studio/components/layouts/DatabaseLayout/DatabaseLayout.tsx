@@ -22,7 +22,6 @@ const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) =>
   const vaultExtension = meta.extensions.byId('supabase_vault')
   const isVaultEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null
   const pgNetExtensionExists = meta.extensions.byId('pg_net') !== undefined
-  const columnLevelPrivileges = useFlag('columnLevelPrivileges')
 
   useEffect(() => {
     if (ui.selectedProjectRef) {
@@ -43,10 +42,7 @@ const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) =>
     <ProjectLayout
       product="Database"
       productMenu={
-        <ProductMenu
-          page={page}
-          menu={generateDatabaseMenu(project, { pgNetExtensionExists, columnLevelPrivileges })}
-        />
+        <ProductMenu page={page} menu={generateDatabaseMenu(project, { pgNetExtensionExists })} />
       }
     >
       <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">

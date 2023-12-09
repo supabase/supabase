@@ -18,6 +18,7 @@ const AuthLayout = ({ title, children }: PropsWithChildren<AuthLayoutProps>) => 
   const { ui, meta } = useStore()
 
   const hooksReleased = useFlag('authHooksReleased')
+  const columnLevelPrivileges = useFlag('columnLevelPrivileges')
 
   useAuthConfigPrefetch({ projectRef })
 
@@ -38,7 +39,7 @@ const AuthLayout = ({ title, children }: PropsWithChildren<AuthLayoutProps>) => 
       productMenu={
         <ProductMenu
           page={page}
-          menu={generateAuthMenu(projectRef ?? 'default', { hooksReleased })}
+          menu={generateAuthMenu(projectRef ?? 'default', { hooksReleased, columnLevelPrivileges })}
         />
       }
     >
