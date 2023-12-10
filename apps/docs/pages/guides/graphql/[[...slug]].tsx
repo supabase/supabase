@@ -49,7 +49,7 @@ const pageMap = [
     remoteFile: 'views.md',
   },
   {
-    slug: 'views',
+    slug: 'functions',
     meta: {
       id: 'graphql-functions',
       title: 'Functions',
