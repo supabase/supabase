@@ -460,7 +460,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                         <p>
                           Pro Plan includes email-based support. You can expect an answer within 1
                           business day in most situation for all severities. We recommend upgrading
-                          to the Team plan for prioritised ticketing for all issues and prioritised
+                          to the Team plan for prioritized ticketing for all issues and prioritized
                           escalation to product engineering teams. Enhanced SLAs for support are
                           available on our Enterprise Plan.
                         </p>
@@ -468,8 +468,8 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
 
                       {subscription?.plan.id === 'team' && (
                         <p>
-                          Team plan includes email-based support. You get prioritised ticketing for
-                          all issues and prioritised escalation to product engineering teams. Low,
+                          Team plan includes email-based support. You get prioritized ticketing for
+                          all issues and prioritized escalation to product engineering teams. Low,
                           Normal, and High severity tickets will generally be handled within 1
                           business day, while Urgent issues, we respond within 1 day, 365 days a
                           year. Enhanced SLAs for support are available on our Enterprise Plan.
