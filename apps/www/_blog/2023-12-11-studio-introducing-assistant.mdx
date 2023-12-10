@@ -78,15 +78,28 @@ We've explored various approaches and designs for the RLS Editor. This SQL-first
 
 ## Postgres Roles
 
-You may never have thought about this, but Studio connects to your database just like any other client or app. It connects to your database using a single Postgres role, referred to as `postgres`. This role functions much like your `service role` key, granting it admin privileges to your database. It has admin read and write privileges, and will bypass Row Level Security.
+You may have never thought about this, but Studio connects to your database just like any other Postgres client. 
 
-Most of you use API keys for Supabase APIs or client libs already: the `anon` and `service_role` keys. These keys actually resolve into Postgres roles, called `anon` and `service_role`. These keys are actually JWT tokens, but we'll come back to that in a minute.
+It uses the default [Postgres role](https://supabase.com/docs/guides/database/postgres/roles), `postgres`. The `postgres` role functions like your `service role` key, granting it admin privileges to your database. It has admin read and write privileges, and bypasses Row Level Security.
 
-What if you could use the same Postgres roles you use in your applications, but in the Studio? What if you could have the Studio pretend to use a different role than the default `postgres` role? Today, you can.
+If you use our client libs, you'll be familiar with the `anon` and `service_role` API keys. These keys actually resolve into Postgres roles, also called `anon` and `service_role`. These keys are actually JWT tokens that contain the Postgres role:
+
+```js
+{
+  "role": "service_role", // the Postgres role
+  "iss": "supabase"       // the issuer of the JWT
+  "iat": 1619011200,      // the time the JWT was issued
+  "exp": 1619014800,      // the time the JWT will expires
+}
+```
+
+What if you could run the queries in Studio using the same Postgres roles you use in your applications? What if you could have the Studio pretend to use a different role than the default `postgres` role? Today, you can:
 
 ![Supabase AI](/images/blog/launch-week-x/day-1/3.png)
 
-An example app will help illustrate this for us. Let's build a Twitter/X clone. In a Twitter clone, you:
+You can use the new Role dropdown to select a different Postgres role for your queries in Studio. This is a powerful tool for testing your Row Level Security policies and determining which data each role can access.
+
+Let's build a Twitter/X clone to illustrate. In a Twitter clone, you:
 
 - have a `tweets` table with columns like `user_id` and `content`.
 - can set up Row Level Security so that only the author of a tweet can access and modify their own tweets.
@@ -101,9 +114,9 @@ Here's our tweets table. Watch the table react when we change roles:
   />
 </video>
 
-Moving from the `postgres` role to the `anon` role removes all of the records from the table. This makes sense as we haven't yet created a policy to allow for `anon` access to this table.
+When we query with the `postgres` role, we can see all the data. When we query with the `anon` no data is returned. This makes sense as we haven't yet created a policy to allow for `anon` access to this table.
 
-Exposing Postgres roles in the Studio allows you to pretend to use the `anon` or `authenticated` roles. Roles also unlocks another handy capability: not only can we have Studio pretend to be different role, it can pretend to be a different _user_.
+The Role dropdown unlocks another handy capability: when combined with Supabase Auth it can even pretend to be a different _user_.
 
 ## User Impersonation
 
