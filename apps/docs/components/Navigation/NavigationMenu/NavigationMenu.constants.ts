@@ -58,7 +58,7 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
   ],
   [
     {
-      label: 'API',
+      label: 'Data API',
     },
     {
       label: 'REST',
