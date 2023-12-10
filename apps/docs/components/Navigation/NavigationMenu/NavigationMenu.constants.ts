@@ -844,6 +844,17 @@ export const graphql: NavMenuConstant = {
   items: [
     { name: 'Overview', url: '/guides/graphql', items: [] },
     { name: 'API', url: '/guides/graphql/api', items: [] },
+    { name: 'Views', url: '/guides/graphql/views', items: [] },
+    { name: 'Functions', url: '/guides/graphql/functions', items: [] },
+    { name: 'Configuration & Customization', url: '/guides/graphql/configuration', items: [] },
+    { name: 'Security', url: '/guides/graphql/security', items: [] },
+    {
+      name: 'Integrations',
+      items: [
+        { name: 'With Apollo', url: '/guides/graphql/with-apollo' },
+        { name: 'With Relay', url: '/guides/graphql/with-relay' },
+      ],
+    },
   ],
 }
 
