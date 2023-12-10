@@ -127,6 +127,12 @@ val data = supabase.postgrest["profiles"].select(Columns.list("id", "username", 
 </TabPanel>
 </Tabs>
 
+<Admonition type="tip">
+
+Security is handled at the database level by the RLS policy. The policy restricts the returned rows, so you don't _need_ a filter on `id`. Depending on your table size and query, you might still want to add a filter for performance. Postgres can use the filter to construct a more efficient query.
+
+</Admonition>
+
 ## Bypassing Row Level Security
 
 If you need to fetch a full list of user profiles, we supply a `service_key` which you can use with your API and Client Libraries to bypass Row Level Security.
