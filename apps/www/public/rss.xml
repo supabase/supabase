@@ -5,7 +5,7 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Sun, 10 Dec 2023 03:30:00 GMT</lastBuildDate>
+      <lastBuildDate>Thu, 07 Dec 2023 03:30:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
   <guid>https://supabase.com/blog/studio-introducing-assistant</guid>
@@ -19,6 +19,13 @@
   <title>Postgres Language Server: implementing the Parser</title>
   <link>https://supabase.com/blog/postgres-language-server-implementing-parser</link>
   <description>A detailed analysis of our iterations to implement a Parser for Postgres</description>
+  <pubDate>Thu, 07 Dec 2023 03:30:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/how-design-works-at-supabase</guid>
+  <title>How design works at Supabase</title>
+  <link>https://supabase.com/blog/how-design-works-at-supabase</link>
+  <description>How design works at Supabase</description>
   <pubDate>Thu, 07 Dec 2023 03:30:00 GMT</pubDate>
 </item>
 <item>
