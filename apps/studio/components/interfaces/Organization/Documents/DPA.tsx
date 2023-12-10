@@ -31,7 +31,7 @@ const DPA = () => {
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent className="flex items-center justify-center h-full">
         <a
-          href="https://supabase.com/downloads/docs/Supabase+DPA+230907.pdf"
+          href="https://supabase.com/downloads/docs/Supabase+DPA+231211.pdf"
           target="_blank"
           rel="noreferrer noopener"
           download={true}
