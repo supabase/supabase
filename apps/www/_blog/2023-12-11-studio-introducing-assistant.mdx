@@ -88,8 +88,7 @@ If you use our client libs, you'll be familiar with the `anon` and `service_role
 {
   "role": "service_role", // the Postgres role
   "iss": "supabase"       // the issuer of the JWT
-  "iat": 1619011200,      // the time the JWT was issued
-  "exp": 1619014800,      // the time the JWT will expires
+  "exp": 1445385600,      // the time the JWT will expires
 }
 ```
 
@@ -120,9 +119,20 @@ The Role dropdown unlocks another handy capability: when combined with Supabase 
 
 ## User Impersonation
 
-Remember we said value of the API keys we use in our applications are actually JWTs? That means you can impersonate a user by swapping the Studio's JWT for theirs. Let's see that in action.
+Remember the API keys above? They can contain an additional field: `sub`. This is the user's ID. When you use the `authenticated` role, the `sub` field is the ID of the user who is logged in to your app:
 
-We've written an RLS policy to allow users to view their own tweets. Here, we can choose the `authenticated` role, and select a specific user to see just their tweets. Here's all of our user's tweets:
+```js
+{
+  "sub": "348b-some-user-uuid", // the ID of the user
+  "role": "authenticated",      // the Postgres role
+  "iss": "supabase"             // the issuer of the JWT
+  "exp": 1445385600,            // the time the JWT will expires
+}
+```
+
+We can impersonate a user in Studio by "minting" a JWT with their ID and then running the queries using that JWT. 
+
+Let's see it in action after we've written an RLS policy to allow users to view _their own_ tweets. Here, we can choose the `authenticated` role, and select a specific user to see just their tweets. Here's all of our user's tweets:
 
 ![Supabase AI](/images/blog/launch-week-x/day-1/7.png)
 
@@ -132,68 +142,72 @@ You can impersonate any user in your project and see things exactly as they woul
 
 ✨ Magic ✨
 
-In record time, you can create RLS policies and test that they work exactly as you expect, right from the Studio. But the fun doesn't stop with the Table Editor. We've brought Roles to both the SQL Editor and GraphiQL as well.
+You can create RLS policies and test that they work exactly as you expect, right from the Studio. 
 
-Any SQL or GraphQL queries you write in will also respect Postgres roles. Let's repeat what we've done above by trying to select a list of our own tweets:
+The fun doesn't stop with the Table Editor. We've added Roles support to both the SQL Editor and GraphiQL as well. Let's repeat what we've done above by trying to select a list of our own tweets in the SQL Editor:
 
 ![Supabase AI](/images/blog/launch-week-x/day-1/8.png)
 
+And in GraphiQL:
+
 ![Supabase AI](/images/blog/launch-week-x/day-1/11.png)
 
-Combining this feature with the new RLS editor, you're able to write and test RLS policies with real data in a matter of minutes, right from the Studio. This will make the process of writing RLS policies many times faster and easier. If you've got feedback, we'd love to hear it. [insert Github Discussion link]
+Combining this feature with the new RLS Editor, you're able to write and test RLS policies with real data in a matter of minutes. This makes the process of writing RLS policies many times faster and easier. If you've got feedback, [we'd love to hear it](insert Github Discussion link).
 
 ## Realtime Inspector
 
-With [Realtime](https://supabase.com/realtime) you can listen for changes to tables, store and synchronize data about user presence, and broadcast any data to clients via channels.
+Supabase [Realtime](https://supabase.com/realtime) is great for building collaborative applications. You can recieve database changes over websockets, store and synchronize data about user presence, and broadcast any data to clients via "channels".
 
-Today we're releasing Realtime Inspector: an easy way to prototype, inspect and debug from directly in the Studio. Realtime Inspector lets you listen to messages being sent and received in channels. You can filter messages by type (presence, broadcast and database changes).
+Today we're releasing Realtime Inspector: an easy way to prototype, inspect, and debug Realtime directly in the Studio. You can use the Realtime Inspector to view messages being sent and received in channels. You can filter messages by type: presence, broadcast, and database changes.
 
 ![Supabase AI](/images/blog/launch-week-x/day-1/6.png)
 
-The astute will also notice that we've included the Postgres roles dropdown here as well. You can view events by role and impersonate users just like in the Table and SQL Editors.
+And, of course, we've included the Roles dropdown here as well. You can view events by role and impersonate users just like the Table and SQL Editors.
 
-If you use Realtime, you're going to find the new inspector very handy. If you've got feedback… [link to Github Discussion]
+If you use Realtime, you'll find the new inspector very handy. If you've got feedback… [link to Github Discussion]
 
 ---
 
 ## Feature Previews
 
-Last, a quick introduction to Feature Previews, our tool for unveiling and rolling out new features. We release beta features as Previews before making them generally available. You can see a list of features that are available for preview along with a screenshot and a brief description. Each feature includes a link to a Github Discussion for feedback.
+Today we're releasing **Feature Previews**, our tool for unveiling new features. We release beta features as Previews before making them generally available. You can see a list of features that are available for preview along with a screenshot and a brief description. Each feature includes a link to a Github Discussion for feedback.
 
 We have a couple of goals with Feature Previews. We want to:
 
 - get features out to you faster
-- make it easier for you to give us feedback on them
+- make it easier for you to give us feedback
 - shorten the iteration loop
 
-The faster we can get feedback and do improvement iterations, the faster we can roll features out of beta preview and into general use.
+The faster we can iterate with your feedback, the faster we can release features into general use.
 
-While these we consider these features to be beta releases, please know that we take your security, privacy and data integrity extremely seriously. Anything we release to Preview is tested with this in mind and is at a stage where we're looking for UX/UI feedback.
+While we consider these features to be beta releases, please know that we take your security, privacy and data integrity extremely seriously. Anything we release to Preview is tested with this in mind and is at a stage where we're looking for UX/UI feedback.
 
 You can find our Feature Preview under the user avatar menu in the lower left:
 
 ![Supabase AI](/images/blog/launch-week-x/day-1/4.png)
 
-At the moment, we've got two features in preview. The new RLS Assistant that we looked at earlier:
+We currently have two features in preview: 
+
+`1.` The new RLS Assistant that we looked at earlier:
 
 ![Supabase AI](/images/blog/launch-week-x/day-1/5.png)
 
-And a newly revised API side panel:
+`2.` And a revised API side panel:
 
 ![Supabase AI](/images/blog/launch-week-x/day-1/10.png)
 
-If you've got feedback for these or any other Preview Features we release, please drop it in the relevant Github Discussions. We'll be actively keeping an eye on them.
+We'll be actively keeping an eye on the Github Discussions and will be responding to your feedback.
 
 ## Wrapping up
 
 In this update, we've taken huge strides in enhancing your experience with Supabase.
 
-**Row Level Security Policies**: We've made it easier than ever to create Row Level Security policies with the help of our Assistant. This feature dramatically simplifies the process of defining fine-grained access control for your data.
+1. **Row Level Security Policies**: We've made it easier than ever to create Row Level Security policies with the help of our new Assistant. This feature dramatically simplifies the process of defining fine-grained access to your data.
 
-**Postgres Roles and User Impersonation**: Our new roles selector allows you to visualize the impact of your security policies directly within the Studio. This lets you to see how different roles interact with your data, offering a powerful tool for testing access control.
+2. **Postgres Roles and User Impersonation**: Our new Roles selector allows you to visualize the impact of your security policies directly within the Studio. This lets you to see how different roles interact with your data, offering a powerful tool for testing access control.
 
-**Realtime Inspector**: With the Realtime Inspector, you can prototype, inspect, and debug Realtime messages. This tool will be very useful for those who use Supabase Realtime.
+3. **Realtime Inspector**: With the Realtime Inspector, you can prototype, inspect, and debug Realtime messages. This tool will be very useful for those who use Supabase Realtime.
 
-**Feature Previews**: We've introduced Feature Previews to bring you new tools and features in the beta stage, making it easier for you to provide feedback and shape the development process.
+4. **Feature Previews**: We've introduced Feature Previews to bring you new tools and features in the beta stage, making it easier for you to provide feedback and shape the development process.
 
 These updates reflect our commitment to a SQL-first approach and a user-centric development. We look forward to your feedback as we continue to work hard making Supabase faster and easier for you to get your ideas out into the wild.
