@@ -315,7 +315,7 @@ psql "sslmode=verify-full sslrootcert=$HOME/Downloads/prod-supabase.cer host=db.
 
 ## How connection pooling works
 
-A "connection pool" is a system (external to Postgres) which manages connections, rather than PostgreSQL's native system. 
+A "connection pool" is a system (external to Postgres) which manages Postgres connections. 
 
 When a client makes a request, the pooler "allocates" an available connection to the client. When the client transaction or session is completed the connection is returned to the pool and is free to be used by another client.
 
