@@ -7,43 +7,25 @@ export const meta = {
   subtitle: 'Use Supabase Branches to test and preview changes',
 }
 
-<Admonition type="note" label="Branching is only available on the Pro Plan and above.">
 
-</Admonition>
+Use branching to safely and easily experiment with changes to your Supabase projects.
 
-<Admonition type="caution" label="Region issues impacting reliability">
+<Admonition type="caution" label="Branching is an Alpha feature, available on the Pro Plan and above.">
 
-Currently, there is a known issue with the reliability of Preview Branches being deployed in the following regions:
+We do not recommended Branching in a production environment while it is in Alpha. To try branching, [request access here](https://forms.supabase.com/branching-request). We are working our upstream provider to improve the stability in the following regions:
 
 - South East Asia (Singapore)
 - South Asia (Mumbai)
-- Central EU (Frankfurt) regions
-
-We are working on the stability fixes with the upstream provider.
-
-Currently, it is advised to use a Supabase Project that is not using these regions.
+- Central EU (Frankfurt)
 
 </Admonition>
 
-Use branching to safely and easily experiment with changes to your Supabase project.
-
-Supabase branches work like Git branches. They let you create and test changes like new configurations, database schemas, or features in a separate, temporary instance without affecting your production setup.
-
-When you're ready to ship your changes, merge your branch to update your production instance with the new changes.
-
-If you understand Git, you already understand Supabase Branching.
-
-<Admonition type="caution" label="Branching is in Alpha">
-
-It is not recommended to use Branching in a production environment.
-
-Branching is an Alpha feature. To try out branching for non-production experiments, [request access here](https://forms.supabase.com/branching-request).
-
-</Admonition>
 
 ## How branching works
 
-Supabase projects can consist of multiple Preview Branches. All Preview Branches are backed by an isolated Supabase instance. Each instance contains all Supabase features, and has its own API credentials.
+Supabase branches work like Git branches. They let you create and test changes like new configurations and features in a separate, temporary environment without affecting your production setup. When you're ready to ship your changes, merge your branch to update your production instance with the new changes.
+
+You can run multiple Preview Branches for every Supabase project. Branches contain all the Supabase features with their own API credentials. Supabase Branching follows the [Trunk Based Development](https://trunkbaseddevelopment.com/) workflow, with one main Production branch and multiple development branches:
 
 <figure className="max-w-[700px] mx-auto">
   <Image
@@ -56,22 +38,17 @@ Supabase projects can consist of multiple Preview Branches. All Preview Branches
     alt="Each branch has a separate Supabase instance."
     src="/docs/img/guides/platform/branching/github-workflow-without-branching--light.jpg?v=1"
   />
-  <figcaption>Each branch has a separate Supabase instance.</figcaption>
+  <figcaption>Each Branch is a separate environment.</figcaption>
 </figure>
 
-Supabase branching works like Git branching, with one main Production branch. Preview Branches branch off your Production branch and contain proposed changes. These changes can then be merged into Production.
+1. Preview environments are branched from your Production branch, containing proposed changes.
+1. When you create a Preview Branch, the SQL migration files from your Production branch are run on the new Preview Branch. The Preview Branch then reflects your current Production branch schema.
+1. The Preview Branch will be [seeded with sample data](#seeding-behaviour) if a seed file exists.
+1. When you are confident that the changes you have made are ready for production you can merge them into your Production Branch, and the changes will be applied to your Production environment.
 
-When you create a Preview Branch, the SQL migration files from your Production branch are run on the new Preview Branch. The Preview Branch then reflects your current Production branch schema.
+<Admonition type="note" label="Data changes are not included">
 
-The Preview Branch will also be [seeded with sample data](#seeding-behaviour) if a seed file exists.
-
-By creating new SQL migrations in a Preview Branch to propose schema changes, those changes can then be merged into your Production branch. These changes then run the new migrations on your Supabase Production branch. This is exactly how Git branches work: experiment on a feature branch and merge back into Production when you're finished.
-
-<Admonition type="note" label="Schema-only changes">
-
-    Only *schema* changes are captured in preview branches.
-
-    Preview Branch instances contain no data by default. You must include a seed file to seed your preview instance with sample data when the Preview Branch is created. Future versions of Branching may allow for automated data seeding and cloning.
+    Preview Branch instances contain no data by default. You must include a seed file to seed your preview instance with sample data when the Preview Branch is created. Future versions of Branching may allow for automated data seeding and cloning after we are confident that we can provide safe data masking.
 
 </Admonition>
 
