@@ -239,8 +239,8 @@
   },
   {
     "author_id": "jonny",
-    "author": "Jonathan Summers-Muir",
-    "position": "Engineering",
+    "author": "Jonny Summers-Muir",
+    "position": "Product design",
     "author_url": "https://github.com/mildtomato",
     "author_image_url": "https://github.com/mildtomato.png"
   },
@@ -281,10 +281,10 @@
   },
   {
     "author_id": "marijana",
-    "author": "Marijana Šimag",
+    "author": "Marijana Pavlinić",
     "position": "Design",
-    "author_url": "https://dribbble.com/marijanasimag",
-    "author_image_url": "https://github.com/marijanasimag.png"
+    "author_url": "https://dribbble.com/marijanapav",
+    "author_image_url": "https://github.com/marijanapav.png"
   },
   {
     "author_id": "ziinc",
@@ -366,5 +366,29 @@
     "position": "Integrations Lead",
     "author_url": "https://twitter.com/kamilogorek",
     "author_image_url": "https://github.com/kamilogorek.png"
+  },
+  {
+    "author_id": "yuri",
+    "author": "Yuri Santana",
+    "username": "yuri",
+    "position": "DevRel Social Media and Community",
+    "author_url": "https://twitter.com/yuricodesbot",
+    "author_image_url": "https://github.com/YuriCodes.png"
+  },
+  {
+    "author_id": "ivasilov",
+    "author": "Ivan Vasilov",
+    "username": "ivasilov",
+    "position": "Engineering",
+    "author_url": "https://twitter.com/ivasilov",
+    "author_image_url": "https://github.com/ivasilov.png"
+  },
+  {
+    "author_id": "philipp",
+    "author": "Philipp Steinrötter",
+    "username": "psteinroe",
+    "position": "Guest Author",
+    "author_url": "https://twitter.com/psteinroe",
+    "author_image_url": "/images/philipp-steinrotter.jpg"
   }
 ]

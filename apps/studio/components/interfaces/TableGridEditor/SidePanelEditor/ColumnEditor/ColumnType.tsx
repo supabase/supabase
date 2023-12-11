@@ -121,7 +121,7 @@ const ColumnType = ({
         */}
         {enumTypes.length > 0 ? (
           <Listbox.Option disabled key="header-1" value="header-1" label="header-1">
-            Enumerated Types
+            Other Data Types
           </Listbox.Option>
         ) : (
           <></>

@@ -4,16 +4,15 @@ import { CHAT_EXAMPLES } from '@/data/chat-examples'
 import { useAppStateSnapshot } from '@/lib/state'
 import { createClient } from '@/lib/supabase/client'
 import { ExternalLink } from 'lucide-react'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useFormState } from 'react-dom'
-import { AssistantChatForm, cn } from 'ui'
 import { createThread } from './actions'
+import { AssistantChatForm } from '@/components/AssistantChatForm'
+import { cn } from 'ui'
 
 const suggestions = CHAT_EXAMPLES
 
 const NewThreadInput = () => {
-  const router = useRouter()
   const [value, setValue] = useState(() => {
     if (typeof window !== 'undefined') {
       const localPrompt = localStorage.getItem('prompt')

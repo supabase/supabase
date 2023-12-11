@@ -1,9 +1,10 @@
 'use client'
 
 import { updateThread } from '@/app/actions'
+import { AssistantChatForm } from '@/components/AssistantChatForm'
 import { useState } from 'react'
 import { useFormState, useFormStatus } from 'react-dom'
-import { AssistantChatForm, Input } from 'ui'
+import { Input } from 'ui'
 
 function ChatInput({ params }: { params: { threadId: string; runId: string } }) {
   const [value, setValue] = useState('')

@@ -475,6 +475,8 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueClient.signOut'
     notes: |
       - In order to use the `signOut()` method, the user needs to be signed in first.
+      - By default, `signOut()` uses the global scope, which signs out all other sessions that the user is logged into as well.
+      - Since Supabase Auth uses JWTs for authentication, the access token JWT will be valid until it's expired. When the user signs out, Supabase revokes the refresh token and deletes the JWT from the client-side. This does not revoke the JWT and it will still be valid until it expires.
     examples:
       - id: sign-out
         name: Sign out
@@ -594,6 +596,53 @@ functions:
             password: 'new password',
             nonce: '123456'
           })
+          ```
+  - id: get-user-identities
+    title: 'getUserIdentities()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.getUserIdentities'
+    notes: |
+      - The user needs to be signed in to call `getUserIdentities()`.
+    examples:
+      - id: get-user-identities
+        name: Returns a list of identities linked to the user
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.getUserIdentities()
+          ```
+  - id: link-identity
+    title: 'linkIdentity()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.linkIdentity'
+    notes: |
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The user needs to be signed in to call `linkIdentity()`.
+      - If the candidate identity is already linked to the existing user or another user, `linkIdentity()` will fail.
+    examples:
+      - id: link-identity
+        name: Link an identity to a user
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.linkIdentity()
+          ```
+  - id: unlink-identity
+    title: 'unlinkIdentity()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.unlinkIdentity'
+    notes: |
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The user needs to be signed in to call `unlinkIdentity()`.
+      - The user must have at least 2 identities in order to unlink an identity.
+      - The identity to be unlinked must belong to the user.
+    examples:
+      - id: unlink-identity
+        name: Unlink an identity
+        isSpotlight: true
+        code: |
+          ```js
+          const googleIdentity = identities.find(
+            identity => identity.provider === 'google'
+          )
+          const { data, error } = await supabase.auth.unlinkIdentity(googleIdentity)
           ```
   - id: send-password-reauthentication
     title: 'reauthenticate()'
