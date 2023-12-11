@@ -44,14 +44,14 @@ const PromoToast = () => {
           <p>Launch Week</p>
           <Image src={LWXLogo} alt="Supabase Launch Week X Logo" width={14} height={14} />
         </div>
-        <span className="font-mono text-sm">Dec 11-15 / 8am PT</span>
-        <CountdownComponent date={new Date(announcement.launchDate)} showCard={false} />
+        <span className="font-mono text-sm">Day 1: introducing the Studio Assistant</span>
+        {/* <CountdownComponent date={new Date(announcement.launchDate)} showCard={false} /> */}
       </div>
 
       <div className="relative z-10 flex items-center space-x-2">
         <Button asChild type="secondary">
-          <Link target="_blank" rel="noreferrer" href="https://supabase.com/launch-week">
-            Claim your ticket
+          <Link target="_blank" rel="noreferrer" href="https://supabase.com/launch-week#today">
+            Go to Launch Week
           </Link>
         </Button>
         <Button type="default" onClick={handleHide}>
