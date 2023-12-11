@@ -41,7 +41,7 @@ Users that signed up with [SAML SSO](/docs/guides/auth/sso/auth-sso-saml) will n
 
 ### Manual linking (Beta)
 
-Supabase Auth allows a user to initiate identity linking with a different email address when they are logged in. To link an OAuth identity to the user:
+Supabase Auth allows a user to initiate identity linking with a different email address when they are logged in. To link an OAuth identity to the user, call [`linkIdentity()`](/docs/reference/javascript/auth-linkidentity):
 
 ```js
 const { data, error } = await supabase.auth.linkIdentity({ provider: 'google' })
@@ -51,7 +51,7 @@ In the example above, the user will be redirected to Google to complete the OAut
 
 ## Unlink an identity
 
-To unlink an identity from a user, the user needs to be logged in first and have at least 2 linked identities.
+You can use [`getUserIdentities()`](/docs/reference/javascript/auth-getuseridentities) to fetch all the identities linked to a user. Then, call [`unlinkIdentity()`](/docs/reference/javascript/auth-unlinkidentity) to unlink the identity. The user needs to be logged in and have at least 2 linked identities in order to unlink an existing identity.
 
 ```js
 // retrieve all identities linked to a user
