@@ -73,6 +73,45 @@ After developing your project and deciding it's Production Ready, you should run
 | Token refresh requests                           | `/auth/v1/token`                                                | IP Address               | 1800 requests per hour (with bursts up to 30 requests).                         | `Rate limit for token refreshes`                                       | Triggered when token refresh requests from a single IP exceed 1800 per hour or 30 in a short burst.  | Yes                 |
 | Create or Verify an MFA challenge                | `/auth/v1/factors/:id/challenge`, `/auth/v1/factors/:id/verify` | IP Address               | 15 requests per minute (with bursts up to 30 requests).                         | `Rate limit for token verifications`                                   | Triggered when MFA challenge/verify requests from a single IP exceed 15 per minute or 30 in a burst. | No                  |
 
+### Auth Rate Limits
+
+Auth rates can be configured for your project in the [rate limits settings page](/dashboard/project/_/auth/rate-limits).
+
+#### Rate limits applied for sum of requests.
+
+The following are limits that are applied when the sum of requests exceeds the limit within a `1hr` window.
+
+| Path                                                           | Description                                                                                                                                                                                                             |
+| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/auth/v1/signup`<br/> `/auth/v1/recover`<br/> `/auth/v1/user` | All endpoints that send emails. <br/> Defaults to `30 emails per hour`. <br/>Updated to `4 emails per hour` on 14th July 2023. Triggered when the sum of email send requests exceeds the set limit per hour. <br/><br/> |
+| `/auth/v1/otp`                                                 | All endpoints that send One-Time-Passwords (OTP). <br/>Defaults to `30 OTPs per hour`. <br/>Triggered when the sum of OTP requests exceeds the set limit per hour.<br/><br/>                                            |
+
+#### Limited by last sent request
+
+All of the following paths are limited by a `60s` window limit.
+
+| Path               | Description                                                                                                                                                                                                                                                                                                      |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/auth/v1/otp`     | Send OTPs or magiclinks. <br/>60 seconds window before a new request is allowed. <br/>Triggered if a new OTP/magiclink request is made within 60 seconds of the last request.<br/> Configuration Variable:`Rate limit for sending emails`, `Rate limit for sending SMS messages`. <br/> Limited by: Last request |
+| `/auth/v1/signup`  | Signup confirmation request. <br/>60 seconds window before a new request is allowed. <br/>Triggered if a new signup confirmation request is made within 60 seconds of the last request.<br/> Configuration Variable:`Rate limit for sending emails`. <br/> Limited by: Last request                              |
+| `/auth/v1/recover` | Password Reset Request. <br/>60 seconds window before a new request is allowed. <br/>Triggered if a new password reset request is made within 60 seconds of the last request.<br/> Configuration Variable:`Rate limit for sending emails`. <br/><br/> Limited by: Last request                                   |
+
+#### Rate limits applied for sum of requests.
+
+| Path                                                            | Description                                                                                                                                                                                                                                                                                                                          | Captcha Enforceable |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------- |
+| `/auth/v1/otp`                                                  | Send OTPs or magiclinks. <br/><br/>60 seconds window before a new request is allowed. <br/><br/>Triggered if a new OTP/magiclink request is made within 60 seconds of the last request.<br/><br/> Configuration Variable:`Rate limit for sending emails`, `Rate limit for sending SMS messages`. <br/><br/> Limited by: Last request | Yes                 |
+| `/auth/v1/signup`                                               | Signup confirmation request. <br/><br/>60 seconds window before a new request is allowed. <br/><br/>Triggered if a new signup confirmation request is made within 60 seconds of the last request.<br/><br/> Configuration Variable:`Rate limit for sending emails`. <br/><br/> Limited by: Last request                              | Yes                 |
+| `/auth/v1/recover`                                              | Password Reset Request. <br/><br/>60 seconds window before a new request is allowed. <br/><br/>Triggered if a new password reset request is made within 60 seconds of the last request.<br/><br/> Configuration Variable:`Rate limit for sending emails`. <br/><br/> Limited by: Last request                                        | Yes                 |
+| `/auth/v1/verify`                                               | Verification requests. <br/><br/>360 requests per hour (with bursts up to 30 requests). <br/><br/>Triggered when requests from a single IP exceed 360 per hour or 30 in a short burst.<br/><br/> Configuration Variable:`Rate limit for token verifications`. <br/><br/> Limited by: IP Address                                      | No                  |
+| `/auth/v1/token`                                                | Token refresh requests. <br/><br/>1800 requests per hour (with bursts up to 30 requests). <br/><br/>Triggered when token refresh requests from a single IP exceed 1800 per hour or 30 in a short burst.<br/><br/> Configuration Variable:`Rate limit for token refreshes`. <br/><br/> Limited by: IP Address                         | Yes                 |
+| `/auth/v1/factors/:id/challenge`, `/auth/v1/factors/:id/verify` | Create or Verify an MFA challenge. <br/><br/>15 requests per minute (with bursts up to 30 requests). <br/><br/>Triggered when MFA challenge/verify requests from a single IP exceed 15 per minute or 30 in a burst.<br/><br/> Configuration Variable:`Rate limit for token verifications`. <br/><br/> Limited by: IP Address         | No                  |
+
+| Path                                                           | Limit | Window   |
+| -------------------------------------------------------------- | ----- | -------- |
+| `/auth/v1/signup`<br/> `/auth/v1/recover`<br/> `/auth/v1/user` | `4`   | `1 hour` |
+| `/auth/v1/otp`                                                 | `30`  | `1 hour` |
+
 ### Realtime Quotas
 
 - Review the [Realtime quotas](/docs/guides/realtime/quotas).
