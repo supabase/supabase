@@ -23,7 +23,7 @@ We do not recommended Branching in a production environment while it is in Alpha
 
 ## How branching works
 
-Supabase branches work like Git branches. They let you create and test changes like new configurations and features in a separate, temporary environment without affecting your production setup. When you're ready to ship your changes, merge your branch to update your production instance with the new changes.
+Supabase Branching is similar to Git. You test changes in a separate, temporary environment without affecting your production setup. When you're ready to ship your changes, merge your branch to update your production instance with the new changes.
 
 You can run multiple Preview Branches for every Supabase project. Branches contain all the Supabase features with their own API credentials. Supabase Branching follows the [Trunk Based Development](https://trunkbaseddevelopment.com/) workflow, with one main Production branch and multiple development branches:
 
@@ -54,9 +54,7 @@ You can run multiple Preview Branches for every Supabase project. Branches conta
 
 ## Git providers
 
-To facilitate Supabase Branching, your Supabase project will be connected to a Git repository via an integration.
-
-Supabase Branching works with [GitHub](#branching-with-github). Future iterations may support other Git providers. If you are interested in other Git providers or a non-Git-based workflow, join the discussions for [GitLab Branching, BitBucket Branching, and non-Git based Branching](https://github.com/orgs/supabase/discussions/18936).
+To manage code changes, your Supabase project must be connected to a Git repository. At this stage we only support [GitHub](#branching-with-github). If you are interested in other Git providers, join the [discussion]((https://github.com/orgs/supabase/discussions/18936)) for GitLab, BitBucket, and non-Git based Branching.
 
 ### Branching with GitHub
 
@@ -101,22 +99,6 @@ Each time a commit is pushed with new migrations in the `./supabase/migrations` 
     <figcaption>New migration files trigger migrations on the preview instance.</figcaption>
 
 </figure>
-
-## Alternatives to branching
-
-If you don’t turn on branching, your Supabase project continues to work as a single branch, on a single instance. You have a single set of API keys for each project, and no preview instances are created. It's the Git equivalent of working directly on the `main` branch.
-
-If you prefer not to use branching, you can manage your environments and tests in other ways:
-
-1. ##### Host a project per environment, and test against a staging project
-
-   Create multiple projects on Supabase with the same schema. Use one project as a staging environment to test any changes. Then migrate tested changes to the production project.
-
-2. ##### Host a single production project, and test locally
-
-   Create a single project to host your production instance. Test any changes locally, then run the migrations against your hosted production project.
-
-You can also combine both strategies to perform both local and staging tests.
 
 ## How to use Supabase Branching
 
@@ -165,7 +147,7 @@ Follow the instructions below **before enabling Branching**.
 
 ##### If your migration files are already in GitHub, under `./supabase/migrations`:
 
-If your migration files are up to date with your production database, you don’t need to do anything. You can now turn on branching.
+If your migration files are up to date with your production database, you don't need to do anything. You can now turn on branching.
 
 ##### If you don't have migration files in GitHub:
 
@@ -228,13 +210,7 @@ Once your repository is [correctly prepared](#set-up-an-existing-project-for-bra
 
 <Admonition type="caution" label="Prepare your GitHub repository before enabling Branching">
 
-Before enabling Branching for your project, make sure your [GitHub repository is prepared](#set-up-an-existing-project-for-branching). If your repository doesn’t have all the migration files, your production branch could run an incomplete set of migrations.
-
-</Admonition>
-
-<Admonition type="note" label="Branching is early access only">
-
-Sign up for early access [here](https://forms.supabase.com/branching-request).
+Before enabling Branching for your project, make sure your [GitHub repository is prepared](#set-up-an-existing-project-for-branching). If your repository doesn't have all the migration files, your production branch could run an incomplete set of migrations.
 
 </Admonition>
 
@@ -242,7 +218,7 @@ Sign up for early access [here](https://forms.supabase.com/branching-request).
     <StepHikeCompact.Step step={1}>
         <StepHikeCompact.Details title="Select the project you want to use, then click `Enable branching`" fullWidth>
 
-            If you’re prompted to join the waitlist, click `Join waitlist`. Access will be expanded as branching graduates from alpha testing.
+            If you're prompted to join the waitlist, click `Join waitlist`. Access will be expanded as branching graduates from alpha testing.
 
             <figure className="max-w-[520px]">
             <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-opt-in-popover.jpg?v=1" />
@@ -252,15 +228,15 @@ Sign up for early access [here](https://forms.supabase.com/branching-request).
     </StepHikeCompact.Step>
 
     <StepHikeCompact.Step step={2}>
-        <StepHikeCompact.Details title="If you see the following dialog, you’re in the alpha testing group" fullWidth>
+        <StepHikeCompact.Details title="If you see the following dialog, you're in the alpha testing group" fullWidth>
 
             <figure className="max-w-[520px]">
                 <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-opt-in-install-github.jpg?v=1" />
             </figure>
 
-            If you don’t have the GitHub integration installed, click `Install GitHub Integration`. The integration is required to run migration files and the optional database seed file.
+            If you don't have the GitHub integration installed, click `Install GitHub Integration`. The integration is required to run migration files and the optional database seed file.
 
-            You’re taken to the GitHub integration page. Click `Install`.
+            You're taken to the GitHub integration page. Click `Install`.
 
             <figure className="max-w-[520px]">
                 <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-opt-in-install-github-permissions.jpg?v=1" />
@@ -278,13 +254,13 @@ Sign up for early access [here](https://forms.supabase.com/branching-request).
     </StepHikeCompact.Step>
 
     <StepHikeCompact.Step step={3}>
-        <StepHikeCompact.Details title="If you see the following dialog, you’re in the alpha testing group" fullWidth>
+        <StepHikeCompact.Details title="If you see the following dialog, you're in the alpha testing group" fullWidth>
 
             You should now see a popover with the GitHub Connection details shown.
 
             Type in the branch you want to use for production. The name of the branch will be validated to make sure it exists in your GitHub repository.
 
-            <Admonition type="caution" label="Your production branch can’t be changed while branching is enabled.">
+            <Admonition type="caution" label="Your production branch can't be changed while branching is enabled.">
 
             To change your production branch, you need to disable branching and re-enable it with a different branch.
 
@@ -350,7 +326,7 @@ Preview branches are automatically created for each pull request, but you can al
 
         <Admonition type="note" label="Only branches from the repository can be used to create a Preview Branch">
 
-            Git branches from external contributors currently can’t support a Preview Branch
+            Git branches from external contributors currently can't support a Preview Branch
 
         </Admonition>
 
@@ -376,15 +352,15 @@ The GitHub integration watches for changes in the `migrations` directory. When i
 
 You can create new migrations either [locally](#develop-locally) or [remotely](#develop-remotely).
 
-Local development is recommended for developers familiar with the Supabase CLI, who want to test changes on their local machine. Remote development is recommended if you don’t want to run Supabase locally, or if you want to collaborate with team members via the dashboard interface.
+Local development is recommended for developers familiar with the Supabase CLI, who want to test changes on their local machine. Remote development is recommended if you don't want to run Supabase locally, or if you want to collaborate with team members via the dashboard interface.
 
 #### Develop locally
 
-You can develop locally by running Supabase on your local machine. You’ll have a database running locally, and another database running remotely on the preview branch.
+You can develop locally by running Supabase on your local machine. You'll have a database running locally, and another database running remotely on the preview branch.
 
-You can experiment on your local database by [writing SQL migrations yourself](https://supabase.com/docs/guides/cli/local-development#database-migrations). You can also [auto-generate migration files by using Supabase’s local studio](https://supabase.com/docs/guides/cli/local-development#diffing-changes) and the `supabase db-diff` command.
+You can experiment on your local database by [writing SQL migrations yourself](https://supabase.com/docs/guides/cli/local-development#database-migrations). You can also [auto-generate migration files by using Supabase's local studio](https://supabase.com/docs/guides/cli/local-development#diffing-changes) and the `supabase db-diff` command.
 
-Once you’re confident in your migration files, push your changes to your remote GitHub repository to update the preview branch.
+Once you're confident in your migration files, push your changes to your remote GitHub repository to update the preview branch.
 
 To create and push local migrations:
 
@@ -509,11 +485,11 @@ To create and push local migrations:
 
             Your migration changes will now run on the remote Preview Branch.
 
-            Supabase’s GitHub integration detects the new migration and runs it against the branch instance.
+            Supabase's GitHub integration detects the new migration and runs it against the branch instance.
 
             It can take up to 10 minutes for migrations to be applied. If you have a PR for your branch, errors are reflected in the GitHub check run status and in a PR comment.
 
-            If you need to reset your database to a clean state (that is, discard any changes that aren’t reflected in the migration files), run `supabase db reset` locally. Then, delete the preview branch and recreate it.
+            If you need to reset your database to a clean state (that is, discard any changes that aren't reflected in the migration files), run `supabase db reset` locally. Then, delete the preview branch and recreate it.
 
      </StepHikeCompact.Details>
 
@@ -527,7 +503,7 @@ As an alternative to developing locally, you can make changes on your remote Sup
 
 <Admonition type="note" label="Changes must be locally pulled and committed to keep your GitHub repository state in sync.">
 
-Dashboard changes aren’t automatically reflected in your repository. If you’d like to see automatic syncing in a future release, [join the discussion](https://github.com/orgs/supabase/discussions/18937).
+Dashboard changes aren't automatically reflected in your repository. If you'd like to see automatic syncing in a future release, [join the discussion](https://github.com/orgs/supabase/discussions/18937).
 
 </Admonition>
 
@@ -600,7 +576,7 @@ Dashboard changes aren’t automatically reflected in your repository. If you’
 
 ### Open a pull request
 
-When you open a pull request on GitHub, the Supabase integration automatically checks for a matching preview branch. If one doesn’t exist, it gets created.
+When you open a pull request on GitHub, the Supabase integration automatically checks for a matching preview branch. If one doesn't exist, it gets created.
 
 A comment is added to your PR with the deployment status of your preview branch. Statuses are shown separately for Database, Services, and APIs.
 
@@ -610,11 +586,11 @@ A comment is added to your PR with the deployment status of your preview branch.
   <figcaption>Supabase GitHub integration will comment on your PR with the status of your Preview Branch, including whether migrations have successfully run.</figcaption>
 </figure>
 
-Every time a new commit is pushed that changes the migration files in `./supabase/migrations`, the new migrations are run against the preview branch. You can check the status of these runs in the comment’s Tasks table.
+Every time a new commit is pushed that changes the migration files in `./supabase/migrations`, the new migrations are run against the preview branch. You can check the status of these runs in the comment's Tasks table.
 
 #### GitHub required check setting
 
-We highly recommend turning on a ‘required check’ for the Supabase integration. You can do this from your GitHub repository settings.
+We highly recommend turning on a ‘required check' for the Supabase integration. You can do this from your GitHub repository settings.
 
 This prevents PRs from being merged when migration checks fail, and stops invalid migrations from being merged into your production branch.
 
@@ -636,7 +612,7 @@ The preview branch has a record of which migrations have been applied, and only 
 
 ### Rolling back migrations
 
-You might want to roll back changes you’ve made in an earlier migration change. For example, you may have pushed a migration file containing schema changes you no longer want.
+You might want to roll back changes you've made in an earlier migration change. For example, you may have pushed a migration file containing schema changes you no longer want.
 
 To fix this, push your latest changes, then delete the preview branch in Supabase and reopen it.
 
@@ -662,13 +638,13 @@ To check the error message, see the Supabase integration comment on your PR.
 
 If you have multiple preview branches, each preview branch might contain different schema changes. This is similar to Git branches, where each branch might contain different code changes.
 
-When a preview branch is merged into the production branch, it creates a schema drift between the production branch and the preview branches you haven’t merged yet.
+When a preview branch is merged into the production branch, it creates a schema drift between the production branch and the preview branches you haven't merged yet.
 
 You can solve thse conflicts the way you would solve normal Git Conflicts: merge or rebase from your production Git branch to your preview Git branch. Since migrations are applied sequentially, ensure that migration files are timestamped correctly after the rebase. Changes that build on top of earlier changes should always have later timestamps.
 
 ### Changing Production Branch
 
-It’s not possible to change the Git branch used as the Production branch for Supabase Branching. The only way to change it is to disable and re-enable branching. See [Disable Branching](#disable-branching).
+It's not possible to change the Git branch used as the Production branch for Supabase Branching. The only way to change it is to disable and re-enable branching. See [Disable Branching](#disable-branching).
 
 ## Branching and hosting providers
 
@@ -687,7 +663,7 @@ With the Supabase branching integration, you can sync the Git branch used by the
 Install the Vercel integration:
 
 - From the [Vercel marketplace](https://vercel.com/integrations/supabase-v2) or
-- By clicking the blue `Deploy` button in a Supabase example app’s `README` file
+- By clicking the blue `Deploy` button in a Supabase example app's `README` file
 
 <Admonition type="note" label="Vercel GitHub integration also required.">
 
@@ -699,11 +675,28 @@ Supabase automatically updates your Vercel project with the correct environment 
 
 ### Netlify
 
-A Netlify integration is under consideration. If you’re interested in branching with Netlify, [join the GitHub discussion](https://github.com/orgs/supabase/discussions/18938).
+A Netlify integration is under consideration. If you're interested in branching with Netlify, [join the GitHub discussion](https://github.com/orgs/supabase/discussions/18938).
+
+## Alternatives to branching
+
+If you don't turn on branching, your Supabase project continues to work as a single branch, on a single instance. You have a single set of API keys for each project, and no preview instances are created. It's the Git equivalent of working directly on the `main` branch.
+
+If you prefer not to use branching, you can manage your environments and tests in other ways:
+
+1. ##### Host a project per environment, and test against a staging project
+
+   Create multiple projects on Supabase with the same schema. Use one project as a staging environment to test any changes. Then migrate tested changes to the production project.
+
+2. ##### Host a single production project, and test locally
+
+   Create a single project to host your production instance. Test any changes locally, then run the migrations against your hosted production project.
+
+You can also combine both strategies to perform both local and staging tests.
+
 
 ## Feedback
 
-Supabase branching is a new and exciting new part of the Supabase development ecosystem. We’re monitoring its success and open to any feedback.
+Supabase branching is a new and exciting new part of the Supabase development ecosystem. We're monitoring its success and open to any feedback.
 
 You can join the [conversation over in GitHub discussions](https://github.com/orgs/supabase/discussions/18937).
 
