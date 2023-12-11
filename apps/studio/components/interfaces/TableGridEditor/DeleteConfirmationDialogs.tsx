@@ -17,7 +17,7 @@ import { useGetTables } from 'data/tables/tables-query'
 import { useStore, useUrlState } from 'hooks'
 import { TableLike } from 'hooks/misc/useTable'
 import { noop } from 'lib/void'
-import { getImpersonatedRole } from 'state/role-impersonation-state'
+import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 
 export type DeleteConfirmationDialogsProps = {
@@ -195,6 +195,8 @@ const DeleteConfirmationDialogs = ({
       snap.closeConfirmationDialog()
     }
   }
+
+  const getImpersonatedRole = useGetImpersonatedRole()
 
   const onConfirmDeleteRow = async () => {
     if (!project) return console.error('Project ref is required')
