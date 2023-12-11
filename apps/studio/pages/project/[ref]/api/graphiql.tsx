@@ -15,7 +15,7 @@ import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-co
 import { useStore } from 'hooks'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { getRoleImpersonationJWT } from 'lib/role-impersonation'
-import { getImpersonatedRole } from 'state/role-impersonation-state'
+import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { NextPageWithLayout } from 'types'
 
 const GraphiQLPage: NextPageWithLayout = () => {
@@ -44,6 +44,8 @@ const GraphiQLPage: NextPageWithLayout = () => {
       meta.extensions.load()
     }
   }, [ui.selectedProjectRef])
+
+  const getImpersonatedRole = useGetImpersonatedRole()
 
   const fetcher = useMemo(() => {
     const fetcherFn = createGraphiQLFetcher({
@@ -78,7 +80,7 @@ const GraphiQLPage: NextPageWithLayout = () => {
     }
 
     return customFetcher
-  }, [projectRef, jwtSecret, accessToken, serviceRoleKey])
+  }, [projectRef, getImpersonatedRole, jwtSecret, accessToken, serviceRoleKey])
 
   if ((IS_PLATFORM && !accessToken) || !isFetched || (isExtensionsLoading && !pgGraphqlExtension)) {
     return <Connecting />

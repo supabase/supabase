@@ -31,8 +31,7 @@ import useEntityType from 'hooks/misc/useEntityType'
 import { TableLike } from 'hooks/misc/useTable'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { EMPTY_ARR } from 'lib/void'
-import { useAppStateSnapshot } from 'state/app-state'
-import { getImpersonatedRole } from 'state/role-impersonation-state'
+import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { SchemaView } from 'types'
 import GridHeaderActions from './GridHeaderActions'
@@ -58,9 +57,10 @@ const TableGridEditor = ({
   const { ref: projectRef, id } = useParams()
 
   const { project } = useProjectContext()
-  const appSnap = useAppStateSnapshot()
   const snap = useTableEditorStateSnapshot()
   const gridRef = useRef<SupabaseGridRef>(null)
+
+  const getImpersonatedRole = useGetImpersonatedRole()
 
   const [encryptedColumns, setEncryptedColumns] = useState([])
 

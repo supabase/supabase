@@ -29,6 +29,7 @@ import { useSqlGenerateMutation } from 'data/ai/sql-generate-mutation'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useFormatQueryMutation } from 'data/sql/format-sql-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
@@ -46,8 +47,9 @@ import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import Telemetry from 'lib/telemetry'
+import toast from 'react-hot-toast'
 import { useAppStateSnapshot } from 'state/app-state'
-import { getImpersonatedRole } from 'state/role-impersonation-state'
+import { isRoleImpersonationEnabled, useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
@@ -66,8 +68,6 @@ import {
   getDiffTypeDropdownLabel,
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import toast from 'react-hot-toast'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
@@ -289,6 +289,8 @@ const SQLEditor = () => {
     }
   }, [formatQuery, id, isDiffOpen, project, snap])
 
+  const getImpersonatedRole = useGetImpersonatedRole()
+
   const executeQuery = useCallback(
     async (force: boolean = false) => {
       if (isDiffOpen) return
@@ -323,6 +325,7 @@ const SQLEditor = () => {
           setLineHighlights([])
         }
 
+        const impersonatedRole = getImpersonatedRole()
         const connectionString = !readReplicasEnabled
           ? project.connectionString
           : databases?.find((db) => db.identifier === snap.selectedDatabaseId)?.connectionString
@@ -335,12 +338,23 @@ const SQLEditor = () => {
           connectionString: connectionString,
           sql: wrapWithRoleImpersonation(sql, {
             projectRef: project.ref,
-            role: getImpersonatedRole(),
+            role: impersonatedRole,
           }),
+          isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
         })
       }
     },
-    [isDiffOpen, id, isExecuting, project, execute, setAiTitle, hasHipaaAddon, supabaseAIEnabled]
+    [
+      isDiffOpen,
+      id,
+      isExecuting,
+      project,
+      supabaseAIEnabled,
+      hasHipaaAddon,
+      execute,
+      getImpersonatedRole,
+      setAiTitle,
+    ]
   )
 
   const handleNewQuery = useCallback(

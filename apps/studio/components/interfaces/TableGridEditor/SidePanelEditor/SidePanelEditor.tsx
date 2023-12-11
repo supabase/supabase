@@ -14,7 +14,7 @@ import { useTableRowCreateMutation } from 'data/table-rows/table-row-create-muta
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
 import { tableKeys } from 'data/tables/keys'
 import { useStore, useUrlState } from 'hooks'
-import { getImpersonatedRole } from 'state/role-impersonation-state'
+import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { ColumnEditor, RowEditor, SpreadsheetImport, TableEditor } from '.'
 import ForeignRowSelector from './RowEditor/ForeignRowSelector/ForeignRowSelector'
@@ -67,6 +67,8 @@ const SidePanelEditor = ({
       ui.setNotification({ category: 'success', message: 'Successfully updated row' })
     },
   })
+
+  const getImpersonatedRole = useGetImpersonatedRole()
 
   const saveRow = async (
     payload: any,
