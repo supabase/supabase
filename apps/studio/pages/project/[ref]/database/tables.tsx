@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 
 import { ColumnList, TableList } from 'components/interfaces/Database'
@@ -60,4 +59,4 @@ const DatabaseTables: NextPageWithLayout = () => {
 
 DatabaseTables.getLayout = (page) => <DatabaseLayout title="Database">{page}</DatabaseLayout>
 
-export default observer(DatabaseTables)
+export default DatabaseTables

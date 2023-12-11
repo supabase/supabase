@@ -1,4 +1,4 @@
-import type { PostgresColumn, PostgresTable, PostgresType } from '@supabase/postgres-meta'
+import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { useParams } from 'common'
 import { isEmpty, noop } from 'lodash'
 import Link from 'next/link'
@@ -21,8 +21,9 @@ import { Dictionary } from 'components/grid'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
+import { usePostgresTypesQuery } from 'data/database/types-query'
 import { useStore } from 'hooks'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
 import { ForeignKeySelector } from '..'
 import ActionBar from '../ActionBar'
 import { TEXT_TYPES } from '../SidePanelEditor.constants'
@@ -44,8 +45,6 @@ import {
 import ColumnForeignKey from './ColumnForeignKey'
 import ColumnType from './ColumnType'
 import HeaderTitle from './HeaderTitle'
-import { toJS } from 'mobx'
-import { usePostgresTypesQuery } from 'data/database/types-query'
 
 export interface ColumnEditorProps {
   column?: PostgresColumn
@@ -85,7 +84,7 @@ const ColumnEditor = ({
     connectionString: project?.connectionString,
   })
   const enumTypes = (types ?? []).filter(
-    (type) => !EXCLUDED_SCHEMAS.filter((x) => x !== 'extensions').includes(type.schema)
+    (type) => !EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS.includes(type.schema)
   )
 
   const { data } = useForeignKeyConstraintsQuery({
