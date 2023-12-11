@@ -40,7 +40,6 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
   const { ui } = useStore()
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
-  console.log(snap)
 
   const isActive = Number(id) === entity.id
   const formatTooltipText = (entityType: string) => {
