@@ -625,7 +625,7 @@ This prevents PRs from being merged when migration checks fail, and stops invali
 
 You can disable branching at any time. Navigate to the [Branches](https://supabase.green/dashboard/project/_/branches) page, which can be found via the Branches dropdown menu on the top navigation, then click "Manage Branches" in the menu. Click the 'Disable branching' button at the top of the Overview section.
 
-## Migration and seeding behavior
+## Migration and seeding behaviour
 
 Migrations are run in sequential order. Each migration builds upon the previous one.
 
@@ -639,7 +639,7 @@ To fix this, push your latest changes, then delete the preview branch in Supabas
 
 The new preview branch is reseeded from your `./supabase/seed.sql` file. Any additional data changes you made on the old preview branch are lost. This is equivalent to running `supabase db reset` locally. All migrations are rerun in sequential order.
 
-### Seeding behavior
+### Seeding behaviour
 
 Your Preview Branches are seeded with sample data from the file `./supabase/seed.sql`.
 
