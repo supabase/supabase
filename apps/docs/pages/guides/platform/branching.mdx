@@ -7,7 +7,6 @@ export const meta = {
   subtitle: 'Use Supabase Branches to test and preview changes',
 }
 
-
 Use branching to safely and easily experiment with changes to your Supabase projects.
 
 <Admonition type="caution" label="Branching is an Alpha feature, available on the Pro Plan and above.">
@@ -19,7 +18,6 @@ We do not recommended Branching in a production environment while it is in Alpha
 - Central EU (Frankfurt)
 
 </Admonition>
-
 
 ## How branching works
 
@@ -54,7 +52,7 @@ You can run multiple Preview Branches for every Supabase project. Branches conta
 
 ## Git providers
 
-To manage code changes, your Supabase project must be connected to a Git repository. At this stage we only support [GitHub](#branching-with-github). If you are interested in other Git providers, join the [discussion]((https://github.com/orgs/supabase/discussions/18936)) for GitLab, BitBucket, and non-Git based Branching.
+To manage code changes, your Supabase project must be connected to a Git repository. At this stage we only support [GitHub](#branching-with-github). If you are interested in other Git providers, join the [discussion](<(https://github.com/orgs/supabase/discussions/18936)>) for GitLab, BitBucket, and non-Git based Branching.
 
 ### Branching with GitHub
 
@@ -228,7 +226,9 @@ Before enabling Branching for your project, make sure your [GitHub repository is
     </StepHikeCompact.Step>
 
     <StepHikeCompact.Step step={2}>
-        <StepHikeCompact.Details title="If you see the following dialog, you're in the alpha testing group" fullWidth>
+        <StepHikeCompact.Details title="Install the GitHub integration" fullWidth>
+
+            If you have been granted early access, once when clicking `Enable branching` you will see the following dialog:
 
             <figure className="max-w-[520px]">
                 <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-opt-in-install-github.jpg?v=1" />
@@ -692,7 +692,6 @@ If you prefer not to use branching, you can manage your environments and tests i
    Create a single project to host your production instance. Test any changes locally, then run the migrations against your hosted production project.
 
 You can also combine both strategies to perform both local and staging tests.
-
 
 ## Feedback
 
