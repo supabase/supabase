@@ -208,7 +208,7 @@ export const REFERENCES: References = {
   kotlin: {
     name: 'Kotlin',
     library: 'supabase-kt',
-    versions: ['v1'],
+    versions: ['v2', 'v1'],
     icon: '/docs/img/libraries/kotlin-icon.svg',
   },
   cli: {
@@ -1624,7 +1624,14 @@ export const reference_swift_v1 = {
   parent: '/reference',
 }
 
-export const reference_kotlin_v0 = {
+export const reference_kotlin_v1 = {
+  icon: 'reference-kotlin',
+  title: 'kotlin',
+  url: 'guides/reference/kotlin',
+  parent: '/reference',
+}
+
+export const reference_kotlin_v2 = {
   icon: 'reference-kotlin',
   title: 'kotlin',
   url: 'guides/reference/kotlin',
@@ -1754,7 +1761,7 @@ export const references = [
       },
       {
         label: 'supabase-kt',
-        versions: ['v0'],
+        versions: ['v2', 'v1'],
         description: 'something about the reference',
         icon: '/docs/img/icons/kotlin-icon.svg',
         url: '/reference/kotlin/start',
