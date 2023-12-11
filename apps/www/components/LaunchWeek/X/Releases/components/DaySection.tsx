@@ -6,6 +6,7 @@ import { useBreakpoint } from 'common'
 import { IconEdit2, cn } from 'ui'
 import CountdownComponent from '../../Countdown'
 import Link from 'next/link'
+import { ArrowRightIcon } from '@heroicons/react/outline'
 
 const DaySection = ({ day }: { day: WeekDayProps }) => {
   const isTablet = useBreakpoint(1023)
@@ -21,7 +22,7 @@ const DaySection = ({ day }: { day: WeekDayProps }) => {
         <div
           className={cn(
             'text-sm inline uppercase font-mono text-foreground-muted tracking-[0.1rem]',
-            day.shipped || (day.hasCountdown && 'text-foreground')
+            (day.shipped || day.hasCountdown) && 'text-foreground'
           )}
         >
           {day.dd}, {day.date}
@@ -30,7 +31,7 @@ const DaySection = ({ day }: { day: WeekDayProps }) => {
           <ul className="flex-1 h-full w-full justify-end grid grid-cols-2 md:flex flex-col gap-1">
             {day.links?.map((link) => (
               <li key={link.href}>
-                <DayLink {...link}></DayLink>
+                <DayLink {...link} />
               </li>
             ))}
           </ul>
@@ -66,17 +67,21 @@ const DaySection = ({ day }: { day: WeekDayProps }) => {
           <Link
             href={day.blog!}
             className={cn(
-              `min-h-[210px] aspect-[3.67/1] relative overflow-hidden flex-1 flex flex-col justify-between
+              `min-h-[210px] group aspect-[3.67/1] relative overflow-hidden flex-1 flex flex-col justify-between
               bg-[#111415] hover:bg-[#121516] hover:border-strong transition-colors border border-muted
               rounded-xl p-4 sm:p-6 md:p-8 text-2xl bg-contain shadow-lg`,
               cssGroup
             )}
           >
             <div className="flex-grow flex flex-col items-start justify-between gap-2 w-full xl:w-2/3 text-left">
-              <div className="flex items-center gap-2 text-sm">
-                <IconEdit2 className="w-4" /> Blog post
+              <div className="relative w-full flex items-center gap-2 text-sm translate-x-0 !ease-[.24,0,.22,.99] duration-200 group-hover:-translate-x-6 transition-transform">
+                <IconEdit2 className="w-4 min-w-4 group-hover:opacity-0 transition-opacity" />
+                <span className="">Blog post</span>
+                <ArrowRightIcon className="w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
-              <h2 className="text-lg leading-7">{day.description}</h2>
+              <h2 className="text-lg leading-7 [&_strong]:font-normal [&_strong]:text-foreground">
+                {day.description}
+              </h2>
             </div>
             {day.steps[0]?.bg_layers &&
               day.steps[0]?.bg_layers?.map(

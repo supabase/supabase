@@ -2,7 +2,7 @@ import { ReactNode } from 'react'
 
 const images = {}
 
-type StepLinkType = 'productHunt' | 'video' | 'docs' | 'xSpace'
+type StepLinkType = 'productHunt' | 'video' | 'docs' | 'xSpace' | 'blog'
 
 export interface StepLink {
   type: StepLinkType
@@ -56,32 +56,37 @@ export const endOfLW8 = '2023-12-15T23:59:59.999-08:00'
 const days: WeekDayProps[] = [
   {
     id: 'day-1',
-    title: 'Read Replicas',
-    shipped: false,
-    // isToday: true,
-    blog: '',
+    title: 'Supabase Studio',
+    shipped: true,
+    isToday: true,
+    blog: '/blog/studio-introducing-assistant',
     hasCountdown: true,
     date: '11 Dec',
     published_at: '2023-12-11T08:00:00.000-08:00',
-    description: null,
+    description: (
+      <>
+        Supabase Studio: introducing an <strong>AI Assistant</strong>,{' '}
+        <strong>Postgres roles</strong>, and <strong>user impersonation</strong>
+      </>
+    ),
     d: 1,
     dd: 'Mon',
     links: [
+      // {
+      //   type: 'productHunt',
+      //   href: 'https://www.producthunt.com/',
+      // },
       {
-        type: 'productHunt',
-        href: 'https://www.producthunt.com/',
+        type: 'blog',
+        href: 'https://supabase.com/docs',
       },
       {
         type: 'video',
-        href: 'https://www.youtube.com/',
+        href: '123',
       },
       {
         type: 'xSpace',
         href: 'https://twitter.com/home',
-      },
-      {
-        type: 'docs',
-        href: 'https://supabase.com/docs',
       },
     ],
     steps: [
