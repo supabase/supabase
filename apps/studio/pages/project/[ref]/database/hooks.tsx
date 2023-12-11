@@ -13,7 +13,7 @@ import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import NoPermission from 'components/ui/NoPermission'
 import { useHooksEnableMutation } from 'data/database/hooks-enable-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions, usePermissionsLoaded, useStore } from 'hooks'
 import { NextPageWithLayout } from 'types'
 import { IconLoader } from 'ui'
 
@@ -39,6 +39,7 @@ const HooksPage: NextPageWithLayout = () => {
   const isHooksEnabled = schemas?.some((schema) => schema.name === 'supabase_functions')
   const canReadWebhooks = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'triggers')
   const canCreateWebhooks = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
+  const isPermissionsLoaded = usePermissionsLoaded()
 
   const { mutate: enableHooks, isLoading: isEnablingHooks } = useHooksEnableMutation({
     onSuccess: () => {
@@ -74,7 +75,7 @@ const HooksPage: NextPageWithLayout = () => {
     setShowDeleteHookForm(true)
   }
 
-  if (!canReadWebhooks) {
+  if (isPermissionsLoaded && !canReadWebhooks) {
     return <NoPermission isFullPage resourceText="view database webhooks" />
   }
 
