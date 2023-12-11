@@ -381,9 +381,9 @@ To create and push local migrations:
     <StepHikeCompact.Step step={1}>
         <StepHikeCompact.Details title="Make schema changes locally." fullWidth>
 
-            If you haven't already started your local Supabase environment, in your terminal run:
+            If you haven't already started your local Supabase environment, in the terminal run:
 
-           ```bash
+            ```bash
             supabase start
             ```
 
@@ -399,15 +399,15 @@ To create and push local migrations:
 
             Once you are confident with your changes, you can create a new migration file.
 
-            We can compare the current state of your database with the state of your migrations directory to generate a new migration file.
+            We can compare the current state of your database with the state of your migrations directory to generate a new migration file. Run the following in the terminal:
 
             ```bash
-            supabase db diff -f "new_feature"
+            supabase db diff -f "add_employees_table"
             ```
 
-            This will create a SQL file called `./supabase/migrations/[timestamp]_new_feature.sql`, and it will contain the SQL statements to make your database schema match the current state of your database.
+            This will create a SQL file called `./supabase/migrations/[timestamp]add_employees_table.sql`, and it will contain the SQL statements to make your database schema match the current state of your database. The SQL in this file will reflect what changes you made in your local dashboard. In this example, we've created a new table called `employees`.
 
-            ```sql 20231127222412_new_feature.sql
+            ```sql 20231127222412_add_employees_table.sql
             create table employees (
             id integer primary key generated always as identity,
                 name text
@@ -422,24 +422,29 @@ To create and push local migrations:
 
             _If you don't want to make further changes, proceed to step 5._
 
-            You can manually edit the new migration file. 
+            You can manually edit the new migration file to make further changes. 
+
             For example, you may choose to use a different name for the table.
 
-            ```sql
-            -- we have updated the table name to `colleagues`
+            ```sql sql 20231127222412_add_colleagues_table.sql
+            -- We have updated the table name to `colleagues`
             create table colleagues (
             id integer primary key generated always as identity,
                 name text
             )
+
+            -- We have also updated the name of the SQL file to `add_colleagues_table`
             ```
 
-            Then we can run `db reset`.
+            Then we can run `db reset` in the terminal:
 
             ```bash
             supabase db reset
             ```
 
-            This will reset the database and run all the migrations again. The local dashboard at [http://localhost:54323](http://localhost:54323) will reflect the new changes you made.
+            This will reset the database and run all the migrations again. 
+            
+            The local dashboard at [http://localhost:54323](http://localhost:54323) will reflect the new changes you made.
 
         </StepHikeCompact.Details>
     </StepHikeCompact.Step>
@@ -449,7 +454,9 @@ To create and push local migrations:
 
             _If you don't want to make further changes, proceed to step 5._
         
-            You may also want to make changes in the dashboard instead. Go to the local dashboard at [http://localhost:54323](http://localhost:54323) and make the changes you want.
+            You can edit your database in your local dashboard to make further changes. 
+            
+            Go to the local dashboard at [http://localhost:54323](http://localhost:54323) and make the changes you want.
 
             Once you've made the schema changes you want, you can either:
             
@@ -464,6 +471,8 @@ To create and push local migrations:
 
             Commit and push your migration file to your remote GitHub repository.
 
+            You can commit and push your changes using the command line, or your preferred Git client. For example, in the terminal run: 
+
             ```bash
             git add supabase/migrations
             git commit -m "Add employees table"
@@ -472,17 +481,17 @@ To create and push local migrations:
 
             Your migration changes will now run on the remote Preview Branch.
 
+            Supabase’s GitHub integration detects the new migration and runs it against the branch instance.
+
+            It can take up to 10 minutes for migrations to be applied. If you have a PR for your branch, errors are reflected in the GitHub check run status and in a PR comment.
+
+            If you need to reset your database to a clean state (that is, discard any changes that aren’t reflected in the migration files), run `supabase db reset` locally. Then, delete the preview branch and recreate it.
+
      </StepHikeCompact.Details>
 
  </StepHikeCompact.Step>
 
 </StepHikeCompact>
-
-Supabase’s GitHub integration detects the new migration and runs it against the branch instance.
-
-It can take up to 10 minutes for migrations to be applied. If you have a PR for your branch, errors are reflected in the GitHub check run status and in a PR comment.
-
-If you need to reset your database to a clean state (that is, discard any changes that aren’t reflected in the migration files), run `supabase db reset` locally. Then, delete the preview branch and recreate it.
 
 #### Develop remotely
 
@@ -522,7 +531,8 @@ Dashboard changes aren’t automatically reflected in your repository. If you’
 
         You may already know the password for this Preview branch, if so, continue to next step.
 
-        If you don't know the password, you must Reset the database password so you know the password. Navigate to `https://supabase.com/dashboard/project/[branch-ref]/settings/database` and click **Reset database password**.
+        If you don't know the password, you must Reset the database password so you know the password. Go to the [database setting page](https://supabase.com/dashboard/project/_/settings/database) and click `Reset database password`.
+        
         Save the new password securely for use in the next step.
 
         </StepHikeCompact.Details>
@@ -532,7 +542,9 @@ Dashboard changes aren’t automatically reflected in your repository. If you’
         <StepHikeCompact.Details title="Pull changes from remote database." fullWidth>
 
          In your terminal, navigate to the directory for your Supabase project.
+
          Use the Supabase client to pull changes from your branch to your local migrations directory.
+
          Make sure to use the database URL for your branch.
 
         ```bash
@@ -545,9 +557,9 @@ Dashboard changes aren’t automatically reflected in your repository. If you’
      <StepHikeCompact.Step step={5}>
         <StepHikeCompact.Details title="Commit and push your migration file." fullWidth>
 
-         No new migrations are run. This is expected, because your database is already up-to-date,
-         based on the changes you made in the dashboard.
-         But this ensures that your migration files are in GitHub, so they can be correctly merged into production.
+         No new migrations are run on your remote Preview Branch. 
+         
+         This is expected, because your database is already up-to-date, based on the changes you made in the dashboard. But this ensures that your migration files are in GitHub, so they can be correctly merged into production.
 
         </StepHikeCompact.Details>
     </StepHikeCompact.Step>
