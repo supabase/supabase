@@ -69,11 +69,11 @@ async function signInWithDiscord() {
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
-When your user signs in, call [loginWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Discord` as the `Provider`:
+When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Discord` as the `Provider`:
 
 ```kotlin
 suspend fun signInWithDiscord() {
-	supabase.gotrue.loginWith(Discord)
+	supabase.auth.signInWith(Discord)
 }
 ```
 
@@ -106,7 +106,7 @@ When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) t
 
 ```kotlin
 suspend fun signOut() {
-	supabase.gotrue.logout()
+	supabase.auth.signOut()
 }
 ```
 
