@@ -34,7 +34,7 @@ export const AIPolicyHeader = ({
         <SheetTitle_Shadcn_ className="truncate">
           {selectedPolicy !== undefined
             ? `Update policy: ${selectedPolicy.name}`
-            : 'Create a new row level security policy'}
+            : 'Create a new Row Level Security policy'}
         </SheetTitle_Shadcn_>
       </div>
       <Button
