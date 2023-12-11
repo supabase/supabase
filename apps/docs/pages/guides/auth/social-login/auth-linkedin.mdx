@@ -78,11 +78,11 @@ async function signInWithLinkedIn() {
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
-When your user signs in, call [loginWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `LinkedIn` as the `Provider`:
+When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `LinkedIn` as the `Provider`:
 
 ```kotlin
 suspend fun signInWithKaLinkedIn() {
-	supabase.gotrue.loginWith(LinkedIn)
+	supabase.auth.signInWith(LinkedIn)
 }
 ```
 
@@ -113,7 +113,7 @@ When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) t
 
 ```kotlin
 suspend fun signOut() {
-	supabase.gotrue.logout()
+	supabase.auth.signOut()
 }
 ```
 
