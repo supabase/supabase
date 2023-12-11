@@ -106,6 +106,7 @@ export const DayLink = ({ type, icon, text, href = '', className }: DayLink) => 
   const isTargetBlank = () => {
     switch (type) {
       case 'productHunt':
+      case 'xSpace':
       case 'docs':
         return true
     }
