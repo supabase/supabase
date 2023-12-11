@@ -164,9 +164,13 @@ Use the Next.js example template to try out branching. This template includes sa
 
 Run the following command in your terminal to clone the example:
 
+<CH.Code lineNumbers={false}>
+
 ```bash
 npx create-next-app -e with-supabase
 ```
+
+</CH.Code>
 
 Push your new project to a GitHub repo. For more information, see the GitHub guides on [creating](https://docs.github.com/en/get-started/quickstart/create-a-repo) and [pushing code](https://docs.github.com/en/get-started/using-git/pushing-commits-to-a-remote-repository) to a new repository.
 
@@ -174,11 +178,11 @@ Push your new project to a GitHub repo. For more information, see the GitHub gui
 
 Before enabling branching on an existing project, make sure your database-related files are up to date. You need a current snapshot of your existing database, so newer migration files have a foundation to run on top of.
 
-<Admonition type="caution" label="Get set up before turning on branching">
+<Admonition type="caution" label="Get set up before enabling Branching">
 
 Setting up the initial state incorrectly can cause migrations to be wrongly applied.
 
-Follow the instructions below **before turning on Supabase branching**.
+Follow the instructions below **before enabling Branching**.
 
 </Admonition>
 
@@ -190,33 +194,63 @@ If your migration files are up to date with your production database, you don’
 
 You need to take a snapshot of your database. Log into Supabase from the [command line client](/docs/guides/cli) and pull the relevant files. Then commit them to GitHub:
 
-1. Inside your project directory, initialize your configuration for Supabase local development:
+<StepHikeCompact>
+    <StepHikeCompact.Step step={1}>
+        <StepHikeCompact.Details title="Inside your project directory, initialize your configuration for Supabase local development:" fullWidth>
 
-   ```bash
-   supabase init
-   ```
+            <CH.Code lineNumbers={false}>
 
-2. Pull down database-related files. You can find your database URL in your [database settings](https://supabase.com/dashboard/project/_/settings/database), under the URI tab of the Connection String settings panel. It will look something like `postgresql://username:password@db.ref.supabase.co:5432/postgres`
+            ```bash
+            supabase init
+            ```
 
-   ```bash
-   supabase db pull --db-url <db_url>
-   ```
+            </CH.Code>
+        </StepHikeCompact.Details>
+    </StepHikeCompact.Step>
 
-3. Commit the `supabase` directory to Git, and push your changes to your remote repository.
+    <StepHikeCompact.Step step={2}>
+        <StepHikeCompact.Details title="Pull down database-related files" fullWidth>
 
-   ```bash
-   git add supabase
-   git commit -m "Initial migration"
-   git push
-   ```
+            You can find your database URL in your [database settings](https://supabase.com/dashboard/project/_/settings/database), under the URI tab of the Connection String settings panel. It will look something like `postgresql://username:password@db.ref.supabase.co:5432/postgres`
+
+            <CH.Code lineNumbers={false}>
+
+            ```bash
+            supabase db pull --db-url <db_url>
+            ```
+
+            </CH.Code>
+
+        </StepHikeCompact.Details>
+    </StepHikeCompact.Step>
+
+    <StepHikeCompact.Step step={3}>
+        <StepHikeCompact.Details title="Commit the `supabase` directory to Git" fullWidth>
+
+            Commit the `supabase` directory to Git, and push your changes to your remote repository.
+
+            <CH.Code lineNumbers={false}>
+
+            ```bash
+            git add supabase
+            git commit -m "Initial migration"
+            git push
+            ```
+
+            </CH.Code>
+
+
+        </StepHikeCompact.Details>
+    </StepHikeCompact.Step>
+</StepHikeCompact>
 
 ### Enable Supabase branching
 
 Once your repository is [correctly prepared](#set-up-an-existing-project-for-branching), you can enable branching from the Supabase dashboard.
 
-<Admonition type="caution" label="Prepare your repo before enabling Branching">
+<Admonition type="caution" label="Prepare your GitHub repository before enabling Branching">
 
-Before turning on branching, make sure your [GitHub repository is prepared](#set-up-an-existing-project-for-branching). If your repository doesn’t have all the migration files, your production branch could run an incomplete set of migrations.
+Before enabling Branching for your project, make sure your [GitHub repository is prepared](#set-up-an-existing-project-for-branching). If your repository doesn’t have all the migration files, your production branch could run an incomplete set of migrations.
 
 </Admonition>
 
@@ -383,9 +417,13 @@ To create and push local migrations:
 
             If you haven't already started your local Supabase environment, in the terminal run:
 
+            <CH.Code lineNumbers={false}>
+
             ```bash
             supabase start
             ```
+
+            </CH.Code>
 
             Then proceed to [http://localhost:54323](http://localhost:54323) to access your local Supabase dashboard.
 
@@ -401,9 +439,13 @@ To create and push local migrations:
 
             We can compare the current state of your database with the state of your migrations directory to generate a new migration file. Run the following in the terminal:
 
+            <CH.Code lineNumbers={false}>
+
             ```bash
             supabase db diff -f "add_employees_table"
             ```
+
+            </CH.Code>
 
             This will create a SQL file called `./supabase/migrations/[timestamp]add_employees_table.sql`, and it will contain the SQL statements to make your database schema match the current state of your database. The SQL in this file will reflect what changes you made in your local dashboard. In this example, we've created a new table called `employees`.
 
@@ -426,7 +468,7 @@ To create and push local migrations:
 
             For example, you may choose to use a different name for the table.
 
-            ```sql sql 20231127222412_add_colleagues_table.sql
+            ```sql sql 20231127222412_add_colleagues_table.sql mark=2
             -- We have updated the table name to `colleagues`
             create table colleagues (
             id integer primary key generated always as identity,
@@ -438,9 +480,13 @@ To create and push local migrations:
 
             Then we can run `db reset` in the terminal:
 
+            <CH.Code lineNumbers={false}>
+
             ```bash
             supabase db reset
             ```
+
+            </CH.Code>
 
             This will reset the database and run all the migrations again. 
             
@@ -473,11 +519,15 @@ To create and push local migrations:
 
             You can commit and push your changes using the command line, or your preferred Git client. For example, in the terminal run: 
 
+            <CH.Code lineNumbers={false}>
+
             ```bash
             git add supabase/migrations
             git commit -m "Add employees table"
             git push --set-upstream origin new-employee
             ```
+
+            </CH.Code>
 
             Your migration changes will now run on the remote Preview Branch.
 
@@ -547,9 +597,13 @@ Dashboard changes aren’t automatically reflected in your repository. If you’
 
          Make sure to use the database URL for your branch.
 
+         <CH.Code lineNumbers={false}>
+
         ```bash
     supabase db pull --db-url "postgres://postgres:[password]@db.[branch-ref].supabase.co:5432/postgres"
         ```
+
+        </CH.Code>
 
         </StepHikeCompact.Details>
     </StepHikeCompact.Step>
