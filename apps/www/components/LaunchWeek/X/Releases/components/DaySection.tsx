@@ -14,11 +14,14 @@ const DaySection = ({ day }: { day: WeekDayProps }) => {
 
   return (
     <section
-      id={day.isToday ? 'today' : day.id}
+      id={day.id}
       className="lwx-nav-anchor border-b py-8 first:border-t border-[#111718] text-[#575E61] scroll-mt-16 grid grid-cols-1 gap-4 md:grid-cols-3"
     >
       {/* Day title and links */}
-      <div className="flex h-full flex-col gap-4 items-between">
+      <div
+        id={day.isToday ? 'today' : undefined}
+        className="flex h-full scroll-mt-16 flex-col gap-4 items-between"
+      >
         <div
           className={cn(
             'text-sm inline uppercase font-mono text-foreground-muted tracking-[0.1rem]',
@@ -67,13 +70,14 @@ const DaySection = ({ day }: { day: WeekDayProps }) => {
           <Link
             href={day.blog!}
             className={cn(
+              // bg-[#111415] hover:bg-[#121516]
               `min-h-[210px] group aspect-[3.67/1] relative overflow-hidden flex-1 flex flex-col justify-between
-              bg-[#111415] hover:bg-[#121516] hover:border-strong transition-colors border border-muted
+              hover:border-strong transition-colors border border-muted
               rounded-xl p-4 sm:p-6 md:p-8 text-2xl bg-contain shadow-lg`,
               cssGroup
             )}
           >
-            <div className="flex-grow flex flex-col items-start justify-between gap-2 w-full xl:w-2/3 text-left">
+            <div className="relative z-10 flex-grow flex flex-col items-start justify-between gap-2 w-full lg:w-3/5 text-left">
               <div className="relative w-full flex items-center gap-2 text-sm translate-x-0 !ease-[.24,0,.22,.99] duration-200 group-hover:-translate-x-6 transition-transform">
                 <IconEdit2 className="w-4 min-w-4 group-hover:opacity-0 transition-opacity" />
                 <span className="">Blog post</span>
@@ -94,11 +98,11 @@ const DaySection = ({ day }: { day: WeekDayProps }) => {
                       <Image
                         src={!!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img}
                         className={`
-                          absolute opacity-90 object-contain
-                          w-full h-full -z-10 transition-all duration-300
+                          absolute opacity-50 lg:opacity-100 object-cover
+                          w-full h-full z-0 transition-all duration-300
                         `}
                         fill
-                        objectPosition={isTablet ? '50%' : '90% 50%'}
+                        objectPosition={isTablet ? '50%' : '30% 50%'}
                         alt={day.title}
                       />
                     </div>

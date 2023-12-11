@@ -91,9 +91,9 @@ const days: WeekDayProps[] = [
     ],
     steps: [
       {
-        title: "Why we'll stay remote",
-        blog: '/blog/why-supabase-remote',
-        // bg_layers: [{ img: images['00-stay-remote'] }],
+        title: '',
+        blog: '',
+        bg_layers: [{ img: '/images/launchweek/lwx/day1/d1_studio.svg' }],
         steps: [],
       },
     ],
