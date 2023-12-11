@@ -4,12 +4,15 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FC, useState } from 'react'
 import { Button, IconCommand, IconGitHub, IconSearch, SearchButton } from 'ui'
+import { useIsLoggedIn, useIsUserLoading } from 'common'
 
 import { getPageType } from '~/lib/helpers'
 import { REFERENCES } from './NavigationMenu.constants'
 import ThemeToggle from '@ui/components/ThemeProvider/ThemeToggle'
 
 const TopNavBar: FC = () => {
+  const isLoggedIn = useIsLoggedIn()
+  const isUserLoading = useIsUserLoading()
   const { resolvedTheme } = useTheme()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
@@ -108,11 +111,13 @@ const TopNavBar: FC = () => {
               Supabase.com
             </a>
           </Button>
-          <Button type="text" asChild>
-            <a href="https://supabase.com/dashboard" target="_blank" rel="noreferrer noopener">
-              Dashboard
-            </a>
-          </Button>
+          {!isUserLoading && (
+            <Button asChild>
+              <a href="https://supabase.com/dashboard" target="_blank" rel="noreferrer noopener">
+                {isLoggedIn ? 'Dashboard' : 'Sign up'}
+              </a>
+            </Button>
+          )}
           <Link
             href="https://github.com/supabase/supabase"
             target="_blank"
