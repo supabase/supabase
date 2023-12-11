@@ -15,9 +15,9 @@ image: lwx-pg-graphql/pg-graphql-og.png
 thumb: lwx-pg-graphql/pg-graphql-thumb.png
 ---
 
-Supabase GraphQL a.k.a. **`pg_graphql`** 1.4+ supports the most requested feature: Postgres functions a.k.a. User Defined Functions (UDFs). This addition marks a significant improvement in GraphQL flexibility at Supabase, both as a novel approach to defining entry points into the Graph and as an escape hatch for users to implement custom/complex operations.
+Supabase GraphQL (pg_graphql) 1.4+ supports the most requested feature: Postgres functions a.k.a. User Defined Functions (UDFs). This addition marks a significant improvement in GraphQL flexibility at Supabase, both as a novel approach to defining entry points into the Graph and as an escape hatch for users to implement custom/complex operations.
 
-As with all entities in `pg_graphql`, UDFs support is based on automatically reflecting parts of the SQL schema. The feature allow for the execution of custom SQL logic within GraphQL queries to help support complex, user defined, server-side operations with a simple GraphQL interface.
+As with all entities in Supabase GraphQL, UDFs support is based on automatically reflecting parts of the SQL schema. The feature allow for the execution of custom SQL logic within GraphQL queries to help support complex, user defined, server-side operations with a simple GraphQL interface.
 
 ## Minimal Example
 
@@ -58,7 +58,7 @@ which returns the JSON payload:
 }
 ```
 
-`pg_graphql` does its best to reflect a coherent GraphQL API from all the information known to the SQL layer. For example, the argument `a` is non-null because it doesn't have a default value while `b` can be omitted since it does have a default. We also detected that this UDF can be displayed in the `Query` type rather than the `Mutation` type because the function was declared as `immutable`, which means it can not edit the database. Of the other [function volatility categories](https://www.postgresql.org/docs/current/xfunc-volatility.html), `stable` similarly translates into a `Query` field while `volatile` (the default) becomes a `Mutation` field.
+Supabase GraphQL does its best to reflect a coherent GraphQL API from all the information known to the SQL layer. For example, the argument `a` is non-null because it doesn't have a default value while `b` can be omitted since it does have a default. We also detected that this UDF can be displayed in the `Query` type rather than the `Mutation` type because the function was declared as `immutable`, which means it can not edit the database. Of the other [function volatility categories](https://www.postgresql.org/docs/current/xfunc-volatility.html), `stable` similarly translates into a `Query` field while `volatile` (the default) becomes a `Mutation` field.
 
 ### Returning Records
 
@@ -186,13 +186,13 @@ The API surface area of SQL functions is surprisingly large. In an effort to bri
 - Functions returning void
 - Variadic functions
 - Functions that accept a table/views's tuple type as an argument
-- Functions that accept or return an array type
+- Functions that accept an array type
 
 We look forward to implementing support for many of these features in coming releases.
 
 ## Takeaways
 
-If you're an existing Supabase user, but new to GraphQL, head over to [GraphiQL built right into Supabase Studio](https://supabase.com/dashboard/project/_/api/graphiql) for your project to interactively explore your projects through the GraphQL API. User defined function support is new in pg_graphql 1.4+. You can check your project's version with:
+If you're an existing Supabase user, but new to GraphQL, head over to [GraphiQL built right into Supabase Studio](https://supabase.com/dashboard/project/_/api/graphiql) for your project to interactively explore your projects through the GraphQL API. User defined function support is new in pg_graphql 1.4+. You can check your project's GraphQL version with:
 
 ```sql
 select * 
@@ -204,7 +204,7 @@ To upgrade, check out [our upgrade guide](https://supabase.com/docs/guides/platf
 
 For new Supabase users, [creating a new project](http://database.new) will get you the latest version of Supabase GraphQL with UDF support.
 
-If you're not ready to start a new project but want to learn more about `pg_graphql`/Supabase GraphQL, check out our [API docs](https://supabase.github.io/pg_graphql/api/) to see how your SQL schema is transformed into a GraphQL API.
+If you're not ready to start a new project but want to learn more about `pg_graphql`/Supabase GraphQL, our [API docs](https://supabase.github.io/pg_graphql/api/) are a great place to learn about how your SQL schema is transformed into a GraphQL API.
 
 ## More Launch Week X
 
