@@ -20,7 +20,7 @@ const DaySection = ({ day }: { day: WeekDayProps }) => {
       {/* Day title and links */}
       <div
         id={day.isToday ? 'today' : undefined}
-        className="flex h-full scroll-mt-16 flex-col gap-4 items-between"
+        className="flex h-full scroll-mt-10 flex-col gap-4 items-between"
       >
         <div
           className={cn(
