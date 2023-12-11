@@ -25,7 +25,7 @@ const DaySection = ({ day }: { day: WeekDayProps }) => {
         <div
           className={cn(
             'text-sm inline uppercase font-mono text-foreground-muted tracking-[0.1rem]',
-            (day.shipped || day.hasCountdown) && 'text-foreground'
+            day.shipped && 'text-foreground'
           )}
         >
           {day.dd}, {day.date}

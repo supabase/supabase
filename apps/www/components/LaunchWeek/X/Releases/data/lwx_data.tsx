@@ -47,7 +47,7 @@ export interface WeekDayProps {
   dd: string
   links?: StepLink[]
   videoThumbnail?: string
-  blog?: string
+  blog: string
   steps: StepProps[] | []
 }
 
@@ -78,11 +78,11 @@ const days: WeekDayProps[] = [
       // },
       {
         type: 'blog',
-        href: 'https://supabase.com/docs',
+        href: '/blog/studio-introducing-assistant',
       },
       {
         type: 'video',
-        href: '123',
+        href: 'hu2SQjvCXIw',
       },
       {
         type: 'xSpace',
@@ -103,7 +103,7 @@ const days: WeekDayProps[] = [
     title: '',
     shipped: false,
     blog: '',
-    hasCountdown: false,
+    hasCountdown: true,
     date: '12 Dec',
     published_at: '2023-12-12T08:00:00.000-08:00',
     description: '',
