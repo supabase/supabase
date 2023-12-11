@@ -149,7 +149,7 @@ const MapView = ({
               <Marker
                 key={region.key}
                 coordinates={coordinates}
-                onMouseEnter={(event) => {
+                onMouseEnter={() => {
                   setTooltip({
                     x: coordinates![0],
                     y: coordinates![1],
