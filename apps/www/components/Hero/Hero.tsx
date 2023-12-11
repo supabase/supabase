@@ -34,7 +34,6 @@ const Hero = () => {
                     <AnnouncementBadge
                       announcement="Launch Week X — 11-15 Dec"
                       url="/launch-week"
-                      badge="Claim your ticket"
                     />
                   </div>
                   <h1 className="text-foreground text-4xl sm:text-5xl sm:leading-none lg:text-7xl">

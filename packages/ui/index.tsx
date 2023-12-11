@@ -182,7 +182,6 @@ export { Separator } from './src/components/shadcn/ui/separator'
 // patterns
 
 export * from './src/patterns/SchemaTableNode'
-export { AssistantChatForm } from './src/patterns/AssistantChatForm'
 
 // links
 
@@ -372,8 +371,9 @@ export * from './src/components/Icon/icons/IconMeh'
 export * from './src/components/Icon/icons/IconMenu'
 export * from './src/components/Icon/icons/IconMessageCircle'
 export * from './src/components/Icon/icons/IconMessageSquare'
-export * from './src/components/Icon/icons/IconMicOff'
 export * from './src/components/Icon/icons/IconMic'
+export * from './src/components/Icon/icons/IconMicOff'
+export * from './src/components/Icon/icons/IconMicSolid'
 export * from './src/components/Icon/icons/IconMinimize2'
 export * from './src/components/Icon/icons/IconMinimize'
 export * from './src/components/Icon/icons/IconMinusCircle'
@@ -413,6 +413,7 @@ export * from './src/components/Icon/icons/IconPocket'
 export * from './src/components/Icon/icons/IconPower'
 export * from './src/components/Icon/icons/IconPrinter'
 export * from './src/components/Icon/icons/IconPresence'
+export * from './src/components/Icon/icons/IconProductHunt'
 export * from './src/components/Icon/icons/IconRadio'
 export * from './src/components/Icon/icons/IconRefreshCcw'
 export * from './src/components/Icon/icons/IconRefreshCw'

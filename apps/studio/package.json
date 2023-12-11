@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 8082",
-    "dev:secrets:pull": "AWS_PROFILE=supabase-dev node internals/getSecrets.js",
+    "dev:secrets:pull": "AWS_PROFILE=supabase-dev node ../../scripts/getSecrets.js -n local/studio",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -38,6 +38,7 @@
     "@tanstack/react-query-devtools": "^4.35.7",
     "@uidotdev/usehooks": "^2.4.1",
     "@zip.js/zip.js": "^2.7.29",
+    "ai": "^2.2.26",
     "ajv": "^8.6.3",
     "awesome-debounce-promise": "^2.1.0",
     "blueimp-md5": "^2.19.0",

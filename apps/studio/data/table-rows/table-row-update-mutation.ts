@@ -5,6 +5,7 @@ import { Query, SupaTable } from 'components/grid'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
 import { ImpersonationRole, wrapWithRoleImpersonation } from 'lib/role-impersonation'
+import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import { ResponseError } from 'types'
 
 export type TableRowUpdateVariables = {
@@ -53,7 +54,12 @@ export async function updateTableRow({
     }
   )
 
-  const { result } = await executeSql({ projectRef, connectionString, sql })
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
+  })
 
   return result
 }
