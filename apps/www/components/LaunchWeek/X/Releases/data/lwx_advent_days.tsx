@@ -91,7 +91,7 @@ export const days: AdventDay[] = [
     links: [
       {
         url: '/blog/postgres-language-server-implementing-parser',
-        label: 'Blog post',
+        label: 'Read blog post',
       },
     ],
     image: '',
@@ -126,7 +126,7 @@ export const days: AdventDay[] = [
     links: [
       {
         url: '/blog/how-design-works-at-supabase',
-        label: 'Blog post',
+        label: 'Read blog post',
       },
     ],
     image: '',

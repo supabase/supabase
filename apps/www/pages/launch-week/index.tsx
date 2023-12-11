@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
@@ -9,14 +10,17 @@ import supabase from '~/lib/supabaseMisc'
 import FaviconImports from '~/components/LaunchWeek/X/FaviconImports'
 import DefaultLayout from '~/components/Layouts/Default'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
-import TicketingFlow from '~/components/LaunchWeek/X/Ticket/TicketingFlow'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import LaunchWeekPrizeSection from '~/components/LaunchWeek/X/LaunchWeekPrizeSection'
-import LWXMeetups, { Meetup } from '~/components/LaunchWeek/X/LWXMeetups'
-import LWXStickyNav from '../../components/LaunchWeek/X/Releases/LWXStickyNav'
-import LWXHeader from '../../components/LaunchWeek/X/Releases/LWXHeader'
-import MainStage from '../../components/LaunchWeek/X/Releases/MainStage'
-import BuildStage from '../../components/LaunchWeek/X/Releases/BuildStage'
+import { Meetup } from '~/components/LaunchWeek/X/LWXMeetups'
+import LWXStickyNav from '~/components/LaunchWeek/X/Releases/LWXStickyNav'
+import LWXHeader from '~/components/LaunchWeek/X/Releases/LWXHeader'
+import MainStage from '~/components/LaunchWeek/X/Releases/MainStage'
+
+const BuildStage = dynamic(() => import('~/components/LaunchWeek/X/Releases/BuildStage'))
+const LWXMeetups = dynamic(() => import('~/components/LaunchWeek/X/LWXMeetups'))
+const LaunchWeekPrizeSection = dynamic(
+  () => import('~/components/LaunchWeek/X/LaunchWeekPrizeSection')
+)
 
 interface Props {
   meetups?: Meetup[]
@@ -114,7 +118,6 @@ export default function LaunchWeekIndex({ meetups }: Props) {
           <LWXHeader />
           <MainStage />
           <BuildStage />
-          {/* <TicketingFlow /> */}
           <SectionContainer id="meetups" className="scroll-mt-[66px]">
             <LWXMeetups meetups={meetups} />
           </SectionContainer>

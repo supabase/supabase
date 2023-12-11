@@ -35,16 +35,14 @@ export function LWXCountdownBanner() {
               className="filter contrast-0 dark:contrast-100"
             />
           </div>
-          <div className="hidden sm:block">
-            <Countdown date={new Date(announcement.launchDate)} showCard={false} />
-          </div>
+          <div className="hidden sm:block">Day 1: AI Assistant and User Impersonation</div>
           <Button
             onClick={() => null}
             size="tiny"
             type="secondary"
             className="px-2 py-1 !leading-none text-xs"
           >
-            Claim your ticket
+            Go to Launch Week
           </Button>
         </div>
       </div>

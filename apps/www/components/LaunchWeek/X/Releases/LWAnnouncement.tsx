@@ -12,14 +12,12 @@ const LWAnnouncement = ({
   title?: string
   isLaunchWeekPage?: boolean
 }) => {
-  // const [_pre, _d1, _d2, _d3, _d4, currentDay] = days
-
   const announcement = (
     <>
       <div className="relative flex-shrink flex items-center p-2 w-2/3 md:w-auto">
         <div className="flex flex-col gap-1 sm:pl-2">
           <div className="flex items-center gap-2">
-            <span className="text-foreground">Launch Week 8</span>
+            <span className="text-foreground">Launch Week X</span>
           </div>
           <span className="text-foreground-light">Explore all the announcements</span>
         </div>
@@ -43,38 +41,18 @@ const LWAnnouncement = ({
     </>
   )
 
-  // const handleClick = () => {
-  //   if (typeof document === 'undefined') return null
-  //   const today = document.getElementById('today')
-  //   if (!today) return
-  //   window.scrollTo({ top: today?.offsetTop + today?.offsetHeight, left: 0, behavior: 'smooth' })
-  // }
-
   return (
     <div className="w-full max-w-xl opacity-0 !animate-[fadeIn_0.5s_cubic-bezier(0.25,0.25,0,1)_0.5s_both]">
       <SmallCard
         className="border hover:border-stronger transition-colors"
         innerClassName="bg-opacity-70 items-stretch"
       >
-        {/* {isLaunchWeekPage ? (
-          <ExpandableVideo
-            videoId="qzxzLSAJDfE"
-            onOpenCallback={handleClick}
-            triggerContainerClassName="w-full"
-            trigger={
-              <div className="flex flex-row justify-between items-stretch w-full h-full gap-2 text-left">
-                {announcement}
-              </div>
-            }
-          />
-        ) : ( */}
         <Link
-          href="/launch-week"
+          href="/launch-week#today"
           className="flex flex-row justify-between items-center w-full h-full gap-2 text-left"
         >
           {announcement}
         </Link>
-        {/* )} */}
       </SmallCard>
     </div>
   )

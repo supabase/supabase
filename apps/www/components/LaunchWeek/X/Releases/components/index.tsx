@@ -1,8 +1,17 @@
-import { IconDocumentation, IconMicSolid, IconProductHunt, IconYoutubeSolid, cn } from 'ui'
+import {
+  ExpandableVideo,
+  IconDocumentation,
+  IconMicSolid,
+  IconProductHunt,
+  IconYoutubeSolid,
+  cn,
+} from 'ui'
 
 import Link from 'next/link'
 import Image from 'next/image'
 import { StepLink } from '../data/lwx_data'
+import { useEffect, useState } from 'react'
+import { ArrowRightIcon } from '@heroicons/react/outline'
 
 export const CheckCircleSolidIcon = () => (
   <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -64,7 +73,19 @@ interface DayLink extends StepLink {
 }
 
 export const DayLink = ({ type, icon, text, href = '', className }: DayLink) => {
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  if (!isMounted) return null
+
   const linkTypes = {
+    blog: {
+      icon: IconDocumentation,
+      text: 'Blog Post',
+    },
     docs: {
       icon: IconDocumentation,
       text: 'Docs',
@@ -85,6 +106,7 @@ export const DayLink = ({ type, icon, text, href = '', className }: DayLink) => 
   const isTargetBlank = () => {
     switch (type) {
       case 'productHunt':
+      case 'xSpace':
       case 'docs':
         return true
     }
@@ -92,21 +114,27 @@ export const DayLink = ({ type, icon, text, href = '', className }: DayLink) => 
   const Icon = icon ?? linkTypes[type].icon
   const Text = () => <>{text ?? linkTypes[type]?.text}</>
 
-  return (
-    <Link
-      href={href}
+  const Component = type === 'video' ? 'button' : Link
+
+  const Asd = ({ component: Comp, ...props }: any) => (
+    <Comp
       className={cn(
         'py-1 flex gap-2 items-center hover:text-foreground transition-colors text-sm',
         className
       )}
-      target={isTargetBlank() ? '_blank' : '_self'}
+      {...props}
     >
       <span className="w-4 h-4 flex items-center justify-center">
         <Icon />
       </span>
       <Text />
-    </Link>
+    </Comp>
   )
+
+  if (type === 'video')
+    return <ExpandableVideo videoId={href} trigger={<Asd component={Component} />} />
+
+  return <Asd href={href} target={isTargetBlank() ? '_blank' : '_self'} component={Component} />
 }
 
 export const VideoPreviewTrigger = ({
