@@ -14,7 +14,7 @@ import { useTableRowCreateMutation } from 'data/table-rows/table-row-create-muta
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
 import { tableKeys } from 'data/tables/keys'
 import { useStore, useUrlState } from 'hooks'
-import { getImpersonatedRole } from 'state/role-impersonation-state'
+import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { ColumnEditor, RowEditor, SpreadsheetImport, TableEditor } from '.'
 import ForeignRowSelector from './RowEditor/ForeignRowSelector/ForeignRowSelector'
@@ -31,8 +31,6 @@ import { ImportContent } from './TableEditor/TableEditor.types'
 export interface SidePanelEditorProps {
   editable?: boolean
   selectedTable?: PostgresTable
-  onRowCreated?: (row: Dictionary<any>) => void
-  onRowUpdated?: (row: Dictionary<any>, idx: number) => void
 
   // Because the panel is shared between grid editor and database pages
   // Both require different responses upon success of these events
@@ -42,8 +40,6 @@ export interface SidePanelEditorProps {
 const SidePanelEditor = ({
   editable = true,
   selectedTable,
-  onRowCreated = noop,
-  onRowUpdated = noop,
   onTableCreated = noop,
 }: SidePanelEditorProps) => {
   const snap = useTableEditorStateSnapshot()
@@ -61,12 +57,18 @@ const SidePanelEditor = ({
     .map((column) => column.name)
 
   const { project } = useProjectContext()
-  const { mutateAsync: createTableRows } = useTableRowCreateMutation()
-  const { mutateAsync: updateTableRow } = useTableRowUpdateMutation({
+  const { mutateAsync: createTableRows } = useTableRowCreateMutation({
     onSuccess() {
-      ui.setNotification({ category: 'success', message: 'Successfully updated row' })
+      toast.success('Successfully created row')
     },
   })
+  const { mutateAsync: updateTableRow } = useTableRowUpdateMutation({
+    onSuccess() {
+      toast.success('Successfully updated row')
+    },
+  })
+
+  const getImpersonatedRole = useGetImpersonatedRole()
 
   const saveRow = async (
     payload: any,
@@ -81,7 +83,7 @@ const SidePanelEditor = ({
     let saveRowError: Error | undefined
     if (isNewRecord) {
       try {
-        const result = await createTableRows({
+        await createTableRows({
           projectRef: project.ref,
           connectionString: project.connectionString,
           table: selectedTable as any,
@@ -89,7 +91,6 @@ const SidePanelEditor = ({
           enumArrayColumns,
           impersonatedRole: getImpersonatedRole(),
         })
-        onRowCreated(result[0])
       } catch (error: any) {
         saveRowError = error
       }
@@ -98,7 +99,7 @@ const SidePanelEditor = ({
       if (hasChanges) {
         if (selectedTable.primary_keys.length > 0) {
           try {
-            const result = await updateTableRow({
+            await updateTableRow({
               projectRef: project.ref,
               connectionString: project.connectionString,
               table: selectedTable as any,
@@ -107,7 +108,6 @@ const SidePanelEditor = ({
               enumArrayColumns,
               impersonatedRole: getImpersonatedRole(),
             })
-            onRowUpdated(result[0], configuration.rowIdx)
           } catch (error: any) {
             saveRowError = error
           }

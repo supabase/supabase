@@ -1,15 +1,15 @@
 [
   {
     "type": "Announcement",
-    "title": "Postgres Language Server: implementing the Parser",
-    "description": "A detailed analysis of our iterations to implement a Parser for Postgres",
-    "imgUrl": "/images/blog/lwx-postgres-language-server/postgres-language-server-thumb.jpg",
-    "logoUrl": "/images/blog/lwx-postgres-language-server/postgres-language-server-thumb.jpg",
+    "title": "Supabase Studio: AI Assistant and User Impersonation",
+    "description": "We're introducing the next generation of our AI Assistant and some features that will help get your ideas into code even faster",
+    "imgUrl": "/images/blog/launch-week-x/day-1/day-1-supabase-assistant-thumb.png",
+    "logoUrl": "/images/blog/launch-week-x/day-1/day-1-supabase-assistant-thumb.png",
     "organization": "Supabase",
-    "url": "/blog/postgres-language-server-implementing-parser",
+    "url": "/blog/studio-introducing-assistant",
     "postMeta": {
-      "name": "philipp",
-      "publishDate": "Dec 08, 2023",
+      "name": "saltcod",
+      "publishDate": "Dec 11, 2023",
       "readLength": 10
     },
     "ctaText": "Learn more"

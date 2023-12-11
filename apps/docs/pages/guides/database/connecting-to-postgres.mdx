@@ -5,17 +5,18 @@ export const meta = {
   id: 'connecting-to-postgres',
   title: 'Connecting to your database',
   description: 'Explore the options for connecting to your Postgres database.',
+  subtitle: 'Explore the options for connecting to your Postgres database.',
 }
 
 Supabase provides several options for programmatically connecting to your Postgres database:
 
-1. Direct connections using Postgres' standard connection system
-2. Connection pooling using PgBouncer
-3. Programmatic access using the [Serverless APIs](/docs/guides/api)
+1. Programmatic access using the Data APIs
+1. Direct connections using the built-in Postgres connection system
+1. Connection pooling for scalable connections
 
-## Serverless APIs
+## Data APIs
 
-Supabase provides auto-updating [APIs](/docs/guides/database/api). This is the easiest way to get started if you are managing data (fetching, inserting, updating). We provide several types of API to suit your preferences:
+Supabase provides auto-updating Data APIs. These are the easiest way to get started if you are managing data (fetching, inserting, updating). We provide several types of API to suit your preferences:
 
 - [REST](/docs/guides/api): interact with your database through a REST interface.
 - [GraphQL](/docs/guides/graphql/api): interact with your database through a GraphQL interface.
@@ -23,11 +24,11 @@ Supabase provides auto-updating [APIs](/docs/guides/database/api). This is the e
 
 ## Direct connections
 
-Every Supabase project provides a full Postgres database. You can connect to the database using [any tool which supports Postgres](#integrations). You can find the connection string in the [Database settings](https://supabase.com/dashboard/project/_/settings/database) inside the dashboard:
+Every Supabase project provides a full Postgres database. You can connect to the database using any tool which supports Postgres. Direct connections are on port `5432`. You can find the connection string in the [Database settings](https://supabase.com/dashboard/project/_/settings/database) inside the dashboard:
 
 1. Go to the `Settings` section.
 2. Click `Database`.
-3. Find your Connection Info and Connection String. Direct connections are on port `5432`.
+3. Find your Connection Info and Connection String.
 
 <video width="99%" muted playsInline controls={true}>
   <source
@@ -38,7 +39,7 @@ Every Supabase project provides a full Postgres database. You can connect to the
 
 ## Connection Pooler
 
-Every Supabase project comes with PgBouncer for connection pooling. A connection pooler is useful for managing a large number of _temporary_ connections. For example, if you are using [Prisma](/partners/integrations/prisma), Drizzle, Kysely, or anything deployed to a Serverless environment (AWS Lambdas or Edge Functions). You can find the connection pool config in the [Database settings](https://supabase.com/dashboard/project/_/settings/database) inside the dashboard:
+Every Supabase project comes with a connection pooler for managing connections to your Postgres database. A connection pooler is useful for managing a large number of _temporary_ connections - for example, if you are using Prisma, Drizzle, Kysely, or anything deployed to a Serverless environment (AWS Lambdas or Edge Functions). You can find the connection pool config in the [Database settings](/dashboard/project/_/settings/database) inside the dashboard:
 
 1. Go to the `Settings` section.
 2. Click `Database`.
@@ -51,29 +52,9 @@ Every Supabase project comes with PgBouncer for connection pooling. A connection
   />
 </video>
 
-## Supavisor
-
-<Admonition type="note">
-
-PgBouncer is being deprecated in favor of Supavisor. Supavisor is available on all new and existing projects.
-
-On 15th January 2024 PgBouncer will be disabled. Additionally, your Supabase database domain (db.projectref.supabase.co) will start resolving to an IPv6 address. No changes are required if your network supports communicating via IPv6. Otherwise, update your applications to use Supavisor which will continue to support IPv4 connections.
-
-[Full details here](https://github.com/orgs/supabase/discussions/17817).
-
-</Admonition>
-
-Supavisor is a new connection pooler by Supabase. It can provide a more scalable connection pool than PgBouncer, and runs on a high-availability cluster segregated from your database.
-
-This can free up some CPU cycles for your database to use for queries. It also makes connecting to Postgres in a serverless environment much easier.
-
-We're building compatibility with PgBouncer, and application changes will not be required to switch from PgBouncer to Supavisor. When a project is switched from PgBouncer to Supavisor, the appropriate connection string will be made available under the Connection Pooling section on [Database settings](https://supabase.com/dashboard/project/_/settings/database). Note that while PgBouncer remains accessible for use, it will no longer be available for configuration from the dashboard. The PgBouncer connection string will also be similarly inaccessible from the dashboard.
-
-Supavisor is open source and compatible with any Postgres deployment. Check out [the Github repository](https://github.com/supabase/supavisor).
-
 ## Choosing a connection method
 
-- The Serverless APIs provide programmatic access and have [built-in connection pooling](https://postgrest.org/en/stable/references/connection_pool.html). You can use these for all browser and application interactions. We recommend using these wherever possible.
+- The Data APIs provide programmatic access and have [built-in connection pooling](https://postgrest.org/en/stable/references/connection_pool.html). You can use these for all browser and application interactions. We recommend using these wherever possible.
 - A "direct connection" is Postgres' native connection system. You should use this for tools which are always alive - usually installed on a long-running server, like Node.js, Ruby, Python, etc.
 - A "connection pooler" is a tool which keeps connections "alive". You should use this for serverless functions and tools which disconnect from the database frequently, like Prisma, Drizzle, Kysely, etc.
 
@@ -89,32 +70,6 @@ You should connect to your database using SSL wherever possible, to prevent snoo
 You can obtain your connection info and Server root certificate from your application's dashboard:
 
 ![Connection Info and Certificate.](/docs/img/guides/database/connection-info-cert.png)
-
-## How connection pooling works
-
-A "connection pool" is a system (external to Postgres) which manages connections, rather than PostgreSQL's native system. Supabase uses [PgBouncer](https://www.pgbouncer.org/) for connection pooling.
-
-When a client makes a request, PgBouncer "allocates" an available connection to the client. When the client transaction or session is completed the connection is returned to the pool and is free to be used by another client.
-
-![Connection pooling](/docs/img/guides/database/connection-pool.png)
-
-Pgbounce provides several Pool Modes, each handling connections differently:
-
-#### Session
-
-When a new client connects, a connection is assigned to the client until it disconnects. Afterward, the connection is returned back to the pool.
-
-All PostgreSQL features can be used with this option.
-
-#### Transaction
-
-This is the suggested option for serverless functions. A connection is only assigned to the client for the duration of a transaction. Two consecutive transactions from the same client could be executed over two different connections.
-
-Some session-based PostgreSQL features such as prepared statements are not available with this option. A comprehensive list of incompatible features can be found [here](https://www.pgbouncer.org/features.html).
-
-#### Statement
-
-This is the most granular option. Connections are returned to the pool after every statement. Transactions with multiple statements are not allowed. This is best used when `AUTOCOMMIT` is in use.
 
 ## Integrations
 
@@ -356,6 +311,40 @@ psql "sslmode=verify-full sslrootcert=$HOME/Downloads/prod-supabase.cer host=db.
   </StepHikeCompact.Step>
 
 </StepHikeCompact>
+
+## How connection pooling works
+
+A "connection pool" is a system (external to Postgres) which manages Postgres connections.
+
+When a client makes a request, the pooler "allocates" an available connection to the client. When the client transaction or session is completed the connection is returned to the pool and is free to be used by another client.
+
+![Connection pooling](/docs/img/guides/database/connection-pool.png)
+
+There are several pool modes, each handling connections differently:
+
+### Session
+
+When a new client connects, a connection is assigned to the client until it disconnects. Afterward, the connection is returned back to the pool.
+
+All Postgres features can be used with this option.
+
+### Transaction
+
+This is the suggested option for serverless functions. A connection is assigned to the client for the duration of a transaction. Two consecutive transactions from the same client could be executed over two different connections. Some session-based Postgres features such as prepared statements are not available with this option.
+
+### Statement
+
+This is the most granular option. Connections are returned to the pool after every statement. Transactions with multiple statements are not allowed. This is best used when `AUTOCOMMIT` is in use.
+
+### Supavisor vs PgBouncer
+
+Supabase previously used PgBouncer for connection pooling. We have now deprecated PgBouncer in favor of Supavisor. Supavisor is available on all new and existing projects.
+
+[Supavisor](https://github.com/supabase/supavisor) is a new connection pooler by Supabase that runs on a high-availability cluster, segregated from your database. This means more resources are available for your database. No Application changes are required to switch from PgBouncer to Supavisor, you simply need to choose the new connection string from the "Connection Pooling" section on [Database settings](https://supabase.com/dashboard/project/_/settings/database).
+
+On 15th January 2024 PgBouncer will be disabled. Additionally, your Supabase database domain (db.projectref.supabase.co) will start resolving to an IPv6 address. No changes are required if your network supports IPv6. Otherwise, update your applications to use Supavisor which will continue to support IPv4 connections.
+
+[Read the full details](https://github.com/orgs/supabase/discussions/17817).
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
