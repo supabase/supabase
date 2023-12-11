@@ -1,7 +1,5 @@
 import { ReactNode } from 'react'
 
-const images = {}
-
 type StepLinkType = 'productHunt' | 'video' | 'docs' | 'xSpace' | 'blog'
 
 export interface StepLink {
@@ -51,7 +49,7 @@ export interface WeekDayProps {
   steps: StepProps[] | []
 }
 
-export const endOfLW8 = '2023-12-15T23:59:59.999-08:00'
+export const endOfLWX = '2023-12-15T23:59:59.999-08:00'
 
 const days: WeekDayProps[] = [
   {
@@ -109,6 +107,12 @@ const days: WeekDayProps[] = [
     description: '',
     d: 2,
     dd: 'Tue',
+    links: [
+      {
+        type: 'xSpace',
+        href: 'https://twitter.com/i/spaces/1MYGNovDoaLJw',
+      },
+    ],
     steps: [],
   },
   {
@@ -121,6 +125,12 @@ const days: WeekDayProps[] = [
     description: '',
     d: 3,
     dd: 'Wed',
+    links: [
+      {
+        type: 'xSpace',
+        href: 'https://twitter.com/i/spaces/1eaKbgDBgyoGX',
+      },
+    ],
     steps: [],
   },
   {
@@ -133,6 +143,12 @@ const days: WeekDayProps[] = [
     description: '',
     d: 4,
     dd: 'Thu',
+    links: [
+      {
+        type: 'xSpace',
+        href: 'https://twitter.com/i/spaces/1ypKdkWjkjrxW',
+      },
+    ],
     steps: [],
   },
   {
@@ -145,6 +161,12 @@ const days: WeekDayProps[] = [
     description: '',
     d: 5,
     dd: 'Fri',
+    links: [
+      {
+        type: 'xSpace',
+        href: 'https://twitter.com/i/spaces/1vAxRvjmvRgxl',
+      },
+    ],
     steps: [],
   },
 ]
