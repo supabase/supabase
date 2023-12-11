@@ -1,6 +1,5 @@
 import { useParams } from 'common'
-import { observer } from 'mobx-react-lite'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { ColumnList, TableList } from 'components/interfaces/Database'
 import { SidePanelEditor } from 'components/interfaces/TableGridEditor'
@@ -8,12 +7,10 @@ import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/Del
 import { DatabaseLayout } from 'components/layouts'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { Table } from 'data/tables/table-query'
-import { useStore } from 'hooks'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { NextPageWithLayout } from 'types'
 
 const DatabaseTables: NextPageWithLayout = () => {
-  const { ui, meta } = useStore()
   const { ref: projectRef } = useParams()
 
   const snap = useTableEditorStateSnapshot()
@@ -22,12 +19,6 @@ const DatabaseTables: NextPageWithLayout = () => {
   // [Joshen] Separate state required to handle edit/delete table
   // since selectedTable above handles the state for ColumnList
   const [selectedTableToEdit, setSelectedTableToEdit] = useState<Table>()
-
-  useEffect(() => {
-    if (ui.selectedProjectRef) {
-      meta.types.load()
-    }
-  }, [ui.selectedProjectRef])
 
   return (
     <>
@@ -68,4 +59,4 @@ const DatabaseTables: NextPageWithLayout = () => {
 
 DatabaseTables.getLayout = (page) => <DatabaseLayout title="Database">{page}</DatabaseLayout>
 
-export default observer(DatabaseTables)
+export default DatabaseTables
