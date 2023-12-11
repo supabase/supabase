@@ -1,6 +1,6 @@
 ---
 title: 'pg_graphql: Postgres functions now supported'
-description: "pg_graphql now supports the most requested feature: Postgres functions a.k.a. User Defined Functions (UDFs)"
+description: 'pg_graphql now supports the most requested feature: Postgres functions a.k.a. User Defined Functions (UDFs)'
 launchweek: x
 categories:
   - product
@@ -28,10 +28,11 @@ create function "addNums"(a int, b int default 1)
 returns int
 immutable
 language sql
-as $$ 
-	select a + b; 
+as $$
+	select a + b;
 $$;
 ```
+
 when reflected in the GraphQL schema, the function is exposed as:
 
 ```sql
@@ -97,22 +98,34 @@ type Query {
   accountsByEmailDomain(
     domainToSearch: String!
 
-    """Query the first `n` records in the collection"""
+    """
+    Query the first `n` records in the collection
+    """
     first: Int
 
-    """Query the last `n` records in the collection"""
+    """
+    Query the last `n` records in the collection
+    """
     last: Int
 
-    """Query values in the collection before the provided cursor"""
+    """
+    Query values in the collection before the provided cursor
+    """
     before: Cursor
 
-    """Query values in the collection after the provided cursor"""
+    """
+    Query values in the collection after the provided cursor
+    """
     after: Cursor
 
-    """Filters to apply to the results set when querying from the collection"""
+    """
+    Filters to apply to the results set when querying from the collection
+    """
     filter: AccountFilter
 
-    """Sort order to apply to the collection"""
+    """
+    Sort order to apply to the collection
+    """
     orderBy: [AccountOrderBy!]
   ): AccountConnection
 }
@@ -164,7 +177,7 @@ i.e.:
 
 ```graphql
 query {
-  accountCollection(filter: {email: {ilike: "%foo.com"}}, first: 2) {
+  accountCollection(filter: { email: { ilike: "%foo.com" } }, first: 2) {
     edges {
       node {
         id
@@ -195,9 +208,9 @@ We look forward to implementing support for many of these features in coming rel
 If you're an existing Supabase user, but new to GraphQL, head over to [GraphiQL built right into Supabase Studio](https://supabase.com/dashboard/project/_/api/graphiql) for your project to interactively explore your projects through the GraphQL API. User defined function support is new in pg_graphql 1.4+. You can check your project's GraphQL version with:
 
 ```sql
-select * 
-from pg_available_extensions 
-where name = 'pg_graphql'
+select *
+from pg_available_extensions
+where name = 'pg_graphql';
 ```
 
 To upgrade, check out [our upgrade guide](https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects).
