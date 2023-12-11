@@ -24,6 +24,7 @@ import {
   generateTableFieldFromPostgresTable,
   validateFields,
 } from './TableEditor.utils'
+import { usePostgresTypesQuery } from 'data/database/types-query'
 
 export interface TableEditorProps {
   table?: PostgresTable
@@ -60,8 +61,13 @@ const TableEditor = ({
   const isNewRecord = isUndefined(table)
 
   const realtimeEnabled = useIsFeatureEnabled('realtime:all')
-
-  const enumTypes = meta.types.list((type: PostgresType) => !EXCLUDED_SCHEMAS.includes(type.schema))
+  const { data: types } = usePostgresTypesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const enumTypes = (types ?? []).filter(
+    (type) => !EXCLUDED_SCHEMAS.filter((x) => x !== 'extensions').includes(type.schema)
+  )
 
   const publications = meta.publications.list()
   const realtimePublication = publications.find(

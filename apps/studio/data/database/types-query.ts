@@ -1,19 +1,17 @@
+import { PostgresType } from '@supabase/postgres-meta'
 import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { components } from 'data/api'
 import { get } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { databaseKeys } from './keys'
 
-export type TypesVariables = {
+export type PostgresTypesVariables = {
   projectRef?: string
   connectionString?: string
 }
 
-export type PostgresType = components['schemas']['PostgresType']
-
-export async function getTypes(
-  { projectRef, connectionString }: TypesVariables,
+export async function getPostgresTypes(
+  { projectRef, connectionString }: PostgresTypesVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) {
@@ -37,26 +35,23 @@ export async function getTypes(
     signal,
   })
 
-  if (error) {
-    throw error
-  }
-
-  return data
+  if (error) throw error
+  return data as PostgresType[]
 }
 
-export type TypesData = Awaited<ReturnType<typeof getTypes>>
-export type TypesError = ResponseError
+export type PostgresTypesData = Awaited<ReturnType<typeof getPostgresTypes>>
+export type PostgresTypesError = ResponseError
 
-export const useTypesQuery = <TData = TypesData>(
-  { projectRef, connectionString }: TypesVariables,
-  { enabled = true, ...options }: UseQueryOptions<TypesData, TypesError, TData> = {}
+export const usePostgresTypesQuery = <TData = PostgresTypesData>(
+  { projectRef, connectionString }: PostgresTypesVariables,
+  { enabled = true, ...options }: UseQueryOptions<PostgresTypesData, PostgresTypesError, TData> = {}
 ) =>
-  useQuery<TypesData, TypesError, TData>(
-    databaseKeys.schemaList(projectRef),
-    ({ signal }) => getTypes({ projectRef, connectionString }, signal),
+  useQuery<PostgresTypesData, PostgresTypesError, TData>(
+    databaseKeys.postgresTypes(projectRef),
+    ({ signal }) => getPostgresTypes({ projectRef, connectionString }, signal),
     { enabled: enabled && typeof projectRef !== 'undefined', ...options }
   )
 
-export function invalidateTypesQuery(client: QueryClient, projectRef: string | undefined) {
-  return client.invalidateQueries(databaseKeys.schemaList(projectRef))
+export function invalidatePostgresTypesQuery(client: QueryClient, projectRef: string | undefined) {
+  return client.invalidateQueries(databaseKeys.postgresTypes(projectRef))
 }

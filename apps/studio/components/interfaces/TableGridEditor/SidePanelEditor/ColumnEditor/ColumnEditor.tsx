@@ -45,6 +45,7 @@ import ColumnForeignKey from './ColumnForeignKey'
 import ColumnType from './ColumnType'
 import HeaderTitle from './HeaderTitle'
 import { toJS } from 'mobx'
+import { usePostgresTypesQuery } from 'data/database/types-query'
 
 export interface ColumnEditorProps {
   column?: PostgresColumn
@@ -72,12 +73,20 @@ const ColumnEditor = ({
   updateEditorDirty = noop,
 }: ColumnEditorProps) => {
   const { ref } = useParams()
-  const { meta, vault } = useStore()
+  const { vault } = useStore()
   const { project } = useProjectContext()
 
   const [errors, setErrors] = useState<Dictionary<any>>({})
   const [columnFields, setColumnFields] = useState<ColumnField>()
   const [isEditingRelation, setIsEditingRelation] = useState<boolean>(false)
+
+  const { data: types } = usePostgresTypesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const enumTypes = (types ?? []).filter(
+    (type) => !EXCLUDED_SCHEMAS.filter((x) => x !== 'extensions').includes(type.schema)
+  )
 
   const { data } = useForeignKeyConstraintsQuery({
     projectRef: project?.ref,
@@ -87,10 +96,6 @@ const ColumnEditor = ({
   const foreignKeyMeta = data || []
 
   const keys = vault.listKeys()
-  const enumTypes = meta.types.list(
-    (type: PostgresType) =>
-      !EXCLUDED_SCHEMAS.filter((x) => x !== 'extensions').includes(type.schema)
-  )
 
   const isNewRecord = column === undefined
   const originalForeignKey = column
