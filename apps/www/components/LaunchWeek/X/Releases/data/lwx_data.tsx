@@ -91,7 +91,12 @@ const days: WeekDayProps[] = [
       {
         title: '',
         blog: '/blog/studio-introducing-assistant',
-        bg_layers: [{ img: '/images/launchweek/lwx/day1/d1_studio.svg' }],
+        bg_layers: [
+          {
+            img: '/images/launchweek/lwx/day1/d1_studio.svg',
+            mobileImg: '/images/launchweek/lwx/day1/d1_studio_mobile.svg',
+          },
+        ],
         steps: [],
       },
     ],

@@ -1,15 +1,15 @@
 import React from 'react'
-import { WeekDayProps } from '../data'
-import { DayLink } from '.'
-import Image from 'next/image'
-import { useBreakpoint } from 'common'
-import { IconEdit2, cn } from 'ui'
-import CountdownComponent from '../../Countdown'
 import Link from 'next/link'
+import Image from 'next/image'
 import { ArrowRightIcon } from '@heroicons/react/outline'
+import { IconEdit2, cn } from 'ui'
+import { useBreakpoint } from 'common'
+import CountdownComponent from '../../Countdown'
+import { DayLink } from '.'
+import { WeekDayProps } from '../data'
 
 const DaySection = ({ day }: { day: WeekDayProps }) => {
-  const isTablet = useBreakpoint(1023)
+  const isMobile = useBreakpoint(639)
   const cssGroup = 'group/d' + day.d
 
   return (
@@ -47,14 +47,15 @@ const DaySection = ({ day }: { day: WeekDayProps }) => {
           <Link
             href={day.blog!}
             className={cn(
-              // bg-[#111415] hover:bg-[#121516]
-              `min-h-[210px] group aspect-[3.67/1] relative overflow-hidden flex-1 flex flex-col justify-between
+              `
+              bg-[#111415] hover:bg-[#121516] sm:!bg-transparent
+              min-h-[210px] group sm:aspect-[3.67/1] relative overflow-hidden flex-1 flex flex-col justify-between
               hover:border-strong transition-colors border border-muted
-              rounded-xl p-4 sm:p-6 md:p-8 text-2xl bg-contain shadow-lg`,
+              rounded-xl text-2xl bg-contain shadow-lg`,
               cssGroup
             )}
           >
-            <div className="relative z-10 flex-grow flex flex-col items-start justify-between gap-2 w-full lg:w-3/5 text-left">
+            <div className="relative p-4 sm:p-6 md:p-8 z-20 flex-grow flex flex-col items-start justify-between gap-2 w-full lg:w-3/5 text-left">
               <div className="relative w-full flex items-center gap-2 text-sm translate-x-0 !ease-[.24,0,.22,.99] duration-200 group-hover:-translate-x-6 transition-transform">
                 <IconEdit2 className="w-4 min-w-4 group-hover:opacity-0 transition-opacity" />
                 <span className="">Blog post</span>
@@ -64,27 +65,30 @@ const DaySection = ({ day }: { day: WeekDayProps }) => {
                 {day.description}
               </h2>
             </div>
-            {day.steps[0]?.bg_layers &&
-              day.steps[0]?.bg_layers?.map(
-                (layer, i) =>
-                  !!layer.img && (
-                    <div
-                      key={`${day.title}-image-${i}`}
-                      className="absolute opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100"
-                    >
-                      <Image
-                        src={!!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img}
-                        className={`
-                          absolute opacity-50 lg:opacity-100 object-cover
-                          w-full h-full z-0 transition-all duration-300
-                        `}
-                        fill
-                        objectPosition={isTablet ? '50%' : '30% 50%'}
-                        alt={day.title}
-                      />
-                    </div>
-                  )
-              )}
+            <div className="relative z-10 border-b border-muted/40 sm:border-none w-full order-first aspect-[2/1] sm:aspect-auto sm:absolute sm:inset-0">
+              {day.steps[0]?.bg_layers &&
+                day.steps[0]?.bg_layers?.map(
+                  (layer, i) =>
+                    !!layer.img && (
+                      <div
+                        key={`${day.title}-image-${i}`}
+                        className="absolute sm:opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100"
+                      >
+                        <Image
+                          src={!!layer.mobileImg && isMobile ? (layer.mobileImg as any) : layer.img}
+                          className={`
+                            absolute opacity-50 lg:opacity-100 object-cover
+                            w-full h-full z-0 transition-all duration-300
+                            object-center
+                          `}
+                          fill
+                          quality={100}
+                          alt={day.title}
+                        />
+                      </div>
+                    )
+                )}
+            </div>
           </Link>
         ) : (
           <div
