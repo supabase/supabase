@@ -44,6 +44,7 @@ import {
 import ColumnForeignKey from './ColumnForeignKey'
 import ColumnType from './ColumnType'
 import HeaderTitle from './HeaderTitle'
+import { toJS } from 'mobx'
 
 export interface ColumnEditorProps {
   column?: PostgresColumn
@@ -86,7 +87,10 @@ const ColumnEditor = ({
   const foreignKeyMeta = data || []
 
   const keys = vault.listKeys()
-  const enumTypes = meta.types.list((type: PostgresType) => !EXCLUDED_SCHEMAS.includes(type.schema))
+  const enumTypes = meta.types.list(
+    (type: PostgresType) =>
+      !EXCLUDED_SCHEMAS.filter((x) => x !== 'extensions').includes(type.schema)
+  )
 
   const isNewRecord = column === undefined
   const originalForeignKey = column
