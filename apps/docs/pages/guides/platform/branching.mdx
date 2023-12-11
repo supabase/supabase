@@ -10,9 +10,9 @@ export const meta = {
 
 Use branching to safely and easily experiment with changes to your Supabase projects.
 
-<Admonition type="caution" label="Branching is an Alpha feature, available on the Pro Plan and above.">
+<Admonition type="caution" label="Branching available for Early Access, available on the Pro Plan and above.">
 
-We do not recommended Branching in a production environment while it is in Alpha. To try branching, [request access here](https://forms.supabase.com/branching-request). We are working our upstream provider to improve the stability in the following regions:
+We do not recommended Branching in a production environment while it is in Early Access. To try branching, [request access here](https://forms.supabase.com/branching-request). We are working our upstream provider to improve the stability in the following regions:
 
 - South East Asia (Singapore)
 - South Asia (Mumbai)
@@ -52,9 +52,11 @@ You can run multiple Preview Branches for every Supabase project. Branches conta
 
 </Admonition>
 
+To manage code changes, your Supabase project must be connected to a Git repository via one of the [Git providers](#git-providers). 
+
 ## Git providers
 
-To manage code changes, your Supabase project must be connected to a Git repository. At this stage we only support [GitHub](#branching-with-github). If you are interested in other Git providers, join the [discussion]((https://github.com/orgs/supabase/discussions/18936)) for GitLab, BitBucket, and non-Git based Branching.
+We currently support [GitHub](#branching-with-github). If you are interested in other Git providers, join the [discussion]((https://github.com/orgs/supabase/discussions/18936)) for GitLab, BitBucket, and non-Git based Branching.
 
 ### Branching with GitHub
 
@@ -218,7 +220,7 @@ Before enabling Branching for your project, make sure your [GitHub repository is
     <StepHikeCompact.Step step={1}>
         <StepHikeCompact.Details title="Select the project you want to use, then click `Enable branching`" fullWidth>
 
-            If you're prompted to join the waitlist, click `Join waitlist`. Access will be expanded as branching graduates from alpha testing.
+            If you're prompted to join the waitlist, click `Join waitlist`.
 
             <figure className="max-w-[520px]">
             <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-opt-in-popover.jpg?v=1" />
@@ -228,7 +230,7 @@ Before enabling Branching for your project, make sure your [GitHub repository is
     </StepHikeCompact.Step>
 
     <StepHikeCompact.Step step={2}>
-        <StepHikeCompact.Details title="If you see the following dialog, you're in the alpha testing group" fullWidth>
+        <StepHikeCompact.Details title="If you see the following dialog, you're in the Early Access group" fullWidth>
 
             <figure className="max-w-[520px]">
                 <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-opt-in-install-github.jpg?v=1" />
@@ -254,7 +256,7 @@ Before enabling Branching for your project, make sure your [GitHub repository is
     </StepHikeCompact.Step>
 
     <StepHikeCompact.Step step={3}>
-        <StepHikeCompact.Details title="If you see the following dialog, you're in the alpha testing group" fullWidth>
+        <StepHikeCompact.Details title="If you see the following dialog, you're in the Early Access group" fullWidth>
 
             You should now see a popover with the GitHub Connection details shown.
 
