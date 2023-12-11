@@ -44,7 +44,7 @@ export async function executeSql(
     | 'isRoleImpersonationEnabled'
   >,
   signal?: AbortSignal
-) {
+): Promise<{ result: any }> {
   if (!projectRef) throw new Error('projectRef is required')
 
   let headers = new Headers()
