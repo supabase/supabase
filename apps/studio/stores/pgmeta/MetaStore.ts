@@ -47,7 +47,6 @@ import PoliciesStore from './PoliciesStore'
 import PublicationStore from './PublicationStore'
 import RolesStore, { IRolesStore } from './RolesStore'
 import TriggersStore from './TriggersStore'
-import TypesStore from './TypesStore'
 import ViewStore, { IViewStore } from './ViewStore'
 
 const BATCH_SIZE = 1000
@@ -68,7 +67,6 @@ export interface IMetaStore {
   functions: IPostgresMetaInterface<any>
   extensions: IPostgresMetaInterface<any>
   publications: IPostgresMetaInterface<any>
-  types: IPostgresMetaInterface<any>
 
   projectRef?: string
 
@@ -160,7 +158,6 @@ export default class MetaStore implements IMetaStore {
   functions: FunctionsStore
   extensions: ExtensionsStore
   publications: PublicationStore
-  types: TypesStore
 
   projectRef?: string
   connectionString?: string
@@ -215,7 +212,6 @@ export default class MetaStore implements IMetaStore {
       `${this.baseUrl}/publications`,
       this.headers
     )
-    this.types = new TypesStore(this.rootStore, `${this.baseUrl}/types`, this.headers)
 
     makeObservable(this, {})
   }
@@ -1019,8 +1015,5 @@ export default class MetaStore implements IMetaStore {
 
     this.publications.setUrl(`${this.baseUrl}/publications`)
     this.publications.setHeaders(this.headers)
-
-    this.types.setUrl(`${this.baseUrl}/types`)
-    this.types.setHeaders(this.headers)
   }
 }
