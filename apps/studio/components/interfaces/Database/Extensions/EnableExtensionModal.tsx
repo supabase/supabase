@@ -1,4 +1,5 @@
 import type { PostgresExtension } from '@supabase/postgres-meta'
+import { ExternalLinkIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -18,7 +19,6 @@ import {
   Listbox,
   Modal,
 } from 'ui'
-import { ExternalLinkIcon } from 'lucide-react'
 
 interface EnableExtensionModalProps {
   visible: boolean
@@ -210,7 +210,7 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
                       <Button
                         asChild
                         type="link"
-                        iconRight={<ExternalLinkIcon width={14} height={14} />}
+                        iconRight={<ExternalLinkIcon width={12} height={12} />}
                       >
                         <a
                           href="/docs/guides/platform/fly-postgres#limitations"
