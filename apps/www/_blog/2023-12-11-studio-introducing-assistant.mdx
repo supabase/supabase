@@ -63,7 +63,7 @@ The new RLS Editor brings SQL front-and-center. We want to give developers acces
 1. A SQL Editor: if you know SQL really well, there's a new editor for you to quickly write your policies.
 2. An Assistant: if you're new to RLS and need some help, you can use the Assistant and chat your way through it.
 
-![Supabase AI](/images/blog/launch-week-x/day-1/1.png)
+<Img src="/images/blog/launch-week-x/day-1/1.png" alt="Supabase new AI Assistant" />
 
 The Assistant has been tuned to produce SQL for Row Level Security, making it fast and easy to get your policies setup the way you need them.
 
@@ -94,7 +94,7 @@ If you use our client libs, you'll be familiar with the `anon` and `service_role
 
 What if you could run the queries in Studio using the same Postgres roles you use in your applications? What if you could have the Studio pretend to use a different role than the default `postgres` role? Today, you can:
 
-![Supabase AI](/images/blog/launch-week-x/day-1/3.png)
+<Img src="/images/blog/launch-week-x/day-1/3.png" alt="Supabase new postgres roles" />
 
 You can use the new Role dropdown to select a different Postgres role for your queries in Studio. This is a powerful tool for testing your Row Level Security policies and determining which data each role can access.
 
@@ -134,7 +134,7 @@ We can impersonate a user in Studio by "minting" a JWT with their ID and then ru
 
 Let's see it in action after we've written an RLS policy to allow users to view _their own_ tweets. Here, we can choose the `authenticated` role, and select a specific user to see just their tweets. Here's all of our user's tweets:
 
-![Supabase AI](/images/blog/launch-week-x/day-1/7.png)
+<Img src="/images/blog/launch-week-x/day-1/7.png" alt="Supabase AI" />
 
 The Table Editor is now impersonating our user.
 
@@ -146,11 +146,11 @@ You can create RLS policies and test that they work exactly as you expect, right
 
 The fun doesn't stop with the Table Editor. We've added Roles support to both the SQL Editor and GraphiQL as well. Let's repeat what we've done above by trying to select a list of our own tweets in the SQL Editor:
 
-![Supabase AI](/images/blog/launch-week-x/day-1/8.png)
+<Img src="/images/blog/launch-week-x/day-1/8.png" alt="Supabase AI" />
 
 And in GraphiQL:
 
-![Supabase AI](/images/blog/launch-week-x/day-1/11.png)
+<Img src="/images/blog/launch-week-x/day-1/11.png" alt="Supabase AI" />
 
 Combining this feature with the new RLS Editor, you're able to write and test RLS policies with real data in a matter of minutes. This makes the process of writing RLS policies many times faster and easier. If you've got feedback, [we'd love to hear it](https://github.com/orgs/supabase/discussions/19595).
 
@@ -160,7 +160,7 @@ Supabase [Realtime](https://supabase.com/realtime) is great for building collabo
 
 Today we're releasing Realtime Inspector: an easy way to prototype, inspect, and debug Realtime directly in the Studio. You can use the Realtime Inspector to view messages being sent and received in channels. You can filter messages by type: presence, broadcast, and database changes.
 
-![Supabase AI](/images/blog/launch-week-x/day-1/6.png)
+<Img src="/images/blog/launch-week-x/day-1/6.png" alt="Supabase AI" />
 
 And, of course, we've included the Roles dropdown here as well. You can view events by role and impersonate users just like the Table and SQL Editors.
 
@@ -184,17 +184,17 @@ While we consider these features to be beta releases, please know that we take y
 
 You can find our Feature Preview under the user avatar menu in the lower left:
 
-![Supabase AI](/images/blog/launch-week-x/day-1/4.png)
+<Img src="/images/blog/launch-week-x/day-1/4.png" alt="Supabase AI Feature Preview" />
 
 We currently have two features in preview:
 
 `1.` The new RLS Assistant that we looked at earlier:
 
-![Supabase AI](/images/blog/launch-week-x/day-1/5.png)
+<Img src="/images/blog/launch-week-x/day-1/5.png" alt="Supabase AI new RLS Assistant" />
 
 `2.` And a revised API side panel:
 
-![Supabase AI](/images/blog/launch-week-x/day-1/10.png)
+<Img src="/images/blog/launch-week-x/day-1/10.png" alt="Supabase AI revised API side panel" />
 
 We'll be actively keeping an eye on the Github Discussions and will be responding to your feedback.
 
