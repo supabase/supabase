@@ -57,10 +57,14 @@ const SidePanelEditor = ({
     .map((column) => column.name)
 
   const { project } = useProjectContext()
-  const { mutateAsync: createTableRows } = useTableRowCreateMutation()
+  const { mutateAsync: createTableRows } = useTableRowCreateMutation({
+    onSuccess() {
+      toast.success('Successfully created row')
+    },
+  })
   const { mutateAsync: updateTableRow } = useTableRowUpdateMutation({
     onSuccess() {
-      ui.setNotification({ category: 'success', message: 'Successfully updated row' })
+      toast.success('Successfully updated row')
     },
   })
 
