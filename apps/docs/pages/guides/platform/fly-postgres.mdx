@@ -6,19 +6,19 @@ export const meta = {
   description: 'Deploy Supabase projects on the Fly.io platform',
 }
 
+Fly Postgres databases are deployed on the Fly.io edge network. Fly Postgres is supported in [every region](https://fly.io/docs/reference/regions/) where Fly.io operates.
+
 <Admonition type="note">
 
-Fly Postgres is currently in private alpha. Submit [this form](https://forms.supabase.com/fly-postgres) if you'd like to request early access.
+Fly Postgres is currently in private alpha. To request early access, [submit the request form](https://forms.supabase.com/fly-postgres).
 
 </Admonition>
-
-Fly Postgres databases are deployed on the Fly.io edge network. Fly Postgres is supported in [every region](https://fly.io/docs/reference/regions/) where Fly.io operates.
 
 ## Quickstart
 
 1. Install the latest version of the [Fly CLI](https://fly.io/docs/hands-on/install-flyctl/)
 2. Authenticate via the CLI: `flyctl auth login`
-3. Set up a new Fly Postgres application with `flyctl extensions supabase create`. The CLI will prompt for the Fly organization, app name and region to launch the database in.
+3. Set up a new Fly Postgres application with `flyctl extensions supabase create`. When prompted, enter your Fly organization, app name, and the region to launch the database in.
 4. Once the provisioning is complete, the database connection string is displayed. Add this as an environment variable to connect to the database from your Fly applications.
 5. Access the Supabase dashboard by running `flyctl extensions supabase dashboard <app-name>`
 
@@ -28,7 +28,7 @@ The full list of CLI commands for Fly Postgres are documented in the [Fly docs](
 
 If your network supports IPv6, connect directly to your Fly Postgres database, as its domain name resolves to an IPv6 address which can be directly used from within your Fly applications.
 
-If your network only supports IPv4, utilize Supavisor instead of connecting to the database directly. Supavisor's domain name resolves to an IPv4 address, allowing networks without IPv6 support to connect.
+If your network only supports IPv4, use Supavisor instead of connecting to the database directly. Supavisor's domain name resolves to an IPv4 address, allowing networks without IPv6 support to connect.
 
 To find your database's connection strings, visit the Supabase [database settings page](https://supabase.com/dashboard/project/_/settings/database).
 
@@ -58,17 +58,17 @@ Each Fly user is entitled to one free Fly Postgres database. To create additiona
 
 Fly Postgres databases are priced exactly the same as projects launched via Supabase. For detailed pricing information, visit the [Supabase pricing page](https://supabase.com/pricing).
 
-The [usage page](https://supabase.com/dashboard/org/_/usage) details the usage of your Fly Postgres databases. The usage information is sent to Fly and the billing is added to your Fly invoice. Supabase adheres to the Fly billing cycles, which is the 1st of every month. Doing any upgrades or downgrades in between will always prorate to the 1st of next month. This can lead to delayed charges. For example, if you upgrade to the Pro plan in the middle of a month, you will be charged the pro-rated amount on the first of the next month.
+The [usage page](https://supabase.com/dashboard/org/_/usage) details the usage of your Fly Postgres databases. The usage information is sent to Fly and the billing is added to your Fly invoice. Supabase adheres to the Fly billing cycles, which start on the 1st of every month. Any upgrades or downgrades in between are prorated and billed on the 1st of the next month. This can lead to delayed charges. For example, if you upgrade to the Pro plan in the middle of a month, you will be charged the pro-rated amount on the first of the next month.
 
 ## Limitations
 
-When using Fly Postgres, please be aware of the current restrictions:
+When using Fly Postgres, be aware of the current restrictions:
 
 - Direct database connections are only supported via IPv6. Read more in the [connecting to your database](#connecting-to-your-database) section.
 - [Network restrictions](/docs/guides/platform/network-restrictions) are not supported
-- Currently, only the database, Supavisor, and Postgrest are supported. Support for additional Supabase products such as Realtime, Storage, and Auth is planned for the near future.
-- New projects can only be launched using the Fly CLI and not via the Supabase studio.
-- The [pg_cron](/docs/guides/database/extensions/pg_cron) extension is not fully supported for Fly projects. Fly projects shutdown after 15 minutes of inactivity, but transparently startup when an external request is received. However, this does not apply to the pg_cron jobs which are not triggered by external requests. As a result, pg_cron jobs will not run when the database is shutdown due to inactivity. We are working on removing this behaviour for paid projects.
+- Currently, only the database, Supavisor, and Postgrest are supported. Support for additional Supabase products such as Realtime, Storage, and Auth is planned.
+- New projects can only be launched using the Fly CLI and not via the Supabase dashboard.
+- The [pg_cron](/docs/guides/database/extensions/pg_cron) extension is not fully supported for Fly projects. Fly projects shut down after 15 minutes of inactivity, but transparently start up when an external request is received. However, this does not apply to pg_cron jobs, which aren’t triggered by external requests. ` pg_cron` jobs don’t run when the database is shut down due to inactivity. We are working on removing this behavior for paid projects.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
