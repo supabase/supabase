@@ -107,64 +107,30 @@ We currently support [GitHub](#branching-with-github). If you are interested in 
 
 ## How to use Supabase Branching
 
-<Admonition type="note" label="Github integration required">
+Supabase Branching requires a hosted [Git provider](#git-providers). Follow these steps to connect your Supabase project to a Git provider, and enable branching.
 
-Supabase branching requires the GitHub integration. Your application must be developed in a GitHub repository.
+### Preparing your Git repository
 
-</Admonition>
+You can use the [Supabase CLI](/docs/guides/cli) to manage changes inside a local `./supabase` directory: 
 
-### Preparing your GitHub repository
-
-You need a GitHub repository to use Supabase branching. The `./supabase` directory in your repository contains your SQL migration files and your database seed file.
-
-To start:
-
-- If you don't have a new project, [set one up using the example template](#set-up-a-new-project-with-the-example-template).
-- If you have an existing project, [make sure your database-related files are up to date](#set-up-an-existing-project-for-branching).
-
-#### Set up a new project with the example template
-
-Use the Next.js example template to try out branching. This template includes sample migration and seed files to get you started.
-
-Run the following command in your terminal to clone the example:
-
-<CH.Code lineNumbers={false}>
-
-```bash
-npx create-next-app -e with-supabase
-```
-
-</CH.Code>
-
-Push your new project to a GitHub repo. For more information, see the GitHub guides on [creating](https://docs.github.com/en/get-started/quickstart/create-a-repo) and [pushing code](https://docs.github.com/en/get-started/using-git/pushing-commits-to-a-remote-repository) to a new repository.
-
-#### Set up an existing project for branching
-
-Before enabling branching on an existing project, make sure your database-related files are up to date. You need a current snapshot of your existing database, so newer migration files have a foundation to run on top of.
-
-<Admonition type="caution" label="Get set up before enabling Branching">
-
-Setting up the initial state incorrectly can cause migrations to be wrongly applied.
-
-Follow the instructions below **before enabling Branching**.
-
-</Admonition>
-
-##### If your migration files are already in GitHub, under `./supabase/migrations`:
-
-If your migration files are up to date with your production database, you don't need to do anything. You can now turn on branching.
-
-##### If you don't have migration files in GitHub:
-
-You need to take a snapshot of your database. Log into Supabase from the [command line client](/docs/guides/cli) and pull the relevant files. Then commit them to GitHub:
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="existing"
+  queryGroup="platform"
+>
+<TabPanel id="existing" label="Existing project">
 
 <StepHikeCompact>
     <StepHikeCompact.Step step={1}>
-        <StepHikeCompact.Details title="Inside your project directory, initialize your configuration for Supabase local development:" fullWidth>
+        <StepHikeCompact.Details title="Initialize Supabase locally" fullWidth>
 
+            If you don't have a `./supabase` directory, you can create one:
+            
             <CH.Code lineNumbers={false}>
 
-            ```bash
+            ```markdown
             supabase init
             ```
 
@@ -173,14 +139,17 @@ You need to take a snapshot of your database. Log into Supabase from the [comman
     </StepHikeCompact.Step>
 
     <StepHikeCompact.Step step={2}>
-        <StepHikeCompact.Details title="Pull down database-related files" fullWidth>
+        <StepHikeCompact.Details title="Sync your database migration" fullWidth>
 
-            You can find your database URL in your [database settings](https://supabase.com/dashboard/project/_/settings/database), under the URI tab of the Connection String settings panel. It will look something like `postgresql://username:password@db.ref.supabase.co:5432/postgres`
+            Sync your database changes using `supabase db pull`. You can find your database URL in your [database settings](https://supabase.com/dashboard/project/_/settings/database), under the URI tab of the Connection String settings panel.
 
             <CH.Code lineNumbers={false}>
 
-            ```bash
-            supabase db pull --db-url <db_url>
+            ```markdown
+            supabase db pull --db-url <db_url> 
+
+            # Your Database URL looks something like: 
+            # postgresql://username:password@db.ref.supabase.co:5432/postgres
             ```
 
             </CH.Code>
@@ -209,21 +178,35 @@ You need to take a snapshot of your database. Log into Supabase from the [comman
 
 </StepHikeCompact>
 
-### Enable Supabase branching
+</TabPanel>
+<TabPanel id="new" label="New Project">
 
-Once your repository is [correctly prepared](#set-up-an-existing-project-for-branching), you can enable branching from the Supabase dashboard.
+Use the Next.js example template to try out branching. This template includes sample migration and seed files to get you started. Run the following command in your terminal to clone the example:
+
+```bash
+npx create-next-app -e with-supabase
+```
+
+Push your new project to a GitHub repo. For more information, see the GitHub guides on [creating](https://docs.github.com/en/get-started/quickstart/create-a-repo) and [pushing code](https://docs.github.com/en/get-started/using-git/pushing-commits-to-a-remote-repository) to a new repository.
+
+</TabPanel>
+</Tabs>
+
+### Enable Supabase Branching
+
+Once your repository is [correctly prepared](#preparing-your-git-repository), you can enable branching from the Supabase dashboard.
 
 <Admonition type="caution" label="Prepare your GitHub repository before enabling Branching">
 
-Before enabling Branching for your project, make sure your [GitHub repository is prepared](#set-up-an-existing-project-for-branching). If your repository doesn't have all the migration files, your production branch could run an incomplete set of migrations.
+If your repository doesn't have all the migration files, your production branch could run an incomplete set of migrations. Make sure your [GitHub repository is prepared](#preparing-your-git-repository). 
 
 </Admonition>
 
 <StepHikeCompact>
     <StepHikeCompact.Step step={1}>
-        <StepHikeCompact.Details title="Select the project you want to use, then click `Enable branching`" fullWidth>
+        <StepHikeCompact.Details title="Inside your Supabase project, click `Enable branching`" fullWidth>
 
-            If you're prompted to join the waitlist, click `Join waitlist`.
+            If you're prompted to join the waitlist, click `Join waitlist`. We're rolling out Branching to users in batches.
 
             <figure className="max-w-[520px]">
             <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-opt-in-popover.jpg?v=1" />
@@ -344,20 +327,14 @@ Preview branches are automatically created for each pull request, but you can al
 
 </StepHikeCompact>
 
-### Develop your app with Supabase branches
+### Make changes to your branch
 
-Supabase branching uses the state of your GitHub repository to apply migrations and seed preview instances. It checks the `supabase` directory at the top level of your repository.
-
-The `supabase` directory should include:
+The Git integration watches for changes in the `supabase` directory. This includes:
 
 - All SQL migration files, under the subdirectory `migrations`
 - An optional `seed.sql` file, used to seed preview instances with sample data
 
-The GitHub integration watches for changes in the `migrations` directory. When it detects a new migration file, it runs the new migration against the matching preview instance.
-
-You can create new migrations either [locally](#develop-locally) or [remotely](#develop-remotely).
-
-Local development is recommended for developers familiar with the Supabase CLI, who want to test changes on their local machine. Remote development is recommended if you don't want to run Supabase locally, or if you want to collaborate with team members via the dashboard interface.
+You can create new migrations either [locally](#develop-locally) or [remotely](#develop-remotely). Local development is recommended for developers familiar with the Supabase CLI, who want to test changes on their local machine. Remote development is recommended if you don't want to run Supabase locally, or if you want to collaborate with team members via the dashboard interface.
 
 #### Develop locally
 
