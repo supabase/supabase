@@ -272,9 +272,8 @@ Sign up for early access [here](https://forms.supabase.com/branching-request).
 
             Type in the branch you want to use for production. The name of the branch will be validated to make sure it exists in your GitHub repository.
 
-            <Admonition type="caution">
+            <Admonition type="caution" label="Your production branch can’t be changed while branching is enabled.">
 
-            Your production branch can’t be changed while branching is enabled.
             To change your production branch, you need to disable branching and re-enable it with a different branch.
 
             </Admonition>
@@ -337,11 +336,9 @@ Preview branches are automatically created for each pull request, but you can al
 
         Type in the branch name you want to add. Click `Create branch` to confirm.
 
-        <Admonition type="note">
+        <Admonition type="note" label="Only branches from the repository can be used to create a Preview Branch">
 
-        **Only branches from the repository can be used to create a Preview Branch**
-
-        Git branches from external contributors currently can’t support a Preview Branch
+            Git branches from external contributors currently can’t support a Preview Branch
 
         </Admonition>
 
@@ -379,30 +376,107 @@ Once you’re confident in your migration files, push your changes to your remot
 
 To create and push local migrations:
 
-1. ##### Create a new migration file.
+<StepHikeCompact>
 
-   ```json
-   supabase migration new "new_feature"
-   ```
+    <StepHikeCompact.Step step={1}>
+        <StepHikeCompact.Details title="Make schema changes locally." fullWidth>
 
-2. ##### Add SQL statements to your new migration file.
+            If you haven't already started your local Supabase environment, in your terminal run:
 
-   You can manually edit the new migration file, or use [local studio](https://supabase.com/docs/guides/cli/local-development#diffing-changes) and diff the changes.
+           ```bash
+            supabase start
+            ```
 
-   ```sql
-   create table employees (
-   id integer primary key generated always as identity,
-       name text
-   )
-   ```
+            Then proceed to [http://localhost:54323](http://localhost:54323) to access your local Supabase dashboard.
 
-3. ##### Commit and push your migration file.
+            You can make changes in either the [Table Editor](http://localhost:54323/project/default/editor) or the [SQL Editor]((http://localhost:54323/project/default/sql)).
 
-   ```sql
-   git add supabase/migrations
-   git commit -m "Add employees table"
-   git push --set-upstream origin new-employee
-   ```
+        </StepHikeCompact.Details>
+    </StepHikeCompact.Step>
+
+    <StepHikeCompact.Step step={2}>
+        <StepHikeCompact.Details title="Create a new migration file." fullWidth>
+
+            Once you are confident with your changes, you can create a new migration file.
+
+            We can compare the current state of your database with the state of your migrations directory to generate a new migration file.
+
+            ```bash
+            supabase db diff -f "new_feature"
+            ```
+
+            This will create a SQL file called `./supabase/migrations/[timestamp]_new_feature.sql`, and it will contain the SQL statements to make your database schema match the current state of your database.
+
+            ```sql 20231127222412_new_feature.sql
+            create table employees (
+            id integer primary key generated always as identity,
+                name text
+            )
+            ```
+
+        </StepHikeCompact.Details>
+    </StepHikeCompact.Step>
+
+    <StepHikeCompact.Step step={3}>
+        <StepHikeCompact.Details title="Make further optional changes by editing the migration file." fullWidth>
+
+            _If you don't want to make further changes, proceed to step 5._
+
+            You can manually edit the new migration file. 
+            For example, you may choose to use a different name for the table.
+
+            ```sql
+            -- we have updated the table name to `colleagues`
+            create table colleagues (
+            id integer primary key generated always as identity,
+                name text
+            )
+            ```
+
+            Then we can run `db reset`.
+
+            ```bash
+            supabase db reset
+            ```
+
+            This will reset the database and run all the migrations again. The local dashboard at [http://localhost:54323](http://localhost:54323) will reflect the new changes you made.
+
+        </StepHikeCompact.Details>
+    </StepHikeCompact.Step>
+
+    <StepHikeCompact.Step step={4}>
+        <StepHikeCompact.Details title="Make further optional changes by editing in local dashboard." fullWidth>
+
+            _If you don't want to make further changes, proceed to step 5._
+        
+            You may also want to make changes in the dashboard instead. Go to the local dashboard at [http://localhost:54323](http://localhost:54323) and make the changes you want.
+
+            Once you've made the schema changes you want, you can either:
+            
+            1. Run `db diff -f [file name]` in the terminal again to generate a new migration file. Your Preview Branch will then have multiple migration files.
+            2. Or; you can manually delete the old migration file, then run `db diff -f [file name]`. All your changes will be captured in a single migration file.
+
+        </StepHikeCompact.Details>
+    </StepHikeCompact.Step>
+
+    <StepHikeCompact.Step step={5}>
+        <StepHikeCompact.Details title="Commit your changes and push." fullWidth>
+
+            Commit and push your migration file to your remote GitHub repository.
+
+            ```bash
+            git add supabase/migrations
+            git commit -m "Add employees table"
+            git push --set-upstream origin new-employee
+            ```
+
+            Your migration changes will now run on the remote Preview Branch.
+
+     </StepHikeCompact.Details>
+
+ </StepHikeCompact.Step>
+
+</StepHikeCompact>
 
 Supabase’s GitHub integration detects the new migration and runs it against the branch instance.
 
@@ -414,29 +488,71 @@ If you need to reset your database to a clean state (that is, discard any change
 
 As an alternative to developing locally, you can make changes on your remote Supabase dashboard. You can then pull these changes to your local machine and commit them to GitHub.
 
-<Admonition type="note">
-
-Changes must be locally pulled and committed to keep your GitHub repository state in sync.
+<Admonition type="note" label="Changes must be locally pulled and committed to keep your GitHub repository state in sync.">
 
 Dashboard changes aren’t automatically reflected in your repository. If you’d like to see automatic syncing in a future release, [join the discussion](https://github.com/orgs/supabase/discussions/18937).
 
 </Admonition>
 
-1. Click on the active branch in the top bar to open the dropdown menu. Select the branch you want to use.
+<StepHikeCompact>
+    <StepHikeCompact.Step step={1}>
+        <StepHikeCompact.Details title="Select the branch you want to use." fullWidth>
 
-   <figure className="max-w-[520px]">
-     <Image src="/docs/img/guides/platform/branching/develop-your-app-develop-remotely.jpg?v=1" />
-   </figure>
+        Go to the project you wish to use hosted on [supabase.com/dashboard](https://supabase.com/dashboard/project/_),
+        click on the active branch in the top bar to open the dropdown menu.
+        Select the branch you wish to use.
 
-2. Make changes to your database schema from the Supabase dashboard.
-3. Reset database password for the branch. To do this, navigate to `https://supabase.com/dashboard/project/[branch-ref]/settings/database` and click **Reset database password**. Save the new password for use in the next step.
-4. In your terminal, navigate to the directory for your Supabase project. Use the Supabase client to pull changes from your branch to your local migrations directory. Make sure to use the database URL for your branch.
+        <figure className="max-w-[520px]">
+            <Image src="/docs/img/guides/platform/branching/develop-your-app-develop-remotely.jpg?v=1" />
+        </figure>
 
-   ```bash
-   	supabase db pull --db-url "postgres://postgres:[password]@db.[branch-ref].supabase.co:5432/postgres"
-   ```
+        </StepHikeCompact.Details>
+    </StepHikeCompact.Step>
 
-5. Commit and push your migration file. No new migrations are run. This is expected, because your database is already up-to-date, based on the changes you made in the dashboard. But this ensures that your migration files are in GitHub, so they can be correctly merged into production.
+    <StepHikeCompact.Step step={2}>
+        <StepHikeCompact.Details title="Make changes to your database schema." fullWidth>
+
+        In the dashboard, you can make changes to your schema with either with the [Table Editor](https://supabase.com/dashboard/project/_/editor) or the [SQL Editor]((https://supabase.com/dashboard/project/_/sql)).
+
+        </StepHikeCompact.Details>
+    </StepHikeCompact.Step>
+
+    <StepHikeCompact.Step step={3}>
+        <StepHikeCompact.Details title="Check you have the password for the Preview Branch database." fullWidth>
+
+        You may already know the password for this Preview branch, if so, continue to next step.
+
+        If you don't know the password, you must Reset the database password so you know the password. Navigate to `https://supabase.com/dashboard/project/[branch-ref]/settings/database` and click **Reset database password**.
+        Save the new password securely for use in the next step.
+
+        </StepHikeCompact.Details>
+    </StepHikeCompact.Step>
+
+    <StepHikeCompact.Step step={4}>
+        <StepHikeCompact.Details title="Pull changes from remote database." fullWidth>
+
+         In your terminal, navigate to the directory for your Supabase project.
+         Use the Supabase client to pull changes from your branch to your local migrations directory.
+         Make sure to use the database URL for your branch.
+
+        ```bash
+    supabase db pull --db-url "postgres://postgres:[password]@db.[branch-ref].supabase.co:5432/postgres"
+        ```
+
+        </StepHikeCompact.Details>
+    </StepHikeCompact.Step>
+
+     <StepHikeCompact.Step step={5}>
+        <StepHikeCompact.Details title="Commit and push your migration file." fullWidth>
+
+         No new migrations are run. This is expected, because your database is already up-to-date,
+         based on the changes you made in the dashboard.
+         But this ensures that your migration files are in GitHub, so they can be correctly merged into production.
+
+        </StepHikeCompact.Details>
+    </StepHikeCompact.Step>
+
+</StepHikeCompact>
 
 ### Open a pull request
 
@@ -518,9 +634,7 @@ With the Supabase branching integration, you can sync the Git branch used by the
 
 ### Vercel
 
-<Admonition type="note">
-
-    Vercel Branching support is in development.
+<Admonition type="note" label="Vercel Branching support is in development.">
 
     The Vercel Integration for Supabase branching is under development. To express your interest, [join the discussion on GitHub discussions](https://github.com/orgs/supabase/discussions/18938).
 
@@ -531,7 +645,7 @@ Install the Vercel integration:
 - From the [Vercel marketplace](https://vercel.com/integrations/supabase-v2) or
 - By clicking the blue `Deploy` button in a Supabase example app’s `README` file
 
-<Admonition type="note">
+<Admonition type="note" label="Vercel GitHub integration also required.">
 
 For branching to work with Vercel, you also need the [Vercel GitHub integration](https://vercel.com/docs/deployments/git/vercel-for-github).
 
