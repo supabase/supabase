@@ -30,7 +30,7 @@ const FeaturePreviewModal = () => {
             key: LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT,
             name: 'Supabase Assistant for RLS policies',
             content: <RLSAIAssistantPreview />,
-            discussionsUrl: undefined,
+            discussionsUrl: 'https://github.com/orgs/supabase/discussions/19594',
           },
         ]
       : []),
