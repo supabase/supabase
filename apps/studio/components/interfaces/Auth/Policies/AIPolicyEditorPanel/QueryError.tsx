@@ -1,8 +1,8 @@
 import styles from '@ui/layout/ai-icon-animation/ai-icon-animation-style.module.css'
 import { QueryResponseError } from 'data/sql/execute-sql-mutation'
-import { useState } from 'react'
+import { initial, last } from 'lodash'
+import { Dispatch, SetStateAction } from 'react'
 import {
-  AiIcon,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
@@ -14,13 +14,15 @@ import {
 
 const QueryError = ({
   error,
+  open,
+  setOpen,
   onSelectDebug,
 }: {
   error: QueryResponseError
+  open: boolean
+  setOpen: Dispatch<SetStateAction<boolean>>
   onSelectDebug: () => void
 }) => {
-  const [open, setOpen] = useState(true)
-
   const formattedError =
     (error?.formattedError?.split('\n') ?? [])?.filter((x: string) => x.length > 0) ?? []
 
@@ -76,15 +78,33 @@ const QueryError = ({
             <CollapsibleContent_Shadcn_ className="overflow-auto">
               {formattedError.length > 0 ? (
                 formattedError.map((x: string, i: number) => (
-                  <pre key={`error-${i}`} className="font-mono text-xs overflow">
-                    {x.split(' ').map((x: string, i: number) => (
-                      <span
-                        className={cn(x === 'ERROR:' && 'text-destructive')}
-                        key={`error-${i}-${x}`}
-                      >
-                        {x}{' '}
-                      </span>
-                    ))}
+                  <pre key={`error-${i}`} className="font-mono text-xs whitespace-pre-wrap">
+                    {x
+                      .split(' ')
+                      .reduce((arr, cur) => {
+                        // Split the ERROR string so that it can be wrapped in a red span
+                        const l = last(arr)
+
+                        if (l && l !== 'ERROR:') {
+                          return initial(arr).concat([[l, cur].join(' ')])
+                        }
+
+                        if (l === '') {
+                          return arr.concat([' '])
+                        }
+
+                        return arr.concat([cur])
+                      }, [] as string[])
+                      .map((str, index, arr) => {
+                        return (
+                          <span
+                            key={index}
+                            className={cn('break-all', str === 'ERROR:' && 'text-destructive')}
+                          >
+                            {str}
+                          </span>
+                        )
+                      })}
                   </pre>
                 ))
               ) : (

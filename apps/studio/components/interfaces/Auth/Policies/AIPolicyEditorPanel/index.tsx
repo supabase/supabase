@@ -61,6 +61,7 @@ export const AIPolicyEditorPanel = memo(function ({
   const isOptedInToAI = selectedOrganization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
 
   const [error, setError] = useState<QueryResponseError>()
+  const [errorPanelOpen, setErrorPanelOpen] = useState(true)
   const [showDetails, setShowDetails] = useState(false)
   // [Joshen] Separate state here as there's a delay between submitting and the API updating the loading status
   const [debugThread, setDebugThread] = useState<MessageWithDebug[]>([])
@@ -218,23 +219,14 @@ export const AIPolicyEditorPanel = memo(function ({
     }
   }, [visible])
 
-  // [Joshen] Problem with monaco is that it's height cannot be dynamically updated once its initialized
-  // So this is sort of a hacky way to do so, until we find a better solution at least
-  const footerHeight = 58
-  const createPolicyEditorHeight =
-    error === undefined
-      ? `calc(100vh - ${footerHeight}px - 54px)`
-      : `calc(100vh - ${footerHeight}px - 151px - ${20 * errorLines}px)`
-  const updatePolicyEditorHeight =
-    showDetails && error === undefined
-      ? `calc(100vh - ${footerHeight}px - 172px)`
-      : showDetails && error !== undefined
-      ? `calc(100vh - ${footerHeight}px - 172px - 122px - ${16 * errorLines}px)`
-      : !showDetails && error === undefined
-      ? `calc(100vh - ${footerHeight}px - 72px)`
-      : !showDetails && error !== undefined
-      ? `calc(100vh - ${footerHeight}px - 72px  - 122px - ${16 * errorLines}px)`
-      : '0'
+  // whenever the deps (current policy details, new error or error panel opens) change, recalculate
+  // the height of the editor
+  useEffect(() => {
+    editorRef.current?.layout({ width: 0, height: 0 })
+    window.requestAnimationFrame(() => {
+      editorRef.current?.layout()
+    })
+  }, [showDetails, error, errorPanelOpen])
 
   return (
     <>
@@ -290,23 +282,19 @@ export const AIPolicyEditorPanel = memo(function ({
                     renderSideBySide: false,
                     scrollBeyondLastLine: false,
                     renderOverviewRuler: false,
+                    renderLineHighlight: 'none',
+                    minimap: { enabled: false },
+                    occurrencesHighlight: false,
+                    folding: false,
+                    selectionHighlight: false,
+                    lineHeight: 20,
+                    padding: { top: 10, bottom: 10 },
                   }}
                 />
               ) : null}
-              <div
-                // [Joshen] Not the cleanest but its to force the editor to re-render its height
-                // for now, till we can find a better solution
-                className={`relative ${incomingChange ? 'hidden' : 'block'}`}
-                style={{
-                  height:
-                    selectedPolicy !== undefined
-                      ? updatePolicyEditorHeight
-                      : createPolicyEditorHeight,
-                }}
-              >
+              <div className={`relative h-full ${incomingChange ? 'hidden' : 'block'}`}>
                 <RLSCodeEditor
                   id="rls-sql-policy"
-                  wrapperClassName={incomingChange ? '!hidden' : ''}
                   defaultValue={''}
                   editorRef={editorRef}
                   placeholder={placeholder}
@@ -314,7 +302,14 @@ export const AIPolicyEditorPanel = memo(function ({
               </div>
 
               <div className="flex flex-col">
-                {error !== undefined && <QueryError error={error} onSelectDebug={onSelectDebug} />}
+                {error !== undefined && (
+                  <QueryError
+                    error={error}
+                    onSelectDebug={onSelectDebug}
+                    open={errorPanelOpen}
+                    setOpen={setErrorPanelOpen}
+                  />
+                )}
                 <SheetFooter_Shadcn_ className="flex flex-col gap-12 px-5 py-4 w-full">
                   <div className="flex justify-end gap-x-2">
                     <Button type="default" disabled={isExecuting} onClick={() => onSelectCancel()}>
