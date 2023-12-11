@@ -9,9 +9,9 @@ export const meta = {
 
 Use branching to safely and easily experiment with changes to your Supabase projects.
 
-<Admonition type="caution" label="Branching is an Alpha feature, available on the Pro Plan and above.">
+<Admonition type="caution" label="Branching available for Early Access, available on the Pro Plan and above.">
 
-We do not recommended Branching in a production environment while it is in Alpha. To try branching, [request access here](https://forms.supabase.com/branching-request). We are working our upstream provider to improve the stability in the following regions:
+We do not recommended Branching in a production environment while it is in Early Access. To try branching, [request access here](https://forms.supabase.com/branching-request). We are working our upstream provider to improve the stability in the following regions:
 
 - South East Asia (Singapore)
 - South Asia (Mumbai)
@@ -21,9 +21,9 @@ We do not recommended Branching in a production environment while it is in Alpha
 
 ## How branching works
 
-Supabase Branching is similar to Git. You test changes in a separate, temporary environment without affecting your production setup. When you're ready to ship your changes, merge your branch to update your production instance with the new changes.
+Supabase Branching works with Git. You can test changes in a separate, temporary environment without affecting your production setup. When you're ready to ship your changes, merge your branch to update your production instance with the new changes.
 
-You can run multiple Preview Branches for every Supabase project. Branches contain all the Supabase features with their own API credentials. Supabase Branching follows the [Trunk Based Development](https://trunkbaseddevelopment.com/) workflow, with one main Production branch and multiple development branches:
+You can run multiple Preview Branches for every Supabase project. Branches contain all the Supabase features with their own API credentials. Preview Environments pause automatically after 5 minutes of inactivity.
 
 <figure className="max-w-[700px] mx-auto">
   <Image
@@ -39,14 +39,9 @@ You can run multiple Preview Branches for every Supabase project. Branches conta
   <figcaption>Each Branch is a separate environment.</figcaption>
 </figure>
 
-1. Preview environments are branched from your Production branch, containing proposed changes.
-1. When you create a Preview Branch, the SQL migration files from your Production branch are run on the new Preview Branch. The Preview Branch then reflects your current Production branch schema.
-1. The Preview Branch will be [seeded with sample data](#seeding-behaviour) if a seed file exists.
-1. When you are confident that the changes you have made are ready for production you can merge them into your Production Branch, and the changes will be applied to your Production environment.
+### Branching workflow
 
-<Admonition type="note" label="Data changes are not included">
-
-    Preview Branch instances contain no data by default. You must include a seed file to seed your preview instance with sample data when the Preview Branch is created. Future versions of Branching may allow for automated data seeding and cloning after we are confident that we can provide safe data masking.
+Preview Branch instances contain no data by default. You must include a seed file to seed your preview instance with sample data when the Preview Branch is created. Future versions of Branching may allow for automated data seeding and cloning after we are confident that we can provide safe data masking.
 
 </Admonition>
 
@@ -62,7 +57,11 @@ In Git, you have a Production Branch (typically this is `main`, `master`, `prod`
 
 You can create a corresponding Preview Branch for any Git branch in your repository. Each time a new Preview Branch is created, the migrations in the Git branch of that Preview Branch are run on the Preview Branch.
 
-The Preview Branch is also seeded with sample data based on `./supabase/seed.sql`, if that file exists.
+# The Preview Branch is also seeded with sample data based on `./supabase/seed.sql`, if that file exists.
+
+Supabase Branching follows the [Trunk Based Development](https://trunkbaseddevelopment.com/) workflow, with one main Production branch and multiple development branches:
+
+> > > > > > > 291f8d3fcf7fa380bab2ab3810224322450a96b3
 
 <figure className="max-w-[700px] mx-auto">
     <Image
@@ -80,7 +79,15 @@ The Preview Branch is also seeded with sample data based on `./supabase/seed.sql
 
 </figure>
 
-Each time a commit is pushed with new migrations in the `./supabase/migrations` directory, the migrations are run on the matching preview instance.
+### Production Branch
+
+In Git, you have a Production Branch (typically this is `main`, `master`, `prod`, etc). This should also be your Supabase project's Production Branch.
+
+### Preview Branches
+
+After connecting your Supabase project to one of the supported [Git providers](#git-providers), a corresponding Supabase Preview will be created whenever a new Git branch is created.
+
+The Git integration can read files from your Git provider, watching every commit and pull request. Each time a commit is pushed with new migrations in the `./supabase/migrations` directory, the migrations are run on the matching Supabase Preview environment:
 
 <figure className="max-w-[700px] mx-auto">
     <Image
@@ -97,6 +104,22 @@ Each time a commit is pushed with new migrations in the `./supabase/migrations` 
     <figcaption>New migration files trigger migrations on the preview instance.</figcaption>
 
 </figure>
+
+### Data changes
+
+The Preview Branch is seeded with sample data based on `./supabase/seed.sql`, if that file exists.
+
+For security reasons, Preview Branches do not contain production data. Future versions of Branching may allow for automated data cloning after we are confident that we can provide safe data masking.
+
+<Admonition type="note" label="Data changes are not merged into production." />
+
+### Merging Production changes
+
+When you merge your Git branch into the production branch, all changes will be applied to your Production environment.
+
+### Git providers
+
+We currently support [GitHub](#branching-with-github). If you are interested in other Git providers, join the [discussion](<(https://github.com/orgs/supabase/discussions/18936)>) for GitLab, BitBucket, and non-Git based Branching.
 
 ## How to use Supabase Branching
 
@@ -216,7 +239,7 @@ Before enabling Branching for your project, make sure your [GitHub repository is
     <StepHikeCompact.Step step={1}>
         <StepHikeCompact.Details title="Select the project you want to use, then click `Enable branching`" fullWidth>
 
-            If you're prompted to join the waitlist, click `Join waitlist`. Access will be expanded as branching graduates from alpha testing.
+            If you're prompted to join the waitlist, click `Join waitlist`.
 
             <figure className="max-w-[520px]">
             <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-opt-in-popover.jpg?v=1" />
@@ -254,7 +277,7 @@ Before enabling Branching for your project, make sure your [GitHub repository is
     </StepHikeCompact.Step>
 
     <StepHikeCompact.Step step={3}>
-        <StepHikeCompact.Details title="If you see the following dialog, you're in the alpha testing group" fullWidth>
+        <StepHikeCompact.Details title="If you see the following dialog, you're in the Early Access group" fullWidth>
 
             You should now see a popover with the GitHub Connection details shown.
 

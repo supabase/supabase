@@ -58,14 +58,16 @@ async function handlePost(request: NextRequest) {
         The output should use the following instructions:
         - The generated SQL must be valid SQL.
         - Always use double apostrophe in SQL strings (eg. 'Night''s watch')
-        - You can use only CREATE POLICY queries, no other queries are allowed.
+        - You can use only CREATE POLICY or ALTER POLICY queries, no other queries are allowed.
         - You can add short explanations to your messages.
         - The result should be a valid markdown. The SQL code should be wrapped in \`\`\`.
         - Always use "auth.uid()" instead of "current_user".
-        - Only use "WITH CHECK" on INSERT or UPDATE policies.
+        - You can't use "USING" expression on INSERT policies.
+        - Only use "WITH CHECK" expression on INSERT or UPDATE policies.
         - The policy name should be short text explaining the policy, enclosed in double quotes.
-        - Always make sure that every \`\`\` has a corresponding ending tag \`\`\`.
-        - Always put explanations as separate text. Don't use inline SQL comments. 
+        - Always put explanations as separate text. Never use inline SQL comments. 
+        - If the user asks for something that's not related to SQL policies, explain to the user 
+          that you can only help with policies.
         
         The output should look like this: 
         "CREATE POLICY user_policy ON users FOR INSERT USING (user_name = current_user) WITH (true);" 
@@ -82,11 +84,12 @@ async function handlePost(request: NextRequest) {
   }
 
   if (policyDefinition !== undefined) {
+    const definitionBlock = codeBlock`${policyDefinition}`
     initMessages.push({
       role: 'user',
       content: codeBlock`
         Here is my policy definition for reference:
-        ${policyDefinition}
+        ${definitionBlock}
       `.trim(),
     })
   }
