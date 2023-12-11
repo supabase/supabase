@@ -55,11 +55,9 @@ In Git, you have a Production Branch (typically this is `main`, `master`, `prod`
 
 You can create a corresponding Preview Branch for any Git branch in your repository. Each time a new Preview Branch is created, the migrations in the Git branch of that Preview Branch are run on the Preview Branch.
 
-# The Preview Branch is also seeded with sample data based on `./supabase/seed.sql`, if that file exists.
+The Preview Branch is also seeded with sample data based on `./supabase/seed.sql`, if that file exists.
 
 Supabase Branching follows the [Trunk Based Development](https://trunkbaseddevelopment.com/) workflow, with one main Production branch and multiple development branches:
-
-> > > > > > > 291f8d3fcf7fa380bab2ab3810224322450a96b3
 
 <figure className="max-w-[700px] mx-auto">
     <Image
