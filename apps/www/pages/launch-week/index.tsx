@@ -13,6 +13,10 @@ import TicketingFlow from '~/components/LaunchWeek/X/Ticket/TicketingFlow'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import LaunchWeekPrizeSection from '~/components/LaunchWeek/X/LaunchWeekPrizeSection'
 import LWXMeetups, { Meetup } from '~/components/LaunchWeek/X/LWXMeetups'
+import LWXStickyNav from '../../components/LaunchWeek/X/Releases/LWXStickyNav'
+import LWXHeader from '../../components/LaunchWeek/X/Releases/LWXHeader'
+import MainStage from '../../components/LaunchWeek/X/Releases/MainStage'
+import BuildStage from '../../components/LaunchWeek/X/Releases/BuildStage'
 
 interface Props {
   meetups?: Meetup[]
@@ -106,8 +110,12 @@ export default function LaunchWeekIndex({ meetups }: Props) {
         }}
       >
         <DefaultLayout>
-          <TicketingFlow />
-          <SectionContainer id="meetups" className="!pt-4 scroll-mt-[66px]">
+          <LWXStickyNav />
+          <LWXHeader />
+          <MainStage />
+          <BuildStage />
+          {/* <TicketingFlow /> */}
+          <SectionContainer id="meetups" className="scroll-mt-[66px]">
             <LWXMeetups meetups={meetups} />
           </SectionContainer>
           <SectionContainer className="lg:pb-40">

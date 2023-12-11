@@ -156,14 +156,6 @@ export default function IndexPage() {
               <p className="p text-lg">
                 Start building for free, collaborate with a team, then scale to millions of users.
               </p>
-              <div className="w-full inline-flex justify-center items-center pt-3 pb-6">
-                <AnnouncementBadge
-                  url="/blog/organization-based-billing"
-                  badge="Update"
-                  announcement="Changes to how we bill"
-                  target="_blank"
-                />
-              </div>
             </div>
           </div>
         </div>

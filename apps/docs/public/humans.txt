@@ -3,6 +3,7 @@ TEAM
 Supabase is 100% remote.
 
 Alaister Young
+Alexander Korotkov
 Amy Q
 Andrew Smith
 Angelico de los Reyes

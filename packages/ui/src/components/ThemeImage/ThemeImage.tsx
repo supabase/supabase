@@ -18,6 +18,7 @@ export const ThemeImage = ({ src, ...props }: any) => {
   return (
     <span className="next-image--dynamic-fill">
       <Image
+        sizes="(max-width: 768px) 120vw, (max-width: 1200px) 100vw, 1200px"
         {...props}
         className={cn('border border-muted rounded-md', props.className)}
         src={

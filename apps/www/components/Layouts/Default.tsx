@@ -22,7 +22,7 @@ const DefaultLayout = (props: Props) => {
   return (
     <>
       {!hideHeader && <Nav />}
-      <main className={cn('min-h-screen', className)}>{children}</main>
+      <main className={cn('relative min-h-screen', className)}>{children}</main>
       {!hideFooter && <Footer className={footerClassName} />}
     </>
   )
