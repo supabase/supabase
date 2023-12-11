@@ -82,6 +82,7 @@ const QueryError = ({
                     {x
                       .split(' ')
                       .reduce((arr, cur) => {
+                        // Split the ERROR string so that it can be wrapped in a red span
                         const l = last(arr)
 
                         if (l && l !== 'ERROR:') {
