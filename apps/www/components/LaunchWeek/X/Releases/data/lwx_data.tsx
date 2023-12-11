@@ -92,7 +92,7 @@ const days: WeekDayProps[] = [
     steps: [
       {
         title: '',
-        blog: '',
+        blog: '/blog/studio-introducing-assistant',
         bg_layers: [{ img: '/images/launchweek/lwx/day1/d1_studio.svg' }],
         steps: [],
       },
