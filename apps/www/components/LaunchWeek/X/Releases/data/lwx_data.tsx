@@ -86,7 +86,7 @@ const days: WeekDayProps[] = [
       },
       {
         type: 'xSpace',
-        href: 'https://twitter.com/home',
+        href: 'https://twitter.com/i/spaces/1OwxWYgDwXVGQ',
       },
     ],
     steps: [
