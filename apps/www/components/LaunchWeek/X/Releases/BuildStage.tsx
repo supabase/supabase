@@ -36,7 +36,7 @@ const BuildStage: FC = () => {
         >
           {days.map((day, i) => (
             <li
-              key={day.id}
+              key={`${day.id}-${i}`}
               className={cn(
                 'relative flex flex-col w-full aspect-square rounded-xl border border-dashed border-muted/50 bg-surface-100/10 col-span-1',
                 day.className
