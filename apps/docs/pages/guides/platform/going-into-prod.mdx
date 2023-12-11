@@ -73,7 +73,7 @@ The following are limits that are applied when the sum of requests exceeds the l
 
 #### Limited by last sent request
 
-All of the following paths are limited by a `60s` window limit.
+In addition, all of the following paths are limited by a `60s` window limit.
 
 | Path               | Description                                                                                                                                                                                                                                                                                                      |
 | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -91,11 +91,6 @@ All of the following paths are limited by a `60s` window limit.
 | `/auth/v1/verify`                                               | Verification requests. <br/><br/>360 requests per hour (with bursts up to 30 requests). <br/><br/>Triggered when requests from a single IP exceed 360 per hour or 30 in a short burst.<br/><br/> Configuration Variable:`Rate limit for token verifications`. <br/><br/> Limited by: IP Address                                      | No                  |
 | `/auth/v1/token`                                                | Token refresh requests. <br/><br/>1800 requests per hour (with bursts up to 30 requests). <br/><br/>Triggered when token refresh requests from a single IP exceed 1800 per hour or 30 in a short burst.<br/><br/> Configuration Variable:`Rate limit for token refreshes`. <br/><br/> Limited by: IP Address                         | Yes                 |
 | `/auth/v1/factors/:id/challenge`, `/auth/v1/factors/:id/verify` | Create or Verify an MFA challenge. <br/><br/>15 requests per minute (with bursts up to 30 requests). <br/><br/>Triggered when MFA challenge/verify requests from a single IP exceed 15 per minute or 30 in a burst.<br/><br/> Contact Support to Configure this variable (Teams Plan and Up) <br/><br/> Limited by: IP Address       | No                  |
-
-| Path                                                           | Limit | Window   |
-| -------------------------------------------------------------- | ----- | -------- |
-| `/auth/v1/signup`<br/> `/auth/v1/recover`<br/> `/auth/v1/user` | `4`   | `1 hour` |
-| `/auth/v1/otp`                                                 | `30`  | `1 hour` |
 
 ### Realtime Quotas
 
