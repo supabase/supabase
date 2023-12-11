@@ -11,14 +11,14 @@ import {
 import { STORAGE_POLICY_TEMPLATES } from './StoragePolicies.constants'
 
 import {
+  POLICY_MODAL_VIEWS,
   PolicySelection,
   PolicyTemplates,
-  POLICY_MODAL_VIEWS,
 } from 'components/interfaces/Auth/Policies'
 import StoragePoliciesEditor from './StoragePoliciesEditor'
 import StoragePoliciesReview from './StoragePoliciesReview'
 
-const newPolicyTemplate = {
+const newPolicyTemplate: any = {
   name: '',
   roles: [],
   policyIds: [],
@@ -33,13 +33,13 @@ const StoragePoliciesEditPolicyModal = ({
   onSelectCancel = () => {},
   onCreatePolicies = () => {},
   onSaveSuccess = () => {},
-}) => {
+}: any) => {
   const { ui } = useStore()
   const [previousView, setPreviousView] = useState('') // Mainly to decide which view to show when back from templates
   const [view, setView] = useState('')
 
   const [policyFormFields, setPolicyFormFields] = useState(newPolicyTemplate)
-  const [policyStatementsForReview, setPolicyStatementsForReview] = useState([])
+  const [policyStatementsForReview, setPolicyStatementsForReview] = useState<any[]>([])
 
   useEffect(() => {
     if (visible) {
@@ -50,7 +50,7 @@ const StoragePoliciesEditPolicyModal = ({
 
   /* Methods to determine which step to show */
   const onViewIntro = () => setView(POLICY_MODAL_VIEWS.SELECTION)
-  const onViewEditor = (state) => {
+  const onViewEditor = (state?: any) => {
     if (state === 'new') {
       setPolicyFormFields({
         ...policyFormFields,
@@ -67,7 +67,7 @@ const StoragePoliciesEditPolicyModal = ({
 
   /* Methods for policy templates */
   const onSelectBackFromTemplates = () => setView(previousView)
-  const onUseTemplate = (template) => {
+  const onUseTemplate = (template: any) => {
     // Each template has an id as a unique identifier to refresh the SQL editor
     // but we don't need this property to be in the policyFormField
     const { id, ...templateFields } = template
@@ -81,7 +81,7 @@ const StoragePoliciesEditPolicyModal = ({
   }
 
   /* Methods for policy editor form fields */
-  const onUpdatePolicyName = (name) => {
+  const onUpdatePolicyName = (name: string) => {
     if (name.length <= 50) {
       setPolicyFormFields({
         ...policyFormFields,
@@ -90,14 +90,14 @@ const StoragePoliciesEditPolicyModal = ({
     }
   }
 
-  const onUpdatePolicyDefinition = (definition) => {
+  const onUpdatePolicyDefinition = (definition: any) => {
     setPolicyFormFields({
       ...policyFormFields,
       definition,
     })
   }
 
-  const onToggleOperation = (operation, isSingleOperation = false) => {
+  const onToggleOperation = (operation: any, isSingleOperation = false) => {
     if (isSingleOperation) {
       return setPolicyFormFields({
         ...policyFormFields,
@@ -113,7 +113,7 @@ const StoragePoliciesEditPolicyModal = ({
     })
   }
 
-  const onUpdatePolicyRoles = (roles) => {
+  const onUpdatePolicyRoles = (roles: any) => {
     setPolicyFormFields({
       ...policyFormFields,
       roles,
@@ -150,7 +150,7 @@ const StoragePoliciesEditPolicyModal = ({
     onSavePolicy(payloads)
   }
 
-  const onSavePolicy = async (payloads) => {
+  const onSavePolicy = async (payloads: any) => {
     const errors = await onCreatePolicies(payloads)
     const hasErrors = errors.indexOf(true) !== -1
     if (hasErrors) {
@@ -166,7 +166,7 @@ const StoragePoliciesEditPolicyModal = ({
     view,
     bucketName,
     onSelectBackFromTemplates = () => {},
-  }) => {
+  }: any) => {
     const getTitle = () => {
       if (view === POLICY_MODAL_VIEWS.EDITOR || view === POLICY_MODAL_VIEWS.SELECTION) {
         return `Adding new policy to ${bucketName}`
@@ -234,9 +234,9 @@ const StoragePoliciesEditPolicyModal = ({
           />
         ) : view === POLICY_MODAL_VIEWS.TEMPLATES ? (
           <PolicyTemplates
-            templates={STORAGE_POLICY_TEMPLATES}
-            onSelectBackFromTemplates={onSelectBackFromTemplates}
+            templates={STORAGE_POLICY_TEMPLATES as any[]}
             onUseTemplate={onUseTemplate}
+            templatesNote={''}
           />
         ) : view === POLICY_MODAL_VIEWS.REVIEW ? (
           <StoragePoliciesReview

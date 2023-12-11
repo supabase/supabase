@@ -14,13 +14,21 @@ import {
   IconTrash,
 } from 'ui'
 
+interface PolicyRowProps {
+  policy: any
+  table: any
+  bucketName: string
+  onSelectPolicyEdit: (p: any, s: string, t: any) => void
+  onSelectPolicyDelete: (s: string) => void
+}
+
 const PolicyRow = ({
   policy,
   table,
   bucketName,
   onSelectPolicyEdit = () => {},
   onSelectPolicyDelete = () => {},
-}) => {
+}: PolicyRowProps) => {
   const { name, command } = policy
   return (
     <div className="group">
@@ -39,21 +47,16 @@ const PolicyRow = ({
               icon={<IconMoreVertical />}
             />
           </DropdownMenuTrigger>
-          <DropdownMenuContent side="bottom" align="end" size="small">
+          <DropdownMenuContent side="bottom" align="end">
             <DropdownMenuItem
               className="space-x-2"
-              type="outline"
               onClick={() => onSelectPolicyEdit(policy, bucketName, table)}
             >
               <IconEdit size={14} />
               <p>Edit</p>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem
-              type="outline"
-              className="space-x-2"
-              onClick={() => onSelectPolicyDelete(policy)}
-            >
+            <DropdownMenuItem className="space-x-2" onClick={() => onSelectPolicyDelete(policy)}>
               <IconTrash size={14} />
               <p>Delete</p>
             </DropdownMenuItem>
@@ -72,7 +75,7 @@ const StoragePoliciesBucketRow = ({
   onSelectPolicyAdd = () => {},
   onSelectPolicyEdit = () => {},
   onSelectPolicyDelete = () => {},
-}) => {
+}: any) => {
   const getFooterLabel = () => {
     if (isEmpty(bucket))
       return table === 'objects'
@@ -106,7 +109,7 @@ const StoragePoliciesBucketRow = ({
         </div>
       ) : (
         <div className="grid grid-cols-1 divide-y [[data-theme*=dark]_&]:divide-dark">
-          {policies.map((policy) => (
+          {policies.map((policy: any) => (
             <PolicyRow
               key={policy.name}
               policy={policy}

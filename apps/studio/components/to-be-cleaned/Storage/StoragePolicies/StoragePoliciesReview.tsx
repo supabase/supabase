@@ -10,11 +10,17 @@ const ReviewEmptyState = () => {
   )
 }
 
+interface StoragePoliciesReviewProps {
+  policyStatements: any[]
+  onSelectBack: any
+  onSelectSave: any
+}
+
 const StoragePoliciesReview = ({
   policyStatements = [],
   onSelectBack = () => {},
   onSelectSave = () => {},
-}) => {
+}: StoragePoliciesReviewProps) => {
   const [isSaving, setIsSaving] = useState(false)
   const onSavePolicy = () => {
     setIsSaving(true)
