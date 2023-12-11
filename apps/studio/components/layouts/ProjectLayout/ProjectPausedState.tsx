@@ -30,7 +30,10 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
   const isFreePlan = subscription?.plan?.id === 'free'
 
-  const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug: orgSlug })
+  const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
+    { slug: orgSlug },
+    { enabled: subscription && subscription.plan.id === 'free' }
+  )
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
 
   const [showConfirmRestore, setShowConfirmRestore] = useState(false)
