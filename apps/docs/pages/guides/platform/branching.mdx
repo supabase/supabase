@@ -125,7 +125,7 @@ Supabase Branching requires a hosted [Git provider](#git-providers). Follow thes
 
 ### Preparing your Git repository
 
-You can use the [Supabase CLI](/docs/guides/cli) to manage changes inside a local `./supabase` directory: 
+You can use the [Supabase CLI](/docs/guides/cli) to manage changes inside a local `./supabase` directory:
 
 <Tabs
   scrollable
@@ -141,7 +141,7 @@ You can use the [Supabase CLI](/docs/guides/cli) to manage changes inside a loca
         <StepHikeCompact.Details title="Initialize Supabase locally" fullWidth>
 
             If you don't have a `./supabase` directory, you can create one:
-            
+
             <CH.Code lineNumbers={false}>
 
             ```markdown
@@ -160,9 +160,9 @@ You can use the [Supabase CLI](/docs/guides/cli) to manage changes inside a loca
             <CH.Code lineNumbers={false}>
 
             ```markdown
-            supabase db pull --db-url <db_url> 
+            supabase db pull --db-url <db_url>
 
-            # Your Database URL looks something like: 
+            # Your Database URL looks something like:
             # postgresql://username:password@db.ref.supabase.co:5432/postgres
             ```
 
@@ -212,7 +212,7 @@ Once your repository is [correctly prepared](#preparing-your-git-repository), yo
 
 <Admonition type="caution" label="Prepare your GitHub repository before enabling Branching">
 
-If your repository doesn't have all the migration files, your production branch could run an incomplete set of migrations. Make sure your [GitHub repository is prepared](#preparing-your-git-repository). 
+If your repository doesn't have all the migration files, your production branch could run an incomplete set of migrations. Make sure your [GitHub repository is prepared](#preparing-your-git-repository).
 
 </Admonition>
 
