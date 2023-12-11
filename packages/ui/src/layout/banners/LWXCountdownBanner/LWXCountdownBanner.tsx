@@ -35,7 +35,7 @@ export function LWXCountdownBanner() {
               className="filter contrast-0 dark:contrast-100"
             />
           </div>
-          <div className="hidden sm:block">Day 1: introducing the Studio Assistant</div>
+          <div className="hidden sm:block">Day 1: AI Assistant and User Impersonation</div>
           <Button
             onClick={() => null}
             size="tiny"
