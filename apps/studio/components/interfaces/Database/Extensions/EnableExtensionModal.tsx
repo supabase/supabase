@@ -1,11 +1,24 @@
 import type { PostgresExtension } from '@supabase/postgres-meta'
 import { useEffect, useState } from 'react'
-import { Button, Form, IconDatabase, IconPlus, Input, Listbox, Modal } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useStore } from 'hooks'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  Form,
+  IconAlertTriangle,
+  IconDatabase,
+  IconPlus,
+  Input,
+  Listbox,
+  Modal,
+} from 'ui'
+import { ExternalLinkIcon } from 'lucide-react'
 
 interface EnableExtensionModalProps {
   visible: boolean
@@ -182,6 +195,33 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
               {values.schema === 'custom' && (
                 <Modal.Content>
                   <Input id="name" name="name" label="Schema name" />
+                </Modal.Content>
+              )}
+
+              {extension.name === 'pg_cron' && project?.cloud_provider === 'FLY' && (
+                <Modal.Content>
+                  <Alert_Shadcn_ variant="warning">
+                    <IconAlertTriangle strokeWidth={2} />
+                    <AlertTitle_Shadcn_>
+                      Fly Postgres does not fully support pg_cron
+                    </AlertTitle_Shadcn_>
+
+                    <AlertDescription_Shadcn_ className="text-end">
+                      <Button
+                        asChild
+                        type="link"
+                        iconRight={<ExternalLinkIcon width={14} height={14} />}
+                      >
+                        <a
+                          href="/docs/guides/platform/fly-postgres#limitations"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <span>Learn more</span>
+                        </a>
+                      </Button>
+                    </AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
                 </Modal.Content>
               )}
 
