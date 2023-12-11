@@ -350,34 +350,35 @@ The Git integration watches for changes in the `supabase` directory. This includ
 - All SQL migration files, under the subdirectory `migrations`
 - An optional `seed.sql` file, used to seed preview instances with sample data
 
-You can create new migrations either [locally](#develop-locally) or [remotely](#develop-remotely). Local development is recommended for developers familiar with the Supabase CLI, who want to test changes on their local machine. Remote development is recommended if you don't want to run Supabase locally, or if you want to collaborate with team members via the dashboard interface.
+You can create new migrations either [locally](#develop-locally) or [remotely](#develop-remotely). Local development is recommended.
 
-#### Develop locally
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="local-dev"
+  queryGroup="making-updates"
+>
+<TabPanel id="local-dev" label="Local Development">
 
-You can develop locally by running Supabase on your local machine. You'll have a database running locally, and another database running remotely on the preview branch.
-
-You can experiment on your local database by [writing SQL migrations yourself](https://supabase.com/docs/guides/cli/local-development#database-migrations). You can also [auto-generate migration files by using Supabase's local studio](https://supabase.com/docs/guides/cli/local-development#diffing-changes) and the `supabase db-diff` command.
-
-Once you're confident in your migration files, push your changes to your remote GitHub repository to update the preview branch.
-
-To create and push local migrations:
+The Supabase CLI provides two options: [manual migrations](https://supabase.com/docs/guides/cli/local-development#database-migrations) and [generated migrations](https://supabase.com/docs/guides/cli/local-development#diffing-changes) using Supabase's local studio and the `supabase db-diff` command. Let's use the latter and push the change to our Preview Branch:
 
 <StepHikeCompact>
 
     <StepHikeCompact.Step step={1}>
-        <StepHikeCompact.Details title="Make schema changes locally." fullWidth>
+        <StepHikeCompact.Details title="Make schema changes locally" fullWidth>
 
-            If you haven't already started your local Supabase environment, in the terminal run:
+            Start supabase locally:
 
             <CH.Code lineNumbers={false}>
 
             ```bash
             supabase start
             ```
-
+            
             </CH.Code>
 
-            Then proceed to [http://localhost:54323](http://localhost:54323) to access your local Supabase dashboard.
+            Then proceed to [localhost:54323](http://localhost:54323) to access your local Supabase dashboard.
 
             You can make changes in either the [Table Editor](http://localhost:54323/project/default/editor) or the [SQL Editor]((http://localhost:54323/project/default/sql)).
 
@@ -385,11 +386,9 @@ To create and push local migrations:
     </StepHikeCompact.Step>
 
     <StepHikeCompact.Step step={2}>
-        <StepHikeCompact.Details title="Create a new migration file." fullWidth>
+        <StepHikeCompact.Details title="Generate a migration file" fullWidth>
 
-            Once you are confident with your changes, you can create a new migration file.
-
-            We can compare the current state of your database with the state of your migrations directory to generate a new migration file. Run the following in the terminal:
+            Once you are finished making database changes, run `supabase db diff` to create a new migration file. For example:
 
             <CH.Code lineNumbers={false}>
 
@@ -399,38 +398,9 @@ To create and push local migrations:
 
             </CH.Code>
 
-            This will create a SQL file called `./supabase/migrations/[timestamp]add_employees_table.sql`, and it will contain the SQL statements to make your database schema match the current state of your database. The SQL in this file will reflect what changes you made in your local dashboard. In this example, we've created a new table called `employees`.
+            This will create a SQL file called `./supabase/migrations/[timestamp]add_employees_table.sql`. This file will reflect the changes that you made in your local dashboard. 
 
-            ```sql 20231127222412_add_employees_table.sql
-            create table employees (
-            id integer primary key generated always as identity,
-                name text
-            )
-            ```
-
-        </StepHikeCompact.Details>
-    </StepHikeCompact.Step>
-
-    <StepHikeCompact.Step step={3}>
-        <StepHikeCompact.Details title="Make further optional changes by editing the migration file." fullWidth>
-
-            _If you don't want to make further changes, proceed to step 5._
-
-            You can manually edit the new migration file to make further changes.
-
-            For example, you may choose to use a different name for the table.
-
-            ```sql sql 20231127222412_add_colleagues_table.sql mark=2
-            -- We have updated the table name to `colleagues`
-            create table colleagues (
-            id integer primary key generated always as identity,
-                name text
-            )
-
-            -- We have also updated the name of the SQL file to `add_colleagues_table`
-            ```
-
-            Then we can run `db reset` in the terminal:
+            If you want to continue making change, you can manually edit this migration file, then use the `db reset` command to pick up your edits:
 
             <CH.Code lineNumbers={false}>
 
@@ -440,36 +410,15 @@ To create and push local migrations:
 
             </CH.Code>
 
-            This will reset the database and run all the migrations again.
-
-            The local dashboard at [http://localhost:54323](http://localhost:54323) will reflect the new changes you made.
+            This will reset the database and run all the migrations again. The local dashboard at [localhost:54323](http://localhost:54323) will reflect the new changes you made.
 
         </StepHikeCompact.Details>
     </StepHikeCompact.Step>
 
-    <StepHikeCompact.Step step={4}>
-        <StepHikeCompact.Details title="Make further optional changes by editing in local dashboard." fullWidth>
-
-            _If you don't want to make further changes, proceed to step 5._
-
-            You can edit your database in your local dashboard to make further changes.
-
-            Go to the local dashboard at [http://localhost:54323](http://localhost:54323) and make the changes you want.
-
-            Once you've made the schema changes you want, you can either:
-
-            1. Run `db diff -f [file name]` in the terminal again to generate a new migration file. Your Preview Branch will then have multiple migration files.
-            2. Or; you can manually delete the old migration file, then run `db diff -f [file name]`. All your changes will be captured in a single migration file.
-
-        </StepHikeCompact.Details>
-    </StepHikeCompact.Step>
-
-    <StepHikeCompact.Step step={5}>
+    <StepHikeCompact.Step step={3}>
         <StepHikeCompact.Details title="Commit your changes and push." fullWidth>
 
-            Commit and push your migration file to your remote GitHub repository.
-
-            You can commit and push your changes using the command line, or your preferred Git client. For example, in the terminal run:
+            Commit and push your migration file to your remote GitHub repository. For example:
 
             <CH.Code lineNumbers={false}>
 
@@ -481,11 +430,7 @@ To create and push local migrations:
 
             </CH.Code>
 
-            Your migration changes will now run on the remote Preview Branch.
-
-            Supabase's GitHub integration detects the new migration and runs it against the branch instance.
-
-            It can take up to 10 minutes for migrations to be applied. If you have a PR for your branch, errors are reflected in the GitHub check run status and in a PR comment.
+            The Supabase integration detects the new migration and runs it on the remote Preview Branch. It can take up to 10 minutes for migrations to be applied. If you have a PR for your branch, errors are reflected in the GitHub check run status and in a PR comment.
 
             If you need to reset your database to a clean state (that is, discard any changes that aren't reflected in the migration files), run `supabase db reset` locally. Then, delete the preview branch and recreate it.
 
@@ -495,13 +440,15 @@ To create and push local migrations:
 
 </StepHikeCompact>
 
-#### Develop remotely
+</TabPanel>
+
+<TabPanel id="remote-dev" label="Remote Development">
 
 As an alternative to developing locally, you can make changes on your remote Supabase dashboard. You can then pull these changes to your local machine and commit them to GitHub.
 
-<Admonition type="note" label="Changes must be locally pulled and committed to keep your GitHub repository state in sync.">
+<Admonition type="note" label="Changes must be locally pulled and committed to keep your Git repository state in sync.">
 
-Dashboard changes aren't automatically reflected in your repository. If you'd like to see automatic syncing in a future release, [join the discussion](https://github.com/orgs/supabase/discussions/18937).
+Dashboard changes aren't automatically reflected in your Git repository. If you'd like to see automatic syncing in a future release, [join the discussion](https://github.com/orgs/supabase/discussions/18937).
 
 </Admonition>
 
@@ -509,9 +456,7 @@ Dashboard changes aren't automatically reflected in your repository. If you'd li
     <StepHikeCompact.Step step={1}>
         <StepHikeCompact.Details title="Select the branch you want to use." fullWidth>
 
-        Go to the project you wish to use hosted on [supabase.com/dashboard](https://supabase.com/dashboard/project/_),
-        click on the active branch in the top bar to open the dropdown menu.
-        Select the branch you wish to use.
+        Select the branch you wish to use in your Supabase [project](https://supabase.com/dashboard/project/_).
 
         <figure className="max-w-[520px]">
             <Image src="/docs/img/guides/platform/branching/develop-your-app-develop-remotely.jpg?v=1" />
@@ -523,7 +468,7 @@ Dashboard changes aren't automatically reflected in your repository. If you'd li
     <StepHikeCompact.Step step={2}>
         <StepHikeCompact.Details title="Make changes to your database schema." fullWidth>
 
-        In the dashboard, you can make changes to your schema with either with the [Table Editor](https://supabase.com/dashboard/project/_/editor) or the [SQL Editor]((https://supabase.com/dashboard/project/_/sql)).
+        Make changes to your schema with either with the [Table Editor](https://supabase.com/dashboard/project/_/editor) or the [SQL Editor]((https://supabase.com/dashboard/project/_/sql)).
 
         </StepHikeCompact.Details>
     </StepHikeCompact.Step>
@@ -531,11 +476,9 @@ Dashboard changes aren't automatically reflected in your repository. If you'd li
     <StepHikeCompact.Step step={3}>
         <StepHikeCompact.Details title="Check you have the password for the Preview Branch database." fullWidth>
 
-        You may already know the password for this Preview branch, if so, continue to next step.
-
         If you don't know the password, you must Reset the database password so you know the password. Go to the [database setting page](https://supabase.com/dashboard/project/_/settings/database) and click `Reset database password`.
 
-        Save the new password securely for use in the next step.
+        Save the new password securely for future use.
 
         </StepHikeCompact.Details>
     </StepHikeCompact.Step>
@@ -543,16 +486,14 @@ Dashboard changes aren't automatically reflected in your repository. If you'd li
     <StepHikeCompact.Step step={4}>
         <StepHikeCompact.Details title="Pull changes from remote database." fullWidth>
 
-         In your terminal, navigate to the directory for your Supabase project.
+         In your local terminal, navigate to the directory for your Supabase project and use the Supabase CLI to pull changes from your branch to your local migrations directory.
 
-         Use the Supabase client to pull changes from your branch to your local migrations directory.
-
-         Make sure to use the database URL for your branch.
+         Make sure to use the database URL for your branch:
 
          <CH.Code lineNumbers={false}>
 
         ```bash
-    supabase db pull --db-url "postgres://postgres:[password]@db.[branch-ref].supabase.co:5432/postgres"
+        supabase db pull --db-url "postgres://postgres:[password]@db.[branch-ref].supabase.co:5432/postgres"
         ```
 
         </CH.Code>
@@ -563,14 +504,15 @@ Dashboard changes aren't automatically reflected in your repository. If you'd li
      <StepHikeCompact.Step step={5}>
         <StepHikeCompact.Details title="Commit and push your migration file." fullWidth>
 
-         No new migrations are run on your remote Preview Branch.
-
-         This is expected, because your database is already up-to-date, based on the changes you made in the dashboard. But this ensures that your migration files are in GitHub, so they can be correctly merged into production.
+         No new migrations will be run on your remote Preview Branch after pushing your changes. This is expected, because your database is already up-to-date, based on the changes you made in the dashboard. But this ensures that your migration files are in GitHub, so they can be correctly merged into production.
 
         </StepHikeCompact.Details>
     </StepHikeCompact.Step>
 
 </StepHikeCompact>
+
+</TabPanel>
+</Tabs>
 
 ### Open a pull request
 
@@ -586,11 +528,9 @@ A comment is added to your PR with the deployment status of your preview branch.
 
 Every time a new commit is pushed that changes the migration files in `./supabase/migrations`, the new migrations are run against the preview branch. You can check the status of these runs in the comment's Tasks table.
 
-#### GitHub required check setting
+### Preventing migration failures
 
-We highly recommend turning on a ‘required check' for the Supabase integration. You can do this from your GitHub repository settings.
-
-This prevents PRs from being merged when migration checks fail, and stops invalid migrations from being merged into your production branch.
+We highly recommend turning on a 'required check' for the Supabase integration. You can do this from your GitHub repository settings. This prevents PRs from being merged when migration checks fail, and stops invalid migrations from being merged into your production branch.
 
 <figure className="max-w-[700px] mx-auto">
   <Image src="/docs/img/guides/platform/branching/github-required-check.jpg?v=1" />
