@@ -68,6 +68,7 @@ When using Fly Postgres, please be aware of the current restrictions:
 - [Network restrictions](/docs/guides/platform/network-restrictions) are not supported
 - Currently, only the database, Supavisor, and Postgrest are supported. Support for additional Supabase products such as Realtime, Storage, and Auth is planned for the near future.
 - New projects can only be launched using the Fly CLI and not via the Supabase studio.
+- [pg_cron](/docs/guides/database/extensions/pg_cron) is not fully supported for Fly projects. Fly projects shutdown after 15 minutes of inactivity, but transparently startup when an external request is received. However, this does not apply to the pg_cron jobs which are not triggered by external requests. As a result, pg_cron jobs will not run when the database is shutdown due to inactivity. We are working on removing this behaviour for paid projects.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
