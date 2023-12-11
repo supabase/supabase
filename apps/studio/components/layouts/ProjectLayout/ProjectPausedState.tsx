@@ -32,7 +32,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
     { slug: orgSlug },
-    { enabled: subscription && subscription.plan.id === 'free' }
+    { enabled: isFreePlan }
   )
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
 
