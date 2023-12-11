@@ -48,6 +48,7 @@ import PublicationStore from './PublicationStore'
 import RolesStore, { IRolesStore } from './RolesStore'
 import TriggersStore from './TriggersStore'
 import ViewStore, { IViewStore } from './ViewStore'
+import { literal } from '@scaleleap/pg-format'
 
 const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
@@ -516,12 +517,16 @@ export default class MetaStore implements IMetaStore {
     const { duplicateTable, isRLSEnabled, isRealtimeEnabled, isDuplicateRows } = metadata
     const { name: sourceTableName, schema: sourceTableSchema } = duplicateTable
     const duplicatedTableName = payload.name
-
+    const duplicatedTableComment = payload.comment
     // The following query will copy the structure of the table along with indexes, constraints and
     // triggers. However, foreign key constraints are not duplicated over - has to be done separately
-    const table = await this.rootStore.meta.query(
-      `CREATE TABLE "${sourceTableSchema}"."${duplicatedTableName}" (LIKE "${sourceTableSchema}"."${sourceTableName}" INCLUDING ALL);`
-    )
+    const tableSql = `CREATE TABLE "${sourceTableSchema}"."${duplicatedTableName}" (LIKE "${sourceTableSchema}"."${sourceTableName}" INCLUDING ALL);`
+    const commentSql =
+      duplicatedTableComment === undefined
+        ? ''
+        : `COMMENT ON TABLE ${duplicatedTableName} IS ${literal(duplicatedTableComment)};`
+    const sql = `BEGIN; ${tableSql} ${commentSql} COMMIT;`
+    const table = await this.rootStore.meta.query(sql)
     if (table.error) throw table.error
 
     // Duplicate foreign key constraints over
