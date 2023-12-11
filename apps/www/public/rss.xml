@@ -5,9 +5,16 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Thu, 07 Dec 2023 03:30:00 GMT</lastBuildDate>
+      <lastBuildDate>Sun, 10 Dec 2023 03:30:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/studio-introducing-assistant</guid>
+  <title>Supabase Studio: AI Assistant and User Impersonation</title>
+  <link>https://supabase.com/blog/studio-introducing-assistant</link>
+  <description>We&apos;re introducing the next generation of our AI Assistant and some features that will help get your ideas into code even faster.</description>
+  <pubDate>Sun, 10 Dec 2023 03:30:00 GMT</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/postgres-language-server-implementing-parser</guid>
   <title>Postgres Language Server: implementing the Parser</title>
   <link>https://supabase.com/blog/postgres-language-server-implementing-parser</link>
@@ -18,7 +25,7 @@
   <guid>https://supabase.com/blog/how-design-works-at-supabase</guid>
   <title>How design works at Supabase</title>
   <link>https://supabase.com/blog/how-design-works-at-supabase</link>
-  <description>How design works at Supabase</description>
+  <description>The transformative journey of Supabase&apos;s Design team and its unique culture to enhance the output and quality of the entire company.</description>
   <pubDate>Thu, 07 Dec 2023 03:30:00 GMT</pubDate>
 </item>
 <item>
