@@ -60,7 +60,7 @@ const LWAnnouncement = ({
           <div className="relative flex-shrink flex items-center p-2 w-2/3 md:w-auto">
             <div className="flex flex-col gap-1 sm:pl-2">
               <div className="flex items-center gap-2">
-                <span className="text-foreground">Launch Week 8</span>
+                <span className="text-foreground">Launch Week X</span>
               </div>
               <span className="text-foreground-light">Explore all the announcements</span>
             </div>
