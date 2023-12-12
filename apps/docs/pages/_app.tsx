@@ -14,7 +14,7 @@ import { CommandMenuProvider, PortalToast, useConsent } from 'ui'
 import { TabsProvider } from 'ui/src/components/Tabs'
 import Favicons from '~/components/Favicons'
 import SiteLayout from '~/layouts/SiteLayout'
-import { API_URL, IS_PLATFORM } from '~/lib/constants'
+import { IS_PLATFORM } from '~/lib/constants'
 import { post } from '~/lib/fetchWrappers'
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
@@ -35,15 +35,20 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
 
   const handlePageTelemetry = useCallback(
     (route: string) => {
-      return post(`${API_URL}/telemetry/page`, {
-        referrer: document.referrer,
-        title: document.title,
-        route,
-        ga: {
-          screen_resolution: telemetryProps?.screenResolution,
-          language: telemetryProps?.language,
-        },
-      })
+      if (IS_PLATFORM) {
+        return post('/platform/telemetry/page', {
+          body: {
+            referrer: document.referrer,
+            title: document.title,
+            route,
+            ga: {
+              screen_resolution: telemetryProps?.screenResolution,
+              language: telemetryProps?.language,
+              session_id: '',
+            },
+          },
+        })
+      }
     },
     [telemetryProps]
   )
@@ -73,7 +78,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     return () => {
       router.events.off('routeChangeComplete', handleRouteChange)
     }
-  }, [router, handlePageTelemetry, consentValue])
+  }, [router, handlePageTelemetry, consentValue, hasAcceptedConsent])
 
   /**
    * Save/restore scroll position when reloading or navigating back/forward.
@@ -120,7 +125,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     if (router.isReady) {
       handlePageTelemetry(router.basePath + router.asPath)
     }
-  }, [router, handlePageTelemetry, consentValue])
+  }, [router, handlePageTelemetry, consentValue, hasAcceptedConsent])
 
   /**
    * Reference docs use `history.pushState()` to jump to
@@ -141,15 +146,13 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     }
   }, [router])
 
-  const SITE_TITLE = 'Supabase Documentation'
-
-  const AuthContainer = (props) => {
+  const AuthContainer = ({ children }) => {
     return IS_PLATFORM ? (
       <SessionContextProvider supabaseClient={supabase}>
-        <AuthProvider>{props.children}</AuthProvider>
+        <AuthProvider>{children}</AuthProvider>
       </SessionContextProvider>
     ) : (
-      <AuthProvider>{props.children}</AuthProvider>
+      <AuthProvider>{children}</AuthProvider>
     )
   }
 
