@@ -323,8 +323,6 @@ services:
       LOGFLARE_API_KEY: ${LOGFLARE_API_KEY}
       LOGFLARE_SINGLE_TENANT: true
       LOGFLARE_SUPABASE_MODE: true
-      LOGFLARE_MIN_CLUSTER_SIZE: 1
-      RELEASE_COOKIE: cookie
 
       # Comment variables to use Big Query backend for analytics
       POSTGRES_BACKEND_URL: postgresql://supabase_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
@@ -336,12 +334,6 @@ services:
       # GOOGLE_PROJECT_NUMBER: ${GOOGLE_PROJECT_NUMBER}
     ports:
       - 4000:4000
-    entrypoint: |
-                  sh -c `cat <<'EOF' > run.sh && sh run.sh
-                  ./logflare eval Logflare.Release.migrate
-                  ./logflare start --sname logflare
-                  EOF
-                  `
 
   # Comment out everything below this point if you are using an external Postgres database
   db:
