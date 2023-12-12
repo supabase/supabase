@@ -27,7 +27,7 @@ export async function getDatabaseExtensions(
         ref: projectRef,
       },
     },
-    headers: Object.fromEntries(headers),
+    headers,
     signal,
   })
 
@@ -49,8 +49,7 @@ export const useDatabaseExtensionsQuery = <TData = DatabaseExtensionsData>(
     databaseExtensionsKeys.list(projectRef),
     ({ signal }) => getDatabaseExtensions({ projectRef, connectionString }, signal),
     {
-      enabled:
-        enabled && typeof projectRef !== 'undefined' && typeof connectionString !== 'undefined',
+      enabled: enabled && typeof projectRef !== 'undefined',
       ...options,
     }
   )

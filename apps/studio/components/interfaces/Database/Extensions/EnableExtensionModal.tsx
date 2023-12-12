@@ -17,23 +17,21 @@ interface EnableExtensionModalProps {
 
 const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionModalProps) => {
   const { project } = useProjectContext()
-  const { ui, meta } = useStore()
+  const { meta } = useStore()
   const [defaultSchema, setDefaultSchema] = useState()
-  const [isEnabling, setIsEnabling] = useState(false)
   const [fetchingSchemaInfo, setFetchingSchemaInfo] = useState(false)
 
   const { data: schemas, isLoading: isSchemasLoading } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const { mutate: enableExtension } = useDatabaseExtensionEnableMutation({
+  const { mutate: enableExtension, isLoading: isEnabling } = useDatabaseExtensionEnableMutation({
     onSuccess: () => {
       toast.success(`${extension.name.toUpperCase()} is on.`)
       onCancel()
     },
     onError: (error) => {
       toast.error(`Failed to enable ${extension.name.toUpperCase()}: ${error.message}`)
-      setIsEnabling(false)
     },
   })
 
@@ -76,25 +74,12 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
     if (project.connectionString === undefined)
       return console.error('Connection string is required')
 
-    setIsEnabling(true)
     const schema =
       defaultSchema !== undefined && defaultSchema !== null
         ? defaultSchema
         : values.schema === 'custom'
         ? values.name
         : values.schema
-
-    if (!schema.startsWith('pg_')) {
-      const { error: createSchemaError } = await meta.query(`create schema if not exists ${schema}`)
-      if (createSchemaError) {
-        setIsEnabling(false)
-        return ui.setNotification({
-          error: createSchemaError,
-          category: 'error',
-          message: `Failed to create schema: ${createSchemaError.message}`,
-        })
-      }
-    }
 
     enableExtension({
       projectRef: project.ref,
@@ -103,6 +88,7 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
       name: extension.name,
       version: extension.default_version,
       cascade: true,
+      createSchema: !schema.startsWith('pg_'),
     })
   }
 

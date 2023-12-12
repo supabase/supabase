@@ -42,8 +42,9 @@ const VaultToggle = () => {
   const onEnableVault = async () => {
     if (vaultExtension === undefined) return
     if (project === undefined) return console.error('Project is required')
-    if (project.connectionString === undefined)
+    if (project.connectionString === undefined) {
       return console.error('Connection string is required')
+    }
 
     setIsEnabling(true)
 

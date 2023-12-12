@@ -4,6 +4,7 @@ import { toast } from 'react-hot-toast'
 import { post } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { databaseExtensionsKeys } from './keys'
+import { executeSql } from 'data/sql/execute-sql-query'
 
 export type DatabaseExtensionEnableVariables = {
   projectRef: string
@@ -12,6 +13,7 @@ export type DatabaseExtensionEnableVariables = {
   name: string
   version: string
   cascade?: boolean
+  createSchema?: boolean
 }
 
 export async function enableDatabaseExtension({
@@ -21,9 +23,22 @@ export async function enableDatabaseExtension({
   name,
   version,
   cascade = false,
+  createSchema = false,
 }: DatabaseExtensionEnableVariables) {
   let headers = new Headers()
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
+
+  if (createSchema) {
+    try {
+      await executeSql({
+        projectRef,
+        connectionString,
+        sql: `create schema if not exists ${schema}`,
+      })
+    } catch (error) {
+      throw error
+    }
+  }
 
   const { data, error } = await post('/platform/pg-meta/{ref}/extensions', {
     params: {
@@ -31,7 +46,7 @@ export async function enableDatabaseExtension({
       path: { ref: projectRef },
     },
     body: { schema, name, version, cascade },
-    headers: Object.fromEntries(headers),
+    headers,
   })
 
   if (error) throw error

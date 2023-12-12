@@ -24,7 +24,7 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
 
   const { mutate: disableExtension, isLoading: isDisabling } = useDatabaseExtensionDisableMutation({
     onSuccess: () => {
-      toast.success(`${extension.name.toUpperCase()} is off.`)
+      toast.success(`${extension.name} is off.`)
       setIsDisableModalOpen(false)
     },
   })
@@ -43,10 +43,11 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
     setIsDisableModalOpen(true)
   }
 
-  async function onConfirmDisable() {
+  const onConfirmDisable = () => {
     if (project === undefined) return console.error('Project is required')
-    if (project.connectionString === undefined)
+    if (project.connectionString === undefined) {
       return console.error('Connection string is required')
+    }
 
     disableExtension({
       projectRef: project.ref,

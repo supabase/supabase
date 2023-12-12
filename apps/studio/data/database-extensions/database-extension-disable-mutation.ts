@@ -25,7 +25,7 @@ export async function disableDatabaseExtension({
       path: { ref: projectRef },
       query: { id },
     },
-    headers: Object.fromEntries(headers),
+    headers,
   })
 
   if (error) throw error
