@@ -1,14 +1,13 @@
 import { createContext, PropsWithChildren, useContext, useMemo } from 'react'
 
 import { useParams } from 'common/hooks'
-import { useProjectDetailQuery } from 'data/projects/project-detail-query'
+import { Project, useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { PROJECT_STATUS } from 'lib/constants'
 import { RoleImpersonationStateContextProvider } from 'state/role-impersonation-state'
 import { TableEditorStateContextProvider } from 'state/table-editor'
-import { Project } from 'types'
 
 export interface ProjectContextType {
-  project: Project | undefined
+  project?: Project
   isLoading: boolean
 }
 

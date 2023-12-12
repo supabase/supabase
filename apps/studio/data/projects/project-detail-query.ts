@@ -1,17 +1,23 @@
 import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { get, isResponseOk } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import { Project, ResponseError } from 'types'
+import { get } from 'data/fetchers'
+import { ResponseError } from 'types'
 import { projectKeys } from './keys'
+import { components } from 'data/api'
 
 export type ProjectDetailVariables = { ref?: string }
+
+export type Project = components['schemas']['ProjectDetailResponse']
 
 export async function getProjectDetail({ ref }: ProjectDetailVariables, signal?: AbortSignal) {
   if (!ref) throw new Error('Project ref is required')
 
-  const data = await get<Project>(`${API_URL}/projects/${ref}`, { signal })
-  if (!isResponseOk(data)) throw data.error
+  const { data, error } = await get('/platform/projects/{ref}', {
+    params: { path: { ref } },
+    signal,
+  })
+
+  if (error) throw error
   return data
 }
 

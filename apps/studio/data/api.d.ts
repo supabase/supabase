@@ -472,7 +472,7 @@ export interface paths {
     get: operations['DatabasesController_getDatabases']
   }
   '/platform/projects/{ref}/databases-statuses': {
-    /** Gets status of all databases within a project */
+    /** Gets statuses of databases within a project */
     get: operations['DatabasesStatusesController_getStatus']
   }
   '/platform/projects/{ref}/db-password': {
@@ -1226,7 +1226,7 @@ export interface paths {
     get: operations['DatabasesController_getDatabases']
   }
   '/v0/projects/{ref}/databases-statuses': {
-    /** Gets status of all databases within a project */
+    /** Gets statuses of databases within a project */
     get: operations['DatabasesStatusesController_getStatus']
   }
   '/v0/projects/{ref}/db-password': {
@@ -3430,6 +3430,7 @@ export interface components {
       status: string
       subscription_id: string
       is_branch_enabled: boolean
+      is_read_replicas_enabled: boolean
       preview_branch_refs: string[]
       disk_volume_size_gb?: number
     }
@@ -3490,6 +3491,7 @@ export interface components {
       status: string
       subscription_id: string
       is_branch_enabled: boolean
+      is_read_replicas_enabled: boolean
       preview_branch_refs: string[]
       disk_volume_size_gb?: number
       endpoint: string
@@ -3566,6 +3568,19 @@ export interface components {
       owner_id?: number
     }
     DatabaseDetailResponse: {
+      /** @enum {string} */
+      status:
+        | 'ACTIVE_HEALTHY'
+        | 'ACTIVE_UNHEALTHY'
+        | 'COMING_UP'
+        | 'GOING_DOWN'
+        | 'INIT_FAILED'
+        | 'REMOVED'
+        | 'RESTORING'
+        | 'UNKNOWN'
+        | 'UPGRADING'
+      /** @enum {string} */
+      cloud_provider: 'AWS' | 'FLY'
       db_port: number
       db_name: string
       db_user: string
@@ -3574,24 +3589,10 @@ export interface components {
       connectionString: string
       identifier: string
       inserted_at: string
-      /** @enum {string} */
-      status:
-        | 'ACTIVE_HEALTHY'
-        | 'ACTIVE_UNHEALTHY'
-        | 'COMING_UP'
-        | 'GOING_DOWN'
-        | 'INIT_FAILED'
-        | 'REMOVED'
-        | 'RESTORING'
-        | 'UNKNOWN'
-        | 'UPGRADING'
       size: string
       region: string
-      /** @enum {string} */
-      cloud_provider: 'AWS' | 'FLY'
     }
     DatabaseStatusResponse: {
-      identifier: string
       /** @enum {string} */
       status:
         | 'ACTIVE_HEALTHY'
@@ -3603,6 +3604,7 @@ export interface components {
         | 'RESTORING'
         | 'UNKNOWN'
         | 'UPGRADING'
+      identifier: string
     }
     UpdatePasswordBody: {
       password: string
@@ -3648,6 +3650,7 @@ export interface components {
       lastDatabaseResizeAt?: string
       is_branch_enabled: boolean
       parent_project_ref?: string
+      is_read_replicas_enabled: boolean
     }
     ProjectRefResponse: {
       id: number
@@ -4820,7 +4823,7 @@ export interface components {
       updated_by: components['schemas']['SnippetUser']
       content: components['schemas']['SnippetContent']
     }
-    ResourceStatusResponse: {
+    ResourceWithServicesStatusResponse: {
       /** @description Supabase project instance compute size */
       compute: string
       /** @description Unique ID representing the fly extension */
@@ -4847,6 +4850,8 @@ export interface components {
        * @example fly_123456789
        */
       supabase_org_id: string
+      /** @description Supabase project services health status */
+      services: components['schemas']['ServiceHealthResponse'][]
     }
     ResourceProvisioningConfigResponse: {
       /**
@@ -8346,12 +8351,6 @@ export interface operations {
   }
   /** Updates project's content */
   ContentController_updateWholeContent: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
     requestBody: {
       content: {
         'application/json': components['schemas']['UpsertContentParams']
@@ -8479,7 +8478,7 @@ export interface operations {
       }
     }
   }
-  /** Gets status of all databases within a project */
+  /** Gets statuses of databases within a project */
   DatabasesStatusesController_getStatus: {
     parameters: {
       path: {
@@ -8493,7 +8492,7 @@ export interface operations {
           'application/json': components['schemas']['DatabaseStatusResponse'][]
         }
       }
-      /** @description Failed to get project's status */
+      /** @description Failed to get statuses of databases of a project */
       500: {
         content: never
       }
@@ -12489,7 +12488,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['ResourceStatusResponse']
+          'application/json': components['schemas']['ResourceWithServicesStatusResponse']
         }
       }
     }
