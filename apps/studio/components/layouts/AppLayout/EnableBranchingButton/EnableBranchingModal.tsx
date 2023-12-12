@@ -207,11 +207,13 @@ const EnableBranchingModal = () => {
                     </div>
                     <div className="flex flex-col gap-y-1">
                       <p className="text-sm text-foreground">
-                        You will not be able to make changes to the database via the dashboard
+                        Branching uses your GitHub repository to apply migrations
                       </p>
                       <p className="text-sm text-foreground-light">
-                        Schema changes for database Preview Branches must be made using Git.
-                        Dashboard changes to Preview Branches are coming soon.
+                        Database migrations are handled via the{' '}
+                        <code className="text-xs">./supabase</code> directory in your GitHub repo.
+                        Migration files will run on both Preview Branches and Production when
+                        pushing to and merging git branches.
                       </p>
                     </div>
                   </div>

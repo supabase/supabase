@@ -29,6 +29,7 @@ import { useSqlGenerateMutation } from 'data/ai/sql-generate-mutation'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useFormatQueryMutation } from 'data/sql/format-sql-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
@@ -44,8 +45,11 @@ import {
 import { IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
+import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import Telemetry from 'lib/telemetry'
+import toast from 'react-hot-toast'
 import { useAppStateSnapshot } from 'state/app-state'
+import { isRoleImpersonationEnabled, useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
@@ -114,9 +118,13 @@ const SQLEditor = () => {
   const [pendingTitle, setPendingTitle] = useState<string>()
   const [hasSelection, setHasSelection] = useState<boolean>(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const readReplicasEnabled = useFlag('readReplicas')
   const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
+  const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery({
+    projectRef: ref,
+  })
 
   // Customers on HIPAA plans should not have access to Supabase AI
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
@@ -147,6 +155,13 @@ const SQLEditor = () => {
   useEffect(() => {
     setIsFirstRender(false)
   }, [])
+
+  useEffect(() => {
+    if (isSuccessReadReplicas) {
+      const primaryDatabase = databases.find((db) => db.identifier === ref)
+      snap.setSelectedDatabaseId(primaryDatabase?.identifier)
+    }
+  }, [isSuccessReadReplicas])
 
   const { data, refetch: refetchEntityDefinitions } = useEntityDefinitionsQuery(
     {
@@ -274,6 +289,8 @@ const SQLEditor = () => {
     }
   }, [formatQuery, id, isDiffOpen, project, snap])
 
+  const getImpersonatedRole = useGetImpersonatedRole()
+
   const executeQuery = useCallback(
     async (force: boolean = false) => {
       if (isDiffOpen) return
@@ -308,14 +325,36 @@ const SQLEditor = () => {
           setLineHighlights([])
         }
 
+        const impersonatedRole = getImpersonatedRole()
+        const connectionString = !readReplicasEnabled
+          ? project.connectionString
+          : databases?.find((db) => db.identifier === snap.selectedDatabaseId)?.connectionString
+        if (!connectionString) {
+          return toast.error('Unable to run query: Connection string is missing')
+        }
+
         execute({
           projectRef: project.ref,
-          connectionString: project.connectionString,
-          sql,
+          connectionString: connectionString,
+          sql: wrapWithRoleImpersonation(sql, {
+            projectRef: project.ref,
+            role: impersonatedRole,
+          }),
+          isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
         })
       }
     },
-    [isDiffOpen, id, isExecuting, project, execute, setAiTitle, hasHipaaAddon, supabaseAIEnabled]
+    [
+      isDiffOpen,
+      id,
+      isExecuting,
+      project,
+      supabaseAIEnabled,
+      hasHipaaAddon,
+      execute,
+      getImpersonatedRole,
+      setAiTitle,
+    ]
   )
 
   const handleNewQuery = useCallback(

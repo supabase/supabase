@@ -14,7 +14,11 @@ export const AIPolicyHeader = ({
   setAssistantVisible: (v: boolean) => void
 }) => {
   return (
-    <SheetHeader_Shadcn_ className="py-3 flex flex-row justify-between items-center">
+    <SheetHeader_Shadcn_
+      className={`${
+        selectedPolicy !== undefined ? 'pt-3 pb-0' : 'py-3'
+      } flex flex-row justify-between items-center`}
+    >
       <div className="flex flex-row gap-3 items-center max-w-[75%]">
         <SheetClose_Shadcn_
           className={clsx(
@@ -30,7 +34,7 @@ export const AIPolicyHeader = ({
         <SheetTitle_Shadcn_ className="truncate">
           {selectedPolicy !== undefined
             ? `Update policy: ${selectedPolicy.name}`
-            : 'Create a new row level security policy'}
+            : 'Create a new Row Level Security policy'}
         </SheetTitle_Shadcn_>
       </div>
       <Button

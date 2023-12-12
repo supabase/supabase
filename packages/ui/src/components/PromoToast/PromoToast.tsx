@@ -39,19 +39,18 @@ const PromoToast = () => {
         visible && 'opacity-100 translate-y-0'
       )}
     >
-      <div className="relative z-10 text-foreground flex flex-col text-base uppercase tracking-[1px]">
-        <div className="flex gap-1.5 items-center">
+      <div className="relative z-10 text-foreground flex flex-col text-base w-1/2">
+        <div className="flex gap-1.5 items-center uppercase tracking-[0.5px]">
           <p>Launch Week</p>
           <Image src={LWXLogo} alt="Supabase Launch Week X Logo" width={14} height={14} />
         </div>
-        <span className="font-mono text-sm">Dec 11-15 / 8am PT</span>
-        <CountdownComponent date={new Date(announcement.launchDate)} showCard={false} />
+        <span className="text-sm leading-4 mt-2">Day 1: AI Assistant and User Impersonation</span>
       </div>
 
       <div className="relative z-10 flex items-center space-x-2">
         <Button asChild type="secondary">
-          <Link target="_blank" rel="noreferrer" href="https://supabase.com/launch-week">
-            Claim your ticket
+          <Link target="_blank" rel="noreferrer" href="https://supabase.com/launch-week#today">
+            Go to Launch Week
           </Link>
         </Button>
         <Button type="default" onClick={handleHide}>

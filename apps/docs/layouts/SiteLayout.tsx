@@ -82,13 +82,13 @@ const levelsData = {
     icon: '/docs/img/icons/menu/reference-javascript',
     name: 'Javascript Reference v2.0',
   },
-  reference_dart_v0: {
-    icon: '/docs/img/icons/menu/reference-dart',
-    name: 'Dart Reference v0.0',
-  },
   reference_dart_v1: {
     icon: '/docs/img/icons/menu/reference-dart',
-    name: 'Dart Reference v0.0',
+    name: 'Dart Reference v1.0',
+  },
+  reference_dart_v2: {
+    icon: '/docs/img/icons/menu/reference-dart',
+    name: 'Dart Reference v2.0',
   },
   reference_csharp_v0: {
     icon: '/docs/img/icons/menu/reference-csharp',
@@ -102,9 +102,13 @@ const levelsData = {
     icon: '/docs/img/icons/menu/reference-swift',
     name: 'Swift Reference v1.0',
   },
-  reference_kotlin_v0: {
+  reference_kotlin_v1: {
     icon: '/docs/img/icons/menu/reference-kotlin',
-    name: 'Kotlin Reference v0.0',
+    name: 'Kotlin Reference v1.0',
+  },
+  reference_kotlin_v2: {
+    icon: '/docs/img/icons/menu/reference-kotlin',
+    name: 'Kotlin Reference v2.0',
   },
   reference_cli: {
     icon: '/docs/img/icons/menu/reference-cli',

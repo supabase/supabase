@@ -114,9 +114,9 @@ const TriggerList = ({
               <div className="flex items-center justify-end">
                 {canUpdateTriggers ? (
                   <DropdownMenu>
-                    <DropdownMenuTrigger>
-                      <Button asChild type="default" className="px-1" icon={<IconMoreVertical />}>
-                        <span />
+                    <DropdownMenuTrigger asChild>
+                      <Button type="default" className="px-1">
+                        <IconMoreVertical />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent side="bottom" align="end" className="w-36">

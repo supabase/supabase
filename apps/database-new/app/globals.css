@@ -78,9 +78,9 @@
 html,
 body,
 main {
-  @apply bg-background;
+  /* @apply bg-background;
   @apply text-foreground;
-  /* height: 100%;
+  height: 100%;
   width: 100%; */
   padding: 0;
   margin: 0;
@@ -169,5 +169,22 @@ main {
   }
   100% {
     background-position: 1000px 0;
+  }
+}
+
+.fade-in {
+  opacity: 0;
+  animation-name: fadeIn;
+  animation-duration: 500ms;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
