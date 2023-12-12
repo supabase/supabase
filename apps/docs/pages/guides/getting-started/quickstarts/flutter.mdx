@@ -68,7 +68,7 @@ export const meta = {
     <StepHikeCompact.Code>
 
       ```yaml pubspec.yaml
-      supabase_flutter: ^1.6.2
+      supabase_flutter: ^2.0.0
       ```
 
     </StepHikeCompact.Code>
@@ -138,7 +138,7 @@ export const meta = {
       class _HomePageState extends State<HomePage> {
         final _future = Supabase.instance.client
             .from('countries')
-            .select<List<Map<String, dynamic>>>();
+            .select();
 
         @override
         Widget build(BuildContext context) {

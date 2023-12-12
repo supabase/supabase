@@ -25,11 +25,8 @@ class _AccountPageState extends State<AccountPage> {
 
     try {
       final userId = supabase.auth.currentUser!.id;
-      final data = await supabase
-          .from('profiles')
-          .select<Map<String, dynamic>>()
-          .eq('id', userId)
-          .single();
+      final data =
+          await supabase.from('profiles').select().eq('id', userId).single();
       _usernameController.text = (data['username'] ?? '') as String;
       _websiteController.text = (data['website'] ?? '') as String;
       _avatarUrl = (data['avatar_url'] ?? '') as String;
