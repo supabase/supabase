@@ -110,9 +110,9 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
-        title: 'Bandwidth',
+        title: 'Shared Bandwidth',
         tooltips: {
-          main: 'Billing is based on the total sum of outgoing traffic (includes Database, Storage, Realtime, Auth) in GB throughout your billing period.',
+          main: 'Billing is based on the total sum of outgoing traffic (includes Database, Storage, Realtime, Auth and Functions) in GB throughout your billing period.',
         },
         plans: {
           free: '5GB included',
@@ -212,6 +212,19 @@ export const pricing: Pricing = {
         },
         usage_based: false,
       },
+      {
+        title: 'Shared Bandwidth',
+        tooltips: {
+          main: 'Billing is based on the total sum of outgoing traffic (includes Database, Storage, Realtime, Auth and Functions) in GB throughout your billing period.',
+        },
+        plans: {
+          free: '5GB included',
+          pro: '250 GB included, then $0.09 per GB',
+          team: '250 GB included, then $0.09 per GB',
+          enterprise: 'Custom',
+        },
+        usage_based: true,
+      },
     ],
   },
   storage: {
@@ -276,6 +289,19 @@ export const pricing: Pricing = {
         },
         usage_based: false,
       },
+      {
+        title: 'Shared Bandwidth',
+        tooltips: {
+          main: 'Billing is based on the total sum of outgoing traffic (includes Database, Storage, Realtime, Auth and Functions) in GB throughout your billing period.',
+        },
+        plans: {
+          free: '5GB included',
+          pro: '250 GB included, then $0.09 per GB',
+          team: '250 GB included, then $0.09 per GB',
+          enterprise: 'Custom',
+        },
+        usage_based: true,
+      },
     ],
   },
   edge_functions: {
@@ -314,6 +340,19 @@ export const pricing: Pricing = {
           free: '10 included',
           pro: '100 included, then $10 per additional 100',
           team: '100 included, then $10 per additional 100',
+          enterprise: 'Custom',
+        },
+        usage_based: true,
+      },
+      {
+        title: 'Shared Bandwidth',
+        tooltips: {
+          main: 'Billing is based on the total sum of outgoing traffic (includes Database, Storage, Realtime, Auth and Functions) in GB throughout your billing period.',
+        },
+        plans: {
+          free: '5GB included',
+          pro: '250 GB included, then $0.09 per GB',
+          team: '250 GB included, then $0.09 per GB',
           enterprise: 'Custom',
         },
         usage_based: true,
@@ -369,6 +408,19 @@ export const pricing: Pricing = {
           enterprise: 'Custom',
         },
         usage_based: false,
+      },
+      {
+        title: 'Shared Bandwidth',
+        tooltips: {
+          main: 'Billing is based on the total sum of outgoing traffic (includes Database, Storage, Realtime, Auth and Functions) in GB throughout your billing period.',
+        },
+        plans: {
+          free: '5GB included',
+          pro: '250 GB included, then $0.09 per GB',
+          team: '250 GB included, then $0.09 per GB',
+          enterprise: 'Custom',
+        },
+        usage_based: true,
       },
     ],
   },
