@@ -32,6 +32,7 @@ import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
+import { Markdown } from 'components/interfaces/Markdown'
 
 // Use a const string to represent no chars option. Represented as empty string on the backend side.
 const NO_REQUIRED_CHARACTERS = 'NO_REQUIRED_CHARS'
@@ -41,6 +42,7 @@ const LOWER_UPPER_DIGITS_SYMBOLS = LOWER_UPPER_DIGITS + ':!@#$%^&*()_+-=[]{};\'\
 
 const schema = object({
   DISABLE_SIGNUP: boolean().required(),
+  SECURITY_MANUAL_LINKING_ENABLED: boolean().required(),
   SITE_URL: string().required('Must have a Site URL'),
   SECURITY_CAPTCHA_ENABLED: boolean().required(),
   SECURITY_CAPTCHA_SECRET: string().when('SECURITY_CAPTCHA_ENABLED', {
@@ -100,6 +102,7 @@ const BasicAuthSettingsForm = observer(() => {
 
   const INITIAL_VALUES = {
     DISABLE_SIGNUP: !authConfig?.DISABLE_SIGNUP,
+    SECURITY_MANUAL_LINKING_ENABLED: authConfig?.SECURITY_MANUAL_LINKING_ENABLED || false,
     SITE_URL: authConfig?.SITE_URL,
     SECURITY_CAPTCHA_ENABLED: authConfig?.SECURITY_CAPTCHA_ENABLED || false,
     SECURITY_CAPTCHA_SECRET: authConfig?.SECURITY_CAPTCHA_SECRET || '',
@@ -208,6 +211,20 @@ const BasicAuthSettingsForm = observer(() => {
                     label="Allow new users to sign up"
                     layout="flex"
                     descriptionText="If this is disabled, new users will not be able to sign up to your application."
+                    disabled={!canUpdateConfig}
+                  />
+                  <Toggle
+                    id="SECURITY_MANUAL_LINKING_ENABLED"
+                    size="small"
+                    label="Allow manual linking"
+                    layout="flex"
+                    descriptionText={
+                      <Markdown
+                        extLinks
+                        className="[&>p>a]:text-foreground-light [&>p>a]:transition-all [&>p>a]:hover:text-foreground [&>p>a]:hover:decoration-brand"
+                        content="Enable [manual linking APIs](https://supabase.com/docs/guides/auth/auth-identity-linking#manual-linking-beta) for your project."
+                      />
+                    }
                     disabled={!canUpdateConfig}
                   />
                 </FormSectionContent>
