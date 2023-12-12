@@ -208,7 +208,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     return supabase.auth.signInWithIdToken(
-      provider: Provider.google,
+      provider: OAuthProvider.google,
       idToken: idToken,
       accessToken: accessToken,
     );
