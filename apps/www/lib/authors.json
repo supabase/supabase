@@ -376,6 +376,14 @@
     "author_image_url": "https://github.com/YuriCodes.png"
   },
   {
+    "author_id": "ivasilov",
+    "author": "Ivan Vasilov",
+    "username": "ivasilov",
+    "position": "Engineering",
+    "author_url": "https://twitter.com/ivasilov",
+    "author_image_url": "https://github.com/ivasilov.png"
+  },
+  {
     "author_id": "philipp",
     "author": "Philipp Steinrötter",
     "username": "psteinroe",

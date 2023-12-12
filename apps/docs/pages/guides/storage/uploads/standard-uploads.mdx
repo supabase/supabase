@@ -55,12 +55,12 @@ val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
 }
 
 suspend fun uploadData(bytes: ByteArray) {
-    supabase.storage["bucket_name"].upload("file_path", bytes)
+    supabase.storage.from("bucket_name").upload("file_path", bytes)
 }
 
 //Or on JVM/Android: (This will stream the data from the file to supabase)
 suspend fun uploadFile(file: File) {
-    supabase.storage["bucket_name"].upload("file_path", file)
+    supabase.storage.from("bucket_name").upload("file_path", file)
 }
 ```
 
