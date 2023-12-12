@@ -38,7 +38,6 @@ import { getQueryClient } from 'data/query-client'
 import { tableKeys } from 'data/tables/keys'
 import { getTable } from 'data/tables/table-query'
 import { getTables } from 'data/tables/tables-query'
-import ExtensionsStore from './ExtensionsStore'
 import ForeignTableStore, { IForeignTableStore } from './ForeignTableStore'
 import FunctionsStore from './FunctionsStore'
 import HooksStore from './HooksStore'
@@ -65,7 +64,6 @@ export interface IMetaStore {
   policies: IPostgresMetaInterface<any>
   triggers: IPostgresMetaInterface<any>
   functions: IPostgresMetaInterface<any>
-  extensions: IPostgresMetaInterface<any>
   publications: IPostgresMetaInterface<any>
 
   projectRef?: string
@@ -156,7 +154,6 @@ export default class MetaStore implements IMetaStore {
   policies: PoliciesStore
   triggers: TriggersStore
   functions: FunctionsStore
-  extensions: ExtensionsStore
   publications: PublicationStore
 
   projectRef?: string
@@ -199,14 +196,6 @@ export default class MetaStore implements IMetaStore {
     this.hooks = new HooksStore(this.rootStore, `${this.baseUrl}/triggers`, this.headers)
     this.triggers = new TriggersStore(this.rootStore, `${this.baseUrl}/triggers`, this.headers)
     this.functions = new FunctionsStore(this.rootStore, `${this.baseUrl}/functions`, this.headers)
-    this.extensions = new ExtensionsStore(
-      this.rootStore,
-      `${this.baseUrl}/extensions`,
-      this.headers,
-      {
-        identifier: 'name',
-      }
-    )
     this.publications = new PublicationStore(
       this.rootStore,
       `${this.baseUrl}/publications`,
@@ -1009,9 +998,6 @@ export default class MetaStore implements IMetaStore {
 
     this.functions.setUrl(`${this.baseUrl}/functions`)
     this.functions.setHeaders(this.headers)
-
-    this.extensions.setUrl(`${this.baseUrl}/extensions`)
-    this.extensions.setHeaders(this.headers)
 
     this.publications.setUrl(`${this.baseUrl}/publications`)
     this.publications.setHeaders(this.headers)
