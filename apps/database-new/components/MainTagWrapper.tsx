@@ -11,10 +11,7 @@ const MainTagWrapper = ({ children }: MainTagWrapperProps) => {
   const isFullHeight = pathname.startsWith('/thread') || pathname === '/'
 
   return (
-    <main
-      role="main"
-      className={cn('w-full flex flex-col grow', isFullHeight && 'h-[calc(100vh-115px)]')}
-    >
+    <main role="main" className={cn('w-full flex flex-col grow', isFullHeight && 'h-full')}>
       {children}
     </main>
   )
