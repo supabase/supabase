@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions, usePermissionsLoaded, useStore } from 'hooks'
 import { NextPageWithLayout } from 'types'
 import { DatabaseLayout } from 'components/layouts'
 import { PublicationsList, PublicationsTables } from 'components/interfaces/Database'
@@ -21,11 +21,12 @@ const DatabaseReplication: NextPageWithLayout = () => {
     PermissionAction.TENANT_SQL_ADMIN_READ,
     'publications'
   )
+  const isPermissionsLoaded = usePermissionsLoaded()
 
   const [selectedPublicationId, setSelectedPublicationId] = useState<number>()
   const selectedPublication = publications.find((pub) => pub.id === selectedPublicationId)
 
-  if (!canViewPublications) {
+  if (isPermissionsLoaded && !canViewPublications) {
     return <NoPermission isFullPage resourceText="view database publications" />
   }
 

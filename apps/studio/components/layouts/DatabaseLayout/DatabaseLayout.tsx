@@ -43,6 +43,7 @@ const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) =>
       productMenu={
         <ProductMenu page={page} menu={generateDatabaseMenu(project, { pgNetExtensionExists })} />
       }
+      isBlocking={false}
     >
       <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
         {children}

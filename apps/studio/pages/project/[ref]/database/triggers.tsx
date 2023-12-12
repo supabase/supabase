@@ -7,7 +7,7 @@ import TriggersList from 'components/interfaces/Database/Triggers/TriggersList/T
 import { DatabaseLayout } from 'components/layouts'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions, usePermissionsLoaded, useStore } from 'hooks'
 import { NextPageWithLayout } from 'types'
 
 const TriggersPage: NextPageWithLayout = () => {
@@ -17,6 +17,7 @@ const TriggersPage: NextPageWithLayout = () => {
   const [showDeleteTriggerForm, setShowDeleteTriggerForm] = useState<boolean>(false)
 
   const canReadTriggers = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'triggers')
+  const isPermissionsLoaded = usePermissionsLoaded()
 
   useEffect(() => {
     if (ui.selectedProjectRef) meta.triggers.load()
@@ -37,7 +38,7 @@ const TriggersPage: NextPageWithLayout = () => {
     setShowDeleteTriggerForm(true)
   }
 
-  if (!canReadTriggers) {
+  if (isPermissionsLoaded && !canReadTriggers) {
     return <NoPermission isFullPage resourceText="view database triggers" />
   }
 

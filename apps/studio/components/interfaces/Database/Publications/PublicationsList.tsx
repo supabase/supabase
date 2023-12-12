@@ -7,8 +7,9 @@ import Table from 'components/to-be-cleaned/Table'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import InformationBox from 'components/ui/InformationBox'
 import NoSearchResults from 'components/ui/NoSearchResults'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions, usePermissionsLoaded, useStore } from 'hooks'
 import { Button, IconAlertCircle, IconSearch, Input, Modal, Toggle } from 'ui'
+import PublicationSkeleton from './PublicationSkeleton'
 
 interface PublicationEvent {
   event: string
@@ -27,6 +28,7 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'publications'
   )
+  const isPermissionsLoaded = usePermissionsLoaded()
 
   const publicationEvents: PublicationEvent[] = [
     { event: 'Insert', key: 'publish_insert' },
@@ -38,6 +40,8 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
     filterString.length === 0
       ? meta.publications.list()
       : meta.publications.list((publication: any) => publication.name.includes(filterString))
+
+  const isLoading = meta.publications.isLoading
 
   const [toggleListenEventValue, setToggleListenEventValue] = useState<{
     publication: any
@@ -82,7 +86,7 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
               onChange={(e) => setFilterString(e.target.value)}
             />
           </div>
-          {!canUpdatePublications && (
+          {isPermissionsLoaded && !canUpdatePublications && (
             <div className="w-[500px]">
               <InformationBox
                 icon={<IconAlertCircle className="text-foreground-light" strokeWidth={2} />}
@@ -92,68 +96,79 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
           )}
         </div>
       </div>
-      {publications.length === 0 ? (
-        <NoSearchResults searchString={filterString} onResetFilter={() => setFilterString('')} />
-      ) : (
-        <div className="overflow-hidden rounded">
-          <Table
-            head={[
-              <Table.th key="header.name">Name</Table.th>,
-              <Table.th key="header.id" className="hidden lg:table-cell">
-                System ID
-              </Table.th>,
-              <Table.th key="header.insert">Insert</Table.th>,
-              <Table.th key="header.update">Update</Table.th>,
-              <Table.th key="header.delete">Delete</Table.th>,
-              <Table.th key="header.truncate">Truncate</Table.th>,
-              <Table.th key="header.source" className="text-right">
-                Source
-              </Table.th>,
-            ]}
-            body={publications.map((x, i) => (
-              <Table.tr className="border-t " key={x.name}>
-                <Table.td className="px-4 py-3" style={{ width: '25%' }}>
-                  {x.name}
-                </Table.td>
-                <Table.td className="hidden lg:table-cell" style={{ width: '25%' }}>
-                  {x.id}
-                </Table.td>
-                {publicationEvents.map((event) => (
-                  <Table.td key={event.key}>
-                    <Toggle
-                      size="tiny"
-                      checked={x[event.key]}
-                      disabled={!canUpdatePublications}
-                      onChange={() => {
-                        setToggleListenEventValue({
-                          publication: x,
-                          event,
-                          currentStatus: x[event.key],
-                        })
-                      }}
-                    />
-                  </Table.td>
-                ))}
-                <Table.td className="px-4 py-3 pr-2">
-                  <div className="flex justify-end gap-2">
-                    <Button
-                      type="default"
-                      style={{ paddingTop: 3, paddingBottom: 3 }}
-                      onClick={() => onSelectPublication(x.id)}
-                    >
-                      {x.tables == null
-                        ? 'All tables'
-                        : `${x.tables.length} ${
-                            x.tables.length > 1 || x.tables.length == 0 ? 'tables' : 'table'
-                          }`}
-                    </Button>
-                  </div>
-                </Table.td>
-              </Table.tr>
-            ))}
+
+      <div className="overflow-hidden rounded">
+        <Table
+          head={[
+            <Table.th key="header.name" style={{ width: '25%' }}>
+              Name
+            </Table.th>,
+            <Table.th key="header.id" className="hidden lg:table-cell" style={{ width: '25%' }}>
+              System ID
+            </Table.th>,
+            <Table.th key="header.insert">Insert</Table.th>,
+            <Table.th key="header.update">Update</Table.th>,
+            <Table.th key="header.delete">Delete</Table.th>,
+            <Table.th key="header.truncate">Truncate</Table.th>,
+            <Table.th key="header.source" className="text-right">
+              Source
+            </Table.th>,
+          ]}
+          body={
+            isLoading
+              ? Array.from({ length: 5 }).map((_, i) => <PublicationSkeleton key={i} index={i} />)
+              : publications.map((x, i) => (
+                  <Table.tr className="border-t" key={x.name}>
+                    <Table.td className="px-4 py-3" style={{ width: '25%' }}>
+                      {x.name}
+                    </Table.td>
+                    <Table.td className="hidden lg:table-cell" style={{ width: '25%' }}>
+                      {x.id}
+                    </Table.td>
+                    {publicationEvents.map((event) => (
+                      <Table.td key={event.key}>
+                        <Toggle
+                          size="tiny"
+                          checked={x[event.key]}
+                          disabled={!canUpdatePublications}
+                          onChange={() => {
+                            setToggleListenEventValue({
+                              publication: x,
+                              event,
+                              currentStatus: x[event.key],
+                            })
+                          }}
+                        />
+                      </Table.td>
+                    ))}
+                    <Table.td className="px-4 py-3 pr-2">
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          type="default"
+                          style={{ paddingTop: 3, paddingBottom: 3 }}
+                          onClick={() => onSelectPublication(x.id)}
+                        >
+                          {x.tables == null
+                            ? 'All tables'
+                            : `${x.tables.length} ${
+                                x.tables.length > 1 || x.tables.length == 0 ? 'tables' : 'table'
+                              }`}
+                        </Button>
+                      </div>
+                    </Table.td>
+                  </Table.tr>
+                ))
+          }
+        />
+
+        {!isLoading && publications.length === 0 && (
+          <NoSearchResults
+            searchString={filterString}
+            onResetFilter={() => setFilterString('')}
+            className="rounded-t-none border-t-0"
           />
-        </div>
-      )}
+        )}
+      </div>
 
       <ConfirmationModal
         visible={toggleListenEventValue !== null}

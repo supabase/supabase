@@ -8,9 +8,11 @@ import { Button, IconAlertCircle, IconExternalLink, IconSearch, Input } from 'ui
 import { useParams } from 'common/hooks'
 import InformationBox from 'components/ui/InformationBox'
 import NoSearchResults from 'components/ui/NoSearchResults'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions, usePermissionsLoaded, useStore } from 'hooks'
 import ExtensionCard from './ExtensionCard'
 import { HIDDEN_EXTENSIONS } from './Extensions.constants'
+import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import ExtensionCardSkeleton from './ExtensionCardSkeleton'
 
 const Extensions = () => {
   const { meta } = useStore()
@@ -21,6 +23,7 @@ const Extensions = () => {
     filterString.length === 0
       ? meta.extensions.list()
       : meta.extensions.list((ext: any) => ext.name.includes(filterString))
+  const isLoading = meta.extensions.isLoading
   const extensionsWithoutHidden = extensions.filter(
     (ext: any) => !HIDDEN_EXTENSIONS.includes(ext.name)
   )
@@ -33,6 +36,7 @@ const Extensions = () => {
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'extensions'
   )
+  const isPermissionsLoaded = usePermissionsLoaded()
 
   useEffect(() => {
     if (filter !== undefined) setFilterString(filter as string)
@@ -50,7 +54,7 @@ const Extensions = () => {
             className="w-64"
             icon={<IconSearch size="tiny" />}
           />
-          {!canUpdateExtensions ? (
+          {isPermissionsLoaded && !canUpdateExtensions ? (
             <div className="w-[500px]">
               <InformationBox
                 icon={<IconAlertCircle className="text-foreground-light" strokeWidth={2} />}
@@ -71,33 +75,52 @@ const Extensions = () => {
         </div>
       </div>
 
-      {extensions.length === 0 && (
-        <NoSearchResults searchString={filterString} onResetFilter={() => setFilterString('')} />
+      {isLoading ? (
+        <div className="my-8 w-full space-y-12">
+          <div className="space-y-4">
+            <ShimmeringLoader className="h-[28px] w-40" />
+
+            <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <ExtensionCardSkeleton key={index} index={index} />
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <>
+          {extensions.length === 0 && (
+            <NoSearchResults
+              searchString={filterString}
+              onResetFilter={() => setFilterString('')}
+            />
+          )}
+
+          <div className="my-8 w-full space-y-12">
+            {enabledExtensions.length > 0 && (
+              <div className="space-y-4">
+                <h4 className="text-lg">Enabled extensions</h4>
+                <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+                  {enabledExtensions.map((extension) => (
+                    <ExtensionCard key={extension.name} extension={extension} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {disabledExtensions.length > 0 && (
+              <div className="space-y-4">
+                <h4 className="text-lg">Available extensions</h4>
+                <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+                  {disabledExtensions.map((extension) => (
+                    <ExtensionCard key={extension.name} extension={extension} />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </>
       )}
-
-      <div className="my-8 w-full space-y-12">
-        {enabledExtensions.length > 0 && (
-          <div className="space-y-4">
-            <h4 className="text-lg">Enabled extensions</h4>
-            <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-              {enabledExtensions.map((extension) => (
-                <ExtensionCard key={extension.name} extension={extension} />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {disabledExtensions.length > 0 && (
-          <div className="space-y-4">
-            <h4 className="text-lg">Available extensions</h4>
-            <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-              {disabledExtensions.map((extension) => (
-                <ExtensionCard key={extension.name} extension={extension} />
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
     </>
   )
 }
