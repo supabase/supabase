@@ -117,7 +117,9 @@ const RolesList = ({}) => {
                 <div className="w-42">
                   <SparkBar
                     type="horizontal"
-                    max={maxConnectionLimit || 0}
+                    // if the maxConnectionLimit is undefined, set totalActiveConnections so that
+                    // the width of the bar is set to 100%
+                    max={maxConnectionLimit || totalActiveConnections}
                     value={totalActiveConnections}
                     barClass={
                       maxConnectionLimit === 0 || maxConnectionLimit === undefined
@@ -128,7 +130,11 @@ const RolesList = ({}) => {
                         ? 'bg-amber-900'
                         : 'bg-green-800'
                     }
-                    labelTop={`${totalActiveConnections}/${maxConnectionLimit || 0}`}
+                    labelTop={
+                      Number.isInteger(maxConnectionLimit)
+                        ? `${totalActiveConnections}/${maxConnectionLimit}`
+                        : `${totalActiveConnections}`
+                    }
                     labelBottom="Active connections"
                   />
                 </div>
