@@ -1,6 +1,6 @@
 import React, { ComponentProps } from 'react'
 import { Toaster as HotToaster, toast as hotToast, resolveValue } from 'react-hot-toast'
-import { Toast as HotToastProps, ToastType } from 'react-hot-toast/dist/core/types'
+import { Toast as HotToastProps, ToastType } from 'react-hot-toast'
 import * as Portal from '@radix-ui/react-portal'
 import { IconCheck } from '../Icon/icons/IconCheck'
 import { IconLoader } from '../Icon/icons/IconLoader'
@@ -84,7 +84,11 @@ function Toast({
   }
 
   const _message =
-    typeof message === 'string' ? <Message>{message}</Message> : resolveValue(message, rest)
+    typeof message === 'string' ? (
+      <Message>{message}</Message>
+    ) : (
+      resolveValue(message, { id, visible, type, message, ...rest })
+    )
 
   return (
     <div className={`${containerClasses.join(' ')} ${visible ? 'animate-enter' : 'animate-leave'}`}>
@@ -140,7 +144,7 @@ function Toaster({ children }: ToasterProps) {
           typeof message === 'string' ? (
             <Toast message={message} {...t} />
           ) : (
-            <>{resolveValue(message, t)}</>
+            <>{resolveValue(message, { message, ...t })}</>
           )
         }
       </HotToaster>
@@ -179,7 +183,7 @@ export function toast(message: string, opts?: ToastOptions) {
         closable={closable}
         actions={actions}
         actionsPosition={actionsPosition}
-        type={type}
+        type={type!}
         {...t}
       />
     ),
