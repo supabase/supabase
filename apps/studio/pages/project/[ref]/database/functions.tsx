@@ -7,7 +7,7 @@ import FunctionsList from 'components/interfaces/Database/Functions/FunctionsLis
 import { DatabaseLayout } from 'components/layouts'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions, usePermissionsLoaded, useStore } from 'hooks'
 import { NextPageWithLayout } from 'types'
 
 const FunctionsPage: NextPageWithLayout = () => {
@@ -17,6 +17,7 @@ const FunctionsPage: NextPageWithLayout = () => {
   const [showDeleteFunctionForm, setShowDeleteFunctionForm] = useState<boolean>(false)
 
   const canReadFunctions = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'functions')
+  const isPermissionsLoaded = usePermissionsLoaded()
 
   useEffect(() => {
     if (ui.selectedProjectRef) meta.functions.load()
@@ -37,7 +38,7 @@ const FunctionsPage: NextPageWithLayout = () => {
     setShowDeleteFunctionForm(true)
   }
 
-  if (!canReadFunctions) {
+  if (isPermissionsLoaded && !canReadFunctions) {
     return <NoPermission isFullPage resourceText="view database functions" />
   }
 
