@@ -1,7 +1,7 @@
 import { noop } from 'lodash'
 import { Badge, Button } from 'ui'
 
-import { Project } from 'types'
+import { Project } from 'data/projects/project-detail-query'
 
 interface PausedProjectCardProps {
   project: Project

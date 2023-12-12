@@ -7,7 +7,7 @@ import { components } from 'data/api'
 
 export type ProjectDetailVariables = { ref?: string }
 
-export type ProjectDetail = components['schemas']['ProjectDetailResponse']
+export type ProjectDetail = components['schemas']['ProjectInfo']
 
 export interface Project extends ProjectDetail {
   /**
@@ -27,7 +27,7 @@ export async function getProjectDetail({ ref }: ProjectDetailVariables, signal?:
   })
 
   if (error) throw error
-  return data as Project
+  return data as unknown as Project
 }
 
 export type ProjectDetailData = Awaited<ReturnType<typeof getProjectDetail>>

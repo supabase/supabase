@@ -4,10 +4,9 @@ import { useRouter } from 'next/router'
 import { Fragment } from 'react'
 import { Button, IconExternalLink } from 'ui'
 
-import { Organization, Project } from 'types'
+import { Organization } from 'types'
 
 interface NotificationActionsProps {
-  project: Project
   organization: Organization
   changelogLink?: string
   availableActions: Action[]
@@ -17,7 +16,6 @@ interface NotificationActionsProps {
 }
 
 const NotificationActions = ({
-  project,
   organization,
   changelogLink,
   availableActions,

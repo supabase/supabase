@@ -14,13 +14,12 @@ import { Button, IconArrowRight, IconBell, IconInbox, Popover } from 'ui'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useNotificationsQuery } from 'data/notifications/notifications-query'
 import { useNotificationsUpdateMutation } from 'data/notifications/notifications-update-mutation'
-import { getProjectDetail } from 'data/projects/project-detail-query'
+import { Project, getProjectDetail } from 'data/projects/project-detail-query'
 import { useProjectRestartServicesMutation } from 'data/projects/project-restart-services-mutation'
 import { setProjectPostgrestStatus } from 'data/projects/projects-query'
 import { useStore } from 'hooks'
 import { delete_, post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { Project } from 'types'
 import NotificationRow from './NotificationRow'
 
 interface NotificationsPopoverProps {
@@ -36,9 +35,9 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
     onError: () => console.error('Failed to update notifications'),
   })
 
-  const [projectToRestart, setProjectToRestart] = useState<Project>()
-  const [projectToApplyMigration, setProjectToApplyMigration] = useState<Project>()
-  const [projectToRollbackMigration, setProjectToRollbackMigration] = useState<Project>()
+  const [projectToRestart, setProjectToRestart] = useState<Partial<Project>>()
+  const [projectToApplyMigration, setProjectToApplyMigration] = useState<Partial<Project>>()
+  const [projectToRollbackMigration, setProjectToRollbackMigration] = useState<Partial<Project>>()
   const [targetNotification, setTargetNotification] = useState<Notification>()
 
   const { mutate: restartProjectServices } = useProjectRestartServicesMutation({
@@ -73,8 +72,9 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
     if (!projectToRestart || !targetNotification) return
 
     const { id } = targetNotification
-
     const { ref, region } = projectToRestart
+    if (!ref || !region) return console.error('Ref and region required')
+
     const serviceNamesByActionName: Record<string, string> = {
       [ActionType.PgBouncerRestart]: 'pgbouncer',
       [ActionType.SchedulePostgresRestart]: 'postgresql',

@@ -8,13 +8,14 @@ import {
   ServiceUpgrade,
   ViolatedLimit,
 } from '@supabase/shared-types/out/notifications'
-import { Markdown } from 'components/interfaces/Markdown'
 import dayjs from 'dayjs'
 import Link from 'next/link'
-import { Project } from 'types'
 import { Button, IconArrowRight, IconExternalLink } from 'ui'
 
-export const formatNotificationText = (project: Project, notification: Notification) => {
+import { Markdown } from 'components/interfaces/Markdown'
+import { Project } from 'data/projects/project-detail-query'
+
+export const formatNotificationText = (project: Partial<Project>, notification: Notification) => {
   const projectName = project.name
 
   if (notification.data.name === NotificationName.ProjectExceedingTierLimit) {

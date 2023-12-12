@@ -6,7 +6,7 @@ import {
   IconChevronRight,
 } from 'ui'
 
-import { Project } from 'types'
+import { Project } from 'data/projects/project-detail-query'
 import SettingsMenuItem from './SettingsMenuItem'
 
 interface ProjectSettingsMenuItemProps {

@@ -3,18 +3,18 @@ import dayjs from 'dayjs'
 import { Button, IconX } from 'ui'
 
 import { useNotificationsDismissMutation } from 'data/notifications/notifications-dismiss-mutation'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { Project } from 'data/projects/project-detail-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useStore } from 'hooks'
-import { Project } from 'types'
 import NotificationActions from './NotificationActions'
 import { formatNotificationCTAText, formatNotificationText } from './NotificationRows.utils'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 
 export interface NotificationRowProps {
   notification: Notification
-  onSelectRestartProject: (project: Project, notification: Notification) => void
-  onSelectApplyMigration: (project: Project, notification: Notification) => void
-  onSelectRollbackMigration: (project: Project, notification: Notification) => void
+  onSelectRestartProject: (project: Partial<Project>, notification: Notification) => void
+  onSelectApplyMigration: (project: Partial<Project>, notification: Notification) => void
+  onSelectRollbackMigration: (project: Partial<Project>, notification: Notification) => void
 }
 
 const NotificationRow = ({
@@ -88,7 +88,6 @@ const NotificationRow = ({
         {(availableActions.length > 0 || changelogLink !== undefined) && (
           <div className="flex items-center">
             <NotificationActions
-              project={project}
               organization={organization}
               changelogLink={changelogLink}
               availableActions={availableActions}

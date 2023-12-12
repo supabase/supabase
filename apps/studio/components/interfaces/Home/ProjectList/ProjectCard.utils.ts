@@ -1,5 +1,5 @@
+import { Project } from 'data/projects/project-detail-query'
 import { PROJECT_STATUS } from 'lib/constants'
-import { Project } from 'types'
 
 export const inferProjectStatus = (project: Project) => {
   let status = undefined
