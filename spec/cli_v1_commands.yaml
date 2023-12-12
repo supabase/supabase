@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.123.0
+  version: 1.123.4
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -2458,6 +2458,10 @@ commands:
     usage: supabase functions download <Function name> [flags]
     subcommands: []
     flags:
+      - id: legacy-bundle
+        name: --legacy-bundle
+        description: Use legacy bundling mechanism.
+        default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
