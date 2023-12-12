@@ -114,7 +114,7 @@ const days: WeekDayProps[] = [
     published_at: '2023-12-12T08:00:00.000-08:00',
     description: (
       <>
-        Edge Functions: <strong>Node and native npm compatibility</strong>
+        Edge Functions: <strong>Node</strong> and native <strong>npm</strong> compatibility
       </>
     ),
     links: [
