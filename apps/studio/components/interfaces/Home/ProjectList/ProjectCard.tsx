@@ -26,6 +26,7 @@ const ProjectCard = ({
   const { name, ref: projectRef } = project
   const desc = `${project.cloud_provider} | ${project.region}`
 
+  // @ts-ignore
   const isBranchingEnabled = project.preview_branch_refs.length > 0
   const isGithubIntegrated = githubIntegration !== undefined
   const isVercelIntegrated = vercelIntegration !== undefined

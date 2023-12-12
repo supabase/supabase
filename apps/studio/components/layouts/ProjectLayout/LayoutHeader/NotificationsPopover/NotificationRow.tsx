@@ -12,9 +12,9 @@ import { formatNotificationCTAText, formatNotificationText } from './Notificatio
 
 export interface NotificationRowProps {
   notification: Notification
-  onSelectRestartProject: (project: Partial<Project>, notification: Notification) => void
-  onSelectApplyMigration: (project: Partial<Project>, notification: Notification) => void
-  onSelectRollbackMigration: (project: Partial<Project>, notification: Notification) => void
+  onSelectRestartProject: (project: any, notification: Notification) => void
+  onSelectApplyMigration: (project: any, notification: Notification) => void
+  onSelectRollbackMigration: (project: any, notification: Notification) => void
 }
 
 const NotificationRow = ({
@@ -63,7 +63,7 @@ const NotificationRow = ({
       <div className="flex-grow mr-8 flex flex-col gap-4">
         <div className="w-full flex justify-between">
           <div className="w-9/10 space-y-2">
-            {formatNotificationText(project, notification)}
+            {formatNotificationText(project.name, notification)}
             {formatNotificationCTAText(availableActions)}
             <p className="text-foreground-light text-sm !mt-2">{insertedAt}</p>
           </div>

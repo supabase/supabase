@@ -15,9 +15,7 @@ import { Button, IconArrowRight, IconExternalLink } from 'ui'
 import { Markdown } from 'components/interfaces/Markdown'
 import { Project } from 'data/projects/project-detail-query'
 
-export const formatNotificationText = (project: Partial<Project>, notification: Notification) => {
-  const projectName = project.name
-
+export const formatNotificationText = (projectName: string, notification: Notification) => {
   if (notification.data.name === NotificationName.ProjectExceedingTierLimit) {
     const { violations } = notification.data
     const violationsText = violations

@@ -7,7 +7,8 @@ import { components } from 'data/api'
 
 export type ProjectDetailVariables = { ref?: string }
 
-export type ProjectDetail = components['schemas']['ProjectInfo']
+export type ProjectMinimal = components['schemas']['ProjectInfo']
+export type ProjectDetail = components['schemas']['ProjectDetailResponse']
 
 export interface Project extends ProjectDetail {
   /**
