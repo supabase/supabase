@@ -3,12 +3,12 @@ import { products } from 'shared-data'
 import { IconBarChart, IconFileText, IconList, IconSettings } from 'ui'
 
 import { Route } from 'components/ui/ui.types'
+import { Project } from 'data/projects/project-detail-query'
 import { BASE_PATH, IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
-import { ProjectBase } from 'types'
 
 export const generateToolRoutes = (
   ref?: string,
-  project?: ProjectBase,
+  project?: Project,
   supabaseAIEnabled?: boolean
 ): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
@@ -50,7 +50,7 @@ export const generateToolRoutes = (
 }
 export const generateProductRoutes = (
   ref?: string,
-  project?: ProjectBase,
+  project?: Project,
   features?: { auth?: boolean; edgeFunctions?: boolean; storage?: boolean; realtime?: boolean }
 ): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
@@ -196,7 +196,7 @@ export const generateProductRoutes = (
   ]
 }
 
-export const generateOtherRoutes = (ref?: string, project?: ProjectBase): Route[] => {
+export const generateOtherRoutes = (ref?: string, project?: Project): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}/building`
 

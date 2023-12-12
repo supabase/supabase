@@ -1,5 +1,4 @@
 import {
-  useFlag,
   useIsFeatureEnabled,
   useSelectedOrganization,
   useSelectedProject,
@@ -11,9 +10,9 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 import { generateSettingsMenu } from './SettingsMenu.utils'
 
+import { useParams } from 'common'
 import ProductMenu from 'components/ui/ProductMenu'
 import ProjectLayout from '..'
-import { useParams } from 'common'
 
 interface SettingsLayoutProps {
   title?: string
