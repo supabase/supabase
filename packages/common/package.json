@@ -11,6 +11,7 @@
   "dependencies": {
     "@serafin/schema-builder": "^0.18.5",
     "@types/dat.gui": "^0.7.12",
+    "ai": "^2.2.29",
     "common-tags": "^1.8.2",
     "config": "*",
     "dat.gui": "^0.7.9",
@@ -32,6 +33,7 @@
     "babel-plugin-transform-import-meta": "^2.2.1",
     "dotenv": "^16.3.1",
     "jest": "^29.7.0",
+    "mdast-util-from-markdown": "^2.0.0",
     "sql-formatter": "^15.0.2",
     "ts-jest": "^29.1.1",
     "tsconfig": "*",

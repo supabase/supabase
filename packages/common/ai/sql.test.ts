@@ -1,13 +1,11 @@
 import { describe, expect, test } from '@jest/globals'
 import { codeBlock } from 'common-tags'
 import OpenAI from 'openai'
-import { format } from 'sql-formatter'
-import { debugSql, editSql, generateSql, titleSql } from './sql'
+import { collectStream, extractMarkdownSql, formatSql } from '../test/util'
+import { chatRlsPolicy, debugSql, editSql, generateSql, titleSql } from './sql'
 
 const openAiKey = process.env.OPENAI_KEY
 const openai = new OpenAI({ apiKey: openAiKey })
-
-const formatSql = (sql: string) => format(sql, { language: 'postgresql', keywordCase: 'lower' })
 
 describe('generate', () => {
   test('single table with specified columns', async () => {
@@ -109,5 +107,37 @@ describe('title', () => {
 
     expect(title).toBe('Create Employees and Departments Tables')
     expect(description).toBeDefined()
+  })
+})
+
+describe('rls chat', () => {
+  test('select policy using table definition', async () => {
+    const responseStream = await chatRlsPolicy(
+      openai,
+      [
+        {
+          role: 'user',
+          content: 'Users can only select their own todos',
+        },
+      ],
+      [
+        codeBlock`
+          create table todos (
+            id bigint primary key generated always as identity,
+            task text,
+            email text,
+            user_id uuid references auth.users (id)
+          );
+        `,
+      ]
+    )
+    const responseText = await collectStream(responseStream)
+    const [sql] = extractMarkdownSql(responseText)
+
+    expect(formatSql(sql)).toBe(codeBlock`
+      create policy select_todo_policy on todos for
+      select
+        using (user_id = auth.uid ());
+    `)
   })
 })
