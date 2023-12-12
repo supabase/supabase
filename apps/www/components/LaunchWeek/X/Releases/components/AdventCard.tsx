@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import Tilt from 'vanilla-tilt'
+import { useWindowSize } from 'react-use'
 import { cn } from 'ui'
 import { useBreakpoint } from 'common'
 
@@ -12,6 +13,7 @@ const AdventCard = ({ day, index }: { day: AdventDay; index: number }) => {
   const isTablet = useBreakpoint(1024)
   const ticketRef = useRef<HTMLDivElement>(null)
   const hiddenRef = useRef<HTMLDivElement>(null)
+  const { width } = useWindowSize()
   const [hiddenHeight, setHiddenHeight] = useState(0)
   const transition = { type: 'spring', damping: 10, mass: 0.75, stiffness: 100, delay: index / 15 }
   const variants = {
@@ -44,10 +46,11 @@ const AdventCard = ({ day, index }: { day: AdventDay; index: number }) => {
       const { height } = hiddenRef.current.getBoundingClientRect()
       setHiddenHeight(height)
     }
-  }, [hiddenRef])
+  }, [hiddenRef, width])
 
   return (
     <div
+      id={day.id}
       ref={ticketRef}
       className="absolute -inset-px group"
       style={{
@@ -55,7 +58,7 @@ const AdventCard = ({ day, index }: { day: AdventDay; index: number }) => {
       }}
     >
       <motion.div
-        className="opacity-0 flex flex-col justify-between w-full aspect-square p-4 md:p-6 lg:p-8 rounded-xl bg-[#121516] transition-colors text-[#575E61] border hover:border-strong overflow-hidden"
+        className="opacity-0 flex flex-col justify-between w-full aspect-square p-6 rounded-xl bg-[#121516] transition-colors text-[#575E61] border hover:border-strong overflow-hidden"
         variants={variants}
       >
         <div className="opacity-30 group-hover:opacity-100 transition-opacity">{day.icon}</div>
