@@ -1,21 +1,30 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
+import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useState } from 'react'
 import { Button, IconExternalLink } from 'ui'
 
-import { useTheme } from 'next-themes'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
+import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useCheckPermissions, useStore } from 'hooks'
-import { useParams } from 'common/hooks'
 import { BASE_PATH } from 'lib/constants'
 
 const WrappersDisabledState = () => {
-  const { ui, meta } = useStore()
+  const { ui } = useStore()
   const { ref } = useParams()
   const { resolvedTheme } = useTheme()
-  const wrappersExtension = meta.extensions.byId('wrappers')
-  const vaultExtension = meta.extensions.byId('supabase_vault')
+  const { project } = useProjectContext()
+
+  const { data } = useDatabaseExtensionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const wrappersExtension = (data ?? []).find((ext) => ext.name === 'wrappers')
+  const vaultExtension = (data ?? []).find((ext) => ext.name === 'supabase_vault')
   const isNotAvailable = wrappersExtension === undefined || vaultExtension === undefined
 
   const [isEnabling, setIsEnabling] = useState<boolean>(false)
@@ -24,18 +33,28 @@ const WrappersDisabledState = () => {
     'extensions'
   )
 
+  const { mutateAsync: enableExtension } = useDatabaseExtensionEnableMutation()
+
   const onEnableWrappers = async () => {
     if (wrappersExtension === undefined || vaultExtension === undefined) return
+    if (project === undefined) return console.error('Project is required')
+    if (project.connectionString === undefined)
+      return console.error('Connection string is required')
+
     setIsEnabling(true)
 
     const requiredExtensions = await Promise.all([
-      await meta.extensions.create({
+      await enableExtension({
+        projectRef: project.ref,
+        connectionString: project.connectionString,
         schema: wrappersExtension.schema ?? 'extensions',
         name: wrappersExtension.name,
         version: wrappersExtension.default_version,
         cascade: true,
       }),
-      await meta.extensions.create({
+      await enableExtension({
+        projectRef: project.ref,
+        connectionString: project.connectionString,
         schema: vaultExtension.schema ?? 'vault',
         name: vaultExtension.name,
         version: vaultExtension.default_version,
@@ -43,7 +62,8 @@ const WrappersDisabledState = () => {
       }),
     ])
     const errors = requiredExtensions.filter(
-      (res) => res.error && !res.error.message.includes('already exists')
+      // @ts-ignore
+      (error) => error.message.includes('already exists')
     )
 
     if (errors.length > 0) {
@@ -51,7 +71,8 @@ const WrappersDisabledState = () => {
         error: errors,
         category: 'error',
         message: `Failed to enable Wrappers for your project: ${errors
-          .map((x) => x.message)
+          // @ts-ignore
+          .map((error) => error.message)
           .join(', ')}`,
       })
     } else {

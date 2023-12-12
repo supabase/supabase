@@ -1,7 +1,5 @@
-import { PostgresExtension, PostgresTrigger } from '@supabase/postgres-meta'
 import { UseQueryOptions, useQuery, useQueryClient } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { get } from 'data/fetchers'
 import { useCallback } from 'react'
 import { ResponseError } from 'types'
 import { databaseExtensionsKeys } from './keys'
@@ -20,19 +18,27 @@ export async function getDatabaseExtensions(
   let headers = new Headers()
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
-  const response = (await get(`${API_URL}/pg-meta/${projectRef}/extensions`, {
+  const { data, error } = await get('/platform/pg-meta/{ref}/extensions', {
+    params: {
+      header: {
+        'x-connection-encrypted': connectionString!,
+      },
+      path: {
+        ref: projectRef,
+      },
+    },
     headers: Object.fromEntries(headers),
     signal,
-  })) as PostgresExtension[] | { error?: any }
+  })
 
-  if (!Array.isArray(response) && response.error) throw response.error
-  return response as PostgresTrigger[]
+  if (error) throw error
+  return data
 }
 
 export type DatabaseExtensionsData = Awaited<ReturnType<typeof getDatabaseExtensions>>
 export type DatabaseExtensionsError = ResponseError
 
-export const useDatabaseExtensions = <TData = DatabaseExtensionsData>(
+export const useDatabaseExtensionsQuery = <TData = DatabaseExtensionsData>(
   { projectRef, connectionString }: DatabaseExtensionsVariables,
   {
     enabled = true,
