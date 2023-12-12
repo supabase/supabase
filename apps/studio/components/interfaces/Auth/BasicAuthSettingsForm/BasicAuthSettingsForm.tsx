@@ -32,6 +32,7 @@ import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
+import { Markdown } from 'components/interfaces/Markdown'
 
 // Use a const string to represent no chars option. Represented as empty string on the backend side.
 const NO_REQUIRED_CHARACTERS = 'NO_REQUIRED_CHARS'
@@ -217,7 +218,13 @@ const BasicAuthSettingsForm = observer(() => {
                     size="small"
                     label="Allow manual linking"
                     layout="flex"
-                    descriptionText="Enable manual linking APIs for your project."
+                    descriptionText={
+                      <Markdown
+                        extLinks
+                        className="[&>p>a]:text-foreground-light [&>p>a]:transition-all [&>p>a]:hover:text-foreground [&>p>a]:hover:decoration-brand"
+                        content="Enable [manual linking APIs](https://supabase.com/docs/guides/auth/auth-identity-linking#manual-linking-beta) for your project."
+                      />
+                    }
                     disabled={!canUpdateConfig}
                   />
                 </FormSectionContent>
