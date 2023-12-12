@@ -114,14 +114,14 @@ const { data: profile } = await supabase
 
 ```kotlin
 // This will return nothing while the user is logged out
-val data = supabase.postgrest["profiles"].select(Columns.list("id", "username", "avatar_url", "website"))
+val data = supabase.from("profiles").select(Columns.list("id", "username", "avatar_url", "website"))
 
 // After the user is logged in, this will only return
 // the logged-in user's data - in this case a single row
-supabase.gotrue.sendOtpTo(Email) {
+supabase.auth.signInWith(OTP) {
     this.email = email
 }
-val data = supabase.postgrest["profiles"].select(Columns.list("id", "username", "avatar_url", "website"))
+val data = supabase.from("profiles").select(Columns.list("id", "username", "avatar_url", "website"))
 ```
 
 </TabPanel>
@@ -169,7 +169,7 @@ const { data, error } = await supabase.auth.signUp({
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-val data = supabase.gotrue.signUpWith(Email) {
+val data = supabase.auth.signUpWith(Email) {
     email = "example@email.com"
     password = "example-password"
     data = buildJsonObject {
@@ -204,9 +204,9 @@ let metadata = user.user_metadata
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-val user = supabase.gotrue.retrieveUserForCurrentSession()
+val user = supabase.auth.retrieveUserForCurrentSession()
 //Or you can use the user from the current session:
-val user = supabase.gotrue.currentUserOrNull()
+val user = supabase.auth.currentUserOrNull()
 val metadata = user?.userMetadata
 ```
 

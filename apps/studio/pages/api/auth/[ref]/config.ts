@@ -147,6 +147,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
     SECURITY_CAPTCHA_ENABLED: false,
     SECURITY_CAPTCHA_PROVIDER: 'hcaptcha',
     SECURITY_CAPTCHA_SECRET: null,
+    SECURITY_MANUAL_LINKING_ENABLED: false,
     SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: '10',
     RATE_LIMIT_EMAIL_SENT: 0,
     RATE_LIMIT_SMS_SENT: 0,

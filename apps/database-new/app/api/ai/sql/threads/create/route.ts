@@ -30,7 +30,6 @@ export async function POST(req: Request) {
     openai.beta.threads.runs.retrieve(thread.id, createRun.id),
     openai.beta.threads.messages.list(thread.id),
   ])
-
   const threadTitle = messages
     .filter((m) => m.role === 'user' && m.content[0]?.type === 'text')
     .map((m) => {
