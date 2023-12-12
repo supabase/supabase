@@ -124,7 +124,7 @@ const days: WeekDayProps[] = [
       },
       {
         type: 'video',
-        href: 'hu2SQjvCXIw',
+        href: 'eCbiywoDORw',
       },
       {
         type: 'xSpace',
