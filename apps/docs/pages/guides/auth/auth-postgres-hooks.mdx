@@ -57,7 +57,7 @@ You can use hooks at specific points along an Auth flow and you can perform cust
 
 ## Use Cases
 
-Based on user feedback, we decided on a few use cases which aim to illustrate how a hook. You can opt to write your own hook if you have a use case which doesn’t fit any of the examples below.
+Based on user feedback, we decided on a few use cases which aim to illustrate how a hook. You can opt to [write your own hook](#writing-your-own-hook) if you have a use case which doesn’t fit any of the examples below.
 
 ## MFA Verification Attempt Hook
 
@@ -121,7 +121,7 @@ Example output:
 ```jsx
 {
   "error": {
-    "http_code": 420,
+    "http_code": 429,
     "message": "You can only verify a factor once very 10 seconds."
   }
 }
@@ -140,7 +140,7 @@ You can do this by creating a table such as:
 
 ```sql
 create table public.mfa_failed_verification_attempts (
-	user_id uuid not null,
+  user_id uuid not null,
   factor_id uuid not null,
   last_failed_at timestamp not null default now(),
   primary key (user_id, factor_id)
@@ -175,7 +175,7 @@ create function public.hook_mfa_verification_attempt(event jsonb)
 			-- last attempt was done too quickly
 			return jsonb_build_object(
 				'error', jsonb_build_object(
-					'http_code', 420,
+					'http_code', 429,
 					'message',   'Please wait a moment before trying again.'));
 		end if;
 
@@ -256,7 +256,7 @@ Example output:
 ```jsx
 {
   "error": {
-    "http_code": 420,
+    "http_code": 429,
     "message": "You can only verify a factor once very 10 seconds."
   }
 }
@@ -308,7 +308,7 @@ create function public.hook_password_verification_attempt(event jsonb)
 			-- last attempt was done too quickly
 			return jsonb_build_object(
 				'error', jsonb_build_object(
-					'http_code', 420,
+					'http_code', 429,
 					'message',   'Please wait a moment before trying again.'));
 		end if;
 
@@ -407,7 +407,7 @@ Example output:
 ```jsx
 {
   "error": {
-    "http_code": 420,
+    "http_code": 429,
     "message": "You can only verify a factor once very 10 seconds."
   }
 }
@@ -421,7 +421,7 @@ You wish to assign roles to users. In particular, you wish to assign users with 
 
 You create a hook which will read and enter information into this table. Example:
 
-```
+```sql
 create or replace function public.custom_access_token_hook(event jsonb)
 returns jsonb
 language plpgsql
@@ -472,7 +472,7 @@ revoke execute
 	from authenticated, anon;
 ```
 
-## Creating a Hook
+## Writing Your Own Hook {#writing-your-own-hook}
 
 Oftentimes, the examples above might not exactly fit your exact use case. In such scenarios, you can consider writing your own hook based off the examples above.
 
@@ -520,11 +520,62 @@ revoke execute
 
 ### Timeouts
 
-Hook timeouts are controlled by a local statement timeout scoped to the Postgres Function Hook. Ensure that your hooks complete within **2 seconds** to avoid any errors
+Hook timeouts are controlled by a `local` statement timeout scoped to the Postgres Function Hook. Ensure that your hooks complete within **2 seconds** to avoid any errors
 
 ### Testing the Hook
 
-We strongly recommend testing the hook prior to going into production via [PgTAP](https://supabase.com/docs/guides/database/extensions/pgtap) or similar.
+We strongly recommend testing the hook prior to going into production via [PgTAP](https://supabase.com/docs/guides/database/extensions/pgtap) or similar. You can able the extension under Database > Extensions > PgTap
+
+Here's an example of what a test could look like:
+
+```sql
+
+-- Load pgTAP
+BEGIN;
+SET client_min_messages TO WARNING;
+
+-- Load pgTAP
+CREATE EXTENSION IF NOT EXISTS pgtap;
+
+-- Test for Allowed Email Address
+SELECT plan(4);
+
+-- Test 1: Allowed Email
+SELECT is(
+    custom_access_token('{"claims": {"email": "allowed@example.com"}, "authentication_method": "password"}'::jsonb),
+    '{"claims": {"email": "allowed@example.com"}, "authentication_method": "password"}'::jsonb,
+    'Allowed email should return the original event'
+);
+
+-- Test 2: SAML Authentication
+SELECT is(
+    custom_access_token('{"claims": {"email": "user@somedomain.com"}, "authentication_method": "sso/saml"}'::jsonb),
+    '{"claims": {"email": "user@somedomain.com"}, "authentication_method": "sso/saml"}'::jsonb,
+    'SAML authentication should return the original event'
+);
+
+-- Test 3: Email/Password Authentication with Supabase.io Domain
+SELECT is(
+    custom_access_token('{"claims": {"email": "user@supabase.io"}, "authentication_method": "password"}'::jsonb),
+    '{"claims": {"email": "user@supabase.io"}, "authentication_method": "password"}'::jsonb,
+    'Email/password authentication with @supabase.io should return the original event'
+);
+
+-- Test 4: Unauthorized Access
+SELECT isnt(
+    custom_access_token('{"claims": {"email": "unauthorized@example.com"}, "authentication_method": "password"}'::jsonb),
+    '{"claims": {"email": "unauthorized@example.com"}, "authentication_method": "password"}'::jsonb,
+    'Unauthorized access should not return the original event'
+);
+
+-- Finish the tests
+SELECT * FROM finish();
+ROLLBACK;
+
+
+````
+
+
 
 ## Connecting the Hook to Supabase Auth
 
