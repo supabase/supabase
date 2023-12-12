@@ -103,27 +103,52 @@ const days: WeekDayProps[] = [
   },
   {
     id: 'day-2',
-    title: '',
-    shipped: false,
-    blog: '',
-    hasCountdown: true,
+    title: 'Edge Functions',
+    shipped: true,
+    blog: '/blog/node-and-native-npm-compatibility',
+    hasCountdown: false,
     date: '12 Dec',
     published_at: '2023-12-12T08:00:00.000-08:00',
-    description: '',
+    description: (
+      <>
+        Edge Functions: <strong>Node and native npm compatibility</strong>
+      </>
+    ),
     d: 2,
     dd: 'Tue',
     links: [
+      {
+        type: 'blog',
+        href: '/blog/node-and-native-npm-compatibility',
+      },
+      {
+        type: 'video',
+        href: 'hu2SQjvCXIw',
+      },
       {
         type: 'xSpace',
         href: 'https://twitter.com/i/spaces/1MYGNovDoaLJw',
       },
     ],
-    steps: [],
+    steps: [
+      {
+        title: '',
+        blog: '/blog/node-and-native-npm-compatibility',
+        bg_layers: [
+          {
+            img: '/images/launchweek/lwx/day2/d2_edge.svg',
+            mobileImg: '/images/launchweek/lwx/day2/d2_edge_mobile.svg',
+          },
+        ],
+        steps: [],
+      },
+    ],
   },
   {
     id: 'day-3',
     title: '',
     shipped: false,
+    hasCountdown: true,
     blog: '',
     date: '13 Dec',
     published_at: '2023-12-13T08:00:00.000-08:00',
