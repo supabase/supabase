@@ -72,14 +72,14 @@ const DaySection = ({ day }: { day: WeekDayProps }) => {
                     !!layer.img && (
                       <div
                         key={`${day.title}-image-${i}`}
-                        className="absolute sm:opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100"
+                        className="absolute sm:opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100 shadow-[inset_0_-40px_40px_-40px_rgba(0,0,0,0.6)] sm:shadow-none"
                       >
                         <Image
                           src={!!layer.mobileImg && isMobile ? (layer.mobileImg as any) : layer.img}
                           className={`
                             absolute opacity-50 lg:opacity-100 object-cover
                             w-full h-full z-0 transition-all duration-300
-                            object-center
+                            object-center sm:object-right
                           `}
                           fill
                           quality={100}
