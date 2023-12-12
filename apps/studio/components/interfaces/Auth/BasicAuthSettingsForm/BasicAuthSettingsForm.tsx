@@ -41,6 +41,7 @@ const LOWER_UPPER_DIGITS_SYMBOLS = LOWER_UPPER_DIGITS + ':!@#$%^&*()_+-=[]{};\'\
 
 const schema = object({
   DISABLE_SIGNUP: boolean().required(),
+  SECURITY_MANUAL_LINKING_ENABLED: boolean().required(),
   SITE_URL: string().required('Must have a Site URL'),
   SECURITY_CAPTCHA_ENABLED: boolean().required(),
   SECURITY_CAPTCHA_SECRET: string().when('SECURITY_CAPTCHA_ENABLED', {
@@ -100,6 +101,7 @@ const BasicAuthSettingsForm = observer(() => {
 
   const INITIAL_VALUES = {
     DISABLE_SIGNUP: !authConfig?.DISABLE_SIGNUP,
+    SECURITY_MANUAL_LINKING_ENABLED: authConfig?.SECURITY_MANUAL_LINKING_ENABLED || false,
     SITE_URL: authConfig?.SITE_URL,
     SECURITY_CAPTCHA_ENABLED: authConfig?.SECURITY_CAPTCHA_ENABLED || false,
     SECURITY_CAPTCHA_SECRET: authConfig?.SECURITY_CAPTCHA_SECRET || '',
@@ -208,6 +210,14 @@ const BasicAuthSettingsForm = observer(() => {
                     label="Allow new users to sign up"
                     layout="flex"
                     descriptionText="If this is disabled, new users will not be able to sign up to your application."
+                    disabled={!canUpdateConfig}
+                  />
+                  <Toggle
+                    id="SECURITY_MANUAL_LINKING_ENABLED"
+                    size="small"
+                    label="Allow manual linking"
+                    layout="flex"
+                    descriptionText="Enable manual linking APIs for your project."
                     disabled={!canUpdateConfig}
                   />
                 </FormSectionContent>
