@@ -54,11 +54,13 @@ export const endOfLWX = '2023-12-15T23:59:59.999-08:00'
 const days: WeekDayProps[] = [
   {
     id: 'day-1',
+    d: 1,
+    dd: 'Mon',
     title: 'Supabase Studio',
     shipped: true,
-    isToday: true,
+    isToday: false,
     blog: '/blog/studio-introducing-assistant',
-    hasCountdown: true,
+    hasCountdown: false,
     date: '11 Dec',
     published_at: '2023-12-11T08:00:00.000-08:00',
     description: (
@@ -67,8 +69,6 @@ const days: WeekDayProps[] = [
         <strong>Postgres roles</strong>, and <strong>user impersonation</strong>
       </>
     ),
-    d: 1,
-    dd: 'Mon',
     links: [
       // {
       //   type: 'productHunt',
@@ -103,10 +103,13 @@ const days: WeekDayProps[] = [
   },
   {
     id: 'day-2',
+    d: 2,
+    dd: 'Tue',
     title: 'Edge Functions',
     shipped: true,
-    blog: '/blog/node-and-native-npm-compatibility',
+    isToday: true,
     hasCountdown: false,
+    blog: '/blog/node-and-native-npm-compatibility',
     date: '12 Dec',
     published_at: '2023-12-12T08:00:00.000-08:00',
     description: (
@@ -114,8 +117,6 @@ const days: WeekDayProps[] = [
         Edge Functions: <strong>Node and native npm compatibility</strong>
       </>
     ),
-    d: 2,
-    dd: 'Tue',
     links: [
       {
         type: 'blog',
@@ -146,6 +147,8 @@ const days: WeekDayProps[] = [
   },
   {
     id: 'day-3',
+    d: 3,
+    dd: 'Wed',
     title: '',
     shipped: false,
     hasCountdown: true,
@@ -153,8 +156,6 @@ const days: WeekDayProps[] = [
     date: '13 Dec',
     published_at: '2023-12-13T08:00:00.000-08:00',
     description: '',
-    d: 3,
-    dd: 'Wed',
     links: [
       {
         type: 'xSpace',
@@ -165,14 +166,14 @@ const days: WeekDayProps[] = [
   },
   {
     id: 'day-4',
+    d: 4,
+    dd: 'Thu',
     title: '',
     shipped: false,
     blog: '',
     date: '14 Dec',
     published_at: '2023-12-14T08:00:00.000-08:00',
     description: '',
-    d: 4,
-    dd: 'Thu',
     links: [
       {
         type: 'xSpace',
@@ -183,14 +184,14 @@ const days: WeekDayProps[] = [
   },
   {
     id: 'day-5',
+    d: 5,
+    dd: 'Fri',
     title: '',
     shipped: false,
     blog: '',
     date: '15 Dec',
     published_at: '2023-12-15T08:00:00.000-08:00',
     description: '',
-    d: 5,
-    dd: 'Fri',
     links: [
       {
         type: 'xSpace',
