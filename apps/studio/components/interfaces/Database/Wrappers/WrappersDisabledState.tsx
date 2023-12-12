@@ -47,7 +47,7 @@ const WrappersDisabledState = () => {
     try {
       setIsEnabling(true)
       await Promise.all([
-        await enableExtension({
+        enableExtension({
           projectRef: project.ref,
           connectionString: project.connectionString,
           schema: wrappersExtension.schema ?? 'extensions',
@@ -55,7 +55,7 @@ const WrappersDisabledState = () => {
           version: wrappersExtension.default_version,
           cascade: true,
         }),
-        await enableExtension({
+        enableExtension({
           projectRef: project.ref,
           connectionString: project.connectionString,
           schema: vaultExtension.schema ?? 'vault',
