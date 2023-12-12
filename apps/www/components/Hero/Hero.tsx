@@ -33,7 +33,7 @@ const Hero = () => {
                   <div className="z-40 w-full flex justify-center mb-8 lg:mb-8">
                     <AnnouncementBadge
                       announcement="Launch Week X — Day 2"
-                      url="/launch-week"
+                      url="/launch-week#day-2"
                       badge="Live"
                     />
                   </div>
