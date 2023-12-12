@@ -71,7 +71,7 @@ const NoResultAlert = ({
                 <p className="text-foreground">Listen to a table for changes</p>
                 <p className="text-foreground-lighter text-xs">Tables must have realtime enabled</p>
               </div>
-              <Link href={`/project/${ref}/database/replication`} target="_blank" rel="noreferrer">
+              <Link href={`/project/${ref}/database/publication`} target="_blank" rel="noreferrer">
                 <Button type="default" iconRight={<IconExternalLink />}>
                   Replication settings
                 </Button>

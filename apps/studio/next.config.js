@@ -210,6 +210,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: '/project/:ref/database/replication',
+        destination: '/project/:ref/database/publication',
+        permanent: true,
+      },
+      {
         source: '/project/:ref/logs/pgbouncer-logs',
         destination: '/project/:ref/logs/pooler-logs',
         permanent: true,

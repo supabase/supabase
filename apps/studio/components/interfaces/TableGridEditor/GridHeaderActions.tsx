@@ -185,7 +185,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
           {!isRealtimeEnabled && (
             <p className="text-sm">
               You may also select which events to broadcast to subscribers on the{' '}
-              <Link href={`/project/${ref}/database/replication`} className="text-brand">
+              <Link href={`/project/${ref}/database/publication`} className="text-brand">
                 database replication
               </Link>{' '}
               settings.

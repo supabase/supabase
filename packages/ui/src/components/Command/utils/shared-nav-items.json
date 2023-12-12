@@ -33,8 +33,8 @@
           "url": "/project/_/database/roles"
         },
         {
-          "label": "Replication",
-          "url": "/project/_/database/replication"
+          "label": "Publication",
+          "url": "/project/_/database/publication"
         },
         {
           "label": "Webhooks",
