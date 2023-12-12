@@ -201,7 +201,7 @@ const MapView = ({
           {tooltip !== undefined && zoom === 1.5 && (
             <Marker coordinates={[tooltip.x - 47, tooltip.y - 5]}>
               <foreignObject width={220} height={66.25}>
-                <div className="bg-black bg-opacity-50 rounded border">
+                <div className="bg-background bg-opacity-50 rounded border">
                   <div className="px-3 py-2 flex flex-col gap-y-1">
                     <div className="flex items-center gap-x-2">
                       <img
