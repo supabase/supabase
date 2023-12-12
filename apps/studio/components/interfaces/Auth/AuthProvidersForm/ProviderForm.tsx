@@ -41,7 +41,6 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
-
   const generateInitialValues = () => {
     const initialValues: { [x: string]: string | boolean } = {}
 
@@ -176,28 +175,19 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                     </Alert_Shadcn_>
                   )}
 
-                  {/* TODO (Joel): Remove after 30th November when we disable the provider */}
-                  {provider.title === 'LinkedIn (Deprecated)' &&
-                    Object.keys(provider.properties).map((x: string) => (
-                      <FormField
-                        key={x}
-                        name={x}
-                        properties={provider.properties[x]}
-                        formValues={values}
-                        disabled={x === 'EXTERNAL_LINKEDIN_ENABLED' ? !canUpdateConfig : true}
-                      />
-                    ))}
-
-                  {provider.title !== 'LinkedIn (Deprecated)' &&
-                    Object.keys(provider.properties).map((x: string) => (
-                      <FormField
-                        key={x}
-                        name={x}
-                        properties={provider.properties[x]}
-                        formValues={values}
-                        disabled={!canUpdateConfig}
-                      />
-                    ))}
+                  {Object.keys(provider.properties).map((x: string) => (
+                    <FormField
+                      key={x}
+                      name={x}
+                      properties={provider.properties[x]}
+                      formValues={values}
+                      // TODO (Joel): Remove after 30th November when we disable the provider
+                      disabled={
+                        ['EXTERNAL_LINKEDIN_CLIENT_ID', 'EXTERNAL_LINKEDIN_SECRET'].includes(x) ||
+                        !canUpdateConfig
+                      }
+                    />
+                  ))}
 
                   {provider?.misc?.alert && (
                     <Alert title={provider.misc.alert.title} variant="warning" withIcon>
