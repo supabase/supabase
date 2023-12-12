@@ -76,6 +76,7 @@
     "react-markdown": "^8.0.3",
     "react-syntax-highlighter": "^15.5.0",
     "react-tooltip": "^4.2.17",
+    "reactflow": "^11.10.1",
     "remark-gfm": "^3.0.1",
     "sse.js": "^0.6.1",
     "tailwind-merge": "^1.13.2",
