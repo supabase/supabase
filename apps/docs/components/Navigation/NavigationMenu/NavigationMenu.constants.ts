@@ -543,6 +543,16 @@ export const auth = {
           url: '/guides/auth/sessions',
         },
         {
+          name: 'User Management',
+          url: '/guides/auth/auth-user-management',
+          items: [
+            {
+              name: 'Identity Linking',
+              url: '/guides/auth/auth-identity-linking',
+            },
+          ],
+        },
+        {
           name: 'Enterprise SSO',
           url: '/guides/auth/enterprise-sso',
           items: [
