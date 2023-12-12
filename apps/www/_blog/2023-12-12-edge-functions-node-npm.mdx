@@ -1,0 +1,145 @@
+---
+title: 'Edge Functions: Node and native npm compatibility'
+description: We're adding Node and native npm compatibility for Edge Functions.
+launchweek: x
+categories:
+  - product
+tags:
+  - launch-week
+  - edge-functions
+date: '2023-12-12'
+published_at: '2023-12-12T09:00:00.000-07:00'
+to_depth: 3
+author: andreespirela,inian
+image: launch-week-x/day-1/day-1-supabase-assistant-thumb.png
+thumb: launch-week-x/day-1/day-1-supabase-assistant-og.png
+---
+
+We are excited to announce Edge Functions now natively support npm modules and Node built-in APIs. You can now directly import millions of popular, commonly used npm modules into your Edge Functions.
+
+```jsx
+import { drizzle } from 'npm:drizzle-orm/node-postgres';
+```
+
+## Migrate existing Node apps to Edge Functions
+
+You can migrate your existing Node apps to Supabase Edge Functions with minimal changes.
+
+We created demo to show how to migrate a Node app that uses Express, Node Postgres, and Drizzle. For more information on using npm modules and Node built-ins within your Edge Functions, see the [Managing dependencies guide](https://supabase.com/docs/guides/functions/import-maps).
+
+// demo goes here
+
+
+## How npm modules work under the hood
+
+We run a customized version of Deno for hosting Edge Functions called [Supabase Edge Runtime](https://supabase.com/blog/edge-runtime-self-hosted-deno-functions). This custom version helps us keep Edge Functions working the same way no matter where it is deployed - on our hosted platform, in local development, or your self-hosted environment.
+
+The biggest challenge when adding npm support was finding an approach that would work across all environments. We wanted to keep the workflow close to your experience with Deno CLI. It should be possible to import npm modules directly in your source code without an extra build step.
+
+When deploying a function, we serialize its module graph into a single file format called [eszip](https://github.com/denoland/eszip). In the hosted environment, all module references are then loaded from the eszip. This is how we avoid extra latency in fetching modules and potential conflicts between module dependencies.
+
+We decided to use eszip module loader in local and self-hosted environments as well. We only need to implement one module loading strategy for all environments. Also, this allows us to keep an Edge Function’s npm modules self-contained within eszip, without running into potential conflicts with npm modules installed in the user’s system.
+
+[Refactoring the module loader](https://github.com/supabase/edge-runtime/pull/223) also fixes other bugs, such [edge functions erroring out](https://github.com/supabase/cli/issues/1584#issuecomment-1848799355) when an `deno.lock` file is already present in the project.
+
+## A few other things you’ve asked for…
+
+### Regional Invocations
+
+You now have the option to specify which region to use when running an Edge Function. Usually, Edge Functions run in the region closest to the user's region. However, sometimes you want to run it closer to the Database or another 3rd party API for optimal performance.
+
+At the time of invocation, you can provide the `x-region` header to specify the region.
+
+<CH.Code>
+
+```bash cURL
+# https://supabase.com/docs/guides/functions/deploy#invoking-remote-functions
+curl --request POST 'https://<project_ref>.supabase.co/functions/v1/hello-world' \
+  --header 'Authorization: Bearer ANON_KEY' \
+  --header 'Content-Type: application/json' \
+  --header 'x-region: eu-west-3' \
+  --data '{ "name":"Functions" }'
+```
+
+```js JavaScript
+// https://supabase.com/docs/reference/javascript/installing
+import { createClient } from '@supabase/supabase-js'
+
+// Create a single supabase client for interacting with your database
+const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
+
+// https://supabase.com/docs/reference/javascript/functions-invoke
+const { data, error } = await supabase.functions.invoke('hello-world', {
+  body: { name: 'Functions' },
+  headers: { 'x-region': 'eu-west-3' },
+})
+```
+
+</CH.Code>
+
+For more details on regional invocations, see the guide https://supabase.com/docs/guides/functions/regional-invocation
+
+### Better Metrics
+
+The metrics section for an edge function in the [Supabase Dashboard](https://supabase.com/dashboard/project/_/functions) shows CPU time and memory used. Also, the invocations are now broken down by HTTP status codes. These changes help you spot any issues with your edge functions and act on them.
+
+See the [logging and metrics guide](https://supabase.com/docs/guides/functions/debugging) for edge functions to learn more.
+
+<Img src="/images/blog/launch-week-x/day-2/1.png" alt="Supabase Dashboard - Edge Functions metrics view" />
+
+### Track errors with Sentry
+
+Our friends at Sentry recently shipped an official [Sentry SDK for Deno](https://deno.land/x/sentry@7.76.0). With this, it’s now easy to track errors and exceptions in your edge functions in Sentry.
+
+Here is a simple example of how to handle exceptions within your function and send them to Sentry.
+
+```jsx
+import * as Sentry from "https://deno.land/x/sentry/index.mjs";
+
+Sentry.init({
+  dsn: _DSN_,
+  integrations: [],
+  // Performance Monitoring
+  tracesSampleRate: 1.0,
+  // Set sampling rate for profiling - this is relative to tracesSampleRate
+  profilesSampleRate: 1.0,
+});
+
+// Set region and execution_id as custom tags
+Sentry.setTag("region", Deno.env.get("SB_REGION"));
+Sentry.setTag("execution_id", Deno.env.get("SB_EXECUTION_ID"));
+
+Deno.serve(async (req) => {
+  try {
+    const { name } = await req.json();
+    const data = {
+      message: `Hello ${name}!`,
+    };
+
+    return new Response(
+      JSON.stringify(data),
+      { headers: { "Content-Type": "application/json" } },
+    );
+  } catch (e) {
+    Sentry.captureException(e);
+    return new Response(
+      JSON.stringify({ msg: "error" }),
+      { status: 500, headers: { "Content-Type": "application/json" } },
+    );
+  }
+});
+```
+
+## What’s next
+
+If you already use parts of the Supabase stack, but couldn’t use Edge Functions because your app was written in Node or wanted to use certain npm modules, we hope this update will entice you to try it again. If you run into any issues, we are just [one support request away](https://supabase.help)
+
+For existing Edge Functions users, regional invocations, better metrics, and error handling are just a glimpse of what will come next. We continue to iterate on platform stability and setting custom limits on resources Edge Functions can use. Watch out for another blog post in the new year.
+
+## More Launch Week X
+
+- [Postgres Language Server: implementing the Parser](https://supabase.com/blog/postgres-language-server-implementing-parser)
+- [How design works at Supabase](https://supabase.com/blog/how-design-works-at-supabase)
+- [The Supabase Album](https://www.youtube.com/watch?v=r1POD-IdG-I)
+- [Supabase Launch Week X Hackathon](https://supabase.com/blog/supabase-hackathon-lwx)
+- [Launch Week X Community Meetups](https://supabase.com/blog/community-meetups-lwx)
