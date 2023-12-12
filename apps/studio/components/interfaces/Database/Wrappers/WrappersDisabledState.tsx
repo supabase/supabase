@@ -5,16 +5,16 @@ import { observer } from 'mobx-react-lite'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useState } from 'react'
+import toast from 'react-hot-toast'
 import { Button, IconExternalLink } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 
 const WrappersDisabledState = () => {
-  const { ui } = useStore()
   const { ref } = useParams()
   const { resolvedTheme } = useTheme()
   const { project } = useProjectContext()
@@ -33,56 +33,46 @@ const WrappersDisabledState = () => {
     'extensions'
   )
 
-  const { mutateAsync: enableExtension } = useDatabaseExtensionEnableMutation()
+  const { mutateAsync: enableExtension } = useDatabaseExtensionEnableMutation({ onError: () => {} })
 
   const onEnableWrappers = async () => {
     if (wrappersExtension === undefined || vaultExtension === undefined) return
     if (project === undefined) return console.error('Project is required')
-    if (project.connectionString === undefined)
+    if (project.connectionString === undefined) {
       return console.error('Connection string is required')
-
-    setIsEnabling(true)
-
-    const requiredExtensions = await Promise.all([
-      await enableExtension({
-        projectRef: project.ref,
-        connectionString: project.connectionString,
-        schema: wrappersExtension.schema ?? 'extensions',
-        name: wrappersExtension.name,
-        version: wrappersExtension.default_version,
-        cascade: true,
-      }),
-      await enableExtension({
-        projectRef: project.ref,
-        connectionString: project.connectionString,
-        schema: vaultExtension.schema ?? 'vault',
-        name: vaultExtension.name,
-        version: vaultExtension.default_version,
-        cascade: true,
-      }),
-    ])
-    const errors = requiredExtensions.filter(
-      // @ts-ignore
-      (error) => error.message.includes('already exists')
-    )
-
-    if (errors.length > 0) {
-      ui.setNotification({
-        error: errors,
-        category: 'error',
-        message: `Failed to enable Wrappers for your project: ${errors
-          // @ts-ignore
-          .map((error) => error.message)
-          .join(', ')}`,
-      })
-    } else {
-      ui.setNotification({
-        category: 'success',
-        message: 'Wrappers is now enabled for your project!',
-      })
     }
 
-    setIsEnabling(false)
+    let hasError = false
+
+    try {
+      setIsEnabling(true)
+      await Promise.all([
+        await enableExtension({
+          projectRef: project.ref,
+          connectionString: project.connectionString,
+          schema: wrappersExtension.schema ?? 'extensions',
+          name: wrappersExtension.name,
+          version: wrappersExtension.default_version,
+          cascade: true,
+        }),
+        await enableExtension({
+          projectRef: project.ref,
+          connectionString: project.connectionString,
+          schema: vaultExtension.schema ?? 'vault',
+          name: vaultExtension.name,
+          version: vaultExtension.default_version,
+          cascade: true,
+        }),
+      ])
+    } catch (error: any) {
+      if (!error.message.includes('already exists')) {
+        hasError = true
+        toast.error(`Failed to enable Wrappers: ${error.message}`)
+      }
+    } finally {
+      setIsEnabling(false)
+      if (!hasError) toast.success('Wrappers is now enabled!')
+    }
   }
 
   return (
