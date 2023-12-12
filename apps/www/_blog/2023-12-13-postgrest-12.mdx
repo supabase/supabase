@@ -15,7 +15,7 @@ image: WIP
 thumb: WIP
 ---
 
-PostgREST 12 is out, and we're happy to announce that it's available on [new Supabase](https://www.notion.so/Show-users-that-used-app-supabase-com-for-2-consecutive-weeks-has-logs-of-dashboard-usage-between-7-f1690c6f2c4f43db9afc460dfafe5cef?pvs=21) projects starting today. In this post we'll focus on just a few of our favorites. For a complete list of new features, check out the [release on GitHub](https://github.com/PostgREST/postgrest/releases/tag/v12.0.0).
+PostgREST 12 is out, and we're happy to announce that it's available on [new Supabase projects](https://supabase.com/dashboard/new) starting today. In this post, we'll focus on just a few of our favorites. For a complete list of new features, check out the [release on GitHub](https://github.com/PostgREST/postgrest/releases/tag/v12.0.0).
 
 ## Performance: JWT Caching
 
@@ -92,7 +92,7 @@ That only scratches the surface. Aggregates are fully compatible with [resource 
 
 ## Media Type Handlers
 
-PostgREST now gives you the flexibility to [handle your own custom media types and override the builtin ones](https://postgrest.org/en/v12.0/references/api/media_type_handlers.html). Among other things, that enables [serving HTML, javascript, or whatever you can think of, straight from your database](https://postgrest.org/en/latest/how-tos/providing-html-content-using-htmx.html).
+PostgREST now gives you the flexibility to [handle your custom media types and override the built-in ones](https://postgrest.org/en/v12.0/references/api/media_type_handlers.html). Among other things, that enables [serving HTML, javascript, or whatever you can think of, straight from your database](https://postgrest.org/en/latest/how-tos/providing-html-content-using-htmx.html).
 
 ```sql
 create or replace function api.index() returns "text/html" as $$
