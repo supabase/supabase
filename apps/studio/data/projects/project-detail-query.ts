@@ -7,7 +7,16 @@ import { components } from 'data/api'
 
 export type ProjectDetailVariables = { ref?: string }
 
-export type Project = components['schemas']['ProjectDetailResponse']
+export type ProjectDetail = components['schemas']['ProjectDetailResponse']
+
+export interface Project extends ProjectDetail {
+  /**
+   * postgrestStatus is available on client side only.
+   * We use this status to check if a project instance is HEALTHY or not
+   * If not we will show ConnectingState and run a polling until it's back online
+   */
+  postgrestStatus?: 'ONLINE' | 'OFFLINE'
+}
 
 export async function getProjectDetail({ ref }: ProjectDetailVariables, signal?: AbortSignal) {
   if (!ref) throw new Error('Project ref is required')
@@ -18,7 +27,7 @@ export async function getProjectDetail({ ref }: ProjectDetailVariables, signal?:
   })
 
   if (error) throw error
-  return data
+  return data as Project
 }
 
 export type ProjectDetailData = Awaited<ReturnType<typeof getProjectDetail>>

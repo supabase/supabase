@@ -25,6 +25,9 @@ export interface ProjectBase {
   preview_branch_refs: string[]
 }
 
+/**
+ * @deprecated Please use type from project-details-query.ts instead
+ */
 export interface Project extends ProjectBase {
   // available after projects.fetchDetail
   connectionString?: string

@@ -188,12 +188,7 @@ const InfrastructureActivity = () => {
       </ScaffoldContainer>
       <ScaffoldContainer className="sticky top-0 py-6 border-b bg-background z-10">
         <div className="flex items-center gap-x-4">
-          {/* {readReplicasEnabled && (
-            <DatabaseSelector
-              selectedDatabaseId={selectedDatabaseId}
-              onChangeDatabaseId={setSelectedDatabaseId}
-            />
-          )} */}
+          {/* {readReplicasEnabled && <DatabaseSelector />} */}
           {!isLoadingSubscription && (
             <>
               <DateRangePicker

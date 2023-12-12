@@ -1,8 +1,9 @@
+import { useParams } from 'common'
 import { createContext, PropsWithChildren, useContext, useMemo } from 'react'
 
-import { useParams } from 'common/hooks'
 import { Project, useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { PROJECT_STATUS } from 'lib/constants'
+import { ProjectStateContextProvider } from 'state/project-state'
 import { RoleImpersonationStateContextProvider } from 'state/role-impersonation-state'
 import { TableEditorStateContextProvider } from 'state/table-editor'
 
@@ -40,9 +41,11 @@ export const ProjectContextProvider = ({
   return (
     <ProjectContext.Provider value={value}>
       <TableEditorStateContextProvider key={`table-editor-state-${projectRef}`}>
-        <RoleImpersonationStateContextProvider key={`role-impersonation-state-${projectRef}`}>
-          {children}
-        </RoleImpersonationStateContextProvider>
+        <ProjectStateContextProvider key={`project-state-${projectRef}`}>
+          <RoleImpersonationStateContextProvider key={`role-impersonation-state-${projectRef}`}>
+            {children}
+          </RoleImpersonationStateContextProvider>
+        </ProjectStateContextProvider>
       </TableEditorStateContextProvider>
     </ProjectContext.Provider>
   )

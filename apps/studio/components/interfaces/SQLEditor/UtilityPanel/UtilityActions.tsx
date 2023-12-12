@@ -5,7 +5,7 @@ import { Button, IconAlignLeft, IconCommand, IconCornerDownLeft, cn } from 'ui'
 
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
-import { useFlag } from 'hooks'
+import { useFlag, useSelectedProject } from 'hooks'
 import { useState } from 'react'
 import FavoriteButton from './FavoriteButton'
 import SavingIndicator from './SavingIndicator'
@@ -29,9 +29,11 @@ const UtilityActions = ({
   executeQuery,
 }: UtilityActionsProps) => {
   const os = detectOS()
-  const snap = useSqlEditorStateSnapshot()
+  const project = useSelectedProject()
   const readReplicasEnabled = useFlag('readReplicas')
   const roleImpersonationEnabledFlag = useFlag('roleImpersonation')
+
+  const showReadReplicasUI = readReplicasEnabled && project?.is_read_replicas_enabled
 
   return (
     <>
@@ -69,18 +71,12 @@ const UtilityActions = ({
 
       <div className="flex items-center justify-between gap-x-2 mx-2">
         <div className="flex items-center">
-          {readReplicasEnabled && (
-            <DatabaseSelector
-              variant="connected-on-right"
-              selectedDatabaseId={snap.selectedDatabaseId}
-              onChangeDatabaseId={snap.setSelectedDatabaseId}
-            />
-          )}
+          {showReadReplicasUI && <DatabaseSelector variant="connected-on-right" />}
 
           {roleImpersonationEnabledFlag && (
             <RoleImpersonationPopover
               serviceRoleLabel="postgres"
-              variant={readReplicasEnabled ? 'connected-on-both' : 'connected-on-right'}
+              variant={showReadReplicasUI ? 'connected-on-both' : 'connected-on-right'}
             />
           )}
 

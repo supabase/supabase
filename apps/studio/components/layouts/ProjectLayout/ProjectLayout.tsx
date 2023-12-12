@@ -7,7 +7,7 @@ import { useFlag, useSelectedOrganization, useSelectedProject, withAuth } from '
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { Fragment, PropsWithChildren, ReactNode } from 'react'
+import { Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
 import AppLayout from '../AppLayout/AppLayout'
 import EnableBranchingModal from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
 import BuildingState from './BuildingState'
@@ -21,6 +21,7 @@ import { ProjectContextProvider } from './ProjectContext'
 import ProjectPausedState from './ProjectPausedState'
 import RestoringState from './RestoringState'
 import UpgradingState from './UpgradingState'
+import { useProjectStateSnapshot } from 'state/project-state'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -181,6 +182,8 @@ interface ContentWrapperProps {
  */
 const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapperProps) => {
   const router = useRouter()
+  const { ref } = useParams()
+  const state = useProjectStateSnapshot()
   const selectedProject = useSelectedProject()
 
   const isSettingsPages = router.pathname.includes('/project/[ref]/settings')
@@ -200,6 +203,10 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
     selectedProject?.status === PROJECT_STATUS.GOING_DOWN ||
     selectedProject?.status === PROJECT_STATUS.PAUSING
   const isProjectOffline = selectedProject?.postgrestStatus === 'OFFLINE'
+
+  useEffect(() => {
+    if (ref) state.setSelectedDatabaseId(ref)
+  }, [ref])
 
   if (isBlocking && (isLoading || (requiresProjectDetails && selectedProject === undefined))) {
     return router.pathname.endsWith('[ref]') ? <LoadingState /> : <Connecting />

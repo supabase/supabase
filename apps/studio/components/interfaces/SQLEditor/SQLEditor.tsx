@@ -68,6 +68,7 @@ import {
   getDiffTypeDropdownLabel,
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
+import { useProjectStateSnapshot } from 'state/project-state'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
@@ -105,6 +106,7 @@ const SQLEditor = () => {
   const organization = useSelectedOrganization()
   const appSnap = useAppStateSnapshot()
   const snap = useSqlEditorStateSnapshot()
+  const projectState = useProjectStateSnapshot()
 
   const { mutate: formatQuery } = useFormatQueryMutation()
   const { mutateAsync: generateSql, isLoading: isGenerateSqlLoading } = useSqlGenerateMutation()
@@ -118,8 +120,10 @@ const SQLEditor = () => {
   const [pendingTitle, setPendingTitle] = useState<string>()
   const [hasSelection, setHasSelection] = useState<boolean>(false)
   const inputRef = useRef<HTMLInputElement>(null)
+
   const readReplicasEnabled = useFlag('readReplicas')
   const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
+  const showReadReplicasUI = readReplicasEnabled && project?.is_read_replicas_enabled
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery({
@@ -159,7 +163,7 @@ const SQLEditor = () => {
   useEffect(() => {
     if (isSuccessReadReplicas) {
       const primaryDatabase = databases.find((db) => db.identifier === ref)
-      snap.setSelectedDatabaseId(primaryDatabase?.identifier)
+      projectState.setSelectedDatabaseId(primaryDatabase?.identifier)
     }
   }, [isSuccessReadReplicas])
 
@@ -326,9 +330,10 @@ const SQLEditor = () => {
         }
 
         const impersonatedRole = getImpersonatedRole()
-        const connectionString = !readReplicasEnabled
+        const connectionString = !showReadReplicasUI
           ? project.connectionString
-          : databases?.find((db) => db.identifier === snap.selectedDatabaseId)?.connectionString
+          : databases?.find((db) => db.identifier === projectState.selectedDatabaseId)
+              ?.connectionString
         if (!connectionString) {
           return toast.error('Unable to run query: Connection string is missing')
         }

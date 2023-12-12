@@ -3,6 +3,7 @@ import { get } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { replicaKeys } from './keys'
 import { useFlag } from 'hooks'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 
 export type ReadReplicasStatusesVariables = {
   projectRef?: string
@@ -34,9 +35,18 @@ export const useReadReplicasStatusesQuery = <TData = ReadReplicasStatusesData>(
   }: UseQueryOptions<ReadReplicasStatusesData, ReadReplicasStatusesError, TData> = {}
 ) => {
   const readReplicasEnabled = useFlag('readReplicas')
-  useQuery<ReadReplicasStatusesData, ReadReplicasStatusesError, TData>(
+  const { data } = useProjectDetailQuery({ ref: projectRef })
+
+  return useQuery<ReadReplicasStatusesData, ReadReplicasStatusesError, TData>(
     replicaKeys.statuses(projectRef),
     ({ signal }) => getReadReplicasStatuses({ projectRef }, signal),
-    { enabled: enabled && readReplicasEnabled && typeof projectRef !== 'undefined', ...options }
+    {
+      enabled:
+        enabled &&
+        data?.is_read_replicas_enabled &&
+        readReplicasEnabled &&
+        typeof projectRef !== 'undefined',
+      ...options,
+    }
   )
 }

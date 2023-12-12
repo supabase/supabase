@@ -1,11 +1,11 @@
 import { JwtSecretUpdateError, JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { useQueryClient } from '@tanstack/react-query'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Badge, IconAlertCircle, Input } from 'ui'
 
 import { useParams } from 'common/hooks'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
-import { useStore } from 'hooks'
+import { useFlag, useSelectedProject, useStore } from 'hooks'
 
 import Panel from 'components/ui/Panel'
 import { DisplayApiSettings } from 'components/ui/ProjectSettings'
@@ -15,16 +15,25 @@ import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { JWT_SECRET_UPDATE_ERROR_MESSAGES } from './API.constants'
 import JWTSettings from './JWTSettings'
 import PostgrestConfig from './PostgrestConfig'
+import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { useProjectStateSnapshot } from 'state/project-state'
 
 const ServiceList = () => {
   const { ui } = useStore()
   const client = useQueryClient()
-
+  const project = useSelectedProject()
   const { ref: projectRef } = useParams()
+  const state = useProjectStateSnapshot()
+
+  const readReplicasEnabled = useFlag('readReplicas')
+  const showReadReplicasUI = readReplicasEnabled && project?.is_read_replicas_enabled
+
   const { data: settings, isError } = useProjectApiQuery({
     projectRef,
   })
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
+  const { data: databases } = useReadReplicasQuery({ projectRef })
 
   const { data } = useJwtSecretUpdatingStatusQuery({ projectRef })
   const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
@@ -61,15 +70,30 @@ const ServiceList = () => {
   const isCustomDomainActive = customDomainData?.customDomain?.status === 'active'
   const apiService = settings?.autoApiService
   const apiUrl = `${apiService?.protocol ?? 'https'}://${apiService?.endpoint ?? '-'}`
-  const endpoint = isCustomDomainActive
+
+  const selectedDatabase = databases?.find((db) => db.identifier === state.selectedDatabaseId)
+
+  const primaryEndpoint = isCustomDomainActive
     ? `https://${customDomainData.customDomain.hostname}`
     : apiUrl
+  const endpoint = !showReadReplicasUI
+    ? primaryEndpoint
+    : isCustomDomainActive && state.selectedDatabaseId === projectRef
+    ? `https://${customDomainData.customDomain.hostname}`
+    : selectedDatabase?.restUrl
 
   return (
     <div>
       <h3 className="mb-6 text-xl text-foreground">API Settings</h3>
       <section>
-        <Panel title={<h5 className="mb-0">Project URL</h5>}>
+        <Panel
+          title={
+            <div className="w-full flex items-center justify-between">
+              <h5 className="mb-0">Project URL</h5>
+              {showReadReplicasUI && <DatabaseSelector />}
+            </div>
+          }
+        >
           <Panel.Content>
             {isError ? (
               <div className="flex items-center justify-center py-4 space-x-2">

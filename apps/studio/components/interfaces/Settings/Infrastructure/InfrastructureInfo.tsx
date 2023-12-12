@@ -49,7 +49,7 @@ const InfrastructureInfo = () => {
 
   const showDbUpgrades = useFlag('databaseUpgrades')
   const readReplicasEnabled = useFlag('readReplicas')
-  const showReplicasUI = readReplicasEnabled && project?.is_read_replicas_enabled
+  const showReadReplicasUI = readReplicasEnabled && project?.is_read_replicas_enabled
   const hasReadReplicas = (databases ?? []).length > 1
   const subject = 'Request%20for%20Postgres%20upgrade%20for%20project'
   const message = `Upgrade information:%0A• Manual intervention reason: ${requires_manual_intervention}`
@@ -69,7 +69,7 @@ const InfrastructureInfo = () => {
 
       <ScaffoldDivider />
 
-      {showReplicasUI && (
+      {showReadReplicasUI && (
         <>
           <InstanceConfiguration />
           <ScaffoldDivider />
@@ -77,7 +77,7 @@ const InfrastructureInfo = () => {
       )}
 
       <ScaffoldContainer>
-        {!showReplicasUI && (
+        {!showReadReplicasUI && (
           <ScaffoldSection>
             <ScaffoldSectionDetail>
               <p>Configuration</p>
