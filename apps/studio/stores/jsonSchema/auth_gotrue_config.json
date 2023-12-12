@@ -3,6 +3,7 @@
   "required": [
     "SITE_URL",
     "DISABLE_SIGNUP",
+    "SECURITY_MANUAL_LINKING_ENABLED",
     "JWT_EXP",
     "JWT_AUD",
     "JWT_DEFAULT_GROUP_NAME",
@@ -64,7 +65,12 @@
     "DISABLE_SIGNUP": {
       "title": "Disable signup",
       "type": "boolean",
-      "help": "Allow/disallow new user signups to your project."
+      "help": "Allow/disallow new user signups for your project."
+    },
+    "SECURITY_MANUAL_LINKING_ENABLED": {
+      "title": "Enable Manual Linking",
+      "type": "boolean",
+      "help": "Enable manual linking APIs for your project"
     },
     "EXTERNAL_EMAIL_ENABLED": {
       "title": "Enable email signup",

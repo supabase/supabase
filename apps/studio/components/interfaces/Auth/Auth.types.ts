@@ -6,6 +6,7 @@ export interface AuthConfig {
   updated_at: string
 
   DISABLE_SIGNUP: boolean
+  SECURITY_MANUAL_LINKING_ENABLED: boolean
   EXTERNAL_EMAIL_ENABLED: boolean
   EXTERNAL_PHONE_ENABLED: boolean
 
