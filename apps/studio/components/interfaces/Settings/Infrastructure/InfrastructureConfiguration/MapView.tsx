@@ -182,7 +182,7 @@ const MapView = ({
                   <circle
                     r={4}
                     className={`animate-ping ${
-                      hasNoDatabases ? 'fill-black/30 dark:fill-white/30' : 'fill-brand'
+                      hasNoDatabases ? 'fill-border-stronger' : 'fill-brand'
                     }`}
                   />
                 )}
@@ -190,7 +190,7 @@ const MapView = ({
                   r={4}
                   className={`cursor-pointer ${
                     hasNoDatabases
-                      ? 'fill-background-surface-300 stroke-black/20 dark:stroke-white/20'
+                      ? 'fill-background-surface-300 stroke-border-stronger'
                       : hasPrimary
                       ? 'fill-brand stroke-brand-500'
                       : 'fill-brand-500 stroke-brand-400'
@@ -203,7 +203,7 @@ const MapView = ({
           {tooltip !== undefined && zoom === 1.5 && (
             <Marker coordinates={[tooltip.x - 47, tooltip.y - 5]}>
               <foreignObject width={220} height={66.25}>
-                <div className="bg-background bg-opacity-50 rounded border">
+                <div className="bg-background/50 rounded border">
                   <div className="px-3 py-2 flex flex-col gap-y-1">
                     <div className="flex items-center gap-x-2">
                       <img
@@ -229,7 +229,7 @@ const MapView = ({
       </ComposableMap>
 
       {showRegionDetails && selectedRegion && (
-        <div className="absolute bottom-4 right-4 flex flex-col bg-background bg-opacity-50 backdrop-blur-sm border rounded w-[400px]">
+        <div className="absolute bottom-4 right-4 flex flex-col bg-background/50 backdrop-blur-sm border rounded w-[400px]">
           <div className="flex items-center justify-between py-4 px-4 border-b">
             <div>
               <p className="text-xs text-foreground-light">
