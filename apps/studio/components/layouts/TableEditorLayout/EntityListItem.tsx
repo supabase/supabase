@@ -51,7 +51,8 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
   }
 
   const exportTableAsCSV = async () => {
-    if (IS_PLATFORM && !project?.connectionString) return console.error('Connection string is required')
+    if (IS_PLATFORM && !project?.connectionString)
+      return console.error('Connection string is required')
     const toastId = ui.setNotification({
       category: 'loading',
       message: `Exporting ${entity.name} as CSV...`,
