@@ -109,7 +109,7 @@ const days: WeekDayProps[] = [
     shipped: true,
     isToday: true,
     hasCountdown: false,
-    blog: '/blog/node-and-native-npm-compatibility',
+    blog: '/blog/edge-functions-node-npm',
     date: '12 Dec',
     published_at: '2023-12-12T08:00:00.000-08:00',
     description: (
@@ -120,7 +120,7 @@ const days: WeekDayProps[] = [
     links: [
       {
         type: 'blog',
-        href: '/blog/node-and-native-npm-compatibility',
+        href: '/blog/edge-functions-node-npm',
       },
       {
         type: 'video',
@@ -134,7 +134,7 @@ const days: WeekDayProps[] = [
     steps: [
       {
         title: '',
-        blog: '/blog/node-and-native-npm-compatibility',
+        blog: '/blog/edge-functions-node-npm',
         bg_layers: [
           {
             img: '/images/launchweek/lwx/day2/d2_edge.svg',
