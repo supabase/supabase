@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { observer } from 'mobx-react-lite'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
 import DeleteHookModal from 'components/interfaces/Database/Hooks/DeleteHookModal'
@@ -13,19 +13,17 @@ import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import NoPermission from 'components/ui/NoPermission'
 import { useHooksEnableMutation } from 'data/database/hooks-enable-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { useCheckPermissions, usePermissionsLoaded, useStore } from 'hooks'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
 import { NextPageWithLayout } from 'types'
-import { IconLoader } from 'ui'
 
 const HooksPage: NextPageWithLayout = () => {
   const { project } = useProjectContext()
-  const { meta, ui } = useStore()
 
   const { ref: projectRef } = useParams()
 
   const {
     data: schemas,
-    isLoading: isLoadingSchemas,
+    isSuccess: isSchemasLoaded,
     refetch,
   } = useSchemasQuery({
     projectRef: project?.ref,
@@ -44,16 +42,9 @@ const HooksPage: NextPageWithLayout = () => {
   const { mutate: enableHooks, isLoading: isEnablingHooks } = useHooksEnableMutation({
     onSuccess: () => {
       refetch()
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully enabled webhooks`,
-      })
+      toast.success('Successfully enabled webhooks')
     },
   })
-
-  useEffect(() => {
-    if (ui.selectedProjectRef) meta.hooks.load()
-  }, [ui.selectedProjectRef])
 
   const enableHooksForProject = async () => {
     if (!projectRef) return console.error('Project ref is required')
@@ -79,16 +70,7 @@ const HooksPage: NextPageWithLayout = () => {
     return <NoPermission isFullPage resourceText="view database webhooks" />
   }
 
-  if (isLoadingSchemas) {
-    return (
-      <div className="w-full h-full flex items-center justify-center space-x-2">
-        <IconLoader className="animate-spin" size="tiny" strokeWidth={1.5} />
-        <p className="text-sm text-foreground-light">Checking if hooks are enabled</p>
-      </div>
-    )
-  }
-
-  if (!isHooksEnabled) {
+  if (isSchemasLoaded && !isHooksEnabled) {
     return (
       <div className="w-full h-full flex items-center justify-center">
         <ProductEmptyState
@@ -97,9 +79,11 @@ const HooksPage: NextPageWithLayout = () => {
           ctaButtonLabel="Enable webhooks"
           onClickCta={() => enableHooksForProject()}
           loading={isEnablingHooks}
-          disabled={isEnablingHooks || !canCreateWebhooks}
+          disabled={isEnablingHooks || (isPermissionsLoaded && !canReadWebhooks)}
           disabledMessage={
-            !canCreateWebhooks ? 'You need additional permissions to enable webhooks' : undefined
+            isPermissionsLoaded && !canCreateWebhooks
+              ? 'You need additional permissions to enable webhooks'
+              : undefined
           }
         >
           <p className="text-sm text-foreground-light">
@@ -137,4 +121,4 @@ const HooksPage: NextPageWithLayout = () => {
 
 HooksPage.getLayout = (page) => <DatabaseLayout title="Hooks">{page}</DatabaseLayout>
 
-export default observer(HooksPage)
+export default HooksPage
