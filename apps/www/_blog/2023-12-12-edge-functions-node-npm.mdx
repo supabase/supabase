@@ -53,9 +53,9 @@ We used the eszip module loader in the local and self-hosted environments too, s
 
 ### Regional Invocations
 
-You now have the option to specify a region when running an Edge Function. Usually, Edge Functions run in the region closest to the user invoking the Function. However, sometimes you want to run it closer to your Postgres database or another 3rd party API for optimal performance.
+You now have the option to specify a region when running an Edge Function (perhaps we should change the name in the future). Usually, Edge Functions run in the region closest to the user invoking the Function. However, sometimes you want to run it closer to your Postgres database or another 3rd party API for optimal performance.
 
-During invocation, you can provide the `x-region` header to specify the region.
+Functions are still deployed to all regions. However, during invocation, you can provide the `x-region` header to restrict the execution to a specific region.
 
 <CH.Code>
 
