@@ -853,7 +853,7 @@ export default {
       flex flex-col
       fixed
       inset-y-0
-      h-full
+      h-full lg:h-screen
       border-l border-overlay
       shadow-xl
     `,
