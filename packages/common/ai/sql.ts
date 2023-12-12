@@ -35,6 +35,7 @@ const editSqlSchema = SchemaBuilder.emptySchema().addString('sql', {
       - Use vector(384) data type for any embedding/vector related query
       - Always use double apostrophe in SQL strings (eg. 'Night''s watch')
       - Use real examples when possible
+      - Add constraints if requested
     `,
 })
 
@@ -67,10 +68,7 @@ type DebugSqlResult = typeof debugSqlSchema.T
 type GenerateTitleResult = typeof generateTitleSchema.T
 
 // Combine the completion functions
-const completionFunctions: Record<
-  string,
-  OpenAI.Chat.Completions.ChatCompletionCreateParams.Function
-> = {
+const completionFunctions = {
   generateSql: {
     name: 'generateSql',
     description: 'Generates Postgres SQL based on a natural language prompt',
@@ -102,7 +100,7 @@ const completionFunctions: Record<
     description: 'Generates a short title and detailed description for a Postgres SQL snippet',
     parameters: generateTitleSchema.schema as Record<string, unknown>,
   },
-}
+} satisfies Record<string, OpenAI.Chat.Completions.ChatCompletionCreateParams.Function>
 
 /**
  * Generates a SQL snippet based on the provided prompt.
@@ -151,8 +149,9 @@ export async function generateSql(openai: OpenAI, prompt: string, entityDefiniti
     })
 
     const [firstChoice] = completionResponse.choices
+    const [firstTool] = firstChoice.message?.tool_calls ?? []
 
-    const sqlResponseString = firstChoice.message?.function_call?.arguments
+    const sqlResponseString = firstTool?.function.arguments
 
     if (!sqlResponseString) {
       throw new EmptyResponseError()
@@ -236,8 +235,9 @@ export async function editSql(
     })
 
     const [firstChoice] = completionResponse.choices
+    const [firstTool] = firstChoice.message?.tool_calls ?? []
 
-    const sqlResponseString = firstChoice.message?.function_call?.arguments
+    const sqlResponseString = firstTool?.function.arguments
 
     if (!sqlResponseString) {
       throw new EmptyResponseError()
@@ -324,8 +324,9 @@ export async function debugSql(
     })
 
     const [firstChoice] = completionResponse.choices
+    const [firstTool] = firstChoice.message?.tool_calls ?? []
 
-    const sqlResponseString = firstChoice.message?.function_call?.arguments
+    const sqlResponseString = firstTool?.function.arguments
 
     if (!sqlResponseString) {
       throw new EmptyResponseError()
@@ -370,21 +371,22 @@ export async function titleSql(openai: OpenAI, sql: string) {
       tool_choice: {
         type: 'function',
         function: {
-          name: completionFunctions.titleSql.name,
+          name: completionFunctions.generateTitle.name,
         },
       },
       tools: [
         {
           type: 'function',
-          function: completionFunctions.titleSql,
+          function: completionFunctions.generateTitle,
         },
       ],
       stream: false,
     })
 
     const [firstChoice] = completionResponse.choices
+    const [firstTool] = firstChoice.message?.tool_calls ?? []
 
-    const sqlResponseString = firstChoice.message?.function_call?.arguments
+    const sqlResponseString = firstTool?.function.arguments
 
     if (!sqlResponseString) {
       throw new EmptyResponseError()
