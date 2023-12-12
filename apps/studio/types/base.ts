@@ -12,6 +12,9 @@ export interface Organization {
   subscription_id?: string | null
 }
 
+/**
+ * @deprecated Please use type from projects-query OR project-details-query.ts instead
+ */
 export interface ProjectBase {
   id: number
   ref: string
