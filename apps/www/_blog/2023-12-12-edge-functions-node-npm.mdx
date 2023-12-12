@@ -8,14 +8,14 @@ tags:
   - launch-week
   - edge-functions
 date: '2023-12-12'
-published_at: '2023-12-12T09:00:00.000-07:00'
+published_at: '2023-12-12T09:05:00.000-07:00'
 to_depth: 3
 author: laktek,andreespirela
 image: launch-week-x/day-2/edge-runtime-og.png
 thumb: launch-week-x/day-2/edge-runtime-thumb.png
 ---
 
-We are excited to announce that Edge Functions now natively support npm modules and Node built-in APIs. You can directly import millions of popular, commonly used npm modules into your Edge Functions.
+We are excited to announce that [Edge Functions](https://supabase.com/docs/guides/functions) now natively supports npm modules and Node built-in APIs. You can directly import millions of popular, commonly used npm modules into your Edge Functions.
 
 ```jsx
 import { drizzle } from 'npm:drizzle-orm/node-postgres'
@@ -25,13 +25,13 @@ import { drizzle } from 'npm:drizzle-orm/node-postgres'
 
 You can migrate your existing Node apps to Supabase Edge Functions with minimal changes.
 
-We created demo to show how to migrate a Node app that uses Express, Node Postgres, and Drizzle. For more information on using npm modules and Node built-ins within your Edge Functions, see the [Managing dependencies guide](https://supabase.com/docs/guides/functions/import-maps).
+We created a demo to show how to migrate a Node app that uses Express, Node Postgres, and Drizzle. For more information on using npm modules and Node built-ins within your Edge Functions, see the [Managing dependencies guide](https://supabase.com/docs/guides/functions/import-maps).
 
 // demo goes here
 
 ## How npm modules work under the hood
 
-We run an open source Deno server for hosting Edge Functions called [Supabase Edge Runtime](https://supabase.com/blog/edge-runtime-self-hosted-deno-functions). This custom version helps us keep Edge Functions working the same way no matter where it is deployed - on our hosted platform, in local development, or your self-hosted environment.
+We run an open source Deno server for hosting Edge Functions called [Supabase Edge Runtime](https://supabase.com/blog/edge-runtime-self-hosted-deno-functions). This custom version helps us keep Edge Functions working the same way no matter where it is deployed - on our hosted platform, in local development, or in your self-hosted environment.
 
 The biggest challenge when adding npm support was finding an approach that would work across all environments. We wanted to keep the workflow close to the Deno CLI experience. It should be possible to import npm modules directly in your source code without an extra build step.
 
@@ -76,7 +76,11 @@ const { data, error } = await supabase.functions.invoke('hello-world', {
 
 </CH.Code>
 
-Check out the [Regional Invocation guide](https://supabase.com/docs/guides/functions/regional-invocation) for more details.
+<div className="bg-gray-300 rounded-lg px-6 py-2 bold">
+
+ℹ️ Check out the [Regional Invocation guide](https://supabase.com/docs/guides/functions/regional-invocation) for more details.
+
+</div>
 
 ### Better Metrics
 
@@ -133,14 +137,15 @@ Deno.serve(async (req) => {
 
 ## What's next
 
-NPM support was one of the most requested features for Edge Functions. If you couldn't use Edge Functions previously because of the lack of support, we hope this update will entice you to try it again. If you run into any issues, we are just [one support request away](https://supabase.help).
+NPM support was one of the most requested features for Edge Functions. If you couldn't use Edge Functions previously because of the lack of support, we hope this update will entice you to [try it again](https://supabase.com/dashboard/project/_/functions). If you run into any issues, we are just [one support request away](https://supabase.help).
 
 For existing Edge Functions users, regional invocations, better metrics, and error handling are just a glimpse of what will come next. We continue to iterate on platform stability and setting custom limits on resources Edge Functions can use. Watch out for another blog post in the new year.
 
 ## More Launch Week X
 
+- [Day 1 - Supabase Studio update: AI Assistant and User Impersonation](https://supabase.com/blog/studio-introducing-assistant)
+- [pg_graphql: Postgres functions now supported](https://supabase.com/blog/pg-graphql-postgres-functions)
 - [Postgres Language Server: implementing the Parser](https://supabase.com/blog/postgres-language-server-implementing-parser)
-- [How design works at Supabase](https://supabase.com/blog/how-design-works-at-supabase)
 - [The Supabase Album](https://www.youtube.com/watch?v=r1POD-IdG-I)
 - [Supabase Launch Week X Hackathon](https://supabase.com/blog/supabase-hackathon-lwx)
 - [Launch Week X Community Meetups](https://supabase.com/blog/community-meetups-lwx)
