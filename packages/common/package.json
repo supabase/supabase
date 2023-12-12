@@ -8,23 +8,28 @@
     "typecheck_CURRENTLY_IGNORED": "tsc --noEmit"
   },
   "dependencies": {
+    "@serafin/schema-builder": "^0.18.5",
     "@types/dat.gui": "^0.7.12",
+    "common-tags": "^1.8.2",
     "config": "*",
     "dat.gui": "^0.7.9",
+    "jsonrepair": "^3.5.0",
     "lodash": "^4.17.21",
     "next-themes": "^0.2.1",
+    "openai": "^4.20.1",
     "react-hot-toast": "^2.4.1",
     "react-use": "^17.4.0"
   },
   "devDependencies": {
+    "@types/common-tags": "^1.8.4",
     "@types/react": "^18.2.24",
     "@types/react-dom": "^18.2.8",
     "tsconfig": "*",
     "typescript": "^5.2.2"
   },
   "peerDependencies": {
-    "@supabase/supabase-js": "*",
     "@supabase/gotrue-js": "^2.58.0",
+    "@supabase/supabase-js": "*",
     "next": "*",
     "react": "*",
     "react-dom": "*"
