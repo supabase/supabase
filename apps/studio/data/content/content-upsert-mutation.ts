@@ -19,6 +19,7 @@ export async function upsertContent(
   signal?: AbortSignal
 ) {
   const { data, error } = await put('/platform/projects/{ref}/content', {
+    // @ts-ignore [Joshen] potentially codegen is wrong
     params: { path: { ref: projectRef } },
     body: {
       id: payload.id,
