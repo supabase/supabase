@@ -169,8 +169,15 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                       <AlertDescription_Shadcn_>
                         As of 1st August, LinkedIn has updated their OAuth API scopes. Please use
                         the new LinkedIn provider below. Developers using this provider should move
-                        over to the new provider. Please refer to our
-                        [docs](/docs/pages/guides/auth/social-login/auth-linkedin) for more details.
+                        over to the new provider. Please refer to our{' '}
+                        <a
+                          href="https://supabase.com/docs/guides/auth/social-login/auth-linkedin"
+                          className="underline"
+                          target="_blank"
+                        >
+                          documentation
+                        </a>{' '}
+                        for more details.
                       </AlertDescription_Shadcn_>
                     </Alert_Shadcn_>
                   )}
