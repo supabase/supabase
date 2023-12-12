@@ -162,21 +162,6 @@ export const days: AdventDay[] = [
     image: '',
   },
   {
-    title: '',
-    type: '',
-    is_shipped: false,
-    className: 'sm:col-span-2 xl:col-span-3 sm:aspect-[2/1] xl:aspect-auto md:h-full',
-    icon: '',
-    id: '',
-    links: [
-      {
-        url: '',
-        label: '',
-      },
-    ],
-    image: '',
-  },
-  {
     title: 'pg_graphql: Postgres functions',
     description: 'pg_graphql now supports User Defined Functions (UDFs)',
     type: '',
@@ -211,6 +196,21 @@ export const days: AdventDay[] = [
     title: '',
     type: '',
     is_shipped: false,
+    className: 'xl:col-span-2 xl:aspect-auto h-full',
+    icon: '',
+    id: '',
+    links: [
+      {
+        url: '',
+        label: '',
+      },
+    ],
+    image: '',
+  },
+  {
+    title: '',
+    type: '',
+    is_shipped: false,
     className: '',
     icon: '',
     id: '',
@@ -226,7 +226,7 @@ export const days: AdventDay[] = [
     title: '',
     type: '',
     is_shipped: false,
-    className: 'xl:col-span-2 xl:aspect-auto h-full',
+    className: 'md:col-span-2 md:aspect-auto xl:col-span-3 xl:aspect-auto md:h-full',
     icon: '',
     id: '',
     links: [
@@ -316,7 +316,7 @@ export const days: AdventDay[] = [
     title: '',
     type: '',
     className:
-      'sm:col-span-2 sm:aspect-[2/1] md:col-span-1 md:aspect-auto xl:col-span-2 xl:aspect-[2/1] h-full',
+      'md:col-span-2 md:aspect-[2/1] md:col-span-1 md:aspect-auto xl:col-span-2 xl:aspect-[2/1] h-full',
     is_shipped: false,
     icon: '',
     id: '',
