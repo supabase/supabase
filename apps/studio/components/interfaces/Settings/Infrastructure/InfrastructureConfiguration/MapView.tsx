@@ -181,14 +181,16 @@ const MapView = ({
                 {selectedRegionKey === region.region && (
                   <circle
                     r={4}
-                    className={`animate-ping ${hasNoDatabases ? 'fill-white/30' : 'fill-brand'}`}
+                    className={`animate-ping ${
+                      hasNoDatabases ? 'fill-black/30 dark:fill-white/30' : 'fill-brand'
+                    }`}
                   />
                 )}
                 <circle
                   r={4}
                   className={`cursor-pointer ${
                     hasNoDatabases
-                      ? 'fill-background-surface-300 stroke-white/20'
+                      ? 'fill-background-surface-300 stroke-black/20 dark:stroke-white/20'
                       : hasPrimary
                       ? 'fill-brand stroke-brand-500'
                       : 'fill-brand-500 stroke-brand-400'
@@ -227,7 +229,7 @@ const MapView = ({
       </ComposableMap>
 
       {showRegionDetails && selectedRegion && (
-        <div className="absolute bottom-4 right-4 flex flex-col bg-black bg-opacity-50 backdrop-blur-sm border rounded w-[400px]">
+        <div className="absolute bottom-4 right-4 flex flex-col bg-background bg-opacity-50 backdrop-blur-sm border rounded w-[400px]">
           <div className="flex items-center justify-between py-4 px-4 border-b">
             <div>
               <p className="text-xs text-foreground-light">
