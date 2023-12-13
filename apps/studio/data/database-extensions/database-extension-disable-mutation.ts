@@ -7,7 +7,7 @@ import { databaseExtensionsKeys } from './keys'
 
 export type DatabaseExtensionDisableVariables = {
   projectRef: string
-  connectionString: string
+  connectionString?: string
   id: string
 }
 
@@ -21,7 +21,7 @@ export async function disableDatabaseExtension({
 
   const { data, error } = await del('/platform/pg-meta/{ref}/extensions', {
     params: {
-      header: { 'x-connection-encrypted': connectionString },
+      header: { 'x-connection-encrypted': connectionString! },
       path: { ref: projectRef },
       query: { id },
     },

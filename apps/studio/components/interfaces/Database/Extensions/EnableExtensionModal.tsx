@@ -27,7 +27,7 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
   })
   const { mutate: enableExtension, isLoading: isEnabling } = useDatabaseExtensionEnableMutation({
     onSuccess: () => {
-      toast.success(`${extension.name.toUpperCase()} is on.`)
+      toast.success(`${extension.name} is on.`)
       onCancel()
     },
     onError: (error) => {
@@ -71,8 +71,6 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
 
   const onSubmit = async (values: any) => {
     if (project === undefined) return console.error('Project is required')
-    if (project.connectionString === undefined)
-      return console.error('Connection string is required')
 
     const schema =
       defaultSchema !== undefined && defaultSchema !== null

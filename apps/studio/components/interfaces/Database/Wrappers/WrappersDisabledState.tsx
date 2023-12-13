@@ -38,9 +38,6 @@ const WrappersDisabledState = () => {
   const onEnableWrappers = async () => {
     if (wrappersExtension === undefined || vaultExtension === undefined) return
     if (project === undefined) return console.error('Project is required')
-    if (project.connectionString === undefined) {
-      return console.error('Connection string is required')
-    }
 
     let hasError = false
 

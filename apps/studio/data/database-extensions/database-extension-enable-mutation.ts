@@ -8,7 +8,7 @@ import { executeSql } from 'data/sql/execute-sql-query'
 
 export type DatabaseExtensionEnableVariables = {
   projectRef: string
-  connectionString: string
+  connectionString?: string
   schema: string
   name: string
   version: string
@@ -42,7 +42,7 @@ export async function enableDatabaseExtension({
 
   const { data, error } = await post('/platform/pg-meta/{ref}/extensions', {
     params: {
-      header: { 'x-connection-encrypted': connectionString },
+      header: { 'x-connection-encrypted': connectionString! },
       path: { ref: projectRef },
     },
     body: { schema, name, version, cascade },

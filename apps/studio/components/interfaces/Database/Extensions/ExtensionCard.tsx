@@ -45,9 +45,6 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
 
   const onConfirmDisable = () => {
     if (project === undefined) return console.error('Project is required')
-    if (project.connectionString === undefined) {
-      return console.error('Connection string is required')
-    }
 
     disableExtension({
       projectRef: project.ref,
