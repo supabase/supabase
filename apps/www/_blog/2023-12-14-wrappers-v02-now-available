@@ -1,5 +1,5 @@
 ---
-title: 'Wrappers v0.2 now available'
+title: 'Postgres Foreign Data Wrappers v0.2 now available'
 description: 'Postgres Foreign Data Wrappers v0.2 brings more Wrappers, query pushdown, remote subquery, and more'
 launchweek: x
 categories:
@@ -11,8 +11,8 @@ date: '2023-12-14'
 published_at: '2023-12-14:00:00.000-07:00'
 to_depth: 3
 author: bo_lu
-image: lwx-postgrest-12/postgrest12-OG.png
-thumb: lwx-postgrest-12/postgrest12-thumb.png
+image: /images/blog/lwx-wrappers/wrappers-OG.png
+thumb: /blog/lwx-wrappers/wrappers-thumb.png
 ---
 
 Wrappers v0.2 is out and now available on the Supabase platform. Wrappers is a PostgreSQL extension that provides integrations with external sources so you can interact with third-party data using SQL.
@@ -58,7 +58,13 @@ The Wrappers v0.2 framework now supports Query Pushdown.
 
 Query pushdown is a technique that enhances query performance by executing parts of the query directly on the data source. It reduces data transfer between the database and the application, enabling faster execution and improved performance.
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/165a3c21-8e38-4d4b-831a-f9bb88a3262b/73e3b13f-b9ee-4471-a463-4d17b9304b4f/Untitled.png)
+<Img
+  src={{
+    dark: '/images/blog/lwx-wrappers/query-pushdown-dark.png',
+    light: '/images/blog/lwx-wrappers/query-pushdown-light.png',
+  }}
+  alt="Examples of Query Pushdown: with and without it."
+/>
 
 ### How to Use Query Pushdown in Wrappers
 
@@ -176,3 +182,11 @@ Want to join the Supabase Wrappers community contributors? [Check out our contri
 
 ## More Launch Week X 
 
+- [Day 1 - Supabase Studio update: AI Assistant and User Impersonation](https://supabase.com/blog/studio-introducing-assistant)
+- [Day 2 - Edge Functions: Node and native npm compatibility](https://supabase.com/blog/edge-functions-node-npm)
+- [Day 3 - Supabase Branching](https://supabase.com/blog/supabase-branching)
+- [Supavisor 1.0: a scalable connection pooler for Postgres](https://supabase.com/blog/supavisor-postgres-connection-pooler)
+- [pg_graphql: Postgres functions now supported](https://supabase.com/blog/pg-graphql-postgres-functions)
+- [Postgres Language Server: implementing the Parser](https://supabase.com/blog/postgres-language-server-implementing-parser)
+- [The Supabase Album](https://www.youtube.com/watch?v=r1POD-IdG-I)
+- [Launch Week X Hackathon](https://supabase.com/blog/supabase-hackathon-lwx)
