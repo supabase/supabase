@@ -1,7 +1,7 @@
 import Panel from 'components/ui/Panel'
 import { IconArchive } from 'ui'
 
-const StoragePoliciesPlaceholder = ({ guiHeight }) => (
+const StoragePoliciesPlaceholder = () => (
   <Panel
     title={[
       <div key="storagePlaceholder" className="flex w-full items-center justify-between">

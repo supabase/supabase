@@ -114,7 +114,7 @@ export const DayLink = ({ type, icon, text, href = '', className }: DayLink) => 
   const Icon = icon ?? linkTypes[type].icon
   const Text = () => <>{text ?? linkTypes[type]?.text}</>
 
-  const Component = type === 'video' ? 'button' : Link
+  const Component = type === 'video' ? 'div' : Link
 
   const Asd = ({ component: Comp, ...props }: any) => (
     <Comp
