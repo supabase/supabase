@@ -19,11 +19,15 @@ import {
 } from 'ui'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { proxy, useSnapshot } from 'valtio'
+import { SAVED_ORG_PROJECT_BRANCH, retrieve, store } from '~/lib/localStorage'
 
 const selectedProject = proxy({
   selectedId: null,
   setSelectedId: (id: string) => {
     selectedProject.selectedId = id
+    if (typeof window !== undefined) {
+      store(window.localStorage, SAVED_ORG_PROJECT_BRANCH, id)
+    }
   },
 })
 
@@ -243,9 +247,12 @@ export function ProjectConfigVariables({ variable }: { variable: 'url' | 'anonKe
     }, 1000)
   }
 
-  if (projectKeys[0] && !selectedId) {
-    setSelectedId(projectKeys[0].id)
-  }
+  useEffect(() => {
+    if (!selectedId && typeof window !== undefined) {
+      const storedId = retrieve(window.localStorage, SAVED_ORG_PROJECT_BRANCH)
+      setSelectedId(storedId ?? projectKeys?.[0]?.id ?? null)
+    }
+  }, [selectedId, projectKeys, setSelectedId])
 
   const currentProject = (projectKeys ?? []).find(
     // Lowercasing is necessary as Command will lowercase values under the hood
