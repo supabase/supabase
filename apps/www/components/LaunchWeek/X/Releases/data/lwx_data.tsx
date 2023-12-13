@@ -152,7 +152,7 @@ const days: WeekDayProps[] = [
     shipped: true,
     isToday: true,
     hasCountdown: false,
-    blog: '/blog/introducing-branching',
+    blog: '/blog/supabase-branching',
     date: '13 Dec',
     published_at: '2023-12-13T08:00:00.000-08:00',
     description: (
@@ -163,7 +163,7 @@ const days: WeekDayProps[] = [
     links: [
       {
         type: 'blog',
-        href: '/blog/introducing-branching',
+        href: '/blog/supabase-branching',
       },
       {
         type: 'video',
@@ -177,7 +177,7 @@ const days: WeekDayProps[] = [
     steps: [
       {
         title: '',
-        blog: '/blog/introducing-branching',
+        blog: '/blog/supabase-branching',
         bg_layers: [
           {
             img: '/images/launchweek/lwx/day3/branching.svg',
