@@ -1,5 +1,4 @@
 import styles from '@ui/layout/ai-icon-animation/ai-icon-animation-style.module.css'
-import { QueryResponseError } from 'data/sql/execute-sql-mutation'
 import { initial, last } from 'lodash'
 import { Dispatch, SetStateAction } from 'react'
 import {
@@ -11,6 +10,11 @@ import {
   Collapsible_Shadcn_,
   cn,
 } from 'ui'
+
+import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
+import { QueryResponseError } from 'data/sql/execute-sql-mutation'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganization } from 'hooks'
 
 const QueryError = ({
   error,
@@ -25,6 +29,11 @@ const QueryError = ({
 }) => {
   const formattedError =
     (error?.formattedError?.split('\n') ?? [])?.filter((x: string) => x.length > 0) ?? []
+
+  // Customers on HIPAA plans should not have access to Supabase AI
+  const organization = useSelectedOrganization()
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
+  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
   return (
     <div className="flex flex-col gap-y-3 px-5">
@@ -60,20 +69,19 @@ const QueryError = ({
                   {open ? 'Hide error details' : 'Show error details'}
                 </Button>
               </CollapsibleTrigger_Shadcn_>
-              <Button
-                size={'tiny'}
-                type="default"
-                className={cn(
-                  'group',
-                  styles['ai-icon__container--allow-hover-effect h-[21px] !py-0']
-                )}
-                // icon={
-                //   <AiIcon className="scale-50 [&>div>div]:border-warning/50 [&>div>div]:group-hover:border-warning" />
-                // }
-                onClick={() => onSelectDebug()}
-              >
-                Fix with Assistant
-              </Button>
+              {!hasHipaaAddon && (
+                <Button
+                  size={'tiny'}
+                  type="default"
+                  className={cn(
+                    'group',
+                    styles['ai-icon__container--allow-hover-effect h-[21px] !py-0']
+                  )}
+                  onClick={() => onSelectDebug()}
+                >
+                  Fix with Assistant
+                </Button>
+              )}
             </div>
             <CollapsibleContent_Shadcn_ className="overflow-auto">
               {formattedError.length > 0 ? (
