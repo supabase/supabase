@@ -54,7 +54,10 @@ const PlanUpdateSidePanel = () => {
 
   const snap = useOrgSettingsPageStateSnapshot()
   const visible = snap.panelKey === 'subscriptionPlan'
-  const onClose = () => snap.setPanelKey(undefined)
+  const onClose = () => {
+    router.push(router.asPath.split('?')[0], undefined, { shallow: true })
+    snap.setPanelKey(undefined)
+  }
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
   const { data: plans, isLoading: isLoadingPlans } = useOrgPlansQuery({ orgSlug: slug })
