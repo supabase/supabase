@@ -40,9 +40,9 @@ export const generateDatabaseMenu = (
         },
         { name: 'Roles', key: 'roles', url: `/project/${ref}/database/roles`, items: [] },
         {
-          name: 'Replication',
-          key: 'replication',
-          url: `/project/${ref}/database/replication`,
+          name: 'Publications',
+          key: 'publication',
+          url: `/project/${ref}/database/publication`,
           items: [],
         },
         ...(!!pgNetExtensionExists
