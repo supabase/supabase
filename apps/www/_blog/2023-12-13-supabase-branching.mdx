@@ -100,21 +100,21 @@ Just note that we _still_ want you to develop locally! You should treat the Prev
 
 ### Database migrations
 
-We've developed Branching to work with a Git provider, starting with GitHub. We've developed a GitHub app that watches for changes inside your connected GitHub repository.
+We've developed Branching to work with a Git provider, starting with GitHub. 
 
-When you open a Pull Request to your connected repo, the app will automatically launch a Preview Branch and apply the schema migrations in `./supabase/migrations` directory. Any errors from running the migrations will be logged to the [Check Run](https://docs.github.com/en/rest/checks/runs?apiVersion=2022-11-28) associated with that git commit. When all checks turn green, your new Preview Branch is ready to use.
+Our [GitHub app](https://github.com/apps/supabase) observes changes within a connected GitHub repository. When you open a Pull Request, it launches a Preview Branch and runs the migrations in `./supabase/migrations`. If there are any errors they are logged to the [Check Run](https://docs.github.com/en/rest/checks/runs?apiVersion=2022-11-28) associated with that git commit. When all checks turn green, your new Preview Branch is ready to use.
 
-When you push a new migration file to the Git branch, the app will run it incrementally on your existing Preview Branch. This allows you verify schema changes easily on existing seed data.
+When you push a new migration file to the Git branch, the app runs it incrementally in your Preview Branch. This allows you verify schema changes easily on existing seed data.
 
-Finally, when you merge that PR, the app will run all newly merged migrations on your Production environment. If you have other PRs already open, make sure to update those migration files to a later timestamp than the ones in Production branch. Other than this being easy, it's worth stressing that you are then following a [standard migration practice](https://supabase.com/docs/guides/cli/managing-environments).
+Finally, when you merge that PR, the app runs the new migrations on your Production environment. If you have other PRs already open, make sure to update those migration files to a later timestamp than the ones in Production branch following a [standard migration practice](/docs/guides/cli/managing-environments).
 
 ### Data seeding
 
-You can seed your Preview branch in the same way that you [seed your local development environment](https://supabase.com/docs/guides/cli/seeding-your-database). Just add `./supabase/seed.sql` in your repo and the seed script will run when the Preview Branch is first created.
+You can seed your Preview branch in the same way that you [seed your local development environment](/docs/guides/cli/seeding-your-database). Just add `./supabase/seed.sql` in your repo and the seed script will run when the Preview Branch is created.
 
-Optionally, you can reset your branch database by running `supabase db reset --db-url <branch-connection-string>`. The branch connection string can be retrieved using your Personal Access Token with Supabase CLI's [branch management](https://supabase.com/docs/reference/cli/supabase-branches-get) commands.
+Optionally, you can reset the database by running `supabase db reset --db-url <branch-connection-string>`. The branch connection string can be retrieved using your Personal Access Token with Supabase CLI's [branch management](/docs/reference/cli/supabase-branches-get) commands.
 
-In the future we'll investigate data masking techniques with a copy-on-write system so that you can emulate a production workload inside your Preview Branches (we plan for this to work with File Storage too).
+We're investigating data masking techniques with a copy-on-write system so that you can emulate a production workload inside your Preview Branches. We plan for this to work with File Storage too.
 
 <Admonition type="note" label="Testing with product workloads today?">
 
@@ -126,17 +126,13 @@ If you need to test with production workloads today, check out [Snaplet](https:/
 
 That's already a lot for Branching v0. Branching will be a core part of the developer workflow in the future. These are the themes we'll explore next:
 
-### Migration queues
-
-We'll give you more visibility into the schedules of the migration runner. This will be useful for debugging. The first step here is simply showing which Preview Branches are queued and actively running. This is our first priority.
-
 ### Declarative config
 
-We're still working on “configuration in code”. For example, you might want to try a different Google Auth in your Preview Branch than the one you use in Product. This would be a lot easier if the code was declarative, inside the [config.toml](https://supabase.com/docs/guides/cli/config) file.
+We're still working on “configuration in code”. For example, you might want to try a different Google Auth in your Preview Branch than the one you use in Product. This would be a lot easier if the code was declarative, inside the [config.toml](/docs/guides/cli/config) file.
 
 ### Automatic dashboard commits
 
-In the current version, when you use the dashboard to create a change on a Preview Branch, you need to run `db diff` locally to pull that change into your Git repository. That will change. We will work on a feature to automatically capture your changes in a Git repo that you've connected.
+In the current version, when you use the dashboard to create a change on a Preview Branch, you need to run `db diff` locally to pull that change into your Git repository. We plan to work on a feature to automatically capture your changes in a Git repo that you've connected.
 
 ### Extended seeding behavior
 
@@ -144,20 +140,10 @@ There are a multitude of different strategies for populating seed data. We've da
 
 ### Copy-on-write
 
-We have something in development :). CoW means you can branch from database snapshot and then run tests on “production-like” workloads. This is the approach that [Postgres.ai](http://Postgres.ai) uses. As we mention above, we need this feature to extend our File Storage product. We are in the process of upgrading all the tools with the right primitives to enable CoW.
-
-### GitHub action templates
-
-Once our GitHub app integration is matured, we will expose all the same logic in GitHub action templates so you can manage and design your own CI/CD pipeline. All of the same API routes that the GitHub app integration uses will be public for you and your team to use.
-
-### Auto deploy functions
-
-Edge functions could auto deploy to your Preview branches on git push events. It's worth also mentioning that support for deploying Edge functions to non-Branching Supabase projects is also being investigated; this would be an alternative to manually adding GitHub actions.
+We have something in development :). CoW means you can branch from database snapshot and then run tests on “production-like” workloads. This is the approach that [Postgres.ai](http://Postgres.ai) uses. As we mention above, we need to figure out an approach that also works with [File Storage](/storage).
 
 ## Interested in using Branching?
 
-We still have our early access form open, and we'll be consistently onboarding new organizations over the next few days and weeks.
+We still have our early-access form open, and we'll be onboarding organizations in batches over the next few weeks, and working with these early users on Pricing.
 
-It's important to note, that we highly recommend you should not use Branching for any of your applications that are in production.
-
-You can check out the docs for Branching and also if you have any feedback, [you can join the discussion here](https://github.com/orgs/supabase/discussions/18937).
+Check out the [Branching docs](/docs/guides/platform/branching) and also if you have any feedback, [you can join the discussion](https://github.com/orgs/supabase/discussions/18937).
