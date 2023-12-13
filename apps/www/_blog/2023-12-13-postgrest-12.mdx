@@ -15,7 +15,7 @@ image: lwx-postgrest-12/postgrest12-OG.png
 thumb: lwx-postgrest-12/postgrest12-thumb.png
 ---
 
-PostgREST 12 is out, and we're happy to announce that it's available on [new Supabase projects](https://supabase.com/dashboard/new) starting today. In this post, we'll focus on just a few of our favorite features, for the complete list, check out the [release on GitHub](https://github.com/PostgREST/postgrest/releases/tag/v12.0.0).
+PostgREST 12 is out. In this post, we'll focus on a few of the major features. For the complete list, check out the [release on GitHub](https://github.com/PostgREST/postgrest/releases/tag/v12.0.0).
 
 ## Performance: JWT Caching
 
@@ -23,7 +23,7 @@ Until now, PostgREST has validated JWTs on every request. As of PostgREST 12, th
 
 Why is that a big deal? Well, it turns out decoding JWTs is expensive. Very expensive.
 
-```sql
+```
 ## before
 $ curl 'localhost:3000/authors_only' -H "Authorization: Bearer $JWT" -D -
 HTTP/1.1 200 OK
@@ -39,11 +39,11 @@ The JWT cache shaves over 130ms off the server side timing. For projects with a 
 
 ## Server Timing Header
 
-Speaking of timing, you may have noticed the `Server-Timing` header in the last example. [That's new too](https://postgrest.org/en/v12.0/references/admin.html#server-timing-header) and it does more than measure JWT decoding duration.
+Did you notice the `Server-Timing` header in the last example? [That's new too](https://postgrest.org/en/v12.0/references/admin.html#server-timing-header) and it does more than measure JWT decoding duration.
 
 Here's a complete reference to what you can extract from your responses:
 
-```sql
+```
 Server-Timing:
 	jwt;dur=14.9,
 	parse;dur=71.1,
@@ -60,7 +60,7 @@ Support for aggregate functions has been [much requested feature](https://github
 
 Currently, PostgREST supports `avg`, `count`, `max`, `min`, `sum`. Here's a minimal example using `count`:
 
-```sql
+```
 $ curl 'http://postgrest/blog_post?select=id.count()'
 
 [
@@ -72,9 +72,7 @@ $ curl 'http://postgrest/blog_post?select=id.count()'
 
 We can also add a “group by” simply by adding another element to the select clause.
 
- 
-
-```sql
+```
 $ curl 'http://postgrest/blog_post?select=title,id.count()'
 
 [
@@ -86,16 +84,20 @@ $ curl 'http://postgrest/blog_post?select=title,id.count()'
     "title": "Contributors Blog",
     "count": 11
   },
+  ...
 ```
 
-That only scratches the surface. Aggregates are fully compatible with [resource embedding](https://postgrest.org/en/stable/references/api/resource_embedding.html) which yields an extremely versatile interface. Stay tuned for another post we have in the works to deep-dive this feature.
+This example only scratches the surface. Aggregates are fully-compatible with [resource embedding](https://postgrest.org/en/stable/references/api/resource_embedding.html) which yields an extremely versatile interface. We'll explore this feature more in a deep-dive coming soon.
 
 ## Media Type Handlers
 
 PostgREST now gives you the flexibility to [handle your custom media types and override the built-in ones](https://postgrest.org/en/v12.0/references/api/media_type_handlers.html). Among other things, that enables [serving HTML, javascript, or whatever you can think of, straight from your database](https://postgrest.org/en/latest/how-tos/providing-html-content-using-htmx.html).
 
 ```sql
-create or replace function api.index() returns "text/html" as $$
+create or replace function api.index() 
+returns "text/html" 
+language sql
+as $$
   select $html$
     <!DOCTYPE html>
     <html>
@@ -115,14 +117,20 @@ create or replace function api.index() returns "text/html" as $$
     </body>
     </html>
   $html$;
-$$ language sql;
+$$;
 ```
 
-With PostgREST running locally we can then navigate to [`http://localhost:3000/rpc/index`](http://localhost:3000/rpc/index) to see
+With PostgREST running locally we can then navigate to [localhost:3000/rpc/index](http://localhost:3000/rpc/index) to see
 
 ![Media Type Handlers](/blog/lwx-postgrest-12/postgrest-12-media-type-handlers.png)
 
 We're still working through the full implications of this feature, but we're very excited internally about the possibilities it unlocks! Similar to aggregate functions, there's a dedicated post for this feature on the way.
+
+## Availability
+
+For self-hosting, check out the PostgREST [release on GitHub](https://github.com/PostgREST/postgrest/releases/tag/v12.0.0).
+
+We're happy to announce that it's available on [new Supabase projects](https://supabase.com/dashboard/new) starting today.
 
 ## More Launch Week X
 
