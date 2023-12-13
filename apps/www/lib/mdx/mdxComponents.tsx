@@ -42,7 +42,7 @@ const BlogCollapsible = ({ title, ...props }: { title: string }) => {
   return (
     <Collapsible_Shadcn_>
       <CollapsibleTrigger_Shadcn_
-        className="    
+        className="
         data-[state=open]:text
         hover:text-foreground-light
         flex items-center gap-3
@@ -88,6 +88,7 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
               {...props}
               className={[type === 'blog' ? 'm-0 object-cover rounded-md border' : ''].join(' ')}
               fill
+              loading="lazy"
             />
           </span>
         )
