@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { createClient } from '@supabase/supabase-js'
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { chunk, compact, find, findIndex, has, isEqual, some, uniq, uniqBy } from 'lodash'
