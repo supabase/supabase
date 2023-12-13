@@ -8,7 +8,6 @@ import Head from 'next/head'
 import { PropsWithChildren, memo, useEffect } from 'react'
 import Footer from '~/components/Navigation/Footer'
 import { menuState, useMenuLevelId, useMenuMobileOpen } from '~/hooks/useMenuState'
-import { ProjectConfigVariables } from '~/components/ProjectConfigVariables'
 
 const levelsData = {
   home: {
@@ -350,8 +349,6 @@ const SiteLayout = ({ children }: PropsWithChildren<{}>) => {
         <title>Supabase Docs</title>
       </Head>
       <main>
-        <ProjectConfigVariables variable="url" />
-        <ProjectConfigVariables variable="anonKey" />
         <div className="flex flex-row h-screen">
           <NavContainer />
           <Container>

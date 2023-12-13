@@ -13,7 +13,10 @@ import {
   CommandItem_Shadcn_ as CommandItem,
   CommandGroup_Shadcn_ as CommandGroup,
   cn,
+  IconCopy,
+  IconCheck,
 } from 'ui'
+import CopyToClipboard from 'react-copy-to-clipboard'
 
 interface ProjectKey {
   id: string
@@ -164,24 +167,42 @@ function ComboBox({
   isLoading: boolean
 }) {
   const [open, setOpen] = useState(false)
+  const [copied, setCopied] = useState(false)
 
-  const currentProject = projectKeysInfo.find((project) => project.id.toLowerCase() === selectedId)
+  const handleCopy = () => {
+    setCopied(true)
+    setTimeout(() => {
+      setCopied(false)
+    }, 1000)
+  }
+
+  // Conversion is necessary as Command will lowercase values
+  const currentProject = projectKeysInfo.find(
+    (project) => project.id.toLowerCase() === selectedId.toLowerCase()
+  )
   const currentSelection =
     variable === 'url' ? currentProject?.endpoint : currentProject?.keys.anonKey
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="max-w-[90%] overflow-hidden justify-between"
-        >
-          {isLoading ? 'Loading...' : currentSelection || 'Select a project...'}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
-      </PopoverTrigger>
+      <div className="flex items-center">
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className="max-w-[90%] overflow-hidden justify-between"
+          >
+            {isLoading ? 'Loading...' : currentSelection || 'Select a project...'}
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <CopyToClipboard text={currentSelection}>
+          <Button variant="ghost" onClick={handleCopy} aria-label="Copy">
+            {copied ? <IconCheck /> : <IconCopy />}
+          </Button>
+        </CopyToClipboard>
+      </div>
       <PopoverContent className="w-[200px] p-0" side="bottom">
         <Command>
           <CommandInput placeholder="Search project..." className="border-none ring-0" />
@@ -199,7 +220,9 @@ function ComboBox({
                 <Check
                   className={cn(
                     'mr-2 h-4 w-4',
-                    selectedId === project.id ? 'opacity-100' : 'opacity-0'
+                    selectedId.toLowerCase() === project.id.toLowerCase()
+                      ? 'opacity-100'
+                      : 'opacity-0'
                   )}
                 />
                 {project.id}
@@ -214,7 +237,11 @@ function ComboBox({
 
 export function ProjectConfigVariables({ variable }: { variable: 'url' | 'anonKey' }) {
   const { projectKeys, isLoading, isError } = useListAllProjectKeys()
-  const [activeId, setActiveId] = useState<string>(null)
+  const [activeId, setActiveId] = useState<string>()
+
+  if (projectKeys[0] && !activeId) {
+    setActiveId(projectKeys[0].id)
+  }
 
   if (isLoading) {
     return <span>Loading</span>
@@ -226,24 +253,13 @@ export function ProjectConfigVariables({ variable }: { variable: 'url' | 'anonKe
 
   return (
     <span>
-      {variable === 'url' && (
-        <ComboBox
-          selectedId={activeId}
-          setSelectedId={setActiveId}
-          projectKeysInfo={projectKeys}
-          variable="url"
-          isLoading={isLoading}
-        />
-      )}
-      {variable === 'anonKey' && (
-        <ComboBox
-          selectedId={activeId}
-          setSelectedId={setActiveId}
-          projectKeysInfo={projectKeys}
-          variable="anonKey"
-          isLoading={isLoading}
-        />
-      )}
+      <ComboBox
+        selectedId={activeId}
+        setSelectedId={setActiveId}
+        projectKeysInfo={projectKeys}
+        variable={variable}
+        isLoading={isLoading}
+      />
     </span>
   )
 }
