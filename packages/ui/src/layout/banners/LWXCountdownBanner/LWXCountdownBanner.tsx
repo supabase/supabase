@@ -35,7 +35,7 @@ export function LWXCountdownBanner() {
               className="filter contrast-0 dark:contrast-100"
             />
           </div>
-          <div className="hidden sm:block">Day 2: Node and native npm compatibility</div>
+          <div className="hidden sm:block">Day 3: introducing Supabase Branching</div>
           <Button
             onClick={() => null}
             size="tiny"

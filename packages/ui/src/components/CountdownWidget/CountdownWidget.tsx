@@ -15,25 +15,25 @@ function CountdownWidget({ days, hours, minutes, seconds, showCard = true }: Cou
 
   return (
     <div className="flex gap-1 items-center">
-      {days && showItem(days) ? (
+      {days !== undefined && days !== '0' ? (
         <>
           <CountdownStep value={days} unit="d" showCard={showCard} />
           <Colon />
         </>
       ) : null}
-      {hours && showItem(hours) ? (
+      {hours !== undefined ? (
         <>
           <CountdownStep value={hours} unit="h" showCard={showCard} />
           <Colon />
         </>
       ) : null}
-      {minutes && showItem(minutes) ? (
+      {minutes !== undefined ? (
         <>
           <CountdownStep value={minutes} unit="m" showCard={showCard} />
           {seconds !== undefined && <Colon />}
         </>
       ) : null}
-      {seconds && showItem(seconds) ? (
+      {seconds !== undefined ? (
         <CountdownStep value={seconds} unit="s" showCard={showCard} />
       ) : null}
     </div>

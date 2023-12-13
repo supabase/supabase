@@ -8,6 +8,13 @@
       <lastBuildDate>Tue, 12 Dec 2023 23:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/supabase-branching</guid>
+  <title>Supabase Branching</title>
+  <link>https://supabase.com/blog/supabase-branching</link>
+  <description>A Postgres database for every Pull Request.</description>
+  <pubDate>Tue, 12 Dec 2023 23:00:00 GMT</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/supavisor-postgres-connection-pooler</guid>
   <title>Supavisor 1.0: a scalable connection pooler for Postgres</title>
   <link>https://supabase.com/blog/supavisor-postgres-connection-pooler</link>
