@@ -387,11 +387,8 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                 {(values.severity === 'Urgent' || values.severity === 'High') && (
                   <p className="text-sm text-foreground-light mt-2">
                     We do our best to respond to everyone as quickly as possible; however, we
-                    prioritize things based on production status. Just as you would prefer we
-                    prioritize your production issue over someone else’s non-production one, we ask
-                    for you to only select higher severities only for production issues. For
-                    non-production issues, we reserve the right to downgrade the severity of a
-                    ticket.
+                    prioritize things based on production status. We ask that you please reserve
+                    High and Urgent severity for actual production issues.
                   </p>
                 )}
               </div>
