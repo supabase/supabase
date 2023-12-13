@@ -3,29 +3,33 @@ import { createGraphiQLFetcher, Fetcher } from '@graphiql/toolkit'
 import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
 import { useTheme } from 'next-themes'
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 
 import ExtensionCard from 'components/interfaces/Database/Extensions/ExtensionCard'
 import GraphiQL from 'components/interfaces/GraphQL/GraphiQL'
 import { DocsLayout } from 'components/layouts'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Connecting from 'components/ui/Loading/Loading'
 import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { useStore } from 'hooks'
+import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { getRoleImpersonationJWT } from 'lib/role-impersonation'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { NextPageWithLayout } from 'types'
 
 const GraphiQLPage: NextPageWithLayout = () => {
-  const { ui, meta } = useStore()
   const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
+  const { project } = useProjectContext()
   const currentTheme = resolvedTheme?.includes('dark') ? 'dark' : 'light'
 
-  const isExtensionsLoading = meta.extensions.isLoading
-  const pgGraphqlExtension = meta.extensions.byId('pg_graphql')
+  const { data, isLoading: isExtensionsLoading } = useDatabaseExtensionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const pgGraphqlExtension = (data ?? []).find((ext) => ext.name === 'pg_graphql')
 
   const { data: accessToken } = useSessionAccessTokenQuery({ enabled: IS_PLATFORM })
   const { data: settings, isFetched } = useProjectApiQuery({ projectRef })
@@ -37,13 +41,6 @@ const GraphiQLPage: NextPageWithLayout = () => {
 
   const { data: config } = useProjectPostgrestConfigQuery({ projectRef })
   const jwtSecret = config?.jwt_secret
-
-  useEffect(() => {
-    if (ui.selectedProjectRef) {
-      // Schemas may be needed when enabling the GraphQL extension
-      meta.extensions.load()
-    }
-  }, [ui.selectedProjectRef])
 
   const getImpersonatedRole = useGetImpersonatedRole()
 

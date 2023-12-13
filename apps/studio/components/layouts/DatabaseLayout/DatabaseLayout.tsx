@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 
 import ProductMenu from 'components/ui/ProductMenu'
+import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSelectedProject, useStore, withAuth } from 'hooks'
 import ProjectLayout from '../'
 import { generateDatabaseMenu } from './DatabaseMenu.utils'
@@ -18,15 +19,18 @@ const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) =>
   const router = useRouter()
   const page = router.pathname.split('/')[4]
 
-  const vaultExtension = meta.extensions.byId('supabase_vault')
+  const { data } = useDatabaseExtensionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const vaultExtension = (data ?? []).find((ext) => ext.name === 'supabase_vault')
   const isVaultEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null
-  const pgNetExtensionExists = meta.extensions.byId('pg_net') !== undefined
+  const pgNetExtensionExists = (data ?? []).find((ext) => ext.name === 'pg_net') !== undefined
 
   useEffect(() => {
     if (ui.selectedProjectRef) {
       meta.roles.load()
       meta.triggers.load()
-      meta.extensions.load()
       meta.publications.load()
     }
   }, [ui.selectedProjectRef])
