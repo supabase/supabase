@@ -1,6 +1,6 @@
 ---
 title: 'Supabase Branching'
-description: 'We are rolling out access to early-access subscribers.'
+description: 'A Postgres database for every Pull Request.'
 launchweek: X
 categories:
   - product
@@ -18,9 +18,9 @@ thumb: lwx-supabase-branching/thumb.png
 
 A few months ago we mentioned that we were working on Branching with a (somewhat ambitious) early-access form.
 
-Today we are rolling out access to early-access subscribers. Internally, we were hoping to make this public access for this Launch Week but, well, [_we did say this was hard_](https://supabase.com/blog/supabase-local-dev#supabase-branching-is-hard).
+Today we are rolling out access to early-access subscribers. Internally, we were hoping to make this public access for this Launch Week but, well, [_we did say this was hard_](/blog/supabase-local-dev#supabase-branching-is-hard).
 
-We are operating on a first-signed-up, first-served basis. For now, we are onboarding organizations on paid plans.
+We're operating on a first-signed-up, first-served basis, rolling it out in batches to paid orgs in who registered for early access.
 
 <Img
   src={{
@@ -32,13 +32,13 @@ We are operating on a first-signed-up, first-served basis. For now, we are onboa
   captionAlign="left"
 />
 
-## What’s Branching?
+## What's Branching?
 
-At some point during your app development, you may want to experiment with some changes to your Postgres database. Today it’s possible to experiment on your development machine. When you run `supabase start` with the Supabase CLI to get the entire stack running locally.
+At some point during your app development, you may want to experiment with some changes to your Postgres database. Today it's possible to experiment on your development machine. When you run `supabase start` with the Supabase CLI to get the entire stack running locally.
 
 This is a great solution - you can play around with ideas and run `supabase db reset` whenever you want to start again. When you want to capture your changes in a database migration, you can run `supabase db diff`.
 
-Branching is a natural extension of this. You can do the above, and when your migration files are committed to a Git branch you simply “`git push`" and we’ll run those migrations on a _remote_ Supabase Preview Branch for you.
+Branching is a natural extension of this. You can do the above, and when your migration files are committed to a Git branch you simply “`git push`" and we'll run those migrations on a _remote_ Supabase Preview Branch for you.
 
 <Img
   alt="Tweet showing Guillermo Rauch mentioning Supabase as one of the companies compatible with the Next.js App Router"
@@ -56,7 +56,7 @@ Your git branches can all have their own Supabase Preview branch.
 
 Each Git branch has its own corresponding Supabase Preview branch, and file changes are monitored automatically from your connected GitHub repository. The rest should feel familiar: when you merge a Pull Request into your main Git branch, Supabase will run all newly added migrations inside your Production database.
 
-Your project’s Preview Branches are designed with safety in mind. They are isolated instances, each with their own set of API keys and database passwords. They contain all the features of Supabase: a Postgres database, Auth, File Storage, Realtime, Edge Functions, and Data APIs.
+Your project's Preview Branches are designed with safety in mind. They are isolated instances, each with their own set of API keys and database passwords. They contain all the features of Supabase: a Postgres database, Auth, File Storage, Realtime, Edge Functions, and Data APIs.
 
 <Img
   alt="Tweet showing Guillermo Rauch mentioning Supabase as one of the companies compatible with the Next.js App Router"
@@ -72,11 +72,11 @@ Your project’s Preview Branches are designed with safety in mind. They are iso
 
 Every Preview branch has its own dedicated instance, with a full suite of Supabase services.
 
-Even in relaxed developer environments, if one of your team accidentally leak a key, it won’t affect your Production branch.
+Even in relaxed developer environments, if one of your team accidentally leak a key, it won't affect your Production branch.
 
 ### Support for Vercel Previews
 
-We’ve designed Supabase Branching to work perfectly with Vercel’s [Preview](https://vercel.com/features/previews) deployments. This means that you get an _entire stack_ with Branching. Your application preview is deployed via Vercel, and the Vercel preview deployment is using the backend of the Supabase Preview branch.
+We've designed Supabase Branching to work perfectly with Vercel's [Preview](https://vercel.com/features/previews) deployments. This means that you get an _entire stack_ with Branching. Your application preview is deployed via Vercel, and the Vercel preview deployment is using the backend of the Supabase Preview branch.
 
 <Img
   alt="Tweet showing Guillermo Rauch mentioning Supabase as one of the companies compatible with the Next.js App Router"
@@ -92,7 +92,7 @@ We’ve designed Supabase Branching to work perfectly with Vercel’s [Preview](
 
 Vercel will build your preview deployments, and your preview deployment can connect to the Supabase services on your Preview Branch.
 
-We’ve made several improvements to our [Vercel Integration](https://vercel.com/integrations/supabase-v2) to make this Vercel experience seamless. For example, since we provide distinct, secure database credentials for every Supabase Preview Branch, we automatically populate the environment variables on Vercel with the connection secrets your app needs to connect to the Preview Branch.
+We've made several improvements to our [Vercel Integration](https://vercel.com/integrations/supabase-v2) to make this Vercel experience seamless. For example, since we provide distinct, secure database credentials for every Supabase Preview Branch, we automatically populate the environment variables on Vercel with the connection secrets your app needs to connect to the Preview Branch.
 
 <Img
   alt="Tweet showing Guillermo Rauch mentioning Supabase as one of the companies compatible with the Next.js App Router"
@@ -112,27 +112,27 @@ The configuration goes both ways! When a new deployment is created in Vercel, we
 
 One of the most well-loved features of Supabase is the dashboard. Even if we [beg](https://supabase.com/docs/guides/platform/maturity-model#in-production), it seems that developers simply want to use it for everything - even in production.
 
-The cool thing about Branching is that every Preivew Branch can be managed from the Dashboard. You can make schema changes, access the settings, and use the [new AI Assistant](https://supabase.com/blog/studio-introducing-assistant). Once you’re happy with your changes, you simply run `supabase db diff` and you can commit everything to your local machine.
+The cool thing about Branching is that every Preivew Branch can be managed from the Dashboard. You can make schema changes, access the settings, and use the [new AI Assistant](https://supabase.com/blog/studio-introducing-assistant). Once you're happy with your changes, you simply run `supabase db diff` and you can commit everything to your local machine.
 
 Just note that we _still_ want you to develop locally! You should treat the Preview Branches like cattle, not pets. Your changes can be wiped at any time if one of your team pushes a destructive migration.
 
 ### Database migrations
 
-We’ve developed Branching to work with a Git provider, starting with GitHub. We’ve developed a GitHub app that watches for changes inside your connected GitHub repository.
+We've developed Branching to work with a Git provider, starting with GitHub. We've developed a GitHub app that watches for changes inside your connected GitHub repository.
 
 When you open a Pull Request to your connected repo, the app will automatically launch a Preview Branch and apply the schema migrations in `./supabase/migrations` directory. Any errors from running the migrations will be logged to the [Check Run](https://docs.github.com/en/rest/checks/runs?apiVersion=2022-11-28) associated with that git commit. When all checks turn green, your new Preview Branch is ready to use.
 
 When you push a new migration file to the Git branch, the app will run it incrementally on your existing Preview Branch. This allows you verify schema changes easily on existing seed data.
 
-Finally, when you merge that PR, the app will run all newly merged migrations on your Production environment. If you have other PRs already open, make sure to update those migration files to a later timestamp than the ones in Production branch. Other than this being easy, it’s worth stressing that you are then following a [standard migration practice](https://supabase.com/docs/guides/cli/managing-environments).
+Finally, when you merge that PR, the app will run all newly merged migrations on your Production environment. If you have other PRs already open, make sure to update those migration files to a later timestamp than the ones in Production branch. Other than this being easy, it's worth stressing that you are then following a [standard migration practice](https://supabase.com/docs/guides/cli/managing-environments).
 
 ### Data seeding
 
 You can seed your Preview branch in the same way that you [seed your local development environment](https://supabase.com/docs/guides/cli/seeding-your-database). Just add `./supabase/seed.sql` in your repo and the seed script will run when the Preview Branch is first created.
 
-Optionally, you can reset your branch database by running `supabase db reset --db-url <branch-connection-string>`. The branch connection string can be retrieved using your Personal Access Token with Supabase CLI’s [branch management](https://supabase.com/docs/reference/cli/supabase-branches-get) commands.
+Optionally, you can reset your branch database by running `supabase db reset --db-url <branch-connection-string>`. The branch connection string can be retrieved using your Personal Access Token with Supabase CLI's [branch management](https://supabase.com/docs/reference/cli/supabase-branches-get) commands.
 
-In the future we’ll investigate data masking techniques with a copy-on-write system so that you can emulate a production workload inside your Preview Branches (we plan for this to work with File Storage too).
+In the future we'll investigate data masking techniques with a copy-on-write system so that you can emulate a production workload inside your Preview Branches (we plan for this to work with File Storage too).
 
 <Admonition type="note" label="Testing with product workloads today?">
 
@@ -142,23 +142,23 @@ If you need to test with production workloads today, check out [Snaplet](https:/
 
 ## Future considerations
 
-That’s already a lot for Branching v0. Branching will be a core part of the developer workflow in the future. These are the themes we’ll explore next:
+That's already a lot for Branching v0. Branching will be a core part of the developer workflow in the future. These are the themes we'll explore next:
 
 ### Migration queues
 
-We’ll give you more visibility into the schedules of the migration runner. This will be useful for debugging. The first step here is simply showing which Preview Branches are queued and actively running. This is our first priority.
+We'll give you more visibility into the schedules of the migration runner. This will be useful for debugging. The first step here is simply showing which Preview Branches are queued and actively running. This is our first priority.
 
 ### Declarative config
 
-We’re still working on “configuration in code”. For example, you might want to try a different Google Auth in your Preview Branch than the one you use in Product. This would be a lot easier if the code was declarative, inside the [config.toml](https://supabase.com/docs/guides/cli/config) file.
+We're still working on “configuration in code”. For example, you might want to try a different Google Auth in your Preview Branch than the one you use in Product. This would be a lot easier if the code was declarative, inside the [config.toml](https://supabase.com/docs/guides/cli/config) file.
 
 ### Automatic dashboard commits
 
-In the current version, when you use the dashboard to create a change on a Preview Branch, you need to run `db diff` locally to pull that change into your Git repository. That will change. We will work on a feature to automatically capture your changes in a Git repo that you’ve connected.
+In the current version, when you use the dashboard to create a change on a Preview Branch, you need to run `db diff` locally to pull that change into your Git repository. That will change. We will work on a feature to automatically capture your changes in a Git repo that you've connected.
 
 ### Extended seeding behavior
 
-There are a multitude of different strategies for populating seed data. We’ve dabbled with AI to generate a seed data, which was fun. We also like the approach of [postgresql-anonymizer](https://postgresql-anonymizer.readthedocs.io/en/stable/) and [Snaplet](https://docs.snaplet.dev/recipes/supabase), who specialize in cloning production data while anonymizing the data for safe development.
+There are a multitude of different strategies for populating seed data. We've dabbled with AI to generate a seed data, which was fun. We also like the approach of [postgresql-anonymizer](https://postgresql-anonymizer.readthedocs.io/en/stable/) and [Snaplet](https://docs.snaplet.dev/recipes/supabase), who specialize in cloning production data while anonymizing the data for safe development.
 
 ### Copy-on-write
 
@@ -170,12 +170,12 @@ Once our GitHub app integration is matured, we will expose all the same logic in
 
 ### Auto deploy functions
 
-Edge functions could auto deploy to your Preview branches on git push events. It’s worth also mentioning that support for deploying Edge functions to non-Branching Supabase projects is also being investigated; this would be an alternative to manually adding GitHub actions.
+Edge functions could auto deploy to your Preview branches on git push events. It's worth also mentioning that support for deploying Edge functions to non-Branching Supabase projects is also being investigated; this would be an alternative to manually adding GitHub actions.
 
 ## Interested in using Branching?
 
-We still have our early access form open, and we’ll be consistently onboarding new organizations over the next few days and weeks.
+We still have our early access form open, and we'll be consistently onboarding new organizations over the next few days and weeks.
 
-It’s important to note, that we highly recommend you should not use Branching for any of your applications that are in production.
+It's important to note, that we highly recommend you should not use Branching for any of your applications that are in production.
 
 You can check out the docs for Branching and also if you have any feedback, [you can join the discussion here](https://github.com/orgs/supabase/discussions/18937).
