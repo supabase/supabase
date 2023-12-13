@@ -1,23 +1,30 @@
-import { useEffect } from 'react'
-import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 import { Tabs } from 'ui'
 
-import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
-import { NextPageWithLayout } from 'types'
+import { SecretsManagement, VaultToggle } from 'components/interfaces/Settings/Vault'
 import { SettingsLayout } from 'components/layouts'
-import { VaultToggle, SecretsManagement } from 'components/interfaces/Settings/Vault'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormHeader } from 'components/ui/Forms'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
+import { useStore } from 'hooks'
+import { NextPageWithLayout } from 'types'
 
 const VaultSettingsSecrets: NextPageWithLayout = () => {
   const router = useRouter()
-  const { meta, vault } = useStore()
+  const { vault } = useStore()
   const { ref } = useParams()
+  const { project } = useProjectContext()
 
-  const vaultExtension = meta.extensions.byId('supabase_vault')
-  const isLoading = meta.extensions.isLoading
+  const { data, isLoading } = useDatabaseExtensionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
+  const vaultExtension = (data ?? []).find((ext) => ext.name === 'supabase_vault')
   const isEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null
 
   useEffect(() => {
