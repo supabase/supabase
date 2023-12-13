@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react'
+import { CSSProperties, Dispatch, SetStateAction, useEffect, useRef, useState } from 'react'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { get } from '~/lib/fetchWrappers'
 import { paths } from '~/types/api'
@@ -12,11 +12,20 @@ import {
   CommandEmpty_Shadcn_ as CommandEmpty,
   CommandItem_Shadcn_ as CommandItem,
   CommandGroup_Shadcn_ as CommandGroup,
+  Input_Shadcn_ as Input,
   cn,
   IconCopy,
   IconCheck,
 } from 'ui'
 import CopyToClipboard from 'react-copy-to-clipboard'
+import { proxy, useSnapshot } from 'valtio'
+
+const selectedProject = proxy({
+  selectedId: null,
+  setSelectedId: (id: string) => {
+    selectedProject.selectedId = id
+  },
+})
 
 interface ProjectKey {
   id: string
@@ -159,51 +168,38 @@ function ComboBox({
   selectedId,
   setSelectedId,
   isLoading,
+  className,
 }: {
   projectKeysInfo: ProjectKey[]
   variable: 'url' | 'anonKey'
   selectedId: string | null
   setSelectedId: Dispatch<SetStateAction<string>>
   isLoading: boolean
+  className?: string
 }) {
   const [open, setOpen] = useState(false)
-  const [copied, setCopied] = useState(false)
-
-  const handleCopy = () => {
-    setCopied(true)
-    setTimeout(() => {
-      setCopied(false)
-    }, 1000)
-  }
 
   // Conversion is necessary as Command will lowercase values
   const currentProject = projectKeysInfo.find(
-    (project) => project.id.toLowerCase() === selectedId.toLowerCase()
+    (project) => project.id.toLowerCase() === selectedId?.toLowerCase()
   )
-  const currentSelection =
-    variable === 'url' ? currentProject?.endpoint : currentProject?.keys.anonKey
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <div className="flex items-center">
+      <div className={cn('flex items-center', className)}>
         <PopoverTrigger asChild aria-label={`Select and copy ${variable}`}>
           <Button
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="max-w-[90%] overflow-hidden justify-between"
+            className="overflow-hidden justify-between border-none px-1"
           >
-            {isLoading ? 'Loading...' : currentSelection || 'Select a project...'}
+            {isLoading ? 'Loading...' : currentProject?.id || 'Select a project...'}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <CopyToClipboard text={currentSelection}>
-          <Button variant="ghost" onClick={handleCopy} aria-label="Copy">
-            {copied ? <IconCheck /> : <IconCopy />}
-          </Button>
-        </CopyToClipboard>
       </div>
-      <PopoverContent className="w-[200px] p-0" side="bottom">
+      <PopoverContent className="z-[999999] p-0" side="bottom">
         <Command>
           <CommandInput placeholder="Search project..." className="border-none ring-0" />
           <CommandEmpty>No project found.</CommandEmpty>
@@ -220,7 +216,7 @@ function ComboBox({
                 <Check
                   className={cn(
                     'mr-2 h-4 w-4',
-                    selectedId.toLowerCase() === project.id.toLowerCase()
+                    selectedId?.toLowerCase() === project.id.toLowerCase()
                       ? 'opacity-100'
                       : 'opacity-0'
                   )}
@@ -236,12 +232,27 @@ function ComboBox({
 }
 
 export function ProjectConfigVariables({ variable }: { variable: 'url' | 'anonKey' }) {
+  const { selectedId, setSelectedId } = useSnapshot(selectedProject)
   const { projectKeys, isLoading, isError } = useListAllProjectKeys()
-  const [activeId, setActiveId] = useState<string>()
+  const [copied, setCopied] = useState(false)
 
-  if (projectKeys[0] && !activeId) {
-    setActiveId(projectKeys[0].id)
+  const handleCopy = () => {
+    setCopied(true)
+    setTimeout(() => {
+      setCopied(false)
+    }, 1000)
   }
+
+  if (projectKeys[0] && !selectedId) {
+    setSelectedId(projectKeys[0].id)
+  }
+
+  const currentProject = (projectKeys ?? []).find(
+    // Lowercasing is necessary as Command will lowercase values under the hood
+    (project) => project.id.toLowerCase() === selectedId?.toLowerCase()
+  )
+  const currentSelection =
+    variable === 'url' ? currentProject?.endpoint : currentProject?.keys.anonKey
 
   if (isLoading) {
     return <span>Loading</span>
@@ -252,15 +263,33 @@ export function ProjectConfigVariables({ variable }: { variable: 'url' | 'anonKe
   }
 
   return (
-    <>
-      <span>{variable === 'url' ? 'Project URL' : 'Anon key'}</span>
-      <ComboBox
-        selectedId={activeId}
-        setSelectedId={setActiveId}
-        projectKeysInfo={projectKeys}
-        variable={variable}
-        isLoading={isLoading}
-      />
-    </>
+    <div
+      style={{ '--copy-button-size': '50px' } as CSSProperties}
+      className="max-w-[min(100%, 500px)] my-4"
+    >
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span>{variable === 'url' ? 'Project URL' : 'Anon key'}</span>
+        <div className="flex justify-between">
+          <ComboBox
+            selectedId={selectedId}
+            setSelectedId={setSelectedId}
+            projectKeysInfo={projectKeys}
+            variable={variable}
+            isLoading={isLoading}
+          />
+          <CopyToClipboard text={currentSelection}>
+            <Button
+              variant="ghost"
+              className="w-[var(--copy-button-size)]"
+              onClick={handleCopy}
+              aria-label="Copy"
+            >
+              {copied ? <IconCheck /> : <IconCopy />}
+            </Button>
+          </CopyToClipboard>
+        </div>
+      </div>
+      <Input disabled type="text" value={currentSelection} />
+    </div>
   )
 }
