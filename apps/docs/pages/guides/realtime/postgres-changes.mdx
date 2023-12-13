@@ -244,7 +244,7 @@ supabase
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-val myChannel = supabase.realtime.createChannel("schema-db-changes")
+val myChannel = supabase.channel("schema-db-changes")
 
 val changes = myChannel.postgresChangeFlow<PostgresAction>(schema = "public")
 
@@ -258,8 +258,7 @@ changes
     }
     .launchIn(yourCoroutineScope)
 
-supabase.realtime.connect()
-myChannel.join()
+myChannel.subscribe()
 ```
 
 </TabPanel>
@@ -313,7 +312,7 @@ final changes = supabase
 Use `PostgresAction.Insert` as type to listen only to database `INSERT`s:
 
 ```kotlin
-val myChannel = supabase.realtime.createChannel("db-changes")
+val myChannel = supabase.channel("db-changes")
 
 val changes = myChannel.postgresChangeFlow<PostgresAction.Insert>(schema = "public")
 
@@ -323,8 +322,7 @@ changes
     }
     .launchIn(yourCoroutineScope)
 
-supabase.realtime.connect()
-myChannel.join()
+myChannel.subscribe()
 ```
 
 </TabPanel>
@@ -378,7 +376,7 @@ supabase
 Use `PostgresAction.Update` as type to listen only to database `UPDATE`s:
 
 ```kotlin
-val myChannel = supabase.realtime.createChannel("db-changes")
+val myChannel = supabase.channel("db-changes")
 
 val changes = myChannel.postgresChangeFlow<PostgresAction.Update>(schema = "public")
 
@@ -388,8 +386,7 @@ changes
     }
     .launchIn(yourCoroutineScope)
 
-supabase.realtime.connect()
-myChannel.join()
+myChannel.subscribe()
 ```
 
 </TabPanel>
@@ -443,7 +440,7 @@ supabase
 Use `PostgresAction.Delete` as type to listen only to database `DELETE`s:
 
 ```kotlin
-val myChannel = supabase.realtime.createChannel("db-changes")
+val myChannel = supabase.channel("db-changes")
 
 val changes = myChannel.postgresChangeFlow<PostgresAction.Delete>(schema = "public")
 
@@ -453,8 +450,7 @@ changes
     }
     .launchIn(yourCoroutineScope)
 
-supabase.realtime.connect()
-myChannel.join()
+myChannel.subscribe()
 ```
 
 </TabPanel>
@@ -508,7 +504,7 @@ supabase
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-val myChannel = supabase.realtime.createChannel("db-changes")
+val myChannel = supabase.channel("db-changes")
 
 val changes = myChannel.postgresChangeFlow<PostgresAction>(schema = "public") {
     table = "todos"
@@ -520,8 +516,7 @@ changes
     }
     .launchIn(yourCoroutineScope)
 
-supabase.realtime.connect()
-myChannel.join()
+myChannel.subscribe()
 ```
 
 </TabPanel>
@@ -589,15 +584,14 @@ supabase
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-val myChannel = supabase.realtime.createChannel("db-changes")
+val myChannel = supabase.channel("db-changes")
 val messageChanges = myChannel.postgresChangeFlow<PostgresAction>(schema = "public") {
     table = "messages"
 }
 val userChanges = myChannel.postgresChangeFlow<PostgresAction.Insert>(schema = "public") {
     table = "users"
 }
-supabase.realtime.connect()
-myChannel.join()
+myChannel.subscribe()
 ```
 
 </TabPanel>
@@ -655,7 +649,7 @@ const changes = client
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-val myChannel = supabase.realtime.createChannel("db-changes")
+val myChannel = supabase.channel("db-changes")
 
 val changes = myChannel.postgresChangeFlow<PostgresAction.Insert>(schema = "public") {
     table = "todos"
@@ -668,8 +662,7 @@ changes
     }
     .launchIn(yourCoroutineScope)
 
-supabase.realtime.connect()
-myChannel.join()
+myChannel.subscribe()
 ```
 
 </TabPanel>
@@ -731,7 +724,7 @@ supabase
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-val myChannel = supabase.realtime.createChannel("db-changes")
+val myChannel = supabase.channel("db-changes")
 
 val changes = myChannel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
     table = "messages"
@@ -744,8 +737,7 @@ changes
     }
     .launchIn(yourCoroutineScope)
 
-supabase.realtime.connect()
-myChannel.join()
+myChannel.subscribe()
 ```
 
 </TabPanel>
@@ -879,7 +871,7 @@ supabase
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-val myChannel = supabase.realtime.createChannel("db-changes")
+val myChannel = supabase.channel("db-changes")
 
 val changes = myChannel.postgresChangeFlow<PostgresAction.Insert>(schema = "public") {
     table = "profiles"
@@ -892,8 +884,7 @@ changes
     }
     .launchIn(yourCoroutineScope)
 
-supabase.realtime.connect()
-myChannel.join()
+myChannel.subscribe()
 ```
 
 </TabPanel>
@@ -953,7 +944,7 @@ supabase
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-val myChannel = supabase.realtime.createChannel("db-changes")
+val myChannel = supabase.channel("db-changes")
 
 val changes = myChannel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
     table = "profiles"
@@ -966,8 +957,7 @@ changes
     }
     .launchIn(yourCoroutineScope)
 
-supabase.realtime.connect()
-myChannel.join()
+myChannel.subscribe()
 ```
 
 </TabPanel>
@@ -1027,7 +1017,7 @@ supabase
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-val myChannel = supabase.realtime.createChannel("db-changes")
+val myChannel = supabase.channel("db-changes")
 
 val changes = myChannel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
     table = "products"
@@ -1040,8 +1030,7 @@ changes
     }
     .launchIn(yourCoroutineScope)
 
-supabase.realtime.connect()
-myChannel.join()
+myChannel.subscribe()
 ```
 
 </TabPanel>
@@ -1101,7 +1090,7 @@ supabase
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-val myChannel = supabase.realtime.createChannel("db-changes")
+val myChannel = supabase.channel("db-changes")
 
 val changes = myChannel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
     table = "products"
@@ -1114,8 +1103,7 @@ changes
     }
     .launchIn(yourCoroutineScope)
 
-supabase.realtime.connect()
-myChannel.join()
+myChannel.subscribe()
 ```
 
 </TabPanel>
@@ -1175,7 +1163,7 @@ supabase
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-val myChannel = supabase.realtime.createChannel("db-changes")
+val myChannel = supabase.channel("db-changes")
 
 val changes = myChannel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
     table = "products"
@@ -1188,8 +1176,7 @@ changes
     }
     .launchIn(yourCoroutineScope)
 
-supabase.realtime.connect()
-myChannel.join()
+myChannel.subscribe()
 ```
 
 </TabPanel>
@@ -1303,7 +1290,7 @@ val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
 		jwtToken = "your-custom-jwt"
 	}
 }
-val myChannel = supabase.realtime.createChannel("db-changes")
+val myChannel = supabase.channel("db-changes")
 
 val changes = myChannel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
     table = "products"
@@ -1316,8 +1303,7 @@ changes
     }
     .launchIn(yourCoroutineScope)
 
-supabase.realtime.connect()
-myChannel.join()
+myChannel.subscribe()
 ```
 
 </TabPanel>

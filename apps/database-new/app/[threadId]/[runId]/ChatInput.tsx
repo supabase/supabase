@@ -24,6 +24,8 @@ function ChatInput({ params }: { params: { threadId: string; runId: string } }) 
   const Message = () => {
     const { pending } = useFormStatus()
 
+    console.log('state.message', state.message)
+
     return !state.success && state.success !== undefined && !pending ? (
       <p className="text-xs text-warning text-center w-full p-3">{state.message}</p>
     ) : null
@@ -40,7 +42,7 @@ function ChatInput({ params }: { params: { threadId: string; runId: string } }) 
           // loading
           // ? 'Generating reply to request...'
           // :
-          'Ask for some changes on the selected message'
+          'Any changes to make?'
         }
         onValueChange={(v) => setValue(v.target.value)}
         message={state.message}

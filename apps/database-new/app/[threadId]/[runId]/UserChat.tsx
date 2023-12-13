@@ -1,12 +1,12 @@
 'use client'
 
 import { useAppStateSnapshot } from '@/lib/state'
-import { AssistantMessage, UserMessage } from '@/lib/types'
+import { pull } from 'lodash'
+import Link from 'next/link'
 import { useParams, usePathname, useRouter } from 'next/navigation'
 import OpenAI from 'openai'
-import { cn } from 'ui'
-import { pull } from 'lodash'
 import { useEffect } from 'react'
+import { cn } from 'ui'
 
 interface UserChatProps {
   message: OpenAI.Beta.Threads.Messages.ThreadMessage
@@ -57,19 +57,16 @@ const UserChat = ({ message, isLatest, times, run }: UserChatProps) => {
   const text = message_content.type === 'text' ? message_content.text.value : ''
 
   return (
-    <div
+    <Link
       className={cn(
         'group',
         'transition flex w-full gap-x-5 px-4 xl:px-8 hover:bg-surface-200/50 cursor-pointer border-r',
         isSelected && 'bg-surface-200',
         isSelected ? 'border-r-foreground' : 'border-r border-r-transparent'
       )}
-      onClick={() => {
-        router.push(`/${threadId}/${runId}/${message.id}`)
-      }}
+      href={`/${threadId}/${runId}/${message.id}`}
     >
       <div className="flex flex-col justify-between items-center relative top-3">
-        {/* Node */}
         <div
           className={cn(
             'transition w-2.5 h-2.5 mt-[1px] ml-[1px] rounded-full border',
@@ -146,7 +143,7 @@ const UserChat = ({ message, isLatest, times, run }: UserChatProps) => {
           </p>
         )}
       </div>
-    </div>
+    </Link>
   )
 }
 
