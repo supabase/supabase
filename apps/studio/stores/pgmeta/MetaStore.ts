@@ -17,7 +17,6 @@ import { ResponseError } from 'types'
 
 import { IPostgresMetaInterface } from '../common/PostgresMetaInterface'
 import { IRootStore } from '../RootStore'
-import ColumnStore from './ColumnStore'
 import OpenApiStore, { IOpenApiStore } from './OpenApiStore'
 import TableStore, { ITableStore } from './TableStore'
 
@@ -38,9 +37,8 @@ import { getQueryClient } from 'data/query-client'
 import { tableKeys } from 'data/tables/keys'
 import { getTable } from 'data/tables/table-query'
 import { getTables } from 'data/tables/tables-query'
+import PostgresMetaInterface from '../common/PostgresMetaInterface'
 import ExtensionsStore from './ExtensionsStore'
-import FunctionsStore from './FunctionsStore'
-import PoliciesStore from './PoliciesStore'
 import PublicationStore from './PublicationStore'
 import RolesStore, { IRolesStore } from './RolesStore'
 import TriggersStore from './TriggersStore'
@@ -140,13 +138,13 @@ export default class MetaStore implements IMetaStore {
   rootStore: IRootStore
   openApi: OpenApiStore
   tables: TableStore
-  columns: ColumnStore
+  columns: PostgresMetaInterface<PostgresColumn>
   views: ViewStore
 
   roles: RolesStore
-  policies: PoliciesStore
+  policies: PostgresMetaInterface<any>
   triggers: TriggersStore
-  functions: FunctionsStore
+  functions: PostgresMetaInterface<any>
   extensions: ExtensionsStore
   publications: PublicationStore
 
@@ -172,13 +170,25 @@ export default class MetaStore implements IMetaStore {
       `${API_URL}/projects/${this.projectRef}/api/rest`
     )
     this.tables = new TableStore(this.rootStore, `${this.baseUrl}/tables`, this.headers)
-    this.columns = new ColumnStore(this.rootStore, `${this.baseUrl}/columns`, this.headers)
+    this.columns = new PostgresMetaInterface(
+      this.rootStore,
+      `${this.baseUrl}/columns`,
+      this.headers
+    )
     this.views = new ViewStore(this.rootStore, `${this.baseUrl}/views`, this.headers)
 
     this.roles = new RolesStore(this.rootStore, `${this.baseUrl}/roles`, this.headers)
-    this.policies = new PoliciesStore(this.rootStore, `${this.baseUrl}/policies`, this.headers)
+    this.policies = new PostgresMetaInterface(
+      this.rootStore,
+      `${this.baseUrl}/policies`,
+      this.headers
+    )
     this.triggers = new TriggersStore(this.rootStore, `${this.baseUrl}/triggers`, this.headers)
-    this.functions = new FunctionsStore(this.rootStore, `${this.baseUrl}/functions`, this.headers)
+    this.functions = new PostgresMetaInterface(
+      this.rootStore,
+      `${this.baseUrl}/functions`,
+      this.headers
+    )
     this.extensions = new ExtensionsStore(
       this.rootStore,
       `${this.baseUrl}/extensions`,
