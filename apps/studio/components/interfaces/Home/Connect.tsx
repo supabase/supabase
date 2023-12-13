@@ -24,23 +24,20 @@ import {
 
 import { DATA, LIBS } from './Connect.utils'
 import CopyButton from 'components/ui/CopyButton'
+import DatabaseConnectionString from '../Settings/Database/DatabaseSettings/DatabaseConnectionString'
 
 const Connect = () => {
-  const { ref } = useParams()
-  //const project = useSelectedProject()
-  //const [open, setOpen] = useState(false)
   const [hoveredItem, setHoveredItem] = useState(DATA[0])
   const [libSelectorOpen, setLibSelectorOpen] = useState(false)
   const [selectedLib, setSelectedLib] = useState(LIBS[0].key)
 
   function onSelectLib(key: string) {
-    console.log('key', key)
     setSelectedLib(key)
     setLibSelectorOpen(false)
   }
   return (
     <div>
-      <Dialog_Shadcn_ open={true}>
+      <Dialog_Shadcn_>
         <DialogTrigger_Shadcn_ asChild>
           <Button type="secondary">
             <span className="flex items-center gap-2">
@@ -58,7 +55,7 @@ const Connect = () => {
 
           <div className="w-full">
             <div className="flex gap-4 ">
-              <div className="text-sm w-4/6 shrink-0">
+              <div className="text-sm w-3/5 shrink-0">
                 <ul className="grid gap-4">
                   {DATA.map((item) => (
                     <li key={item.key} onMouseEnter={() => setHoveredItem(item)}>
@@ -162,7 +159,9 @@ const Connect = () => {
               </div>
             </Tabs.Panel>
             <Tabs.Panel id="connection_strings" label="Connection strings" key="connection_strings">
-              <div className="bg-surface-300 p-4">aeu</div>
+              <div className="bg-surface-300 p-4">
+                <DatabaseConnectionString />
+              </div>
             </Tabs.Panel>
           </Tabs>
 

@@ -3,7 +3,7 @@ export const DATA = [
     key: 'project_url',
     label: 'Project URL',
     value: 'https://vfdwrixrngvznobuouxs.supabase.red',
-    description: `A RESTful endpoint for querying and managing your database. Put this in your .env file elit.`,
+    description: `A RESTful endpoint for querying and managing your database. Put this in your .env file.`,
     type: 'info',
   },
   {
@@ -11,15 +11,14 @@ export const DATA = [
     label: 'Anon key',
     value: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzd...',
     description:
-      'This key is safe to use in a browser if you have enabled Row Level Security for your tables and configured policies.',
+      'This key is safe to use in a browser with Row Level Security enabled and policies configured.',
     type: 'info',
   },
   {
     key: 'service_key',
     label: 'Service key',
     value: 'eyehjGcaOiJIazI1NiIhetnetEHdeh3HEnCJ9.eyJpc3MiOiJzd...',
-    description:
-      'This key is used to access your database from a server environment. Do not expose this key publicly.',
+    description: `This key is used to access your database from a server environment. Do not expose this key publicly.`,
     type: 'warning',
   },
 ]
