@@ -632,6 +632,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/blog/supavisor-postgres-connection-pooler-ga',
+    destination: '/blog/supavisor-postgres-connection-pooler',
+  },
+  {
+    permanent: true,
     source: '/blog/2022/06/15/blog/2022/06/29/visualizing-supabase-data-using-metabase',
     destination: '/blog/visualizing-supabase-data-using-metabase',
   },

@@ -98,6 +98,7 @@ const LWXMeetups = ({ meetups }: { meetups?: Meetup[] }) => {
 
               return (
                 <Link
+                  key={meetup.id}
                   href={meetup.link ?? ''}
                   target="_blank"
                   onClick={() => handleSelectMeetup(meetup)}
