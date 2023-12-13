@@ -18,7 +18,7 @@ Hooks might help you:
 - Add additional custom claims to your JWT
 
 
-You can use hooks at specific points along an Auth flow and you can perform custom behaviour via PostgreSQL Functions supplied which conform to the signature specified by Supabase.  Currently, the following hooks are available
+You can use hooks at specific points along an Auth flow to perform custom behaviour via PostgreSQL Functions.  Currently, the following hooks are available:
 
 **Teams and** **Enterprise**
 
@@ -29,6 +29,8 @@ You can use hooks at specific points along an Auth flow and you can perform cust
 
 - Custom Access Token Hook
 
+
+Below is a flow chart illustrating how Supabase Auth makes use of an Auth Hook:
 
 <Mermaid
  chart={`flowchart TD
@@ -57,7 +59,7 @@ You can use hooks at specific points along an Auth flow and you can perform cust
 
 ## Use Cases
 
-Based on user feedback, we decided on a few use cases which aim to illustrate how a hook. You can opt to [write your own hook](#writing-your-own-hook) if you have a use case which doesn’t fit any of the examples below.
+Based on user feedback, we decided on a few use cases to illustrate how a hook. These use cases are not exhaustive and you can opt to [write your own hook](#writing-your-own-hook) if you have a use case which doesn’t fit any of the examples below.
 
 ## MFA Verification Attempt Hook
 
@@ -95,7 +97,7 @@ In exchange your hook should return back a JSON object with these fields set:
 
 Return these only if your hook processed the input without errors.
 
-- `decision` A string containing the decision whether to allow authentication to move forward. Use `reject` to completely reject the verification attempt and log the user out of all active sessions. Use `continue` to use the default Supabase Auth behavior.
+- `decision` A string containing the decision on whether to allow authentication to move forward. Use `reject` to completely reject the verification attempt and log the user out of all active sessions. Use `continue` to use the default Supabase Auth behavior.
 - `message` The message to show the user if the decision was `reject`.
 
 Example output:
@@ -474,7 +476,7 @@ revoke execute
 
 ## Writing Your Own Hook
 
-Oftentimes, the examples above might not exactly fit your exact use case. In such scenarios, you can consider [writing your own hook](#writing-your-own-hook) based off the examples above.
+Oftentimes, the examples above might not exactly fit your use case. In such scenarios, you can consider writing your own hook based off the examples above.
 
 ### Writing the Hook
 
@@ -504,9 +506,9 @@ Avoid adding a `security definer` tag to the function to avoid permission errors
 
 By default, Postgres functions are tagged with `security invoker` and will run with the permissions of the user that calls it. In the case of Auth Hooks, `supabase_auth_admin`  is the invoker and it will run with the permissions of `supabase_auth_admin`.
 
-In contrast, the `security definer` tag specifies that the hook is to be executed with the privileges of the user that owns it.  In the case of functions created via the Supabase Dashboard this is `postgres` which does not have permissions over the Auth schema. As such, introducing a `security definer` tag could prevent Supabase Auth from having the appropriate permissions to access tables or execute functions.
+In contrast, the `security definer` tag specifies that the hook is to be executed with the privileges of the user that owns it.  In the case of functions created via the Supabase Dashboard this is `postgres` which does not have permissions over the Auth schema. Introducing a `security definer` tag could prevent Supabase Auth from having the appropriate permissions to access tables or execute functions.
 
-As with the specific case examples above you will need to grant appropriate permissions to the functions and tables involved.
+As with the previous examples above you will need to grant appropriate permissions to the functions and tables involved.
 
 ```sql
 grant execute
@@ -524,7 +526,7 @@ Hook timeouts are controlled by a `local` statement timeout scoped to the Postgr
 
 ### Testing the Hook
 
-We strongly recommend testing the hook prior to going into production via [PgTAP](https://supabase.com/docs/guides/database/extensions/pgtap) or similar. You can able the extension under Database > Extensions > PgTap
+We strongly recommend testing the hook prior to going into production via [PgTAP](https://supabase.com/docs/guides/database/extensions/pgtap) or similar. You can enable the extension under Database > Extensions > PgTap
 
 Here's an example of what a test could look like for an MFA Verification test.
 
