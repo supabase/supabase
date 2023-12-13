@@ -186,7 +186,7 @@ function ComboBox({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <div className="flex items-center">
-        <PopoverTrigger asChild>
+        <PopoverTrigger asChild aria-label={`Select and copy ${variable}`}>
           <Button
             variant="outline"
             role="combobox"
@@ -252,7 +252,8 @@ export function ProjectConfigVariables({ variable }: { variable: 'url' | 'anonKe
   }
 
   return (
-    <span>
+    <>
+      <span>{variable === 'url' ? 'Project URL' : 'Anon key'}</span>
       <ComboBox
         selectedId={activeId}
         setSelectedId={setActiveId}
@@ -260,6 +261,6 @@ export function ProjectConfigVariables({ variable }: { variable: 'url' | 'anonKe
         variable={variable}
         isLoading={isLoading}
       />
-    </span>
+    </>
   )
 }

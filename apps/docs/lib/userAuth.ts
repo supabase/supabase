@@ -9,11 +9,7 @@ export async function getAccessToken() {
     return
   }
 
-  const aboutToExpire = currentSession?.expires_at
-    ? currentSession.expires_at - Math.ceil(Date.now() / 1000) < 30
-    : false
-
-  if (!currentSession || aboutToExpire) {
+  if (!currentSession) {
     const {
       data: { session },
       error,
