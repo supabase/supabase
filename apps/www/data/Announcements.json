@@ -1,16 +1,16 @@
 [
   {
     "type": "Announcement",
-    "title": "Postgres Language Server: implementing the Parser",
-    "description": "A detailed analysis of our iterations to implement a Parser for Postgres",
-    "imgUrl": "/images/blog/lwx-postgres-language-server/postgres-language-server-thumb.jpg",
-    "logoUrl": "/images/blog/lwx-postgres-language-server/postgres-language-server-thumb.jpg",
+    "title": "Edge Functions: Node and native npm compatibility",
+    "description": "We're adding Node and native npm compatibility for Edge Functions",
+    "imgUrl": "launch-week-x/day-2/edge-runtime-thumb.png",
+    "logoUrl": "launch-week-x/day-2/edge-runtime-thumb.png",
     "organization": "Supabase",
-    "url": "/blog/postgres-language-server-implementing-parser",
+    "url": "/blog/edge-functions-node-npm",
     "postMeta": {
-      "name": "philipp",
-      "publishDate": "Dec 08, 2023",
-      "readLength": 10
+      "name": "laktek",
+      "publishDate": "Dec 12, 2023",
+      "readLength": 5
     },
     "ctaText": "Learn more"
   },

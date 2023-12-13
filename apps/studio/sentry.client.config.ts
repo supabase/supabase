@@ -43,6 +43,10 @@ Sentry.init({
     "undefined is not an object (evaluating 'n.chat.setReady')",
     "undefined is not an object (evaluating 'i.chat.setReady')",
   ],
+  denyUrls: [
+    // [Joshen] We're getting a huge influx of events from this particular source
+    'injectCoinbaseWalletDappProvider.js',
+  ],
   beforeSend: (event) => filterConsoleErrors(event),
 })
 

@@ -51,7 +51,6 @@ const NavigationBar = () => {
 
   const { project } = useProjectContext()
   const navLayoutV2 = useFlag('navigationLayoutV2')
-  const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
   const showFeaturePreviews = useFlag('featurePreviews')
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
 
@@ -69,7 +68,7 @@ const NavigationBar = () => {
   const realtimeFlagEnabled = useFlag('realtimeDashboard')
 
   const activeRoute = router.pathname.split('/')[3]
-  const toolRoutes = generateToolRoutes(projectRef, project, supabaseAIEnabled)
+  const toolRoutes = generateToolRoutes(projectRef, project)
   const productRoutes = generateProductRoutes(projectRef, project, {
     auth: authEnabled,
     edgeFunctions: edgeFunctionsEnabled,

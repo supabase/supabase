@@ -1,8 +1,6 @@
 import { ReactNode } from 'react'
 
-const images = {}
-
-type StepLinkType = 'productHunt' | 'video' | 'docs' | 'xSpace'
+type StepLinkType = 'productHunt' | 'video' | 'docs' | 'xSpace' | 'blog'
 
 export interface StepLink {
   type: StepLinkType
@@ -47,99 +45,159 @@ export interface WeekDayProps {
   dd: string
   links?: StepLink[]
   videoThumbnail?: string
-  blog?: string
+  blog: string
   steps: StepProps[] | []
 }
 
-export const endOfLW8 = '2023-12-15T23:59:59.999-08:00'
+export const endOfLWX = '2023-12-15T23:59:59.999-08:00'
 
 const days: WeekDayProps[] = [
   {
     id: 'day-1',
-    title: 'Read Replicas',
-    shipped: false,
-    // isToday: true,
-    blog: '',
-    hasCountdown: true,
-    date: '11 Dec',
-    published_at: '2023-12-11T08:00:00.000-08:00',
-    description: null,
     d: 1,
     dd: 'Mon',
+    title: 'Supabase Studio',
+    shipped: true,
+    isToday: false,
+    blog: '/blog/studio-introducing-assistant',
+    hasCountdown: false,
+    date: '11 Dec',
+    published_at: '2023-12-11T08:00:00.000-08:00',
+    description: (
+      <>
+        Supabase Studio: introducing an <strong>AI Assistant</strong>,{' '}
+        <strong>Postgres roles</strong>, and <strong>user impersonation</strong>
+      </>
+    ),
     links: [
+      // {
+      //   type: 'productHunt',
+      //   href: 'https://www.producthunt.com/',
+      // },
       {
-        type: 'productHunt',
-        href: 'https://www.producthunt.com/',
+        type: 'blog',
+        href: '/blog/studio-introducing-assistant',
       },
       {
         type: 'video',
-        href: 'https://www.youtube.com/',
+        href: 'hu2SQjvCXIw',
       },
       {
         type: 'xSpace',
-        href: 'https://twitter.com/home',
-      },
-      {
-        type: 'docs',
-        href: 'https://supabase.com/docs',
+        href: 'https://twitter.com/i/spaces/1OwxWYgDwXVGQ',
       },
     ],
     steps: [
       {
-        title: "Why we'll stay remote",
-        blog: '/blog/why-supabase-remote',
-        // bg_layers: [{ img: images['00-stay-remote'] }],
+        title: '',
+        blog: '/blog/studio-introducing-assistant',
+        bg_layers: [
+          {
+            img: '/images/launchweek/lwx/day1/d1_studio.svg',
+            mobileImg: '/images/launchweek/lwx/day1/d1_studio_mobile.svg',
+          },
+        ],
         steps: [],
       },
     ],
   },
   {
     id: 'day-2',
-    title: '',
-    shipped: false,
-    blog: '',
-    hasCountdown: false,
-    date: '12 Dec',
-    published_at: '2023-12-12T08:00:00.000-08:00',
-    description: '',
     d: 2,
     dd: 'Tue',
-    steps: [],
+    title: 'Edge Functions',
+    shipped: true,
+    isToday: true,
+    hasCountdown: false,
+    blog: '/blog/edge-functions-node-npm',
+    date: '12 Dec',
+    published_at: '2023-12-12T08:00:00.000-08:00',
+    description: (
+      <>
+        Edge Functions: <strong>Node</strong> and native <strong>npm</strong> compatibility
+      </>
+    ),
+    links: [
+      {
+        type: 'blog',
+        href: '/blog/edge-functions-node-npm',
+      },
+      {
+        type: 'video',
+        href: 'eCbiywoDORw',
+      },
+      {
+        type: 'xSpace',
+        href: 'https://twitter.com/i/spaces/1MYGNovDoaLJw',
+      },
+    ],
+    steps: [
+      {
+        title: '',
+        blog: '/blog/edge-functions-node-npm',
+        bg_layers: [
+          {
+            img: '/images/launchweek/lwx/day2/d2_edge.svg',
+            mobileImg: '/images/launchweek/lwx/day2/d2_edge_mobile.svg',
+          },
+        ],
+        steps: [],
+      },
+    ],
   },
   {
     id: 'day-3',
+    d: 3,
+    dd: 'Wed',
     title: '',
     shipped: false,
+    hasCountdown: true,
     blog: '',
     date: '13 Dec',
     published_at: '2023-12-13T08:00:00.000-08:00',
     description: '',
-    d: 3,
-    dd: 'Wed',
+    links: [
+      {
+        type: 'xSpace',
+        href: 'https://twitter.com/i/spaces/1eaKbgDBgyoGX',
+      },
+    ],
     steps: [],
   },
   {
     id: 'day-4',
+    d: 4,
+    dd: 'Thu',
     title: '',
     shipped: false,
     blog: '',
     date: '14 Dec',
     published_at: '2023-12-14T08:00:00.000-08:00',
     description: '',
-    d: 4,
-    dd: 'Thu',
+    links: [
+      {
+        type: 'xSpace',
+        href: 'https://twitter.com/i/spaces/1ypKdkWjkjrxW',
+      },
+    ],
     steps: [],
   },
   {
     id: 'day-5',
+    d: 5,
+    dd: 'Fri',
     title: '',
     shipped: false,
     blog: '',
     date: '15 Dec',
     published_at: '2023-12-15T08:00:00.000-08:00',
     description: '',
-    d: 5,
-    dd: 'Fri',
+    links: [
+      {
+        type: 'xSpace',
+        href: 'https://twitter.com/i/spaces/1vAxRvjmvRgxl',
+      },
+    ],
     steps: [],
   },
 ]

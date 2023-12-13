@@ -18,7 +18,6 @@ import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
-import { useEffect, useState } from 'react'
 
 type Post = ReturnType<typeof getSortedPosts>[number]
 

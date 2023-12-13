@@ -38,10 +38,8 @@ import { getQueryClient } from 'data/query-client'
 import { tableKeys } from 'data/tables/keys'
 import { getTable } from 'data/tables/table-query'
 import { getTables } from 'data/tables/tables-query'
-import ExtensionsStore from './ExtensionsStore'
 import ForeignTableStore, { IForeignTableStore } from './ForeignTableStore'
 import FunctionsStore from './FunctionsStore'
-import HooksStore from './HooksStore'
 import MaterializedViewStore, { IMaterializedViewStore } from './MaterializedViewStore'
 import PoliciesStore from './PoliciesStore'
 import PublicationStore from './PublicationStore'
@@ -60,12 +58,10 @@ export interface IMetaStore {
   materializedViews: IMaterializedViewStore
   foreignTables: IForeignTableStore
 
-  hooks: IPostgresMetaInterface<any>
   roles: IRolesStore
   policies: IPostgresMetaInterface<any>
   triggers: IPostgresMetaInterface<any>
   functions: IPostgresMetaInterface<any>
-  extensions: IPostgresMetaInterface<any>
   publications: IPostgresMetaInterface<any>
 
   projectRef?: string
@@ -151,12 +147,10 @@ export default class MetaStore implements IMetaStore {
   materializedViews: MaterializedViewStore
   foreignTables: ForeignTableStore
 
-  hooks: HooksStore
   roles: RolesStore
   policies: PoliciesStore
   triggers: TriggersStore
   functions: FunctionsStore
-  extensions: ExtensionsStore
   publications: PublicationStore
 
   projectRef?: string
@@ -196,17 +190,8 @@ export default class MetaStore implements IMetaStore {
 
     this.roles = new RolesStore(this.rootStore, `${this.baseUrl}/roles`, this.headers)
     this.policies = new PoliciesStore(this.rootStore, `${this.baseUrl}/policies`, this.headers)
-    this.hooks = new HooksStore(this.rootStore, `${this.baseUrl}/triggers`, this.headers)
     this.triggers = new TriggersStore(this.rootStore, `${this.baseUrl}/triggers`, this.headers)
     this.functions = new FunctionsStore(this.rootStore, `${this.baseUrl}/functions`, this.headers)
-    this.extensions = new ExtensionsStore(
-      this.rootStore,
-      `${this.baseUrl}/extensions`,
-      this.headers,
-      {
-        identifier: 'name',
-      }
-    )
     this.publications = new PublicationStore(
       this.rootStore,
       `${this.baseUrl}/publications`,
@@ -1001,17 +986,11 @@ export default class MetaStore implements IMetaStore {
     this.policies.setUrl(`${this.baseUrl}/policies`)
     this.policies.setHeaders(this.headers)
 
-    this.hooks.setUrl(`${this.baseUrl}/triggers`)
-    this.hooks.setHeaders(this.headers)
-
     this.triggers.setUrl(`${this.baseUrl}/triggers`)
     this.triggers.setHeaders(this.headers)
 
     this.functions.setUrl(`${this.baseUrl}/functions`)
     this.functions.setHeaders(this.headers)
-
-    this.extensions.setUrl(`${this.baseUrl}/extensions`)
-    this.extensions.setHeaders(this.headers)
 
     this.publications.setUrl(`${this.baseUrl}/publications`)
     this.publications.setHeaders(this.headers)

@@ -4,6 +4,10 @@ import clsx from 'clsx'
 import { X } from 'lucide-react'
 import { AiIcon, Button, SheetClose_Shadcn_, SheetHeader_Shadcn_, SheetTitle_Shadcn_, cn } from 'ui'
 
+import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganization } from 'hooks'
+
 export const AIPolicyHeader = ({
   selectedPolicy,
   assistantVisible,
@@ -13,6 +17,11 @@ export const AIPolicyHeader = ({
   assistantVisible: boolean
   setAssistantVisible: (v: boolean) => void
 }) => {
+  // Customers on HIPAA plans should not have access to Supabase AI
+  const organization = useSelectedOrganization()
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
+  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
+
   return (
     <SheetHeader_Shadcn_
       className={`${
@@ -37,20 +46,22 @@ export const AIPolicyHeader = ({
             : 'Create a new Row Level Security policy'}
         </SheetTitle_Shadcn_>
       </div>
-      <Button
-        aria-expanded={assistantVisible}
-        aria-controls="ai-chat-assistant"
-        size="tiny"
-        type="outline"
-        className={cn('group', styles['ai-icon__container--allow-hover-effect'], 'px-3 py-0.5')}
-        rounded
-        icon={
-          <AiIcon className="scale-75 [&>div>div]:border-foreground-light [&>div>div]:group-hover:border-foreground -mr-0.5" />
-        }
-        onClick={() => setAssistantVisible(!assistantVisible)}
-      >
-        {assistantVisible ? <>Close Assistant</> : <>Open Assistant</>}
-      </Button>
+      {!hasHipaaAddon && (
+        <Button
+          aria-expanded={assistantVisible}
+          aria-controls="ai-chat-assistant"
+          size="tiny"
+          type="outline"
+          className={cn('group', styles['ai-icon__container--allow-hover-effect'], 'px-3 py-0.5')}
+          rounded
+          icon={
+            <AiIcon className="scale-75 [&>div>div]:border-foreground-light [&>div>div]:group-hover:border-foreground -mr-0.5" />
+          }
+          onClick={() => setAssistantVisible(!assistantVisible)}
+        >
+          {assistantVisible ? <>Close Assistant</> : <>Open Assistant</>}
+        </Button>
+      )}
     </SheetHeader_Shadcn_>
   )
 }
