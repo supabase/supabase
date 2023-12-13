@@ -24,9 +24,9 @@ Supavisor 1.0 symbolizes production readiness and comes with many bug fixes. It 
 2. named prepared statement support
 3. query cancelation
 
-## What is connection pooling
+## What is connection pooling?
 
-Supavisor is built with Elixir. Since the [Dashbit](https://dashbit.co/) team have been helping with the development, we invited Jose Valim, the creator of Elixir, to explain connection pooling, OTP, and why Elixir is a great fit for a connection pooler:
+Supavisor is built with Elixir. Since the [Dashbit](https://dashbit.co/) team have been helping with the development we invited Jose Valim, the creator of Elixir, to explain connection pooling, OTP, and why Elixir is a great fit for a connection pooler:
 
 <div className="video-container">
   <iframe
@@ -38,17 +38,17 @@ Supavisor is built with Elixir. Since the [Dashbit](https://dashbit.co/) team ha
   />
 </div>
 
-## Parsing SQL
+## SQL parsing with Rust
 
-To implement these features, we now parse all SQL statements from connected clients.
+To implement the latest set of features, we now parse all SQL statements from connected clients.
 
-Supavisor, developed in Elixir, supports high concurrency and rapid IO. Despite Elixir's slower parsing, it provides excellent interop with Rust, via [Rustler](https://github.com/rusterlium/rustler). For efficient SQL parsing, we use [`pg_query.rs`](https://github.com/pganalyze/pg_query.rs).
+Supavisor, developed in Elixir, supports high concurrency and rapid I/O. Elixir doesn't have great performance for parsing, but it provides excellent interop with Rust via [Rustler](https://github.com/rusterlium/rustler). For efficient SQL parsing, we use [`pg_query.rs`](https://github.com/pganalyze/pg_query.rs).
 
 ## Load Balancing
 
-When set up with a Postgres cluster, Supavisor now balances read requests between the primary server and its replicas. It randomly distributes these read requests across the entire Postgres cluster.
+When set up with a Postgres cluster, Supavisor load-balances read requests between the primary server and its replicas. It randomly distributes these read requests across the entire Postgres cluster.
 
-Supavisor targets write operations to the primary automatically by bouncing off read-only replicas until it hits the primary with a successful write. The trade-off here is that writes may take a few milliseconds longer to complete in favor of zero additional client-side complexity. This write strategy also makes transparent primary failovers painless because detecting the primary for writes is automatic.
+Supavisor targets write operations to the primary automatically by probing read replicas until it hits the primary with a successful write, [similar to libpq](https://www.percona.com/blog/seamless-application-failover-using-libpq-features-in-postgresql/). The trade-off here is that writes may take a few milliseconds longer to complete in favor of zero additional client-side complexity. This write strategy also makes transparent primary failovers painless because detecting the primary for writes is automatic.
 
 ### Read-after-writes
 
