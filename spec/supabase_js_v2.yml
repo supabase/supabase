@@ -639,9 +639,15 @@ functions:
         isSpotlight: true
         code: |
           ```js
+          // retrieve all identites linked to a user
+          const identities = await supabase.auth.getUserIdentities()
+
+          // find the google identity 
           const googleIdentity = identities.find(
             identity => identity.provider === 'google'
           )
+
+          // unlink the google identity
           const { data, error } = await supabase.auth.unlinkIdentity(googleIdentity)
           ```
   - id: send-password-reauthentication

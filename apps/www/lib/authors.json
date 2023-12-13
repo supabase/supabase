@@ -316,6 +316,13 @@
     "author_image_url": "https://github.com/laktek.png"
   },
   {
+    "author_id": "andreespirela",
+    "author": "Andrees Pirela",
+    "position": "Engineering",
+    "author_url": "https://github.com/andreespirela",
+    "author_image_url": "https://github.com/andreespirela.png"
+  },
+  {
     "author_id": "saltcod",
     "author": "Terry Sutton",
     "position": "Engineering",
