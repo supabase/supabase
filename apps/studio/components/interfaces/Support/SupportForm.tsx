@@ -388,7 +388,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                   <p className="text-sm text-foreground-light mt-2">
                     We do our best to respond to everyone as quickly as possible; however, we
                     prioritize things based on production status. We ask that you please reserve
-                    High and Urgent severity for actual production issues.
+                    High and Urgent severity for production-impacting issues only.
                   </p>
                 )}
               </div>
