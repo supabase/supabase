@@ -16,9 +16,9 @@ image: lwx-supavisor/supavisor-og.png
 thumb: lwx-supavisor/supavisor-thumb.png
 ---
 
-After [launching Supavisor in August](https://supabase.com/blog/supavisor-1-million), we've successfully migrated all projects on the platform. Every new Supabase project launched now gets a Supavisor connection string to use for connection pooling. 
+After [launching Supavisor in August](https://supabase.com/blog/supavisor-1-million), we've successfully migrated all projects on the platform. Every new Supabase project launched now gets a Supavisor connection string to use for connection pooling.
 
-Supavisor 1.0 symbolizes production readiness and comes with many bug fixes. It includes three important features: 
+Supavisor 1.0 symbolizes production readiness and comes with many bug fixes. It includes three important features:
 
 1. query load balancing
 2. named prepared statement support
@@ -40,10 +40,9 @@ Supavisor is built with Elixir. Since the [Dashbit](https://dashbit.co/) team ha
 
 ## Parsing SQL
 
-To implement these features, we now parse all SQL statements from connected clients. 
+To implement these features, we now parse all SQL statements from connected clients.
 
 Supavisor, developed in Elixir, supports high concurrency and rapid IO. Despite Elixir's slower parsing, it provides excellent interop with Rust, via [Rustler](https://github.com/rusterlium/rustler). For efficient SQL parsing, we use [`pg_query.rs`](https://github.com/pganalyze/pg_query.rs).
-
 
 ## Load Balancing
 
@@ -55,15 +54,15 @@ Supavisor targets write operations to the primary automatically by bouncing off 
 
 With automatic primary detection, it's easy to guarantee read-after-writes from the same client by wrapping the read and write in a transaction.
 
-Future work is planned to allow custom server targeting with SQL statements such as `SET SERVER 'primary'` to let clients guarantee read-after-writes outside of transactions or across clients. 
+Future work is planned to allow custom server targeting with SQL statements such as `SET SERVER 'primary'` to let clients guarantee read-after-writes outside of transactions or across clients.
 
 ## Named Prepared Statements
 
-Many clients use named [prepared statements](https://www.postgresql.org/docs/current/sql-prepare.html) when generating parameterized SQL. During statement preparation Postgres parses, plans, and optimizes queries. 
+Many clients use named [prepared statements](https://www.postgresql.org/docs/current/sql-prepare.html) when generating parameterized SQL. During statement preparation Postgres parses, plans, and optimizes queries.
 
-If a client can create named prepared statements, then such a client can re-use these query plans and simply submit parameters for them. 
+If a client can create named prepared statements, then such a client can re-use these query plans and simply submit parameters for them.
 
-The problem with named prepared statements and pooling in the transaction mode is that statements are not shared across Postgres backends (connections). Each client connection must issue prepared statements for each query they will run. 
+The problem with named prepared statements and pooling in the transaction mode is that statements are not shared across Postgres backends (connections). Each client connection must issue prepared statements for each query they will run.
 
 Supavisor now supports named prepared statements. Supavisor parses each query and identifies `PREPARE` statements. When a `PREPARE` statement is received on one connection, it is broadcast across all connections. This approach allows every client to access named prepared statements that have been issued by other connections. This adds a slight increase in memory overhead when duplicating query plans for each Postgres connection but should come with significant throughput gains.
 
@@ -77,7 +76,7 @@ Supavisor now supports named prepared statements. Supavisor parses each query an
 
 ## Query Cancelation
 
-With 1.0 we get query official cancelation as well. If you're in `psql` typing `Ctrl+C` will actually cancel your query now. 
+With 1.0 we get query official cancelation as well. If you're in `psql` typing `Ctrl+C` will actually cancel your query now.
 
 Especially useful if you accidentally run a heavy query!
 
@@ -87,18 +86,18 @@ For the Supavisor rollout, we maintained consistent pooling settings between PgB
 
 Now, we're raising the client connection limit for smaller projects in Supavisor. Here are the updated default configurations:
 
-| Database Size | default_pool_size | max_connections | default_max_clients |
-| --- | --- | --- | --- |
-| micro | 15 | 60 | 200 |
-| small | 15 | 90 | 1000 (previously 200) |
-| medium | 15 | 120 | 1000 (previously 200) |
-| large | 15 | 160 | 1000 (previously 300) |
-| xl | 20 | 240 | 1000 (previously 700) |
-| 2xl | 25 | 380 | 1500 |
-| 4xl | 32 | 480 | 3000 |
-| 8xl | 64 | 490 | 6000 |
-| 12xl | 96 | 500 | 9000 |
-| 16xl | 128 | 500 | 12000 |
+| Database Size | default_pool_size | max_connections | default_max_clients   |
+| ------------- | ----------------- | --------------- | --------------------- |
+| micro         | 15                | 60              | 200                   |
+| small         | 15                | 90              | 1000 (previously 200) |
+| medium        | 15                | 120             | 1000 (previously 200) |
+| large         | 15                | 160             | 1000 (previously 300) |
+| xl            | 20                | 240             | 1000 (previously 700) |
+| 2xl           | 25                | 380             | 1500                  |
+| 4xl           | 32                | 480             | 3000                  |
+| 8xl           | 64                | 490             | 6000                  |
+| 12xl          | 96                | 500             | 9000                  |
+| 16xl          | 128               | 500             | 12000                 |
 
 In this table:
 
