@@ -25,12 +25,12 @@ const StoragePolicies = () => {
   const { data } = useBucketsQuery({ projectRef })
   const buckets = data ?? []
 
-  const roles = meta.roles.list((role) => !meta.roles.systemRoles.includes(role.name))
+  const roles = meta.roles.list((role: any) => !meta.roles.systemRoles.includes(role.name))
 
-  const [policies, setPolicies] = useState([])
+  const [policies, setPolicies] = useState<any[]>([])
   const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState({})
-  const [selectedPolicyToDelete, setSelectedPolicyToDelete] = useState({})
-  const [isEditingPolicyForBucket, setIsEditingPolicyForBucket] = useState({})
+  const [selectedPolicyToDelete, setSelectedPolicyToDelete] = useState<any>({})
+  const [isEditingPolicyForBucket, setIsEditingPolicyForBucket] = useState<any>({})
 
   // Only use storage policy editor when creating new policies for buckets
   const showStoragePolicyEditor =
@@ -60,9 +60,7 @@ const StoragePolicies = () => {
     if (meta) {
       await meta.policies.load()
       const storagePolicies =
-        meta?.policies.list((policy) => policy.schema === 'storage', {
-          allSchemas: true,
-        }) ?? []
+        meta?.policies.list((policy: any) => policy.schema === 'storage') ?? []
       setPolicies(storagePolicies)
     }
   }
@@ -72,7 +70,7 @@ const StoragePolicies = () => {
     setIsEditingPolicyForBucket({ bucket: bucketName, table })
   }
 
-  const onSelectPolicyEdit = (policy, bucketName = '', table = '') => {
+  const onSelectPolicyEdit = (policy: any, bucketName = '', table = '') => {
     setIsEditingPolicyForBucket({ bucket: bucketName, table })
     setSelectedPolicyToEdit(policy)
   }
@@ -81,7 +79,7 @@ const StoragePolicies = () => {
     setIsEditingPolicyForBucket({})
   }
 
-  const onSelectPolicyDelete = (policy) => setSelectedPolicyToDelete(policy)
+  const onSelectPolicyDelete = (policy: any) => setSelectedPolicyToDelete(policy)
   const onCancelPolicyDelete = () => setSelectedPolicyToDelete({})
 
   const onSavePolicySuccess = async () => {
@@ -94,7 +92,7 @@ const StoragePolicies = () => {
     Functions that involve the CRUD for policies
     For each API call within the Promise.all, return true if an error occurred, else return false
   */
-  const onCreatePolicies = async (payloads) => {
+  const onCreatePolicies = async (payloads: any[]) => {
     return await Promise.all(
       payloads.map(async (payload) => {
         const res = await meta.policies.create(payload)
@@ -110,7 +108,7 @@ const StoragePolicies = () => {
     )
   }
 
-  const onCreatePolicy = async (payload) => {
+  const onCreatePolicy = async (payload: any) => {
     const res = await meta.policies.create(payload)
     if (res.error) {
       ui.setNotification({
@@ -122,7 +120,7 @@ const StoragePolicies = () => {
     return false
   }
 
-  const onUpdatePolicy = async (payload) => {
+  const onUpdatePolicy = async (payload: any) => {
     const res = await meta.policies.update(payload.id, payload)
     if (res.error) {
       ui.setNotification({
@@ -135,8 +133,8 @@ const StoragePolicies = () => {
   }
 
   const onDeletePolicy = async () => {
-    const res = await meta.policies.del(selectedPolicyToDelete.id)
-    if (res.error) {
+    const res: any = await meta.policies.del(selectedPolicyToDelete.id)
+    if (res) {
       ui.setNotification({
         category: 'error',
         message: `Failed to delete policy: ${res.error.message}`,
@@ -229,7 +227,6 @@ const StoragePolicies = () => {
         schema="storage"
         roles={roles}
         table={isEditingPolicyForBucket.table}
-        target={isEditingPolicyForBucket.bucket}
         selectedPolicyToEdit={selectedPolicyToEdit}
         onSelectCancel={onCancelPolicyEdit}
         onCreatePolicy={onCreatePolicy}

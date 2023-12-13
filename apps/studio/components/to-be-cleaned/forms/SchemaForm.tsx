@@ -1,6 +1,17 @@
-import { AutoForm } from 'uniforms-bootstrap4'
 import Ajv from 'ajv'
+import { PropsWithChildren } from 'react'
+import { AutoForm } from 'uniforms-bootstrap4'
 import { JSONSchemaBridge } from 'uniforms-bridge-json-schema'
+
+interface SchemaFormProps
+  extends PropsWithChildren<{
+    schema: any
+    model: any
+    disabled: boolean
+    formRef: any
+    onSubmit: any
+    onChangeModel: any
+  }> {}
 
 const SchemaForm = ({
   schema,
@@ -10,7 +21,7 @@ const SchemaForm = ({
   formRef,
   onSubmit,
   onChangeModel = () => {},
-}) => {
+}: SchemaFormProps) => {
   const validatedSchema = new JSONSchemaBridge(schema, createValidator(schema))
   return (
     <AutoForm
@@ -31,9 +42,9 @@ export default SchemaForm
 let ajv = new Ajv({ strict: false, allErrors: true, useDefaults: true })
 ajv = ajv.addFormat('absolute-url', '^(http://|https://)')
 
-const createValidator = (schema) => {
+const createValidator = (schema: any) => {
   const validator = ajv.compile(schema)
-  return (model) => {
+  return (model: any) => {
     let cleansedModel = { ...model }
     Object.entries(cleansedModel).map(([k, v]) => {
       const isRequired = schema.required.indexOf(k) != -1
@@ -52,7 +63,7 @@ const createValidator = (schema) => {
  * JSON Schema doesn't support validation for empty strings.
  * We want to convert all empty strings to NULL to ensure they get validated
  */
-const nullifyStringIfEmpty = (data) => {
+const nullifyStringIfEmpty = (data: any) => {
   if (data.trim() === '') return null
   else return data
 }

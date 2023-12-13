@@ -3,6 +3,18 @@ import { Button, Form, Modal } from 'ui'
 
 // [Joshen] As of 280222, let's just use ConfirmationModal as the one and only confirmation modal (Deprecate this)
 
+interface ConfirmModalProps {
+  visible: boolean
+  danger?: boolean
+  title: string
+  description: string
+  size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge' | 'xxlarge'
+  buttonLabel: string
+  buttonLoadingLabel?: string
+  onSelectCancel: () => void
+  onSelectConfirm: () => void
+}
+
 const ConfirmModal = ({
   visible = false,
   danger = false,
@@ -13,7 +25,7 @@ const ConfirmModal = ({
   buttonLoadingLabel = '',
   onSelectCancel = () => {},
   onSelectConfirm = () => {},
-}) => {
+}: ConfirmModalProps) => {
   useEffect(() => {
     if (visible) {
       setLoading(false)
@@ -42,8 +54,7 @@ const ConfirmModal = ({
         validateOnBlur
         onSubmit={() => onConfirm()}
         validate={() => {
-          let errors = []
-          return errors
+          return []
         }}
       >
         {() => {

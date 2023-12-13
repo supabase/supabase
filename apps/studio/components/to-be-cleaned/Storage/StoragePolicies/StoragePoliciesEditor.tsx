@@ -23,7 +23,7 @@ const PolicyDefinition = ({ definition = '', onUpdatePolicyDefinition = () => {}
   )
 }
 
-const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = () => {} }) => {
+const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = () => {} }: any) => {
   const allowedClientLibraryMethods = deriveAllowedClientLibraryMethods(allowedOperations)
   return (
     <div className="flex justify-between space-x-12">
@@ -114,7 +114,7 @@ const StoragePoliciesEditor = ({
   onToggleOperation = () => {},
   onUpdatePolicyRoles = () => {},
   onReviewPolicy = () => {},
-}) => {
+}: any) => {
   const definition = policyFormFields.definition
   const selectedRoles = policyFormFields.roles
 

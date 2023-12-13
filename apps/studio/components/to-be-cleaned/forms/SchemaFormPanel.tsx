@@ -7,7 +7,7 @@ export default function SchemaFormPanel({
   title,
   model,
   children,
-  onChangeModel = (model) => {},
+  onChangeModel = () => {},
   onReset = () => {},
   onSubmit,
   loading,
@@ -16,8 +16,8 @@ export default function SchemaFormPanel({
   message = '',
   disabled = false,
   disabledMessage = '',
-}) {
-  let formRef
+}: any) {
+  let formRef: any
   const [submitButtonLoading, setSubmitButtonLoading] = useState(false)
   const [hasChanged, setHasChanged] = useState(false)
   const isLoading = loading !== undefined ? loading : submitButtonLoading
@@ -35,7 +35,7 @@ export default function SchemaFormPanel({
       .then(() => {
         setSubmitButtonLoading(true)
       })
-      .catch((error) => {
+      .catch((error: any) => {
         console.error('Error on submitting', error)
       })
   }
@@ -81,14 +81,14 @@ export default function SchemaFormPanel({
       <div className="Form section-block--body px-6 py-3">
         <SchemaForm
           disabled={disabled}
-          onChangeModel={(model) => {
+          onChangeModel={(model: any) => {
             setHasChanged(true)
             if (onChangeModel) onChangeModel(model)
           }}
-          formRef={(ref) => (formRef = ref)}
+          formRef={(ref: any) => (formRef = ref)}
           schema={schema}
           model={model}
-          onSubmit={async (args) => {
+          onSubmit={async (args: any) => {
             onSubmit(args)
               .then(() => {
                 setSubmitButtonLoading(false)
