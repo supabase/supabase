@@ -1,5 +1,5 @@
 import Layout from '~/layouts/DefaultGuideLayout'
-import {CodeBlock, Admonition} from 'ui'
+import {CodeBlock, Admonition, Accordion} from 'ui'
 
 export const meta = {
   id: 'auth-postgres-hooks',
@@ -246,7 +246,19 @@ Example output:
 
 ## Examples
 
+<Accordion
+ type="default"
+  openBehaviour="multiple"
+  chevronAlign="right"
+  justified
+  size="medium"
+  className="text-foreground-light">
+<div className="border-b pb-3">
 ### Example: Limit Failed MFA Verification Attempts
+<Accordion.Item
+        header={<span className="text-foreground font-bold">Details </span>}
+        id={`limit-failed-mfa-verification-attempts`}
+      >
 
 ****Scenario****
 
@@ -322,7 +334,46 @@ create function public.hook_mfa_verification_attempt(event jsonb)
 	$$;
 ```
 
+Supabase Auth will invoke this function with the `supabase_auth_admin` role which does not have permissions to modify the `public` schema. So you should grant it appropriate permissions:
+
+```sql
+grant execute
+	on function public.hook_mfa_verification_attempt
+	to supabase_auth_admin;
+
+grant all
+	on table public.mfa_failed_verification_attempts
+	to supabase_auth_admin;
+```
+
+Finally to make sure this function and table are not accessible from Supabase Serverless APIs, revoke those permissions from the `authenticated` and `anon` roles:
+
+```sql
+revoke execute
+	on function public.hook_mfa_verification_attempt
+	from authenticated, anon;
+
+revoke all
+	on table public.mfa_failed_verification_attempts
+	from authenticated, anon;
+
+</Accordion.Item>
+</div>
+</Accordion>
+
+<Accordion
+ type="default"
+  openBehaviour="multiple"
+  chevronAlign="right"
+  justified
+  size="medium"
+  className="text-foreground-light">
+<div className="border-b pb-3">
 ### Example: Limit Failed Password Verification Attempts
+<Accordion.Item
+        header={<span className="text-foreground font-bold">Details </span>}
+        id={`limit-failed-password-verification-attempts`}
+      >
 
 ****Scenario****
 
@@ -334,7 +385,7 @@ First you need to create a table that will record the last time a user had an in
 
 You can do this by creating a table such as:
 
-```sql
+``sql
 create table public.password_failed_verification_attempts (
 	user_id uuid not null,
   last_failed_at timestamp not null default now(),
@@ -416,10 +467,23 @@ revoke all
 	on table public.password_failed_verification_attempts
 	from authenticated, anon;
 ```
+</Accordion.Item>
+</div>
+</Accordion>
 
-
-
-### Example: Add Custom Claims To Access Token
+<Accordion
+ type="default"
+  openBehaviour="multiple"
+  chevronAlign="right"
+  justified
+  size="medium"
+  className="text-foreground-light">
+<div className="border-b pb-3">
+### Example: Add Custom Claims to Token
+<Accordion.Item
+        header={<span className="text-foreground font-bold">Details </span>}
+        id={`add-custom-claims-to-token`}
+      >
 
 ****Scenario****
 
@@ -477,7 +541,9 @@ revoke execute
 	on function public.custom_access_token_hook
 	from authenticated, anon;
 ```
-
+</Accordion.Item>
+</div>
+</Accordion>
 ## Writing Your Own Hook
 
 Oftentimes, the examples above might not exactly fit your use case. In such scenarios, you can consider writing your own hook based off the examples above.
