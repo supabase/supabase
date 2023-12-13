@@ -526,9 +526,9 @@ Hook timeouts are controlled by a `local` statement timeout scoped to the Postgr
 
 ### Testing the Hook
 
-We strongly recommend testing the hook prior to going into production via [PgTAP](https://supabase.com/docs/guides/database/extensions/pgtap) or similar. You can enable the extension under Database > Extensions > PgTap
+We strongly recommend testing the hook prior to going into production via [PgTAP](https://supabase.com/docs/guides/database/extensions/pgtap) or similar. You can enable the extension under `Database > Extensions > PgTap`
 
-Here's an example of what a test could look like for an MFA Verification test.
+Here's an example of what a test could look like for an MFA Verification hook.
 
 ```sql
 begin;
