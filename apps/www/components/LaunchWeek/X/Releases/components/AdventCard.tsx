@@ -84,6 +84,7 @@ const AdventCard = ({ day, index }: { day: AdventDay; index: number }) => {
             <div className="flex gap-1 mt-3 flex-wrap">
               {day.links?.map((link: AdventLink) => (
                 <Link
+                  key={link.url}
                   href={link.url}
                   target={link.target ?? '_self'}
                   className="px-2 py-1 pointer-events-auto border border-muted transition-colors text-foreground-light bg-[#191D1E] hover:bg-[#22272A] rounded text-xs"
