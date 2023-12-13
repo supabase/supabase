@@ -5,7 +5,6 @@ const FormSection = ({
   id,
   header,
   disabled,
-  visible = true,
   className,
 }: {
   children: React.ReactNode
@@ -18,7 +17,6 @@ const FormSection = ({
   const classes = [
     'grid grid-cols-12 gap-6 px-8 py-8',
     `${disabled ? ' opacity-30' : ' opacity-100'}`,
-    `${visible ? ' block' : ' hidden'}`,
     `${className}`,
   ]
 
