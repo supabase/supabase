@@ -58,7 +58,7 @@ const AdventCard = ({ day, index }: { day: AdventDay; index: number }) => {
       }}
     >
       <motion.div
-        className="opacity-0 flex flex-col justify-between w-full aspect-square p-6 rounded-xl bg-[#121516] transition-colors text-[#575E61] border hover:border-strong overflow-hidden"
+        className="opacity-0 flex flex-col justify-between w-full h-full p-6 rounded-xl bg-[#121516] transition-colors text-[#575E61] border hover:border-strong overflow-hidden"
         variants={variants}
       >
         <div className="opacity-30 group-hover:opacity-100 transition-opacity">{day.icon}</div>
