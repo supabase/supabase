@@ -7,6 +7,7 @@ interface Props {
   className?: string
   hasChevron?: boolean
   chevronAnimation?: 'translate' | 'fadeIn'
+  target?: '_blank' | '_self'
 }
 
 function TextLink({
@@ -15,6 +16,7 @@ function TextLink({
   className,
   hasChevron = true,
   chevronAnimation = 'translate',
+  target = '_self',
   ...props
 }: Props) {
   return (
@@ -24,6 +26,7 @@ function TextLink({
         'text-foreground-light hover:text-foreground mt-3 block cursor-pointer text-sm focus-visible:ring-2 focus-visible:outline-none focus-visible:rounded-sm focus-visible:ring-foreground-lighter focus-visible:text-foreground',
         className
       )}
+      target={target}
       {...props}
     >
       <div className="group flex items-center gap-1">

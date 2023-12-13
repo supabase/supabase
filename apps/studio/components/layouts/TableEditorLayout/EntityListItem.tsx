@@ -27,6 +27,7 @@ import { useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
+import { IS_PLATFORM } from 'common'
 
 export interface EntityListItemProps {
   id: number
@@ -50,7 +51,8 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
   }
 
   const exportTableAsCSV = async () => {
-    if (!project?.connectionString) return console.error('Connection string is required')
+    if (IS_PLATFORM && !project?.connectionString)
+      return console.error('Connection string is required')
     const toastId = ui.setNotification({
       category: 'loading',
       message: `Exporting ${entity.name} as CSV...`,
@@ -60,7 +62,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
       const table = await getTable({
         id: entity.id,
         projectRef,
-        connectionString: project.connectionString,
+        connectionString: project?.connectionString,
       })
       const supaTable =
         table &&
@@ -76,7 +78,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
 
       const rows = await fetchAllTableRows({
         projectRef,
-        connectionString: project.connectionString,
+        connectionString: project?.connectionString,
         table: supaTable,
       })
       const formattedRows = rows.map((row) => {

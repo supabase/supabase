@@ -125,8 +125,7 @@ export const useEntityTypesQuery = <TData = EntityTypesData>(
         signal
       ),
     {
-      enabled:
-        enabled && typeof projectRef !== 'undefined' && typeof connectionString !== 'undefined',
+      enabled: enabled && typeof projectRef !== 'undefined',
       getNextPageParam(lastPage, pages) {
         const page = pages.length
         const currentTotalCount = page * limit

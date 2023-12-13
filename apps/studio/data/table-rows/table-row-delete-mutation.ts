@@ -6,6 +6,7 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
 import { Table } from 'data/tables/table-query'
 import { ImpersonationRole, wrapWithRoleImpersonation } from 'lib/role-impersonation'
+import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import { ResponseError } from 'types'
 import { getPrimaryKeys } from './utils'
 
@@ -45,7 +46,12 @@ export async function deleteTableRow({
     role: impersonatedRole,
   })
 
-  const { result } = await executeSql({ projectRef, connectionString, sql })
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
+  })
 
   return result
 }

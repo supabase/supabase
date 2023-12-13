@@ -5,7 +5,6 @@
   "private": true,
   "scripts": {
     "dev": "next --port 3000",
-    "dev:secrets:pull": "AWS_PROFILE=supabase-dev node ../../scripts/getSecrets.js -n local/www",
     "build": "next build",
     "export": "next export",
     "start": "next start",
@@ -17,6 +16,7 @@
     "@code-hike/mdx": "^0.9.0",
     "@heroicons/react": "^1.0.6",
     "@mdx-js/react": "^2.3.0",
+    "@octokit/rest": "^20.0.2",
     "@next/bundle-analyzer": "^13.5.6",
     "@next/mdx": "^13.5.6",
     "@react-three/fiber": "^7.0.29",
@@ -66,7 +66,6 @@
     "yup": "^0.32.11"
   },
   "devDependencies": {
-    "@aws-sdk/client-secrets-manager": "^3.468.0",
     "@types/classnames": "^2.3.1",
     "@types/dat.gui": "^0.7.10",
     "@types/mdx-js__react": "^1.5.6",

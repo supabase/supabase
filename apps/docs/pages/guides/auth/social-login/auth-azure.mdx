@@ -140,11 +140,11 @@ async function signInWithAzure() {
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
-When your user signs in, call [loginWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Azure` as the `Provider`:
+When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Azure` as the `Provider`:
 
 ```kotlin
 suspend fun signInWithAzure() {
-    supabase.gotrue.loginWith(Azure) {
+    supabase.auth.signInWith(Azure) {
         scopes.add("email")
     }
 }
@@ -177,7 +177,7 @@ When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) t
 
 ```kotlin
 suspend fun signOut() {
-    supabase.gotrue.logout()
+    supabase.auth.signOut()
 }
 ```
 
@@ -213,7 +213,7 @@ async function signInWithAzure() {
 
 ```kotlin
 suspend fun signInWithAzure() {
-    supabase.gotrue.loginWith(Azure) {
+    supabase.auth.signInWith(Azure) {
         scopes.add("offline_access")
     }
 }

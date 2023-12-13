@@ -49,7 +49,11 @@ const TotalUsage = ({
     showRelationToSubscription &&
     Boolean(
       usage?.usages.find(
-        (metric) => !metric.unlimited && metric.usage > (metric?.pricing_free_units ?? 0)
+        (usageItem) =>
+          // Filter out compute as compute has no quota and is always being charged for
+          !usageItem.metric.startsWith('COMPUTE_') &&
+          !usageItem.unlimited &&
+          usageItem.usage > (usageItem?.pricing_free_units ?? 0)
       )
     )
 
