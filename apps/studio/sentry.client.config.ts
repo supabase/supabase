@@ -50,7 +50,7 @@ Sentry.init({
   ],
   denyUrls: [
     // [Joshen] We're getting a huge influx of events from this particular source
-    /injectCoinbaseWalletDappProvider/i,
+    'injectCoinbaseWalletDappProvider.js',
     // Facebook flakiness
     /graph\.facebook\.com/i,
     // Facebook blocked
