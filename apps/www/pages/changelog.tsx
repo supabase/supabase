@@ -251,7 +251,7 @@ function ChangelogPage({ changelog, pageInfo, restPage }: ChangelogPageProps) {
           <div className="grid gap-12 lg:gap-36">
             {changelog.length > 0 &&
               changelog
-                // .filter((entry: Entry) => !entry.title.includes('[d]'))
+                //  .filter((entry: Entry) => !entry.title.includes('[d]'))
                 .map((entry: Entry, i: number) => {
                   return (
                     <div key={i} className="border-muted grid border-l lg:grid-cols-12 lg:gap-8">
