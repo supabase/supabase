@@ -1,6 +1,9 @@
 import * as Sentry from '@sentry/nextjs'
 import { match } from 'path-to-regexp'
 
+// [Joshen] Added some common ignore rules to declutter sentry based on this
+// https://docs.sentry.io/platforms/javascript/configuration/filtering/#decluttering-sentry
+
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
   tracesSampleRate: 0.01,
@@ -20,6 +23,8 @@ Sentry.init({
     }),
   ],
   ignoreErrors: [
+    // Random plugins/extensions
+    'top.GLOBALS',
     'ResizeObserver',
     'Non-Error exception captured',
     'Non-Error promise rejection',
@@ -42,6 +47,25 @@ Sentry.init({
     // [Joshen] Seems to be from hcaptcha
     "undefined is not an object (evaluating 'n.chat.setReady')",
     "undefined is not an object (evaluating 'i.chat.setReady')",
+  ],
+  denyUrls: [
+    // [Joshen] We're getting a huge influx of events from this particular source
+    /injectCoinbaseWalletDappProvider/i,
+    // Facebook flakiness
+    /graph\.facebook\.com/i,
+    // Facebook blocked
+    /connect\.facebook\.net\/en_US\/all\.js/i,
+    // Woopra flakiness
+    /eatdifferent\.com\.woopra-ns\.com/i,
+    /static\.woopra\.com\/js\/woopra\.js/i,
+    // Chrome extensions
+    /extensions\//i,
+    /^chrome:\/\//i,
+    /^chrome-extension:\/\//i,
+    // Other plugins
+    /127\.0\.0\.1:4001\/isrunning/i, // Cacaoweb
+    /webappstoolbarba\.texthelp\.com\//i,
+    /metrics\.itunes\.apple\.com\.edgesuite\.net\//i,
   ],
   beforeSend: (event) => filterConsoleErrors(event),
 })
