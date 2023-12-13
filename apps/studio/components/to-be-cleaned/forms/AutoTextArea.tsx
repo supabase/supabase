@@ -1,7 +1,8 @@
+import { TextAreaProps } from '@ui/components/Input/Input'
+import { useRef, useState } from 'react'
 import { Input } from 'ui'
-import React, { useState, useEffect, useRef } from 'react'
 
-const AutoTextArea = (props) => {
+const AutoTextArea = (props: TextAreaProps) => {
   const textAreaRef = useRef(null)
   const [text, setText] = useState('')
   const [textAreaHeight, setTextAreaHeight] = useState('auto')
