@@ -62,7 +62,13 @@ The problem with named prepared statements and pooling in the transaction mode i
 
 Supavisor now supports named prepared statements. Supavisor parses each query and identifies `PREPARE` statements. When a `PREPARE` statement is received on one connection, it is broadcast across all connections. This approach allows every client to access named prepared statements that have been issued by other connections. This adds a slight increase in memory overhead when duplicating query plans for each Postgres connection but should come with significant throughput gains.
 
-![Supavisor named prepared statements.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/165a3c21-8e38-4d4b-831a-f9bb88a3262b/0dd21c44-b47a-44d7-b890-a24e31973c31/Supavisor_named_prepared_statements.png)
+<Img
+  src={{
+    dark: 'WIP',
+    light: 'WIP',
+  }}
+  alt="Diagram explaining how named prepared statements work in Supavisor"
+/>
 
 ## Query Cancelation
 
