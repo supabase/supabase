@@ -472,9 +472,9 @@ revoke execute
 	from authenticated, anon;
 ```
 
-## Writing Your Own Hook {#writing-your-own-hook}
+## Writing Your Own Hook
 
-Oftentimes, the examples above might not exactly fit your exact use case. In such scenarios, you can consider writing your own hook based off the examples above.
+Oftentimes, the examples above might not exactly fit your exact use case. In such scenarios, you can consider [writing your own hook](#writing-your-own-hook) based off the examples above.
 
 ### Writing the Hook
 
@@ -526,53 +526,63 @@ Hook timeouts are controlled by a `local` statement timeout scoped to the Postgr
 
 We strongly recommend testing the hook prior to going into production via [PgTAP](https://supabase.com/docs/guides/database/extensions/pgtap) or similar. You can able the extension under Database > Extensions > PgTap
 
-Here's an example of what a test could look like:
+Here's an example of what a test could look like for an MFA Verification test.
 
 ```sql
+begin;
+select plan (1);
 
--- Load pgTAP
-BEGIN;
-SET client_min_messages TO WARNING;
-
--- Load pgTAP
-CREATE EXTENSION IF NOT EXISTS pgtap;
-
--- Test for Allowed Email Address
-SELECT plan(4);
-
--- Test 1: Allowed Email
-SELECT is(
-    custom_access_token('{"claims": {"email": "allowed@example.com"}, "authentication_method": "password"}'::jsonb),
-    '{"claims": {"email": "allowed@example.com"}, "authentication_method": "password"}'::jsonb,
-    'Allowed email should return the original event'
+-- table to store test results
+create temporary table test_results (
+  name text primary key
+  , result boolean
+  , debug text
 );
 
--- Test 2: SAML Authentication
-SELECT is(
-    custom_access_token('{"claims": {"email": "user@somedomain.com"}, "authentication_method": "sso/saml"}'::jsonb),
-    '{"claims": {"email": "user@somedomain.com"}, "authentication_method": "sso/saml"}'::jsonb,
-    'SAML authentication should return the original event'
+-- function to record test result when run inside a block with vars
+create or replace function tests.record_result(name text, result boolean, debug text DEFAULT NULL)
+  returns void language plpgsql as $$
+begin
+  insert into test_results(name, result, debug) values (name, result, debug);
+end;
+$$;
+
+do $$
+  declare
+     -- Arrange and setup any variablese user in the test
+    _user1 uuid = '00000000-0000-0000-0000-000000000001';
+    _factor1 uuid = 'FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFF1';
+    _valid_user1_event jsonb = jsonb_build_object('user_id', _user1, 'factor_id', _factor1, 'valid', true);
+    _invalid_user1_event jsonb = jsonb_build_object('user_id', _user1, 'factor_id', _factor1, 'valid', false);
+    _result jsonb;
+  begin
+    set search_path to 'public';
+
+    insert into auth.users(id) values (_user1);
+
+    -- Act and run the function
+    perform tests.record_result(
+      'Valid event result'
+      , (select hook_mfa_verification_attempt(_valid_user1_event)) ->> 'decision' = 'continue'
+    );
+
+    -- Add further test cases here
+  end;
+$$;
+
+set search_path to 'extensions';
+
+-- Assert that the desired result is received
+select set_eq(
+  $$ select name, result, debug from test_results $$,
+  $$ select * from (values
+    , ('Valid event result', true, null)
+  ) as t $$,
+  'MFA Auth hook tests:'
 );
 
--- Test 3: Email/Password Authentication with Supabase.io Domain
-SELECT is(
-    custom_access_token('{"claims": {"email": "user@supabase.io"}, "authentication_method": "password"}'::jsonb),
-    '{"claims": {"email": "user@supabase.io"}, "authentication_method": "password"}'::jsonb,
-    'Email/password authentication with @supabase.io should return the original event'
-);
-
--- Test 4: Unauthorized Access
-SELECT isnt(
-    custom_access_token('{"claims": {"email": "unauthorized@example.com"}, "authentication_method": "password"}'::jsonb),
-    '{"claims": {"email": "unauthorized@example.com"}, "authentication_method": "password"}'::jsonb,
-    'Unauthorized access should not return the original event'
-);
-
--- Finish the tests
-SELECT * FROM finish();
-ROLLBACK;
-
-
+select * from finish();
+rollback;
 ````
 
 
@@ -580,7 +590,7 @@ ROLLBACK;
 ## Connecting the Hook to Supabase Auth
 
 Head over to `Authentication > Hooks (Beta)` and select the appropriate PostgreSQL function from the dropdown menu.
-![Hooks UI](/apps/docs/public/img/guides/auth-postgres-hooks/hooks-ui.png)
+![Hooks UI](/docs/public/img/guides/auth-postgres-hooks/hooks-ui.png)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 export default Page
