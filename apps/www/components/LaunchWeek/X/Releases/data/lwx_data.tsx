@@ -150,7 +150,6 @@ const days: WeekDayProps[] = [
     dd: 'Wed',
     title: 'Supabase Branching',
     shipped: true,
-    isToday: true,
     hasCountdown: false,
     blog: '/blog/supabase-branching',
     date: '13 Dec',
@@ -193,19 +192,44 @@ const days: WeekDayProps[] = [
     d: 4,
     dd: 'Thu',
     title: '',
-    shipped: false,
-    hasCountdown: true,
-    blog: '',
+    shipped: true,
+    isToday: true,
+    hasCountdown: false,
+    blog: '/blog/auth-password-strength',
     date: '14 Dec',
     published_at: '2023-12-14T08:00:00.000-08:00',
-    description: '',
+    description: (
+      <>
+        Auth: <strong>Password strength</strong> checking and <strong>leak protection</strong>
+      </>
+    ),
     links: [
+      {
+        type: 'blog',
+        href: '/blog/auth-password-strength',
+      },
+      {
+        type: 'video',
+        href: '',
+      },
       {
         type: 'xSpace',
         href: 'https://twitter.com/i/spaces/1ypKdkWjkjrxW',
       },
     ],
-    steps: [],
+    steps: [
+      {
+        title: '',
+        blog: '/blog/auth-password-strength',
+        bg_layers: [
+          {
+            img: '/images/launchweek/lwx/day4/d4_auth.svg',
+            mobileImg: '/images/launchweek/lwx/day4/d4_auth_mobile.svg',
+          },
+        ],
+        steps: [],
+      },
+    ],
   },
   {
     id: 'day-5',
