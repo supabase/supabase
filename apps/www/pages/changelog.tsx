@@ -111,11 +111,6 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
               createdAt
               url
               title
-              # labels(first: 10) {
-                # nodes {
-                  # name
-                # }
-              # }
               body
             }
           }
