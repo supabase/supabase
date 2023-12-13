@@ -22,7 +22,15 @@ Today we are rolling out access to early-access subscribers. Internally, we were
 
 We are operating on a first-signed-up, first-served basis. For now, we are onboarding organizations on paid plans.
 
-<Img src="/images/blog/lwx-supabase-branching/branching-ui.png" wide={true} />
+<Img
+  src={{
+    light: '/images/blog/lwx-supabase-branching/branching-ui--light.png',
+    dark: '/images/blog/lwx-supabase-branching/branching-ui--dark.png',
+  }}
+  wide={true}
+  caption="New Branching UI in the Supabase dashboard"
+  captionAlign="left"
+/>
 
 ## What’s Branching?
 
@@ -38,6 +46,8 @@ Branching is a natural extension of this. You can do the above, and when your mi
     light: '/images/blog/lwx-supabase-branching/feat-branches-examples--light.png',
     dark: '/images/blog/lwx-supabase-branching/feat-branches-examples--dark.png',
   }}
+  caption="Your git branches can all have their own Supabase Preview branch."
+  captionAlign="left"
 />
 
 {/* ![Your git branches can all have their own Supabase Preview branch.](https://prod-files-secure.s3.us-west-2.amazonaws.com/165a3c21-8e38-4d4b-831a-f9bb88a3262b/049d8657-9e88-4fc2-b712-7c1cae620a07/feat-branches-examples.png) */}
@@ -54,6 +64,8 @@ Your project’s Preview Branches are designed with safety in mind. They are iso
     light: '/images/blog/lwx-supabase-branching/isolated-instances--light.png',
     dark: '/images/blog/lwx-supabase-branching/isolated-instances--dark.png',
   }}
+  caption="Every Preview branch has its own dedicated instance, with a full suite of Supabase services."
+  captionAlign="left"
 />
 
 {/* ![Every Preview branch has its own dedicated instance, with a full suite of Supabase services.](https://prod-files-secure.s3.us-west-2.amazonaws.com/165a3c21-8e38-4d4b-831a-f9bb88a3262b/2272753e-a95d-487a-ad8a-d79b95ab4281/pre-screen-4-1.png) */}
@@ -72,6 +84,8 @@ We’ve designed Supabase Branching to work perfectly with Vercel’s [Preview](
     light: '/images/blog/lwx-supabase-branching/vercel-support--light.png',
     dark: '/images/blog/lwx-supabase-branching/vercel-support--dark.png',
   }}
+  caption=""
+  captionAlign="left"
 />
 
 {/* ![Vercel will build your preview deployments, and your preview deployment can connect to the Supabase services on your Preview Branch.](https://prod-files-secure.s3.us-west-2.amazonaws.com/165a3c21-8e38-4d4b-831a-f9bb88a3262b/e96576d4-8ea4-4d7e-a4b0-23baa2390904/vercel-support.png) */}
@@ -82,8 +96,12 @@ We’ve made several improvements to our [Vercel Integration](https://vercel.com
 
 <Img
   alt="Tweet showing Guillermo Rauch mentioning Supabase as one of the companies compatible with the Next.js App Router"
-  src={'/images/blog/lwx-supabase-branching/vercel-env-var-settings.png'}
+  src={{
+    light: '/images/blog/lwx-supabase-branching/vercel-env-var-settings--light.png',
+    dark: '/images/blog/lwx-supabase-branching/vercel-env-var-settings--dark.png',
+  }}
   wide={true}
+  captionAlign="left"
 />
 
 {/* ![pre-screen-2.jpg](https://prod-files-secure.s3.us-west-2.amazonaws.com/165a3c21-8e38-4d4b-831a-f9bb88a3262b/d65003da-7f99-45d5-815b-00668adf4b75/pre-screen-2.jpg) */}
@@ -116,11 +134,11 @@ Optionally, you can reset your branch database by running `supabase db reset --d
 
 In the future we’ll investigate data masking techniques with a copy-on-write system so that you can emulate a production workload inside your Preview Branches (we plan for this to work with File Storage too).
 
-<aside>
+<Admonition type="note" label="Testing with product workloads today?">
 
-ℹ️ If you need to test with production workloads today, check out [Snaplet](https://www.snaplet.dev/) and [Postgres.ai](http://Postgres.ai). Both are great partners of Supabase.
+If you need to test with production workloads today, check out [Snaplet](https://www.snaplet.dev/) and [Postgres.ai](http://Postgres.ai). Both are great partners of Supabase.
 
-</aside>
+</Admonition>
 
 ## Future considerations
 
