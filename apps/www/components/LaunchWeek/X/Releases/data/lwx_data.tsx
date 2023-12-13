@@ -157,7 +157,7 @@ const days: WeekDayProps[] = [
     published_at: '2023-12-13T08:00:00.000-08:00',
     description: (
       <>
-        Supabase <strong>Branching</strong>
+        Introducing Supabase <strong>Branching</strong>, a Postgres database for every pull request
       </>
     ),
     links: [
