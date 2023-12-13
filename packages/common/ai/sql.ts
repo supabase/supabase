@@ -62,8 +62,7 @@ const generateTitleSchema = SchemaBuilder.emptySchema()
   })
   .addString('description', {
     description: stripIndent`
-      The generated description for the SQL snippet (longer and more detailed than title).
-      - Read the SQL line by line and summarize it
+      The generated description for the SQL snippet.
     `,
   })
 
@@ -103,7 +102,11 @@ const completionFunctions = {
   },
   generateTitle: {
     name: 'generateTitle',
-    description: 'Generates a short title and detailed description for a Postgres SQL snippet',
+    description: stripIndent`
+      Generates a short title and summarized description for a Postgres SQL snippet.
+      
+      The description should describe why this table was created (eg. "Table to track todos")
+    `,
     parameters: generateTitleSchema.schema as Record<string, unknown>,
   },
 } satisfies Record<string, OpenAI.Chat.Completions.ChatCompletionCreateParams.Function>

@@ -105,7 +105,7 @@ describe('title', () => {
       `
     )
 
-    expect(title).toBe('Create Employees and Departments Tables')
+    expect(title).toBe('Employee and Department Tables')
     expect(description).toBeDefined()
   })
 })
