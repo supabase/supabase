@@ -13,6 +13,7 @@ import { paginateGraphql } from '@octokit/plugin-paginate-graphql'
 import { GetServerSideProps } from 'next'
 import Link from 'next/link'
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/outline'
+import { deletedDiscussions } from '~/lib/changelog.utils'
 
 export const ExtendedOctokit = Octokit.plugin(paginateGraphql)
 export type ExtendedOctokit = InstanceType<typeof ExtendedOctokit>
@@ -97,7 +98,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
     const query = `
       query troubleshootDiscussions($cursor: String, $owner: String!, $repo: String!, $categoryId: ID!) {
         repository(owner: $owner, name: $repo) {
-          discussions(first: 10, after: $cursor, categoryId: $categoryId, orderBy: { field: CREATED_AT, direction: DESC }) {
+          discussions(first: 50, after: $cursor, categoryId: $categoryId, orderBy: { field: CREATED_AT, direction: DESC }) {
             totalCount
             pageInfo {
               hasPreviousPage
@@ -153,12 +154,19 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
   const formattedDiscussions = await Promise.all(
     discussions.map(async (item: any): Promise<any> => {
       const discussionsMdxSource: MDXRemoteSerializeResult = await mdxSerialize(item.body)
+      // Find a date rewrite for the current item's title
+      const dateRewrite = deletedDiscussions.find((rewrite) => {
+        return item.title && rewrite.title && item.title.includes(rewrite.title)
+      })
+
+      // Use the createdAt date from dateRewrite if found, otherwise use item.createdAt
+      const created_at = dateRewrite ? dateRewrite.createdAt : item.createdAt
 
       return {
         ...item,
         source: discussionsMdxSource,
         type: 'discussion',
-        created_at: item.createdAt,
+        created_at,
         url: item.url,
       }
     })
