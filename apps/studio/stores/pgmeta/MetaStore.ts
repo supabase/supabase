@@ -42,7 +42,6 @@ import ForeignTableStore, { IForeignTableStore } from './ForeignTableStore'
 import FunctionsStore from './FunctionsStore'
 import MaterializedViewStore, { IMaterializedViewStore } from './MaterializedViewStore'
 import PoliciesStore from './PoliciesStore'
-import PublicationStore from './PublicationStore'
 import RolesStore, { IRolesStore } from './RolesStore'
 import TriggersStore from './TriggersStore'
 import ViewStore, { IViewStore } from './ViewStore'
@@ -62,7 +61,6 @@ export interface IMetaStore {
   policies: IPostgresMetaInterface<any>
   triggers: IPostgresMetaInterface<any>
   functions: IPostgresMetaInterface<any>
-  publications: IPostgresMetaInterface<any>
 
   projectRef?: string
 
@@ -105,7 +103,6 @@ export interface IMetaStore {
     metadata: {
       duplicateTable: PostgresTable
       isRLSEnabled: boolean
-      isRealtimeEnabled: boolean
       isDuplicateRows: boolean
     }
   ) => void
@@ -114,16 +111,9 @@ export interface IMetaStore {
     payload: any,
     columns: ColumnField[],
     isRLSEnabled: boolean,
-    isRealtimeEnabled: boolean,
     importContent?: ImportContent
   ) => any
-  updateTable: (
-    toastId: string,
-    table: PostgresTable,
-    payload: any,
-    columns: ColumnField[],
-    isRealtimeEnabled: boolean
-  ) => any
+  updateTable: (toastId: string, table: PostgresTable, payload: any, columns: ColumnField[]) => any
   insertRowsViaSpreadsheet: (
     file: any,
     table: PostgresTable,
@@ -151,7 +141,6 @@ export default class MetaStore implements IMetaStore {
   policies: PoliciesStore
   triggers: TriggersStore
   functions: FunctionsStore
-  publications: PublicationStore
 
   projectRef?: string
   connectionString?: string
@@ -192,11 +181,6 @@ export default class MetaStore implements IMetaStore {
     this.policies = new PoliciesStore(this.rootStore, `${this.baseUrl}/policies`, this.headers)
     this.triggers = new TriggersStore(this.rootStore, `${this.baseUrl}/triggers`, this.headers)
     this.functions = new FunctionsStore(this.rootStore, `${this.baseUrl}/functions`, this.headers)
-    this.publications = new PublicationStore(
-      this.rootStore,
-      `${this.baseUrl}/publications`,
-      this.headers
-    )
 
     makeObservable(this, {})
   }
@@ -301,71 +285,6 @@ export default class MetaStore implements IMetaStore {
       .replace(/\s+/g, ' ')
       .trim()
     return await this.query(query)
-  }
-
-  async updateTableRealtime(table: PostgresTable, enable: boolean) {
-    let publicationUpdateError
-    const publications = this.publications.list()
-
-    const queryClient = getQueryClient()
-    const project = await getCachedProjectDetail(queryClient, this.rootStore.ui.selectedProjectRef)
-    const projectRef = project?.ref
-    const connectionString = project?.connectionString
-    const publicTables = await queryClient.fetchQuery({
-      queryKey: tableKeys.list(projectRef, 'public'),
-      queryFn: ({ signal }) =>
-        getTables({ projectRef, connectionString, schema: 'public' }, signal),
-    })
-
-    let realtimePublication = publications.find((pub) => pub.name === 'supabase_realtime')
-    if (realtimePublication === undefined) {
-      const { data: publication, error: publicationCreateError } = await this.publications.create({
-        name: 'supabase_realtime',
-        publish_insert: true,
-        publish_update: true,
-        publish_delete: true,
-        tables: [],
-      })
-      if (publicationCreateError) throw publicationCreateError
-      realtimePublication = publication
-    }
-
-    const { id, tables: publicationTables } = realtimePublication
-    if (publicationTables === null) {
-      // UI doesn't have support for toggling realtime for ALL tables
-      // Switch it to individual tables via an array of strings
-      // Refer to PublicationStore for more information about this
-      const realtimeTables = enable
-        ? publicTables.map((t: any) => `${t.schema}.${t.name}`)
-        : publicTables
-            .filter((t: any) => t.id !== table.id)
-            .map((t: any) => `${t.schema}.${t.name}`)
-      const { error } = await this.publications.update(id, { tables: realtimeTables })
-      publicationUpdateError = error
-    } else {
-      const isAlreadyEnabled = publicationTables.some((x: any) => x.id == table.id)
-
-      const realtimeTables =
-        isAlreadyEnabled && !enable
-          ? // Toggle realtime off
-            publicationTables
-              .filter((t: any) => t.id !== table.id)
-              .map((t: any) => `${t.schema}.${t.name}`)
-          : !isAlreadyEnabled && enable
-          ? // Toggle realtime on
-            [`${table.schema}.${table.name}`].concat(
-              publicationTables.map((t: any) => `${t.schema}.${t.name}`)
-            )
-          : null
-
-      if (realtimeTables === null) return
-
-      const payload = { id, tables: realtimeTables }
-      const { error } = await this.publications.update(id, payload)
-      publicationUpdateError = error
-    }
-
-    if (publicationUpdateError) throw publicationUpdateError
   }
 
   async createColumn(
@@ -494,11 +413,10 @@ export default class MetaStore implements IMetaStore {
     metadata: {
       duplicateTable: PostgresTable
       isRLSEnabled: boolean
-      isRealtimeEnabled: boolean
       isDuplicateRows: boolean
     }
   ) {
-    const { duplicateTable, isRLSEnabled, isRealtimeEnabled, isDuplicateRows } = metadata
+    const { duplicateTable, isRLSEnabled, isDuplicateRows } = metadata
     const { name: sourceTableName, schema: sourceTableSchema } = duplicateTable
     const duplicatedTableName = payload.name
 
@@ -561,8 +479,6 @@ export default class MetaStore implements IMetaStore {
       if (updateTable.error) throw updateTable.error
     }
 
-    if (isRealtimeEnabled && duplicatedTable) await this.updateTableRealtime(duplicatedTable, true)
-
     return duplicatedTable
   }
 
@@ -571,7 +487,6 @@ export default class MetaStore implements IMetaStore {
     payload: any,
     columns: ColumnField[] = [],
     isRLSEnabled: boolean,
-    isRealtimeEnabled: boolean,
     importContent?: ImportContent
   ) {
     // Create the table first
@@ -590,9 +505,6 @@ export default class MetaStore implements IMetaStore {
         })
         if (updatedTable.error) throw updatedTable.error
       }
-
-      // Toggle Realtime if configured to be
-      if (isRealtimeEnabled) await this.updateTableRealtime(table, true)
 
       // Then insert the columns - we don't do Promise.all as we want to keep the integrity
       // of the column order during creation. Note that we add primary key constraints separately
@@ -706,13 +618,7 @@ export default class MetaStore implements IMetaStore {
     }
   }
 
-  async updateTable(
-    toastId: string,
-    table: PostgresTable,
-    payload: any,
-    columns: ColumnField[],
-    isRealtimeEnabled: boolean
-  ) {
+  async updateTable(toastId: string, table: PostgresTable, payload: any, columns: ColumnField[]) {
     // Prepare a check to see if primary keys to the tables were updated or not
     const primaryKeyColumns = columns
       .filter((column) => column.isPrimaryKey)
@@ -815,9 +721,6 @@ export default class MetaStore implements IMetaStore {
       )
       if (primaryKeys.error) throw primaryKeys.error
     }
-
-    // Update table's realtime configuration
-    await this.updateTableRealtime(table, isRealtimeEnabled)
 
     const queryClient = getQueryClient()
     const project = await getCachedProjectDetail(queryClient, this.rootStore.ui.selectedProjectRef)
@@ -991,8 +894,5 @@ export default class MetaStore implements IMetaStore {
 
     this.functions.setUrl(`${this.baseUrl}/functions`)
     this.functions.setHeaders(this.headers)
-
-    this.publications.setUrl(`${this.baseUrl}/publications`)
-    this.publications.setHeaders(this.headers)
   }
 }
