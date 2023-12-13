@@ -31,7 +31,7 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
       onCancel()
     },
     onError: (error) => {
-      toast.error(`Failed to enable ${extension.name.toUpperCase()}: ${error.message}`)
+      toast.error(`Failed to enable ${extension.name}: ${error.message}`)
     },
   })
 
