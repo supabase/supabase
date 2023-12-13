@@ -15,6 +15,7 @@ import {
   IconTriangle,
   cn,
   ThemeImage,
+  Admonition,
 } from 'ui'
 import ImageFadeStack from '~/components/ImageFadeStack'
 import ZoomableImg from '~/components/ZoomableImg/ZoomableImg'
@@ -122,6 +123,7 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
     ),
     code: (props: any) => <InlineCodeTag>{props.children}</InlineCodeTag>,
     BlogCollapsible: (props: any) => <BlogCollapsible {...props} />,
+    Admonition,
   }
 
   return components as any
