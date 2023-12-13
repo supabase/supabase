@@ -252,7 +252,7 @@ export const days: AdventDay[] = [
     id: 'supavisor',
     links: [
       {
-        url: '/blog/supavisor-postgres-connection-pooler-ga',
+        url: '/blog/supavisor-postgres-connection-pooler',
         label: 'Read blog post',
       },
     ],
