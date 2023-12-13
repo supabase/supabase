@@ -148,14 +148,18 @@ const days: WeekDayProps[] = [
     id: 'day-3',
     d: 3,
     dd: 'Wed',
-    title: 'branching',
+    title: 'Supabase Branching',
     shipped: true,
     isToday: true,
     hasCountdown: false,
     blog: '/blog/introducing-branching',
     date: '13 Dec',
     published_at: '2023-12-13T08:00:00.000-08:00',
-    description: <>Branching</>,
+    description: (
+      <>
+        Supabase <strong>Branching</strong>
+      </>
+    ),
     links: [
       {
         type: 'blog',
