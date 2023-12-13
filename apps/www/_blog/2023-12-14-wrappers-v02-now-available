@@ -1,6 +1,6 @@
 ---
 title: 'Postgres Foreign Data Wrappers v0.2 now available'
-description: 'Postgres Foreign Data Wrappers v0.2 brings more Wrappers, query pushdown, remote subquery, and more'
+description: "Postgres Foreign Data Wrappers v0.2 brings more Wrappers, query pushdown, remote subquery, and more"
 launchweek: x
 categories:
   - product
