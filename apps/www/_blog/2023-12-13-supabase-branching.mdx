@@ -100,7 +100,7 @@ Just note that we _still_ want you to develop locally! You should treat the Prev
 
 ### Database migrations
 
-We've developed Branching to work with a Git provider, starting with GitHub. 
+We've developed Branching to work with a Git provider, starting with GitHub.
 
 Our [GitHub app](https://github.com/apps/supabase) observes changes within a connected GitHub repository. When you open a Pull Request, it launches a Preview Branch and runs the migrations in `./supabase/migrations`. If there are any errors they are logged to the [Check Run](https://docs.github.com/en/rest/checks/runs?apiVersion=2022-11-28) associated with that git commit. When all checks turn green, your new Preview Branch is ready to use.
 
