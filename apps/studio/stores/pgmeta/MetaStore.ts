@@ -17,7 +17,6 @@ import { ResponseError } from 'types'
 
 import { IPostgresMetaInterface } from '../common/PostgresMetaInterface'
 import { IRootStore } from '../RootStore'
-import ColumnStore from './ColumnStore'
 import OpenApiStore, { IOpenApiStore } from './OpenApiStore'
 import TableStore, { ITableStore } from './TableStore'
 
@@ -38,10 +37,7 @@ import { getQueryClient } from 'data/query-client'
 import { tableKeys } from 'data/tables/keys'
 import { getTable } from 'data/tables/table-query'
 import { getTables } from 'data/tables/tables-query'
-import ForeignTableStore, { IForeignTableStore } from './ForeignTableStore'
-import FunctionsStore from './FunctionsStore'
-import MaterializedViewStore, { IMaterializedViewStore } from './MaterializedViewStore'
-import PoliciesStore from './PoliciesStore'
+import PostgresMetaInterface from '../common/PostgresMetaInterface'
 import PublicationStore from './PublicationStore'
 import RolesStore, { IRolesStore } from './RolesStore'
 import TriggersStore from './TriggersStore'
@@ -55,8 +51,6 @@ export interface IMetaStore {
   tables: ITableStore
   columns: IPostgresMetaInterface<PostgresColumn>
   views: IViewStore
-  materializedViews: IMaterializedViewStore
-  foreignTables: IForeignTableStore
 
   roles: IRolesStore
   policies: IPostgresMetaInterface<any>
@@ -142,15 +136,13 @@ export default class MetaStore implements IMetaStore {
   rootStore: IRootStore
   openApi: OpenApiStore
   tables: TableStore
-  columns: ColumnStore
+  columns: PostgresMetaInterface<PostgresColumn>
   views: ViewStore
-  materializedViews: MaterializedViewStore
-  foreignTables: ForeignTableStore
 
   roles: RolesStore
-  policies: PoliciesStore
+  policies: PostgresMetaInterface<any>
   triggers: TriggersStore
-  functions: FunctionsStore
+  functions: PostgresMetaInterface<any>
   publications: PublicationStore
 
   projectRef?: string
@@ -175,23 +167,25 @@ export default class MetaStore implements IMetaStore {
       `${API_URL}/projects/${this.projectRef}/api/rest`
     )
     this.tables = new TableStore(this.rootStore, `${this.baseUrl}/tables`, this.headers)
-    this.columns = new ColumnStore(this.rootStore, `${this.baseUrl}/columns`, this.headers)
+    this.columns = new PostgresMetaInterface(
+      this.rootStore,
+      `${this.baseUrl}/columns`,
+      this.headers
+    )
     this.views = new ViewStore(this.rootStore, `${this.baseUrl}/views`, this.headers)
-    this.materializedViews = new MaterializedViewStore(
-      this.rootStore,
-      `${this.baseUrl}/materialized-views`,
-      this.headers
-    )
-    this.foreignTables = new ForeignTableStore(
-      this.rootStore,
-      `${this.baseUrl}/foreign-tables`,
-      this.headers
-    )
 
     this.roles = new RolesStore(this.rootStore, `${this.baseUrl}/roles`, this.headers)
-    this.policies = new PoliciesStore(this.rootStore, `${this.baseUrl}/policies`, this.headers)
+    this.policies = new PostgresMetaInterface(
+      this.rootStore,
+      `${this.baseUrl}/policies`,
+      this.headers
+    )
     this.triggers = new TriggersStore(this.rootStore, `${this.baseUrl}/triggers`, this.headers)
-    this.functions = new FunctionsStore(this.rootStore, `${this.baseUrl}/functions`, this.headers)
+    this.functions = new PostgresMetaInterface(
+      this.rootStore,
+      `${this.baseUrl}/functions`,
+      this.headers
+    )
     this.publications = new PublicationStore(
       this.rootStore,
       `${this.baseUrl}/publications`,
@@ -973,12 +967,6 @@ export default class MetaStore implements IMetaStore {
 
     this.views.setUrl(`${this.baseUrl}/views`)
     this.views.setHeaders(this.headers)
-
-    this.materializedViews.setUrl(`${this.baseUrl}/materialized-views`)
-    this.materializedViews.setHeaders(this.headers)
-
-    this.foreignTables.setUrl(`${this.baseUrl}/foreign-tables`)
-    this.foreignTables.setHeaders(this.headers)
 
     this.roles.setUrl(`${this.baseUrl}/roles`)
     this.roles.setHeaders(this.headers)
