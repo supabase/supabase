@@ -20,23 +20,23 @@ A few months ago we mentioned that we were working on Branching with a (somewhat
 
 Today we are rolling out access to early-access subscribers. Internally, we were hoping to make this public access for this Launch Week but, well, [_we did say this was hard_](/blog/supabase-local-dev#supabase-branching-is-hard).
 
-We're operating on a first-signed-up, first-served basis, rolling it out in batches to paid orgs in who registered for early access.
+We're operating on a first-signed-up, first-served basis, rolling it out in batches to paid orgs who registered for early access.
 
-<Img
-  src={{
-    light: '/images/blog/lwx-supabase-branching/branching-ui--light.png',
-    dark: '/images/blog/lwx-supabase-branching/branching-ui--dark.png',
-  }}
-  wide={true}
-  caption="New Branching UI in the Supabase dashboard"
-  captionAlign="left"
-/>
+<div className="video-container">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/peXKxavGnBo"
+    title="YouTube video player"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+  />
+</div>
 
 ## What's Branching?
 
 At some point during development, you will probably need to experiment with your Postgres database. Today that's possible on your local development machine using the Supabase CLI. When you run `supabase start` with the CLI to get the entire Supabase stack running locally. You can play around with ideas and run `supabase db reset` whenever you want to start again. When you want to capture your changes in a database migration, you can run `supabase db diff`.
 
-Branching is a natural extension of this, but instead of experimenting with a just a _local_ database you also get _remote_ database. You continue to use the workflow above, and then when you commit your changes to Git we'll run them on a Supabase Preview Branch.
+Branching is a natural extension of this, but instead of experimenting with just a _local_ database you also get _remote_ database. You continue to use the workflow above, and then when you commit your changes to Git we'll run them on a Supabase Preview Branch.
 
 <Img
   alt="Each Git branch has a corresponding Supabase Preview."
@@ -62,7 +62,7 @@ Your project's Preview Branches are designed with safety in mind. They are isola
   captionAlign="left"
 />
 
-Even in relaxed developer environments, if one of your team accidentally leak a key it won't affect your Production branch.
+Even in relaxed developer environments, if one of your team accidentally leaks a key it won't affect your Production branch.
 
 ### Support for Vercel Previews
 
@@ -95,7 +95,7 @@ We've made several improvements to our [Vercel Integration](https://vercel.com/i
 
 One of the most-loved features of Supabase is the dashboard. Even if we [beg](/docs/guides/platform/maturity-model#in-production), it seems that developers simply want to use it for everything - even in production.
 
-The cool thing about Branching is that every Supabase Preview can be managed from the Dashboard. You can make schema changes, access the SQL Editor, and use the [new AI Assistant](/blog/studio-introducing-assistant). Once you're happy with your changes, you simply run `supabase db diff` on your local maching to pull the changes and you can commit them to Git.
+The cool thing about Branching is that every Supabase Preview can be managed from the Dashboard. You can make schema changes, access the SQL Editor, and use the [new AI Assistant](/blog/studio-introducing-assistant). Once you're happy with your changes, you simply run `supabase db diff` on your local machine to pull the changes and you can commit them to Git.
 
 Just note that we _still_ want you to develop locally! You should treat the Preview Branches [like cattle, not pets](https://devops.stackexchange.com/questions/653/what-is-the-definition-of-cattle-not-pets). Your Preview changes can be wiped at any time if one of your team pushes a destructive migration.
 
@@ -105,9 +105,9 @@ We've developed Branching to work with a Git provider, starting with GitHub.
 
 Our [GitHub app](https://github.com/apps/supabase) observes changes within a connected GitHub repository. When you open a Pull Request, it launches a Preview Branch and runs the migrations in `./supabase/migrations`. If there are any errors they are logged to the [Check Run](https://docs.github.com/en/rest/checks/runs?apiVersion=2022-11-28) associated with that git commit. When all checks turn green, your new Preview Branch is ready to use.
 
-When you push a new migration file to the Git branch, the app runs it incrementally in your Preview Branch. This allows you verify schema changes easily on existing seed data.
+When you push a new migration file to the Git branch, the app runs it incrementally in your Preview Branch. This allows you to verify schema changes easily on existing seed data.
 
-Finally, when you merge that PR, the app runs the new migrations on your Production environment. If you have other PRs already open, make sure to update those migration files to a later timestamp than the ones in Production branch following a [standard migration practice](/docs/guides/cli/managing-environments).
+Finally, when you merge that PR, the app runs the new migrations on your Production environment. If you have other PRs already open, make sure to update those migration files to a later timestamp than the ones in the Production branch following a [standard migration practice](/docs/guides/cli/managing-environments).
 
 ### Data seeding
 
@@ -137,22 +137,34 @@ In the current version, when you use the dashboard to create a change on a Previ
 
 ### Extended seeding behavior
 
-There are a multitude of different strategies for populating seed data. We've dabbled with AI to generate a seed data, which was fun. We also like the approach of [postgresql-anonymizer](https://postgresql-anonymizer.readthedocs.io/en/stable/) and [Snaplet](https://docs.snaplet.dev/recipes/supabase), who specialize in cloning production data while anonymizing the data for safe development.
+There are a multitude of different strategies for populating seed data. We've dabbled with AI to generate seed data, which was fun. We also like the approach of [postgresql-anonymizer](https://postgresql-anonymizer.readthedocs.io/en/stable/) and [Snaplet](https://docs.snaplet.dev/recipes/supabase), which specialize in cloning production data while anonymizing the data for safe development.
 
 ### Copy-on-write
 
-We have something in development :). CoW means you can branch from database snapshot and then run tests on “production-like” workloads. This is the approach that [Postgres.ai](http://Postgres.ai) uses. As we mention above, we need to figure out an approach that also works with [File Storage](/storage).
+We have something in development :). CoW means you can branch from database snapshot and then run tests on “production-like” workloads. This is the approach that [Postgres.ai](http://Postgres.ai) uses. As we mentioned above, we need to figure out an approach that also works with [File Storage](/storage).
 
 ## Interested in using Branching?
 
-We still have our early-access form open, and we'll be onboarding organizations in batches over the next few weeks, and working with these early users on Pricing.
+We still have our [early-access form open](https://forms.supabase.com/branching-request), and we'll be onboarding organizations in batches over the next few weeks, and working with these early users on Pricing.
 
 Check out the [Branching docs](/docs/guides/platform/branching) and also if you have any feedback, [you can join the discussion](https://github.com/orgs/supabase/discussions/18937).
+
+<Img
+  src={{
+    light: '/images/blog/lwx-supabase-branching/branching-ui--light.png',
+    dark: '/images/blog/lwx-supabase-branching/branching-ui--dark.png',
+  }}
+  wide={true}
+  caption="New Branching UI in the Supabase dashboard"
+  captionAlign="left"
+/>
 
 ## More Launch Week X
 
 - [Day 1 - Supabase Studio update: AI Assistant and User Impersonation](https://supabase.com/blog/studio-introducing-assistant)
 - [Day 2 - Edge Functions: Node and native npm compatibility](https://supabase.com/blog/edge-functions-node-npm)
-- [Postgres Language Server: implementing the Parser](https://supabase.com/blog/postgres-language-server-implementing-parser)
+- [Supavisor 1.0: a scalable connection pooler for Postgres](https://supabase.com/blog/supavisor-postgres-connection-pooler)
+- [PostgREST 12](https://supabase.com/blog/postgrest-12)
+- [pg_graphql: Postgres functions now supported](https://supabase.com/blog/pg-graphql-postgres-functions)
 - [The Supabase Album](https://www.youtube.com/watch?v=r1POD-IdG-I)
 - [Launch Week X Hackathon](https://supabase.com/blog/supabase-hackathon-lwx)
