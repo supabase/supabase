@@ -1,23 +1,22 @@
 import { filter, has, isEmpty, isNull, isUndefined, keyBy, mapValues, partition } from 'lodash'
 import { makeAutoObservable } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
-import { createContext, FormEvent, useContext, useEffect, useState } from 'react'
+import { FormEvent, createContext, useContext, useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import { Button, IconPlus, IconTrash, Input, Listbox, Modal, Radio, SidePanel, Toggle } from 'ui'
 
 import { Dictionary } from 'components/grid'
-import { Function } from 'components/interfaces/Functions/Functions.types'
 import { POSTGRES_DATA_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import Panel from 'components/ui/Panel'
 import SqlEditor from 'components/ui/SqlEditor'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useStore } from 'hooks'
-import { isResponseOk } from 'lib/common/fetch'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { SupaResponse } from 'types'
-import { convertArgumentTypes, convertConfigParams, hasWhitespace } from './Functions.utils'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
+import { useDatabaseFunctionCreateMutation } from 'data/database-functions/database-functions-create-mutation'
+import { useDatabaseFunctionUpdateMutation } from 'data/database-functions/database-functions-update-mutation'
+import { useSchemasQuery } from 'data/database/schemas-query'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { convertArgumentTypes, convertConfigParams, hasWhitespace } from './Functions.utils'
 
 // [Refactor] Remove local state, just use the Form component
 
@@ -27,7 +26,7 @@ class CreateFunctionFormState {
   // @ts-ignore
   args: { value: { name: string; type: string; error?: string }[] }
   // @ts-ignore
-  behavior: { value: string; error?: string }
+  behaviour: { value: string; error?: string }
   // @ts-ignore
   configParams: {
     value: { name: string; value: string; error?: { name?: string; value?: string } }[]
@@ -58,7 +57,7 @@ class CreateFunctionFormState {
       definition: this.definition.value,
       return_type: this.returnType.value,
       language: this.language.value,
-      behavior: this.behavior.value,
+      behaviour: this.behaviour.value,
       security_definer: this.securityDefiner.value,
       args: this.args.value.map((x: any) => `${x.name} ${x.type}`),
       config_params: mapValues(keyBy(this.configParams.value, 'name'), 'value'),
@@ -69,7 +68,7 @@ class CreateFunctionFormState {
     this.id = func?.id
     this.originalName = func?.name
     this.args = convertArgumentTypes(func?.argument_types)
-    this.behavior = { value: func?.behavior ?? 'VOLATILE' }
+    this.behaviour = { value: func?.behaviour ?? 'VOLATILE' }
     this.configParams = convertConfigParams(func?.config_params)
     this.definition = { value: func?.definition ?? '' }
     this.language = { value: func?.language ?? 'plpgsql' }
@@ -81,7 +80,7 @@ class CreateFunctionFormState {
 
   update(state: Dictionary<any>) {
     this.args = state.args
-    this.behavior = state.behavior
+    this.behaviour = state.behaviour
     this.configParams = state.configParams
     this.definition = state.definition
     this.language = state.language
@@ -93,7 +92,6 @@ class CreateFunctionFormState {
 }
 
 interface ICreateFunctionStore {
-  loading: boolean
   formState: CreateFunctionFormState
   meta: any
   schemas: Dictionary<any>[]
@@ -110,7 +108,6 @@ interface ICreateFunctionStore {
 }
 
 class CreateFunctionStore implements ICreateFunctionStore {
-  loading = false
   formState = new CreateFunctionFormState()
   meta = null
   schemas = []
@@ -137,10 +134,6 @@ class CreateFunctionStore implements ICreateFunctionStore {
 
   setSchemas = (value: Dictionary<any>[]) => {
     this.schemas = value as any
-  }
-
-  setLoading = (value: boolean) => {
-    this.loading = value
   }
 
   setIsDirty = (value: boolean) => {
@@ -264,7 +257,6 @@ interface CreateFunctionProps {
 }
 
 const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
-  const { ui, meta } = useStore()
   const { project } = useProjectContext()
   const _localState = useLocalObservable(() => new CreateFunctionStore())
 
@@ -282,46 +274,50 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
     }
   )
 
+  const { mutate: createDatabaseFunction, isLoading: isCreating } =
+    useDatabaseFunctionCreateMutation()
+  const { mutate: updateDatabaseFunction, isLoading: isUpdating } =
+    useDatabaseFunctionUpdateMutation()
+
   useEffect(() => {
     _localState.formState.reset(func)
     _localState.setIsDirty(false)
   }, [visible, func])
 
   async function handleSubmit() {
-    try {
-      if (_localState.validateForm()) {
-        _localState.setLoading(true)
-
-        const body = _localState.formState.requestBody
-        const response: SupaResponse<Function> = body.id
-          ? await (meta as any).functions.update(body.id, body)
-          : await (meta as any).functions.create(body)
-
-        if (!isResponseOk(response)) {
-          ui.setNotification({
-            category: 'error',
-            message: `Failed to create function: ${
-              response.error.message ?? 'Submit request failed'
-            }`,
-          })
-          _localState.setLoading(false)
-        } else {
-          ui.setNotification({
-            category: 'success',
-            message: `${_localState.isEditing ? 'Updated' : 'Created new'} function called ${
-              response.name
-            }`,
-          })
-          _localState.setLoading(false)
-          setVisible(!visible)
-        }
+    if (!project) return console.error('Project is required')
+    if (_localState.validateForm()) {
+      const body = _localState.formState.requestBody
+      if (body.id) {
+        updateDatabaseFunction(
+          {
+            id: body.id,
+            projectRef: project.ref,
+            connectionString: project.connectionString,
+            payload: body,
+          },
+          {
+            onSuccess: () => {
+              toast.success(`Successfully updated function ${body.name}`)
+              setVisible(!visible)
+            },
+          }
+        )
+      } else {
+        createDatabaseFunction(
+          {
+            projectRef: project.ref,
+            connectionString: project.connectionString,
+            payload: body,
+          },
+          {
+            onSuccess: () => {
+              toast.success(`Successfully created function ${body.name}`)
+              setVisible(!visible)
+            },
+          }
+        )
       }
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to create function: ${error.message}`,
-      })
-      _localState.setLoading(false)
     }
   }
 
@@ -337,7 +333,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
         onCancel={isClosingSidePanel}
         header={_localState.title}
         className="hooks-sidepanel mr-0 transform transition-all duration-300 ease-in-out"
-        loading={_localState.loading}
+        loading={isCreating || isUpdating}
         onConfirm={handleSubmit}
       >
         <CreateFunctionContext.Provider value={_localState}>
@@ -833,12 +829,12 @@ const SelectBehavior = observer(({}) => {
 
   return (
     <Listbox
-      id="behavior"
+      id="behaviour"
       size="small"
       label="Behavior"
       layout="horizontal"
-      value={_localState!.formState.behavior.value}
-      onChange={(value) => _localState!.onFormChange({ key: 'behavior', value })}
+      value={_localState!.formState.behaviour.value}
+      onChange={(value) => _localState!.onFormChange({ key: 'behaviour', value })}
     >
       <Listbox.Option value="IMMUTABLE" label="immutable">
         immutable

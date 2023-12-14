@@ -38,14 +38,13 @@ const ChooseFunctionForm = ({
   setVisible,
 }: ChooseFunctionFormProps) => {
   const _localState = useLocalObservable(() => new ChooseFunctionFormStore())
-  _localState.triggerFunctions = triggerFunctions as any
 
   function selectFunction(id: number) {
     onChange(id)
     setVisible(!visible)
   }
 
-  const hasPublicSchemaFunctions = _localState.triggerFunctions.length >= 1
+  const hasPublicSchemaFunctions = triggerFunctions.length >= 1
 
   return (
     <SidePanel

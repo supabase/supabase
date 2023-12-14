@@ -16,7 +16,7 @@ export type DatabasePublicationCreateVariables = {
   publish_truncate?: boolean
 }
 
-export async function updateDatabasePublication({
+export async function createDatabasePublication({
   projectRef,
   connectionString,
   name,
@@ -49,7 +49,7 @@ export async function updateDatabasePublication({
   return data
 }
 
-type DatabasePublicationCreateData = Awaited<ReturnType<typeof updateDatabasePublication>>
+type DatabasePublicationCreateData = Awaited<ReturnType<typeof createDatabasePublication>>
 
 export const useDatabasePublicationCreateMutation = ({
   onSuccess,
@@ -69,7 +69,7 @@ export const useDatabasePublicationCreateMutation = ({
     DatabasePublicationCreateData,
     ResponseError,
     DatabasePublicationCreateVariables
-  >((vars) => updateDatabasePublication(vars), {
+  >((vars) => createDatabasePublication(vars), {
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
       await queryClient.invalidateQueries(databasePublicationsKeys.list(projectRef))
