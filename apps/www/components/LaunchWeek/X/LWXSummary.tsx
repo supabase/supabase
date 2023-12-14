@@ -18,29 +18,33 @@ const LWXSummary = () => {
             height={16}
             className="w-3 h-3"
           />
+          <span className="font-mono uppercase tracking-wide">Main Stage</span>
         </div>
         <div className="font-mono uppercase tracking-wide text-xs">11-15 Dec</div>
       </div>
-      <div className="w-[calc(100%+2px)] bg-surface-100 p-4 flex flex-col gap-2 -m-px border rounded-lg">
-        <div className="pb-4 border-b">
-          <div className="font-mono uppercase text-sm text-foreground tracking-wide">
-            Main Stage
-          </div>
-          <ul className="flex flex-col gap-2 mt-4">
-            {mainDays.map(
-              (day, i: number) =>
-                day.shipped && (
-                  <ol key={day.id}>
-                    <Link href={day.blog} className="block py-1 hover:text-foreground">
-                      {i + 1} - {day.description}
-                    </Link>
-                  </ol>
-                )
-            )}
-          </ul>
-        </div>
-        <div className="mt-4">
-          <div className="font-mono uppercase text-sm text-foreground tracking-wide">
+      <div className="pb-4 border-t p-4">
+        {/* <div className="font-mono uppercase text-sm text-foreground tracking-wide">Main Stage</div> */}
+        <ul className="flex flex-col gap-2">
+          {mainDays.map(
+            (day, i: number) =>
+              day.shipped && (
+                <ol key={day.id}>
+                  <Link
+                    href={day.blog}
+                    className="group flex items-center justify-between py-1 hover:text-foreground"
+                  >
+                    <span>
+                      Day {i + 1} - {day.description}
+                    </span>
+                  </Link>
+                </ol>
+              )
+          )}
+        </ul>
+      </div>
+      <div className="w-[calc(100%+2px)] bg-surface-100 flex flex-col gap-2 -m-px border rounded-lg">
+        <div className="p-4">
+          <div className="font-mono uppercase text-xs text-foreground tracking-wide">
             Build Stage
           </div>
           <ul className="flex flex-col gap-2 mt-4">
@@ -50,18 +54,30 @@ const LWXSummary = () => {
                   <ol key={day.id}>
                     <Link
                       href={day.links[0].url}
-                      className="relative flex items-center group w-full py-1 hover:text-foreground"
+                      className="relative flex items-center justify-between group w-full py-1 hover:text-foreground"
                     >
-                      <span className="absolute block left-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <IconArrowRight />
-                      </span>{' '}
-                      <span className="relative translate-x-0 transition-transform group-hover:translate-x-6">
+                      <span className="relative">
+                        <span className="font-mono uppercase mr-2">
+                          {i + 1 < 10 ? '0' : ''}
+                          {i + 1} -
+                        </span>
                         {day.title}
                       </span>
+                      {/* <span className="relative block opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0">
+                        <IconArrowRight />
+                      </span> */}
                     </Link>
                   </ol>
                 )
             )}
+            <ol className="border-t pt-4 mt-2">
+              <Link
+                href="/blog/supabase-hackathon-lwx"
+                className="relative flex items-center justify-between group w-full py-1 hover:text-foreground"
+              >
+                Supabase Launch Week X Hackathon
+              </Link>
+            </ol>
           </ul>
         </div>
       </div>
