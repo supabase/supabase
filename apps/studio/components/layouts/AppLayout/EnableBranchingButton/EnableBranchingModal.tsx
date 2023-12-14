@@ -234,12 +234,11 @@ const EnableBranchingModal = () => {
                     </div>
                     <div className="flex flex-col gap-y-1">
                       <p className="text-sm text-foreground">
-                        Preview branches are billed per hour
+                        Preview branches are billed $0.32 per day (approximately $10 per month)
                       </p>
                       <p className="text-sm text-foreground-light">
-                        Launching a new preview branch incurs additional compute costs, starting at
-                        $0.01344 per hour (~$10/month). This cost will continue for as long as the
-                        branch has not been removed.
+                        Launching a new preview branch incurs additional compute costs at $0.32 per
+                        day. This cost will continue for as long as the branch has not been removed.
                       </p>
                     </div>
                   </div>
