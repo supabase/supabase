@@ -59,11 +59,11 @@ Below is a flow chart illustrating how Supabase Auth makes use of an Auth Hook:
 
 ## Use Cases
 
-Based on user feedback, we decided on a few use cases to illustrate how a hook. These use cases are not exhaustive and you can opt to [write your own hook](#writing-your-own-hook) if you have a use case which doesn’t fit any of the examples below.
+Based on user feedback, we decided on a few use cases to illustrate how a hook works. These use cases are not exhaustive and you can opt to [write your own hook](#writing-your-own-hook) if you have a use case which doesn’t fit any of the examples below.
 
 ## MFA Verification Attempt Hook
 
-You may wish to increase security beyond the requirements of the [Supabase MFA implementation](https://supabase.com/docs/guides/auth/auth-mfa). You may need to meet compliance requirements set out by your client or you might be working in a field where data is sensitive.
+Depending on your security or compliance requirements, you may need to enforce stricter restrictions beyond the default [Supabase MFA implementation](https://supabase.com/docs/guides/auth/auth-mfa).
 
 For such scenarios, the MFA Verification Attempt hook can allow you to add additional checks to:
 
@@ -75,9 +75,9 @@ For such scenarios, the MFA Verification Attempt hook can allow you to add addit
 
 Supabase Auth will supply the following fields to your hook:
 
-- `factor_id` Unique identifier for the MFA factor the user is verifying. Correlate this to the `auth.mfa_factors` table.
-- `user_id` Unique identifier for the user. Correlate this with `auth.users`
-- `valid` Whether the verification attempt was valid, in the case for TOTP this means that the six digit code was correct (true) or incorrect (false). The hook will generally receive true once, and false many times for the same user and factor.
+- `factor_id` Unique identifier for the MFA factor being verified. 
+- `user_id` Unique identifier for the user.
+- `valid` Whether the verification attempt was valid. For TOTP, this means that the six digit code was correct (true) or incorrect (false). The hook will generally receive true once, and false many times for the same user and factor.
 
 Example payload:
 
@@ -91,7 +91,7 @@ Example payload:
 
 ### Outputs
 
-In exchange your hook should return back a JSON object with these fields set:
+In exchange your hook should return a JSON object with these fields set:
 
 ********************************On Success********************************
 
@@ -190,7 +190,7 @@ Example output:
 
 ## Custom Access Token Hook
 
-You may wish to add additional claims based on the authentication method used or add additional metadata to select users. The custom access token hook runs before a token is issued and allows you to add claims.
+The custom access token hook runs before a token is issued and allows you to add additional claims based on the authentication method used or add additional metadata to select users.
 
 ### Inputs
 
