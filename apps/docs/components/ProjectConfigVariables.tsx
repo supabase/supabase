@@ -24,9 +24,9 @@ import Link from 'next/link'
 
 const selectedProject = proxy({
   selectedId: null,
-  setSelectedId: (id: string) => {
+  setSelectedId: (id: string | null) => {
     selectedProject.selectedId = id
-    if (typeof window !== undefined) {
+    if (typeof window !== undefined && id !== null) {
       store(window.localStorage, SAVED_ORG_PROJECT_BRANCH, id)
     }
   },
