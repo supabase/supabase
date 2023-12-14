@@ -1,6 +1,6 @@
 ---
 title: 'Supabase Auth: Identity Linking, Hooks, and HaveIBeenPwned integration'
-description: "Four major Auth features: Identity Linking, Session Control, Leaked Password Protection, and Hooks"
+description: 'Four major Auth features: Identity Linking, Session Control, Leaked Password Protection, and Hooks'
 launchweek: X
 categories:
   - product
@@ -34,21 +34,21 @@ We're excited to announce four new features for Supabase Auth:
 
 ## Identity Linking
 
-When a user signs in, an identity is created with the authentication method and sign-in provider. Historically, [Supabase Auth](https://supabase.com/docs/guides/auth) has been automatically linking identities to a user if the identity shares the same verified email as the user. This is convenient to de-duplicate user accounts. However, some developers also need the flexibility to link accounts that don’t share the same email. 
+When a user signs in, an identity is created with the authentication method and sign-in provider. Historically, [Supabase Auth](/docs/guides/auth) has been automatically linking identities to a user if the identity shares the same verified email as the user. This is convenient to de-duplicate user accounts. However, some developers also need the flexibility to link accounts that don’t share the same email.
 
 Today we are launching Identity Linking, which developers can use to manually link two separate identities. We’ve added two new endpoints for developers to manage the identity linking process:
 
-Once a user is signed in, use `linkIdentity()` to [link an OAuth identity](https://supabase.com/docs/reference/javascript/auth-linkidentity):
+Once a user is signed in, use `linkIdentity()` to [link an OAuth identity](/docs/reference/javascript/auth-linkidentity):
 
 ```jsx
 const { data, error } = await supabase
-	.auth
-	.linkIdentity({ 
-		provider: 'google' 
-	})
+  .auth
+  .linkIdentity({
+    provider: 'google',
+  })
 ```
 
-Use `unlinkIdentity()` to [unlink an identity](https://supabase.com/docs/reference/javascript/auth-unlinkidentity): 
+Use `unlinkIdentity()` to [unlink an identity](/docs/reference/javascript/auth-unlinkidentity):
 
 ```jsx
 // retrieve all identities linked to a user
@@ -58,17 +58,17 @@ const {
 
 // find the google identity linked to the user
 const googleIdentity = identities
-	.find(({ provider }) => provider === 'google')
+  .find(({ provider }) => provider === 'google')
 
 // unlink the google identity from the user
 const { data, error } = await supabase
-	.auth
-	.unlinkIdentity(googleIdentity)
+  .auth
+  .unlinkIdentity(googleIdentity)
 ```
 
-Currently, these methods support linking an OAuth identity. To link an email or phone identity to the user, you can use the [`updateUser()`](https://supabase.com/docs/reference/javascript/auth-updateuser)method.
+Currently, these methods support linking an OAuth identity. To link an email or phone identity to the user, you can use the [`updateUser()`](/docs/reference/javascript/auth-updateuser)method.
 
-Manual linking is disabled by default. You can enable it for your project in [the dashboard Auth settings](https://supabase.com/dashboard/project/_/settings/auth).
+Manual linking is disabled by default. You can enable it for your project in [the dashboard Auth settings](/dashboard/project/_/settings/auth).
 
 <Img
   alt="How to enable manual linking"
@@ -79,8 +79,12 @@ Manual linking is disabled by default. You can enable it for your project in [th
   caption="How to enable manual linking"
   captionAlign="left"
 />
+<br/>
+<Admonition>
 
-> For more information about how identity linking works, see the [Identity Linking docs](https://supabase.com/docs/guides/auth/auth-identity-linking).
+See the [Identity Linking docs](/docs/guides/auth/auth-identity-linking) for more information.
+
+</Admonition>
 
 ## Session Control
 
@@ -88,7 +92,7 @@ Supabase Auth manages the full session lifecycle from the moment your user signs
 
 1. Creating the session for the user.
 2. Refreshing the session to keep it active.
-3. Revoking the session upon expiry or logout. 
+3. Revoking the session upon expiry or logout.
 
 For developers who want finer control over their users’ sessions, we have exposed 3 new settings:
 
@@ -107,14 +111,18 @@ These session control settings are available on the Pro plan and above.
   caption="How to enforce single session per user"
   captionAlign="left"
 />
+<br/>
+<Admonition>
 
-> For more information, see the [Session Management docs](https://supabase.com/docs/guides/auth/sessions).
+See the [Session Management docs](/docs/guides/auth/sessions) for more information.
+
+</Admonition>
 
 ## Leaked Password Protection
 
-Passwords can be inherently insecure due to common user behaviors like choosing guessable passwords or reusing them across different platforms. 
+Passwords can be inherently insecure due to common user behaviors like choosing guessable passwords or reusing them across different platforms.
 
-Even though OAuth and magiclinks are more secure, we recognize passwords are here to stay. We want to make the potential pitfalls less user-prone. To accomplish that, we have integrated the [HaveIBeenPwned.org](https://haveibeenpwned.com/) *Pwned Passwords API* in Supabase Auth to prevent users from using leaked passwords. 
+Even though OAuth and magiclinks are more secure, we recognize passwords are here to stay. We want to make the potential pitfalls less user-prone. To accomplish that, we have integrated the [HaveIBeenPwned.org](https://haveibeenpwned.com/) _Pwned Passwords API_ in Supabase Auth to prevent users from using leaked passwords.
 
 <Admonition type="note" label="Go library">
 
@@ -122,7 +130,7 @@ Even though OAuth and magiclinks are more secure, we recognize passwords are her
 
 </Admonition>
 
-As an additional step, we have added the ability to specify password requirements for your users. This can be configured from your project’s Auth settings in [the dashboard](https://supabase.com/dashboard/project/_/settings/auth):
+As an additional step, we have added the ability to specify password requirements for your users. This can be configured from your project’s Auth settings in [the dashboard](/dashboard/project/_/settings/auth):
 
 <Img
   alt="Adding password requirements"
@@ -133,8 +141,12 @@ As an additional step, we have added the ability to specify password requirement
   caption="Adding password requirements"
   captionAlign="left"
 />
+<br/>
+<Admonition>
 
-> Check out the [password docs](https://supabase.com/docs/guides/auth/passwords) for more information.
+See the [password docs](/docs/guides/auth/passwords) for more information.
+
+</Admonition>
 
 ## Auth Hooks
 
@@ -146,9 +158,9 @@ We’ve received a ton of feedback asking for ways to customize Auth, like:
 
 We aim to maintain a straightforward and seamless Supabase Auth experience. It should work effortlessly for most developers, requiring no customization. However, recognizing the diversity of apps, you can now extend standard Auth features through Auth Hooks.
 
-Auth Hooks are simply Postgres functions that run synchronously at key points in the Auth lifecycle, to change the outcome of the action. 
+Auth Hooks are simply Postgres functions that run synchronously at key points in the Auth lifecycle, to change the outcome of the action.
 
-For example, to customize the JWT claims with Auth Hooks, you can create a Postgres function that accepts the JWT claims in the first argument and returns the JWT you wish to be used by Supabase Auth. 
+For example, to customize the JWT claims with Auth Hooks, you can create a Postgres function that accepts the JWT claims in the first argument and returns the JWT you wish to be used by Supabase Auth.
 
 Suppose you’re creating a gamified application and you wish to attach the user’s level to the JWT as a custom claim:
 
@@ -161,16 +173,16 @@ declare
   user_level jsonb;
 begin
   -- fetch the current user's level
-  select 
-    to_jsonb(level) into user_level 
-  from profiles 
-  where 
+  select
+    to_jsonb(level) into user_level
+  from profiles
+  where
     user_id = event->>'user_id'::uuid;
 
   -- change the event.claims.level
   return jsonb_set(
-		event, 
-		'{claims,level}', 
+		event,
+		'{claims,level}',
 		user_level);
 
 end;
@@ -203,9 +215,9 @@ Supabase is a founding contributor of [Standard Webhooks](https://www.standardwe
 
 ## One more thing…
 
-If you’ve been following us from [the start](https://supabase.com/blog/supabase-auth), you will know that Supabase Auth started by forking [Netlify’s GoTrue server](https://github.com/netlify/gotrue). A lot has changed since then and we’ve diverged from the upstream repository. At this stage it makes sense to rename the project to something else (*cues drumroll*) — Auth. 
+If you’ve been following us from [the start](https://supabase.com/blog/supabase-auth), you will know that Supabase Auth started by forking [Netlify’s GoTrue server](https://github.com/netlify/gotrue). A lot has changed since then and we’ve diverged from the upstream repository. At this stage it makes sense to rename the project to something else (_cues drumroll_) — Auth.
 
-This simply means that the repositories will be renamed from using `gotrue` to `auth`.  But don’t worry! Docker images and libraries like `@supabase/gotrue-js` will continue to be published and you can use `@supabase/auth-js` interchangeably for the current v2 version for as long as it is supported. All of the classes and methods remain in place. No breaking changes here!
+This simply means that the repositories will be renamed from using `gotrue` to `auth`. But don’t worry! Docker images and libraries like `@supabase/gotrue-js` will continue to be published and you can use `@supabase/auth-js` interchangeably for the current v2 version for as long as it is supported. All of the classes and methods remain in place. No breaking changes here!
 
 ## Conclusion
 
@@ -213,7 +225,7 @@ Thanks for reading till the end! We hope you enjoyed the Supabase Auth updates f
 
 We are looking forward to seeing what you build with these new features, and, of course, your feedback to make them even better.
 
-## More Launch Week X 
+## More Launch Week X
 
 - [Day 1 - Supabase Studio update: AI Assistant and User Impersonation](https://supabase.com/blog/studio-introducing-assistant)
 - [Day 2 - Edge Functions: Node and native npm compatibility](https://supabase.com/blog/edge-functions-node-npm)
