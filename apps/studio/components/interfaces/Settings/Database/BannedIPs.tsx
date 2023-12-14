@@ -64,13 +64,11 @@ const BannedIPs = () => {
 
   useEffect(() => {
     // Fetch user's IP address
-    fetch('/api/get-ip-address')
+    fetch(`/api/database/${ref}/get-ip-address`)
       .then((response) => response.json())
       .then((data) => setUserIPAddress(data.ipAddress))
       .catch((error) => console.error('Error fetching user IP:', error))
   }, [])
-
-  console.log('IP match: ', userIPAddress)
 
   return (
     <div id="banned-ips">
@@ -94,15 +92,15 @@ const BannedIPs = () => {
         {ipList && ipList.banned_ipv4_addresses.length > 0 ? (
           ipList.banned_ipv4_addresses.map((ip) => {
             return (
-              <div
-                key={ip}
-                className={`px-8 py-4 flex items-center justify-between ${
-                  ip === userIPAddress ? 'text-foreground-lighter' : ''
-                }`}
-              >
+              <div key={ip} className="px-8 py-4 flex items-center justify-between">
                 <div className="flex items-center space-x-5">
                   <IconGlobe size={16} className="text-foreground-lighter" />
                   <p className="text-sm font-mono">{ip}</p>
+                  {ip === userIPAddress && (
+                    <span className="text-sm font-bold text-dark-500 bg-gray-300 [[data-theme*=dark]_&]:bg-zinc-900 px-2 py-1 rounded-full">
+                      YOUR IP
+                    </span>
+                  )}
                 </div>
                 <div>
                   <Button type="default" onClick={() => openConfirmationModal(ip)}>
