@@ -98,7 +98,7 @@ const BannedIPs = () => {
                   <p className="text-sm font-mono">{ip}</p>
                   {ip === userIPAddress && (
                     <span className="text-sm font-bold text-dark-500 bg-gray-300 [[data-theme*=dark]_&]:bg-zinc-900 px-2 py-1 rounded-full">
-                      YOUR IP
+                      Your IP
                     </span>
                   )}
                 </div>
