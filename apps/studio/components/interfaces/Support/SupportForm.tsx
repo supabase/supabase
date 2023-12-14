@@ -384,6 +384,13 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                 ) : (
                   <></>
                 )}
+                {(values.severity === 'Urgent' || values.severity === 'High') && (
+                  <p className="text-sm text-foreground-light mt-2">
+                    We do our best to respond to everyone as quickly as possible; however,
+                    prioritization will be based on production status. We ask that you reserve High
+                    and Urgent severity for production-impacting issues only.
+                  </p>
+                )}
               </div>
             )}
 
@@ -428,19 +435,44 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                 </div>
               )}
 
-            {subscription?.plan.id === 'free' && values.category !== 'Login_issues' && (
+            {subscription?.plan.id !== 'enterprise' && values.category !== 'Login_issues' && (
               <div className="px-6">
                 <InformationBox
                   icon={<IconAlertCircle strokeWidth={2} />}
+                  defaultVisibility={true}
+                  hideCollapse={true}
                   title="Expected response times are based on your project's plan"
                   description={
                     <div className="space-y-4 mb-1">
-                      <p>
-                        Free plan support is available within the community and officially by the
-                        team on a best efforts basis, though we cannot guarantee a response time.
-                        For a guaranteed response time we recommend upgrading to the Pro plan.
-                        Enhanced SLAs for support are available on our Enterprise Plan.
-                      </p>
+                      {subscription?.plan.id === 'free' && (
+                        <p>
+                          Free plan support is available within the community and officially by the
+                          team on a best efforts basis. For a guaranteed response we recommend
+                          upgrading to the Pro plan. Enhanced SLAs for support are available on our
+                          Enterprise Plan.
+                        </p>
+                      )}
+
+                      {subscription?.plan.id === 'pro' && (
+                        <p>
+                          Pro Plan includes email-based support. You can expect an answer within 1
+                          business day in most situation for all severities. We recommend upgrading
+                          to the Team plan for prioritized ticketing on all issues and prioritized
+                          escalation to product engineering teams. Enhanced SLAs for support are
+                          available on our Enterprise Plan.
+                        </p>
+                      )}
+
+                      {subscription?.plan.id === 'team' && (
+                        <p>
+                          Team plan includes email-based support. You get prioritized ticketing on
+                          all issues and prioritized escalation to product engineering teams. Low,
+                          Normal, and High severity tickets will generally be handled within 1
+                          business day, while Urgent issues, we respond within 1 day, 365 days a
+                          year. Enhanced SLAs for support are available on our Enterprise Plan.
+                        </p>
+                      )}
+
                       <div className="flex items-center space-x-2">
                         <Button asChild>
                           <Link
