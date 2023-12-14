@@ -11,6 +11,7 @@ import { Badge, Divider, IconChevronLeft } from 'ui'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import BlogLinks from '~/components/LaunchWeek/7/BlogLinks'
+import LWXSummary from '~/components/LaunchWeek/X/LWXSummary'
 import { generateReadingTime, isNotNullOrUndefined } from '~/lib/helpers'
 import ShareArticleActions from '~/components/Blog/ShareArticleActions'
 import useActiveAnchors from '~/hooks/useActiveAnchors'
@@ -122,6 +123,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
   const authorArray = props.blog.author.split(',')
   useActiveAnchors('h2, h3, h4', '.prose-toc a')
   const isLaunchWeek7 = props.blog.launchweek === 7
+  const isLaunchWeekX = props.blog.launchweek?.toString().toLocaleLowerCase() === 'x'
 
   const author = authorArray
     .map((authorId) => {
@@ -331,6 +333,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                     </div>
                   </article>
                   {isLaunchWeek7 && <BlogLinks />}
+                  {isLaunchWeekX && <LWXSummary />}
                   <div className="block lg:hidden py-8">
                     <div className="text-foreground-lighter text-sm">Share this article</div>
                     <ShareArticleActions title={props.blog.title} slug={props.blog.slug} />
