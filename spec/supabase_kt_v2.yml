@@ -2818,13 +2818,13 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          //get all identities
+          //get all identities linked to a user
           val identities = supabase.auth.currentIdentitiesOrNull() ?: emptyList()
           
-          //find the google identity
+          //find the google identity linked to the user
           val googleIdentity = identities.first { it.provider == "google" }
           
-          //unlink the google identity
+          //unlink the google identity from the user
           supabase.auth.unlinkIdentity(googleIdentity.identityId!!)
           ```
   - id: set-session
