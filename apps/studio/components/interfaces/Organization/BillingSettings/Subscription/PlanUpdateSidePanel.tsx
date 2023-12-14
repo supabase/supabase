@@ -55,7 +55,10 @@ const PlanUpdateSidePanel = () => {
   const snap = useOrgSettingsPageStateSnapshot()
   const visible = snap.panelKey === 'subscriptionPlan'
   const onClose = () => {
-    router.push(router.asPath.split('?')[0], undefined, { shallow: true })
+    const { panel, ...queryWithoutPanel } = router.query
+    router.push({ pathname: router.pathname, query: queryWithoutPanel }, undefined, {
+      shallow: true,
+    })
     snap.setPanelKey(undefined)
   }
 
