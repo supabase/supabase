@@ -195,7 +195,7 @@ const days: WeekDayProps[] = [
     shipped: true,
     isToday: true,
     hasCountdown: false,
-    blog: '/blog/supabase-auth-dentity-linking-session-control',
+    blog: '/blog/supabase-auth-identity-linking-hooks',
     date: '14 Dec',
     published_at: '2023-12-14T08:00:00.000-08:00',
     description: (
@@ -207,7 +207,7 @@ const days: WeekDayProps[] = [
     links: [
       {
         type: 'blog',
-        href: '/blog/supabase-auth-dentity-linking-session-control',
+        href: '/blog/supabase-auth-identity-linking-hooks',
       },
       {
         type: 'video',
@@ -221,7 +221,7 @@ const days: WeekDayProps[] = [
     steps: [
       {
         title: '',
-        blog: '/blog/supabase-auth-dentity-linking-session-control',
+        blog: '/blog/supabase-auth-identity-linking-hooks',
         bg_layers: [
           {
             img: '/images/launchweek/lwx/day4/d4_auth.svg',
