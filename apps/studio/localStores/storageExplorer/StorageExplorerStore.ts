@@ -12,7 +12,7 @@ import {
   STORAGE_ROW_TYPES,
   STORAGE_SORT_BY,
   STORAGE_VIEWS,
-} from 'components/to-be-cleaned/Storage/Storage.constants.ts'
+} from 'components/to-be-cleaned/Storage/Storage.constants'
 import { useStore } from 'hooks'
 import { delete_, post } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
