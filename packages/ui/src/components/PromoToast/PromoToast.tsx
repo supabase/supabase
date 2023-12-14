@@ -49,7 +49,7 @@ const PromoToast = () => {
 
       <div className="relative z-10 flex items-center space-x-2">
         <Button asChild type="secondary">
-          <Link target="_blank" rel="noreferrer" href="https://supabase.com/launch-week#day-3">
+          <Link target="_blank" rel="noreferrer" href="https://supabase.com/launch-week#day-4">
             Go to Launch Week
           </Link>
         </Button>
