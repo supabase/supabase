@@ -8,6 +8,7 @@ tags:
   - launch-week
   - auth
 date: '2023-12-14'
+published_at: '2023-12-14:00:05.000-07:00'
 toc_depth: 3
 author: stojan,joel,kangmingtay
 image: lwx-supabase-auth/auth-og.png
@@ -30,7 +31,6 @@ We're excited to announce four new features for Supabase Auth:
     allowfullscreen
   />
 </div>
-> Watch a demonstration of some of the new features
 
 ## Identity Linking
 
@@ -116,10 +116,11 @@ Passwords can be inherently insecure due to common user behaviors like choosing 
 
 Even though OAuth and magiclinks are more secure, we recognize passwords are here to stay. We want to make the potential pitfalls less user-prone. To accomplish that, we have integrated the [HaveIBeenPwned.org](https://haveibeenpwned.com/) *Pwned Passwords API* in Supabase Auth to prevent users from using leaked passwords. 
 
-<aside>
+<Admonition type="note" label="Go library">
+
 ℹ️ We have open-sourced a Go library for interacting with the [HaveIBeenPwned.org](http://HaveIBeenPwned.org) Pwned Passwords API that we use in our Auth server. Check out the [repository](https://github.com/supabase/hibp) and feel free to contribute!
 
-</aside>
+</Admonition>
 
 As an additional step, we have added the ability to specify password requirements for your users. This can be configured from your project’s Auth settings in [the dashboard](https://supabase.com/dashboard/project/_/settings/auth):
 
