@@ -2781,6 +2781,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
+          //get the identities from the current user
           val identities = supabase.auth.currentIdentitiesOrNull()
           //Or retrieve them
           val identities = supabase.auth.retrieveUserForCurrentSession().identities
