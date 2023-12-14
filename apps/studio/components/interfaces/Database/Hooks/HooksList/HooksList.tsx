@@ -10,7 +10,7 @@ import AlertError from 'components/ui/AlertError'
 import { FormHeader } from 'components/ui/Forms'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useDatabaseHooks } from 'data/database-triggers/database-triggers-query'
+import { useDatabaseHooksQuery } from 'data/database-triggers/database-triggers-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
 import { noop } from 'lib/void'
 import HooksListEmpty from './HooksListEmpty'
@@ -30,7 +30,7 @@ const HooksList = ({ createHook = noop, editHook = noop, deleteHook = noop }: Ho
     isSuccess,
     isError,
     error,
-  } = useDatabaseHooks({
+  } = useDatabaseHooksQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
