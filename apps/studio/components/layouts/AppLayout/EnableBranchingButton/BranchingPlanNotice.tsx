@@ -17,8 +17,7 @@ const BranchingPlanNotice = () => {
         Database branching is only available on the Pro plan and above
       </AlertTitle_Shadcn_>
       <AlertDescription_Shadcn_>
-        Head over to your organization's billing settings to upgrade your plan in order to enable
-        branching for this project
+        Go to your organization's billing settings and upgrade your plan to enable branching for this project
       </AlertDescription_Shadcn_>
       <AlertDescription_Shadcn_>
         <Button size="tiny" type="default" className="mt-4">
