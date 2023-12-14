@@ -2802,7 +2802,7 @@ functions:
           supabase.auth.linkIdentity(OAuthProvider)
           
           //Example:
-          supabase.auth.linkIdentity(Github)
+          supabase.auth.linkIdentity(Google)
           ```
   - id: unlink-identity
     title: 'unlinkIdentity()'
