@@ -31,7 +31,6 @@ const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) =>
     if (ui.selectedProjectRef) {
       meta.roles.load()
       meta.triggers.load()
-      meta.publications.load()
     }
   }, [ui.selectedProjectRef])
 

@@ -25,7 +25,6 @@ const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
   useEffect(() => {
     if (ui.selectedProjectRef) {
       meta.policies.load()
-      meta.publications.load()
     }
   }, [ui.selectedProjectRef])
 

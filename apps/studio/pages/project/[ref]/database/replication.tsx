@@ -1,21 +1,27 @@
-import { useState } from 'react'
-import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useState } from 'react'
 
-import { useCheckPermissions, usePermissionsLoaded, useStore } from 'hooks'
-import { NextPageWithLayout } from 'types'
-import { DatabaseLayout } from 'components/layouts'
 import { PublicationsList, PublicationsTables } from 'components/interfaces/Database'
-import NoPermission from 'components/ui/NoPermission'
+import { DatabaseLayout } from 'components/layouts'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import NoPermission from 'components/ui/NoPermission'
+import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
+import { NextPageWithLayout } from 'types'
 
 // [Joshen] Technically, best that we have these as separate URLs
 // makes it easier to manage state, but foresee that this page might
 // be consolidated somewhere else eventually for better UX
 
 const DatabaseReplication: NextPageWithLayout = () => {
-  const { meta } = useStore()
-  const publications = meta.publications.list()
+  const { project } = useProjectContext()
+
+  const { data } = useDatabasePublicationsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const publications = data ?? []
 
   const canViewPublications = useCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_READ,
@@ -37,7 +43,7 @@ const DatabaseReplication: NextPageWithLayout = () => {
           <div className="mb-4">
             <h3 className="mb-1 text-xl text-foreground">Database Replications</h3>
           </div>
-          {selectedPublicationId === undefined ? (
+          {selectedPublication === undefined ? (
             <PublicationsList onSelectPublication={setSelectedPublicationId} />
           ) : (
             <PublicationsTables
@@ -53,4 +59,4 @@ const DatabaseReplication: NextPageWithLayout = () => {
 
 DatabaseReplication.getLayout = (page) => <DatabaseLayout title="Database">{page}</DatabaseLayout>
 
-export default observer(DatabaseReplication)
+export default DatabaseReplication
