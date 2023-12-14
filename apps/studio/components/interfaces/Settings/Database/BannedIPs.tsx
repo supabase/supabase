@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams } from 'common/hooks'
 import { useStore } from 'hooks'
 import { FormHeader, FormPanel } from 'components/ui/Forms'
@@ -17,6 +17,7 @@ import ConfirmationModal from 'components/ui/ConfirmationModal'
 
 import { useBannedIPsQuery } from 'data/banned-ips/banned-ips-query'
 import { useBannedIPsDeleteMutation } from 'data/banned-ips/banned-ips-delete-mutations'
+import { BASE_PATH } from 'lib/constants'
 
 const BannedIPs = () => {
   const { ref } = useParams()
@@ -60,6 +61,15 @@ const BannedIPs = () => {
     setShowUnban(true)
   }
 
+  const [userIPAddress, setUserIPAddress] = useState<string | null>(null)
+
+  useEffect(() => {
+    // Fetch user's IP address
+    fetch(`${BASE_PATH}/api/get-ip-address`)
+      .then((response) => response.json())
+      .then((data) => setUserIPAddress(data.ipAddress))
+  }, [])
+
   return (
     <div id="banned-ips">
       <div className="flex items-center justify-between">
@@ -85,6 +95,11 @@ const BannedIPs = () => {
               <div className="flex items-center space-x-5">
                 <IconGlobe size={16} className="text-foreground-lighter" />
                 <p className="text-sm font-mono">{ip}</p>
+                {ip === userIPAddress && (
+                  <span className="text-sm font-bold text-dark-500 bg-gray-300 [[data-theme*=dark]_&]:bg-zinc-900 px-2 py-1 rounded-full">
+                    Your IP
+                  </span>
+                )}
               </div>
               <div>
                 <Button type="default" onClick={() => openConfirmationModal(ip)}>
