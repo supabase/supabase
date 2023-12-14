@@ -66,8 +66,8 @@ Next.js [Middleware](https://nextjs.org/docs/app/building-your-application/routi
 Create a new `middleware.js` file in the root of your project and populate with the following:
 
 ```js middleware.js
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
-import { NextResponse } from 'next/server';
+import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
+import { NextResponse } from 'next/server'
 
 export async function middleware(req) {
   const res = NextResponse.next();
@@ -104,10 +104,10 @@ export const config = {
 Create a new `middleware.ts` file in the root of your project and populate with the following:
 
 ```ts middleware.ts
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
-import { NextResponse } from 'next/server';
+import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
+import { NextResponse } from 'next/server'
 
-import type { NextRequest } from 'next/server';
+import type { NextRequest } from 'next/server'
 
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
