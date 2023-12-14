@@ -7,7 +7,7 @@ const LWXSummary = () => {
   return (
     <div className="w-full border bg-alternative-200 flex flex-col rounded-lg text-foreground-lighter mt-12">
       <div className="w-full p-4 flex justify-between items-center">
-        <div className="flex items-center gap-2 leading-none uppercase text-xs">
+        <div className="flex items-center gap-1.5 leading-none uppercase text-xs">
           <span className="text-foreground tracking-[1px]">Launch Week</span>{' '}
           <Image
             src="/images/launchweek/lwx/logos/lwx_logo.svg"
@@ -16,12 +16,14 @@ const LWXSummary = () => {
             height={16}
             className="w-3 h-3"
           />
-          <span className="font-mono uppercase tracking-wide">Main Stage</span>
+          {/* <span className="font-mono uppercase tracking-wide">Main Stage</span> */}
         </div>
         <div className="font-mono uppercase tracking-wide text-xs">11-15 Dec</div>
       </div>
       <div className="pb-4 border-t p-4">
-        {/* <div className="font-mono uppercase text-sm text-foreground tracking-wide">Main Stage</div> */}
+        <div className="font-mono uppercase text-xs text-foreground tracking-wide mb-3">
+          Main Stage
+        </div>
         <ul className="flex flex-col gap-2">
           {mainDays.map(
             (day, i: number) =>
@@ -81,7 +83,7 @@ const LWXSummary = () => {
                 href="/blog/community-meetups-lwx"
                 className="relative flex items-center justify-between group w-full py-1 hover:text-foreground"
               >
-                Launch Week X Community Meetups
+                Supabase Launch Week X Community Meetups
               </Link>
             </ol>
           </ul>
