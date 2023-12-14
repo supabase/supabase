@@ -3,7 +3,6 @@ import createClient from 'openapi-fetch'
 import { v4 as uuidv4 } from 'uuid'
 import { API_URL, LOCAL_SUPABASE } from './constants'
 import { getAccessToken } from './userAuth'
-import { useCallback, useEffect, useReducer, useRef } from 'react'
 
 const DEFAULT_HEADERS = {
   'Content-Type': 'application/json',
