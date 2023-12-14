@@ -7,6 +7,10 @@ export const meta = {
   description: 'Use Supabase Postgres Functions to customize your authentication flow',
 }
 
+<Admonition type="info">
+Hooks are currently in beta and will only be available on all projects early 2024.
+</Admonition>
+
 
 Supabase allows you to use PostgreSQL functions to alter the default Supabase Auth flow. Developers can use hooks to write custom behaviour when there are no built-in ways of achieving the desired behaviour.
 
@@ -26,10 +30,10 @@ You can use hooks at specific points along an Auth flow to perform custom behavi
 | Password Verification Attempt    | Teams and Enterprise    |
 | Custom Access Token              | Free                    |
 
+You can link a hook to an extensiblity point to signal to Supabase Auth that it should make use of the hook.
 
 
-
-Below is a flow chart illustrating how Supabase Auth makes use of an Auth Hook:
+Below is a flow chart illustrating how Supabase Auth uses an Auth Hook:
 
 <Mermaid
  chart={`flowchart TD
@@ -54,6 +58,7 @@ Below is a flow chart illustrating how Supabase Auth makes use of an Auth Hook:
     end`}
     />
 
+
 ## Creating and Managing Hooks
 ### Writing a Hook
 
@@ -76,7 +81,9 @@ $$ language plpgsql;
 
 ### Assigning Hook Permissions
 
-Supabase Auth will invoke a hook with the `supabase_auth_admin` role. The `supabase_auth_admin` role does not have permissions to modify the `public` schema by default - you will need to grant the role additional permissions to execute the function you have defined:
+You will need to assign additional permissions to the postgres functions and the tables that it will interact with.
+
+By default, Supabase Auth will invoke a hook with the `supabase_auth_admin` role and the `supabase_auth_admin` role does not have permissions to modify the `public` schema - you will need to grant the role additional permissions to execute the function you have defined:
 
 ```sql
 grant execute
@@ -84,7 +91,7 @@ grant execute
 	to supabase_auth_admin;
 ```
 
-Also revoke permissions from the `authenticated` and `anon` roles to ensure the tafunction is not accessible by Supabase Serverless APIs.
+Also revoke permissions from the `authenticated` and `anon` roles to ensure the function is not accessible by Supabase Serverless APIs.
 
 ```sql
 revoke execute
@@ -96,9 +103,9 @@ revoke execute
 Avoid adding a `security definer` tag to the function to avoid permission errors.
 </Admonition>
 
-By default, Postgres functions are tagged with `security invoker` and will run with the permissions of the user that calls it. In the case of Auth Hooks, `supabase_auth_admin`  is the invoker and it will run with the permissions of `supabase_auth_admin`.
+Postgres functions have an implicit tag of `security invoker` and will run with the permissions of the user that calls it. In the case of Auth Hooks, `supabase_auth_admin`  is the invoker and it will run with the permissions of `supabase_auth_admin`.
 
-In contrast, the `security definer` tag specifies that the hook is to be executed with the privileges of the user that owns it.  In the case of functions created via the Supabase Dashboard this is `postgres` which does not have permissions over the Auth schema. Introducing a `security definer` tag could prevent Supabase Auth from having the appropriate permissions to access tables or execute functions.
+The alternative `security definer` tag specifies that the hook is to be executed with the privileges of the user that owns it.  In the case of functions created via the Supabase Dashboard this is `postgres` which does not have permissions over the Auth schema. Introducing a `security definer` tag could prevent Supabase Auth from having the appropriate permissions to access tables or execute functions.
 
 
 ### Timeouts
@@ -223,7 +230,7 @@ Example output:
 
 #### On Error
 
-Returns the default http error.
+Returns the default error.
 
 ## Password Verification Attempts Hook
 
@@ -267,7 +274,7 @@ Example output:
 
 #### On Error
 
-Returns the default http error
+Returns the default error
 
 ## Custom Access Token Hook
 
@@ -300,21 +307,7 @@ Returns the default http error
 
 ## Examples
 
-<Accordion
- type="default"
-  openBehaviour="multiple"
-  chevronAlign="right"
-  justified
-  size="medium"
-  className="text-foreground-light">
-<div className="border-b pb-3">
 ### Example: Limit Failed MFA Verification Attempts
-<Accordion.Item
-        header={<span className="text-foreground font-bold">Details </span>}
-        id={`limit-failed-mfa-verification-attempts`}
-      >
-
-### Scenario
 
 Your company requires that a user can only input an incorrect MFA Verification code every 2 seconds and not more than that.
 
@@ -386,11 +379,8 @@ create function public.hook_mfa_verification_attempt(event jsonb)
 		return jsonb_build_object('decision', 'continue');
 	end;
 	$$;
-```
 
-Assign appropriate permissions to `supabase_auth_admin`:
-
-```sql
+-- Assign appropriate permissions and revoke access
 grant execute
 	on function public.hook_mfa_verification_attempt
 	to supabase_auth_admin;
@@ -398,11 +388,7 @@ grant execute
 grant all
 	on table public.mfa_failed_verification_attempts
 	to supabase_auth_admin;
-```
 
-Revoke permissions from `authenticated` and `anon` to prevent unintentional access by Supabase Serverless APIs.
-
-```sql
 revoke execute
 	on function public.hook_mfa_verification_attempt
 	from authenticated, anon;
@@ -412,25 +398,17 @@ revoke all
 	from authenticated, anon;
 ```
 
-</Accordion.Item>
-</div>
-</Accordion>
 
-<Accordion
- type="default"
-  openBehaviour="multiple"
-  chevronAlign="right"
-  justified
-  size="medium"
-  className="text-foreground-light">
-<div className="border-b pb-3">
 ### Example: Limit Failed Password Verification Attempts
-<Accordion.Item
-        header={<span className="text-foreground font-bold">Details </span>}
-        id={`limit-failed-password-verification-attempts`}
-      >
 
-### Scenario
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="add-admin-role" label="Limit Failed Password Verification Attempts">
 
 As part of new security measures within the company, users can only input an incorrect password every 10 seconds and not more than that. You are charged with impelementing a hook to enforce this.
 
@@ -440,7 +418,7 @@ First you need to create a table that will record the last time a user had an in
 
 You can do this by creating a table such as:
 
-``sql
+```sql
 create table public.password_failed_verification_attempts (
 	user_id uuid not null,
   last_failed_at timestamp not null default now(),
@@ -497,11 +475,9 @@ create function public.hook_password_verification_attempt(event jsonb)
 		return jsonb_build_object('decision', 'continue');
 	end;
 	$$;
-```
 
-Grant appropriate permissions to `supabase_auth_admin`
 
-```sql
+-- Assign appropriate permissions
 grant execute
 	on function public.hook_password_verification_attempt
 	to supabase_auth_admin;
@@ -509,11 +485,7 @@ grant execute
 grant all
 	on table public.password_failed_verification_attempts
 	to supabase_auth_admin;
-```
 
-Revoke permissions from `authenticated` and `anon` to prevent unintentional access by Supabase Serverless APIs.
-
-```sql
 revoke execute
 	on function public.hook_password_verification_attempt
 	from authenticated, anon;
@@ -522,25 +494,20 @@ revoke all
 	on table public.password_failed_verification_attempts
 	from authenticated, anon;
 ```
-</Accordion.Item>
-</div>
-</Accordion>
+</TabPanel>
+</Tabs>
 
-<Accordion
- type="default"
-  openBehaviour="multiple"
-  chevronAlign="right"
-  justified
-  size="medium"
-  className="text-foreground-light">
-<div className="border-b pb-3">
+
 ### Example: Add Custom Claims to Token
-<Accordion.Item
-        header={<span className="text-foreground font-bold">Details </span>}
-        id={`add-custom-claims-to-token`}
-      >
 
-### Scenario
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="add-admin-role" label="Add Admin Role">
 
 Your company would like to allow users with a `@supabase.com` email account to perform restricted actions. To support this, users who are registered as admins with the company should be accorded the `admin` role.
 
@@ -579,11 +546,42 @@ begin
     return event;
 end;
 $$;
-```
-</Accordion.Item>
-</div>
-</Accordion>
 
+grant execute
+	on function public.custom_access_token_hook
+	to supabase_auth_admin;
+
+revoke execute
+	on function public.custom_access_token_hook
+	from authenticated, anon;
+```
+</TabPanel>
+
+<TabPanel id="delete-usermetadata-claim" label="Delete Claims">
+Your company would like to remove the user metadata claim in order to reduce the size of your access token.
+
+```sql
+create or replace function custom_access_token_delete_user_metadata(input jsonb)
+returns jsonb as $$
+declare
+    result jsonb;
+begin
+    input := jsonb_set(input, '{claims}', (input->'claims') - 'user_metadata');
+    result := jsonb_build_object('claims', input->'claims');
+    return result;
+end; $$ language plpgsql;
+
+grant execute
+	on function public.custom_access_token_delete_user_metadata
+	to supabase_auth_admin;
+
+revoke execute
+	on function public.custom_access_token_delete_user_metadata
+	from authenticated, anon;
+```
+</TabPanel>
+
+</Tabs>
 
 
 
