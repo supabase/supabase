@@ -1,7 +1,9 @@
+import { PostgresFunction } from '@supabase/postgres-meta'
 import { has, isEmpty, mapValues, union, without } from 'lodash'
 import { makeAutoObservable } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { createContext, useContext, useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import SVG from 'react-inlinesvg'
 
 import { Dictionary } from 'components/grid'
@@ -13,6 +15,8 @@ import {
   DatabaseFunction,
   useDatabaseFunctionsQuery,
 } from 'data/database-functions/database-functions-query'
+import { useDatabaseTriggerCreateMutation } from 'data/database-triggers/database-trigger-create-mutation'
+import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-mutation'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
@@ -106,7 +110,6 @@ class CreateTriggerFormState {
 
 interface ICreateTriggerStore {
   chooseFunctionFormVisible: boolean
-  loading: boolean
   formState: CreateTriggerFormState
   meta: any
   tables: Dictionary<any>[]
@@ -114,14 +117,12 @@ interface ICreateTriggerStore {
   onSelectFunction: (fn: DatabaseFunction) => void
   setChooseFunctionFormVisible: (value: boolean) => void
   setDefaultSelectedTable: () => void
-  setLoading: (value: boolean) => void
   setTables: (value: any[]) => void
   validateForm: () => boolean
 }
 
 class CreateTriggerStore implements ICreateTriggerStore {
   chooseFunctionFormVisible = false
-  loading = false
   formState = new CreateTriggerFormState()
   meta = null
   tables = []
@@ -129,10 +130,6 @@ class CreateTriggerStore implements ICreateTriggerStore {
 
   constructor() {
     makeAutoObservable(this)
-  }
-
-  get title() {
-    return this.formState.id ? `Edit '${this.formState.originalName}' trigger` : 'Add a new Trigger'
   }
 
   get isEditing() {
@@ -150,10 +147,6 @@ class CreateTriggerStore implements ICreateTriggerStore {
       this.formState.schema.value = (this.tables[0] as any).schema
       this.formState.tableId.value = (this.tables[0] as any).id
     }
-  }
-
-  setLoading = (value: boolean) => {
-    this.loading = value
   }
 
   setisDirty = (value: boolean) => {
@@ -269,6 +262,21 @@ const CreateTrigger = ({ trigger, visible, setVisible }: CreateTriggerProps) => 
   })
   const triggerFunctions = (data ?? []).filter((fn) => fn.return_type === 'trigger')
 
+  const { mutate: createDatabaseTrigger, isLoading: isCreating } =
+    useDatabaseTriggerCreateMutation()
+  const { mutate: updateDatabaseTrigger, isLoading: isUpdating } =
+    useDatabaseTriggerUpdateMutation()
+
+  useEffect(() => {
+    const fetchFunctions = async () => {
+      await meta.functions.load()
+      const triggerFuncs = meta.functions.list((x: PostgresFunction) => x.return_type === 'trigger')
+      _localState.setTriggerFunctions(triggerFuncs)
+    }
+
+    if (ui.selectedProjectRef) fetchFunctions()
+  }, [ui.selectedProjectRef])
+
   useEffect(() => {
     _localState.setisDirty(false)
     if (trigger) {
@@ -280,40 +288,46 @@ const CreateTrigger = ({ trigger, visible, setVisible }: CreateTriggerProps) => 
   }, [visible, trigger])
 
   async function handleSubmit() {
-    try {
-      if (_localState.validateForm()) {
-        _localState.setLoading(true)
+    if (!project) return console.error('Project is required')
 
-        const body = _localState.formState.requestBody
-        const response: any = _localState.isEditing
-          ? await (meta as any).triggers.update(body.id, body)
-          : await (meta as any).triggers.create(body)
-
-        if (response.error) {
-          ui.setNotification({
-            category: 'error',
-            message: `Failed to create trigger: ${
-              response.error?.message ?? 'submit request failed'
-            }`,
-          })
-          _localState.setLoading(false)
-        } else {
-          ui.setNotification({
-            category: 'success',
-            message: `${_localState.isEditing ? 'Updated' : 'Created new'} trigger called ${
-              response.name
-            }`,
-          })
-          _localState.setLoading(false)
-          setVisible(!visible)
-        }
+    if (_localState.validateForm()) {
+      const body = _localState.formState.requestBody
+      if (_localState.isEditing && body.id) {
+        updateDatabaseTrigger(
+          {
+            projectRef: project?.ref,
+            connectionString: project?.connectionString,
+            id: body.id,
+            payload: body,
+          },
+          {
+            onSuccess: () => {
+              toast.success(`Successfully updated trigger ${body.name}`)
+              setVisible(!visible)
+            },
+            onError: (error) => {
+              toast.error(`Failed to update trigger: ${error.message}`)
+            },
+          }
+        )
+      } else {
+        createDatabaseTrigger(
+          {
+            projectRef: project?.ref,
+            connectionString: project?.connectionString,
+            payload: body,
+          },
+          {
+            onSuccess: () => {
+              toast.success(`Successfully created trigger ${body.name}`)
+              setVisible(!visible)
+            },
+            onError: (error) => {
+              toast.error(`Failed to create trigger: ${error.message}`)
+            },
+          }
+        )
       }
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Filed to create trigger: ${error.message}`,
-      })
-      _localState.setLoading(false)
     }
   }
 
@@ -329,14 +343,18 @@ const CreateTrigger = ({ trigger, visible, setVisible }: CreateTriggerProps) => 
         size="large"
         visible={visible}
         onCancel={isClosingSidePanel}
-        header={_localState.title}
+        header={
+          _localState.formState.id
+            ? `Edit '${_localState.formState.originalName}' trigger`
+            : 'Add a new Trigger'
+        }
         hideFooter={!hasPublicTables}
         className={
           _localState.chooseFunctionFormVisible
             ? 'hooks-sidepanel mr-16 transform transition-all duration-300 ease-in-out'
             : 'hooks-sidepanel mr-0 transform transition-all duration-300 ease-in-out'
         }
-        loading={_localState.loading}
+        loading={isCreating || isUpdating}
         onConfirm={handleSubmit}
       >
         {hasPublicTables ? (

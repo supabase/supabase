@@ -32,7 +32,7 @@ export async function getDatabaseTriggers(
 export type DatabaseTriggersData = Awaited<ReturnType<typeof getDatabaseTriggers>>
 export type DatabaseTriggersError = ResponseError
 
-export const useDatabaseHooks = <TData = DatabaseTriggersData>(
+export const useDatabaseHooksQuery = <TData = DatabaseTriggersData>(
   { projectRef, connectionString }: DatabaseTriggersVariables,
   {
     enabled = true,
@@ -56,7 +56,7 @@ export const useDatabaseHooks = <TData = DatabaseTriggersData>(
     }
   )
 
-export const useDatabaseTriggers = <TData = DatabaseTriggersData>(
+export const useDatabaseTriggersQuery = <TData = DatabaseTriggersData>(
   { projectRef, connectionString }: DatabaseTriggersVariables,
   {
     enabled = true,
