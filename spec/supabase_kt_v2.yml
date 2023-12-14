@@ -2770,6 +2770,64 @@ functions:
              }
           }
           ```
+  - id: get-user-identities
+    title: 'currentIdentitiesOrNull()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.getUserIdentities'
+    notes: |
+      - The user needs to be signed in to call `currentIdentitiesOrNull()`.
+    examples:
+      - id: get-user-identities
+        name: Returns a list of identities linked to the user
+        isSpotlight: true
+        code: |
+          ```kotlin
+          //get the identities from the current user
+          val identities = supabase.auth.currentIdentitiesOrNull()
+          //Or retrieve them
+          val identities = supabase.auth.retrieveUserForCurrentSession().identities
+          ```
+  - id: link-identity
+    title: 'linkIdentity()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.linkIdentity'
+    notes: |
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The user needs to be signed in to call `linkIdentity()`.
+      - If the candidate identity is already linked to the existing user or another user, `linkIdentity()` will fail.
+      - This method works similarly to `signInWith()` using an OAuthProvider. To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
+    examples:
+      - id: link-identity
+        name: Link an identity to a user
+        isSpotlight: true
+        code: |
+          ```kotlin
+          supabase.auth.linkIdentity(OAuthProvider)
+          
+          //Example:
+          supabase.auth.linkIdentity(Google)
+          ```
+  - id: unlink-identity
+    title: 'unlinkIdentity()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.unlinkIdentity'
+    notes: |
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The user needs to be signed in to call `unlinkIdentity()`.
+      - The user must have at least 2 identities in order to unlink an identity.
+      - The identity to be unlinked must belong to the user.
+    examples:
+      - id: unlink-identity
+        name: Unlink an identity
+        isSpotlight: true
+        code: |
+          ```kotlin
+          //get all identities linked to a user
+          val identities = supabase.auth.currentIdentitiesOrNull() ?: emptyList()
+          
+          //find the google identity linked to the user
+          val googleIdentity = identities.first { it.provider == "google" }
+          
+          //unlink the google identity from the user
+          supabase.auth.unlinkIdentity(googleIdentity.identityId!!)
+          ```
   - id: set-session
     title: 'importSession()'
     $ref: '@supabase/gotrue-js.GoTrueClient.setSession'
