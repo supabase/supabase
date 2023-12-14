@@ -268,16 +268,6 @@ const CreateTrigger = ({ trigger, visible, setVisible }: CreateTriggerProps) => 
     useDatabaseTriggerUpdateMutation()
 
   useEffect(() => {
-    const fetchFunctions = async () => {
-      await meta.functions.load()
-      const triggerFuncs = meta.functions.list((x: PostgresFunction) => x.return_type === 'trigger')
-      _localState.setTriggerFunctions(triggerFuncs)
-    }
-
-    if (ui.selectedProjectRef) fetchFunctions()
-  }, [ui.selectedProjectRef])
-
-  useEffect(() => {
     _localState.setisDirty(false)
     if (trigger) {
       _localState.formState.reset(trigger)
