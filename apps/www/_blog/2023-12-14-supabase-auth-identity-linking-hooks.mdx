@@ -66,7 +66,7 @@ const { data, error } = await supabase
 	.unlinkIdentity(googleIdentity)
 ```
 
-Currently, these methods support linking an OAuth identity. To link an email or phone identity to the user, you can use the `[updateUser()](https://supabase.com/docs/reference/javascript/auth-updateuser)`method.
+Currently, these methods support linking an OAuth identity. To link an email or phone identity to the user, you can use the [`updateUser()`](https://supabase.com/docs/reference/javascript/auth-updateuser)method.
 
 Manual linking is disabled by default. You can enable it for your project in [the dashboard Auth settings](https://supabase.com/dashboard/project/_/settings/auth).
 
