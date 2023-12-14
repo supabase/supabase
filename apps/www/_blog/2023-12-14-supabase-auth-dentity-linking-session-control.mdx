@@ -70,7 +70,15 @@ Currently, these methods support linking an OAuth identity. To link an email or 
 
 Manual linking is disabled by default. You can enable it for your project in [the dashboard Auth settings](https://supabase.com/dashboard/project/_/settings/auth).
 
-IMAGE GOES HERE
+<Img
+  alt="How to enable manual linking"
+  src={{
+    light: '/images/blog/lwx-supabase-auth/account-linking-config-light.png',
+    dark: '/images/blog/lwx-supabase-auth/account-linking-config-dark.png',
+  }}
+  caption="How to enable manual linking"
+  captionAlign="left"
+/>
 
 > For more information about how identity linking works, see the [Identity Linking docs](https://supabase.com/docs/guides/auth/auth-identity-linking).
 
@@ -90,7 +98,15 @@ For developers who want finer control over their users’ sessions, we have expo
 
 These session control settings are available on the Pro plan and above.
 
-IMAGE GOES HERE
+<Img
+  alt="How to enforce single session per user"
+  src={{
+    light: '/images/blog/lwx-supabase-auth/session-config-light.png',
+    dark: '/images/blog/lwx-supabase-auth/session-config-dark.png',
+  }}
+  caption="How to enforce single session per user"
+  captionAlign="left"
+/>
 
 > For more information, see the [Session Management docs](https://supabase.com/docs/guides/auth/sessions).
 
@@ -107,7 +123,15 @@ Even though OAuth and magiclinks are more secure, we recognize passwords are her
 
 As an additional step, we have added the ability to specify password requirements for your users. This can be configured from your project’s Auth settings in [the dashboard](https://supabase.com/dashboard/project/_/settings/auth):
 
-IMAGE GOES HERE
+<Img
+  alt="Adding password requirements"
+  src={{
+    light: '/images/blog/lwx-supabase-auth/passwords-config-light.png',
+    dark: '/images/blog/lwx-supabase-auth/passwords-config-dark.png',
+  }}
+  caption="Adding password requirements"
+  captionAlign="left"
+/>
 
 > Check out the [password docs](https://supabase.com/docs/guides/auth/passwords) for more information.
 
@@ -154,7 +178,15 @@ $$
 
 Once you’ve created the function in the database, you only need to register it with Supabase Auth:
 
-IMAGE GOES HERE
+<Img
+  alt="Auth Hooks"
+  src={{
+    light: '/images/blog/lwx-supabase-auth/hooks-light.png',
+    dark: '/images/blog/lwx-supabase-auth/hooks-dark.png',
+  }}
+  caption="Auth Hooks"
+  captionAlign="left"
+/>
 
 Currently, you can register an Auth Hook for the following points in the flow:
 
