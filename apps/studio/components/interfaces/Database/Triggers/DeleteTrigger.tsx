@@ -1,9 +1,8 @@
-import { observer } from 'mobx-react-lite'
-import { useState } from 'react'
+import toast from 'react-hot-toast'
 
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
-import { useStore } from 'hooks'
-import { isResponseOk } from 'lib/common/fetch'
+import { useDatabaseTriggerDeleteMutation } from 'data/database-triggers/database-trigger-delete-mutation'
 
 interface DeleteTriggerProps {
   trigger?: any
@@ -12,31 +11,28 @@ interface DeleteTriggerProps {
 }
 
 const DeleteTrigger = ({ trigger, visible, setVisible }: DeleteTriggerProps) => {
-  const { ui, meta } = useStore()
-  const [loading, setLoading] = useState(false)
+  const { project } = useProjectContext()
   const { id, name, schema } = trigger ?? {}
 
+  const { mutate: deleteDatabaseTrigger, isLoading } = useDatabaseTriggerDeleteMutation()
+
   async function handleDelete() {
-    try {
-      setLoading(true)
-      if (!id) {
-        throw Error('Invalid trigger info')
+    if (!project) return console.error('Project is required')
+    if (!id) return console.error('Trigger ID is required')
+
+    deleteDatabaseTrigger(
+      {
+        projectRef: project.ref,
+        connectionString: project.connectionString,
+        id,
+      },
+      {
+        onSuccess: () => {
+          toast.success(`Successfully removed ${name}`)
+          setVisible(false)
+        },
       }
-      const response = await meta.triggers.del(id)
-      if (!isResponseOk(response)) {
-        throw response.error
-      } else {
-        ui.setNotification({ category: 'success', message: `Successfully removed ${name}` })
-        setVisible(false)
-      }
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to delete ${name}: ${error.message}`,
-      })
-    } finally {
-      setLoading(false)
-    }
+    )
   }
 
   return (
@@ -45,7 +41,7 @@ const DeleteTrigger = ({ trigger, visible, setVisible }: DeleteTriggerProps) => 
       onCancel={() => setVisible(!visible)}
       onConfirm={handleDelete}
       title="Delete this trigger"
-      loading={loading}
+      loading={isLoading}
       confirmLabel={`Delete trigger ${name}`}
       confirmPlaceholder="Type in name of trigger"
       confirmString={name}
@@ -55,4 +51,4 @@ const DeleteTrigger = ({ trigger, visible, setVisible }: DeleteTriggerProps) => 
   )
 }
 
-export default observer(DeleteTrigger)
+export default DeleteTrigger

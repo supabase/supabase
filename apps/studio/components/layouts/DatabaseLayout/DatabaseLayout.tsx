@@ -30,8 +30,6 @@ const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) =>
   useEffect(() => {
     if (ui.selectedProjectRef) {
       meta.roles.load()
-      meta.triggers.load()
-      meta.publications.load()
     }
   }, [ui.selectedProjectRef])
 
