@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 import { useRouter } from 'next/router'
 import { IconChevronRight, IconArrowLeft } from '~/../../packages/ui'
 import { REFERENCES } from './NavigationMenu/NavigationMenu.constants'
@@ -43,22 +43,20 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
 
   return (
     <div
-      className="dark:bg-scale-200 dark:border-scale-400 sidebar-width sticky top-16
+      className="bg-background border-muted sidebar-width sticky top-16
       h-screen overflow-y-scroll border-r py-8 px-6 sidebar-menu-container hidden lg:block"
     >
       {isInReferencePages && (
         <>
           <Link href="/reference">
-            <a>
-              <div className="flex items-center space-x-4 opacity-75 hover:opacity-100 transition">
-                <IconArrowLeft size={16} strokeWidth={2} className="text-scale-1200" />
-                <span className="text-sm text-scale-1200">All Reference Docs</span>
-              </div>
-            </a>
+            <div className="flex items-center space-x-4 opacity-75 hover:opacity-100 transition">
+              <IconArrowLeft size={16} strokeWidth={2} className="text-foreground" />
+              <span className="text-sm text-foreground">All Reference Docs</span>
+            </div>
           </Link>
           {referenceMeta !== undefined && (
             <div className="my-5 flex items-center space-x-4">
-              <div className="h-10 w-10 rounded bg-scale-500 flex items-center justify-center">
+              <div className="h-10 w-10 rounded bg-surface-100 flex items-center justify-center">
                 <Image
                   className="rounded"
                   width={24}
@@ -67,7 +65,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                   src={referenceMeta.icon}
                 />
               </div>
-              <p className="text-scale-1200 font-bold">{referenceMeta.name}</p>
+              <p className="text-foreground font-bold">{referenceMeta.name}</p>
             </div>
           )}
         </>
@@ -76,21 +74,19 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
         <div className="my-2">
           {menuItems[0].items.map((item) => (
             <Link key={item.name} href={item.url}>
-              <a>
-                <div
-                  key={item.name}
-                  className={[
-                    'py-1.5 px-5 rounded text-sm transition',
-                    `${
-                      item.url === asPath
-                        ? 'bg-scale-200 text-brand-900'
-                        : 'text-scale-1100 hover:text-scale-1200'
-                    }`,
-                  ].join(' ')}
-                >
-                  {item.name}
-                </div>
-              </a>
+              <div
+                key={item.name}
+                className={[
+                  'py-1.5 px-5 rounded text-sm transition',
+                  `${
+                    item.url === asPath
+                      ? 'bg-background text-brand-link'
+                      : 'text-foreground-light hover:text-foreground'
+                  }`,
+                ].join(' ')}
+              >
+                {item.name}
+              </div>
             </Link>
           ))}
         </div>
@@ -105,11 +101,11 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
             <Accordion.Item key={group.label} value={group.label}>
               <Accordion.Trigger className="w-full flex items-center space-x-2 py-1.5">
                 <IconChevronRight
-                  className="transition text-scale-1000 data-open-parent:rotate-90"
+                  className="transition text-foreground-lighter data-open-parent:rotate-90"
                   size={14}
                   strokeWidth={2}
                 />
-                <span className="text-scale-1200 text-sm group-hover:text-brand-900 transition">
+                <span className="text-foreground text-sm group-hover:text-brand transition">
                   {group.label}
                 </span>
               </Accordion.Trigger>
@@ -118,20 +114,18 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                   if (section.items.length === 0) {
                     return (
                       <Link href={section.url} key={section.name}>
-                        <a>
-                          <div
-                            className={[
-                              'py-1.5 px-5 rounded text-sm transition',
-                              `${
-                                section.url === asPath
-                                  ? 'bg-scale-200 text-brand-900'
-                                  : 'text-scale-1100 hover:text-scale-1200'
-                              }`,
-                            ].join(' ')}
-                          >
-                            {section.name}
-                          </div>
-                        </a>
+                        <div
+                          className={[
+                            'py-1.5 px-5 rounded text-sm transition',
+                            `${
+                              section.url === asPath
+                                ? 'bg-background text-brand'
+                                : 'text-foreground-light hover:text-foreground'
+                            }`,
+                          ].join(' ')}
+                        >
+                          {section.name}
+                        </div>
                       </Link>
                     )
                   } else {
@@ -146,32 +140,30 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                         <Accordion.Item value={section.name}>
                           <Accordion.Trigger className="flex items-center space-x-2 px-4 py-1.5">
                             <IconChevronRight
-                              className="transition text-scale-1000 data-open-parent:rotate-90"
+                              className="transition text-foreground-lighter data-open-parent:rotate-90"
                               size={14}
                               strokeWidth={2}
                             />
-                            <span className="text-scale-1200 text-sm group-hover:text-brand-900 transition">
+                            <span className="text-foreground text-sm group-hover:text-brand transition">
                               {section.name}
                             </span>
                           </Accordion.Trigger>
                           <Accordion.Content className="my-2 data-open:animate-slide-down data-closed:animate-slide-up">
                             {section.items.map((item: NavMenuSection) => (
                               <Link key={item.name} href={item.url}>
-                                <a>
-                                  <div
-                                    key={item.name}
-                                    className={[
-                                      'py-1.5 ml-4 px-5 rounded text-sm transition',
-                                      `${
-                                        item.url === asPath
-                                          ? 'bg-scale-200 text-brand-900'
-                                          : 'text-scale-1100 hover:text-scale-1200'
-                                      }`,
-                                    ].join(' ')}
-                                  >
-                                    {item.name}
-                                  </div>
-                                </a>
+                                <div
+                                  key={item.name}
+                                  className={[
+                                    'py-1.5 ml-4 px-5 rounded text-sm transition',
+                                    `${
+                                      item.url === asPath
+                                        ? 'bg-background text-brand'
+                                        : 'text-foreground-light hover:text-foreground'
+                                    }`,
+                                  ].join(' ')}
+                                >
+                                  {item.name}
+                                </div>
                               </Link>
                             ))}
                           </Accordion.Content>

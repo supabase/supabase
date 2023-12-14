@@ -1,8 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import Link from 'next/link'
 import React from 'react'
-import defaultTheme from '../../lib/theme/defaultTheme'
-import { Button } from './Button'
+import { Button } from '@ui/components/Button'
 
 const SIZES = ['tiny', 'small', 'medium', 'large', 'xlarge'] as const
 const TYPES = [
@@ -77,9 +76,9 @@ describe('#Button', () => {
   it("shouldn't crash when wrapped with next/link", () => {
     expect(() =>
       render(
-        <Link href="https://supabase.com">
-          <Button>Button</Button>
-        </Link>
+        <Button asChild>
+          <Link href="https://supabase.com">Button</Link>
+        </Button>
       )
     ).not.toThrow()
   })

@@ -1,37 +1,31 @@
-import { NextSeo } from 'next-seo'
-import { GetServerSideProps } from 'next'
-import DefaultLayout from '~/components/Layouts/Default'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
-import { createClient } from '@supabase/supabase-js'
 import { useEffect, useRef, useState } from 'react'
-import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/LaunchSection/LaunchWeekLogoHeader'
-import { motion } from 'framer-motion'
-import { UserData } from '~/components/LaunchWeek/Ticket/hooks/use-conf-data'
-import LW7BgGraphic from '../../../components/LaunchWeek/LW7BgGraphic'
-import CTABanner from '../../../components/CTABanner'
-import { debounce } from 'lodash'
-import TicketsGrid from '../../../components/LaunchWeek/Ticket/TicketsGrid'
+import { GetServerSideProps } from 'next'
+import { NextSeo } from 'next-seo'
 import { Button } from 'ui'
 import Link from 'next/link'
-import { useTheme } from 'common/Providers'
+import { motion } from 'framer-motion'
+import { debounce } from 'lodash'
+
+import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
+import { useTheme } from 'next-themes'
+
+import FaviconImports from '~/components/LaunchWeek/X/FaviconImports'
+import DefaultLayout from '~/components/Layouts/Default'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import { UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
+import CTABanner from '~/components/CTABanner'
+import TicketsGrid from '~/components/LaunchWeek/X/TicketsGrid'
+import supabase from '../../../lib/supabaseMisc'
 
 interface Props {
   users: UserData[]
 }
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'http://localhost:54321',
-  process.env.SUPABASE_SERVICE_ROLE_SECRET ??
-    process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_SECRET ??
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9idWxkYW5ycHRsb2t0eGNmZnZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE2Njk3MjcwMTIsImV4cCI6MTk4NTMwMzAxMn0.SZLqryz_-stF8dgzeVXmzZWPOqdOrBwqJROlFES8v3I'
-)
-
 const generateOgs = async (users: UserData[]) => {
   users?.map(async (user) => {
-    const ogImageUrl = `https://obuldanrptloktxcffvn.functions.supabase.co/lw7-ticket-og?username=${encodeURIComponent(
+    const ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lwx-ticket?username=${encodeURIComponent(
       user.username ?? ''
-    )}${!!user.golden ? '&golden=true' : ''}`
+    )}${!!user.golden ? '&platinum=true' : ''}`
     return await fetch(ogImageUrl)
   })
 }
@@ -39,11 +33,12 @@ const generateOgs = async (users: UserData[]) => {
 export default function TicketsPage({ users }: Props) {
   const ref = useRef(null)
   const PAGE_COUNT = 20
-  const TITLE = '#SupaLaunchWeek Tickets'
-  const DESCRIPTION = 'Supabase Launch Week 7 | 10–14 April 2023'
-  const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/seven/launch-week-7-teaser.jpg`
+  const TITLE = '#SupaLaunchWeek X Tickets'
+  const DESCRIPTION = 'Supabase Launch Week X | 11-15 December 2023'
+  const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/lwx/lwx-og.jpg`
 
-  const { isDarkMode } = useTheme()
+  const { resolvedTheme, setTheme } = useTheme()
+  const [initialDarkMode] = useState(resolvedTheme?.includes('dark'))
   const [isLoading, setIsLoading] = useState(false)
   const [offset, setOffset] = useState(1)
   const [isLast, setIsLast] = useState(false)
@@ -56,8 +51,8 @@ export default function TicketsPage({ users }: Props) {
 
   const loadUsers = async (offset: number) => {
     const from = offset * PAGE_COUNT
-    return await supabaseAdmin!
-      .from('lw7_tickets_golden')
+    return await supabase!
+      .from('lwx_tickets_golden')
       .select('*')
       .range(from, from + PAGE_COUNT - 1)
       .order('createdAt', { ascending: false })
@@ -82,14 +77,21 @@ export default function TicketsPage({ users }: Props) {
   }
 
   useEffect(() => {
-    document.body.className = '!dark bg-[#1C1C1C]'
-
     const handleDebouncedScroll = debounce(() => !isLast && handleScroll(), 200)
+
     window.addEventListener('scroll', handleDebouncedScroll)
 
     return () => {
-      document.body.className = isDarkMode ? 'dark' : 'light'
       window.removeEventListener('scroll', handleDebouncedScroll)
+    }
+  }, [])
+
+  useEffect(() => {
+    setTheme('dark')
+    document.body.className = 'dark bg-[#060809]'
+    return () => {
+      document.body.className = ''
+      setTheme('dark')
     }
   }, [])
 
@@ -108,18 +110,10 @@ export default function TicketsPage({ users }: Props) {
           ],
         }}
       />
+      <FaviconImports />
       <DefaultLayout>
-        <div className="bg-[#1C1C1C] -mt-[65px]">
-          <div className="relative bg-lw7 pt-20">
-            <div className="relative z-10">
-              <SectionContainer className="flex flex-col justify-around items-center !py-4 md:!py-8 gap-2 md:gap-4 !px-2 !mx-auto h-auto">
-                <LaunchWeekLogoHeader />
-              </SectionContainer>
-              <LW7BgGraphic />
-            </div>
-            <div className="bg-lw7-gradient absolute inset-0 z-0" />
-          </div>
-          <SectionContainer className="z-10 -mt-60 md:-mt-[500px] max-w-none overflow-hidden">
+        <div className="">
+          <SectionContainer className="z-10">
             <div className="text-center relative z-10 text-white mb-4 lg:mb-10">
               <motion.div
                 className="max-w-[38rem] mx-auto px-4 flex flex-col items-center gap-4"
@@ -128,22 +122,15 @@ export default function TicketsPage({ users }: Props) {
                 viewport={{ once: true, margin: '-150px' }}
                 transition={{ type: 'spring', bounce: 0, delay: 0.2 }}
               >
-                <h2 className="text-4xl">
-                  Check out <span className="gradient-text-pink-500">all the tickets</span>
-                </h2>
-                <p className="radial-gradient-text-scale-500">
-                  Join us on April 16th for Launch Week 7's final day{' '}
-                  <br className="hidden md:inline-block" /> and find out if you are one of the lucky
-                  winners. Get sharing!
+                <h2 className="text-4xl">Launch Week X tickets</h2>
+                <p className="text-foreground-light">
+                  Join us on Launch Week X's final day <br className="hidden md:inline-block" /> and
+                  find out if you are one of the lucky winners.
                 </p>
                 <div className="mt-1">
-                  <Link href="/launch-week">
-                    <a>
-                      <Button type="outline" size="medium">
-                        Go to Launch Week 7
-                      </Button>
-                    </a>
-                  </Link>
+                  <Button asChild type="outline" size="medium">
+                    <Link href="/launch-week">Go to Launch Week X</Link>
+                  </Button>
                 </div>
               </motion.div>
             </div>
@@ -157,25 +144,26 @@ export default function TicketsPage({ users }: Props) {
             </div>
           </SectionContainer>
         </div>
-        <CTABanner />
+        <CTABanner className="!bg-[#060809] border-t-0" />
       </DefaultLayout>
     </>
   )
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
-  const { data: users } = await supabaseAdmin!
-    .from('lw7_tickets_golden')
+  let { data: lwx_tickets, error } = await supabase
+    .from('lwx_tickets_golden')
     .select('*')
+
     .order('createdAt', { ascending: false })
     .limit(20)
 
   // Generate og images of not present
-  generateOgs(users as any[])
+  generateOgs(lwx_tickets as any[])
 
   return {
     props: {
-      users,
+      users: lwx_tickets,
     },
   }
 }

@@ -1,17 +1,15 @@
 import { MDXProvider } from '@mdx-js/react'
 import { NextSeo } from 'next-seo'
 import Head from 'next/head'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FC, useEffect, useRef, useState } from 'react'
-import { IconExternalLink } from 'ui'
+import { ExpandableVideo, IconExternalLink } from 'ui'
 import components from '~/components'
 import { highlightSelectedTocItem } from '~/components/CustomHTMLElements/CustomHTMLElements.utils'
 import { FooterHelpCalloutType } from '~/components/FooterHelpCallout'
 import GuidesTableOfContents from '~/components/GuidesTableOfContents'
 import useHash from '~/hooks/useHash'
 import { LayoutMainContent } from '../DefaultLayout'
-import ExpandableVideo from 'ui/src/components/ExpandableVideo/ExpandableVideo'
 
 interface Props {
   meta: {
@@ -71,7 +69,7 @@ const Layout: FC<Props> = (props) => {
   const ogPageType = asPath.split('/')[2]
   // open graph image url constructor
   const ogImageUrl = encodeURI(
-    `https://obuldanrptloktxcffvn.functions.supabase.co/og-images?site=docs${
+    `https://obuldanrptloktxcffvn.supabase.co/functions/v1/og-images?site=docs${
       ogPageType ? `&type=${ogPageType}` : ''
     }&title=${props.meta?.title}&description=${props.meta?.description}`
   )
@@ -79,7 +77,7 @@ const Layout: FC<Props> = (props) => {
   return (
     <>
       <Head>
-        <title>{props.meta?.title} | Supabase Docs</title>
+        <title>{`${props.meta?.title} | Supabase Docs`}</title>
         <meta name="description" content={props.meta?.description} />
         <meta property="og:image" content={ogImageUrl} />
         <meta name="twitter:image" content={ogImageUrl} />
@@ -117,19 +115,19 @@ const Layout: FC<Props> = (props) => {
             ].join(' ')}
           >
             {props.meta.breadcrumb && (
-              <p className="text-brand-900 tracking-wider mb-3">{props.meta.breadcrumb}</p>
+              <p className="text-brand tracking-wider mb-3">{props.meta.breadcrumb}</p>
             )}
             <article
               ref={articleRef}
               className={`${
                 props.meta?.hide_table_of_contents || !hasTableOfContents ? '' : ''
-              } prose dark:prose-dark max-w-none`}
+              } prose max-w-none`}
             >
               <h1 className="mb-0">{props.meta.title}</h1>
               {props.meta.subtitle && (
-                <h2 className="mt-3 text-xl text-scale-1100">{props.meta.subtitle}</h2>
+                <h2 className="mt-3 text-xl text-foreground-light">{props.meta.subtitle}</h2>
               )}
-              <div className="w-full h-[1px] bg-scale-500 my-8"></div>
+              <div className="w-full border-b my-8"></div>
               <MDXProvider components={components}>{props.children}</MDXProvider>
 
               {EDIT_BUTTON_EXCLUDE_LIST.includes(router.route) ? (
@@ -139,7 +137,7 @@ const Layout: FC<Props> = (props) => {
                   <div>
                     <a
                       href={`https://github.com/supabase/supabase/edit/master/apps/docs/pages${router.asPath}.mdx`}
-                      className="text-sm transition flex items-center gap-1 text-scale-1000 hover:text-scale-1200 w-fit"
+                      className="text-sm transition flex items-center gap-1 text-foreground-lighter hover:text-foreground w-fit"
                     >
                       Edit this page on GitHub <IconExternalLink size={14} strokeWidth={1.5} />
                     </a>
@@ -152,7 +150,7 @@ const Layout: FC<Props> = (props) => {
             <div
               className={[
                 'col-span-3',
-                'border-scale-400 dark:bg-scale-200 table-of-contents-height',
+                'border-overlay bg-background table-of-contents-height',
                 'thin-scrollbar overflow-y-auto sticky hidden md:block md:col-span-3 px-2',
                 'transition-all ease-out',
                 'duration-100',
@@ -164,7 +162,7 @@ const Layout: FC<Props> = (props) => {
                     <ExpandableVideo imgUrl={tocVideoPreview} videoId={props.meta.tocVideo} />
                   </div>
                 )}
-                <span className="block font-mono text-xs uppercase text-scale-1200 px-5 mb-6">
+                <span className="block font-mono text-xs uppercase text-foreground px-5 mb-6">
                   On this page
                 </span>
                 <GuidesTableOfContents list={tocList} />

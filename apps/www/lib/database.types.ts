@@ -1,112 +1,140 @@
-export type Json = string | number | boolean | null | { [key: string]: Json } | Json[]
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
 export interface Database {
   public: {
     Tables: {
-      partners: {
-        Row: {
-          id: number
-          slug: string
-          type: Database['public']['Enums']['partner_type']
-          category: string
-          developer: string
-          title: string
-          description: string
-          logo: string
-          images: string[]
-          video: string
-          overview: string
-          website: string
-          docs: string
-          approved: boolean
-        }
-        Insert: {
-          id?: number
-          slug?: string
-          type?: Database['public']['Enums']['partner_type']
-          category?: string
-          developer?: string
-          title?: string
-          description?: string
-          logo?: string
-          images?: string[]
-          video?: string
-          overview?: string
-          website?: string
-          docs?: string
-          approved?: boolean
-        }
-        Update: {
-          id?: number
-          slug?: string
-          type?: Database['public']['Enums']['partner_type']
-          category?: string
-          developer?: string
-          title?: string
-          description?: string
-          logo?: string
-          images?: string[]
-          video?: string
-          overview?: string
-          website?: string
-          docs?: string
-          approved?: boolean
-        }
-      }
       partner_contacts: {
         Row: {
-          id: number
-          type: Database['public']['Enums']['partner_type']
           company: string
+          contacted: boolean
           country: string
-          details?: string
+          created_at: string
+          details: string | null
           email: string
           first: string
+          id: number
           last: string
-          phone?: string
-          size?: number
-          title?: string
+          phone: string | null
+          size: number | null
+          title: string | null
+          type: Database['public']['Enums']['partner_type']
           website: string
         }
         Insert: {
+          company: string
+          contacted?: boolean
+          country: string
+          created_at?: string
+          details?: string | null
+          email: string
+          first: string
           id?: number
-          type?: Database['public']['Enums']['partner_type']
-          company?: string
-          country?: string
-          details?: string
-          email?: string
-          first?: string
-          last?: string
-          phone?: string
-          size?: number
-          title?: string
-          website?: string
+          last: string
+          phone?: string | null
+          size?: number | null
+          title?: string | null
+          type: Database['public']['Enums']['partner_type']
+          website: string
         }
         Update: {
-          id?: number
-          type?: Database['public']['Enums']['partner_type']
           company?: string
+          contacted?: boolean
           country?: string
-          details?: string
+          created_at?: string
+          details?: string | null
           email?: string
           first?: string
+          id?: number
           last?: string
-          phone?: string
-          size?: number
-          title?: string
+          phone?: string | null
+          size?: number | null
+          title?: string | null
+          type?: Database['public']['Enums']['partner_type']
           website?: string
         }
+        Relationships: []
+      }
+      partners: {
+        Row: {
+          approved: boolean | null
+          call_to_action_link: string | null
+          category: string
+          contact: number
+          created_at: string
+          description: string
+          developer: string
+          docs: string | null
+          featured: boolean
+          id: number
+          images: string[] | null
+          logo: string
+          overview: string
+          slug: string
+          title: string
+          tsv: unknown | null
+          type: Database['public']['Enums']['partner_type']
+          video: string | null
+          website: string
+        }
+        Insert: {
+          approved?: boolean | null
+          call_to_action_link?: string | null
+          category: string
+          contact: number
+          created_at?: string
+          description: string
+          developer: string
+          docs?: string | null
+          featured?: boolean
+          id?: number
+          images?: string[] | null
+          logo: string
+          overview: string
+          slug: string
+          title: string
+          tsv?: unknown | null
+          type: Database['public']['Enums']['partner_type']
+          video?: string | null
+          website: string
+        }
+        Update: {
+          approved?: boolean | null
+          call_to_action_link?: string | null
+          category?: string
+          contact?: number
+          created_at?: string
+          description?: string
+          developer?: string
+          docs?: string | null
+          featured?: boolean
+          id?: number
+          images?: string[] | null
+          logo?: string
+          overview?: string
+          slug?: string
+          title?: string
+          tsv?: unknown | null
+          type?: Database['public']['Enums']['partner_type']
+          video?: string | null
+          website?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'partners_contact_fkey'
+            columns: ['contact']
+            referencedRelation: 'partner_contacts'
+            referencedColumns: ['id']
+          }
+        ]
       }
     }
     Views: {}
-    Functions: {
-      derive_label_sort_from_label: {
-        Args: { label: string }
-        Returns: string
-      }
-    }
+    Functions: {}
     Enums: {
       partner_type: 'technology' | 'expert'
+    }
+    CompositeTypes: {
+      [_ in never]: never
     }
   }
 }

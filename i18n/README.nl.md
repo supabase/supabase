@@ -39,7 +39,7 @@ Om te zien hoe u kunt bijdragen, bezoek [Aan de slag](../DEVELOPERS.md)
 ## Status
 
 - [Alpha: We testen Supabase met een gesloten groep klanten
-- [x] Publieke Alpha: Iedereen kan zich aanmelden op [app.supabase.com](https://app.supabase.com). Maar doe het rustig aan, er zijn een paar kinken
+- [x] Publieke Alpha: Iedereen kan zich aanmelden op [supabase.com/dashboard](https://supabase.com/dashboard). Maar doe het rustig aan, er zijn een paar kinken
 - [Publieke Beta: Stabiel genoeg voor de meeste niet-bedrijfsmatige toepassingen
 - [Publiek: General Availability [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
@@ -55,10 +55,10 @@ Supabase is een combinatie van open source tools. We bouwen de functies van Fire
 
 **Architectuur**
 
-Supabase is een [gehost platform](https://app.supabase.com). U kunt zich aanmelden en Supabase gebruiken zonder iets te installeren.
+Supabase is een [gehost platform](https://supabase.com/dashboard). U kunt zich aanmelden en Supabase gebruiken zonder iets te installeren.
 U kunt ook [zelf hosten](https://supabase.com/docs/guides/hosting/overview) en [lokaal ontwikkelen](https://supabase.com/docs/guides/local-development).
 
-architectuur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+![architectuur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
 
 - [PostgreSQL](https://www.postgresql.org/) is een object-relationeel database systeem met meer dan 30 jaar actieve ontwikkeling die het een sterke reputatie heeft opgeleverd voor betrouwbaarheid, robuustheid en prestaties.
 - [Realtime](https://github.com/supabase/realtime) is een Elixir server waarmee je kunt luisteren naar PostgreSQL inserts, updates en deletes met behulp van websockets. Realtime peilt de ingebouwde replicatiefunctionaliteit van Postgres voor database wijzigingen, converteert wijzigingen naar JSON, en zendt vervolgens de JSON over websockets uit naar geautoriseerde clients.
@@ -247,7 +247,7 @@ Onze aanpak voor client libraries is modulair. Elke sub-bibliotheek is een op zi
 - [Vereenvoudigd Chinees / 简体中文](/i18n/README.zh-cn.md)
 - [Zweeds / Svenska](/i18n/README.sv.md)
 - [Thai / ไทย](/i18n/README.th.md)
-- [Traditioneel Chinees / 繁体中文](/i18n/README.zh-tw.md)
+- [Traditioneel Chinees / 繁體中文](/i18n/README.zh-tw.md)
 - [Turks / Türkçe](/i18n/README.tr.md)
 - [Oekraïens / Українська](/i18n/README.uk.md)
 - [Vietnamees / Tiếng Việt](/i18n/README.vi-vn.md)

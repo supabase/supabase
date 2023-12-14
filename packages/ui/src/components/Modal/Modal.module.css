@@ -114,7 +114,7 @@
 }
 
 .sbui-modal-icon-container--success {
-  @apply text-brand-500 bg-brand-500 bg-opacity-20;
+  @apply text-brand-300 bg-brand-300 bg-opacity-20;
 }
 
 .sbui-modal-close-container {

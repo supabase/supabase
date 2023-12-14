@@ -1,15 +1,17 @@
+'use client'
+
 import { Slot } from '@radix-ui/react-slot'
 import { VariantProps, cva } from 'class-variance-authority'
-import * as React from 'react'
-import { sizes } from './../../lib/commonCva'
-import { cn } from './../../lib/utils'
-import { IconContext } from './../Icon/IconContext'
-import { IconLoader } from './../Icon/icons/IconLoader'
+import { IconContext } from '@ui/components/Icon/IconContext'
+import { IconLoader } from '@ui/components/Icon/icons/IconLoader'
+import { sizes } from '@ui/lib/commonCva'
+import { cn } from '@ui/lib/utils'
+import { cloneElement, forwardRef, isValidElement } from 'react'
 
 export type ButtonVariantProps = VariantProps<typeof buttonVariants>
 const buttonVariants = cva(
   `relative 
-  flex iems-center justify-center
+  flex items-center justify-center
   cursor-pointer 
   inline-flex 
   items-center 
@@ -30,62 +32,58 @@ const buttonVariants = cva(
     variants: {
       type: {
         primary: `
-            bg-brand-fixed-1100 hover:bg-brand-fixed-1000
+            bg-brand-button hover:bg-brand-button/80
             text-white
-            border-brand-fixed-1000 hover:border-brand-fixed-900 dark:border-brand-fixed-1000 dark:hover:border-brand-fixed-1000
+            border-brand
             focus-visible:outline-brand-600
             shadow-sm`,
         secondary: `
-            bg-scale-1200
-            text-scale-100 hover:text-scale-800
-            focus-visible:text-scale-600
-            border-scale-1100 hover:border-scale-900
-            focus-visible:outline-scale-700
+            bg-foreground
+            text-background hover:text-border-stronger
+            focus-visible:text-border-control
+            border-foreground-light hover:border-foreground-lighter
+            focus-visible:outline-border-strong
             shadow-sm`,
         default: `
-            text-scale-1200
-            bg-scale-100 hover:bg-scale-300
-            border-scale-600 hover:border-scale-700
-            dark:border-scale-700 hover:dark:border-scale-800
-            dark:bg-scale-500 dark:hover:bg-scale-600
+            text-foreground
+            bg-button hover:bg-selection
+            border-button hover:border-button-hover
             focus-visible:outline-brand-600
             shadow-sm`,
         alternative: `
-            text-brand-1100
+            text-brand-600
             bg-brand-200 hover:bg-brand-400
-            border-brand-600 hover:border-brand-800
-            dark:border-brand-700 hover:dark:border-brand-800
-            focus-visible:border-brand-800
+            border-brand-600
+            focus-visible:border-brand-300
             focus-visible:outline-brand-600
             shadow-sm`,
         outline: `
-            text-scale-1200
+            text-foreground
             bg-transparent
-            border-scale-600 hover:border-scale-700
-            dark:border-scale-800 hover:dark:border-scale-900
-            focus-visible:outline-scale-700`,
+            border-strong hover:border-stronger
+            focus-visible:outline-border-strong`,
         dashed: `
-            text-scale-1200
+            text-foreground
             border
             border-dashed
-            border-scale-700 hover:border-scale-900
+            border-strong hover:border-stronger
             bg-transparent
-            focus-visible:outline-scale-700
+            focus-visible:outline-border-strong
             shadow-sm`,
         link: `
-            text-brand-1100
+            text-brand-600
             border
             border-transparent
             hover:bg-brand-400
             border-opacity-0
-            bg-opacity-0 dark:bg-opacity-0
+            bg-opacity-0
             shadow-none
-            focus-visible:outline-scale-700`,
+            focus-visible:outline-border-strong`,
         text: `
-            text-scale-1200
-            hover:bg-scale-500
+            text-foreground
+            hover:bg-surface-300
             shadow-none
-            focus-visible:outline-scale-700
+            focus-visible:outline-border-strong
             border-transparent`,
         danger: `
             text-red-1100
@@ -111,11 +109,14 @@ const buttonVariants = cva(
         ...sizes,
       },
       overlay: {
-        base: `absolute inset-0 bg-scale-200 opacity-50`,
+        base: `absolute inset-0 bg-background opacity-50`,
         container: `fixed inset-0 transition-opacity`,
       },
       disabled: {
-        true: 'opacity-50 cursor-not-allowed pointer-events-none',
+        true: 'opacity-50 cursor-default',
+      },
+      rounded: {
+        true: 'rounded-full',
       },
       defaultVariants: {
         //   variant: 'default',
@@ -148,9 +149,10 @@ export interface ButtonProps
   icon?: React.ReactNode
   iconLeft?: React.ReactNode
   iconRight?: React.ReactNode
+  rounded?: boolean
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
       asChild = false,
@@ -163,6 +165,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       iconRight,
       iconLeft,
       htmlType = 'button',
+      rounded,
       ...props
     },
     ref
@@ -180,11 +183,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         type={htmlType}
         {...props}
-        className={cn(buttonVariants({ type, size, disabled, block }), className)}
+        className={cn(buttonVariants({ type, size, disabled, block, rounded }), className)}
       >
         {asChild ? (
-          React.isValidElement(children) ? (
-            React.cloneElement(
+          isValidElement(children) ? (
+            cloneElement(
               children,
               undefined,
               showIcon &&

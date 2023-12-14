@@ -4,7 +4,7 @@ node_modules
 out
 .docz
 tmp
-.swp
+*.swp
 
 coverage
 allure-results
@@ -82,8 +82,10 @@ typings/
 .env
 # excempt the apps/www .env
 !apps/www/.env
+.env.tmp
 .env.test
 .env.local
+.env.staging
 .env.production
 
 # parcel-bundler cache (https://parceljs.org/)
@@ -124,6 +126,9 @@ apps/new-docs/*
 
 # UI tokens
 packages/ui/tokens/**/*.json
+
+# UI Storybook build
+packages/ui/storybook-static
 
 # For self-hosted logs: https://github.com/supabase/supabase/blob/86e3ab20abfdb9c3e666334d3d2f8efeef9ccf2c/docker/docker-compose-logging.yml#L101
 gcloud.json

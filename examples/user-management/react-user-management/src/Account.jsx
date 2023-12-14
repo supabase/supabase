@@ -33,7 +33,7 @@ export default function Account({ session }) {
     getProfile()
   }, [session])
 
-  async function updateProfile(event) {
+  async function updateProfile(event, avatarUrl) {
     event.preventDefault()
 
     setLoading(true)
@@ -43,7 +43,7 @@ export default function Account({ session }) {
       id: user.id,
       username,
       website,
-      avatar_url,
+      avatarUrl,
       updated_at: new Date(),
     }
 
@@ -51,6 +51,8 @@ export default function Account({ session }) {
 
     if (error) {
       alert(error.message)
+    } else {
+      setAvatarUrl(avatarUrl)
     }
     setLoading(false)
   }
@@ -61,8 +63,7 @@ export default function Account({ session }) {
         url={avatar_url}
         size={150}
         onUpload={(event, url) => {
-          setAvatarUrl(url)
-          updateProfile(event)
+          updateProfile(event, url)
         }}
       />
       <div>

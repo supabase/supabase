@@ -39,7 +39,7 @@ Chcete-li zjistit, jak přispívat, navštivte stránku [Začínáme](../DEVELOP
 ## Stav
 
 - [x] Alfa: Testujeme Supabase s uzavřenou skupinou zákazníků
-- [x] Veřejná alfa: [app.supabase.com](https://app.supabase.com). Ale buďte na nás mírní, je tu několik zádrhelů
+- [x] Veřejná alfa: [supabase.com/dashboard](https://supabase.com/dashboard). Ale buďte na nás mírní, je tu několik zádrhelů
 - [x] Veřejná beta verze: Dostatečně stabilní pro většinu případů použití mimo podniky
 - [ ] Veřejná: Všeobecná dostupnost [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
@@ -55,7 +55,7 @@ Supabase je kombinací nástrojů s otevřeným zdrojovým kódem. Funkce Fireba
 
 **Architektura**
 
-Supabase je [hostovaná platforma](https://app.supabase.com). Můžete se zaregistrovat a začít používat Supabase, aniž byste museli cokoli instalovat.
+Supabase je [hostovaná platforma](https://supabase.com/dashboard). Můžete se zaregistrovat a začít používat Supabase, aniž byste museli cokoli instalovat.
 Můžete také [hostovat sami](https://supabase.com/docs/guides/hosting/overview) a [vyvíjet lokálně](https://supabase.com/docs/guides/local-development).
 
 ![Architektura](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
@@ -247,7 +247,7 @@ Náš přístup ke klientským knihovnám je modulární. Každá dílčí kniho
 - [Zjednodušená čínština / 简体中文](/i18n/README.zh-cn.md)
 - [Švédština / Svenska](/i18n/README.sv.md)
 - [Thai / ไทย](/i18n/README.th.md)
-- [Tradiční čínština / 繁体中文](/i18n/README.zh-tw.md)
+- [Tradiční čínština / 繁體中文](/i18n/README.zh-tw.md)
 - [Turečtina / Türkçe](/i18n/README.tr.md)
 - [Ukrajinština / Українська](/i18n/README.uk.md)
 - [Vietnamština / Tiếng Việt](/i18n/README.vi-vn.md)

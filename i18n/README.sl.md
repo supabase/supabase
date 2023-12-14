@@ -39,7 +39,7 @@ Za celotno dokumentacijo obiščite [supabase.com/docs](https://supabase.com/doc
 ## Status
 
 - [x] Alfa: Testiramo bazo Supabase z zaprtim naborom strank
-- [x] Javna alfa: [app.supabase.com](https://app.supabase.com). Vendar nas ne obremenjujte, saj je še nekaj pomanjkljivosti
+- [x] Javna alfa: [supabase.com/dashboard](https://supabase.com/dashboard). Vendar nas ne obremenjujte, saj je še nekaj pomanjkljivosti
 - [x] Javna beta različica: Dovolj stabilna za večino primerov uporabe, ki niso povezani s podjetji
 - [ ] Javna: Splošna razpoložljivost [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
@@ -55,7 +55,7 @@ Supabaza je kombinacija odprtokodnih orodij. Funkcije Firebase gradimo z odprtok
 
 **Arhitektura**
 
-Supabase je [gostovana platforma](https://app.supabase.com). Prijavite se lahko in začnete uporabljati bazo Supabase, ne da bi kar koli namestili.
+Supabase je [gostovana platforma](https://supabase.com/dashboard). Prijavite se lahko in začnete uporabljati bazo Supabase, ne da bi kar koli namestili.
 Lahko tudi [gostujete sami](https://supabase.com/docs/guides/hosting/overview) in [razvijate lokalno](https://supabase.com/docs/guides/local-development).
 
 ![Arhitektura](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
@@ -247,7 +247,7 @@ Naš pristop k odjemalskim knjižnicam je modularen. Vsaka pod-knjižnica je sam
 - [Poenostavljena kitajščina / 简体中文](/i18n/README.zh-cn.md)
 - [švedščina / Svenska](/i18n/README.sv.md)
 - [Thai / ไทย](/i18n/README.th.md)
-- [tradicionalna kitajščina / 繁体中文](/i18n/README.zh-tw.md)
+- [tradicionalna kitajščina / 繁體中文](/i18n/README.zh-tw.md)
 - [Turščina / Türkçe](/i18n/README.tr.md)
 - [ukrajinski / Українська](/i18n/README.uk.md)
 - [Vietnamščina / Tiếng Việt](/i18n/README.vi-vn.md)

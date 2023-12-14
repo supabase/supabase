@@ -39,7 +39,7 @@ Untuk melihat bagaimana cara berkontribusi, kunjungi [Memulai](../DEVELOPERS.md)
 ## Status
 
 - [x] Alpha: Kami sedang menguji Supabase dengan sekumpulan pelanggan tertutup
-- [x] Alpha Publik: Siapa pun dapat mendaftar di [app.supabase.com](https://app.supabase.com). Tapi jangan khawatir, ada beberapa hal yang perlu diperhatikan
+- [x] Alpha Publik: Siapa pun dapat mendaftar di [supabase.com/dashboard](https://supabase.com/dashboard). Tapi jangan khawatir, ada beberapa hal yang perlu diperhatikan
 - [x] Public Beta: Cukup stabil untuk sebagian besar kasus penggunaan non-perusahaan
 - [Publik: Ketersediaan Umum [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
@@ -55,7 +55,7 @@ Supabase adalah kombinasi dari alat sumber terbuka. Kami membangun fitur-fitur F
 
 **Arsitektur**
 
-Supabase adalah [platform yang di-host](https://app.supabase.com). Anda bisa mendaftar dan mulai menggunakan Supabase tanpa menginstal apa pun.
+Supabase adalah [platform yang di-host](https://supabase.com/dashboard). Anda bisa mendaftar dan mulai menggunakan Supabase tanpa menginstal apa pun.
 Anda juga bisa [menghosting sendiri](https://supabase.com/docs/guides/hosting/overview) dan [mengembangkan secara lokal](https://supabase.com/docs/guides/local-development).
 
 ![Arsitektur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
@@ -247,7 +247,7 @@ Pendekatan kami untuk pustaka klien bersifat modular. Setiap sub-pustaka adalah 
 - [Bahasa Mandarin / 简体中文](/i18n/README.zh-cn.md)
 - [Bahasa Swedia / Svenska](/i18n/README.sv.md)
 - [Bahasa Thai / ไทย](/i18n/README.th.md)
-- [Bahasa Tionghoa Tradisional / 繁体中文](/i18n/README.zh-tw.md)
+- [Bahasa Tionghoa Tradisional / 繁體中文](/i18n/README.zh-tw.md)
 - [Bahasa Turki / Türkçe](/i18n/README.tr.md)
 - [Bahasa Ukraina / Українська](/i18n/README.uk.md)
 - [Bahasa Vietnam / Tiếng Việt](/i18n/README.vi-vn.md)

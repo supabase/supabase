@@ -38,6 +38,7 @@ and run the SQL queries yourself.
   size="small"
   type="underlined"
   defaultActiveId="dashboard"
+  queryGroup="database-method"
 >
 <TabPanel id="dashboard" label="Dashboard">
 
@@ -48,7 +49,7 @@ and run the SQL queries yourself.
   />
 </video>
 
-1. Go to the [Table Editor](https://app.supabase.com/project/_/editor) page in the Dashboard.
+1. Go to the [Table Editor](https://supabase.com/dashboard/project/_/editor) page in the Dashboard.
 2. Click **New Table** and create a table with the name `todos`.
 3. Click **Save**.
 4. Click **New Column** and create a column with the name `task` and type `text`.
@@ -180,6 +181,7 @@ Use the "Bulk Loading" instructions if you are loading large data sets.
   size="small"
   type="underlined"
   defaultActiveId="sql"
+  queryGroup="language"
 >
 <TabPanel id="sql" label="SQL">
 
@@ -291,6 +293,7 @@ For example if you had the following situations:
   size="small"
   type="underlined"
   defaultActiveId="dashboard"
+  queryGroup="database-method"
 >
 <TabPanel id="dashboard" label="Dashboard">
 
@@ -425,7 +428,7 @@ Views provide the several benefits:
 
 #### Simplicity
 
-As a query becomes complex it becomes a hassle to call it. Especially when we run it at regularly. In the example above, instead of repeatedly running:
+As a query becomes more complex, it can be a hassle to call it over and over - especially when we run it regularly. In the example above, instead of repeatedly running:
 
 ```sql
 select

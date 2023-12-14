@@ -26,7 +26,7 @@ Resources:
 
 Once your application is live, you should never change your database using the Dashboard. Supabase provides various [access levels](https://supabase.com/docs/guides/platform/access-control) for the Dashboard that can help enforce this. Some other important things to consider at this point include:
 
-- Read the [Production Checklist](docs/guides/platform/going-into-prod).
+- Read the [Production Checklist](/docs/guides/platform/going-into-prod).
 - Make your team aware of the [Shared Responsibilities](/docs/guides/platform/shared-responsibility-model) between your organization and Supabase.
 - Design a [safe workflow](https://supabase.com/docs/guides/platform/shared-responsibility-model#you-decide-your-own-workflow) for managing your database. We strongly recommend running [multiple environments](/docs/guides/cli/managing-environments) as part of your development workflow (`local` -> `staging` -> `prod`).
 - As your database to grows, we strongly recommend moving to [Point-in-Time Recovery](/docs/guides/platform/backups#point-in-time-recovery). This is safer and has less impact on your database performance during maintenance windows.

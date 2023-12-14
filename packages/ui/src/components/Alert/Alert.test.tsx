@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import Alert, { AlertVariant } from './Alert'
+import { Alert, AlertVariant } from './Alert'
 import defaultTheme from '../../lib/theme/defaultTheme'
 
 const VARIANTS: AlertVariant[] = ['success', 'danger', 'warning', 'info', 'neutral']

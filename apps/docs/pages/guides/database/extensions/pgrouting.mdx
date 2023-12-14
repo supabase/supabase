@@ -29,10 +29,11 @@ The core functionality of `pgRouting` is a set of path finding algorithms includ
   size="small"
   type="underlined"
   defaultActiveId="dashboard"
+  queryGroup="database-method"
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Database](https://app.supabase.com/project/_/database/tables) page in the Dashboard.
+1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
 3. Search for "pgrouting" and enable the extension.
 
@@ -56,7 +57,7 @@ To disable an extension you can call `drop extension`.
 
 ## Example
 
-As an example, we'll solve the [traveling salesman probelem](https://en.wikipedia.org/wiki/Travelling_salesman_problem) using the pgRouting's `pgr_TSPeuclidean` function from some PostGIS coodinates.
+As an example, we'll solve the [traveling salesman problem](https://en.wikipedia.org/wiki/Travelling_salesman_problem) using the pgRouting's `pgr_TSPeuclidean` function from some PostGIS coodinates.
 
 A summary of the traveling salesman problem is, given a set of city coordinates, solve for a path that goes through each city and minimizes the total distance traveled.
 

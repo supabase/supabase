@@ -10,8 +10,9 @@ export const meta = {
 ![Supabase User Management example](/docs/img/user-management-demo.png)
 
 <Admonition type="note">
-  If you get stuck while working through this guide, refer to the [full example on
-  GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/react-user-management).
+
+If you get stuck while working through this guide, refer to the [full example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/react-user-management).
+
 </Admonition>
 
 <ProjectSetup />
@@ -58,7 +59,9 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 ```
 
-And one optional step is to update the CSS file `src/index.css` to make the app look nice.
+### App Styling (Optional)
+
+An optional step is to update the CSS file `src/index.css` to make the app look nice.
 You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/react-user-management/src/index.css).
 
 ### Set up a Login component
@@ -134,31 +137,38 @@ export default function Account({ session }) {
   const [avatar_url, setAvatarUrl] = useState(null)
 
   useEffect(() => {
+    let ignore = false
     async function getProfile() {
       setLoading(true)
       const { user } = session
 
-      let { data, error } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
         .select(`username, website, avatar_url`)
         .eq('id', user.id)
         .single()
 
-      if (error) {
-        console.warn(error)
-      } else if (data) {
-        setUsername(data.username)
-        setWebsite(data.website)
-        setAvatarUrl(data.avatar_url)
+      if (!ignore) {
+        if (error) {
+          console.warn(error)
+        } else if (data) {
+          setUsername(data.username)
+          setWebsite(data.website)
+          setAvatarUrl(data.avatar_url)
+        }
       }
 
       setLoading(false)
     }
 
     getProfile()
+
+    return () => {
+      ignore = true
+    }
   }, [session])
 
-  async function updateProfile(event) {
+  async function updateProfile(event, avatarUrl) {
     event.preventDefault()
 
     setLoading(true)
@@ -172,10 +182,12 @@ export default function Account({ session }) {
       updated_at: new Date(),
     }
 
-    let { error } = await supabase.from('profiles').upsert(updates)
+    const { error } = await supabase.from('profiles').upsert(updates)
 
     if (error) {
       alert(error.message)
+    } else {
+      setAvatarUrl(avatarUrl)
     }
     setLoading(false)
   }
@@ -314,7 +326,7 @@ export default function Avatar({ url, size, onUpload }) {
       const fileName = `${Math.random()}.${fileExt}`
       const filePath = `${fileName}`
 
-      let { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file)
+      const { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file)
 
       if (uploadError) {
         throw uploadError
@@ -378,8 +390,7 @@ return (
       url={avatar_url}
       size={150}
       onUpload={(event, url) => {
-        setAvatarUrl(url)
-        updateProfile(event)
+        updateProfile(event, url)
       }}
     />
     {/* ... */}

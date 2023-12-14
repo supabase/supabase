@@ -1,11 +1,10 @@
-import { Badge, Button, IconArrowUpRight, IconShuffle, IconWifi, IconX, Space } from 'ui'
+import { Button, IconArrowUpRight, IconShuffle, IconWifi, IconX, ThemeImage } from 'ui'
 import ApiExamples from 'data/products/storage/api-examples'
 import DashboardViewData from 'data/products/storage/dashboard-carousel.json'
 import StoragePermissionsData from 'data/products/storage/permissions-examples'
-import Solutions from 'data/Solutions.json'
+import Solutions from 'data/Solutions'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
-import Image from 'next/image'
 import Link from 'next/link'
 import ImageCarousel from '~/components/Carousels/ImageCarousel'
 import SplitCodeBlockCarousel from '~/components/Carousels/SplitCodeBlockCarousel'
@@ -57,24 +56,16 @@ function StoragePage() {
             'With custom policies and permissions that are familiar and easy to implement.',
           ]}
           image={[
-            <div className="header--light block w-full" key="light">
-              <Image
-                src={`${basePath}/images/product/storage/header--light.png`}
-                alt="storage header"
-                layout="responsive"
-                width="1386"
-                height="1067"
-              />
-            </div>,
-            <div className="header--dark mr-0 w-full dark:block" key="dark">
-              <Image
-                src={`${basePath}/images/product/storage/header--dark.png`}
-                alt="storage header"
-                layout="responsive"
-                width="1386"
-                height="1067"
-              />
-            </div>,
+            <ThemeImage
+              src={{
+                light: `${basePath}/images/product/storage/header--light.png`,
+                dark: `${basePath}/images/product/storage/header--dark.png`,
+              }}
+              alt="storage header"
+              layout="responsive"
+              width="1386"
+              height="1067"
+            />,
           ]}
           documentation_url={'/docs/guides/storage'}
         />
@@ -153,12 +144,12 @@ function StoragePage() {
                   author={'supabase'}
                   author_url={'https://github.com/supabase'}
                   author_img={'https://avatars.githubusercontent.com/u/54469796'}
-                  repo_name={'nextjs-ts-user-management'}
+                  repo_name={'nextjs-user-management'}
                   repo_url={
-                    'https://github.com/supabase/supabase/tree/master/examples/user-management/nextjs-ts-user-management'
+                    'https://github.com/supabase/supabase/tree/master/examples/user-management/nextjs-user-management'
                   }
                   vercel_deploy_url={
-                    'https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fuser-mangement%2Fnextjs-ts-user-management&project-name=supabase-user-management&repository-name=supabase-user-management&demo-title=Supabase%20User%20Management&demo-description=An%20example%20web%20app%20using%20Supabase%20and%20Next.js&demo-url=https%3A%2F%2Fsupabase-nextjs-ts-user-management.vercel.app&demo-image=https%3A%2F%2Fi.imgur.com%2FZ3HkQqe.png&integration-ids=oac_jUduyjQgOyzev1fjrW83NYOv&external-id=nextjs-user-management'
+                    'https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fuser-management%2Fnextjs-user-management&project-name=supabase-nextjs-user-management&repository-name=supabase-nextjs-user-management&integration-ids=oac_VqOgBHqhEoFTPzGkPd7L0iH6&external-id=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fuser-management%2Fnextjs-user-management'
                   }
                   demo_url={''}
                 />
@@ -184,18 +175,15 @@ function StoragePage() {
                     title="CDN"
                     text="Serve from over 285 cities globally to reduce latency."
                   />
-                  <Link href="/docs/guides/storage/cdn" passHref>
-                    <a>
-                      <Button
-                        size="small"
-                        type="default"
-                        className="mt-4"
-                        icon={<IconArrowUpRight />}
-                      >
-                        Explore docs
-                      </Button>
-                    </a>
-                  </Link>
+                  <Button
+                    asChild
+                    size="small"
+                    type="default"
+                    className="mt-4"
+                    icon={<IconArrowUpRight />}
+                  >
+                    <Link href="/docs/guides/storage/cdn/fundamentals">Explore docs</Link>
+                  </Button>
                 </div>
                 <div className="col-span-6 lg:col-span-12 xl:col-span-4">
                   <FeatureColumn
@@ -203,18 +191,17 @@ function StoragePage() {
                     title="Image Optimizations and Transformations"
                     text="Resize and compress your media files on the fly."
                   />
-                  <Link href="/docs/guides/storage/image-transformations" passHref>
-                    <a>
-                      <Button
-                        size="small"
-                        type="default"
-                        className="mt-4"
-                        icon={<IconArrowUpRight />}
-                      >
-                        Explore docs
-                      </Button>
-                    </a>
-                  </Link>
+                  <Button
+                    asChild
+                    size="small"
+                    type="default"
+                    className="mt-4"
+                    icon={<IconArrowUpRight />}
+                  >
+                    <Link href="/docs/guides/storage/serving/image-transformations">
+                      Explore docs
+                    </Link>
+                  </Button>
                 </div>
               </div>,
             ]}
@@ -224,7 +211,7 @@ function StoragePage() {
         <div className="relative">
           <div className="section--masked">
             <div className="section--bg-masked">
-              <div className="section--bg border-t border-gray-100 dark:border-gray-600"></div>
+              <div className="section--bg border-t border-control"></div>
             </div>
             <div className="section-container pt-12 pb-0">
               {/* <FloatingIcons /> */}
@@ -250,18 +237,17 @@ function StoragePage() {
                         policies.
                       </p>
 
-                      <Link href="/docs/reference/javascript/storage-createbucket" passHref>
-                        <a>
-                          <Button
-                            size="small"
-                            type="default"
-                            className="mt-4"
-                            icon={<IconArrowUpRight />}
-                          >
-                            Explore documentation
-                          </Button>
-                        </a>
-                      </Link>
+                      <Button
+                        asChild
+                        size="small"
+                        type="default"
+                        className="mt-4"
+                        icon={<IconArrowUpRight />}
+                      >
+                        <Link href="/docs/reference/javascript/storage-createbucket">
+                          Explore documentation
+                        </Link>
+                      </Button>
                     </div>
                     <div className="col-span-12 lg:col-span-6 lg:col-start-7">
                       <SplitCodeBlockCarousel

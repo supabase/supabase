@@ -4,7 +4,7 @@ import CTABanner from 'components/CTABanner/index'
 import FlyOut from 'components/UI/FlyOut'
 import { AlphaNumbers, IntroductionSegments, PerformanceComparisonData } from 'data/BetaPage'
 import authors from 'lib/authors.json'
-import { APP_NAME, DESCRIPTION } from 'lib/constants'
+import { APP_NAME, DEFAULT_META_DESCRIPTION } from 'lib/constants'
 import { NextSeo } from 'next-seo'
 import Head from 'next/head'
 import Link from 'next/link'
@@ -16,7 +16,7 @@ import Layout from '~/components/Layouts/Default'
 const site_title = `${APP_NAME} | We are now in Beta`
 
 // Dark text: text-dark-400
-// Light text: text-dark-300
+// Light text: text-foreground-light
 
 type Props = {
   darkMode: boolean
@@ -28,19 +28,17 @@ const NavFlyOutMenu = (props: any) => {
 
   return (
     <>
-      <div className="grid items-center grid-cols-12 col-span-12 border-b border-dashed border-dark-300 dark:border-dark-400 sm:border-r">
+      <div className="grid items-center grid-cols-12 col-span-12 border-b border-dashed border-default sm:border-r">
         {segments.flat().map((segment: any) => (
           <div
             key={segment.key}
             onClick={() => scrollTo(segment.key)}
             className={`
-              text-dark-300 dark:text-dark-400 dark:bg-dark-600 hover:bg-dark-100 dark:hover:bg-dark-500 border-dark-300 dark:border-dark-400 col-span-12 cursor-pointer border-t border-dashed
-              bg-white px-4 py-4 sm:border-l lg:col-span-4 lg:px-6 lg:py-10`}
+              text-foreground-light bg-surface-100 hover:bg-surface-200 border-default col-span-12 cursor-pointer border-t border-dashed
+              px-4 py-4 sm:border-l lg:col-span-4 lg:px-6 lg:py-10`}
           >
-            <p className="flex items-center text-black dark:text-white">
-              <span className="mr-2 font-mono text-xs text-dark-300 dark:text-dark-400">
-                0{segment.no}
-              </span>
+            <p className="flex items-center text-foreground">
+              <span className="mr-2 font-mono text-xs text-foreground-light">0{segment.no}</span>
               <span>{segment.name}</span>
             </p>
           </div>
@@ -53,12 +51,12 @@ const NavFlyOutMenu = (props: any) => {
 const VideoShot = (props: any) => {
   const { src } = props
   return (
-    <div className="p-2 rounded-xl bg-gradient-to-r from-green-400 via-violet-500 to-blue-500">
+    <div className="p-2 rounded-xl bg-gradient-to-b from-border-strong to-background-surface-300">
       <div className="rounded-md shadow-lg" style={{ height: 'fit-content' }}>
-        <div className="flex items-center justify-start w-full h-5 px-2 bg-dark-400 rounded-t-md">
-          <div className="w-2 h-2 mr-2 rounded-full bg-dark-500" />
-          <div className="w-2 h-2 mr-2 rounded-full bg-dark-500" />
-          <div className="w-2 h-2 mr-2 rounded-full bg-dark-500" />
+        <div className="flex items-center justify-start w-full h-5 px-2 bg-border-strong rounded-t-md">
+          <div className="w-2 h-2 mr-2 rounded-full bg-overlay" />
+          <div className="w-2 h-2 mr-2 rounded-full bg-overlay" />
+          <div className="w-2 h-2 mr-2 rounded-full bg-overlay" />
         </div>
         <video className="rounded-b-md" src={src} autoPlay loop muted playsInline>
           Your browser does not support the video tag
@@ -94,8 +92,8 @@ const SectionHeader = (props: any) => {
   const { sectionNumber, header } = props
   return (
     <div className="col-span-12">
-      <span className="block mb-3 font-mono text-3xl text-scale-1200">0{sectionNumber}</span>
-      <h3 className="text-6xl text-black dark:text-white">{header}</h3>
+      <span className="block mb-3 font-mono text-3xl text-foreground">0{sectionNumber}</span>
+      <h3 className="text-6xl text-foreground">{header}</h3>
     </div>
   )
 }
@@ -112,13 +110,13 @@ const Hero = (props: Props) => {
         backgroundSize: '65%',
         backgroundPosition: '120% 50%',
       }}
-      className="py-16 bg-no-repeat dark:bg-scale-300 bg-gray-50 lg:py-36"
+      className="py-16 bg-no-repeat bg-surface-100 lg:py-36"
     >
-      <div className="container grid items-center h-full grid-cols-12 gap-4 px-8 py-20 mx-auto text-dark-300 lg:px-28">
-        <div className="col-span-12 text-scale-900 dark:text-white md:col-span-9 lg:col-span-8 xl:col-span-6">
+      <div className="container grid items-center h-full grid-cols-12 gap-4 px-8 py-20 mx-auto text-foreground-light lg:px-28">
+        <div className="col-span-12 text-foreground md:col-span-9 lg:col-span-8 xl:col-span-6">
           <p className="mb-10 text-4xl">Supabase is an open source Firebase alternative.</p>
           <p className="text-2xl">
-            Today, we're moving to <span className="text-brand-900">Beta</span>
+            Today, we're moving to <span className="text-brand">Beta</span>
           </p>
           <time itemProp="datePublished" dateTime="2020-12-03" className="text-sm opacity-80">
             Published December 3rd, 2020
@@ -131,15 +129,15 @@ const Hero = (props: Props) => {
 
 const Introduction = () => {
   return (
-    <div className="container grid grid-cols-12 gap-4 px-8 py-20 mx-auto text-dark-300 lg:px-28">
+    <div className="container grid grid-cols-12 gap-4 px-8 py-20 mx-auto text-foreground-light lg:px-28">
       <div className="col-span-12 sm:col-span-9 xl:col-span-8">
         <p>
-          <span className="block text-2xl text-scale-1200">
+          <span className="block text-2xl text-foreground">
             After the launch of our{' '}
             <a
               href="https://news.ycombinator.com/item?id=23319901"
               target="_blank"
-              className="text-brand-900 hover:text-brand-900"
+              className="text-brand hover:text-brand"
             >
               Alpha
             </a>{' '}
@@ -147,14 +145,14 @@ const Introduction = () => {
           </span>
         </p>
       </div>
-      <div className="col-span-12 mb-20 text-base text-scale-1200 sm:col-span-9 xl:col-span-6">
+      <div className="col-span-12 mb-20 text-base text-foreground sm:col-span-9 xl:col-span-6">
         <p>
           we've been fortunate to work with thousands of early adopters on improving both our Open
           Source, and Hosted offerings. Companies like{' '}
           <a
             href="/blog/2020/12/02/case-study-xendit"
             target="_blank"
-            className="text-brand-900 hover:text-brand-900"
+            className="text-brand hover:text-brand"
           >
             Xendit
           </a>
@@ -162,7 +160,7 @@ const Introduction = () => {
           <a
             href="/blog/2020/12/02/case-study-monitoro"
             target="_blank"
-            className="text-brand-900 hover:text-brand-900"
+            className="text-brand hover:text-brand"
           >
             Monitoro
           </a>
@@ -170,7 +168,7 @@ const Introduction = () => {
           <a
             href="/blog/2020/12/02/case-study-tayfa"
             target="_blank"
-            className="text-brand-900 hover:text-brand-900"
+            className="text-brand hover:text-brand"
           >
             TAYFA
           </a>{' '}
@@ -179,7 +177,7 @@ const Introduction = () => {
       </div>
 
       <div className="col-span-12 mb-10 text-base">
-        <p className="pb-2 border-b-2 border-dark-200 text-scale-1100 dark:border-dark-400 w-60">
+        <p className="pb-2 border-b-2 border-default text-foreground-light w-60">
           Alpha Program in Numbers
         </p>
       </div>
@@ -194,20 +192,20 @@ const Introduction = () => {
             className="grid items-center grid-cols-8 col-span-6 gap-x-1 sm:col-span-4 sm:grid-cols-12 md:gap-x-0 xl:gap-x-6"
           >
             <div className="col-span-4 sm:col-span-4 md:col-span-3 xl:col-span-2">
-              <div className="flex items-center justify-center w-12 h-12 rounded-md bg-scale-1200 dark:bg-white">
+              <div className="flex items-center justify-center w-12 h-12 rounded-md bg-foreground">
                 {stat.icon}
               </div>
             </div>
             <div className="col-span-7 sm-col-span-8 text-dark-400 md:col-span-9 xl:col-span-10">
-              <p className="text-5xl text-scale-1200 lg:text-6xl">
+              <p className="text-5xl text-foreground lg:text-6xl">
                 <CountUp triggerAnimOnScroll={true} referenceElId="alphaNumbers">
                   {stat.value}
                 </CountUp>
-                {stat.unit && <span className="ml-1 text-2xl text-scale-1200">{stat.unit}</span>}
+                {stat.unit && <span className="ml-1 text-2xl text-foreground">{stat.unit}</span>}
               </p>
             </div>
             <div className="col-span-12 col-start-0 sm:col-span-9 sm:col-start-5 md:col-span-10 md:col-start-4 xl:col-start-3">
-              <p className="text-xs text-scale-1000 lg:text-base">{stat.name}</p>
+              <p className="text-xs text-foreground-lighter lg:text-base">{stat.name}</p>
             </div>
           </div>
         ))}
@@ -219,18 +217,17 @@ const Introduction = () => {
 const TableOfContents = (props: any) => {
   const { scrollTo } = props
   return (
-    <div className="dark:bg-scale-300 text-dark-400 dark:text-dark-200 bg-gray-50">
+    <div className="bg-surface-100 text-foreground">
       <div className="container grid grid-cols-12 gap-4 px-8 py-20 mx-auto lg:px-28">
         <div className="col-span-12 mb-10 text-base">
-          <p className="text-2xl text-black dark:text-white">
-            Supabase <span className="text-brand-900 dark:text-brand-900">Beta</span> is starting
-            now.
+          <p className="text-2xl text-foreground">
+            Supabase <span className="text-brand">Beta</span> is starting now.
           </p>
         </div>
         <div className="grid grid-cols-12 col-span-12 gap-y-10">
           {IntroductionSegments.map((segment: any, segmentIdx: number) => (
             <div key={`introSegment_${segmentIdx}`} className="grid grid-cols-12 col-span-12">
-              <div className="col-span-12 mb-10 text-scale-1200 sm:col-span-5 sm:mb-0 xl:col-span-4">
+              <div className="col-span-12 mb-10 text-foreground sm:col-span-5 sm:mb-0 xl:col-span-4">
                 <p>{segment.description}</p>
               </div>
               <div className="hidden sm:col-span-1 sm:block xl:col-span-2" />
@@ -241,8 +238,8 @@ const TableOfContents = (props: any) => {
                     className="flex items-center mb-5 cursor-pointer"
                     onClick={() => scrollTo(chapter.key)}
                   >
-                    <p className="font-mono text-xs text-scale-1200">{`0${chapter.no}`}</p>
-                    <p className="ml-4 text-base text-black transition border-b border-gray-400 hover:text-gray-1000 dark:hover:text-gray-1000 dark:text-white">
+                    <p className="font-mono text-xs text-foreground">{`0${chapter.no}`}</p>
+                    <p className="ml-4 text-base text-black transition border-b border-default hover:text-foreground">
                       {chapter.name}
                     </p>
                   </div>
@@ -302,7 +299,7 @@ const Performance = () => {
         {PerformanceComparisonData.map((metric: any) => {
           const multiplier = (metric.stats[0].value / metric.stats[1].value).toFixed(1)
           return (
-            <div key={`${metric.key}`} className="mb-10 text-dark-400 dark:text-dark-300">
+            <div key={`${metric.key}`} className="mb-10 text-foreground-light">
               <p className="pb-2 mb-4 sm:w-36">{metric.title}</p>
               <div className="flex flex-col sm:flex-row sm:items-center">
                 <div className="w-full sm:w-5/6">
@@ -312,11 +309,7 @@ const Performance = () => {
                         {stat.name}
                       </p>
                       <Bar
-                        color={
-                          stat.name === 'Supabase'
-                            ? 'bg-brand-900 dark:bg-brand-800'
-                            : 'bg-brand-300 dark:bg-brand-400'
-                        }
+                        color={stat.name === 'Supabase' ? 'bg-brand' : 'bg-brand-400'}
                         finalPercentage={Math.ceil((stat.value / maxValue) * 100)}
                       />
                       <p className="ml-2">{stat.value}/s</p>
@@ -324,7 +317,7 @@ const Performance = () => {
                   ))}
                 </div>
                 <div className="flex flex-col text-left sm:w-1/6 sm:text-right">
-                  <p className="text-6xl text-dark-700 dark:text-dark-100">{multiplier}x</p>
+                  <p className="text-6xl text-foreground-lighter">{multiplier}x</p>
                   <p className="-mt-2 text-sm">more {metric.key}s per second</p>
                 </div>
               </div>
@@ -336,11 +329,11 @@ const Performance = () => {
   }
 
   return (
-    <div id="performance" className="bg-white dark:bg-scale-200">
-      <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-dark-400 dark:text-dark-300 gap-y-10 lg:px-28">
+    <div id="performance" className="bg-background">
+      <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-foreground-light gap-y-10 lg:px-28">
         <SectionHeader sectionNumber={1} header="Performance" />
 
-        <div className="grid items-center grid-cols-12 col-span-12 mb-10 text-scale-1200 gap-x-2 lg:gap-x-8">
+        <div className="grid items-center grid-cols-12 col-span-12 mb-10 text-foreground gap-x-2 lg:gap-x-8">
           <div className="col-span-12 text-base sm:col-span-9 xl:col-span-7">
             <p className="mb-10">
               We started Supabase to give developers a web-ready database that is delightful to use,
@@ -353,7 +346,7 @@ const Performance = () => {
               <a
                 href="https://elixir-lang.org/"
                 target="_blank"
-                className="text-brand-900 hover:text-brand-900"
+                className="text-brand hover:text-brand"
               >
                 Elixir
               </a>{' '}
@@ -361,7 +354,7 @@ const Performance = () => {
               <a
                 href="https://github.com/supabase/realtime"
                 target="_blank"
-                className="text-brand-900 hover:text-brand-900"
+                className="text-brand hover:text-brand"
               >
                 Realtime engine
               </a>
@@ -369,19 +362,19 @@ const Performance = () => {
               <a
                 href="https://postgrest.org/en/v7.0.0/"
                 target="_blank"
-                className="text-brand-900 hover:text-brand-900"
+                className="text-brand hover:text-brand"
               >
                 PostgREST
               </a>{' '}
               team while they improved the performance of their auto-generated CRUD APIs.
             </p>
-            <p className="text-dark-400 dark:text-dark-300">
+            <p className="text-foreground-light">
               We're publishing the results of our benchmarks here and we'll continue to seek gains
               throughout our Beta program and beyond. Our{' '}
               <a
                 href="https://github.com/supabase/benchmarks/"
                 target="_blank"
-                className="text-brand-900 hover:text-brand-900"
+                className="text-brand hover:text-brand"
               >
                 benchmarks
               </a>{' '}
@@ -419,11 +412,11 @@ const Performance = () => {
 
 const Security = () => {
   return (
-    <div id="security" className="dark:bg-scale-300 bg-gray-50">
-      <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-dark-400 dark:text-dark-200 gap-y-10 lg:px-28">
+    <div id="security" className="bg-surface-100">
+      <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-foreground-light gap-y-10 lg:px-28">
         <SectionHeader sectionNumber={2} header="Security" />
 
-        <div className="grid grid-cols-12 col-span-12 text-scale-1200 gap-x-2 lg:gap-x-8">
+        <div className="grid grid-cols-12 col-span-12 text-foreground gap-x-2 lg:gap-x-8">
           <div className="col-span-12 text-base sm:col-span-9 xl:col-span-7">
             <p className="mb-10">
               As an infrastructure provider, security has been a priority from day one. While we had
@@ -451,11 +444,7 @@ const Security = () => {
               </li>
               <li className="mb-5">
                 Adopted the{' '}
-                <a
-                  href="https://snyk.io/"
-                  target="_blank"
-                  className="text-brand-900 hover:text-brand-900"
-                >
+                <a href="https://snyk.io/" target="_blank" className="text-brand hover:text-brand">
                   Snyk
                 </a>{' '}
                 dependency monitor as part of our SSDLC on several key component of our system, to
@@ -467,7 +456,7 @@ const Security = () => {
                 <a
                   href="https://github.com/PostgREST/postgrest/pull/1600#issuecomment-735257952"
                   target="_blank"
-                  className="text-brand-900 hover:text-brand-900"
+                  className="text-brand hover:text-brand"
                 >
                   now uses
                 </a>{' '}
@@ -483,11 +472,11 @@ const Security = () => {
 
 const Reliability = () => {
   return (
-    <div id="reliability" className="bg-white dark:bg-scale-200">
-      <div className="container grid grid-cols-12 px-8 py-12 mx-auto text-dark-400 dark:text-dark-300 gap-y-10 lg:px-28 ">
+    <div id="reliability" className="bg-background">
+      <div className="container grid grid-cols-12 px-8 py-12 mx-auto text-foreground-light gap-y-10 lg:px-28 ">
         <SectionHeader sectionNumber={3} header="Reliability" />
 
-        <div className="grid grid-cols-12 col-span-12 mb-10 text-scale-1200 gap-x-2 lg:gap-x-8">
+        <div className="grid grid-cols-12 col-span-12 mb-10 text-foreground gap-x-2 lg:gap-x-8">
           <div className="col-span-12 text-base sm:col-span-9 xl:col-span-7">
             <p className="mb-5">
               During Alpha we experienced 2 availability incidents, neither affecting customer
@@ -513,7 +502,7 @@ const Reliability = () => {
               <a
                 href="https://status.supabase.com"
                 target="_blank"
-                className="text-brand-900 hover:text-brand-900"
+                className="text-brand hover:text-brand"
               >
                 https://status.supabase.com
               </a>{' '}
@@ -536,11 +525,11 @@ const Reliability = () => {
 const NewFeaturesAndIntegrations = () => {
   const { basePath } = useRouter()
   return (
-    <div id="newFeaturesAndIntegrations" className="dark:bg-scale-300 bg-gray-50">
-      <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-dark-400 dark:text-dark-200 gap-y-10 lg:px-28">
+    <div id="newFeaturesAndIntegrations" className="bg-surface-100">
+      <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-foreground-light gap-y-10 lg:px-28">
         <SectionHeader sectionNumber={4} header="New Features & Integrations" />
 
-        <div className="grid grid-cols-12 col-span-12 mb-10 text-scale-1200 gap-x-2 lg:gap-x-8">
+        <div className="grid grid-cols-12 col-span-12 mb-10 text-foreground gap-x-2 lg:gap-x-8">
           <div className="col-span-12 text-base sm:col-span-9 xl:col-span-7">
             <p className="mb-5">
               If you're new to Supabase, here's a few of the things you get when you choose us as
@@ -548,16 +537,14 @@ const NewFeaturesAndIntegrations = () => {
             </p>
             <ul className="">
               <li className="mb-10">
-                <p className="w-20 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">
-                  Auth
-                </p>
+                <p className="w-20 pb-2 mb-2 border-b-2 border-default">Auth</p>
                 <p className="mb-5">
                   If you're new to Supabase, here's a few of the things you get when you choose us
                   as your backend. We provide{' '}
                   <a
                     href="/docs/reference/javascript/auth-signup"
                     target="_blank"
-                    className="text-brand-900 hover:text-brand-900"
+                    className="text-brand hover:text-brand"
                   >
                     JavaScript
                   </a>{' '}
@@ -565,7 +552,7 @@ const NewFeaturesAndIntegrations = () => {
                   <a
                     href="/docs/gotrue/server/about#endpoints"
                     target="_blank"
-                    className="text-brand-900 hover:text-brand-900"
+                    className="text-brand hover:text-brand"
                   >
                     HTTP
                   </a>
@@ -579,15 +566,13 @@ const NewFeaturesAndIntegrations = () => {
                 <VideoShot src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/tabAuthRules.mp4" />
               </li>
               <li className="mb-10">
-                <p className="w-20 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">
-                  Realtime
-                </p>
+                <p className="w-20 pb-2 mb-2 border-b-2 border-default">Realtime</p>
                 <p>
                   You can{' '}
                   <a
                     href="/docs/guides/client-libraries#realtime-changes"
                     target="_blank"
-                    className="text-brand-900 hover:text-brand-900"
+                    className="text-brand hover:text-brand"
                   >
                     subscribe to changes in your database
                   </a>{' '}
@@ -597,16 +582,14 @@ const NewFeaturesAndIntegrations = () => {
                 </p>
               </li>
               <li className="mb-10">
-                <p className="w-24 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">
-                  CRUD API
-                </p>
+                <p className="w-24 pb-2 mb-2 border-b-2 border-default">CRUD API</p>
                 <p>
                   You can use your database immediately, without an ORM or an API backend. We
                   support GraphQL-like{' '}
                   <a
-                    href="/docs/reference/javascript/select#query-foreign-tables"
+                    href="/docs/reference/javascript/select?example=query-referenced-tables"
                     target="_blank"
-                    className="text-brand-900 hover:text-brand-900"
+                    className="text-brand hover:text-brand"
                   >
                     querying from multiple tables
                   </a>{' '}
@@ -614,7 +597,7 @@ const NewFeaturesAndIntegrations = () => {
                   <a
                     href="/docs/reference/javascript/rpc"
                     target="_blank"
-                    className="text-brand-900 hover:text-brand-900"
+                    className="text-brand hover:text-brand"
                   >
                     invoke complex functions
                   </a>
@@ -622,9 +605,7 @@ const NewFeaturesAndIntegrations = () => {
                 </p>
               </li>
               <li className="mb-10">
-                <p className="pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400 w-44">
-                  Quickstart Templates
-                </p>
+                <p className="pb-2 mb-2 border-b-2 border-default w-44">Quickstart Templates</p>
                 <p>
                   If you're unfamiliar with SQL, we provide a set of Quickstart Templates to get you
                   building quickly. Very soon you'll be able to deploy entire apps (front and back
@@ -632,9 +613,7 @@ const NewFeaturesAndIntegrations = () => {
                 </p>
               </li>
               <li className="mb-10">
-                <p className="w-24 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">
-                  Table View
-                </p>
+                <p className="w-24 pb-2 mb-2 border-b-2 border-default">Table View</p>
                 <p className="mb-5">
                   View and edit your data like a spreadsheet from within the Supabase dashboard.
                   Build your schema, create complex relationships, and import and export to csv.
@@ -642,9 +621,7 @@ const NewFeaturesAndIntegrations = () => {
                 <VideoShot src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/tabTableEditor.mp4" />
               </li>
               <li>
-                <p className="w-24 pb-2 mb-2 border-b-2 border-dark-200 dark:border-dark-400">
-                  SQL Editor
-                </p>
+                <p className="w-24 pb-2 mb-2 border-b-2 border-default">SQL Editor</p>
                 <p className="mb-5">
                   No need to install third party SQL tools, you can run queries directly from the
                   Supabase Dashboard.
@@ -660,11 +637,11 @@ const NewFeaturesAndIntegrations = () => {
 }
 
 const BetaPricing = () => (
-  <div id="betaPricing" className="bg-white dark:bg-scale-200">
-    <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-dark-400 dark:text-dark-300 gap-y-10 lg:px-28">
+  <div id="betaPricing" className="bg-background">
+    <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-foreground-light gap-y-10 lg:px-28">
       <SectionHeader sectionNumber={5} header="Beta Pricing" />
 
-      <div className="grid grid-cols-12 col-span-12 mb-10 text-scale-1200 gap-x-2 lg:gap-x-8">
+      <div className="grid grid-cols-12 col-span-12 mb-10 text-foreground gap-x-2 lg:gap-x-8">
         <div className="col-span-12 text-base sm:col-span-9 xl:col-span-7">
           <p className="mb-10">For up to date pricing info see: https://supabase.com/pricing</p>
           <p className="mb-10">
@@ -703,7 +680,7 @@ const BetaPricing = () => (
               <a
                 href="mailto:rory@supabase.io"
                 target="_blank"
-                className="text-brand-900 hover:text-brand-900"
+                className="text-brand hover:text-brand"
               >
                 rory@supabase.io
               </a>
@@ -716,7 +693,7 @@ const BetaPricing = () => (
           </ul>
           <p>
             The Supabase Base plan is now called the Supabase Pro plan as per the{' '}
-            <a href="https://supabase.com/pricing" className="text-brand-900 hover:text-brand-900">
+            <a href="https://supabase.com/pricing" className="text-brand hover:text-brand">
               pricing page
             </a>
             .
@@ -728,11 +705,11 @@ const BetaPricing = () => (
 )
 
 const OpenSource = () => (
-  <div id="openSource" className="dark:bg-scale-300 bg-gray-50">
-    <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-dark-400 dark:text-dark-200 gap-y-10 lg:px-28">
+  <div id="openSource" className="bg-surface-100">
+    <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-foreground-light gap-y-10 lg:px-28">
       <SectionHeader sectionNumber={6} header="Open Source" />
 
-      <div className="grid grid-cols-12 col-span-12 mb-10 text-scale-1200 gap-x-2 lg:gap-x-8">
+      <div className="grid grid-cols-12 col-span-12 mb-10 text-foreground gap-x-2 lg:gap-x-8">
         <div className="col-span-12 text-base sm:col-span-9 xl:col-span-7">
           <p className="mb-10">
             Great software is multi generational and stretches beyond any single company.
@@ -747,7 +724,7 @@ const OpenSource = () => (
             <a
               href="https://github.com/sponsors/supabase/"
               target="_blank"
-              className="text-brand-900 hover:text-brand-900"
+              className="text-brand hover:text-brand"
             >
               sponsorship
             </a>{' '}
@@ -759,7 +736,7 @@ const OpenSource = () => (
             <a
               href="/blog/2020/12/02/supabase-striveschool"
               target="_blank"
-              className="text-brand-900 hover:text-brand-900"
+              className="text-brand hover:text-brand"
             >
               partnering with Strive School
             </a>{' '}
@@ -772,7 +749,7 @@ const OpenSource = () => (
             <a
               href="mailto:rory@supabase.io"
               target="_blank"
-              className="text-brand-900 hover:text-brand-900"
+              className="text-brand hover:text-brand"
             >
               rory@supabase.io
             </a>{' '}
@@ -783,7 +760,7 @@ const OpenSource = () => (
             <a
               href="https://github.com/supabase"
               target="_blank"
-              className="text-brand-900 hover:text-brand-900"
+              className="text-brand hover:text-brand"
             >
               our GitHub.
             </a>{' '}
@@ -795,10 +772,10 @@ const OpenSource = () => (
 )
 
 const FundingPartners = () => (
-  <div id="fundingPartners" className="bg-white dark:bg-scale-200">
-    <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-dark-400 dark:text-dark-300 gap-y-10 lg:px-28">
+  <div id="fundingPartners" className="bg-background">
+    <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-foreground-light gap-y-10 lg:px-28">
       <SectionHeader sectionNumber={7} header="Funding Partners" />
-      <div className="grid grid-cols-12 col-span-12 mb-10 text-scale-1200 gap-x-2 lg:gap-x-8">
+      <div className="grid grid-cols-12 col-span-12 mb-10 text-foreground gap-x-2 lg:gap-x-8">
         <div className="col-span-12 text-base sm:col-span-9 xl:col-span-7">
           <p className="mb-10">
             Building a platform that can offer all the amazing features of Firebase will take
@@ -819,7 +796,7 @@ const FundingPartners = () => (
             <a
               href="https://twitter.com/supabase"
               target="_blank"
-              className="text-brand-900 hover:text-brand-900"
+              className="text-brand hover:text-brand"
             >
               Twitter
             </a>{' '}
@@ -832,11 +809,11 @@ const FundingPartners = () => (
 )
 
 const ScalingOurTeam = () => (
-  <div id="scalingOurTeam" className="dark:bg-scale-300 bg-gray-50">
-    <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-dark-400 dark:text-dark-200 gap-y-10 lg:px-28">
+  <div id="scalingOurTeam" className="bg-surface-100">
+    <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-foreground-light gap-y-10 lg:px-28">
       <SectionHeader sectionNumber={8} header="Scaling Our Team" />
 
-      <div className="grid grid-cols-12 col-span-12 mb-10 text-scale-1200 gap-x-2 lg:gap-x-8">
+      <div className="grid grid-cols-12 col-span-12 mb-10 text-foreground gap-x-2 lg:gap-x-8">
         <div className="col-span-12 text-base sm:col-span-9 xl:col-span-7">
           <p className="mb-10">
             We are extremely proud of our team. We're a mix of 11 engineers, from 8 different
@@ -856,7 +833,7 @@ const ScalingOurTeam = () => (
             <a
               href="mailto:work@supabase.io"
               target="_blank"
-              className="text-brand-900 hover:text-brand-900"
+              className="text-brand hover:text-brand"
             >
               work@supabase.io
             </a>
@@ -869,14 +846,11 @@ const ScalingOurTeam = () => (
 )
 
 const WhatsNext = () => (
-  <div
-    id="whatsNext"
-    className="bg-white border-b-px dark:bg-scale-200 dark:border-scale-600 border-gray-50"
-  >
-    <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-dark-400 dark:text-dark-300 gap-y-10 lg:px-28">
+  <div id="whatsNext" className="border-b-px bg-background border-muted">
+    <div className="container grid grid-cols-12 px-8 py-20 mx-auto text-foreground-light gap-y-10 lg:px-28">
       <SectionHeader sectionNumber={9} header="What's Next" />
 
-      <div className="grid grid-cols-12 col-span-12 mb-10 text-scale-1200 gap-x-2 lg:gap-x-8">
+      <div className="grid grid-cols-12 col-span-12 mb-10 text-foreground gap-x-2 lg:gap-x-8">
         <div className="col-span-12 text-base sm:col-span-9 xl:col-span-7">
           <p className="mb-5">
             If you watch our repos you'll see that development never stops, we ship every day (and
@@ -917,7 +891,7 @@ const WhatsNext = () => (
             <a
               href="mailto:support@supabase.io"
               target="_blank"
-              className="text-brand-900 hover:text-brand-900"
+              className="text-brand hover:text-brand"
             >
               support@supabase.io
             </a>{' '}
@@ -925,7 +899,7 @@ const WhatsNext = () => (
             <a
               href="https://github.com/supabase/supabase/discussions"
               target="_blank"
-              className="text-brand-900 hover:text-brand-900"
+              className="text-brand hover:text-brand"
             >
               discussion
             </a>{' '}
@@ -975,7 +949,7 @@ const Beta = (props: Props) => {
         title={site_title}
         openGraph={{
           title: site_title,
-          description: DESCRIPTION,
+          description: DEFAULT_META_DESCRIPTION,
           url: `https://supabase.com/beta`,
           type: 'article',
           article: {
@@ -991,18 +965,16 @@ const Beta = (props: Props) => {
           },
           images: [
             {
-              url: 'https://supabase.com/og/og-image.jpg',
+              url: 'https://supabase.com/og/og-image-v2.jpg',
             },
           ],
         }}
       />
       <Container>
         <div className="sticky inset-0 z-50">
-          <div className="flex items-center justify-between px-5 py-5 shadow-lg bg-scale-1200 dark:bg-scale-300 xl:px-20">
+          <div className="flex items-center justify-between px-5 py-5 shadow-lg bg-surface-100 xl:px-20">
             <Link href="/">
-              <a>
-                <Image src={`${basePath}/images/logo-dark.png`} height={24} width={120} />
-              </a>
+              <Image src={`${basePath}/images/logo-dark.png`} height={24} width={120} alt="" />
             </Link>
             <HamburgerMenu openMenu={() => setMenuOpen(!menuOpen)} />
           </div>

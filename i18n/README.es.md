@@ -39,7 +39,7 @@ Para ver cómo contribuir, visite [Getting Started](../DEVELOPERS.md)
 ## Estado
 
 - [x] Alfa: Estamos probando Supabase con un grupo cerrado de clientes
-- [x] Alfa público: Cualquiera puede registrarse en [app.supabase.com](https://app.supabase.com). Pero no te pases, hay algunos problemas
+- [x] Alfa público: Cualquiera puede registrarse en [supabase.com/dashboard](https://supabase.com/dashboard). Pero no te pases, hay algunos problemas
 - [Beta pública: Suficientemente estable para la mayoría de los casos de uso no empresariales
 - [Público: Disponibilidad general [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
@@ -55,10 +55,10 @@ Supabase es una combinación de herramientas de código abierto. Estamos constru
 
 **Arquitectura**
 
-Supabase es una [plataforma alojada](https://app.supabase.com). Puedes registrarte y empezar a usar Supabase sin instalar nada.
+Supabase es una [plataforma alojada](https://supabase.com/dashboard). Puedes registrarte y empezar a usar Supabase sin instalar nada.
 También puede [autoalojarse](https://supabase.com/docs/guides/hosting/overview) y [desarrollar localmente](https://supabase.com/docs/guides/local-development).
 
-arquitectura](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+![arquitectura](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
 
 - [PostgreSQL](https://www.postgresql.org/) es un sistema de base de datos objeto-relacional con más de 30 años de desarrollo activo que le ha valido una sólida reputación por su fiabilidad, robustez de características y rendimiento.
 - [Realtime](https://github.com/supabase/realtime) es un servidor Elixir que te permite escuchar las inserciones, actualizaciones y eliminaciones de PostgreSQL utilizando websockets. Realtime sondea la funcionalidad de replicación integrada de Postgres en busca de cambios en la base de datos, convierte los cambios a JSON y, a continuación, transmite el JSON a través de websockets a los clientes autorizados.
@@ -247,7 +247,7 @@ Nuestro enfoque para las bibliotecas cliente es modular. Cada sublibrería es un
 - [Chino simplificado / 简体中文](/i18n/README.zh-cn.md)
 - [Sueco / Svenska](/i18n/README.sv.md)
 - [Tailandés / ไทย](/i18n/README.th.md)
-- [Chino tradicional / 繁体中文](/i18n/README.zh-tw.md)
+- [Chino tradicional / 繁體中文](/i18n/README.zh-tw.md)
 - [Turco / Türkçe](/i18n/README.tr.md)
 - [Ucraniano / Українська](/i18n/README.uk.md)
 - [Vietnamita / Tiếng Việt](/i18n/README.vi-vn.md)

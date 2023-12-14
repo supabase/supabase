@@ -1,22 +1,45 @@
-import { Command as CommandPrimitive } from 'cmdk-supabase'
+import { Command as CommandPrimitive } from 'cmdk'
 import * as React from 'react'
 
 import { cn } from './../../lib/utils'
 
 import { DetailedHTMLProps, HTMLAttributes, KeyboardEventHandler } from 'react'
+import { LoadingLine } from '../LoadingLine/LoadingLine'
 import { Modal } from '../Modal'
 import { ModalProps } from '../Modal/Modal'
 import { useCommandMenu } from './CommandMenuProvider'
-import { LoadingLine } from './LoadingLine'
+import { commandScore } from './command-score'
 
 type CommandPrimitiveElement = React.ElementRef<typeof CommandPrimitive>
 type CommandPrimitiveProps = React.ComponentPropsWithoutRef<typeof CommandPrimitive>
+
+export const copyToClipboard = (str: string, callback = () => {}) => {
+  const focused = window.document.hasFocus()
+  if (focused) {
+    window.navigator?.clipboard?.writeText(str).then(callback)
+  } else {
+    console.warn('Unable to copy to clipboard')
+  }
+}
+
+// `__forcemount__` must be lowercase because `cmdk` converts values to lowercase
+export const FORCE_MOUNT_ITEM = '__forcemount__'
+
+// A hack to implement force mounting while that option is not available
+// in an official release for `cmdk`.
+// See https://github.com/pacocoursey/cmdk/issues/164
+function commandFilter(value: string, search: string) {
+  return value.includes(FORCE_MOUNT_ITEM)
+    ? 1
+    : commandScore(value.replace(FORCE_MOUNT_ITEM, ''), search)
+}
 
 export const Command = React.forwardRef<CommandPrimitiveElement, CommandPrimitiveProps>(
   ({ className, ...props }, ref) => (
     <CommandPrimitive
       ref={ref}
       className={cn('flex h-full w-full flex-col overflow-hidden', className)}
+      filter={commandFilter}
       {...props}
     />
   )
@@ -42,8 +65,8 @@ export const CommandDialog = ({ children, onKeyDown, page, ...props }: CommandDi
       {...props}
       hideFooter
       className={cn(
-        '!bg-[#f8f9fa]/95 dark:!bg-[#1c1c1c]/80 backdrop-filter backdrop-blur-sm',
-        '!border-[#e6e8eb]/90 dark:!border-[#282828]/90',
+        '!bg-overlay/90 backdrop-filter backdrop-blur-sm',
+        '!border-overlay/90',
         'transition ease-out',
         'place-self-start mx-auto top-24',
         animateBounce ? 'scale-[101.5%]' : 'scale-100'
@@ -51,9 +74,7 @@ export const CommandDialog = ({ children, onKeyDown, page, ...props }: CommandDi
     >
       <Command
         className={[
-          '[&_[cmdk-group]]:px-2 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-scale-800 [&_[cmdk-input]]:h-12',
-
-          '[&_[cmdk-item]_svg]:mr-3',
+          '[&_[cmdk-group]]:px-2 [&_[cmdk-group]]:!bg-transparent [&_[cmdk-group-heading]]:!bg-transparent [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-border-stronger [&_[cmdk-input]]:h-12',
           '[&_[cmdk-item]_svg]:h-5',
           '[&_[cmdk-item]_svg]:w-5',
           '[&_[cmdk-input-wrapper]_svg]:h-5',
@@ -89,7 +110,7 @@ export const CommandInput = React.forwardRef<
         className={cn(
           'flex h-11 w-full rounded-md bg-transparent px-4 py-7 text-sm outline-none',
           'focus:shadow-none focus:ring-transparent',
-          'text-scale-1100 placeholder:text-scale-800 dark:placeholder:text-scale-800 disabled:cursor-not-allowed disabled:opacity-50 dark:text-scale-1200 border-0',
+          'text-foreground-light placeholder:text-border-stronger disabled:cursor-not-allowed disabled:opacity-50 border-0',
           className
         )}
         {...props}
@@ -108,7 +129,7 @@ export const CommandList = React.forwardRef<CommandPrimitiveListElement, Command
   ({ className, ...props }, ref) => (
     <CommandPrimitive.List
       ref={ref}
-      className={cn('overflow-y-auto overflow-x-hidden', className)}
+      className={cn('overflow-y-auto overflow-x-hidden bg-transparent', className)}
       {...props}
     />
   )
@@ -125,7 +146,7 @@ export const CommandEmpty = React.forwardRef<
 >((props, ref) => (
   <CommandPrimitive.Empty
     ref={ref}
-    className="py-6 text-center text-sm text-scale-900"
+    className="py-6 text-center text-sm text-foreground-muted"
     {...props}
   />
 ))
@@ -142,7 +163,7 @@ export const CommandGroup = React.forwardRef<
   <CommandPrimitive.Group
     ref={ref}
     className={cn(
-      'overflow-hidden py-3 px-2 text-scale-700 dark:text-scale-800 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group-heading]]:text-sm [&_[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-scale-900 [&_[cmdk-group-heading]]:dark:text-sca-300',
+      'overflow-hidden py-3 px-2 text-border-strong [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group-heading]]:text-sm [&_[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted',
       className
     )}
     {...props}
@@ -165,7 +186,7 @@ export const CommandSeparator = React.forwardRef<
     className={cn(
       `h-px
     w-full
-    bg-scale-50
+    bg-alternative
     `,
       className
     )}
@@ -195,42 +216,32 @@ export const CommandItem = React.forwardRef<CommandPrimitiveItemElement, Command
         'text-sm',
         'group',
         'py-3',
-        'text-scale-1100',
+        'text-foreground-light',
         'relative',
         'flex',
         type === 'block-link'
           ? `
-      bg-[#fbfcfd]/90
-      dark:bg-[#232323]/90
+        bg-transparent
         border
-      border-[#ddd]/90
-      dark:border-[#282828]/90
-        backdrop-filter
-        backdrop-blur-md
+        border-overlay/90
         px-5
         transition-all
         outline-none
-      aria-selected:border-[#ccc]
-      dark:aria-selected:border-[#323232]
-      aria-selected:bg-[#f1f3f5]/90
-      dark:aria-selected:bg-[#323232]
+        aria-selected:border-overlay
+        aria-selected:bg-overlay-hover/90
         aria-selected:shadow-sm
         aria-selected:scale-[100.3%]
         data-[disabled]:pointer-events-none data-[disabled]:opacity-50`
           : type === 'link'
           ? `
         px-2
-        backdrop-filter
-        backdrop-blur-md
         transition-all
         outline-none
-        aria-selected:bg-[#f1f3f5]/90
-        dark:aria-selected:bg-[#323232]
+        aria-selected:bg-overlay-hover/90
         data-[disabled]:pointer-events-none data-[disabled]:opacity-50`
           : `
         px-2
-        aria-selected:bg-scale-300
-        dark:aria-selected:bg-[#323232]/80
+        aria-selected:bg-overlay-hover/80
         aria-selected:backdrop-filter
         aria-selected:backdrop-blur-md
         data-[disabled]:pointer-events-none
@@ -241,7 +252,7 @@ export const CommandItem = React.forwardRef<CommandPrimitiveItemElement, Command
       {...props}
     >
       <div className="w-full flex flex-row justify-between items-center">
-        <div className="flex flex-row flex-grow items-center">{children}</div>
+        <div className="flex flex-row gap-2 flex-grow items-center">{children}</div>
         {badge}
       </div>
     </CommandPrimitive.Item>
@@ -255,7 +266,7 @@ export const CommandItemStale = React.forwardRef<CommandPrimitiveItemElement, Co
     <CommandPrimitive.Item
       ref={ref}
       className={cn(
-        'text-scale-1100 relative flex cursor-default select-none items-center rounded-md py-1.5 px-2 text-sm outline-none aria-selected:bg-scale-500 data-[disabled]:pointer-events-none data-[disabled]:opacity-50 dark:aria-selected:bg-scale-500',
+        'text-foreground-light relative flex cursor-default select-none items-center rounded-md py-1.5 px-2 text-sm outline-none aria-selected:bg-overlay-selection data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
         className
       )}
       {...props}
@@ -285,8 +296,8 @@ export const CommandShortcut = ({
         'cursor-default px-1.5 py-0.5 rounded text-xs [&:not(:last-child)]:hover:cursor-pointer',
         'justify-end',
         type === 'breadcrumb'
-          ? 'text-scale-900'
-          : 'bg-scale-500 text-scale-900 [&:not(:last-child)]:hover:bg-scale-600 last:bg-scale-600 last:text-scale-900',
+          ? 'text-foreground-muted'
+          : 'bg-overlay-hover text-foreground-muted [&:not(:last-child)]:hover:bg-selection last:bg-selection last:text-foreground-muted',
         className
       )}
     >
@@ -305,28 +316,24 @@ CommandShortcut.displayName = 'CommandLabel'
 
 export interface TextHighlighterProps
   extends DetailedHTMLProps<HTMLAttributes<HTMLSpanElement>, HTMLSpanElement> {
-  text: string | undefined
-  query: string | undefined
+  text: string
+  query: string
 }
 
 export const TextHighlighter = ({ text, query, ...props }: TextHighlighterProps) => {
-  const highlightMatches = (text?: string) => {
-    if (!text) {
-      return ''
+  // Wrap all instances of `query` in a span to make them bold
+  const elements = text.split(query).flatMap((part, index, parts) => {
+    const returnValue = [<>{part}</>]
+
+    // Add back the wrapped `query` (if it's not the last element)
+    if (index !== parts.length - 1) {
+      returnValue.push(<span className="font-semibold text-foreground">{query}</span>)
     }
 
-    if (!query) {
-      return text
-    }
+    return returnValue
+  })
 
-    const regex = new RegExp(query, 'gi')
-    return text.replace(
-      regex,
-      (match) => `<span class="font-semibold text-scale-1200">${match}</span>`
-    )
-  }
-
-  return <span dangerouslySetInnerHTML={{ __html: highlightMatches(text) }} {...props} />
+  return <span {...props}>{elements}</span>
 }
 
 TextHighlighter.displayName = 'TextHighlighter'
@@ -360,14 +367,20 @@ export function useHistoryKeys({ enable, messages, setPrompt }: UseHistoryKeysOp
         case 'ArrowUp':
           setMessageSelectionIndex((index) => {
             const newIndex = Math.max(index - 1, 0)
-            setPrompt(messages[newIndex] ?? '')
+            const newMessage = messages[newIndex]
+            if (newMessage) {
+              setPrompt(newMessage)
+            }
             return newIndex
           })
           return
         case 'ArrowDown':
           setMessageSelectionIndex((index) => {
             const newIndex = Math.min(index + 1, messages.length)
-            setPrompt(messages[newIndex] ?? '')
+            const newMessage = messages[newIndex]
+            if (newMessage) {
+              setPrompt(newMessage)
+            }
             return newIndex
           })
           return
@@ -408,8 +421,10 @@ export function useAutoInputFocus() {
 
   // Focus the input when typing from anywhere
   React.useEffect(() => {
-    function onKeyDown() {
-      input?.focus()
+    function onKeyDown(e: KeyboardEvent) {
+      if (!e.ctrlKey && !e.altKey && !e.metaKey && e.key !== 'Tab') {
+        input?.focus()
+      }
     }
 
     window.addEventListener('keydown', onKeyDown)

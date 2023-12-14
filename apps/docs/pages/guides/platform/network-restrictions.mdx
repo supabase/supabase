@@ -8,7 +8,7 @@ export const meta = {
 
 <Admonition type="note">
 
-Network Restrictions is currently in beta and is slowly being made available to all projects. [Contact support](https://app.supabase.com/support/new) if you'd like to request early access.
+Network Restrictions is currently in beta and is slowly being made available to all projects. [Contact support](https://supabase.com/dashboard/support/new) if you'd like to request early access.
 
 </Admonition>
 
@@ -66,8 +66,9 @@ Restrictions applied successfully: true
 
 ## Limitations
 
-- The current iteration of Network Restrictions applies to connections to Postgres and PgBouncer and doesn't currently apply to APIs offered over HTTPS (e.g., PostgREST, Storage, and Auth).
+- The current iteration of Network Restrictions applies to connections to Postgres and PgBouncer and doesn't currently apply to APIs offered over HTTPS (e.g., PostgREST, Storage, and Auth). This includes using Supabase client libraries like [supabase-js](https://supabase.com/docs/reference/javascript).
 - Network Restrictions should not be used if you need to connect to your Postgres database using Edge Functions.
+- [Supavisor](https://github.com/supabase/supavisor/) does not currently support Network Restrictions.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

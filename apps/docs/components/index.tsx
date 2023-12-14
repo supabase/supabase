@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { Alert, Button, CodeBlock, GlassPanel, markdownComponents, Tabs } from 'ui'
 import StepHikeCompact from '~/components/StepHikeCompact'
 // Common components
-import Admonition from './Admonition'
 import ButtonCard from './ButtonCard'
 import JwtGenerator from './JwtGenerator'
 
@@ -22,6 +21,8 @@ import QuickstartIntro from './MDX/quickstart_intro.mdx'
 import SocialProviderSettingsSupabase from './MDX/social_provider_settings_supabase.mdx'
 import SocialProviderSetup from './MDX/social_provider_setup.mdx'
 import StorageManagement from './MDX/storage_management.mdx'
+import KotlinProjectSetup from './MDX/kotlin_project_setup.mdx'
+import MigrationWarnings from './MDX/migration_warnings.mdx'
 import { CH } from '@code-hike/mdx/components'
 import RefHeaderSection from './reference/RefHeaderSection'
 
@@ -31,12 +32,13 @@ import CliGlobalFlagsHandler from '~/components/reference/enrichments/cli/CliGlo
 import Options from '~/components/Options'
 import Param from '~/components/Params'
 
+import { Admonition, ThemeImage } from 'ui'
 import {
   IconMenuJavascript,
   IconMenuHome,
   IconMenuGettingStarted,
   IconMenuDatabase,
-  IconMenuServerlessApis,
+  IconMenuRestApis,
   IconMenuAuth,
   IconMenuEdgeFunctions,
   IconMenuRealtime,
@@ -70,6 +72,8 @@ const components = {
   QuickstartIntro,
   DatabaseSetup,
   ProjectSetup,
+  KotlinProjectSetup,
+  MigrationWarnings,
   SocialProviderSetup,
   SocialProviderSettingsSupabase,
   StepHikeCompact,
@@ -81,7 +85,7 @@ const components = {
       {props.children}
     </Alert>
   ),
-  Tabs,
+  Tabs: (props: any) => <Tabs wrappable {...props} />,
   TabPanel: (props: any) => <Tabs.Panel {...props}>{props.children}</Tabs.Panel>,
   h2: (props: any) => (
     <Heading tag="h2" {...props}>
@@ -93,6 +97,12 @@ const components = {
       {props.children}
     </Heading>
   ),
+  h4: (props: any) => (
+    <Heading tag="h4" {...props}>
+      {props.children}
+    </Heading>
+  ),
+  Image: (props: any) => <ThemeImage fill className="object-contain" {...props} />,
   RefSubLayout,
   RefHeaderSection: (props: any) => <RefHeaderSection {...props} />,
   CliGlobalFlagsHandler: () => <CliGlobalFlagsHandler />,
@@ -102,7 +112,7 @@ const components = {
   IconMenuHome,
   IconMenuGettingStarted,
   IconMenuDatabase,
-  IconMenuServerlessApis,
+  IconMenuRestApis,
   IconMenuAuth,
   IconMenuEdgeFunctions,
   IconMenuRealtime,

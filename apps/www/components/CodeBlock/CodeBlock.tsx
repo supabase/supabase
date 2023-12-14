@@ -63,8 +63,8 @@ function CodeBlock(props: CodeBlockProps) {
       {filename && (
         <div
           className="
-            bg-scale-200
-            text-scale-900
+            bg-background
+            text-muted
             flex
             h-8 w-full
             items-center
@@ -119,7 +119,7 @@ function CodeBlock(props: CodeBlockProps) {
                 type="text"
                 icon={
                   copied ? (
-                    <span className="text-brand-900">
+                    <span className="text-brand">
                       <IconCheck strokeWidth={3} />
                     </span>
                   ) : (

@@ -1,8 +1,9 @@
+import { Button } from '.'
 // Button.stories.ts|tsx
 
 import type { Meta, StoryObj } from '@storybook/react'
 
-import { Button, ButtonProps } from './Button'
+import { ButtonProps } from './Button'
 
 import { IconAirplay } from '../Icon/icons/IconAirplay'
 
@@ -15,6 +16,17 @@ const meta: Meta<typeof Button> = {
   component: Button,
 }
 
+export const Neutral = (args: any) => <Button {...args}>Button text</Button>
+export const Success = (args: any) => <Button {...args}>Button text</Button>
+export const withStyles = (args: any) => <Button {...args}>Button text</Button>
+export const withIcon = (args: any) => <Button {...args}>Button text</Button>
+export const withIconRight = (args: any) => <Button {...args}>Button text</Button>
+export const withBlock = (args: any) => <Button {...args}>Button text</Button>
+export const withOnlyIcon = (args: any) => <Button {...args} />
+export const withOnlyLoading = (args: any) => <Button {...args} />
+export const withLoadingCentered = (args: any) => (
+  <Button {...args}>Loading icon is centered</Button>
+)
 export default meta
 
 type Story = StoryObj<typeof Button>

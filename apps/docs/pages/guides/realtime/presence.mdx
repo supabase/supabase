@@ -1,164 +1,312 @@
 import Layout from '~/layouts/DefaultGuideLayout'
+import StepHikeCompact from '~/components/StepHikeCompact'
 
 export const meta = {
-  id: 'presence',
   title: 'Presence',
-  description: "Getting started with Realtime's Presence feature",
+  description: 'Share state between users with Realtime Presence.',
+  subtitle: 'Share state between users with Realtime Presence.',
+  // breadcrumb: 'Realtime Presence Quickstart',
 }
 
-Presence utilizes an in-memory conflict-free replicated data type (CRDT) to track and synchronize shared state in an eventually consistent manner. It computes the difference between existing state and new state changes and sends the necessary updates to clients via Broadcast.
+Let's explore how to implement Realtime Presence to track state between multiple users.
 
-When a new client subscribes to a channel, it will immediately receive the channel's latest state in a single message instead of waiting for all other clients to send their individual states.
+## Usage
 
-Clients are free to come-and-go as they please, and as long as they are all subscribed to the same channel then they will all have the same Presence state as each other.
+You can use the Supabase client libraries to track Presence state between users.
 
-The neat thing about Presence is that if a client is suddenly disconnected (for example, they go offline), their state will be automatically removed from the shared state. If you've ever tried to build an “I'm online” feature which handles unexpected disconnects, you'll appreciate how useful this is.
+### Initialize the client
 
-## Presence State
+Go to your Supabase project's [API Settings](https://supabase.com/dashboard/project/_/settings/api) and grab the `URL` and `anon` public API key.
 
-You can get started by listening to `sync` event messages notifying the client that a channel's state has been synchronized on the server. You can get the state by calling the channel's `presenceState` helper:
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
 
 ```js
-const { createClient } = require('@supabase/supabase-js')
+import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY)
+const SUPABASE_URL = 'https://<project>.supabase.co'
+const SUPABASE_KEY = '<your-anon-key>'
 
-const channel = supabase.channel('test')
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+```
 
-channel
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+void main() {
+  Supabase.initialize(
+    url: 'https://<project>.supabase.co',
+    anonKey: '<your-anon-key>',
+  );
+
+  runApp(MyApp());
+}
+
+final supabase = Supabase.instance.client;
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val supabaseUrl = "https://<project>.supabase.co"
+val supabaseKey = "<your-anon-key>"
+val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
+    install(Realtime)
+}
+```
+
+</TabPanel>
+</Tabs>
+
+### Sync and track state
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+Listen to the `sync`, `join`, and `leave` events triggered whenever any client joins or leaves the channel or changes their slice of state:
+
+```js
+const roomOne = supabase.channel('room_01')
+
+roomOne
   .on('presence', { event: 'sync' }, () => {
-    const state = channel.presenceState()
-    console.log(state)
+    const newState = roomOne.presenceState()
+    console.log('sync', newState)
   })
-  .subscribe()
-```
-
-Whenever there's Presence activity on the `'test'` channel, this `sync` event will be broadcast to all clients subscribed to the channel.
-
-## Listen to Joins
-
-You can create a client and listen to new state joining the channel's Presence:
-
-```js
-// Supabase client setup
-
-const channel = supabase.channel('test')
-
-channel
   .on('presence', { event: 'join' }, ({ key, newPresences }) => {
-    console.log(key, newPresences)
+    console.log('join', key, newPresences)
+  })
+  .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
+    console.log('leave', key, leftPresences)
   })
   .subscribe()
 ```
 
-## Track Presence
+</TabPanel>
+<TabPanel id="dart" label="Dart">
 
-On another client, subscribe to the channel and insert state to be tracked by Presence:
+```dart
+final supabase = Supabase.instance.client;
 
+final roomOne = supabase.channel('room_01');
+
+roomOne.onPresenceSync((_) {
+  final newState = roomOne.presenceState();
+  print('sync: $newState');
+}).onPresenceJoin((payload) {
+  print('join: $payload');
+}).onPresenceLeave((payload) {
+  print('leave: $payload');
+}).subscribe();
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+Listen to the presence change flow, emitting new a new `PresenceAction` whenever someone joins or leaves:
+
+```kotlin
+val roomOne = supabase.channel("room_01")
+val presenceFlow: Flow<PresenceAction> = roomOne.presenceChangeFlow()
+presenceFlow
+    .onEach {
+        println(it.joins) //You can also use it.decodeJoinsAs<YourType>()
+        println(it.leaves) //You can also use it.decodeLeavesAs<YourType>()
+    }
+    .launchIn(yourCoroutineScope) //You can also use .collect { } here
+
+roomOne.subscribe()
+```
+
+</TabPanel>
+</Tabs>
+
+### Sending state
+
+You can send state to all subscribers using `track()`:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+{/* prettier-ignore */}
 ```js
-// Supabase client setup
+const roomOne = supabase.channel('room_01')
 
-const channel = supabase.channel('test')
+const userStatus = {
+  user: 'user-1',
+  online_at: new Date().toISOString(),
+}
 
-channel.subscribe(async (status) => {
-  if (status === 'SUBSCRIBED') {
-    const presenceTrackStatus = await channel.track({
-      user: 'user-1',
-      online_at: new Date().toISOString(),
-    })
-    console.log(presenceTrackStatus)
-  }
+roomOne.subscribe(async (status) => {
+  if (status !== 'SUBSCRIBED') { return }
+
+  const presenceTrackStatus = await roomOne.track(userStatus)
+  console.log(presenceTrackStatus)
 })
 ```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final roomOne = supabase.channel('room_01');
+
+final userStatus = {
+  'user': 'user-1',
+  'online_at': DateTime.now().toIso8601String(),
+};
+
+roomOne.subscribe((status, error) async {
+  if (status != RealtimeSubscribeStatus.subscribed) return;
+
+  final presenceTrackStatus = await roomOne.track(userStatus);
+  print(presenceTrackStatus);
+});
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val roomOne = supabase.channel("room_01")
+
+val userStatus = UserStatus( //Your custom class
+    user = "user-1",
+    onlineAt = Clock.System.now().toEpochMilliseconds()
+)
+
+roomOne.subscribe(blockUntilSubscribed = true) //You can also use the roomOne.status flow instead, but this parameter will block the coroutine until the status is joined.
+
+roomOne.track(userStatus)
+```
+
+</TabPanel>
+</Tabs>
+
+A client will receive state from any other client that is subscribed to the same topic (in this case `room_01`). It will also automatically trigger its own `sync` and `join` event handlers.
+
+### Stop tracking
+
+You can stop tracking presence using the `untrack()` method. This will trigger the `sync` and `leave` event handlers.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const untrackPresence = async () => {
+  const presenceUntrackStatus = await roomOne.untrack()
+  console.log(presenceUntrackStatus)
+}
+
+untrackPresence()
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final roomOne = supabase.channel('room_01');
+
+untrackPresence() async {
+  final presenceUntrackStatus = await roomOne.untrack();
+  print(presenceUntrackStatus);
+}
+
+untrackPresence();
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+suspend fun untrackPresence() {
+	roomOne.untrack()
+}
+
+untrackPresence()
+```
+
+</TabPanel>
+</Tabs>
+
+## Presence options
+
+You can pass configuration options while initializing the Supabase Client.
 
 ### Presence Key
 
-By default, Presence will generate an `UUIDv1` key on the server to uniquely track a client channel's state but you may pass Presence a custom key when creating the channel.
+By default, Presence will generate a unique `UUIDv1` key on the server to track a client channel's state. If you prefer, you can provide a custom key when creating the channel. This key should be unique among clients.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
 
 ```js
-// Supabase client setup
+import { createClient } from '@supabase/supabase-js'
 
-const channel = supabase.channel('test', {
+const channelC = supabase.channel('test', {
   config: {
     presence: {
-      key: 'userId-1',
+      key: 'userId-123',
     },
   },
 })
-
-channel.subscribe(async (status) => {
-  if (status === 'SUBSCRIBED') {
-    const presenceTrackStatus = await channel.track({
-      user: 'user-1',
-      online_at: new Date().toISOString(),
-    })
-    console.log(presenceTrackStatus)
-  }
-})
 ```
 
-## Listen to Leaves
+</TabPanel>
+<TabPanel id="dart" label="Dart">
 
-You can create a client and listen to a client channel's state leaving:
-
-```js
-// Supabase client setup
-
-const channel = supabase.channel('test')
-
-channel
-  .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
-    console.log(key, leftPresences)
-  })
-  .subscribe()
+```dart
+final channelC = supabase.channel(
+  'test',
+  opts: const RealtimeChannelConfig(key: 'userId-123'),
+);
 ```
 
-## Untrack Presence
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
 
-On another client, subscribe to the channel, and remove tracked state from Presence:
-
-```js
-// Supabase client setup
-
-const channel = supabase.channel('test')
-
-channel.subscribe(async (status) => {
-  if (status === 'SUBSCRIBED') {
-    const presenceTrackStatus = await channel.track({
-      user: 'user-1',
-      online_at: new Date().toISOString(),
-    })
-
-    if (presenceTrackStatus === 'ok') {
-      const presenceUntrackStatus = await channel.untrack()
-      console.log(presenceUntrackStatus)
+```kotlin
+val channelC = supabase.channel("test") {
+    presence {
+        key = "userId-123"
     }
-  }
-})
+}
 ```
 
-## Client-Side Rate Limit
-
-There is a default client-side rate limit that enables you to send 10 messages per second, or one message every 100 milliseconds. You can customize this when creating the client:
-
-```js
-const { createClient } = require('@supabase/supabase-js')
-
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY,
-  {
-    realtime: {
-      params: {
-        eventsPerSecond: 5
-      }
-    }
-  }
-```
-
-By setting `eventsPerSecond` to 5, you can send one message every 200 milliseconds on a per client basis.
-
-Learn more by visiting the [Quotas](/docs/guides/realtime/quotas) section.
+</TabPanel>
+</Tabs>
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

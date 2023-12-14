@@ -28,8 +28,8 @@ module.exports = {
     brand12: 'hsla(153, 60%, 95%, 1)',
   },
   contrast: {
-    'brand-hiContrast': 'var(--colors-brand-9)',
-    'brand-loContrast': 'var(--colors-brand-4)',
+    'brand-hiContrast': 'hsl(var(--brand-default))',
+    'brand-loContrast': 'hsl(var(--brand-300))',
   },
   scale: {
     scale1: 'var(--colors-slate1)',

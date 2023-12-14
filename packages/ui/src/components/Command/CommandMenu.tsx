@@ -1,6 +1,5 @@
 import { useRouter } from 'next/router'
 import * as React from 'react'
-import { ElementRef, useRef } from 'react'
 import { IconHome } from '../Icon/icons/IconHome'
 
 import { IconArrowRight } from './../Icon/icons/IconArrowRight'
@@ -12,6 +11,7 @@ import { IconMonitor } from './../Icon/icons/IconMonitor'
 import { IconPhone } from './../Icon/icons/IconPhone'
 import { IconUser } from './../Icon/icons/IconUser'
 import { IconKey } from './../Icon/icons/IconKey'
+import { IconLink } from './../Icon/icons/IconLink'
 
 import AiCommand from './AiCommand'
 import sharedItems from './utils/shared-nav-items.json'
@@ -23,6 +23,8 @@ import {
   CommandItem,
   CommandLabel,
   CommandList,
+  FORCE_MOUNT_ITEM,
+  copyToClipboard,
 } from './Command.utils'
 import { COMMAND_ROUTES } from './Command.constants'
 import { useCommandMenu } from './CommandMenuProvider'
@@ -34,6 +36,8 @@ import APIKeys from './APIKeys'
 import SearchableStudioItems from './SearchableStudioItems'
 import CommandMenuShortcuts from './CommandMenuShortcuts'
 import { BadgeExperimental } from './Command.Badges'
+import { AiIconAnimation } from '@ui/layout/ai-icon-animation'
+import ChildItem from './ChildItem'
 
 export const CHAT_ROUTES = [
   COMMAND_ROUTES.AI, // this one is temporary
@@ -61,10 +65,28 @@ interface CommandMenuProps {
 const CommandMenu = ({ projectRef }: CommandMenuProps) => {
   const router = useRouter()
 
-  const commandInputRef = useRef<ElementRef<typeof CommandInput>>(null)
-  const { isOpen, setIsOpen, search, setSearch, pages, setPages, currentPage, site } =
-    useCommandMenu()
+  const {
+    isOpen,
+    setIsOpen,
+    search,
+    setSearch,
+    pages,
+    setPages,
+    currentPage,
+    site,
+    project,
+    inputRef: commandInputRef,
+  } = useCommandMenu()
   const showCommandInput = !currentPage || !CHAT_ROUTES.includes(currentPage)
+
+  // This function has been added to prevent the use of double quotes in the search docs input due to an issue with the cmdk-supabase module. This function can be removed when we transition to using cmdk.
+  const handleInputChange = (value: string) => {
+    const newValue = value.replace(/"/g, '') // Remove double quotes
+    setSearch(newValue)
+  }
+
+  const commandListMaxHeight =
+    currentPage === COMMAND_ROUTES.DOCS_SEARCH ? 'min(600px, 50vh)' : '300px'
 
   return (
     <>
@@ -87,17 +109,23 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
             ref={commandInputRef}
             placeholder="Type a command or search..."
             value={search}
-            onValueChange={setSearch}
+            onValueChange={handleInputChange}
           />
         )}
-        <CommandList className={['my-2', showCommandInput && 'max-h-[300px]'].join(' ')}>
+        <CommandList
+          style={{
+            maxHeight: commandListMaxHeight,
+            height: currentPage === COMMAND_ROUTES.DOCS_SEARCH ? commandListMaxHeight : 'auto',
+          }}
+          className="my-2"
+        >
           {!currentPage && (
             <>
-              <CommandGroup heading="Documentation" forceMount>
+              <CommandGroup heading="Documentation">
                 <CommandItem
                   type="command"
+                  value={site === 'docs' ? `${FORCE_MOUNT_ITEM}--docs-search` : undefined}
                   onSelect={() => setPages([...pages, COMMAND_ROUTES.DOCS_SEARCH])}
-                  forceMount
                 >
                   <IconBook className="" />
 
@@ -106,7 +134,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                     {search ? (
                       <>
                         {': '}
-                        <span className="text-scale-1200 font-semibold">{search}</span>
+                        <span className="text-foreground font-semibold">{search}</span>
                       </>
                     ) : (
                       '...'
@@ -115,19 +143,18 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                 </CommandItem>
                 <CommandItem
                   type="command"
-                  badge={<BadgeExperimental />}
+                  value={site === 'docs' ? `${FORCE_MOUNT_ITEM}--ai-info` : undefined}
                   onSelect={() => {
                     setPages([...pages, COMMAND_ROUTES.AI])
                   }}
-                  forceMount
                 >
-                  <AiIcon />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-900 to-brand-1100">
+                  <AiIconAnimation />
+                  <span className="text-brand">
                     Ask Supabase AI
                     {search ? (
                       <>
                         {': '}
-                        <span className="text-scale-1200 font-semibold">{search}</span>
+                        <span className="text-foreground font-semibold">{search}</span>
                       </>
                     ) : (
                       '...'
@@ -140,7 +167,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                 <CommandGroup heading="Quickstarts">
                   {sharedItems.quickstarts.map((item) => (
                     <CommandItem key={item.url} type="link" onSelect={() => router.push(item.url)}>
-                      <IconArrowRight className="text-scale-900" />
+                      <IconArrowRight className="text-foreground-muted" />
                       <CommandLabel>
                         Start with <span className="font-bold"> {item.label}</span>
                       </CommandLabel>
@@ -153,7 +180,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                 <CommandGroup heading="Projects">
                   {sharedItems.projectTools.map((item) => (
                     <CommandItem key={item.url} type="link" onSelect={() => router.push(item.url)}>
-                      <IconArrowRight className="text-scale-900" />
+                      <IconArrowRight className="text-foreground-muted" />
                       <CommandLabel>
                         <span className="font-bold"> {item.label}</span>
                       </CommandLabel>
@@ -166,7 +193,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                 <CommandGroup heading="Studio tools">
                   {sharedItems.tools.map((item) => (
                     <CommandItem key={item.url} type="link" onSelect={() => router.push(item.url)}>
-                      <IconArrowRight className="text-scale-900" />
+                      <IconArrowRight className="text-foreground-muted" />
                       <CommandLabel>
                         Go to <span className="font-bold"> {item.label}</span>
                       </CommandLabel>
@@ -178,12 +205,11 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
               {site === 'studio' && (
                 <CommandGroup heading="Experimental">
                   <CommandItem
-                    forceMount
                     type="command"
                     badge={<BadgeExperimental />}
                     onSelect={() => setPages([...pages, COMMAND_ROUTES.GENERATE_SQL])}
                   >
-                    <AiIcon className="text-scale-1100" />
+                    <AiIcon className="text-foreground-light" />
                     <CommandLabel>Generate SQL with Supabase AI</CommandLabel>
                   </CommandItem>
                 </CommandGroup>
@@ -192,13 +218,28 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
               {site === 'studio' && projectRef !== undefined && (
                 <CommandGroup heading="Project tools">
                   <CommandItem
-                    forceMount
                     type="command"
-                    onSelect={() => setPages([...pages, COMMAND_ROUTES.API_KEYS])}
+                    onSelect={() => {
+                      setSearch('')
+                      setPages([...pages, COMMAND_ROUTES.API_KEYS])
+                    }}
                   >
-                    <IconKey className="text-scale-1100" />
+                    <IconKey className="text-foreground-light" />
                     <CommandLabel>Get API keys</CommandLabel>
                   </CommandItem>
+                  {project?.apiUrl !== undefined && (
+                    <ChildItem
+                      isSubItem={false}
+                      onSelect={() => {
+                        copyToClipboard(project?.apiUrl ?? '')
+                        setIsOpen(false)
+                      }}
+                      className="space-x-2"
+                    >
+                      <IconLink className="text-foreground-light" />
+                      <CommandLabel>Copy API URL</CommandLabel>
+                    </ChildItem>
+                  )}
                 </CommandGroup>
               )}
 
@@ -214,11 +255,11 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                         key={item.url}
                         type="link"
                         onSelect={() => {
-                          router.push(item.url)
+                          router.push(itemUrl)
                           setIsOpen(false)
                         }}
                       >
-                        <IconArrowRight className="text-scale-900" />
+                        <IconArrowRight className="text-foreground-muted" />
                         <CommandLabel>
                           Go to <span className="font-bold"> {item.label}</span>
                         </CommandLabel>
@@ -233,7 +274,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
               <CommandGroup heading="Support">
                 {sharedItems.support.map((item) => (
                   <CommandItem key={item.url} type="link" onSelect={() => router.push(item.url)}>
-                    <IconLifeBuoy className="text-scale-900" />
+                    <IconLifeBuoy className="text-foreground-muted" />
                     <CommandLabel>
                       Go to <span className="font-bold"> {item.label}</span>
                     </CommandLabel>
@@ -253,8 +294,14 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
               )}
 
               <CommandGroup heading="Settings">
-                <CommandItem type="link" onSelect={() => setPages([...pages, 'Theme'])}>
-                  <IconMonitor className="mr-2" />
+                <CommandItem
+                  type="link"
+                  onSelect={() => {
+                    setSearch('')
+                    setPages([...pages, 'Theme'])
+                  }}
+                >
+                  <IconMonitor />
                   Change theme
                 </CommandItem>
               </CommandGroup>

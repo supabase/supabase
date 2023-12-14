@@ -1,8 +1,8 @@
 import ButtonCard from './ButtonCard'
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 
 const Frameworks = () => {
-  const { isDarkMode } = useTheme()
+  const { resolvedTheme } = useTheme()
 
   const frameworks = [
     {
@@ -14,12 +14,12 @@ const Frameworks = () => {
       href: '/guides/with-angular',
     },
     {
-      name: 'Expo',
+      name: 'Expo React Native',
       logo: {
-        light: '/docs/img/icons/expo-icon.svg',
-        dark: '/docs/img/icons/expo-icon-dark.svg',
+        light: '/docs/img/icons/expo-icon-light.svg',
+        dark: '/docs/img/icons/expo-icon.svg',
       },
-      href: '/guides/with-expo',
+      href: '/guides/with-expo-react-native',
     },
     {
       name: 'Flutter',
@@ -38,10 +38,18 @@ const Frameworks = () => {
       href: '/reference/javascript/installing#javascript',
     },
     {
+      name: 'Kotlin',
+      logo: {
+        light: '/docs/img/icons/kotlin-icon.svg',
+        dark: '/docs/img/icons/kotlin-icon.svg',
+      },
+      href: '/guides/with-kotlin',
+    },
+    {
       name: 'Next.js',
       logo: {
-        light: '/docs/img/icons/nextjs-light-icon.svg',
-        dark: '/docs/img/icons/nextjs-dark-icon.svg',
+        light: '/docs/img/icons/nextjs-icon-light.svg',
+        dark: '/docs/img/icons/nextjs-icon.svg',
       },
       href: '/guides/with-nextjs',
     },
@@ -85,6 +93,14 @@ const Frameworks = () => {
       },
       href: '/guides/with-vue-3',
     },
+    {
+      name: 'refine',
+      logo: {
+        light: '/docs/img/icons/refine-icon.svg',
+        dark: '/docs/img/icons/refine-icon.svg',
+      },
+      href: '/guides/getting-started/tutorials/with-refine',
+    },
   ]
   return (
     <div className="grid md:grid-cols-12 gap-4 not-prose">
@@ -94,8 +110,7 @@ const Frameworks = () => {
             layout="horizontal"
             to={x.href}
             title={x.name}
-            // [Joshen] Nice to have: theming
-            icon={isDarkMode ? x.logo.dark : x.logo.light}
+            icon={resolvedTheme?.includes('dark') ? x.logo.dark : x.logo.light}
           />
         </div>
       ))}

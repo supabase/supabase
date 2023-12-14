@@ -39,7 +39,7 @@ Et näha, kuidas panustada, külastage [Getting Started](../DEVELOPERS.md)
 ## Staatus
 
 - [x] Alpha: Me testime Supabase'i suletud kliendikogumiga
-- [x] Avalik Alpha: Igaüks saab registreeruda aadressil [app.supabase.com](https://app.supabase.com). Kuid olge meiega ettevaatlikud, seal on mõned veidrused
+- [x] Avalik Alpha: Igaüks saab registreeruda aadressil [supabase.com/dashboard](https://supabase.com/dashboard). Kuid olge meiega ettevaatlikud, seal on mõned veidrused
 - [x] Avalik beeta: Piisavalt stabiilne enamiku mitte-ettevõtluskasutuse jaoks
 - [ ] Avalik: Üldine kättesaadavus [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
@@ -55,7 +55,7 @@ Supabase on avatud lähtekoodiga tööriistade kombinatsioon. Me ehitame Firebas
 
 **Arhitektuur**
 
-Supabase on [hostitud platvorm](https://app.supabase.com). Võite registreeruda ja alustada Supabase'i kasutamist ilma midagi installimata.
+Supabase on [hostitud platvorm](https://supabase.com/dashboard). Võite registreeruda ja alustada Supabase'i kasutamist ilma midagi installimata.
 Võite ka [ise hostida](https://supabase.com/docs/guides/hosting/overview) ja [arendada lokaalselt](https://supabase.com/docs/guides/local-development).
 
 ![Arhitektuur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
@@ -247,7 +247,7 @@ Meie lähenemine kliendiraamatukogudele on modulaarne. Iga alamraamatukogu on is
 - [Lihtsustatud hiina keel / 简体中文](/i18n/README.zh-cn.md)
 - [Rootsi / Svenska](/i18n/README.sv.md)
 - [Tai / ไทย](/i18n/README.th.md)
-- [Traditsiooniline hiina keel / 繁体中文](/i18n/README.zh-tw.md)
+- [Traditsiooniline hiina keel / 繁體中文](/i18n/README.zh-tw.md)
 - [Turkish / Türkçe](/i18n/README.tr.md)
 - [Ukraina / Українська](/i18n/README.uk.md)
 - [Vietnami keel / Tiếng Việt](/i18n/README.vi-vn.md)

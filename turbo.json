@@ -1,4 +1,5 @@
 {
+  "$schema": "https://turbo.build/schema.json",
   "pipeline": {
     "build": {
       "dependsOn": ["^build"],
@@ -16,7 +17,7 @@
     },
     "docs#build": {
       "dependsOn": ["^build"],
-      "env": ["SUPABASE_SERVICE_ROLE_KEY", "OPENAI_KEY", "ALGOLIA_SEARCH_ADMIN_KEY"],
+      "env": ["SUPABASE_SERVICE_ROLE_KEY", "OPENAI_KEY"],
       "outputs": [".next/**", "!.next/cache/**"]
     },
     "studio#build": {
@@ -37,7 +38,9 @@
         "SENTRY_URL",
         "SESSION_COOKIE_SECRET",
         "SUPABASE_ENCRYPTION_KEY",
-        "PLATFORM_PG_META_URL"
+        "PLATFORM_PG_META_URL",
+        "NEXT_PUBLIC_VERCEL_ENV",
+        "NEXT_PUBLIC_SITE_URL"
       ],
       "outputs": [".next/**", "!.next/cache/**"]
     },
@@ -49,6 +52,9 @@
     },
     "test": {
       "cache": false
+    },
+    "typecheck": {
+      "outputs": ["**/node_modules/.cache/tsbuildinfo.json"]
     }
   }
 }

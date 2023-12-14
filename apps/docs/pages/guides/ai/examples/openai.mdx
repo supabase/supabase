@@ -5,7 +5,7 @@ export const meta = {
   title: 'Generating OpenAI GPT3 completions',
   description: 'Generate GPT text completions using OpenAI and Supabase Edge Functions.',
   subtitle: 'Generate GPT text completions using OpenAI and Supabase Edge Functions.',
-  video: 'https://www.youtube.com/v/29p8kIqyU_Y',
+  video: 'https://www.youtube-nocookie.com/v/29p8kIqyU_Y',
   tocVideo: '29p8kIqyU_Y',
 }
 
@@ -42,7 +42,7 @@ serve(async (req) => {
   const { query } = await req.json()
 
   const completionConfig: CreateCompletionRequest = {
-    model: 'text-davinci-003',
+    model: 'gpt-3.5-turbo-instruct',
     prompt: query,
     max_tokens: 256,
     temperature: 0,

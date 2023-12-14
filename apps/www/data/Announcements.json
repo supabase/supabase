@@ -1,31 +1,31 @@
 [
   {
     "type": "Announcement",
-    "title": "Flutter Hackathon",
-    "description": "Build Flutter apps and win limited edition swag.",
-    "imgUrl": "/images/blog/flutter-hackathon/thumbnail.jpg",
-    "logoUrl": "/images/blog/flutter-hackathon/thumbnail.jpg",
+    "title": "Edge Functions: Node and native npm compatibility",
+    "description": "We're adding Node and native npm compatibility for Edge Functions",
+    "imgUrl": "launch-week-x/day-2/edge-runtime-thumb.png",
+    "logoUrl": "launch-week-x/day-2/edge-runtime-thumb.png",
     "organization": "Supabase",
-    "url": "/blog/flutter-hackathon",
+    "url": "/blog/edge-functions-node-npm",
     "postMeta": {
-      "name": "Tyler",
-      "publishDate": "May 12, 2023",
-      "readLength": 3
+      "name": "laktek",
+      "publishDate": "Dec 12, 2023",
+      "readLength": 5
     },
-    "ctaText": "See how to join"
+    "ctaText": "Learn more"
   },
   {
     "type": "Announcement",
-    "title": "Supabase Launch Week 7",
-    "description": "One new feature (or more) every day during a week.",
-    "imgUrl": "/images/launchweek/seven/launch-week-7.jpg",
-    "logoUrl": "/images/launchweek/seven/launch-week-7.jpg",
+    "title": "Supabase Launch Week X Hackathon",
+    "description": "Build an Open Source Project over 10 days. 5 prize categories",
+    "imgUrl": "/images/blog/lwx-hackathon/ogimage.png",
+    "logoUrl": "/images/blog/lwx-hackathon/ogimage.png",
     "organization": "Supabase",
-    "url": "/launch-week",
+    "url": "/blog/supabase-hackathon-lwx",
     "postMeta": {
-      "name": "Paul Copplestone",
-      "publishDate": "Apr 03, 2023",
-      "readLength": 5
+      "name": "ant_wilson",
+      "publishDate": "Dec 05, 2023",
+      "readLength": 3
     },
     "ctaText": "Learn more"
   }

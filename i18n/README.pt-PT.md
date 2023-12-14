@@ -39,7 +39,7 @@ Para ver como contribuir, visite [Getting Started](../DEVELOPERS.md)
 ## Status
 
 - [x] Alfa: Estamos a testar o Supabase com um conjunto fechado de clientes
-- [x] Alfa Público: Qualquer pessoa pode inscrever-se em [app.supabase.com](https://app.supabase.com). Mas vá com calma, ainda há alguns problemas
+- [x] Alfa Público: Qualquer pessoa pode inscrever-se em [supabase.com/dashboard](https://supabase.com/dashboard). Mas vá com calma, ainda há alguns problemas
 - [x] Beta Público: Estável o suficiente para a maioria dos casos de uso não empresarial
 - [ ] Público: Disponibilidade geral [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
@@ -55,7 +55,7 @@ O Supabase é uma combinação de ferramentas de código aberto. Estamos a const
 
 **Arquitectura**
 
-Supabase é uma [plataforma alojada](https://app.supabase.com). Pode registar-se e começar a usar o Supabase sem instalar nada.
+Supabase é uma [plataforma alojada](https://supabase.com/dashboard). Pode registar-se e começar a usar o Supabase sem instalar nada.
 Pode também [auto-hospedar](https://supabase.com/docs/guides/hosting/overview) e [desenvolver localmente](https://supabase.com/docs/guides/local-development).
 
 ![Arquitectura](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
@@ -247,7 +247,7 @@ A nossa abordagem para as bibliotecas de clientes é modular. Cada sub-bibliotec
 - [Chinês simplificado / 简体中文](/i18n/README.zh-cn.md)
 - [Sueco / Svenska](/i18n/README.sv.md)
 - [Tailandês / ไทย](/i18n/README.th.md)
-- [Chinês tradicional / 繁体中文](/i18n/README.zh-tw.md)
+- [Chinês tradicional / 繁體中文](/i18n/README.zh-tw.md)
 - [Turco / Türkçe](/i18n/README.tr.md)
 - [Ucraniano / Українська](/i18n/README.uk.md)
 - [Vietnamita / Tiếng Việt](/i18n/README.vi-vn.md)

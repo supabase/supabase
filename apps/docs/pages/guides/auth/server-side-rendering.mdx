@@ -36,11 +36,11 @@ Upon successful verification of the identity of the user, the Supabase Auth serv
 
 <Admonition type="tip">
 
-You can configure [redirects URLs](https://app.supabase.com/project/_/auth/url-configuration) in the Supabase Dashboard. You can use [wildcard match patterns](/docs/guides/auth#redirect-urls-and-wildcards) like `*` and `**` to allow redirects to different forms of URLs.
+You can configure [redirects URLs](https://supabase.com/dashboard/project/_/auth/url-configuration) in the Supabase Dashboard. You can use [wildcard match patterns](/docs/guides/auth#redirect-urls-and-wildcards) like `*` and `**` to allow redirects to different forms of URLs.
 
 </Admonition>
 
-Supabase Auth supports two authentication flows: **Implicit** and **PKCE**. The **PKCE** flow is generally preferred when on the server. It introduces a few additional steps which guard a against replay and URL capture attacks. Unlike the implicit flow, it also allows users to access the `access_token` and `refresh_token` on the server.
+Supabase Auth supports two authentication flows: **Implicit** and **PKCE**. The **PKCE** flow is generally preferred when on the server. It introduces a few additional steps which guard against replay and URL capture attacks. Unlike the implicit flow, it also allows users to access the `access_token` and `refresh_token` on the server.
 
 <Accordion
   type="default"
@@ -48,11 +48,11 @@ Supabase Auth supports two authentication flows: **Implicit** and **PKCE**. The 
   chevronAlign="right"
   justified
   size="medium"
-  className="text-scale-900 dark:text-white"
+  className="text-foreground-light"
   >
     <div className="border-b pb-3">
       <Accordion.Item
-        header={<span className="text-scale-1200 font-bold">Implicit</span>}
+        header={<span className="text-foreground font-bold">Implicit</span>}
         id={`ssr-implicit-flow`}
       >
 
@@ -65,7 +65,7 @@ Supabase Auth supports two authentication flows: **Implicit** and **PKCE**. The 
 
         The client libraries are designed to listen for this type of URL, extract the access token, refresh token and some extra information from it, and finally persist it in local storage for further use by the library and your app.
 
-        <Admonition type="info">
+        <Admonition type="note">
 
         Web browsers do not send the URL fragment to the server they're making the request to. Since you may not be hosting the single-page app on a server under your direct control (such as on GitHub Pages or other freemium hosting providers), we want to prevent hosting services from getting access to your user's authorization credentials by default.
         
@@ -77,7 +77,7 @@ Supabase Auth supports two authentication flows: **Implicit** and **PKCE**. The 
     </div>
     <div className="border-b pb-3">
       <Accordion.Item
-        header={<span className="text-scale-1200 font-bold">PKCE</span>}
+        header={<span className="text-foreground font-bold">PKCE</span>}
         id={`ssr-pkce-flow`}
       >
       
@@ -87,7 +87,7 @@ Supabase Auth supports two authentication flows: **Implicit** and **PKCE**. The 
         ```
         The `code` parameter is commonly known as the Auth Code and can be exchanged for an access token by calling `exchangeCodeForSession(code)`.
 
-        <Admonition type="info">
+        <Admonition type="note">
 
         For security purposes, the code has a validity of 5 minutes and can only be exchanged for an access token once. You will need to restart the authentication flow from scratch if you wish to obtain a new access token.
         
@@ -127,7 +127,7 @@ Supabase Auth supports two authentication flows: **Implicit** and **PKCE**. The 
         const supabase = createClient(
              'https://xyzcompany.supabase.co',
              'public-anon-key',
-             options: {
+             {
                ...
                auth: {
                  ...

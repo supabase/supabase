@@ -2,8 +2,7 @@ const config = require('config/tailwind.config')
 
 module.exports = config({
   content: [
-    './../../packages/common/**/*.{ts,tsx}',
-    './../../packages/ui/**/*.{tsx,ts,js}',
+    '../../packages/ui/src/**/*.{tsx,ts,js}',
     './pages/**/*.{tsx,mdx}',
     './components/**/*.tsx',
     './layouts/**/*.tsx',

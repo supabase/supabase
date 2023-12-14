@@ -1,10 +1,10 @@
 import { useInView } from 'react-intersection-observer'
-import { FC } from 'react'
+import { FC, PropsWithChildren } from 'react'
 import { highlightSelectedNavItem } from '~/components/CustomHTMLElements/CustomHTMLElements.utils'
 import { useRouter } from 'next/router'
 import { useNavigationMenuContext } from '~/components/Navigation/NavigationMenu/NavigationMenu.Context'
 import { menuState } from '~/hooks/useMenuState'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 
 interface ISectionContainer {
   id: string
@@ -17,9 +17,9 @@ interface ISectionContainer {
 }
 
 type RefSubLayoutSubComponents = {
-  Section: FC<ISectionContainer>
-  EducationSection: FC<IEducationSection>
-  EducationRow: FC<IEducationRow>
+  Section: FC<PropsWithChildren<ISectionContainer>>
+  EducationSection: FC<PropsWithChildren<IEducationSection>>
+  EducationRow: FC<PropsWithChildren<IEducationRow>>
   Details: FC<ISectionDetails>
   Examples: FC<ISectionExamples>
 }
@@ -50,7 +50,9 @@ interface IEducationSection {
 interface ISectionDetails {}
 interface ISectionExamples {}
 
-const RefSubLayout: FC<RefSubLayoutType> & RefSubLayoutSubComponents = (props) => {
+const RefSubLayout: FC<PropsWithChildren<RefSubLayoutType>> & RefSubLayoutSubComponents = (
+  props
+) => {
   return (
     <div className="flex flex-col w-full divide-y px-5 max-w-7xl mx-auto py-16">
       {props.children}
@@ -58,12 +60,12 @@ const RefSubLayout: FC<RefSubLayoutType> & RefSubLayoutSubComponents = (props) =
   )
 }
 
-const Section: FC<ISectionContainer> = (props) => {
+const Section: FC<PropsWithChildren<ISectionContainer>> = (props) => {
   return (
     <article
       key={props.id + 'section'}
       className={[
-        props.singleColumn ? 'prose dark:prose-dark w-full' : 'w-full',
+        props.singleColumn ? 'prose w-full' : 'w-full',
         'py-16 lg:py-32 first:pt-8 last:pb-8',
       ].join(' ')}
     >
@@ -107,7 +109,7 @@ const StickyHeader: FC<StickyHeader> = ({ icon, ...props }) => {
   return (
     <div className={['flex items-center gap-3 not-prose', icon && 'mb-8'].join(' ')}>
       {icon && (
-        <div className="w-8 h-8 bg-brand-500 rounded flex items-center justify-center">
+        <div className="w-8 h-8 bg-brand-300 rounded flex items-center justify-center">
           <Image width={16} height={16} alt={icon} src={`${icon}.svg`} />
         </div>
       )}
@@ -119,7 +121,7 @@ const StickyHeader: FC<StickyHeader> = ({ icon, ...props }) => {
           id={props.slug}
           data-ref-id={props.id}
           className={[
-            'text-2xl font-medium text-scale-1200 scroll-mt-24',
+            'text-2xl font-medium text-foreground scroll-mt-24',
             !icon && 'mb-8',
             props.monoFont && 'font-mono',
           ].join(' ')}
@@ -131,11 +133,11 @@ const StickyHeader: FC<StickyHeader> = ({ icon, ...props }) => {
   )
 }
 
-const Details: FC<ISectionDetails> = (props) => {
+const Details: FC<PropsWithChildren<ISectionDetails>> = (props) => {
   return <div className="relative w-full">{props.children}</div>
 }
 
-const Examples: FC<ISectionExamples> = (props) => {
+const Examples: FC<PropsWithChildren<ISectionExamples>> = (props) => {
   return (
     <div className="w-full">
       <div className="sticky top-24">{props.children}</div>
@@ -143,7 +145,7 @@ const Examples: FC<ISectionExamples> = (props) => {
   )
 }
 
-const EducationRow: FC<IEducationRow> = (props) => {
+const EducationRow: FC<PropsWithChildren<IEducationRow>> = (props) => {
   return (
     <div className={['grid lg:grid-cols-2 gap-8 lg:gap-16', props.className].join(' ')}>
       {props.children}
@@ -151,11 +153,15 @@ const EducationRow: FC<IEducationRow> = (props) => {
   )
 }
 
-const EducationSection: FC<IEducationSection> = ({ icon, hideTitle = false, ...props }) => {
+const EducationSection: FC<PropsWithChildren<IEducationSection>> = ({
+  icon,
+  hideTitle = false,
+  ...props
+}) => {
   return (
     <article
       key={props.id + 'education'}
-      className={'prose dark:prose-dark max-w-none py-16 lg:py-32 first:pt-8 last:pb-8'}
+      className={'prose max-w-none py-16 lg:py-32 first:pt-8 last:pb-8'}
     >
       {!hideTitle && <StickyHeader {...props} icon={icon} />}
       {props.children}

@@ -39,9 +39,9 @@ For at se, hvordan man bidrager, besøg [Getting Started](../DEVELOPERS.md)
 ## Status
 
 - [x] Alpha: Vi tester Supabase med et lukket sæt af kunder
-- [x] Offentlig Alpha: Alle kan tilmelde sig på [app.supabase.com](https://app.supabase.com). Men vær forsigtig med os, der er et par knuder
+- [x] Offentlig Alpha: Alle kan tilmelde sig på [supabase.com/dashboard](https://supabase.com/dashboard). Men vær forsigtig med os, der er et par knuder
 - [x] Public Beta: Stabil nok til de fleste ikke-virksomhedsrelaterede brugssager
-- [ ] Public: Public: Generel tilgængelighed [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [ ] Public: Generel tilgængelighed [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
 Vi er i øjeblikket i Public Beta. Hold øje med "releases" i denne repo for at få besked om større opdateringer.
 
@@ -55,7 +55,7 @@ Supabase er en kombination af open source-værktøjer. Vi opbygger funktionerne 
 
 **Arkitektur**
 
-Supabase er en [hosted platform](https://app.supabase.com). Du kan tilmelde dig og begynde at bruge Supabase uden at installere noget.
+Supabase er en [hosted platform](https://supabase.com/dashboard). Du kan tilmelde dig og begynde at bruge Supabase uden at installere noget.
 Du kan også [selv hoste](https://supabase.com/docs/guides/hosting/overview) og [udvikle lokalt](https://supabase.com/docs/guides/local-development).
 
 ![Arkitektur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
@@ -247,7 +247,7 @@ Vores tilgang til klientbiblioteker er modulær. Hvert delbibliotek er en selvst
 - [Forenklet kinesisk / 简体中文](/i18n/README.zh-cn.md)
 - [Svensk / Svenska](/i18n/README.sv.md)
 - [Thai / ไทย](/i18n/README.th.md)
-- [Traditionelt kinesisk / 繁体中文](/i18n/README.zh-tw.md)
+- [Traditionelt kinesisk / 繁體中文](/i18n/README.zh-tw.md)
 - [tyrkisk / Türkçe](/i18n/README.tr.md)
 - [Ukrainsk / Українська](/i18n/README.uk.md)
 - [Vietnamesisk / Tiếng Việt](/i18n/README.vi-vn.md)

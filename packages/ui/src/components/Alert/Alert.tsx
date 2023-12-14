@@ -29,7 +29,7 @@ const icons: Record<AlertVariant, React.ReactElement> = {
   neutral: <></>,
 }
 
-function Alert({
+export function Alert({
   variant = 'neutral',
   className,
   title,
@@ -82,5 +82,3 @@ function Alert({
     </>
   )
 }
-
-export default Alert

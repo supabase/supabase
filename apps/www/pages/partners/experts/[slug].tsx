@@ -1,5 +1,6 @@
-import { marked } from 'marked'
 import { GetStaticPaths, GetStaticProps } from 'next'
+import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
+import { serialize } from 'next-mdx-remote/serialize'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -8,11 +9,17 @@ import 'swiper/swiper.min.css'
 import { IconChevronLeft, IconExternalLink } from 'ui'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import supabase from '~/lib/supabase'
+import supabase from '~/lib/supabaseMisc'
 import { Partner } from '~/types/partners'
 import Error404 from '../../404'
 
-function Partner({ partner }: { partner: Partner }) {
+function Partner({
+  partner,
+  overview,
+}: {
+  partner: Partner
+  overview: MDXRemoteSerializeResult<Record<string, unknown>, Record<string, unknown>>
+}) {
   if (!partner) return <Error404 />
   return (
     <>
@@ -25,7 +32,7 @@ function Partner({ partner }: { partner: Partner }) {
           url: `https://supabase.com/partners/experts/${partner.slug}`,
           images: [
             {
-              url: partner.images[0] ?? partner.logo,
+              url: partner.images ? partner.images[0] : partner.logo,
             },
           ],
         }}
@@ -35,11 +42,12 @@ function Partner({ partner }: { partner: Partner }) {
         <SectionContainer>
           <div className="col-span-12 mx-auto mb-2 max-w-5xl space-y-12 lg:col-span-2">
             {/* Back button */}
-            <Link href="/partners/experts">
-              <a className="text-scale-1200 hover:text-scale-1000 flex cursor-pointer items-center transition-colors">
-                <IconChevronLeft style={{ padding: 0 }} />
-                Back
-              </a>
+            <Link
+              href="/partners/experts"
+              className="text-foreground hover:text-foreground-lighter flex cursor-pointer items-center transition-colors"
+            >
+              <IconChevronLeft style={{ padding: 0 }} />
+              Back
             </Link>
 
             <div className="flex items-center space-x-4">
@@ -47,7 +55,7 @@ function Partner({ partner }: { partner: Partner }) {
                 layout="fixed"
                 width={56}
                 height={56}
-                className="bg-scale-400 flex-shrink-f0 h-14 w-14 rounded-full"
+                className="bg-surface2100 flex-shrink-f0 h-14 w-14 rounded-full"
                 src={partner.logo}
                 alt={partner.title}
               />
@@ -57,7 +65,7 @@ function Partner({ partner }: { partner: Partner }) {
             </div>
 
             <div
-              className="bg-scale-300 py-6"
+              className="bg-surface-100 py-6"
               style={{ marginLeft: 'calc(50% - 50vw)', marginRight: 'calc(50% - 50vw)' }}
             >
               <Swiper
@@ -85,7 +93,7 @@ function Partner({ partner }: { partner: Partner }) {
                   },
                 }}
               >
-                {partner.images.map((image: any, i: number) => {
+                {partner.images?.map((image: any, i: number) => {
                   return (
                     <SwiperSlide key={i}>
                       <div className="relative ml-3 mr-3 block cursor-move overflow-hidden rounded-md">
@@ -107,7 +115,7 @@ function Partner({ partner }: { partner: Partner }) {
             <div className="grid gap-3 space-y-16 lg:grid-cols-4 lg:space-y-0 lg:space-x-3">
               <div className="lg:col-span-3">
                 <h2
-                  className="text-scale-1200"
+                  className="text-foreground"
                   style={{ fontSize: '1.5rem', marginBottom: '1rem' }}
                 >
                   Overview
@@ -115,7 +123,7 @@ function Partner({ partner }: { partner: Partner }) {
 
                 {partner.video && (
                   <div
-                    className="bg-scale-1000 relative w-full rounded-md shadow-lg"
+                    className="bg-foreground-lighter relative w-full rounded-md shadow-lg"
                     style={{ padding: '56.25% 0 0 0', marginBottom: '1rem' }}
                   >
                     <iframe
@@ -129,54 +137,57 @@ function Partner({ partner }: { partner: Partner }) {
                   </div>
                 )}
 
-                <div className="prose" dangerouslySetInnerHTML={{ __html: partner.overview }} />
+                <div className="prose">
+                  <MDXRemote {...overview} />
+                </div>
               </div>
 
               <div>
                 <h2
-                  className="text-scale-1200"
+                  className="text-foreground"
                   style={{ fontSize: '1.5rem', marginBottom: '1rem' }}
                 >
                   Details
                 </h2>
 
-                <div className="text-scale-1200 divide-y">
+                <div className="text-foreground divide-y">
                   {partner.type === 'technology' && (
                     <div className="flex items-center justify-between py-2">
-                      <span className="text-scale-900">Developer</span>
-                      <span className="text-scale-1200">{partner.developer}</span>
+                      <span className="text-foreground-lighter">Developer</span>
+                      <span className="text-foreground">{partner.developer}</span>
                     </div>
                   )}
 
                   <div className="flex items-center justify-between py-2">
-                    <span className="text-scale-900">Category</span>
-                    <Link href={`/partners/experts#${partner.category.toLowerCase()}`}>
-                      <a className="text-brand-900 hover:text-brand-800 transition-colors">
-                        {partner.category}
-                      </a>
+                    <span className="text-lighter">Category</span>
+                    <Link
+                      href={`/partners/experts#${partner.category.toLowerCase()}`}
+                      className="text-brand hover:underline transition-colors"
+                    >
+                      {partner.category}
                     </Link>
                   </div>
 
                   <div className="flex items-center justify-between py-2">
-                    <span className="text-scale-900">Website</span>
+                    <span className="text-foreground-lighter">Website</span>
                     <a
                       href={partner.website}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-brand-900 hover:text-brand-800 transition-colors"
+                      className="text-brand hover:underline transition-colors"
                     >
                       {new URL(partner.website).host}
                     </a>
                   </div>
 
-                  {partner.type === 'technology' && (
+                  {partner.type === 'technology' && partner.docs && (
                     <div className="flex items-center justify-between py-2">
-                      <span className="text-scale-900">Documentation</span>
+                      <span className="text-foreground-lighter">Documentation</span>
                       <a
                         href={partner.docs}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-brand-900 hover:text-brand-800 transition-colors"
+                        className="text-brand hover:underline transition-colors"
                       >
                         <span className="flex items-center space-x-1">
                           <span>Learn</span>
@@ -197,7 +208,11 @@ function Partner({ partner }: { partner: Partner }) {
 
 // This function gets called at build time
 export const getStaticPaths: GetStaticPaths = async () => {
-  const { data: slugs } = await supabase.from('partners').select('slug')
+  const { data: slugs } = await supabase
+    .from('partners')
+    .select('slug')
+    .eq('approved', true)
+    .eq('type', 'expert')
 
   const paths: {
     params: { slug: string }
@@ -231,10 +246,10 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   }
 
   // Parse markdown
-  partner.overview = marked.parse(partner.overview)
+  const overview = await serialize(partner.overview)
 
   return {
-    props: { partner },
+    props: { partner, overview },
     revalidate: 18000, // In seconds - refresh every 5 hours
   }
 }
