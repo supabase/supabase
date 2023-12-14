@@ -65,7 +65,7 @@ const TriggersList = ({
 
   return (
     <>
-      {(triggers ?? []).length == 0 ? (
+      {(triggers ?? []).length === 0 ? (
         <div className="flex h-full w-full items-center justify-center">
           <ProductEmptyState
             title="Triggers"
