@@ -19,16 +19,28 @@ import {
 } from 'ui'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { proxy, useSnapshot } from 'valtio'
-import { SAVED_ORG_PROJECT_BRANCH, retrieve, store } from '~/lib/localStorage'
+import { LOCAL_STORAGE_KEYS, remove, retrieve, store } from '~/lib/storage'
 import Link from 'next/link'
+import { useIsLoggedIn } from 'common'
 
-const selectedProject = proxy({
+const projectStore = proxy({
   selectedId: null,
   setSelectedId: (id: string | null) => {
-    selectedProject.selectedId = id
-    if (typeof window !== undefined && id !== null) {
-      store(window.localStorage, SAVED_ORG_PROJECT_BRANCH, id)
+    projectStore.selectedId = id
+    if (id !== null) {
+      store('local', LOCAL_STORAGE_KEYS.SAVED_ORG_PROJECT_BRANCH, id)
     }
+  },
+  projectKeys: [] as ProjectKey[],
+  setProjectKeys: (projects: ProjectKey[]) => {
+    projectStore.projectKeys = projects
+  },
+  clear: () => {
+    projectStore.setSelectedId(null)
+    projectStore.setProjectKeys([])
+    // Also done centrally in lib/userAuth,
+    // but no harm and an extra failsafe in doing it twice
+    remove('local', LOCAL_STORAGE_KEYS.SAVED_ORG_PROJECT_BRANCH)
   },
 })
 
@@ -146,23 +158,28 @@ async function listAllProjectKeys() {
 }
 
 function useListAllProjectKeys() {
-  const initialMount = useRef(true)
-  const [projectKeys, setProjectKeys] = useState<ProjectKey[]>([])
+  const requestSent = useRef(false)
+  const isLoggedIn = useIsLoggedIn()
+  const { setSelectedId, projectKeys, setProjectKeys, clear: clearData } = useSnapshot(projectStore)
 
   const [isLoading, setIsLoading] = useState(true)
   const [isError, setIsError] = useState(false)
 
   useEffect(() => {
-    if (initialMount.current) {
+    if (isLoggedIn && !requestSent.current) {
+      requestSent.current = true
       listAllProjectKeys()
         .then((keys) => {
           setProjectKeys(keys)
         })
         .catch(() => setIsError(true))
         .finally(() => setIsLoading(false))
-      initialMount.current = false
+    } else {
+      requestSent.current = false
+      setIsLoading(false)
+      clearData()
     }
-  }, [])
+  }, [isLoggedIn, setSelectedId, setProjectKeys, clearData])
 
   return { projectKeys, isLoading, isError }
 }
@@ -182,7 +199,7 @@ function ComboBox({
   isLoading,
   className,
 }: {
-  projectKeysInfo: ProjectKey[]
+  projectKeysInfo: Readonly<ProjectKey[]>
   variable: Variable
   selectedId: string | null
   setSelectedId: Dispatch<SetStateAction<string>>
@@ -244,7 +261,8 @@ function ComboBox({
 }
 
 export function ProjectConfigVariables({ variable }: { variable: Variable }) {
-  const { selectedId, setSelectedId } = useSnapshot(selectedProject)
+  const isLoggedIn = useIsLoggedIn()
+  const { selectedId, setSelectedId } = useSnapshot(projectStore)
   const { projectKeys, isLoading, isError } = useListAllProjectKeys()
   const [copied, setCopied] = useState(false)
 
@@ -257,7 +275,7 @@ export function ProjectConfigVariables({ variable }: { variable: Variable }) {
 
   useEffect(() => {
     if (!selectedId && typeof window !== undefined) {
-      const storedId = retrieve(window.localStorage, SAVED_ORG_PROJECT_BRANCH)
+      const storedId = retrieve('local', LOCAL_STORAGE_KEYS.SAVED_ORG_PROJECT_BRANCH)
       setSelectedId(storedId ?? projectKeys?.[0]?.id ?? null)
     }
   }, [selectedId, projectKeys, setSelectedId])
@@ -267,9 +285,13 @@ export function ProjectConfigVariables({ variable }: { variable: Variable }) {
     (project) => project.id.toLowerCase() === selectedId?.toLowerCase()
   )
   const currentSelection =
-    variable === 'url' ? currentProject?.endpoint : currentProject?.keys.anonKey
+    variable === 'url'
+      ? currentProject?.endpoint
+      : variable === 'anonKey'
+      ? currentProject?.keys.anonKey
+      : 'Wrong variable'
 
-  const noData = !isLoading && (isError || projectKeys.length === 0)
+  const noData = !isLoading && projectKeys.length === 0
 
   return (
     <div
@@ -278,7 +300,7 @@ export function ProjectConfigVariables({ variable }: { variable: Variable }) {
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span>{prettyFormatVariable[variable]}</span>
-        {!noData && (
+        {isLoggedIn && !noData && (
           <div className="flex justify-between">
             <ComboBox
               selectedId={selectedId}
@@ -303,45 +325,56 @@ export function ProjectConfigVariables({ variable }: { variable: Variable }) {
       <Input
         disabled
         type="text"
+        className="font-mono"
         value={
           isLoading
             ? 'Loading...'
-            : noData
+            : !isLoggedIn || noData
             ? `YOUR ${prettyFormatVariable[variable].toUpperCase()}`
             : currentSelection
         }
       />
-      {noData && (
-        <span className="text-foreground-muted text-sm ml-1">
-          There was a problem getting your {prettyFormatVariable[variable]}.{' '}
-          {isError ? (
-            <>
-              Are you{' '}
-              <Link
-                className="text-foreground-muted"
-                href="https://supabase.com/dashboard"
-                rel="noreferrer noopener"
-                target="_blank"
-              >
-                logged in
-              </Link>
-              ?
-            </>
-          ) : (
-            <>
-              Do you have{' '}
-              <Link
-                className="text-foreground-muted"
-                href="https://supabase.com/dashboard"
-                rel="noreferrer noopener"
-                target="_blank"
-              >
-                any projects
-              </Link>
-              ?
-            </>
-          )}
-        </span>
+      {!isLoggedIn && (
+        <p className="text-foreground-muted text-sm mt-2 mb-0 ml-1">
+          There was a problem getting your {prettyFormatVariable[variable]}. Are you{' '}
+          <Link
+            className="text-foreground-muted"
+            href="/dashboard"
+            rel="noreferrer noopener"
+            target="_blank"
+          >
+            logged in
+          </Link>
+          ?
+        </p>
+      )}
+      {isLoggedIn && noData && (
+        <>
+          <p className="text-foreground-muted text-sm mt-2 mb-0 ml-1">
+            There was a problem getting your {prettyFormatVariable[variable]}. Do you have{' '}
+            <Link
+              className="text-foreground-muted"
+              href="/dashboard"
+              rel="noreferrer noopener"
+              target="_blank"
+            >
+              any projects
+            </Link>
+            ?
+          </p>
+          <p className="text-foreground-muted text-sm mt-0 ml-1">
+            You can also try looking up the value in the{' '}
+            <Link
+              className="text-foreground-muted"
+              href="/dashboard/project/_/settings/api"
+              rel="noreferrer noopener"
+              target="_blank"
+            >
+              dashboard
+            </Link>
+            .
+          </p>
+        </>
       )}
     </div>
   )

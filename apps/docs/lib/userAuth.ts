@@ -1,10 +1,17 @@
 import { Session } from '@supabase/supabase-js'
-import { gotrueClient as auth } from 'common'
+import { LOCAL_STORAGE_KEYS, gotrueClient as auth } from 'common'
+import { remove } from './storage'
 
 let currentSession: Session | null
 
-auth.onAuthStateChange((_, session) => {
+auth.onAuthStateChange((event, session) => {
   currentSession = session
+
+  if (event === 'SIGNED_OUT') {
+    Object.keys(LOCAL_STORAGE_KEYS).forEach((key) => {
+      remove('local', key)
+    })
+  }
 })
 
 export async function getAccessToken() {
