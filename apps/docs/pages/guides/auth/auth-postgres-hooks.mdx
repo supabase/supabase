@@ -269,11 +269,30 @@ Example output:
 }
 ```
 
-
 ## Custom Access Token Hook
 
 The custom access token hook runs before a token is issued and allows you to add additional claims based on the authentication method used or add additional metadata to select users.
-Claims returned must conform to our specification. While you are free to add claims, you can only remove the `user_metadata` and app_metadata claims as we rely on the rest  of the claims for proper functioning of the service.
+Claims returned must conform to our specification. Supabase Auth will check for these claims after the hook is run and return an error if they are not present.
+
+Here's a listing of all fields currently available on an access token:
+
+| Field           | Is Required Claim |
+|-----------------|-------------------|
+| `aud`           | Yes               |
+| `exp`           | Yes               |
+| `jti`           | No                |
+| `iat`           | Yes               |
+| `iss`           | No                |
+| `nbf`           | No                |
+| `sub`           | Yes               |
+| `email`         | Yes               |
+| `phone`         | Yes               |
+| `app_metadata`  | No                |
+| `user_metadata` | No                |
+| `role`          | Yes               |
+| `aal`           | Yes               |
+| `amr`           | No                |
+| `session_id`    | No                |
 
 
 ### Inputs
@@ -289,14 +308,19 @@ Claims returned must conform to our specification. While you are free to add cla
 
 Return these only if your hook processed the input without errors.
 
-- `claims` A json containing the updated claims after the hook has been run
-The following fields are availble: `aud`, `exp`, `jti`, `iat`, `iss`, `nbf`, `sub`, `email`, `phone`, `app_metadata`, `user_metadata`, `role`, `aal`, `amr`, `session_id`
-
-Of which, the following fields are required claims: `aud` , `exp` `iat`, `sub`, `email`, `phone`, `role`, `aal`. Supabase Auth will check for these claims after the hook is run and return an error if they are not present.
+- `claims` A json containing the updated claims after the hook has been run.
 
 ## Examples
 
 ### Example: Limit Failed MFA Verification Attempts
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="add-admin-role" label="Limit Failed MFA Verification Attempts">
 
 Your company requires that a user can only input an incorrect MFA Verification code every 2 seconds and not more than that.
 
@@ -386,6 +410,8 @@ revoke all
 	on table public.mfa_failed_verification_attempts
 	from authenticated, anon;
 ```
+</TabPanel>
+</Tabs>
 
 
 ### Example: Limit Failed Password Verification Attempts
