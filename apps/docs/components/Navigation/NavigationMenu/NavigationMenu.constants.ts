@@ -947,7 +947,7 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/examples/slack-bot-mention',
         },
         {
-          name: 'Upload PDF and extract content',
+          name: 'Convert PDF to HTML',
           url: '/guides/functions/examples/pdf-upload-extract',
         },
       ],
