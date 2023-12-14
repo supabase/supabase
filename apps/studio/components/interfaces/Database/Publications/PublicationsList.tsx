@@ -2,14 +2,18 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
+import { Button, IconAlertCircle, IconSearch, Input, Modal, Toggle } from 'ui'
 
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import InformationBox from 'components/ui/InformationBox'
 import NoSearchResults from 'components/ui/NoSearchResults'
-import { useCheckPermissions, usePermissionsLoaded, useStore } from 'hooks'
-import { Button, IconAlertCircle, IconSearch, Input, Modal, Toggle } from 'ui'
+import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
+import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
 import PublicationSkeleton from './PublicationSkeleton'
+import toast from 'react-hot-toast'
 
 interface PublicationEvent {
   event: string
@@ -21,8 +25,20 @@ interface PublicationsListProps {
 }
 
 const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps) => {
-  const { ui, meta } = useStore()
+  const { project } = useProjectContext()
   const [filterString, setFilterString] = useState<string>('')
+
+  const { data, isLoading } = useDatabasePublicationsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const { mutate: updatePublications } = useDatabasePublicationUpdateMutation({
+    onSuccess: () => {
+      toast.success('Successfully updated event')
+      setToggleListenEventValue(null)
+    },
+  })
+  console.log(data)
 
   const canUpdatePublications = useCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -38,10 +54,8 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
   ]
   const publications =
     filterString.length === 0
-      ? meta.publications.list()
-      : meta.publications.list((publication: any) => publication.name.includes(filterString))
-
-  const isLoading = meta.publications.isLoading
+      ? data ?? []
+      : (data ?? []).filter((publication) => publication.name.includes(filterString))
 
   const [toggleListenEventValue, setToggleListenEventValue] = useState<{
     publication: any
@@ -50,27 +64,16 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
   } | null>(null)
 
   const toggleListenEvent = async () => {
-    if (!toggleListenEventValue) return
+    if (!toggleListenEventValue || !project) return
 
     const { publication, event, currentStatus } = toggleListenEventValue
-
-    try {
-      let payload: any = { id: publication.id }
-      payload[`publish_${event.event.toLowerCase()}`] = !currentStatus
-      const { data, error }: any = await meta.publications.update(publication.id, payload)
-      if (error) {
-        throw error
-      } else {
-        setToggleListenEventValue(null)
-        return data
-      }
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to toggle for ${publication.name}: ${error.message}`,
-      })
-      return false
-    }
+    const payload = {
+      projectRef: project.ref,
+      connectionString: project.connectionString,
+      id: publication.id,
+    } as any
+    payload[`publish_${event.event.toLowerCase()}`] = !currentStatus
+    updatePublications(payload)
   }
 
   return (
@@ -117,7 +120,7 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
           body={
             isLoading
               ? Array.from({ length: 5 }).map((_, i) => <PublicationSkeleton key={i} index={i} />)
-              : publications.map((x, i) => (
+              : publications.map((x) => (
                   <Table.tr className="border-t" key={x.name}>
                     <Table.td className="px-4 py-3" style={{ width: '25%' }}>
                       {x.name}
@@ -129,13 +132,13 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
                       <Table.td key={event.key}>
                         <Toggle
                           size="tiny"
-                          checked={x[event.key]}
+                          checked={(x as any)[event.key]}
                           disabled={!canUpdatePublications}
                           onChange={() => {
                             setToggleListenEventValue({
                               publication: x,
                               event,
-                              currentStatus: x[event.key],
+                              currentStatus: (x as any)[event.key],
                             })
                           }}
                         />
@@ -172,8 +175,9 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
 
       <ConfirmationModal
         visible={toggleListenEventValue !== null}
-        header="Confirm"
+        header={`Confirm to toggle sending ${toggleListenEventValue?.event.event.toLowerCase()} events`}
         buttonLabel="Confirm"
+        buttonLoadingLabel="Updating"
         onSelectCancel={() => setToggleListenEventValue(null)}
         onSelectConfirm={() => {
           toggleListenEvent()
