@@ -49,7 +49,7 @@ export interface WeekDayProps {
   steps: StepProps[] | []
 }
 
-export const endOfLWX = '2023-12-15T23:59:59.999-08:00'
+export const endOfLWXHackathon = '2023-12-17T23:59:59.999-08:00'
 
 const days: WeekDayProps[] = [
   {
