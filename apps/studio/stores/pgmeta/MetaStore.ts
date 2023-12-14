@@ -53,7 +53,6 @@ export interface IMetaStore {
 
   roles: IRolesStore
   policies: IPostgresMetaInterface<any>
-  triggers: IPostgresMetaInterface<any>
   functions: IPostgresMetaInterface<any>
 
   projectRef?: string
@@ -131,7 +130,6 @@ export default class MetaStore implements IMetaStore {
 
   roles: RolesStore
   policies: PostgresMetaInterface<any>
-  triggers: TriggersStore
   functions: PostgresMetaInterface<any>
 
   projectRef?: string
@@ -169,7 +167,6 @@ export default class MetaStore implements IMetaStore {
       `${this.baseUrl}/policies`,
       this.headers
     )
-    this.triggers = new TriggersStore(this.rootStore, `${this.baseUrl}/triggers`, this.headers)
     this.functions = new PostgresMetaInterface(
       this.rootStore,
       `${this.baseUrl}/functions`,
@@ -875,9 +872,6 @@ export default class MetaStore implements IMetaStore {
 
     this.policies.setUrl(`${this.baseUrl}/policies`)
     this.policies.setHeaders(this.headers)
-
-    this.triggers.setUrl(`${this.baseUrl}/triggers`)
-    this.triggers.setHeaders(this.headers)
 
     this.functions.setUrl(`${this.baseUrl}/functions`)
     this.functions.setHeaders(this.headers)
