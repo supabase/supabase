@@ -33,6 +33,7 @@ import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutati
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
 import { Markdown } from 'components/interfaces/Markdown'
+import FormField from '../AuthProvidersForm/FormField'
 
 // Use a const string to represent no chars option. Represented as empty string on the backend side.
 const NO_REQUIRED_CHARACTERS = 'NO_REQUIRED_CHARS'
@@ -172,7 +173,6 @@ const BasicAuthSettingsForm = observer(() => {
     <Form id={formId} initialValues={INITIAL_VALUES} onSubmit={onSubmit} validationSchema={schema}>
       {({ handleReset, resetForm, values, initialValues }: any) => {
         const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
-
         // Form is reset once remote data is loaded in store
         useEffect(() => {
           if (isSuccess) resetForm({ values: INITIAL_VALUES, initialValues: INITIAL_VALUES })
@@ -241,59 +241,54 @@ const BasicAuthSettingsForm = observer(() => {
                         actions={<span className="mr-3 text-foreground-lighter">characters</span>}
                         disabled={!canUpdateConfig}
                       />
-                      <>
-                        <Radio.Group
-                          id="PASSWORD_REQUIRED_CHARACTERS"
-                          name="PASSWORD_REQUIRED_CHARACTERS"
-                          label="Required characters"
-                          descriptionText="Passwords that do not have at least one of each will be rejected as weak."
-                        >
-                          <Radio
-                            label="No required characters"
-                            value={NO_REQUIRED_CHARACTERS}
-                            checked={values.PASSWORD_REQUIRED_CHARACTERS === NO_REQUIRED_CHARACTERS}
-                            description="(default)"
-                          />
-                          <Radio
-                            label="Letters and digits"
-                            value={LETTERS_AND_DIGITS}
-                            checked={values.PASSWORD_REQUIRED_CHARACTERS === LETTERS_AND_DIGITS}
-                          />
-                          <Radio
-                            label="Lowercase, uppercase letters and digits"
-                            value={LOWER_UPPER_DIGITS}
-                            checked={values.PASSWORD_REQUIRED_CHARACTERS === LOWER_UPPER_DIGITS}
-                          />
-                          <Radio
-                            label="Lowercase, uppercase letters, digits and symbols"
-                            value={LOWER_UPPER_DIGITS_SYMBOLS}
-                            checked={
-                              values.PASSWORD_REQUIRED_CHARACTERS === LOWER_UPPER_DIGITS_SYMBOLS
-                            }
-                            description="(recommended)"
-                          />
-                        </Radio.Group>
-                        <div className="border-t border-muted"></div>
-                        {isProPlanAndUp ? (
-                          <></>
-                        ) : (
-                          <UpgradeToPro
-                            primaryText="Upgrade to Pro"
-                            secondaryText="Leaked password protection available on Pro plans and up."
-                            projectRef={projectRef!}
-                            organizationSlug={organization!.slug}
-                          />
-                        )}
-                        <Toggle
-                          id="PASSWORD_HIBP_ENABLED"
-                          size="small"
-                          label="Prevent use of leaked passwords"
-                          afterLabel=" (recommended)"
-                          layout="flex"
-                          descriptionText="Rejects the use of known or easy to guess passwords on sign up or password change. Powered by the HaveIBeenPwned.org Pwned Passwords API."
-                          disabled={!canUpdateConfig || !isProPlanAndUp}
+                      <FormField
+                        name="PASSWORD_REQUIRED_CHARACTERS"
+                        properties={{
+                          type: 'select',
+                          title: 'Password Requirements',
+                          description:
+                            'Passwords that do not have at least one of each will be rejected as weak.',
+                          enum: [
+                            {
+                              label: 'No required characters (default)',
+                              value: NO_REQUIRED_CHARACTERS,
+                            },
+                            {
+                              label: 'Letters and digits',
+                              value: LETTERS_AND_DIGITS,
+                            },
+                            {
+                              label: 'Lowercase, uppercase letters and digits',
+                              value: LOWER_UPPER_DIGITS,
+                            },
+                            {
+                              label:
+                                'Lowercase, uppercase letters, digits and symbols (recommended)',
+                              value: LOWER_UPPER_DIGITS_SYMBOLS,
+                            },
+                          ],
+                        }}
+                        formValues={values}
+                      />
+                      {isProPlanAndUp ? (
+                        <></>
+                      ) : (
+                        <UpgradeToPro
+                          primaryText="Upgrade to Pro"
+                          secondaryText="Leaked password protection available on Pro plans and up."
+                          projectRef={projectRef!}
+                          organizationSlug={organization!.slug}
                         />
-                      </>
+                      )}
+                      <Toggle
+                        id="PASSWORD_HIBP_ENABLED"
+                        size="small"
+                        label="Prevent use of leaked passwords"
+                        afterLabel=" (recommended)"
+                        layout="flex"
+                        descriptionText="Rejects the use of known or easy to guess passwords on sign up or password change. Powered by the HaveIBeenPwned.org Pwned Passwords API."
+                        disabled={!canUpdateConfig || !isProPlanAndUp}
+                      />
                     </FormSectionContent>
                   </FormSection>
                 </>
@@ -358,22 +353,27 @@ const BasicAuthSettingsForm = observer(() => {
                   />
                   {values.SECURITY_CAPTCHA_ENABLED && (
                     <>
-                      <Radio.Group
-                        id="SECURITY_CAPTCHA_PROVIDER"
+                      <FormField
                         name="SECURITY_CAPTCHA_PROVIDER"
-                        label="Choose Captcha Provider"
-                      >
-                        <Radio
-                          label="hCaptcha"
-                          value="hcaptcha"
-                          checked={values.SECURITY_CAPTCHA_PROVIDER === 'hcaptcha'}
-                        />
-                        <Radio
-                          label="Turnstile by Cloudflare"
-                          value="turnstile"
-                          checked={values.SECURITY_CAPTCHA_PROVIDER === 'turnstile'}
-                        />
-                      </Radio.Group>
+                        properties={{
+                          type: 'select',
+                          title: 'Choose Captcha Provider',
+                          description: '',
+                          enum: [
+                            {
+                              label: 'hCaptcha',
+                              value: 'hcaptcha',
+                              icon: 'hcaptcha-icon.png',
+                            },
+                            {
+                              label: 'Turnstile by Cloudflare',
+                              value: 'turnstile',
+                              icon: 'cloudflare-icon.png',
+                            },
+                          ],
+                        }}
+                        formValues={values}
+                      />
                       <Input
                         id="SECURITY_CAPTCHA_SECRET"
                         type={hidden ? 'password' : 'text'}

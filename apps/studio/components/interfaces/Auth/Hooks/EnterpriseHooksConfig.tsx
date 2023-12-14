@@ -1,6 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { observer } from 'mobx-react-lite'
 import { useEffect } from 'react'
 import {
   AlertDescription_Shadcn_,
@@ -20,11 +19,11 @@ import {
   FormSectionContent,
   FormSectionLabel,
 } from 'components/ui/Forms'
+import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions, useSelectedOrganization, useStore, useFlag } from 'hooks'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
+import { useCheckPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
 
 import SchemaFunctionSelector from './SchemaFunctionSelector'
 
@@ -37,8 +36,8 @@ const schema = object({
 
 const FORM_ID = 'enterprise-hooks-config'
 
-const EnterpriseHooksConfig = observer(() => {
-  const { ui, meta } = useStore()
+const EnterpriseHooksConfig = () => {
+  const { ui } = useStore()
   const { ref: projectRef } = useParams()
   const {
     data: authConfig,
@@ -79,10 +78,6 @@ const EnterpriseHooksConfig = observer(() => {
         }
       : null),
   }
-
-  useEffect(() => {
-    if (ui.selectedProjectRef) meta.functions.load()
-  }, [ui.selectedProjectRef])
 
   const onSubmit = (values: any, { resetForm }: any) => {
     const payload = { ...values }
@@ -128,6 +123,7 @@ const EnterpriseHooksConfig = observer(() => {
         const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
         // Form is reset once remote data is loaded in store
+        // eslint-disable-next-line react-hooks/rules-of-hooks
         useEffect(() => {
           if (isSuccess) {
             resetForm({ values: INITIAL_VALUES, initialValues: INITIAL_VALUES })
@@ -253,6 +249,6 @@ const EnterpriseHooksConfig = observer(() => {
       }}
     </Form>
   )
-})
+}
 
 export default EnterpriseHooksConfig

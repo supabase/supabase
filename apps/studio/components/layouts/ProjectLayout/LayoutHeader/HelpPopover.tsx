@@ -94,7 +94,7 @@ const HelpPopover = ({ alt = false }: HelpPopoverProps) => {
             </Button>
           </div>
           <p className="text-sm text-foreground-lighter">
-            Expected response time is based on your billing plan. Pro and Pay as You Go plans are
+            Expected response time is based on your billing plan. Projects on paid plans are
             prioritized.
           </p>
           <div>
