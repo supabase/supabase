@@ -34,12 +34,6 @@ export async function constructHeaders(headersInit?: HeadersInit | undefined) {
 export const get: typeof _get = async (url, init) => {
   const headers = await constructHeaders(init?.headers)
 
-  // on self-hosted, we don't have a /platform prefix
-  if (LOCAL_SUPABASE && url.startsWith('/platform')) {
-    // @ts-ignore
-    url = url.replace('/platform', '')
-  }
-
   return await _get(url, {
     ...init,
     headers,
@@ -48,12 +42,6 @@ export const get: typeof _get = async (url, init) => {
 
 export const post: typeof _post = async (url, init) => {
   const headers = await constructHeaders(init?.headers)
-
-  // on self-hosted, we don't have a /platform prefix
-  if (LOCAL_SUPABASE && url.startsWith('/platform')) {
-    // @ts-ignore
-    url = url.replace('/platform', '')
-  }
 
   return await _post(url, {
     ...init,

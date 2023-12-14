@@ -21,9 +21,13 @@ import CopyToClipboard from 'react-copy-to-clipboard'
 import { proxy, useSnapshot } from 'valtio'
 import { LOCAL_STORAGE_KEYS, remove, retrieve, store } from '~/lib/storage'
 import Link from 'next/link'
-import { useIsLoggedIn } from 'common'
+import { useIsLoggedIn, useIsUserLoading } from 'common'
 
 const projectStore = proxy({
+  dataRequested: false,
+  setDataRequested: (newValue: boolean) => {
+    projectStore.dataRequested = newValue
+  },
   selectedId: null,
   setSelectedId: (id: string | null) => {
     projectStore.selectedId = id
@@ -41,6 +45,7 @@ const projectStore = proxy({
     // Also done centrally in lib/userAuth,
     // but no harm and an extra failsafe in doing it twice
     remove('local', LOCAL_STORAGE_KEYS.SAVED_ORG_PROJECT_BRANCH)
+    projectStore.setDataRequested(false)
   },
 })
 
@@ -158,28 +163,44 @@ async function listAllProjectKeys() {
 }
 
 function useListAllProjectKeys() {
-  const requestSent = useRef(false)
+  const isUserLoading = useIsUserLoading()
   const isLoggedIn = useIsLoggedIn()
-  const { setSelectedId, projectKeys, setProjectKeys, clear: clearData } = useSnapshot(projectStore)
-
+  const {
+    setSelectedId,
+    projectKeys,
+    setProjectKeys,
+    clear: clearData,
+    dataRequested,
+    setDataRequested,
+  } = useSnapshot(projectStore)
   const [isLoading, setIsLoading] = useState(true)
   const [isError, setIsError] = useState(false)
 
   useEffect(() => {
-    if (isLoggedIn && !requestSent.current) {
-      requestSent.current = true
+    if (isLoggedIn && !dataRequested) {
+      setDataRequested(true)
       listAllProjectKeys()
         .then((keys) => {
           setProjectKeys(keys)
         })
         .catch(() => setIsError(true))
         .finally(() => setIsLoading(false))
-    } else {
-      requestSent.current = false
-      setIsLoading(false)
+    } else if (!isLoggedIn) {
       clearData()
     }
-  }, [isLoggedIn, setSelectedId, setProjectKeys, clearData])
+
+    if (!isLoggedIn && !isUserLoading) {
+      setIsLoading(false)
+    }
+  }, [
+    isLoggedIn,
+    setSelectedId,
+    setProjectKeys,
+    clearData,
+    isUserLoading,
+    dataRequested,
+    setDataRequested,
+  ])
 
   return { projectKeys, isLoading, isError }
 }
