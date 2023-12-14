@@ -50,7 +50,6 @@ export interface IMetaStore {
   columns: IPostgresMetaInterface<PostgresColumn>
   views: IViewStore
 
-  roles: IRolesStore
   policies: IPostgresMetaInterface<any>
 
   projectRef?: string
@@ -126,7 +125,6 @@ export default class MetaStore implements IMetaStore {
   columns: PostgresMetaInterface<PostgresColumn>
   views: ViewStore
 
-  roles: RolesStore
   policies: PostgresMetaInterface<any>
 
   projectRef?: string
@@ -158,7 +156,6 @@ export default class MetaStore implements IMetaStore {
     )
     this.views = new ViewStore(this.rootStore, `${this.baseUrl}/views`, this.headers)
 
-    this.roles = new RolesStore(this.rootStore, `${this.baseUrl}/roles`, this.headers)
     this.policies = new PostgresMetaInterface(
       this.rootStore,
       `${this.baseUrl}/policies`,
@@ -858,9 +855,6 @@ export default class MetaStore implements IMetaStore {
 
     this.views.setUrl(`${this.baseUrl}/views`)
     this.views.setHeaders(this.headers)
-
-    this.roles.setUrl(`${this.baseUrl}/roles`)
-    this.roles.setHeaders(this.headers)
 
     this.policies.setUrl(`${this.baseUrl}/policies`)
     this.policies.setHeaders(this.headers)
