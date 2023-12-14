@@ -2,8 +2,6 @@
 // https://deno.land/manual/getting_started/setup_your_environment
 // This enables autocomplete, go to definition, etc.
 import 'https://deno.land/x/xhr@0.3.0/mod.ts'
-import { serve } from 'https://deno.land/std@0.195.0/http/server.ts'
-
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import Api2Pdf from 'https://esm.sh/api2pdf@2'
 
@@ -35,7 +33,7 @@ class ApplicationError extends Error {
 
 class UserError extends ApplicationError {}
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   try {
     if (req.method === 'OPTIONS') {
       return new Response('ok', { headers: corsHeaders })
