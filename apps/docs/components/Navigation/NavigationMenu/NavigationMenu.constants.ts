@@ -946,10 +946,6 @@ export const functions: NavMenuConstant = {
           name: 'Slack Bot responding to mentions',
           url: '/guides/functions/examples/slack-bot-mention',
         },
-        {
-          name: 'Convert PDF to HTML',
-          url: '/guides/functions/examples/pdf-upload-extract',
-        },
       ],
     },
     {
