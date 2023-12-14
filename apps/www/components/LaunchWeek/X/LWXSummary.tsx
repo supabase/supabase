@@ -1,9 +1,7 @@
 import Image from 'next/image'
 import React from 'react'
 import { buildDays, mainDays } from './Releases/data'
-import { WeekDayProps } from '../types'
 import Link from 'next/link'
-import { IconArrowRight } from 'ui'
 
 const LWXSummary = () => {
   return (
@@ -76,6 +74,14 @@ const LWXSummary = () => {
                 className="relative flex items-center justify-between group w-full py-1 hover:text-foreground"
               >
                 Supabase Launch Week X Hackathon
+              </Link>
+            </ol>
+            <ol className="">
+              <Link
+                href="/blog/community-meetups-lwx"
+                className="relative flex items-center justify-between group w-full py-1 hover:text-foreground"
+              >
+                Launch Week X Community Meetups
               </Link>
             </ol>
           </ul>
