@@ -2,7 +2,7 @@ import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 
 import { delete_ } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { ResponseError } from 'types'
 
 export type UserDeleteMFAFactorsVariables = {
@@ -11,7 +11,11 @@ export type UserDeleteMFAFactorsVariables = {
 }
 
 export async function deleteMFAFactors({ projectRef, userId }: UserDeleteMFAFactorsVariables) {
-  const response = await delete_(`${API_URL}/auth/${projectRef}/users/${userId}/factors`)
+  const response = IS_PLATFORM
+    ? await delete_(`${API_URL}/auth/${projectRef}/users/${userId}/factors`)
+    : await delete_(`${API_URL}/auth/${projectRef}/users`, {
+        id: userId,
+      })
   if (response.error) throw response.error
   return response
 }
