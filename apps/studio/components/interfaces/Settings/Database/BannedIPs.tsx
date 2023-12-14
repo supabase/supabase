@@ -12,6 +12,7 @@ import {
   IconExternalLink,
   IconGlobe,
   Modal,
+  Badge,
 } from 'ui'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 
@@ -95,11 +96,7 @@ const BannedIPs = () => {
               <div className="flex items-center space-x-5">
                 <IconGlobe size={16} className="text-foreground-lighter" />
                 <p className="text-sm font-mono">{ip}</p>
-                {ip === userIPAddress && (
-                  <span className="text-sm font-bold text-dark-500 bg-gray-300 [[data-theme*=dark]_&]:bg-zinc-900 px-2 py-1 rounded-full">
-                    Your IP
-                  </span>
-                )}
+                {ip === userIPAddress && <Badge color="scale">Your IP address</Badge>}
               </div>
               <div>
                 <Button type="default" onClick={() => openConfirmationModal(ip)}>
