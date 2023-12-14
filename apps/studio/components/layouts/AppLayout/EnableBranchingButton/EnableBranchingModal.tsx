@@ -229,6 +229,23 @@ const EnableBranchingModal = () => {
                   <div className="flex flex-row gap-4">
                     <div>
                       <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-300 flex items-center justify-center">
+                        <IconDollarSign className="text-amber-900" size={20} strokeWidth={2} />
+                      </figure>
+                    </div>
+                    <div className="flex flex-col gap-y-1">
+                      <p className="text-sm text-foreground">
+                        Preview branches are billed per hour
+                      </p>
+                      <p className="text-sm text-foreground-light">
+                        Launching a new preview branch incurs additional compute costs, starting at
+                        $0.01344 per hour (~$10/month). This cost will continue for as long as the
+                        branch has not been removed.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex flex-row gap-4 mt-2">
+                    <div>
+                      <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-300 flex items-center justify-center">
                         <IconFileText className="text-amber-900" size={20} strokeWidth={2} />
                       </figure>
                     </div>
@@ -241,23 +258,6 @@ const EnableBranchingModal = () => {
                         <code className="text-xs">./supabase</code> directory in your GitHub repo.
                         Migration files will run on both Preview Branches and Production when
                         pushing to and merging git branches.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex flex-row gap-4 mt-2">
-                    <div>
-                      <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-300 flex items-center justify-center">
-                        <IconDollarSign className="text-amber-900" size={20} strokeWidth={2} />
-                      </figure>
-                    </div>
-                    <div className="flex flex-col gap-y-1">
-                      <p className="text-sm text-foreground">
-                        Preview branches are billed per hour
-                      </p>
-                      <p className="text-sm text-foreground-light">
-                        Launching a new preview branch incurs additional compute costs, starting at
-                        $0.01344 per hour (~$10/month). This cost will continue for as long as the
-                        branch has not been removed.
                       </p>
                     </div>
                   </div>
