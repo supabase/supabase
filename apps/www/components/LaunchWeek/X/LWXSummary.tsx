@@ -7,7 +7,10 @@ const LWXSummary = () => {
   return (
     <div className="w-full border bg-alternative-200 flex flex-col rounded-lg text-foreground-lighter mt-12">
       <div className="w-full p-4 flex justify-between items-center">
-        <div className="flex items-center gap-1.5 leading-none uppercase text-xs">
+        <Link
+          href="/launch-week"
+          className="flex items-center gap-1.5 leading-none uppercase text-xs"
+        >
           <span className="text-foreground tracking-[1px]">Launch Week</span>{' '}
           <Image
             src="/images/launchweek/lwx/logos/lwx_logo.svg"
@@ -17,7 +20,7 @@ const LWXSummary = () => {
             className="w-3 h-3"
           />
           {/* <span className="font-mono uppercase tracking-wide">Main Stage</span> */}
-        </div>
+        </Link>
         <div className="font-mono uppercase tracking-wide text-xs">11-15 Dec</div>
       </div>
       <div className="pb-4 border-t p-4">
