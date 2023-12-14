@@ -26,7 +26,7 @@ class CreateFunctionFormState {
   // @ts-ignore
   args: { value: { name: string; type: string; error?: string }[] }
   // @ts-ignore
-  behaviour: { value: string; error?: string }
+  behavior: { value: string; error?: string }
   // @ts-ignore
   configParams: {
     value: { name: string; value: string; error?: { name?: string; value?: string } }[]
@@ -57,7 +57,7 @@ class CreateFunctionFormState {
       definition: this.definition.value,
       return_type: this.returnType.value,
       language: this.language.value,
-      behaviour: this.behaviour.value,
+      behavior: this.behavior.value,
       security_definer: this.securityDefiner.value,
       args: this.args.value.map((x: any) => `${x.name} ${x.type}`),
       config_params: mapValues(keyBy(this.configParams.value, 'name'), 'value'),
@@ -68,7 +68,7 @@ class CreateFunctionFormState {
     this.id = func?.id
     this.originalName = func?.name
     this.args = convertArgumentTypes(func?.argument_types)
-    this.behaviour = { value: func?.behaviour ?? 'VOLATILE' }
+    this.behavior = { value: func?.behavior ?? 'VOLATILE' }
     this.configParams = convertConfigParams(func?.config_params)
     this.definition = { value: func?.definition ?? '' }
     this.language = { value: func?.language ?? 'plpgsql' }
@@ -80,7 +80,7 @@ class CreateFunctionFormState {
 
   update(state: Dictionary<any>) {
     this.args = state.args
-    this.behaviour = state.behaviour
+    this.behavior = state.behavior
     this.configParams = state.configParams
     this.definition = state.definition
     this.language = state.language
@@ -829,12 +829,12 @@ const SelectBehavior = observer(({}) => {
 
   return (
     <Listbox
-      id="behaviour"
+      id="behavior"
       size="small"
       label="Behavior"
       layout="horizontal"
-      value={_localState!.formState.behaviour.value}
-      onChange={(value) => _localState!.onFormChange({ key: 'behaviour', value })}
+      value={_localState!.formState.behavior.value}
+      onChange={(value) => _localState!.onFormChange({ key: 'behavior', value })}
     >
       <Listbox.Option value="IMMUTABLE" label="immutable">
         immutable
