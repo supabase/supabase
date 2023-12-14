@@ -202,6 +202,8 @@ Currently, you can register an Auth Hook for the following points in the flow:
 - **MFA verification attempt**: called each time an MFA factor is verified, allowing finer control over detecting and blocking attempts.
 - **Password verification attempt**: called each time a password is used to sign-in a user, allowing finer control over the security of the user’s accounts.
 
+And if writing PL/pgSQL functions is not your forte, you can always use [pg_net](https://supabase.com/docs/guides/database/extensions/pg_net) to send out requests to your backend APIs instead, or use [plv8](https://supabase.com/docs/guides/database/extensions/plv8) to manipulate JSON more easily by writing your function in JavaScript.
+
 Auth Hooks is available today for self-hosting and will be rolled out to the platform next month. Reach out to us via [support](https://supabase.help) if you need access sooner!
 
 That’s not all! Postgres functions aren’t the only way to write hooks.
