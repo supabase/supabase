@@ -247,7 +247,7 @@ Supabase - это [размещенная платформа](https://supabase.c
 - [упрощенный китайский / 简体中文](/i18n/README.zh-cn.md)
 - [шведский / Svenska](/i18n/README.sv.md)
 - [тайский / ไทย](/i18n/README.th.md)
-- [традиционный китайский / 繁体中文](/i18n/README.zh-tw.md)
+- [традиционный китайский / 繁體中文](/i18n/README.zh-tw.md)
 - [турецкий / Türkçe](/i18n/README.tr.md)
 - [Украинский / Українська](/i18n/README.uk.md)
 - [Вьетнамский / Tiếng Việt](/i18n/README.vi-vn.md)

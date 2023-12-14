@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import OpenAI from 'openai'
+import { revalidatePath } from 'next/cache'
 
 const openai = new OpenAI()
 
@@ -29,7 +30,6 @@ export async function POST(req: Request) {
     openai.beta.threads.runs.retrieve(thread.id, createRun.id),
     openai.beta.threads.messages.list(thread.id),
   ])
-
   const threadTitle = messages
     .filter((m) => m.role === 'user' && m.content[0]?.type === 'text')
     .map((m) => {
@@ -51,6 +51,8 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error(error)
   }
+
+  revalidatePath('/profile')
 
   return Response.json({ threadId: thread.id, runId: run.id })
 }

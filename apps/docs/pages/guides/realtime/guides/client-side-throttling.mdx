@@ -13,6 +13,15 @@ The Supabase clients include functionality for throttling messages.
 
 You can customize the client-side throttling when creating the client:
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
 ```js
 import { createClient } from '@supabase/supabase-js'
 
@@ -27,6 +36,29 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   },
 })
 ```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+void main() async {
+  Supabase.initialize(
+    url: 'https://<project>.supabase.co',
+    anonKey: '<your-anon-key>',
+    realtimeClientOptions: const RealtimeClientOptions(
+      eventsPerSecond: 2,
+    ),
+  );
+  runApp(const MyApp());
+}
+
+final supabase = Supabase.instance.client;
+```
+
+</TabPanel>
+</Tabs>
 
 ## Default client throttling
 

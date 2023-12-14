@@ -1,5 +1,5 @@
 {
-  "name": "database-new",
+  "name": "database-design",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -17,16 +17,18 @@
     "common": "*",
     "config": "*",
     "dayjs": "^1.11.10",
+    "eslint-config-next": "^14.0.3",
     "lodash": "^4.17.21",
     "lucide-react": "^0.292.0",
-    "next": "^13.5.3",
+    "next": "^14.0.3",
     "openai": "^4.17.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-flow": "^1.0.3",
     "sql-formatter": "^13.1.0",
     "ui": "*",
-    "valtio": "^1.12.0"
+    "valtio": "^1.12.0",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/node": "^18.11.9",
@@ -34,7 +36,7 @@
     "@types/react-dom": "^18.2.8",
     "autoprefixer": "10.4.14",
     "nextjs-node-loader": "^1.1.5-alpha.0",
-    "postcss": "8.4.29",
+    "postcss": "8.4.31",
     "typescript": "^5.2.2"
   }
 }

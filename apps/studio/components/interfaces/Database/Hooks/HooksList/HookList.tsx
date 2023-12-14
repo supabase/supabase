@@ -6,7 +6,7 @@ import Image from 'next/legacy/image'
 import { useParams } from 'common/hooks'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
-import { useDatabaseHooks } from 'data/database-triggers/database-triggers-query'
+import { useDatabaseHooksQuery } from 'data/database-triggers/database-triggers-query'
 import { useCheckPermissions } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import {
@@ -32,7 +32,7 @@ export interface HookListProps {
 const HookList = ({ schema, filterString, editHook = noop, deleteHook = noop }: HookListProps) => {
   const { ref } = useParams()
   const { project } = useProjectContext()
-  const { data: hooks } = useDatabaseHooks({
+  const { data: hooks } = useDatabaseHooksQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -91,9 +91,9 @@ const HookList = ({ schema, filterString, editHook = noop, deleteHook = noop }: 
               <div className="flex justify-end gap-4">
                 {canUpdateWebhook ? (
                   <DropdownMenu>
-                    <DropdownMenuTrigger>
-                      <Button asChild type="default" icon={<IconMoreVertical />} className="px-1">
-                        <span></span>
+                    <DropdownMenuTrigger asChild>
+                      <Button type="default" className="px-1">
+                        <IconMoreVertical />
                       </Button>
                     </DropdownMenuTrigger>
 

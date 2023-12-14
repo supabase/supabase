@@ -5,6 +5,21 @@ export const appState = proxy({
   setHideCode: (value: boolean) => {
     appState.hideCode = value
   },
+
+  selectedCode: '',
+  setSelectedCode: (value: string) => {
+    appState.selectedCode = value
+  },
+
+  loginDialogOpen: false,
+  setLoginDialogOpen: (value: boolean) => {
+    appState.loginDialogOpen = value
+  },
+
+  runsLoading: [] as string[],
+  setRunsLoading: (value: string[]) => {
+    appState.runsLoading = value
+  },
 })
 
 export const getAppStateSnapshot = () => snapshot(appState)

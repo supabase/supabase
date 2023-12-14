@@ -58,7 +58,7 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
   ],
   [
     {
-      label: 'API',
+      label: 'Data API',
     },
     {
       label: 'REST',
@@ -190,7 +190,7 @@ export const REFERENCES: References = {
   dart: {
     name: 'Flutter',
     library: 'supabase-dart',
-    versions: ['v1', 'v0'],
+    versions: ['v2', 'v1'],
     icon: '/docs/img/libraries/flutter-icon.svg',
   },
   csharp: {
@@ -208,7 +208,7 @@ export const REFERENCES: References = {
   kotlin: {
     name: 'Kotlin',
     library: 'supabase-kt',
-    versions: ['v1'],
+    versions: ['v2', 'v1'],
     icon: '/docs/img/libraries/kotlin-icon.svg',
   },
   cli: {
@@ -542,6 +542,17 @@ export const auth = {
           name: 'User Sessions',
           url: '/guides/auth/sessions',
         },
+        { name: 'Passwords', url: '/guides/auth/passwords' },
+        {
+          name: 'User Management',
+          url: '/guides/auth/auth-user-management',
+          items: [
+            {
+              name: 'Identity Linking',
+              url: '/guides/auth/auth-identity-linking',
+            },
+          ],
+        },
         {
           name: 'Enterprise SSO',
           url: '/guides/auth/enterprise-sso',
@@ -552,7 +563,6 @@ export const auth = {
             },
           ],
         },
-        { name: 'Password Reset', url: '/guides/auth/auth-password-reset' },
         { name: 'Email Templates', url: '/guides/auth/auth-email-templates' },
       ],
     },
@@ -844,6 +854,17 @@ export const graphql: NavMenuConstant = {
   items: [
     { name: 'Overview', url: '/guides/graphql', items: [] },
     { name: 'API', url: '/guides/graphql/api', items: [] },
+    { name: 'Views', url: '/guides/graphql/views', items: [] },
+    { name: 'Functions', url: '/guides/graphql/functions', items: [] },
+    { name: 'Configuration & Customization', url: '/guides/graphql/configuration', items: [] },
+    { name: 'Security', url: '/guides/graphql/security', items: [] },
+    {
+      name: 'Integrations',
+      items: [
+        { name: 'With Apollo', url: '/guides/graphql/with-apollo' },
+        { name: 'With Relay', url: '/guides/graphql/with-relay' },
+      ],
+    },
   ],
 }
 
@@ -1184,6 +1205,10 @@ export const ai = {
         {
           name: 'LlamaIndex',
           url: '/guides/ai/integrations/llamaindex',
+        },
+        {
+          name: 'Roboflow',
+          url: '/guides/ai/integrations/roboflow',
         },
       ],
     },
@@ -1574,14 +1599,14 @@ export const reference_javascript_v2 = {
   parent: '/reference',
 }
 
-export const reference_dart_v0 = {
+export const reference_dart_v1 = {
   icon: 'reference-dart',
   title: 'Flutter',
   url: '/guides/reference/dart',
   parent: '/reference',
 }
 
-export const reference_dart_v1 = {
+export const reference_dart_v2 = {
   icon: 'reference-dart',
   title: 'Flutter',
   url: '/guides/reference/dart',
@@ -1609,7 +1634,14 @@ export const reference_swift_v1 = {
   parent: '/reference',
 }
 
-export const reference_kotlin_v0 = {
+export const reference_kotlin_v1 = {
+  icon: 'reference-kotlin',
+  title: 'kotlin',
+  url: 'guides/reference/kotlin',
+  parent: '/reference',
+}
+
+export const reference_kotlin_v2 = {
   icon: 'reference-kotlin',
   title: 'kotlin',
   url: 'guides/reference/kotlin',
@@ -1739,7 +1771,7 @@ export const references = [
       },
       {
         label: 'supabase-kt',
-        versions: ['v0'],
+        versions: ['v2', 'v1'],
         description: 'something about the reference',
         icon: '/docs/img/icons/kotlin-icon.svg',
         url: '/reference/kotlin/start',

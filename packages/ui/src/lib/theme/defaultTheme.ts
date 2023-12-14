@@ -879,6 +879,8 @@ export default {
       large: `w-screen max-w-2xl h-full`,
       xlarge: `w-screen max-w-3xl h-full`,
       xxlarge: `w-screen max-w-4xl h-full`,
+      xxxlarge: `w-screen max-w-5xl h-full`,
+      xxxxlarge: `w-screen max-w-6xl h-full`,
     },
     align: {
       left: `
@@ -1334,7 +1336,7 @@ export default {
       data-open:animate-dropdown-content-show
       data-closed:animate-dropdown-content-hide
     `,
-    with_icon: 'pl-10',
+    with_icon: 'pl-2',
     addOnBefore: `
       w-full flex flex-row items-center space-x-3
     `,

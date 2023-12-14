@@ -18,6 +18,8 @@ import { Alert, Button, IconExternalLink, IconInfo, Listbox } from 'ui'
 import Activity from './Activity'
 import Bandwidth from './Bandwidth'
 import SizeAndCounts from './SizeAndCounts'
+import Compute from './Compute'
+import TotalUsage from './TotalUsage'
 
 const Usage = () => {
   const { slug, projectRef } = useParams()
@@ -186,7 +188,7 @@ const Usage = () => {
               </Button>,
             ]}
           >
-            Your projects can become unresponsive or enter read only mode.{' '}
+            Your projects can become unresponsive or enter read-only mode.{' '}
             {subscription.plan.id === 'free'
               ? 'Please upgrade to the Pro plan to ensure that your projects remain available.'
               : 'Please disable spend cap to ensure that your projects remain available.'}
@@ -227,6 +229,23 @@ const Usage = () => {
           />
         </ScaffoldContainer>
       )}
+
+      <TotalUsage
+        orgSlug={slug as string}
+        projectRef={selectedProjectRef}
+        subscription={subscription}
+        startDate={startDate}
+        endDate={endDate}
+        currentBillingCycleSelected={currentBillingCycleSelected}
+      />
+
+      <Compute
+        orgSlug={slug as string}
+        projectRef={selectedProjectRef}
+        subscription={subscription}
+        startDate={startDate}
+        endDate={endDate}
+      />
 
       <Bandwidth
         orgSlug={slug as string}

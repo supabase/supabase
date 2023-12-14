@@ -1,18 +1,21 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { Query, SupaRow, SupaTable } from 'components/grid'
+import { Query, SupaRow } from 'components/grid'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
+import { Table } from 'data/tables/table-query'
+import { ImpersonationRole, wrapWithRoleImpersonation } from 'lib/role-impersonation'
+import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import { ResponseError } from 'types'
 import { getPrimaryKeys } from './utils'
-import { Table } from 'data/tables/table-query'
 
 export type TableRowDeleteVariables = {
   projectRef: string
   connectionString?: string
   table: Table
   rows: SupaRow[]
+  impersonatedRole?: ImpersonationRole
 }
 
 export function getTableRowDeleteSql({
@@ -36,10 +39,19 @@ export async function deleteTableRow({
   connectionString,
   table,
   rows,
+  impersonatedRole,
 }: TableRowDeleteVariables) {
-  const sql = getTableRowDeleteSql({ table, rows })
+  const sql = wrapWithRoleImpersonation(getTableRowDeleteSql({ table, rows }), {
+    projectRef,
+    role: impersonatedRole,
+  })
 
-  const { result } = await executeSql({ projectRef, connectionString, sql })
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
+  })
 
   return result
 }

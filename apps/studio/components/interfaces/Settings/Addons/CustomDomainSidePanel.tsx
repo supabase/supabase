@@ -38,7 +38,13 @@ const CustomDomainSidePanel = () => {
 
   const snap = useSubscriptionPageStateSnapshot()
   const visible = snap.panelKey === 'customDomain'
-  const onClose = () => snap.setPanelKey(undefined)
+  const onClose = () => {
+    const { panel, ...queryWithoutPanel } = router.query
+    router.push({ pathname: router.pathname, query: queryWithoutPanel }, undefined, {
+      shallow: true,
+    })
+    snap.setPanelKey(undefined)
+  }
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })

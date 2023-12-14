@@ -3,22 +3,25 @@ import { PostgresRole } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Badge, Button, IconPlus, IconSearch, IconX, Input } from 'ui'
 
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormHeader } from 'components/ui/Forms'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import SparkBar from 'components/ui/SparkBar'
+import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { useCheckPermissions, useStore } from 'hooks'
 import CreateRolePanel from './CreateRolePanel'
 import DeleteRoleModal from './DeleteRoleModal'
 import RoleRow from './RoleRow'
+import RoleRowSkeleton from './RoleRowSkeleton'
 import { SUPABASE_ROLES } from './Roles.constants'
 
 const RolesList = ({}) => {
   const { meta } = useStore()
+  const { project } = useProjectContext()
 
-  const [maxConnectionLimit, setMaxConnectionLimit] = useState(0)
   const [filterString, setFilterString] = useState('')
   const [filterType, setFilterType] = useState<'all' | 'active'>('all')
   const [isCreatingRole, setIsCreatingRole] = useState(false)
@@ -26,15 +29,11 @@ const RolesList = ({}) => {
 
   const canUpdateRoles = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'roles')
 
-  useEffect(() => {
-    const getMaxConnectionLimit = async () => {
-      const res = await meta.query('show max_connections')
-      if (!res.error) {
-        setMaxConnectionLimit(Number(res[0]?.max_connections ?? 0))
-      }
-    }
-    getMaxConnectionLimit()
-  }, [])
+  const { data } = useMaxConnectionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const maxConnectionLimit = data?.maxConnections
 
   const roles = meta.roles.list()
   const filteredRoles = (
@@ -45,6 +44,8 @@ const RolesList = ({}) => {
   const [supabaseRoles, otherRoles] = partition(filteredRoles, (role: PostgresRole) =>
     SUPABASE_ROLES.includes(role.name)
   )
+
+  const isLoading = meta.roles.isLoading
 
   const totalActiveConnections = roles
     .map((role: PostgresRole) => role.active_connections)
@@ -116,10 +117,12 @@ const RolesList = ({}) => {
                 <div className="w-42">
                   <SparkBar
                     type="horizontal"
-                    max={maxConnectionLimit}
+                    // if the maxConnectionLimit is undefined, set totalActiveConnections so that
+                    // the width of the bar is set to 100%
+                    max={maxConnectionLimit || totalActiveConnections}
                     value={totalActiveConnections}
                     barClass={
-                      maxConnectionLimit === 0
+                      maxConnectionLimit === 0 || maxConnectionLimit === undefined
                         ? 'bg-control'
                         : totalActiveConnections > 0.9 * maxConnectionLimit
                         ? 'bg-red-800'
@@ -127,7 +130,11 @@ const RolesList = ({}) => {
                         ? 'bg-amber-900'
                         : 'bg-green-800'
                     }
-                    labelTop={`${totalActiveConnections}/${maxConnectionLimit}`}
+                    labelTop={
+                      Number.isInteger(maxConnectionLimit)
+                        ? `${totalActiveConnections}/${maxConnectionLimit}`
+                        : `${totalActiveConnections}`
+                    }
                     labelBottom="Active connections"
                   />
                 </div>
@@ -150,7 +157,7 @@ const RolesList = ({}) => {
               </Tooltip.Content>
             </Tooltip.Root>
             <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
+              <Tooltip.Trigger asChild>
                 <Button
                   type="primary"
                   disabled={!canUpdateRoles}
@@ -179,36 +186,38 @@ const RolesList = ({}) => {
 
         <div className="space-y-4">
           <div>
-            {supabaseRoles.length > 0 && (
-              <div className="bg-surface-100 border border-default px-6 py-3 rounded-t flex items-center space-x-4">
-                <p className="text-sm text-foreground-light">Roles managed by Supabase</p>
-                <Badge color="green">Protected</Badge>
-              </div>
-            )}
-            {supabaseRoles.map((role: PostgresRole, i: number) => (
-              <RoleRow
-                disabled
-                key={role.id}
-                role={role}
-                onSelectDelete={setSelectedRoleToDelete}
-              />
-            ))}
+            <div className="bg-surface-100 border border-default px-6 py-3 rounded-t flex items-center space-x-4">
+              <p className="text-sm text-foreground-light">Roles managed by Supabase</p>
+              <Badge color="green">Protected</Badge>
+            </div>
+
+            {isLoading
+              ? Array.from({ length: 5 }).map((_, i) => <RoleRowSkeleton key={i} index={i} />)
+              : supabaseRoles.map((role: PostgresRole, i: number) => (
+                  <RoleRow
+                    disabled
+                    key={role.id}
+                    role={role}
+                    onSelectDelete={setSelectedRoleToDelete}
+                  />
+                ))}
           </div>
 
           <div>
-            {otherRoles.length > 0 && (
-              <div className="bg-surface-100 border border-default px-6 py-3 rounded-t">
-                <p className="text-sm text-foreground-light">Other database roles</p>
-              </div>
-            )}
-            {otherRoles.map((role: PostgresRole, i: number) => (
-              <RoleRow
-                key={role.id}
-                disabled={!canUpdateRoles}
-                role={role}
-                onSelectDelete={setSelectedRoleToDelete}
-              />
-            ))}
+            <div className="bg-surface-100 border border-default px-6 py-3 rounded-t">
+              <p className="text-sm text-foreground-light">Other database roles</p>
+            </div>
+
+            {isLoading
+              ? Array.from({ length: 3 }).map((_, i) => <RoleRowSkeleton key={i} index={i} />)
+              : otherRoles.map((role: PostgresRole, i: number) => (
+                  <RoleRow
+                    key={role.id}
+                    disabled={!canUpdateRoles}
+                    role={role}
+                    onSelectDelete={setSelectedRoleToDelete}
+                  />
+                ))}
           </div>
         </div>
 

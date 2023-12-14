@@ -221,7 +221,7 @@ const InputField = ({
         label={field.name}
         labelOptional={field.format}
         descriptionText={field.comment}
-        defaultValue={defaultValue === null ? 'null' : defaultValue}
+        value={defaultValue === null ? 'null' : defaultValue}
         onChange={(value: string) => {
           if (value === 'null') onUpdateField({ [field.name]: null })
           else onUpdateField({ [field.name]: value })

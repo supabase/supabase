@@ -1,15 +1,16 @@
-import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { NextPageWithLayout } from 'types'
-import { useCheckPermissions } from 'hooks'
+import { CreateWrapper } from 'components/interfaces/Database'
 import { DatabaseLayout } from 'components/layouts'
 import NoPermission from 'components/ui/NoPermission'
-import { CreateWrapper } from 'components/interfaces/Database'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
+import { NextPageWithLayout } from 'types'
 
 const DatabaseWrappersNew: NextPageWithLayout = () => {
   const canCreateWrappers = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
-  if (!canCreateWrappers) {
+  const isPermissionsLoaded = usePermissionsLoaded()
+
+  if (isPermissionsLoaded && !canCreateWrappers) {
     return <NoPermission isFullPage resourceText="create foreign data wrappers" />
   }
 
@@ -18,4 +19,4 @@ const DatabaseWrappersNew: NextPageWithLayout = () => {
 
 DatabaseWrappersNew.getLayout = (page) => <DatabaseLayout title="Wrappers">{page}</DatabaseLayout>
 
-export default observer(DatabaseWrappersNew)
+export default DatabaseWrappersNew

@@ -10,7 +10,7 @@ services:
 
   studio:
     container_name: supabase-studio
-    image: supabase/studio:20231023-7e2cd92
+    image: supabase/studio:20231123-64a766a
     restart: unless-stopped
     healthcheck:
       test:
@@ -76,7 +76,7 @@ services:
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.99.0
+    image: supabase/gotrue:v2.125.1
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -135,7 +135,7 @@ services:
 
   rest:
     container_name: supabase-rest
-    image: postgrest/postgrest:v11.2.0
+    image: postgrest/postgrest:v11.2.2
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -196,7 +196,7 @@ services:
 
   storage:
     container_name: supabase-storage
-    image: supabase/storage-api:v0.40.4
+    image: supabase/storage-api:v0.43.11
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -255,7 +255,7 @@ services:
 
   meta:
     container_name: supabase-meta
-    image: supabase/postgres-meta:v0.68.0
+    image: supabase/postgres-meta:v0.75.0
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -273,7 +273,7 @@ services:
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.22.4
+    image: supabase/edge-runtime:v1.29.1
     restart: unless-stopped
     depends_on:
       analytics:
@@ -323,8 +323,6 @@ services:
       LOGFLARE_API_KEY: ${LOGFLARE_API_KEY}
       LOGFLARE_SINGLE_TENANT: true
       LOGFLARE_SUPABASE_MODE: true
-      LOGFLARE_MIN_CLUSTER_SIZE: 1
-      RELEASE_COOKIE: cookie
 
       # Comment variables to use Big Query backend for analytics
       POSTGRES_BACKEND_URL: postgresql://supabase_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
@@ -336,12 +334,6 @@ services:
       # GOOGLE_PROJECT_NUMBER: ${GOOGLE_PROJECT_NUMBER}
     ports:
       - 4000:4000
-    entrypoint: |
-                  sh -c `cat <<'EOF' > run.sh && sh run.sh
-                  ./logflare eval Logflare.Release.migrate
-                  ./logflare start --sname logflare
-                  EOF
-                  `
 
   # Comment out everything below this point if you are using an external Postgres database
   db:

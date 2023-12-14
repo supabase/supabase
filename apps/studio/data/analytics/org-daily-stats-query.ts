@@ -16,9 +16,7 @@ export enum EgressType {
 // [Joshen] Get this from common package instead of API and dashboard having one copy each
 export enum PricingMetric {
   EGRESS = 'EGRESS',
-  DATABASE_EGRESS = 'DATABASE_EGRESS',
   DATABASE_SIZE = 'DATABASE_SIZE',
-  STORAGE_EGRESS = 'STORAGE_EGRESS',
   STORAGE_SIZE = 'STORAGE_SIZE',
   MONTHLY_ACTIVE_USERS = 'MONTHLY_ACTIVE_USERS',
   MONTHLY_ACTIVE_SSO_USERS = 'MONTHLY_ACTIVE_SSO_USERS',
@@ -30,6 +28,7 @@ export enum PricingMetric {
 }
 
 export enum ComputeUsageMetric {
+  COMPUTE_HOURS_BRANCH = 'COMPUTE_HOURS_BRANCH',
   COMPUTE_HOURS_XS = 'COMPUTE_HOURS_XS',
   COMPUTE_HOURS_SM = 'COMPUTE_HOURS_SM',
   COMPUTE_HOURS_MD = 'COMPUTE_HOURS_MD',
@@ -40,6 +39,33 @@ export enum ComputeUsageMetric {
   COMPUTE_HOURS_8XL = 'COMPUTE_HOURS_8XL',
   COMPUTE_HOURS_12XL = 'COMPUTE_HOURS_12XL',
   COMPUTE_HOURS_16XL = 'COMPUTE_HOURS_16XL',
+}
+
+export const computeUsageMetricLabel = (computeUsageMetric: ComputeUsageMetric) => {
+  switch (computeUsageMetric) {
+    case 'COMPUTE_HOURS_BRANCH':
+      return 'Branches'
+    case 'COMPUTE_HOURS_XS':
+      return 'Starter'
+    case 'COMPUTE_HOURS_SM':
+      return 'Small'
+    case 'COMPUTE_HOURS_MD':
+      return 'Medium'
+    case 'COMPUTE_HOURS_L':
+      return 'Large'
+    case 'COMPUTE_HOURS_XL':
+      return 'XL'
+    case 'COMPUTE_HOURS_2XL':
+      return '2XL'
+    case 'COMPUTE_HOURS_4XL':
+      return '4XL'
+    case 'COMPUTE_HOURS_8XL':
+      return '8XL'
+    case 'COMPUTE_HOURS_12XL':
+      return '12XL'
+    case 'COMPUTE_HOURS_16XL':
+      return '16XL'
+  }
 }
 
 export type OrgDailyStatsVariables = {
