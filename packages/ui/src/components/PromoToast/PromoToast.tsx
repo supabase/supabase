@@ -44,7 +44,7 @@ const PromoToast = () => {
           <p>Launch Week</p>
           <Image src={LWXLogo} alt="Supabase Launch Week X Logo" width={14} height={14} />
         </div>
-        <span className="text-sm leading-4 mt-2">Day 4: Password Strength and Leak Protection</span>
+        <span className="text-sm leading-4 mt-2">Day 4: Supabase Auth Day</span>
       </div>
 
       <div className="relative z-10 flex items-center space-x-2">
