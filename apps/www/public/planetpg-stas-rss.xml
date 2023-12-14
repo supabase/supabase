@@ -1,0 +1,19 @@
+
+  <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <title>'Postgres | Supabase Blog</title>
+      <link>https://supabase.com/blog</link>
+      <description>Latest Postgres news from Stanislav Muzhyk at Supabase</description>
+      <language>en</language>
+      <lastBuildDate>Tue, 12 Dec 2023 23:00:00 GMT</lastBuildDate>
+      <atom:link href="https://supabase.com/planetpg-stas-rss.xml" rel="self" type="application/rss+xml"/>
+      <item>
+  <guid>https://supabase.com/blog/supavisor-postgres-connection-pooler</guid>
+  <title>Supavisor 1.0: a scalable connection pooler for Postgres</title>
+  <link>https://supabase.com/blog/supavisor-postgres-connection-pooler</link>
+  <description>Supavisor is now used across all projects, providing a scalable and cloud-native Postgres connection pooler that can handle millions of connections</description>
+  <pubDate>Tue, 12 Dec 2023 23:00:00 GMT</pubDate>
+</item>
+
+    </channel>
+  </rss>
