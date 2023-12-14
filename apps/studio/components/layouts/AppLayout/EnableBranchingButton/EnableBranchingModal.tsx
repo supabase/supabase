@@ -19,6 +19,8 @@ import { useAppStateSnapshot } from 'state/app-state'
 import BranchingPITRNotice from './BranchingPITRNotice'
 import BranchingPostgresVersionNotice from './BranchingPostgresVersionNotice'
 import GithubRepositorySelection from './GithubRepositorySelection'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import BranchingPlanNotice from './BranchingPlanNotice'
 
 const EnableBranchingModal = () => {
   const { ui } = useStore()
@@ -52,6 +54,9 @@ const EnableBranchingModal = () => {
   })
   const hasMinimumPgVersion =
     Number(last(data?.current_app_version.split('-') ?? [])?.split('.')[0] ?? 0) >= 15
+
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
+  const isFreePlan = subscription?.plan.id === 'free'
 
   const { data: addons } = useProjectAddonsQuery({ projectRef: ref })
   const hasPitrEnabled =
@@ -181,7 +186,11 @@ const EnableBranchingModal = () => {
 
             {isSuccess && (
               <>
-                {hasMinimumPgVersion ? (
+                {isFreePlan ? (
+                  <BranchingPlanNotice />
+                ) : !hasMinimumPgVersion ? (
+                  <BranchingPostgresVersionNotice />
+                ) : (
                   <>
                     <GithubRepositorySelection
                       form={form}
@@ -192,8 +201,6 @@ const EnableBranchingModal = () => {
                     />
                     {!hasPitrEnabled && <BranchingPITRNotice />}
                   </>
-                ) : (
-                  <BranchingPostgresVersionNotice />
                 )}
                 <Modal.Content className="px-7 py-6 flex flex-col gap-3">
                   <p className="text-sm text-foreground-light">
