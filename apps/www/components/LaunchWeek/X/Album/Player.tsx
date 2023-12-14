@@ -4,7 +4,7 @@ import { IconArrowRight, cn } from 'ui'
 
 const Player = () => {
   const [audio, state, controls, ref] = useAudio({
-    src: 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/audio/supabase-album/Trinity.m4a',
+    src: 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/audio/supabase-album/Starbuck.m4a',
     loop: true,
   })
 
