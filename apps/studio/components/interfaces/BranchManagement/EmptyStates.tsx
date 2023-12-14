@@ -79,7 +79,13 @@ export const PullRequestsEmptyState = ({
               <p className="text-foreground-light">Browse our documentation</p>
             </div>
             <Button type="default" iconRight={<IconExternalLink />}>
-              Docs
+              <Link
+                target="_blank"
+                rel="noreferrer"
+                href="https://supabase.com/docs/guides/platform/branching"
+              >
+                Docs
+              </Link>
             </Button>
           </div>
         </div>
@@ -116,7 +122,13 @@ export const PreviewBranchesEmptyState = ({
             <p className="text-foreground-light">Browse our documentation</p>
           </div>
           <Button type="default" iconRight={<IconExternalLink />}>
-            Docs
+            <Link
+              target="_blank"
+              rel="noreferrer"
+              href="https://supabase.com/docs/guides/platform/branching"
+            >
+              Docs
+            </Link>
           </Button>
         </div>
       </div>
