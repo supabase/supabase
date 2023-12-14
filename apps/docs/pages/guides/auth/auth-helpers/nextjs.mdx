@@ -52,7 +52,7 @@ When using the Supabase client on the server, you must perform extra steps to en
 
 Next.js Server Components allow you to read a cookie but not write back to it. Middleware on the other hand allow you to both read and write to cookies.
 
-Next.js [Middleware](https://nextjs.org/docs/app/building-your-application/routing/middleware) runs immediately before each route is rendered. To avoid unnecessary renders, we include a matcher to decide when the middleware should run. You can read more on matching paths in the Next.js [documentation](https://nextjs.org/docs/app/building-your-application/routing/middleware#matching-paths). We'll use Middleware to refresh the user's session before loading Server Component routes.
+Next.js [Middleware](https://nextjs.org/docs/app/building-your-application/routing/middleware) runs immediately before each route is rendered. To avoid unnecessary execution, we include a matcher config to decide when the middleware should run. You can read more on matching paths in the Next.js [documentation](https://nextjs.org/docs/app/building-your-application/routing/middleware#matching-paths). We'll use Middleware to refresh the user's session before loading Server Component routes.
 
 <Tabs
   scrollable
