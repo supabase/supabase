@@ -17,6 +17,7 @@ import ConfirmationModal from 'components/ui/ConfirmationModal'
 
 import { useBannedIPsQuery } from 'data/banned-ips/banned-ips-query'
 import { useBannedIPsDeleteMutation } from 'data/banned-ips/banned-ips-delete-mutations'
+import { BASE_PATH } from '../../../../lib/constants'
 
 const BannedIPs = () => {
   const { ref } = useParams()
@@ -64,7 +65,7 @@ const BannedIPs = () => {
 
   useEffect(() => {
     // Fetch user's IP address
-    fetch(`/api/get-ip-address`)
+    fetch(`${BASE_PATH}/api/get-ip-address`)
       .then((response) => response.json())
       .then((data) => setUserIPAddress(data.ipAddress))
   }, [])
