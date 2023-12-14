@@ -67,9 +67,9 @@ Depending on your security or compliance requirements, you may need to enforce s
 
 For such scenarios, the MFA Verification Attempt hook can allow you to add additional checks to:
 
-- Ask users to wait a set time between verification attempts, to limit the number of attempts that can be done in a period of time.
-- Force sign out users if they have too many invalid verification attempts.
-- Count, rate limit, ban or do other actions.
+- Limit the number of verification attempts performed over a period of time.
+- Sign out users who have too many invalid verification attempts.
+- Count, rate limit, or ban signins.
 
 ### Inputs
 
@@ -95,7 +95,7 @@ In exchange your hook should return a JSON object with these fields set:
 
 ********************************On Success********************************
 
-Return these only if your hook processed the input without errors.
+Return this if your hook processed the input without errors.
 
 - `decision` A string containing the decision on whether to allow authentication to move forward. Use `reject` to completely reject the verification attempt and log the user out of all active sessions. Use `continue` to use the default Supabase Auth behavior.
 - `message` The message to show the user if the decision was `reject`.
@@ -124,7 +124,7 @@ Example output:
 {
   "error": {
     "http_code": 429,
-    "message": "You can only verify a factor once very 10 seconds."
+    "message": "You can only verify a factor once every 10 seconds."
   }
 }
 ```
@@ -196,7 +196,7 @@ The custom access token hook runs before a token is issued and allows you to add
 
 - `user_id`Unique identifier for the user attempting to sign in. Correlate this to the `auth.users` table.
 - `claims` Claims which are attached to the access token.
-- `authentication_method` the authentication method used to request for the access token. Possible values include:
+- `authentication_method` the authentication method used to request the access token. Possible values include:
     - `oauth`
     - `password`
     - `otp`
