@@ -34,6 +34,7 @@ export async function createDatabaseFunction({
     params: {
       path: { ref: projectRef },
     },
+    // @ts-ignore API codegen is typed wrongly, i suspect its using the body for edge functions instead
     body: payload,
     headers,
   })
