@@ -364,7 +364,6 @@ const SidePanelEditor = ({
         if (isRealtimeEnabled) await updateTableRealtime(table, isRealtimeEnabled)
 
         await Promise.all([
-          updateTableRealtime(table, isRealtimeEnabled),
           queryClient.invalidateQueries(tableKeys.list(project?.ref, table.schema)),
           queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
         ])

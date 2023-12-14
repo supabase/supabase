@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 
 import { PublicationsList, PublicationsTables } from 'components/interfaces/Database'
@@ -60,4 +59,4 @@ const DatabaseReplication: NextPageWithLayout = () => {
 
 DatabaseReplication.getLayout = (page) => <DatabaseLayout title="Database">{page}</DatabaseLayout>
 
-export default observer(DatabaseReplication)
+export default DatabaseReplication
