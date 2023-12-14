@@ -542,6 +542,7 @@ export const auth = {
           name: 'User Sessions',
           url: '/guides/auth/sessions',
         },
+        { name: 'Passwords', url: '/guides/auth/passwords' },
         {
           name: 'User Management',
           url: '/guides/auth/auth-user-management',
@@ -562,7 +563,6 @@ export const auth = {
             },
           ],
         },
-        { name: 'Password Reset', url: '/guides/auth/auth-password-reset' },
         { name: 'Email Templates', url: '/guides/auth/auth-email-templates' },
       ],
     },

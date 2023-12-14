@@ -2350,6 +2350,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/auth/auth-password-reset',
+    destination: '/docs/guides/auth/passwords',
+  },
+  {
+    permanent: true,
     source: '/docs/reference/dart/sign-in-with-apple',
     destination: '/docs/reference/dart/sign-in-with-id-token',
   },
