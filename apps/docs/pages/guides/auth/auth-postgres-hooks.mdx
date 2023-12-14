@@ -63,9 +63,7 @@ Based on user feedback, we decided on a few use cases to illustrate how a hook w
 
 ## MFA Verification Attempt Hook
 
-Depending on your security or compliance requirements, you may need to enforce stricter restrictions beyond the default [Supabase MFA implementation](https://supabase.com/docs/guides/auth/auth-mfa).
-
-For such scenarios, the MFA Verification Attempt hook can allow you to add additional checks to:
+You can use hooks to enforce restrictions beyond the default [Supabase MFA implementation](https://supabase.com/docs/guides/auth/auth-mfa). For example, you can:
 
 - Limit the number of verification attempts performed over a period of time.
 - Sign out users who have too many invalid verification attempts.
