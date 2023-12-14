@@ -262,7 +262,8 @@ const BasicAuthSettingsForm = observer(() => {
                               value: LOWER_UPPER_DIGITS,
                             },
                             {
-                              label: 'Lowercase, uppercase letters, digits and symbols',
+                              label:
+                                'Lowercase, uppercase letters, digits and symbols (recommended)',
                               value: LOWER_UPPER_DIGITS_SYMBOLS,
                             },
                           ],
@@ -362,10 +363,12 @@ const BasicAuthSettingsForm = observer(() => {
                             {
                               label: 'hCaptcha',
                               value: 'hcaptcha',
+                              icon: 'hcaptcha-icon.png',
                             },
                             {
                               label: 'Turnstile by Cloudflare',
                               value: 'turnstile',
+                              icon: 'cloudflare-icon.png',
                             },
                           ],
                         }}
