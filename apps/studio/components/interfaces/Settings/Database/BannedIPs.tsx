@@ -64,7 +64,7 @@ const BannedIPs = () => {
 
   useEffect(() => {
     // Fetch user's IP address
-    fetch(`/api/database/${ref}/get-ip-address`)
+    fetch(`/api/get-ip-address`)
       .then((response) => response.json())
       .then((data) => setUserIPAddress(data.ipAddress))
       .catch((error) => console.error('Error fetching user IP:', error))
