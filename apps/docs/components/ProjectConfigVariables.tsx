@@ -20,6 +20,7 @@ import {
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { proxy, useSnapshot } from 'valtio'
 import { SAVED_ORG_PROJECT_BRANCH, retrieve, store } from '~/lib/localStorage'
+import Link from 'next/link'
 
 const selectedProject = proxy({
   selectedId: null,
@@ -166,6 +167,13 @@ function useListAllProjectKeys() {
   return { projectKeys, isLoading, isError }
 }
 
+type Variable = 'url' | 'anonKey'
+
+const prettyFormatVariable: Record<Variable, string> = {
+  url: 'Project URL',
+  anonKey: 'Anon key',
+}
+
 function ComboBox({
   projectKeysInfo,
   variable,
@@ -175,7 +183,7 @@ function ComboBox({
   className,
 }: {
   projectKeysInfo: ProjectKey[]
-  variable: 'url' | 'anonKey'
+  variable: Variable
   selectedId: string | null
   setSelectedId: Dispatch<SetStateAction<string>>
   isLoading: boolean
@@ -235,7 +243,7 @@ function ComboBox({
   )
 }
 
-export function ProjectConfigVariables({ variable }: { variable: 'url' | 'anonKey' }) {
+export function ProjectConfigVariables({ variable }: { variable: Variable }) {
   const { selectedId, setSelectedId } = useSnapshot(selectedProject)
   const { projectKeys, isLoading, isError } = useListAllProjectKeys()
   const [copied, setCopied] = useState(false)
@@ -261,13 +269,7 @@ export function ProjectConfigVariables({ variable }: { variable: 'url' | 'anonKe
   const currentSelection =
     variable === 'url' ? currentProject?.endpoint : currentProject?.keys.anonKey
 
-  if (isLoading) {
-    return <span>Loading</span>
-  }
-
-  if (isError || projectKeys.length === 0) {
-    return <span>YOUR ANON KEY</span>
-  }
+  const noData = !isLoading && (isError || projectKeys.length === 0)
 
   return (
     <div
@@ -275,28 +277,72 @@ export function ProjectConfigVariables({ variable }: { variable: 'url' | 'anonKe
       className="max-w-[min(100%, 500px)] my-4"
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <span>{variable === 'url' ? 'Project URL' : 'Anon key'}</span>
-        <div className="flex justify-between">
-          <ComboBox
-            selectedId={selectedId}
-            setSelectedId={setSelectedId}
-            projectKeysInfo={projectKeys}
-            variable={variable}
-            isLoading={isLoading}
-          />
-          <CopyToClipboard text={currentSelection}>
-            <Button
-              variant="ghost"
-              className="w-[var(--copy-button-size)]"
-              onClick={handleCopy}
-              aria-label="Copy"
-            >
-              {copied ? <IconCheck /> : <IconCopy />}
-            </Button>
-          </CopyToClipboard>
-        </div>
+        <span>{prettyFormatVariable[variable]}</span>
+        {!noData && (
+          <div className="flex justify-between">
+            <ComboBox
+              selectedId={selectedId}
+              setSelectedId={setSelectedId}
+              projectKeysInfo={projectKeys}
+              variable={variable}
+              isLoading={isLoading}
+            />
+            <CopyToClipboard text={currentSelection}>
+              <Button
+                variant="ghost"
+                className="w-[var(--copy-button-size)]"
+                onClick={handleCopy}
+                aria-label="Copy"
+              >
+                {copied ? <IconCheck /> : <IconCopy />}
+              </Button>
+            </CopyToClipboard>
+          </div>
+        )}
       </div>
-      <Input disabled type="text" value={currentSelection} />
+      <Input
+        disabled
+        type="text"
+        value={
+          isLoading
+            ? 'Loading...'
+            : noData
+            ? `YOUR ${prettyFormatVariable[variable].toUpperCase()}`
+            : currentSelection
+        }
+      />
+      {noData && (
+        <span className="text-foreground-muted text-sm ml-1">
+          There was a problem getting your {prettyFormatVariable[variable]}.{' '}
+          {isError ? (
+            <>
+              Are you{' '}
+              <Link
+                className="text-foreground-muted"
+                href="https://supabase.com/dashboard"
+                rel="noreferrer noopener"
+                target="_blank"
+              >
+                logged in
+              </Link>
+              ?
+            </>
+          ) : (
+            <>
+              Do you have{' '}
+              <Link
+                className="text-foreground-muted"
+                href="https://supabase.com/dashboard"
+                rel="noreferrer noopener"
+                target="_blank"
+              >
+                any projects
+              </Link>
+              ?
+            </>
+          )}
+        </span>
+      )}
     </div>
   )
 }

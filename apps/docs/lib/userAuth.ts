@@ -1,7 +1,11 @@
 import { Session } from '@supabase/supabase-js'
 import { gotrueClient as auth } from 'common'
 
-let currentSession: Session | null = null
+let currentSession: Session | null
+
+auth.onAuthStateChange((_, session) => {
+  currentSession = session
+})
 
 export async function getAccessToken() {
   // ignore if server-side
@@ -9,7 +13,11 @@ export async function getAccessToken() {
     return
   }
 
-  if (!currentSession) {
+  const aboutToExpire = currentSession?.expires_at
+    ? currentSession.expires_at - Math.ceil(Date.now() / 1000) < 30
+    : false
+
+  if (!currentSession || aboutToExpire) {
     const {
       data: { session },
       error,
