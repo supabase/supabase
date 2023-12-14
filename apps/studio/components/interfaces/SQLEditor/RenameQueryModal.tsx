@@ -22,7 +22,6 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
   const { ref } = useParams()
   const organization = useSelectedOrganization()
   const snap = useSqlEditorStateSnapshot()
-  const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
 
   // Customers on HIPAA plans should not have access to Supabase AI
@@ -89,7 +88,7 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
                 onChange={(e) => setNameInput(e.target.value)}
               />
               <div className="flex w-full justify-end mt-2">
-                {supabaseAIEnabled && !hasHipaaAddon && isAiButtonVisible && (
+                {!hasHipaaAddon && isAiButtonVisible && (
                   <Button
                     type="default"
                     onClick={async () => {

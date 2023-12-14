@@ -5,9 +5,30 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Mon, 11 Dec 2023 23:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Tue, 12 Dec 2023 23:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/supabase-branching</guid>
+  <title>Supabase Branching</title>
+  <link>https://supabase.com/blog/supabase-branching</link>
+  <description>A Postgres database for every Pull Request.</description>
+  <pubDate>Tue, 12 Dec 2023 23:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supavisor-postgres-connection-pooler</guid>
+  <title>Supavisor 1.0: a scalable connection pooler for Postgres</title>
+  <link>https://supabase.com/blog/supavisor-postgres-connection-pooler</link>
+  <description>Supavisor is now used across all projects, providing a scalable and cloud-native Postgres connection pooler that can handle millions of connections</description>
+  <pubDate>Tue, 12 Dec 2023 23:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/postgrest-12</guid>
+  <title>PostgREST 12</title>
+  <link>https://supabase.com/blog/postgrest-12</link>
+  <description>PostgREST 12 is out and we take a look at some of the major new features like JWT Caching and Aggregate Functions</description>
+  <pubDate>Tue, 12 Dec 2023 23:00:00 GMT</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/edge-functions-node-npm</guid>
   <title>Edge Functions: Node and native npm compatibility</title>
   <link>https://supabase.com/blog/edge-functions-node-npm</link>
