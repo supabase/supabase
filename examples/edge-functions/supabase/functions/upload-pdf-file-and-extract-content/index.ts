@@ -1,14 +1,13 @@
 // Follow this setup guide to integrate the Deno language server with your editor:
 // https://deno.land/manual/getting_started/setup_your_environment
 // This enables autocomplete, go to definition, etc.
-
 import 'https://deno.land/x/xhr@0.3.0/mod.ts'
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+import { serve } from 'https://deno.land/std@0.195.0/http/server.ts'
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.5.0'
-import Api2Pdf from 'https://esm.sh/api2pdf@2.0.3'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import Api2Pdf from 'https://esm.sh/api2pdf@2'
 
-console.log('Function now running...')
+console.log('PDF Function is now running...')
 
 // Supabase API URL & Anon Key - env values exported by default
 const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
@@ -20,7 +19,7 @@ const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? ''
 // For example: > supabase functions deploy <function-name> --secrets API2PDF_KEY
 const a2pAPIKey = Deno.env.get('API2PDF_KEY')
 
-// initialise new Api2Pdf instance
+// initialize new Api2Pdf instance
 const a2pClient = new Api2Pdf(a2pAPIKey)
 
 const corsHeaders = {
@@ -97,27 +96,6 @@ serve(async (req) => {
 
     // Typical Supabase storage file public url pattern
     const filePublicUrl = `${supabaseUrl}/storage/v1/object/public/<my-bucket-name>/${filePath}`
-
-    /** 
-     * OR alternatively fetch file public url from Supabase (if file is public)
-     * ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-     * const { data: filePublicUrl } = await supabaseClient.storage
-          .from("<my-bucket-name>")
-          .getPublicUrl(filePath); 
-     */
-
-    /**
-     * OR fetch file signed url from Supabase (if file is protected/private)
-     * ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-     * const { data: urlObj, error: urlObjErr } = await supabaseClient.storage
-            .from("<my-bucket-name>")
-            .createSignedUrl(filePath, 3600) // URL expires in 1 hour
-          if (urlObjErr) {
-            throw urlObjErr
-          } else {
-            filePublicUrl = urlObj?.signedUrl
-          }
-     */
 
     let finalText: string = ''
 
