@@ -12,7 +12,7 @@ Hooks are currently in beta and will only be available on all projects early 202
 </Admonition>
 
 
-Supabase allows you to use PostgreSQL functions to alter the default Supabase Auth flow. Developers can use hooks to write custom behaviour when there are no built-in ways of achieving the desired behaviour.
+Supabase allows you to use PostgreSQL functions to alter the default Supabase Auth flow. Developers can use hooks to write custom behaviour when there are no built-in ways of achieving the desired behavior.
 
 Hooks might help you:
 
@@ -22,7 +22,7 @@ Hooks might help you:
 - Add additional custom claims to your JWT
 
 
-You can use hooks at specific points along an Auth flow to perform custom behaviour via PostgreSQL Functions. These are known as **extensibility points**. Currently, the following extensibility points are available:
+You can use hooks at specific points along an Auth flow to perform custom behavior via PostgreSQL Functions. These are known as **extensibility points**. Currently, the following extensibility points are available:
 
 | Extensibility Point              | Available on Plan       |
 |----------------------------------|-------------------------|
@@ -43,7 +43,7 @@ Below is a flow chart illustrating how Supabase Auth uses an Auth Hook:
     ValidityCheck --Yes-->ContinueFlow[Continue with flow]
     ValidityCheck --No-->Error(Return Error)
 
-    DecisionA -- No ---->H[Continue with Supabase Default Behaviour]
+    DecisionA -- No ---->H[Continue with Supabase Default Behavior]
     H--> ValidityCheck{Is response valid?}
     DecisionA --Yes--->ValidateInput((Validate Inputs))
         ValidateOutput -->ContinueFlow
@@ -62,9 +62,7 @@ Below is a flow chart illustrating how Supabase Auth uses an Auth Hook:
 ## Creating and Managing Hooks
 ### Writing a Hook
 
-Head to the `SQL Editor > Templates` and select the corresponding template (e.g. `MFA Verification Attempt` ). This will generate an example function for the corresponding extensibility point.
-
-Here is an example of what a function outline for the  *MFA Verification Attempt* Hook would look like:
+Head to the `SQL Editor > Templates` and select `Add Auth Hook (General)`. Here is an example of what a function outline for the Hook would look like:
 
 ```sql
 create
@@ -78,11 +76,33 @@ end;
 $$ language plpgsql;
 ```
 
-Unfortunately, we do not currently support the JSONB operator `?` as `?` is a reserved character in the Object Relational Mapper (ORM) that we use.
+Note that the JSONB operator `?` cannot currently be used when writing a hook as it is a reserved character in the ORM used by Supabase Auth.
+
+### Handling Hook errors
+
+Unless otherwise specified, hooks return errors with the following fields:
+
+- `error` An object that contains information about the error.
+    - `http_code` A number indicating the HTTP code to be returned. If not set, the code is HTTP 500 Internal Server Error.
+    - `message` A message to be returned in the HTTP response. Must be set.
+
+You should return an error if an input in the `event` payload has been processed incorrectly. This error could result from a server error (e.g. An unexpected error with the data) or a user error (e.g. the user has exceeded the number of available attempts).
+
+In general, Supabase Auth will ignore all fields other than the `error` field attached to the returned JSON.
+
+Example output:
+```jsx
+{
+  "error": {
+    "http_code": 429,
+    "message": "You can only verify a factor once very 10 seconds."
+  }
+}
+```
 
 ### Assigning Hook Permissions
 
-You will need to assign additional permissions to the postgres functions and the tables that it will interact with.
+You will need to assign additional permissions to the hook as well as the tables that it will interact with.
 
 By default, Supabase Auth will invoke a hook with the `supabase_auth_admin` role and the `supabase_auth_admin` role does not have permissions to modify the `public` schema - you will need to grant the role additional permissions to execute the function you have defined:
 
@@ -104,9 +124,9 @@ revoke execute
 Avoid adding a `security definer` tag to the function to avoid permission errors.
 </Admonition>
 
-Postgres functions have an implicit tag of `security invoker` and will run with the permissions of the user that calls it. In the case of Auth Hooks, `supabase_auth_admin`  is the invoker and it will run with the permissions of `supabase_auth_admin`.
+At time of writing, Postgres functions have an implicit tag of `security invoker` and will run with the permissions of the user that calls it. In the case of Auth Hooks, `supabase_auth_admin`  is the invoker and it will run with the permissions of `supabase_auth_admin`.
 
-The alternative `security definer` tag specifies that the hook is to be executed with the privileges of the user that owns it.  In the case of functions created via the Supabase Dashboard this is `postgres` which does not have permissions over the Auth schema. Introducing a `security definer` tag could prevent Supabase Auth from having the appropriate permissions to access tables or execute functions.
+The `security definer` tag specifies that the hook is to be executed with the privileges of the user that owns it.  In the case of functions created via the Supabase Dashboard this is `postgres` which does not have permissions over the Auth schema. Introducing a `security definer` tag could prevent Supabase Auth from having the appropriate permissions to access tables or execute functions.
 
 
 ### Timeouts
@@ -115,9 +135,9 @@ Hook timeouts are controlled by a `local` statement timeout scoped to the Postgr
 
 ### Testing the Hook
 
-We strongly recommend testing the hook prior to going into production via [PgTAP](https://supabase.com/docs/guides/database/extensions/pgtap) or similar. You can enable the extension under `Database > Extensions > PgTap`
+We strongly recommend testing the hook prior to going into production via [PgTAP](https://supabase.com/docs/guides/database/extensions/pgtap) or similar. You can enable the extension under `Database > Extensions > PgTAP`
 
-Here's an example of what a test could look like for an MFA Verification hook.
+Here's an example of what a `PgTAP` test could look like for an MFA Verification hook.
 
 ```sql
 begin;
@@ -140,7 +160,7 @@ $$;
 
 do $$
   declare
-     -- Arrange and setup any variablese user in the test
+     -- Arrange and setup any variables used in the test
     _user1 uuid = '00000000-0000-0000-0000-000000000001';
     _factor1 uuid = 'FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFF1';
     _valid_user1_event jsonb = jsonb_build_object('user_id', _user1, 'factor_id', _factor1, 'valid', true);
@@ -185,11 +205,11 @@ In the dashboard, navigate to `Authentication > Hooks (Beta)` and select the app
 
 ## MFA Verification Attempt Hook
 
-You can use hooks to enforce restrictions beyond the default [Supabase MFA implementation](https://supabase.com/docs/guides/auth/auth-mfa). For example, you can:
+You can add additional checks to the [Supabase MFA implementation](https://supabase.com/docs/guides/auth/auth-mfa) with hooks. For example, you can:
 
 - Limit the number of verification attempts performed over a period of time.
 - Sign out users who have too many invalid verification attempts.
-- Count, rate limit, or ban signins.
+- Count, rate limit, or ban sign-ins.
 
 ### Inputs
 
@@ -197,7 +217,7 @@ Supabase Auth will supply the following fields to your hook:
 
 - `factor_id` Unique identifier for the MFA factor being verified. 
 - `user_id` Unique identifier for the user.
-- `valid` Whether the verification attempt was valid. For TOTP, this means that the six digit code was correct (true) or incorrect (false). The hook will generally receive true once, and false many times for the same user and factor.
+- `valid` Whether the verification attempt was valid. For TOTP, this means that the six digit code was correct (true) or incorrect (false).
 
 Example payload:
 
@@ -213,7 +233,7 @@ Example payload:
 
 Return this if your hook processed the input without errors.
 
-- `decision` A string containing the decision on whether to allow authentication to move forward. Use `reject` to completely reject the verification attempt and log the user out of all active sessions. Use `continue` to use the default Supabase Auth behavior.
+- `decision` A string containing the decision on whether to allow authentication to move forward. Use `reject` to deny the verification attempt and log the user out of all active sessions. Use `continue` to use the default Supabase Auth behavior.
 - `message` The message to show the user if the decision was `reject`.
 
 Example output:
@@ -234,7 +254,7 @@ Example output:
 >
 <TabPanel id="add-admin-role" label="Limit Failed MFA Verification Attempts">
 
-Your company requires that a user can only input an incorrect MFA Verification code every 2 seconds and not more than that.
+Imagine that your company requires that a user can only input an incorrect MFA Verification code every 2 seconds and not more than that.
 
 #### Database Setup
 
@@ -327,14 +347,11 @@ revoke all
 
 ## Password Verification Attempts Hook
 
-As with the MFA Verification Hooks, you may wish to increase security beyond the requirements of the default password implementation in order to fulfil security or compliance requirements.
+Imagine that you wish to increase security beyond the requirements of the default password implementation in order to fulfill security or compliance requirements.
 
-Because this hook runs on unauthenticated requests, this function can be called many times by just about anyone. Be careful when using this hook to prevent users from entering your app, as you can accidentally create a vulnerability where attackers can use this feature from preventing legitimate users to enter.
+As the hook runs on unauthenticated requests, malicious users can abuse the hook by calling it multiple times.  Pay extra care when using the hook as you can unintentionally block legitimate users from accessing your application.
 
-
-Check if a password is valid prior to taking any additional action in order to ensure the user is legitimate. Instead of blocking further password verification attempts, you can also use this hook to trigger an email or other notification to the user or administrator in your system.
-
-
+Check if a password is valid prior to taking any additional action to ensure the user is legitimate. Instead of blocking further verification attempts, consider sending an email or notification to an administrator via a trigger instead.
 
 ### Inputs
 
@@ -347,7 +364,6 @@ Check if a password is valid prior to taking any additional action in order to e
 	"valid": true,
 }
 ```
-
 
 ### Outputs
 
