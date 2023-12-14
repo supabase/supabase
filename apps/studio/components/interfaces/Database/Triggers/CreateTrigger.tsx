@@ -26,6 +26,7 @@ import {
   SidePanel,
 } from 'ui'
 import ChooseFunctionForm from './ChooseFunctionForm'
+import { PostgresFunction } from '@supabase/postgres-meta'
 
 class CreateTriggerFormState {
   id: number | undefined
@@ -282,7 +283,7 @@ const CreateTrigger = ({ trigger, visible, setVisible }: CreateTriggerProps) => 
   useEffect(() => {
     const fetchFunctions = async () => {
       await meta.functions.load()
-      const triggerFuncs = (meta as any)!.functions.listTriggerFunctions()
+      const triggerFuncs = meta.functions.list((x: PostgresFunction) => x.return_type === 'trigger')
       _localState.setTriggerFunctions(triggerFuncs)
     }
 
