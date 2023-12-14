@@ -39,7 +39,6 @@ import { getTable } from 'data/tables/table-query'
 import { getTables } from 'data/tables/tables-query'
 import PostgresMetaInterface from '../common/PostgresMetaInterface'
 import RolesStore, { IRolesStore } from './RolesStore'
-import TriggersStore from './TriggersStore'
 import ViewStore, { IViewStore } from './ViewStore'
 
 const BATCH_SIZE = 1000
