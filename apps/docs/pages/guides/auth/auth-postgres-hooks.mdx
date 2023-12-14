@@ -100,7 +100,7 @@ revoke execute
 	from authenticated, anon;
 ```
 
-<Admonition type="warn">
+<Admonition type="warning">
 Avoid adding a `security definer` tag to the function to avoid permission errors.
 </Admonition>
 
@@ -177,7 +177,7 @@ rollback;
 ````
 
 
-### Connecting the Hook to Supabase Auth
+### Connecting the Hook
 
 In the dashboard, navigate to `Authentication > Hooks (Beta)` and select the appropriate PostgreSQL function from the dropdown menu.
 ![Hooks UI](/docs/img/guides/auth-postgres-hooks/hooks-ui.png)
@@ -211,10 +211,6 @@ Example payload:
 
 ### Outputs
 
-In exchange your hook should return a JSON object with these fields set:
-
-#### On Success
-
 Return this if your hook processed the input without errors.
 
 - `decision` A string containing the decision on whether to allow authentication to move forward. Use `reject` to completely reject the verification attempt and log the user out of all active sessions. Use `continue` to use the default Supabase Auth behavior.
@@ -228,90 +224,6 @@ Example output:
    "message" : "You have exceeded maximum number of MFA attempts."
 }
 ```
-
-## Password Verification Attempts Hook
-
-As with the MFA Verification Hooks, you may wish to increase security beyond the requirements of the default password implementation in order to fulfil security or compliance requirements.
-
-This hook allows you to introduce additional constraints around password verification
-
-### Inputs
-
-- `user_id` Unique identifier for the user attempting to sign in. Correlate this to the `auth.users` table.
-- `valid` Whether the password verification attempt was valid.
-
-```json
-{
-	"user_id": "3919cb6e-4215-4478-a960-6d3454326cec",
-	"valid": true,
-}
-```
-
-### Outputs
-
-In exchange your hook should return back a JSON object with these fields set:
-
-#### On Success
-
-Return these only if your hook processed the input without errors.
-
-- `decision` A string containing the decision whether to allow authentication to move forward. Use `reject` to completely reject the verification attempt and log the user out of all active sessions. Use `continue` to use the default Supabase Auth behavior.
-- `message` The message to show the user if the decision was `reject`.
-- `should_logout_user` Whether to logout a user if a `reject` decision is issued. Has no effect when a `continue` decision is issued.
-
-Example output:
-
-```json
-{
-   "decision": "reject",
-   "message" : "You have exceeded maximum number of MFA attempts.",
-   "should_logout_user": "false"
-}
-```
-
-## Custom Access Token Hook
-
-The custom access token hook runs before a token is issued and allows you to add additional claims based on the authentication method used or add additional metadata to select users.
-Claims returned must conform to our specification. Supabase Auth will check for these claims after the hook is run and return an error if they are not present.
-
-Here's a listing of all fields currently available on an access token:
-
-| Field           | Is Required Claim |
-|-----------------|-------------------|
-| `aud`           | Yes               |
-| `exp`           | Yes               |
-| `jti`           | No                |
-| `iat`           | Yes               |
-| `iss`           | No                |
-| `nbf`           | No                |
-| `sub`           | Yes               |
-| `email`         | Yes               |
-| `phone`         | Yes               |
-| `app_metadata`  | No                |
-| `user_metadata` | No                |
-| `role`          | Yes               |
-| `aal`           | Yes               |
-| `amr`           | No                |
-| `session_id`    | No                |
-
-
-### Inputs
-
-- `user_id`Unique identifier for the user attempting to sign in. Correlate this to the `auth.users` table.
-- `claims` Claims which are attached to the access token.
-- `authentication_method` the authentication method used to request the access token. Possible values include:
-`oauth`, `password`, `otp`, `totp`, `recovery`, `invite`, `sso/saml`, `magiclink`, `email/signup`, `email_change`, `token_refresh`.
-
-
-
-### On Success
-
-Return these only if your hook processed the input without errors.
-
-- `claims` A json containing the updated claims after the hook has been run.
-
-## Examples
-
 ### Example: Limit Failed MFA Verification Attempts
 <Tabs
   scrollable
@@ -413,6 +325,47 @@ revoke all
 </TabPanel>
 </Tabs>
 
+## Password Verification Attempts Hook
+
+As with the MFA Verification Hooks, you may wish to increase security beyond the requirements of the default password implementation in order to fulfil security or compliance requirements.
+
+Because this hook runs on unauthenticated requests, this function can be called many times by just about anyone. Be careful when using this hook to prevent users from entering your app, as you can accidentally create a vulnerability where attackers can use this feature from preventing legitimate users to enter.
+
+
+Check if a password is valid prior to taking any additional action in order to ensure the user is legitimate. Instead of blocking further password verification attempts, you can also use this hook to trigger an email or other notification to the user or administrator in your system.
+
+
+
+### Inputs
+
+- `user_id` Unique identifier for the user attempting to sign in. Correlate this to the `auth.users` table.
+- `valid` Whether the password verification attempt was valid.
+
+```json
+{
+	"user_id": "3919cb6e-4215-4478-a960-6d3454326cec",
+	"valid": true,
+}
+```
+
+
+### Outputs
+
+Return these only if your hook processed the input without errors.
+
+- `decision` A string containing the decision whether to allow authentication to move forward. Use `reject` to completely reject the verification attempt and log the user out of all active sessions. Use `continue` to use the default Supabase Auth behavior.
+- `message` The message to show the user if the decision was `reject`.
+- `should_logout_user` Whether to logout a user if a `reject` decision is issued. Has no effect when a `continue` decision is issued.
+
+Example output:
+
+```json
+{
+   "decision": "reject",
+   "message" : "You have exceeded maximum number of MFA attempts.",
+   "should_logout_user": "false"
+}
+```
 
 ### Example: Limit Failed Password Verification Attempts
 
@@ -512,6 +465,47 @@ revoke all
 </TabPanel>
 </Tabs>
 
+## Custom Access Token Hook
+
+The custom access token hook runs before a token is issued and allows you to add additional claims based on the authentication method used or add additional metadata to select users.
+
+Claims returned must conform to our specification. Supabase Auth will check for these claims after the hook is run and return an error if they are not present.
+
+Here's a listing of all fields currently available on an access token:
+
+| Field           | Is Required Claim |
+|-----------------|-------------------|
+| `aud`           | Yes               |
+| `exp`           | Yes               |
+| `jti`           | No                |
+| `iat`           | Yes               |
+| `iss`           | No                |
+| `nbf`           | No                |
+| `sub`           | Yes               |
+| `email`         | Yes               |
+| `phone`         | Yes               |
+| `app_metadata`  | No                |
+| `user_metadata` | No                |
+| `role`          | Yes               |
+| `aal`           | Yes               |
+| `amr`           | No                |
+| `session_id`    | No                |
+
+
+### Inputs
+
+- `user_id`Unique identifier for the user attempting to sign in. Correlate this to the `auth.users` table.
+- `claims` Claims which are attached to the access token.
+- `authentication_method` the authentication method used to request the access token. Possible values include:
+`oauth`, `password`, `otp`, `totp`, `recovery`, `invite`, `sso/saml`, `magiclink`, `email/signup`, `email_change`, `token_refresh`.
+
+
+
+### Outputs
+
+Return these only if your hook processed the input without errors.
+
+- `claims` A json containing the updated claims after the hook has been run.
 
 ### Example: Add Custom Claims to Token
 
