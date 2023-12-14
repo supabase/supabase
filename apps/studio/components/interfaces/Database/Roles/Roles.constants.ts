@@ -17,6 +17,19 @@ export const SUPABASE_ROLES = [
   'pgtle_admin',
 ]
 
+export const SYSTEM_ROLES = [
+  'postgres',
+  'pgbouncer',
+  'supabase_admin',
+  'supabase_auth_admin',
+  'supabase_storage_admin',
+  'dashboard_user',
+  'authenticator',
+  'pg_database_owner',
+  'pg_read_all_data',
+  'pg_write_all_data',
+]
+
 export const ROLE_PERMISSIONS: any = {
   can_login: {
     disabled: false,

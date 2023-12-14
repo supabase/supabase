@@ -1,9 +1,15 @@
+import { useParams } from 'common'
 import { filter, find, get, isEmpty } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
 import { IconLoader } from 'ui'
 
+import { PolicyEditorModal } from 'components/interfaces/Auth/Policies'
+import { SYSTEM_ROLES } from 'components/interfaces/Database/Roles/Roles.constants'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
+import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
+import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useStore } from 'hooks'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { formatPoliciesForStorage } from '../Storage.utils'
@@ -11,13 +17,10 @@ import StoragePoliciesBucketRow from './StoragePoliciesBucketRow'
 import StoragePoliciesEditPolicyModal from './StoragePoliciesEditPolicyModal'
 import StoragePoliciesPlaceholder from './StoragePoliciesPlaceholder'
 
-import { useParams } from 'common'
-import { PolicyEditorModal } from 'components/interfaces/Auth/Policies'
-import { useBucketsQuery } from 'data/storage/buckets-query'
-
 const StoragePolicies = () => {
   const { ui, meta } = useStore()
   const { ref: projectRef } = useParams()
+  const { project } = useProjectContext()
 
   const storageStore = useStorageStore()
   const { loaded } = storageStore
@@ -25,7 +28,11 @@ const StoragePolicies = () => {
   const { data } = useBucketsQuery({ projectRef })
   const buckets = data ?? []
 
-  const roles = meta.roles.list((role: any) => !meta.roles.systemRoles.includes(role.name))
+  const { data: rolesData } = useDatabaseRolesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const roles = (rolesData ?? []).filter((role) => SYSTEM_ROLES.includes(role.name))
 
   const [policies, setPolicies] = useState<any[]>([])
   const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState({})

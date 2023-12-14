@@ -1,5 +1,6 @@
 import { UseQueryOptions, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useCallback } from 'react'
+import { PostgresRole } from '@supabase/postgres-meta'
 
 import { get } from 'data/fetchers'
 import { ResponseError } from 'types'
@@ -29,7 +30,7 @@ export async function getDatabaseRoles(
   })
 
   if (error) throw error
-  return data
+  return data as PostgresRole[]
 }
 
 export type DatabaseRolesData = Awaited<ReturnType<typeof getDatabaseRoles>>

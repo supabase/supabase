@@ -1,8 +1,9 @@
 import { PostgresRole } from '@supabase/postgres-meta'
-import { useState } from 'react'
+import toast from 'react-hot-toast'
 import { Modal } from 'ui'
 
-import { useStore } from 'hooks'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useDatabaseRoleDeleteMutation } from 'data/database-roles/database-role-delete-mutation'
 
 interface DeleteRoleModalProps {
   role: PostgresRole
@@ -11,27 +12,23 @@ interface DeleteRoleModalProps {
 }
 
 const DeleteRoleModal = ({ role, visible, onClose }: DeleteRoleModalProps) => {
-  const { ui, meta } = useStore()
-  const [isDeleting, setIsDeleting] = useState(false)
+  const { project } = useProjectContext()
+
+  const { mutate: deleteDatabaseRole, isLoading: isDeleting } = useDatabaseRoleDeleteMutation({
+    onSuccess: () => {
+      toast.success(`Successfully deleted role: ${role.name}`)
+      onClose()
+    },
+  })
 
   const deleteRole = async () => {
+    if (!project) return console.error('Project is required')
     if (!role) return console.error('Failed to delete role: role is missing')
-
-    setIsDeleting(true)
-    const res: any = await meta.roles.del(role.id)
-    setIsDeleting(false)
-    if (res.error) {
-      return ui.setNotification({
-        category: 'error',
-        message: `Failed to delete role: ${res.error.message}`,
-      })
-    } else {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully deleted role: "${role.name}"`,
-      })
-      onClose()
-    }
+    deleteDatabaseRole({
+      projectRef: project.ref,
+      connectionString: project.connectionString,
+      id: role.id.toString(),
+    })
   }
 
   return (
