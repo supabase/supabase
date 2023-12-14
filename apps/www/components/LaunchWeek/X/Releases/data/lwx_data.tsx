@@ -200,7 +200,8 @@ const days: WeekDayProps[] = [
     published_at: '2023-12-14T08:00:00.000-08:00',
     description: (
       <>
-        Auth: <strong>Password strength</strong> checking and <strong>leak protection</strong>
+        Auth: <strong>Identity Linking</strong>, <strong>Session Control</strong>,{' '}
+        <strong>Password Protection</strong> and <strong>Hooks</strong>
       </>
     ),
     links: [
