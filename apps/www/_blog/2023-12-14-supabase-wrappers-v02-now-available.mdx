@@ -1,6 +1,6 @@
 ---
 title: 'Supabase Postgres Foreign Data Wrappers v0.2 now available'
-description: "Supabase Postgres Foreign Data Wrappers v0.2 brings more Wrappers, query pushdown, remote subquery, and more"
+description: 'Supabase Postgres Foreign Data Wrappers v0.2 brings more Wrappers, query pushdown, remote subquery, and more'
 launchweek: x
 categories:
   - product
@@ -25,7 +25,7 @@ create foreign table products (
   description text,
   default_price text
 )
-server my_stripe_server 
+server my_stripe_server
 options ( object 'products' );
 
 -- Fetch all your Stripe products in Postgres
@@ -34,14 +34,14 @@ select * from products limit 10;
 
 **Key Features and Improvements in Wrappers v0.2:**
 
-- [New Wrappers](https://www.notion.so/Wrappers-v0-2-the-Postgres-FDW-Framework-9f9875ad7ff5424d91b93af14c4ae2a5?pvs=21)
-- [Query Pushdown](https://www.notion.so/Wrappers-v0-2-the-Postgres-FDW-Framework-9f9875ad7ff5424d91b93af14c4ae2a5?pvs=21)
-- [Remote Subquery](https://www.notion.so/Wrappers-v0-2-the-Postgres-FDW-Framework-9f9875ad7ff5424d91b93af14c4ae2a5?pvs=21)
-- [Usage Statistics](https://www.notion.so/Wrappers-v0-2-the-Postgres-FDW-Framework-9f9875ad7ff5424d91b93af14c4ae2a5?pvs=21)
+- [New Wrappers](#new-wrappers-and-improvements)
+- [Query Pushdown](#support-for-query-pushdown)
+- [Remote Subquery](#remote-subqueries)
+- [Usage Statistics](#fdw-usage-statistics)
 
-To start using Wrappers on the Supabase Platform, check out the [Wrappers docs](https://supabase.com/docs/guides/database/extensions/wrappers/overview).
+To start using Wrappers on the Supabase platform, check out the [Wrappers docs](https://supabase.com/docs/guides/database/extensions/wrappers/overview).
 
-## New Wrappers and improvements
+## New Wrappers and Improvements
 
 - [Airtable](https://supabase.com/docs/guides/database/extensions/wrappers/airtable) (Read-only): query your Airtable bases with [support for jsonb](https://github.com/supabase/wrappers/pull/181)
 - [AWS S3](https://supabase.com/docs/guides/database/extensions/wrappers/s3) (Read-only): with support for CSV, JSON, and Parquet
@@ -71,8 +71,8 @@ Query pushdown is a technique that enhances query performance by executing parts
 In Wrappers, the pushdown logic is integrated into each extension. You don’t need to modify your queries to benefit from this feature. For example, the [Stripe FDW](https://supabase.com/docs/guides/database/extensions/wrappers/stripe) automatically applies query pushdown for `id` within the `customer` object:
 
 ```sql
-select * 
-from stripe.customers 
+select *
+from stripe.customers
 where id = 'cus_N5WMk7pvQPkY3B';
 ```
 
@@ -85,21 +85,21 @@ https://api.stripe.com/v1/customers/cus_N5WMk7pvQPkY3B
 We can use push down criteria and other query parameters too. For example, [ClickHouse FDW](https://supabase.com/docs/guides/database/extensions/wrappers/clickhouse) supports `order by` and `limit` pushdown:
 
 ```sql
-select * 
-from clickhouse.people 
-order by name 
+select *
+from clickhouse.people
+order by name
 limit 20;
 ```
 
-This query executes `order by name limit 20` on ClickHouse before transferring the result to Postgres. 
+This query executes `order by name limit 20` on ClickHouse before transferring the result to Postgres.
 
 For details on where pushdown is supported, consult each FDW's documentation in the [Wrappers Documentation](https://supabase.com/docs/guides/database/extensions/wrappers/overview).
 
 ## Remote Subqueries
 
-Remote subqueries enable the use of prepared data on a remote server, which is beneficial for complex queries or sensitive data protection. 
+Remote subqueries enable the use of prepared data on a remote server, which is beneficial for complex queries or sensitive data protection.
 
-### Static subqueries
+### Static Subqueries
 
 In its most basic form, you can map a query on the remote server into a foreign table in Postgres. For instance:
 
@@ -159,11 +159,11 @@ Quantitative metrics play a pivotal role when working with Postgres FDWs because
 We can use these to identify bottlenecks, latency issues, and inefficiencies in data retrieval. Access this table on the Supabase platform using the following:
 
 ```sql
-select * 
+select *
 from extensions.wrappers_fdw_stats;
 ```
 
-## Thanks to our Community Contributors
+## Thanks to Our Community Contributors
 
 We couldn't build Wrappers v0.2 without our community and we'd like to thank all the following people for their contributions:
 
@@ -180,7 +180,7 @@ Want to join the Supabase Wrappers community contributors? [Check out our contri
 - [Blog Post: Supabase Wrappers, a Postgres FDW framework written in Rust](https://supabase.com/blog/postgres-foreign-data-wrappers-rust)
 - [Blog Post: Wrappers UI](https://supabase.com/blog/supabase-studio-3-0#wrappers-ui)
 
-## More Launch Week X 
+## More Launch Week X
 
 - [Day 1 - Supabase Studio update: AI Assistant and User Impersonation](https://supabase.com/blog/studio-introducing-assistant)
 - [Day 2 - Edge Functions: Node and native npm compatibility](https://supabase.com/blog/edge-functions-node-npm)
