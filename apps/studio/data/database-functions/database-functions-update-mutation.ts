@@ -23,7 +23,7 @@ export type DatabaseFunctionUpdateVariables = {
   }
 }
 
-export async function updateDatabasePublication({
+export async function updateDatabaseFunction({
   projectRef,
   connectionString,
   id,
@@ -46,7 +46,7 @@ export async function updateDatabasePublication({
   return data
 }
 
-type DatabaseFunctionUpdateData = Awaited<ReturnType<typeof updateDatabasePublication>>
+type DatabaseFunctionUpdateData = Awaited<ReturnType<typeof updateDatabaseFunction>>
 
 export const useDatabaseFunctionUpdateMutation = ({
   onSuccess,
@@ -59,7 +59,7 @@ export const useDatabaseFunctionUpdateMutation = ({
   const queryClient = useQueryClient()
 
   return useMutation<DatabaseFunctionUpdateData, ResponseError, DatabaseFunctionUpdateVariables>(
-    (vars) => updateDatabasePublication(vars),
+    (vars) => updateDatabaseFunction(vars),
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables

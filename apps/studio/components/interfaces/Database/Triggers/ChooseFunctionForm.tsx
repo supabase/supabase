@@ -64,7 +64,7 @@ const ChooseFunctionForm = ({
 
 export default ChooseFunctionForm
 
-const NoticeBox = ({}) => {
+const NoticeBox = () => {
   const { ref } = useParams()
 
   return (
@@ -74,7 +74,7 @@ const NoticeBox = ({}) => {
         title="Only functions that return a trigger will be displayed below"
         description={`You can make functions by using the Database Functions`}
         button={
-          <Button type="default">
+          <Button asChild type="default">
             <Link href={`/project/${ref}/database/functions`}>Go to Functions</Link>
           </Button>
         }
