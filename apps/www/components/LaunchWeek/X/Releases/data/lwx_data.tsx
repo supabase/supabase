@@ -107,7 +107,6 @@ const days: WeekDayProps[] = [
     dd: 'Tue',
     title: 'Edge Functions',
     shipped: true,
-    isToday: true,
     hasCountdown: false,
     blog: '/blog/edge-functions-node-npm',
     date: '12 Dec',
@@ -149,20 +148,45 @@ const days: WeekDayProps[] = [
     id: 'day-3',
     d: 3,
     dd: 'Wed',
-    title: '',
-    shipped: false,
-    hasCountdown: true,
-    blog: '',
+    title: 'Supabase Branching',
+    shipped: true,
+    isToday: true,
+    hasCountdown: false,
+    blog: '/blog/supabase-branching',
     date: '13 Dec',
     published_at: '2023-12-13T08:00:00.000-08:00',
-    description: '',
+    description: (
+      <>
+        Introducing Supabase <strong>Branching</strong>, a Postgres database for every pull request
+      </>
+    ),
     links: [
+      {
+        type: 'blog',
+        href: '/blog/supabase-branching',
+      },
+      {
+        type: 'video',
+        href: 'peXKxavGnBo',
+      },
       {
         type: 'xSpace',
         href: 'https://twitter.com/i/spaces/1eaKbgDBgyoGX',
       },
     ],
-    steps: [],
+    steps: [
+      {
+        title: '',
+        blog: '/blog/supabase-branching',
+        bg_layers: [
+          {
+            img: '/images/launchweek/lwx/day3/branching.svg',
+            mobileImg: '/images/launchweek/lwx/day3/branching_mobile.svg',
+          },
+        ],
+        steps: [],
+      },
+    ],
   },
   {
     id: 'day-4',
@@ -170,6 +194,7 @@ const days: WeekDayProps[] = [
     dd: 'Thu',
     title: '',
     shipped: false,
+    hasCountdown: true,
     blog: '',
     date: '14 Dec',
     published_at: '2023-12-14T08:00:00.000-08:00',

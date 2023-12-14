@@ -79,7 +79,7 @@ const LWXStickyNav: FC = () => {
                     {day.dd}{' '}
                     {day.isToday && (
                       <span
-                        title="Is Live"
+                        title="Live"
                         className="w-1 h-1 ml-1 animate-pulse rounded-full bg-brand mb-2 block"
                       />
                     )}

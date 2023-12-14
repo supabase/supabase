@@ -145,9 +145,7 @@ export default function TicketHome({ users, meetups }: Props) {
                     <Image
                       src="/images/launchweek/8/stars.svg"
                       alt="starts background"
-                      layout="fill"
-                      objectFit="cover"
-                      className="opacity-70 pointer-events-none"
+                      className="opacity-70 object-cover pointer-events-none"
                       draggable={false}
                     />
                   </div>
@@ -156,9 +154,8 @@ export default function TicketHome({ users, meetups }: Props) {
               <div className="absolute w-full aspect-[1/1] md:aspect-[1.5/1] lg:aspect-[2.5/1] inset-0 z-0">
                 <Image
                   src="/images/launchweek/8/LW8-gradient.png"
-                  layout="fill"
-                  objectFit="cover"
-                  objectPosition="top"
+                  fill
+                  className="object-cover object-top"
                   priority
                   draggable={false}
                   alt="Launch Week 8 gradient background"
