@@ -14,7 +14,7 @@ export type DatabaseFunctionUpdateVariables = {
     name: string
     schema: string
     args: string[]
-    behaviour: string // 'VOLATILE' | 'STABLE' | 'IMMUTABLE'
+    behavior: string // 'VOLATILE' | 'STABLE' | 'IMMUTABLE'
     definition: string
     language: string
     return_type: string

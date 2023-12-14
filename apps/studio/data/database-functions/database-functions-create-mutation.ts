@@ -13,7 +13,7 @@ export type DatabaseFunctionCreateVariables = {
     name: string
     schema: string
     args: string[]
-    behaviour: string // 'VOLATILE' | 'STABLE' | 'IMMUTABLE'
+    behavior: string // 'VOLATILE' | 'STABLE' | 'IMMUTABLE'
     definition: string
     language: string
     return_type: string
@@ -34,7 +34,6 @@ export async function createDatabaseFunction({
     params: {
       path: { ref: projectRef },
     },
-    // @ts-ignore [Joshen] API codegen is typed wrongly
     body: payload,
     headers,
   })
