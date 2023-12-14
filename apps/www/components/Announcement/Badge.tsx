@@ -29,12 +29,13 @@ const AnnouncementBadge = ({
     <Link
       href={url}
       target={target}
-      className="
+      className={cn(
+        `
           group/announcement
           relative
           flex flex-row
           items-center
-          pr-3 p-1
+          p-1 pr-3
           text-sm
           w-auto
           gap-2
@@ -48,7 +49,9 @@ const AnnouncementBadge = ({
           shadow-md
           overflow-hidden
           focus-visible:outline-none focus-visible:ring-brand-600 focus-visible:ring-2 focus-visible:rounded-full
-          "
+          `,
+        !badge && 'px-4'
+      )}
     >
       {badge && (
         <Badge color="brand" size="large" className="py-1">

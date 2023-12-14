@@ -18,3 +18,7 @@ export const EXCLUDED_SCHEMAS = [
   'graphql',
   'graphql_public',
 ]
+
+export const EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS = EXCLUDED_SCHEMAS.filter(
+  (x) => x !== 'extensions'
+)

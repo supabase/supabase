@@ -208,10 +208,12 @@ Calling [`signInWithSSO`](/docs/reference/javascript/auth-signinwithsso) starts 
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-supabase.gotrue.loginWith(SSO.withDomain("company.com"))
+supabase.auth.signInWith(SSO) {
+    domain = "company.com"
+}
 ```
 
-Calling [`loginWith(SSO)`](/docs/reference/kotlin/auth-signinwithsso) starts the sign-in process using the identity provider registered for the `company.com` domain name. It is not required that identity providers be assigned one or multiple domain names, in which case you can use the provider's unique ID instead.
+Calling [`signInWith(SSO)`](/docs/reference/kotlin/auth-signinwithsso) starts the sign-in process using the identity provider registered for the `company.com` domain name. It is not required that identity providers be assigned one or multiple domain names, in which case you can use the provider's unique ID instead.
 
 </TabPanel>
 </Tabs>

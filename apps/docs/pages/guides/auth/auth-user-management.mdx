@@ -1,0 +1,87 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'auth-user-management',
+  title: 'User Management',
+  description: 'Manage your users with Supabase Auth',
+  subtitle: 'Manage your users with Supabase Auth',
+}
+
+## The User Object
+
+The user object stores all the information related to a user in your application. The user object can be retrieved using one of these methods:
+
+1. [`supabase.auth.getUser()`](/docs/reference/javascript/auth-getuser)
+2. Retrieve a user object as an admin using [`supabase.auth.admin.getUserById()`](/docs/reference/javascript/auth-admin-listusers)
+
+A user can sign in with one of the following methods:
+
+- Password-based method (with email or phone)
+- Passwordless method (with email or phone)
+- OAuth
+- SAML SSO
+
+An identity describes the authentication method that a user can use to sign in. A user can have multiple identities. These are the types of identities supported:
+
+- Email
+- Phone
+- OAuth
+- SAML
+
+<Admonition type="note">
+
+A user with an email or phone identity will be able to sign in with either a password or passwordless method (e.g. use a one-time password (OTP) or magiclink). By default, a user with an unverified email or phone number will not be able to sign in.
+
+</Admonition>
+
+The user object contains the following attributes:
+
+| Attributes         | Type             | Description                                                                                                                                                                                                                                          |
+| ------------------ | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| id                 | `string`         | The unique id of the identity of the user.                                                                                                                                                                                                           |
+| aud                | `string`         | The audience claim.                                                                                                                                                                                                                                  |
+| role               | `string`         | The role claim used by Postgres to perform Role Level Security (RLS) checks.                                                                                                                                                                         |
+| email              | `string`         | The user's email address.                                                                                                                                                                                                                            |
+| email_confirmed_at | `string`         | The timestamp that the user's email was confirmed. If null, it means that the user's email is not confirmed.                                                                                                                                         |
+| phone              | `string`         | The user's phone number.                                                                                                                                                                                                                             |
+| phone_confirmed_at | `string`         | The timestamp that the user's phone was confirmed. If null, it means that the user's phone is not confirmed.                                                                                                                                         |
+| confirmed_at       | `string`         | The timestamp that either the user's email or phone was confirmed. If null, it means that the user does not have a confirmed email address and phone number.                                                                                         |
+| last_sign_in_at    | `string`         | The timestamp that the user last signed in.                                                                                                                                                                                                          |
+| app_metadata       | `object`         | The `provider` attribute indicates the first provider that the user used to sign up with. The `providers` attribute indicates the list of providers that the user can use to login with.                                                             |
+| user_metadata      | `object`         | Defaults to the first provider's identity data but can contain additional custom user metadata if specified. Refer to [**User Identity**](/docs/guides/auth/auth-identity-linking#the-user-identity) for more information about the identity object. |
+| identities         | `UserIdentity[]` | Contains an object array of identities linked to the user.                                                                                                                                                                                           |
+| created_at         | `string`         | The timestamp that the user was created.                                                                                                                                                                                                             |
+| updated_at         | `string`         | The timestamp that the user was last updated.                                                                                                                                                                                                        |
+
+## Configuration
+
+Supabase Auth provides these [configuration options](/dashboard/project/_/settings/auth) to control user access to your application:
+
+- **Allow new users to sign up**: Users will be able to sign up. If this config is disabled, only existing users can sign in.
+- **Allow unverified email sign in**: Users will not need to have a verified email address to sign in.
+
+  - If enabled, you can structure your RLS policies to provide different access controls to a user with an unverified email and a user with a verified email. For example,
+
+  ```sql
+  -- Allows a user to read all posts regardless of whether they have a verified email address
+  create policy "policy_name"
+  ON public.posts
+  for select to authenticated using (
+      true
+  );
+
+  -- Only allow users with a verified email address to insert posts
+  create policy "policy_name"
+  ON public.posts
+  for insert to authenticated with check (
+      auth.jwt()->>'email_verified' is true
+  );
+  ```
+
+- **Confirm Email (Deprecated)**: Users will need to confirm their email address before signing in for the first time.
+  - Having **Confirm Email** disabled assumes that the user's email does not need to be verified in order to login and implicitly confirms the user's email in the database.
+  - If you previously relied on this config to autoconfirm a user's email address, you can switch to use **Allow unverified email sign in** instead. This new option allows the user to sign in with an unverified email which you can keep track of through the user object. It provides more versatility if you require your users to verify their email address in the future since you can structure your RLS policies to check the user's `email_verified` field.
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

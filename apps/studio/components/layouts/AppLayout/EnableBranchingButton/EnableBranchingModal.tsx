@@ -1,13 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
+import { last } from 'lodash'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   Form_Shadcn_,
+  IconDollarSign,
+  IconExternalLink,
   IconFileText,
   IconGitBranch,
   Modal,
@@ -18,15 +18,18 @@ import SidePanelGitHubRepoLinker from 'components/interfaces/Organization/Integr
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
+import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
 import { useCheckGithubBranchValidity } from 'data/integrations/integrations-github-branch-check'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization, useStore } from 'hooks'
 import { useAppStateSnapshot } from 'state/app-state'
+import BranchingPITRNotice from './BranchingPITRNotice'
+import BranchingPostgresVersionNotice from './BranchingPostgresVersionNotice'
 import GithubRepositorySelection from './GithubRepositorySelection'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { AlertCircleIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import BranchingPlanNotice from './BranchingPlanNotice'
 
 const EnableBranchingModal = () => {
   const { ui } = useStore()
@@ -49,15 +52,22 @@ const EnableBranchingModal = () => {
     orgSlug: selectedOrg?.slug,
   })
 
+  const {
+    data,
+    error: upgradeEligibilityError,
+    isLoading: isLoadingUpgradeEligibility,
+    isError: isErrorUpgradeEligibility,
+    isSuccess: isSuccessUpgradeEligibility,
+  } = useProjectUpgradeEligibilityQuery({
+    projectRef: ref,
+  })
+  const hasMinimumPgVersion =
+    Number(last(data?.current_app_version.split('-') ?? [])?.split('.')[0] ?? 0) >= 15
+
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
   const isFreePlan = subscription?.plan.id === 'free'
 
-  const {
-    data: addons,
-    error: addonsError,
-    isLoading: isLoadingAddons,
-    isError: isErrorAddons,
-  } = useProjectAddonsQuery({ projectRef: ref })
+  const { data: addons } = useProjectAddonsQuery({ projectRef: ref })
   const hasPitrEnabled =
     (addons?.selected_addons ?? []).find((addon) => addon.type === 'pitr') !== undefined
 
@@ -113,6 +123,10 @@ const EnableBranchingModal = () => {
     defaultValues: { branchName: '' },
   })
 
+  const isLoading = isLoadingIntegrations || isLoadingUpgradeEligibility
+  const isError = isErrorIntegrations || isErrorUpgradeEligibility
+  const isSuccess = isSuccessIntegrations && isSuccessUpgradeEligibility
+
   const canSubmit = form.getValues('branchName').length > 0 && !isChecking && isValid
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     if (!ref) return console.error('Project ref is required')
@@ -132,8 +146,8 @@ const EnableBranchingModal = () => {
         hideFooter
         visible={snap.showEnableBranchingModal}
         onCancel={() => snap.setShowEnableBranchingModal(false)}
-        className="!bg"
-        size="medium"
+        className="!bg !max-w-[40rem]"
+        size="xlarge"
       >
         <Form_Shadcn_ {...form}>
           <form
@@ -141,15 +155,26 @@ const EnableBranchingModal = () => {
             onSubmit={form.handleSubmit(onSubmit)}
             onChange={() => setIsValid(false)}
           >
-            <Modal.Content className="px-7 py-5 flex items-center space-x-4">
-              <IconGitBranch strokeWidth={2} size={20} />
-              <div>
-                <p className="text-foreground">Enable database branching</p>
-                <p className="text-sm text-foreground-light">Manage environments in Supabase</p>
+            <Modal.Content className="px-7 py-5 flex items-center justify-between space-x-4">
+              <div className="flex items-center gap-x-4">
+                <IconGitBranch strokeWidth={2} size={20} />
+                <div>
+                  <p className="text-foreground">Enable database branching</p>
+                  <p className="text-sm text-foreground-light">Manage environments in Supabase</p>
+                </div>
               </div>
+              <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                <Link
+                  href="https://supabase.com/docs/guides/platform/branching"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Documentation
+                </Link>
+              </Button>
             </Modal.Content>
 
-            {(isLoadingIntegrations || isLoadingAddons) && (
+            {isLoading && (
               <>
                 <Modal.Separator />
                 <Modal.Content className="px-7 py-6">
@@ -159,41 +184,44 @@ const EnableBranchingModal = () => {
               </>
             )}
 
-            {isErrorAddons && (
+            {isError && (
               <>
                 <Modal.Separator />
                 <Modal.Content className="px-7 py-6">
-                  <AlertError error={addonsError} subject="Failed to retrieve project addons" />
+                  {isErrorIntegrations ? (
+                    <AlertError
+                      error={integrationsError}
+                      subject="Failed to retrieve integrations"
+                    />
+                  ) : isErrorUpgradeEligibility ? (
+                    <AlertError
+                      error={upgradeEligibilityError}
+                      subject="Failed to retrieve Postgres version"
+                    />
+                  ) : null}
                 </Modal.Content>
                 <Modal.Separator />
               </>
             )}
 
-            {hasPitrEnabled ? (
+            {isSuccess && (
               <>
-                {isErrorIntegrations && (
+                {isFreePlan ? (
+                  <BranchingPlanNotice />
+                ) : !hasMinimumPgVersion ? (
+                  <BranchingPostgresVersionNotice />
+                ) : (
                   <>
-                    <Modal.Separator />
-                    <Modal.Content className="px-7 py-6">
-                      <AlertError
-                        error={integrationsError}
-                        subject="Failed to retrieve integrations"
-                      />
-                    </Modal.Content>
-                    <Modal.Separator />
+                    <GithubRepositorySelection
+                      form={form}
+                      isChecking={isChecking}
+                      isValid={canSubmit}
+                      integration={githubIntegration}
+                      hasGithubIntegrationInstalled={hasGithubIntegrationInstalled}
+                    />
+                    {!hasPitrEnabled && <BranchingPITRNotice />}
                   </>
                 )}
-
-                {isSuccessIntegrations && (
-                  <GithubRepositorySelection
-                    form={form}
-                    isChecking={isChecking}
-                    isValid={canSubmit}
-                    integration={githubIntegration}
-                    hasGithubIntegrationInstalled={hasGithubIntegrationInstalled}
-                  />
-                )}
-
                 <Modal.Content className="px-7 py-6 flex flex-col gap-3">
                   <p className="text-sm text-foreground-light">
                     Please keep in mind the following:
@@ -201,98 +229,68 @@ const EnableBranchingModal = () => {
                   <div className="flex flex-row gap-4">
                     <div>
                       <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-300 flex items-center justify-center">
+                        <IconDollarSign className="text-amber-900" size={20} strokeWidth={2} />
+                      </figure>
+                    </div>
+                    <div className="flex flex-col gap-y-1">
+                      <p className="text-sm text-foreground">
+                        Preview branches are billed per hour
+                      </p>
+                      <p className="text-sm text-foreground-light">
+                        Launching a new preview branch incurs additional compute costs, starting at
+                        $0.01344 per hour (~$10/month). This cost will continue for as long as the
+                        branch has not been removed.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex flex-row gap-4 mt-2">
+                    <div>
+                      <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-300 flex items-center justify-center">
                         <IconFileText className="text-amber-900" size={20} strokeWidth={2} />
                       </figure>
                     </div>
-                    <div>
+                    <div className="flex flex-col gap-y-1">
                       <p className="text-sm text-foreground">
-                        You will not be able to use the dashboard to make changes to the database
+                        Branching uses your GitHub repository to apply migrations
                       </p>
                       <p className="text-sm text-foreground-light">
-                        Schema changes for database Preview Branches must be made using git.
-                        Dashboard changes to Preview Branches are coming soon.
+                        Database migrations are handled via the{' '}
+                        <code className="text-xs">./supabase</code> directory in your GitHub repo.
+                        Migration files will run on both Preview Branches and Production when
+                        pushing to and merging git branches.
                       </p>
                     </div>
                   </div>
                 </Modal.Content>
-
-                <Modal.Separator />
-
-                <Modal.Content className="px-7">
-                  <div className="flex items-center space-x-2 py-2 pb-4">
-                    <Button
-                      size="medium"
-                      block
-                      disabled={isCreating}
-                      type="default"
-                      onClick={() => snap.setShowEnableBranchingModal(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      block
-                      size="medium"
-                      form={formId}
-                      disabled={isCreating || !canSubmit}
-                      loading={isCreating}
-                      type="primary"
-                      htmlType="submit"
-                    >
-                      I understand, enable branching
-                    </Button>
-                  </div>
-                </Modal.Content>
               </>
-            ) : (
-              <div className="">
-                <Alert_Shadcn_ className="rounded-none border-r-0 border-l-0 px-7 [&>svg]:left-6">
-                  <AlertCircleIcon strokeWidth={2} />
-                  <AlertTitle_Shadcn_>
-                    Point in time recovery (PITR) is required for branching
-                  </AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_>
-                    This is to ensure that you can always recover data if you make a "bad
-                    migration". For example, if you accidentally delete a column or some of your
-                    production data.
-                  </AlertDescription_Shadcn_>
-                  {isFreePlan && (
-                    <AlertDescription_Shadcn_ className="mt-2">
-                      To enable PITR, you may first upgrade your organization's plan to at least
-                      Pro, then purchase the PITR add on for your project via the{' '}
-                      <Link
-                        href={`/project/${ref}/settings/addons?panel=pitr`}
-                        className="text-brand"
-                      >
-                        project settings
-                      </Link>
-                      .
-                    </AlertDescription_Shadcn_>
-                  )}
-                </Alert_Shadcn_>
-                <Modal.Content className="px-7">
-                  <div className="flex items-center justify-end space-x-2 py-4 pb-4">
-                    <Button
-                      size="tiny"
-                      type="default"
-                      onClick={() => snap.setShowEnableBranchingModal(false)}
-                    >
-                      Understood
-                    </Button>
-                    <Button size="tiny">
-                      <Link
-                        href={
-                          isFreePlan
-                            ? `/org/${selectedOrg?.slug}/billing?panel=subscriptionPlan`
-                            : `/project/${ref}/settings/addons?panel=pitr`
-                        }
-                      >
-                        {isFreePlan ? 'Upgrade to Pro' : 'Enable PITR'}
-                      </Link>
-                    </Button>
-                  </div>
-                </Modal.Content>
-              </div>
             )}
+
+            <Modal.Separator />
+
+            <Modal.Content className="px-7">
+              <div className="flex items-center space-x-2 py-2 pb-4">
+                <Button
+                  size="medium"
+                  block
+                  disabled={isCreating}
+                  type="default"
+                  onClick={() => snap.setShowEnableBranchingModal(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  block
+                  size="medium"
+                  form={formId}
+                  disabled={!isSuccess || isCreating || !canSubmit}
+                  loading={isCreating}
+                  type="primary"
+                  htmlType="submit"
+                >
+                  I understand, enable branching
+                </Button>
+              </div>
+            </Modal.Content>
           </form>
         </Form_Shadcn_>
       </Modal>

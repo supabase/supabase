@@ -6,10 +6,16 @@ import { Alert } from 'ui'
 
 export const COLOR_MAP = {
   white: { bar: 'fill-foreground', marker: 'bg-foreground' },
-  green: { bar: 'fill-green-1000', marker: 'bg-green-1000' },
-  blue: { bar: 'fill-blue-1000', marker: 'bg-blue-1000' },
-  yellow: { bar: 'fill-amber-1000', marker: 'bg-amber-1000' },
-  orange: { bar: 'fill-orange-1000', marker: 'bg-orange-1000' },
+  green: { bar: 'fill-green-800', marker: 'bg-green-800' },
+  'dark-green': { bar: 'fill-green-1000', marker: 'bg-green-1000' },
+  blue: { bar: 'fill-blue-900', marker: 'bg-blue-900' },
+  yellow: { bar: 'fill-yellow-800', marker: 'bg-yellow-800' },
+  'dark-yellow': { bar: 'fill-yellow-1000', marker: 'bg-yellow-1000' },
+  orange: { bar: 'fill-orange-800', marker: 'bg-orange-800' },
+  'dark-orange': { bar: 'fill-orange-1000', marker: 'bg-orange-1100' },
+  red: { bar: 'fill-red-800', marker: 'bg-red-800' },
+  'dark-red': { bar: 'fill-red-1000', marker: 'bg-red-1000' },
+  purple: { bar: 'fill-purple-900', marker: 'bg-purple-900' },
 }
 
 export const Y_DOMAIN_CEILING_MULTIPLIER = 4 / 3
@@ -20,17 +26,30 @@ export const USAGE_STATUS = {
   EXCEEDED: 'EXCEEDED',
 }
 
+export type AttributeColor =
+  | 'white'
+  | 'blue'
+  | 'green'
+  | 'yellow'
+  | 'orange'
+  | 'purple'
+  | 'red'
+  | 'dark-red'
+  | 'dark-orange'
+  | 'dark-yellow'
+  | 'dark-green'
+
 export interface Attribute {
   key: string
   name?: string
-  color: 'white' | 'blue' | 'green' | 'yellow' | 'orange'
+  color: AttributeColor
 }
 export interface CategoryAttribute {
   anchor: string
   key: string // Property from organization usage
   attributes: Attribute[] // For querying against stats-daily / infra-monitoring
   name: string
-  unit: 'bytes' | 'absolute' | 'percentage'
+  unit: 'bytes' | 'absolute' | 'percentage' | 'hours'
   links?: {
     name: string
     url: string
@@ -42,10 +61,10 @@ export interface CategoryAttribute {
   additionalInfo?: (subscription?: OrgSubscription, usage?: OrgUsageResponse) => JSX.Element | null
 }
 
-export type CategoryMetaKey = 'bandwidth' | 'sizeCount' | 'activity'
+export type CategoryMetaKey = 'bandwidth' | 'sizeCount' | 'activity' | 'compute'
 
 export interface CategoryMeta {
-  key: 'bandwidth' | 'sizeCount' | 'activity'
+  key: CategoryMetaKey
   name: string
   description: string
   attributes: CategoryAttribute[]
@@ -58,7 +77,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
     description: 'Amount of data transmitted over all network connections',
     attributes: [
       {
-        anchor: 'dbEgress',
+        anchor: 'egress',
         key: PricingMetric.EGRESS,
         attributes: [
           { key: EgressType.AUTH, name: 'Auth Egress', color: 'yellow' },
@@ -231,7 +250,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         ],
       },
       {
-        anchor: 'functionInvocations',
+        anchor: 'funcInvocations',
         key: PricingMetric.FUNCTION_INVOCATIONS,
         attributes: [{ key: PricingMetric.FUNCTION_INVOCATIONS.toLowerCase(), color: 'white' }],
         name: 'Edge Function Invocations',
@@ -250,7 +269,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         anchor: 'realtimeMessageCount',
         key: PricingMetric.REALTIME_MESSAGE_COUNT,
         attributes: [{ key: PricingMetric.REALTIME_MESSAGE_COUNT.toLowerCase(), color: 'white' }],
-        name: 'Realtime Message Count',
+        name: 'Realtime Messages',
         unit: 'absolute',
         description:
           "Count of messages going through Realtime.\nUsage example: If you do a database change and 5 clients listen to that change via Realtime, that's 5 messages. If you broadcast a message and 4 clients listen to that, that's 5 messages (1 message sent, 4 received).\nBilling is based on the total amount of messages throughout your billing period.",
@@ -263,7 +282,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         ],
       },
       {
-        anchor: 'realtimePeakConnection',
+        anchor: 'realtimePeakConnections',
         key: PricingMetric.REALTIME_PEAK_CONNECTIONS,
         attributes: [
           { key: PricingMetric.REALTIME_PEAK_CONNECTIONS.toLowerCase(), color: 'white' },
