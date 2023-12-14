@@ -13,7 +13,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     ipAddress = forwardedFor.split(',').at(0) ?? 'Unknown'
   }
 
-  return res.status(200).json({ ipAddress, forwardedFor, cfConnectingIp })
+  return res.status(200).json({ ipAddress })
 }
 
 export default handler
