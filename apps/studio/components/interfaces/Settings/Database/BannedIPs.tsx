@@ -67,7 +67,6 @@ const BannedIPs = () => {
     fetch(`/api/get-ip-address`)
       .then((response) => response.json())
       .then((data) => setUserIPAddress(data.ipAddress))
-      .catch((error) => console.error('Error fetching user IP:', error))
   }, [])
 
   return (
