@@ -30,7 +30,6 @@ import {
 import { usePoolingConfigurationUpdateMutation } from 'data/database/pooling-configuration-update-mutation'
 import { useCheckPermissions, useStore } from 'hooks'
 
-const PanelTitle = 'Connection Pooling'
 const formId = 'connection-pooling-form'
 
 const ConnectionPooling = () => {
@@ -49,7 +48,7 @@ const ConnectionPooling = () => {
         <Panel
           title={
             <h5 key="panel-title" className="mb-0">
-              {PanelTitle}
+              Connection Pooling
             </h5>
           }
         >
@@ -175,7 +174,7 @@ export const MainConfig = ({ projectRef, poolingInfo }: MainConfigProps) => {
   return (
     <Panel
       className="mb-8"
-      title={<h5>Connection pooling</h5>}
+      title={<h5>Connection Pooling</h5>}
       footer={
         poolingInfo.pgbouncer_enabled && (
           <FormActions
