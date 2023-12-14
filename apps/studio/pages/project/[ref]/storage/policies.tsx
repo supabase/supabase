@@ -1,4 +1,3 @@
-import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
 import { useEffect } from 'react'
 
@@ -12,14 +11,14 @@ import { NextPageWithLayout } from 'types'
  * PageLayout is used to setup layout - as usual it will requires inject global store
  */
 const PageLayout: NextPageWithLayout = () => {
-  const { ref } = useParams()
-
-  const { meta } = useStore()
+  const { ui, meta } = useStore()
   const { project } = useProjectContext()
 
   useEffect(() => {
-    meta.roles.load()
-  }, [project])
+    if (ui.selectedProjectRef) {
+      meta.roles.load()
+    }
+  }, [ui.selectedProjectRef])
 
   if (!project) return <div></div>
 
