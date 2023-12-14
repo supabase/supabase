@@ -386,9 +386,9 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                 )}
                 {(values.severity === 'Urgent' || values.severity === 'High') && (
                   <p className="text-sm text-foreground-light mt-2">
-                    We do our best to respond to everyone as quickly as possible; however, we
-                    prioritize things based on production status. We ask that you please reserve
-                    High and Urgent severity for production-impacting issues only.
+                    We do our best to respond to everyone as quickly as possible; however,
+                    prioritization will be based on production status. We ask that you reserve High
+                    and Urgent severity for production-impacting issues only.
                   </p>
                 )}
               </div>
@@ -457,7 +457,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                         <p>
                           Pro Plan includes email-based support. You can expect an answer within 1
                           business day in most situation for all severities. We recommend upgrading
-                          to the Team plan for prioritized ticketing for all issues and prioritized
+                          to the Team plan for prioritized ticketing on all issues and prioritized
                           escalation to product engineering teams. Enhanced SLAs for support are
                           available on our Enterprise Plan.
                         </p>
@@ -465,7 +465,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
 
                       {subscription?.plan.id === 'team' && (
                         <p>
-                          Team plan includes email-based support. You get prioritized ticketing for
+                          Team plan includes email-based support. You get prioritized ticketing on
                           all issues and prioritized escalation to product engineering teams. Low,
                           Normal, and High severity tickets will generally be handled within 1
                           business day, while Urgent issues, we respond within 1 day, 365 days a
