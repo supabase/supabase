@@ -6,8 +6,8 @@ import { Button, IconExternalLink } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { FDW, useFDWsQuery } from 'data/fdw/fdws-query'
-import { useStore } from 'hooks'
 import DeleteWrapperModal from './DeleteWrapperModal'
 import WrapperRow from './WrapperRow'
 import { WRAPPERS } from './Wrappers.constants'
@@ -15,22 +15,23 @@ import WrappersDisabledState from './WrappersDisabledState'
 import WrappersDropdown from './WrappersDropdown'
 
 const Wrappers = () => {
-  const { meta } = useStore()
   const { project } = useProjectContext()
   const { data, isLoading } = useFDWsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+  const { data: exts, isLoading: isLoadingExtensions } = useDatabaseExtensionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const wrappersExtension = (exts ?? []).find((ext) => ext.name === 'wrappers')
+  const vaultExtension = (exts ?? []).find((ext) => ext.name === 'supabase_vault')
 
   const [open, setOpen] = useState<string>('')
   const [selectedWrapperToDelete, setSelectedWrapperToDelete] = useState<FDW>()
 
   const wrappers = data?.result ?? []
   const groupedWrappers = groupBy(wrappers, 'handler')
-
-  const wrappersExtension = meta.extensions.byId('wrappers')
-  const vaultExtension = meta.extensions.byId('supabase_vault')
-  const isLoadingExtensions = meta.extensions.isLoading
 
   const isWrappersEnabled =
     wrappersExtension !== undefined &&

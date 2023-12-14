@@ -9,6 +9,7 @@ import { useFlag } from 'hooks'
 import { useState } from 'react'
 import FavoriteButton from './FavoriteButton'
 import SavingIndicator from './SavingIndicator'
+import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 
 export type UtilityActionsProps = {
   id: string
@@ -28,9 +29,9 @@ const UtilityActions = ({
   executeQuery,
 }: UtilityActionsProps) => {
   const os = detectOS()
+  const snap = useSqlEditorStateSnapshot()
   const readReplicasEnabled = useFlag('readReplicas')
   const roleImpersonationEnabledFlag = useFlag('roleImpersonation')
-  const [selectedDatabaseId, setSelectedDatabaseId] = useState<string>('1')
 
   return (
     <>
@@ -67,16 +68,20 @@ const UtilityActions = ({
       </Tooltip.Root>
 
       <div className="flex items-center justify-between gap-x-2 mx-2">
-        {readReplicasEnabled && (
-          <DatabaseSelector
-            selectedDatabaseId={selectedDatabaseId}
-            onChangeDatabaseId={setSelectedDatabaseId}
-          />
-        )}
-
         <div className="flex items-center">
+          {readReplicasEnabled && (
+            <DatabaseSelector
+              variant="connected-on-right"
+              selectedDatabaseId={snap.selectedDatabaseId}
+              onChangeDatabaseId={snap.setSelectedDatabaseId}
+            />
+          )}
+
           {roleImpersonationEnabledFlag && (
-            <RoleImpersonationPopover serviceRoleLabel="postgres" variant="connected-on-right" />
+            <RoleImpersonationPopover
+              serviceRoleLabel="postgres"
+              variant={readReplicasEnabled ? 'connected-on-both' : 'connected-on-right'}
+            />
           )}
 
           <Button

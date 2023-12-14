@@ -35,8 +35,6 @@ type ROW_ACTIONTYPE =
       type: 'SET_ROWS_COUNT'
       payload: number
     }
-  | { type: 'ADD_NEW_ROW'; payload: Dictionary<any> }
-  | { type: 'EDIT_ROW'; payload: { row: Dictionary<any>; idx: number } }
   | { type: 'REMOVE_ROWS'; payload: { rowIdxs: number[] } }
   | { type: 'SELECT_ALL_ROWS'; payload: { selectedRows: ReadonlySet<number> } }
 
@@ -80,24 +78,6 @@ const RowReducer = (state: RowInitialState, action: ROW_ACTIONTYPE) => {
       return {
         ...state,
         totalRows: action.payload,
-      }
-    }
-    case 'ADD_NEW_ROW': {
-      const supaRow = { ...action.payload, idx: state.rows.length }
-      const totalRows = state.totalRows + 1
-      return {
-        ...state,
-        rows: update(state.rows, { $push: [supaRow] }),
-        totalRows: totalRows,
-      }
-    }
-    case 'EDIT_ROW': {
-      const supaRow = { ...action.payload.row, idx: action.payload.idx }
-      return {
-        ...state,
-        rows: update(state.rows, {
-          [action.payload.idx]: { $set: supaRow },
-        }),
       }
     }
     default:

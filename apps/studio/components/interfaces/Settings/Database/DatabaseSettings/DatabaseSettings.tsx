@@ -18,14 +18,15 @@ import DatabaseSelector from 'components/ui/DatabaseSelector'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useFlag, useSelectedOrganization } from 'hooks'
 import { pluckObjectFields } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
-import { MOCK_DATABASES } from '../../Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import ConfirmDisableReadOnlyModeModal from './ConfirmDisableReadOnlyModal'
 import ResetDbPassword from './ResetDbPassword'
+import DatabaseConnectionString from './DatabaseConnectionString'
 
 const DatabaseSettings = () => {
   const router = useRouter()
@@ -37,17 +38,31 @@ const DatabaseSettings = () => {
   const readReplicasEnabled = useFlag('readReplicas')
   const connectionStringsRef = useRef<HTMLDivElement>(null)
 
-  const [selectedDatabaseId, setSelectedDatabaseId] = useState<string>('1')
+  const [selectedDatabaseId, setSelectedDatabaseId] = useState<string>(projectRef ?? '')
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
 
-  // [Joshen] Read replicas mock UI stuff
-  const [open, setOpen] = useState(false)
-  const databases = MOCK_DATABASES
-  const selectedDatabase = databases.find((db) => db.id.toString() === selectedDatabaseId)
-
-  const { data, error, isLoading, isError, isSuccess } = useProjectSettingsQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
+  const {
+    data,
+    error: projectSettingsError,
+    isLoading: isLoadingProjectSettings,
+    isError: isErrorProjectSettings,
+    isSuccess: isSuccessProjectSettings,
+  } = useProjectSettingsQuery({ projectRef })
   const { data: resourceWarnings } = useResourceWarningsQuery()
+  const {
+    data: databases,
+    error: readReplicasError,
+    isLoading: isLoadingReadReplicas,
+    isError: isErrorReadReplicas,
+    isSuccess: isSuccessReadReplicas,
+  } = useReadReplicasQuery({ projectRef })
+  const error = readReplicasEnabled ? readReplicasError : projectSettingsError
+  const isLoading = readReplicasEnabled ? isLoadingReadReplicas : isLoadingProjectSettings
+  const isError = readReplicasEnabled ? isErrorReadReplicas : isErrorProjectSettings
+  const isSuccess = readReplicasEnabled ? isSuccessReadReplicas : isSuccessProjectSettings
+
+  const selectedDatabase = (databases ?? []).find((db) => db.identifier === selectedDatabaseId)
 
   const isReadOnlyMode =
     (resourceWarnings ?? [])?.find((warning) => warning.project === projectRef)
@@ -55,10 +70,10 @@ const DatabaseSettings = () => {
 
   const { project } = data ?? {}
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
-  const connectionInfo =
-    project !== undefined
-      ? pluckObjectFields(project, DB_FIELDS)
-      : { db_user: '', db_host: '', db_port: '', db_name: '' }
+  const emptyState = { db_user: '', db_host: '', db_port: '', db_name: '' }
+  const connectionInfo = readReplicasEnabled
+    ? pluckObjectFields(selectedDatabase || emptyState, DB_FIELDS)
+    : pluckObjectFields(project || emptyState, DB_FIELDS)
 
   const handleCopy = (labelValue?: string) =>
     Telemetry.sendEvent(
@@ -70,18 +85,6 @@ const DatabaseSettings = () => {
       telemetryProps,
       router
     )
-  const uriConnString =
-    `postgresql://${connectionInfo.db_user}:[YOUR-PASSWORD]@` +
-    `${connectionInfo.db_host}:${connectionInfo.db_port.toString()}` +
-    `/${connectionInfo.db_name}`
-  const golangConnString =
-    `user=${connectionInfo.db_user} password=[YOUR-PASSWORD] ` +
-    `host=${connectionInfo.db_host} port=${connectionInfo.db_port.toString()}` +
-    ` dbname=${connectionInfo.db_name}`
-  const psqlConnString =
-    `psql -h ${connectionInfo.db_host} -p ` +
-    `${connectionInfo.db_port.toString()} -d ${connectionInfo.db_name} ` +
-    `-U ${connectionInfo.db_user}`
 
   useEffect(() => {
     if (connectionString !== undefined && connectionStringsRef.current !== undefined) {
@@ -152,9 +155,17 @@ const DatabaseSettings = () => {
 
           <Panel
             title={
-              <h5 key="panel-title" className="mb-0">
-                Connection info
-              </h5>
+              <div className="w-full flex items-center justify-between">
+                <h5 key="panel-title" className="mb-0">
+                  Connection info
+                </h5>
+                {readReplicasEnabled && (
+                  <DatabaseSelector
+                    selectedDatabaseId={selectedDatabaseId}
+                    onChangeDatabaseId={setSelectedDatabaseId}
+                  />
+                )}
+              </div>
             }
             className="!m-0"
           >
@@ -169,9 +180,7 @@ const DatabaseSettings = () => {
                     <ShimmeringLoader className="h-8 w-full col-span-8" delayIndex={i} />
                   </div>
                 ))}
-              {isError && (
-                <AlertError error={error} subject="Failed to retrieve database settings" />
-              )}
+              {isError && <AlertError error={error} subject="Failed to retrieve databases" />}
               {isSuccess && (
                 <>
                   <Input
@@ -222,7 +231,11 @@ const DatabaseSettings = () => {
                     layout="horizontal"
                     disabled
                     readOnly
-                    value={'[The password you provided when you created this project]'}
+                    value={
+                      selectedDatabaseId !== projectRef
+                        ? '[The password for your primary database]'
+                        : '[The password you provided when you created this project]'
+                    }
                     label="Password"
                   />
                 </>
@@ -231,149 +244,9 @@ const DatabaseSettings = () => {
           </Panel>
         </section>
 
+        <DatabaseConnectionString />
+
         <ResetDbPassword disabled={isLoading || isError} />
-
-        <section className="space-y-6">
-          <Panel
-            title={
-              <div ref={connectionStringsRef} className="w-full flex items-center justify-between">
-                <h5 key="panel-title" className="mb-0">
-                  Connection string
-                </h5>
-                {readReplicasEnabled && (
-                  <DatabaseSelector
-                    selectedDatabaseId={selectedDatabaseId}
-                    onChangeDatabaseId={setSelectedDatabaseId}
-                  />
-                )}
-              </div>
-            }
-            className="!m-0"
-          >
-            <Panel.Content>
-              {isLoading && <ShimmeringLoader className="h-8 w-full" />}
-              {isError && (
-                <AlertError error={error} subject="Failed to retrieve database settings" />
-              )}
-              {isSuccess && (
-                <Tabs type="underlined" size="small">
-                  <Tabs.Panel id="psql" label="PSQL">
-                    <Input
-                      copy
-                      readOnly
-                      disabled
-                      value={psqlConnString}
-                      onCopy={() => {
-                        handleCopy('PSQL')
-                      }}
-                    />
-                  </Tabs.Panel>
-
-                  <Tabs.Panel id="uri" label="URI">
-                    <Input
-                      copy
-                      readOnly
-                      disabled
-                      value={uriConnString}
-                      onCopy={() => {
-                        handleCopy('URI')
-                      }}
-                    />
-                  </Tabs.Panel>
-
-                  <Tabs.Panel id="golang" label="Golang">
-                    <Input
-                      copy
-                      readOnly
-                      disabled
-                      value={golangConnString}
-                      onCopy={() => {
-                        handleCopy('Golang')
-                      }}
-                    />
-                  </Tabs.Panel>
-
-                  <Tabs.Panel id="jdbc" label="JDBC">
-                    <Input
-                      copy
-                      readOnly
-                      disabled
-                      value={
-                        `jdbc:postgresql://${
-                          connectionInfo.db_host
-                        }:${connectionInfo.db_port.toString()}` +
-                        `/${connectionInfo.db_name}?user=${connectionInfo.db_user}&password=[YOUR-PASSWORD]`
-                      }
-                      onCopy={() => {
-                        handleCopy('JDBC')
-                      }}
-                    />
-                  </Tabs.Panel>
-
-                  <Tabs.Panel id="dotnet" label=".NET">
-                    <Input
-                      copy
-                      readOnly
-                      disabled
-                      value={
-                        `User Id=${connectionInfo.db_user};Password=[YOUR-PASSWORD];` +
-                        `Server=${
-                          connectionInfo.db_host
-                        };Port=${connectionInfo.db_port.toString()};` +
-                        `Database=${connectionInfo.db_name}`
-                      }
-                      onCopy={() => {
-                        handleCopy('.NET')
-                      }}
-                    />
-                  </Tabs.Panel>
-
-                  <Tabs.Panel id="nodejs" label="Nodejs">
-                    <Input
-                      copy
-                      readOnly
-                      disabled
-                      value={uriConnString}
-                      onCopy={() => {
-                        handleCopy('Nodejs')
-                      }}
-                    />
-                  </Tabs.Panel>
-
-                  <Tabs.Panel id="php" label="PHP">
-                    <Input
-                      copy
-                      readOnly
-                      disabled
-                      value={golangConnString}
-                      onCopy={() => {
-                        handleCopy('PHP')
-                      }}
-                    />
-                  </Tabs.Panel>
-
-                  <Tabs.Panel id="python" label="Python">
-                    <Input
-                      copy
-                      readOnly
-                      disabled
-                      value={
-                        `user=${connectionInfo.db_user} password=[YOUR-PASSWORD]` +
-                        ` host=${
-                          connectionInfo.db_host
-                        } port=${connectionInfo.db_port.toString()}` +
-                        ` database=${connectionInfo.db_name}`
-                      }
-                      onCopy={() => {
-                        handleCopy('Python')
-                      }}
-                    />
-                  </Tabs.Panel>
-                </Tabs>
-              )}
-            </Panel.Content>
-          </Panel>
-        </section>
       </div>
 
       <ConfirmDisableReadOnlyModeModal

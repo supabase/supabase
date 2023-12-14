@@ -23,7 +23,7 @@ const TemplatesList = ({
     >
       <Menu type="border">
         {templates.map((template, i) => {
-          const active = selectedTemplate === template
+          const active = selectedTemplate?.id === template?.id
           return (
             <div
               key={i}

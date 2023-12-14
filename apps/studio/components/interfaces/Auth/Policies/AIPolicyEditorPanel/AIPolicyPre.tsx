@@ -1,24 +1,40 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Copy, FileDiff } from 'lucide-react'
+import { Check, Copy, FileDiff } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { format } from 'sql-formatter'
 import { Button, CodeBlock, cn } from 'ui'
 
 interface AAIPolicyPreProps {
   onDiff: (s: string) => void
   children: string[]
+  className?: string
 }
 
-export const AIPolicyPre = ({ onDiff, children }: AAIPolicyPreProps) => {
+export const AIPolicyPre = ({ onDiff, children, className }: AAIPolicyPreProps) => {
+  const [copied, setCopied] = useState(false)
+
+  useEffect(() => {
+    if (!copied) return
+    const timer = setTimeout(() => setCopied(false), 2000)
+    return () => clearTimeout(timer)
+  }, [copied])
+
   let formatted = (children || [''])[0]
   try {
-    formatted = format(formatted, { language: 'postgresql' })
+    formatted = format(formatted, { language: 'postgresql', keywordCase: 'upper' })
   } catch {}
 
   if (formatted.length === 0) {
     return null
   }
+
+  function handleCopy(formatted: string) {
+    navigator.clipboard.writeText(formatted).then()
+    setCopied(true)
+  }
+
   return (
-    <pre className="rounded-md relative group">
+    <pre className={cn('rounded-md relative group', className)}>
       <CodeBlock
         value={formatted}
         language="sql"
@@ -54,12 +70,8 @@ export const AIPolicyPre = ({ onDiff, children }: AAIPolicyPreProps) => {
         </Tooltip.Root>
         <Tooltip.Root delayDuration={0}>
           <Tooltip.Trigger asChild>
-            <Button
-              type="text"
-              size="tiny"
-              onClick={() => navigator.clipboard.writeText(formatted).then()}
-            >
-              <Copy className="h-4 w-4" />
+            <Button type="text" size="tiny" onClick={() => handleCopy(formatted)}>
+              {copied ? <Check size={16} className="text-brand-600" /> : <Copy size={16} />}
             </Button>
           </Tooltip.Trigger>
           <Tooltip.Portal>

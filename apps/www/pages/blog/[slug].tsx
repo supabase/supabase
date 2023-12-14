@@ -229,7 +229,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
           ],
         }}
       />
-      <DefaultLayout>
+      <DefaultLayout className="overflow-x-hidden">
         <div
           className="
             container mx-auto px-6 py-4 md:py-8 xl:py-16 sm:px-16
@@ -275,7 +275,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                                   <div className="w-10">
                                     <Image
                                       src={author.author_image_url}
-                                      className="border-default rounded-full border"
+                                      className="border-default rounded-full border w-full aspect-square object-cover"
                                       alt={`${author.author} avatar`}
                                       width={40}
                                       height={40}

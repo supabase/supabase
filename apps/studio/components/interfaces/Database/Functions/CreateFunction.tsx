@@ -17,6 +17,7 @@ import { isResponseOk } from 'lib/common/fetch'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { SupaResponse } from 'types'
 import { convertArgumentTypes, convertConfigParams, hasWhitespace } from './Functions.utils'
+import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 
 // [Refactor] Remove local state, just use the Form component
 
@@ -755,13 +756,15 @@ const SelectSchema = observer(({}) => {
 })
 
 const SelectLanguage = observer(({}) => {
-  const { meta } = useStore()
   const _localState = useContext(CreateFunctionContext)
+  const { project } = useProjectContext()
 
-  const [enabledExtensions] = partition(
-    meta.extensions.list(),
-    (ext: any) => !isNull(ext.installed_version)
-  )
+  const { data } = useDatabaseExtensionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
+  const [enabledExtensions] = partition(data ?? [], (ext: any) => !isNull(ext.installed_version))
 
   return (
     <Listbox
