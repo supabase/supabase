@@ -111,6 +111,7 @@ const StringToPositiveNumber = z.union([
     .string()
     .max(0, 'The field accepts only a number')
     .transform((v) => null),
+  z.null(),
 ])
 
 const FormSchema = z.object({
