@@ -1336,7 +1336,7 @@ export default {
       data-open:animate-dropdown-content-show
       data-closed:animate-dropdown-content-hide
     `,
-    with_icon: 'pl-10',
+    with_icon: 'pl-2',
     addOnBefore: `
       w-full flex flex-row items-center space-x-3
     `,
