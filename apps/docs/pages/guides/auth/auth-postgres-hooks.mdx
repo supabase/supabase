@@ -18,14 +18,13 @@ Hooks might help you:
 - Add additional custom claims to your JWT
 
 
-You can use hooks at specific points along an Auth flow to perform custom behaviour via PostgreSQL Functions.  Currently, the following hooks are available:
+You can use hooks at specific points along an Auth flow to perform custom behaviour via PostgreSQL Functions. These are known as **extensibility points**. Currently, the following extensibility points are available:
 
-
-| Hook                            | Available on Plan      |
-|---------------------------------|------------------------|
-| MFA Verification Attempt Hook   | Teams and Enterprise   |
-| Password Verification Attempt Hook | Teams and Enterprise |
-| Custom Access Token Hook        | Free                   |
+| Extensibility Point              | Available on Plan       |
+|----------------------------------|-------------------------|
+| MFA Verification Attempt         | Teams and Enterprise    |
+| Password Verification Attempt    | Teams and Enterprise    |
+| Custom Access Token              | Free                    |
 
 
 
@@ -58,9 +57,9 @@ Below is a flow chart illustrating how Supabase Auth makes use of an Auth Hook:
 ## Creating and Managing Hooks
 ### Writing a Hook
 
-Head to the `SQL Editor > Templates` and select the corresponding template (e.g. `MFA Verification Attempt` ). This will generate a function signature for the corresponding extensibility point.
+Head to the `SQL Editor > Templates` and select the corresponding template (e.g. `MFA Verification Attempt` ). This will generate an example function for the corresponding extensibility point.
 
-Here is an example for the *MFA Verification Attempt* Hook
+Here is an example of what a function outline for the  *MFA Verification Attempt* Hook would look like:
 
 ```sql
 create
@@ -77,7 +76,7 @@ $$ language plpgsql;
 
 ### Assigning Hook Permissions
 
-Supabase Auth will invoke this function with the `supabase_auth_admin` role which does not have permissions to modify the `public` schema. So you should grant `supabase_auth_admin` additional permissions to execute the function you have defined:
+Supabase Auth will invoke a hook with the `supabase_auth_admin` role. The `supabase_auth_admin` role does not have permissions to modify the `public` schema by default - you will need to grant the role additional permissions to execute the function you have defined:
 
 ```sql
 grant execute
@@ -85,7 +84,7 @@ grant execute
 	to supabase_auth_admin;
 ```
 
-Finally to make sure this function and table are not accessible from Supabase Serverless APIs, revoke those permissions from the `authenticated` and `anon` roles:
+Also revoke permissions from the `authenticated` and `anon` roles to ensure the tafunction is not accessible by Supabase Serverless APIs.
 
 ```sql
 revoke execute
@@ -100,7 +99,6 @@ Avoid adding a `security definer` tag to the function to avoid permission errors
 By default, Postgres functions are tagged with `security invoker` and will run with the permissions of the user that calls it. In the case of Auth Hooks, `supabase_auth_admin`  is the invoker and it will run with the permissions of `supabase_auth_admin`.
 
 In contrast, the `security definer` tag specifies that the hook is to be executed with the privileges of the user that owns it.  In the case of functions created via the Supabase Dashboard this is `postgres` which does not have permissions over the Auth schema. Introducing a `security definer` tag could prevent Supabase Auth from having the appropriate permissions to access tables or execute functions.
-
 
 
 ### Timeouts
@@ -177,12 +175,6 @@ In the dashboard, navigate to `Authentication > Hooks (Beta)` and select the app
 ![Hooks UI](/docs/img/guides/auth-postgres-hooks/hooks-ui.png)
 
 
-
-
-## Use Cases
-
-Based on user feedback, we decided on a few use cases to illustrate how a hook works. These use cases are not exhaustive and you can opt to [write your own hook](#writing-your-own-hook) if you have a use case which doesn’t fit any of the examples below.
-
 ## MFA Verification Attempt Hook
 
 You can use hooks to enforce restrictions beyond the default [Supabase MFA implementation](https://supabase.com/docs/guides/auth/auth-mfa). For example, you can:
@@ -231,23 +223,8 @@ Example output:
 
 #### On Error
 
-Return this if your hook processed the input with some error.
+Returns the default http error.
 
-- `error` An object that contains information about the error.
-    - `http_code` A number indicating the HTTP code to be returned. If not set, the code is HTTP 500 Internal Server Error.
-    - `message` A message to be returned in the HTTP response. Must be set.
-- In general all other fields attached to the returned JSON are ignored.
-
-Example output:
-
-```jsx
-{
-  "error": {
-    "http_code": 429,
-    "message": "You can only verify a factor once every 10 seconds."
-  }
-}
-```
 ## Password Verification Attempts Hook
 
 As with the MFA Verification Hooks, you may wish to increase security beyond the requirements of the default password implementation in order to fulfil security or compliance requirements.
@@ -256,7 +233,7 @@ This hook allows you to introduce additional constraints around password verific
 
 ### Inputs
 
-- `user_id`Unique identifier for the user attempting to sign in. Correlate this to the `auth.users` table.
+- `user_id` Unique identifier for the user attempting to sign in. Correlate this to the `auth.users` table.
 - `valid` Whether the password verification attempt was valid.
 
 ```json
@@ -290,79 +267,36 @@ Example output:
 
 #### On Error
 
-Return this if your hook processed the input with some error.
-
-- `error` An object that contains information about the error.
-    - `http_code` A number indicating the HTTP code to be returned. If not set, the code is HTTP 500 Internal Server Error.
-    - `message` A message to be returned in the HTTP response. Must be set.
-- In general all other fields attached to the returned JSON are ignored.
-
-Example output:
-
-```jsx
-{
-  "error": {
-    "http_code": 429,
-    "message": "You can only verify a factor once very 10 seconds."
-  }
-}
-```
+Returns the default http error
 
 ## Custom Access Token Hook
 
 The custom access token hook runs before a token is issued and allows you to add additional claims based on the authentication method used or add additional metadata to select users.
+Claims returned must conform to our specification. While you are free to add claims, you can only remove the `user_metadata` and app_metadata claims as we rely on the rest  of the claims for proper functioning of the service.
+
 
 ### Inputs
 
 - `user_id`Unique identifier for the user attempting to sign in. Correlate this to the `auth.users` table.
 - `claims` Claims which are attached to the access token.
 - `authentication_method` the authentication method used to request the access token. Possible values include:
-    - `oauth`
-    - `password`
-    - `otp`
-    - `totp`
-    - `recovery`
-    - `invite`
-    - `sso/saml`
-    - `magiclink`
-    - `email/signup`
-    - `email_change`
-    - `token_refresh`
+`oauth`, `password`, `otp`, `totp`, `recovery`, `invite`, `sso/saml`, `magiclink`, `email/signup`, `email_change`, `token_refresh`.
+
+
 
 ### Outputs
 
 In exchange your hook should return back a JSON object with these fields set:
 
-********************************On Success********************************
+#### Success
 
 Return these only if your hook processed the input without errors.
 
 - `claims` A json containing the updated claims after the hook has been run
 
-****************On Error****************
+#### On Error
 
-Return this if your hook processed the input with some error.
-
-- `error` An object that contains information about the error.
-    - `http_code` A number indicating the HTTP code to be returned. If not set, the code is HTTP 500 Internal Server Error.
-    - `message` A message to be returned in the HTTP response. Must be set.
-- In general all other fields attached to the returned JSON are ignored.
-
-
-
-<Admonition type="warn">
-Claims returned must conform to our specification. While you are free to add claims, you can only remove the `user_metadata` and app_metadata claims as we rely on the rest  of the claims for proper functioning of the service.
-</Admonition>
-Example output:
-
-```jsx
-{
-  "error": {
-    "http_code": 429,
-    "message": "You can only verify a factor once very 10 seconds."
-  }
-}
-```
+Returns the default http error
 
 ## Examples
 
@@ -454,7 +388,7 @@ create function public.hook_mfa_verification_attempt(event jsonb)
 	$$;
 ```
 
-Supabase Auth will invoke this function with the `supabase_auth_admin` role which does not have permissions to modify the `public` schema. So you should grant it appropriate permissions:
+Assign appropriate permissions to `supabase_auth_admin`:
 
 ```sql
 grant execute
@@ -466,7 +400,7 @@ grant all
 	to supabase_auth_admin;
 ```
 
-Finally to make sure this function and table are not accessible from Supabase Serverless APIs, revoke those permissions from the `authenticated` and `anon` roles:
+Revoke permissions from `authenticated` and `anon` to prevent unintentional access by Supabase Serverless APIs.
 
 ```sql
 revoke execute
@@ -565,7 +499,7 @@ create function public.hook_password_verification_attempt(event jsonb)
 	$$;
 ```
 
-Supabase Auth will invoke this function with the `supabase_auth_admin` role which does not have permissions to modify the `public` schema. So you should grant it appropriate permissions:
+Grant appropriate permissions to `supabase_auth_admin`
 
 ```sql
 grant execute
@@ -577,7 +511,7 @@ grant all
 	to supabase_auth_admin;
 ```
 
-Finally to make sure this function and table are not accessible from Supabase Serverless APIs, revoke those permissions from the `authenticated` and `anon` roles:
+Revoke permissions from `authenticated` and `anon` to prevent unintentional access by Supabase Serverless APIs.
 
 ```sql
 revoke execute
