@@ -41,8 +41,6 @@ Users that signed up with [SAML SSO](/docs/guides/auth/sso/auth-sso-saml) will n
 
 ### Manual linking (Beta)
 
-Supabase Auth allows a user to initiate identity linking with a different email address when they are logged in. To link an OAuth identity to the user, call [`linkIdentity()`](/docs/reference/javascript/auth-linkidentity):
-
 <Tabs
   scrollable
   size="small"
@@ -52,12 +50,16 @@ Supabase Auth allows a user to initiate identity linking with a different email 
 >
 <TabPanel id="js" label="JavaScript">
 
+Supabase Auth allows a user to initiate identity linking with a different email address when they are logged in. To link an OAuth identity to the user, call [`linkIdentity()`](/docs/reference/javascript/auth-linkidentity):
+
 ```js
 const { data, error } = await supabase.auth.linkIdentity({ provider: 'google' })
 ```
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+
+Supabase Auth allows a user to initiate identity linking with a different email address when they are logged in. To link an OAuth identity to the user, call [`linkIdentity()`](/docs/reference/kotlin/auth-linkidentity):
 
 ```kotlin
 supabase.auth.linkIdentity(Google)
@@ -69,8 +71,6 @@ In the example above, the user will be redirected to Google to complete the OAut
 
 ## Unlink an identity
 
-You can use [`getUserIdentities()`](/docs/reference/javascript/auth-getuseridentities) to fetch all the identities linked to a user. Then, call [`unlinkIdentity()`](/docs/reference/javascript/auth-unlinkidentity) to unlink the identity. The user needs to be logged in and have at least 2 linked identities in order to unlink an existing identity.
-
 <Tabs
   scrollable
   size="small"
@@ -79,6 +79,8 @@ You can use [`getUserIdentities()`](/docs/reference/javascript/auth-getuserident
   queryGroup="language"
 >
 <TabPanel id="js" label="JavaScript">
+
+You can use [`getUserIdentities()`](/docs/reference/javascript/auth-getuseridentities) to fetch all the identities linked to a user. Then, call [`unlinkIdentity()`](/docs/reference/javascript/auth-unlinkidentity) to unlink the identity. The user needs to be logged in and have at least 2 linked identities in order to unlink an existing identity.
 
 ```js
 // retrieve all identities linked to a user
@@ -95,6 +97,8 @@ const { data, error } = await supabase.auth.unlinkIdentity(googleIdentity)
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
+
+You can use [`currentIdentitiesOrNull()`](/docs/reference/kotlin/auth-getuseridentities) to get all the identities linked to a user. Then, call [`unlinkIdentity()`](/docs/reference/kotlin/auth-unlinkidentity) to unlink the identity. The user needs to be logged in and have at least 2 linked identities in order to unlink an existing identity.
 
 ```kotlin
 //get all identities linked to a user
