@@ -1286,6 +1286,7 @@ export const platform: NavMenuConstant = {
         { name: 'Compute Add-ons', url: '/guides/platform/compute-add-ons' },
         { name: 'Custom Domains', url: '/guides/platform/custom-domains' },
         { name: 'Database Backups', url: '/guides/platform/backups' },
+        { name: 'Read Replicas', url: '/guides/platform/read-replicas' },
       ],
     },
     {
