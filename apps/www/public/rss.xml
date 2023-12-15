@@ -8,6 +8,13 @@
       <lastBuildDate>Thu, 14 Dec 2023 23:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/introducing-read-replicas</guid>
+  <title>Introducing Read Replicas</title>
+  <link>https://supabase.com/blog/introducing-read-replicas</link>
+  <description>We are launching support for database Read Replicas</description>
+  <pubDate>Thu, 14 Dec 2023 23:00:00 GMT</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/client-libraries-v2</guid>
   <title>Supabase Libraries V2: Python, Swift, Kotlin, Flutter, and Typescript</title>
   <link>https://supabase.com/blog/client-libraries-v2</link>
