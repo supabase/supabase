@@ -113,7 +113,7 @@ const AdventCard = ({ day, index }: { day: AdventDay; index: number }) => {
                 href={link.url}
                 title={link.label}
                 target={link.target ?? '_self'}
-                className="w-8 h-8 md:w-6 md:h-6 xl:w-16 xl:h-16 xl:p-1 inline-flex items-center justify-center pointer-events-auto transition-colors text-foreground-light hover:text-foreground"
+                className="w-8 h-8 md:w-6 md:h-6 xl:w-14 xl:h-14 xl:p-1 inline-flex items-center justify-center pointer-events-auto transition-colors text-foreground-light hover:text-foreground"
               >
                 {link.icon}
               </Link>
