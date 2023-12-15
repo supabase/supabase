@@ -29,7 +29,7 @@ This is deployed within the Fly infrastructure, making it the fastest Postgres d
 
 ## Managing expectations
 
-Before you get too excited, this will be a progressive rollout. It turns out that building inter-company integrations is a lot of work when you factor in billing, support hand off, and educating Supabase staff how to understand [sandwich analogies](https://fly.io/blog/carving-the-scheduler-out-of-our-orchestrator/). 
+Before you get too excited, this will be a progressive rollout. It turns out that building inter-company integrations is a lot of work when you factor in billing, support hand off, and educating Supabase staff how to understand [sandwich analogies](https://fly.io/blog/carving-the-scheduler-out-of-our-orchestrator/).
 
 We’ve been working with a few early testers and we have some bugs to iron out. You can [sign up for the waitlist](https://forms.supabase.com/fly-postgres) if you want to help with testing. We’ll release timelines as we are confident that your data is safe.
 
@@ -39,7 +39,7 @@ We’re excited about what this partnership means for 2024. Namely, distributing
 
 ## Managed vs unmanaged Postgres
 
-Fly’s current Postgres offering is [unmanaged](https://fly.io/docs/postgres/getting-started/what-you-should-know). This means that you’re responsible for handling scaling, point in time backups, replication, major version upgrades, etc. We’ll be running Fly’s *managed* Postgres, which means that we do all that for you, so that you can concentrate on building. 
+Fly’s current Postgres offering is [unmanaged](https://fly.io/docs/postgres/getting-started/what-you-should-know). This means that you’re responsible for handling scaling, point in time backups, replication, major version upgrades, etc. We’ll be running Fly’s _managed_ Postgres, which means that we do all that for you, so that you can concentrate on building.
 
 The managed service is built on the [Fly extension API](https://fly.io/docs/reference/extensions_api/) (which [Fly Redis](https://fly.io/docs/reference/redis/) also uses). While it’s in alpha, you can launch it using the `extension` command:
 
@@ -61,25 +61,25 @@ Let’s dig into the implementation.
 
 ### **Working with Fly machines**
 
-Fly Postgres is built on top of [Fly machines](https://fly.io/docs/machines/). Machines are light-weight VMs deployed via Firecracker. The Machines API offers substantial control over an application’s lifecycle. They can be suspended during inactivity and resumed within a couple of seconds whenever a new request arrives. 
+Fly Postgres is built on top of [Fly machines](https://fly.io/docs/machines/). Machines are light-weight VMs deployed via Firecracker. The Machines API offers substantial control over an application’s lifecycle. They can be suspended during inactivity and resumed within a couple of seconds whenever a new request arrives.
 
-We built [fly-admin](https://github.com/supabase/fly-admin), a Typescript wrapper to simplify our interaction with the Fly API. Since Supabase bundles a few extra services into Postgres, we prepared a single Docker image which we can pass to the Fly Machines API. Our current build process involves building an AMI for AWS using [Packer](https://www.packer.io/). We re-use parts of that pipeline to build an [All In One Image](https://github.com/supabase/postgres/tree/develop/docker/all-in-one). This image has all the necessary services to run a Supabase project within a single Docker container. 
+We built [fly-admin](https://github.com/supabase/fly-admin), a Typescript wrapper to simplify our interaction with the Fly API. Since Supabase bundles a few extra services into Postgres, we prepared a single Docker image which we can pass to the Fly Machines API. Our current build process involves building an AMI for AWS using [Packer](https://www.packer.io/). We re-use parts of that pipeline to build an [All In One Image](https://github.com/supabase/postgres/tree/develop/docker/all-in-one). This image has all the necessary services to run a Supabase project within a single Docker container.
 
 ### **Move to multi-cloud**
 
-With this launch, Supabase is officially multi-cloud. We deliberately avoided using managed services from cloud providers when building Supabase on AWS to simplify multi-cloud transition. These transitions are never simple because even the base primitives offered between cloud providers can vary significantly. 
+With this launch, Supabase is officially multi-cloud. We deliberately avoided using managed services from cloud providers when building Supabase on AWS to simplify multi-cloud transition. These transitions are never simple because even the base primitives offered between cloud providers can vary significantly.
 
-For example, Fly Machines offer a simple method for suspending a VM when it's not in use and transparently resuming it within seconds. This simplifies the process of pausing inactive databases. There is no direct primitive on AWS to achieve this. 
+For example, Fly Machines offer a simple method for suspending a VM when it's not in use and transparently resuming it within seconds. This simplifies the process of pausing inactive databases. There is no direct primitive on AWS to achieve this.
 
-On the other hand, we had to work around a few AWS primitives that Fly doesn’t provide. Fly machines don’t have network-attached storage, so we need to treat any data in Fly volumes as ephemeral. To address this, we enable physical backups for all projects running on Fly, using WAL-G. Database changes are continuously streamed to S3. When there is a host or volume corruption, we restore the project to a new Fly host using the latest data in S3. 
+On the other hand, we had to work around a few AWS primitives that Fly doesn’t provide. Fly machines don’t have network-attached storage, so we need to treat any data in Fly volumes as ephemeral. To address this, we enable physical backups for all projects running on Fly, using WAL-G. Database changes are continuously streamed to S3. When there is a host or volume corruption, we restore the project to a new Fly host using the latest data in S3.
 
-To capture host issues on AWS, we listen to [AWS Health events](https://docs.aws.amazon.com/health/latest/ug/aws-health-concepts-and-terms.html). For Fly, we send the Machine logs to [Logflare](https://logflare.com/) using the [fly-log-shipper](https://github.com/superfly/fly-log-shipper). 
+To capture host issues on AWS, we listen to [AWS Health events](https://docs.aws.amazon.com/health/latest/ug/aws-health-concepts-and-terms.html). For Fly, we send the Machine logs to [Logflare](https://logflare.com/) using the [fly-log-shipper](https://github.com/superfly/fly-log-shipper).
 
-In addition to publishing images in AWS’s container registry, we publish the All In One image to Fly’s Docker registry. This improved the reliability and performance of project launches on Fly. 
+In addition to publishing images in AWS’s container registry, we publish the All In One image to Fly’s Docker registry. This improved the reliability and performance of project launches on Fly.
 
 ### **Building the Fly extension**
 
-Fly have an [excellent approach](https://fly.io/docs/reference/extensions_api/) for extending their platform. We added a few routes to our API to provision users and projects and we were on our way. 
+Fly have an [excellent approach](https://fly.io/docs/reference/extensions_api/) for extending their platform. We added a few routes to our API to provision users and projects and we were on our way.
 
 Fly users can access the Supabase dashboard using their existing Fly credentials. The Supabase API initiates an OAuth flow with Fly to authenticate the user. Our Auth team created a [Fly OAuth provider](https://github.com/supabase/gotrue/pull/1261) to make the integration with our API easier.
 
@@ -93,11 +93,11 @@ The [network restrictions](https://supabase.com/docs/guides/platform/network-res
 
 **Backups within Fly**
 
-Fly projects are backed up to S3 since Fly doesn’t provide a managed Blob storage (yet). This incurs inter-cloud bandwidth fees which can get pretty high quickly. To minimize these costs and keep more of the infrastructure within Fly, we are exploring the possibility of deploying something like Minio within Fly. We heard some [rumors](https://community.fly.io/t/blob-storage-without-blowing-transit-budget/9903/5) that Fly is working on Blob Storage too. 
+Fly projects are backed up to S3 since Fly doesn’t provide a managed Blob storage (yet). This incurs inter-cloud bandwidth fees which can get pretty high quickly. To minimize these costs and keep more of the infrastructure within Fly, we are exploring the possibility of deploying something like Minio within Fly. We heard some [rumors](https://community.fly.io/t/blob-storage-without-blowing-transit-budget/9903/5) that Fly is working on Blob Storage too.
 
 ## Getting started
 
-Sign up for the preview [here](https://forms.supabase.com/fly-postgres), wait till we allowlist your org and get started with the [Quickstart](https://supabase.com/docs/guides/platform/fly-postgres#quickstart) in our docs. 
+Sign up for the preview [here](https://forms.supabase.com/fly-postgres), wait till we allowlist your org and get started with the [Quickstart](https://supabase.com/docs/guides/platform/fly-postgres#quickstart) in our docs.
 
 Fly Postgres users get one free project. The rest of the pricing is similar to our existing pricing.
 
