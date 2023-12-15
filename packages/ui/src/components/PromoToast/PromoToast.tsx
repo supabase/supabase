@@ -3,8 +3,6 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Button, cn } from 'ui'
 import { LOCAL_STORAGE_KEYS } from 'common'
-import announcement from '../../layout/banners/data/Announcement.json'
-import CountdownComponent from '../CountdownWidget/Countdown'
 import PromoBg from './PromoBg'
 
 const LWXLogo =
