@@ -3,8 +3,6 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Button, cn } from 'ui'
 import { LOCAL_STORAGE_KEYS } from 'common'
-import announcement from '../../layout/banners/data/Announcement.json'
-import CountdownComponent from '../CountdownWidget/Countdown'
 import PromoBg from './PromoBg'
 
 const LWXLogo =
@@ -44,12 +42,12 @@ const PromoToast = () => {
           <p>Launch Week</p>
           <Image src={LWXLogo} alt="Supabase Launch Week X Logo" width={14} height={14} />
         </div>
-        <span className="text-sm leading-4 mt-2">Day 4: Supabase Auth Day</span>
+        <span className="text-sm leading-4 mt-2">Day 5: introducing Read Replicas</span>
       </div>
 
       <div className="relative z-10 flex items-center space-x-2">
         <Button asChild type="secondary">
-          <Link target="_blank" rel="noreferrer" href="https://supabase.com/launch-week#day-4">
+          <Link target="_blank" rel="noreferrer" href="https://supabase.com/launch-week#day-5">
             Go to Launch Week
           </Link>
         </Button>

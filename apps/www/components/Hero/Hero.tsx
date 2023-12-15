@@ -7,7 +7,6 @@ import { Button, IconBookOpen } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import HeroFrameworks from './HeroFrameworks'
 import styles from './hero.module.css'
-import Image from 'next/image'
 import AnnouncementBadge from '../Announcement/Badge'
 
 const Hero = () => {
@@ -32,8 +31,8 @@ const Hero = () => {
                 <div className="flex flex-col items-center">
                   <div className="z-40 w-full flex justify-center mb-8 lg:mb-8">
                     <AnnouncementBadge
-                      announcement="Launch Week X — Day 4"
-                      url="/launch-week#day-4"
+                      announcement="Launch Week X — Day 5"
+                      url="/launch-week#day-5"
                       badge="Live"
                     />
                   </div>
