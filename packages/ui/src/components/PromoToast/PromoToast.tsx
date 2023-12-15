@@ -44,12 +44,12 @@ const PromoToast = () => {
           <p>Launch Week</p>
           <Image src={LWXLogo} alt="Supabase Launch Week X Logo" width={14} height={14} />
         </div>
-        <span className="text-sm leading-4 mt-2">Day 4: Supabase Auth Day</span>
+        <span className="text-sm leading-4 mt-2">Day 5: Read Replicas</span>
       </div>
 
       <div className="relative z-10 flex items-center space-x-2">
         <Button asChild type="secondary">
-          <Link target="_blank" rel="noreferrer" href="https://supabase.com/launch-week#day-4">
+          <Link target="_blank" rel="noreferrer" href="https://supabase.com/launch-week#day-5">
             Go to Launch Week
           </Link>
         </Button>
