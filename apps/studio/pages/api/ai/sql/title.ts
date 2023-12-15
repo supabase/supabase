@@ -1,5 +1,4 @@
-import { ContextLengthError } from 'common/ai/errors'
-import { titleSql } from 'common/ai/sql'
+import { ContextLengthError, titleSql } from 'ai-commands'
 import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { OpenAI } from 'openai'

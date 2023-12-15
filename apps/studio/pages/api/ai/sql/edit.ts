@@ -1,5 +1,4 @@
-import { ContextLengthError, EmptySqlError } from 'common/ai/errors'
-import { editSql } from 'common/ai/sql'
+import { ContextLengthError, EmptySqlError, editSql } from 'ai-commands'
 import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { OpenAI } from 'openai'

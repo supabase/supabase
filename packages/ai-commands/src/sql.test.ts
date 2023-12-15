@@ -5,6 +5,7 @@ import { collectStream, extractMarkdownSql, formatSql } from '../test/util'
 import { chatRlsPolicy, debugSql, editSql, generateSql, titleSql } from './sql'
 
 const openAiKey = process.env.OPENAI_KEY
+console.log(openAiKey)
 const openai = new OpenAI({ apiKey: openAiKey })
 
 describe('generate', () => {
