@@ -193,7 +193,6 @@ const days: WeekDayProps[] = [
     dd: 'Thu',
     title: '',
     shipped: true,
-    isToday: true,
     hasCountdown: false,
     blog: '/blog/supabase-auth-identity-linking-hooks',
     date: '14 Dec',
@@ -201,7 +200,7 @@ const days: WeekDayProps[] = [
     description: (
       <>
         Supabase Auth: <strong>Identity Linking</strong>, <strong>Session Control</strong>,{' '}
-        <strong>Passwords</strong> and <strong>Hooks</strong>
+        <strong>Password Protection</strong> and <strong>Hooks</strong>
       </>
     ),
     links: [
@@ -237,19 +236,44 @@ const days: WeekDayProps[] = [
     d: 5,
     dd: 'Fri',
     title: '',
-    shipped: false,
-    hasCountdown: true,
-    blog: '',
+    shipped: true,
+    isToday: true,
+    hasCountdown: false,
+    blog: '/blog/introducing-read-replicas',
     date: '15 Dec',
     published_at: '2023-12-15T08:00:00.000-08:00',
-    description: '',
+    description: (
+      <>
+        Introducing <strong>Read Replicas</strong> for low latency
+      </>
+    ),
     links: [
+      {
+        type: 'blog',
+        href: '/blog/introducing-read-replicas',
+      },
+      {
+        type: 'video',
+        href: 'PX3R1fXjJ2M',
+      },
       {
         type: 'xSpace',
         href: 'https://twitter.com/i/spaces/1vAxRvjmvRgxl',
       },
     ],
-    steps: [],
+    steps: [
+      {
+        title: '',
+        blog: '/blog/introducing-read-replicas',
+        bg_layers: [
+          {
+            img: '/images/launchweek/lwx/day5/d5_read_replicas.svg',
+            mobileImg: '/images/launchweek/lwx/day5/d5_read_replicas_mobile.svg',
+          },
+        ],
+        steps: [],
+      },
+    ],
   },
 ]
 

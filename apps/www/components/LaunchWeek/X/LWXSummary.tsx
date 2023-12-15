@@ -32,13 +32,11 @@ const LWXSummary = () => {
             (day, i: number) =>
               day.shipped && (
                 <ol key={day.id}>
-                  <Link
-                    href={day.blog}
-                    className="group flex items-center justify-between py-1 hover:text-foreground"
-                  >
-                    <span>
-                      Day {i + 1} - {day.description}
+                  <Link href={day.blog} className="group flex py-1 gap-2 hover:text-foreground">
+                    <span className="shrink-0 text-sm font-mono uppercase leading-6">
+                      Day {i + 1} -
                     </span>
+                    <span className="leading-6">{day.description}</span>
                   </Link>
                 </ol>
               )
