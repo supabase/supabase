@@ -29,6 +29,7 @@
     "@radix-ui/react-accordion": "^1.1.2",
     "@supabase/auth-helpers-react": "^0.4.2",
     "@supabase/supabase-js": "^2.38.2",
+    "@tanstack/react-query": "^5.13.4",
     "common": "*",
     "config": "*",
     "framer-motion": "^6.5.1",

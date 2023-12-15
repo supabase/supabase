@@ -1,8 +1,8 @@
 import { type paths } from '~/types/api'
 import createClient from 'openapi-fetch'
 import { v4 as uuidv4 } from 'uuid'
-import { API_URL, LOCAL_SUPABASE } from './constants'
-import { getAccessToken } from './userAuth'
+import { API_URL } from '../constants'
+import { getAccessToken } from '../userAuth'
 
 const DEFAULT_HEADERS = {
   'Content-Type': 'application/json',
