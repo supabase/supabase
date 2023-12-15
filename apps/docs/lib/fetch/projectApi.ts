@@ -1,6 +1,6 @@
 import { ResponseError } from '~/types/fetch'
 import { get } from './fetchWrappers'
-import { QueryClient, UseQueryOptions, useQuery } from '@tanstack/react-query'
+import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 
 const projectApiKeys = {
   api: (projectRef: string | undefined) => ['projects', projectRef, 'api'] as const,
@@ -42,11 +42,4 @@ export function useProjectApiQuery<TData = ProjectApiData>(
     enabled,
     ...options,
   })
-}
-
-export function invalidateProjectApiQuery(
-  { projectRef }: ProjectApiVariables,
-  queryClient: QueryClient
-) {
-  return queryClient.invalidateQueries({ queryKey: projectApiKeys.api(projectRef) })
 }

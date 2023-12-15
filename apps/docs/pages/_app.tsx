@@ -6,18 +6,35 @@ import '../styles/prism-okaidia.scss'
 
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { createClient } from '@supabase/supabase-js'
-import { QueryClientProvider } from '@tanstack/react-query'
+import { QueryClientProvider, useQueryClient } from '@tanstack/react-query'
 import { AuthProvider, ThemeProvider, useTelemetryProps, useThemeSandbox } from 'common'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useState } from 'react'
+import { PropsWithChildren, useCallback, useEffect, useState } from 'react'
 import { AppPropsWithLayout } from 'types'
 import { CommandMenuProvider, PortalToast, useConsent } from 'ui'
 import { TabsProvider } from 'ui/src/components/Tabs'
 import Favicons from '~/components/Favicons'
 import SiteLayout from '~/layouts/SiteLayout'
 import { IS_PLATFORM } from '~/lib/constants'
-import { post } from '~/lib/fetch/fetchWrappers'
+import { unauthedAllowedPost } from '~/lib/fetch/fetchWrappers'
 import { useRootQueryClient } from '~/lib/fetch/queryClient'
+import { useOnLogout } from '~/lib/userAuth'
+
+/**
+ *
+ * !!! IMPORTANT !!!
+ * Ensure data is cleared on sign out.
+ *
+ * **/
+function SignOutHandler({ children }: PropsWithChildren) {
+  const queryClient = useQueryClient()
+  useOnLogout(() => {
+    queryClient.cancelQueries()
+    queryClient.clear()
+  })
+
+  return <>{children}</>
+}
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter()
@@ -39,7 +56,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const handlePageTelemetry = useCallback(
     (route: string) => {
       if (IS_PLATFORM) {
-        return post('/platform/telemetry/page', {
+        return unauthedAllowedPost('/platform/telemetry/page', {
           body: {
             referrer: document.referrer,
             title: document.title,
@@ -164,16 +181,18 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       <QueryClientProvider client={queryClient}>
         <Favicons />
         <AuthContainer>
-          <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
-            <CommandMenuProvider site="docs">
-              <TabsProvider>
-                <SiteLayout>
-                  <PortalToast />
-                  <Component {...pageProps} />
-                </SiteLayout>
-              </TabsProvider>
-            </CommandMenuProvider>
-          </ThemeProvider>
+          <SignOutHandler>
+            <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
+              <CommandMenuProvider site="docs">
+                <TabsProvider>
+                  <SiteLayout>
+                    <PortalToast />
+                    <Component {...pageProps} />
+                  </SiteLayout>
+                </TabsProvider>
+              </CommandMenuProvider>
+            </ThemeProvider>
+          </SignOutHandler>
         </AuthContainer>
       </QueryClientProvider>
     </>

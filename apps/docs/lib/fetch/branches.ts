@@ -2,7 +2,7 @@ import { ResponseError } from '~/types/fetch'
 import { get } from './fetchWrappers'
 import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 import { useProjectsQuery } from './projects'
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 
 const branchKeys = {
   list: (projectRef: string | undefined) => ['projects', projectRef, 'branches'] as const,
@@ -41,15 +41,14 @@ export function useBranchesQuery<TData = BranchesData>(
   })
 }
 
-export function useAllProjectsBranchesQuery<TData = BranchesData>({}: Omit<
-  UseQueryOptions<BranchesData, BranchesError, TData>,
-  'queryKey'
-> = {}) {
+export function useAllProjectsBranchesQuery<TData = BranchesData>({
+  enabled = true,
+}: Omit<UseQueryOptions<BranchesData, BranchesError, TData>, 'queryKey'> = {}) {
   const [isPending, setIsPending] = useState(true)
   const [isError, setIsError] = useState(false)
   const [data, setData] = useState<Record<string, BranchesData>>()
 
-  const { data: allProjects, isError: projectsIsError } = useProjectsQuery()
+  const { data: allProjects, isError: projectsIsError } = useProjectsQuery({ enabled })
 
   if (data) {
     // Skip processing so that existing data is returned, rather than fetching again
@@ -88,16 +87,9 @@ export function useAllProjectsBranchesQuery<TData = BranchesData>({}: Omit<
       .finally(() => setIsPending(false))
   }
 
-  const invalidate = useCallback(() => {
-    setIsPending(false)
-    setIsError(true)
-    setData(undefined)
-  }, [setIsPending, setIsError, setData])
-
   return {
     isPending,
     isError,
     data,
-    invalidate,
   }
 }

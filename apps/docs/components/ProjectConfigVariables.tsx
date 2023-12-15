@@ -199,6 +199,7 @@ function ProjectConfigVariablesView({
   variable: Variable
   instances: InstanceData[]
 }) {
+  const isLoggedIn = useIsLoggedIn()
   const { selectedInstance } = useSnapshot(instanceStore)
 
   const projectRef = selectedInstance?.branch
@@ -213,7 +214,7 @@ function ProjectConfigVariablesView({
     {
       projectRef,
     },
-    { enabled: !!projectRef }
+    { enabled: isLoggedIn && !!projectRef }
   )
 
   const { copied, handleCopy } = useCopy()
@@ -226,10 +227,6 @@ function ProjectConfigVariablesView({
       : apiIsSuccess
       ? 'loggedIn.hasData.apiDataSuccess'
       : 'loggedIn.hasData.apiDataError'
-
-  console.log('parentStateSummary', parentStateSummary)
-  console.log('apiStateSummary', apiStateSummary)
-  console.log('apiData', apiData)
 
   let variableValue: string = null
   if (apiIsSuccess) {
@@ -354,23 +351,21 @@ export function ProjectConfigVariables({ variable }: { variable: Variable }) {
     setSelectedInstance,
     clear: clearSharedStoreData,
   } = useSnapshot(instanceStore)
-  const queryClient = useQueryClient()
   const {
     data: organizations,
     isPending: organizationsIsPending,
     isError: organizationsIsError,
-  } = useOrganizationsQuery()
+  } = useOrganizationsQuery({ enabled: isLoggedIn })
   const {
     data: projects,
     isPending: projectsIsPending,
     isError: projectsIsError,
-  } = useProjectsQuery()
+  } = useProjectsQuery({ enabled: isLoggedIn })
   const {
     data: branches,
     isPending: branchesIsPending,
     isError: branchesIsError,
-    invalidate: invalidateAllProjectsBranchesQuery,
-  } = useAllProjectsBranchesQuery()
+  } = useAllProjectsBranchesQuery({ enabled: isLoggedIn })
 
   const anyIsPending = organizationsIsPending || projectsIsPending || branchesIsPending
   const anyIsError = organizationsIsError || projectsIsError || branchesIsError
@@ -391,21 +386,8 @@ export function ProjectConfigVariables({ variable }: { variable: Variable }) {
     // This is a safeguard against display bugs,
     // since the page will keep displaying after the user logs out.
     // This way no data is left to display even if there is a view bug.
-    if (stateSummary === 'loggedOut') {
-      invalidateProjectsQuery(queryClient)
-      invalidateOrganizationsQuery(queryClient)
-      invalidateAllProjectsBranchesQuery()
-      // @ts-ignore -- problem with OpenAPI spec that codegen reads from
-      invalidateProjectApiQuery({ projectRef: selectedInstance?.project.ref }, queryClient)
-      clearSharedStoreData()
-    }
-  }, [
-    selectedInstance,
-    stateSummary,
-    clearSharedStoreData,
-    invalidateAllProjectsBranchesQuery,
-    queryClient,
-  ])
+    clearSharedStoreData()
+  }, [clearSharedStoreData])
   useOnLogout(cleanUp)
 
   const formattedData: InstanceData[] = useMemo(

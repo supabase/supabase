@@ -15,7 +15,10 @@ const { GET: _get, POST: _post } = createClient<paths>({
   headers: DEFAULT_HEADERS,
 })
 
-export async function constructHeaders(headersInit?: HeadersInit | undefined) {
+export async function constructHeaders(
+  headersInit?: HeadersInit | undefined,
+  { allowUnauthenticated = false }: { allowUnauthenticated?: boolean } = {}
+) {
   const requestId = uuidv4()
   const headers = new Headers(headersInit)
 
@@ -25,6 +28,8 @@ export async function constructHeaders(headersInit?: HeadersInit | undefined) {
     const accessToken = await getAccessToken()
     if (accessToken) {
       headers.set('Authorization', `Bearer ${accessToken}`)
+    } else if (!allowUnauthenticated) {
+      throw Error("can't fetch authenticated routes without signing in")
     }
   }
 
@@ -32,7 +37,13 @@ export async function constructHeaders(headersInit?: HeadersInit | undefined) {
 }
 
 export const get: typeof _get = async (url, init) => {
-  const headers = await constructHeaders(init?.headers)
+  let headers: Headers = null
+  try {
+    headers = await constructHeaders(init?.headers)
+  } catch (err) {
+    console.error(err)
+    return
+  }
 
   return await _get(url, {
     ...init,
@@ -41,7 +52,28 @@ export const get: typeof _get = async (url, init) => {
 }
 
 export const post: typeof _post = async (url, init) => {
-  const headers = await constructHeaders(init?.headers)
+  let headers: Headers = null
+  try {
+    headers = await constructHeaders(init?.headers)
+  } catch (err) {
+    console.error(err)
+    return
+  }
+
+  return await _post(url, {
+    ...init,
+    headers,
+  })
+}
+
+export const unauthedAllowedPost: typeof _post = async (url, init) => {
+  let headers: Headers = null
+  try {
+    headers = await constructHeaders(init?.headers, { allowUnauthenticated: true })
+  } catch (err) {
+    console.error(err)
+    return
+  }
 
   return await _post(url, {
     ...init,

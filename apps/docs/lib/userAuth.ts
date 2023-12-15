@@ -1,7 +1,9 @@
 import { Session } from '@supabase/supabase-js'
-import { LOCAL_STORAGE_KEYS, gotrueClient as auth, useIsLoggedIn, useIsUserLoading } from 'common'
+import { LOCAL_STORAGE_KEYS, gotrueClient, useIsLoggedIn, useIsUserLoading } from 'common'
 import { remove } from './storage'
-import { useEffect, useRef } from 'react'
+import { useRef } from 'react'
+
+export const auth = gotrueClient
 
 let currentSession: Session | null
 
@@ -41,18 +43,18 @@ export async function getAccessToken() {
 
 export function useOnLogout(callback: () => void) {
   const isUserLoading = useIsUserLoading()
-  const isLoggedIn = useIsLoggedIn()
   const hasFinishedLoading = useRef(false)
+  const isLoggedIn = useIsLoggedIn()
+  const isPreviousLoggedIn = useRef(isLoggedIn)
 
-  useEffect(() => {
-    if (!isUserLoading) {
-      hasFinishedLoading.current === true
-    }
-  }, [isUserLoading])
+  if (!isUserLoading) {
+    hasFinishedLoading.current = true
+  }
 
-  useEffect(() => {
-    if (hasFinishedLoading.current && !isLoggedIn) {
-      callback()
-    }
-  }, [isLoggedIn, callback])
+  if (!isLoggedIn && isPreviousLoggedIn.current) {
+    // Just logged out
+    callback()
+  }
+
+  isPreviousLoggedIn.current = isLoggedIn
 }

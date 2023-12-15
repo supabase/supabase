@@ -1,4 +1,4 @@
-import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { ResponseError } from '~/types/fetch'
 import { get } from './fetchWrappers'
 
@@ -25,8 +25,4 @@ export function useProjectsQuery<TData = ProjectsData>({
     enabled,
     ...options,
   })
-}
-
-export function invalidateProjectsQuery(client: QueryClient) {
-  return client.invalidateQueries({ queryKey: projectKeys.list() })
 }

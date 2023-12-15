@@ -1,4 +1,4 @@
-import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from './fetchWrappers'
 import { ResponseError } from '~/types/fetch'
 
@@ -25,8 +25,4 @@ export function useOrganizationsQuery<TData = OrganizationsData>({
     enabled,
     ...options,
   })
-}
-
-export function invalidateOrganizationsQuery(client: QueryClient) {
-  return client.invalidateQueries({ queryKey: organizationKeys.list() })
 }
