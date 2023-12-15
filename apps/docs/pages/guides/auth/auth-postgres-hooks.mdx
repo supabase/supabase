@@ -8,7 +8,7 @@ export const meta = {
 }
 
 <Admonition type="info">
-Hooks are currently in beta and will only be available on all projects early 2024.
+Hooks are in beta. They will be available for all projects in early 2024.
 </Admonition>
 
 
@@ -199,13 +199,12 @@ rollback;
 
 ### Connecting the Hook
 
-In the dashboard, navigate to `Authentication > Hooks (Beta)` and select the appropriate PostgreSQL function from the dropdown menu.
-![Hooks UI](/docs/img/guides/auth-postgres-hooks/hooks-ui.png)
+In the dashboard, navigate to [`Authentication > Hooks (Beta)`](/dashboard/project/_/auth/hooks) and select the appropriate PostgreSQL function from the dropdown menu.
 
 
 ## MFA Verification Attempt Hook
 
-You can add additional checks to the [Supabase MFA implementation](https://supabase.com/docs/guides/auth/auth-mfa) with hooks. For example, you can:
+You can add additional checks to the [Supabase MFA implementation](/docs/guides/auth/auth-mfa) with hooks. For example, you can:
 
 - Limit the number of verification attempts performed over a period of time.
 - Sign out users who have too many invalid verification attempts.
@@ -376,7 +375,7 @@ Example output:
 ```json
 {
    "decision": "reject",
-   "message" : "You have exceeded maximum number of MFA attempts.",
+   "message" : "You have exceeded maximum number of password Sign-In attempts.",
    "should_logout_user": "false"
 }
 ```
@@ -390,7 +389,7 @@ Example output:
   defaultActiveId="js"
   queryGroup="language"
 >
-<TabPanel id="add-admin-role" label="Limit Failed Password Verification Attempts">
+<TabPanel id="limit-failed-password-verification-attempts" label="Limit Failed Password Verification Attempts">
 
 As part of new security measures within the company, users can only input an incorrect password every 10 seconds and not more than that. You want to write a hook to enforce this.
 
