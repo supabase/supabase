@@ -95,7 +95,7 @@ The [network restrictions](https://supabase.com/docs/guides/platform/network-res
 
 ### Backups within Fly
 
-Fly projects are backed up to S3 since Fly doesn’t provide managed Blob storage (yet). This incurs inter-cloud bandwidth fees which can get pretty high quickly. To minimize these costs and keep more of the infrastructure within Fly, we are exploring the possibility of deploying something like Minio within Fly. We heard some [rumors](https://community.fly.io/t/blob-storage-without-blowing-transit-budget/9903/5) that Fly is working on Blob Storage too.
+Fly projects are backed up to AWS S3 as Fly doesn’t provide managed Blob storage (yet). This incurs inter-cloud bandwidth fees. Luckily, Fly are working on [Blob Storage](https://fly.io/docs/flyctl/extensions-tigris-list/), watch this space.
 
 ## Getting started
 
