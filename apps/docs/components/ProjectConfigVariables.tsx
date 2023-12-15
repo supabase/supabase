@@ -158,7 +158,7 @@ function ComboBox({
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="overflow-hidden justify-between border-none px-1"
+            className="overflow-hidden h-auto min-h-10 flex justify-between border-none px-1 text-left"
           >
             {parentStateSummary === 'userLoading' || parentStateSummary === 'loggedIn.dataPending'
               ? 'Loading...'
@@ -278,22 +278,19 @@ function ProjectConfigVariablesView({
   }
 
   return (
-    <div
-      style={{ '--copy-button-size': '50px' } as CSSProperties}
-      className="max-w-[min(100%, 500px)] my-4"
-    >
+    <div className="max-w-[min(100%, 500px)] my-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <span>{prettyFormatVariable[variable]}</span>
+        <span className="grow-[100]">{prettyFormatVariable[variable]}</span>
         {(parentStateSummary === 'userLoading' ||
           parentStateSummary === 'loggedIn.dataPending' ||
           parentStateSummary === 'loggedIn.hasData') && (
-          <div className="flex justify-between">
+          <div className="flex items-center justify-between grow max-w-full gap-2">
             <ComboBox parentStateSummary={parentStateSummary} instances={instances} />
             <CopyToClipboard text={variableValue ?? ''}>
               <Button
                 disabled={!variableValue}
                 variant="ghost"
-                className="w-[var(--copy-button-size)]"
+                className="px-0"
                 onClick={handleCopy}
                 aria-label="Copy"
               >
