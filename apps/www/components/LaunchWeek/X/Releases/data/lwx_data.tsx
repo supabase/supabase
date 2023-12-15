@@ -238,6 +238,7 @@ const days: WeekDayProps[] = [
     dd: 'Fri',
     title: '',
     shipped: false,
+    hasCountdown: true,
     blog: '',
     date: '15 Dec',
     published_at: '2023-12-15T08:00:00.000-08:00',
