@@ -29,17 +29,17 @@ This is deployed within the Fly infrastructure, making it the fastest Postgres d
 
 ## Managing expectations
 
-Before you get too excited, this will be a progressive rollout. It turns out that building inter-company integrations is a lot of work when you factor in billing, support hand off, and educating Supabase staff how to understand [sandwich analogies](https://fly.io/blog/carving-the-scheduler-out-of-our-orchestrator/).
+Before you get too excited, this will be a progressive rollout. It turns out that building inter-company integrations is a lot of work when you factor in billing, support handoff, and educating Supabase staff on how to understand [sandwich analogies](https://fly.io/blog/carving-the-scheduler-out-of-our-orchestrator/).
 
 We’ve been working with a few early testers and we have some bugs to iron out. You can [sign up for the waitlist](https://forms.supabase.com/fly-postgres) if you want to help with testing. We’ll release timelines as we are confident that your data is safe.
 
 ## Supabase + Fly = SupaFly?
 
-We’re excited about what this partnership means for 2024. Namely, distributing Postgres across the planet. Our work with Fly also helps us take a step towards Serverless Postgres, because the Firecracker VM. It also puts a bunch of easy-to-spin-up compute resources right next to the database. That sounds like fun.
+We’re excited about what this partnership means for 2024. Namely, distributing Postgres across the planet. Our work with Fly also helps us take a step towards Serverless Postgres, because of the Firecracker VM. It also puts a bunch of easy-to-spin-up compute resources right next to the database. That sounds like fun.
 
 ## Managed vs unmanaged Postgres
 
-Fly’s current Postgres offering is [unmanaged](https://fly.io/docs/postgres/getting-started/what-you-should-know). This means that you’re responsible for handling scaling, point in time backups, replication, major version upgrades, etc. We’ll be running Fly’s _managed_ Postgres, which means that we do all that for you, so that you can concentrate on building.
+Fly’s current Postgres offering is [unmanaged](https://fly.io/docs/postgres/getting-started/what-you-should-know). This means that you’re responsible for handling scaling, point-in-time backups, replication, major version upgrades, etc. We’ll be running Fly’s _managed_ Postgres, which means that we do all that for you so that you can concentrate on building.
 
 The managed service is built on the [Fly extension API](https://fly.io/docs/reference/extensions_api/) (which [Fly Redis](https://fly.io/docs/reference/redis/) also uses). While it’s in alpha, you can launch it using the `extension` command:
 
@@ -79,7 +79,7 @@ In addition to publishing images in AWS’s container registry, we publish the A
 
 ### **Building the Fly extension**
 
-Fly have an [excellent approach](https://fly.io/docs/reference/extensions_api/) for extending their platform. We added a few routes to our API to provision users and projects and we were on our way.
+Fly has an [excellent approach](https://fly.io/docs/reference/extensions_api/) for extending their platform. We added a few routes to our API to provision users and projects and we were on our way.
 
 Fly users can access the Supabase dashboard using their existing Fly credentials. The Supabase API initiates an OAuth flow with Fly to authenticate the user. Our Auth team created a [Fly OAuth provider](https://github.com/supabase/gotrue/pull/1261) to make the integration with our API easier.
 
@@ -87,17 +87,17 @@ Fly users can access the Supabase dashboard using their existing Fly credentials
 
 We’re still working through a few challenges with the Fly team.
 
-### **Support for Network Restrictions**
+### Support for Network Restrictions
 
 The [network restrictions](https://supabase.com/docs/guides/platform/network-restrictions) feature relies on the container receiving the correct IP of the client connecting to it. With our current setup, the container sees the Fly proxy IP instead. Connections run through the Fly proxy, which exposes the Proxy protocol. Postgres can’t use this information directly, but we’re looking at [making Supavisor proxy-protocol aware](https://github.com/supabase/supavisor).
 
-**Backups within Fly**
+### Backups within Fly
 
-Fly projects are backed up to S3 since Fly doesn’t provide a managed Blob storage (yet). This incurs inter-cloud bandwidth fees which can get pretty high quickly. To minimize these costs and keep more of the infrastructure within Fly, we are exploring the possibility of deploying something like Minio within Fly. We heard some [rumors](https://community.fly.io/t/blob-storage-without-blowing-transit-budget/9903/5) that Fly is working on Blob Storage too.
+Fly projects are backed up to S3 since Fly doesn’t provide managed Blob storage (yet). This incurs inter-cloud bandwidth fees which can get pretty high quickly. To minimize these costs and keep more of the infrastructure within Fly, we are exploring the possibility of deploying something like Minio within Fly. We heard some [rumors](https://community.fly.io/t/blob-storage-without-blowing-transit-budget/9903/5) that Fly is working on Blob Storage too.
 
 ## Getting started
 
-Sign up for the preview [here](https://forms.supabase.com/fly-postgres), wait till we allowlist your org and get started with the [Quickstart](https://supabase.com/docs/guides/platform/fly-postgres#quickstart) in our docs.
+Sign up for the preview [here](https://forms.supabase.com/fly-postgres), wait till we allowlist your org, and get started with the [Quickstart](https://supabase.com/docs/guides/platform/fly-postgres#quickstart) in our docs.
 
 Fly Postgres users get one free project. The rest of the pricing is similar to our existing pricing.
 
