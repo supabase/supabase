@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router'
 import { Button_Shadcn_ } from 'ui'
 import { auth } from '~/lib/userAuth'
 
@@ -13,12 +14,28 @@ export function getServerSideProps() {
 }
 
 export default function DevOnlySecretAuth() {
+  const router = useRouter()
+
   function signIn({ provider }: { provider: 'github' | 'google' }) {
-    auth.signInWithOAuth({ provider })
+    auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo:
+          process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
+            ? location.origin
+            : process.env.NEXT_PUBLIC_SITE_URL,
+      },
+    })
   }
 
   function signOut() {
-    auth.signOut()
+    auth.signOut().then(({ error }) => {
+      if (error) {
+        throw error
+      }
+
+      router.push('/')
+    })
   }
 
   return (
