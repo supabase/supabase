@@ -32,56 +32,97 @@ interface InstanceData {
   branch?: BranchesData[number]
 }
 
-function dehydrateInstance(instance: InstanceData | null) {
-  if (!instance) return ''
+type InstanceKey = readonly [string | undefined, string, string | undefined]
 
-  return JSON.stringify([
-    instance.organization?.id,
+function toInstanceKey(instance: InstanceData | null) {
+  if (!instance) return null
+
+  return [
+    instance.organization?.id ?? null,
     // @ts-ignore -- problem with OpenAPI spec that codegen reads from
     instance.project.ref,
     instance.branch?.id ?? null,
-  ])
+  ] satisfies InstanceKey
 }
 
-function rehydrateInstance(validInstances: InstanceData[], maybeInstance: string) {
+function getInstanceDataFromKey(validInstances: InstanceData[], instanceKey: InstanceKey | null) {
+  if (!instanceKey || instanceKey[0] === null) return null
+
+  return (
+    validInstances.find(
+      (instance) =>
+        instance.organization?.id === instanceKey[0] &&
+        // @ts-ignore -- problem with OpenAPI spec that codegen reads from
+        instance.project.ref === instanceKey[1] &&
+        (instanceKey[2] === null || instance.branch?.id === instanceKey[2])
+    ) ?? null
+  )
+}
+
+function toStoredString(instanceKey: InstanceKey | null) {
+  return JSON.stringify(instanceKey)
+}
+
+function fromStoredString(maybeInstanceKey: string) {
   try {
-    const [organizationId, projectRef, branchId] = JSON.parse(maybeInstance)
-
-    if (organizationId === null) return null
-
-    return (
-      validInstances.find(
-        (instance) =>
-          instance.organization?.id === organizationId &&
-          // @ts-ignore -- problem with OpenAPI spec that codegen reads from
-          instance.project.ref === projectRef &&
-          (branchId === null || instance.branch?.id === branchId)
-      ) ?? null
-    )
+    return JSON.parse(maybeInstanceKey)
   } catch {
     return null
   }
+}
+
+function escapeSpacedSlashes(str: string) {
+  return str.replace(/ \/ /g, ' [forward-slash] ')
+}
+
+function restoreSpacedSlashes(str: string) {
+  return str.replace(/ \[forward-slash\] /g, ' / ')
 }
 
 function toPrettyString(instance: InstanceData | null) {
   if (!instance) return ''
 
   const { organization, project, branch = null } = instance
-  return `${organization ? `${organization.name} / ` : ''}${project.name}${
-    branch ? ` / ${branch.name}` : ''
-  }`
+  return `${
+    organization ? `${escapeSpacedSlashes(organization.name)} / ` : ''
+  }${escapeSpacedSlashes(project.name)}${branch ? ` / ${escapeSpacedSlashes(branch.name)}` : ''}`
+}
+
+function fromPrettyString(instances: InstanceData[], maybeInstance: string) {
+  const [organizationNameEscaped, projectNameEscaped, branchNameEscaped] =
+    maybeInstance.split(' / ')
+  const organizationName = organizationNameEscaped
+    ? restoreSpacedSlashes(organizationNameEscaped)
+    : null
+  const projectName = projectNameEscaped ? restoreSpacedSlashes(projectNameEscaped) : null
+  const branchName = branchNameEscaped ? restoreSpacedSlashes(branchNameEscaped) : null
+
+  if (organizationName && projectName) {
+    return (
+      instances.find(
+        (instance) =>
+          // This gets filtered through `Command`'s `value` prop,
+          // which automatically converts to lowercase
+          instance.organization?.name.toLowerCase() === organizationName &&
+          instance.project?.name.toLowerCase() === projectName &&
+          (!instance.branch || instance.branch.name.toLowerCase() === branchName)
+      ) ?? null
+    )
+  }
+
+  return null
 }
 
 const instanceStore = proxy({
-  selectedInstance: null as InstanceData | null,
-  setSelectedInstance: (instance: InstanceData | null) => {
-    instanceStore.selectedInstance = instance
-    if (instance !== null) {
-      store('local', LOCAL_STORAGE_KEYS.SAVED_ORG_PROJECT_BRANCH, dehydrateInstance(instance))
+  selectedInstanceKey: null as InstanceKey | null,
+  setSelectedInstanceKey: (instanceKey: InstanceKey | null) => {
+    instanceStore.selectedInstanceKey = instanceKey
+    if (instanceKey !== null) {
+      store('local', LOCAL_STORAGE_KEYS.SAVED_ORG_PROJECT_BRANCH, toStoredString(instanceKey))
     }
   },
   clear: () => {
-    instanceStore.setSelectedInstance(null)
+    instanceStore.setSelectedInstanceKey(null)
     // Also done centrally in lib/userAuth,
     // but no harm and an extra failsafe in doing it twice
     remove('local', LOCAL_STORAGE_KEYS.SAVED_ORG_PROJECT_BRANCH)
@@ -97,23 +138,22 @@ const prettyFormatVariable: Record<Variable, string> = {
 
 function ComboBox({
   parentStateSummary,
-  variable,
   instances,
   className,
 }: {
   parentStateSummary: ProjectConfigVariablesState
-  variable: string
   instances: InstanceData[]
   className?: string
 }) {
-  const { selectedInstance, setSelectedInstance } = useSnapshot(instanceStore)
+  const { selectedInstanceKey, setSelectedInstanceKey } = useSnapshot(instanceStore)
+  const selectedInstance = getInstanceDataFromKey(instances, selectedInstanceKey)
 
   const [open, setOpen] = useState(false)
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <div className={cn('flex items-center', className)}>
-        <PopoverTrigger asChild aria-label={`Select and copy ${variable}`}>
+        <PopoverTrigger asChild aria-label={`Select project`}>
           <Button
             variant="outline"
             role="combobox"
@@ -134,11 +174,10 @@ function ComboBox({
           <CommandGroup>
             {instances.map((instance) => (
               <CommandItem
-                key={dehydrateInstance(instance)}
-                value={dehydrateInstance(instance)}
+                key={toStoredString(toInstanceKey(instance))}
                 onSelect={(selectedValue: string) => {
-                  const newSelectedInstance = rehydrateInstance(instances, selectedValue)
-                  setSelectedInstance(newSelectedInstance)
+                  const newSelectedInstance = fromPrettyString(instances, selectedValue)
+                  setSelectedInstanceKey(toInstanceKey(newSelectedInstance))
                   setOpen(false)
                 }}
               >
@@ -195,8 +234,9 @@ function ProjectConfigVariablesView({
   instances: InstanceData[]
 }) {
   const isLoggedIn = useIsLoggedIn()
-  const { selectedInstance } = useSnapshot(instanceStore)
+  const { selectedInstanceKey } = useSnapshot(instanceStore)
 
+  const selectedInstance = getInstanceDataFromKey(instances, selectedInstanceKey)
   const projectRef = selectedInstance?.branch
     ? selectedInstance?.branch?.project_ref
     : // @ts-ignore -- problem with OpenAPI spec that codegen reads from
@@ -248,11 +288,7 @@ function ProjectConfigVariablesView({
           parentStateSummary === 'loggedIn.dataPending' ||
           parentStateSummary === 'loggedIn.hasData') && (
           <div className="flex justify-between">
-            <ComboBox
-              parentStateSummary={parentStateSummary}
-              variable={variable}
-              instances={instances}
-            />
+            <ComboBox parentStateSummary={parentStateSummary} instances={instances} />
             <CopyToClipboard text={variableValue ?? ''}>
               <Button
                 disabled={!variableValue}
@@ -342,8 +378,8 @@ export function ProjectConfigVariables({ variable }: { variable: Variable }) {
   const isLoggedIn = useIsLoggedIn()
 
   const {
-    selectedInstance,
-    setSelectedInstance,
+    selectedInstanceKey,
+    setSelectedInstanceKey,
     clear: clearSharedStoreData,
   } = useSnapshot(instanceStore)
   const {
@@ -411,15 +447,15 @@ export function ProjectConfigVariables({ variable }: { variable: Variable }) {
   )
 
   useEffect(() => {
-    if (!selectedInstance && typeof window !== undefined) {
-      let storedInstance: InstanceData = null
-      const dehydratedInstance = retrieve('local', LOCAL_STORAGE_KEYS.SAVED_ORG_PROJECT_BRANCH)
-      if (dehydratedInstance) {
-        storedInstance = rehydrateInstance(formattedData, dehydratedInstance)
+    if (!selectedInstanceKey && typeof window !== undefined) {
+      let storedInstanceKey: InstanceKey = null
+      const storedMaybeInstanceKey = retrieve('local', LOCAL_STORAGE_KEYS.SAVED_ORG_PROJECT_BRANCH)
+      if (storedMaybeInstanceKey) {
+        storedInstanceKey = fromStoredString(storedMaybeInstanceKey)
       }
-      setSelectedInstance(storedInstance ?? formattedData[0] ?? null)
+      setSelectedInstanceKey(storedInstanceKey ?? toInstanceKey(formattedData[0]) ?? null)
     }
-  }, [selectedInstance, setSelectedInstance, formattedData])
+  }, [selectedInstanceKey, setSelectedInstanceKey, formattedData])
 
   return (
     <ProjectConfigVariablesView
