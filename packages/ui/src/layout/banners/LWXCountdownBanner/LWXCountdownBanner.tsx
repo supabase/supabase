@@ -33,7 +33,7 @@ export function LWXCountdownBanner() {
               className="filter contrast-0 dark:contrast-100"
             />
           </div>
-          <div className="hidden sm:block">Day 5: Read Replicas</div>
+          <div className="hidden sm:block">Day 5: introducing Read Replicas</div>
           <Button
             onClick={() => null}
             size="tiny"
