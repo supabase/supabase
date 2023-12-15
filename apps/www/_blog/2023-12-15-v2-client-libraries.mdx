@@ -22,7 +22,7 @@ Heres what you you need to know:
 
 ## Version 2, for all libraries
 
-All of the libraries mentioned in this post are now on v2. This is because we want the API for each library to “move in lock step”. You should be able to jump around each of the client libraries and they should operate the same, barring any language idiosyncrasies. 
+All of the libraries mentioned in this post are now on v2. This is because we want the API for each library to “move in lock step”. You should be able to jump around each of the client libraries and they should operate the same, barring any language idiosyncrasies.
 
 ## Supabase Python v2
 
@@ -57,12 +57,12 @@ Check out the [docs](https://supabase.com/docs/reference/kotlin/introduction), a
 - [Getting started with Android Kotlin](https://supabase.com/docs/guides/getting-started/quickstarts/kotlin)
 - [Getting started with Supabase on Android](https://www.youtube.com/watch?v=QaLuM6Uwy4U) (Video)
 - Demos:
-    - [Chat Demo (Desktop/Android/Browser)](https://github.com/supabase-community/supabase-kt/tree/master/demos/chat-demo-mpp)
-    - [File Upload Demo (Desktop/Android)](https://github.com/supabase-community/supabase-kt/tree/master/demos/file-upload)
-    - [Android Native Google login & in-app OAuth (Android)](https://github.com/supabase-community/supabase-kt/tree/master/demos/android-login)
-    - [Multi-Factor Authentication (Desktop/Android/Browser)](https://github.com/supabase-community/supabase-kt/tree/master/demos/multi-factor-authentication)
-    - [Multiplatform Deep Linking (Desktop/Android)](https://github.com/supabase-community/supabase-kt/tree/master/demos/multiplatform-deeplinks)
-    - [Groceries Store App (Android)](https://github.com/hieuwu/android-groceries-store)
+  - [Chat Demo (Desktop/Android/Browser)](https://github.com/supabase-community/supabase-kt/tree/master/demos/chat-demo-mpp)
+  - [File Upload Demo (Desktop/Android)](https://github.com/supabase-community/supabase-kt/tree/master/demos/file-upload)
+  - [Android Native Google login & in-app OAuth (Android)](https://github.com/supabase-community/supabase-kt/tree/master/demos/android-login)
+  - [Multi-Factor Authentication (Desktop/Android/Browser)](https://github.com/supabase-community/supabase-kt/tree/master/demos/multi-factor-authentication)
+  - [Multiplatform Deep Linking (Desktop/Android)](https://github.com/supabase-community/supabase-kt/tree/master/demos/multiplatform-deeplinks)
+  - [Groceries Store App (Android)](https://github.com/hieuwu/android-groceries-store)
 
 ## Typescript v2 updates
 
@@ -71,8 +71,8 @@ We’ve made several updates for Typescript support in `supabase-js`:
 - the Supabase CLI now generates [Table and Enum shorthands](https://supabase.com/docs/guides/api/rest/generating-types#type-shorthands)
 - new helpers `QueryResult` and `QueryData` extract the result types for [complex queries and joins](https://supabase.com/docs/guides/api/rest/generating-types#response-types-for-complex-queries)
 - relationships between tables are now supported:
-    - one-to-many relationships are typed as `T[]`
-    - many-to-one relationships are typed as `T | null`
+  - one-to-many relationships are typed as `T[]`
+  - many-to-one relationships are typed as `T | null`
 
 ## Flutter v2 updates
 
@@ -81,18 +81,18 @@ The core theme of Flutter v2 has been stability and better DX. We want to give a
 - **Type safety for queries:** The return type of a query will automatically be set to `List` of `Map` depending on return type ( `single()` or `maybeSingle()` )
 - **Type safety for Realtime:** Realtime broadcast and presence get their own methods to make it more easily accessible.
 - **Performance:**
-    - Initialization time has been reduced by lazily refreshing the session in the background.
-    - Lighter package size. We have removed some dependencies
+  - Initialization time has been reduced by lazily refreshing the session in the background.
+  - Lighter package size. We have removed some dependencies
 
 ## React Native and Expo support
 
 We’ve [worked with the Expo team](https://docs.expo.dev/guides/using-supabase/) to improve support for React Native.
 
-https://youtu.be/7DYZdAPPJOw 
+https://youtu.be/7DYZdAPPJOw
 
 By default, `supabase-js` uses the browser's `localStorage` mechanism to persist the user's session. This can be extended with platform-specific implementations. React Native can target native mobile and web applications with the same code base, so we need a storage implementation that works for all these platforms. Now you can use [react-native-async-storage](https://supabase.com/blog/react-native-authentication#authentication-storage) or a combination with [expo-secure-sorage](https://supabase.com/blog/react-native-authentication#encrypting-the-user-session) for AES encrypted sessions.
 
-Beyond that we’ve focused on making supabase-js highly compatible with React Native and created plenty of [video tutorials](https://youtube.com/playlist?list=PL5S4mPUpp4OsrbRTx21k34aACOgpqQGlx&si=Ez-0S4QhBxtayYsq) and documentation for [crafting an offline-first experience](https://supabase.com/blog/react-native-offline-first-watermelon-db), [uploading files to Supabase Storage](https://supabase.com/blog/react-native-storage), and [sending push notifications](https://supabase.com/docs/guides/functions/examples/push-notifications). 
+Beyond that we’ve focused on making supabase-js highly compatible with React Native and created plenty of [video tutorials](https://youtube.com/playlist?list=PL5S4mPUpp4OsrbRTx21k34aACOgpqQGlx&si=Ez-0S4QhBxtayYsq) and documentation for [crafting an offline-first experience](https://supabase.com/blog/react-native-offline-first-watermelon-db), [uploading files to Supabase Storage](https://supabase.com/blog/react-native-storage), and [sending push notifications](https://supabase.com/docs/guides/functions/examples/push-notifications).
 
 ## Our approach to client libraries
 
@@ -102,10 +102,10 @@ We prefer have a strong preference to develop the client libraries with our comm
 
 If you haven’t already, it’s worth reading “[The Cathedral and the Bazaar](https://en.wikipedia.org/wiki/The_Cathedral_and_the_Bazaar)” by Eric S. Raymond. In short, it contrasts two software development approaches:
 
-1. **The "Cathedral"** represents closed, centralized development, where a small group of developers work in isolation. 
+1. **The "Cathedral"** represents closed, centralized development, where a small group of developers work in isolation.
 2. **The "Bazaar"** symbolizes open, decentralized collaboration, where a large community of developers openly shares and collaborates on code.
 
-We believe the “bazaar” model is the right model for an open source business. If you aren’t constantly pushing in this direction then it’s extremely likely that the company will relicense (seen most recently with [Hashi](https://news.ycombinator.com/item?id=37081306)). The way we see it, the more we can foster our community the less power we have. 
+We believe the “bazaar” model is the right model for an open source business. If you aren’t constantly pushing in this direction then it’s extremely likely that the company will relicense (seen most recently with [Hashi](https://news.ycombinator.com/item?id=37081306)). The way we see it, the more we can foster our community the less power we have.
 
 ### Fostering the community
 
@@ -121,7 +121,7 @@ The client libs are one of the best ways to foster the community because they lo
   alt="Diagram explaining Supabase community"
 />
 
-We want the Supabase community to outlive us. With more community maintainers, you should feel *even safer* knowing that there is already a continuity plan in place. We’re [giving back to the community](https://supabase.com/blog/supabase-series-b#giving-back) as those contributions grow, and we hope to expand this as we become even more commercially successful.
+We want the Supabase community to outlive us. With more community maintainers, you should feel _even safer_ knowing that there is already a continuity plan in place. We’re [giving back to the community](https://supabase.com/blog/supabase-series-b#giving-back) as those contributions grow, and we hope to expand this as we become even more commercially successful.
 
 ### Modularity
 
