@@ -128,7 +128,7 @@ Currently, we have implemented a round-robin strategy of routing PostgREST reque
 
 ### Supabase Products leveraging Replicas
 
-We are working on support for database-level load balancing through [Supavisor](https://supabase.com/blog/supabase-branching). When routing database traffic through Supavisor, it routes write queries to the primary and splits read queries between the primary and read replica. This distributes load to all your databases without any changes to your application. Other Supabase products like Auth, Storage, and Realtime use the database heavily. We are working on adding read replica support to these products, so that they can leverage the read replica when appropriate. This means they won’t just query the primary but will also use the read replica’s compute when possible.
+We are working on support for database-level load balancing through [Supavisor](https://supabase.com/blog/supavisor-postgres-connection-pooler). When routing database traffic through Supavisor, it routes write queries to the primary and splits read queries between the primary and read replica. This distributes load to all your databases without any changes to your application. Other Supabase products like Auth, Storage, and Realtime use the database heavily. We are working on adding read replica support to these products, so that they can leverage the read replica when appropriate. This means they won’t just query the primary but will also use the read replica’s compute when possible.
 
 ## Pricing and Availability
 
