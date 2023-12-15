@@ -1,6 +1,6 @@
 ---
 title: 'Supabase Libraries V2: Python, Swift, Kotlin, Flutter, and Typescript'
-description: 'Swift, Kotlin, C#, and Python are now stable and are onto the same version number v2.'
+description: 'Swift, Kotlin, C#, and Python are now stable and moving to the v2 API.'
 launchweek: X
 categories:
   - product
@@ -16,13 +16,13 @@ thumb: lwx-client-libs/client-libs-thumb.png
 
 Here is what you need to know:
 
-- [Swift](https://supabase.com/docs/reference/swift/introduction), [Kotlin](https://supabase.com/docs/reference/kotlin/introduction), [C#](https://supabase.com/docs/reference/csharp/introduction), and [Python](https://supabase.com/docs/reference/python/introduction) are now stable.
-- We’ve added even more support for mobile using React Native and [Expo](https://supabase.com/docs/guides/getting-started/tutorials/with-expo-react-native).
+- [Swift](/docs/reference/swift/introduction), [Kotlin](/docs/reference/kotlin/introduction), [C#](/docs/reference/csharp/introduction), and [Python](/docs/reference/python/introduction) are now stable.
+- We’ve added even more support for mobile using React Native and [Expo](/docs/guides/getting-started/tutorials/with-expo-react-native).
 - We’re consolidating all client libraries onto the same version number (v2) so that you get a consistent API across all libraries.
 
 ## Version 2, for all libraries
 
-All of the libraries mentioned in this post are now on v2. This is because we want the API for each library to “move in lock step”. You should be able to jump around each of the client libraries and they should operate the same, barring any language idiosyncrasies.
+All of the libraries mentioned in this post are now on v2. We want the API for each library to “move in lock step”. You should be able to jump around each of the client libraries and they should operate the same, barring any language idiosyncrasies.
 
 ## Supabase Python v2
 
@@ -77,7 +77,7 @@ We’ve made several updates for Typescript support in `supabase-js`:
 
 ## Flutter v2 updates
 
-The core theme of Flutter v2 has been stability and better DX. We want to give a shout-out to [Vinzent](https://github.com/Vinzent03), a community maintainer who has done the majority of the work. Some notable improvements:
+The core theme of Flutter v2 has been stability and better DX. Shout-out to [Vinzent](https://github.com/Vinzent03), a community maintainer who has done the majority of the work. Some notable improvements:
 
 - **Type safety for queries:** The return type of a query will automatically be set to `List` of `Map` depending on return type ( `single()` or `maybeSingle()` )
 - **Type safety for Realtime:** Realtime broadcast and presence get their own methods to make it more easily accessible.
@@ -101,7 +101,11 @@ We’ve [worked with the Expo team](https://docs.expo.dev/guides/using-supabase/
 
 By default, `supabase-js` uses the browser's `localStorage` mechanism to persist the user's session. This can be extended with platform-specific implementations. React Native can target native mobile and web applications with the same code base, so we need a storage implementation that works for all these platforms. Now you can use [react-native-async-storage](https://supabase.com/blog/react-native-authentication#authentication-storage) or a combination with [expo-secure-sorage](https://supabase.com/blog/react-native-authentication#encrypting-the-user-session) for AES encrypted sessions.
 
-Beyond that we’ve focused on making supabase-js highly compatible with React Native and created plenty of [video tutorials](https://youtube.com/playlist?list=PL5S4mPUpp4OsrbRTx21k34aACOgpqQGlx&si=Ez-0S4QhBxtayYsq) and documentation for [crafting an offline-first experience](https://supabase.com/blog/react-native-offline-first-watermelon-db), [uploading files to Supabase Storage](https://supabase.com/blog/react-native-storage), and [sending push notifications](https://supabase.com/docs/guides/functions/examples/push-notifications).
+Beyond that we’ve focused on making supabase-js highly compatible with React Native and created plenty of [video tutorials](https://youtube.com/playlist?list=PL5S4mPUpp4OsrbRTx21k34aACOgpqQGlx&si=Ez-0S4QhBxtayYsq) and documentation for: 
+
+- [crafting an offline-first experience](https://supabase.com/blog/react-native-offline-first-watermelon-db)
+- [uploading files to Supabase Storage](https://supabase.com/blog/react-native-storage)
+- [sending push notifications](https://supabase.com/docs/guides/functions/examples/push-notifications).
 
 ## Our approach to client libraries
 
@@ -111,16 +115,16 @@ We have a strong preference to develop the client libraries with our community. 
 
 If you haven’t already, it’s worth reading “[The Cathedral and the Bazaar](https://en.wikipedia.org/wiki/The_Cathedral_and_the_Bazaar)” by Eric S. Raymond. In short, it contrasts two software development approaches:
 
-1. **The "Cathedral"** represents closed, centralized development, where a small group of developers work in isolation.
-2. **The "Bazaar"** symbolizes open, decentralized collaboration, where a large community of developers openly shares and collaborates on code.
+1. The **Cathedral** represents closed, centralized development, where a small group of developers work in isolation.
+2. The **Bazaar** symbolizes open, decentralized collaboration, where a large community of developers openly shares and collaborates on code.
 
 We believe the “bazaar” model is the right model for an open source business. If you aren’t constantly pushing in this direction then it’s extremely likely that the company will relicense (seen most recently with [Hashi](https://news.ycombinator.com/item?id=37081306)). The way we see it, the more we can foster our community the less power we have.
 
 ### Fostering the community
 
-We just reached 1000 contributors to our [main repo](https://github.com/supabase/supabase). It’s not easy to build a community of contributors, it’s something that need to be fostered.
+We just reached 1000 contributors to our [main repo](https://github.com/supabase/supabase). It’s not easy to build a community of contributors, it’s something that need to be fostered. (Shout out to [@tobiastornros](https://github.com/tobiastornros), contributor #1000 - and everyone else who [contributed yesterday](https://x.com/kiwicopple/status/1735282666872987673?s=20))
 
-The client libs are one of the best ways to foster the community because they lower complexity than some of the tools we maintain (do you know [Haskell](https://github.com/PostgREST/postgrest)?).
+The client libs are one of the best ways to foster the community because they are lower-complexity than some of the tools we maintain (do you know [Haskell](https://github.com/PostgREST/postgrest)?).
 
 <Img
   src={{
@@ -130,11 +134,11 @@ The client libs are one of the best ways to foster the community because they lo
   alt="Diagram explaining Supabase community"
 />
 
-We want the Supabase community to outlive us. With more community maintainers, you should feel _even safer_ knowing that there is already a continuity plan in place. We’re [giving back to the community](https://supabase.com/blog/supabase-series-b#giving-back) as those contributions grow, and we hope to expand this as we become even more commercially successful.
+We want the Supabase community to outlive us. With more community maintainers, you should feel _even safer_ knowing that there is already a continuity plan in place. We’re [giving back to the community](https://supabase.com/blog/supabase-series-b#giving-back) and we hope to expand this as we become even more commercially successful.
 
 ### Modularity
 
-As a [Principle](https://supabase.com/docs/guides/getting-started/architecture#product-principles), we develop a single library for each tool we support. While Supabase may “feel” like a single tool when you’re using it, it is a set of individual tools which you can use independently (especially useful for self hosting):
+As a [Principle](https://supabase.com/docs/guides/getting-started/architecture#product-principles), we develop a library for each tool we support. While Supabase may “feel” like a single tool when you’re using it, it's actually a set of tools which you can use independently (especially useful for self hosting):
 
 <Img
   src={{
