@@ -21,7 +21,7 @@ We're launching Fly Postgres, a managed Postgres offering jointly developed by S
 - [pgvector](https://github.com/pgvector/pgvector/) support for [Vector/AI workloads](https://supabase.com/docs/guides/ai)
 - Auto-generated Data APIs: [REST](https://supabase.com/docs/guides/api) (using [PostgREST](https://postgrest.org)) and [GraphQL](https://supabase.com/docs/guides/graphql) (using [pg_graphql](https://github.com/supabase/pg_graphql/))
 - [Supavisor](https://supabase.com/blog/supavisor-postgres-connection-pooler), our Postgres connection pooler
-- Daily [backups](https://supabase.com/docs/guides/platform/backups) and point-in-time recovery
+- Daily backups and point-in-time recovery
 - A dashboard for managing everything related to your database including tables, views, enums, indexes, etc
 - [Branching](https://supabase.com/docs/guides/platform/branching), [observability](https://github.com/supabase/supabase-grafana), and migrations
 
@@ -35,19 +35,21 @@ We’ve been working with a few early testers and we have some bugs to iron out.
 
 ## Supabase + Fly = SupaFly?
 
-We’re excited about what this partnership means for 2024. Namely, distributing Postgres across the planet. Our work with Fly also helps us take a step towards Serverless Postgres, because of the Firecracker VM. It also puts a bunch of easy-to-spin-up compute resources right next to the database. That sounds like fun.
+We’re excited about what this partnership means for 2024. Namely, distributing Postgres across the planet. The Firecracker VM gives us some neat ideas for Postgres. Integrating with Fly also puts a bunch of easy-to-spin-up compute resources right next to the database. That sounds like fun.
 
 ## Managed vs unmanaged Postgres
 
-Fly’s current Postgres offering is [unmanaged](https://fly.io/docs/postgres/getting-started/what-you-should-know). This means that you’re responsible for handling scaling, point-in-time backups, replication, major version upgrades, etc. We’ll be running Fly’s _managed_ Postgres, which means that we do all that for you so that you can concentrate on building.
+Fly’s current Postgres offering is [unmanaged](https://fly.io/docs/postgres/getting-started/what-you-should-know). This means that you’re responsible for handling scaling, point-in-time backups, replication, major version upgrades, etc. We’ll run Fly’s _managed_ Postgres, which means that we do all that for you, and you can concentrate on building.
 
-The managed service is built on the [Fly extension API](https://fly.io/docs/reference/extensions_api/) (which [Fly Redis](https://fly.io/docs/reference/redis/) also uses). While it’s in alpha, you can launch it using the `extension` command:
+The managed service is built with the [Fly extension API](https://fly.io/docs/reference/extensions_api/) (also used by [Fly Redis](https://fly.io/docs/reference/redis/)). 
+
+Testers can launch a Postgres database using the `fly extensions` command:
 
 ```markdown
 fly extensions supabase create
 ```
 
-Once the service becomes stable, it will be swapped for the `postgres` namespace:
+Once the service is stable, it will be swapped for the `postgres` namespace:
 
 ```markdown
 fly postgres create
@@ -61,17 +63,17 @@ Let’s dig into the implementation.
 
 ### **Working with Fly machines**
 
-Fly Postgres is built on top of [Fly machines](https://fly.io/docs/machines/). Machines are light-weight VMs deployed via Firecracker. The Machines API offers substantial control over an application’s lifecycle. They can be suspended during inactivity and resumed within a couple of seconds whenever a new request arrives.
+Fly Postgres is built on top of [Fly machines](https://fly.io/docs/machines/). Machines are light-weight Firecracker VMs. The Machines API offers substantial control over an application’s lifecycle. They can be suspended during inactivity and resumed within a couple of seconds whenever a new request arrives.
 
-We built [fly-admin](https://github.com/supabase/fly-admin), a Typescript wrapper to simplify our interaction with the Fly API. Since Supabase bundles a few extra services into Postgres, we prepared a single Docker image which we can pass to the Fly Machines API. Our current build process involves building an AMI for AWS using [Packer](https://www.packer.io/). We re-use parts of that pipeline to build an [All In One Image](https://github.com/supabase/postgres/tree/develop/docker/all-in-one). This image has all the necessary services to run a Supabase project within a single Docker container.
+We built [fly-admin](https://github.com/supabase/fly-admin), a Typescript wrapper to simplify our interaction with the Fly API. Supabase bundles a few extra services into Postgres, so we prepared a single Docker image which we can pass to the Fly Machines API. Our current build process outputs an AMI for AWS using [Packer](https://www.packer.io/). We re-use parts of that pipeline to build an [All In One Image](https://github.com/supabase/postgres/tree/develop/docker/all-in-one). This image has all the services to run a Supabase project within a single Docker container.
 
 ### **Move to multi-cloud**
 
-With this launch, Supabase is officially multi-cloud. We deliberately avoided using managed services from cloud providers when building Supabase on AWS to simplify multi-cloud transition. These transitions are never simple because even the base primitives offered between cloud providers can vary significantly.
+With this launch, Supabase is officially multi-cloud. We deliberately avoided using AWS's managed services when building Supabase to simplify our multi-cloud transition. These transitions are never simple - even the base primitives offered between cloud providers can vary significantly.
 
-For example, Fly Machines offer a simple method for suspending a VM when it's not in use and transparently resuming it within seconds. This simplifies the process of pausing inactive databases. There is no direct primitive on AWS to achieve this.
+For example, Fly Machines offer a simple method for suspending a VM when it's not in use, transparently resuming it within seconds. This simplifies the process of pausing inactive databases. There is no direct primitive on AWS to achieve this.
 
-On the other hand, we had to work around a few AWS primitives that Fly doesn’t provide. Fly machines don’t have network-attached storage, so we need to treat any data in Fly volumes as ephemeral. To address this, we enable physical backups for all projects running on Fly, using WAL-G. Database changes are continuously streamed to S3. When there is a host or volume corruption, we restore the project to a new Fly host using the latest data in S3.
+On the other hand, we had to work around a few AWS primitives that Fly doesn’t provide. Fly machines don’t have network-attached storage, so we treat any data in Fly volumes as ephemeral. We run physical backups for all projects running on Fly using WAL-G. Database changes are continuously streamed to S3. When there is a host or volume corruption, we restore the project to a new Fly host using the latest data in S3.
 
 To capture host issues on AWS, we listen to [AWS Health events](https://docs.aws.amazon.com/health/latest/ug/aws-health-concepts-and-terms.html). For Fly, we send the Machine logs to [Logflare](https://logflare.com/) using the [fly-log-shipper](https://github.com/superfly/fly-log-shipper).
 
