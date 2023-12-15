@@ -42,14 +42,8 @@ export async function getAccessToken() {
 }
 
 export function useOnLogout(callback: () => void) {
-  const isUserLoading = useIsUserLoading()
-  const hasFinishedLoading = useRef(false)
   const isLoggedIn = useIsLoggedIn()
   const isPreviousLoggedIn = useRef(isLoggedIn)
-
-  if (!isUserLoading) {
-    hasFinishedLoading.current = true
-  }
 
   if (!isLoggedIn && isPreviousLoggedIn.current) {
     // Just logged out
