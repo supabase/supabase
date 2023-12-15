@@ -1,6 +1,6 @@
 import clientLibsCommonSections from '~/../../spec/common-client-libs-sections.json'
 import typeSpec from '~/../../spec/enrichments/tsdoc_v2/combined.json'
-import spec from '~/../../spec/supabase_swift_v1.yml' assert { type: 'yml' }
+import spec from '~/../../spec/supabase_swift_v2.yml' assert { type: 'yml' }
 import RefSectionHandler from '~/components/reference/RefSectionHandler'
 import { flattenSections } from '~/lib/helpers'
 import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'
@@ -9,7 +9,7 @@ import { useRouter } from 'next/router'
 import RefSEO from '~/components/reference/RefSEO'
 
 const sections = flattenSections(clientLibsCommonSections)
-const libraryPath = '/swift/v1'
+const libraryPath = '/swift/v2'
 
 export default function SwiftReference(props) {
   const router = useRouter()
