@@ -129,13 +129,6 @@ export const MainConfig = ({ projectRef, poolingInfo }: MainConfigProps) => {
   const { ui } = useStore()
   const { project } = useProjectContext()
 
-  const { mutateAsync: updateConfiguration, isLoading: isUpdating } =
-    usePoolingConfigurationUpdateMutation({
-      onSuccess: (res) => {
-        ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
-      },
-    })
-
   const canUpdateConnectionPoolingConfiguration = useCheckPermissions(
     PermissionAction.UPDATE,
     'projects',
@@ -155,6 +148,22 @@ export const MainConfig = ({ projectRef, poolingInfo }: MainConfigProps) => {
       max_client_conn: poolingInfo.max_client_conn as number | undefined,
     },
   })
+
+  const { mutateAsync: updateConfiguration, isLoading: isUpdating } =
+    usePoolingConfigurationUpdateMutation({
+      onSuccess: (data) => {
+        if (data) {
+          form.reset({
+            ignore_startup_parameters: data.ignore_startup_parameters,
+            pool_mode: data.pool_mode,
+            default_pool_size: data.default_pool_size,
+            max_client_conn: data.max_client_conn,
+          })
+        }
+
+        ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
+      },
+    })
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
     try {
