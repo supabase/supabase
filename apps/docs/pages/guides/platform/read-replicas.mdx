@@ -13,19 +13,19 @@ To try out read replicas, [request access here](https://forms.supabase.com/read-
 
 </Admonition>
 
-Read replicas continuously replicate data from a primary database. You can both read and write data on a primary database, but you can *only* read (for example, use `select` statements), and not write, on a read replica.
+Read replicas continuously replicate data from a primary database. You can both read and write data on a primary database, but you can _only_ read (for example, use `select` statements), and not write, on a read replica.
 
-|  | select | insert | update | delete |
- | --- | --- | --- | --- | --- |
- | Primary | ✅ | ✅ | ✅ | ✅ |
- | Read Replica | ✅ | - | - | - |
+|              | select | insert | update | delete |
+| ------------ | ------ | ------ | ------ | ------ |
+| Primary      | ✅     | ✅     | ✅     | ✅     |
+| Read Replica | ✅     | -      | -      | -      |
 
 When you create a project, the automatically created database is considered the primary database. If you then add read replicas, they will receive and synchronize data from this primary database. Replication is asynchronous. It happens in the background, so transactions on the primary aren't blocked. The time delay between writing data to the primary and the read replica receiving the change is called replication lag.
 
-Read replicas have many applications: 
+Read replicas have many applications:
 
 - They reduce read load on the primary database.
-    - For example, you can use a read replica for complex analytical queries and reserve the primary for user-facing create, update, and delete operations.
+  - For example, you can use a read replica for complex analytical queries and reserve the primary for user-facing create, update, and delete operations.
 - For projects that need to cover a global audience, additional databases can be spun up closer to users in any of our twelve supported regions to reduce latency.
 - Read replicas provide data redundancy.
 
@@ -35,9 +35,9 @@ We use a hybrid approach to replicate data from a primary to its read replicas, 
 
 ### Streaming replication
 
-Postgres generates a Write Ahead Log (WAL) as database changes occur. With streaming replication, these changes stream from the primary to the read replica server. The WAL alone is sufficient to reconstruct the database to its current state. 
+Postgres generates a Write Ahead Log (WAL) as database changes occur. With streaming replication, these changes stream from the primary to the read replica server. The WAL alone is sufficient to reconstruct the database to its current state.
 
-This replication method is fast, since changes are streamed directly from the primary to the read replica. On the other hand, it faces challenges when the read replica can't keep up with the WAL changes from its primary. This can happen when the read replica is too small, running on degraded hardware, or has a heavier workload running. 
+This replication method is fast, since changes are streamed directly from the primary to the read replica. On the other hand, it faces challenges when the read replica can't keep up with the WAL changes from its primary. This can happen when the read replica is too small, running on degraded hardware, or has a heavier workload running.
 
 To address this, Postgres does provide tunable configuration, like `wal_keep_size`, to adjust the WAL retained by the primary. If the read replica fails to “catch up” before the WAL surpasses the `wal_keep_size` setting, the replication is terminated. Tuning is a bit of an art - the amount of WAL required is variable for every situation.
 
@@ -46,6 +46,7 @@ To address this, Postgres does provide tunable configuration, like `wal_keep_siz
 In this replication method, the primary continuously buffers WAL changes to a local file and then sends the file to the read replica. If multiple read replicas are present, files could also be sent to an intermediary location accessible by all. The read replica then reads the WAL files and applies those changes. There is higher replication lag than streaming replication since the primary buffers the changes locally first. It also means there is a small chance that WAL changes do not reach read replicas if the primary goes down before the file is transferred. In these cases, if the primary fails a replica using streaming replication would (in most cases) be more up-to-date than a replica using file-based log shipping.
 
 ### File-based log shipping 🤝 Streaming replication
+
 <figure className="max-w-[700px] mx-auto">
     <Image
         className="hidden dark:block"
@@ -62,7 +63,7 @@ In this replication method, the primary continuously buffers WAL changes to a lo
 
 </figure>
 
-We bring these two methods together to achieve quick, stable, and reliable replication. Each method addresses the limitations of the other. Streaming replication minimizes replication lag, while file-based log shipping provides a fallback. For file-based log shipping, we use our existing Point In Time Recovery (PITR) infrastructure. We regularly archive files from the primary using [WAL-G](https://github.com/wal-g/wal-g), an open source archival and restoration tool, and ship the WAL files to S3. 
+We bring these two methods together to achieve quick, stable, and reliable replication. Each method addresses the limitations of the other. Streaming replication minimizes replication lag, while file-based log shipping provides a fallback. For file-based log shipping, we use our existing Point In Time Recovery (PITR) infrastructure. We regularly archive files from the primary using [WAL-G](https://github.com/wal-g/wal-g), an open source archival and restoration tool, and ship the WAL files to S3.
 
 We combine it with streaming replication to reduce replication lag. Once WAL-G files have been synced from S3, read replicas connect to the primary and stream the WAL directly.
 
@@ -82,7 +83,6 @@ We combine it with streaming replication to reduce replication lag. Once WAL-G f
     />
 
 </figure>
-
 
 Read replicas can be managed from the [infrastructure settings page](https://supabase.com/dashboard/project/_/settings/infrastructure). For now, each project can only spin up to two read replicas. Read replicas also inherit the compute size of their primary database.
 
@@ -112,8 +112,8 @@ A connection pool through Supavisor is also available for each read replica. Its
         alt="SQL editor view."
         src="/docs/img/guides/platform/read-replicas/sql-editor.png?v=1"
     />
-</figure>
 
+</figure>
 
 In the SQL editor, you can choose if you want to run the query on the primary or one of the replicas.
 
@@ -138,10 +138,10 @@ All settings made through the dashboard will be propagated across all databases 
 A project needs to satisfy these requirements to spin up a read replica:
 
 1. Running on AWS.
-    - Support for projects on Fly is in progress.
+   - Support for projects on Fly is in progress.
 2. Running on at least a small compute.
 3. PostgreSQL 15.
-    - For projects running on older versions of PostgreSQL, you can initiate self-serve upgrades with pg_upgrade. For details, see the [upgrade guide](/docs/guides/platform/migrating-and-upgrading-projects#pgupgrade).
+   - For projects running on older versions of PostgreSQL, you can initiate self-serve upgrades with pg_upgrade. For details, see the [upgrade guide](/docs/guides/platform/migrating-and-upgrading-projects#pgupgrade).
 
 ### Read replicas need to be brought down before starting the following procedures
 
