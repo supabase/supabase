@@ -317,12 +317,7 @@ function ProjectConfigVariablesView({
       {parentStateSummary === 'loggedOut' && (
         <p className="text-foreground-muted text-sm mt-2 mb-0 ml-1">
           There was a problem getting your {prettyFormatVariable[variable]}. Are you{' '}
-          <Link
-            className="text-foreground-muted"
-            href="/dashboard"
-            rel="noreferrer noopener"
-            target="_blank"
-          >
+          <Link className="text-foreground-muted" href="/dashboard">
             logged in
           </Link>
           ?
@@ -337,12 +332,7 @@ function ProjectConfigVariablesView({
             {parentStateSummary === 'loggedIn.hasNoData' && (
               <>
                 Do you have{' '}
-                <Link
-                  className="text-foreground-muted"
-                  href="/dashboard"
-                  rel="noreferrer noopener"
-                  target="_blank"
-                >
+                <Link className="text-foreground-muted" href="/dashboard">
                   any projects
                 </Link>
                 ?
@@ -353,12 +343,7 @@ function ProjectConfigVariablesView({
             apiStateSummary === 'loggedIn.hasData.apiDataError') && (
             <p className="text-foreground-muted text-sm mt-0 ml-1">
               You can also try looking up the value in the{' '}
-              <Link
-                className="text-foreground-muted"
-                href="/dashboard/project/_/settings/api"
-                rel="noreferrer noopener"
-                target="_blank"
-              >
+              <Link className="text-foreground-muted" href="/dashboard/project/_/settings/api">
                 dashboard
               </Link>
               .
