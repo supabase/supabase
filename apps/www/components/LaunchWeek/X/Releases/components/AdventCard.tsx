@@ -29,12 +29,13 @@ const AdventCard = ({ day, index }: { day: AdventDay; index: number }) => {
       },
     }),
   }
+  const isClientLibsCard = day.type === 'clientLibs'
 
   useEffect(() => {
     if (ticketRef.current) {
       Tilt.init(ticketRef.current, {
         glare: false,
-        max: 4,
+        max: isClientLibsCard ? 1 : 4,
         gyroscope: false,
         'full-page-listening': false,
       })
@@ -58,43 +59,67 @@ const AdventCard = ({ day, index }: { day: AdventDay; index: number }) => {
       }}
     >
       <motion.div
-        className="opacity-0 flex flex-col justify-between w-full h-full p-6 rounded-xl bg-[#121516] transition-colors text-[#575E61] border hover:border-strong overflow-hidden"
+        className={cn(
+          'opacity-0 flex flex-col justify-between w-full h-full p-6 rounded-xl bg-[#121516] transition-colors text-[#575E61] border hover:border-strong overflow-hidden',
+          isClientLibsCard && 'xl:flex-row'
+        )}
         variants={variants}
       >
-        <div className="opacity-30 group-hover:opacity-100 transition-opacity">{day.icon}</div>
-        <div
-          className={cn(
-            'relative group-hover:!bottom-0 !ease-[.25,.25,0,1] duration-300 transition-all flex flex-col gap-1'
-          )}
-          style={{
-            bottom: isTablet ? 0 : -hiddenHeight + 'px',
-          }}
-        >
-          <h4 className="text-foreground text-lg">{day.title}</h4>
+        <div className={cn('w-full h-full flex flex-col flex-1')}>
+          <div className="flex-1 opacity-30 group-hover:opacity-100 transition-opacity">
+            {day.icon}
+          </div>
           <div
-            ref={hiddenRef}
-            className="relative z-10 !ease-[.25,.25,0,1] duration-300 transition-opacity opacity-100 lg:opacity-0 group-hover:opacity-100"
+            className={cn(
+              'relative group-hover:!bottom-0 !ease-[.25,.25,0,1] duration-300 transition-all flex flex-col gap-1'
+            )}
             style={{
-              backfaceVisibility: 'hidden',
-              transform: 'translateZ(0)',
-              WebkitFontSmoothing: 'subpixel-antialiased',
+              bottom: isTablet ? 0 : -hiddenHeight + 'px',
             }}
           >
-            <p className="text-[#575E61] text-sm">{day.description}</p>
-            <div className="flex gap-1 mt-3 flex-wrap">
-              {day.links?.map((link: AdventLink) => (
-                <Link
-                  key={link.url}
-                  href={link.url}
-                  target={link.target ?? '_self'}
-                  className="px-2 py-1 pointer-events-auto border border-muted transition-colors text-foreground-light bg-[#191D1E] hover:bg-[#22272A] rounded text-xs"
-                >
-                  {link.label}
-                </Link>
-              ))}
+            <h4 className="text-foreground text-lg leading-6">{day.title}</h4>
+            <div
+              ref={hiddenRef}
+              className="relative z-10 !ease-[.25,.25,0,1] duration-300 transition-opacity opacity-100 lg:opacity-0 group-hover:opacity-100"
+              style={{
+                backfaceVisibility: 'hidden',
+                transform: 'translateZ(0)',
+                WebkitFontSmoothing: 'subpixel-antialiased',
+              }}
+            >
+              <p className="text-[#575E61] text-sm">{day.description}</p>
+              {!isClientLibsCard && (
+                <div className="flex gap-1 mt-3 flex-wrap">
+                  {day.links?.map((link: AdventLink) => (
+                    <Link
+                      key={link.url}
+                      href={link.url}
+                      target={link.target ?? '_self'}
+                      className="px-2 py-1 pointer-events-auto border border-muted transition-colors text-foreground-light bg-[#191D1E] hover:bg-[#22272A] rounded text-xs"
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
+        {isClientLibsCard && (
+          <div className="flex xl:h-full items-end justify-start xl:justify-end xl:w-2/3 gap-4 xl:gap-6 xl:pb-4 mt-4 flex-wrap">
+            {day.links?.map((link: AdventLink) => (
+              <Link
+                key={link.url}
+                href={link.url}
+                title={link.label}
+                target={link.target ?? '_self'}
+                className="w-8 h-8 md:w-6 md:h-6 xl:w-14 xl:h-14 xl:p-1 inline-flex items-center justify-center pointer-events-auto transition-colors text-foreground-light hover:text-foreground"
+              >
+                {link.icon}
+              </Link>
+            ))}
+          </div>
+        )}
       </motion.div>
     </div>
   )
