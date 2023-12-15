@@ -14,7 +14,7 @@ image: lwx-client-libs/client-libs-OG.png
 thumb: lwx-client-libs/client-libs-thumb.png
 ---
 
-Heres what you you need to know:
+Here is what you need to know:
 
 - [Swift](https://supabase.com/docs/reference/swift/introduction), [Kotlin](https://supabase.com/docs/reference/kotlin/introduction), [C#](https://supabase.com/docs/reference/csharp/introduction), and [Python](https://supabase.com/docs/reference/python/introduction) are now stable.
 - We’ve added even more support for mobile using React Native and [Expo](https://supabase.com/docs/guides/getting-started/tutorials/with-expo-react-native).
@@ -34,10 +34,11 @@ Check out the [docs](https://supabase.com/docs/reference/python/introduction), a
 - [Python data loading with Supabase](https://supabase.com/blog/loading-data-supabase-python)
 - [GitHub OAuth in your Python Flask app](https://supabase.com/blog/oauth2-login-python-flask-apps)
 
-<aside>
-ℹ️ Don’t forget, we also have a [Python library for working with embeddings](https://supabase.com/docs/guides/ai/python/api)!
+<Admonition type="note" label="Vecs">
 
-</aside>
+Don’t forget that we also have Vecs, a Python client for managing and querying vector stores in Postgres with the pgvector extension. [Get started](https://supabase.com/docs/guides/ai/python/api)!
+
+</Admonition>
 
 ## Supabase Swift v2
 
@@ -104,7 +105,7 @@ Beyond that we’ve focused on making supabase-js highly compatible with React N
 
 ## Our approach to client libraries
 
-We prefer have a strong preference to develop the client libraries with our community. This is part of our open source philosophy:
+We have a strong preference to develop the client libraries with our community. This is part of our open source philosophy:
 
 ### The Cathedral or the Bazaar?
 
@@ -133,7 +134,7 @@ We want the Supabase community to outlive us. With more community maintainers, y
 
 ### Modularity
 
-As a [Principle](https://supabase.com/docs/guides/getting-started/architecture#product-principles), we develop a single library for each tool we support. While Supabase may “feel” like a single tool when you’re using it, it is actually a set of individual tools which you can use independently (especially useful for self hosting):
+As a [Principle](https://supabase.com/docs/guides/getting-started/architecture#product-principles), we develop a single library for each tool we support. While Supabase may “feel” like a single tool when you’re using it, it is a set of individual tools which you can use independently (especially useful for self hosting):
 
 <Img
   src={{
@@ -143,7 +144,7 @@ As a [Principle](https://supabase.com/docs/guides/getting-started/architecture#p
   alt="Diagram explaining how Supabase is built behind the scenes"
 />
 
-We have libraries for each of the middleware components. For example, `supabase-js` is simply a wrapper around `postgres-js`, `storage-js`, etc. If you want to self-host PostgREST with your own database, it should feel very familiar:
+We have libraries for each of the middleware components. For example, `supabase-js` is simply a wrapper around `postgres-js`, `storage-js`, etc. If you want to self-host PostgREST with your database, it should feel very familiar:
 
 ```jsx
 // supabase-js
@@ -159,11 +160,11 @@ const { data } = postgrest.from('countries').select('id, name')
 
 We’re not completely against this idea, but from what we’ve seen so far:
 
-- Each language has it’s own idiosyncrasies. Developers using generated libraries often find themselves writing code that feels unnatural in their chosen language.
+- Each language has its idiosyncrasies. Developers using generated libraries often find themselves writing code that feels unnatural in their chosen language.
 - Generated libraries are somewhat bloated. We want to keep the libraries extremely small.
 
 That said, we may look into this approach in the future, perhaps starting with one of the tools.
 
 ## Get involved
 
-If you want to become a maintainer, please just get started with PRs. If, after a few PRs, you enjoy the process, ping one of the team on Discord and let us know - we’ll work with you to become a community maintainer.
+If you want to become a maintainer, please just get started with PRs. If, after a few PRs, you enjoy the process, ping one of the teams on Discord and let us know - we’ll work with you to become a community maintainer.
