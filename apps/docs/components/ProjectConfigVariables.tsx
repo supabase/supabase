@@ -20,15 +20,10 @@ import { proxy, useSnapshot } from 'valtio'
 import { LOCAL_STORAGE_KEYS, remove, retrieve, store } from '~/lib/storage'
 import Link from 'next/link'
 import { useIsLoggedIn, useIsUserLoading } from 'common'
-import { ProjectsData, invalidateProjectsQuery, useProjectsQuery } from '~/lib/fetch/projects'
-import {
-  OrganizationsData,
-  invalidateOrganizationsQuery,
-  useOrganizationsQuery,
-} from '~/lib/fetch/organizations'
+import { ProjectsData, useProjectsQuery } from '~/lib/fetch/projects'
+import { OrganizationsData, useOrganizationsQuery } from '~/lib/fetch/organizations'
 import { BranchesData, useAllProjectsBranchesQuery } from '~/lib/fetch/branches'
-import { invalidateProjectApiQuery, useProjectApiQuery } from '~/lib/fetch/projectApi'
-import { useQueryClient } from '@tanstack/react-query'
+import { useProjectApiQuery } from '~/lib/fetch/projectApi'
 import { useOnLogout } from '~/lib/userAuth'
 
 interface InstanceData {
@@ -392,13 +387,12 @@ export function ProjectConfigVariables({ variable }: { variable: Variable }) {
 
   const formattedData: InstanceData[] = useMemo(
     () =>
-      !Array.isArray(projects)
+      stateSummary !== 'loggedIn.hasData'
         ? []
         : projects.flatMap((project) => {
             const organization =
-              (organizations ?? []).find(
-                (organization) => organization.id === project.organization_id
-              ) ?? null
+              organizations.find((organization) => organization.id === project.organization_id) ??
+              null
 
             // @ts-ignore -- problem with OpenAPI spec that codegen reads from
             if (!project.is_branch_enabled) {
@@ -413,7 +407,7 @@ export function ProjectConfigVariables({ variable }: { variable: Variable }) {
 
             return projectBranches.map((branch) => ({ organization, project, branch }))
           }),
-    [branches, organizations, projects]
+    [branches, organizations, projects, stateSummary]
   )
 
   useEffect(() => {

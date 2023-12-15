@@ -48,17 +48,28 @@ export function useAllProjectsBranchesQuery<TData = BranchesData>({
   const [isError, setIsError] = useState(false)
   const [data, setData] = useState<Record<string, BranchesData>>()
 
-  const { data: allProjects, isError: projectsIsError } = useProjectsQuery({ enabled })
+  const {
+    data: allProjects,
+    isPending: projectsIsPending,
+    isError: projectsIsError,
+  } = useProjectsQuery({ enabled })
 
-  if (data) {
-    // Skip processing so that existing data is returned, rather than fetching again
-    // In future, may way to add support for query keys and refetching
+  if (!enabled) {
+    if (!isPending) setIsPending(true)
+  } else if (projectsIsPending) {
+    if (!isPending) setIsPending(true)
   } else if (projectsIsError) {
-    setIsError(true)
-    setIsPending(false)
+    if (!isError || isPending) {
+      setIsError(true)
+      setIsPending(false)
+    }
+  } else if (data && !isError) {
+    // Skip processing so that existing data is returned, rather than fetching again
+    // In future, may want to add support for query keys and refetching
+    if (isPending) setIsPending(false)
   } else {
     Promise.all(
-      (allProjects ?? []).map(async (project) => {
+      allProjects.map(async (project) => {
         // @ts-ignore -- problem with OpenAPI spec that codegen reads from
         if (!project.is_branch_enabled) {
           return null
@@ -81,7 +92,8 @@ export function useAllProjectsBranchesQuery<TData = BranchesData>({
           }
           return Object.assign(record, branch)
         }, {})
-        return setData(formattedBranches)
+        setData(formattedBranches)
+        setIsError(false)
       })
       .catch(() => setIsError(true))
       .finally(() => setIsPending(false))
