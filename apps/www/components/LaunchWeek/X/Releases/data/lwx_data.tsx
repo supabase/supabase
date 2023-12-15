@@ -239,19 +239,18 @@ const days: WeekDayProps[] = [
     shipped: true,
     isToday: true,
     hasCountdown: false,
-    blog: '/blog/read-replicas',
+    blog: '/blog/introducing-read-replicas',
     date: '15 Dec',
     published_at: '2023-12-15T08:00:00.000-08:00',
     description: (
       <>
-        High Availability: launching support for
-        <br className="hidden lg:block" /> database <strong>Read Replicas</strong>
+        Introducing <strong>Read Replicas</strong> for High Availability
       </>
     ),
     links: [
       {
         type: 'blog',
-        href: '/blog/read-replicas',
+        href: '/blog/introducing-read-replicas',
       },
       {
         type: 'video',
@@ -265,7 +264,7 @@ const days: WeekDayProps[] = [
     steps: [
       {
         title: '',
-        blog: '/blog/read-replicas',
+        blog: '/blog/introducing-read-replicas',
         bg_layers: [
           {
             img: '/images/launchweek/lwx/day5/d5_read_replicas.svg',
