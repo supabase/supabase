@@ -47,7 +47,7 @@ Replication is asynchronous. It happens in the background so that transactions a
   />
 </div>
 
-### Why Read Replicas?
+## Why Read Replicas?
 
 To scale your database, you have two choices: horizontal scaling and vertical scaling. Vertical scaling involves adding more RAM and CPU to your existing server. Our 16XL [compute add-on](https://supabase.com/docs/guides/platform/compute-add-ons) has 64 cores CPU and 256 GB RAM - sufficient for almost any well-architected workload.
 
@@ -67,7 +67,7 @@ One of the best features of read replicas is that you can launch them in a diffe
 
 The main drawback of horizontal scaling is complexity. Typically, you need to manage replication lag, handle recovery when a replica fails, and implement some level of application level changes to fully utilize the read replica. In line with our promise to “make Postgres simpler for developers”, we have handled most of that complexity for you:
 
-### Using Read Replicas
+## Using Read Replicas
 
 You can manage and visualize read replicas from the [infrastructure settings page](https://supabase.com/dashboard/project/_/settings/infrastructure).
 
@@ -84,7 +84,7 @@ To make use of your read replicas, copy your connection string for the read repl
 
 Each replica also has its own associated instance of [PostgREST](https://supabase.com/docs/guides/api). You can directly address each PostgREST instance, similar to connecting to a specific read replica. Alternatively, we offer a load-balancing endpoint which uses a round-robin strategy to route to each of the PostgREST instances.
 
-### Implementation
+## Implementation
 
 Postgres offers various methods to replicate data, each with trade-offs. We use the following native methods:
 
@@ -116,7 +116,7 @@ Streaming replication minimizes replication lag, while file-based log shipping p
 
 We combine it with streaming replication to reduce replication lag. Once WAL-G files have been synced from S3, read replicas connect to the primary and stream the WAL directly.
 
-### What’s coming
+## What's coming
 
 ### Automatic Failover
 
