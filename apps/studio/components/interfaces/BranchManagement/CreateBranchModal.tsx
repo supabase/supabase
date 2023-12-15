@@ -220,7 +220,7 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
               <AlertTitle_Shadcn_>Each Preview branch costs $0.32 per day</AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_>
                 Each preview branch costs $0.32 per day until it is removed. This pricing is for
-                Early access and is subject to change.
+                Early Access and is subject to change.
               </AlertDescription_Shadcn_>
             </Alert_Shadcn_>
           </Modal.Content>
