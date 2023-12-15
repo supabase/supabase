@@ -77,7 +77,7 @@ const AdventCard = ({ day, index }: { day: AdventDay; index: number }) => {
               bottom: isTablet ? 0 : -hiddenHeight + 'px',
             }}
           >
-            <h4 className="text-foreground text-lg">{day.title}</h4>
+            <h4 className="text-foreground text-lg leading-6">{day.title}</h4>
             <div
               ref={hiddenRef}
               className="relative z-10 !ease-[.25,.25,0,1] duration-300 transition-opacity opacity-100 lg:opacity-0 group-hover:opacity-100"
