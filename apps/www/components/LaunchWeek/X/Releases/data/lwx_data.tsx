@@ -244,7 +244,7 @@ const days: WeekDayProps[] = [
     published_at: '2023-12-15T08:00:00.000-08:00',
     description: (
       <>
-        Introducing <strong>Read Replicas</strong> for High Availability
+        Introducing <strong>Read Replicas</strong> for low latency
       </>
     ),
     links: [
