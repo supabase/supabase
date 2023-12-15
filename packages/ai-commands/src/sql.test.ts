@@ -14,15 +14,8 @@ describe('generate', () => {
       'create a table to track employees with name, email, and position'
     )
 
-    expect(formatSql(sql)).toBe(codeBlock`
-      create table employees (
-        id bigint primary key generated always as identity,
-        name text,
-        email text,
-        position text
-      );
-    `)
-    expect(title).toBeDefined()
+    expect(formatSql(sql)).toMatchSnapshot()
+    expect(title).toMatchSnapshot()
   })
 })
 
@@ -40,13 +33,7 @@ describe('edit', () => {
       `
     )
 
-    expect(formatSql(sql)).toBe(codeBlock`
-      create table employees (
-        id bigint primary key generated always as identity,
-        name text check (length(name) >= 4),
-        email text
-      );
-    `)
+    expect(formatSql(sql)).toMatchSnapshot()
   })
 })
 
@@ -70,19 +57,7 @@ describe('debug', () => {
       `
     )
 
-    expect(formatSql(sql)).toBe(codeBlock`
-      create table departments (
-        id bigint primary key generated always as identity,
-        name text
-      );
-      
-      create table employees (
-        id bigint primary key generated always as identity,
-        name text,
-        email text,
-        department_id bigint references departments (id)
-      );
-    `)
+    expect(formatSql(sql)).toMatchSnapshot()
   })
 })
 
@@ -105,8 +80,8 @@ describe('title', () => {
       `
     )
 
-    expect(title).toBe('Employee and Department Tables')
-    expect(description).toBeDefined()
+    expect(title).toMatchSnapshot()
+    expect(description).toMatchSnapshot()
   })
 })
 
@@ -134,10 +109,6 @@ describe('rls chat', () => {
     const responseText = await collectStream(responseStream)
     const [sql] = extractMarkdownSql(responseText)
 
-    expect(formatSql(sql)).toBe(codeBlock`
-      create policy select_todo_policy on todos for
-      select
-        using (user_id = auth.uid ());
-    `)
+    expect(formatSql(sql)).toMatchSnapshot()
   })
 })
