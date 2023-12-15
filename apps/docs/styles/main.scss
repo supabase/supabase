@@ -54,6 +54,26 @@ article h1 {
   scrollbar-width: thin;
 }
 
+.custom-scrollbar {
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: hsl(var(--scrollbar-track));
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: hsl(var(--scrollbar-thumb));
+    border-radius: 100vh;
+    border: 2px solid hsl(var(--scrollbar-track));
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--scrollbar-hover));
+  }
+}
+
 .sidebar-width {
   width: var(--sidebar-width);
 }

@@ -32,6 +32,9 @@
   --background-alternative-default: 0deg 0% 100%;
   --background-alternative-200: 0deg 0% 100%;
   --foreground-contrast: 210deg 25% 98.4%;
+  --scrollbar-track: 192deg 15% 94%;
+  --scrollbar-thumb: 153deg 58% 42%;
+  --scrollbar-hover: 153deg 59% 35%;
   --border-button-hover: var(--colors-slate-light-700);
   --border-button-default: var(--colors-slate-light-600);
   --border-stronger: var(--colors-gray-light-800);

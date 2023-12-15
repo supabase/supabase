@@ -305,6 +305,7 @@ const NavContainer = memo(function NavContainer() {
           'border-r overflow-auto h-screen',
           'backdrop-blur backdrop-filter bg-background',
           'flex flex-col',
+          'custom-scrollbar'
         ].join(' ')}
       >
         <div className="top-0 sticky z-10">

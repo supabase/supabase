@@ -31,6 +31,9 @@
   --destructive-200: 10.9deg 23.4% 9.2%;
   --background-alternative-200: 0deg 0% 5.5%;
   --foreground-contrast: 0deg 0% 11%;
+  --scrollbar-track: 0deg   0%  20%;
+  --scrollbar-thumb: 136deg 56% 45%;
+  --scrollbar-hover: 136deg 56% 49%;
   --border-button-hover: var(--colors-gray-dark-800);
   --border-button-default: var(--colors-gray-dark-700);
   --border-stronger: var(--colors-gray-dark-800);
