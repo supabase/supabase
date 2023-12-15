@@ -1,6 +1,4 @@
 import { useRouter } from 'next/router'
-import announcement from '../data/Announcement.json'
-import Countdown from './Countdown'
 import Image from 'next/image'
 import { Button } from 'ui'
 

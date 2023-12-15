@@ -7,7 +7,6 @@ import { Button, IconBookOpen } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import HeroFrameworks from './HeroFrameworks'
 import styles from './hero.module.css'
-import Image from 'next/image'
 import AnnouncementBadge from '../Announcement/Badge'
 
 const Hero = () => {
