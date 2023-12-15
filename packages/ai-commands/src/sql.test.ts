@@ -2,7 +2,8 @@ import { describe, expect, test } from '@jest/globals'
 import { codeBlock } from 'common-tags'
 import OpenAI from 'openai'
 import { collectStream, extractMarkdownSql, formatSql } from '../test/util'
-import { chatRlsPolicy, debugSql, editSql, generateSql, titleSql } from './sql'
+import { debugSql, editSql, generateSql, titleSql } from './sql'
+import { chatRlsPolicy } from './sql.edge'
 
 const openAiKey = process.env.OPENAI_KEY
 const openai = new OpenAI({ apiKey: openAiKey })

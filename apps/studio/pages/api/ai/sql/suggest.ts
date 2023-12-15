@@ -1,5 +1,5 @@
 import { StreamingTextResponse } from 'ai'
-import { chatRlsPolicy } from 'ai-commands'
+import { chatRlsPolicy } from 'ai-commands/edge'
 import { NextRequest } from 'next/server'
 import OpenAI from 'openai'
 
