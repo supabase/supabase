@@ -239,6 +239,7 @@ const EnableBranchingModal = () => {
                       <p className="text-sm text-foreground-light">
                         Launching a new preview branch incurs additional compute costs at $0.32 per
                         day. This cost will continue for as long as the branch has not been removed.
+                        This pricing is for Early Access and is subject to change.
                       </p>
                     </div>
                   </div>

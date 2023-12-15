@@ -1,6 +1,4 @@
 import { useRouter } from 'next/router'
-import announcement from '../data/Announcement.json'
-import Countdown from './Countdown'
 import Image from 'next/image'
 import { Button } from 'ui'
 
@@ -35,7 +33,7 @@ export function LWXCountdownBanner() {
               className="filter contrast-0 dark:contrast-100"
             />
           </div>
-          <div className="hidden sm:block">Day 4: Supabase Auth Day</div>
+          <div className="hidden sm:block">Day 5: introducing Read Replicas</div>
           <Button
             onClick={() => null}
             size="tiny"
