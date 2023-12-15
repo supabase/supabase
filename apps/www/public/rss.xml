@@ -5,9 +5,30 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Wed, 13 Dec 2023 23:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Thu, 14 Dec 2023 23:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/introducing-read-replicas</guid>
+  <title>Introducing Read Replicas</title>
+  <link>https://supabase.com/blog/introducing-read-replicas</link>
+  <description>We are launching support for database Read Replicas</description>
+  <pubDate>Thu, 14 Dec 2023 23:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/client-libraries-v2</guid>
+  <title>Supabase Libraries V2: Python, Swift, Kotlin, Flutter, and Typescript</title>
+  <link>https://supabase.com/blog/client-libraries-v2</link>
+  <description>Swift, Kotlin, C#, and Python are now stable and moving to the v2 API.</description>
+  <pubDate>Thu, 14 Dec 2023 23:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/postgres-on-fly-by-supabase</guid>
+  <title>Fly Postgres, managed by Supabase</title>
+  <link>https://supabase.com/blog/postgres-on-fly-by-supabase</link>
+  <description>A managed Postgres offering developed by Supabase and Fly.io</description>
+  <pubDate>Thu, 14 Dec 2023 23:00:00 GMT</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/supabase-auth-identity-linking-hooks</guid>
   <title>Supabase Auth: Identity Linking, Hooks, and HaveIBeenPwned integration</title>
   <link>https://supabase.com/blog/supabase-auth-identity-linking-hooks</link>
