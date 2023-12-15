@@ -85,9 +85,9 @@ export const ProfileInformation = ({ profile }: { profile: Profile }) => {
                     First name
                   </FormLabel_Shadcn_>
                   <FormControl_Shadcn_ className="col-span-8">
-                    <Input_Shadcn_ {...field} className="w-full !mt-0" />
+                    <Input_Shadcn_ {...field} className="w-full" />
                   </FormControl_Shadcn_>
-                  <FormMessage_Shadcn_ />
+                  <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
                 </FormItem_Shadcn_>
               )}
             />
@@ -100,8 +100,9 @@ export const ProfileInformation = ({ profile }: { profile: Profile }) => {
                     Last name
                   </FormLabel_Shadcn_>
                   <FormControl_Shadcn_ className="col-span-8">
-                    <Input_Shadcn_ {...field} className="w-full mt-0" />
+                    <Input_Shadcn_ {...field} className="w-full" />
                   </FormControl_Shadcn_>
+                  <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
                 </FormItem_Shadcn_>
               )}
             />

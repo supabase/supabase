@@ -1,18 +1,14 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
+import { components } from 'data/api'
 import { patch } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { databaseKeys } from './keys'
 
 export type PoolingConfigurationUpdateVariables = {
   ref: string
-  pgbouncer_enabled: boolean
-  ignore_startup_parameters: string
-  pool_mode: 'transaction' | 'session' | 'statement'
-  default_pool_size?: number
-  max_client_conn?: number | null
-}
+} & components['schemas']['UpdatePgbouncerConfigBody']
 
 export async function updatePoolingConfiguration({
   ref,
