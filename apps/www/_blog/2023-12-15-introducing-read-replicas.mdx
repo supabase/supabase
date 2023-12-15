@@ -1,6 +1,6 @@
 ---
 title: 'Introducing Read Replicas'
-description: 'We are launching support for database Read Replicas'
+description: 'We are launching support for Postgres Read Replicas'
 launchweek: x
 categories:
   - product
@@ -15,7 +15,7 @@ image: lwx-read-replicas/introducing-read-replicas-og.png
 thumb: lwx-read-replicas/read-replicas-thumb.png
 ---
 
-Today, we are launching support for database Read Replicas. You can use Read Replicas to:
+Today, we are launching support for Postgres Read Replicas. You can use Read Replicas to:
 
 1. Distribute load across various databases.
 2. Serve data closer to your users.
@@ -30,10 +30,10 @@ Read replicas continuously, well, _replicate_ data from a primary database. It c
 
 You can both read and write data on the Primary database. You can _only_ read, on a Read Replica:
 
-|              | select | insert | update | delete |
-| ------------ | ------ | ------ | ------ | ------ |
-| Primary      | ✅     | ✅     | ✅     | ✅     |
-| Read Replica | ✅     | -      | -      | -      |
+|              | `select` | `insert` | `update` | `delete` |
+| ------------ | -------- | -------- | -------- | -------- |
+| Primary      | ✅       | ✅       | ✅       | ✅       |
+| Read Replica | ✅       | -        | -        | -        |
 
 Replication is asynchronous. It happens in the background so that transactions aren't blocked on the primary. The delay between writing data to the primary and the read replica receiving the change is called _replication lag_.
 
@@ -82,7 +82,7 @@ In the SQL editor, you can choose if you want to run the query on the primary or
 
 To make use of your read replicas, copy your connection string for the read replica, update your apps to use the new read replica and you are done! A unique connection pool is also provisioned for each read replica via [Supavisor](https://github.com/supabase/supavisor).
 
-Each replica also has its own associated instance of [PostgREST](https://supabase.com/docs/guides/api). You can directly address each PostgREST instance, similar to connecting to a specific read replica. Alternatively, we offer a load-balancing endpoint which uses a round-robin strategy to route to each of the PostgREST instances.
+Each replica also has its own associated instance of [PostgREST](https://supabase.com/docs/guides/api), a Data API for [REST](/docs/guides/api) and [GraphQL](/docs/guides/graphql). You can directly access each PostgREST instance, similar to connecting to a specific read replica. Alternatively, we offer a load-balancing endpoint which uses a round-robin strategy to route to each of the PostgREST instances.
 
 ## Implementation
 
