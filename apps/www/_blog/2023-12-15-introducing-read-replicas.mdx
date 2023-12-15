@@ -11,8 +11,8 @@ date: '2023-12-15'
 published_at: '2023-12-15:01:00.000-07:00'
 to_depth: 3
 author: angelico,
-image: WIP
-thumb: WIP
+image: lwx-read-replicas/read-replicas-OG.png
+thumb: lwx-read-replicas/read-replicas-thumb.png
 ---
 
 Today, we are launching support for database Read Replicas. You can use Read Replicas to:
@@ -24,7 +24,7 @@ Today, we are launching support for database Read Replicas. You can use Read Rep
 
 You can create read replicas in any of our 12 supported regions. To start, each project supports up to two replicas. 
 
-### What are Read Replicas?
+## What are Read Replicas?
 
 Read replicas continuously, well, *replicate* data from a primary database. It contains a constantly-updated copy of the data in the Primary.
 
@@ -45,10 +45,11 @@ However, certain workloads may push against the CPU and memory limits of a singl
 
 This is where horizontal scaling is useful. You can add read replicas to scale more easily. Instead of a single database handling all of your traffic, you can split the traffic across multiple databases. 
 
-<aside>
-ℹ️ Our read replicas will inherit the compute size of its primary. They will eventually scale independently.
+<Admonition type="note" label="Compute Size">
 
-</aside>
+Our read replicas will inherit the compute size of its primary. They will eventually scale independently.
+
+</Admonition>
 
 Read replicas are great for reducing the load on your primary database. For instance, you can designate one of your read replicas for analytical tasks. This way, a runaway query in a read replica won't impact the primary.
 
@@ -60,11 +61,17 @@ The main drawback of horizontal scaling is complexity. Typically, you need to ma
 
 You can manage and visualize read replicas from the [infrastructure settings page](https://supabase.com/dashboard/project/_/settings/infrastructure).
 
-![Group.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/165a3c21-8e38-4d4b-831a-f9bb88a3262b/b4a2f445-3767-4fa1-95f2-3c386c478952/Group.png)
+src={{
+  dark: "/images/blog/lwx-read-replicas/read-replicas-02.png",
+  light: "/images/blog/lwx-read-replicas/read-replicas-02.png"
+}}
 
 In the SQL editor, you can choose if you want to run the query on the primary or one of the read replicas.
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/165a3c21-8e38-4d4b-831a-f9bb88a3262b/49a5f807-59fc-4398-8be7-46e4c652bff4/Untitled.png)
+src={{
+  dark: "/images/blog/lwx-read-replicas/read-replicas.png",
+  light: "/images/blog/lwx-read-replicas/read-replicas.png"
+}}
 
 To make use of your read replicas, copy your connection string for the read replica, update your apps to use the new read replica and you are done! A unique connection pool is also provisioned for each read replica via [Supavisor](https://github.com/supabase/supavisor). 
 
@@ -74,7 +81,7 @@ Each replica also has its own associated instance of [PostgREST](https://supabas
 
 Postgres offers various methods to replicate data, each with trade-offs. We use the following native methods:
 
-**Streaming replication**
+### Streaming replication
 
 Postgres generates a Write Ahead Log (WAL) as database changes occur. With streaming replication, these changes stream from the primary to the read replica server. The WAL alone is sufficient to reconstruct the database to its current state. 
 
@@ -82,26 +89,18 @@ This replication method is fast, since changes are streamed directly from the pr
 
 To address this, Postgres does provide tunable configuration, like `wal_keep_size`, to adjust the WAL retained by the primary. If the read replica fails to “catch up” before the WAL surpasses the `wal_keep_size` setting, the replication is terminated. Tuning is a bit of an art - the amount of WAL required is variable for every situation.
 
-**File-based Log shipping**
+### File-based Log shipping
 
 In this replication method, the primary continuously buffers WAL changes to a local file and then sends the file to the read replica. If multiple read replicas are present, files could also be sent to an intermediary location accessible by all. The read replica then reads the WAL files and applies those changes. There is higher replication lag than streaming replication since the primary buffers the changes locally first. It also means there is a small chance that WAL changes do not reach read replicas if the primary goes down before the file is transferred. In these cases, if the primary fails a replica using streaming replication would (in most cases) be more up-to-date than a replica using file-based log shipping.
 
-**File-Based Log shipping 🤝 Streaming replication**
+### File-Based Log shipping 🤝 Streaming replication
 
 We use a hybrid approach to address the limitations of each method. 
 
-- old diagrams
-    
-    ![Original diagram](https://prod-files-secure.s3.us-west-2.amazonaws.com/165a3c21-8e38-4d4b-831a-f9bb88a3262b/41130f27-c9a3-4667-b81c-709e299c3a9e/Untitled.png)
-    
-    Original diagram
-    
-    ![Suggested changes to the diagram](https://prod-files-secure.s3.us-west-2.amazonaws.com/165a3c21-8e38-4d4b-831a-f9bb88a3262b/45be49e8-1f63-43ad-aa14-fdd8732982b9/Untitled.png)
-    
-    Suggested changes to the diagram
-    
-
-![streaming-replication-dark.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/165a3c21-8e38-4d4b-831a-f9bb88a3262b/f500ebed-404e-49cc-b0a5-83d48479bf02/streaming-replication-dark.png)
+src={{
+  dark: "/images/blog/lwx-read-replicas/streaming-replication-dark.png",
+  light: "/images/blog/lwx-read-replicas/streaming-replication-light.png"
+}}
 
 Streaming replication minimizes replication lag, while file-based log shipping provides a fallback. For file-based log shipping, we use our existing Point In Time Recovery (PITR) infrastructure. We regularly archive files from the primary using [WAL-G](https://github.com/wal-g/wal-g), an open source archival and restoration tool, and ship the WAL files to S3. 
 
@@ -131,7 +130,5 @@ Read replicas are priced like regular databases for compute and storage. There i
 - The compute instance of the read replica. The compute hours used by your read replica will be added to the total compute hours used by your organization and charged at the same rate.
 - The disk size of the read replica will be charged at the same rate of 0.125$ / GB
 - Any WAL transfer between the primary and read replica will be charged at 9c / GB
-
-~~We are rolling out self-serve Read Replica support to all paid plans over the next month. If you want to be prioritized on the rollout, [let us know](https://forms.supabase.com/read-replica)!~~ 
 
 [Sign-ups](https://forms.supabase.com/read-replica) for early access of self-serve Read Replica support are now open. Following which we will progressively rollout self-serve Read Replica support to all paid plans over the next few months.
