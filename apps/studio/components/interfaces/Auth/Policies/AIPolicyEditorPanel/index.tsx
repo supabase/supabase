@@ -29,6 +29,9 @@ import { AIPolicyHeader } from './AIPolicyHeader'
 import PolicyDetails from './PolicyDetails'
 import QueryError from './QueryError'
 import RLSCodeEditor from './RLSCodeEditor'
+import Telemetry from 'lib/telemetry'
+import { useTelemetryProps } from 'common'
+import { useRouter } from 'next/router'
 
 const DiffEditor = dynamic(
   () => import('@monaco-editor/react').then(({ DiffEditor }) => DiffEditor),
@@ -50,6 +53,8 @@ export const AIPolicyEditorPanel = memo(function ({
   onSelectCancel,
 }: AIPolicyEditorPanelProps) {
   const { meta } = useStore()
+  const router = useRouter()
+  const telemetryProps = useTelemetryProps()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
 
@@ -259,10 +264,38 @@ export const AIPolicyEditorPanel = memo(function ({
                     <span className="text-sm">Accept changes from assistant</span>
                   </div>
                   <div className="flex gap-3">
-                    <Button type="default" onClick={() => setIncomingChange(undefined)}>
+                    <Button
+                      type="default"
+                      onClick={() => {
+                        setIncomingChange(undefined)
+                        Telemetry.sendEvent(
+                          {
+                            category: 'rls_editor',
+                            action: 'ai_suggestion_discard',
+                            label: 'rls-ai-assistant',
+                          },
+                          telemetryProps,
+                          router
+                        )
+                      }}
+                    >
                       Discard
                     </Button>
-                    <Button type="primary" onClick={() => acceptChange()}>
+                    <Button
+                      type="primary"
+                      onClick={() => {
+                        acceptChange()
+                        Telemetry.sendEvent(
+                          {
+                            category: 'rls_editor',
+                            action: 'ai_suggestion_accept',
+                            label: 'rls-ai-assistant',
+                          },
+                          telemetryProps,
+                          router
+                        )
+                      }}
+                    >
                       Accept
                     </Button>
                   </div>
