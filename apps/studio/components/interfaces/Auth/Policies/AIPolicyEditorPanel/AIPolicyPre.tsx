@@ -63,7 +63,7 @@ export const AIPolicyPre = ({ onDiff, children, className }: AAIPolicyPreProps) 
                 Telemetry.sendEvent(
                   {
                     category: 'rls_editor',
-                    action: 'ai_suggestion_diff',
+                    action: 'ai_suggestion_diffed',
                     label: 'rls-ai-assistant',
                   },
                   telemetryProps,
@@ -98,7 +98,7 @@ export const AIPolicyPre = ({ onDiff, children, className }: AAIPolicyPreProps) 
                 Telemetry.sendEvent(
                   {
                     category: 'rls_editor',
-                    action: 'ai_suggestion_copy',
+                    action: 'ai_suggestion_copied',
                     label: 'rls-ai-assistant',
                   },
                   telemetryProps,

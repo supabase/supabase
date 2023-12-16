@@ -271,7 +271,7 @@ export const AIPolicyEditorPanel = memo(function ({
                         Telemetry.sendEvent(
                           {
                             category: 'rls_editor',
-                            action: 'ai_suggestion_discard',
+                            action: 'ai_suggestion_discarded',
                             label: 'rls-ai-assistant',
                           },
                           telemetryProps,
@@ -288,7 +288,7 @@ export const AIPolicyEditorPanel = memo(function ({
                         Telemetry.sendEvent(
                           {
                             category: 'rls_editor',
-                            action: 'ai_suggestion_accept',
+                            action: 'ai_suggestion_accepted',
                             label: 'rls-ai-assistant',
                           },
                           telemetryProps,
