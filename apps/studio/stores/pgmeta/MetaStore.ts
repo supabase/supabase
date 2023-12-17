@@ -342,9 +342,8 @@ export default class MetaStore implements IMetaStore {
                 id: toastId,
                 progress,
                 category: 'loading',
-                message: `Adding ${importContent.rows.length.toLocaleString()} rows to ${
-                  table.name
-                }`,
+                message: `Adding ${importContent.rows.length.toLocaleString()} rows to ${table.name
+                  }`,
               })
             }
           )
@@ -377,7 +376,11 @@ export default class MetaStore implements IMetaStore {
     const existingPrimaryKeyColumns = table.primary_keys.map((pk: PostgresPrimaryKey) => pk.name)
     const isPrimaryKeyUpdated = !isEqual(primaryKeyColumns, existingPrimaryKeyColumns)
 
-    if (isPrimaryKeyUpdated) {
+    // When table name is changed we can either remove the PK constraints and readd them
+    // or rename them. Removing and readding them allows code reuse.
+    const tableNameChanged = table?.name !== payload?.name
+
+    if (isPrimaryKeyUpdated || tableNameChanged) {
       // Remove any primary key constraints first (we'll add it back later)
       // If we do it later, and if the user deleted a PK column, we'd need to do
       // an additional check when removing PK if the column in the PK was removed
@@ -472,7 +475,9 @@ export default class MetaStore implements IMetaStore {
     }
 
     // Then add back the primary keys again
-    if (isPrimaryKeyUpdated && primaryKeyColumns.length > 0) {
+    // either primary key is changed or table name is changed we drop the original primary keys.
+    // so we need to re add them
+    if ((isPrimaryKeyUpdated || tableNameChanged) && primaryKeyColumns.length > 0) {
       await addPrimaryKey(
         this.projectRef,
         this.connectionString,
