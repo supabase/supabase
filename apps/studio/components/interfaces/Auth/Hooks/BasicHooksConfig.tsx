@@ -1,6 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { observer } from 'mobx-react-lite'
 import { useEffect } from 'react'
 import {
   AlertDescription_Shadcn_,
@@ -8,7 +7,6 @@ import {
   Alert_Shadcn_,
   Form,
   IconAlertCircle,
-  IconAlertTriangle,
   Toggle,
 } from 'ui'
 import { boolean, object, string } from 'yup'
@@ -23,7 +21,7 @@ import {
 } from 'components/ui/Forms'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions, useStore, useFlag } from 'hooks'
+import { useCheckPermissions, useFlag, useStore } from 'hooks'
 
 import SchemaFunctionSelector from './SchemaFunctionSelector'
 
@@ -34,8 +32,8 @@ const schema = object({
 
 const formId = 'auth-basic-hooks-form'
 
-const BasicHooksConfig = observer(() => {
-  const { ui, meta } = useStore()
+const BasicHooksConfig = () => {
+  const { ui } = useStore()
   const { ref: projectRef } = useParams()
   const {
     data: authConfig,
@@ -87,10 +85,6 @@ const BasicHooksConfig = observer(() => {
     )
   }
 
-  useEffect(() => {
-    if (ui.selectedProjectRef) meta.functions.load()
-  }, [ui.selectedProjectRef])
-
   if (isError) {
     return (
       <Alert_Shadcn_ variant="destructive">
@@ -107,6 +101,7 @@ const BasicHooksConfig = observer(() => {
         const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
         // Form is reset once remote data is loaded in store
+        // eslint-disable-next-line react-hooks/rules-of-hooks
         useEffect(() => {
           if (isSuccess) {
             resetForm({ values: INITIAL_VALUES, initialValues: INITIAL_VALUES })
@@ -175,6 +170,6 @@ const BasicHooksConfig = observer(() => {
       }}
     </Form>
   )
-})
+}
 
 export default BasicHooksConfig

@@ -3,7 +3,15 @@ import { useParams } from 'common'
 import { last } from 'lodash'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Button, Form_Shadcn_, IconFileText, IconGitBranch, Modal } from 'ui'
+import {
+  Button,
+  Form_Shadcn_,
+  IconDollarSign,
+  IconExternalLink,
+  IconFileText,
+  IconGitBranch,
+  Modal,
+} from 'ui'
 import * as z from 'zod'
 
 import SidePanelGitHubRepoLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelGitHubRepoLinker'
@@ -19,6 +27,9 @@ import { useAppStateSnapshot } from 'state/app-state'
 import BranchingPITRNotice from './BranchingPITRNotice'
 import BranchingPostgresVersionNotice from './BranchingPostgresVersionNotice'
 import GithubRepositorySelection from './GithubRepositorySelection'
+import Link from 'next/link'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import BranchingPlanNotice from './BranchingPlanNotice'
 
 const EnableBranchingModal = () => {
   const { ui } = useStore()
@@ -52,6 +63,9 @@ const EnableBranchingModal = () => {
   })
   const hasMinimumPgVersion =
     Number(last(data?.current_app_version.split('-') ?? [])?.split('.')[0] ?? 0) >= 15
+
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
+  const isFreePlan = subscription?.plan.id === 'free'
 
   const { data: addons } = useProjectAddonsQuery({ projectRef: ref })
   const hasPitrEnabled =
@@ -132,8 +146,8 @@ const EnableBranchingModal = () => {
         hideFooter
         visible={snap.showEnableBranchingModal}
         onCancel={() => snap.setShowEnableBranchingModal(false)}
-        className="!bg"
-        size="large"
+        className="!bg !max-w-[40rem]"
+        size="xlarge"
       >
         <Form_Shadcn_ {...form}>
           <form
@@ -141,12 +155,23 @@ const EnableBranchingModal = () => {
             onSubmit={form.handleSubmit(onSubmit)}
             onChange={() => setIsValid(false)}
           >
-            <Modal.Content className="px-7 py-5 flex items-center space-x-4">
-              <IconGitBranch strokeWidth={2} size={20} />
-              <div>
-                <p className="text-foreground">Enable database branching</p>
-                <p className="text-sm text-foreground-light">Manage environments in Supabase</p>
+            <Modal.Content className="px-7 py-5 flex items-center justify-between space-x-4">
+              <div className="flex items-center gap-x-4">
+                <IconGitBranch strokeWidth={2} size={20} />
+                <div>
+                  <p className="text-foreground">Enable database branching</p>
+                  <p className="text-sm text-foreground-light">Manage environments in Supabase</p>
+                </div>
               </div>
+              <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                <Link
+                  href="https://supabase.com/docs/guides/platform/branching"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Documentation
+                </Link>
+              </Button>
             </Modal.Content>
 
             {isLoading && (
@@ -181,7 +206,11 @@ const EnableBranchingModal = () => {
 
             {isSuccess && (
               <>
-                {hasMinimumPgVersion ? (
+                {isFreePlan ? (
+                  <BranchingPlanNotice />
+                ) : !hasMinimumPgVersion ? (
+                  <BranchingPostgresVersionNotice />
+                ) : (
                   <>
                     <GithubRepositorySelection
                       form={form}
@@ -192,14 +221,29 @@ const EnableBranchingModal = () => {
                     />
                     {!hasPitrEnabled && <BranchingPITRNotice />}
                   </>
-                ) : (
-                  <BranchingPostgresVersionNotice />
                 )}
                 <Modal.Content className="px-7 py-6 flex flex-col gap-3">
                   <p className="text-sm text-foreground-light">
                     Please keep in mind the following:
                   </p>
                   <div className="flex flex-row gap-4">
+                    <div>
+                      <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-300 flex items-center justify-center">
+                        <IconDollarSign className="text-amber-900" size={20} strokeWidth={2} />
+                      </figure>
+                    </div>
+                    <div className="flex flex-col gap-y-1">
+                      <p className="text-sm text-foreground">
+                        Preview branches are billed per hour
+                      </p>
+                      <p className="text-sm text-foreground-light">
+                        Launching a new preview branch incurs additional compute costs, starting at
+                        $0.01344 per hour (~$10/month). This cost will continue for as long as the
+                        branch has not been removed.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex flex-row gap-4 mt-2">
                     <div>
                       <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-300 flex items-center justify-center">
                         <IconFileText className="text-amber-900" size={20} strokeWidth={2} />

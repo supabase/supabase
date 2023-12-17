@@ -35,7 +35,7 @@ const AnnouncementBadge = ({
           relative
           flex flex-row
           items-center
-          pr-3 p-1
+          p-1 pr-3
           text-sm
           w-auto
           gap-2

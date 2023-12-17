@@ -1,6 +1,7 @@
 import { useTheme } from 'next-themes'
 import * as React from 'react'
 import Image from 'next/image'
+import { cn } from '../../lib/utils'
 
 interface Props {
   title: string
@@ -52,10 +53,8 @@ const GlassPanel = ({
         <Image
           src={logoImage}
           alt={title}
-          layout="fill"
-          objectFit="contain"
-          objectPosition="left"
-          className={className}
+          fill
+          className={cn('object-contain object-left', className)}
         />
       </div>
     </div>

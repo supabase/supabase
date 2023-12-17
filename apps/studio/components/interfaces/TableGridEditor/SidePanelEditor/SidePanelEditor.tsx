@@ -27,6 +27,10 @@ import {
   UpdateColumnPayload,
 } from './SidePanelEditor.types'
 import { ImportContent } from './TableEditor/TableEditor.types'
+import { useDatabasePublicationCreateMutation } from 'data/database-publications/database-publications-create-mutation'
+import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
+import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
+import { getTables } from 'data/tables/tables-query'
 
 export interface SidePanelEditorProps {
   editable?: boolean
@@ -44,8 +48,10 @@ const SidePanelEditor = ({
 }: SidePanelEditorProps) => {
   const snap = useTableEditorStateSnapshot()
   const [_, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
+
   const { meta, ui } = useStore()
   const queryClient = useQueryClient()
+  const { project } = useProjectContext()
 
   const [isEdited, setIsEdited] = useState<boolean>(false)
   const [isClosingPanel, setIsClosingPanel] = useState<boolean>(false)
@@ -56,7 +62,6 @@ const SidePanelEditor = ({
     })
     .map((column) => column.name)
 
-  const { project } = useProjectContext()
   const { mutateAsync: createTableRows } = useTableRowCreateMutation({
     onSuccess() {
       toast.success('Successfully created row')
@@ -66,6 +71,14 @@ const SidePanelEditor = ({
     onSuccess() {
       toast.success('Successfully updated row')
     },
+  })
+  const { data: publications } = useDatabasePublicationsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const { mutateAsync: createPublication } = useDatabasePublicationCreateMutation()
+  const { mutateAsync: updatePublication } = useDatabasePublicationUpdateMutation({
+    onError: () => {},
   })
 
   const getImpersonatedRole = useGetImpersonatedRole()
@@ -246,6 +259,73 @@ const SidePanelEditor = ({
     })
   }
 
+  const updateTableRealtime = async (table: PostgresTable, enabled: boolean) => {
+    if (!project) return console.error('Project is required')
+    let realtimePublication = (publications ?? []).find((pub) => pub.name === 'supabase_realtime')
+    const publicTables = await queryClient.fetchQuery({
+      queryKey: tableKeys.list(project.ref, 'public'),
+      queryFn: ({ signal }) =>
+        getTables(
+          { projectRef: project.ref, connectionString: project.connectionString, schema: 'public' },
+          signal
+        ),
+    })
+
+    try {
+      if (realtimePublication === undefined) {
+        realtimePublication = await createPublication({
+          projectRef: project.ref,
+          connectionString: project?.connectionString,
+          name: 'supabase_realtime',
+          publish_insert: true,
+          publish_update: true,
+          publish_delete: true,
+        })
+      }
+      const { id, tables: publicationTables } = realtimePublication
+      if (publicationTables === null) {
+        // UI doesn't have support for toggling realtime for ALL tables
+        // Switch it to individual tables via an array of strings
+        // Refer to PublicationStore for more information about this
+        const realtimeTables = enabled
+          ? publicTables.map((t: any) => `${t.schema}.${t.name}`)
+          : publicTables
+              .filter((t: any) => t.id !== table.id)
+              .map((t: any) => `${t.schema}.${t.name}`)
+        await updatePublication({
+          id,
+          projectRef: project.ref,
+          connectionString: project?.connectionString,
+          tables: realtimeTables,
+        })
+      } else {
+        const isAlreadyEnabled = publicationTables.some((x: any) => x.id == table.id)
+        const realtimeTables =
+          isAlreadyEnabled && !enabled
+            ? // Toggle realtime off
+              publicationTables
+                .filter((t: any) => t.id !== table.id)
+                .map((t: any) => `${t.schema}.${t.name}`)
+            : !isAlreadyEnabled && enabled
+            ? // Toggle realtime on
+              [`${table.schema}.${table.name}`].concat(
+                publicationTables.map((t: any) => `${t.schema}.${t.name}`)
+              )
+            : null
+        if (realtimeTables === null) return
+        await updatePublication({
+          id,
+          projectRef: project.ref,
+          connectionString: project?.connectionString,
+          tables: realtimeTables,
+        })
+      }
+    } catch (error: any) {
+      console.log({ error })
+      toast.error(`Failed to update realtime for ${table.name}: ${error.message}`)
+    }
+  }
+
   const saveTable = async (
     payload: any,
     columns: ColumnField[],
@@ -261,8 +341,7 @@ const SidePanelEditor = ({
   ) => {
     let toastId
     let saveTableError = false
-    const { tableId, importContent, isRLSEnabled, isRealtimeEnabled, isDuplicateRows } =
-      configuration
+    const { importContent, isRLSEnabled, isRealtimeEnabled, isDuplicateRows } = configuration
 
     try {
       if (
@@ -279,10 +358,10 @@ const SidePanelEditor = ({
 
         const table: any = await meta.duplicateTable(payload, {
           isRLSEnabled,
-          isRealtimeEnabled,
           isDuplicateRows,
           duplicateTable,
         })
+        if (isRealtimeEnabled) await updateTableRealtime(table, isRealtimeEnabled)
 
         await Promise.all([
           queryClient.invalidateQueries(tableKeys.list(project?.ref, table.schema)),
@@ -302,14 +381,8 @@ const SidePanelEditor = ({
           message: `Creating new table: ${payload.name}...`,
         })
 
-        const table = await meta.createTable(
-          toastId,
-          payload,
-          columns,
-          isRLSEnabled,
-          isRealtimeEnabled,
-          importContent
-        )
+        const table = await meta.createTable(toastId, payload, columns, isRLSEnabled, importContent)
+        if (isRealtimeEnabled) await updateTableRealtime(table, true)
 
         await Promise.all([
           queryClient.invalidateQueries(tableKeys.list(project?.ref, table.schema)),
@@ -333,9 +406,10 @@ const SidePanelEditor = ({
           toastId,
           selectedTable,
           payload,
-          columns,
-          isRealtimeEnabled
+          columns
         )
+
+        await updateTableRealtime(table, isRealtimeEnabled)
 
         if (hasError) {
           ui.setNotification({
