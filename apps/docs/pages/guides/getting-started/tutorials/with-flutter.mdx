@@ -541,7 +541,7 @@ We will use [`image_picker`](https://pub.dev/packages/image_picker) plugin to se
 Add the following line in your pubspec.yaml file to install `image_picker`:
 
 ```yaml
-image_picker: ^0.8.4
+image_picker: ^1.0.5
 ```
 
 Using [`image_picker`](https://pub.dev/packages/image_picker) requires some additional preparation depending on the platform.
@@ -687,10 +687,10 @@ class _AccountPageState extends State<AccountPage> {
     });
 
     try {
-      final userId = supabase.auth.currentUser!.id;
+      final userId = supabase.auth.currentSession!.user.id;
       final data = await supabase
           .from('profiles')
-          .select<Map<String, dynamic>>()
+          .select()
           .eq('id', userId)
           .single();
       _usernameController.text = (data['username'] ?? '') as String;
