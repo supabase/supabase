@@ -549,15 +549,13 @@ We have brought numerous updates behind the scenes to make the SDK work more int
             .count(); // CountOption.exact is the default value
 
         final data = res.data;
-        final count = res.count;
+        final int count = res.count;
 
         // `.count()` directly on `.from()` performs a head request,
         // obtaining the count value without fetching the data.
-        final res = await supabase
+        final int count = await supabase
             .from('cities')
             .count(); // CountOption.exact is the default value
-
-        final count = res.count;
         ```
 
       </TabPanel>
