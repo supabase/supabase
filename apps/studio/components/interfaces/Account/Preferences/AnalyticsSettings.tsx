@@ -17,8 +17,8 @@ const AnalyticsSettings = () => {
         <Toggle
           checked={snap.isOptedInTelemetry}
           onChange={onToggleOptIn}
-          label="Opt-in to send telemetry data from the dashboard"
-          descriptionText="By opting into sending telemetry data, Supabase can improve the overall dashboard user experience"
+          label="Opt-in to sending anonymous telemetry data from the dashboard"
+          descriptionText="By opting-in to sending anonymous telemetry data, Supabase can improve your overall dashboard user experience"
         />
       </Panel.Content>
     </Panel>
