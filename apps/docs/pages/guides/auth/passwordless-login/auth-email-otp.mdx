@@ -59,11 +59,11 @@ Future<void> signInWithEmailOtp() async {
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
-When your user signs in, call [sendOtpTo()](/docs/reference/kotlin/auth-signinwithotp) with their email address:
+When your user signs in, call [signInWith(OTP)](/docs/reference/kotlin/auth-signinwithotp) with their email address:
 
 ```kotlin
 suspend fun signInWithEmailOtp() {
-	supabase.gotrue.sendOtpTo(Email) {
+	supabase.auth.signInWith(OTP) {
 		email = "example@email.com"
 	}
 }

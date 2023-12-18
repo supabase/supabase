@@ -1,6 +1,4 @@
 import { useRouter } from 'next/router'
-import announcement from '../data/Announcement.json'
-import Countdown from './Countdown'
 import Image from 'next/image'
 import { Button } from 'ui'
 
@@ -35,16 +33,14 @@ export function LWXCountdownBanner() {
               className="filter contrast-0 dark:contrast-100"
             />
           </div>
-          <div className="hidden sm:block">
-            <Countdown date={new Date(announcement.launchDate)} showCard={false} />
-          </div>
+          <div className="hidden sm:block">Day 5: introducing Read Replicas</div>
           <Button
             onClick={() => null}
             size="tiny"
             type="secondary"
             className="px-2 py-1 !leading-none text-xs"
           >
-            Claim your ticket
+            Go to Launch Week
           </Button>
         </div>
       </div>

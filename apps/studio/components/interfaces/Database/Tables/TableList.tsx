@@ -10,9 +10,10 @@ import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
@@ -46,7 +47,6 @@ const TableList = ({
   onDeleteTable = noop,
   onOpenTable = noop,
 }: TableListProps) => {
-  const { meta } = useStore()
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
 
@@ -82,8 +82,11 @@ const TableList = ({
     }
   )
 
-  const publications = meta.publications.list()
-  const realtimePublication = publications.find(
+  const { data: publications } = useDatabasePublicationsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const realtimePublication = (publications ?? []).find(
     (publication) => publication.name === 'supabase_realtime'
   )
 

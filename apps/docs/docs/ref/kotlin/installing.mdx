@@ -51,7 +51,17 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supab
             </TabPanel>
         </Tabs>
 
-        The available modules are: [**gotrue-kt**](https://github.com/supabase-community/supabase-kt/tree/master/GoTrue), [**realtime-kt**](https://github.com/supabase-community/supabase-kt/tree/master/Realtime), [**storage-kt**](https://github.com/supabase-community/supabase-kt/tree/master/Storage), [**functions-kt**](https://github.com/supabase-community/supabase-kt/tree/master/Functions), [**postgrest-kt**](https://github.com/supabase-community/supabase-kt/tree/master/Postgrest), [**apollo-graphql**](https://github.com/supabase-community/supabase-kt/tree/master/plugins/ApolloGraphQL), [**compose-auth**](https://github.com/supabase-community/supabase-kt/tree/master/plugins/ComposeAuth) and [**compose-auth-ui**](https://github.com/supabase-community/supabase-kt/tree/master/plugins/ComposeAuthUI)
+        The available modules are:
+        - [**gotrue-kt**](https://github.com/supabase-community/supabase-kt/tree/master/GoTrue)
+        - [**realtime-kt**](https://github.com/supabase-community/supabase-kt/tree/master/Realtime)
+        - [**storage-kt**](https://github.com/supabase-community/supabase-kt/tree/master/Storage)
+        - [**functions-kt**](https://github.com/supabase-community/supabase-kt/tree/master/Functions)
+        - [**postgrest-kt**](https://github.com/supabase-community/supabase-kt/tree/master/Postgrest)
+        - [apollo-graphql](https://github.com/supabase-community/supabase-kt/tree/master/plugins/ApolloGraphQL) - Creates an [Apollo GraphQL Client](https://github.com/apollographql/apollo-kotlin) for interacting with the Supabase API.
+        - [compose-auth](https://github.com/supabase-community/supabase-kt/tree/master/plugins/ComposeAuth) - Provides easy Native Google & Apple Auth for Compose Multiplatform targets.
+        - [compose-auth-ui](https://github.com/supabase-community/supabase-kt/tree/master/plugins/ComposeAuthUI) - Provides UI Components for Compose Multiplatform.
+        - [coil-integration](https://github.com/supabase-community/supabase-kt/tree/master/plugins/CoilIntegration) - Provides a [Coil](https://github.com/coil-kt/coil) Integration for displaying images stored in Supabase Storage.
+        - [imageloader-integration](https://github.com/supabase-community/supabase-kt/tree/master/plugins/ImageLoaderIntegration) - Provides a [Compose ImageLoader](https://github.com/qdsfdhvh/compose-imageloader) Integration for displaying images stored in Supabase Storage.
 
         When using multiple modules, you can also use the BOM dependency to ensure that all modules use the same version:
 
@@ -265,7 +275,10 @@ By default, [KotlinX Serialization](https://github.com/Kotlin/kotlinx.serializat
         </Tabs>
         ```kotlin
         val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
-            //Already the default serializer
+            //Already the default serializer, but you can provide a custom Json instance (optional):
+            defaultSerializer = KotlinXSerializer(Json {
+                //apply your custom config
+            })
         }
         ```
     </RefSubLayout.Examples>

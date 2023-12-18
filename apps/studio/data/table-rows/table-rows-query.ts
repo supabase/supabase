@@ -11,6 +11,7 @@ import {
 } from '../sql/execute-sql-query'
 import { getPagination } from '../utils/pagination'
 import { formatFilterValue } from './utils'
+import { IS_PLATFORM } from 'common'
 
 type GetTableRowsArgs = {
   table?: SupaTable
@@ -36,7 +37,7 @@ export const fetchAllTableRows = async ({
   filters?: Filter[]
   sorts?: Sort[]
 }) => {
-  if (!connectionString) {
+  if (IS_PLATFORM && !connectionString) {
     console.error('Connection string is required')
     return []
   }

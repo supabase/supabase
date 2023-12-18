@@ -12,6 +12,8 @@ import { RedirectType, redirect } from 'next/navigation'
 
 import OpenAI from 'openai'
 import { z } from 'zod'
+import { threadId } from 'worker_threads'
+import { MessageContentText } from 'openai/resources/beta/threads/index.mjs'
 
 const openai = new OpenAI()
 
@@ -161,8 +163,23 @@ export async function createThread(prevState: any, formData: FormData) {
         run_id: run.id,
         user_id: user.id,
         thread_title: threadTitle as string,
+        latest_message_id: message.id,
       })
       revalidatePath('/profile')
+      if (error) throw error
+    } catch (error) {
+      console.error(error)
+    }
+
+    // insert into supabase
+    try {
+      const { error } = await supabase.from('messages_user').insert({
+        message_id: message.id,
+        thread_id: thread.id,
+        text: (message.content[0] as MessageContentText).text.value,
+        run_id: run.id,
+        user_id: user.id,
+      })
       if (error) throw error
     } catch (error) {
       console.error(error)
@@ -193,7 +210,6 @@ export async function createThread(prevState: any, formData: FormData) {
 export async function updateThread(prevState: any, formData: FormData) {
   const cookieStore = cookies()
   const supabase = createClient(cookieStore)
-
   let redirectUrl = ''
 
   try {
@@ -215,6 +231,47 @@ export async function updateThread(prevState: any, formData: FormData) {
     })
 
     revalidatePath(`/${data.threadId}/${data.runId}`, 'layout')
+
+    // insert into supabase
+
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser()
+
+    if (userError || !user) {
+      return {
+        success: false,
+        message: 'Failed to get user',
+        data: undefined,
+      }
+    }
+    console.log('message.content[0]', message.content[0])
+    try {
+      const { error } = await supabase.from('messages_user').insert({
+        message_id: message.id,
+        thread_id: data.threadId,
+        text: (message.content[0] as MessageContentText).text.value,
+        run_id: data.runId,
+        user_id: user.id,
+      })
+      if (error) throw error
+    } catch (error) {
+      console.error(error)
+    }
+    console.log('message.id', message.id)
+    // update existing thread with latest messageID
+    try {
+      const { error } = await supabase
+        .from('threads')
+        .update({
+          latest_message_id: message.id,
+        })
+        .eq('thread_id', data.threadId)
+      if (error) throw error
+    } catch (error) {
+      console.error('Update error:', error)
+    }
 
     const run = await openai.beta.threads.runs.create(message.thread_id, {
       assistant_id: 'asst_oLWrK8lScZVNEpfjwUIvBAnq',

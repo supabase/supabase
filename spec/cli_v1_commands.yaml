@@ -2700,11 +2700,11 @@ commands:
         default_value: ''
       - id: linked
         name: --linked
-        description: Resets the linked project to current migrations.
+        description: Resets the linked project with local migrations.
         default_value: 'false'
       - id: local
         name: --local
-        description: Resets the local database to current migrations.
+        description: Resets the local database with local migrations.
         default_value: 'true'
       - id: version
         name: --version <string>

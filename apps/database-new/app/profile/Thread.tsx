@@ -31,7 +31,7 @@ const Thread = ({ thread }: { thread: ThreadType }) => {
         <div className="flex flex-col grow overflow-hidden">
           <Link
             className="flex text-sm group-hover:underline truncate"
-            href={`/${thread.thread_id}/${thread.run_id}`}
+            href={`/${thread.thread_id}/${thread.run_id}/${thread.latest_message_id}`}
           >
             <span className="truncate">{thread.thread_title}</span>
           </Link>
