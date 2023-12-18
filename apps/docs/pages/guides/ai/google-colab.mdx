@@ -61,7 +61,7 @@ Now we're going to create a new collection and insert some documents.
 Create a new code block below the install block (`ctrl+m b`). Add the following code to the code block and execute it (`ctrl+enter`):
 
 ```py
-collection = vx.create_collection(name="colab_collection", dimension=3)
+collection = vx.get_or_create_collection(name="colab_collection", dimension=3)
 
 collection.upsert(
     vectors=[

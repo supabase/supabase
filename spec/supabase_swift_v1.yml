@@ -415,17 +415,17 @@ functions:
           let session = try await supabase.auth.refreshSession(refreshToken: "custom-refresh-token")
           ```
   - id: on-auth-state-change
-    title: "onAuthStateChange()"
+    title: "authStateChanges"
     notes: |
       - Types of auth events: `INITIAL_SESSION`, `SIGNED_IN`, `SIGNED_OUT`, `TOKEN_REFRESHED`, `USER_UPDATED`, `PASSWORD_RECOVERY`, `MFA_CHALLENGE_VERIFIED`
-      - The `INITIAL_SESSION` can be used to allow you to invoke the callback function when `onAuthStateChange` is first called.
+      - The `INITIAL_SESSION` can be used to allow you to invoke the callback function when `authStateChanges` is first called.
     examples:
       - id: listen-to-auth-changes
         name: Listen to auth changes
         isSpotlight: true
         code: |
           ```swift
-          for await (event, session) in await supabase.auth.onAuthStateChange() {
+          for await (event, session) in await supabase.auth.authStateChanges {
             print(event, session)
           }
           ```
@@ -433,7 +433,7 @@ functions:
         name: Listen to a specific event
         code: |
           ```swift
-          for await (_, session) in await supabase.auth.onAuthStateChange().filter({ $0.event == .signedIn }) {
+          for await (_, session) in await supabase.auth.authStateChanges.filter({ $0.event == .signedIn }) {
             // handle signIn event.
           }
           ```
@@ -3182,18 +3182,11 @@ functions:
           ```swift
           let fileName = "avatar1.png"
 
-          let file = File(
-            name: fileName,
-            data: fileData,
-            fileName: fileName,
-            contentType: "image/png"
-          )
-
           try await supabase.storage
             .from("avatars")
             .upload(
               path: "public/\(fileName)",
-              file: file,
+              file: fileData,
               fileOptions: FileOptions(
                 cacheControl: "3600",
                 upsert: false
@@ -3216,18 +3209,11 @@ functions:
           ```swift
           let fileName = "avatar1.png"
 
-          let file = File(
-            name: fileName,
-            data: fileData,
-            fileName: fileName,
-            contentType: "image/png"
-          )
-
           try await supabase.storage
             .from("avatars")
             .update(
               path: "public/\(fileName)",
-              file: file,
+              file: fileData,
               fileOptions: FileOptions(
                 cacheControl: "3600",
                 upsert: true

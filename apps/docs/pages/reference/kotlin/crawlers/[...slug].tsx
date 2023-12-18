@@ -1,6 +1,6 @@
 import clientLibsCommonSections from '~/../../spec/common-client-libs-sections.json'
 import typeSpec from '~/../../spec/enrichments/tsdoc_v2/combined.json'
-import spec from '~/../../spec/supabase_kt_v1.yml' assert { type: 'yml' }
+import spec from '~/../../spec/supabase_kt_v2.yml' assert { type: 'yml' }
 import RefSectionHandler from '~/components/reference/RefSectionHandler'
 import { flattenSections } from '~/lib/helpers'
 import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'
@@ -14,7 +14,7 @@ const libraryPath = '/kotlin'
 export default function KotlinReference(props) {
   const router = useRouter()
   const slug = router.query.slug[0]
-  const filteredSection = sections.filter((section) => section.id === slug)
+  const filteredSection = sections.filter((section) => section.slug === slug)
 
   const pageTitle = filteredSection[0]?.title
     ? `${filteredSection[0]?.title} | Supabase`

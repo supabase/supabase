@@ -13,7 +13,7 @@ Looking for guides on how to use Single Sign-On with the Supabase dashboard? Hea
 
 </Admonition>
 
-Supabase Auth supports enterprise-level Single Sign-On (SSO) for any identity providers compatible with the using the SAML 2.0 protocol. This is a non-exclusive list of supported identity providers:
+Supabase Auth supports enterprise-level Single Sign-On (SSO) for any identity providers compatible with the SAML 2.0 protocol. This is a non-exclusive list of supported identity providers:
 
 - Google Workspaces (formerly known as GSuite)
 - Okta, Auth0
@@ -208,10 +208,12 @@ Calling [`signInWithSSO`](/docs/reference/javascript/auth-signinwithsso) starts 
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-supabase.gotrue.loginWith(SSO.withDomain("company.com"))
+supabase.auth.signInWith(SSO) {
+    domain = "company.com"
+}
 ```
 
-Calling [`loginWith(SSO)`](/docs/reference/kotlin/auth-signinwithsso) starts the sign-in process using the identity provider registered for the `company.com` domain name. It is not required that identity providers be assigned one or multiple domain names, in which case you can use the provider's unique ID instead.
+Calling [`signInWith(SSO)`](/docs/reference/kotlin/auth-signinwithsso) starts the sign-in process using the identity provider registered for the `company.com` domain name. It is not required that identity providers be assigned one or multiple domain names, in which case you can use the provider's unique ID instead.
 
 </TabPanel>
 </Tabs>

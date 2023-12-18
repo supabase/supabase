@@ -47,6 +47,27 @@ async function signInWithEmail() {
 ```
 
 </TabPanel>
+<TabPanel id="react-native" label="Expo React Native">
+Follow the [Expo Quickstart Guide](/docs/guides/getting-started/tutorials/with-expo-react-native#initialize-a-react-native-app) to initialize `supabase-js` with React Native.
+
+To start the sign in process call [signInWithOtp()](/docs/reference/javascript/auth-signinwithotp) with their email address:
+
+```ts
+import { makeRedirectUri } from 'expo-auth-session'
+
+const redirectTo = makeRedirectUri()
+
+const { error } = await supabase.auth.signInWithOtp({
+  email: 'example@email.com',
+  options: {
+    emailRedirectTo: redirectTo,
+  },
+})
+```
+
+Read the [Deep Linking Documentation](/docs/guides/auth/native-mobile-deep-linking) to learn how to handle deep linking.
+
+</TabPanel>
 <TabPanel id="dart" label="Dart">
 
 When your user signs in, call [signIn()](/docs/reference/dart/auth-signinwithotp) with their email address:
@@ -60,11 +81,11 @@ Future<void> signInWithEmail() async {
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
-When your user signs in, call [sendOtpTo()](/docs/reference/kotlin/auth-signinwithotp) with their email address:
+To start the sign in process call [signInWith(OTP)](/docs/reference/kotlin/auth-signinwithotp) with their email address:
 
 ```kotlin
-suspend fun loginWithEmail() {
-	supabase.gotrue.sendOtpTo(Email) {
+suspend fun signInWithEmail() {
+	supabase.auth.signInWith(OTP) {
 		email = "example@email.com"
 	}
 }
@@ -107,7 +128,7 @@ When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) t
 
 ```kotlin
 suspend fun logout() {
-	supabase.gotrue.logout()
+	supabase.auth.signOut()
 }
 ```
 

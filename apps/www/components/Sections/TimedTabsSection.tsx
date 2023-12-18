@@ -213,7 +213,7 @@ const OpenInColab = ({ colabUrl, className }: { colabUrl: string; className?: st
     ].join(' ')}
   >
     <Image
-      className="opacity-100 hover:opacity-80 transition-opacity invert dark:filter-none"
+      className="opacity-100 hover:opacity-80 transition-opacity contrast-[.2] filter"
       src="/images/logos/google-colaboratory.svg"
       alt="Google Colaboratory logo"
       width={30}

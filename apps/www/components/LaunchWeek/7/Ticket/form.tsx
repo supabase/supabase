@@ -31,7 +31,7 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
   const [focused, setFocused] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [formState, setFormState] = useState<FormState>('default')
-  const { setPageState, setUserData, session, userData, supabase } = useConfData()
+  const { setTicketState, setUserData, session, userData, supabase } = useConfData()
   const router = useRouter()
   const isCaptchaEnabled = false
 
@@ -75,10 +75,10 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
                   )}`
               )
               .join('&')
-            await router.replace(`/launch-week/tickets?${queryString}`, '/launch-week/tickets')
+            await router.replace(`/launch-week/7/tickets?${queryString}`, '/launch-week/7/tickets')
           } else {
             setUserData(params)
-            setPageState('ticket')
+            setTicketState('ticket')
           }
         })
         .catch(async (err) => {
@@ -88,7 +88,7 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
           setFormState('error')
         })
     },
-    [email, router, setPageState, setUserData, sharePage]
+    [email, router, setTicketState, setUserData, sharePage]
   )
 
   const onSubmit = useCallback(

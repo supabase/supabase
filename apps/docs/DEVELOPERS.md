@@ -51,7 +51,7 @@ The client libraries are essentially wrappers around the clients for the various
 
 #### Example
 
-Let's look at the `updateUser()` function in the `supabase-js` library.
+Let's look at the [`updateUser()`](https://supabase.com/docs/reference/javascript/auth-updateuser) function in the `supabase-js` library.
 
 #### Common file
 
@@ -60,7 +60,7 @@ Several pieces of information for this function come from a [common file](https:
 1. id — used to identify this function
 2. title - the human-readable title
 3. slug — the url slug
-4. product - the Supabase tool or product that "owns" this function. Since `updateUser()` is an auth function, its product is `auth`
+4. product - the Supabase tool or product that "owns" this function. Since `updateUser()` is an Auth function, its product is `auth`
 5. type — `updateUser()` is a function and marked as such, but we can also have sections of markdown interspersed with these function definitions.
 
 When a new function is added, this info would need to be manually added to the common file.
@@ -90,7 +90,7 @@ These reference docs are rendered by Next.JS via a dynamic route using a [`[...s
 
 The reference docs for the [Supabase Management API](https://supabase.com/docs/reference/api) and the [Supabase CLI](https://supabase.com/docs/reference/cli) are a little more straightforward than the client libraries. Both files also have a [common file](https://github.com/supabase/supabase/blob/master/spec/common-cli-sections.json) which handles things like `title`, `id` and `slug`. Both also have a spec file detailing things like parameters, descriptions, and responses ([Management API](https://github.com/supabase/supabase/blob/master/spec/api_v0_openapi.json) / [CLI](https://github.com/supabase/supabase/blob/master/spec/cli_v1_commands.yaml))
 
-On the Next.JS side of things, these work almost exactly the same as the client libaries with a dynamic [`[...slug.tsx]`](https://github.com/supabase/supabase/blob/master/apps/docs/pages/reference/cli/%5B...slug%5D.tsx).
+On the Next.JS side of things, these work almost exactly the same as the client libraries with a dynamic [`[...slug.tsx]`](https://github.com/supabase/supabase/blob/master/apps/docs/pages/reference/cli/%5B...slug%5D.tsx).
 
 ### Misc
 

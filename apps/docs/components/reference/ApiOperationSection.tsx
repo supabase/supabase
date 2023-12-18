@@ -33,7 +33,7 @@ const ApiOperationSection = (props) => {
             {operation.path}
           </code>
         </div>
-        <div className="prose dark:prose-dark py-4">
+        <div className="prose py-4">
           <p>{operation.description}</p>
         </div>
         {/* Path Parameters */}

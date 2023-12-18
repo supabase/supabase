@@ -10,7 +10,7 @@ import { toString } from 'mdast-util-to-string'
 import { mdxjs } from 'micromark-extension-mdxjs'
 import { u } from 'unist-builder'
 import { filter } from 'unist-util-filter'
-import { BaseSource, Json, Section } from './base'
+import { BaseLoader, BaseSource, Json, Section } from './base'
 
 /**
  * Extracts ES literals from an `estree` `ObjectExpression`
@@ -189,29 +189,39 @@ export type ProcessedMdx = {
   sections: Section[]
 }
 
-export class MarkdownSource extends BaseSource {
+export class MarkdownLoader extends BaseLoader {
   type = 'markdown' as const
 
-  constructor(source: string, public filePath: string, public parentFilePath?: string) {
+  constructor(source: string, public filePath: string) {
     const path = filePath.replace(/^pages/, '').replace(/\.mdx?$/, '')
-    const parentPath = parentFilePath?.replace(/^pages/, '').replace(/\.mdx?$/, '')
-
-    super(source, path, parentPath)
+    super(source, path)
   }
 
   async load() {
     const contents = await readFile(this.filePath, 'utf8')
+    return [new MarkdownSource(this.source, this.path, contents)]
+  }
+}
 
-    const { checksum, meta, sections } = processMdxForSearch(contents)
+export class MarkdownSource extends BaseSource {
+  type = 'markdown' as const
+
+  constructor(source: string, path: string, public contents: string) {
+    super(source, path)
+  }
+
+  process() {
+    const { checksum, meta, sections } = processMdxForSearch(this.contents)
 
     this.checksum = checksum
     this.meta = meta
     this.sections = sections
 
-    return {
-      checksum,
-      meta,
-      sections,
-    }
+    return { checksum, meta, sections }
+  }
+
+  extractIndexedContent(): string {
+    const sections = this.sections ?? []
+    return sections.map(({ content }) => content).join('\n\n')
   }
 }

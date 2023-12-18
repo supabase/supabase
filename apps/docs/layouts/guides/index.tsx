@@ -121,7 +121,7 @@ const Layout: FC<Props> = (props) => {
               ref={articleRef}
               className={`${
                 props.meta?.hide_table_of_contents || !hasTableOfContents ? '' : ''
-              } prose dark:prose-dark max-w-none`}
+              } prose max-w-none`}
             >
               <h1 className="mb-0">{props.meta.title}</h1>
               {props.meta.subtitle && (
