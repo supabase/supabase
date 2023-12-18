@@ -1,5 +1,8 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
+import { useQueryClient } from '@tanstack/react-query'
 import { useChat } from 'ai/react'
+import { useParams } from 'common'
+import { uniqBy } from 'lodash'
 import { FileDiff } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -12,12 +15,12 @@ import {
 } from 'components/interfaces/SQLEditor/SQLEditor.types'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
+import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
+import { useSelectedOrganization, useSelectedProject } from 'hooks'
 import { BASE_PATH, OPT_IN_TAGS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
-import { uniqBy } from 'lodash'
 import { AIPolicyChat } from './AIPolicyChat'
 import {
   MessageWithDebug,
@@ -49,7 +52,8 @@ export const AIPolicyEditorPanel = memo(function ({
   selectedPolicy,
   onSelectCancel,
 }: AIPolicyEditorPanelProps) {
-  const { meta } = useStore()
+  const { ref } = useParams()
+  const queryClient = useQueryClient()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
 
@@ -108,7 +112,7 @@ export const AIPolicyEditorPanel = memo(function ({
   const { mutate: executeMutation, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess: () => {
       // refresh all policies
-      meta.policies.load()
+      queryClient.invalidateQueries(databasePoliciesKeys.list(ref))
       toast.success('Successfully created new policy')
       onSelectCancel()
     },
