@@ -106,9 +106,6 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
             <ReadOnlyBadge id={id} />
           )
         ) : null}
-        {/* <span className="text-foreground-light text-sm">
-          {savingState === 'UPDATING_FAILED' && 'Failed to save'}
-        </span> */}
       </div>
     </>
   )
