@@ -14,6 +14,13 @@ create table employees (
 );"
 `;
 
+exports[`debug fix typos 1`] = `
+"select
+  *
+from
+  employees;"
+`;
+
 exports[`edit add length constraint 1`] = `
 "create table employees (
   id bigint primary key generated always as identity,

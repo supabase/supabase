@@ -44,7 +44,7 @@ const debugSqlSchema = SchemaBuilder.emptySchema()
     description: 'A short suggested solution for the error (as concise as possible).',
   })
   .addString('sql', {
-    description: 'The SQL rewritten to apply the solution. Includes all the original SQL.',
+    description: 'The SQL rewritten to apply the solution. Includes all the original logic, but modified to fix the issue.',
   })
 
 const generateTitleSchema = SchemaBuilder.emptySchema()
@@ -81,7 +81,7 @@ const completionFunctions = {
   debugSql: {
     name: 'debugSql',
     description: stripIndent`
-      Debugs a Postgres SQL error and modifies the SQL to fix it.
+      Debugs a Postgres SQL error. Returns the fixed SQL and a solution explaining it.
       - Create extensions if they are missing (only for valid extensions)
       - Suggest creating tables if they are missing
       - Include all of the original SQL

@@ -60,6 +60,19 @@ describe('debug', () => {
 
     expect(formatSql(sql)).toMatchSnapshot()
   })
+
+  test('fix typos', async () => {
+    const { sql, solution } = await debugSql(
+      openai,
+      'syntax error at or near "fromm"',
+      codeBlock`
+        select * fromm employees;
+      `
+    )
+
+    expect(solution).toBeDefined()
+    expect(formatSql(sql)).toMatchSnapshot()
+  })
 })
 
 describe('title', () => {
