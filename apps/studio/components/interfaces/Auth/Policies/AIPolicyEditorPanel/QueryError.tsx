@@ -87,7 +87,7 @@ const QueryError = ({
                     Telemetry.sendEvent(
                       {
                         category: 'rls_editor',
-                        action: 'ai_suggestion_asked',
+                        action: 'ai_debugger_requested',
                         label: 'rls-ai-assistant',
                       },
                       telemetryProps,
