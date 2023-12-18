@@ -1,20 +1,17 @@
 import { PostgresTable } from '@supabase/postgres-meta'
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { get } from 'data/fetchers'
+import { sortBy } from 'lodash'
 import { useCallback } from 'react'
 import { ResponseError } from 'types'
 import { tableKeys } from './keys'
-import { Table } from './table-query'
 
 export type TablesVariables = {
   projectRef?: string
   connectionString?: string
   schema?: string
-  sortByProperty?: string
+  sortByProperty?: keyof PostgresTable
 }
-
-export type TablesResponse = Table[] | { error?: any }
 
 export async function getTables(
   { projectRef, connectionString, schema, sortByProperty = 'name' }: TablesVariables,
@@ -27,32 +24,35 @@ export async function getTables(
   let headers = new Headers()
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
-  let queryParams = new URLSearchParams()
-  if (schema) queryParams.set('included_schemas', schema)
-  const searchStr = queryParams.toString()
+  let queryParams = {}
+  if (schema) {
+    queryParams = { included_schemas: schema }
+  }
 
-  const response = (await get(
-    `${API_URL}/pg-meta/${projectRef}/tables${searchStr ? `?${searchStr}` : ''}`,
-    {
-      headers: Object.fromEntries(headers),
-      signal,
-    }
-  )) as TablesResponse
+  console.log(queryParams)
+  const { data, error } = await get('/platform/pg-meta/{ref}/tables', {
+    params: {
+      header: {
+        'x-connection-encrypted': connectionString!,
+      },
+      path: {
+        ref: projectRef,
+      },
+      query: queryParams as any,
+    },
+    headers: Object.fromEntries(headers),
+    signal,
+  })
 
-  if (!Array.isArray(response) && response.error) {
-    throw response.error
+  if (!Array.isArray(data) && error) {
+    throw error
   }
 
   // Sort the data if the sortByName option is true
-  if (Array.isArray(response)) {
-    // Sort the data if the sortByName option is true
-    if (sortByProperty) {
-      response.sort((a, b) => a[sortByProperty].localeCompare(b[sortByProperty]))
-    }
-    return response as PostgresTable[]
+  if (Array.isArray(data) && sortByProperty) {
+    return sortBy(data, (t) => t[sortByProperty]) as PostgresTable[]
   }
-
-  return response as PostgresTable[]
+  return data as PostgresTable[]
 }
 
 export type TablesData = Awaited<ReturnType<typeof getTables>>
