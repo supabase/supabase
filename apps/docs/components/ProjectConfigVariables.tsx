@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import {
   Button_Shadcn_ as Button,
@@ -32,7 +32,7 @@ interface InstanceData {
   branch?: BranchesData[number]
 }
 
-type InstanceKey = readonly [string | undefined, string, string | undefined]
+type InstanceKey = readonly [string | null, string, string | null]
 
 function toInstanceKey(instance: InstanceData | null) {
   if (!instance) return null
@@ -317,7 +317,12 @@ function ProjectConfigVariablesView({
       {parentStateSummary === 'loggedOut' && (
         <p className="text-foreground-muted text-sm mt-2 mb-0 ml-1">
           There was a problem getting your {prettyFormatVariable[variable]}. Are you{' '}
-          <Link className="text-foreground-muted" href="/dashboard">
+          <Link
+            className="text-foreground-muted"
+            href="https://supabase.com/dashboard"
+            rel="noreferrer noopener"
+            target="_blank"
+          >
             logged in
           </Link>
           ?
@@ -332,7 +337,12 @@ function ProjectConfigVariablesView({
             {parentStateSummary === 'loggedIn.hasNoData' && (
               <>
                 Do you have{' '}
-                <Link className="text-foreground-muted" href="/dashboard">
+                <Link
+                  className="text-foreground-muted"
+                  href="https://supabase.com/dashboard"
+                  rel="noreferrer noopener"
+                  target="_blank"
+                >
                   any projects
                 </Link>
                 ?
@@ -343,7 +353,12 @@ function ProjectConfigVariablesView({
             apiStateSummary === 'loggedIn.hasData.apiDataError') && (
             <p className="text-foreground-muted text-sm mt-0 ml-1">
               You can also try looking up the value in the{' '}
-              <Link className="text-foreground-muted" href="/dashboard/project/_/settings/api">
+              <Link
+                className="text-foreground-muted"
+                href="https://supabase.com/dashboard/project/_/settings/api"
+                rel="noreferrer noopener"
+                target="_blank"
+              >
                 dashboard
               </Link>
               .
@@ -395,13 +410,10 @@ export function ProjectConfigVariables({ variable }: { variable: Variable }) {
     ? 'loggedIn.hasNoData'
     : 'loggedIn.hasData'
 
-  const cleanUp = useCallback(() => {
-    // This is a safeguard against display bugs,
-    // since the page will keep displaying after the user logs out.
-    // This way no data is left to display even if there is a view bug.
-    clearSharedStoreData()
-  }, [clearSharedStoreData])
-  useOnLogout(cleanUp)
+  // This is a safeguard against display bugs,
+  // since the page will keep displaying after the user logs out.
+  // This way no data is left to display even if there is a view bug.
+  useOnLogout(clearSharedStoreData)
 
   const formattedData: InstanceData[] = useMemo(
     () =>

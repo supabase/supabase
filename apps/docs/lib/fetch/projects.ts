@@ -6,7 +6,7 @@ const projectKeys = {
   list: () => ['all-projects'] as const,
 }
 
-async function getProjects(signal?: AbortSignal) {
+export async function getProjects(signal?: AbortSignal) {
   const { data, error } = await get('/platform/projects', { signal })
   if (error) throw error
   return data

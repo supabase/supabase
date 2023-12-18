@@ -22,15 +22,11 @@ export function store(storageType: StorageType, key: string, value: string) {
 export function retrieve(storageType: StorageType, key: string) {
   if (typeof window === 'undefined') return
   const storage = getStorage(storageType)
-
-  if (!storage) return
   return storage.getItem(key)
 }
 
 export function remove(storageType: StorageType, key: string) {
   if (typeof window === 'undefined') return
   const storage = getStorage(storageType)
-
-  if (!storage) return
   return storage.removeItem(key)
 }

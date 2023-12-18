@@ -1,11 +1,11 @@
 import { ResponseError } from '~/types/fetch'
 import { get } from './fetchWrappers'
 import { UseQueryOptions, useQuery } from '@tanstack/react-query'
-import { useProjectsQuery } from './projects'
-import { useState } from 'react'
+import { getProjects } from './projects'
 
 const branchKeys = {
   list: (projectRef: string | undefined) => ['projects', projectRef, 'branches'] as const,
+  listAll: () => ['all-projects', 'all-branches'] as const,
 }
 
 export interface BranchVariables {
@@ -41,67 +41,47 @@ export function useBranchesQuery<TData = BranchesData>(
   })
 }
 
-export function useAllProjectsBranchesQuery<TData = BranchesData>({
-  enabled = true,
-}: Omit<UseQueryOptions<BranchesData, BranchesError, TData>, 'queryKey'> = {}) {
-  const [isPending, setIsPending] = useState(true)
-  const [isError, setIsError] = useState(false)
-  const [data, setData] = useState<Record<string, BranchesData>>()
+async function getAllBranches(signal?: AbortSignal) {
+  const allProjects = await getProjects(signal)
 
-  const {
-    data: allProjects,
-    isPending: projectsIsPending,
-    isError: projectsIsError,
-  } = useProjectsQuery({ enabled })
+  const branchesList = await Promise.all(
+    allProjects.map(async (project) => {
+      // @ts-ignore -- problem with OpenAPI spec that codegen reads from
+      if (!project.is_branch_enabled) {
+        return null
+      }
 
-  if (!enabled) {
-    if (!isPending) setIsPending(true)
-  } else if (projectsIsPending) {
-    if (!isPending) setIsPending(true)
-  } else if (projectsIsError) {
-    if (!isError || isPending) {
-      setIsError(true)
-      setIsPending(false)
+      // @ts-ignore -- problem with OpenAPI spec that codegen reads from
+      const projectRef = project.ref as string
+      try {
+        const branches = await getBranches({ projectRef })
+        return { [projectRef]: branches }
+      } catch {
+        return null
+      }
+    })
+  )
+
+  const branchesMap = branchesList.reduce((record, branch) => {
+    if (!branch) {
+      return record
     }
-  } else if (data && !isError) {
-    // Skip processing so that existing data is returned, rather than fetching again
-    // In future, may want to add support for query keys and refetching
-    if (isPending) setIsPending(false)
-  } else {
-    Promise.all(
-      allProjects.map(async (project) => {
-        // @ts-ignore -- problem with OpenAPI spec that codegen reads from
-        if (!project.is_branch_enabled) {
-          return null
-        }
+    return Object.assign(record, branch)
+  }, {})
+  return branchesMap
+}
 
-        // @ts-ignore -- problem with OpenAPI spec that codegen reads from
-        const projectRef = project.ref as string
-        try {
-          const branches = await getBranches({ projectRef })
-          return { [projectRef]: branches }
-        } catch {
-          return null
-        }
-      })
-    )
-      .then((branches) => {
-        const formattedBranches = branches.reduce((record, branch) => {
-          if (!branch) {
-            return record
-          }
-          return Object.assign(record, branch)
-        }, {})
-        setData(formattedBranches)
-        setIsError(false)
-      })
-      .catch(() => setIsError(true))
-      .finally(() => setIsPending(false))
-  }
+export type AllBranchesData = Awaited<ReturnType<typeof getAllBranches>>
+type AllBranchesError = ResponseError
 
-  return {
-    isPending,
-    isError,
-    data,
-  }
+export function useAllProjectsBranchesQuery<TData = AllBranchesData>({
+  enabled = true,
+  ...options
+}: Omit<UseQueryOptions<AllBranchesData, AllBranchesError, TData>, 'queryKey'> = {}) {
+  return useQuery<AllBranchesData, AllBranchesError, TData>({
+    queryKey: branchKeys.listAll(),
+    queryFn: ({ signal }) => getAllBranches(signal),
+    enabled,
+    ...options,
+  })
 }

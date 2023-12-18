@@ -42,7 +42,7 @@ export const get: typeof _get = async (url, init) => {
     headers = await constructHeaders(init?.headers)
   } catch (err) {
     console.error(err)
-    return
+    return { error: err, response: undefined }
   }
 
   return await _get(url, {
@@ -57,7 +57,7 @@ export const post: typeof _post = async (url, init) => {
     headers = await constructHeaders(init?.headers)
   } catch (err) {
     console.error(err)
-    return
+    return { error: err, response: undefined }
   }
 
   return await _post(url, {
@@ -72,7 +72,7 @@ export const unauthedAllowedPost: typeof _post = async (url, init) => {
     headers = await constructHeaders(init?.headers, { allowUnauthenticated: true })
   } catch (err) {
     console.error(err)
-    return
+    return { error: err, response: undefined }
   }
 
   return await _post(url, {

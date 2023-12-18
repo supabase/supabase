@@ -1,7 +1,7 @@
 import { Session } from '@supabase/supabase-js'
-import { LOCAL_STORAGE_KEYS, gotrueClient, useIsLoggedIn, useIsUserLoading } from 'common'
-import { remove } from './storage'
-import { useEffect, useRef } from 'react'
+import { gotrueClient } from 'common'
+import { LOCAL_STORAGE_KEYS, remove } from './storage'
+import { useEffect } from 'react'
 
 export const auth = gotrueClient
 
@@ -12,7 +12,7 @@ auth.onAuthStateChange((event, session) => {
 
   if (event === 'SIGNED_OUT') {
     Object.keys(LOCAL_STORAGE_KEYS).forEach((key) => {
-      remove('local', key)
+      remove('local', LOCAL_STORAGE_KEYS[key])
     })
   }
 })
