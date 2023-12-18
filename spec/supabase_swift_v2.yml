@@ -382,11 +382,11 @@ functions:
   - id: resend-email-or-phone-otps
     title: "resend()"
     notes: |
-      - Resends a signup confirmation, email change or phone change email to the user.
+      - Resends a signup confirmation, email change, or phone change email to the user.
       - Passwordless sign-ins can be resent by calling the `signInWithOTP()` method again.
       - Password recovery emails can be resent by calling the `resetPassswordForEmail()` method again.
-      - This method will only resend an email or phone OTP to the user if there was an initial signup, email change or phone change request being made.
-      - You can specify a redirect url when you resend an email link using the `emailRedirectTo` option.
+      - This method only resends an email or phone OTP to the user if there an initial signup, email change, or phone change request was made.
+      - You can specify a redirect URL when you resend an email link using the `emailRedirectTo` option.
     examples:
       - id: resend-email-signup-confirmation
         name: Resend an email signup confirmation
