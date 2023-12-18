@@ -4,9 +4,10 @@ import Image from 'next/image'
 import { ArrowRightIcon } from '@heroicons/react/outline'
 import { IconEdit2, cn } from 'ui'
 import { useBreakpoint } from 'common'
+
+import { WeekDayProps } from '../data'
 import CountdownComponent from '../../Countdown'
 import { DayLink } from '.'
-import { WeekDayProps } from '../data'
 
 const DaySection = ({ day }: { day: WeekDayProps }) => {
   const isMobile = useBreakpoint(639)
