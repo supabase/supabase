@@ -35,28 +35,9 @@ You can link a hook to an extensiblity point to signal to Supabase Auth that it 
 
 Below is a flow chart illustrating how Supabase Auth uses an Auth Hook:
 
-<Mermaid
- chart={`flowchart TD
-    subgraph Supabase Auth
-    Start[Event Occurs] --> DecisionA{Is a Hook defined?}
-
-    ValidityCheck --Yes-->ContinueFlow[Continue with flow]
-    ValidityCheck --No-->Error(Return Error)
-
-    DecisionA -- No ---->H[Continue with Supabase Default Behavior]
-    H--> ValidityCheck{Is response valid?}
-    DecisionA --Yes--->ValidateInput((Validate Inputs))
-        ValidateOutput -->ContinueFlow
-    end
-
-
-
-    subgraph Auth Hook
-    ValidateInput ---->CallHook[Execute PostgreSQL Function]
-
-    CallHook ---> ValidateOutput((Validate Outputs))
-    end`}
-    />
+<Image
+  alt="Auth Hooks Flowchart"
+  src="/docs/img/guides/auth-postgres-hooks/hooks-flowchart.png"/>
 
 
 ## Creating and managing Hooks
@@ -68,10 +49,10 @@ In the dashboard, go to `SQL Editor > Templates` and select `Add Auth Hook (Gene
 create or replace function
 mfa_verification_attempt(event jsonb) returns jsonb as $$
 declare
-    -- Add your variables here
+  -- Add your variables here
 begin
-    -- Add your logic here
-    return response
+  -- Add your logic here
+  return response
 end;
 $$ language plpgsql;
 ```
@@ -108,16 +89,16 @@ By default, Supabase Auth invokes hooks with the `supabase_auth_admin` role. Thi
 
 ```sql
 grant execute
-	on function public.custom_access_token_hook
-	to supabase_auth_admin;
+  on function public.custom_access_token_hook
+  to supabase_auth_admin;
 ```
 
 Also revoke permissions from the `authenticated` and `anon` roles to ensure the function is not accessible by Supabase Serverless APIs.
 
 ```sql
 revoke execute
-	on function public.custom_access_token_hook
-	from authenticated, anon;
+  on function public.custom_access_token_hook
+  from authenticated, anon;
 ```
 
 <Admonition type="caution">
@@ -133,68 +114,6 @@ The `security definer` tag executes a function with the privileges of the user w
 
 Ensure that your hooks complete within **2 seconds** to avoid any errors.
 
-### Testing the Hook
-
-We strongly recommend testing the hook prior to going into production via [PgTAP](/docs/guides/database/extensions/pgtap) or similar. You can enable the extension under `Database > Extensions > PgTAP`
-
-Here's an example of a `PgTAP` test for an MFA Verification hook:
-
-```sql
-begin;
-select plan (1);
-
--- table to store test results
-create temporary table test_results (
-  name text primary key,
-  result boolean,
-  debug text
-);
-
--- function to record test result when run inside a block with vars
-create or replace function tests.record_result(name text, result boolean, debug text DEFAULT NULL)
-  returns void language plpgsql as $$
-begin
-  insert into test_results(name, result, debug) values (name, result, debug);
-end;
-$$;
-
-do $$
-  declare
-    -- Arrange and set up any variables used in the test
-    _user1 uuid = '00000000-0000-0000-0000-000000000001';
-    _factor1 uuid = 'FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFF1';
-    _valid_user1_event jsonb = jsonb_build_object('user_id', _user1, 'factor_id', _factor1, 'valid', true);
-    _invalid_user1_event jsonb = jsonb_build_object('user_id', _user1, 'factor_id', _factor1, 'valid', false);
-    _result jsonb;
-  begin
-    set search_path to 'public';
-
-    insert into auth.users(id) values (_user1);
-
-    -- Act and run the function
-    perform tests.record_result(
-      'Valid event result',
-      (select hook_mfa_verification_attempt(_valid_user1_event)) ->> 'decision' = 'continue'
-    );
-
-    -- Add further test cases here
-  end;
-$$;
-
-set search_path to 'extensions';
-
--- Assert that the desired result is received
-select set_eq(
-  $$ select name, result, debug from test_results $$,
-  $$ select * from (values,
-    ('Valid event result', true, null)
-  ) as t $$,
-  'MFA Auth hook tests:'
-);
-
-select * from finish();
-rollback;
-````
 
 
 ### Connecting the Hook
@@ -202,7 +121,7 @@ rollback;
 In the dashboard, navigate to [`Authentication > Hooks (Beta)`](/dashboard/project/_/auth/hooks) and select the appropriate PostgreSQL function from the dropdown menu.
 
 
-## MFA Verification Attempt Hook
+## MFA Verification Attempt Extensibility Point
 
 You can add additional checks to the [Supabase MFA implementation](/docs/guides/auth/auth-mfa) with hooks. For example, you can:
 
@@ -210,7 +129,7 @@ You can add additional checks to the [Supabase MFA implementation](/docs/guides/
 - Sign out users who have too many invalid verification attempts.
 - Count, rate limit, or ban sign-ins.
 
-### Inputs
+**Inputs**
 
 Supabase Auth will supply the following fields to your hook:
 
@@ -228,7 +147,7 @@ Example payload:
 }
 ```
 
-### Outputs
+**Outputs**
 
 Return this if your hook processed the input without errors.
 
@@ -243,7 +162,7 @@ Example output:
    "message" : "You have exceeded maximum number of MFA attempts."
 }
 ```
-### Example: MFA Verification Attempt Extensibility Point
+**Examples**
 <Tabs
   scrollable
   size="small"
@@ -272,72 +191,71 @@ Create a hook to read and write information to this table. For example:
 
 ```sql
 create function public.hook_mfa_verification_attempt(event jsonb)
-returns jsonb
-language plpgsql
+  returns jsonb
+  language plpgsql
 as $$
-		declare
-			last_failed_at timestamp;
-		begin
-			if event->'valid' is true
-			then
-				-- code is valid, accept it
-				return jsonb_build_object('decision', 'continue');
-			end if;
+  declare
+    last_failed_at timestamp;
+  begin
+    if event->'valid' is true then
+      -- code is valid, accept it
+      return jsonb_build_object('decision', 'continue');
+    end if;
 
-			select last_failed_at into last_failed_at
-				from public.mfa_failed_verification_attempts
-				where
-					user_id = event->'user_id'
-						and
-					factor_id = event->'factor_id';
+    select last_failed_at into last_failed_at
+      from public.mfa_failed_verification_attempts
+      where
+        user_id = event->'user_id'
+          and
+        factor_id = event->'factor_id';
 
-			if last_failed_at is not null and now() - last_failed_at < interval '2 seconds'
-			then
-				-- last attempt was done too quickly
-				return jsonb_build_object(
-					'error', jsonb_build_object(
-						'http_code', 429,
-						'message',   'Please wait a moment before trying again.'));
-			end if;
+    if last_failed_at is not null and now() - last_failed_at < interval '2 seconds' then
+      -- last attempt was done too quickly
+      return jsonb_build_object(
+        'error', jsonb_build_object(
+          'http_code', 429,
+          'message',   'Please wait a moment before trying again.'
+        )
+      );
+    end if;
 
-			-- record this failed attempt
-			insert into public.mfa_failed_verification_attempts
-				(
-					user_id,
-					factor_id,
-					last_refreshed_at
-				)
-				values
-				(
-					event->'user_id',
-					event->'factor_id',
-					now()
-				)
-				on conflict
-			do update
-				set last_refreshed_at = now();
+    -- record this failed attempt
+    insert into public.mfa_failed_verification_attempts
+      (
+        user_id,
+        factor_id,
+        last_refreshed_at
+      )
+      values
+      (
+        event->'user_id',
+        event->'factor_id',
+        now()
+      )
+      on conflict do update
+        set last_refreshed_at = now();
 
-			-- finally let Supabase Auth do the default behavior for a failed attempt
-			return jsonb_build_object('decision', 'continue');
-		end;
-	$$;
+    -- finally let Supabase Auth do the default behavior for a failed attempt
+    return jsonb_build_object('decision', 'continue');
+  end;
+$$;
 
 -- Assign appropriate permissions and revoke access
 grant execute
-	on function public.hook_mfa_verification_attempt
-	to supabase_auth_admin;
+  on function public.hook_mfa_verification_attempt
+  to supabase_auth_admin;
 
 grant all
-	on table public.mfa_failed_verification_attempts
-	to supabase_auth_admin;
+  on table public.mfa_failed_verification_attempts
+  to supabase_auth_admin;
 
 revoke execute
-	on function public.hook_mfa_verification_attempt
-	from authenticated, anon;
+  on function public.hook_mfa_verification_attempt
+  from authenticated, anon;
 
 revoke all
-	on table public.mfa_failed_verification_attempts
-	from authenticated, anon;
+  on table public.mfa_failed_verification_attempts
+  from authenticated, anon;
 ```
 </TabPanel>
 <TabPanel id="send-email-after-failed-attempts" label="Send Email After Failed Attempts">
@@ -361,100 +279,97 @@ create or replace function public.hook_mfa_verification_attempt_with_email(event
 returns jsonb
 language plpgsql
 as $$
-declare
-  last_failed_at timestamp;
-  server_token text;
-  email_address text;
-  email_body text;
-  response jsonb;
-  http_code int;
-  error_message text;
-begin
-  -- check if the code is valid
-  if event->'valid' is true then
-    -- code is valid, accept it
-    return jsonb_build_object('decision', 'continue');
-  end if;
+  declare
+    last_failed_at timestamp;
+    server_token text;
+    email_address text;
+    email_body text;
+    response jsonb;
+    http_code int;
+    error_message text;
+  begin
+    -- check if the code is valid
+    if event->'valid' is true then
+      -- code is valid, accept it
+      return jsonb_build_object('decision', 'continue');
+    end if;
 
-  -- fetch the server token with a specific name from the vault.decrypted_secrets table
-  select token into server_token
-  from vault.decrypted_secrets
-  where name = 'yoursecretname'
+    -- fetch the server token with a specific name from the vault.decrypted_secrets table
+    select token into server_token
+    from vault.decrypted_secrets
+    where name = 'yoursecretname';
 
-  -- make sure we have a token
-  if server_token is null then
-    return jsonb_build_object(
-      'error', jsonb_build_object(
-      'http_code', 401,
-      'message', 'Valid server token required'
-    )
-  );
-  end if;
-
-  -- fetch the last failed attempt time
-  select last_failed_at into last_failed_at
-  from public.mfa_failed_verification_attempts
-  where user_id = event->>'user_id'
-  and factor_id = event->>'factor_id';
-
-  -- check if the last attempt was too quick
-  if last_failed_at is not null and now() - last_failed_at < interval '1 minute' then
-    -- construct the email body
-    email_address := (select email from auth.users where id = (event->>'user_id')::uuid);
-    -- Insert your email here
-    email_body := format('{"from": "yoursenderemail@example.com", "to": "%s", "subject": "too many mfa attempts", "textbody": "there have been too many mfa attempts.", "htmlbody": "<html><body><strong>alert:</strong> too many mfa attempts.</body></html>", "messagestream": "outbound"}', email_address);
-
-    -- perform the http post request
-    select net.http_post(
-      'https://api.postmarkapp.com/email',
-      email_body,
-      'application/json',
-      array['accept: application/json', 'x-postmark-server-token: ' || server_token]
-    ) into response;
-
-    -- extract http code and error message if any
-    http_code := (response ->> 'status')::int;
-    error_message := response ->> 'message';
-
-    -- return an error if the email sending fails
-    if (response -> 'status' is null) or (http_code < 200 or http_code >= 300) then
+    -- make sure we have a token
+    if server_token is null then
       return jsonb_build_object(
         'error', jsonb_build_object(
-          'http_code', coalesce(http_code, 0),
-          'message', coalesce(error_message, 'error sending email')
-        )
-    );
+        'http_code', 401,
+        'message', 'Valid server token required'
+      ));
     end if;
 
-    -- return an error for a successful attempt which is repeated multiple time
-    return jsonb_build_object(
-      'error', jsonb_build_object(
-        'http_code', 429,
-        'message', 'please wait a moment before trying again.'
+    -- fetch the last failed attempt time
+    select last_failed_at into last_failed_at
+    from public.mfa_failed_verification_attempts
+    where user_id = event->>'user_id'
+    and factor_id = event->>'factor_id';
+
+    -- check if the last attempt was too quick
+    if last_failed_at is not null and now() - last_failed_at < interval '1 minute' then
+      -- construct the email body
+      email_address := (select email from auth.users where id = (event->>'user_id')::uuid);
+      -- Insert your email here
+      email_body := format('{"from": "yoursenderemail@example.com", "to": "%s", "subject": "too many mfa attempts", "textbody": "there have been too many mfa attempts.", "htmlbody": "<html><body><strong>alert:</strong> too many mfa attempts.</body></html>", "messagestream": "outbound"}', email_address);
+
+      -- perform the http post request
+      select net.http_post(
+        'https://api.postmarkapp.com/email',
+        email_body,
+        'application/json',
+        array['accept: application/json', 'x-postmark-server-token: ' || server_token]
+      ) into response;
+
+      -- extract http code and error message if any
+      http_code := (response ->> 'status')::int;
+      error_message := response ->> 'message';
+
+      -- return an error if the email sending fails
+      if (response -> 'status' is null) or (http_code < 200 or http_code >= 300) then
+        return jsonb_build_object(
+          'error', jsonb_build_object(
+            'http_code', coalesce(http_code, 0),
+            'message', coalesce(error_message, 'error sending email')
+          ));
+      end if;
+
+      -- return an error for a successful attempt which is repeated multiple time
+      return jsonb_build_object(
+        'error', jsonb_build_object(
+          'http_code', 429,
+          'message', 'please wait a moment before trying again.'
+        ));
+      end if;
+
+      -- record the failed attempt
+      insert into public.mfa_failed_verification_attempts
+      (
+          user_id,
+          factor_id,
+          last_refreshed_at
       )
-    );
-    end if;
+      values
+      (
+          event->'user_id',
+          event->'factor_id',
+          now()
+      )
+      on conflict (user_id, factor_id)
+      do update
+          set last_refreshed_at = now();
 
-    -- record the failed attempt
-    insert into public.mfa_failed_verification_attempts
-    (
-        user_id,
-        factor_id,
-        last_refreshed_at
-    )
-    values
-    (
-        event->'user_id',
-        event->'factor_id',
-        now()
-    )
-    on conflict (user_id, factor_id)
-    do update
-        set last_refreshed_at = now();
-
-    -- let supabase auth do the default behavior for a failed attempt
-    return jsonb_build_object('decision', 'continue');
-end;
+      -- let supabase auth do the default behavior for a failed attempt
+      return jsonb_build_object('decision', 'continue');
+  end;
 $$;
 
 -- assign appropriate permissions and revoke access
@@ -478,7 +393,7 @@ As this hook runs on unauthenticated requests, malicious users can abuse the hoo
 
 Check if a password is valid prior to taking any additional action to ensure the user is legitimate. Instead of blocking further verification attempts, consider sending an email or notification to an administrator via a trigger instead.
 
-### Inputs
+**Inputs**
 
 - `user_id` Unique identifier for the user attempting to sign in. Correlate this to the `auth.users` table.
 - `valid` Whether the password verification attempt was valid.
@@ -490,7 +405,7 @@ Check if a password is valid prior to taking any additional action to ensure the
 }
 ```
 
-### Outputs
+**Outputs**
 
 Return these only if your hook processed the input without errors.
 
@@ -508,7 +423,7 @@ Example output:
 }
 ```
 
-### Example: Limit Failed Password Verification Attempts
+**Examples**
 
 <Tabs
   scrollable
@@ -540,66 +455,64 @@ create function public.hook_password_verification_attempt(event jsonb)
 returns jsonb
 language plpgsql
 as $$
-	declare
-		last_failed_at timestamp;
-	begin
-		if event->'valid' is true
-		then
-			-- password is valid, accept it
-			return jsonb_build_object('decision', 'continue');
-		end if;
+  declare
+    last_failed_at timestamp;
+  begin
+    if event->'valid' is true then
+      -- password is valid, accept it
+      return jsonb_build_object('decision', 'continue');
+    end if;
 
-		select last_failed_at into last_failed_at
-			from public.password_failed_verification_attempts
-			where
-				user_id = event->'user_id'
+    select last_failed_at into last_failed_at
+      from public.password_failed_verification_attempts
+      where
+        user_id = event->'user_id';
 
-		if last_failed_at is not null and now() - last_failed_at < interval '10 seconds'
-		then
-			-- last attempt was done too quickly
-			return jsonb_build_object(
-				'error', jsonb_build_object(
-					'http_code', 429,
-					'message',   'Please wait a moment before trying again.'));
-		end if;
+    if last_failed_at is not null and now() - last_failed_at < interval '10 seconds' then
+      -- last attempt was done too quickly
+      return jsonb_build_object(
+        'error', jsonb_build_object(
+          'http_code', 429,
+          'message',   'Please wait a moment before trying again.'
+        )
+      );
+    end if;
 
-		-- record this failed attempt
-		insert into public.password_failed_verification_attempts
-			(
-				user_id,
-				last_failed_at
-			)
-			values
-			(
-				event->'user_id',
-				now()
-			)
-			on conflict
-        do update
-          set last_failed_at = now();
+    -- record this failed attempt
+    insert into public.password_failed_verification_attempts
+      (
+        user_id,
+        last_failed_at
+      )
+      values
+      (
+        event->'user_id',
+        now()
+      )
+      on conflict do update
+        set last_failed_at = now();
 
-		-- finally let Supabase Auth do the default behavior for a failed attempt
-		return jsonb_build_object('decision', 'continue');
-	end;
-	$$;
-
+    -- finally let Supabase Auth do the default behavior for a failed attempt
+    return jsonb_build_object('decision', 'continue');
+  end;
+$$;
 
 -- Assign appropriate permissions
 grant execute
-	on function public.hook_password_verification_attempt
-	to supabase_auth_admin;
+  on function public.hook_password_verification_attempt
+  to supabase_auth_admin;
 
 grant all
-	on table public.password_failed_verification_attempts
-	to supabase_auth_admin;
+  on table public.password_failed_verification_attempts
+  to supabase_auth_admin;
 
 revoke execute
-	on function public.hook_password_verification_attempt
-	from authenticated, anon;
+  on function public.hook_password_verification_attempt
+  from authenticated, anon;
 
 revoke all
-	on table public.password_failed_verification_attempts
-	from authenticated, anon;
+  on table public.password_failed_verification_attempts
+  from authenticated, anon;
 ```
 </TabPanel>
 </Tabs>
@@ -631,7 +544,7 @@ These are the fields currently available on an access token:
 | `session_id`    | No                |
 
 
-### Inputs
+**Inputs**
 
 - `user_id` Unique identifier for the user attempting to sign in. Correlate this to the `auth.users` table.
 - `claims` Claims which are attached to the access token.
@@ -640,13 +553,13 @@ These are the fields currently available on an access token:
 
 
 
-### Outputs
+**Outputs**
 
 Return these only if your hook processed the input without errors.
 
 - `claims` A json containing the updated claims after the hook has been run.
 
-### Example: Add Custom Claims to Token
+**Examples**
 
 <Tabs
   scrollable
@@ -657,51 +570,61 @@ Return these only if your hook processed the input without errors.
 >
 <TabPanel id="add-admin-role" label="Add Admin Role">
 
-Your company would like to allow users with a `@supabase.com` email account to perform restricted actions. To support this, users who are registered as admins with the company should be accorded the `admin` role.
+Your company would like to allow registered admin users to perform restricted actions by granting an `admin` claim to their token.
 
-Create a hook which adds an additional role:
+Create a profiles table with an `is_admin` flag:
+
+```sql
+create table profiles (
+  user_id uuid NOT NULL PRIMARY KEY REFERENCES auth.users (id),
+  email text NOT NULL UNIQUE,
+  is_admin boolean NOT NULL DEFAULT false
+);
+```
+
+Create a hook which adds an additional role based on the `is_admin` flag:
 
 ```sql
 create or replace function public.custom_access_token_hook(event jsonb)
 returns jsonb
 language plpgsql
 as $$
-	declare
-		claims jsonb;
-		user_email text;
-	begin
-		-- Fetch the email based on user_id
-		select email into user_email from users where id = event->>'user_id';
+  declare
+    claims jsonb;
+    is_admin boolean;
+  begin
+    -- Check if the user is marked as admin in the profiles table
+    select is_admin into is_admin from profiles where user_id = event->>'user_id';
 
-		-- Check if the email has suffix '@supabase.com'
-		if user_email like '%@supabase.com' then
-			claims := event->'claims';
+    -- Proceed only if the user is an admin
+    if is_admin then
+      claims := event->'claims';
 
-			-- check if 'user_metadata' exists in claims
-			if jsonb_typeof(claims->'user_metadata') is null then
-				-- if 'user_metadata' does not exist, create an empty object
-				claims := jsonb_set(claims, '{user_metadata}', '{}');
-			end if;
+      -- Check if 'user_metadata' exists in claims
+      if jsonb_typeof(claims->'user_metadata') is null then
+        -- If 'user_metadata' does not exist, create an empty object
+        claims := jsonb_set(claims, '{user_metadata}', '{}');
+      end if;
 
-			-- set a claim of 'admin'
-			claims := jsonb_set(claims, '{user_metadata, admin}', 'true');
+      -- Set a claim of 'admin'
+      claims := jsonb_set(claims, '{user_metadata, admin}', 'true');
 
-			-- update the 'claims' object in the original event
-			event := jsonb_set(event, '{claims}', claims);
-		end if;
+      -- Update the 'claims' object in the original event
+      event := jsonb_set(event, '{claims}', claims);
+    end if;
 
-		-- return the modified or original event
-		return event;
-	end;
+    -- Return the modified or original event
+    return event;
+  end;
 $$;
 
 grant execute
-	on function public.custom_access_token_hook
-	to supabase_auth_admin;
+  on function public.custom_access_token_hook
+  to supabase_auth_admin;
 
 revoke execute
-	on function public.custom_access_token_hook
-	from authenticated, anon;
+  on function public.custom_access_token_hook
+  from authenticated, anon;
 ```
 </TabPanel>
 
@@ -709,23 +632,25 @@ revoke execute
 Your company would like to remove the user metadata claim in order to reduce the size of your access token.
 
 ```sql
+
 create or replace function custom_access_token_delete_user_metadata(input jsonb)
 returns jsonb as $$
-declare
+  declare
     result jsonb;
-begin
+  begin
     input := jsonb_set(input, '{claims}', (input->'claims') - 'user_metadata');
     result := jsonb_build_object('claims', input->'claims');
     return result;
-end; $$ language plpgsql;
+  end;
+$$ language plpgsql;
 
 grant execute
-	on function public.custom_access_token_delete_user_metadata
-	to supabase_auth_admin;
+  on function public.custom_access_token_delete_user_metadata
+  to supabase_auth_admin;
 
 revoke execute
-	on function public.custom_access_token_delete_user_metadata
-	from authenticated, anon;
+  on function public.custom_access_token_delete_user_metadata
+  from authenticated, anon;
 ```
 </TabPanel>
 <TabPanel id="add-metadata-claim-plv8" label="Add claim via plv8">
@@ -733,33 +658,34 @@ Your company runs a new version of a gamification app and would like to add a `l
 
 Enable the `plv8` extension under [`Database > Extensions`](/dashboard/project/_/database/extensions)
 
-```sql
+```javascript
 create or replace function custom_access_token_hook(event jsonb)
 returns jsonb
 language plv8
 as $$
-    var user_level;
+  var user_level;
 
-    // Fetch the current user's level from the profiles table
-    var result = plv8.execute("select level from profiles where user_id = $1", [event.user_id]);
-    if (result.length > 0) {
-        user_level = result[0].level;
-    } else {
-        // Assign a default level of 0 if no level is found
-        user_level = 0;
-    }
+  // Fetch the current user's level from the profiles table
+  var result = plv8.execute("select level from profiles where user_id = $1", [event.user_id]);
+  if (result.length > 0) {
+    user_level = result[0].level;
+  } else {
+    // Assign a default level of 0 if no level is found
+    user_level = 0;
+  }
 
-    // Check if 'claims' exists in the event object; if not, initialize it
-    if (!event.claims) {
-        event.claims = {};
-    }
+  // Check if 'claims' exists in the event object; if not, initialize it
+  if (!event.claims) {
+    event.claims = {};
+  }
 
-    // Update the level in the claims
-    event.claims.level = user_level;
+  // Update the level in the claims
+  event.claims.level = user_level;
 
-    return event;
+  return event;
 $$;
 ```
+</TabPanel>
 
 </Tabs>
 
