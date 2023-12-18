@@ -4,7 +4,7 @@ import { buildDays as days } from '~/components/LaunchWeek/X/Releases/data'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import AdventCard from './components/AdventCard'
 import { motion, useInView } from 'framer-motion'
-import { IconLock, cn } from 'ui'
+import { cn } from 'ui'
 
 const BuildStage: FC = () => {
   const ref = React.useRef(null)
