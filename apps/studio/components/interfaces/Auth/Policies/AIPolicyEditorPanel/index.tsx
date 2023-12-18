@@ -57,12 +57,10 @@ export const AIPolicyEditorPanel = memo(function ({
 }: AIPolicyEditorPanelProps) {
   const { ref } = useParams()
   const queryClient = useQueryClient()
-  const { meta } = useStore()
-  const router = useRouter()
-  const telemetryProps = useTelemetryProps()
-
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
+  const router = useRouter()
+  const telemetryProps = useTelemetryProps()
 
   // use chat id because useChat doesn't have a reset function to clear all messages
   const [chatId, setChatId] = useState(uuidv4())
