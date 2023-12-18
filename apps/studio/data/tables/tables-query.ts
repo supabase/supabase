@@ -17,7 +17,7 @@ export type TablesVariables = {
 export type TablesResponse = Table[] | { error?: any }
 
 export async function getTables(
-  { projectRef, connectionString, schema, sortByProperty = 'ename' }: TablesVariables,
+  { projectRef, connectionString, schema, sortByProperty = 'name' }: TablesVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) {
@@ -44,21 +44,16 @@ export async function getTables(
   }
 
   // Sort the data if the sortByName option is true
-  // Type guard to check if response is an array of tables
-  if (Array.isArray(response) && sortByProperty) {
-    // Sort the data based on the provided sortByProperty
-    response.sort((a, b) => {
-      const propA = a[sortByProperty]
-      const propB = b[sortByProperty]
-
-      if (typeof propA === 'string' && typeof propB === 'string') {
-        return propA.localeCompare(propB);
-      }
-      return 0; // Handle the case where the property doesn't exist or is not a string
-    });
-
-    return response as PostgresTable[];
+  if (Array.isArray(response)) {
+    // Sort the data if the sortByName option is true
+    if (sortByProperty) {
+      response.sort((a, b) => a[sortByProperty].localeCompare(b[sortByProperty]))
+    }
+    return response as PostgresTable[]
   }
+
+  return response as PostgresTable[]
+}
 
 export type TablesData = Awaited<ReturnType<typeof getTables>>
 export type TablesError = ResponseError
