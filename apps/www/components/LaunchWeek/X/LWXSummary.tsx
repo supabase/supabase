@@ -1,7 +1,7 @@
-import Image from 'next/image'
 import React from 'react'
-import { buildDays, mainDays } from './Releases/data'
+import Image from 'next/image'
 import Link from 'next/link'
+import { buildDays, mainDays } from './Releases/data'
 
 const LWXSummary = () => {
   return (
@@ -19,7 +19,6 @@ const LWXSummary = () => {
             height={16}
             className="w-3 h-3"
           />
-          {/* <span className="font-mono uppercase tracking-wide">Main Stage</span> */}
         </Link>
         <div className="font-mono uppercase tracking-wide text-xs">11-15 Dec</div>
       </div>
@@ -64,9 +63,6 @@ const LWXSummary = () => {
                         </span>
                         {day.title}
                       </span>
-                      {/* <span className="relative block opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0">
-                        <IconArrowRight />
-                      </span> */}
                     </Link>
                   </ol>
                 )

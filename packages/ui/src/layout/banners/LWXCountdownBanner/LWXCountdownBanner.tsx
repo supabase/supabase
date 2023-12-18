@@ -1,8 +1,6 @@
 import { useRouter } from 'next/router'
 import Image from 'next/image'
-import { Button } from 'ui'
-
-// import VideoPreview from './VideoPreview'
+import { Button, cn } from 'ui'
 
 export function LWXCountdownBanner() {
   const { pathname } = useRouter()
@@ -18,10 +16,10 @@ export function LWXCountdownBanner() {
     <div className="relative w-full h-14 p-2 flex items-center group justify-center text-foreground bg-alternative hover:bg-surface-200 dark:bg-[#020405] hover:dark:bg-[#05080a] transition-colors overflow-hidden">
       <div className="relative z-10 flex items-center justify-center">
         <div
-          className={[
+          className={cn(
             'w-full flex gap-5 md:gap-10 items-center md:justify-center text-sm',
-            isLaunchWeekSection && '!justify-center',
-          ].join(' ')}
+            isLaunchWeekSection && '!justify-center'
+          )}
         >
           <div className="flex gap-1.5 items-center">
             <p>Launch Week</p>
@@ -33,14 +31,14 @@ export function LWXCountdownBanner() {
               className="filter contrast-0 dark:contrast-100"
             />
           </div>
-          <div className="hidden sm:block">Day 5: introducing Read Replicas</div>
+          <div className="hidden sm:block">11-15 Dec</div>
           <Button
             onClick={() => null}
             size="tiny"
             type="secondary"
             className="px-2 py-1 !leading-none text-xs"
           >
-            Go to Launch Week
+            View announcements
           </Button>
         </div>
       </div>
