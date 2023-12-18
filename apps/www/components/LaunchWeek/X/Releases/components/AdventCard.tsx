@@ -104,7 +104,7 @@ const AdventCard = ({ day, index }: { day: AdventDay; index: number }) => {
           </div>
         </div>
         {isClientLibsCard && (
-          <div className="flex xl:h-full order-first xl:order-last items-end justify-start xl:justify-end xl:w-2/3 gap-4 xl:gap-6 xl:pb-4 mt-4 flex-wrap">
+          <div className="flex xl:h-full order-first xl:order-last items-end justify-start xl:justify-end xl:w-2/3 gap-4 xl:gap-6 pb-4 mb-4 xl:pb-0 flex-wrap">
             {day.icons?.map((link: AdventLink) => (
               <Link
                 key={link.url}
