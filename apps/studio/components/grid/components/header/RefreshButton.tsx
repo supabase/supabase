@@ -9,7 +9,7 @@ import { TableLike } from 'hooks/misc/useTable'
 
 export type RefreshButtonProps = {
   table: TableLike | SupaTable
-  isRefetching: boolean
+  isRefetching?: boolean
 }
 
 const RefreshButton = ({ table, isRefetching }: RefreshButtonProps) => {

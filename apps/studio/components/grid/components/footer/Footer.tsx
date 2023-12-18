@@ -10,7 +10,7 @@ import RefreshButton from '../header/RefreshButton'
 
 export interface FooterProps {
   isLoading?: boolean
-  isRefetching: boolean
+  isRefetching?: boolean
 }
 
 const Footer = ({ isLoading, isRefetching }: FooterProps) => {

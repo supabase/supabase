@@ -188,7 +188,7 @@ const SupabaseGridLayout = (props: SupabaseGridProps) => {
             onImportData={onImportData}
             onEditForeignKeyColumnValue={onEditForeignKeyColumnValue}
           />
-          <Footer isLoading={isLoading || isRefetching} />
+          <Footer isLoading={isLoading} isRefetching={isRefetching} />
           <Shortcuts gridRef={gridRef} />
         </>
       )}
