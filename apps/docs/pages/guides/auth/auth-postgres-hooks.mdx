@@ -258,7 +258,7 @@ revoke all
   from authenticated, anon;
 ```
 </TabPanel>
-<TabPanel id="send-email-after-failed-attempts" label="Send Email After Failed Attempts">
+<TabPanel id="send-email-after-failed-attempts" label="Send Email After Failed Verification Attempts">
 
 Enable the `pg_net` extension under [`Database > Extensions`](/dashboard/project/_/database/extensions)
 
@@ -319,9 +319,14 @@ as $$
       -- construct the email body
       email_address := (select email from auth.users where id = (event->>'user_id')::uuid);
       -- Insert your email here
-      email_body := format('{"from": "yoursenderemail@example.com", "to": "%s", "subject": "too many mfa attempts", "textbody": "there have been too many mfa attempts.", "htmlbody": "<html><body><strong>alert:</strong> too many mfa attempts.</body></html>", "messagestream": "outbound"}', email_address);
+      email_body := format('{"from": "yoursenderemail@example.com",
+                             "to": "%s",
+                             "subject": "too many mfa attempts",
+                             "textbody": "there have been too many mfa attempts.",
+                             "htmlbody": "<html><body><strong>alert:</strong> too many mfa attempts.</body></html>",
+                             "messagestream": "outbound"}', email_address);
 
-      -- perform the http post request
+      -- perform the http post request. Here we assume you are using Postmark as an email provider.
       select net.http_post(
         'https://api.postmarkapp.com/email',
         email_body,
@@ -342,7 +347,6 @@ as $$
           ));
       end if;
 
-      -- return an error for a successful attempt which is repeated multiple time
       return jsonb_build_object(
         'error', jsonb_build_object(
           'http_code', 429,
@@ -442,9 +446,9 @@ Create a table to record each user's last incorrect password verification attemp
 
 ```sql
 create table public.password_failed_verification_attempts (
-    user_id uuid not null,
-    last_failed_at timestamp not null default now(),
-    primary key (user_id)
+  user_id uuid not null,
+  last_failed_at timestamp not null default now(),
+  primary key (user_id)
 );
 ```
 
@@ -515,6 +519,112 @@ revoke all
   from authenticated, anon;
 ```
 </TabPanel>
+<TabPanel id="send-email-on-first-password-login" label="Send Email On First Password Login">
+
+Your company wishes to send out a welcome email to users on the first time they login via email and password.
+
+Create a table to track sign in attempts. We refrain from using the `auth.users` table's `last_signed_in_at` field as it includes successful OAuth and magic link sign ins.
+
+```sql
+create table public.password_sign_in_attempts (
+  user_id uuid not null,
+  attempt_id uuid not null,
+  last_attempt_at timestamp not null default now(),
+  attempt_successful boolean not null,
+  primary key (user_id, attempt_id)
+);
+```
+
+```sql
+create or replace function public.hook_send_welcome_email(event jsonb)
+returns jsonb
+language plpgsql
+as $$
+  declare
+    user_id uuid;
+    server_token text;
+    email_address text;
+    email_body text;
+    response jsonb;
+    http_code int;
+    error_message text;
+    attempt_count int;
+  begin
+    user_id := (event->>'user_id')::uuid;
+
+    -- check if the password verification is valid
+    if event->'valid' is true then
+      -- Check the number of previous attempts
+      select count(*) into attempt_count
+      from public.password_sign_in_attempts
+      where user_id = user_id;
+
+      -- If it's the first successful login, send a welcome email
+      if attempt_count = 0 then
+        -- Fetch the server token and email address
+        select token into server_token from vault.decrypted_secrets where name = 'yoursecretname';
+        select email into email_address from auth.users where id = user_id;
+
+        -- Construct the welcome email body
+        email_body := format('{"from": "yoursenderemail@example.com",
+                               "to": "%s",
+                               "subject": "Welcome to Our Service",
+                               "textbody": "Welcome! Thank you for joining our service.",
+                               "htmlbody": "<html><body><strong>Welcome!</strong> Thank you for joining our service.</body></html>",
+                               "messagestream": "outbound"}', email_address);
+
+        -- Perform the HTTP POST request using Postmark
+        select net.http_post(
+          'https://api.postmarkapp.com/email',
+          email_body,
+          'application/json',
+          array['accept: application/json', 'x-postmark-server-token: ' || server_token]
+        ) into response;
+
+        -- Extract HTTP code and error message, if any
+        http_code := (response ->> 'status')::int;
+        error_message := response ->> 'message';
+
+        -- Handle email sending errors
+        if (response -> 'status' is null) or (http_code < 200 or http_code >= 300) then
+          return jsonb_build_object(
+            'error', jsonb_build_object(
+              'http_code', coalesce(http_code, 0),
+              'message', coalesce(error_message, 'error sending email')
+            ));
+        end if;
+      end if;
+    end if;
+
+    -- Record the attempt, successful or not
+    insert into public.password_sign_in_attempts (user_id, attempt_id, last_failed_at)
+    values (user_id, (event->>'attempt_id')::uuid, now())
+    on conflict (user_id, attempt_id)
+    do update set last_failed_at = now();
+
+    -- Continue with default behavior
+    return jsonb_build_object('decision', 'continue');
+  end;
+$$;
+
+-- Assign appropriate permissions
+grant execute
+  on function send_welcome_email
+  to supabase_auth_admin;
+
+revoke execute
+  on function public.send_welcome_email
+  from authenticated, anon;
+
+grant all
+  on table public.password_verification_attempts
+  to supabase_auth_admin;
+
+revoke all
+  on table public.password_verification_attempts
+  from authenticated, anon;
+```
+</TabPanel>
 </Tabs>
 
 ## Custom Access Token Extensibility Point
@@ -576,9 +686,9 @@ Create a profiles table with an `is_admin` flag:
 
 ```sql
 create table profiles (
-  user_id uuid NOT NULL PRIMARY KEY REFERENCES auth.users (id),
-  email text NOT NULL UNIQUE,
-  is_admin boolean NOT NULL DEFAULT false
+  user_id uuid not null primary key references auth.users (id),
+  email text not null unique,
+  is_admin boolean not null default false
 );
 ```
 
@@ -632,7 +742,6 @@ revoke execute
 Your company would like to remove the user metadata claim in order to reduce the size of your access token.
 
 ```sql
-
 create or replace function custom_access_token_delete_user_metadata(input jsonb)
 returns jsonb as $$
   declare
@@ -653,7 +762,7 @@ revoke execute
   from authenticated, anon;
 ```
 </TabPanel>
-<TabPanel id="add-metadata-claim-plv8" label="Add claim via plv8">
+<TabPanel id="add-metadata-claim-plv8" label="Add Claim Via PLV8">
 Your company runs a new version of a gamification app and would like to add a `level` claim to the access token. We fetch the level of an existing user from the `profiles` table and assign new users a default level of zero.
 
 Enable the `plv8` extension under [`Database > Extensions`](/dashboard/project/_/database/extensions)
