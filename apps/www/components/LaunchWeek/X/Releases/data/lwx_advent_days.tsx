@@ -8,6 +8,7 @@ export interface AdventDay {
   is_shipped: boolean
   image: string
   links: AdventLink[]
+  icons?: AdventLink[]
 }
 
 export interface AdventLink {
@@ -299,8 +300,13 @@ export const days: AdventDay[] = [
     id: 'supabase-libraries-v2',
     links: [
       {
+        url: '/blog/client-libraries-v2',
+        label: 'Read blog post',
+      },
+    ],
+    icons: [
+      {
         url: '/blog/client-libraries-v2#supabase-python-v2',
-        // target: '_blank',
         label: 'Python',
         icon: (
           <svg
@@ -327,7 +333,6 @@ export const days: AdventDay[] = [
       },
       {
         url: '/blog/client-libraries-v2#supabase-swift-v2',
-        // target: '_blank',
         label: 'Swift',
         icon: (
           <svg
@@ -348,7 +353,6 @@ export const days: AdventDay[] = [
       },
       {
         url: '/blog/client-libraries-v2#supabase-kotlin-v2',
-        // target: '_blank',
         label: 'Kotlin',
         icon: (
           <svg
@@ -367,7 +371,6 @@ export const days: AdventDay[] = [
       },
       {
         url: '/blog/client-libraries-v2#typescript-v2-updates',
-        // target: '_blank',
         label: 'Typescript',
         icon: (
           <svg
@@ -388,7 +391,6 @@ export const days: AdventDay[] = [
       },
       {
         url: '/blog/client-libraries-v2#flutter-v2-updates',
-        // target: '_blank',
         label: 'Flutter',
         icon: (
           <svg
@@ -463,53 +465,7 @@ export const days: AdventDay[] = [
   {
     title: '',
     type: '',
-    is_shipped: false,
-    className: '',
-    icon: '',
-    id: '',
-    links: [
-      {
-        url: '',
-        label: '',
-      },
-    ],
-    image: '',
-  },
-  {
-    title: '',
-    type: '',
-    is_shipped: false,
-    className: '',
-    icon: '',
-    id: '',
-    links: [
-      {
-        url: '',
-        label: '',
-      },
-    ],
-    image: '',
-  },
-  {
-    title: '',
-    type: '',
-    is_shipped: false,
-    className: 'md:aspect-[2/1] md:col-span-2 h-full',
-    icon: '',
-    id: '',
-    links: [
-      {
-        url: '',
-        label: '',
-      },
-    ],
-    image: '',
-  },
-  {
-    title: '',
-    type: '',
-    className:
-      'md:col-span-2 md:aspect-[2/1] md:col-span-1 md:aspect-auto xl:col-span-2 xl:aspect-[2/1] h-full',
+    className: 'sm:aspect-[2/1] sm:col-span-1 sm:col-span-2 sm:aspect-[2/1] h-full',
     is_shipped: false,
     icon: '',
     id: '',
