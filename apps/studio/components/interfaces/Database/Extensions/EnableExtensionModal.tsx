@@ -203,13 +203,18 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
                   <Alert_Shadcn_ variant="warning">
                     <IconAlertTriangle strokeWidth={2} />
                     <AlertTitle_Shadcn_>
-                      Fly Postgres does not fully support pg_cron
+                      The pg_cron extension is not fully supported for Fly projects
                     </AlertTitle_Shadcn_>
 
-                    <AlertDescription_Shadcn_ className="text-end">
+                    <AlertDescription_Shadcn_>
+                      You can still enable the extension, but pg_cron jobs may not run due to the
+                      behaviour of Fly projects.
+                    </AlertDescription_Shadcn_>
+
+                    <AlertDescription_Shadcn_ className="mt-3">
                       <Button
                         asChild
-                        type="link"
+                        type="default"
                         iconRight={<ExternalLinkIcon width={12} height={12} />}
                       >
                         <a
