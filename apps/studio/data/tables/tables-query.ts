@@ -44,16 +44,21 @@ export async function getTables(
   }
 
   // Sort the data if the sortByName option is true
-  if (Array.isArray(response)) {
-    // Sort the data if the sortByName option is true
-    if (sortByProperty) {
-      response.sort((a, b) => a.name.localeCompare(b.name))
-    }
-    return response as PostgresTable[]
-  }
+  // Type guard to check if response is an array of tables
+  if (Array.isArray(response) && sortByProperty) {
+    // Sort the data based on the provided sortByProperty
+    response.sort((a, b) => {
+      const propA = a[sortByProperty]
+      const propB = b[sortByProperty]
 
-  return response as PostgresTable[]
-}
+      if (typeof propA === 'string' && typeof propB === 'string') {
+        return propA.localeCompare(propB);
+      }
+      return 0; // Handle the case where the property doesn't exist or is not a string
+    });
+
+    return response as PostgresTable[];
+  }
 
 export type TablesData = Awaited<ReturnType<typeof getTables>>
 export type TablesError = ResponseError
