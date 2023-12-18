@@ -1,3 +1,4 @@
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { IS_PLATFORM } from './constants'
 
 export const LOCAL_STORAGE_KEYS_ALLOWLIST = [
@@ -7,6 +8,7 @@ export const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   'supabase.dashboard.sign_in_clicks_v4',
   'supabase.dashboard.auth.debug',
   'supabase.dashboard.auth.navigatorLock.disabled',
+  LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT,
 ]
 
 export function clearLocalStorage() {
