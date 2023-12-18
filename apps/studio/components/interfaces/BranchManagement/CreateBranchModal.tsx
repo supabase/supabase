@@ -217,11 +217,10 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
           <Modal.Content className="py-2">
             <Alert_Shadcn_ variant="warning">
               <IconAlertCircle strokeWidth={1.5} />
-              <AlertTitle_Shadcn_>Preview branches are billed per hour</AlertTitle_Shadcn_>
+              <AlertTitle_Shadcn_>Each Preview branch costs $0.32 per day</AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_>
-                Launching a new preview branch incurs additional compute costs, starting at $0.01344
-                per hour (~$10/month). This cost will continue for as long as the branch has not
-                been removed.
+                Each preview branch costs $0.32 per day until it is removed. This pricing is for
+                Early Access and is subject to change.
               </AlertDescription_Shadcn_>
             </Alert_Shadcn_>
           </Modal.Content>

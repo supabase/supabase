@@ -5,13 +5,12 @@ import {
   AnalyticsSettings,
   ThemeSettings,
 } from 'components/interfaces/Account/Preferences'
+import { ProfileInformation } from 'components/interfaces/Account/Preferences/ProfileInformation'
 import { AccountLayout } from 'components/layouts'
-import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useProfileUpdateMutation } from 'data/profile/profile-update-mutation'
-import { useIsFeatureEnabled, useStore } from 'hooks'
+import { useIsFeatureEnabled } from 'hooks'
 import { useProfile } from 'lib/profile'
 import { NextPageWithLayout } from 'types'
 
@@ -40,33 +39,9 @@ User.getLayout = (page) => (
 export default User
 
 const ProfileCard = observer(() => {
-  const { ui } = useStore()
-
   const profileUpdateEnabled = useIsFeatureEnabled('profile:update')
 
   const { profile, error, isLoading, isError, isSuccess } = useProfile()
-  const { mutateAsync: updateProfile, isLoading: isUpdating } = useProfileUpdateMutation({
-    onSuccess: () => {
-      ui.setNotification({ category: 'success', message: 'Successfully saved profile' })
-    },
-    onError: (error) => {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: "Couldn't update profile. Please try again later.",
-      })
-    },
-  })
-
-  const updateUser = async (model: any) => {
-    try {
-      await updateProfile({
-        firstName: model.first_name,
-        lastName: model.last_name,
-      })
-    } finally {
-    }
-  }
 
   return (
     <article className="max-w-4xl p-4">
@@ -89,28 +64,7 @@ const ProfileCard = observer(() => {
           <section>
             <AccountInformation profile={profile} />
           </section>
-          {profileUpdateEnabled && (
-            <section>
-              {/* @ts-ignore */}
-              <SchemaFormPanel
-                title="Profile"
-                schema={{
-                  type: 'object',
-                  required: [],
-                  properties: {
-                    first_name: { type: 'string' },
-                    last_name: { type: 'string' },
-                  },
-                }}
-                model={{
-                  first_name: profile?.first_name ?? '',
-                  last_name: profile?.last_name ?? '',
-                }}
-                onSubmit={updateUser}
-                loading={isUpdating}
-              />
-            </section>
-          )}
+          {profileUpdateEnabled && isSuccess ? <ProfileInformation profile={profile!} /> : null}
         </>
       )}
 

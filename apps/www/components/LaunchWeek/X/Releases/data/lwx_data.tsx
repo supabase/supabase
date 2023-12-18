@@ -150,7 +150,6 @@ const days: WeekDayProps[] = [
     dd: 'Wed',
     title: 'Supabase Branching',
     shipped: true,
-    isToday: true,
     hasCountdown: false,
     blog: '/blog/supabase-branching',
     date: '13 Dec',
@@ -193,37 +192,88 @@ const days: WeekDayProps[] = [
     d: 4,
     dd: 'Thu',
     title: '',
-    shipped: false,
-    hasCountdown: true,
-    blog: '',
+    shipped: true,
+    hasCountdown: false,
+    blog: '/blog/supabase-auth-identity-linking-hooks',
     date: '14 Dec',
     published_at: '2023-12-14T08:00:00.000-08:00',
-    description: '',
+    description: (
+      <>
+        Supabase Auth: <strong>Identity Linking</strong>, <strong>Session Control</strong>,{' '}
+        <strong>Password Protection</strong> and <strong>Hooks</strong>
+      </>
+    ),
     links: [
+      {
+        type: 'blog',
+        href: '/blog/supabase-auth-identity-linking-hooks',
+      },
+      {
+        type: 'video',
+        href: 'LF8GABnAFyE',
+      },
       {
         type: 'xSpace',
         href: 'https://twitter.com/i/spaces/1ypKdkWjkjrxW',
       },
     ],
-    steps: [],
+    steps: [
+      {
+        title: '',
+        blog: '/blog/supabase-auth-identity-linking-hooks',
+        bg_layers: [
+          {
+            img: '/images/launchweek/lwx/day4/d4_auth.svg',
+            mobileImg: '/images/launchweek/lwx/day4/d4_auth_mobile.svg',
+          },
+        ],
+        steps: [],
+      },
+    ],
   },
   {
     id: 'day-5',
     d: 5,
     dd: 'Fri',
     title: '',
-    shipped: false,
-    blog: '',
+    shipped: true,
+    isToday: true,
+    hasCountdown: false,
+    blog: '/blog/introducing-read-replicas',
     date: '15 Dec',
     published_at: '2023-12-15T08:00:00.000-08:00',
-    description: '',
+    description: (
+      <>
+        Introducing <strong>Read Replicas</strong> for low latency
+      </>
+    ),
     links: [
+      {
+        type: 'blog',
+        href: '/blog/introducing-read-replicas',
+      },
+      {
+        type: 'video',
+        href: 'PX3R1fXjJ2M',
+      },
       {
         type: 'xSpace',
         href: 'https://twitter.com/i/spaces/1vAxRvjmvRgxl',
       },
     ],
-    steps: [],
+    steps: [
+      {
+        title: '',
+        blog: '/blog/introducing-read-replicas',
+        bg_layers: [
+          {
+            img: '/images/launchweek/lwx/day5/d5_read_replicas.svg',
+            mobileImg: '/images/launchweek/lwx/day5/d5_read_replicas_mobile.svg',
+          },
+        ],
+        steps: [],
+      },
+    ],
   },
 ]
 
