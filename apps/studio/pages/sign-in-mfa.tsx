@@ -41,23 +41,21 @@ const SignInMfaPage: NextPageWithLayout = () => {
             return router.push({ pathname: '/sign-in', query: router.query })
           }
 
-          if (data) {
-            if (data.currentLevel === data.nextLevel) {
-              Telemetry.sendEvent(
-                { category: 'account', action: 'sign_in', label: '' },
-                telemetryProps,
-                router
-              )
-              await queryClient.resetQueries()
+          if (data.currentLevel === data.nextLevel) {
+            Telemetry.sendEvent(
+              { category: 'account', action: 'sign_in', label: '' },
+              telemetryProps,
+              router
+            )
+            await queryClient.resetQueries()
 
-              router.push(getReturnToPath())
+            router.push(getReturnToPath())
 
-              return
-            }
-            if (data.currentLevel !== data.nextLevel) {
-              setLoading(false)
-              return
-            }
+            return
+          }
+          if (data.currentLevel !== data.nextLevel) {
+            setLoading(false)
+            return
           }
         } else {
           // if the user doesn't have a token, he needs to go back to the sign-in page
