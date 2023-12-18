@@ -1,13 +1,26 @@
 import type { PostgresExtension } from '@supabase/postgres-meta'
+import { ExternalLinkIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import { Button, Form, IconDatabase, IconPlus, Input, Listbox, Modal } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useStore } from 'hooks'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  Form,
+  IconAlertTriangle,
+  IconDatabase,
+  IconPlus,
+  Input,
+  Listbox,
+  Modal,
+} from 'ui'
 
 interface EnableExtensionModalProps {
   visible: boolean
@@ -167,6 +180,38 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
               {values.schema === 'custom' && (
                 <Modal.Content>
                   <Input id="name" name="name" label="Schema name" />
+                </Modal.Content>
+              )}
+
+              {extension.name === 'pg_cron' && project?.cloud_provider === 'FLY' && (
+                <Modal.Content>
+                  <Alert_Shadcn_ variant="warning">
+                    <IconAlertTriangle strokeWidth={2} />
+                    <AlertTitle_Shadcn_>
+                      The pg_cron extension is not fully supported for Fly projects
+                    </AlertTitle_Shadcn_>
+
+                    <AlertDescription_Shadcn_>
+                      You can still enable the extension, but pg_cron jobs may not run due to the
+                      behaviour of Fly projects.
+                    </AlertDescription_Shadcn_>
+
+                    <AlertDescription_Shadcn_ className="mt-3">
+                      <Button
+                        asChild
+                        type="default"
+                        iconRight={<ExternalLinkIcon width={12} height={12} />}
+                      >
+                        <a
+                          href="/docs/guides/platform/fly-postgres#limitations"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <span>Learn more</span>
+                        </a>
+                      </Button>
+                    </AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
                 </Modal.Content>
               )}
 
