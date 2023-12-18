@@ -83,6 +83,22 @@ const SupabaseGridLayout = (props: SupabaseGridProps) => {
     },
     {
       keepPreviousData: true,
+      retryDelay: (retryAttempt, error: any) => {
+        // when an errorMissingColumn error occurs, it's due to non-existant column in the sort parameter. Delete the
+        // sort param and try again.
+        if (error && error.routine === 'errorMissingColumn') {
+          setParams((prevParams) => {
+            return {
+              ...prevParams,
+              ...{ sort: undefined },
+            }
+          })
+        }
+        if (retryAttempt > 3) {
+          return Infinity
+        }
+        return 5000
+      },
       onSuccess(data) {
         dispatch({
           type: 'SET_ROWS_COUNT',
