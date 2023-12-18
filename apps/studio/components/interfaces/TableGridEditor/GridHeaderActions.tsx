@@ -182,18 +182,6 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
             )}
           </Tooltip.Trigger>
         </Tooltip.Root>
-        <Button
-          type="default"
-          icon={
-            <MousePointer2
-              size={14}
-              className={isRealtimeEnabled ? 'text-brand' : 'text-lighter'}
-            />
-          }
-          onClick={() => setShowEnableRealtime(true)}
-        >
-          Realtime {isRealtimeEnabled ? 'on' : 'off'}
-        </Button>
 
         {roleImpersonationEnabledFlag && <RoleImpersonationPopover serviceRoleLabel="postgres" />}
 
