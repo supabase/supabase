@@ -1,8 +1,8 @@
 {
   "name": "ai-commands",
   "version": "0.0.0",
-  "main": "./index.tsx",
-  "types": "./index.tsx",
+  "main": "./index.ts",
+  "types": "./index.ts",
   "license": "MIT",
   "scripts": {
     "typecheck": "tsc --noEmit",
