@@ -1,0 +1,51 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`debug fix order of operations 1`] = `
+"create table departments (
+  id bigint primary key generated always as identity,
+  name text
+);
+
+create table employees (
+  id bigint primary key generated always as identity,
+  name text,
+  email text,
+  department_id bigint references departments (id)
+);"
+`;
+
+exports[`debug fix typos 1`] = `
+"select
+  *
+from
+  employees;"
+`;
+
+exports[`edit add length constraint 1`] = `
+"create table employees (
+  id bigint primary key generated always as identity,
+  name text check (length(name) >= 4),
+  email text
+);"
+`;
+
+exports[`generate single table with specified columns 1`] = `
+"create table employees (
+  id bigint primary key generated always as identity,
+  name text,
+  email text,
+  position text
+);"
+`;
+
+exports[`generate single table with specified columns 2`] = `"Employee Tracking Table"`;
+
+exports[`rls chat select policy using table definition 1`] = `
+"create policy select_todo_policy on todos for
+select
+  using (user_id = auth.uid ());"
+`;
+
+exports[`title title matches content 1`] = `"Employee and Department Tables"`;
+
+exports[`title title matches content 2`] = `"Tables to track employees and their respective departments"`;
