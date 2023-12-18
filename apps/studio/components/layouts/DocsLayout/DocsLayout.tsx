@@ -6,19 +6,18 @@ import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeatureP
 import Error from 'components/ui/Error'
 import ProductMenu from 'components/ui/ProductMenu'
 import { useOpenAPISpecQuery } from 'data/open-api/api-spec-query'
-import { useIsFeatureEnabled, useSelectedProject, useStore, withAuth } from 'hooks'
+import { useIsFeatureEnabled, useSelectedProject, withAuth } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
 import ProjectLayout from '../'
 import { generateDocsMenu } from './DocsLayout.utils'
 
 function DocsLayout({ title, children }: { title: string; children: ReactElement }) {
   const router = useRouter()
-  const { ui } = useStore()
   const selectedProject = useSelectedProject()
   const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
 
   const { data, isLoading, error } = useOpenAPISpecQuery(
-    { projectRef: ui.selectedProjectRef },
+    { projectRef: selectedProject?.ref },
     { enabled: !isPaused }
   )
 
