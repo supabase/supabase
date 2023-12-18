@@ -4,20 +4,14 @@ import { toast } from 'react-hot-toast'
 import { post } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { databasePoliciesKeys } from './keys'
+import { components } from 'data/api'
+
+type CreatePolicyBody = components['schemas']['CreatePolicyBody']
 
 export type DatabasePolicyCreateVariables = {
   projectRef: string
   connectionString?: string
-  payload: {
-    name: string
-    schema: string
-    table: string
-    definition: string
-    check: string
-    action: 'PERMISSIVE' | 'RESTRICTIVE' | undefined
-    command: 'ALL' | 'SELECT' | 'INSERT' | 'DELETE' | 'UPDATE'
-    roles: string[]
-  }
+  payload: CreatePolicyBody
 }
 
 export async function createDatabasePolicy({
