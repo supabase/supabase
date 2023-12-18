@@ -35,7 +35,6 @@ const UtilityActions = ({
 
   return (
     <>
-      {IS_PLATFORM && <ReadOnlyBadge id={id} />}
       <SavingIndicator id={id} />
 
       {IS_PLATFORM && <FavoriteButton id={id} />}
