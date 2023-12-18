@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { ReactElement } from 'react'
 
+import { useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import Error from 'components/ui/Error'
 import ProductMenu from 'components/ui/ProductMenu'
@@ -13,11 +14,12 @@ import { generateDocsMenu } from './DocsLayout.utils'
 
 function DocsLayout({ title, children }: { title: string; children: ReactElement }) {
   const router = useRouter()
+  const { ref } = useParams()
   const selectedProject = useSelectedProject()
   const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
 
   const { data, isLoading, error } = useOpenAPISpecQuery(
-    { projectRef: selectedProject?.ref },
+    { projectRef: ref },
     { enabled: !isPaused }
   )
 
