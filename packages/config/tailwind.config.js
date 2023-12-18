@@ -200,7 +200,6 @@ const uiConfig = ui({
               display: 'block',
               position: 'relative',
               paddingLeft: '1rem',
-              marginBottom: '2rem',
             },
             'ol>li::before': {
               position: 'absolute',

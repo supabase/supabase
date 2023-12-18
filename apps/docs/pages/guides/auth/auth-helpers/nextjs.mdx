@@ -52,7 +52,7 @@ When using the Supabase client on the server, you must perform extra steps to en
 
 Next.js Server Components allow you to read a cookie but not write back to it. Middleware on the other hand allow you to both read and write to cookies.
 
-Next.js [Middleware](https://nextjs.org/docs/app/building-your-application/routing/middleware) runs immediately before each route is rendered. We'll use Middleware to refresh the user's session before loading Server Component routes.
+Next.js [Middleware](https://nextjs.org/docs/app/building-your-application/routing/middleware) runs immediately before each route is rendered. To avoid unnecessary execution, we include a matcher config to decide when the middleware should run. You can read more on matching paths in the Next.js [documentation](https://nextjs.org/docs/app/building-your-application/routing/middleware#matching-paths). We'll use Middleware to refresh the user's session before loading Server Component routes.
 
 <Tabs
   scrollable
@@ -71,9 +71,28 @@ import { NextResponse } from 'next/server'
 
 export async function middleware(req) {
   const res = NextResponse.next()
+
+  // Create a Supabase client configured to use cookies
   const supabase = createMiddlewareClient({ req, res })
+
+  // Refresh session if expired - required for Server Components
   await supabase.auth.getSession()
+
   return res
+}
+
+// Ensure the middleware is only called for relevant paths.
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * Feel free to modify this pattern to include more paths.
+     */
+    '/((?!_next/static|_next/image|favicon.ico).*)',
+  ],
 }
 ```
 
@@ -92,9 +111,27 @@ import type { Database } from '@/lib/database.types'
 
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next()
+
+  // Create a Supabase client configured to use cookies
   const supabase = createMiddlewareClient<Database>({ req, res })
+
+  // Refresh session if expired - required for Server Components
   await supabase.auth.getSession()
+
   return res
+}
+
+// Ensure the middleware is only called for relevant paths.
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!_next/static|_next/image|favicon.ico).*)',
+  ],
 }
 ```
 

@@ -202,7 +202,7 @@ export const REFERENCES: References = {
   swift: {
     name: 'Swift',
     library: 'supabase-swift',
-    versions: ['v1'],
+    versions: ['v2', 'v1'],
     icon: '/docs/img/libraries/swift-icon.svg',
   },
   kotlin: {
@@ -1286,6 +1286,7 @@ export const platform: NavMenuConstant = {
         { name: 'Compute Add-ons', url: '/guides/platform/compute-add-ons' },
         { name: 'Custom Domains', url: '/guides/platform/custom-domains' },
         { name: 'Database Backups', url: '/guides/platform/backups' },
+        { name: 'Read Replicas', url: '/guides/platform/read-replicas' },
       ],
     },
     {
@@ -1295,6 +1296,7 @@ export const platform: NavMenuConstant = {
         { name: 'Access Control', url: '/guides/platform/access-control' },
         { name: 'Custom Postgres Config', url: '/guides/platform/custom-postgres-config' },
         { name: 'Database Size', url: '/guides/platform/database-size' },
+        { name: 'Fly Postgres', url: '/guides/platform/fly-postgres' },
         { name: 'HTTP Status Codes', url: '/guides/platform/http-status-codes' },
         { name: 'Logging', url: '/guides/platform/logs' },
         { name: 'Metrics', url: '/guides/platform/metrics' },
@@ -1634,6 +1636,13 @@ export const reference_swift_v1 = {
   parent: '/reference',
 }
 
+export const reference_swift_v2 = {
+  icon: 'reference-swift',
+  title: 'swift',
+  url: 'guides/reference/swift',
+  parent: '/reference',
+}
+
 export const reference_kotlin_v1 = {
   icon: 'reference-kotlin',
   title: 'kotlin',
@@ -1764,7 +1773,7 @@ export const references = [
       },
       {
         label: 'supabase-swift',
-        versions: ['v0'],
+        versions: ['v2', 'v1'],
         description: 'something about the reference',
         icon: '/docs/img/icons/swift-icon.svg',
         url: '/reference/swift/start',
