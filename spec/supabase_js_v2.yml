@@ -4104,7 +4104,7 @@ functions:
                   name
                 )
               `)
-              .order('name', { referenceTable: 'cities', ascending: false })
+              .order('name', { referencedTable: 'cities', ascending: false })
             ```
         data:
           sql: |
