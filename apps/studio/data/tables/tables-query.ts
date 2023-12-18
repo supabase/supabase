@@ -29,7 +29,6 @@ export async function getTables(
     queryParams = { included_schemas: schema }
   }
 
-  console.log(queryParams)
   const { data, error } = await get('/platform/pg-meta/{ref}/tables', {
     params: {
       header: {
