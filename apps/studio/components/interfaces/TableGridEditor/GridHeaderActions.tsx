@@ -1,21 +1,22 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { MousePointer2 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
+import toast from 'react-hot-toast'
 import { Button, IconAlertCircle, IconLock, Modal } from 'ui'
 
 import { rlsAcknowledgedKey } from 'components/grid/constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import APIDocsButton from 'components/ui/APIDocsButton'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
-import { useCheckPermissions, useFlag, useIsFeatureEnabled, useStore } from 'hooks'
-import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
+import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
-import toast from 'react-hot-toast'
+import { useCheckPermissions, useFlag, useIsFeatureEnabled } from 'hooks'
+import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
 
 export interface GridHeaderActionsProps {
   table: PostgresTable
@@ -23,7 +24,6 @@ export interface GridHeaderActionsProps {
 
 const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   const { ref } = useParams()
-  const { meta, ui } = useStore()
   const { project } = useProjectContext()
   const realtimeEnabled = useIsFeatureEnabled('realtime:all')
   const roleImpersonationEnabledFlag = useFlag('roleImpersonation')
@@ -31,7 +31,11 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   const [showEnableRealtime, setShowEnableRealtime] = useState(false)
 
   const projectRef = project?.ref
-  const policies = meta.policies.list((policy: PostgresPolicy) => policy.table_id === table.id)
+  const { data } = useDatabasePoliciesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const policies = data ?? []
 
   const { data: publications } = useDatabasePublicationsQuery({
     projectRef: project?.ref,
