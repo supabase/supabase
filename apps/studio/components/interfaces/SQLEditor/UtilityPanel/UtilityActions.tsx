@@ -6,10 +6,10 @@ import { Button, IconAlignLeft, IconCommand, IconCornerDownLeft, cn } from 'ui'
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { useFlag } from 'hooks'
-import { useState } from 'react'
 import FavoriteButton from './FavoriteButton'
 import SavingIndicator from './SavingIndicator'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import ReadOnlyBadge from './ReadOnlyBadge'
 
 export type UtilityActionsProps = {
   id: string
@@ -35,14 +35,10 @@ const UtilityActions = ({
 
   return (
     <>
+      {IS_PLATFORM && <ReadOnlyBadge id={id} />}
       <SavingIndicator id={id} />
 
       {IS_PLATFORM && <FavoriteButton id={id} />}
-
-      {/* [Joshen] Am opting to remove this - i don't think its useful? */}
-      {/* [Joshen] Keeping in mind to not sprawl controls everywhere */}
-      {/* [Joshen] There's eventually gonna be user impersonation here as well so let's see */}
-      {/* <SizeToggleButton id={id} /> */}
 
       <Tooltip.Root delayDuration={0}>
         <Tooltip.Trigger asChild>
