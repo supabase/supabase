@@ -1,7 +1,9 @@
+import { PostgresFunction } from '@supabase/postgres-meta'
 import { has, isEmpty, mapValues, union, without } from 'lodash'
 import { makeAutoObservable } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { createContext, useContext, useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import SVG from 'react-inlinesvg'
 
 import { Dictionary } from 'components/grid'
@@ -9,6 +11,12 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import FormEmptyBox from 'components/ui/FormBoxEmpty'
 import NoTableState from 'components/ui/States/NoTableState'
+import {
+  DatabaseFunction,
+  useDatabaseFunctionsQuery,
+} from 'data/database-functions/database-functions-query'
+import { useDatabaseTriggerCreateMutation } from 'data/database-triggers/database-trigger-create-mutation'
+import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-mutation'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
@@ -102,46 +110,26 @@ class CreateTriggerFormState {
 
 interface ICreateTriggerStore {
   chooseFunctionFormVisible: boolean
-  loading: boolean
   formState: CreateTriggerFormState
   meta: any
-  selectedFunction?: Dictionary<any>[]
   tables: Dictionary<any>[]
-  triggerFunctions: Dictionary<any>[]
   onFormChange: ({ key, value }: { key: string; value: any }) => void
-  onSelectFunction: (id: number) => void
+  onSelectFunction: (fn: DatabaseFunction) => void
   setChooseFunctionFormVisible: (value: boolean) => void
   setDefaultSelectedTable: () => void
-  setLoading: (value: boolean) => void
   setTables: (value: any[]) => void
-  setTriggerFunctions: (value: Dictionary<any>[]) => void
   validateForm: () => boolean
 }
 
 class CreateTriggerStore implements ICreateTriggerStore {
   chooseFunctionFormVisible = false
-  loading = false
   formState = new CreateTriggerFormState()
   meta = null
   tables = []
-  triggerFunctions = []
   isDirty = false
 
   constructor() {
     makeAutoObservable(this)
-  }
-
-  get selectedFunction() {
-    const func = this.triggerFunctions.find(
-      (x: any) =>
-        x.name == this.formState.functionName.value &&
-        x.schema == this.formState.functionSchema.value
-    )
-    return func
-  }
-
-  get title() {
-    return this.formState.id ? `Edit '${this.formState.originalName}' trigger` : 'Add a new Trigger'
   }
 
   get isEditing() {
@@ -161,10 +149,6 @@ class CreateTriggerStore implements ICreateTriggerStore {
     }
   }
 
-  setLoading = (value: boolean) => {
-    this.loading = value
-  }
-
   setisDirty = (value: boolean) => {
     this.isDirty = value
   }
@@ -174,10 +158,6 @@ class CreateTriggerStore implements ICreateTriggerStore {
       .sort((a, b) => a.schema.localeCompare(b.schema))
       .filter((a) => !EXCLUDED_SCHEMAS.includes(a.schema)) as any
     this.setDefaultSelectedTable()
-  }
-
-  setTriggerFunctions = (value: Dictionary<any>[]) => {
-    this.triggerFunctions = value as any
   }
 
   onFormChange = ({ key, value }: { key: string; value: any }) => {
@@ -192,12 +172,9 @@ class CreateTriggerStore implements ICreateTriggerStore {
     }
   }
 
-  onSelectFunction = (id: number) => {
-    const func = this.triggerFunctions.find((x: any) => x.id == id)
-    if (func) {
-      this.formState.functionName.value = (func as any).name
-      this.formState.functionSchema.value = (func as any).schema
-    }
+  onSelectFunction = (fn: DatabaseFunction) => {
+    this.formState.functionName.value = fn.name
+    this.formState.functionSchema.value = fn.schema
   }
 
   validateForm = () => {
@@ -279,15 +256,16 @@ const CreateTrigger = ({ trigger, visible, setVisible }: CreateTriggerProps) => 
     }
   )
 
-  useEffect(() => {
-    const fetchFunctions = async () => {
-      await meta.functions.load()
-      const triggerFuncs = (meta as any)!.functions.listTriggerFunctions()
-      _localState.setTriggerFunctions(triggerFuncs)
-    }
+  const { data } = useDatabaseFunctionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const triggerFunctions = (data ?? []).filter((fn) => fn.return_type === 'trigger')
 
-    if (ui.selectedProjectRef) fetchFunctions()
-  }, [ui.selectedProjectRef])
+  const { mutate: createDatabaseTrigger, isLoading: isCreating } =
+    useDatabaseTriggerCreateMutation()
+  const { mutate: updateDatabaseTrigger, isLoading: isUpdating } =
+    useDatabaseTriggerUpdateMutation()
 
   useEffect(() => {
     _localState.setisDirty(false)
@@ -300,40 +278,46 @@ const CreateTrigger = ({ trigger, visible, setVisible }: CreateTriggerProps) => 
   }, [visible, trigger])
 
   async function handleSubmit() {
-    try {
-      if (_localState.validateForm()) {
-        _localState.setLoading(true)
+    if (!project) return console.error('Project is required')
 
-        const body = _localState.formState.requestBody
-        const response: any = _localState.isEditing
-          ? await (meta as any).triggers.update(body.id, body)
-          : await (meta as any).triggers.create(body)
-
-        if (response.error) {
-          ui.setNotification({
-            category: 'error',
-            message: `Failed to create trigger: ${
-              response.error?.message ?? 'submit request failed'
-            }`,
-          })
-          _localState.setLoading(false)
-        } else {
-          ui.setNotification({
-            category: 'success',
-            message: `${_localState.isEditing ? 'Updated' : 'Created new'} trigger called ${
-              response.name
-            }`,
-          })
-          _localState.setLoading(false)
-          setVisible(!visible)
-        }
+    if (_localState.validateForm()) {
+      const body = _localState.formState.requestBody
+      if (_localState.isEditing && body.id) {
+        updateDatabaseTrigger(
+          {
+            projectRef: project?.ref,
+            connectionString: project?.connectionString,
+            id: body.id,
+            payload: body,
+          },
+          {
+            onSuccess: () => {
+              toast.success(`Successfully updated trigger ${body.name}`)
+              setVisible(!visible)
+            },
+            onError: (error) => {
+              toast.error(`Failed to update trigger: ${error.message}`)
+            },
+          }
+        )
+      } else {
+        createDatabaseTrigger(
+          {
+            projectRef: project?.ref,
+            connectionString: project?.connectionString,
+            payload: body,
+          },
+          {
+            onSuccess: () => {
+              toast.success(`Successfully created trigger ${body.name}`)
+              setVisible(!visible)
+            },
+            onError: (error) => {
+              toast.error(`Failed to create trigger: ${error.message}`)
+            },
+          }
+        )
       }
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Filed to create trigger: ${error.message}`,
-      })
-      _localState.setLoading(false)
     }
   }
 
@@ -349,14 +333,18 @@ const CreateTrigger = ({ trigger, visible, setVisible }: CreateTriggerProps) => 
         size="large"
         visible={visible}
         onCancel={isClosingSidePanel}
-        header={_localState.title}
+        header={
+          _localState.formState.id
+            ? `Edit '${_localState.formState.originalName}' trigger`
+            : 'Add a new Trigger'
+        }
         hideFooter={!hasPublicTables}
         className={
           _localState.chooseFunctionFormVisible
             ? 'hooks-sidepanel mr-16 transform transition-all duration-300 ease-in-out'
             : 'hooks-sidepanel mr-0 transform transition-all duration-300 ease-in-out'
         }
-        loading={_localState.loading}
+        loading={isCreating || isUpdating}
         onConfirm={handleSubmit}
       >
         {hasPublicTables ? (
@@ -387,10 +375,13 @@ const CreateTrigger = ({ trigger, visible, setVisible }: CreateTriggerProps) => 
                 )}
               </div>
               <ChooseFunctionForm
-                triggerFunctions={_localState.triggerFunctions}
+                triggerFunctions={triggerFunctions}
                 visible={_localState.chooseFunctionFormVisible}
                 setVisible={_localState.setChooseFunctionFormVisible}
-                onChange={(id: number) => _localState.onSelectFunction(id)}
+                onChange={(id: number) => {
+                  const selectedFn = (data ?? []).find((fn) => fn.id === id)
+                  if (selectedFn) _localState.onSelectFunction(selectedFn)
+                }}
               />
             </CreateTriggerContext.Provider>
             <ConfirmationModal

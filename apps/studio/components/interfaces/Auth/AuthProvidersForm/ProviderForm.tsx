@@ -41,7 +41,6 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
-
   const generateInitialValues = () => {
     const initialValues: { [x: string]: string | boolean } = {}
 
@@ -170,34 +169,32 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                       <AlertDescription_Shadcn_>
                         As of 1st August, LinkedIn has updated their OAuth API scopes. Please use
                         the new LinkedIn provider below. Developers using this provider should move
-                        over to the new provider. Please refer to our
-                        [docs](/docs/pages/guides/auth/social-login/auth-linkedin) for more details.
+                        over to the new provider. Please refer to our{' '}
+                        <a
+                          href="https://supabase.com/docs/guides/auth/social-login/auth-linkedin"
+                          className="underline"
+                          target="_blank"
+                        >
+                          documentation
+                        </a>{' '}
+                        for more details.
                       </AlertDescription_Shadcn_>
                     </Alert_Shadcn_>
                   )}
 
-                  {/* TODO (Joel): Remove after 30th November when we disable the provider */}
-                  {provider.title === 'LinkedIn (Deprecated)' &&
-                    Object.keys(provider.properties).map((x: string) => (
-                      <FormField
-                        key={x}
-                        name={x}
-                        properties={provider.properties[x]}
-                        formValues={values}
-                        disabled={x === 'EXTERNAL_LINKEDIN_ENABLED' ? !canUpdateConfig : true}
-                      />
-                    ))}
-
-                  {provider.title !== 'LinkedIn (Deprecated)' &&
-                    Object.keys(provider.properties).map((x: string) => (
-                      <FormField
-                        key={x}
-                        name={x}
-                        properties={provider.properties[x]}
-                        formValues={values}
-                        disabled={!canUpdateConfig}
-                      />
-                    ))}
+                  {Object.keys(provider.properties).map((x: string) => (
+                    <FormField
+                      key={x}
+                      name={x}
+                      properties={provider.properties[x]}
+                      formValues={values}
+                      // TODO (Joel): Remove after 30th November when we disable the provider
+                      disabled={
+                        ['EXTERNAL_LINKEDIN_CLIENT_ID', 'EXTERNAL_LINKEDIN_SECRET'].includes(x) ||
+                        !canUpdateConfig
+                      }
+                    />
+                  ))}
 
                   {provider?.misc?.alert && (
                     <Alert title={provider.misc.alert.title} variant="warning" withIcon>

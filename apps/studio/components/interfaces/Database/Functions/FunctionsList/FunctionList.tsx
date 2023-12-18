@@ -1,7 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { includes, noop } from 'lodash'
-import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import {
   Button,
@@ -9,7 +8,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  IconCheck,
   IconEdit3,
   IconFileText,
   IconMoreVertical,
@@ -18,7 +16,8 @@ import {
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
+import { useCheckPermissions } from 'hooks'
 
 interface FunctionListProps {
   schema: string
@@ -36,11 +35,14 @@ const FunctionList = ({
   deleteFunction = noop,
 }: FunctionListProps) => {
   const router = useRouter()
-  const { meta } = useStore()
   const { project: selectedProject } = useProjectContext()
 
-  const functions = meta.functions.list()
-  const filteredFunctions = functions.filter((x: any) =>
+  const { data: functions } = useDatabaseFunctionsQuery({
+    projectRef: selectedProject?.ref,
+    connectionString: selectedProject?.connectionString,
+  })
+
+  const filteredFunctions = (functions ?? []).filter((x) =>
     includes(x.name.toLowerCase(), filterString.toLowerCase())
   )
   const _functions = filteredFunctions.filter((x) => x.schema == schema)
@@ -163,4 +165,4 @@ const FunctionList = ({
   )
 }
 
-export default observer(FunctionList)
+export default FunctionList

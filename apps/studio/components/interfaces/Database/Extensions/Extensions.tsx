@@ -1,29 +1,35 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { isNull, partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Button, IconAlertCircle, IconExternalLink, IconSearch, Input } from 'ui'
 
-import { useParams } from 'common/hooks'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import InformationBox from 'components/ui/InformationBox'
 import NoSearchResults from 'components/ui/NoSearchResults'
-import { useCheckPermissions, usePermissionsLoaded, useStore } from 'hooks'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
 import ExtensionCard from './ExtensionCard'
-import { HIDDEN_EXTENSIONS } from './Extensions.constants'
-import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import ExtensionCardSkeleton from './ExtensionCardSkeleton'
+import { HIDDEN_EXTENSIONS } from './Extensions.constants'
 
 const Extensions = () => {
-  const { meta } = useStore()
   const { filter } = useParams()
+  const { project } = useProjectContext()
   const [filterString, setFilterString] = useState<string>('')
+
+  const { data, isLoading } = useDatabaseExtensionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
   const extensions =
     filterString.length === 0
-      ? meta.extensions.list()
-      : meta.extensions.list((ext: any) => ext.name.includes(filterString))
-  const isLoading = meta.extensions.isLoading
+      ? data ?? []
+      : (data ?? []).filter((ext) => ext.name.includes(filterString))
   const extensionsWithoutHidden = extensions.filter(
     (ext: any) => !HIDDEN_EXTENSIONS.includes(ext.name)
   )

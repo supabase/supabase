@@ -101,8 +101,6 @@
     "sql-formatter": "^12.2.0",
     "sqlstring": "^2.3.2",
     "ui": "*",
-    "uniforms-bootstrap4": "^3.6.2",
-    "uniforms-bridge-json-schema": "^3.6.2",
     "uuid": "^9.0.1",
     "valtio": "^1.11.2",
     "yup": "^0.32.11",
