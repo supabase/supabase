@@ -11,12 +11,13 @@ export type TablesVariables = {
   projectRef?: string
   connectionString?: string
   schema?: string
+  sortByProperty?: string
 }
 
 export type TablesResponse = Table[] | { error?: any }
 
 export async function getTables(
-  { projectRef, connectionString, schema }: TablesVariables,
+  { projectRef, connectionString, schema, sortByProperty = 'ename' }: TablesVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) {
@@ -40,6 +41,15 @@ export async function getTables(
 
   if (!Array.isArray(response) && response.error) {
     throw response.error
+  }
+
+  // Sort the data if the sortByName option is true
+  if (Array.isArray(response)) {
+    // Sort the data if the sortByName option is true
+    if (sortByProperty) {
+      response.sort((a, b) => a.name.localeCompare(b.name))
+    }
+    return response as PostgresTable[]
   }
 
   return response as PostgresTable[]
