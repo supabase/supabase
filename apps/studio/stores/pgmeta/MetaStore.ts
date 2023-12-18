@@ -49,8 +49,6 @@ export interface IMetaStore {
   columns: IPostgresMetaInterface<PostgresColumn>
   views: IViewStore
 
-  policies: IPostgresMetaInterface<any>
-
   projectRef?: string
 
   query: (value: string) => Promise<any | { error: ResponseError }>
@@ -124,8 +122,6 @@ export default class MetaStore implements IMetaStore {
   columns: PostgresMetaInterface<PostgresColumn>
   views: ViewStore
 
-  policies: PostgresMetaInterface<any>
-
   projectRef?: string
   connectionString?: string
   baseUrl: string
@@ -155,11 +151,6 @@ export default class MetaStore implements IMetaStore {
     )
     this.views = new ViewStore(this.rootStore, `${this.baseUrl}/views`, this.headers)
 
-    this.policies = new PostgresMetaInterface(
-      this.rootStore,
-      `${this.baseUrl}/policies`,
-      this.headers
-    )
     makeObservable(this, {})
   }
 
@@ -854,8 +845,5 @@ export default class MetaStore implements IMetaStore {
 
     this.views.setUrl(`${this.baseUrl}/views`)
     this.views.setHeaders(this.headers)
-
-    this.policies.setUrl(`${this.baseUrl}/policies`)
-    this.policies.setHeaders(this.headers)
   }
 }
