@@ -26,7 +26,6 @@ const AuthLayout = ({ title, children }: PropsWithChildren<AuthLayoutProps>) => 
 
   useEffect(() => {
     if (ui.selectedProjectRef) {
-      meta.policies.load()
       meta.roles.load()
     }
   }, [ui.selectedProjectRef])

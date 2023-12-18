@@ -9,7 +9,7 @@ import { ProjectLayoutWithAuth } from '../'
 import TableEditorMenu from './TableEditorMenu'
 
 const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
-  const { vault, meta, ui } = useStore()
+  const { vault, ui } = useStore()
   const project = useSelectedProject()
 
   const canReadTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'tables')
@@ -21,12 +21,6 @@ const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
   })
   const vaultExtension = (data ?? []).find((ext) => ext.name === 'supabase_vault')
   const isVaultEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null
-
-  useEffect(() => {
-    if (ui.selectedProjectRef) {
-      meta.policies.load()
-    }
-  }, [ui.selectedProjectRef])
 
   useEffect(() => {
     if (isVaultEnabled) {
