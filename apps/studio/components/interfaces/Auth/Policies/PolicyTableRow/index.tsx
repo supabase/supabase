@@ -26,10 +26,13 @@ const PolicyTableRow = ({
   onSelectDeletePolicy = noop,
 }: PolicyTableRowProps) => {
   const { project } = useProjectContext()
-  const { data: policies } = useDatabasePoliciesQuery({
+  const { data } = useDatabasePoliciesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+  const policies = (data ?? []).filter(
+    (policy) => policy.schema === table.schema && policy.table === table.name
+  )
 
   return (
     <Panel
