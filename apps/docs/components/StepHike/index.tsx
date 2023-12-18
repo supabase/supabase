@@ -23,73 +23,8 @@ const StepHike = ({ children, title }) => {
   if (steps.length === 0 || !steps)
     throw 'StepHike component needs at least 1 <StepHike.Step> child'
 
-  // console.log('length of the steps filter', steps.length)
-
   return (
     <div className="">
-      {/* <div
-        className="
-          sticky w-full top-[96px] z-50 p-5 rounded-lg
-      flex gap-3 items-center
-      bg-white-1200 dark:bg-scale-200
-      border-t border-l border-r border-scale-600
-      h-[60px]
-      not-prose
-     rounded-bl-none
-     rounded-br-none
-     shadow-md
-     -mb-1.5
-      "
-      >
-        <h3 className="text-scale-1200 text-xl">{title}</h3>
-        <div className="justify-end grow flex gap-3">
-          <Button type="default" onClick={() => handlePrev()} disabled={activeStep?.step === 0}>
-            Prev
-          </Button>
-          <Button
-            type="default"
-            onClick={() => handleNext()}
-            disabled={steps.length - 1 === activeStep?.step}
-          >
-            Next
-          </Button>
-        </div>
-      </div> */}
-
-      {/* <div
-        className="sticky w-full top-[128px] bottom-[64px] z-10 p-5 rounded-lg
-
-      flex gap-3 items-center
-      backdrop-blur-lg backdrop-filter bg-white-1200 dark:bg-whiteA-300
-
-      h-[60px]
-      not-prose
-      "
-      >
-        <div className="flex items-center gap-6">
-          <div className="border bg-scale-600 border-scale-700 flex w-7 h-7 items-center justify-center rounded text-base text-scale-1200 font-semibold font-mono">
-            {activeStep?.step + 1}
-          </div>
-          <h3 className="text-scale-1200 text-xl">
-            {steps[activeStep?.step] && steps[activeStep?.step].props.title}
-          </h3>
-          <span className="font-mono uppercase text-xs">
-            Step {activeStep?.step + 1} of {steps?.length}
-          </span>
-        </div>
-        <div className="justify-end grow flex gap-3">
-          <Button type="default" onClick={() => handlePrev()} disabled={activeStep?.step === 0}>
-            Prev
-          </Button>
-          <Button
-            type="default"
-            onClick={() => handleNext()}
-            disabled={steps.length - 1 === activeStep?.step}
-          >
-            Next
-          </Button>
-        </div>
-      </div> */}
       <StepHikeContext.Provider value={{ activeStep, steps }}>{children}</StepHikeContext.Provider>
     </div>
   )
@@ -104,27 +39,6 @@ const Step = ({ children, title, step }) => {
 
   const ChildrenRender = ({ active }) => <div className="pl-[74px]">{children}</div>
 
-  // const ref = useRef<HTMLDivElement | null>(null)
-
-  // useEffect(() => {
-  //   const cachedRef = ref.current
-  //   const observer = new IntersectionObserver(
-  //     ([e]) =>
-  //       // setStuck(e.intersectionRatio < 1)
-  //       console.log('scroll', title),
-  //     {
-  //       threshold: [0],
-  //       rootMargin: '0px 0px 0px 0px',
-  //     }
-  //   )
-
-  //   // const cachedRef: HTMLDivElement | null
-  //   // Argument of type 'HTMLDivElement | null' is not assignable to parameter of type 'Element'.
-  //   // Type 'null' is not assignable to type 'Element'.ts(2345)
-  //   observer.observe(cachedRef)
-  //   return () => observer.unobserve(cachedRef)
-  // }, [ref])
-
   const { ref } = useInView({
     rootMargin: '10px 20px 30px 40px',
     threshold: 1,
@@ -138,24 +52,20 @@ const Step = ({ children, title, step }) => {
     <>
       <StepHikeContext.Consumer>
         {({ activeStep, steps }) => {
-          // console.log('activeStep', activeStep)
           const cleanTitleId = title.replaceAll(' ', '-').toLowerCase()
           const active = cleanTitleId === activeStep?.titleId
 
-          // useEffect(() => {}, [])
-
           return (
             <div>
-              {/* <div className="h-[2px] w-full bg-scale-500"></div> */}
               <div
                 ref={ref}
                 className="sticky w-full top-[64px] z-10 p-5 rounded-lg
 
       flex gap-3 items-center
-      backdrop-blur-lg backdrop-filter bg-white-1200 dark:bg-whiteA-300
+      backdrop-blur-lg backdrop-filter bg-background
 
 
-      border-b border-l border-r border-scale-600 border-t
+      border-b border-l border-r border-control border-t
 
       h-[60px]
       not-prose
@@ -163,10 +73,10 @@ const Step = ({ children, title, step }) => {
       "
               >
                 <div className="flex items-center gap-6">
-                  <div className="border bg-scale-600 border-scale-700 flex w-7 h-7 items-center justify-center rounded text-base text-scale-1200 font-semibold font-mono">
+                  <div className="border bg-selection border-strong flex w-7 h-7 items-center justify-center rounded text-base text-foreground font-semibold font-mono">
                     {step}
                   </div>
-                  <h3 className="text-scale-1200 text-xl" id={cleanTitleId}>
+                  <h3 className="text-foreground text-xl" id={cleanTitleId}>
                     {title}
                   </h3>
                   <span className="font-mono uppercase text-xs">

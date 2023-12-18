@@ -10,7 +10,7 @@ export default {
 }
 
 const content = (
-  <span className="text-scale-900 text-sm">
+  <span className="text-foreground-muted text-sm">
     SidePanel content is inserted here, if you need to insert anything into the SidePanel you can do
     so via
     <span className="text-code">children</span>
@@ -23,8 +23,8 @@ export const Default = (args: any) => (
       {...args}
       header={
         <>
-          <h3 className="text-base text-scale-1200">This is the title</h3>
-          <p className="text-xs text-scale-900">This is the title</p>
+          <h3 className="text-base text-foreground">This is the title</h3>
+          <p className="text-xs text-foreground-muted">This is the title</p>
         </>
       }
     >
@@ -66,7 +66,7 @@ export const customFooter = (args: any) => (
 export const triggerElement = (args: any) => (
   <>
     <SidePanel {...args}>
-      <span className="text-scale-900">This was opened with a trigger element</span>
+      <span className="text-foreground-muted">This was opened with a trigger element</span>
     </SidePanel>
   </>
 )
@@ -80,7 +80,7 @@ export const nestedSidepanels = (args: any) => {
       <div
         className="
           p-3 px-5 
-          bg-scale-300 border border-scale-600 rounded flex gap-4 
+          bg-surface-100 border border-control rounded flex gap-4 
           justify-between
           items-center
           
@@ -93,8 +93,8 @@ export const nestedSidepanels = (args: any) => {
           -translate-y-1/2"
       >
         <div>
-          <h4 className="text-scale-1200 text-base">Shall we nest some components?</h4>
-          <p className="text-scale-1100 text-sm">yea sure, go on then.</p>
+          <h4 className="text-foreground text-base">Shall we nest some components?</h4>
+          <p className="text-foreground-light text-sm">yea sure, go on then.</p>
         </div>
         <Button type="secondary" onClick={() => setPanel1Visible(true)}>
           Open sidepanel
@@ -106,11 +106,11 @@ export const nestedSidepanels = (args: any) => {
         onConfirm={() => setPanel1Visible(false)}
       >
         <div className="space-y-3">
-          <p className="text-sm text-scale-900 font-light">
+          <p className="text-sm text-foreground-muted font-light">
             This Sidepanel was opened with a trigger element
           </p>
 
-          <p className="text-sm text-scale-1200">
+          <p className="text-sm text-foreground">
             You can open a nested panel by clicking the button below
           </p>
 
@@ -135,51 +135,51 @@ export const nestedSidepanels = (args: any) => {
 export const longContent = (args: any) => (
   <>
     <SidePanel {...args}>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
-      <p className="text-scale-900">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
+      <p className="text-foreground-muted">This is a paragraph</p>
     </SidePanel>
   </>
 )

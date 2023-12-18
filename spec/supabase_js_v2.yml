@@ -26,7 +26,7 @@ functions:
 
     examples:
       - id: create-client
-        name: createClient()
+        name: Creating a client
         code: |
           ```js
           import { createClient } from '@supabase/supabase-js'
@@ -34,7 +34,7 @@ functions:
           // Create a single supabase client for interacting with your database
           const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
           ```
-      - id: create-client
+      - id: with-custom-domain
         name: With a custom domain
         code: |
           ```js
@@ -65,13 +65,13 @@ functions:
           const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key", options)
           ```
       - id: api-schemas
-        name: API schemas
+        name: With custom schemas
         code: |
           ```js
           import { createClient } from '@supabase/supabase-js'
 
-          // Provide a custom schema. Defaults to "public".
           const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
+            // Provide a custom schema. Defaults to "public".
             db: { schema: 'other_schema' }
           })
           ```
@@ -81,7 +81,7 @@ functions:
 
           Note: each client connection can only access a single schema, so the code above can access the `other_schema` schema but cannot access the `public` schema.
       - id: custom-fetch-implementation
-        name: Custom `fetch` implementation
+        name: Custom fetch implementation
         code: |
           ```js
           import { createClient } from '@supabase/supabase-js'
@@ -475,6 +475,8 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueClient.signOut'
     notes: |
       - In order to use the `signOut()` method, the user needs to be signed in first.
+      - By default, `signOut()` uses the global scope, which signs out all other sessions that the user is logged into as well.
+      - Since Supabase Auth uses JWTs for authentication, the access token JWT will be valid until it's expired. When the user signs out, Supabase revokes the refresh token and deletes the JWT from the client-side. This does not revoke the JWT and it will still be valid until it expires.
     examples:
       - id: sign-out
         name: Sign out
@@ -595,6 +597,59 @@ functions:
             nonce: '123456'
           })
           ```
+  - id: get-user-identities
+    title: 'getUserIdentities()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.getUserIdentities'
+    notes: |
+      - The user needs to be signed in to call `getUserIdentities()`.
+    examples:
+      - id: get-user-identities
+        name: Returns a list of identities linked to the user
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.getUserIdentities()
+          ```
+  - id: link-identity
+    title: 'linkIdentity()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.linkIdentity'
+    notes: |
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The user needs to be signed in to call `linkIdentity()`.
+      - If the candidate identity is already linked to the existing user or another user, `linkIdentity()` will fail.
+    examples:
+      - id: link-identity
+        name: Link an identity to a user
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.linkIdentity()
+          ```
+  - id: unlink-identity
+    title: 'unlinkIdentity()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.unlinkIdentity'
+    notes: |
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The user needs to be signed in to call `unlinkIdentity()`.
+      - The user must have at least 2 identities in order to unlink an identity.
+      - The identity to be unlinked must belong to the user.
+    examples:
+      - id: unlink-identity
+        name: Unlink an identity
+        isSpotlight: true
+        code: |
+          ```js
+          // retrieve all identites linked to a user
+          const identities = await supabase.auth.getUserIdentities()
+
+          // find the google identity 
+          const googleIdentity = identities.find(
+            identity => identity.provider === 'google'
+          )
+
+          // unlink the google identity
+          const { data, error } = await supabase.auth.unlinkIdentity(googleIdentity)
+          ```
   - id: send-password-reauthentication
     title: 'reauthenticate()'
     $ref: '@supabase/gotrue-js.GoTrueClient.reauthenticate'
@@ -630,7 +685,7 @@ functions:
           ```js
           const { data, error } = await supabase.auth.resend({
             type: 'signup',
-            email: 'email@example.com'
+            email: 'email@example.com',
             options: {
               emailRedirectTo: 'https://example.com/welcome'
             }
@@ -1337,8 +1392,8 @@ functions:
             "statusText": "OK"
           }
           ```
-      - id: query-foreign-tables
-        name: Query foreign tables
+      - id: query-referenced-tables
+        name: Query referenced tables
         description: |
           If your database has foreign key relationships, you can query related tables too.
         code: |
@@ -1400,18 +1455,18 @@ functions:
             "statusText": "OK"
           }
           ```
-      - id: query-foreign-tables-through-a-join-table
-        name: Query foreign tables through a join table
+      - id: query-referenced-tables-through-a-join-table
+        name: Query referenced tables through a join table
         code: |
           ```ts
-            const { data, error } = await supabase
-              .from('users')
-              .select(`
-                name,
-                teams (
-                  name
-                )
-              `)
+          const { data, error } = await supabase
+            .from('users')
+            .select(`
+              name,
+              teams (
+                name
+              )
+            `)
             ```
         data:
           sql: |
@@ -1486,8 +1541,8 @@ functions:
           the `select()` method to query the related data. The join table needs
           to have the foreign keys as part of its composite primary key.
         hideCodeBlock: true
-      - id: query-the-same-foreign-table-multiple-times
-        name: Query the same foreign table multiple times
+      - id: query-the-same-referenced-table-multiple-times
+        name: Query the same referenced table multiple times
         code: |
           ```ts
           const { data, error } = await supabase
@@ -1541,12 +1596,12 @@ functions:
           }
           ```
         description: |
-          If you need to query the same foreign table twice, use the name of the
+          If you need to query the same referenced table twice, use the name of the
           joined column to identify which join to use. You can also give each
           column an alias.
         hideCodeBlock: true
-      - id: filtering-through-foreign-tables
-        name: Filtering through foreign tables
+      - id: filtering-through-referenced-tables
+        name: Filtering through referenced tables
         code: |
           ```ts
           const { data, error } = await supabase
@@ -1595,12 +1650,12 @@ functions:
           }
           ```
         description: |
-          If the filter on a foreign table's column is not satisfied, the foreign
+          If the filter on a referenced table's column is not satisfied, the referenced
           table returns `[]` or `null` but the parent table is not filtered out.
           If you want to filter out the parent table rows, use the `!inner` hint
         hideCodeBlock: true
-      - id: querying-foreign-table-with-count
-        name: Querying foreign table with count
+      - id: querying-referenced-table-with-count
+        name: Querying referenced table with count
         code: |
           ```ts
           const { data, error } = await supabase
@@ -1728,8 +1783,8 @@ functions:
           [operators](/docs/guides/database/json#query-the-jsonb-data) for
           querying JSON data.
         hideCodeBlock: true
-      - id: querying-foreign-table-with-inner-join
-        name: Querying foreign table with inner join
+      - id: querying-referenced-table-with-inner-join
+        name: Querying referenced table with inner join
         code: |
           ```ts
           const { data, error } = await supabase
@@ -1775,8 +1830,46 @@ functions:
           }
           ```
         description: |
-          If you don't want to return the foreign table contents, you can leave the parenthesis empty.
+          If you don't want to return the referenced table contents, you can leave the parenthesis empty.
           Like `.select('name, countries!inner()')`.
+        hideCodeBlock: true
+      - id: switching-schemas-per-query
+        name: Switching schemas per query
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .schema('myschema')
+            .from('mytable')
+            .select()
+          ```
+        data:
+          sql: |
+            ```sql
+            create schema myschema;
+
+            create table myschema.mytable (
+              id uuid primary key default gen_random_uuid(),
+              data text
+            );
+
+            insert into myschema.mytable (data) values ('mydata');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": "4162e008-27b0-4c0f-82dc-ccaeee9a624d",
+                "data": "mydata"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          In addition to setting the schema during initialization, you can also switch schemas on a per-query basis.
+          Make sure you've set up your [database privileges and API settings](/docs/guides/api/using-custom-schemas).
         hideCodeBlock: true
 
   - id: insert
@@ -2414,8 +2507,8 @@ functions:
             "statusText": "OK"
           }
           ```
-      - id: filter-foreign-tables
-        name: Filter Foreign Tables
+      - id: filter-referenced-tables
+        name: Filter referenced tables
         code: |
           ```ts
           const { data, error } = await supabase
@@ -2469,7 +2562,7 @@ functions:
             }
             ```
         description: |
-          You can filter on foreign tables in your `select()` query using dot
+          You can filter on referenced tables in your `select()` query using dot
           notation.
   ######## TODO CHECK FILTER YAML ERRORS ########
   - id: eq
@@ -3740,8 +3833,8 @@ functions:
           }
           ```
         hideCodeBlock: true
-      - id: use-or-on-foreign-tables
-        name: Use `or` on foreign tables
+      - id: use-or-on-referenced-tables
+        name: Use `or` on referenced tables
         code: |
           ```ts
           const { data, error } = await supabase
@@ -3752,7 +3845,7 @@ functions:
                 name
               )
             `)
-            .or('country_id.eq.1,name.eq.Beijing', { foreignTable: 'cities' })
+            .or('country_id.eq.1,name.eq.Beijing', { referenceTable: 'cities' })
           ```
         data:
           sql: |
@@ -3844,8 +3937,8 @@ functions:
           ```
         hideCodeBlock: true
         isSpotlight: true
-      - id: on-a-foreign-table
-        name: On a foreign table
+      - id: on-a-referenced-table
+        name: On a referenced table
         code: |
           ```ts
           const { data, error } = await supabase
@@ -3999,8 +4092,8 @@ functions:
           ```
         hideCodeBlock: true
         isSpotlight: true
-      - id: on-a-foreign-table
-        name: On a foreign table
+      - id: on-a-referenced-table
+        name: On a referenced table
         code: |
           ```ts
             const { data, error } = await supabase
@@ -4011,7 +4104,7 @@ functions:
                   name
                 )
               `)
-              .order('name', { foreignTable: 'cities', ascending: false })
+              .order('name', { referenceTable: 'cities', ascending: false })
             ```
         data:
           sql: |
@@ -4061,7 +4154,7 @@ functions:
           }
           ```
         description: |
-          Ordering on foreign tables doesn't affect the ordering of
+          Ordering on referenced tables doesn't affect the ordering of
           the parent table.
         hideCodeBlock: true
 
@@ -4105,8 +4198,8 @@ functions:
           ```
         hideCodeBlock: true
         isSpotlight: true
-      - id: on-a-foreign-table
-        name: On a foreign table
+      - id: on-a-referenced-table
+        name: On a referenced table
         code: |
           ```ts
           const { data, error } = await supabase
@@ -4117,7 +4210,7 @@ functions:
                 name
               )
             `)
-            .limit(1, { foreignTable: 'cities' })
+            .limit(1, { referenceTable: 'cities' })
           ```
         data:
           sql: |
@@ -4320,6 +4413,7 @@ functions:
           ```
         hideCodeBlock: true
         isSpotlight: true
+
   - id: csv
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.csv'
     title: csv()
@@ -4358,6 +4452,7 @@ functions:
           By default, the data is returned in JSON format, but can also be returned as Comma Separated Values.
         hideCodeBlock: true
         isSpotlight: true
+
   - id: returns
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.returns'
     title: returns()
@@ -4375,6 +4470,51 @@ functions:
           ```
           let x: typeof data // MyType | null
           ```
+        hideCodeBlock: true
+        isSpotlight: true
+
+  - id: explain
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.explain'
+    title: Using Explain
+    description: |
+      For debugging slow queries, you can get the [Postgres `EXPLAIN` execution plan](https://www.postgresql.org/docs/current/sql-explain.html) of a query
+      using the `explain()` method. This works on any query, even for `rpc()` or writes.
+
+      Explain is not enabled by default as it can reveal sensitive information about your database.
+      It's best to only enable this for testing environments but if you wish to enable it for production you can provide additional protection by using a `pre-request` function.
+
+      Follow the [Performance Debugging Guide](/docs/guides/api/rest/debugging-performance) to enable the functionality on your project.
+    examples:
+      - id: get-execution-plan
+        name: Get the execution plan
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .explain()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```
+          Aggregate  (cost=33.34..33.36 rows=1 width=112)
+            ->  Limit  (cost=0.00..18.33 rows=1000 width=40)
+                  ->  Seq Scan on countries  (cost=0.00..22.00 rows=1200 width=40)
+          ```
+        description: |
+          By default, the data is returned in TEXT format, but can also be returned as JSON by using the `format` parameter.
         hideCodeBlock: true
         isSpotlight: true
 
@@ -5061,7 +5201,7 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          const { data } = supabase
+          const { data } = await supabase
             .storage
             .from('avatars')
             .createSignedUrl('folder/avatar1.png', 60, {
@@ -5076,7 +5216,7 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          const { data } = supabase
+          const { data } = await supabase
             .storage
             .from('avatars')
             .createSignedUrl('folder/avatar1.png', 60, {

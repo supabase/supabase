@@ -164,7 +164,7 @@ export const CalendarExample = {
                         variant={'outline'}
                         className={cn(
                           'w-[240px] pl-3 text-left font-normal',
-                          !field.value && 'text-muted-foreground'
+                          !field.value && 'text-foreground-muted'
                         )}
                       >
                         {field.value ? format(field.value, 'PPP') : <span>Pick a date</span>}

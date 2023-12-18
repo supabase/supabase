@@ -6,7 +6,7 @@ import Typed from 'typed.js'
 import { Button, ButtonProps, cn, IconCommand, IconSearch, SearchButton } from 'ui'
 
 import DefaultLayout from '~/components/Layouts/Default'
-import InteractiveShimmerCard from '~/components/InteractiveShimmerCard'
+import Panel from '~/components/Panel'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { questions } from 'shared-data'
 import data from '~/data/support'
@@ -63,21 +63,20 @@ const Index = () => {
                   justify-between
                   bg-background
                   border
-                  border-scale-500
+                  border-control
                   hover:bg-surface-100
-                  hover:border-scale-600
                   transition 
                   rounded"
               >
                 <div className="flex items-center flex-1 space-x-2">
-                  <IconSearch className="text-light" size={18} strokeWidth={2} />
+                  <IconSearch className="text-foreground-light" size={18} strokeWidth={2} />
                   <p
                     ref={typerRef}
-                    className="text-lighter text-sm group-hover:text-light transition"
+                    className="text-foreground-lighter text-sm group-hover:text-foreground-light transition"
                   />
                 </div>
                 <div className="flex items-center h-full space-x-1">
-                  <div className="hidden text-lighter md:flex items-center justify-center h-5 w-10 border rounded bg-scale-500 border-scale-700 gap-1">
+                  <div className="hidden text-foreground-lighter md:flex items-center justify-center h-5 w-10 border rounded bg-surface-300 border-foreground-lighter/30 gap-1">
                     <IconCommand size={12} strokeWidth={1.5} />
                     <span className="text-[12px]">K</span>
                   </div>
@@ -88,7 +87,7 @@ const Index = () => {
         </div>
         <SectionContainer className="text grid gap-5 md:grid-cols-2 xl:grid-cols-3 max-w-7xl !pb-8">
           {data.cards.map((card) => (
-            <InteractiveShimmerCard
+            <Panel
               key={card.title}
               outerClassName={cn(card.className)}
               innerClassName="flex flex-col p-5"
@@ -96,7 +95,7 @@ const Index = () => {
               <div className="mb-4 lg:mb-8 flex-1">
                 <h2 className="text text-lg font-medium">{card.title}</h2>
                 <div className="my-2 block">
-                  <p className="text-light">{card.paragraph}</p>
+                  <p className="text-foreground-light">{card.paragraph}</p>
                 </div>
               </div>
               <div className="flex gap-2">
@@ -113,7 +112,7 @@ const Index = () => {
                   </Button>
                 ))}
               </div>
-            </InteractiveShimmerCard>
+            </Panel>
           ))}
         </SectionContainer>
         <SectionContainer className="!pt-0 max-w-7xl">

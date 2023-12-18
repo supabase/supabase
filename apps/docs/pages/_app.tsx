@@ -1,21 +1,17 @@
-import '../../../packages/ui/build/css/themes/dark.css'
-import '../../../packages/ui/build/css/themes/light.css'
-
 import '@code-hike/mdx/styles'
 import 'config/code-hike.scss'
-import '../styles/main.scss?v=1.0.0'
+import '../styles/main.scss'
 import '../styles/new-docs.scss'
 import '../styles/prism-okaidia.scss'
 
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { createClient } from '@supabase/supabase-js'
-import { AuthProvider, ThemeProvider, useTelemetryProps } from 'common'
+import { AuthProvider, ThemeProvider, useTelemetryProps, useThemeSandbox } from 'common'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
 import { AppPropsWithLayout } from 'types'
-import { CommandMenuProvider, useConsent } from 'ui'
+import { CommandMenuProvider, PortalToast, PromoToast, useConsent } from 'ui'
 import { TabsProvider } from 'ui/src/components/Tabs'
-import PortalToast from 'ui/src/layout/PortalToast'
 import Favicons from '~/components/Favicons'
 import SiteLayout from '~/layouts/SiteLayout'
 import { API_URL, IS_PLATFORM } from '~/lib/constants'
@@ -25,6 +21,8 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
   const { consentValue, hasAcceptedConsent } = useConsent()
+
+  useThemeSandbox()
 
   const [supabase] = useState(() =>
     IS_PLATFORM
@@ -159,16 +157,12 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     <>
       <Favicons />
       <AuthContainer>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
+        <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
           <CommandMenuProvider site="docs">
             <TabsProvider>
               <SiteLayout>
                 <PortalToast />
+                <PromoToast />
                 <Component {...pageProps} />
               </SiteLayout>
             </TabsProvider>

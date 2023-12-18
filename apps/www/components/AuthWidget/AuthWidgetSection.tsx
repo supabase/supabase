@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import { Button } from 'ui'
+import { Button, ThemeImage } from 'ui'
 import { useState } from 'react'
 // Import Swiper React components
 import { useRouter } from 'next/router'
@@ -61,7 +61,7 @@ function AuthWidgetSection() {
             <div className="relative lg:mx-auto lg:max-w-md">
               <div className="glow-area transition-all"></div>
 
-              <div className="border-overlay bg-white dark:bg-overlay pointer-events-none relative rounded-xl border px-8 py-12 drop-shadow-sm">
+              <div className="border-overlay bg-surface-100 pointer-events-none relative rounded-xl border px-8 py-12 drop-shadow-sm">
                 <div className="mb-6 flex flex-col gap-6">
                   <div className="flex items-center gap-3">
                     <div
@@ -75,14 +75,16 @@ function AuthWidgetSection() {
                     </div>
                     <h1 className="text-foreground text-2xl">Acme Industries</h1>
                   </div>
-                  <p className="text-light text-auth-widget-test">Sign in today for Supa stuff</p>
+                  <p className="text-foreground-light text-auth-widget-test">
+                    Sign in today for Supa stuff
+                  </p>
                 </div>
                 <Auth.UserContextProvider supabaseClient={supabase}>
                   <AuthContainer supabaseClient={supabase}>
                     <Auth
                       // @ts-ignore
                       socialLayout={layout}
-                      theme={resolvedTheme === 'dark' ? 'dark' : 'default'}
+                      theme={resolvedTheme?.includes('dark') ? 'dark' : 'default'}
                       providers={['google', 'facebook', 'twitter']}
                       supabaseClient={supabase}
                       appearance={{
@@ -111,17 +113,17 @@ function AuthWidgetSection() {
             <div className="prose !max-w-md">
               <h3 className="text-2xl">Auth UI</h3>
               <p className="!mb-0">Pre-built auth widgets to get started in minutes.</p>
-              <p className="text-lighter mt-0">
+              <p className="text-foreground-lighter mt-0">
                 Customizable authentication UI component with custom themes and extensible styles to
                 match your brand and aesthetic
               </p>
               <div className="mb-4 flex items-center space-x-2">
-                <div className="relative m-0 w-8 flex items-center">
+                <div className="relative m-0 w-8 aspect-square flex items-center">
                   <Image
                     src={`${basePath}/images/product/auth/react-icon.svg`}
                     alt="react icon"
                     layout="fill"
-                    className="w-full"
+                    className="w-full m-0"
                   />
                 </div>
                 <small>React only. Other frameworks coming soon.</small>
@@ -143,7 +145,7 @@ function AuthWidgetSection() {
                     className={[
                       'bg-surface-100 border-brand h-10 w-10 rounded-full border-2 transition hover:scale-105',
                       brandColor.brand === 'hsl(var(--brand-default))'
-                        ? ' !bg-brand ring-foreground-muted border-foreground-lighter ring-2 drop-shadow-lg'
+                        ? '!bg-brand ring-border-strong !border-foreground ring-2 ring-offset-2 ring-offset-transparent drop-shadow-lg'
                         : '',
                     ].join(' ')}
                   ></button>
@@ -156,9 +158,9 @@ function AuthWidgetSection() {
                       })
                     }
                     className={[
-                      'h-10 w-10 rounded-full border-2 border-orange-900 bg-orange-300 transition hover:scale-105 ',
+                      'h-10 w-10 rounded-full border-2 border-orange-900 bg-orange-600 transition hover:scale-105',
                       brandColor.brand === 'var(--colors-orange9)'
-                        ? ' ring-foreground-muted border-foreground-lighter !bg-orange-900 ring-2 drop-shadow-lg'
+                        ? 'ring-border-strong !border-foreground !bg-orange-900 ring-2 ring-offset-2 ring-offset-transparent drop-shadow-lg'
                         : '',
                     ].join(' ')}
                   ></button>
@@ -171,9 +173,9 @@ function AuthWidgetSection() {
                       })
                     }
                     className={[
-                      'border-crimson-900 bg-crimson-300 h-10 w-10 rounded-full border-2 transition hover:scale-105 ',
+                      'border-crimson-900 bg-crimson-500 h-10 w-10 rounded-full border-2 transition hover:scale-105',
                       brandColor.brand === 'var(--colors-crimson9)'
-                        ? ' ring-foreground-muted border-foreground-lighter !bg-crimson-900 ring-2 drop-shadow-lg'
+                        ? 'ring-border-strong !border-foreground !bg-crimson-900 ring-2 ring-offset-2 ring-offset-transparent drop-shadow-lg'
                         : '',
                     ].join(' ')}
                   ></button>
@@ -186,9 +188,9 @@ function AuthWidgetSection() {
                       })
                     }
                     className={[
-                      'h-10 w-10 rounded-full border-2 border-indigo-900 bg-indigo-300 transition hover:scale-105 ',
+                      'h-10 w-10 rounded-full border-2 border-indigo-900 bg-indigo-600 transition hover:scale-105',
                       brandColor.brand === 'var(--colors-indigo9)'
-                        ? ' ring-foreground-muted border-foreground-lighter !bg-indigo-900 ring-2 drop-shadow-lg dark:ring-white'
+                        ? 'ring-border-strong !border-foreground !bg-indigo-900 ring-2 ring-offset-2 ring-offset-transparent drop-shadow-lg'
                         : '',
                     ].join(' ')}
                   ></button>
@@ -201,78 +203,63 @@ function AuthWidgetSection() {
                   <button
                     onClick={() => setRadius('4px')}
                     className={[
-                      'bg-surface-100 ring-foreground-muted border-border flex h-10 w-10 items-center justify-center rounded-full border hover:scale-105',
+                      'bg-surface-100 ring-border-strong border-default flex h-10 w-10 items-center justify-center rounded-full border hover:scale-105',
                       radius === '4px'
-                        ? 'ring-foreground-muted border-foreground-lighter border-2 ring-2'
+                        ? 'ring-border-strong !border-foreground border-2 ring-2 ring-offset-2 ring-offset-transparent'
                         : '',
                     ].join(' ')}
                   >
-                    <div className="relative m-0 w-4 items-center hidden text-red-900 dark:flex">
-                      <Image
-                        src="/images/auth-ui/small--light.svg"
+                    <div className="relative m-0 w-4 items-center justify-center text-red-900">
+                      <ThemeImage
+                        src={{
+                          light: '/images/auth-ui/small--dark.svg',
+                          dark: '/images/auth-ui/small--light.svg',
+                        }}
                         alt="react icon"
                         layout="fill"
-                        className="w-full"
-                      />
-                    </div>
-                    <div className="relative m-0 w-4 items-center flex text-red-900 dark:hidden">
-                      <Image
-                        src="/images/auth-ui/small--dark.svg"
-                        alt="react icon"
-                        layout="fill"
-                        className="w-full"
+                        className="w-full h-full object-contain"
                       />
                     </div>
                   </button>
                   <button
                     onClick={() => setRadius('10px')}
                     className={[
-                      'bg-surface-100 border-border flex h-10 w-10 items-center justify-center rounded-full  border transition hover:scale-105',
+                      'bg-surface-100 border-default flex h-10 w-10 items-center justify-center rounded-full  border transition hover:scale-105',
                       radius === '10px'
-                        ? 'ring-foreground-muted border-foreground-lighter border-2 ring-2'
+                        ? 'ring-border-strong !border-foreground border-2 ring-2 ring-offset-2 ring-offset-transparent'
                         : '',
                     ].join(' ')}
                   >
-                    <div className="relative m-0 w-4 items-center hidden text-red-900 dark:flex">
-                      <Image
-                        src="/images/auth-ui/medium--light.svg"
+                    <div className="relative m-0 w-4 items-center justify-center text-red-900">
+                      <ThemeImage
+                        src={{
+                          light: '/images/auth-ui/medium--dark.svg',
+                          dark: '/images/auth-ui/medium--light.svg',
+                        }}
                         alt="react icon"
                         layout="fill"
-                        className="w-full"
-                      />
-                    </div>
-                    <div className="relative m-0 w-4 items-center flex text-red-900 dark:hidden">
-                      <Image
-                        src="/images/auth-ui/medium--dark.svg"
-                        alt="react icon"
-                        layout="fill"
-                        className="w-full"
+                        className="w-full h-full object-contain"
                       />
                     </div>
                   </button>
                   <button
                     onClick={() => setRadius('32px')}
                     className={[
-                      'bg-surface-100 border-border flex h-10 w-10 items-center justify-center rounded-full  border transition hover:scale-105',
+                      'bg-surface-100 border-default flex h-10 w-10 items-center justify-center rounded-full  border transition hover:scale-105',
                       radius === '32px'
-                        ? 'ring-foreground-muted border-foreground-lighter border-2 ring-2'
+                        ? 'ring-border-strong !border-foreground border-2 ring-2 ring-offset-2 ring-offset-transparent'
                         : '',
                     ].join(' ')}
                   >
-                    <div className="relative m-0 w-4 items-center flex text-red-900 dark:hidden">
-                      <Image
-                        src="/images/auth-ui/large--light.svg"
+                    <div className="relative m-0 w-4 items-center justify-center flex text-red-900">
+                      <ThemeImage
+                        src={{
+                          light: '/images/auth-ui/large--light.svg',
+                          dark: '/images/auth-ui/large--dark.svg',
+                        }}
                         alt="react icon"
                         layout="fill"
-                        className="w-full"
-                      />
-                    </div>
-                    <div className="relative m-0 w-4 items-center hidden text-red-900 dark:flex">
-                      <Image
-                        src="/images/auth-ui/large--dark.svg"
-                        alt="react icon"
-                        layout="fill"
-                        className="w-full"
+                        className="w-full h-full object-contain"
                       />
                     </div>
                   </button>
@@ -285,9 +272,9 @@ function AuthWidgetSection() {
                   <button
                     onClick={() => setLayout('horizontal')}
                     className={[
-                      'bg-surface-100 border-control flex h-10 w-10 items-center justify-center rounded-full border transition hover:scale-105 ',
+                      'bg-surface-100 border-control flex h-10 w-10 items-center justify-center rounded-full border transition hover:scale-105',
                       layout === 'horizontal'
-                        ? 'ring-foreground-muted border-foreground-lighter border-2 ring-2'
+                        ? 'ring-border-strong !border-foreground border-2 ring-2 ring-offset-2 ring-offset-transparent'
                         : '',
                     ].join(' ')}
                   >
@@ -296,9 +283,9 @@ function AuthWidgetSection() {
                   <button
                     onClick={() => setLayout('vertical')}
                     className={[
-                      'bg-surface-100 border-control flex h-10 w-10 items-center justify-center rounded-full border transition hover:scale-105 ',
+                      'bg-surface-100 border-control flex h-10 w-10 items-center justify-center rounded-full border transition hover:scale-105',
                       layout === 'vertical'
-                        ? 'ring-foreground-muted border-foreground-lighter border-2 ring-2'
+                        ? 'ring-border-strong !border-foreground border-2 ring-2 ring-offset-2 ring-offset-transparent'
                         : '',
                     ].join(' ')}
                   >

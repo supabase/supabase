@@ -38,8 +38,9 @@ export const CodeBlock = ({
   hideCopy = false,
   hideLineNumbers = false,
 }: CodeBlockProps) => {
-  const { theme } = useTheme()
-  const monokaiTheme = monokaiCustomTheme(theme === 'dark')
+  const { resolvedTheme } = useTheme()
+  const isDarkTheme = resolvedTheme?.includes('dark')!
+  const monokaiTheme = monokaiCustomTheme(isDarkTheme)
 
   const [copied, setCopied] = useState(false)
 
@@ -78,13 +79,13 @@ export const CodeBlock = ({
 
   const large = false
   // don't show line numbers if bash == lang
-  if (lang !== 'bash') hideLineNumbers = true
+  if (lang === 'bash' || lang === 'sh') hideLineNumbers = true
   const showLineNumbers = !hideLineNumbers
 
   return (
     <>
       {title && (
-        <div className="rounded-t-md bg-scale-300 py-2 px-4 border-b border-scale-500 text-blue-1100 font-sans">
+        <div className="rounded-t-md bg-surface-100 py-2 px-4 border-b border-default text-blue-1100 font-sans">
           {title.replace(/%20/g, ' ')}
         </div>
       )}
@@ -97,7 +98,7 @@ export const CodeBlock = ({
             // @ts-ignore
             style={monokaiTheme}
             className={[
-              'code-block border p-4 w-full !my-0 !bg-scale-300',
+              'code-block border p-4 w-full !my-0 !bg-surface-100',
               `${!title ? '!rounded-md' : '!rounded-t-none !rounded-b-md'}`,
               `${!showLineNumbers ? 'pl-6' : ''}`,
               className,
@@ -110,7 +111,7 @@ export const CodeBlock = ({
             lineProps={(lineNumber) => {
               if (linesToHighlight.includes(lineNumber)) {
                 return {
-                  style: { display: 'block', backgroundColor: 'var(--colors-scale6)' },
+                  style: { display: 'block', backgroundColor: 'hsl(var(--background-selection))' },
                 }
               }
               return {}
@@ -136,7 +137,7 @@ export const CodeBlock = ({
             <div
               className={[
                 'absolute right-2',
-                `${theme === 'dark' ? 'dark' : ''}`,
+                `${isDarkTheme ? 'dark' : ''}`,
                 `${!title ? 'top-2' : 'top-[3.25rem]'}`,
               ].join(' ')}
             >

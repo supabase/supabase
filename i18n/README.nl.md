@@ -247,7 +247,7 @@ Onze aanpak voor client libraries is modulair. Elke sub-bibliotheek is een op zi
 - [Vereenvoudigd Chinees / 简体中文](/i18n/README.zh-cn.md)
 - [Zweeds / Svenska](/i18n/README.sv.md)
 - [Thai / ไทย](/i18n/README.th.md)
-- [Traditioneel Chinees / 繁体中文](/i18n/README.zh-tw.md)
+- [Traditioneel Chinees / 繁體中文](/i18n/README.zh-tw.md)
 - [Turks / Türkçe](/i18n/README.tr.md)
 - [Oekraïens / Українська](/i18n/README.uk.md)
 - [Vietnamees / Tiếng Việt](/i18n/README.vi-vn.md)

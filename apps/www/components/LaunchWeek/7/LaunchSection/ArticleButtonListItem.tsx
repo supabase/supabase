@@ -1,4 +1,3 @@
-import { NewspaperIcon } from '@heroicons/react/outline'
 import Link from 'next/link'
 import { Article } from '../../types'
 
@@ -9,7 +8,7 @@ const ArticleButtonListItem = (props: Article) => {
         <span className="text-foreground group-hover:text-brand text-left text-base transition">
           {props.title}
         </span>
-        <p className="text-light text-left text-sm transition">{props.description}</p>
+        <p className="text-foreground-light text-left text-sm transition">{props.description}</p>
       </div>
     </Link>
   )

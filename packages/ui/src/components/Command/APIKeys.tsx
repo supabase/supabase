@@ -39,10 +39,10 @@ const APIKeys = ({ isSubItem = false }) => {
       )}
       {apiKeys?.anon === undefined && apiKeys?.service === undefined && (
         <CommandItem type="link" className="items-start">
-          <IconAlertCircle strokeWidth={1.5} className="text-scale-1100" />
+          <IconAlertCircle strokeWidth={1.5} className="text-foreground-light" />
           <div>
             <p>No API keys available</p>
-            <p className="text-scale-1000">
+            <p className="text-foreground-lighter">
               You may not have the necessary permissions to view the project's API keys
             </p>
           </div>

@@ -9,14 +9,14 @@ export function ScheduleInfo() {
         <p className="md:max-w-lg">
           Each day of the week we will announce a new item, every day, from Monday to Friday.
         </p>
-        <p className="text-light text-base md:max-w-lg">
+        <p className="text-foreground-light text-base md:max-w-lg">
           The first launch will be on Monday 08:00 PT | 11:00 ET.
         </p>
       </div>
-      <div className="dark:bg-scale-300 flex flex-col gap-4 overflow-hidden rounded-md border bg-white shadow-sm md:max-w-lg">
+      <div className="flex flex-col gap-4 overflow-hidden rounded-md border bg-white shadow-sm md:max-w-lg">
         <div className="flex flex-col gap-3 p-10 pb-0">
           <h3 className="text-foreground text-lg">You can still win a lucky gold ticket</h3>
-          <p className="text-light text-sm">
+          <p className="text-foreground-light text-sm">
             A few of the lucky attendees for Launch Week will get a limited edition Supabase goodie
             bag.
           </p>

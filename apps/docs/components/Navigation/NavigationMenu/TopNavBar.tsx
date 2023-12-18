@@ -4,12 +4,15 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FC, useState } from 'react'
 import { Button, IconCommand, IconGitHub, IconSearch, SearchButton } from 'ui'
+import { useIsLoggedIn, useIsUserLoading } from 'common'
 
 import { getPageType } from '~/lib/helpers'
 import { REFERENCES } from './NavigationMenu.constants'
 import ThemeToggle from '@ui/components/ThemeProvider/ThemeToggle'
 
 const TopNavBar: FC = () => {
+  const isLoggedIn = useIsLoggedIn()
+  const isUserLoading = useIsUserLoading()
   const { resolvedTheme } = useTheme()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
@@ -59,13 +62,15 @@ const TopNavBar: FC = () => {
             <Image
               className="cursor-pointer"
               src={
-                resolvedTheme === 'dark' ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'
+                resolvedTheme?.includes('dark')
+                  ? '/docs/supabase-dark.svg'
+                  : '/docs/supabase-light.svg'
               }
               width={96}
               height={24}
               alt="Supabase Logo"
             />
-            <span className="font-mono text-sm font-medium text-brand">DOCS</span>
+            <span className="font-mono text-sm font-medium text-brand-link">DOCS</span>
           </Link>
         </div>
 
@@ -83,8 +88,8 @@ const TopNavBar: FC = () => {
               hover:bg-opacity-100
               border
               transition
-              border-scale-500 pl-1.5 md:pl-3 pr-1.5 w-full h-[32px] rounded
-              text-lighter
+              pl-1.5 md:pl-3 pr-1.5 w-full h-[32px] rounded
+              text-foreground-lighter
               "
             >
               <div className="flex items-center space-x-2">
@@ -106,18 +111,23 @@ const TopNavBar: FC = () => {
               Supabase.com
             </a>
           </Button>
-          <Button type="text" asChild>
-            <a href="https://supabase.com/dashboard" target="_blank" rel="noreferrer noopener">
-              Dashboard
-            </a>
-          </Button>
+          {!isUserLoading && (
+            <Button asChild>
+              <a href="https://supabase.com/dashboard" target="_blank" rel="noreferrer noopener">
+                {isLoggedIn ? 'Dashboard' : 'Sign up'}
+              </a>
+            </Button>
+          )}
           <Link
             href="https://github.com/supabase/supabase"
             target="_blank"
             rel="noreferrer noopener"
             className="px-2.5 py-1"
           >
-            <IconGitHub size={16} className="text-scale-1100 hover:text-scale-1200 transition" />
+            <IconGitHub
+              size={16}
+              className="text-foreground-light hover:text-foreground transition"
+            />
           </Link>
           <ThemeToggle />
         </div>

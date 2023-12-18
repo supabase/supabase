@@ -1,10 +1,11 @@
 import Link from 'next/link'
 import React, { ReactNode, useRef } from 'react'
 import { Button, IconArrowUpRight } from 'ui'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import InteractiveShimmerCard from '../InteractiveShimmerCard'
 import { LazyMotion, domAnimation, m, useInView } from 'framer-motion'
 import { INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
+
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import Panel from '~/components/Panel'
 
 interface UseCase {
   img?: string
@@ -62,10 +63,7 @@ const UseCase = ({
 
   return (
     <m.div initial={initial} animate={isInView ? animate : initial} className="flex">
-      <InteractiveShimmerCard
-        outerClassName="w-full"
-        innerClassName="p-4 md:p-8 h-full !bg-scale-200"
-      >
+      <Panel outerClassName="w-full" innerClassName="p-4 md:p-8 h-full !bg-background">
         <div className="h-full flex flex-col gap-4 items-start justify-between">
           <div className="prose">
             <div className="flex items-center gap-2">
@@ -76,11 +74,11 @@ const UseCase = ({
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                <path d={useCase.icon} fillRule="evenodd" fill="var(--colors-scale11)" />
+                <path d={useCase.icon} fillRule="evenodd" fill="hsl(var(--foreground-light))" />
               </svg>
               <h4 className="text-base sm:text-lg m-0">{useCase.title}</h4>
             </div>
-            <p className="text-sm text-muted mt-2">{useCase.description}</p>
+            <p className="text-sm text-foreground-lighter mt-2">{useCase.description}</p>
           </div>
           {useCase.cta &&
             (useCase.cta.isDisabled ? (
@@ -95,7 +93,7 @@ const UseCase = ({
               </Button>
             ))}
         </div>
-      </InteractiveShimmerCard>
+      </Panel>
     </m.div>
   )
 }
