@@ -5,10 +5,7 @@ import { useEffect, useState } from 'react'
 import { IconLoader } from 'ui'
 
 import { PolicyEditorModal } from 'components/interfaces/Auth/Policies'
-import { SYSTEM_ROLES } from 'components/interfaces/Database/Roles/Roles.constants'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
-import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useStore } from 'hooks'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
@@ -20,19 +17,12 @@ import StoragePoliciesPlaceholder from './StoragePoliciesPlaceholder'
 const StoragePolicies = () => {
   const { ui, meta } = useStore()
   const { ref: projectRef } = useParams()
-  const { project } = useProjectContext()
 
   const storageStore = useStorageStore()
   const { loaded } = storageStore
 
   const { data } = useBucketsQuery({ projectRef })
   const buckets = data ?? []
-
-  const { data: rolesData } = useDatabaseRolesQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-  const roles = (rolesData ?? []).filter((role) => SYSTEM_ROLES.includes(role.name))
 
   const [policies, setPolicies] = useState<any[]>([])
   const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState({})
@@ -222,7 +212,6 @@ const StoragePolicies = () => {
       <StoragePoliciesEditPolicyModal
         visible={showStoragePolicyEditor}
         bucketName={isEditingPolicyForBucket.bucket}
-        roles={roles}
         onSelectCancel={onCancelPolicyEdit}
         onCreatePolicies={onCreatePolicies}
         onSaveSuccess={onSavePolicySuccess}
@@ -232,7 +221,6 @@ const StoragePolicies = () => {
       <PolicyEditorModal
         visible={showGeneralPolicyEditor}
         schema="storage"
-        roles={roles}
         table={isEditingPolicyForBucket.table}
         selectedPolicyToEdit={selectedPolicyToEdit}
         onSelectCancel={onCancelPolicyEdit}

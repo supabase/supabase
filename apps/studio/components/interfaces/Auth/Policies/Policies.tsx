@@ -10,13 +10,10 @@ import { IconHelpCircle } from 'ui'
 
 import { useQueryClient } from '@tanstack/react-query'
 import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { SYSTEM_ROLES } from 'components/interfaces/Database/Roles/Roles.constants'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import InformationBox from 'components/ui/InformationBox'
-import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { tableKeys } from 'data/tables/keys'
 
 interface PoliciesProps {
@@ -34,17 +31,10 @@ const Policies = ({
 }: PoliciesProps) => {
   const router = useRouter()
   const { ref } = useParams()
-  const { project } = useProjectContext()
 
   const { ui, meta } = useStore()
   const queryClient = useQueryClient()
   const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
-
-  const { data } = useDatabaseRolesQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-  const roles = (data ?? []).filter((role) => SYSTEM_ROLES.includes(role.name))
 
   const [selectedSchemaAndTable, setSelectedSchemaAndTable] = useState<any>({})
   const [selectedTableToToggleRLS, setSelectedTableToToggleRLS] = useState<any>({})
@@ -201,7 +191,6 @@ const Policies = ({
 
       <PolicyEditorModal
         visible={!isEmpty(selectedSchemaAndTable)}
-        roles={roles}
         schema={selectedSchemaAndTable.schema}
         table={selectedSchemaAndTable.table}
         selectedPolicyToEdit={selectedPolicyToEdit}
