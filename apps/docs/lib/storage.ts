@@ -8,7 +8,11 @@ function getStorage(storageType: StorageType) {
   return storageType === 'local' ? window.localStorage : window.sessionStorage
 }
 
-export function store(storageType: StorageType, key: string, value: string) {
+export function store(
+  storageType: StorageType,
+  key: keyof typeof LOCAL_STORAGE_KEYS,
+  value: string
+) {
   if (typeof window === 'undefined') return
   const storage = getStorage(storageType)
 
@@ -19,13 +23,13 @@ export function store(storageType: StorageType, key: string, value: string) {
   }
 }
 
-export function retrieve(storageType: StorageType, key: string) {
+export function retrieve(storageType: StorageType, key: keyof typeof LOCAL_STORAGE_KEYS) {
   if (typeof window === 'undefined') return
   const storage = getStorage(storageType)
   return storage.getItem(key)
 }
 
-export function remove(storageType: StorageType, key: string) {
+export function remove(storageType: StorageType, key: keyof typeof LOCAL_STORAGE_KEYS) {
   if (typeof window === 'undefined') return
   const storage = getStorage(storageType)
   return storage.removeItem(key)
