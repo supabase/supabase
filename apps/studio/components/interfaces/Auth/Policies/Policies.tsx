@@ -1,4 +1,5 @@
-import type { PostgresPolicy, PostgresRole, PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
+import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common/hooks'
 import { PolicyEditorModal, PolicyTableRow } from 'components/interfaces/Auth/Policies'
 import { useStore } from 'hooks'
@@ -6,10 +7,11 @@ import { isEmpty } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useCallback, useState } from 'react'
+import toast from 'react-hot-toast'
 import { IconHelpCircle } from 'ui'
 
-import { useQueryClient } from '@tanstack/react-query'
 import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
@@ -18,8 +20,6 @@ import { useDatabasePolicyCreateMutation } from 'data/database-policies/database
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
 import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
 import { tableKeys } from 'data/tables/keys'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import toast from 'react-hot-toast'
 
 interface PoliciesProps {
   tables: PostgresTable[]
@@ -41,7 +41,6 @@ const Policies = ({
   const { ui, meta } = useStore()
   const queryClient = useQueryClient()
   const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
-  const roles = meta.roles.list((role: PostgresRole) => !meta.roles.systemRoles.includes(role.name))
 
   const [selectedSchemaAndTable, setSelectedSchemaAndTable] = useState<any>({})
   const [selectedTableToToggleRLS, setSelectedTableToToggleRLS] = useState<any>({})
@@ -219,7 +218,6 @@ const Policies = ({
 
       <PolicyEditorModal
         visible={!isEmpty(selectedSchemaAndTable)}
-        roles={roles}
         schema={selectedSchemaAndTable.schema}
         table={selectedSchemaAndTable.table}
         selectedPolicyToEdit={selectedPolicyToEdit}
