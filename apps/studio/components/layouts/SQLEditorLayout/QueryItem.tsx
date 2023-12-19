@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
-import { useParams } from 'common'
+import { useParams, useUser } from 'common'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -97,6 +97,15 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
 
   const snap = useSqlEditorStateSnapshot()
   const project = useSelectedProject()
+
+  const user = useUser()
+  const { id: snippetID } = tabInfo || {}
+  const snippet =
+    snippetID !== undefined && snap.snippets && snap.snippets[snippetID] !== undefined
+      ? snap.snippets[snippetID]
+      : null
+
+  const isSnippetOwner = user?.user_metadata?.user_name === snippet?.snippet?.owner?.username
 
   const { mutate: deleteContent, isLoading: isDeleting } = useContentDeleteMutation({
     onSuccess(data) {
@@ -218,10 +227,13 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
             </span>
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom" align="end">
-            <DropdownMenuItem onClick={onClickRename} className="space-x-2">
-              <IconEdit2 size="tiny" />
-              <p>Rename query</p>
-            </DropdownMenuItem>
+            {isSnippetOwner && (
+              <DropdownMenuItem onClick={onClickRename} className="space-x-2">
+                <IconEdit2 size="tiny" />
+                <p>Rename query</p>
+              </DropdownMenuItem>
+            )}
+
             {visibility === 'user' && canCreateSQLSnippet && (
               <DropdownMenuItem onClick={onClickShare} className="space-x-2">
                 <IconShare size="tiny" />
@@ -244,13 +256,15 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
                 <p>Download as migration file</p>
               </DropdownMenuItem>
             )}
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={onClickDelete} className="space-x-2">
-                <IconTrash size="tiny" />
-                <p>Delete query</p>
-              </DropdownMenuItem>
-            </>
+            {isSnippetOwner && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={onClickDelete} className="space-x-2">
+                  <IconTrash size="tiny" />
+                  <p>Delete query</p>
+                </DropdownMenuItem>
+              </>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       ) : (
