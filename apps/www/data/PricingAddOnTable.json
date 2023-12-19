@@ -28,7 +28,7 @@
           },
           {
             "key": "poolerConnections",
-            "title": "Connections: Pooler",
+            "title": "Connections: Supavisor",
             "value": "200"
           }
         ]
@@ -53,8 +53,8 @@
           },
           {
             "key": "poolerConnections",
-            "title": "Connections: Pooler (recommended)",
-            "value": "200"
+            "title": "Connections: Supavisor (recommended)",
+            "value": "1000"
           }
         ]
       },
@@ -78,8 +78,8 @@
           },
           {
             "key": "poolerConnections",
-            "title": "Connections: Pooler (recommended)",
-            "value": "200"
+            "title": "Connections: Supavisor (recommended)",
+            "value": "1000"
           }
         ]
       },
@@ -103,8 +103,8 @@
           },
           {
             "key": "poolerConnections",
-            "title": "Connections: Pooler (recommended)",
-            "value": "300"
+            "title": "Connections: Supavisor (recommended)",
+            "value": "1000"
           }
         ]
       },
@@ -128,8 +128,8 @@
           },
           {
             "key": "poolerConnections",
-            "title": "Connections: Pooler (recommended)",
-            "value": "700"
+            "title": "Connections: Supavisor (recommended)",
+            "value": "1000"
           }
         ]
       },
@@ -153,7 +153,7 @@
           },
           {
             "key": "poolerConnections",
-            "title": "Connections: Pooler (recommended)",
+            "title": "Connections: Supavisor (recommended)",
             "value": "1500"
           }
         ]
@@ -178,7 +178,7 @@
           },
           {
             "key": "poolerConnections",
-            "title": "Connections: Pooler (recommended)",
+            "title": "Connections: Supavisor (recommended)",
             "value": "3000"
           }
         ]
@@ -203,7 +203,7 @@
           },
           {
             "key": "poolerConnections",
-            "title": "Connections: Pooler (recommended)",
+            "title": "Connections: Supavisor (recommended)",
             "value": "6000"
           }
         ]
@@ -232,7 +232,7 @@
           },
           {
             "key": "poolerConnections",
-            "title": "Connections: Pooler (recommended)",
+            "title": "Connections: Supavisor (recommended)",
             "value": "9000"
           }
         ]
@@ -261,7 +261,7 @@
           },
           {
             "key": "poolerConnections",
-            "title": "Connections: Pooler (recommended)",
+            "title": "Connections: Supavisor (recommended)",
             "value": "12,000"
           }
         ]
