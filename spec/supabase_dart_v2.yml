@@ -918,16 +918,15 @@ functions:
         name: Querying with count option
         description: |
           You can get the number of rows by using the count option.
-          Allowed values for count option are [exact](https://postgrest.org/en/stable/api.html#exact-count), [planned](https://postgrest.org/en/stable/api.html#planned-count) and [estimated](https://postgrest.org/en/stable/api.html#estimated-count).
+          Allowed values for count option are [CountOption.exact](https://postgrest.org/en/stable/api.html#exact-count), [CountOptionplanned](https://postgrest.org/en/stable/api.html#planned-count) and [CountOption.estimated](https://postgrest.org/en/stable/api.html#estimated-count).
         code: |
           ```dart
-          final res = await supabase.from('cities').select(
-                'name',
-                const FetchOptions(
-                  count: CountOption.exact,
-                ),
-              );
+          final res = await supabase
+              .from('cities')
+              .select('name')
+              .count(CountOption.exact);
 
+          final data = res.data;
           final count = res.count;
           ```
       - id: querying-json-data
@@ -1075,13 +1074,14 @@ functions:
       - id: return-the-exact-number-of-rows
         name: Return the exact number of rows
         description: |
-          Allowed values for count option are `exact`, `planned` and `estimated`.
+          Allowed values for count option are `CountOption.exact`, `CountOption.planned` and `CountOption.estimated`.
         code: |
           ```dart
-          final res = await supabase.from('users').upsert(
-            {'id': 3, 'message': 'foo', 'username': 'supabot'},
-            options: const FetchOptions(count: CountOption.exact),
-          );
+          final res = await supabase.from('users').upsert({
+            'id': 3,
+            'message': 'foo',
+            'username': 'supabot'
+          }).count(CountOption.exact);
 
           final data = res.data;
           final count = res.count;

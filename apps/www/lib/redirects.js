@@ -2358,4 +2358,19 @@ module.exports = [
     source: '/docs/reference/dart/sign-in-with-apple',
     destination: '/docs/reference/dart/sign-in-with-id-token',
   },
+  {
+    permanent: true,
+    source: '/guides/database/large-datasets',
+    destination: '/guides/database/import-data',
+  },
+  {
+    permanent: true,
+    source: '/guides/api/rest/debugging-performance',
+    destination: '/guides/database/debugging-performance',
+  },
+  {
+    permanent: true,
+    source: '/guides/api/rest/joins-and-nesting',
+    destination: '/guides/database/joins-and-nesting',
+  },
 ]

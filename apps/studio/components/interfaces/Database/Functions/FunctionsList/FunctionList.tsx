@@ -1,6 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { includes, noop } from 'lodash'
+import { includes, noop, sortBy } from 'lodash'
 import { useRouter } from 'next/router'
 import {
   Button,
@@ -45,9 +45,11 @@ const FunctionList = ({
   const filteredFunctions = (functions ?? []).filter((x) =>
     includes(x.name.toLowerCase(), filterString.toLowerCase())
   )
-  const _functions = filteredFunctions.filter((x) => x.schema == schema)
+  const _functions = sortBy(
+    filteredFunctions.filter((x) => x.schema == schema),
+    (func) => func.name.toLocaleLowerCase()
+  )
   const projectRef = selectedProject?.ref
-
   const canUpdateFunctions = useCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'functions'
