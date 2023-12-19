@@ -36,7 +36,7 @@ Then let's install the only additional dependency: [`supabase_flutter`](https://
 Copy and paste the following line in your pubspec.yaml to install the package:
 
 ```yaml
-supabase_flutter: ^1.10.3
+supabase_flutter: ^2.0.0
 ```
 
 Run `flutter pub get` to install the dependencies.
@@ -136,15 +136,12 @@ Future<void> main() async {
   await Supabase.initialize(
     url: 'YOUR_SUPABASE_URL',
     anonKey: 'YOUR_SUPABASE_ANON_KEY',
-    authFlowType: AuthFlowType.pkce,
   );
   runApp(MyApp());
 }
 
 final supabase = Supabase.instance.client;
 ```
-
-`AuthFlowType.pkce` on `authFlowType` parameter indicates that we are using a secure [PKCE flow](https://supabase.com/blog/supabase-auth-sso-pkce#introducing-pkce) to perform our magic link login.
 
 ### Set up Splash Screen
 
@@ -331,11 +328,8 @@ class _AccountPageState extends State<AccountPage> {
 
     try {
       final userId = supabase.auth.currentUser!.id;
-      final data = await supabase
-          .from('profiles')
-          .select<Map<String, dynamic>>()
-          .eq('id', userId)
-          .single();
+      final data =
+          await supabase.from('profiles').select().eq('id', userId).single();
       _usernameController.text = (data['username'] ?? '') as String;
       _websiteController.text = (data['website'] ?? '') as String;
     } on PostgrestException catch (error) {
@@ -547,7 +541,7 @@ We will use [`image_picker`](https://pub.dev/packages/image_picker) plugin to se
 Add the following line in your pubspec.yaml file to install `image_picker`:
 
 ```yaml
-image_picker: ^0.8.4
+image_picker: ^1.0.5
 ```
 
 Using [`image_picker`](https://pub.dev/packages/image_picker) requires some additional preparation depending on the platform.
@@ -693,10 +687,10 @@ class _AccountPageState extends State<AccountPage> {
     });
 
     try {
-      final userId = supabase.auth.currentUser!.id;
+      final userId = supabase.auth.currentSession!.user.id;
       final data = await supabase
           .from('profiles')
-          .select<Map<String, dynamic>>()
+          .select()
           .eq('id', userId)
           .single();
       _usernameController.text = (data['username'] ?? '') as String;
