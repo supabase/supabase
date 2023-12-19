@@ -1,5 +1,6 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 import {CodeBlock, Admonition, Accordion} from 'ui'
+import Image from 'next/image'
 
 export const meta = {
   id: 'auth-postgres-hooks',
@@ -37,11 +38,13 @@ Below is a flow chart illustrating how Supabase Auth uses an Auth Hook:
 
 <Image
   alt="Auth Hooks Flowchart"
+  width={'1000'}
+  height={'400'}
   src="/docs/img/guides/auth-postgres-hooks/hooks-flowchart.png"/>
 
 
-## Creating and managing Hooks
-### Writing a Hook
+## Create a Hook
+### Write a Hook
 
 In the dashboard, go to `SQL Editor > Templates` and select `Add Auth Hook (General)`. The function for your hook should look like this:
 
@@ -59,7 +62,7 @@ $$ language plpgsql;
 
 Note that the JSONB operator `?` can't be used when writing a hook, because it is a reserved character in the ORM used by Supabase Auth.
 
-### Handling Hook errors
+### Handle Hook errors
 
 Unless otherwise specified, your hook should return errors with the following fields:
 
@@ -81,7 +84,7 @@ Example output:
 }
 ```
 
-### Assigning Hook permissions
+### Assign Hook permissions
 
 You need to assign additional permissions to the hook and the tables that it interacts with.
 
@@ -116,7 +119,7 @@ Ensure that your hooks complete within **2 seconds** to avoid any errors.
 
 
 
-### Connecting the Hook
+### Connect a Hook
 
 In the dashboard, navigate to [`Authentication > Hooks (Beta)`](/dashboard/project/_/auth/hooks) and select the appropriate PostgreSQL function from the dropdown menu.
 
@@ -795,7 +798,51 @@ as $$
 $$;
 ```
 </TabPanel>
+<TabPanel id="restrict-access-to-select-users" label="Restrict Access To Select Users">
+Your company has an internal application which should only be accessible to employees. All employees will have to log in via Single Sign On (SSO). We exempt some employees from the policy via an allowlist.
 
+```sql
+create or replace function public.restrict_application_access(event jsonb)
+ returns jsonb
+ language plpgsql
+as $function$
+declare
+    authentication_method text;
+    email_claim text;
+    allowed_emails text[] := array['myemail@company.com', 'example@company.com'];
+begin
+    -- Extract email claim and authentication method
+    email_claim = event->'claims'->>'email';
+    authentication_method = event->'authentication_method';
+    -- Authentication methods come double quoted (e.g. "otp")
+    authentication_method = replace(authentication_method, '"', '');
+
+    if email_claim ilike '%@supabase.io' or authentication_method = 'sso/saml' or email_claim = any(allowed_emails) then
+        return event;
+    end if;
+
+    -- If none of the conditions are met, return an error
+    return jsonb_build_object(
+        'error', jsonb_build_object(
+            'http_code', 403,
+            'message', 'Staging access is only allowed to team members. Please use your @company.com account instead'
+        )
+    );
+end;
+$function$
+;
+-- manually added
+grant execute
+  on function public.restrict_application_access
+  to supabase_auth_admin;
+
+revoke execute
+  on function public.restrict_application_access
+  from authenticated, anon;
+
+```
+
+</TabPanel>
 </Tabs>
 
 
