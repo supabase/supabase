@@ -16,9 +16,9 @@ export function getServerSideProps() {
 export default function DevOnlySecretAuth() {
   const router = useRouter()
 
-  function signIn({ provider }: { provider: 'github' | 'google' }) {
+  function signIn() {
     auth.signInWithOAuth({
-      provider,
+      provider: 'github',
       options: {
         redirectTo:
           process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
@@ -48,13 +48,7 @@ export default function DevOnlySecretAuth() {
           same domain.
         </p>
         <div className="flex flex-col gap-2 max-w-sm">
-          <Button_Shadcn_ onClick={() => signIn({ provider: 'github' })}>
-            {' '}
-            Sign in with GitHub
-          </Button_Shadcn_>
-          <Button_Shadcn_ onClick={() => signIn({ provider: 'google' })}>
-            Sign in with Google
-          </Button_Shadcn_>
+          <Button_Shadcn_ onClick={() => signIn()}> Sign in with GitHub</Button_Shadcn_>
           <Button_Shadcn_ onClick={signOut}>Sign out</Button_Shadcn_>
         </div>
       </section>
