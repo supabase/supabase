@@ -47,7 +47,7 @@ const FunctionList = ({
   )
   const _functions = sortBy(
     filteredFunctions.filter((x) => x.schema == schema),
-    'name'
+    (func) => func.name.toLocaleLowerCase()
   )
   const projectRef = selectedProject?.ref
   const canUpdateFunctions = useCheckPermissions(

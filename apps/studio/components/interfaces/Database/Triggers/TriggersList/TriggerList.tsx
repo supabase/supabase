@@ -41,13 +41,13 @@ const TriggerList = ({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const filteredTriggers = (triggers ?? []).filter((x: any) =>
+  const filteredTriggers = (triggers ?? []).filter((x) =>
     includes(x.name.toLowerCase(), filterString.toLowerCase())
   )
 
   const _triggers = sortBy(
-    filteredTriggers.filter((x: any) => x.schema == schema),
-    'name'
+    filteredTriggers.filter((x) => x.schema == schema),
+    (trigger) => trigger.name.toLocaleLowerCase()
   )
   const canUpdateTriggers = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
 
