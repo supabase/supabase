@@ -239,8 +239,11 @@ export default function IndexPage() {
                                     plan.name !== 'Enterprise' ? 'text-5xl' : 'text-4xl'
                                   }`}
                                 >
-                                  {plan.name !== 'Enterprise' ? '$' : ''}
-                                  {plan.priceMonthly}
+                                  {plan.name !== 'Enterprise' ? (
+                                    '$' + plan.priceMonthly
+                                  ) : (
+                                    <a href={plan.href}>{plan.priceMonthly}</a>
+                                  )}
                                 </p>
                                 <p className="text-foreground-lighter mb-1.5 ml-1 text-[13px] leading-4">
                                   {plan.costUnit}
