@@ -1,9 +1,11 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
+import toast from 'react-hot-toast'
 import { Button, Form, IconHelpCircle, Input, SidePanel, Toggle } from 'ui'
 
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
-import { useStore } from 'hooks'
+import { useDatabaseRoleCreateMutation } from 'data/database-roles/database-role-create-mutation'
 import { ROLE_PERMISSIONS } from './Roles.constants'
 
 interface CreateRolePanelProps {
@@ -14,8 +16,7 @@ interface CreateRolePanelProps {
 const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
   const formId = 'create-new-role'
   const submitRef: any = useRef()
-  const { ui, meta } = useStore()
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { project } = useProjectContext()
 
   const initialValues = {
     name: '',
@@ -33,23 +34,20 @@ const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
     return errors
   }
 
-  const onSubmit = async (values: any) => {
-    setIsSubmitting(true)
-    const res = await meta.roles.create(values)
-    setIsSubmitting(false)
-
-    if (res.error) {
-      return ui.setNotification({
-        category: 'error',
-        message: `Failed to create role: ${res.error.message}`,
-      })
-    } else {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully created new role: ${res.name}`,
-      })
+  const { mutate: createDatabaseRole, isLoading: isCreating } = useDatabaseRoleCreateMutation({
+    onSuccess: (res) => {
+      toast.success(`Successfully created new role: ${res.name}`)
       onClose()
-    }
+    },
+  })
+
+  const onSubmit = async (values: any) => {
+    if (!project) return console.error('Project is required')
+    createDatabaseRole({
+      projectRef: project.ref,
+      connectionString: project.connectionString,
+      payload: values,
+    })
   }
 
   return (
@@ -67,7 +65,7 @@ const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
             type="default"
             htmlType="button"
             onClick={onClose}
-            disabled={isSubmitting}
+            disabled={isCreating}
           >
             Cancel
           </Button>
@@ -75,8 +73,8 @@ const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
             size="tiny"
             type="primary"
             htmlType="button"
-            disabled={isSubmitting}
-            loading={isSubmitting}
+            disabled={isCreating}
+            loading={isCreating}
             onClick={() => submitRef?.current?.click()}
           >
             Create role
@@ -91,73 +89,67 @@ const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
         validate={validate}
         onSubmit={onSubmit}
       >
-        {({ isSubmitting, handleReset, values, initialValues }: any) => {
-          return (
-            <div>
-              <FormSection
-                header={
-                  <FormSectionLabel className="lg:!col-span-4">Role Configuration</FormSectionLabel>
-                }
-              >
-                <FormSectionContent loading={false} className="lg:!col-span-8">
-                  <Input id="name" label="Name" />
-                </FormSectionContent>
-              </FormSection>
-              <SidePanel.Separator />
-              <FormSection
-                header={
-                  <FormSectionLabel className="lg:!col-span-4">Role Privileges</FormSectionLabel>
-                }
-              >
-                <FormSectionContent loading={false} className="lg:!col-span-8">
-                  <div className="space-y-[9px]">
-                    {Object.keys(ROLE_PERMISSIONS).map((permission) => (
-                      <Toggle
-                        size="small"
-                        disabled={ROLE_PERMISSIONS[permission].disabled}
-                        className={[
-                          'roles-toggle',
-                          ROLE_PERMISSIONS[permission].disabled ? 'opacity-50' : '',
-                        ].join(' ')}
-                        key={permission}
-                        id={permission}
-                        name={permission}
-                        label={ROLE_PERMISSIONS[permission].description}
-                        afterLabel={
-                          ROLE_PERMISSIONS[permission].disabled && (
-                            <Tooltip.Root delayDuration={0}>
-                              <Tooltip.Trigger type="button">
-                                <IconHelpCircle
-                                  size="tiny"
-                                  strokeWidth={2}
-                                  className="ml-2 relative top-[3px]"
-                                />
-                              </Tooltip.Trigger>
-                              <Tooltip.Content align="center" side="bottom">
-                                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                <div
-                                  className={[
-                                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                    'border border-background space-y-1',
-                                  ].join(' ')}
-                                >
-                                  <span className="text-xs">
-                                    This privilege cannot be granted via the dashboard
-                                  </span>
-                                </div>
-                              </Tooltip.Content>
-                            </Tooltip.Root>
-                          )
-                        }
-                      />
-                    ))}
-                  </div>
-                </FormSectionContent>
-              </FormSection>
-              <button ref={submitRef} type="submit" className="hidden" />
-            </div>
-          )
-        }}
+        <div>
+          <FormSection
+            header={
+              <FormSectionLabel className="lg:!col-span-4">Role Configuration</FormSectionLabel>
+            }
+          >
+            <FormSectionContent loading={false} className="lg:!col-span-8">
+              <Input id="name" label="Name" />
+            </FormSectionContent>
+          </FormSection>
+          <SidePanel.Separator />
+          <FormSection
+            header={<FormSectionLabel className="lg:!col-span-4">Role Privileges</FormSectionLabel>}
+          >
+            <FormSectionContent loading={false} className="lg:!col-span-8">
+              <div className="space-y-[9px]">
+                {Object.keys(ROLE_PERMISSIONS).map((permission) => (
+                  <Toggle
+                    size="small"
+                    disabled={ROLE_PERMISSIONS[permission].disabled}
+                    className={[
+                      'roles-toggle',
+                      ROLE_PERMISSIONS[permission].disabled ? 'opacity-50' : '',
+                    ].join(' ')}
+                    key={permission}
+                    id={permission}
+                    name={permission}
+                    label={ROLE_PERMISSIONS[permission].description}
+                    afterLabel={
+                      ROLE_PERMISSIONS[permission].disabled && (
+                        <Tooltip.Root delayDuration={0}>
+                          <Tooltip.Trigger type="button">
+                            <IconHelpCircle
+                              size="tiny"
+                              strokeWidth={2}
+                              className="ml-2 relative top-[3px]"
+                            />
+                          </Tooltip.Trigger>
+                          <Tooltip.Content align="center" side="bottom">
+                            <Tooltip.Arrow className="radix-tooltip-arrow" />
+                            <div
+                              className={[
+                                'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                'border border-background space-y-1',
+                              ].join(' ')}
+                            >
+                              <span className="text-xs">
+                                This privilege cannot be granted via the dashboard
+                              </span>
+                            </div>
+                          </Tooltip.Content>
+                        </Tooltip.Root>
+                      )
+                    }
+                  />
+                ))}
+              </div>
+            </FormSectionContent>
+          </FormSection>
+          <button ref={submitRef} type="submit" className="hidden" />
+        </div>
       </Form>
     </SidePanel>
   )

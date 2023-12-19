@@ -38,6 +38,7 @@ import CommandMenuShortcuts from './CommandMenuShortcuts'
 import { BadgeExperimental } from './Command.Badges'
 import { AiIconAnimation } from '@ui/layout/ai-icon-animation'
 import ChildItem from './ChildItem'
+import { useParams } from 'common'
 
 export const CHAT_ROUTES = [
   COMMAND_ROUTES.AI, // this one is temporary
@@ -58,12 +59,9 @@ const iconPicker: { [key: string]: React.ReactNode } = {
   products: <IconColumns />,
 }
 
-interface CommandMenuProps {
-  projectRef?: string
-}
-
-const CommandMenu = ({ projectRef }: CommandMenuProps) => {
+const CommandMenu = () => {
   const router = useRouter()
+  const { ref: projectRef } = useParams()
 
   const {
     isOpen,
@@ -246,9 +244,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
               {site === 'studio' && (
                 <CommandGroup heading="Navigate">
                   {sharedItems.tools.map((item) => {
-                    const itemUrl = (
-                      projectRef ? item.url.replace('_', projectRef) : item.url
-                    ).split('https://supabase.com/dashboard')[1]
+                    const itemUrl = projectRef ? item.url.replace('_', projectRef) : item.url
 
                     return (
                       <CommandItem

@@ -13,7 +13,7 @@ export interface DatabaseLayoutProps {
 }
 
 const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) => {
-  const { ui, meta, vault } = useStore()
+  const { ui, vault } = useStore()
   const project = useSelectedProject()
 
   const router = useRouter()
@@ -26,12 +26,6 @@ const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) =>
   const vaultExtension = (data ?? []).find((ext) => ext.name === 'supabase_vault')
   const isVaultEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null
   const pgNetExtensionExists = (data ?? []).find((ext) => ext.name === 'pg_net') !== undefined
-
-  useEffect(() => {
-    if (ui.selectedProjectRef) {
-      meta.roles.load()
-    }
-  }, [ui.selectedProjectRef])
 
   useEffect(() => {
     if (isVaultEnabled) {
