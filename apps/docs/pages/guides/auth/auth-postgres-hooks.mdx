@@ -275,7 +275,14 @@ create table public.mfa_failed_verification_attempts (
   primary key (user_id, factor_id)
 );
 ```
+Store the API key of our email API provider in [Supabase Vault](/docs/guides/database/vault)
+```sql
+select vault.create_secret('my_secret', 'my_secret_name', 'my_secret_description');
+```
+
+
 Create a hook to send an email when there are two or more failed attempts in a one minute window.
+
 
 ```sql
 create or replace function public.hook_mfa_verification_attempt_with_email(event jsonb)
@@ -538,6 +545,13 @@ create table public.password_sign_in_attempts (
 );
 ```
 
+Store the API key of our email API provider in [Supabase Vault](/docs/guides/database/vault)
+```sql
+select vault.create_secret('my_secret', 'my_secret_name', 'my_secret_description');
+```
+
+Create a hook to send an email on first login with email and password:
+
 ```sql
 create or replace function public.hook_send_welcome_email(event jsonb)
 returns jsonb
@@ -565,7 +579,7 @@ as $$
       -- If it's the first successful login, send a welcome email
       if attempt_count = 0 then
         -- Fetch the server token and email address
-        select token into server_token from vault.decrypted_secrets where name = 'yoursecretname';
+        select token into server_token from vault.decrypted_secrets where name = 'your_postmark_key';
         select email into email_address from auth.users where id = user_id;
 
         -- Construct the welcome email body
