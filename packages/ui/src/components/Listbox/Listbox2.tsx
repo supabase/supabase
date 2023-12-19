@@ -181,10 +181,12 @@ function Listbox({
   }
 
   let selectClasses = [__styles.container, __styles.base, buttonClassName]
+  let addonBeforeClasses = [__styles.addOnBefore]
+
   if (error) selectClasses.push(__styles.variants.error)
   if (!error) selectClasses.push(__styles.variants.standard)
   // if (icon) selectClasses.push(SelectStyles['sbui-listbox--with-icon'])
-  if (icon) selectClasses.push(__styles.with_icon)
+  if (icon) addonBeforeClasses.push(__styles.with_icon)
   // if (size) selectClasses.push(SelectStyles[`sbui-listbox--${size}`])
   if (size) selectClasses.push(__styles.size[size])
   // if (borderless) selectClasses.push(SelectStyles['sbui-listbox--borderless'])
@@ -212,7 +214,7 @@ function Listbox({
             name={name}
             id={id}
           >
-            <span className={__styles.addOnBefore}>
+            <span className={cn(addonBeforeClasses)}>
               {icon && <InputIconContainer icon={icon} />}
               {selectedNode?.addOnBefore && <selectedNode.addOnBefore />}
               <span className={__styles.label}>{selectedNode?.label}</span>

@@ -1,19 +1,12 @@
-import {
-  useFlag,
-  useIsFeatureEnabled,
-  useSelectedOrganization,
-  useSelectedProject,
-  useStore,
-  withAuth,
-} from 'hooks'
+import { useIsFeatureEnabled, useSelectedOrganization, useSelectedProject, withAuth } from 'hooks'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect } from 'react'
+import { PropsWithChildren } from 'react'
 import { generateSettingsMenu } from './SettingsMenu.utils'
 
+import { useParams } from 'common'
 import ProductMenu from 'components/ui/ProductMenu'
 import ProjectLayout from '..'
-import { useParams } from 'common'
 
 interface SettingsLayoutProps {
   title?: string
@@ -22,7 +15,6 @@ interface SettingsLayoutProps {
 const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutProps>) => {
   const router = useRouter()
   const { ref } = useParams()
-  const { ui, meta } = useStore()
   const project = useSelectedProject()
   const organization = useSelectedOrganization()
 
@@ -50,12 +42,6 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
     storage: storageEnabled,
     invoices: invoicesEnabled,
   })
-
-  useEffect(() => {
-    if (ui.selectedProjectRef) {
-      meta.extensions.load()
-    }
-  }, [ui.selectedProjectRef])
 
   return (
     <ProjectLayout

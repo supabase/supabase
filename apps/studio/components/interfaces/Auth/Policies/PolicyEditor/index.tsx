@@ -1,4 +1,3 @@
-import type { PostgresRole } from '@supabase/postgres-meta'
 import { Modal } from 'ui'
 
 import PolicyAllowedOperation from './PolicyAllowedOperation'
@@ -12,7 +11,6 @@ export { PolicyName, PolicyRoles }
 
 interface PolicyEditorProps {
   isNewPolicy: boolean
-  roles: PostgresRole[]
   policyFormFields: any
   onUpdatePolicyFormFields: (value: any) => void
   onViewTemplates: () => void
@@ -21,7 +19,6 @@ interface PolicyEditorProps {
 
 const PolicyEditor = ({
   isNewPolicy = true,
-  roles = [],
   policyFormFields = {},
   onUpdatePolicyFormFields = () => {},
   onViewTemplates = () => {},
@@ -58,7 +55,6 @@ const PolicyEditor = ({
         )}
         <Modal.Content>
           <PolicyRoles
-            roles={roles}
             selectedRoles={selectedRoles}
             onUpdateSelectedRoles={(roles) => onUpdatePolicyFormFields({ roles })}
           />
