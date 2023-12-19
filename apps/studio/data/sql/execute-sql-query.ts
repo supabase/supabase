@@ -67,7 +67,6 @@ export async function executeSql(
       isRoleImpersonationEnabled &&
       typeof error === 'object' &&
       error !== null &&
-      'error' in error &&
       'formattedError' in error
     ) {
       let updatedError = error as { error: string; formattedError: string }

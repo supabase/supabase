@@ -84,7 +84,7 @@ const SupabaseGridLayout = (props: SupabaseGridProps) => {
     {
       keepPreviousData: true,
       retryDelay: (retryAttempt, error: any) => {
-        if (error && error.error.message?.includes('does not exist')) {
+        if (error && error.message?.includes('does not exist')) {
           setParams((prevParams) => {
             return {
               ...prevParams,
