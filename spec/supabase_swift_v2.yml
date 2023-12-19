@@ -379,6 +379,57 @@ functions:
             )
           )
           ```
+  - id: resend-email-or-phone-otps
+    title: "resend()"
+    notes: |
+      - Resends a signup confirmation, email change, or phone change email to the user.
+      - Passwordless sign-ins can be resent by calling the `signInWithOTP()` method again.
+      - Password recovery emails can be resent by calling the `resetPassswordForEmail()` method again.
+      - This method only resends an email or phone OTP to the user if there an initial signup, email change, or phone change request was made.
+      - You can specify a redirect URL when you resend an email link using the `emailRedirectTo` option.
+    examples:
+      - id: resend-email-signup-confirmation
+        name: Resend an email signup confirmation
+        description: Resends the email signup confirmation to the user
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase.auth.resend(
+            email: "email@example.com",
+            type: .signup,
+            emailRedirectTo: URL(string: "my-app-scheme://")
+          )
+          ```
+      - id: resend-phone-signup-confirmation
+        name: Resend a phone signup confirmation
+        description: Resends the phone signup confirmation email to the user
+        code: |
+          ```swift
+          try await supabase.auth.resend(
+            phone: "1234567890",
+            type: .sms
+          )
+          ```
+      - id: resend-email-change-email
+        name: Resend email change email
+        description: Resends the email change email to the user
+        code: |
+          ```swift
+          try await supabase.auth.resend(
+            email: "email@example.com",
+            type: .emailChange
+          )
+          ```
+      - id: resend-phone-change
+        name: Resend phone change OTP
+        description: Resends the phone change OTP to the user
+        code: |
+          ```swift
+          try await supabase.auth.resend(
+            phone: "1234567890",
+            type: .phoneChange
+          )
+          ```
   - id: set-session
     title: "setSession()"
     notes: |

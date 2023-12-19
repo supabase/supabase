@@ -17,7 +17,6 @@ import { ResponseError } from 'types'
 
 import { IPostgresMetaInterface } from '../common/PostgresMetaInterface'
 import { IRootStore } from '../RootStore'
-import OpenApiStore, { IOpenApiStore } from './OpenApiStore'
 import TableStore, { ITableStore } from './TableStore'
 
 import {
@@ -38,19 +37,15 @@ import { tableKeys } from 'data/tables/keys'
 import { getTable } from 'data/tables/table-query'
 import { getTables } from 'data/tables/tables-query'
 import PostgresMetaInterface from '../common/PostgresMetaInterface'
-import RolesStore, { IRolesStore } from './RolesStore'
 import ViewStore, { IViewStore } from './ViewStore'
 
 const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
 
 export interface IMetaStore {
-  openApi: IOpenApiStore
   tables: ITableStore
   columns: IPostgresMetaInterface<PostgresColumn>
   views: IViewStore
-
-  roles: IRolesStore
 
   projectRef?: string
 
@@ -120,12 +115,9 @@ export interface IMetaStore {
 }
 export default class MetaStore implements IMetaStore {
   rootStore: IRootStore
-  openApi: OpenApiStore
   tables: TableStore
   columns: PostgresMetaInterface<PostgresColumn>
   views: ViewStore
-
-  roles: RolesStore
 
   projectRef?: string
   connectionString?: string
@@ -144,10 +136,6 @@ export default class MetaStore implements IMetaStore {
       this.headers['x-connection-encrypted'] = connectionString
     }
 
-    this.openApi = new OpenApiStore(
-      this.rootStore,
-      `${API_URL}/projects/${this.projectRef}/api/rest`
-    )
     this.tables = new TableStore(this.rootStore, `${this.baseUrl}/tables`, this.headers)
     this.columns = new PostgresMetaInterface(
       this.rootStore,
@@ -156,7 +144,6 @@ export default class MetaStore implements IMetaStore {
     )
     this.views = new ViewStore(this.rootStore, `${this.baseUrl}/views`, this.headers)
 
-    this.roles = new RolesStore(this.rootStore, `${this.baseUrl}/roles`, this.headers)
     makeObservable(this, {})
   }
 
@@ -840,9 +827,6 @@ export default class MetaStore implements IMetaStore {
       this.headers['x-connection-encrypted'] = connectionString
     }
 
-    this.openApi.setUrl(`${API_URL}/projects/${this.projectRef}/api/rest`)
-    this.openApi.setHeaders(this.headers)
-
     this.tables.setUrl(`${this.baseUrl}/tables`)
     this.tables.setHeaders(this.headers)
 
@@ -851,8 +835,5 @@ export default class MetaStore implements IMetaStore {
 
     this.views.setUrl(`${this.baseUrl}/views`)
     this.views.setHeaders(this.headers)
-
-    this.roles.setUrl(`${this.baseUrl}/roles`)
-    this.roles.setHeaders(this.headers)
   }
 }
