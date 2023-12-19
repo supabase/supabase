@@ -179,12 +179,6 @@ export { ScrollArea, ScrollBar } from './src/components/shadcn/ui/scroll-area'
 
 export { Separator } from './src/components/shadcn/ui/separator'
 
-export {
-  HoverCard,
-  HoverCardTrigger,
-  HoverCardContent,
-} from './src/components/shadcn/ui/hover-card'
-
 // patterns
 
 export * from './src/patterns/SchemaTableNode'

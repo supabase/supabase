@@ -8,12 +8,12 @@ import { useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import {
   Button,
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
+  IconLock,
   IconPlusCircle,
-  IconUnlock,
   Modal,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
 } from 'ui'
 
 import { rlsAcknowledgedKey } from 'components/grid/constants'
@@ -23,8 +23,11 @@ import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
-import { useCheckPermissions, useFlag, useIsFeatureEnabled } from 'hooks'
+import { useCheckPermissions, useFlag, useIsFeatureEnabled, useStore } from 'hooks'
 import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
+import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
+import { useQueryClient } from '@tanstack/react-query'
+import { databasePoliciesKeys } from 'data/database-policies/keys'
 
 export interface GridHeaderActionsProps {
   table: PostgresTable
@@ -35,8 +38,12 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   const { project } = useProjectContext()
   const realtimeEnabled = useIsFeatureEnabled('realtime:all')
   const roleImpersonationEnabledFlag = useFlag('roleImpersonation')
+  const { ui, meta } = useStore()
+  const queryClient = useQueryClient()
 
   const [showEnableRealtime, setShowEnableRealtime] = useState(false)
+  const [open, setOpen] = useState(false)
+  const [rlsConfirmModalOpen, setRlsConfirmModalOpen] = useState(false)
 
   const projectRef = project?.ref
   const { data } = useDatabasePoliciesQuery({
@@ -113,6 +120,28 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
     })
   }
 
+  const closeConfirmModal = () => {
+    setRlsConfirmModalOpen(false)
+  }
+
+  const onToggleRLS = async () => {
+    const payload = {
+      id: table.id,
+      rls_enabled: !table.rls_enabled,
+    }
+
+    const res: any = await meta.tables.update(payload.id, payload)
+    if (res.error) {
+      return ui.setNotification({
+        category: 'error',
+        message: `Failed to toggle RLS: ${res.error.message}`,
+      })
+    }
+
+    await queryClient.invalidateQueries(databasePoliciesKeys.list(ref, table.schema))
+    closeConfirmModal()
+  }
+
   return (
     <>
       <div className="flex items-center space-x-3">
@@ -140,64 +169,70 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
             </Tooltip.Portal>
           </Tooltip.Root>
         )}
-        <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger className="w-full">
-            {(table.rls_enabled || showRLSWarning) && (
-              <Link passHref href={`/project/${projectRef}/auth/policies?search=${table.id}`}>
-                <Button
-                  type={table.rls_enabled ? 'default' : 'warning'}
-                  className="group"
-                  icon={table.rls_enabled ? null : <IconUnlock strokeWidth={2} size={14} />}
-                >
-                  {table.rls_enabled ? (
-                    <div className="flex items-center gap-1">
-                      {policies.length > 0 ? (
-                        <span>
-                          <span className="text-right text-xs rounded-full px-2 py-1 bg-surface-200 dark:bg-surface-100 text-brand-1100">
-                            {policies.length}
+        <div>
+          {(table.rls_enabled || showRLSWarning) && (
+            <>
+              {table.rls_enabled ? (
+                <div className="flex items-center gap-1">
+                  <Link passHref href={`/project/${projectRef}/auth/policies?search=${table.id}`}>
+                    <Button
+                      type={table.rls_enabled ? 'default' : 'warning'}
+                      className="group"
+                      icon={
+                        policies.length > 0 ? (
+                          <span>
+                            <span className="text-right text-xs rounded-xl px-2 py-0.5 bg-surface-200 dark:bg-surface-100 text-brand-1100">
+                              {policies.length}
+                            </span>
                           </span>
-                        </span>
-                      ) : (
-                        <IconPlusCircle size={12} />
-                      )}
-
-                      <span className="flex-1 text-left mr-1">
+                        ) : (
+                          <IconPlusCircle size={12} />
+                        )
+                      }
+                    >
+                      <span className="flex-1 text-left">
                         Auth {policies.length > 1 ? 'policies' : 'policy'}
                       </span>
+                    </Button>
+                  </Link>
+                </div>
+              ) : (
+                <Popover_Shadcn_ open={open} onOpenChange={() => setOpen(!open)} modal={false}>
+                  <PopoverTrigger_Shadcn_ asChild>
+                    <Button type="warning" icon={<IconLock size={14} />}>
+                      RLS Disabled
+                    </Button>
+                  </PopoverTrigger_Shadcn_>
+                  <PopoverContent_Shadcn_ className="w-48 min-w-[395px]">
+                    <div className="grid gap-2 text-sm px-2 py-4">
+                      <h3 className="flex items-center gap-2">
+                        <IconLock size={14} /> Row Level Security (RLS)
+                      </h3>
+                      <div className="grid gap-2 mt-1">
+                        <p>
+                          You can restrict and control who can read, write and update data in this
+                          table using Row Level Security.
+                        </p>
+                        <p>
+                          With RLS enabled, anonymous users will not be able to read/write data in
+                          the table.
+                        </p>
+                        <p className="mt-2">
+                          <Button
+                            type="default"
+                            onClick={() => setRlsConfirmModalOpen(!rlsConfirmModalOpen)}
+                          >
+                            Enable RLS for this table{' '}
+                          </Button>
+                        </p>
+                      </div>
                     </div>
-                  ) : (
-                    <HoverCard>
-                      <HoverCardTrigger>
-                        <span className="flex-1 text-left mr-1">RLS Disabled</span>
-                      </HoverCardTrigger>
-                      <HoverCardContent>
-                        <span className="flex-1 text-left mr-1">RLS Disabled</span>
-                      </HoverCardContent>
-                    </HoverCard>
-                  )}
-                  {!table.rls_enabled && (
-                    <Tooltip.Portal>
-                      <Tooltip.Content side="bottom">
-                        <Tooltip.Arrow className="radix-tooltip-arrow" />
-                        <div
-                          className={[
-                            'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                            'border border-scale-200',
-                          ].join(' ')}
-                        >
-                          <span className="text-xs text-foreground">
-                            You are allowing anonymous access to your data. Enable Row Level
-                            Security.
-                          </span>
-                        </div>
-                      </Tooltip.Content>
-                    </Tooltip.Portal>
-                  )}
-                </Button>
-              </Link>
-            )}
-          </Tooltip.Trigger>
-        </Tooltip.Root>
+                  </PopoverContent_Shadcn_>
+                </Popover_Shadcn_>
+              )}
+            </>
+          )}
+        </div>
 
         {roleImpersonationEnabledFlag && <RoleImpersonationPopover serviceRoleLabel="postgres" />}
 
@@ -248,6 +283,17 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
           )}
         </Modal.Content>
       </ConfirmationModal>
+
+      <ConfirmModal
+        danger={table.rls_enabled}
+        visible={rlsConfirmModalOpen}
+        title="Confirm to enable Row Level Security"
+        description="Are you sure you want to enable Row Level Security for this table?"
+        buttonLabel="Confirm"
+        buttonLoadingLabel="Saving"
+        onSelectCancel={closeConfirmModal}
+        onSelectConfirm={onToggleRLS}
+      />
     </>
   )
 }
