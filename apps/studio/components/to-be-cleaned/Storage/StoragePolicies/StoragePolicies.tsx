@@ -1,34 +1,30 @@
+import { useParams } from 'common'
 import { filter, find, get, isEmpty } from 'lodash'
-import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
+import toast from 'react-hot-toast'
 import { IconLoader } from 'ui'
 
+import { PolicyEditorModal } from 'components/interfaces/Auth/Policies'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
+import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
+import { useDatabasePolicyCreateMutation } from 'data/database-policies/database-policy-create-mutation'
+import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
+import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
+import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useStore } from 'hooks'
 import { formatPoliciesForStorage } from '../Storage.utils'
 import StoragePoliciesBucketRow from './StoragePoliciesBucketRow'
 import StoragePoliciesEditPolicyModal from './StoragePoliciesEditPolicyModal'
 import StoragePoliciesPlaceholder from './StoragePoliciesPlaceholder'
 
-import { useParams } from 'common'
-import { PolicyEditorModal } from 'components/interfaces/Auth/Policies'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
-import { useBucketsQuery } from 'data/storage/buckets-query'
-import { useDatabasePolicyCreateMutation } from 'data/database-policies/database-policy-create-mutation'
-import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
-import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
-import toast from 'react-hot-toast'
-
 const StoragePolicies = () => {
-  const { ui, meta } = useStore()
+  const { ui } = useStore()
   const { project } = useProjectContext()
   const { ref: projectRef } = useParams()
 
   const { data, isLoading: isLoadingBuckets } = useBucketsQuery({ projectRef })
   const buckets = data ?? []
-
-  const roles = meta.roles.list((role: any) => !meta.roles.systemRoles.includes(role.name))
 
   const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState({})
   const [selectedPolicyToDelete, setSelectedPolicyToDelete] = useState<any>({})
@@ -246,7 +242,6 @@ const StoragePolicies = () => {
       <StoragePoliciesEditPolicyModal
         visible={showStoragePolicyEditor}
         bucketName={isEditingPolicyForBucket.bucket}
-        roles={roles}
         onSelectCancel={onCancelPolicyEdit}
         onCreatePolicies={onCreatePolicies}
         onSaveSuccess={onSavePolicySuccess}
@@ -256,7 +251,6 @@ const StoragePolicies = () => {
       <PolicyEditorModal
         visible={showGeneralPolicyEditor}
         schema="storage"
-        roles={roles}
         table={isEditingPolicyForBucket.table}
         selectedPolicyToEdit={selectedPolicyToEdit}
         onSelectCancel={onCancelPolicyEdit}
@@ -279,4 +273,4 @@ const StoragePolicies = () => {
   )
 }
 
-export default observer(StoragePolicies)
+export default StoragePolicies
