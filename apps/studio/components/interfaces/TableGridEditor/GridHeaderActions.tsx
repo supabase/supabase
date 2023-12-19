@@ -6,7 +6,15 @@ import { MousePointer2 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
-import { Button, IconAlertCircle, IconLock, Modal } from 'ui'
+import {
+  Button,
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+  IconPlusCircle,
+  IconUnlock,
+  Modal,
+} from 'ui'
 
 import { rlsAcknowledgedKey } from 'components/grid/constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -137,26 +145,35 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
             {(table.rls_enabled || showRLSWarning) && (
               <Link passHref href={`/project/${projectRef}/auth/policies?search=${table.id}`}>
                 <Button
-                  type={table.rls_enabled ? 'link' : 'warning'}
+                  type={table.rls_enabled ? 'default' : 'warning'}
                   className="group"
-                  asChild
-                  icon={
-                    table.rls_enabled ? (
-                      <IconLock strokeWidth={2} size={14} />
-                    ) : (
-                      <IconAlertCircle strokeWidth={2} size={14} />
-                    )
-                  }
+                  icon={table.rls_enabled ? null : <IconUnlock strokeWidth={2} size={14} />}
                 >
                   {table.rls_enabled ? (
-                    <>
-                      <span className="flex-1 text-left mr-1">Security policies</span>
-                      <span className="text-right rounded-full px-2 py-1 font-bold hover:bg-brand-400 bg-brand-400 text-brand-1100">
-                        {policies.length}
+                    <div className="flex items-center gap-1">
+                      {policies.length > 0 ? (
+                        <span>
+                          <span className="text-right text-xs rounded-full px-2 py-1 bg-surface-200 dark:bg-surface-100 text-brand-1100">
+                            {policies.length}
+                          </span>
+                        </span>
+                      ) : (
+                        <IconPlusCircle size={12} />
+                      )}
+
+                      <span className="flex-1 text-left mr-1">
+                        Auth {policies.length > 1 ? 'policies' : 'policy'}
                       </span>
-                    </>
+                    </div>
                   ) : (
-                    <span className="flex-1 text-left mr-1">No security policies</span>
+                    <HoverCard>
+                      <HoverCardTrigger>
+                        <span className="flex-1 text-left mr-1">RLS Disabled</span>
+                      </HoverCardTrigger>
+                      <HoverCardContent>
+                        <span className="flex-1 text-left mr-1">RLS Disabled</span>
+                      </HoverCardContent>
+                    </HoverCard>
                   )}
                   {!table.rls_enabled && (
                     <Tooltip.Portal>
@@ -176,7 +193,6 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                       </Tooltip.Content>
                     </Tooltip.Portal>
                   )}
-                  {/* {!table.rls_enabled && 'RLS is not enabled'} */}
                 </Button>
               </Link>
             )}

@@ -46,7 +46,7 @@ export default function RLSBannerWarning() {
     <>
       {!isAcknowledged && !rlsEnabled && isPublicTable ? (
         <div>
-          <div className="text-center bg-amber-500 text-amber-1100 text-xs py-2.5 flex items-center justify-center relative">
+          <div className="text-center text-xs py-2.5 flex items-center justify-center relative">
             <IconAlertCircle size={16} strokeWidth={2} />
             <span className="font-bold mx-2">Table is public</span> You are allowing anonymous
             access to your data.{' '}
@@ -60,7 +60,7 @@ export default function RLSBannerWarning() {
             <div className="ml-20 absolute right-5">
               <Button
                 type="outline"
-                className="hover:text-foreground text-amber-900 border border-amber-800"
+                className="hover:text-foreground border border-amber-800"
                 onClick={() => setIsOpen(true)}
               >
                 Dismiss
