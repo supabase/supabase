@@ -29,7 +29,7 @@ import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useStore } from 'hooks'
 import CreateIndexSidePanel from './CreateIndexSidePanel'
 import SchemaSelector from 'components/ui/SchemaSelector'
-import { partition } from 'lodash'
+import { partition, sortBy } from 'lodash'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
 
@@ -85,9 +85,7 @@ const Indexes = () => {
   const schema = schemas?.find((schema) => schema.name === selectedSchema)
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
 
-  const sortedIndexes = (allIndexes?.result ?? []).sort(
-    (a, b) => a.table.localeCompare(b.table) || a.name.localeCompare(b.name)
-  )
+  const sortedIndexes = sortBy(allIndexes?.result ?? [], 'name')
   const indexes =
     search.length > 0
       ? sortedIndexes.filter((index) => index.name.includes(search) || index.table.includes(search))
