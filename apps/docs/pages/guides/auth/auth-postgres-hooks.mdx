@@ -13,7 +13,7 @@ Hooks are in beta. They will be available for all projects in early 2024.
 </Admonition>
 
 
-Supabase allows you to use PostgreSQL functions to alter the default Supabase Auth flow. Developers can use hooks to add custom behavior that's not supported natively.
+Supabase allows you to use Postgres functions to alter the default Supabase Auth flow. Developers can use hooks to add custom behavior that's not supported natively.
 
 Hooks help you:
 
@@ -27,9 +27,9 @@ You can use hooks at specific points along an Auth flow to perform custom behavi
 
 | Extensibility Point              | Available on Plan       |
 |----------------------------------|-------------------------|
+| Custom Access Token              | Free, Pro                |
 | MFA Verification Attempt         | Teams and Enterprise    |
 | Password Verification Attempt    | Teams and Enterprise    |
-| Custom Access Token              | Free                    |
 
 You can link a hook to an extensiblity point to signal to Supabase Auth that it should make use of the hook.
 
@@ -64,7 +64,7 @@ Note that the JSONB operator `?` can't be used when writing a hook, because it i
 
 ### Handle Hook errors
 
-Unless otherwise specified, your hook should return errors with the following fields:
+To return an error from a hook, return a JSON object with the following properties:
 
 - `error` An object that contains information about the error.
     - `http_code` A number indicating the HTTP code to be returned. If not set, the code is HTTP 500 Internal Server Error.
@@ -72,10 +72,10 @@ Unless otherwise specified, your hook should return errors with the following fi
 
 You should return an error if an input in the `event` payload has been processed incorrectly. This error could result from a server error (for example, an unexpected error with the data) or a user error (for example, the user has exceeded the number of available attempts).
 
-In general, Supabase Auth ignores all fields other than the `error` field attached to the returned JSON.
+When returning an error object, Supabase Auth ignores all other fields you may have attached.
 
 Example output:
-```jsx
+```json
 {
   "error": {
     "http_code": 429,
@@ -84,7 +84,7 @@ Example output:
 }
 ```
 
-### Assign Hook permissions
+### Hook grants and roles
 
 You need to assign additional permissions to the hook and the tables that it interacts with.
 
@@ -108,7 +108,7 @@ revoke execute
 Avoid adding a `security definer` tag to the function to avoid permission errors.
 </Admonition>
 
-At time of writing, Postgres functions have an implicit tag of `security invoker` and run with the permissions of the calling user. In the case of Auth Hooks, `supabase_auth_admin`  is the invoker and hook functions run with the permissions of `supabase_auth_admin`.
+Postgres functions have an implicit tag of `security invoker` and run with the permissions of the calling user. In the case of Auth Hooks, `supabase_auth_admin`  is the invoker and hook functions run with the permissions of `supabase_auth_admin`.
 
 The `security definer` tag executes a function with the privileges of the user who owns it.  In the case of functions created via the Supabase Dashboard, this user is `postgres`, which does not have permissions for the Auth schema. Using `security definer` tag would prevent Supabase Auth from having the appropriate permissions to access tables or execute functions.
 
