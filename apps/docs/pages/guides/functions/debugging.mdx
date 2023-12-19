@@ -34,8 +34,11 @@ When [developing locally](/docs/guides/functions/local-development) you will see
 
 - Outgoing connections to ports `25`, `465`, and `587` are not allowed.
 - Serving of HTML content is not supported (`GET` requests that return `text/html` will be rewritten to `text/plain`).
-- Deno FileSystem APIs are not available to use within Edge Functions.
-- Importing modules using `npm:` specifier is currently not supported ([use a CDN to load npm modules](/docs/guides/functions/import-maps)).
+- Deno & Node FileSystem APIs are not available to use within Edge Functions.
+- Wall clock limit: 400s
+- CPU Time: 2000 ms
+- Total bundle size: 10 MB
+- Memory limit for the function: 150 MB
 
 ## Troubleshooting
 
@@ -72,7 +75,7 @@ There are two debugging tools available: Invocations and Logs. Invocations shows
 
 ## Advanced Techniques
 
-### Checking Function Boot Time
+### Checking Function Boot-Time
 
 Check the logs for the function. In the logs, look for a "Booted" event and note the reported boot time. If available, click on the event to access more details, including the regions from where the function was served. Investigate if the boot time is excessively high (longer than 1 second) and note any patterns or regions where it occurs.
 
@@ -94,6 +97,31 @@ Examine if there are any unnecessary or redundant dependencies that can be remov
 
 ```bash
 deno info --import-map=/path/to/import_map.json /path/to/function/index.ts
+```
+
+### Dealing with errors
+
+You should always check whether the Edge Function call was successful by looking at the [error codes](https://supabase.com/docs/reference/javascript/functions-invoke?example=error-handling).
+You should expect up to 2% errors when calling an Edge Function. Therefore, you should verify the call and act on it accordingly which might be a retry or even an attempt to call it in [another region](https://supabase.com/docs/guides/functions/regional-invocation).  
+
+```js
+import { FunctionsHttpError, FunctionsRelayError, FunctionsFetchError } from "@supabase/supabase-js";
+
+const { data, error } = await supabase.functions.invoke('hello', {
+  headers: {
+    "my-custom-header": 'my-custom-header-value'
+  },
+  body: { foo: 'bar' }
+})
+
+if (error instanceof FunctionsHttpError) {
+  const errorMessage = await error.context.json()
+  console.log('Function returned an error', errorMessage)
+} else if (error instanceof FunctionsRelayError) {
+  console.log('Relay error:', error.message)
+} else if (error instanceof FunctionsFetchError) {
+  console.log('Fetch error:', error.message)
+}
 ```
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
