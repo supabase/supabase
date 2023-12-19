@@ -38,7 +38,6 @@ import { tableKeys } from 'data/tables/keys'
 import { getTable } from 'data/tables/table-query'
 import { getTables } from 'data/tables/tables-query'
 import PostgresMetaInterface from '../common/PostgresMetaInterface'
-import RolesStore, { IRolesStore } from './RolesStore'
 import ViewStore, { IViewStore } from './ViewStore'
 
 const BATCH_SIZE = 1000
@@ -49,8 +48,6 @@ export interface IMetaStore {
   tables: ITableStore
   columns: IPostgresMetaInterface<PostgresColumn>
   views: IViewStore
-
-  roles: IRolesStore
 
   projectRef?: string
 
@@ -125,8 +122,6 @@ export default class MetaStore implements IMetaStore {
   columns: PostgresMetaInterface<PostgresColumn>
   views: ViewStore
 
-  roles: RolesStore
-
   projectRef?: string
   connectionString?: string
   baseUrl: string
@@ -156,7 +151,6 @@ export default class MetaStore implements IMetaStore {
     )
     this.views = new ViewStore(this.rootStore, `${this.baseUrl}/views`, this.headers)
 
-    this.roles = new RolesStore(this.rootStore, `${this.baseUrl}/roles`, this.headers)
     makeObservable(this, {})
   }
 
@@ -851,8 +845,5 @@ export default class MetaStore implements IMetaStore {
 
     this.views.setUrl(`${this.baseUrl}/views`)
     this.views.setHeaders(this.headers)
-
-    this.roles.setUrl(`${this.baseUrl}/roles`)
-    this.roles.setHeaders(this.headers)
   }
 }
