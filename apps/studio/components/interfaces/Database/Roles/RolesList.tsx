@@ -1,8 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { PostgresRole } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
-import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import { Badge, Button, IconPlus, IconSearch, IconX, Input } from 'ui'
 
@@ -10,16 +8,16 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { FormHeader } from 'components/ui/Forms'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import SparkBar from 'components/ui/SparkBar'
+import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import CreateRolePanel from './CreateRolePanel'
 import DeleteRoleModal from './DeleteRoleModal'
 import RoleRow from './RoleRow'
 import RoleRowSkeleton from './RoleRowSkeleton'
 import { SUPABASE_ROLES } from './Roles.constants'
 
-const RolesList = ({}) => {
-  const { meta } = useStore()
+const RolesList = () => {
   const { project } = useProjectContext()
 
   const [filterString, setFilterString] = useState('')
@@ -29,29 +27,30 @@ const RolesList = ({}) => {
 
   const canUpdateRoles = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'roles')
 
-  const { data } = useMaxConnectionsQuery({
+  const { data: maxConnData } = useMaxConnectionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const maxConnectionLimit = data?.maxConnections
+  const maxConnectionLimit = maxConnData?.maxConnections
 
-  const roles = meta.roles.list()
+  const { data, isLoading } = useDatabaseRolesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const roles = (data ?? []).sort((a, b) => a.name.localeCompare(b.name))
+
   const filteredRoles = (
-    filterType === 'active'
-      ? meta.roles.list((role: PostgresRole) => role.active_connections > 0)
-      : meta.roles.list()
-  ).filter((role: PostgresRole) => role.name.includes(filterString))
-  const [supabaseRoles, otherRoles] = partition(filteredRoles, (role: PostgresRole) =>
+    filterType === 'active' ? roles.filter((role) => role.active_connections > 0) : roles
+  ).filter((role) => role.name.includes(filterString))
+  const [supabaseRoles, otherRoles] = partition(filteredRoles, (role) =>
     SUPABASE_ROLES.includes(role.name)
   )
 
-  const isLoading = meta.roles.isLoading
-
   const totalActiveConnections = roles
-    .map((role: PostgresRole) => role.active_connections)
+    .map((role) => role.active_connections)
     .reduce((a, b) => a + b, 0)
   const rolesWithActiveConnections = roles
-    .filter((role: PostgresRole) => role.active_connections > 0)
+    .filter((role) => role.active_connections > 0)
     .sort((a, b) => b.active_connections - a.active_connections)
 
   return (
@@ -148,7 +147,7 @@ const RolesList = ({}) => {
                   ].join(' ')}
                 >
                   <p className="text-xs text-foreground-light pr-2">Connections by roles:</p>
-                  {rolesWithActiveConnections.map((role: PostgresRole) => (
+                  {rolesWithActiveConnections.map((role) => (
                     <div key={role.id} className="text-xs text-foreground">
                       {role.name}: {role.active_connections}
                     </div>
@@ -193,7 +192,7 @@ const RolesList = ({}) => {
 
             {isLoading
               ? Array.from({ length: 5 }).map((_, i) => <RoleRowSkeleton key={i} index={i} />)
-              : supabaseRoles.map((role: PostgresRole, i: number) => (
+              : supabaseRoles.map((role, i: number) => (
                   <RoleRow
                     disabled
                     key={role.id}
@@ -210,7 +209,7 @@ const RolesList = ({}) => {
 
             {isLoading
               ? Array.from({ length: 3 }).map((_, i) => <RoleRowSkeleton key={i} index={i} />)
-              : otherRoles.map((role: PostgresRole, i: number) => (
+              : otherRoles.map((role, i: number) => (
                   <RoleRow
                     key={role.id}
                     disabled={!canUpdateRoles}
@@ -237,4 +236,4 @@ const RolesList = ({}) => {
   )
 }
 
-export default observer(RolesList)
+export default RolesList

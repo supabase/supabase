@@ -640,19 +640,34 @@ export const database: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Connecting to your database', url: '/guides/database/connecting-to-postgres' },
+        { name: 'Importing data', url: '/guides/database/import-data' },
+        { name: 'Securing your data', url: '/guides/database/secure-data' },
+      ],
+    },
+    {
+      name: 'Working with your database (basics)',
+      url: undefined,
+      items: [
         { name: 'Managing tables, views, and data', url: '/guides/database/tables' },
+        { name: 'Managing indexes', url: '/guides/database/postgres/indexes' },
         {
           name: 'Querying joins and nested tables',
-          url: '/guides/api/joins-and-nesting',
+          url: '/guides/database/joins-and-nesting',
         },
         { name: 'JSON and unstructured data', url: '/guides/database/json' },
-        { name: 'Managing database functions', url: '/guides/database/functions' },
-        { name: 'Managing indexes', url: '/guides/database/postgres/indexes' },
-        { name: 'Managing database triggers', url: '/guides/database/postgres/triggers' },
+      ],
+    },
+    {
+      name: 'Working with your database (intermediate)',
+      url: undefined,
+      items: [
+        { name: 'Implementing cascade deletes', url: '/guides/database/postgres/cascade-deletes' },
         { name: 'Managing enums', url: '/guides/database/postgres/enums' },
+        { name: 'Managing database functions', url: '/guides/database/functions' },
+        { name: 'Managing database triggers', url: '/guides/database/postgres/triggers' },
         { name: 'Managing database webhooks', url: '/guides/database/webhooks' },
         { name: 'Using Full Text Search', url: '/guides/database/full-text-search' },
-        { name: 'Importing large datasets', url: '/guides/database/large-datasets' },
+        { name: 'Partitioning your tables', url: '/guides/database/partitions' },
       ],
     },
     {
@@ -665,16 +680,15 @@ export const database: NavMenuConstant = {
       ],
     },
     {
-      name: 'Postgres Guides',
+      name: 'Configuration, optimization, and testing',
       url: undefined,
       items: [
-        { name: 'Query Optimization', url: '/guides/database/query-optimization' },
-        { name: 'Debugging and monitoring', url: '/guides/database/inspect' },
-        { name: 'Partitioning your tables', url: '/guides/database/partitions' },
-        { name: 'Implementing Cascade Deletes', url: '/guides/database/postgres/cascade-deletes' },
+        { name: 'Database configuration', url: '/guides/database/postgres/configuration' },
         { name: 'Managing database replication', url: '/guides/database/replication' },
+        { name: 'Query optimization', url: '/guides/database/query-optimization' },
+        { name: 'Debugging and monitoring', url: '/guides/database/inspect' },
+        { name: 'Debugging performance issues', url: '/guides/database/debugging-performance' },
         { name: 'Testing your database', url: '/guides/database/testing' },
-        { name: 'Database Configuration', url: '/guides/database/postgres/configuration' },
       ],
     },
     {
@@ -833,13 +847,35 @@ export const api: NavMenuConstant = {
         { name: 'Creating API routes', url: '/guides/api/creating-routes' },
         { name: 'How API Keys work', url: '/guides/api/api-keys' },
         { name: 'Securing your API', url: '/guides/api/securing-your-api' },
+      ],
+    },
+    {
+      name: 'Using the Data APIs',
+      url: '/guides/api/data-apis',
+      items: [
         {
-          name: 'Debugging performance issues',
-          url: '/guides/api/rest/debugging-performance',
+          name: 'Managing tables, views, and data',
+          url: '/guides/api/data-apis#managing-tables-views-and-data',
         },
         {
           name: 'Querying joins and nested tables',
-          url: '/guides/api/joins-and-nesting',
+          url: '/guides/api/data-apis#querying-joins-and-nested-tables',
+        },
+        {
+          name: 'JSON and unstructured data',
+          url: '/guides/api/data-apis#json-and-unstructured-data',
+        },
+        {
+          name: 'Managing database functions',
+          url: '/guides/api/data-apis#managing-database-functions',
+        },
+        {
+          name: 'Using full-text search',
+          url: '/guides/api/data-apis#using-full-text-search',
+        },
+        {
+          name: 'Debugging performance issues',
+          url: '/guides/api/data-apis#debugging-performance-issues',
         },
         { name: 'Using custom schemas', url: '/guides/api/using-custom-schemas' },
       ],
@@ -1704,41 +1740,6 @@ export const reference_self_hosting_functions = {
   url: '/guides/reference/self-hosting/functions',
   parent: '/reference',
 }
-
-// export const reference: [
-//   {
-//     label: 'Official'
-//     items: [
-//       { name: 'Reference Documentation'; url: '/reference'; },
-//       { name: 'Supabase JavaScript Library'; url: '/reference/javascript'; },
-//       { name: 'Supabase Flutter Library'; url: '/reference/dart'; },
-//       { name: 'Supabase CLI'; url: '/reference/cli'; },
-//       { name: 'Management API'; url: '/reference/api'; }
-//     ]
-//   },
-//   {
-//     label: 'Self-hosting'
-//     items: [
-//       { name: 'Auth Server'; url: '/reference/auth'; },
-//       { name: 'Storage Server'; url: '/reference/storage'; }
-//     ]
-//   }
-//     {
-//       label: 'Clients',
-//       items: [
-//         { name: 'Auth Server', url: '/reference/auth'},
-//         { name: 'Storage Server', url: '/reference/storage'},
-//       ],
-//     },
-//   'reference/javascript': SupabaseJsV2Nav,
-//   'reference/javascript/v1': SupabaseJsV1Nav,
-//   'reference/dart': SupabaseDartV1Nav,
-//   'reference/dart/v0': SupabaseDartV0Nav,
-//   'reference/cli': SupabaseCLINav,
-//   'reference/api': SupabaseAPINav,
-//   'reference/auth': AuthServerNav,
-//   'reference/storage': StorageServerNav,
-// ]
 
 export const references = [
   {
