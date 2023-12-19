@@ -14,6 +14,9 @@ import {
   Input_Shadcn_,
 } from 'ui'
 import * as z from 'zod'
+import Telemetry from 'lib/telemetry'
+import { useTelemetryProps } from 'common'
+import { useRouter } from 'next/router'
 
 import { useProfile } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
@@ -38,6 +41,8 @@ export const AIPolicyChat = ({
   const { profile } = useProfile()
   const snap = useAppStateSnapshot()
   const bottomRef = useRef<HTMLDivElement>(null)
+  const router = useRouter()
+  const telemetryProps = useTelemetryProps()
 
   const name = compact([profile?.first_name, profile?.last_name]).join(' ')
 
@@ -117,6 +122,15 @@ export const AIPolicyChat = ({
           className="sticky p-5 flex-0 border-t"
           onSubmit={form.handleSubmit((data: z.infer<typeof FormSchema>) => {
             onSubmit(data.chat)
+            Telemetry.sendEvent(
+              {
+                category: 'rls_editor',
+                action: 'ai_suggestion_asked',
+                label: 'rls-ai-assistant',
+              },
+              telemetryProps,
+              router
+            )
           })}
         >
           <FormField_Shadcn_

@@ -1,6 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { includes } from 'lodash'
+import { includes, sortBy } from 'lodash'
 import {
   Badge,
   Button,
@@ -41,11 +41,14 @@ const TriggerList = ({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const filteredTriggers = (triggers ?? []).filter((x: any) =>
+  const filteredTriggers = (triggers ?? []).filter((x) =>
     includes(x.name.toLowerCase(), filterString.toLowerCase())
   )
 
-  const _triggers = filteredTriggers.filter((x: any) => x.schema == schema)
+  const _triggers = sortBy(
+    filteredTriggers.filter((x) => x.schema == schema),
+    (trigger) => trigger.name.toLocaleLowerCase()
+  )
   const canUpdateTriggers = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
 
   if (_triggers.length === 0 && filterString.length === 0) {
