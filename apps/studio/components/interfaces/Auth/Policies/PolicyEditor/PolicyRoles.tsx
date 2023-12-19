@@ -21,7 +21,6 @@ const PolicyRoles = ({ selectedRoles, onUpdateSelectedRoles }: PolicyRolesProps)
     .filter((role) => !SYSTEM_ROLES.includes(role.name))
     .sort((a, b) => a.name.localeCompare(b.name))
 
-  // @ts-ignore
   const formattedRoles = roles.map((role) => {
     return {
       id: role.id,

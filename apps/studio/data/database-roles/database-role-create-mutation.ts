@@ -4,19 +4,14 @@ import { toast } from 'react-hot-toast'
 import { post } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { databaseRolesKeys } from './keys'
+import { components } from 'data/api'
+
+type CreateRoleBody = components['schemas']['CreateRoleBody']
 
 export type DatabaseRoleCreateVariables = {
   projectRef: string
   connectionString?: string
-  payload: {
-    name: string
-    is_superuser: boolean
-    can_login: boolean
-    can_create_role: boolean
-    can_create_db: boolean
-    is_replication_role: boolean
-    can_bypass_rls: boolean
-  }
+  payload: CreateRoleBody
 }
 
 export async function createDatabaseRole({

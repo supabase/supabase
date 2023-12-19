@@ -4,20 +4,15 @@ import { toast } from 'react-hot-toast'
 import { patch } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { databaseRolesKeys } from './keys'
+import { components } from 'data/api'
+
+type UpdateRoleBody = components['schemas']['UpdateRoleBody']
 
 export type DatabaseRoleUpdateVariables = {
   projectRef: string
   connectionString?: string
   id: number
-  payload: {
-    name: string
-    is_superuser: boolean
-    can_login: boolean
-    can_create_role: boolean
-    can_create_db: boolean
-    is_replication_role: boolean
-    can_bypass_rls: boolean
-  }
+  payload: UpdateRoleBody
 }
 
 export async function updateDatabaseRole({
