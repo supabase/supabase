@@ -17,6 +17,76 @@ thumb: lwx-best-launches/top-10-thumb.png
 
 This launch week was unique. We had so much content that we decided to do a “main stage”, with five major features, and a “build stage” with additional content. It's a lot to digest, so here are 10 of my favorites.
 
+## Top 10
+
+### #1: We teamed up with Fly
+
+We're launching Fly Postgres, a managed Postgres offering by Supabase and [Fly.io](http://fly.io/). Fly's current Postgres offering is unmanaged, so we're working with them to bring the same delightful Postgres experience on Fly.
+
+[Read more](/blog/postgres-on-fly-by-supabase)
+
+### #2: We launched Supabase Grafana
+
+We shipped an open source observability suite for your Supabase project, using Prometheus and Grafana. It collects around 200 metrics and can be deployed to any server.
+
+[Read more](/supabase/supabase-grafana)
+
+### #3: pg_graphql now supports Postgres Functions
+
+Supabase GraphQL (pg_graphql) 1.4+ supports the most requested feature: Postgres functions a.k.a. User Defined Functions. Execute custom SQL logic within GraphQL queries to support complex server-side operations.
+
+[Read more](/blog/pg-graphql-postgres-functions)
+
+### #4: Python libs are now stable
+
+Supabase Python is now stable and ready to use in your Python applications. We've created a few guides and examples to show how easy it is to use the Python libraries with existing frameworks like Flask.
+
+[Read more](/blog/client-libraries-v2)
+
+### #5: Aggregate Functions in PostgREST
+
+Support for aggregate functions has been much requested feature that went through multiple iterations of design and review. PostgREST 12 was just released and it now supports `avg`, `count`, `max`, `min`, `sum`. 
+
+[Read more](/blog/postgrest-12)
+
+### #6: Supavisor 1.0
+
+Supavisor is a cloud-native connection pooler for Postgres, built with Elixir. We've migrated all projects on the platform from pgbouncer to Supavisof. Every new Supabase project launched now gets a Supavisor connection string to use for connection pooling.
+
+[Read more](/blog/supavisor-postgres-connection-pooler)
+
+### #7: Edge Functions now support Node & NPM
+
+Edge Functions now natively supports npm modules and Node built-in APIs. You can directly import millions of popular, commonly used npm modules into your Edge Functions.
+
+[Read more](/blog/edge-functions-node-npm)
+
+### #8: Leaked Password Protection with Have I Been Pwned
+
+we have integrated the [HaveIBeenPwned.org](https://haveibeenpwned.com/) *Pwned Passwords API* in Supabase Auth to prevent users from using leaked passwords. This will prevent your users from using a password that has previously been leaked.
+
+[Read more](/blog/supabase-auth-identity-linking-hooks)
+
+### #9: Supabase Branching
+
+Branching give you a Postgres database for every Pull Request. You can run experimental changes on your branch database, and then merge your changes into production when you're happy with the changes. We're rolling out branching in batches. 
+
+[Read more](/blog/supabase-branching)
+
+### #10: Postgres Read Replicas
+
+Read replicas continuously, well, *replicate* data from a primary database. It contains a constantly-updated copy of the data in your Primary. These are great for distributing data closer to your users to reduce application latency, and for reducing the load on your Primary database.
+
+[Read more](/blog/introducing-read-replicas)
+
+### Bonus: we dropped an Album
+
+I made a [bet](https://twitter.com/kiwicopple/status/1664118998169014273) with Sam that we would make an album. Luckily Jon has a side-hobby. Check out [supabase.productions](https://supabase.productions/).
+
+### We teamed up with Fly
+
+We're launching Fly Postgres, a managed Postgres offering by Supabase and [Fly.io](http://fly.io/). Fly's current Postgres offering is unmanaged, so we're working with them to bring the same delightful Postgres experience on Fly.
+
 ## Cool things from the community
 
 I also wanted to highlight a few thing that happened in the community over the past few weeks:
