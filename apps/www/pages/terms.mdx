@@ -1,5 +1,6 @@
 import Layout from '../layouts/Layout'
 import SectionContainer from '../components/Layouts/SectionContainer'
+import withStaticData from '~/components/withStaticData'
 
 export const meta = {
   title: 'Terms of Service',
@@ -243,4 +244,6 @@ Supabase may identify Customer as a user of the Services and may use Customer's 
 
 </SectionContainer>
 
-export default (context) => <Layout meta={meta} children={context.children} context={context} />
+export default withStaticData((context) => (
+  <Layout meta={meta} children={context.children} context={context} />
+))

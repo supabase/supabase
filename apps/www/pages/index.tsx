@@ -4,6 +4,7 @@ import { getSortedPosts } from '~/lib/posts'
 import content from '~/data/home/content'
 import Layout from '~/components/Layouts/Default'
 import Hero from '~/components/Hero/Hero'
+import withStaticData from '~/components/withStaticData'
 
 // Import Swiper styles if swiper used on page
 import 'swiper/swiper.min.css'
@@ -43,4 +44,4 @@ export async function getStaticProps() {
   }
 }
 
-export default Index
+export default withStaticData(Index)

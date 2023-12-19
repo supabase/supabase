@@ -10,6 +10,7 @@ import PartnerLinkBox from '~/components/Partners/PartnerLinkBox'
 import supabase from '~/lib/supabaseMisc'
 import { Partner } from '~/types/partners'
 import TileGrid from '../../../components/Partners/TileGrid'
+import withStaticData from '../../../components/withStaticData'
 
 export async function getStaticProps() {
   const { data: partners } = await supabase
@@ -214,4 +215,4 @@ function IntegrationPartnersPage(props: Props) {
   )
 }
 
-export default IntegrationPartnersPage
+export default withStaticData(IntegrationPartnersPage)

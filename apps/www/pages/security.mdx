@@ -1,15 +1,14 @@
 import {
   KeyIcon,
-  LinkIcon,
   UserGroupIcon,
   ShieldCheckIcon,
   RewindIcon,
   CreditCardIcon,
   ClipboardCheckIcon,
 } from '@heroicons/react/outline'
-import { Button, IconGitHub, IconActivity } from 'ui'
+import { IconGitHub, IconActivity } from 'ui'
 import Layout from '../layouts/Layout'
-import Link from 'next/link'
+import withStaticData from '~/components/withStaticData'
 
 export const meta = {
   type: 'lp',
@@ -134,4 +133,6 @@ In addition to internal security reviews, we use various tools to scan our code 
 
 </div>
 
-export default (context) => <Layout meta={meta} children={context.children} context={context} />
+export default withStaticData((context) => (
+  <Layout meta={meta} children={context.children} context={context} />
+))

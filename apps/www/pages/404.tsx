@@ -3,9 +3,10 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Button } from 'ui'
 
-import DefaultLayout from '../components/Layouts/Default'
-
 import { useTheme } from 'next-themes'
+
+import DefaultLayout from '../components/Layouts/Default'
+import withStaticData from '~/components/withStaticData'
 
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
@@ -74,4 +75,4 @@ const Error404 = () => {
   )
 }
 
-export default Error404
+export default withStaticData(Error404)

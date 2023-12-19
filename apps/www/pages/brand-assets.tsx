@@ -60,13 +60,13 @@ const Index = () => {
                 <div className="p-16">
                   <div className="space-y-2">
                     <h1 className="text-foreground text-4xl">Supabase logos</h1>
-                    <p className="text-foreground-light text-sm">
+                    <div className="text-foreground-light text-sm">
                       <p>
                         Download Supabase official logos, including as SVG's, in both light and dark
                         theme.
                       </p>
                       <p>Do not use any other color for the wordmark.</p>
-                    </p>
+                    </div>
                     <form method="get" action={`/brand-assets.zip`}>
                       <Button htmlType="submit" type="default" iconRight={<IconDownload />}>
                         Download logo kit
@@ -91,7 +91,7 @@ const Index = () => {
                 <div className="p-16">
                   <div className="space-y-2">
                     <h1 className="text-foreground text-4xl">Supabase Integrations</h1>
-                    <p className="text-foreground-light text-sm">
+                    <div className="text-foreground-light text-sm">
                       <p>
                         When building a{' '}
                         <a
@@ -103,7 +103,7 @@ const Index = () => {
                         , use this "Connect Supabase" button to initiate the OAuth redirect.
                       </p>
                       <p>Do not use any other color for the wordmark.</p>
-                    </p>
+                    </div>
                     <form
                       method="get"
                       action={`https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/supabase-brand-assets/connect-supabase/connect-supabase.zip`}

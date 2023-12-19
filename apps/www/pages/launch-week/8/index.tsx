@@ -14,6 +14,7 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/8/LaunchWeekLogoHeader'
 import { Meetup } from '~/components/LaunchWeek/8/LW8Meetups'
 import LW8CalloutsSection from '~/components/LaunchWeek/8/LW8CalloutsSection'
+import withStaticData from '~/components/withStaticData'
 
 import 'swiper/swiper.min.css'
 
@@ -40,7 +41,7 @@ const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_MISC_USE_ANON_KEY!
 )
 
-export default function TicketHome({ users, meetups }: Props) {
+function TicketHome({ users, meetups }: Props) {
   const { query } = useRouter()
 
   const TITLE = 'Supabase Launch Week 8'
@@ -209,3 +210,5 @@ export const getServerSideProps: GetServerSideProps = async () => {
     },
   }
 }
+
+export default withStaticData(TicketHome)

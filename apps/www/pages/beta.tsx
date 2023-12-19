@@ -12,6 +12,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import Layout from '~/components/Layouts/Default'
+import withStaticData from '~/components/withStaticData'
 
 const site_title = `${APP_NAME} | We are now in Beta`
 
@@ -1023,4 +1024,4 @@ const Beta = (props: Props) => {
   )
 }
 
-export default Beta
+export default withStaticData(Beta)

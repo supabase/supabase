@@ -1,11 +1,13 @@
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
+import supabase from '~/lib/supabaseMisc'
+import { Partner } from '~/types/partners'
+
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import PartnerLinkBox from '~/components/Partners/PartnerLinkBox'
-import supabase from '~/lib/supabaseMisc'
-import { Partner } from '~/types/partners'
-import TileGrid from '../../../components/Partners/TileGrid'
+import TileGrid from '~/components/Partners/TileGrid'
+import withStaticData from '~/components/withStaticData'
 
 export async function getStaticProps() {
   const { data: partners } = await supabase
@@ -108,4 +110,4 @@ function ExpertPartnersPage(props: Props) {
   )
 }
 
-export default ExpertPartnersPage
+export default withStaticData(ExpertPartnersPage)

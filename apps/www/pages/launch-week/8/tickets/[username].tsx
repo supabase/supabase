@@ -12,6 +12,7 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import TicketContainer from '~/components/LaunchWeek/8/Ticket/TicketContainer'
 import { SITE_URL } from '~/lib/constants'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
+import withStaticData from '~/components/withStaticData'
 
 const LaunchWeekPrizeSection = dynamic(
   () => import('~/components/LaunchWeek/8/LaunchWeekPrizeSection')
@@ -31,7 +32,7 @@ const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_MISC_USE_ANON_KEY!
 )
 
-export default function UsernamePage({ user, users, ogImageUrl }: Props) {
+function UsernamePage({ user, users, ogImageUrl }: Props) {
   const { username, ticketNumber, name } = user
 
   const TITLE = `${name ? name + '’s' : 'Get your'} #SupaLaunchWeek Ticket`
@@ -178,3 +179,5 @@ export const getStaticPaths: GetStaticPaths = async () => {
     fallback: 'blocking',
   })
 }
+
+export default withStaticData(UsernamePage)

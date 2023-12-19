@@ -1,11 +1,8 @@
 import { Button, IconArrowUpRight, IconShuffle, IconWifi, IconX, ThemeImage } from 'ui'
-import ApiExamples from 'data/products/storage/api-examples'
-import DashboardViewData from 'data/products/storage/dashboard-carousel.json'
-import StoragePermissionsData from 'data/products/storage/permissions-examples'
-import Solutions from 'data/Solutions'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
+
 import ImageCarousel from '~/components/Carousels/ImageCarousel'
 import SplitCodeBlockCarousel from '~/components/Carousels/SplitCodeBlockCarousel'
 import CTABanner from '~/components/CTABanner'
@@ -16,6 +13,12 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import ProductIcon from '~/components/ProductIcon'
 import APISection from '~/components/Sections/APISection'
 import ProductHeader from '~/components/Sections/ProductHeader'
+import withStaticData from '~/components/withStaticData'
+
+import ApiExamples from 'data/products/storage/api-examples'
+import DashboardViewData from 'data/products/storage/dashboard-carousel.json'
+import StoragePermissionsData from 'data/products/storage/permissions-examples'
+import Solutions from 'data/Solutions'
 
 function StoragePage() {
   // base path for images
@@ -267,4 +270,4 @@ function StoragePage() {
   )
 }
 
-export default StoragePage
+export default withStaticData(StoragePage)

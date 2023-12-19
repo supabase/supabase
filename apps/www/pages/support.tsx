@@ -8,6 +8,7 @@ import { Button, ButtonProps, cn, IconCommand, IconSearch, SearchButton } from '
 import DefaultLayout from '~/components/Layouts/Default'
 import Panel from '~/components/Panel'
 import SectionContainer from '~/components/Layouts/SectionContainer'
+import withStaticData from '~/components/withStaticData'
 import { questions } from 'shared-data'
 import data from '~/data/support'
 
@@ -151,4 +152,4 @@ const Index = () => {
   )
 }
 
-export default Index
+export default withStaticData(Index)

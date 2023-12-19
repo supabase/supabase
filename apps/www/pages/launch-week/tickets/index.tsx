@@ -3,11 +3,12 @@ import { GetServerSideProps } from 'next'
 import { NextSeo } from 'next-seo'
 import { Button } from 'ui'
 import Link from 'next/link'
+import { useTheme } from 'next-themes'
 import { motion } from 'framer-motion'
 import { debounce } from 'lodash'
 
 import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
-import { useTheme } from 'next-themes'
+import supabase from '~/lib/supabaseMisc'
 
 import FaviconImports from '~/components/LaunchWeek/X/FaviconImports'
 import DefaultLayout from '~/components/Layouts/Default'
@@ -15,7 +16,7 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import { UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import CTABanner from '~/components/CTABanner'
 import TicketsGrid from '~/components/LaunchWeek/X/TicketsGrid'
-import supabase from '../../../lib/supabaseMisc'
+import withStaticData from '~/components/withStaticData'
 
 interface Props {
   users: UserData[]
@@ -30,7 +31,7 @@ const generateOgs = async (users: UserData[]) => {
   })
 }
 
-export default function TicketsPage({ users }: Props) {
+function TicketsPage({ users }: Props) {
   const ref = useRef(null)
   const PAGE_COUNT = 20
   const TITLE = '#SupaLaunchWeek X Tickets'
@@ -167,3 +168,5 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     },
   }
 }
+
+export default withStaticData(TicketsPage)

@@ -15,6 +15,7 @@ import { Meetup } from '~/components/LaunchWeek/X/LWXMeetups'
 import LWXStickyNav from '~/components/LaunchWeek/X/Releases/LWXStickyNav'
 import LWXHeader from '~/components/LaunchWeek/X/Releases/LWXHeader'
 import MainStage from '~/components/LaunchWeek/X/Releases/MainStage'
+import withStaticData from '~/components/withStaticData'
 
 const BuildStage = dynamic(() => import('~/components/LaunchWeek/X/Releases/BuildStage'))
 const LWXMeetups = dynamic(() => import('~/components/LaunchWeek/X/LWXMeetups'))
@@ -26,7 +27,7 @@ interface Props {
   meetups?: Meetup[]
 }
 
-export default function LaunchWeekIndex({ meetups }: Props) {
+function LaunchWeekIndex({ meetups }: Props) {
   const { query } = useRouter()
 
   const TITLE = 'Supabase Launch Week X | 11-15 December 2023'
@@ -138,3 +139,5 @@ export const getServerSideProps: GetServerSideProps = async () => {
     },
   }
 }
+
+export default withStaticData(LaunchWeekIndex)

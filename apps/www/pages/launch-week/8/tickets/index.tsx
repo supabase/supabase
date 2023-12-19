@@ -16,6 +16,7 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import { UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import CTABanner from '~/components/CTABanner'
 import TicketsGrid from '~/components/LaunchWeek/8/TicketsGrid'
+import withStaticData from '~/components/withStaticData'
 
 interface Props {
   users: UserData[]
@@ -35,7 +36,7 @@ const generateOgs = async (users: UserData[]) => {
   })
 }
 
-export default function TicketsPage({ users }: Props) {
+function TicketsPage({ users }: Props) {
   const ref = useRef(null)
   const PAGE_COUNT = 20
   const TITLE = '#SupaLaunchWeek Tickets'
@@ -181,3 +182,5 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     },
   }
 }
+
+export default withStaticData(TicketsPage)

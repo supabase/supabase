@@ -1,6 +1,7 @@
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
+import withStaticData from '~/components/withStaticData'
 
 // NOTE: this is a placeholder for our future Next.js marketing page. For now it redirects to our Next.js guide.
 
@@ -37,4 +38,4 @@ function Nextjs() {
   )
 }
 
-export default Nextjs
+export default withStaticData(Nextjs)

@@ -2,17 +2,18 @@ import fs from 'fs'
 
 import { useRouter } from 'next/router'
 import Head from 'next/head'
-
+import Link from 'next/link'
 import { NextSeo } from 'next-seo'
+import { GlassPanel } from 'ui'
+import { motion } from 'framer-motion'
+
 import { generateRss } from '~/lib/rss'
 import { getSortedPosts } from '~/lib/posts'
-
-import DefaultLayout from '~/components/Layouts/Default'
 import PostTypes from '~/types/post'
-import { motion } from 'framer-motion'
+
 import styles from './customers.module.css'
-import Link from 'next/link'
-import { GlassPanel } from 'ui'
+import DefaultLayout from '~/components/Layouts/Default'
+import withStaticData from '~/components/withStaticData'
 
 export async function getStaticProps() {
   const allPostsData = getSortedPosts({ directory: '_customers' })
@@ -134,4 +135,4 @@ function CustomerStoriesPage(props: any) {
   )
 }
 
-export default CustomerStoriesPage
+export default withStaticData(CustomerStoriesPage)

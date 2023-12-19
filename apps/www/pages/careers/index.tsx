@@ -3,14 +3,17 @@ import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useTheme } from 'next-themes'
 import ReactMarkdown from 'react-markdown'
 import { Badge, Button, IconCheck } from 'ui'
+
+import Styles from './career.module.css'
 import Globe from '~/components/Globe'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import { useTheme } from 'next-themes'
+import withStaticData from '~/components/withStaticData'
+
 import career from '~/data/career.json'
-import Styles from './career.module.css'
 
 export async function getStaticProps() {
   const job_res = await fetch('https://boards-api.greenhouse.io/v1/boards/supabase/jobs')
@@ -524,4 +527,4 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
   )
 }
 
-export default CareerPage
+export default withStaticData(CareerPage)

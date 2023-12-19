@@ -18,6 +18,7 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import supabase from '~/lib/supabaseMisc'
 import { Partner } from '~/types/partners'
 import Error404 from '../../404'
+import withStaticData from '../../../components/withStaticData'
 
 /**
  * Returns custom components so that the markdown converts to a nice looking html.
@@ -339,4 +340,4 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   }
 }
 
-export default Partner
+export default withStaticData(Partner)

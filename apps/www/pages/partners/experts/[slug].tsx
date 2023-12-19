@@ -5,13 +5,16 @@ import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import 'swiper/swiper.min.css'
 import { IconChevronLeft, IconExternalLink } from 'ui'
-import DefaultLayout from '~/components/Layouts/Default'
-import SectionContainer from '~/components/Layouts/SectionContainer'
 import supabase from '~/lib/supabaseMisc'
 import { Partner } from '~/types/partners'
+
+import 'swiper/swiper.min.css'
+
+import DefaultLayout from '~/components/Layouts/Default'
+import SectionContainer from '~/components/Layouts/SectionContainer'
 import Error404 from '../../404'
+import withStaticData from '~/components/withStaticData'
 
 function Partner({
   partner,
@@ -254,4 +257,4 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   }
 }
 
-export default Partner
+export default withStaticData(Partner)

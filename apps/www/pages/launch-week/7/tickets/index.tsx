@@ -1,20 +1,22 @@
-import { NextSeo } from 'next-seo'
-import { GetServerSideProps } from 'next'
-import DefaultLayout from '~/components/Layouts/Default'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
-import { createClient } from '@supabase/supabase-js'
 import { useEffect, useRef, useState } from 'react'
-import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/7/LaunchSection/LaunchWeekLogoHeader'
 import { motion } from 'framer-motion'
-import { UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
-import LW7BgGraphic from '~/components/LaunchWeek/7/LW7BgGraphic'
-import CTABanner from '~/components/CTABanner'
 import { debounce } from 'lodash'
-import TicketsGrid from '~/components/LaunchWeek/7/TicketsGrid'
 import { Button } from 'ui'
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
+import { NextSeo } from 'next-seo'
+import { GetServerSideProps } from 'next'
+import { createClient } from '@supabase/supabase-js'
+
+import DefaultLayout from '~/components/Layouts/Default'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
+import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/7/LaunchSection/LaunchWeekLogoHeader'
+import { UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
+import LW7BgGraphic from '~/components/LaunchWeek/7/LW7BgGraphic'
+import CTABanner from '~/components/CTABanner'
+import TicketsGrid from '~/components/LaunchWeek/7/TicketsGrid'
+import withStaticData from '~/components/withStaticData'
 
 interface Props {
   users: UserData[]
@@ -34,7 +36,7 @@ const generateOgs = async (users: UserData[]) => {
   })
 }
 
-export default function TicketsPage({ users }: Props) {
+function TicketsPage({ users }: Props) {
   const ref = useRef(null)
   const PAGE_COUNT = 20
   const TITLE = '#SupaLaunchWeek Tickets'
@@ -169,3 +171,5 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     },
   }
 }
+
+export default withStaticData(TicketsPage)

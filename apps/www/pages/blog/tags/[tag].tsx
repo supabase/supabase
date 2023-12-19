@@ -3,6 +3,7 @@ import { getSortedPosts, getAllTags } from '~/lib/posts'
 import Link from 'next/link'
 import { startCase } from 'lodash'
 
+import withStaticData from '~/components/withStaticData'
 import DefaultLayout from '~/components/Layouts/Default'
 import BlogListItem from '~/components/Blog/BlogListItem'
 import PostTypes from '~/types/post'
@@ -65,4 +66,4 @@ function TagBlogsPage(props: Props) {
   )
 }
 
-export default TagBlogsPage
+export default withStaticData(TagBlogsPage)

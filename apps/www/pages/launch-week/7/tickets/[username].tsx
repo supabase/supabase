@@ -1,20 +1,22 @@
+import { useEffect, useState } from 'react'
+import { IconArrowDown } from 'ui'
 import { NextSeo } from 'next-seo'
 import { GetStaticProps, GetStaticPaths } from 'next'
 import Error from 'next/error'
+import { useTheme } from 'next-themes'
+import { createClient } from '@supabase/supabase-js'
+import { SITE_URL, SAMPLE_TICKET_NUMBER } from '~/lib/constants'
+
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import TicketContainer from '~/components/LaunchWeek/7/Ticket/TicketContainer'
-import { SITE_URL, SAMPLE_TICKET_NUMBER } from '~/lib/constants'
-import { createClient } from '@supabase/supabase-js'
-import { useEffect, useState } from 'react'
-import { IconArrowDown } from 'ui'
 import LaunchWeekPrizeSection from '~/components/LaunchWeek/7/LaunchWeekPrizeSection'
 import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/7/LaunchSection/LaunchWeekLogoHeader'
 import TicketBrickWall from '~/components/LaunchWeek/7/LaunchSection/TicketBrickWall'
 import { UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import LW7BgGraphic from '~/components/LaunchWeek/7/LW7BgGraphic'
 import CTABanner from '~/components/CTABanner'
-import { useTheme } from 'next-themes'
+import withStaticData from '~/components/withStaticData'
 
 interface Props {
   user: UserData
@@ -27,7 +29,7 @@ const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_MISC_USE_ANON_KEY!
 )
 
-export default function UsernamePage({ user, users, ogImageUrl }: Props) {
+function UsernamePage({ user, users, ogImageUrl }: Props) {
   const { resolvedTheme } = useTheme()
   const { username, ticketNumber, name, golden, referrals, bg_image_id } = user
   const TITLE = `${name ? name + '’s' : 'Get your'} #SupaLaunchWeek Ticket`
@@ -162,3 +164,5 @@ export const getStaticPaths: GetStaticPaths = async () => {
     fallback: 'blocking',
   })
 }
+
+export default withStaticData(UsernamePage)

@@ -26,6 +26,7 @@ import APISection from '~/components/Sections/APISection'
 import GithubExamples from '~/components/Sections/GithubExamples'
 import ProductHeader from '~/components/Sections/ProductHeader'
 import AuthProviders from '~/data/auth.json'
+import withStaticData from '~/components/withStaticData'
 
 function AuthPage() {
   // base path for images
@@ -245,4 +246,4 @@ function AuthPage() {
   )
 }
 
-export default AuthPage
+export default withStaticData(AuthPage)

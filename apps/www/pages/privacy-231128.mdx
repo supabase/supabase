@@ -1,6 +1,7 @@
 import Layout from '../layouts/Layout'
-import SectionContainer from '../components/Layouts/SectionContainer'
 import { PrivacySettings } from 'ui'
+import SectionContainer from '../components/Layouts/SectionContainer'
+import withStaticData from '~/components/withStaticData'
 
 export const meta = {
   title: 'Privacy Policy | Supabase',
@@ -341,4 +342,6 @@ We also use cookieless technologies to collect information to assess how our Ser
 
 </SectionContainer>
 
-export default (context) => <Layout meta={meta} children={context.children} context={context} />
+export default withStaticData((context) => (
+  <Layout meta={meta} children={context.children} context={context} />
+))

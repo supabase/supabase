@@ -2,6 +2,7 @@ import { GetStaticPaths, GetStaticProps } from 'next'
 import 'swiper/swiper.min.css'
 import supabase from '~/lib/supabaseMisc'
 import Error404 from '../404'
+import withStaticData from '~/components/withStaticData'
 
 function PartnerPage() {
   // Should be redirected to ./experts/:slug or ./integrations/:slug
@@ -61,4 +62,4 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   }
 }
 
-export default PartnerPage
+export default withStaticData(PartnerPage)

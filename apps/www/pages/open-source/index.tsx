@@ -8,6 +8,7 @@ import OSSHero from '~/components/OpenSource/OSSHero'
 import ProductHeaderCentered from '~/components/Sections/ProductHeaderCentered'
 import Repos from '~/components/OpenSource/Repos'
 import Sponsorships from '~/components/OpenSource/Sponsorships'
+import withStaticData from '~/components/withStaticData'
 
 import pageData from '~/data/open-source'
 
@@ -58,4 +59,4 @@ const OpenSource = () => {
   )
 }
 
-export default OpenSource
+export default withStaticData(OpenSource)

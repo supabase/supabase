@@ -1,8 +1,8 @@
 import { GetServerSideProps } from 'next'
 import { NextSeo } from 'next-seo'
-import { useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { createClient } from '@supabase/supabase-js'
+import { useTheme } from 'next-themes'
 
 import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
 
@@ -11,7 +11,7 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/7/LaunchSection/LaunchWeekLogoHeader'
 import { UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import LW7BgGraphic from '~/components/LaunchWeek/7/LW7BgGraphic'
-import { useTheme } from 'next-themes'
+import withStaticData from '~/components/withStaticData'
 
 const LW7Releases = dynamic(() => import('~/components/LaunchWeek/7/Releases'))
 const LaunchWeekPrizeSection = dynamic(
@@ -31,7 +31,8 @@ const supabaseAdmin = createClient(
   // ANON KEY
   process.env.NEXT_PUBLIC_MISC_USE_ANON_KEY!
 )
-export default function TicketHome({ users }: Props) {
+
+function TicketHome({ users }: Props) {
   const { theme, setTheme } = useTheme()
 
   const TITLE = 'Supabase LaunchWeek 7'
@@ -91,3 +92,5 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     },
   }
 }
+
+export default withStaticData(TicketHome)

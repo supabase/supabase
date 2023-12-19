@@ -4,6 +4,7 @@ import LayoutComparison from '~/layouts/comparison'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
+import withStaticData from '~/components/withStaticData'
 
 // import all components used in blog articles here
 // for instance, if you use a button, you must add `Button` in the components object below.
@@ -59,7 +60,7 @@ export async function getStaticProps({ params }: any) {
   }
 }
 
-function BlogPostPage(props: any) {
+function AlternativesShowPage(props: any) {
   // @ts-ignore
   // const content = hydrate(props.blog.content, { components })
   // const content = props.blog.content
@@ -79,4 +80,4 @@ function BlogPostPage(props: any) {
   return <LayoutComparison components={mdxComponents()} props={props} />
 }
 
-export default BlogPostPage
+export default withStaticData(AlternativesShowPage)

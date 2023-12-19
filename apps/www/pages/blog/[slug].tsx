@@ -18,7 +18,8 @@ import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
-import LWXSummary from '../../components/LaunchWeek/X/LWXSummary'
+import LWXSummary from '~/components/LaunchWeek/X/LWXSummary'
+import withStaticData from '~/components/withStaticData'
 
 type Post = ReturnType<typeof getSortedPosts>[number]
 
@@ -402,4 +403,4 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
   )
 }
 
-export default BlogPostPage
+export default withStaticData(BlogPostPage)

@@ -1,16 +1,19 @@
+import { useState } from 'react'
 import { Badge, IconCode, IconFastForward, IconGlobe, IconRefreshCcw, ThemeImage, cn } from 'ui'
 import UseCaseExamples from 'data/products/functions/usecase-examples'
-import Solutions from 'data/Solutions'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
 import 'swiper/swiper.min.css'
+
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import ScrollableCodeBlock from '~/components/ScrollableCodeBlock'
 import FunctionsUsecases from '~/components/Sections/FunctionsUsecases'
 import ProductHeader from '~/components/Sections/ProductHeader'
+import withStaticData from '~/components/withStaticData'
+
+import Solutions from 'data/Solutions'
 
 const featureBlocks = [
   {
@@ -284,4 +287,4 @@ serve(async (req) => {
   )
 }
 
-export default Database
+export default withStaticData(Database)

@@ -13,6 +13,7 @@ import { paginateGraphql } from '@octokit/plugin-paginate-graphql'
 import { GetServerSideProps } from 'next'
 import Link from 'next/link'
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/outline'
+import withStaticData from '~/components/withStaticData'
 
 export const ExtendedOctokit = Octokit.plugin(paginateGraphql)
 export type ExtendedOctokit = InstanceType<typeof ExtendedOctokit>
@@ -299,4 +300,4 @@ function ChangelogPage({ changelog, pageInfo, restPage }: ChangelogPageProps) {
   )
 }
 
-export default ChangelogPage
+export default withStaticData(ChangelogPage)

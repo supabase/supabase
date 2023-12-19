@@ -14,6 +14,7 @@ import PostTypes from '~/types/post'
 import DefaultLayout from '~/components/Layouts/Default'
 import BlogListItem from '~/components/Blog/BlogListItem'
 import BlogFilters from '~/components/Blog/BlogFilters'
+import withStaticData from '~/components/withStaticData'
 
 export async function getStaticProps() {
   const allPostsData = getSortedPosts({ directory: '_blog', runner: '** BLOG PAGE **' })
@@ -223,4 +224,4 @@ function FeaturedThumb(blog: PostTypes) {
   )
 }
 
-export default Blog
+export default withStaticData(Blog)

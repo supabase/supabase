@@ -5,12 +5,14 @@ import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Button, IconChevronRight, IconExternalLink, IconChevronLeft } from 'ui'
-import CTABanner from '~/components/CTABanner'
-import DefaultLayout from '~/components/Layouts/Default'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
 import { SITE_ORIGIN } from '~/lib/constants'
+
+import CTABanner from '~/components/CTABanner'
+import DefaultLayout from '~/components/Layouts/Default'
+import withStaticData from '~/components/withStaticData'
 
 // table of contents extractor
 const toc = require('markdown-toc')
@@ -211,4 +213,4 @@ function CaseStudyPage(props: any) {
   )
 }
 
-export default CaseStudyPage
+export default withStaticData(CaseStudyPage)

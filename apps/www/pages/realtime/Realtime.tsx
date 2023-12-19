@@ -1,18 +1,21 @@
 import { Button, IconGrid, IconLayers, IconMenu, ThemeImage } from 'ui'
-import ApiExamples from 'data/products/realtime/api-examples'
-import AppExamples from 'data/products/realtime/app-examples'
-import Solutions from 'data/Solutions'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+
+import 'swiper/swiper.min.css'
+import RealtimeStyles from './Realtime.module.css'
+
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import APISection from '~/components/Sections/APISection'
 import ProductHeader from '~/components/Sections/ProductHeader'
-import RealtimeStyles from './Realtime.module.css'
+import withStaticData from '~/components/withStaticData'
 
-import 'swiper/swiper.min.css'
+import ApiExamples from 'data/products/realtime/api-examples'
+import AppExamples from 'data/products/realtime/app-examples'
+import Solutions from 'data/Solutions'
 
 const Cursor = ({ className = '', color = 'none' }) => {
   return (
@@ -236,4 +239,4 @@ function RealtimePage() {
   )
 }
 
-export default RealtimePage
+export default withStaticData(RealtimePage)

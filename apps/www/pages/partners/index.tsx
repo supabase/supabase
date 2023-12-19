@@ -11,6 +11,7 @@ import DefaultLayout from '~/components/Layouts/Default'
 import ProductHeaderCentered from '~/components/Sections/ProductHeaderCentered'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import Panel from '~/components/Panel'
+import withStaticData from '~/components/withStaticData'
 
 import pageData from '~/data/partners'
 
@@ -246,4 +247,4 @@ const Partners = () => {
   )
 }
 
-export default Partners
+export default withStaticData(Partners)

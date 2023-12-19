@@ -15,6 +15,7 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import LWXBackground from '~/components/LaunchWeek/X/LWXBackground'
+import withStaticData from '~/components/withStaticData'
 
 const LWXTicketContainer = dynamic(() => import('~/components/LaunchWeek/X/Ticket/TicketContainer'))
 const LaunchWeekPrizeSection = dynamic(
@@ -28,7 +29,7 @@ interface Props {
   ogImageUrl: string
 }
 
-export default function UsernamePage({ user, ogImageUrl }: Props) {
+function UsernamePage({ user, ogImageUrl }: Props) {
   const { username, ticketNumber, name } = user
 
   const TITLE = `${name ? name + '’s' : 'Get your'} #SupaLaunchWeek Ticket`
@@ -170,3 +171,5 @@ export const getStaticPaths: GetStaticPaths = async () => {
     fallback: 'blocking',
   })
 }
+
+export default withStaticData(UsernamePage)

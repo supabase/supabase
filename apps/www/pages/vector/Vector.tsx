@@ -6,6 +6,7 @@ import DefaultLayout from '~/components/Layouts/Default'
 import { useBreakpoint } from 'common'
 import { PRODUCT_SHORTNAMES } from '~/lib/constants'
 import vectorPageData from '~/data/products/vector/pageData'
+import withStaticData from '~/components/withStaticData'
 
 import 'swiper/swiper.min.css'
 
@@ -66,4 +67,4 @@ function VectorPage() {
   )
 }
 
-export default VectorPage
+export default withStaticData(VectorPage)

@@ -1,18 +1,14 @@
+import { useState } from 'react'
 import { Badge, Button, IconArrowUpRight, IconX, Tabs, ThemeImage } from 'ui'
-// data
-import ApiExamplesData from 'data/products/database/api-examples'
-import ExtensionsExamplesData from 'data/products/database/extensions-examples'
-import SqlViewCarouselData from 'data/products/database/sql-view-carousel.json'
-import TableViewCarouselData from 'data/products/database/table-view-carousel.json'
-import Solutions from 'data/Solutions'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
+import { TweetCard } from 'ui'
 // Import Swiper styles
 import 'swiper/swiper.min.css'
+
 import ImageCarousel from '~/components/Carousels/ImageCarousel'
 import SplitCodeBlockCarousel from '~/components/Carousels/SplitCodeBlockCarousel'
 import FeatureColumn from '~/components/FeatureColumn'
@@ -23,7 +19,14 @@ import ProductIcon from '~/components/ProductIcon'
 import APISection from '~/components/Sections/APISection'
 import GithubExamples from '~/components/Sections/GithubExamples'
 import ProductHeader from '~/components/Sections/ProductHeader'
-import { TweetCard } from 'ui'
+import withStaticData from '~/components/withStaticData'
+
+// data
+import ApiExamplesData from 'data/products/database/api-examples'
+import ExtensionsExamplesData from 'data/products/database/extensions-examples'
+import SqlViewCarouselData from 'data/products/database/sql-view-carousel.json'
+import TableViewCarouselData from 'data/products/database/table-view-carousel.json'
+import Solutions from 'data/Solutions'
 
 // install Swiper's Controller component
 // SwiperCore.use([Controller])
@@ -304,4 +307,4 @@ function Database() {
   )
 }
 
-export default Database
+export default withStaticData(Database)

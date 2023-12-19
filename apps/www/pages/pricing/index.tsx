@@ -7,7 +7,7 @@ import { NextSeo } from 'next-seo'
 import { useTheme } from 'next-themes'
 import { Accordion, Button, IconCheck, Select } from 'ui'
 
-import AnnouncementBadge from '~/components/Announcement/Badge'
+import withStaticData from '~/components/withStaticData'
 import CTABanner from '~/components/CTABanner'
 import ComputePricingModal from '~/components/Pricing/ComputePricingModal'
 import DefaultLayout from '~/components/Layouts/Default'
@@ -18,7 +18,7 @@ import pricingFaq from '~/data/PricingFAQ.json'
 import { pricing } from 'shared-data/pricing'
 import { plans } from 'shared-data/plans'
 
-export default function IndexPage() {
+function Pricing() {
   const router = useRouter()
   const { basePath, asPath } = useRouter()
   const { resolvedTheme } = useTheme()
@@ -933,3 +933,5 @@ export default function IndexPage() {
     </DefaultLayout>
   )
 }
+
+export default withStaticData(Pricing)

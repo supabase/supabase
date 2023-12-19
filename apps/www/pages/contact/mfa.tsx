@@ -1,7 +1,9 @@
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
+
 import DefaultLayout from '~/components/Layouts/Default'
 import MfaContactForm from '~/components/MfaContactForm'
+import withStaticData from '~/components/withStaticData'
 
 const meta_title = 'MFA early access | Supabase'
 const meta_description = ''
@@ -35,4 +37,4 @@ const EnterpriseContactPage = () => {
   )
 }
 
-export default EnterpriseContactPage
+export default withStaticData(EnterpriseContactPage)

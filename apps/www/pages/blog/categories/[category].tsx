@@ -3,6 +3,7 @@ import { getSortedPosts, getAllCategories } from '~/lib/posts'
 import Link from 'next/link'
 import { startCase } from 'lodash'
 
+import withStaticData from '~/components/withStaticData'
 import DefaultLayout from '~/components/Layouts/Default'
 import BlogListItem from '~/components/Blog/BlogListItem'
 import PostTypes from '~/types/post'
@@ -65,4 +66,4 @@ function CategoriesIndex(props: Props) {
   )
 }
 
-export default CategoriesIndex
+export default withStaticData(CategoriesIndex)

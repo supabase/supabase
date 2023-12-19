@@ -7,6 +7,7 @@ import supabase from '~/lib/supabaseMisc'
 import CTABanner from 'components/CTABanner/index'
 import Layout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
+import withStaticData from '~/components/withStaticData'
 
 const DPA = () => {
   const [email, setEmail] = useState<string>('')
@@ -111,4 +112,4 @@ const DPA = () => {
     </>
   )
 }
-export default DPA
+export default withStaticData(DPA)
