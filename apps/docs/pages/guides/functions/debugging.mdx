@@ -102,16 +102,16 @@ deno info --import-map=/path/to/import_map.json /path/to/function/index.ts
 ### Dealing with errors
 
 You should always check whether the Edge Function call was successful by looking at the [error codes](https://supabase.com/docs/reference/javascript/functions-invoke?example=error-handling).
-You should expect up to 2% errors when calling an Edge Function. Therefore, you should verify the call and act on it accordingly which might be a retry or even an attempt to call it in [another region](https://supabase.com/docs/guides/functions/regional-invocation).  
+You should expect up to 2% errors when calling an Edge Function. Therefore, you should verify the call and act on it accordingly which might be a retry or even an attempt to call it in [another region](https://supabase.com/docs/guides/functions/regional-invocation).
 
 ```js
-import { FunctionsHttpError, FunctionsRelayError, FunctionsFetchError } from "@supabase/supabase-js";
+import { FunctionsHttpError, FunctionsRelayError, FunctionsFetchError } from '@supabase/supabase-js'
 
 const { data, error } = await supabase.functions.invoke('hello', {
   headers: {
-    "my-custom-header": 'my-custom-header-value'
+    'my-custom-header': 'my-custom-header-value',
   },
-  body: { foo: 'bar' }
+  body: { foo: 'bar' },
 })
 
 if (error instanceof FunctionsHttpError) {
