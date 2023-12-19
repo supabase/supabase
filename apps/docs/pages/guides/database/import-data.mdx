@@ -2,13 +2,12 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   id: 'database',
-  title: 'Importing into Supabase',
-  description: 'Importing large datasets into Supabase.',
-  subtitle: 'Importing large datasets into Supabase.',
-  sidebar_label: 'FUNDAMENTALS',
+  title: 'Import data into Supabase',
 }
 
-Importing large datasets requires careful planning and execution to ensure the process is efficient, reliable, and doesn't disrupt your application. In this guide, we cover various best practices and techniques for importing datasets, and highlight common pitfalls to avoid.
+You can import data into Supabase in multiple ways. The best method depends on your data size and app requirements.
+
+If you're working with small datasets in development, you can experiment quickly using CSV import in the Supabase dashboard. If you're working with a large dataset in production, you should plan your data import to minimize app latency and ensure data integrity.
 
 ## How to import data into Supabase
 
@@ -18,6 +17,12 @@ You have multiple options for importing your data into Supabase:
 2. [Bulk import using `pgloader`](#option-2-bulk-import-using-pgloader)
 3. [Using the Postgres `COPY` command](#option-3-using-postgres-copy-command)
 4. [Using the Supabase API](#option-4-using-the-supabase-api)
+
+<Admonition type="tip">
+
+If you're importing a large dataset or importing data into production, plan ahead and [prepare your database](#preparing-to-import-data).
+
+</Admonition>
 
 ### Option 1: CSV Import via Supabase Dashboard
 
@@ -80,21 +85,25 @@ Read more about [Rate Limiting, Resource Allocation, & Abuse Prevention.](/docs/
 
 ## Preparing to import data
 
-Before importing data, you should have a plan for timing, disk space, and more. Prepare your database in advance.
+Large data imports can affect your database performance. Failed imports can also cause data corruption. Importing data is a safe and common operation, but you should plan ahead if you're importing a lot of data, or if you're working in a production environment.
 
-### 1. Statement Timeouts
+### 1. Back up your data
+
+Backups help you restore your data if something goes wrong. Databases on Pro and Enterprise plans are automatically backed up on schedule, but you can also take your own backup. See [Database Backups](/docs/guides/platform/backups) for more information.
+
+### 2. Increase statement timeouts
 
 By default, Supabase enforces query statement timeouts to ensure fair resource allocation and prevent long-running queries from affecting the overall system. When importing large datasets, you may encounter timeouts. To address this:
 
 - **Increase the Statement Timeout**: You can adjust the statement timeout for your session or connection to accommodate longer-running queries. Be cautious when doing this, as excessively long queries can negatively impact system performance. Read more about [Statement Timeouts](/docs/guides/database/postgres/configuration).
 
-### 2. Disk Size Considerations
+### 3. Estimate your required disk size
 
 Large datasets consume disk space. Ensure your Supabase project has sufficient disk capacity to accommodate the imported data. If you know how big your database is going to be, you can manually increase the size in your [projects database settings](/dashboard/project/_/settings/database).
 
 Read more about [disk management](/docs/guides/platform/database-size#disk-management).
 
-### 3. Disabling Triggers
+### 4. Disable triggers
 
 When importing large datasets, it's often beneficial to disable triggers temporarily. Triggers can significantly slow down the import process, especially if they involve complex logic or referential integrity checks. After the import, you can re-enable the triggers.
 
@@ -108,7 +117,7 @@ ALTER TABLE table_name DISABLE TRIGGER ALL;
 ALTER TABLE table_name ENABLE TRIGGER ALL;
 ```
 
-### 4. Building Indices at the End
+### 5. Rebuild indices after data import is complete
 
 Indexing is crucial for query performance, but building indices while importing a large dataset can be time-consuming. Consider building or rebuilding indices after the data import is complete. This approach can significantly speed up the import process and reduce the overall time required.
 
@@ -120,15 +129,6 @@ create index index_name on table_name (column_name);
 ```
 
 Read more about [Managing Indexes in PostgreSQL](/docs/guides/database/postgres/indexes).
-
-## Common Pitfalls to Avoid
-
-- **Not Planning Ahead**: Importing large datasets should be well-planned. Ensure you have enough disk space, account for statement timeouts, and know which tools to use.
-- **Not Monitoring Progress**: Keep an eye on the import progress, especially when using custom scripts or tools. Monitor for any errors or issues.
-- **Not Backing Up Data**: Before any major import, create a backup of your existing data to ensure you can recover if something goes wrong. Read more about [Database Backups](/docs/guides/platform/backups#frequency-of-backups).
-- **Neglecting Indexing**: Don't forget to build necessary indexes after importing data for optimal query performance.
-
-By following these best practices and avoiding common pitfalls, you can successfully import large datasets into your Supabase project while maintaining data integrity and system performance.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
