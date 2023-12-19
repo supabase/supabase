@@ -119,7 +119,7 @@ const CommandMenuProvider = ({
       }}
     >
       {children}
-      <CommandMenu projectRef={projectRef} />
+      <CommandMenu />
     </CommandMenuContext.Provider>
   )
 }
