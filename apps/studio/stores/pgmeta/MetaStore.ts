@@ -17,7 +17,6 @@ import { ResponseError } from 'types'
 
 import { IPostgresMetaInterface } from '../common/PostgresMetaInterface'
 import { IRootStore } from '../RootStore'
-import OpenApiStore, { IOpenApiStore } from './OpenApiStore'
 import TableStore, { ITableStore } from './TableStore'
 
 import {
@@ -44,7 +43,6 @@ const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
 
 export interface IMetaStore {
-  openApi: IOpenApiStore
   tables: ITableStore
   columns: IPostgresMetaInterface<PostgresColumn>
   views: IViewStore
@@ -117,7 +115,6 @@ export interface IMetaStore {
 }
 export default class MetaStore implements IMetaStore {
   rootStore: IRootStore
-  openApi: OpenApiStore
   tables: TableStore
   columns: PostgresMetaInterface<PostgresColumn>
   views: ViewStore
@@ -139,10 +136,6 @@ export default class MetaStore implements IMetaStore {
       this.headers['x-connection-encrypted'] = connectionString
     }
 
-    this.openApi = new OpenApiStore(
-      this.rootStore,
-      `${API_URL}/projects/${this.projectRef}/api/rest`
-    )
     this.tables = new TableStore(this.rootStore, `${this.baseUrl}/tables`, this.headers)
     this.columns = new PostgresMetaInterface(
       this.rootStore,
@@ -833,9 +826,6 @@ export default class MetaStore implements IMetaStore {
       this.connectionString = connectionString
       this.headers['x-connection-encrypted'] = connectionString
     }
-
-    this.openApi.setUrl(`${API_URL}/projects/${this.projectRef}/api/rest`)
-    this.openApi.setHeaders(this.headers)
 
     this.tables.setUrl(`${this.baseUrl}/tables`)
     this.tables.setHeaders(this.headers)
