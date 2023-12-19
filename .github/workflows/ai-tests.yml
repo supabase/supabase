@@ -18,8 +18,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  check:
+  test:
     runs-on: ubuntu-latest
+
+    env:
+      OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
 
     strategy:
       matrix:
