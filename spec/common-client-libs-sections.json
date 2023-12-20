@@ -403,6 +403,13 @@
         "type": "function"
       },
       {
+        "id": "on-auth-state-change",
+        "title": "Listen to auth events",
+        "slug": "auth-onauthstatechange",
+        "product": "auth",
+        "type": "function"
+      },
+      {
         "id": "sign-in",
         "title": "Sign in a user",
         "slug": "auth-signin",
@@ -595,13 +602,6 @@
         "id": "set-session",
         "title": "Set the session data",
         "slug": "auth-setsession",
-        "product": "auth",
-        "type": "function"
-      },
-      {
-        "id": "on-auth-state-change",
-        "title": "Listen to auth events",
-        "slug": "auth-onauthstatechange",
         "product": "auth",
         "type": "function"
       },
