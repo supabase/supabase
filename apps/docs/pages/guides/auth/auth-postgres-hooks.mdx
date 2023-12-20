@@ -3,8 +3,8 @@ import {CodeBlock, Admonition, Accordion} from 'ui'
 import Image from 'next/image'
 
 export const meta = {
-  id: 'auth-postgres-hooks',
-  title: 'Auth Hooks (Postgres)',
+  id: 'auth-hooks',
+  title: 'Auth Hooks',
   description: 'Use Supabase Postgres Functions to customize your authentication flow',
 }
 
@@ -21,15 +21,15 @@ Hooks help you:
 - Support legacy systems by integrating with identity credentials from external authentication systems
 - Add additional custom claims to your JWT
 
-You can use hooks at specific points along an Auth flow to perform custom behavior via Postgres Functions. These are known as **extensibility points**. The following extensibility points are available:
+You can use hooks at specific points along an Auth flow to perform custom behavior via Postgres Functions. The following hooks are available:
 
-| Extensibility Point              | Available on Plan       |
+| Hook                             | Available on Plan       |
 |----------------------------------|-------------------------|
-| Custom Access Token              | Free, Pro                |
+| Custom Access Token              | Free, Pro               |
 | MFA Verification Attempt         | Teams and Enterprise    |
 | Password Verification Attempt    | Teams and Enterprise    |
 
-You can link a hook to an extensiblity point to signal to Supabase Auth that it should make use of the hook.
+You can connect a hook to Supabase Auth to signal to Supabase Auth that it should make use of the hook.
 
 Below is a flow chart illustrating how Supabase Auth uses an Auth Hook:
 
@@ -37,7 +37,7 @@ Below is a flow chart illustrating how Supabase Auth uses an Auth Hook:
   alt="Auth Hooks Flowchart"
   width={'1000'}
   height={'400'}
-  src="/docs/img/guides/auth-postgres-hooks/hooks-flowchart.png"/>
+  src="/docs/img/guides/auth-hooks/hooks-flowchart.png"/>
 
 
 ## Create a Hook
@@ -132,7 +132,7 @@ Ensure that your hooks complete within **2 seconds** to avoid any errors.
 In the dashboard, navigate to [`Authentication > Hooks (Beta)`](/dashboard/project/_/auth/hooks) and select the appropriate PostgreSQL function from the dropdown menu.
 
 
-## MFA Verification Attempt Extensibility Point
+## Hook: MFA Verification Attempt
 
 You can add additional checks to the [Supabase MFA implementation](/docs/guides/auth/auth-mfa) with hooks. For example, you can:
 
@@ -270,7 +270,7 @@ revoke all
 </TabPanel>
 </Tabs>
 
-## Password Verification Attempt Extensibility Point
+## Hook: Password Verification Attempt
 
 Your company wishes to increase security beyond the requirements of the default password implementation in order to fulfill security or compliance requirements. You plan to track the status of a password sign-in attempt and take action via an email or a restriction on logins where necessary.
 
@@ -303,7 +303,7 @@ Example output:
 ```json
 {
    "decision": "reject",
-   "message" : "You have exceeded maximum number of password Sign-In attempts.",
+   "message" : "You have exceeded maximum number of password sign-in attempts.",
    "should_logout_user": "false"
 }
 ```
@@ -513,7 +513,7 @@ revoke all
 </TabPanel>
 </Tabs>
 
-## Custom Access Token Extensibility Point
+## Hook: Custom Access Token
 
 The custom access token hook runs before a token is issued and allows you to add additional claims based on the authentication method used.
 
