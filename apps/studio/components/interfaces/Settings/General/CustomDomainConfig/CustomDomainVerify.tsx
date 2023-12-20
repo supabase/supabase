@@ -83,8 +83,8 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
                 {isNotVerifiedYet ? (
                   <div className="mt-2">
                     <p>
-                      Do check again in a bit as it may take up to 24 hours for changes in DNS
-                      records to propagate.
+                      Please check again soon. Note that it may take up to 24 hours for changes in
+                      DNS records to propagate.
                     </p>
                     <p>
                       You may also visit{' '}

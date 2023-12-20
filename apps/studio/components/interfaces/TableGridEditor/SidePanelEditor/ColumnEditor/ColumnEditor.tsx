@@ -17,7 +17,7 @@ import {
   Toggle,
 } from 'ui'
 
-import { Dictionary } from 'components/grid'
+import { Dictionary } from 'types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'

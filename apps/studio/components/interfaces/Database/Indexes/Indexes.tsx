@@ -12,7 +12,6 @@ import {
   IconSearch,
   IconTrash,
   Input,
-  Listbox,
   Modal,
   SidePanel,
 } from 'ui'
@@ -22,16 +21,16 @@ import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import CodeEditor from 'components/ui/CodeEditor'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
+import SchemaSelector from 'components/ui/SchemaSelector'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { DatabaseIndex, useIndexesQuery } from 'data/database/indexes-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useStore } from 'hooks'
-import CreateIndexSidePanel from './CreateIndexSidePanel'
-import SchemaSelector from 'components/ui/SchemaSelector'
-import { partition } from 'lodash'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { partition, sortBy } from 'lodash'
 import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
+import CreateIndexSidePanel from './CreateIndexSidePanel'
 
 const Indexes = () => {
   const { ui } = useStore()
@@ -85,9 +84,7 @@ const Indexes = () => {
   const schema = schemas?.find((schema) => schema.name === selectedSchema)
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
 
-  const sortedIndexes = (allIndexes?.result ?? []).sort(
-    (a, b) => a.table.localeCompare(b.table) || a.name.localeCompare(b.name)
-  )
+  const sortedIndexes = sortBy(allIndexes?.result ?? [], (index) => index.name.toLocaleLowerCase())
   const indexes =
     search.length > 0
       ? sortedIndexes.filter((index) => index.name.includes(search) || index.table.includes(search))

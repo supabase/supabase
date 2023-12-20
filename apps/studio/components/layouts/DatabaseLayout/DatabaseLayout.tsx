@@ -7,13 +7,14 @@ import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-ex
 import { useSelectedProject, useStore, withAuth } from 'hooks'
 import ProjectLayout from '../'
 import { generateDatabaseMenu } from './DatabaseMenu.utils'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 
 export interface DatabaseLayoutProps {
   title?: string
 }
 
 const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) => {
-  const { ui, meta, vault } = useStore()
+  const { ui, vault } = useStore()
   const project = useSelectedProject()
 
   const router = useRouter()
@@ -23,15 +24,12 @@ const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) =>
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+  const { data: addons } = useProjectAddonsQuery({ projectRef: project?.ref })
+
   const vaultExtension = (data ?? []).find((ext) => ext.name === 'supabase_vault')
   const isVaultEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null
   const pgNetExtensionExists = (data ?? []).find((ext) => ext.name === 'pg_net') !== undefined
-
-  useEffect(() => {
-    if (ui.selectedProjectRef) {
-      meta.roles.load()
-    }
-  }, [ui.selectedProjectRef])
+  const pitrEnabled = addons?.selected_addons.find((addon) => addon.type === 'pitr') !== undefined
 
   useEffect(() => {
     if (isVaultEnabled) {
@@ -43,7 +41,10 @@ const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) =>
     <ProjectLayout
       product="Database"
       productMenu={
-        <ProductMenu page={page} menu={generateDatabaseMenu(project, { pgNetExtensionExists })} />
+        <ProductMenu
+          page={page}
+          menu={generateDatabaseMenu(project, { pgNetExtensionExists, pitrEnabled })}
+        />
       }
       isBlocking={false}
     >
