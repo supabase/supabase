@@ -6,7 +6,6 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { Button, IconChevronDown, IconHelpCircle, IconTerminal, SidePanel } from 'ui'
 
-import { Dictionary } from 'components/grid'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import InformationBox from 'components/ui/InformationBox'
 import SqlEditor from 'components/ui/SqlEditor'
