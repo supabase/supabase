@@ -4,17 +4,16 @@ import { Button, IconX } from 'ui'
 
 import { useNotificationsDismissMutation } from 'data/notifications/notifications-dismiss-mutation'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { Project } from 'data/projects/project-detail-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
+import { ProjectInfo, useProjectsQuery } from 'data/projects/projects-query'
 import { useStore } from 'hooks'
 import NotificationActions from './NotificationActions'
 import { formatNotificationCTAText, formatNotificationText } from './NotificationRows.utils'
 
 export interface NotificationRowProps {
   notification: Notification
-  onSelectRestartProject: (project: any, notification: Notification) => void
-  onSelectApplyMigration: (project: any, notification: Notification) => void
-  onSelectRollbackMigration: (project: any, notification: Notification) => void
+  onSelectRestartProject: (project: ProjectInfo, notification: Notification) => void
+  onSelectApplyMigration: (project: ProjectInfo, notification: Notification) => void
+  onSelectRollbackMigration: (project: ProjectInfo, notification: Notification) => void
 }
 
 const NotificationRow = ({

@@ -14,9 +14,9 @@ import { Button, IconArrowRight, IconBell, IconInbox, Popover } from 'ui'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useNotificationsQuery } from 'data/notifications/notifications-query'
 import { useNotificationsUpdateMutation } from 'data/notifications/notifications-update-mutation'
-import { Project, getProjectDetail } from 'data/projects/project-detail-query'
+import { getProjectDetail } from 'data/projects/project-detail-query'
 import { useProjectRestartServicesMutation } from 'data/projects/project-restart-services-mutation'
-import { setProjectPostgrestStatus } from 'data/projects/projects-query'
+import { ProjectInfo, setProjectPostgrestStatus } from 'data/projects/projects-query'
 import { useStore } from 'hooks'
 import { delete_, post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
@@ -35,9 +35,9 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
     onError: () => console.error('Failed to update notifications'),
   })
 
-  const [projectToRestart, setProjectToRestart] = useState<Partial<Project>>()
-  const [projectToApplyMigration, setProjectToApplyMigration] = useState<Partial<Project>>()
-  const [projectToRollbackMigration, setProjectToRollbackMigration] = useState<Partial<Project>>()
+  const [projectToRestart, setProjectToRestart] = useState<ProjectInfo>()
+  const [projectToApplyMigration, setProjectToApplyMigration] = useState<ProjectInfo>()
+  const [projectToRollbackMigration, setProjectToRollbackMigration] = useState<ProjectInfo>()
   const [targetNotification, setTargetNotification] = useState<Notification>()
 
   const { mutate: restartProjectServices } = useProjectRestartServicesMutation({
