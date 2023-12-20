@@ -28,7 +28,7 @@ import InstanceConfiguration from './InfrastructureConfiguration/InstanceConfigu
 
 const InfrastructureInfo = () => {
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { project, isLoading } = useProjectContext()
 
   const authEnabled = useIsFeatureEnabled('project_auth:all')
 
@@ -84,8 +84,14 @@ const InfrastructureInfo = () => {
               <p className="text-foreground-light text-sm">Information on your server provider</p>
             </ScaffoldSectionDetail>
             <ScaffoldSectionContent>
-              <Input readOnly disabled value={project?.cloud_provider} label="Cloud provider" />
-              <Input readOnly disabled value={project?.region} label="Region" />
+              {isLoading ? (
+                <GenericSkeletonLoader />
+              ) : (
+                <>
+                  <Input readOnly disabled value={project?.cloud_provider} label="Cloud provider" />
+                  <Input readOnly disabled value={project?.region} label="Region" />
+                </>
+              )}
             </ScaffoldSectionContent>
           </ScaffoldSection>
         )}

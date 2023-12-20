@@ -27,12 +27,13 @@ export type ProjectsError = ResponseError
 export const useProjectsQuery = <TData = ProjectsData>({
   enabled = true,
   ...options
-}: UseQueryOptions<ProjectsData, ProjectsError, TData> = {}) =>
-  useQuery<ProjectsData, ProjectsError, TData>(
+}: UseQueryOptions<ProjectsData, ProjectsError, TData> = {}) => {
+  return useQuery<ProjectsData, ProjectsError, TData>(
     projectKeys.list(),
     ({ signal }) => getProjects(signal),
-    { enabled: enabled, ...options }
+    { enabled, ...options }
   )
+}
 
 export function prefetchProjects(client: QueryClient) {
   return client.prefetchQuery(projectKeys.list(), ({ signal }) => getProjects(signal))
