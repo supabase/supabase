@@ -20,7 +20,7 @@ const CustomerStories = () => {
   })
 
   return (
-    <SectionContainer>
+    <SectionContainer id="customers">
       <div className="mb-12">
         <SectionHeader
           title={'Infrastructure'}
