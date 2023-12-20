@@ -8,7 +8,8 @@ import customerStories from '~/data/CustomerStories'
 import Panel from '../Panel'
 
 const CustomerStories = () => {
-  const selection = ['Pebblely', 'Chatbase', 'Mendable.ai']
+  // const selection = ['Pebblely', 'Chatbase', 'Mendable.ai']
+  const selection = ['Pebblely', 'Good Tape', 'Mendable.ai']
   const customers = customerStories.filter((story: any) => selection.includes(story.organization))
 
   const caseStudyThumbs = customers.map((customer: any, idx: number) => {

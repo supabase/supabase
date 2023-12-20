@@ -20,6 +20,26 @@ export const data = [
   },
   {
     type: 'Customer Story',
+    title:
+      'Good Tape migrates to Supabase managed Postgres and Authentication and achieves database efficiency and a 60% cost reduction',
+    description:
+      "Explore how Good Tape achieved remarkable database efficiency and reduced costs by 60% through their successful migration to Supabase's managed services.",
+    imgUrl: 'images/customers/logos/goodtape.png',
+    logo: '/images/customers/logos/goodtape.png',
+    logo_inverse: '/images/customers/logos/light/goodtape.png',
+    organization: 'Good Tape',
+    url: '/customers/good-tape',
+    path: '/customers/good-tape',
+    postMeta: {
+      name: 'Paul Copplestone',
+      avatarUrl: 'https://avatars0.githubusercontent.com/u/10214025?v=4',
+      publishDate: 'Oct 31, 2023',
+      readLength: 4,
+    },
+    ctaText: 'View story',
+  },
+  {
+    type: 'Customer Story',
     title: 'How Next Door Lending leveraged Supabase to become a top 10 mortgage broker',
     description: '',
     imgUrl: 'images/customers/logos/next-door-lending.png',
@@ -114,9 +134,9 @@ export const data = [
   },
   {
     type: 'Customer Story',
-    title: 'Mendable.ai switches from Pinecone to Supabase for PostgreSQL vector embeddings.',
+    title: 'Mendable.ai switches from Pinecone to Supabase for PostgreSQL vector embeddings',
     description:
-      'How Mendable.ai boosts efficiency and accuracy of chat powered search for documentation using Supabase with pg_vector.',
+      'How Mendable.ai boosts efficiency and accuracy of chat powered search for documentation using Supabase with pg_vector',
     imgUrl: 'images/customers/logos/mendableai.png',
     logo: '/images/customers/logos/mendableai.png',
     logo_inverse: '/images/customers/logos/light/mendableai.png',
