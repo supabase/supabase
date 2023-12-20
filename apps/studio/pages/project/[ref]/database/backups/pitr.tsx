@@ -1,7 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { Tabs } from 'ui'
 
 import { PITRNotice, PITRSelection } from 'components/interfaces/Database/Backups/PITR'
 import { DatabaseLayout } from 'components/layouts'
@@ -12,9 +10,10 @@ import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useBackupsQuery } from 'data/database/backups-query'
-import { useCheckPermissions, useSelectedOrganization } from 'hooks'
-import { NextPageWithLayout } from 'types'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useCheckPermissions, usePermissionsLoaded, useSelectedOrganization } from 'hooks'
+import { NextPageWithLayout } from 'types'
+import { Tabs } from 'ui'
 
 const DatabasePhysicalBackups: NextPageWithLayout = () => {
   const router = useRouter()
@@ -54,7 +53,7 @@ DatabasePhysicalBackups.getLayout = (page) => (
   <DatabaseLayout title="Database">{page}</DatabaseLayout>
 )
 
-const PITR = observer(() => {
+const PITR = () => {
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
   const {
@@ -74,8 +73,11 @@ const PITR = observer(() => {
   const isEnabled = backups?.pitr_enabled
 
   const canReadPhysicalBackups = useCheckPermissions(PermissionAction.READ, 'physical_backups')
+  const isPermissionsLoaded = usePermissionsLoaded()
 
-  if (!canReadPhysicalBackups) return <NoPermission resourceText="view PITR backups" />
+  if (isPermissionsLoaded && !canReadPhysicalBackups) {
+    return <NoPermission resourceText="view PITR backups" />
+  }
 
   return (
     <>
@@ -105,6 +107,6 @@ const PITR = observer(() => {
       )}
     </>
   )
-})
+}
 
 export default DatabasePhysicalBackups

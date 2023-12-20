@@ -18,24 +18,9 @@ The Supabase CLI provides tools to develop your project locally, deploy to the S
   scrollable
   size="small"
   type="underlined"
-  defaultActiveId="npm"
+  defaultActiveId="macos"
   queryGroup="platform"
 >
-<TabPanel id="npm" label="npm">
-
-Install the CLI as dev dependency via [npm](https://www.npmjs.com/package/supabase):
-
-```sh
-npm install supabase --save-dev
-```
-
-Run the CLI by prefixing each command with `npx` (only applicable when installing through `npm`):
-
-```sh
-npx supabase <command>
-```
-
-</TabPanel>
 <TabPanel id="macos" label="macOS">
 
 Install the CLI with [Homebrew](https://brew.sh):
@@ -76,6 +61,27 @@ and run one of the following:
 - `sudo rpm -i <...>.rpm`
 
 </TabPanel>
+<TabPanel id="npx" label="npm / Bun">
+
+Run the CLI by prefixing each command with `npx`:
+
+```sh
+npx supabase <command>
+```
+
+Or with `bunx`:
+
+```sh
+bunx supabase <command>
+```
+
+You can also install the CLI as dev dependency via [npm](https://www.npmjs.com/package/supabase):
+
+```sh
+npm install supabase --save-dev
+```
+
+</TabPanel>
 </Tabs>
 
 ## Updating the Supabase CLI
@@ -86,16 +92,9 @@ When a new [version](https://github.com/supabase/cli/releases) is released, you 
   scrollable
   size="small"
   type="underlined"
-  defaultActiveId="npm"
+  defaultActiveId="macos"
   queryGroup="platform"
 >
-<TabPanel id="npm" label="npm">
-
-```sh
-npm update supabase --save-dev
-```
-
-</TabPanel>
 <TabPanel id="macos" label="macOS">
 
 ```sh
@@ -117,6 +116,15 @@ brew upgrade supabase
 ```
 
 </TabPanel>
+<TabPanel id="npm" label="npm / Bun">
+
+If you have installed the CLI as dev dependency via [npm](https://www.npmjs.com/package/supabase), you can update it with:
+
+```sh
+npm update supabase --save-dev
+```
+
+</TabPanel>
 </Tabs>
 
 If you have any Supabase containers running locally, remember to restart them after upgrading to use the new features.
@@ -131,6 +139,12 @@ supabase start
 The Supabase CLI uses Docker containers to manage the local development stack. To get started,
 
 - Install [Docker Desktop](https://docs.docker.com/desktop)
+
+<Admonition type="tip" label="Intel-based Mac">
+
+If you are running Supabase on Intel-based Mac, disable [MacOS Virtualization Framework](https://github.com/supabase/cli/issues/1083#issuecomment-1691431279) to prevent Studio from being stuck in a crashloop.
+
+</Admonition>
 
 Inside the folder where you want to create your project, run:
 

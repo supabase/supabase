@@ -1,3 +1,5 @@
+'use client'
+
 import { useAppStateSnapshot } from '@/lib/state'
 import { Button } from 'ui'
 

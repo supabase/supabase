@@ -1,6 +1,5 @@
 import { useRouter } from 'next/router'
 import * as React from 'react'
-import { ElementRef, useRef } from 'react'
 import { IconHome } from '../Icon/icons/IconHome'
 
 import { IconArrowRight } from './../Icon/icons/IconArrowRight'
@@ -24,6 +23,7 @@ import {
   CommandItem,
   CommandLabel,
   CommandList,
+  FORCE_MOUNT_ITEM,
   copyToClipboard,
 } from './Command.utils'
 import { COMMAND_ROUTES } from './Command.constants'
@@ -38,6 +38,7 @@ import CommandMenuShortcuts from './CommandMenuShortcuts'
 import { BadgeExperimental } from './Command.Badges'
 import { AiIconAnimation } from '@ui/layout/ai-icon-animation'
 import ChildItem from './ChildItem'
+import { useParams } from 'common'
 
 export const CHAT_ROUTES = [
   COMMAND_ROUTES.AI, // this one is temporary
@@ -58,12 +59,9 @@ const iconPicker: { [key: string]: React.ReactNode } = {
   products: <IconColumns />,
 }
 
-interface CommandMenuProps {
-  projectRef?: string
-}
-
-const CommandMenu = ({ projectRef }: CommandMenuProps) => {
+const CommandMenu = () => {
   const router = useRouter()
+  const { ref: projectRef } = useParams()
 
   const {
     isOpen,
@@ -84,6 +82,9 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
     const newValue = value.replace(/"/g, '') // Remove double quotes
     setSearch(newValue)
   }
+
+  const commandListMaxHeight =
+    currentPage === COMMAND_ROUTES.DOCS_SEARCH ? 'min(600px, 50vh)' : '300px'
 
   return (
     <>
@@ -109,12 +110,19 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
             onValueChange={handleInputChange}
           />
         )}
-        <CommandList className={['my-2', showCommandInput && 'max-h-[300px]'].join(' ')}>
+        <CommandList
+          style={{
+            maxHeight: commandListMaxHeight,
+            height: currentPage === COMMAND_ROUTES.DOCS_SEARCH ? commandListMaxHeight : 'auto',
+          }}
+          className="my-2"
+        >
           {!currentPage && (
             <>
               <CommandGroup heading="Documentation">
                 <CommandItem
                   type="command"
+                  value={site === 'docs' ? `${FORCE_MOUNT_ITEM}--docs-search` : undefined}
                   onSelect={() => setPages([...pages, COMMAND_ROUTES.DOCS_SEARCH])}
                 >
                   <IconBook className="" />
@@ -133,7 +141,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                 </CommandItem>
                 <CommandItem
                   type="command"
-                  badge={<BadgeExperimental />}
+                  value={site === 'docs' ? `${FORCE_MOUNT_ITEM}--ai-info` : undefined}
                   onSelect={() => {
                     setPages([...pages, COMMAND_ROUTES.AI])
                   }}
@@ -236,9 +244,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
               {site === 'studio' && (
                 <CommandGroup heading="Navigate">
                   {sharedItems.tools.map((item) => {
-                    const itemUrl = (
-                      projectRef ? item.url.replace('_', projectRef) : item.url
-                    ).split('https://supabase.com/dashboard')[1]
+                    const itemUrl = projectRef ? item.url.replace('_', projectRef) : item.url
 
                     return (
                       <CommandItem

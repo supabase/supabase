@@ -80,8 +80,8 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
                 onOpenChange={() => setDropdownVisible(!dropdownVisible)}
                 modal={false}
               >
-                <DropdownMenuTrigger>
-                  <Button asChild iconRight={<IconChevronDown />} type="default">
+                <DropdownMenuTrigger asChild>
+                  <Button iconRight={<IconChevronDown />} type="default">
                     <span>Manage</span>
                   </Button>
                 </DropdownMenuTrigger>

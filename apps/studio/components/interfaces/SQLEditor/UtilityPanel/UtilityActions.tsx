@@ -1,14 +1,15 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { IS_PLATFORM } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
-import { Button, IconAlignLeft, IconCommand, IconCornerDownLeft } from 'ui'
+import { Button, IconAlignLeft, IconCommand, IconCornerDownLeft, cn } from 'ui'
 
+import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { useFlag } from 'hooks'
 import { useState } from 'react'
 import FavoriteButton from './FavoriteButton'
 import SavingIndicator from './SavingIndicator'
-import { useFlag } from 'hooks'
-import SizeToggleButton from './SizeToggleButton'
+import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 
 export type UtilityActionsProps = {
   id: string
@@ -28,8 +29,9 @@ const UtilityActions = ({
   executeQuery,
 }: UtilityActionsProps) => {
   const os = detectOS()
+  const snap = useSqlEditorStateSnapshot()
   const readReplicasEnabled = useFlag('readReplicas')
-  const [selectedDatabaseId, setSelectedDatabaseId] = useState<string>('1')
+  const roleImpersonationEnabledFlag = useFlag('roleImpersonation')
 
   return (
     <>
@@ -66,32 +68,43 @@ const UtilityActions = ({
       </Tooltip.Root>
 
       <div className="flex items-center justify-between gap-x-2 mx-2">
-        {readReplicasEnabled && (
-          <DatabaseSelector
-            selectedDatabaseId={selectedDatabaseId}
-            onChangeDatabaseId={setSelectedDatabaseId}
-          />
-        )}
+        <div className="flex items-center">
+          {readReplicasEnabled && (
+            <DatabaseSelector
+              variant="connected-on-right"
+              selectedDatabaseId={snap.selectedDatabaseId}
+              onChangeDatabaseId={snap.setSelectedDatabaseId}
+            />
+          )}
 
-        <Button
-          onClick={() => executeQuery()}
-          disabled={isDisabled || isExecuting}
-          loading={isExecuting}
-          type="default"
-          size="tiny"
-          iconRight={
-            <div className="flex items-center space-x-1">
-              {os === 'macos' ? (
-                <IconCommand size={10} strokeWidth={1.5} />
-              ) : (
-                <p className="text-xs text-foreground-light">CTRL</p>
-              )}
-              <IconCornerDownLeft size={10} strokeWidth={1.5} />
-            </div>
-          }
-        >
-          {hasSelection ? 'Run selected' : 'Run'}
-        </Button>
+          {roleImpersonationEnabledFlag && (
+            <RoleImpersonationPopover
+              serviceRoleLabel="postgres"
+              variant={readReplicasEnabled ? 'connected-on-both' : 'connected-on-right'}
+            />
+          )}
+
+          <Button
+            onClick={() => executeQuery()}
+            disabled={isDisabled || isExecuting}
+            loading={isExecuting}
+            type="primary"
+            size="tiny"
+            iconRight={
+              <div className="flex items-center space-x-1">
+                {os === 'macos' ? (
+                  <IconCommand size={10} strokeWidth={1.5} />
+                ) : (
+                  <p className="text-xs text-foreground-light">CTRL</p>
+                )}
+                <IconCornerDownLeft size={10} strokeWidth={1.5} />
+              </div>
+            }
+            className={cn(roleImpersonationEnabledFlag && 'rounded-l-none')}
+          >
+            {hasSelection ? 'Run selected' : 'Run'}
+          </Button>
+        </div>
       </div>
     </>
   )

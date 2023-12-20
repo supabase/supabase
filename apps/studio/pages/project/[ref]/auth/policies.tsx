@@ -3,10 +3,10 @@ import { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { partition } from 'lodash'
-import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
 import { Button, IconExternalLink, IconSearch, Input } from 'ui'
 
+import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Policies } from 'components/interfaces/Auth/Policies'
 import { AIPolicyEditorPanel } from 'components/interfaces/Auth/Policies/AIPolicyEditorPanel'
 import { AuthLayout } from 'components/layouts'
@@ -15,9 +15,10 @@ import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useCheckPermissions, useFlag, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { NextPageWithLayout } from 'types'
@@ -58,14 +59,14 @@ const onFilterTables = (
 }
 
 const AuthPoliciesPage: NextPageWithLayout = () => {
+  const { search } = useParams()
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
-  const { meta } = useStore()
-  const { search } = useParams()
   const [searchString, setSearchString] = useState<string>('')
-  const canCreatePolicyWithAi = useFlag('policyEditorWithAi')
 
   const [showPolicyAiEditor, setShowPolicyAiEditor] = useState(false)
+  const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState<PostgresPolicy>()
+  const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
 
   useEffect(() => {
     if (search) setSearchString(search)
@@ -81,7 +82,10 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   const schema = schemas?.find((schema) => schema.name === snap.selectedSchemaName)
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
 
-  const policies = meta.policies.list()
+  const { data: policies } = useDatabasePoliciesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
   const {
     data: tables,
@@ -95,7 +99,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
     schema: snap.selectedSchemaName,
   })
 
-  const filteredTables = onFilterTables(tables ?? [], policies, searchString)
+  const filteredTables = onFilterTables(tables ?? [], policies ?? [], searchString)
   const canReadPolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'policies')
   const canCreatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
 
@@ -137,9 +141,9 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
                 Documentation
               </Button>
             </a>
-            {canCreatePolicyWithAi && (
+            {isAiAssistantEnabled && (
               <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger>
+                <Tooltip.Trigger asChild>
                   <Button
                     type="primary"
                     disabled={!canCreatePolicies}
@@ -176,12 +180,24 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
       {isError && <AlertError error={error} subject="Failed to retrieve tables" />}
 
       {isSuccess && (
-        <Policies tables={filteredTables} hasTables={tables.length > 0} isLocked={isLocked} />
+        <Policies
+          tables={filteredTables}
+          hasTables={tables.length > 0}
+          isLocked={isLocked}
+          onSelectEditPolicy={(policy) => {
+            setSelectedPolicyToEdit(policy)
+            setShowPolicyAiEditor(true)
+          }}
+        />
       )}
 
       <AIPolicyEditorPanel
         visible={showPolicyAiEditor}
-        onSelectCancel={() => setShowPolicyAiEditor(false)}
+        selectedPolicy={selectedPolicyToEdit}
+        onSelectCancel={() => {
+          setShowPolicyAiEditor(false)
+          setSelectedPolicyToEdit(undefined)
+        }}
       />
     </div>
   )
@@ -193,4 +209,4 @@ AuthPoliciesPage.getLayout = (page) => (
   </AuthLayout>
 )
 
-export default observer(AuthPoliciesPage)
+export default AuthPoliciesPage

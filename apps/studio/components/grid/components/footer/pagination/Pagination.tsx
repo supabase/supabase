@@ -6,6 +6,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { useUrlState } from 'hooks'
+import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { Button, IconArrowLeft, IconArrowRight, IconLoader, InputNumber, Modal } from 'ui'
 import { useDispatch, useTrackedState } from '../../../store'
 import { DropdownControl } from '../../common'
@@ -33,6 +34,9 @@ const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
   })
   const filters = formatFilterURLParams(filter as string[])
   const table = state.table ?? undefined
+
+  const roleImpersonationState = useRoleImpersonationStateSnapshot()
+
   const { project } = useProjectContext()
   const { data, isLoading, isSuccess, isError } = useTableRowsCountQuery(
     {
@@ -41,6 +45,7 @@ const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
       connectionString: project?.connectionString,
       table,
       filters,
+      impersonatedRole: roleImpersonationState.role,
     },
     {
       keepPreviousData: true,

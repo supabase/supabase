@@ -1,11 +1,12 @@
 import clsx from 'clsx'
-import { partition } from 'lodash'
 
 import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrgUpcomingInvoiceQuery } from 'data/invoices/org-invoice-upcoming-query'
-import { useState } from 'react'
-import { Button, Collapsible, IconChevronRight } from 'ui'
+import { useMemo, useState } from 'react'
+import { Button, Collapsible, IconChevronRight, IconInfo } from 'ui'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { billingMetricUnit, formatUsage } from '../helpers'
 
 export interface UpcomingInvoiceProps {
   slug?: string
@@ -20,9 +21,42 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
     isSuccess,
   } = useOrgUpcomingInvoiceQuery({ orgSlug: slug })
 
-  const [showUsageFees, setShowUsageFees] = useState(false)
-  const [usageFees, fixedFees] = partition(upcomingInvoice?.lines ?? [], (item) => item.usage_based)
-  const totalUsageFees = Number(usageFees.reduce((a, b) => a + b.amount, 0).toFixed(2))
+  const [usageFeesExpanded, setUsageFeesExpanded] = useState<string[]>([])
+
+  const fixedFees = useMemo(() => {
+    return (upcomingInvoice?.lines || [])
+      .filter((item) => !item.breakdown)
+      .sort((a, b) => {
+        // Prorations should be below regular usage fees
+        return Number(a.proration) - Number(b.proration)
+      })
+  }, [upcomingInvoice])
+
+  const feesWithBreakdown = useMemo(() => {
+    return (upcomingInvoice?.lines || [])
+      .filter((item) => item.breakdown?.length)
+      .sort((a, b) => Number(a.usage_based) - Number(b.usage_based) || b.amount - a.amount)
+  }, [upcomingInvoice])
+
+  const expandUsageFee = (fee: string) => {
+    setUsageFeesExpanded([...usageFeesExpanded, fee])
+  }
+
+  const collapseUsageFee = (fee: string) => {
+    setUsageFeesExpanded(usageFeesExpanded.filter((item) => item !== fee))
+  }
+
+  const allFeesExpanded = useMemo(() => {
+    return feesWithBreakdown.length === usageFeesExpanded.length
+  }, [feesWithBreakdown, usageFeesExpanded])
+
+  const toggleAllFees = () => {
+    if (allFeesExpanded) {
+      setUsageFeesExpanded([])
+    } else {
+      setUsageFeesExpanded(feesWithBreakdown.map((item) => item.description))
+    }
+  }
 
   return (
     <>
@@ -37,83 +71,163 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
       {isError && <AlertError subject="Failed to retrieve upcoming invoice" error={error} />}
 
       {isSuccess && (
-        <table className="w-full">
-          <thead>
-            <tr className="border-b">
-              <th className="py-2 font-normal text-left text-sm text-foreground-light w-1/2">
-                Item
-              </th>
-              <th className="py-2 font-normal text-left text-sm text-foreground-light">Count</th>
-              <th className="py-2 font-normal text-left text-sm text-foreground-light">
-                Unit price
-              </th>
-              <th className="py-2 font-normal text-right text-sm text-foreground-light">Price</th>
-            </tr>
-          </thead>
-          <tbody>
-            {fixedFees.map((item) => (
-              <tr key={item.description} className="border-b">
-                <td className="py-2 text-sm">{item.description ?? 'Unknown'}</td>
-                <td className="py-2 text-sm">{item.quantity}</td>
-                <td className="py-2 text-sm">
-                  {item.unit_price === 0 ? 'FREE' : `$${item.unit_price}`}
-                </td>
-                <td className="py-2 text-sm text-right">${item.amount}</td>
-              </tr>
-            ))}
-          </tbody>
-
-          {usageFees.length > 0 && (
-            <Collapsible asChild open={showUsageFees} onOpenChange={setShowUsageFees}>
-              <tbody>
-                <Collapsible.Trigger asChild>
-                  <tr className="border-b cursor-pointer" style={{ WebkitAppearance: 'initial' }}>
-                    <td className="py-2 text-sm flex items-center space-x-2">
-                      <Button
-                        type="text"
-                        className="!px-1"
-                        icon={
-                          <IconChevronRight
-                            className={clsx('transition', showUsageFees && 'rotate-90')}
-                          />
-                        }
-                      />
-                      <p>Usage items</p>
-                    </td>
-                    <td />
-                    <td />
-                    <td className="text-sm text-right">
-                      {!showUsageFees ? `$${totalUsageFees}` : null}
-                    </td>
-                  </tr>
-                </Collapsible.Trigger>
-                <Collapsible.Content asChild>
-                  <>
-                    {usageFees.map((fee) => (
-                      <tr className="border-b" key={fee.description}>
-                        <td className="py-2 text-sm pl-8">{fee.description}</td>
-                        <td className="py-2 text-sm"></td>
-                        <td className="py-2 text-sm">
-                          {fee.unit_price ? `$${fee.unit_price}` : null}
-                        </td>
-                        <td className="py-2 text-sm text-right">${fee.amount ?? 0}</td>
-                      </tr>
-                    ))}
-                  </>
-                </Collapsible.Content>
-              </tbody>
-            </Collapsible>
+        <div>
+          {feesWithBreakdown.length > 0 && (
+            <div className="mb-2">
+              <Button size="tiny" type="default" onClick={toggleAllFees}>
+                {allFeesExpanded ? 'Collapse All' : 'Expand All'}
+              </Button>
+            </div>
           )}
 
-          <tbody>
-            <tr>
-              <td className="py-2 text-sm">Total</td>
-              <td className="py-2 text-sm" />
-              <td className="py-2 text-sm" />
-              <td className="py-2 text-sm text-right">${upcomingInvoice?.amount_total ?? 0}</td>
-            </tr>
-          </tbody>
-        </table>
+          <table className="w-full">
+            <thead>
+              <tr className="border-b">
+                <th className="py-2 font-medium text-left text-sm text-foreground-light max-w-[200px]">
+                  Item
+                </th>
+                <th className="py-2 font-medium text-right text-sm text-foreground-light pr-4">
+                  Usage
+                </th>
+                <th className="py-2 font-medium text-left text-sm text-foreground-light">
+                  Unit price
+                </th>
+                <th className="py-2 font-medium text-right text-sm text-foreground-light">Cost</th>
+              </tr>
+            </thead>
+            <tbody>
+              {fixedFees.map((item) => (
+                <tr key={item.description} className="border-b">
+                  <td className="py-2 text-sm max-w-[200px]" colSpan={item.proration ? 3 : 1}>
+                    {item.description ?? 'Unknown'}
+                  </td>
+                  {!item.proration && (
+                    <td className="py-2 text-sm text-right pr-4">
+                      {item.quantity?.toLocaleString()}
+                    </td>
+                  )}
+                  {!item.proration && (
+                    <td className="py-2 text-sm">
+                      {item.unit_price === 0 ? 'FREE' : `$${item.unit_price}`}
+                    </td>
+                  )}
+                  <td className="py-2 text-sm text-right">${item.amount}</td>
+                </tr>
+              ))}
+            </tbody>
+
+            {feesWithBreakdown.length > 0 &&
+              feesWithBreakdown.map((fee) => (
+                <Collapsible
+                  asChild
+                  open={usageFeesExpanded.includes(fee.description)}
+                  onOpenChange={(open) =>
+                    open ? expandUsageFee(fee.description) : collapseUsageFee(fee.description)
+                  }
+                  key={fee.description}
+                >
+                  <tbody>
+                    <Collapsible.Trigger asChild>
+                      <tr
+                        className={usageFeesExpanded.includes(fee.description) ? '' : 'border-b'}
+                        key={fee.description}
+                        style={{ WebkitAppearance: 'initial' }}
+                      >
+                        <td className="py-2 text-sm max-w-[200px]">
+                          <Button
+                            type="text"
+                            className="!px-1"
+                            icon={
+                              <IconChevronRight
+                                className={clsx(
+                                  'transition',
+                                  usageFeesExpanded.includes(fee.description) && 'rotate-90'
+                                )}
+                              />
+                            }
+                          />{' '}
+                          <span>
+                            {fee.description}
+                            {fee.usage_metric &&
+                              billingMetricUnit(fee.usage_metric) &&
+                              ` (${billingMetricUnit(fee.usage_metric)})`}
+                          </span>
+                        </td>
+                        <td className="py-2 pr-4 text-sm text-right tabular-nums max-w-[100px]">
+                          {fee.usage_original
+                            ? `${formatUsage(fee.usage_metric!, fee.usage_original)}`
+                            : fee.quantity
+                            ? fee.quantity
+                            : null}
+                        </td>
+                        <td className="py-2 text-sm">
+                          {fee.unit_price_desc
+                            ? `${fee.unit_price_desc}`
+                            : fee.unit_price
+                            ? `$${fee.unit_price}`
+                            : null}
+                        </td>
+                        <td className="py-2 text-sm text-right max-w-[70px]">${fee.amount ?? 0}</td>
+                      </tr>
+                    </Collapsible.Trigger>
+
+                    <Collapsible.Content asChild>
+                      <>
+                        {fee.breakdown?.map((breakdown) => (
+                          <tr
+                            className="last:border-b cursor-pointer"
+                            style={{ WebkitAppearance: 'initial' }}
+                            key={breakdown.project_ref}
+                          >
+                            <td className="pb-1 text-xs pl-8 max-w-[200px]">
+                              {breakdown.project_name}
+                            </td>
+                            <td className="pb-1 text-xs tabular-nums text-right pr-4">
+                              {formatUsage(fee.usage_metric!, breakdown.usage)}
+                            </td>
+                            <td />
+                            <td />
+                          </tr>
+                        ))}
+                      </>
+                    </Collapsible.Content>
+                  </tbody>
+                </Collapsible>
+              ))}
+
+            <tfoot>
+              <tr>
+                <td className="py-4 text-sm font-medium">
+                  <span className="mr-2">Projected Costs</span>
+                  <Tooltip.Root delayDuration={0}>
+                    <Tooltip.Trigger>
+                      <IconInfo size={12} strokeWidth={2} />
+                    </Tooltip.Trigger>
+                    <Tooltip.Portal>
+                      <Tooltip.Content side="bottom">
+                        <Tooltip.Arrow className="radix-tooltip-arrow" />
+                        <div
+                          className={[
+                            'rounded bg-alternative py-1 px-2 leading-none shadow',
+                            'border border-background',
+                          ].join(' ')}
+                        >
+                          <span className="text-xs text-foreground">
+                            Estimated costs at the end of the billing cycle. Final amounts may vary
+                            depending on your usage.
+                          </span>
+                        </div>
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
+                  </Tooltip.Root>
+                </td>
+                <td className="py-4 text-sm text-right font-medium" colSpan={3}>
+                  ${upcomingInvoice?.amount_projected ?? '-'}
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
       )}
     </>
   )

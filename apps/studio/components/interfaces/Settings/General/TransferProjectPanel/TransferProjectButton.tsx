@@ -84,7 +84,7 @@ const TransferProjectButton = () => {
   return (
     <>
       <Tooltip.Root delayDuration={0}>
-        <Tooltip.Trigger>
+        <Tooltip.Trigger asChild>
           <Button
             onClick={toggle}
             type="default"

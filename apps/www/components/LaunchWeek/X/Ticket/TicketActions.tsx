@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { SITE_URL, TWEET_TEXT, TWEET_TEXT_GOLDEN } from '~/lib/constants'
+import { SITE_URL, TWEET_TEXT, TWEET_TEXT_GOLDEN, TWEET_TEXT_SECRET } from '~/lib/constants'
 import { Button, IconLinkedinSolid, IconTwitterX, cn } from 'ui'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import { useParams } from '~/hooks/useParams'
@@ -8,14 +8,17 @@ import { useBreakpoint } from 'common'
 
 export default function TicketActions() {
   const { userData, supabase } = useConfData()
-  const { golden, username } = userData
+  const { golden, username, metadata } = userData
   const [_imgReady, setImgReady] = useState(false)
   const [_loading, setLoading] = useState(false)
   const isTablet = useBreakpoint(1280)
   const downloadLink = useRef<HTMLAnchorElement>()
-  const link = `${SITE_URL}/tickets/${username}?lw=x${golden ? `&platinum=true` : ''}`
+  const hasSecretTicket = metadata?.hasSecretTicket
+  const link = `${SITE_URL}/tickets/${username}?lw=x${
+    hasSecretTicket ? '&secret=true' : golden ? `&platinum=true` : ''
+  }`
   const permalink = encodeURIComponent(link)
-  const text = golden ? TWEET_TEXT_GOLDEN : TWEET_TEXT
+  const text = hasSecretTicket ? TWEET_TEXT_SECRET : golden ? TWEET_TEXT_GOLDEN : TWEET_TEXT
   const encodedText = encodeURIComponent(text)
   const tweetUrl = `https://twitter.com/intent/tweet?url=${permalink}&text=${encodedText}`
   const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${permalink}`

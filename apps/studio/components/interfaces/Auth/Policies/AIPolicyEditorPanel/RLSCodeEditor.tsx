@@ -16,28 +16,9 @@ interface RLSCodeEditorProps {
   wrapperClassName?: string
   className?: string
   value?: string
+  placeholder?: string
   editorRef: MutableRefObject<editor.IStandaloneCodeEditor | null>
 }
-
-// const placeholderText = `
-// CREATE POLICY *name* ON *table_name*\n
-// [ AS { PERMISSIVE | RESTRICTIVE } ]\n
-// [ FOR { ALL | SELECT | INSERT | UPDATE | DELETE } ]\n
-// [ TO *role_name* ]\n
-// [ USING ( *using_expression* ) ]\n
-// [ WITH CHECK ( *check_expression* ) ];
-// `.trim()
-
-const placeholderText = `
-CREATE POLICY *name* ON *table_name*\n
-AS PERMISSIVE -- PERMISSIVE | RESTRICTIVE\n
-FOR ALL -- ALL | SELECT | INSERT | UPDATE | DELETE\n
-TO *role_name* -- Default: public\n
-USING ( *using_expression* )\n
-WITH CHECK ( *check_expression* );\n
-&nbsp;\n
--- Docs: https://www.postgresql.org/docs/current/sql-createpolicy.html
-`.trim()
 
 const RLSCodeEditor = ({
   id,
@@ -45,6 +26,7 @@ const RLSCodeEditor = ({
   wrapperClassName,
   className,
   value,
+  placeholder,
   editorRef,
 }: RLSCodeEditorProps) => {
   const hasValue = useRef<any>()
@@ -55,8 +37,8 @@ const RLSCodeEditor = ({
 
     hasValue.current = editor.createContextKey('hasValue', false)
 
-    const placeholder = document.querySelector('.monaco-placeholder') as HTMLElement | null
-    if (placeholder) placeholder.style.display = 'block'
+    const placeholderEl = document.querySelector('.monaco-placeholder') as HTMLElement | null
+    if (placeholderEl) placeholderEl.style.display = 'block'
 
     editor.addCommand(
       monaco.KeyCode.Tab,
@@ -66,7 +48,7 @@ const RLSCodeEditor = ({
             // @ts-ignore
             identifier: 'add-placeholder',
             range: new monaco.Range(1, 1, 1, 1),
-            text: placeholderText
+            text: (placeholder ?? '')
               .split('\n\n')
               .join('\n')
               .replaceAll('*', '')
@@ -83,12 +65,12 @@ const RLSCodeEditor = ({
   const onChange: OnChange = (value) => {
     hasValue.current.set((value ?? '').length > 0)
 
-    const placeholder = document.querySelector('.monaco-placeholder') as HTMLElement | null
-    if (placeholder) {
+    const placeholderEl = document.querySelector('.monaco-placeholder') as HTMLElement | null
+    if (placeholderEl) {
       if (!value) {
-        placeholder.style.display = 'block'
+        placeholderEl.style.display = 'block'
       } else {
-        placeholder.style.display = 'none'
+        placeholderEl.style.display = 'none'
       }
     }
   }
@@ -122,12 +104,14 @@ const RLSCodeEditor = ({
         onMount={onMount}
         onChange={onChange}
       />
-      <div
-        className="monaco-placeholder absolute top-[3px] left-[57px] text-sm pointer-events-none font-mono [&>div>p]:text-foreground-lighter [&>div>p]:!m-0 tracking-tighter"
-        style={{ display: 'none' }}
-      >
-        <Markdown content={placeholderText} />
-      </div>
+      {placeholder !== undefined && (
+        <div
+          className="monaco-placeholder absolute top-[3px] left-[57px] text-sm pointer-events-none font-mono [&>div>p]:text-foreground-lighter [&>div>p]:!m-0 tracking-tighter"
+          style={{ display: 'none' }}
+        >
+          <Markdown content={placeholder} />
+        </div>
+      )}
     </>
   )
 }

@@ -25,6 +25,7 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 
 interface SchemaSelectorProps {
   className?: string
+  disabled?: boolean
   size?: 'tiny' | 'small'
   showError?: boolean
   selectedSchemaName: string
@@ -35,6 +36,7 @@ interface SchemaSelectorProps {
 
 const SchemaSelector = ({
   className,
+  disabled = false,
   size = 'tiny',
   showError = true,
   selectedSchemaName,
@@ -64,8 +66,10 @@ const SchemaSelector = ({
       {isSchemasLoading && (
         <Button
           type="outline"
-          className="w-full [&>span]:w-full"
+          className={`w-full [&>span]:w-full ${size === 'small' ? 'py-1.5' : ''}`}
+          size={size}
           icon={<IconLoader className="animate-spin" size={12} />}
+          disabled={!!disabled}
         >
           <div className="w-full flex space-x-3 py-0.5">
             <p className="text-xs text-foreground-light">Loading schemas...</p>
@@ -92,6 +96,7 @@ const SchemaSelector = ({
           <PopoverTrigger_Shadcn_ asChild>
             <Button
               size={size}
+              disabled={disabled}
               type="outline"
               className={`w-full [&>span]:w-full ${size === 'small' ? 'py-1.5' : ''}`}
               iconRight={

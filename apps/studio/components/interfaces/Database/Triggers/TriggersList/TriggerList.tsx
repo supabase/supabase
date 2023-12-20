@@ -1,7 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { includes } from 'lodash'
-import { observer } from 'mobx-react-lite'
+import { includes, sortBy } from 'lodash'
 import {
   Badge,
   Button,
@@ -16,8 +15,10 @@ import {
   IconX,
 } from 'ui'
 
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
+import { useCheckPermissions } from 'hooks'
 
 interface TriggerListProps {
   schema: string
@@ -34,13 +35,20 @@ const TriggerList = ({
   editTrigger,
   deleteTrigger,
 }: TriggerListProps) => {
-  const { meta } = useStore()
-  const triggers = meta.triggers.list()
-  const filteredTriggers = triggers.filter((x: any) =>
+  const { project } = useProjectContext()
+
+  const { data: triggers } = useDatabaseTriggersQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const filteredTriggers = (triggers ?? []).filter((x) =>
     includes(x.name.toLowerCase(), filterString.toLowerCase())
   )
 
-  const _triggers = filteredTriggers.filter((x: any) => x.schema == schema)
+  const _triggers = sortBy(
+    filteredTriggers.filter((x) => x.schema == schema),
+    (trigger) => trigger.name.toLocaleLowerCase()
+  )
   const canUpdateTriggers = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
 
   if (_triggers.length === 0 && filterString.length === 0) {
@@ -114,9 +122,9 @@ const TriggerList = ({
               <div className="flex items-center justify-end">
                 {canUpdateTriggers ? (
                   <DropdownMenu>
-                    <DropdownMenuTrigger>
-                      <Button asChild type="default" className="px-1" icon={<IconMoreVertical />}>
-                        <span />
+                    <DropdownMenuTrigger asChild>
+                      <Button type="default" className="px-1">
+                        <IconMoreVertical />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent side="bottom" align="end" className="w-36">
@@ -161,4 +169,4 @@ const TriggerList = ({
   )
 }
 
-export default observer(TriggerList)
+export default TriggerList

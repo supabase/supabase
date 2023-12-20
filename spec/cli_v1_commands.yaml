@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.115.4
+  version: 1.123.0
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -312,6 +312,10 @@ commands:
         name: --no-backup
         description: Deletes all data volumes after stopping.
         default_value: 'false'
+      - id: project-id
+        name: --project-id <string>
+        description: Local project ID to stop.
+        default_value: ''
   - id: supabase-status
     title: supabase status
     summary: Show status of local Supabase containers
@@ -1478,6 +1482,15 @@ commands:
         name: -p, --password <string>
         description: Password to your remote Postgres database.
         default_value: ''
+  - id: supabase-logout
+    title: supabase logout
+    summary: Log out and delete access tokens locally
+    tags:
+      - local-dev
+    links: []
+    usage: supabase logout
+    subcommands: []
+    flags: []
   - id: supabase-login
     title: supabase login
     summary: Authenticate using an access token
@@ -2455,7 +2468,7 @@ commands:
     description: Deploy a Function to the linked Supabase project.
     tags: []
     links: []
-    usage: supabase functions deploy <Function name> [flags]
+    usage: supabase functions deploy [Function name] [flags]
     subcommands: []
     flags:
       - id: import-map
@@ -2687,11 +2700,11 @@ commands:
         default_value: ''
       - id: linked
         name: --linked
-        description: Resets the linked project to current migrations.
+        description: Resets the linked project with local migrations.
         default_value: 'false'
       - id: local
         name: --local
-        description: Resets the local database to current migrations.
+        description: Resets the local database with local migrations.
         default_value: 'true'
       - id: version
         name: --version <string>
@@ -2807,7 +2820,7 @@ commands:
       - id: schema
         name: -s, --schema <strings>
         description: Comma separated list of schema to include.
-        default_value: all
+        default_value: '[]'
   - id: supabase-db-lint
     title: supabase db lint
     summary: Checks local database for typing error
@@ -2877,7 +2890,7 @@ commands:
       - id: schema
         name: -s, --schema <strings>
         description: Comma separated list of schema to include.
-        default_value: all
+        default_value: '[]'
   - id: supabase-db-dump
     title: supabase db dump
     summary: Dumps data or schemas from the remote database
@@ -2954,7 +2967,7 @@ commands:
       - id: schema
         name: -s, --schema <strings>
         description: Comma separated list of schema to include.
-        default_value: all
+        default_value: '[]'
       - id: use-copy
         name: --use-copy
         description: Uses copy statements in place of inserts.
@@ -3035,7 +3048,7 @@ commands:
       - id: schema
         name: -s, --schema <strings>
         description: Comma separated list of schema to include.
-        default_value: all
+        default_value: '[]'
       - id: use-migra
         name: --use-migra
         description: Use migra to generate schema diff.
@@ -3203,6 +3216,10 @@ commands:
         name: --name <string>
         description: Rename the preview branch.
         default_value: ''
+      - id: reset-on-push
+        name: --reset-on-push
+        description: Reset the preview branch on git push.
+        default_value: 'false'
       - id: experimental
         name: --experimental
         description: enable experimental features
@@ -3270,7 +3287,7 @@ commands:
     description: Create a preview branch for the linked project.
     tags: []
     links: []
-    usage: supabase branches create <name> [flags]
+    usage: supabase branches create [name] [flags]
     subcommands: []
     flags:
       - id: region

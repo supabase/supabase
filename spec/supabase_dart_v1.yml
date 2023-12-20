@@ -881,6 +881,18 @@ functions:
             .select()
             .csv();
           ```
+      - id: switching-schemas-per-query
+        name: Switching schemas per query
+        description: |
+          You can perform queries on custom schemas.
+          Make sure you've set up your [database privileges and API settings](/docs/guides/api/using-custom-schemas).
+        code: |
+          ```dart
+          final data = await supabase
+            .useSchema('myschema')
+            .from('users')
+            .select();
+          ```
 
   - id: insert
     description: |
