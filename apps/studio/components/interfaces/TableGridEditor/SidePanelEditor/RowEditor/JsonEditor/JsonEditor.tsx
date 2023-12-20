@@ -83,29 +83,31 @@ const JsonEdit = ({
             </p>
           )}
           <div className="flex items-center gap-x-2">
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger asChild>
-                <Button
-                  type="default"
-                  icon={<IconAlignLeft />}
-                  className="px-1"
-                  onClick={() => prettify()}
-                />
-              </Tooltip.Trigger>
-              <Tooltip.Portal>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                      'border border-background',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-foreground">Prettify JSON</span>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            </Tooltip.Root>
+            {view === 'edit' && (
+              <Tooltip.Root delayDuration={0}>
+                <Tooltip.Trigger asChild>
+                  <Button
+                    type="default"
+                    icon={<IconAlignLeft />}
+                    className="px-1"
+                    onClick={() => prettify()}
+                  />
+                </Tooltip.Trigger>
+                <Tooltip.Portal>
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-alternative py-1 px-2 leading-none shadow',
+                        'border border-background',
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-foreground">Prettify JSON</span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
+              </Tooltip.Root>
+            )}
             <TwoOptionToggle
               options={['view', 'edit']}
               activeOption={view}
