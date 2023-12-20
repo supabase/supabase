@@ -6,7 +6,6 @@ export const COLUMN_MIN_WIDTH = 100
 
 export const STORAGE_KEY_PREFIX = 'supabase_grid'
 
-export const REFRESH_PAGE_IMMEDIATELY = -1
 export const TOTAL_ROWS_INITIAL = -1
 export const TOTAL_ROWS_RESET = -2
 

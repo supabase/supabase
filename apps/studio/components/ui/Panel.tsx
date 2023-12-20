@@ -8,7 +8,7 @@ interface PanelProps {
   hideHeaderStyling?: boolean
   loading?: boolean
   noMargin?: boolean
-  title?: JSX.Element | false
+  title?: ReactNode | false
   wrapWithLoading?: boolean
   noHideOverflow?: boolean
 }

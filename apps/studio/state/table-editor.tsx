@@ -1,5 +1,6 @@
 import { PostgresColumn } from '@supabase/postgres-meta'
-import { Dictionary, SupaRow } from 'components/grid'
+import { SupaRow } from 'components/grid'
+import { Dictionary } from 'types'
 import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
 import { JsonEditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
 import { PropsWithChildren, createContext, useContext, useRef } from 'react'
@@ -55,6 +56,15 @@ export const createTableEditorState = () => {
     selectedSchemaName: 'public',
     setSelectedSchemaName: (schemaName: string) => {
       state.selectedSchemaName = schemaName
+    },
+
+    page: 1,
+    setPage: (page: number) => {
+      state.page = page
+    },
+    rowsPerPage: 100,
+    setRowsPerPage: (rowsPerPage: number) => {
+      state.rowsPerPage = rowsPerPage
     },
 
     ui: { open: 'none' } as UIState,

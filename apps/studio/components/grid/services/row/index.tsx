@@ -2,17 +2,6 @@ import { Filter, ServiceError, Sort, SupaRow } from '../../types'
 
 export interface IRowService {
   count: (filters: Filter[]) => Promise<{ data?: number; error?: ServiceError }>
-
-  fetchPage: (
-    page: number,
-    rowsPerPage: number,
-    filters: Filter[],
-    sorts: Sort[]
-  ) => Promise<{
-    data?: { rows: SupaRow[] }
-    error?: ServiceError
-  }>
-
   fetchAllData: (filters: Filter[], sorts: Sort[]) => Promise<any[]>
 
   /**

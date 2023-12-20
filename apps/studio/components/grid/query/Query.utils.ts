@@ -1,5 +1,6 @@
 import { ident, literal, format } from '@scaleleap/pg-format'
-import { Dictionary, Filter, QueryPagination, QueryTable, Sort } from '../types'
+import { Filter, QueryPagination, QueryTable, Sort } from '../types'
+import type { Dictionary } from 'types'
 
 export function countQuery(
   table: QueryTable,

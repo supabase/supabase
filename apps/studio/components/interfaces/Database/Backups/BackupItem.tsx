@@ -8,12 +8,13 @@ import { useCheckPermissions } from 'hooks'
 
 interface BackupItemProps {
   index: number
+  isHealthy: boolean
   projectRef: string
   backup: DatabaseBackup
   onSelectBackup: () => void
 }
 
-const BackupItem = ({ index, backup, projectRef, onSelectBackup }: BackupItemProps) => {
+const BackupItem = ({ index, isHealthy, backup, projectRef, onSelectBackup }: BackupItemProps) => {
   const canTriggerScheduledBackups = useCheckPermissions(
     PermissionAction.INFRA_EXECUTE,
     'queue_job.restore.prepare'
@@ -36,7 +37,11 @@ const BackupItem = ({ index, backup, projectRef, onSelectBackup }: BackupItemPro
     if (backup.status === 'COMPLETED')
       return (
         <div className="flex space-x-4">
-          <Button type="default" disabled={!canTriggerScheduledBackups} onClick={onSelectBackup}>
+          <Button
+            type="default"
+            disabled={!isHealthy || !canTriggerScheduledBackups}
+            onClick={onSelectBackup}
+          >
             Restore
           </Button>
           {!backup.isPhysicalBackup && (

@@ -153,9 +153,8 @@ const ReportFilterBar = ({
           helpers={datepickerHelpers}
         />
         <DropdownMenu>
-          <DropdownMenuTrigger>
+          <DropdownMenuTrigger asChild>
             <Button
-              asChild
               type="default"
               className="inline-flex flex-row gap-2"
               iconRight={<IconChevronDown size={14} />}

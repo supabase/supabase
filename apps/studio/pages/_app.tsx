@@ -13,6 +13,7 @@ import 'styles/storage.scss'
 import 'styles/stripe.scss'
 import 'styles/toast.scss'
 import 'styles/ui.scss'
+import 'styles/reactflow.scss'
 
 import { loader } from '@monaco-editor/react'
 import { TooltipProvider } from '@radix-ui/react-tooltip'
@@ -128,7 +129,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
       }
 
       const hasAcknowledgedConsent = localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
-      if (hasAcknowledgedConsent === null) {
+      if (IS_PLATFORM && hasAcknowledgedConsent === null) {
         consentToastId.current = toast(
           <ConsentToast onAccept={onAcceptConsent} onOptOut={onOptOut} />,
           {

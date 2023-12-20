@@ -49,7 +49,6 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
   const snippet = snap.snippets[id]
   const result = snap.results[id]?.[0]
   const isUtilityPanelCollapsed = (snippet?.splitSizes?.[1] ?? 0) === 0
-  const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
 
@@ -110,11 +109,11 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
                   </pre>
                 ))
               ) : (
-                <p className="font-mono text-sm">{result.error.error}</p>
+                <p className="font-mono text-sm">{result.error?.message}</p>
               )}
             </div>
           )}
-          {supabaseAIEnabled && !hasHipaaAddon && (
+          {!hasHipaaAddon && (
             <Button
               icon={
                 <div className="scale-75">

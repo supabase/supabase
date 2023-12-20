@@ -1,6 +1,24 @@
 export const data = [
   {
     type: 'Customer Story',
+    title: 'Supabase migration drives shotgun to an 83% reduction in data infrastructure costs',
+    description:
+      "Explore how Shotgun achieved remarkable database efficiency and reduced costs by 80% through their successful migration to Supabase's managed services.",
+    imgUrl: 'images/customers/logos/shotgun.png',
+    logoUrl: 'images/customers/logos/shotgun.png',
+    organization: 'Shotgun',
+    url: '/customers/shotgun',
+    path: '/customers/shotgun',
+    postMeta: {
+      name: 'Paul Copplestone',
+      avatarUrl: 'https://avatars0.githubusercontent.com/u/10214025?v=4',
+      publishDate: 'Nov 30, 2023',
+      readLength: 3,
+    },
+    ctaText: 'View story',
+  },
+  {
+    type: 'Customer Story',
     title: 'How Next Door Lending leveraged Supabase to become a top 10 mortgage broker',
     description: '',
     imgUrl: 'images/customers/logos/next-door-lending.png',

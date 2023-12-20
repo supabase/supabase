@@ -4,7 +4,7 @@ import { Attribute, COLOR_MAP } from './Usage.constants'
 
 export interface SingleAttributeTooltipContentProps {
   name: string
-  unit: 'bytes' | 'percentage' | 'absolute'
+  unit: 'bytes' | 'percentage' | 'absolute' | 'hours'
   value: any
   isAfterToday: boolean
   tooltipFormatter?: (value: any) => any
@@ -37,6 +37,7 @@ export interface MultiAttributeTooltipContentProps {
   values: Payload<ValueType, string | number>[]
   isAfterToday: boolean
   tooltipFormatter?: (value: any) => any
+  unit: 'bytes' | 'percentage' | 'absolute' | 'hours'
 }
 
 const AttributeContent = ({
@@ -44,25 +45,29 @@ const AttributeContent = ({
   attributeMeta,
   sumValue,
   tooltipFormatter,
+  unit,
 }: {
   attribute: Attribute
   attributeMeta?: Payload<ValueType, string | number>
   sumValue: number
   tooltipFormatter?: (value: any) => any
+  unit: 'bytes' | 'percentage' | 'absolute' | 'hours'
 }) => {
   const attrValue = Number(attributeMeta?.value ?? 0)
   const percentageContribution = ((attrValue / sumValue) * 100).toFixed(1)
 
   return (
     <div key={attribute.name} className="flex items-center justify-between">
-      <div className="flex items-center space-x-2 w-[200px]">
+      <div className="flex items-center space-x-2 w-[175px]">
         <div className={clsx('w-3 h-3 rounded-full border', COLOR_MAP[attribute.color].marker)} />
         <p className="text-xs prose">
           {attribute.name} ({percentageContribution}%):{' '}
         </p>
       </div>
       <p className="text-xs tabular-nums">
-        {tooltipFormatter !== undefined ? tooltipFormatter(attrValue) : attrValue}
+        {tooltipFormatter !== undefined
+          ? tooltipFormatter(attrValue)
+          : `${attrValue}${unit === 'hours' ? ' H' : ''}`}
       </p>
     </div>
   )
@@ -73,6 +78,7 @@ export const MultiAttributeTooltipContent = ({
   values,
   isAfterToday,
   tooltipFormatter,
+  unit,
 }: MultiAttributeTooltipContentProps) => {
   const sumValue = values.reduce((a, b) => a + Number(b.value), 0)
   return (
@@ -94,6 +100,7 @@ export const MultiAttributeTooltipContent = ({
                 attributeMeta={attributeMeta}
                 sumValue={sumValue}
                 tooltipFormatter={tooltipFormatter}
+                unit={unit}
               />
             )
           })}

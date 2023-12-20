@@ -61,6 +61,8 @@ Under the "Credentials" tab, the `Secret` value will be used as the `client secr
 
 ## Add login code to your client app
 
+Since Keycloak version 22, the `openid` scope must be passed. Add this to the [`supabase.auth.signInWithOAuth()`](/docs/reference/javascript/auth-signinwithoauth) method.
+
 <Tabs
   scrollable
   size="small"
@@ -86,11 +88,11 @@ async function signInWithKeycloak() {
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
-When your user signs in, call [loginWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Keycloak` as the `Provider`:
+When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Keycloak` as the `Provider`:
 
 ```kotlin
 suspend fun signInWithKeycloak() {
-	supabase.gotrue.loginWith(Keycloak) {
+	supabase.auth.signInWith(Keycloak) {
 		scopes.add("openid")
 	}
 }
@@ -123,7 +125,7 @@ When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) t
 
 ```kotlin
 suspend fun signOut() {
-	supabase.gotrue.logout()
+	supabase.auth.signOut()
 }
 ```
 

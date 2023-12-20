@@ -6,6 +6,36 @@ import { useRouter } from 'next/router'
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import Split from 'react-split'
 import { format } from 'sql-formatter'
+
+import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
+import { useSqlEditMutation } from 'data/ai/sql-edit-mutation'
+import { useSqlGenerateMutation } from 'data/ai/sql-generate-mutation'
+import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
+import { SqlSnippet } from 'data/content/sql-snippets-query'
+import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import { useFormatQueryMutation } from 'data/sql/format-sql-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { isError } from 'data/utils/error-check'
+import {
+  useFlag,
+  useLocalStorage,
+  useLocalStorageQuery,
+  useSelectedOrganization,
+  useSelectedProject,
+  useStore,
+} from 'hooks'
+import { IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
+import { uuidv4 } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
+import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
+import Telemetry from 'lib/telemetry'
+import toast from 'react-hot-toast'
+import { useAppStateSnapshot } from 'state/app-state'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { isRoleImpersonationEnabled, useGetImpersonatedRole } from 'state/role-impersonation-state'
+import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import {
   AiIconAnimation,
   Button,
@@ -22,32 +52,8 @@ import {
   Input_Shadcn_,
   cn,
 } from 'ui'
-
-import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
-import { useSqlEditMutation } from 'data/ai/sql-edit-mutation'
-import { useSqlGenerateMutation } from 'data/ai/sql-generate-mutation'
-import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
-import { SqlSnippet } from 'data/content/sql-snippets-query'
-import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
-import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { useFormatQueryMutation } from 'data/sql/format-sql-query'
-import { isError } from 'data/utils/error-check'
-import {
-  useFlag,
-  useLocalStorage,
-  useLocalStorageQuery,
-  useSelectedOrganization,
-  useSelectedProject,
-  useStore,
-} from 'hooks'
-import { IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
-import { uuidv4 } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
-import Telemetry from 'lib/telemetry'
-import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
-import AISettingsModal from './AISettingsModal'
 import { sqlAiDisclaimerComment, untitledSnippetTitle } from './SQLEditor.constants'
 import {
   ContentDiff,
@@ -63,7 +69,6 @@ import {
   getDiffTypeDropdownLabel,
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
@@ -99,7 +104,9 @@ const SQLEditor = () => {
   const { profile } = useProfile()
   const project = useSelectedProject()
   const organization = useSelectedOrganization()
+  const appSnap = useAppStateSnapshot()
   const snap = useSqlEditorStateSnapshot()
+  const databaseSelectorState = useDatabaseSelectorStateSnapshot()
 
   const { mutate: formatQuery } = useFormatQueryMutation()
   const { mutateAsync: generateSql, isLoading: isGenerateSqlLoading } = useSqlGenerateMutation()
@@ -113,16 +120,19 @@ const SQLEditor = () => {
   const [pendingTitle, setPendingTitle] = useState<string>()
   const [hasSelection, setHasSelection] = useState<boolean>(false)
   const inputRef = useRef<HTMLInputElement>(null)
-  const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
+
+  const readReplicasEnabled = useFlag('readReplicas')
+  const showReadReplicasUI = readReplicasEnabled && project?.is_read_replicas_enabled
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
+  const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery({
+    projectRef: ref,
+  })
 
   // Customers on HIPAA plans should not have access to Supabase AI
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
   const [isAiOpen, setIsAiOpen] = useLocalStorageQuery('supabase_sql-editor-ai-open', true)
-
-  const [isAISettingsOpen, setIsAISettingsOpen] = useState(false)
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
 
   const selectedOrganization = useSelectedOrganization()
@@ -148,6 +158,13 @@ const SQLEditor = () => {
   useEffect(() => {
     setIsFirstRender(false)
   }, [])
+
+  useEffect(() => {
+    if (isSuccessReadReplicas) {
+      const primaryDatabase = databases.find((db) => db.identifier === ref)
+      databaseSelectorState.setSelectedDatabaseId(primaryDatabase?.identifier)
+    }
+  }, [isSuccessReadReplicas, databases, ref])
 
   const { data, refetch: refetchEntityDefinitions } = useEntityDefinitionsQuery(
     {
@@ -275,6 +292,8 @@ const SQLEditor = () => {
     }
   }, [formatQuery, id, isDiffOpen, project, snap])
 
+  const getImpersonatedRole = useGetImpersonatedRole()
+
   const executeQuery = useCallback(
     async (force: boolean = false) => {
       if (isDiffOpen) return
@@ -299,7 +318,7 @@ const SQLEditor = () => {
           return
         }
 
-        if (supabaseAIEnabled && !hasHipaaAddon && snippet?.snippet.name === untitledSnippetTitle) {
+        if (!hasHipaaAddon && snippet?.snippet.name === untitledSnippetTitle) {
           // Intentionally don't await title gen (lazy)
           setAiTitle(id, sql)
         }
@@ -309,14 +328,38 @@ const SQLEditor = () => {
           setLineHighlights([])
         }
 
+        const impersonatedRole = getImpersonatedRole()
+        const connectionString = !showReadReplicasUI
+          ? project.connectionString
+          : databases?.find((db) => db.identifier === databaseSelectorState.selectedDatabaseId)
+              ?.connectionString
+        if (IS_PLATFORM && !connectionString) {
+          return toast.error('Unable to run query: Connection string is missing')
+        }
+
         execute({
           projectRef: project.ref,
-          connectionString: project.connectionString,
-          sql,
+          connectionString: connectionString,
+          sql: wrapWithRoleImpersonation(sql, {
+            projectRef: project.ref,
+            role: impersonatedRole,
+          }),
+          isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
         })
       }
     },
-    [isDiffOpen, id, isExecuting, project, execute, setAiTitle, hasHipaaAddon, supabaseAIEnabled]
+    [
+      isDiffOpen,
+      id,
+      isExecuting,
+      project,
+      hasHipaaAddon,
+      execute,
+      getImpersonatedRole,
+      setAiTitle,
+      databaseSelectorState.selectedDatabaseId,
+      databases,
+    ]
   )
 
   const handleNewQuery = useCallback(
@@ -514,7 +557,6 @@ const SQLEditor = () => {
         setDebugSolution,
       }}
     >
-      <AISettingsModal visible={isAISettingsOpen} onCancel={() => setIsAISettingsOpen(false)} />
       <ConfirmModal
         visible={isConfirmModalOpen}
         title="Destructive operation"
@@ -530,10 +572,10 @@ const SQLEditor = () => {
         }}
       />
       <div className="flex h-full flex-col relative">
-        {isAiOpen && supabaseAIEnabled && !hasHipaaAddon && (
+        {isAiOpen && !hasHipaaAddon && (
           <AISchemaSuggestionPopover
             onClickSettings={() => {
-              setIsAISettingsOpen(true)
+              appSnap.setShowAiSettingsModal(true)
             }}
           >
             <motion.div
@@ -797,7 +839,7 @@ const SQLEditor = () => {
                       <button
                         onClick={() => {
                           setIsSchemaSuggestionDismissed(true)
-                          setIsAISettingsOpen(true)
+                          appSnap.setShowAiSettingsModal(true)
                         }}
                         className="text-brand-600 hover:text-brand-600 transition"
                       >

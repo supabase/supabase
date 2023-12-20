@@ -65,7 +65,7 @@ Supabase Auth supports two authentication flows: **Implicit** and **PKCE**. The 
 
         The client libraries are designed to listen for this type of URL, extract the access token, refresh token and some extra information from it, and finally persist it in local storage for further use by the library and your app.
 
-        <Admonition type="info">
+        <Admonition type="note">
 
         Web browsers do not send the URL fragment to the server they're making the request to. Since you may not be hosting the single-page app on a server under your direct control (such as on GitHub Pages or other freemium hosting providers), we want to prevent hosting services from getting access to your user's authorization credentials by default.
         
@@ -87,7 +87,7 @@ Supabase Auth supports two authentication flows: **Implicit** and **PKCE**. The 
         ```
         The `code` parameter is commonly known as the Auth Code and can be exchanged for an access token by calling `exchangeCodeForSession(code)`.
 
-        <Admonition type="info">
+        <Admonition type="note">
 
         For security purposes, the code has a validity of 5 minutes and can only be exchanged for an access token once. You will need to restart the authentication flow from scratch if you wish to obtain a new access token.
         

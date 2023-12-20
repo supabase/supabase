@@ -1,3 +1,5 @@
+import { Project } from 'data/projects/project-detail-query'
+
 export type CloudProvider = 'FLY' | 'AWS'
 export type Region = typeof AWS_REGIONS | typeof FLY_REGIONS
 
@@ -22,12 +24,14 @@ export const AWS_REGIONS = {
   // SOUTH_AFRICA: 'South Africa (Cape Town)',
 } as const
 
+export type AWS_REGIONS_KEYS = keyof typeof AWS_REGIONS
+
 export const FLY_REGIONS = {
   SOUTHEAST_ASIA: 'Singapore',
 } as const
 
 export const AWS_REGIONS_DEFAULT =
-  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? AWS_REGIONS.SOUTHEAST_ASIA : AWS_REGIONS.EAST_US
+  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? AWS_REGIONS.SOUTHEAST_ASIA : AWS_REGIONS.WEST_US
 
 // TO DO, change default to US region for prod
 export const FLY_REGIONS_DEFAULT = FLY_REGIONS.SOUTHEAST_ASIA
@@ -116,7 +120,7 @@ export const SERVICE_STATUS = {
   REMOVED: 'REMOVED',
 }
 
-export const PROJECT_STATUS = {
+export const PROJECT_STATUS: { [key: string]: Project['status'] } = {
   INACTIVE: 'INACTIVE',
   ACTIVE_HEALTHY: 'ACTIVE_HEALTHY',
   ACTIVE_UNHEALTHY: 'ACTIVE_UNHEALTHY',
@@ -126,9 +130,11 @@ export const PROJECT_STATUS = {
   INIT_FAILED: 'INIT_FAILED',
   REMOVED: 'REMOVED',
   RESTORING: 'RESTORING',
-  RESTORATION_FAILED: 'RESTORATION_FAILED',
   UPGRADING: 'UPGRADING',
+  // @ts-ignore [Joshen] API codegen seems to be wrong here, pausing is still a valid status
   PAUSING: 'PAUSING',
+  // @ts-ignore [Joshen] This is no longer part of the project status enum, but leaving here for now just in case
+  RESTORATION_FAILED: 'RESTORATION_FAILED',
 }
 
 export const DEFAULT_MINIMUM_PASSWORD_STRENGTH = 4

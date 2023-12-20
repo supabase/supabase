@@ -6,7 +6,19 @@ import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import DatePicker from 'react-datepicker'
-import { Alert, Button, IconChevronLeft, IconChevronRight, IconHelpCircle, Modal } from 'ui'
+import {
+  Alert,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconAlertTriangle,
+  IconChevronLeft,
+  IconChevronRight,
+  IconExternalLink,
+  IconHelpCircle,
+  Modal,
+} from 'ui'
 
 import { FormHeader, FormPanel } from 'components/ui/Forms'
 import InformationBox from 'components/ui/InformationBox'
@@ -25,6 +37,8 @@ import {
 import PITRStatus from './PITRStatus'
 import TimeInput from './TimeInput'
 import TimezoneSelection from './TimezoneSelection'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import Link from 'next/link'
 
 const PITRSelection = () => {
   const router = useRouter()
@@ -32,9 +46,12 @@ const PITRSelection = () => {
   const queryClient = useQueryClient()
 
   const { data: backups } = useBackupsQuery({ projectRef: ref })
+  const { data: databases } = useReadReplicasQuery({ projectRef: ref })
   const [showConfiguration, setShowConfiguration] = useState(false)
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [selectedTimezone, setSelectedTimezone] = useState<Timezone>(getClientTimezone())
+
+  const hasReadReplicas = (databases ?? []).length > 1
 
   const {
     mutate: restoreFromPitr,
@@ -126,6 +143,29 @@ const PITRSelection = () => {
         <BackupsEmpty />
       ) : (
         <>
+          {hasReadReplicas && (
+            <Alert_Shadcn_ variant="warning">
+              <IconAlertTriangle strokeWidth={2} />
+              <AlertTitle_Shadcn_>
+                Unable to restore from PITR as project has read replicas enabled
+              </AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_>
+                You will need to remove all read replicas first from your project's infrastructure
+                settings prior to starting a PITR restore.
+              </AlertDescription_Shadcn_>
+              <div className="flex items-center gap-x-2 mt-2">
+                {/* [Joshen] Ideally we have some links to a docs to explain why so */}
+                {/* <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                  Documentation
+                </Button> */}
+                <Button type="default">
+                  <Link href={`/project/${ref}/settings/infrastructure`}>
+                    Infrastructure settings
+                  </Link>
+                </Button>
+              </div>
+            </Alert_Shadcn_>
+          )}
           {!showConfiguration ? (
             <PITRStatus
               selectedTimezone={selectedTimezone}

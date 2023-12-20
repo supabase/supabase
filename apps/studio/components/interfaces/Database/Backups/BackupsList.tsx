@@ -24,8 +24,10 @@ const BackupsList = () => {
   const router = useRouter()
   const queryClient = useQueryClient()
   const organization = useSelectedOrganization()
+
   const { project: selectedProject } = useProjectContext()
   const projectRef = selectedProject?.ref || 'default'
+  const isHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
   const [selectedBackup, setSelectedBackup] = useState<DatabaseBackup>()
 
@@ -96,6 +98,7 @@ const BackupsList = () => {
                     backup={x}
                     projectRef={projectRef}
                     index={i}
+                    isHealthy={isHealthy}
                     onSelectBackup={() => setSelectedBackup(x)}
                   />
                 )

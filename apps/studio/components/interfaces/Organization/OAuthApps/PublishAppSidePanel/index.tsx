@@ -250,8 +250,10 @@ const PublishAppSidePanel = ({
                             >
                               <div className="absolute bottom-1 right-1">
                                 <DropdownMenu>
-                                  <DropdownMenuTrigger>
-                                    <Button type="default" icon={<IconEdit />} className="px-1" />
+                                  <DropdownMenuTrigger asChild>
+                                    <Button type="default" className="px-1">
+                                      <IconEdit />
+                                    </Button>
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent align="end" side="bottom">
                                     <DropdownMenuItem

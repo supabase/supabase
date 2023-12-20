@@ -101,7 +101,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
                 </div>
                 <div className="flex items-end justify-end">
                   <Tooltip.Root delayDuration={0}>
-                    <Tooltip.Trigger>
+                    <Tooltip.Trigger asChild>
                       <Button
                         type="default"
                         disabled={!canUpdateDiskSizeConfig || disabled}

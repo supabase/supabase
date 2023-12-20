@@ -11,6 +11,8 @@ import { NextPageWithLayout } from 'types'
 
 const SignInPage: NextPageWithLayout = () => {
   const router = useRouter()
+  const searchParams = new URLSearchParams(router.query as Record<string, string>).toString()
+
   useEffect(() => {
     if (!IS_PLATFORM) {
       // on selfhosted instance just redirect to projects page
@@ -22,7 +24,7 @@ const SignInPage: NextPageWithLayout = () => {
     <>
       <div className="flex flex-col gap-5">
         <SignInWithGitHub />
-        <SignInWithSSO />
+        <SignInWithSSO searchParams={searchParams} />
 
         <div className="relative">
           <div className="absolute inset-0 flex items-center">

@@ -122,7 +122,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 </TabPanel>
 </Tabs>
 
-<Admonition type="info">
+<Admonition type="note">
 
 Note that we are specifying filterSerializedResponseHeaders here. We need to tell SvelteKit that supabase needs the content-range header.
 
@@ -209,7 +209,7 @@ declare global {
 
 Authentication can be initiated [client](/docs/guides/auth/auth-helpers/sveltekit#client-side) or [server-side](/docs/guides/auth/auth-helpers/sveltekit#server-side). All of the [supabase-js authentication strategies](/docs/reference/javascript/auth-api) are supported with the Auth Helpers client.
 
-<Admonition type="info">
+<Admonition type="note">
 
 Note: The authentication flow requires the [Code Exchange Route](/docs/guides/auth/auth-helpers/sveltekit#code-exchange-route) to exchange a `code` for the user's `session`.
 
@@ -318,7 +318,7 @@ export const load = async ({ fetch, data, depends }) => {
 }
 ```
 
-<Admonition type="info">
+<Admonition type="note">
 
 TypeScript types can be [generated with the Supabase CLI](https://supabase.com/docs/reference/javascript/typescript-support) and passed to `createSupabaseLoadClient` to add type support to the Supabase client.
 
@@ -755,7 +755,7 @@ For [row level security](https://supabase.com/docs/guides/auth/row-level-securit
 <script lang="ts">
   export let data
 
-  const { user, tableData } = data
+  let { user, tableData } = data
   $: ({ user, tableData } = data)
 </script>
 

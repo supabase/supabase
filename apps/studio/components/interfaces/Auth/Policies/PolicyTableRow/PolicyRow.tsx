@@ -77,14 +77,14 @@ const PolicyRow = ({
       <div>
         {canUpdatePolicies ? (
           <DropdownMenu>
-            <DropdownMenuTrigger>
+            <DropdownMenuTrigger asChild>
               <Button
                 type="default"
                 style={{ paddingLeft: 4, paddingRight: 4 }}
                 icon={<IconMoreVertical />}
               />
             </DropdownMenuTrigger>
-            <DropdownMenuContent side="bottom" align="end">
+            <DropdownMenuContent side="bottom" align="end" className="w-32">
               <DropdownMenuItem className="space-x-2" onClick={() => onSelectEditPolicy(policy)}>
                 <IconEdit size={14} />
                 <p>Edit</p>
@@ -98,7 +98,7 @@ const PolicyRow = ({
           </DropdownMenu>
         ) : (
           <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger>
+            <Tooltip.Trigger asChild>
               <Button
                 disabled
                 type="default"

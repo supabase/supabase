@@ -28,11 +28,9 @@ const BlogListItem = ({ post }: Props) => {
       <Link href={post.path} className="group inline-block min-w-full">
         <div className="flex flex-col space-y-6">
           <div className="flex flex-col space-y-3">
-            <div
-              className={`border-default relative mb-4 w-full aspect-[2/1] lg:aspect-[3/2] overflow-auto rounded-lg border shadow-sm`}
-            >
+            <div className="border-default relative mb-4 w-full aspect-[2/1] lg:aspect-[3/2] overflow-hidden rounded-lg border shadow-sm">
               <Image
-                layout="fill"
+                fill
                 src={
                   !post.thumb
                     ? `/images/blog/blog-placeholder.png`
@@ -40,9 +38,8 @@ const BlogListItem = ({ post }: Props) => {
                     ? post.thumb
                     : `/images/blog/${post.thumb}`
                 }
-                objectFit="cover"
-                className="scale-100 object-cover overflow-hidden transform duration-100 ease-in group-hover:scale-105"
-                alt="case study thumbnail"
+                className="scale-100 object-cover overflow-hidden transform transition-transform group-hover:scale-105"
+                alt={`${post.title} thumbnail`}
               />
             </div>
 
@@ -67,9 +64,9 @@ const BlogListItem = ({ post }: Props) => {
                   {author.author_image_url && (
                     <Image
                       src={author.author_image_url}
-                      className="rounded-full border border-default w-full h-full"
+                      className="rounded-full object-cover border border-default w-full h-full"
                       alt={`${author.author} avatar`}
-                      layout="fill"
+                      fill
                     />
                   )}
                 </div>

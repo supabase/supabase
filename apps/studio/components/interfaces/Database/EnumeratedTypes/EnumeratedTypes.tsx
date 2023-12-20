@@ -135,14 +135,9 @@ const EnumeratedTypes = () => {
                       {!isLocked && (
                         <div className="flex justify-end items-center space-x-2">
                           <DropdownMenu>
-                            <DropdownMenuTrigger>
-                              <Button
-                                asChild
-                                type="default"
-                                icon={<IconMoreVertical />}
-                                className="px-1"
-                              >
-                                <span></span>
+                            <DropdownMenuTrigger asChild>
+                              <Button type="default" className="px-1">
+                                <IconMoreVertical />
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent side="bottom" align="end" className="w-32">

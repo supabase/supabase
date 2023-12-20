@@ -31,10 +31,19 @@ import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
+import { Markdown } from 'components/interfaces/Markdown'
+import FormField from '../AuthProvidersForm/FormField'
+
+// Use a const string to represent no chars option. Represented as empty string on the backend side.
+const NO_REQUIRED_CHARACTERS = 'NO_REQUIRED_CHARS'
+const LETTERS_AND_DIGITS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789'
+const LOWER_UPPER_DIGITS = 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789'
+const LOWER_UPPER_DIGITS_SYMBOLS = LOWER_UPPER_DIGITS + ':!@#$%^&*()_+-=[]{};\'\\\\:"|<>?,./`~'
 
 const schema = object({
   DISABLE_SIGNUP: boolean().required(),
+  SECURITY_MANUAL_LINKING_ENABLED: boolean().required(),
   SITE_URL: string().required('Must have a Site URL'),
   SECURITY_CAPTCHA_ENABLED: boolean().required(),
   SECURITY_CAPTCHA_SECRET: string().when('SECURITY_CAPTCHA_ENABLED', {
@@ -49,6 +58,10 @@ const schema = object({
   }),
   SESSIONS_TIMEBOX: number().min(0, 'Must be a positive number'),
   SESSIONS_INACTIVITY_TIMEOUT: number().min(0, 'Must be a positive number'),
+  SESSIONS_SINGLE_PER_USER: boolean(),
+  PASSWORD_MIN_LENGTH: number().min(6, 'Must be greater or equal to 6.'),
+  PASSWORD_REQUIRED_CHARACTERS: string(),
+  PASSWORD_HIBP_ENABLED: boolean(),
 })
 
 function HoursOrNeverText({ value }: { value: number }) {
@@ -60,6 +73,8 @@ function HoursOrNeverText({ value }: { value: number }) {
     return 'hours'
   }
 }
+
+const formId = 'auth-config-basic-settings'
 
 const BasicAuthSettingsForm = observer(() => {
   const { ui } = useStore()
@@ -73,7 +88,6 @@ const BasicAuthSettingsForm = observer(() => {
   } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
-  const formId = 'auth-config-basic-settings'
   const [hidden, setHidden] = useState(true)
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
@@ -83,20 +97,47 @@ const BasicAuthSettingsForm = observer(() => {
   })
 
   const isProPlanAndUp = isSuccessSubscription && subscription?.plan?.id !== 'free'
+  const singlePerUserReleased = useFlag('authSingleSessionPerUserReleased')
+  const passwordStrengthReleased = useFlag('authPasswordStrengthReleased')
+  const hibpReleased = useFlag('authHIBPReleased')
 
   const INITIAL_VALUES = {
     DISABLE_SIGNUP: !authConfig?.DISABLE_SIGNUP,
+    SECURITY_MANUAL_LINKING_ENABLED: authConfig?.SECURITY_MANUAL_LINKING_ENABLED || false,
     SITE_URL: authConfig?.SITE_URL,
     SECURITY_CAPTCHA_ENABLED: authConfig?.SECURITY_CAPTCHA_ENABLED || false,
     SECURITY_CAPTCHA_SECRET: authConfig?.SECURITY_CAPTCHA_SECRET || '',
     SECURITY_CAPTCHA_PROVIDER: authConfig?.SECURITY_CAPTCHA_PROVIDER || 'hcaptcha',
     SESSIONS_TIMEBOX: authConfig?.SESSIONS_TIMEBOX || 0,
     SESSIONS_INACTIVITY_TIMEOUT: authConfig?.SESSIONS_INACTIVITY_TIMEOUT || 0,
+    ...(singlePerUserReleased
+      ? {
+          SESSIONS_SINGLE_PER_USER: authConfig?.SESSIONS_SINGLE_PER_USER || false,
+        }
+      : null),
+
+    ...(passwordStrengthReleased
+      ? {
+          PASSWORD_MIN_LENGTH: authConfig?.PASSWORD_MIN_LENGTH || 6,
+          PASSWORD_REQUIRED_CHARACTERS:
+            authConfig?.PASSWORD_REQUIRED_CHARACTERS || NO_REQUIRED_CHARACTERS,
+
+          ...(hibpReleased
+            ? {
+                PASSWORD_HIBP_ENABLED: authConfig?.PASSWORD_HIBP_ENABLED || false,
+              }
+            : null),
+        }
+      : null),
   }
 
   const onSubmit = (values: any, { resetForm }: any) => {
     const payload = { ...values }
     payload.DISABLE_SIGNUP = !values.DISABLE_SIGNUP
+    // The backend uses empty string to represent no required characters in the password
+    if (payload.PASSWORD_REQUIRED_CHARACTERS === NO_REQUIRED_CHARACTERS) {
+      payload.PASSWORD_REQUIRED_CHARACTERS = ''
+    }
 
     updateAuthConfig(
       { projectRef: projectRef!, config: payload },
@@ -132,7 +173,6 @@ const BasicAuthSettingsForm = observer(() => {
     <Form id={formId} initialValues={INITIAL_VALUES} onSubmit={onSubmit} validationSchema={schema}>
       {({ handleReset, resetForm, values, initialValues }: any) => {
         const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
-
         // Form is reset once remote data is loaded in store
         useEffect(() => {
           if (isSuccess) resetForm({ values: INITIAL_VALUES, initialValues: INITIAL_VALUES })
@@ -173,9 +213,86 @@ const BasicAuthSettingsForm = observer(() => {
                     descriptionText="If this is disabled, new users will not be able to sign up to your application."
                     disabled={!canUpdateConfig}
                   />
+                  <Toggle
+                    id="SECURITY_MANUAL_LINKING_ENABLED"
+                    size="small"
+                    label="Allow manual linking"
+                    layout="flex"
+                    descriptionText={
+                      <Markdown
+                        extLinks
+                        className="[&>p>a]:text-foreground-light [&>p>a]:transition-all [&>p>a]:hover:text-foreground [&>p>a]:hover:decoration-brand"
+                        content="Enable [manual linking APIs](https://supabase.com/docs/guides/auth/auth-identity-linking#manual-linking-beta) for your project."
+                      />
+                    }
+                    disabled={!canUpdateConfig}
+                  />
                 </FormSectionContent>
               </FormSection>
-              <div className="border-t border-muted"></div>
+              {passwordStrengthReleased && (
+                <>
+                  <FormSection header={<FormSectionLabel>Passwords</FormSectionLabel>}>
+                    <FormSectionContent loading={isLoading}>
+                      <InputNumber
+                        id="PASSWORD_MIN_LENGTH"
+                        size="small"
+                        label="Minimum password length"
+                        descriptionText="Passwords shorter than this value will be rejected as weak. Minimum 6, recommended 8 or more."
+                        actions={<span className="mr-3 text-foreground-lighter">characters</span>}
+                        disabled={!canUpdateConfig}
+                      />
+                      <FormField
+                        name="PASSWORD_REQUIRED_CHARACTERS"
+                        properties={{
+                          type: 'select',
+                          title: 'Password Requirements',
+                          description:
+                            'Passwords that do not have at least one of each will be rejected as weak.',
+                          enum: [
+                            {
+                              label: 'No required characters (default)',
+                              value: NO_REQUIRED_CHARACTERS,
+                            },
+                            {
+                              label: 'Letters and digits',
+                              value: LETTERS_AND_DIGITS,
+                            },
+                            {
+                              label: 'Lowercase, uppercase letters and digits',
+                              value: LOWER_UPPER_DIGITS,
+                            },
+                            {
+                              label:
+                                'Lowercase, uppercase letters, digits and symbols (recommended)',
+                              value: LOWER_UPPER_DIGITS_SYMBOLS,
+                            },
+                          ],
+                        }}
+                        formValues={values}
+                      />
+                      {isProPlanAndUp ? (
+                        <></>
+                      ) : (
+                        <UpgradeToPro
+                          primaryText="Upgrade to Pro"
+                          secondaryText="Leaked password protection available on Pro plans and up."
+                          projectRef={projectRef!}
+                          organizationSlug={organization!.slug}
+                        />
+                      )}
+                      <Toggle
+                        id="PASSWORD_HIBP_ENABLED"
+                        size="small"
+                        label="Prevent use of leaked passwords"
+                        afterLabel=" (recommended)"
+                        layout="flex"
+                        descriptionText="Rejects the use of known or easy to guess passwords on sign up or password change. Powered by the HaveIBeenPwned.org Pwned Passwords API."
+                        disabled={!canUpdateConfig || !isProPlanAndUp}
+                      />
+                    </FormSectionContent>
+                  </FormSection>
+                </>
+              )}
               <FormSection header={<FormSectionLabel>User Sessions</FormSectionLabel>}>
                 <FormSectionContent loading={isLoading}>
                   {isProPlanAndUp ? (
@@ -188,11 +305,21 @@ const BasicAuthSettingsForm = observer(() => {
                       organizationSlug={organization!.slug}
                     />
                   )}
+                  {singlePerUserReleased && (
+                    <Toggle
+                      id="SESSIONS_SINGLE_PER_USER"
+                      size="small"
+                      label="Enforce single session per user"
+                      layout="flex"
+                      descriptionText="If enabled, all but a user's most recently active session will be terminated."
+                      disabled={!canUpdateConfig || !isProPlanAndUp}
+                    />
+                  )}
                   <InputNumber
                     id="SESSIONS_TIMEBOX"
                     size="small"
                     label="Time-box user sessions"
-                    descriptionText="How long before a user is forced to log in again, use 0 for never"
+                    descriptionText="The amount of time before a user is forced to sign in again. Use 0 for never"
                     actions={
                       <span className="mr-3 text-foreground-lighter">
                         <HoursOrNeverText value={values.SESSIONS_TIMEBOX} />
@@ -204,7 +331,7 @@ const BasicAuthSettingsForm = observer(() => {
                     id="SESSIONS_INACTIVITY_TIMEOUT"
                     size="small"
                     label="Inactivity timeout"
-                    descriptionText="How long users need to be inactive to be forced to log in again, use 0 for never"
+                    descriptionText="The amount of time a user needs to be inactive to be forced to sign in again. Use 0 for never."
                     actions={
                       <span className="mr-3 text-foreground-lighter">
                         <HoursOrNeverText value={values.SESSIONS_INACTIVITY_TIMEOUT} />
@@ -214,7 +341,6 @@ const BasicAuthSettingsForm = observer(() => {
                   />
                 </FormSectionContent>
               </FormSection>
-              <div className="border-t border-scale-400"></div>
               <FormSection header={<FormSectionLabel>Bot and Abuse Protection</FormSectionLabel>}>
                 <FormSectionContent loading={isLoading}>
                   <Toggle
@@ -227,22 +353,27 @@ const BasicAuthSettingsForm = observer(() => {
                   />
                   {values.SECURITY_CAPTCHA_ENABLED && (
                     <>
-                      <Radio.Group
-                        id="SECURITY_CAPTCHA_PROVIDER"
+                      <FormField
                         name="SECURITY_CAPTCHA_PROVIDER"
-                        label="Choose Captcha Provider"
-                      >
-                        <Radio
-                          label="hCaptcha"
-                          value="hcaptcha"
-                          checked={values.SECURITY_CAPTCHA_PROVIDER === 'hcaptcha'}
-                        />
-                        <Radio
-                          label="Turnstile by Cloudflare"
-                          value="turnstile"
-                          checked={values.SECURITY_CAPTCHA_PROVIDER === 'turnstile'}
-                        />
-                      </Radio.Group>
+                        properties={{
+                          type: 'select',
+                          title: 'Choose Captcha Provider',
+                          description: '',
+                          enum: [
+                            {
+                              label: 'hCaptcha',
+                              value: 'hcaptcha',
+                              icon: 'hcaptcha-icon.png',
+                            },
+                            {
+                              label: 'Turnstile by Cloudflare',
+                              value: 'turnstile',
+                              icon: 'cloudflare-icon.png',
+                            },
+                          ],
+                        }}
+                        formValues={values}
+                      />
                       <Input
                         id="SECURITY_CAPTCHA_SECRET"
                         type={hidden ? 'password' : 'text'}

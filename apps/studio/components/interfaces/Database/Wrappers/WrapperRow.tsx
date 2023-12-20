@@ -141,7 +141,7 @@ const WrapperRow = ({
                       </Link>
                     ) : (
                       <Tooltip.Root delayDuration={0}>
-                        <Tooltip.Trigger>
+                        <Tooltip.Trigger asChild>
                           <Button
                             type="default"
                             disabled
@@ -169,7 +169,7 @@ const WrapperRow = ({
                       </Tooltip.Root>
                     )}
                     <Tooltip.Root delayDuration={0}>
-                      <Tooltip.Trigger>
+                      <Tooltip.Trigger asChild>
                         <Button
                           type="default"
                           disabled={!canManageWrappers}

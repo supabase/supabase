@@ -59,7 +59,7 @@ When developing with Expo, you can test Sign in with Apple via the Expo Go app, 
     3. An **App ID** which uniquely identifies the app you are building. You can create a new App ID from the [Identifiers](https://developer.apple.com/account/resources/identifiers/list/bundleId) section in the Apple Developer Console (use the filter menu in the upper right side to see all App IDs). These usually are a reverse domain name string, for example `com.example.app`. Make sure you configure Sign in with Apple once you create an App ID in the Capabilities list. At this time Supabase Auth does not support Server-to-Server notification endpoints, so you should leave that setting blank. (In the past App IDs were referred to as _bundle IDs._)
     4. A **Services ID** which uniquely identifies the web services provided by the app you registered in the previous step. You can create a new Services ID from the [Identifiers](https://developer.apple.com/account/resources/identifiers/list/serviceId) section in the Apple Developer Console (use the filter menu in the upper right side to see all Services IDs). These usually are a reverse domain name string, for example `com.example.app.web`.
     5. Configure Website URLs for the newly created **Services ID**. The web domain you should use is the domain your Supabase project is hosted on. This is usually `<project-id>.supabase.co` while the redirect URL is `https://<project-id>.supabase.co/auth/v1/callback`.
-    6. Create a signing **Key** in the [Keys](https://developer.apple.com/account/resources/authkeys/list) section of the Apple Developer Console. You can use this key to generate a secret key using the tool below, which is added to your Supabase project's Auth configuration. Make sure you safely store the `AuthKey_XXXXXXXXXX.p8` file. If you ever loose access to it, or make it public accidentally please revoke it from the Apple Developer Console and create a new one immediately. You will have to generate a new secret key using this file every 6 months, so make sure you schedule a recurring meeting in your calendar!
+    6. Create a signing **Key** in the [Keys](https://developer.apple.com/account/resources/authkeys/list) section of the Apple Developer Console. You can use this key to generate a secret key using the tool below, which is added to your Supabase project's Auth configuration. Make sure you safely store the `AuthKey_XXXXXXXXXX.p8` file. If you ever lose access to it, or make it public accidentally please revoke it from the Apple Developer Console and create a new one immediately. You will have to generate a new secret key using this file every 6 months, so make sure you schedule a recurring meeting in your calendar!
     7. Finally, add the information you configured above to the [Apple provider configuration in the Supabase dashboard](https://supabase.com/dashboard/project/_/auth/providers).
 
     <Admonition>
@@ -202,17 +202,40 @@ When developing with Expo, you can test Sign in with Apple via the Expo Go app, 
 
     ## Using Native Sign in with Apple in Flutter
 
-    Unlike the OAuth flow which requires the use of a web browser, the native Sign in with Apple flow on iOS, macOS, watchOS or tvOS uses the [operating system's built-in functionalities](https://developer.apple.com/documentation/authenticationservices) to prompt the user for consent.
+    You can perform Apple sign in using the [sign_in_with_apple](https://pub.dev/packages/sign_in_with_apple) package on Flutter.
+    Follow the instructions in the package README to set up native Apple sign in on iOS and macOS.
 
-    When the user provides consent, Apple issues an identity token (commonly abbreviated as ID token) that is then sent to your project's Supabase Auth server. When valid, a new user session is started by issuing an access and refresh token from Supabase Auth.
-
-    If you are building an iOS or macOS app using Flutter, you can use the [signInWithApple()](/docs/reference/dart/sign-in-with-apple) method to perform Apple sign in:
+    Once the setup is complete on the Flutter app, add the bundle ID of your app to your Supabase dashboard in `Authentication -> Providers -> Apple` in order to register your app with Supabase.
 
     ```dart
+    import 'package:sign_in_with_apple/sign_in_with_apple.dart';
     import 'package:supabase_flutter/supabase_flutter.dart';
 
-    final AuthResponse res = await supabase.auth.signInWithApple();
-    final User? user = res.user;
+    /// Performs Apple sign in on iOS or macOS
+    Future<AuthResponse> signInWithApple() async {
+      final rawNonce = supabase.auth.generateRawNonce();
+      final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
+
+      final credential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+        nonce: hashedNonce,
+      );
+
+      final idToken = credential.identityToken;
+      if (idToken == null) {
+        throw const AuthException(
+            'Could not find ID Token from generated credential.');
+      }
+
+      return signInWithIdToken(
+        provider: OAuthProvider.apple,
+        idToken: idToken,
+        nonce: rawNonce,
+      );
+    }
     ```
 
     ### Configuration [#flutter-configuration-native-app]
@@ -292,7 +315,7 @@ When developing with Expo, you can test Sign in with Apple via the Expo Go app, 
   
     ## Using Native Sign in with Apple in Kotlin
   
-	When using [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/), you can use the [compose-auth](https://supabase.com/docs/reference/kotlin/installing) plugin. On iOS it uses Native Apple Login automatically and on other platforms it uses `gotrue.loginWith(Apple)`.
+	When using [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/), you can use the [compose-auth](https://supabase.com/docs/reference/kotlin/installing) plugin. On iOS it uses Native Apple Login automatically and on other platforms it uses `gotrue.signInWith(Apple)`.
 
     **Initialize the Supabase Client**
 

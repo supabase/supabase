@@ -105,7 +105,7 @@ const CostControl = ({}: CostControlProps) => {
                   {currentPlan?.name || ''} plan requires you to have spend cap off at all times.
                   Your projects will never become unresponsive. Only when your{' '}
                   <Link
-                    href="#breakdown"
+                    href={`/org/${slug}/usage`}
                     className="text-green-900 transition hover:text-green-1000"
                   >
                     included usage
@@ -117,7 +117,7 @@ const CostControl = ({}: CostControlProps) => {
                   You can control whether your organization is charged for additional usage beyond
                   the{' '}
                   <Link
-                    href="#breakdown"
+                    href={`/org/${slug}/usage`}
                     className="text-green-900 transition hover:text-green-1000"
                   >
                     included quota

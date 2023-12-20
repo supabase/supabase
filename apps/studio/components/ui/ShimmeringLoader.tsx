@@ -1,9 +1,19 @@
-const ANIMATION_DELAY = 150
+import { cn } from 'ui'
 
-const ShimmeringLoader = ({ className = '', delayIndex = 0, animationDelay = 150 }) => {
+export interface ShimmeringLoader {
+  className?: string
+  delayIndex?: number
+  animationDelay?: number
+}
+
+const ShimmeringLoader = ({
+  className,
+  delayIndex = 0,
+  animationDelay = 150,
+}: ShimmeringLoader) => {
   return (
     <div
-      className={`shimmering-loader rounded py-3 ${className}`}
+      className={cn('shimmering-loader rounded py-3', className)}
       style={{
         animationFillMode: 'backwards',
         animationDelay: `${delayIndex * animationDelay}ms`,

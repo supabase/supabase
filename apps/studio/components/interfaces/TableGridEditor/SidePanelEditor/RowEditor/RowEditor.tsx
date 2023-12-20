@@ -1,5 +1,5 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
-import { Dictionary } from 'components/grid'
+import { Dictionary } from 'types'
 import { isEmpty, isUndefined, noop, partition } from 'lodash'
 import { useEffect, useMemo, useState } from 'react'
 import { SidePanel } from 'ui'
@@ -190,7 +190,6 @@ const RowEditor = ({
                 </SidePanel.Content>
               </>
             )}
-
             <JsonEdit
               visible={isEditingJson}
               column={selectedValueForJsonEdit?.column ?? ''}

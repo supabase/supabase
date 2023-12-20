@@ -5,6 +5,7 @@ import Table from 'components/to-be-cleaned/Table'
 import { User } from 'data/auth/users-query'
 import UserDropdown from './UserDropdown'
 import { getDateFromIsoString } from './Users.utils'
+import { getDisplayName } from './UserListItem.utils'
 
 interface UserListItemProps {
   user: User
@@ -19,6 +20,9 @@ const UserListItem = ({ user, canRemoveUser, canRemoveMFAFactors }: UserListItem
 
   return (
     <Table.tr className="relative" key={user.id}>
+      <Table.td className="whitespace-nowrap">
+        <span className="text-foreground">{getDisplayName(user)}</span>
+      </Table.td>
       <Table.td className="whitespace-nowrap">
         <div className="flex items-center gap-2">
           <span className="text-sm text-foreground">{!user.email ? '-' : user.email}</span>

@@ -13,6 +13,7 @@ import {
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useFlag, useIsFeatureEnabled } from 'hooks'
 import {
   AlertDescription_Shadcn_,
@@ -23,10 +24,11 @@ import {
   Input,
 } from 'ui'
 import ProjectUpgradeAlert from '../General/Infrastructure/ProjectUpgradeAlert'
+import InstanceConfiguration from './InfrastructureConfiguration/InstanceConfiguration'
 
 const InfrastructureInfo = () => {
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { project, isLoading } = useProjectContext()
 
   const authEnabled = useIsFeatureEnabled('project_auth:all')
 
@@ -39,12 +41,16 @@ const InfrastructureInfo = () => {
   } = useProjectUpgradeEligibilityQuery({
     projectRef: ref,
   })
+  const { data: databases } = useReadReplicasQuery({ projectRef: ref })
   const { current_app_version, latest_app_version, requires_manual_intervention } = data || {}
   const isOnLatestVersion = current_app_version === latest_app_version
   const currentPgVersion = (current_app_version ?? '').split('supabase-postgres-')[1]
   const latestPgVersion = (latest_app_version ?? '').split('supabase-postgres-')[1]
 
   const showDbUpgrades = useFlag('databaseUpgrades')
+  const readReplicasEnabled = useFlag('readReplicas')
+  const showReadReplicasUI = readReplicasEnabled && project?.is_read_replicas_enabled
+  const hasReadReplicas = (databases ?? []).length > 1
   const subject = 'Request%20for%20Postgres%20upgrade%20for%20project'
   const message = `Upgrade information:%0A• Manual intervention reason: ${requires_manual_intervention}`
 
@@ -60,19 +66,36 @@ const InfrastructureInfo = () => {
           </div>
         </div>
       </ScaffoldContainer>
+
       <ScaffoldDivider />
+
+      {showReadReplicasUI && (
+        <>
+          <InstanceConfiguration />
+          <ScaffoldDivider />
+        </>
+      )}
+
       <ScaffoldContainer>
+        {!showReadReplicasUI && (
+          <ScaffoldSection>
+            <ScaffoldSectionDetail>
+              <p>Configuration</p>
+              <p className="text-foreground-light text-sm">Information on your server provider</p>
+            </ScaffoldSectionDetail>
+            <ScaffoldSectionContent>
+              {isLoading ? (
+                <GenericSkeletonLoader />
+              ) : (
+                <>
+                  <Input readOnly disabled value={project?.cloud_provider} label="Cloud provider" />
+                  <Input readOnly disabled value={project?.region} label="Region" />
+                </>
+              )}
+            </ScaffoldSectionContent>
+          </ScaffoldSection>
+        )}
         <ScaffoldSection>
-          <ScaffoldSectionDetail>
-            <p>Configuration</p>
-            <p className="text-foreground-light text-sm">Information on your server provider</p>
-          </ScaffoldSectionDetail>
-          <ScaffoldSectionContent>
-            <Input readOnly disabled value={project?.cloud_provider} label="Cloud provider" />
-            <Input readOnly disabled value={project?.region} label="Region" />
-          </ScaffoldSectionContent>
-        </ScaffoldSection>
-        <ScaffoldSection className="!pt-0">
           <ScaffoldSectionDetail>
             <p>Service Versions</p>
             <p className="text-foreground-light text-sm">
@@ -132,7 +155,18 @@ const InfrastructureInfo = () => {
                     ),
                   ]}
                 />
-                {showDbUpgrades && data?.eligible && <ProjectUpgradeAlert />}
+                {showDbUpgrades && data?.eligible && !hasReadReplicas && <ProjectUpgradeAlert />}
+                {showDbUpgrades && data.eligible && hasReadReplicas && (
+                  <Alert_Shadcn_>
+                    <AlertTitle_Shadcn_>
+                      A new version of Postgres is available for your project
+                    </AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_>
+                      You will need to remove all read replicas first prior to upgrading your
+                      Postgrest version to the latest available ({latestPgVersion}).
+                    </AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
+                )}
                 {showDbUpgrades && !data?.eligible && data?.requires_manual_intervention && (
                   <Alert_Shadcn_ title="A new version of Postgres is available for your project">
                     <AlertTitle_Shadcn_>
