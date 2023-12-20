@@ -4,7 +4,7 @@ import Panel from './Panel'
 
 function ExampleCard(props: any) {
   return (
-    <Panel innerClassName="bg-surface-100" hasShimmer>
+    <Panel innerClassName="bg-surface-100">
       <div className="h-32 p-5 flex flex-col justify-between ">
         <div className="mb-4 flex flex-col gap-2">
           <div className="flex flex-wrap items-center gap-2">
@@ -24,14 +24,36 @@ function ExampleCard(props: any) {
         <div className="flex flex-col justify-between p-5">
           <div className="mt-3 pt-5 border-t flex items-stretch gap-2">
             {props.repo_url && (
-              <Button asChild size="tiny" type="default" iconRight={<IconArrowUpRight />}>
+              <Button
+                asChild
+                size="tiny"
+                type="default"
+                className="group overflow-hidden"
+                iconRight={
+                  <div className="relative w-3.5 h-3.5 flex items-center justify-center">
+                    <IconArrowUpRight className="absolute inset-0 transition-transform duration-200 translate-x-0 translate-y-0 group-hover:translate-x-6 group-hover:-translate-y-6" />
+                    <IconArrowUpRight className="absolute inset-0 transition-transform duration-200 -translate-x-6 translate-y-6 group-hover:translate-x-0 group-hover:-translate-y-0" />
+                  </div>
+                }
+              >
                 <Link href={props.repo_url} as={props.repo_url} target="_blank">
                   View Code
                 </Link>
               </Button>
             )}
             {props.demo_url && (
-              <Button asChild size="tiny" type="default" iconRight={<IconArrowUpRight />}>
+              <Button
+                asChild
+                size="tiny"
+                type="default"
+                className="group overflow-hidden"
+                iconRight={
+                  <div className="relative w-3.5 h-3.5 flex items-center justify-center">
+                    <IconArrowUpRight className="absolute inset-0 transition-transform duration-200 translate-x-0 translate-y-0 group-hover:translate-x-6 group-hover:-translate-y-6" />
+                    <IconArrowUpRight className="absolute inset-0 transition-transform duration-200 -translate-x-6 translate-y-6 group-hover:translate-x-0 group-hover:-translate-y-0" />
+                  </div>
+                }
+              >
                 <Link href={props.demo_url} as={props.demo_url} target="_blank">
                   Launch Demo
                 </Link>
