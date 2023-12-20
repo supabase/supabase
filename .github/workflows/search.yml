@@ -39,6 +39,7 @@ jobs:
         with:
           sparse-checkout: |
             apps/docs
+            spec
             supabase
 
       - name: Setup node

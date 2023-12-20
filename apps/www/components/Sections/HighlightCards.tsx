@@ -49,7 +49,7 @@ const HighlightCard = ({ highlight, index }: { highlight: Highlight; index: numb
           <div
             className="absolute inset-0 w-full h-full z-10"
             style={{
-              background: `radial-gradient(100% 50% at 50% 50%, transparent, hsl(var(--background-alternative)))`,
+              background: `radial-gradient(100% 50% at 50% 50%, transparent, hsl(var(--background-alternative-default)))`,
             }}
           />
           {highlight.image && <Img isHovered={isHovered} />}

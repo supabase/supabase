@@ -163,7 +163,7 @@ const GenerateSQL = () => {
                               hideCopy
                               language="sql"
                               className="
-                                relative prose dark:prose-dark bg-surface-100 max-w-none !mb-0
+                                relative prose bg-surface-100 max-w-none !mb-0
                                 !rounded-b-none
                                 
                               "

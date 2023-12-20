@@ -46,7 +46,7 @@ const GuidesTableOfContents: FC<Props> = ({ list }) => {
         <li key={`${item.level}-${i}`} className={item.level === 3 ? 'ml-4' : ''}>
           <a
             href={`#${formatSlug(item.link)}`}
-            className="text-foreground-lighter hover:text-brand transition-colors"
+            className="text-foreground-lighter hover:text-brand-link transition-colors"
             dangerouslySetInnerHTML={{ __html: formatTOCHeader(removeAnchor(item.text)) }}
           />
         </li>

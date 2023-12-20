@@ -30,7 +30,7 @@ const GitHubButton = () => {
 
   return (
     <Button
-      className="hidden group lg:flex text-foreground-light hover:text-foreground-strong"
+      className="hidden group lg:flex text-foreground-light hover:text-foreground"
       type="text"
       asChild
     >

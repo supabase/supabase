@@ -11,7 +11,7 @@ export const PricingTableRowDesktop = (props: any) => {
     <>
       <tr className="divide-border" style={{ borderTop: 'none' }} id={`${props.sectionId}-desktop`}>
         <th
-          className="bg-background text-foreground sticky top-[62px] z-10 py-3 pl-6 text-left text-sm font-medium dark:text-white"
+          className="bg-background text-foreground sticky top-[62px] z-10 py-3 pl-6 text-left text-sm font-medium"
           scope="colgroup"
         >
           <div className="flex items-center gap-4">
@@ -30,7 +30,7 @@ export const PricingTableRowDesktop = (props: any) => {
           <Fragment key={feat.title}>
             <tr className="divide-border" key={i}>
               <th
-                className={`text-foreground flex items-center px-6 py-5 last:pb-24 text-left text-xs font-normal dark:text-white `}
+                className={`text-foreground flex items-center px-6 py-5 last:pb-24 text-left text-xs font-normal `}
                 scope="row"
               >
                 <span>{feat.title}</span>
@@ -63,7 +63,7 @@ export const PricingTableRowDesktop = (props: any) => {
                         <IconPricingMinus plan={planValue} />
                       </div>
                     ) : (
-                      <span className="text-foreground text-xs dark:text-white flex items-center gap-3">
+                      <span className="text-foreground text-xs flex items-center gap-3">
                         {feat.tooltips?.[planName] && (
                           <span
                             className="shrink-0 hover:text-background-overlay-default cursor-pointer transition-colors"
@@ -97,7 +97,7 @@ export const PricingTableRowMobile = (props: any) => {
   return (
     <>
       <table className="mt-8 w-full" id={`${props.sectionId}-mobile`}>
-        <caption className="bg-background border-default border-t px-4 py-3 text-left text-sm font-medium dark:text-white">
+        <caption className="bg-background border-default border-t px-4 py-3 text-left text-sm font-medium text-foreground">
           <div className="flex items-center gap-2">
             {category.icon ? <ProductIcon icon={props.icon} /> : null}
             <span className="text-foreground font-normal">{category.title}</span>

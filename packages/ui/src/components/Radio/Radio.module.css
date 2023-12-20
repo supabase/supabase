@@ -11,7 +11,7 @@
 } */
 
 .sbui-radio-container--card--active {
-  @apply bg-brand-100 bg-opacity-20 border-brand-200 dark:border-brand-200 z-10;
+  @apply bg-brand-100 bg-opacity-20 border-brand-200 z-10;
 }
 
 /* .sbui-radio-container--card:first-child {

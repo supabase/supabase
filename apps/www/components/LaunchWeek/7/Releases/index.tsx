@@ -508,7 +508,7 @@ export default function LW7Releases() {
                     animate="default"
                     whileHover="hover"
                   >
-                    <div className="flex items-center text-center lg:text-left justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
+                    <div className="flex items-center text-center lg:text-left justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-foreground">
                       <CartTitle>{day2.steps[0].title}</CartTitle>
                       <StyledArticleBadge className="lg:ml-2">New</StyledArticleBadge>
                     </div>
@@ -596,7 +596,7 @@ export default function LW7Releases() {
                     animate="default"
                     whileHover="hover"
                   >
-                    <div className="flex items-center text-center lg:text-left justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
+                    <div className="flex items-center text-center lg:text-left justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-foreground">
                       <CartTitle>{day3.steps[0].title}</CartTitle>
                       <StyledArticleBadge className="lg:ml-2">Updated</StyledArticleBadge>
                     </div>
@@ -684,7 +684,7 @@ export default function LW7Releases() {
                     animate="default"
                     whileHover="hover"
                   >
-                    <div className="flex items-center text-center lg:text-left justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
+                    <div className="flex items-center text-center lg:text-left justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-foreground">
                       <CartTitle>{day4.steps[0].title}</CartTitle>
                       <StyledArticleBadge className="lg:ml-2">New</StyledArticleBadge>
                     </div>

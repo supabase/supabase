@@ -282,7 +282,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                             <div className="relative w-full h-full mx-auto">
                               <Image
                                 src={`/images/career/icons/${human.icon}${
-                                  resolvedTheme === 'dark' ? '-dark' : '-light'
+                                  resolvedTheme?.includes('dark') ? '-dark' : '-light'
                                 }.svg`}
                                 className="w-12 h-12 sm:w-10 sm:h-10 lg:w-12 lg:h-12"
                                 alt={`${human.icon} icon`}
@@ -307,7 +307,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                   <div className="relative w-full h-full mx-auto">
                     <Image
                       src={`/images/career/icons/open_source${
-                        resolvedTheme === 'dark' ? '-dark' : '-light'
+                        resolvedTheme?.includes('dark') ? '-dark' : '-light'
                       }.svg`}
                       alt="open source icon"
                       layout="fill"
@@ -395,7 +395,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                           <div className="relative w-full h-full mx-auto">
                             <Image
                               src={`/images/career/icons/${benefits.icon}${
-                                resolvedTheme === 'dark' ? '-dark' : '-light'
+                                resolvedTheme?.includes('dark') ? '-dark' : '-light'
                               }.svg`}
                               alt={`${benefits.icon} icon`}
                               layout="fill"
@@ -422,7 +422,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
               <div className="relative w-full h-full mx-auto">
                 <Image
                   src={`/images/career/icons/jobs${
-                    resolvedTheme === 'dark' ? '-dark' : '-light'
+                    resolvedTheme?.includes('dark') ? '-dark' : '-light'
                   }.svg`}
                   alt="jobs icon"
                   layout="fill"
@@ -447,7 +447,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                     className="flex lg:block items-start space-x-6 lg:space-x-0 lg:w-full"
                   >
                     <div className="lg:flex items-center">
-                      <h3 className="bg-brand-400 dark:bg-brand-500 border-[1px] border-brand-300 text-brand-600 text-md text-center w-[44px] px-2 py-1.5 rounded-md">
+                      <h3 className="bg-brand-400 border-[1px] border-brand-300 text-brand-600 text-md text-center w-[44px] px-2 py-1.5 rounded-md">
                         {i + 1}
                       </h3>
                       <div className="h-[100px] w-[1px] sm:h-[100px] mx-auto lg:h-[1px] lg:w-full bg-brand-500 lg:pr-6"></div>
@@ -463,7 +463,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                   </div>
                 )
               })}
-              <h3 className="bg-brand-400 dark:bg-brand-500 border-[1px] border-brand-300 text-brand-600 text-xl w-[44px] lg:min-w-[40px] min-h-[40px] px-2 py-1 rounded-md grid justify-items-center items-center">
+              <h3 className="bg-brand-400 border-[1px] border-brand-300 text-brand-600 text-xl w-[44px] lg:min-w-[40px] min-h-[40px] px-2 py-1 rounded-md grid justify-items-center items-center">
                 <IconCheck />
               </h3>
             </div>
@@ -487,7 +487,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                     return (
                       <div className="cursor-pointer md:cursor-default" key={i}>
                         <Link href={job.absolute_url}>
-                          <div className="bg-alternative border-muted drop-shadow-sm border p-4 px-7 rounded-md sm:flex sm:items-center transition ease-out hover:bg-alternative dark:hover:bg-surface-100 hover:drop-shadow-md hover:cursor-pointer">
+                          <div className="bg-alternative border-muted drop-shadow-sm border p-4 px-7 rounded-md sm:flex sm:items-center transition ease-out hover:bg-surface-100 hover:drop-shadow-md hover:cursor-pointer">
                             <h2 className="text-base min-w-[240px] lg:min-w-[316px] truncate mr-6">
                               {job.title}
                             </h2>
