@@ -37,7 +37,7 @@ function ExampleCard(props: any) {
                 }
               >
                 <Link href={props.repo_url} as={props.repo_url} target="_blank">
-                  View Code
+                  View Template
                 </Link>
               </Button>
             )}
@@ -45,7 +45,7 @@ function ExampleCard(props: any) {
               <Button
                 asChild
                 size="tiny"
-                type="default"
+                type="text"
                 className="group overflow-hidden"
                 iconRight={
                   <div className="relative w-3.5 h-3.5 flex items-center justify-center">
