@@ -46,35 +46,43 @@ Below is a flow chart illustrating how Supabase Auth uses an Auth Hook:
 ## Create a Hook
 ### Write a Hook
 
-In the dashboard, go to `SQL Editor > Templates` and select `Add Auth Hook (General)`. The function for your hook should look like this:
+A hook is a [Postgres Function](https://www.postgresql.org/docs/current/sql-createfunction.html) that takes in a `jsonb` object and return a `jsonb` object. In the body of a hook
+you can transform the input payload via native [JSON operators](https://www.postgresql.org/docs/16/functions-json.html) or extensions such as [plv8](https://supabase.com/docs/guides/database/extensions/plv8) which allow you to transform data in other programming languages.
+
+<Admonition type="warning">
+The `?` JSONB operator is not supported as it conflicts with our ORM.
+</Admonition>
+
+Here is an example outline of what a hook looks like:
 
 ```sql
-create or replace function
-mfa_verification_attempt(event jsonb) returns jsonb as $$
+create or replace function public.custom_access_token_hook(event jsonb)
+returns jsonb
+language plpgsql
+as $$
 declare
-  -- Add your variables here
+  -- Insert variables here
 begin
-  -- Add your logic here
-  return response
+  -- Insert logic here
+  return event;
 end;
-$$ language plpgsql;
+$$;
 ```
 
-Note that the JSONB operator `?` can't be used when writing a hook, because it is a reserved character in the ORM used by Supabase Auth.
+You can also view this template under `SQL Editor > Templates > Add Auth Hook (General)`
 
-### Handle Hook errors
+### Hook Errors
 
-To return an error from a hook, return a JSON object with the following properties:
+Return an error to change the behaviour of Supabase Auth. In the context of Supabase Auth, a hook is a runtime error which can change the behaviour of Supabase Auth. For instance, you can return an error to halt the authentication process for a user. Do not return developer errors which result from logical errors where the code does not do what the developer intended. For example, do not return divide by zero errors or errors which occur when inserting into a table.
+
+An error is a JSON object with the following properties:
 
 - `error` An object that contains information about the error.
     - `http_code` A number indicating the HTTP code to be returned. If not set, the code is HTTP 500 Internal Server Error.
     - `message` A message to be returned in the HTTP response. Required.
 
-You should return an error if an input in the `event` payload has been processed incorrectly. This error could result from a server error (for example, an unexpected error with the data) or a user error (for example, the user has exceeded the number of available attempts).
+Here's an example:
 
-When returning an error object, Supabase Auth ignores all other fields you may have attached.
-
-Example output:
 ```json
 {
   "error": {
@@ -83,6 +91,8 @@ Example output:
   }
 }
 ```
+
+When an error is returned, Supabase Auth will ignore all other fields in the payload.
 
 ### Hook grants and roles
 
@@ -108,16 +118,13 @@ revoke execute
 Avoid adding a `security definer` tag to the function to avoid permission errors.
 </Admonition>
 
-Postgres functions have an implicit tag of `security invoker` and run with the permissions of the calling user. In the case of Auth Hooks, `supabase_auth_admin`  is the invoker and hook functions run with the permissions of `supabase_auth_admin`.
+Postgres functions have an implicit tag of `security invoker` which grants the calling user (`supabase_auth_admin`) appropriate permissions.
 
-The `security definer` tag executes a function with the privileges of the user who owns it.  In the case of functions created via the Supabase Dashboard, this user is `postgres`, which does not have permissions for the Auth schema. Using `security definer` tag would prevent Supabase Auth from having the appropriate permissions to access tables or execute functions.
-
+You can read more about `security definer` and `security invoker` tags [here](/docs/guides/database/functions#security-definer-vs-invoker).
 
 ### Timeouts
 
 Ensure that your hooks complete within **2 seconds** to avoid any errors.
-
-
 
 ### Connect a Hook
 
@@ -166,6 +173,7 @@ Example output:
 }
 ```
 **Examples**
+
 <Tabs
   scrollable
   size="small"
@@ -260,142 +268,6 @@ revoke all
   on table public.mfa_failed_verification_attempts
   from authenticated, anon;
 ```
-</TabPanel>
-<TabPanel id="send-email-after-failed-attempts" label="Send Email After Failed Verification Attempts">
-
-Enable the `pg_net` extension under [`Database > Extensions`](/dashboard/project/_/database/extensions)
-
-Create a table to record the last time a user had an incorrect MFA verification attempt for a factor.
-
-```sql
-create table public.mfa_failed_verification_attempts (
-  user_id uuid not null,
-  factor_id uuid not null,
-  last_failed_at timestamp not null default now(),
-  primary key (user_id, factor_id)
-);
-```
-Store the API key of our email API provider in [Supabase Vault](/docs/guides/database/vault)
-```sql
-select vault.create_secret('my_secret', 'my_secret_name', 'my_secret_description');
-```
-
-
-Create a hook to send an email when there are two or more failed attempts in a one minute window.
-
-
-```sql
-create or replace function public.hook_mfa_verification_attempt_with_email(event jsonb)
-returns jsonb
-language plpgsql
-as $$
-  declare
-    last_failed_at timestamp;
-    server_token text;
-    email_address text;
-    email_body text;
-    response jsonb;
-    http_code int;
-    error_message text;
-  begin
-    -- check if the code is valid
-    if event->'valid' is true then
-      -- code is valid, accept it
-      return jsonb_build_object('decision', 'continue');
-    end if;
-
-    -- fetch the server token with a specific name from the vault.decrypted_secrets table
-    select token into server_token
-    from vault.decrypted_secrets
-    where name = 'yoursecretname';
-
-    -- make sure we have a token
-    if server_token is null then
-      return jsonb_build_object(
-        'error', jsonb_build_object(
-        'http_code', 401,
-        'message', 'Valid server token required'
-      ));
-    end if;
-
-    -- fetch the last failed attempt time
-    select last_failed_at into last_failed_at
-    from public.mfa_failed_verification_attempts
-    where user_id = event->>'user_id'
-    and factor_id = event->>'factor_id';
-
-    -- check if the last attempt was too quick
-    if last_failed_at is not null and now() - last_failed_at < interval '1 minute' then
-      -- construct the email body
-      email_address := (select email from auth.users where id = (event->>'user_id')::uuid);
-      -- Insert your email here
-      email_body := format('{"from": "yoursenderemail@example.com",
-                             "to": "%s",
-                             "subject": "too many mfa attempts",
-                             "textbody": "there have been too many mfa attempts.",
-                             "htmlbody": "<html><body><strong>alert:</strong> too many mfa attempts.</body></html>",
-                             "messagestream": "outbound"}', email_address);
-
-      -- perform the http post request. Here we assume you are using Postmark as an email provider.
-      select net.http_post(
-        'https://api.postmarkapp.com/email',
-        email_body,
-        'application/json',
-        array['accept: application/json', 'x-postmark-server-token: ' || server_token]
-      ) into response;
-
-      -- extract http code and error message if any
-      http_code := (response ->> 'status')::int;
-      error_message := response ->> 'message';
-
-      -- return an error if the email sending fails
-      if (response -> 'status' is null) or (http_code < 200 or http_code >= 300) then
-        return jsonb_build_object(
-          'error', jsonb_build_object(
-            'http_code', coalesce(http_code, 0),
-            'message', coalesce(error_message, 'error sending email')
-          ));
-      end if;
-
-      return jsonb_build_object(
-        'error', jsonb_build_object(
-          'http_code', 429,
-          'message', 'please wait a moment before trying again.'
-        ));
-      end if;
-
-      -- record the failed attempt
-      insert into public.mfa_failed_verification_attempts
-      (
-          user_id,
-          factor_id,
-          last_refreshed_at
-      )
-      values
-      (
-          event->'user_id',
-          event->'factor_id',
-          now()
-      )
-      on conflict (user_id, factor_id)
-      do update
-          set last_refreshed_at = now();
-
-      -- let supabase auth do the default behavior for a failed attempt
-      return jsonb_build_object('decision', 'continue');
-  end;
-$$;
-
--- assign appropriate permissions and revoke access
-grant execute on function public.hook_mfa_verification_attempt_with_email to supabase_auth_admin;
-
-grant all on table public.mfa_failed_verification_attempts to supabase_auth_admin;
-
-revoke execute on function public.hook_mfa_verification_attempt_with_email from authenticated, anon;
-
-revoke all on table public.mfa_failed_verification_attempts from authenticated, anon;
-```
-
 </TabPanel>
 </Tabs>
 
@@ -646,7 +518,7 @@ revoke all
 
 ## Custom Access Token Extensibility Point
 
-The custom access token hook runs before a token is issued and allows you to add additional claims based on the authentication method used or add additional metadata to select users.
+The custom access token hook runs before a token is issued and allows you to add additional claims based on the authentication method used.
 
 Claims returned must conform to our specification. Supabase Auth will check for these claims after the hook is run and return an error if they are not present.
 
@@ -677,8 +549,6 @@ These are the fields currently available on an access token:
 - `claims` Claims which are attached to the access token.
 - `authentication_method` the authentication method used to request the access token. Possible values include:
 `oauth`, `password`, `otp`, `totp`, `recovery`, `invite`, `sso/saml`, `magiclink`, `email/signup`, `email_change`, `token_refresh`.
-
-
 
 **Outputs**
 
@@ -751,31 +621,6 @@ grant execute
 
 revoke execute
   on function public.custom_access_token_hook
-  from authenticated, anon;
-```
-</TabPanel>
-
-<TabPanel id="delete-usermetadata-claim" label="Delete Claims">
-Your company would like to remove the user metadata claim in order to reduce the size of your access token.
-
-```sql
-create or replace function custom_access_token_delete_user_metadata(input jsonb)
-returns jsonb as $$
-  declare
-    result jsonb;
-  begin
-    input := jsonb_set(input, '{claims}', (input->'claims') - 'user_metadata');
-    result := jsonb_build_object('claims', input->'claims');
-    return result;
-  end;
-$$ language plpgsql;
-
-grant execute
-  on function public.custom_access_token_delete_user_metadata
-  to supabase_auth_admin;
-
-revoke execute
-  on function public.custom_access_token_delete_user_metadata
   from authenticated, anon;
 ```
 </TabPanel>
@@ -853,13 +698,9 @@ grant execute
 revoke execute
   on function public.restrict_application_access
   from authenticated, anon;
-
 ```
-
 </TabPanel>
 </Tabs>
-
-
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 export default Page
