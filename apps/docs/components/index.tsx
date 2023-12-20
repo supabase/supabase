@@ -3,7 +3,6 @@ import { Alert, Button, CodeBlock, GlassPanel, markdownComponents, Tabs } from '
 import StepHikeCompact from '~/components/StepHikeCompact'
 // Common components
 import ButtonCard from './ButtonCard'
-import JwtGenerator from './JwtGenerator'
 
 // Page specific components
 import AuthProviders from './AuthProviders'
@@ -12,7 +11,6 @@ import Frameworks from './Frameworks'
 import FunctionsExamples from './FunctionsExamples'
 
 // Other components
-import { Mermaid } from 'mdx-mermaid/lib/Mermaid'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import { Heading } from './CustomHTMLElements'
 import DatabaseSetup from './MDX/database_setup.mdx'
@@ -68,7 +66,6 @@ const components = {
   Frameworks,
   AuthProviders,
   FunctionsExamples,
-  JwtGenerator,
   QuickstartIntro,
   DatabaseSetup,
   ProjectSetup,
@@ -78,7 +75,6 @@ const components = {
   SocialProviderSettingsSupabase,
   StepHikeCompact,
   StorageManagement,
-  Mermaid,
   Extensions,
   Alert: (props: any) => (
     <Alert {...props} className="not-prose">
