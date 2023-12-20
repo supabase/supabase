@@ -1,18 +1,25 @@
-import { last, noop } from 'lodash'
+import { last } from 'lodash'
 import { IconChevronRight, IconHome } from 'ui'
 
 interface DrilldownBreadCrumbsProps {
   breadcrumbs: string[]
+  resetBreadcrumbs: () => void
   onSelectBreadcrumb: (breadcrumb: string[]) => void
 }
 
 const DrilldownBreadCrumbs = ({
   breadcrumbs = [],
-  onSelectBreadcrumb = noop,
+  resetBreadcrumbs,
+  onSelectBreadcrumb,
 }: DrilldownBreadCrumbsProps) => {
   return (
     <div className="flex items-center space-x-2">
-      <IconHome size={16} strokeWidth={2} />
+      <IconHome
+        size={16}
+        strokeWidth={2}
+        onClick={() => resetBreadcrumbs()}
+        className="cursor-pointer"
+      />
       {breadcrumbs.length > 0 &&
         breadcrumbs.map((crumb) => (
           <div className="flex items-center space-x-2" key={crumb}>
