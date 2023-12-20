@@ -34,23 +34,21 @@ const Footer = ({ isLoading, isRefetching }: FooterProps) => {
   }
 
   return (
-    <div className="px-2 w-full">
-      <div className="flex h-10 items-center">
-        {selectedView === 'data' && <Pagination isLoading={isLoading} />}
+    <div className="flex h-10 items-center px-2 w-full">
+      {selectedView === 'data' && <Pagination isLoading={isLoading} />}
 
-        {(isTableSelected || isViewSelected) && (
-          <div className="ml-auto flex items-center gap-4">
-            {selectedTable && <RefreshButton table={selectedTable} isRefetching={isRefetching} />}
-            <TwoOptionToggle
-              width={75}
-              options={['definition', 'data']}
-              activeOption={selectedView}
-              borderOverride="border-gray-500"
-              onClickOption={setSelectedView}
-            />
-          </div>
-        )}
-      </div>
+      {(isTableSelected || isViewSelected) && (
+        <div className="ml-auto flex items-center gap-4">
+          {selectedTable && <RefreshButton table={selectedTable} isRefetching={isRefetching} />}
+          <TwoOptionToggle
+            width={75}
+            options={['definition', 'data']}
+            activeOption={selectedView}
+            borderOverride="border-gray-500"
+            onClickOption={setSelectedView}
+          />
+        </div>
+      )}
     </div>
   )
 }
