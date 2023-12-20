@@ -2,6 +2,7 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { get } from 'data/fetchers'
 import { IS_PLATFORM } from 'lib/constants'
+import { ResponseError } from 'types'
 import { customDomainKeys } from './keys'
 
 export type CustomDomainsVariables = {
@@ -67,7 +68,7 @@ export async function getCustomDomains(
     throw new Error('projectRef is required')
   }
 
-  const { data, error } = await get('/v1/projects/{ref}/custom-hostname', {
+  const { data, error: _error } = await get('/v1/projects/{ref}/custom-hostname', {
     params: {
       path: {
         ref: projectRef,
@@ -76,15 +77,13 @@ export async function getCustomDomains(
     signal,
   })
 
-  if (error) {
+  if (_error) {
+    const error = _error as ResponseError
     // not allowed error and no hostname configured error are
     // valid steps in the process of setting up a custom domain
     // so we convert them to data instead of errors
 
-    const isNotAllowedError = (error as any)?.message?.includes(
-      'not allowed to set up custom domain'
-    )
-
+    const isNotAllowedError = error.message?.includes('not allowed to set up custom domain')
     if (isNotAllowedError) {
       return {
         customDomain: null,
@@ -92,10 +91,7 @@ export async function getCustomDomains(
       } as const
     }
 
-    const isNoHostnameConfiguredError = (error as any)?.message?.includes(
-      'custom hostname configuration'
-    )
-
+    const isNoHostnameConfiguredError = error.message?.includes('custom hostname configuration')
     if (isNoHostnameConfiguredError) {
       return {
         customDomain: null,
@@ -110,7 +106,7 @@ export async function getCustomDomains(
 }
 
 export type CustomDomainsData = Awaited<ReturnType<typeof getCustomDomains>>
-export type CustomDomainsError = unknown
+export type CustomDomainsError = ResponseError
 
 export const useCustomDomainsQuery = <TData = CustomDomainsData>(
   { projectRef }: CustomDomainsVariables,
