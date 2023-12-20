@@ -7,7 +7,7 @@ import { ChangeEvent, createContext, useContext, useEffect, useRef, useState } f
 import { toast } from 'react-hot-toast'
 import { Button, Input, Listbox } from 'ui'
 
-import { Dictionary } from 'components/grid'
+import { Dictionary } from 'types'
 import VercelIntegrationLayout from 'components/layouts/VercelIntegrationLayout'
 import {
   createVercelEnv,

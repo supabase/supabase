@@ -1,5 +1,5 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
-import { Dictionary } from 'components/grid'
+import { Dictionary } from 'types'
 import dayjs from 'dayjs'
 import { compact, find, isEqual, isNull, isString, isUndefined, omitBy } from 'lodash'
 
