@@ -1,15 +1,14 @@
-import { useRouter } from 'next/router'
-import { Button, IconGitHub, IconGitHubSolid } from 'ui'
+import { Button, IconGitHubSolid } from 'ui'
+import Link from 'next/link'
+
 import SectionContainer from '../Layouts/SectionContainer'
 import ExampleCard from '../ExampleCard'
 
 import Examples from 'data/Examples'
-import Link from 'next/link'
 
 const BuiltExamples = () => {
-  const { basePath } = useRouter()
   return (
-    <SectionContainer className="xl:pt-32">
+    <SectionContainer id="examples" className="xl:pt-32">
       <div className="text-center">
         <h3 className="h2">Start building in seconds</h3>
         <p className="p">
