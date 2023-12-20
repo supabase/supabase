@@ -1,38 +1,64 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { useRef } from 'react'
 import toast from 'react-hot-toast'
-import { Button, Form, IconHelpCircle, Input, SidePanel, Toggle } from 'ui'
+import { SidePanel } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
 import { useDatabaseRoleCreateMutation } from 'data/database-roles/database-role-create-mutation'
 import { ROLE_PERMISSIONS } from './Roles.constants'
+
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import {
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormLabel_Shadcn_,
+  FormMessage_Shadcn_,
+  Form_Shadcn_,
+  Input_Shadcn_,
+  Switch,
+} from 'ui'
+
+import z from 'zod'
+
+import { FormActions } from 'components/ui/Forms'
 
 interface CreateRolePanelProps {
   visible: boolean
   onClose: () => void
 }
 
+const FormSchema = z.object({
+  name: z
+    .string()
+    .refine((value) => value.trim().length > 0, 'You must provide a name')
+    .default(''),
+  is_superuser: z.boolean().default(false),
+  can_login: z.boolean().default(false),
+  can_create_role: z.boolean().default(false),
+  can_create_db: z.boolean().default(false),
+  is_replication_role: z.boolean().default(false),
+  can_bypass_rls: z.boolean().default(false),
+})
+
+const initialValues = {
+  name: '',
+  is_superuser: false,
+  can_login: false,
+  can_create_role: false,
+  can_create_db: false,
+  is_replication_role: false,
+  can_bypass_rls: false,
+}
+
 const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
   const formId = 'create-new-role'
-  const submitRef: any = useRef()
+
   const { project } = useProjectContext()
 
-  const initialValues = {
-    name: '',
-    is_superuser: false,
-    can_login: false,
-    can_create_role: false,
-    can_create_db: false,
-    is_replication_role: false,
-    can_bypass_rls: false,
-  }
-
-  const validate = (values: any) => {
-    const errors: any = {}
-    if (values.name.length === 0) errors.name = 'Please provide a name for your role'
-    return errors
-  }
+  const form = useForm({
+    resolver: zodResolver(FormSchema),
+    defaultValues: initialValues,
+  })
 
   const { mutate: createDatabaseRole, isLoading: isCreating } = useDatabaseRoleCreateMutation({
     onSuccess: (res) => {
@@ -50,6 +76,11 @@ const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
     })
   }
 
+  const handleClose = () => {
+    onClose()
+    form.reset()
+  }
+
   return (
     <SidePanel
       size="large"
@@ -57,106 +88,112 @@ const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
       header="Create a new role"
       className="mr-0 transform transition-all duration-300 ease-in-out"
       loading={false}
-      onCancel={onClose}
+      onCancel={handleClose}
       customFooter={
         <div className="flex w-full justify-end space-x-3 border-t border-default px-3 py-4">
-          <Button
-            size="tiny"
-            type="default"
-            htmlType="button"
-            onClick={onClose}
-            disabled={isCreating}
-          >
-            Cancel
-          </Button>
-          <Button
-            size="tiny"
-            type="primary"
-            htmlType="button"
-            disabled={isCreating}
-            loading={isCreating}
-            onClick={() => submitRef?.current?.click()}
-          >
-            Create role
-          </Button>
+          <FormActions
+            form={formId}
+            isSubmitting={isCreating}
+            hasChanges={form.formState.isDirty}
+            handleReset={() => form.reset()}
+          />
         </div>
       }
     >
-      <Form
-        validateOnBlur
-        id={formId}
-        initialValues={initialValues}
-        validate={validate}
-        onSubmit={onSubmit}
-      >
-        {({ isSubmitting, handleReset, values, initialValues }: any) => {
-          return (
-            <div>
-              <FormSection
-                header={
-                  <FormSectionLabel className="lg:!col-span-4">Role Configuration</FormSectionLabel>
-                }
-              >
-                <FormSectionContent loading={false} className="lg:!col-span-8">
-                  <Input id="name" label="Name" />
-                </FormSectionContent>
-              </FormSection>
-              <SidePanel.Separator />
-              <FormSection
-                header={
-                  <FormSectionLabel className="lg:!col-span-4">Role Privileges</FormSectionLabel>
-                }
-              >
-                <FormSectionContent loading={false} className="lg:!col-span-8">
-                  <div className="space-y-[9px]">
-                    {Object.keys(ROLE_PERMISSIONS).map((permission) => (
-                      <Toggle
-                        size="small"
-                        disabled={ROLE_PERMISSIONS[permission].disabled}
-                        className={[
-                          'roles-toggle',
-                          ROLE_PERMISSIONS[permission].disabled ? 'opacity-50' : '',
-                        ].join(' ')}
-                        key={permission}
-                        id={permission}
-                        name={permission}
-                        label={ROLE_PERMISSIONS[permission].description}
-                        afterLabel={
-                          ROLE_PERMISSIONS[permission].disabled && (
-                            <Tooltip.Root delayDuration={0}>
-                              <Tooltip.Trigger type="button">
-                                <IconHelpCircle
-                                  size="tiny"
-                                  strokeWidth={2}
-                                  className="ml-2 relative top-[3px]"
-                                />
-                              </Tooltip.Trigger>
-                              <Tooltip.Content align="center" side="bottom">
-                                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                <div
-                                  className={[
-                                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                    'border border-background space-y-1',
-                                  ].join(' ')}
-                                >
-                                  <span className="text-xs">
-                                    This privilege cannot be granted via the dashboard
-                                  </span>
-                                </div>
-                              </Tooltip.Content>
-                            </Tooltip.Root>
-                          )
-                        }
-                      />
-                    ))}
-                  </div>
-                </FormSectionContent>
-              </FormSection>
-              <button ref={submitRef} type="submit" className="hidden" />
+      <Form_Shadcn_ {...form}>
+        <form
+          id={formId}
+          className="grid gap-6 w-full px-8 py-8"
+          onSubmit={form.handleSubmit(onSubmit)}
+        >
+          <FormField_Shadcn_
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
+                <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
+                  Name
+                </FormLabel_Shadcn_>
+                <FormControl_Shadcn_ className="col-span-8">
+                  <Input_Shadcn_ {...field} className="w-full" />
+                </FormControl_Shadcn_>
+                <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
+              </FormItem_Shadcn_>
+            )}
+          />
+          <div className="grid gap-2 mt-4 md:grid md:grid-cols-12">
+            <div className="col-span-4">
+              <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
+                Role privileges
+              </FormLabel_Shadcn_>
             </div>
-          )
-        }}
-      </Form>
+            <div className="col-span-8 grid gap-4">
+              {Object.keys(ROLE_PERMISSIONS)
+                .filter((permissionKey) => ROLE_PERMISSIONS[permissionKey].grant_by_dashboard)
+                .map((permissionKey) => {
+                  const permission = ROLE_PERMISSIONS[permissionKey]
+                  // const name = permissionKey as keyof typeof ROLE_PERMISSIONS // Ivan help me!
+                  const name = permissionKey as any
+
+                  return (
+                    <FormField_Shadcn_
+                      key={permissionKey}
+                      control={form.control}
+                      name={name}
+                      render={({ field }) => (
+                        <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
+                          <FormControl_Shadcn_ className="col-span-8 flex items-center gap-4">
+                            <div className="w-full text-sm">
+                              <Switch checked={field.value} onCheckedChange={field.onChange} />
+                              <FormLabel_Shadcn_>{permission.description}</FormLabel_Shadcn_>
+                            </div>
+                          </FormControl_Shadcn_>
+                          <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
+                        </FormItem_Shadcn_>
+                      )}
+                    />
+                  )
+                })}
+
+              <SidePanel.Separator />
+
+              <div className="grid gap-4">
+                <p className="text-sm">These privileges cannot be granted via the Dashboard:</p>
+                {Object.keys(ROLE_PERMISSIONS)
+                  .filter((permissionKey) => !ROLE_PERMISSIONS[permissionKey].grant_by_dashboard)
+                  .map((permissionKey) => {
+                    const permission = ROLE_PERMISSIONS[permissionKey]
+                    const name = permissionKey as any // Ivan help me, again!
+
+                    return (
+                      <FormField_Shadcn_
+                        key={permissionKey}
+                        control={form.control}
+                        name={name}
+                        render={({ field }) => (
+                          <FormItem_Shadcn_ className="   space-y-0 opacity-70">
+                            <FormControl_Shadcn_ className="  flex items-center gap-4">
+                              <div className="w-full text-sm">
+                                <Switch
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                  disabled
+                                  aria-readonly
+                                />
+                                <FormLabel_Shadcn_>{permission.description}</FormLabel_Shadcn_>
+                              </div>
+                            </FormControl_Shadcn_>
+                            <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
+                          </FormItem_Shadcn_>
+                        )}
+                      />
+                    )
+                  })}
+              </div>
+            </div>
+          </div>
+        </form>
+      </Form_Shadcn_>
     </SidePanel>
   )
 }

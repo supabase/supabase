@@ -32,30 +32,42 @@ export const SYSTEM_ROLES = [
   'pg_write_all_data',
 ]
 
-export const ROLE_PERMISSIONS: any = {
+export type RolePermission = {
+  disabled: boolean
+  description: string
+  grant_by_dashboard: boolean
+}
+
+export const ROLE_PERMISSIONS: Record<string, RolePermission> = {
   can_login: {
     disabled: false,
     description: 'User can login',
+    grant_by_dashboard: true,
   },
   can_create_role: {
     disabled: false,
     description: 'User can create roles',
+    grant_by_dashboard: true,
   },
   can_create_db: {
     disabled: false,
     description: 'User can create databases',
+    grant_by_dashboard: true,
   },
   can_bypass_rls: {
     disabled: true,
     description: 'User bypasses every row level security policy',
+    grant_by_dashboard: false,
   },
   is_superuser: {
     disabled: true,
     description: 'User is a Superuser',
+    grant_by_dashboard: false,
   },
   is_replication_role: {
     disabled: true,
     description:
       'User can initiate streaming replication and put the system in and out of backup mode',
+    grant_by_dashboard: false,
   },
 }
