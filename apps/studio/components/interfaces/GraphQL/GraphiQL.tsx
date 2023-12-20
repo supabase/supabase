@@ -369,7 +369,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
 
                       <HeaderEditor isHidden={activeSecondaryEditor !== 'headers'} />
 
-                      {canReadJWTSecret && roleImpersonationEnabledFlag && (
+                      {canReadJWTSecret && (
                         <div
                           className={clsx(
                             'graphiql-editor px-1',
@@ -411,9 +411,8 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                         <span className="text-amber-900">RLS will be bypassed.</span>
                       </AlertTitle_Shadcn_>
                       <AlertDescription_Shadcn_>
-                        {roleImpersonationEnabledFlag
-                          ? 'You can send queries as a specific role/user by using the role impersonation tab.'
-                          : 'You can send queries as a specific role/user by changing the "Authorization" header.'}
+                        You can send queries as a specific role/user by using the role impersonation
+                        tab.
                       </AlertDescription_Shadcn_>
                       <Button
                         type="outline"
