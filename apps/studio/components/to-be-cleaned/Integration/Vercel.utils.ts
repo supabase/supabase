@@ -1,6 +1,6 @@
 import { post, get } from 'lib/common/fetch'
 import { INTEGRATION_ENVS_ALIAS } from 'lib/vercelConfigs'
-import { Dictionary } from 'components/grid'
+import { Dictionary } from 'types'
 import { API_URL } from 'lib/constants'
 
 export async function fetchVercelProjects({

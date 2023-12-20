@@ -61,6 +61,8 @@ Under the "Credentials" tab, the `Secret` value will be used as the `client secr
 
 ## Add login code to your client app
 
+Since Keycloak version 22, the `openid` scope must be passed. Add this to the [`supabase.auth.signInWithOAuth()`](/docs/reference/javascript/auth-signinwithoauth) method.
+
 <Tabs
   scrollable
   size="small"
