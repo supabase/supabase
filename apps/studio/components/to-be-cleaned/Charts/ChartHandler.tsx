@@ -1,4 +1,4 @@
-import { Dictionary } from 'components/grid'
+import { Dictionary } from 'types'
 import { isUndefined } from 'lodash'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
