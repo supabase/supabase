@@ -1445,7 +1445,7 @@ revoke all
     title: 'Add Auth Hook (Custom Access Token)',
     description: 'Create an Auth Hook to add custom claims to your Auth Token',
     sql: `
--- Assumes that there is an `is_admin` flag on the profiles table.
+-- Assumes that there is an is_admin flag on the profiles table.
 create or replace function public.custom_access_token_hook(event jsonb)
 returns jsonb
 language plpgsql
