@@ -79,9 +79,9 @@ export async function GET(request: NextRequest) {
 </TabPanel>
 <TabPanel id="sveltekit" label="SvelteKit">
 
-Create a new file at `src/routes/auth/confirm/+server.js` and populate with the following:
+Create a new file at `src/routes/auth/confirm/+server.ts` and populate with the following:
 
-```js src/routes/auth/confirm/+server.js
+```js src/routes/auth/confirm/+server.ts
 import { redirect } from '@sveltejs/kit';
 
 export const GET = async (event) => {
