@@ -106,7 +106,7 @@ const SQLEditor = () => {
   const organization = useSelectedOrganization()
   const appSnap = useAppStateSnapshot()
   const snap = useSqlEditorStateSnapshot()
-  const projectState = useDatabaseSelectorStateSnapshot()
+  const databaseSelectorState = useDatabaseSelectorStateSnapshot()
 
   const { mutate: formatQuery } = useFormatQueryMutation()
   const { mutateAsync: generateSql, isLoading: isGenerateSqlLoading } = useSqlGenerateMutation()
@@ -162,9 +162,9 @@ const SQLEditor = () => {
   useEffect(() => {
     if (isSuccessReadReplicas) {
       const primaryDatabase = databases.find((db) => db.identifier === ref)
-      projectState.setSelectedDatabaseId(primaryDatabase?.identifier)
+      databaseSelectorState.setSelectedDatabaseId(primaryDatabase?.identifier)
     }
-  }, [isSuccessReadReplicas])
+  }, [isSuccessReadReplicas, databases, ref])
 
   const { data, refetch: refetchEntityDefinitions } = useEntityDefinitionsQuery(
     {
@@ -331,7 +331,7 @@ const SQLEditor = () => {
         const impersonatedRole = getImpersonatedRole()
         const connectionString = !showReadReplicasUI
           ? project.connectionString
-          : databases?.find((db) => db.identifier === projectState.selectedDatabaseId)
+          : databases?.find((db) => db.identifier === databaseSelectorState.selectedDatabaseId)
               ?.connectionString
         if (!connectionString) {
           return toast.error('Unable to run query: Connection string is missing')
@@ -348,7 +348,18 @@ const SQLEditor = () => {
         })
       }
     },
-    [isDiffOpen, id, isExecuting, project, hasHipaaAddon, execute, getImpersonatedRole, setAiTitle]
+    [
+      isDiffOpen,
+      id,
+      isExecuting,
+      project,
+      hasHipaaAddon,
+      execute,
+      getImpersonatedRole,
+      setAiTitle,
+      databaseSelectorState.selectedDatabaseId,
+      databases,
+    ]
   )
 
   const handleNewQuery = useCallback(
