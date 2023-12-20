@@ -36,11 +36,6 @@ export const sqlEditorState = proxy({
     [key: string]: 'IDLE' | 'UPDATING' | 'UPDATING_FAILED'
   },
 
-  selectedDatabaseId: undefined as string | undefined,
-  setSelectedDatabaseId: (value?: string) => {
-    sqlEditorState.selectedDatabaseId = value
-  },
-
   orderSnippets: (snippets: SqlSnippet[]) => {
     return (
       snippets
