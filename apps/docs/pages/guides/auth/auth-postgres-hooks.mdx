@@ -12,7 +12,6 @@ export const meta = {
 Hooks are in beta. They will be available for all projects in early 2024.
 </Admonition>
 
-
 Supabase allows you to use Postgres functions to alter the default Supabase Auth flow. Developers can use hooks to add custom behavior that's not supported natively.
 
 Hooks help you:
@@ -21,7 +20,6 @@ Hooks help you:
 - Improve security by adding additional checks to password and multi-factor authentication
 - Support legacy systems by integrating with identity credentials from external authentication systems
 - Add additional custom claims to your JWT
-
 
 You can use hooks at specific points along an Auth flow to perform custom behavior via Postgres Functions. These are known as **extensibility points**. The following extensibility points are available:
 
@@ -33,7 +31,6 @@ You can use hooks at specific points along an Auth flow to perform custom behavi
 
 You can link a hook to an extensiblity point to signal to Supabase Auth that it should make use of the hook.
 
-
 Below is a flow chart illustrating how Supabase Auth uses an Auth Hook:
 
 <Image
@@ -44,16 +41,15 @@ Below is a flow chart illustrating how Supabase Auth uses an Auth Hook:
 
 
 ## Create a Hook
-### Write a Hook
+### What is a Hook
 
-A hook is a [Postgres Function](https://www.postgresql.org/docs/current/sql-createfunction.html) that takes in a `jsonb` object and return a `jsonb` object. In the body of a hook
-you can transform the input payload via native [JSON operators](https://www.postgresql.org/docs/16/functions-json.html) or extensions such as [plv8](https://supabase.com/docs/guides/database/extensions/plv8) which allow you to transform data in other programming languages.
+A hook is a [Postgres Function](https://www.postgresql.org/docs/current/sql-createfunction.html) that takes in a `jsonb` object and return a `jsonb` object. You can transform the `jsonb` input in the body of the hook via native operators such as [JSON operators](https://www.postgresql.org/docs/16/functions-json.html) or extensions such as [plv8](https://supabase.com/docs/guides/database/extensions/plv8) which allow you to use JavaScript within Postgres.
 
-<Admonition type="warning">
+<Admonition type="caution">
 The `?` JSONB operator is not supported as it conflicts with our ORM.
 </Admonition>
 
-Here is an example outline of what a hook looks like:
+A hook typically has the following signature:
 
 ```sql
 create or replace function public.custom_access_token_hook(event jsonb)
@@ -69,36 +65,13 @@ end;
 $$;
 ```
 
-You can also view this template under `SQL Editor > Templates > Add Auth Hook (General)`
-
-### Hook Errors
-
-Return an error to change the behaviour of Supabase Auth. In the context of Supabase Auth, a hook is a runtime error which can change the behaviour of Supabase Auth. For instance, you can return an error to halt the authentication process for a user. Do not return developer errors which result from logical errors where the code does not do what the developer intended. For example, do not return divide by zero errors or errors which occur when inserting into a table.
-
-An error is a JSON object with the following properties:
-
-- `error` An object that contains information about the error.
-    - `http_code` A number indicating the HTTP code to be returned. If not set, the code is HTTP 500 Internal Server Error.
-    - `message` A message to be returned in the HTTP response. Required.
-
-Here's an example:
-
-```json
-{
-  "error": {
-    "http_code": 429,
-    "message": "You can only verify a factor once every 10 seconds."
-  }
-}
-```
-
-When an error is returned, Supabase Auth will ignore all other fields in the payload.
+You can visit `SQL Editor > Templates` for hook templates.
 
 ### Hook grants and roles
 
-You need to assign additional permissions to the hook and the tables that it interacts with.
+You need to assign additional permissions so that Supabase Auth can access the hook as well as the tables it interacts with.
 
-By default, Supabase Auth invokes hooks with the `supabase_auth_admin` role. This role doesn't have permissions to modify the `public` schema. You need to grant the role permission to execute your hook function:
+The `supabase_auth_admin` role does not have permissions to the `public` schema. You need to grant the role permission to execute your hook function:
 
 ```sql
 grant execute
@@ -120,7 +93,35 @@ Avoid adding a `security definer` tag to the function to avoid permission errors
 
 Postgres functions have an implicit tag of `security invoker` which grants the calling user (`supabase_auth_admin`) appropriate permissions.
 
-You can read more about `security definer` and `security invoker` tags [here](/docs/guides/database/functions#security-definer-vs-invoker).
+Read more about `security definer` and `security invoker` tags [in our database guide](/docs/guides/database/functions#security-definer-vs-invoker).
+
+### Hook errors
+
+You should return an error when facing a runtime error. Runtime errors are specific to your application and arise from specific business logic rather than programmer errors.
+
+Runtime errors could happen when:
+- The user does not have appropriate permissions
+- The event payload received does not have required claims.
+- The user has performed an action which violates a business rule.
+
+The error is a JSON object and has the following properties:
+
+- `error` An object that contains information about the error.
+    - `http_code` A number indicating the HTTP code to be returned. If not set, the code is HTTP 500 Internal Server Error.
+    - `message` A message to be returned in the HTTP response. Required.
+
+Here's an example:
+
+```json
+{
+  "error": {
+    "http_code": 429,
+    "message": "You can only verify a factor once every 10 seconds."
+  }
+}
+```
+
+When an error is returned, the error is propagated upwards and translated into a HTTP error which is then returned to your application. Supabase Auth will only take into account the error and disregard the rest of the payload.
 
 ### Timeouts
 
@@ -271,11 +272,11 @@ revoke all
 
 ## Password Verification Attempt Extensibility Point
 
-Imagine that you wish to increase security beyond the requirements of the default password implementation in order to fulfill security or compliance requirements.
+Your company wishes to increase security beyond the requirements of the default password implementation in order to fulfill security or compliance requirements. You plan to track the status of a password sign-in attempt and take action via an email or a restriction on logins where necessary.
 
 As this hook runs on unauthenticated requests, malicious users can abuse the hook by calling it multiple times.  Pay extra care when using the hook as you can unintentionally block legitimate users from accessing your application.
 
-Check if a password is valid prior to taking any additional action to ensure the user is legitimate. Instead of blocking further verification attempts, consider sending an email or notification to an administrator via a trigger instead.
+Check if a password is valid prior to taking any additional action to ensure the user is legitimate. Where possible, give preference to sending an email or notification over blocking the user.
 
 **Inputs**
 
@@ -330,7 +331,7 @@ create table public.password_failed_verification_attempts (
 );
 ```
 
-Create a hook which to read and write information to this table. For example:
+Create a hook to read and write information to this table. For example:
 
 ```sql
 create function public.hook_password_verification_attempt(event jsonb)
@@ -399,9 +400,9 @@ revoke all
 </TabPanel>
 <TabPanel id="send-email-on-first-password-login" label="Send Email On First Password Login">
 
-Your company wishes to send out a welcome email to users on the first time they login via email and password.
+Your company would like to send out a welcome email to users on the first time they login via email and password. We make use of [Supabase Vault](/docs/guides/database/vault) to store the API Key of our mail provider and we use `pg_net` to send a HTTP request to our email provider to send the email.
 
-Create a table to track sign in attempts. We refrain from using the `auth.users` table's `last_signed_in_at` field as it includes successful OAuth and magic link sign ins.
+Create a table to track sign in attempts.
 
 ```sql
 create table public.password_sign_in_attempts (
@@ -413,12 +414,12 @@ create table public.password_sign_in_attempts (
 );
 ```
 
-Store the API key of our email API provider in [Supabase Vault](/docs/guides/database/vault)
+Store the API key of our email API provider:
 ```sql
 select vault.create_secret('my_secret', 'my_secret_name', 'my_secret_description');
 ```
 
-Create a hook to send an email on first login with email and password:
+Create the hook:
 
 ```sql
 create or replace function public.hook_send_welcome_email(event jsonb)
@@ -570,12 +571,11 @@ Create a profiles table with an `is_admin` flag:
 ```sql
 create table profiles (
   user_id uuid not null primary key references auth.users (id),
-  email text not null unique,
   is_admin boolean not null default false
 );
 ```
 
-Create a hook which adds an additional role based on the `is_admin` flag:
+Create a hook:
 
 ```sql
 create or replace function public.custom_access_token_hook(event jsonb)
@@ -623,7 +623,17 @@ revoke execute
 <TabPanel id="add-metadata-claim-plv8" label="Add Claim Via PLV8">
 Your company runs a new version of a gamification app and would like to add a `level` claim to the access token. We fetch the level of an existing user from the `profiles` table and assign new users a default level of zero.
 
-Enable the `plv8` extension under [`Database > Extensions`](/dashboard/project/_/database/extensions)
+Create a `profiles` table to hold information:
+
+```sql
+create table profiles (
+  user_id uuid not null primary key references auth.users (id),
+  level integer,
+  is_admin boolean not null default false
+);
+```
+
+Enable the `plv8` extension under [`Database > Extensions`](/dashboard/project/_/database/extensions) to allow us to write JavaScript code within our query.
 
 ```javascript
 create or replace function custom_access_token_hook(event jsonb)
@@ -633,7 +643,7 @@ as $$
   var user_level;
 
   // Fetch the current user's level from the profiles table
-  var result = plv8.execute("select level from profiles where user_id = $1", [event.user_id]);
+  var result = plv8.execute("select level from public.profiles where user_id = $1", [event.user_id]);
   if (result.length > 0) {
     user_level = result[0].level;
   } else {
