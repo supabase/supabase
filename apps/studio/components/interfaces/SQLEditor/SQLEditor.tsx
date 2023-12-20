@@ -6,22 +6,6 @@ import { useRouter } from 'next/router'
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import Split from 'react-split'
 import { format } from 'sql-formatter'
-import {
-  AiIconAnimation,
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  IconCheck,
-  IconChevronDown,
-  IconCornerDownLeft,
-  IconLoader,
-  IconSettings,
-  IconX,
-  Input_Shadcn_,
-  cn,
-} from 'ui'
 
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useSqlEditMutation } from 'data/ai/sql-edit-mutation'
@@ -49,8 +33,25 @@ import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import Telemetry from 'lib/telemetry'
 import toast from 'react-hot-toast'
 import { useAppStateSnapshot } from 'state/app-state'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { isRoleImpersonationEnabled, useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
+import {
+  AiIconAnimation,
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  IconCheck,
+  IconChevronDown,
+  IconCornerDownLeft,
+  IconLoader,
+  IconSettings,
+  IconX,
+  Input_Shadcn_,
+  cn,
+} from 'ui'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
 import { sqlAiDisclaimerComment, untitledSnippetTitle } from './SQLEditor.constants'
@@ -68,7 +69,6 @@ import {
   getDiffTypeDropdownLabel,
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selecor'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })

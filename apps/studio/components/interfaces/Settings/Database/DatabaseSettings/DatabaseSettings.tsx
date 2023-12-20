@@ -2,16 +2,6 @@ import { useParams, useTelemetryProps } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertTriangle,
-  IconExternalLink,
-  Input,
-  Tabs,
-} from 'ui'
 
 import AlertError from 'components/ui/AlertError'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
@@ -24,10 +14,19 @@ import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useFlag, useSelectedOrganization, useSelectedProject } from 'hooks'
 import { pluckObjectFields } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selecor'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconAlertTriangle,
+  IconExternalLink,
+  Input,
+} from 'ui'
 import ConfirmDisableReadOnlyModeModal from './ConfirmDisableReadOnlyModal'
-import ResetDbPassword from './ResetDbPassword'
 import DatabaseConnectionString from './DatabaseConnectionString'
+import ResetDbPassword from './ResetDbPassword'
 
 const DatabaseSettings = () => {
   const router = useRouter()

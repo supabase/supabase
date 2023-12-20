@@ -1,9 +1,9 @@
-import { useParams } from 'common'
 import { createContext, PropsWithChildren, useContext, useMemo } from 'react'
 
+import { useParams } from 'common'
 import { Project, useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { PROJECT_STATUS } from 'lib/constants'
-import { DatabaseSelectorStateContextProvider } from 'state/database-selecor'
+import { DatabaseSelectorStateContextProvider } from 'state/database-selector'
 import { RoleImpersonationStateContextProvider } from 'state/role-impersonation-state'
 import { TableEditorStateContextProvider } from 'state/table-editor'
 

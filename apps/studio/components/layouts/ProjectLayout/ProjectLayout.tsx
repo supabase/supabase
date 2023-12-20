@@ -1,3 +1,7 @@
+import Head from 'next/head'
+import { useRouter } from 'next/router'
+import { Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
+
 import { useParams } from 'common/hooks'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import AISettingsModal from 'components/ui/AISettingsModal'
@@ -5,9 +9,7 @@ import Connecting from 'components/ui/Loading/Loading'
 import ResourceExhaustionWarningBanner from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
 import { useFlag, useSelectedOrganization, useSelectedProject, withAuth } from 'hooks'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
-import Head from 'next/head'
-import { useRouter } from 'next/router'
-import { Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import AppLayout from '../AppLayout/AppLayout'
 import EnableBranchingModal from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
 import BuildingState from './BuildingState'
@@ -21,7 +23,6 @@ import { ProjectContextProvider } from './ProjectContext'
 import ProjectPausedState from './ProjectPausedState'
 import RestoringState from './RestoringState'
 import UpgradingState from './UpgradingState'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selecor'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul

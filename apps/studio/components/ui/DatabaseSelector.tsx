@@ -1,5 +1,11 @@
-import { useParams } from 'common'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
+
+import { useParams } from 'common'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { formatDatabaseID, formatDatabaseRegion } from 'data/read-replicas/replicas.utils'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Button,
   CommandGroup_Shadcn_,
@@ -15,12 +21,6 @@ import {
   ScrollArea,
   cn,
 } from 'ui'
-
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { formatDatabaseID, formatDatabaseRegion } from 'data/read-replicas/replicas.utils'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selecor'
 
 interface DatabaseSelectorProps {
   variant?: 'regular' | 'connected-on-right' | 'connected-on-left' | 'connected-on-both'
