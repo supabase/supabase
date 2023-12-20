@@ -1,5 +1,5 @@
 import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
-import { Project } from 'types'
+import { Project } from 'data/projects/project-detail-query'
 
 export const generateRealtimeMenu = (project?: Project): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'

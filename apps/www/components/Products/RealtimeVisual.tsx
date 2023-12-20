@@ -45,7 +45,7 @@ const RealtimeVisual = () => {
               height="247.703"
               rx="11.75"
               stroke="hsl(var(--border-overlay))"
-              stroke-width="0.5"
+              strokeWidth="0.5"
             />
           </g>
           <g opacity="0.1">
@@ -113,7 +113,7 @@ const RealtimeVisual = () => {
             rx="6.24973"
             fill="hsl(var(--brand-default))"
             stroke="hsl(var(--background-surface-200))"
-            stroke-width="1.74909"
+            strokeWidth="1.74909"
           />
           <path
             d="M148 329.969C148 316.83 158.652 306.18 171.79 306.18C184.927 306.18 195.578 316.83 195.578 329.967C195.578 343.104 184.928 353.754 171.791 353.754H148V329.969Z"
@@ -144,7 +144,7 @@ const RealtimeVisual = () => {
             filterUnits="userSpaceOnUse"
             color-interpolation-filters="sRGB"
           >
-            <feFlood flood-opacity="0" result="BackgroundImageFix" />
+            <feFlood floodOpacity="0" result="BackgroundImageFix" />
             <feGaussianBlur in="BackgroundImageFix" stdDeviation="4.36172" />
             <feComposite in2="SourceAlpha" operator="in" result="effect1_backgroundBlur_410_1821" />
             <feBlend
@@ -163,7 +163,7 @@ const RealtimeVisual = () => {
             filterUnits="userSpaceOnUse"
             color-interpolation-filters="sRGB"
           >
-            <feFlood flood-opacity="0" result="BackgroundImageFix" />
+            <feFlood floodOpacity="0" result="BackgroundImageFix" />
             <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
             <feGaussianBlur stdDeviation="37.8787" result="effect1_foregroundBlur_410_1821" />
           </filter>

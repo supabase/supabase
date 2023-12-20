@@ -203,6 +203,46 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
+        title: 'Leaked password protection',
+        plans: {
+          free: false,
+          pro: true,
+          team: true,
+          enterprise: true,
+        },
+        usage_based: false,
+      },
+      {
+        title: 'Single session per user',
+        plans: {
+          free: false,
+          pro: true,
+          team: true,
+          enterprise: true,
+        },
+        usage_based: false,
+      },
+      {
+        title: 'Session timeouts',
+        plans: {
+          free: false,
+          pro: true,
+          team: true,
+          enterprise: true,
+        },
+        usage_based: false,
+      },
+      {
+        title: 'Auth Hooks',
+        plans: {
+          free: 'Custom Access Token (JWT)',
+          pro: 'Custom Access Token (JWT)',
+          team: 'All',
+          enterprise: 'All',
+        },
+        usage_based: false,
+      },
+      {
         title: 'Advanced security features',
         plans: {
           free: false,
