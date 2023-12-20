@@ -17,7 +17,7 @@ import JWTSettings from './JWTSettings'
 import PostgrestConfig from './PostgrestConfig'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useDatabaseSelectorStateSnapshot } from 'state/project-state'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selecor'
 
 const ServiceList = () => {
   const { ui } = useStore()

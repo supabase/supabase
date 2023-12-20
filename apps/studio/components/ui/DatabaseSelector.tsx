@@ -20,7 +20,7 @@ import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { formatDatabaseID, formatDatabaseRegion } from 'data/read-replicas/replicas.utils'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useDatabaseSelectorStateSnapshot } from 'state/project-state'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selecor'
 
 interface DatabaseSelectorProps {
   variant?: 'regular' | 'connected-on-right' | 'connected-on-left' | 'connected-on-both'
