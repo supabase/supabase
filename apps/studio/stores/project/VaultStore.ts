@@ -1,5 +1,5 @@
 import type { PostgresColumn } from '@supabase/postgres-meta'
-import { Query } from 'components/grid'
+import { Query } from 'components/grid/query/Query'
 import { makeAutoObservable } from 'mobx'
 import { SchemaView, VaultSecret } from 'types'
 import { IRootStore } from '../RootStore'
