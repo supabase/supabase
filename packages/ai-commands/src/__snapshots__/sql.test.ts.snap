@@ -38,14 +38,8 @@ exports[`generate single table with specified columns 1`] = `
 );"
 `;
 
-exports[`generate single table with specified columns 2`] = `"Employee Tracking Table"`;
-
 exports[`rls chat select policy using table definition 1`] = `
 "create policy select_todo_policy on todos for
 select
   using (user_id = auth.uid ());"
 `;
-
-exports[`title title matches content 1`] = `"Employee and Department Tables"`;
-
-exports[`title title matches content 2`] = `"Tables to track employees and their respective departments"`;
