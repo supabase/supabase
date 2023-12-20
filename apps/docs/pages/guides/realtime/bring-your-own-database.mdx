@@ -31,6 +31,8 @@ Realtime relies on Postgres' logical replication functionality to get database c
 - `max_replication_slots`: we recommend `10` because Realtime requires a few slots plus the slots you'll need for your non-Realtime logical replication needs.
 - `max_slot_wal_keep_size`: we recommend `1024` (MB) so Realtime can attempt to deliver more database changes stored in Postgres.
 
+See [Compute Add-ons](/docs/guides/platform/compute-add-ons#postgres-replication-slots-and-wal-senders) for the recommended `max_replication_slots` at different instance sizes based on the values we use for our own cloud offering.
+
 ## Realtime Database Setup
 
 ### `supabase_realtime` Publication

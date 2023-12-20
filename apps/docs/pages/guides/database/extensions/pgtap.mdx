@@ -135,12 +135,14 @@ API:
 ## Testing Functions
 
 ```sql
-begin;
-select plan( 1 );
+prepare hello_expr as select 'hello'
 
-select function_returns( 'hello_world', 'text' );                   # test if the function "hello_world" returns text
-select function_returns( 'is_even', ARRAY['integer'], 'boolean' );  # test if the function "is_even" returns a boolean
-select results_eq('select * from hello_world()', 'hello');          # test if the function "hello_world" returns "hello"
+begin;
+select plan(3);
+-- You'll need to create a hello_world and is_even function
+select function_returns( 'hello_world', 'text' );                   -- test if the function "hello_world" returns text
+select function_returns( 'is_even', ARRAY['integer'], 'boolean' );  -- test if the function "is_even" returns a boolean
+select results_eq('select * from hello_world()', 'hello_expr');          -- test if the function "hello_world" returns "hello"
 
 select * from finish();
 rollback;

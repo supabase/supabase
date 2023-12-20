@@ -106,8 +106,8 @@
   {
     "type": "example",
     "products": ["database"],
-    "title": "NextJS todo list app",
-    "description": "NextJS todo list example",
+    "title": "Next.js todo list app",
+    "description": "Next.js todo list example",
     "author": "supabase",
     "author_url": "https://github.com/supabase",
     "author_img": "https://avatars.githubusercontent.com/u/54469796",

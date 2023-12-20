@@ -10,8 +10,9 @@ export const meta = {
 ![Supabase User Management example](/docs/img/user-management-demo.png)
 
 <Admonition type="note">
-  If you get stuck while working through this guide, refer to the [full example on
-  GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/nuxt3-user-management).
+
+If you get stuck while working through this guide, refer to the [full example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/nuxt3-user-management).
+
 </Admonition>
 
 <ProjectSetup />
@@ -48,7 +49,9 @@ These variables will be exposed on the browser, and that's completely fine since
 Amazing thing about [NuxtSupabase](https://supabase.nuxtjs.org/) is that setting environment variables is all we need to do in order to start using Supabase.
 No need to initialize Supabase. The library will take care of it automatically.
 
-And one optional step is to update the CSS file `assets/main.css` to make the app look nice.
+### App Styling (Optional)
+
+An optional step is to update the CSS file `assets/main.css` to make the app look nice.
 You can find the full contents of this file [here](https://github.com/supabase-community/nuxt3-quickstarter/blob/main/assets/main.css).
 
 ```typescript nuxt.config.ts
@@ -128,7 +131,7 @@ const avatar_path = ref('')
 loading.value = true
 const user = useSupabaseUser()
 
-let { data } = await supabase
+const { data } = await supabase
   .from('profiles')
   .select(`username, website, avatar_url`)
   .eq('id', user.value.id)
@@ -155,7 +158,7 @@ async function updateProfile() {
       updated_at: new Date(),
     }
 
-    let { error } = await supabase.from('profiles').upsert(updates, {
+    const { error } = await supabase.from('profiles').upsert(updates, {
       returning: 'minimal', // Don't return the value after inserting
     })
     if (error) throw error
@@ -169,7 +172,7 @@ async function updateProfile() {
 async function signOut() {
   try {
     loading.value = true
-    let { error } = await supabase.auth.signOut()
+    const { error } = await supabase.auth.signOut()
     if (error) throw error
     user.value = null
   } catch (error) {
@@ -283,7 +286,7 @@ const uploadAvatar = async (evt) => {
     const fileName = `${Math.random()}.${fileExt}`
     const filePath = `${fileName}`
 
-    let { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file)
+    const { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file)
 
     if (uploadError) throw uploadError
 
@@ -349,7 +352,7 @@ const avatar_path = ref('')
 loading.value = true
 const user = useSupabaseUser()
 
-let { data } = await supabase
+const { data } = await supabase
   .from('profiles')
   .select(`username, website, avatar_url`)
   .eq('id', user.value.id)
@@ -376,7 +379,7 @@ async function updateProfile() {
       updated_at: new Date(),
     }
 
-    let { error } = await supabase.from('profiles').upsert(updates, {
+    const { error } = await supabase.from('profiles').upsert(updates, {
       returning: 'minimal', // Don't return the value after inserting
     })
 
@@ -391,7 +394,7 @@ async function updateProfile() {
 async function signOut() {
   try {
     loading.value = true
-    let { error } = await supabase.auth.signOut()
+    const { error } = await supabase.auth.signOut()
     if (error) throw error
   } catch (error) {
     alert(error.message)

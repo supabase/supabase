@@ -57,7 +57,7 @@ export default function Config() {
                     >
                       <RefSubLayout.Details>
                         <div className="mt-4">
-                          <code className="text-md flex gap-4 text-md text-scale-900 break-all">
+                          <code className="text-md flex gap-4 text-md text-foreground-lighter break-all">
                             <span className="uppercase">{operation.operation}</span>
                             {operation.fullPath}
                           </code>

@@ -3,11 +3,16 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'cicd-workflow',
   title: 'Deploying with GitHub Actions',
-  description: 'How to deploy Supabase Edge Functions with a CI / CD pipeline.',
-  video: 'https://www.youtube.com/v/6OMVWiiycLs',
+  description: 'Use GitHub Actions as a CI / CD pipeline to deploy your Edge Functions.',
+  subtitle: 'Use GitHub Actions as a CI / CD pipeline to deploy your Edge Functions.',
+  tocVideo: '6OMVWiiycLs',
 }
 
-As described in the Supabase CLI [Environments Guide](/docs/guides/cli/managing-environments), you can use the [`setup-cli` GitHub Action](https://github.com/marketplace/actions/supabase-cli-action) to run Supabase CLI commands in your GitHub Actions, for example to deploy a Supabase Edge Function:
+You can use the official [`setup-cli` GitHub Action](https://github.com/marketplace/actions/supabase-cli-action) to run Supabase CLI commands in your GitHub Actions.
+
+## Sample Workflow
+
+The following GitHub Action deploys all Edge Functions any time code is merged into the `main` branch:
 
 ```yaml
 name: Deploy Function
@@ -36,7 +41,7 @@ jobs:
       - run: supabase functions deploy --project-ref $PROJECT_ID
 ```
 
-Since Supabase CLI [v1.62.0](https://github.com/supabase/cli/releases/tag/v1.62.0) you can deploy all functions with a single command.
+## Declarative Configuration
 
 Individual function configuration like [JWT verification](/docs/guides/cli/config#functions.function_name.verify_jwt) and [import map location](/docs/guides/cli/config#functions.function_name.import_map) can be set via the `config.toml` file.
 
@@ -45,16 +50,9 @@ Individual function configuration like [JWT verification](/docs/guides/cli/confi
 verify_jwt = false
 ```
 
-<div class="video-container">
-  <iframe
-    src="https://www.youtube-nocookie.com/embed/6OMVWiiycLs"
-    frameBorder="1"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowFullScreen
-  ></iframe>
-</div>
+## Resources
 
-See the [example on GitHub](https://github.com/supabase/supabase/blob/master/examples/edge-functions/.github/workflows/deploy.yaml).
+- See the [example on GitHub](https://github.com/supabase/supabase/blob/master/examples/edge-functions/.github/workflows/deploy.yaml).
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

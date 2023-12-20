@@ -1,25 +1,19 @@
-/* This example requires Tailwind CSS v2.0+ */
-import React, { useEffect, useRef, useState } from 'react'
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
-import { FormLayout } from '../../lib/Layout/FormLayout'
-
-import InputIconContainer from '../../lib/Layout/InputIconContainer'
-import InputErrorIcon from '../../lib/Layout/InputErrorIcon'
-import { IconCheck } from '../Icon/icons/IconCheck'
-
-import { useFormContext } from '../Form/FormContext'
 import { flatten } from 'lodash'
+import React, { useEffect, useRef, useState } from 'react'
 
-import { SelectContext } from './SelectContext'
-
+import { cn } from '@ui/lib/utils'
+import { FormLayout } from '../../lib/Layout/FormLayout'
+import InputErrorIcon from '../../lib/Layout/InputErrorIcon'
+import InputIconContainer from '../../lib/Layout/InputIconContainer'
 import styleHandler from '../../lib/theme/styleHandler'
-
-function classNames(...classes: any) {
-  return classes.filter(Boolean).join(' ')
-}
+import { useFormContext } from '../Form/FormContext'
+import { IconCheck } from '../Icon/icons/IconCheck'
+import { SelectContext } from './SelectContext'
 
 export interface Props extends Omit<React.InputHTMLAttributes<HTMLButtonElement>, 'size'> {
   className?: string
+  buttonClassName?: string
   children: React.ReactNode
   descriptionText?: string | React.ReactNode
   error?: string
@@ -34,7 +28,6 @@ export interface Props extends Omit<React.InputHTMLAttributes<HTMLButtonElement>
   actions?: React.ReactNode
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
   defaultValue?: any
-  borderless?: boolean
   validation?: (x: any) => void
   optionsWidth?: number
   // override the button prop for onchange we only return a single value
@@ -45,6 +38,7 @@ export interface Props extends Omit<React.InputHTMLAttributes<HTMLButtonElement>
 function Listbox({
   children,
   className,
+  buttonClassName,
   descriptionText,
   error,
   icon,
@@ -60,7 +54,6 @@ function Listbox({
   style,
   size = 'medium',
   defaultValue,
-  borderless = false,
   validation,
   disabled,
   optionsWidth,
@@ -187,11 +180,13 @@ function Listbox({
     if (validation) fieldLevelValidation(id, validation(value))
   }
 
-  let selectClasses = [__styles.container, __styles.base]
+  let selectClasses = [__styles.container, __styles.base, buttonClassName]
+  let addonBeforeClasses = [__styles.addOnBefore]
+
   if (error) selectClasses.push(__styles.variants.error)
   if (!error) selectClasses.push(__styles.variants.standard)
   // if (icon) selectClasses.push(SelectStyles['sbui-listbox--with-icon'])
-  if (icon) selectClasses.push(__styles.with_icon)
+  if (icon) addonBeforeClasses.push(__styles.with_icon)
   // if (size) selectClasses.push(SelectStyles[`sbui-listbox--${size}`])
   if (size) selectClasses.push(__styles.size[size])
   // if (borderless) selectClasses.push(SelectStyles['sbui-listbox--borderless'])
@@ -213,13 +208,13 @@ function Listbox({
         <DropdownMenuPrimitive.Trigger asChild disabled={disabled}>
           <button
             ref={triggerRef}
-            className={selectClasses.join(' ')}
+            className={cn(selectClasses)}
             onBlur={handleBlurEvent}
             onFocus={onFocus}
             name={name}
             id={id}
           >
-            <span className={__styles.addOnBefore}>
+            <span className={cn(addonBeforeClasses)}>
               {icon && <InputIconContainer icon={icon} />}
               {selectedNode?.addOnBefore && <selectedNode.addOnBefore />}
               <span className={__styles.label}>{selectedNode?.label}</span>
@@ -269,7 +264,7 @@ interface OptionProps {
   value: any
   label: string
   disabled?: boolean
-  children?: React.ReactNode
+  children?: React.ReactNode | (({ active, selected }: any) => React.ReactNode)
   className?: string
   addOnBefore?: ({ active, selected }: any) => React.ReactNode
 }
@@ -298,11 +293,12 @@ function SelectOption({
         return (
           <DropdownMenuPrimitive.Item
             key={id}
-            className={`${classNames(
+            className={cn(
               __styles.option,
               active ? __styles.option_active : ' ',
-              disabled ? __styles.option_disabled : ' '
-            )} ${className}`}
+              disabled ? __styles.option_disabled : ' ',
+              className
+            )}
             onSelect={() => (!disabled ? onChange(value) : {})}
           >
             <div className={__styles.option_inner}>
@@ -314,10 +310,7 @@ function SelectOption({
 
             {active ? (
               <span
-                className={classNames(
-                  __styles.option_check,
-                  active ? __styles.option_check_active : ''
-                )}
+                className={cn(__styles.option_check, active ? __styles.option_check_active : '')}
               >
                 <IconCheck className={__styles.option_check_icon} aria-hidden="true" />
               </span>

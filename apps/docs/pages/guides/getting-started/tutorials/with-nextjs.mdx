@@ -1,8 +1,8 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-  title: 'Build a User Management App with NextJS',
-  description: 'Learn how to use Supabase in your Next App.',
+  title: 'Build a User Management App with Next.js',
+  description: 'Learn how to use Supabase in your Next.js App.',
 }
 
 <QuickstartIntro />
@@ -10,8 +10,9 @@ export const meta = {
 ![Supabase User Management example](/docs/img/user-management-demo.png)
 
 <Admonition type="note">
-  If you get stuck while working through this guide, refer to the [full example on
-  GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/nextjs-user-management).
+
+If you get stuck while working through this guide, refer to the [full example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/nextjs-user-management).
+
 </Admonition>
 
 <ProjectSetup />
@@ -63,7 +64,9 @@ NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 ```
 
-And one optional step is to update the CSS file `app/globals.css` to make the app look nice.
+### App Styling (Optional)
+
+An optional step is to update the CSS file `app/globals.css` to make the app look nice.
 You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/nextjs-user-management/app/globals.css).
 
 ### Supabase Auth Helpers
@@ -78,7 +81,7 @@ Install the auth helpers for Next.js
 npm install @supabase/auth-helpers-nextjs @supabase/supabase-js
 ```
 
-### NextJS Middleware
+### Next.js Middleware
 
 <Tabs
   scrollable
@@ -299,7 +302,8 @@ import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
 export async function GET(req) {
-  const supabase = createRouteHandlerClient({ cookies })
+  const cookieStore = cookies()
+  const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
   const { searchParams } = new URL(req.url)
   const code = searchParams.get('code')
 
@@ -320,7 +324,8 @@ import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(req: NextRequest) {
-  const supabase = createRouteHandlerClient({ cookies })
+  const cookieStore = cookies()
+  const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
   const { searchParams } = new URL(req.url)
   const code = searchParams.get('code')
 
@@ -354,7 +359,8 @@ import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
 export async function POST(req) {
-  const supabase = createRouteHandlerClient({ cookies })
+  const cookieStore = cookies()
+  const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
 
   // Check if we have a session
   const {
@@ -380,7 +386,8 @@ import { cookies } from 'next/headers'
 import { type NextRequest, NextResponse } from 'next/server'
 
 export async function POST(req: NextRequest) {
-  const supabase = createRouteHandlerClient({ cookies })
+  const cookieStore = cookies()
+  const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
 
   // Check if we have a session
   const {
@@ -433,7 +440,7 @@ export default function AccountForm({ session }) {
     try {
       setLoading(true)
 
-      let { data, error, status } = await supabase
+      const { data, error, status } = await supabase
         .from('profiles')
         .select(`full_name, username, website, avatar_url`)
         .eq('id', user?.id)
@@ -464,7 +471,7 @@ export default function AccountForm({ session }) {
     try {
       setLoading(true)
 
-      let { error } = await supabase.from('profiles').upsert({
+      const { error } = await supabase.from('profiles').upsert({
         id: user?.id,
         full_name: fullname,
         username,
@@ -559,7 +566,7 @@ export default function AccountForm({ session }: { session: Session | null }) {
     try {
       setLoading(true)
 
-      let { data, error, status } = await supabase
+      const { data, error, status } = await supabase
         .from('profiles')
         .select(`full_name, username, website, avatar_url`)
         .eq('id', user?.id)
@@ -599,7 +606,7 @@ export default function AccountForm({ session }: { session: Session | null }) {
     try {
       setLoading(true)
 
-      let { error } = await supabase.from('profiles').upsert({
+      const { error } = await supabase.from('profiles').upsert({
         id: user?.id as string,
         full_name: fullname,
         username,
@@ -692,7 +699,8 @@ import { cookies } from 'next/headers'
 import AccountForm from './account-form'
 
 export default async function Account() {
-  const supabase = createServerComponentClient({ cookies })
+  const cookieStore = cookies()
+  const supabase = createServerComponentClient({ cookies: () => cookieStore })
 
   const {
     data: { session },
@@ -794,7 +802,7 @@ export default function Avatar({ uid, url, size, onUpload }) {
       const fileExt = file.name.split('.').pop()
       const filePath = `${uid}-${Math.random()}.${fileExt}`
 
-      let { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file)
+      const { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file)
 
       if (uploadError) {
         throw uploadError
@@ -899,7 +907,7 @@ export default function Avatar({
       const fileExt = file.name.split('.').pop()
       const filePath = `${uid}-${Math.random()}.${fileExt}`
 
-      let { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file)
+      const { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file)
 
       if (uploadError) {
         throw uploadError

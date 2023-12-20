@@ -16,7 +16,7 @@ const CTABanner = dynamic(() => import('components/CTABanner/index'))
 const CustomerStories = dynamic(() => import('components/CustomerStories'))
 const TwitterSocialSection = dynamic(() => import('~/components/TwitterSocialSection'))
 
-type Props = { customerStories: PostTypes[] }
+type Props = { customerStories: PostTypes[]; blogPosts: PostTypes[] }
 
 const Index = ({ customerStories }: Props) => {
   return (

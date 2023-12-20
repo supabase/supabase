@@ -8,7 +8,9 @@ export const meta = {
   tocVideo: 'Ow_Uzedfohk',
 }
 
-Supabase Auth is designed to work perfectly with [Postgres Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS).
+[Postgres Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS) is a feature of Postgres that allows you to control which users are permitted to perform SELECT/INSERT/UPDATE/DELETE statements on specific rows within tables and views. For example, you could restrict a `blog_post` table such that the current user is only allowed to UPDATE rows where their user id is set in the table's `author_id` column.
+
+Supabase Auth is designed to work perfectly with RLS.
 
 You can use RLS to create [Policies](https://www.postgresql.org/docs/current/sql-createpolicy.html) that are incredibly powerful and flexible, allowing you to write complex SQL rules which fit your unique business needs.
 
@@ -87,11 +89,12 @@ to authenticated
 using ( team_id in (select auth.jwt() -> 'app_metadata' -> 'teams'));
 ```
 
-{/* prettier-ignore */}
 <Admonition type="caution">
+
 Keep in mind that a JWT is not always "fresh". In the example above, even if you remove a user from a team and update the `app_metadata` field, that will not be reflected using `auth.jwt()` until the user's JWT is refreshed. 
 
 Also, if you are using Cookies for Auth, then you must be mindful of the JWT size. Some browsers are limited to 4096 bytes for each cookie, and so the total size of your JWT should be small enough to fit inside this limitation.
+
 </Admonition>
 
 ## Important considerations
@@ -230,7 +233,7 @@ create table members (
 
 -- 2.  Enable RLS
 alter table teams enable row level security;
-alter table members enable row level security
+alter table members enable row level security;
 
 -- 3.  Create security definer function, which should be run as "postgres"
 create function private.get_teams_for_authenticated_user()
