@@ -192,10 +192,9 @@ functions:
       - The auth methods can be accessed via the `supabase.auth` namespace.
       - By default, the supabase client sets `persistSession` to true and attempts to store the session in local storage. When using the supabase client in an environment that doesn't support local storage, you might notice the following warning message being logged:
 
-      > No storage option exists to persist the session, which may result in unexpected behavior when using auth.
-      If you want to set `persistSession` to true, please provide a storage option or you may set `persistSession` to false to disable this warning.
+        > No storage option exists to persist the session, which may result in unexpected behavior when using auth. If you want to set `persistSession` to true, please provide a storage option or you may set `persistSession` to false to disable this warning.
 
-      This warning message can be safely ignored if you're not using auth on the server-side. If you are using auth and you want to set `persistSession` to true, you will need to provide a custom storage implementation that follows [this interface](https://github.com/supabase/gotrue-js/blob/master/src/lib/types.ts#L1027).
+        This warning message can be safely ignored if you're not using auth on the server-side. If you are using auth and you want to set `persistSession` to true, you will need to provide a custom storage implementation that follows [this interface](https://github.com/supabase/gotrue-js/blob/master/src/lib/types.ts#L1027).
       - Any email links and one-time passwords (OTPs) sent have a default expiry of 24 hours. We have the following [rate limits](/docs/guides/platform/going-into-prod#auth-rate-limits) in place to guard against brute force attacks.
       - The expiry of an access token can be set in the "JWT expiry limit" field in [your project's auth settings](/dashboard/project/_/settings/auth). A refresh token never expires and can only be used once.
 
@@ -224,6 +223,7 @@ functions:
             }
           })
           ```
+
   - id: sign-up
     title: 'signUp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
@@ -284,6 +284,202 @@ functions:
             }
           )
           ```
+
+  - id: on-auth-state-change
+    title: 'onAuthStateChange()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.onAuthStateChange'
+    notes: |
+      - Subscribes to important events occurring on the user's session.
+      - Use on the frontend/client. It is less useful on the server.
+      - Events are emitted across tabs to keep your application's UI up-to-date. Some events can fire very frequently, based on the number of tabs open. Use a quick and efficient callback function, and defer or debounce as many operations as you can to be performed outside of the callback.
+      - **Important:** A callback can be an `async` function and it runs synchronously during the processing of the changes causing the event. You can easily create a dead-lock by using `await` on a call to another method of the Supabase library.
+        - Avoid using `async` functions as callbacks.
+        - Limit the number of `await` calls in `async` callbacks.
+        - Do not use other Supabase functions in the callback function. If you must, dispatch the functions once the callback has finished executing. Use this as a quick way to achieve this:
+          ```js
+          supabase.auth.onAuthStateChange((event, session) => {
+            setTimeout(async () => {
+              // await on other Supabase function here
+              // this runs right after the callback has finished
+            }, 0)
+          })
+          ```
+      - Emitted events:
+        - `INITIAL_SESSION`
+          - Emitted right after the Supabase client is constructed and the initial session from storage is loaded.
+        - `SIGNED_IN`
+          - Emitted each time a user signs in. 
+          - Avoid making assumptions as to when this event is fired. Instead, check the user object attached to the event to see if a new user has signed in and update your application's UI.
+          - This event can fire very frequently depending on the number of tabs open in your application.
+        - `SIGNED_OUT`
+          - Emitted when the user signs out. This can be after:
+            - A call to `supabase.auth.signOut()`.
+            - After the user's session has expired for any reason:
+              - User has signed out on another device.
+              - The session has reached its timebox limit or inactivity timeout.
+              - User has signed in on another device with single session per user enabled.
+              - Check the [User Sessions](/docs/guides/auth/sessions) docs for more information.
+          - Use this to clean up any local storage your application has associated with the user.
+        - `TOKEN_REFRESHED`
+          - Emitted each time a new access and refresh token are fetched for the signed in user.
+          - It's best practice and highly recommended to extract the access token (JWT) and store it in memory for further use in your application.
+            - Avoid frequent calls to `supabase.auth.getSession()` for the same purpose.
+          - There is a background process that keeps track of when the session should be refreshed so you will always receive valid tokens by listening to this event.
+          - The frequency of this event is related to the JWT expiry limit configured on your project.
+        - `USER_UPDATED`
+          - Emitted each time the `supabase.auth.updateUser()` method finishes successfully. Listen to it to update your application's UI based on new profile information.
+        - `PASSWORD_RECOVERY`
+          - Emitted instead of the `SIGNED_IN` event when the user lands on a page that includes a password recovery link in the URL.
+          - Use it to show a UI to the user where they can [reset their password](/docs/guides/auth/passwords#resetting-a-users-password-forgot-password).
+
+    examples:
+      - id: listen-to-auth-changes
+        name: Listen to auth changes
+        isSpotlight: true
+        code: |
+          ```js
+          const subscription = supabase.auth.onAuthStateChange((event, session) => {
+            console.log(event, session)
+
+            if (event === 'INITIAL_SESSION') {
+              // handle initial session
+            } else if (event === 'SIGNED_IN') {
+              // handle sign in event
+            } else if (event === 'SIGNED_OUT') {
+              // handle sign out event
+            } else if (event === 'PASSWORD_RECOVERY') {
+              // handle password recovery event
+            } else if (event === 'TOKEN_REFRESHED') {
+              // handle token refreshed event
+            } else if (event === 'USER_UPDATED') {
+              // handle user updated event
+            }
+          })
+
+          // call unsubscribe to remove the callback
+          subscription.unsubscribe()
+          ```
+      - id: listen-to-sign-out
+        name: Listen to sign out
+        description: |
+          Make sure you clear out any local data, such as local and session storage, after the client library has detected the user's sign out.
+        code: |
+          ```js
+          supabase.auth.onAuthStateChange((event, session) => {
+            if (event === 'SIGNED_OUT') {
+              console.log('SIGNED_OUT', session)
+
+              // clear local and session storage
+              [
+                window.localStorage,
+                window.sessionStorage,
+              ].forEach((storage) => {
+                Object.entries(storage)
+                  .forEach(([key]) => {
+                    storage.removeItem(key)
+                  })
+              })
+            }
+          })
+          ```
+      - id: store-provider-tokens
+        name: Store OAuth provider tokens on sign in
+        description: |
+          When using [OAuth (Social Login)](/docs/guides/auth/social-login) you sometimes wish to get access to the provider's access token and refresh token, in order to call provider APIs in the name of the user.
+
+          For example, if you are using [Sign in with Google](/docs/guides/auth/social-login/auth-google) you may want to use the provider token to call Google APIs on behalf of the user. Supabase Auth does not keep track of the provider access and refresh token, but does return them for you once, immediately after sign in. You can use the `onAuthStateChange` method to listen for the presence of the provider tokens and store them in local storage. You can further send them to your server's APIs for use on the backend.
+
+          Finally, make sure you remove them from local storage on the `SIGNED_OUT` event. If the OAuth provider supports token revocation, make sure you call those APIs either from the frontend or schedule them to be called on the backend.
+        code: |
+          ```js
+          // Register this immediately after calling createClient!
+          // Because signInWithOAuth causes a redirect, you need to fetch the
+          // provider tokens from the callback.
+          supabase.auth.onAuthStateChange((event, session) => {
+            if (session && session.provider_token) {
+              window.localStorage.setItem('oauth_provider_token', session.provider_token)
+            }
+
+            if (session && session.provider_refresh_token) {
+              window.localStorage.setItem('oauth_provider_refresh_token', session.provider_refresh_token)
+            }
+
+            if (event === 'SIGNED_OUT') {
+              window.localStorage.removeItem('oauth_provider_token')
+              window.localStorage.removeItem('oauth_provider_refresh_token')
+            }
+          })
+          ```
+      - id: react-user-session-context
+        name: Use React Context for the User's session
+        description: |
+          Instead of relying on `supabase.auth.getSession()` within your React components, you can use a [React Context](https://react.dev/reference/react/createContext) to store the latest session information from the `onAuthStateChange` callback and access it that way.
+        code: |
+          ```js
+          const SessionContext = React.createContext(null)
+
+          function main() {
+            const [session, setSession] = React.useState(null)
+
+            React.useEffect(() => {
+              const subscription = supabase.auth.onAuthStateChange(
+                (event, session) => {
+                  if (event === 'SIGNED_OUT') {
+                    setSession(null)
+                  } else if (session) {
+                    setSession(session)
+                  }
+                })
+
+              return () => {
+                subscription.unsubscribe()
+              }
+            }, [])
+
+            return (
+              <SessionContext.Provider value={session}>
+                <App />
+              </SessionContext.Provider>
+            )
+          }
+          ```
+      - id: listen-to-password-recovery-events
+        name: Listen to password recovery events
+        code: |
+          ```js
+          supabase.auth.onAuthStateChange((event, session) => {
+            if (event === 'PASSWORD_RECOVERY') {
+              console.log('PASSWORD_RECOVERY', session)
+              // show screen to update user's password
+              showPasswordResetScreen(true)
+            }
+          })
+          ```
+      - id: listen-to-sign-in
+        name: Listen to sign in
+        code: |
+          ```js
+          supabase.auth.onAuthStateChange((event, session) => {
+            if (event === 'SIGNED_IN') console.log('SIGNED_IN', session)
+          })
+          ```
+      - id: listen-to-token-refresh
+        name: Listen to token refresh
+        code: |
+          ```js
+          supabase.auth.onAuthStateChange((event, session) => {
+            if (event === 'TOKEN_REFRESHED') console.log('TOKEN_REFRESHED', session)
+          })
+          ```
+      - id: listen-to-user-updates
+        name: Listen to user updates
+        code: |
+          ```js
+          supabase.auth.onAuthStateChange((event, session) => {
+            if (event === 'USER_UPDATED') console.log('USER_UPDATED', session)
+          })
+          ```
+
   - id: sign-in-with-password
     title: 'signInWithPassword()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithPassword'
@@ -398,21 +594,44 @@ functions:
           })
           ```
       - id: sign-in-with-scopes
-        name: Sign in with scopes
+        name: Sign in with scopes and access provider tokens
         isSpotlight: false
         description: |
-          If you need additional data from an OAuth provider, you can include a space-separated list of scopes in your request to get back an OAuth provider token.
-          You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider. The list of scopes will be documented by the third-party provider you are using and specifying scopes will enable you to use the OAuth provider token to call additional APIs supported by the third-party provider to get more information.
+          If you need additional access from an OAuth provider, in order to access provider specific APIs in the name of the user, you can do this by passing in the scopes the user should authorize for your application. Note that the `scopes` option takes in **a space-separated list** of scopes.
+
+          Because OAuth sign-in often includes redirects, you should register an `onAuthStateChange` callback immediately after you create the Supabase client. This callback will listen for the presence of `provider_token` and `provider_refresh_token` properties on the `session` object and store them in local storage. The client library will emit these values **only once** immediately after the user signs in. You can then access them by looking them up in local storage, or send them to your backend servers for further processing.
+
+          Finally, make sure you remove them from local storage on the `SIGNED_OUT` event. If the OAuth provider supports token revocation, make sure you call those APIs either from the frontend or schedule them to be called on the backend.
         code: |
           ```js
-          const { data, error } = await supabase.auth.signInWithOAuth({
+          // Register this immediately after calling createClient!
+          // Because signInWithOAuth causes a redirect, you need to fetch the
+          // provider tokens from the callback.
+          supabase.auth.onAuthStateChange((event, session) => {
+            if (session && session.provider_token) {
+              window.localStorage.setItem('oauth_provider_token', session.provider_token)
+            }
+
+            if (session && session.provider_refresh_token) {
+              window.localStorage.setItem('oauth_provider_refresh_token', session.provider_refresh_token)
+            }
+
+            if (event === 'SIGNED_OUT') {
+              window.localStorage.removeItem('oauth_provider_token')
+              window.localStorage.removeItem('oauth_provider_refresh_token')
+            }
+          })
+
+          // Call this on your Sign in with GitHub button to initiate OAuth
+          // with GitHub with the requested elevated scopes.
+          await supabase.auth.signInWithOAuth({
             provider: 'github',
             options: {
               scopes: 'repo gist notifications'
             }
           })
-          const oAuthToken = data.session.provider_token // use to access provider API
           ```
+
   - id: sign-in-with-id-token
     title: 'signInWithIdToken'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithIdToken'
@@ -763,69 +982,7 @@ functions:
           const { data, error } = await supabase.auth.refreshSession({ refresh_token })
           const { session, user } = data
           ```
-  - id: on-auth-state-change
-    title: 'onAuthStateChange()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.onAuthStateChange'
-    notes: |
-      - Types of auth events: `INITIAL_SESSION`, `SIGNED_IN`, `SIGNED_OUT`, `TOKEN_REFRESHED`, `USER_UPDATED`, `PASSWORD_RECOVERY`
-      - The `INITIAL_SESSION` can be used to allow you to invoke the callback function when `onAuthStateChange` is first called.
-      - Currently, `onAuthStateChange()` does not work across tabs. For instance, in the case of a password reset flow, the original tab which requested for the password reset link will not receive the `SIGNED_IN` and `PASSWORD_RECOVERY` event when the user clicks on the link.
 
-    examples:
-      - id: listen-to-auth-changes
-        name: Listen to auth changes
-        isSpotlight: true
-        code: |
-          ```js
-          supabase.auth.onAuthStateChange((event, session) => {
-            console.log(event, session)
-          })
-          ```
-      - id: listen-to-password-recovery-events
-        name: Listen to password recovery events
-        code: |
-          ```js
-          supabase.auth.onAuthStateChange((event, session) => {
-            if (event == 'PASSWORD_RECOVERY') {
-              console.log('PASSWORD_RECOVERY', session)
-
-              // show screen to update user's password
-              showPasswordResetScreen(true)
-            }
-          })
-          ```
-      - id: listen-to-sign-in
-        name: Listen to sign in
-        code: |
-          ```js
-          supabase.auth.onAuthStateChange((event, session) => {
-            if (event == 'SIGNED_IN') console.log('SIGNED_IN', session)
-          })
-          ```
-      - id: listen-to-sign-out
-        name: Listen to sign out
-        code: |
-          ```js
-          supabase.auth.onAuthStateChange((event, session) => {
-            if (event == 'SIGNED_OUT') console.log('SIGNED_OUT', session)
-          })
-          ```
-      - id: listen-to-token-refresh
-        name: Listen to token refresh
-        code: |
-          ```js
-          supabase.auth.onAuthStateChange((event, session) => {
-            if (event == 'TOKEN_REFRESHED') console.log('TOKEN_REFRESHED', session)
-          })
-          ```
-      - id: listen-to-user-updates
-        name: Listen to user updates
-        code: |
-          ```js
-          supabase.auth.onAuthStateChange((event, session) => {
-            if (event == 'USER_UPDATED') console.log('USER_UPDATED', session)
-          })
-          ```
   - id: exchange-code-for-session
     title: 'exchangeCodeForSession()'
     $ref: '@supabase/gotrue-js.GoTrueClient.exchangeCodeForSession'
