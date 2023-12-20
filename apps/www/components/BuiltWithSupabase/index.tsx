@@ -33,7 +33,7 @@ const BuiltExamples = () => {
               className={`col-span-12 lg:col-span-6 xl:col-span-4 ${i > 2 && `sm:hidden lg:block`}`}
               key={i}
             >
-              <ExampleCard {...example} />
+              <ExampleCard {...example} showProducts />
             </div>
           )
         })}

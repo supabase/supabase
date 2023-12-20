@@ -5,24 +5,26 @@ import Panel from './Panel'
 function ExampleCard(props: any) {
   return (
     <Panel innerClassName="bg-surface-100">
-      <div className="h-32 p-5 flex flex-col justify-between ">
-        <div className="mb-4 flex flex-col gap-2">
+      <div className="p-5 flex flex-col justify-between">
+        <div className="flex flex-col gap-2">
           <div className="flex flex-wrap items-center gap-2">
             <h4 className="text-foreground text-lg">{props.title} </h4>
           </div>
-          <div className="inline-flex gap-1">
-            {props.products.map((product: string) => (
-              <span className="!px-1 py-0.5 bg-surface-300 !rounded border text-xs text-lighter">
-                {product}
-              </span>
-            ))}
-          </div>
-          <p className="text-sm text-foreground-muted mb-2">{props.description}</p>
+          {props.showProducts && (
+            <div className="inline-flex gap-2">
+              {props.products.map((product: string) => (
+                <span className="!px-1 py-0.5 bg-surface-300 !rounded border text-xs text-lighter">
+                  {product}
+                </span>
+              ))}
+            </div>
+          )}
+          <p className="text-sm text-foreground-muted">{props.description}</p>
         </div>
       </div>
       <div>
-        <div className="flex flex-col justify-between p-5">
-          <div className="mt-3 pt-5 border-t flex items-stretch gap-2">
+        <div className="flex flex-col justify-between p-5 pt-0">
+          <div className="pt-5 border-t flex items-stretch gap-2">
             {props.repo_url && (
               <Button
                 asChild

@@ -87,7 +87,7 @@ export default [
     products: [PRODUCT_NAMES.DATABASE, PRODUCT_NAMES.AUTHENTICATION],
     title: 'Expo React Native Starter',
     description:
-      'An extended version of create-t3-turbo implementing authentication using Supabase Auth on both the web and mobile applications.',
+      'An extended version of create-t3-turbo implementing authentication on both the web and mobile applications.',
     author: 'Supabase Community',
     author_url: 'https://github.com/supabase-community',
     author_img: 'https://avatars.githubusercontent.com/u/87650496',
