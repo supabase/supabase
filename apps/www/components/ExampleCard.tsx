@@ -21,11 +21,7 @@ function ExampleCard(props: any) {
         </div>
       </div>
       <div>
-        <div
-          className="
-          border-default flex
-          flex-col justify-between rounded rounded-t-none p-5"
-        >
+        <div className="flex flex-col justify-between p-5">
           <div className="mt-3 pt-5 border-t flex items-stretch gap-2">
             {props.repo_url && (
               <Button asChild size="tiny" type="default" iconRight={<IconArrowUpRight />}>

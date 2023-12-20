@@ -4,7 +4,7 @@ export default [
   {
     type: 'example',
     tags: ['Next.js'],
-    products: [PRODUCT_NAMES.DATABASE],
+    products: [PRODUCT_NAMES.DATABASE, PRODUCT_NAMES.AUTHENTICATION],
     title: 'Stripe Subscriptions Starter',
     description:
       'The all-in-one subscription starter kit for high-performance SaaS applications, powered by Stripe, Supabase, and Vercel.',
@@ -36,7 +36,7 @@ export default [
   {
     type: 'example',
     tags: ['AI'],
-    products: [PRODUCT_NAMES.DATABASE, PRODUCT_NAMES.VECTOR],
+    products: [PRODUCT_NAMES.DATABASE, PRODUCT_NAMES.AUTHENTICATION, PRODUCT_NAMES.VECTOR],
     title: 'AI Chatbot',
     description:
       'An open-source AI chatbot app template built with Next.js, the Vercel AI SDK, OpenAI, and Supabase.',
