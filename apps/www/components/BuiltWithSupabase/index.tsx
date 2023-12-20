@@ -1,11 +1,10 @@
 import { useRouter } from 'next/router'
-import { Button, IconGitHub } from 'ui'
+import { Button, IconGitHub, IconGitHubSolid } from 'ui'
 import SectionContainer from '../Layouts/SectionContainer'
 import ExampleCard from '../ExampleCard'
 
-import Examples from 'data/Examples.json'
+import Examples from 'data/Examples'
 import Link from 'next/link'
-// import Button from '../Button'
 
 const BuiltExamples = () => {
   const { basePath } = useRouter()
@@ -20,7 +19,7 @@ const BuiltExamples = () => {
               View all examples
             </Link>
           </Button>
-          <Button asChild type="default" icon={<IconGitHub />} size="small">
+          <Button asChild type="default" icon={<IconGitHubSolid size="tiny" />} size="small">
             <Link
               href="https://github.com/supabase/supabase/tree/master/examples"
               as="https://github.com/supabase/supabase/tree/master/examples"
