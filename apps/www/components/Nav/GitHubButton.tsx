@@ -3,7 +3,7 @@ import { Button } from 'ui'
 import { Octokit } from 'octokit'
 
 const GitHubButton = () => {
-  const [stars, setStars] = useState<string>('56')
+  const [stars, setStars] = useState<string>('60.8')
   const octokit = new Octokit()
 
   const kFormatter = (num: number) => {

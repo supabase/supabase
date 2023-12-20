@@ -83,6 +83,20 @@ const SupabaseGridLayout = (props: SupabaseGridProps) => {
     },
     {
       keepPreviousData: true,
+      retryDelay: (retryAttempt, error: any) => {
+        if (error && error.message?.includes('does not exist')) {
+          setParams((prevParams) => {
+            return {
+              ...prevParams,
+              ...{ sort: undefined },
+            }
+          })
+        }
+        if (retryAttempt > 3) {
+          return Infinity
+        }
+        return 5000
+      },
       onSuccess(data) {
         dispatch({
           type: 'SET_ROWS_COUNT',

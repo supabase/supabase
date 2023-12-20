@@ -5,7 +5,7 @@ import { FormEvent, createContext, useContext, useEffect, useState } from 'react
 import toast from 'react-hot-toast'
 import { Button, IconPlus, IconTrash, Input, Listbox, Modal, Radio, SidePanel, Toggle } from 'ui'
 
-import { Dictionary } from 'components/grid'
+import { Dictionary } from 'types'
 import { POSTGRES_DATA_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
