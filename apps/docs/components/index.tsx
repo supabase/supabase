@@ -4,12 +4,6 @@ import StepHikeCompact from '~/components/StepHikeCompact'
 // Common components
 import ButtonCard from './ButtonCard'
 
-// Page specific components
-import AuthProviders from './AuthProviders'
-import Extensions from './Extensions'
-import Frameworks from './Frameworks'
-import FunctionsExamples from './FunctionsExamples'
-
 // Other components
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import { Heading } from './CustomHTMLElements'
@@ -19,7 +13,6 @@ import QuickstartIntro from './MDX/quickstart_intro.mdx'
 import SocialProviderSettingsSupabase from './MDX/social_provider_settings_supabase.mdx'
 import SocialProviderSetup from './MDX/social_provider_setup.mdx'
 import StorageManagement from './MDX/storage_management.mdx'
-import KotlinProjectSetup from './MDX/kotlin_project_setup.mdx'
 import MigrationWarnings from './MDX/migration_warnings.mdx'
 import { CH } from '@code-hike/mdx/components'
 import RefHeaderSection from './reference/RefHeaderSection'
@@ -63,19 +56,14 @@ const components = {
   CodeBlock,
   GlassPanel,
   Link,
-  Frameworks,
-  AuthProviders,
-  FunctionsExamples,
   QuickstartIntro,
   DatabaseSetup,
   ProjectSetup,
-  KotlinProjectSetup,
   MigrationWarnings,
   SocialProviderSetup,
   SocialProviderSettingsSupabase,
   StepHikeCompact,
   StorageManagement,
-  Extensions,
   Alert: (props: any) => (
     <Alert {...props} className="not-prose">
       {props.children}
