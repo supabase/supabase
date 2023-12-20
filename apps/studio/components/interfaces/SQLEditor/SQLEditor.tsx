@@ -68,7 +68,7 @@ import {
   getDiffTypeDropdownLabel,
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
-import { useProjectStateSnapshot } from 'state/project-state'
+import { useDatabaseSelectorStateSnapshot } from 'state/project-state'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
@@ -106,7 +106,7 @@ const SQLEditor = () => {
   const organization = useSelectedOrganization()
   const appSnap = useAppStateSnapshot()
   const snap = useSqlEditorStateSnapshot()
-  const projectState = useProjectStateSnapshot()
+  const projectState = useDatabaseSelectorStateSnapshot()
 
   const { mutate: formatQuery } = useFormatQueryMutation()
   const { mutateAsync: generateSql, isLoading: isGenerateSqlLoading } = useSqlGenerateMutation()

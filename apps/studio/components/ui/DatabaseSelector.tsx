@@ -20,7 +20,7 @@ import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { formatDatabaseID, formatDatabaseRegion } from 'data/read-replicas/replicas.utils'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useProjectStateSnapshot } from 'state/project-state'
+import { useDatabaseSelectorStateSnapshot } from 'state/project-state'
 
 interface DatabaseSelectorProps {
   variant?: 'regular' | 'connected-on-right' | 'connected-on-left' | 'connected-on-both'
@@ -31,7 +31,7 @@ const DatabaseSelector = ({ variant = 'regular' }: DatabaseSelectorProps) => {
   const { ref: projectRef } = useParams()
   const [open, setOpen] = useState(false)
 
-  const state = useProjectStateSnapshot()
+  const state = useDatabaseSelectorStateSnapshot()
   const selectedDatabaseId = state.selectedDatabaseId
 
   const { data } = useReadReplicasQuery({ projectRef })

@@ -17,14 +17,14 @@ import JWTSettings from './JWTSettings'
 import PostgrestConfig from './PostgrestConfig'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useProjectStateSnapshot } from 'state/project-state'
+import { useDatabaseSelectorStateSnapshot } from 'state/project-state'
 
 const ServiceList = () => {
   const { ui } = useStore()
   const client = useQueryClient()
   const project = useSelectedProject()
   const { ref: projectRef } = useParams()
-  const state = useProjectStateSnapshot()
+  const state = useDatabaseSelectorStateSnapshot()
 
   const readReplicasEnabled = useFlag('readReplicas')
   const showReadReplicasUI = readReplicasEnabled && project?.is_read_replicas_enabled

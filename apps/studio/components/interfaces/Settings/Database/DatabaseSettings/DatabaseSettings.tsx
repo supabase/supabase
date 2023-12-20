@@ -24,7 +24,7 @@ import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useFlag, useSelectedOrganization, useSelectedProject } from 'hooks'
 import { pluckObjectFields } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
-import { useProjectStateSnapshot } from 'state/project-state'
+import { useDatabaseSelectorStateSnapshot } from 'state/project-state'
 import ConfirmDisableReadOnlyModeModal from './ConfirmDisableReadOnlyModal'
 import ResetDbPassword from './ResetDbPassword'
 import DatabaseConnectionString from './DatabaseConnectionString'
@@ -33,7 +33,7 @@ const DatabaseSettings = () => {
   const router = useRouter()
   const { ref: projectRef, connectionString } = useParams()
   const telemetryProps = useTelemetryProps()
-  const state = useProjectStateSnapshot()
+  const state = useDatabaseSelectorStateSnapshot()
   const selectedProject = useSelectedProject()
   const organization = useSelectedOrganization()
 

@@ -21,7 +21,7 @@ import { ProjectContextProvider } from './ProjectContext'
 import ProjectPausedState from './ProjectPausedState'
 import RestoringState from './RestoringState'
 import UpgradingState from './UpgradingState'
-import { useProjectStateSnapshot } from 'state/project-state'
+import { useDatabaseSelectorStateSnapshot } from 'state/project-state'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -183,7 +183,7 @@ interface ContentWrapperProps {
 const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapperProps) => {
   const router = useRouter()
   const { ref } = useParams()
-  const state = useProjectStateSnapshot()
+  const state = useDatabaseSelectorStateSnapshot()
   const selectedProject = useSelectedProject()
 
   const isSettingsPages = router.pathname.includes('/project/[ref]/settings')

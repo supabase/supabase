@@ -3,34 +3,40 @@ import { proxy, snapshot, useSnapshot } from 'valtio'
 
 import { useConstant } from 'common'
 
-export function createProjectState() {
-  const projectState = proxy({
+export function createDatabaseSelectorState() {
+  const state = proxy({
     selectedDatabaseId: undefined as string | undefined,
     setSelectedDatabaseId: (id: string | undefined) => {
-      projectState.selectedDatabaseId = id
+      state.selectedDatabaseId = id
     },
   })
 
-  return projectState
+  return state
 }
 
-export type ProjectState = ReturnType<typeof createProjectState>
+export type DatabaseSelectorState = ReturnType<typeof createDatabaseSelectorState>
 
-export const ProjectStateContext = createContext<ProjectState>(createProjectState())
+export const DatabaseSelectorStateContext = createContext<DatabaseSelectorState>(
+  createDatabaseSelectorState()
+)
 
-export const ProjectStateContextProvider = ({ children }: PropsWithChildren) => {
-  const state = useConstant(createProjectState)
+export const DatabaseSelectorStateContextProvider = ({ children }: PropsWithChildren) => {
+  const state = useConstant(createDatabaseSelectorState)
 
-  return <ProjectStateContext.Provider value={state}>{children}</ProjectStateContext.Provider>
+  return (
+    <DatabaseSelectorStateContext.Provider value={state}>
+      {children}
+    </DatabaseSelectorStateContext.Provider>
+  )
 }
 
-export function useProjectStateSnapshot(options?: Parameters<typeof useSnapshot>[1]) {
-  const projectState = useContext(ProjectStateContext)
-  return useSnapshot(projectState, options)
+export function useDatabaseSelectorStateSnapshot(options?: Parameters<typeof useSnapshot>[1]) {
+  const state = useContext(DatabaseSelectorStateContext)
+  return useSnapshot(state, options)
 }
 
 // Helper methods
 export function useGetSelectedDatabaseId() {
-  const projectState = useContext(ProjectStateContext)
-  return useCallback(() => snapshot(projectState).selectedDatabaseId, [projectState])
+  const state = useContext(DatabaseSelectorStateContext)
+  return useCallback(() => snapshot(state).selectedDatabaseId, [state])
 }

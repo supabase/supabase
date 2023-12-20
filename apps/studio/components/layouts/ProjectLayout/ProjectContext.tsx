@@ -3,7 +3,7 @@ import { createContext, PropsWithChildren, useContext, useMemo } from 'react'
 
 import { Project, useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { PROJECT_STATUS } from 'lib/constants'
-import { ProjectStateContextProvider } from 'state/project-state'
+import { DatabaseSelectorStateContextProvider } from 'state/project-state'
 import { RoleImpersonationStateContextProvider } from 'state/role-impersonation-state'
 import { TableEditorStateContextProvider } from 'state/table-editor'
 
@@ -41,11 +41,11 @@ export const ProjectContextProvider = ({
   return (
     <ProjectContext.Provider value={value}>
       <TableEditorStateContextProvider key={`table-editor-state-${projectRef}`}>
-        <ProjectStateContextProvider key={`project-state-${projectRef}`}>
+        <DatabaseSelectorStateContextProvider key={`project-state-${projectRef}`}>
           <RoleImpersonationStateContextProvider key={`role-impersonation-state-${projectRef}`}>
             {children}
           </RoleImpersonationStateContextProvider>
-        </ProjectStateContextProvider>
+        </DatabaseSelectorStateContextProvider>
       </TableEditorStateContextProvider>
     </ProjectContext.Provider>
   )
