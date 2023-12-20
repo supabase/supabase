@@ -14,6 +14,7 @@ import useEntityType from 'hooks/misc/useEntityType'
 import { timeout } from 'lib/helpers'
 import Link from 'next/link'
 import { Button } from 'ui'
+import Footer from 'components/grid/components/footer'
 
 export interface TableDefinitionProps {
   id?: number
@@ -102,32 +103,37 @@ const TableDefinition = ({ id }: TableDefinitionProps) => {
   }
 
   return (
-    <div className="flex-grow overflow-y-auto border-t border-muted relative">
-      <Button asChild type="default" className="absolute top-2 right-5 z-10">
-        <Link
-          href={`/project/${ref}/sql/new?content=${encodeURIComponent(formattedDefinition ?? '')}`}
-        >
-          Open in SQL Editor
-        </Link>
-      </Button>
-      <Editor
-        className="monaco-editor"
-        theme={resolvedTheme?.includes('dark') ? 'vs-dark' : 'vs'}
-        onMount={handleEditorOnMount}
-        defaultLanguage="pgsql"
-        value={formattedDefinition}
-        path={''}
-        options={{
-          domReadOnly: true,
-          readOnly: true,
-          tabSize: 2,
-          fontSize: 13,
-          minimap: { enabled: false },
-          wordWrap: 'on',
-          fixedOverflowWidgets: true,
-        }}
-      />
-    </div>
+    <>
+      <div className="flex-grow overflow-y-auto border-t border-muted relative">
+        <Button asChild type="default" className="absolute top-2 right-5 z-10">
+          <Link
+            href={`/project/${ref}/sql/new?content=${encodeURIComponent(
+              formattedDefinition ?? ''
+            )}`}
+          >
+            Open in SQL Editor
+          </Link>
+        </Button>
+        <Editor
+          className="monaco-editor"
+          theme={resolvedTheme?.includes('dark') ? 'vs-dark' : 'vs'}
+          onMount={handleEditorOnMount}
+          defaultLanguage="pgsql"
+          value={formattedDefinition}
+          path={''}
+          options={{
+            domReadOnly: true,
+            readOnly: true,
+            tabSize: 2,
+            fontSize: 13,
+            minimap: { enabled: false },
+            wordWrap: 'on',
+            fixedOverflowWidgets: true,
+          }}
+        />
+      </div>
+      <Footer />
+    </>
   )
 }
 
