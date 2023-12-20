@@ -6,11 +6,7 @@ import { Route } from 'components/ui/ui.types'
 import { Project } from 'data/projects/project-detail-query'
 import { BASE_PATH, IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 
-export const generateToolRoutes = (
-  ref?: string,
-  project?: Project,
-  supabaseAIEnabled?: boolean
-): Route[] => {
+export const generateToolRoutes = (ref?: string, project?: Project): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}/building`
 
@@ -39,12 +35,7 @@ export const generateToolRoutes = (
       ),
       link: !IS_PLATFORM
         ? `/project/${ref}/sql/1`
-        : ref &&
-          (isProjectBuilding
-            ? buildingUrl
-            : supabaseAIEnabled
-            ? `/project/${ref}/sql/new`
-            : `/project/${ref}/sql/templates`),
+        : ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sql/new`),
     },
   ]
 }

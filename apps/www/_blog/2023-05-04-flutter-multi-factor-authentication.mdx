@@ -668,8 +668,7 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final privatePostsFuture =
-        supabase.from('private_posts').select<List<Map<String, dynamic>>>();
+    final privatePostsFuture = supabase.from('private_posts').select();
 
     return Scaffold(
       appBar: AppBar(

@@ -1,31 +1,19 @@
 import { Transition } from '@headlessui/react'
+import { useParams } from 'common'
+import { map as lodashMap, uniqBy } from 'lodash'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+import { Button, IconChevronDown, IconHelpCircle, IconTerminal, SidePanel } from 'ui'
+
 import { Dictionary } from 'components/grid'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import InformationBox from 'components/ui/InformationBox'
 import SqlEditor from 'components/ui/SqlEditor'
-import { map as lodashMap, uniqBy } from 'lodash'
-import { observer, useLocalObservable } from 'mobx-react-lite'
-import { useRouter } from 'next/router'
-import { createContext, useContext, useState } from 'react'
-import { Button, IconChevronDown, IconHelpCircle, IconTerminal, SidePanel } from 'ui'
-
-interface IChooseFunctionFormStore {
-  functionSchemas: string[]
-  triggerFunctions: Dictionary<any>[]
-}
-
-class ChooseFunctionFormStore implements IChooseFunctionFormStore {
-  triggerFunctions = []
-
-  get functionSchemas() {
-    return lodashMap(uniqBy(this.triggerFunctions, 'schema'), 'schema')
-  }
-}
-
-const ChooseFunctionFormContext = createContext<IChooseFunctionFormStore | null>(null)
+import { DatabaseFunction } from 'data/database-functions/database-functions-query'
 
 export interface ChooseFunctionFormProps {
-  triggerFunctions: Dictionary<any>[]
+  triggerFunctions: DatabaseFunction[]
   visible: boolean
   onChange: (id: number) => void
   setVisible: (value: boolean) => void
@@ -37,15 +25,13 @@ const ChooseFunctionForm = ({
   onChange,
   setVisible,
 }: ChooseFunctionFormProps) => {
-  const _localState = useLocalObservable(() => new ChooseFunctionFormStore())
-  _localState.triggerFunctions = triggerFunctions as any
+  const hasPublicSchemaFunctions = triggerFunctions.length >= 1
+  const functionSchemas = lodashMap(uniqBy(triggerFunctions, 'schema'), 'schema')
 
   function selectFunction(id: number) {
     onChange(id)
     setVisible(!visible)
   }
-
-  const hasPublicSchemaFunctions = _localState.triggerFunctions.length >= 1
 
   return (
     <SidePanel
@@ -57,14 +43,17 @@ const ChooseFunctionForm = ({
     >
       <div className="py-6">
         {hasPublicSchemaFunctions ? (
-          <ChooseFunctionFormContext.Provider value={_localState}>
-            <div className="space-y-6">
-              <NoticeBox />
-              {_localState.functionSchemas.map((schema: string) => (
-                <SchemaFunctionGroup key={schema} schema={schema} selectFunction={selectFunction} />
-              ))}
-            </div>
-          </ChooseFunctionFormContext.Provider>
+          <div className="space-y-6">
+            <NoticeBox />
+            {functionSchemas.map((schema: string) => (
+              <SchemaFunctionGroup
+                key={schema}
+                schema={schema}
+                functions={triggerFunctions.filter((x) => x.schema == schema)}
+                selectFunction={selectFunction}
+              />
+            ))}
+          </div>
         ) : (
           <NoFunctionsState />
         )}
@@ -73,11 +62,11 @@ const ChooseFunctionForm = ({
   )
 }
 
-export default observer(ChooseFunctionForm)
+export default ChooseFunctionForm
 
-const NoticeBox = ({}) => {
-  const router = useRouter()
-  const { ref } = router.query
+const NoticeBox = () => {
+  const { ref } = useParams()
+
   return (
     <div className="px-6">
       <InformationBox
@@ -85,13 +74,8 @@ const NoticeBox = ({}) => {
         title="Only functions that return a trigger will be displayed below"
         description={`You can make functions by using the Database Functions`}
         button={
-          <Button
-            type="default"
-            onClick={() => {
-              router.push(`/project/${ref}/database/functions`)
-            }}
-          >
-            Go to Functions
+          <Button asChild type="default">
+            <Link href={`/project/${ref}/database/functions`}>Go to Functions</Link>
           </Button>
         }
       />
@@ -99,7 +83,7 @@ const NoticeBox = ({}) => {
   )
 }
 
-const NoFunctionsState = ({}) => {
+const NoFunctionsState = () => {
   // for the empty 'no tables' state link
   const router = useRouter()
   const { ref } = router.query
@@ -121,12 +105,11 @@ const NoFunctionsState = ({}) => {
 
 export interface SchemaFunctionGroupProps {
   schema: string
+  functions: DatabaseFunction[]
   selectFunction: (id: number) => void
 }
 
-const SchemaFunctionGroup = observer(({ schema, selectFunction }: SchemaFunctionGroupProps) => {
-  const _pageState = useContext(ChooseFunctionFormContext)
-  const _functions = _pageState!.triggerFunctions.filter((x) => x.schema == schema)
+const SchemaFunctionGroup = ({ schema, functions, selectFunction }: SchemaFunctionGroupProps) => {
   return (
     <div className="space-y-4">
       <div className="sticky top-0 flex items-center space-x-1 px-6 backdrop-blur backdrop-filter">
@@ -134,7 +117,7 @@ const SchemaFunctionGroup = observer(({ schema, selectFunction }: SchemaFunction
         <h5>{schema}</h5>
       </div>
       <div className="space-y-0 divide-y border-t border-b border-default">
-        {_functions.map((x) => (
+        {functions.map((x) => (
           <Function
             id={x.id}
             key={x.id}
@@ -146,7 +129,7 @@ const SchemaFunctionGroup = observer(({ schema, selectFunction }: SchemaFunction
       </div>
     </div>
   )
-})
+}
 
 export interface FunctionProps {
   id: number

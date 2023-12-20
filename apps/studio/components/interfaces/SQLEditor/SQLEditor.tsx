@@ -122,7 +122,6 @@ const SQLEditor = () => {
   const inputRef = useRef<HTMLInputElement>(null)
 
   const readReplicasEnabled = useFlag('readReplicas')
-  const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
   const showReadReplicasUI = readReplicasEnabled && project?.is_read_replicas_enabled
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
@@ -319,7 +318,7 @@ const SQLEditor = () => {
           return
         }
 
-        if (supabaseAIEnabled && !hasHipaaAddon && snippet?.snippet.name === untitledSnippetTitle) {
+        if (!hasHipaaAddon && snippet?.snippet.name === untitledSnippetTitle) {
           // Intentionally don't await title gen (lazy)
           setAiTitle(id, sql)
         }
@@ -349,17 +348,7 @@ const SQLEditor = () => {
         })
       }
     },
-    [
-      isDiffOpen,
-      id,
-      isExecuting,
-      project,
-      supabaseAIEnabled,
-      hasHipaaAddon,
-      execute,
-      getImpersonatedRole,
-      setAiTitle,
-    ]
+    [isDiffOpen, id, isExecuting, project, hasHipaaAddon, execute, getImpersonatedRole, setAiTitle]
   )
 
   const handleNewQuery = useCallback(
@@ -572,7 +561,7 @@ const SQLEditor = () => {
         }}
       />
       <div className="flex h-full flex-col relative">
-        {isAiOpen && supabaseAIEnabled && !hasHipaaAddon && (
+        {isAiOpen && !hasHipaaAddon && (
           <AISchemaSuggestionPopover
             onClickSettings={() => {
               appSnap.setShowAiSettingsModal(true)

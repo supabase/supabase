@@ -1,16 +1,16 @@
 [
   {
     "type": "Announcement",
-    "title": "Supabase Studio: AI Assistant and User Impersonation",
-    "description": "We're introducing the next generation of our AI Assistant and some features that will help get your ideas into code even faster",
-    "imgUrl": "/images/blog/launch-week-x/day-1/day-1-supabase-assistant-thumb.png",
-    "logoUrl": "/images/blog/launch-week-x/day-1/day-1-supabase-assistant-thumb.png",
+    "title": "Edge Functions: Node and native npm compatibility",
+    "description": "We're adding Node and native npm compatibility for Edge Functions",
+    "imgUrl": "launch-week-x/day-2/edge-runtime-thumb.png",
+    "logoUrl": "launch-week-x/day-2/edge-runtime-thumb.png",
     "organization": "Supabase",
-    "url": "/blog/studio-introducing-assistant",
+    "url": "/blog/edge-functions-node-npm",
     "postMeta": {
-      "name": "saltcod",
-      "publishDate": "Dec 11, 2023",
-      "readLength": 10
+      "name": "laktek",
+      "publishDate": "Dec 12, 2023",
+      "readLength": 5
     },
     "ctaText": "Learn more"
   },

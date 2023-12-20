@@ -639,9 +639,15 @@ functions:
         isSpotlight: true
         code: |
           ```js
+          // retrieve all identites linked to a user
+          const identities = await supabase.auth.getUserIdentities()
+
+          // find the google identity 
           const googleIdentity = identities.find(
             identity => identity.provider === 'google'
           )
+
+          // unlink the google identity
           const { data, error } = await supabase.auth.unlinkIdentity(googleIdentity)
           ```
   - id: send-password-reauthentication
@@ -860,13 +866,14 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase.auth.mfa.enroll({
-            factorType: 'totp'
+            factorType: 'totp',
+            friendlyName: 'your_friendly_name'
           })
 
           // Use the id to create a challenge.
           // The challenge can be verified by entering the code generated from the authenticator app.
           // The code will be generated upon scanning the qr_code or entering the secret into the authenticator app.
-          const { id, type, totp: { qr_code, secret, uri } } = data
+          const { id, type, totp: { qr_code, secret, uri }, friendly_name } = data
           ```
   - id: mfa-challenge
     title: 'mfa.challenge()'
@@ -4098,7 +4105,7 @@ functions:
                   name
                 )
               `)
-              .order('name', { referenceTable: 'cities', ascending: false })
+              .order('name', { referencedTable: 'cities', ascending: false })
             ```
         data:
           sql: |

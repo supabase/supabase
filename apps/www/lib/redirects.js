@@ -632,6 +632,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/blog/supavisor-postgres-connection-pooler-ga',
+    destination: '/blog/supavisor-postgres-connection-pooler',
+  },
+  {
+    permanent: true,
     source: '/blog/2022/06/15/blog/2022/06/29/visualizing-supabase-data-using-metabase',
     destination: '/blog/visualizing-supabase-data-using-metabase',
   },
@@ -2345,7 +2350,27 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/auth/auth-password-reset',
+    destination: '/docs/guides/auth/passwords',
+  },
+  {
+    permanent: true,
     source: '/docs/reference/dart/sign-in-with-apple',
     destination: '/docs/reference/dart/sign-in-with-id-token',
+  },
+  {
+    permanent: true,
+    source: '/guides/database/large-datasets',
+    destination: '/guides/database/import-data',
+  },
+  {
+    permanent: true,
+    source: '/guides/api/rest/debugging-performance',
+    destination: '/guides/database/debugging-performance',
+  },
+  {
+    permanent: true,
+    source: '/guides/api/rest/joins-and-nesting',
+    destination: '/guides/database/joins-and-nesting',
   },
 ]
