@@ -1,8 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { post } from 'lib/common/fetch'
-import { API_ADMIN_URL } from 'lib/constants'
+import { post } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { customDomainKeys } from './keys'
 
@@ -15,13 +14,13 @@ export async function createCustomDomain({
   projectRef,
   customDomain,
 }: CustomDomainCreateVariables) {
-  const response = await post(
-    `${API_ADMIN_URL}/projects/${projectRef}/custom-hostname/initialize`,
-    { custom_hostname: customDomain }
-  )
+  const { data, error } = await post(`/v1/projects/{ref}/custom-hostname/initialize`, {
+    params: { path: { ref: projectRef } },
+    body: { custom_hostname: customDomain },
+  })
 
-  if (response.error) throw response.error
-  return response
+  if (error) throw error
+  return data
 }
 
 type CustomDomainCreateData = Awaited<ReturnType<typeof createCustomDomain>>
