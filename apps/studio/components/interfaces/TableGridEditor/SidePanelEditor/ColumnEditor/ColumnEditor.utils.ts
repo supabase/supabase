@@ -1,11 +1,6 @@
-import { find, isUndefined, isEqual, isNull } from 'lodash'
+import { isEqual } from 'lodash'
 import { Dictionary } from 'types'
-import type {
-  PostgresColumn,
-  PostgresRelationship,
-  PostgresTable,
-  PostgresType,
-} from '@supabase/postgres-meta'
+import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 
 import { uuidv4 } from 'lib/helpers'
 import {
@@ -108,7 +103,7 @@ export const generateCreateColumnPayload = (
     ...(!isIdentity &&
       defaultValue && {
         defaultValueFormat:
-          isNull(defaultValue) || isSQLExpression(defaultValue)
+          defaultValue === null || isSQLExpression(defaultValue)
             ? 'expression'
             : ('literal' as 'expression' | 'literal'),
       }),
@@ -147,7 +142,7 @@ export const generateUpdateColumnPayload = (
   if (!isEqual(originalColumn.default_value as string, defaultValue)) {
     payload.defaultValue = defaultValue
     payload.defaultValueFormat =
-      isNull(defaultValue) || isSQLExpression(defaultValue)
+      defaultValue === null || isSQLExpression(defaultValue)
         ? 'expression'
         : ('literal' as 'expression' | 'literal')
   }
@@ -215,13 +210,12 @@ export const getColumnForeignKey = (
   foreignKeys: ForeignKeyConstraint[]
 ) => {
   const { relationships } = table
-  const foreignKey = find(relationships, (relationship) => {
-    return (
+  const foreignKey = relationships.find(
+    (relationship) =>
       relationship.source_schema === column.schema &&
       relationship.source_table_name === column.table &&
       relationship.source_column_name === column.name
-    )
-  })
+  )
   if (foreignKey === undefined) return foreignKey
   else {
     const foreignKeyMeta = foreignKeys.find((fk) => fk.id === foreignKey.id)

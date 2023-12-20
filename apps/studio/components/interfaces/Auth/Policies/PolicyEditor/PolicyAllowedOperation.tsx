@@ -1,4 +1,3 @@
-import { noop } from 'lodash'
 import { Radio } from 'ui'
 
 interface PolicyAllowedOperationProps {
@@ -8,7 +7,7 @@ interface PolicyAllowedOperationProps {
 
 const PolicyAllowedOperation = ({
   operation = '',
-  onSelectOperation = noop,
+  onSelectOperation = () => undefined,
 }: PolicyAllowedOperationProps) => {
   return (
     <div className="flex justify-between space-x-12">

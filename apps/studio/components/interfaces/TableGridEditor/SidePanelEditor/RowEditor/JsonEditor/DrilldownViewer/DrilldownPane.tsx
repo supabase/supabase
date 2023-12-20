@@ -1,4 +1,3 @@
-import { isNull, noop } from 'lodash'
 import { IconChevronRight } from 'ui'
 
 import { Dictionary } from 'types'
@@ -10,7 +9,7 @@ interface DrilldownPaneProps {
   onSelectKey: (key: string, pane: number) => void
 }
 
-const DrilldownPane = ({ pane, jsonData, activeKey, onSelectKey = noop }: DrilldownPaneProps) => {
+const DrilldownPane = ({ pane, jsonData, activeKey, onSelectKey = () => undefined }: DrilldownPaneProps) => {
   if (!jsonData) {
     return (
       <div className={`flex-1 ${pane === 2 ? 'border-l border-default' : ''}`}>
@@ -32,11 +31,11 @@ const DrilldownPane = ({ pane, jsonData, activeKey, onSelectKey = noop }: Drilld
   }
 
   const keysWithChildren = Object.keys(jsonData).filter(
-    (key: string) => typeof jsonData[key] === 'object' && !isNull(jsonData[key])
+    (key: string) => typeof jsonData[key] === 'object' && jsonData[key] !==  null
   )
 
   const keysWithoutChildren = Object.keys(jsonData).filter(
-    (key: string) => isNull(jsonData[key]) || typeof jsonData[key] !== 'object'
+    (key: string) => jsonData[key] === null || typeof jsonData[key] !== 'object'
   )
 
   return (
@@ -69,7 +68,7 @@ const DrilldownPane = ({ pane, jsonData, activeKey, onSelectKey = noop }: Drilld
               typeof jsonData[key] !== 'string' ? '!text-green-900' : '!text-yellow-900'
             }`}
           >
-            {isNull(jsonData[key])
+            {jsonData[key] === null
               ? 'null'
               : typeof jsonData[key] === 'string'
               ? `"${jsonData[key]}"`

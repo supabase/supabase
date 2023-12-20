@@ -1,6 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { noop, partition } from 'lodash'
+import { partition } from 'lodash'
 import { useState } from 'react'
 import { Button, IconSearch, Input } from 'ui'
 
@@ -25,9 +25,9 @@ interface TriggersListProps {
 }
 
 const TriggersList = ({
-  createTrigger = noop,
-  editTrigger = noop,
-  deleteTrigger = noop,
+  createTrigger = () => undefined,
+  editTrigger = () => undefined,
+  deleteTrigger = () => undefined,
 }: TriggersListProps) => {
   const { project } = useProjectContext()
   const [selectedSchema, setSelectedSchema] = useState<string>('public')

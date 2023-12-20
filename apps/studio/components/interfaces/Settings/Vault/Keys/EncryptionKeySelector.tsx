@@ -1,4 +1,3 @@
-import { noop } from 'lodash'
 import { IconPlus, Input, Listbox, Modal } from 'ui'
 
 import { useStore } from 'hooks'
@@ -21,8 +20,8 @@ const EncryptionKeySelector = ({
   labelOptional,
   selectedKeyId,
   error,
-  onSelectKey = noop,
-  onUpdateDescription = noop,
+  onSelectKey = () => undefined,
+  onUpdateDescription = () => undefined,
 }: EncryptionKeySelectorProps) => {
   const { vault } = useStore()
   const keys = vault.listKeys()

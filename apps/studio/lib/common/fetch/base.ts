@@ -1,5 +1,4 @@
 import { getAccessToken } from 'lib/gotrue'
-import { isUndefined } from 'lodash'
 import { SupaResponse } from 'types/base'
 
 export function handleError<T>(e: any, requestId: string): SupaResponse<T> {
@@ -94,7 +93,7 @@ export async function constructHeaders(requestId: string, optionHeaders?: { [pro
     ...optionHeaders,
   }
 
-  const hasAuthHeader = !isUndefined(optionHeaders) && 'Authorization' in optionHeaders
+  const hasAuthHeader = optionHeaders !== undefined && 'Authorization' in optionHeaders
   if (!hasAuthHeader) {
     const accessToken = await getAccessToken()
     if (accessToken) headers.Authorization = `Bearer ${accessToken}`

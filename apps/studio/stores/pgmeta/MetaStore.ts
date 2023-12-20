@@ -1,5 +1,5 @@
 import { Query } from 'components/grid/query/Query'
-import { chunk, find, isEmpty, isEqual, isUndefined } from 'lodash'
+import { chunk, isEmpty, isEqual } from 'lodash'
 import { makeObservable } from 'mobx'
 import Papa from 'papaparse'
 
@@ -285,7 +285,7 @@ export default class MetaStore implements IMetaStore {
         if (addPK.error) throw addPK.error
       }
 
-      if (!isUndefined(foreignKey)) {
+      if (foreignKey !== undefined) {
         this.rootStore.ui.setNotification({
           id: toastId,
           category: 'loading',
@@ -323,10 +323,10 @@ export default class MetaStore implements IMetaStore {
       const column: any = await this.columns.update(id, formattedPayload)
       if (column.error) throw column.error
 
-      const originalColumn = find(selectedTable.columns, { id })
-      const existingForeignKey = find(selectedTable.relationships, {
-        source_column_name: originalColumn!.name,
-      })
+      const originalColumn = selectedTable.columns?.find((it) => it.id === id)
+      const existingForeignKey = selectedTable.relationships.find(
+        (it) => it.source_column_name === originalColumn!.name
+      )
 
       if (!skipPKCreation && isPrimaryKey !== undefined) {
         const existingPrimaryKeys = selectedTable.primary_keys.map((x) => x.name)
@@ -432,7 +432,9 @@ export default class MetaStore implements IMetaStore {
       queryFn: ({ signal }) => getTables({ projectRef, connectionString }, signal),
     })
 
-    const duplicatedTable = find(tables, { schema: sourceTableSchema, name: duplicatedTableName })
+    const duplicatedTable = tables.find(
+      (it) => it.schema === sourceTableSchema && it.name === duplicatedTableName
+    )
 
     if (isRLSEnabled) {
       const updateTable: any = await this.tables.update(duplicatedTable!.id, {
@@ -498,14 +500,14 @@ export default class MetaStore implements IMetaStore {
 
       // Then add the foreign key constraints here
       for (const column of columns) {
-        if (!isUndefined(column.foreignKey)) {
+        if (column.foreignKey !== undefined) {
           const relationship = await this.addForeignKey(column.foreignKey)
           if (relationship.error) throw relationship.error
         }
       }
 
       // If the user is importing data via a spreadsheet
-      if (!isUndefined(importContent)) {
+      if (importContent !== undefined) {
         if (importContent.file && importContent.rowCount > 0) {
           // Via a CSV file
           const { error }: any = await this.insertRowsViaSpreadsheet(
@@ -531,7 +533,7 @@ export default class MetaStore implements IMetaStore {
             if (identity.error) throw identity.error
           }
 
-          if (!isUndefined(error)) {
+          if (error !== undefined) {
             this.rootStore.ui.setNotification({
               category: 'error',
               message: 'Do check your spreadsheet if there are any discrepancies.',
@@ -637,14 +639,15 @@ export default class MetaStore implements IMetaStore {
         })
         await this.createColumn(columnPayload, updatedTable, column.foreignKey)
       } else {
-        const originalColumn = find(originalColumns, { id: column.id })
+        const originalColumn = originalColumns?.find((it) => it.id === column.id)
         if (originalColumn) {
           const columnPayload = generateUpdateColumnPayload(originalColumn, updatedTable, column)
-          const originalForeignKey = find(table.relationships, {
-            source_schema: originalColumn.schema,
-            source_table_name: originalColumn.table,
-            source_column_name: originalColumn.name,
-          })
+          const originalForeignKey = table.relationships.find(
+            (it) =>
+              it.source_schema === originalColumn.schema &&
+              it.source_table_name === originalColumn.table &&
+              it.source_column_name === originalColumn.name
+          )
           const hasForeignKeyUpdated = !isEqual(originalForeignKey, column.foreignKey)
           if (!isEmpty(columnPayload) || hasForeignKeyUpdated) {
             this.rootStore.ui.setNotification({
@@ -812,7 +815,7 @@ export default class MetaStore implements IMetaStore {
     const batchedPromises = chunk(promises, 10)
     for (const batchedPromise of batchedPromises) {
       const res = await Promise.allSettled(batchedPromise.map((batch) => batch()))
-      const hasFailedBatch = find(res, { status: 'rejected' })
+      const hasFailedBatch = res.find((it) => it.status === 'rejected')
       if (hasFailedBatch) break
       onProgressUpdate(insertProgress * 100)
     }

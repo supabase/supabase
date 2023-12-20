@@ -1,6 +1,6 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { Dictionary } from 'types'
-import { isEmpty, isUndefined, noop, partition } from 'lodash'
+import { isEmpty, partition } from 'lodash'
 import { useEffect, useMemo, useState } from 'react'
 import { SidePanel } from 'ui'
 
@@ -32,9 +32,9 @@ const RowEditor = ({
   row,
   selectedTable,
   visible = false,
-  closePanel = noop,
-  saveChanges = noop,
-  updateEditorDirty = noop,
+  closePanel = () => undefined,
+  saveChanges = () => undefined,
+  updateEditorDirty = () => undefined,
 }: RowEditorProps) => {
   const [errors, setErrors] = useState<Dictionary<any>>({})
   const [rowFields, setRowFields] = useState<any[]>([])
@@ -43,8 +43,8 @@ const RowEditor = ({
   const [isSelectingForeignKey, setIsSelectingForeignKey] = useState<boolean>(false)
   const [referenceRow, setReferenceRow] = useState<RowField>()
 
-  const isNewRecord = isUndefined(row)
-  const isEditingJson = !isUndefined(selectedValueForJsonEdit)
+  const isNewRecord = row === undefined
+  const isEditingJson = selectedValueForJsonEdit !== undefined
 
   const [loading, setLoading] = useState(false)
 

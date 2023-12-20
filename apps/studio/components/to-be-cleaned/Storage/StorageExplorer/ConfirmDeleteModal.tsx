@@ -1,4 +1,3 @@
-import { noop } from 'lodash'
 import { useEffect, useState } from 'react'
 import { Alert, Button, Modal } from 'ui'
 
@@ -12,8 +11,8 @@ interface ConfirmDeleteModalProps {
 const ConfirmDeleteModal = ({
   visible = false,
   selectedItemsToDelete = [],
-  onSelectCancel = noop,
-  onSelectDelete = noop,
+  onSelectCancel = () => undefined,
+  onSelectDelete = () => undefined,
 }: ConfirmDeleteModalProps) => {
   const [deleting, setDeleting] = useState(false)
 

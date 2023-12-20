@@ -1,5 +1,4 @@
 import type { PostgresType } from '@supabase/postgres-meta'
-import { noop } from 'lodash'
 import Link from 'next/link'
 import { ReactNode } from 'react'
 import {
@@ -47,7 +46,7 @@ const ColumnType = ({
   showLabel = true,
   description,
   showRecommendation = false,
-  onOptionSelect = noop,
+  onOptionSelect = () => undefined,
 }: ColumnTypeProps) => {
   // @ts-ignore
   const availableTypes = POSTGRES_DATA_TYPES.concat(enumTypes.map((type) => type.name))

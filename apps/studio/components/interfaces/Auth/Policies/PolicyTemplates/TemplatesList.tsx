@@ -1,4 +1,3 @@
-import { noop } from 'lodash'
 import { Menu } from 'ui'
 
 import { PolicyTemplate } from './PolicyTemplates.constants'
@@ -14,7 +13,7 @@ const TemplatesList = ({
   templates = [],
   templatesNote = '',
   selectedTemplate,
-  setSelectedTemplate = noop,
+  setSelectedTemplate = () => undefined,
 }: TemplatesListProps) => (
   <div className="flex flex-col justify-between border-r border-default" style={{ width: '30%' }}>
     <div

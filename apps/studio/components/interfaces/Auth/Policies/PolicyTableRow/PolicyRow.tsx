@@ -1,7 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { noop } from 'lodash'
 import {
   Button,
   DropdownMenu,
@@ -25,8 +24,8 @@ interface PolicyRowProps {
 
 const PolicyRow = ({
   policy,
-  onSelectEditPolicy = noop,
-  onSelectDeletePolicy = noop,
+  onSelectEditPolicy = () => undefined,
+  onSelectDeletePolicy = () => undefined,
 }: PolicyRowProps) => {
   const canUpdatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
 

@@ -1,5 +1,5 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
-import { isEmpty, isUndefined, noop } from 'lodash'
+import { isEmpty } from 'lodash'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
@@ -52,14 +52,14 @@ const TableEditor = ({
   table,
   isDuplicating,
   visible = false,
-  closePanel = noop,
-  saveChanges = noop,
-  updateEditorDirty = noop,
+  closePanel = () => undefined,
+  saveChanges = () => undefined,
+  updateEditorDirty = () => undefined,
 }: TableEditorProps) => {
   const snap = useTableEditorStateSnapshot()
   const { ui } = useStore()
   const { project } = useProjectContext()
-  const isNewRecord = isUndefined(table)
+  const isNewRecord = table === undefined
   const realtimeEnabled = useIsFeatureEnabled('realtime:all')
 
   const { data: types } = usePostgresTypesQuery({

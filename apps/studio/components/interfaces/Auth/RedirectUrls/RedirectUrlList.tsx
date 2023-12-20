@@ -1,4 +1,3 @@
-import { noop } from 'lodash'
 import { Button, IconGlobe, IconTrash } from 'ui'
 
 import { EmptyListState } from 'components/ui/States'
@@ -13,7 +12,7 @@ interface RedirectUrlListProps {
 const RedirectUrlList = ({
   URI_ALLOW_LIST_ARRAY,
   canUpdate,
-  onSelectUrlToDelete = noop,
+  onSelectUrlToDelete = () => undefined,
 }: RedirectUrlListProps) => {
   return (
     <div className="-space-y-px">

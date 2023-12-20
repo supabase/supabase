@@ -1,4 +1,3 @@
-import { compact } from 'lodash'
 import { createClient } from '@supabase/supabase-js'
 import { uuidv4 } from 'lib/helpers'
 
@@ -36,7 +35,7 @@ export const uploadAttachments = async (ref: string, files: File[]) => {
       return data
     })
   )
-  const keys = compact(uploadedFiles).map((file) => file.path)
+  const keys = uploadedFiles.filter(Boolean).map((file) => file!.path)
 
   const { data, error } = await supportSupabaseClient.storage
     .from('support-attachments')

@@ -1,5 +1,4 @@
 import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
-import { noop } from 'lodash'
 import { Alert } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -20,10 +19,10 @@ interface PolicyTableRowProps {
 const PolicyTableRow = ({
   table,
   isLocked,
-  onSelectToggleRLS = noop,
-  onSelectCreatePolicy = noop,
-  onSelectEditPolicy = noop,
-  onSelectDeletePolicy = noop,
+  onSelectToggleRLS = () => undefined,
+  onSelectCreatePolicy = () => undefined,
+  onSelectEditPolicy = () => undefined,
+  onSelectDeletePolicy = () => undefined,
 }: PolicyTableRowProps) => {
   const { project } = useProjectContext()
   const { data } = useDatabasePoliciesQuery({

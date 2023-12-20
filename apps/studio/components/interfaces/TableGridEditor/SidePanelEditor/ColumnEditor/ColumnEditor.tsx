@@ -1,6 +1,6 @@
 import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { useParams } from 'common'
-import { isEmpty, noop } from 'lodash'
+import { isEmpty } from 'lodash'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import {
@@ -67,9 +67,9 @@ const ColumnEditor = ({
   column,
   selectedTable,
   visible = false,
-  closePanel = noop,
-  saveChanges = noop,
-  updateEditorDirty = noop,
+  closePanel = () => undefined,
+  saveChanges = () => undefined,
+  updateEditorDirty = () => undefined,
 }: ColumnEditorProps) => {
   const { ref } = useParams()
   const { vault } = useStore()

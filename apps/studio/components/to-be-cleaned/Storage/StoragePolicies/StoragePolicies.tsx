@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { filter, find, get, isEmpty } from 'lodash'
+import { isEmpty } from 'lodash'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 import { IconLoader } from 'ui'
@@ -57,23 +57,21 @@ const StoragePolicies = () => {
 
   // Only use storage policy editor when creating new policies for buckets
   const showStoragePolicyEditor =
-    isEmpty(selectedPolicyToEdit) &&
-    !isEmpty(isEditingPolicyForBucket) &&
-    get(isEditingPolicyForBucket, ['bucket'], '').length > 0
+    (isEmpty(selectedPolicyToEdit) &&
+      !isEmpty(isEditingPolicyForBucket) &&
+      isEditingPolicyForBucket.bucket) ||
+    ''.length > 0
 
   const showGeneralPolicyEditor = !isEmpty(isEditingPolicyForBucket) && !showStoragePolicyEditor
 
   // Policies under storage.objects
-  const storageObjectsPolicies = filter(policies, { table: 'objects' })
+  const storageObjectsPolicies = policies.filter((it) => it.table === 'objects')
   const formattedStorageObjectPolicies = formatPoliciesForStorage(buckets, storageObjectsPolicies)
-  const ungroupedPolicies = get(
-    find(formattedStorageObjectPolicies, { name: 'Ungrouped' }),
-    ['policies'],
-    []
-  )
+  const ungroupedPolicies =
+    formattedStorageObjectPolicies.find((it) => it.name === 'Ungrouped')?.policies || []
 
   // Policies under storage.buckets
-  const storageBucketPolicies = filter(policies, { table: 'buckets' })
+  const storageBucketPolicies = policies.filter((it) => it.table === 'buckets')
 
   const onSelectPolicyAdd = (bucketName = '', table = '') => {
     setSelectedPolicyToEdit({})
@@ -191,11 +189,9 @@ const StoragePolicies = () => {
 
           {/* Sections for policies grouped by buckets */}
           {buckets.map((bucket) => {
-            const bucketPolicies = get(
-              find(formattedStorageObjectPolicies, { name: bucket.name }),
-              ['policies'],
-              []
-            )
+            const bucketPolicies =
+              formattedStorageObjectPolicies.find((it) => it.name === bucket.name)?.policies || []
+
             return (
               <StoragePoliciesBucketRow
                 key={bucket.name}

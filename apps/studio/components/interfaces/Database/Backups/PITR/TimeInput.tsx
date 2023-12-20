@@ -1,6 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import dayjs from 'dayjs'
-import { isNaN, noop } from 'lodash'
+import { isNaN } from 'lodash'
 import { ChangeEvent, useEffect, useState } from 'react'
 import { IconClock } from 'ui'
 
@@ -22,7 +22,7 @@ interface TimeInputProps {
   onChange?: (time: Time) => void
 }
 
-const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: TimeInputProps) => {
+const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = () => undefined }: TimeInputProps) => {
   const [isFocused, setIsFocused] = useState(false)
   const [error, setError] = useState<string>()
   const [time, setTime] = useState<Time>(defaultTime || { h: 0, m: 0, s: 0 })

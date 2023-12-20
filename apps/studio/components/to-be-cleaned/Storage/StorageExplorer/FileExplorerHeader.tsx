@@ -1,20 +1,16 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { compact, debounce, isEqual, noop } from 'lodash'
+import { debounce, isEqual } from 'lodash'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuRadioGroup,
   DropdownMenuSeparator,
   DropdownMenuItem,
   DropdownMenuTrigger,
   IconChevronLeft,
   IconChevronRight,
-  IconChevronsDown,
-  IconChevronsUp,
-  IconCode,
   IconColumns,
   IconEdit2,
   IconFolderPlus,
@@ -29,7 +25,6 @@ import {
   DropdownMenuSub,
   DropdownMenuSubTrigger,
   DropdownMenuSubContent,
-  DropdownMenuRadioItem,
 } from 'ui'
 
 import { useCheckPermissions } from 'hooks'
@@ -137,8 +132,8 @@ interface FileExplorerHeader {
 
 const FileExplorerHeader = ({
   itemSearchString = '',
-  setItemSearchString = noop,
-  onFilesUpload = noop,
+  setItemSearchString = () => undefined,
+  onFilesUpload = () => undefined,
 }: FileExplorerHeader) => {
   const debounceDuration = 300
   const snap = useStorageExplorerStateSnapshot()
@@ -228,7 +223,7 @@ const FileExplorerHeader = ({
       event.stopPropagation()
     }
     setIsEditingPath(false)
-    onSetPathByString(compact(pathString.split('/')))
+    onSetPathByString(pathString.split('/').filter(Boolean))
   }
 
   const onSetPathByString = async (paths: any[]) => {

@@ -1,4 +1,4 @@
-import { trimEnd, groupBy, difference } from 'lodash'
+import { groupBy, difference } from 'lodash'
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from './Storage.constants'
 import { StoragePolicyFormField } from 'components/interfaces/Storage/Storage.types'
 
@@ -68,7 +68,7 @@ export const formatStoragePolicies = (buckets: any[], policies: any[]) => {
 export const truncateDefinitionToExcludeBucket = (definition: string) => {
   const definitionSegments = definition?.split(' AND ') ?? []
   return definitionSegments.length > 1
-    ? trimEnd(definitionSegments.slice(1).join(' AND '), ')') + ')'
+    ? (definitionSegments.slice(1).join(' AND '), ')').trimEnd() + ')'
     : ''
 }
 

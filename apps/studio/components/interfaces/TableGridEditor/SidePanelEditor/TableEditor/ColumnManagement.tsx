@@ -1,6 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import type { PostgresColumn, PostgresTable, PostgresType } from '@supabase/postgres-meta'
-import { isEmpty, noop, partition } from 'lodash'
+import { isEmpty, partition } from 'lodash'
 import Link from 'next/link'
 import { useState } from 'react'
 import {
@@ -37,9 +37,9 @@ const ColumnManagement = ({
   enumTypes = [],
   importContent,
   isNewRecord,
-  onColumnsUpdated = noop,
-  onSelectImportData = noop,
-  onClearImportContent = noop,
+  onColumnsUpdated = () => undefined,
+  onSelectImportData = () => undefined,
+  onClearImportContent = () => undefined,
 }: ColumnManagementProps) => {
   const [selectedColumnToEditRelation, setSelectedColumnToEditRelation] = useState<ColumnField>()
 

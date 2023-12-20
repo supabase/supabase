@@ -1,4 +1,3 @@
-import { noop } from 'lodash'
 import { Badge, IconCode, IconDatabase } from 'ui'
 
 import Description from 'components/interfaces/Docs/Description'
@@ -39,7 +38,7 @@ const Param = ({
   required,
   description,
   metadata = {},
-  onDesciptionUpdated = noop,
+  onDesciptionUpdated = () => undefined,
 }: ParamProps) => {
   return (
     <>

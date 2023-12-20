@@ -1,4 +1,3 @@
-import { noop } from 'lodash'
 import { PropsWithChildren, useState } from 'react'
 import { Button } from 'ui'
 
@@ -20,7 +19,7 @@ const ActionBar = ({
   applyButtonLabel = 'Apply',
   backButtonLabel = 'Back',
   applyFunction = undefined,
-  closePanel = noop,
+  closePanel = () => undefined,
   formId,
 }: PropsWithChildren<ActionBarProps>) => {
   const [isRunning, setIsRunning] = useState(false)

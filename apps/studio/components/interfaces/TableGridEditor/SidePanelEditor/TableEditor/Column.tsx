@@ -13,7 +13,6 @@ import {
   Popover,
 } from 'ui'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
-import { noop } from 'lodash'
 import { typeExpressionSuggestions } from '../ColumnEditor/ColumnEditor.constants'
 import { Suggestion } from '../ColumnEditor/ColumnEditor.types'
 import { getForeignKeyCascadeAction } from '../ColumnEditor/ColumnEditor.utils'
@@ -57,9 +56,9 @@ const Column = ({
   isNewRecord = false,
   hasImportContent = false,
   dragHandleProps = EMPTY_OBJ,
-  onEditRelation = noop,
-  onUpdateColumn = noop,
-  onRemoveColumn = noop,
+  onEditRelation = () => undefined,
+  onUpdateColumn = () => undefined,
+  onRemoveColumn = () => undefined,
 }: ColumnProps) => {
   const suggestions: Suggestion[] = typeExpressionSuggestions?.[column.format] ?? []
 

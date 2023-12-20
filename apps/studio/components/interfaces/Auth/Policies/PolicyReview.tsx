@@ -1,5 +1,5 @@
 import SqlEditor from 'components/ui/SqlEditor'
-import { isEmpty, noop } from 'lodash'
+import { isEmpty } from 'lodash'
 import { useState } from 'react'
 import { Button, Modal } from 'ui'
 import { PolicyForReview } from './Policies.types'
@@ -12,8 +12,8 @@ interface PolicyReviewProps {
 
 const PolicyReview = ({
   policy = {},
-  onSelectBack = noop,
-  onSelectSave = noop,
+  onSelectBack = () => undefined,
+  onSelectSave = () => undefined,
 }: PolicyReviewProps) => {
   const [isSaving, setIsSaving] = useState(false)
   const onSavePolicy = () => {

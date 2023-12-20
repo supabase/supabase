@@ -1,4 +1,3 @@
-import { noop } from 'lodash'
 import { Button, IconExternalLink } from 'ui'
 
 interface PolicyEditorFooterProps {
@@ -9,8 +8,8 @@ interface PolicyEditorFooterProps {
 
 const PolicyEditorFooter = ({
   showTemplates,
-  onViewTemplates = noop,
-  onReviewPolicy = noop,
+  onViewTemplates = () => undefined,
+  onReviewPolicy = () => undefined,
 }: PolicyEditorFooterProps) => (
   <div className="flex justify-between items-center border-t px-6 py-4 border-default">
     <a

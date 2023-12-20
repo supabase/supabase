@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import Papa from 'papaparse'
-import { has, includes } from 'lodash'
+import { has } from 'lodash'
 import { tryParseJson } from 'lib/helpers'
 import { UPLOAD_FILE_EXTENSIONS } from './SpreadsheetImport.constants'
 
@@ -125,10 +125,10 @@ export const inferColumnType = (column: string, rows: object[]) => {
   }
 
   // Infer boolean type
-  if (includes(['true', 'false'], columnData.toString().toLowerCase())) {
+  if (['true', 'false'].includes(columnData.toString().toLowerCase())) {
     const isAllBoolean = columnDataAcrossRows.every((item: any) => {
       if (item === null || item === undefined) return true
-      else return includes(['true', 'false'], item.toString().toLowerCase())
+      else return ['true', 'false'].includes(item.toString().toLowerCase())
     })
     if (isAllBoolean) {
       return 'bool'

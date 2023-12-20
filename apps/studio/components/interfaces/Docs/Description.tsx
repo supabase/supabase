@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { noop } from 'lodash'
 import { useState } from 'react'
 import { Button, IconLoader } from 'ui'
 
@@ -27,7 +26,7 @@ interface DescrptionProps {
   onChange: (value: string) => void
 }
 
-const Description = ({ content, metadata, onChange = noop }: DescrptionProps) => {
+const Description = ({ content, metadata, onChange = () => undefined }: DescrptionProps) => {
   const { meta, ui } = useStore()
 
   const contentText = temp_removePostgrestText(content || '').trim()

@@ -1,5 +1,5 @@
 import Editor, { EditorProps, OnMount } from '@monaco-editor/react'
-import { merge, noop } from 'lodash'
+import { merge } from 'lodash'
 import { editor } from 'monaco-editor'
 import { useRef } from 'react'
 import { cn } from 'ui'
@@ -30,8 +30,8 @@ const CodeEditor = ({
   autofocus = true,
   isReadOnly = false,
   hideLineNumbers = false,
-  onInputChange = noop,
-  onInputRun = noop,
+  onInputChange = () => undefined,
+  onInputRun = () => undefined,
   className,
   loading,
   options,

@@ -1,4 +1,3 @@
-import { some } from 'lodash'
 import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 
 import { ImportContent, TableField } from './TableEditor.types'
@@ -15,10 +14,10 @@ export const validateFields = (field: TableField) => {
   if (field.name.length === 0) {
     errors['name'] = 'Please assign a name for your table'
   }
-  if (some(field.columns, (column: ColumnField) => column.format.length === 0)) {
+  if (field.columns.some((column: ColumnField) => column.format.length === 0)) {
     errors['columns'] = 'Ensure that all your columns are assigned a type'
   }
-  if (some(field.columns, (column: ColumnField) => column.name.length === 0)) {
+  if (field.columns.some((column: ColumnField) => column.name.length === 0)) {
     errors['columns'] = 'Ensure that all your columns are named'
   }
   return errors

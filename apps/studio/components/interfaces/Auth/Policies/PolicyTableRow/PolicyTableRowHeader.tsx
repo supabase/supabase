@@ -1,7 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { noop } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Badge, Button, IconLock } from 'ui'
@@ -19,8 +18,8 @@ interface PolicyTableRowHeaderProps {
 const PolicyTableRowHeader = ({
   table,
   isLocked,
-  onSelectToggleRLS = noop,
-  onSelectCreatePolicy = noop,
+  onSelectToggleRLS = () => undefined,
+  onSelectCreatePolicy = () => undefined,
 }: PolicyTableRowHeaderProps) => {
   const router = useRouter()
   const { ref } = router.query

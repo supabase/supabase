@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import { get as _get, find } from 'lodash'
 import { useRouter } from 'next/router'
 import toast from 'react-hot-toast'
 
@@ -40,11 +39,9 @@ const DeleteBucketModal = ({ visible = false, bucket, onClose }: DeleteBucketMod
         buckets,
         storageObjectsPolicies
       )
-      const bucketPolicies = _get(
-        find(formattedStorageObjectPolicies, { name: bucket!.name }),
-        ['policies'],
-        []
-      )
+      const bucketPolicies =
+        formattedStorageObjectPolicies.find((it) => it.name === bucket!.name)?.policies || []
+
       await Promise.all(
         bucketPolicies.map((policy: any) =>
           deletePolicy({

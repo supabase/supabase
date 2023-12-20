@@ -6,7 +6,6 @@
 // the component over to the UI library
 
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { noop } from 'lodash'
 import { useEffect, useRef, useState } from 'react'
 import {
   Button,
@@ -52,8 +51,8 @@ const InputWithSuggestions = ({
   suggestions = [],
   suggestionsTooltip,
   suggestionsHeader,
-  onChange = noop,
-  onSelectSuggestion = noop,
+  onChange = () => undefined,
+  onSelectSuggestion = () => undefined,
 }: InputWithSuggestionsProps) => {
   const ref = useRef(null)
   const [filteredSuggestions, setFilteredSuggestions] = useState<Suggestion[]>(suggestions)

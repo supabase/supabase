@@ -1,4 +1,3 @@
-import { noop } from 'lodash'
 import { IconEdit, IconGrid, Modal } from 'ui'
 
 import CardButton from 'components/ui/CardButton'
@@ -11,8 +10,8 @@ interface PolicySelectionProps {
 
 const PolicySelection = ({
   description = '',
-  onViewTemplates = noop,
-  onViewEditor = noop,
+  onViewTemplates = () => undefined,
+  onViewEditor = () => undefined,
 }: PolicySelectionProps) => {
   return (
     <Modal.Content>

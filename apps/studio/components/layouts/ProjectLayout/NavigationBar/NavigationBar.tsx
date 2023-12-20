@@ -1,6 +1,5 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useParams } from 'common'
-import { isUndefined } from 'lodash'
 import { FlaskConical } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
@@ -95,7 +94,7 @@ const NavigationBar = () => {
           </Link>
         )}
         <NavigationIconButton
-          isActive={isUndefined(activeRoute) && !isUndefined(router.query.ref)}
+          isActive={activeRoute === undefined && router.query.ref !== undefined}
           route={{
             key: 'HOME',
             label: 'Home',

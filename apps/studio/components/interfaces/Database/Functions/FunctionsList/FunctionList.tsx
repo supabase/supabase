@@ -1,6 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { includes, noop, sortBy } from 'lodash'
+import { includes, sortBy } from 'lodash'
 import { useRouter } from 'next/router'
 import {
   Button,
@@ -31,8 +31,8 @@ const FunctionList = ({
   schema,
   filterString,
   isLocked,
-  editFunction = noop,
-  deleteFunction = noop,
+  editFunction = () => undefined,
+  deleteFunction = () => undefined,
 }: FunctionListProps) => {
   const router = useRouter()
   const { project: selectedProject } = useProjectContext()

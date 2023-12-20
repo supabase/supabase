@@ -1,4 +1,3 @@
-import { includes, noop } from 'lodash'
 import { Button, IconEdit2, IconLink, Input, Listbox, Select } from 'ui'
 
 import { DATETIME_TYPES, JSON_TYPES, TEXT_TYPES } from '../SidePanelEditor.constants'
@@ -18,9 +17,9 @@ const InputField = ({
   field,
   errors,
   isEditable = true,
-  onUpdateField = noop,
-  onEditJson = noop,
-  onSelectForeignKey = noop,
+  onUpdateField = () => undefined,
+  onEditJson = () => undefined,
+  onSelectForeignKey = () => undefined,
 }: InputFieldProps) => {
   if (field.enums.length > 0) {
     const isArray = field.format[0] === '_'
@@ -112,7 +111,7 @@ const InputField = ({
     )
   }
 
-  if (includes(TEXT_TYPES, field.format)) {
+  if (TEXT_TYPES.includes(field.format)) {
     return (
       <div className="text-area-text-sm">
         <Input.TextArea
@@ -153,7 +152,7 @@ const InputField = ({
     )
   }
 
-  if (includes(JSON_TYPES, field.format)) {
+  if (JSON_TYPES.includes(field.format)) {
     return (
       <Input
         layout="horizontal"
@@ -179,7 +178,7 @@ const InputField = ({
     )
   }
 
-  if (includes(DATETIME_TYPES, field.format)) {
+  if (DATETIME_TYPES.includes(field.format)) {
     return (
       <DateTimeInput
         name={field.name}

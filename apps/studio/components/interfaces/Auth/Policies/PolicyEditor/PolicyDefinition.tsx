@@ -1,5 +1,4 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { noop } from 'lodash'
 import { useEffect } from 'react'
 import { IconHelpCircle } from 'ui'
 
@@ -18,8 +17,8 @@ const PolicyDefinition = ({
   operation = '',
   definition = '',
   check = '',
-  onUpdatePolicyUsing = noop,
-  onUpdatePolicyCheck = noop,
+  onUpdatePolicyUsing = () => undefined,
+  onUpdatePolicyCheck = () => undefined,
 }: PolicyDefinitionProps) => {
   const showUsing = (operation: string) =>
     ['SELECT', 'UPDATE', 'DELETE', 'ALL'].includes(operation) || !operation

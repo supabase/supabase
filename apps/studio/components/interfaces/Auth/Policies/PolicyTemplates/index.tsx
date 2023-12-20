@@ -1,4 +1,4 @@
-import { isEmpty, noop } from 'lodash'
+import { isEmpty } from 'lodash'
 import { useState } from 'react'
 import { Button } from 'ui'
 
@@ -15,7 +15,7 @@ interface PolicyTemplatesProps {
 const PolicyTemplates = ({
   templates = [],
   templatesNote = '',
-  onUseTemplate = noop,
+  onUseTemplate = () => undefined,
 }: PolicyTemplatesProps) => {
   const [selectedTemplate, setSelectedTemplate] = useState<PolicyTemplate>(templates[0])
   return (

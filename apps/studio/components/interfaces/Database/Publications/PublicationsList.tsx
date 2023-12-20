@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { noop } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import { Button, IconAlertCircle, IconSearch, Input, Modal, Toggle } from 'ui'
@@ -24,7 +23,7 @@ interface PublicationsListProps {
   onSelectPublication: (id: number) => void
 }
 
-const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps) => {
+const PublicationsList = ({ onSelectPublication = () => undefined }: PublicationsListProps) => {
   const { project } = useProjectContext()
   const [filterString, setFilterString] = useState<string>('')
 

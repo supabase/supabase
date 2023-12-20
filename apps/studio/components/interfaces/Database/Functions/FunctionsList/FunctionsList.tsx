@@ -1,7 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PostgresFunction } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { noop, partition } from 'lodash'
+import {  partition } from 'lodash'
 import { useState } from 'react'
 import { Button, IconSearch, Input } from 'ui'
 
@@ -25,9 +25,9 @@ interface FunctionsListProps {
 }
 
 const FunctionsList = ({
-  createFunction = noop,
-  editFunction = noop,
-  deleteFunction = noop,
+  createFunction = () => undefined,
+  editFunction = () => undefined,
+  deleteFunction = () => undefined,
 }: FunctionsListProps) => {
   const { project } = useProjectContext()
   const [selectedSchema, setSelectedSchema] = useState<string>('public')

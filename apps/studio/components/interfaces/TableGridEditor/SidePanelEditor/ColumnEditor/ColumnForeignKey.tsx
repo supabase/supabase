@@ -1,4 +1,3 @@
-import { isUndefined } from 'lodash'
 import { Badge, Button, IconArrowRight } from 'ui'
 
 import InformationBox from 'components/ui/InformationBox'
@@ -21,7 +20,7 @@ const ColumnForeignKey = ({
   onSelectRemoveRelation,
   onSelectCancelRemoveRelation,
 }: ColumnForeignKeyProps) => {
-  const hasNoForeignKey = isUndefined(originalForeignKey) && isUndefined(column?.foreignKey)
+  const hasNoForeignKey = originalForeignKey === undefined && column?.foreignKey === undefined
   if (hasNoForeignKey) {
     return (
       <Button type="default" onClick={onSelectEditRelation}>

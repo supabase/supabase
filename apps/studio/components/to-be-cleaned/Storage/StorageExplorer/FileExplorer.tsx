@@ -6,7 +6,6 @@ import ItemContextMenu from './ItemContextMenu'
 import FolderContextMenu from './FolderContextMenu'
 import ColumnContextMenu from './ColumnContextMenu'
 import FileExplorerColumn from './FileExplorerColumn'
-import { noop } from 'lodash'
 import { StorageColumn } from '../Storage.types'
 
 export interface FileExplorerProps {
@@ -30,11 +29,11 @@ const FileExplorer = ({
   selectedItems = [],
   selectedFilePreview = {},
   itemSearchString,
-  onFilesUpload = noop,
-  onSelectAllItemsInColumn = noop,
-  onSelectColumnEmptySpace = noop,
-  onColumnLoadMore = noop,
-  onCopyUrl = noop,
+  onFilesUpload = () => undefined,
+  onSelectAllItemsInColumn = () => undefined,
+  onSelectColumnEmptySpace = () => undefined,
+  onColumnLoadMore = () => undefined,
+  onCopyUrl = () => undefined,
 }: FileExplorerProps) => {
   const fileExplorerRef = useRef<any>(null)
 

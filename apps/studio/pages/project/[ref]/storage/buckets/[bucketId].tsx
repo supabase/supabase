@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import { find } from 'lodash'
 import { observer } from 'mobx-react-lite'
 
 import { StorageLayout } from 'components/layouts'
@@ -15,7 +14,7 @@ const PageLayout: NextPageWithLayout = () => {
 
   const { data, isSuccess, isError, error } = useBucketsQuery({ projectRef: ref })
   const buckets = data ?? []
-  const bucket = find(buckets, { id: bucketId })
+  const bucket = buckets.find((it) => it.id === bucketId)
 
   if (!project) return null
 

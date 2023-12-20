@@ -1,4 +1,4 @@
-import { compact, uniqBy } from 'lodash'
+import { uniqBy } from 'lodash'
 import { Item, Menu, Separator, Submenu } from 'react-contexify'
 import 'react-contexify/dist/ReactContexify.css'
 import {
@@ -44,7 +44,7 @@ const ColumnContextMenu = ({ id = '' }: ColumnContextMenuProps) => {
       .map((item: any) => {
         return { ...item, columnIndex }
       })
-    const columnFilesId = compact(columnFiles.map((item: any) => item.id))
+    const columnFilesId = columnFiles.map((item: any) => item.id).filter(Boolean)
     const selectedItemsFromColumn = selectedItems.filter((item: any) =>
       columnFilesId.includes(item.id)
     )

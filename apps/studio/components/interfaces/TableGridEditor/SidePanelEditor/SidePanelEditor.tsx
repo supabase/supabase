@@ -1,6 +1,6 @@
 import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { useQueryClient } from '@tanstack/react-query'
-import { isEmpty, isUndefined, noop } from 'lodash'
+import { isEmpty } from 'lodash'
 import { useState } from 'react'
 import { toast } from 'react-hot-toast'
 import { Modal } from 'ui'
@@ -44,7 +44,7 @@ export interface SidePanelEditorProps {
 const SidePanelEditor = ({
   editable = true,
   selectedTable,
-  onTableCreated = noop,
+  onTableCreated = () => undefined,
 }: SidePanelEditorProps) => {
   const snap = useTableEditorStateSnapshot()
   const [_, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
@@ -541,7 +541,7 @@ const SidePanelEditor = ({
 
   return (
     <>
-      {!isUndefined(selectedTable) && (
+      {selectedTable !== undefined && (
         <RowEditor
           row={snap.sidePanel?.type === 'row' ? snap.sidePanel.row : undefined}
           selectedTable={selectedTable}
@@ -551,7 +551,7 @@ const SidePanelEditor = ({
           updateEditorDirty={() => setIsEdited(true)}
         />
       )}
-      {!isUndefined(selectedTable) && (
+      {selectedTable !== undefined && (
         <ColumnEditor
           column={
             snap.sidePanel?.type === 'column'

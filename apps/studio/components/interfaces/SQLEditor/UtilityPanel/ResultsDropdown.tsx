@@ -3,7 +3,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { useStore } from 'hooks'
 import { copyToClipboard } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
-import { compact, isObject, isString, map } from 'lodash'
+import { map } from 'lodash'
 import { useRouter } from 'next/router'
 import { useMemo, useRef } from 'react'
 import { CSVLink } from 'react-csv'
@@ -39,12 +39,12 @@ const ResultsDropdown = ({ id, isExecuting }: ResultsDropdownProps) => {
     if (result?.rows) {
       const rows = Array.from(result.rows || []).map((row) => {
         return map(row, (v, k) => {
-          if (isString(v)) {
+          if (typeof v === 'string') {
             // replace all newlines with the character \n
             // escape all quotation marks
             return v.replaceAll(/\n/g, '\\n').replaceAll(/"/g, '""')
           }
-          if (isObject(v)) {
+          if (typeof v === 'object') {
             // replace all quotation marks with two quotation marks to escape them.
             return JSON.stringify(v).replaceAll(/\"/g, '""')
           }
@@ -52,7 +52,7 @@ const ResultsDropdown = ({ id, isExecuting }: ResultsDropdownProps) => {
         })
       })
 
-      return compact(rows)
+      return rows?.filter(Boolean)
     }
     return ''
   }, [result])

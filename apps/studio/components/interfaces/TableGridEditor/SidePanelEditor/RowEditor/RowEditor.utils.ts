@@ -1,7 +1,7 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { Dictionary } from 'types'
 import dayjs from 'dayjs'
-import { compact, find, isEqual, isNull, isString, isUndefined, omitBy } from 'lodash'
+import { isEqual, omitBy } from 'lodash'
 
 import { minifyJSON, tryParseJson } from 'lib/helpers'
 import {
@@ -22,19 +22,19 @@ export const generateRowFields = (
 
   return table.columns!.map((column) => {
     const value =
-      isUndefined(row) && TEXT_TYPES.includes(column.format)
+      row === undefined && TEXT_TYPES.includes(column.format)
         ? null
-        : isUndefined(row) && column.format === 'bool' && !column.is_nullable
+        : row === undefined && column.format === 'bool' && !column.is_nullable
         ? column.default_value
-        : isUndefined(row) && column.format === 'bool' && column.is_nullable
+        : row === undefined && column.format === 'bool' && column.is_nullable
         ? 'null'
-        : isUndefined(row)
+        : row === undefined
         ? ''
         : DATETIME_TYPES.includes(column.format)
         ? convertPostgresDatetimeToInputDatetime(column.format, row[column.name])
         : parseValue(row[column.name], column.format)
 
-    const foreignKey = find(relationships, (relationship) => {
+    const foreignKey = relationships.find((relationship) => {
       return (
         relationship.source_schema === column.schema &&
         relationship.source_table_name === column.table &&
@@ -107,7 +107,7 @@ export const parseValue = (originalValue: any, format: string) => {
 const parseDescription = (description: string | null) => {
   // [Joshen] Definitely can find a better way to parse the description, but this suffices for now
   if (!description) return ''
-  const commentLines = compact(description.split('\n'))
+  const commentLines = description.split('\n').filter(Boolean)
   if (commentLines.length == 1) {
     // Only user comment
     return description
@@ -172,7 +172,7 @@ export const generateRowObjectFromFields = (
     } else if (field.format.includes('json')) {
       if (typeof field.value === 'object') {
         rowObject[field.name] = value
-      } else if (isString(value)) {
+      } else if (typeof value === 'string') {
         rowObject[field.name] = tryParseJson(value)
       }
     } else if (field.format === 'bool' && value) {
@@ -188,7 +188,7 @@ export const generateRowObjectFromFields = (
       rowObject[field.name] = value
     }
   })
-  return includeNullProperties ? rowObject : omitBy(rowObject, isNull)
+  return includeNullProperties ? rowObject : omitBy(rowObject, it => it === null)
 }
 
 export const generateUpdateRowPayload = (originalRow: any, field: RowField[]) => {

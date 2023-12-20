@@ -7,14 +7,13 @@ import { IconClipboard, IconEdit, IconMove, IconDownload, IconTrash2, IconChevro
 import { useCheckPermissions } from 'hooks'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import { noop } from 'lodash'
 
 interface ItemContextMenuProps {
   id: string
   onCopyUrl: (name: string, url: string) => void
 }
 
-const ItemContextMenu = ({ id = '', onCopyUrl = noop }: ItemContextMenuProps) => {
+const ItemContextMenu = ({ id = '', onCopyUrl = () => undefined }: ItemContextMenuProps) => {
   const storageExplorerStore = useStorageStore()
   const {
     getFileUrl,

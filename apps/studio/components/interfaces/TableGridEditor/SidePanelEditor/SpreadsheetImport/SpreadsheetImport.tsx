@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { PostgresTable } from '@supabase/postgres-meta'
-import { debounce, includes, noop } from 'lodash'
+import { debounce } from 'lodash'
 import { useCallback, useEffect, useState } from 'react'
 import { Button, IconExternalLink, SidePanel, Tabs } from 'ui'
 
@@ -41,7 +41,7 @@ const SpreadsheetImport = ({
   selectedTable,
   saveContent,
   closePanel,
-  updateEditorDirty = noop,
+  updateEditorDirty = () => undefined,
 }: SpreadsheetImportProps) => {
   const { ui } = useStore()
 
@@ -99,7 +99,7 @@ const SpreadsheetImport = ({
       )
     }
 
-    if (!file || !includes(UPLOAD_FILE_TYPES, file?.type) || !acceptedFileExtension(file)) {
+    if (!file || !UPLOAD_FILE_TYPES.includes(file?.type) || !acceptedFileExtension(file)) {
       ui.setNotification({
         category: 'info',
         message: 'Sorry! We only accept CSV or TSV file types, please upload another file.',

@@ -1,5 +1,5 @@
 import type { PostgresColumn, PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
-import { find, get, isEmpty, sortBy } from 'lodash'
+import { isEmpty, sortBy } from 'lodash'
 import { useEffect, useState } from 'react'
 
 import { Dictionary } from 'types'
@@ -70,13 +70,14 @@ const ForeignKeySelector = ({
   })
 
   const foreignKey = column?.foreignKey
-  const selectedTable: PostgresTable | undefined = find(tables, {
-    name: selectedForeignKey?.table,
-    schema: selectedForeignKey?.schema,
-  })
-  const selectedColumn: PostgresColumn | undefined = find(selectedTable?.columns ?? [], {
-    name: selectedForeignKey?.column,
-  })
+  const selectedTable: PostgresTable | undefined = tables?.find(
+    (table) =>
+      table.name === selectedForeignKey?.table && table.schema === selectedForeignKey?.schema
+  )
+
+  const selectedColumn: PostgresColumn | undefined = (selectedTable?.columns ?? []).find(
+    (column) => column.name === selectedForeignKey?.column
+  )
 
   useEffect(() => {
     // Reset the state of the side panel
@@ -126,7 +127,7 @@ const ForeignKeySelector = ({
       })
     }
 
-    const table = find(tables, { id: tableId })
+    const table = tables?.find((it) => it.id === tableId)
     if (table) {
       const primaryColumn = table.primary_keys[0]?.name
       const firstColumn = table.columns?.length ? table.columns[0].name : undefined
@@ -143,7 +144,7 @@ const ForeignKeySelector = ({
 
   const updateSelectedColumn = (columnId: string) => {
     setErrors({})
-    const column = find(selectedTable?.columns, { id: columnId })
+    const column = selectedTable?.columns?.find((it) => it.id === columnId)
     if (column) {
       const updatedForeignKey = { ...selectedForeignKey, column: column.name } as ForeignKey
       setSelectedForeignKey(updatedForeignKey)
@@ -194,7 +195,7 @@ const ForeignKeySelector = ({
           Edit foreign key relation{' '}
           {column?.name && (
             <>
-              for <span className="text-code">{get(column, ['name'], '')}</span>
+              for <span className="text-code">{column.name || ''}</span>
             </>
           )}
         </span>

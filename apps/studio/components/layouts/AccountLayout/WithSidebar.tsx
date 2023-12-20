@@ -1,5 +1,4 @@
 import { useFlag } from 'hooks'
-import { isUndefined } from 'lodash'
 import Link from 'next/link'
 import { ReactNode } from 'react'
 import { Badge, IconArrowUpRight, IconLogOut, Menu } from 'ui'
@@ -179,7 +178,7 @@ const SidebarLinkItem = ({
   isExternal,
   onClick,
 }: SidebarLinkProps) => {
-  if (isUndefined(href)) {
+  if (href === undefined) {
     let icon
     if (isExternal) {
       icon = <IconArrowUpRight size={'tiny'} />

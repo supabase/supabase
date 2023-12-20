@@ -1,6 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { includes, noop } from 'lodash'
+import { includes } from 'lodash'
 import Image from 'next/legacy/image'
 
 import { useParams } from 'common/hooks'
@@ -29,7 +29,7 @@ export interface HookListProps {
   deleteHook: (hook: any) => void
 }
 
-const HookList = ({ schema, filterString, editHook = noop, deleteHook = noop }: HookListProps) => {
+const HookList = ({ schema, filterString, editHook = () => undefined, deleteHook = () => undefined }: HookListProps) => {
   const { ref } = useParams()
   const { project } = useProjectContext()
   const { data: hooks } = useDatabaseHooksQuery({

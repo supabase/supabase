@@ -1,5 +1,4 @@
 import dayjs from 'dayjs'
-import { noop } from 'lodash'
 import Image from 'next/image'
 import { PropsWithChildren, memo, useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
@@ -24,7 +23,7 @@ const Message = memo(function Message({
   content,
   createdAt,
   isDebug,
-  onDiff = noop,
+  onDiff = () => undefined,
   children,
 }: PropsWithChildren<MessageProps>) {
   const { profile } = useProfile()

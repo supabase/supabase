@@ -1,7 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { noop } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import {
@@ -39,10 +38,10 @@ interface ColumnListProps {
 
 const ColumnList = ({
   table,
-  onSelectBack = noop,
-  onAddColumn = noop,
-  onEditColumn = noop,
-  onDeleteColumn = noop,
+  onSelectBack = () => undefined,
+  onAddColumn = () => undefined,
+  onEditColumn = () => undefined,
+  onDeleteColumn = () => undefined,
 }: ColumnListProps) => {
   const [filterString, setFilterString] = useState<string>('')
   const { data: selectedTable, error, isError, isLoading, isSuccess } = useTable(table.id)

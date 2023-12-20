@@ -1,4 +1,3 @@
-import { noop } from 'lodash'
 import { useEffect, useState } from 'react'
 import { Button, Input, Modal } from 'ui'
 
@@ -14,8 +13,8 @@ const MoveItemsModal = ({
   bucketName = '',
   visible = false,
   selectedItemsToMove = [],
-  onSelectCancel = noop,
-  onSelectMove = noop,
+  onSelectCancel = () => undefined,
+  onSelectMove = () => undefined,
 }: MoveItemsModalProps) => {
   const [moving, setMoving] = useState(false)
   const [newPath, setNewPath] = useState('')

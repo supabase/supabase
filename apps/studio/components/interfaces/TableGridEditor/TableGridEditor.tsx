@@ -2,7 +2,6 @@ import type { PostgresColumn, PostgresRelationship, PostgresTable } from '@supab
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { QueryKey, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { find, isUndefined } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -159,7 +158,7 @@ const TableGridEditor = ({
     return <Connecting />
   }
 
-  if (isUndefined(selectedTable)) {
+  if (selectedTable === undefined) {
     return <NotFoundState id={Number(id)} />
   }
 
@@ -222,7 +221,7 @@ const TableGridEditor = ({
   // stale as they are accessed via some react-tracked madness
   // [TODO]: refactor out all of react-tracked
   const onSelectEditColumn = (name: string) => {
-    const column = find(columnsRef.current, { name }) as PostgresColumn
+    const column = columnsRef.current.find((it) => it.name === name) as PostgresColumn
     if (column) {
       snap.onEditColumn(column)
     } else {
@@ -234,7 +233,7 @@ const TableGridEditor = ({
   }
 
   const onSelectDeleteColumn = (name: string) => {
-    const column = find(columnsRef.current ?? [], { name }) as PostgresColumn
+    const column = (columnsRef.current ?? []).find((it) => it.name === name) as PostgresColumn
     if (column) {
       snap.onDeleteColumn(column)
     } else {

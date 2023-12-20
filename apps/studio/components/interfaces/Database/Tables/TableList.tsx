@@ -1,6 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { noop, partition } from 'lodash'
+import { partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 
@@ -42,10 +42,10 @@ interface TableListProps {
 }
 
 const TableList = ({
-  onAddTable = noop,
-  onEditTable = noop,
-  onDeleteTable = noop,
-  onOpenTable = noop,
+  onAddTable = () => undefined,
+  onEditTable = () => undefined,
+  onDeleteTable = () => undefined,
+  onOpenTable = () => undefined,
 }: TableListProps) => {
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()

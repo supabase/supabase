@@ -1,5 +1,4 @@
 import Editor, { OnChange, useMonaco } from '@monaco-editor/react'
-import { noop } from 'lodash'
 import { useEffect, useRef } from 'react'
 
 import { useStore } from 'hooks'
@@ -21,7 +20,7 @@ const SqlEditor = ({
   defaultValue = '',
   readOnly = false,
   contextmenu = true,
-  onInputChange = noop,
+  onInputChange = () => undefined,
 }: SqlEditorProps) => {
   const monaco = useMonaco()
   const { meta } = useStore()

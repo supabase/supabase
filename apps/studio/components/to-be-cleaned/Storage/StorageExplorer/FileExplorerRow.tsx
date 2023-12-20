@@ -1,6 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { find, isEmpty, isEqual } from 'lodash'
+import { isEmpty, isEqual } from 'lodash'
 import { useContextMenu } from 'react-contexify'
 import SVG from 'react-inlinesvg'
 import {
@@ -123,7 +123,7 @@ const FileExplorerRow = ({
 
   const isPublic = selectedBucket.public
   const itemWithColumnIndex = { ...item, columnIndex }
-  const isSelected = find(selectedItems, item) !== undefined
+  const isSelected = selectedItems.find((item) => item !== undefined)
   const isOpened =
     openedFolders.length > columnIndex ? isEqual(openedFolders[columnIndex], item) : false
   const isPreviewed = !isEmpty(selectedFilePreview) && isEqual(selectedFilePreview.id, item.id)
@@ -152,7 +152,7 @@ const FileExplorerRow = ({
       selectRangeItems(columnIndex, itemIndex)
       return
     }
-    if (find(selectedItems, (item: any) => itemWithColumnIndex.id === item.id) !== undefined) {
+    if (selectedItems.find((item: any) => itemWithColumnIndex.id === item.id) !== undefined) {
       setSelectedItems(
         selectedItems.filter((selectedItem: any) => itemWithColumnIndex.id !== selectedItem.id)
       )

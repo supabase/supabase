@@ -1,5 +1,4 @@
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
-import { flatten } from 'lodash'
 import React, { useEffect, useRef, useState } from 'react'
 
 import { cn } from '@ui/lib/utils'
@@ -116,7 +115,7 @@ function Listbox({
 
   useEffect(() => {
     const data: any = children
-    const content: any = flatten(data)
+    const content: any = data.flat()
 
     function findNode(_value: any) {
       return content.find((node: any) => node.props.value === _value)

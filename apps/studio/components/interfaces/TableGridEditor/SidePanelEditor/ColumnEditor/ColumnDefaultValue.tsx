@@ -1,5 +1,4 @@
 import type { PostgresType } from '@supabase/postgres-meta'
-import { noop } from 'lodash'
 import { Select } from 'ui'
 
 import { POSTGRES_DATA_TYPES } from '../SidePanelEditor.constants'
@@ -17,7 +16,7 @@ interface ColumnDefaultValueProps {
 const ColumnDefaultValue = ({
   columnFields,
   enumTypes = [],
-  onUpdateField = noop,
+  onUpdateField = () => undefined,
 }: ColumnDefaultValueProps) => {
   const suggestions: Suggestion[] = typeExpressionSuggestions?.[columnFields.format] ?? []
 

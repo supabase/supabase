@@ -1,5 +1,4 @@
 import { Dictionary } from 'types'
-import { isUndefined } from 'lodash'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import { Button, IconActivity, IconAlertCircle, IconBarChart, IconLoader } from 'ui'
@@ -75,7 +74,7 @@ const ChartHandler = ({
 
       const { error, ...res } = await get(url)
 
-      if ((error || isUndefined(res)) && !cancel) {
+      if ((error || res === undefined) && !cancel) {
         setFetching(false)
         setFetchedData(undefined)
         return console.error('Chart error:', error)
@@ -127,7 +126,7 @@ const ChartHandler = ({
     )
   }
 
-  if (isUndefined(chartData)) {
+  if (chartData === undefined) {
     return (
       <div className="flex h-52 w-full flex-col items-center justify-center space-y-4">
         <IconAlertCircle className="text-border-strong" />

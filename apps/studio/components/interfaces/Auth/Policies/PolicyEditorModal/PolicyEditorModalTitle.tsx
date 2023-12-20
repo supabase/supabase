@@ -1,4 +1,3 @@
-import { noop } from 'lodash'
 import { IconChevronLeft } from 'ui'
 
 import { POLICY_MODAL_VIEWS } from 'components/interfaces/Auth/Policies'
@@ -16,7 +15,7 @@ const PolicyEditorModalTitle = ({
   schema,
   table,
   isNewPolicy,
-  onSelectBackFromTemplates = noop,
+  onSelectBackFromTemplates = () => undefined,
 }: PolicyEditorModalTitleProps) => {
   const getTitle = () => {
     if (view === POLICY_MODAL_VIEWS.EDITOR || view === POLICY_MODAL_VIEWS.SELECTION) {

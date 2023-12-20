@@ -1,4 +1,3 @@
-import { noop } from 'lodash'
 import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
 
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
@@ -11,7 +10,7 @@ type FeaturePreviewContextType = {
 
 const FeaturePreviewContext = createContext<FeaturePreviewContextType>({
   flags: EMPTY_OBJ,
-  onUpdateFlag: noop,
+  onUpdateFlag: () => undefined,
 })
 
 export default FeaturePreviewContext

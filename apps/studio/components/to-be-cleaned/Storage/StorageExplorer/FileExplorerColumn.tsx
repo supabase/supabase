@@ -1,5 +1,5 @@
 import { Transition } from '@headlessui/react'
-import { get, noop, sum } from 'lodash'
+import { sum } from 'lodash'
 import { useEffect, useRef, useState } from 'react'
 import { useContextMenu } from 'react-contexify'
 import { Checkbox, IconUpload } from 'ui'
@@ -77,11 +77,11 @@ const FileExplorerColumn = ({
   selectedItems = [],
   selectedFilePreview = {},
   itemSearchString,
-  onFilesUpload = noop,
-  onSelectAllItemsInColumn = noop,
-  onSelectColumnEmptySpace = noop,
-  onColumnLoadMore = noop,
-  onCopyUrl = noop,
+  onFilesUpload = () => undefined,
+  onSelectAllItemsInColumn = () => undefined,
+  onSelectColumnEmptySpace = () => undefined,
+  onColumnLoadMore = () => undefined,
+  onCopyUrl = () => undefined,
 }: FileExplorerColumnProps) => {
   const [isDraggedOver, setIsDraggedOver] = useState(false)
   const fileExplorerColumnRef = useRef<any>(null)
@@ -106,7 +106,7 @@ const FileExplorerColumn = ({
   )
 
   const columnItems = column.items
-  const columnItemsSize = sum(columnItems.map((item) => get(item, ['metadata', 'size'], 0)))
+  const columnItemsSize = sum(columnItems.map((item) => item?.metadata?.size || 0))
 
   const isEmpty =
     column.items.filter((item) => item.status !== STORAGE_ROW_STATUS.LOADING).length === 0
@@ -156,7 +156,7 @@ const FileExplorerColumn = ({
       onDragOver={onDragOver}
       onDrop={onDrop}
       onClick={(event) => {
-        const eventTarget = get(event.target, ['className'], '')
+        const eventTarget = (event.target as any).className || ''
         if (typeof eventTarget === 'string' && eventTarget.includes('react-contexify')) return
         onSelectColumnEmptySpace(index)
       }}

@@ -1,4 +1,3 @@
-import { noop } from 'lodash'
 import { observer } from 'mobx-react-lite'
 
 import Table from 'components/to-be-cleaned/Table'
@@ -14,8 +13,8 @@ interface SchemaTableProps {
 const SchemaTable = ({
   schema,
   filterString,
-  editHook = noop,
-  deleteHook = noop,
+  editHook = () => undefined,
+  deleteHook = () => undefined,
 }: SchemaTableProps) => {
   return (
     <div key={schema} className="">

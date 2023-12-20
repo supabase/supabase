@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { filter, orderBy, without } from 'lodash'
+import { orderBy, without } from 'lodash'
 import { KeyboardEvent, ReactNode, useEffect, useRef, useState } from 'react'
 import {
   IconAlertCircle,
@@ -83,8 +83,8 @@ export default function MultiSelect({
   // Options to show in Popover menu
   const filteredOptions =
     searchString.length > 0
-      ? filter(formattedOptions, (option) => !option.disabled && option.name.includes(searchString))
-      : filter(formattedOptions, { disabled: false })
+      ? formattedOptions.filter((option) => !option.disabled && option.name.includes(searchString))
+      : formattedOptions.filter((it) => !it.disabled)
 
   const checkIfActive = (option: MultiSelectOption) => {
     const isOptionSelected = (selectedOptions || []).find((x) => x === option.value)

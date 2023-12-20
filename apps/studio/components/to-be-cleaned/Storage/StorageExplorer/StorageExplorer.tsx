@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { compact, get, isEmpty, uniqBy } from 'lodash'
+import { uniqBy } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useRef, useState } from 'react'
 
@@ -127,7 +127,7 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
       .map((item: any) => {
         return { ...item, columnIndex }
       })
-    const columnFilesId = compact(columnFiles.map((item: any) => item.id))
+    const columnFilesId = columnFiles.map((item: any) => item.id).filter(Boolean)
     const selectedItemsFromColumn = selectedItems.filter((item: any) =>
       columnFilesId.includes(item.id)
     )
@@ -150,7 +150,7 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
   const onFilesUpload = async (event: any, columnIndex = -1) => {
     event.persist()
     const items = event.target.files || event.dataTransfer.items
-    const isDrop = !isEmpty(get(event, ['dataTransfer', 'items'], []))
+    const isDrop = (event?.dataTransfer?.items || []).length > 0
     await uploadFiles(items, columnIndex, isDrop)
     event.target.value = ''
   }

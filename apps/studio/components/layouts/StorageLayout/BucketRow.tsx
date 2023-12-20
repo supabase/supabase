@@ -1,6 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
-import { noop } from 'lodash'
 import Link from 'next/link'
 import {
   Badge,
@@ -31,8 +30,8 @@ const BucketRow = ({
   bucket,
   projectRef = '',
   isSelected = false,
-  onSelectDeleteBucket = noop,
-  onSelectEditBucket = noop,
+  onSelectDeleteBucket = () => undefined,
+  onSelectEditBucket = () => undefined,
 }: BucketRowProps) => {
   const canUpdateBuckets = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 

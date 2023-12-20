@@ -1,5 +1,4 @@
 import { useRef, useEffect, useState } from 'react'
-import { includes } from 'lodash'
 import TooltipListener from 'components/to-be-cleaned/TooltipListener'
 
 /**
@@ -52,8 +51,8 @@ function useKeyboardShortcuts(keyMap: any, whitelistNodes = [], whitelistClasses
   const handleKeydown = (event: any) => {
     if (
       !keyMap ||
-      includes(whitelistNodes, event.target.nodeName) ||
-      includes(whitelistClasses, event.target.className)
+      whitelistNodes.includes(event.target.nodeName as unknown as never) ||
+      whitelistClasses.includes(event.target.className as unknown as never)
     ) {
       return
     }
