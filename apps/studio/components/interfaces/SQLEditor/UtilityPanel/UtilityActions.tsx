@@ -1,15 +1,13 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { IS_PLATFORM } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
-import { Button, IconAlignLeft, IconCommand, IconCornerDownLeft, cn } from 'ui'
+import { Button, IconAlignLeft, IconCommand, IconCornerDownLeft } from 'ui'
 
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { useFlag, useSelectedProject } from 'hooks'
-import { useState } from 'react'
 import FavoriteButton from './FavoriteButton'
 import SavingIndicator from './SavingIndicator'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 
 export type UtilityActionsProps = {
   id: string
@@ -31,7 +29,6 @@ const UtilityActions = ({
   const os = detectOS()
   const project = useSelectedProject()
   const readReplicasEnabled = useFlag('readReplicas')
-  const roleImpersonationEnabledFlag = useFlag('roleImpersonation')
 
   const showReadReplicasUI = readReplicasEnabled && project?.is_read_replicas_enabled
 
@@ -73,12 +70,10 @@ const UtilityActions = ({
         <div className="flex items-center">
           {showReadReplicasUI && <DatabaseSelector variant="connected-on-right" />}
 
-          {roleImpersonationEnabledFlag && (
-            <RoleImpersonationPopover
-              serviceRoleLabel="postgres"
-              variant={showReadReplicasUI ? 'connected-on-both' : 'connected-on-right'}
-            />
-          )}
+          <RoleImpersonationPopover
+            serviceRoleLabel="postgres"
+            variant={showReadReplicasUI ? 'connected-on-both' : 'connected-on-right'}
+          />
 
           <Button
             onClick={() => executeQuery()}
@@ -96,7 +91,7 @@ const UtilityActions = ({
                 <IconCornerDownLeft size={10} strokeWidth={1.5} />
               </div>
             }
-            className={cn(roleImpersonationEnabledFlag && 'rounded-l-none')}
+            className="rounded-l-none"
           >
             {hasSelection ? 'Run selected' : 'Run'}
           </Button>
