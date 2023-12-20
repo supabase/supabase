@@ -866,13 +866,14 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase.auth.mfa.enroll({
-            factorType: 'totp'
+            factorType: 'totp',
+            friendlyName: 'your_friendly_name'
           })
 
           // Use the id to create a challenge.
           // The challenge can be verified by entering the code generated from the authenticator app.
           // The code will be generated upon scanning the qr_code or entering the secret into the authenticator app.
-          const { id, type, totp: { qr_code, secret, uri } } = data
+          const { id, type, totp: { qr_code, secret, uri }, friendly_name } = data
           ```
   - id: mfa-challenge
     title: 'mfa.challenge()'
