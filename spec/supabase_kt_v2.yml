@@ -2269,7 +2269,7 @@ functions:
         code: |
           ```kotlin
           val (csvData, _) = supabase.from("countries").select {
-              explain()
+              csv()
           }
           ```
         data:
