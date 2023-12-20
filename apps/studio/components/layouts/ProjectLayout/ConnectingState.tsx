@@ -7,7 +7,7 @@ import { Badge, Button, IconExternalLink, IconLoader, IconMonitor, IconServer } 
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { setProjectPostgrestStatus } from 'data/projects/projects-query'
 import pingPostgrest from 'lib/pingPostgrest'
-import { Project } from 'types'
+import { Project } from 'data/projects/project-detail-query'
 
 export interface ConnectingStateProps {
   project: Project

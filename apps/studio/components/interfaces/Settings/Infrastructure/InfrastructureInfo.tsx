@@ -28,7 +28,7 @@ import InstanceConfiguration from './InfrastructureConfiguration/InstanceConfigu
 
 const InfrastructureInfo = () => {
   const { ref } = useParams()
-  const { project } = useProjectContext()
+  const { project, isLoading } = useProjectContext()
 
   const authEnabled = useIsFeatureEnabled('project_auth:all')
 
@@ -49,6 +49,7 @@ const InfrastructureInfo = () => {
 
   const showDbUpgrades = useFlag('databaseUpgrades')
   const readReplicasEnabled = useFlag('readReplicas')
+  const showReadReplicasUI = readReplicasEnabled && project?.is_read_replicas_enabled
   const hasReadReplicas = (databases ?? []).length > 1
   const subject = 'Request%20for%20Postgres%20upgrade%20for%20project'
   const message = `Upgrade information:%0A• Manual intervention reason: ${requires_manual_intervention}`
@@ -68,7 +69,7 @@ const InfrastructureInfo = () => {
 
       <ScaffoldDivider />
 
-      {readReplicasEnabled && (
+      {showReadReplicasUI && (
         <>
           <InstanceConfiguration />
           <ScaffoldDivider />
@@ -76,15 +77,21 @@ const InfrastructureInfo = () => {
       )}
 
       <ScaffoldContainer>
-        {!readReplicasEnabled && (
+        {!showReadReplicasUI && (
           <ScaffoldSection>
             <ScaffoldSectionDetail>
               <p>Configuration</p>
               <p className="text-foreground-light text-sm">Information on your server provider</p>
             </ScaffoldSectionDetail>
             <ScaffoldSectionContent>
-              <Input readOnly disabled value={project?.cloud_provider} label="Cloud provider" />
-              <Input readOnly disabled value={project?.region} label="Region" />
+              {isLoading ? (
+                <GenericSkeletonLoader />
+              ) : (
+                <>
+                  <Input readOnly disabled value={project?.cloud_provider} label="Cloud provider" />
+                  <Input readOnly disabled value={project?.region} label="Region" />
+                </>
+              )}
             </ScaffoldSectionContent>
           </ScaffoldSection>
         )}
