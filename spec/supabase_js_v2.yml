@@ -224,7 +224,6 @@ functions:
           })
           ```
 
-
   - id: sign-up
     title: 'signUp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
@@ -290,8 +289,8 @@ functions:
     title: 'onAuthStateChange()'
     $ref: '@supabase/gotrue-js.GoTrueClient.onAuthStateChange'
     notes: |
-      - Lets you subscribe to important events ocurring on the user's session.
-      - Should be used on the frontend/client. It is less useful on the server.
+      - Subscribes to important events occurring on the user's session.
+      - Use on the frontend/client. It is less useful on the server.
       - Events are emitted across tabs to keep your application's UI up-to-date. Some events can fire very frequently, based on the number of tabs open. Use a quick and efficient callback function, and defer or debounce as many operations as you can to be performed outside of the callback.
       - **Important:** A callback can be an `async` function and it runs synchronously during the processing of the changes causing the event. You can easily create a dead-lock by using `await` on a call to another method of the Supabase library.
         - Avoid using `async` functions as callbacks.
@@ -451,7 +450,6 @@ functions:
           supabase.auth.onAuthStateChange((event, session) => {
             if (event === 'PASSWORD_RECOVERY') {
               console.log('PASSWORD_RECOVERY', session)
-
               // show screen to update user's password
               showPasswordResetScreen(true)
             }
