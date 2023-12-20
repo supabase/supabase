@@ -75,24 +75,19 @@ export class SupabaseService {
   }
 
   get user() {
-    return this.supabase.auth.getUser()
-      .then(({ data }) => data?.user)
+    return this.supabase.auth.getUser().then(({ data }) => data?.user)
   }
 
   get session() {
-    return this.supabase.auth.getSession()
-      .then(({ data }) => data?.session)
+    return this.supabase.auth.getSession().then(({ data }) => data?.session)
   }
 
   get profile() {
     return this.user
-      .then(user => user?.id)
-      .then(id => this.supabase
-        .from('profiles')
-        .select(`username, website, avatar_url`)
-        .eq('id', id)
-        .single()
-      );
+      .then((user) => user?.id)
+      .then((id) =>
+        this.supabase.from('profiles').select(`username, website, avatar_url`).eq('id', id).single()
+      )
   }
 
   authChanges(callback: (event: AuthChangeEvent, session: Session | null) => void) {
@@ -108,7 +103,7 @@ export class SupabaseService {
   }
 
   async updateProfile(profile: Profile) {
-    const user = await this.user;
+    const user = await this.user
     const update = {
       ...profile,
       id: user?.id,
@@ -179,7 +174,7 @@ import { SupabaseService } from '../supabase.service'
 })
 export class LoginPage {
   email = ''
-  
+
   constructor(private readonly supabase: SupabaseService) {}
 
   async handleLogin(event: any) {
@@ -187,10 +182,10 @@ export class LoginPage {
     const loader = await this.supabase.createLoader()
     await loader.present()
     try {
-      const { error } = await this.supabase.signIn(this.email)     
+      const { error } = await this.supabase.signIn(this.email)
       if (error) {
         throw error
-      }  
+      }
       await loader.dismiss()
       await this.supabase.createNotice('Check your email for the login link!')
     } catch (error: any) {
@@ -255,7 +250,7 @@ export class AccountPage implements OnInit {
     website: '',
   }
 
-  email = '';
+  email = ''
 
   constructor(private readonly supabase: SupabaseService, private router: Router) {}
   ngOnInit() {
@@ -264,7 +259,7 @@ export class AccountPage implements OnInit {
   }
 
   async getEmail() {
-    this.email = await this.supabase.user.then(user => user?.email || '')
+    this.email = await this.supabase.user.then((user) => user?.email || '')
   }
 
   async getProfile() {
