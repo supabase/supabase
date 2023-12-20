@@ -11,9 +11,9 @@ const BuiltExamples = () => {
   return (
     <SectionContainer className="xl:pt-32">
       <div className="text-center">
-        <h3 className="h2">Get started in seconds</h3>
+        <h3 className="h2">Start building in seconds</h3>
         <p className="p">
-          Kickstart your next project with templates built from us and our community.
+          Kickstart your next project with templates built by us and our community.
         </p>
         <div className="flex justify-center gap-2 py-4">
           <Button asChild type="default" size="small" className="h-full">
