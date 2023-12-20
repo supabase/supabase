@@ -27,6 +27,9 @@ const csp = [
 const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
   output: 'standalone',
+  experimental: {
+    fallbackNodePolyfills: false,
+  },
   async redirects() {
     return [
       ...(process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
