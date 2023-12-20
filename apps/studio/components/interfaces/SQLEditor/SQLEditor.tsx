@@ -333,7 +333,7 @@ const SQLEditor = () => {
           ? project.connectionString
           : databases?.find((db) => db.identifier === databaseSelectorState.selectedDatabaseId)
               ?.connectionString
-        if (!connectionString) {
+        if (IS_PLATFORM && !connectionString) {
           return toast.error('Unable to run query: Connection string is missing')
         }
 
