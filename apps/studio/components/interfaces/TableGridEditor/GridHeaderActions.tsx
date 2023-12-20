@@ -50,8 +50,9 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-
-  const policies = (data ?? []).filter((policy) => policy.table_id === table.id)
+  const policies = (data ?? []).filter(
+    (policy) => policy.schema === table.schema && policy.table === table.name
+  )
 
   const { data: publications } = useDatabasePublicationsQuery({
     projectRef: project?.ref,

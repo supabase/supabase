@@ -13,16 +13,16 @@ import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useFlag } from 'hooks'
 import { pluckObjectFields } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 
 const DatabaseConnectionString = () => {
   const router = useRouter()
   const { ref: projectRef, connectionString } = useParams()
   const telemetryProps = useTelemetryProps()
+  const state = useDatabaseSelectorStateSnapshot()
 
   const readReplicasEnabled = useFlag('readReplicas')
   const connectionStringsRef = useRef<HTMLDivElement>(null)
-
-  const [selectedDatabaseId, setSelectedDatabaseId] = useState<string>(projectRef ?? '')
 
   const {
     data,
@@ -44,7 +44,9 @@ const DatabaseConnectionString = () => {
   const isError = readReplicasEnabled ? isErrorReadReplicas : isErrorProjectSettings
   const isSuccess = readReplicasEnabled ? isSuccessReadReplicas : isSuccessProjectSettings
 
-  const selectedDatabase = (databases ?? []).find((db) => db.identifier === selectedDatabaseId)
+  const selectedDatabase = (databases ?? []).find(
+    (db) => db.identifier === state.selectedDatabaseId
+  )
 
   const { project } = data ?? {}
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
@@ -78,7 +80,7 @@ const DatabaseConnectionString = () => {
 
   useEffect(() => {
     if (connectionString !== undefined && connectionStringsRef.current !== undefined) {
-      setSelectedDatabaseId(connectionString)
+      state.setSelectedDatabaseId(connectionString)
       connectionStringsRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' })
     }
   }, [connectionString])
@@ -92,12 +94,7 @@ const DatabaseConnectionString = () => {
               <h5 key="panel-title" className="mb-0">
                 Connection string
               </h5>
-              {readReplicasEnabled && (
-                <DatabaseSelector
-                  selectedDatabaseId={selectedDatabaseId}
-                  onChangeDatabaseId={setSelectedDatabaseId}
-                />
-              )}
+              {readReplicasEnabled && <DatabaseSelector />}
             </div>
           }
           className="!m-0"

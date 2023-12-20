@@ -30,11 +30,11 @@ import { useFlag, useStore } from 'hooks'
 import useLatest from 'hooks/misc/useLatest'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import { Project } from 'types'
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
 import { CATEGORY_OPTIONS, SERVICE_OPTIONS, SEVERITY_OPTIONS } from './Support.constants'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { Project } from 'data/projects/project-detail-query'
 
 const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']

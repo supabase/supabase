@@ -34,11 +34,10 @@ A new edge function will now exist under `./supabase/functions/openai/index.ts`.
 We'll design the function to take your user's query (via POST request) and forward it to OpenAI's API.
 
 ```ts index.ts
-import 'xhr_polyfill'
-import { serve } from 'std/server'
-import { CreateCompletionRequest } from 'openai'
+import { CreateCompletionRequest } from 'https://esm.sh/openai@3.1.0'
+import 'https://deno.land/x/xhr@0.3.0/mod.ts'
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   const { query } = await req.json()
 
   const completionConfig: CreateCompletionRequest = {
