@@ -45,11 +45,11 @@ git clone https://github.com/supabase-community/firebase-to-supabase.git
 
 ## Command line options
 
-### List all Firestore collections
+### List all firestore collections
 
 `node collections.js`
 
-### Dump Firestore collection to JSON file
+### Dump firestore collection to JSON file
 
 `node firestore2json.js <collectionName> [<batchSize>] [<limit>]`
 
@@ -79,7 +79,7 @@ And split it into two files (one table for users and one table for items):
 ]
 ```
 
-### Import JSON file to Supabase (PostgreSQL) [#import-to-supabase]
+### Import JSON file to Supabase (postgreSQL) [#import-to-supabase]
 
 `node json2supabase.js <path_to_json_file> [<primary_key_strategy>] [<primary_key_name>]`
 
@@ -139,7 +139,7 @@ module.exports = (collectionName, doc, recordCounters, writeRecord) => {
 }
 ```
 
-#### Add a timestamp of when this record was dumped from Firestore
+#### Add a timestamp of when this record was dumped from firestore
 
 ```js
 module.exports = (collectionName, doc, recordCounters, writeRecord) => {

@@ -17,7 +17,7 @@ If you get stuck while working through this guide, refer to the [full example on
 
 <ProjectSetup />
 
-## Building the App
+## Building the app
 
 Let's start building the Svelte app from scratch.
 
@@ -47,7 +47,7 @@ PUBLIC_SUPABASE_ANON_KEY="YOUR_SUPABASE_KEY"
 
 Optionally, add `src/styles.css` with the [CSS from the example](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/sveltekit-user-management/src/styles.css).
 
-### Supabase Auth Helpers
+### Supabase Auth helpers
 
 SvelteKit is a highly versatile framework offering pre-rendering at build time (SSG), server-side rendering at request time (SSR), API routes, and more.
 
@@ -186,7 +186,7 @@ Update your `src/routes/+layout.svelte`:
 </div>
 ```
 
-### Set up a Login page
+### Set up a login page
 
 #### Supabase Auth UI
 
@@ -245,7 +245,7 @@ export const load: PageServerLoad = async ({ url, locals: { getSession } }) => {
 }
 ```
 
-### Proof Key for Code Exchange (PKCE)
+### Proof key for Code Exchange (PKCE)
 
 As we are employing Proof Key for Code Exchange (PKCE) in our authentication flow, it is necessary to create a server endpoint responsible for exchanging the code for a session.
 
