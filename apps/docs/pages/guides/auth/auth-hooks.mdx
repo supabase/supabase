@@ -627,7 +627,7 @@ revoke execute
 <TabPanel id="add-metadata-claim-plv8" label="Add claim via plv8">
 You can add custom claims to the access token. In this example, we fetch the level of an existing user from the `profiles` table and assign new users a default level of zero.
 
-For convenience, we enable the `plv8` extension so that we can run JavaScript within our query.
+For convenience, we enable the `plv8` extension under [`Database > Extensions`](/dashboard/project/_/database/extensions) to run JavaScript within our query.
 
 Create a `profiles` table to hold information:
 
@@ -639,7 +639,6 @@ create table profiles (
 );
 ```
 
-Enable the `plv8` extension under [`Database > Extensions`](/dashboard/project/_/database/extensions) to allow us to write JavaScript code within our query.
 
 ```javascript
 create or replace function custom_access_token_hook(event jsonb)
