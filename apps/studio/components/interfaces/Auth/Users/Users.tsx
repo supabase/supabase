@@ -1,11 +1,14 @@
-import { useParams } from 'common'
 import { useState } from 'react'
-import { Button, IconRefreshCw, IconSearch, IconX, Input, Listbox } from 'ui'
 
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import APIDocsButton from 'components/ui/APIDocsButton'
+import NoPermission from 'components/ui/NoPermission'
 import { useUsersQuery } from 'data/auth/users-query'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
+import { Button, IconRefreshCw, IconSearch, IconX, Input, Listbox } from 'ui'
 import AddUserDropdown from './AddUserDropdown'
 import UsersList from './UsersList'
 
@@ -18,6 +21,9 @@ const Users = () => {
   const [search, setSearch] = useState('')
   const [filterKeywords, setFilterKeywords] = useState('')
   const [filterVerified, setFilterVerified] = useState<'verified' | 'unverified'>()
+
+  const canReadUsers = useCheckPermissions(PermissionAction.TENANT_SQL_SELECT, 'auth.users')
+  const isPermissionsLoaded = usePermissionsLoaded()
 
   const { data, isLoading, isSuccess, refetch, isRefetching } = useUsersQuery({
     projectRef,
@@ -99,16 +105,22 @@ const Users = () => {
       <section className="thin-scrollbars mt-4 overflow-visible px-6">
         <div className="section-block--body relative overflow-x-auto rounded">
           <div className="inline-block min-w-full align-middle">
-            <UsersList
-              page={page}
-              setPage={setPage}
-              keywords={filterKeywords}
-              verified={filterVerified}
-              total={data?.total ?? 0}
-              users={data?.users ?? []}
-              isLoading={isLoading}
-              isSuccess={isSuccess}
-            />
+            {isPermissionsLoaded && !canReadUsers ? (
+              <div className="mt-8">
+                <NoPermission isFullPage resourceText="access your project's users" />
+              </div>
+            ) : (
+              <UsersList
+                page={page}
+                setPage={setPage}
+                keywords={filterKeywords}
+                verified={filterVerified}
+                total={data?.total ?? 0}
+                users={data?.users ?? []}
+                isLoading={isLoading}
+                isSuccess={isSuccess}
+              />
+            )}
           </div>
         </div>
       </section>
