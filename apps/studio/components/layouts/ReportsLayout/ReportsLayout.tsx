@@ -20,7 +20,6 @@ const ReportsLayout = ({ title, children }: PropsWithChildren<ReportsLayoutProps
 
   const menuItems = [
     {
-      title: 'Custom reports',
       key: 'reports',
       items: [
         {
