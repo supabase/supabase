@@ -157,7 +157,7 @@ export default [
   },
   {
     type: 'example',
-    tags: ['Nest.js'],
+    tags: ['NestJs'],
     products: [PRODUCT_NAMES.DATABASE, PRODUCT_NAMES.AUTHENTICATION],
     title: 'NestJS example',
     description: 'NestJS example using Supabase Auth',
