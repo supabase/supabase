@@ -5,6 +5,7 @@ import AlertError from 'components/ui/AlertError'
 import MultiSelect from 'components/ui/MultiSelect'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
+import { sortBy } from 'lodash'
 
 interface PolicyRolesProps {
   selectedRoles: string[]
@@ -18,9 +19,10 @@ const PolicyRoles = ({ selectedRoles, onUpdateSelectedRoles }: PolicyRolesProps)
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const roles = (data ?? [])
-    .filter((role) => !SYSTEM_ROLES.includes(role.name as SystemRole))
-    .sort((a, b) => a.name.localeCompare(b.name))
+  const roles = sortBy(
+    (data ?? []).filter((role) => !SYSTEM_ROLES.includes(role.name as SystemRole)),
+    (r) => r.name
+  )
 
   const formattedRoles = roles.map((role) => {
     return {

@@ -1,6 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { partition } from 'lodash'
+import { partition, sortBy } from 'lodash'
 import { useState } from 'react'
 import { Badge, Button, IconPlus, IconSearch, IconX, Input } from 'ui'
 
@@ -39,7 +39,7 @@ const RolesList = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const roles = (data ?? []).sort((a, b) => a.name.localeCompare(b.name))
+  const roles = sortBy(data ?? [], (r) => r.name)
 
   const filteredRoles = (
     filterType === 'active' ? roles.filter((role) => role.active_connections > 0) : roles
@@ -51,9 +51,10 @@ const RolesList = () => {
   const totalActiveConnections = roles
     .map((role) => role.active_connections)
     .reduce((a, b) => a + b, 0)
-  const rolesWithActiveConnections = roles
-    .filter((role) => role.active_connections > 0)
-    .sort((a, b) => b.active_connections - a.active_connections)
+  const rolesWithActiveConnections = sortBy(
+    roles.filter((role) => role.active_connections > 0),
+    (r) => r.active_connections
+  )
 
   return (
     <>
