@@ -1,4 +1,5 @@
 import { Content } from 'mdast'
+import { Node } from 'unist'
 
 export enum ErrorSeverity {
   Error = 1,
@@ -81,7 +82,7 @@ export interface LintError {
   fix?: LintFix
 }
 
-type Check = (content: Content, file: string) => LintError[]
+type Check = (content: Content, index: number, parent: Node, file: string) => LintError[]
 
 export function error({
   message,
@@ -112,7 +113,7 @@ export function error({
 }
 
 export class LintRule {
-  readonly nodeTypes: Content['type'][]
+  readonly nodeTypes: Node['type'][]
   private check: Check
 
   constructor({
@@ -126,7 +127,7 @@ export class LintRule {
     this.nodeTypes = Array.isArray(nodeTypes) ? nodeTypes : [nodeTypes]
   }
 
-  runRule(content: Content, file: string) {
-    return this.check(content, file)
+  runRule(content: Content, index: number, parent: Node, file: string) {
+    return this.check(content, index, parent, file)
   }
 }

@@ -1,8 +1,9 @@
-import { Content, Text } from 'mdast'
+import { Content } from 'mdast'
+import { Node } from 'unist'
 import { capitalizedWords } from '../config/words'
 import { ErrorSeverity, FixReplace, LintError, LintRule, error } from '.'
 
-function headingsSentenceCaseCheck(node: Content, file: string) {
+function headingsSentenceCaseCheck(node: Content, _: number, __: Node, file: string) {
   if (!('children' in node)) {
     return []
   }

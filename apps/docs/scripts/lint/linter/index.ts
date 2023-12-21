@@ -4,9 +4,11 @@ import { fromMarkdown } from 'mdast-util-from-markdown'
 import { mdxFromMarkdown } from 'mdast-util-mdx'
 import { mdxjs } from 'micromark-extension-mdxjs'
 import { extname } from 'path'
+import { visit } from 'unist-util-visit'
 import { headingsSentenceCase } from '../rules/headings-sentence-case'
 import { LintError, LintRule } from '../rules'
 import { walk } from '../../utils/walk'
+import { testIsContent } from '../utils/mdast'
 
 interface Rules {
   byType: Partial<Record<Content['type'], LintRule[]>>
@@ -40,10 +42,10 @@ export async function lint(target: string, options: { autoFix: boolean; isDirect
       mdastExtensions: [mdxFromMarkdown()],
     })
 
-    mdxTree.children.forEach((child) => {
-      if (rules.byType[child.type]) {
-        rules.byType[child.type].forEach((rule) => {
-          const result = rule.runRule(child, page.path)
+    visit(mdxTree, testIsContent, function modify(node, index, parent) {
+      if (rules.byType[node.type]) {
+        rules.byType[node.type].forEach((rule: LintRule) => {
+          const result = rule.runRule(node, index, parent, page.path)
           if (result.length) {
             localErrors.push(...result)
           }
@@ -70,4 +72,5 @@ export async function lint(target: string, options: { autoFix: boolean; isDirect
   })
 
   await Promise.all(result)
+  return errors
 }

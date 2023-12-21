@@ -5,6 +5,10 @@ import { resolve } from 'node:path'
 
 const args = parseArgs({
   options: {
+    debug: {
+      type: 'boolean',
+      short: 'd',
+    },
     fix: {
       type: 'boolean',
       short: 'f',
@@ -29,7 +33,15 @@ async function main() {
     console.log('Autofixing is on')
   }
 
-  lint(target, { autoFix: isAutoFixOn, isDirectory: targetIsDirectory })
+  const isDebugOn = Boolean(args.values.debug)
+  if (isDebugOn) {
+    console.log('Debug mode is on')
+  }
+
+  const errors = await lint(target, { autoFix: isAutoFixOn, isDirectory: targetIsDirectory })
+  if (isDebugOn) {
+    console.log(JSON.stringify(errors, null, 2))
+  }
 }
 
 main()
