@@ -44,10 +44,16 @@ Below is a flow chart illustrating how Supabase Auth uses an Auth Hook:
 
 ### What is a Hook
 
-A hook is a [Postgres Function](https://www.postgresql.org/docs/current/sql-createfunction.html) that takes in a `jsonb` object and return a `jsonb` object. You can transform the `jsonb` input in the body of the hook via native operators such as [JSON operators](https://www.postgresql.org/docs/16/functions-json.html) or extensions such as [plv8](https://supabase.com/docs/guides/database/extensions/plv8).
+A hook is a [Postgres Function](https://www.postgresql.org/docs/current/sql-createfunction.html) with a single argument -- the `event` of type [JSONB]() -- and which returns a JSONB object.
+
+This function is invoked by Supabase Auth at its point in the flow by providing an event object. The object returned by the function gives instructions on how Supabase Auth should continue processing.
+
+To access properties of the `event` argument, you can use the [JSON operators and functions](https://www.postgresql.org/docs/current/functions-json.html). 
+
+There are no restrictions as to what language can be used to write Auth Hooks. If [PL/pgSQL](https://www.postgresql.org/docs/current/plpgsql.html) is too difficult consider using the [plv8](/docs/guides/database/extensions/plv8) extension which lets you use JavaScript to define functions.
 
 <Admonition type="caution">
-  The `?` JSONB operator is not supported as it conflicts with our ORM.
+  If you're using the Supabase SQL Editor, there's an issue when using the `?` (*Does the string exist as a top-level key within the JSON value?*) operator. Use a direct connection to the database if you need to use it when defining a function.
 </Admonition>
 
 Here is an example hook signature:
