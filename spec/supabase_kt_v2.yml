@@ -1982,7 +1982,7 @@ functions:
         name: With `upsert()`
         code: |
           ```kotlin
-          val toUpsert = Country(id = 1, name = "Algeria")
+          val toUpsert = Country(id = 2, name = "Algeria")
           val count = supabase.from("countries").upsert(toUpsert) {
               select()
           }.decodeSingle<Country>()
@@ -2003,7 +2003,7 @@ functions:
           {
             "data": [
               {
-                "id": 1,
+                "id": 2,
                 "name": "Algeria"
               }
             ],
