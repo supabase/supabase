@@ -5,7 +5,7 @@ import EnterpriseHooksConfig from 'components/interfaces/Auth/Hooks/EnterpriseHo
 import { AuthLayout } from 'components/layouts'
 import { FormsContainer } from 'components/ui/Forms'
 import NoPermission from 'components/ui/NoPermission'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
+import { usePermissionsLoaded } from 'hooks'
 import { NextPageWithLayout } from 'types'
 
 const Hooks: NextPageWithLayout = () => {

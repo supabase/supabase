@@ -40,14 +40,6 @@ export const formatTimeToTimeString = (time: Time) => {
   )}:${formatNumberToTwoDigits(time.s)}`
 }
 
-export const getTimezoneOffsetText = (timezone: Timezone) => {
-  return timezone.text.split(')')[0].slice(1)
-}
-
-export const getTimezoneOffset = (timezone: Timezone) => {
-  return timezone.text.split(')')[0].slice(4)
-}
-
 export function constrainDateToRange(current: dayjs.Dayjs, lower: dayjs.Dayjs, upper: dayjs.Dayjs) {
   if (current.isBefore(lower)) {
     return lower

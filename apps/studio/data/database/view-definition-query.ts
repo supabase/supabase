@@ -1,6 +1,5 @@
 import { UseQueryOptions } from '@tanstack/react-query'
-import { useCallback } from 'react'
-import { ExecuteSqlData, useExecuteSqlPrefetch, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { ExecuteSqlData, useExecuteSqlQuery } from '../sql/execute-sql-query'
 
 type GetViewDefinition = {
   schema?: string
@@ -45,17 +44,3 @@ export const useViewDefinitionQuery = <TData extends ViewDefinitionData = ViewDe
   )
 }
 
-export const useViewDefinitionQueryPrefetch = () => {
-  const prefetch = useExecuteSqlPrefetch()
-
-  return useCallback(
-    ({ projectRef, connectionString, schema, name }: ViewDefinitionVariables) =>
-      prefetch({
-        projectRef,
-        connectionString,
-        sql: getViewDefinitionQuery({ schema, name }),
-        queryKey: ['view-definition', schema, name],
-      }),
-    [prefetch]
-  )
-}

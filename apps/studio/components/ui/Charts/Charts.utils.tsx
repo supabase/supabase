@@ -1,4 +1,3 @@
-import { DATETIME_FORMAT } from 'components/interfaces/Reports/Reports.constants'
 import dayjs from 'dayjs'
 import React, { useMemo } from 'react'
 import { ResponsiveContainer } from 'recharts'
@@ -25,7 +24,7 @@ export const numberFormatter = (num: number, precision = 2) =>
  * isFloat(123)     // false
  * isFloat(123.123)     // true
  */
-export const isFloat = (num: number) => String(num).includes('.')
+const isFloat = (num: number) => String(num).includes('.')
 
 /**
  * Formats a number to a particular precision.

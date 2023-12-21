@@ -1,4 +1,3 @@
-import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
 import { IconAlertCircle } from 'ui'
 

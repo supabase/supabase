@@ -1,7 +1,6 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
 import { API_ADMIN_URL } from 'lib/constants'
-import { useCallback } from 'react'
 import { oauthAppKeys } from './keys'
 import { ResponseError } from 'types'
 
@@ -45,15 +44,3 @@ export const useAuthorizedAppsQuery = <TData = AuthorizedAppsData>(
       ...options,
     }
   )
-
-export const useAuthorizedAppsPrefetch = ({ slug }: AuthorizedAppsVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (slug) {
-      client.prefetchQuery(oauthAppKeys.authorizedApps(slug), ({ signal }) =>
-        getAuthorizedApps({ slug }, signal)
-      )
-    }
-  }, [slug])
-}

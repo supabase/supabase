@@ -177,7 +177,7 @@ export function parseSupaTable(
   }
 }
 
-export function onLoadStorage(storageRef: string, tableName: string, schema?: string | null) {
+function onLoadStorage(storageRef: string, tableName: string, schema?: string | null) {
   const storageKey = getStorageKey(STORAGE_KEY_PREFIX, storageRef)
   const jsonStr = localStorage.getItem(storageKey)
   if (!jsonStr) return

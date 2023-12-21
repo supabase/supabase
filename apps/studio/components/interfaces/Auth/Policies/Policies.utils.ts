@@ -58,7 +58,7 @@ export const createSQLPolicy = (
   return {}
 }
 
-export const createSQLStatementForCreatePolicy = (
+const createSQLStatementForCreatePolicy = (
   policyFormFields: PolicyFormField
 ): PolicyForReview => {
   const { name, definition, check, command, schema, table } = policyFormFields
