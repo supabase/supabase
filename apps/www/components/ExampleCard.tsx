@@ -23,7 +23,7 @@ function ExampleCard(props: any) {
       <Panel innerClassName="bg-surface-100 group/panel" hasActiveOnHover>
         <div className="flex flex-col justify-between">
           {props.tags && (
-            <div className="relative w-full aspect-[3/1] bg-alternative flex items-center justify-center gap-4 overflow-hidden">
+            <div className="relative w-full aspect-[3/1] bg-alternative border-b flex items-center justify-center gap-4 overflow-hidden">
               {props.tags.map((tag: string) => {
                 const framework = frameworks.find((f) => f.name === tag)
                 if (!framework) return null
