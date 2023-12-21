@@ -15,7 +15,7 @@ export const SUPABASE_ROLES = [
   'pgsodium_keyiduser',
   'pgsodium_keymaker',
   'pgtle_admin',
-]
+] as const
 
 // [Joshen] This was originally in the Roles mobx store
 // Just keeping it for now in case we need to differ it from ^ SUPABASE_ROLES
@@ -30,15 +30,9 @@ export const SYSTEM_ROLES = [
   'pg_database_owner',
   'pg_read_all_data',
   'pg_write_all_data',
-]
+] as const
 
-export type RolePermission = {
-  disabled: boolean
-  description: string
-  grant_by_dashboard: boolean
-}
-
-export const ROLE_PERMISSIONS: Record<string, RolePermission> = {
+export const ROLE_PERMISSIONS = {
   can_login: {
     disabled: false,
     description: 'User can login',
@@ -70,4 +64,4 @@ export const ROLE_PERMISSIONS: Record<string, RolePermission> = {
       'User can initiate streaming replication and put the system in and out of backup mode',
     grant_by_dashboard: false,
   },
-}
+} as const

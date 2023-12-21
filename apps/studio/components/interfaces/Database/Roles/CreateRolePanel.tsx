@@ -1,12 +1,6 @@
-import toast from 'react-hot-toast'
-import { SidePanel } from 'ui'
-
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useDatabaseRoleCreateMutation } from 'data/database-roles/database-role-create-mutation'
-import { ROLE_PERMISSIONS } from './Roles.constants'
-
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
 import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -15,12 +9,15 @@ import {
   FormMessage_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
+  SidePanel,
   Switch,
 } from 'ui'
-
 import z from 'zod'
 
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormActions } from 'components/ui/Forms'
+import { useDatabaseRoleCreateMutation } from 'data/database-roles/database-role-create-mutation'
+import { ROLE_PERMISSIONS } from './Roles.constants'
 
 interface CreateRolePanelProps {
   visible: boolean
@@ -28,10 +25,7 @@ interface CreateRolePanelProps {
 }
 
 const FormSchema = z.object({
-  name: z
-    .string()
-    .refine((value) => value.trim().length > 0, 'You must provide a name')
-    .default(''),
+  name: z.string().trim().min(1, 'You must provide a name').default(''),
   is_superuser: z.boolean().default(false),
   can_login: z.boolean().default(false),
   can_create_role: z.boolean().default(false),
@@ -55,9 +49,8 @@ const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
 
   const { project } = useProjectContext()
 
-  const form = useForm({
+  const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    defaultValues: initialValues,
   })
 
   const { mutate: createDatabaseRole, isLoading: isCreating } = useDatabaseRoleCreateMutation({
@@ -67,7 +60,7 @@ const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
     },
   })
 
-  const onSubmit = async (values: any) => {
+  const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
     if (!project) return console.error('Project is required')
     createDatabaseRole({
       projectRef: project.ref,
@@ -128,18 +121,16 @@ const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
               </FormLabel_Shadcn_>
             </div>
             <div className="col-span-8 grid gap-4">
-              {Object.keys(ROLE_PERMISSIONS)
+              {(Object.keys(ROLE_PERMISSIONS) as (keyof typeof ROLE_PERMISSIONS)[])
                 .filter((permissionKey) => ROLE_PERMISSIONS[permissionKey].grant_by_dashboard)
                 .map((permissionKey) => {
                   const permission = ROLE_PERMISSIONS[permissionKey]
-                  // const name = permissionKey as keyof typeof ROLE_PERMISSIONS // Ivan help me!
-                  const name = permissionKey as any
 
                   return (
                     <FormField_Shadcn_
                       key={permissionKey}
                       control={form.control}
-                      name={name}
+                      name={permissionKey}
                       render={({ field }) => (
                         <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
                           <FormControl_Shadcn_ className="col-span-8 flex items-center gap-4">
@@ -159,20 +150,19 @@ const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
 
               <div className="grid gap-4">
                 <p className="text-sm">These privileges cannot be granted via the Dashboard:</p>
-                {Object.keys(ROLE_PERMISSIONS)
+                {(Object.keys(ROLE_PERMISSIONS) as (keyof typeof ROLE_PERMISSIONS)[])
                   .filter((permissionKey) => !ROLE_PERMISSIONS[permissionKey].grant_by_dashboard)
                   .map((permissionKey) => {
                     const permission = ROLE_PERMISSIONS[permissionKey]
-                    const name = permissionKey as any // Ivan help me, again!
 
                     return (
                       <FormField_Shadcn_
                         key={permissionKey}
                         control={form.control}
-                        name={name}
+                        name={permissionKey}
                         render={({ field }) => (
-                          <FormItem_Shadcn_ className="   space-y-0 opacity-70">
-                            <FormControl_Shadcn_ className="  flex items-center gap-4">
+                          <FormItem_Shadcn_ className="space-y-0 opacity-70">
+                            <FormControl_Shadcn_ className="flex items-center gap-4">
                               <div className="w-full text-sm">
                                 <Switch
                                   checked={field.value}
