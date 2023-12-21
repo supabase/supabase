@@ -404,7 +404,7 @@ Notice above that, we are using three refine hooks, namely the [`useGetIdentity(
 
 `useLogOut()` is also an auth hook. It calls the `authProvider.logout` method to end the session.
 
-`useForm()`, in contrast, is a data hook that exposes a series of useful objects that serve the edit form. For example, we are grabbing the `onFinish` function to submit the form with the `handleSubmit` event handler. We are aslo using `formLoading` property to present state changes of the submitted form.
+`useForm()`, in contrast, is a data hook that exposes a series of useful objects that serve the edit form. For example, we are grabbing the `onFinish` function to submit the form with the `handleSubmit` event handler. We are also using `formLoading` property to present state changes of the submitted form.
 
 The `useForm()` hook is a higher-level hook built on top of refine's `useForm()` core hook. It fully supports form state management, field validation and submission using React Hook Form. Behind the scenes, it invokes the `dataProvider.getOne` method to get the user profile data from our Supabase `/profiles` endpoint and also invokes `dataProvider.update` method when `onFinish()` is called.
 

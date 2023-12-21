@@ -1,5 +1,6 @@
 import { configure } from 'mobx'
-import { Project } from 'types'
+
+import { Project } from 'data/projects/project-detail-query'
 import UiStore, { IUiStore } from './UiStore'
 import MetaStore, { IMetaStore } from './pgmeta/MetaStore'
 import VaultStore, { IVaultStore } from './project/VaultStore'

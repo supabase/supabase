@@ -1,7 +1,7 @@
 import { isEmpty, last } from 'lodash'
 import { useState } from 'react'
 
-import { Dictionary } from 'components/grid'
+import { Dictionary } from 'types'
 import DrilldownBreadCrumbs from './DrilldownBreadCrumbs'
 import DrilldownPane from './DrilldownPane'
 
@@ -39,6 +39,13 @@ const DrilldownViewer = ({ jsonData = {} }: DrilldownViewerProps) => {
     }
   }
 
+  const resetBreadcrumbs = () => {
+    setActiveKey(undefined)
+    setBreadCrumbs([])
+    setJsonPane1(jsonData)
+    setJsonPane2({})
+  }
+
   const selectBreadcrumb = (crumbPath: string[]) => {
     const key = last(crumbPath) || ''
     setActiveKey(key)
@@ -65,9 +72,13 @@ const DrilldownViewer = ({ jsonData = {} }: DrilldownViewerProps) => {
   }
 
   return (
-    <div className="border border-gray-500 rounded">
+    <div className="border border-x-0 border-t-0 border-gray-500">
       <div className="h-10 px-3 flex-initial flex items-center justify-between">
-        <DrilldownBreadCrumbs breadcrumbs={breadCrumbs} onSelectBreadcrumb={selectBreadcrumb} />
+        <DrilldownBreadCrumbs
+          breadcrumbs={breadCrumbs}
+          onSelectBreadcrumb={selectBreadcrumb}
+          resetBreadcrumbs={resetBreadcrumbs}
+        />
       </div>
       <div className="flex items-stretch flex-auto justify-between border-t border-gray-500">
         <DrilldownPane

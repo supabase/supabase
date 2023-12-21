@@ -89,67 +89,73 @@ const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
         validate={validate}
         onSubmit={onSubmit}
       >
-        <div>
-          <FormSection
-            header={
-              <FormSectionLabel className="lg:!col-span-4">Role Configuration</FormSectionLabel>
-            }
-          >
-            <FormSectionContent loading={false} className="lg:!col-span-8">
-              <Input id="name" label="Name" />
-            </FormSectionContent>
-          </FormSection>
-          <SidePanel.Separator />
-          <FormSection
-            header={<FormSectionLabel className="lg:!col-span-4">Role Privileges</FormSectionLabel>}
-          >
-            <FormSectionContent loading={false} className="lg:!col-span-8">
-              <div className="space-y-[9px]">
-                {Object.keys(ROLE_PERMISSIONS).map((permission) => (
-                  <Toggle
-                    size="small"
-                    disabled={ROLE_PERMISSIONS[permission].disabled}
-                    className={[
-                      'roles-toggle',
-                      ROLE_PERMISSIONS[permission].disabled ? 'opacity-50' : '',
-                    ].join(' ')}
-                    key={permission}
-                    id={permission}
-                    name={permission}
-                    label={ROLE_PERMISSIONS[permission].description}
-                    afterLabel={
-                      ROLE_PERMISSIONS[permission].disabled && (
-                        <Tooltip.Root delayDuration={0}>
-                          <Tooltip.Trigger type="button">
-                            <IconHelpCircle
-                              size="tiny"
-                              strokeWidth={2}
-                              className="ml-2 relative top-[3px]"
-                            />
-                          </Tooltip.Trigger>
-                          <Tooltip.Content align="center" side="bottom">
-                            <Tooltip.Arrow className="radix-tooltip-arrow" />
-                            <div
-                              className={[
-                                'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                'border border-background space-y-1',
-                              ].join(' ')}
-                            >
-                              <span className="text-xs">
-                                This privilege cannot be granted via the dashboard
-                              </span>
-                            </div>
-                          </Tooltip.Content>
-                        </Tooltip.Root>
-                      )
-                    }
-                  />
-                ))}
-              </div>
-            </FormSectionContent>
-          </FormSection>
-          <button ref={submitRef} type="submit" className="hidden" />
-        </div>
+        {({ isSubmitting, handleReset, values, initialValues }: any) => {
+          return (
+            <div>
+              <FormSection
+                header={
+                  <FormSectionLabel className="lg:!col-span-4">Role Configuration</FormSectionLabel>
+                }
+              >
+                <FormSectionContent loading={false} className="lg:!col-span-8">
+                  <Input id="name" label="Name" />
+                </FormSectionContent>
+              </FormSection>
+              <SidePanel.Separator />
+              <FormSection
+                header={
+                  <FormSectionLabel className="lg:!col-span-4">Role Privileges</FormSectionLabel>
+                }
+              >
+                <FormSectionContent loading={false} className="lg:!col-span-8">
+                  <div className="space-y-[9px]">
+                    {Object.keys(ROLE_PERMISSIONS).map((permission) => (
+                      <Toggle
+                        size="small"
+                        disabled={ROLE_PERMISSIONS[permission].disabled}
+                        className={[
+                          'roles-toggle',
+                          ROLE_PERMISSIONS[permission].disabled ? 'opacity-50' : '',
+                        ].join(' ')}
+                        key={permission}
+                        id={permission}
+                        name={permission}
+                        label={ROLE_PERMISSIONS[permission].description}
+                        afterLabel={
+                          ROLE_PERMISSIONS[permission].disabled && (
+                            <Tooltip.Root delayDuration={0}>
+                              <Tooltip.Trigger type="button">
+                                <IconHelpCircle
+                                  size="tiny"
+                                  strokeWidth={2}
+                                  className="ml-2 relative top-[3px]"
+                                />
+                              </Tooltip.Trigger>
+                              <Tooltip.Content align="center" side="bottom">
+                                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                <div
+                                  className={[
+                                    'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                    'border border-background space-y-1',
+                                  ].join(' ')}
+                                >
+                                  <span className="text-xs">
+                                    This privilege cannot be granted via the dashboard
+                                  </span>
+                                </div>
+                              </Tooltip.Content>
+                            </Tooltip.Root>
+                          )
+                        }
+                      />
+                    ))}
+                  </div>
+                </FormSectionContent>
+              </FormSection>
+              <button ref={submitRef} type="submit" className="hidden" />
+            </div>
+          )
+        }}
       </Form>
     </SidePanel>
   )
