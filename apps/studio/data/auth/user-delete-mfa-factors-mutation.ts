@@ -11,11 +11,7 @@ export type UserDeleteMFAFactorsVariables = {
 }
 
 export async function deleteMFAFactors({ projectRef, userId }: UserDeleteMFAFactorsVariables) {
-  const response = IS_PLATFORM
-    ? await delete_(`${API_URL}/auth/${projectRef}/users/${userId}/factors`)
-    : await delete_(`${API_URL}/auth/${projectRef}/users`, {
-        id: userId,
-      })
+  const response = await delete_(`${API_URL}/auth/${projectRef}/users/${userId}/factors`)
   if (response.error) throw response.error
   return response
 }
