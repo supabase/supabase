@@ -31,15 +31,6 @@ You can use hooks at specific points along an Auth flow to perform custom behavi
 
 You can connect a hook to Supabase Auth to signal to Supabase Auth that it should make use of the hook.
 
-Below is a flow chart illustrating how Supabase Auth uses an Auth Hook:
-
-<Image
-  alt="Auth Hooks Flowchart"
-  width={'1000'}
-  height={'400'}
-  src="/docs/img/guides/auth-hooks/hooks-flowchart.png"
-/>
-
 ## Create a Hook
 
 ### What is a Hook
@@ -185,7 +176,7 @@ Example output:
   scrollable
   size="small"
   type="underlined"
-  defaultActiveId="js"
+  defaultActiveId="limit-failed-mfa-verification-attempts"
   queryGroup="language"
 >
 <TabPanel id="limit-failed-mfa-verification-attempts" label="Limit failed MFA verification attempts">
@@ -321,7 +312,7 @@ Example output:
   scrollable
   size="small"
   type="underlined"
-  defaultActiveId="js"
+  defaultActiveId="limit-failed-password-verification-attempts"
   queryGroup="language"
 >
 <TabPanel id="limit-failed-password-verification-attempts" label="Limit failed password verification attempts">
@@ -530,23 +521,8 @@ Claims returned must conform to our specification. Supabase Auth will check for 
 
 These are the fields currently available on an access token:
 
-| Field           | Required |
-| --------------- | -------- |
-| `aud`           | Yes      |
-| `exp`           | Yes      |
-| `jti`           | No       |
-| `iat`           | Yes      |
-| `iss`           | No       |
-| `nbf`           | No       |
-| `sub`           | Yes      |
-| `email`         | Yes      |
-| `phone`         | Yes      |
-| `app_metadata`  | No       |
-| `user_metadata` | No       |
-| `role`          | Yes      |
-| `aal`           | Yes      |
-| `amr`           | No       |
-| `session_id`    | No       |
+Required Claims: `aud`, `exp`, `iat`, `sub`, `email`, `phone`, `role`, `aal`, `session_id`
+Optional Claims: `jti`, `iss`, `nbf`, `app_metadata`, `user_metadata`, `amr`
 
 **Inputs**
 
@@ -567,7 +543,7 @@ Return these only if your hook processed the input without errors.
   scrollable
   size="small"
   type="underlined"
-  defaultActiveId="js"
+  defaultActiveId="add-admin-role"
   queryGroup="language"
 >
 <TabPanel id="add-admin-role" label="Add admin role">
