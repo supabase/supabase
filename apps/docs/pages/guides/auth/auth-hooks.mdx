@@ -402,7 +402,7 @@ revoke all
 </TabPanel>
 <TabPanel id="send-email-on-failed-password-attempt" label="Send email notification on failed password attempts">
 
-You can notify an admin user via email instead of blocking the user. To do so, make use of [Supabase Vault](/docs/guides/database/vault) to store the API Key of our mail provider and use `pg_net` to send a HTTP request to our email provider to send the email.
+You can notify a user via email instead of blocking the user. To do so, make use of [Supabase Vault](/docs/guides/database/vault) to store the API Key of our mail provider and use [`pg_net`](/docs/guides/database/extensions/pg_net) to send a HTTP request to our email provider to send the email. Ensure that you have configured a sender signature for the email account which you are sending emails from.
 
 First, create a table to track sign in attempts.
 
@@ -419,73 +419,75 @@ create table public.password_sign_in_attempts (
 Next, store the API key of our email API provider:
 
 ```sql
-select vault.create_secret('my_secret', 'my_secret_name', 'my_secret_description');
+select vault.create_secret('my_api_key', 'my_api_key_name', 'my_email_provider_api_key');
 ```
 
 Create the hook:
 
 ```sql
-create or replace function public.hook_notify_admin_on_failed_attempts(event jsonb)
+create or replace function public.hook_notify_user_on_failed_attempts(event jsonb)
 returns jsonb
 language plpgsql
 as $$
   declare
     user_id uuid;
     server_token text;
-    admin_email_address text;
-    email_body text;
-    response jsonb;
+    user_email_address text;
+    email_body jsonb;
+    response_id int; -- Variable to store the response ID
     http_code int;
-    error_message text;
+    error_message jsonb;
     attempt_count int;
     max_attempts int := 5; -- Set the threshold for failed attempts
   begin
     user_id := (event->>'user_id')::uuid;
 
-    -- Record the attempt, successful or not
+    -- Record the attempt
     insert into public.password_sign_in_attempts (user_id, attempt_id, last_attempt_at, attempt_successful)
     values (user_id, (event->>'attempt_id')::uuid, now(), (event->>'valid')::boolean)
     on conflict (user_id, attempt_id)
     do update set last_attempt_at = now(), attempt_successful = (event->>'valid')::boolean;
 
-    -- Check the number of recent failed attempts
-    select count(*) into attempt_count
-    from public.password_sign_in_attempts
-    where user_id = user_id and attempt_successful = false and last_attempt_at > (now() - interval '1 day');
+    -- Check failed attempts and fetch user email
+    select count(*), u.email into attempt_count, user_email_address
+    from public.password_sign_in_attempts a
+    join auth.users u on a.user_id = u.id
+    where a.user_id = user_id and attempt_successful = false and last_attempt_at > (now() - interval '1 day');
 
-    -- Notify admin if the number of failed attempts exceeds the threshold
+    -- Notify user if the number of failed attempts exceeds the threshold
     if attempt_count >= max_attempts then
-      -- Fetch the server token and admin email address
-      select token into server_token from vault.decrypted_secrets where name = 'my_secret_name';
-      admin_email_address := 'admin@example.com'; -- Replace with actual admin email
+      -- Fetch the server token
+      select decrypted_secret into server_token from vault.decrypted_secrets where name = 'my_api_key_name';
 
       -- Prepare the email body
-      email_body := format('{"from": "yoursenderemail@example.com",
-                             "to": "%s",
-                             "subject": "Repeated Login Attempts Detected",
-                             "textbody": "Alert: Repeated login attempts detected for user ID: %s.",
-                             "htmlbody": "<html><body><strong>Alert:</strong> Repeated login attempts detected for user ID: %s.</body></html>",
-                             "messagestream": "outbound"}', admin_email_address, user_id, user_id);
+      email_body := format('{
+        "from": "yoursenderemail@example.com",
+        "to": "%s",
+        "subject": "Security Alert: Repeated Login Attempts Detected",
+        "textbody": "We have detected repeated login attempts for your account. If this was not you, please secure your account.",
+        "htmlbody": "<html><body><strong>Security Alert:</strong> We have detected repeated login attempts for your account. If this was not you, please secure your account.</body></html>",
+        "messagestream": "outbound"
+      }', user_email_address)::jsonb;
 
-      -- Perform the HTTP POST request using the mail API
-      select net.http_post(
-        'https://api.yourmailprovider.com/send', -- Replace with actual mail API endpoint
+      -- Perform the HTTP POST request using Postmark
+      select id into response_id from net.http_post(
+        'https://api.youremailprovider.com/email',
         email_body,
         'application/json',
-        array['accept: application/json', 'x-api-key: ' || server_token]
-      ) into response;
+        array['Accept: application/json', 'X-Postmark-Server-Token: ' || server_token]
+      );
 
-      -- Extract HTTP code and error message, if any
-      http_code := (response ->> 'status')::int;
-      error_message := response ->> 'message';
+      -- Fetch the response from net._http_response using the obtained id
+      select status_code, content into http_code, error_message from net._http_response where id = response_id;
 
       -- Handle email sending errors
-      if (response -> 'status' is null) or (http_code < 200 or http_code >= 300) then
+      if http_code is null or (http_code < 200 or http_code >= 300) then
         return jsonb_build_object(
           'error', jsonb_build_object(
             'http_code', coalesce(http_code, 0),
-            'message', coalesce(error_message, 'error sending email')
-          ));
+            'message', coalesce(error_message ->> 'message', 'error sending email')
+          )
+        );
       end if;
     end if;
 
@@ -496,11 +498,11 @@ $$;
 
 -- Assign appropriate permissions
 grant execute
-  on function public.hook_notify_admin_on_failed_attempts
+  on function public.hook_notify_user_on_failed_attempts
   to supabase_auth_admin;
 
 revoke execute
-  on function public.hook_notify_admin_on_failed_attempts
+  on function public.hook_notify_user_on_failed_attempts
   from authenticated, anon;
 
 grant all
