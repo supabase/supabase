@@ -419,9 +419,8 @@ create table public.password_sign_in_attempts (
 Next, store the API key of our email API provider:
 
 ```sql
-select vault.create_secret('my_api_key', 'my_api_key_name', 'my_email_provider_api_key');
+select vault.create_secret('my_api_key', 'my_api_key_name', 'description_of_my_api_key');
 ```
-
 Create the hook:
 
 ```sql
