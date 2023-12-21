@@ -1,4 +1,4 @@
-import generator from 'generate-password'
+import generator from 'generate-password-browser'
 import { debounce } from 'lodash'
 import { useRouter } from 'next/router'
 import { ChangeEvent, useRef, useState } from 'react'
