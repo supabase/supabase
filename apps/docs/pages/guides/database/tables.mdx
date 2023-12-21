@@ -21,7 +21,7 @@ For example, this table has 3 "columns" (`id`, `name`, `description`) and 4 "row
 
 There are a few important differences from a spreadsheet, but it's a good starting point if you're new to Relational databases.
 
-## Creating Tables
+## Creating tables
 
 When creating a table, it's best practice to add columns at the same time.
 
@@ -140,7 +140,7 @@ if the default types don't fit your needs. You can use any data type that Postgr
 You can "cast" columns from one type to another, however there can be some incompatibilities between types.
 For example, if you cast a `timestamp` to a `date`, you will lose all the time information that was previously saved.
 
-### Primary Keys
+### Primary keys
 
 A table can have a "primary key" - a unique identifier for every row of data. A few tips for Primary Keys:
 
@@ -260,7 +260,7 @@ psql -h DATABASE_URL -p 5432 -d postgres -U postgres \
 
 If you receive an error `FATAL:  password authentication failed for user "postgres"`, reset your database password in the Database Settings and try again.
 
-## Joining tables with Foreign Keys
+## Joining tables with foreign keys
 
 Tables can be "joined" together using Foreign Keys.
 
@@ -471,7 +471,7 @@ where courses.code != 'PG101';
 
 Without a view, we would need to go into every dependent query to add the new rule. This would increase in the likelihood of errors and inconsistencies, as well as introducing a lot of effort for a developer. With views, we can alter just the underlying query in the view **transcripts**. The change will be applied to all applications using this view.
 
-#### Logical Organization
+#### Logical organization
 
 With views, we can give our query a name. This is extremely useful for teams working with the same database. Instead of guessing what a query is supposed to do, a well-named view can easily explain it. For example, by looking at the name of the view **transcripts**, we can infer that the underlying query might involve the **students**, **courses**, and **grades** tables.
 
@@ -479,7 +479,7 @@ With views, we can give our query a name. This is extremely useful for teams wor
 
 Views can restrict the amount and type of data presented to a user. Instead of allowing a user direct access to a set of tables, we provide them a view instead. We can prevent them from reading sensitive columns by excluding them from the underlying query.
 
-### Materialized Views
+### Materialized views
 
 A [materialized view](https://www.postgresql.org/docs/12/rules-materializedviews.html) is a form of view but it also stores the results to disk. In subsequent reads of a materialized view, the time taken to return its results would be much faster than a conventional view. This is because the data is readily available for a materialized view while the conventional view executes the underlying query each time it is called.
 
@@ -515,7 +515,7 @@ refresh materialized view transcripts;
 
 It's up to you how regularly refresh your materialized views, and it's probably different for each view depending on its use-case.
 
-### Materialized views vs Conventional views
+### Materialized views vs conventional views
 
 Materialized views are useful when execution times for queries or views are too slow. These could likely occur in views or queries involving multiple tables and billions of rows. When using such a view, however, there should be tolerance towards data being outdated. Some use-cases for materialized views are internal dashboards and analytics.
 

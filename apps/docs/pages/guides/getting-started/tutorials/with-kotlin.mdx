@@ -24,7 +24,7 @@ If you get stuck while working through this guide, refer to the [full example on
 
 ## Building the app
 
-### Create new Android project
+### Create new android project
 
 Open Android Studio > New Project > Base Activity (Jetpack Compose).
 
@@ -43,7 +43,7 @@ SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 SUPABASE_URL=YOUR_SUPABASE_URL
 ```
 
-#### Read and set value to BuildConfig
+#### Read and set value to buildConfig
 
 In your `build.gradle` (app) file, create a `Properties` object and read the values from your `local.properties` file by calling the `buildConfigField` method:
 
@@ -99,7 +99,7 @@ plugins {
 }
 ```
 
-### Set up Hilt for dependency injection
+### Set up hilt for dependency injection
 
 In the `build.gradle` (app) file, add the following:
 
@@ -137,7 +137,7 @@ class MainActivity : ComponentActivity() {
 }
 ```
 
-### Provide Supabase instances with Hilt
+### Provide Supabase instances with hilt
 
 To make the app easier to test, create a `SupabaseMdule.kt` file as follows:
 

@@ -78,7 +78,7 @@ order by document_sections.embedding <#> embedding;
 
 The above example only configures `select` access to users. If you wanted, you could create more RLS policies for inserts, updates, and deletes in order to apply the same permission logic for those other operations. See [Row Level Security](/docs/guides/database/postgres/row-level-security) for a more in-depth guide on RLS policies.
 
-## Alternative Scenarios
+## Alternative scenarios
 
 Every app has its own unique requirements and may differ from the above example. Here are some alternative scenarios we often see and how they are implemented in Supabase.
 
@@ -189,7 +189,7 @@ Since we're managing users and authentication outside of Supabase, we have two o
 1. Make a direct Postgres connection to the Supabase DB and set the current user every request
 2. Issue a custom JWT from your system and use it to authenticate with the REST API
 
-#### Direct Postgres Connection
+#### Direct Postgres connection
 
 You can directly connect to your Supabase Postgres DB using the [connection info](/dashboard/project/_/settings/database) on your project's database settings page. To use RLS with this method, we use a custom session variable that contains the current user's ID:
 

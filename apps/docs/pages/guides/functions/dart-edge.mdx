@@ -28,7 +28,7 @@ Make sure you have [the edge CLI](https://docs.dartedge.dev/#getting-started) in
 dart pub global activate edge
 ```
 
-## Setting up your first Dart Edge project
+## Setting up your first dart edge project
 
 Create a new Dart Edge project using the `new` command on the edge CLI. This will create a familiar boilerplate for your Dart Edge project such as `main.dart` and `pubspec.yaml` file.
 
@@ -74,7 +74,7 @@ supabase:
     webhook_handler: 'lib/webhooks.dart'
 ```
 
-## Using Supabase Client
+## Using Supabase client
 
 Now let’s try to interact with our Supabase database. We will start by installing the dependencies.
 
@@ -92,7 +92,7 @@ We also need to use a special HTTP client to HTTP requests in the edge environme
 dart pub add edge_http_client
 ```
 
-### Initialize SupabaseClient
+### Initialize supabaseClient
 
 At this point, you can initialize a `SupabaseClient` by passing the [EdgeHttpClient](https://pub.dev/packages/edge_http_client). We can access the Supabase credentials through the [environment variables](https://supabase.com/docs/guides/functions/secrets) using `Deno.env.get()` method. Note that [Supabase credentials are available by default](https://supabase.com/docs/guides/functions/secrets), so no configurations are necessary.
 
@@ -120,7 +120,7 @@ void main() {
 }
 ```
 
-## Run the Functions
+## Run the functions
 
 ### Run locally
 
@@ -146,7 +146,7 @@ You should be able to access your local function here:
 
 [http://localhost:54321/functions/v1/dart_edge](http://localhost:54321/functions/v1/dart_edge)
 
-### Deploy to the Edge
+### Deploy to the edge
 
 Run the following commands to compile and deploy your function on Supabase Edge functions.
 

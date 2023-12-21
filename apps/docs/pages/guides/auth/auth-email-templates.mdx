@@ -28,7 +28,7 @@ The templating system provides the following variables for use:
 
 ## Limitations
 
-### Email Prefetching
+### Email prefetching
 
 Certain email providers may have spam detection or other security features that prefetch URL links from incoming emails (e.g. [Safe Links in Microsoft Defender for Office 365](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-links-about?view=o365-worldwide)).
 In this scenario, the `{{ .ConfirmationURL }}` sent will be consumed instantly which leads to a "Token has expired or is invalid" error.
@@ -47,7 +47,7 @@ To guard against this:
   The user should be brought to a page on your site where they can confirm the action by clicking a button.
   The button should contain the actual confirmation link which can be obtained from parsing the `confirmation_url={{ .ConfirmationURL }}` query parameter in the URL.
 
-### Email Tracking
+### Email tracking
 
 If you are using an external email provider that enables "email tracking", the links inside the Supabase email templates will be overwritten and won't perform as expected. We recommend disabling email tracking to ensure email links are not overwritten.
 

@@ -31,9 +31,9 @@ You can use hooks at specific points along an Auth flow to perform custom behavi
 
 You can connect a hook to Supabase Auth to signal to Supabase Auth that it should make use of the hook.
 
-## Create a Hook
+## Create a hook
 
-### What is a Hook
+### What is a hook
 
 A hook is a [Postgres Function](https://www.postgresql.org/docs/current/sql-createfunction.html) with a single argument -- the `event` of type [JSONB]() -- and which returns a JSONB object.
 
@@ -124,11 +124,11 @@ When an error is returned, the error is propagated from the hook to Supabase Aut
 
 Ensure that your hooks complete within **2 seconds** to avoid any errors.
 
-### Connect a Hook
+### Connect a hook
 
 In the dashboard, navigate to [`Authentication > Hooks (Beta)`](/dashboard/project/_/auth/hooks) and select the appropriate PostgreSQL function from the dropdown menu.
 
-## Hook: MFA Verification Attempt
+## Hook: MFA verification attempt
 
 You can add additional checks to the [Supabase MFA implementation](/docs/guides/auth/auth-mfa) with hooks. For example, you can:
 
@@ -268,7 +268,7 @@ revoke all
 </TabPanel>
 </Tabs>
 
-## Hook: Password Verification Attempt
+## Hook: Password verification attempt
 
 Your company wishes to increase security beyond the requirements of the default password implementation in order to fulfill security or compliance requirements. You plan to track the status of a password sign-in attempt and take action via an email or a restriction on logins where necessary.
 
@@ -513,7 +513,7 @@ revoke all
 </TabPanel>
 </Tabs>
 
-## Hook: Custom Access Token
+## Hook: Custom access token
 
 The custom access token hook runs before a token is issued and allows you to add additional claims based on the authentication method used.
 

@@ -21,7 +21,7 @@ The number of dimensions in your embeddings is the most important factor in choo
 
 ## HNSW
 
-### 384 Dimensions
+### 384 dimensions
 
 This benchmark uses the dbpedia-entities-openai-1M dataset containing 1,000,000 embeddings of text, regenerated for 384 dimension embeddings. Each embedding is generated using [gte-small](https://huggingface.co/Supabase/gte-small).
 
@@ -52,7 +52,7 @@ Accuracy was 0.99 for benchmarks.
 </TabPanel>
 </Tabs>
 
-### 960 Dimensions
+### 960 dimensions
 
 This benchmark uses the [gist-960](http://corpus-texmex.irisa.fr/) dataset, which contains 1,000,000 embeddings of images. Each embedding is 960 dimensions.
 
@@ -85,7 +85,7 @@ QPS can also be improved by increasing [`m` and `ef_construction`](/docs/guides/
 </TabPanel>
 </Tabs>
 
-### 1536 Dimensions
+### 1536 dimensions
 
 This benchmark uses the [dbpedia-entities-openai-1M](https://huggingface.co/datasets/KShivendu/dbpedia-entities-openai-1M) dataset, which contains 1,000,000 embeddings of text. And 224,482 embeddings from [Wikipedia articles](https://huggingface.co/datasets/Supabase/wikipedia-en-embeddings) for compute add-ons `large` and below. Each embedding is 1536 dimensions created with the [OpenAI Embeddings API](https://platform.openai.com/docs/guides/embeddings).
 
@@ -136,7 +136,7 @@ It is possible to upload more vectors to a single table if Memory allows it (for
 
 ## IVFFlat
 
-### 384 Dimensions
+### 384 dimensions
 
 This benchmark uses the dbpedia-entities-openai-1M dataset containing 1,000,000 embeddings of text, regenerated for 384 dimension embeddings. Each embedding is generated using [gte-small](https://huggingface.co/Supabase/gte-small).
 
@@ -181,7 +181,7 @@ This benchmark uses the dbpedia-entities-openai-1M dataset containing 1,000,000 
 </TabPanel>
 </Tabs>
 
-### 960 Dimensions
+### 960 dimensions
 
 This benchmark uses the [gist-960](http://corpus-texmex.irisa.fr/) dataset, which contains 1,000,000 embeddings of images. Each embedding is 960 dimensions.
 
@@ -210,7 +210,7 @@ This benchmark uses the [gist-960](http://corpus-texmex.irisa.fr/) dataset, whic
 </TabPanel>
 </Tabs>
 
-### 1536 Dimensions
+### 1536 dimensions
 
 This benchmark uses the [dbpedia-entities-openai-1M](https://huggingface.co/datasets/KShivendu/dbpedia-entities-openai-1M) dataset, which contains 1,000,000 embeddings of text. Each embedding is 1536 dimensions created with the [OpenAI Embeddings API](https://platform.openai.com/docs/guides/embeddings).
 
@@ -322,7 +322,7 @@ You can increase the Requests per Second by increasing `m` and `ef_construction`
 
 Check out more tips and the complete step-by-step guide in [Going to Production for AI applications](going-to-prod).
 
-## Benchmark Methodology
+## Benchmark methodology
 
 We follow techniques outlined in the [ANN Benchmarks](https://github.com/erikbern/ann-benchmarks) methodology. A Python test runner is responsible for uploading the data, creating the index, and running the queries. The pgvector engine is implemented using [vecs](https://github.com/supabase/vecs), a Python client for pgvector.
 
