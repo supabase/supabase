@@ -1982,10 +1982,10 @@ functions:
         name: With `upsert()`
         code: |
           ```kotlin
-          val toUpsert = User(username = "supabot")
-          val count = supabase.from("users").upsert(toUpsert) {
+          val toUpsert = Country(id = 1, name = "Algeria")
+          val count = supabase.from("countries").upsert(toUpsert) {
               select()
-          }.decodeSingle<User>()
+          }.decodeSingle<Country>()
           ```
         data:
           sql: |
