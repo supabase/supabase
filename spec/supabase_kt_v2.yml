@@ -518,7 +518,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          let toUpsert = User(username = "supabot")
+          val toUpsert = User(username = "supabot")
           supabase.from("users").upsert(toUpsert, onConflict = "username")
           ```
       - id: upsert-return-row-count
@@ -526,7 +526,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          let toUpsert = User(username = "supabot")
+          val toUpsert = User(username = "supabot")
           val count = supabase.from("users").upsert(toUpsert, onConflict = "username") {
               count(Count.EXACT)
           }.count()
@@ -1963,6 +1963,56 @@ functions:
           }
           ```
         hideCodeBlock: true
+  - id: using-modifiers
+    title: Using Modifiers
+    description: |
+      Filters work on the row level—they allow you to return rows that
+      only match certain conditions without changing the shape of the rows.
+      Modifiers are everything that don't fit that definition—allowing you to
+      change the format of the response (e.g., returning a CSV string).
+
+      Modifiers are be specified next to the filter block. Some modifiers only apply for
+      queries that return rows (e.g., `select()` or `rpc()` on a function that
+      returns a table response).
+  - id: db-modifiers-select
+    title: select()
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.select'
+    examples:
+      - id: with-upsert
+        name: With `upsert()`
+        code: |
+          ```kotlin
+          val toUpsert = Country(id = 2, name = "Algeria")
+          val count = supabase.from("countries").upsert(toUpsert) {
+              select()
+          }.decodeSingle<Country>()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 2,
+                "name": "Algeria"
+              }
+            ],
+            "status": 201,
+            "statusText": "Created"
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
   - id: order
     title: order()
     description: |
