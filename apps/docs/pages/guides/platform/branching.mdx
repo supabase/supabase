@@ -572,7 +572,7 @@ If you have multiple preview branches, each preview branch might contain differe
 
 When a preview branch is merged into the production branch, it creates a schema drift between the production branch and the preview branches you haven't merged yet.
 
-You can solve thse conflicts the way you would solve normal Git Conflicts: merge or rebase from your production Git branch to your preview Git branch. Since migrations are applied sequentially, ensure that migration files are timestamped correctly after the rebase. Changes that build on top of earlier changes should always have later timestamps.
+You can solve these conflicts the way you would solve normal Git Conflicts: merge or rebase from your production Git branch to your preview Git branch. Since migrations are applied sequentially, ensure that migration files are timestamped correctly after the rebase. Changes that build on top of earlier changes should always have later timestamps.
 
 ### Changing Production Branch
 

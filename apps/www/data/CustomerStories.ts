@@ -5,7 +5,8 @@ export const data = [
     description:
       "Explore how Shotgun achieved remarkable database efficiency and reduced costs by 80% through their successful migration to Supabase's managed services.",
     imgUrl: 'images/customers/logos/shotgun.png',
-    logoUrl: 'images/customers/logos/shotgun.png',
+    logo: '/images/customers/logos/shotgun.png',
+    logo_inverse: '/images/customers/logos/light/shotgun.png',
     organization: 'Shotgun',
     url: '/customers/shotgun',
     path: '/customers/shotgun',
@@ -19,10 +20,31 @@ export const data = [
   },
   {
     type: 'Customer Story',
+    title:
+      'Good Tape migrates to Supabase managed Postgres and Authentication and achieves database efficiency and a 60% cost reduction',
+    description:
+      "Explore how Good Tape achieved remarkable database efficiency and reduced costs by 60% through their successful migration to Supabase's managed services.",
+    imgUrl: 'images/customers/logos/goodtape.png',
+    logo: '/images/customers/logos/goodtape.png',
+    logo_inverse: '/images/customers/logos/light/goodtape.png',
+    organization: 'Good Tape',
+    url: '/customers/good-tape',
+    path: '/customers/good-tape',
+    postMeta: {
+      name: 'Paul Copplestone',
+      avatarUrl: 'https://avatars0.githubusercontent.com/u/10214025?v=4',
+      publishDate: 'Oct 31, 2023',
+      readLength: 4,
+    },
+    ctaText: 'View story',
+  },
+  {
+    type: 'Customer Story',
     title: 'How Next Door Lending leveraged Supabase to become a top 10 mortgage broker',
     description: '',
     imgUrl: 'images/customers/logos/next-door-lending.png',
-    logoUrl: 'images/customers/logos/next-door-lending.png',
+    logo: '/images/customers/logos/next-door-lending.png',
+    logo_inverse: '/images/customers/logos/light/next-door-lending.png',
     organization: 'Next Door Lending',
     url: '/customers/next-door-lending',
     path: '/customers/next-door-lending',
@@ -40,7 +62,8 @@ export const data = [
     description:
       'Learn how Pebblely, an AI image generation company, used Supabase Auth for rapid growth and adaptable security solutions.',
     imgUrl: 'images/customers/logos/pebblely.png',
-    logoUrl: 'images/customers/logos/pebblely.png',
+    logo: '/images/customers/logos/pebblely.png',
+    logo_inverse: '/images/customers/logos/light/pebblely.png',
     organization: 'Pebblely',
     url: '/customers/pebblely',
     path: '/customers/pebblely',
@@ -58,7 +81,8 @@ export const data = [
     description:
       'How Yasser leveraged Supabase to build Chatbase and became one of the most successful single-founder AI products.',
     imgUrl: 'images/customers/logos/chatbase.png',
-    logoUrl: 'images/customers/logos/chatbase.png',
+    logo: '/images/customers/logos/chatbase.png',
+    logo_inverse: '/images/customers/logos/light/chatbase.png',
     organization: 'Chatbase',
     url: '/customers/chatbase',
     path: '/customers/chatbase',
@@ -76,7 +100,8 @@ export const data = [
     description:
       'Learn how one of the most popular Generative AI projects uses Supabase as their Vector Store.',
     imgUrl: 'images/customers/logos/quivr.png',
-    logoUrl: 'images/customers/logos/quivr.png',
+    logo: '/images/customers/logos/quivr.png',
+    logo_inverse: '/images/customers/logos/light/quivr.png',
     organization: 'Quivr',
     url: '/customers/quivr',
     path: '/customers/quivr',
@@ -94,7 +119,8 @@ export const data = [
     description:
       'Learn how Berri AI overcame challenges with self-hosting their vector database on AWS RDS and successfully migrated to Supabase.',
     imgUrl: 'images/customers/logos/berriai.png',
-    logoUrl: 'images/customers/logos/berriai.png',
+    logo: '/images/customers/logos/berriai.png',
+    logo_inverse: '/images/customers/logos/light/berriai.png',
     organization: 'Berri AI',
     url: '/customers/berriai',
     path: '/customers/berriai',
@@ -108,11 +134,12 @@ export const data = [
   },
   {
     type: 'Customer Story',
-    title: 'Mendable.ai switches from Pinecone to Supabase for PostgreSQL vector embeddings.',
+    title: 'Mendable.ai switches from Pinecone to Supabase for PostgreSQL vector embeddings',
     description:
-      'How Mendable.ai boosts efficiency and accuracy of chat powered search for documentation using Supabase with pg_vector.',
+      'How Mendable.ai boosts efficiency and accuracy of chat powered search for documentation using Supabase with pg_vector',
     imgUrl: 'images/customers/logos/mendableai.png',
-    logoUrl: 'images/customers/logos/mendableai.png',
+    logo: '/images/customers/logos/mendableai.png',
+    logo_inverse: '/images/customers/logos/light/mendableai.png',
     organization: 'Mendable.ai',
     url: '/customers/mendableai',
     path: '/customers/mendableai',
@@ -130,7 +157,8 @@ export const data = [
     description:
       'How a bootstrapped startup migrated from Heroku to Supabase in 30 minutes and never looked back.',
     imgUrl: 'images/customers/logos/happyteams.png',
-    logoUrl: 'images/customers/logos/happyteams.png',
+    logo: '/images/customers/logos/happyteams.png',
+    logo_inverse: '/images/customers/logos/light/happyteams.png',
     organization: 'HappyTeams',
     url: '/customers/happyteams',
     path: '/customers/happyteams',
@@ -149,7 +177,8 @@ export const data = [
     description:
       'As a payment processor, Xendit are responsible for verifying that all transactions are legal.',
     imgUrl: 'images/customers/logos/xendit.png',
-    logoUrl: 'images/customers/logos/xendit.png',
+    logo: '/images/customers/logos/xendit.png',
+    logo_inverse: '/images/customers/logos/light/xendit.png',
     organization: 'Xendit',
     url: '/customers/xendit',
     path: '/customers/xendit',
@@ -167,7 +196,8 @@ export const data = [
     description:
       'With Supabase, Replenysh gets a slick auth experience, reduces DevOps overhead, and continues to scale with Postgres.',
     imgUrl: 'images/customers/logos/replenysh.png',
-    logoUrl: 'images/customers/logos/replenysh.png',
+    logo: '/images/customers/logos/replenysh.png',
+    logo_inverse: '/images/customers/logos/light/replenysh.png',
     organization: 'Replenysh',
     url: '/customers/replenysh',
     path: '/customers/replenysh',

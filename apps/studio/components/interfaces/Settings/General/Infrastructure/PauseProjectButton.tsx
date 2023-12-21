@@ -12,7 +12,8 @@ import {
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useProjectPauseMutation } from 'data/projects/project-pause-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
 
 const PauseProjectButton = () => {
@@ -20,6 +21,7 @@ const PauseProjectButton = () => {
   const router = useRouter()
   const queryClient = useQueryClient()
   const { project } = useProjectContext()
+  const organization = useSelectedOrganization()
   const isProjectActive = useIsProjectActive()
   const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -29,6 +31,9 @@ const PauseProjectButton = () => {
     PermissionAction.INFRA_EXECUTE,
     'queue_jobs.projects.pause'
   )
+
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
+  const isFreePlan = subscription?.plan.id === 'free'
 
   const { mutate: pauseProject, isLoading: isPausing } = useProjectPauseMutation({
     onSuccess: (res, variables) => {
@@ -48,6 +53,9 @@ const PauseProjectButton = () => {
     pauseProject({ ref: projectRef })
   }
 
+  const buttonDisabled =
+    !isFreePlan || project === undefined || isPaused || !canPauseProject || !isProjectActive
+
   return (
     <>
       <Tooltip.Root delayDuration={0}>
@@ -57,12 +65,12 @@ const PauseProjectButton = () => {
             icon={<IconPause />}
             onClick={() => setIsModalOpen(true)}
             loading={isPausing}
-            disabled={project === undefined || isPaused || !canPauseProject || !isProjectActive}
+            disabled={buttonDisabled}
           >
             Pause Project
           </Button>
         </Tooltip.Trigger>
-        {project !== undefined && (isPaused || !canPauseProject || !isProjectActive) ? (
+        {buttonDisabled ? (
           <Tooltip.Portal>
             <Tooltip.Content side="bottom">
               <Tooltip.Arrow className="radix-tooltip-arrow" />
@@ -79,6 +87,8 @@ const PauseProjectButton = () => {
                     ? 'You need additional permissions to pause this project'
                     : !isProjectActive
                     ? 'Unable to pause project as project is not active'
+                    : !isFreePlan
+                    ? 'Projects on a paid plan will always be running'
                     : ''}
                 </span>
               </div>
