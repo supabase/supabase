@@ -10,6 +10,7 @@ interface PolicyRolesProps {
   selectedRoles: string[]
   onUpdateSelectedRoles: (roles: string[]) => void
 }
+type SystemRole = (typeof SYSTEM_ROLES)[number]
 
 const PolicyRoles = ({ selectedRoles, onUpdateSelectedRoles }: PolicyRolesProps) => {
   const { project } = useProjectContext()
@@ -18,7 +19,7 @@ const PolicyRoles = ({ selectedRoles, onUpdateSelectedRoles }: PolicyRolesProps)
     connectionString: project?.connectionString,
   })
   const roles = (data ?? [])
-    .filter((role) => !SYSTEM_ROLES.includes(role.name))
+    .filter((role) => !SYSTEM_ROLES.includes(role.name as SystemRole))
     .sort((a, b) => a.name.localeCompare(b.name))
 
   const formattedRoles = roles.map((role) => {
