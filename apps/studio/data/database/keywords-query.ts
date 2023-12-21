@@ -40,4 +40,3 @@ export const useKeywordsQuery = <TData extends KeywordsData = KeywordsData>(
     }
   )
 }
-

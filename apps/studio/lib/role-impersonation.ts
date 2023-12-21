@@ -63,10 +63,7 @@ function getPostgrestClaims(projectRef: string, role: PostgrestImpersonationRole
   }
 }
 
-function getPostgrestRoleImpersonationSql(
-  projectRef: string,
-  role: PostgrestImpersonationRole
-) {
+function getPostgrestRoleImpersonationSql(projectRef: string, role: PostgrestImpersonationRole) {
   const claims = getPostgrestClaims(projectRef, role)
 
   return /* SQL */ `

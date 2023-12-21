@@ -84,8 +84,4 @@ function usePrevious(value: any) {
   return ref.current
 }
 
-export {
-  useKeyboardShortcuts,
-  TooltipListener,
-  usePrevious,
-}
+export { useKeyboardShortcuts, TooltipListener, usePrevious }

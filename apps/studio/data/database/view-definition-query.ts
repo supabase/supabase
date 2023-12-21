@@ -43,4 +43,3 @@ export const useViewDefinitionQuery = <TData extends ViewDefinitionData = ViewDe
     }
   )
 }
-
