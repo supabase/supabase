@@ -175,7 +175,8 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
                       ].join(' ')}
                       afterLabel={
                         !disabled &&
-                        ROLE_PERMISSIONS[permission].disabled && (
+                        ROLE_PERMISSIONS[permission].disabled &&
+                        ((
                           <Tooltip.Root delayDuration={0}>
                             <Tooltip.Trigger type="button">
                               <IconHelpCircle
@@ -200,7 +201,7 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
                               </Tooltip.Content>
                             </Tooltip.Portal>
                           </Tooltip.Root>
-                        )
+                        ) as any)
                       }
                     />
                   ))}
