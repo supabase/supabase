@@ -15,7 +15,11 @@ function ExampleCard(props: any) {
   if (!mounted) return null
 
   return (
-    <Link href={props.repo_url} className="w-full h-full" target="_blank">
+    <Link
+      href={props.repo_url}
+      className="relative w-full h-full focus-visible:outline-brand focus-visible:rounded-xl"
+      target="_blank"
+    >
       <Panel innerClassName="bg-surface-100 group/panel" hasActiveOnHover>
         <div className="flex flex-col justify-between">
           {props.tags && (
@@ -90,6 +94,7 @@ function ExampleCard(props: any) {
             <div className="flex items-stretch gap-2">
               {props.repo_url && (
                 <Button
+                  tabIndex={-1}
                   size="tiny"
                   type="text"
                   className="group overflow-hidden text-foreground-lighter group-hover/panel:text-foreground !bg-transparent !p-0"
