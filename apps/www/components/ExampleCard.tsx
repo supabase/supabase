@@ -105,17 +105,17 @@ function ExampleCard(props: any) {
         <div>
           <div className="flex flex-col justify-between p-5 pt-0">
             {/* opacity-100 lg:opacity-0 group-hover/panel:opacity-100 transition-opacity */}
-            <div className="flex items-stretch gap-2 opacity-100 lg:opacity-0 group-hover/panel:opacity-100 transition-opacity">
+            <div className="flex items-stretch gap-2">
               {props.repo_url && (
                 <Button
                   asChild
                   size="tiny"
                   type="text"
-                  className="group overflow-hidden"
+                  className="group overflow-hidden !bg-transparent !p-0"
                   iconRight={
                     <div className="relative w-3.5 h-3.5 flex items-center justify-center">
-                      <IconArrowUpRight className="absolute inset-0 transition-transform duration-200 translate-x-0 translate-y-0 group-hover:translate-x-6 group-hover:-translate-y-6" />
-                      <IconArrowUpRight className="absolute inset-0 transition-transform duration-200 -translate-x-6 translate-y-6 group-hover:translate-x-0 group-hover:-translate-y-0" />
+                      <IconArrowUpRight className="absolute inset-0 transition-transform duration-200 translate-x-0 translate-y-0 group-hover/panel:translate-x-6 group-hover/panel:-translate-y-6" />
+                      <IconArrowUpRight className="absolute inset-0 transition-transform duration-200 -translate-x-6 translate-y-6 group-hover/panel:translate-x-0 group-hover/panel:-translate-y-0" />
                     </div>
                   }
                 >
