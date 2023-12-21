@@ -2,12 +2,20 @@ import Link from 'next/link'
 import { Button, IconArrowUpRight } from 'ui'
 import { useBreakpoint } from 'common'
 import Panel from './Panel'
+import { useEffect, useState } from 'react'
 
 function ExampleCard(props: any) {
   const isXs = useBreakpoint()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) return null
 
   return (
-    <Link href={props.repo_url} className="w-full h-full">
+    <Link href={props.repo_url} className="w-full h-full" target="_blank">
       <Panel innerClassName="bg-surface-100 group/panel" hasActiveOnHover>
         <div className="flex flex-col justify-between">
           {props.tags && (
