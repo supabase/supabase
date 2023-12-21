@@ -44,13 +44,13 @@ Below is a flow chart illustrating how Supabase Auth uses an Auth Hook:
 
 ### What is a Hook
 
-A hook is a [Postgres Function](https://www.postgresql.org/docs/current/sql-createfunction.html) that takes in a `jsonb` object and return a `jsonb` object. You can transform the `jsonb` input in the body of the hook via native operators such as [JSON operators](https://www.postgresql.org/docs/16/functions-json.html) or extensions such as [plv8](https://supabase.com/docs/guides/database/extensions/plv8) which allow you to use JavaScript within Postgres.
+A hook is a [Postgres Function](https://www.postgresql.org/docs/current/sql-createfunction.html) that takes in a `jsonb` object and return a `jsonb` object. You can transform the `jsonb` input in the body of the hook via native operators such as [JSON operators](https://www.postgresql.org/docs/16/functions-json.html) or extensions such as [plv8](https://supabase.com/docs/guides/database/extensions/plv8).
 
 <Admonition type="caution">
   The `?` JSONB operator is not supported as it conflicts with our ORM.
 </Admonition>
 
-A hook typically has the following signature:
+Here is an example hook signature:
 
 ```sql
 create or replace function public.custom_access_token_hook(event jsonb)
