@@ -25,7 +25,13 @@ async function main() {
   let target = args.positionals[0]
   target = resolve(target)
 
-  const targetIsDirectory = await isDirectory(target)
+  let targetIsDirectory: boolean
+  try {
+    targetIsDirectory = await isDirectory(target)
+  } catch {
+    console.error('Coud not access target file or directory:', target)
+    process.exit(1)
+  }
   console.log(targetIsDirectory ? 'Linting directory:' : 'Linting file:', target)
 
   const isAutoFixOn = Boolean(args.values.fix)
