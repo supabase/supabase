@@ -3,7 +3,7 @@ import { PRODUCT_NAMES } from 'shared-data/products'
 export default [
   {
     type: 'example',
-    tags: ['Next.js'],
+    tags: ['Next.js', 'Stripe', 'Vercel'],
     products: [PRODUCT_NAMES.DATABASE, PRODUCT_NAMES.AUTHENTICATION],
     title: 'Stripe Subscriptions Starter',
     description:
@@ -35,7 +35,7 @@ export default [
   },
   {
     type: 'example',
-    tags: ['AI'],
+    tags: ['Next.js', 'OpenAI', 'Vercel'],
     products: [PRODUCT_NAMES.DATABASE, PRODUCT_NAMES.AUTHENTICATION, PRODUCT_NAMES.VECTOR],
     title: 'AI Chatbot',
     description:
@@ -51,7 +51,7 @@ export default [
   },
   {
     type: 'example',
-    tags: ['AI'],
+    tags: ['LangChain', 'Next.js'],
     products: [PRODUCT_NAMES.DATABASE, PRODUCT_NAMES.VECTOR],
     title: 'LangChain + Next.js Starter',
     description:
@@ -98,6 +98,7 @@ export default [
   },
   {
     type: 'example',
+    tags: ['Svelte'],
     products: [PRODUCT_NAMES.DATABASE],
     title: 'Svelte kanban board',
     description: 'A Trello clone using Supabase as the storage system.',
@@ -111,6 +112,7 @@ export default [
   },
   {
     type: 'example',
+    tags: ['Next.js'],
     products: [PRODUCT_NAMES.DATABASE],
     title: 'Next.js Realtime chat app',
     description: 'Next.js Slack clone app using Supabase realtime subscriptions',
@@ -125,6 +127,7 @@ export default [
   },
   {
     type: 'example',
+    tags: ['Next.js'],
     products: [PRODUCT_NAMES.DATABASE, PRODUCT_NAMES.AUTHENTICATION],
     title: 'Next.js Subscription and Auth',
     description: 'The all-in-one starter kit for high-performance SaaS applications.',
@@ -139,6 +142,7 @@ export default [
   },
   {
     type: 'example',
+    tags: ['Expo', 'React'],
     products: [PRODUCT_NAMES.DATABASE],
     title: 'Expo React Native Starter',
     description: 'Template bottom tabs with auth flow (Typescript)',
@@ -153,6 +157,7 @@ export default [
   },
   {
     type: 'example',
+    tags: ['Nest.js'],
     products: [PRODUCT_NAMES.DATABASE, PRODUCT_NAMES.AUTHENTICATION],
     title: 'NestJS example',
     description: 'NestJS example using Supabase Auth',
@@ -166,6 +171,7 @@ export default [
   },
   {
     type: 'example',
+    tags: ['React'],
     products: [PRODUCT_NAMES.DATABASE],
     title: 'ReactJS realtime chat app',
     description: 'Example app of real-time chat using supabase realtime api',
@@ -179,6 +185,7 @@ export default [
   },
   {
     type: 'example',
+    tags: ['Javascript'],
     products: [PRODUCT_NAMES.DATABASE, PRODUCT_NAMES.AUTHENTICATION],
     title: 'Vanilla-js Auth app',
     description:
@@ -193,6 +200,7 @@ export default [
   },
   {
     type: 'example',
+    tags: ['React'],
     products: [PRODUCT_NAMES.DATABASE],
     title: 'React Native todo list app',
     description: 'React Native Todo List example with Expo',
@@ -207,6 +215,7 @@ export default [
   },
   {
     type: 'example',
+    tags: ['Next.js'],
     products: [PRODUCT_NAMES.DATABASE],
     title: 'Next.js todo list app',
     description: 'Next.js todo list example',
@@ -221,6 +230,7 @@ export default [
   },
   {
     type: 'example',
+    tags: ['React'],
     products: [PRODUCT_NAMES.DATABASE],
     title: 'React todo list app',
     description: 'React todo List example',
@@ -235,6 +245,7 @@ export default [
   },
   {
     type: 'example',
+    tags: ['Svelte'],
     products: [PRODUCT_NAMES.DATABASE],
     title: 'Svelte todo list app',
     description: 'Sveltejs todo with TailwindCSS and Snowpack',
@@ -249,6 +260,7 @@ export default [
   },
   {
     type: 'example',
+    tags: ['Vue'],
     products: [PRODUCT_NAMES.DATABASE],
     title: 'Vue.js todo list app',
     description: 'Vue.js todo app using TypeScript',
@@ -263,6 +275,7 @@ export default [
   },
   {
     type: 'example',
+    tags: ['Angular'],
     products: [PRODUCT_NAMES.DATABASE],
     title: 'Angular todo list app',
     description: 'Angular todo List example',
