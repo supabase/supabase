@@ -1,5 +1,5 @@
 import Layout from '~/layouts/DefaultGuideLayout'
-import {CodeBlock, Admonition, Accordion} from 'ui'
+import { CodeBlock, Admonition, Accordion } from 'ui'
 import Image from 'next/image'
 
 export const meta = {
@@ -9,7 +9,7 @@ export const meta = {
 }
 
 <Admonition type="info">
-Hooks are in beta. They will be available for all projects in early 2024.
+  Hooks are in beta. They will be available for all projects in early 2024.
 </Admonition>
 
 Supabase allows you to use Postgres functions to alter the default Supabase Auth flow. Developers can use hooks to add custom behavior that's not supported natively.
@@ -23,11 +23,11 @@ Hooks help you:
 
 You can use hooks at specific points along an Auth flow to perform custom behavior via Postgres Functions. The following hooks are available:
 
-| Hook                             | Available on Plan       |
-|----------------------------------|-------------------------|
-| Custom Access Token              | Free, Pro               |
-| MFA Verification Attempt         | Teams and Enterprise    |
-| Password Verification Attempt    | Teams and Enterprise    |
+| Hook                          | Available on Plan    |
+| ----------------------------- | -------------------- |
+| Custom Access Token           | Free, Pro            |
+| MFA Verification Attempt      | Teams and Enterprise |
+| Password Verification Attempt | Teams and Enterprise |
 
 You can connect a hook to Supabase Auth to signal to Supabase Auth that it should make use of the hook.
 
@@ -37,16 +37,17 @@ Below is a flow chart illustrating how Supabase Auth uses an Auth Hook:
   alt="Auth Hooks Flowchart"
   width={'1000'}
   height={'400'}
-  src="/docs/img/guides/auth-hooks/hooks-flowchart.png"/>
-
+  src="/docs/img/guides/auth-hooks/hooks-flowchart.png"
+/>
 
 ## Create a Hook
+
 ### What is a Hook
 
 A hook is a [Postgres Function](https://www.postgresql.org/docs/current/sql-createfunction.html) that takes in a `jsonb` object and return a `jsonb` object. You can transform the `jsonb` input in the body of the hook via native operators such as [JSON operators](https://www.postgresql.org/docs/16/functions-json.html) or extensions such as [plv8](https://supabase.com/docs/guides/database/extensions/plv8) which allow you to use JavaScript within Postgres.
 
 <Admonition type="caution">
-The `?` JSONB operator is not supported as it conflicts with our ORM.
+  The `?` JSONB operator is not supported as it conflicts with our ORM.
 </Admonition>
 
 A hook typically has the following signature:
@@ -87,19 +88,18 @@ revoke execute
   from authenticated, anon;
 ```
 
-<Admonition type="caution">
-Avoid adding a `security definer` tag to the function to avoid permission errors.
-</Admonition>
+For security, we recommend against the use the `security definer` tag. The `security definer` tag specifies that the function is to be executed with the privileges of the user that owns it. When a function is created via the Supabase dashboard with the tag, it will have the extensive permissions of the `postgres` role.
 
-Postgres functions have an implicit tag of `security invoker` which grants the calling user (`supabase_auth_admin`) appropriate permissions.
+We recommend that you do not use any tag and explicitly grant permissions to `supabase_auth_admin` as described above.
 
-Read more about `security definer` and `security invoker` tags [in our database guide](/docs/guides/database/functions#security-definer-vs-invoker).
+Read more about `security definer` tag [in our database guide](/docs/guides/database/functions#security-definer-vs-invoker).
 
 ### Hook errors
 
-You should return an error when facing a runtime error. Runtime errors are specific to your application and arise from specific business logic rather than programmer errors.
+You should return an error when facing a runtime error. Runtime errors are specific to your application and arise from specific business rules rather than programmer errors.
 
 Runtime errors could happen when:
+
 - The user does not have appropriate permissions
 - The event payload received does not have required claims.
 - The user has performed an action which violates a business rule.
@@ -107,8 +107,8 @@ Runtime errors could happen when:
 The error is a JSON object and has the following properties:
 
 - `error` An object that contains information about the error.
-    - `http_code` A number indicating the HTTP code to be returned. If not set, the code is HTTP 500 Internal Server Error.
-    - `message` A message to be returned in the HTTP response. Required.
+  - `http_code` A number indicating the HTTP code to be returned. If not set, the code is HTTP 500 Internal Server Error.
+  - `message` A message to be returned in the HTTP response. Required.
 
 Here's an example:
 
@@ -131,7 +131,6 @@ Ensure that your hooks complete within **2 seconds** to avoid any errors.
 
 In the dashboard, navigate to [`Authentication > Hooks (Beta)`](/dashboard/project/_/auth/hooks) and select the appropriate PostgreSQL function from the dropdown menu.
 
-
 ## Hook: MFA Verification Attempt
 
 You can add additional checks to the [Supabase MFA implementation](/docs/guides/auth/auth-mfa) with hooks. For example, you can:
@@ -144,7 +143,7 @@ You can add additional checks to the [Supabase MFA implementation](/docs/guides/
 
 Supabase Auth will supply the following fields to your hook:
 
-- `factor_id` Unique identifier for the MFA factor being verified. 
+- `factor_id` Unique identifier for the MFA factor being verified.
 - `user_id` Unique identifier for the user.
 - `valid` Whether the verification attempt was valid. For TOTP, this means that the six digit code was correct (true) or incorrect (false).
 
@@ -152,9 +151,9 @@ Example payload:
 
 ```json
 {
-	"factor_id": "6eab6a69-7766-48bf-95d8-bd8f606894db",
-	"user_id": "3919cb6e-4215-4478-a960-6d3454326cec",
-	"valid": true,
+  "factor_id": "6eab6a69-7766-48bf-95d8-bd8f606894db",
+  "user_id": "3919cb6e-4215-4478-a960-6d3454326cec",
+  "valid": true
 }
 ```
 
@@ -169,10 +168,11 @@ Example output:
 
 ```json
 {
-   "decision": "reject",
-   "message" : "You have exceeded maximum number of MFA attempts."
+  "decision": "reject",
+  "message": "You have exceeded maximum number of MFA attempts."
 }
 ```
+
 **Examples**
 
 <Tabs
@@ -182,7 +182,7 @@ Example output:
   defaultActiveId="js"
   queryGroup="language"
 >
-<TabPanel id="limit-failed-mfa-verification-attempts" label="Limit Failed MFA Verification Attempts">
+<TabPanel id="limit-failed-mfa-verification-attempts" label="Limit failed MFA verification attempts">
 
 Your company requires that a user can input an incorrect MFA Verification code no more than once every 2 seconds.
 
@@ -267,6 +267,7 @@ revoke all
   on table public.mfa_failed_verification_attempts
   from authenticated, anon;
 ```
+
 </TabPanel>
 </Tabs>
 
@@ -274,9 +275,9 @@ revoke all
 
 Your company wishes to increase security beyond the requirements of the default password implementation in order to fulfill security or compliance requirements. You plan to track the status of a password sign-in attempt and take action via an email or a restriction on logins where necessary.
 
-As this hook runs on unauthenticated requests, malicious users can abuse the hook by calling it multiple times.  Pay extra care when using the hook as you can unintentionally block legitimate users from accessing your application.
+As this hook runs on unauthenticated requests, malicious users can abuse the hook by calling it multiple times. Pay extra care when using the hook as you can unintentionally block legitimate users from accessing your application.
 
-Check if a password is valid prior to taking any additional action to ensure the user is legitimate. Where possible, give preference to sending an email or notification over blocking the user.
+Check if a password is valid prior to taking any additional action to ensure the user is legitimate. Where possible, send an email or notification instead of blocking the user.
 
 **Inputs**
 
@@ -285,8 +286,8 @@ Check if a password is valid prior to taking any additional action to ensure the
 
 ```json
 {
-	"user_id": "3919cb6e-4215-4478-a960-6d3454326cec",
-	"valid": true,
+  "user_id": "3919cb6e-4215-4478-a960-6d3454326cec",
+  "valid": true
 }
 ```
 
@@ -302,9 +303,9 @@ Example output:
 
 ```json
 {
-   "decision": "reject",
-   "message" : "You have exceeded maximum number of password sign-in attempts.",
-   "should_logout_user": "false"
+  "decision": "reject",
+  "message": "You have exceeded maximum number of password sign-in attempts.",
+  "should_logout_user": "false"
 }
 ```
 
@@ -317,7 +318,7 @@ Example output:
   defaultActiveId="js"
   queryGroup="language"
 >
-<TabPanel id="limit-failed-password-verification-attempts" label="Limit Failed Password Verification Attempts">
+<TabPanel id="limit-failed-password-verification-attempts" label="Limit failed password verification attempts">
 
 As part of new security measures within the company, users can only input an incorrect password every 10 seconds and not more than that. You want to write a hook to enforce this.
 
@@ -397,12 +398,13 @@ revoke all
   on table public.password_failed_verification_attempts
   from authenticated, anon;
 ```
+
 </TabPanel>
-<TabPanel id="send-email-on-first-password-login" label="Send Email On First Password Login">
+<TabPanel id="send-email-on-failed-password-attempt" label="Send email notification on failed password attempts">
 
-Your company would like to send out a welcome email to users on the first time they login via email and password. We make use of [Supabase Vault](/docs/guides/database/vault) to store the API Key of our mail provider and we use `pg_net` to send a HTTP request to our email provider to send the email.
+You can notify an admin user via email instead of blocking the user. To do so, make use of [Supabase Vault](/docs/guides/database/vault) to store the API Key of our mail provider and use `pg_net` to send a HTTP request to our email provider to send the email.
 
-Create a table to track sign in attempts.
+First, create a table to track sign in attempts.
 
 ```sql
 create table public.password_sign_in_attempts (
@@ -414,7 +416,8 @@ create table public.password_sign_in_attempts (
 );
 ```
 
-Store the API key of our email API provider:
+Next, store the API key of our email API provider:
+
 ```sql
 select vault.create_secret('my_secret', 'my_secret_name', 'my_secret_description');
 ```
@@ -422,71 +425,69 @@ select vault.create_secret('my_secret', 'my_secret_name', 'my_secret_description
 Create the hook:
 
 ```sql
-create or replace function public.hook_send_welcome_email(event jsonb)
+create or replace function public.hook_notify_admin_on_failed_attempts(event jsonb)
 returns jsonb
 language plpgsql
 as $$
   declare
     user_id uuid;
     server_token text;
-    email_address text;
+    admin_email_address text;
     email_body text;
     response jsonb;
     http_code int;
     error_message text;
     attempt_count int;
+    max_attempts int := 5; -- Set the threshold for failed attempts
   begin
     user_id := (event->>'user_id')::uuid;
 
-    -- check if the password verification is valid
-    if event->'valid' is true then
-      -- Check the number of previous attempts
-      select count(*) into attempt_count
-      from public.password_sign_in_attempts
-      where user_id = user_id;
+    -- Record the attempt, successful or not
+    insert into public.password_sign_in_attempts (user_id, attempt_id, last_attempt_at, attempt_successful)
+    values (user_id, (event->>'attempt_id')::uuid, now(), (event->>'valid')::boolean)
+    on conflict (user_id, attempt_id)
+    do update set last_attempt_at = now(), attempt_successful = (event->>'valid')::boolean;
 
-      -- If it's the first successful login, send a welcome email
-      if attempt_count = 0 then
-        -- Fetch the server token and email address
-        select token into server_token from vault.decrypted_secrets where name = 'your_postmark_key';
-        select email into email_address from auth.users where id = user_id;
+    -- Check the number of recent failed attempts
+    select count(*) into attempt_count
+    from public.password_sign_in_attempts
+    where user_id = user_id and attempt_successful = false and last_attempt_at > (now() - interval '1 day');
 
-        -- Construct the welcome email body
-        email_body := format('{"from": "yoursenderemail@example.com",
-                               "to": "%s",
-                               "subject": "Welcome to Our Service",
-                               "textbody": "Welcome! Thank you for joining our service.",
-                               "htmlbody": "<html><body><strong>Welcome!</strong> Thank you for joining our service.</body></html>",
-                               "messagestream": "outbound"}', email_address);
+    -- Notify admin if the number of failed attempts exceeds the threshold
+    if attempt_count >= max_attempts then
+      -- Fetch the server token and admin email address
+      select token into server_token from vault.decrypted_secrets where name = 'my_secret_name';
+      admin_email_address := 'admin@example.com'; -- Replace with actual admin email
 
-        -- Perform the HTTP POST request using Postmark
-        select net.http_post(
-          'https://api.postmarkapp.com/email',
-          email_body,
-          'application/json',
-          array['accept: application/json', 'x-postmark-server-token: ' || server_token]
-        ) into response;
+      -- Prepare the email body
+      email_body := format('{"from": "yoursenderemail@example.com",
+                             "to": "%s",
+                             "subject": "Repeated Login Attempts Detected",
+                             "textbody": "Alert: Repeated login attempts detected for user ID: %s.",
+                             "htmlbody": "<html><body><strong>Alert:</strong> Repeated login attempts detected for user ID: %s.</body></html>",
+                             "messagestream": "outbound"}', admin_email_address, user_id, user_id);
 
-        -- Extract HTTP code and error message, if any
-        http_code := (response ->> 'status')::int;
-        error_message := response ->> 'message';
+      -- Perform the HTTP POST request using the mail API
+      select net.http_post(
+        'https://api.yourmailprovider.com/send', -- Replace with actual mail API endpoint
+        email_body,
+        'application/json',
+        array['accept: application/json', 'x-api-key: ' || server_token]
+      ) into response;
 
-        -- Handle email sending errors
-        if (response -> 'status' is null) or (http_code < 200 or http_code >= 300) then
-          return jsonb_build_object(
-            'error', jsonb_build_object(
-              'http_code', coalesce(http_code, 0),
-              'message', coalesce(error_message, 'error sending email')
-            ));
-        end if;
+      -- Extract HTTP code and error message, if any
+      http_code := (response ->> 'status')::int;
+      error_message := response ->> 'message';
+
+      -- Handle email sending errors
+      if (response -> 'status' is null) or (http_code < 200 or http_code >= 300) then
+        return jsonb_build_object(
+          'error', jsonb_build_object(
+            'http_code', coalesce(http_code, 0),
+            'message', coalesce(error_message, 'error sending email')
+          ));
       end if;
     end if;
-
-    -- Record the attempt, successful or not
-    insert into public.password_sign_in_attempts (user_id, attempt_id, last_failed_at)
-    values (user_id, (event->>'attempt_id')::uuid, now())
-    on conflict (user_id, attempt_id)
-    do update set last_failed_at = now();
 
     -- Continue with default behavior
     return jsonb_build_object('decision', 'continue');
@@ -495,21 +496,22 @@ $$;
 
 -- Assign appropriate permissions
 grant execute
-  on function send_welcome_email
+  on function public.hook_notify_admin_on_failed_attempts
   to supabase_auth_admin;
 
 revoke execute
-  on function public.send_welcome_email
+  on function public.hook_notify_admin_on_failed_attempts
   from authenticated, anon;
 
 grant all
-  on table public.password_verification_attempts
+  on table public.password_sign_in_attempts
   to supabase_auth_admin;
 
 revoke all
-  on table public.password_verification_attempts
+  on table public.password_sign_in_attempts
   from authenticated, anon;
 ```
+
 </TabPanel>
 </Tabs>
 
@@ -522,30 +524,29 @@ Claims returned must conform to our specification. Supabase Auth will check for 
 These are the fields currently available on an access token:
 
 | Field           | Required |
-|-----------------|-------------------|
-| `aud`           | Yes               |
-| `exp`           | Yes               |
-| `jti`           | No                |
-| `iat`           | Yes               |
-| `iss`           | No                |
-| `nbf`           | No                |
-| `sub`           | Yes               |
-| `email`         | Yes               |
-| `phone`         | Yes               |
-| `app_metadata`  | No                |
-| `user_metadata` | No                |
-| `role`          | Yes               |
-| `aal`           | Yes               |
-| `amr`           | No                |
-| `session_id`    | No                |
-
+| --------------- | -------- |
+| `aud`           | Yes      |
+| `exp`           | Yes      |
+| `jti`           | No       |
+| `iat`           | Yes      |
+| `iss`           | No       |
+| `nbf`           | No       |
+| `sub`           | Yes      |
+| `email`         | Yes      |
+| `phone`         | Yes      |
+| `app_metadata`  | No       |
+| `user_metadata` | No       |
+| `role`          | Yes      |
+| `aal`           | Yes      |
+| `amr`           | No       |
+| `session_id`    | No       |
 
 **Inputs**
 
 - `user_id` Unique identifier for the user attempting to sign in. Correlate this to the `auth.users` table.
 - `claims` Claims which are attached to the access token.
 - `authentication_method` the authentication method used to request the access token. Possible values include:
-`oauth`, `password`, `otp`, `totp`, `recovery`, `invite`, `sso/saml`, `magiclink`, `email/signup`, `email_change`, `token_refresh`.
+  `oauth`, `password`, `otp`, `totp`, `recovery`, `invite`, `sso/saml`, `magiclink`, `email/signup`, `email_change`, `token_refresh`.
 
 **Outputs**
 
@@ -562,9 +563,9 @@ Return these only if your hook processed the input without errors.
   defaultActiveId="js"
   queryGroup="language"
 >
-<TabPanel id="add-admin-role" label="Add Admin Role">
+<TabPanel id="add-admin-role" label="Add admin role">
 
-Your company would like to allow registered admin users to perform restricted actions by granting an `admin` claim to their token.
+You can allow registered admin users to perform restricted actions by granting an `admin` claim to their token.
 
 Create a profiles table with an `is_admin` flag:
 
@@ -619,9 +620,12 @@ revoke execute
   on function public.custom_access_token_hook
   from authenticated, anon;
 ```
+
 </TabPanel>
-<TabPanel id="add-metadata-claim-plv8" label="Add Claim Via PLV8">
-Your company runs a new version of a gamification app and would like to add a `level` claim to the access token. We fetch the level of an existing user from the `profiles` table and assign new users a default level of zero.
+<TabPanel id="add-metadata-claim-plv8" label="Add claim via plv8">
+You can add custom claims to the access token. In this example, we fetch the level of an existing user from the `profiles` table and assign new users a default level of zero.
+
+For convenience, we enable the `plv8` extension so that we can run JavaScript within our query.
 
 Create a `profiles` table to hold information:
 
@@ -662,9 +666,10 @@ as $$
   return event;
 $$;
 ```
+
 </TabPanel>
-<TabPanel id="restrict-access-to-select-users" label="Restrict Access To Select Users">
-Your company has an internal application which should only be accessible to employees. All employees will have to log in via Single Sign On (SSO). We exempt some employees from the policy via an allowlist.
+<TabPanel id="restrict-access-to-sso-users" label="Restrict access to SSO users">
+You can restrict access to internal applications with a hook. For example, you require that employees log in via [SAML Single Sign On (SSO)](/docs/guides/auth/sso/auth-sso-saml). You can exempt some employees from the policy via an allowlist.
 
 ```sql
 create or replace function public.restrict_application_access(event jsonb)
@@ -705,6 +710,7 @@ revoke execute
   on function public.restrict_application_access
   from authenticated, anon;
 ```
+
 </TabPanel>
 </Tabs>
 
