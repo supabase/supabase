@@ -10,8 +10,8 @@ function ExampleCard(props: any) {
   const isXs = useBreakpoint()
 
   return (
-    <>
-      <Panel innerClassName="bg-surface-100 group/panel">
+    <Link href={props.repo_url} className="w-full h-full">
+      <Panel innerClassName="bg-surface-100 group/panel" hasActiveOnHover>
         <div className="flex flex-col justify-between">
           <div className="w-full aspect-[3/1] bg-alternative flex items-center justify-center gap-4">
             <svg
@@ -30,7 +30,7 @@ function ExampleCard(props: any) {
           <div className="p-5 flex flex-col gap-2">
             <div className="flex items-start justify-between">
               <h4 className="text-foreground text-lg">{props.title} </h4>
-              {props.showProducts && (
+              {/* {props.showProducts && (
                 <div className="inline-flex gap-1.5">
                   {props.products.map((product: string) => (
                     <div
@@ -38,7 +38,6 @@ function ExampleCard(props: any) {
                       className="opacity-100 lg:opacity-0 group-hover/panel:opacity-100 transition-opacity w-6 h-6 flex items-center justify-center bg-surface-300 rounded border border-control text-xs text-lighter"
                       title={product}
                     >
-                      {/* {product} */}
                       <svg
                         width="16"
                         height="16"
@@ -57,14 +56,14 @@ function ExampleCard(props: any) {
                     </div>
                   ))}
                 </div>
-              )}
+              )} */}
             </div>
             <p className="text-sm text-foreground-muted">{props.description}</p>
           </div>
         </div>
         <div>
           <div className="flex flex-col justify-between p-5 pt-0">
-            <div className="pt-5 border-t flex items-stretch gap-2">
+            <div className="pt-5 border-t flex items-stretch gap-2 opacity-100 lg:opacity-0 group-hover/panel:opacity-100 transition-opacity">
               {props.repo_url && (
                 <Button
                   asChild
@@ -115,7 +114,7 @@ function ExampleCard(props: any) {
           disableInternalStyle
         />
       )}
-    </>
+    </Link>
   )
 }
 
