@@ -87,23 +87,23 @@ Read more about [Rate Limiting, Resource Allocation, & Abuse Prevention.](/docs/
 
 Large data imports can affect your database performance. Failed imports can also cause data corruption. Importing data is a safe and common operation, but you should plan ahead if you're importing a lot of data, or if you're working in a production environment.
 
-### 1. back up your data
+### 1. Back up your data
 
 Backups help you restore your data if something goes wrong. Databases on Pro and Enterprise plans are automatically backed up on schedule, but you can also take your own backup. See [Database Backups](/docs/guides/platform/backups) for more information.
 
-### 2. increase statement timeouts
+### 2. Increase statement timeouts
 
 By default, Supabase enforces query statement timeouts to ensure fair resource allocation and prevent long-running queries from affecting the overall system. When importing large datasets, you may encounter timeouts. To address this:
 
 - **Increase the Statement Timeout**: You can adjust the statement timeout for your session or connection to accommodate longer-running queries. Be cautious when doing this, as excessively long queries can negatively impact system performance. Read more about [Statement Timeouts](/docs/guides/database/postgres/configuration).
 
-### 3. estimate your required disk size
+### 3. Estimate your required disk size
 
 Large datasets consume disk space. Ensure your Supabase project has sufficient disk capacity to accommodate the imported data. If you know how big your database is going to be, you can manually increase the size in your [projects database settings](/dashboard/project/_/settings/database).
 
 Read more about [disk management](/docs/guides/platform/database-size#disk-management).
 
-### 4. disable triggers
+### 4. Disable triggers
 
 When importing large datasets, it's often beneficial to disable triggers temporarily. Triggers can significantly slow down the import process, especially if they involve complex logic or referential integrity checks. After the import, you can re-enable the triggers.
 
@@ -117,7 +117,7 @@ ALTER TABLE table_name DISABLE TRIGGER ALL;
 ALTER TABLE table_name ENABLE TRIGGER ALL;
 ```
 
-### 5. rebuild indices after data import is complete
+### 5. Rebuild indices after data import is complete
 
 Indexing is crucial for query performance, but building indices while importing a large dataset can be time-consuming. Consider building or rebuilding indices after the data import is complete. This approach can significantly speed up the import process and reduce the overall time required.
 

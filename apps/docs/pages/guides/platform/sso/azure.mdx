@@ -14,7 +14,7 @@ This feature is only available on the Teams and Enterprise tiers. Please contact
 
 Supabase supports single sign-on (SSO) using Microsoft Azure AD.
 
-## Step 1: Add and register an enterprise application [#add-and-register-enterprise-application]
+## Step 1: Add and register an Enterprise application [#add-and-register-enterprise-application]
 
 Open up the [Azure Active Directory](https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/Overview) dashboard for your Azure account.
 
@@ -22,7 +22,7 @@ Click the _Add_ button then _Enterprise application_.
 
 ![Azure AD console: Default Directory Overview](/docs/img/sso-azure-step-01.png)
 
-## Step 2: Choose create your own application [#create-application]
+## Step 2: Choose Create your own application [#create-application]
 
 You'll be using the custom enterprise application setup for Supabase.
 
@@ -37,7 +37,7 @@ don't find in the gallery (Non-gallery)_.
 
 ![Azure AD console: Create your own application modal](/docs/img/sso-azure-step-03.png)
 
-## Step 4: Choose the set up single sign-on option [#set-up-single-sign-on]
+## Step 4: Choose the Set up single sign-on option [#set-up-single-sign-on]
 
 Before you get to assigning users and groups, which would allow accounts in Azure AD to access Supabase, you need to configure the SAML details that allows Supabase to accept sign in requests from Azure AD.
 
@@ -49,7 +49,7 @@ Supabase only supports the SAML 2.0 protocol for Single Sign-On, which is an ind
 
 ![Azure AD console: Supabase application, Single sign-on configuration screen, selected SAML](/docs/img/sso-azure-step-05.png)
 
-## Step 6: Upload sAML-based sign-on metadata file [#upload-saml-metadata]
+## Step 6: Upload SAML-based sign-on metadata file [#upload-saml-metadata]
 
 First you need to download Supabase's SAML metadata file. Click the button below to initiate a download of the file.
 

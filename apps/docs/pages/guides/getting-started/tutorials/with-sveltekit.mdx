@@ -47,7 +47,7 @@ PUBLIC_SUPABASE_ANON_KEY="YOUR_SUPABASE_KEY"
 
 Optionally, add `src/styles.css` with the [CSS from the example](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/sveltekit-user-management/src/styles.css).
 
-### Supabase Auth helpers
+### Supabase Auth Helpers
 
 SvelteKit is a highly versatile framework offering pre-rendering at build time (SSG), server-side rendering at request time (SSR), API routes, and more.
 
@@ -245,7 +245,7 @@ export const load: PageServerLoad = async ({ url, locals: { getSession } }) => {
 }
 ```
 
-### Proof key for Code Exchange (PKCE)
+### Proof Key for Code Exchange (PKCE)
 
 As we are employing Proof Key for Code Exchange (PKCE) in our authentication flow, it is necessary to create a server endpoint responsible for exchanging the code for a session.
 

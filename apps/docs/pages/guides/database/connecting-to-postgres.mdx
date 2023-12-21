@@ -73,7 +73,7 @@ You can obtain your connection info and Server root certificate from your applic
 
 ## Integrations
 
-### Connecting with drizzle
+### Connecting with Drizzle
 
 [Drizzle ORM](https://github.com/drizzle-team/drizzle-orm) is a TypeScript ORM for SQL databases designed with maximum type safety in mind. You can use their ORM to connect to your database.
 
@@ -234,7 +234,7 @@ Assuming you've downloaded your SSL certificate to `$HOME/Downloads/prod-supabas
 psql "sslmode=verify-full sslrootcert=$HOME/Downloads/prod-supabase.cer host=db.ref.supabase.co dbname=postgres user=postgres"
 ```
 
-### Connecting with postgres.js
+### Connecting with Postgres.js
 
 [Postgres.js](https://github.com/porsager/postgres) is a full-featured PostgreSQL client for Node.js and Deno.
 
@@ -336,7 +336,7 @@ This is the suggested option for serverless functions. A connection is assigned 
 
 This is the most granular option. Connections are returned to the pool after every statement. Transactions with multiple statements are not allowed. This is best used when `AUTOCOMMIT` is in use.
 
-### Supavisor vs pgBouncer
+### Supavisor vs PgBouncer
 
 Supabase previously used PgBouncer for connection pooling. We have now deprecated PgBouncer in favor of Supavisor. Supavisor is available on all new and existing projects.
 

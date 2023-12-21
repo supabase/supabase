@@ -13,7 +13,7 @@ Realtime is written in [Elixir](https://elixir-lang.org/), which compiles to [Er
 
 ![Global Architecture](/docs/img/guides/realtime/realtime-arch.png)
 
-## Elixir & phoenix
+## Elixir & Phoenix
 
 Phoenix is fast and able to handle millions of concurrent connections.
 
@@ -49,7 +49,7 @@ Realtime knows the region your database is in, and connects to it from the close
 
 Every Realtime region has at least two nodes so if one node goes offline the other node should reconnect and start streaming changes again.
 
-## Streaming the write-Ahead log
+## Streaming the Write-Ahead Log
 
 A Postgres logical replication slot is acquired when connecting to your database.
 
