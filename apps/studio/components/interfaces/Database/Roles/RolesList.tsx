@@ -39,7 +39,7 @@ const RolesList = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const roles = sortBy(data ?? [], (r) => r.name)
+  const roles = sortBy(data ?? [], (r) => r.name.toLocaleLowerCase())
 
   const filteredRoles = (
     filterType === 'active' ? roles.filter((role) => role.active_connections > 0) : roles

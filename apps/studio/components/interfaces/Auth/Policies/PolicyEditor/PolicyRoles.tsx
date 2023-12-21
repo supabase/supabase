@@ -21,7 +21,7 @@ const PolicyRoles = ({ selectedRoles, onUpdateSelectedRoles }: PolicyRolesProps)
   })
   const roles = sortBy(
     (data ?? []).filter((role) => !SYSTEM_ROLES.includes(role.name as SystemRole)),
-    (r) => r.name
+    (r) => r.name.toLocaleLowerCase()
   )
 
   const formattedRoles = roles.map((role) => {
