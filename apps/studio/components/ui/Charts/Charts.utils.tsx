@@ -24,7 +24,7 @@ export const numberFormatter = (num: number, precision = 2) =>
  * isFloat(123)     // false
  * isFloat(123.123)     // true
  */
-const isFloat = (num: number) => String(num).includes('.')
+export const isFloat = (num: number) => String(num).includes('.')
 
 /**
  * Formats a number to a particular precision.
