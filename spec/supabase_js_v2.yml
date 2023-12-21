@@ -4676,6 +4676,45 @@ functions:
         hideCodeBlock: true
         isSpotlight: true
 
+      - id: get-execution-plan-with-analyze-and-verbose
+        name: Get the execution plan with analyze and verbose
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .explain({analyze:true,verbose:true})
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```
+          Aggregate  (cost=33.34..33.36 rows=1 width=112) (actual time=0.041..0.041 rows=1 loops=1)
+            Output: NULL::bigint, count(ROW(countries.id, countries.name)), COALESCE(json_agg(ROW(countries.id, countries.name)), '[]'::json), NULLIF(current_setting('response.headers'::text, true), ''::text), NULLIF(current_setting('response.status'::text, true), ''::text)
+            ->  Limit  (cost=0.00..18.33 rows=1000 width=40) (actual time=0.005..0.006 rows=3 loops=1)
+                  Output: countries.id, countries.name
+                  ->  Seq Scan on public.countries  (cost=0.00..22.00 rows=1200 width=40) (actual time=0.004..0.005 rows=3 loops=1)
+                        Output: countries.id, countries.name
+          Query Identifier: -4730654291623321173
+          Planning Time: 0.407 ms
+          Execution Time: 0.119 ms
+          ```
+        description: |
+          By default, the data is returned in TEXT format, but can also be returned as JSON by using the `format` parameter.
+        hideCodeBlock: true
+        isSpotlight: false
+
   # NOTE: Not available on currently deployed PostgREST
   # db.geojson():
   #   $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.geojson'
