@@ -51,9 +51,10 @@ const RolesList = () => {
   const totalActiveConnections = roles
     .map((role) => role.active_connections)
     .reduce((a, b) => a + b, 0)
+  // order the roles with active connections by number of connections, most connections first
   const rolesWithActiveConnections = sortBy(
     roles.filter((role) => role.active_connections > 0),
-    (r) => r.active_connections
+    (r) => -r.active_connections
   )
 
   return (
