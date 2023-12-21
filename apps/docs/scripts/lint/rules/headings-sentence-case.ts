@@ -10,6 +10,8 @@ function headingsSentenceCaseCheck(node: Content, _: number, __: Node, file: str
 
   const textNode = node.children[0]
   // need to account for `inlineCode` children, in initial, middle, and final positions
+  // need to account for headings beginning with number
+  // investigate why JSON Web Token at beginning isn't working
   if (textNode?.type !== 'text') {
     return []
   }
