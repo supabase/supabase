@@ -42,7 +42,7 @@ on storage.objects
 for insert
 to authenticated
 with check (
-  storage.foldername(name)[1] = 'private'
+  (storage.foldername(name))[1] = 'private'
 );
 ```
 
