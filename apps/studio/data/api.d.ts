@@ -467,6 +467,14 @@ export interface paths {
     /** Gets daily project stats */
     get: operations['DailyStatsController_getDailyStats']
   }
+  '/platform/projects/{ref}/databases': {
+    /** Gets non-removed databases of a specified project */
+    get: operations['DatabasesController_getDatabases']
+  }
+  '/platform/projects/{ref}/databases-statuses': {
+    /** Gets statuses of databases within a project */
+    get: operations['DatabasesStatusesController_getStatus']
+  }
   '/platform/projects/{ref}/db-password': {
     /** Updates the database password */
     patch: operations['DbPasswordController_updatePassword']
@@ -1213,6 +1221,14 @@ export interface paths {
     /** Gets daily project stats */
     get: operations['DailyStatsController_getDailyStats']
   }
+  '/v0/projects/{ref}/databases': {
+    /** Gets non-removed databases of a specified project */
+    get: operations['DatabasesController_getDatabases']
+  }
+  '/v0/projects/{ref}/databases-statuses': {
+    /** Gets statuses of databases within a project */
+    get: operations['DatabasesStatusesController_getStatus']
+  }
   '/v0/projects/{ref}/db-password': {
     /** Updates the database password */
     patch: operations['DbPasswordController_updatePassword']
@@ -1547,6 +1563,14 @@ export interface paths {
     /** Disables project's readonly mode for the next 15 minutes */
     post: operations['ReadOnlyController_temporarilyDisableReadonlyMode']
   }
+  '/v1/projects/{ref}/read-replicas/setup': {
+    /** Set up a read replica */
+    post: operations['ReadReplicaController_setUpReadReplica']
+  }
+  '/v1/projects/{ref}/read-replicas/remove': {
+    /** Remove a read replica */
+    post: operations['ReadReplicaController_removeReadReplica']
+  }
   '/v1/projects/{ref}/health': {
     /** Gets project's service health status */
     get: operations['ServiceHealthController_checkServiceHealth']
@@ -1858,6 +1882,10 @@ export interface components {
       SMS_TEST_OTP_VALID_UNTIL: string
       HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED?: boolean
       HOOK_MFA_VERIFICATION_ATTEMPT_URI?: string
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED?: boolean
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI?: string
+      HOOK_CUSTOM_ACCESS_TOKEN_ENABLED?: boolean
+      HOOK_CUSTOM_ACCESS_TOKEN_URI?: string
       EXTERNAL_APPLE_ENABLED: boolean
       EXTERNAL_APPLE_CLIENT_ID: string
       EXTERNAL_APPLE_SECRET: string
@@ -2004,6 +2032,10 @@ export interface components {
       SMS_TEMPLATE?: string
       HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED?: boolean
       HOOK_MFA_VERIFICATION_ATTEMPT_URI?: string
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED?: boolean
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI?: string
+      HOOK_CUSTOM_ACCESS_TOKEN_ENABLED?: boolean
+      HOOK_CUSTOM_ACCESS_TOKEN_URI?: string
       EXTERNAL_APPLE_ENABLED?: boolean
       EXTERNAL_APPLE_CLIENT_ID?: string
       EXTERNAL_APPLE_SECRET?: string
@@ -2144,6 +2176,10 @@ export interface components {
       SMS_TEST_OTP_VALID_UNTIL: string
       HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED?: boolean
       HOOK_MFA_VERIFICATION_ATTEMPT_URI?: string
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED?: boolean
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI?: string
+      HOOK_CUSTOM_ACCESS_TOKEN_ENABLED?: boolean
+      HOOK_CUSTOM_ACCESS_TOKEN_URI?: string
       EXTERNAL_APPLE_ENABLED: boolean
       EXTERNAL_APPLE_CLIENT_ID: string
       EXTERNAL_APPLE_SECRET: string
@@ -3394,6 +3430,7 @@ export interface components {
       status: string
       subscription_id: string
       is_branch_enabled: boolean
+      is_read_replicas_enabled: boolean
       preview_branch_refs: string[]
       disk_volume_size_gb?: number
     }
@@ -3454,6 +3491,7 @@ export interface components {
       status: string
       subscription_id: string
       is_branch_enabled: boolean
+      is_read_replicas_enabled: boolean
       preview_branch_refs: string[]
       disk_volume_size_gb?: number
       endpoint: string
@@ -3529,6 +3567,45 @@ export interface components {
       content?: Record<string, never>
       owner_id?: number
     }
+    DatabaseDetailResponse: {
+      /** @enum {string} */
+      status:
+        | 'ACTIVE_HEALTHY'
+        | 'ACTIVE_UNHEALTHY'
+        | 'COMING_UP'
+        | 'GOING_DOWN'
+        | 'INIT_FAILED'
+        | 'REMOVED'
+        | 'RESTORING'
+        | 'UNKNOWN'
+        | 'UPGRADING'
+      /** @enum {string} */
+      cloud_provider: 'AWS' | 'FLY'
+      db_port: number
+      db_name: string
+      db_user: string
+      restUrl: string
+      db_host: string
+      connectionString: string
+      identifier: string
+      inserted_at: string
+      size: string
+      region: string
+    }
+    DatabaseStatusResponse: {
+      /** @enum {string} */
+      status:
+        | 'ACTIVE_HEALTHY'
+        | 'ACTIVE_UNHEALTHY'
+        | 'COMING_UP'
+        | 'GOING_DOWN'
+        | 'INIT_FAILED'
+        | 'REMOVED'
+        | 'RESTORING'
+        | 'UNKNOWN'
+        | 'UPGRADING'
+      identifier: string
+    }
     UpdatePasswordBody: {
       password: string
     }
@@ -3573,6 +3650,7 @@ export interface components {
       lastDatabaseResizeAt?: string
       is_branch_enabled: boolean
       parent_project_ref?: string
+      is_read_replicas_enabled: boolean
     }
     ProjectRefResponse: {
       id: number
@@ -4501,6 +4579,31 @@ export interface components {
       override_enabled: boolean
       override_active_until: string
     }
+    SetUpReadReplicaBody: {
+      /**
+       * @description Region you want your read replica to reside in
+       * @example us-east-1
+       * @enum {string}
+       */
+      read_replica_region:
+        | 'us-east-1'
+        | 'us-west-1'
+        | 'us-west-2'
+        | 'ap-southeast-1'
+        | 'ap-northeast-1'
+        | 'ap-northeast-2'
+        | 'ap-southeast-2'
+        | 'eu-west-1'
+        | 'eu-west-2'
+        | 'eu-west-3'
+        | 'eu-central-1'
+        | 'ca-central-1'
+        | 'ap-south-1'
+        | 'sa-east-1'
+    }
+    RemoveReadReplicaBody: {
+      database_identifier: string
+    }
     AuthHealthResponse: {
       name: string
       version: string
@@ -4516,8 +4619,10 @@ export interface components {
         | components['schemas']['AuthHealthResponse']
         | components['schemas']['RealtimeHealthResponse']
       /** @enum {string} */
-      name: 'auth' | 'db' | 'realtime' | 'rest' | 'storage'
+      name: 'auth' | 'db' | 'pooler' | 'realtime' | 'rest' | 'storage'
       healthy: boolean
+      /** @enum {string} */
+      status: 'COMING_UP' | 'ACTIVE_HEALTHY' | 'UNHEALTHY'
       error?: string
     }
     V1PgbouncerConfigResponse: {
@@ -4718,7 +4823,7 @@ export interface components {
       updated_by: components['schemas']['SnippetUser']
       content: components['schemas']['SnippetContent']
     }
-    ResourceStatusResponse: {
+    ResourceWithServicesStatusResponse: {
       /** @description Supabase project instance compute size */
       compute: string
       /** @description Unique ID representing the fly extension */
@@ -4745,6 +4850,8 @@ export interface components {
        * @example fly_123456789
        */
       supabase_org_id: string
+      /** @description Supabase project services health status */
+      services: components['schemas']['ServiceHealthResponse'][]
     }
     ResourceProvisioningConfigResponse: {
       /**
@@ -8244,12 +8351,6 @@ export interface operations {
   }
   /** Updates project's content */
   ContentController_updateWholeContent: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
     requestBody: {
       content: {
         'application/json': components['schemas']['UpsertContentParams']
@@ -8356,6 +8457,42 @@ export interface operations {
         }
       }
       /** @description Failed to get daily project stats */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets non-removed databases of a specified project */
+  DatabasesController_getDatabases: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['DatabaseDetailResponse'][]
+        }
+      }
+    }
+  }
+  /** Gets statuses of databases within a project */
+  DatabasesStatusesController_getStatus: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['DatabaseStatusResponse'][]
+        }
+      }
+      /** @description Failed to get statuses of databases of a project */
       500: {
         content: never
       }
@@ -11722,12 +11859,58 @@ export interface operations {
       }
     }
   }
+  /** Set up a read replica */
+  ReadReplicaController_setUpReadReplica: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SetUpReadReplicaBody']
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to set up read replica */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Remove a read replica */
+  ReadReplicaController_removeReadReplica: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RemoveReadReplicaBody']
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to remove read replica */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Gets project's service health status */
   ServiceHealthController_checkServiceHealth: {
     parameters: {
       query: {
         timeout_ms?: number
-        services: ('auth' | 'db' | 'realtime' | 'rest' | 'storage')[]
+        services: ('auth' | 'db' | 'pooler' | 'realtime' | 'rest' | 'storage')[]
       }
       path: {
         /** @description Project ref */
@@ -12305,7 +12488,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['ResourceStatusResponse']
+          'application/json': components['schemas']['ResourceWithServicesStatusResponse']
         }
       }
     }

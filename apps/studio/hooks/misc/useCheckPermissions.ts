@@ -1,6 +1,7 @@
 import { useIsLoggedIn } from 'common'
 import jsonLogic from 'json-logic-js'
 
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { IS_PLATFORM } from 'lib/constants'
 import { Permission } from 'types'
@@ -80,4 +81,14 @@ export function useCheckPermissions(
   if (!IS_PLATFORM) return true
 
   return doPermissionsCheck(allPermissions, action, resource, data, orgId)
+}
+
+export function usePermissionsLoaded() {
+  const isLoggedIn = useIsLoggedIn()
+  const { isFetched: isPermissionsFetched } = usePermissionsQuery({ enabled: isLoggedIn })
+  const { isFetched: isOrganizationsFetched } = useOrganizationsQuery({ enabled: isLoggedIn })
+
+  if (!IS_PLATFORM) return true
+
+  return isLoggedIn && isPermissionsFetched && isOrganizationsFetched
 }

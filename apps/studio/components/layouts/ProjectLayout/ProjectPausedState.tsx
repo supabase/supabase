@@ -30,7 +30,10 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
   const isFreePlan = subscription?.plan?.id === 'free'
 
-  const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug: orgSlug })
+  const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
+    { slug: orgSlug },
+    { enabled: isFreePlan }
+  )
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
 
   const [showConfirmRestore, setShowConfirmRestore] = useState(false)
@@ -119,7 +122,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
               <div className="flex items-center justify-center gap-4">
                 <Tooltip.Root delayDuration={0}>
-                  <Tooltip.Trigger>
+                  <Tooltip.Trigger asChild>
                     <Button
                       size="tiny"
                       type="primary"

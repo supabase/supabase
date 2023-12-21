@@ -106,15 +106,9 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
   return (
     <>
       <DropdownMenu>
-        <DropdownMenuTrigger>
-          <Button
-            asChild
-            className="opacity-50 flex"
-            type="text"
-            icon={<IconChevronDown />}
-            style={{ padding: '3px' }}
-          >
-            <span></span>
+        <DropdownMenuTrigger asChild>
+          <Button className="opacity-50 flex" type="text" style={{ padding: '3px' }}>
+            <IconChevronDown />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" side="bottom">

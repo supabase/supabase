@@ -50,7 +50,7 @@ const PolicyTableRowHeader = ({
         <div className="flex-1">
           <div className="flex flex-row justify-end gap-x-2">
             <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
+              <Tooltip.Trigger asChild>
                 <Button
                   type="default"
                   disabled={!canToggleRLS}
@@ -79,7 +79,7 @@ const PolicyTableRowHeader = ({
             </Tooltip.Root>
             {!isAiAssistantEnabled && (
               <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger>
+                <Tooltip.Trigger asChild>
                   <Button
                     type="outline"
                     disabled={!canCreatePolicies}

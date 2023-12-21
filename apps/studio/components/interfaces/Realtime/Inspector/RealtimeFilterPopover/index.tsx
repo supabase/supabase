@@ -78,7 +78,10 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
           <div className="py-3 px-4 border-b border-overlay">
             <div className="flex items-center justify-between gap-2">
               <div className="flex gap-2.5 items-center">
-                <IconPresence size="xlarge" className="bg-brand-400 rounded text-brand-600" />
+                <IconPresence
+                  size="xlarge"
+                  className="bg-foreground rounded text-background-muted"
+                />
                 <label htmlFor="toggle-presence" className="text-sm">
                   Presence
                 </label>
@@ -99,7 +102,10 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
           <div className="py-3 px-4 border-b border-overlay">
             <div className="flex items-center justify-between">
               <div className="flex gap-2.5 items-center">
-                <IconBroadcast size="xlarge" className="bg-brand-400 rounded text-brand-600" />
+                <IconBroadcast
+                  size="xlarge"
+                  className="bg-foreground rounded text-background-muted"
+                />
                 <label htmlFor="toggle-broadcast" className="text-sm">
                   Broadcast
                 </label>
@@ -122,7 +128,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
               <div className="flex gap-2.5 items-center">
                 <IconDatabaseChanges
                   size="xlarge"
-                  className="bg-brand-400 rounded text-brand-600"
+                  className="bg-foreground rounded text-background-muted"
                 />
                 <label htmlFor="toggle-db-changes" className="text-sm">
                   Database changes

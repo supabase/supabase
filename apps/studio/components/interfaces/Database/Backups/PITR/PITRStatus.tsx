@@ -10,6 +10,7 @@ import { useBackupsQuery } from 'data/database/backups-query'
 import { useCheckPermissions } from 'hooks'
 import { Timezone } from './PITR.types'
 import TimezoneSelection from './TimezoneSelection'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 
 interface PITRStatusProps {
   selectedTimezone: Timezone
@@ -24,6 +25,9 @@ const PITRStatus = ({
 }: PITRStatusProps) => {
   const { ref } = useParams()
   const { data: backups } = useBackupsQuery({ projectRef: ref })
+  const { data: databases } = useReadReplicasQuery({ projectRef: ref })
+
+  const hasReadReplicas = (databases ?? []).length > 1
 
   const { earliestPhysicalBackupDateUnix, latestPhysicalBackupDateUnix } =
     backups?.physicalBackupData ?? {}
@@ -56,8 +60,11 @@ const PITRStatus = ({
               </span>
             </div>
             <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
-                <Button disabled={!canTriggerPhysicalBackup} onClick={() => onSetConfiguration()}>
+              <Tooltip.Trigger asChild>
+                <Button
+                  disabled={hasReadReplicas || !canTriggerPhysicalBackup}
+                  onClick={() => onSetConfiguration()}
+                >
                   Start a restore
                 </Button>
               </Tooltip.Trigger>

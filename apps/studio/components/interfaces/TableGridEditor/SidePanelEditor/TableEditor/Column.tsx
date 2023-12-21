@@ -1,5 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import type { PostgresType } from '@supabase/postgres-meta'
+
 import {
   Button,
   Checkbox,
@@ -11,7 +12,6 @@ import {
   Input,
   Popover,
 } from 'ui'
-
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import { noop } from 'lodash'
 import { typeExpressionSuggestions } from '../ColumnEditor/ColumnEditor.constants'
@@ -20,6 +20,7 @@ import { getForeignKeyCascadeAction } from '../ColumnEditor/ColumnEditor.utils'
 import ColumnType from '../ColumnEditor/ColumnType'
 import InputWithSuggestions from '../ColumnEditor/InputWithSuggestions'
 import { ColumnField } from '../SidePanelEditor.types'
+import { EMPTY_ARR, EMPTY_OBJ } from 'lib/void'
 
 /**
  * [Joshen] For context:
@@ -51,11 +52,11 @@ interface ColumnProps {
 }
 
 const Column = ({
-  column = {} as ColumnField,
-  enumTypes = [] as PostgresType[],
+  column = EMPTY_OBJ as ColumnField,
+  enumTypes = EMPTY_ARR as PostgresType[],
   isNewRecord = false,
   hasImportContent = false,
-  dragHandleProps = {},
+  dragHandleProps = EMPTY_OBJ,
   onEditRelation = noop,
   onUpdateColumn = noop,
   onRemoveColumn = noop,
@@ -93,7 +94,7 @@ const Column = ({
       </div>
       <div className="w-[5%] mr-2.5">
         <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger>
+          <Tooltip.Trigger asChild>
             <Button
               type={column.foreignKey !== undefined ? 'secondary' : 'default'}
               onClick={() => onEditRelation(column)}

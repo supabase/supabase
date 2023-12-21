@@ -100,8 +100,8 @@ const {
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-supabase.gotrue.signUpWith(Phone) {
-    phoneNumber = "+13334445555"
+supabase.auth.signUpWith(Phone) {
+    phone = "+13334445555"
     password = "some-password"
 }
 ```
@@ -151,9 +151,9 @@ const {
 You should present a form to the user so they can input the 6 digit pin, then send it along with the phone number to `verifyPhoneOtp`:
 
 ```kotlin
-supabase.gotrue.verifyPhoneOtp(
+supabase.auth.verifyPhoneOtp(
     type = OtpType.Phone.SMS,
-    phoneNumber = "+13334445555",
+    phone = "+13334445555",
     token = "123456"
 )
 ```
@@ -210,8 +210,8 @@ const { user, error } = await supabase.auth.signInWithPassword({
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-supabase.gotrue.loginWith(Phone) {
-    phoneNumber = "+13334445555"
+supabase.auth.signInWith(Phone) {
+    phone = "+13334445555"
     password = "some-password"
 }
 ```
@@ -256,11 +256,11 @@ const { data, error } = await supabase.auth.signInWithOtp({
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
-In Kotlin, we can use the `sendOtpTo` method and change the property `phoneNumber`
+In Kotlin, we can use the `signInWith(OTP)` method and change the property `phone`
 
 ```kotlin
-supabase.gotrue.sendOtpTo(Phone) {
-    phoneNumber = "+13334445555"
+supabase.auth.signInWith(OTP) {
+    phone = "+13334445555"
 }
 ```
 
@@ -304,9 +304,9 @@ const {
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-supabase.gotrue.verifyPhoneOtp(
+supabase.auth.verifyPhoneOtp(
     type = OtpType.Phone.SMS,
-    phoneNumber = "+13334445555",
+    phone = "+13334445555",
     token = "123456"
 )
 ```

@@ -9,24 +9,8 @@ const BreadcrumbsView = ({ defaultValue: breadcrumbs }: BreadcrumbsViewProps) =>
   return (
     <>
       {breadcrumbs?.length
-        ? breadcrumbs.map((breadcrumb: any) => (
+        ? breadcrumbs.map((breadcrumb: any, idx: number) => (
             <Fragment key={breadcrumb.key}>
-              <span className="text-border-stronger">
-                <svg
-                  viewBox="0 0 24 24"
-                  width="16"
-                  height="16"
-                  stroke="currentColor"
-                  strokeWidth="1"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  fill="none"
-                  shapeRendering="geometricPrecision"
-                >
-                  <path d="M16 3.549L7.12 20.600"></path>
-                </svg>
-              </span>
-
               <a
                 onClick={breadcrumb.onClick || (() => {})}
                 className={`text-gray-1100 block px-2 py-1 text-xs leading-5 focus:bg-gray-100 focus:text-gray-900 focus:outline-none ${
@@ -35,6 +19,23 @@ const BreadcrumbsView = ({ defaultValue: breadcrumbs }: BreadcrumbsViewProps) =>
               >
                 {breadcrumb.label}
               </a>
+              {idx !== breadcrumbs.length - 1 && (
+                <span className="text-border-stronger">
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="16"
+                    height="16"
+                    stroke="currentColor"
+                    strokeWidth="1"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    fill="none"
+                    shapeRendering="geometricPrecision"
+                  >
+                    <path d="M16 3.549L7.12 20.600"></path>
+                  </svg>
+                </span>
+              )}
             </Fragment>
           ))
         : null}

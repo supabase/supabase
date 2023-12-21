@@ -1,8 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { compact, last, sortBy } from 'lodash'
+import { compact, last } from 'lodash'
 import { Loader2 } from 'lucide-react'
-import OpenAI from 'openai'
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   AiIcon,
@@ -15,13 +14,17 @@ import {
   Input_Shadcn_,
 } from 'ui'
 import * as z from 'zod'
+import Telemetry from 'lib/telemetry'
+import { useTelemetryProps } from 'common'
+import { useRouter } from 'next/router'
 
 import { useProfile } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
+import { MessageWithDebug } from './AIPolicyEditorPanel.utils'
 import Message from './Message'
 
 interface AIPolicyChatProps {
-  messages: OpenAI.Beta.Threads.Messages.ThreadMessage[]
+  messages: MessageWithDebug[]
   loading: boolean
   onSubmit: (s: string) => void
   onDiff: (s: string) => void
@@ -38,16 +41,10 @@ export const AIPolicyChat = ({
   const { profile } = useProfile()
   const snap = useAppStateSnapshot()
   const bottomRef = useRef<HTMLDivElement>(null)
+  const router = useRouter()
+  const telemetryProps = useTelemetryProps()
 
   const name = compact([profile?.first_name, profile?.last_name]).join(' ')
-  const sorted = useMemo(() => {
-    return sortBy(messages, (m) => m.created_at).filter((m) => {
-      if (m.content[0].type === 'text') {
-        return !m.content[0].text.value.startsWith('Here is my database schema for reference:')
-      }
-      return false
-    })
-  }, [messages])
 
   const FormSchema = z.object({ chat: z.string() })
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -57,16 +54,16 @@ export const AIPolicyChat = ({
     defaultValues: { chat: '' },
   })
   const formChatValue = form.getValues().chat
-  const pendingReply = loading && last(sorted)?.role === 'user'
+  const pendingReply = loading && last(messages)?.role === 'user'
 
+  // try to scroll on each rerender to the bottom
   useEffect(() => {
-    // 👇️ scroll to bottom every time messages change
-    if (bottomRef.current) {
+    if (loading && bottomRef.current) {
       setTimeout(() => {
         bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
       }, 500)
     }
-  }, [messages.length])
+  })
 
   useEffect(() => {
     if (!loading) {
@@ -80,9 +77,10 @@ export const AIPolicyChat = ({
   }, [formChatValue])
 
   return (
-    <div id={'ai-chat-assistant'} className="flex flex-col h-full">
+    <div id={'ai-chat-assistant'} className="flex flex-col h-full max-w-full">
       <div className="overflow-auto flex-1">
         <Message
+          key="zero"
           role="assistant"
           content={`Hi${
             name ? ' ' + name : ''
@@ -101,21 +99,19 @@ export const AIPolicyChat = ({
           </div>
         </Message>
 
-        {sorted.map((m, idx) => (
+        {messages.map((m) => (
           <Message
-            key={`message-${idx}`}
-            name={name}
+            key={`message-${m.id}`}
+            name={m.name}
             role={m.role}
-            content={
-              m.content[0] && m.content[0].type === 'text' ? m.content[0].text.value : undefined
-            }
-            createdAt={m.created_at}
-            isDebug={(m.metadata as any).type === 'debug'}
+            content={m.content}
+            createdAt={new Date(m.createdAt || new Date()).getTime()}
+            isDebug={m.isDebug}
             onDiff={onDiff}
           />
         ))}
 
-        {pendingReply && <Message role="assistant" content="Thinking..." />}
+        {pendingReply && <Message key="thinking" role="assistant" content="Thinking..." />}
 
         <div ref={bottomRef} className="h-1" />
       </div>
@@ -126,6 +122,15 @@ export const AIPolicyChat = ({
           className="sticky p-5 flex-0 border-t"
           onSubmit={form.handleSubmit((data: z.infer<typeof FormSchema>) => {
             onSubmit(data.chat)
+            Telemetry.sendEvent(
+              {
+                category: 'rls_editor',
+                action: 'ai_suggestion_asked',
+                label: 'rls-ai-assistant',
+              },
+              telemetryProps,
+              router
+            )
           })}
         >
           <FormField_Shadcn_

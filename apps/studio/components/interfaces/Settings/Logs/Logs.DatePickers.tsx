@@ -50,9 +50,8 @@ const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
   return (
     <div className="flex items-center">
       <DropdownMenu>
-        <DropdownMenuTrigger>
+        <DropdownMenuTrigger asChild>
           <Button
-            asChild
             type={helperValue ? 'secondary' : 'default'}
             icon={<IconClock size={12} />}
             className="rounded-r-none"

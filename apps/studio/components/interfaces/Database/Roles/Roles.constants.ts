@@ -6,6 +6,7 @@ export const SUPABASE_ROLES = [
   'dashboard_user',
   'supabase_admin',
   'supabase_auth_admin',
+  'supabase_read_only_user',
   'supabase_replication_admin',
   'supabase_storage_admin',
   'supabase_functions_admin',
@@ -13,6 +14,22 @@ export const SUPABASE_ROLES = [
   'pgsodium_keyholder',
   'pgsodium_keyiduser',
   'pgsodium_keymaker',
+  'pgtle_admin',
+]
+
+// [Joshen] This was originally in the Roles mobx store
+// Just keeping it for now in case we need to differ it from ^ SUPABASE_ROLES
+export const SYSTEM_ROLES = [
+  'postgres',
+  'pgbouncer',
+  'supabase_admin',
+  'supabase_auth_admin',
+  'supabase_storage_admin',
+  'dashboard_user',
+  'authenticator',
+  'pg_database_owner',
+  'pg_read_all_data',
+  'pg_write_all_data',
 ]
 
 export const ROLE_PERMISSIONS: any = {

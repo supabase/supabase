@@ -5,10 +5,11 @@ import { Button, IconAlignLeft, IconCommand, IconCornerDownLeft, cn } from 'ui'
 
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
-import { useFlag } from 'hooks'
+import { useFlag, useSelectedProject } from 'hooks'
 import { useState } from 'react'
 import FavoriteButton from './FavoriteButton'
 import SavingIndicator from './SavingIndicator'
+import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 
 export type UtilityActionsProps = {
   id: string
@@ -28,9 +29,11 @@ const UtilityActions = ({
   executeQuery,
 }: UtilityActionsProps) => {
   const os = detectOS()
+  const project = useSelectedProject()
   const readReplicasEnabled = useFlag('readReplicas')
   const roleImpersonationEnabledFlag = useFlag('roleImpersonation')
-  const [selectedDatabaseId, setSelectedDatabaseId] = useState<string>('1')
+
+  const showReadReplicasUI = readReplicasEnabled && project?.is_read_replicas_enabled
 
   return (
     <>
@@ -67,16 +70,14 @@ const UtilityActions = ({
       </Tooltip.Root>
 
       <div className="flex items-center justify-between gap-x-2 mx-2">
-        {readReplicasEnabled && (
-          <DatabaseSelector
-            selectedDatabaseId={selectedDatabaseId}
-            onChangeDatabaseId={setSelectedDatabaseId}
-          />
-        )}
-
         <div className="flex items-center">
+          {showReadReplicasUI && <DatabaseSelector variant="connected-on-right" />}
+
           {roleImpersonationEnabledFlag && (
-            <RoleImpersonationPopover serviceRoleLabel="postgres" variant="connected-on-right" />
+            <RoleImpersonationPopover
+              serviceRoleLabel="postgres"
+              variant={showReadReplicasUI ? 'connected-on-both' : 'connected-on-right'}
+            />
           )}
 
           <Button

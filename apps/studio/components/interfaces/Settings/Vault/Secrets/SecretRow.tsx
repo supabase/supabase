@@ -110,9 +110,9 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
           {dayjs(secret.updated_at).format('MMM D, YYYY')}
         </p>
         <DropdownMenu>
-          <DropdownMenuTrigger>
-            <Button asChild type="text" className="px-1" icon={<IconMoreVertical />}>
-              <span></span>
+          <DropdownMenuTrigger asChild>
+            <Button type="text" className="px-1">
+              <IconMoreVertical />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom">

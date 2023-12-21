@@ -307,7 +307,7 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
 
     When the user provides consent, Google issues an identity token (commonly abbreviated as ID token) that is then sent to your project's Supabase Auth server. When valid, a new user session is started by issuing an access and refresh token from Supabase Auth.
 
-    When using [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/), you can use the [compose-auth](https://supabase.com/docs/reference/kotlin/installing) plugin. On Android it uses Google OneTap automatically and on other platforms it uses `gotrue.loginWith(Google)`.
+    When using [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/), you can use the [compose-auth](https://supabase.com/docs/reference/kotlin/installing) plugin. On Android it uses Google OneTap (or Credential Manager on Android 14+) automatically and on other platforms it uses `auth.signInWith(Google)`.
     Alternatively, you can have a look at [Google One Tap](https://developers.google.com/identity/one-tap/android/overview), just login with the IdToken after you receive it.
 
     **Initialize the Supabase Client**

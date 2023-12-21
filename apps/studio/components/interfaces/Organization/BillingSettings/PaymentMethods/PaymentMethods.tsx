@@ -171,14 +171,12 @@ const PaymentMethods = () => {
                                   {isActive && <Badge color="green">Active</Badge>}
                                   {canUpdatePaymentMethods && !isActive ? (
                                     <DropdownMenu>
-                                      <DropdownMenuTrigger>
+                                      <DropdownMenuTrigger asChild>
                                         <Button
-                                          asChild
                                           type="outline"
-                                          icon={<IconMoreHorizontal />}
                                           className="hover:border-gray-500 px-1"
                                         >
-                                          <span />
+                                          <IconMoreHorizontal />
                                         </Button>
                                       </DropdownMenuTrigger>
                                       <DropdownMenuContent align="end">

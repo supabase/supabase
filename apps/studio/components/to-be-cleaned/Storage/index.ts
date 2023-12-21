@@ -4,4 +4,4 @@ import StorageSettings from './StorageSettings/StorageSettings'
 
 import DeleteBucketModal from './DeleteBucketModal'
 
-export { StorageExplorer, StoragePolicies, StorageSettings, DeleteBucketModal }
+export { DeleteBucketModal, StorageExplorer, StoragePolicies, StorageSettings }
