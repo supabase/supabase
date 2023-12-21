@@ -15,7 +15,7 @@ If you get stuck while working through this guide, refer to the [full example on
 
 </Admonition>
 
-## About redwoodJS
+## About RedwoodJS
 
 A Redwood application is split into two parts: a frontend and a backend. This is represented as two node projects within a single monorepo.
 
@@ -43,7 +43,7 @@ to how your Supabase `public` schema references the `auth.users`.
 
 <ProjectSetup />
 
-## Building the app
+## Building the App
 
 Let's start building the RedwoodJS app from scratch.
 
@@ -55,7 +55,7 @@ RedwoodJS requires Node.js `>= 14.x <= 16.x` and Yarn `>= 1.15`.
 
 Make sure you have installed yarn since RedwoodJS relies on it to [manage its packages in workspaces](https://classic.yarnpkg.com/lang/en/docs/workspaces/) for its `web` and `api` "sides".
 
-### Initialize a redwoodJS app
+### Initialize a RedwoodJS app
 
 We can use [Create Redwood App](https://redwoodjs.com/docs/quick-start) command to initialize
 an app called `supabase-redwoodjs`:
@@ -157,12 +157,12 @@ const App = () => (
 export default App
 ```
 
-### App styling (optional)
+### App Styling (Optional)
 
 An optional step is to update the CSS file `web/src/index.css` to make the app look nice.
 You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/react-user-management/src/index.css).
 
-### Start redwoodJS and your first page
+### Start RedwoodJS and your first Page
 
 Let's test our setup at the moment by starting up the app:
 
@@ -216,7 +216,7 @@ const Routes = () => {
 export default Routes
 ```
 
-### Set up a login component
+### Set up a Login component
 
 Let's set up a Redwood component to manage logins and sign ups. We'll use Magic Links, so users can sign in with their email without using passwords.
 
@@ -288,7 +288,7 @@ const Auth = () => {
 export default Auth
 ```
 
-### Set up an account component
+### Set up an Account component
 
 After a user is signed in we can allow them to edit their profile details and manage their account.
 
@@ -433,7 +433,7 @@ You'll see the use of `useAuth()` several times. Redwood's `useAuth` hook provid
 logIn, logOut, currentUser, and access the `supabase` authenticate client. We'll use it to get an instance
 of the supabase client to interact with your API.
 
-### Update home page
+### Update Home Page
 
 Now that we have all the components in place, let's update your `HomePage` page to use them:
 

@@ -17,11 +17,11 @@ If you get stuck while working through this guide, refer to the [full example on
 
 <ProjectSetup />
 
-## Building the app
+## Building the App
 
 Let's start building the Vue app from scratch.
 
-### Initialize an ionic vue app
+### Initialize an Ionic Vue app
 
 We can use the [Ionic CLI](https://ionicframework.com/docs/cli) to initialize
 an app called `supabase-ionic-vue`:
@@ -58,7 +58,7 @@ const supabaseAnonKey = process.env.VUE_APP_SUPABASE_ANON_KEY as string;
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 ```
 
-### Set up a login route
+### Set up a Login route
 
 Let's set up a Vue component to manage logins and sign ups. We'll use Magic Links, so users can sign in with their email without using passwords.
 

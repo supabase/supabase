@@ -11,7 +11,7 @@ export const meta = {
 
 When using [passwordless sign-ins](/docs/reference/javascript/auth-signinwithotp) or [third-party providers](/docs/reference/javascript/auth-signinwithoauth#sign-in-using-a-third-party-provider-with-redirect), the Supabase client library methods provide a `redirectTo` parameter to specify where to redirect the user to after authentication. By default, the user will be redirected to the [`SITE_URL`](/docs/reference/auth/config#site_url) but you can modify the `SITE_URL` or add additional redirect URLs to the [allow list](https://supabase.com/dashboard/project/_/auth/url-configuration). Once you've added necessary URLs to the allow list, you can specify the URL you want the user to be redirected to in the `redirectTo` parameter.
 
-## Use wildcards in redirect uRLs
+## Use wildcards in redirect URLs
 
 Supabase allows you to specify wildcards when adding redirect URLs to the [allow list](https://supabase.com/dashboard/project/_/auth/url-configuration). You can use wildcard match patterns to support preview URLs from providers like Netlify and Vercel.
 
@@ -41,14 +41,14 @@ While the "globstar" (`**`) is useful for local development and preview URLs, we
 | `http://localhost:3000/?`      | matches `http://localhost:3000/a` but not `http://localhost:3000/foo`                                                                                              |
 | `http://localhost:3000/[!a-z]` | matches `http://localhost:3000/1` but not `http://localhost:3000/a`                                                                                                |
 
-## Netlify preview uRLs
+## Netlify preview URLs
 
 For deployments with Netlify, set the `SITE_URL` to your official site URL. Add the following additional redirect URLs for local development and deployment previews:
 
 - `http://localhost:3000/**`
 - `https://**--my_org.netlify.app/**`
 
-## Vercel preview uRLs
+## Vercel preview URLs
 
 For deployments with Vercel, set the `SITE_URL` to your official site URL. Add the following additional redirect URLs for local development and deployment previews:
 
@@ -78,7 +78,7 @@ const { data, error } = await supabase.auth.signInWithOAuth({
 })
 ```
 
-## Mobile deep linking uRIs
+## Mobile deep linking URIs
 
 For mobile applications you can use deep linking URIs. For example, for your `SITE_URL` you can specify something like `com.supabase://login-callback/` and for additional redirect URLs something like `com.supabase.staging://login-callback/` if needed.
 

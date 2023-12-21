@@ -17,11 +17,11 @@ If you get stuck while working through this guide, refer to the [full example on
 
 <ProjectSetup />
 
-## Building the app
+## Building the App
 
 Let's start building the SwiftUI app from scratch.
 
-### Create a swiftUI app in xcode
+### Create a SwiftUI app in Xcode
 
 Open Xcode and create a new SwiftUI project.
 
@@ -43,7 +43,7 @@ let supabase = SupabaseClient(
 )
 ```
 
-### Set up a login view
+### Set up a Login view
 
 Set up a SwiftUI view to manage logins and sign ups.
 Users should be able to sign in using a magic link.
@@ -291,7 +291,7 @@ Update the entry point to the newly created `AppView`. Run in Xcode to launch yo
 Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like
 photos and videos.
 
-### Add photosPicker
+### Add PhotosPicker
 
 Let's add support for the user to pick an image from the library and upload it.
 Start by creating a new type to hold the picked avatar image:
@@ -330,7 +330,7 @@ enum TransferError: Error {
 }
 ```
 
-#### Add photosPicker to profile page
+#### Add PhotosPicker to Profile page
 
 ```swift ProfileView.swift
 struct ProfileView: View {
