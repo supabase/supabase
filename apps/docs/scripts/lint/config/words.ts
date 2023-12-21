@@ -62,6 +62,7 @@ class ExceptionList {
 
 const capitalizedWords = new ExceptionList()
 capitalizedWords
+  .addPlural('API')
   .addSingle('Auth')
   .addSingle('Auth UI')
   .addSingle('Azure')
