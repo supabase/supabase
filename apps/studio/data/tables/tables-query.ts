@@ -39,7 +39,7 @@ export async function getTables(
       },
       query: queryParams as any,
     },
-    headers: Object.fromEntries(headers),
+    headers,
     signal,
   })
 
