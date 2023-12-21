@@ -2,7 +2,8 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { partition } from 'lodash'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { motion, useAnimation, AnimatePresence } from 'framer-motion'
 
 import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import AlertError from 'components/ui/AlertError'
@@ -27,10 +28,12 @@ import {
   IconChevronsDown,
   IconEdit,
   IconLoader,
+  IconPlusCircle,
   IconRefreshCw,
   IconSearch,
   IconX,
   Input,
+  Input_Shadcn_,
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
@@ -99,7 +102,7 @@ const TableEditorMenu = () => {
   return (
     <>
       <div
-        className="pt-5 flex flex-col flex-grow space-y-4 h-full"
+        className="pt-5 flex flex-col flex-grow space-y-3 h-full"
         style={{ maxHeight: 'calc(100vh - 48px)' }}
       >
         <SchemaSelector
@@ -112,7 +115,7 @@ const TableEditorMenu = () => {
           onSelectCreateSchema={() => snap.onAddSchema()}
         />
 
-        <div className="space-y-1 mx-4">
+        <div className="grid gap-3 mx-4 zans">
           {!isLocked ? (
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger className="w-full">
@@ -123,7 +126,7 @@ const TableEditorMenu = () => {
                   size="tiny"
                   icon={
                     <div className="text-foreground-lighter">
-                      <IconEdit size={14} strokeWidth={1.5} />
+                      <IconPlusCircle size={14} strokeWidth={1.5} />
                     </div>
                   }
                   type="default"
@@ -198,15 +201,9 @@ const TableEditorMenu = () => {
         </div>
 
         <nav className="flex flex-auto flex-col gap-2 pb-4 px-2">
-          <div className="flex items-center justify-between w-full px-3">
-            <div className="flex items-center gap-1 text-sm text-foreground-lighter">
-              <p>Tables</p>
-              {totalCount !== undefined && (
-                <p style={{ fontVariantNumeric: 'tabular-nums' }}>({totalCount})</p>
-              )}
-            </div>
-
-            <div className="flex gap-3 items-center">
+          <div className="relative">
+            <SearchToggle />
+            <div className="flex gap-3 items-center absolute right-0 top-1">
               <DropdownMenu>
                 <Tooltip.Root delayDuration={0}>
                   <DropdownMenuTrigger asChild>
@@ -245,14 +242,21 @@ const TableEditorMenu = () => {
                   </DropdownMenuRadioGroup>
                 </DropdownMenuContent>
               </DropdownMenu>
-
-              <button
+              {/* <button
                 className="cursor-pointer text-foreground-lighter transition-colors hover:text-foreground"
                 onClick={refreshTables}
               >
                 <IconRefreshCw className={isRefetching ? 'animate-spin' : ''} size={14} />
-              </button>
+              </button> */}
             </div>
+          </div>
+          <div className="flex items-center justify-between w-full px-3">
+            {/* <div className="flex items-center gap-1 text-sm text-foreground-lighter">
+              <p>Tables</p>
+              {totalCount !== undefined && (
+                <p style={{ fontVariantNumeric: 'tabular-nums' }}>({totalCount})</p>
+              )}
+            </div> */}
           </div>
 
           {isLoading && (
@@ -313,3 +317,48 @@ const TableEditorMenu = () => {
 }
 
 export default TableEditorMenu
+
+const SearchToggle = () => {
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const inputRef = useRef<HTMLInputElement | null>(null)
+
+  const expandSearch = () => {
+    setIsSearchOpen(!isSearchOpen)
+  }
+
+  useEffect(() => {
+    if (isSearchOpen && inputRef.current) {
+      inputRef.current.focus()
+    }
+  }, [isSearchOpen])
+
+  return (
+    <div className="relative flex items-center">
+      <motion.button
+        onClick={expandSearch}
+        initial={{ x: 0 }}
+        animate={{ x: isSearchOpen ? 190 : 0, transition: { duration: 0 } }} // Animate based on isSearchOpen
+        className=" px-2 py-1 rounded-md   transition  transform hover:scale-105 focus:outline-none"
+      >
+        {isSearchOpen ? <IconX /> : <IconSearch />}
+      </motion.button>
+      <AnimatePresence>
+        {isSearchOpen && (
+          <motion.div
+            initial={{ x: 10, opacity: 0 }}
+            animate={{ x: 0, opacity: 1, transition: { duration: 0.2 } }}
+            exit={{ x: 20, opacity: 0, transition: { duration: 0.2 } }}
+            className="absolute top-0 left-2"
+          >
+            <Input_Shadcn_
+              type="text"
+              placeholder="Search..."
+              className="bg-surface-100 border-b rounded-md px-2 !py-0.5 h-8 focus:outline-none w-44"
+              ref={inputRef}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
