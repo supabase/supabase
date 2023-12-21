@@ -27,6 +27,11 @@ const csp = [
 const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
   output: 'standalone',
+  experimental: {
+    // [Kevin] Next polyfills Node modules like Crypto by default, blowing up the bundle size. We use generate-password-browser (safe to use in browser) and the polyfills are not needed for us
+    // Revisit on Next 14 upgrade (PR #19909)
+    fallbackNodePolyfills: false,
+  },
   async redirects() {
     return [
       ...(process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
