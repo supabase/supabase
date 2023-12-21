@@ -2,7 +2,7 @@ import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 
 import { delete_ } from 'lib/common/fetch'
-import { API_URL, IS_PLATFORM } from 'lib/constants'
+import { API_URL } from 'lib/constants'
 import { ResponseError } from 'types'
 
 export type UserDeleteMFAFactorsVariables = {
