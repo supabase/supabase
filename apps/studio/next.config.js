@@ -30,7 +30,8 @@ const nextConfig = {
   experimental: {
     // [Kevin] Next polyfills Node modules like Crypto by default, blowing up the bundle size. We use generate-password-browser (safe to use in browser) and the polyfills are not needed for us
     // Revisit on Next 14 upgrade (PR #19909)
-    fallbackNodePolyfills: false,
+    // [Ivan] Temporarily enable until we find a fix for breaking anon-role in the Realtime inspector
+    fallbackNodePolyfills: true,
   },
   async redirects() {
     return [
