@@ -152,13 +152,17 @@ const DeleteConfirmationDialogs = ({
             selectedTable!.name,
           ])
         ),
-        // invalidate all views from this schema
+        // refetch all entities in the sidebar because deleting a column may regenerate a view (and change its id)
+        queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
+        // invalidate all views from this schema, not sure if this is needed since you can't actually delete a column
+        // which has a view dependent on it
         snap.selectedSchemaName
           ? queryClient.invalidateQueries(
               viewKeys.listBySchema(projectRef, snap.selectedSchemaName)
             )
           : null,
-        // invalidate the view if there's a view with this id
+        // invalidate the view if there's a view with this id, not sure if this is needed because you can't delete a
+        // column from a view
         queryClient.invalidateQueries(viewKeys.view(projectRef, selectedTable?.id)),
       ])
     } catch (error: any) {
