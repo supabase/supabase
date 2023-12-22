@@ -5,7 +5,6 @@ import {
   useQueryClient,
   UseQueryOptions,
 } from '@tanstack/react-query'
-import md5 from 'blueimp-md5'
 import { useCallback } from 'react'
 
 import { post } from 'data/fetchers'
@@ -122,7 +121,7 @@ export const useExecuteSqlQuery = <TData = ExecuteSqlData>(
   { enabled = true, ...options }: UseQueryOptions<ExecuteSqlData, ExecuteSqlError, TData> = {}
 ) =>
   useQuery<ExecuteSqlData, ExecuteSqlError, TData>(
-    sqlKeys.query(projectRef, queryKey ?? [md5(sql)]),
+    sqlKeys.query(projectRef, queryKey ?? [btoa(sql)]),
     ({ signal }) =>
       executeSql(
         { projectRef, connectionString, sql, queryKey, handleError, isRoleImpersonationEnabled },
@@ -135,7 +134,7 @@ export const prefetchExecuteSql = (
   client: QueryClient,
   { projectRef, connectionString, sql, queryKey, handleError }: ExecuteSqlVariables
 ) => {
-  return client.prefetchQuery(sqlKeys.query(projectRef, queryKey ?? [md5(sql)]), ({ signal }) =>
+  return client.prefetchQuery(sqlKeys.query(projectRef, queryKey ?? [btoa(sql)]), ({ signal }) =>
     executeSql({ projectRef, connectionString, sql, queryKey, handleError }, signal)
   )
 }

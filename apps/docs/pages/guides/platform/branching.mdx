@@ -13,8 +13,6 @@ Use branching to safely and easily experiment with changes to your Supabase proj
 
 We do not recommended Branching in a production environment while it is in Early Access. To try branching, [request access here](https://forms.supabase.com/branching-request).
 
-We are working with our upstream provider to improve the stability in the South East Asia (Singapore) region.
-
 </Admonition>
 
 ## How branching works
@@ -574,7 +572,7 @@ If you have multiple preview branches, each preview branch might contain differe
 
 When a preview branch is merged into the production branch, it creates a schema drift between the production branch and the preview branches you haven't merged yet.
 
-You can solve thse conflicts the way you would solve normal Git Conflicts: merge or rebase from your production Git branch to your preview Git branch. Since migrations are applied sequentially, ensure that migration files are timestamped correctly after the rebase. Changes that build on top of earlier changes should always have later timestamps.
+You can solve these conflicts the way you would solve normal Git Conflicts: merge or rebase from your production Git branch to your preview Git branch. Since migrations are applied sequentially, ensure that migration files are timestamped correctly after the rebase. Changes that build on top of earlier changes should always have later timestamps.
 
 ### Changing Production Branch
 

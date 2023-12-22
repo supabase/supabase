@@ -129,7 +129,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
       }
 
       const hasAcknowledgedConsent = localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
-      if (hasAcknowledgedConsent === null) {
+      if (IS_PLATFORM && hasAcknowledgedConsent === null) {
         consentToastId.current = toast(
           <ConsentToast onAccept={onAcceptConsent} onOptOut={onOptOut} />,
           {

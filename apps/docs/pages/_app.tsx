@@ -10,7 +10,7 @@ import { AuthProvider, ThemeProvider, useTelemetryProps, useThemeSandbox } from 
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
 import { AppPropsWithLayout } from 'types'
-import { CommandMenuProvider, PortalToast, PromoToast, useConsent } from 'ui'
+import { CommandMenuProvider, PortalToast, useConsent } from 'ui'
 import { TabsProvider } from 'ui/src/components/Tabs'
 import Favicons from '~/components/Favicons'
 import SiteLayout from '~/layouts/SiteLayout'
@@ -162,7 +162,6 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
             <TabsProvider>
               <SiteLayout>
                 <PortalToast />
-                <PromoToast />
                 <Component {...pageProps} />
               </SiteLayout>
             </TabsProvider>

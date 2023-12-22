@@ -72,6 +72,7 @@ const TableList = ({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       schema: snap.selectedSchemaName,
+      sortByProperty: 'name',
     },
     {
       select(tables) {

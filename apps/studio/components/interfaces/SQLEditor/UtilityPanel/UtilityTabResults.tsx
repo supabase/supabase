@@ -109,7 +109,7 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
                   </pre>
                 ))
               ) : (
-                <p className="font-mono text-sm">{result.error.error}</p>
+                <p className="font-mono text-sm">{result.error?.message}</p>
               )}
             </div>
           )}
