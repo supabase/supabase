@@ -19,7 +19,7 @@ export default [
   },
   {
     type: 'example',
-    tags: ['Next.js'],
+    tags: ['Next.js', 'Vercel'],
     products: [PRODUCT_NAMES.DATABASE, PRODUCT_NAMES.AUTHENTICATION],
     title: 'Next.js Starter',
     description:
