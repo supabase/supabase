@@ -45,7 +45,7 @@ Please [secure your services](#securing-your-services) as soon as possible using
 
 For security reasons, we "pin" the versions of each service in the docker-compose file (these versions are updated ~monthly). If you want to update any services immediately, you can do so by updating the version number in the docker compose file and then running `docker compose pull`. You can find all the latest docker images in the [Supabase Docker Hub](https://hub.docker.com/u/supabase).
 
-### Accessing Supabase Studio
+### Accessing Supabase dashboard
 
 You can access the Supabase Dashboard through the API gateway on port `8000`. For example: `http://<your-ip>:8000`, or [localhost:8000](http://localhost:8000) if you are running Docker locally.
 
@@ -86,7 +86,7 @@ The default password is `your-super-secret-and-long-postgres-password`. You shou
 
 While we provided you with some example secrets for getting started, you should NEVER deploy your Supabase setup using the defaults we have provided. Please follow all of the steps in this section to ensure you have a secure setup, and then [restart all services](#restarting-all-services) to pick up the changes.
 
-### Generate API Keys
+### Generate API keys
 
 Create a new `JWT_SECRET` and store it securely.
 
@@ -94,7 +94,7 @@ We can use your JWT Secret to generate new `anon` and `service` API keys using t
 
 <JwtGenerator />
 
-### Update API Keys
+### Update API keys
 
 Replace the values in the `.env` file:
 
@@ -103,7 +103,7 @@ Replace the values in the `.env` file:
 
 You will need to [restart](#restarting-all-services) the services for the changes to take effect.
 
-### Update Secrets
+### Update secrets
 
 Update the `.env` file with your own secrets. In particular, these are required:
 
@@ -114,7 +114,7 @@ Update the `.env` file with your own secrets. In particular, these are required:
 
 You will need to [restart](#restarting-all-services) the services for the changes to take effect.
 
-### Dashboard Authentication
+### Dashboard authentication
 
 The dashboard is protected with Basic Authentication. The default user and password MUST be updated before using Supabase in production.
 Update the following values in the `.env` file:

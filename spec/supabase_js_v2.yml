@@ -308,8 +308,8 @@ functions:
         - `INITIAL_SESSION`
           - Emitted right after the Supabase client is constructed and the initial session from storage is loaded.
         - `SIGNED_IN`
-          - Emitted each time a user signs in. 
-          - Avoid making assumptions as to when this event is fired. Instead, check the user object attached to the event to see if a new user has signed in and update your application's UI.
+          - Emitted each time a user session is confirmed or re-established, including on user sign in and when refocusing a tab. 
+          - Avoid making assumptions as to when this event is fired, this may occur even when the user is already signed in. Instead, check the user object attached to the event to see if a new user has signed in and update your application's UI.
           - This event can fire very frequently depending on the number of tabs open in your application.
         - `SIGNED_OUT`
           - Emitted when the user signs out. This can be after:
