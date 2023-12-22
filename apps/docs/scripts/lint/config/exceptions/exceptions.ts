@@ -1,14 +1,28 @@
 import { countWords } from '../../utils/words'
 
+export type ExceptionTestPlugin = (
+  word: string,
+  fullString?: string,
+  index?: number
+) => ExceptionResult
+
+interface ExceptionResult {
+  exception: boolean
+  advanceIndexBy: number
+  match?: string
+}
+
 export class ExceptionList {
   private map: Map<string, string[]>
+  private plugins: ExceptionTestPlugin[] | undefined
 
   static isMultiword(word: string) {
     return /\s+/.test(word)
   }
 
-  constructor() {
+  constructor({ plugins }: { plugins?: ExceptionTestPlugin[] } = {}) {
     this.map = new Map()
+    this.plugins = plugins
   }
 
   addSingle(word: string) {
@@ -47,6 +61,15 @@ export class ExceptionList {
     advanceIndexBy: number
     match?: string
   } {
+    if (this.plugins) {
+      for (const plugin of this.plugins) {
+        const pluginResult = plugin(word, fullString, index)
+        if (pluginResult.exception) {
+          return pluginResult
+        }
+      }
+    }
+
     if (this.map.has(word)) {
       const multiwords = this.getSortedMultiwords(word)
       for (const term of multiwords) {

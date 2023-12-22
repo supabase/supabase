@@ -1,6 +1,5 @@
 import { ExceptionList } from '../config/exceptions/exceptions'
 
-const initialismRegex = /^[A-Z]+$/
 export const symbolRegex = /[^\s\w]+/
 
 interface Token {
@@ -28,15 +27,6 @@ export function tokenize(
 
     const isTokenSymbol = symbolRegex.test(token)
     if (isTokenSymbol) {
-      result.push({
-        value: token,
-        positionInParent: { columnZeroIndexed: position },
-      } satisfies Token)
-      continue
-    }
-
-    const isTokenInitialism = initialismRegex.test(token)
-    if (isTokenInitialism) {
       result.push({
         value: token,
         positionInParent: { columnZeroIndexed: position },

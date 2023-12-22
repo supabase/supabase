@@ -1,6 +1,22 @@
-import { ExceptionList } from './exceptions'
+import { ExceptionList, ExceptionTestPlugin } from './exceptions'
 
-const capitalizedWords = new ExceptionList()
+const initialismRegex = /^[A-Z0-9]+$/
+
+const allowInitialisms: ExceptionTestPlugin = (word: string) => {
+  if (initialismRegex.test(word)) {
+    return {
+      exception: true,
+      advanceIndexBy: 0,
+    }
+  }
+
+  return {
+    exception: false,
+    advanceIndexBy: 0,
+  }
+}
+
+const capitalizedWords = new ExceptionList({ plugins: [allowInitialisms] })
 
 capitalizedWords
   .addSingle('Amazon')
