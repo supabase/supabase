@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { partition } from 'lodash'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { motion, useAnimation, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 
 import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import AlertError from 'components/ui/AlertError'
@@ -26,14 +26,10 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
   IconChevronsDown,
-  IconEdit,
   IconLoader,
   IconPlusCircle,
-  IconRefreshCw,
   IconSearch,
   IconX,
-  Input,
-  Input_Shadcn_,
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
@@ -48,6 +44,8 @@ const TableEditorMenu = () => {
     'table-editor-sort',
     'alphabetical'
   )
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const inputRef = useRef<HTMLInputElement | null>(null)
 
   const { project } = useProjectContext()
   const {
@@ -75,12 +73,11 @@ const TableEditorMenu = () => {
     }
   )
 
-  const totalCount = data?.pages?.[0].data.count
   const entityTypes = useMemo(
     () => data?.pages.flatMap((page) => page.data.entities),
     [data?.pages]
   )
-
+  console.log('entityTypes', entityTypes)
   const { data: schemas } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -93,12 +90,22 @@ const TableEditorMenu = () => {
     await refetch()
   }
 
+  refreshTables
   const [protectedSchemas] = partition(
     (schemas ?? []).sort((a, b) => a.name.localeCompare(b.name)),
     (schema) => EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
   )
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
 
+  const expandSearch = () => {
+    setIsSearchOpen(!isSearchOpen)
+  }
+
+  useEffect(() => {
+    if (isSearchOpen && inputRef.current) {
+      inputRef.current.focus()
+    }
+  }, [isSearchOpen])
   return (
     <>
       <div
@@ -106,7 +113,7 @@ const TableEditorMenu = () => {
         style={{ maxHeight: 'calc(100vh - 48px)' }}
       >
         <SchemaSelector
-          className="mx-4"
+          className="mx-4 h-7"
           selectedSchemaName={snap.selectedSchemaName}
           onSelectSchema={(name: string) => {
             setSearchText('')
@@ -130,7 +137,7 @@ const TableEditorMenu = () => {
                     </div>
                   }
                   type="default"
-                  style={{ justifyContent: 'start' }}
+                  className="justify-start h-7"
                   onClick={snap.onAddTable}
                 >
                   <span>New table</span>
@@ -169,41 +176,56 @@ const TableEditorMenu = () => {
               </AlertDescription_Shadcn_>
             </Alert_Shadcn_>
           )}
-
-          {/* Table search input */}
-          <div className="mb-2 block">
-            <Input
-              className="table-editor-search border-none"
-              icon={
-                isSearching ? (
-                  <IconLoader
-                    className="animate-spin text-foreground-lighter"
-                    size={12}
-                    strokeWidth={1.5}
-                  />
-                ) : (
-                  <IconSearch className="text-foreground-lighter" size={12} strokeWidth={1.5} />
-                )
-              }
-              placeholder="Search tables"
-              onChange={(e) => setSearchText(e.target.value.trim())}
-              value={searchText}
-              size="tiny"
-              actions={
-                searchText && (
-                  <Button size="tiny" type="text" onClick={() => setSearchText('')}>
-                    <IconX size={12} strokeWidth={2} />
-                  </Button>
-                )
-              }
-            />
-          </div>
         </div>
 
-        <nav className="flex flex-auto flex-col gap-2 pb-4 px-2">
+        <div className="flex flex-auto flex-col gap-2 pb-4 px-2">
           <div className="relative">
-            <SearchToggle />
-            <div className="flex gap-3 items-center absolute right-0 top-1">
+            <div className="relative flex items-center text-foreground-lighter">
+              <AnimatePresence>
+                {isSearchOpen && (
+                  <motion.div
+                    initial={{ x: 10, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1, transition: { duration: 0.2 } }}
+                    exit={{ x: 20, opacity: 0, transition: { duration: 0 } }}
+                    className="absolute top-0 left-2"
+                  >
+                    <input
+                      type="text"
+                      placeholder="Search..."
+                      className="bg-default rounded-md px-2 py-0 h-8 focus:outline-none w-44 text-sm"
+                      onChange={(e) => setSearchText(e.target.value.trim())}
+                      value={searchText}
+                      ref={inputRef}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              <motion.button
+                onClick={expandSearch}
+                initial={{ x: 0 }}
+                animate={{ x: isSearchOpen ? 185 : 0, transition: { duration: 0 } }}
+                className="px-2 py-1 rounded-md mt-0.5 transition transform hover:scale-105 focus:outline-none"
+              >
+                {isSearchOpen ? (
+                  isSearching ? (
+                    <IconLoader
+                      className="animate-spin text-foreground-lighter"
+                      size={15}
+                      strokeWidth={1.5}
+                    />
+                  ) : (
+                    <button onClick={() => setSearchText('')}>
+                      <IconX />
+                    </button>
+                  )
+                ) : (
+                  <button>
+                    <IconSearch />
+                  </button>
+                )}
+              </motion.button>
+            </div>
+            <div className="flex gap-3 items-center absolute right-2 top-1.5">
               <DropdownMenu>
                 <Tooltip.Root delayDuration={0}>
                   <DropdownMenuTrigger asChild>
@@ -242,21 +264,7 @@ const TableEditorMenu = () => {
                   </DropdownMenuRadioGroup>
                 </DropdownMenuContent>
               </DropdownMenu>
-              {/* <button
-                className="cursor-pointer text-foreground-lighter transition-colors hover:text-foreground"
-                onClick={refreshTables}
-              >
-                <IconRefreshCw className={isRefetching ? 'animate-spin' : ''} size={14} />
-              </button> */}
             </div>
-          </div>
-          <div className="flex items-center justify-between w-full px-3">
-            {/* <div className="flex items-center gap-1 text-sm text-foreground-lighter">
-              <p>Tables</p>
-              {totalCount !== undefined && (
-                <p style={{ fontVariantNumeric: 'tabular-nums' }}>({totalCount})</p>
-              )}
-            </div> */}
           </div>
 
           {isLoading && (
@@ -289,7 +297,6 @@ const TableEditorMenu = () => {
                   </p>
                 </div>
               )}
-
               {(entityTypes?.length ?? 0) > 0 && (
                 <div className="flex flex-1">
                   <InfiniteList
@@ -308,7 +315,7 @@ const TableEditorMenu = () => {
               )}
             </>
           )}
-        </nav>
+        </div>
       </div>
 
       <ProtectedSchemaModal visible={showModal} onClose={() => setShowModal(false)} />
@@ -317,48 +324,3 @@ const TableEditorMenu = () => {
 }
 
 export default TableEditorMenu
-
-const SearchToggle = () => {
-  const [isSearchOpen, setIsSearchOpen] = useState(false)
-  const inputRef = useRef<HTMLInputElement | null>(null)
-
-  const expandSearch = () => {
-    setIsSearchOpen(!isSearchOpen)
-  }
-
-  useEffect(() => {
-    if (isSearchOpen && inputRef.current) {
-      inputRef.current.focus()
-    }
-  }, [isSearchOpen])
-
-  return (
-    <div className="relative flex items-center">
-      <motion.button
-        onClick={expandSearch}
-        initial={{ x: 0 }}
-        animate={{ x: isSearchOpen ? 190 : 0, transition: { duration: 0 } }} // Animate based on isSearchOpen
-        className=" px-2 py-1 rounded-md   transition  transform hover:scale-105 focus:outline-none"
-      >
-        {isSearchOpen ? <IconX /> : <IconSearch />}
-      </motion.button>
-      <AnimatePresence>
-        {isSearchOpen && (
-          <motion.div
-            initial={{ x: 10, opacity: 0 }}
-            animate={{ x: 0, opacity: 1, transition: { duration: 0.2 } }}
-            exit={{ x: 20, opacity: 0, transition: { duration: 0.2 } }}
-            className="absolute top-0 left-2"
-          >
-            <Input_Shadcn_
-              type="text"
-              placeholder="Search..."
-              className="bg-surface-100 border-b rounded-md px-2 !py-0.5 h-8 focus:outline-none w-44"
-              ref={inputRef}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  )
-}
