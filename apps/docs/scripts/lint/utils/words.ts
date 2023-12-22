@@ -1,7 +1,3 @@
-export function pluralize(word: string) {
-  return [word, `${word}s`]
-}
-
-export function stripSymbols(word: string) {
-  return word.replace(/\W/g, '')
+export function countWords(s: string) {
+  return s.trim().split(/s+/g).length
 }

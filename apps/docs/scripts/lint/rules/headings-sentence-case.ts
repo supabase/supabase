@@ -1,136 +1,140 @@
-import { Content } from 'mdast'
 import { Node } from 'unist'
-import { capitalizedWords } from '../config/words'
+import { capitalizedWords } from '../config/exceptions/capitalizedWords'
 import { ErrorSeverity, FixReplace, LintError, LintRule, error } from '.'
+import { symbolRegex, tokenize } from '../utils/text'
+import { visit } from 'unist-util-visit'
+import { Heading } from 'mdast'
+import { countWords } from '../utils/words'
 
-function headingsSentenceCaseCheck(node: Content, _: number, __: Node, file: string) {
-  if (!('children' in node)) {
-    return []
-  }
-
-  const textNode = node.children[0]
-  // need to account for `inlineCode` children, in initial, middle, and final positions
-  // need to account for headings beginning with number
-  // investigate why JSON Web Token at beginning isn't working
-  if (textNode?.type !== 'text') {
-    return []
-  }
-  const text = textNode.value
-
+function headingsSentenceCaseCheck(node: Heading, _: number, __: Node, file: string) {
   const errors: LintError[] = []
 
-  const wordRegex = /\b\S+\b/g
+  visit(node, 'text', function lint(textNode, index, parent) {
+    const isFirstNodeOfHeading = index === 0
 
-  const firstMatch = wordRegex.exec(text)
-  const firstWord = firstMatch?.[0]
-  if (
-    capitalizedWords.matchException({
-      word: firstWord,
-      fullString: text,
-      index: firstMatch.index,
-    }).exception
-  ) {
-    wordRegex.lastIndex += capitalizedWords.matchException({
-      word: firstWord,
-      fullString: text,
-      index: wordRegex.lastIndex,
-    }).advanceIndexBy
-  } else if (firstWord?.[0] && /[a-z]/.test(firstWord[0])) {
-    errors.push(
-      error({
-        message: 'First word in heading should be capitalized.',
-        severity: ErrorSeverity.Error,
-        file,
-        line: textNode.position.start.line,
-        column: textNode.position.start.column,
-        fix: new FixReplace({
-          start: {
-            line: textNode.position.start.line,
-            column: textNode.position.start.column,
-          },
-          end: {
-            line: textNode.position.start.line,
-            column: textNode.position.start.column + 1,
-          },
-          text: firstWord[0].toUpperCase(),
-        }),
-      })
-    )
-  }
+    const text = textNode.value
+    const tokens = tokenize(text, { exceptions: [capitalizedWords] })
 
-  let currMatch: RegExpExecArray
-  while ((currMatch = wordRegex.exec(text)) !== null) {
-    const currWord = currMatch[0]
-    const index = textNode.position.start.column + currMatch.index
+    tokens.forEach((token, index, tokens) => {
+      if (symbolRegex.test(token.value)) {
+        return
+      }
 
-    if (text[currMatch.index - 2] === ':') {
-      if (currWord[0] && /[a-z]/.test(currWord[0])) {
+      // Token can only be multiple words long if it has already matched the exception list
+      if (countWords(token.value) > 1) {
+        return
+      }
+
+      // Error if first token of first word starts with lowercase letter
+      if (isFirstNodeOfHeading && index === 0 && /[a-z]/.test(token[0])) {
         errors.push(
           error({
-            message: 'First word after colon should be capitalized.',
+            message: 'First word in heading should be capitalized.',
             severity: ErrorSeverity.Error,
             file,
             line: textNode.position.start.line,
-            column: textNode.position.start.column,
+            column: textNode.position.start.column + token.positionInParent.columnZeroIndexed,
             fix: new FixReplace({
               start: {
                 line: textNode.position.start.line,
-                column: textNode.position.start.column,
+                column: textNode.position.start.column + token.positionInParent.columnZeroIndexed,
               },
               end: {
                 line: textNode.position.start.line,
-                column: textNode.position.start.column + 1,
+                column:
+                  textNode.position.start.column + token.positionInParent.columnZeroIndexed + 1,
               },
-              text: firstWord[0].toUpperCase(),
+              text: token.value[0].toUpperCase(),
+            }),
+          })
+        )
+        return
+      }
+
+      // Error if any other token starts with lowercase letter
+      // Exception: if the preceding token is a symbol
+      if (
+        // Token is not first word of heading
+        !(isFirstNodeOfHeading && index === 0) &&
+        // Preceding token (if exists) is not a symbol
+        (index === 0 || !symbolRegex.test(tokens[index - 1].value)) &&
+        // Token is capitalized
+        /[A-Z]/.test(token[0])
+      ) {
+        errors.push(
+          error({
+            message: 'Heading should be in sentence case.',
+            severity: ErrorSeverity.Error,
+            file,
+            line: textNode.position.start.line,
+            column: textNode.position.start.column + token.positionInParent.columnZeroIndexed,
+            fix: new FixReplace({
+              start: {
+                line: textNode.position.start.line,
+                column: textNode.position.start.column + token.positionInParent.columnZeroIndexed,
+              },
+              end: {
+                line: textNode.position.start.line,
+                column:
+                  textNode.position.start.column + token.positionInParent.columnZeroIndexed + 1,
+              },
+              text: token.value[0].toLowerCase(),
             }),
           })
         )
       }
-    } else if (
-      /[A-Z]/.test(currWord[0]) &&
-      /[a-z]/.test(currWord) &&
-      capitalizedWords.matchException({
-        word: currWord,
-        fullString: text,
-        index: currMatch.index,
-      }).exception
-    ) {
-      wordRegex.lastIndex += capitalizedWords.matchException({
-        word: currWord,
-        fullString: text,
-        index: currMatch.index,
-      }).advanceIndexBy
-    } else if (
-      /[A-Z]/.test(currWord[0]) &&
-      /[a-z]/.test(currWord) &&
-      !capitalizedWords.matchException({
-        word: currWord,
-        fullString: text,
-        index: currMatch.index,
-      }).exception
-    ) {
-      errors.push(
-        error({
-          message: 'Heading should be in sentence case.',
-          severity: ErrorSeverity.Error,
-          file,
-          line: textNode.position.start.line,
-          column: textNode.position.start.column,
-          fix: new FixReplace({
-            start: {
-              line: textNode.position.start.line,
-              column: index,
-            },
-            end: {
-              line: textNode.position.start.line,
-              column: index + 1,
-            },
-            text: currWord[0].toLowerCase(),
-          }),
-        })
-      )
-    }
-  }
+    })
+  })
+
+  /* const firstMatch = wordRegex.exec(text)
+									if (text[currMatch.index - 2] === ':') {
+									  if (currWord[0] && /[a-z]/.test(currWord[0])) {
+										errors.push(
+										  error({
+											message: 'First word after colon should be capitalized.',
+											severity: ErrorSeverity.Error,
+											file,
+											line: textNode.position.start.line,
+											column: textNode.position.start.column,
+											fix: new FixReplace({
+											  start: {
+												line: textNode.position.start.line,
+												column: textNode.position.start.column,
+											  },
+											  end: {
+												line: textNode.position.start.line,
+												column: textNode.position.start.column + 1,
+											  },
+											  text: firstWord[0].toUpperCase(),
+											}),
+										  })
+										)
+									  }
+									} else if (
+									  /[A-Z]/.test(currWord[0]) &&
+									  /[a-z]/.test(currWord) &&
+									  capitalizedWords.matchException({
+										word: currWord,
+										fullString: text,
+										index: currMatch.index,
+									  }).exception
+									) {
+									  wordRegex.lastIndex += capitalizedWords.matchException({
+										word: currWord,
+										fullString: text,
+										index: currMatch.index,
+									  }).advanceIndexBy
+									} else if (
+									  /[A-Z]/.test(currWord[0]) &&
+									  /[a-z]/.test(currWord) &&
+									  !capitalizedWords.matchException({
+										word: currWord,
+										fullString: text,
+										index: currMatch.index,
+									  }).exception
+									) {
+									}
+								  } */
 
   return errors
 }
