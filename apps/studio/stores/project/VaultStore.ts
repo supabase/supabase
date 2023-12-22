@@ -1,6 +1,5 @@
 import type { PostgresColumn } from '@supabase/postgres-meta'
 import { Query } from 'components/grid/query/Query'
-import { getViews } from 'data/views/views-query'
 import { makeAutoObservable } from 'mobx'
 import { VaultSecret } from 'types'
 import { IRootStore } from '../RootStore'
@@ -22,7 +21,6 @@ export interface IVaultStore {
   updateSecret: (id: string, payload: Partial<VaultSecret>) => any
   deleteSecret: (id: string) => any
   fetchSecretValue: (id: string) => any
-  listEncryptedColumns: (schema: string, table: string) => any
 }
 
 interface EncryptionKey {
@@ -207,27 +205,5 @@ export default class VaultStore implements IVaultStore {
       })
     }
     return res[0].decrypted_secret
-  }
-
-  async listEncryptedColumns(schema: string, table: string) {
-    if (!table) return []
-
-    const views = await getViews({
-      projectRef: this.rootStore.meta.projectRef,
-      connectionString: this.rootStore.meta.connectionString,
-      schema,
-    })
-    const decryptedView = views.find((view) => view.name === `decrypted_${table}`)
-    if (!decryptedView) return []
-
-    const encryptedColumns = await this.rootStore.meta.query(
-      `SELECT column_name as name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'decrypted_${table}' and column_name like 'decrypted_%'`
-    )
-    if (!encryptedColumns.error) {
-      return encryptedColumns.map((column: any) => column.name.split('decrypted_')[1])
-    } else {
-      console.error('Error fetching encrypted columns', encryptedColumns.error)
-      return []
-    }
   }
 }
