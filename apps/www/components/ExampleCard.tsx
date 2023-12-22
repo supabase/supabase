@@ -2,9 +2,17 @@ import Link from 'next/link'
 import { Button, IconArrowUpRight } from 'ui'
 import { useBreakpoint } from 'common'
 import Panel from './Panel'
+import { useEffect, useState } from 'react'
 
 function ExampleCard(props: any) {
   const isXs = useBreakpoint()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) return null
 
   return (
     <Link href={props.repo_url} className="w-full h-full" target="_blank">
