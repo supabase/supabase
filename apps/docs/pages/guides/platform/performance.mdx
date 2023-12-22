@@ -8,7 +8,7 @@ export const meta = {
 
 The Supabase platform automatically optimizes your Postgres database to take advantage of the compute resources of the plan your project is on. However, these optimizations are based on assumptions about the type of workflow the project is being utilized for, and it is likely that better results can be obtained by tuning the database for your particular workflow.
 
-## Examining Query Performance
+## Examining query performance
 
 Unoptimized queries are a major cause of poor database performance. The techniques on this page can help you identify and understand queries that take the most time and resources from your database.
 
@@ -24,7 +24,7 @@ Database performance is a large topic and many factors can contribute. Some of t
 
 Thankfully there are solutions to all these issues, which we will cover in the following sections.
 
-### Postgres Cumulative Statistics system
+### Postgres cumulative statistics system
 
 Postgres collects data about its own operations using the [cumulative statistics system](https://www.postgresql.org/docs/current/monitoring-stats.html). In addition to this, every Supabase project has the [pg_stat_statements extension](/docs/guides/database/extensions/pg_stat_statements) enabled by default. This extension records query execution performance details and is the best way to find inefficient queries. This information can be combined with the Postgres query plan analyzer to develop more efficient queries.
 

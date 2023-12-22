@@ -29,23 +29,23 @@ The Supabase Platform has "organizations" and "projects". An organization may co
 
 Organization-based Billing was introduced on September 4th 2023. We are migrating all projects to this new structure. Read the [announcement](https://supabase.com/blog/organization-based-billing) for more context.
 
-### Legacy Billing (Project-based)
+### Legacy billing (project-based)
 
 If your organization was created before September 4th 2023, each project had an individual subscription, a plan and addons.
 
 ![Billing Before](/docs/img/guides/platform/org-billing-before.png)
 
-### Current Billing (Organization-based)
+### Current billing (organization-based)
 
 With Organization-based Billing, each organization only has a single subscription with a single plan (Free, Pro, Team or Enterprise). Project addons such as [Compute](/docs/guides/platform/compute-add-ons), [Custom Domains](/docs/guides/platform/custom-domains) and [PITR](/docs/guides/platform/backups#point-in-time-recovery) are still configured per project and are added to your organization subscription.
 
 ![Billing: After](/docs/img/guides/platform/org-billing-after.png)
 
-## Unified Egress
+## Unified egress
 
 Each organization receives a total egress quota (eg. 250GB on the Pro plan) which can be used for anything - Storage, Realtime, Auth, Functions or Database.
 
-### Included Egress Quota
+### Included egress quota
 
 Each plan includes a quota for unified egress, which is applied to your entire organization.
 
@@ -56,7 +56,7 @@ Each plan includes a quota for unified egress, which is applied to your entire o
 | Team       | 250 GB             | $0.09 per GB |
 | Enterprise | Custom             | Custom       |
 
-### Egress Dashboards
+### Egress dashboards
 
 You can see a breakdown of the different types of egress on your [organization usage page](https://supabase.com/dashboard/org/_/usage).
 
@@ -70,17 +70,17 @@ You can see a breakdown of the different types of egress on your [organization u
   />
 </div>
 
-### Legacy Egress
+### Legacy egress
 
 Under the old system, you had different quotas for each service. i.e. on the Pro plan, you had 50GB of database egress and 200GB of storage egress included. If you weren't using storage, you'd miss out on the included egress. The new system provides you more egress in every scenario.
 
-## Quotas and Features
+## Quotas and features
 
 Quotas and features are applied to your entire organization, independent of how many projects you launch within that organization. For billing purposes, we sum the usage across all projects in a monthly invoice.
 
 Upgrading your organization to a paid plan means that you unlock the benefits of the paid plan for **all** projects within that organization - for example, no projects in your "Pro" organization will be paused. See [pricing page](https://supabase.com/pricing) for details on all plans.
 
-### Usage Items
+### Usage items
 
 | Metric                     | Free                     | Pro/Team                                    | Enterprise |
 | -------------------------- | ------------------------ | ------------------------------------------- | ---------- |
@@ -133,7 +133,7 @@ With Legacy Billing, when you upgraded the [Compute Add-On](/docs/guides/platfor
 
 Supabase provides two "Free organizations". Each organization can run a `Starter` instance for free. This is a great way to get started with Supabase and try out the platform.
 
-### Compute Credits
+### Compute credits
 
 Paid plans come with $10 of Compute Credits to cover one Starter instance or parts of any other [Compute Add-On](/docs/guides/platform/compute-add-ons).
 
@@ -145,7 +145,7 @@ Additionally, Compute Credits reset every month and do not accumulate, in case y
 
 With Legacy Billing, you used to pay $25 for every single Pro plan project in an organization. Previously, we gave you a free “Starter” instance on paid plans - we're now giving you $10 in Compute Credits instead, to cover the first instance. You end up not paying extra for the first project inside your paid plan organization - just like before. In case you add a Compute Add-On to your first project, you also end up paying exactly the same as before.
 
-## Legacy vs Organization-based Billing
+## Legacy vs organization-based billing
 
 If you are using Legacy Billing and have a single project in your organization, there is no change in pricing or quota. Here are some examples on how the new Organization-based Billing migration affects you.
 
