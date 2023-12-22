@@ -37,7 +37,6 @@ import { tableKeys } from 'data/tables/keys'
 import { getTable } from 'data/tables/table-query'
 import { getTables } from 'data/tables/tables-query'
 import PostgresMetaInterface from '../common/PostgresMetaInterface'
-import ViewStore, { IViewStore } from './ViewStore'
 
 const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
@@ -45,7 +44,6 @@ const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
 export interface IMetaStore {
   tables: ITableStore
   columns: IPostgresMetaInterface<PostgresColumn>
-  views: IViewStore
 
   projectRef?: string
   connectionString?: string
@@ -118,7 +116,6 @@ export default class MetaStore implements IMetaStore {
   rootStore: IRootStore
   tables: TableStore
   columns: PostgresMetaInterface<PostgresColumn>
-  views: ViewStore
 
   projectRef?: string
   connectionString?: string
@@ -143,7 +140,6 @@ export default class MetaStore implements IMetaStore {
       `${this.baseUrl}/columns`,
       this.headers
     )
-    this.views = new ViewStore(this.rootStore, `${this.baseUrl}/views`, this.headers)
 
     makeObservable(this, {})
   }
@@ -833,8 +829,5 @@ export default class MetaStore implements IMetaStore {
 
     this.columns.setUrl(`${this.baseUrl}/columns`)
     this.columns.setHeaders(this.headers)
-
-    this.views.setUrl(`${this.baseUrl}/views`)
-    this.views.setHeaders(this.headers)
   }
 }
