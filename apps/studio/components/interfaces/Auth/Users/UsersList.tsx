@@ -60,7 +60,7 @@ const UsersList = ({
               <UsersListItemSkeleton />
             </>
           )}
-          {isSuccess && users.length == 0 && (
+          {isSuccess && users.length === 0 && (
             <Table.tr>
               <Table.td
                 colSpan={8}
