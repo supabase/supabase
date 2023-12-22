@@ -57,18 +57,18 @@ const Nav = () => {
    * https://github.com/pacocoursey/next-themes/issues/169
    * TODO: remove when bug has been fixed
    */
-  // const [mounted, setMounted] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
-  // useEffect(() => {
-  //   setMounted(true)
-  // }, [])
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
-  // if (!mounted) {
-  //   return null
-  // }
+  if (!mounted) {
+    return null
+  }
 
-  const showDarkLogo = isLaunchWeekPage || resolvedTheme?.includes('dark')! || isHomePage
-  // isLaunchWeekPage || (mounted && resolvedTheme?.includes('dark')!) || isHomePage
+  const showDarkLogo =
+    isLaunchWeekPage || (mounted && resolvedTheme?.includes('dark')!) || isHomePage
 
   return (
     <>
