@@ -44,7 +44,7 @@ function headingsSentenceCaseCheck(headingNode: Heading, _: number, __: Node, fi
       }
 
       // Error if first token of first word starts with lowercase letter
-      if (isFirstNodeOfHeading && index === 0 && /[a-z]/.test(token[0])) {
+      if (isFirstNodeOfHeading && index === 0 && /[a-z]/.test(token.value[0])) {
         errors.push(
           error({
             message: 'First word in heading should be capitalized.',
@@ -69,6 +69,31 @@ function headingsSentenceCaseCheck(headingNode: Heading, _: number, __: Node, fi
         return
       }
 
+      // Error if first word after colon starts with lowercase letter
+      if (index !== 0 && tokens[index - 1].value.endsWith(':') && /[a-z]/.test(token.value[0])) {
+        errors.push(
+          error({
+            message: 'First word after colon should be capitalized.',
+            severity: ErrorSeverity.Error,
+            file,
+            line: textNode.position.start.line,
+            column: textNode.position.start.column,
+            fix: new FixReplace({
+              start: {
+                line: textNode.position.start.line,
+                column: textNode.position.start.column + token.positionInParent.columnZeroIndexed,
+              },
+              end: {
+                line: textNode.position.start.line,
+                column:
+                  textNode.position.start.column + token.positionInParent.columnZeroIndexed + 1,
+              },
+              text: token.value[0].toUpperCase(),
+            }),
+          })
+        )
+      }
+
       // Error if any other token starts with lowercase letter
       // Exception: if the preceding token is a symbol
       if (
@@ -77,7 +102,7 @@ function headingsSentenceCaseCheck(headingNode: Heading, _: number, __: Node, fi
         // Preceding token (if exists) is not a symbol
         (index === 0 || !symbolRegex.test(tokens[index - 1].value)) &&
         // Token is capitalized
-        /[A-Z]/.test(token[0])
+        /[A-Z]/.test(token.value[0])
       ) {
         errors.push(
           error({
@@ -103,56 +128,6 @@ function headingsSentenceCaseCheck(headingNode: Heading, _: number, __: Node, fi
       }
     })
   })
-
-  /* const firstMatch = wordRegex.exec(text)
-																			if (text[currMatch.index - 2] === ':') {
-																			  if (currWord[0] && /[a-z]/.test(currWord[0])) {
-																				errors.push(
-																				  error({
-																					message: 'First word after colon should be capitalized.',
-																					severity: ErrorSeverity.Error,
-																					file,
-																					line: textNode.position.start.line,
-																					column: textNode.position.start.column,
-																					fix: new FixReplace({
-																					  start: {
-																						line: textNode.position.start.line,
-																						column: textNode.position.start.column,
-																					  },
-																					  end: {
-																						line: textNode.position.start.line,
-																						column: textNode.position.start.column + 1,
-																					  },
-																					  text: firstWord[0].toUpperCase(),
-																					}),
-																				  })
-																				)
-																			  }
-																			} else if (
-																			  /[A-Z]/.test(currWord[0]) &&
-																			  /[a-z]/.test(currWord) &&
-																			  capitalizedWords.matchException({
-																				word: currWord,
-																				fullString: text,
-																				index: currMatch.index,
-																			  }).exception
-																			) {
-																			  wordRegex.lastIndex += capitalizedWords.matchException({
-																				word: currWord,
-																				fullString: text,
-																				index: currMatch.index,
-																			  }).advanceIndexBy
-																			} else if (
-																			  /[A-Z]/.test(currWord[0]) &&
-																			  /[a-z]/.test(currWord) &&
-																			  !capitalizedWords.matchException({
-																				word: currWord,
-																				fullString: text,
-																				index: currMatch.index,
-																			  }).exception
-																			) {
-																			}
-																		  } */
 
   return errors
 }
