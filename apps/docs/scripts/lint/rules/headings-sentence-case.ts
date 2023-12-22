@@ -6,11 +6,30 @@ import { visit } from 'unist-util-visit'
 import { Heading } from 'mdast'
 import { countWords } from '../utils/words'
 
-function headingsSentenceCaseCheck(node: Heading, _: number, __: Node, file: string) {
+function isFirstOfTheLine(_: Node, index: number, parent: Node, ancestor: Node) {
+  if (index !== 0) return false
+
+  let curr = ancestor
+  while ('children' in curr && Array.isArray(curr.children) && curr.children.length > 0) {
+    curr = curr.children[0]
+    if (curr === parent) {
+      return true
+    }
+  }
+
+  return false
+}
+
+function headingsSentenceCaseCheck(headingNode: Heading, _: number, __: Node, file: string) {
   const errors: LintError[] = []
 
-  visit(node, 'text', function lint(textNode, index, parent) {
-    const isFirstNodeOfHeading = index === 0
+  visit(headingNode, 'text', function lint(textNode, textNodeIndex, textNodeParent) {
+    const isFirstNodeOfHeading = isFirstOfTheLine(
+      textNode,
+      textNodeIndex,
+      textNodeParent,
+      headingNode
+    )
 
     const text = textNode.value
     const tokens = tokenize(text, { exceptions: [capitalizedWords] })
@@ -87,54 +106,54 @@ function headingsSentenceCaseCheck(node: Heading, _: number, __: Node, file: str
   })
 
   /* const firstMatch = wordRegex.exec(text)
-									if (text[currMatch.index - 2] === ':') {
-									  if (currWord[0] && /[a-z]/.test(currWord[0])) {
-										errors.push(
-										  error({
-											message: 'First word after colon should be capitalized.',
-											severity: ErrorSeverity.Error,
-											file,
-											line: textNode.position.start.line,
-											column: textNode.position.start.column,
-											fix: new FixReplace({
-											  start: {
-												line: textNode.position.start.line,
-												column: textNode.position.start.column,
-											  },
-											  end: {
-												line: textNode.position.start.line,
-												column: textNode.position.start.column + 1,
-											  },
-											  text: firstWord[0].toUpperCase(),
-											}),
-										  })
-										)
-									  }
-									} else if (
-									  /[A-Z]/.test(currWord[0]) &&
-									  /[a-z]/.test(currWord) &&
-									  capitalizedWords.matchException({
-										word: currWord,
-										fullString: text,
-										index: currMatch.index,
-									  }).exception
-									) {
-									  wordRegex.lastIndex += capitalizedWords.matchException({
-										word: currWord,
-										fullString: text,
-										index: currMatch.index,
-									  }).advanceIndexBy
-									} else if (
-									  /[A-Z]/.test(currWord[0]) &&
-									  /[a-z]/.test(currWord) &&
-									  !capitalizedWords.matchException({
-										word: currWord,
-										fullString: text,
-										index: currMatch.index,
-									  }).exception
-									) {
-									}
-								  } */
+														if (text[currMatch.index - 2] === ':') {
+														  if (currWord[0] && /[a-z]/.test(currWord[0])) {
+															errors.push(
+															  error({
+																message: 'First word after colon should be capitalized.',
+																severity: ErrorSeverity.Error,
+																file,
+																line: textNode.position.start.line,
+																column: textNode.position.start.column,
+																fix: new FixReplace({
+																  start: {
+																	line: textNode.position.start.line,
+																	column: textNode.position.start.column,
+																  },
+																  end: {
+																	line: textNode.position.start.line,
+																	column: textNode.position.start.column + 1,
+																  },
+																  text: firstWord[0].toUpperCase(),
+																}),
+															  })
+															)
+														  }
+														} else if (
+														  /[A-Z]/.test(currWord[0]) &&
+														  /[a-z]/.test(currWord) &&
+														  capitalizedWords.matchException({
+															word: currWord,
+															fullString: text,
+															index: currMatch.index,
+														  }).exception
+														) {
+														  wordRegex.lastIndex += capitalizedWords.matchException({
+															word: currWord,
+															fullString: text,
+															index: currMatch.index,
+														  }).advanceIndexBy
+														} else if (
+														  /[A-Z]/.test(currWord[0]) &&
+														  /[a-z]/.test(currWord) &&
+														  !capitalizedWords.matchException({
+															word: currWord,
+															fullString: text,
+															index: currMatch.index,
+														  }).exception
+														) {
+														}
+													  } */
 
   return errors
 }
