@@ -41,6 +41,7 @@ export function tokenize(
         value: token,
         positionInParent: { columnZeroIndexed: position },
       } satisfies Token)
+      continue
     }
 
     const matchingExceptions = exceptions
@@ -70,6 +71,5 @@ export function tokenize(
     }
   }
 
-  console.log(result)
   return result satisfies Token[]
 }

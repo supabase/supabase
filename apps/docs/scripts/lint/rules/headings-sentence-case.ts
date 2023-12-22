@@ -92,6 +92,7 @@ function headingsSentenceCaseCheck(headingNode: Heading, _: number, __: Node, fi
             }),
           })
         )
+        return
       }
 
       // Error if any other token starts with lowercase letter
