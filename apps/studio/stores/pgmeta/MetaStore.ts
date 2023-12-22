@@ -48,6 +48,7 @@ export interface IMetaStore {
   views: IViewStore
 
   projectRef?: string
+  connectionString?: string
 
   query: (value: string) => Promise<any | { error: ResponseError }>
   validateQuery: (value: string) => Promise<any | { error: ResponseError }>
