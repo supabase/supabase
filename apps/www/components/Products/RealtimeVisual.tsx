@@ -142,7 +142,7 @@ const RealtimeVisual = () => {
             width="325.38"
             height="265.65"
             filterUnits="userSpaceOnUse"
-            color-interpolation-filters="sRGB"
+            colorInterpolationFilters="sRGB"
           >
             <feFlood floodOpacity="0" result="BackgroundImageFix" />
             <feGaussianBlur in="BackgroundImageFix" stdDeviation="4.36172" />
@@ -161,7 +161,7 @@ const RealtimeVisual = () => {
             width="528.338"
             height="528.338"
             filterUnits="userSpaceOnUse"
-            color-interpolation-filters="sRGB"
+            colorInterpolationFilters="sRGB"
           >
             <feFlood floodOpacity="0" result="BackgroundImageFix" />
             <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
