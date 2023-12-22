@@ -131,7 +131,7 @@ supabase.storage.from("bucket").downloadAuthenticatedTo("image.jpg", file) {
 </TabPanel>
 </Tabs>
 
-## Automatic Image Optimisation (WebP)
+## Automatic Image Optimization (WebP)
 
 When using the image transformation API, Storage will automatically find the best format supported by the client and return that to the client, without any code change. For instance, if you use Chrome when viewing a jpeg image and using transformation options, you'll see that images are automatically optimized as `webp` images.
 
@@ -143,7 +143,7 @@ We currently only support WebP. AVIF support will come in the near future.
 
 </Admonition>
 
-**Disabling automatic optimisation:**
+**Disabling automatic optimization:**
 
 In case you'd like to return the original format of the image and **opt-out** from the automatic image optimization detection, you can pass the `format=origin` parameter when requesting a transformed image, this is also supported in the JavaScript SDK starting from v2.2.0
 
@@ -348,7 +348,7 @@ supabase.storage.from("bucket").downloadAuthenticatedTo("image.jpg", file) {
 
 ## Self Hosting
 
-Our solution to image resizing and optimisation can be self-hosted as with any other Supabase product. Under the hood we use [Imgproxy](https://imgproxy.net/)
+Our solution to image resizing and optimization can be self-hosted as with any other Supabase product. Under the hood we use [Imgproxy](https://imgproxy.net/)
 
 #### Imgproxy Configuration:
 

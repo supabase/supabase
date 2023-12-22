@@ -38,7 +38,7 @@ Then let's install the only additional dependency: [supabase-js](https://github.
 npm install @supabase/supabase-js
 ```
 
-And finally we want to save the environment variables in the `environment.ts` file.
+And finally, we want to save the environment variables in the `src/environments/environment.ts` file.
 All we need are the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
 These variables will be exposed on the browser, and that's completely fine since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
@@ -75,19 +75,19 @@ export class SupabaseService {
   }
 
   get user() {
-    return this.supabase.auth.user()
+    return this.supabase.auth.getUser().then(({ data }) => data?.user)
   }
 
   get session() {
-    return this.supabase.auth.session()
+    return this.supabase.auth.getSession().then(({ data }) => data?.session)
   }
 
   get profile() {
-    return this.supabase
-      .from('profiles')
-      .select(`username, website, avatar_url`)
-      .eq('id', this.user?.id)
-      .single()
+    return this.user
+      .then((user) => user?.id)
+      .then((id) =>
+        this.supabase.from('profiles').select(`username, website, avatar_url`).eq('id', id).single()
+      )
   }
 
   authChanges(callback: (event: AuthChangeEvent, session: Session | null) => void) {
@@ -95,23 +95,22 @@ export class SupabaseService {
   }
 
   signIn(email: string) {
-    return this.supabase.auth.signIn({ email })
+    return this.supabase.auth.signInWithOtp({ email })
   }
 
   signOut() {
     return this.supabase.auth.signOut()
   }
 
-  updateProfile(profile: Profile) {
+  async updateProfile(profile: Profile) {
+    const user = await this.user
     const update = {
       ...profile,
-      id: this.user?.id,
+      id: user?.id,
       updated_at: new Date(),
     }
 
-    return this.supabase.from('profiles').upsert(update, {
-      returning: 'minimal', // Don't return the value after inserting
-    })
+    return this.supabase.from('profiles').upsert(update)
   }
 
   downLoadImage(path: string) {
@@ -135,8 +134,8 @@ export class SupabaseService {
 
 ### Set up a Login route
 
-Let's set up an route to manage logins and sign ups. We'll use Magic Links, so users can sign in with their email without using passwords.
-Create an **LoginPage** with `ionic g page login` Ionic CLI command.
+Let's set up a route to manage logins and signups. We'll use Magic Links so users can sign in with their email without using passwords.
+Create a **LoginPage** with the `ionic g page login` Ionic CLI command.
 
 > This guide will show the template inline, but the example app will have templateUrls
 
@@ -173,20 +172,23 @@ import { SupabaseService } from '../supabase.service'
   `,
   styleUrls: ['./login.page.scss'],
 })
-export class LoginPage implements OnInit {
+export class LoginPage {
   email = ''
+
   constructor(private readonly supabase: SupabaseService) {}
 
-  ngOnInit() {}
   async handleLogin(event: any) {
     event.preventDefault()
     const loader = await this.supabase.createLoader()
     await loader.present()
     try {
-      await this.supabase.signIn(this.email)
+      const { error } = await this.supabase.signIn(this.email)
+      if (error) {
+        throw error
+      }
       await loader.dismiss()
       await this.supabase.createNotice('Check your email for the login link!')
-    } catch (error) {
+    } catch (error: any) {
       await loader.dismiss()
       await this.supabase.createNotice(error.error_description || error.message)
     }
@@ -196,10 +198,10 @@ export class LoginPage implements OnInit {
 
 ### Account page
 
-After a user is signed in we can allow them to edit their profile details and manage their account.
+After a user is signed in, we can allow them to edit their profile details and manage their account.
 Create an **AccountComponent** with `ionic g page account` Ionic CLI command.
 
-```ts src/app/account.component.ts
+```ts src/app/account.page.ts
 import { Component, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 import { Profile, SupabaseService } from '../supabase.service'
@@ -217,7 +219,7 @@ import { Profile, SupabaseService } from '../supabase.service'
       <form>
         <ion-item>
           <ion-label position="stacked">Email</ion-label>
-          <ion-input type="email" [value]="session?.user?.email"></ion-input>
+          <ion-input type="email" name="email" [(ngModel)]="email" readonly></ion-input>
         </ion-item>
 
         <ion-item>
@@ -248,11 +250,16 @@ export class AccountPage implements OnInit {
     website: '',
   }
 
-  session = this.supabase.session
+  email = ''
 
   constructor(private readonly supabase: SupabaseService, private router: Router) {}
   ngOnInit() {
+    this.getEmail()
     this.getProfile()
+  }
+
+  async getEmail() {
+    this.email = await this.supabase.user.then((user) => user?.email || '')
   }
 
   async getProfile() {
@@ -264,7 +271,7 @@ export class AccountPage implements OnInit {
       if (profile) {
         this.profile = profile
       }
-    } catch (error) {
+    } catch (error: any) {
       alert(error.message)
     }
   }
@@ -273,10 +280,14 @@ export class AccountPage implements OnInit {
     const loader = await this.supabase.createLoader()
     await loader.present()
     try {
-      await this.supabase.updateProfile({ ...this.profile, avatar_url })
+      const { error } = await this.supabase.updateProfile({ ...this.profile, avatar_url })
+      if (error) {
+        throw error
+      }
       await loader.dismiss()
       await this.supabase.createNotice('Profile updated!')
-    } catch (error) {
+    } catch (error: any) {
+      await loader.dismiss()
       await this.supabase.createNotice(error.message)
     }
   }
@@ -321,7 +332,7 @@ export class AppComponent {
 
 Then update the **AppRoutingModule**
 
-```ts src/app/app.ts"
+```ts src/app/app-routing.module.ts"
 import { NgModule } from '@angular/core'
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router'
 
@@ -365,17 +376,17 @@ Every Supabase project is configured with [Storage](/docs/guides/storage) for ma
 
 Let's create an avatar for the user so that they can upload a profile photo.
 
-First install two packages in order to interact with the user's camera.
+First, install two packages in order to interact with the user's camera.
 
 ```bash
 npm install @ionic/pwa-elements @capacitor/camera
 ```
 
-[CapacitorJS](https://capacitorjs.com) is a cross platform native runtime from Ionic that enables web apps to be deployed through the app store and provides access to native device API.
+[CapacitorJS](https://capacitorjs.com) is a cross-platform native runtime from Ionic that enables web apps to be deployed through the app store and provides access to native device API.
 
 Ionic PWA elements is a companion package that will polyfill certain browser APIs that provide no user interface with custom Ionic UI.
 
-With those packages installed we can update our `main.ts` to include an additional bootstrapping call for the Ionic PWA Elements.
+With those packages installed, we can update our `main.ts` to include an additional bootstrapping call for the Ionic PWA Elements.
 
 ```ts src/main.ts
 import { enableProdMode } from '@angular/core'
@@ -406,6 +417,8 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'
 import { SupabaseService } from '../supabase.service'
 import { Camera, CameraResultType } from '@capacitor/camera'
+import { addIcons } from 'ionicons'
+import { person } from 'ionicons/icons'
 @Component({
   selector: 'app-avatar',
   template: `
@@ -448,7 +461,7 @@ import { Camera, CameraResultType } from '@capacitor/camera'
   `,
   ],
 })
-export class AvatarComponent implements OnInit {
+export class AvatarComponent {
   _avatarUrl: SafeResourceUrl | undefined
   uploading = false
 
@@ -461,15 +474,18 @@ export class AvatarComponent implements OnInit {
 
   @Output() upload = new EventEmitter<string>()
 
-  constructor(private readonly supabase: SupabaseService, private readonly dom: DomSanitizer) {}
-
-  ngOnInit() {}
+  constructor(private readonly supabase: SupabaseService, private readonly dom: DomSanitizer) {
+    addIcons({ person })
+  }
 
   async downloadImage(path: string) {
     try {
-      const { data } = await this.supabase.downLoadImage(path)
-      this._avatarUrl = this.dom.bypassSecurityTrustResourceUrl(URL.createObjectURL(data))
-    } catch (error) {
+      const { data, error } = await this.supabase.downLoadImage(path)
+      if (error) {
+        throw error
+      }
+      this._avatarUrl = this.dom.bypassSecurityTrustResourceUrl(URL.createObjectURL(data!))
+    } catch (error: any) {
       console.error('Error downloading image: ', error.message)
     }
   }
@@ -481,17 +497,21 @@ export class AvatarComponent implements OnInit {
         resultType: CameraResultType.DataUrl,
       })
 
-      const file = await fetch(photo.dataUrl)
+      const file = await fetch(photo.dataUrl!)
         .then((res) => res.blob())
         .then((blob) => new File([blob], 'my-file', { type: `image/${photo.format}` }))
 
       const fileName = `${Math.random()}-${new Date().getTime()}.${photo.format}`
 
       await loader.present()
-      await this.supabase.uploadAvatar(fileName, file)
+      const { error } = await this.supabase.uploadAvatar(fileName, file)
+
+      if (error) {
+        throw error
+      }
 
       this.upload.emit(fileName)
-    } catch (error) {
+    } catch (error: any) {
       this.supabase.createNotice(error.message)
     } finally {
       loader.dismiss()
@@ -502,7 +522,7 @@ export class AvatarComponent implements OnInit {
 
 ### Add the new widget
 
-And then we can add the widget on top of the **AccountComponent** html template:
+And then, we can add the widget on top of the **AccountComponent** HTML template:
 
 ```ts src/app/account.component.ts
 template: `
@@ -526,7 +546,7 @@ template: `
 
 <StorageManagement />
 
-At this stage you have a fully functional application!
+At this stage, you have a fully functional application!
 
 ## See also
 

@@ -14,8 +14,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return handlePost(req, res)
     case 'PATCH':
       return handlePatch(req, res)
+    case 'PUT':
+      return handlePut(req, res)
     default:
-      res.setHeader('Allow', ['GET', 'POST', 'PATCH'])
+      res.setHeader('Allow', ['GET', 'POST', 'PATCH', 'PUT'])
       res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
   }
 }
@@ -51,4 +53,10 @@ const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
 const handlePatch = async (req: NextApiRequest, res: NextApiResponse) => {
   // Platform specific endpoint
   return res.status(200).json({})
+}
+
+const handlePut = async (req: NextApiRequest, res: NextApiResponse) => {
+  // Platform specific endpoint
+  const snippet: UserContent = req.body
+  return res.status(200).json({ data: snippet })
 }

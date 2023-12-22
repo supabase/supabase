@@ -42,6 +42,7 @@ const General = () => {
       project_id: project?.id,
     },
   })
+
   const { mutateAsync: updateProject, isLoading: isUpdating } = useProjectUpdateMutation()
 
   const onSubmit = async (values: any, { resetForm }: any) => {
