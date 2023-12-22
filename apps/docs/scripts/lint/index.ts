@@ -2,6 +2,7 @@ import { parseArgs } from 'node:util'
 import { lint } from './linter'
 import { isDirectory } from './utils/files'
 import { resolve } from 'node:path'
+import { builtinRules, getRulesConfig, validateUniqueRuleIds } from './rules'
 
 const args = parseArgs({
   options: {
@@ -44,7 +45,24 @@ async function main() {
     console.log('Debug mode is on')
   }
 
-  const errors = await lint(target, { autoFix: isAutoFixOn, isDirectory: targetIsDirectory })
+  const rules = [...builtinRules]
+  const ruleValidationResult = validateUniqueRuleIds(rules)
+
+  if (!ruleValidationResult.success) {
+    console.error(
+      'Rules must have unique IDs. The following IDS are conflicting:\n',
+      ruleValidationResult.conflictingIds.join(', ')
+    )
+    process.exit(1)
+  }
+
+  const rulesConfig = getRulesConfig(rules)
+
+  const errors = await lint(target, {
+    autoFix: isAutoFixOn,
+    isDirectory: targetIsDirectory,
+    rulesConfig,
+  })
   if (isDebugOn) {
     console.log(JSON.stringify(errors, null, 2))
   }

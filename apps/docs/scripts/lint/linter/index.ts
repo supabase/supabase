@@ -1,31 +1,24 @@
 import { readFile, writeFile } from 'fs/promises'
-import { Content } from 'mdast'
+import { commentMarker } from 'mdast-comment-marker'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { mdxFromMarkdown } from 'mdast-util-mdx'
 import { mdxjs } from 'micromark-extension-mdxjs'
 import { extname } from 'path'
 import { visit } from 'unist-util-visit'
-import { headingsSentenceCase } from '../rules/headings-sentence-case'
-import { LintError, LintRule } from '../rules'
+import { LintError } from '../rules/rules'
 import { walk } from '../../utils/walk'
 import { testIsContent } from '../utils/mdast'
-
-interface Rules {
-  byType: Partial<Record<Content['type'], LintRule[]>>
-}
-
-const rules: Rules = {
-  byType: {
-    heading: [headingsSentenceCase()],
-  },
-}
+import { RulesConfig } from '../rules'
 
 interface FileErrors {
   file: string
   errors: LintError[]
 }
 
-export async function lint(target: string, options: { autoFix: boolean; isDirectory: boolean }) {
+export async function lint(
+  target: string,
+  options: { autoFix: boolean; isDirectory: boolean; rulesConfig: RulesConfig }
+) {
   const pages = options.isDirectory ? await walk(target ?? 'pages') : [{ path: target }]
   const errors: FileErrors[] = []
 
@@ -42,9 +35,18 @@ export async function lint(target: string, options: { autoFix: boolean; isDirect
       mdastExtensions: [mdxFromMarkdown()],
     })
 
-    visit(mdxTree, testIsContent, function modify(node, index, parent) {
-      if (rules.byType[node.type]) {
-        rules.byType[node.type].forEach((rule: LintRule) => {
+    visit(mdxTree, function collectIgnores(node) {
+      const info = commentMarker(node)
+      if (!info) return
+      if (info.name !== 'prose-lint') return
+
+      // Global ignores
+      // Local ignores
+    })
+
+    visit(mdxTree, testIsContent, function lintNodes(node, index, parent) {
+      if (options.rulesConfig.byType[node.type]) {
+        options.rulesConfig.byType[node.type].forEach((rule) => {
           const result = rule.runRule(node, index, parent, page.path)
           if (result.length) {
             localErrors.push(...result)

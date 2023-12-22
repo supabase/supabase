@@ -1,6 +1,6 @@
 import { Node } from 'unist'
 import { capitalizedWords } from '../config/exceptions/capitalizedWords'
-import { ErrorSeverity, FixReplace, LintError, LintRule, error } from '.'
+import { ErrorSeverity, FixReplace, LintError, LintRule, error } from './rules'
 import { symbolRegex, tokenize } from '../utils/text'
 import { visit } from 'unist-util-visit'
 import { Heading } from 'mdast'
@@ -13,7 +13,7 @@ function isFirstOfTheLine(_: Node, index: number, parent: Node, ancestor: Node) 
   do {
     if (curr === parent) return true
 
-    curr = curr.children?.[0]
+    curr = 'children' in curr ? curr.children?.[0] : null
   } while (curr)
 
   return false
@@ -139,5 +139,6 @@ export function headingsSentenceCase() {
   return new LintRule({
     check: headingsSentenceCaseCheck,
     nodeTypes: 'heading',
+    id: 'headings-sentence-case',
   })
 }
