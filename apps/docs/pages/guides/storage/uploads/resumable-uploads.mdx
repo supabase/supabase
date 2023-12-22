@@ -129,7 +129,7 @@ When two or more clients upload a file to the same path using different upload U
 
 If you provide the `x-upsert` header the last client to complete the upload will succeed instead.
 
-### UppyJS Example
+### UppyJS example
 
 You can check a [full example using UppyJS](https://github.com/supabase/supabase/tree/master/examples/storage/resumable-upload-uppy).
 
@@ -140,7 +140,7 @@ UppyJS has integrations with different frameworks:
 - [Vue](https://uppy.io/docs/vue/)
 - [Angular](https://uppy.io/docs/angular/)
 
-## Overwriting Files
+## Overwriting files
 
 When uploading a file to a path that already exists, the default behavior is to return a `400 Asset Already Exists` error.
 If you want to overwrite a file on a specific path you can set the `x-upsert` header to `true`.

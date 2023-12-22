@@ -9,7 +9,7 @@ export const meta = {
 
 In Postgres, a trigger executes a set of actions automatically on table events such as INSERTs, UPDATEs, DELETEs, or TRUNCATE operations.
 
-## Creating a Trigger
+## Creating a trigger
 
 Creating triggers involve 2 parts:
 
@@ -25,7 +25,7 @@ for each row
 execute function trigger_function();
 ```
 
-## Trigger Functions
+## Trigger functions
 
 A trigger function is a user-defined [Function](docs/guides/database/functions) that Postgres executes when the trigger is fired.
 
@@ -70,7 +70,7 @@ Here are some of the key variables and options available within trigger function
 - `TG_ARGV`: An array of string arguments provided when creating the trigger.
 - `TG_NARGS`: The number of arguments in the `TG_ARGV` array.
 
-## Types of Triggers
+## Types of triggers
 
 There are two types of trigger, `BEFORE` and `AFTER`:
 
@@ -103,7 +103,7 @@ There are two options available for executing triggers:
 - `for each row`: specifies that the trigger function should be executed once for each affected row.
 - `for each statement`: the trigger is executed once for the entire operation (eg, once on insert). This can be more efficient than `for each row` when dealing with multiple rows affected by a single SQL statement, as they allow you to perform calculations or updates on groups of rows at once.
 
-## Dropping a Trigger
+## Dropping a trigger
 
 You can delete a trigger using the `drop trigger` command:
 
