@@ -9,6 +9,7 @@ import { LintError } from '../rules/rules'
 import { walk } from '../../utils/walk'
 import { testIsContent } from '../utils/mdast'
 import { RulesConfig } from '../rules'
+import { FileIgnores } from '../ignore'
 
 interface FileErrors {
   file: string
@@ -29,6 +30,7 @@ export async function lint(
 
     const contents = await readFile(page.path, 'utf8')
     const localErrors: LintError[] = []
+    const localIgnores = new FileIgnores()
 
     const mdxTree = fromMarkdown(contents, {
       extensions: [mdxjs()],
@@ -40,8 +42,28 @@ export async function lint(
       if (!info) return
       if (info.name !== 'prose-lint') return
 
-      // Global ignores
-      // Local ignores
+      if ('disable-all' in info.parameters) {
+        for (const parameter in info.parameters) {
+          if (parameter === 'disable-all') continue
+          localIgnores.addGlobalIgnore(parameter)
+        }
+        return
+      }
+
+      if ('disable' in info.parameters) {
+        for (const parameter in info.parameters) {
+          if (parameter === 'disable') continue
+          localIgnores.startRangeIgnore(parameter, node.position.start.line)
+        }
+        return
+      }
+
+      if ('enable' in info.parameters) {
+        for (const parameter in info.parameters) {
+          if (parameter === 'enable') continue
+          localIgnores.endRangeIgnore(parameter, node.position.end.line)
+        }
+      }
     })
 
     visit(mdxTree, testIsContent, function lintNodes(node, index, parent) {

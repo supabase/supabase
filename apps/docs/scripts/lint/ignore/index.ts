@@ -1,24 +1,25 @@
 type RuleId = string
 
-type Range = [number, number]
+type Range = [number, number | undefined]
 
 class Ranges {
-  readonly ranges: Range[]
+  ranges: Range[]
 
   static overlaps(a: Range, b: Range) {
     if (a[0] > b[0]) return Ranges.overlaps(b, a)
-    return a[1] >= b[0]
+    return a[1] === undefined || a[1] > b[0]
   }
 
   static mergeRanges(a: Range, b: Range): Range {
-    return [Math.min(a[0], b[0]), Math.max(a[0], b[0])]
+    const atLeastOneEndUndefined = a[1] === undefined || b[1] === undefined
+    return [Math.min(a[0], b[0]), atLeastOneEndUndefined ? a[1] ?? b[1] : Math.max(a[1], b[1])]
   }
 
   constructor() {
     this.ranges = []
   }
 
-  addRange(start: number, end: number) {
+  addRange(start: number, end: number | undefined) {
     let newRange = [start, end] as Range
 
     // linear but short enough that this probably shouldn't matter
@@ -35,6 +36,10 @@ class Ranges {
     }
 
     return this
+  }
+
+  getLast() {
+    return this.ranges.at(-1)
   }
 }
 
@@ -68,7 +73,7 @@ export class FileIgnores {
     this.ignores.set(ruleId, { scope: 'file', ruleId })
   }
 
-  addRangeIgnore(ruleId: RuleId, start: number, end: number) {
+  startRangeIgnore(ruleId: RuleId, start: number) {
     const currIgnore = this.ignores.get(ruleId)
 
     if (FileIgnores.isGlobal(currIgnore)) return
@@ -77,11 +82,26 @@ export class FileIgnores {
       this.ignores.set(ruleId, {
         scope: 'range',
         ruleId,
-        ranges: new Ranges().addRange(start, end),
+        ranges: new Ranges().addRange(start, undefined),
       })
       return
     }
 
-    currIgnore.ranges.addRange(start, end)
+    currIgnore.ranges.addRange(start, undefined)
+  }
+
+  endRangeIgnore(ruleId: RuleId, end: number) {
+    const currIgnore = this.ignores.get(ruleId)
+
+    if (!currIgnore) return
+    if (FileIgnores.isGlobal(currIgnore)) return
+
+    const rangeToEdit = currIgnore.ranges.getLast()
+    if (rangeToEdit) {
+      // deal with this better
+      console.error("Trying to close a range that wasn't opened")
+    } else {
+      rangeToEdit[1] = end
+    }
   }
 }
