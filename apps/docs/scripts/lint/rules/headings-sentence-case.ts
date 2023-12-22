@@ -102,7 +102,9 @@ function headingsSentenceCaseCheck(headingNode: Heading, _: number, __: Node, fi
         // Preceding token (if exists) is not a symbol
         (index === 0 || !symbolRegex.test(tokens[index - 1].value)) &&
         // Token is capitalized
-        /[A-Z]/.test(token.value[0])
+        /[A-Z]/.test(token.value[0]) &&
+        // Token doesn't match exception list
+        !token.matchedException
       ) {
         errors.push(
           error({

@@ -1,9 +1,11 @@
 import { ExceptionList } from '../config/exceptions/exceptions'
 
+const initialismRegex = /^[A-Z]+$/
 export const symbolRegex = /[^\s\w]+/
 
 interface Token {
   value: string
+  matchedException?: boolean
   positionInParent: {
     columnZeroIndexed: number // 0-indexed
   }
@@ -26,8 +28,19 @@ export function tokenize(
 
     const isTokenSymbol = symbolRegex.test(token)
     if (isTokenSymbol) {
-      result.push({ value: token, positionInParent: { columnZeroIndexed: position } })
+      result.push({
+        value: token,
+        positionInParent: { columnZeroIndexed: position },
+      } satisfies Token)
       continue
+    }
+
+    const isTokenInitialism = initialismRegex.test(token)
+    if (isTokenInitialism) {
+      result.push({
+        value: token,
+        positionInParent: { columnZeroIndexed: position },
+      } satisfies Token)
     }
 
     const matchingExceptions = exceptions
@@ -42,16 +55,21 @@ export function tokenize(
       .sort((a, b) => b.advanceIndexBy - a.advanceIndexBy)
 
     if (matchingExceptions.length === 0) {
-      result.push({ value: token, positionInParent: { columnZeroIndexed: position } })
+      result.push({
+        value: token,
+        positionInParent: { columnZeroIndexed: position },
+      } satisfies Token)
     } else {
       const mostCompleteException = matchingExceptions[0]
       result.push({
         value: mostCompleteException.match || token,
+        matchedException: true,
         positionInParent: { columnZeroIndexed: position },
-      })
+      } satisfies Token)
       wordOrSymbolRegex.lastIndex += mostCompleteException.advanceIndexBy
     }
   }
 
+  console.log(result)
   return result satisfies Token[]
 }
