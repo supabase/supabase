@@ -6,13 +6,13 @@ import { useEffect, useState } from 'react'
 
 function ExampleCard(props: any) {
   const isXs = useBreakpoint()
-  const [mounted, setMounted] = useState(false)
+  // const [mounted, setMounted] = useState(false)
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  // useEffect(() => {
+  //   setMounted(true)
+  // }, [])
 
-  if (!mounted) return null
+  // if (!mounted) return null
 
   return (
     <Link href={props.repo_url} className="w-full h-full" target="_blank">
