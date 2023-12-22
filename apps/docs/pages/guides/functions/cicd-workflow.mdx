@@ -10,7 +10,7 @@ export const meta = {
 
 You can use the official [`setup-cli` GitHub Action](https://github.com/marketplace/actions/supabase-cli-action) to run Supabase CLI commands in your GitHub Actions.
 
-## Sample Workflow
+## Sample workflow
 
 The following GitHub Action deploys all Edge Functions any time code is merged into the `main` branch:
 
@@ -41,7 +41,7 @@ jobs:
       - run: supabase functions deploy --project-ref $PROJECT_ID
 ```
 
-## Declarative Configuration
+## Declarative configuration
 
 Individual function configuration like [JWT verification](/docs/guides/cli/config#functions.function_name.verify_jwt) and [import map location](/docs/guides/cli/config#functions.function_name.import_map) can be set via the `config.toml` file.
 
