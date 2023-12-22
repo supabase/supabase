@@ -55,6 +55,7 @@ const Nav = () => {
   /**
    * Temporary fix for next-theme client side bug
    * https://github.com/pacocoursey/next-themes/issues/169
+   * TODO: remove when bug has been fixed
    */
   const [mounted, setMounted] = useState(false)
 
