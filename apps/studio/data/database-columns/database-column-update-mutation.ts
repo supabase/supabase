@@ -1,0 +1,71 @@
+import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-hot-toast'
+
+import { components } from 'data/api'
+import { patch } from 'data/fetchers'
+import { ResponseError } from 'types'
+import { databaseColumnsKeys } from './keys'
+
+export type UpdateColumnBody = components['schemas']['UpdateColumnBody']
+
+export type DatabaseColumnUpdateVariables = {
+  projectRef: string
+  connectionString?: string
+  id: string
+  payload: components['schemas']['UpdateColumnBody']
+}
+
+export async function updateDatabaseColumn({
+  projectRef,
+  connectionString,
+  id,
+  payload,
+}: DatabaseColumnUpdateVariables) {
+  let headers = new Headers()
+  if (connectionString) headers.set('x-connection-encrypted', connectionString)
+
+  const { data, error } = await patch('/platform/pg-meta/{ref}/columns', {
+    params: {
+      header: { 'x-connection-encrypted': connectionString! },
+      path: { ref: projectRef },
+      query: { id },
+    },
+    body: payload,
+    headers,
+  })
+
+  if (error) throw error
+  return data
+}
+
+type DatabaseColumnUpdateData = Awaited<ReturnType<typeof updateDatabaseColumn>>
+
+export const useDatabaseColumnUpdateMutation = ({
+  onSuccess,
+  onError,
+  ...options
+}: Omit<
+  UseMutationOptions<DatabaseColumnUpdateData, ResponseError, DatabaseColumnUpdateVariables>,
+  'mutationFn'
+> = {}) => {
+  const queryClient = useQueryClient()
+
+  return useMutation<DatabaseColumnUpdateData, ResponseError, DatabaseColumnUpdateVariables>(
+    (vars) => updateDatabaseColumn(vars),
+    {
+      async onSuccess(data, variables, context) {
+        const { projectRef } = variables
+        await queryClient.invalidateQueries(databaseColumnsKeys.list(projectRef))
+        await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to update database column: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
+      },
+      ...options,
+    }
+  )
+}
