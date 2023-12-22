@@ -47,7 +47,7 @@ Supabase projects have automatic vacuuming enabled, which ensures that these ope
 It is possible to [fine-tune](https://www.percona.com/blog/2018/08/10/tuning-autovacuum-in-postgresql-and-autovacuum-internals/) the [autovacuum parameters](https://www.enterprisedb.com/blog/postgresql-vacuum-and-analyze-best-practice-tips), or [manually initiate](https://www.postgresql.org/docs/current/sql-vacuum.html) vacuum operations.
 Running a manual vacuum after deleting large amounts of data from your DB could help reduce the database size reported by Postgres.
 
-### Preoccupied Space
+### Preoccupied space
 
 New Supabase projects have a database size of ~40-60mb. This space includes pre-installed extensions, schemas, and default Postgres data. Additional database size is used when installing extensions, even if those extensions are inactive.
 
@@ -55,7 +55,7 @@ New Supabase projects have a database size of ~40-60mb. This space includes pre-
 
 Supabase uses network-attached storage to balance performance with scalability. The behavior of your disk depends on your billing plan.
 
-### Paid Plan Behavior
+### Paid plan behavior
 
 Projects on the Pro plan and above have auto-scaling Disk Storage.
 
@@ -79,7 +79,7 @@ A Supabase (or Postgres) update will "right-size" your disk based on the current
 
 The maximum Disk Storage Size for the Pro plan is 16TB. If you need more than this, [contact us](https://forms.supabase.com/enterprise) to learn more about the Enterprise plan.
 
-### Free Plan Behavior
+### Free plan behavior
 
 Free Plan projects enter [read-only](#read-only-mode) mode when you exceed the 500MB limit. Once in read-only mode, you have several options:
 

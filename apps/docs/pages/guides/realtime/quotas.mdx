@@ -15,7 +15,7 @@ Upgrade your plan to increase your quotas. Without a spend cap, or on an Enterpr
 
 </Admonition>
 
-## Quotas by Plan
+## Quotas by plan
 
 |                                                                                        | Free  | Pro   | Pro (no spend cap) | Team   | Enterprise |
 | -------------------------------------------------------------------------------------- | ----- | ----- | ------------------ | ------ | ---------- |
@@ -34,7 +34,7 @@ Beyond the Free and Pro plan you can customize your quotas by [contacting suppor
 
 Some basic WebSocket message throttling is implemented client-side. See the [Throttling](/docs/guides/realtime/guides/client-side-throttling) guide for more details.
 
-## Quota Errors
+## Quota errors
 
 When you exceed a quota, errors will appear in the backend logs and client-side messages in the WebSocket connection.
 
@@ -64,7 +64,7 @@ Too many Channel joins per second.
 
 Clients will be disconnected if your project is generating too many messages per second. `supabase-js` will reconnect automatically when the message throughput decreases below your plan quota. An `event` is a WebSocket message delivered to, or sent from a client.
 
-## Postgres Changes Payload Quota
+## Postgres changes payload quota
 
 When this quota is reached, the `new` and `old` record payloads only include the fields with a value size of less than or equal to 64 bytes.
 
