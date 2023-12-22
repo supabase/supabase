@@ -62,7 +62,7 @@ bg-foreground-light
 | ------------------------------- | ------------------------------------------------------------ |
 | `{background}-{DEFAULT}`        | Main body background (**DEFAULT** is optional)               |
 | `{background}-surface-100`      | Panels and surfaces on the same level of the main background |
-| `{background}-surface-200`      | Surfaces that overlap the main content (ex. drodowns)        |
+| `{background}-surface-200`      | Surfaces that overlap the main content (ex. dropdowns)        |
 | `{background}-surface-300`      | Surfaces that are stacked above {background}-surface-200     |
 | `{background}-alternative`      | Alernative background (inverted)                             |
 | `{background}-overlay`          | Overlays, Dropdowns, Popovers                                |
