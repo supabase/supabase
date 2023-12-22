@@ -1,9 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { IconAlertCircle } from 'ui'
 
 import Table from 'components/to-be-cleaned/Table'
+import AlertError from 'components/ui/AlertError'
 import { User } from 'data/auth/users-query'
 import { useCheckPermissions } from 'hooks'
+import { ResponseError } from 'types'
+import { IconAlertCircle } from 'ui'
 import UserListItem from './UsersListItem'
 import UsersListItemSkeleton from './UsersListItemSkeleton'
 import UsersPagination from './UsersPagination'
@@ -18,6 +20,7 @@ interface UsersListProps {
   users: User[]
   isLoading: boolean
   isSuccess: boolean
+  error: ResponseError | null
 }
 
 const UsersList = ({
@@ -28,6 +31,7 @@ const UsersList = ({
   users,
   isLoading,
   isSuccess,
+  error,
 }: UsersListProps) => {
   // Check once on the top level, rather than checking for every row
   const canRemoveUser = useCheckPermissions(PermissionAction.TENANT_SQL_DELETE, 'auth.users')
@@ -60,6 +64,7 @@ const UsersList = ({
               <UsersListItemSkeleton />
             </>
           )}
+          {error && <AlertError error={error} subject="Failed to retrieve users" />}
           {isSuccess && users.length == 0 && (
             <Table.tr>
               <Table.td

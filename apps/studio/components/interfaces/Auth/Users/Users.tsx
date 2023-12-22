@@ -25,7 +25,7 @@ const Users = () => {
   const canReadUsers = useCheckPermissions(PermissionAction.TENANT_SQL_SELECT, 'auth.users')
   const isPermissionsLoaded = usePermissionsLoaded()
 
-  const { data, isLoading, isSuccess, refetch, isRefetching } = useUsersQuery({
+  const { data, isLoading, isSuccess, refetch, isRefetching, error } = useUsersQuery({
     projectRef,
     page,
     keywords: filterKeywords,
@@ -119,6 +119,7 @@ const Users = () => {
                 users={data?.users ?? []}
                 isLoading={isLoading}
                 isSuccess={isSuccess}
+                error={error}
               />
             )}
           </div>
