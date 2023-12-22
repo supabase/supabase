@@ -16,7 +16,7 @@ export const mutuallyExclusiveNote = (
 
 Database backups are an integral part of any disaster recovery plan. Disasters come in many shapes and sizes. It could be as simple as accidentally deleting a table column, the database crashing, or even a natural calamity wiping out the underlying hardware a database is running on. The risks and impact brought by these scenarios can never be fully eliminated, but only minimized or even mitigated. Having database backups is a form of insurance policy. They are essentially snapshots of the database at various points in time. When disaster strikes, database backups allow the project to be brought back to any of these points in time, therefore averting the crisis.
 
-## Frequency of Backups
+## Frequency of backups
 
 When deciding how often a database should be backed up, the key business metric Recovery Point Objective (RPO) should be considered. RPO is the threshold for how much data, measured in time, a business could lose when disaster strikes. This amount is fully dependent on a business and its underlying requirements. A low RPO would mean that database backups would have to be taken at an increased cadence throughout the day. Each Supabase project has access to two forms of backups, Daily Backups and Point-in-Time Recovery (PITR). The agreed upon RPO would be a deciding factor in choosing which solution best fits a project.
 
@@ -28,7 +28,7 @@ Database backups do not include objects stored via the Storage API, as the datab
 
 </Admonition>
 
-## Daily Backups
+## Daily backups
 
 All Pro and Enterprise plan Supabase projects are backed up automatically on a daily basis. In terms of Recovery Point Objective (RPO), Daily Backups would be suitable for projects willing to lose up to 24 hours worth of data if disaster hits at the most inopportune time. If a lower RPO is required, enabling Point-in-Time Recovery should be considered.
 
@@ -38,13 +38,13 @@ For security purposes, passwords for custom roles are not stored in daily backup
 
 </Admonition>
 
-### Backup Process [#daily-backups-process]
+### Backup process [#daily-backups-process]
 
 The PostgreSQL utility [pg_dumpall](https://www.postgresql.org/docs/current/app-pg-dumpall.html) is used to perform daily backups. An SQL file is generated, zipped up, and sent to our storage servers for safe keeping.
 
 You can access daily backups in the [Scheduled backups](https://supabase.com/dashboard/project/_/database/backups/scheduled) settings in the Dashboard. Pro plan projects can access the last 7 days' worth of daily backups while Enterprise plan projects can access up to 30 days' worth of daily backups. Users can restore their project to any one of the backups. If you wish to generate a logical backup on your own, you can do so through the [Supabase CLI](/docs/reference/cli/supabase-db-dump).
 
-#### Backup Process for Large Databases
+#### Backup process for large databases
 
 Databases larger than 100GB[^1], if they're on a recent build[^2] of the Supabase platform, get automatically transitioned[^3] to use daily physical backups. Physical backups are a more performant backup mechanism that lowers the overhead and impact on the database being backed up, and also avoids holding locks on objects in your database for a long period of time. While restores are unaffected, the backups created using this method cannot be downloaded from the Backups section of the dashboard.
 
@@ -56,7 +56,7 @@ Once a database is transitioned to using physical backups, it continues to use p
 [^2]: Projects created or upgraded after the 14th of July 2022 are eligible.
 [^3]: The transition to physical backups is handled transparently and does not require any user intervention. It involves a single restart of the database to pick up new configuration that can only be loaded at start; the expected downtime for the restart is a few seconds.
 
-### Restoration Process [#daily-backups-restoration-process]
+### Restoration process [#daily-backups-restoration-process]
 
 When selecting a backup to restore to, select the closest available one made before the desired point in time to restore to. Earlier backups can always be chosen too but do consider the number of days' worth of data that could be lost.
 
@@ -64,7 +64,7 @@ The Dashboard will then prompt for a confirmation before proceeding with the res
 
 {/* screenshot of the Dashboard of the project completing restoration */}
 
-## Point-in-Time Recovery
+## Point-in-Time recovery
 
 Point-in-Time Recovery (PITR) allows a project to be backed up at much shorter intervals. This provides users an option to restore to any chosen point of up to seconds in granularity. Even with daily backups, a day's worth of data could still be lost. With PITR, backups could be performed up to the point of disaster.
 
@@ -78,7 +78,7 @@ Projects interested in PITR will also need to use at least a Small compute add-o
 
 {mutuallyExclusiveNote}
 
-### Backup Process [#pitr-backup-process]
+### Backup process [#pitr-backup-process]
 
 As discussed [here](https://supabase.com/blog/postgresql-physical-logical-backups), PITR is made possible by a combination of taking physical backups of a project, as well as archiving [Write Ahead Log (WAL)](https://www.postgresql.org/docs/current/wal-intro.html) files. Physical backups provide a snapshot of the underlying directory of the database, while WAL files contain records of every change made in the database.
 
@@ -92,7 +92,7 @@ You can access PITR in the [Point in Time](https://supabase.com/dashboard/projec
 
 Note that the latest restore point of the project could be significantly far from the current time. This occurs when there has not been any recent activity in the database, and therefore no WAL file backups have been made recently. This is perfectly fine as the state of the database at the latest point of recovery would still be indicative of the state of the database at the current time given that no transactions have been made in between.
 
-### Restoration Process [#pitr-restoration-process]
+### Restoration process [#pitr-restoration-process]
 
 ![PITR: Calendar view](/docs/img/backups-pitr-calendar-view.png)
 

@@ -14,7 +14,7 @@ In some cases, access to new features require upgrading or migrating your Supaba
 
 There are a few methods available to upgrade your project.
 
-### pg_upgrade
+### `pg_upgrade`
 
 <Admonition type="note">
 
@@ -31,7 +31,7 @@ Additionally, if a pg_upgrade upgrade should fail, your original DB would be bro
 
 As a rough rule of thumb, pg_upgrade operates at ~100mbps (when executing an upgrade on your data). Using the size of your database, you can use this metric to derive an approximate sense of the downtime window necessary for the upgrade. During this window, you should plan for your DB and associated services to be unavailable.
 
-### Pause + Restore
+### Pause + restore
 
 <Admonition type="note">
 
@@ -50,7 +50,7 @@ Note that a pause + restore upgrade involves tearing down your project's resourc
 
 Regardless of the upgrade method, a few caveats apply:
 
-#### Logical Replication
+#### Logical replication
 
 If you are using logical replication, the replication slots will not be preserved by the upgrade process. You will need to manually recreate them after the upgrade with the method `pg_create_logical_replication_slot`. Refer to the Postgres docs on [Replication Management Functions](https://www.postgresql.org/docs/current/functions-admin.html#FUNCTIONS-REPLICATION) for more details about the method.
 
@@ -65,7 +65,7 @@ Breaking changes are generally only present in major version upgrades of Postgre
 
 If you are upgrading from a significantly older version, you will need to consider the release notes for any intermediary releases as well.
 
-#### Disk Sizing
+#### Disk sizing
 
 When upgrading, the Supabase platform will "right-size" your disk based on the current size of the database. For example, if your database is 100GB in size, and you have a 200GB disk, the upgrade will reduce the disk size to 120GB (1.2x the size of your database).
 
@@ -203,7 +203,7 @@ supabase db diff --linked --schema auth,storage > changes.sql
 
 Replication for Realtime is disabled for all tables in your new project. On the [Replication](https://supabase.com/dashboard/project/_/database/replication) page in the Dashboard, select your new project and enable replication for tables that were enabled in your old project.
 
-### Migrate Storage objects
+### Migrate storage objects
 
 The new project has the old project's Storage buckets, but the Storage objects need to be migrated manually. Use this script to move storage objects from one project to another.
 

@@ -67,7 +67,7 @@ suspend fun uploadFile(file: File) {
 </TabPanel>
 </Tabs>
 
-## Overwriting Files
+## Overwriting files
 
 When uploading a file to a path that already exists, the default behavior is to return a `400 Asset Already Exists` error.
 If you want to overwrite a file on a specific path you can set the `upsert` options to `true` or using the `x-upsert` header.
@@ -96,7 +96,7 @@ await supabase.storage.from('bucket_name').upload('file_path', file, {
 We do advise against overwriting files when possible, as our Content Delivery Network will take sometime to propagate the changes to all the edge nodes leading to stale content.
 Uploading a file to a new path is the recommended way to avoid propagation delays and stale content.
 
-## Content Type
+## Content type
 
 By default, Storage will assume the content type of an asset from the file extension. If you want to specify the content type for your asset simply pass the `contentType` option during upload.
 
