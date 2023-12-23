@@ -65,7 +65,7 @@ const UsersList = ({
             </>
           )}
           {error && <AlertError error={error} subject="Failed to retrieve users" />}
-          {isSuccess && users.length == 0 && (
+          {isSuccess && users.length === 0 && (
             <Table.tr>
               <Table.td
                 colSpan={8}
