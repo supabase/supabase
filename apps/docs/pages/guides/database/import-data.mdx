@@ -24,14 +24,14 @@ If you're importing a large dataset or importing data into production, plan ahea
 
 </Admonition>
 
-### Option 1: CSV Import via Supabase Dashboard
+### Option 1: CSV import via Supabase dashboard
 
 Supabase dashboard provides a user-friendly way to import data. However, for very large datasets, this method may not be the most efficient choice, given the size limit is 100MB. It's generally better suited for smaller datasets and quick data imports. Consider using alternative methods like pgloader for large-scale data imports.
 
 1. Navigate to the relevant table in the [Table Editor.](/dashboard/project/_/editor)
 2. Click on “Insert” then choose "Import Data from CSV" and follow the on-screen instructions to upload your CSV file.
 
-### Option 2: Bulk Import using pgloader
+### Option 2: Bulk import using pgloader
 
 [pgloader](https://pgloader.io/) is a powerful tool for efficiently importing data into a PostgreSQL database that supports a wide range of source database engines, including MySQL and MS SQL.
 
@@ -68,7 +68,7 @@ You can use it in conjunction with Supabase by following these steps:
 
 For databases using the Postgres engine, we recommend using the [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html) and [psql](https://www.postgresql.org/docs/current/app-psql.html) command line tools.
 
-### Option 3: Using Postgres Copy command
+### Option 3: Using Postgres copy command
 
 Read more about [Bulk data loading.](/docs/guides/database/tables#bulk-data-loading)
 

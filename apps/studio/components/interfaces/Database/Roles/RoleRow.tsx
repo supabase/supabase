@@ -161,49 +161,52 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
             <Collapsible.Content>
               <div className="group border-t border-default bg-surface-100 py-6 px-20 text-foreground">
                 <div className="py-4 space-y-[9px]">
-                  {Object.keys(ROLE_PERMISSIONS).map((permission) => (
-                    <Toggle
-                      size="small"
-                      key={permission}
-                      id={permission}
-                      name={permission}
-                      label={ROLE_PERMISSIONS[permission].description}
-                      disabled={disabled || ROLE_PERMISSIONS[permission].disabled}
-                      className={[
-                        'roles-toggle',
-                        disabled || ROLE_PERMISSIONS[permission].disabled ? 'opacity-50' : '',
-                      ].join(' ')}
-                      afterLabel={
-                        !disabled &&
-                        ROLE_PERMISSIONS[permission].disabled && (
-                          <Tooltip.Root delayDuration={0}>
-                            <Tooltip.Trigger type="button">
-                              <IconHelpCircle
-                                size="tiny"
-                                strokeWidth={2}
-                                className="ml-2 relative top-[3px]"
-                              />
-                            </Tooltip.Trigger>
-                            <Tooltip.Portal>
-                              <Tooltip.Content align="center" side="bottom">
-                                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                <div
-                                  className={[
-                                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                    'border border-background space-y-1',
-                                  ].join(' ')}
-                                >
-                                  <span className="text-xs">
-                                    This privilege cannot be updated via the dashboard
-                                  </span>
-                                </div>
-                              </Tooltip.Content>
-                            </Tooltip.Portal>
-                          </Tooltip.Root>
-                        )
-                      }
-                    />
-                  ))}
+                  {(Object.keys(ROLE_PERMISSIONS) as (keyof typeof ROLE_PERMISSIONS)[]).map(
+                    (permission) => (
+                      <Toggle
+                        size="small"
+                        key={permission}
+                        id={permission}
+                        name={permission}
+                        label={ROLE_PERMISSIONS[permission].description}
+                        disabled={disabled || ROLE_PERMISSIONS[permission].disabled}
+                        className={[
+                          'roles-toggle',
+                          disabled || ROLE_PERMISSIONS[permission].disabled ? 'opacity-50' : '',
+                        ].join(' ')}
+                        afterLabel={
+                          !disabled && ROLE_PERMISSIONS[permission].disabled ? (
+                            <Tooltip.Root delayDuration={0}>
+                              <Tooltip.Trigger type="button">
+                                <IconHelpCircle
+                                  size="tiny"
+                                  strokeWidth={2}
+                                  className="ml-2 relative top-[3px]"
+                                />
+                              </Tooltip.Trigger>
+                              <Tooltip.Portal>
+                                <Tooltip.Content align="center" side="bottom">
+                                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                  <div
+                                    className={[
+                                      'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                      'border border-background space-y-1',
+                                    ].join(' ')}
+                                  >
+                                    <span className="text-xs">
+                                      This privilege cannot be updated via the dashboard
+                                    </span>
+                                  </div>
+                                </Tooltip.Content>
+                              </Tooltip.Portal>
+                            </Tooltip.Root>
+                          ) : (
+                            <></>
+                          )
+                        }
+                      />
+                    )
+                  )}
                 </div>
                 {!disabled && (
                   <div className="py-4 flex items-center space-x-2 justify-end">

@@ -45,7 +45,7 @@ To address this, Postgres does provide tunable configuration, like `wal_keep_siz
 
 In this replication method, the primary continuously buffers WAL changes to a local file and then sends the file to the read replica. If multiple read replicas are present, files could also be sent to an intermediary location accessible by all. The read replica then reads the WAL files and applies those changes. There is higher replication lag than streaming replication since the primary buffers the changes locally first. It also means there is a small chance that WAL changes do not reach read replicas if the primary goes down before the file is transferred. In these cases, if the primary fails a replica using streaming replication would (in most cases) be more up-to-date than a replica using file-based log shipping.
 
-### File-based log shipping 🤝 Streaming replication
+### File-based log shipping 🤝 streaming replication
 
 <figure className="max-w-[700px] mx-auto">
     <Image

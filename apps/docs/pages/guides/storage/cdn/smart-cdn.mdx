@@ -25,7 +25,7 @@ When a file is updated or deleted, the CDN cache is automatically invalidated to
 
 When an asset is invalidated at the CDN level, browsers may not update its cache. This is where cache eviction comes into play.
 
-## Cache Eviction
+## Cache eviction
 
 Even when an asset is marked as invalidated at the CDN level, browsers may not refresh their cache for that asset.
 
@@ -33,7 +33,7 @@ If you have assets that undergo frequent updates, it is advisable to upload the 
 
 If you anticipate that your asset might be deleted, it's advisable to set a shorter browser Time-to-Live (TTL) value using the `cacheControl` option. The default TTL is typically set to 1 hour, which is generally a reasonable default value.
 
-## Bypassing Cache
+## Bypassing cache
 
 If you need to ensure assets refresh directly from the origin server and bypass the cache, you can achieve this by adding a unique query string to the URL.
 

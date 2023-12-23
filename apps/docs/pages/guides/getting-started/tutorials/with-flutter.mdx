@@ -18,7 +18,7 @@ If you get stuck while working through this guide, refer to the [full example on
 
 <ProjectSetup />
 
-## Building the App
+## Building the app
 
 Let's start building the Flutter app from scratch.
 
@@ -143,7 +143,7 @@ Future<void> main() async {
 final supabase = Supabase.instance.client;
 ```
 
-### Set up Splash Screen
+### Set up splash screen
 
 Let's create a splash screen that will be shown to users right after they open the app.
 This screen retrieves the current session and redirects the user accordingly.
@@ -189,7 +189,7 @@ class _SplashPageState extends State<SplashPage> {
 }
 ```
 
-### Set up a Login page
+### Set up a login page
 
 Let's create a Flutter widget to manage logins and sign ups.
 We'll use Magic Links, so users can sign in with their email without using passwords.
@@ -297,7 +297,7 @@ class _LoginPageState extends State<LoginPage> {
 }
 ```
 
-### Set up Account page
+### Set up account page
 
 After a user is signed in we can allow them to edit their profile details and manage their account.
 Let's create a new widget called `account_page.dart` for that.
@@ -534,7 +534,7 @@ We will be storing the image as a publicly sharable image.
 Make sure your `avatars` bucket is set to public, and if it is not, change the publicity by clicking the dot menu that appears when you hover over the bucket name.
 You should see an orange `Public` badge next to your bucket name if your bucket is set to public.
 
-### Adding image uploading feature to Account page
+### Adding image uploading feature to account page
 
 We will use [`image_picker`](https://pub.dev/packages/image_picker) plugin to select an image from the device.
 
