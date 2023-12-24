@@ -32,7 +32,7 @@ functions:
         code: |
           ```swift
           let client = SupabaseClient(
-            supabaseURL: URL(string: "https://xyzcompany.supabase.co")!, 
+            supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
             supabaseKey: "public-anon-key",
             options: SupabaseClientOptions(
               db: .init(
@@ -68,7 +68,7 @@ functions:
         code: |
           ```swift
           let supabase = SupabaseClient(
-            supabaseURL: URL(string: "https://xyzcompany.supabase.co")!, 
+            supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
             supabaseKey: "public-anon-key",
             options: .init(
               auth: .init(
@@ -212,7 +212,7 @@ functions:
           ```swift
           let url = try await supabase.auth.getOAuthSignInURL(provider: .github)
 
-          let session = ASWebAuthenticationSession(url: url, callbackURLScheme: "my-app-scheme") { url, error in 
+          let session = ASWebAuthenticationSession(url: url, callbackURLScheme: "my-app-scheme") { url, error in
             guard let url else { return }
 
             Task {
@@ -820,7 +820,7 @@ functions:
               let name: String
               let teams: [Team]
             }
-            
+
             struct Team: Decodable {
               let name: String
             }
@@ -1312,7 +1312,7 @@ functions:
             // use `returning: .representation` to return the created object.
             .insert(Country(id: 1, name: "Denmark"), returning: .representation)
             // specify you want a single value returned, otherwise it returns a list.
-            .single() 
+            .single()
             .execute()
             .value
           ```
@@ -1424,7 +1424,7 @@ functions:
           ```swift
           struct Country: Decodable {
             let id: Int
-            let name: String          
+            let name: String
           }
 
           let country: Country = try await supabase.database
@@ -2721,7 +2721,7 @@ functions:
 
           let response: Response = try await supabase.functions
             .invoke(
-              "hello", 
+              "hello",
               options: FunctionInvokeOptions(
                 body: ["foo": "bar"]
               )
@@ -2734,11 +2734,11 @@ functions:
           ```swift
           let response = try await supabase.functions
             .invoke(
-              "hello", 
+              "hello",
               options: FunctionInvokeOptions(
                 body: ["foo": "bar"]
               ),
-              decode: { data, response in 
+              decode: { data, response in
                 String(data: data, encoding: .utf8)
               }
             )
@@ -2758,7 +2758,7 @@ functions:
           do {
             let response = try await supabase.functions
               .invoke(
-                "hello", 
+                "hello",
                 options: FunctionInvokeOptions(
                   body: ["foo": "bar"]
                 )
@@ -2780,7 +2780,7 @@ functions:
           ```swift
           let response = try await supabase.functions
             .invoke(
-              "hello", 
+              "hello",
               options: FunctionInvokeOptions(
                 headers: [
                   "my-custom-header": "my-custom-header-value"
@@ -2797,7 +2797,7 @@ functions:
           ```swift
           let response = try await supabase.functions
             .invoke(
-              "hello", 
+              "hello",
               options: FunctionInvokeOptions(
                 method: .delete,
                 headers: [
@@ -2816,7 +2816,7 @@ functions:
           ```swift
           let response = try await supabase.functions
             .invoke(
-              "hello", 
+              "hello",
               options: FunctionInvokeOptions(
                 method: .get,
                 headers: [
@@ -2843,7 +2843,7 @@ functions:
             .channel("room1")
 
           channel
-            .on("broadcast", filter: ChannelFilter(event: "cursor-pos")) { message in 
+            .on("broadcast", filter: ChannelFilter(event: "cursor-pos")) { message in
               print("Cursor position received!", message.payload)
             }
             .subscribe { status, error in
@@ -2883,7 +2883,7 @@ functions:
           ```swift
           let channel = supabase.realtime.channel("room1")
           channel
-            .on("presence", filter: ChannelFilter(event: "join")) { message in 
+            .on("presence", filter: ChannelFilter(event: "join")) { message in
               print("Newly joined presences: ", message.payload)
             }
             .subscribe { status, error in
@@ -2901,7 +2901,7 @@ functions:
           ```swift
           let channel = supabase.realtime.channel("room1")
           channel
-            .on("presence", filter: ChannelFilter(event: "leave")) { message in 
+            .on("presence", filter: ChannelFilter(event: "leave")) { message in
               print("Newly left presences: ", message.payload)
             }
             .subscribe { status, error in
@@ -3152,7 +3152,7 @@ functions:
           ```swift
           try await supabase.storage
             .createBucket(
-              "avatars", 
+              "avatars",
               options: BucketOptions(
                 public: false,
                 allowedMimeTypes: ["image/png"],
@@ -3192,7 +3192,7 @@ functions:
           ```swift
           try await supabase.storage
             .updateBucket(
-              "avatars", 
+              "avatars",
               options: BucketOptions(
                 public: false,
                 fileSizeLimit: 1024,
@@ -3238,8 +3238,9 @@ functions:
             .upload(
               path: "public/\(fileName)",
               file: fileData,
-              fileOptions: FileOptions(
+              options: FileOptions(
                 cacheControl: "3600",
+                contentType: "image/png",
                 upsert: false
               )
             )
@@ -3265,8 +3266,9 @@ functions:
             .update(
               path: "public/\(fileName)",
               file: fileData,
-              fileOptions: FileOptions(
+              options: FileOptions(
                 cacheControl: "3600",
+                contentType: "image/png",
                 upsert: true
               )
             )
