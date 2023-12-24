@@ -82,6 +82,7 @@ export async function GET(request: NextRequest) {
 Create a new file at `src/routes/auth/confirm/+server.js` and populate with the following:
 
 ```js src/routes/auth/confirm/+server.js
+import type { EmailOtpType } from '@supabase/supabase-js';
 import { redirect } from '@sveltejs/kit';
 
 export const GET = async (event) => {
@@ -90,19 +91,21 @@ export const GET = async (event) => {
 		locals: { supabase }
 	} = event;
 	const token_hash = url.searchParams.get('token_hash') as string;
-	const type = url.searchParams.get('type') as string;
+	const type = url.searchParams.get('type') as EmailOtpType;
 	const next = url.searchParams.get('next') ?? '/';
+	console.log({ token_hash, type, next });
 
-  if (token_hash && type) {
-    const { error } = await supabase.auth.verifyOtp({ token_hash, type });
-    if (!error) {
-      throw redirect(303, `/${next.slice(1)}`);
-    }
-  }
+	if (token_hash && type) {
+		const { error } = await supabase.auth.verifyOtp({ token_hash, type });
+		if (!error) {
+			throw redirect(303, `/${next.slice(1)}`);
+		}
+	}
 
-  // return the user to an error page with some instructions
-  throw redirect(303, '/auth/auth-code-error');
+	// return the user to an error page with some instructions
+	throw redirect(303, '/auth/auth-code-error');
 };
+
 ```
 
 </TabPanel>
