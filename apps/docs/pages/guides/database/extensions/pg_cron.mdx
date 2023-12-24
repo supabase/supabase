@@ -67,7 +67,7 @@ The schedule uses the standard cron syntax, in which \* means "run every time pe
 
 You can use [crontab.guru](https://crontab.guru/) to help validate your cron schedules.
 
-### Scheduling System Maintenance
+### Scheduling system maintenance
 
 Be extremely careful when setting up pg_cron jobs for system maintenance tasks as they can have unintended consequences. For instance, scheduling a command to terminate idle connections with `pg_terminate_backend(pid)` can disrupt critical background processes like nightly backups. Often, there is an existing Postgres setting e.g. `idle_session_timeout` that can perform these common maintenance tasks without the risk.
 

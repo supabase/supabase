@@ -221,7 +221,7 @@ commands:
     flags:
       - id: recursive
         name: -r, --recursive
-        description: Recursively move a directory.
+        description: Recursively remove a directory.
         default_value: 'false'
       - id: experimental
         name: --experimental
@@ -238,7 +238,7 @@ commands:
     flags:
       - id: recursive
         name: -r, --recursive
-        description: Recursively remove a directory.
+        description: Recursively move a directory.
         default_value: 'false'
       - id: experimental
         name: --experimental

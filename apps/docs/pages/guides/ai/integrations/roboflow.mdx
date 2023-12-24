@@ -12,13 +12,13 @@ In this guide, we will walk through two examples of using [Roboflow Inference](h
 
 <DatabaseSetup />
 
-## Save Computer Vision Predictions
+## Save computer vision predictions
 
 Once you have a trained vision model, you need to create business logic for your application. In many cases, you want to save inference results to a file.
 
 The steps below show you how to run a vision model locally and save predictions to Supabase.
 
-### Preparation: Set up a Model
+### Preparation: Set up a model
 
 Before you begin, you will need an object detection model trained on your data.
 
@@ -28,7 +28,7 @@ All models have an infinitely scalable API through which you can query your mode
 
 For this guide, we will use a demo [rock, paper, scissors](https://universe.roboflow.com/roboflow-58fyf/rock-paper-scissors-sxsw) model.
 
-### Step 1: Install and Start Roboflow Inference
+### Step 1: Install and start Roboflow Inference
 
 You will deploy our model locally using Roboflow Inference, a computer vision inference server.
 
@@ -42,7 +42,7 @@ pip install inference inference-cli inference-sdk && inference server start
 
 An inference server will be available at `http://localhost:9001`.
 
-### Step 2: Run Inference on an Image
+### Step 2: Run inference on an image
 
 You can run inference on images and videos. Let's run inference on an image.
 
@@ -76,7 +76,7 @@ When you run the code above, a list of predictions will be printed to the consol
 {'time': 0.05402109300121083, 'image': {'width': 640, 'height': 480}, 'predictions': [{'x': 312.5, 'y': 392.0, 'width': 255.0, 'height': 110.0, 'confidence': 0.8620790839195251, 'class': 'Paper', 'class_id': 0}]}
 ```
 
-### Step 3: Save Results in Supabase
+### Step 3: Save results in Supabase
 
 To save results in Supabase, add the following code to your script:
 
@@ -110,17 +110,17 @@ Here is an example result:
 data=[{'predictions': {'time': 0.08492901099998562, 'image': {'width': 640, 'height': 480}, 'predictions': [{'x': 312.5, 'y': 392.0, 'width': 255.0, 'height': 110.0, 'confidence': 0.8620790839195251, 'class': 'Paper', 'class_id': 0}]}}, {'predictions': {'time': 0.08818970100037404, 'image': {'width': 640, 'height': 480}, 'predictions': [{'x': 312.5, 'y': 392.0, 'width': 255.0, 'height': 110.0, 'confidence': 0.8620790839195251, 'class': 'Paper', 'class_id': 0}]}}] count=None
 ```
 
-## Calculate and Save CLIP Embeddings
+## Calculate and save CLIP embeddings
 
 You can use the Supabase vector database functionality to store and query CLIP embeddings.
 
 Roboflow Inference provides a HTTP interface through which you can calculate image and text embeddings using CLIP.
 
-### Step 1: Install and Start Roboflow Inference
+### Step 1: Install and start Roboflow Inference
 
 See [Step #1: Install and Start Roboflow Inference](#step-1-install-and-start-roboflow-inference) above to install and start Roboflow Inference.
 
-### Step 2: Run CLIP on an Image
+### Step 2: Run CLIP on an image
 
 Create a new Python file and add the following code:
 
@@ -168,7 +168,7 @@ Above, replace:
 
 You can also calculate CLIP embeddings in the cloud by setting `SERVER_URL` to `https://infer.roboflow.com`.
 
-### Step 3: Save Embeddings in Supabase
+### Step 3: Save embeddings in Supabase
 
 You can store your image embeddings in Supabase using the Supabase `vecs` Python package:
 

@@ -29,7 +29,7 @@ Note that CDNs might still evict your object from their cache if it has not been
 
 The cache status of a particular request is sent in the `cf-cache-status` header. A cache status of `MISS` indicates that the CDN node did not have the object in its cache and had to ping the origin to get it. A cache status of `HIT` indicates that the object was sent directly from the CDN.
 
-### Public vs Private Buckets
+### Public vs private buckets
 
 Objects in public buckets do not require any authorization to access objects. This leads to a better cache hit rate compared to private buckets.
 
