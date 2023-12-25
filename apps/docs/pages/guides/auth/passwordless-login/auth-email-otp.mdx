@@ -40,7 +40,9 @@ const { data, error } = await supabase.auth.signInWithOtp({
   email: 'example@email.com',
   options: {
     // set this to false if you do not want the user to be automatically signed up
-    shouldCreateUser: false,
+    shouldCreateUser: false, 
+    //this does not explain what this option does. Will the email be sent anyway if the user is not already signed up?
+    //  Can I use this flow to ensure that the email address is correct? Will it fail if the user is not already signed up and I set this to false?
   },
 })
 ```
