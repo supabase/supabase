@@ -151,7 +151,7 @@ object SupabaseModule {
             supabaseKey = BuildConfig.SUPABASE_ANON_KEY
         ) {
             install(Postgrest)
-            install(GoTrue) {
+            install(Auth) {
                 flowType = FlowType.PKCE
                 scheme = "app"
                 host = "supabase.com"
@@ -168,8 +168,8 @@ object SupabaseModule {
 
     @Provides
     @Singleton
-    fun provideSupabaseGoTrue(client: SupabaseClient): GoTrue {
-        return client.gotrue
+    fun provideSupabaseAuth(client: SupabaseClient): Auth {
+        return client.auth
     }
 
 
@@ -266,7 +266,9 @@ class ProductRepositoryImpl @Inject constructor(
     override suspend fun getProduct(id: String): ProductDto {
         return withContext(Dispatchers.IO) {
             postgrest["products"].select {
-                eq("id", id)
+                filter {
+                    eq("id", id)
+                }
             }.decodeSingle<ProductDto>()
         }
     }
@@ -274,7 +276,9 @@ class ProductRepositoryImpl @Inject constructor(
     override suspend fun deleteProduct(id: String) {
         return withContext(Dispatchers.IO) {
             postgrest["products"].delete {
-                eq("id", id)
+                filter {
+                    eq("id", id)
+                }
             }
         }
     }
@@ -331,11 +335,11 @@ interface AuthenticationRepository {
 
 ```kotlin
 class AuthenticationRepositoryImpl @Inject constructor(
-    private val goTrue: GoTrue
+    private val auth: Auth
 ) : AuthenticationRepository {
     override suspend fun signIn(email: String, password: String): Boolean {
         return try {
-            goTrue.loginWith(Email) {
+            auth.loginWith(Email) {
                 this.email = email
                 this.password = password
             }
@@ -347,7 +351,7 @@ class AuthenticationRepositoryImpl @Inject constructor(
 
     override suspend fun signUp(email: String, password: String): Boolean {
         return try {
-            goTrue.signUpWith(Email) {
+            auth.signUpWith(Email) {
                 this.email = email
                 this.password = password
             }
@@ -359,7 +363,7 @@ class AuthenticationRepositoryImpl @Inject constructor(
 
     override suspend fun signInWithGoogle(): Boolean {
         return try {
-            goTrue.loginWith(Google)
+            auth.loginWith(Google)
             true
         } catch (e: Exception) {
             false
@@ -1163,7 +1167,7 @@ fun SignInScreen(
 
 ### Create the success screen
 
-Implement a "Sign In" success screen. Create new "Empty Activity" and in `AndroidManifest.xml`, add a deep link, make sure `scheme` and `host` are the same as the ones set in the GoTrue instance.
+Implement a "Sign In" success screen. Create new "Empty Activity" and in `AndroidManifest.xml`, add a deep link, make sure `scheme` and `host` are the same as the ones set in the Auth instance.
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
