@@ -24,14 +24,16 @@ Realtime relies on the `wal2json` Postgres extension to format database changes 
 Postgres databases managed by AWS RDS and Google Cloud SQL should already have `wal2json` installed.
 Please check to make sure this is indeed the case with your Postgres database.
 
-## Logical Replication Configuration
+## Logical replication configuration
 
 Realtime relies on Postgres' logical replication functionality to get database changes. Please enable logical replication on your database and configure the following settings:
 
 - `max_replication_slots`: we recommend `10` because Realtime requires a few slots plus the slots you'll need for your non-Realtime logical replication needs.
 - `max_slot_wal_keep_size`: we recommend `1024` (MB) so Realtime can attempt to deliver more database changes stored in Postgres.
 
-## Realtime Database Setup
+See [Compute Add-ons](/docs/guides/platform/compute-add-ons#postgres-replication-slots-and-wal-senders) for the recommended `max_replication_slots` at different instance sizes based on the values we use for our own cloud offering.
+
+## Realtime database setup
 
 ### `supabase_realtime` Publication
 

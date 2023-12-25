@@ -26,7 +26,7 @@ functions:
 
     examples:
       - id: create-client
-        name: createClient()
+        name: Creating a client
         code: |
           ```js
           import { createClient } from '@supabase/supabase-js'
@@ -34,7 +34,7 @@ functions:
           // Create a single supabase client for interacting with your database
           const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
           ```
-      - id: create-client
+      - id: with-custom-domain
         name: With a custom domain
         code: |
           ```js
@@ -65,13 +65,13 @@ functions:
           const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key", options)
           ```
       - id: api-schemas
-        name: API schemas
+        name: With custom schemas
         code: |
           ```js
           import { createClient } from '@supabase/supabase-js'
 
-          // Provide a custom schema. Defaults to "public".
           const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
+            // Provide a custom schema. Defaults to "public".
             db: { schema: 'other_schema' }
           })
           ```
@@ -81,7 +81,7 @@ functions:
 
           Note: each client connection can only access a single schema, so the code above can access the `other_schema` schema but cannot access the `public` schema.
       - id: custom-fetch-implementation
-        name: Custom `fetch` implementation
+        name: Custom fetch implementation
         code: |
           ```js
           import { createClient } from '@supabase/supabase-js'
@@ -192,10 +192,9 @@ functions:
       - The auth methods can be accessed via the `supabase.auth` namespace.
       - By default, the supabase client sets `persistSession` to true and attempts to store the session in local storage. When using the supabase client in an environment that doesn't support local storage, you might notice the following warning message being logged:
 
-      > No storage option exists to persist the session, which may result in unexpected behavior when using auth.
-      If you want to set `persistSession` to true, please provide a storage option or you may set `persistSession` to false to disable this warning.
+        > No storage option exists to persist the session, which may result in unexpected behavior when using auth. If you want to set `persistSession` to true, please provide a storage option or you may set `persistSession` to false to disable this warning.
 
-      This warning message can be safely ignored if you're not using auth on the server-side. If you are using auth and you want to set `persistSession` to true, you will need to provide a custom storage implementation that follows [this interface](https://github.com/supabase/gotrue-js/blob/master/src/lib/types.ts#L1027).
+        This warning message can be safely ignored if you're not using auth on the server-side. If you are using auth and you want to set `persistSession` to true, you will need to provide a custom storage implementation that follows [this interface](https://github.com/supabase/gotrue-js/blob/master/src/lib/types.ts#L1027).
       - Any email links and one-time passwords (OTPs) sent have a default expiry of 24 hours. We have the following [rate limits](/docs/guides/platform/going-into-prod#auth-rate-limits) in place to guard against brute force attacks.
       - The expiry of an access token can be set in the "JWT expiry limit" field in [your project's auth settings](/dashboard/project/_/settings/auth). A refresh token never expires and can only be used once.
 
@@ -224,6 +223,7 @@ functions:
             }
           })
           ```
+
   - id: sign-up
     title: 'signUp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
@@ -284,6 +284,202 @@ functions:
             }
           )
           ```
+
+  - id: on-auth-state-change
+    title: 'onAuthStateChange()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.onAuthStateChange'
+    notes: |
+      - Subscribes to important events occurring on the user's session.
+      - Use on the frontend/client. It is less useful on the server.
+      - Events are emitted across tabs to keep your application's UI up-to-date. Some events can fire very frequently, based on the number of tabs open. Use a quick and efficient callback function, and defer or debounce as many operations as you can to be performed outside of the callback.
+      - **Important:** A callback can be an `async` function and it runs synchronously during the processing of the changes causing the event. You can easily create a dead-lock by using `await` on a call to another method of the Supabase library.
+        - Avoid using `async` functions as callbacks.
+        - Limit the number of `await` calls in `async` callbacks.
+        - Do not use other Supabase functions in the callback function. If you must, dispatch the functions once the callback has finished executing. Use this as a quick way to achieve this:
+          ```js
+          supabase.auth.onAuthStateChange((event, session) => {
+            setTimeout(async () => {
+              // await on other Supabase function here
+              // this runs right after the callback has finished
+            }, 0)
+          })
+          ```
+      - Emitted events:
+        - `INITIAL_SESSION`
+          - Emitted right after the Supabase client is constructed and the initial session from storage is loaded.
+        - `SIGNED_IN`
+          - Emitted each time a user session is confirmed or re-established, including on user sign in and when refocusing a tab. 
+          - Avoid making assumptions as to when this event is fired, this may occur even when the user is already signed in. Instead, check the user object attached to the event to see if a new user has signed in and update your application's UI.
+          - This event can fire very frequently depending on the number of tabs open in your application.
+        - `SIGNED_OUT`
+          - Emitted when the user signs out. This can be after:
+            - A call to `supabase.auth.signOut()`.
+            - After the user's session has expired for any reason:
+              - User has signed out on another device.
+              - The session has reached its timebox limit or inactivity timeout.
+              - User has signed in on another device with single session per user enabled.
+              - Check the [User Sessions](/docs/guides/auth/sessions) docs for more information.
+          - Use this to clean up any local storage your application has associated with the user.
+        - `TOKEN_REFRESHED`
+          - Emitted each time a new access and refresh token are fetched for the signed in user.
+          - It's best practice and highly recommended to extract the access token (JWT) and store it in memory for further use in your application.
+            - Avoid frequent calls to `supabase.auth.getSession()` for the same purpose.
+          - There is a background process that keeps track of when the session should be refreshed so you will always receive valid tokens by listening to this event.
+          - The frequency of this event is related to the JWT expiry limit configured on your project.
+        - `USER_UPDATED`
+          - Emitted each time the `supabase.auth.updateUser()` method finishes successfully. Listen to it to update your application's UI based on new profile information.
+        - `PASSWORD_RECOVERY`
+          - Emitted instead of the `SIGNED_IN` event when the user lands on a page that includes a password recovery link in the URL.
+          - Use it to show a UI to the user where they can [reset their password](/docs/guides/auth/passwords#resetting-a-users-password-forgot-password).
+
+    examples:
+      - id: listen-to-auth-changes
+        name: Listen to auth changes
+        isSpotlight: true
+        code: |
+          ```js
+          const subscription = supabase.auth.onAuthStateChange((event, session) => {
+            console.log(event, session)
+
+            if (event === 'INITIAL_SESSION') {
+              // handle initial session
+            } else if (event === 'SIGNED_IN') {
+              // handle sign in event
+            } else if (event === 'SIGNED_OUT') {
+              // handle sign out event
+            } else if (event === 'PASSWORD_RECOVERY') {
+              // handle password recovery event
+            } else if (event === 'TOKEN_REFRESHED') {
+              // handle token refreshed event
+            } else if (event === 'USER_UPDATED') {
+              // handle user updated event
+            }
+          })
+
+          // call unsubscribe to remove the callback
+          subscription.unsubscribe()
+          ```
+      - id: listen-to-sign-out
+        name: Listen to sign out
+        description: |
+          Make sure you clear out any local data, such as local and session storage, after the client library has detected the user's sign out.
+        code: |
+          ```js
+          supabase.auth.onAuthStateChange((event, session) => {
+            if (event === 'SIGNED_OUT') {
+              console.log('SIGNED_OUT', session)
+
+              // clear local and session storage
+              [
+                window.localStorage,
+                window.sessionStorage,
+              ].forEach((storage) => {
+                Object.entries(storage)
+                  .forEach(([key]) => {
+                    storage.removeItem(key)
+                  })
+              })
+            }
+          })
+          ```
+      - id: store-provider-tokens
+        name: Store OAuth provider tokens on sign in
+        description: |
+          When using [OAuth (Social Login)](/docs/guides/auth/social-login) you sometimes wish to get access to the provider's access token and refresh token, in order to call provider APIs in the name of the user.
+
+          For example, if you are using [Sign in with Google](/docs/guides/auth/social-login/auth-google) you may want to use the provider token to call Google APIs on behalf of the user. Supabase Auth does not keep track of the provider access and refresh token, but does return them for you once, immediately after sign in. You can use the `onAuthStateChange` method to listen for the presence of the provider tokens and store them in local storage. You can further send them to your server's APIs for use on the backend.
+
+          Finally, make sure you remove them from local storage on the `SIGNED_OUT` event. If the OAuth provider supports token revocation, make sure you call those APIs either from the frontend or schedule them to be called on the backend.
+        code: |
+          ```js
+          // Register this immediately after calling createClient!
+          // Because signInWithOAuth causes a redirect, you need to fetch the
+          // provider tokens from the callback.
+          supabase.auth.onAuthStateChange((event, session) => {
+            if (session && session.provider_token) {
+              window.localStorage.setItem('oauth_provider_token', session.provider_token)
+            }
+
+            if (session && session.provider_refresh_token) {
+              window.localStorage.setItem('oauth_provider_refresh_token', session.provider_refresh_token)
+            }
+
+            if (event === 'SIGNED_OUT') {
+              window.localStorage.removeItem('oauth_provider_token')
+              window.localStorage.removeItem('oauth_provider_refresh_token')
+            }
+          })
+          ```
+      - id: react-user-session-context
+        name: Use React Context for the User's session
+        description: |
+          Instead of relying on `supabase.auth.getSession()` within your React components, you can use a [React Context](https://react.dev/reference/react/createContext) to store the latest session information from the `onAuthStateChange` callback and access it that way.
+        code: |
+          ```js
+          const SessionContext = React.createContext(null)
+
+          function main() {
+            const [session, setSession] = React.useState(null)
+
+            React.useEffect(() => {
+              const subscription = supabase.auth.onAuthStateChange(
+                (event, session) => {
+                  if (event === 'SIGNED_OUT') {
+                    setSession(null)
+                  } else if (session) {
+                    setSession(session)
+                  }
+                })
+
+              return () => {
+                subscription.unsubscribe()
+              }
+            }, [])
+
+            return (
+              <SessionContext.Provider value={session}>
+                <App />
+              </SessionContext.Provider>
+            )
+          }
+          ```
+      - id: listen-to-password-recovery-events
+        name: Listen to password recovery events
+        code: |
+          ```js
+          supabase.auth.onAuthStateChange((event, session) => {
+            if (event === 'PASSWORD_RECOVERY') {
+              console.log('PASSWORD_RECOVERY', session)
+              // show screen to update user's password
+              showPasswordResetScreen(true)
+            }
+          })
+          ```
+      - id: listen-to-sign-in
+        name: Listen to sign in
+        code: |
+          ```js
+          supabase.auth.onAuthStateChange((event, session) => {
+            if (event === 'SIGNED_IN') console.log('SIGNED_IN', session)
+          })
+          ```
+      - id: listen-to-token-refresh
+        name: Listen to token refresh
+        code: |
+          ```js
+          supabase.auth.onAuthStateChange((event, session) => {
+            if (event === 'TOKEN_REFRESHED') console.log('TOKEN_REFRESHED', session)
+          })
+          ```
+      - id: listen-to-user-updates
+        name: Listen to user updates
+        code: |
+          ```js
+          supabase.auth.onAuthStateChange((event, session) => {
+            if (event === 'USER_UPDATED') console.log('USER_UPDATED', session)
+          })
+          ```
+
   - id: sign-in-with-password
     title: 'signInWithPassword()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithPassword'
@@ -398,21 +594,44 @@ functions:
           })
           ```
       - id: sign-in-with-scopes
-        name: Sign in with scopes
+        name: Sign in with scopes and access provider tokens
         isSpotlight: false
         description: |
-          If you need additional data from an OAuth provider, you can include a space-separated list of scopes in your request to get back an OAuth provider token.
-          You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider. The list of scopes will be documented by the third-party provider you are using and specifying scopes will enable you to use the OAuth provider token to call additional APIs supported by the third-party provider to get more information.
+          If you need additional access from an OAuth provider, in order to access provider specific APIs in the name of the user, you can do this by passing in the scopes the user should authorize for your application. Note that the `scopes` option takes in **a space-separated list** of scopes.
+
+          Because OAuth sign-in often includes redirects, you should register an `onAuthStateChange` callback immediately after you create the Supabase client. This callback will listen for the presence of `provider_token` and `provider_refresh_token` properties on the `session` object and store them in local storage. The client library will emit these values **only once** immediately after the user signs in. You can then access them by looking them up in local storage, or send them to your backend servers for further processing.
+
+          Finally, make sure you remove them from local storage on the `SIGNED_OUT` event. If the OAuth provider supports token revocation, make sure you call those APIs either from the frontend or schedule them to be called on the backend.
         code: |
           ```js
-          const { data, error } = await supabase.auth.signInWithOAuth({
+          // Register this immediately after calling createClient!
+          // Because signInWithOAuth causes a redirect, you need to fetch the
+          // provider tokens from the callback.
+          supabase.auth.onAuthStateChange((event, session) => {
+            if (session && session.provider_token) {
+              window.localStorage.setItem('oauth_provider_token', session.provider_token)
+            }
+
+            if (session && session.provider_refresh_token) {
+              window.localStorage.setItem('oauth_provider_refresh_token', session.provider_refresh_token)
+            }
+
+            if (event === 'SIGNED_OUT') {
+              window.localStorage.removeItem('oauth_provider_token')
+              window.localStorage.removeItem('oauth_provider_refresh_token')
+            }
+          })
+
+          // Call this on your Sign in with GitHub button to initiate OAuth
+          // with GitHub with the requested elevated scopes.
+          await supabase.auth.signInWithOAuth({
             provider: 'github',
             options: {
               scopes: 'repo gist notifications'
             }
           })
-          const oAuthToken = data.session.provider_token // use to access provider API
           ```
+
   - id: sign-in-with-id-token
     title: 'signInWithIdToken'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithIdToken'
@@ -475,6 +694,8 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueClient.signOut'
     notes: |
       - In order to use the `signOut()` method, the user needs to be signed in first.
+      - By default, `signOut()` uses the global scope, which signs out all other sessions that the user is logged into as well.
+      - Since Supabase Auth uses JWTs for authentication, the access token JWT will be valid until it's expired. When the user signs out, Supabase revokes the refresh token and deletes the JWT from the client-side. This does not revoke the JWT and it will still be valid until it expires.
     examples:
       - id: sign-out
         name: Sign out
@@ -595,6 +816,59 @@ functions:
             nonce: '123456'
           })
           ```
+  - id: get-user-identities
+    title: 'getUserIdentities()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.getUserIdentities'
+    notes: |
+      - The user needs to be signed in to call `getUserIdentities()`.
+    examples:
+      - id: get-user-identities
+        name: Returns a list of identities linked to the user
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.getUserIdentities()
+          ```
+  - id: link-identity
+    title: 'linkIdentity()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.linkIdentity'
+    notes: |
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The user needs to be signed in to call `linkIdentity()`.
+      - If the candidate identity is already linked to the existing user or another user, `linkIdentity()` will fail.
+    examples:
+      - id: link-identity
+        name: Link an identity to a user
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.linkIdentity()
+          ```
+  - id: unlink-identity
+    title: 'unlinkIdentity()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.unlinkIdentity'
+    notes: |
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The user needs to be signed in to call `unlinkIdentity()`.
+      - The user must have at least 2 identities in order to unlink an identity.
+      - The identity to be unlinked must belong to the user.
+    examples:
+      - id: unlink-identity
+        name: Unlink an identity
+        isSpotlight: true
+        code: |
+          ```js
+          // retrieve all identites linked to a user
+          const identities = await supabase.auth.getUserIdentities()
+
+          // find the google identity 
+          const googleIdentity = identities.find(
+            identity => identity.provider === 'google'
+          )
+
+          // unlink the google identity
+          const { data, error } = await supabase.auth.unlinkIdentity(googleIdentity)
+          ```
   - id: send-password-reauthentication
     title: 'reauthenticate()'
     $ref: '@supabase/gotrue-js.GoTrueClient.reauthenticate'
@@ -620,6 +894,7 @@ functions:
       - Passwordless sign-ins can be resent by calling the `signInWithOtp()` method again.
       - Password recovery emails can be resent by calling the `resetPassswordForEmail()` method again.
       - This method will only resend an email or phone OTP to the user if there was an initial signup, email change or phone change request being made.
+      - You can specify a redirect url when you resend an email link using the `emailRedirectTo` option.
     examples:
       - id: resend-email-signup-confirmation
         name: Resend an email signup confirmation
@@ -629,7 +904,10 @@ functions:
           ```js
           const { data, error } = await supabase.auth.resend({
             type: 'signup',
-            email: 'email@example.com'
+            email: 'email@example.com',
+            options: {
+              emailRedirectTo: 'https://example.com/welcome'
+            }
           })
           ```
       - id: resend-phone-signup-confirmation
@@ -704,69 +982,7 @@ functions:
           const { data, error } = await supabase.auth.refreshSession({ refresh_token })
           const { session, user } = data
           ```
-  - id: on-auth-state-change
-    title: 'onAuthStateChange()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.onAuthStateChange'
-    notes: |
-      - Types of auth events: `SIGNED_IN`, `SIGNED_OUT`, `TOKEN_REFRESHED`, `USER_UPDATED`, `PASSWORD_RECOVERY`
-      - Currently, `onAuthStateChange()` does not work across tabs.
-      For instance, in the case of a password reset flow, the original tab which requested for the password reset link will not receive the `SIGNED_IN` and `PASSWORD_RECOVERY` event when the user clicks on the link.
 
-    examples:
-      - id: listen-to-auth-changes
-        name: Listen to auth changes
-        isSpotlight: true
-        code: |
-          ```js
-          supabase.auth.onAuthStateChange((event, session) => {
-            console.log(event, session)
-          })
-          ```
-      - id: listen-to-password-recovery-events
-        name: Listen to password recovery events
-        code: |
-          ```js
-          supabase.auth.onAuthStateChange((event, session) => {
-            if (event == 'PASSWORD_RECOVERY') {
-              console.log('PASSWORD_RECOVERY', session)
-
-              // show screen to update user's password
-              showPasswordResetScreen(true)
-            }
-          })
-          ```
-      - id: listen-to-sign-in
-        name: Listen to sign in
-        code: |
-          ```js
-          supabase.auth.onAuthStateChange((event, session) => {
-            if (event == 'SIGNED_IN') console.log('SIGNED_IN', session)
-          })
-          ```
-      - id: listen-to-sign-out
-        name: Listen to sign out
-        code: |
-          ```js
-          supabase.auth.onAuthStateChange((event, session) => {
-            if (event == 'SIGNED_OUT') console.log('SIGNED_OUT', session)
-          })
-          ```
-      - id: listen-to-token-refresh
-        name: Listen to token refresh
-        code: |
-          ```js
-          supabase.auth.onAuthStateChange((event, session) => {
-            if (event == 'TOKEN_REFRESHED') console.log('TOKEN_REFRESHED', session)
-          })
-          ```
-      - id: listen-to-user-updates
-        name: Listen to user updates
-        code: |
-          ```js
-          supabase.auth.onAuthStateChange((event, session) => {
-            if (event == 'USER_UPDATED') console.log('USER_UPDATED', session)
-          })
-          ```
   - id: exchange-code-for-session
     title: 'exchangeCodeForSession()'
     $ref: '@supabase/gotrue-js.GoTrueClient.exchangeCodeForSession'
@@ -783,7 +999,7 @@ functions:
   - id: auth-mfa-api
     title: 'Overview'
     notes: |
-      This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `supabase.auth.mfa` namespace. 
+      This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `supabase.auth.mfa` namespace.
 
       Currently, we only support time-based one-time password (TOTP) as the 2nd factor. We don't support recovery codes but we allow users to enroll more than 1 TOTP factor, with an upper limit of 10.
 
@@ -807,13 +1023,14 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase.auth.mfa.enroll({
-            factorType: 'totp'
+            factorType: 'totp',
+            friendlyName: 'your_friendly_name'
           })
 
           // Use the id to create a challenge.
           // The challenge can be verified by entering the code generated from the authenticator app.
           // The code will be generated upon scanning the qr_code or entering the secret into the authenticator app.
-          const { id, type, totp: { qr_code, secret, uri } } = data
+          const { id, type, totp: { qr_code, secret, uri }, friendly_name } = data
           ```
   - id: mfa-challenge
     title: 'mfa.challenge()'
@@ -1016,6 +1233,8 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.inviteUserByEmail'
     notes: |
       - Sends an invite link to the user's email address.
+      - The `inviteUserByEmail()` method is typically used by administrators to invite users to join the application.
+      - Note that PKCE is not supported when using `inviteUserByEmail`. This is because the browser initiating the invite is often different from the browser acecpting the invite which makes it difficult to provide the security guarantees required of the PKCE flow.
     examples:
       - id: invite-a-user
         name: Invite a user
@@ -1331,8 +1550,8 @@ functions:
             "statusText": "OK"
           }
           ```
-      - id: query-foreign-tables
-        name: Query foreign tables
+      - id: query-referenced-tables
+        name: Query referenced tables
         description: |
           If your database has foreign key relationships, you can query related tables too.
         code: |
@@ -1394,18 +1613,18 @@ functions:
             "statusText": "OK"
           }
           ```
-      - id: query-foreign-tables-through-a-join-table
-        name: Query foreign tables through a join table
+      - id: query-referenced-tables-through-a-join-table
+        name: Query referenced tables through a join table
         code: |
           ```ts
-            const { data, error } = await supabase
-              .from('users')
-              .select(`
-                name,
-                teams (
-                  name
-                )
-              `)
+          const { data, error } = await supabase
+            .from('users')
+            .select(`
+              name,
+              teams (
+                name
+              )
+            `)
             ```
         data:
           sql: |
@@ -1480,8 +1699,8 @@ functions:
           the `select()` method to query the related data. The join table needs
           to have the foreign keys as part of its composite primary key.
         hideCodeBlock: true
-      - id: query-the-same-foreign-table-multiple-times
-        name: Query the same foreign table multiple times
+      - id: query-the-same-referenced-table-multiple-times
+        name: Query the same referenced table multiple times
         code: |
           ```ts
           const { data, error } = await supabase
@@ -1535,12 +1754,12 @@ functions:
           }
           ```
         description: |
-          If you need to query the same foreign table twice, use the name of the
+          If you need to query the same referenced table twice, use the name of the
           joined column to identify which join to use. You can also give each
           column an alias.
         hideCodeBlock: true
-      - id: filtering-through-foreign-tables
-        name: Filtering through foreign tables
+      - id: filtering-through-referenced-tables
+        name: Filtering through referenced tables
         code: |
           ```ts
           const { data, error } = await supabase
@@ -1589,12 +1808,12 @@ functions:
           }
           ```
         description: |
-          If the filter on a foreign table's column is not satisfied, the foreign
+          If the filter on a referenced table's column is not satisfied, the referenced
           table returns `[]` or `null` but the parent table is not filtered out.
           If you want to filter out the parent table rows, use the `!inner` hint
         hideCodeBlock: true
-      - id: querying-foreign-table-with-count
-        name: Querying foreign table with count
+      - id: querying-referenced-table-with-count
+        name: Querying referenced table with count
         code: |
           ```ts
           const { data, error } = await supabase
@@ -1722,8 +1941,8 @@ functions:
           [operators](/docs/guides/database/json#query-the-jsonb-data) for
           querying JSON data.
         hideCodeBlock: true
-      - id: querying-foreign-table-with-inner-join
-        name: Querying foreign table with inner join
+      - id: querying-referenced-table-with-inner-join
+        name: Querying referenced table with inner join
         code: |
           ```ts
           const { data, error } = await supabase
@@ -1769,8 +1988,46 @@ functions:
           }
           ```
         description: |
-          If you don't want to return the foreign table contents, you can leave the parenthesis empty.
+          If you don't want to return the referenced table contents, you can leave the parenthesis empty.
           Like `.select('name, countries!inner()')`.
+        hideCodeBlock: true
+      - id: switching-schemas-per-query
+        name: Switching schemas per query
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .schema('myschema')
+            .from('mytable')
+            .select()
+          ```
+        data:
+          sql: |
+            ```sql
+            create schema myschema;
+
+            create table myschema.mytable (
+              id uuid primary key default gen_random_uuid(),
+              data text
+            );
+
+            insert into myschema.mytable (data) values ('mydata');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": "4162e008-27b0-4c0f-82dc-ccaeee9a624d",
+                "data": "mydata"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          In addition to setting the schema during initialization, you can also switch schemas on a per-query basis.
+          Make sure you've set up your [database privileges and API settings](/docs/guides/api/using-custom-schemas).
         hideCodeBlock: true
 
   - id: insert
@@ -2408,8 +2665,8 @@ functions:
             "statusText": "OK"
           }
           ```
-      - id: filter-foreign-tables
-        name: Filter Foreign Tables
+      - id: filter-referenced-tables
+        name: Filter referenced tables
         code: |
           ```ts
           const { data, error } = await supabase
@@ -2463,7 +2720,7 @@ functions:
             }
             ```
         description: |
-          You can filter on foreign tables in your `select()` query using dot
+          You can filter on referenced tables in your `select()` query using dot
           notation.
   ######## TODO CHECK FILTER YAML ERRORS ########
   - id: eq
@@ -3734,8 +3991,8 @@ functions:
           }
           ```
         hideCodeBlock: true
-      - id: use-or-on-foreign-tables
-        name: Use `or` on foreign tables
+      - id: use-or-on-referenced-tables
+        name: Use `or` on referenced tables
         code: |
           ```ts
           const { data, error } = await supabase
@@ -3746,7 +4003,7 @@ functions:
                 name
               )
             `)
-            .or('country_id.eq.1,name.eq.Beijing', { foreignTable: 'cities' })
+            .or('country_id.eq.1,name.eq.Beijing', { referenceTable: 'cities' })
           ```
         data:
           sql: |
@@ -3838,8 +4095,8 @@ functions:
           ```
         hideCodeBlock: true
         isSpotlight: true
-      - id: on-a-foreign-table
-        name: On a foreign table
+      - id: on-a-referenced-table
+        name: On a referenced table
         code: |
           ```ts
           const { data, error } = await supabase
@@ -3993,8 +4250,8 @@ functions:
           ```
         hideCodeBlock: true
         isSpotlight: true
-      - id: on-a-foreign-table
-        name: On a foreign table
+      - id: on-a-referenced-table
+        name: On a referenced table
         code: |
           ```ts
             const { data, error } = await supabase
@@ -4005,7 +4262,7 @@ functions:
                   name
                 )
               `)
-              .order('name', { foreignTable: 'cities', ascending: false })
+              .order('name', { referencedTable: 'cities', ascending: false })
             ```
         data:
           sql: |
@@ -4055,7 +4312,7 @@ functions:
           }
           ```
         description: |
-          Ordering on foreign tables doesn't affect the ordering of
+          Ordering on referenced tables doesn't affect the ordering of
           the parent table.
         hideCodeBlock: true
 
@@ -4099,8 +4356,8 @@ functions:
           ```
         hideCodeBlock: true
         isSpotlight: true
-      - id: on-a-foreign-table
-        name: On a foreign table
+      - id: on-a-referenced-table
+        name: On a referenced table
         code: |
           ```ts
           const { data, error } = await supabase
@@ -4111,7 +4368,7 @@ functions:
                 name
               )
             `)
-            .limit(1, { foreignTable: 'cities' })
+            .limit(1, { referenceTable: 'cities' })
           ```
         data:
           sql: |
@@ -4314,6 +4571,7 @@ functions:
           ```
         hideCodeBlock: true
         isSpotlight: true
+
   - id: csv
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.csv'
     title: csv()
@@ -4352,6 +4610,7 @@ functions:
           By default, the data is returned in JSON format, but can also be returned as Comma Separated Values.
         hideCodeBlock: true
         isSpotlight: true
+
   - id: returns
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.returns'
     title: returns()
@@ -4371,6 +4630,90 @@ functions:
           ```
         hideCodeBlock: true
         isSpotlight: true
+
+  - id: explain
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.explain'
+    title: Using Explain
+    description: |
+      For debugging slow queries, you can get the [Postgres `EXPLAIN` execution plan](https://www.postgresql.org/docs/current/sql-explain.html) of a query
+      using the `explain()` method. This works on any query, even for `rpc()` or writes.
+
+      Explain is not enabled by default as it can reveal sensitive information about your database.
+      It's best to only enable this for testing environments but if you wish to enable it for production you can provide additional protection by using a `pre-request` function.
+
+      Follow the [Performance Debugging Guide](/docs/guides/api/rest/debugging-performance) to enable the functionality on your project.
+    examples:
+      - id: get-execution-plan
+        name: Get the execution plan
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .explain()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```
+          Aggregate  (cost=33.34..33.36 rows=1 width=112)
+            ->  Limit  (cost=0.00..18.33 rows=1000 width=40)
+                  ->  Seq Scan on countries  (cost=0.00..22.00 rows=1200 width=40)
+          ```
+        description: |
+          By default, the data is returned in TEXT format, but can also be returned as JSON by using the `format` parameter.
+        hideCodeBlock: true
+        isSpotlight: true
+
+      - id: get-execution-plan-with-analyze-and-verbose
+        name: Get the execution plan with analyze and verbose
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('countries')
+            .select()
+            .explain({analyze:true,verbose:true})
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```
+          Aggregate  (cost=33.34..33.36 rows=1 width=112) (actual time=0.041..0.041 rows=1 loops=1)
+            Output: NULL::bigint, count(ROW(countries.id, countries.name)), COALESCE(json_agg(ROW(countries.id, countries.name)), '[]'::json), NULLIF(current_setting('response.headers'::text, true), ''::text), NULLIF(current_setting('response.status'::text, true), ''::text)
+            ->  Limit  (cost=0.00..18.33 rows=1000 width=40) (actual time=0.005..0.006 rows=3 loops=1)
+                  Output: countries.id, countries.name
+                  ->  Seq Scan on public.countries  (cost=0.00..22.00 rows=1200 width=40) (actual time=0.004..0.005 rows=3 loops=1)
+                        Output: countries.id, countries.name
+          Query Identifier: -4730654291623321173
+          Planning Time: 0.407 ms
+          Execution Time: 0.119 ms
+          ```
+        description: |
+          By default, the data is returned in TEXT format, but can also be returned as JSON by using the `format` parameter.
+        hideCodeBlock: true
+        isSpotlight: false
 
   # NOTE: Not available on currently deployed PostgREST
   # db.geojson():
@@ -4558,7 +4901,7 @@ functions:
         code: |
           ```js
           supabase
-            .channel('any')
+            .channel('room1')
             .on('broadcast', { event: 'cursor-pos' }, payload => {
               console.log('Cursor position received!', payload)
             })
@@ -4577,7 +4920,7 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          const channel = supabase.channel('any')
+          const channel = supabase.channel('room1')
           channel
             .on('presence', { event: 'sync' }, () => {
               console.log('Synced presence state: ', channel.presenceState())
@@ -4593,7 +4936,7 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          const channel = supabase.channel('any')
+          const channel = supabase.channel('room1')
           channel
             .on('presence', { event: 'join' }, ({ newPresences }) => {
               console.log('Newly joined presences: ', newPresences)
@@ -4609,7 +4952,7 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          const channel = supabase.channel('any')
+          const channel = supabase.channel('room1')
           channel
             .on('presence', { event: 'leave' }, ({ leftPresences }) => {
               console.log('Newly left presences: ', leftPresences)
@@ -4627,7 +4970,7 @@ functions:
         code: |
           ```js
           supabase
-            .channel('any')
+            .channel('room1')
             .on('postgres_changes', { event: '*', schema: '*' }, payload => {
               console.log('Change received!', payload)
             })
@@ -4638,7 +4981,7 @@ functions:
         code: |
           ```js
           supabase
-            .channel('any')
+            .channel('room1')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
             })
@@ -4649,7 +4992,7 @@ functions:
         code: |
           ```js
           supabase
-            .channel('any')
+            .channel('room1')
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
             })
@@ -4667,7 +5010,7 @@ functions:
         code: |
           ```js
           supabase
-            .channel('any')
+            .channel('room1')
             .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
             })
@@ -4685,7 +5028,7 @@ functions:
         code: |
           ```js
           supabase
-            .channel('any')
+            .channel('room1')
             .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'countries' }, payload => {
               console.log('Change received!', payload)
             })
@@ -4697,7 +5040,7 @@ functions:
         code: |
           ```js
           supabase
-            .channel('any')
+            .channel('room1')
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'countries' }, handleRecordInserted)
             .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'countries' }, handleRecordDeleted)
             .subscribe()
@@ -4710,11 +5053,50 @@ functions:
         code: |
           ```js
           supabase
-            .channel('any')
+            .channel('room1')
             .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'countries', filter: 'id=eq.200' }, handleRecordUpdated)
             .subscribe()
           ```
-
+  - id: broadcast-message
+    title: broadcastMessage()
+    description: |
+      Broadcast a message to all connected clients to a channel.
+    notes: |
+      - When using REST you don't need to subscribe to the channel
+      - REST calls are only available from 2.37.0 onwards
+    $ref: '@supabase/realtime-js.RealtimeChannel.send'
+    examples:
+      - id: send-a-message
+        name: Send a message via websocket
+        isSpotlight: true
+        code: |
+          ```js
+          supabase
+            .channel('room1')
+            .subscribe((status) => {
+              if (status === 'SUBSCRIBED') {
+                channel.send({
+                  type: 'broadcast',
+                  event: 'cursor-pos',
+                  payload: { x: Math.random(), y: Math.random() },
+                })
+              }
+            })
+          ```
+      - id: send-a-message-via-rest
+        name: Send a message via REST
+        isSpotlight: true
+        code: |
+          ```js
+          supabase
+            .channel('room1')
+            .send({
+              type: 'broadcast',
+              event: 'cursor-pos',
+              payload: { x: Math.random(), y: Math.random()
+              },
+            })
+          ```
   - id: get-channels
     title: getChannels()
     $ref: '@supabase/supabase-js.index.SupabaseClient.getChannels'
@@ -4762,7 +5144,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: `select`
         - `objects` table permissions: none
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: list-buckets
         name: List buckets
@@ -4781,7 +5163,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: `select`
         - `objects` table permissions: none
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: get-bucket
         name: Get bucket
@@ -4800,7 +5182,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: `insert`
         - `objects` table permissions: none
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: create-bucket
         name: Create bucket
@@ -4823,7 +5205,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: `select`
         - `objects` table permissions: `select` and `delete`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: empty-bucket
         name: Empty bucket
@@ -4841,7 +5223,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: `select` and `update`
         - `objects` table permissions: none
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: update-bucket
         name: Update bucket
@@ -4864,7 +5246,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: `select` and `delete`
         - `objects` table permissions: none
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: delete-bucket
         name: Delete bucket
@@ -4883,7 +5265,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: only `insert` when you are uploading new files and `select`, `insert` and `update` when you are upserting files
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
       - For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Upload file using `ArrayBuffer` from base64 file data instead, see example below.
     examples:
       - id: upload-file
@@ -4921,7 +5303,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `update` and `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
       - For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Update file using `ArrayBuffer` from base64 file data instead, see example below.
     examples:
       - id: update-file
@@ -4959,7 +5341,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `update` and `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: move-file
         name: Move file
@@ -4979,7 +5361,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `insert` and `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: copy-file
         name: Copy file
@@ -4999,7 +5381,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: create-signed-url
         name: Create Signed URL
@@ -5016,7 +5398,7 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          const { data } = supabase
+          const { data } = await supabase
             .storage
             .from('avatars')
             .createSignedUrl('folder/avatar1.png', 60, {
@@ -5031,7 +5413,7 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          const { data } = supabase
+          const { data } = await supabase
             .storage
             .from('avatars')
             .createSignedUrl('folder/avatar1.png', 60, {
@@ -5046,7 +5428,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: create-signed-urls
         name: Create Signed URLs
@@ -5066,7 +5448,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `insert`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: create-signed-upload-url
         name: Create Signed Upload URL
@@ -5086,7 +5468,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: none
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: upload-to-signed-url
         name: Upload to a signed URL
@@ -5107,7 +5489,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: none
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: returns-the-url-for-an-asset-in-a-public-bucket
         name: Returns the URL for an asset in a public bucket
@@ -5154,7 +5536,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: download-file
         name: Download file
@@ -5190,7 +5572,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `delete` and `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: delete-file
         name: Delete file
@@ -5210,7 +5592,7 @@ functions:
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `select`
-      - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     examples:
       - id: list-files-in-a-bucket
         name: List files in a bucket

@@ -1,5 +1,14 @@
 import dynamic from 'next/dynamic'
-import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
+import {
+  createContext,
+  ElementRef,
+  PropsWithChildren,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
+import { CommandInput } from './Command.utils'
 
 // `CommandMenu` is heavy - code split to reduce app bundle size
 const CommandMenu = dynamic(() => import('./CommandMenu'), {
@@ -16,7 +25,8 @@ export interface CommandMenuContextValue {
   pages: string[]
   setPages: React.Dispatch<React.SetStateAction<string[]>>
   currentPage?: string
-  site: 'studio' | 'docs'
+  inputRef: React.RefObject<HTMLInputElement>
+  site: 'studio' | 'docs' | 'website'
 
   /**
    * Project metadata for easy retrieval
@@ -46,7 +56,7 @@ export const useCommandMenu = () => {
 }
 
 export interface CommandMenuProviderProps {
-  site: 'studio' | 'docs'
+  site: 'studio' | 'docs' | 'website'
   projectRef?: string
   /**
    * Project's API keys, for easy access through CMDK
@@ -81,6 +91,7 @@ const CommandMenuProvider = ({
   const [isLoading, setIsLoading] = useState(false)
   const [search, setSearch] = useState('')
   const [pages, setPages] = useState<string[]>([])
+  const inputRef = useRef<ElementRef<typeof CommandInput>>(null)
   const currentPage = pages[pages.length - 1]
 
   const project = projectRef !== undefined ? { ref: projectRef, apiKeys, apiUrl } : undefined
@@ -104,10 +115,11 @@ const CommandMenuProvider = ({
         metadata,
         isOptedInToAI,
         saveGeneratedSQL,
+        inputRef,
       }}
     >
       {children}
-      <CommandMenu projectRef={projectRef} />
+      <CommandMenu />
     </CommandMenuContext.Provider>
   )
 }

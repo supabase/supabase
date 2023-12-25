@@ -3,7 +3,12 @@
 }
 
 .dark_community {
-  background-image: radial-gradient(closest-side at 50% 50%, #132121, #132121db, #121212);
+  background-image: radial-gradient(
+    closest-side at 50% 50%,
+    #132121,
+    #132121db,
+    hsl(var(--background-default))
+  );
 }
 
 .community {

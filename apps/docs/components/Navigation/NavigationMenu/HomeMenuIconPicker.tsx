@@ -23,6 +23,7 @@ import {
   IconMenuStatus,
   IconMenuKotlin,
   IconMenuAI,
+  IconMenuDevCli,
 } from './HomeMenuIcons'
 
 function getMenuIcon(menuKey: string, width: number = 16, height: number = 16) {
@@ -69,6 +70,8 @@ function getMenuIcon(menuKey: string, width: number = 16, height: number = 16) {
       return <IconMenuKotlin width={width} height={height} />
     case 'reference-api':
       return <IconMenuApi width={width} height={height} />
+    case 'dev-cli':
+      return <IconMenuDevCli width={width} height={height} />
     case 'reference-cli':
       return <IconMenuCli width={width} height={height} />
     case 'status':

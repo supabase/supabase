@@ -1,0 +1,136 @@
+---
+title: 'PostgREST 12'
+description: 'PostgREST 12 is out and we take a look at some of the major new features like JWT Caching and Aggregate Functions'
+launchweek: x
+categories:
+  - product
+tags:
+  - launch-week
+  - postgrest
+  - planetpg
+date: '2023-12-13'
+published_at: '2023-12-13:00:00.000-07:00'
+to_depth: 3
+author: oli_rice
+image: lwx-postgrest-12/postgrest12-OG.png
+thumb: lwx-postgrest-12/postgrest12-thumb.png
+---
+
+PostgREST 12 is out. In this post, we'll focus on a few of the major features. For the complete list, check out the [release on GitHub](https://github.com/PostgREST/postgrest/releases/tag/v12.0.0).
+
+## Performance: JWT Caching
+
+Until now, PostgREST has validated JWTs on every request. As of PostgREST 12, the JWT is cached on the first request using the `exp` claim to set the cache entry's lifetime.
+
+Why is that a big deal? Well, it turns out decoding JWTs is expensive. Very expensive.
+
+```
+## before
+$ curl 'localhost:3000/authors_only' -H "Authorization: Bearer $JWT" -D -
+HTTP/1.1 200 OK
+Server-Timing: jwt;dur=147.7
+
+## after, with JWT caching
+$ curl 'localhost:3000/authors_only' -H "Authorization: Bearer $JWT" -D -
+HTTP/1.1 200 OK
+Server-Timing: jwt;dur=14.1
+```
+
+The JWT cache shaves over 130ms off the server side timing. For projects with a high volume of API calls, upgrading to PostgREST 12 gives you faster responses, higher throughput, and lower resource consumption.
+
+## Server Timing Header
+
+Did you notice the `Server-Timing` header in the last example? [That's new too](https://postgrest.org/en/v12.0/references/admin.html#server-timing-header) and it does more than measure JWT decoding duration.
+
+Here's a complete reference to what you can extract from your responses:
+
+```
+Server-Timing:
+	jwt;dur=14.9,
+	parse;dur=71.1,
+	plan;dur=109.0,
+	transaction;dur=353.2,
+	response;dur=4.4
+```
+
+Where the information from each phase is internally timed by PostgREST for better visibility into server side performance.
+
+## Aggregate Functions
+
+Support for aggregate functions has been [much requested feature](https://github.com/supabase/postgrest-js/issues/206) that went through multiple iterations of design and review.
+
+Currently, PostgREST supports `avg`, `count`, `max`, `min`, `sum`. Here's a minimal example using `count`:
+
+```
+$ curl 'http://postgrest/blog_post?select=id.count()'
+
+[
+  {
+    "count": 51,
+  }
+]
+```
+
+We can also add a “group by” simply by adding another element to the select clause.
+
+```
+$ curl 'http://postgrest/blog_post?select=title,id.count()'
+
+[
+  {
+    "title": "Supabase Blog",
+    "count": 40
+  },
+  {
+    "title": "Contributors Blog",
+    "count": 11
+  },
+  ...
+```
+
+This example only scratches the surface. Aggregates are fully-compatible with [resource embedding](https://postgrest.org/en/stable/references/api/resource_embedding.html) which yields an extremely versatile interface. We'll explore this feature more in a deep-dive coming soon.
+
+## Media Type Handlers
+
+PostgREST now gives you the flexibility to [handle your custom media types and override the built-in ones](https://postgrest.org/en/v12.0/references/api/media_type_handlers.html). Among other things, that enables [serving HTML, javascript, or whatever you can think of, straight from your database](https://postgrest.org/en/latest/how-tos/providing-html-content-using-htmx.html).
+
+```sql
+create domain "text/html" as text;
+
+create or replace function api.index()
+returns "text/html"
+language sql
+as $$
+  select $html$
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>PostgREST + HTMX To-Do List</title>
+      <!-- Tailwind for CSS styling -->
+      <link href="https://unpkg.com/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    </head>
+    <body class="bg-gray-900">
+      <div class="flex justify-center">
+        <div class="max-w-lg mt-5 p-6 bg-gray-800 border border-gray-800 rounded-lg shadow-xl">
+          <h5 class="mb-3 text-2xl font-bold tracking-tight text-white">PostgREST + HTMX To-Do List</h5>
+        </div>
+      </div>
+    </body>
+    </html>
+  $html$;
+$$;
+```
+
+With PostgREST running locally we can then navigate to [localhost:3000/rpc/index](http://localhost:3000/rpc/index) to see
+
+![Media Type Handlers](/images/blog/lwx-postgrest-12/postgrest-12-media-type-handlers.png)
+
+We're still working through the full implications of this feature, but we're very excited internally about the possibilities it unlocks! Similar to aggregate functions, there's a dedicated post for this feature on the way.
+
+## Availability
+
+For self-hosting, check out the PostgREST [release on GitHub](https://github.com/PostgREST/postgrest/releases/tag/v12.0.0).
+
+The latest version will be rolled out across all projects on the managed platform soon. Keep an eye out for notifications inside [Supabase Studio](https://supabase.com/dashboard).

@@ -4,6 +4,7 @@ export const meta = {
   id: 'pgroonga',
   title: 'PGroonga: Multilingual Full Text Search',
   description: 'Full Text Search for multiple languages in PostgreSQL',
+  tocVideo: 'Mmmv9g_MiBA',
 }
 
 `PGroonga` is a PostgreSQL extension adding a full text search indexing method based on [Groonga](https://groonga.org). While native PostgreSQL supports full text indexing, it is limited to alphabet and digit based languages. `PGroonga` offers a wider range of character support making it viable for a superset of languages supported by PostgreSQL including Japanese, Chinese, etc.
@@ -93,7 +94,7 @@ Index Scan using ix_memos_content on memos  (cost=0.00..1.11 rows=1 width=36)
 (2 rows)
 ```
 
-The pgroonga index is used to retrive the result set:
+The pgroonga index is used to retrieve the result set:
 
 ```markdown
 | id  | content                                                                  |
@@ -101,7 +102,7 @@ The pgroonga index is used to retrive the result set:
 | 2   | 'Groonga is a fast full text search engine that supports all languages.' |
 ```
 
-## Full Text Search
+## Full text search
 
 The `&@~` operator performs full text search. It returns any matching results. Unlike `LIKE` operator, pgroonga can search any text that contains the keyword case insensitive.
 

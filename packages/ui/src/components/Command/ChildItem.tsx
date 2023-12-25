@@ -1,4 +1,4 @@
-import { useCommandState } from 'cmdk-supabase'
+import { useCommandState } from 'cmdk'
 import { CommandItem } from './Command.utils'
 import React from 'react'
 

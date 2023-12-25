@@ -105,16 +105,12 @@ In our example below, we will be copying lots of existing chat messages out of o
 
 After we have pre-loaded a new child table with copied rows and verified that the rows are valid with a check constraint, then we can **attach** the partition to the parent table with `ATTACH PARTITION ...` command. This will make the new range of child data available for queries on the parent table.
 
-<img
-  className="dark:hidden !m-0"
+<Img
   alt="diagram reference"
-  src="/images/blog/partitions/dynamic-table-partitioning-diagram-light.png"
-/>
-
-<img
-  className="hidden dark:block !m-0"
-  alt="diagram reference"
-  src="/images/blog/partitions/dynamic-table-partitioning-diagram-dark.png"
+  src={{
+    light: '/images/blog/partitions/dynamic-table-partitioning-diagram-light.png',
+    dark: '/images/blog/partitions/dynamic-table-partitioning-diagram-dark.png',
+  }}
 />
 
 Postgres partitioning became significantly easier in recent versions. Postgres added the new syntax for [Declarative Partitioning](https://www.postgresql.org/docs/current/ddl-partitioning.html#DDL-PARTITIONING-DECLARATIVE) that makes it easy to create new partitions by adding additional details to your `CREATE TABLE` statements:
@@ -373,7 +369,7 @@ COMMIT;
 
 And that's it! While there is some complexity, I hope this example has given you some ideas on how you too can partition your data for optimal query performance. There are many ways to slice this problem depending on your needs, while I showed one simple common approach to partition time series data by date range, there are a lot of other approaches and I suggest you go over the official Postgres Table Partitioning documentation to see how other patterns may apply to your situation.
 
-Full code example: [https://github.com/supabase/supabase/tree/master/examples/enterprise-patterns/supachat](https://github.com/supabase/supabase/tree/master/examples/enterprise-patterns/supachat)
+[See the full code example on GitHub](https://github.com/supabase/supabase/tree/master/examples/enterprise-patterns/supachat)
 
 ## More Postgres Resources
 

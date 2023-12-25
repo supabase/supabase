@@ -57,7 +57,7 @@ This will serve as the `client_id` when you make API calls to authenticate the u
 - Click on `generate code` at the bottom to generate the `Client secret code` -- this will serve as a `client_secret` for your supabase project.
 - Make sure you enabled `Client secret code` by selecting `enable` from the `Activation state` section.
 
-## Additional configurations on Kakao Developers Portal
+## Additional configurations on Kakao Developers portal
 
 - Make sure the Kakao Login is enabled in the `Kakao Login` tab.
 - Set following scopes under the "Consent Items": account_email, profile_image, profile_nickname
@@ -92,11 +92,11 @@ async function signInWithKakao() {
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
-When your user signs in, call [loginWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Kakao` as the `Provider`:
+When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Kakao` as the `Provider`:
 
 ```kotlin
 suspend fun signInWithKakao() {
-	supabase.gotrue.loginWith(Kakao)
+	supabase.auth.signInWith(Kakao)
 }
 ```
 
@@ -127,7 +127,7 @@ When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) t
 
 ```kotlin
 suspend fun signOut() {
-	supabase.gotrue.logout()
+	supabase.auth.signOut()
 }
 ```
 

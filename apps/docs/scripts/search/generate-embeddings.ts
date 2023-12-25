@@ -1,18 +1,23 @@
 import { createClient } from '@supabase/supabase-js'
 import dotenv from 'dotenv'
-import minimist from 'minimist'
-import 'openai'
-import { Configuration, OpenAIApi } from 'openai'
-import { inspect } from 'util'
+import { parseArgs } from 'node:util'
+import { OpenAI } from 'openai'
 import { v4 as uuidv4 } from 'uuid'
 import { fetchSources } from './sources'
+import { Json, Section } from './sources/base'
 
 dotenv.config()
 
-async function generateEmbeddings() {
-  const argv = minimist(process.argv.slice(2))
+const args = parseArgs({
+  options: {
+    refresh: {
+      type: 'boolean',
+    },
+  },
+})
 
-  const shouldRefresh = Boolean(argv.refresh)
+async function generateEmbeddings() {
+  const shouldRefresh = Boolean(args.values.refresh)
 
   const requiredEnvVars = [
     'NEXT_PUBLIC_SUPABASE_URL',
@@ -59,15 +64,19 @@ async function generateEmbeddings() {
   }
 
   for (const embeddingSource of embeddingSources) {
-    const { type, source, path, parentPath } = embeddingSource
+    const { type, source, path } = embeddingSource
 
     try {
-      const { checksum, meta, sections } = await embeddingSource.load()
+      const {
+        checksum,
+        sections,
+        meta = {},
+      }: { checksum: string; sections: Section[]; meta?: Json } = embeddingSource.process()
 
       // Check for existing page in DB and compare checksums
       const { error: fetchPageError, data: existingPage } = await supabaseClient
         .from('page')
-        .select('id, path, checksum, parentPage:parent_page_id(id, path)')
+        .select('id, path, checksum')
         .filter('path', 'eq', path)
         .limit(1)
         .maybeSingle()
@@ -78,34 +87,6 @@ async function generateEmbeddings() {
 
       // We use checksum to determine if this page & its sections need to be regenerated
       if (!shouldRefresh && existingPage?.checksum === checksum) {
-        const existingParentPage = Array.isArray(existingPage?.parentPage)
-          ? existingPage?.parentPage[0]
-          : existingPage?.parentPage
-
-        // If parent page changed, update it
-        if (existingParentPage?.path !== parentPath) {
-          console.log(`[${path}] Parent page has changed. Updating to '${parentPath}'...`)
-          const { error: fetchParentPageError, data: parentPage } = await supabaseClient
-            .from('page')
-            .select()
-            .filter('path', 'eq', parentPath)
-            .limit(1)
-            .maybeSingle()
-
-          if (fetchParentPageError) {
-            throw fetchParentPageError
-          }
-
-          const { error: updatePageError } = await supabaseClient
-            .from('page')
-            .update({ parent_page_id: parentPage?.id })
-            .filter('id', 'eq', existingPage.id)
-
-          if (updatePageError) {
-            throw updatePageError
-          }
-        }
-
         // No content/embedding update required on this page
         // Update other meta info
         const { error: updatePageError } = await supabaseClient
@@ -145,17 +126,6 @@ async function generateEmbeddings() {
         }
       }
 
-      const { error: fetchParentPageError, data: parentPage } = await supabaseClient
-        .from('page')
-        .select()
-        .filter('path', 'eq', parentPath)
-        .limit(1)
-        .maybeSingle()
-
-      if (fetchParentPageError) {
-        throw fetchParentPageError
-      }
-
       // Create/update page record. Intentionally clear checksum until we
       // have successfully generated all page sections.
       const { error: upsertPageError, data: page } = await supabaseClient
@@ -167,7 +137,7 @@ async function generateEmbeddings() {
             type,
             source,
             meta,
-            parent_page_id: parentPage?.id,
+            content: embeddingSource.extractIndexedContent(),
             version: refreshVersion,
             last_refresh: refreshDate,
           },
@@ -187,28 +157,23 @@ async function generateEmbeddings() {
         const input = content.replace(/\n/g, ' ')
 
         try {
-          const configuration = new Configuration({ apiKey: process.env.OPENAI_KEY })
-          const openai = new OpenAIApi(configuration)
+          const openai = new OpenAI({ apiKey: process.env.OPENAI_KEY })
 
-          const embeddingResponse = await openai.createEmbedding({
+          const embeddingResponse = await openai.embeddings.create({
             model: 'text-embedding-ada-002',
             input,
           })
 
-          if (embeddingResponse.status !== 200) {
-            throw new Error(inspect(embeddingResponse.data, false, 2))
-          }
+          const [responseData] = embeddingResponse.data
 
-          const [responseData] = embeddingResponse.data.data
-
-          const { error: insertPageSectionError, data: pageSection } = await supabaseClient
+          const { error: insertPageSectionError } = await supabaseClient
             .from('page_section')
             .insert({
               page_id: page.id,
               slug,
               heading,
               content,
-              token_count: embeddingResponse.data.usage.total_tokens,
+              token_count: embeddingResponse.usage.total_tokens,
               embedding: responseData.embedding,
             })
             .select()
