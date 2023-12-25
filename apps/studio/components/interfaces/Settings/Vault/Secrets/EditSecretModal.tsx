@@ -2,13 +2,15 @@ import { isEmpty } from 'lodash'
 import { useEffect, useState } from 'react'
 import { Button, Form, IconEye, IconEyeOff, Input, Modal } from 'ui'
 
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useVaultSecretUpdateMutation } from 'data/vault/vault-secret-update-mutation'
 import { useStore } from 'hooks'
 import { VaultSecret } from 'types'
 import EncryptionKeySelector from '../Keys/EncryptionKeySelector'
 
 interface EditSecretModalProps {
-  selectedSecret: VaultSecret
+  selectedSecret: VaultSecret | undefined
   onClose: () => void
 }
 
@@ -17,6 +19,9 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
   const [selectedKeyId, setSelectedKeyId] = useState<string>()
   const [showSecretValue, setShowSecretValue] = useState(false)
   const [isLoadingSecretValue, setIsLoadingSecretValue] = useState(false)
+  const { project } = useProjectContext()
+
+  const { mutateAsync: updateSecret } = useVaultSecretUpdateMutation()
 
   let INITIAL_VALUES = {
     name: selectedSecret?.name ?? '',
@@ -40,9 +45,9 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
 
   const onUpdateSecret = async (values: any, { setSubmitting }: any) => {
     const payload: Partial<VaultSecret> = {}
-    if (values.name !== selectedSecret.name) payload.name = values.name
-    if (values.description !== selectedSecret.description) payload.description = values.description
-    if (selectedKeyId !== selectedSecret.key_id) {
+    if (values.name !== selectedSecret?.name) payload.name = values.name
+    if (values.description !== selectedSecret?.description) payload.description = values.description
+    if (selectedKeyId !== selectedSecret?.key_id) {
       let encryptionKeyId = selectedKeyId
       if (values.keyId === 'create-new') {
         const addKeyRes = await vault.addKey(values.keyName || undefined)
@@ -61,9 +66,14 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
     }
     payload.secret = values.secret
 
-    if (!isEmpty(payload)) {
+    if (!isEmpty(payload) && selectedSecret) {
       setSubmitting(true)
-      const res = await vault.updateSecret(selectedSecret.id, payload)
+      const res = await updateSecret({
+        projectRef: project?.ref!,
+        connectionString: project?.connectionString,
+        id: selectedSecret.id,
+        ...payload,
+      })
       if (!res.error) {
         ui.setNotification({ category: 'success', message: 'Successfully updated secret' })
         setSubmitting(false)

@@ -20,8 +20,8 @@ import Loading from 'components/ui/Loading'
 import { invalidateSchemasQuery } from 'data/database/schemas-query'
 import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
+import { useVaultSecretsQuery } from 'data/vault/vault-secrets-query'
 import { useCheckPermissions, useImmutableValue, useStore } from 'hooks'
-import { VaultSecret } from 'types'
 import {
   Button,
   Form,
@@ -51,6 +51,11 @@ const EditWrapper = () => {
 
   const { data, isLoading } = useFDWsQuery({
     projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
+  const { data: secrets, isLoading: isSecretsLoading } = useVaultSecretsQuery({
+    projectRef: project?.ref!,
     connectionString: project?.connectionString,
   })
 
@@ -219,10 +224,15 @@ const EditWrapper = () => {
             useEffect(() => {
               const fetchEncryptedValues = async () => {
                 setLoadingSecrets(true)
+                // If the secrets haven't loaded, escape and run the effect again when they're loaded
+                if (isSecretsLoading) {
+                  return
+                }
+
                 const res = await Promise.all(
                   encryptedOptions.map(async (option) => {
-                    const [secret] = vault.listSecrets(
-                      (secret: VaultSecret) => secret.name === `${wrapper.name}_${option.name}`
+                    const secret = secrets?.find(
+                      (secret) => secret.name === `${wrapper.name}_${option.name}`
                     )
                     if (secret !== undefined) {
                       const value = await vault.fetchSecretValue(secret.id)
@@ -245,7 +255,7 @@ const EditWrapper = () => {
               }
 
               if (encryptedOptions.length > 0) fetchEncryptedValues()
-            }, [])
+            }, [isSecretsLoading])
 
             return (
               <FormPanel

@@ -25,8 +25,8 @@ import { VaultSecret } from 'types'
 
 interface SecretRowProps {
   secret: VaultSecret
-  onSelectEdit: (secret: any) => void
-  onSelectRemove: (secret: any) => void
+  onSelectEdit: (secret: VaultSecret) => void
+  onSelectRemove: (secret: VaultSecret) => void
 }
 
 const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => {

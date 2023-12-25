@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Button, Form, IconEye, IconEyeOff, IconHelpCircle, Input, Modal } from 'ui'
 
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import InformationBox from 'components/ui/InformationBox'
+import { useVaultSecretCreateMutation } from 'data/vault/vault-secret-create-mutation'
 import { useStore } from 'hooks'
 import EncryptionKeySelector from '../Keys/EncryptionKeySelector'
 
@@ -14,6 +16,9 @@ const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
   const { vault, ui } = useStore()
   const [showSecretValue, setShowSecretValue] = useState(false)
   const [selectedKeyId, setSelectedKeyId] = useState<string>()
+  const { project } = useProjectContext()
+
+  const { mutateAsync: addSecret } = useVaultSecretCreateMutation()
 
   const keys = vault.listKeys()
 
@@ -50,7 +55,9 @@ const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
       }
     }
 
-    const res = await vault.addSecret({
+    const res = await addSecret({
+      projectRef: project?.ref!,
+      connectionString: project?.connectionString,
       name: values.name,
       description: values.description,
       secret: values.secret,

@@ -6,22 +6,26 @@ import Link from 'next/link'
 import { Fragment, useEffect, useState } from 'react'
 import { Button, IconExternalLink, IconLoader, IconSearch, IconX, Input, Listbox } from 'ui'
 
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Divider from 'components/ui/Divider'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useVaultSecretsQuery } from 'data/vault/vault-secrets-query'
+import { useCheckPermissions } from 'hooks'
+import { sortBy } from 'lodash'
+import { VaultSecret } from 'types'
 import AddNewSecretModal from './AddNewSecretModal'
 import DeleteSecretModal from './DeleteSecretModal'
 import EditSecretModal from './EditSecretModal'
 import SecretRow from './SecretRow'
 
 const SecretsManagement = () => {
-  const { vault } = useStore()
   const { search } = useParams()
+  const { project } = useProjectContext()
 
   const [searchValue, setSearchValue] = useState<string>('')
   const [selectedSort, setSelectedSort] = useState<'updated_at' | 'name'>('updated_at')
   const [showAddSecretModal, setShowAddSecretModal] = useState(false)
-  const [selectedSecretToEdit, setSelectedSecretToEdit] = useState<any>()
-  const [selectedSecretToRemove, setSelectedSecretToRemove] = useState<any>()
+  const [selectedSecretToEdit, setSelectedSecretToEdit] = useState<VaultSecret>()
+  const [selectedSecretToRemove, setSelectedSecretToRemove] = useState<VaultSecret>()
 
   const canManageSecrets = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
@@ -29,21 +33,29 @@ const SecretsManagement = () => {
     if (search !== undefined) setSearchValue(search)
   }, [search])
 
-  const secrets = (
-    searchValue.length > 0
-      ? vault.listSecrets(
-          (secret: any) =>
-            (secret?.name ?? '').toLowerCase().includes(searchValue.toLowerCase()) ||
-            secret.key_id.toLowerCase().includes(searchValue.toLowerCase())
-        )
-      : vault.listSecrets()
-  ).sort((a: any, b: any) => {
-    if (selectedSort === 'updated_at') {
-      return Number(new Date(a.updated_at)) - Number(new Date(b.updated_at))
-    } else {
-      return a[selectedSort] > b[selectedSort] ? 1 : -1
-    }
+  const { data, isLoading } = useVaultSecretsQuery({
+    projectRef: project?.ref!,
+    connectionString: project?.connectionString,
   })
+
+  let secrets: VaultSecret[] = []
+  if (data) {
+    const filtered =
+      searchValue.length > 0
+        ? data?.filter(
+            (secret) =>
+              (secret?.name ?? '').toLowerCase().includes(searchValue.toLowerCase()) ||
+              secret.key_id.toLowerCase().includes(searchValue.toLowerCase())
+          )
+        : data
+    secrets = sortBy(filtered, (s) => {
+      if (selectedSort === 'updated_at') {
+        return Number(new Date(s.updated_at))
+      } else {
+        return s[selectedSort]
+      }
+    })
+  }
 
   return (
     <>
@@ -144,7 +156,7 @@ const SecretsManagement = () => {
 
         {/* Table of secrets */}
         <div className="border border-default rounded">
-          {!vault.isLoaded ? (
+          {isLoading ? (
             <div className="px-6 py-6 space-x-2 flex items-center justify-center">
               <IconLoader
                 className="animate-spin text-foreground-light"
