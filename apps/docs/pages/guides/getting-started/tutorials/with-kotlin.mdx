@@ -366,7 +366,7 @@ class AuthenticationRepositoryImpl @Inject constructor(
 
     override suspend fun signInWithGoogle(): Boolean {
         return try {
-            auth.loginWith(Google)
+            auth.signInWith(Google)
             true
         } catch (e: Exception) {
             false
