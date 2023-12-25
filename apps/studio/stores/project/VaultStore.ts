@@ -14,7 +14,6 @@ export interface IVaultStore {
   listKeys: (filter?: any) => EncryptionKey[]
   addKey: (name?: string) => any
   deleteKey: (id: string) => any
-  encryptColumn: (column: PostgresColumn, keyId: string) => any
 
   listSecrets: (filter?: any) => VaultSecret[]
   addSecret: (secret: Partial<VaultSecret>) => any
@@ -129,11 +128,6 @@ export default class VaultStore implements IVaultStore {
       this.data.keys = this.data.keys.filter((key) => key.id !== id)
     }
     return res
-  }
-
-  async encryptColumn(column: PostgresColumn, keyId: string) {
-    const query = `security label for pgsodium on column "${column.table}"."${column.name}" is 'ENCRYPT WITH KEY ID ${keyId} SECURITY INVOKER';`
-    return await this.rootStore.meta.query(query)
   }
 
   listSecrets(filter?: any) {
