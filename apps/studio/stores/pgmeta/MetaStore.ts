@@ -27,6 +27,12 @@ import {
   ExtendedPostgresRelationship,
   UpdateColumnPayload,
 } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.types'
+import {
+  addForeignKey,
+  addPrimaryKey,
+  removeForeignKey,
+  removePrimaryKey,
+} from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.utils'
 import { ImportContent } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableEditor.types'
 import { createDatabaseColumn } from 'data/database-columns/database-column-create-mutation'
 import { deleteDatabaseColumn } from 'data/database-columns/database-column-delete-mutation'
@@ -50,21 +56,6 @@ export interface IMetaStore {
   query: (value: string) => Promise<any | { error: ResponseError }>
   validateQuery: (value: string) => Promise<any | { error: ResponseError }>
   formatQuery: (value: string) => Promise<any | { error: ResponseError }>
-
-  /** The methods below are basically just queries but may be supported directly
-   * from the pg-meta library in the future */
-  addPrimaryKey: (
-    schema: string,
-    table: string,
-    columns: string[]
-  ) => Promise<any | { error: ResponseError }>
-  removePrimaryKey: (schema: string, table: string) => Promise<any | { error: ResponseError }>
-  addForeignKey: (
-    relationship: ExtendedPostgresRelationship
-  ) => Promise<any | { error: ResponseError }>
-  removeForeignKey: (
-    relationship: Partial<PostgresRelationship>
-  ) => Promise<any | { error: ResponseError }>
 
   /** The methods below involve several contexts due to the UI flow of the
    *  dashboard and hence do not sit within their own stores */
@@ -182,63 +173,6 @@ export default class MetaStore implements IMetaStore {
     }
   }
 
-  async addPrimaryKey(schema: string, table: string, columns: string[]) {
-    const primaryKeyColumns = columns.join('","')
-    const query = `ALTER TABLE "${schema}"."${table}" ADD PRIMARY KEY ("${primaryKeyColumns}")`
-    return await this.query(query)
-  }
-
-  async removePrimaryKey(schema: string, table: string) {
-    const query = `ALTER TABLE "${schema}"."${table}" DROP CONSTRAINT "${table}_pkey"`
-    return await this.query(query)
-  }
-
-  // [Joshen TODO] Eventually need to extend this to composite foreign keys
-  async addForeignKey(relationship: ExtendedPostgresRelationship) {
-    const { deletion_action, update_action } = relationship
-    const deletionAction =
-      deletion_action === FOREIGN_KEY_CASCADE_ACTION.CASCADE
-        ? 'ON DELETE CASCADE'
-        : deletion_action === FOREIGN_KEY_CASCADE_ACTION.RESTRICT
-        ? 'ON DELETE RESTRICT'
-        : deletion_action === FOREIGN_KEY_CASCADE_ACTION.SET_DEFAULT
-        ? 'ON DELETE SET DEFAULT'
-        : deletion_action === FOREIGN_KEY_CASCADE_ACTION.SET_NULL
-        ? 'ON DELETE SET NULL'
-        : ''
-    const updateAction =
-      update_action === FOREIGN_KEY_CASCADE_ACTION.CASCADE
-        ? 'ON UPDATE CASCADE'
-        : update_action === FOREIGN_KEY_CASCADE_ACTION.RESTRICT
-        ? 'ON UPDATE RESTRICT'
-        : ''
-
-    const query = `
-      ALTER TABLE "${relationship.source_schema}"."${relationship.source_table_name}"
-      ADD CONSTRAINT "${relationship.source_table_name}_${relationship.source_column_name}_fkey"
-      FOREIGN KEY ("${relationship.source_column_name}")
-      REFERENCES "${relationship.target_table_schema}"."${relationship.target_table_name}" ("${relationship.target_column_name}")
-      ${updateAction}
-      ${deletionAction};
-    `
-      .replace(/\s+/g, ' ')
-      .trim()
-    return await this.query(query)
-  }
-
-  async removeForeignKey(relationship: Partial<PostgresRelationship>) {
-    const constraintName =
-      relationship.constraint_name ||
-      `${relationship.source_table_name}_${relationship.source_column_name}_fkey`
-    const query = `
-      ALTER TABLE "${relationship.source_schema}"."${relationship.source_table_name}"
-      DROP CONSTRAINT IF EXISTS "${constraintName}"
-    `
-      .replace(/\s+/g, ' ')
-      .trim()
-    return await this.query(query)
-  }
-
   async createColumn(
     payload: CreateColumnPayload,
     selectedTable: PostgresTable,
@@ -268,13 +202,22 @@ export default class MetaStore implements IMetaStore {
         const existingPrimaryKeys = selectedTable.primary_keys.map((x) => x.name)
 
         if (existingPrimaryKeys.length > 0) {
-          const removePK = await this.removePrimaryKey(column.schema, column.table)
-          if (removePK.error) throw removePK.error
+          await removePrimaryKey(
+            this.projectRef,
+            this.connectionString,
+            column.schema,
+            column.table
+          )
         }
 
         const primaryKeyColumns = existingPrimaryKeys.concat([column.name])
-        const addPK = await this.addPrimaryKey(column.schema, column.table, primaryKeyColumns)
-        if (addPK.error) throw addPK.error
+        await addPrimaryKey(
+          this.projectRef,
+          this.connectionString,
+          column.schema,
+          column.table,
+          primaryKeyColumns
+        )
       }
 
       if (!isUndefined(foreignKey)) {
@@ -283,8 +226,7 @@ export default class MetaStore implements IMetaStore {
           category: 'loading',
           message: 'Adding foreign key to column...',
         })
-        const relation = await this.addForeignKey(foreignKey)
-        if (relation.error) throw relation.error
+        await addForeignKey(this.projectRef, this.connectionString, foreignKey)
       }
 
       this.rootStore.ui.setNotification({
@@ -329,8 +271,12 @@ export default class MetaStore implements IMetaStore {
 
         // Primary key is getting updated for the column
         if (existingPrimaryKeys.length > 0) {
-          const removePK = await this.removePrimaryKey(column.schema, column.table)
-          if (removePK.error) throw removePK.error
+          await removePrimaryKey(
+            this.projectRef,
+            this.connectionString,
+            column.schema,
+            column.table
+          )
         }
 
         const primaryKeyColumns = isPrimaryKey
@@ -338,21 +284,24 @@ export default class MetaStore implements IMetaStore {
           : existingPrimaryKeys.filter((x) => x !== column.name)
 
         if (primaryKeyColumns.length) {
-          const addPK = await this.addPrimaryKey(column.schema, column.table, primaryKeyColumns)
-          if (addPK.error) throw addPK.error
+          await addPrimaryKey(
+            this.projectRef,
+            this.connectionString,
+            column.schema,
+            column.table,
+            primaryKeyColumns
+          )
         }
       }
 
       // For updating of foreign key relationship, we remove the original one by default
       // Then just add whatever was in foreignKey - simplicity over trying to derive whether to update or not
       if (existingForeignKey !== undefined) {
-        const relation: any = await this.removeForeignKey(existingForeignKey)
-        if (relation.error) throw relation.error
+        await removeForeignKey(this.projectRef, this.connectionString, existingForeignKey)
       }
 
       if (foreignKey !== undefined) {
-        const relation: any = await this.addForeignKey(foreignKey)
-        if (relation.error) throw relation.error
+        await addForeignKey(this.projectRef, this.connectionString, foreignKey)
       }
 
       if (!skipSuccessMessage) {
@@ -390,13 +339,12 @@ export default class MetaStore implements IMetaStore {
     if (relationships.length > 0) {
       // @ts-ignore
       relationships.map(async (relationship: PostgresRelationship) => {
-        const relation = await this.rootStore.meta.addForeignKey({
+        await addForeignKey(this.projectRef, this.connectionString, {
           ...relationship,
           source_table_name: duplicatedTableName,
           deletion_action: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
           update_action: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
         })
-        if (relation.error) throw relation.error
       })
     }
 
@@ -491,15 +439,19 @@ export default class MetaStore implements IMetaStore {
         .filter((column: ColumnField) => column.isPrimaryKey)
         .map((column: ColumnField) => column.name)
       if (primaryKeyColumns.length > 0) {
-        const primaryKeys = await this.addPrimaryKey(table.schema, table.name, primaryKeyColumns)
-        if (primaryKeys.error) throw primaryKeys.error
+        await addPrimaryKey(
+          this.projectRef,
+          this.connectionString,
+          table.schema,
+          table.name,
+          primaryKeyColumns
+        )
       }
 
       // Then add the foreign key constraints here
       for (const column of columns) {
         if (!isUndefined(column.foreignKey)) {
-          const relationship = await this.addForeignKey(column.foreignKey)
-          if (relationship.error) throw relationship.error
+          await addForeignKey(this.projectRef, this.connectionString, column.foreignKey)
         }
       }
 
@@ -594,8 +546,7 @@ export default class MetaStore implements IMetaStore {
       // an additional check when removing PK if the column in the PK was removed
       // So doing this one step earlier, lets us skip that additional check.
       if (table.primary_keys.length > 0) {
-        const removePK = await this.removePrimaryKey(table.schema, table.name)
-        if (removePK.error) throw removePK.error
+        await removePrimaryKey(this.projectRef, this.connectionString, table.schema, table.name)
       }
     }
 
@@ -678,12 +629,13 @@ export default class MetaStore implements IMetaStore {
 
     // Then add back the primary keys again
     if (isPrimaryKeyUpdated && primaryKeyColumns.length > 0) {
-      const primaryKeys = await this.addPrimaryKey(
+      await addPrimaryKey(
+        this.projectRef,
+        this.connectionString,
         updatedTable.schema,
         updatedTable.name,
         primaryKeyColumns
       )
-      if (primaryKeys.error) throw primaryKeys.error
     }
 
     const queryClient = getQueryClient()
