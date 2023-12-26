@@ -115,7 +115,7 @@ export default class MetaStore implements IMetaStore {
   rootStore: IRootStore
   tables: TableStore
 
-  projectRef?: string
+  projectRef: string
   connectionString?: string
   baseUrl: string
   headers: { [prop: string]: any }
@@ -265,7 +265,6 @@ export default class MetaStore implements IMetaStore {
           message: 'Assigning primary key to column...',
         })
         // Same logic in createTable: Remove any primary key constraints first (we'll add it back later)
-        // @ts-ignore
         const existingPrimaryKeys = selectedTable.primary_keys.map((x) => x.name)
 
         if (existingPrimaryKeys.length > 0) {
@@ -284,7 +283,7 @@ export default class MetaStore implements IMetaStore {
           category: 'loading',
           message: 'Adding foreign key to column...',
         })
-        const relation: any = await this.addForeignKey(foreignKey)
+        const relation = await this.addForeignKey(foreignKey)
         if (relation.error) throw relation.error
       }
 
@@ -657,7 +656,7 @@ export default class MetaStore implements IMetaStore {
             })
             const skipPKCreation = true
             const skipSuccessMessage = true
-            const res: any = await this.updateColumn(
+            const res = await this.updateColumn(
               column.id,
               columnPayload,
               updatedTable,
