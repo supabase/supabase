@@ -15,7 +15,7 @@ interface AddNewSecretModalProps {
 }
 
 const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
-  const { vault, ui } = useStore()
+  const { ui } = useStore()
   const [showSecretValue, setShowSecretValue] = useState(false)
   const [selectedKeyId, setSelectedKeyId] = useState<string>()
   const { project } = useProjectContext()

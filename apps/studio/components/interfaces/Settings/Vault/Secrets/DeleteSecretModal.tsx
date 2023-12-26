@@ -12,7 +12,7 @@ interface DeleteSecretModalProps {
 }
 
 const DeleteSecretModal = ({ selectedSecret, onClose }: DeleteSecretModalProps) => {
-  const { vault, ui } = useStore()
+  const { ui } = useStore()
   const { project } = useProjectContext()
 
   const [isDeleting, setIsDeleting] = useState(false)

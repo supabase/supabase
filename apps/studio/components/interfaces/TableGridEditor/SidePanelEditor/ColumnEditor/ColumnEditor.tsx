@@ -22,7 +22,6 @@ import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { usePostgresTypesQuery } from 'data/database/types-query'
 import { usePgSodiumKeysQuery } from 'data/pg-sodium-keys/pg-sodium-keys-query'
-import { useStore } from 'hooks'
 import { EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
 import { Dictionary } from 'types'
 import { ForeignKeySelector } from '..'
@@ -73,7 +72,6 @@ const ColumnEditor = ({
   updateEditorDirty = noop,
 }: ColumnEditorProps) => {
   const { ref } = useParams()
-  const { vault } = useStore()
   const { project } = useProjectContext()
 
   const [errors, setErrors] = useState<Dictionary<any>>({})

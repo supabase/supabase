@@ -17,7 +17,7 @@ interface EditSecretModalProps {
 }
 
 const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
-  const { ui, vault } = useStore()
+  const { ui } = useStore()
   const [selectedKeyId, setSelectedKeyId] = useState<string>()
   const [showSecretValue, setShowSecretValue] = useState(false)
   const { project } = useProjectContext()
