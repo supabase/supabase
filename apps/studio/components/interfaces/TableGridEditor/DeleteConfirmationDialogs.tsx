@@ -7,6 +7,7 @@ import { SupaRow } from 'components/grid'
 import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { useDatabaseColumnDeleteMutation } from 'data/database-columns/database-column-delete-mutation'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { sqlKeys } from 'data/sql/keys'
 import { useTableRowDeleteAllMutation } from 'data/table-rows/table-row-delete-all-mutation'
@@ -44,6 +45,8 @@ const DeleteConfirmationDialogs = ({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+
+  const { mutateAsync: deleteColumn } = useDatabaseColumnDeleteMutation()
 
   const { mutate: deleteRows } = useTableRowDeleteMutation({
     onSuccess: () => {
@@ -127,8 +130,12 @@ const DeleteConfirmationDialogs = ({
     try {
       if (selectedColumnToDelete === undefined) return
 
-      const response: any = await meta.columns.del(selectedColumnToDelete.id, isDeleteWithCascade)
-      if (response.error) throw response.error
+      // error may be thrown
+      await deleteColumn({
+        id: selectedColumnToDelete.id,
+        cascade: isDeleteWithCascade,
+        projectRef: projectRef!,
+      })
 
       removeDeletedColumnFromFiltersAndSorts(selectedColumnToDelete.name)
 
