@@ -4,6 +4,7 @@ import { Button, Form, IconEye, IconEyeOff, Input, Modal } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import { useVaultSecretUpdateMutation } from 'data/vault/vault-secret-update-mutation'
 import { useStore } from 'hooks'
 import { VaultSecret } from 'types'
@@ -18,7 +19,6 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
   const { ui, vault } = useStore()
   const [selectedKeyId, setSelectedKeyId] = useState<string>()
   const [showSecretValue, setShowSecretValue] = useState(false)
-  const [isLoadingSecretValue, setIsLoadingSecretValue] = useState(false)
   const { project } = useProjectContext()
 
   const { mutateAsync: updateSecret } = useVaultSecretUpdateMutation()
@@ -106,25 +106,22 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
         onSubmit={onUpdateSecret}
       >
         {({ isSubmitting, resetForm }: any) => {
-          // [Alaister] although this "technically" is breaking the rules of React hooks
-          // it won't error because the hooks are always rendered in the same order
           // eslint-disable-next-line react-hooks/rules-of-hooks
-          useEffect(() => {
-            if (selectedSecret !== undefined && selectedSecret.decryptedSecret === undefined) {
-              fetchSecretValue()
+          const { isLoading: isLoadingSecretValue } = useVaultSecretDecryptedValueQuery(
+            {
+              projectRef: project?.ref!,
+              id: selectedSecret?.id!,
+            },
+            {
+              enabled: !!(project?.ref && selectedSecret?.id),
+              onSuccess: (res) => {
+                resetForm({
+                  values: { ...INITIAL_VALUES, secret: res },
+                  initialValues: { ...INITIAL_VALUES, secret: res },
+                })
+              },
             }
-          }, [selectedSecret])
-
-          const fetchSecretValue = async () => {
-            if (selectedSecret === undefined) return
-            setIsLoadingSecretValue(true)
-            const res = await vault.fetchSecretValue(selectedSecret.id)
-            resetForm({
-              values: { ...INITIAL_VALUES, secret: res },
-              initialValues: { ...INITIAL_VALUES, secret: res },
-            })
-            setIsLoadingSecretValue(false)
-          }
+          )
 
           return isLoadingSecretValue ? (
             <div className="space-y-2 py-4 px-2">

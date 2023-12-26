@@ -20,6 +20,7 @@ import Loading from 'components/ui/Loading'
 import { invalidateSchemasQuery } from 'data/database/schemas-query'
 import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
+import { getDecryptedValue } from 'data/vault/vault-secret-decrypted-value-query'
 import { useVaultSecretsQuery } from 'data/vault/vault-secrets-query'
 import { useCheckPermissions, useImmutableValue, useStore } from 'hooks'
 import {
@@ -45,7 +46,7 @@ const EditWrapper = () => {
   const formId = 'edit-wrapper-form'
   const router = useRouter()
   const queryClient = useQueryClient()
-  const { ui, vault } = useStore()
+  const { ui } = useStore()
   const { ref, id } = useParams()
   const { project } = useProjectContext()
 
@@ -235,7 +236,11 @@ const EditWrapper = () => {
                       (secret) => secret.name === `${wrapper.name}_${option.name}`
                     )
                     if (secret !== undefined) {
-                      const value = await vault.fetchSecretValue(secret.id)
+                      const value = await getDecryptedValue({
+                        projectRef: project?.ref!,
+                        connectionString: project?.connectionString,
+                        id: secret.id,
+                      })
                       return { [option.name]: value }
                     } else {
                       return { [option.name]: '' }
