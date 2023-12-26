@@ -4,7 +4,6 @@ import { makeObservable } from 'mobx'
 import Papa from 'papaparse'
 
 import type {
-  PostgresColumn,
   PostgresPrimaryKey,
   PostgresRelationship,
   PostgresTable,
@@ -15,7 +14,6 @@ import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { timeout, tryParseJson } from 'lib/helpers'
 import { ResponseError } from 'types'
 
-import { IPostgresMetaInterface } from '../common/PostgresMetaInterface'
 import { IRootStore } from '../RootStore'
 import TableStore, { ITableStore } from './TableStore'
 
@@ -30,20 +28,21 @@ import {
   UpdateColumnPayload,
 } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.types'
 import { ImportContent } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableEditor.types'
+import { createDatabaseColumn } from 'data/database-columns/database-column-create-mutation'
+import { deleteDatabaseColumn } from 'data/database-columns/database-column-delete-mutation'
+import { updateDatabaseColumn } from 'data/database-columns/database-column-update-mutation'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import { getCachedProjectDetail } from 'data/projects/project-detail-query'
 import { getQueryClient } from 'data/query-client'
 import { tableKeys } from 'data/tables/keys'
 import { getTable } from 'data/tables/table-query'
 import { getTables } from 'data/tables/tables-query'
-import PostgresMetaInterface from '../common/PostgresMetaInterface'
 
 const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
 
 export interface IMetaStore {
   tables: ITableStore
-  columns: IPostgresMetaInterface<PostgresColumn>
 
   projectRef?: string
   connectionString?: string
@@ -115,7 +114,6 @@ export interface IMetaStore {
 export default class MetaStore implements IMetaStore {
   rootStore: IRootStore
   tables: TableStore
-  columns: PostgresMetaInterface<PostgresColumn>
 
   projectRef?: string
   connectionString?: string
@@ -135,11 +133,6 @@ export default class MetaStore implements IMetaStore {
     }
 
     this.tables = new TableStore(this.rootStore, `${this.baseUrl}/tables`, this.headers)
-    this.columns = new PostgresMetaInterface(
-      this.rootStore,
-      `${this.baseUrl}/columns`,
-      this.headers
-    )
 
     makeObservable(this, {})
   }
@@ -258,8 +251,11 @@ export default class MetaStore implements IMetaStore {
     try {
       // Once pg-meta supports composite keys, we can remove this logic
       const { isPrimaryKey, ...formattedPayload } = payload
-      const column: any = await this.columns.create(formattedPayload)
-      if (column.error) throw column.error
+      const column = await createDatabaseColumn({
+        projectRef: this.projectRef,
+        connectionString: this.connectionString,
+        payload: formattedPayload,
+      })
 
       // Firing createColumn in createTable will bypass this block
       if (isPrimaryKey) {
@@ -317,8 +313,12 @@ export default class MetaStore implements IMetaStore {
   ) {
     try {
       const { isPrimaryKey, ...formattedPayload } = payload
-      const column: any = await this.columns.update(id, formattedPayload)
-      if (column.error) throw column.error
+      const column = await updateDatabaseColumn({
+        projectRef: this.projectRef,
+        connectionString: this.connectionString,
+        id,
+        payload: formattedPayload,
+      })
 
       const originalColumn = find(selectedTable.columns, { id })
       const existingForeignKey = find(selectedTable.relationships, {
@@ -480,8 +480,11 @@ export default class MetaStore implements IMetaStore {
           ...column,
           isPrimaryKey: false,
         })
-        const newColumn: any = await this.columns.create(columnPayload)
-        if (newColumn.error) throw newColumn.error
+        await createDatabaseColumn({
+          projectRef: this.projectRef,
+          connectionString: this.connectionString,
+          payload: columnPayload,
+        })
       }
 
       // Then add the primary key constraints here to support composite keys
@@ -613,8 +616,11 @@ export default class MetaStore implements IMetaStore {
         category: 'loading',
         message: `Removing column ${column.name} from ${updatedTable.name}`,
       })
-      const deletedColumn: any = await this.columns.del(column.id)
-      if (deletedColumn.error) throw deletedColumn.error
+      await deleteDatabaseColumn({
+        projectRef: this.projectRef,
+        connectionString: this.connectionString,
+        id: column.id,
+      })
     }
 
     // Add any new columns / Update any existing columns
@@ -826,8 +832,5 @@ export default class MetaStore implements IMetaStore {
 
     this.tables.setUrl(`${this.baseUrl}/tables`)
     this.tables.setHeaders(this.headers)
-
-    this.columns.setUrl(`${this.baseUrl}/columns`)
-    this.columns.setHeaders(this.headers)
   }
 }
