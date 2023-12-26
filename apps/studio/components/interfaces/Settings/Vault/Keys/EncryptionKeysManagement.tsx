@@ -20,14 +20,20 @@ import {
   Modal,
 } from 'ui'
 
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Divider from 'components/ui/Divider'
+import { usePgSodiumKeyCreateMutation } from 'data/pg-sodium-keys/pg-sodium-key-create-mutation'
+import { usePgSodiumKeyDeleteMutation } from 'data/pg-sodium-keys/pg-sodium-key-delete-mutation'
+import { EncryptionKey, usePgSodiumKeysQuery } from 'data/pg-sodium-keys/pg-sodium-keys-query'
 import { useCheckPermissions, useStore } from 'hooks'
+import { sortBy } from 'lodash'
 
 const DEFAULT_KEY_NAME = 'No description provided'
 
 const EncryptionKeysManagement = () => {
-  const { vault, ui } = useStore()
+  const { ui } = useStore()
   const { id } = useParams()
+  const { project } = useProjectContext()
 
   const [searchValue, setSearchValue] = useState<string>('')
   const [selectedSort, setSelectedSort] = useState<'name' | 'created'>('created')
@@ -41,25 +47,39 @@ const EncryptionKeysManagement = () => {
     if (id !== undefined) setSearchValue(id)
   }, [id])
 
-  const keys = (
-    searchValue
-      ? vault.listKeys(
-          (key: any) =>
+  const { data, isLoading, isSuccess } = usePgSodiumKeysQuery({
+    projectRef: project?.ref!,
+    connectionString: project?.connectionString,
+  })
+  const { mutateAsync: addKeyMutation } = usePgSodiumKeyCreateMutation()
+  const { mutateAsync: deleteKeyMutation } = usePgSodiumKeyDeleteMutation()
+
+  let keys: EncryptionKey[] = []
+  if (isSuccess) {
+    const filtered = searchValue
+      ? data.filter(
+          (key) =>
             (key?.name ?? '').toLowerCase().includes(searchValue.toLowerCase()) ||
             key.id.toLowerCase().includes(searchValue.toLowerCase())
         )
-      : vault.listKeys()
-  ).sort((a: any, b: any) => {
-    if (selectedSort === 'created') {
-      return Number(new Date(a.created)) - Number(new Date(b.created))
-    } else {
-      return a[selectedSort] > b[selectedSort] ? 1 : -1
-    }
-  })
+      : data
+
+    keys = sortBy(filtered, (k) => {
+      if (selectedSort === 'created') {
+        return Number(new Date(k.created))
+      } else {
+        return k[selectedSort]
+      }
+    })
+  }
 
   const addKey = async (values: any, { setSubmitting }: any) => {
     setSubmitting(true)
-    const res = await vault.addKey(values.name)
+    const res = await addKeyMutation({
+      projectRef: project?.ref!,
+      connectionString: project?.connectionString,
+      name: values.name,
+    })
     if (!res.error) {
       ui.setNotification({ category: 'success', message: 'Successfully added new key' })
       setShowAddKeyModal(false)
@@ -77,7 +97,11 @@ const EncryptionKeysManagement = () => {
     if (!selectedKeyToRemove) return
 
     setIsDeletingKey(true)
-    const res = await vault.deleteKey(selectedKeyToRemove.id)
+    const res = await deleteKeyMutation({
+      projectRef: project?.ref!,
+      connectionString: project?.connectionString,
+      id: selectedKeyToRemove.id,
+    })
     if (!res.error) {
       ui.setNotification({ category: 'success', message: `Successfully deleted encryption key` })
       setSelectedKeyToRemove(undefined)
@@ -182,7 +206,7 @@ const EncryptionKeysManagement = () => {
 
         {/* Table of keys */}
         <div className="border rounded">
-          {!vault.isLoaded ? (
+          {isLoading ? (
             <div className="px-6 py-6 space-x-2 flex items-center justify-center">
               <IconLoader
                 className="animate-spin text-foreground-light"

@@ -3,6 +3,8 @@ import { Button, Form, IconEye, IconEyeOff, IconHelpCircle, Input, Modal } from 
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import InformationBox from 'components/ui/InformationBox'
+import { usePgSodiumKeyCreateMutation } from 'data/pg-sodium-keys/pg-sodium-key-create-mutation'
+import { usePgSodiumKeysQuery } from 'data/pg-sodium-keys/pg-sodium-keys-query'
 import { useVaultSecretCreateMutation } from 'data/vault/vault-secret-create-mutation'
 import { useStore } from 'hooks'
 import EncryptionKeySelector from '../Keys/EncryptionKeySelector'
@@ -18,16 +20,20 @@ const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
   const [selectedKeyId, setSelectedKeyId] = useState<string>()
   const { project } = useProjectContext()
 
+  const { mutateAsync: addKeyMutation } = usePgSodiumKeyCreateMutation()
   const { mutateAsync: addSecret } = useVaultSecretCreateMutation()
 
-  const keys = vault.listKeys()
+  const { data: keys } = usePgSodiumKeysQuery({
+    projectRef: project?.ref!,
+    connectionString: project?.connectionString,
+  })
 
   useEffect(() => {
-    if (visible) {
+    if (visible && keys) {
       setShowSecretValue(false)
       setSelectedKeyId(keys[0]?.id ?? 'create-new')
     }
-  }, [visible])
+  }, [visible, keys])
 
   const validate = (values: any) => {
     const errors: any = {}
@@ -43,7 +49,11 @@ const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
     let encryptionKeyId = selectedKeyId
 
     if (selectedKeyId === 'create-new') {
-      const addKeyRes = await vault.addKey(values.keyName || undefined)
+      const addKeyRes = await addKeyMutation({
+        projectRef: project?.ref!,
+        connectionString: project?.connectionString,
+        name: values.keyName || undefined,
+      })
       if (addKeyRes.error) {
         return ui.setNotification({
           error: addKeyRes.error,

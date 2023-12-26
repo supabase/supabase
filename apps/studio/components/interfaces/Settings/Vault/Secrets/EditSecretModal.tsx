@@ -4,6 +4,7 @@ import { Button, Form, IconEye, IconEyeOff, Input, Modal } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { usePgSodiumKeyCreateMutation } from 'data/pg-sodium-keys/pg-sodium-key-create-mutation'
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import { useVaultSecretUpdateMutation } from 'data/vault/vault-secret-update-mutation'
 import { useStore } from 'hooks'
@@ -21,6 +22,7 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
   const [showSecretValue, setShowSecretValue] = useState(false)
   const { project } = useProjectContext()
 
+  const { mutateAsync: addKeyMutation } = usePgSodiumKeyCreateMutation()
   const { mutateAsync: updateSecret } = useVaultSecretUpdateMutation()
 
   let INITIAL_VALUES = {
@@ -50,7 +52,11 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
     if (selectedKeyId !== selectedSecret?.key_id) {
       let encryptionKeyId = selectedKeyId
       if (values.keyId === 'create-new') {
-        const addKeyRes = await vault.addKey(values.keyName || undefined)
+        const addKeyRes = await addKeyMutation({
+          projectRef: project?.ref!,
+          connectionString: project?.connectionString,
+          name: values.keyName || undefined,
+        })
         if (addKeyRes.error) {
           return ui.setNotification({
             error: addKeyRes.error,
