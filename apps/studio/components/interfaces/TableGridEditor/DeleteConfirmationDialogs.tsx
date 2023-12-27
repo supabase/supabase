@@ -12,6 +12,7 @@ import { entityTypeKeys } from 'data/entity-types/keys'
 import { useTableRowDeleteAllMutation } from 'data/table-rows/table-row-delete-all-mutation'
 import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
 import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-mutation'
+import { useTableDeleteMutation } from 'data/tables/table-delete-mutation'
 import { useGetTables } from 'data/tables/tables-query'
 import { viewKeys } from 'data/views/keys'
 import { useStore, useUrlState } from 'hooks'
@@ -78,6 +79,7 @@ const DeleteConfirmationDialogs = ({
       snap.closeConfirmationDialog()
     },
   })
+  const { mutateAsync: deleteTable } = useTableDeleteMutation()
 
   const { mutate: deleteRows } = useTableRowDeleteMutation({
     onSuccess: () => {
@@ -157,8 +159,12 @@ const DeleteConfirmationDialogs = ({
     try {
       if (selectedTableToDelete === undefined) return
 
-      const response: any = await meta.tables.del(selectedTableToDelete.id, isDeleteWithCascade)
-      if (response.error) throw response.error
+      await deleteTable({
+        projectRef: project?.ref!,
+        schema: selectedTableToDelete.schema,
+        id: selectedTableToDelete.id,
+        cascade: isDeleteWithCascade,
+      })
 
       const tables = await getTables(snap.selectedSchemaName)
 

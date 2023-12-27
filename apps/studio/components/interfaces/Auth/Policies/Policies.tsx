@@ -19,7 +19,7 @@ import InformationBox from 'components/ui/InformationBox'
 import { useDatabasePolicyCreateMutation } from 'data/database-policies/database-policy-create-mutation'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
 import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
-import { tableKeys } from 'data/tables/keys'
+import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 
 interface PoliciesProps {
   tables: PostgresTable[]
@@ -50,6 +50,7 @@ const Policies = ({
 
   const { mutateAsync: createDatabasePolicy } = useDatabasePolicyCreateMutation()
   const { mutateAsync: updateDatabasePolicy } = useDatabasePolicyUpdateMutation()
+  const { mutateAsync: updateTable } = useTableUpdateMutation()
   const { mutate: deleteDatabasePolicy } = useDatabasePolicyDeleteMutation({
     onSuccess: () => {
       toast.success('Successfully deleted policy!')
@@ -70,7 +71,7 @@ const Policies = ({
     setSelectedTableToToggleRLS({})
   }
 
-  const onSelectToggleRLS = (table: any) => {
+  const onSelectToggleRLS = (table: PostgresTable) => {
     setSelectedTableToToggleRLS(table)
   }
 
@@ -103,15 +104,23 @@ const Policies = ({
       rls_enabled: !selectedTableToToggleRLS.rls_enabled,
     }
 
-    const res: any = await meta.tables.update(payload.id, payload)
-    if (res.error) {
-      return ui.setNotification({
-        category: 'error',
-        message: `Failed to toggle RLS: ${res.error.message}`,
+    try {
+      await updateTable({
+        projectRef: project?.ref!,
+        connectionString: project?.connectionString,
+        id: payload.id,
+        schema: (selectedTableToToggleRLS as PostgresTable).schema,
+        payload: payload,
       })
+    } catch (error: any) {
+      if (error) {
+        return ui.setNotification({
+          category: 'error',
+          message: `Failed to toggle RLS: ${error.message}`,
+        })
+      }
     }
 
-    await queryClient.invalidateQueries(tableKeys.list(ref, selectedTableToToggleRLS.schema))
     closeConfirmModal()
   }
 
