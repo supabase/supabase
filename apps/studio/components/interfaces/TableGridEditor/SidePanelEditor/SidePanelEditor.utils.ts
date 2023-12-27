@@ -1,19 +1,41 @@
-import { PostgresRelationship, PostgresTable } from '@supabase/postgres-meta'
+import { PostgresPrimaryKey, PostgresRelationship, PostgresTable } from '@supabase/postgres-meta'
+import { chunk, find, isEmpty, isEqual } from 'lodash'
+import Papa from 'papaparse'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
+import { Query } from 'components/grid/query/Query'
 import { createDatabaseColumn } from 'data/database-columns/database-column-create-mutation'
+import { deleteDatabaseColumn } from 'data/database-columns/database-column-delete-mutation'
 import { updateDatabaseColumn } from 'data/database-columns/database-column-update-mutation'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
+import { getQueryClient } from 'data/query-client'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { tableKeys } from 'data/tables/keys'
+import { createTable as createTableMutation } from 'data/tables/table-create-mutation'
+import { deleteTable as deleteTableMutation } from 'data/tables/table-delete-mutation'
+import { getTable } from 'data/tables/table-query'
+import { updateTable as updateTableMutation } from 'data/tables/table-update-mutation'
+import { getTables } from 'data/tables/tables-query'
 import { getViews } from 'data/views/views-query'
 import { useStore } from 'hooks'
+import { timeout, tryParseJson } from 'lib/helpers'
+import { IUiStore } from 'stores/UiStore'
 import { IMetaStore } from 'stores/pgmeta/MetaStore'
 import {
+  generateCreateColumnPayload,
+  generateUpdateColumnPayload,
+} from './ColumnEditor/ColumnEditor.utils'
+import {
+  ColumnField,
   CreateColumnPayload,
   ExtendedPostgresRelationship,
   UpdateColumnPayload,
 } from './SidePanelEditor.types'
+import { ImportContent } from './TableEditor/TableEditor.types'
+
+const BATCH_SIZE = 1000
+const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
 
 export interface UseEncryptedColumnsArgs {
   schemaName?: string
@@ -300,4 +322,502 @@ export const updateColumn = async ({
   } catch (error: any) {
     return { error }
   }
+}
+
+export const duplicateTable = async (
+  projectRef: string,
+  connectionString: string | undefined,
+  payload: { name: string },
+  metadata: {
+    duplicateTable: PostgresTable
+    isRLSEnabled: boolean
+    isDuplicateRows: boolean
+  }
+) => {
+  const { duplicateTable, isRLSEnabled, isDuplicateRows } = metadata
+  const { name: sourceTableName, schema: sourceTableSchema } = duplicateTable
+  const duplicatedTableName = payload.name
+
+  // The following query will copy the structure of the table along with indexes, constraints and
+  // triggers. However, foreign key constraints are not duplicated over - has to be done separately
+  await executeSql({
+    projectRef,
+    connectionString,
+    sql: `CREATE TABLE "${sourceTableSchema}"."${duplicatedTableName}" (LIKE "${sourceTableSchema}"."${sourceTableName}" INCLUDING ALL);`,
+  })
+
+  // Duplicate foreign key constraints over
+  const relationships = duplicateTable.relationships
+  if (relationships.length > 0) {
+    relationships.map(async (relationship: PostgresRelationship) => {
+      await addForeignKey(projectRef, connectionString, {
+        ...relationship,
+        source_table_name: duplicatedTableName,
+        deletion_action: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
+        update_action: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
+      })
+    })
+  }
+
+  // Duplicate rows if needed
+  if (isDuplicateRows) {
+    const rows = await executeSql({
+      projectRef,
+      connectionString,
+      sql: `INSERT INTO "${sourceTableSchema}"."${duplicatedTableName}" SELECT * FROM "${sourceTableSchema}"."${sourceTableName}";`,
+    })
+
+    // Insert into does not copy over auto increment sequences, so we manually do it next if any
+    const columns = duplicateTable.columns ?? []
+    const identityColumns = columns.filter((column) => column.identity_generation !== null)
+    identityColumns.map(async (column) => {
+      const identity = await executeSql({
+        projectRef,
+        connectionString,
+        sql: `SELECT setval('"${sourceTableSchema}"."${duplicatedTableName}_${column.name}_seq"', (SELECT MAX("${column.name}") FROM "${sourceTableSchema}"."${sourceTableName}"));`,
+      })
+    })
+  }
+
+  const queryClient = getQueryClient()
+  const tables = await queryClient.fetchQuery({
+    queryKey: tableKeys.list(projectRef, sourceTableSchema),
+    queryFn: ({ signal }) =>
+      getTables({ projectRef, connectionString, schema: sourceTableSchema }, signal),
+  })
+
+  const duplicatedTable = find(tables, { schema: sourceTableSchema, name: duplicatedTableName })!
+
+  if (isRLSEnabled) {
+    await updateTableMutation({
+      projectRef,
+      connectionString,
+      id: duplicatedTable?.id!,
+      schema: duplicatedTable?.schema!,
+      payload: { rls_enabled: isRLSEnabled },
+    })
+  }
+
+  return duplicatedTable
+}
+
+export const createTable = async (
+  projectRef: string,
+  connectionString: string | undefined,
+  ui: IUiStore,
+  toastId: string,
+  payload: {
+    name: string
+    schema: string
+    comment?: string | undefined
+  },
+  columns: ColumnField[] = [],
+  isRLSEnabled: boolean,
+  importContent?: ImportContent
+) => {
+  // Create the table first. Error may be thrown.
+  const table = await createTableMutation({
+    projectRef: projectRef,
+    connectionString: connectionString,
+    payload: payload,
+  })
+
+  // If we face any errors during this process after the actual table creation
+  // We'll delete the table as a way to clean up and not leave behind bits that
+  // got through successfully. This is so that the user can continue editing in
+  // the table side panel editor conveniently
+  try {
+    // Toggle RLS if configured to be
+    if (isRLSEnabled) {
+      await updateTableMutation({
+        projectRef,
+        connectionString,
+        id: table.id,
+        schema: table.schema,
+        payload: { rls_enabled: isRLSEnabled },
+      })
+    }
+
+    // Then insert the columns - we don't do Promise.all as we want to keep the integrity
+    // of the column order during creation. Note that we add primary key constraints separately
+    // via the query endpoint to support composite primary keys as pg-meta does not support that OOB
+    ui.setNotification({
+      id: toastId,
+      category: 'loading',
+      message: `Adding ${columns.length} columns to ${table.name}...`,
+    })
+
+    for (const column of columns) {
+      // We create all columns without primary keys first
+      const columnPayload = generateCreateColumnPayload(table.id, {
+        ...column,
+        isPrimaryKey: false,
+      })
+      await createDatabaseColumn({
+        projectRef,
+        connectionString,
+        payload: columnPayload,
+      })
+    }
+
+    // Then add the primary key constraints here to support composite keys
+    const primaryKeyColumns = columns
+      .filter((column: ColumnField) => column.isPrimaryKey)
+      .map((column: ColumnField) => column.name)
+    if (primaryKeyColumns.length > 0) {
+      await addPrimaryKey(projectRef, connectionString, table.schema, table.name, primaryKeyColumns)
+    }
+
+    // Then add the foreign key constraints here
+    for (const column of columns) {
+      if (column.foreignKey !== undefined) {
+        await addForeignKey(projectRef, connectionString, column.foreignKey)
+      }
+    }
+
+    // If the user is importing data via a spreadsheet
+    if (importContent !== undefined) {
+      if (importContent.file && importContent.rowCount > 0) {
+        // Via a CSV file
+        const { error }: any = await insertRowsViaSpreadsheet(
+          projectRef,
+          connectionString,
+          importContent.file,
+          table as PostgresTable,
+          importContent.selectedHeaders,
+          (progress: number) => {
+            ui.setNotification({
+              id: toastId,
+              progress,
+              category: 'loading',
+              message: `Adding ${importContent.rowCount.toLocaleString()} rows to ${table.name}`,
+            })
+          }
+        )
+
+        // For identity columns, manually raise the sequences
+        const identityColumns = columns.filter((column) => column.isIdentity)
+        for (const column of identityColumns) {
+          await executeSql({
+            projectRef,
+            connectionString,
+            sql: `SELECT setval('${table.name}_${column.name}_seq', (SELECT MAX("${column.name}") FROM "${table.name}"));`,
+          })
+        }
+
+        if (error !== undefined) {
+          ui.setNotification({
+            category: 'error',
+            message: 'Do check your spreadsheet if there are any discrepancies.',
+          })
+          ui.setNotification({
+            category: 'error',
+            message: `Table ${table.name} has been created but we ran into an error while inserting rows:
+          ${error.message}`,
+            error,
+          })
+        }
+      } else {
+        // Via text copy and paste
+        await insertTableRows(
+          projectRef,
+          connectionString,
+          table as PostgresTable,
+          importContent.rows,
+          importContent.selectedHeaders,
+          (progress: number) => {
+            ui.setNotification({
+              id: toastId,
+              progress,
+              category: 'loading',
+              message: `Adding ${importContent.rows.length.toLocaleString()} rows to ${table.name}`,
+            })
+          }
+        )
+
+        // For identity columns, manually raise the sequences
+        const identityColumns = columns.filter((column) => column.isIdentity)
+        for (const column of identityColumns) {
+          await executeSql({
+            projectRef,
+            connectionString,
+            sql: `SELECT setval('${table.name}_${column.name}_seq', (SELECT MAX("${column.name}") FROM "${table.name}"));`,
+          })
+        }
+      }
+    }
+
+    // Finally, return the created table
+    return table
+  } catch (error) {
+    deleteTableMutation({
+      projectRef,
+      connectionString,
+      id: table.id,
+      schema: table.schema,
+    })
+    throw error
+  }
+}
+
+export const updateTable = async (
+  projectRef: string,
+  connectionString: string | undefined,
+  ui: IUiStore,
+  toastId: string,
+  table: PostgresTable,
+  payload: any,
+  columns: ColumnField[]
+) => {
+  // Prepare a check to see if primary keys to the tables were updated or not
+  const primaryKeyColumns = columns
+    .filter((column) => column.isPrimaryKey)
+    .map((column) => column.name)
+
+  const existingPrimaryKeyColumns = table.primary_keys.map((pk: PostgresPrimaryKey) => pk.name)
+  const isPrimaryKeyUpdated = !isEqual(primaryKeyColumns, existingPrimaryKeyColumns)
+
+  if (isPrimaryKeyUpdated) {
+    // Remove any primary key constraints first (we'll add it back later)
+    // If we do it later, and if the user deleted a PK column, we'd need to do
+    // an additional check when removing PK if the column in the PK was removed
+    // So doing this one step earlier, lets us skip that additional check.
+    if (table.primary_keys.length > 0) {
+      await removePrimaryKey(projectRef, connectionString, table.schema, table.name)
+    }
+  }
+
+  // Update the table
+  const updatedTable = await updateTableMutation({
+    projectRef,
+    connectionString,
+    id: table.id,
+    schema: table.schema,
+    payload,
+  })
+
+  const originalColumns = table.columns ?? []
+  const columnIds = columns.map((column) => column.id)
+
+  // Delete any removed columns
+  const columnsToRemove = originalColumns.filter((column) => !columnIds.includes(column.id))
+  for (const column of columnsToRemove) {
+    ui.setNotification({
+      id: toastId,
+      category: 'loading',
+      message: `Removing column ${column.name} from ${updatedTable.name}`,
+    })
+    await deleteDatabaseColumn({
+      projectRef,
+      connectionString,
+      id: column.id,
+    })
+  }
+
+  // Add any new columns / Update any existing columns
+  let hasError = false
+  for (const column of columns) {
+    if (!column.id.includes(table.id.toString())) {
+      ui.setNotification({
+        id: toastId,
+        category: 'loading',
+        message: `Adding column ${column.name} to ${updatedTable.name}`,
+      })
+      // Ensure that columns do not created as primary key first, cause the primary key will
+      // be added later on further down in the code
+      const columnPayload = generateCreateColumnPayload(updatedTable.id, {
+        ...column,
+        isPrimaryKey: false,
+      })
+      await createColumn({
+        projectRef: projectRef,
+        connectionString: connectionString,
+        payload: columnPayload,
+        selectedTable: updatedTable as PostgresTable,
+        foreignKey: column.foreignKey,
+      })
+    } else {
+      const originalColumn = find(originalColumns, { id: column.id })
+      if (originalColumn) {
+        const columnPayload = generateUpdateColumnPayload(
+          originalColumn,
+          updatedTable as PostgresTable,
+          column
+        )
+        const originalForeignKey = find(table.relationships, {
+          source_schema: originalColumn.schema,
+          source_table_name: originalColumn.table,
+          source_column_name: originalColumn.name,
+        })
+        const hasForeignKeyUpdated = !isEqual(originalForeignKey, column.foreignKey)
+        if (!isEmpty(columnPayload) || hasForeignKeyUpdated) {
+          ui.setNotification({
+            id: toastId,
+            category: 'loading',
+            message: `Updating column ${column.name} from ${updatedTable.name}`,
+          })
+          const skipPKCreation = true
+          const skipSuccessMessage = true
+          const res = await updateColumn({
+            projectRef: projectRef,
+            connectionString: connectionString,
+            id: column.id,
+            payload: columnPayload,
+            selectedTable: updatedTable as PostgresTable,
+            foreignKey: column.foreignKey,
+            skipPKCreation,
+            skipSuccessMessage,
+          })
+          if (res?.error) {
+            hasError = true
+            ui.setNotification({
+              category: 'error',
+              message: `Failed to update column "${column.name}": ${res.error.message}`,
+            })
+          }
+        }
+      }
+    }
+  }
+
+  // Then add back the primary keys again
+  if (isPrimaryKeyUpdated && primaryKeyColumns.length > 0) {
+    await addPrimaryKey(
+      projectRef,
+      connectionString,
+      updatedTable.schema,
+      updatedTable.name,
+      primaryKeyColumns
+    )
+  }
+
+  const queryClient = getQueryClient()
+
+  queryClient.invalidateQueries(tableKeys.table(projectRef, table.id))
+
+  return {
+    table: await getTable({
+      projectRef,
+      connectionString,
+      id: table.id,
+    }),
+    hasError,
+  }
+}
+
+export const insertRowsViaSpreadsheet = async (
+  projectRef: string,
+  connectionString: string | undefined,
+  file: any,
+  table: PostgresTable,
+  selectedHeaders: string[],
+  onProgressUpdate: (progress: number) => void
+) => {
+  let chunkNumber = 0
+  let insertError: any = undefined
+  const t1: any = new Date()
+  return new Promise((resolve) => {
+    Papa.parse(file, {
+      header: true,
+      // dynamicTyping has to be disabled so that "00001" doesn't get parsed as 1.
+      dynamicTyping: false,
+      skipEmptyLines: true,
+      chunkSize: CHUNK_SIZE,
+      quoteChar: file.type === 'text/tab-separated-values' ? '' : '"',
+      chunk: async (results: any, parser: any) => {
+        parser.pause()
+
+        const formattedData = results.data.map((row: any) => {
+          const formattedRow: any = {}
+          selectedHeaders.forEach((header) => {
+            const column = table.columns?.find((c) => c.name === header)
+            if ((column?.data_type ?? '') === 'ARRAY' || (column?.format ?? '').includes('json')) {
+              formattedRow[header] = tryParseJson(row[header])
+            } else if (row[header] === '') {
+              // if the cell is empty string, convert it to NULL
+              formattedRow[header] = null
+            } else {
+              formattedRow[header] = row[header]
+            }
+          })
+          return formattedRow
+        })
+
+        const insertQuery = new Query().from(table.name, table.schema).insert(formattedData).toSql()
+        try {
+          await executeSql({ projectRef, connectionString, sql: insertQuery })
+        } catch (error) {
+          console.warn(error)
+          insertError = error
+          parser.abort()
+        }
+
+        chunkNumber += 1
+        const progress = (chunkNumber * CHUNK_SIZE) / file.size
+        const progressPercentage = progress > 1 ? 100 : progress * 100
+        onProgressUpdate(progressPercentage)
+        parser.resume()
+      },
+      complete: () => {
+        const t2: any = new Date()
+        console.log(`Total time taken for importing spreadsheet: ${(t2 - t1) / 1000} seconds`)
+        resolve({ error: insertError })
+      },
+    })
+  })
+}
+
+export const insertTableRows = async (
+  projectRef: string,
+  connectionString: string | undefined,
+  table: PostgresTable,
+  rows: any,
+  selectedHeaders: string[],
+  onProgressUpdate: (progress: number) => void
+) => {
+  let insertError = undefined
+  let insertProgress = 0
+
+  const formattedRows = rows.map((row: any) => {
+    const formattedRow: any = {}
+    selectedHeaders.forEach((header) => {
+      const column = table.columns?.find((c) => c.name === header)
+      if ((column?.data_type ?? '') === 'ARRAY' || (column?.format ?? '').includes('json')) {
+        formattedRow[header] = tryParseJson(row[header])
+      } else {
+        formattedRow[header] = row[header]
+      }
+    })
+    return formattedRow
+  })
+
+  const batches = chunk(formattedRows, BATCH_SIZE)
+  const promises = batches.map((batch: any) => {
+    return () => {
+      return Promise.race([
+        new Promise(async (resolve, reject) => {
+          const insertQuery = new Query().from(table.name, table.schema).insert(batch).toSql()
+          try {
+            await executeSql({ projectRef, connectionString, sql: insertQuery })
+          } catch (error) {
+            insertError = error
+            reject(error)
+          }
+
+          insertProgress = insertProgress + batch.length / rows.length
+          resolve({})
+        }),
+        timeout(30000),
+      ])
+    }
+  })
+
+  const batchedPromises = chunk(promises, 10)
+  for (const batchedPromise of batchedPromises) {
+    const res = await Promise.allSettled(batchedPromise.map((batch) => batch()))
+    const hasFailedBatch = find(res, { status: 'rejected' })
+    if (hasFailedBatch) break
+    onProgressUpdate(insertProgress * 100)
+  }
+  return { error: insertError }
 }
