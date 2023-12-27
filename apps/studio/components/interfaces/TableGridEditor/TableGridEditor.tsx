@@ -21,7 +21,7 @@ import {
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { sqlKeys } from 'data/sql/keys'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
-import { useCheckPermissions, useFlag, useLatest, useStore, useUrlState } from 'hooks'
+import { useCheckPermissions, useLatest, useStore, useUrlState } from 'hooks'
 import useEntityType from 'hooks/misc/useEntityType'
 import { TableLike } from 'hooks/misc/useTable'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
@@ -67,8 +67,6 @@ const TableGridEditor = ({
       setUrlState({ view })
     }
   }
-
-  const roleImpersonationEnabledFlag = useFlag('roleImpersonation')
 
   const canEditTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
   const canEditColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
@@ -311,11 +309,9 @@ const TableGridEditor = ({
               )}
               {(isTableSelected || isViewSelected) && (
                 <>
-                  {isViewSelected && roleImpersonationEnabledFlag && (
-                    <RoleImpersonationPopover serviceRoleLabel="postgres" />
-                  )}
+                  {isViewSelected && <RoleImpersonationPopover serviceRoleLabel="postgres" />}
 
-                  {(canEditViaTableEditor || roleImpersonationEnabledFlag) && (
+                  {canEditViaTableEditor && (
                     <div className="h-[20px] w-px border-r border-control"></div>
                   )}
 
