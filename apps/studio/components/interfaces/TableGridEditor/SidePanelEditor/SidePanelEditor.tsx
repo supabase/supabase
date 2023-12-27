@@ -30,6 +30,7 @@ import {
   ExtendedPostgresRelationship,
   UpdateColumnPayload,
 } from './SidePanelEditor.types'
+import { createColumn, updateColumn } from './SidePanelEditor.utils'
 import { ImportContent } from './TableEditor/TableEditor.types'
 
 export interface SidePanelEditorProps {
@@ -191,12 +192,18 @@ const SidePanelEditor = ({
 
     const { columnId } = configuration
     const response = isNewRecord
-      ? await meta.createColumn(
+      ? await createColumn(
+          project?.ref!,
+          project?.connectionString,
+          ui,
           payload as CreateColumnPayload,
           selectedTable as PostgresTable,
           foreignKey
         )
-      : await meta.updateColumn(
+      : await updateColumn(
+          project?.ref!,
+          project?.connectionString,
+          ui,
           columnId as string,
           payload as UpdateColumnPayload,
           selectedTable as PostgresTable,

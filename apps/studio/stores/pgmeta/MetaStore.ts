@@ -21,22 +21,17 @@ import {
   generateCreateColumnPayload,
   generateUpdateColumnPayload,
 } from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
-import {
-  ColumnField,
-  CreateColumnPayload,
-  ExtendedPostgresRelationship,
-  UpdateColumnPayload,
-} from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.types'
+import { ColumnField } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.types'
 import {
   addForeignKey,
   addPrimaryKey,
-  removeForeignKey,
+  createColumn,
   removePrimaryKey,
+  updateColumn,
 } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.utils'
 import { ImportContent } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableEditor.types'
 import { createDatabaseColumn } from 'data/database-columns/database-column-create-mutation'
 import { deleteDatabaseColumn } from 'data/database-columns/database-column-delete-mutation'
-import { updateDatabaseColumn } from 'data/database-columns/database-column-update-mutation'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import { getCachedProjectDetail } from 'data/projects/project-detail-query'
 import { getQueryClient } from 'data/query-client'
@@ -57,21 +52,6 @@ export interface IMetaStore {
   validateQuery: (value: string) => Promise<any | { error: ResponseError }>
   formatQuery: (value: string) => Promise<any | { error: ResponseError }>
 
-  /** The methods below involve several contexts due to the UI flow of the
-   *  dashboard and hence do not sit within their own stores */
-  createColumn: (
-    payload: CreateColumnPayload,
-    selectedTable: PostgresTable,
-    foreignKey?: ExtendedPostgresRelationship
-  ) => any
-  updateColumn: (
-    id: string,
-    payload: UpdateColumnPayload,
-    selectedTable: PostgresTable,
-    foreignKey?: ExtendedPostgresRelationship,
-    skipPKCreation?: boolean,
-    skipSuccessMessage?: boolean
-  ) => any
   duplicateTable: (
     payload: any,
     metadata: {
@@ -168,148 +148,6 @@ export default class MetaStore implements IMetaStore {
       if (response.error) throw response.error
 
       return response
-    } catch (error: any) {
-      return { error }
-    }
-  }
-
-  async createColumn(
-    payload: CreateColumnPayload,
-    selectedTable: PostgresTable,
-    foreignKey?: ExtendedPostgresRelationship
-  ) {
-    const toastId = this.rootStore.ui.setNotification({
-      category: 'loading',
-      message: `Creating column "${payload.name}"...`,
-    })
-    try {
-      // Once pg-meta supports composite keys, we can remove this logic
-      const { isPrimaryKey, ...formattedPayload } = payload
-      const column = await createDatabaseColumn({
-        projectRef: this.projectRef,
-        connectionString: this.connectionString,
-        payload: formattedPayload,
-      })
-
-      // Firing createColumn in createTable will bypass this block
-      if (isPrimaryKey) {
-        this.rootStore.ui.setNotification({
-          id: toastId,
-          category: 'loading',
-          message: 'Assigning primary key to column...',
-        })
-        // Same logic in createTable: Remove any primary key constraints first (we'll add it back later)
-        const existingPrimaryKeys = selectedTable.primary_keys.map((x) => x.name)
-
-        if (existingPrimaryKeys.length > 0) {
-          await removePrimaryKey(
-            this.projectRef,
-            this.connectionString,
-            column.schema,
-            column.table
-          )
-        }
-
-        const primaryKeyColumns = existingPrimaryKeys.concat([column.name])
-        await addPrimaryKey(
-          this.projectRef,
-          this.connectionString,
-          column.schema,
-          column.table,
-          primaryKeyColumns
-        )
-      }
-
-      if (!isUndefined(foreignKey)) {
-        this.rootStore.ui.setNotification({
-          id: toastId,
-          category: 'loading',
-          message: 'Adding foreign key to column...',
-        })
-        await addForeignKey(this.projectRef, this.connectionString, foreignKey)
-      }
-
-      this.rootStore.ui.setNotification({
-        id: toastId,
-        category: 'success',
-        message: `Successfully created column "${column.name}"`,
-      })
-    } catch (error: any) {
-      this.rootStore.ui.setNotification({
-        id: toastId,
-        category: 'error',
-        message: `An error occurred while creating the column "${payload.name}"`,
-      })
-      return { error }
-    }
-  }
-
-  async updateColumn(
-    id: string,
-    payload: UpdateColumnPayload,
-    selectedTable: PostgresTable,
-    foreignKey?: ExtendedPostgresRelationship,
-    skipPKCreation?: boolean,
-    skipSuccessMessage: boolean = false
-  ) {
-    try {
-      const { isPrimaryKey, ...formattedPayload } = payload
-      const column = await updateDatabaseColumn({
-        projectRef: this.projectRef,
-        connectionString: this.connectionString,
-        id,
-        payload: formattedPayload,
-      })
-
-      const originalColumn = find(selectedTable.columns, { id })
-      const existingForeignKey = find(selectedTable.relationships, {
-        source_column_name: originalColumn!.name,
-      })
-
-      if (!skipPKCreation && isPrimaryKey !== undefined) {
-        const existingPrimaryKeys = selectedTable.primary_keys.map((x) => x.name)
-
-        // Primary key is getting updated for the column
-        if (existingPrimaryKeys.length > 0) {
-          await removePrimaryKey(
-            this.projectRef,
-            this.connectionString,
-            column.schema,
-            column.table
-          )
-        }
-
-        const primaryKeyColumns = isPrimaryKey
-          ? existingPrimaryKeys.concat([column.name])
-          : existingPrimaryKeys.filter((x) => x !== column.name)
-
-        if (primaryKeyColumns.length) {
-          await addPrimaryKey(
-            this.projectRef,
-            this.connectionString,
-            column.schema,
-            column.table,
-            primaryKeyColumns
-          )
-        }
-      }
-
-      // For updating of foreign key relationship, we remove the original one by default
-      // Then just add whatever was in foreignKey - simplicity over trying to derive whether to update or not
-      if (existingForeignKey !== undefined) {
-        await removeForeignKey(this.projectRef, this.connectionString, existingForeignKey)
-      }
-
-      if (foreignKey !== undefined) {
-        await addForeignKey(this.projectRef, this.connectionString, foreignKey)
-      }
-
-      if (!skipSuccessMessage) {
-        this.rootStore.ui.setNotification({
-          category: 'success',
-          message: `Successfully updated column "${column.name}"`,
-        })
-      }
     } catch (error: any) {
       return { error }
     }
@@ -588,7 +426,14 @@ export default class MetaStore implements IMetaStore {
           ...column,
           isPrimaryKey: false,
         })
-        await this.createColumn(columnPayload, updatedTable, column.foreignKey)
+        await createColumn(
+          this.projectRef,
+          this.connectionString,
+          this.rootStore.ui,
+          columnPayload,
+          updatedTable,
+          column.foreignKey
+        )
       } else {
         const originalColumn = find(originalColumns, { id: column.id })
         if (originalColumn) {
@@ -607,7 +452,10 @@ export default class MetaStore implements IMetaStore {
             })
             const skipPKCreation = true
             const skipSuccessMessage = true
-            const res = await this.updateColumn(
+            const res = await updateColumn(
+              this.projectRef,
+              this.connectionString,
+              this.rootStore.ui,
               column.id,
               columnPayload,
               updatedTable,

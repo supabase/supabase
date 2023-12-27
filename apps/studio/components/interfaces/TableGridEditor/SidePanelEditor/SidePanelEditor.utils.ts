@@ -1,11 +1,19 @@
-import { PostgresRelationship } from '@supabase/postgres-meta'
+import { PostgresRelationship, PostgresTable } from '@supabase/postgres-meta'
+import { createDatabaseColumn } from 'data/database-columns/database-column-create-mutation'
+import { updateDatabaseColumn } from 'data/database-columns/database-column-update-mutation'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { getViews } from 'data/views/views-query'
 import { useStore } from 'hooks'
+import { find, isUndefined } from 'lodash'
 import { useEffect, useState } from 'react'
+import { IUiStore } from 'stores/UiStore'
 import { IMetaStore } from 'stores/pgmeta/MetaStore'
-import { ExtendedPostgresRelationship } from './SidePanelEditor.types'
+import {
+  CreateColumnPayload,
+  ExtendedPostgresRelationship,
+  UpdateColumnPayload,
+} from './SidePanelEditor.types'
 
 export interface UseEncryptedColumnsArgs {
   schemaName?: string
@@ -159,4 +167,146 @@ export const removeForeignKey = async (
     sql: query,
     queryKey: ['foreign-keys'],
   })
+}
+
+/**
+ * The methods below involve several contexts due to the UI flow of the
+ * dashboard and hence do not sit within their own stores
+ */
+export const createColumn = async (
+  projectRef: string,
+  connectionString: string | undefined,
+  ui: IUiStore,
+  payload: CreateColumnPayload,
+  selectedTable: PostgresTable,
+  foreignKey?: ExtendedPostgresRelationship
+) => {
+  const toastId = ui.setNotification({
+    category: 'loading',
+    message: `Creating column "${payload.name}"...`,
+  })
+  try {
+    // Once pg-meta supports composite keys, we can remove this logic
+    const { isPrimaryKey, ...formattedPayload } = payload
+    const column = await createDatabaseColumn({
+      projectRef: projectRef,
+      connectionString: connectionString,
+      payload: formattedPayload,
+    })
+
+    // Firing createColumn in createTable will bypass this block
+    if (isPrimaryKey) {
+      ui.setNotification({
+        id: toastId,
+        category: 'loading',
+        message: 'Assigning primary key to column...',
+      })
+      // Same logic in createTable: Remove any primary key constraints first (we'll add it back later)
+      const existingPrimaryKeys = selectedTable.primary_keys.map((x) => x.name)
+
+      if (existingPrimaryKeys.length > 0) {
+        await removePrimaryKey(projectRef, connectionString, column.schema, column.table)
+      }
+
+      const primaryKeyColumns = existingPrimaryKeys.concat([column.name])
+      await addPrimaryKey(
+        projectRef,
+        connectionString,
+        column.schema,
+        column.table,
+        primaryKeyColumns
+      )
+    }
+
+    if (!isUndefined(foreignKey)) {
+      ui.setNotification({
+        id: toastId,
+        category: 'loading',
+        message: 'Adding foreign key to column...',
+      })
+      await addForeignKey(projectRef, connectionString, foreignKey)
+    }
+
+    ui.setNotification({
+      id: toastId,
+      category: 'success',
+      message: `Successfully created column "${column.name}"`,
+    })
+  } catch (error: any) {
+    ui.setNotification({
+      id: toastId,
+      category: 'error',
+      message: `An error occurred while creating the column "${payload.name}"`,
+    })
+    return { error }
+  }
+}
+
+export const updateColumn = async (
+  projectRef: string,
+  connectionString: string | undefined,
+  ui: IUiStore,
+  id: string,
+  payload: UpdateColumnPayload,
+  selectedTable: PostgresTable,
+  foreignKey?: ExtendedPostgresRelationship,
+  skipPKCreation?: boolean,
+  skipSuccessMessage: boolean = false
+) => {
+  try {
+    const { isPrimaryKey, ...formattedPayload } = payload
+    const column = await updateDatabaseColumn({
+      projectRef: projectRef,
+      connectionString: connectionString,
+      id,
+      payload: formattedPayload,
+    })
+
+    const originalColumn = find(selectedTable.columns, { id })
+    const existingForeignKey = find(selectedTable.relationships, {
+      source_column_name: originalColumn!.name,
+    })
+
+    if (!skipPKCreation && isPrimaryKey !== undefined) {
+      const existingPrimaryKeys = selectedTable.primary_keys.map((x) => x.name)
+
+      // Primary key is getting updated for the column
+      if (existingPrimaryKeys.length > 0) {
+        await removePrimaryKey(projectRef, connectionString, column.schema, column.table)
+      }
+
+      const primaryKeyColumns = isPrimaryKey
+        ? existingPrimaryKeys.concat([column.name])
+        : existingPrimaryKeys.filter((x) => x !== column.name)
+
+      if (primaryKeyColumns.length) {
+        await addPrimaryKey(
+          projectRef,
+          connectionString,
+          column.schema,
+          column.table,
+          primaryKeyColumns
+        )
+      }
+    }
+
+    // For updating of foreign key relationship, we remove the original one by default
+    // Then just add whatever was in foreignKey - simplicity over trying to derive whether to update or not
+    if (existingForeignKey !== undefined) {
+      await removeForeignKey(projectRef, connectionString, existingForeignKey)
+    }
+
+    if (foreignKey !== undefined) {
+      await addForeignKey(projectRef, connectionString, foreignKey)
+    }
+
+    if (!skipSuccessMessage) {
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully updated column "${column.name}"`,
+      })
+    }
+  } catch (error: any) {
+    return { error }
+  }
 }
