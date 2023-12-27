@@ -15,7 +15,6 @@ import { timeout, tryParseJson } from 'lib/helpers'
 import { ResponseError } from 'types'
 
 import { IRootStore } from '../RootStore'
-import TableStore, { ITableStore } from './TableStore'
 
 import {
   generateCreateColumnPayload,
@@ -36,15 +35,16 @@ import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constan
 import { getCachedProjectDetail } from 'data/projects/project-detail-query'
 import { getQueryClient } from 'data/query-client'
 import { tableKeys } from 'data/tables/keys'
+import { createTable } from 'data/tables/table-create-mutation'
+import { deleteTable } from 'data/tables/table-delete-mutation'
 import { getTable } from 'data/tables/table-query'
+import { updateTable } from 'data/tables/table-update-mutation'
 import { getTables } from 'data/tables/tables-query'
 
 const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
 
 export interface IMetaStore {
-  tables: ITableStore
-
   projectRef?: string
   connectionString?: string
 
@@ -84,7 +84,6 @@ export interface IMetaStore {
 }
 export default class MetaStore implements IMetaStore {
   rootStore: IRootStore
-  tables: TableStore
 
   projectRef: string
   connectionString?: string
@@ -102,8 +101,6 @@ export default class MetaStore implements IMetaStore {
       this.connectionString = connectionString
       this.headers['x-connection-encrypted'] = connectionString
     }
-
-    this.tables = new TableStore(this.rootStore, `${this.baseUrl}/tables`, this.headers)
 
     makeObservable(this, {})
   }
@@ -216,10 +213,13 @@ export default class MetaStore implements IMetaStore {
     const duplicatedTable = find(tables, { schema: sourceTableSchema, name: duplicatedTableName })
 
     if (isRLSEnabled) {
-      const updateTable: any = await this.tables.update(duplicatedTable!.id, {
-        rls_enabled: isRLSEnabled,
+      await updateTable({
+        projectRef: this.projectRef,
+        connectionString: this.connectionString,
+        id: duplicatedTable?.id!,
+        schema: duplicatedTable?.schema!,
+        payload: { rls_enabled: isRLSEnabled },
       })
-      if (updateTable.error) throw updateTable.error
     }
 
     return duplicatedTable
@@ -227,14 +227,21 @@ export default class MetaStore implements IMetaStore {
 
   async createTable(
     toastId: string,
-    payload: any,
+    payload: {
+      name: string
+      schema: string
+      comment?: string | undefined
+    },
     columns: ColumnField[] = [],
     isRLSEnabled: boolean,
     importContent?: ImportContent
   ) {
-    // Create the table first
-    const table = await this.tables.create(payload)
-    if ('error' in table) throw table.error
+    // Create the table first. Error may be thrown.
+    const table = await createTable({
+      projectRef: this.projectRef,
+      connectionString: this.connectionString,
+      payload: payload,
+    })
 
     // If we face any errors during this process after the actual table creation
     // We'll delete the table as a way to clean up and not leave behind bits that
@@ -243,10 +250,13 @@ export default class MetaStore implements IMetaStore {
     try {
       // Toggle RLS if configured to be
       if (isRLSEnabled) {
-        const updatedTable: any = await this.tables.update(table.id, {
-          rls_enabled: isRLSEnabled,
+        await updateTable({
+          projectRef: this.projectRef,
+          connectionString: this.connectionString,
+          id: table.id,
+          schema: table.schema,
+          payload: { rls_enabled: isRLSEnabled },
         })
-        if (updatedTable.error) throw updatedTable.error
       }
 
       // Then insert the columns - we don't do Promise.all as we want to keep the integrity
@@ -298,7 +308,7 @@ export default class MetaStore implements IMetaStore {
           // Via a CSV file
           const { error }: any = await this.insertRowsViaSpreadsheet(
             importContent.file,
-            table,
+            table as PostgresTable,
             importContent.selectedHeaders,
             (progress: number) => {
               this.rootStore.ui.setNotification({
@@ -334,7 +344,7 @@ export default class MetaStore implements IMetaStore {
         } else {
           // Via text copy and paste
           await this.insertTableRows(
-            table,
+            table as PostgresTable,
             importContent.rows,
             importContent.selectedHeaders,
             (progress: number) => {
@@ -362,8 +372,13 @@ export default class MetaStore implements IMetaStore {
 
       // Finally, return the created table
       return table
-    } catch (error: any) {
-      this.tables.del(table.id)
+    } catch (error) {
+      deleteTable({
+        projectRef: this.projectRef,
+        connectionString: this.connectionString,
+        id: table.id,
+        schema: table.schema,
+      })
       throw error
     }
   }
@@ -388,8 +403,13 @@ export default class MetaStore implements IMetaStore {
     }
 
     // Update the table
-    const updatedTable: any = await this.tables.update(table.id, payload)
-    if (updatedTable.error) throw updatedTable.error
+    const updatedTable = await updateTable({
+      projectRef: this.projectRef,
+      connectionString: this.connectionString,
+      id: table.id,
+      schema: table.schema,
+      payload,
+    })
 
     const originalColumns = table.columns ?? []
     const columnIds = columns.map((column) => column.id)
@@ -428,13 +448,17 @@ export default class MetaStore implements IMetaStore {
           projectRef: this.projectRef,
           connectionString: this.connectionString,
           payload: columnPayload,
-          selectedTable: updatedTable,
+          selectedTable: updatedTable as PostgresTable,
           foreignKey: column.foreignKey,
         })
       } else {
         const originalColumn = find(originalColumns, { id: column.id })
         if (originalColumn) {
-          const columnPayload = generateUpdateColumnPayload(originalColumn, updatedTable, column)
+          const columnPayload = generateUpdateColumnPayload(
+            originalColumn,
+            updatedTable as PostgresTable,
+            column
+          )
           const originalForeignKey = find(table.relationships, {
             source_schema: originalColumn.schema,
             source_table_name: originalColumn.table,
@@ -454,7 +478,7 @@ export default class MetaStore implements IMetaStore {
               connectionString: this.connectionString,
               id: column.id,
               payload: columnPayload,
-              selectedTable: updatedTable,
+              selectedTable: updatedTable as PostgresTable,
               foreignKey: column.foreignKey,
               skipPKCreation,
               skipSuccessMessage,
@@ -624,8 +648,5 @@ export default class MetaStore implements IMetaStore {
       this.connectionString = connectionString
       this.headers['x-connection-encrypted'] = connectionString
     }
-
-    this.tables.setUrl(`${this.baseUrl}/tables`)
-    this.tables.setHeaders(this.headers)
   }
 }

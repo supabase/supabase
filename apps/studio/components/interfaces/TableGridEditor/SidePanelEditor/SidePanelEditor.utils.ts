@@ -1,5 +1,4 @@
 import { PostgresRelationship, PostgresTable } from '@supabase/postgres-meta'
-import { find } from 'lodash'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
@@ -257,10 +256,10 @@ export const updateColumn = async ({
       payload: formattedPayload,
     })
 
-    const originalColumn = find(selectedTable.columns, { id })
-    const existingForeignKey = find(selectedTable.relationships, {
-      source_column_name: originalColumn!.name,
-    })
+    const originalColumn = selectedTable.columns?.find((c) => c.id === id)
+    const existingForeignKey = selectedTable.relationships.find(
+      (r) => r.source_column_name === originalColumn!.name
+    )
 
     if (!skipPKCreation && isPrimaryKey !== undefined) {
       const existingPrimaryKeys = selectedTable.primary_keys.map((x) => x.name)
