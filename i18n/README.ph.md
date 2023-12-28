@@ -7,7 +7,7 @@
 
 # Supabase
 
-[Supabase](https://supabase.com) Ay isang alternatibong bukas na mapagkukunan ng Firebase. Binubuo namin ang mga tampok ng Firebase gamit ang mga tool na pangnegosyo at bukas na mapagkukunan.
+[Supabase](https://supabase.com) ay isang alternatibo ng Firebase. Kami ay gumagawa ng mga feature ng Firebase gamit ang mga enterprise-grade na open source tools.
 
 [x] In-host na Postgres Database [Docs](https://supabase.com/docs/guides/database)
 - [x] Authentication at Authorization [Docs](https://supabase.com/docs/guides/auth)
@@ -25,13 +25,13 @@
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
-Magmasid sa 'releases' ng repositoriyo na ito upang maabisuhan ng mga malalaking pag-update.
+Tumingin sa 'releases' ng repository na ito upang maabisuhan ng mga malalaking pag-update.
 
 <kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
 ## Teknikal na Dokumentasyon
 
-Para sa buong dokumentasyon, bisitahin ang [supabase.com/docs](https://supabase.com/docs).
+Para sa buong dokumentasyon, bisitahin lamang ang [supabase.com/docs](https://supabase.com/docs).
 
 Upang malaman kung paano makatulong, bisitahin ang [Paano mag simula](./DEVELOPERS.md).
 
@@ -46,7 +46,9 @@ Upang malaman kung paano makatulong, bisitahin ang [Paano mag simula](./DEVELOPE
 
 ## Paano ito gumagana 
 
-Ang Supabase ay isang kombinasyon ng mga bukas na mapagkukunan na tool. Binubuo namin ang mga tampok ng Firebase gamit ang mga pangnegosyong antas, bukas na mapagkukunan na produkto. Kung ang mga tool at komunidad ay umiiral na, na may MIT, Apache 2, o kahalintulad na bukas na lisensya, gagamitin at susuportahan namin ang nasabing tool. Kung ang tool ay wala, itinataguyod at binubuksan namin ito sa bukas na mapagkukunan. Ang Supabase ay hindi isang 1-to-1 na pagmamapa ng Firebase. Layunin namin bigyan ang mga developer ng karanasang katulad ng Firebase gamit ang mga bukas na mapagkukunan na tool.
+Supabase ay combinasyon ng mga open source tools. Kami ay nag gumagawa ng fetures open source gamit ang 
+enterprice-grade open source na producto kung ang kumunidad ay nag exist, with an MIT,MIT, Apache 2, or equivalent open license, at kami gumagamit at sumosuporta sa tool na ito. kung ang tool ay hindi nag exist 
+kami ang gumagawa at ini open namin ito sa aming sarili. Supabase ay hindi 1-to-1 mapping ng Firebase. Ang  Layunin namin na bigyan ang mga developer ng isang Firebase-like na karanasan sa pag-develop gamit ang open source tools  
 
 **Arkitektura**
 
@@ -62,13 +64,13 @@ Ang Supabase ay isang [hosted platform](https://supabase.com/dashboard). Pwedeng
 - [**GoTrue**](https://github.com/supabase/gotrue): Isang JWT based na API para sa pamamahala ng mga users at paglalabas ng JWT tokens.
 - [**Storage**](https://github.com/supabase/storage-api): Nagbibigay ng isang RESTful interface para sa pamamahala ng mga files na naka-store sa S3, gamit ang Postgres para pamahalaan ang mga pahintulot.
 - [**pg_graphql**](http://github.com/supabase/pg_graphql/): Isang PostgreSQL extension na nag-eexpose ng GraphQL API.
-- [**postgres-meta**](https://github.com/supabase/postgres-meta): Isang RESTful na API para sa pamamahala ng iyong Postgres, na nagbibigay-daan sa iyo na kumuha ng mga tables, magdagdag ng mga roles, tumakbo ng mga queries, atbp.
+- [**postgres-meta**](https://github.com/supabase/postgres-meta): Isang RESTful na API para sa pamamahala ng iyong Postgres, na nagbibigay-daan sa iyo na kumuha ng mga tables, magdagdag ng mga roles, tumakbo ng mga queries, etc.
 - [**Kong**](https://github.com/Kong/kong): Isang cloud-native API gateway.
 
 
-#### Mga Aklatang Kliente
+#### Client libraries
 
-Ang aming pamamaraan para sa mga aklatang kliyente ay modular. Bawat sub-aklatan ay isang independiyenteng implementasyon para sa isang solong panlabas na sistema. Ito ay isa sa mga paraan na aming ginagamit upang suportahan ang mga umiiral na mga kasangkapan
+Ang aming pamamaraan para sa mga client libraries ay modular. Bawat sub-libraries ay isang indipendent na implementasyon para sa  single external systema single external system. Ito ay isa sa mga paraan na aming ginagamit upang suportahan ang mga umiiral na mga kagamitan
 
 <table style="table-layout:fixed; white-space: nowrap;">
   <tr>
@@ -119,7 +121,7 @@ Ang aming pamamaraan para sa mga aklatang kliyente ay modular. Bawat sub-aklatan
     <td><a href="https://github.com/supabase/functions-dart" target="_blank" rel="noopener noreferrer">functions-dart</a></td>
   </tr>
   <!-- /notranslate -->
-  <th colspan="7">💚 Community  💚</th>
+  <th colspan="7">💚 Community 💚</th>
   <!-- notranslate -->
   <tr>
     <td>C#</td>
