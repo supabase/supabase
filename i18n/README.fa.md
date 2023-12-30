@@ -5,9 +5,9 @@
 <img src="https://user-images.githubusercontent.com/8291514/213727225-56186826-bee8-43b5-9b15-86e839d89393.png#gh-dark-mode-only">
 </p>
 
-<h1>Supabase</h1>
+<h1 dir="rtl">Supabase</h1>
 
-<p>
+<p dir="rtl">
 <a href="https://supabase.com">Supabase</a> یک جایگزین اپن‌سورس برای Firebase است. ما در حال ساخت امکانات Firebase با استفاده ابزارهای اپن‌سورس و کلاس تجاری هستیم.
 </p>
 
@@ -26,26 +26,26 @@
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
-<p>
+<p dir="rtl">
 "releases" این مخزن را دنبال کنید تا در جریان به‌روزسانی‌ها قرار بگیرید.
 <p>
 
 <kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="این مخزن را دنبال کنید."/></kbd>
 
-<h2>مستندات</h2>
+<h2 dir="rtl">مستندات</h2>
 
-<p>
+<p dir="rtl">
 برای مستندات کامل به <a href="https://supabase.com/docs">supabase.com/docs</a> مراجعه کنید.
 </p>
 
-<p>
+<p dir="rtl">
 برای چگونگی مشارکت کردن به <a href="./DEVELOPERS.md">Getting Started</a> مراجعه کنید.
 </p>
 
 
-<h2>جامعه و پشتیبانی</h2>
+<h2 dir="rtl">جامعه و پشتیبانی</h2>
 
-<ul>
+<ul dir="rtl">
   <li>
   <a href="https://github.com/supabase/supabase/discussions">Community Forum</a>. گزینه مناسب برای راهنمایی گرفتن در مورد توسعه و روش مناسب استفاده از دیتابیس می‌باشد.
   </li>
@@ -61,22 +61,23 @@
 </ul>
 
 
-<h2>چطور کار میکند</h2>
+<h2 dir="rtl">چطور کار میکند</h2>
 
-<p>
+<p dir="rtl">
 Supabase ترکیبی از ابزارهای اپن‌سورس است. ما امکانات Firebase را با استفاده از محصولات اپن‌سورس و کلاس تجاری می‌سازیم. اگر ابزار و جامعه‌ی آن وجود داشته باشد، با استفاده از گواهینامه MIT, Apache 2 یا هر گواهینامه‌ی معادلی، ما از آن ابزار استفاده و پشتیبانی می‌کنیم. اگر ابزاری وجود نداشته باشد، ما خودمان آن را می‌سازیم و اپن‌سورس می‌کنیم. Supabase یک محصول دقیقا شبیه و معادل یک‌به‌یک Firebase نیست. ما سعی داریم با استفاده از ابزارهای اپن‌سورس تجربه شبیه به Firebase به توسعه‌دهندگان ارائه دهیم.
 </p>
 
-<strong>معماری</strong>
+<strong dir="rtl">معماری</strong>
 
-<p>
+<p dir="rtl">
 Supabase یک <a href="https://supabase.com/dashboard">پلتفرم میزبانی‌شده</a>
  است. شما می‌توانید بدون نصب چیزی، ثبت‌نام و شروع به استفاده از Supabase کنید.
 شما همچنین می‌توانید به‌صورت <a href="https://supabase.com/docs/guides/hosting/overview">خود میزبانی</a> و <a href="https://supabase.com/docs/guides/local-development">محلی توسعه دهید</a>.
 </p>
 
 ![معماری](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
-<ul>
+
+<ul dir="rtl">
   <li>
     <a href="https://www.postgresql.org/">Postgres</a> یک سیستم دیتابیس object-relational با بیش از ۳۰سال سابقه توسعه می‌باشد که اعتبار زیادی بابت اتکاپذیری، امکانات قوی و سرعت کسب کرده است.
   </li>
@@ -104,9 +105,9 @@ Supabase یک <a href="https://supabase.com/dashboard">پلتفرم میزبان
 </ul>
 
 
-<h4>کتابخانه‌های کلاینت</h4>
+<h4 dir="rtl">کتابخانه‌های کلاینت</h4>
 
-<p>
+<p dir="rtl">
 کتابخانه‌ی کلاینت ما چند-تیکه است. هر زیر-کتابخانه یک پیاده‌سازی جداگانه برای یک سیستم خارجی واحد دارد. این یکی از روش‌های ما برای پشتیانی از ابزارهای موجود است.
 </p>
 
@@ -245,9 +246,9 @@ Supabase یک <a href="https://supabase.com/dashboard">پلتفرم میزبان
   <!-- /notranslate -->
 </table>
 
-<h2>ترجمه‌ها</h2>
+<h2 dir="rtl">ترجمه‌ها</h2>
 
-<ul>
+<ul dir="rtl">
   <li><a href="/i18n/languages.md">لیست ترجمه‌ها</a></li>
 </ul>
 
