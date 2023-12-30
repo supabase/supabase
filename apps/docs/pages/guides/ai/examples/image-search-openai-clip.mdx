@@ -16,7 +16,7 @@ The [OpenAI CLIP Model](https://github.com/openai/CLIP) was trained on a variety
 
 You can find the full application code as a Python Poetry project on [GitHub](https://github.com/supabase/supabase/tree/master/examples/ai/image_search#image-search-with-supabase-vector).
 
-## Create a new Python Project with Poetry
+## Create a new Python project with Poetry
 
 [Poetry](https://python-poetry.org/) provides packaging and dependency management for Python. If you haven't already, install poetry via pip:
 
@@ -46,7 +46,7 @@ supabase start
 
 This will start up the Supabase stack locally and print out a bunch of environment details, including your local `DB URL`. Make a note of that for later user.
 
-## Install the Dependencies
+## Install the dependencies
 
 We will need to add the following dependencies to our project:
 
@@ -134,7 +134,7 @@ search = "image_search.main:search"
 
 After activating the virtual environtment with `poetry shell` you can now run your seed script via `poetry run seed`. You can inspect the generated embeddings in your local database by visiting the local Supabase dashboard at [localhost:54323](http://localhost:54323/project/default/editor), selecting the `vecs` schema, and the `image_vectors` database.
 
-## Perform an Image Search from a Text Query
+## Perform an image search from a text query
 
 With Supabase Vector we can easily query our embeddings. We can use either an image as search input or alternative we can generate an embedding from a string input and use that as the query input:
 

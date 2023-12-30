@@ -564,6 +564,7 @@ export const auth = {
           ],
         },
         { name: 'Email Templates', url: '/guides/auth/auth-email-templates' },
+        { name: 'Auth Hooks', url: '/guides/auth/auth-hooks' },
       ],
     },
     {
