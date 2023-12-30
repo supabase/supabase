@@ -1817,6 +1817,19 @@ functions:
               }
           }
           ```
+      - id: search-multiple-columns
+        name: Search multiple columns
+        code: |
+          ```kotlin
+          supabase.from("quotes").select(columns = Columns.list("catchphrase")) {
+              filter {
+                or {
+                  textSearch(column = "catchphrase", query = "'fat' & 'cat'", config = "english", type = TextSearchType.YOUR_TYPE)
+                  textSearch(column = "author", query = "'fat' & 'cat'", config = "english", type = TextSearchType.YOUR_TYPE)
+                }
+              }
+          }
+          ```
       - id: basic-normalization
         name: Basic normalization
         description: Uses PostgreSQL's `plainto_tsquery` function.
