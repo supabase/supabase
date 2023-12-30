@@ -5,11 +5,11 @@
 <img src="https://user-images.githubusercontent.com/8291514/213727225-56186826-bee8-43b5-9b15-86e839d89393.png#gh-dark-mode-only">
 </p>
 
----
+<h1>Supabase</h1>
 
-# Supabase
-
-‫[Supabase](https://supabase.com) یک جایگزین اپن‌سورس برای Firebase است. ما در حال ساخت امکانات Firebase با استفاده ابزارهای اپن‌سورس و کلاس تجاری هستیم.
+<p>
+<a href="https://supabase.com">Supabase</a> یک جایگزین اپن‌سورس برای Firebase است. ما در حال ساخت امکانات Firebase با استفاده ابزارهای اپن‌سورس و کلاس تجاری هستیم.
+</p>
 
 - [x] ‫دیتابیس Postgres میزبانی‌شده. [مستندات](https://supabase.com/docs/guides/database)
 - [x] احراز هویت و کنترل سطح دسترسی. [مستندات](https://supabase.com/docs/guides/auth)
@@ -26,47 +26,89 @@
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
-‫. "releases" این مخزن را دنبال کنید تا در جریان به‌روزسانی‌ها قرار بگیرید.
+<p>
+"releases" این مخزن را دنبال کنید تا در جریان به‌روزسانی‌ها قرار بگیرید.
+<p>
 
 <kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="این مخزن را دنبال کنید."/></kbd>
 
-## مستندات
+<h2>مستندات</h2>
 
-برای مستندات کامل به‫ [supabase.com/docs](https://supabase.com/docs) مراجعه کنید.
+<p>
+برای مستندات کامل به <a href="https://supabase.com/docs">supabase.com/docs</a> مراجعه کنید.
+</p>
 
-‫ برای چگونگی مشارکت کردن به [Getting Started](./DEVELOPERS.md) مراجعه کنید.
-
-## جامعه و پشتیبانی
-
-- ‫[Community Forum](https://github.com/supabase/supabase/discussions). گزینه مناسب برای راهنمایی گرفتن در مورد توسعه و روش مناسب استفاده از دیتابیس می‌باشد.
-- ‫[GitHub Issues](https://github.com/supabase/supabase/issues). گزینه مناسب برای خطاها و باگ‌هایی که در استفاده از Supabase برمی‌خوردید.
-- ‫[Email Support](https://supabase.com/docs/support#business-support). بهترین گزینه برای مشکلات مرتبط با دیتابیس و زیرساخت است.
-- ‫[Discord](https://discord.supabase.com). بهترین گزینه برای به اشتراک گذاشتن برنامه‌های خود و با جامعه معاشرت کردن.
+<p>
+برای چگونگی مشارکت کردن به <a href="./DEVELOPERS.md">Getting Started</a> مراجعه کنید.
+</p>
 
 
-## چطور کار میکند
+<h2>جامعه و پشتیبانی</h2>
 
-‫Supabase ترکیبی از ابزارهای اپن‌سورس است. ما امکانات Firebase را با استفاده از محصولات اپن‌سورس و کلاس تجاری می‌سازیم. اگر ابزار و جامعه‌ی آن وجود داشته باشد، با استفاده از گواهینامه MIT, Apache 2 یا هر گواهینامه‌ی معادلی، ما از آن ابزار استفاده و پشتیبانی می‌کنیم. اگر ابزاری وجود نداشته باشد، ما خودمان آن را می‌سازیم و اپن‌سورس می‌کنیم. Supabase یک محصول دقیقا شبیه و معادل یک‌به‌یک Firebase نیست. ما سعی داریم با استفاده از ابزارهای اپن‌سورس تجربه شبیه به Firebase به توسعه‌دهندگان ارائه دهیم.
+<ul>
+  <li>
+  <a href="https://github.com/supabase/supabase/discussions">Community Forum</a>. گزینه مناسب برای راهنمایی گرفتن در مورد توسعه و روش مناسب استفاده از دیتابیس می‌باشد.
+  </li>
+  <li>
+  <a href="https://github.com/supabase/supabase/issues">GitHub Issues</a>. گزینه مناسب برای خطاها و باگ‌هایی که در استفاده از Supabase برمی‌خوردید.
+  </li>
+  <li>
+  <a href="https://supabase.com/docs/support#business-support">Email Support</a>. بهترین گزینه برای مشکلات مرتبط با دیتابیس و زیرساخت است.
+  <li>
+  <a href="https://discord.supabase.com">Discord</a>. بهترین گزینه برای به اشتراک گذاشتن برنامه‌های خود و با جامعه معاشرت کردن.
 
-**معماری**
+  </li>
+</ul>
 
-‫Supabase یک [پلتفرم میزبانی‌شده](https://supabase.com/dashboard) است. شما می‌توانید بدون نصب چیزی، ثبت‌نام و شروع به استفاده از Supabase کنید.
-شما همچنین می‌توانید به‌صورت [خود میزبانی](https://supabase.com/docs/guides/hosting/overview) و [محلی توسعه دهید](https://supabase.com/docs/guides/local-development).
+
+<h2>چطور کار میکند</h2>
+
+<p>
+Supabase ترکیبی از ابزارهای اپن‌سورس است. ما امکانات Firebase را با استفاده از محصولات اپن‌سورس و کلاس تجاری می‌سازیم. اگر ابزار و جامعه‌ی آن وجود داشته باشد، با استفاده از گواهینامه MIT, Apache 2 یا هر گواهینامه‌ی معادلی، ما از آن ابزار استفاده و پشتیبانی می‌کنیم. اگر ابزاری وجود نداشته باشد، ما خودمان آن را می‌سازیم و اپن‌سورس می‌کنیم. Supabase یک محصول دقیقا شبیه و معادل یک‌به‌یک Firebase نیست. ما سعی داریم با استفاده از ابزارهای اپن‌سورس تجربه شبیه به Firebase به توسعه‌دهندگان ارائه دهیم.
+</p>
+
+<strong>معماری</strong>
+
+<p>
+Supabase یک <a href="https://supabase.com/dashboard">پلتفرم میزبانی‌شده</a>
+ است. شما می‌توانید بدون نصب چیزی، ثبت‌نام و شروع به استفاده از Supabase کنید.
+شما همچنین می‌توانید به‌صورت <a href="https://supabase.com/docs/guides/hosting/overview">خود میزبانی</a> و <a href="https://supabase.com/docs/guides/local-development">محلی توسعه دهید</a>.
+</p>
 
 ![معماری](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+<ul>
+  <li>
+    <a href="https://www.postgresql.org/">Postgres</a> یک سیستم دیتابیس object-relational با بیش از ۳۰سال سابقه توسعه می‌باشد که اعتبار زیادی بابت اتکاپذیری، امکانات قوی و سرعت کسب کرده است.
+  </li>
+  <li>
+    <a href="https://github.com/supabase/realtime">Realtime</a> یک سرور Elixir است که اجازه می‌دهد به اضافه کردن، به‌روز کردن و حذف کردن‌های PostgreSQL با استفاده از websockets گوش دهید. Supabase به عملکرد داخلی PostgreSQL برای replication گوش می‌دهد، replication byte stream را به JSON تبدیل می‌کند و JSON را از طریق websock به خارج broadcast می‌کند.
+  </li>
+  <li>
+    <a href="http://postgrest.org/">PostgREST</a> یک وب سرور است که دیتابیس PostgreSQL را به صورت مستقیم به RESTful API تبدیل می‌کند.
+  </li>
+  <li>
+    <a href="https://github.com/netlify/gotrue">GoTrue</a> یک API بر پایه‌ی JWT برای مدیریت کاربران و صدور توکن احراز هویت است.
+  </li>
+  <li>
+    <a href="https://github.com/supabase/storage-api">Storage</a> یک رابط RESTful برای مدیریت فایل‌های ذخیره شده در S3 با استفاده از Postgres برای مدیریت دسترسی‌ها فراهم می‌کند.
+  </li>
+  <li>
+    <a href="http://github.com/supabase/pg_graphql/">pg_graphql</a> یک افزونه PostgreSQL که یک GraphQL API را در معرض نمایش قرار می‌دهد
+  </li>
+  <li>
+    <a href="https://github.com/supabase/postgres-meta">postgres-meta</a> یک RESTful API برای مدیریت Postgres، دریافت جدول‌های داده، اضافه کردن roleها و اجرای queryها و غیره می‌باشد.
+  </li>
+  <li>
+    <a href="https://github.com/Kong/kong">Kong</a> یک gateway ابری-بومی می‌باشد.
+  </li>
+</ul>
 
-- ‫[Postgre](https://www.postgresql.org/) یک سیستم دیتابیس object-relational با بیش از ۳۰سال سابقه توسعه می‌باشد که اعتبار زیادی بابت اتکاپذیری، امکانات قوی و سرعت کسب کرده است.
-- ‫[Realtime](https://github.com/supabase/realtime) یک سرور Elixir است که اجازه می‌دهد به اضافه کردن، به‌روز کردن و حذف کردن‌های PostgreSQL با استفاده از websockets گوش دهید. Supabase به عملکرد داخلی PostgreSQL برای replication گوش می‌دهد، replication byte stream را به JSON تبدیل می‌کند و JSON را از طریق websock به خارج broadcast می‌کند.
-- ‫[PostgREST](http://postgrest.org/) یک وب سرور است که دیتابیس PostgreSQL را به صورت مستقیم به RESTful API تبدیل می‌کند.
-- ‫[GoTrue](https://github.com/netlify/gotrue) یک API بر پایه‌ی JWT برای مدیریت کاربران و صدور توکن احراز هویت است.
-- ‫[Storage](https://github.com/supabase/storage-api) یک رابط RESTful برای مدیریت فایل‌های ذخیره شده در S3 با استفاده از Postgres برای مدیریت دسترسی‌ها فراهم می‌کند.
-- ‫[pg_graphql](http://github.com/supabase/pg_graphql/) یک افزونه PostgreSQL که یک GraphQL API را در معرض نمایش قرار می‌دهد
-- ‫[postgres-meta](https://github.com/supabase/postgres-meta) یک RESTful API برای مدیریت Postgres، دریافت جدول‌های داده، اضافه کردن roleها و اجرای queryها و غیره می‌باشد.
-- ‫[Kong](https://github.com/Kong/kong) یک gateway ابری-بومی می‌باشد.
 
-#### کتابخانه‌های کلاینت
+<h4>کتابخانه‌های کلاینت</h4>
 
+<p>
 کتابخانه‌ی کلاینت ما چند-تیکه است. هر زیر-کتابخانه یک پیاده‌سازی جداگانه برای یک سیستم خارجی واحد دارد. این یکی از روش‌های ما برای پشتیانی از ابزارهای موجود است.
+</p>
 
 <table style="table-layout:fixed; white-space: nowrap;">
   <tr>
@@ -203,10 +245,11 @@
   <!-- /notranslate -->
 </table>
 
+<h2>ترجمه‌ها</h2>
 
-## ترجمه‌ها
-
-- [لیست ترجمه‌ها](/i18n/languages.md)
+<ul>
+  <li><a href="/i18n/languages.md">لیست ترجمه‌ها</a></li>
+</ul>
 
 ---
 
@@ -214,6 +257,5 @@
 
 [![New Sponsor](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)
 
-</p>
 
 </div>
