@@ -1,21 +1,27 @@
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { ReactElement, useEffect } from 'react'
+import { ReactElement } from 'react'
 
+import { useParams } from 'common'
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import Error from 'components/ui/Error'
 import ProductMenu from 'components/ui/ProductMenu'
-import { useIsFeatureEnabled, useSelectedProject, useStore, withAuth } from 'hooks'
+import { useOpenAPISpecQuery } from 'data/open-api/api-spec-query'
+import { useIsFeatureEnabled, useSelectedProject, withAuth } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
 import ProjectLayout from '../'
 import { generateDocsMenu } from './DocsLayout.utils'
-import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 function DocsLayout({ title, children }: { title: string; children: ReactElement }) {
   const router = useRouter()
-  const { ui, meta } = useStore()
-  const { data, isLoading, error } = meta.openApi
+  const { ref } = useParams()
   const selectedProject = useSelectedProject()
   const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
+
+  const { data, isLoading, error } = useOpenAPISpecQuery(
+    { projectRef: ref },
+    { enabled: !isPaused }
+  )
 
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const hideMenu = isNewAPIDocsEnabled && router.pathname.endsWith('/graphiql')
@@ -29,12 +35,6 @@ function DocsLayout({ title, children }: { title: string; children: ReactElement
     if (!page && !resource) return 'introduction'
     return (page || resource || '') as string
   }
-
-  useEffect(() => {
-    if (ui.selectedProjectRef && !isPaused) {
-      meta.openApi.load()
-    }
-  }, [ui.selectedProjectRef, isPaused])
 
   if (error) {
     return (

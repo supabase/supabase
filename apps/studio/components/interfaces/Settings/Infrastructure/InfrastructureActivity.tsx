@@ -29,16 +29,11 @@ import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useFlag, useSelectedOrganization } from 'hooks'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants'
 import { INFRA_ACTIVITY_METRICS } from './Infrastructure.constants'
-import DatabaseSelector from 'components/ui/DatabaseSelector'
 
 const InfrastructureActivity = () => {
   const { ref: projectRef } = useParams()
   const organization = useSelectedOrganization()
   const [dateRange, setDateRange] = useState<any>()
-
-  // [Joshen] Not for first iteration of read replicas
-  const [selectedDatabaseId, setSelectedDatabaseId] = useState<string>('1')
-  const readReplicasEnabled = useFlag('readReplicas')
 
   const { data: subscription, isLoading: isLoadingSubscription } = useOrgSubscriptionQuery({
     orgSlug: organization?.slug,
@@ -48,7 +43,7 @@ const InfrastructureActivity = () => {
   const { data: resourceWarnings } = useResourceWarningsQuery()
   const projectResourceWarnings = resourceWarnings?.find((x) => x.project === projectRef)
 
-  const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
+  const { data: addons } = useProjectAddonsQuery({ projectRef })
   const selectedAddons = addons?.selected_addons ?? []
 
   const { computeInstance } = getAddons(selectedAddons)
@@ -188,12 +183,8 @@ const InfrastructureActivity = () => {
       </ScaffoldContainer>
       <ScaffoldContainer className="sticky top-0 py-6 border-b bg-background z-10">
         <div className="flex items-center gap-x-4">
-          {/* {readReplicasEnabled && (
-            <DatabaseSelector
-              selectedDatabaseId={selectedDatabaseId}
-              onChangeDatabaseId={setSelectedDatabaseId}
-            />
-          )} */}
+          {/* [Joshen] Metrics for replicas not available yet */}
+          {/* {readReplicasEnabled && <DatabaseSelector />} */}
           {!isLoadingSubscription && (
             <>
               <DateRangePicker

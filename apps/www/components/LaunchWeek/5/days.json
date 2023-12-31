@@ -47,7 +47,7 @@
             "description": "Updated documentation for supabase-js"
           },
           {
-            "title": "Typescript support",
+            "title": "TypeScript support",
             "url": "/docs/reference/javascript/typescript-support",
             "description": "Using types generated directly from your database."
           }

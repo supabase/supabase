@@ -38,6 +38,7 @@ const JsonEditor = ({ value = '', readOnly = false, onInputChange = noop }: Json
         },
         wordWrap: 'on',
         fixedOverflowWidgets: true,
+        lineNumbersMinChars: 4,
       }}
       onMount={onMount}
       onChange={onInputChange}
