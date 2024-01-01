@@ -122,6 +122,7 @@ Push notifications are an important part of any mobile app. They allow you to se
     1. Navigate to the [table editor](https://supabase.com/dashboard/project/_/editor) in your Supabase Dashboard.
     1. In your `notifications` table, insert a new row.
     1. Watch the magic happen 🪄
+
   </TabPanel>
   <TabPanel id="fcm" label="Firebase Cloud Messaging">
     Firebase Cloud Messaging (FCM) is a push notification service offered by Google that allows you to send push notifications to your users' devices on iOS, Android, and Web.
@@ -131,8 +132,8 @@ Push notifications are an important part of any mobile app. They allow you to se
     ## Supabase Setup
 
     We will create two tables. One to store the user's FCM token and a `notifications` table. The edge function will be triggered when a new row is inserted into the `notifications` table and sends a push notification to the user.
-    
-    Run the following SQL to create the tables. 
+
+    Run the following SQL to create the tables.
 
     ```sql
     create table public.profiles (
@@ -257,7 +258,7 @@ Push notifications are an important part of any mobile app. They allow you to se
 
     1. Follow the official [FCM Setup Guide](https://firebase.google.com/docs/cloud-messaging) to set up FCM for your client side application.
     1. Generate a new service account private key from the Firebase console `Project Settings > Service Accounts > Generate new private key`.
-    1. Save the service account private key as `service-account.json` under `supabase/functions` directory. 
+    1. Save the service account private key as `service-account.json` under `supabase/functions` directory.
 
     ## Deploy the function
 
@@ -288,9 +289,6 @@ Push notifications are an important part of any mobile app. They allow you to se
 
   </TabPanel>
 </Tabs>
-
-
-
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
