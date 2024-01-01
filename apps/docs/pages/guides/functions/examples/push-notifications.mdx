@@ -114,7 +114,7 @@ Push notifications are an important part of any mobile app. They allow you to se
     1. Conditions to fire webhook: Select the `notifications` table and tick the `Insert` event.
     1. Webhook configuration: Supabase Edge Functions.
     1. Edge Function: Select the `push` edge function and leave the method as `POST` and timeout as `1000`.
-    1. HTTP Headers: Click "Add new header" > "Add auth header with service key and leave Content-type: `application/json`.
+    1. HTTP Headers: Click "Add new header" > "Add auth header with service key" and leave Content-type: `application/json`.
     1. Click "Create webhook".
 
     ## Send push notification
@@ -126,34 +126,56 @@ Push notifications are an important part of any mobile app. They allow you to se
   <TabPanel id="fcm" label="Firebase Cloud Messaging">
     Firebase Cloud Messaging (FCM) is a push notification service that is completely free to use. 
  
-    This guide will show you how to send push notifications to your Flutter app using FCM, Supabase Edge Functions, and database web hooks.
-
-    ## FCM Setup
-
-    1. Follow the official [FCM Setup Guide](https://firebase.google.com/docs/cloud-messaging) to set up FCM for your client side application.
-    1. Generate a new service account private key from the Firebase console `Project Settings > Service Accounts > Generate new private key`.
-    1. Save the service account private key as `service-account.json` under `supabase/functions` directory. 
+    This guide will show you how to send push notifications to your app when a new row is inserted into a table using FCM, Supabase Edge Functions, and database web hooks.
 
     ## Supabase Setup
+
+    We will create two tables. One to store the user's FCM token and a `notifications` table. The edge function will be triggered when a new row is inserted into the `notifications` table and sends a push notification to the user.
+    
+    Run the following SQL to create the tables. 
+
+    ```sql
+    create table public.profiles (
+      id uuid references auth.users(id) not null primary key,
+      fcm_token text
+    );
+
+    create table public.notifications (
+      id uuid not null default gen_random_uuid(),
+      user_id uuid references auth.users(id) not null,
+      created_at timestamp with time zone not null default now(),
+      body text not null,
+    );
+    ```
+
+    With the tables created, we can now create the edge function that will be triggered by database webhook when a notification is inserted.
+
+    Create the function using the following command:
+    ```bash
+    # Initialize Supabase in your working directory
+    supabase init
+    # Create the push edge function
+    supabase functions new push
+    ```
+
+    Add the following code to `supabase/functions/push/index.ts`:
 
     ```ts supabase/functions/push/index.ts
     import { createClient } from 'npm:@supabase/supabase-js@2'
     import { JWT } from 'npm:google-auth-library@9'
     import serviceAccount from '../service-account.json' with { type: 'json' }
 
-    interface Order {
+    interface Notification {
       id: string
-      profile_id: string
-      name: string
-      price: number
+      user_id: string
+      body: string
     }
 
     interface WebhookPayload {
       type: 'INSERT'
       table: string
-      record: Order
+      record: Notification
       schema: 'public'
-      old_record: null | Order
     }
 
     const supabase = createClient(
@@ -189,8 +211,8 @@ Push notifications are an important part of any mobile app. They allow you to se
             message: {
               token: fcmToken,
               notification: {
-                title: `Order confirmation`,
-                body: `${payload.record.name} purchased for \$${payload.record.price}.00`,
+                title: `Notification from Supabase`,
+                body: payload.record.body,
               },
             },
           }),
@@ -230,6 +252,39 @@ Push notifications are an important part of any mobile app. They allow you to se
       })
     }
     ```
+
+    ## FCM Setup
+
+    1. Follow the official [FCM Setup Guide](https://firebase.google.com/docs/cloud-messaging) to set up FCM for your client side application.
+    1. Generate a new service account private key from the Firebase console `Project Settings > Service Accounts > Generate new private key`.
+    1. Save the service account private key as `service-account.json` under `supabase/functions` directory. 
+
+    ## Deploy the function
+
+    Deploy the function with the following command:
+
+    ```bash
+    # Link your local Supabase project to the remote Supabase project
+    supabase link
+    # Deploy the function
+    supabase functions deploy push --no-verify-jwt
+    ```
+
+    ## Create the database webhook
+
+    Navigate to the [Database Webhooks settings](https://supabase.com/dashboard/project/_/database/hooks) in your Supabase Dashboard.
+
+    1. Enable and create a new hook.
+    1. Conditions to fire webhook: Select the `public.notifications` table and tick the `Insert` event.
+    1. Webhook configuration: Supabase Edge Functions.
+    1. Edge Function: Select the `push` edge function and leave the method as `POST` and timeout as `1000`.
+    1. Click "Create webhook".
+
+    ## Send push notification
+
+    1. Navigate to the [table editor](https://supabase.com/dashboard/project/_/editor) in your Supabase Dashboard.
+    1. In your `notifications` table, insert a new row.
+    1. Watch the magic happen 🪄
 
   </TabPanel>
 </Tabs>
