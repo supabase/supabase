@@ -214,9 +214,13 @@ const NotificationsPopverV2 = () => {
                 <div className="flex flex-col gap-y-4 items-center flex-grow justify-center">
                   <IconInbox size={32} className="text-foreground-light" />
                   <div className="flex flex-col gap-y-1">
-                    <p className="text-foreground-light text-sm w-64 text-center">All caught up</p>
+                    <p className="text-foreground-light text-sm w-64 text-center">
+                      {activeTab === 'archive' ? 'No archived notifications' : 'All caught up'}
+                    </p>
                     <p className="text-foreground-lighter text-sm w-64 text-center">
-                      You will be notified here for any notices on your organizations and projects
+                      {activeTab === 'archive'
+                        ? 'Notifications that you have previously archived will be shown here'
+                        : 'You will be notified here for any notices on your organizations and projects'}
                     </p>
                   </div>
                 </div>
