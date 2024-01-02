@@ -8,7 +8,7 @@ import {
 } from 'common'
 import { useStore } from 'hooks'
 import { GOTRUE_ERRORS, IS_PLATFORM } from './constants'
-import { clearLocalStorage, resetSignInClicks } from './local-storage'
+import { clearLocalStorage } from './local-storage'
 
 export const AuthContext = AuthContextInternal
 
@@ -41,8 +41,6 @@ export function useSignOut() {
   const queryClient = useQueryClient()
 
   return useCallback(async () => {
-    resetSignInClicks()
-
     const result = await gotrueClient.signOut()
     clearLocalStorage()
     await queryClient.clear()
