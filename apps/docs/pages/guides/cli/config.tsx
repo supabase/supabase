@@ -96,7 +96,7 @@ function Info({ parameter }: { parameter: Parameter }) {
                 <p className="text-sm font-bold uppercase">See also</p>
                 <ul>
                   {parameter.links.map((link) => (
-                    <li>
+                    <li key={link.link}>
                       <a href={link.link}>{link.name}</a>
                     </li>
                   ))}

@@ -92,3 +92,6 @@ export interface ResponseError {
   message: string
   requestId?: string
 }
+export interface Dictionary<T> {
+  [Key: string]: T
+}

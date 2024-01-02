@@ -31,7 +31,7 @@ Setting up OAuth with Azure consists of four broad steps:
 
 ![Register an application.](/docs/img/guides/auth-azure/azure-register-app.png)
 
-## Obtain a Client ID and Secret
+## Obtain a client ID and secret
 
 - Once your app has been registered, the client ID can be found under the [list of app registrations](https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps) under the column titled _Application (client) ID_.
 - You can also find it in the app overview screen.
@@ -46,7 +46,7 @@ Setting up OAuth with Azure consists of four broad steps:
 
 ![Obtain the client secret](/docs/img/guides/auth-azure/azure-client-secret.png)
 
-## Guarding Against Unverified Email Domains
+## Guarding against unverified email domains
 
 Microsoft Entra ID can send out unverified email domains in certain cases. This may open up your project to a vulnerability where a malicious user can impersonate already existing accounts on your project.
 
@@ -97,7 +97,7 @@ Configure this in the following way:
   ```
 - Select _Save_ to apply the new configuration.
 
-## Configure a Tenant URL (Optional)
+## Configure a tenant URL (optional)
 
 A Microsoft Entra tenant is the directory of users who are allowed to access your project. This section depends on what your OAuth registration uses for _Supported account types._
 

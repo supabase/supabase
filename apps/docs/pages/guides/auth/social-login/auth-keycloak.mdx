@@ -23,11 +23,11 @@ Keycloak OAuth consists of five broad steps:
 - Obtain the `Secret` from the credentials tab which will be used as the `client secret`.
 - Add the callback url of your application to your allowlist.
 
-## Access your Keycloak Admin console
+## Access your Keycloak admin console
 
 - Login by visiting [`http://localhost:8080`](http://localhost:8080) and clicking on "Administration Console".
 
-## Create a Keycloak Realm
+## Create a Keycloak realm
 
 - Once you've logged in to the Keycloak console, you can add a realm from the side panel. The default realm should be named "Master".
 - After you've added a new realm, you can retrieve the `issuer` from the "OpenID Endpoint Configuration" endpoint. The `issuer` will be used as the `Keycloak URL`.
@@ -35,13 +35,13 @@ Keycloak OAuth consists of five broad steps:
 
 ![Add a Keycloak Realm.](/docs/img/guides/auth-keycloak/keycloak-create-realm.png)
 
-## Create a Keycloak Client
+## Create a Keycloak client
 
 The "Client ID" of the created client will serve as the `client_id` when you make API calls to authenticate the user.
 
 ![Add a Keycloak client](/docs/img/guides/auth-keycloak/keycloak-add-client.png)
 
-## Client Settings
+## Client settings
 
 After you've created the client successfully, ensure that you set the following settings:
 
@@ -52,7 +52,7 @@ After you've created the client successfully, ensure that you set the following 
 ![Obtain the client id, set the client protocol and access type](/docs/img/guides/auth-keycloak/keycloak-client-id.png)
 ![Set redirect uri](/docs/img/guides/auth-keycloak/keycloak-redirect-uri.png)
 
-## Obtain the Client Secret
+## Obtain the client secret
 
 This will serve as the `client_secret` when you make API calls to authenticate the user.
 Under the "Credentials" tab, the `Secret` value will be used as the `client secret`.

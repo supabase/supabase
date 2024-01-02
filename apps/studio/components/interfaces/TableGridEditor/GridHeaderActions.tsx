@@ -37,7 +37,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   const { ref } = useParams()
   const { project } = useProjectContext()
   const realtimeEnabled = useIsFeatureEnabled('realtime:all')
-  const roleImpersonationEnabledFlag = useFlag('roleImpersonation')
+
   const { ui, meta } = useStore()
   const queryClient = useQueryClient()
 
@@ -230,7 +230,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
           </>
         )}
 
-        {roleImpersonationEnabledFlag && <RoleImpersonationPopover serviceRoleLabel="postgres" />}
+        <RoleImpersonationPopover serviceRoleLabel="postgres" />
 
         {realtimeEnabled && (
           <Button
