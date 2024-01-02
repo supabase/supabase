@@ -59,7 +59,7 @@ const onFilterTables = (
 }
 
 const AuthPoliciesPage: NextPageWithLayout = () => {
-  const { search } = useParams()
+  const { search, schema } = useParams()
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
   const [searchString, setSearchString] = useState<string>('')
@@ -72,6 +72,10 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
     if (search) setSearchString(search)
   }, [search])
 
+  useEffect(() => {
+    if (schema) snap.setSelectedSchemaName(schema)
+  }, [schema])
+
   const { data: schemas } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -79,8 +83,8 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   const [protectedSchemas] = partition(schemas, (schema) =>
     EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
   )
-  const schema = schemas?.find((schema) => schema.name === snap.selectedSchemaName)
-  const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
+  const selectedSchema = schemas?.find((schema) => schema.name === snap.selectedSchemaName)
+  const isLocked = protectedSchemas.some((s) => s.id === selectedSchema?.id)
 
   const { data: policies } = useDatabasePoliciesQuery({
     projectRef: project?.ref,
