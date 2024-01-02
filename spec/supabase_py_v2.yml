@@ -322,7 +322,7 @@ functions:
         isSpotlight: true
         code: |
           ```py
-          res = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+          res = await supabase.auth.mfa.get_authenticator_assurance_level()
           # Response has the following structure { current_level, next_level, current_authentication_methods }
           ```
   - id: get-user
