@@ -190,7 +190,7 @@ select
 (1 row)
 ```
 
-## Analyzing Responses
+## Analyzing responses
 
 Waiting requests are stored in the `net.http_request_queue` table. Upon execution, they are deleted.
 
@@ -230,9 +230,9 @@ select * from net._http_response;
 
 The data can also be observed in the `net` schema with the [Supabase Dashboard's SQL Editor](https://supabase.com/dashboard/project/_/editor)
 
-## Debugging Requests:
+## Debugging requests
 
-### Inspecting Request Data
+### Inspecting request data
 
 The [Postman Echo API](https://documenter.getpostman.com/view/5025623/SWTG5aqV) returns a response with the same body and content
 as the request. It can be used to inspect the data being sent.
@@ -281,7 +281,7 @@ begin
         ) as request_id;
 
     -- Optionally Log row data or other data for inspection in Supabase Dashboard's Postgres Logs
-    -- (https://supabase.com/dashboard/project/<PROJECT REFERENCE ID>/logs/postgres-logs)
+    -- (https://supabase.com/dashboard/project/_/logs/postgres-logs)
     raise log 'Logging an entire row as JSON (%)', row_data_var;
 
     -- return the row data to inspect
@@ -297,7 +297,7 @@ $$ language plpgsql;
 select debugging_example(<row_id>);
 ```
 
-### Inspecting Failed Requests
+### Inspecting failed requests
 
 Finds all failed requests
 
@@ -319,7 +319,7 @@ See the [self-hosting docs](/docs/guides/hosting/overview#configuration) for sel
 
 The extension is configured to execute up to 200 requests per second reliably. The response messages are stored for only 6 hours to prevent needless buildup. The default behavior can be modified by rewriting config variables.
 
-### Get Current Settings
+### Get current settings
 
 ```sql
 select
@@ -329,7 +329,7 @@ from pg_settings
 where "name" like 'pg_net%';
 ```
 
-### Alter Settings
+### Alter settings
 
 Note, that doing `ALTER SYSTEM` requires SUPERUSER but on PostgreSQL >= 15, you can do:
 
@@ -366,7 +366,7 @@ select
     ) as request_id;
 ```
 
-### Call an Endpoint Every Minute with [pg_cron](https://supabase.com/docs/guides/database/extensions/pgcron)
+### Call an endpoint every minute with [pg_cron](https://supabase.com/docs/guides/database/extensions/pgcron)
 
 The pg_cron extension enables PostgreSQL to become its own cron server. With it you can schedule regular calls with up to a minute precision to endpoints.
 
@@ -417,7 +417,7 @@ create trigger <trigger_name>
     execute function <function_name>();
 ```
 
-### Send Multiple Table Rows in One Request
+### Send multiple table rows in one request
 
 ```sql
 with "selected_table_rows" as (
@@ -437,7 +437,7 @@ FROM "selected_table_rows";
 
 More examples can be seen in the [Extension's GitHub page](https://github.com/supabase/pg_net/)
 
-## Limitations:
+## Limitations
 
 - To improve speed and performance, the requests and responses are stored in [unlogged tables](https://pgpedia.info/u/unlogged-table.html), which are not preserved during a crash or unclean shutdown.
 - By default, response data is saved for only 6 hours
