@@ -74,7 +74,7 @@ supabase:
     webhook_handler: 'lib/webhooks.dart'
 ```
 
-## Using Supabase Client
+## Using Supabase client
 
 Now let’s try to interact with our Supabase database. We will start by installing the dependencies.
 
@@ -92,7 +92,7 @@ We also need to use a special HTTP client to HTTP requests in the edge environme
 dart pub add edge_http_client
 ```
 
-### Initialize SupabaseClient
+### Initialize `SupabaseClient`
 
 At this point, you can initialize a `SupabaseClient` by passing the [EdgeHttpClient](https://pub.dev/packages/edge_http_client). We can access the Supabase credentials through the [environment variables](https://supabase.com/docs/guides/functions/secrets) using `Deno.env.get()` method. Note that [Supabase credentials are available by default](https://supabase.com/docs/guides/functions/secrets), so no configurations are necessary.
 

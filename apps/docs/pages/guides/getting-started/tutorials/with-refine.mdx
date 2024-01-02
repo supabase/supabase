@@ -29,7 +29,7 @@ It is possible to customize the `authProvider` for Supabase and as we'll see bel
 
 <ProjectSetup />
 
-## Building the App
+## Building the app
 
 Let's start building the refine app from scratch.
 
@@ -63,7 +63,7 @@ We should have a running instance of the app with a Welcome page at `http://loca
 
 Let's move ahead to understand the generated code now.
 
-### refine `supabaseClient`
+### Refine `supabaseClient`
 
 The `create refine-app` generated a Supabase client for us in the `src/utility/supabaseClient.ts` file. It has two constants: `SUPABASE_URL` and `SUPABASE_KEY`. We want to replace them as `supabaseUrl` and `supabaseAnonKey` respectively and assign them our own Supabase server's values.
 
@@ -273,7 +273,7 @@ const authProvider: AuthBindings = {
 export default authProvider
 ```
 
-### Set up a Login component
+### Set up a login component
 
 We have chosen to use the headless refine core package that comes with no supported UI framework. So, let's set up a plain React component to manage logins and sign ups.
 

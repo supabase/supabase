@@ -17,7 +17,7 @@ This submodule provides convenience helpers for implementing user authentication
 
 ## Configuration
 
-### Install SvelteKit Auth Helpers library
+### Install SvelteKit Auth helpers library
 
 This library supports Node.js `^16.15.0`.
 
@@ -25,7 +25,7 @@ This library supports Node.js `^16.15.0`.
 npm install @supabase/auth-helpers-sveltekit @supabase/supabase-js
 ```
 
-### Declare Environment Variables
+### Declare environment variables
 
 Retrieve your project's URL and anon key from your [API settings](https://supabase.com/dashboard/project/_/settings/api), and create a `.env.local` file with the following environment variables:
 
@@ -35,7 +35,7 @@ PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ```
 
-### Creating a Supabase Client
+### Creating a Supabase client
 
 <Tabs
   scrollable
@@ -128,7 +128,7 @@ Note that we are specifying filterSerializedResponseHeaders here. We need to tel
 
 </Admonition>
 
-### Code Exchange Route
+### Code Exchange route
 
 The `Code Exchange` route is required for the [server-side auth flow](https://supabase.com/docs/guides/auth/server-side-rendering) implemented by the SvelteKit Auth Helpers. It exchanges an auth `code` for the user's `session`, which is set as a cookie for future requests made to Supabase.
 
@@ -254,7 +254,7 @@ export const load = async ({ locals: { getSession } }) => {
 </TabPanel>
 </Tabs>
 
-#### Shared Load functions and pages
+#### Shared load functions and pages
 
 To utilize Supabase in shared load functions and within pages, it is essential to create a Supabase client in the root layout load.
 
@@ -366,7 +366,7 @@ We need to create an event listener in the root `+layout.svelte` file in order t
 
 The usage of `invalidate` tells SvelteKit that the root `+layout.ts` load function should be executed whenever the session updates to keep the page store in sync.
 
-#### Sign in / Sign up / Sign out
+#### Sign in / sign up / sign out
 
 We can access the supabase instance in our `+page.svelte` file through the data object.
 
@@ -544,7 +544,7 @@ export const GET = async ({ locals: { supabase, getSession } }) => {
 
 If you visit `/api/protected-route` without a valid session cookie, you will get a 401 response.
 
-### Protecting Actions
+### Protecting actions
 
 Wrap an Action to check that the user has a valid session. If they're not logged in the session is `null`.
 
@@ -827,11 +827,11 @@ export const actions = {
 }
 ```
 
-## Migration Guide [#migration]
+## Migration guide [#migration]
 
 ### Migrate to 0.10
 
-#### PKCE Auth Flow
+#### PKCE Auth flow
 
 Proof Key for Code Exchange (PKCE) is the new server-side auth flow implemented by the SvelteKit Auth Helpers. It requires a server endpoint for `/auth/callback` that exchanges an auth `code` for the user's `session`.
 
@@ -1422,7 +1422,7 @@ declare namespace App {
 </TabPanel>
 </Tabs>
 
-#### withPageAuth [#migration-with-page-auth-0-8]
+#### `withPageAuth` [#migration-with-page-auth-0-8]
 
 <Tabs
   scrollable
@@ -1501,7 +1501,7 @@ export const load: PageLoad = async (event) => {
 </TabPanel>
 </Tabs>
 
-#### withApiAuth [#migration-with-api-auth-0-8]
+#### `withApiAuth` [#migration-with-api-auth-0-8]
 
 <Tabs
   scrollable
@@ -1818,7 +1818,7 @@ declare namespace App {
 </TabPanel>
 </Tabs>
 
-#### withPageAuth
+#### `withPageAuth`
 
 <Tabs
   scrollable
@@ -1895,7 +1895,7 @@ export const load: PageLoad = withAuth(async ({ session, getSupabaseClient }) =>
 </TabPanel>
 </Tabs>
 
-#### withApiAuth
+#### `withApiAuth`
 
 <Tabs
   scrollable
@@ -1960,7 +1960,7 @@ export const GET: RequestHandler = withAuth(async ({ session, getSupabaseClient 
 </TabPanel>
 </Tabs>
 
-## Additional Links
+## Additional links
 
 - [Auth Helpers Source code](https://github.com/supabase/auth-helpers)
 - [SvelteKit example](https://github.com/supabase/auth-helpers/tree/main/examples/sveltekit)

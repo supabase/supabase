@@ -121,7 +121,7 @@ const { data, error } = await supabase.from('users').select('user_id, name')
 // Still => { id: 'd0714948', name: 'Jane' }
 ```
 
-### How It Works
+### How it works
 
 1. A user signs up. Supabase creates a new user in the `auth.users` table.
 2. Supabase returns a new JWT, which contains the user's `UUID`.
@@ -131,7 +131,7 @@ const { data, error } = await supabase.from('users').select('user_id, name')
 
 Supabase provides a special function in Postgres, `auth.uid()`, which extracts the user's UID from the JWT. This is especially useful when creating policies.
 
-## User Management
+## User management
 
 Supabase provides multiple endpoints to authenticate and manage your users:
 

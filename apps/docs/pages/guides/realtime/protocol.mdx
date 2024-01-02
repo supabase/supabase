@@ -100,7 +100,7 @@ The heartbeat message should be sent every 30 seconds to avoid a connection time
 }
 ```
 
-## Access Token
+## Access token
 
 To update the access token, you need to send to the server a message specifying a new token in the `payload.access_token` value.
 
@@ -161,7 +161,7 @@ Structure of the broadcast event
 
 The Presence events allow clients to monitor the online status of other clients in real-time.
 
-### State Update
+### State update
 
 After joining, the server sends a `presence_state` message to a client with presence information. The payload field contains keys in UUID format, where each key represents a client and its value is a JSON object containing information about that client.
 
@@ -176,7 +176,7 @@ After joining, the server sends a `presence_state` message to a client with pres
 }
 ```
 
-### Diff Update
+### Diff update
 
 After a change to the presence state, such as a client joining or leaving, the server sends a presence_diff message to update the client's view of the presence state. The payload field contains two keys, `joins` and `leaves`, which represent clients that have joined and left, respectively. The values associated with each key are UUIDs of the clients.
 

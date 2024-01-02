@@ -14,13 +14,13 @@ Custom Postgres Config gives you advanced control over your database. Using it t
 
 </Admonition>
 
-## Custom Postgres Config
+## Custom Postgres config
 
 While most Postgres parameters can be configured from [within SQL](https://www.postgresql.org/docs/current/config-setting.html#CONFIG-SETTING-SQL-COMMAND-INTERACTION), some parameters must either be set using a config file, or require superuser access. Custom Postgres Config allows you to configure such parameters.
 
 From the perspective of Postgres, config overrides will show up in the global configuration file. Role or database specific configuration could override them for some scenarios; please refer to the [Postgres docs](https://www.postgresql.org/docs/current/) on each parameter for additional details.
 
-### Supported Parameters
+### Supported parameters
 
 The following parameters are available for overrides:
 
@@ -74,7 +74,7 @@ export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
 export default Page
 
-## Pooler Config
+## Pooler config
 
 You can also [customize some parameters](https://supabase.com/dashboard/project/_/settings/database) for the Connection Pooler:
 

@@ -135,7 +135,7 @@ services:
 
   rest:
     container_name: supabase-rest
-    image: postgrest/postgrest:v11.2.2
+    image: postgrest/postgrest:v12.0.1
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -338,7 +338,7 @@ services:
   # Comment out everything below this point if you are using an external Postgres database
   db:
     container_name: supabase-db
-    image: supabase/postgres:15.1.0.117
+    image: supabase/postgres:15.1.0.147
     healthcheck:
       test: pg_isready -U postgres -h localhost
       interval: 5s

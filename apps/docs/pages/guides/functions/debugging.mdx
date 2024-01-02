@@ -7,7 +7,7 @@ export const meta = {
   subtitle: 'Debugging tips and Edge Function limitations.',
 }
 
-## Logs & Debugging
+## Logs & debugging
 
 Logs are provided for each function invocation, locally and in production.
 
@@ -70,13 +70,13 @@ There are two debugging tools available: Invocations and Logs. Invocations shows
 - Search the [Edge Runtime](https://github.com/supabase/edge-runtime) and [CLI](https://github.com/supabase/cli) repos for the error message, to see if it has been reported before.
 - If the output from the commands above does not help you to resolve the issue, please open a support ticket via the Supabase Dashboard (by clicking the "Help" button at the top right) and include all output and details about your commands.
 
-## Advanced Techniques
+## Advanced techniques
 
-### Checking Function Boot Time
+### Checking function boot time
 
 Check the logs for the function. In the logs, look for a "Booted" event and note the reported boot time. If available, click on the event to access more details, including the regions from where the function was served. Investigate if the boot time is excessively high (longer than 1 second) and note any patterns or regions where it occurs.
 
-### Finding Bundle Size
+### Finding bundle size
 
 To find the bundle size of a function, run the following command locally:
 
@@ -86,7 +86,7 @@ deno info /path/to/function/index.ts
 
 Look for the "size" field in the output which represents the approximate bundle size of the function.You can find the accurate bundle size when you deploy your function via Supabase CLI. If the function is part of a larger application, consider examining the bundle size of the specific function independently.
 
-### Analyze Dependencies
+### Analyze dependencies
 
 Run `deno info`, providing the path to your input map if you use one.
 Review the dependencies listed in the output. Pay attention to any significantly large dependencies, as they can contribute to increased bundle size and potential boot time issues.

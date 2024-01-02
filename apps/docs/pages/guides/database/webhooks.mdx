@@ -12,7 +12,7 @@ Database Webhooks allow you to send real-time data from your database to another
 
 You can hook into three table events: `INSERT`, `UPDATE`, and `DELETE`. All events are fired _after_ a database row is changed.
 
-## Webhooks vs Triggers
+## Webhooks vs triggers
 
 Database Webhooks are very similar to triggers, and that's because Database Webhooks are just a convenience wrapper around triggers using the [pg_net](/docs/guides/database/extensions/pgnet) extension. This extension is asynchronous, and therefore will not block your database changes for long-running network requests.
 
