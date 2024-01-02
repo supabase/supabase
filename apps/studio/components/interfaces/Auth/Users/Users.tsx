@@ -119,7 +119,7 @@ const Users = () => {
             size="tiny"
             icon={<IconRefreshCw />}
             type="default"
-            loading={isLoading || isRefetching}
+            loading={isRefetching && !isFetchingNextPage}
             onClick={() => refetch()}
           >
             Reload
