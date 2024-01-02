@@ -1,10 +1,10 @@
+import dayjs from 'dayjs'
 import { Badge } from 'ui'
 
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 import Table from 'components/to-be-cleaned/Table'
 import { User } from 'data/auth/users-query'
 import UserDropdown from './UserDropdown'
-import { getDateFromIsoString } from './Users.utils'
 import { getDisplayName } from './UserListItem.utils'
 
 interface UserListItemProps {
@@ -15,8 +15,8 @@ interface UserListItemProps {
 
 const UserListItem = ({ user, canRemoveUser, canRemoveMFAFactors }: UserListItemProps) => {
   const isUserConfirmed = user.email_confirmed_at || user.phone_confirmed_at
-  const createdAt = getDateFromIsoString(user.created_at)
-  const lastSignedIn = getDateFromIsoString(user.last_sign_in_at)
+  const createdAt = dayjs(user.created_at)
+  const lastSignedIn = dayjs(user.last_sign_in_at)
 
   return (
     <Table.tr className="relative" key={user.id}>
