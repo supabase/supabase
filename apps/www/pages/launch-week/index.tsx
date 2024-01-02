@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
@@ -9,10 +10,17 @@ import supabase from '~/lib/supabaseMisc'
 import FaviconImports from '~/components/LaunchWeek/X/FaviconImports'
 import DefaultLayout from '~/components/Layouts/Default'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
-import TicketingFlow from '~/components/LaunchWeek/X/Ticket/TicketingFlow'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import LaunchWeekPrizeSection from '~/components/LaunchWeek/X/LaunchWeekPrizeSection'
-import LWXMeetups, { Meetup } from '~/components/LaunchWeek/X/LWXMeetups'
+import { Meetup } from '~/components/LaunchWeek/X/LWXMeetups'
+import LWXStickyNav from '~/components/LaunchWeek/X/Releases/LWXStickyNav'
+import LWXHeader from '~/components/LaunchWeek/X/Releases/LWXHeader'
+import MainStage from '~/components/LaunchWeek/X/Releases/MainStage'
+
+const BuildStage = dynamic(() => import('~/components/LaunchWeek/X/Releases/BuildStage'))
+const LWXMeetups = dynamic(() => import('~/components/LaunchWeek/X/LWXMeetups'))
+const LaunchWeekPrizeSection = dynamic(
+  () => import('~/components/LaunchWeek/X/LaunchWeekPrizeSection')
+)
 
 interface Props {
   meetups?: Meetup[]
@@ -22,8 +30,7 @@ export default function LaunchWeekIndex({ meetups }: Props) {
   const { query } = useRouter()
 
   const TITLE = 'Supabase Launch Week X | 11-15 December 2023'
-  const DESCRIPTION =
-    'Claim your ticket for a chance to win Supabase swag and join us for a week of announcing new features.'
+  const DESCRIPTION = 'Join us for a week of announcing new features, every day at 8 AM PT.'
   const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/lwx/lwx-og.jpg`
 
   const ticketNumber = query.ticketNumber?.toString()
@@ -106,8 +113,11 @@ export default function LaunchWeekIndex({ meetups }: Props) {
         }}
       >
         <DefaultLayout>
-          <TicketingFlow />
-          <SectionContainer id="meetups" className="!pt-4 scroll-mt-[66px]">
+          <LWXStickyNav />
+          <LWXHeader />
+          <MainStage />
+          <BuildStage />
+          <SectionContainer id="meetups" className="scroll-mt-[66px]">
             <LWXMeetups meetups={meetups} />
           </SectionContainer>
           <SectionContainer className="lg:pb-40">

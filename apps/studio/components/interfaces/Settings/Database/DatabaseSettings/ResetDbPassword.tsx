@@ -1,7 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import generator from 'generate-password'
+import generator from 'generate-password-browser'
 import { debounce } from 'lodash'
 import { useEffect, useRef, useState } from 'react'
 import { Button, Input, Modal } from 'ui'

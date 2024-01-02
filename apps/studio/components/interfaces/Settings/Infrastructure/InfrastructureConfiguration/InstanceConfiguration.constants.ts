@@ -1,15 +1,5 @@
 import { AWS_REGIONS, AWS_REGIONS_KEYS } from 'lib/constants'
 
-export interface DatabaseConfiguration {
-  id: number
-  type: 'PRIMARY' | 'READ_REPLICA'
-  cloud_provider: 'AWS' | 'FLY'
-  region: string
-  size: string
-  status: string
-  inserted_at: string
-}
-
 export interface Region {
   key: AWS_REGIONS_KEYS
   name: string
@@ -18,84 +8,9 @@ export interface Region {
 }
 
 // ReactFlow is scaling everything by the factor of 2
-export const NODE_WIDTH = 560
+export const NODE_WIDTH = 660
 export const NODE_ROW_HEIGHT = 50
 export const NODE_SEP = 20
-
-export const MOCK_DATABASES: DatabaseConfiguration[] = [
-  {
-    id: 1,
-    type: 'PRIMARY',
-    cloud_provider: 'AWS',
-    region: 'ap-southeast-1b',
-    size: 't4g.micro',
-    status: 'ACTIVE_HEALTHY',
-    inserted_at: '2023-11-01 06:47:46.837002',
-  },
-  {
-    id: 2,
-    type: 'READ_REPLICA',
-    cloud_provider: 'AWS',
-    region: 'ap-northeast-1',
-    size: 't4g.micro',
-    status: 'ACTIVE_HEALTHY',
-    inserted_at: '2023-11-01 06:47:46.837002',
-  },
-  {
-    id: 3,
-    type: 'READ_REPLICA',
-    cloud_provider: 'AWS',
-    region: 'ap-southeast-1b',
-    size: 't4g.micro',
-    status: 'ACTIVE_HEALTHY',
-    inserted_at: '2023-11-01 06:47:46.837002',
-  },
-  {
-    id: 4,
-    type: 'READ_REPLICA',
-    cloud_provider: 'AWS',
-    region: 'ap-northeast-2',
-    size: 't4g.micro',
-    status: 'ACTIVE_HEALTHY',
-    inserted_at: '2023-11-01 06:47:46.837002',
-  },
-  {
-    id: 5,
-    type: 'READ_REPLICA',
-    cloud_provider: 'AWS',
-    region: 'eu-central-1',
-    size: 't4g.micro',
-    status: 'ACTIVE_HEALTHY',
-    inserted_at: '2023-11-01 06:47:46.837002',
-  },
-  {
-    id: 6,
-    type: 'READ_REPLICA',
-    cloud_provider: 'AWS',
-    region: 'eu-central-1',
-    size: 't4g.micro',
-    status: 'ACTIVE_HEALTHY',
-    inserted_at: '2023-11-01 06:47:46.837002',
-  },
-  {
-    id: 7,
-    type: 'READ_REPLICA',
-    cloud_provider: 'AWS',
-    region: 'ap-southeast-1',
-    size: 't4g.micro',
-    status: 'ACTIVE_HEALTHY',
-    inserted_at: '2023-11-01 06:47:46.837002',
-  },
-  {
-    id: 8,
-    type: 'READ_REPLICA',
-    cloud_provider: 'AWS',
-    region: 'ap-southeast-1',
-    size: 't4g.micro',
-    status: 'ACTIVE_HEALTHY',
-    inserted_at: '2023-11-01 06:47:46.837002',
-  },
-]
 
 // [Joshen] Coordinates from https://github.com/jsonmaur/aws-regions/issues/11
 const AWS_REGIONS_COORDINATES: { [key: string]: [number, number] } = {
@@ -113,7 +28,7 @@ const AWS_REGIONS_COORDINATES: { [key: string]: [number, number] } = {
   SOUTH_AMERICA: [-46.38, -23.34],
 }
 
-const AWS_REGIONS_VALUES: { [key: string]: string } = {
+export const AWS_REGIONS_VALUES: { [key: string]: string } = {
   SOUTHEAST_ASIA: 'ap-southeast-1',
   NORTHEAST_ASIA: 'ap-northeast-1',
   NORTHEAST_ASIA_2: 'ap-northeast-2',

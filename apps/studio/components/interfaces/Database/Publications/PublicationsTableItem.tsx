@@ -5,7 +5,10 @@ import { useState } from 'react'
 import { Badge, Toggle } from 'ui'
 
 import Table from 'components/to-be-cleaned/Table'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks'
+import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import toast from 'react-hot-toast'
 
 interface PublicationsTableItemProps {
   table: PostgresTable
@@ -13,10 +16,9 @@ interface PublicationsTableItemProps {
 }
 
 const PublicationsTableItem = ({ table, selectedPublication }: PublicationsTableItemProps) => {
-  const { ui, meta } = useStore()
+  const { project } = useProjectContext()
   const enabledForAllTables = selectedPublication.tables == null
 
-  const [loading, setLoading] = useState(false)
   const [checked, setChecked] = useState(
     selectedPublication.tables?.find((x: any) => x.id == table.id) != undefined
   )
@@ -26,13 +28,16 @@ const PublicationsTableItem = ({ table, selectedPublication }: PublicationsTable
     'publications'
   )
 
+  const { mutate: updatePublications, isLoading } = useDatabasePublicationUpdateMutation()
+
   const toggleReplicationForTable = async (
     table: PostgresTable,
     publication: PostgresPublication
   ) => {
+    if (project === undefined) return console.error('Project is required')
+
     const originalChecked = checked
     setChecked(!checked)
-    setLoading(true)
 
     const publicationTables = publication?.tables ?? []
     const exists = publicationTables.some((x: any) => x.id == table.id)
@@ -44,20 +49,25 @@ const PublicationsTableItem = ({ table, selectedPublication }: PublicationsTable
           .filter((x: any) => x.id != table.id)
           .map((x: any) => `${x.schema}.${x.name}`)
 
-    try {
-      const id = publication.id
-      const payload = { tables, id }
-      const { error } = await meta.publications.update(id, payload)
-      if (error) throw error
-      setLoading(false)
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to toggle replication for ${table.name}: ${error.message}`,
-      })
-      setChecked(originalChecked)
-      setLoading(false)
-    }
+    updatePublications(
+      {
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        id: publication.id,
+        tables,
+      },
+      {
+        onSuccess: () => {
+          toast.success(
+            `Successfully ${checked ? 'disabled' : 'enabled'} replication for ${table.name}`
+          )
+        },
+        onError: (error) => {
+          toast.error(`Failed to toggle replication for ${table.name}: ${error.message}`)
+          setChecked(originalChecked)
+        },
+      }
+    )
   }
 
   return (
@@ -78,7 +88,7 @@ const PublicationsTableItem = ({ table, selectedPublication }: PublicationsTable
             <Toggle
               size="tiny"
               align="right"
-              disabled={!canUpdatePublications || loading}
+              disabled={!canUpdatePublications || isLoading}
               className="m-0 ml-2 mt-1 -mb-1 p-0"
               checked={checked}
               onChange={() => toggleReplicationForTable(table, selectedPublication)}

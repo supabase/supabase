@@ -57,7 +57,7 @@ const SchemaFlowHandler = ({ content }: SchemaGraphProps) => {
 
   return (
     <>
-      <div className={cn('h-full grow')}>
+      <div className="h-full grow fade-in">
         <ReactFlow
           defaultNodes={[]}
           defaultEdges={[]}

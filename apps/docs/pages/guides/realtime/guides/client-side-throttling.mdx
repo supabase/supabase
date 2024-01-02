@@ -66,11 +66,11 @@ By default the Supabase clients throttles messages to 10 messages per-second (1 
 
 Each client has their own throttling behavior. If you instantiate two clients, by default you would send 20 messages per-second to your project.
 
-## Project Quotas
+## Project quotas
 
 Each Broadcast and Presence message counts towards your [Project Quotas](/docs/guides/realtime/quotas).
 
-It's common to unintentionally flood the Realtime service with messages. For example, tracking mouse movents without throttling would send hundreds of events per second. It's rare that you need so many messages. Updating a mouse movement even a few times per second is usually enough for the human eye.
+It's common to unintentionally flood the Realtime service with messages. For example, tracking mouse movements without throttling would send hundreds of events per second. It's rare that you need so many messages. Updating a mouse movement even a few times per second is usually enough for the human eye.
 
 The throttling parameter protects against these unintended floods.
 

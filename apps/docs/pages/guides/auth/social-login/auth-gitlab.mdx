@@ -27,7 +27,7 @@ Setting up GitLab logins for your application consists of 3 parts:
 
 <SocialProviderSetup provider="GitLab" />
 
-## Create your GitLab Application
+## Create your GitLab application
 
 - Click on your `profile logo` (avatar) in the top-right corner.
 - Select `Edit profile`.
@@ -39,7 +39,7 @@ Setting up GitLab logins for your application consists of 3 parts:
 - Click `Save Application` at the bottom.
 - Copy and save your `Application ID` (`client_id`) and `Secret` (`client_secret`) which you'll need later.
 
-## Add your GitLab credentials into your Supabase Project
+## Add your GitLab credentials into your Supabase project
 
 <SocialProviderSettingsSupabase provider="GitLab" />
 
@@ -67,11 +67,11 @@ async function signInWithGitLab() {
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
-When your user signs in, call [loginWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Gitlab` as the `Provider`:
+When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Gitlab` as the `Provider`:
 
 ```kotlin
 suspend fun signInWithGitLab() {
-	supabase.gotrue.loginWith(Gitlab)
+	supabase.auth.signInWith(Gitlab)
 }
 ```
 
@@ -102,7 +102,7 @@ When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) t
 
 ```kotlin
 suspend fun signOut() {
-	supabase.gotrue.logout()
+	supabase.auth.signOut()
 }
 ```
 

@@ -5,10 +5,10 @@ import { useState } from 'react'
 
 import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useProjectsQuery } from 'data/projects/projects-query'
+import { ProjectInfo, useProjectsQuery } from 'data/projects/projects-query'
 import { useIsFeatureEnabled, useSelectedOrganization, useSelectedProject } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
-import { Organization, Project } from 'types'
+import { Organization } from 'types'
 import {
   Button,
   CommandEmpty_Shadcn_,
@@ -53,7 +53,7 @@ const ProjectLink = ({
   project,
   setOpen,
 }: {
-  project: Project
+  project: ProjectInfo
   organization?: Organization
   setOpen: (value: boolean) => void
 }) => {

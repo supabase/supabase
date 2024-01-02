@@ -15,5 +15,5 @@ export default function RowRenderer(key: Key, props: RenderRowProps<SupaRow>) {
     })
   }
 
-  return <Row {...props} onContextMenu={displayMenu} />
+  return <Row key={key} {...props} onContextMenu={displayMenu} />
 }

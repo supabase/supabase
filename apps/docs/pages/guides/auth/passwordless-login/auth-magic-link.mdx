@@ -70,7 +70,7 @@ Read the [Deep Linking Documentation](/docs/guides/auth/native-mobile-deep-linki
 </TabPanel>
 <TabPanel id="dart" label="Dart">
 
-To start the sign in process call [signIn()](/docs/reference/dart/auth-signinwithotp) with their email address:
+When your user signs in, call [signIn()](/docs/reference/dart/auth-signinwithotp) with their email address:
 
 ```dart
 Future<void> signInWithEmail() async {
@@ -81,11 +81,11 @@ Future<void> signInWithEmail() async {
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
-To start the sign in process call [sendOtpTo()](/docs/reference/kotlin/auth-signinwithotp) with their email address:
+To start the sign in process call [signInWith(OTP)](/docs/reference/kotlin/auth-signinwithotp) with their email address:
 
 ```kotlin
-suspend fun loginWithEmail() {
-	supabase.gotrue.sendOtpTo(Email) {
+suspend fun signInWithEmail() {
+	supabase.auth.signInWith(OTP) {
 		email = "example@email.com"
 	}
 }
@@ -128,7 +128,7 @@ When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) t
 
 ```kotlin
 suspend fun logout() {
-	supabase.gotrue.logout()
+	supabase.auth.signOut()
 }
 ```
 

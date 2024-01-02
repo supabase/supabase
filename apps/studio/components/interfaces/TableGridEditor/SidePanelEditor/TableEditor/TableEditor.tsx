@@ -1,13 +1,15 @@
-import type { PostgresTable, PostgresType } from '@supabase/postgres-meta'
+import type { PostgresTable } from '@supabase/postgres-meta'
 import { isEmpty, isUndefined, noop } from 'lodash'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
+import { usePostgresTypesQuery } from 'data/database/types-query'
 import { useIsFeatureEnabled, useStore } from 'hooks'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { Alert, Badge, Button, Checkbox, IconBookOpen, Input, Modal, SidePanel } from 'ui'
 import { SpreadsheetImport } from '../'
@@ -55,16 +57,24 @@ const TableEditor = ({
   updateEditorDirty = noop,
 }: TableEditorProps) => {
   const snap = useTableEditorStateSnapshot()
-  const { ui, meta } = useStore()
+  const { ui } = useStore()
   const { project } = useProjectContext()
   const isNewRecord = isUndefined(table)
-
   const realtimeEnabled = useIsFeatureEnabled('realtime:all')
 
-  const enumTypes = meta.types.list((type: PostgresType) => !EXCLUDED_SCHEMAS.includes(type.schema))
+  const { data: types } = usePostgresTypesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const enumTypes = (types ?? []).filter(
+    (type) => !EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS.includes(type.schema)
+  )
 
-  const publications = meta.publications.list()
-  const realtimePublication = publications.find(
+  const { data: publications } = useDatabasePublicationsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const realtimePublication = (publications ?? []).find(
     (publication) => publication.name === 'supabase_realtime'
   )
   const realtimeEnabledTables = realtimePublication?.tables ?? []

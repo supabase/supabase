@@ -1,4 +1,4 @@
-import { Dictionary } from 'components/grid'
+import { Dictionary } from 'types'
 import { ColumnField } from '../SidePanelEditor.types'
 
 export interface TableField {

@@ -1,28 +1,45 @@
-import { MOCK_DATABASES } from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
+
+import { useParams } from 'common'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { formatDatabaseID, formatDatabaseRegion } from 'data/read-replicas/replicas.utils'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
-  Popover_Shadcn_,
-  PopoverTrigger_Shadcn_,
   Button,
-  IconChevronDown,
-  PopoverContent_Shadcn_,
-  Command_Shadcn_,
-  CommandList_Shadcn_,
   CommandGroup_Shadcn_,
-  ScrollArea,
   CommandItem_Shadcn_,
+  CommandList_Shadcn_,
+  Command_Shadcn_,
   IconCheck,
+  IconChevronDown,
+  IconPlus,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
+  ScrollArea,
+  cn,
 } from 'ui'
 
 interface DatabaseSelectorProps {
-  selectedDatabaseId: string
-  onChangeDatabaseId: (id: string) => void
+  variant?: 'regular' | 'connected-on-right' | 'connected-on-left' | 'connected-on-both'
 }
 
-const DatabaseSelector = ({ selectedDatabaseId, onChangeDatabaseId }: DatabaseSelectorProps) => {
+const DatabaseSelector = ({ variant = 'regular' }: DatabaseSelectorProps) => {
+  const router = useRouter()
+  const { ref: projectRef } = useParams()
   const [open, setOpen] = useState(false)
-  const databases = MOCK_DATABASES.sort((a, b) => (a.id > b.id ? 1 : -1))
-  const selectedDatabase = databases.find((db) => db.id.toString() === selectedDatabaseId)
+
+  const state = useDatabaseSelectorStateSnapshot()
+  const selectedDatabaseId = state.selectedDatabaseId
+
+  const { data } = useReadReplicasQuery({ projectRef })
+  const databases = data ?? []
+
+  const selectedDatabase = databases.find((db) => db.identifier === selectedDatabaseId)
+  const selectedDatabaseRegion = formatDatabaseRegion(selectedDatabase?.region ?? '')
+  const formattedDatabaseId = formatDatabaseID(selectedDatabaseId ?? '')
 
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
@@ -30,52 +47,84 @@ const DatabaseSelector = ({ selectedDatabaseId, onChangeDatabaseId }: DatabaseSe
         <div className="flex items-center space-x-2 cursor-pointer">
           <Button
             type="default"
-            className="pr-2"
+            className={cn(
+              'pr-2',
+              variant === 'connected-on-right' && 'rounded-r-none',
+              variant === 'connected-on-left' && 'rounded-l-none border-l-0',
+              variant === 'connected-on-both' && 'rounded-none border-x-0'
+            )}
             iconRight={
               <IconChevronDown className="text-foreground-light" strokeWidth={2} size={12} />
             }
           >
             Source:{' '}
             <span className="capitalize">
-              {(selectedDatabase?.type ?? '').split('_').join(' ').toLowerCase()}
-              {selectedDatabase?.type === 'PRIMARY' && ' database'}
+              {selectedDatabase?.identifier === projectRef ? 'Primary database' : 'Read replica'}
             </span>{' '}
-            {selectedDatabase?.type === 'READ_REPLICA' && <span>(ID: {selectedDatabase?.id})</span>}
+            {selectedDatabase?.identifier !== projectRef && (
+              <span>
+                ({selectedDatabaseRegion} - {formattedDatabaseId})
+              </span>
+            )}
           </Button>
         </div>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-48" side="bottom" align="end">
+      <PopoverContent_Shadcn_ className="p-0 w-64" side="bottom" align="end">
         <Command_Shadcn_>
           <CommandList_Shadcn_>
             <CommandGroup_Shadcn_>
               <ScrollArea className={(databases || []).length > 7 ? 'h-[210px]' : ''}>
                 {databases?.map((database) => {
+                  const region = formatDatabaseRegion(database.region)
+                  const id = formatDatabaseID(database.identifier)
+
                   return (
                     <CommandItem_Shadcn_
-                      key={database.id}
-                      value={database.id.toString()}
+                      key={database.identifier}
+                      value={database.identifier}
                       className="cursor-pointer w-full"
                       onSelect={() => {
-                        onChangeDatabaseId(database.id.toString())
+                        state.setSelectedDatabaseId(database.identifier)
                         setOpen(false)
                       }}
                       onClick={() => {
-                        onChangeDatabaseId(database.id.toString())
+                        state.setSelectedDatabaseId(database.identifier)
                         setOpen(false)
                       }}
                     >
                       <div className="w-full flex items-center justify-between">
                         <p>
-                          {database.type === 'PRIMARY'
+                          {database.identifier === projectRef
                             ? 'Primary database'
-                            : `Read replica (ID: ${database.id})`}
+                            : `Read replica (${region} - ${id})`}
                         </p>
-                        {database.id.toString() === selectedDatabaseId && <IconCheck />}
+                        {database.identifier === selectedDatabaseId && <IconCheck />}
                       </div>
                     </CommandItem_Shadcn_>
                   )
                 })}
               </ScrollArea>
+            </CommandGroup_Shadcn_>
+            <CommandGroup_Shadcn_ className="border-t">
+              <CommandItem_Shadcn_
+                className="cursor-pointer w-full"
+                onSelect={() => {
+                  setOpen(false)
+                  router.push(`/project/${projectRef}/settings/infrastructure`)
+                }}
+                onClick={() => setOpen(false)}
+              >
+                <Link
+                  href={`/project/${projectRef}/settings/infrastructure`}
+                  onClick={() => {
+                    setOpen(false)
+                  }}
+                  className="w-full flex items-center gap-2"
+                >
+                  <IconPlus size={14} strokeWidth={1.5} />
+                  <p>Create a new read replica</p>
+                </Link>
+              </CommandItem_Shadcn_>
             </CommandGroup_Shadcn_>
           </CommandList_Shadcn_>
         </Command_Shadcn_>

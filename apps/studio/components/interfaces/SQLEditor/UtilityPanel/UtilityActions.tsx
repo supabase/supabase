@@ -1,12 +1,11 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { IS_PLATFORM } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
-import { Button, IconAlignLeft, IconCommand, IconCornerDownLeft, cn } from 'ui'
+import { Button, IconAlignLeft, IconCommand, IconCornerDownLeft } from 'ui'
 
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
-import { useFlag } from 'hooks'
-import { useState } from 'react'
+import { useFlag, useSelectedProject } from 'hooks'
 import FavoriteButton from './FavoriteButton'
 import SavingIndicator from './SavingIndicator'
 
@@ -28,9 +27,10 @@ const UtilityActions = ({
   executeQuery,
 }: UtilityActionsProps) => {
   const os = detectOS()
+  const project = useSelectedProject()
   const readReplicasEnabled = useFlag('readReplicas')
-  const roleImpersonationEnabledFlag = useFlag('roleImpersonation')
-  const [selectedDatabaseId, setSelectedDatabaseId] = useState<string>('1')
+
+  const showReadReplicasUI = readReplicasEnabled && project?.is_read_replicas_enabled
 
   return (
     <>
@@ -67,17 +67,13 @@ const UtilityActions = ({
       </Tooltip.Root>
 
       <div className="flex items-center justify-between gap-x-2 mx-2">
-        {readReplicasEnabled && (
-          <DatabaseSelector
-            selectedDatabaseId={selectedDatabaseId}
-            onChangeDatabaseId={setSelectedDatabaseId}
-          />
-        )}
-
         <div className="flex items-center">
-          {roleImpersonationEnabledFlag && (
-            <RoleImpersonationPopover serviceRoleLabel="postgres" variant="connected-on-right" />
-          )}
+          {showReadReplicasUI && <DatabaseSelector variant="connected-on-right" />}
+
+          <RoleImpersonationPopover
+            serviceRoleLabel="postgres"
+            variant={showReadReplicasUI ? 'connected-on-both' : 'connected-on-right'}
+          />
 
           <Button
             onClick={() => executeQuery()}
@@ -95,7 +91,7 @@ const UtilityActions = ({
                 <IconCornerDownLeft size={10} strokeWidth={1.5} />
               </div>
             }
-            className={cn(roleImpersonationEnabledFlag && 'rounded-l-none')}
+            className="rounded-l-none"
           >
             {hasSelection ? 'Run selected' : 'Run'}
           </Button>

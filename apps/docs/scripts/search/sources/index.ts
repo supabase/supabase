@@ -71,7 +71,7 @@ export async function fetchSources() {
     'swift-lib',
     '/reference/swift',
     { title: 'Swift Reference' },
-    '../../spec/supabase_swift_v1.yml',
+    '../../spec/supabase_swift_v2.yml',
     '../../spec/common-client-libs-sections.json'
   ).load()
 

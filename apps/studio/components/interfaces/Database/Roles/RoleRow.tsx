@@ -1,6 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PostgresRole } from '@supabase/postgres-meta'
 import { useState } from 'react'
+import toast from 'react-hot-toast'
 import {
   Button,
   Collapsible,
@@ -16,7 +17,8 @@ import {
   Toggle,
 } from 'ui'
 
-import { useStore } from 'hooks'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useDatabaseRoleUpdateMutation } from 'data/database-roles/database-role-update-mutation'
 import { ROLE_PERMISSIONS } from './Roles.constants'
 
 interface RoleRowProps {
@@ -26,8 +28,10 @@ interface RoleRowProps {
 }
 
 const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
-  const { ui, meta } = useStore()
+  const { project } = useProjectContext()
   const [isExpanded, setIsExpanded] = useState(false)
+
+  const { mutate: updateDatabaseRole, isLoading: isUpdating } = useDatabaseRoleUpdateMutation()
 
   const {
     is_superuser,
@@ -38,24 +42,24 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
     can_bypass_rls,
   } = role
 
-  const onSaveChanges = async (values: any, { setSubmitting, resetForm }: any) => {
-    setSubmitting(true)
-    const { is_superuser, is_replication_role, ...payload } = values
-    const res = await meta.roles.update(role.id, payload)
-    setSubmitting(false)
+  const onSaveChanges = async (values: any, { resetForm }: any) => {
+    if (!project) return console.error('Project is required')
 
-    if (res.error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to update role "${role.name}": ${res.error.message}`,
-      })
-    } else {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully updated role "${role.name}"`,
-      })
-      resetForm({ values: { ...values }, initialValues: { ...values } })
-    }
+    const { is_superuser, is_replication_role, ...payload } = values
+    updateDatabaseRole(
+      {
+        projectRef: project.ref,
+        connectionString: project.connectionString,
+        id: role.id,
+        payload,
+      },
+      {
+        onSuccess: () => {
+          toast.success(`Successfully updated role "${role.name}"`)
+          resetForm({ values: { ...values }, initialValues: { ...values } })
+        },
+      }
+    )
   }
 
   return (
@@ -83,7 +87,7 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
         'last:rounded-bl last:rounded-br',
       ].join(' ')}
     >
-      {({ values, initialValues, handleReset, isSubmitting }: any) => {
+      {({ values, initialValues, handleReset }: any) => {
         const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
         return (
@@ -157,55 +161,58 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
             <Collapsible.Content>
               <div className="group border-t border-default bg-surface-100 py-6 px-20 text-foreground">
                 <div className="py-4 space-y-[9px]">
-                  {Object.keys(ROLE_PERMISSIONS).map((permission) => (
-                    <Toggle
-                      size="small"
-                      key={permission}
-                      id={permission}
-                      name={permission}
-                      label={ROLE_PERMISSIONS[permission].description}
-                      disabled={disabled || ROLE_PERMISSIONS[permission].disabled}
-                      className={[
-                        'roles-toggle',
-                        disabled || ROLE_PERMISSIONS[permission].disabled ? 'opacity-50' : '',
-                      ].join(' ')}
-                      afterLabel={
-                        !disabled &&
-                        ROLE_PERMISSIONS[permission].disabled && (
-                          <Tooltip.Root delayDuration={0}>
-                            <Tooltip.Trigger type="button">
-                              <IconHelpCircle
-                                size="tiny"
-                                strokeWidth={2}
-                                className="ml-2 relative top-[3px]"
-                              />
-                            </Tooltip.Trigger>
-                            <Tooltip.Portal>
-                              <Tooltip.Content align="center" side="bottom">
-                                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                <div
-                                  className={[
-                                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                    'border border-background space-y-1',
-                                  ].join(' ')}
-                                >
-                                  <span className="text-xs">
-                                    This privilege cannot be updated via the dashboard
-                                  </span>
-                                </div>
-                              </Tooltip.Content>
-                            </Tooltip.Portal>
-                          </Tooltip.Root>
-                        )
-                      }
-                    />
-                  ))}
+                  {(Object.keys(ROLE_PERMISSIONS) as (keyof typeof ROLE_PERMISSIONS)[]).map(
+                    (permission) => (
+                      <Toggle
+                        size="small"
+                        key={permission}
+                        id={permission}
+                        name={permission}
+                        label={ROLE_PERMISSIONS[permission].description}
+                        disabled={disabled || ROLE_PERMISSIONS[permission].disabled}
+                        className={[
+                          'roles-toggle',
+                          disabled || ROLE_PERMISSIONS[permission].disabled ? 'opacity-50' : '',
+                        ].join(' ')}
+                        afterLabel={
+                          !disabled && ROLE_PERMISSIONS[permission].disabled ? (
+                            <Tooltip.Root delayDuration={0}>
+                              <Tooltip.Trigger type="button">
+                                <IconHelpCircle
+                                  size="tiny"
+                                  strokeWidth={2}
+                                  className="ml-2 relative top-[3px]"
+                                />
+                              </Tooltip.Trigger>
+                              <Tooltip.Portal>
+                                <Tooltip.Content align="center" side="bottom">
+                                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                  <div
+                                    className={[
+                                      'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                      'border border-background space-y-1',
+                                    ].join(' ')}
+                                  >
+                                    <span className="text-xs">
+                                      This privilege cannot be updated via the dashboard
+                                    </span>
+                                  </div>
+                                </Tooltip.Content>
+                              </Tooltip.Portal>
+                            </Tooltip.Root>
+                          ) : (
+                            <></>
+                          )
+                        }
+                      />
+                    )
+                  )}
                 </div>
                 {!disabled && (
                   <div className="py-4 flex items-center space-x-2 justify-end">
                     <Button
                       type="default"
-                      disabled={!hasChanges || isSubmitting}
+                      disabled={!hasChanges || isUpdating}
                       onClick={() => handleReset()}
                     >
                       Cancel
@@ -213,8 +220,8 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
                     <Button
                       type="primary"
                       htmlType="submit"
-                      disabled={!hasChanges || isSubmitting}
-                      loading={isSubmitting}
+                      disabled={!hasChanges || isUpdating}
+                      loading={isUpdating}
                     >
                       Save
                     </Button>

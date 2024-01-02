@@ -1,3 +1,7 @@
+import Head from 'next/head'
+import { useRouter } from 'next/router'
+import { Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
+
 import { useParams } from 'common/hooks'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import AISettingsModal from 'components/ui/AISettingsModal'
@@ -5,9 +9,7 @@ import Connecting from 'components/ui/Loading/Loading'
 import ResourceExhaustionWarningBanner from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
 import { useFlag, useSelectedOrganization, useSelectedProject, withAuth } from 'hooks'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
-import Head from 'next/head'
-import { useRouter } from 'next/router'
-import { Fragment, PropsWithChildren, ReactNode } from 'react'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import AppLayout from '../AppLayout/AppLayout'
 import EnableBranchingModal from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
 import BuildingState from './BuildingState'
@@ -181,6 +183,8 @@ interface ContentWrapperProps {
  */
 const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapperProps) => {
   const router = useRouter()
+  const { ref } = useParams()
+  const state = useDatabaseSelectorStateSnapshot()
   const selectedProject = useSelectedProject()
 
   const isSettingsPages = router.pathname.includes('/project/[ref]/settings')
@@ -200,6 +204,10 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
     selectedProject?.status === PROJECT_STATUS.GOING_DOWN ||
     selectedProject?.status === PROJECT_STATUS.PAUSING
   const isProjectOffline = selectedProject?.postgrestStatus === 'OFFLINE'
+
+  useEffect(() => {
+    if (ref) state.setSelectedDatabaseId(ref)
+  }, [ref])
 
   if (isBlocking && (isLoading || (requiresProjectDetails && selectedProject === undefined))) {
     return router.pathname.endsWith('[ref]') ? <LoadingState /> : <Connecting />

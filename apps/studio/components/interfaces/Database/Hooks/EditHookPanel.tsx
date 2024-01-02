@@ -93,7 +93,7 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
     [data]
   )
   const restUrl = project?.restUrl
-  const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
+  const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : 'co'
 
   const isEdgeFunction = (url: string) =>
     url.includes(`https://${ref}.functions.supabase.${restUrlTld}/`) ||
