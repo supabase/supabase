@@ -73,7 +73,7 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
     2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app. Within _Authorized domains_ make sure you add your Supabase project's domain `<project-id>.supabase.co`. Configure the non-sensitive scopes by making sure the following ones are selected: `.../auth/userinfo.email`, `.../auth/userinfo.profile`, `openid`. If you're selecting other sensitive scopes, your app may require additional verification. In those cases, it's best to use [custom domains](/docs/guides/platform/custom-domains).
     3. Finally, add the client ID and secret from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers).
 
-    ## Using personalized sign-in buttons, One Tap or automatic sign-in
+    ## Using personalized sign-in buttons, one-tap or automatic signin
 
     Most web apps and websites can utilize Google's [personalized sign-in buttons](https://developers.google.com/identity/gsi/web/guides/personalized-button), [One Tap](https://developers.google.com/identity/gsi/web/guides/features) or [automatic sign-in](https://developers.google.com/identity/gsi/web/guides/automatic-sign-in-sign-out) for the best user experience.
 
@@ -120,7 +120,7 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
 
     Use of nonce is recommended, though optional. Make sure each nonce is generated randomly and available both in the `data-nonce` attribute as well as in the `handleSignInWithGoogle` callback function; otherwise the ID token will not be accepted.
 
-    ### Important Note on Nonce Validation
+    ### Important note on nonce validation
 
     Supabase Auth expects the nonce in Google's ID token to be hashed (specifically with SHA-256 and represented as a hexadecimal string).
 
@@ -160,7 +160,7 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
 
   <TabPanel id="react-native" label="Expo React Native">
 
-    ## Using Native Sign in with Google in Expo
+    ## Using native sign in with Google in Expo
 
     Unlike the OAuth flow which requires the use of a web browser, the native Sign in with Google flow on Android uses the [operating system's built-in functionalities](https://developers.google.com/android/reference/com/google/android/gms/auth/api/identity/package-summary) to prompt the user for consent. Note that native sign-in has been rebranded as _One Tap sign-in on Android_ by Google, which you should not confuse with _One Tap sign in for web_, as mentioned below.
 
@@ -234,7 +234,7 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
 
   <TabPanel id="flutter" label="Flutter">
 
-    ## Using Native Sign in with Google in Flutter
+    ## Using native sign in with Google in Flutter
 
     Native Google sign in with Supabase is done through the [google_sign_in](https://pub.dev/packages/google_sign_in) package for iOS and Android. Follow the instructions on the [google_sign_in](https://pub.dev/packages/google_sign_in) package for plugin specific settings.
 

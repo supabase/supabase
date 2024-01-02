@@ -53,7 +53,7 @@ In general, it is a bad idea to over-use column encryption for mundane data or d
 
 Note that Supabase projects are already encrypted at rest by default.
 
-## Get the Root Encryption Key for your Supabase Project
+## Get the root encryption key for your Supabase project
 
 Encryption requires keys. Keeping the keys in the same database as the encrypted data would be unsafe. For more information about managing the pgsodium root encryption key on your Supabase project see **[encryption key location](#encryption-key-location)**. This key is required to decrypt values stored in [Supabase Vault](/docs/guides/database/vault) and data encrypted with Transparent Column Encryption.
 

@@ -62,9 +62,9 @@ bg-foreground-light
 | ------------------------------- | ------------------------------------------------------------ |
 | `{background}-{DEFAULT}`        | Main body background (**DEFAULT** is optional)               |
 | `{background}-surface-100`      | Panels and surfaces on the same level of the main background |
-| `{background}-surface-200`      | Surfaces that overlap the main content (ex. drodowns)        |
+| `{background}-surface-200`      | Surfaces that overlap the main content (ex. dropdowns)        |
 | `{background}-surface-300`      | Surfaces that are stacked above {background}-surface-200     |
-| `{background}-alternative`      | Alernative background (inverted)                             |
+| `{background}-alternative`      | Alternative background (inverted)                             |
 | `{background}-overlay`          | Overlays, Dropdowns, Popovers                                |
 | `{background}-control`          | Inputs, Radios, Checkboxes                                   |
 | `{background}-button-{DEFAULT}` | Button default                                               |
@@ -88,7 +88,7 @@ text-background-surface-100
 | ------------------------- | ---------------------------------------- |
 | `border-{DEFAULT}`        | Default border (**DEFAULT** is optional) |
 | `border-secondary`        | Secondary border                         |
-| `border-alternative`      | Alernative border (inverted)             |
+| `border-alternative`      | Alternative border (inverted)             |
 | `border-overlay`          | Overlays, Dropdowns, Popovers            |
 | `border-control`          | Inputs, Radios, Checkboxes               |
 | `border-strong`           | Hover, Focus                             |
