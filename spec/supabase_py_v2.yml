@@ -240,16 +240,11 @@ functions:
         name: Enroll a time-based, one-time password (TOTP) factor
         isSpotlight: true
         code: |
-          ```js
+          ```
           res = await supabase.auth.mfa.enroll({
             "factor_type": "totp",
             "friendly_name": "your_friendly_name"
           })
-
-          # Use the id to create a challenge.
-          # The challenge can be verified by entering the code generated from the authenticator app.
-          # The code will be generated upon scanning the qr_code or entering the secret into the authenticator app.
-          # Response has the following structure: { id, type, totp: { qr_code, secret, uri }, friendly_name }
           ```
   - id: mfa-challenge
     title: 'mfa.challenge()'
@@ -323,7 +318,6 @@ functions:
         code: |
           ```py
           res = await supabase.auth.mfa.get_authenticator_assurance_level()
-          # Response has the following structure { current_level, next_level, current_authentication_methods }
           ```
   - id: get-user
     title: 'get_user'
