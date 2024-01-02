@@ -10,7 +10,6 @@ import { object, string } from 'yup'
 import { getMfaAuthenticatorAssuranceLevel } from 'data/profile/mfa-authenticator-assurance-level-query'
 import { useStore } from 'hooks'
 import { auth, buildPathWithParams, getReturnToPath } from 'lib/gotrue'
-import { incrementSignInClicks } from 'lib/local-storage'
 import { Button, Form, Input } from 'ui'
 
 const signInSchema = object({
@@ -45,11 +44,6 @@ const SignInForm = () => {
     })
 
     if (!error) {
-      const signInClicks = incrementSignInClicks()
-      if (signInClicks > 1) {
-        Sentry.captureMessage('Sign in without previous sign out detected')
-      }
-
       try {
         const data = await getMfaAuthenticatorAssuranceLevel()
         if (data) {

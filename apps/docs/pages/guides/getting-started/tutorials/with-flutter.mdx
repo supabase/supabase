@@ -18,7 +18,7 @@ If you get stuck while working through this guide, refer to the [full example on
 
 <ProjectSetup />
 
-## Building the App
+## Building the app
 
 Let's start building the Flutter app from scratch.
 
@@ -36,7 +36,7 @@ Then let's install the only additional dependency: [`supabase_flutter`](https://
 Copy and paste the following line in your pubspec.yaml to install the package:
 
 ```yaml
-supabase_flutter: ^1.10.3
+supabase_flutter: ^2.0.0
 ```
 
 Run `flutter pub get` to install the dependencies.
@@ -136,7 +136,6 @@ Future<void> main() async {
   await Supabase.initialize(
     url: 'YOUR_SUPABASE_URL',
     anonKey: 'YOUR_SUPABASE_ANON_KEY',
-    authFlowType: AuthFlowType.pkce,
   );
   runApp(MyApp());
 }
@@ -144,9 +143,7 @@ Future<void> main() async {
 final supabase = Supabase.instance.client;
 ```
 
-`AuthFlowType.pkce` on `authFlowType` parameter indicates that we are using a secure [PKCE flow](https://supabase.com/blog/supabase-auth-sso-pkce#introducing-pkce) to perform our magic link login.
-
-### Set up Splash Screen
+### Set up splash screen
 
 Let's create a splash screen that will be shown to users right after they open the app.
 This screen retrieves the current session and redirects the user accordingly.
@@ -192,7 +189,7 @@ class _SplashPageState extends State<SplashPage> {
 }
 ```
 
-### Set up a Login page
+### Set up a login page
 
 Let's create a Flutter widget to manage logins and sign ups.
 We'll use Magic Links, so users can sign in with their email without using passwords.
@@ -300,7 +297,7 @@ class _LoginPageState extends State<LoginPage> {
 }
 ```
 
-### Set up Account page
+### Set up account page
 
 After a user is signed in we can allow them to edit their profile details and manage their account.
 Let's create a new widget called `account_page.dart` for that.
@@ -331,11 +328,8 @@ class _AccountPageState extends State<AccountPage> {
 
     try {
       final userId = supabase.auth.currentUser!.id;
-      final data = await supabase
-          .from('profiles')
-          .select<Map<String, dynamic>>()
-          .eq('id', userId)
-          .single();
+      final data =
+          await supabase.from('profiles').select().eq('id', userId).single();
       _usernameController.text = (data['username'] ?? '') as String;
       _websiteController.text = (data['website'] ?? '') as String;
     } on PostgrestException catch (error) {
@@ -540,14 +534,14 @@ We will be storing the image as a publicly sharable image.
 Make sure your `avatars` bucket is set to public, and if it is not, change the publicity by clicking the dot menu that appears when you hover over the bucket name.
 You should see an orange `Public` badge next to your bucket name if your bucket is set to public.
 
-### Adding image uploading feature to Account page
+### Adding image uploading feature to account page
 
 We will use [`image_picker`](https://pub.dev/packages/image_picker) plugin to select an image from the device.
 
 Add the following line in your pubspec.yaml file to install `image_picker`:
 
 ```yaml
-image_picker: ^0.8.4
+image_picker: ^1.0.5
 ```
 
 Using [`image_picker`](https://pub.dev/packages/image_picker) requires some additional preparation depending on the platform.
@@ -693,10 +687,10 @@ class _AccountPageState extends State<AccountPage> {
     });
 
     try {
-      final userId = supabase.auth.currentUser!.id;
+      final userId = supabase.auth.currentSession!.user.id;
       final data = await supabase
           .from('profiles')
-          .select<Map<String, dynamic>>()
+          .select()
           .eq('id', userId)
           .single();
       _usernameController.text = (data['username'] ?? '') as String;

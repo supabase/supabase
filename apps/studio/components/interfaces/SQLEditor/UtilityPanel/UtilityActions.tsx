@@ -1,15 +1,13 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { IS_PLATFORM } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
-import { Button, IconAlignLeft, IconCommand, IconCornerDownLeft, cn } from 'ui'
+import { Button, IconAlignLeft, IconCommand, IconCornerDownLeft } from 'ui'
 
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
-import { useFlag } from 'hooks'
+import { useFlag, useSelectedProject } from 'hooks'
 import FavoriteButton from './FavoriteButton'
 import SavingIndicator from './SavingIndicator'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import ReadOnlyBadge from './ReadOnlyBadge'
 
 export type UtilityActionsProps = {
   id: string
@@ -29,9 +27,10 @@ const UtilityActions = ({
   executeQuery,
 }: UtilityActionsProps) => {
   const os = detectOS()
-  const snap = useSqlEditorStateSnapshot()
+  const project = useSelectedProject()
   const readReplicasEnabled = useFlag('readReplicas')
-  const roleImpersonationEnabledFlag = useFlag('roleImpersonation')
+
+  const showReadReplicasUI = readReplicasEnabled && project?.is_read_replicas_enabled
 
   return (
     <>
@@ -64,20 +63,12 @@ const UtilityActions = ({
 
       <div className="flex items-center justify-between gap-x-2 mx-2">
         <div className="flex items-center">
-          {readReplicasEnabled && (
-            <DatabaseSelector
-              variant="connected-on-right"
-              selectedDatabaseId={snap.selectedDatabaseId}
-              onChangeDatabaseId={snap.setSelectedDatabaseId}
-            />
-          )}
+          {showReadReplicasUI && <DatabaseSelector variant="connected-on-right" />}
 
-          {roleImpersonationEnabledFlag && (
-            <RoleImpersonationPopover
-              serviceRoleLabel="postgres"
-              variant={readReplicasEnabled ? 'connected-on-both' : 'connected-on-right'}
-            />
-          )}
+          <RoleImpersonationPopover
+            serviceRoleLabel="postgres"
+            variant={showReadReplicasUI ? 'connected-on-both' : 'connected-on-right'}
+          />
 
           <Button
             onClick={() => executeQuery()}
@@ -95,7 +86,7 @@ const UtilityActions = ({
                 <IconCornerDownLeft size={10} strokeWidth={1.5} />
               </div>
             }
-            className={cn(roleImpersonationEnabledFlag && 'rounded-l-none')}
+            className="rounded-l-none"
           >
             {hasSelection ? 'Run selected' : 'Run'}
           </Button>

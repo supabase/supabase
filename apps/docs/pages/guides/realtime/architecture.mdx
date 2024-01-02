@@ -27,7 +27,7 @@ Channels are implemented using [Phoenix Channels](https://hexdocs.pm/phoenix/cha
 
 The PG2 adapter utilizes Erlang [process groups](https://www.erlang.org/docs/18/man/pg2.html) to implement the PubSub model where a publisher can send messages to many subscribers.
 
-## Global Cluster
+## Global cluster
 
 Presence is an in-memory key-value store backed by a CRDT. When a user is connected to the cluster the state of that user is sent to all connected Realtime nodes.
 
@@ -41,7 +41,7 @@ Thanks to the Realtime cluster, you (an amazing Supabase user) don't have to thi
 
 If you're using Broadcast, Presence, or streaming database changes, messages will always get to your users via the shortest path possible.
 
-## Connecting to a Database
+## Connecting to a database
 
 Realtime allows you to listen to changes from your Postgres database. When a new client connects to Realtime and initializes the `postgres_changes` Realtime Extension the cluster will connect to your Postgres database and start streaming changes from a replication slot.
 

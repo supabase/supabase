@@ -1,13 +1,13 @@
-import { Project } from 'types'
 import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
+import { Project } from 'data/projects/project-detail-query'
 import { IS_PLATFORM } from 'lib/constants'
 
 export const generateDatabaseMenu = (
   project?: Project,
-  flags?: { pgNetExtensionExists: boolean }
+  flags?: { pgNetExtensionExists: boolean; pitrEnabled: boolean }
 ): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
-  const { pgNetExtensionExists } = flags || {}
+  const { pgNetExtensionExists, pitrEnabled } = flags || {}
 
   return [
     {
@@ -66,7 +66,9 @@ export const generateDatabaseMenu = (
               {
                 name: 'Backups',
                 key: 'backups',
-                url: `/project/${ref}/database/backups/scheduled`,
+                url: pitrEnabled
+                  ? `/project/${ref}/database/backups/pitr`
+                  : `/project/${ref}/database/backups/scheduled`,
                 items: [],
               },
             ]
