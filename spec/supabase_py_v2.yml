@@ -306,7 +306,7 @@ functions:
     notes: |
       - Authenticator Assurance Level (AAL) is the measure of the strength of an authentication mechanism.
       - In Supabase, having an AAL of `aal1` refers to having the 1st factor of authentication such as an email and password or OAuth sign-in while `aal2` refers to the 2nd factor of authentication such as a time-based, one-time-password (TOTP).
-      - If the user has a verified factor, the `nextLevel` field will return `aal2`, else, it will return `aal1`.
+      - If the user has a verified factor, the `next_level` field will return `aal2`, else, it will return `aal1`.
     examples:
       - id: get-aal
         name: Get the AAL details of a session
