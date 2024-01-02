@@ -8,6 +8,7 @@ import { wrapWithTransaction } from 'data/sql/utils/transaction'
 import { useStore } from 'hooks'
 import { ResponseError } from 'types'
 import { FDW } from './fdws-query'
+import { entityTypeKeys } from 'data/entity-types/keys'
 
 export type FDWDeleteVariables = {
   projectRef: string
@@ -72,6 +73,7 @@ export const useFDWDeleteMutation = ({
       const { projectRef } = variables
 
       await Promise.all([
+        queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
         queryClient.invalidateQueries(sqlKeys.query(projectRef, ['fdws'])),
         vault.load(),
       ])

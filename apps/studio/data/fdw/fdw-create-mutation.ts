@@ -10,6 +10,7 @@ import { sqlKeys } from 'data/sql/keys'
 import { wrapWithTransaction } from 'data/sql/utils/transaction'
 import { useStore } from 'hooks'
 import { ResponseError } from 'types'
+import { entityTypeKeys } from 'data/entity-types/keys'
 
 export type FDWCreateVariables = {
   projectRef?: string
@@ -161,6 +162,7 @@ export const useFDWCreateMutation = ({
       const { projectRef } = variables
 
       await Promise.all([
+        queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
         queryClient.invalidateQueries(sqlKeys.query(projectRef, ['fdws']), { refetchType: 'all' }),
         vault.load(),
       ])
