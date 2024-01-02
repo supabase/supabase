@@ -1,6 +1,7 @@
-import { Button } from 'ui'
+import { memo } from 'react'
 
 import { USERS_PAGE_LIMIT } from 'data/auth/users-query'
+import { Button } from 'ui'
 
 interface UsersPaginationProps {
   total: number
@@ -33,28 +34,21 @@ const UsersPagination = ({ total, page, setPage, isFetchingNextPage }: UsersPagi
         </p>
       </div>
       <div className="flex flex-1 justify-between sm:justify-end">
-        {isFetchingNextPage ? (
-          <Button type="default" disabled loading className="ml-3">
+        {hasPrevious && !(isFetchingNextPage && page === 2) && (
+          <Button type="default" onClick={() => setPage(page - 1)} disabled={isFetchingNextPage}>
+            Previous
+          </Button>
+        )}
+        {(hasNext || isFetchingNextPage) && (
+          <Button
+            type="default"
+            className="ml-3"
+            onClick={() => setPage(page + 1)}
+            disabled={isFetchingNextPage}
+            loading={isFetchingNextPage}
+          >
             Next
           </Button>
-        ) : (
-          <>
-            {hasPrevious && (
-              <Button type="default" disabled={!hasPrevious} onClick={() => setPage(page - 1)}>
-                Previous
-              </Button>
-            )}
-            {hasNext && (
-              <Button
-                type="default"
-                disabled={!hasNext}
-                className="ml-3"
-                onClick={() => setPage(page + 1)}
-              >
-                Next
-              </Button>
-            )}
-          </>
         )}
       </div>
     </nav>
