@@ -298,9 +298,6 @@ const TableGridEditor = ({
               {canEditViaTableEditor && (
                 <GridHeaderActions table={selectedTable as PostgresTable} />
               )}
-              {(isTableSelected || isViewSelected) && (
-                <RoleImpersonationPopover serviceRoleLabel="postgres" />
-              )}
             </>
           ) : null
         }
