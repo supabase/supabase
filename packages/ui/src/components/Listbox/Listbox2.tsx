@@ -84,7 +84,7 @@ function Listbox({
   }
 
   useEffect(() => {
-    if (value) {
+    if (value !== undefined) {
       setSelected(value)
     }
   }, [value])

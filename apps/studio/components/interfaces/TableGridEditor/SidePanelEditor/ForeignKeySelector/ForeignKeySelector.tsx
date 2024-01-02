@@ -2,7 +2,7 @@ import type { PostgresColumn, PostgresSchema, PostgresTable } from '@supabase/po
 import { find, get, isEmpty, sortBy } from 'lodash'
 import { useEffect, useState } from 'react'
 
-import { Dictionary } from 'components/grid'
+import { Dictionary } from 'types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import InformationBox from 'components/ui/InformationBox'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'

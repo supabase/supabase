@@ -1,7 +1,7 @@
 import { isNull, noop } from 'lodash'
 import { IconChevronRight } from 'ui'
 
-import { Dictionary } from 'components/grid'
+import { Dictionary } from 'types'
 
 interface DrilldownPaneProps {
   pane: number
@@ -45,24 +45,28 @@ const DrilldownPane = ({ pane, jsonData, activeKey, onSelectKey = noop }: Drilld
         <div
           key={key}
           className={`
-              ${key === activeKey ? 'bg-alternative' : ''}
-              group flex cursor-pointer items-center
-              justify-between py-2 px-5 hover:bg-alternative
+              ${key === activeKey ? 'bg-surface-300' : ''}
+              group flex cursor-pointer items-center transition
+              justify-between py-2 px-5 hover:bg-surface-200
             `}
           onClick={() => onSelectKey(key, pane)}
         >
-          <p className="font-mono text-xs !text-blue-700">{key}</p>
-          <div className={`${key === activeKey ? 'block' : 'hidden'} group-hover:block`}>
+          <p className="font-mono text-xs !text-blue-900">{key}</p>
+          <div
+            className={`${
+              key === activeKey ? 'opacity-100' : 'opacity-50'
+            } group-hover:opacity-100 transition`}
+          >
             <IconChevronRight strokeWidth={2} size={16} />
           </div>
         </div>
       ))}
       {keysWithoutChildren.map((key: string) => (
         <div key={key} className="flex space-x-2 py-2 px-5">
-          <p className="font-mono text-xs !text-blue-700">{key}:</p>
+          <p className="font-mono text-xs !text-blue-900">{key}:</p>
           <p
             className={`break-all font-mono text-xs ${
-              typeof jsonData[key] !== 'string' ? '!text-green-700' : '!text-yellow-700'
+              typeof jsonData[key] !== 'string' ? '!text-green-900' : '!text-yellow-900'
             }`}
           >
             {isNull(jsonData[key])

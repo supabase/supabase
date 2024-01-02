@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { toast } from 'react-hot-toast'
 import { Modal } from 'ui'
 
-import { Dictionary } from 'components/grid'
+import { Dictionary } from 'types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { entityTypeKeys } from 'data/entity-types/keys'

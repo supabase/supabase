@@ -16,7 +16,7 @@ describe('generate', () => {
     )
 
     expect(formatSql(sql)).toMatchSnapshot()
-    expect(title).toMatchSnapshot()
+    await expect(title).toMatchCriteria('relates to employees')
   })
 })
 
@@ -94,8 +94,8 @@ describe('title', () => {
       `
     )
 
-    expect(title).toMatchSnapshot()
-    expect(description).toMatchSnapshot()
+    await expect(title).toMatchCriteria('relates to employees and departments')
+    await expect(description).toMatchCriteria('describes employees and departments')
   })
 })
 
