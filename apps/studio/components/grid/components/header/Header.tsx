@@ -26,7 +26,6 @@ import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useCheckPermissions, useStore, useUrlState } from 'hooks'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import RLSBannerWarning from './RLSBannerWarning'
 import FilterDropdown from './filter'
 import SortPopover from './sort'
 
@@ -83,7 +82,6 @@ const Header = ({
         )}
         <div className="sb-grid-header__inner">{headerActions}</div>
       </div>
-      <RLSBannerWarning />
     </div>
   )
 }
