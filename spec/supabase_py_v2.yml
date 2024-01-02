@@ -231,10 +231,6 @@ functions:
       - To create a challenge, see [`mfa.challenge()`](/docs/reference/python/auth-mfa-challenge).
       - To verify a challenge, see [`mfa.verify()`](/docs/reference/python/auth-mfa-verify).
       - To create and verify a challenge in a single step, see [`mfa.challenge_and_verify()`](/docs/reference/python/auth-mfa-challengeandverify).
-      - To generate a QR code for the `totp` secret in nextjs, you can do the following:
-      ```html
-      <Image src={data.totp.qr_code} alt={data.totp.uri} layout="fill"></Image>
-      ```
     examples:
       - id: enroll-totp-factor
         name: Enroll a time-based, one-time password (TOTP) factor
@@ -316,7 +312,7 @@ functions:
         name: Get the AAL details of a session
         isSpotlight: true
         code: |
-          ```py
+          ```
           res = await supabase.auth.mfa.get_authenticator_assurance_level()
           ```
   - id: get-user
