@@ -15,7 +15,7 @@ import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useTableQuery } from 'data/tables/table-query'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import ActionBar from '../../ActionBar'
-import { useEncryptedColumns } from './ForeignRowSelector.utils'
+import { useEncryptedColumns } from '../../SidePanelEditor.utils'
 import Pagination from './Pagination'
 import SelectorGrid from './SelectorGrid'
 
