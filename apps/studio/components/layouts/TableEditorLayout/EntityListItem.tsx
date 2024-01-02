@@ -235,7 +235,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
               <DropdownMenuItem key="delete-table" className="space-x-2" asChild>
                 <Link
                   key="view-policies"
-                  href={`/project/${projectRef}/auth/policies?search=${entity.id}`}
+                  href={`/project/${projectRef}/auth/policies?schema=${snap.selectedSchemaName}&search=${entity.id}`}
                 >
                   <IconLock size="tiny" />
                   <p>View Policies</p>
