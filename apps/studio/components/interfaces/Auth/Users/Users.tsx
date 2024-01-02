@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
@@ -11,8 +12,10 @@ import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
 import { Button, IconRefreshCw, IconSearch, IconX, Input, Listbox } from 'ui'
 import AddUserDropdown from './AddUserDropdown'
 import UsersList from './UsersList'
+import { authKeys } from 'data/auth/keys'
 
 const Users = () => {
+  const queryClient = useQueryClient()
   const { project } = useProjectContext()
   const { ref: projectRef } = useParams()
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
@@ -40,7 +43,18 @@ const Users = () => {
       keywords: filterKeywords,
       verified: filterVerified,
     },
-    { keepPreviousData: true }
+    {
+      keepPreviousData: true,
+      onSuccess(data) {
+        if (data.users.length <= 0 && data.total > 0) {
+          queryClient.removeQueries(
+            authKeys.users(projectRef, { page, keywords: filterKeywords, verified: filterVerified })
+          )
+
+          setPage((prev) => prev - 1)
+        }
+      },
+    }
   )
 
   function onVerifiedFilterChange(e: any) {
