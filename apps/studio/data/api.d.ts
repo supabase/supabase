@@ -242,7 +242,7 @@ export interface paths {
   }
   '/platform/organizations/{slug}/billing/subscription/preview': {
     /** Preview subscription changes */
-    post: operations['SubscriptionController_previewSubscriptionChangeV2']
+    post: operations['SubscriptionController_previewSubscriptionChange']
   }
   '/platform/organizations/{slug}/billing/subscription/schedule': {
     /** Deletes any upcoming subscription schedule */
@@ -254,7 +254,7 @@ export interface paths {
   }
   '/platform/organizations/{slug}/billing/invoices/upcoming': {
     /** Gets the upcoming invoice */
-    get: operations['OrgInvoicesController_getUpcomingInvoiceV2']
+    get: operations['OrgInvoicesController_getUpcomingInvoice']
   }
   '/platform/pg-meta/{ref}/column-privileges': {
     /** Retrieve column privileges */
@@ -463,10 +463,6 @@ export interface paths {
     /** Updates project's content */
     patch: operations['ContentController_updateContent']
   }
-  '/platform/projects/{ref}/daily-stats': {
-    /** Gets daily project stats */
-    get: operations['DailyStatsController_getDailyStats']
-  }
   '/platform/projects/{ref}/databases': {
     /** Gets non-removed databases of a specified project */
     get: operations['DatabasesController_getDatabases']
@@ -494,12 +490,6 @@ export interface paths {
   '/platform/projects/{ref}/infra-monitoring': {
     /** Gets project's usage metrics */
     get: operations['InfraMonitoringController_getUsageMetrics']
-  }
-  '/platform/projects/{ref}/invoices': {
-    /** Gets project's invoices */
-    get: operations['InvoicesController_getInvoices']
-    /** Gets project's invoice count */
-    head: operations['InvoicesController_getInvoiceCount']
   }
   '/platform/projects/{ref}/pause': {
     /** Pauses the project */
@@ -728,6 +718,10 @@ export interface paths {
   '/platform/vercel/projects': {
     /** Gets the project with the given ID if provided, otherwise gets the list of projects */
     get: operations['VercelProjectsController_getVercelProjects']
+  }
+  '/platform/vercel/projects/{id}': {
+    /** Gets the Vercel project with the given ID */
+    get: operations['VercelProjectsController_getVercelProject']
   }
   '/platform/vercel/projects/envs': {
     /** Gets the environment variables for the given project ID on behalf of the given team ID */
@@ -1217,10 +1211,6 @@ export interface paths {
     /** Updates project's content */
     patch: operations['ContentController_updateContent']
   }
-  '/v0/projects/{ref}/daily-stats': {
-    /** Gets daily project stats */
-    get: operations['DailyStatsController_getDailyStats']
-  }
   '/v0/projects/{ref}/databases': {
     /** Gets non-removed databases of a specified project */
     get: operations['DatabasesController_getDatabases']
@@ -1248,12 +1238,6 @@ export interface paths {
   '/v0/projects/{ref}/infra-monitoring': {
     /** Gets project's usage metrics */
     get: operations['InfraMonitoringController_getUsageMetrics']
-  }
-  '/v0/projects/{ref}/invoices': {
-    /** Gets project's invoices */
-    get: operations['InvoicesController_getInvoices']
-    /** Gets project's invoice count */
-    head: operations['InvoicesController_getInvoiceCount']
   }
   '/v0/projects/{ref}/pause': {
     /** Pauses the project */
@@ -1430,6 +1414,7 @@ export interface paths {
     post: operations['ProjectsController_createProject']
   }
   '/v1/projects/{ref}/api-keys': {
+    /** Get project api keys */
     get: operations['ApiKeysController_getProjectApiKeys']
   }
   '/v1/projects/{ref}/branches': {
@@ -4631,6 +4616,7 @@ export interface components {
       default_pool_size?: number
       ignore_startup_parameters?: string
       max_client_conn?: number
+      connection_string?: string
     }
     AuthConfigResponse: {
       smtp_admin_email?: string
@@ -6419,7 +6405,7 @@ export interface operations {
     }
   }
   /** Preview subscription changes */
-  SubscriptionController_previewSubscriptionChangeV2: {
+  SubscriptionController_previewSubscriptionChange: {
     parameters: {
       path: {
         /** @description Organization slug */
@@ -6489,7 +6475,7 @@ export interface operations {
     }
   }
   /** Gets the upcoming invoice */
-  OrgInvoicesController_getUpcomingInvoiceV2: {
+  OrgInvoicesController_getUpcomingInvoice: {
     parameters: {
       path: {
         /** @description Organization slug */
@@ -8436,32 +8422,6 @@ export interface operations {
       }
     }
   }
-  /** Gets daily project stats */
-  DailyStatsController_getDailyStats: {
-    parameters: {
-      query: {
-        attribute: string
-        interval: string
-        endDate: string
-        startDate: string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>
-        }
-      }
-      /** @description Failed to get daily project stats */
-      500: {
-        content: never
-      }
-    }
-  }
   /** Gets non-removed databases of a specified project */
   DatabasesController_getDatabases: {
     parameters: {
@@ -8627,48 +8587,6 @@ export interface operations {
         }
       }
       /** @description Failed to get project's usage metrics */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Gets project's invoices */
-  InvoicesController_getInvoices: {
-    parameters: {
-      query?: {
-        limit?: string
-        offset?: string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>[]
-        }
-      }
-      /** @description Failed to get project's invoices */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Gets project's invoice count */
-  InvoicesController_getInvoiceCount: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: never
-      }
-      /** @description Failed to get project's invoice count */
       500: {
         content: never
       }
@@ -9814,6 +9732,28 @@ export interface operations {
       }
     }
   }
+  /** Gets invoices for the given customer */
+  InvoicesController_getInvoices: {
+    parameters: {
+      query: {
+        customer: string
+        slug?: string
+        limit: string
+        offset: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['Invoice'][]
+        }
+      }
+      /** @description Failed to retrieve invoices */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Gets the total count of invoices for the given customer */
   InvoicesController_countInvoices: {
     parameters: {
@@ -9985,6 +9925,29 @@ export interface operations {
         }
       }
       /** @description Failed to get project(s) */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets the Vercel project with the given ID */
+  VercelProjectsController_getVercelProject: {
+    parameters: {
+      header: {
+        vercel_authorization: string
+      }
+      path: {
+        id: string
+        teamId: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': Record<string, never>
+        }
+      }
+      /** @description Failed to get project */
       500: {
         content: never
       }
@@ -11122,6 +11085,7 @@ export interface operations {
       }
     }
   }
+  /** Get project api keys */
   ApiKeysController_getProjectApiKeys: {
     parameters: {
       path: {
