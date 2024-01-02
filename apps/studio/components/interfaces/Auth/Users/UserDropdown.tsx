@@ -225,6 +225,7 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
         visible={isDeleteModalOpen}
         header="Confirm to delete"
         buttonLabel="Delete"
+        buttonLoadingLabel="Delete"
         onSelectCancel={() => setIsDeleteModalOpen(false)}
         onSelectConfirm={() => {
           handleDelete()
