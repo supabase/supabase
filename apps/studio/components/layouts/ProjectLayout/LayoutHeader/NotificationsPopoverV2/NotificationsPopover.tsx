@@ -186,29 +186,41 @@ const NotificationsPopverV2 = () => {
           )}
           {isSuccess && (
             <div className="flex flex-1 h-[400px]">
-              <InfiniteList
-                items={notifications}
-                ItemComponent={NotificationRow}
-                LoaderComponent={
-                  <div className="p-4">
-                    <ShimmeringLoader />
+              {notifications.length > 0 ? (
+                <InfiniteList
+                  items={notifications}
+                  ItemComponent={NotificationRow}
+                  LoaderComponent={
+                    <div className="p-4">
+                      <ShimmeringLoader />
+                    </div>
+                  }
+                  itemProps={{
+                    setRowHeight: (idx: number, height: number) => {
+                      if (rowHeights.current) {
+                        rowHeights.current = { ...rowHeights.current, [idx]: height }
+                      }
+                    },
+                    getProject: (id: number) => projects?.find((project) => project.id === id),
+                    getOrganization: (id: number) => organizations?.find((org) => org.id === id),
+                    onArchiveNotification: (id: string) => onArchiveNotification(id),
+                  }}
+                  getItemSize={(idx: number) => rowHeights?.current?.[idx] ?? 56}
+                  hasNextPage={hasNextPage}
+                  isLoadingNextPage={isFetchingNextPage}
+                  onLoadNextPage={() => fetchNextPage()}
+                />
+              ) : (
+                <div className="flex flex-col gap-y-4 items-center flex-grow justify-center">
+                  <IconInbox size={32} className="text-foreground-light" />
+                  <div className="flex flex-col gap-y-1">
+                    <p className="text-foreground-light text-sm w-64 text-center">All caught up</p>
+                    <p className="text-foreground-lighter text-sm w-64 text-center">
+                      You will be notified here for any notices on your organizations and projects
+                    </p>
                   </div>
-                }
-                itemProps={{
-                  setRowHeight: (idx: number, height: number) => {
-                    if (rowHeights.current) {
-                      rowHeights.current = { ...rowHeights.current, [idx]: height }
-                    }
-                  },
-                  getProject: (id: number) => projects?.find((project) => project.id === id),
-                  getOrganization: (id: number) => organizations?.find((org) => org.id === id),
-                  onArchiveNotification: (id: string) => onArchiveNotification(id),
-                }}
-                getItemSize={(idx: number) => rowHeights?.current?.[idx] ?? 56}
-                hasNextPage={hasNextPage}
-                isLoadingNextPage={isFetchingNextPage}
-                onLoadNextPage={() => fetchNextPage()}
-              />
+                </div>
+              )}
             </div>
           )}
         </div>
