@@ -20,6 +20,7 @@ interface UsersListProps {
   users: User[]
   isLoading: boolean
   isSuccess: boolean
+  isFetchingNextPage: boolean
   error: ResponseError | null
 }
 
@@ -31,6 +32,7 @@ const UsersList = ({
   users,
   isLoading,
   isSuccess,
+  isFetchingNextPage,
   error,
 }: UsersListProps) => {
   // Check once on the top level, rather than checking for every row
@@ -94,7 +96,12 @@ const UsersList = ({
             ))}
           <Table.tr>
             <Table.td colSpan={8}>
-              <UsersPagination total={total} page={page} setPage={setPage} />
+              <UsersPagination
+                total={total}
+                page={page}
+                setPage={setPage}
+                isFetchingNextPage={isFetchingNextPage}
+              />
             </Table.td>
           </Table.tr>
         </>

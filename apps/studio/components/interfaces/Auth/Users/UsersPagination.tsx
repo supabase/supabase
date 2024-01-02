@@ -6,9 +6,10 @@ interface UsersPaginationProps {
   total: number
   page: number
   setPage: (page: number) => void
+  isFetchingNextPage: boolean
 }
 
-const UsersPagination = ({ total, page, setPage }: UsersPaginationProps) => {
+const UsersPagination = ({ total, page, setPage, isFetchingNextPage }: UsersPaginationProps) => {
   const startRowFromPage = USERS_PAGE_LIMIT * (page - 1) + 1
   const fromRow = startRowFromPage > total ? total : startRowFromPage
 
@@ -32,20 +33,28 @@ const UsersPagination = ({ total, page, setPage }: UsersPaginationProps) => {
         </p>
       </div>
       <div className="flex flex-1 justify-between sm:justify-end">
-        {hasPrevious && (
-          <Button type="default" disabled={!hasPrevious} onClick={() => setPage(page - 1)}>
-            Previous
-          </Button>
-        )}
-        {hasNext && (
-          <Button
-            type="default"
-            disabled={!hasNext}
-            className="ml-3"
-            onClick={() => setPage(page + 1)}
-          >
+        {isFetchingNextPage ? (
+          <Button type="default" disabled loading className="ml-3">
             Next
           </Button>
+        ) : (
+          <>
+            {hasPrevious && (
+              <Button type="default" disabled={!hasPrevious} onClick={() => setPage(page - 1)}>
+                Previous
+              </Button>
+            )}
+            {hasNext && (
+              <Button
+                type="default"
+                disabled={!hasNext}
+                className="ml-3"
+                onClick={() => setPage(page + 1)}
+              >
+                Next
+              </Button>
+            )}
+          </>
         )}
       </div>
     </nav>

@@ -25,12 +25,23 @@ const Users = () => {
   const canReadUsers = useCheckPermissions(PermissionAction.TENANT_SQL_SELECT, 'auth.users')
   const isPermissionsLoaded = usePermissionsLoaded()
 
-  const { data, isLoading, isSuccess, refetch, isRefetching, error } = useUsersQuery({
-    projectRef,
-    page,
-    keywords: filterKeywords,
-    verified: filterVerified,
-  })
+  const {
+    data,
+    isLoading,
+    isSuccess,
+    refetch,
+    isRefetching,
+    error,
+    isPreviousData: isFetchingNextPage,
+  } = useUsersQuery(
+    {
+      projectRef,
+      page,
+      keywords: filterKeywords,
+      verified: filterVerified,
+    },
+    { keepPreviousData: true }
+  )
 
   function onVerifiedFilterChange(e: any) {
     setFilterVerified(e)
@@ -119,6 +130,7 @@ const Users = () => {
                 users={data?.users ?? []}
                 isLoading={isLoading}
                 isSuccess={isSuccess}
+                isFetchingNextPage={isFetchingNextPage}
                 error={error}
               />
             )}
