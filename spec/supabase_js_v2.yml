@@ -4368,7 +4368,7 @@ functions:
                 name
               )
             `)
-            .limit(1, { referenceTable: 'cities' })
+            .limit(1, { referencedTable: 'cities' })
           ```
         data:
           sql: |
