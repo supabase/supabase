@@ -6,7 +6,6 @@ import * as yup from 'yup'
 import { useSignUpMutation } from 'data/misc/signup-mutation'
 import { useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
-import { resetSignInClicks } from 'lib/local-storage'
 import { passwordSchema } from 'lib/schemas'
 import PasswordConditionsHelper from './PasswordConditionsHelper'
 
@@ -47,7 +46,6 @@ const SignUpForm = () => {
       token = captchaResponse?.response ?? null
     }
 
-    resetSignInClicks()
     signup({
       email,
       password,

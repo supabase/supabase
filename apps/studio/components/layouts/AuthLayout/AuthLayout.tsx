@@ -31,6 +31,7 @@ const AuthLayout = ({ title, children }: PropsWithChildren<AuthLayoutProps>) => 
           menu={generateAuthMenu(projectRef ?? 'default', { hooksReleased })}
         />
       }
+      isBlocking={false}
     >
       <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
         {children}
