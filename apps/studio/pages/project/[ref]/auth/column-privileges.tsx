@@ -126,16 +126,6 @@ const PrivilegesPage: NextPageWithLayout = () => {
     allRoles?.filter((role: PostgresRole) => EDITABLE_ROLES.includes(role.name)) ?? []
   const roles = rolesList.map((role: PostgresRole) => role.name)
 
-  const handleChangeSchema = (schema: string) => {
-    const newTable = tableList?.find((table) => table.schema === schema)?.name ?? ''
-    setSelectedSchema(schema)
-    setSelectedTable(newTable)
-  }
-
-  const handleChangeRole = (role: string) => {
-    setSelectedRole(role)
-  }
-
   const table = tableList?.find((table) => table.name === selectedTable)
 
   const {
@@ -158,6 +148,38 @@ const PrivilegesPage: NextPageWithLayout = () => {
       [columnPrivileges, selectedRole, table?.id, tablePrivilege]
     )
   )
+
+  const hasChanges = operations.length > 0
+
+  const handleChangeSchema = (schema: string) => {
+    if (hasChanges) {
+      if (window.confirm('You will lose your changes. Are you sure?')) {
+        resetOperations()
+      } else {
+        return
+      }
+    }
+
+    const newTable = tableList?.find((table) => table.schema === schema)?.name
+    setSelectedSchema(schema)
+    setSelectedTable(newTable)
+  }
+
+  const handleChangeTable = (table: string) => {
+    if (hasChanges) {
+      if (window.confirm('You will lose your changes. Are you sure?')) {
+        resetOperations()
+      } else {
+        return
+      }
+    }
+
+    setSelectedTable(table)
+  }
+
+  const handleChangeRole = (role: string) => {
+    setSelectedRole(role)
+  }
 
   const { apply: applyColumnPrivileges, isLoading: isApplyingChanges } =
     useApplyPrivilegeOperations(
@@ -213,10 +235,10 @@ const PrivilegesPage: NextPageWithLayout = () => {
             roles={roles}
             onChangeSchema={handleChangeSchema}
             onChangeRole={handleChangeRole}
-            onChangeTable={setSelectedTable}
+            onChangeTable={handleChangeTable}
             applyChanges={applyChanges}
             resetChanges={resetOperations}
-            hasChanges={operations.length > 0}
+            hasChanges={hasChanges}
             isApplyingChanges={isApplyingChanges}
           />
           {isLoading ? (
