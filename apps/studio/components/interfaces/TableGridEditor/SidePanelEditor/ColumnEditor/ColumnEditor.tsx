@@ -21,7 +21,6 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { usePostgresTypesQuery } from 'data/database/types-query'
-import { usePgSodiumKeysQuery } from 'data/pg-sodium-keys/pg-sodium-keys-query'
 import { EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
 import { Dictionary } from 'types'
 import { ForeignKeySelector } from '..'
@@ -93,25 +92,20 @@ const ColumnEditor = ({
   })
   const foreignKeyMeta = data || []
 
-  const { data: keys } = usePgSodiumKeysQuery({
-    projectRef: project?.ref!,
-    connectionString: project?.connectionString,
-  })
-
   const isNewRecord = column === undefined
   const originalForeignKey = column
     ? getColumnForeignKey(column, selectedTable, foreignKeyMeta)
     : undefined
 
   useEffect(() => {
-    if (visible && keys) {
+    if (visible) {
       setErrors({})
       const columnFields = isNewRecord
-        ? { ...generateColumnField(), keyId: keys.length > 0 ? keys[0].id : 'create-new' }
+        ? generateColumnField()
         : generateColumnFieldFromPostgresColumn(column!, selectedTable, foreignKeyMeta)
       setColumnFields(columnFields)
     }
-  }, [visible, keys])
+  }, [visible])
 
   if (!columnFields) return null
 
