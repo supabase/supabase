@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@code-hike/mdx": "^0.9.0",
+    "@hcaptcha/react-hcaptcha": "^1.9.2",
     "@mdx-js/loader": "^2.1.5",
     "@mdx-js/react": "^2.3.0",
     "@next/bundle-analyzer": "^13.5.6",

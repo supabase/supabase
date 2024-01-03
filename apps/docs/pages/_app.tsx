@@ -64,7 +64,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const handlePageTelemetry = useCallback(
     (route: string) => {
       if (IS_PLATFORM) {
-        return unauthedAllowedPost('/platform/telemetry/page', {
+        unauthedAllowedPost('/platform/telemetry/page', {
           body: {
             referrer: document.referrer,
             title: document.title,
@@ -75,6 +75,8 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
               session_id: '',
             },
           },
+        }).catch((e) => {
+          console.error('Problem sending telemetry:', e)
         })
       }
     },
