@@ -42,6 +42,8 @@ Sentry.init({
     // [Joshen] Seems to be from hcaptcha
     "undefined is not an object (evaluating 'n.chat.setReady')",
     "undefined is not an object (evaluating 'i.chat.setReady')",
+    // [Terry] When users paste in an embedded Github Gist
+    'Unexpected "❤ by GitHu" at line',
   ],
   denyUrls: [
     // [Joshen] We're getting a huge influx of events from this particular source
