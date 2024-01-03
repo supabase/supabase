@@ -6,10 +6,10 @@ export const meta = {
   description: 'Secure your data using Postgres Column Level Security.',
 }
 
-PostgreSQL's [Row Level Security (RLS)](https://www.postgresql.org/docs/current/ddl-rowsecurity.html) gives you granular control over who can access rows of data. However, it doesn't give you control over which columns they can access within rows. Sometimes you want to restrict access to specific columns in your database. Column Level Privilages allows you to do just that.
+PostgreSQL's [Row Level Security (RLS)](https://www.postgresql.org/docs/current/ddl-rowsecurity.html) gives you granular control over who can access rows of data. However, it doesn't give you control over which columns they can access within rows. Sometimes you want to restrict access to specific columns in your database. Column Level Privileges allows you to do just that.
 
 <Admonition type="caution">
-  This is an advanced feature. We do not recommend using column-level privilages for most users.
+  This is an advanced feature. We do not recommend using column-level privileges for most users.
   Instead, we recommend using RLS policies in combination with a dedicated table for handling user
   roles.
 </Admonition>
@@ -76,15 +76,15 @@ from
 
 This time, we are revoking the column-level `UPDATE` privilege of the `title` column from the `authenticated` role. We didn't need to revoke the table-level `UPDATE` privilege because it's already revoked.
 
-## Manage column privilages in the Dashboard
+## Manage column privileges in the Dashboard
 
 You can view and edit the privileges in the [Supabase Studio](https://app.supabase.com/project/_/auth/privileges).
 
 ![Column level privileges](/docs/img/guides/privileges/column-level-privileges.png)
 
-## Manage column privilages in Migrations
+## Manage column privileges in Migrations
 
-While you can manage privilages directly from the Dashboard, as your project grows you may want to manage them in your migrations. Read about database migrations in the [Local Development](https://supabase.com/docs/guides/getting-started/local-development#database-migrations) guide.
+While you can manage privileges directly from the Dashboard, as your project grows you may want to manage them in your migrations. Read about database migrations in the [Local Development](https://supabase.com/docs/guides/getting-started/local-development#database-migrations) guide.
 
 <StepHikeCompact>
 
@@ -148,7 +148,7 @@ authenticated;
   </StepHikeCompact.Step>
 </StepHikeCompact>
 
-## Considerations when using column-level privilages
+## Considerations when using column-level privileges
 - If you turn off a column privilege you won't be able to use that column at all.
 - All operations (insert, update, delete) as well as using `select *` will fail.
 
