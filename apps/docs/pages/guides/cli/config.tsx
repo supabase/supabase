@@ -1,4 +1,4 @@
-import specFile from '~/../../spec/cli_v1_config.yaml' assert { type: 'yml' }
+import specFile from '~/spec/cli_v1_config.yaml' assert { type: 'yml' }
 import { Parameter } from '~/lib/refGenerator/refTypes'
 import ReactMarkdown from 'react-markdown'
 import GuidesTableOfContents from '~/components/GuidesTableOfContents'
@@ -96,7 +96,7 @@ function Info({ parameter }: { parameter: Parameter }) {
                 <p className="text-sm font-bold uppercase">See also</p>
                 <ul>
                   {parameter.links.map((link) => (
-                    <li>
+                    <li key={link.link}>
                       <a href={link.link}>{link.name}</a>
                     </li>
                   ))}

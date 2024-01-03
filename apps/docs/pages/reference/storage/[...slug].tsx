@@ -1,5 +1,5 @@
 import { CodeBlock, Tabs } from 'ui'
-import specFile from '~/../../spec/transforms/storage_v0_openapi_deparsed.json' assert { type: 'json' }
+import specFile from '~/spec/transforms/storage_v0_openapi_deparsed.json' assert { type: 'json' }
 import { gen_v3 } from '~/lib/refGenerator/helpers'
 
 import RefSubLayout from '~/layouts/ref/RefSubLayout'

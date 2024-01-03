@@ -1,6 +1,6 @@
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
 
-import spec from '~/../../spec/cli_v1_commands.yaml' assert { type: 'yaml' }
+import spec from '~/spec/cli_v1_commands.yaml' assert { type: 'yaml' }
 import Param from '~/components/Params'
 import Options from '~/components/Options'
 
