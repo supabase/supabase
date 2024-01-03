@@ -3,6 +3,7 @@ import dayjs from 'dayjs'
 import { compact } from 'lodash'
 import { z } from 'zod'
 import { PostgresColumn, PostgresTable } from './types'
+import { getAppStateSnapshot } from './state'
 
 const NameDefinition = z.union([
   z.object({
@@ -289,4 +290,16 @@ export function slugify(str: string) {
     .replace(/[^\w-]+/g, '') // Remove non-word characters except hyphens
     .replace(/--+/g, '-') // Replace multiple consecutive hyphens with a single hyphen
     .replace(/^-+|-+$/g, '') // Remove leading and trailing hyphens
+}
+
+export const copyToClipboard = () => {
+  const snap = getAppStateSnapshot()
+  const focused = window.document.hasFocus()
+  if (focused) {
+    console.log('hay', snap)
+    window.navigator?.clipboard?.writeText(snap.selectedCode)
+  } else {
+    console.log('hoo')
+    console.warn('Unable to copy to clipboard')
+  }
 }
