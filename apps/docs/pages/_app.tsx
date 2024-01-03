@@ -19,6 +19,7 @@ import { IS_PLATFORM } from '~/lib/constants'
 import { unauthedAllowedPost } from '~/lib/fetch/fetchWrappers'
 import { useRootQueryClient } from '~/lib/fetch/queryClient'
 import { useOnLogout } from '~/lib/userAuth'
+import { LOCAL_STORAGE_KEYS, remove } from '~/lib/storage'
 
 /**
  *
@@ -28,10 +29,17 @@ import { useOnLogout } from '~/lib/userAuth'
  * **/
 function SignOutHandler({ children }: PropsWithChildren) {
   const queryClient = useQueryClient()
-  useOnLogout(() => {
+
+  const cleanUp = useCallback(() => {
     queryClient.cancelQueries()
     queryClient.clear()
-  })
+
+    Object.keys(LOCAL_STORAGE_KEYS).forEach((key) => {
+      remove('local', LOCAL_STORAGE_KEYS[key])
+    })
+  }, [queryClient])
+
+  useOnLogout(cleanUp)
 
   return <>{children}</>
 }

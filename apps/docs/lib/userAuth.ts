@@ -1,16 +1,7 @@
 import { gotrueClient } from 'common'
-import { LOCAL_STORAGE_KEYS, remove } from './storage'
 import { useEffect } from 'react'
 
 export const auth = gotrueClient
-
-auth.onAuthStateChange((event) => {
-  if (event === 'SIGNED_OUT') {
-    Object.keys(LOCAL_STORAGE_KEYS).forEach((key) => {
-      remove('local', LOCAL_STORAGE_KEYS[key])
-    })
-  }
-})
 
 export async function getAccessToken() {
   // ignore if server-side
