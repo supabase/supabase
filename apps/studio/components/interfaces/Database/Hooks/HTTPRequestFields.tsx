@@ -104,7 +104,7 @@ const HTTPRequestFields = ({
             <Listbox id="http_url" name="http_url" label="Select which edge function to trigger">
               {edgeFunctions.map((fn) => {
                 const restUrl = selectedProject?.restUrl
-                const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
+                const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : 'co'
                 const functionUrl = `https://${ref}.supabase.${restUrlTld}/functions/v1/${fn.slug}`
 
                 return (

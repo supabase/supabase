@@ -1,4 +1,3 @@
-import dayjs from 'dayjs'
 import { filterFunctionsRequestResponse } from 'lib/logs'
 import { PreviewLogData } from '..'
 import { LOGS_TAILWIND_CLASSES } from '../Logs.constants'
@@ -15,7 +14,7 @@ const FunctionInvocationSelectionRender = ({ log }: { log: PreviewLogData }) => 
   const response = metadata?.response?.[0]
   const method = request?.method
   const status = response?.status_code
-  const requestUrl = new URL(request?.url)
+  const requestUrl = request?.url !== undefined ? new URL(request?.url) : undefined
   const executionTimeMs = metadata.execution_time_ms
   const deploymentId = metadata.deployment_id
 
@@ -32,10 +31,12 @@ const FunctionInvocationSelectionRender = ({ log }: { log: PreviewLogData }) => 
         <SelectionDetailedRow label="Execution Time" value={`${executionTimeMs}ms`} />
         <SelectionDetailedRow label="Deployment ID" value={deploymentId} />
         <SelectionDetailedRow label="Log ID" value={log.id} />
-        <SelectionDetailedRow
-          label="Request Path"
-          value={requestUrl.pathname + requestUrl.search}
-        />
+        {requestUrl !== undefined && (
+          <SelectionDetailedRow
+            label="Request Path"
+            value={requestUrl.pathname + requestUrl.search}
+          />
+        )}
       </div>
       <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding}`}>
         <h3 className="text-lg text-foreground mb-4">Request Metadata</h3>

@@ -389,20 +389,24 @@ class StorageExplorerStore {
       return filePreview.url
     } else {
       const signedUrl = await this.fetchFilePreview(file.name, expiresIn)
-      const formattedUrl = new URL(signedUrl)
-      formattedUrl.searchParams.set('t', new Date().toISOString())
-      const fileUrl = formattedUrl.toString()
+      try {
+        const formattedUrl = new URL(signedUrl)
+        formattedUrl.searchParams.set('t', new Date().toISOString())
+        const fileUrl = formattedUrl.toString()
 
-      // Also save it to cache
-      const fileCache = {
-        id: file.id,
-        url: fileUrl,
-        expiresIn: DEFAULT_EXPIRY,
-        fetchedAt: Date.now(),
+        // Also save it to cache
+        const fileCache = {
+          id: file.id,
+          url: fileUrl,
+          expiresIn: DEFAULT_EXPIRY,
+          fetchedAt: Date.now(),
+        }
+        this.addFileToPreviewCache(fileCache)
+        return fileUrl
+      } catch (error) {
+        console.error('Failed to get file URL', error)
+        return ''
       }
-      this.addFileToPreviewCache(fileCache)
-
-      return fileUrl
     }
   }
 
@@ -721,7 +725,7 @@ class StorageExplorerStore {
     this.clearSelectedItemsToMove()
   }
 
-  fetchFilePreview = async (fileName, expiresIn = 0) => {
+  fetchFilePreview = async (fileName, expiresIn = 0): Promise<string | null> => {
     const includeBucket = false
     const pathToFile = this.getPathAlongOpenedFolders(includeBucket)
     const formattedPathToFile = pathToFile.length > 0 ? `${pathToFile}/${fileName}` : fileName

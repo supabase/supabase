@@ -5,10 +5,8 @@ import { useParams } from 'common'
 import { find, isUndefined } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
 
 import { parseSupaTable, SupabaseGrid, SupaTable } from 'components/grid'
-import { Dictionary } from 'types'
 import { ERROR_PRIMARY_KEY_NOTFOUND } from 'components/grid/constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Connecting from 'components/ui/Loading/Loading'
@@ -28,11 +26,12 @@ import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { EMPTY_ARR } from 'lib/void'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { SchemaView } from 'types'
+import { Dictionary, SchemaView } from 'types'
 import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
 import GridHeaderActions from './GridHeaderActions'
 import NotFoundState from './NotFoundState'
 import SidePanelEditor from './SidePanelEditor'
+import { useEncryptedColumns } from './SidePanelEditor/SidePanelEditor.utils'
 import TableDefinition from './TableDefinition'
 
 export interface TableGridEditorProps {
@@ -49,15 +48,13 @@ const TableGridEditor = ({
   selectedTable,
 }: TableGridEditorProps) => {
   const router = useRouter()
-  const { meta, ui, vault } = useStore()
+  const { meta, ui } = useStore()
   const { ref: projectRef, id } = useParams()
 
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
 
   const getImpersonatedRole = useGetImpersonatedRole()
-
-  const [encryptedColumns, setEncryptedColumns] = useState([])
 
   const [{ view: selectedView = 'data' }, setUrlState] = useUrlState()
   const setSelectedView = (view: string) => {
@@ -72,10 +69,10 @@ const TableGridEditor = ({
   const canEditColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
   const isReadOnly = !canEditTables && !canEditColumns
 
-  const getEncryptedColumns = async (table: any) => {
-    const columns = await vault.listEncryptedColumns(table.schema, table.name)
-    setEncryptedColumns(columns)
-  }
+  const encryptedColumns = useEncryptedColumns({
+    schemaName: selectedTable?.schema,
+    tableName: selectedTable?.name,
+  })
 
   const queryClient = useQueryClient()
   const { mutate: mutateUpdateTableRow } = useTableRowUpdateMutation({
@@ -142,12 +139,6 @@ const TableGridEditor = ({
     schema: selectedTable?.schema,
   })
   const foreignKeyMeta = data || []
-
-  useEffect(() => {
-    if (selectedTable !== undefined && selectedTable.id !== undefined) {
-      getEncryptedColumns(selectedTable)
-    }
-  }, [selectedTable?.id])
 
   const entityType = useEntityType(selectedTable?.id)
   const columnsRef = useLatest(selectedTable?.columns ?? EMPTY_ARR)

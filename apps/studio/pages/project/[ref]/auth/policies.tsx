@@ -1,11 +1,10 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { partition } from 'lodash'
 import { useEffect, useState } from 'react'
-import { Button, IconExternalLink, IconSearch, Input } from 'ui'
 
+import { useParams } from 'common'
 import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Policies } from 'components/interfaces/Auth/Policies'
 import { AIPolicyEditorPanel } from 'components/interfaces/Auth/Policies/AIPolicyEditorPanel'
@@ -18,10 +17,11 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { NextPageWithLayout } from 'types'
+import { Button, IconExternalLink, IconSearch, Input } from 'ui'
 
 /**
  * Filter tables by table name and policy name
@@ -59,7 +59,7 @@ const onFilterTables = (
 }
 
 const AuthPoliciesPage: NextPageWithLayout = () => {
-  const { search } = useParams()
+  const { search, schema } = useParams()
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
   const [searchString, setSearchString] = useState<string>('')
@@ -72,6 +72,10 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
     if (search) setSearchString(search)
   }, [search])
 
+  useEffect(() => {
+    if (schema) snap.setSelectedSchemaName(schema)
+  }, [schema])
+
   const { data: schemas } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -79,8 +83,8 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   const [protectedSchemas] = partition(schemas, (schema) =>
     EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
   )
-  const schema = schemas?.find((schema) => schema.name === snap.selectedSchemaName)
-  const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
+  const selectedSchema = schemas?.find((schema) => schema.name === snap.selectedSchemaName)
+  const isLocked = protectedSchemas.some((s) => s.id === selectedSchema?.id)
 
   const { data: policies } = useDatabasePoliciesQuery({
     projectRef: project?.ref,
@@ -102,8 +106,9 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   const filteredTables = onFilterTables(tables ?? [], policies ?? [], searchString)
   const canReadPolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'policies')
   const canCreatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
+  const isPermissionsLoaded = usePermissionsLoaded()
 
-  if (!canReadPolicies) {
+  if (isPermissionsLoaded && !canReadPolicies) {
     return <NoPermission isFullPage resourceText="view this project's RLS policies" />
   }
 
@@ -132,15 +137,15 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
             />
           </div>
           <div className="flex items-center gap-x-2">
-            <a
-              target="_blank"
-              rel="noreferrer"
-              href="https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security"
-            >
-              <Button type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
+            <Button type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />} asChild>
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href="https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security"
+              >
                 Documentation
-              </Button>
-            </a>
+              </a>
+            </Button>
             {isAiAssistantEnabled && (
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger asChild>
@@ -152,7 +157,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
                     Create a new policy
                   </Button>
                 </Tooltip.Trigger>
-                {!canCreatePolicies && (
+                {isPermissionsLoaded && !canCreatePolicies && (
                   <Tooltip.Portal>
                     <Tooltip.Content side="bottom">
                       <Tooltip.Arrow className="radix-tooltip-arrow" />
