@@ -20,6 +20,7 @@ Sentry.init({
     }),
   ],
   ignoreErrors: [
+    // Used exclusively in Monaco Editor.
     'ResizeObserver',
     // [Joshen] We currently use stripe-js for customers to save their credit card data
     // I'm unable to reproduce this error on local, staging nor prod across chrome, safari or firefox
@@ -33,14 +34,9 @@ Sentry.init({
     'The provided `href` (/org/[slug]/team) value is missing query values (slug)',
     'The provided `href` (/org/[slug]/billing) value is missing query values (slug)',
     'The provided `href` (/org/[slug]/invoices) value is missing query values (slug)',
-    // [Joshen] Seems to be from hcaptcha
-    "undefined is not an object (evaluating 'n.chat.setReady')",
-    "undefined is not an object (evaluating 'i.chat.setReady')",
   ],
-  denyUrls: [
-    // [Joshen] We're getting a huge influx of events from this particular source
-    'injectCoinbaseWalletDappProvider.js',
-  ],
+  // Allow for exception captures originating only from our own code.
+  allowUrls: ['app:///_next/'],
 })
 
 // Replace dynamic query param with a template text

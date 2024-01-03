@@ -5,6 +5,7 @@ Sentry.init({
   tracesSampleRate: 0.01,
   debug: false,
   ignoreErrors: [
+    // Used exclusively in Monaco Editor.
     'ResizeObserver',
     // [Joshen] We currently use stripe-js for customers to save their credit card data
     // I'm unable to reproduce this error on local, staging nor prod across chrome, safari or firefox
