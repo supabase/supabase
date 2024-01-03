@@ -84,9 +84,9 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
           type="text"
           className="px-1.5"
           icon={
-            isFetching ? (
+            isFetching && revealedValue === undefined ? (
               <IconLoader className="animate-spin" size={16} strokeWidth={1.5} />
-            ) : revealedValue === undefined ? (
+            ) : !revealSecret ? (
               <IconEye size={16} strokeWidth={1.5} />
             ) : (
               <IconEyeOff size={16} strokeWidth={1.5} />
@@ -95,7 +95,7 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
           onClick={() => setRevealSecret(!revealSecret)}
         />
         <div className="flex-grow">
-          {revealSecret ? (
+          {revealSecret && revealedValue ? (
             <Input copy size="small" className="font-mono" value={revealedValue} />
           ) : (
             <p className="text-sm font-mono">••••••••••••••••••</p>

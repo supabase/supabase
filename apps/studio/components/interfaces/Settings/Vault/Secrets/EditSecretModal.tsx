@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { Button, Form, IconEye, IconEyeOff, Input, Modal } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { usePgSodiumKeyCreateMutation } from 'data/pg-sodium-keys/pg-sodium-key-create-mutation'
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import { useVaultSecretUpdateMutation } from 'data/vault/vault-secret-update-mutation'
@@ -97,7 +97,6 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
 
   return (
     <Modal
-      closable
       hideFooter
       size="medium"
       visible={selectedSecret !== undefined}
@@ -131,14 +130,8 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
           )
 
           return isLoadingSecretValue ? (
-            <div className="space-y-2 py-4 px-2">
-              <ShimmeringLoader />
-              <div className="w-3/4">
-                <ShimmeringLoader />
-              </div>
-              <div className="w-1/2">
-                <ShimmeringLoader />
-              </div>
+            <div className="p-4">
+              <GenericSkeletonLoader />
             </div>
           ) : (
             <div className="py-4">
