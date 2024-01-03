@@ -20,13 +20,13 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@apidevtools/swagger-cli": "^4.0.4",
+    "@redocly/cli": "^1.6.0",
     "@types/json-stringify-safe": "^5.0.0",
-    "@types/lodash": "^4.14.185",
+    "@types/lodash": "^4.14.202",
     "json-stringify-safe": "^5.0.1",
     "lodash": "^4.17.21",
-    "prettier": "^2.7.1",
-    "tsx": "^3.14.0"
+    "prettier": "^2.8.8",
+    "tsx": "^4.7.0"
   },
   "prettier": {
     "semi": false,

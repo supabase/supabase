@@ -14,6 +14,7 @@ import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-muta
 import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-mutation'
 import { tableKeys } from 'data/tables/keys'
 import { useGetTables } from 'data/tables/tables-query'
+import { viewKeys } from 'data/views/keys'
 import { useStore, useUrlState } from 'hooks'
 import { TableLike } from 'hooks/misc/useTable'
 import { noop } from 'lib/void'
@@ -151,9 +152,19 @@ const DeleteConfirmationDialogs = ({
             selectedTable!.name,
           ])
         ),
+        // refetch all entities in the sidebar because deleting a column may regenerate a view (and change its id)
+        queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
+        // invalidate all views from this schema, not sure if this is needed since you can't actually delete a column
+        // which has a view dependent on it
+        snap.selectedSchemaName
+          ? queryClient.invalidateQueries(
+              viewKeys.listBySchema(projectRef, snap.selectedSchemaName)
+            )
+          : null,
+        // invalidate the view if there's a view with this id, not sure if this is needed because you can't delete a
+        // column from a view
+        queryClient.invalidateQueries(viewKeys.view(projectRef, selectedTable?.id)),
       ])
-
-      if (snap.selectedSchemaName) await meta.views.loadBySchema(snap.selectedSchemaName)
     } catch (error: any) {
       ui.setNotification({
         category: 'error',
@@ -176,7 +187,17 @@ const DeleteConfirmationDialogs = ({
 
       const tables = await getTables(snap.selectedSchemaName)
 
-      await queryClient.invalidateQueries(entityTypeKeys.list(projectRef))
+      await Promise.all([
+        queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
+        // invalidate all views from this schema
+        snap.selectedSchemaName
+          ? queryClient.invalidateQueries(
+              viewKeys.listBySchema(projectRef, snap.selectedSchemaName)
+            )
+          : null,
+        // invalidate the view if there's a view with this id
+        queryClient.invalidateQueries(viewKeys.view(projectRef, selectedTableToDelete?.id)),
+      ])
 
       onAfterDeleteTable(tables)
 
@@ -184,7 +205,6 @@ const DeleteConfirmationDialogs = ({
         category: 'success',
         message: `Successfully deleted table "${selectedTableToDelete.name}"`,
       })
-      if (snap.selectedSchemaName) await meta.views.loadBySchema(snap.selectedSchemaName)
     } catch (error: any) {
       ui.setNotification({
         error,

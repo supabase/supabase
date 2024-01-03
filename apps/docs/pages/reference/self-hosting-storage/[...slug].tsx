@@ -1,5 +1,5 @@
-import storageSpec from '~/../../spec/storage_v0_openapi.json' assert { type: 'json' }
-import selfHostingStorageCommonSections from '~/../../spec/common-self-hosting-storage-sections.json'
+import storageSpec from '~/spec/storage_v0_openapi.json' assert { type: 'json' }
+import selfHostingStorageCommonSections from '~/spec/common-self-hosting-storage-sections.json'
 import RefSectionHandler from '~/components/reference/RefSectionHandler'
 import { flattenSections } from '~/lib/helpers'
 import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'

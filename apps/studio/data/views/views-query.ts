@@ -1,49 +1,66 @@
-import { PostgresView } from '@supabase/postgres-meta'
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { UseQueryOptions, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useCallback } from 'react'
+
+import { get } from 'data/fetchers'
+import { ResponseError } from 'types'
 import { viewKeys } from './keys'
-import { View } from './view-query'
 
 export type ViewsVariables = {
   projectRef?: string
   connectionString?: string
+  schema?: string
 }
 
-export type ViewsResponse = View[] | { error?: any }
-
 export async function getViews(
-  { projectRef, connectionString }: ViewsVariables,
+  { projectRef, connectionString, schema }: ViewsVariables,
   signal?: AbortSignal
 ) {
-  if (!projectRef) {
-    throw new Error('projectRef is required')
-  }
+  if (!projectRef) throw new Error('projectRef is required')
 
   let headers = new Headers()
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
-  const response = (await get(`${API_URL}/pg-meta/${projectRef}/views`, {
-    headers: Object.fromEntries(headers),
+  const { data, error } = await get('/platform/pg-meta/{ref}/views', {
+    params: {
+      header: { 'x-connection-encrypted': connectionString! },
+      path: { ref: projectRef },
+      query: {
+        included_schemas: schema || '',
+      } as any,
+    },
+    headers,
     signal,
-  })) as ViewsResponse
+  })
 
-  if (!Array.isArray(response) && response.error) {
-    throw response.error
-  }
-
-  return response as PostgresView[]
+  if (error) throw error
+  return data
 }
 
 export type ViewsData = Awaited<ReturnType<typeof getViews>>
-export type ViewsError = unknown
+export type ViewsError = ResponseError
 
 export const useViewsQuery = <TData = ViewsData>(
-  { projectRef, connectionString }: ViewsVariables,
+  { projectRef, connectionString, schema }: ViewsVariables,
   { enabled = true, ...options }: UseQueryOptions<ViewsData, ViewsError, TData> = {}
 ) =>
   useQuery<ViewsData, ViewsError, TData>(
-    viewKeys.list(projectRef),
-    ({ signal }) => getViews({ projectRef, connectionString }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
+    schema ? viewKeys.listBySchema(projectRef, schema) : viewKeys.list(projectRef),
+    ({ signal }) => getViews({ projectRef, connectionString, schema }, signal),
+    {
+      enabled: enabled && typeof projectRef !== 'undefined',
+      ...options,
+    }
   )
+
+export const useViewsPrefetch = ({ projectRef, connectionString, schema }: ViewsVariables) => {
+  const client = useQueryClient()
+
+  return useCallback(() => {
+    if (projectRef) {
+      client.prefetchQuery(
+        schema ? viewKeys.listBySchema(projectRef, schema) : viewKeys.list(projectRef),
+        ({ signal }) => getViews({ projectRef, connectionString, schema }, signal)
+      )
+    }
+  }, [projectRef, schema])
+}

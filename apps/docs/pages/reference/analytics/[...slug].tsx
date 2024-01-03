@@ -1,4 +1,4 @@
-import specFile from '~/../../spec/transforms/analytics_v0_openapi_deparsed.json' assert { type: 'json' }
+import specFile from '~/spec/transforms/analytics_v0_openapi_deparsed.json' assert { type: 'json' }
 import { gen_v3, enrichedOperation } from '~/lib/refGenerator/helpers'
 import { Tabs, CodeBlock } from 'ui'
 
