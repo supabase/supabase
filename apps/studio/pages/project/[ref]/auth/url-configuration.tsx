@@ -5,13 +5,14 @@ import SiteUrl from 'components/interfaces/Auth/SiteUrl/SiteUrl'
 import { AuthLayout } from 'components/layouts'
 import { FormsContainer } from 'components/ui/Forms'
 import NoPermission from 'components/ui/NoPermission'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
 import { NextPageWithLayout } from 'types'
 
 const URLConfiguration: NextPageWithLayout = () => {
   const canReadAuthSettings = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
+  const isPermissionsLoaded = usePermissionsLoaded()
 
-  if (!canReadAuthSettings) {
+  if (isPermissionsLoaded && !canReadAuthSettings) {
     return <NoPermission isFullPage resourceText="access your project's email settings" />
   } else {
     return (
