@@ -1,4 +1,4 @@
-import specFile from '~/../../spec/storage_v0_config.yaml' assert { type: 'yml' }
+import specFile from '~/spec/storage_v0_config.yaml' assert { type: 'yml' }
 import { Parameter } from '~/lib/refGenerator/refTypes'
 
 import ReactMarkdown from 'react-markdown'
