@@ -100,6 +100,7 @@ export const LOCAL_STORAGE_KEYS = {
   UI_PREVIEW_API_SIDE_PANEL: 'supabase-ui-api-side-panel',
   UI_PREVIEW_RLS_AI_ASSISTANT: 'supabase-ui-rls-ai-assistant',
   DASHBOARD_HISTORY: (ref: string) => `dashboard-history-${ref}`,
+  UI_PREVIEW_CLS: 'supabase-ui-cls',
 }
 
 export const OPT_IN_TAGS = {

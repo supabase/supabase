@@ -2,6 +2,7 @@ import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
+import { useIsColumnLevelPrivilegesEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import ProductMenu from 'components/ui/ProductMenu'
 import { useAuthConfigPrefetch } from 'data/auth/auth-config-query'
 import { useFlag, withAuth } from 'hooks'
@@ -15,7 +16,7 @@ export interface AuthLayoutProps {
 const AuthLayout = ({ title, children }: PropsWithChildren<AuthLayoutProps>) => {
   const { ref: projectRef = 'default' } = useParams()
   const hooksReleased = useFlag('authHooksReleased')
-  const columnLevelPrivileges = useFlag('columnLevelPrivileges')
+  const columnLevelPrivileges = useIsColumnLevelPrivilegesEnabled()
 
   useAuthConfigPrefetch({ projectRef })
 

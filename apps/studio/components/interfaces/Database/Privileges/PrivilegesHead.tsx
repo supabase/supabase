@@ -34,7 +34,7 @@ const PrivilegesHead = ({
   isApplyingChanges = false,
 }: PrivilegesHeadProps) => {
   return (
-    <div className="mb-4">
+    <div className="mb-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <div className="w-[230px]">
@@ -120,7 +120,7 @@ const RolesListbox = ({
 }) => {
   return (
     <Listbox size="small" value={selectedRole} onChange={onChangeRole}>
-      <Listbox.Option disabled key="normal-rols" value="normal-rols" label="Roles">
+      <Listbox.Option disabled key="normal-roles" value="normal-roles" label="Roles">
         <p className="text-sm">Roles</p>
       </Listbox.Option>
       {roles.map((role) => (

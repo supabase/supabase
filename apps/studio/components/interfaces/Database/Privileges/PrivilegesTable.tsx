@@ -1,6 +1,6 @@
 import Table from 'components/to-be-cleaned/Table'
 import { ColumnPrivilege } from 'data/privileges/column-privileges-query'
-import { Toggle } from 'ui'
+import { Switch, Toggle } from 'ui'
 import {
   ALL_PRIVILEGE_TYPES,
   COLUMN_PRIVILEGE_TYPES,
@@ -14,6 +14,7 @@ export interface PrivilegesTableProps
     'tableCheckedStates' | 'columnCheckedStates' | 'toggleTablePrivilege' | 'toggleColumnPrivilege'
   > {
   columnPrivileges: ColumnPrivilege[]
+  isApplyingChanges?: boolean
 }
 
 const PrivilegesTable = ({
@@ -22,6 +23,7 @@ const PrivilegesTable = ({
   columnCheckedStates,
   toggleTablePrivilege,
   toggleColumnPrivilege,
+  isApplyingChanges = false,
 }: PrivilegesTableProps) => {
   const handleClickColumnName = (columnId: string) => {
     const hasAllPrivileges = COLUMN_PRIVILEGE_TYPES.every(
@@ -48,16 +50,15 @@ const PrivilegesTable = ({
 
           return (
             <Table.th key={`header-${privilege}`}>
-              <div className="inline-flex items-baseline gap-2">
+              <div className="inline-flex items-center gap-2">
                 <span>{privilege.charAt(0) + privilege.slice(1).toLowerCase()}</span>
 
-                <Toggle
+                <Switch
                   checked={checked}
-                  onChange={() => {
+                  onCheckedChange={() => {
                     toggleTablePrivilege(privilege)
                   }}
-                  // disabled={isLoading}
-                  size="tiny"
+                  disabled={isApplyingChanges}
                 />
               </div>
             </Table.th>
@@ -78,13 +79,12 @@ const PrivilegesTable = ({
               <Table.td key={privilege}>
                 {COLUMN_PRIVILEGE_TYPES.includes(privilege as any) && (
                   <div className="inline-flex">
-                    <Toggle
+                    <Switch
                       checked={checked}
-                      onChange={() => {
+                      onCheckedChange={() => {
                         toggleColumnPrivilege(column.column_id, privilege)
                       }}
-                      // disabled={isLoading}
-                      size="tiny"
+                      disabled={isApplyingChanges}
                     />
                   </div>
                 )}

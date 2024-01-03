@@ -231,6 +231,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
                 columnCheckedStates={columnCheckedStates}
                 toggleTablePrivilege={toggleTablePrivilege}
                 toggleColumnPrivilege={toggleColumnPrivilege}
+                isApplyingChanges={isApplyingChanges}
               />
               <p className="text-xs text-right text-light">
                 <strong>Warning: </strong>

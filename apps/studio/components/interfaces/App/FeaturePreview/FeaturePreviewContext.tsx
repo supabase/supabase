@@ -67,3 +67,8 @@ export const useIsRLSAIAssistantEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT]
 }
+
+export const useIsColumnLevelPrivilegesEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]
+}
