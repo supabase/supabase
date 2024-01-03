@@ -7,7 +7,7 @@ info:
 
     Supabase Swift.
 
-  specUrl: https://github.com/supabase/supabase/edit/master/spec/supabase_swift_v2.yml
+  specUrl: https://github.com/supabase/supabase/edit/master/apps/docs/spec/supabase_swift_v2.yml
   slugPrefix: "/"
   libraries:
     - id: "Swift"
