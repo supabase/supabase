@@ -241,7 +241,7 @@ const EditWrapper = () => {
                         connectionString: project?.connectionString,
                         id: secret.id,
                       })
-                      return { [option.name]: value }
+                      return { [option.name]: value[0].decrypted_secret }
                     } else {
                       return { [option.name]: '' }
                     }
