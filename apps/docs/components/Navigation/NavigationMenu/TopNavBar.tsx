@@ -89,7 +89,7 @@ const TopNavBar: FC = () => {
           )}
           {process.env.NEXT_PUBLIC_DEV_AUTH_PAGE === 'true' && (
             <Button asChild>
-              <Link href="/__dev-secret-auth">Dev auth page</Link>
+              <Link href="/__dev-secret-auth">Supabase Team signin</Link>
             </Button>
           )}
           <Link
