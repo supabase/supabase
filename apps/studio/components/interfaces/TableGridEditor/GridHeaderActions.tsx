@@ -4,7 +4,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { MousePointer2 } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import toast from 'react-hot-toast'
 import {
   Button,
@@ -154,23 +154,57 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
 
         {table.rls_enabled ? (
           <div className="flex items-center gap-1">
-            <Link passHref href={`/project/${projectRef}/auth/policies?search=${table.id}`}>
-              <Button
-                type={table.rls_enabled ? 'default' : 'warning'}
-                className="group !h-[28px] !py-0"
-                icon={
-                  policies.length > 0 ? (
-                    <span className="text-right text-xs rounded-xl px-2 py-0.5 bg-surface-200 dark:bg-surface-100 text-brand-1100">
-                      {policies.length}
-                    </span>
-                  ) : (
-                    <IconPlusCircle size={12} />
-                  )
-                }
-              >
-                Auth {policies.length > 1 ? 'policies' : 'policy'}
-              </Button>
-            </Link>
+            {policies.length < 1 ? (
+              <Tooltip.Root delayDuration={0}>
+                <Tooltip.Trigger className="w-full">
+                  <Link passHref href={`/project/${projectRef}/auth/policies?search=${table.id}`}>
+                    <Button
+                      type={'warning'}
+                      className="group !h-[28px] !py-0"
+                      icon={<IconPlusCircle size={12} />}
+                    >
+                      Auth policy
+                    </Button>
+                  </Link>
+                </Tooltip.Trigger>
+                <Tooltip.Portal>
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-alternative py-1 px-2 leading-none shadow',
+                        'border border-background',
+                      ].join(' ')}
+                    >
+                      <div className="text-xs text-foreground p-1 leading-relaxed">
+                        <p>RLS is enabled for this table, but no policies are set. </p>
+                        <p>
+                          Select queries will return an <u>empty array</u> of results.
+                        </p>
+                      </div>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
+              </Tooltip.Root>
+            ) : (
+              <Link passHref href={`/project/${projectRef}/auth/policies?search=${table.id}`}>
+                <Button
+                  type={policies.length < 1 ? 'warning' : 'default'}
+                  className="group !h-[28px] !py-0"
+                  icon={
+                    policies.length > 0 ? (
+                      <span className="text-right text-xs rounded-xl px-2 py-0.5 bg-surface-200 dark:bg-surface-100 text-brand-1100">
+                        {policies.length}
+                      </span>
+                    ) : (
+                      <IconPlusCircle size={12} />
+                    )
+                  }
+                >
+                  Auth {policies.length > 1 ? 'policies' : 'policy'}
+                </Button>
+              </Link>
+            )}
           </div>
         ) : (
           <Popover_Shadcn_ open={open} onOpenChange={() => setOpen(!open)} modal={false}>
