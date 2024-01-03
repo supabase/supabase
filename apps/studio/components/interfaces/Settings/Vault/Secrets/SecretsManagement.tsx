@@ -1,6 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { sortBy } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { Fragment, useEffect, useState } from 'react'
@@ -10,7 +11,6 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import Divider from 'components/ui/Divider'
 import { useVaultSecretsQuery } from 'data/vault/vault-secrets-query'
 import { useCheckPermissions } from 'hooks'
-import { sortBy } from 'lodash'
 import { VaultSecret } from 'types'
 import AddNewSecretModal from './AddNewSecretModal'
 import DeleteSecretModal from './DeleteSecretModal'
@@ -37,25 +37,23 @@ const SecretsManagement = () => {
     projectRef: project?.ref!,
     connectionString: project?.connectionString,
   })
-
-  let secrets: VaultSecret[] = []
-  if (data) {
-    const filtered =
-      searchValue.length > 0
-        ? data?.filter(
-            (secret) =>
-              (secret?.name ?? '').toLowerCase().includes(searchValue.toLowerCase()) ||
-              secret.key_id.toLowerCase().includes(searchValue.toLowerCase())
-          )
-        : data
-    secrets = sortBy(filtered, (s) => {
+  const allSecrets = data || []
+  const secrets = sortBy(
+    searchValue.length > 0
+      ? allSecrets.filter(
+          (secret) =>
+            (secret?.name ?? '').toLowerCase().includes(searchValue.toLowerCase()) ||
+            secret.key_id.toLowerCase().includes(searchValue.toLowerCase())
+        )
+      : allSecrets,
+    (s) => {
       if (selectedSort === 'updated_at') {
         return Number(new Date(s.updated_at))
       } else {
         return s[selectedSort]
       }
-    })
-  }
+    }
+  )
 
   return (
     <>
