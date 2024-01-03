@@ -5,6 +5,7 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import { ResponseError, VaultSecret } from 'types'
 import { vaultSecretsKeys } from './keys'
 import { sqlKeys } from 'data/sql/keys'
+import toast from 'react-hot-toast'
 
 export type VaultSecretCreateVariables = {
   projectRef: string
@@ -29,6 +30,7 @@ export async function createVaultSecret({
 type VaultSecretCreateData = Awaited<ReturnType<typeof createVaultSecret>>
 
 export const useVaultSecretCreateMutation = ({
+  onError,
   onSuccess,
   ...options
 }: Omit<
@@ -46,6 +48,13 @@ export const useVaultSecretCreateMutation = ({
           sqlKeys.query(projectRef, vaultSecretsKeys.list(projectRef))
         )
         await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to delete secret: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
       },
       ...options,
     }
