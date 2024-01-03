@@ -56,7 +56,7 @@ Supabase는 오픈 소스 도구의 조합입니다. 저희는 엔터프라이�
 **아키텍처**
 
 Supabase는 [호스팅 플랫폼](https://supabase.com/dashboard)입니다. 가입만 하면 아무것도 설치하지 않고 Supabase를 사용할 수 있습니다.
-자체 호스팅](https://supabase.com/docs/guides/hosting/overview) 및 [로컬 개발](https://supabase.com/docs/guides/local-development)도 가능합니다.
+[자체 호스팅](https://supabase.com/docs/guides/hosting/overview) 및 [로컬 개발](https://supabase.com/docs/guides/local-development)도 가능합니다.
 
 ![아키텍처](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
 

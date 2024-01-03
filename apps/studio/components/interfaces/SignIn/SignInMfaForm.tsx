@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react'
 import { Button, Form, IconLock, Input } from 'ui'
 import { object, string } from 'yup'
 
+import { useTelemetryProps } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useMfaChallengeAndVerifyMutation } from 'data/profile/mfa-challenge-and-verify-mutation'
@@ -14,6 +15,7 @@ import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
 import { useStore } from 'hooks'
 import { useSignOut } from 'lib/auth'
 import { getReturnToPath } from 'lib/gotrue'
+import Telemetry from 'lib/telemetry'
 
 const signInSchema = object({
   code: string().required('MFA Code is required'),
@@ -23,6 +25,8 @@ const SignInMfaForm = () => {
   const { ui } = useStore()
   const queryClient = useQueryClient()
   const router = useRouter()
+  const telemetryProps = useTelemetryProps()
+
   const {
     data: factors,
     error: factorsError,
@@ -71,6 +75,11 @@ const SignInMfaForm = () => {
               message: `Signed in successfully!`,
             })
 
+            Telemetry.sendEvent(
+              { category: 'account', action: 'sign_in', label: '' },
+              telemetryProps,
+              router
+            )
             await queryClient.resetQueries()
 
             router.push(getReturnToPath())

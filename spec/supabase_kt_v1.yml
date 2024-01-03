@@ -2098,15 +2098,15 @@ functions:
       Creates a new user.
       - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://supabase.com/dashboard/project/_/auth/providers).
       - **Confirm email** determines if users need to confirm their email address after signing up.
-        - If **Confirm email** is enabled, the return value is null and you will be logged in instead.
-        - If **Confirm email** is disabled, the return value is the user and you won't be logged in automatically.
+        - If **Confirm email** is enabled, the return value is the user and you won't be logged in automatically.
+        - If **Confirm email** is disabled, the return value is null and you will be logged in instead.
       - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
       - To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
       - If signUpWith() is called for an existing confirmed user:
         - If **Confirm email** is enabled in [your project](https://supabase.com/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
         - If **Confirm email** is disabled, the error message, `User already registered` is returned.
     examples:
-      - id: sign-up-phone
+      - id: sign-up-email
         name: Sign up with email
         isSpotlight: true
         code: |

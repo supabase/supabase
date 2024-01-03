@@ -54,7 +54,7 @@ Upon sign out, all refresh tokens and potentially other database objects related
 
 <Admonition type="caution">
 
-Access tokens of revoked sessions remain valid until their expiry time, encoded in the `exp` claim. The user won't be immediately loggged out and will only be logged out when the access token expires. 
+Access tokens of revoked sessions remain valid until their expiry time, encoded in the `exp` claim. The user won't be immediately logged out and will only be logged out when the access token expires. 
 
 </Admonition>
 
@@ -156,7 +156,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 })
 ```
 
-The `customStorageObject` should implement the [`localStorage` interface](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage).
+The `customStorageObject` should implement the `getItem`, `setItem`, and `removeItem` methods from the [`Storage` interface](https://developer.mozilla.org/en-US/docs/Web/API/Storage). Async versions of these methods are also supported.
 
 When using cookies to store access and refresh tokens, make sure that the [`Expires` or `Max-Age` attributes](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#attributes) of the cookies is set to a timestamp very far into the future. Browsers will clear the cookies, but the session will remain active in Supabase Auth. Therefore it's best to let Supabase Auth control the validity of these tokens and instruct the browser to always store the cookies indefinitely.
 

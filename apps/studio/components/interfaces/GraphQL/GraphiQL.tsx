@@ -35,7 +35,8 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
 import { MouseEventHandler, useCallback, useEffect, useState } from 'react'
 
-import { useCheckPermissions, useFlag, useLocalStorage } from 'hooks'
+import { useCheckPermissions, useLocalStorage } from 'hooks'
+import { XIcon } from 'lucide-react'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -45,7 +46,6 @@ import {
 } from 'ui'
 import { RoleImpersonationSelector } from '../RoleImpersonationSelector'
 import styles from './graphiql.module.css'
-import { XIcon } from 'lucide-react'
 
 export interface GraphiQLProps {
   fetcher: Fetcher
@@ -81,7 +81,6 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
   const merge = useMergeQuery()
   const prettify = usePrettifyEditors()
 
-  const roleImpersonationEnabledFlag = useFlag('roleImpersonation')
   const canReadJWTSecret = useCheckPermissions(PermissionAction.READ, 'field.jwt_secret')
 
   const [rlsBypassedWarningDismissed, setRlsBypassedWarningDismissed] = useLocalStorage(
@@ -315,7 +314,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                         Headers
                       </UnStyledButton>
 
-                      {canReadJWTSecret && roleImpersonationEnabledFlag && (
+                      {canReadJWTSecret && (
                         <UnStyledButton
                           type="button"
                           className={
@@ -370,7 +369,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
 
                       <HeaderEditor isHidden={activeSecondaryEditor !== 'headers'} />
 
-                      {canReadJWTSecret && roleImpersonationEnabledFlag && (
+                      {canReadJWTSecret && (
                         <div
                           className={clsx(
                             'graphiql-editor px-1',
@@ -412,9 +411,8 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                         <span className="text-amber-900">RLS will be bypassed.</span>
                       </AlertTitle_Shadcn_>
                       <AlertDescription_Shadcn_>
-                        {roleImpersonationEnabledFlag
-                          ? 'You can send queries as a specific role/user by using the role impersonation tab.'
-                          : 'You can send queries as a specific role/user by changing the "Authorization" header.'}
+                        You can send queries as a specific role/user by using the role impersonation
+                        tab.
                       </AlertDescription_Shadcn_>
                       <Button
                         type="outline"

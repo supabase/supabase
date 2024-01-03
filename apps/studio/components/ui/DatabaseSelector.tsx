@@ -1,5 +1,11 @@
-import { useParams } from 'common'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
+
+import { useParams } from 'common'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { formatDatabaseID, formatDatabaseRegion } from 'data/read-replicas/replicas.utils'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Button,
   CommandGroup_Shadcn_,
@@ -8,6 +14,7 @@ import {
   Command_Shadcn_,
   IconCheck,
   IconChevronDown,
+  IconPlus,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
@@ -15,24 +22,21 @@ import {
   cn,
 } from 'ui'
 
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { formatDatabaseID, formatDatabaseRegion } from 'data/read-replicas/replicas.utils'
-
 interface DatabaseSelectorProps {
-  selectedDatabaseId?: string
   variant?: 'regular' | 'connected-on-right' | 'connected-on-left' | 'connected-on-both'
-  onChangeDatabaseId: (id: string) => void
 }
 
-const DatabaseSelector = ({
-  selectedDatabaseId,
-  variant = 'regular',
-  onChangeDatabaseId,
-}: DatabaseSelectorProps) => {
+const DatabaseSelector = ({ variant = 'regular' }: DatabaseSelectorProps) => {
+  const router = useRouter()
   const { ref: projectRef } = useParams()
   const [open, setOpen] = useState(false)
+
+  const state = useDatabaseSelectorStateSnapshot()
+  const selectedDatabaseId = state.selectedDatabaseId
+
   const { data } = useReadReplicasQuery({ projectRef })
   const databases = data ?? []
+
   const selectedDatabase = databases.find((db) => db.identifier === selectedDatabaseId)
   const selectedDatabaseRegion = formatDatabaseRegion(selectedDatabase?.region ?? '')
   const formattedDatabaseId = formatDatabaseID(selectedDatabaseId ?? '')
@@ -80,11 +84,11 @@ const DatabaseSelector = ({
                       value={database.identifier}
                       className="cursor-pointer w-full"
                       onSelect={() => {
-                        onChangeDatabaseId(database.identifier)
+                        state.setSelectedDatabaseId(database.identifier)
                         setOpen(false)
                       }}
                       onClick={() => {
-                        onChangeDatabaseId(database.identifier)
+                        state.setSelectedDatabaseId(database.identifier)
                         setOpen(false)
                       }}
                     >
@@ -100,6 +104,27 @@ const DatabaseSelector = ({
                   )
                 })}
               </ScrollArea>
+            </CommandGroup_Shadcn_>
+            <CommandGroup_Shadcn_ className="border-t">
+              <CommandItem_Shadcn_
+                className="cursor-pointer w-full"
+                onSelect={() => {
+                  setOpen(false)
+                  router.push(`/project/${projectRef}/settings/infrastructure`)
+                }}
+                onClick={() => setOpen(false)}
+              >
+                <Link
+                  href={`/project/${projectRef}/settings/infrastructure`}
+                  onClick={() => {
+                    setOpen(false)
+                  }}
+                  className="w-full flex items-center gap-2"
+                >
+                  <IconPlus size={14} strokeWidth={1.5} />
+                  <p>Create a new read replica</p>
+                </Link>
+              </CommandItem_Shadcn_>
             </CommandGroup_Shadcn_>
           </CommandList_Shadcn_>
         </Command_Shadcn_>

@@ -13,13 +13,13 @@ async function waitForRunCompletion(params: { threadId: string; runId: string })
   let realRun = await openai.beta.threads.runs.retrieve(params.threadId, params.runId)
 
   while (realRun.status === 'in_progress') {
-    console.log('while..')
+    //console.log('while..')
     await new Promise((resolve) => setTimeout(resolve, 2000))
     realRun = await openai.beta.threads.runs.retrieve(params.threadId, params.runId)
-    console.log('realRun', realRun.status)
+    //console.log('realRun', realRun.status)
   }
 
-  console.log('Run completed:', realRun.status)
+  //console.log('Run completed:', realRun.status)
 }
 
 export async function CodeEditor({ params }: { params: any }) {

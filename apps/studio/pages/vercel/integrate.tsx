@@ -6,7 +6,7 @@ import { useRouter } from 'next/router'
 import { ChangeEvent, createContext, useContext, useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
 
-import { Dictionary } from 'components/grid'
+import { Dictionary } from 'types'
 import VercelIntegrationLayout from 'components/layouts/VercelIntegrationLayout'
 import {
   createVercelEnv,

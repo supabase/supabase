@@ -65,52 +65,10 @@ To sign up the user, call [signUpWith(Email)](/docs/reference/kotlin/auth-signup
 
 ```kotlin
 suspend fun signUpNewUser() {
-	supabase.gotrue.signUpWith(Email) {
+	supabase.auth.signUpWith(Email) {
 		email = "example@email.com"
 		password = "example-password"
 	}
-}
-```
-
-</TabPanel>
-</Tabs>
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="js"
-  queryGroup="language"
->
-<TabPanel id="js" label="JavaScript">
-
-When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
-
-```js
-async function signOut() {
-  const { error } = await supabase.auth.signOut()
-}
-```
-
-</TabPanel>
-<TabPanel id="dart" label="Dart">
-
-When your user signs out, call [signOut()](/docs/reference/dart/auth-signout) to remove them from the browser session and any objects from localStorage:
-
-```dart
-Future<void> signOut() async {
-   await supabase.auth.signOut();
-}
-```
-
-</TabPanel>
-<TabPanel id="kotlin" label="Kotlin">
-
-When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
-
-```kotlin
-suspend fun logout() {
-	supabase.gotrue.logout()
 }
 ```
 
@@ -156,11 +114,11 @@ Future<void> signInWithEmail() async {
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
-When your user signs in, call [loginWith(Email)](/docs/reference/kotlin/auth-signinwithpassword) with their email address and password:
+When your user signs in, call [signInWith(Email)](/docs/reference/kotlin/auth-signinwithpassword) with their email address and password:
 
 ```kotlin
 suspend fun signInWithEmail() {
-	supabase.gotrue.loginWith(Email) {
+	supabase.auth.signInWith(Email) {
 		email = "example@email.com"
 		password = "example-password"
 	}
@@ -208,7 +166,7 @@ When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) t
 
 ```kotlin
 suspend fun logout() {
-	supabase.gotrue.logout()
+	supabase.auth.signOut()
 }
 ```
 

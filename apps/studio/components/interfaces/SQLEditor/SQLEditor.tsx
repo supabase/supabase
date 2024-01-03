@@ -6,22 +6,6 @@ import { useRouter } from 'next/router'
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import Split from 'react-split'
 import { format } from 'sql-formatter'
-import {
-  AiIconAnimation,
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  IconCheck,
-  IconChevronDown,
-  IconCornerDownLeft,
-  IconLoader,
-  IconSettings,
-  IconX,
-  Input_Shadcn_,
-  cn,
-} from 'ui'
 
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useSqlEditMutation } from 'data/ai/sql-edit-mutation'
@@ -29,6 +13,7 @@ import { useSqlGenerateMutation } from 'data/ai/sql-generate-mutation'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useFormatQueryMutation } from 'data/sql/format-sql-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
@@ -46,9 +31,27 @@ import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import Telemetry from 'lib/telemetry'
+import toast from 'react-hot-toast'
 import { useAppStateSnapshot } from 'state/app-state'
-import { getImpersonatedRole } from 'state/role-impersonation-state'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { isRoleImpersonationEnabled, useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
+import {
+  AiIconAnimation,
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  IconCheck,
+  IconChevronDown,
+  IconCornerDownLeft,
+  IconLoader,
+  IconSettings,
+  IconX,
+  Input_Shadcn_,
+  cn,
+} from 'ui'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
 import { sqlAiDisclaimerComment, untitledSnippetTitle } from './SQLEditor.constants'
@@ -66,8 +69,6 @@ import {
   getDiffTypeDropdownLabel,
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import toast from 'react-hot-toast'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
@@ -105,6 +106,7 @@ const SQLEditor = () => {
   const organization = useSelectedOrganization()
   const appSnap = useAppStateSnapshot()
   const snap = useSqlEditorStateSnapshot()
+  const databaseSelectorState = useDatabaseSelectorStateSnapshot()
 
   const { mutate: formatQuery } = useFormatQueryMutation()
   const { mutateAsync: generateSql, isLoading: isGenerateSqlLoading } = useSqlGenerateMutation()
@@ -118,8 +120,9 @@ const SQLEditor = () => {
   const [pendingTitle, setPendingTitle] = useState<string>()
   const [hasSelection, setHasSelection] = useState<boolean>(false)
   const inputRef = useRef<HTMLInputElement>(null)
+
   const readReplicasEnabled = useFlag('readReplicas')
-  const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
+  const showReadReplicasUI = readReplicasEnabled && project?.is_read_replicas_enabled
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery({
@@ -159,9 +162,9 @@ const SQLEditor = () => {
   useEffect(() => {
     if (isSuccessReadReplicas) {
       const primaryDatabase = databases.find((db) => db.identifier === ref)
-      snap.setSelectedDatabaseId(primaryDatabase?.identifier)
+      databaseSelectorState.setSelectedDatabaseId(primaryDatabase?.identifier)
     }
-  }, [isSuccessReadReplicas])
+  }, [isSuccessReadReplicas, databases, ref])
 
   const { data, refetch: refetchEntityDefinitions } = useEntityDefinitionsQuery(
     {
@@ -289,6 +292,8 @@ const SQLEditor = () => {
     }
   }, [formatQuery, id, isDiffOpen, project, snap])
 
+  const getImpersonatedRole = useGetImpersonatedRole()
+
   const executeQuery = useCallback(
     async (force: boolean = false) => {
       if (isDiffOpen) return
@@ -313,7 +318,7 @@ const SQLEditor = () => {
           return
         }
 
-        if (supabaseAIEnabled && !hasHipaaAddon && snippet?.snippet.name === untitledSnippetTitle) {
+        if (!hasHipaaAddon && snippet?.snippet.name === untitledSnippetTitle) {
           // Intentionally don't await title gen (lazy)
           setAiTitle(id, sql)
         }
@@ -323,10 +328,12 @@ const SQLEditor = () => {
           setLineHighlights([])
         }
 
-        const connectionString = !readReplicasEnabled
+        const impersonatedRole = getImpersonatedRole()
+        const connectionString = !showReadReplicasUI
           ? project.connectionString
-          : databases?.find((db) => db.identifier === snap.selectedDatabaseId)?.connectionString
-        if (!connectionString) {
+          : databases?.find((db) => db.identifier === databaseSelectorState.selectedDatabaseId)
+              ?.connectionString
+        if (IS_PLATFORM && !connectionString) {
           return toast.error('Unable to run query: Connection string is missing')
         }
 
@@ -335,12 +342,24 @@ const SQLEditor = () => {
           connectionString: connectionString,
           sql: wrapWithRoleImpersonation(sql, {
             projectRef: project.ref,
-            role: getImpersonatedRole(),
+            role: impersonatedRole,
           }),
+          isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
         })
       }
     },
-    [isDiffOpen, id, isExecuting, project, execute, setAiTitle, hasHipaaAddon, supabaseAIEnabled]
+    [
+      isDiffOpen,
+      id,
+      isExecuting,
+      project,
+      hasHipaaAddon,
+      execute,
+      getImpersonatedRole,
+      setAiTitle,
+      databaseSelectorState.selectedDatabaseId,
+      databases,
+    ]
   )
 
   const handleNewQuery = useCallback(
@@ -553,7 +572,7 @@ const SQLEditor = () => {
         }}
       />
       <div className="flex h-full flex-col relative">
-        {isAiOpen && supabaseAIEnabled && !hasHipaaAddon && (
+        {isAiOpen && !hasHipaaAddon && (
           <AISchemaSuggestionPopover
             onClickSettings={() => {
               appSnap.setShowAiSettingsModal(true)

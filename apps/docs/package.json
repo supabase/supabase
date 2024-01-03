@@ -60,6 +60,7 @@
     "remark": "^14.0.2",
     "remark-emoji": "^3.1.2",
     "remark-gfm": "^3.0.1",
+    "shared-data": "*",
     "ui": "*",
     "unist-builder": "^3.0.1",
     "unist-util-filter": "^4.0.1",
@@ -82,7 +83,7 @@
     "openapi-types": "^12.0.2",
     "sass": "^1.68.0",
     "tsconfig": "*",
-    "tsx": "^3.14.0",
+    "tsx": "^4.6.2",
     "typescript": "^5.2.2"
   }
 }
