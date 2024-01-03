@@ -117,6 +117,7 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
             {
               projectRef: project?.ref!,
               id: selectedSecret?.id!,
+              connectionString: project?.connectionString,
             },
             {
               enabled: !!(project?.ref && selectedSecret?.id),

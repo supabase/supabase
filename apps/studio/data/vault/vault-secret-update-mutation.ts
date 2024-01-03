@@ -4,6 +4,7 @@ import { Query } from 'components/grid/query/Query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { ResponseError, VaultSecret } from 'types'
 import { vaultSecretsKeys } from './keys'
+import { sqlKeys } from 'data/sql/keys'
 
 export type VaultSecretUpdateVariables = {
   projectRef: string
@@ -43,7 +44,9 @@ export const useVaultSecretUpdateMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(vaultSecretsKeys.list(projectRef))
+        await queryClient.invalidateQueries(
+          sqlKeys.query(projectRef, vaultSecretsKeys.list(projectRef))
+        )
         await onSuccess?.(data, variables, context)
       },
       ...options,
