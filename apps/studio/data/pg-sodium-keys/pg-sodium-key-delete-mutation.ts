@@ -4,6 +4,7 @@ import { Query } from 'components/grid/query/Query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { ResponseError } from 'types'
 import { pgSodiumKeys } from './keys'
+import { sqlKeys } from 'data/sql/keys'
 
 export type VaultSecretDeleteVariables = {
   projectRef: string
@@ -42,8 +43,9 @@ export const usePgSodiumKeyDeleteMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        console.log(pgSodiumKeys.list(projectRef))
-        await queryClient.invalidateQueries(pgSodiumKeys.list(projectRef), {}, {})
+        await queryClient.invalidateQueries(
+          sqlKeys.query(projectRef, pgSodiumKeys.list(projectRef))
+        )
         await onSuccess?.(data, variables, context)
       },
 

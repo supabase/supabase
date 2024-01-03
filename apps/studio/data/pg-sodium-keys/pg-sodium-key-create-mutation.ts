@@ -1,6 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 
 import { executeSql } from 'data/sql/execute-sql-query'
+import { sqlKeys } from 'data/sql/keys'
 import { ResponseError } from 'types'
 import { pgSodiumKeys } from './keys'
 
@@ -46,7 +47,9 @@ export const usePgSodiumKeyCreateMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(pgSodiumKeys.list(projectRef))
+        await queryClient.invalidateQueries(
+          sqlKeys.query(projectRef, pgSodiumKeys.list(projectRef))
+        )
         await onSuccess?.(data, variables, context)
       },
       ...options,
