@@ -1,4 +1,5 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
 
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
@@ -34,6 +35,7 @@ export async function createEncryptionKey({
 type EncryptionKeyCreateData = Awaited<ReturnType<typeof createEncryptionKey>>
 
 export const usePgSodiumKeyCreateMutation = ({
+  onError,
   onSuccess,
   ...options
 }: Omit<
@@ -51,6 +53,13 @@ export const usePgSodiumKeyCreateMutation = ({
           sqlKeys.query(projectRef, pgSodiumKeys.list(projectRef))
         )
         await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to create key: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
       },
       ...options,
     }

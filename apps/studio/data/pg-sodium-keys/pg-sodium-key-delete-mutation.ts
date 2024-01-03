@@ -1,4 +1,5 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
 
 import { Query } from 'components/grid/query/Query'
 import { executeSql } from 'data/sql/execute-sql-query'
@@ -30,6 +31,7 @@ export async function deleteVaultSecret({
 type VaultSecretDeleteData = Awaited<ReturnType<typeof deleteVaultSecret>>
 
 export const usePgSodiumKeyDeleteMutation = ({
+  onError,
   onSuccess,
   ...options
 }: Omit<
@@ -48,7 +50,13 @@ export const usePgSodiumKeyDeleteMutation = ({
         )
         await onSuccess?.(data, variables, context)
       },
-
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to delete key: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
+      },
       ...options,
     }
   )
