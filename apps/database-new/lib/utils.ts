@@ -296,10 +296,8 @@ export const copyToClipboard = () => {
   const snap = getAppStateSnapshot()
   const focused = window.document.hasFocus()
   if (focused) {
-    console.log('hay', snap)
     window.navigator?.clipboard?.writeText(snap.selectedCode)
   } else {
-    console.log('hoo')
     console.warn('Unable to copy to clipboard')
   }
 }
