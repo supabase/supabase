@@ -207,7 +207,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
         <div className="graphiql-main">
           <div
             ref={pluginResize.firstRef}
-            style={{ minWidth: 0 }}
+            style={{ minWidth: '750px' }}
             className={clsx('graphiql-sessions', styles.graphiqlSessions)}
           >
             <div
