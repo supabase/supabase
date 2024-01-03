@@ -44,7 +44,9 @@ const PrivilegesTable = ({
     <Table
       className="table-fixed mb-4"
       head={[
-        <Table.th key="header-column"></Table.th>,
+        <Table.th key="header-column">
+          <span>Column</span>
+        </Table.th>,
         ...ALL_PRIVILEGE_TYPES.map((privilege) => {
           const checked = tableCheckedStates[privilege]
 
@@ -68,7 +70,10 @@ const PrivilegesTable = ({
       body={columnPrivileges.map((column) => (
         <Table.tr key={column.column_id}>
           <Table.td>
-            <button onClick={() => handleClickColumnName(column.column_id)}>
+            <button
+              onClick={() => handleClickColumnName(column.column_id)}
+              className="block w-full truncate text-left text-foreground"
+            >
               {column.column_name}
             </button>
           </Table.td>
