@@ -142,7 +142,7 @@ const EncryptionKeysManagement = () => {
                   : []
               }
             />
-            <div className="w-32">
+            <div className="w-44">
               <Listbox size="small" value={selectedSort} onChange={setSelectedSort}>
                 <Listbox.Option
                   id="created"
