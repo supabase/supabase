@@ -389,7 +389,7 @@ class StorageExplorerStore {
       return filePreview.url
     } else {
       const signedUrl = await this.fetchFilePreview(file.name, expiresIn)
-      if (signedUrl) {
+      try {
         const formattedUrl = new URL(signedUrl)
         formattedUrl.searchParams.set('t', new Date().toISOString())
         const fileUrl = formattedUrl.toString()
@@ -403,7 +403,8 @@ class StorageExplorerStore {
         }
         this.addFileToPreviewCache(fileCache)
         return fileUrl
-      } else {
+      } catch (error) {
+        console.error('Failed to get file URL', error)
         return ''
       }
     }
