@@ -3,11 +3,14 @@ import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 import { get } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { privilegeKeys } from './keys'
+import { components } from 'data/api'
 
 export type ColumnPrivilegesVariables = {
   projectRef?: string
   connectionString?: string
 }
+
+export type ColumnPrivilege = components['schemas']['PostgresColumnPrivileges']
 
 export async function getColumnPrivileges(
   { projectRef, connectionString }: ColumnPrivilegesVariables,

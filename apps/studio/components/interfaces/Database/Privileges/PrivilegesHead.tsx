@@ -1,5 +1,6 @@
 import { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
-import { Listbox } from 'ui'
+
+import { Button, Listbox } from 'ui'
 
 export interface PrivilegesHeadProps {
   selectedSchema: string
@@ -11,6 +12,10 @@ export interface PrivilegesHeadProps {
   onChangeSchema: (schema: string) => void
   onChangeRole: (role: string) => void
   onChangeTable: (table: string) => void
+  hasChanges?: boolean
+  resetChanges: () => void
+  applyChanges: () => void
+  isApplyingChanges?: boolean
 }
 
 const PrivilegesHead = ({
@@ -23,11 +28,15 @@ const PrivilegesHead = ({
   selectedTable,
   tables,
   onChangeTable,
+  hasChanges = false,
+  resetChanges,
+  applyChanges,
+  isApplyingChanges = false,
 }: PrivilegesHeadProps) => {
   return (
     <div className="mb-4">
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center gap-4">
           <div className="w-[230px]">
             <SchemasListbox
               selectedSchema={selectedSchema}
@@ -46,6 +55,26 @@ const PrivilegesHead = ({
           <div className="w-[230px]">
             <RolesListbox selectedRole={selectedRole} roles={roles} onChangeRole={onChangeRole} />
           </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Button
+            type="default"
+            size="tiny"
+            onClick={resetChanges}
+            disabled={!hasChanges || isApplyingChanges}
+          >
+            Reset
+          </Button>
+          <Button
+            type="primary"
+            size="tiny"
+            onClick={applyChanges}
+            disabled={!hasChanges || isApplyingChanges}
+            loading={isApplyingChanges}
+          >
+            Apply Changes
+          </Button>
         </div>
       </div>
     </div>

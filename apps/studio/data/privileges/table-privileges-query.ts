@@ -1,5 +1,6 @@
 import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 
+import { components } from 'data/api'
 import { get } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { privilegeKeys } from './keys'
@@ -8,6 +9,8 @@ export type TablePrivilegesVariables = {
   projectRef?: string
   connectionString?: string
 }
+
+export type TablePrivilege = components['schemas']['PostgresTablePrivileges']
 
 export async function getTablePrivileges(
   { projectRef, connectionString }: TablePrivilegesVariables,
