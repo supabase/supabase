@@ -7,7 +7,7 @@ info:
 
     Supabase Python(Community).
 
-  definition: ../../spec/enrichments/tsdoc_v2/combined.json
+  definition: spec/enrichments/tsdoc_v2/combined.json
   specUrl: https://github.com/supabase/supabase/edit/master/spec/supabase_py_v2.yml
   slugPrefix: '/'
   libraries:

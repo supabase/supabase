@@ -1,7 +1,7 @@
 import fs from 'fs'
 
 import yaml from 'js-yaml'
-import commonLibSections from '../../../../spec/common-client-libs-sections.json' assert { type: 'json' }
+import commonLibSections from '../../spec/common-client-libs-sections.json' assert { type: 'json' }
 import { flattenSections } from '../helpers.mjs'
 
 const flatCommonLibSections = flattenSections(commonLibSections)
@@ -18,7 +18,7 @@ const clientLibFiles = [
 export function generateReferencePages() {
   let refPages = []
   clientLibFiles.map((file) => {
-    const spec = yaml.load(fs.readFileSync(`../../spec/${file.fileName}.yml`, 'utf8'))
+    const spec = yaml.load(fs.readFileSync(`spec/${file.fileName}.yml`, 'utf8'))
     spec.functions.map((fn) => {
       const slug = flatCommonLibSections.find((item) => item.id === fn.id)?.slug
       refPages.push(`reference/${file.label}/${file.versionSlug ? file.version + '/' : ''}${slug}`)

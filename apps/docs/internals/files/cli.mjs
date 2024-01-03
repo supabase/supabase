@@ -1,11 +1,11 @@
 import fs from 'fs'
 import yaml from 'js-yaml'
-import cliCommonSections from '../../../../spec/common-cli-sections.json' assert { type: 'json' }
+import cliCommonSections from '../../spec/common-cli-sections.json' assert { type: 'json' }
 import { flattenSections } from '../helpers.mjs'
 
 const flatCLISections = flattenSections(cliCommonSections)
 
-const cliSpec = yaml.load(fs.readFileSync(`../../spec/cli_v1_commands.yaml`, 'utf8'))
+const cliSpec = yaml.load(fs.readFileSync(`spec/cli_v1_commands.yaml`, 'utf8'))
 
 export function generateCLIPages() {
   let cliPages = []
