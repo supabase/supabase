@@ -2,6 +2,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
+import { sortBy } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { Fragment, useEffect, useState } from 'react'
@@ -24,9 +25,8 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import Divider from 'components/ui/Divider'
 import { usePgSodiumKeyCreateMutation } from 'data/pg-sodium-keys/pg-sodium-key-create-mutation'
 import { usePgSodiumKeyDeleteMutation } from 'data/pg-sodium-keys/pg-sodium-key-delete-mutation'
-import { EncryptionKey, usePgSodiumKeysQuery } from 'data/pg-sodium-keys/pg-sodium-keys-query'
+import { usePgSodiumKeysQuery } from 'data/pg-sodium-keys/pg-sodium-keys-query'
 import { useCheckPermissions, useStore } from 'hooks'
-import { sortBy } from 'lodash'
 
 const DEFAULT_KEY_NAME = 'No description provided'
 
@@ -47,31 +47,30 @@ const EncryptionKeysManagement = () => {
     if (id !== undefined) setSearchValue(id)
   }, [id])
 
-  const { data, isLoading, isSuccess } = usePgSodiumKeysQuery({
+  const { data, isLoading } = usePgSodiumKeysQuery({
     projectRef: project?.ref!,
     connectionString: project?.connectionString,
   })
   const { mutateAsync: addKeyMutation } = usePgSodiumKeyCreateMutation()
   const { mutateAsync: deleteKeyMutation } = usePgSodiumKeyDeleteMutation()
 
-  let keys: EncryptionKey[] = []
-  if (isSuccess) {
-    const filtered = searchValue
-      ? data.filter(
+  const allKeys = data || []
+  const keys = sortBy(
+    searchValue
+      ? allKeys.filter(
           (key) =>
             (key?.name ?? '').toLowerCase().includes(searchValue.toLowerCase()) ||
             key.id.toLowerCase().includes(searchValue.toLowerCase())
         )
-      : data
-
-    keys = sortBy(filtered, (k) => {
+      : allKeys,
+    (k) => {
       if (selectedSort === 'created') {
         return Number(new Date(k.created))
       } else {
         return k[selectedSort]
       }
-    })
-  }
+    }
+  )
 
   const addKey = async (values: any, { setSubmitting }: any) => {
     setSubmitting(true)

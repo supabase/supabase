@@ -8,13 +8,14 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { FormHeader } from 'components/ui/Forms'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { NextPageWithLayout } from 'types'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 
 const VaultSettingsSecrets: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = useParams()
   const { project } = useProjectContext()
 
-  const { data } = useDatabaseExtensionsQuery({
+  const { data, isLoading } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -25,7 +26,13 @@ const VaultSettingsSecrets: NextPageWithLayout = () => {
   return (
     <div className="1xl:px-28 mx-auto flex flex-col px-5 py-6 lg:px-16 xl:px-24 2xl:px-32 ">
       <FormHeader title="Vault" description="Application level encryption for your project" />
-      {!isEnabled ? (
+      {isLoading ? (
+        <div className="border rounded border-default p-12 space-y-2">
+          <ShimmeringLoader />
+          <ShimmeringLoader className="w-3/4" />
+          <ShimmeringLoader className="w-1/2" />
+        </div>
+      ) : !isEnabled ? (
         <VaultToggle />
       ) : (
         <Tabs
