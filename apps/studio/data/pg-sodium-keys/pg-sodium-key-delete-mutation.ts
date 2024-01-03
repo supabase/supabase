@@ -45,9 +45,7 @@ export const usePgSodiumKeyDeleteMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(
-          sqlKeys.query(projectRef, pgSodiumKeys.list(projectRef))
-        )
+        await queryClient.invalidateQueries(pgSodiumKeys.list(projectRef))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
