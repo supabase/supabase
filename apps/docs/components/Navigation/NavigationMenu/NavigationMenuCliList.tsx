@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { IconChevronLeft } from 'ui'
 import * as NavItems from './NavigationMenu.constants'
 
-import clientLibsCommon from '~/../../spec/common-cli.yml' assert { type: 'yml' }
+import clientLibsCommon from '~/spec/common-cli.yml' assert { type: 'yml' }
 
 const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
   const router = useRouter()

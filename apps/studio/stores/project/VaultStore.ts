@@ -1,7 +1,8 @@
 import type { PostgresColumn } from '@supabase/postgres-meta'
 import { Query } from 'components/grid/query/Query'
+import { getViews } from 'data/views/views-query'
 import { makeAutoObservable } from 'mobx'
-import { SchemaView, VaultSecret } from 'types'
+import { VaultSecret } from 'types'
 import { IRootStore } from '../RootStore'
 
 export interface IVaultStore {
@@ -211,10 +212,12 @@ export default class VaultStore implements IVaultStore {
   async listEncryptedColumns(schema: string, table: string) {
     if (!table) return []
 
-    await this.rootStore.meta.views.loadBySchema(schema)
-    const decryptedView = this.rootStore.meta.views.find(
-      (view: SchemaView) => view.name === `decrypted_${table}`
-    )
+    const views = await getViews({
+      projectRef: this.rootStore.meta.projectRef,
+      connectionString: this.rootStore.meta.connectionString,
+      schema,
+    })
+    const decryptedView = views.find((view) => view.name === `decrypted_${table}`)
     if (!decryptedView) return []
 
     const encryptedColumns = await this.rootStore.meta.query(
