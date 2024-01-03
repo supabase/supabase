@@ -7,9 +7,9 @@ info:
 
     Supabase Dart.
 
-  definition: ../../spec/enrichments/tsdoc_v2/combined.json
+  definition: spec/enrichments/tsdoc_v2/combined.json
   slugPrefix: '/'
-  specUrl: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v2.yml
+  specUrl: https://github.com/supabase/supabase/edit/master/apps/docs/spec/supabase_dart_v2.yml
   libraries:
     - name: 'Dart'
       id: 'dart'
