@@ -1,5 +1,4 @@
 import { PostgresRole } from '@supabase/postgres-meta'
-import { observer } from 'mobx-react-lite'
 import { useMemo, useState } from 'react'
 
 import { useParams } from 'common/hooks'
@@ -10,19 +9,17 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import EmptyPageState from 'components/ui/Error'
 import Connecting from 'components/ui/Loading/Loading'
+import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useColumnPrivilegesQuery } from 'data/privileges/column-privileges-query'
 import { useTablePrivilegesQuery } from 'data/privileges/table-privileges-query'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useStore } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { NextPageWithLayout } from 'types'
 
 const EDITABLE_ROLES = ['authenticated', 'anon', 'service_role']
 
 const PrivilegesPage: NextPageWithLayout = () => {
-  const { meta } = useStore()
-
   const pathParams = useParams()
   const { project } = useProjectContext()
 
@@ -48,12 +45,14 @@ const PrivilegesPage: NextPageWithLayout = () => {
     }
   )
 
-  const { data: allSchemas } = useSchemasQuery({
+  const { data: allSchemas, isLoading: isLoadingSchemas } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-
-  const rolesList = meta.roles.list((role: PostgresRole) => EDITABLE_ROLES.includes(role.name))
+  const { data: allRoles, isLoading: isLoadingRoles } = useDatabaseRolesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
   const tables = tableList
     ?.filter((table) => table.schema === selectedSchema)
@@ -92,6 +91,8 @@ const PrivilegesPage: NextPageWithLayout = () => {
 
   const schemas = allSchemas?.filter((schema) => !EXCLUDED_SCHEMAS.includes(schema.name)) ?? []
 
+  const rolesList =
+    allRoles?.filter((role: PostgresRole) => EDITABLE_ROLES.includes(role.name)) ?? []
   const roles = rolesList.map((role: PostgresRole) => role.name)
 
   const handleChangeSchema = (schema: string) => {
@@ -113,8 +114,18 @@ const PrivilegesPage: NextPageWithLayout = () => {
     return <EmptyPageState error={errorTablePrivileges || errorColumnPrivileges} />
   }
 
-  if (isLoadingTablePrivileges || isLoadingColumnPrivileges || isLoadingTables) {
-    return <Connecting />
+  if (
+    isLoadingTablePrivileges ||
+    isLoadingColumnPrivileges ||
+    isLoadingTables ||
+    isLoadingSchemas ||
+    isLoadingRoles
+  ) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <Connecting />
+      </div>
+    )
   }
 
   const table = tableList?.find((table) => table.name === selectedTable)
@@ -140,10 +151,6 @@ const PrivilegesPage: NextPageWithLayout = () => {
   )
 }
 
-PrivilegesPage.getLayout = (page) => (
-  <AuthLayout title="Column Privileges">
-    <div>{page}</div>
-  </AuthLayout>
-)
+PrivilegesPage.getLayout = (page) => <AuthLayout title="Column Privileges">{page}</AuthLayout>
 
-export default observer(PrivilegesPage)
+export default PrivilegesPage
