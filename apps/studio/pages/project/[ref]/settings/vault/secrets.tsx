@@ -1,4 +1,3 @@
-import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { Tabs } from 'ui'
 
@@ -55,4 +54,4 @@ const VaultSettingsSecrets: NextPageWithLayout = () => {
 }
 
 VaultSettingsSecrets.getLayout = (page) => <SettingsLayout title="Vault">{page}</SettingsLayout>
-export default observer(VaultSettingsSecrets)
+export default VaultSettingsSecrets
