@@ -100,7 +100,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
     direction: 'horizontal',
     initiallyHidden: pluginContext?.visiblePlugin ? undefined : 'second',
     onHiddenElementChange: (resizableElement) => {
-      if (resizableElement === 'first') {
+      if (resizableElement === 'second') {
         pluginContext?.setVisiblePlugin(null)
       }
     },
