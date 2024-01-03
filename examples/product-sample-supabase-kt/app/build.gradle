@@ -74,12 +74,12 @@ dependencies {
     implementation "androidx.compose.material:material:1.1.1"
     
     // Supabase setup
-    implementation "io.github.jan-tennert.supabase:gotrue-kt:1.0.0"
-    implementation "io.github.jan-tennert.supabase:postgrest-kt:1.0.0"
-    implementation "io.github.jan-tennert.supabase:storage-kt:1.0.0"
-    implementation "io.ktor:ktor-client-android:2.3.0"
-    implementation "io.ktor:ktor-utils:2.3.0"
-    implementation "io.ktor:ktor-client-core:2.3.0"
+    implementation "io.github.jan-tennert.supabase:gotrue-kt:$supabase_version"
+    implementation "io.github.jan-tennert.supabase:postgrest-kt:$supabase_version"
+    implementation "io.github.jan-tennert.supabase:storage-kt:$supabase_version"
+    implementation "io.ktor:ktor-client-android:$ktor_version"
+    implementation "io.ktor:ktor-utils:$ktor_version"
+    implementation "io.ktor:ktor-client-core:$ktor_version"
     implementation "io.coil-kt:coil-compose:1.3.2"
 
 

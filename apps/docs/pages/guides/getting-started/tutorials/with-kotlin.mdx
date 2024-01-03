@@ -269,7 +269,9 @@ class ProductRepositoryImpl @Inject constructor(
     override suspend fun getProduct(id: String): ProductDto {
         return withContext(Dispatchers.IO) {
             postgrest.from("products").select {
-                eq("id", id)
+                filter {
+                    eq("id", id)
+                }
             }.decodeSingle<ProductDto>()
         }
     }
@@ -277,7 +279,9 @@ class ProductRepositoryImpl @Inject constructor(
     override suspend fun deleteProduct(id: String) {
         return withContext(Dispatchers.IO) {
             postgrest.from("products").delete {
-                eq("id", id)
+                filter {
+                    eq("id", id)
+                }
             }
         }
     }
