@@ -1,4 +1,4 @@
-import selfHostingRealtimeCommonSections from '~/../../spec/common-self-hosting-realtime-sections.json'
+import selfHostingRealtimeCommonSections from '~/spec/common-self-hosting-realtime-sections.json'
 
 import RefSectionHandler from '~/components/reference/RefSectionHandler'
 import { flattenSections } from '~/lib/helpers'
