@@ -124,7 +124,7 @@ combine-raw.tsdoc.v2:
 ###############################################################################
 
 validate.analytics.v0:
-	npx @redocly/cli lint --extends=minimal --no-schema $(REPO_DIR)/analytics_v0_openapi.json
+	npx @redocly/cli lint --extends=minimal $(REPO_DIR)/analytics_v0_openapi.json
 
 ###############################################################################
 # Format everything - easier for git to track changes.
