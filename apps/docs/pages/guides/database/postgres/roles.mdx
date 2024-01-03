@@ -9,7 +9,7 @@ export const meta = {
 
 Postgres manages database access permissions using the concept of roles. Generally you wouldn't use these roles for your own application - they are mostly for configuring _system access_ to your database. If you want to configure _application access_, then you should use [Row Level Security](/docs/guides/database/postgres/row-level-security).
 
-## Users vs Roles
+## Users vs roles
 
 In PostgreSQL, roles can function as users or groups of users. Users are roles with login privileges, while groups (also known as role groups) are roles that don't have login privileges but can be used to manage permissions for multiple users.
 
@@ -46,11 +46,11 @@ If you use special symbols in your Postgres password, you must remember to [perc
 
 When you created your project you were also asked to enter a password. This is actually the password for the `postgres` role in your database. You can update this from the Dashboard under the [database settings](https://supabase.com/dashboard/project/_/settings/database) page. You should _never_ give this to 3rd-party service unless you absolutely trust them. Instead, we recommend that you create a new user for every service that you want to give access too. This will also help you with debugging - you can see every query that each role is executing in your database within `pg_stat_statements`.
 
-## Granting Permissions
+## Granting permissions
 
 Roles can be granted various permissions on database objects using the `GRANT` command. Permissions include `SELECT`, `INSERT`, `UPDATE`, and `DELETE`. You can configure access to almost any object inside your database - including tables, views, functions, and triggers.
 
-## Revoking Permissions
+## Revoking permissions
 
 Permissions can be revoked using the `REVOKE` command:
 
@@ -58,7 +58,7 @@ Permissions can be revoked using the `REVOKE` command:
 REVOKE permission_type ON object_name FROM role_name;
 ```
 
-## Role Hierarchy
+## Role hierarchy
 
 Roles can be organized in a hierarchy, where one role can inherit permissions from another. This simplifies permission management, as you can define permissions at a higher level and have them automatically apply to all child roles.
 
@@ -78,7 +78,7 @@ In some cases, you might want to prevent a role from having a child relationship
 alter role "child_role_name" noinherit;
 ```
 
-## Supabase Roles
+## Supabase roles
 
 Postgres comes with a set of [predefined roles](https://www.postgresql.org/docs/current/predefined-roles.html). Supabase extends this with a default set of roles which are configured on your database when you start a new project:
 

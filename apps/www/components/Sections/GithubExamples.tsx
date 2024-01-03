@@ -9,7 +9,7 @@ import SwiperCore, { Navigation, Pagination } from 'swiper'
 import Link from 'next/link'
 import { Button, IconGitHub, IconArrowLeft, IconArrowRight, IconBookOpen } from 'ui'
 
-import Examples from '../../data/Examples.json'
+import Examples from '~/data/Examples'
 import ExampleCard from '../ExampleCard'
 
 // install Swiper modules

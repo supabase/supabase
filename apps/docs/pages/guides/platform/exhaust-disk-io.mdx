@@ -7,13 +7,13 @@ export const meta = {
     'Understand Disk IO, what can deplete your Disk Budget and what you can do about it.',
 }
 
-## Understanding Disk IO and Disk Budget
+## Understanding disk IO and disk budget
 
 Disk IO refers to two metrics: throughput in Megabits per Second and IOPS which are Input/Output Operations per Second. Depending on the compute add-on of your instance you will have [different baseline performances](https://supabase.com/docs/guides/platform/compute-add-ons#disk-io).
 
 Smaller compute instances can burst and exceed their baseline performance for a short quota of time every day. This quota is represented as your Disk Budget and once your Disk Budget is consumed, your instance reverts back to its baseline performance. You can read more about this under [Bursting and Disk Budget](https://supabase.com/docs/guides/platform/compute-add-ons#bursting-and-disk-budget).
 
-## Depleting your Disk Budget
+## Depleting your disk budget
 
 Running out of Disk Budget means that your instance is using more disk than its compute add-on can handle and essentially gets throttled. This could have a wide range of implications:
 
@@ -23,7 +23,7 @@ Running out of Disk Budget means that your instance is using more disk than its 
 - Disruption of internal Postgres processes such as [autovacuuming](https://supabase.com/docs/guides/platform/database-size#vacuum-operations)
 - Your instance may become unresponsive
 
-## Monitor your Disk Budget
+## Monitor your disk budget
 
 To check your Disk Budget on the Supabase Platform, head over to [Database Health in the Reports section](https://supabase.com/dashboard/project/_/reports/database).
 
