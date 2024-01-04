@@ -8,7 +8,7 @@ jobs:
     steps:
       - id: normalize
         name: Normalize branch name
-        run: echo "NORMALIZED_BRANCH=$(echo "$GITHUB_REF_NAME" | sed 's|/|-|' | sed 's|.||')" >> $GITHUB_OUTPUT
+        run: echo "NORMALIZED_BRANCH=$(echo "$GITHUB_REF_NAME" | sed 's|/|-|' | sed 's|\.||')" >> $GITHUB_OUTPUT
       - id: test
         name: Test
         run: echo "branch ${{ steps.normalize.outputs.NORMALIZED_BRANCH }}"
