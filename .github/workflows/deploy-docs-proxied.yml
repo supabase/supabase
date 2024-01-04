@@ -11,4 +11,4 @@ jobs:
         run: echo "NORMALIZED_BRANCH=$(echo "$GITHUB_REF" | sed 's|/|-|' | sed 's|.||')" >> $GITHUB_OUTPUT
       - id: test
         name: Test
-        run: echo "$BRANCH"
+        run: echo "branch ${{ steps.normalize.outputs.NORMALIZED_BRANCH }}"
