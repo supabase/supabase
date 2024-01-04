@@ -417,8 +417,7 @@ const ComputeInstanceSidePanel = () => {
                 variant="info"
                 title="Your project will need to be restarted when changing it's compute size"
               >
-                It will take up to 2 minutes for changes to take place, in which your project will
-                be unavailable during that time.
+                Your project will be unavailable for up to 2 minutes while the changes take place.
               </Alert>
             )}
 
@@ -473,8 +472,7 @@ const ComputeInstanceSidePanel = () => {
               variant="warning"
               title="Your project will need to be restarted when changing it's compute size"
             >
-              It will take up to 2 minutes for changes to take place, in which your project will be
-              unavailable during that time.
+              Your project will be unavailable for up to 2 minutes while the changes take place.
             </Alert>
           </div>
         </Modal.Content>

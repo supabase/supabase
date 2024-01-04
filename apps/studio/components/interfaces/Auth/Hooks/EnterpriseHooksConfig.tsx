@@ -54,7 +54,7 @@ const EnterpriseHooksConfig = () => {
 
   const organization = useSelectedOrganization()
   const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery({
-    orgSlug: organization!.slug,
+    orgSlug: organization?.slug,
   })
 
   const isTeamsEnterprisePlan =
@@ -155,12 +155,12 @@ const EnterpriseHooksConfig = () => {
                 </div>
               }
             >
-              {!isTeamsEnterprisePlan && (
+              {!isTeamsEnterprisePlan && organization !== undefined && (
                 <UpgradeToPro
                   primaryText="Upgrade plan"
                   secondaryText="Configuring Enterprise Hooks requires a Teams or Enterprise plan."
                   projectRef={projectRef!}
-                  organizationSlug={organization!.slug}
+                  organizationSlug={organization.slug}
                   buttonText="Upgrade"
                 />
               )}

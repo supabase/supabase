@@ -101,7 +101,7 @@ const GitHubIntegration: NextPageWithLayout = () => {
     }
 
     /**
-     * Only install if instgration hasn't already been installed
+     * Only install if Integration hasn't already been installed
      */
     if (!isIntegrationInstalled) {
       mutate({
