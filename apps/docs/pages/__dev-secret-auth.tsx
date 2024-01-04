@@ -6,11 +6,6 @@ import { Button_Shadcn_, Input_Shadcn_ } from 'ui'
 import { auth } from '~/lib/userAuth'
 
 export function getServerSideProps() {
-  if (process.env.NEXT_PUBLIC_DEV_AUTH_PAGE === 'true') {
-    return {
-      props: {},
-    }
-  }
   return {
     notFound: true,
   }
