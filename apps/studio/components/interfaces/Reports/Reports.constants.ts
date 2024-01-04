@@ -379,6 +379,3 @@ select
     },
   },
 }
-
-export const DATETIME_FORMAT = 'MMM D, ha'
-export const DATETIME_SECOND_FORMAT = 'MMM D, ha'

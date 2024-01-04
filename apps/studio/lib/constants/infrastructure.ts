@@ -1,4 +1,4 @@
-import { Project } from 'data/projects/project-detail-query'
+import { components } from 'data/api'
 
 export type CloudProvider = 'FLY' | 'AWS'
 export type Region = typeof AWS_REGIONS | typeof FLY_REGIONS
@@ -34,7 +34,7 @@ export const AWS_REGIONS_DEFAULT =
   process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? AWS_REGIONS.SOUTHEAST_ASIA : AWS_REGIONS.WEST_US
 
 // TO DO, change default to US region for prod
-export const FLY_REGIONS_DEFAULT = FLY_REGIONS.SOUTHEAST_ASIA
+const FLY_REGIONS_DEFAULT = FLY_REGIONS.SOUTHEAST_ASIA
 
 export const PRICING_TIER_LABELS_ORG = {
   FREE: 'Free - $0/month',
@@ -102,25 +102,9 @@ export const PROVIDERS = {
   },
 } as const
 
-// @todo ini update for prod
-export const AWS_SUPPORTED_AZ = {
-  EAST_US: ['us-east-1a', 'us-east-1b', 'us-east-1c', 'us-east-1d', 'us-east-1e', 'us-east-1f'],
-  SOUTHEAST_ASIA: ['ap-southeast-1a', 'ap-southeast-1b', 'ap-southeast-1c'],
-  WEST_EU: ['eu-west-1a', 'eu-west-1b', 'eu-west-1c'],
-}
-
-export const SERVICE_STATUS = {
-  INACTIVE: 'INACTIVE',
-  ACTIVE_HEALTHY: 'ACTIVE_HEALTHY',
-  ACTIVE_UNHEALTHY: 'ACTIVE_UNHEALTHY',
-  COMING_UP: 'COMING_UP',
-  UNKNOWN: 'UNKNOWN',
-  GOING_DOWN: 'GOING_DOWN',
-  INIT_FAILED: 'INIT_FAILED',
-  REMOVED: 'REMOVED',
-}
-
-export const PROJECT_STATUS: { [key: string]: Project['status'] } = {
+export const PROJECT_STATUS: {
+  [key: string]: components['schemas']['ProjectDetailResponse']['status']
+} = {
   INACTIVE: 'INACTIVE',
   ACTIVE_HEALTHY: 'ACTIVE_HEALTHY',
   ACTIVE_UNHEALTHY: 'ACTIVE_UNHEALTHY',
@@ -162,7 +146,5 @@ export const PASSWORD_STRENGTH_PERCENTAGE = {
   3: '80%',
   4: '100%',
 }
-
-export const DEFAULT_FREE_PROJECTS_LIMIT = 2
 
 export const DEFAULT_PROJECT_API_SERVICE_ID = 1

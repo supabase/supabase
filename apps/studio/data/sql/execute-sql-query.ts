@@ -1,11 +1,4 @@
-import {
-  QueryClient,
-  QueryKey,
-  useQuery,
-  useQueryClient,
-  UseQueryOptions,
-} from '@tanstack/react-query'
-import { useCallback } from 'react'
+import { QueryClient, QueryKey, useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { post } from 'data/fetchers'
 import {
@@ -136,38 +129,5 @@ export const prefetchExecuteSql = (
 ) => {
   return client.prefetchQuery(sqlKeys.query(projectRef, queryKey ?? [btoa(sql)]), ({ signal }) =>
     executeSql({ projectRef, connectionString, sql, queryKey, handleError }, signal)
-  )
-}
-
-/**
- * useExecuteSqlPrefetch is used for prefetching a SQL query. For example, starting a query loading before a page is navigated to.
- *
- * @example
- * const prefetch = useExecuteSqlPrefetch()
- *
- * return (
- *   <Link onMouseEnter={() => prefetch({ ...args })}>
- *     Start loading on hover
- *   </Link>
- * )
- */
-export const useExecuteSqlPrefetch = () => {
-  const client = useQueryClient()
-
-  return useCallback(
-    ({ projectRef, connectionString, sql, queryKey, handleError }: ExecuteSqlVariables) => {
-      if (projectRef) {
-        return prefetchExecuteSql(client, {
-          projectRef,
-          connectionString,
-          sql,
-          queryKey,
-          handleError,
-        })
-      }
-
-      return Promise.resolve()
-    },
-    [client]
   )
 }
