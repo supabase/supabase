@@ -32,8 +32,7 @@ jobs:
             latest=false
           tags: |
             type=ref,event=tag
-            type=sha,prefix={{date 'YYYYMMDD'}}-,enable=${{ github.event_name == 'schedule' }}
-            type=raw,value=${{ inputs.version }},enable=${{ github.event_name == 'workflow_dispatch' }}
+            type=sha,prefix={{date 'YYYYMMDD'}}-
 
   # release_x86:
   #   needs: settings
