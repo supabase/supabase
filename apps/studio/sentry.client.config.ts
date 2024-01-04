@@ -34,6 +34,13 @@ Sentry.init({
     'The provided `href` (/org/[slug]/team) value is missing query values (slug)',
     'The provided `href` (/org/[slug]/billing) value is missing query values (slug)',
     'The provided `href` (/org/[slug]/invoices) value is missing query values (slug)',
+    // [Joshen] Seems to be from hcaptcha
+    "undefined is not an object (evaluating 'n.chat.setReady')",
+    "undefined is not an object (evaluating 'i.chat.setReady')",
+    // [Terry] When users paste in an embedded Github Gist
+    // Error thrown by `sql-formatter` lexer when given invalid input
+    // Original format: new Error(`Parse error: Unexpected "${text}" at line ${line} column ${col}`)
+    /^Parse error: Unexpected ".+" at line \d+ column \d+$/,
   ],
   // Allow for exception captures originating only from our own code.
   allowUrls: ['app:///_next/'],
