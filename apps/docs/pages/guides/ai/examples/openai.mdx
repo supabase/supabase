@@ -34,27 +34,27 @@ A new edge function will now exist under `./supabase/functions/openai/index.ts`.
 We'll design the function to take your user's query (via POST request) and forward it to OpenAI's API.
 
 ```ts index.ts
-import { CreateCompletionRequest } from 'https://esm.sh/openai@3.1.0'
-import 'https://deno.land/x/xhr@0.3.0/mod.ts'
+import OpenAI from 'https://deno.land/x/openai@v4.24.0/mod.ts'
 
 Deno.serve(async (req) => {
-  const { query } = await req.json()
+  const query = await req.json()
+  const apiKey = Deno.env.get('OPENAI_API_KEY')
+  const openai = new OpenAI({
+    apiKey: apiKey,
+  })
 
-  const completionConfig: CreateCompletionRequest = {
-    model: 'gpt-3.5-turbo-instruct',
-    prompt: query,
-    max_tokens: 256,
-    temperature: 0,
+  // Documentation here: https://github.com/openai/openai-node
+  const chatCompletion = await openai.chat.completions.create({
+    messages: [{ role: 'user', content: query }],
+    // Choose model from here: https://platform.openai.com/docs/models
+    model: 'gpt-3.5-turbo',
     stream: false,
-  }
+  })
 
-  return fetch('https://api.openai.com/v1/completions', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(completionConfig),
+  const reply = chatCompletion.choices[0].message.content
+
+  return new Response(reply, {
+    headers: { 'Content-Type': 'text/plain' },
   })
 })
 ```
