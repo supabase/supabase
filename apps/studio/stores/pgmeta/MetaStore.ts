@@ -426,7 +426,8 @@ export default class MetaStore implements IMetaStore {
     const connectionString = project?.connectionString
     const tables = await queryClient.fetchQuery({
       queryKey: tableKeys.list(projectRef, 'public'),
-      queryFn: ({ signal }) => getTables({ projectRef, connectionString }, signal),
+      queryFn: ({ signal }) =>
+        getTables({ projectRef, connectionString, schema: sourceTableSchema }, signal),
     })
 
     const duplicatedTable = find(tables, { schema: sourceTableSchema, name: duplicatedTableName })
