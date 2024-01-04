@@ -219,13 +219,6 @@ export const WRAPPERS: WrapperMeta[] = [
             required: true,
             type: 'text',
           },
-          // {
-          //   name: 'rowid_column',
-          //   label: 'Row ID Column',
-          //   defaultValue: 'id',
-          //   editable: true,
-          //   required: true,
-          // },
         ],
       },
       {
@@ -367,13 +360,6 @@ export const WRAPPERS: WrapperMeta[] = [
             required: true,
             type: 'text',
           },
-          // {
-          //   name: 'rowid_column',
-          //   label: 'Row ID Column',
-          //   defaultValue: 'id',
-          //   editable: true,
-          //   required: true,
-          // },
         ],
       },
       {
@@ -413,13 +399,6 @@ export const WRAPPERS: WrapperMeta[] = [
             required: true,
             type: 'text',
           },
-          // {
-          //   name: 'rowid_column',
-          //   label: 'Row ID Column',
-          //   defaultValue: 'id',
-          //   editable: true,
-          //   required: true,
-          // },
         ],
       },
     ],
@@ -450,15 +429,6 @@ export const WRAPPERS: WrapperMeta[] = [
           isTextArea: true,
           urlHelper: 'https://firebase.google.com/docs/admin/setup#initialize-sdk',
         },
-        // NOTE(alaister): this is a valid option, but it may confuse the basic use case
-        // so I'm omitting it for now. We can add back once we make it's use clearer.
-        // {
-        //   name: 'access_token',
-        //   label: 'OAuth2 token to access Firebase',
-        //   required: false,
-        //   encrypted: false,
-        //   hidden: false,
-        // },
       ],
     },
     tables: [

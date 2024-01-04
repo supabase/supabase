@@ -1,7 +1,6 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { useCallback } from 'react'
 import { configKeys } from './keys'
 import { ResponseError } from 'types'
 
@@ -104,15 +103,3 @@ export const useProjectApiQuery = <TData = ProjectApiData>(
       ...options,
     }
   )
-
-export const useProjectApiPrefetch = ({ projectRef }: ProjectApiVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (projectRef) {
-      client.prefetchQuery(configKeys.api(projectRef), ({ signal }) =>
-        getProjectApi({ projectRef }, signal)
-      )
-    }
-  }, [projectRef])
-}

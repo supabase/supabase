@@ -1,8 +1,8 @@
-import { trimEnd, groupBy, difference } from 'lodash'
+import { groupBy, difference } from 'lodash'
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from './Storage.constants'
 import { StoragePolicyFormField } from 'components/interfaces/Storage/Storage.types'
 
-export const shortHash = (str: string) => {
+const shortHash = (str: string) => {
   let hash = 0
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i)
@@ -40,7 +40,7 @@ export const formatPoliciesForStorage = (buckets: any[], policies: any[]) => {
 }
 
 /* Start: Internal methods to support formatPoliciesForStorage but exported for tests to cover */
-export const formatStoragePolicies = (buckets: any[], policies: any[]) => {
+const formatStoragePolicies = (buckets: any[], policies: any[]) => {
   const availableBuckets = buckets.map((bucket) => bucket.name)
   const formattedPolicies = policies.map((policy) => {
     const { definition: policyDefinition, check: policyCheck } = policy
@@ -65,14 +65,7 @@ export const formatStoragePolicies = (buckets: any[], policies: any[]) => {
   return formattedPolicies
 }
 
-export const truncateDefinitionToExcludeBucket = (definition: string) => {
-  const definitionSegments = definition?.split(' AND ') ?? []
-  return definitionSegments.length > 1
-    ? trimEnd(definitionSegments.slice(1).join(' AND '), ')') + ')'
-    : ''
-}
-
-export const extractBucketNameFromDefinition = (definition: string) => {
+const extractBucketNameFromDefinition = (definition: string) => {
   const definitionSegments = definition?.split(' AND ') ?? []
   const [bucketDefinition] = definitionSegments.filter((segment: string) =>
     segment.includes('bucket_id')
@@ -80,7 +73,7 @@ export const extractBucketNameFromDefinition = (definition: string) => {
   return bucketDefinition ? bucketDefinition.split("'")[1] : null
 }
 
-export const groupPoliciesByBucket = (policies: any[]) => {
+const groupPoliciesByBucket = (policies: any[]) => {
   const policiesByBucket = groupBy(policies, 'bucket')
   return Object.keys(policiesByBucket).map((bucketName) => {
     return { name: bucketName, policies: policiesByBucket[bucketName] }
@@ -144,7 +137,7 @@ export const deriveAllowedClientLibraryMethods = (allowedOperations = []) => {
 
 // Create policy SQL statements on save based on configuration.
 // Used purely for previewing in the review step, not actually fired
-export const createSQLStatementForCreatePolicy = (
+const createSQLStatementForCreatePolicy = (
   idx: number,
   bucketName: string,
   policyName: string,

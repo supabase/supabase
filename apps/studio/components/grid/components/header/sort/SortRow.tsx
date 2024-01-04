@@ -1,6 +1,6 @@
-import { XYCoord } from 'dnd-core'
+import type { XYCoord } from 'dnd-core'
 import { memo, useRef } from 'react'
-import { DropTargetMonitor, useDrag, useDrop } from 'react-dnd'
+import { useDrag, useDrop } from 'react-dnd'
 import { Button, IconMenu, IconX, Toggle } from 'ui'
 
 import { DragItem, Sort, SupaTable } from 'components/grid/types'
