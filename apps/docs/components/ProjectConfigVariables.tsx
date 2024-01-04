@@ -17,7 +17,7 @@ import {
 } from 'ui'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { proxy, useSnapshot } from 'valtio'
-import { LOCAL_STORAGE_KEYS, remove, retrieve, store } from '~/lib/storage'
+import { LOCAL_STORAGE_KEYS, retrieve, store } from '~/lib/storage'
 import Link from 'next/link'
 import { useIsLoggedIn, useIsUserLoading } from 'common'
 import { ProjectsData, useProjectsQuery } from '~/lib/fetch/projects'
@@ -123,9 +123,6 @@ const instanceStore = proxy({
   },
   clear: () => {
     instanceStore.setSelectedInstanceKey(null)
-    // Also done centrally in lib/userAuth,
-    // but no harm and an extra failsafe in doing it twice
-    remove('local', LOCAL_STORAGE_KEYS.SAVED_ORG_PROJECT_BRANCH)
   },
 })
 
@@ -135,6 +132,20 @@ const prettyFormatVariable: Record<Variable, string> = {
   url: 'Project URL',
   anonKey: 'Anon key',
 }
+
+type ProjectConfigVariablesState =
+  | 'userLoading'
+  | 'loggedOut'
+  | 'loggedIn.dataPending'
+  | 'loggedIn.hasData'
+  | 'loggedIn.hasNoData'
+  | 'loggedIn.dataError'
+
+type ProjectConfigVariablesPlusApiState =
+  | Omit<ProjectConfigVariablesState, 'loggedIn.hasData'>
+  | 'loggedIn.hasData.apiDataPending'
+  | 'loggedIn.hasData.apiDataSuccess'
+  | 'loggedIn.hasData.apiDataError'
 
 function ComboBox({
   parentStateSummary,
@@ -196,20 +207,6 @@ function ComboBox({
     </Popover>
   )
 }
-
-type ProjectConfigVariablesState =
-  | 'userLoading'
-  | 'loggedOut'
-  | 'loggedIn.dataPending'
-  | 'loggedIn.hasData'
-  | 'loggedIn.hasNoData'
-  | 'loggedIn.dataError'
-
-type ProjectConfigVariablesPlusApiState =
-  | Omit<ProjectConfigVariablesState, 'loggedIn.hasData'>
-  | 'loggedIn.hasData.apiDataPending'
-  | 'loggedIn.hasData.apiDataSuccess'
-  | 'loggedIn.hasData.apiDataError'
 
 function useCopy() {
   const [copied, setCopied] = useState(false)
@@ -410,9 +407,6 @@ export function ProjectConfigVariables({ variable }: { variable: Variable }) {
     ? 'loggedIn.hasNoData'
     : 'loggedIn.hasData'
 
-  // This is a safeguard against display bugs,
-  // since the page will keep displaying after the user logs out.
-  // This way no data is left to display even if there is a view bug.
   useOnLogout(clearSharedStoreData)
 
   const formattedData: InstanceData[] = useMemo(
