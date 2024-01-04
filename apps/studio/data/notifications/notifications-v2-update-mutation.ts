@@ -3,17 +3,17 @@ import { toast } from 'react-hot-toast'
 
 import { patch } from 'data/fetchers'
 import { ResponseError } from 'types'
-import { notificationKeys } from './keys'
 
 export type NotificationsUpdateVariables = {
-  id: string
+  ids: string[]
   status: 'new' | 'seen' | 'archived'
 }
 
-export async function updateNotifications({ id, status }: NotificationsUpdateVariables) {
+export async function updateNotifications({ ids, status }: NotificationsUpdateVariables) {
   const { data, error } = await patch('/platform/notifications', {
-    // @ts-ignore
-    body: [{ id, status }],
+    body: ids.map((id) => {
+      return { id, status }
+    }),
     headers: { Version: '2' },
   })
   if (error) throw error

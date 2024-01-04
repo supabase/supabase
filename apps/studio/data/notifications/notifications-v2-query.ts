@@ -8,15 +8,17 @@ import { notificationKeys } from './keys'
 const NOTIFICATIONS_PAGE_LIMIT = 10
 
 export type NotificationVariables = {
-  archived: boolean
+  // archived: boolean
   page: number
   limit?: number
+  status?: 'new' | 'seen' | 'archived'
+  priority?: 'Critical' | 'Warning' | 'Info'
 }
 
 export type Notification = components['schemas']['NotificationResponseV2']
 
 /**
- * Notification Data - This is not typed from the API end as it's meant to open-ended
+ * Notification Data - This is not typed from the API end as it's meant to be open-ended
  * @param title: Title of the notification
  * @param message: Rendered as Markdown to support inline links. Should be capped to n characters
  * @param project_id: (Optional) Only available if notification is specifically for a project (e.g exhaustion notification)
@@ -25,14 +27,23 @@ export type Notification = components['schemas']['NotificationResponseV2']
 export type NotificationData = {
   title: string
   message: string
-  project_id?: number
+  org_slug?: string
+  project_ref?: string
   actions: { label: string; url?: string; action_type?: string }[]
 }
 
 export async function getNotifications(options: NotificationVariables, signal?: AbortSignal) {
-  const { archived, page = 0, limit = NOTIFICATIONS_PAGE_LIMIT } = options
+  const { page = 0, limit = NOTIFICATIONS_PAGE_LIMIT, status, priority } = options
   const { data, error } = await get('/platform/notifications', {
-    params: { query: { archived, offset: page * limit, limit } },
+    params: {
+      // @ts-ignore
+      query: {
+        offset: page * limit,
+        limit,
+        ...(status !== undefined ? { status } : { status: ['new', 'seen'] }),
+        ...(priority !== undefined ? { priority } : {}),
+      },
+    },
     headers: { Version: '2' },
     signal,
   })
@@ -46,24 +57,21 @@ export type NotificationsData = Awaited<ReturnType<typeof getNotifications>>
 export type NotificationsError = ResponseError
 
 export const useNotificationsV2Query = <TData = NotificationsData>(
-  { archived, limit = NOTIFICATIONS_PAGE_LIMIT }: Omit<NotificationVariables, 'page'>,
+  { status, priority, limit = NOTIFICATIONS_PAGE_LIMIT }: Omit<NotificationVariables, 'page'>,
   {
     enabled = true,
     ...options
   }: UseInfiniteQueryOptions<NotificationsData, NotificationsError, TData> = {}
 ) => {
   return useInfiniteQuery<NotificationsData, NotificationsError, TData>(
-    notificationKeys.listV2({ archived, limit }),
-    ({ signal, pageParam }) => getNotifications({ archived, limit, page: pageParam }, signal),
+    notificationKeys.listV2({ status, priority, limit }),
+    ({ signal, pageParam }) =>
+      getNotifications({ status, priority, limit, page: pageParam }, signal),
     {
       enabled: enabled,
       getNextPageParam(lastPage, pages) {
         const page = pages.length
-
-        if (lastPage.length < limit) {
-          return undefined
-        }
-
+        if (lastPage.length < limit) return undefined
         return page
       },
       ...options,

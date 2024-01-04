@@ -3,19 +3,19 @@ import clsx from 'clsx'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
-import { Button, IconAlertCircle, IconAlertTriangle, IconArchive } from 'ui'
+import { Button, IconAlertCircle, IconAlertTriangle, IconArchive, IconExternalLink } from 'ui'
 
 import { Markdown } from 'components/interfaces/Markdown'
 import { Notification, NotificationData } from 'data/notifications/notifications-v2-query'
-import { Organization, Project } from 'types'
-import { not } from 'ajv/dist/compile/codegen'
+import { Organization } from 'types'
+import { Project } from 'data/projects/project-detail-query'
 
 interface NotificationRowProps {
   index: number
   listRef: any
   item: Notification
   setRowHeight: (idx: number, height: number) => void
-  getProject: (id: number) => Project
+  getProject: (ref: string) => Project
   getOrganization: (id: number) => Organization
   onArchiveNotification: (id: string) => void
 }
@@ -33,7 +33,7 @@ const NotificationRow = ({
   const { status, priority } = notification
   // @ts-ignore
   const data = notification.data as NotificationData
-  const project = data.project_id !== undefined ? getProject(data.project_id) : undefined
+  const project = data.project_ref !== undefined ? getProject(data.project_ref) : undefined
   const organization = project !== undefined ? getOrganization(project.organization_id) : undefined
 
   const daysFromNow = dayjs().diff(dayjs(notification.inserted_at), 'day')
@@ -121,7 +121,11 @@ const NotificationRow = ({
                   ? action.url.replace('[slug]', organization?.slug ?? '_')
                   : action.url
                 return (
-                  <Button key={key} type="outline">
+                  <Button
+                    key={key}
+                    type="outline"
+                    icon={<IconExternalLink strokeWidth={1.5} size={14} />}
+                  >
                     <Link href={url} target="_blank" rel="noreferrer">
                       {action.label}
                     </Link>

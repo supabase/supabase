@@ -21,6 +21,10 @@ export interface paths {
     /** Update notifications */
     patch: operations['NotificationsController_updateNotificationsV2']
   }
+  '/platform/notifications/summary': {
+    /** Get an aggregated data of interest across all notifications for the user */
+    get: operations['NotificationsController_getNotificationsSummary']
+  }
   '/platform/reset-password': {
     /** Reset password for email */
     post: operations['ResetPasswordController_resetPassword']
@@ -926,6 +930,10 @@ export interface paths {
     /** Update notifications */
     patch: operations['NotificationsController_updateNotificationsV2']
   }
+  '/v0/notifications/summary': {
+    /** Get an aggregated data of interest across all notifications for the user */
+    get: operations['NotificationsController_getNotificationsSummary']
+  }
   '/v0/status': {
     /** Get infrastructure status */
     get: operations['StatusController_getStatus']
@@ -1719,6 +1727,18 @@ export interface components {
     UpdateNotificationsBodyV1: {
       ids: string[]
     }
+    NotificationAction: {
+      label: string
+      url?: string
+      action_type?: string
+    }
+    NotificationData: {
+      org_slug?: string
+      project_ref?: string
+      title: string
+      message?: string
+      actions?: components['schemas']['NotificationAction'][]
+    }
     NotificationResponseV2: {
       /** @enum {string} */
       type:
@@ -1731,11 +1751,16 @@ export interface components {
       status: 'new' | 'seen' | 'archived'
       /** @enum {string} */
       priority: 'Critical' | 'Warning' | 'Info'
+      data: components['schemas']['NotificationData']
       id: string
       inserted_at: string
       name: string
-      data: Record<string, never>
       meta: Record<string, never>
+    }
+    NotificationsSummary: {
+      unread_count: number
+      has_warning: boolean
+      has_critical: boolean
     }
     UpdateNotificationBodyV2: {
       id: string
@@ -3451,6 +3476,7 @@ export interface components {
         | 'us-east-1'
         | 'us-west-1'
         | 'us-west-2'
+        | 'ap-east-1'
         | 'ap-southeast-1'
         | 'ap-northeast-1'
         | 'ap-northeast-2'
@@ -3812,6 +3838,7 @@ export interface components {
       effective_cache_size?: string
       maintenance_work_mem?: string
       max_connections?: number
+      max_locks_per_transaction?: number
       max_parallel_maintenance_workers?: number
       max_parallel_workers?: number
       max_parallel_workers_per_gather?: number
@@ -3826,6 +3853,7 @@ export interface components {
       effective_cache_size?: string
       maintenance_work_mem?: string
       max_connections?: number
+      max_locks_per_transaction?: number
       max_parallel_maintenance_workers?: number
       max_parallel_workers?: number
       max_parallel_workers_per_gather?: number
@@ -3864,7 +3892,7 @@ export interface components {
       available_addons: components['schemas']['AvailableAddonResponse'][]
     }
     UpdateAddonBody: {
-      addon_variant: string
+      addon_variant: Record<string, never>
       /** @enum {string} */
       addon_type: 'custom_domain' | 'compute_instance' | 'pitr'
     }
@@ -4236,7 +4264,6 @@ export interface components {
     }
     SyncVercelEnvError: {
       message: string
-      details: string
     }
     CreateVercelConnectionResponse: {
       id: string
@@ -4357,7 +4384,7 @@ export interface components {
       expiry_time: string
     }
     UpdateAddonAdminBody: {
-      addon_variant: string
+      addon_variant: Record<string, never>
       /** @enum {string} */
       addon_type: 'custom_domain' | 'compute_instance' | 'pitr'
       price_id?: string
@@ -4574,6 +4601,7 @@ export interface components {
         | 'us-east-1'
         | 'us-west-1'
         | 'us-west-2'
+        | 'ap-east-1'
         | 'ap-southeast-1'
         | 'ap-northeast-1'
         | 'ap-northeast-2'
@@ -4960,7 +4988,8 @@ export interface operations {
   NotificationsController_getNotificationsV2: {
     parameters: {
       query: {
-        archived?: boolean
+        status: 'new' | 'seen' | 'archived'
+        priority: 'Critical' | 'Warning' | 'Info'
         offset: number
         limit: number
       }
@@ -5012,6 +5041,16 @@ export interface operations {
       /** @description Failed to update notifications */
       500: {
         content: never
+      }
+    }
+  }
+  /** Get an aggregated data of interest across all notifications for the user */
+  NotificationsController_getNotificationsSummary: {
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['NotificationsSummary']
+        }
       }
     }
   }
@@ -9289,7 +9328,6 @@ export interface operations {
       path: {
         /** @description Project ref */
         ref: string
-        addon_variant: string
       }
     }
     responses: {
@@ -10833,7 +10871,6 @@ export interface operations {
       path: {
         /** @description Project ref */
         ref: string
-        addon_variant: string
       }
     }
     responses: {
