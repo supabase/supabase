@@ -118,9 +118,6 @@ export const useRealtimeMessages = ({
     // Hack to confirm Postgres is subscribed
     // Need to add 'extension' key in the 'payload'
     newChannel.on('system' as any, {} as any, (payload: any) => {
-      // if (payload.extension === 'postgres_changes' && payload.status === 'ok') {
-      //   pushMessageTo('#conn_info', 'postgres_subscribed', {})
-      // }
       pushMessage('SYSTEM', payload)
     })
 

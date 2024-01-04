@@ -50,33 +50,6 @@ const PublicationsTables = ({ selectedPublication, onSelectBack }: PublicationsT
     }
   )
 
-  // const publication = selectedPublication
-  // const enabledForAllTables = publication.tables == null
-
-  // const toggleReplicationForAllTables = async (publication: any, disable: boolean) => {
-  //   const toggle = disable ? 'disable' : 'enable'
-  //   ConfirmAlert({
-  //     title: 'Confirm',
-  //     type: 'warn',
-  //     message: `Are you sure you want to ${toggle} replication for all tables in ${publication.name}?`,
-  //     onAsyncConfirm: async () => {
-  //       try {
-  //         const res: any = await meta.publications.recreate(publication.id)
-  //         if (res.error) {
-  //           throw res.error
-  //         } else {
-  //           onPublicationUpdated(res)
-  //         }
-  //       } catch (error: any) {
-  //         ui.setNotification({
-  //           category: 'error',
-  //           message: `Failed to toggle replication for all tables: ${error.message}`,
-  //         })
-  //       }
-  //     },
-  //   })
-  // }
-
   return (
     <>
       <div className="mb-4">

@@ -172,5 +172,3 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
 }
 
 export default withAuth(AccountLayout)
-
-export const AccountLayoutWithoutAuth = AccountLayout

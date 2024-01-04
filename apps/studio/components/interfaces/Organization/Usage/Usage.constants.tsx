@@ -18,8 +18,6 @@ export const COLOR_MAP = {
   purple: { bar: 'fill-purple-900', marker: 'bg-purple-900' },
 }
 
-export const Y_DOMAIN_CEILING_MULTIPLIER = 4 / 3
-
 export const USAGE_STATUS = {
   NORMAL: 'NORMAL',
   APPROACHING: 'APPROACHING',

@@ -125,7 +125,7 @@ interface MainConfigProps {
   poolingInfo: PoolingConfigurationData
 }
 
-export const MainConfig = ({ projectRef, poolingInfo }: MainConfigProps) => {
+const MainConfig = ({ projectRef, poolingInfo }: MainConfigProps) => {
   const { ui } = useStore()
   const { project } = useProjectContext()
 
