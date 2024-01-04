@@ -1,5 +1,4 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { IS_PLATFORM } from './constants'
 
 const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   'graphiql:theme',
