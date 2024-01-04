@@ -67,7 +67,7 @@ const WithSidebar = ({
           <div className="-mt-1">
             <Menu>
               {customSidebarContent}
-              {sections.map((section, i) => {
+              {sections.map((section) => {
                 return Boolean(section.heading) ? (
                   <SectionWithHeaders
                     key={section.key}

@@ -1,16 +1,10 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { PropsWithChildren, useCallback, useEffect } from 'react'
 
-import {
-  AuthContext as AuthContextInternal,
-  AuthProvider as AuthProviderInternal,
-  gotrueClient,
-} from 'common'
+import { AuthProvider as AuthProviderInternal, gotrueClient } from 'common'
 import { useStore } from 'hooks'
 import { GOTRUE_ERRORS, IS_PLATFORM } from './constants'
-import { clearLocalStorage, resetSignInClicks } from './local-storage'
-
-export const AuthContext = AuthContextInternal
+import { clearLocalStorage } from './local-storage'
 
 export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
   const { ui } = useStore()
@@ -41,8 +35,6 @@ export function useSignOut() {
   const queryClient = useQueryClient()
 
   return useCallback(async () => {
-    resetSignInClicks()
-
     const result = await gotrueClient.signOut()
     clearLocalStorage()
     await queryClient.clear()

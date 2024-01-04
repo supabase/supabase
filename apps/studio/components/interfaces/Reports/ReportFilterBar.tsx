@@ -67,15 +67,6 @@ const PRODUCT_FILTERS = [
     description: 'Realtime connection requests',
     icon: IconZap,
   },
-  // TODO: support functions once union parsing is fixed
-  // {
-  //   key: 'functions',
-  //   filterKey: 'request.host',
-  //   filterValue: '.functions.',
-  //   label: 'Edge Functions',
-  //   description: 'Edge function calls',
-  //   icon: IconCode,
-  // },
   {
     key: 'graphql',
     filterKey: 'request.path',

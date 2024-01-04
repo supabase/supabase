@@ -1,4 +1,4 @@
-import { camelCase, snakeCase } from 'lodash'
+import { snakeCase } from 'lodash'
 import { IS_PLATFORM } from 'lib/constants'
 
 /**
@@ -65,60 +65,4 @@ export const toSnakeCase = (object) => {
   } else {
     return object
   }
-}
-
-// Typically for HTTP response bodies
-// @ts-ignore
-export const toCamelCase = (object, whitelist = []) => {
-  const camelCaseObject: any = {}
-  const camelCaseArray: any[] = []
-
-  if (!object) return null
-
-  if (Array.isArray(object)) {
-    for (const item of object) {
-      if (typeof item === 'object') {
-        camelCaseArray.push(toCamelCase(item))
-      } else {
-        camelCaseArray.push(item)
-      }
-    }
-    return camelCaseArray
-  } else if (typeof object === 'object') {
-    for (const key of Object.keys(object)) {
-      // @ts-ignore
-      if (whitelist.length > 0 && whitelist.indexOf(key) >= 0) {
-        // @ts-ignore
-        snakeCaseObject[key] = value
-      } else if (typeof object[key] === 'object') {
-        camelCaseObject[camelCase(key)] = toCamelCase(object[key])
-      } else {
-        camelCaseObject[camelCase(key)] = object[key]
-      }
-    }
-    return camelCaseObject
-  } else {
-    return object
-  }
-}
-
-/**
- * Moves all Namespaced variables to the root
- *
- * @example
- * flattenNamespaceOnUser('https://supabase.io', { email: "copple@supabase.io", "https://supabase.io": { username: 'copple' } })
- * //=>
- * { email: "copple@supabase.io", username: 'copple' })
- */
-export const flattenNamespaceOnUser = (
-  NAMESPACE: string,
-  user: {
-    [prop: string]: any
-  }
-) => {
-  let res = { ...user }
-  Object.entries(user[NAMESPACE]).forEach(([k, v]) => {
-    res[k] = v
-  })
-  return res
 }

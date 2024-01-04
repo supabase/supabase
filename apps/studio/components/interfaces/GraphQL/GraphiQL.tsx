@@ -71,7 +71,7 @@ interface GraphiQLInterfaceProps {
   theme: 'dark' | 'light'
 }
 
-export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
+const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
   const editorContext = useEditorContext({ nonNull: true })
   const executionContext = useExecutionContext({ nonNull: true })
   const schemaContext = useSchemaContext({ nonNull: true })
@@ -100,7 +100,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
     direction: 'horizontal',
     initiallyHidden: pluginContext?.visiblePlugin ? undefined : 'second',
     onHiddenElementChange: (resizableElement) => {
-      if (resizableElement === 'first') {
+      if (resizableElement === 'second') {
         pluginContext?.setVisiblePlugin(null)
       }
     },
@@ -207,7 +207,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
         <div className="graphiql-main">
           <div
             ref={pluginResize.firstRef}
-            style={{ minWidth: 0 }}
+            style={{ minWidth: '750px' }}
             className={clsx('graphiql-sessions', styles.graphiqlSessions)}
           >
             <div

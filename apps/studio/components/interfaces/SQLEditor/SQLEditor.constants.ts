@@ -1513,7 +1513,7 @@ revoke execute on function public.custom_access_token_hook from authenticated, a
   },
 ]
 
-export const SQL_SNIPPET_SCHEMA_VERSION = '1.0'
+const SQL_SNIPPET_SCHEMA_VERSION = '1.0'
 
 export const NEW_SQL_SNIPPET_SKELETON: UserContent<SqlSnippets.Content> = {
   name: 'New Query',

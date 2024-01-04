@@ -1,7 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { getForeignKeyCascadeAction } from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
-import { XYCoord } from 'dnd-core'
+import type { XYCoord } from 'dnd-core'
 import * as React from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 import { IconArrowRight, IconKey, IconLink, IconLock } from 'ui'

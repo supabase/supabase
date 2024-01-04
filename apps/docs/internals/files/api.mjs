@@ -1,4 +1,4 @@
-import sections from '../../../../spec/common-api-sections.json' assert { type: 'json' }
+import sections from '../../spec/common-api-sections.json' assert { type: 'json' }
 import { flattenSections } from '../helpers.mjs'
 
 const flatSections = flattenSections(sections)
