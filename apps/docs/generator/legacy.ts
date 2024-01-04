@@ -19,7 +19,7 @@ import * as yaml from 'js-yaml'
 import { flattenSections } from '../lib/helpers'
 
 const commonDocSpecJson = JSON.parse(
-  fs.readFileSync('../../spec/common-client-libs-sections.json', 'utf8')
+  fs.readFileSync('spec/common-client-libs-sections.json', 'utf8')
 )
 
 const flattenedCommonDocSpecJson = flattenSections(commonDocSpecJson)
