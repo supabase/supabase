@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import { useTheme } from 'next-themes'
 import { useWindowSize } from 'react-use'
 
-import { Announcement, Button, LWXCountdownBanner, cn } from 'ui'
+import { Button, cn } from 'ui'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -72,9 +72,9 @@ const Nav = () => {
 
   return (
     <>
-      <Announcement>
+      {/* <Announcement>
         <LWXCountdownBanner />
-      </Announcement>
+      </Announcement> */}
       <div
         className={cn('sticky top-0 z-40 transform', isLaunchWeekXPage && 'relative')}
         style={{ transform: 'translate3d(0,0,999px)' }}
