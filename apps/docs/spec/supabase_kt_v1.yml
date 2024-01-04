@@ -7,7 +7,7 @@ info:
 
     Supabase Kotlin.
 
-  specUrl: https://github.com/supabase/supabase/edit/master/spec/supabase_kt_v2.yml
+  specUrl: https://github.com/supabase/supabase/edit/master/apps/docs/spec/supabase_kt_v1.yml
   slugPrefix: '/'
   libraries:
     - name: 'Kotlin'
@@ -31,49 +31,49 @@ functions:
       [supabase-kt](https://github.com/supabase-community/supabase-kt) provides several platform implementations for OAuth and OTP link verification. \
       **On JVM**, it uses a HTTP Callback Server to receive the session data from a successful OAuth login.
 
-      *Note: OTP link verification such as sign ups are not supported on JVM. You may have to send a verification token rather than a url in your email. To send the token, rather than a redirect url, change `{{ .ConfirmationURL }}` in your sign up email to `{{ .Token }}`*
+      *Note: OTP link verification such as sign ups are not supported on JVM. You may have to send a verification token rather than a url in your E-Mail. To send the token, rather than a redirect url, you have to change `{{ .ConfirmationURL }}` in your sign up email to `{{ .Token }}`*
 
-      **On Android, iOS & MacOS**, OAuth and OTP verification use deeplinks. Refer to the guide below on how to setup deeplinks. Alternatively you can use Native Google Auth or a WebView for OAuth. Refer to the [demo](https://github.com/supabase-community/supabase-kt/tree/master/demos/android-login) to learn more.
+      **On Android, IOS & MacOS**, it uses deeplinks. Refer to the guide below on how to setup deeplinks. Alternatively you could use Native Google Auth or a WebView for OAuth. Refer to our [demo](https://github.com/supabase-community/supabase-kt/tree/master/demos/android-login) to learn more.
       **On JS**, it uses the website origin as the callback url. Session importing gets handled automatically.
       **Windows, tvOS, watchOS & Linux** currently have no default implementation. Feel free to create a PR.
 
-      You always make your own implementation and use `auth.parseSessionFromFragment(fragment)` or `auth.parseSessionFromUrl(url)` to let [supabase-kt](https://github.com/supabase-community/supabase-kt) handle the parsing after receiving a callback.
-      Then you can simply use `auth.importSession(session)`.
+      You always make your own implementation and use `gotrue.parseSessionFromFragment(fragment)` or `gotrue.parseSessionFromUrl(url)` to let [supabase-kt](https://github.com/supabase-community/supabase-kt) handle the parsing after receiving a callback.
+      Then you can simply use `gotrue.importSession(session)`.
 
       ### Configure deeplink callbacks for Authentication
 
-      Deeplinks are supported on Android, iOS and MacOS.
-      1. **Set up a deeplink** \
-      On Android, set up a [deeplink](https://developer.android.com/training/app-links/deep-linking) in your Android manifest. \
-      On iOS and MacOS, set up a [url scheme](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app).
+      Deeplinks are supported on Android, IOS and MacOS.
+      1. **Setup a deeplink for you app** \
+      On Android you may setup a [deeplink](https://developer.android.com/training/app-links/deep-linking) in your Android manifest. \
+      On IOS & MacOS you may setup a [url scheme](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app).
       2. **Add your deeplink to the [redirect URLs](https://supabase.com/dashboard/project/_/auth/url-configuration)** \
       **Pattern**: scheme://host
-      3. **Configure the Auth plugin**
-      Set the `host` and `scheme` in the Auth config:
+      3. **Configure the GoTrue plugin**
+      You have to set the `host` and the `scheme` in the GoTrue config:
           ```kotlin
-          install(Auth) {
-             host = "deeplink host" // this can be anything, eg. your package name or app/company url (not your Supabase url)
+          install(GoTrue) {
+             host = "deeplink host" // this can be anything, eg. your package name or app/company url (not your supabase url)
              scheme = "deeplink scheme"
 
-             // On Android only, you can set OAuth and SSO logins to open in a custom tab, rather than an external browser:
+             //Android only, you can also change that OAuth/SSO logins open in a custom tab, rather than an external browser:
              defaultExternalAuthAction = ExternalAuthAction.CUSTOM_TABS //defaults to EXTERNAL_BROWSER
           }
           ```
       4. **Call platform specific function on startup** \
       On Android: `supabase.handleDeeplinks(intent)` \
-      On iOS/MacOS: `supabase.handleDeeplinks(url)`
+      On IOS/MacOS: `supabase.handleDeeplinks(url)`
 
-      Then you can log in using OAuth:
+      Then you can just login using OAuth:
       ```kotlin
-      supabase.auth.signInWith(Google)
+      supabase.gotrue.loginWith(Google)
       ```
       Or open OTP links directly in your app.
 
       ### PKCE Authentication flow
       supabase-kt supports the [PKCE authentication flow](https://supabase.com/blog/supabase-auth-sso-pkce).
-      To use it, change the `flowType` in the Auth configuration:
+      To use it, you just have to change the `flowType` in the GoTrue configuration:
       ```kotlin
-      install(Auth) {
+      install(GoTrue) {
         flowType = FlowType.PKCE
       }
       ```
@@ -87,20 +87,20 @@ functions:
               supabaseUrl = "https://xyzcompany.supabase.co",
               supabaseKey = "public-anon-key"
           ) {
-              install(Auth)
+              install(GoTrue)
               install(Postgrest)
               //install other modules
           }
           ```
-      - id: configure-auth
-        name: Configure Auth module
+      - id: configure-gotrue
+        name: Configure GoTrue module
         code: |
           ```kotlin
           val supabase = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
               supabaseKey = "public-anon-key"
           ) {
-              install(Auth) {
+              install(GoTrue) {
                   alwaysAutoRefresh = false // default: true
                   autoLoadFromStorage = false // default: true
                   //and more...
@@ -110,25 +110,25 @@ functions:
         description: |
           **Common:**
 
-          `alwaysAutoRefresh` - whether the Auth plugin should always auto refresh expired sessions automatically. Default: `true`
+          `alwaysAutoRefresh` - whether the GoTrue plugin should always auto refresh expired sessions automatically. Default: `true`
 
-          `autoLoadFromStorage` - whether the Auth plugin should automatically load the session from the session manager. Default: `true`
+          `autoLoadFromStorage` - whether the GoTrue plugin should automatically load the session from the session manager. Default: `true`
 
-          `autoSaveToStorage` - whether the Auth plugin should automatically save the session to the session manager. Default: `true`
+          `autoSaveToStorage` - whether the GoTrue plugin should automatically save the session to the session manager. Default: `true`
 
           `flowType` - Which authentication flow to use. Currently available: FlowType.PKCE and FlowType.IMPLICIT. Default: `FlowType.IMPLICIT`
 
           `codeVerifierCache` - Interface for saving and loading codes for the PKCE authentication flow. Default: `SettingsCodeVerifierCache`
 
-          `customUrl` - Custom url for the Auth API. Can be safely ignored when using Supabase. Default: `null`
+          `customUrl` - Custom url for the GoTrue API. Can be safely ignored when using Supabase. Default: `null`
 
-          `jwtToken` - Plugin specific JWT Token. Can be ignored when using the Auth plugin. Default: `null`
+          `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`
 
-          `retryDelay` - Duration after which the Auth plugin should retry a failed session refresh. Default: `10.seconds`
+          `retryDelay` - Duration after which the GoTrue plugin should retry a failed session refresh. Default: `10.seconds`
 
           `sessionManager` - Interface for saving and loading the user session. Default: `SettingsSessionManager`
 
-          **Android & iOS:**
+          **Android & IOS:**
 
           `scheme` - The scheme for the redirect url, when using deep linking. Default: `supabase`
 
@@ -164,13 +164,13 @@ functions:
           }
           ```
         description: |
-          `propertyConversionMethod` - The method to use to convert the property names to the column names when applying filters and using the update method. Default: `PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE`
+          `propertyConversionMethod` - The method to use to convert the property names to the column names when applying filters & using the update method. Default: `PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE`
 
           `defaultSchema` - The default schema to use for database requests. Default: `public`
 
           `customUrl` - Custom url for the PostgREST API. Can be safely ignored when using Supabase. Default: `null`
 
-          `jwtToken` - Plugin specific JWT Token. Can be ignored when using the Auth plugin. Default: `null`
+          `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`
       - id: configure-storage
         name: Configure Storage module
         code: |
@@ -197,7 +197,7 @@ functions:
 
           `customUrl` - Custom url for the Storage API. Can be safely ignored when using Supabase. Default: `null`
 
-          `jwtToken` - Plugin specific JWT Token. Can be ignored when using the Auth plugin. Default: `null`
+          `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`
       - id: configure-realtime
         name: Configure Realtime module
         code: |
@@ -224,7 +224,7 @@ functions:
 
           `customUrl` - Custom url for the Realtime websocket. Can be safely ignored when using Supabase. Default: `null`
 
-          `jwtToken` - Plugin specific JWT Token. Can be ignored when using the Auth plugin. Default: `null`
+          `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`
       - id: configure-functions
         name: Configure Functions plugin
         code: |
@@ -241,7 +241,7 @@ functions:
         description: |
           `customUrl` - Custom url for the Functions API. Can be safely ignored when using Supabase. Default: `null`
 
-          `jwtToken` - Plugin specific JWT Token. Can be ignored when using the Auth plugin. Default: `null`
+          `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`
       - id: configure-graphql
         name: Configure GraphQL plugin
         code: |
@@ -262,7 +262,7 @@ functions:
 
           `customUrl` - Custom url for the GraphQL API. Can be safely ignored when using Supabase. Default: `null`
 
-          `jwtToken` - Plugin specific JWT Token. Can be ignored when using the Auth plugin. Default: `null`
+          `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`
 
           **You can access the created ApolloClient via `supabase.graphql.apolloClient`, which automatically adds the required headers depending on your session.**
 
@@ -279,37 +279,37 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val city = supabase.from("cities").select().decodeSingle<City>()
+          val city = supabase.postgrest["cities"].select().decodeSingle<City>()
           ```
       - id: selecting-specific-columns
         name: Selecting specific columns
         description: You can select specific fields from your tables.
         code: |
           ```kotlin
-          val city = supabase.from("cities").select(columns = Columns.list("id, name")).decodeSingle<City>()
+          val city = supabase.postgrest["cities"].select(columns = Columns.list("id, name")).decodeSingle<City>()
           ```
       - id: query-foreign-tables
         name: Query foreign tables
         description: If your database has foreign key relationships, you can query related tables too.
         code: |
           ```kotlin
-          val columns = Columns.raw("""
-              id,
-              name,
-              cities (
-                id,
-                name
-              )
-          """.trimIndent())
-          val country = supabase.from("countries")
-            .select(
-              columns = columns
-            )
-            .decodeSingle<Country>()
+          val country = supabase.postgrest["countries"]
+                      .select(
+                          columns = Columns.raw(
+                                          """
+                                          id,
+                                          name,
+                                          cities (
+                                              id,
+                                              name
+                                          )
+                                          """)
+                      )
+                      .decodeSingle<Country>()
           ```
         note: |
           What about join tables
-          If your tables are **NOT** directly related, but instead are joined by a _join table_,
+          If you're in a situation where your tables are **NOT** directly related, but instead are joined by a _join table_,
           you can still use the `select()` method to query the related data. The PostgREST engine detects the relationship automatically.
           For more details, [follow the link](https://postgrest.org/en/latest/api.html#embedding-through-join-tables).
       - id: query-the-same-foreign-table-multiple-times
@@ -323,14 +323,14 @@ functions:
           (both in the users) table
         code: |
           ```kotlin
-          val columns = Columns.raw("""
-              content,
-              from: sender_id(name),
-              to: receiver_id(name)
-          """.trimIndent())
-          val message = supabase.from("messages")
-              .select(columns = columns)
-              .decodeSingle<Message>()
+          val message = supabase.postgrest["messages"]
+                      .select(columns = Columns.raw(
+                                        """
+                                        content,
+                                        from: sender_id(name),
+                                        to: receiver_id(name)
+                                        """))
+                      .decodeSingle<Message>()
           ```
       - id: querying-with-count-option
         name: Querying with count option
@@ -339,10 +339,8 @@ functions:
           Allowed values for count option are [Count.EXACT](https://postgrest.org/en/stable/api.html#exact-count), [Count.PLANNED](https://postgrest.org/en/stable/api.html#planned-count) and [Count.ESTIMATED](https://postgrest.org/en/stable/api.html#estimated-count).
         code: |
           ```kotlin
-          val count = supabase.from("countries")
-                      .select(head = true) {
-                          count(Count.EXACT)
-                      }
+          val count = supabase.postgrest["countries"]
+                      .select(head = true, count = Count.EXACT)
                       .count()!!
           ```
       - id: querying-json-data
@@ -355,13 +353,13 @@ functions:
           [PostgREST docs](http://postgrest.org/en/v7.0.0/api.html#json-columns) for more details.
         code: |
           ```kotlin
-          val columns = Columns.raw("""
-              id, name
-              address->city
-          """.trimIndent())
-          val user = supabase.from("users")
-              .select(columns = columns)
-              .decodeSingle<User>()
+          val user = supabase.postgrest["users"]
+                      .select(columns = Columns.raw(
+                                      """
+                                      id, name
+                                      address->city
+                                      """)
+                      .decodeSingle<User>()
           ```
 
   - id: insert
@@ -371,6 +369,7 @@ functions:
       - When calling an `insert` method, you have to provide a [serializable value](/docs/reference/kotlin/installing#serialization).
       - By default, every time you run `insert()`, the client library will make a `select` to return the full record.
       This is convenient, but it can also cause problems if your policies are not configured to allow the `select` operation.
+      If you are using Row Level Security and you are encountering problems, try setting the `returning` param to `Returning.MINIMAL`.
     examples:
       - id: create-a-record
         name: Create a record
@@ -378,17 +377,7 @@ functions:
         code: |
           ```kotlin
           val city = City(name = "The Shire", countryId = 554)
-          supabase.from("cities").insert(city)
-          ```
-      - id: create-a-record-and-return
-        name: Create a record and return it
-        isSpotlight: true
-        code: |
-          ```kotlin
-          val city = City(name = "The Shire", countryId = 554)
-          val result = supabase.from("cities").insert(city) { 
-              select() 
-          }.decodeSingle<City>()
+          supabase.postgrest["cities"].insert(city, returning = Returning.MINIMAL) //returning defaults to Returning.REPRESENTATION
           ```
       - id: bulk-create
         name: Bulk create
@@ -399,7 +388,15 @@ functions:
           ```kotlin
           val theShire = City(name = "The Shire", countryId = 554)
           val rohan = City(name = "Rohan", countryId = 554)
-          supabase.from("cities").insert(listOf(theShire, rohan))
+          supabase.postgrest["cities"].insert(listOf(theShire, rohan), returning = Returning.MINIMAL) //returning defaults to Returning.REPRESENTATION
+          ```
+      - id: fetch-inserted-data
+        name: Fetch inserted record
+        code: |
+          ```kotlin
+          val theShire = City(name = "The Shire", countryId = 554)
+          val rohan = City(name = "Rohan", countryId = 554)
+          val result = supabase.postgrest["cities"].insert(listOf(theShire, rohan)).decodeList<City>()
           ```
 
   - id: update
@@ -413,37 +410,32 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.from("countries").update(
+          supabase.postgrest["countries"].update(
               {
                  Country::name setTo "Australia"
                  //or
                  set("name", "Australia")
               }
           ) {
-              filter {
-                  Country::id eq 1
-                  //or
-                  eq("id", 1)
-              }
+             Country::id eq 1
+             //or
+             eq("id", 1)
           }
           ```
       - id: update-a-record-and-return-it
         name: Update a record and return it
         code: |
           ```kotlin
-          val newCountry = supabase.from("countries").update(
+          val newCountry = supabase.postgrest["countries"].update(
               {
                  Country::name setTo "Australia"
                  //or
                  set("name", "Australia")
               }
           ) {
-              select()
-              filter {
-                  Country::id eq 1
-                  //or
-                  eq("id", 1)
-              }
+             Country::id eq 1
+             //or
+             eq("id", 1)
           }.decodeSingle<Country>()
           ```
         data:
@@ -455,7 +447,7 @@ functions:
             insert into
               countries (id, name)
             values
-              (1, 'Australia');
+              (1, 'Taiwan');
             ```
         response: |
           ```json
@@ -481,15 +473,15 @@ functions:
         code: |
           ```kotlin
           val address = Address(street = "Melrose Place", postcode = 90210)
-          supabase.from("users").update(
+          supabase.postgrest["users"].update(
               {
                  User::address setTo address
               }
           ) {
-              filter {
-                  eq("address->postcode", 90210)
-              }
-          }
+             User::id eq 1
+             //or
+             eq("address->postcode", 90210)
+          }.decodeSingle<Country>()
           ```
 
   - id: upsert
@@ -507,7 +499,7 @@ functions:
         code: |
           ```kotlin
           val toUpsert = Message(id = 3, message = "foo", username = "supabot")
-          supabase.from("messages").upsert(toUpsert)
+          supabase.postgrest["messages"].insert(toUpsert, upsert = true)
           ```
       - id: upserting-into-tables-with-constraints
         name: Upserting into tables with constraints
@@ -518,18 +510,16 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val toUpsert = User(username = "supabot")
-          supabase.from("users").upsert(toUpsert, onConflict = "username")
+          let toUpsert = User(username = "supabot")
+          supabase.postgrest["users"].insert(toUpsert, upsert = true, onConflict = "username")
           ```
       - id: upsert-return-row-count
         name: Return the exact number of rows
         isSpotlight: true
         code: |
           ```kotlin
-          val toUpsert = User(username = "supabot")
-          val count = supabase.from("users").upsert(toUpsert, onConflict = "username") {
-              count(Count.EXACT)
-          }.count()
+          let toUpsert = User(username = "supabot")
+          val count = supabase.postgrest["users"].insert(toUpsert, upsert = true, onConflict = "username", count = Count.EXACT).count()
           ```
 
   - id: delete
@@ -548,25 +538,20 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.from("cities").delete {
-              filter {
-                  City::id eq 666
-                  //or
-                  eq("id", 666)
-              }
+          supabase.postgrest["cities"].delete {
+             City::id eq 666
+             //or
+             eq("id", 666)
           }
           ```
       - id: fetch-delete-records
         name: Fetch deleted records
         code: |
           ```kotlin
-          val deletedCity = supabase.from("cities").delete {
-              select()
-              filter {
-                  City::id eq 666
-                  //or
-                  eq("id", 666)
-              }
+          val deletedCity = supabase.postgrest["cities"].delete {
+             City::id eq 666
+             //or
+             eq("id", 666)
           }.decodeSingle<City>()
           ```
   - id: rpc
@@ -613,7 +598,7 @@ functions:
       As you can see on the property syntax:
       the name of the `countryId` gets converted to `country_id`.
 
-      By default, this is done by converting camel case to snake case, but you can customize this by changing the `propertyConversionMethod` in the Postgrest Config
+      By default, this is done by converting camel case to snake case, but you can customize this by changing the `PropertyConversionMethod` in the Postgrest Config
 
       If a database function returns a table response, you can also apply filters.
     examples:
@@ -624,12 +609,10 @@ functions:
           `delete()`, and `rpc()`
         code: |
           ```kotlin
-          supabase.from("cities").select(columns = Columns.list("name", "country_id")) {
-              filter {
-                  City::name eq "The Shire"
-                  //or
-                  eq("name", "The Shire")
-              }
+          supabase.postgrest["cities"].select(columns = Columns.list("name", "country_id")) {
+              City::name eq "The Shire"
+              //or
+              eq("name", "The Shire")
           }
           ```
       - id: multiple-filters
@@ -639,16 +622,14 @@ functions:
           `delete()`, and `rpc()`
         code: |
           ```kotlin
-          supabase.from("cities").select(columns = Columns.list("name, country_id")) {
-              filter {
-                  and { //when both are true
-                     City::population gt 40000
-                     City::population lt 700000
-                  }
-                  or { //when either one of the filters are true
-                     City::name eq "London"
-                     City::name eq "Berlin"
-                  }
+          supabase.postgrest["cities"].select(columns = Columns.list("name, country_id")) {
+              and { //when both are true
+                 City::population gt 40000
+                 City::population lt 700000
+              }
+              or { //when either one of the filters are true
+                 City::name eq "London"
+                 City::name eq "Berlin"
               }
           }
           ```
@@ -690,28 +671,23 @@ functions:
           ```
         code: |
           ```kotlin
-          supabase.from("users").select {
-              filter {
-                  eq("address->postcode", 90210)
-              }
+          supabase.postgrest["users"].select {
+             eq("address->postcode", 90210)
           }
           ```
       - id: filter-foreign-tables
         name: Filter Foreign Tables
         code: |
           ```kotlin
-          val columns = Columns.raw("""
-              name,
-              cities!inner (
-                  name
-              )
-          """.trimIndent())
-          supabase.from("countries").select(
-                columns = columns
+          supabase.postgrest["countries"].select(
+                columns = Columns.raw("""
+                                      name,
+                                      cities!inner (
+                                        name
+                                      )
+                                      """)
           ) {
-              filter {
-                  eq("cities.name", "Bali")
-              }
+              eq("cities.name", "Bali")
           }
           ```
         data:
@@ -765,15 +741,13 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.from("countries").select(columns = Columns.list("name")) {
-              filter {
-                  or {
-                      Country::id eq 2
-                      Country::name eq "Algeria"
-                      //or
-                      eq("id", 2)
-                      eq("name", "Algeria")
-                  }
+          supabase.postgrest["countries"].select(columns = Columns.list("name")) {
+              or {
+                  Country::id eq 2
+                  Country::name eq "Algeria"
+                  //or
+                  eq("id", 2)
+                  eq("name", "Algeria")
               }
           }
           ```
@@ -781,14 +755,12 @@ functions:
         name: Use `or` with `and`
         code: |
           ```kotlin
-          supabase.from("countries").select(columns = Columns.list("name")) {
-              filter {
-                  or {
-                      Country::id gt 3
-                      and {
-                         Country::id eq 1
-                         Country::name eq "Afghanistan"
-                      }
+          supabase.postgrest["countries"].select(columns = Columns.list("name")) {
+              or {
+                  Country::id gt 3
+                  and {
+                     Country::id eq 1
+                     Country::name eq "Afghanistan"
                   }
               }
           }
@@ -806,10 +778,8 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.from("countries").select {
-              filter {
-                  filterNot("name", FilterOperation.IS, "")
-              }
+          supabase.postgrest["countries"].select {
+              filterNot("name", FilterOperation.IS, "")
           }
           ```
 
@@ -823,12 +793,10 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.from("cities").select(columns = Columns.list("name", "country_id")) {
-              filter {
-                  City::name eq "The Shire"
-                  //or
-                  eq("name", "The Shire")
-              }
+          supabase.postgrest["cities"].select(columns = Columns.list("name", "country_id")) {
+              City::name eq "The Shire"
+              //or
+              eq("name", "The Shire")
           }
           ```
       - id: with-update
@@ -836,24 +804,20 @@ functions:
         code: |
           ```kotlin
           val toUpdate = City(name = "Mordor")
-          supabase.from("cities").update(toUpdate) {
-              filter {
-                  City::name eq "San Francisco"
-                  //or
-                  eq("name", "San Francisco")
-              }
+          supabase.postgrest["cities"].update(toUpdate) {
+              City::name eq "San Francisco"
+              //or
+              eq("name", "San Francisco")
           }
           ```
       - id: with-delete
         name: With `delete()`
         code: |
           ```kotlin
-          supabase.from("cities").delete {
-              filter {
-                  City::name eq "Mordor"
-                  //or
-                  eq("name", "Mordor")
-              }
+          supabase.postgrest["cities"].delete {
+              City::name eq "Mordor"
+              //or
+              eq("name", "Mordor")
           }
           ```
       - id: with-rpc
@@ -861,11 +825,9 @@ functions:
         code: |
           ```kotlin
           supabase.postgrest.rpc("function") {
-              filter {
-                  City::name eq "Mordor"
-                  //or
-                  eq("name", "Mordor")
-              }
+              City::name eq "Mordor"
+              //or
+              eq("name", "Mordor")
           }
           ```
 
@@ -879,12 +841,10 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.from("cities").select(columns = Columns.list("name", "country_id")) {
-              filter {
-                  City::name neq "The Shire"
-                  //or
-                  neq("name", "The Shire")
-              }
+          supabase.postgrest["cities"].select(columns = Columns.list("name", "country_id")) {
+              City::name neq "The Shire"
+              //or
+              neq("name", "The Shire")
           }
           ```
       - id: with-update
@@ -892,24 +852,20 @@ functions:
         code: |
           ```kotlin
           val toUpdate = City(name = "Mordor")
-          supabase.from("cities").update(toUpdate) {
-              filter {
-                  City::name neq "The Shire"
-                  //or
-                  neq("name", "The Shire")
-              }
+          supabase.postgrest["cities"].update(toUpdate) {
+              City::name neq "The Shire"
+              //or
+              neq("name", "The Shire")
           }
           ```
       - id: with-delete
         name: With `delete()`
         code: |
           ```kotlin
-          supabase.from("cities").delete {
-              filter {
-                  City::name neq "The Shire"
-                  //or
-                  neq("name", "The Shire")
-              }
+          supabase.postgrest["cities"].delete {
+              City::name neq "The Shire"
+              //or
+              neq("name", "The Shire")
           }
           ```
       - id: with-rpc
@@ -917,9 +873,7 @@ functions:
         code: |
           ```kotlin
           supabase.rpc("echo_all_cities") {
-              filter {
-                  neq("address->postcode", 90210)
-              }
+              neq("address->postcode", 90210)
           }
           ```
 
@@ -933,12 +887,10 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.from("cities").select(columns = Columns.list("name")) {
-              filter {
-                 City::countryId gt 300
-                 //or
-                 gt("country_id", 300)
-              }
+          supabase.postgrest["cities"].select(columns = Columns.list("name")) {
+             City::countryId gt 300
+             //or
+             gt("country_id", 300)
           }
           ```
       - id: with-update
@@ -946,24 +898,20 @@ functions:
         code: |
           ```kotlin
           val toUpdate = City(name = "Mordor")
-          supabase.from("cities").update(toUpdate) {
-              filter {
-                 City::countryId gt 300
-                 //or
-                 gt("country_id", 300)
-              }
+          supabase.postgrest["cities"].update(toUpdate) {
+             City::countryId gt 300
+             //or
+             gt("country_id", 300)
           }
           ```
       - id: with-delete
         name: With `delete()`
         code: |
           ```kotlin
-          supabase.from("cities").delete {
-              filter {
-                 City::countryId gt 300
-                 //or
-                 gt("country_id", 300)
-              }
+          supabase.postgrest["cities"].delete {
+             City::countryId gt 300
+             //or
+             gt("country_id", 300)
           }
           ```
       - id: with-rpc
@@ -971,11 +919,9 @@ functions:
         code: |
           ```kotlin
           supabase.postgrest.rpc("echo_all_cities") {
-              filter {
-                 City::countryId gt 300
-                 //or
-                 gt("country_id", 300)
-              }
+             City::countryId gt 250
+             //or
+             gt("country_id", 300)
           }
           ```
 
@@ -989,12 +935,10 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.from("cities").select(columns = Columns.list("name")) {
-              filter {
-                 City::countryId gte 300
-                 //or
-                 gte("country_id", 300)
-              }
+          supabase.postgrest["cities"].select(columns = Columns.list("name")) {
+             City::countryId gte 300
+             //or
+             gte("country_id", 300)
           }
           ```
       - id: with-update
@@ -1002,24 +946,20 @@ functions:
         code: |
           ```kotlin
           val toUpdate = City(name = "Mordor")
-          supabase.from("cities").update(toUpdate) {
-              filter {
-                 City::countryId gte 300
-                 //or
-                 gte("country_id", 300)
-              }
+          supabase.postgrest["cities"].update(toUpdate) {
+             City::countryId gte 300
+             //or
+             gte("country_id", 300)
           }
           ```
       - id: with-delete
         name: With `delete()`
         code: |
           ```kotlin
-          supabase.from("cities").delete {
-              filter {
-                 City::countryId gte 300
-                 //or
-                 gte("country_id", 300)
-              }
+          supabase.postgrest["cities"].delete {
+             City::countryId gte 300
+             //or
+             gte("country_id", 300)
           }
           ```
       - id: with-rpc
@@ -1027,11 +967,9 @@ functions:
         code: |
           ```kotlin
           supabase.postgrest.rpc("echo_all_cities") {
-              filter {
-                 City::countryId gte 300
-                 //or
-                 gte("country_id", 300)
-              }
+             City::countryId gte 250
+             //or
+             gte("country_id", 300)
           }
           ```
 
@@ -1045,12 +983,10 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.from("cities").select(columns = Columns.list("name")) {
-              filter {
-                 City::countryId lt 300
-                 //or
-                 lt("country_id", 300)
-              }
+          supabase.postgrest["cities"].select(columns = Columns.list("name")) {
+             City::countryId lt 300
+             //or
+             lt("country_id", 300)
           }
           ```
       - id: with-update
@@ -1058,24 +994,20 @@ functions:
         code: |
           ```kotlin
           val toUpdate = City(name = "Mordor")
-          supabase.from("cities").update(toUpdate) {
-              filter {
-                 City::countryId lt 300
-                 //or
-                 lt("country_id", 300)
-              }
+          supabase.postgrest["cities"].update(toUpdate) {
+             City::countryId lt 300
+             //or
+             lt("country_id", 300)
           }
           ```
       - id: with-delete
         name: With `delete()`
         code: |
           ```kotlin
-          supabase.from("cities").delete {
-              filter {
-                 City::countryId lt 300
-                 //or
-                 lt("country_id", 300)
-              }
+          supabase.postgrest["cities"].delete {
+             City::countryId lt 300
+             //or
+             lt("country_id", 300)
           }
           ```
       - id: with-rpc
@@ -1083,11 +1015,9 @@ functions:
         code: |
           ```kotlin
           supabase.postgrest.rpc("echo_all_cities") {
-              filter {
-                 City::countryId lt 300
-                 //or
-                 lt("country_id", 300)
-              }
+             City::countryId lt 250
+             //or
+             lt("country_id", 300)
           }
           ```
 
@@ -1101,12 +1031,10 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.from("cities").select(columns = Columns.list("name")) {
-              filter {
-                 City::countryId lte 300
-                 //or
-                 lte("country_id", 300)
-              }
+          supabase.postgrest["cities"].select(columns = Columns.list("name")) {
+             City::countryId lte 300
+             //or
+             lte("country_id", 300)
           }
           ```
       - id: with-update
@@ -1114,24 +1042,20 @@ functions:
         code: |
           ```kotlin
           val toUpdate = City(name = "Mordor")
-          supabase.from("cities").update(toUpdate) {
-              filter {
-                 City::countryId lte 300
-                 //or
-                 lte("country_id", 300)
-              }
+          supabase.postgrest["cities"].update(toUpdate) {
+             City::countryId lte 300
+             //or
+             lte("country_id", 300)
           }
           ```
       - id: with-delete
         name: With `delete()`
         code: |
           ```kotlin
-          supabase.from("cities").delete {
-              filter {
-                 City::countryId lte 300
-                 //or
-                 lte("country_id", 300)
-              }
+          supabase.postgrest["cities"].delete {
+             City::countryId lte 300
+             //or
+             lte("country_id", 300)
           }
           ```
       - id: with-rpc
@@ -1139,11 +1063,9 @@ functions:
         code: |
           ```kotlin
           supabase.postgrest.rpc("echo_all_cities") {
-              filter {
-                 City::countryId lte 300
-                 //or
-                 lte("country_id", 300)
-              }
+             City::countryId lte 250
+             //or
+             lte("country_id", 300)
           }
           ```
 
@@ -1157,12 +1079,10 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.from("cities").select(columns = Columns.list("name")) {
-              filter {
-                 City::name like "%la%"
-                 //or
-                 like("name", "%la%")
-              }
+          supabase.postgrest["cities"].select(columns = Columns.list("name")) {
+             City::name like "%la%"
+             //or
+             like("name", "%la%")
           }
           ```
       - id: with-update
@@ -1170,24 +1090,20 @@ functions:
         code: |
           ```kotlin
           val toUpdate = City(name = "Mordor")
-          supabase.from("cities").update(toUpdate) {
-              filter {
-                 City::name like "%la%"
-                 //or
-                 like("name", "%la%")
-              }
+          supabase.postgrest["cities"].update(toUpdate) {
+             City::name like "%la%"
+             //or
+             like("name", "%la%")
           }
           ```
       - id: with-delete
         name: With `delete()`
         code: |
           ```kotlin
-          supabase.from("cities").delete {
-              filter {
-                 City::name like "%la%"
-                 //or
-                 like("name", "%la%")
-              }
+          supabase.postgrest["cities"].delete {
+             City::name like "%la%"
+             //or
+             like("name", "%la%")
           }
           ```
       - id: with-rpc
@@ -1195,11 +1111,9 @@ functions:
         code: |
           ```kotlin
           supabase.postgrest.rpc("echo_all_cities") {
-              filter {
-                 City::name like "%la%"
-                 //or
-                 like("name", "%la%")
-              }
+             City::name like "%la%"
+             //or
+             like("name", "%la%")
           }
           ```
 
@@ -1213,12 +1127,10 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.from("cities").select(columns = Columns.list("name")) {
-              filter {
-                 City::name ilike "%la%"
-                 //or
-                 ilike("name", "%la%")
-              }
+          supabase.postgrest["cities"].select(columns = Columns.list("name")) {
+             City::name ilike "%la%"
+             //or
+             ilike("name", "%la%")
           }
           ```
       - id: with-update
@@ -1226,24 +1138,20 @@ functions:
         code: |
           ```kotlin
           val toUpdate = City(name = "Mordor")
-          supabase.from("cities").update(toUpdate) {
-              filter {
-                 City::name ilike "%la%"
-                 //or
-                 ilike("name", "%la%")
-              }
+          supabase.postgrest["cities"].update(toUpdate) {
+             City::name ilike "%la%"
+             //or
+             ilike("name", "%la%")
           }
           ```
       - id: with-delete
         name: With `delete()`
         code: |
           ```kotlin
-          supabase.from("cities").delete {
-              filter {
-                 City::name ilike "%la%"
-                 //or
-                 ilike("name", "%la%")
-              }
+          supabase.postgrest["cities"].delete {
+             City::name ilike "%la%"
+             //or
+             ilike("name", "%la%")
           }
           ```
       - id: with-rpc
@@ -1251,11 +1159,9 @@ functions:
         code: |
           ```kotlin
           supabase.postgrest.rpc("echo_all_cities") {
-              filter {
-                 City::name ilike "%la%"
-                 //or
-                 ilike("name", "%la%")
-              }
+             City::name ilike "%la%"
+             //or
+             ilike("name", "%la%")
           }
           ```
 
@@ -1271,12 +1177,10 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.from("cities").select(columns = Columns.list("name")) {
-              filter {
-                 City::name isExact null
-                 //or
-                 exact("name", null)
-              }
+          supabase.postgrest["cities"].select(columns = Columns.list("name")) {
+             City::name isExact null
+             //or
+             exact("name", null)
           }
           ```
       - id: with-update
@@ -1284,24 +1188,20 @@ functions:
         code: |
           ```kotlin
           val toUpdate = City(name = "Mordor")
-          supabase.from("cities").update(toUpdate) {
-              filter {
-                 City::name isExact null
-                 //or
-                 exact("name", null)
-              }
+          supabase.postgrest["cities"].update(toUpdate) {
+             City::name isExact null
+             //or
+             exact("name", null)
           }
           ```
       - id: with-delete
         name: With `delete()`
         code: |
           ```kotlin
-          supabase.from("cities").delete {
-              filter {
-                 City::name isExact null
-                 //or
-                 exact("name", null)
-              }
+          supabase.postgrest["cities"].delete {
+              City::name isExact null
+             //or
+             exact("name", null)
           }
           ```
       - id: with-rpc
@@ -1309,11 +1209,9 @@ functions:
         code: |
           ```kotlin
           supabase.postgrest.rpc("echo_all_cities") {
-              filter {
-                 City::name isExact null
-                 //or
-                 exact("name", null)
-              }
+             City::name isExact null
+             //or
+             exact("name", null)
           }
           ```
 
@@ -1327,12 +1225,10 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.from("cities").select(columns = Columns.list("name")) {
-              filter {
-                 City::name isIn listOf("Rio de Janeiro", "San Francisco")
-                 //or
-                 isIn("name", listOf("Rio de Janeiro", "San Francisco"))
-              }
+          supabase.postgrest["cities"].select(columns = Columns.list("name")) {
+             City::name isIn listOf("Rio de Janeiro", "San Francisco")
+             //or
+             isIn("name", listOf("Rio de Janeiro", "San Francisco"))
           }
           ```
       - id: with-update
@@ -1340,24 +1236,20 @@ functions:
         code: |
           ```kotlin
           val toUpdate = City(name = "Mordor")
-          supabase.from("cities").update(toUpdate) {
-              filter {
-                 City::name isIn listOf("Rio de Janeiro", "San Francisco")
-                 //or
-                 isIn("name", listOf("Rio de Janeiro", "San Francisco"))
-              }
+          supabase.postgrest["cities"].update(toUpdate) {
+             City::name isIn listOf("Rio de Janeiro", "San Francisco")
+             //or
+             isIn("name", listOf("Rio de Janeiro", "San Francisco"))
           }
           ```
       - id: with-delete
         name: With `delete()`
         code: |
           ```kotlin
-          supabase.from("cities").delete {
-              filter {
-                 City::name isIn listOf("Rio de Janeiro", "San Francisco")
-                 //or
-                 isIn("name", listOf("Rio de Janeiro", "San Francisco"))
-              }
+          supabase.postgrest["cities"].delete {
+             City::name isIn listOf("Rio de Janeiro", "San Francisco")
+             //or
+             isIn("name", listOf("Rio de Janeiro", "San Francisco"))
           }
           ```
       - id: with-rpc
@@ -1365,11 +1257,9 @@ functions:
         code: |
           ```kotlin
           supabase.postgrest.rpc("echo_all_cities") {
-              filter {
-                 City::name isIn listOf("Rio de Janeiro", "San Francisco")
-                 //or
-                 isIn("name", listOf("Rio de Janeiro", "San Francisco"))
-              }
+             City::name isIn listOf("Rio de Janeiro", "San Francisco")
+             //or
+             isIn("name", listOf("Rio de Janeiro", "San Francisco"))
           }
           ```
 
@@ -1381,12 +1271,10 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.from("cities").select(columns = Columns.list("name")) {
-              filter {
-                 City::mainExports contains listOf("oil")
-                 //or
-                 contains("main_exports", listOf("oil"))
-              }
+          supabase.postgrest["cities"].select(columns = Columns.list("name")) {
+             City::mainExports contains listOf("oil")
+             //or
+             contains("main_exports", listOf("oil"))
           }
           ```
       - id: with-update
@@ -1394,24 +1282,20 @@ functions:
         code: |
           ```kotlin
           val toUpdate = City(name = "Mordor")
-          supabase.from("cities").update(toUpdate) {
-              filter {
-                 City::mainExports contains listOf("oil")
-                 //or
-                 contains("main_exports", listOf("oil"))
-              }
+          supabase.postgrest["cities"].update(toUpdate) {
+             City::mainExports contains listOf("oil")
+             //or
+             contains("main_exports", listOf("oil"))
           }
           ```
       - id: with-delete
         name: With `delete()`
         code: |
           ```kotlin
-          supabase.from("cities").delete {
-              filter {
-                 City::mainExports contains listOf("oil")
-                 //or
-                 contains("main_exports", listOf("oil"))
-              }
+          supabase.postgrest["cities"].delete {
+             City::mainExports contains listOf("oil")
+             //or
+             contains("main_exports", listOf("oil"))
           }
           ```
       - id: with-rpc
@@ -1419,11 +1303,9 @@ functions:
         code: |
           ```kotlin
           supabase.postgrest.rpc("echo_all_cities") {
-              filter {
-                 City::mainExports contains listOf("oil")
-                 //or
-                 contains("main_exports", listOf("oil"))
-              }
+             City::mainExports contains listOf("oil")
+             //or
+             contains("main_exports", listOf("oil"))
           }
           ```
 
@@ -1437,12 +1319,10 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-            supabase.from("reservations").select {
-                filter {
-                   Reservation::during rangeLt ("2000-01-02 08:30" to "2000-01-02 09:30")
-                   //or
-                   rangeLt("during", "2000-01-02 08:30" to "2000-01-02 09:30")
-                }
+            supabase.postgrest["reservations"].select {
+               Reservation::during rangeLt ("2000-01-02 08:30" to "2000-01-02 09:30")
+               //or
+               rangeLt("during", "2000-01-02 08:30" to "2000-01-02 09:30")
             }
           ```
         data:
@@ -1493,12 +1373,10 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-            supabase.from("reservations").select {
-                filter {
-                   Reservation::during rangeGt ("2000-01-02 08:30" to "2000-01-02 09:30")
-                   //or
-                   rangeGt("during", "2000-01-02 08:30" to "2000-01-02 09:30")
-                }
+            supabase.postgrest["reservations"].select {
+               Reservation::during rangeGt ("2000-01-02 08:30" to "2000-01-02 09:30")
+               //or
+               rangeGt("during", "2000-01-02 08:30" to "2000-01-02 09:30")
             }
           ```
         data:
@@ -1548,12 +1426,10 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-            supabase.from("reservations").select {
-                filter {
-                   Reservation::during rangeGte ("2000-01-02 08:30" to "2000-01-02 09:30")
-                   //or
-                   rangeGte("during", "2000-01-02 08:30" to "2000-01-02 09:30")
-                }
+            supabase.postgrest["reservations"].select {
+               Reservation::during rangeGte ("2000-01-02 08:30" to "2000-01-02 09:30")
+               //or
+               rangeGte("during", "2000-01-02 08:30" to "2000-01-02 09:30")
             }
           ```
         data:
@@ -1605,12 +1481,10 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-            supabase.from("reservations").select {
-                filter {
-                   Reservation::during rangeLte ("2000-01-02 08:30" to "2000-01-02 09:30")
-                   //or
-                   rangeLte("during", "2000-01-02 08:30" to "2000-01-02 09:30")
-                }
+            supabase.postgrest["reservations"].select {
+               Reservation::during rangeLte ("2000-01-02 08:30" to "2000-01-02 09:30")
+               //or
+               rangeLte("during", "2000-01-02 08:30" to "2000-01-02 09:30")
             }
           ```
         data:
@@ -1661,12 +1535,10 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-            supabase.from("reservations").select {
-                filter {
-                   Reservation::during adjacent ("2000-01-02 08:30" to "2000-01-02 09:30")
-                   //or
-                   adjacent("during", "2000-01-02 08:30" to "2000-01-02 09:30")
-                }
+            supabase.postgrest["reservations"].select {
+               Reservation::during adjacent ("2000-01-02 08:30" to "2000-01-02 09:30")
+               //or
+               adjacent("during", "2000-01-02 08:30" to "2000-01-02 09:30")
             }
           ```
         data:
@@ -1713,12 +1585,10 @@ functions:
         name: On array columns
         code: |
           ```kotlin
-          supabase.from("issues").select(columns = Columns.list("title")) {
-              filter {
-                 Issue::tags overlaps listOf("is:closed", "severity:high")
-                 //or
-                 overlaps("tags", listOf("is:closed", "severity:high"))
-              }
+          supabase.postgrest["issues"].select(columns = Columns.list("title")) {
+             Issue::tags overlaps listOf("is:closed", "severity:high")
+             //or
+             overlaps("tags", listOf("is:closed", "severity:high"))
           }
           ```
         data:
@@ -1755,12 +1625,10 @@ functions:
         name: On range columns
         code: |
           ```kotlin
-          supabase.from("issues").select(columns = Columns.list("title")) {
-              filter {
-                 Issue::during overlaps listOf("2000-01-01 12:45", "2000-01-01 13:15")
-                 //or
-                 overlaps("during", listOf("2000-01-01 12:45", "2000-01-01 13:15"))
-              }
+          supabase.postgrest["issues"].select(columns = Columns.list("title")) {
+             Issue::tags overlaps listOf("is:closed", "severity:high")
+             //or
+             overlaps("tags", listOf("is:closed", "severity:high"))
           }
           ```
         data:
@@ -1811,10 +1679,8 @@ functions:
         name: Text search
         code: |
           ```kotlin
-          supabase.from("quotes").select(columns = Columns.list("catchphrase")) {
-              filter {
-                 textSearch(column = "catchphrase", query = "'fat' & 'cat'", config = "english", type = TextSearchType.YOUR_TYPE)
-              }
+          supabase.postgrest["quotes"].select(columns = Columns.list("catchphrase")) {
+             textSearch(column = "catchphrase", query = "'fat' & 'cat'", config = "english", type = TextSearchType.YOUR_TYPE)
           }
           ```
       - id: basic-normalization
@@ -1822,10 +1688,8 @@ functions:
         description: Uses PostgreSQL's `plainto_tsquery` function.
         code: |
           ```kotlin
-          supabase.from("quotes").select(columns = Columns.list("catchphrase")) {
-              filter {
-                 textSearch(column = "catchphrase", query = "'fat' & 'cat'", config = "english", type = TextSearchType.PLAINTO)
-              }
+          supabase.postgrest["quotes"].select(columns = Columns.list("catchphrase")) {
+             textSearch(column = "catchphrase", query = "'fat' & 'cat'", config = "english", type = TextSearchType.PLAINTO)
           }
           ```
       - id: full-normalization
@@ -1833,10 +1697,8 @@ functions:
         description: Uses PostgreSQL's `phraseto_tsquery` function.
         code: |
           ```kotlin
-          supabase.from("quotes").select(columns = Columns.list("catchphrase")) {
-              filter {
-                 textSearch(column = "catchphrase", query = "'fat' & 'cat'", config = "english", type = TextSearchType.PHRASETO)
-              }
+          supabase.postgrest["quotes"].select(columns = Columns.list("catchphrase")) {
+             textSearch(column = "catchphrase", query = "'fat' & 'cat'", config = "english", type = TextSearchType.PHRASETO)
           }
           ```
       - id: web-search
@@ -1853,10 +1715,8 @@ functions:
 
         code: |
           ```kotlin
-          supabase.from("quotes").select(columns = Columns.list("catchphrase")) {
-              filter {
-                 textSearch(column = "catchphrase", query = "'fat' & 'cat'", config = "english", type = TextSearchType.WEBSEARCH)
-              }
+          supabase.postgrest["quotes"].select(columns = Columns.list("catchphrase")) {
+             textSearch(column = "catchphrase", query = "'fat' & 'cat'", config = "english", type = TextSearchType.WEBSEARCH)
           }
           ```
 
@@ -1870,10 +1730,8 @@ functions:
         name: With `select()`
         code: |
           ```kotlin
-          supabase.from("countries").select {
-              filter {
-                 filter(column = "name", operator = FilterOperator.IN, value = "('Algeria', 'Japan')")
-              } 
+          supabase.postgrest["countries"].select {
+             filter(column = "name", operator = FilterOperator.IN, value = "('Algeria', 'Japan')")
           }
           ```
         data:
@@ -1908,18 +1766,15 @@ functions:
         name: On a foreign table
         code: |
           ```kotlin
-          val columns = Columns.raw("""
-              name,
-              cities!inner (
-                  name
-              )
-          """.trimIndent())
-          supabase.from("countries").select(
-             columns = columns
+          supabase.postgrest["countries"].select(
+             columns = Columns.raw("""
+                                   name,
+                                   cities!inner (
+                                     name
+                                   )
+                                   """)
           ) {
-              filter {
-                  filter(column = "cities.name", operator = FilterOperator.EQ, value = "Bali")
-              }
+             filter(column = "cities.name", operator = FilterOperator.EQ, value = "Bali")
           }
           ```
         data:
@@ -1963,56 +1818,6 @@ functions:
           }
           ```
         hideCodeBlock: true
-  - id: using-modifiers
-    title: Using Modifiers
-    description: |
-      Filters work on the row level—they allow you to return rows that
-      only match certain conditions without changing the shape of the rows.
-      Modifiers are everything that don't fit that definition—allowing you to
-      change the format of the response (e.g., returning a CSV string).
-
-      Modifiers are be specified next to the filter block. Some modifiers only apply for
-      queries that return rows (e.g., `select()` or `rpc()` on a function that
-      returns a table response).
-  - id: db-modifiers-select
-    title: select()
-    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.select'
-    examples:
-      - id: with-upsert
-        name: With `upsert()`
-        code: |
-          ```kotlin
-          val toUpsert = Country(id = 2, name = "Algeria")
-          val count = supabase.from("countries").upsert(toUpsert) {
-              select()
-          }.decodeSingle<Country>()
-          ```
-        data:
-          sql: |
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'Afghanistan');
-            ```
-        response: |
-          ```json
-          {
-            "data": [
-              {
-                "id": 2,
-                "name": "Algeria"
-              }
-            ],
-            "status": 201,
-            "statusText": "Created"
-          }
-          ```
-        hideCodeBlock: true
-        isSpotlight: true
   - id: order
     title: order()
     description: |
@@ -2023,7 +1828,7 @@ functions:
         name: With `select()`
         code: |
           ```kotlin
-          supabase.from("countries").select(columns = Columns.list("id", "name")) {
+          supabase.postgrest["countries"].select(columns = Columns.list("id", "name")) {
              order(column = "id", order = Order.ASCENDING)
           }
           ```
@@ -2067,18 +1872,19 @@ functions:
         name: On a foreign table
         code: |
           ```kotlin
-          val columns = Columns.raw("""
-              name,
-              cities (
-                  name
+          supabase.postgrest["countries"].select(
+              columns = Columns.raw(
+                  """
+                              name,
+                              cities (
+                                name
+                              )
+                        """
               )
-          """.trimIndent())
-          supabase.from("countries").select(
-              columns = columns
           ) {
               order(column = "id", order = Order.ASCENDING, foreignTable = "cities")
           }
-          ```
+            ```
         data:
           sql: |
             ```sql
@@ -2141,8 +1947,8 @@ functions:
         name: With `select()`
         code: |
           ```kotlin
-          supabase.from("countries").select {
-              limit(count = 1)
+          supabase.postgrest["countries"].select {
+              limit(count = 20)
           }
           ```
         data:
@@ -2176,16 +1982,17 @@ functions:
         name: On a foreign table
         code: |
           ```kotlin
-          val columns = Columns.raw("""
-              name,
-              cities (
-                  name
+          supabase.postgrest["countries"].select(
+              columns = Columns.raw(
+                  """
+                              name,
+                              cities (
+                                name
+                              )
+                        """
               )
-          """)
-          supabase.from("countries").select(
-              columns = columns
           ) {
-              limit(count = 1, foreignTable = "cities")
+              limit(count = 20, foreignTable = "cities")
           }
           ```
         data:
@@ -2237,7 +2044,7 @@ functions:
         name: With `select()`
         code: |
           ```kotlin
-          supabase.from("countries").select {
+          supabase.postgrest["countries"].select {
               range(1L..5L)
           }
           ```
@@ -2271,138 +2078,18 @@ functions:
           ```
         hideCodeBlock: true
         isSpotlight: true
-  - id: single
-    title: single()
-    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.single'
-    examples:
-      - id: with-select
-        name: With `select()`
-        code: |
-          ```kotlin
-          val result = supabase.from("countries").select(Columns.list("name")) {
-              limit(1)
-              single()
-          }
-          ```
-        data:
-          sql: |
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
-            ```
-        response: |
-          ```json
-          {
-            "data": {
-              "name": "Afghanistan"
-            },
-            "status": 200,
-            "statusText": "OK"
-          }
-          ```
-        hideCodeBlock: true
-        isSpotlight: true
-
-  - id: csv
-    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.csv'
-    title: csv()
-    examples:
-      - id: return-data-as-csv
-        name: Return data as CSV
-        code: |
-          ```kotlin
-          val (csvData, _) = supabase.from("countries").select {
-              csv()
-          }
-          ```
-        data:
-          sql: |
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
-            ```
-        response: |
-          ```json
-          {
-            "data": "id,name\n1,Afghanistan\n2,Albania\n3,Algeria",
-            "status": 200,
-            "statusText": "OK"
-          }
-          ```
-        description: |
-          By default, the data is returned in JSON format, but can also be returned as Comma Separated Values.
-        hideCodeBlock: true
-        isSpotlight: true
-
-  - id: explain
-    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.explain'
-    title: Using Explain
-    description: |
-      For debugging slow queries, you can get the [Postgres `EXPLAIN` execution plan](https://www.postgresql.org/docs/current/sql-explain.html) of a query
-      using the `explain()` method. This works on any query, even for `rpc()` or writes.
-
-      Explain is not enabled by default as it can reveal sensitive information about your database.
-      It's best to only enable this for testing environments but if you wish to enable it for production you can provide additional protection by using a `pre-request` function.
-
-      Follow the [Performance Debugging Guide](/docs/guides/api/rest/debugging-performance) to enable the functionality on your project.
-    examples:
-      - id: get-execution-plan
-        name: Get the execution plan
-        code: |
-          ```kotlin
-          val result = supabase.from("countries").select {
-              explain()
-          }
-          ```
-        data:
-          sql: |
-            ```sql
-            create table
-              countries (id int8 primary key, name text);
-
-            insert into
-              countries (id, name)
-            values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
-            ```
-        response: |
-          ```
-          Aggregate  (cost=33.34..33.36 rows=1 width=112)
-            ->  Limit  (cost=0.00..18.33 rows=1000 width=40)
-                  ->  Seq Scan on countries  (cost=0.00..22.00 rows=1200 width=40)
-          ```
-        description: |
-          By default, the data is returned in TEXT format, but can also be returned as JSON by using the `format` parameter.
-        hideCodeBlock: true
-        isSpotlight: true
   - id: auth-api
     title: 'Overview'
     notes: |
-      - The auth methods can be accessed via the Supabase Auth client.
+      - The auth methods can be accessed via the Supabase GoTrue Auth client.
     examples:
       - id: create-auth-client
-        name: Create auth client
+        name: Create gotrue client
         isSpotlight: true
         code: |
           ```kotlin
           val supabase = createSupabaseClient(supabaseURL = "https://xyzcompany.supabase.co'", supabaseKey = "public-anon-key") { ... }
-          val auth = supabase.auth
+          val gotrue = supabase.gotrue
           ```
   - id: sign-up
     title: 'signUp()'
@@ -2424,7 +2111,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val user = supabase.auth.signUpWith(Email) {
+          val user = supabase.gotrue.signUpWith(Email) {
               email = "example@email.com"
               password = "example-password"
           }
@@ -2434,8 +2121,8 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val user = supabase.auth.signUpWith(Phone) {
-              phone = "+4912345679"
+          val user = supabase.gotrue.signUpWith(Phone) {
+              phoneNumber = "+4912345679"
               password = "example-password"
           }
           ```
@@ -2444,7 +2131,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          val user = supabase.auth.signUpWith(Email) {
+          val user = supabase.gotrue.signUpWith(Email) {
               email = "example@email.com"
               password = "example-password"
               data = buildJsonObject {
@@ -2459,13 +2146,13 @@ functions:
           - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
         code: |
           ```kotlin
-          val user = supabase.auth.signUpWith(Email, redirectUrl = "https://example.com") {
+          val user = supabase.gotrue.signUpWith(Email, redirectUrl = "https://example.com") {
               email = "example@email.com"
               password = "example-password"
           }
           ```
   - id: sign-in-with-password
-    title: 'signInWith()'
+    title: 'loginWith()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithPassword'
     notes: |
       Logs in an existing user.
@@ -2476,7 +2163,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.auth.signInWith(Email) {
+          supabase.gotrue.loginWith(Email) {
               email = "example@email.com"
               password = "example-password"
           }
@@ -2486,8 +2173,8 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          supabase.auth.signInWith(Phone) {
-              phone = "+4912345679"
+          supabase.gotrue.loginWith(Phone) {
+              phoneNumber = "+4912345679"
               password = "example-password"
           }
           ```
@@ -2496,7 +2183,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          supabase.auth.signInWith(IDToken) {
+          supabase.gotrue.loginWith(IDToken) {
               idToken = "token"
               provider = Google //Also supported: Apple, Azure and Facebook
               //optional:
@@ -2508,13 +2195,13 @@ functions:
           ```
 
   - id: sign-in-with-otp
-    title: 'signInWith(OTP)'
+    title: 'sendOtpTo()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOtp'
     notes: |
       Sends a OTP to the user's email or phone number.
       - Requires either an email or phone number.
       - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
-      - If the user doesn't exist, `signInWith(OTP)` will signup the user instead. To restrict this behavior, you can set `createUser` to `false`.
+      - If the user doesn't exist, `sendOtpTo()` will signup the user instead. To restrict this behavior, you can set `createUser` to `false`.
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](/docs/reference/auth/config#site_url).
@@ -2528,7 +2215,7 @@ functions:
         description: The user will be sent an email which contains either a magiclink or a OTP or both. By default, a given user can only request a OTP once every 60 seconds.
         code: |
           ```kotlin
-          supabase.auth.signInWith(OTP) {
+          supabase.gotrue.sendOtpTo(Email) {
               email = "example@email.com"
           }
           ```
@@ -2538,12 +2225,12 @@ functions:
         description: The user will be sent a SMS which contains a OTP. By default, a given user can only request a OTP once every 60 seconds.
         code: |
           ```kotlin
-          supabase.auth.signInWith(OTP) {
-              phone = "+4912345679"
+          supabase.gotrue.sendOtpTo(Phone) {
+              phoneNumber = "+4912345679"
           }
           ```
   - id: sign-in-with-oauth
-    title: 'signInWith(OAuthProvider)'
+    title: 'loginWith(OAuthProvider)'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOAuth'
     notes: |
       - This method is used for signing in using a third-party provider.
@@ -2555,14 +2242,14 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.auth.signInWith(Github)
+          supabase.gotrue.loginWith(Github)
           ```
       - id: sign-in-using-a-third-party-provider with scopes
         name: Sign in using a third-party provider with scopes
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.auth.signInWith(Github) {
+          supabase.gotrue.loginWith(Github) {
               scopes.add("email")
           }
           ```
@@ -2578,7 +2265,7 @@ functions:
           - To see how you can use a custom in-app browser on Android, check our [demo](https://github.com/supabase-community/supabase-kt/tree/development/demos/android-login) on GitHub.
         code: |
           ```kotlin
-          val url = supabase.auth.oAuthUrl(Github, redirectUrl = "https://example.com")
+          val url = supabase.gotrue.oAuthUrl(Github, redirectUrl = "https://example.com")
           ```
       - id: sign-in-with-scopes
         name: Create a custom url with scopes
@@ -2588,7 +2275,7 @@ functions:
           You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider. The list of scopes will be documented by the third-party provider you are using and specifying scopes will enable you to use the OAuth provider token to call additional APIs supported by the third-party provider to get more information.
         code: |
           ```kotlin
-          val url = supabase.auth.oAuthUrl(Github, redirectUrl = "https://example.com") {
+          val url = supabase.gotrue.oAuthUrl(Github, redirectUrl = "https://example.com") {
               scopes.add("email")
           }
           ```
@@ -2597,8 +2284,8 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithSSO'
     notes: |
       - Before you can call this method you need to [establish a connection](/docs/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to an identity provider. Use the [CLI commands](/docs/reference/cli/supabase-sso) to do this.
-      - If you've associated an email domain to the identity provider, you can change the `domain` property in the `signInWith(SSO)` method to start a sign-in flow.
-      - In case you need to use a different way to start the authentication flow with an identity provider, you can change the `providerId` property. For example:
+      - If you've associated an email domain to the identity provider, you can use the `SSO.withDomain()` function in the `loginWith` method to start a sign-in flow.
+      - In case you need to use a different way to start the authentication flow with an identity provider, you can use the `SSO.withProviderId` function. For example:
           - Mapping specific user email addresses with an identity provider.
           - Using different hints to identity the identity provider to be used by the user, like a company-specific page, IP address or other tracking information.
       - To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
@@ -2612,9 +2299,7 @@ functions:
             // You can extract the user's email domain and use it to trigger the
             // authentication flow with the correct identity provider.
 
-            supabase.auth.signInWith(SSO) {
-                domain = "company.com"
-            }
+            supabase.gotrue.loginWith(SSO.withDomain("company.com"))
 
             //the url was opened automatically, if you don't want that, provide a custom redirect url
           ```
@@ -2626,39 +2311,37 @@ functions:
             // Useful when you need to map a user's sign in request according
             // to different rules that can't use email domains.
 
-            supabase.auth.signInWith(SSO){
-                providerId = "21648a9d-8d5a-4555-a9d1-d6375dc14e92"
-            }
+            supabase.gotrue.loginWith(SSO.withProvider("21648a9d-8d5a-4555-a9d1-d6375dc14e92"))
 
             //the url was opened automatically, if you don't want that, provide a custom redirect url
           ```
   - id: sign-out
-    title: 'signOut()'
+    title: 'logout()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signOut'
     notes: |
       Logs out the current user.
-      - In order to use the `signOut()` method, the user needs to be signed in first.
+      - In order to use the `logout()` method, the user needs to be signed in first.
     examples:
       - id: sign-out
         name: Sign out
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.auth.signOut()
+          supabase.gotrue.logout()
           ```
       - id: sign-out-all-sessions
         name: Sign out all sessions
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.auth.signOut(SignOutScope.GLOBAL)
+          supabase.gotrue.logout(LogoutScope.GLOBAL)
           ```
       - id: sign-out-others
         name: Sign out all sessions except the current
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.auth.signOut(SignOutScope.OTHERS)
+          supabase.gotrue.logout(LogoutScope.OTHERS)
           ```
   - id: verify-otp
     title: 'Verify OTPs'
@@ -2671,7 +2354,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.auth.verifyEmailOtp(type = OtpType.Email.INVITE, email = "example@email.com", token = "token")
+          supabase.gotrue.verifyEmailOtp(type = OtpType.Email.INVITE, email = "example@email.com", token = "token")
           ```
         description: |
           Available types are:
@@ -2685,7 +2368,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          supabase.auth.verifyPhoneOtp(type = OtpType.Phone.SMS, phone = "+491234567", token = "token")
+          supabase.gotrue.verifyPhoneOtp(type = OtpType.Phone.SMS, phoneNumber = "+491234567", token = "token")
           ```
         description: |
           Available types are:
@@ -2704,15 +2387,15 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.auth.reauthenticate()
+          supabase.gotrue.reauthenticate()
           ```
   - id: resend-email-or-phone-otps
     title: 'resend()'
     $ref: '@supabase/gotrue-js.GoTrueClient.resend'
     notes: |
       - Resends a signup confirmation, email change or phone change email to the user.
-      - Passwordless sign-ins can be resent by calling the `signInWith(OTP)` method again.
-      - Password recovery emails can be resent by calling the `resetPasswordForEmail()` method again.
+      - Passwordless sign-ins can be resent by calling the `sendOtpTo()` method again.
+      - Password recovery emails can be resent by calling the `sendRecoveryEmail()` method again.
       - This method will only resend an email or phone OTP to the user if there was an initial signup, email change or phone change request being made.
     examples:
       - id: resend-email-signup-confirmation
@@ -2721,28 +2404,28 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.auth.resendEmail(OtpType.Email.SIGNUP, "example@email.com")
+          supabase.gotrue.resendEmail(OtpType.Email.SIGNUP, "example@email.com")
           ```
       - id: resend-phone-signup-confirmation
         name: Resend a phone signup confirmation
         description: Resends the phone signup confirmation email to the user
         code: |
           ```kotlin
-          supabase.auth.resendPhone(OtpType.Phone.SMS, "1234567890")
+          supabase.gotrue.resendPhone(OtpType.Phone.SMS, "1234567890")
           ```
       - id: resend-email-change-email
         name: Resend email change email
         description: Resends the email change email to the user
         code: |
           ```kotlin
-          supabase.auth.resendEmail(OtpType.Email.EMAIL_CHANGE, "example@email.com")
+          supabase.gotrue.resendEmail(OtpType.Email.EMAIL_CHANGE, "example@email.com")
           ```
       - id: resend-phone-change
         name: Resend phone change OTP
         description: Resends the phone change OTP to the user
         code: |
           ```kotlin
-          supabase.auth.resendPhone(OtpType.Phone.PHONE_CHANGE, "1234567890")
+          supabase.gotrue.resendPhone(OtpType.Phone.PHONE_CHANGE, "1234567890")
           ```
   - id: get-session
     title: 'Get current session'
@@ -2755,7 +2438,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val session = supabase.auth.currentSessionOrNull()
+          val session = supabase.gotrue.currentSessionOrNull()
           ```
   - id: get-user
     title: 'getUser()'
@@ -2770,7 +2453,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val user = supabase.auth.retrieveUserForCurrentSession(updateSession = true)
+          val user = supabase.gotrue.retrieveUserForCurrentSession(updateSession = true)
           ```
         description: |
           `updateSession` updates the local session with the new user
@@ -2779,7 +2462,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val user = supabase.auth.retrieveUser("JWT")
+          val user = supabase.gotrue.retrieveUser("JWT")
           ```
   - id: update-user
     title: 'modifyUser()'
@@ -2796,7 +2479,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          val user = supabase.auth.modifyUser {
+          val user = supabase.gotrue.modifyUser {
              email = "newEmail@email.com"
           }
           ```
@@ -2805,7 +2488,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          val user = supabase.auth.modifyUser {
+          val user = supabase.gotrue.modifyUser {
              password = "secretPassword"
           }
           ```
@@ -2814,69 +2497,11 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val user = supabase.auth.modifyUser {
+          val user = supabase.gotrue.modifyUser {
              data {
                 put("name", "John")
              }
           }
-          ```
-  - id: get-user-identities
-    title: 'currentIdentitiesOrNull()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.getUserIdentities'
-    notes: |
-      - The user needs to be signed in to call `currentIdentitiesOrNull()`.
-    examples:
-      - id: get-user-identities
-        name: Returns a list of identities linked to the user
-        isSpotlight: true
-        code: |
-          ```kotlin
-          //get the identities from the current user
-          val identities = supabase.auth.currentIdentitiesOrNull()
-          //Or retrieve them
-          val identities = supabase.auth.retrieveUserForCurrentSession().identities
-          ```
-  - id: link-identity
-    title: 'linkIdentity()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.linkIdentity'
-    notes: |
-      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
-      - The user needs to be signed in to call `linkIdentity()`.
-      - If the candidate identity is already linked to the existing user or another user, `linkIdentity()` will fail.
-      - This method works similarly to `signInWith()` using an OAuthProvider. To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
-    examples:
-      - id: link-identity
-        name: Link an identity to a user
-        isSpotlight: true
-        code: |
-          ```kotlin
-          supabase.auth.linkIdentity(OAuthProvider)
-          
-          //Example:
-          supabase.auth.linkIdentity(Google)
-          ```
-  - id: unlink-identity
-    title: 'unlinkIdentity()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.unlinkIdentity'
-    notes: |
-      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
-      - The user needs to be signed in to call `unlinkIdentity()`.
-      - The user must have at least 2 identities in order to unlink an identity.
-      - The identity to be unlinked must belong to the user.
-    examples:
-      - id: unlink-identity
-        name: Unlink an identity
-        isSpotlight: true
-        code: |
-          ```kotlin
-          //get all identities linked to a user
-          val identities = supabase.auth.currentIdentitiesOrNull() ?: emptyList()
-          
-          //find the google identity linked to the user
-          val googleIdentity = identities.first { it.provider == "google" }
-          
-          //unlink the google identity from the user
-          supabase.auth.unlinkIdentity(googleIdentity.identityId!!)
           ```
   - id: set-session
     title: 'importSession()'
@@ -2893,7 +2518,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.auth.importSession(UserSession(accessToken = "token", refreshToken = "refresh", expiresIn = 2000, tokenType = "Bearer", user = null))
+          supabase.gotrue.importSession(UserSession(accessToken = "token", refreshToken = "refresh", expiresIn = 2000, tokenType = "Bearer", user = null))
           ```
   - id: refresh-session
     title: 'refreshSession()'
@@ -2901,21 +2526,21 @@ functions:
     notes: |
       This method will refresh the session whether the current one is expired or not.
 
-      - This is done automatically, but can be disabled in the Auth config.
+      - This is done automatically, but can be disabled in the GoTrue config.
     examples:
       - id: refresh-current-session
         name: Refresh current session
         isSpotlight: true
         code: |
           ```kotlin
-          val session = supabase.auth.refreshCurrentSession()
+          val session = supabase.gotrue.refreshCurrentSession()
           ```
       - id: refresh-session-using-the-current-session
         name: Refresh session using the refresh token
         isSpotlight: true
         code: |
           ```kotlin
-          val session = supabase.auth.refreshSession(refreshToken = "refreshToken")
+          val session = supabase.gotrue.refreshSession(refreshToken = "refreshToken")
           ```
   - id: on-auth-state-change
     title: 'sessionStatus'
@@ -2928,7 +2553,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.auth.sessionStatus.collect {
+          supabase.gotrue.sessionStatus.collect {
               when(it) {
                   is SessionStatus.Authenticated -> println(it.session.user)
                   SessionStatus.LoadingFromStorage -> println("Loading from storage")
@@ -2948,12 +2573,12 @@ functions:
     notes: |
       Sends a password reset request to the given email address.
       - The password reset flow consist of 2 broad steps: (i) Allow the user to login via the password reset link; (ii) Update the user's password.
-      - The `resetPasswordForEmail()` only sends a password reset link to the user's email.
+      - The `sendRecoveryEmail()` only sends a password reset link to the user's email.
       To update the user's password, see [`modifyUser()`](/docs/reference/kotlin/auth-updateuser).
       - The user gets redirected back to your app, assuming you setup [OTP handling](/docs/reference/kotlin/initializing)
       - After the user has been redirected successfully, prompt them for a new password and call `modifyUser()`:
         ```kotlin
-        supabase.auth.modifyUser {
+        supabase.gotrue.modifyUser {
             password = "1234567"
         }
         ```
@@ -2963,25 +2588,25 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.auth.resetPasswordForEmail(email = "example@email.com")
+          supabase.gotrue.sendRecoveryEmail(email = "example@email.com")
           ```
   - id: exchange-code-for-session
     title: 'exchangeCodeForSession()'
     $ref: '@supabase/gotrue-js.GoTrueClient.exchangeCodeForSession'
     notes: |
-      - Used when `flowType` is set to `FlowType.PKCE` in the Auth configuration.
+      - Used when `flowType` is set to `FlowType.PKCE` in the GoTrue configuration.
     examples:
       - id: exchange-auth-code
         name: Exchange Auth Code
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.auth.exchangeCodeForSession("34e770dd-9ff9-416c-87fa-43b31d7ef225")
+          supabase.gotrue.exchangeCodeForSession("34e770dd-9ff9-416c-87fa-43b31d7ef225")
           ```
   - id: auth-mfa-api
     title: 'Overview'
     notes: |
-      This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `supabase.auth.mfa` namespace.
+      This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `supabase.gotrue.mfa` namespace.
 
       Currently, we only support time-based one-time password (TOTP) as the 2nd factor. We don't support recovery codes but we allow users to enroll more than 1 TOTP factor, with an upper limit of 10.
 
@@ -3001,7 +2626,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val factor = supabase.auth.mfa.enroll(factorType = FactorType.TOTP)
+          val factor = supabase.gotrue.mfa.enroll(factorType = FactorType.TOTP)
 
           // Use the id to create a challenge.
           // The challenge can be verified by entering the code generated from the authenticator app.
@@ -3014,14 +2639,14 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val verifiedFactors = supabase.auth.mfa.verifiedFactors
+          val verifiedFactors = supabase.gotrue.mfa.verifiedFactors
           ```
       - id: retrieve-verified-factors
         name: Retrieve verified factors
         isSpotlight: true
         code: |
           ```kotlin
-          val verifiedFactors = supabase.auth.mfa.retrieveFactorsForCurrentUser()
+          val verifiedFactors = supabase.gotrue.mfa.retrieveFactorsForCurrentUser()
           ```
   - id: mfa-challenge
     title: 'mfa.challenge()'
@@ -3036,7 +2661,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val challenge = supabase.auth.mfa.createChallenge(factorId = "34e770dd-9ff9-416c-87fa-43b31d7ef225")
+          val challenge = supabase.gotrue.mfa.createChallenge(factorId = "34e770dd-9ff9-416c-87fa-43b31d7ef225")
           ```
   - id: mfa-verify
     title: 'mfa.verify()'
@@ -3050,7 +2675,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.auth.mfa.verifyChallenge(
+          supabase.gotrue.mfa.verifyChallenge(
               factorId = "34e770dd-9ff9-416c-87fa-43b31d7ef225",
               challengeId = "4034ae6f-a8ce-4fb5-8ee5-69a5863a7c15",
               code = "123456",
@@ -3070,7 +2695,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.auth.mfa.createChallengeAndVerify(
+          supabase.gotrue.mfa.createChallengeAndVerify(
               factorId = "34e770dd-9ff9-416c-87fa-43b31d7ef225",
               code = "123456",
               saveSession = true // this is set to true by default, but you can set it to false if you want to handle the session yourself
@@ -3087,7 +2712,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.auth.mfa.unenroll(factorId = "34e770dd-9ff9-416c-87fa-43b31d7ef225")
+          supabase.gotrue.mfa.unenroll(factorId = "34e770dd-9ff9-416c-87fa-43b31d7ef225")
           ```
   - id: mfa-get-authenticator-assurance-level
     title: 'mfa.getAuthenticatorAssuranceLevel()'
@@ -3102,30 +2727,30 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val (current, next) = supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+          val (current, next) = supabase.gotrue.mfa.getAuthenticatorAssuranceLevel()
           ```
       - id: aal-enabled
         name: Check whether the user has at least one verified factor
         isSpotlight: true
         code: |
           ```kotlin
-          val enabled = supabase.auth.mfa.isMfaEnabled
+          val enabled = supabase.gotrue.mfa.isMfaEnabled
           //flow variant, automatically emitting new values on session changes
-          val enabledFlow = supabase.auth.mfa.isMfaEnabledFlow
+          val enabledFlow = supabase.gotrue.mfa.isMfaEnabledFlow
           ```
       - id: aal-enabled-for-current-session
         name: Check whether the user is logged in using AAL2
         isSpotlight: true
         code: |
           ```kotlin
-          val loggedInUsingMfa = supabase.auth.mfa.loggedInUsingMfa
+          val loggedInUsingMfa = supabase.gotrue.mfa.loggedInUsingMfa
           //flow variant, automatically emitting new values on session changes
-          val loggedInUsingMfaFlow = supabase.auth.mfa.loggedInUsingMfaFlow
+          val loggedInUsingMfaFlow = supabase.gotrue.mfa.loggedInUsingMfaFlow
           ```
   - id: admin-api
     title: 'Overview'
     notes: |
-      - Any method under the `supabase.auth.admin` namespace requires a `service_role` key.
+      - Any method under the `supabase.gotrue.admin` namespace requires a `service_role` key.
       - These methods are considered admin methods and should be called on a trusted server. Never expose your `service_role` key in the browser.
     examples:
       - id: create-auth-admin-client
@@ -3137,16 +2762,16 @@ functions:
               supabaseUrl = "https://id.supabase.co",
               supabaseKey = "supabaseKey"
           ) {
-              install(Auth) {
+              install(GoTrue) {
                   autoLoadFromStorage = false
                   alwaysAutoRefresh = false
               }
               // install other plugins (these will use the service role key)
           }
-          supabase.auth.importAuthToken("service_role")
+          supabase.gotrue.importAuthToken("service_role")
 
           // Access auth admin api
-          val adminGoTrueClient = supabase.auth.admin
+          val adminGoTrueClient = supabase.gotrue.admin
           ```
 
   - id: get-user-by-id
@@ -3161,7 +2786,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val user = supabase.auth.admin.retrieveUserById(uid = "f2a0b0a0-6b1a-4b7a-8f1a-4b7a6b1a8f1a")
+          val user = supabase.gotrue.admin.retrieveUserById(uid = "f2a0b0a0-6b1a-4b7a-8f1a-4b7a6b1a8f1a")
           ```
 
   - id: list-users
@@ -3176,14 +2801,14 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val users = supabase.auth.admin.retrieveUsers()
+          val users = supabase.gotrue.admin.retrieveUsers()
           ```
       - id: get-paginated-list-of-users
         name: Paginated list of users
         isSpotlight: false
         code: |
           ```kotlin
-          val users = supabase.auth.admin.retrieveUsers(
+          val users = supabase.gotrue.admin.retrieveUsers(
               page = 1,
               perPage = 100
           )
@@ -3200,7 +2825,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val userWithEmail = supabase.auth.admin.createUserWithEmail {
+          val userWithEmail = supabase.gotrue.admin.createUserWithEmail {
               email = "example@email.com"
               password = "secretpassword"
               userMetadata {
@@ -3213,8 +2838,8 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val userWithPhone = supabase.auth.admin.createUserWithPhone {
-              phone = "+49123456789"
+          val userWithPhone = supabase.gotrue.admin.createUserWithPhone {
+              phoneNumber = "+49123456789"
               password = "secretpassword"
               userMetadata {
                   put("name", "John")
@@ -3225,7 +2850,7 @@ functions:
         name: Auto-confirm the user's email
         code: |
           ```kotlin
-          val userWithEmail = supabase.auth.admin.createUserWithEmail {
+          val userWithEmail = supabase.gotrue.admin.createUserWithEmail {
               email = "example@email.com"
               password = "secretpassword"
               autoConfirm = true
@@ -3235,8 +2860,8 @@ functions:
         name: Auto-confirm the user's phone number
         code: |
           ```kotlin
-          val userWithPhone = supabase.auth.admin.createUserWithPhone {
-              phone = "+49123456789"
+          val userWithPhone = supabase.gotrue.admin.createUserWithPhone {
+              phoneNumber = "+49123456789"
               password = "secretpassword"
               autoConfirm = true
           }
@@ -3253,7 +2878,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.auth.admin.deleteUser(uid = "uid")
+          supabase.gotrue.admin.deleteUser(uid = "uid")
           ```
 
   - id: invite-user-by-email
@@ -3267,7 +2892,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.auth.admin.inviteUserByEmail(
+          supabase.gotrue.admin.inviteUserByEmail(
               email = "example@email.com",
               //optional:
               redirectTo = "https://example.com/redirect",
@@ -3288,7 +2913,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val (url, user) = supabase.auth.admin.generateLinkFor(LinkType.Signup) {
+          val (url, user) = supabase.gotrue.admin.generateLinkFor(LinkType.Signup) {
               email = "example@email.com"
               password = "secretpassword"
           }
@@ -3298,7 +2923,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          val (url, user) = supabase.auth.admin.generateLinkFor(LinkType.Invite) {
+          val (url, user) = supabase.gotrue.admin.generateLinkFor(LinkType.Invite) {
               email = "example@email.com"
           }
           ```
@@ -3307,7 +2932,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          val (url, user) = supabase.auth.admin.generateLinkFor(LinkType.MagicLink) {
+          val (url, user) = supabase.gotrue.admin.generateLinkFor(LinkType.MagicLink) {
               email = "example@email.com"
           }
           ```
@@ -3316,7 +2941,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          val (url, user) = supabase.auth.admin.generateLinkFor(LinkType.Recovery) {
+          val (url, user) = supabase.gotrue.admin.generateLinkFor(LinkType.Recovery) {
               email = "example@email.com"
           }
           ```
@@ -3326,13 +2951,13 @@ functions:
         code: |
           ```kotlin
           // generate an email change link to be sent to the current email address
-          val (url, user) = supabase.auth.admin.generateLinkFor(LinkType.EmailChangeCurrent) {
+          val (url, user) = supabase.gotrue.admin.generateLinkFor(LinkType.EmailChangeCurrent) {
               email = "example@email.com"
               newEmail = "newEmail@email.com"
           }
 
           // generate an email change link to be sent to the new email address
-          val (url, user) = supabase.auth.admin.generateLinkFor(LinkType.EmailChangeNew) {
+          val (url, user) = supabase.gotrue.admin.generateLinkFor(LinkType.EmailChangeNew) {
               email = "example@email.com"
               newEmail = "newEmail@email.com"
           }
@@ -3349,7 +2974,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          supabase.auth.admin.updateUserById(uid = "id") {
+          supabase.gotrue.admin.updateUserById(uid = "id") {
               email = "example@email.com"
           }
           ```
@@ -3358,7 +2983,7 @@ functions:
         isSpotlight: false
         code: |
           ```js
-          supabase.auth.admin.updateUserById(uid = "id") {
+          supabase.gotrue.admin.updateUserById(uid = "id") {
               password = "password"
           }
           ```
@@ -3367,7 +2992,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.auth.admin.updateUserById(uid = "id") {
+          supabase.gotrue.admin.updateUserById(uid = "id") {
               userMetadata = buildJsonObject {
                   put("key", "value")
               }
@@ -3378,7 +3003,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          supabase.auth.admin.updateUserById(uid = "id") {
+          supabase.gotrue.admin.updateUserById(uid = "id") {
               appMetadata = buildJsonObject {
                   put("key", "value")
               }
@@ -3389,7 +3014,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          supabase.auth.admin.updateUserById(uid = "id") {
+          supabase.gotrue.admin.updateUserById(uid = "id") {
               emailConfirm = true
           }
           ```
@@ -3398,7 +3023,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          supabase.auth.admin.updateUserById(uid = "id") {
+          supabase.gotrue.admin.updateUserById(uid = "id") {
               phoneConfirm = true
           }
           ```
@@ -3413,7 +3038,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          const factors = supabase.auth.admin.retrieveFactors(uid = "id")
+          const factors = supabase.gotrue.admin.retrieveFactors(uid = "id")
           ```
   - id: mfa-delete-factor
     title: 'mfa.deleteFactor()'
@@ -3426,7 +3051,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.auth.admin.deleteFactor(uid = "id", factorId = "factor_id")
+          supabase.gotrue.admin.deleteFactor(uid = "id", factorId = "factor_id")
           ```
   - id: invoke
     title: 'invoke()'
@@ -3490,6 +3115,13 @@ functions:
       - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
       - When using a method with a generic type like `track`, `broadcast` or `broadcastFlow`, you have to provide a [serializable class](/docs/reference/kotlin/installing#serialization) as the type parameter.
     examples:
+      - id: connect-to-realtime-client
+        name: Connect to Realtime
+        isSpotlight: true
+        code: |
+          ```kotlin
+          supabase.realtime.connect()
+          ```
       - id: liste-to-broadcasts
         name: Listen to broadcasts
         code: |
@@ -3497,7 +3129,7 @@ functions:
           @Serializable
           data class Message(val content: String, val sender: String)
 
-          val channel = supabase.channel("channelId") {
+          val channel = supabase.realtime.createChannel("channelId") {
               //optional config
           }
 
@@ -3508,7 +3140,8 @@ functions:
               println(it)
           }
 
-          channel.subscribe(blockUntilSubscribed = true)
+          supabase.realtime.connect()
+          channel.join(blockUntilJoined = true)
 
           channel.broadcast(event = "message", Message("I joined!", "John"))
           ```
@@ -3520,7 +3153,7 @@ functions:
           data class PresenceState(val username: String)
 
           val connectedUsers = mutableSetOf<PresenceState>()
-          val channel = supabase.channel("channelId") {
+          val channel = supabase.realtime.createChannel("channelId") {
               //optional config
           }
 
@@ -3532,14 +3165,15 @@ functions:
               connectedUsers -= it.decodeLeavesAs<PresenceState>()
           }
 
-          channel.subscribe(blockUntilSubscribed = true)
+          supabase.realtime.connect()
+          channel.join(blockUntilJoined = true)
           //send own state
           channel.track(PresenceState(username = "John"))
       - id: listen-to-all-database-changes
         name: Listen to all database changes
         code: |
           ```kotlin
-          val channel = supabase.channel("channelId") {
+          val channel = supabase.realtime.createChannel("channelId") {
               //optional config
           }
           val changeFlow = channel.postgresChangeFlow<PostgresAction>(schema = "public")
@@ -3554,13 +3188,14 @@ functions:
               }
           }
 
-          channel.subscribe()
+          supabase.realtime.connect()
+          channel.join()
           ```
       - id: listen-to-a-specific-table
         name: Listen to a specific table
         code: |
           ```kotlin
-          val channel = supabase.channel("channelId") {
+          val channel = supabase.realtime.createChannel("channelId") {
               //optional config
           }
           val changeFlow = channel.postgresChangeFlow<PostgresAction>(schema = "public") {
@@ -3577,13 +3212,14 @@ functions:
               }
           }
 
-          channel.subscribe()
+          supabase.realtime.connect()
+          channel.join()
           ```
       - id: listen-to-inserts
         name: Listen to inserts
         code: |
           ```kotlin
-          val channel = supabase.channel("channelId") {
+          val channel = supabase.realtime.createChannel("channelId") {
               //optional config
           }
           val changeFlow = channel.postgresChangeFlow<PostgresAction.Insert>(schema = "public") {
@@ -3595,7 +3231,8 @@ functions:
               println(it.record)
           }
 
-          channel.subscribe()
+          supabase.realtime.connect()
+          channel.join()
           ```
       - id: listen-to-updates
         name: Listen to updates
@@ -3608,7 +3245,7 @@ functions:
           ```
         code: |
           ```kotlin
-          val channel = supabase.channel("channelId") {
+          val channel = supabase.realtime.createChannel("channelId") {
               //optional config
           }
           val changeFlow = channel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
@@ -3621,7 +3258,8 @@ functions:
               println(it.oldRecord)
           }
 
-          channel.subscribe()
+          supabase.realtime.connect()
+          channel.join()
           ```
       - id: listen-to-deletes
         name: Listen to deletes
@@ -3634,7 +3272,7 @@ functions:
           ```
         code: |
           ```kotlin
-          val channel = supabase.channel("channelId") {
+          val channel = supabase.realtime.createChannel("channelId") {
               //optional config
           }
           val changeFlow = channel.postgresChangeFlow<PostgresAction.Delete>(schema = "public") {
@@ -3646,14 +3284,15 @@ functions:
               println(it.oldRecord)
           }
 
-          channel.subscribe()
+          supabase.realtime.connect()
+          channel.join()
           ```
       - id: listening-to-row-level-changes
         name: Listen to row level changes
         description: You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
         code: |
           ```kotlin
-          val channel = supabase.channel("channelId") {
+          val channel = supabase.realtime.createChannel("channelId") {
              //optional config
           }
           val changeFlow = channel.postgresChangeFlow<PostgresAction.Delete>(schema = "public") {
@@ -3666,7 +3305,8 @@ functions:
               println(it.oldRecord)
           }
 
-          channel.subscribe()
+          supabase.realtime.connect()
+          channel.join()
           ```
 
   - id: remove-channel
@@ -3682,7 +3322,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val channel = supabase.channel("channelId") {
+          val channel = supabase.realtime.createChannel("channelId") {
               //optional config
           }
           //...
@@ -3693,11 +3333,11 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val channel = supabase.channel("channelId") {
+          val channel = supabase.realtime.createChannel("channelId") {
               //optional config
           }
           //...
-          channel.unsubscribe()
+          channel.leave()
           ```
   - id: remove-all-channels
     title: removeAllChannels()
@@ -3841,14 +3481,14 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: `insert`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
-      - Resumable uploads use a `Disk` cache by default to store the upload urls. You can customize that in the Auth config by changing the `resumable.cache` property.
+      - Resumable uploads use a `Disk` cache by default to store the upload urls. You can customize that in the GoTrue config by changing the `resumable.cache` property.
     examples:
       - id: upload-file
         name: Upload file
         isSpotlight: true
         code: |
           ```kotlin
-          val bucket = supabase.storage.from("avatars")
+          val bucket = supabase.storage["avatars"]
           bucket.upload("myIcon.png", byteArray, upsert = false)
           //on JVM you can use java.io.File
           bucket.upload("myIcon.png", file, upsert = false)
@@ -3858,7 +3498,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val bucket = supabase.storage.from("avatars")
+          val bucket = supabase.storage["avatars"]
           bucket.uploadAsFlow("test.png", byteArrayOf()).collect {
               when(it) {
                   is UploadStatus.Progress -> println("Progress: ${it.totalBytesSend.toFloat() / it.contentLength * 100}%")
@@ -3871,7 +3511,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val bucket = supabase.storage.from("avatars")
+          val bucket = supabase.storage["avatars"]
           //JVM/Android:
           val upload = bucket.resumable.createOrContinueUpload("icon.png", File("icon.png"))
           //Other platforms:
@@ -3919,7 +3559,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val bucket = supabase.storage.from("avatars")
+          val bucket = supabase.storage["avatars"]
 
           //only on JVM/Android:
           bucket.resumable.continuePreviousFileUploads()
@@ -3952,7 +3592,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val bucket = supabase.storage.from("avatars")
+          val bucket = supabase.storage["avatars"]
           bucket.update("myIcon.png", byteArray, upsert = false)
           //on JVM you can use java.io.File
           bucket.update("myIcon.png", file, upsert = false)
@@ -3972,7 +3612,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val bucket = supabase.storage.from("avatars")
+          val bucket = supabase.storage["avatars"]
           bucket.move("icon1.png", "icon2.png")
           ```
   - id: from-copy
@@ -3989,7 +3629,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.storage.from("test").copy(from = "avatar.png", to = "avatar2.png")
+          supabase.storage["test"].copy(from = "avatar.png", to = "avatar2.png")
           ```
   - id: from-create-signed-url
     title: from.createSignedUrl()
@@ -4005,14 +3645,14 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val bucket = supabase.storage.from("avatars")
+          val bucket = supabase.storage["avatars"]
           val url = bucket.createSignedUrl(path = "icon.png", expiresIn = 3.minutes)
           ```
       - id: create-signed-url-with-transformation
         name: Create Signed URL with transformation
         code: |
           ```kotlin
-          val bucket = supabase.storage.from("avatars")
+          val bucket = supabase.storage["avatars"]
           val url = bucket.createSignedUrl(path = "icon.png", expiresIn = 3.minutes) {
               size(100, 100)
               fill()
@@ -4032,7 +3672,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val urls = supabase.storage.from("avatars").createSignedUrls(20.minutes, "avata1.jpg", "avatar2.jpg")
+          val urls = supabase.storage["avatars"].createSignedUrls(20.minutes, "avata1.jpg", "avatar2.jpg")
           ```
   - id: from-create-signed-upload-url
     title: from.createSignedUploadUrl()
@@ -4048,7 +3688,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val url = supabase.storage.from("avatars").createSignedUploadUrl("avatar.png")
+          val url = supabase.storage["avatars"].createSignedUploadUrl("avatar.png")
           ```
   - id: from-upload-to-signed-url
     title: from.uploadToSignedUrl()
@@ -4064,9 +3704,9 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.storage.from("avatars").uploadToSignedUrl(path = "avatar.jpg", token = "token-from-createSignedUploadUrl", data = bytes)
+          supabase.storage["avatars"].uploadToSignedUrl(path = "avatar.jpg", token = "token-from-createSignedUploadUrl", data = bytes)
           //or on JVM:
-          supabase.storage.from("avatars").uploadToSignedUrl(path = "avatar.jpg", token = "token-from-createSignedUploadUrl", file = File("avatar.jpg"))
+          supabase.storage["avatars"].uploadToSignedUrl(path = "avatar.jpg", token = "token-from-createSignedUploadUrl", file = File("avatar.jpg"))
           ```
   - id: from-get-public-url
     title: from.getPublicUrl()
@@ -4083,14 +3723,14 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val url = supabase.storage.from("public-bucket").publicUrl("folder/avatar1.png")
+          val url = supabase.storage["public-bucket"].publicUrl("folder/avatar1.png")
           ```
       - id: transform-asset-in-public-bucket
         name: Returns the URL for an asset in a public bucket with transformations
         isSpotlight: true
         code: |
           ```kotlin
-          val url = supabase.storage.from("public-bucket").publicRenderUrl("folder/avatar1.png") {
+          val url = supabase.storage["public-bucket"].publicRenderUrl("folder/avatar1.png") {
               size(100, 100)
           }
           ```
@@ -4109,7 +3749,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val bucket = supabase.storage.from("avatars")
+          val bucket = supabase.storage["avatars"]
           val bytes = bucket.downloadAuthenticated("test.png")
           //or on JVM:
           bucket.downloadAuthenticatedTo("test.png", File("test.png"))
@@ -4119,7 +3759,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val bucket = supabase.storage.from("avatars")
+          val bucket = supabase.storage["avatars"]
           val bytes = bucket.downloadPublic("test.png")
           //or on JVM:
           bucket.downloadPublicTo("test.png", File("test.png"))
@@ -4128,7 +3768,7 @@ functions:
         name: Download file with transformation
         code: |
           ```kotlin
-          val bucket = supabase.storage.from("avatars")
+          val bucket = supabase.storage["avatars"]
           val bytes = bucket.downloadPublic("test.png") {
               size(100, 100)
               fill()
@@ -4145,7 +3785,7 @@ functions:
         name: Download file with progress
         code: |
           ```kotlin
-          val bucket = supabase.storage.from("avatars")
+          val bucket = supabase.storage["avatars"]
           bucket.downloadAuthenticatedAsFlow("icon.png").collect {
               when(it) {
                   is DownloadStatus.ByteData -> println("Downloaded ${it.data.size} bytes")
@@ -4176,7 +3816,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val bucket = supabase.storage.from("avatars")
+          val bucket = supabase.storage["avatars"]
           bucket.delete("test.png", "test2.png")
           ```
 
@@ -4194,6 +3834,6 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val bucket = supabase.storage.from("avatars")
+          val bucket = supabase.storage["avatars"]
           val files = bucket.list()
           ```

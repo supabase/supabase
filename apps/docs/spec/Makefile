@@ -60,16 +60,16 @@ download.analytics.v0:
 transform: dereference.api.v0  dereference.auth.v1 dereference.storage.v0 dereference.tsdoc.v2 combine.tsdoc.v2
 
 dereference.api.v0:
-	npx swagger-cli bundle --dereference --outfile $(REPO_DIR)/transforms/api_v0_openapi_deparsed.json $(REPO_DIR)/api_v0_openapi.json
+	npx @redocly/cli bundle --dereferenced -o $(REPO_DIR)/transforms/api_v0_openapi_deparsed.json $(REPO_DIR)/api_v0_openapi.json
 
 dereference.auth.v1:
-	npx swagger-cli bundle --dereference --outfile $(REPO_DIR)/transforms/auth_v1_openapi_deparsed.json $(REPO_DIR)/auth_v1_openapi.json
+	npx @redocly/cli bundle --dereferenced -o $(REPO_DIR)/transforms/auth_v1_openapi_deparsed.json $(REPO_DIR)/auth_v1_openapi.json
 
 dereference.storage.v0:
-	npx swagger-cli bundle --dereference --outfile $(REPO_DIR)/transforms/storage_v0_openapi_deparsed.json $(REPO_DIR)/storage_v0_openapi.json
+	npx @redocly/cli bundle --dereferenced -o $(REPO_DIR)/transforms/storage_v0_openapi_deparsed.json $(REPO_DIR)/storage_v0_openapi.json
 
 dereference.analytics.v0:
-	npx swagger-cli bundle --dereference --outfile $(REPO_DIR)/transforms/analytics_v0_openapi_deparsed.json $(REPO_DIR)/analytics_v0_openapi.json
+	npx @redocly/cli bundle --dereferenced -o $(REPO_DIR)/transforms/analytics_v0_openapi_deparsed.json $(REPO_DIR)/analytics_v0_openapi.json
 
 # No longer updated
 # dereference.tsdoc.v1:
@@ -124,7 +124,7 @@ combine-raw.tsdoc.v2:
 ###############################################################################
 
 validate.analytics.v0:
-	npx swagger-cli validate --no-schema $(REPO_DIR)/analytics_v0_openapi.json
+	npx @redocly/cli lint --extends=minimal $(REPO_DIR)/analytics_v0_openapi.json
 
 ###############################################################################
 # Format everything - easier for git to track changes.
