@@ -178,7 +178,7 @@ jobs:
       - name: Update file
         run: |
           cd '${{ env.cli_repo }}'
-          sed -i 's/${{ env.cli_repo_owner }}\/${{ env.service_to_update }}:v[0-9]*\.[0-9]*\.[0-9]*/${{ env.cli_repo_owner }}\/${{ env.service_to_update }}:${{ needs.settings.outputs.image_version }}/' internal/utils/misc.go
+          sed -i 's/${{ env.cli_repo_owner }}\/${{ env.service_to_update }}:.*/${{ env.cli_repo_owner }}\/${{ env.service_to_update }}:${{ needs.settings.outputs.image_version }}"/' internal/utils/misc.go
 
       - name: Commit changes
         run: |
