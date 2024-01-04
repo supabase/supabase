@@ -23,3 +23,4 @@ yarn-error.log*
 **/*/generated/**/*
 !**/*/generated/.gitkeep
 !**/*/generated/**/.gitkeep
+.vercel
