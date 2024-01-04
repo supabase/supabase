@@ -30,16 +30,6 @@ export const useOrganizationsQuery = <TData = OrganizationsData>({
     { enabled: enabled, ...options, staleTime: 30 * 60 * 1000 }
   )
 
-export function prefetchOrganizations(client: QueryClient) {
-  return client.prefetchQuery(organizationKeys.list(), ({ signal }) => getOrganizations(signal))
-}
-
-export const useOrganizationsPrefetch = () => {
-  const client = useQueryClient()
-
-  return useCallback(() => prefetchOrganizations(client), [])
-}
-
 export function invalidateOrganizationsQuery(client: QueryClient) {
   return client.invalidateQueries(organizationKeys.list())
 }

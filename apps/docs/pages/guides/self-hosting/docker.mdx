@@ -308,7 +308,7 @@ docker exec -it $(docker ps | grep supabase-db | awk '{print $1}') psql -U supab
 # Drop all the data in the _analytics schema
 DROP PUBLICATION logflare_pub; DROP SCHEMA _analytics CASCADE; CREATE SCHEMA _analytics;\q
 # Drop the analytics container
-docker rm supabase-db
+docker rm supabase-analytics
 ```
 
 ---

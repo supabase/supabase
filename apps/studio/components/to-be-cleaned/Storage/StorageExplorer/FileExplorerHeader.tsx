@@ -6,15 +6,11 @@ import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuRadioGroup,
   DropdownMenuSeparator,
   DropdownMenuItem,
   DropdownMenuTrigger,
   IconChevronLeft,
   IconChevronRight,
-  IconChevronsDown,
-  IconChevronsUp,
-  IconCode,
   IconColumns,
   IconEdit2,
   IconFolderPlus,
@@ -29,14 +25,12 @@ import {
   DropdownMenuSub,
   DropdownMenuSubTrigger,
   DropdownMenuSubContent,
-  DropdownMenuRadioItem,
 } from 'ui'
 
 import { useCheckPermissions } from 'hooks'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
-import { useAppStateSnapshot } from 'state/app-state'
 import APIDocsButton from 'components/ui/APIDocsButton'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 

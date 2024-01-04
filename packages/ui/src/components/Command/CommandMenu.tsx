@@ -177,7 +177,13 @@ const CommandMenu = () => {
               {site === 'docs' && (
                 <CommandGroup heading="Projects">
                   {sharedItems.projectTools.map((item) => (
-                    <CommandItem key={item.url} type="link" onSelect={() => router.push(item.url)}>
+                    <CommandItem
+                      key={item.url}
+                      type="link"
+                      onSelect={() =>
+                        window.open(`https://supabase.com/dashboard${item.url}`, '_blank')
+                      }
+                    >
                       <IconArrowRight className="text-foreground-muted" />
                       <CommandLabel>
                         <span className="font-bold"> {item.label}</span>
@@ -190,7 +196,13 @@ const CommandMenu = () => {
               {site === 'docs' && (
                 <CommandGroup heading="Studio tools">
                   {sharedItems.tools.map((item) => (
-                    <CommandItem key={item.url} type="link" onSelect={() => router.push(item.url)}>
+                    <CommandItem
+                      key={item.url}
+                      type="link"
+                      onSelect={() =>
+                        window.open(`https://supabase.com/dashboard${item.url}`, '_blank')
+                      }
+                    >
                       <IconArrowRight className="text-foreground-muted" />
                       <CommandLabel>
                         Go to <span className="font-bold"> {item.label}</span>

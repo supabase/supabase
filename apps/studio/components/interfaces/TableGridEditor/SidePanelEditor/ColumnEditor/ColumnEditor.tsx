@@ -17,13 +17,12 @@ import {
   Toggle,
 } from 'ui'
 
-import { Dictionary } from 'types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { usePostgresTypesQuery } from 'data/database/types-query'
-import { useStore } from 'hooks'
 import { EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
+import { Dictionary } from 'types'
 import { ForeignKeySelector } from '..'
 import ActionBar from '../ActionBar'
 import { TEXT_TYPES } from '../SidePanelEditor.constants'
@@ -72,7 +71,6 @@ const ColumnEditor = ({
   updateEditorDirty = noop,
 }: ColumnEditorProps) => {
   const { ref } = useParams()
-  const { vault } = useStore()
   const { project } = useProjectContext()
 
   const [errors, setErrors] = useState<Dictionary<any>>({})
@@ -94,8 +92,6 @@ const ColumnEditor = ({
   })
   const foreignKeyMeta = data || []
 
-  const keys = vault.listKeys()
-
   const isNewRecord = column === undefined
   const originalForeignKey = column
     ? getColumnForeignKey(column, selectedTable, foreignKeyMeta)
@@ -105,7 +101,7 @@ const ColumnEditor = ({
     if (visible) {
       setErrors({})
       const columnFields = isNewRecord
-        ? { ...generateColumnField(), keyId: keys.length > 0 ? keys[0].id : 'create-new' }
+        ? generateColumnField()
         : generateColumnFieldFromPostgresColumn(column!, selectedTable, foreignKeyMeta)
       setColumnFields(columnFields)
     }

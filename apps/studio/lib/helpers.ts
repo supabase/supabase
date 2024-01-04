@@ -87,36 +87,6 @@ export const pluckObjectFields = (model: any, fields: any[]) => {
 }
 
 /**
- * Trims down a JSON Schema only to the fields that a user wants.
- * @param {object} jsonSchema
- * @param {array} fields a list of properties to pluck. eg: ['first_name', 'last_name']
- */
-export const pluckJsonSchemaFields = (jsonSchema: any, fields: any) => {
-  let schema: any = {
-    type: 'object',
-    required: [],
-    properties: {},
-  }
-  fields.forEach((field: any) => {
-    if (jsonSchema.properties[field]) {
-      schema.properties[field] = jsonSchema.properties[field]
-      if (jsonSchema.required.includes(field)) schema.required.push(field)
-    }
-  })
-  return schema
-}
-
-/**
- * Before return to frontend, we should filter sensitive project props
- */
-export const filterSensitiveProjectProps = (project: any) => {
-  project.db_user_supabase = undefined
-  project.db_pass_supabase = undefined
-
-  return project
-}
-
-/**
  * Returns undefined if the string isn't parse-able
  */
 export const tryParseInt = (str: string) => {

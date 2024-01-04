@@ -38,7 +38,7 @@ const HookList = ({ schema, filterString, editHook = noop, deleteHook = noop }: 
   })
 
   const restUrl = project?.restUrl
-  const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
+  const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : 'co'
 
   const filteredHooks = (hooks ?? []).filter(
     (x: any) =>
