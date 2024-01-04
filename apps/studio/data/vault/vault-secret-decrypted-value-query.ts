@@ -14,7 +14,7 @@ export const vaultSecretDecryptedValueQuery = (id: string) => {
 }
 
 export type VaultSecretsDecryptedValueVariables = {
-  projectRef: string
+  projectRef?: string
   connectionString?: string
   id: string
 }
@@ -42,6 +42,7 @@ export type VaultSecretsDecryptedValueError = unknown
 export const useVaultSecretDecryptedValueQuery = <TData = VaultSecretsDecryptedValueData>(
   { projectRef, connectionString, id }: VaultSecretsDecryptedValueVariables,
   {
+    enabled,
     ...options
   }: UseQueryOptions<VaultSecretsDecryptedValueData, VaultSecretsDecryptedValueError, TData> = {}
 ) =>
@@ -52,6 +53,7 @@ export const useVaultSecretDecryptedValueQuery = <TData = VaultSecretsDecryptedV
       select(data) {
         return (data[0] as any).decrypted_secret
       },
+      enabled: enabled && typeof projectRef !== 'undefined',
       ...options,
     }
   )

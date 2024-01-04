@@ -20,12 +20,14 @@ const DeleteSecretModal = ({ selectedSecret, onClose }: DeleteSecretModalProps) 
   const { mutateAsync: deleteSecret } = useVaultSecretDeleteMutation()
 
   const onConfirmDeleteSecret = async () => {
+    if (!project) return console.error('Project is required')
+
     setIsDeleting(true)
     if (!selectedSecret) {
       return
     }
     const res = await deleteSecret({
-      projectRef: project?.ref!,
+      projectRef: project.ref,
       connectionString: project?.connectionString,
       id: selectedSecret.id,
     })

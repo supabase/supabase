@@ -23,7 +23,7 @@ export const getPgSodiumKeysQuery = () => {
 }
 
 export type PgSodiumKeysVariables = {
-  projectRef: string
+  projectRef?: string
   connectionString?: string
 }
 
@@ -49,7 +49,7 @@ export type PgSodiumKeysError = unknown
 
 export const usePgSodiumKeysQuery = <TData = PgSodiumKeysData>(
   { projectRef, connectionString }: PgSodiumKeysVariables,
-  { ...options }: UseQueryOptions<PgSodiumKeysData, PgSodiumKeysError, TData> = {}
+  { enabled, ...options }: UseQueryOptions<PgSodiumKeysData, PgSodiumKeysError, TData> = {}
 ) =>
   useQuery<PgSodiumKeysData, PgSodiumKeysError, TData>(
     pgSodiumKeys.list(projectRef),
@@ -58,6 +58,7 @@ export const usePgSodiumKeysQuery = <TData = PgSodiumKeysData>(
       select(data) {
         return sortBy(data, (k) => Number(new Date(k.created))) as any
       },
+      enabled: enabled && typeof projectRef !== 'undefined',
       ...options,
     }
   )

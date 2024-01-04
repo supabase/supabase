@@ -46,6 +46,8 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
   }
 
   const onUpdateSecret = async (values: any, { setSubmitting }: any) => {
+    if (!project) return console.error('Project is required')
+
     const payload: Partial<VaultSecret> = {}
     if (values.name !== selectedSecret?.name) payload.name = values.name
     if (values.description !== selectedSecret?.description) payload.description = values.description
@@ -75,7 +77,7 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
     if (!isEmpty(payload) && selectedSecret) {
       setSubmitting(true)
       const res = await updateSecret({
-        projectRef: project?.ref!,
+        projectRef: project.ref,
         connectionString: project?.connectionString,
         id: selectedSecret.id,
         ...payload,
@@ -111,6 +113,8 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
         onSubmit={onUpdateSecret}
       >
         {({ isSubmitting, resetForm }: any) => {
+          // [Joshen] JFYI this is breaking rules of hooks, will be fixed once we move to
+          // using react hook form instead
           // eslint-disable-next-line react-hooks/rules-of-hooks
           const { isLoading: isLoadingSecretValue } = useVaultSecretDecryptedValueQuery(
             {

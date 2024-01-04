@@ -24,7 +24,7 @@ const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
   const { mutateAsync: addSecret } = useVaultSecretCreateMutation()
 
   const { data: keys } = usePgSodiumKeysQuery({
-    projectRef: project?.ref!,
+    projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
@@ -45,6 +45,8 @@ const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
   }
 
   const onAddNewSecret = async (values: any, { setSubmitting }: any) => {
+    if (!project) return console.error('Project is required')
+
     setSubmitting(true)
     let encryptionKeyId = selectedKeyId
 
@@ -66,7 +68,7 @@ const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
     }
 
     const res = await addSecret({
-      projectRef: project?.ref!,
+      projectRef: project.ref,
       connectionString: project?.connectionString,
       name: values.name,
       description: values.description,

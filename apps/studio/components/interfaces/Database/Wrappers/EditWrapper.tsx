@@ -56,7 +56,7 @@ const EditWrapper = () => {
   })
 
   const { data: secrets, isLoading: isSecretsLoading } = useVaultSecretsQuery({
-    projectRef: project?.ref!,
+    projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
@@ -237,7 +237,7 @@ const EditWrapper = () => {
                     )
                     if (secret !== undefined) {
                       const value = await getDecryptedValue({
-                        projectRef: project?.ref!,
+                        projectRef: project?.ref,
                         connectionString: project?.connectionString,
                         id: secret.id,
                       })

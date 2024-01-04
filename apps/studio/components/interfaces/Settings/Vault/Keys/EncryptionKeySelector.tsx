@@ -28,7 +28,7 @@ const EncryptionKeySelector = ({
   const { project } = useProjectContext()
 
   const { data } = usePgSodiumKeysQuery({
-    projectRef: project?.ref!,
+    projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 

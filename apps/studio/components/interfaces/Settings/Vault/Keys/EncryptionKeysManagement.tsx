@@ -48,7 +48,7 @@ const EncryptionKeysManagement = () => {
   }, [id])
 
   const { data, isLoading } = usePgSodiumKeysQuery({
-    projectRef: project?.ref!,
+    projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
   const { mutateAsync: addKeyMutation } = usePgSodiumKeyCreateMutation()
@@ -73,10 +73,12 @@ const EncryptionKeysManagement = () => {
   )
 
   const addKey = async (values: any, { setSubmitting }: any) => {
+    if (!project) return console.error('Project is required')
+
     setSubmitting(true)
     const res = await addKeyMutation({
-      projectRef: project?.ref!,
-      connectionString: project?.connectionString,
+      projectRef: project.ref,
+      connectionString: project.connectionString,
       name: values.name,
     })
     if (!res.error) {
@@ -94,11 +96,12 @@ const EncryptionKeysManagement = () => {
 
   const confirmDeleteKey = async () => {
     if (!selectedKeyToRemove) return
+    if (!project) return console.error('Project is required')
 
     setIsDeletingKey(true)
     const res = await deleteKeyMutation({
-      projectRef: project?.ref!,
-      connectionString: project?.connectionString,
+      projectRef: project.ref,
+      connectionString: project.connectionString,
       id: selectedKeyToRemove.id,
     })
     if (!res.error) {

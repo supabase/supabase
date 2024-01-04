@@ -14,7 +14,7 @@ export const getVaultSecretsQuery = () => {
 }
 
 export type VaultSecretsVariables = {
-  projectRef: string
+  projectRef?: string
   connectionString?: string
 }
 
@@ -23,7 +23,7 @@ export type VaultSecretsError = unknown
 
 export const useVaultSecretsQuery = <TData extends VaultSecretsData = VaultSecretsData>(
   { projectRef, connectionString }: VaultSecretsVariables,
-  options: UseQueryOptions<ExecuteSqlData, VaultSecretsError, TData> = {}
+  { enabled, ...options }: UseQueryOptions<ExecuteSqlData, VaultSecretsError, TData> = {}
 ) => {
   return useExecuteSqlQuery(
     {
@@ -36,6 +36,7 @@ export const useVaultSecretsQuery = <TData extends VaultSecretsData = VaultSecre
       select(data) {
         return data.result
       },
+      enabled: enabled && typeof projectRef !== 'undefined',
       ...options,
     }
   )
