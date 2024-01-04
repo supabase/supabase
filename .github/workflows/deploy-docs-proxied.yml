@@ -1,6 +1,6 @@
 name: Proxy docs preview site via www preview site
 
-on: workflow_dispatch
+on: [pull_request, workflow_dispatch]
 
 jobs:
   proxy:
