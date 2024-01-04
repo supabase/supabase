@@ -1,6 +1,6 @@
 import Table from 'components/to-be-cleaned/Table'
 import { ColumnPrivilege } from 'data/privileges/column-privileges-query'
-import { Switch, Toggle } from 'ui'
+import { Switch } from 'ui'
 import {
   ALL_PRIVILEGE_TYPES,
   COLUMN_PRIVILEGE_TYPES,
@@ -14,6 +14,7 @@ export interface PrivilegesTableProps
     'tableCheckedStates' | 'columnCheckedStates' | 'toggleTablePrivilege' | 'toggleColumnPrivilege'
   > {
   columnPrivileges: ColumnPrivilege[]
+  disabled: boolean
   isApplyingChanges?: boolean
 }
 
@@ -23,6 +24,7 @@ const PrivilegesTable = ({
   columnCheckedStates,
   toggleTablePrivilege,
   toggleColumnPrivilege,
+  disabled,
   isApplyingChanges = false,
 }: PrivilegesTableProps) => {
   const handleClickColumnName = (columnId: string) => {
@@ -60,7 +62,7 @@ const PrivilegesTable = ({
                   onCheckedChange={() => {
                     toggleTablePrivilege(privilege)
                   }}
-                  disabled={isApplyingChanges}
+                  disabled={disabled || isApplyingChanges}
                 />
               </div>
             </Table.th>
@@ -83,13 +85,13 @@ const PrivilegesTable = ({
             return (
               <Table.td key={privilege}>
                 {COLUMN_PRIVILEGE_TYPES.includes(privilege as any) && (
-                  <div className="inline-flex">
+                  <div className="ml-5 inline-flex">
                     <Switch
                       checked={checked}
                       onCheckedChange={() => {
                         toggleColumnPrivilege(column.column_id, privilege)
                       }}
-                      disabled={isApplyingChanges}
+                      disabled={disabled || isApplyingChanges}
                     />
                   </div>
                 )}
@@ -99,7 +101,7 @@ const PrivilegesTable = ({
           {TABLE_PRIVILEGE_TYPES.map((privilege) => {
             return (
               <Table.td key={privilege}>
-                <span className="text-xs text-foreground-lighter">N/A</span>
+                <span className="ml-5 text-xs text-foreground-lighter">N/A</span>
               </Table.td>
             )
           })}

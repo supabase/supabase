@@ -1,39 +1,39 @@
 import { PostgresRole } from '@supabase/postgres-meta'
+import { useParams } from 'common'
 import Link from 'next/link'
 import { useCallback, useMemo, useState } from 'react'
-
-import { useParams } from 'common/hooks'
-import PrivilegesHead from 'components/interfaces/Database/Privileges/PrivilegesHead'
-import PrivilegesTable from 'components/interfaces/Database/Privileges/PrivilegesTable'
-import { AuthLayout } from 'components/layouts'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import EmptyPageState from 'components/ui/Error'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useColumnPrivilegesQuery } from 'data/privileges/column-privileges-query'
-import { useTablePrivilegesQuery } from 'data/privileges/table-privileges-query'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { NextPageWithLayout } from 'types'
 import { Button, IconExternalLink } from 'ui'
-import AlertError from 'components/ui/AlertError'
+
 import {
   getDefaultColumnCheckedStates,
   getDefaultTableCheckedStates,
   useApplyPrivilegeOperations,
   usePrivilegesState,
 } from 'components/interfaces/Database/Privileges/Privileges.utils'
+import PrivilegesHead from 'components/interfaces/Database/Privileges/PrivilegesHead'
+import PrivilegesTable from 'components/interfaces/Database/Privileges/PrivilegesTable'
+import { AuthLayout } from 'components/layouts'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import AlertError from 'components/ui/AlertError'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
+import { useColumnPrivilegesQuery } from 'data/privileges/column-privileges-query'
+import { useTablePrivilegesQuery } from 'data/privileges/table-privileges-query'
+import { useTablesQuery } from 'data/tables/tables-query'
+import { NextPageWithLayout } from 'types'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import ProtectedSchemaWarning from 'components/interfaces/Database/ProtectedSchemaWarning'
+import toast from 'react-hot-toast'
 
 const EDITABLE_ROLES = ['authenticated', 'anon', 'service_role']
 
 const PrivilegesPage: NextPageWithLayout = () => {
-  const pathParams = useParams()
+  const { ref, table: paramTable } = useParams()
   const { project } = useProjectContext()
 
   const [selectedSchema, setSelectedSchema] = useState<string>('public')
-  const [selectedTable, setSelectedTable] = useState<string | undefined>(pathParams.table)
+  const [selectedTable, setSelectedTable] = useState<string | undefined>(paramTable)
   const [selectedRole, setSelectedRole] = useState<string>('authenticated')
 
   const { data: tableList, isLoading: isLoadingTables } = useTablesQuery(
@@ -54,10 +54,6 @@ const PrivilegesPage: NextPageWithLayout = () => {
     }
   )
 
-  const { data: allSchemas, isLoading: isLoadingSchemas } = useSchemasQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
   const { data: allRoles, isLoading: isLoadingRoles } = useDatabaseRolesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -120,13 +116,12 @@ const PrivilegesPage: NextPageWithLayout = () => {
     [allColumnPrivileges, selectedRole, selectedSchema, selectedTable]
   )
 
-  const schemas = allSchemas?.filter((schema) => !EXCLUDED_SCHEMAS.includes(schema.name)) ?? []
-
   const rolesList =
     allRoles?.filter((role: PostgresRole) => EDITABLE_ROLES.includes(role.name)) ?? []
   const roles = rolesList.map((role: PostgresRole) => role.name)
 
   const table = tableList?.find((table) => table.name === selectedTable)
+  const isLocked = EXCLUDED_SCHEMAS.includes(selectedSchema)
 
   const {
     tableCheckedStates,
@@ -185,6 +180,10 @@ const PrivilegesPage: NextPageWithLayout = () => {
     useApplyPrivilegeOperations(
       useCallback(() => {
         resetOperations()
+        toast.success(
+          `Successfully updated privileges on ${selectedSchema}.${selectedTable} for the ${selectedRole} role`,
+          { duration: 6000 }
+        )
       }, [resetOperations])
     )
 
@@ -193,22 +192,17 @@ const PrivilegesPage: NextPageWithLayout = () => {
   }
 
   const isLoading =
-    isLoadingTablePrivileges ||
-    isLoadingColumnPrivileges ||
-    isLoadingTables ||
-    isLoadingSchemas ||
-    isLoadingRoles
+    isLoadingTablePrivileges || isLoadingColumnPrivileges || isLoadingTables || isLoadingRoles
 
   const isError = isErrorTablePrivileges || isErrorColumnPrivileges
 
   return (
-    <ScaffoldContainer>
-      <ScaffoldSection>
-        <div className="col-span-12">
-          <div className="flex items-center justify-between mb-6 gap-12">
+    <ScaffoldContainer className="h-full">
+      <ScaffoldSection className="h-full">
+        <div className="col-span-12 flex flex-col pb-4 gap-y-4">
+          <div className="flex items-center justify-between">
             <div>
               <h3 className="mb-1 text-xl">Column-level privileges</h3>
-
               <div className="text-sm text-lighter">
                 <p>Grant or revoke privileges on a column based on user role.</p>
                 <p>This is an advanced feature and should be used with caution.</p>
@@ -217,7 +211,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
             <div className="flex items-center space-x-2">
               <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                 <Link
-                  href="https://supabase.com/docs/guides/guides/auth/column-level-security"
+                  href="https://supabase.com/docs/guides/auth/column-level-security"
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -227,11 +221,11 @@ const PrivilegesPage: NextPageWithLayout = () => {
             </div>
           </div>
           <PrivilegesHead
+            disabled={isLocked}
             selectedSchema={selectedSchema}
             selectedRole={selectedRole}
             selectedTable={table}
             tables={tables ?? []}
-            schemas={schemas}
             roles={roles}
             onChangeSchema={handleChangeSchema}
             onChangeRole={handleChangeRole}
@@ -241,13 +235,17 @@ const PrivilegesPage: NextPageWithLayout = () => {
             hasChanges={hasChanges}
             isApplyingChanges={isApplyingChanges}
           />
+          {isLocked && (
+            <ProtectedSchemaWarning schema={selectedSchema} entity="column privileges" />
+          )}
           {isLoading ? (
             <GenericSkeletonLoader />
           ) : isError ? (
             <AlertError error={errorTablePrivileges || errorColumnPrivileges} />
           ) : table && tablePrivilege ? (
-            <>
+            <div>
               <PrivilegesTable
+                disabled={isLocked}
                 columnPrivileges={columnPrivileges}
                 tableCheckedStates={tableCheckedStates}
                 columnCheckedStates={columnCheckedStates}
@@ -259,7 +257,20 @@ const PrivilegesPage: NextPageWithLayout = () => {
                 <strong>Warning: </strong>
                 Changing column privileges can break existing queries
               </p>
-            </>
+            </div>
+          ) : (tables ?? []).length === 0 ? (
+            <div className="flex-grow flex flex-col items-center justify-center w-[600px] mx-auto">
+              <p className="text-center">There are no tables in the {selectedSchema} schema</p>
+              <p className="text-sm text-foreground-light text-center">
+                Once a table is available in the schema, you may manage it's column-level privileges
+                here
+              </p>
+              {selectedSchema === 'public' && (
+                <Button asChild className="mt-4">
+                  <Link href={`/project/${ref}/editor`}>Create a new table</Link>
+                </Button>
+              )}
+            </div>
           ) : (
             <div className="flex flex-col items-center justify-center h-64 ">
               <p className="text-foreground-light">Select a table to edit privileges</p>
