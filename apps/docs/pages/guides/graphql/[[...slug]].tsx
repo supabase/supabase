@@ -167,7 +167,7 @@ export const getStaticProps: GetStaticProps<PGGraphQLDocsProps> = async ({ param
 
       // If we have a mapping for this page, use the mapped path
       if (page) {
-        return page.slug + hash
+        return 'graphql/' + page.slug + hash
       }
 
       // If we don't have this page in our docs, link to original docs

@@ -1,5 +1,5 @@
-import analyticsSpec from '~/../../spec/transforms/analytics_v0_openapi_deparsed.json' assert { type: 'json' }
-import selfHostingAnalyticsCommonSections from '~/../../spec/common-self-hosting-analytics-sections.json'
+import analyticsSpec from '~/spec/transforms/analytics_v0_openapi_deparsed.json' assert { type: 'json' }
+import selfHostingAnalyticsCommonSections from '~/spec/common-self-hosting-analytics-sections.json'
 import RefSectionHandler from '~/components/reference/RefSectionHandler'
 import { flattenSections } from '~/lib/helpers'
 import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'

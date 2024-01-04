@@ -1,14 +1,8 @@
 import { QueryKey, UseQueryOptions } from '@tanstack/react-query'
 import { Filter, Query, Sort, SupaRow, SupaTable } from 'components/grid'
 import { ImpersonationRole, wrapWithRoleImpersonation } from 'lib/role-impersonation'
-import { useCallback } from 'react'
 import { useIsRoleImpersonationEnabled } from 'state/role-impersonation-state'
-import {
-  ExecuteSqlData,
-  executeSql,
-  useExecuteSqlPrefetch,
-  useExecuteSqlQuery,
-} from '../sql/execute-sql-query'
+import { ExecuteSqlData, executeSql, useExecuteSqlQuery } from '../sql/execute-sql-query'
 import { getPagination } from '../utils/pagination'
 import { formatFilterValue } from './utils'
 import { IS_PLATFORM } from 'common'
@@ -176,35 +170,5 @@ export const useTableRowsQuery = <TData extends TableRowsData = TableRowsData>(
       enabled: typeof projectRef !== 'undefined' && typeof table !== 'undefined',
       ...options,
     }
-  )
-}
-
-/**
- * useTableRowsPrefetch is used for prefetching table rows. For example, starting a query loading before a page is navigated to.
- *
- * @example
- * const prefetch = useTableRowsPrefetch({ projectRef })
- *
- * return (
- *   <Link onMouseEnter={() => prefetch()}>
- *     Start loading on hover
- *   </Link>
- * )
- */
-export const useTableRowsPrefetch = () => {
-  const prefetch = useExecuteSqlPrefetch()
-
-  return useCallback(
-    ({ projectRef, connectionString, queryKey, table, ...args }: TableRowsVariables) =>
-      prefetch({
-        projectRef,
-        connectionString,
-        sql: getTableRowsSqlQuery({ table, ...args }),
-        queryKey: [
-          ...(queryKey ?? []),
-          { table: { name: table?.name, schema: table?.schema }, ...args },
-        ],
-      }),
-    [prefetch]
   )
 }

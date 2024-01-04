@@ -16,14 +16,13 @@ import {
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useCheckCNAMERecordMutation } from 'data/custom-domains/check-cname-mutation'
 import { useCustomDomainCreateMutation } from 'data/custom-domains/custom-domains-create-mutation'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 
 const schema = yup.object({
   domain: yup.string().required('A value for your custom domain is required'),
 })
 
 const CustomDomainsConfigureHostname = () => {
-  const { ui } = useStore()
   const { ref } = useParams()
   const { project } = useProjectContext()
 
@@ -121,7 +120,7 @@ const CustomDomainsConfigureHostname = () => {
                     "your project's API URL"
                   )}
                   , with as low a TTL as possible. If you're using Cloudflare as your DNS provider,
-                  do disable the proxy option.
+                  disable the proxy option.
                 </p>
               </FormSection>
             </FormPanel>

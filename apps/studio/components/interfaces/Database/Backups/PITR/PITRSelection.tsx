@@ -15,7 +15,6 @@ import {
   IconAlertTriangle,
   IconChevronLeft,
   IconChevronRight,
-  IconExternalLink,
   IconHelpCircle,
   Modal,
 } from 'ui'

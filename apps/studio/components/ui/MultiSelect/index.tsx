@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import { filter, orderBy, without } from 'lodash'
-import { KeyboardEvent, ReactNode, useEffect, useRef, useState } from 'react'
+import { ReactNode, useEffect, useRef, useState } from 'react'
 import {
   IconAlertCircle,
   IconCheck,
@@ -118,14 +118,6 @@ export default function MultiSelect({
 
     setSelected(formattedPayload)
     onChange(formattedPayload)
-  }
-
-  const onKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      if (searchString.length > 0 && filteredOptions.length === 1) {
-        handleChange(filteredOptions[0])
-      }
-    }
   }
 
   return (

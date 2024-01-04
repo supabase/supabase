@@ -3,18 +3,17 @@ import dayjs from 'dayjs'
 import { Button, IconX } from 'ui'
 
 import { useNotificationsDismissMutation } from 'data/notifications/notifications-dismiss-mutation'
-import { useProjectsQuery } from 'data/projects/projects-query'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { ProjectInfo, useProjectsQuery } from 'data/projects/projects-query'
 import { useStore } from 'hooks'
-import { Project } from 'types'
 import NotificationActions from './NotificationActions'
 import { formatNotificationCTAText, formatNotificationText } from './NotificationRows.utils'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 
 export interface NotificationRowProps {
   notification: Notification
-  onSelectRestartProject: (project: Project, notification: Notification) => void
-  onSelectApplyMigration: (project: Project, notification: Notification) => void
-  onSelectRollbackMigration: (project: Project, notification: Notification) => void
+  onSelectRestartProject: (project: ProjectInfo, notification: Notification) => void
+  onSelectApplyMigration: (project: ProjectInfo, notification: Notification) => void
+  onSelectRollbackMigration: (project: ProjectInfo, notification: Notification) => void
 }
 
 const NotificationRow = ({
@@ -63,7 +62,7 @@ const NotificationRow = ({
       <div className="flex-grow mr-8 flex flex-col gap-4">
         <div className="w-full flex justify-between">
           <div className="w-9/10 space-y-2">
-            {formatNotificationText(project, notification)}
+            {formatNotificationText(project.name, notification)}
             {formatNotificationCTAText(availableActions)}
             <p className="text-foreground-light text-sm !mt-2">{insertedAt}</p>
           </div>
@@ -88,7 +87,6 @@ const NotificationRow = ({
         {(availableActions.length > 0 || changelogLink !== undefined) && (
           <div className="flex items-center">
             <NotificationActions
-              project={project}
               organization={organization}
               changelogLink={changelogLink}
               availableActions={availableActions}

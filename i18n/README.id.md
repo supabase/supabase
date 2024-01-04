@@ -12,13 +12,13 @@
 - [x] Basis Data Postgres yang dihosting. [Dokumen](https://supabase.com/docs/guides/database)
 - [x] Otentikasi dan Otorisasi. [Dokumen](https://supabase.com/docs/guides/auth)
 - [x] API yang dibuat secara otomatis.
-  - [x] REST. [Documents](https://supabase.com/docs/guides/api#rest-api-overview)
-  - [x] GraphQL. [Documents](https://supabase.com/docs/guides/api#graphql-api-overview)
-  - [x] Langganan realtime. [Documents](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] REST. [Dokumen](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Dokumen](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Langganan realtime. [Dokumen](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Fungsi-fungsi.
-  - [x] Fungsi-fungsi Basis Data. [Documents](https://supabase.com/docs/guides/database/functions)
-  - [x] Fungsi Tepi [Documents](https://supabase.com/docs/guides/functions)
-- [x] Penyimpanan File. [Documents](https://supabase.com/docs/guides/storage)
+  - [x] Fungsi-fungsi Basis Data. [Dokumen](https://supabase.com/docs/guides/database/functions)
+  - [x] Fungsi Tepi [Dokumen](https://supabase.com/docs/guides/functions)
+- [x] Penyimpanan File. [Dokumen](https://supabase.com/docs/guides/storage)
 - [x] Dasbor
 
 ![Dasbor Supabase](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)

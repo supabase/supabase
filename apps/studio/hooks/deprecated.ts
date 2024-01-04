@@ -3,40 +3,6 @@ import { includes } from 'lodash'
 import TooltipListener from 'components/to-be-cleaned/TooltipListener'
 
 /**
- * Hook for listening to clicks outside of the target element.
- *
- * @param   {Function}      onClickOutside
- *
- * @returns {Object}        Ref for the target element
- */
-
-function clickOutsideListener(onClickOutside: any) {
-  const ref = useRef(null)
-
-  const handleNavigate = (event: any) => {
-    if (
-      !ref.current ||
-      ref.current === event.target ||
-      (ref.current as any).contains(event.target)
-    ) {
-      return
-    }
-
-    onClickOutside(event)
-  }
-
-  useEffect(() => {
-    document.body.addEventListener('click', handleNavigate)
-
-    return () => {
-      document.body.removeEventListener('click', handleNavigate)
-    }
-  })
-
-  return ref
-}
-
-/**
  * Hook for listening on key events.
  *
  * @param {Object|Map} keyMap       Key names mapped to event handlers. If a key name exists, its
@@ -110,38 +76,6 @@ function useKeyboardShortcuts(keyMap: any, whitelistNodes = [], whitelistClasses
   })
 }
 
-function isMounted() {
-  const isMounted = useRef(false)
-  // @ts-ignore
-  useEffect(() => {
-    isMounted.current = true
-    return () => (isMounted.current = false)
-  }, [])
-  return isMounted
-}
-
-function getWindowDimensions() {
-  if (typeof window === 'undefined' || !window) return { width: 0, height: 0 }
-
-  const { innerWidth: width, innerHeight: height } = window
-  return { width, height }
-}
-
-function useWindowDimensions() {
-  const [windowDimensions, setWindowDimensions] = useState(getWindowDimensions())
-
-  useEffect(() => {
-    function handleResize() {
-      setWindowDimensions(getWindowDimensions())
-    }
-
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
-
-  return windowDimensions
-}
-
 function usePrevious(value: any) {
   const ref = useRef()
   useEffect(() => {
@@ -150,11 +84,4 @@ function usePrevious(value: any) {
   return ref.current
 }
 
-export {
-  clickOutsideListener,
-  useKeyboardShortcuts,
-  isMounted,
-  TooltipListener,
-  useWindowDimensions,
-  usePrevious,
-}
+export { useKeyboardShortcuts, TooltipListener, usePrevious }

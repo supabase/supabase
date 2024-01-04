@@ -1,7 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common/hooks'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
-import { isUnixMicro, unixMicroToIsoTimestamp } from 'components/interfaces/Settings/Logs'
 import FunctionsLayout from 'components/layouts/FunctionsLayout'
 import AreaChart from 'components/ui/Charts/AreaChart'
 import BarChart from 'components/ui/Charts/BarChart'

@@ -259,9 +259,11 @@ const FormField = ({ name, properties, formValues, disabled = false }: FormField
                 key={option.value}
                 label={option.label}
                 value={option.value}
-                addOnBefore={() => (
-                  <img className="h-6 w-6" src={`${BASE_PATH}/img/icons/${option.icon}`} />
-                )}
+                addOnBefore={() => {
+                  return option.icon ? (
+                    <img className="h-6 w-6" src={`${BASE_PATH}/img/icons/${option.icon}`} />
+                  ) : null
+                }}
               >
                 {option.label}
               </Listbox.Option>

@@ -1,33 +1,38 @@
-import { useEffect } from 'react'
+import { useParams } from 'common'
 import { useRouter } from 'next/router'
-import { observer } from 'mobx-react-lite'
 import { Tabs } from 'ui'
 
-import { useStore } from 'hooks'
-import { useParams } from 'common/hooks'
-import { NextPageWithLayout } from 'types'
+import { EncryptionKeysManagement, VaultToggle } from 'components/interfaces/Settings/Vault'
 import { SettingsLayout } from 'components/layouts'
-import { VaultToggle, EncryptionKeysManagement } from 'components/interfaces/Settings/Vault'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormHeader } from 'components/ui/Forms'
+import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
+import { NextPageWithLayout } from 'types'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 
 const VaultSettingsSecrets: NextPageWithLayout = () => {
   const router = useRouter()
-  const { meta, vault } = useStore()
   const { ref } = useParams()
+  const { project } = useProjectContext()
 
-  const vaultExtension = meta.extensions.byId('supabase_vault')
+  const { data, isLoading } = useDatabaseExtensionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
+  const vaultExtension = (data ?? []).find((ext) => ext.name === 'supabase_vault')
   const isEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null
-
-  useEffect(() => {
-    if (isEnabled) {
-      vault.load()
-    }
-  }, [isEnabled])
 
   return (
     <div className="1xl:px-28 mx-auto flex flex-col px-5 py-6 lg:px-16 xl:px-24 2xl:px-32 ">
       <FormHeader title="Vault" description="Application level encryption for your project" />
-      {!isEnabled ? (
+      {isLoading ? (
+        <div className="border rounded border-default p-12 space-y-2">
+          <ShimmeringLoader />
+          <ShimmeringLoader className="w-3/4" />
+          <ShimmeringLoader className="w-1/2" />
+        </div>
+      ) : !isEnabled ? (
         <VaultToggle />
       ) : (
         <Tabs
@@ -49,4 +54,4 @@ const VaultSettingsSecrets: NextPageWithLayout = () => {
 }
 
 VaultSettingsSecrets.getLayout = (page) => <SettingsLayout title="Vault">{page}</SettingsLayout>
-export default observer(VaultSettingsSecrets)
+export default VaultSettingsSecrets

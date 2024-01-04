@@ -159,6 +159,13 @@ const menus: Menu[] = [
     type: 'reference',
   },
   {
+    id: 'reference_swift_v2',
+    path: '/reference/swift',
+    commonSectionsFile: 'common-client-libs-sections.json',
+    specFile: 'supabase_swift_v2.yml',
+    type: 'reference',
+  },
+  {
     id: 'reference_kotlin_v1',
     path: '/reference/kotlin/v1',
     commonSectionsFile: 'common-client-libs-sections.json',

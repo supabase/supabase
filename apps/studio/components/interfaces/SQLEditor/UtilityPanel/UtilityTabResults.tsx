@@ -2,13 +2,7 @@ import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscri
 import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { isError } from 'data/utils/error-check'
-import {
-  useFlag,
-  useLocalStorageQuery,
-  useSelectedOrganization,
-  useSelectedProject,
-  useStore,
-} from 'hooks'
+import { useLocalStorageQuery, useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
 import { IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
 import { format } from 'sql-formatter'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
@@ -49,7 +43,6 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
   const snippet = snap.snippets[id]
   const result = snap.results[id]?.[0]
   const isUtilityPanelCollapsed = (snippet?.splitSizes?.[1] ?? 0) === 0
-  const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
 
@@ -110,11 +103,11 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
                   </pre>
                 ))
               ) : (
-                <p className="font-mono text-sm">{result.error.error}</p>
+                <p className="font-mono text-sm">{result.error?.message}</p>
               )}
             </div>
           )}
-          {supabaseAIEnabled && !hasHipaaAddon && (
+          {!hasHipaaAddon && (
             <Button
               icon={
                 <div className="scale-75">

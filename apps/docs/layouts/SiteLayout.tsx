@@ -102,6 +102,10 @@ const levelsData = {
     icon: '/docs/img/icons/menu/reference-swift',
     name: 'Swift Reference v1.0',
   },
+  reference_swift_v2: {
+    icon: '/docs/img/icons/menu/reference-swift',
+    name: 'Swift Reference v2.0',
+  },
   reference_kotlin_v1: {
     icon: '/docs/img/icons/menu/reference-kotlin',
     name: 'Kotlin Reference v1.0',

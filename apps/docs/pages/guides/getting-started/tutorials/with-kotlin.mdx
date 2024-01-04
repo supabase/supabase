@@ -1,4 +1,5 @@
 import Layout from '~/layouts/DefaultGuideLayout'
+import KotlinProjectSetup from '~/components/MDX/kotlin_project_setup.mdx'
 
 export const meta = {
   title: 'Build a Product Management Android App with Jetpack Compose',
@@ -42,7 +43,7 @@ SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 SUPABASE_URL=YOUR_SUPABASE_URL
 ```
 
-#### Read and set value to BuildConfig
+#### Read and set value to `BuildConfig`
 
 In your `build.gradle` (app) file, create a `Properties` object and read the values from your `local.properties` file by calling the `buildConfigField` method:
 
@@ -268,7 +269,9 @@ class ProductRepositoryImpl @Inject constructor(
     override suspend fun getProduct(id: String): ProductDto {
         return withContext(Dispatchers.IO) {
             postgrest.from("products").select {
-                eq("id", id)
+                filter {
+                    eq("id", id)
+                }
             }.decodeSingle<ProductDto>()
         }
     }
@@ -276,7 +279,9 @@ class ProductRepositoryImpl @Inject constructor(
     override suspend fun deleteProduct(id: String) {
         return withContext(Dispatchers.IO) {
             postgrest.from("products").delete {
-                eq("id", id)
+                filter {
+                    eq("id", id)
+                }
             }
         }
     }
