@@ -124,21 +124,3 @@ export const SERVICE_OPTIONS = [
     disabled: false,
   },
 ]
-
-export const GITHUB_LINKS = [
-  {
-    name: 'supabase-js',
-    description: 'For issues with our Javascript client',
-    url: 'https://github.com/supabase/supabase-js/issues',
-  },
-  {
-    name: 'supabase-flutter',
-    description: 'For issues with our Flutter integration',
-    url: 'https://github.com/supabase-community/supabase-flutter/issues',
-  },
-  {
-    name: 'supabase',
-    description: 'For other issues about our API',
-    url: 'https://github.com/supabase/supabase/issues',
-  },
-]

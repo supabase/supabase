@@ -55,12 +55,7 @@ const GitHubIntegrationConnectionForm = ({
 
   const [repoOwner, repoName] = githubProjectIntegration?.metadata.name.split('/') ?? []
 
-  const {
-    data: githubBranches,
-    error: githubBranchesError,
-    isLoading: isLoadingBranches,
-    isSuccess: isSuccessBranches,
-  } = useGithubBranchesQuery({
+  const { data: githubBranches, isLoading: isLoadingBranches } = useGithubBranchesQuery({
     organizationIntegrationId: integration?.id,
     repoOwner,
     repoName,
@@ -76,7 +71,7 @@ const GitHubIntegrationConnectionForm = ({
     },
   })
 
-  const { data: previewBranches, isLoading: isLoadingPreviewBranches } = useBranchesQuery(
+  const { data: previewBranches } = useBranchesQuery(
     { projectRef: project?.parentRef },
     { enabled: project !== undefined }
   )

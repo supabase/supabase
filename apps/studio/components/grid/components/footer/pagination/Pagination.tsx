@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 
-import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
