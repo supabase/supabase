@@ -122,7 +122,7 @@ const NotificationsPopverV2 = () => {
                 className={clsx(
                   'transition-all -mr-3 group-hover:-mr-1',
                   'z-10 h-4 flex items-center justify-center rounded-full bg-black dark:bg-white',
-                  summary?.unread_count ?? 0 > 9 ? 'px-0.5 w-auto' : 'w-4'
+                  (summary?.unread_count ?? 0) > 9 ? 'px-0.5 w-auto' : 'w-4'
                 )}
               >
                 <p className="text-xs text-background-alternative">{summary?.unread_count}</p>
@@ -159,7 +159,7 @@ const NotificationsPopverV2 = () => {
                   <div
                     className={clsx([
                       'flex items-center justify-center text-xs rounded-full bg-surface-300 h-4',
-                      summary?.unread_count ?? 0 > 9 ? 'px-0.5 w-auto' : 'w-4',
+                      (summary?.unread_count ?? 0) > 9 ? 'px-0.5 w-auto' : 'w-4',
                     ])}
                   >
                     {summary?.unread_count}
