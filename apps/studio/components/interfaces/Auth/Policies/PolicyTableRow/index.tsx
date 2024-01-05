@@ -30,9 +30,9 @@ const PolicyTableRow = ({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const policies = (data ?? []).filter(
-    (policy) => policy.schema === table.schema && policy.table === table.name
-  )
+  const policies = (data ?? [])
+    .filter((policy) => policy.schema === table.schema && policy.table === table.name)
+    .sort((a, b) => a.name.localeCompare(b.name))
 
   return (
     <Panel
