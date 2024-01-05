@@ -16,7 +16,7 @@ const CLSPreview = () => {
         />
       </div>
       <Image
-        src={`${BASE_PATH}/img/previews/rls-ai-assistant-preview.png`}
+        src={`${BASE_PATH}/img/previews/cls-preview.png`}
         width={1860}
         height={970}
         alt="api-docs-side-panel-preview"
