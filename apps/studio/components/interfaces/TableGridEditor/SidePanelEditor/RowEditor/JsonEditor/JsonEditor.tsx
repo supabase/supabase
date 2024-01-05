@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Button, IconAlignLeft, IconAlignRight, SidePanel } from 'ui'
+import { Button, IconAlignLeft, SidePanel } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
 import TwoOptionToggle from 'components/ui/TwoOptionToggle'

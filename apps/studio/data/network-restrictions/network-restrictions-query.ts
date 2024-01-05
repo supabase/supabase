@@ -1,5 +1,4 @@
-import { useCallback } from 'react'
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { networkRestrictionKeys } from './keys'
 import { get } from 'lib/common/fetch'
@@ -61,15 +60,3 @@ export const useNetworkRestrictionsQuery = <TData = NetworkRestrictionsData>(
     ({ signal }) => getNetworkRestrictions({ projectRef }, signal),
     { enabled: enabled && typeof projectRef !== 'undefined', ...options }
   )
-
-export const useNetworkRestrictionsPrefetch = ({ projectRef }: NetworkRestrictionsVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (projectRef) {
-      client.prefetchQuery(networkRestrictionKeys.list(projectRef), ({ signal }) =>
-        getNetworkRestrictions({ projectRef }, signal)
-      )
-    }
-  }, [projectRef])
-}

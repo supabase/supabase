@@ -1,6 +1,5 @@
 import { UseQueryOptions } from '@tanstack/react-query'
-import { useCallback } from 'react'
-import { ExecuteSqlData, useExecuteSqlPrefetch, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { ExecuteSqlData, useExecuteSqlQuery } from '../sql/execute-sql-query'
 import { CREATE_PG_GET_TABLEDEF_SQL } from './database-query-constants'
 
 type GetTableDefinition = {
@@ -49,20 +48,5 @@ export const useTableDefinitionQuery = <TData extends TableDefinitionData = Tabl
       },
       ...options,
     }
-  )
-}
-
-export const useTableDefinitionQueryPrefetch = () => {
-  const prefetch = useExecuteSqlPrefetch()
-
-  return useCallback(
-    ({ projectRef, connectionString, schema, name }: TableDefinitionVariables) =>
-      prefetch({
-        projectRef,
-        connectionString,
-        sql: getTableDefinitionQuery({ schema, name }),
-        queryKey: ['table-definition', schema, name],
-      }),
-    [prefetch]
   )
 }

@@ -1,6 +1,5 @@
 import { UseQueryOptions } from '@tanstack/react-query'
-import { useCallback } from 'react'
-import { ExecuteSqlData, useExecuteSqlPrefetch, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { ExecuteSqlData, useExecuteSqlQuery } from '../sql/execute-sql-query'
 import { ENTITY_TYPE } from './entity-type-constants'
 
 type EntityTypeArgs = {
@@ -75,30 +74,3 @@ export const useEntityTypeQuery = <TData extends EntityTypeData = EntityTypeData
       ...options,
     }
   )
-
-/**
- * useEntityTypePrefetch is used for prefetching table rows. For example, starting a query loading before a page is navigated to.
- *
- * @example
- * const prefetch = useEntityTypePrefetch()
- *
- * return (
- *   <Link onMouseEnter={() => prefetch({ ...args })}>
- *     Start loading on hover
- *   </Link>
- * )
- */
-export const useEntityTypePrefetch = () => {
-  const prefetch = useExecuteSqlPrefetch()
-
-  return useCallback(
-    ({ projectRef, connectionString, id, ...args }: EntityTypeVariables) =>
-      prefetch({
-        projectRef,
-        connectionString,
-        sql: entityTypeSqlQuery({ id, ...args }),
-        queryKey: ['entity-type', id],
-      }),
-    [prefetch]
-  )
-}
