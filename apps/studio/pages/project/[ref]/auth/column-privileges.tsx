@@ -179,11 +179,11 @@ const PrivilegesPage: NextPageWithLayout = () => {
   const { apply: applyColumnPrivileges, isLoading: isApplyingChanges } =
     useApplyPrivilegeOperations(
       useCallback(() => {
-        resetOperations()
         toast.success(
-          `Successfully updated privileges on ${selectedSchema}.${selectedTable} for the ${selectedRole} role`,
+          `Successfully updated privileges on ${selectedSchema}.${selectedTable} for ${selectedRole}`,
           { duration: 6000 }
         )
+        resetOperations()
       }, [resetOperations])
     )
 
