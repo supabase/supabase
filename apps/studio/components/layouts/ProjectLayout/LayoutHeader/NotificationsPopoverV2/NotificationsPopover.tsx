@@ -242,7 +242,9 @@ const NotificationsPopverV2 = () => {
                     <p className="text-foreground-light text-sm w-64 text-center">
                       {activeTab === 'archived'
                         ? `No archived ${
-                            selectedFilter !== undefined ? `${selectedFilter} ` : ''
+                            ['warning', 'critical'].includes(selectedFilter)
+                              ? `${selectedFilter} `
+                              : ''
                           }notifications`
                         : 'All caught up'}
                     </p>

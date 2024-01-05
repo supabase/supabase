@@ -31,7 +31,7 @@ const NotificationRow = ({
 }: NotificationRowProps) => {
   const ref = useRef<HTMLDivElement>(null)
   const { status, priority } = notification
-  // @ts-ignore
+
   const data = notification.data as NotificationData
   const project = data.project_ref !== undefined ? getProject(data.project_ref) : undefined
   const organization = project !== undefined ? getOrganization(project.organization_id) : undefined
