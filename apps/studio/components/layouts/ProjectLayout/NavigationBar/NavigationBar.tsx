@@ -79,7 +79,7 @@ const NavigationBar = () => {
   return (
     <div
       className={[
-        'flex w-14 flex-col justify-between overflow-y-hidden p-2',
+        'hide-scrollbar flex w-14 flex-col justify-between p-2 overflow-y-auto',
         'border-r bg-background border-default',
       ].join(' ')}
     >

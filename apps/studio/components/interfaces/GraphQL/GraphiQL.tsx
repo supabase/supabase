@@ -71,7 +71,7 @@ interface GraphiQLInterfaceProps {
   theme: 'dark' | 'light'
 }
 
-export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
+const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
   const editorContext = useEditorContext({ nonNull: true })
   const executionContext = useExecutionContext({ nonNull: true })
   const schemaContext = useSchemaContext({ nonNull: true })

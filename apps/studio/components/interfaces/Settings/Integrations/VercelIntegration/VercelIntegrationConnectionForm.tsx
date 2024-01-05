@@ -52,15 +52,14 @@ const VercelIntegrationConnectionForm = ({
     },
   })
 
-  const { mutate: updateVercelConnection, isLoading: isUpdatingVercelConnection } =
-    useVercelConnectionUpdateMutation({
-      onSuccess: (data) => {
-        ui.setNotification({
-          category: 'success',
-          message: `Updated Supabase directory`,
-        })
-      },
-    })
+  const { mutate: updateVercelConnection } = useVercelConnectionUpdateMutation({
+    onSuccess: (data) => {
+      ui.setNotification({
+        category: 'success',
+        message: `Updated Supabase directory`,
+      })
+    },
+  })
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     /**

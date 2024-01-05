@@ -1,10 +1,9 @@
 import { QueryKey, UseQueryOptions } from '@tanstack/react-query'
-import { useCallback } from 'react'
 
 import { Filter, Query, SupaTable } from 'components/grid'
 import { ImpersonationRole, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { useIsRoleImpersonationEnabled } from 'state/role-impersonation-state'
-import { ExecuteSqlData, useExecuteSqlPrefetch, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { ExecuteSqlData, useExecuteSqlQuery } from '../sql/execute-sql-query'
 import { formatFilterValue } from './utils'
 
 type GetTableRowsCountArgs = {
@@ -86,35 +85,5 @@ export const useTableRowsCountQuery = <TData extends TableRowsCountData = TableR
       enabled: typeof projectRef !== 'undefined' && typeof table !== 'undefined',
       ...options,
     }
-  )
-}
-
-/**
- * useTableRowsCountPrefetch is used for prefetching the table rows count. For example, starting a query loading before a page is navigated to.
- *
- * @example
- * const prefetch = useTableRowsCountPrefetch()
- *
- * return (
- *   <Link onMouseEnter={() => prefetch({ ...args })}>
- *     Start loading on hover
- *   </Link>
- * )
- */
-export const useTableRowsCountPrefetch = () => {
-  const prefetch = useExecuteSqlPrefetch()
-
-  return useCallback(
-    ({ projectRef, connectionString, queryKey, table, ...args }: TableRowsCountVariables) =>
-      prefetch({
-        projectRef,
-        connectionString,
-        sql: getTableRowsCountSqlQuery({ table, ...args }),
-        queryKey: [
-          ...(queryKey ?? []),
-          { table: { name: table?.name, schema: table?.schema }, ...args },
-        ],
-      }),
-    [prefetch]
   )
 }

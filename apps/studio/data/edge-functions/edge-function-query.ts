@@ -1,7 +1,6 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
 import { API_ADMIN_URL, IS_PLATFORM } from 'lib/constants'
-import { useCallback } from 'react'
 import { edgeFunctionsKeys } from './keys'
 
 export type EdgeFunctionVariables = {
@@ -52,15 +51,3 @@ export const useEdgeFunctionQuery = <TData = EdgeFunctionData>(
       ...options,
     }
   )
-
-export const useResourcePrefetch = ({ projectRef, slug }: EdgeFunctionVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (projectRef && slug) {
-      client.prefetchQuery(edgeFunctionsKeys.detail(projectRef, slug), ({ signal }) =>
-        getEdgeFunction({ projectRef, slug }, signal)
-      )
-    }
-  }, [projectRef, slug])
-}

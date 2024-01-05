@@ -3,7 +3,6 @@ import Link from 'next/link'
 
 import { useParams } from 'common'
 import {
-  ScaffoldContainer,
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
