@@ -5,9 +5,23 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Mon, 18 Dec 2023 23:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Thu, 04 Jan 2024 23:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/beta-update-december-2023</guid>
+  <title>Supabase Beta December 2023</title>
+  <link>https://supabase.com/blog/beta-update-december-2023</link>
+  <description>A Launch Week X rundown with all the fantastic goodies we shipped</description>
+  <pubDate>Thu, 04 Jan 2024 23:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/launch-week-x-hackathon-winners</guid>
+  <title>Launch Week X Hackathon Winners</title>
+  <link>https://supabase.com/blog/launch-week-x-hackathon-winners</link>
+  <description>Announcing the winners of the Launch Week X Hackathon!</description>
+  <pubDate>Wed, 03 Jan 2024 23:00:00 GMT</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/launch-week-x-best-launches</guid>
   <title>Top 10 Launches of LWX</title>
   <link>https://supabase.com/blog/launch-week-x-best-launches</link>
