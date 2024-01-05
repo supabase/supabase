@@ -3,6 +3,7 @@ import clsx from 'clsx'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
+import { useInView } from 'react-intersection-observer'
 import { Button, IconAlertCircle, IconAlertTriangle, IconArchive, IconExternalLink } from 'ui'
 
 import { Markdown } from 'components/interfaces/Markdown'
@@ -18,6 +19,7 @@ interface NotificationRowProps {
   getProject: (ref: string) => Project
   getOrganization: (id: number) => Organization
   onArchiveNotification: (id: string) => void
+  queueMarkRead: (id: string) => void
 }
 
 const NotificationRow = ({
@@ -28,8 +30,10 @@ const NotificationRow = ({
   getProject,
   getOrganization,
   onArchiveNotification,
+  queueMarkRead,
 }: NotificationRowProps) => {
   const ref = useRef<HTMLDivElement>(null)
+  const { ref: viewRef, inView } = useInView()
   const { status, priority } = notification
 
   const data = notification.data as NotificationData
@@ -52,6 +56,12 @@ const NotificationRow = ({
     }
   }, [ref])
 
+  useEffect(() => {
+    if (inView && notification.status === 'new') {
+      queueMarkRead(notification.id)
+    }
+  }, [inView])
+
   return (
     <div
       ref={ref}
@@ -61,7 +71,7 @@ const NotificationRow = ({
         status !== 'new' ? 'bg-background' : ''
       )}
     >
-      <div className="flex flex-col gap-y-2 w-full">
+      <div ref={viewRef} className="flex flex-col gap-y-2 w-full">
         {(project !== undefined || organization !== undefined) && (
           <div className="flex items-center">
             {organization !== undefined && (

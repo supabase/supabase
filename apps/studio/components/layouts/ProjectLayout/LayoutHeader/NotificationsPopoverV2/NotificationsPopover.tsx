@@ -34,6 +34,9 @@ const NotificationsPopverV2 = () => {
   const [selectedFilter, setSelectedFilter] = useState<NOTIFICATION_FILTER_TYPE>('all')
   const [activeTab, setActiveTab] = useState<'inbox' | 'archived'>('inbox')
 
+  // Storing in ref as no re-rendering required
+  const markedRead = useRef<string[]>([])
+
   // [Joshen] Just FYI this variable row heights logic should ideally live in InfiniteList
   // but I ran into some infinite loops issues when I was trying to implement it there
   // so opting to simplify and implement it here for now
@@ -73,8 +76,9 @@ const NotificationsPopverV2 = () => {
   }
 
   const markNotificationsRead = () => {
-    const ids = notifications.filter((n) => n.status === 'new').map((n) => n.id)
-    updateNotifications({ ids, status: 'seen' })
+    if (markedRead.current.length > 0) {
+      updateNotifications({ ids: markedRead.current, status: 'seen' })
+    }
   }
 
   return (
@@ -229,6 +233,11 @@ const NotificationsPopverV2 = () => {
                     getOrganization: (id: number) => organizations?.find((org) => org.id === id),
                     onArchiveNotification: (id: string) =>
                       updateNotifications({ ids: [id], status: 'archived' }),
+                    queueMarkRead: (id: string) => {
+                      if (markedRead.current && !markedRead.current.includes(id)) {
+                        markedRead.current.push(id)
+                      }
+                    },
                   }}
                   getItemSize={(idx: number) => rowHeights?.current?.[idx] ?? 56}
                   hasNextPage={hasNextPage}
