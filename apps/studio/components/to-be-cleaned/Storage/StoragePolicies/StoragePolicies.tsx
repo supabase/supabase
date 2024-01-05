@@ -195,7 +195,8 @@ const StoragePolicies = () => {
               find(formattedStorageObjectPolicies, { name: bucket.name }),
               ['policies'],
               []
-            )
+            ).sort((a: any, b: any) => a.name.localeCompare(b.name))
+
             return (
               <StoragePoliciesBucketRow
                 key={bucket.name}
