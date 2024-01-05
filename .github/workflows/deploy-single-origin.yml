@@ -26,7 +26,7 @@ jobs:
       - id: deploy
         name: Deploy
         run: |
-          echo "DEPLOY_URL=$(vercel deploy --yes --token ${{ secrets.VERCEL_TOKEN }})" >> $GITHUB_OUTPUT
+          echo "DEPLOY_URL=$(vercel deploy --token ${{ secrets.VERCEL_TOKEN }})" >> $GITHUB_OUTPUT
           #   www:
           #     runs-on: ubuntu-latest
           #     needs: studio
