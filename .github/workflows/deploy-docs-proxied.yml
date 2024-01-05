@@ -1,9 +1,9 @@
 name: Proxy docs preview site via www preview site
 
-on: [pull_request, workflow_dispatch]
+on: [pull_request, workflow_dispatch] # pull_request for testing only, remove later
 
 env:
-  VERCEL_ORG_ID:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
 
 jobs:
   setup:
@@ -17,11 +17,18 @@ jobs:
       - id: log
         name: Log branch name
         run: echo "branch ${{ steps.normalize.outputs.NORMALIZED_BRANCH }}"
+          #   docs:
+          #     runs-on: ubuntu-latest
+          #     needs: setup
+          #     env:
+          #       VERCEL_PROJECT_ID: 
   studio:
     runs-on: ubuntu-latest
     needs: setup
     env:
-      VERCEL_PROJECT_ID:
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_STUDIO_STAGING_PROJECT_ID }}
+    outputs:
+      url: ${{ steps.deploy.outputs.DEPLOY_URL }}
     steps:
       - id: checkout
         name: Checkout studio
@@ -54,48 +61,48 @@ jobs:
         name: Deploy
         working-directory: ./
         run: |
-          npx vercel deploy --cwd apps/studio --yes --token ${{ secrets.VERCEL_TOKEN }}
-  www:
-    runs-on: ubuntu-latest
-    needs: setup
-    environment:
-      name: preview
-      url: ${{ steps.deploy.outputs.DEPLOY_URL }}
-    env:
-      VERCEL_PROJECT_ID:
-    steps:
-      - id: checkout
-        name: Checkout www
-        uses: actions/checkout@v4
-        with:
-          sparse-checkout: |
-            apps/www
-            packages
-      - id: node
-        name: Set up Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18.x
-          cache: 'npm'
-      - id: install
-        name: Install dependencies
-        working-directory: ./
-        run: npm ci
-      - id: pull
-        name: Pull Vercel environment
-        working-directory: ./
-        run: |
-          npx vercel pull --cwd apps/www --environment-preview --yes --token ${{ secrets.VERCEL_TOKEN }}
-      - id: build
-        name: Build
-        working-directory: ./
-        run: |
-          npx vercel build --cwd apps/www --yes --token ${{ secrets.VERCEL_TOKEN }}
-      - id: deploy
-        name: Deploy
-        run: |
-          # See https://vercel.com/docs/deployments/generated-urls#url-with-git-branch
-          export DOCS_PATH="https://docs-git-${{ needs.setup.outputs.branch }}-supabase.vercel.app/docs"
-          export STUDIO_PATH="https://studio-staging-git-${{ needs.setup.outputs.branch }}-supabase.vercel.app/dashboard"
-          echo "DEPLOY_URL=$(npx vercel deploy --cwd apps/www --yes --token ${{ secrets.VERCEL_TOKEN }} \
-            --env NEXT_PUBLIC_STUDIO_URL=$DOCS_PATH NEXT_PUBLIC_DOCS_URL=$STUDIO_PATH)" >> $GITHUB_OUTPUT
+          echo "DEPLOY_URL=$(npx vercel deploy --cwd apps/studio --yes --token ${{ secrets.VERCEL_TOKEN }})" >> $GITHUB_OUTPUT
+          #   www:
+          #     runs-on: ubuntu-latest
+          #     needs: studio
+          #     environment:
+          #       name: preview
+          #       url: ${{ steps.deploy.outputs.DEPLOY_URL }}
+          #     env:
+          #       VERCEL_PROJECT_ID:
+          #     steps:
+          #       - id: checkout
+          #         name: Checkout www
+          #         uses: actions/checkout@v4
+          #         with:
+          #           sparse-checkout: |
+          #             apps/www
+          #             packages
+          #       - id: node
+          #         name: Set up Node
+          #         uses: actions/setup-node@v3
+          #         with:
+          #           node-version: 18.x
+          #           cache: 'npm'
+          #       - id: install
+          #         name: Install dependencies
+          #         working-directory: ./
+          #         run: npm ci
+          #       - id: pull
+          #         name: Pull Vercel environment
+          #         working-directory: ./
+          #         run: |
+          #           npx vercel pull --cwd apps/www --environment-preview --yes --token ${{ secrets.VERCEL_TOKEN }}
+          #       - id: build
+          #         name: Build
+          #         working-directory: ./
+          #         run: |
+          #           npx vercel build --cwd apps/www --yes --token ${{ secrets.VERCEL_TOKEN }}
+          #       - id: deploy
+          #         name: Deploy
+          #         run: |
+          #           # See https://vercel.com/docs/deployments/generated-urls#url-with-git-branch
+          #           export DOCS_PATH="https://docs-git-${{ needs.setup.outputs.branch }}-supabase.vercel.app/docs"
+          #           export STUDIO_PATH="https://studio-staging-git-${{ needs.studio.outputs.url }}-supabase.vercel.app/dashboard"
+          #           echo "DEPLOY_URL=$(npx vercel deploy --cwd apps/www --yes --token ${{ secrets.VERCEL_TOKEN }} \
+          #             --env NEXT_PUBLIC_STUDIO_URL=$DOCS_PATH NEXT_PUBLIC_DOCS_URL=$STUDIO_PATH)" >> $GITHUB_OUTPUT
