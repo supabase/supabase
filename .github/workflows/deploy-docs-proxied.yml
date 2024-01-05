@@ -6,8 +6,25 @@ env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
 
 jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      branch: ${{ steps.normalize.outputs.NORMALIZED_BRANCH }}
+    steps:
+      - id: normalize
+        name: Normalize branch name
+        run: echo "NORMALIZED_BRANCH=$(echo "$GITHUB_REF_NAME" | sed 's|/|-|' | sed 's|\.||')" >> $GITHUB_OUTPUT
+      - id: log
+        name: Log branch name
+        run: echo "branch ${{ steps.normalize.outputs.NORMALIZED_BRANCH }}"
+          #   docs:
+          #     runs-on: ubuntu-latest
+          #     needs: setup
+          #     env:
+          #       VERCEL_PROJECT_ID: 
   studio:
     runs-on: ubuntu-latest
+    needs: setup
     env:
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_STUDIO_STAGING_PROJECT_ID }}
     outputs:
@@ -20,6 +37,16 @@ jobs:
           sparse-checkout: |
             apps/studio
             packages
+      - id: node
+        name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          cache: 'npm'
+      - id: install
+        name: Install dependencies
+        working-directory: ./
+        run: npm ci
       - id: cli
         name: Install Vercel CLI
         run: npm install --global vercel
