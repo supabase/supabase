@@ -267,12 +267,23 @@ In the following code snippet, we perform the following steps:
 ```js title=src/routes/auth/callback/+server.js
 // src/routes/auth/callback/+server.js
 import { redirect } from '@sveltejs/kit'
+import { isAuthApiError } from '@supabase/supabase-js'
 
 export const GET = async ({ url, locals: { supabase } }) => {
   const code = url.searchParams.get('code')
 
   if (code) {
-    await supabase.auth.exchangeCodeForSession(code)
+    try {
+      await supabase.auth.exchangeCodeForSession(code)
+    } catch (error) {
+       // If opened in another browser without PCKE cookie, need to redirect user to login.
+       if (isAuthApiError(error)) {
+         // optionally add "Email verified! Please login." message to your login UI using the query param.
+         throw redirect(303, "/?verified=true")
+       } else {
+         throw error
+       }
+     }
   }
 
   throw redirect(303, '/account')
