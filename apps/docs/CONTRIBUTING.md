@@ -90,7 +90,7 @@ const docsDir = 'docs'
 const externalSite = 'https://supabase.github.io/pg_graphql'
 ```
 
-Check the contributing sections for [guide structure](#guide-structure) and [reference-structure](#reference-structure) to learn more about the file structures.
+Check the sections for [guide structure](#guide-structure) and [reference structure](#reference-structure) to learn more about the file structures.
 
 ## Guide structure
 
@@ -143,17 +143,17 @@ Add an entry with the `name`, `url`, and (optional) `icon` for your page.
 
 ## Reference structure
 
-Reference docs are produced from the reference specs and source-code references. A common spec file contains shared function and endpoint definitions, and library-specific spec files contain further details.
+Reference docs are produced from the reference specs and library source code. A common spec file contains shared function and endpoint definitions, and library-specific spec files contain further details.
 
 ### Common spec file
 
-For example, see the [spec file for the language SDKs](https://github.com/supabase/supabase/blob/master/apps/docs/spec/common-client-libs-sections.json). This section contains definitions for the common SDK functions:
+Each type of library (for example, language SDK or CLI) has a common spec file. For example, see the [spec file for the language SDKs](https://github.com/supabase/supabase/blob/master/apps/docs/spec/common-client-libs-sections.json). This file contains definitions for the common SDK functions:
 
 - **id** - Identifies the function
 - **title** - Human-readable title
 - **slug** - URL slug
 - **product** - Supabase product that owns the function. For example, database operations are owned by `database`, and auth functions are owned by`auth`
-- **type** - Can be `function` for a structured function definition or `markdown` for a prose explainer section.
+- **type** - `function` for a structured function definition or `markdown` for a prose explainer section.
 
 To add a new function, manually add an entry to this common file.
 
