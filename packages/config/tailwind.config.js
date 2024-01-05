@@ -251,7 +251,7 @@ const uiConfig = ui({
               textUnderlineOffset: '2px',
             },
             'a:hover': {
-              opacity: 0.75,
+              opacity: 0.7,
             },
             figcaption: {
               color: 'hsl(var(--foreground-muted))',

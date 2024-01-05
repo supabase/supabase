@@ -8,14 +8,15 @@ import Quote from '~/components/Quote'
 import Chart from '~/components/Charts/PGCharts'
 import InlineCodeTag from '~/components/InlineCode'
 import {
+  Admonition,
   Badge,
+  cn,
   Collapsible_Shadcn_,
   CollapsibleTrigger_Shadcn_,
   CollapsibleContent_Shadcn_,
+  IconArrowUpRight,
   IconTriangle,
-  cn,
   ThemeImage,
-  Admonition,
 } from 'ui'
 import ImageFadeStack from '~/components/ImageFadeStack'
 import ZoomableImg from '~/components/ZoomableImg/ZoomableImg'
@@ -38,6 +39,12 @@ const getCaptionAlign = (align?: 'left' | 'center' | 'right') => {
       return 'text-center'
   }
 }
+
+const LinkComponent = (props: PropsWithChildren<HTMLAnchorElement>) => (
+  <a href={props.href} target={props.target} className="inline-flex">
+    {props.children} {props.target === '_blank' && <IconArrowUpRight className="w-3" />}
+  </a>
+)
 
 const BlogCollapsible = ({ title, ...props }: { title: string }) => {
   return (
@@ -116,11 +123,8 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
         )}
       </figure>
     ),
-    Link: (props: PropsWithChildren<HTMLAnchorElement>) => (
-      <a href={props.href} target={props.target}>
-        {props.children}
-      </a>
-    ),
+    Link: LinkComponent,
+    a: LinkComponent,
     code: (props: any) => <InlineCodeTag>{props.children}</InlineCodeTag>,
     BlogCollapsible: (props: any) => <BlogCollapsible {...props} />,
     Admonition,
