@@ -1,4 +1,4 @@
-name: Proxy docs preview site via www preview site
+name: Deploy under single origin
 
 on: [pull_request, workflow_dispatch] # pull_request for testing only, remove later
 
