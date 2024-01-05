@@ -108,7 +108,7 @@ const CliCommandSection = (props) => {
             {commandFlags.length > 0 && (
               <>
                 <h3 className="text-lg text-foreground mb-3">Flags</h3>
-                <ul className="">
+                <ul>
                   {commandFlags.map((flag: Flag) => (
                     <>
                       <li className="mt-0">

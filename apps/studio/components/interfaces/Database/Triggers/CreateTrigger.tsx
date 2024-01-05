@@ -347,7 +347,7 @@ const CreateTrigger = ({ trigger, visible, setVisible }: CreateTriggerProps) => 
         onConfirm={handleSubmit}
       >
         {hasPublicTables ? (
-          <div className="">
+          <div>
             <CreateTriggerContext.Provider value={_localState}>
               <div className="my-6 space-y-10">
                 {_localState.isEditing ? (
