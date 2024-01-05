@@ -1,4 +1,3 @@
-import { PostgresFunction } from '@supabase/postgres-meta'
 import { has, isEmpty, mapValues, union, without } from 'lodash'
 import { makeAutoObservable } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'

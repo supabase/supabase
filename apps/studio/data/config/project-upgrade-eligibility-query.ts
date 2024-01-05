@@ -1,5 +1,4 @@
-import { useCallback } from 'react'
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { get } from 'lib/common/fetch'
 import { API_ADMIN_URL } from 'lib/constants'
@@ -47,17 +46,3 @@ export const useProjectUpgradeEligibilityQuery = <TData = ProjectUpgradeEligibil
     ({ signal }) => getProjectUpgradeEligibility({ projectRef }, signal),
     { enabled: enabled && typeof projectRef !== 'undefined', ...options }
   )
-
-export const useProjectUpgradeEligibilityPrefetch = ({
-  projectRef,
-}: ProjectUpgradeEligibilityVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (projectRef) {
-      client.prefetchQuery(configKeys.upgradeEligibility(projectRef), ({ signal }) =>
-        getProjectUpgradeEligibility({ projectRef }, signal)
-      )
-    }
-  }, [projectRef])
-}

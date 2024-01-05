@@ -3,7 +3,7 @@ import jwt from 'jwt-simple'
 import { User } from 'data/auth/users-query'
 import { uuidv4 } from './helpers'
 
-export type PostgrestImpersonationRole =
+type PostgrestImpersonationRole =
   | {
       type: 'postgrest'
       role: 'anon'
@@ -63,10 +63,7 @@ function getPostgrestClaims(projectRef: string, role: PostgrestImpersonationRole
   }
 }
 
-export function getPostgrestRoleImpersonationSql(
-  projectRef: string,
-  role: PostgrestImpersonationRole
-) {
+function getPostgrestRoleImpersonationSql(projectRef: string, role: PostgrestImpersonationRole) {
   const claims = getPostgrestClaims(projectRef, role)
 
   return /* SQL */ `
@@ -82,13 +79,13 @@ export function getPostgrestRoleImpersonationSql(
 export const ROLE_IMPERSONATION_SQL_LINE_COUNT = 11
 export const ROLE_IMPERSONATION_NO_RESULTS = 'ROLE_IMPERSONATION_NO_RESULTS'
 
-export function getCustomRoleImpersonationSql(roleName: string) {
+function getCustomRoleImpersonationSql(roleName: string) {
   return /* SQL */ `
     set local role '${roleName}';
   `
 }
 
-export interface WrapWithRoleImpersonationOptions {
+interface WrapWithRoleImpersonationOptions {
   projectRef: string
   role?: ImpersonationRole
 }

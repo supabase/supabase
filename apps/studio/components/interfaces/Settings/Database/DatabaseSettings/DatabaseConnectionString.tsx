@@ -1,6 +1,6 @@
 import { useParams, useTelemetryProps } from 'common'
 import { useRouter } from 'next/router'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { Input, Tabs } from 'ui'
 
 import AlertError from 'components/ui/AlertError'

@@ -1,12 +1,9 @@
-import { find, isUndefined, isEqual, isNull } from 'lodash'
+import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
+import { find, isEqual, isNull } from 'lodash'
 import { Dictionary } from 'types'
-import type {
-  PostgresColumn,
-  PostgresRelationship,
-  PostgresTable,
-  PostgresType,
-} from '@supabase/postgres-meta'
 
+import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
+import { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import { uuidv4 } from 'lib/helpers'
 import {
   ColumnField,
@@ -14,8 +11,6 @@ import {
   ExtendedPostgresRelationship,
   UpdateColumnPayload,
 } from '../SidePanelEditor.types'
-import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
-import { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 
 const isSQLExpression = (input: string) => {
   if (['CURRENT_DATE'].includes(input)) return true
@@ -174,12 +169,6 @@ export const validateFields = (field: ColumnField) => {
   }
   if (field.format.length === 0) {
     errors['format'] = `Please select a type for your column`
-  }
-  if (field.isEncrypted && field.keyId === 'create-new' && (field?.keyName ?? '').length === 0) {
-    errors['keyName'] = 'Please provide a name for your new key'
-  }
-  if (field.isEncrypted && field.format !== 'text') {
-    errors['isEncrypted'] = 'Only columns of type text can be encrypted'
   }
   return errors
 }

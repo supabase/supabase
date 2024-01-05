@@ -1,4 +1,3 @@
-import { PlayCircle } from 'lucide-react'
 import { Button, IconExternalLink } from 'ui'
 
 const NoChannelEmptyState = () => {
