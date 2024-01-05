@@ -54,7 +54,7 @@ jobs:
         name: Build
         working-directory: ./
         run: |
-          vercel build --cwd apps/studio --yes --token ${{ secrets.VERCEL_TOKEN }}
+          vercel build --yes --token ${{ secrets.VERCEL_TOKEN }}
       - id: deploy
         name: Deploy
         working-directory: ./
