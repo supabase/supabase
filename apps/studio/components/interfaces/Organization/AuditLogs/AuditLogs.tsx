@@ -123,86 +123,6 @@ const AuditLogs = () => {
     <>
       <ScaffoldContainerLegacy>
         <div className="space-y-4 flex flex-col">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <p className="text-xs prose">Filter by</p>
-              <FilterPopover
-                name="Users"
-                options={members ?? []}
-                labelKey="username"
-                valueKey="gotrue_id"
-                activeOptions={filters.users}
-                onSaveFilters={(values) => setFilters({ ...filters, users: values })}
-              />
-              <FilterPopover
-                name="Projects"
-                options={
-                  projects?.filter((p) => p.organization_id === currentOrganization?.id) ?? []
-                }
-                labelKey="name"
-                valueKey="ref"
-                activeOptions={filters.projects}
-                onSaveFilters={(values) => setFilters({ ...filters, projects: values })}
-              />
-              <DatePicker
-                hideTime
-                hideClear
-                triggerButtonType="dashed"
-                triggerButtonTitle=""
-                from={dateRange.from}
-                to={dateRange.to}
-                minDate={dayjs().subtract(retentionPeriod, 'days').toDate()}
-                maxDate={dayjs().toDate()}
-                onChange={(value) => {
-                  if (value.from !== null && value.to !== null) {
-                    const current = dayjs().utc()
-                    const from = dayjs(value.from)
-                      .utc()
-                      .hour(current.hour())
-                      .minute(current.minute())
-                      .second(current.second())
-                      .toISOString()
-                    const to = dayjs(value.to)
-                      .utc()
-                      .hour(current.hour())
-                      .minute(current.minute())
-                      .second(current.second())
-                      .toISOString()
-                    setDateRange({ from, to })
-                  }
-                }}
-                renderFooter={() => {
-                  return (
-                    <Alert title="" variant="info" className="mx-3 pl-2 pr-2 pt-1 pb-2">
-                      Your organization has a log retention period of{' '}
-                      <span className="text-brand">
-                        {retentionPeriod} day
-                        {retentionPeriod > 1 ? 's' : ''}
-                      </span>
-                      . You may only view logs from{' '}
-                      {dayjs().subtract(retentionPeriod, 'days').format('DD MMM YYYY')} as the
-                      earliest date.
-                    </Alert>
-                  )
-                }}
-              />
-              {isSuccess && (
-                <>
-                  <div className="h-[20px] border-r border-strong !ml-4 !mr-2" />
-                  <p className="prose text-xs">Viewing {sortedLogs.length} logs in total</p>
-                </>
-              )}
-            </div>
-            <Button
-              type="default"
-              disabled={isLoading || isRefetching}
-              icon={<IconRefreshCw className={isRefetching ? 'animate-spin' : ''} />}
-              onClick={() => refetch()}
-            >
-              {isRefetching ? 'Refreshing' : 'Refresh'}
-            </Button>
-          </div>
-
           {isLoading && (
             <div className="space-y-2">
               <ShimmeringLoader />
@@ -247,6 +167,85 @@ const AuditLogs = () => {
 
           {isSuccess && (
             <>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <p className="text-xs prose">Filter by</p>
+                  <FilterPopover
+                    name="Users"
+                    options={members ?? []}
+                    labelKey="username"
+                    valueKey="gotrue_id"
+                    activeOptions={filters.users}
+                    onSaveFilters={(values) => setFilters({ ...filters, users: values })}
+                  />
+                  <FilterPopover
+                    name="Projects"
+                    options={
+                      projects?.filter((p) => p.organization_id === currentOrganization?.id) ?? []
+                    }
+                    labelKey="name"
+                    valueKey="ref"
+                    activeOptions={filters.projects}
+                    onSaveFilters={(values) => setFilters({ ...filters, projects: values })}
+                  />
+                  <DatePicker
+                    hideTime
+                    hideClear
+                    triggerButtonType="dashed"
+                    triggerButtonTitle=""
+                    from={dateRange.from}
+                    to={dateRange.to}
+                    minDate={dayjs().subtract(retentionPeriod, 'days').toDate()}
+                    maxDate={dayjs().toDate()}
+                    onChange={(value) => {
+                      if (value.from !== null && value.to !== null) {
+                        const current = dayjs().utc()
+                        const from = dayjs(value.from)
+                          .utc()
+                          .hour(current.hour())
+                          .minute(current.minute())
+                          .second(current.second())
+                          .toISOString()
+                        const to = dayjs(value.to)
+                          .utc()
+                          .hour(current.hour())
+                          .minute(current.minute())
+                          .second(current.second())
+                          .toISOString()
+                        setDateRange({ from, to })
+                      }
+                    }}
+                    renderFooter={() => {
+                      return (
+                        <Alert title="" variant="info" className="mx-3 pl-2 pr-2 pt-1 pb-2">
+                          Your organization has a log retention period of{' '}
+                          <span className="text-brand">
+                            {retentionPeriod} day
+                            {retentionPeriod > 1 ? 's' : ''}
+                          </span>
+                          . You may only view logs from{' '}
+                          {dayjs().subtract(retentionPeriod, 'days').format('DD MMM YYYY')} as the
+                          earliest date.
+                        </Alert>
+                      )
+                    }}
+                  />
+                  {isSuccess && (
+                    <>
+                      <div className="h-[20px] border-r border-strong !ml-4 !mr-2" />
+                      <p className="prose text-xs">Viewing {sortedLogs.length} logs in total</p>
+                    </>
+                  )}
+                </div>
+                <Button
+                  type="default"
+                  disabled={isLoading || isRefetching}
+                  icon={<IconRefreshCw className={isRefetching ? 'animate-spin' : ''} />}
+                  onClick={() => refetch()}
+                >
+                  {isRefetching ? 'Refreshing' : 'Refresh'}
+                </Button>
+              </div>
               {logs.length === 0 ? (
                 <div className="bg-surface-100 border rounded p-4 flex items-center justify-between">
                   <p className="prose text-sm">
