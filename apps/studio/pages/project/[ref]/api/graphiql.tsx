@@ -49,7 +49,7 @@ const GraphiQLPage: NextPageWithLayout = () => {
       url: `${API_URL}/projects/${projectRef}/api/graphql`,
       fetch,
     })
-    const customFetcher: Fetcher = (graphqlParams, opts) => {
+    const customFetcher: Fetcher = async (graphqlParams, opts) => {
       let userAuthorization: string | undefined
 
       const role = getImpersonatedRole()
@@ -59,7 +59,8 @@ const GraphiQLPage: NextPageWithLayout = () => {
         role !== undefined &&
         role.type === 'postgrest'
       ) {
-        userAuthorization = `Bearer ${getRoleImpersonationJWT(projectRef, jwtSecret, role)}`
+        const token = await getRoleImpersonationJWT(projectRef, jwtSecret, role)
+        userAuthorization = 'Bearer ' + token
       }
 
       return fetcherFn(graphqlParams, {
