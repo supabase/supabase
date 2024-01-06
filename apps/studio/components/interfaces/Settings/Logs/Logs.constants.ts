@@ -247,12 +247,6 @@ limit 100
   },
 ]
 
-export const LOG_TYPE_LABEL_MAPPING: { [k: string]: string } = {
-  explorer: 'Explorer',
-  api: 'API',
-  database: 'Database',
-}
-
 const _SQL_FILTER_COMMON = {
   search_query: (value: string) => `regexp_contains(event_message, '${value}')`,
 }

@@ -1,6 +1,5 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'data/fetchers'
-import { useCallback } from 'react'
 import { ResponseError } from 'types'
 import { databaseKeys } from './keys'
 
@@ -38,15 +37,3 @@ export const usePoolingConfigurationQuery = <TData = PoolingConfigurationData>(
       ...options,
     }
   )
-
-export const usePoolingConfigurationPrefetch = ({ projectRef }: PoolingConfigurationVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (projectRef) {
-      client.prefetchQuery(databaseKeys.poolingConfiguration(projectRef), ({ signal }) =>
-        getPoolingConfiguration({ projectRef }, signal)
-      )
-    }
-  }, [projectRef])
-}
