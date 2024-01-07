@@ -2,7 +2,6 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'data/fetchers'
 import { subscriptionKeys } from './keys'
 import { ResponseError } from 'types'
-import { components } from 'data/api'
 
 export type OrgSubscriptionVariables = {
   orgSlug?: string
