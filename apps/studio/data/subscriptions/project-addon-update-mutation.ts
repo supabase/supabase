@@ -1,19 +1,15 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { post } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { subscriptionKeys } from './keys'
+import { AddonVariantId, ProjectAddonType } from './types'
 
 export type ProjectAddonUpdateVariables = {
   projectRef: string
-  variant: string
-  type: 'custom_domain' | 'compute_instance' | 'pitr'
-}
-
-export type ProjectAddonUpdateResponse = {
-  error?: any
+  variant: AddonVariantId
+  type: ProjectAddonType
 }
 
 export async function updateSubscriptionAddon({
@@ -25,13 +21,21 @@ export async function updateSubscriptionAddon({
   if (!variant) throw new Error('variant is required')
   if (!type) throw new Error('type is required')
 
-  const response = (await post(`${API_URL}/projects/${projectRef}/billing/addons`, {
-    addon_type: type,
-    addon_variant: variant,
-  })) as ProjectAddonUpdateResponse
-  if (response.error) throw response.error
+  const { data, error } = await post(`/platform/projects/{ref}/billing/addons`, {
+    params: {
+      path: {
+        ref: projectRef,
+      },
+    },
+    body: {
+      addon_type: type,
+      addon_variant: variant,
+    },
+  })
 
-  return response
+  if (error) throw error
+
+  return data
 }
 
 type ProjectAddonUpdateData = Awaited<ReturnType<typeof updateSubscriptionAddon>>

@@ -4,7 +4,7 @@ import { useReducer, useRef, useState } from 'react'
 
 import { useParams } from 'common'
 import { useSendDowngradeFeedbackMutation } from 'data/feedback/exit-survey-send'
-import { OrgSubscription } from 'data/subscriptions/org-subscription-query'
+import { OrgSubscription } from 'data/subscriptions/types'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
 import { useFlag, useStore } from 'hooks'
 import { Alert, Button, Input, Modal } from 'ui'

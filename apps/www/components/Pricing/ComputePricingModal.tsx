@@ -86,7 +86,7 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
         <div className="p-5">
           <table className="text-foreground m-0 hidden w-full table-auto overflow-hidden rounded-b lg:table text-xs">
             <thead>
-              <tr className="">
+              <tr>
                 {columnNames.map((column) => (
                   <th key={column.key} className="p-3 text-left font-medium">
                     {column.title}
@@ -98,9 +98,9 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
               {pricingAddOn.database.rows.map((row, i) => (
                 <Fragment key={`row-${i}`}>
                   {i === 0 && (
-                    <tr className="">
+                    <tr>
                       <td className="pb-1 bg-border-strong px-3 py-1 -mr-1 border-l-4 border-strong">
-                        <span className="">First instance is free on paid plans</span>
+                        <span>First instance is free on paid plans</span>
                       </td>
                     </tr>
                   )}

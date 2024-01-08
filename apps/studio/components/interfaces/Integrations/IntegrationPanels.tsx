@@ -298,7 +298,7 @@ const IntegrationConnectionHeader = React.forwardRef<HTMLDivElement, Integration
         )}
       >
         {props.title && <h5 className="text-foreground">{props.title}</h5>}
-        <Markdown content={markdown} className="" />
+        <Markdown content={markdown} />
       </div>
     )
   }

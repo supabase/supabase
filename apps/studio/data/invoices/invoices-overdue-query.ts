@@ -1,22 +1,19 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { get } from 'data/fetchers'
 import { invoicesKeys } from './keys'
+import { components } from 'data/api'
 
-export type OverdueInvoicesResponse = {
-  id: string
-  organization_id: number
-}
+export type OverdueInvoicesResponse = components['schemas']['OverdueInvoiceCount']
 
 export async function getOverdueInvoices(signal?: AbortSignal) {
-  const response = await get(`${API_URL}/stripe/invoices/overdue`, {
+  const { data, error } = await get('/platform/stripe/invoices/overdue', {
     signal,
   })
-  if (response.error) {
-    throw response.error
+  if (error) {
+    throw error
   }
 
-  return response as OverdueInvoicesResponse[]
+  return data
 }
 
 export type OverdueInvoicesData = Awaited<ReturnType<typeof getOverdueInvoices>>
