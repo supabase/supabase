@@ -31,7 +31,7 @@ There are two main parts to the Vault UI, Secrets and Encryption Keys:
 
 You can use the Vault to store secrets - everything from Environment Variables to API Keys. You can then use these secrets anywhere in your database: Postgres [Functions](/docs/guides/database/functions), Triggers, and [Webhooks](/docs/guides/database/webhooks). From a SQL perspective, accessing secrets is as easy as querying a table (or in this case, a view). The underlying secrets tables will be stored in encrypted form.
 
-## Encryption Keys
+## Encryption keys
 
 These are keys used to encrypt data inside your database. You can create different Encryption Keys for different purposes, for example: one for encrypting user-data, and another for application-data. Each key is encrypted itself using a root encryption key that lives outside of the database. See **[Encryption key location](#encryption-key-location)** for more details.
 
@@ -161,7 +161,7 @@ Notice how this view has a `decrypted_secret` column that contains the decrypted
 
 You should ensure that you protect access to this view with the appropriate SQL privilege settings at all times, as anyone that has access to the view has access to decrypted secrets.
 
-### Updating Secrets
+### Updating secrets
 
 A secret can be updated with the `vault.update_secret()` function, this function makes updating secrets easy, just provide the secret UUID as the first argument, and then an updated secret, updated optional unique name, or updated description:
 
@@ -197,7 +197,7 @@ updated_at       | 2022-12-14 02:51:13.938396+00
 
 </details>
 
-## Deep Dive
+## Deep dive
 
 <div className="video-container">
   <iframe
@@ -211,7 +211,7 @@ updated_at       | 2022-12-14 02:51:13.938396+00
 
 As we mentioned, the Vault uses pgsodium's Transparent Column Encryption (TCE) to store secrets in an authenticated encrypted form. There are some details around that you may be curious about, what does authenticated mean, and where are encryption keys store? This section explains those details.
 
-### Authenticated Encryption with Associated Data
+### Authenticated encryption with associated data
 
 The first important feature of TCE is that it uses an [Authenticated Encryption with Associated Data](<https://en.wikipedia.org/wiki/Authenticated_encryption#Authenticated_encryption_with_associated_data_(AEAD)>) encryption algorithm (based on libsodium).
 
@@ -227,7 +227,7 @@ This is an important safety precaution - there is little value in storing the en
 
 Where are the keys stored? Supabase creates and manages the root keys (from which all key IDs are derived) in our secured backend systems. We keep this root key safe and separate from your data. You remain in control of your keys - a separate API endpoint is available that you can use to access the key if you want to decrypt your data outside of Supabase.
 
-### Internal Details
+### Internal details
 
 To encrypt data, you need a _key id_. You can use the default key id created automatically for every project, or create your own key ids Using the `pgsodium.create_key()` function. Key ids are used to internally derive the encryption key used to encrypt secrets in the vault. Vault users typically do not have access to the key itself, only the key id.
 

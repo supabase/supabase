@@ -11,7 +11,6 @@ import {
   LogTemplate,
   LogsTableName,
   QueryType,
-  TEMPLATES,
   ensureNoTimestampConflict,
   maybeShowUpgradePrompt,
 } from 'components/interfaces/Settings/Logs'

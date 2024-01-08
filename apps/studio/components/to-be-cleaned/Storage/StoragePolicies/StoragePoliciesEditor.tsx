@@ -107,7 +107,6 @@ const PolicyEditorFooter = ({ onViewTemplates = () => {}, onReviewPolicy = () =>
 
 const StoragePoliciesEditor = ({
   policyFormFields = {},
-  roles = [],
   onViewTemplates = () => {},
   onUpdatePolicyName = () => {},
   onUpdatePolicyDefinition = () => {},
@@ -119,7 +118,7 @@ const StoragePoliciesEditor = ({
   const selectedRoles = policyFormFields.roles
 
   return (
-    <div className="">
+    <div>
       <div className="mb-8 space-y-8 py-6">
         <Modal.Content>
           <PolicyName
@@ -137,11 +136,7 @@ const StoragePoliciesEditor = ({
         </Modal.Content>
         <Modal.Separator />
         <Modal.Content>
-          <PolicyRoles
-            roles={roles}
-            selectedRoles={selectedRoles}
-            onUpdateSelectedRoles={onUpdatePolicyRoles}
-          />
+          <PolicyRoles selectedRoles={selectedRoles} onUpdateSelectedRoles={onUpdatePolicyRoles} />
         </Modal.Content>
         <Modal.Separator />
         <Modal.Content>

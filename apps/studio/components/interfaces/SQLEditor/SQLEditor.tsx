@@ -6,22 +6,6 @@ import { useRouter } from 'next/router'
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import Split from 'react-split'
 import { format } from 'sql-formatter'
-import {
-  AiIconAnimation,
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  IconCheck,
-  IconChevronDown,
-  IconCornerDownLeft,
-  IconLoader,
-  IconSettings,
-  IconX,
-  Input_Shadcn_,
-  cn,
-} from 'ui'
 
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useSqlEditMutation } from 'data/ai/sql-edit-mutation'
@@ -49,8 +33,25 @@ import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import Telemetry from 'lib/telemetry'
 import toast from 'react-hot-toast'
 import { useAppStateSnapshot } from 'state/app-state'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { isRoleImpersonationEnabled, useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
+import {
+  AiIconAnimation,
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  IconCheck,
+  IconChevronDown,
+  IconCornerDownLeft,
+  IconLoader,
+  IconSettings,
+  IconX,
+  Input_Shadcn_,
+  cn,
+} from 'ui'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
 import { sqlAiDisclaimerComment, untitledSnippetTitle } from './SQLEditor.constants'
@@ -105,6 +106,7 @@ const SQLEditor = () => {
   const organization = useSelectedOrganization()
   const appSnap = useAppStateSnapshot()
   const snap = useSqlEditorStateSnapshot()
+  const databaseSelectorState = useDatabaseSelectorStateSnapshot()
 
   const { mutate: formatQuery } = useFormatQueryMutation()
   const { mutateAsync: generateSql, isLoading: isGenerateSqlLoading } = useSqlGenerateMutation()
@@ -118,7 +120,9 @@ const SQLEditor = () => {
   const [pendingTitle, setPendingTitle] = useState<string>()
   const [hasSelection, setHasSelection] = useState<boolean>(false)
   const inputRef = useRef<HTMLInputElement>(null)
+
   const readReplicasEnabled = useFlag('readReplicas')
+  const showReadReplicasUI = readReplicasEnabled && project?.is_read_replicas_enabled
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery({
@@ -158,9 +162,9 @@ const SQLEditor = () => {
   useEffect(() => {
     if (isSuccessReadReplicas) {
       const primaryDatabase = databases.find((db) => db.identifier === ref)
-      snap.setSelectedDatabaseId(primaryDatabase?.identifier)
+      databaseSelectorState.setSelectedDatabaseId(primaryDatabase?.identifier)
     }
-  }, [isSuccessReadReplicas])
+  }, [isSuccessReadReplicas, databases, ref])
 
   const { data, refetch: refetchEntityDefinitions } = useEntityDefinitionsQuery(
     {
@@ -325,10 +329,11 @@ const SQLEditor = () => {
         }
 
         const impersonatedRole = getImpersonatedRole()
-        const connectionString = !readReplicasEnabled
+        const connectionString = !showReadReplicasUI
           ? project.connectionString
-          : databases?.find((db) => db.identifier === snap.selectedDatabaseId)?.connectionString
-        if (!connectionString) {
+          : databases?.find((db) => db.identifier === databaseSelectorState.selectedDatabaseId)
+              ?.connectionString
+        if (IS_PLATFORM && !connectionString) {
           return toast.error('Unable to run query: Connection string is missing')
         }
 
@@ -343,7 +348,18 @@ const SQLEditor = () => {
         })
       }
     },
-    [isDiffOpen, id, isExecuting, project, hasHipaaAddon, execute, getImpersonatedRole, setAiTitle]
+    [
+      isDiffOpen,
+      id,
+      isExecuting,
+      project,
+      hasHipaaAddon,
+      execute,
+      getImpersonatedRole,
+      setAiTitle,
+      databaseSelectorState.selectedDatabaseId,
+      databases,
+    ]
   )
 
   const handleNewQuery = useCallback(

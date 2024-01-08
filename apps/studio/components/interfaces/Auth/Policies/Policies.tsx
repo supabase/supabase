@@ -1,4 +1,5 @@
-import type { PostgresPolicy, PostgresRole, PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
+import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common/hooks'
 import { PolicyEditorModal, PolicyTableRow } from 'components/interfaces/Auth/Policies'
 import { useStore } from 'hooks'
@@ -6,15 +7,19 @@ import { isEmpty } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useCallback, useState } from 'react'
+import toast from 'react-hot-toast'
 import { IconHelpCircle } from 'ui'
 
-import { useQueryClient } from '@tanstack/react-query'
+import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import InformationBox from 'components/ui/InformationBox'
+import { useDatabasePolicyCreateMutation } from 'data/database-policies/database-policy-create-mutation'
+import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
+import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
 import { tableKeys } from 'data/tables/keys'
-import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 interface PoliciesProps {
   tables: PostgresTable[]
@@ -31,17 +36,26 @@ const Policies = ({
 }: PoliciesProps) => {
   const router = useRouter()
   const { ref } = useParams()
+  const { project } = useProjectContext()
 
   const { ui, meta } = useStore()
   const queryClient = useQueryClient()
   const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
-  const roles = meta.roles.list((role: PostgresRole) => !meta.roles.systemRoles.includes(role.name))
 
   const [selectedSchemaAndTable, setSelectedSchemaAndTable] = useState<any>({})
   const [selectedTableToToggleRLS, setSelectedTableToToggleRLS] = useState<any>({})
   const [RLSEditorWithAIShown, showRLSEditorWithAI] = useState(false)
   const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState<PostgresPolicy | {}>({})
   const [selectedPolicyToDelete, setSelectedPolicyToDelete] = useState<any>({})
+
+  const { mutateAsync: createDatabasePolicy } = useDatabasePolicyCreateMutation()
+  const { mutateAsync: updateDatabasePolicy } = useDatabasePolicyUpdateMutation()
+  const { mutate: deleteDatabasePolicy } = useDatabasePolicyDeleteMutation({
+    onSuccess: () => {
+      toast.success('Successfully deleted policy!')
+      closeConfirmModal()
+    },
+  })
 
   const closePolicyEditorModal = useCallback(() => {
     setSelectedPolicyToEdit({})
@@ -101,41 +115,53 @@ const Policies = ({
     closeConfirmModal()
   }
 
-  const onCreatePolicy = useCallback(async (payload: any) => {
-    const res = await meta.policies.create(payload)
-    if (res.error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Error adding policy: ${res.error.message}`,
-      })
-      return true
-    }
-    return false
-  }, [])
+  const onCreatePolicy = useCallback(
+    async (payload: any) => {
+      if (!project) {
+        console.error('Project is required')
+        return true
+      }
+
+      try {
+        await createDatabasePolicy({
+          projectRef: project.ref,
+          connectionString: project.connectionString,
+          payload,
+        })
+        return false
+      } catch (error) {
+        return true
+      }
+    },
+    [project]
+  )
 
   const onUpdatePolicy = async (payload: any) => {
-    const res = await meta.policies.update(payload.id, payload)
-    if (res.error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Error updating policy: ${res.error.message}`,
-      })
+    if (!project) {
+      console.error('Project is required')
       return true
     }
-    return false
+
+    try {
+      await updateDatabasePolicy({
+        projectRef: project.ref,
+        connectionString: project.connectionString,
+        id: payload.id,
+        payload,
+      })
+      return false
+    } catch (error) {
+      return true
+    }
   }
 
   const onDeletePolicy = async () => {
-    const res = await meta.policies.del(selectedPolicyToDelete.id)
-    if (typeof res !== 'boolean' && res.error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Error deleting policy: ${res.error.message}`,
-      })
-    } else {
-      ui.setNotification({ category: 'success', message: 'Successfully deleted policy!' })
-    }
-    closeConfirmModal()
+    if (!project) return console.error('Project is required')
+    deleteDatabasePolicy({
+      projectRef: project.ref,
+      connectionString: project.connectionString,
+      id: selectedPolicyToDelete.id,
+    })
   }
 
   return (
@@ -192,7 +218,6 @@ const Policies = ({
 
       <PolicyEditorModal
         visible={!isEmpty(selectedSchemaAndTable)}
-        roles={roles}
         schema={selectedSchemaAndTable.schema}
         table={selectedSchemaAndTable.table}
         selectedPolicyToEdit={selectedPolicyToEdit}

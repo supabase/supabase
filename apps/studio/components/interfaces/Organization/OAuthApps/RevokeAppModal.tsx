@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { useAuthorizedAppRevokeMutation } from 'data/oauth/authorized-app-revoke-mutation'
 import { AuthorizedApp } from 'data/oauth/authorized-apps-query'
 import { useStore } from 'hooks'
-import { Alert, IconAlertOctagon, IconLock, Modal } from 'ui'
+import { Alert, IconLock, Modal } from 'ui'
 
 export interface RevokeAppModalProps {
   selectedApp?: AuthorizedApp

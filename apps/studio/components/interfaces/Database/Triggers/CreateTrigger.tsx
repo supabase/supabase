@@ -1,4 +1,3 @@
-import { PostgresFunction } from '@supabase/postgres-meta'
 import { has, isEmpty, mapValues, union, without } from 'lodash'
 import { makeAutoObservable } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
@@ -6,7 +5,7 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import SVG from 'react-inlinesvg'
 
-import { Dictionary } from 'components/grid'
+import { Dictionary } from 'types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import FormEmptyBox from 'components/ui/FormBoxEmpty'
@@ -348,7 +347,7 @@ const CreateTrigger = ({ trigger, visible, setVisible }: CreateTriggerProps) => 
         onConfirm={handleSubmit}
       >
         {hasPublicTables ? (
-          <div className="">
+          <div>
             <CreateTriggerContext.Provider value={_localState}>
               <div className="my-6 space-y-10">
                 {_localState.isEditing ? (

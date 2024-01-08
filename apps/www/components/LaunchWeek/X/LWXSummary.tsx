@@ -1,7 +1,7 @@
-import Image from 'next/image'
 import React from 'react'
-import { buildDays, mainDays } from './Releases/data'
+import Image from 'next/image'
 import Link from 'next/link'
+import { buildDays, mainDays } from './Releases/data'
 
 const LWXSummary = () => {
   return (
@@ -19,7 +19,6 @@ const LWXSummary = () => {
             height={16}
             className="w-3 h-3"
           />
-          {/* <span className="font-mono uppercase tracking-wide">Main Stage</span> */}
         </Link>
         <div className="font-mono uppercase tracking-wide text-xs">11-15 Dec</div>
       </div>
@@ -32,13 +31,11 @@ const LWXSummary = () => {
             (day, i: number) =>
               day.shipped && (
                 <ol key={day.id}>
-                  <Link
-                    href={day.blog}
-                    className="group flex items-center justify-between py-1 hover:text-foreground"
-                  >
-                    <span>
-                      Day {i + 1} - {day.description}
+                  <Link href={day.blog} className="group flex py-1 gap-2 hover:text-foreground">
+                    <span className="shrink-0 text-sm font-mono uppercase leading-6">
+                      Day {i + 1} -
                     </span>
+                    <span className="leading-6">{day.description}</span>
                   </Link>
                 </ol>
               )
@@ -66,9 +63,6 @@ const LWXSummary = () => {
                         </span>
                         {day.title}
                       </span>
-                      {/* <span className="relative block opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0">
-                        <IconArrowRight />
-                      </span> */}
                     </Link>
                   </ol>
                 )
@@ -81,7 +75,7 @@ const LWXSummary = () => {
                 Supabase Launch Week X Hackathon
               </Link>
             </ol>
-            <ol className="">
+            <ol>
               <Link
                 href="/blog/community-meetups-lwx"
                 className="relative flex items-center justify-between group w-full py-1 hover:text-foreground"

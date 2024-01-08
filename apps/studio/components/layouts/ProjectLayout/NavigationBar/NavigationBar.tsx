@@ -28,6 +28,7 @@ import {
   useCommandMenu,
 } from 'ui'
 
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useFlag, useIsFeatureEnabled } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
@@ -39,7 +40,6 @@ import {
   generateToolRoutes,
 } from './NavigationBar.utils'
 import NavigationIconButton from './NavigationIconButton'
-import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 const NavigationBar = () => {
   const os = detectOS()
@@ -65,7 +65,6 @@ const NavigationBar = () => {
     'project_storage:all',
     'realtime:all',
   ])
-  const realtimeFlagEnabled = useFlag('realtimeDashboard')
 
   const activeRoute = router.pathname.split('/')[3]
   const toolRoutes = generateToolRoutes(projectRef, project)
@@ -73,14 +72,14 @@ const NavigationBar = () => {
     auth: authEnabled,
     edgeFunctions: edgeFunctionsEnabled,
     storage: storageEnabled,
-    realtime: realtimeEnabled && realtimeFlagEnabled,
+    realtime: realtimeEnabled,
   })
   const otherRoutes = generateOtherRoutes(projectRef, project)
 
   return (
     <div
       className={[
-        'flex w-14 flex-col justify-between overflow-y-hidden p-2',
+        'hide-scrollbar flex w-14 flex-col justify-between p-2 overflow-y-auto',
         'border-r bg-background border-default',
       ].join(' ')}
     >

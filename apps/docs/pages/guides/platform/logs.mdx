@@ -9,7 +9,7 @@ export const meta = {
 
 The Supabase Platform includes a Logs Explorer that allows log tracing and debugging. Log retention is based on your [project's pricing plan](https://supabase.com/pricing).
 
-## Product Logs
+## Product logs
 
 Supabase provides a logging interface specific to each product. You can use simple regular expressions for keywords and patterns to search log event messages. You can also export and download the log events matching your query as a spreadsheet.
 
@@ -88,7 +88,7 @@ Edge Function log messages have a max length of 10,000 characters. If you try to
 
 ---
 
-## Logging Postgres Queries
+## Logging Postgres queries
 
 By default, only DDL statements are logged for new Supabase projects.
 
@@ -155,7 +155,7 @@ If any permission errors are encountered when executing `alter role postgres ...
 
 </Admonition>
 
-## Logging Realtime Connections
+## Logging realtime connections
 
 Realtime doesn't log new WebSocket connections or Channel joins by default. Enable connection logging per client by including an `info` `log_level` parameter when instantiating the Supabase client.
 
@@ -190,7 +190,7 @@ You can access the following logs from the **Sources** drop-down:
 
 The Logs Explorer uses BigQuery and supports all [available SQL functions and operators](https://cloud.google.com/bigquery/docs/reference/standard-sql/functions-and-operators).
 
-### Timestamp Display and Behavior
+### Timestamp display and behavior
 
 Each log entry is stored with a `timestamp` as a `TIMESTAMP` data type. Use the appropriate [timestamp function](https://cloud.google.com/bigquery/docs/reference/standard-sql/timestamp_functions#timestamp) to utilize the `timestamp` field in a query.
 
@@ -206,7 +206,7 @@ select datetime(timestamp) from ....
 -- 2022-09-27T09:17:10.439Z
 ```
 
-### Unnesting Arrays
+### Unnesting arrays
 
 Each log event stores metadata an array of objects with multiple levels, and can be seen by selecting single log events in the Logs Explorer. To query arrays, use `unnest()` on each array field and add it to the query as a join. This allows you to reference the nested objects with an alias and select their individual fields.
 
@@ -243,11 +243,11 @@ This allows you to select the `method` and `cf_ipcountry` columns. In JS dot not
 - `metadata[].request[].method`
 - `metadata[].request[].headers[].cf_ipcountry`
 
-### LIMIT and Result Row Limitations
+### LIMIT and result row limitations
 
 The Logs Explorer has a maximum of 1000 rows per run. Use `LIMIT` to optimize your queries by reducing the number of rows returned further.
 
-### Best Practices
+### Best practices
 
 1. Include a filter over **timestamp**
 
@@ -278,7 +278,7 @@ from
   cross join unnest(m.request) as r;
 ```
 
-### Examples and Templates
+### Examples and templates
 
 The Logs Explorer includes **Templates** (available in the Templates tab or the dropdown in the Query tab) to help you get started.
 
@@ -294,7 +294,7 @@ from
 where h.x_real_ip is not null and r.method = "GET";
 ```
 
-### Log Source Reference
+### Log source reference
 
 Refer to the full field reference for each available source below. Do note that in order to access each nested key, you would need to perform the [necessary unnesting joins](#unnesting-arrays)
 

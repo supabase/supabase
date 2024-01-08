@@ -54,7 +54,7 @@ SSD Disks are attached to your servers and the disk performance depends on the c
 
 [Contact us](https://supabase.com/contact/enterprise) if you require a custom plan.
 
-### Bursting and Disk Budget
+### Bursting and disk budget
 
 Smaller compute instances can burst up to their largest throughput and IOPS for 30 minutes in a day. Beyond that, the performance reverts to the baseline. For example, the free tier can burst up to 2,085 Mbps for 30 minutes a day and reverts to the baseline performance of 87 Mbps. Your disk budget gets replenished throughout the day.
 
@@ -62,7 +62,7 @@ If you need consistent disk performance, choose the 4XL or larger compute add-on
 
 If you're unsure of how much throughput or IOPS your application requires, you can load test your project and inspect these [metrics in the Dashboard](https://supabase.com/dashboard/project/_/reports). If the `Disk IO % consumed` stat is more than 1%, it indicates that your workload has burst beyond the baseline IO throughput during the day. If this metric goes to 100%, the workload has used up all available disk budget and will revert to baseline performance. Projects that use any disk budget are good candidates for upgrading to a larger compute add-on with higher baseline throughput.
 
-## Postgres Replication Slots and WAL Senders
+## Postgres replication slots and WAL senders
 
 [Replication Slots](https://postgresqlco.nf/doc/en/param/max_replication_slots) and [WAL Senders](https://postgresqlco.nf/doc/en/param/max_wal_senders/) are used to enable [Postgres Replication](/docs/guides/database/replication).
 

@@ -29,7 +29,6 @@ const newPolicyTemplate: any = {
 const StoragePoliciesEditPolicyModal = ({
   visible = false,
   bucketName = '',
-  roles = [],
   onSelectCancel = () => {},
   onCreatePolicies = () => {},
   onSaveSuccess = () => {},
@@ -177,7 +176,7 @@ const StoragePoliciesEditPolicyModal = ({
     }
     if (view === POLICY_MODAL_VIEWS.TEMPLATES) {
       return (
-        <div className="">
+        <div>
           <div className="flex items-center space-x-3">
             <span
               onClick={onSelectBackFromTemplates}
@@ -223,7 +222,6 @@ const StoragePoliciesEditPolicyModal = ({
           />
         ) : view === POLICY_MODAL_VIEWS.EDITOR ? (
           <StoragePoliciesEditor
-            roles={roles}
             policyFormFields={policyFormFields}
             onViewTemplates={onViewTemplates}
             onUpdatePolicyName={onUpdatePolicyName}

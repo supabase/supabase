@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast'
 import { patch } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { databaseFunctionsKeys } from './keys'
-import { Dictionary } from 'components/grid'
+import { Dictionary } from 'types'
 
 export type DatabaseFunctionUpdateVariables = {
   projectRef: string

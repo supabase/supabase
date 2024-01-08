@@ -55,7 +55,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
             {parameters && (
               <div className="not-prose mt-12">
                 <h5 className="mb-3 text-base text-foreground">Parameters</h5>
-                <ul className="">
+                <ul>
                   {parameters.map((param) => {
                     // grab override params from yaml file
                     const overrideParams = item.overrideParams

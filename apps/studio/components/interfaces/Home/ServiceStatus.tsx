@@ -35,8 +35,7 @@ const ServiceStatus = () => {
 
   // [Joshen] Need pooler service check eventually
   const { data: status, isLoading } = useProjectServiceStatusQuery({ projectRef: ref })
-  const { data: edgeFunctionsStatus, isLoading: isLoadingEdgeFunctions } =
-    useEdgeFunctionServiceStatusQuery({ projectRef: ref })
+  const { data: edgeFunctionsStatus } = useEdgeFunctionServiceStatusQuery({ projectRef: ref })
   const { isLoading: isLoadingPostgres, isSuccess: isSuccessPostgres } =
     usePostgresServiceStatusQuery({
       projectRef: ref,

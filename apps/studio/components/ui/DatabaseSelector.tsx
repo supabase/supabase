@@ -1,5 +1,11 @@
-import { useParams } from 'common'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
+
+import { useParams } from 'common'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { formatDatabaseID, formatDatabaseRegion } from 'data/read-replicas/replicas.utils'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Button,
   CommandGroup_Shadcn_,
@@ -16,25 +22,17 @@ import {
   cn,
 } from 'ui'
 
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { formatDatabaseID, formatDatabaseRegion } from 'data/read-replicas/replicas.utils'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-
 interface DatabaseSelectorProps {
-  selectedDatabaseId?: string
   variant?: 'regular' | 'connected-on-right' | 'connected-on-left' | 'connected-on-both'
-  onChangeDatabaseId: (id: string) => void
 }
 
-const DatabaseSelector = ({
-  selectedDatabaseId,
-  variant = 'regular',
-  onChangeDatabaseId,
-}: DatabaseSelectorProps) => {
+const DatabaseSelector = ({ variant = 'regular' }: DatabaseSelectorProps) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const [open, setOpen] = useState(false)
+
+  const state = useDatabaseSelectorStateSnapshot()
+  const selectedDatabaseId = state.selectedDatabaseId
 
   const { data } = useReadReplicasQuery({ projectRef })
   const databases = data ?? []
@@ -86,11 +84,11 @@ const DatabaseSelector = ({
                       value={database.identifier}
                       className="cursor-pointer w-full"
                       onSelect={() => {
-                        onChangeDatabaseId(database.identifier)
+                        state.setSelectedDatabaseId(database.identifier)
                         setOpen(false)
                       }}
                       onClick={() => {
-                        onChangeDatabaseId(database.identifier)
+                        state.setSelectedDatabaseId(database.identifier)
                         setOpen(false)
                       }}
                     >

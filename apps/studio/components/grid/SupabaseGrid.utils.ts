@@ -1,7 +1,8 @@
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { STORAGE_KEY_PREFIX } from './constants'
 import { InitialStateType } from './store/reducers'
-import { Dictionary, Sort, SupabaseGridProps, SupaColumn, SupaTable } from './types'
+import { Sort, SupabaseGridProps, SupaColumn, SupaTable } from './types'
+import type { Dictionary } from 'types'
 import { getGridColumns } from './utils/gridColumns'
 import { FilterOperatorOptions } from './components/header/filter'
 import { Filter } from 'components/grid/types'
@@ -176,7 +177,7 @@ export function parseSupaTable(
   }
 }
 
-export function onLoadStorage(storageRef: string, tableName: string, schema?: string | null) {
+function onLoadStorage(storageRef: string, tableName: string, schema?: string | null) {
   const storageKey = getStorageKey(STORAGE_KEY_PREFIX, storageRef)
   const jsonStr = localStorage.getItem(storageKey)
   if (!jsonStr) return

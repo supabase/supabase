@@ -13,7 +13,7 @@ const ProductMenu = ({ page, menu }: ProductMenuProps) => {
     <div className="flex flex-col space-y-8 overflow-y-auto">
       <Menu type="pills">
         {menu.map((group, idx) => (
-          <div key={group.title}>
+          <div key={group.title || group.key}>
             <div className="my-6 space-y-8">
               <div className="mx-3">
                 <Menu.Group

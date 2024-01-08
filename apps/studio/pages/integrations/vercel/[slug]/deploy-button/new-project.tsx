@@ -1,4 +1,4 @@
-import generator from 'generate-password'
+import generator from 'generate-password-browser'
 import { debounce } from 'lodash'
 import { useRouter } from 'next/router'
 import { ChangeEvent, useRef, useState } from 'react'
@@ -245,7 +245,7 @@ const CreateProject = () => {
   )
 
   return (
-    <div className="">
+    <div>
       <p className="mb-2">Supabase project details</p>
       <div className="py-2">
         <Input
