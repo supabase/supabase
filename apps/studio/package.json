@@ -85,6 +85,7 @@
     "react-grid-layout": "^1.4.2",
     "react-hot-toast": "^2.4.1",
     "react-inlinesvg": "^4.0.4",
+    "react-intersection-observer": "^9.5.3",
     "react-markdown": "^8.0.3",
     "react-simple-maps": "4.0.0-beta.6",
     "react-split": "^2.0.13",
