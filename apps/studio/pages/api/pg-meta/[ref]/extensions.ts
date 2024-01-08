@@ -30,7 +30,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
     headers,
   })
   if (response.error) {
-    return res.status(400).json({ error: response.error })
+    return res.status(400).json(response.error)
   }
   return res.status(200).json(response)
 }
@@ -44,7 +44,7 @@ const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
 
   if (response.error) {
     console.error('Extensions POST:', response.error)
-    return res.status(400).json({ error: response.error })
+    return res.status(400).json(response.error)
   }
 
   return res.status(200).json(response)
@@ -56,7 +56,7 @@ const handleDelete = async (req: NextApiRequest, res: NextApiResponse) => {
 
   if (response.error) {
     console.error('Extensions DELETE:', response.error)
-    return res.status(400).json({ error: response.error })
+    return res.status(400).json(response.error)
   }
 
   return res.status(200).json(response)
