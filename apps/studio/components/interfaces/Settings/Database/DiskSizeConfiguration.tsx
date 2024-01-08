@@ -79,7 +79,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
   return (
     <div id="diskManagement">
       <FormHeader title="Disk management" />
-      {projectSubscriptionData?.plan.id !== 'free' ? (
+      {projectSubscriptionData?.usage_billing_enabled === true ? (
         <div className="flex flex-col gap-3">
           <Panel className="!m-0">
             <Panel.Content>
@@ -95,7 +95,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
                     </span>
                   )}
                   <p className="text-sm opacity-50">
-                    Supabase employs auto-scaling storage and allows for manual disk size <br />{' '}
+                    Supabase employs auto-scaling storage and allows for manual disk size
                     adjustments when necessary
                   </p>
                 </div>
@@ -156,18 +156,38 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
         <Alert
           withIcon
           variant="info"
-          title={'Disk size configuration is not available for projects on the Free plan'}
+          title={
+            projectSubscriptionData?.plan?.id === 'free'
+              ? 'Disk size configuration is not available for projects on the Free plan'
+              : 'Disk size configuration is only available when disabling the spend cap.'
+          }
           actions={
             <Button asChild type="default">
-              <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>
-                Upgrade subscription
+              <Link
+                href={`/org/${organization?.slug}/billing?panel=${
+                  projectSubscriptionData?.plan?.id === 'free' ? 'subscriptionPlan' : 'costControl'
+                }`}
+                target="_blank"
+              >
+                {projectSubscriptionData?.plan?.id === 'free'
+                  ? 'Upgrade subscription'
+                  : 'Disable spend cap'}
               </Link>
             </Button>
           }
         >
           <div>
-            If you are intending to use more than 500MB of disk space, then you will need to upgrade
-            to at least the Pro plan.
+            {projectSubscriptionData?.plan?.id === 'free' ? (
+              <p>
+                If you are intending to use more than 500MB of disk space, then you will need to
+                upgrade to at least the Pro plan.
+              </p>
+            ) : (
+              <p>
+                If you are intending to use more than 8GB of disk space, then you will need to
+                disable your spend cap.
+              </p>
+            )}
           </div>
         </Alert>
       )}

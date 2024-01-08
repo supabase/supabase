@@ -104,11 +104,13 @@ const InvoicesSettings = () => {
                         <p>{x.number}</p>
                       </Table.td>
                       <Table.td>
-                        <InvoiceStatusBadge status={x.status} />
+                        <InvoiceStatusBadge status={x.status as InvoiceStatus} />
                       </Table.td>
                       <Table.td className="align-right">
                         <div className="flex items-center justify-end space-x-2">
-                          {[InvoiceStatus.UNCOLLECTIBLE, InvoiceStatus.OPEN].includes(x.status) && (
+                          {[InvoiceStatus.UNCOLLECTIBLE, InvoiceStatus.OPEN].includes(
+                            x.status as InvoiceStatus
+                          ) && (
                             <Button asChild>
                               <Link
                                 href={`https://redirect.revops.supabase.com/pay-invoice/${x.id}`}

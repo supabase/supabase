@@ -6,7 +6,7 @@ import logConstants from 'shared-data/logConstants'
 import BackwardIterator from 'components/ui/CodeEditor/Providers/BackwardIterator'
 import uniqBy from 'lodash/uniqBy'
 import { useEffect } from 'react'
-import { PlanId } from 'data/subscriptions/org-subscription-query'
+import { PlanId } from 'data/subscriptions/types'
 
 /**
  * Convert a micro timestamp from number/string to iso timestamp

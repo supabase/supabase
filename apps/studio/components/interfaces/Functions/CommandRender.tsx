@@ -22,7 +22,7 @@ const Command = ({ item }: any) => {
         <div className="flex gap-2 font-mono text-sm font-normal text-foreground">
           <span className="text-foreground-lighter">$</span>
           <span>
-            <span className="">{item.jsx ? item.jsx() : null} </span>
+            <span>{item.jsx ? item.jsx() : null} </span>
             <button
               type="button"
               className="text-foreground-lighter hover:text-foreground"
