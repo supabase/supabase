@@ -1,6 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { RenderEditCellProps } from 'react-data-grid'
 import { useCallback, useState } from 'react'
+import { RenderEditCellProps } from 'react-data-grid'
 import { IconMaximize, Popover } from 'ui'
 
 import { BlockKeys, MonacoEditor, NullValue } from 'components/grid/components/common'
@@ -36,6 +36,9 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   }, [])
 
   const saveChanges = useCallback((newValue: string | null) => {
+    if (newValue && newValue.slice(-3, -2) === ',') {
+      newValue = newValue.replace(/,(?=\s*?[\}\]])/g, '')
+    }
     if (newValue !== value) commitChange(newValue)
   }, [])
 
