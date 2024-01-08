@@ -236,7 +236,7 @@ export interface paths {
   }
   '/platform/organizations/{slug}/payments/setup-intent': {
     /** Sets up a payment method */
-    post: operations['SetupIntentController_setUpPaymentMethod']
+    post: operations['SetupIntentOrgController_setUpPaymentMethod']
   }
   '/platform/organizations/{slug}/billing/subscription': {
     /** Gets the current subscription */
@@ -466,6 +466,10 @@ export interface paths {
     delete: operations['ContentController_deleteContent']
     /** Updates project's content */
     patch: operations['ContentController_updateContent']
+  }
+  '/platform/projects/{ref}/daily-stats': {
+    /** Gets daily project stats */
+    get: operations['DailyStatsController_getDailyStats']
   }
   '/platform/projects/{ref}/databases': {
     /** Gets non-removed databases of a specified project */
@@ -1659,6 +1663,10 @@ export interface paths {
     /** List members of an organization */
     get: operations['V1OrganizationMembersController_v1ListOrganizationMembers']
   }
+  '/v1/organizations/{slug}': {
+    /** Gets information about the organization */
+    get: operations['V1OrganizationSlugController_getOrganization']
+  }
   '/v1/oauth/authorize': {
     /** Authorize user through oauth */
     get: operations['OAuthController_authorize']
@@ -2713,6 +2721,9 @@ export interface components {
         stripeAccount?: string
       }
     }
+    HCaptchaBody: {
+      hcaptchaToken: string
+    }
     SetupIntentResponse: {
       id: string
       object: string
@@ -2746,8 +2757,10 @@ export interface components {
         stripeAccount?: string
       }
     }
+    /** @enum {string} */
+    BillingPlanId: 'free' | 'pro' | 'team' | 'enterprise'
     BillingSubscriptionPlan: {
-      id: Record<string, never>
+      id: components['schemas']['BillingPlanId']
       name: string
       price: number
     }
@@ -2756,18 +2769,38 @@ export interface components {
       supabase_prod_id: string
       price: number
     }
+    /** @enum {string} */
+    ProjectAddonType: 'custom_domain' | 'compute_instance' | 'pitr'
+    /** @enum {string} */
+    AddonVariantId:
+      | 'ci_small'
+      | 'ci_medium'
+      | 'ci_large'
+      | 'ci_xlarge'
+      | 'ci_2xlarge'
+      | 'ci_4xlarge'
+      | 'ci_8xlarge'
+      | 'ci_12xlarge'
+      | 'ci_16xlarge'
+      | 'cd_default'
+      | 'pitr_7'
+      | 'pitr_14'
+      | 'pitr_28'
+    /** @enum {string} */
+    ProjectAddonVariantPricingType: 'fixed' | 'usage'
+    /** @enum {string} */
+    ProjectAddonPricingInterval: 'monthly' | 'hourly'
     ProjectAddonVariantResponse: {
-      identifier: string
+      identifier: components['schemas']['AddonVariantId']
+      price_type: components['schemas']['ProjectAddonVariantPricingType']
+      price_interval: components['schemas']['ProjectAddonPricingInterval']
       name: string
       price_description: string
-      price_type: Record<string, never>
-      price_interval: Record<string, never>
       price: number
       meta?: Record<string, never>
     }
     SelectedAddonResponse: {
-      /** @enum {string} */
-      type: 'custom_domain' | 'compute_instance' | 'pitr'
+      type: components['schemas']['ProjectAddonType']
       variant: components['schemas']['ProjectAddonVariantResponse']
     }
     BillingProjectAddonResponse: {
@@ -2827,9 +2860,9 @@ export interface components {
       expiry_year: number
     }
     ScheduledPlanChange: {
+      target_plan: components['schemas']['BillingPlanId']
       /** Format: date-time */
       at: string
-      target_plan: Record<string, never>
       usage_billing_enabled: boolean
     }
     GetSubscriptionResponse: {
@@ -2855,6 +2888,21 @@ export interface components {
       payment_method?: string
       /** @enum {string} */
       tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
+    }
+    /** @enum {string} */
+    BillingPlanChangeType: 'upgrade' | 'downgrade' | 'none'
+    /** @enum {string} */
+    BillingPlanEffectiveAt: 'now' | 'end_of_billing_period' | 'none'
+    PlanResponse: {
+      id: components['schemas']['BillingPlanId']
+      change_type: components['schemas']['BillingPlanChangeType']
+      effective_at: components['schemas']['BillingPlanEffectiveAt']
+      name: string
+      price: number
+      is_current: boolean
+    }
+    PlansResponse: {
+      plans: components['schemas']['PlanResponse'][]
     }
     UpcomingInvoice: Record<string, never>
     ColumnPrivilege: {
@@ -3749,6 +3797,8 @@ export interface components {
       amount: number
     }
     PreviewProjectTransferResponse: {
+      source_subscription_plan: components['schemas']['BillingPlanId']
+      target_subscription_plan: components['schemas']['BillingPlanId']
       valid: boolean
       warnings: components['schemas']['PreviewTransferInfo'][]
       errors: components['schemas']['PreviewTransferInfo'][]
@@ -3761,8 +3811,6 @@ export interface components {
       credits_on_source_organization: number
       costs_on_target_organization: number
       charge_on_target_organization: number
-      source_subscription_plan: Record<string, never>
-      target_subscription_plan: Record<string, unknown> | null
       source_invoice_items: components['schemas']['PreviewTransferInvoiceItem'][]
       target_invoice_items: components['schemas']['PreviewTransferInvoiceItem'][]
     }
@@ -3881,8 +3929,7 @@ export interface components {
       fileSizeLimit: number
     }
     AvailableAddonResponse: {
-      /** @enum {string} */
-      type: 'custom_domain' | 'compute_instance' | 'pitr'
+      type: components['schemas']['ProjectAddonType']
       name: string
       variants: components['schemas']['ProjectAddonVariantResponse'][]
     }
@@ -3892,9 +3939,8 @@ export interface components {
       available_addons: components['schemas']['AvailableAddonResponse'][]
     }
     UpdateAddonBody: {
-      addon_variant: Record<string, never>
-      /** @enum {string} */
-      addon_type: 'custom_domain' | 'compute_instance' | 'pitr'
+      addon_variant: components['schemas']['AddonVariantId']
+      addon_type: components['schemas']['ProjectAddonType']
     }
     ServiceApiKey: {
       api_key_encrypted?: string
@@ -4384,9 +4430,8 @@ export interface components {
       expiry_time: string
     }
     UpdateAddonAdminBody: {
-      addon_variant: Record<string, never>
-      /** @enum {string} */
-      addon_type: 'custom_domain' | 'compute_instance' | 'pitr'
+      addon_variant: components['schemas']['AddonVariantId']
+      addon_type: components['schemas']['ProjectAddonType']
       price_id?: string
     }
     DatabaseResponse: {
@@ -4775,6 +4820,12 @@ export interface components {
       role_name: string
       mfa_enabled: boolean
     }
+    V1OrganizationSlugResponse: {
+      plan?: components['schemas']['BillingPlanId']
+      opt_in_tags: ('AI_SQL_GENERATOR_OPT_IN' | 'PREVIEW_BRANCHES_OPT_IN')[]
+      id: string
+      name: string
+    }
     OAuthTokenBody: {
       /** @enum {string} */
       grant_type: 'authorization_code' | 'refresh_token'
@@ -4896,8 +4947,7 @@ export interface components {
       supabase_org_id: string
     }
     FlyOrganization: {
-      /** @enum {string} */
-      plan: 'free' | 'pro' | 'team' | 'enterprise'
+      plan: components['schemas']['BillingPlanId']
       id: string
       supabase_org_id: string
       name: string
@@ -6381,12 +6431,26 @@ export interface operations {
     }
   }
   /** Sets up a payment method */
-  SetupIntentController_setUpPaymentMethod: {
+  SetupIntentOrgController_setUpPaymentMethod: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['HCaptchaBody']
+      }
+    }
     responses: {
       201: {
         content: {
           'application/json': components['schemas']['SetupIntentResponse']
         }
+      }
+      403: {
+        content: never
       }
       /** @description Failed to set up a payment method */
       500: {
@@ -6501,7 +6565,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': Record<string, never>
+          'application/json': components['schemas']['PlansResponse']
         }
       }
       403: {
@@ -8461,6 +8525,32 @@ export interface operations {
       }
     }
   }
+  /** Gets daily project stats */
+  DailyStatsController_getDailyStats: {
+    parameters: {
+      query: {
+        attribute: string
+        interval: string
+        endDate: string
+        startDate: string
+      }
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': Record<string, never>
+        }
+      }
+      /** @description Failed to get daily project stats */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Gets non-removed databases of a specified project */
   DatabasesController_getDatabases: {
     parameters: {
@@ -9328,6 +9418,7 @@ export interface operations {
       path: {
         /** @description Project ref */
         ref: string
+        addon_variant: components['schemas']['AddonVariantId']
       }
     }
     responses: {
@@ -9838,6 +9929,25 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve invoice */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Sets up a payment method */
+  SetupIntentController_setUpPaymentMethod: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['HCaptchaBody']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['SetupIntentResponse']
+        }
+      }
+      /** @description Failed to set up a payment method */
       500: {
         content: never
       }
@@ -10871,6 +10981,7 @@ export interface operations {
       path: {
         /** @description Project ref */
         ref: string
+        addon_variant: components['schemas']['AddonVariantId']
       }
     }
     responses: {
@@ -12394,6 +12505,21 @@ export interface operations {
       200: {
         content: {
           'application/json': components['schemas']['V1OrganizationMemberResponse'][]
+        }
+      }
+    }
+  }
+  /** Gets information about the organization */
+  V1OrganizationSlugController_getOrganization: {
+    parameters: {
+      path: {
+        slug: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['V1OrganizationSlugResponse']
         }
       }
     }
