@@ -8,23 +8,42 @@ categories:
   - product
 tags:
   - supabase-engineering
-date: '2024-01-08'
+date: '2024-01-09'
 toc_depth: 3
 ---
 
 Elixir offers a powerful feature by allowing multiple nodes to communicate between them without extra services in the middle, reducing the overall complexity of your system.
 
-DIAGRAM GOES HERE
+<Img
+  src={{
+    dark: '/images/blog/elixir-clustering-using-postgres/elixir-multiple-nodes.png',
+    light: '/images/blog/elixir-clustering-using-postgres/elixir-multiple-nodes-light.png',
+  }}
+  alt="Elixir nodes communicating between each other without extra services in the middle"
+/>
 
 However, when it comes to connecting the servers, there seems to be a barrier of entry that many people encounter, including ourselves, on how to provide the name discovery required to connect said servers. We have released our approach to solving this problem by open-sourcing [libcluster Postgres Strategy](https://github.com/supabase/libcluster_postgres) and today, we explore the motivations behind its creation and the methodologies employed in its development. 
 
-DIAGRAM GOES HERE
+<Img
+  src={{
+    dark: '/images/blog/elixir-clustering-using-postgres/libcluster.png',
+    light: '/images/blog/elixir-clustering-using-postgres/libcluster.png',
+  }}
+  alt="Elixir nodes communicating between each other without extra services in the middle"
+/>
 
 ## Why do we need a distributed Erlang Cluster?
 
 At Supabase, we use clustering in all of our Elixir projects which include [Logflare](https://github.com/Logflare/logflare), [Supavisor](https://github.com/supabase/supavisor) and [Realtime](https://github.com/supabase/realtime). With multiple servers connected, we can load shed, create globally distributed services, and provide the best service to our customers so we’re closer to them geographically and to their instances, reducing overall latency.
 
-DIAGRAM GOES HERE
+<Img
+  src={{
+    dark: '/images/blog/elixir-clustering-using-postgres/realtime-architecture.png',
+    light: '/images/blog/elixir-clustering-using-postgres/realtime-architecture-light.png',
+  }}
+  alt="Example of Realtime architecture where a customer from CA will connect to the server closest to them and their Supabase instance"
+/>
+
 
 To achieve a connected cluster, we wanted to be as cloud-agnostic as possible. This makes our self-hosting options more accessible. We don’t want to introduce extra services to solve this single issue - Postgres is the logical way to achieve it.
 
