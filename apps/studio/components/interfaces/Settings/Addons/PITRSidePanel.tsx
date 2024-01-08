@@ -26,6 +26,7 @@ import {
 } from 'ui'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { AlertTriangleIcon } from 'lucide-react'
+import { AddonVariantId } from 'data/subscriptions/types'
 
 const PITR_CATEGORY_OPTIONS: {
   id: 'off' | 'on'
@@ -149,7 +150,7 @@ const PITRSidePanel = () => {
     if (selectedOption === 'pitr_0' && subscriptionPitr !== undefined) {
       removeAddon({ projectRef, variant: subscriptionPitr.variant.identifier })
     } else {
-      updateAddon({ projectRef, type: 'pitr', variant: selectedOption })
+      updateAddon({ projectRef, type: 'pitr', variant: selectedOption as AddonVariantId })
     }
   }
 

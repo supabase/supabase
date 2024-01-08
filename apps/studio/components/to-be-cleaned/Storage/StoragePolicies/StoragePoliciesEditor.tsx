@@ -118,7 +118,7 @@ const StoragePoliciesEditor = ({
   const selectedRoles = policyFormFields.roles
 
   return (
-    <div className="">
+    <div>
       <div className="mb-8 space-y-8 py-6">
         <Modal.Content>
           <PolicyName

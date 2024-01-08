@@ -9,7 +9,7 @@ const CliGlobalFlagsHandler = () => {
     <RefSubLayout.EducationRow className="not-prose">
       <RefSubLayout.Details>
         <h3 className="text-lg text-foreground mb-3">Flags</h3>
-        <ul className="">
+        <ul>
           {spec.flags.map((flag) => {
             return (
               <Param
