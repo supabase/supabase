@@ -1,27 +1,16 @@
 import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { FC, useState } from 'react'
+import { FC } from 'react'
 import { Button, IconCommand, IconGitHub, IconSearch, SearchButton } from 'ui'
 import { useIsLoggedIn, useIsUserLoading } from 'common'
 
-import { getPageType } from '~/lib/helpers'
-import { REFERENCES } from './NavigationMenu.constants'
 import ThemeToggle from '@ui/components/ThemeProvider/ThemeToggle'
 
 const TopNavBar: FC = () => {
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
   const { resolvedTheme } = useTheme()
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-
-  const { asPath, push } = useRouter()
-  const pathSegments = asPath.split('/')
-
-  const library = pathSegments.length >= 3 ? pathSegments[2] : undefined
-  const libraryMeta = REFERENCES?.[library] ?? undefined
-  const versions = libraryMeta?.versions ?? []
 
   return (
     <nav className="h-[60px] border-b backdrop-blur backdrop-filter bg bg-opacity-75">
@@ -89,7 +78,7 @@ const TopNavBar: FC = () => {
           )}
           {process.env.NEXT_PUBLIC_DEV_AUTH_PAGE === 'true' && (
             <Button asChild>
-              <Link href="/__dev-secret-auth">Supabase Team signin</Link>
+              <Link href="/__dev-secret-auth">Dev-only secret signin</Link>
             </Button>
           )}
           <Link

@@ -14,6 +14,7 @@ import {
   cn,
   IconCopy,
   IconCheck,
+  ScrollArea,
 } from 'ui'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { proxy, useSnapshot } from 'valtio'
@@ -40,7 +41,7 @@ function toInstanceKey(instance: InstanceData | null) {
   return [
     instance.organization?.id ?? null,
     // @ts-ignore -- problem with OpenAPI spec that codegen reads from
-    instance.project.ref,
+    instance.project.ref as string,
     instance.branch?.id ?? null,
   ] satisfies InstanceKey
 }
@@ -71,46 +72,38 @@ function fromStoredString(maybeInstanceKey: string) {
   }
 }
 
-function escapeSpacedSlashes(str: string) {
-  return str.replace(/ \/ /g, ' [forward-slash] ')
-}
-
-function restoreSpacedSlashes(str: string) {
-  return str.replace(/ \[forward-slash\] /g, ' / ')
-}
-
 function toPrettyString(instance: InstanceData | null) {
   if (!instance) return ''
 
   const { organization, project, branch = null } = instance
-  return `${
-    organization ? `${escapeSpacedSlashes(organization.name)} / ` : ''
-  }${escapeSpacedSlashes(project.name)}${branch ? ` / ${escapeSpacedSlashes(branch.name)}` : ''}`
+  return `${organization ? `${organization.name} / ` : ''}${project.name}${
+    branch ? ` / ${branch.name}` : ''
+  }`
 }
 
-function fromPrettyString(instances: InstanceData[], maybeInstance: string) {
-  const [organizationNameEscaped, projectNameEscaped, branchNameEscaped] =
-    maybeInstance.split(' / ')
-  const organizationName = organizationNameEscaped
-    ? restoreSpacedSlashes(organizationNameEscaped)
-    : null
-  const projectName = projectNameEscaped ? restoreSpacedSlashes(projectNameEscaped) : null
-  const branchName = branchNameEscaped ? restoreSpacedSlashes(branchNameEscaped) : null
+/**
+ * The Command component uses the `value` for both search matching and selection.
+ * Because the two are conflated, the value must contain both:
+ * 1. The organization/project/branch refs, for uniquely identifying the project
+ * 2. The organization/project/branch name, so combobox search works as expected.
+ */
+function toCommandValue(instance: InstanceData) {
+  const instanceKey = toInstanceKey(instance)
+  const prettyString = toPrettyString(instance)
+  return JSON.stringify([instanceKey, prettyString])
+}
 
-  if (organizationName && projectName) {
-    return (
-      instances.find(
-        (instance) =>
-          // This gets filtered through `Command`'s `value` prop,
-          // which automatically converts to lowercase
-          instance.organization?.name.toLowerCase() === organizationName &&
-          instance.project?.name.toLowerCase() === projectName &&
-          (!instance.branch || instance.branch.name.toLowerCase() === branchName)
-      ) ?? null
-    )
+function getKeyFromCommandValue(maybeInstance: string) {
+  try {
+    const instance = JSON.parse(maybeInstance)
+    // For maximum safety, should check that the structure matches rather than casting,
+    // but we can avoid that complexity as long as this is only ever used to decode
+    // values encoded by `toCommandValue`
+    return instance[0] as InstanceKey
+  } catch {
+    console.error('Failed to parse instance key from command value:', maybeInstance)
+    return null
   }
-
-  return null
 }
 
 const instanceStore = proxy({
@@ -183,24 +176,27 @@ function ComboBox({
           <CommandInput placeholder="Search project..." className="border-none ring-0" />
           <CommandEmpty>No project found.</CommandEmpty>
           <CommandGroup>
-            {instances.map((instance) => (
-              <CommandItem
-                key={toStoredString(toInstanceKey(instance))}
-                onSelect={(selectedValue: string) => {
-                  const newSelectedInstance = fromPrettyString(instances, selectedValue)
-                  setSelectedInstanceKey(toInstanceKey(newSelectedInstance))
-                  setOpen(false)
-                }}
-              >
-                <Check
-                  className={cn(
-                    'mr-2 h-4 w-4',
-                    instance === selectedInstance ? 'opacity-100' : 'opacity-0'
-                  )}
-                />
-                {toPrettyString(instance)}
-              </CommandItem>
-            ))}
+            <ScrollArea className={instances.length > 10 ? 'h-[280px]' : ''}>
+              {instances.map((instance) => (
+                <CommandItem
+                  key={toStoredString(toInstanceKey(instance))}
+                  value={toCommandValue(instance)}
+                  onSelect={(selectedValue: string) => {
+                    const instanceKey = getKeyFromCommandValue(selectedValue)
+                    setSelectedInstanceKey(instanceKey)
+                    setOpen(false)
+                  }}
+                >
+                  <Check
+                    className={cn(
+                      'mr-2 h-4 w-4',
+                      instance === selectedInstance ? 'opacity-100' : 'opacity-0'
+                    )}
+                  />
+                  {toPrettyString(instance)}
+                </CommandItem>
+              ))}
+            </ScrollArea>
           </CommandGroup>
         </Command>
       </PopoverContent>
