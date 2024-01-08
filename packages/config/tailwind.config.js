@@ -241,17 +241,18 @@ const uiConfig = ui({
             },
             a: {
               position: 'relative',
-              transition: 'opacity 0.18s ease',
+              transition: 'all 0.18s ease',
               paddingBottom: '2px',
               fontWeight: '400',
               opacity: 1,
               color: 'hsl(var(--foreground-default))',
               textDecorationLine: 'underline',
+              textDecorationColor: 'hsl(var(--foreground-lighter))',
               textDecorationThickness: '1px',
               textUnderlineOffset: '2px',
             },
             'a:hover': {
-              opacity: 0.7,
+              textDecorationColor: 'hsl(var(--foreground-default))',
             },
             figcaption: {
               color: 'hsl(var(--foreground-muted))',
