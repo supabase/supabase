@@ -1,6 +1,5 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { isResponseOk, put } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { put } from 'data/fetchers'
 import { toast } from 'react-hot-toast'
 import { ResponseError } from 'types/base'
 import { subscriptionKeys } from './keys'
@@ -22,15 +21,22 @@ export async function updateOrgSubscription({
   if (!slug) throw new Error('slug is required')
   if (!tier) throw new Error('tier is required')
 
-  const payload: { tier: string; payment_method?: string } = { tier }
+  const payload: { tier: SubscriptionTier; payment_method?: string } = { tier }
   if (paymentMethod !== undefined) payload.payment_method = paymentMethod
 
-  const response = await put<void>(`${API_URL}/organizations/${slug}/billing/subscription`, payload)
-  if (!isResponseOk(response)) {
-    throw response.error
+  const { error, data } = await put(`/platform/organizations/{slug}/billing/subscription`, {
+    body: {
+      payment_method: payload.payment_method,
+      tier: payload.tier,
+    },
+    params: { path: { slug } },
+  })
+
+  if (error) {
+    throw error
   }
 
-  return response
+  return data
 }
 
 type OrgSubscriptionUpdateData = Awaited<ReturnType<typeof updateOrgSubscription>>
