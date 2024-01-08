@@ -196,7 +196,7 @@ const Addons = () => {
                   </div>
                   <div className="flex-grow">
                     <p className="text-sm text-foreground-light">Current option:</p>
-                    <p className="">{computeInstance?.variant.name ?? 'Micro'}</p>
+                    <p>{computeInstance?.variant.name ?? 'Micro'}</p>
                     <ProjectUpdateDisabledTooltip
                       projectUpdateDisabled={projectUpdateDisabled}
                       projectNotActive={!isProjectActive}
@@ -375,7 +375,7 @@ const Addons = () => {
                   </div>
                   <div>
                     <p className="text-sm text-foreground-light">Current option:</p>
-                    <p className="">
+                    <p>
                       {pitr !== undefined
                         ? `Point in time recovery of ${pitr.variant.meta?.backup_duration_days} days is enabled`
                         : 'Point in time recovery is not enabled'}
@@ -470,7 +470,7 @@ const Addons = () => {
                   </div>
                   <div>
                     <p className="text-sm text-foreground-light">Current option:</p>
-                    <p className="">
+                    <p>
                       {customDomain !== undefined
                         ? 'Custom domain is enabled'
                         : 'Custom domain is not enabled'}
