@@ -10,7 +10,7 @@ import InformationBox from 'components/ui/InformationBox'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useOrganizationBillingSubscriptionPreview } from 'data/organizations/organization-billing-subscription-preview'
-import { useOrgPlansQuery } from 'data/subscriptions/org-plans-query'
+import { OrgPlan } from 'data/subscriptions/types'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
 import { SubscriptionTier } from 'data/subscriptions/types'
@@ -34,6 +34,7 @@ import EnterpriseCard from './EnterpriseCard'
 import ExitSurveyModal from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import PaymentMethodSelection from './PaymentMethodSelection'
+import { useOrgPlansQuery } from 'data/subscriptions/org-plans-query'
 
 const PlanUpdateSidePanel = () => {
   const { ui } = useStore()
@@ -96,7 +97,7 @@ const PlanUpdateSidePanel = () => {
     isSuccess: subscriptionPreviewInitialized,
   } = useOrganizationBillingSubscriptionPreview({ tier: selectedTier, organizationSlug: slug })
 
-  const availablePlans = plans ?? []
+  const availablePlans: OrgPlan[] = plans?.plans ?? []
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
   const subscriptionPlanMeta = subscriptionsPlans.find((tier) => tier.id === selectedTier)
 

@@ -535,7 +535,7 @@ const NewFeaturesAndIntegrations = () => {
               If you're new to Supabase, here's a few of the things you get when you choose us as
               your backend.
             </p>
-            <ul className="">
+            <ul>
               <li className="mb-10">
                 <p className="w-20 pb-2 mb-2 border-b-2 border-default">Auth</p>
                 <p className="mb-5">

@@ -39,12 +39,12 @@ const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) =
         router.push(`/project/${ref}/functions/${item.slug}/details`)
       }}
     >
-      <Table.td className="">
+      <Table.td>
         <div className="flex items-center gap-2">
           <p className="text-sm text-foreground">{item.name}</p>
         </div>
       </Table.td>
-      <Table.td className="">
+      <Table.td>
         <div className="text-xs text-foreground-light flex gap-2 items-center truncate">
           <p className="font-mono truncate hidden md:inline">{endpoint}</p>
           <button
