@@ -21,6 +21,10 @@ export interface paths {
     /** Update notifications */
     patch: operations['NotificationsController_updateNotificationsV2']
   }
+  '/platform/notifications/summary': {
+    /** Get an aggregated data of interest across all notifications for the user */
+    get: operations['NotificationsController_getNotificationsSummary']
+  }
   '/platform/reset-password': {
     /** Reset password for email */
     post: operations['ResetPasswordController_resetPassword']
@@ -242,7 +246,7 @@ export interface paths {
   }
   '/platform/organizations/{slug}/billing/subscription/preview': {
     /** Preview subscription changes */
-    post: operations['SubscriptionController_previewSubscriptionChangeV2']
+    post: operations['SubscriptionController_previewSubscriptionChange']
   }
   '/platform/organizations/{slug}/billing/subscription/schedule': {
     /** Deletes any upcoming subscription schedule */
@@ -254,7 +258,7 @@ export interface paths {
   }
   '/platform/organizations/{slug}/billing/invoices/upcoming': {
     /** Gets the upcoming invoice */
-    get: operations['OrgInvoicesController_getUpcomingInvoiceV2']
+    get: operations['OrgInvoicesController_getUpcomingInvoice']
   }
   '/platform/pg-meta/{ref}/column-privileges': {
     /** Retrieve column privileges */
@@ -463,10 +467,6 @@ export interface paths {
     /** Updates project's content */
     patch: operations['ContentController_updateContent']
   }
-  '/platform/projects/{ref}/daily-stats': {
-    /** Gets daily project stats */
-    get: operations['DailyStatsController_getDailyStats']
-  }
   '/platform/projects/{ref}/databases': {
     /** Gets non-removed databases of a specified project */
     get: operations['DatabasesController_getDatabases']
@@ -494,12 +494,6 @@ export interface paths {
   '/platform/projects/{ref}/infra-monitoring': {
     /** Gets project's usage metrics */
     get: operations['InfraMonitoringController_getUsageMetrics']
-  }
-  '/platform/projects/{ref}/invoices': {
-    /** Gets project's invoices */
-    get: operations['InvoicesController_getInvoices']
-    /** Gets project's invoice count */
-    head: operations['InvoicesController_getInvoiceCount']
   }
   '/platform/projects/{ref}/pause': {
     /** Pauses the project */
@@ -729,6 +723,10 @@ export interface paths {
     /** Gets the project with the given ID if provided, otherwise gets the list of projects */
     get: operations['VercelProjectsController_getVercelProjects']
   }
+  '/platform/vercel/projects/{id}': {
+    /** Gets the Vercel project with the given ID */
+    get: operations['VercelProjectsController_getVercelProject']
+  }
   '/platform/vercel/projects/envs': {
     /** Gets the environment variables for the given project ID on behalf of the given team ID */
     get: operations['VercelEnvironmentVariablesController_getEnvironmentVariables']
@@ -931,6 +929,10 @@ export interface paths {
     delete: operations['NotificationsController_deleteNotifications']
     /** Update notifications */
     patch: operations['NotificationsController_updateNotificationsV2']
+  }
+  '/v0/notifications/summary': {
+    /** Get an aggregated data of interest across all notifications for the user */
+    get: operations['NotificationsController_getNotificationsSummary']
   }
   '/v0/status': {
     /** Get infrastructure status */
@@ -1217,10 +1219,6 @@ export interface paths {
     /** Updates project's content */
     patch: operations['ContentController_updateContent']
   }
-  '/v0/projects/{ref}/daily-stats': {
-    /** Gets daily project stats */
-    get: operations['DailyStatsController_getDailyStats']
-  }
   '/v0/projects/{ref}/databases': {
     /** Gets non-removed databases of a specified project */
     get: operations['DatabasesController_getDatabases']
@@ -1248,12 +1246,6 @@ export interface paths {
   '/v0/projects/{ref}/infra-monitoring': {
     /** Gets project's usage metrics */
     get: operations['InfraMonitoringController_getUsageMetrics']
-  }
-  '/v0/projects/{ref}/invoices': {
-    /** Gets project's invoices */
-    get: operations['InvoicesController_getInvoices']
-    /** Gets project's invoice count */
-    head: operations['InvoicesController_getInvoiceCount']
   }
   '/v0/projects/{ref}/pause': {
     /** Pauses the project */
@@ -1430,6 +1422,7 @@ export interface paths {
     post: operations['ProjectsController_createProject']
   }
   '/v1/projects/{ref}/api-keys': {
+    /** Get project api keys */
     get: operations['ApiKeysController_getProjectApiKeys']
   }
   '/v1/projects/{ref}/branches': {
@@ -1734,6 +1727,18 @@ export interface components {
     UpdateNotificationsBodyV1: {
       ids: string[]
     }
+    NotificationAction: {
+      label: string
+      url?: string
+      action_type?: string
+    }
+    NotificationData: {
+      org_slug?: string
+      project_ref?: string
+      title: string
+      message?: string
+      actions?: components['schemas']['NotificationAction'][]
+    }
     NotificationResponseV2: {
       /** @enum {string} */
       type:
@@ -1746,11 +1751,16 @@ export interface components {
       status: 'new' | 'seen' | 'archived'
       /** @enum {string} */
       priority: 'Critical' | 'Warning' | 'Info'
+      data: components['schemas']['NotificationData']
       id: string
       inserted_at: string
       name: string
-      data: Record<string, never>
       meta: Record<string, never>
+    }
+    NotificationsSummary: {
+      unread_count: number
+      has_warning: boolean
+      has_critical: boolean
     }
     UpdateNotificationBodyV2: {
       id: string
@@ -3466,6 +3476,7 @@ export interface components {
         | 'us-east-1'
         | 'us-west-1'
         | 'us-west-2'
+        | 'ap-east-1'
         | 'ap-southeast-1'
         | 'ap-northeast-1'
         | 'ap-northeast-2'
@@ -3827,6 +3838,7 @@ export interface components {
       effective_cache_size?: string
       maintenance_work_mem?: string
       max_connections?: number
+      max_locks_per_transaction?: number
       max_parallel_maintenance_workers?: number
       max_parallel_workers?: number
       max_parallel_workers_per_gather?: number
@@ -3841,6 +3853,7 @@ export interface components {
       effective_cache_size?: string
       maintenance_work_mem?: string
       max_connections?: number
+      max_locks_per_transaction?: number
       max_parallel_maintenance_workers?: number
       max_parallel_workers?: number
       max_parallel_workers_per_gather?: number
@@ -3879,7 +3892,7 @@ export interface components {
       available_addons: components['schemas']['AvailableAddonResponse'][]
     }
     UpdateAddonBody: {
-      addon_variant: string
+      addon_variant: Record<string, never>
       /** @enum {string} */
       addon_type: 'custom_domain' | 'compute_instance' | 'pitr'
     }
@@ -4251,7 +4264,6 @@ export interface components {
     }
     SyncVercelEnvError: {
       message: string
-      details: string
     }
     CreateVercelConnectionResponse: {
       id: string
@@ -4372,7 +4384,7 @@ export interface components {
       expiry_time: string
     }
     UpdateAddonAdminBody: {
-      addon_variant: string
+      addon_variant: Record<string, never>
       /** @enum {string} */
       addon_type: 'custom_domain' | 'compute_instance' | 'pitr'
       price_id?: string
@@ -4589,6 +4601,7 @@ export interface components {
         | 'us-east-1'
         | 'us-west-1'
         | 'us-west-2'
+        | 'ap-east-1'
         | 'ap-southeast-1'
         | 'ap-northeast-1'
         | 'ap-northeast-2'
@@ -4631,6 +4644,7 @@ export interface components {
       default_pool_size?: number
       ignore_startup_parameters?: string
       max_client_conn?: number
+      connection_string?: string
     }
     AuthConfigResponse: {
       smtp_admin_email?: string
@@ -4974,7 +4988,8 @@ export interface operations {
   NotificationsController_getNotificationsV2: {
     parameters: {
       query: {
-        archived?: boolean
+        status: 'new' | 'seen' | 'archived'
+        priority: 'Critical' | 'Warning' | 'Info'
         offset: number
         limit: number
       }
@@ -5026,6 +5041,16 @@ export interface operations {
       /** @description Failed to update notifications */
       500: {
         content: never
+      }
+    }
+  }
+  /** Get an aggregated data of interest across all notifications for the user */
+  NotificationsController_getNotificationsSummary: {
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['NotificationsSummary']
+        }
       }
     }
   }
@@ -6419,7 +6444,7 @@ export interface operations {
     }
   }
   /** Preview subscription changes */
-  SubscriptionController_previewSubscriptionChangeV2: {
+  SubscriptionController_previewSubscriptionChange: {
     parameters: {
       path: {
         /** @description Organization slug */
@@ -6489,7 +6514,7 @@ export interface operations {
     }
   }
   /** Gets the upcoming invoice */
-  OrgInvoicesController_getUpcomingInvoiceV2: {
+  OrgInvoicesController_getUpcomingInvoice: {
     parameters: {
       path: {
         /** @description Organization slug */
@@ -8436,32 +8461,6 @@ export interface operations {
       }
     }
   }
-  /** Gets daily project stats */
-  DailyStatsController_getDailyStats: {
-    parameters: {
-      query: {
-        attribute: string
-        interval: string
-        endDate: string
-        startDate: string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>
-        }
-      }
-      /** @description Failed to get daily project stats */
-      500: {
-        content: never
-      }
-    }
-  }
   /** Gets non-removed databases of a specified project */
   DatabasesController_getDatabases: {
     parameters: {
@@ -8627,48 +8626,6 @@ export interface operations {
         }
       }
       /** @description Failed to get project's usage metrics */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Gets project's invoices */
-  InvoicesController_getInvoices: {
-    parameters: {
-      query?: {
-        limit?: string
-        offset?: string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>[]
-        }
-      }
-      /** @description Failed to get project's invoices */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Gets project's invoice count */
-  InvoicesController_getInvoiceCount: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: never
-      }
-      /** @description Failed to get project's invoice count */
       500: {
         content: never
       }
@@ -9371,7 +9328,6 @@ export interface operations {
       path: {
         /** @description Project ref */
         ref: string
-        addon_variant: string
       }
     }
     responses: {
@@ -9814,6 +9770,28 @@ export interface operations {
       }
     }
   }
+  /** Gets invoices for the given customer */
+  InvoicesController_getInvoices: {
+    parameters: {
+      query: {
+        customer: string
+        slug?: string
+        limit: string
+        offset: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['Invoice'][]
+        }
+      }
+      /** @description Failed to retrieve invoices */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Gets the total count of invoices for the given customer */
   InvoicesController_countInvoices: {
     parameters: {
@@ -9985,6 +9963,29 @@ export interface operations {
         }
       }
       /** @description Failed to get project(s) */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets the Vercel project with the given ID */
+  VercelProjectsController_getVercelProject: {
+    parameters: {
+      header: {
+        vercel_authorization: string
+      }
+      path: {
+        id: string
+        teamId: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': Record<string, never>
+        }
+      }
+      /** @description Failed to get project */
       500: {
         content: never
       }
@@ -10870,7 +10871,6 @@ export interface operations {
       path: {
         /** @description Project ref */
         ref: string
-        addon_variant: string
       }
     }
     responses: {
@@ -11122,6 +11122,7 @@ export interface operations {
       }
     }
   }
+  /** Get project api keys */
   ApiKeysController_getProjectApiKeys: {
     parameters: {
       path: {
