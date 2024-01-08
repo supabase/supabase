@@ -104,12 +104,12 @@ const InvoicesSettings = () => {
                         <p>{x.number}</p>
                       </Table.td>
                       <Table.td>
-                        <InvoiceStatusBadge status={x.status as any} />
+                        <InvoiceStatusBadge status={x.status as InvoiceStatus} />
                       </Table.td>
                       <Table.td className="align-right">
                         <div className="flex items-center justify-end space-x-2">
                           {[InvoiceStatus.UNCOLLECTIBLE, InvoiceStatus.OPEN].includes(
-                            x.status as any
+                            x.status as InvoiceStatus
                           ) && (
                             <Button asChild>
                               <Link
