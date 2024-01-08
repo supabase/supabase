@@ -25,6 +25,25 @@ interface SchemaGraphProps {
 }
 
 const SchemaFlowHandler = ({ content }: SchemaGraphProps) => {
+  console.log('the actual content', content)
+  const fakeContent = `CREATE TABLE
+  users (
+    id bigint primary key generated always as identity,
+    username text,
+    email text,
+    password text,
+    joined_at timestamp with time zone
+  );
+
+CREATE TABLE
+  tweets (
+    id bigint primary key generated always as identity,
+    user_id bigint,
+    content text,
+    created_at timestamp with time zone,
+    foreign key (user_id) references users (id)
+  );
+`
   const { resolvedTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const [tables, setTables] = useState<PostgresTable[]>([])
@@ -93,21 +112,6 @@ const SchemaFlowHandler = ({ content }: SchemaGraphProps) => {
 }
 
 const ExportedSchemaGraph = ({ content }: SchemaGraphProps) => {
-  const snap = useAppStateSnapshot()
-  const params = useParams()
-
-  const runId = params.runId as string
-
-  useEffect(() => {
-    const runIsLoading = snap.runsLoading.includes(runId)
-    if (runIsLoading) {
-      // let currentRunsLoading = snap.runsLoading
-      const payload = [...snap.runsLoading.filter((item) => item !== runId)]
-      snap.setRunsLoading([...payload])
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [runId]) // Intentionally left snap out of the dependency array
-
   return (
     <ReactFlowProvider>
       <SchemaFlowHandler content={content} />

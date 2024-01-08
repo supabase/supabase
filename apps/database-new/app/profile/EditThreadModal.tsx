@@ -21,7 +21,7 @@ const EditThreadModal = ({
     message: undefined,
     success: undefined,
     data: {
-      row_id: thread.id,
+      thread_id: thread.thread_id,
       thread_title: thread.thread_title,
     },
   }
@@ -65,7 +65,7 @@ const EditThreadModal = ({
             name="thread_title"
             defaultValue={state.data.thread_title}
           />
-          <Input_Shadcn_ name="row_id" value={state.data.row_id} type="hidden" />
+          <Input_Shadcn_ name="thread_id" value={state.data.thread_id} type="hidden" />
         </Modal.Content>
         <Modal.Separator />
         <Modal.Content className="flex flex-row gap-3 justify-end">

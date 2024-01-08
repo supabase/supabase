@@ -4,7 +4,7 @@ import { CHAT_EXAMPLES } from '@/data/chat-examples'
 import { useAppStateSnapshot } from '@/lib/state'
 import { createClient } from '@/lib/supabase/client'
 import { ExternalLink } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useFormState } from 'react-dom'
 import { createThread } from './actions'
 import { AssistantChatForm } from '@/components/AssistantChatForm'
@@ -25,17 +25,17 @@ const NewThreadInput = () => {
   })
 
   const initialState = {
+    input: undefined,
     message: undefined,
     success: undefined,
     data: {
       value,
-      runId: undefined,
       threadId: undefined,
       messageId: undefined,
     },
   }
 
-  const [state, formAction] = useFormState(createThread, initialState)
+  //const [state, formAction] = useFormState(createThread, initialState)
 
   // useEffect(() => {
   //   if (state.success && state.data.threadId && state.data.runId && state.data.messageId) {
@@ -55,7 +55,7 @@ const NewThreadInput = () => {
     <>
       <div className="relative w-10/12 xl:w-11/12 max-w-xl">
         <AssistantChatForm
-          action={formAction}
+          // formAction={formAction}
           key={'new-thread-form'}
           id={'new-thread-form'}
           onSubmit={async (event) => {
@@ -72,9 +72,9 @@ const NewThreadInput = () => {
           value={value}
           placeholder="e.g Create a Telegram-like chat application"
           onValueChange={(e) => setValue(e.target.value)}
-          message={state?.message}
+          //message={state?.message}
         />
-        {state?.message && <p>{state?.message}</p>}
+        {/* {state?.message && <p>{state?.message}</p>} */}
       </div>
       <div className="flex gap-3">
         {suggestions.map((suggestion, idx) => (

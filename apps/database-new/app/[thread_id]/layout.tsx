@@ -1,14 +1,15 @@
-import { Chat } from '@/app/[threadId]/[runId]/Chat'
 import SaveSchemaDropdown from '@/components/Header/SaveSchemaDropdown'
 import ToggleCodeEditorButton from '@/components/Header/ToggleCodeEditorButton'
+import { Chat } from './Chat'
 
 export default function Layout({
   children,
   params,
 }: {
   children: React.ReactNode
-  params: { threadId: string; runId: string }
+  params: { thread_id: string }
 }) {
+  console.log('layout params', params)
   return (
     <div className="flex flex-col-reverse items-between xl:flex-row xl:items-center xl:justify-between bg-alternative h-full">
       <Chat params={params} />
@@ -16,6 +17,7 @@ export default function Layout({
         <ToggleCodeEditorButton />
         <SaveSchemaDropdown />
       </div>
+
       {children}
     </div>
   )

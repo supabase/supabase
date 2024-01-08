@@ -7,7 +7,7 @@ import { Messages } from './Messages'
 import { ChatInput } from './ChatInput'
 import { BottomMarker } from './BottomMarker'
 
-async function Chat({ params }: { params: { threadId: string; runId: string } }) {
+async function Chat({ params }: { params: { thread_id: string } }) {
   return (
     <div
       className={cn(

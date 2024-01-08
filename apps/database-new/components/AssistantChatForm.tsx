@@ -3,6 +3,16 @@ import React, { ChangeEvent, createRef, useEffect } from 'react'
 import { useFormStatus } from 'react-dom'
 import { TextArea_Shadcn_, cn } from 'ui'
 
+import { createClient } from '@/lib/supabase/server'
+import { revalidatePath } from 'next/cache'
+
+import { redirect } from 'next/navigation'
+
+import { z } from 'zod'
+import { useChat } from 'ai/react'
+import { Message } from 'ai'
+import { createThread } from '@/app/actions'
+
 export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
   loading?: boolean
   disabled?: boolean
@@ -10,12 +20,23 @@ export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
   onValueChange: (value: ChangeEvent<HTMLTextAreaElement>) => void
   message?: string
   children?: React.ReactNode
+  threadId?: string
+  //formAction: (formData: FormData) => void
 }
 
 const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
-  ({ loading, disabled, value, onValueChange, message, ...props }, ref) => {
+  ({ loading, disabled, value, onValueChange, message, threadId, ...props }, ref) => {
     const textAreaRef = createRef<HTMLTextAreaElement>()
     const submitRef = createRef<HTMLButtonElement>()
+
+    const { messages, input, handleInputChange, handleSubmit } = useChat({
+      onFinish: redirectOnFinish,
+    })
+
+    async function redirectOnFinish(message: Message) {
+      console.log('AssistantChatForm', { input }, { message })
+      createThread(input, message, threadId)
+    }
 
     useEffect(() => {
       if (textAreaRef) {
@@ -83,31 +104,41 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
     }
 
     return (
-      <form ref={ref} className="relative" {...props}>
-        <div className={cn('absolute', 'top-2 left-2', 'ml-1 w-6 h-6 rounded-full bg-dbnew')}></div>
-        <TextArea_Shadcn_
-          name="value"
-          ref={textAreaRef}
-          autoFocus
-          rows={1}
-          disabled={disabled || submitRef.current?.disabled}
-          contentEditable
-          required
-          className={
-            'transition-all text-sm pl-12 pr-10 rounded-[18px] resize-none box-border leading-6'
-          }
-          placeholder={props.placeholder}
-          spellCheck={false}
-          value={value}
-          onChange={(event: ChangeEvent<HTMLTextAreaElement>) => onValueChange(event)}
-          onKeyDown={handleKeyDown}
-        />
-        {props.children}
-        <SubmitButton />
-        <p aria-live="polite" className="sr-only" role="status">
-          {message}
-        </p>
-      </form>
+      <>
+        {messages.map((m) => (
+          <div key={m.id}>
+            {m.role === 'user' ? 'User: ' : 'AI: '}
+            {m.content}
+          </div>
+        ))}
+        <form ref={ref} className="relative" onSubmit={handleSubmit}>
+          <div
+            className={cn('absolute', 'top-2 left-2', 'ml-1 w-6 h-6 rounded-full bg-dbnew')}
+          ></div>
+          <TextArea_Shadcn_
+            name="value"
+            ref={textAreaRef}
+            autoFocus
+            rows={1}
+            disabled={disabled || submitRef.current?.disabled}
+            contentEditable
+            required
+            className={
+              'transition-all text-sm pl-12 pr-10 rounded-[18px] resize-none box-border leading-6'
+            }
+            placeholder={props.placeholder}
+            spellCheck={false}
+            value={input}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+          />
+          {props.children}
+          <SubmitButton />
+          <p aria-live="polite" className="sr-only" role="status">
+            {message}
+          </p>
+        </form>
+      </>
     )
   }
 )
