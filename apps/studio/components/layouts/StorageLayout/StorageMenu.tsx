@@ -141,7 +141,7 @@ const StorageMenu = () => {
             )}
           </div>
           <div className="h-px w-full bg-border"></div>
-          <div className="">
+          <div>
             <Menu.Group title="Configuration" />
             <Link href={`/project/${ref}/storage/policies`} legacyBehavior>
               <Menu.Item rounded active={page === 'policies'}>
