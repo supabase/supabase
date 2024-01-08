@@ -32,6 +32,7 @@ import {
 
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { AddonVariantId } from 'data/subscriptions/types'
 
 const COMPUTE_CATEGORY_OPTIONS: {
   id: 'micro' | 'optimized'
@@ -170,7 +171,11 @@ const ComputeInstanceSidePanel = () => {
     if (selectedOption === 'ci_micro' && subscriptionCompute !== undefined) {
       removeAddon({ projectRef, variant: subscriptionCompute.variant.identifier })
     } else {
-      updateAddon({ projectRef, type: 'compute_instance', variant: selectedOption })
+      updateAddon({
+        projectRef,
+        type: 'compute_instance',
+        variant: selectedOption as AddonVariantId,
+      })
     }
   }
 

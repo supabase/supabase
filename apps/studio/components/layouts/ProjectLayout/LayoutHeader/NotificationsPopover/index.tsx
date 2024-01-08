@@ -27,9 +27,10 @@ interface NotificationsPopoverProps {
 }
 
 const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
-  const queryClient = useQueryClient()
   const router = useRouter()
   const { meta, ui } = useStore()
+  const queryClient = useQueryClient()
+
   const { data: notifications } = useNotificationsQuery()
   const { mutate: updateNotifications } = useNotificationsUpdateMutation({
     onError: () => console.error('Failed to update notifications'),
@@ -271,6 +272,7 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
         onSelectCancel={() => setProjectToRestart(undefined)}
         onSelectConfirm={onConfirmProjectRestart}
       />
+
       <ConfirmModal
         size="large"
         visible={projectToApplyMigration !== undefined}
@@ -304,6 +306,7 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
         onSelectCancel={() => setProjectToApplyMigration(undefined)}
         onSelectConfirm={onConfirmProjectApplyMigration}
       />
+
       <ConfirmModal
         size="medium"
         visible={projectToRollbackMigration !== undefined}
