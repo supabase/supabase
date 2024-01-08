@@ -6,7 +6,6 @@ import AreaChart from 'components/ui/Charts/AreaChart'
 import BarChart from 'components/ui/Charts/BarChart'
 import StackedBarChart from 'components/ui/Charts/StackedBarChart'
 import NoPermission from 'components/ui/NoPermission'
-import { useFunctionsInvStatsQuery } from 'data/analytics/functions-inv-stats-query'
 import { useFunctionsReqStatsQuery } from 'data/analytics/functions-req-stats-query'
 import { useFunctionsResourceUsageQuery } from 'data/analytics/functions-resource-usage-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
@@ -69,41 +68,23 @@ const PageLayout: NextPageWithLayout = () => {
     slug: functionSlug,
   })
   const id = selectedFunction?.id
-  const resourceUsageMetricsEnabled = useFlag('enableResourceUsageMetricsForEdgeFunctions')
 
-  const invStatsResult = useFunctionsInvStatsQuery(
-    {
-      projectRef,
-      functionId: id,
-      interval: selectedInterval.key,
-    },
-    { enabled: !resourceUsageMetricsEnabled }
-  )
+  const reqStatsResult = useFunctionsReqStatsQuery({
+    projectRef,
+    functionId: id,
+    interval: selectedInterval.key,
+  })
 
-  const reqStatsResult = useFunctionsReqStatsQuery(
-    {
-      projectRef,
-      functionId: id,
-      interval: selectedInterval.key,
-    },
-    { enabled: resourceUsageMetricsEnabled }
-  )
-
-  const resourceUsageResult = useFunctionsResourceUsageQuery(
-    {
-      projectRef,
-      functionId: id,
-      interval: selectedInterval.key,
-    },
-    { enabled: resourceUsageMetricsEnabled }
-  )
+  const resourceUsageResult = useFunctionsResourceUsageQuery({
+    projectRef,
+    functionId: id,
+    interval: selectedInterval.key,
+  })
 
   const reqStatsData = useMemo(() => {
-    const result = resourceUsageMetricsEnabled
-      ? reqStatsResult.data?.result
-      : invStatsResult.data?.result
+    const result = reqStatsResult.data?.result
     return result || []
-  }, [invStatsResult.data, reqStatsResult.data, resourceUsageMetricsEnabled])
+  }, [reqStatsResult.data])
 
   const resourceUsageData = useMemo(() => {
     return resourceUsageResult.data?.result || []
@@ -190,9 +171,7 @@ const PageLayout: NextPageWithLayout = () => {
             title="Execution time"
             tooltip="Average execution time of function invocations"
             data={execTimeChartData}
-            isLoading={
-              resourceUsageMetricsEnabled ? reqStatsResult.isLoading : invStatsResult.isLoading
-            }
+            isLoading={reqStatsResult.isLoading}
             renderer={(props) => {
               return (
                 <AreaChart
@@ -207,122 +186,93 @@ const PageLayout: NextPageWithLayout = () => {
               )
             }}
           />
-          {resourceUsageMetricsEnabled ? (
-            <ReportWidget
-              title="Invocations"
-              data={invocationsChartData}
-              isLoading={reqStatsResult.isLoading}
-              renderer={(props) => {
-                const data = props.data
-                  .map((d: any) => [
-                    {
-                      status: '2xx',
-                      count: d.success_count,
-                      timestamp: d.timestamp,
-                    },
-                    {
-                      status: '3xx',
-                      count: d.redirect_count,
-                      timestamp: d.timestamp,
-                    },
-                    {
-                      status: '4xx',
-                      count: d.client_err_count,
-                      timestamp: d.timestamp,
-                    },
-                    {
-                      status: '5xx',
-                      count: d.server_err_count,
-                      timestamp: d.timestamp,
-                    },
-                  ])
-                  .flat()
+          <ReportWidget
+            title="Invocations"
+            data={invocationsChartData}
+            isLoading={reqStatsResult.isLoading}
+            renderer={(props) => {
+              const data = props.data
+                .map((d: any) => [
+                  {
+                    status: '2xx',
+                    count: d.success_count,
+                    timestamp: d.timestamp,
+                  },
+                  {
+                    status: '3xx',
+                    count: d.redirect_count,
+                    timestamp: d.timestamp,
+                  },
+                  {
+                    status: '4xx',
+                    count: d.client_err_count,
+                    timestamp: d.timestamp,
+                  },
+                  {
+                    status: '5xx',
+                    count: d.server_err_count,
+                    timestamp: d.timestamp,
+                  },
+                ])
+                .flat()
 
-                return (
-                  <StackedBarChart
-                    className="w-full"
-                    xAxisKey="timestamp"
-                    yAxisKey="count"
-                    stackKey="status"
-                    data={data}
-                    highlightedValue={sumBy(data, 'count')}
-                    customDateFormat={selectedInterval.format}
-                    stackColors={['brand', 'slate', 'yellow', 'red']}
-                    onBarClick={() => {
-                      router.push(
-                        `/project/${projectRef}/functions/${functionSlug}/invocations?its=${startDate.toISOString()}`
-                      )
-                    }}
-                  />
-                )
-              }}
-            />
-          ) : (
-            <ReportWidget
-              title="Invocations"
-              data={invocationsChartData}
-              isLoading={invStatsResult.isLoading}
-              renderer={(props) => (
-                <BarChart
+              return (
+                <StackedBarChart
                   className="w-full"
                   xAxisKey="timestamp"
                   yAxisKey="count"
-                  data={props.data}
-                  highlightedValue={sumBy(props.data, 'count')}
+                  stackKey="status"
+                  data={data}
+                  highlightedValue={sumBy(data, 'count')}
                   customDateFormat={selectedInterval.format}
-                  onBarClick={(v) => {
+                  stackColors={['brand', 'slate', 'yellow', 'red']}
+                  onBarClick={() => {
                     router.push(
-                      `/project/${projectRef}/functions/${functionSlug}/invocations?its=${startDate.toISOString()}&ite=${
-                        v.timestamp
-                      }`
+                      `/project/${projectRef}/functions/${functionSlug}/invocations?its=${startDate.toISOString()}`
                     )
                   }}
                 />
-              )}
-            />
-          )}
-          {resourceUsageMetricsEnabled && (
-            <>
-              <ReportWidget
-                title="CPU time"
-                tooltip="Average CPU time usage for the function"
-                data={resourceUsageChartData}
-                isLoading={resourceUsageResult.isLoading}
-                renderer={(props) => {
-                  return (
-                    <AreaChart
-                      className="w-full"
-                      xAxisKey="timestamp"
-                      customDateFormat={selectedInterval.format}
-                      yAxisKey="avg_cpu_time_used"
-                      data={props.data}
-                      format="ms"
-                      highlightedValue={meanBy(props.data, 'avg_cpu_time_used')}
-                    />
-                  )
-                }}
-              />
-              <ReportWidget
-                title="Memory"
-                tooltip="Average memory usage for the function"
-                data={resourceUsageChartData}
-                isLoading={resourceUsageResult.isLoading}
-                renderer={(props) => {
-                  return (
-                    <AreaChart
-                      className="w-full"
-                      xAxisKey="timestamp"
-                      customDateFormat={selectedInterval.format}
-                      yAxisKey="avg_memory_used"
-                      data={props.data}
-                      format="MB"
-                      highlightedValue={meanBy(props.data, 'avg_memory_used')}
-                    />
-                  )
-                }}
-              />
-            </>
-          )}
+              )
+            }}
+          />
+          <ReportWidget
+            title="CPU time"
+            tooltip="Average CPU time usage for the function"
+            data={resourceUsageChartData}
+            isLoading={resourceUsageResult.isLoading}
+            renderer={(props) => {
+              return (
+                <AreaChart
+                  className="w-full"
+                  xAxisKey="timestamp"
+                  customDateFormat={selectedInterval.format}
+                  yAxisKey="avg_cpu_time_used"
+                  data={props.data}
+                  format="ms"
+                  highlightedValue={meanBy(props.data, 'avg_cpu_time_used')}
+                />
+              )
+            }}
+          />
+          <ReportWidget
+            title="Memory"
+            tooltip="Average memory usage for the function"
+            data={resourceUsageChartData}
+            isLoading={resourceUsageResult.isLoading}
+            renderer={(props) => {
+              return (
+                <AreaChart
+                  className="w-full"
+                  xAxisKey="timestamp"
+                  customDateFormat={selectedInterval.format}
+                  yAxisKey="avg_memory_used"
+                  data={props.data}
+                  format="MB"
+                  highlightedValue={meanBy(props.data, 'avg_memory_used')}
+                />
+              )
+            }}
+          />
         </div>
       </div>
     </div>
