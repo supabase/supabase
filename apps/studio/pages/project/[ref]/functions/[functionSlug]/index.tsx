@@ -165,7 +165,7 @@ const PageLayout: NextPageWithLayout = () => {
           Statistics for past {selectedInterval.label}
         </span>
       </div>
-      <div className="">
+      <div>
         <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:grid-cols-2 lg:gap-8">
           <ReportWidget
             title="Execution time"

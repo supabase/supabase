@@ -28,7 +28,7 @@ const PolicyEditorModalTitle = ({
   }
   if (view === POLICY_MODAL_VIEWS.TEMPLATES) {
     return (
-      <div className="">
+      <div>
         <div className="flex items-center space-x-3">
           <span
             onClick={onSelectBackFromTemplates}

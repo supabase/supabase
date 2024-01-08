@@ -124,7 +124,7 @@ export const LaunchSection = (props: WeekDayProps) => {
                   </div>
                 }
               >
-                <div className="">
+                <div>
                   <div className="video-container">
                     <iframe
                       src={`https://www.youtube-nocookie.com/embed/${props.youtube_id}?autoplay=1`}
