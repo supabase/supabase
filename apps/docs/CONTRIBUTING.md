@@ -90,11 +90,13 @@ const docsDir = 'docs'
 const externalSite = 'https://supabase.github.io/pg_graphql'
 ```
 
-## File structure
+Check the sections for [guide structure](#guide-structure) and [reference structure](#reference-structure) to learn more about the file structures.
 
-The Supabase docs use [MDX](https://mdxjs.com/).
+## Guide structure
 
-Adding a new doc requires:
+The Supabase docs use [MDX](https://mdxjs.com/). Guides are written in unstructured prose as MDX documents.
+
+Adding a new guide requires:
 
 - A layout
 - Metadata
@@ -138,6 +140,37 @@ export default Page
 The navigation is defined in [`NavigationMenu.constants.ts`](https://github.com/supabase/supabase/blob/master/apps/docs/components/Navigation/NavigationMenu/NavigationMenu.constants.ts).
 
 Add an entry with the `name`, `url`, and (optional) `icon` for your page.
+
+## Reference structure
+
+Reference docs are produced from the reference specs and library source code. A common spec file contains shared function and endpoint definitions, and library-specific spec files contain further details.
+
+### Common spec file
+
+Each type of library (for example, language SDK or CLI) has a common spec file. For example, see the [spec file for the language SDKs](https://github.com/supabase/supabase/blob/master/apps/docs/spec/common-client-libs-sections.json). This file contains definitions for the common SDK functions:
+
+- **id** - Identifies the function
+- **title** - Human-readable title
+- **slug** - URL slug
+- **product** - Supabase product that owns the function. For example, database operations are owned by `database`, and auth functions are owned by`auth`
+- **type** - `function` for a structured function definition or `markdown` for a prose explainer section.
+
+To add a new function, manually add an entry to this common file.
+
+### Specific spec file
+
+Each library also has its own spec file containing library-specific details. For example, see the [JavaScript SDK spec file](https://github.com/supabase/supabase/blob/master/apps/docs/spec/supabase_js_v2.yml).
+
+The functions listed in this file match the ones defined in the common spec file.
+
+Each function contains a description, code examples, and optional notes. The parameters are pulled from the source code via the `$ref` property, which references a function definition in the source code repo. These references are pulled down and transformed using commands in the spec [Makefile](https://github.com/supabase/supabase/blob/master/apps/docs/spec/Makefile). Unless you're a library maintainer, you don't need to worry about this.
+
+If you're a library maintainer, follow these steps when updating function parameters or return values:
+
+1. Get your changes merged to `master` in your library
+2. This will kick off an action that automatically updates the spec file in the library's `gh-pages` branch
+3. Run `make` in `/spec` of the `supabase/supabase` repo. This will regenerate all of the `tsdoc` files that the docs site uses
+4. You should now see the changes you've made in the docs site locally
 
 ## Content reuse
 
@@ -321,3 +354,9 @@ Here are some exceptions and Supabase-specific guidelines.
 - `Setup` is a noun. `Set up` is a verb.
 - `Supabase` is capitalized (not `supabase`), except in code.
 - `Supabase Platform` is in title case (not `Supabase platform`).
+
+## Search
+
+Search is handled using a Supabase instance. During CI, [a script](https://github.com/supabase/supabase/blob/master/apps/docs/scripts/search/generate-embeddings.ts) aggregates all content sources (eg. guides, reference docs, etc), indexes them using OpenAI embeddings, and stores them in a Supabase database.
+
+Search uses a hybrid of native Postgres FTS and embedding similarity search based on [`pgvector`](https://github.com/pgvector/pgvector). At runtime, a PostgREST call triggers the RPC that runs the weighted FTS search, and an [Edge Function](https://github.com/supabase/blob/master/supabase/functions) is executed to perform the embedding search.
