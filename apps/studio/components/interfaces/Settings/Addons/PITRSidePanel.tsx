@@ -344,8 +344,9 @@ const PITRSidePanel = () => {
               (selectedPitr?.price ?? 0) < (subscriptionPitr?.variant.price ?? 0) ? (
                 subscription?.billing_via_partner === false && (
                   <p className="text-sm text-foreground-light">
-                    Upon clicking confirm, the amount of that's unused during the current billing
-                    cycle will be returned as credits that can be used for subsequent billing cycles
+                    Upon clicking confirm, the add-on is removed immediately and any unused time in
+                    the current billing cycle is added as prorated credits to your organization and
+                    used in subsequent billing cycles
                   </p>
                 )
               ) : (
@@ -355,14 +356,14 @@ const PITRSidePanel = () => {
                   will be added to your monthly invoice.{' '}
                   {subscription?.billing_via_partner ? (
                     <>
-                      For the current billing cycle you'll be charged a pro-rated amount at the end
+                      For the current billing cycle you'll be charged a prorated amount at the end
                       of the cycle.{' '}
                     </>
                   ) : (
                     <>
                       The addon is prepaid per month and in case of a downgrade, you get credits for
                       the remaining time. For the current billing cycle you're immediately charged a
-                      pro-rated amount for the remaining days.
+                      prorated amount for the remaining days.
                     </>
                   )}
                 </p>
