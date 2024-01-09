@@ -73,11 +73,12 @@ const NotificationRow = ({
     >
       <div ref={viewRef} className="flex flex-col gap-y-2 w-full">
         {(project !== undefined || organization !== undefined) && (
-          <div className="flex items-center">
+          <div className="flex items-center max-w-[350px]">
             {organization !== undefined && (
               <Link
+                title={organization.name}
                 href={`/org/${organization.slug}/general`}
-                className="text-xs transition text-foreground-light hover:text-foreground underline"
+                className="text-xs transition text-foreground-light hover:text-foreground underline truncate"
               >
                 {organization.name}
               </Link>
@@ -101,8 +102,9 @@ const NotificationRow = ({
             )}
             {project !== undefined && (
               <Link
+                title={project.name}
                 href={`/project/${project.ref}`}
-                className="text-xs transition text-foreground-light hover:text-foreground underline"
+                className="text-xs transition text-foreground-light hover:text-foreground underline truncate"
               >
                 {project.name}
               </Link>
