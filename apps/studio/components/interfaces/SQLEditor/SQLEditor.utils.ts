@@ -1,21 +1,9 @@
 // @ts-ignore
-import MarkdownTable from 'markdown-table'
 import { NEW_SQL_SNIPPET_SKELETON, destructiveSqlRegex } from './SQLEditor.constants'
 import { SqlSnippets, UserContent } from 'types'
 import { DiffType } from './SQLEditor.types'
 import { removeCommentsFromSql } from 'lib/helpers'
 import { stripIndent } from 'common-tags'
-
-export const getResultsMarkdown = (results: any[]) => {
-  const columns = Object.keys(results[0])
-  const rows = results.map((x: any) => {
-    const temp: any[] = []
-    columns.forEach((col) => temp.push(x[col]))
-    return temp
-  })
-  const table = [columns].concat(rows)
-  return MarkdownTable(table)
-}
 
 export const createSqlSnippetSkeleton = ({
   id,

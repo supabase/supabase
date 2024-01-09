@@ -24,8 +24,7 @@ const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) =
 
   // get the .co or .net TLD from the restUrl
   const restUrl = project?.restUrl
-  const restUrlTld =
-    restUrl !== undefined ? new URL(restUrl as string).hostname.split('.').pop() : 'co'
+  const restUrlTld = restUrl !== undefined ? new URL(restUrl).hostname.split('.').pop() : 'co'
   const functionUrl = `https://${ref}.supabase.${restUrlTld}/functions/v1/${item.slug}`
 
   const endpoint =
@@ -40,12 +39,12 @@ const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) =
         router.push(`/project/${ref}/functions/${item.slug}/details`)
       }}
     >
-      <Table.td className="">
+      <Table.td>
         <div className="flex items-center gap-2">
           <p className="text-sm text-foreground">{item.name}</p>
         </div>
       </Table.td>
-      <Table.td className="">
+      <Table.td>
         <div className="text-xs text-foreground-light flex gap-2 items-center truncate">
           <p className="font-mono truncate hidden md:inline">{endpoint}</p>
           <button

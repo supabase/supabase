@@ -2,7 +2,7 @@ import { ModalProps } from '@ui/components/Modal/Modal'
 import { snakeCase } from 'lodash'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Button, CodeBlock, IconExternalLink, Modal, Separator, Tabs, TabsProvider } from 'ui'
+import { Button, CodeBlock, IconExternalLink, Modal, Tabs, TabsProvider } from 'ui'
 
 import TwoOptionToggle from 'components/ui/TwoOptionToggle'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'

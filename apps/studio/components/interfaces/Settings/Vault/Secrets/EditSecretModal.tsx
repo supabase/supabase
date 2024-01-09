@@ -2,21 +2,28 @@ import { isEmpty } from 'lodash'
 import { useEffect, useState } from 'react'
 import { Button, Form, IconEye, IconEyeOff, Input, Modal } from 'ui'
 
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { usePgSodiumKeyCreateMutation } from 'data/pg-sodium-keys/pg-sodium-key-create-mutation'
+import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
+import { useVaultSecretUpdateMutation } from 'data/vault/vault-secret-update-mutation'
 import { useStore } from 'hooks'
 import { VaultSecret } from 'types'
 import EncryptionKeySelector from '../Keys/EncryptionKeySelector'
 
 interface EditSecretModalProps {
-  selectedSecret: VaultSecret
+  selectedSecret: VaultSecret | undefined
   onClose: () => void
 }
 
 const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
-  const { ui, vault } = useStore()
+  const { ui } = useStore()
   const [selectedKeyId, setSelectedKeyId] = useState<string>()
   const [showSecretValue, setShowSecretValue] = useState(false)
-  const [isLoadingSecretValue, setIsLoadingSecretValue] = useState(false)
+  const { project } = useProjectContext()
+
+  const { mutateAsync: addKeyMutation } = usePgSodiumKeyCreateMutation()
+  const { mutateAsync: updateSecret } = useVaultSecretUpdateMutation()
 
   let INITIAL_VALUES = {
     name: selectedSecret?.name ?? '',
@@ -39,13 +46,19 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
   }
 
   const onUpdateSecret = async (values: any, { setSubmitting }: any) => {
+    if (!project) return console.error('Project is required')
+
     const payload: Partial<VaultSecret> = {}
-    if (values.name !== selectedSecret.name) payload.name = values.name
-    if (values.description !== selectedSecret.description) payload.description = values.description
-    if (selectedKeyId !== selectedSecret.key_id) {
+    if (values.name !== selectedSecret?.name) payload.name = values.name
+    if (values.description !== selectedSecret?.description) payload.description = values.description
+    if (selectedKeyId !== selectedSecret?.key_id) {
       let encryptionKeyId = selectedKeyId
       if (values.keyId === 'create-new') {
-        const addKeyRes = await vault.addKey(values.keyName || undefined)
+        const addKeyRes = await addKeyMutation({
+          projectRef: project?.ref!,
+          connectionString: project?.connectionString,
+          name: values.keyName || undefined,
+        })
         if (addKeyRes.error) {
           return ui.setNotification({
             error: addKeyRes.error,
@@ -61,9 +74,14 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
     }
     payload.secret = values.secret
 
-    if (!isEmpty(payload)) {
+    if (!isEmpty(payload) && selectedSecret) {
       setSubmitting(true)
-      const res = await vault.updateSecret(selectedSecret.id, payload)
+      const res = await updateSecret({
+        projectRef: project.ref,
+        connectionString: project?.connectionString,
+        id: selectedSecret.id,
+        ...payload,
+      })
       if (!res.error) {
         ui.setNotification({ category: 'success', message: 'Successfully updated secret' })
         setSubmitting(false)
@@ -81,7 +99,6 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
 
   return (
     <Modal
-      closable
       hideFooter
       size="medium"
       visible={selectedSecret !== undefined}
@@ -96,35 +113,29 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
         onSubmit={onUpdateSecret}
       >
         {({ isSubmitting, resetForm }: any) => {
-          // [Alaister] although this "technically" is breaking the rules of React hooks
-          // it won't error because the hooks are always rendered in the same order
+          // [Joshen] JFYI this is breaking rules of hooks, will be fixed once we move to
+          // using react hook form instead
           // eslint-disable-next-line react-hooks/rules-of-hooks
-          useEffect(() => {
-            if (selectedSecret !== undefined && selectedSecret.decryptedSecret === undefined) {
-              fetchSecretValue()
+          const { isLoading: isLoadingSecretValue } = useVaultSecretDecryptedValueQuery(
+            {
+              projectRef: project?.ref!,
+              id: selectedSecret?.id!,
+              connectionString: project?.connectionString,
+            },
+            {
+              enabled: !!(project?.ref && selectedSecret?.id),
+              onSuccess: (res) => {
+                resetForm({
+                  values: { ...INITIAL_VALUES, secret: res },
+                  initialValues: { ...INITIAL_VALUES, secret: res },
+                })
+              },
             }
-          }, [selectedSecret])
-
-          const fetchSecretValue = async () => {
-            if (selectedSecret === undefined) return
-            setIsLoadingSecretValue(true)
-            const res = await vault.fetchSecretValue(selectedSecret.id)
-            resetForm({
-              values: { ...INITIAL_VALUES, secret: res },
-              initialValues: { ...INITIAL_VALUES, secret: res },
-            })
-            setIsLoadingSecretValue(false)
-          }
+          )
 
           return isLoadingSecretValue ? (
-            <div className="space-y-2 py-4 px-2">
-              <ShimmeringLoader />
-              <div className="w-3/4">
-                <ShimmeringLoader />
-              </div>
-              <div className="w-1/2">
-                <ShimmeringLoader />
-              </div>
+            <div className="p-4">
+              <GenericSkeletonLoader />
             </div>
           ) : (
             <div className="py-4">

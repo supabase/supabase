@@ -5,7 +5,7 @@ import { IconMaximize, Popover } from 'ui'
 
 import { BlockKeys, MonacoEditor, NullValue } from 'components/grid/components/common'
 import { useTrackedState } from 'components/grid/store'
-import { tryParseJson } from 'lib/helpers'
+import { prettifyJSON, tryParseJson } from 'lib/helpers'
 import { isNil } from 'lodash'
 
 interface JsonEditorProps<TRow, TSummaryRow = unknown>
@@ -147,29 +147,7 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   )
 }
 
-export const prettifyJSON = (value: string) => {
-  if (value.length > 0) {
-    try {
-      return JSON.stringify(JSON.parse(value), undefined, 2)
-    } catch (err) {
-      // dont need to throw error, just return text value
-      // Users have to fix format if they want to save
-      return value
-    }
-  } else {
-    return value
-  }
-}
-
-export const minifyJSON = (value: string) => {
-  try {
-    return JSON.stringify(JSON.parse(value))
-  } catch (err) {
-    throw err
-  }
-}
-
-export const verifyJSON = (value: string) => {
+const verifyJSON = (value: string) => {
   try {
     JSON.parse(value)
     return true

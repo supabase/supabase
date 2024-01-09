@@ -227,8 +227,13 @@ const DocsSearch = () => {
     switch (pageType) {
       case PageType.Markdown:
       case PageType.Reference:
-        const docsLink = site === 'docs' ? link : `https://supabase.com/docs${link}`
-        return router.push(docsLink)
+        if (site === 'docs') {
+          return router.push(link)
+        } else if (site === 'website') {
+          return router.push(`/docs${link}`)
+        } else {
+          return window.open(`https://supabase.com/docs${link}`, '_blank')
+        }
       case PageType.GithubDiscussion:
         return window.open(link, '_blank')
       default:

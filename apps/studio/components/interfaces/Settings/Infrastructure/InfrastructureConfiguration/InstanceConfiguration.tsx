@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { isEqual, partition } from 'lodash'
+import { partition } from 'lodash'
 import { Globe2, Loader2, Network } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useEffect, useMemo, useRef, useState } from 'react'

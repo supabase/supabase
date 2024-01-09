@@ -107,7 +107,7 @@ const AreaChart = ({
         </RechartAreaChart>
       </Container>
       {data && (
-        <div className="text-foreground-lighter -mt-2 flex items-center justify-between text-xs">
+        <div className="text-foreground-lighter -mt-8 flex items-center justify-between text-xs">
           <span>{dayjs(data[0][xAxisKey]).format(customDateFormat)}</span>
           <span>{dayjs(data[data?.length - 1]?.[xAxisKey]).format(customDateFormat)}</span>
         </div>

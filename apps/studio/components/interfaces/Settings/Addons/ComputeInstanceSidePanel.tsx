@@ -32,6 +32,7 @@ import {
 
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { AddonVariantId } from 'data/subscriptions/types'
 
 const COMPUTE_CATEGORY_OPTIONS: {
   id: 'micro' | 'optimized'
@@ -170,7 +171,11 @@ const ComputeInstanceSidePanel = () => {
     if (selectedOption === 'ci_micro' && subscriptionCompute !== undefined) {
       removeAddon({ projectRef, variant: subscriptionCompute.variant.identifier })
     } else {
-      updateAddon({ projectRef, type: 'compute_instance', variant: selectedOption })
+      updateAddon({
+        projectRef,
+        type: 'compute_instance',
+        variant: selectedOption as AddonVariantId,
+      })
     }
   }
 
@@ -417,8 +422,7 @@ const ComputeInstanceSidePanel = () => {
                 variant="info"
                 title="Your project will need to be restarted when changing it's compute size"
               >
-                It will take up to 2 minutes for changes to take place, in which your project will
-                be unavailable during that time.
+                Your project will be unavailable for up to 2 minutes while the changes take place.
               </Alert>
             )}
 
@@ -473,8 +477,7 @@ const ComputeInstanceSidePanel = () => {
               variant="warning"
               title="Your project will need to be restarted when changing it's compute size"
             >
-              It will take up to 2 minutes for changes to take place, in which your project will be
-              unavailable during that time.
+              Your project will be unavailable for up to 2 minutes while the changes take place.
             </Alert>
           </div>
         </Modal.Content>
