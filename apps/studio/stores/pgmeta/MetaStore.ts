@@ -175,7 +175,6 @@ export default class MetaStore implements IMetaStore {
     // Duplicate foreign key constraints over
     const relationships = duplicateTable.relationships
     if (relationships.length > 0) {
-      // @ts-ignore
       relationships.map(async (relationship: PostgresRelationship) => {
         await addForeignKey(this.projectRef, this.connectionString, {
           ...relationship,
@@ -194,8 +193,7 @@ export default class MetaStore implements IMetaStore {
       if (rows.error) throw rows.error
 
       // Insert into does not copy over auto increment sequences, so we manually do it next if any
-      const columns = duplicateTable.columns
-      // @ts-ignore
+      const columns = duplicateTable.columns ?? []
       const identityColumns = columns.filter((column) => column.identity_generation !== null)
       identityColumns.map(async (column) => {
         const identity = await this.rootStore.meta.query(
@@ -374,7 +372,7 @@ export default class MetaStore implements IMetaStore {
     const primaryKeyColumns = columns
       .filter((column) => column.isPrimaryKey)
       .map((column) => column.name)
-    // @ts-ignore
+
     const existingPrimaryKeyColumns = table.primary_keys.map((pk: PostgresPrimaryKey) => pk.name)
     const isPrimaryKeyUpdated = !isEqual(primaryKeyColumns, existingPrimaryKeyColumns)
 
@@ -392,11 +390,10 @@ export default class MetaStore implements IMetaStore {
     const updatedTable: any = await this.tables.update(table.id, payload)
     if (updatedTable.error) throw updatedTable.error
 
-    const originalColumns = table.columns
+    const originalColumns = table.columns ?? []
     const columnIds = columns.map((column) => column.id)
 
     // Delete any removed columns
-    // @ts-ignore
     const columnsToRemove = originalColumns.filter((column) => !columnIds.includes(column.id))
     for (const column of columnsToRemove) {
       this.rootStore.ui.setNotification({
