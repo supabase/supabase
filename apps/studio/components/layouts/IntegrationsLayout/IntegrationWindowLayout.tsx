@@ -1,4 +1,3 @@
-import { useParams } from 'common'
 import { useFlag, withAuth } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { PropsWithChildren, ReactNode, forwardRef } from 'react'

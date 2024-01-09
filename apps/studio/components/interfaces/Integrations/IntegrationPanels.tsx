@@ -68,7 +68,7 @@ const Avatar = ({ src }: { src: string | undefined }) => {
 }
 
 const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInstallationProps>(
-  ({ title, integration, disabled, ...props }, ref) => {
+  ({ integration, disabled, ...props }, ref) => {
     const IntegrationIconBlock = () => {
       return (
         <div className="bg-black text-white w-8 h-8 rounded flex items-center justify-center">
@@ -206,7 +206,7 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
 )
 
 const IntegrationConnectionOption = React.forwardRef<HTMLLIElement, IntegrationConnectionProps>(
-  ({ className, connection, type, ...props }, ref) => {
+  ({ connection, type, ...props }, ref) => {
     const { data: projects } = useProjectsQuery()
     const project = projects?.find((project) => project.ref === connection.supabase_project_ref)
 
@@ -246,7 +246,7 @@ const EmptyIntegrationConnection = React.forwardRef<
     orgSlug?: string
     onClick: () => void
   }
->(({ className, showNode = true, orgSlug = '_', onClick, ...props }, ref) => {
+>(({ className, showNode = true, onClick, ...props }, ref) => {
   return (
     <div
       ref={ref}
@@ -285,7 +285,7 @@ interface IntegrationConnectionHeader extends React.HTMLAttributes<HTMLDivElemen
 }
 
 const IntegrationConnectionHeader = React.forwardRef<HTMLDivElement, IntegrationConnectionHeader>(
-  ({ className, name, markdown = '', showNode = true, ...props }, ref) => {
+  ({ className, markdown = '', showNode = true, ...props }, ref) => {
     return (
       <div
         {...props}
@@ -298,7 +298,7 @@ const IntegrationConnectionHeader = React.forwardRef<HTMLDivElement, Integration
         )}
       >
         {props.title && <h5 className="text-foreground">{props.title}</h5>}
-        <Markdown content={markdown} className="" />
+        <Markdown content={markdown} />
       </div>
     )
   }

@@ -245,20 +245,6 @@ export const timestampLocalFormatter = (value: string | number) => {
 }
 
 /*
- * Header Formatter
- *
- * for http response codes
- */
-
-export const HeaderFormmater = ({ value }: any) => {
-  return (
-    <div className="flex h-full items-center text-xs font-normal text-foreground-lighter">
-      {value}
-    </div>
-  )
-}
-
-/*
  * JSON Syntax Highlighter
  *
  * for http response codes

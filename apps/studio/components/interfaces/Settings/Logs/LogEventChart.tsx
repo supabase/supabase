@@ -1,6 +1,6 @@
-import BarChart, { BarChartProps } from 'components/ui/Charts/BarChart'
+import BarChart from 'components/ui/Charts/BarChart'
 import { Datum } from 'components/ui/Charts/Charts.types'
-import { EventChartData, isUnixMicro, LogData, unixMicroToIsoTimestamp } from '.'
+import { EventChartData } from '.'
 
 export interface LogEventChartProps {
   data: EventChartData[]

@@ -13,7 +13,6 @@ import Link from 'next/link'
 import { Button, IconArrowRight, IconExternalLink } from 'ui'
 
 import { Markdown } from 'components/interfaces/Markdown'
-import { Project } from 'data/projects/project-detail-query'
 
 export const formatNotificationText = (projectName: string, notification: Notification) => {
   if (notification.data.name === NotificationName.ProjectExceedingTierLimit) {

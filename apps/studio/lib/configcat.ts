@@ -3,7 +3,7 @@ import * as configcat from 'configcat-js'
 
 let client: configcat.IConfigCatClient
 
-export function getClient() {
+function getClient() {
   if (client) {
     return client
   }

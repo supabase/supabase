@@ -1,8 +1,7 @@
 import { OAuthScope } from '@supabase/shared-types/out/constants'
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
 import { API_ADMIN_URL } from 'lib/constants'
-import { useCallback } from 'react'
 import { resourceKeys } from './keys'
 
 export type ApiAuthorizationVariables = {
@@ -46,15 +45,3 @@ export const useApiAuthorizationQuery = <TData = ResourceData>(
       ...options,
     }
   )
-
-export const useApiAuthorizationPrefetch = ({ id }: ApiAuthorizationVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (id) {
-      client.prefetchQuery(resourceKeys.resource(id), ({ signal }) =>
-        getApiAuthorizationDetails({ id }, signal)
-      )
-    }
-  }, [id])
-}
