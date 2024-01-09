@@ -206,6 +206,16 @@ const table = [
   {
     computeAddOn: 'large',
     filters: false,
+    rls: false,
+    concurrency: 200000,
+    maxDBChanges: '0.05 (3/min)',
+    maxMessagesPerClient: '0.05 (3/min)',
+    totalMessagesPerSecond: 40000,
+    p95Latency: 4581,
+  },
+  {
+    computeAddOn: 'large',
+    filters: false,
     rls: true,
     concurrency: 500,
     maxDBChanges: 40,
