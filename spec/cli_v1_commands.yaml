@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.127.4
+  version: 1.131.3
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -200,9 +200,22 @@ commands:
           Result: PASS
     tags: []
     links: []
-    usage: supabase test db
+    usage: supabase test db [path] ... [flags]
     subcommands: []
-    flags: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: |
+          Tests the database specified by the connection string (must be percent-encoded).
+        default_value: ''
+      - id: linked
+        name: --linked
+        description: Runs pgTAP tests on the linked project.
+        default_value: 'false'
+      - id: local
+        name: --local
+        description: Runs pgTAP tests on the local database.
+        default_value: 'true'
   - id: supabase-storage
     title: supabase storage
     summary: Manage Supabase Storage objects
@@ -442,7 +455,7 @@ commands:
       - id: exclude
         name: -x, --exclude <strings>
         description: |
-          Names of containers to not start. [gotrue,realtime,storage-api,imgproxy,kong,inbucket,postgrest,pgadmin-schema-diff,migra,postgres-meta,studio,edge-runtime,logflare,vector,pgbouncer]
+          Names of containers to not start. [gotrue,realtime,storage-api,imgproxy,kong,inbucket,postgrest,pgadmin-schema-diff,migra,postgres-meta,studio,edge-runtime,logflare,vector,pgbouncer,pg_prove]
         default_value: '[]'
       - id: ignore-health-check
         name: --ignore-health-check
