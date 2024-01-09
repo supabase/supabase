@@ -157,7 +157,6 @@ export const generateUpdateColumnPayload = (
     payload.isPrimaryKey = field.isPrimaryKey
   }
 
-  console.log('payload:', payload)
   return payload
 }
 
