@@ -125,7 +125,7 @@ const CommandMenu = () => {
                   value={site === 'docs' ? `${FORCE_MOUNT_ITEM}--docs-search` : undefined}
                   onSelect={() => setPages([...pages, COMMAND_ROUTES.DOCS_SEARCH])}
                 >
-                  <IconBook className="" />
+                  <IconBook />
 
                   <span>
                     Search the docs

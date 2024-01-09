@@ -38,7 +38,7 @@ export interface Props extends Omit<React.InputHTMLAttributes<HTMLSelectElement>
   validation?: (x: any) => void
 }
 
-export const ColLayout = (props: any) => <div className="">{props.children}</div>
+export const ColLayout = (props: any) => <div>{props.children}</div>
 
 function Select({
   autoComplete,

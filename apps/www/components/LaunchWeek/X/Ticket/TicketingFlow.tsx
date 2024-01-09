@@ -134,12 +134,12 @@ const TicketingFlow = () => {
                     ) : winningChances !== 2 ? (
                       <p className="text-2xl lg:text-3xl">
                         <span className="text-[#8B9092]">You're in!</span>{' '}
-                        <span className="">Now share your ticket to win limited swag.</span>
+                        <span>Now share your ticket to win limited swag.</span>
                       </p>
                     ) : (
                       <p className="text-2xl lg:text-3xl">
                         <span className="text-[#8B9092]">Just one more.</span>{' '}
-                        <span className="">Keep sharing to increase your chances.</span>
+                        <span>Keep sharing to increase your chances.</span>
                       </p>
                     )}
                     <CountdownComponent date={LWX_LAUNCH_DATE} showCard={false} />

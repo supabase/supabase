@@ -1,28 +1,21 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { get } from 'data/fetchers'
 import { subscriptionKeys } from './keys'
 
 export type OrgPlansVariables = {
   orgSlug?: string
 }
 
-export type OrgPlansResponse = {
-  id: 'free' | 'pro' | 'team' | 'enterprise'
-  name: string
-  price: number
-  is_current: boolean
-  change_type: 'downgrade' | 'upgrade' | 'none'
-  effective_at: string
-}[]
-
 export async function getOrgPlans({ orgSlug }: OrgPlansVariables, signal?: AbortSignal) {
   if (!orgSlug) throw new Error('orgSlug is required')
 
-  const response = await get(`${API_URL}/organizations/${orgSlug}/billing/plans`, { signal })
-  if (response.error) throw response.error
+  const { error, data } = await get('/platform/organizations/{slug}/billing/plans', {
+    params: { path: { slug: orgSlug } },
+    signal,
+  })
+  if (error) throw error
 
-  return response.plans as OrgPlansResponse
+  return data
 }
 
 export type OrgPlansData = Awaited<ReturnType<typeof getOrgPlans>>
