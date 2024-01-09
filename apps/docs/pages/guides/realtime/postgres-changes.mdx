@@ -1362,6 +1362,8 @@ Realtime systems usually require forethought because of their scaling dynamics. 
 
 There can be a database bottleneck which limits message throughput. If your database cannot authorize the changes rapidly enough, the changes will be delayed until you receive a timeout.
 
+Please note that currently to maintain the order of changes, we are using a single thread to process changes on the database side. This means that compute upgrades will not improve the performance of this feature by much, refer to form below to estimate the maximum throughput you can expect from your database instance.
+
 If you are using Postgres Changes at scale, you should consider using separate "public" table without RLS and filters. Alternatively, you can use Realtime server-side only and then re-stream the changes to your clients using a Realtime Broadcast.
 
 You can estimate what maximum throughput you can expect from your database instance using the following form:
