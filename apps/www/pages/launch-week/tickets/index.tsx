@@ -112,7 +112,7 @@ export default function TicketsPage({ users }: Props) {
       />
       <FaviconImports />
       <DefaultLayout>
-        <div className="">
+        <div>
           <SectionContainer className="z-10">
             <div className="text-center relative z-10 text-white mb-4 lg:mb-10">
               <motion.div

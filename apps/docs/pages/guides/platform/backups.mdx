@@ -46,7 +46,7 @@ You can access daily backups in the [Scheduled backups](https://supabase.com/das
 
 #### Backup process for large databases
 
-Databases larger than 100GB[^1], if they're on a recent build[^2] of the Supabase platform, get automatically transitioned[^3] to use daily physical backups. Physical backups are a more performant backup mechanism that lowers the overhead and impact on the database being backed up, and also avoids holding locks on objects in your database for a long period of time. While restores are unaffected, the backups created using this method cannot be downloaded from the Backups section of the dashboard.
+Databases larger than 40GB[^1], if they're on a recent build[^2] of the Supabase platform, get automatically transitioned[^3] to use daily physical backups. Physical backups are a more performant backup mechanism that lowers the overhead and impact on the database being backed up, and also avoids holding locks on objects in your database for a long period of time. While restores are unaffected, the backups created using this method cannot be downloaded from the Backups section of the dashboard.
 
 This class of physical backups only allows for recovery to a fixed time each day, similar to daily backups. You can upgrade to [PITR](#point-in-time-recovery) for access to more granular recovery options.
 

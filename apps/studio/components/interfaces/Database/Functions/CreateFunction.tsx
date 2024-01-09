@@ -499,7 +499,7 @@ const InputMultiArguments = observer(({ readonly }: InputMultiArgumentsProps) =>
           )
         )}
         {!readonly && (
-          <div className="">
+          <div>
             <Button type="default" icon={<IconPlus />} onClick={onAddArgument} disabled={readonly}>
               Add a new argument
             </Button>

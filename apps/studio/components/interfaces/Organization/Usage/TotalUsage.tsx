@@ -1,4 +1,4 @@
-import { OrgSubscription } from 'data/subscriptions/org-subscription-query'
+import { OrgSubscription } from 'data/subscriptions/types'
 import SectionContent from './SectionContent'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import AlertError from 'components/ui/AlertError'

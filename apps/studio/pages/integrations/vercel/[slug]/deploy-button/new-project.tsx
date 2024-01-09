@@ -245,7 +245,7 @@ const CreateProject = () => {
   )
 
   return (
-    <div className="">
+    <div>
       <p className="mb-2">Supabase project details</p>
       <div className="py-2">
         <Input
