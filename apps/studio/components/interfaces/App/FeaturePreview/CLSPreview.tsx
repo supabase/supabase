@@ -1,6 +1,7 @@
 import { Markdown } from 'components/interfaces/Markdown'
 import { BASE_PATH } from 'lib/constants'
 import Image from 'next/image'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, IconAlertCircle } from 'ui'
 
 const CLSPreview = () => {
   return (
@@ -12,8 +13,20 @@ const CLSPreview = () => {
         />
         <Markdown
           className="text-foreground-light max-w-full"
-          content={`This is an advanced feature and should be used with caution.`}
+          content={`This is an advanced feature and should be used with caution. Unless you have a very specific use case, we recommend just using [Row-Level Security](https://supabase.com/docs/guides/auth/row-level-security).`}
         />
+        <Alert_Shadcn_ variant="warning" className="mt-8">
+          <IconAlertCircle strokeWidth={2} />
+          <AlertTitle_Shadcn_>
+            Changes to column privileges will not be reflected in migrations when running{' '}
+            <code className="text-xs">supabase db diff</code>.
+          </AlertTitle_Shadcn_>
+          <AlertDescription_Shadcn_>
+            Column privileges are not supported in the current version of the Supabase CLI.
+            <br />
+            You will need to manually apply these changes to your database.
+          </AlertDescription_Shadcn_>
+        </Alert_Shadcn_>
       </div>
       <Image
         src={`${BASE_PATH}/img/previews/cls-preview.png`}
