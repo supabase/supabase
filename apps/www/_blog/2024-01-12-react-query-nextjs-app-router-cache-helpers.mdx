@@ -56,7 +56,7 @@ npm install @supabase/supabase-js @tanstack/react-query @supabase/ssr @supabase-
 
 Create a React Query client in the root of your component tree. In Next.js app router applications, this is the `layout.tsx` file in the `app` folder.
 
-The `QueryClientProvider` can only be used in client components and can't be directly embeeded in the `layout.tsx` file. Therefore make sure to create a client component first, e.g.
+The `QueryClientProvider` can only be used in client components and can't be directly embedded in the `layout.tsx` file. Therefore make sure to create a client component first, e.g.
 
 ```tsx components/ReactQueryClientProvider.tsx
 'use client'
@@ -81,7 +81,7 @@ export const ReactQueryClientProvider = ({ children }: { children: React.ReactNo
 }
 ```
 
-Next, wrap the root in `laout.tsx`:
+Next, wrap the root in `layout.tsx`:
 
 ```tsx app/layout.tsx
 import type { Metadata } from 'next'
@@ -144,7 +144,7 @@ Further reading: [detailed documentation for Supabase SSR in Next.js](/docs/guid
 
 #### Create a TypedSupabaseClient type
 
-To make sure we have the proper typing avaialable in all our components, we can create a `TypedSupabaseClient` type that we can hand to React Query:
+To make sure we have the proper typing available in all our components, we can create a `TypedSupabaseClient` type that we can hand to React Query:
 
 ```ts utils/types.ts
 import { SupabaseClient } from '@supabase/supabase-js'
@@ -235,7 +235,7 @@ export function getCountryById(client: TypedSupabaseClient, countryId: number) {
 }
 ```
 
-This is a simple query functions that takes in either the browser or the server Supabase client and the id of a country, and returns a supabase-js query.
+This is a simple query function that takes in either the browser or the server Supabase client and the id of a country, and returns a supabase-js query.
 
 ### Fetch data server side
 
