@@ -1,10 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
 import { components } from 'data/api'
 import { post } from 'data/fetchers'
 import { ResponseError } from 'types'
-import { databaseColumnsKeys } from './keys'
 
 export type CreateColumnBody = components['schemas']['CreateColumnBody']
 
@@ -45,14 +44,10 @@ export const useDatabaseColumnCreateMutation = ({
   UseMutationOptions<DatabaseColumnCreateData, ResponseError, DatabaseColumnCreateVariables>,
   'mutationFn'
 > = {}) => {
-  const queryClient = useQueryClient()
-
   return useMutation<DatabaseColumnCreateData, ResponseError, DatabaseColumnCreateVariables>(
     (vars) => createDatabaseColumn(vars),
     {
       async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(databaseColumnsKeys.list(projectRef))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

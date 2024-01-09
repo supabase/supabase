@@ -192,23 +192,21 @@ const SidePanelEditor = ({
 
     const { columnId } = configuration
     const response = isNewRecord
-      ? await createColumn(
-          project?.ref!,
-          project?.connectionString,
-          ui,
-          payload as CreateColumnPayload,
-          selectedTable as PostgresTable,
-          foreignKey
-        )
-      : await updateColumn(
-          project?.ref!,
-          project?.connectionString,
-          ui,
-          columnId as string,
-          payload as UpdateColumnPayload,
-          selectedTable as PostgresTable,
-          foreignKey
-        )
+      ? await createColumn({
+          projectRef: project?.ref!,
+          connectionString: project?.connectionString,
+          payload: payload as CreateColumnPayload,
+          selectedTable: selectedTable as PostgresTable,
+          foreignKey,
+        })
+      : await updateColumn({
+          projectRef: project?.ref!,
+          connectionString: project?.connectionString,
+          id: columnId as string,
+          payload: payload as UpdateColumnPayload,
+          selectedTable: selectedTable as PostgresTable,
+          foreignKey,
+        })
 
     if (response?.error) {
       ui.setNotification({ category: 'error', message: response.error.message })

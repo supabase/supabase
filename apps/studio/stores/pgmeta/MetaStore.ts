@@ -1,5 +1,5 @@
 import { Query } from 'components/grid/query/Query'
-import { chunk, find, isEmpty, isEqual, isUndefined } from 'lodash'
+import { chunk, find, isEmpty, isEqual } from 'lodash'
 import { makeObservable } from 'mobx'
 import Papa from 'papaparse'
 
@@ -288,13 +288,13 @@ export default class MetaStore implements IMetaStore {
 
       // Then add the foreign key constraints here
       for (const column of columns) {
-        if (!isUndefined(column.foreignKey)) {
+        if (column.foreignKey !== undefined) {
           await addForeignKey(this.projectRef, this.connectionString, column.foreignKey)
         }
       }
 
       // If the user is importing data via a spreadsheet
-      if (!isUndefined(importContent)) {
+      if (importContent !== undefined) {
         if (importContent.file && importContent.rowCount > 0) {
           // Via a CSV file
           const { error }: any = await this.insertRowsViaSpreadsheet(
@@ -320,7 +320,7 @@ export default class MetaStore implements IMetaStore {
             if (identity.error) throw identity.error
           }
 
-          if (!isUndefined(error)) {
+          if (error !== undefined) {
             this.rootStore.ui.setNotification({
               category: 'error',
               message: 'Do check your spreadsheet if there are any discrepancies.',
@@ -426,14 +426,13 @@ export default class MetaStore implements IMetaStore {
           ...column,
           isPrimaryKey: false,
         })
-        await createColumn(
-          this.projectRef,
-          this.connectionString,
-          this.rootStore.ui,
-          columnPayload,
-          updatedTable,
-          column.foreignKey
-        )
+        await createColumn({
+          projectRef: this.projectRef,
+          connectionString: this.connectionString,
+          payload: columnPayload,
+          selectedTable: updatedTable,
+          foreignKey: column.foreignKey,
+        })
       } else {
         const originalColumn = find(originalColumns, { id: column.id })
         if (originalColumn) {
@@ -452,17 +451,16 @@ export default class MetaStore implements IMetaStore {
             })
             const skipPKCreation = true
             const skipSuccessMessage = true
-            const res = await updateColumn(
-              this.projectRef,
-              this.connectionString,
-              this.rootStore.ui,
-              column.id,
-              columnPayload,
-              updatedTable,
-              column.foreignKey,
+            const res = await updateColumn({
+              projectRef: this.projectRef,
+              connectionString: this.connectionString,
+              id: column.id,
+              payload: columnPayload,
+              selectedTable: updatedTable,
+              foreignKey: column.foreignKey,
               skipPKCreation,
-              skipSuccessMessage
-            )
+              skipSuccessMessage,
+            })
             if (res?.error) {
               hasError = true
               this.rootStore.ui.setNotification({

@@ -1,13 +1,14 @@
 import { PostgresRelationship, PostgresTable } from '@supabase/postgres-meta'
+import { find } from 'lodash'
+import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
+
 import { createDatabaseColumn } from 'data/database-columns/database-column-create-mutation'
 import { updateDatabaseColumn } from 'data/database-columns/database-column-update-mutation'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { getViews } from 'data/views/views-query'
 import { useStore } from 'hooks'
-import { find, isUndefined } from 'lodash'
-import { useEffect, useState } from 'react'
-import { IUiStore } from 'stores/UiStore'
 import { IMetaStore } from 'stores/pgmeta/MetaStore'
 import {
   CreateColumnPayload,
@@ -173,18 +174,20 @@ export const removeForeignKey = async (
  * The methods below involve several contexts due to the UI flow of the
  * dashboard and hence do not sit within their own stores
  */
-export const createColumn = async (
-  projectRef: string,
-  connectionString: string | undefined,
-  ui: IUiStore,
-  payload: CreateColumnPayload,
-  selectedTable: PostgresTable,
+export const createColumn = async ({
+  projectRef,
+  connectionString,
+  payload,
+  selectedTable,
+  foreignKey,
+}: {
+  projectRef: string
+  connectionString: string | undefined
+  payload: CreateColumnPayload
+  selectedTable: PostgresTable
   foreignKey?: ExtendedPostgresRelationship
-) => {
-  const toastId = ui.setNotification({
-    category: 'loading',
-    message: `Creating column "${payload.name}"...`,
-  })
+}) => {
+  const toastId = toast.loading(`Creating column "${payload.name}"...`)
   try {
     // Once pg-meta supports composite keys, we can remove this logic
     const { isPrimaryKey, ...formattedPayload } = payload
@@ -196,11 +199,7 @@ export const createColumn = async (
 
     // Firing createColumn in createTable will bypass this block
     if (isPrimaryKey) {
-      ui.setNotification({
-        id: toastId,
-        category: 'loading',
-        message: 'Assigning primary key to column...',
-      })
+      toast.loading('Assigning primary key to column...', { id: toastId })
       // Same logic in createTable: Remove any primary key constraints first (we'll add it back later)
       const existingPrimaryKeys = selectedTable.primary_keys.map((x) => x.name)
 
@@ -218,41 +217,37 @@ export const createColumn = async (
       )
     }
 
-    if (!isUndefined(foreignKey)) {
-      ui.setNotification({
-        id: toastId,
-        category: 'loading',
-        message: 'Adding foreign key to column...',
-      })
+    if (foreignKey !== undefined) {
+      toast.loading('Adding foreign key to column...', { id: toastId })
       await addForeignKey(projectRef, connectionString, foreignKey)
     }
 
-    ui.setNotification({
-      id: toastId,
-      category: 'success',
-      message: `Successfully created column "${column.name}"`,
-    })
+    toast.success(`Successfully created column "${column.name}"`, { id: toastId })
   } catch (error: any) {
-    ui.setNotification({
-      id: toastId,
-      category: 'error',
-      message: `An error occurred while creating the column "${payload.name}"`,
-    })
+    toast.error(`An error occurred while creating the column "${payload.name}"`, { id: toastId })
     return { error }
   }
 }
 
-export const updateColumn = async (
-  projectRef: string,
-  connectionString: string | undefined,
-  ui: IUiStore,
-  id: string,
-  payload: UpdateColumnPayload,
-  selectedTable: PostgresTable,
-  foreignKey?: ExtendedPostgresRelationship,
-  skipPKCreation?: boolean,
-  skipSuccessMessage: boolean = false
-) => {
+export const updateColumn = async ({
+  projectRef,
+  connectionString,
+  id,
+  payload,
+  selectedTable,
+  foreignKey,
+  skipPKCreation,
+  skipSuccessMessage = false,
+}: {
+  projectRef: string
+  connectionString: string | undefined
+  id: string
+  payload: UpdateColumnPayload
+  selectedTable: PostgresTable
+  foreignKey?: ExtendedPostgresRelationship
+  skipPKCreation?: boolean
+  skipSuccessMessage?: boolean
+}) => {
   try {
     const { isPrimaryKey, ...formattedPayload } = payload
     const column = await updateDatabaseColumn({
@@ -301,10 +296,7 @@ export const updateColumn = async (
     }
 
     if (!skipSuccessMessage) {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully updated column "${column.name}"`,
-      })
+      toast.success(`Successfully updated column "${column.name}"`)
     }
   } catch (error: any) {
     return { error }
