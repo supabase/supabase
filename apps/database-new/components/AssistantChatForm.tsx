@@ -22,12 +22,11 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
     const textAreaRef = createRef<HTMLTextAreaElement>()
     const submitRef = createRef<HTMLButtonElement>()
 
-    const { messages, input, handleInputChange, handleSubmit } = useChat({
+    const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
       onFinish: redirectOnFinish,
     })
 
     async function redirectOnFinish(message: Message) {
-      console.log('AssistantChatForm', { input }, { message })
       createThread(input, message, threadId)
     }
 
@@ -57,24 +56,22 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
     }
 
     const SubmitButton = () => {
-      const { pending } = useFormStatus()
-
       return (
         <div className="absolute right-1.5 top-1.5 flex gap-3 items-center">
-          {loading || pending ? (
+          {isLoading && (
             <Loader2 size={22} className="animate-spin w-7 h-7 text-muted" strokeWidth={1} />
-          ) : null}
+          )}
 
           <button
             title="Send AI prompt"
             ref={submitRef}
             type="submit"
-            disabled={pending}
+            disabled={isLoading}
             className={cn(
               'transition-all',
               'flex items-center justify-center w-7 h-7 border border-control rounded-full mr-0.5 p-1.5 background-alternative',
               !value ? 'text-muted opacity-50' : 'text-default opacity-100',
-              loading || pending ? 'hidden' : ''
+              isLoading ? 'hidden' : ''
             )}
           >
             <svg

@@ -42,7 +42,6 @@ function ChatInput({ params }: ChatInputProps) {
     <div className="px-4 pb-4">
       {thread_id}
       <AssistantChatForm
-        //action={formAction}
         key={`chat-thread-form-${thread_id}`}
         id={`chat-thread-form-${thread_id}`}
         value={value}
@@ -50,9 +49,8 @@ function ChatInput({ params }: ChatInputProps) {
         onValueChange={(v) => setValue(v.target.value)}
         threadId={thread_id}
         //message={state.message}
-      >
-        {/* <Input type="hidden" name="runId" value={runId} key={`chat-thread-form-${runId}}`} /> */}
-      </AssistantChatForm>
+      />
+
       {/* <Message /> */}
     </div>
   )

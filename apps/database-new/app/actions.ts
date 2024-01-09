@@ -1,21 +1,12 @@
 'use server'
 
-import { last, sortBy } from 'lodash'
-
-import { AssistantMessage } from '@/lib/types'
-import { parseTables } from '@/lib/utils'
-
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { cookies } from 'next/headers'
-import { RedirectType, redirect } from 'next/navigation'
-
-import OpenAI from 'openai'
-import { z } from 'zod'
-import { MessageContentText } from 'openai/resources/beta/threads/index.mjs'
+import { redirect } from 'next/navigation'
 import { Message } from 'ai'
 
-const openai = new OpenAI()
+import { z } from 'zod'
 
 export async function logout() {
   const cookieStore = cookies()
@@ -102,7 +93,6 @@ export async function createThread(input: string, message: Message, currentThrea
       data: undefined,
     }
   }
-
   redirect(`/${thread_id}/${message_id}`)
 }
 
