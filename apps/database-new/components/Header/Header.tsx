@@ -26,8 +26,6 @@ const Header = async () => {
             <span>design</span>
           </div>
         </Link>
-
-        <CurrentThreadName />
       </div>
       <div className="flex gap-3">
         <HeaderActions user={user} />

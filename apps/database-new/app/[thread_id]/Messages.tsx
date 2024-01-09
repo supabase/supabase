@@ -27,11 +27,8 @@ async function Messages({ params }: { params: { thread_id: string } }) {
   return (
     <div className="flex flex-col py-2 xl:py-6">
       {messagesSorted.map((message, idx) => {
-        const index = userMessages?.indexOf(message)
         const createdAtTimestamp = dayjs(message.created_at)
-
-        const reply = userMessages?.[index + 1]
-        const isLatest = idx === userMessages.length - 1
+        const isLatest = Array.isArray(userMessages) && idx === userMessages.length - 1
 
         const hoursFromNow = dayjs().diff(createdAtTimestamp, 'hour')
         const formattedTimeFromNow = dayjs(createdAtTimestamp).fromNow()

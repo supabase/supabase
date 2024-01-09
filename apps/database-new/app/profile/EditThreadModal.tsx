@@ -56,7 +56,7 @@ const EditThreadModal = ({
       header="Edit thread name"
       className="pb-2"
     >
-      <form ref={formRef} action={formAction} key={`${thread.id}-update-thread-title-form`}>
+      <form ref={formRef} action={formAction} key={`${thread.thread_id}-update-thread-title-form`}>
         <Modal.Content className="py-4">
           <Label_Shadcn_ htmlFor="thread_title">Provide a name for your thread</Label_Shadcn_>
           <Input_Shadcn_
