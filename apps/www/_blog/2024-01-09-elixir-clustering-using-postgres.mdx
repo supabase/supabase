@@ -1,16 +1,23 @@
 ---
 title: Elixir clustering using Postgres
-description: 'WIP'
+description: 'Learn about our approach to connecting multiple nodes in Elixir using Postgres'
 author: filipe
-image: WIP
-thumb: WIP
+image: elixir-clustering-using-postgres/elixir-clustering-OG.png
+thumb: elixir-clustering-using-postgres/elixir-clustering-thumb.png
 categories:
-  - product
+  - engineering
 tags:
   - supabase-engineering
+  - planetpg
 date: '2024-01-09'
 toc_depth: 3
 ---
+
+<Admonition type="note" label="Supabase Engineering">
+
+Introducing Supabase Engineering—a new blog series where our engineering teams discuss what they build, share tools, technologies, best practices, and how they overcome the challenges they face. Kicking off the series is a post by Filipe Cabaço from the Realtime team.
+
+</Admonition>
 
 Elixir offers a powerful feature by allowing multiple nodes to communicate between them without extra services in the middle, reducing the overall complexity of your system.
 
@@ -34,7 +41,7 @@ However, when it comes to connecting the servers, there seems to be a barrier of
 
 ## Why do we need a distributed Erlang Cluster?
 
-At Supabase, we use clustering in all of our Elixir projects which include [Logflare](https://github.com/Logflare/logflare), [Supavisor](https://github.com/supabase/supavisor) and [Realtime](https://github.com/supabase/realtime). With multiple servers connected, we can load shed, create globally distributed services, and provide the best service to our customers so we’re closer to them geographically and to their instances, reducing overall latency.
+At Supabase, we use clustering in all of our Elixir projects which include [Logflare](https://supabase.com/docs/guides/database/extensions/wrappers/logflare), [Supavisor](https://supabase.com/blog/supavisor-postgres-connection-pooler) and [Realtime](https://supabase.com/docs/guides/realtime). With multiple servers connected, we can load shed, create globally distributed services, and provide the best service to our customers so we’re closer to them geographically and to their instances, reducing overall latency.
 
 <Img
   src={{
@@ -49,11 +56,11 @@ To achieve a connected cluster, we wanted to be as cloud-agnostic as possible. T
 
 The other piece of the puzzle was already built by the Erlang community being the defacto library to facilitate the creation of connected Elixir servers: [libcluster](https://github.com/bitwalker/libcluster).
 
-### What is libcluster?
+## What is libcluster?
 
 [libcluster](https://github.com/bitwalker/libcluster) is the go-to package for connecting multiple BEAM instances and setting up healing strategies. libcluster provides out-of-the-box strategies and it allows users to define their own strategies by implementing a simple behavior that defines cluster formation and healing according to the supporting service you want to use.
 
-### How did we use Postgres?
+## How did we use Postgres?
 
 Postgres provides an event system using two commands: [NOTIFY](https://www.postgresql.org/docs/current/sql-notify.html) and [LISTEN](https://www.postgresql.org/docs/current/sql-listen.html) so we can use them to propagate events within our Postgres instance.
 
@@ -88,7 +95,7 @@ receive do msg -> IO.inspect(msg) end
 # {:notification, #PID<0.223.0>, #Reference<0.57446457.3896770561.212335>, "channel", "test"}
 ```
 
-### Building the strategy
+## Building the strategy
 
 Using the libcluster `Strategy` behavior, inspired by [this GitHub repository](https://github.com/kevbuchanan/libcluster_postgres) and knowing how `NOTIFY/LISTEN` works, implementing a strategy becomes straightforward:
 
@@ -158,3 +165,10 @@ These three simple steps allow us to connect as many nodes as needed, regardless
 In this post, we have described our approach to connecting multiple nodes in Elixir using Postgres. We have also made this strategy available for anyone to use. Please check the code at [github.com/supabase/libcluster_postgres](https://github.com/supabase/libcluster_postgres)
 
 A special thank you to [@gotbones](https://twitter.com/gotbones) for creating libcluster and [@kevinbuch_](https://twitter.com/kevinbuch_) for the original inspiration for this strategy.
+
+## More Supabase Realtime
+
+- [Realtime docs](https://supabase.com/docs/guides/realtime)
+- [Realtime: Multiplayer Edition](https://supabase.com/blog/supabase-realtime-multiplayer-general-availability)
+- [Video - How to subscribe to real-time changes on your database](https://www.youtube.com/watch?v=2rUjcmgZDwQ)
+- [Video- Listening to real-time changes on the database with Flutter and Supabase](https://www.youtube.com/watch?v=gboTC2lcgzw)
