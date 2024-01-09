@@ -248,7 +248,7 @@ const CustomDomainSidePanel = () => {
                   <p className="text-sm text-foreground-light">
                     Upon clicking confirm, the add-on is removed immediately and any unused time in
                     the current billing cycle is added as prorated credits to your organization and
-                    used in subsequent billing cycles
+                    used in subsequent billing cycles.
                   </p>
                 )
               ) : (
