@@ -1,7 +1,6 @@
 import HeaderActions from './HeaderActions'
 import { createClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
-import CurrentThreadName from './CurrentThreadName'
 import Link from 'next/link'
 import UserDropdown from './UserDropdown'
 

@@ -17,8 +17,8 @@ import EditThreadModal from './EditThreadModal'
 import { ThreadType } from './Threads'
 
 const Thread = ({ thread }: { thread: ThreadType }) => {
-  const { created_at, id, thread_title, message_id } = thread
-  const formattedTimeAgo = timeAgo(created_at)
+  const { created_at, thread_id, thread_title } = thread
+  const formattedTimeAgo = timeAgo(created_at!)
 
   const [editOpen, setEditOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
@@ -26,7 +26,7 @@ const Thread = ({ thread }: { thread: ThreadType }) => {
   return (
     <>
       <div
-        key={id}
+        key={thread_id}
         className="group w-full flex flex-row items-center gap-6  border rounded pl-5 pr-2 transition bg-surface-100 hover:bg-surface-200 h-14"
       >
         <div className="flex flex-col grow overflow-hidden">
@@ -67,13 +67,13 @@ const Thread = ({ thread }: { thread: ThreadType }) => {
         </div>
       </div>
       <ConfirmDeleteThreadModal
-        key={`${id}-delete-dialog`}
+        key={`${thread_id}-delete-dialog`}
         thread={thread}
         visible={deleteOpen}
         onClose={() => setDeleteOpen(false)}
       />
       <EditThreadModal
-        key={`${id}-edit-dialog`}
+        key={`${thread_id}-edit-dialog`}
         thread={thread}
         visible={editOpen}
         onClose={() => setEditOpen(false)}
