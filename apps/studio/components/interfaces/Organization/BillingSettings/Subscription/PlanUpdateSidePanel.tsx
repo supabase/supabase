@@ -519,7 +519,7 @@ const PlanUpdateSidePanel = () => {
           ) : (
             <div className="py-4 space-y-2">
               <p className="text-sm">
-                This organization is billed through one of our partners and you will be charged by
+                This organization is billed through our partner Fly.io and you will be charged by
                 them directly.
               </p>
               {subscriptionPreview?.billed_via_partner &&
