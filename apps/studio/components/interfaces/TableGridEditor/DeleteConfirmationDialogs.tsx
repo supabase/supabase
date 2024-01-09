@@ -9,11 +9,9 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useDatabaseColumnDeleteMutation } from 'data/database-columns/database-column-delete-mutation'
 import { entityTypeKeys } from 'data/entity-types/keys'
-import { sqlKeys } from 'data/sql/keys'
 import { useTableRowDeleteAllMutation } from 'data/table-rows/table-row-delete-all-mutation'
 import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
 import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-mutation'
-import { tableKeys } from 'data/tables/keys'
 import { useGetTables } from 'data/tables/tables-query'
 import { viewKeys } from 'data/views/keys'
 import { useStore, useUrlState } from 'hooks'
@@ -49,40 +47,9 @@ const DeleteConfirmationDialogs = ({
   const { mutate: deleteColumn } = useDatabaseColumnDeleteMutation({
     onSuccess: async () => {
       if (!(snap.confirmationDialog?.type === 'column')) return
-
       const selectedColumnToDelete = snap.confirmationDialog.column
       removeDeletedColumnFromFiltersAndSorts(selectedColumnToDelete.name)
-
       toast.success(`Successfully deleted column "${selectedColumnToDelete.name}"`)
-
-      await Promise.all([
-        queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints'])),
-        queryClient.invalidateQueries(
-          tableKeys.table(project?.ref, selectedColumnToDelete!.table_id)
-        ),
-        queryClient.invalidateQueries(
-          sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
-        ),
-        queryClient.invalidateQueries(
-          sqlKeys.query(project?.ref, [
-            'table-definition',
-            selectedTable!.schema,
-            selectedTable!.name,
-          ])
-        ),
-        // refetch all entities in the sidebar because deleting a column may regenerate a view (and change its id)
-        queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
-        // invalidate all views from this schema, not sure if this is needed since you can't actually delete a column
-        // which has a view dependent on it
-        snap.selectedSchemaName
-          ? queryClient.invalidateQueries(
-              viewKeys.listBySchema(projectRef, snap.selectedSchemaName)
-            )
-          : null,
-        // invalidate the view if there's a view with this id, not sure if this is needed because you can't delete a
-        // column from a view
-        queryClient.invalidateQueries(viewKeys.view(projectRef, selectedTable?.id)),
-      ])
       snap.closeConfirmationDialog()
     },
     onError: (error) => {
@@ -179,6 +146,7 @@ const DeleteConfirmationDialogs = ({
       cascade: isDeleteWithCascade,
       projectRef: projectRef!,
       connectionString: project?.connectionString,
+      table: selectedTable,
     })
   }
 
