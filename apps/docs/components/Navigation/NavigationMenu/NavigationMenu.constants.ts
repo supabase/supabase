@@ -1543,6 +1543,7 @@ export const migrate = {
   title: 'Migrate to Supabase',
   url: '/guides/migrate',
   items: [
+    { name: 'Cognito Auth', url: '/guides/migrations/cognito-auth' },
     { name: 'Firebase Auth', url: '/guides/migrations/firebase-auth' },
     { name: 'Firestore Data', url: '/guides/migrations/firestore-data' },
     { name: 'Firebase Storage', url: '/guides/migrations/firebase-storage' },
