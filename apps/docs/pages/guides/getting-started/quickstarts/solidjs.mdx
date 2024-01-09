@@ -77,7 +77,10 @@ export const meta = {
   <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Query data from the app">
 
-    In `App.jsx`, create a Supabase client using your [Project URL and public API (anon) key](https://supabase.com/dashboard/project/_/settings/api).
+    In `App.jsx`, create a Supabase client using your project URL and public API (anon) key:
+
+    <ProjectConfigVariables variable="url" />
+    <ProjectConfigVariables variable="anonKey" />
 
     Add a `getCountries` function to fetch the data and display the query result to the page.
 
