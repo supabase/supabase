@@ -107,7 +107,7 @@ export const meta = {
       DIRECT_URL="postgres://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres"
 
       # PostgreSQL pooler connection string with Supavisor config — used by Prisma Client
-      DATABASE_URL="postgres://postgres.[YOUR-PROJECT-REF]:[YOUR-PASSWORD]@aws-0-eu-central-1.pooler.supabase.com:6543/postgres"
+      DATABASE_URL="postgres://postgres.[YOUR-PROJECT-REF]:[YOUR-PASSWORD]@aws-0-[YOUR-PROJECT-REGION].pooler.supabase.com:6543/postgres"
       ```
     </StepHikeCompact.Code>
 
@@ -238,7 +238,7 @@ export const meta = {
       ![RedwoodJS Splash Page](/docs/img/redwoodjs-qs-countries-ui.png)
     </StepHikeCompact.Code>
 
-  </StepHikeCompact.Step>  
+  </StepHikeCompact.Step>
 </StepHikeCompact>
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} hideToc={true} />
