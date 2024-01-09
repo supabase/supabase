@@ -193,7 +193,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
           { duration: 6000 }
         )
         resetOperations()
-      }, [resetOperations])
+      }, [resetOperations, selectedRole, selectedSchema, selectedTable])
     )
 
   function applyChanges() {
