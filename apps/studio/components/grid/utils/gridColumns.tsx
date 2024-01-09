@@ -40,6 +40,8 @@ export const ESTIMATED_CHARACTER_PIXEL_WIDTH = 9
 export function getGridColumns(
   table: SupaTable,
   options?: {
+    projectRef?: string
+    tableId?: string
     editable?: boolean
     defaultWidth?: string | number
     onAddColumn?: () => void
@@ -79,9 +81,12 @@ export function getGridColumns(
         />
       ),
       renderEditCell: options
-        ? getColumnEditor(x, columnType, options?.editable ?? false, options.onExpandJSONEditor)
+        ? getCellEditor(x, columnType, options?.editable ?? false, options.onExpandJSONEditor)
         : undefined,
-      renderCell: getColumnFormatter(x, columnType),
+      renderCell: getCellRenderer(x, columnType, {
+        projectRef: options?.projectRef,
+        tableId: options?.tableId,
+      }),
 
       // [Next 18 Refactor] Double check if this is correct
       parent: undefined,
@@ -101,7 +106,7 @@ export function getGridColumns(
   return gridColumns
 }
 
-function getColumnEditor(
+function getCellEditor(
   columnDefinition: SupaColumn,
   columnType: ColumnType,
   isEditable: boolean,
@@ -166,7 +171,11 @@ function getColumnEditor(
   }
 }
 
-function getColumnFormatter(columnDef: SupaColumn, columnType: ColumnType) {
+function getCellRenderer(
+  columnDef: SupaColumn,
+  columnType: ColumnType,
+  metadata: { projectRef?: string; tableId?: string }
+) {
   switch (columnType) {
     case 'boolean': {
       return BooleanFormatter
@@ -175,7 +184,10 @@ function getColumnFormatter(columnDef: SupaColumn, columnType: ColumnType) {
       if (columnDef.isPrimaryKey || !columnDef.isUpdatable) {
         return DefaultFormatter
       } else {
-        return ForeignKeyFormatter
+        // eslint-disable-next-line react/display-name
+        return (p: any) => (
+          <ForeignKeyFormatter {...p} projectRef={metadata.projectRef} tableId={metadata.tableId} />
+        )
       }
     }
     case 'json': {
