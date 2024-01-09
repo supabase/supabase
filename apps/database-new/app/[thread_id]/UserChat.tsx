@@ -23,11 +23,7 @@ interface UserChatProps {
 }
 
 const UserChat = ({ message, isLatest, times }: UserChatProps) => {
-  const router = useRouter()
-  const snap = useAppStateSnapshot()
   const { thread_id } = useParams()
-
-  console.log('userchat', thread_id, { message })
 
   // using the local state for run loading
   const isLoading = false

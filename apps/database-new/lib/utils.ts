@@ -113,7 +113,6 @@ export async function parseTables(sql: string) {
   // See: https://github.com/pyramation/libpg-query-node/pull/34
 
   const result = await parseQuery(sql)
-  console.log('the result', result)
   const parsedSql = parseQueryResultSchema.safeParse(result)
 
   if (!parsedSql.success) {

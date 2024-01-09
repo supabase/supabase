@@ -25,25 +25,6 @@ interface SchemaGraphProps {
 }
 
 const SchemaFlowHandler = ({ content }: SchemaGraphProps) => {
-  console.log('the actual content', content)
-  const fakeContent = `CREATE TABLE
-  users (
-    id bigint primary key generated always as identity,
-    username text,
-    email text,
-    password text,
-    joined_at timestamp with time zone
-  );
-
-CREATE TABLE
-  tweets (
-    id bigint primary key generated always as identity,
-    user_id bigint,
-    content text,
-    created_at timestamp with time zone,
-    foreign key (user_id) references users (id)
-  );
-`
   const { resolvedTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const [tables, setTables] = useState<PostgresTable[]>([])
@@ -58,12 +39,11 @@ CREATE TABLE
         const tables = await parseTables(content)
         setTables(tables)
       } catch (error) {
-        // Handle errors
         console.log('error', error)
       }
     }
 
-    parseTableData() // Call the async function
+    parseTableData()
   }, [])
 
   useEffect(() => {
