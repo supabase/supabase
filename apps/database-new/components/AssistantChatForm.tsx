@@ -2,13 +2,6 @@ import { Loader2 } from 'lucide-react'
 import React, { ChangeEvent, createRef, useEffect } from 'react'
 import { useFormStatus } from 'react-dom'
 import { TextArea_Shadcn_, cn } from 'ui'
-
-import { createClient } from '@/lib/supabase/server'
-import { revalidatePath } from 'next/cache'
-
-import { redirect } from 'next/navigation'
-
-import { z } from 'zod'
 import { useChat } from 'ai/react'
 import { Message } from 'ai'
 import { createThread } from '@/app/actions'

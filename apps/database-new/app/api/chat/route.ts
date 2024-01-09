@@ -2,7 +2,7 @@ import OpenAI from 'openai'
 import { OpenAIStream, StreamingTextResponse } from 'ai'
 import { stripIndent } from 'common-tags'
 
-// import is weird, fix
+// import is weird, what's up with this?
 import { ContextLengthError } from '../../../../../packages/ai-commands/src/errors'
 
 // Create an OpenAI API client (that's edge friendly!)
@@ -73,10 +73,8 @@ export async function POST(req: Request) {
       stream: true,
     })
 
-    // Transform the streamed SSE response from OpenAI to a ReadableStream
-    //return OpenAIStream(response)
     const stream = OpenAIStream(response)
-    // Respond with the stream
+
     return new StreamingTextResponse(stream)
   } catch (error) {
     if (error instanceof Error && 'code' in error && error.code === 'context_length_exceeded') {
@@ -84,24 +82,4 @@ export async function POST(req: Request) {
     }
     throw error
   }
-
-  //   // Ask OpenAI for a streaming completion given the prompt
-  //   const response = await openai.completions.create({
-  //     model: 'text-davinci-003',
-  //     stream: true,
-  //     temperature: 0.6,
-  //     max_tokens: 300,
-  //     prompt: `Give people advice about setting up a database
-
-  // Developer: I want to create a twitter clone
-  // Expert: "You should create four tables: users, tweets, likes, comments. "
-  // Developer: I want to create a todo list
-  // Expert: "You should create two tables: todos and users"
-  // Developer: ${prompt}
-  // Expert:`,
-  //   })
-  // Convert the response into a friendly text-stream
-  // const stream = OpenAIStream(response)
-  // Respond with the stream
-  // return new StreamingTextResponse(stream)
 }

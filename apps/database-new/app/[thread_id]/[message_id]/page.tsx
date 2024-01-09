@@ -1,11 +1,3 @@
-// import { CodeEditor } from '@/app/[threadId]/[runId]/[messageId]/CodeEditor'
-// import { SchemaFlow } from '@/app/[threadId]/[runId]/[messageId]/SchemaFlow'
-// import GraphLoader from '@/components/Loaders/GraphLoader'
-// import SchemaLoader from '@/components/Loaders/SchemaLoader'
-// import { Loader2 } from 'lucide-react'
-// import Image from 'next/image'
-// import { Suspense } from 'react'
-
 import GraphLoader from '@/components/Loaders/GraphLoader'
 import SchemaLoader from '@/components/Loaders/SchemaLoader'
 import { Suspense } from 'react'
@@ -33,6 +25,7 @@ async function getMessage(message_id: string) {
   if (error) {
     throw new Error('Failed to fetch message')
   }
+
   return message.message_content
 }
 
