@@ -46,7 +46,7 @@ const PrivilegesHead = ({
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-4">
         <SchemaSelector
-          className="w-[200px] [&>button]:py-[5px]"
+          className="bg-control rounded-md w-[200px] [&>button]:py-[5px]"
           selectedSchemaName={selectedSchema}
           onSelectSchema={onChangeSchema}
         />

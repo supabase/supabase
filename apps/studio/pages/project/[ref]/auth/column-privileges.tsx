@@ -2,7 +2,7 @@ import { PostgresRole } from '@supabase/postgres-meta'
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useCallback, useMemo, useState } from 'react'
-import { Button, IconExternalLink } from 'ui'
+import toast from 'react-hot-toast'
 
 import {
   getDefaultColumnCheckedStates,
@@ -12,6 +12,7 @@ import {
 } from 'components/interfaces/Database/Privileges/Privileges.utils'
 import PrivilegesHead from 'components/interfaces/Database/Privileges/PrivilegesHead'
 import PrivilegesTable from 'components/interfaces/Database/Privileges/PrivilegesTable'
+import ProtectedSchemaWarning from 'components/interfaces/Database/ProtectedSchemaWarning'
 import { AuthLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
@@ -21,10 +22,16 @@ import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useColumnPrivilegesQuery } from 'data/privileges/column-privileges-query'
 import { useTablePrivilegesQuery } from 'data/privileges/table-privileges-query'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { NextPageWithLayout } from 'types'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import ProtectedSchemaWarning from 'components/interfaces/Database/ProtectedSchemaWarning'
-import toast from 'react-hot-toast'
+import { NextPageWithLayout } from 'types'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconAlertCircle,
+  IconExternalLink,
+} from 'ui'
 
 const EDITABLE_ROLES = ['authenticated', 'anon', 'service_role']
 
@@ -253,10 +260,19 @@ const PrivilegesPage: NextPageWithLayout = () => {
                 toggleColumnPrivilege={toggleColumnPrivilege}
                 isApplyingChanges={isApplyingChanges}
               />
-              <p className="text-xs text-right text-light">
-                <strong>Warning: </strong>
-                Changing column privileges can break existing queries
-              </p>
+              <Alert_Shadcn_ variant="warning">
+                <IconAlertCircle strokeWidth={2} />
+                <AlertTitle_Shadcn_>Alpha Warnings</AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_>
+                  <ul className="list-disc list-inside">
+                    <li>Changing column privileges can break existing queries</li>
+                    <li>
+                      Changes to column privileges will not be reflected migrations when running{' '}
+                      <code className="text-xs">supabase db diff</code>
+                    </li>
+                  </ul>
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
             </div>
           ) : (tables ?? []).length === 0 ? (
             <div className="flex-grow flex flex-col items-center justify-center w-[600px] mx-auto">
