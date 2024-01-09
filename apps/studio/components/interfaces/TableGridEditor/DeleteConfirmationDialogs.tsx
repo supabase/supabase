@@ -44,8 +44,27 @@ const DeleteConfirmationDialogs = ({
     connectionString: project?.connectionString,
   })
 
+  const removeDeletedColumnFromFiltersAndSorts = (columnName: string) => {
+    setParams((prevParams) => {
+      const existingFilters = (prevParams?.filter ?? []) as string[]
+      const existingSorts = (prevParams?.sort ?? []) as string[]
+
+      return {
+        ...prevParams,
+        filter: existingFilters.filter((filter: string) => {
+          const [column] = filter.split(':')
+          if (column !== columnName) return filter
+        }),
+        sort: existingSorts.filter((sort: string) => {
+          const [column] = sort.split(':')
+          if (column !== columnName) return sort
+        }),
+      }
+    })
+  }
+
   const { mutate: deleteColumn } = useDatabaseColumnDeleteMutation({
-    onSuccess: async () => {
+    onSuccess: () => {
       if (!(snap.confirmationDialog?.type === 'column')) return
       const selectedColumnToDelete = snap.confirmationDialog.column
       removeDeletedColumnFromFiltersAndSorts(selectedColumnToDelete.name)
@@ -110,25 +129,6 @@ const DeleteConfirmationDialogs = ({
         ? snap.confirmationDialog.numRows ?? 0
         : snap.confirmationDialog.rows.length
       : 0
-
-  const removeDeletedColumnFromFiltersAndSorts = (columnName: string) => {
-    setParams((prevParams) => {
-      const existingFilters = (prevParams?.filter ?? []) as string[]
-      const existingSorts = (prevParams?.sort ?? []) as string[]
-
-      return {
-        ...prevParams,
-        filter: existingFilters.filter((filter: string) => {
-          const [column] = filter.split(':')
-          if (column !== columnName) return filter
-        }),
-        sort: existingSorts.filter((sort: string) => {
-          const [column] = sort.split(':')
-          if (column !== columnName) return sort
-        }),
-      }
-    })
-  }
 
   const isDeleteWithCascade =
     snap.confirmationDialog?.type === 'column' || snap.confirmationDialog?.type === 'table'
