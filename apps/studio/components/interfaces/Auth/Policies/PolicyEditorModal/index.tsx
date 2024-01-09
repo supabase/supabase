@@ -188,7 +188,7 @@ const PolicyEditorModal = ({
       ]}
       onCancel={isClosingPolicyEditor}
     >
-      <div className="">
+      <div>
         <ConfirmationModal
           visible={isClosingPolicyEditorModal}
           header="Discard changes"
