@@ -1,5 +1,6 @@
 import { PostgresRole } from '@supabase/postgres-meta'
 import { useParams } from 'common'
+import { XIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -22,6 +23,7 @@ import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useColumnPrivilegesQuery } from 'data/privileges/column-privileges-query'
 import { useTablePrivilegesQuery } from 'data/privileges/table-privileges-query'
 import { useTablesQuery } from 'data/tables/tables-query'
+import { useLocalStorage } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { NextPageWithLayout } from 'types'
 import {
@@ -198,6 +200,15 @@ const PrivilegesPage: NextPageWithLayout = () => {
     applyColumnPrivileges(operations)
   }
 
+  const [diffWarningDismissed, setDiffWarningDismissed] = useLocalStorage(
+    'cls-diff-warning-dismissed',
+    false
+  )
+  const [selectStarWarningDismissed, setSelectStarWarningDismissed] = useLocalStorage(
+    'cls-select-star-warning-dismissed',
+    false
+  )
+
   const isLoading =
     isLoadingTablePrivileges || isLoadingColumnPrivileges || isLoadingTables || isLoadingRoles
 
@@ -212,21 +223,74 @@ const PrivilegesPage: NextPageWithLayout = () => {
               <h3 className="mb-1 text-xl">Column-level privileges</h3>
               <div className="text-sm text-lighter">
                 <p>Grant or revoke privileges on a column based on user role.</p>
-                <p>This is an advanced feature and should be used with caution.</p>
               </div>
             </div>
             <div className="flex items-center space-x-2">
               <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                <Link
+                <a
                   href="https://supabase.com/docs/guides/auth/column-level-security"
                   target="_blank"
                   rel="noreferrer"
                 >
                   Documentation
-                </Link>
+                </a>
               </Button>
             </div>
           </div>
+
+          {!diffWarningDismissed && (
+            <Alert_Shadcn_ variant="warning">
+              <IconAlertCircle strokeWidth={2} />
+              <AlertTitle_Shadcn_>
+                Changes to column privileges will not be reflected in migrations when running{' '}
+                <code className="text-xs">supabase db diff</code>.
+              </AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_>
+                Column privileges are not supported in the current version of the Supabase CLI.
+                <br />
+                You will need to manually apply these changes to your database.
+              </AlertDescription_Shadcn_>
+              <Button
+                type="outline"
+                aria-label="Dismiss"
+                className="absolute top-2 right-2 p-1 !pl-1"
+                onClick={() => {
+                  setDiffWarningDismissed(true)
+                }}
+              >
+                <XIcon width={14} height={14} />
+              </Button>
+            </Alert_Shadcn_>
+          )}
+
+          {!selectStarWarningDismissed && (
+            <Alert_Shadcn_ variant="warning">
+              <IconAlertCircle strokeWidth={2} />
+              <AlertTitle_Shadcn_>
+                Changing column privileges can break existing queries.
+              </AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_>
+                If you remove a column privilege for a role, that role will lose all access to that
+                column.
+                <br />
+                All operations selecting <code className="text-xs">*</code> (including{' '}
+                <code className="text-xs">returning *</code> for{' '}
+                <code className="text-xs">insert</code>, <code className="text-xs">update</code>,
+                and <code className="text-xs">delete</code>) will fail.
+              </AlertDescription_Shadcn_>
+              <Button
+                type="outline"
+                aria-label="Dismiss"
+                className="absolute top-2 right-2 p-1 !pl-1"
+                onClick={() => {
+                  setSelectStarWarningDismissed(true)
+                }}
+              >
+                <XIcon width={14} height={14} />
+              </Button>
+            </Alert_Shadcn_>
+          )}
+
           <PrivilegesHead
             disabled={isLocked}
             selectedSchema={selectedSchema}
@@ -260,19 +324,6 @@ const PrivilegesPage: NextPageWithLayout = () => {
                 toggleColumnPrivilege={toggleColumnPrivilege}
                 isApplyingChanges={isApplyingChanges}
               />
-              <Alert_Shadcn_ variant="warning">
-                <IconAlertCircle strokeWidth={2} />
-                <AlertTitle_Shadcn_>Alpha Warnings</AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
-                  <ul className="list-disc list-inside">
-                    <li>Changing column privileges can break existing queries</li>
-                    <li>
-                      Changes to column privileges will not be reflected migrations when running{' '}
-                      <code className="text-xs">supabase db diff</code>
-                    </li>
-                  </ul>
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
             </div>
           ) : (tables ?? []).length === 0 ? (
             <div className="flex-grow flex flex-col items-center justify-center w-[600px] mx-auto">
