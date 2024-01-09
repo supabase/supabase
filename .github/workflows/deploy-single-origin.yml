@@ -31,6 +31,29 @@ jobs:
         name: Deploy
         run: |
           echo "DEPLOY_URL=$(vercel deploy --token ${{ secrets.VERCEL_TOKEN }})" >> $GITHUB_OUTPUT
+
+  docs:
+    runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.title, '[ci shared auth]')
+    env:
+      VERCEL_PROJECT_ID: ${{ secrets. VERCEL_DOCS_PROJECT_ID }}
+    outputs:
+      url: ${{ steps.deploy.outputs.DEPLOY_URL }}
+    steps:
+      - id: checkout
+        name: Checkout docs
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            apps/docs
+            packages
+      - id: cli
+        name: Install Vercel CLI
+        run: npm install --global vercel
+      - id: deploy
+        name: Deploy
+        run: |
+          echo "DEPLOY_URL=$(vercel deploy --token ${{ secrets.VERCEL_TOKEN }})" >> $GITHUB_OUTPUT
           #   www:
           #     runs-on: ubuntu-latest
           #     needs: studio
