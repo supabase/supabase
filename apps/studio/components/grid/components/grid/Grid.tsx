@@ -108,18 +108,16 @@ export const Grid = memo(
         copyToClipboard(text)
       }
 
-      useKeyboardShortcuts(
-        {
-          'Command+c': (event: KeyboardEvent) => {
-            event.stopPropagation()
-            copyCellValue()
-          },
-          'Control+c': (event: KeyboardEvent) => {
-            event.stopPropagation()
-            copyCellValue()
-          },
+      useKeyboardShortcuts({
+        'Command+c': (event: KeyboardEvent) => {
+          event.stopPropagation()
+          copyCellValue()
         },
-      )
+        'Control+c': (event: KeyboardEvent) => {
+          event.stopPropagation()
+          copyCellValue()
+        },
+      })
 
       function onSelectedCellChange(args: { rowIdx: number; row: any; column: any }) {
         setSelectedCell(args)
