@@ -397,5 +397,13 @@
     "position": "Guest Author",
     "author_url": "https://twitter.com/psteinroe",
     "author_image_url": "/images/philipp-steinrotter.jpg"
+  },
+  {
+    "author_id": "filipe",
+    "author": "Filipe Cabaço",
+    "username": "filipe",
+    "position": "Engineering",
+    "author_url": "https://twitter.com/filipecabaco",
+    "author_image_url": "https://github.com/filipecabaco.png"
   }
 ]
