@@ -4,7 +4,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { MousePointer2 } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { ReactNode, useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import { Button, IconAlertCircle, IconLock, Modal } from 'ui'
 
@@ -20,9 +20,10 @@ import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
 
 export interface GridHeaderActionsProps {
   table: PostgresTable
+  children: ReactNode
 }
 
-const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
+const GridHeaderActions = ({ table, children }: GridHeaderActionsProps) => {
   const { ref } = useParams()
   const { project } = useProjectContext()
   const realtimeEnabled = useIsFeatureEnabled('realtime:all')
@@ -108,7 +109,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
 
   return (
     <>
-      <div className="flex items-center space-x-3">
+      <div className="flex items-center space-x-2 space-y-2 sm:space-y-0 flex-wrap">
         {isReadOnly && (
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger className="w-full">
@@ -136,6 +137,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
 
         {(table.rls_enabled || showRLSWarning) && (
           <Button
+          className='mt-2 sm:mt-0'
             asChild
             type={table.rls_enabled ? 'link' : 'warning'}
             icon={
@@ -178,6 +180,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
             <APIDocsButton section={['entities', table.name]} />
           </div>
         )}
+        {children}
       </div>
 
       <ConfirmationModal

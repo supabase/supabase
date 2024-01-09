@@ -296,24 +296,21 @@ const TableGridEditor = ({
           isTableSelected || isViewSelected || canEditViaTableEditor ? (
             <>
               {canEditViaTableEditor && (
-                <GridHeaderActions table={selectedTable as PostgresTable} />
-              )}
-              {(isTableSelected || isViewSelected) && (
-                <>
-                  {isViewSelected && <RoleImpersonationPopover serviceRoleLabel="postgres" />}
-
-                  {canEditViaTableEditor && (
-                    <div className="h-[20px] w-px border-r border-control"></div>
-                  )}
-
-                  <div>
-                    <TwoOptionToggle
+                <GridHeaderActions table={selectedTable as PostgresTable}>
+                <TwoOptionToggle
                       width={75}
                       options={['definition', 'data']}
                       activeOption={selectedView}
                       borderOverride="border-gray-500"
                       onClickOption={setSelectedView}
                     />
+                </GridHeaderActions>
+              )}
+              {(isTableSelected || isViewSelected) && (
+                <>
+                  {isViewSelected && <RoleImpersonationPopover serviceRoleLabel="postgres" />}
+                  <div>
+                    
                   </div>
                 </>
               )}

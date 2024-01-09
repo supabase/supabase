@@ -160,7 +160,7 @@ export const Grid = memo(
                 // [Joshen] Temp fix with magic numbers till we find a better solution
                 // RDG used to use flex, but with v7 they've moved to CSS grid and the
                 // in built no rows fallback only takes the width of the CSS grid itself
-                <div style={{ width: `calc(100vw - 255px - 55px)` }}>
+                <div style={{ width: `calc(100vw - 255px - 55px)`, minWidth:'300px' }}>
                   {isLoading && (
                     <div className="p-2 col-span-full">
                       <GenericSkeletonLoader />

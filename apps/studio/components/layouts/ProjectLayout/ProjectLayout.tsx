@@ -49,6 +49,7 @@ export interface ProjectLayoutProps {
   title?: string
   isLoading?: boolean
   isBlocking?: boolean
+  expandedMenu?: boolean
   product?: string
   productMenu?: ReactNode
   hideHeader?: boolean
@@ -60,6 +61,7 @@ const ProjectLayout = ({
   title,
   isLoading = false,
   isBlocking = true,
+  expandedMenu = true,
   product = '',
   productMenu,
   children,
@@ -104,7 +106,7 @@ const ProjectLayout = ({
           {/* Product menu bar */}
           {!showPausedState && (
             <MenuBarWrapper isLoading={isLoading} isBlocking={isBlocking} productMenu={productMenu}>
-              <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
+              <ProductMenuBar title={product} expanded={expandedMenu}>{productMenu}</ProductMenuBar>
             </MenuBarWrapper>
           )}
           <main className="flex flex-col flex-1 w-full overflow-x-hidden">

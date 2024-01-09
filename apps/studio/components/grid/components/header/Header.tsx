@@ -13,6 +13,7 @@ import {
   IconChevronDown,
   IconDownload,
   IconFileText,
+  IconMoreHorizontal,
   IconTrash,
   IconX,
   cn,
@@ -63,10 +64,13 @@ const Header = ({
   const { selectedRows } = state
 
   return (
-    <div>
-      <div className="flex h-10 items-center justify-between bg-surface-100 px-5 py-1.5">
+    <>
+      <div className="flex items-center justify-between bg-surface-100 sm:px-5 py-1.5">
         {customHeader ? (
-          <>{customHeader}</>
+          <>
+            {customHeader}
+            <div className="sb-grid-header__inner">{headerActions}</div>
+          </>
         ) : (
           <>
             {selectedRows.size > 0 ? (
@@ -78,14 +82,14 @@ const Header = ({
                 onAddColumn={onAddColumn}
                 onAddRow={onAddRow}
                 onImportData={onImportData}
+                headerActions={headerActions}
               />
             )}
           </>
         )}
-        <div className="sb-grid-header__inner">{headerActions}</div>
       </div>
       <RLSBannerWarning />
-    </div>
+    </>
   )
 }
 
@@ -94,6 +98,7 @@ export default Header
 type DefaultHeaderProps = {
   table: SupaTable
   isRefetching: boolean
+  headerActions?: ReactNode
   onAddColumn?: () => void
   onAddRow?: () => void
   onImportData?: () => void
@@ -101,6 +106,7 @@ type DefaultHeaderProps = {
 const DefaultHeader = ({
   table,
   isRefetching,
+  headerActions,
   onAddColumn,
   onAddRow,
   onImportData,
@@ -109,119 +115,129 @@ const DefaultHeader = ({
 
   // [Joshen] Using this logic to block both column and row creation/update/delete
   const canCreateColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
+  const [expandedMoreSettings, setExpandedMoreSettings] = useState(false)
 
   const [{ filter: filters, sort: sorts }, setParams] = useUrlState({
     arrayKeys: ['sort', 'filter'],
   })
 
+  function handleMoreSettings() {
+    setExpandedMoreSettings(!expandedMoreSettings)
+  }
   return (
-    <div className="flex items-center gap-4">
-      <div className="flex items-center gap-2">
+    <div className="flex items-center gap-0 sm:gap-4 flex-wrap sm:flex-nowrap overflow-hidden">
+      <div className="flex items-center gap-1">
         <RefreshButton table={table} isRefetching={isRefetching} />
         <FilterDropdown table={table} filters={filters as string[]} setParams={setParams} />
         <SortPopover table={table} sorts={sorts as string[]} setParams={setParams} />
+        {canAddNew && (
+          <>
+            <div className="h-[20px] w-px border-r border-control"></div>
+            <div className="flex items-center gap-2">
+              {canCreateColumns && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      type="primary"
+                      size="tiny"
+                      icon={<IconChevronDown size={14} strokeWidth={1.5} />}
+                    >
+                      Insert
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent side="bottom" align="start">
+                    {[
+                      ...(onAddRow !== undefined
+                        ? [
+                            <DropdownMenuItem
+                              key="add-row"
+                              className="group space-x-2"
+                              onClick={onAddRow}
+                            >
+                              <div className="-mt-2 pr-1.5">
+                                <div className="border border-foreground-lighter w-[15px] h-[4px]" />
+                                <div className="border border-foreground-lighter w-[15px] h-[4px] my-[2px]" />
+                                <div
+                                  className={cn([
+                                    'border border-foreground-light w-[15px] h-[4px] translate-x-0.5',
+                                    'transition duration-200 group-data-[highlighted]:border-brand group-data-[highlighted]:translate-x-0',
+                                  ])}
+                                />
+                              </div>
+                              <div>
+                                <p>Insert row</p>
+                                <p className="text-foreground-light">
+                                  Insert a new row into {table.name}
+                                </p>
+                              </div>
+                            </DropdownMenuItem>,
+                          ]
+                        : []),
+                      ...(onAddColumn !== undefined
+                        ? [
+                            <DropdownMenuItem
+                              key="add-column"
+                              className="group space-x-2"
+                              onClick={onAddColumn}
+                            >
+                              <div className="flex -mt-2 pr-1.5">
+                                <div className="border border-foreground-lighter w-[4px] h-[15px]" />
+                                <div className="border border-foreground-lighter w-[4px] h-[15px] mx-[2px]" />
+                                <div
+                                  className={cn([
+                                    'border border-foreground-light w-[4px] h-[15px] -translate-y-0.5',
+                                    'transition duration-200 group-data-[highlighted]:border-brand group-data-[highlighted]:translate-y-0',
+                                  ])}
+                                />
+                              </div>
+                              <div>
+                                <p>Insert column</p>
+                                <p className="text-foreground-light">
+                                  Insert a new column into {table.name}
+                                </p>
+                              </div>
+                            </DropdownMenuItem>,
+                          ]
+                        : []),
+                      ...(onImportData !== undefined
+                        ? [
+                            <DropdownMenuItem
+                              key="import-data"
+                              className="group space-x-2"
+                              onClick={onImportData}
+                            >
+                              <div className="relative -mt-2">
+                                <IconFileText className="-translate-x-[2px]" />
+                                <IconArrowUp
+                                  className={clsx(
+                                    'transition duration-200 absolute bottom-0 right-0 translate-y-1 opacity-0 bg-brand-400 rounded-full',
+                                    'group-data-[highlighted]:translate-y-0 group-data-[highlighted]:text-brand group-data-[highlighted]:opacity-100'
+                                  )}
+                                  strokeWidth={3}
+                                  size={12}
+                                />
+                              </div>
+                              <div>
+                                <p>Import data from CSV</p>
+                                <p className="text-foreground-light">Insert new rows from a CSV</p>
+                              </div>
+                            </DropdownMenuItem>,
+                          ]
+                        : []),
+                    ]}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </div>
+          </>
+        )}
       </div>
-      {canAddNew && (
-        <>
-          <div className="h-[20px] w-px border-r border-control"></div>
-          <div className="flex items-center gap-2">
-            {canCreateColumns && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    type="primary"
-                    size="tiny"
-                    icon={<IconChevronDown size={14} strokeWidth={1.5} />}
-                  >
-                    Insert
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent side="bottom" align="start">
-                  {[
-                    ...(onAddRow !== undefined
-                      ? [
-                          <DropdownMenuItem
-                            key="add-row"
-                            className="group space-x-2"
-                            onClick={onAddRow}
-                          >
-                            <div className="-mt-2 pr-1.5">
-                              <div className="border border-foreground-lighter w-[15px] h-[4px]" />
-                              <div className="border border-foreground-lighter w-[15px] h-[4px] my-[2px]" />
-                              <div
-                                className={cn([
-                                  'border border-foreground-light w-[15px] h-[4px] translate-x-0.5',
-                                  'transition duration-200 group-data-[highlighted]:border-brand group-data-[highlighted]:translate-x-0',
-                                ])}
-                              />
-                            </div>
-                            <div>
-                              <p>Insert row</p>
-                              <p className="text-foreground-light">
-                                Insert a new row into {table.name}
-                              </p>
-                            </div>
-                          </DropdownMenuItem>,
-                        ]
-                      : []),
-                    ...(onAddColumn !== undefined
-                      ? [
-                          <DropdownMenuItem
-                            key="add-column"
-                            className="group space-x-2"
-                            onClick={onAddColumn}
-                          >
-                            <div className="flex -mt-2 pr-1.5">
-                              <div className="border border-foreground-lighter w-[4px] h-[15px]" />
-                              <div className="border border-foreground-lighter w-[4px] h-[15px] mx-[2px]" />
-                              <div
-                                className={cn([
-                                  'border border-foreground-light w-[4px] h-[15px] -translate-y-0.5',
-                                  'transition duration-200 group-data-[highlighted]:border-brand group-data-[highlighted]:translate-y-0',
-                                ])}
-                              />
-                            </div>
-                            <div>
-                              <p>Insert column</p>
-                              <p className="text-foreground-light">
-                                Insert a new column into {table.name}
-                              </p>
-                            </div>
-                          </DropdownMenuItem>,
-                        ]
-                      : []),
-                    ...(onImportData !== undefined
-                      ? [
-                          <DropdownMenuItem
-                            key="import-data"
-                            className="group space-x-2"
-                            onClick={onImportData}
-                          >
-                            <div className="relative -mt-2">
-                              <IconFileText className="-translate-x-[2px]" />
-                              <IconArrowUp
-                                className={clsx(
-                                  'transition duration-200 absolute bottom-0 right-0 translate-y-1 opacity-0 bg-brand-400 rounded-full',
-                                  'group-data-[highlighted]:translate-y-0 group-data-[highlighted]:text-brand group-data-[highlighted]:opacity-100'
-                                )}
-                                strokeWidth={3}
-                                size={12}
-                              />
-                            </div>
-                            <div>
-                              <p>Import data from CSV</p>
-                              <p className="text-foreground-light">Insert new rows from a CSV</p>
-                            </div>
-                          </DropdownMenuItem>,
-                        ]
-                      : []),
-                  ]}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-          </div>
-        </>
-      )}
+      <div className="space-y-1 items-end sm:hidden">
+        <Button type="text" size="tiny" icon={<IconMoreHorizontal />} onClick={handleMoreSettings}>
+          {!expandedMoreSettings ? 'More' : 'Hide'} Settings
+        </Button>
+      </div>
+      <div className={!expandedMoreSettings ? `sm:h-7 h-0 overflow-hidden` : ''}>{headerActions}</div>
     </div>
   )
 }

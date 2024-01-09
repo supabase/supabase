@@ -2,13 +2,16 @@ import { PropsWithChildren } from 'react'
 
 interface ProductMenuBarProps {
   title: string
+  expanded?: boolean
 }
 
-const ProductMenuBar = ({ title, children }: PropsWithChildren<ProductMenuBarProps>) => {
+const ProductMenuBar = ({ title, expanded = true, children }: PropsWithChildren<ProductMenuBarProps>) => {
+  const isExpanded = expanded ? 'w-64' : 'w-0';
   return (
     <div
       className={[
-        'hide-scrollbar flex w-64 flex-col border-r', // Layout
+        isExpanded,
+        'hide-scrollbar flex md:w-64 flex-col border-r', // Layout
         'bg-background',
         'border-default ',
       ].join(' ')}
