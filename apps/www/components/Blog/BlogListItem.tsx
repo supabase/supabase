@@ -7,6 +7,7 @@ import PostTypes from '~/types/post'
 
 interface Props {
   post: PostTypes
+
 }
 
 const BlogListItem = ({ post }: Props) => {
@@ -58,10 +59,10 @@ const BlogListItem = ({ post }: Props) => {
             )}
           </div>
           <div className="flex items-center -space-x-2">
-            {author.map((author: any, i: number) => {
+            {author.map((author, i) => {
               return (
                 <div className="relative ring-background w-10 h-10 rounded-full ring-2" key={i}>
-                  {author.author_image_url && (
+                  {author && author.author_image_url && (
                     <Image
                       src={author.author_image_url}
                       className="rounded-full object-cover border border-default w-full h-full"
