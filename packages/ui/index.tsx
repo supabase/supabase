@@ -148,6 +148,8 @@ export {
 
 export { Input as Input_Shadcn_ } from './src/components/shadcn/ui/input'
 
+export { Button as Button_Shadcn_ } from './src/components/shadcn/ui/button'
+
 export { TextArea as TextArea_Shadcn_ } from './src/components/shadcn/ui/text-area'
 
 export { Label as Label_Shadcn_ } from './src/components/shadcn/ui/label'
