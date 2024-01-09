@@ -29,7 +29,7 @@ Elixir offers a powerful feature by allowing multiple nodes to communicate betwe
   alt="Elixir nodes communicating between each other without extra services in the middle"
 />
 
-However, when it comes to connecting the servers, there seems to be a barrier of entry that many people encounter, including ourselves, on how to provide the name discovery required to connect said servers. We have released our approach to solving this problem by open-sourcing [libcluster Postgres Strategy](https://github.com/supabase/libcluster_postgres) and today, we explore the motivations behind its creation and the methodologies employed in its development. 
+However, when it comes to connecting the servers, there seems to be a barrier of entry that many people encounter, including ourselves, on how to provide the name discovery required to connect said servers. We have released our approach to solving this problem by open-sourcing [libcluster Postgres Strategy](https://github.com/supabase/libcluster_postgres) and today, we explore the motivations behind its creation and the methodologies employed in its development.
 
 <Img
   src={{
@@ -50,7 +50,6 @@ At Supabase, we use clustering in all of our Elixir projects which include [Logf
   }}
   alt="Example of Realtime architecture where a customer from CA will connect to the server closest to them and their Supabase instance"
 />
-
 
 To achieve a connected cluster, we wanted to be as cloud-agnostic as possible. This makes our self-hosting options more accessible. We don’t want to introduce extra services to solve this single issue - Postgres is the logical way to achieve it.
 
@@ -164,7 +163,7 @@ These three simple steps allow us to connect as many nodes as needed, regardless
 
 In this post, we have described our approach to connecting multiple nodes in Elixir using Postgres. We have also made this strategy available for anyone to use. Please check the code at [github.com/supabase/libcluster_postgres](https://github.com/supabase/libcluster_postgres)
 
-A special thank you to [@gotbones](https://twitter.com/gotbones) for creating libcluster and [@kevinbuch_](https://twitter.com/kevinbuch_) for the original inspiration for this strategy.
+A special thank you to [@gotbones](https://twitter.com/gotbones) for creating libcluster and [@kevinbuch\_](https://twitter.com/kevinbuch_) for the original inspiration for this strategy.
 
 ## More Supabase Realtime
 
