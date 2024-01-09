@@ -190,7 +190,6 @@ const ForeignKeySelector = ({
       size="medium"
       visible={visible}
       onCancel={closePanel}
-      // @ts-ignore
       header={
         <span>
           Edit foreign key relation{' '}
@@ -258,7 +257,6 @@ const ForeignKeySelector = ({
             <Listbox.Option key="empty" value={1} label="---">
               ---
             </Listbox.Option>
-            {/* @ts-ignore */}
             {sortBy(tables, ['schema']).map((table) => {
               return (
                 <Listbox.Option key={table.id} value={table.id} label={table.name}>

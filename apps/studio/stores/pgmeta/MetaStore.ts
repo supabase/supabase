@@ -425,7 +425,7 @@ export default class MetaStore implements IMetaStore {
     const projectRef = project?.ref
     const connectionString = project?.connectionString
     const tables = await queryClient.fetchQuery({
-      queryKey: tableKeys.list(projectRef, 'public'),
+      queryKey: tableKeys.list(projectRef, sourceTableSchema),
       queryFn: ({ signal }) =>
         getTables({ projectRef, connectionString, schema: sourceTableSchema }, signal),
     })
