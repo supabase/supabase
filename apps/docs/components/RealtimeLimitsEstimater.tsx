@@ -257,9 +257,7 @@ export default function RealtimeLimitsEstimater({}) {
     const val = e.target.value
     setComputeAddOn(val)
     setConcurrency(500)
-    setFilters(false)
-    setRLS(false)
-    setLimits(findTableValue({ computeAddOn: val, filters: false, rls: false, concurrency: 500 }))
+    setLimits(findTableValue({ computeAddOn: val, filters, rls, concurrency: 500 }))
   }
 
   const handleFiltersSelection = (e) => {
