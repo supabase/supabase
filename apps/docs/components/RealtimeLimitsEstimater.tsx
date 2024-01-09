@@ -343,14 +343,14 @@ export default function RealtimeLimitsEstimater({}) {
 
       {limits && (
         <div className="mt-8">
-          <h4>Current Maximum Possible Throughput</h4>
+          <h4>Current maximum possible throughput</h4>
 
           <table className="table-auto">
             <thead>
               <tr>
-                <th className="px-4 py-2">Total DB Changes /sec</th>
-                <th className="px-4 py-2">Max Messages Per Client /sec</th>
-                <th className="px-4 py-2">Max Total Messages /sec</th>
+                <th className="px-4 py-2">Total DB changes /sec</th>
+                <th className="px-4 py-2">Max messages per client /sec</th>
+                <th className="px-4 py-2">Max total messages /sec</th>
                 <th className="px-4 py-2">Latency p95</th>
               </tr>
             </thead>
