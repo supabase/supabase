@@ -244,19 +244,31 @@ const CustomDomainSidePanel = () => {
             <>
               {selectedOption === 'cd_none' ||
               (selectedCustomDomain?.price ?? 0) < (subscriptionCDOption?.variant.price ?? 0) ? (
-                <p className="text-sm text-foreground-light">
-                  Upon clicking confirm, the amount of that's unused during the current billing
-                  cycle will be returned as credits that can be used for subsequent billing cycles
-                </p>
+                !subscription?.billing_via_partner && (
+                  <p className="text-sm text-foreground-light">
+                    Upon clicking confirm, the amount of that's unused during the current billing
+                    cycle will be returned as credits that can be used for subsequent billing cycles
+                  </p>
+                )
               ) : (
                 <p className="text-sm text-foreground-light">
                   Upon clicking confirm, the amount of{' '}
                   <span className="text-foreground">
                     ${selectedCustomDomain?.price.toLocaleString()}
                   </span>{' '}
-                  will be added to your monthly invoice. You're immediately charged for the
-                  remaining days of your billing cycle. The addon is prepaid per month and in case
-                  of a downgrade, you get credits for the remaining time.
+                  will be added to your monthly invoice.{' '}
+                  {subscription?.billing_via_partner ? (
+                    <>
+                      For the current billing cycle you'll be charged a pro-rated amount at the end
+                      of the cycle.{' '}
+                    </>
+                  ) : (
+                    <>
+                      The addon is prepaid per month and in case of a downgrade, you get credits for
+                      the remaining time. For the current billing cycle you're immediately charged a
+                      pro-rated amount for the remaining days.
+                    </>
+                  )}
                 </p>
               )}
 
