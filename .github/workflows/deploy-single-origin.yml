@@ -1,6 +1,9 @@
 name: Deploy under single origin
 
-on: [pull_request, workflow_dispatch] # pull_request for testing only, remove later
+on:
+  pull_request:
+    branches:
+      - master
 
 env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
@@ -8,6 +11,7 @@ env:
 jobs:
   studio:
     runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.title, '[ci shared auth]')
     env:
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_STUDIO_STAGING_PROJECT_ID }}
     outputs:
