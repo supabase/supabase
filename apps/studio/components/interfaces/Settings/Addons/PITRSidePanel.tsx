@@ -342,7 +342,7 @@ const PITRSidePanel = () => {
             <>
               {selectedOption === 'pitr_0' ||
               (selectedPitr?.price ?? 0) < (subscriptionPitr?.variant.price ?? 0) ? (
-                !subscription?.billing_via_partner && (
+                subscription?.billing_via_partner === false && (
                   <p className="text-sm text-foreground-light">
                     Upon clicking confirm, the amount of that's unused during the current billing
                     cycle will be returned as credits that can be used for subsequent billing cycles

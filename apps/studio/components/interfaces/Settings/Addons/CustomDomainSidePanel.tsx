@@ -244,7 +244,7 @@ const CustomDomainSidePanel = () => {
             <>
               {selectedOption === 'cd_none' ||
               (selectedCustomDomain?.price ?? 0) < (subscriptionCDOption?.variant.price ?? 0) ? (
-                !subscription?.billing_via_partner && (
+                subscription?.billing_via_partner === false && (
                   <p className="text-sm text-foreground-light">
                     Upon clicking confirm, the amount of that's unused during the current billing
                     cycle will be returned as credits that can be used for subsequent billing cycles
