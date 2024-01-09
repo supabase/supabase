@@ -56,7 +56,6 @@ export const generateColumnFieldFromPostgresColumn = (
   foreignKeys: ForeignKeyConstraint[]
 ): ColumnField => {
   const { primary_keys } = table
-  // @ts-ignore
   const primaryKeyColumns = primary_keys.map((key) => key.name)
   const foreignKey = getColumnForeignKey(column, table, foreignKeys)
   const isArray = column?.data_type === 'ARRAY'
@@ -116,7 +115,6 @@ export const generateUpdateColumnPayload = (
   table: PostgresTable,
   field: ColumnField
 ): Partial<UpdateColumnPayload> => {
-  // @ts-ignore
   const primaryKeyColumns = table.primary_keys.map((key) => key.name)
   const isOriginallyPrimaryKey = primaryKeyColumns.includes(originalColumn.name)
 
@@ -159,6 +157,7 @@ export const generateUpdateColumnPayload = (
     payload.isPrimaryKey = field.isPrimaryKey
   }
 
+  console.log('payload:', payload)
   return payload
 }
 
