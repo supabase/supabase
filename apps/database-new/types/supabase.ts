@@ -88,29 +88,6 @@ export interface Database {
       }
     }
     Views: {
-      oldest_messages: {
-        Row: {
-          message_id: string | null
-          thread_id: string | null
-          user_id: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "messages_thread_id_fkey"
-            columns: ["thread_id"]
-            isOneToOne: false
-            referencedRelation: "threads"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "messages_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
       profile_threads: {
         Row: {
           created_at: string | null
