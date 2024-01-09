@@ -36,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     if: contains(github.event.pull_request.title, '[ci shared auth]')
     env:
-      VERCEL_PROJECT_ID: ${{ secrets. VERCEL_DOCS_PROJECT_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_DOCS_PROJECT_ID }}
     outputs:
       url: ${{ steps.deploy.outputs.DEPLOY_URL }}
     steps:
@@ -54,50 +54,29 @@ jobs:
         name: Deploy
         run: |
           echo "DEPLOY_URL=$(vercel deploy --token ${{ secrets.VERCEL_TOKEN }})" >> $GITHUB_OUTPUT
-          #   www:
-          #     runs-on: ubuntu-latest
-          #     needs: studio
-          #     environment:
-          #       name: preview
-          #       url: ${{ steps.deploy.outputs.DEPLOY_URL }}
-          #     env:
-          #       VERCEL_PROJECT_ID:
-          #     steps:
-          #       - id: checkout
-          #         name: Checkout www
-          #         uses: actions/checkout@v4
-          #         with:
-          #           sparse-checkout: |
-          #             apps/www
-          #             packages
-          #       - id: node
-          #         name: Set up Node
-          #         uses: actions/setup-node@v3
-          #         with:
-          #           node-version: 18.x
-          #           cache: 'npm'
-          #       - id: install
-          #         name: Install dependencies
-          #         working-directory: ./
-          #         run: npm ci
-          #       - id: cli
-          #         name: Install Vercel CLI
-          #         run: npm install --global vercel
-          #       - id: pull
-          #         name: Pull Vercel environment
-          #         working-directory: ./
-          #         run: |
-          #           vercel pull --cwd apps/www --environment-preview --yes --token ${{ secrets.VERCEL_TOKEN }}
-          #       - id: build
-          #         name: Build
-          #         working-directory: ./
-          #         run: |
-          #           vercel build --yes --token ${{ secrets.VERCEL_TOKEN }}
-          #       - id: deploy
-          #         name: Deploy
-          #         run: |
-          #           # See https://vercel.com/docs/deployments/generated-urls#url-with-git-branch
-          #           export DOCS_PATH="https://docs-git-${{ needs.setup.outputs.branch }}-supabase.vercel.app/docs"
-          #           export STUDIO_PATH="https://studio-staging-git-${{ needs.studio.outputs.url }}-supabase.vercel.app/dashboard"
-          #           echo "DEPLOY_URL=$(vercel deploy --prebuilt --yes --token ${{ secrets.VERCEL_TOKEN }} \
-          #             --env NEXT_PUBLIC_STUDIO_URL=$DOCS_PATH NEXT_PUBLIC_DOCS_URL=$STUDIO_PATH)" >> $GITHUB_OUTPUT
+
+  www:
+    runs-on: ubuntu-latest
+    needs: [docs, studio]
+    environment:
+      name: preview
+      url: ${{ steps.deploy.outputs.DEPLOY_URL }}
+    env:
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_WWW_PROJECT_ID }}
+    steps:
+      - id: checkout
+        name: Checkout www
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            apps/www
+            packages
+      - id: cli
+        name: Install Vercel CLI
+        run: npm install --global vercel
+      - id: deploy
+        name: Deploy
+        run: |
+          echo "DEPLOY_URL=$(vercel deploy --token ${{ secrets.VERCEL_TOKEN }} \
+            --env NEXT_PUBLIC_STUDIO_URL="${{ needs.studio.outputs.url }}" \
+              NEXT_PUBLIC_DOCS_URL="${{ needs.docs.outputs.url }}")" >> $GITHUB_OUTPUT
