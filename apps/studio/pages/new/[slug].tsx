@@ -33,9 +33,10 @@ import {
   PROVIDERS,
   Region,
 } from 'lib/constants'
-import { passwordStrength, pluckObjectFields } from 'lib/helpers'
+import { getDistanceLatLonKM, passwordStrength, pluckObjectFields } from 'lib/helpers'
 import { NextPageWithLayout } from 'types'
-import { Button, IconExternalLink, IconInfo, IconUsers, Input, Listbox } from 'ui'
+import { Button, IconExternalLink, IconInfo, IconLoader, IconUsers, Input, Listbox } from 'ui'
+import toast from 'react-hot-toast'
 
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
@@ -47,12 +48,17 @@ const Wizard: NextPageWithLayout = () => {
   const { data: membersExceededLimit, isLoading: isLoadingFreeProjectLimitCheck } =
     useFreeProjectLimitCheckQuery({ slug })
 
+  const [retrievingLocation, setRetrievingLocation] = useState(false)
   const [projectName, setProjectName] = useState('')
   const [postgresVersion, setPostgresVersion] = useState('')
   const [cloudProvider, setCloudProvider] = useState<CloudProvider>(PROVIDERS[DEFAULT_PROVIDER].id)
 
   const [dbPass, setDbPass] = useState('')
-  const [dbRegion, setDbRegion] = useState(PROVIDERS[cloudProvider].default_region)
+  const [dbRegion, setDbRegion] = useState(
+    ['staging', 'local'].includes(process.env.NEXT_PUBLIC_ENVIRONMENT ?? '')
+      ? PROVIDERS[cloudProvider].default_region
+      : ''
+  )
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
   const [passwordStrengthWarning, setPasswordStrengthWarning] = useState('')
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(0)
@@ -148,10 +154,18 @@ const Wizard: NextPageWithLayout = () => {
     setCloudProvider(cloudProviderId)
     if (cloudProviderId === PROVIDERS.AWS.id) {
       setAvailableRegions(getAvailableRegions(PROVIDERS['AWS'].id))
-      setDbRegion(PROVIDERS['AWS'].default_region)
+      setDbRegion(
+        ['staging', 'local'].includes(process.env.NEXT_PUBLIC_ENVIRONMENT ?? '')
+          ? PROVIDERS['AWS'].default_region
+          : ''
+      )
     } else {
       setAvailableRegions(getAvailableRegions(PROVIDERS['FLY'].id))
-      setDbRegion(PROVIDERS['FLY'].default_region)
+      setDbRegion(
+        ['staging', 'local'].includes(process.env.NEXT_PUBLIC_ENVIRONMENT ?? '')
+          ? PROVIDERS['FLY'].default_region
+          : ''
+      )
     }
   }
 
@@ -200,6 +214,45 @@ const Wizard: NextPageWithLayout = () => {
 
     setDbPass(password)
     delayedCheckPasswordStrength(password)
+  }
+
+  function getClosestRegion() {
+    // [Joshen] Either apse1, usw1, euc1
+    const locations =
+      cloudProvider === 'AWS'
+        ? {
+            [AWS_REGIONS.WEST_US]: { lat: 38.8375, long: 120.8958 },
+            [AWS_REGIONS.CENTRAL_EU]: { lat: 50.119, long: 8.6821 },
+            [AWS_REGIONS.SOUTHEAST_ASIA]: { lat: 1.3521, long: 103.8198 },
+          }
+        : {
+            [FLY_REGIONS.SOUTHEAST_ASIA]: { lat: 1.3521, long: 103.8198 },
+          }
+
+    setRetrievingLocation(true)
+    navigator.geolocation.getCurrentPosition(
+      (location) => {
+        setRetrievingLocation(false)
+        const distances = Object.keys(locations).map((reg) => {
+          const region = (locations as any)[reg]
+          return getDistanceLatLonKM(
+            location.coords.latitude,
+            location.coords.longitude,
+            region.lat,
+            region.long
+          )
+        })
+        const shortestDistance = Math.min(...distances)
+        const closestRegion = Object.keys(locations)[distances.indexOf(shortestDistance)]
+        setDbRegion(closestRegion)
+        toast.success('Successfully selected region closest to your location')
+      },
+      (error) => {
+        setRetrievingLocation(false)
+        toast.error('Unable to retrieve your current location')
+      },
+      { enableHighAccuracy: false }
+    )
   }
 
   // [Fran] Enforce APSE1 region on staging
@@ -399,8 +452,31 @@ const Wizard: NextPageWithLayout = () => {
                     type="select"
                     value={dbRegion}
                     onChange={(value) => setDbRegion(value)}
-                    descriptionText="Select a region close to your users for the best performance."
+                    descriptionText={
+                      <div>
+                        <p>
+                          Select the region closest to your users for the best performance. You may
+                          also{' '}
+                          <span
+                            className="text-brand opacity-50 underline hover:opacity-100 transition cursor-pointer relative"
+                            onClick={getClosestRegion}
+                          >
+                            select the region closest to your location.
+                            {retrievingLocation && (
+                              <IconLoader
+                                className="absolute top-0.5 -right-5 text-foreground animate-spin"
+                                size={14}
+                                strokeWidth={2}
+                              />
+                            )}
+                          </span>
+                        </p>
+                      </div>
+                    }
                   >
+                    <Listbox.Option disabled key="empty" label="---" value="">
+                      <span className="text-foreground">Select a region for your project</span>
+                    </Listbox.Option>
                     {Object.keys(availableRegions).map((option: string, i) => {
                       const label = Object.values(availableRegions)[i] as string
                       return (
