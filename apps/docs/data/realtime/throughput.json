@@ -183,6 +183,16 @@
     "computeAddOn": "large",
     "filters": false,
     "rls": false,
+    "concurrency": 100000,
+    "maxDBChanges": "0.1 (6/min)",
+    "maxMessagesPerClient": "0.1 (6/min)",
+    "totalMessagesPerSecond": 40000,
+    "p95Latency": 4951
+  },
+  {
+    "computeAddOn": "large",
+    "filters": false,
+    "rls": false,
     "concurrency": 200000,
     "maxDBChanges": "0.05 (3/min)",
     "maxMessagesPerClient": "0.05 (3/min)",
