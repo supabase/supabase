@@ -282,12 +282,12 @@ export default function Profile({ user }) {
 export const getServerSideProps = async (ctx) => {
   // Create authenticated Supabase Client
   const supabase = createPagesServerClient(ctx)
-  // Check if we have a session
+  // Check if we have a user
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  if (!session)
+  if (!user)
     return {
       redirect: {
         destination: '/',
@@ -297,8 +297,7 @@ export const getServerSideProps = async (ctx) => {
 
   return {
     props: {
-      initialSession: session,
-      user: session.user,
+      user,
     },
   }
 }
@@ -335,8 +334,8 @@ export const getServerSideProps = async (ctx) => {
   const supabase = createPagesServerClient(ctx)
   // Check if we have a session
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
+    data: { user },
+  } = await supabase.auth.getUser()
 
   if (!session)
     return {
@@ -351,8 +350,7 @@ export const getServerSideProps = async (ctx) => {
 
   return {
     props: {
-      initialSession: session,
-      user: session.user,
+      user,
       data: data ?? [],
     },
   }
@@ -381,10 +379,10 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const supabase = createPagesServerClient(ctx)
   // Check if we have a session
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  if (!session)
+  if (!user)
     return {
       redirect: {
         destination: '/',
@@ -397,8 +395,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
 
   return {
     props: {
-      initialSession: session,
-      user: session.user,
+      user,
       data: data ?? [],
     },
   }
@@ -411,6 +408,10 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
 ## Server-side data fetching to OAuth APIs using `provider token` {`#oauth-provider-token`}
 
 When using third-party auth providers, sessions are initiated with an additional `provider_token` field which is persisted in the auth cookie and can be accessed within the session object. The `provider_token` can be used to make API requests to the OAuth provider's API endpoints on behalf of the logged-in user.
+
+Note that the server accesses data on the session object returned by `auth.getSession`. This data should normally not be trusted, because it is read from the local storage medium. It is not revalidated against the Auth server unless the session is expired, which means the sender can tamper with it.
+
+In this case, the third-party API will validate the `provider_token`, and a malicious actor is unable to forge one.
 
 <Tabs
   scrollable
@@ -543,12 +544,12 @@ import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
 const ProtectedRoute = async (req, res) => {
   // Create authenticated Supabase Client
   const supabase = createPagesServerClient({ req, res })
-  // Check if we have a session
+  // Check if we have a user
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  if (!session)
+  if (!user)
     return res.status(401).json({
       error: 'not_authenticated',
       description: 'The user does not have an active session or is not authenticated',
@@ -574,10 +575,10 @@ const ProtectedRoute: NextApiHandler = async (req, res) => {
   const supabase = createPagesServerClient({ req, res })
   // Check if we have a session
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  if (!session)
+  if (!user)
     return res.status(401).json({
       error: 'not_authenticated',
       description: 'The user does not have an active session or is not authenticated',
@@ -610,11 +611,11 @@ export async function middleware(req: NextRequest) {
   const supabase = createMiddlewareClient({ req, res })
   // Check if we have a session
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
+    data: { user },
+  } = await supabase.auth.getUser()
 
   // Check auth condition
-  if (session?.user.email?.endsWith('@gmail.com')) {
+  if (user?.email?.endsWith('@gmail.com')) {
     // Authentication successful, forward request to protected route.
     return res
   }
@@ -705,10 +706,10 @@ const ProtectedRoute: NextApiHandler = async (req, res) => {
   const supabase = createPagesServerClient({ req, res })
   // Check if we have a session
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  if (!session)
+  if (!user)
     return res.status(401).json({
       error: 'not_authenticated',
       description: 'The user does not have an active session or is not authenticated',
@@ -764,10 +765,10 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const supabase = createPagesServerClient(ctx)
   // Check if we have a session
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  if (!session)
+  if (!user)
     return {
       redirect: {
         destination: '/',
@@ -831,11 +832,11 @@ export async function middleware(req: NextRequest) {
   const supabase = createMiddlewareClient({ req, res })
   // Check if we have a session
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
+    data: { user },
+  } = await supabase.auth.getUser()
 
   // Check auth condition
-  if (session?.user.email?.endsWith('@gmail.com')) {
+  if (user?.email?.endsWith('@gmail.com')) {
     // Authentication successful, forward request to protected route.
     return res
   }
