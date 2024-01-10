@@ -22,6 +22,7 @@ import {
   SidePanel,
 } from 'ui'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { AddonVariantId } from 'data/subscriptions/types'
 
 const CustomDomainSidePanel = () => {
   const { ui } = useStore()
@@ -121,7 +122,7 @@ const CustomDomainSidePanel = () => {
     if (selectedOption === 'cd_none' && subscriptionCDOption !== undefined) {
       removeAddon({ projectRef, variant: subscriptionCDOption.variant.identifier })
     } else {
-      updateAddon({ projectRef, type: 'custom_domain', variant: selectedOption })
+      updateAddon({ projectRef, type: 'custom_domain', variant: selectedOption as AddonVariantId })
     }
   }
 

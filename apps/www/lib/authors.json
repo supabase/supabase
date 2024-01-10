@@ -405,5 +405,13 @@
     "position": "Guest Author",
     "author_url": "https://twitter.com/gc_psk",
     "author_image_url": "https://github.com/Gbuomprisco.png"
+  },
+  {
+    "author_id": "filipe",
+    "author": "Filipe Cabaço",
+    "username": "filipe",
+    "position": "Engineering",
+    "author_url": "https://twitter.com/filipecabaco",
+    "author_image_url": "https://github.com/filipecabaco.png"
   }
 ]

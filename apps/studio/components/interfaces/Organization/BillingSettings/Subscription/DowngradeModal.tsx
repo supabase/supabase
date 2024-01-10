@@ -1,4 +1,4 @@
-import { OrgSubscription, ProjectAddon } from 'data/subscriptions/org-subscription-query'
+import { OrgSubscription, ProjectAddon } from 'data/subscriptions/types'
 import { PricingInformation } from 'shared-data'
 import { Alert, IconAlertOctagon, IconMinusCircle, IconPauseCircle, Modal } from 'ui'
 
