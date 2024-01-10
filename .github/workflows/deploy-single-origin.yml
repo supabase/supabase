@@ -5,6 +5,10 @@ on:
     branches:
       - master
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
 
@@ -78,5 +82,5 @@ jobs:
         name: Deploy
         run: |
           echo "DEPLOY_URL=$(vercel deploy --token ${{ secrets.VERCEL_TOKEN }} \
-                --env NEXT_PUBLIC_STUDIO_URL="${{ needs.studio.outputs.url }}" \
-                --env NEXT_PUBLIC_DOCS_URL="${{ needs.docs.outputs.url }}")" >> $GITHUB_OUTPUT
+                --build-env NEXT_PUBLIC_STUDIO_URL="${{ needs.studio.outputs.url }}" \
+                --build-env NEXT_PUBLIC_DOCS_URL="${{ needs.docs.outputs.url }}")" >> $GITHUB_OUTPUT
