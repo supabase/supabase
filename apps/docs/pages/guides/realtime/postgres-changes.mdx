@@ -1366,7 +1366,7 @@ Database changes are processed on a single thread to maintain the change order. 
 
 If you are using Postgres Changes at scale, you should consider using separate "public" table without RLS and filters. Alternatively, you can use Realtime server-side only and then re-stream the changes to your clients using a Realtime Broadcast.
 
-You can estimate what maximum throughput you can expect from your database instance using the following form:
+Enter your database settings to estimate the maximum throughput for your instance:
 
 <RealtimeLimitsEstimater />
 
