@@ -3,8 +3,8 @@
 Supabase is migrating to use tailwind classes that use CSS properties.
 This is to support the concept of theming, so that:
 
-1. It is easy for the team to update the theme without changing 100s of files.
-2. We could offer custom or additional themes in future.
+1. It is easy for the team to update the theme without changing 100s of files
+2. We could offer custom or additional themes in future
 
 ## Primitives
 
@@ -62,9 +62,9 @@ bg-foreground-light
 | ------------------------------- | ------------------------------------------------------------ |
 | `{background}-{DEFAULT}`        | Main body background (**DEFAULT** is optional)               |
 | `{background}-surface-100`      | Panels and surfaces on the same level of the main background |
-| `{background}-surface-200`      | Surfaces that overlap the main content (ex. dropdowns)        |
+| `{background}-surface-200`      | Surfaces that overlap the main content (ex. dropdowns)       |
 | `{background}-surface-300`      | Surfaces that are stacked above {background}-surface-200     |
-| `{background}-alternative`      | Alternative background (inverted)                             |
+| `{background}-alternative`      | Alternative background (inverted)                            |
 | `{background}-overlay`          | Overlays, Dropdowns, Popovers                                |
 | `{background}-control`          | Inputs, Radios, Checkboxes                                   |
 | `{background}-button-{DEFAULT}` | Button default                                               |
@@ -88,7 +88,7 @@ text-background-surface-100
 | ------------------------- | ---------------------------------------- |
 | `border-{DEFAULT}`        | Default border (**DEFAULT** is optional) |
 | `border-secondary`        | Secondary border                         |
-| `border-alternative`      | Alternative border (inverted)             |
+| `border-alternative`      | Alternative border (inverted)            |
 | `border-overlay`          | Overlays, Dropdowns, Popovers            |
 | `border-control`          | Inputs, Radios, Checkboxes               |
 | `border-strong`           | Hover, Focus                             |
