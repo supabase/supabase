@@ -26,7 +26,7 @@ import {
   useSelectedProject,
   useStore,
 } from 'hooks'
-import { IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
@@ -179,7 +179,7 @@ const SQLEditor = () => {
   const isDiffOpen = !!sqlDiff
 
   const [savedSplitSize, setSavedSplitSize] = useLocalStorage(
-    'supabase_sql-editor-split-size',
+    LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE,
     `[50, 50]`
   )
 

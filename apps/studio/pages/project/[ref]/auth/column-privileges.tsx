@@ -209,11 +209,11 @@ const PrivilegesPage: NextPageWithLayout = () => {
   }
 
   const [diffWarningDismissed, setDiffWarningDismissed] = useLocalStorage(
-    'cls-diff-warning-dismissed',
+    LOCAL_STORAGE_KEYS.CLS_DIFF_WARNING,
     false
   )
   const [selectStarWarningDismissed, setSelectStarWarningDismissed] = useLocalStorage(
-    'cls-select-star-warning-dismissed',
+    LOCAL_STORAGE_KEYS.CLS_SELECT_STAR_WARNING,
     false
   )
 
