@@ -164,10 +164,10 @@ const Nav = () => {
                     ) : (
                       <>
                         <Button type="default" className="hidden lg:block" asChild>
-                          <Link href="https://supabase.com/dashboard">Sign in</Link>
+                          <Link href="/dashboard">Sign in</Link>
                         </Button>
                         <Button className="hidden text-white lg:block" asChild>
-                          <Link href="https://supabase.com/dashboard">Start your project</Link>
+                          <Link href="/dashboard">Start your project</Link>
                         </Button>
                       </>
                     )}
