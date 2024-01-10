@@ -383,38 +383,22 @@ const ComputeInstanceSidePanel = () => {
               </p>
             )}
 
-            {hasChanges &&
-              (selectedCategory !== 'micro' && selectedCompute?.price_interval === 'monthly' ? (
-                // Monthly payment with project-level subscription
-                <p className="text-sm text-foreground-light">
-                  Upon clicking confirm, the amount of{' '}
-                  <span className="text-foreground">
-                    ${selectedCompute?.price.toLocaleString()}
-                  </span>{' '}
-                  will be added to your monthly invoice. Any previous compute addon is prorated and
-                  you're immediately charged for the remaining days of your billing cycle. The addon
-                  is prepaid per month and in case of a downgrade, you get credits for the remaining
-                  time.
-                </p>
-              ) : selectedCategory !== 'micro' ? (
-                // Hourly usage-billing with org-based subscription
-                <p className="text-sm text-foreground-light">
-                  There are no immediate charges when changing compute. Compute Hours are a
-                  usage-based item and you're billed at the end of your billing cycle based on your
-                  compute usage. Read more about{' '}
-                  <Link
-                    href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="underline"
-                  >
-                    Compute Billing
-                  </Link>
-                  .
-                </p>
-              ) : (
-                <></>
-              ))}
+            {hasChanges && selectedCategory !== 'micro' && (
+              <p className="text-sm text-foreground-light">
+                There are no immediate charges when changing compute. Compute Hours are a
+                usage-based item and you're billed at the end of your billing cycle based on your
+                compute usage. Read more about{' '}
+                <Link
+                  href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline"
+                >
+                  Compute Billing
+                </Link>
+                .
+              </p>
+            )}
 
             {hasChanges && !blockMicroDowngradeDueToPitr && (
               <Alert
@@ -453,7 +437,7 @@ const ComputeInstanceSidePanel = () => {
                   <IconAlertTriangle className="h-4 w-4" />
                   <AlertDescription_Shadcn_>
                     You have a scheduled subscription change that will be canceled if you change
-                    your PITR add on.
+                    your Optimized Compute add on.
                   </AlertDescription_Shadcn_>
                 </Alert_Shadcn_>
               )}
