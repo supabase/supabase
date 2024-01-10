@@ -44,11 +44,9 @@ function ChatInput({ params }: ChatInputProps) {
       <AssistantChatForm
         key={`chat-thread-form-${thread_id}`}
         id={`chat-thread-form-${thread_id}`}
-        value={value}
+        chatContext={'edit'}
         placeholder={'Any changes to make?'}
-        onValueChange={(v) => setValue(v.target.value)}
         threadId={thread_id}
-        //message={state.message}
       />
 
       {/* <Message /> */}

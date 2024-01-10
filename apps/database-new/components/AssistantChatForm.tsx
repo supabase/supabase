@@ -1,28 +1,30 @@
-import { Loader2 } from 'lucide-react'
-import React, { ChangeEvent, createRef, useEffect } from 'react'
-import { useFormStatus } from 'react-dom'
-import { TextArea_Shadcn_, cn } from 'ui'
-import { useChat } from 'ai/react'
-import { Message } from 'ai'
+import { ExternalLink } from 'lucide-react'
+import { cn } from 'ui'
+
 import { createThread } from '@/app/actions'
+import { CHAT_EXAMPLES } from '@/data/chat-examples'
+import { Message } from 'ai'
+import { useChat } from 'ai/react'
+import { Loader2 } from 'lucide-react'
+import React, { createRef, useEffect } from 'react'
+import { TextArea_Shadcn_ } from 'ui'
+import ChatLoadingAnimation from '@/app/[thread_id]/ChatLoadingAnimation'
 
 export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
   loading?: boolean
   disabled?: boolean
-  value?: string
-  onValueChange: (value: ChangeEvent<HTMLTextAreaElement>) => void
   message?: string
   children?: React.ReactNode
   threadId?: string
-  //formAction: (formData: FormData) => void
+  chatContext: 'new' | 'edit'
 }
 
 const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
-  ({ loading, disabled, value, onValueChange, message, threadId, ...props }, ref) => {
+  ({ loading, disabled, message, threadId, chatContext, ...props }, ref) => {
     const textAreaRef = createRef<HTMLTextAreaElement>()
     const submitRef = createRef<HTMLButtonElement>()
 
-    const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
+    const { messages, input, setInput, handleInputChange, handleSubmit, isLoading } = useChat({
       onFinish: redirectOnFinish,
     })
 
@@ -32,27 +34,43 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
 
     useEffect(() => {
       if (textAreaRef) {
-        if (!value && textAreaRef && textAreaRef.current) {
+        textAreaRef?.current?.focus()
+
+        if (!input && textAreaRef && textAreaRef.current) {
           textAreaRef.current.style.height = '40px'
         } else if (textAreaRef && textAreaRef.current) {
           const newHeight = textAreaRef.current.scrollHeight + 'px'
           textAreaRef.current.style.height = newHeight
         }
       }
-    }, [value, textAreaRef])
+    }, [input, textAreaRef])
 
-    useEffect(() => {
-      textAreaRef?.current?.focus()
-    }, [value, textAreaRef])
-
-    const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      // Check if the pressed key is "Enter" (key code 13) without the "Shift" key
-      if (event.key === 'Enter' && !event.shiftKey) {
-        event.preventDefault()
-        if (submitRef.current) {
-          submitRef.current.click()
-        }
-      }
+    const ChatSuggestions = () => {
+      const suggestions = CHAT_EXAMPLES
+      return (
+        <div className="flex gap-3 mt-4">
+          {suggestions.map((suggestion, idx) => (
+            <button
+              key={idx}
+              type="button"
+              className={cn(
+                'text-xs',
+                'flex items-center gap-3 !pr-3',
+                'transition border rounded-full px-3 py-1.5',
+                'text-light',
+                'hover:border-stronger hover:text'
+              )}
+              onClick={(event) => {
+                setInput(suggestion.prompt)
+                event.preventDefault()
+              }}
+            >
+              {suggestion.label}
+              <ExternalLink size={12} />
+            </button>
+          ))}
+        </div>
+      )
     }
 
     const SubmitButton = () => {
@@ -70,7 +88,7 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
             className={cn(
               'transition-all',
               'flex items-center justify-center w-7 h-7 border border-control rounded-full mr-0.5 p-1.5 background-alternative',
-              !value ? 'text-muted opacity-50' : 'text-default opacity-100',
+              !input ? 'text-muted opacity-50' : 'text-default opacity-100',
               isLoading ? 'hidden' : ''
             )}
           >
@@ -93,14 +111,29 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
       )
     }
 
+    function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+      // Check if the pressed key is "Enter" (key code 13) without the "Shift" key
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault()
+        if (submitRef.current) {
+          submitRef.current.click()
+        }
+      }
+
+      // Cast e.target to HTMLTextAreaElement to access the 'value' property
+      const textarea = e.target as HTMLTextAreaElement
+      setInput(textarea.value)
+    }
+
     return (
       <>
-        {messages.map((m) => (
+        {/* {messages.map((m) => (
           <div key={m.id}>
             {m.role === 'user' ? 'User: ' : 'AI: '}
             {m.content}
           </div>
-        ))}
+        ))} */}
+        {isLoading && <ChatLoadingAnimation />}
         <form ref={ref} className="relative" onSubmit={handleSubmit}>
           <div
             className={cn('absolute', 'top-2 left-2', 'ml-1 w-6 h-6 rounded-full bg-dbnew')}
@@ -120,7 +153,7 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
             spellCheck={false}
             value={input}
             onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
+            onKeyDown={(e) => handleKeyDown(e)}
           />
           {props.children}
           <SubmitButton />
@@ -128,6 +161,7 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
             {message}
           </p>
         </form>
+        {chatContext === 'new' && <ChatSuggestions />}
       </>
     )
   }
