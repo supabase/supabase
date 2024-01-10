@@ -41,7 +41,6 @@ export const generateTableFieldFromPostgresTable = (
   isDuplicating = false,
   isRealtimeEnabled = false
 ): TableField => {
-  console.log('generate', { table })
   return {
     id: table.id,
     name: isDuplicating ? `${table.name}_duplicate` : table.name,
