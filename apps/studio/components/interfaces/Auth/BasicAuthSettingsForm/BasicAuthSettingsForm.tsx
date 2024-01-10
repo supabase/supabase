@@ -14,7 +14,6 @@ import {
   IconEyeOff,
   Input,
   InputNumber,
-  Radio,
   Toggle,
 } from 'ui'
 import { boolean, number, object, string } from 'yup'

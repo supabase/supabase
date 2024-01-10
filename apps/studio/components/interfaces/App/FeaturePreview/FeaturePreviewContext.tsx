@@ -14,8 +14,6 @@ const FeaturePreviewContext = createContext<FeaturePreviewContextType>({
   onUpdateFlag: noop,
 })
 
-export default FeaturePreviewContext
-
 export const useFeaturePreviewContext = () => useContext(FeaturePreviewContext)
 
 export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}>) => {
@@ -53,10 +51,6 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}
 }
 
 // Helpers
-export const useIsNavigationPreviewEnabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_NAVIGATION_LAYOUT]
-}
 
 export const useIsAPIDocsSidePanelEnabled = () => {
   const { flags } = useFeaturePreviewContext()

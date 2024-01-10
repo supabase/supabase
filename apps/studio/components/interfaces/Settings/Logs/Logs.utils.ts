@@ -6,7 +6,7 @@ import logConstants from 'shared-data/logConstants'
 import BackwardIterator from 'components/ui/CodeEditor/Providers/BackwardIterator'
 import uniqBy from 'lodash/uniqBy'
 import { useEffect } from 'react'
-import { PlanId } from 'data/subscriptions/org-subscription-query'
+import { PlanId } from 'data/subscriptions/types'
 
 /**
  * Convert a micro timestamp from number/string to iso timestamp
@@ -240,7 +240,7 @@ export const genCountQuery = (table: LogsTableName, filters: Filters): string =>
 }
 
 /** calculates how much the chart start datetime should be offset given the current datetime filter params */
-export const calcChartStart = (params: Partial<LogsEndpointParams>): [Dayjs, string] => {
+const calcChartStart = (params: Partial<LogsEndpointParams>): [Dayjs, string] => {
   const ite = params.iso_timestamp_end ? dayjs(params.iso_timestamp_end) : dayjs()
   // todo @TzeYiing needs typing
   const its: any = params.iso_timestamp_start ? dayjs(params.iso_timestamp_start) : dayjs()
@@ -458,7 +458,7 @@ export const fillTimeseries = (
   return newData
 }
 
-export const getTimestampTruncation = (samples: Dayjs[]): 'second' | 'minute' | 'hour' | 'day' => {
+const getTimestampTruncation = (samples: Dayjs[]): 'second' | 'minute' | 'hour' | 'day' => {
   const truncationCounts = samples.reduce(
     (acc, sample) => {
       const truncation = _getTruncation(sample)

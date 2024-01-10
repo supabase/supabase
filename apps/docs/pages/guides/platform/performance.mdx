@@ -167,9 +167,9 @@ You can pair the information available from `pg_stat_statements` with the detail
 
 ## Optimizing the number of connections
 
-By default, the number of connections allowed to Postgres and PgBouncer is configured based on the resources available to the database.
+By default, the number of connections allowed to Postgres and Supavisor is configured based on the resources available to the database.
 
-| Compute Add-on | Postgresql connections | PGBouncer connections |
+| Compute Add-on | Postgresql connections | Supavisor connections |
 | -------------- | ---------------------- | --------------------- |
 | None           | 60                     | 200                   |
 | Small          | 90                     | 200                   |
@@ -197,9 +197,9 @@ In such a scenario, you can consider:
 
 ### Configuring clients to use fewer connections
 
-You can use the [pg_stat_activity](https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-ACTIVITY-VIEW) view to debug which clients are holding open connections on your DB. `pg_stat_activity` only exposes information on direct connections to the database. Information on the number of connections to pgbouncer is available [via the metrics endpoint](../platform/metrics).
+You can use the [pg_stat_activity](https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-ACTIVITY-VIEW) view to debug which clients are holding open connections on your DB. `pg_stat_activity` only exposes information on direct connections to the database. Information on the number of connections to Supavisor is available [via the metrics endpoint](../platform/metrics).
 
-Depending on the clients involved, you might be able to configure them to work with fewer connections (e.g. by imposing a limit on the maximum number of connections they're allowed to use), or shift specific workloads to connect via [pgbouncer](/docs/guides/database/connecting-to-postgres#connection-pooler) instead. Transient workflows, which can quickly scale up and down in response to traffic (e.g. serverless functions), can especially benefit from using a connection pooler rather than connecting to the DB directly.
+Depending on the clients involved, you might be able to configure them to work with fewer connections (e.g. by imposing a limit on the maximum number of connections they're allowed to use), or shift specific workloads to connect via [Supavisor](/docs/guides/database/connecting-to-postgres#connection-pooler) instead. Transient workflows, which can quickly scale up and down in response to traffic (e.g. serverless functions), can especially benefit from using a connection pooler rather than connecting to the DB directly.
 
 ### Allowing higher number of connections
 

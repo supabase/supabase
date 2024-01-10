@@ -1,8 +1,7 @@
 import { PostgresTrigger } from '@supabase/postgres-meta'
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { useCallback } from 'react'
 import { databaseTriggerKeys } from './keys'
 import { ResponseError } from 'types'
 
@@ -71,15 +70,3 @@ export const useDatabaseTriggersQuery = <TData = DatabaseTriggersData>(
       ...options,
     }
   )
-
-export const useDatabaseTriggersPrefetch = ({ projectRef }: DatabaseTriggersVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (projectRef) {
-      client.prefetchQuery(databaseTriggerKeys.list(projectRef), ({ signal }) =>
-        getDatabaseTriggers({ projectRef }, signal)
-      )
-    }
-  }, [projectRef])
-}

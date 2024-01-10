@@ -45,7 +45,6 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
     permissions ?? []
   )
 
-  const isExpired = isInviteExpired(member?.invited_at ?? '')
   const isPendingInviteAcceptance = member.invited_id
 
   const roleId = member.role_ids?.[0] ?? -1

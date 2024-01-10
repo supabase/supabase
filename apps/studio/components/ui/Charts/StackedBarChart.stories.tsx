@@ -1,8 +1,7 @@
 import React from 'react'
-import { ComponentStory, ComponentMeta } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import dayjs from 'dayjs'
 import Chart from './StackedBarChart'
-import { StackedChartProps } from './Charts.types'
 import { DEFAULT_STACK_COLORS, genStackColorScales } from './Charts.constants'
 
 export default {
