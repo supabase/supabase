@@ -3,7 +3,7 @@
 import 'react-data-grid/lib/styles.css'
 import DataGrid, { DataGridHandle, RowsChangeData } from 'react-data-grid'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
-import { forwardRef, useState } from 'react'
+import { forwardRef, useRef } from 'react'
 import { memo } from 'react-tracked'
 
 import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
@@ -99,10 +99,10 @@ export const Grid = memo(
         })
       }
 
-      const [selectedCell, setSelectedCell] = useState<{ rowIdx: number; row: any; column: any }>()
+      const selectedCellRef = useRef<{ rowIdx: number; row: any; column: any } | null>(null)
 
       function copyCellValue() {
-        const selectedCellValue = selectedCell?.row[selectedCell?.column?.key]
+        const selectedCellValue = selectedCellRef.current?.row[selectedCellRef.current?.column?.key]
         const text = formatClipboardValue(selectedCellValue)
         if (!text) return
         copyToClipboard(text)
@@ -120,7 +120,7 @@ export const Grid = memo(
       })
 
       function onSelectedCellChange(args: { rowIdx: number; row: any; column: any }) {
-        setSelectedCell(args)
+        selectedCellRef.current = args
         dispatch({
           type: 'SELECTED_CELL_CHANGE',
           payload: { position: { idx: args.column.idx, rowIdx: args.rowIdx } },
