@@ -17,6 +17,10 @@ export interface SupabaseGridProps {
    */
   table: SupaTable
   /**
+   * database table id
+   */
+  tableId?: string
+  /**
    *
    * run sql query
    */
@@ -36,9 +40,9 @@ export interface SupabaseGridProps {
    */
   schema?: string
   /**
-   * storageRef is used to save state on localstorage
+   * projectRef is used to save state on localstorage
    */
-  storageRef?: string
+  projectRef?: string
   /**
    * Optional grid theme
    */
