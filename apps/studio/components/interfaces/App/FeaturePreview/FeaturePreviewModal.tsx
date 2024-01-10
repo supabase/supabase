@@ -39,6 +39,7 @@ const FeaturePreviewModal = () => {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,
       name: 'Column-level privileges',
       content: <CLSPreview />,
+      discussionsUrl: 'https://github.com/orgs/supabase/discussions/20295',
     },
   ]
 
