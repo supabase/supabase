@@ -25,6 +25,7 @@ import {
   IconCheck,
   IconColumns,
   IconEdit,
+  IconEye,
   IconMoreVertical,
   IconPlus,
   IconSearch,
@@ -33,6 +34,7 @@ import {
   Input,
 } from 'ui'
 import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
+import { useRouter } from 'next/router'
 
 interface TableListProps {
   onAddTable: () => void
@@ -47,6 +49,7 @@ const TableList = ({
   onDeleteTable = noop,
   onOpenTable = noop,
 }: TableListProps) => {
+  const router = useRouter()
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
 
@@ -305,6 +308,19 @@ const TableList = ({
                                           </Tooltip.Content>
                                         </Tooltip.Portal>
                                       )}
+                                    </Tooltip.Root>
+                                  </DropdownMenuItem>
+
+                                  <DropdownMenuItem
+                                    onClick={() =>
+                                      router.push(`/project/${project?.ref}/editor/${x.id}`)
+                                    }
+                                  >
+                                    <Tooltip.Root delayDuration={0}>
+                                      <Tooltip.Trigger className="flex items-center space-x-2">
+                                        <IconEye size="tiny" />
+                                        <p>View table</p>
+                                      </Tooltip.Trigger>
                                     </Tooltip.Root>
                                   </DropdownMenuItem>
 
