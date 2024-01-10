@@ -82,5 +82,5 @@ jobs:
         name: Deploy
         run: |
           echo "DEPLOY_URL=$(vercel deploy --token ${{ secrets.VERCEL_TOKEN }} \
-                --build-env NEXT_PUBLIC_STUDIO_URL="${{ needs.studio.outputs.url }}" \
-                --build-env NEXT_PUBLIC_DOCS_URL="${{ needs.docs.outputs.url }}")" >> $GITHUB_OUTPUT
+                --build-env NEXT_PUBLIC_STUDIO_URL="${{ needs.studio.outputs.url }}/dashboard" \
+                --build-env NEXT_PUBLIC_DOCS_URL="${{ needs.docs.outputs.url }}/docs")" >> $GITHUB_OUTPUT
