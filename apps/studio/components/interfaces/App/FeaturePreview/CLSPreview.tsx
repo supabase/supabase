@@ -1,9 +1,12 @@
+import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import { BASE_PATH } from 'lib/constants'
 import Image from 'next/image'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, IconAlertCircle } from 'ui'
 
 const CLSPreview = () => {
+  const { ref } = useParams()
+
   return (
     <div className="flex flex-col gap-2">
       <div className="mb-4 flex flex-col gap-y-2">
@@ -41,7 +44,7 @@ const CLSPreview = () => {
           <li>
             <Markdown
               className="text-foreground-light"
-              content={`Grant access to a new UI for granting and/or revoking column-level privileges.`}
+              content={`Grant access to a new UI for granting and/or revoking column-level privileges [here](/project/${ref}/auth/column-privileges).`}
             />
           </li>
         </ul>
