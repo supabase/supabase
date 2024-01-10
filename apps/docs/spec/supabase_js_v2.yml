@@ -738,6 +738,8 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueClient.getSession'
     notes: |
       - This method retrieves the current local session (i.e local storage).
+      - The session contains a signed JWT and unencoded session data.
+      - Since the unencoded session data is retrieved from the local storage medium, **do not** rely on it as a source of trusted data on the server. It could be tampered with by the sender. If you need verified, trustworthy user data, call [`getUser`](/docs/reference/javascript/auth-getuser) instead.
       - If the session has an expired access token, this method will use the refresh token to get a new session.
     examples:
       - id: get-the-session-data

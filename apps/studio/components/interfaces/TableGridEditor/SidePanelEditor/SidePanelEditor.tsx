@@ -5,17 +5,21 @@ import { useState } from 'react'
 import { toast } from 'react-hot-toast'
 import { Modal } from 'ui'
 
-import { Dictionary } from 'types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { useDatabasePublicationCreateMutation } from 'data/database-publications/database-publications-create-mutation'
+import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
+import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { sqlKeys } from 'data/sql/keys'
 import { useTableRowCreateMutation } from 'data/table-rows/table-row-create-mutation'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
 import { tableKeys } from 'data/tables/keys'
+import { getTables } from 'data/tables/tables-query'
 import { useStore, useUrlState } from 'hooks'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { Dictionary } from 'types'
 import { ColumnEditor, RowEditor, SpreadsheetImport, TableEditor } from '.'
 import ForeignRowSelector from './RowEditor/ForeignRowSelector/ForeignRowSelector'
 import JsonEdit from './RowEditor/JsonEditor/JsonEditor'
@@ -26,11 +30,8 @@ import {
   ExtendedPostgresRelationship,
   UpdateColumnPayload,
 } from './SidePanelEditor.types'
+import { createColumn, updateColumn } from './SidePanelEditor.utils'
 import { ImportContent } from './TableEditor/TableEditor.types'
-import { useDatabasePublicationCreateMutation } from 'data/database-publications/database-publications-create-mutation'
-import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
-import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
-import { getTables } from 'data/tables/tables-query'
 
 export interface SidePanelEditorProps {
   editable?: boolean
@@ -191,17 +192,21 @@ const SidePanelEditor = ({
 
     const { columnId } = configuration
     const response = isNewRecord
-      ? await meta.createColumn(
-          payload as CreateColumnPayload,
-          selectedTable as PostgresTable,
-          foreignKey
-        )
-      : await meta.updateColumn(
-          columnId as string,
-          payload as UpdateColumnPayload,
-          selectedTable as PostgresTable,
-          foreignKey
-        )
+      ? await createColumn({
+          projectRef: project?.ref!,
+          connectionString: project?.connectionString,
+          payload: payload as CreateColumnPayload,
+          selectedTable: selectedTable as PostgresTable,
+          foreignKey,
+        })
+      : await updateColumn({
+          projectRef: project?.ref!,
+          connectionString: project?.connectionString,
+          id: columnId as string,
+          payload: payload as UpdateColumnPayload,
+          selectedTable: selectedTable as PostgresTable,
+          foreignKey,
+        })
 
     if (response?.error) {
       ui.setNotification({ category: 'error', message: response.error.message })
@@ -402,12 +407,7 @@ const SidePanelEditor = ({
           message: `Updating table: ${selectedTable?.name}...`,
         })
 
-        const { table, hasError }: any = await meta.updateTable(
-          toastId,
-          selectedTable,
-          payload,
-          columns
-        )
+        const { table, hasError } = await meta.updateTable(toastId, selectedTable, payload, columns)
 
         await updateTableRealtime(table, isRealtimeEnabled)
 

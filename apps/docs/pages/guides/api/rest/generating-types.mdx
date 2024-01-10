@@ -205,6 +205,8 @@ on:
 jobs:
   update:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       PROJECT_REF: <your-project-id>
@@ -224,7 +226,7 @@ jobs:
       - name: Commit files
         if: ${{contains(steps.git_status.outputs.status, ' ')}}
         run: |
-          git add types/database/index.ts
+          git add types/supabase.ts
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git commit -m "Update database types" -a

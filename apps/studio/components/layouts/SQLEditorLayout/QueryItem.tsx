@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
-import { useParams, useUser } from 'common'
+import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -28,6 +28,7 @@ import {
   Modal,
 } from 'ui'
 
+import DownloadSnippetModal from 'components/interfaces/SQLEditor/DownloadSnippetModal'
 import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
 import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
@@ -38,7 +39,6 @@ import { IS_PLATFORM } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import DownloadSnippetModal from 'components/interfaces/SQLEditor/DownloadSnippetModal'
 
 export interface QueryItemProps {
   tabInfo: SqlSnippet
@@ -98,14 +98,13 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
   const snap = useSqlEditorStateSnapshot()
   const project = useSelectedProject()
 
-  const user = useUser()
   const { id: snippetID } = tabInfo || {}
   const snippet =
     snippetID !== undefined && snap.snippets && snap.snippets[snippetID] !== undefined
       ? snap.snippets[snippetID]
       : null
 
-  const isSnippetOwner = user?.user_metadata?.user_name === snippet?.snippet?.owner?.username
+  const isSnippetOwner = profile?.id === snippet?.snippet?.owner?.id
 
   const { mutate: deleteContent, isLoading: isDeleting } = useContentDeleteMutation({
     onSuccess(data) {
