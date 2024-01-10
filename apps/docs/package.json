@@ -26,6 +26,7 @@
     "@next/mdx": "^13.5.6",
     "@octokit/auth-app": "^6.0.3",
     "@octokit/core": "^5.0.2",
+    "@octokit/graphql": "^7.0.2",
     "@octokit/plugin-paginate-graphql": "^4.0.0",
     "@radix-ui/react-accordion": "^1.1.2",
     "@supabase/auth-helpers-react": "^0.4.2",
