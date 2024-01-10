@@ -34,9 +34,8 @@ export interface InfiniteListProps<T> {
   LoaderComponent?: ReactNode
 }
 
-// eslint-disable-next-line react/display-name
-const Item = memo(({ listRef, LoaderComponent, data, index, style }: ItemProps) => {
-  const { items, itemProps, ItemComponent } = data
+const Item = memo(({ data, index, style }: ItemProps) => {
+  const { items, itemProps, ItemComponent, listRef, LoaderComponent } = data
   const item = index < items.length ? items[index] : undefined
 
   return item ? (
@@ -76,7 +75,7 @@ function InfiniteList<T>({
   }
 
   const itemCount = hasNextPage ? items.length + 1 : items.length
-  const itemData = createItemData(items, { itemProps, ItemComponent })
+  const itemData = createItemData(items, { itemProps, ItemComponent, LoaderComponent, listRef })
 
   return (
     <div className="relative flex flex-col flex-grow">
@@ -101,9 +100,7 @@ function InfiniteList<T>({
                   itemSize={getItemSize}
                   onItemsRendered={onItemsRendered}
                 >
-                  {(props) => (
-                    <Item listRef={listRef} LoaderComponent={LoaderComponent} {...props} />
-                  )}
+                  {Item}
                 </VariableSizeList>
               )}
             </InfiniteLoader>
