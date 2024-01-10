@@ -18,7 +18,7 @@
     "@mdx-js/react": "^2.3.0",
     "@next/bundle-analyzer": "^13.5.6",
     "@next/mdx": "^13.5.6",
-    "@octokit/core": "^5.0.2",
+    "@octokit/core": "^4.2.4",
     "@octokit/graphql": "^7.0.2",
     "@octokit/plugin-paginate-graphql": "^4.0.0",
     "@octokit/rest": "^20.0.2",
