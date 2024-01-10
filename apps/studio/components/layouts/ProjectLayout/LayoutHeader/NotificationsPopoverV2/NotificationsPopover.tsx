@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { SlidersHorizontal } from 'lucide-react'
+import { Settings2Icon, SlidersHorizontal } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
 import {
   Button,
@@ -32,6 +32,7 @@ import {
   WarningIcon,
 } from './NotificationsPopover.constants'
 import { useNotificationsSummaryQuery } from 'data/notifications/notifications-v2-summary-query'
+import { NotificationsFilter } from './NotificationsFilter'
 
 const NotificationsPopverV2 = () => {
   const [open, setOpen] = useState(false)
@@ -165,7 +166,7 @@ const NotificationsPopverV2 = () => {
             </Tabs>
             <Popover_Shadcn_ modal={false} open={openFilters} onOpenChange={setOpenFilters}>
               <PopoverTrigger_Shadcn_ asChild>
-                <Button type="text" icon={<SlidersHorizontal size={14} />}>
+                <Button type="text" icon={<Settings2Icon size={14} />}>
                   View {selectedFilter}
                 </Button>
               </PopoverTrigger_Shadcn_>
