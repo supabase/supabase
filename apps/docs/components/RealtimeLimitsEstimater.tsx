@@ -1,253 +1,10 @@
-import { find, set } from 'lodash'
 import { useState } from 'react'
-import { Select } from 'ui'
-
-const table = [
-  {
-    computeAddOn: 'micro',
-    filters: true,
-    rls: true,
-    concurrency: NaN,
-    maxDBChanges: NaN,
-    maxMessagesPerClient: NaN,
-    totalMessagesPerSecond: NaN,
-    p95Latency: NaN,
-  },
-  {
-    computeAddOn: 'micro',
-    filters: false,
-    rls: false,
-    concurrency: 500,
-    maxDBChanges: 64,
-    maxMessagesPerClient: 64,
-    totalMessagesPerSecond: 32000,
-    p95Latency: 238,
-  },
-  {
-    computeAddOn: 'micro',
-    filters: false,
-    rls: false,
-    concurrency: 5000,
-    maxDBChanges: 10,
-    maxMessagesPerClient: 10,
-    totalMessagesPerSecond: 50000,
-    p95Latency: 807,
-  },
-  {
-    computeAddOn: 'micro',
-    filters: false,
-    rls: false,
-    concurrency: 10000,
-    maxDBChanges: 5,
-    maxMessagesPerClient: 5,
-    totalMessagesPerSecond: 50000,
-    p95Latency: 1310,
-  },
-  {
-    computeAddOn: 'micro',
-    filters: false,
-    rls: false,
-    concurrency: 30000,
-    maxDBChanges: 1,
-    maxMessagesPerClient: 1,
-    totalMessagesPerSecond: 30000,
-    p95Latency: 941,
-  },
-  {
-    computeAddOn: 'micro',
-    filters: false,
-    rls: true,
-    concurrency: 500,
-    maxDBChanges: 30,
-    maxMessagesPerClient: 6,
-    totalMessagesPerSecond: 3000,
-    p95Latency: 228,
-  },
-  {
-    computeAddOn: 'micro',
-    filters: false,
-    rls: true,
-    concurrency: 1500,
-    maxDBChanges: 10,
-    maxMessagesPerClient: 2,
-    totalMessagesPerSecond: 3000,
-    p95Latency: 356,
-  },
-  {
-    computeAddOn: 'micro',
-    filters: false,
-    rls: true,
-    concurrency: 3000,
-    maxDBChanges: 5,
-    maxMessagesPerClient: 1,
-    totalMessagesPerSecond: 3000,
-    p95Latency: 616,
-  },
-  {
-    computeAddOn: 'small',
-    filters: true,
-    rls: true,
-    concurrency: NaN,
-    maxDBChanges: NaN,
-    maxMessagesPerClient: NaN,
-    totalMessagesPerSecond: NaN,
-    p95Latency: NaN,
-  },
-  {
-    computeAddOn: 'small',
-    filters: false,
-    rls: false,
-    concurrency: 500,
-    maxDBChanges: 64,
-    maxMessagesPerClient: 64,
-    totalMessagesPerSecond: 32000,
-    p95Latency: 184,
-  },
-  {
-    computeAddOn: 'small',
-    filters: false,
-    rls: false,
-    concurrency: 5000,
-    maxDBChanges: 10,
-    maxMessagesPerClient: 10,
-    totalMessagesPerSecond: 50000,
-    p95Latency: 782,
-  },
-  {
-    computeAddOn: 'small',
-    filters: false,
-    rls: false,
-    concurrency: 10000,
-    maxDBChanges: 5,
-    maxMessagesPerClient: 5,
-    totalMessagesPerSecond: 50000,
-    p95Latency: 1349,
-  },
-  {
-    computeAddOn: 'small',
-    filters: false,
-    rls: false,
-    concurrency: 35000,
-    maxDBChanges: 1,
-    maxMessagesPerClient: 1,
-    totalMessagesPerSecond: 35000,
-    p95Latency: 1287,
-  },
-  {
-    computeAddOn: 'small',
-    filters: false,
-    rls: true,
-    concurrency: 500,
-    maxDBChanges: 30,
-    maxMessagesPerClient: 6,
-    totalMessagesPerSecond: 3000,
-    p95Latency: 282,
-  },
-  {
-    computeAddOn: 'small',
-    filters: false,
-    rls: true,
-    concurrency: 1500,
-    maxDBChanges: 10,
-    maxMessagesPerClient: 2,
-    totalMessagesPerSecond: 3000,
-    p95Latency: 387,
-  },
-  {
-    computeAddOn: 'small',
-    filters: false,
-    rls: true,
-    concurrency: 3000,
-    maxDBChanges: 5,
-    maxMessagesPerClient: 1,
-    totalMessagesPerSecond: 3000,
-    p95Latency: 920,
-  },
-  {
-    computeAddOn: 'large',
-    filters: false,
-    rls: false,
-    concurrency: 500,
-    maxDBChanges: 64,
-    maxMessagesPerClient: 64,
-    totalMessagesPerSecond: 32000,
-    p95Latency: 184,
-  },
-  {
-    computeAddOn: 'large',
-    filters: false,
-    rls: false,
-    concurrency: 5000,
-    maxDBChanges: 10,
-    maxMessagesPerClient: 10,
-    totalMessagesPerSecond: 50000,
-    p95Latency: 672,
-  },
-  {
-    computeAddOn: 'large',
-    filters: false,
-    rls: false,
-    concurrency: 10000,
-    maxDBChanges: 5,
-    maxMessagesPerClient: 5,
-    totalMessagesPerSecond: 50000,
-    p95Latency: 1253,
-  },
-  {
-    computeAddOn: 'large',
-    filters: false,
-    rls: false,
-    concurrency: 35000,
-    maxDBChanges: 1,
-    maxMessagesPerClient: 1,
-    totalMessagesPerSecond: 35000,
-    p95Latency: 1257,
-  },
-  {
-    computeAddOn: 'large',
-    filters: false,
-    rls: false,
-    concurrency: 200000,
-    maxDBChanges: '0.05 (3/min)',
-    maxMessagesPerClient: '0.05 (3/min)',
-    totalMessagesPerSecond: 40000,
-    p95Latency: 4581,
-  },
-  {
-    computeAddOn: 'large',
-    filters: false,
-    rls: true,
-    concurrency: 500,
-    maxDBChanges: 40,
-    maxMessagesPerClient: 8,
-    totalMessagesPerSecond: 4000,
-    p95Latency: 618,
-  },
-  {
-    computeAddOn: 'large',
-    filters: false,
-    rls: true,
-    concurrency: 2000,
-    maxDBChanges: 10,
-    maxMessagesPerClient: 2,
-    totalMessagesPerSecond: 4000,
-    p95Latency: 606,
-  },
-  {
-    computeAddOn: 'large',
-    filters: false,
-    rls: true,
-    concurrency: 4000,
-    maxDBChanges: 5,
-    maxMessagesPerClient: 1,
-    totalMessagesPerSecond: 4000,
-    p95Latency: 918,
-  },
-]
+import { Select, Collapsible, Button, IconChevronDown } from 'ui'
+import throughputTable from '~/data/realtime/throughput.json'
 
 export default function RealtimeLimitsEstimater({}) {
   const findTableValue = ({ computeAddOn, filters, rls, concurrency }) => {
-    return table.find(
+    return throughputTable.find(
       (l) =>
         l.computeAddOn === computeAddOn &&
         l.filters === filters &&
@@ -262,6 +19,8 @@ export default function RealtimeLimitsEstimater({}) {
   const [concurrency, setConcurrency] = useState(500)
 
   const [limits, setLimits] = useState(findTableValue({ computeAddOn, filters, rls, concurrency }))
+
+  const [expandPreview, setExpandPreview] = useState(false)
 
   const handleComputeAddOnSelection = (e) => {
     const val = e.target.value
@@ -293,14 +52,10 @@ export default function RealtimeLimitsEstimater({}) {
   return (
     <div>
       <h4>Set your expected parameters</h4>
-      <div className="grid mb-8 gap-y-8 gap-x-8 grid-cols-4">
+      <div className="grid mb-8 gap-y-8 gap-x-8 grid-cols-2 xl:grid-cols-4">
         <div>
           <label htmlFor="computeAddOn">Compute:</label>
-          <Select
-            id="computeAddOn"
-            style={{ fontFamily: 'monospace' }}
-            onChange={handleComputeAddOnSelection}
-          >
+          <Select id="computeAddOn" className="font-mono" onChange={handleComputeAddOnSelection}>
             <Select.Option value="micro">Micro</Select.Option>
             <Select.Option value="small">Small to medium</Select.Option>
             <Select.Option value="large">Large to 16XL</Select.Option>
@@ -311,7 +66,7 @@ export default function RealtimeLimitsEstimater({}) {
           <label htmlFor="filters">Filters:</label>
           <Select
             id="filters"
-            style={{ fontFamily: 'monospace' }}
+            className="font-mono"
             disabled={true}
             onChange={handleFiltersSelection}
           >
@@ -322,7 +77,7 @@ export default function RealtimeLimitsEstimater({}) {
 
         <div>
           <label htmlFor="rls">RLS:</label>
-          <Select id="rls" style={{ fontFamily: 'monospace' }} onChange={handleRLSSelection}>
+          <Select id="rls" className="font-mono" onChange={handleRLSSelection}>
             <Select.Option value="false">No</Select.Option>
             <Select.Option value="true">Yes</Select.Option>
           </Select>
@@ -330,12 +85,8 @@ export default function RealtimeLimitsEstimater({}) {
 
         <div>
           <label htmlFor="concurrency">Concurrency:</label>
-          <Select
-            id="concurrency"
-            style={{ fontFamily: 'monospace' }}
-            onChange={handleConcurrencySelection}
-          >
-            {table
+          <Select id="concurrency" className="font-mono" onChange={handleConcurrencySelection}>
+            {throughputTable
               .filter(
                 (l) => l.computeAddOn === computeAddOn && l.filters === filters && l.rls === rls
               )
@@ -344,7 +95,7 @@ export default function RealtimeLimitsEstimater({}) {
                   value={l.concurrency.toString()}
                   selected={l.concurrency === concurrency}
                 >
-                  {l.concurrency.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                  {Intl.NumberFormat().format(l.concurrency)}
                 </Select.Option>
               ))}
           </Select>
@@ -369,7 +120,7 @@ export default function RealtimeLimitsEstimater({}) {
                 <td className="border px-4 py-2">{limits.maxDBChanges}</td>
                 <td className="border px-4 py-2">{limits.maxMessagesPerClient}</td>
                 <td className="border px-4 py-2">
-                  {limits.totalMessagesPerSecond.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                  {Intl.NumberFormat().format(limits.totalMessagesPerSecond)}
                 </td>
                 <td className="border px-4 py-2">{limits.p95Latency}ms</td>
               </tr>
@@ -377,6 +128,78 @@ export default function RealtimeLimitsEstimater({}) {
           </table>
         </div>
       )}
+
+      <Collapsible open={expandPreview} onOpenChange={setExpandPreview}>
+        <Collapsible.Trigger asChild>
+          <div className="py-1 flex items-center">
+            <p className="text-sm">View raw throughput table</p>
+            <Button
+              type="text"
+              icon={
+                <IconChevronDown
+                  size={18}
+                  strokeWidth={2}
+                  className={expandPreview && 'rotate-180'}
+                />
+              }
+              className="px-1"
+              onClick={() => setExpandPreview(!expandPreview)}
+            />
+          </div>
+        </Collapsible.Trigger>
+        <Collapsible.Content>
+          <div>
+            {throughputTable
+              .map((l) => l.computeAddOn)
+              .filter((v, i, a) => a.indexOf(v) === i)
+              .map((computeAddOn) => (
+                <div>
+                  <h4>
+                    {computeAddOn === 'micro'
+                      ? 'Micro'
+                      : computeAddOn === 'small'
+                      ? 'Small to medium'
+                      : 'Large to 16XL'}
+                  </h4>
+                  <table className="table-auto">
+                    <thead>
+                      <tr>
+                        <th className="px-4 py-2">Compute</th>
+                        <th className="px-4 py-2">Filters</th>
+                        <th className="px-4 py-2">RLS</th>
+                        <th className="px-4 py-2">Concurrency</th>
+                        <th className="px-4 py-2">Total DB changes /sec</th>
+                        <th className="px-4 py-2">Max messages per client /sec</th>
+                        <th className="px-4 py-2">Max total messages /sec</th>
+                        <th className="px-4 py-2">Latency p95</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {throughputTable
+                        .filter((l) => l.computeAddOn === computeAddOn)
+                        .map((l) => (
+                          <tr>
+                            <td className="border px-4 py-2">{l.computeAddOn}</td>
+                            <td className="border px-4 py-2">{l.filters ? '✅' : '🚫'}</td>
+                            <td className="border px-4 py-2">{l.rls ? '✅' : '🚫'}</td>
+                            <td className="border px-4 py-2">
+                              {Intl.NumberFormat().format(l.concurrency)}
+                            </td>
+                            <td className="border px-4 py-2">{l.maxDBChanges}</td>
+                            <td className="border px-4 py-2">{l.maxMessagesPerClient}</td>
+                            <td className="border px-4 py-2">
+                              {Intl.NumberFormat().format(l.totalMessagesPerSecond)}
+                            </td>
+                            <td className="border px-4 py-2">{l.p95Latency}ms</td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                </div>
+              ))}
+          </div>
+        </Collapsible.Content>
+      </Collapsible>
     </div>
   )
 }
