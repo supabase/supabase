@@ -84,7 +84,7 @@ export default function RealtimeLimitsEstimater({}) {
         </div>
 
         <div>
-          <label htmlFor="concurrency">Concurrency:</label>
+          <label htmlFor="concurrency">Connected clients:</label>
           <Select id="concurrency" className="font-mono" onChange={handleConcurrencySelection}>
             {throughputTable
               .filter(
@@ -164,10 +164,9 @@ export default function RealtimeLimitsEstimater({}) {
                   <table className="table-auto">
                     <thead>
                       <tr>
-                        <th className="px-4 py-2">Compute</th>
                         <th className="px-4 py-2">Filters</th>
                         <th className="px-4 py-2">RLS</th>
-                        <th className="px-4 py-2">Concurrency</th>
+                        <th className="px-4 py-2">Connected clients</th>
                         <th className="px-4 py-2">Total DB changes /sec</th>
                         <th className="px-4 py-2">Max messages per client /sec</th>
                         <th className="px-4 py-2">Max total messages /sec</th>
@@ -179,7 +178,6 @@ export default function RealtimeLimitsEstimater({}) {
                         .filter((l) => l.computeAddOn === computeAddOn)
                         .map((l) => (
                           <tr>
-                            <td className="border px-4 py-2">{l.computeAddOn}</td>
                             <td className="border px-4 py-2">{l.filters ? '✅' : '🚫'}</td>
                             <td className="border px-4 py-2">{l.rls ? '✅' : '🚫'}</td>
                             <td className="border px-4 py-2">
