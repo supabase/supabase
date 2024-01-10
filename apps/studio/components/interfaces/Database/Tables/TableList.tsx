@@ -73,6 +73,7 @@ const TableList = ({
       connectionString: project?.connectionString,
       schema: snap.selectedSchemaName,
       sortByProperty: 'name',
+      includeColumns: true,
     },
     {
       select(tables) {
