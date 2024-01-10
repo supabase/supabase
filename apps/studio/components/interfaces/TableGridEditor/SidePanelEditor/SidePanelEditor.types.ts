@@ -1,33 +1,11 @@
 import type { PostgresRelationship } from '@supabase/postgres-meta'
+import { CreateColumnBody } from 'data/database-columns/database-column-create-mutation'
+import { UpdateColumnBody } from 'data/database-columns/database-column-update-mutation'
 
-export interface CreateColumnPayload {
-  tableId: number
-  name: string
-  type: string
-  check?: string | null
-  comment?: string
-  defaultValue?: any
-  defaultValueFormat?: 'expression' | 'literal'
-  isIdentity?: boolean
-  identityGeneration?: 'BY DEFAULT' | 'ALWAYS'
-  isNullable?: boolean
-  isPrimaryKey?: boolean
-  isUnique?: boolean
-}
+export interface CreateColumnPayload extends CreateColumnBody {}
 
-export interface UpdateColumnPayload {
-  name?: string
-  comment?: string | null
-  type?: string
-  check?: string | null
-  dropDefault?: boolean
-  defaultValue?: any
-  defaultValueFormat?: 'expression' | 'literal'
-  isIdentity?: boolean
-  isNullable?: boolean
-  isUnique?: boolean
+export interface UpdateColumnPayload extends UpdateColumnBody {
   isPrimaryKey?: boolean
-  identityGeneration?: 'BY DEFAULT' | 'ALWAYS'
 }
 
 export interface CreateTablePayload {
