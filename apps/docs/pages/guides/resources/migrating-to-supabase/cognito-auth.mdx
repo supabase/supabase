@@ -7,20 +7,24 @@ export const meta = {
   sidebar_label: 'Cognito Auth',
 }
 
-Supabase provides
+This guide describes how to perform a bulk migration of your Amazon Web Services (AWS) Cognito User Pool to Supabase Auth. Unfortunately, this guide does not handle the migration of secrets such as
+Single Sign On (SSO) Identity Providers and Multi Factor Authentication devices. You will need to re-register MFA factors and SSO IDPs (to include link here).
 
-## Set up the migration tool
+## Export Users From Cognito
 
-Decide which user pool to migrate from
+Use this script to export users from a User Pool to CSV. // insert script after figuring out where to store it
 
-1. Export from [Cognito to CSV](https://github.com/hawkerfun/cognito-csv-exporter)
-2. Load CSV into database?
+## Load Cognito Users into Supabase
 
+Use a script to iterate through the CSV file and create users via the `supabase.auth.admin.createUser`. We provide a sample for reference but you can also write your own.
 
-### Migrating SAML IDP Providers
-
-
-### Migrating MFA Factors
+Here's how [Cognito User fields](https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_UserType.html) map to Supabase fields map to fields on our `auth.users` schema.
+This can change as both services evolve. We recommend that you experiment with a few users in a local environment via [a local AWS Cognito emulator](https://hub.docker.com/r/jagregory/cognito-local) and the local Supabase setup.
 
 
 ### How are current users impacted?
+
+Users with a linked password sign in method will have to reset their password.
+
+
+AWS also provides a [reference architecture for user exports](https://aws.amazon.com/solutions/implementations/cognito-user-profiles-export-reference-architecture/)
