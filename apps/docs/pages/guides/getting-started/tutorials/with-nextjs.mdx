@@ -364,10 +364,10 @@ export async function POST(req) {
 
   // Check if we have a session
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  if (session) {
+  if (user) {
     await supabase.auth.signOut()
   }
 
@@ -427,14 +427,13 @@ Let's create a new component for that called `AccountForm` within the `app/accou
 import { useCallback, useEffect, useState } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
-export default function AccountForm({ session }) {
+export default function AccountForm({ user }) {
   const supabase = createClientComponentClient()
   const [loading, setLoading] = useState(true)
   const [fullname, setFullname] = useState(null)
   const [username, setUsername] = useState(null)
   const [website, setWebsite] = useState(null)
   const [avatar_url, setAvatarUrl] = useState(null)
-  const user = session?.user
 
   const getProfile = useCallback(async () => {
     try {
@@ -492,7 +491,7 @@ export default function AccountForm({ session }) {
     <div className="form-widget">
       <div>
         <label htmlFor="email">Email</label>
-        <input id="email" type="text" value={session?.user.email} disabled />
+        <input id="email" type="text" value={user?.email} disabled />
       </div>
       <div>
         <label htmlFor="fullName">Full Name</label>
@@ -551,16 +550,15 @@ export default function AccountForm({ session }) {
 'use client'
 import { useCallback, useEffect, useState } from 'react'
 import { Database } from '../database.types'
-import { Session, createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { User, createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
-export default function AccountForm({ session }: { session: Session | null }) {
+export default function AccountForm({ user }: { user: User | null }) {
   const supabase = createClientComponentClient<Database>()
   const [loading, setLoading] = useState(true)
   const [fullname, setFullname] = useState<string | null>(null)
   const [username, setUsername] = useState<string | null>(null)
   const [website, setWebsite] = useState<string | null>(null)
   const [avatar_url, setAvatarUrl] = useState<string | null>(null)
-  const user = session?.user
 
   const getProfile = useCallback(async () => {
     try {
@@ -627,7 +625,7 @@ export default function AccountForm({ session }: { session: Session | null }) {
     <div className="form-widget">
       <div>
         <label htmlFor="email">Email</label>
-        <input id="email" type="text" value={session?.user.email} disabled />
+        <input id="email" type="text" value={user?.email} disabled />
       </div>
       <div>
         <label htmlFor="fullName">Full Name</label>
@@ -703,10 +701,10 @@ export default async function Account() {
   const supabase = createServerComponentClient({ cookies: () => cookieStore })
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  return <AccountForm session={session} />
+  return <AccountForm user={user} />
 }
 ```
 
@@ -723,10 +721,10 @@ export default async function Account() {
   const supabase = createServerComponentClient<Database>({ cookies })
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  return <AccountForm session={session} />
+  return <AccountForm user={user} />
 }
 ```
 
