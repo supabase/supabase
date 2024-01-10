@@ -232,7 +232,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
                 <IconCopy size="tiny" />
                 <p>Duplicate Table</p>
               </DropdownMenuItem>
-              <DropdownMenuItem key="delete-table" className="space-x-2" asChild>
+              <DropdownMenuItem key="view-policies" className="space-x-2" asChild>
                 <Link
                   key="view-policies"
                   href={`/project/${projectRef}/auth/policies?schema=${snap.selectedSchemaName}&search=${entity.id}`}

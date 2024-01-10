@@ -150,7 +150,7 @@
     "prettier": "^2.8.8",
     "sass": "^1.68.0",
     "storybook-dark-mode": "^3.0.1",
-    "tailwindcss": "^3.3.5",
+    "tailwindcss": "^3.4.1",
     "typescript": "^5.2.2"
   }
 }

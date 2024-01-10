@@ -275,6 +275,7 @@ const SchemaGraph = ({ schema }: { schema: string }) => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     schema,
+    includeColumns: true,
   })
 
   if (isLoading) {
