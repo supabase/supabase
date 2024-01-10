@@ -6,49 +6,21 @@ import '../styles/prism-okaidia.scss'
 
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { createClient } from '@supabase/supabase-js'
-import { QueryClientProvider, useQueryClient } from '@tanstack/react-query'
 import { AuthProvider, ThemeProvider, useTelemetryProps, useThemeSandbox } from 'common'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { AppPropsWithLayout } from 'types'
 import { CommandMenuProvider, PortalToast, useConsent } from 'ui'
 import { TabsProvider } from 'ui/src/components/Tabs'
 import Favicons from '~/components/Favicons'
 import SiteLayout from '~/layouts/SiteLayout'
-import { IS_PLATFORM } from '~/lib/constants'
-import { unauthedAllowedPost } from '~/lib/fetch/fetchWrappers'
-import { useRootQueryClient } from '~/lib/fetch/queryClient'
-import { useOnLogout } from '~/lib/userAuth'
-import { LOCAL_STORAGE_KEYS, remove } from '~/lib/storage'
-
-/**
- *
- * !!! IMPORTANT !!!
- * Ensure data is cleared on sign out.
- *
- * **/
-function SignOutHandler({ children }: PropsWithChildren) {
-  const queryClient = useQueryClient()
-
-  const cleanUp = useCallback(() => {
-    queryClient.cancelQueries()
-    queryClient.clear()
-
-    Object.keys(LOCAL_STORAGE_KEYS).forEach((key) => {
-      remove('local', LOCAL_STORAGE_KEYS[key])
-    })
-  }, [queryClient])
-
-  useOnLogout(cleanUp)
-
-  return <>{children}</>
-}
+import { API_URL, IS_PLATFORM } from '~/lib/constants'
+import { post } from '~/lib/fetchWrappers'
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
   const { consentValue, hasAcceptedConsent } = useConsent()
-  const queryClient = useRootQueryClient()
 
   useThemeSandbox()
 
@@ -63,22 +35,15 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
 
   const handlePageTelemetry = useCallback(
     (route: string) => {
-      if (IS_PLATFORM) {
-        unauthedAllowedPost('/platform/telemetry/page', {
-          body: {
-            referrer: document.referrer,
-            title: document.title,
-            route,
-            ga: {
-              screen_resolution: telemetryProps?.screenResolution,
-              language: telemetryProps?.language,
-              session_id: '',
-            },
-          },
-        }).catch((e) => {
-          console.error('Problem sending telemetry:', e)
-        })
-      }
+      return post(`${API_URL}/telemetry/page`, {
+        referrer: document.referrer,
+        title: document.title,
+        route,
+        ga: {
+          screen_resolution: telemetryProps?.screenResolution,
+          language: telemetryProps?.language,
+        },
+      })
     },
     [telemetryProps]
   )
@@ -108,7 +73,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     return () => {
       router.events.off('routeChangeComplete', handleRouteChange)
     }
-  }, [router, handlePageTelemetry, consentValue, hasAcceptedConsent])
+  }, [router, handlePageTelemetry, consentValue])
 
   /**
    * Save/restore scroll position when reloading or navigating back/forward.
@@ -155,7 +120,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     if (router.isReady) {
       handlePageTelemetry(router.basePath + router.asPath)
     }
-  }, [router, handlePageTelemetry, consentValue, hasAcceptedConsent])
+  }, [router, handlePageTelemetry, consentValue])
 
   /**
    * Reference docs use `history.pushState()` to jump to
@@ -176,35 +141,33 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     }
   }, [router])
 
-  const AuthContainer = ({ children }) => {
+  const SITE_TITLE = 'Supabase Documentation'
+
+  const AuthContainer = (props) => {
     return IS_PLATFORM ? (
       <SessionContextProvider supabaseClient={supabase}>
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>{props.children}</AuthProvider>
       </SessionContextProvider>
     ) : (
-      <AuthProvider>{children}</AuthProvider>
+      <AuthProvider>{props.children}</AuthProvider>
     )
   }
 
   return (
     <>
-      <QueryClientProvider client={queryClient}>
-        <Favicons />
-        <AuthContainer>
-          <SignOutHandler>
-            <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
-              <CommandMenuProvider site="docs">
-                <TabsProvider>
-                  <SiteLayout>
-                    <PortalToast />
-                    <Component {...pageProps} />
-                  </SiteLayout>
-                </TabsProvider>
-              </CommandMenuProvider>
-            </ThemeProvider>
-          </SignOutHandler>
-        </AuthContainer>
-      </QueryClientProvider>
+      <Favicons />
+      <AuthContainer>
+        <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
+          <CommandMenuProvider site="docs">
+            <TabsProvider>
+              <SiteLayout>
+                <PortalToast />
+                <Component {...pageProps} />
+              </SiteLayout>
+            </TabsProvider>
+          </CommandMenuProvider>
+        </ThemeProvider>
+      </AuthContainer>
     </>
   )
 }
