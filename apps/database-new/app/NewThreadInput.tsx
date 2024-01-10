@@ -1,52 +1,17 @@
 'use client'
 
+import { AssistantChatForm } from '@/components/AssistantChatForm'
 import { CHAT_EXAMPLES } from '@/data/chat-examples'
 import { useAppStateSnapshot } from '@/lib/state'
 import { createClient } from '@/lib/supabase/client'
 import { ExternalLink } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { useFormState } from 'react-dom'
-import { createThread } from './actions'
-import { AssistantChatForm } from '@/components/AssistantChatForm'
+import { useState } from 'react'
 import { cn } from 'ui'
 
 const suggestions = CHAT_EXAMPLES
 
 const NewThreadInput = () => {
-  const [value, setValue] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const localPrompt = localStorage.getItem('prompt')
-      if (localPrompt) {
-        localStorage.removeItem('prompt')
-        return localPrompt
-      }
-    }
-    return ''
-  })
-
-  const initialState = {
-    input: undefined,
-    message: undefined,
-    success: undefined,
-    data: {
-      value,
-      threadId: undefined,
-      messageId: undefined,
-    },
-  }
-
-  //const [state, formAction] = useFormState(createThread, initialState)
-
-  // useEffect(() => {
-  //   if (state.success && state.data.threadId && state.data.runId && state.data.messageId) {
-  //     console.log(state.data)
-  //     const { threadId, runId, messageId } = state.data
-  //     console.log('threadId', threadId)
-  //     console.log('runId', runId)
-  //     console.log('messageId', messageId)
-  //     // router.push(`/${state.data.threadId}/${state.data.runId}/${state.data.messageId}`)
-  //   }
-  // }, [state.success])
+  const [value, setValue] = useState('')
 
   const supabase = createClient()
   const snap = useAppStateSnapshot()
@@ -64,7 +29,6 @@ const NewThreadInput = () => {
             } = await supabase.auth.getUser()
             if (!user) {
               event.preventDefault()
-              localStorage.setItem('prompt', value)
               snap.setLoginDialogOpen(true)
               return
             }

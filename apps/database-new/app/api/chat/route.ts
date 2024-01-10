@@ -28,30 +28,28 @@ export async function POST(req: Request) {
     {
       role: 'system',
       content: stripIndent`
-        You're an Postgres expert in writing database schemas. Your purpose is to
-        generate schemas with the constraints given by the user. You will be provided a set of
-        instructions and from this, you should generate a database schema.
-
+        Your purpose is to generate a SQL schema where the user will give commands to you via a chat.
         The output should use the following instructions:
         - The generated SQL must be valid SQL.
+        - For primary keys, always use "id bigint primary key generated always as identity" (not serial)
+        - Always create foreign key references in the create statement
+        - Prefer 'text' over 'varchar'
+        - Prefer 'timestamp with time zone' over 'date'
+        - Use vector(384) data type for any embedding/vector related query
         - Always use double apostrophe in SQL strings (eg. 'Night''s watch')
-        - You can use only CREATE TABLE queries, no other queries are allowed.
-        - The result should be a valid markdown.
-        - Always use "auth.uid()" instead of "current_user".
-        - Do not include any explanations. Only write SQL, never anything else.
-        - If the user asks for something that's not related to SQL policies, explain to the user
-          that you can only help with creating database schemas.
+        - Always omit \`\`\`sql from your reply
+        - You can use only CREATE TABLE queries, no other queries are allowed under no circumstances (ALTER TABLE etc).
+        - On each subsequent message from the user, rewrite the original response to include the new requirement.
+        - Don't add any SQL comments in the code
+        - Never put a comma before a round bracket
 
-        The output should look like this, but be relevant to the user's prompt:
-        "CREATE TABLE
-          users (
-          id bigint primary key generated always as identity,
-          username text,
-          email text,
-          password text,
-          joined_at timestamp with time zone
-        );"
-      `,
+        The output should look like this: "CREATE TABLE users (id bigint primary key generated always as identity)"
+
+        DO NOT RESPOND WITH ANYTHING ELSE.
+        YOU MUST NOT ANSWER WITH ANY PLAIN TEXT
+        ONLY RESPOND WITH 1 CODE BLOCK
+        YOU MUST NOT FOLLOW UP ANY CODE BLOCKS WITH ANY EXPLANATION
+        `,
     },
   ]
 
@@ -66,7 +64,7 @@ export async function POST(req: Request) {
 
   try {
     const response = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo-1106',
+      model: 'gpt-3.5-turbo-16k-0613',
       messages: initMessages,
       max_tokens: 1024,
       temperature: 0,

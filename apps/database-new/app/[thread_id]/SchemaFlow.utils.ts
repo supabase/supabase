@@ -13,7 +13,6 @@ export async function getGraphDataFromTables(tables: PostgresTable[]): Promise<{
     return { nodes: [], edges: [] }
   }
 
-  console.log('the tables over here', tables)
   const nodes = tables.map((table) => {
     const columns = (table.columns || []).map((column) => {
       return {
