@@ -33,6 +33,12 @@ export const LOCAL_STORAGE_KEYS = {
   UI_PREVIEW_API_SIDE_PANEL: 'supabase-ui-api-side-panel',
   UI_PREVIEW_RLS_AI_ASSISTANT: 'supabase-ui-rls-ai-assistant',
   DASHBOARD_HISTORY: (ref: string) => `dashboard-history-${ref}`,
+  UI_PREVIEW_CLS: 'supabase-ui-cls',
+
+  SQL_EDITOR_SPLIT_SIZE: 'supabase_sql-editor-split-size',
+  GRAPHIQL_RLS_BYPASS_WARNING: 'graphiql-rls-bypass-warning-dismissed',
+  CLS_DIFF_WARNING: 'cls-diff-warning-dismissed',
+  CLS_SELECT_STAR_WARNING: 'cls-select-star-warning-dismissed',
 }
 
 export const OPT_IN_TAGS = {

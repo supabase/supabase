@@ -576,6 +576,7 @@ export const auth = {
         { name: 'Managing User Data', url: '/guides/auth/managing-user-data' },
         { name: 'Multi-Factor Authentication', url: '/guides/auth/auth-mfa' },
         { name: 'Row Level Security', url: '/guides/auth/row-level-security' },
+        { name: 'Column Level Security', url: '/guides/auth/column-level-security' },
       ],
     },
     {
