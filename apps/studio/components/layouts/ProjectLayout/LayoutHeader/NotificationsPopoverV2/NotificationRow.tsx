@@ -66,7 +66,7 @@ const NotificationRow = ({
     <div
       ref={ref}
       className={clsx(
-        `p-4 flex justify-between gap-x-3`,
+        `p-4 flex justify-between gap-x-3 group`,
         index !== 0 ? 'border-t' : '',
         status !== 'new' ? 'bg-background' : ''
       )}
@@ -180,8 +180,8 @@ const NotificationRow = ({
             <Tooltip.Trigger asChild>
               <Button
                 type="outline"
-                icon={<IconArchive />}
-                className="px-1"
+                icon={<IconArchive size={14} strokeWidth={2} className="text-foreground-light" />}
+                className="p-1.5 group-hover:opacity-100 opacity-0 transition rounded-full"
                 onClick={() => onArchiveNotification(notification.id)}
               />
             </Tooltip.Trigger>
