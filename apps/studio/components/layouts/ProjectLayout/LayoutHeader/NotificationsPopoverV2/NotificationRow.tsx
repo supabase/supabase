@@ -170,7 +170,7 @@ const NotificationRow = ({
               <Button
                 type="outline"
                 icon={<IconArchive size={13} strokeWidth={2} className="text-foreground-light" />}
-                className="p-1.5 group-hover:opacity-100 opacity-100 transition rounded-full"
+                className="p-1.5 group-hover:opacity-100 opacity-0 transition rounded-full"
                 onClick={() => onArchiveNotification(notification.id)}
               />
             </Tooltip.Trigger>

@@ -32,7 +32,6 @@ import {
   WarningIcon,
 } from './NotificationsPopover.constants'
 import { useNotificationsSummaryQuery } from 'data/notifications/notifications-v2-summary-query'
-import { NotificationsFilter } from './NotificationsFilter'
 
 const NotificationsPopverV2 = () => {
   const [open, setOpen] = useState(false)
