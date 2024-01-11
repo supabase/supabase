@@ -222,7 +222,7 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  await supabase.auth.getSession()
+  await supabase.auth.getUser()
 
   return response
 }
@@ -423,7 +423,13 @@ export default function Index () {
 </TabPanel>
 <TabPanel id="sveltekit" label="SvelteKit">
 
-Creating a Supabase client with the `ssr` package automatically configures it to use Cookies. This means your user's session is available throughout the entire SvelteKit stack - page, layout, server, hooks. It just works!
+Creating a Supabase client with the `ssr` package automatically configures it to use Cookies. This means your user's session is available throughout the entire SvelteKit stack - page, layout, server, hooks.
+
+<Admonition type="danger">
+
+Beware when accessing the session object on the server, because it is not revalidated on every request from the client. That means the sender can tamper with unencoded data in the session object. If you need to verify the integrity of user data for server logic, call `auth.getUser` instead, which will query the Supabase Auth server for trusted user data.
+
+</Admonition>
 
 <Tabs
   scrollable

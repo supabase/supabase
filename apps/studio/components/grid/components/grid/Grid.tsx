@@ -3,7 +3,7 @@
 import 'react-data-grid/lib/styles.css'
 import DataGrid, { DataGridHandle, RowsChangeData } from 'react-data-grid'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
-import { forwardRef } from 'react'
+import { forwardRef, useRef } from 'react'
 import { memo } from 'react-tracked'
 
 import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
@@ -11,11 +11,13 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
-import { useUrlState } from 'hooks'
+import { useKeyboardShortcuts, useUrlState } from 'hooks'
 import { Button } from 'ui'
 import { useDispatch, useTrackedState } from '../../store'
 import { Filter, GridProps, SupaRow } from '../../types'
 import RowRenderer from './RowRenderer'
+import { formatClipboardValue } from 'components/grid/utils'
+import { copyToClipboard } from 'lib/helpers'
 
 const rowKeyGetter = (row: SupaRow) => {
   return row?.idx ?? -1
@@ -97,7 +99,28 @@ export const Grid = memo(
         })
       }
 
+      const selectedCellRef = useRef<{ rowIdx: number; row: any; column: any } | null>(null)
+
+      function copyCellValue() {
+        const selectedCellValue = selectedCellRef.current?.row[selectedCellRef.current?.column?.key]
+        const text = formatClipboardValue(selectedCellValue)
+        if (!text) return
+        copyToClipboard(text)
+      }
+
+      useKeyboardShortcuts({
+        'Command+c': (event: KeyboardEvent) => {
+          event.stopPropagation()
+          copyCellValue()
+        },
+        'Control+c': (event: KeyboardEvent) => {
+          event.stopPropagation()
+          copyCellValue()
+        },
+      })
+
       function onSelectedCellChange(args: { rowIdx: number; row: any; column: any }) {
+        selectedCellRef.current = args
         dispatch({
           type: 'SELECTED_CELL_CHANGE',
           payload: { position: { idx: args.column.idx, rowIdx: args.rowIdx } },
