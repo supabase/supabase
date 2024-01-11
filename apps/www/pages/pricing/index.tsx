@@ -5,12 +5,13 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { useTheme } from 'next-themes'
-import { Accordion, Button, IconArrowUpRight, IconCheck, Select } from 'ui'
+import { Accordion, Button, IconArrowUpRight, IconCheck, Select, cn } from 'ui'
 
 import AnnouncementBadge from '~/components/Announcement/Badge'
 import CTABanner from '~/components/CTABanner'
 import ComputePricingModal from '~/components/Pricing/ComputePricingModal'
 import DefaultLayout from '~/components/Layouts/Default'
+import PricingAddons from '~/components/Pricing/PricingAddons'
 import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/Pricing/PricingTableRow'
 
 import Solutions from '~/data/Solutions'
@@ -53,43 +54,6 @@ export default function IndexPage() {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
   }, [asPath])
-
-  const addons = [
-    {
-      name: 'Optimized Compute',
-      heroImg: 'addons-compute-hero',
-      icon: 'compute-upgrade',
-      price: 'Starts from $5',
-      description: 'Increase the capability of your database only for what you need.',
-      leftCtaText: 'Documentation',
-      leftCtaLink: 'https://supabase.com/docs/guides/platform/compute-add-ons',
-      rightCtaText: 'See Pricing breakdown',
-      rightCtaLink: '#open-modal',
-    },
-    {
-      name: 'Custom Domain',
-      heroImg: 'addons-domains-hero',
-      icon: 'custom-domain-upgrade',
-      price: 'Flat fee $10',
-      description:
-        'Use your own domain for your Supabase project to present a more polished product to your users.',
-      leftCtaText: 'Documentation',
-      leftCtaLink: 'https://supabase.com/docs/guides/platform/custom-domains',
-      rightCtaText: 'See more',
-      rightCtaLink: 'http://',
-    },
-    {
-      name: 'Point in Time Recovery',
-      heroImg: 'addons-pitr-hero',
-      icon: 'pitr-upgrade',
-      price: 'Starts from $100',
-      description: 'Roll back to any specific point in time and ensure that data is not lost.',
-      leftCtaText: 'Documentation',
-      leftCtaLink: 'https://supabase.com/docs/guides/platform/backups',
-      rightCtaText: 'See Pricing breakdown',
-      rightCtaLink: 'http://',
-    },
-  ]
 
   const MobileHeader = ({
     // title,
@@ -331,79 +295,7 @@ export default function IndexPage() {
         id="addons"
         className="sm:py-18 container relative mx-auto px-4 py-16 shadow-sm md:py-24 lg:px-12 lg:pt-32 lg:pb-12"
       >
-        <div>
-          <div className="text-center">
-            <h2 className="text-foreground text-3xl">Easily customizable add-ons</h2>
-            <p className="text-foreground-light mt-4 mb-8 lg:mb-16 text-lg">
-              Level up your Supabase experience with add-ons.
-            </p>
-          </div>
-
-          <div className="grid lg:grid-cols-3 gap-4 mb-16">
-            {addons.map((addon) => (
-              <div className="bg-surface-100 border rounded-[4px]" key={addon.name}>
-                <div className="overflow-hidden rounded-lg relative h-60">
-                  <Image
-                    className="w-full"
-                    layout="fill"
-                    objectFit="cover"
-                    src={`${basePath}/images/pricing/${addon.heroImg}${
-                      resolvedTheme?.includes('dark') ? '' : '-light'
-                    }.png`}
-                    alt=""
-                  />
-                </div>
-                <div className="px-8 -mt-1">
-                  <p className="text-[13px] text-foreground-lighter">{addon.price}</p>
-                  <div className="flex items-center gap-2 mt-2">
-                    <Image
-                      src={`${basePath}/images/pricing/${addon.icon}${
-                        resolvedTheme?.includes('dark') ? '' : '-light'
-                      }.svg`}
-                      className="file:"
-                      width={14}
-                      height={14}
-                      alt="Compute"
-                    />
-                    <span className="text-sm text-foreground">{addon.name}</span>
-                  </div>
-                  <p className="mt-2 text-foreground-lighter text-[13px] min-h-[40px] lg:min-h-[50px] lg:max-w-[290px]">
-                    {addon.description}
-                  </p>
-                  <div className="flex items-center justify-between mt-4 mb-4 lg:mb-8">
-                    <Button asChild size="tiny" type="default">
-                      <Link href={addon.leftCtaLink} as={addon.leftCtaLink}>
-                        {addon.leftCtaText}
-                      </Link>
-                    </Button>
-                    {addon.name === 'Optimized Compute' ? (
-                      <button
-                        className="text-brand-600 text-[13px] leading-4 hover:underline "
-                        onClick={() => setShowComputeModal(true)}
-                      >
-                        {addon.rightCtaText}
-                      </button>
-                    ) : (
-                      ''
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="flex flex-col md:flex-row items-center gap-4 justify-center text-center">
-            <span className="prose">Got something you'd like to see here?</span>
-            <Button asChild size="tiny" type="default">
-              <Link
-                href="https://github.com/supabase/supabase/discussions/categories/feature-requests"
-                as="https://github.com/supabase/supabase/discussions/categories/feature-requests"
-                target="_blank"
-              >
-                Request a feature
-              </Link>
-            </Button>
-          </div>
-        </div>
+        <PricingAddons setShowComputeModal={setShowComputeModal} />
 
         <div
           id="cost-control"
