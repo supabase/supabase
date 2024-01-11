@@ -413,13 +413,17 @@ export default function IndexPage() {
             <span className="bg-brand-400 text-brand-600 rounded-md bg-opacity-30 inline-block py-0.5 px-2 text-[13px] leading-4 mt-2">
               Available for Pro plan
             </span>
-            <h2 className="text-foreground text-4xl mt-4">Cost control with spend caps</h2>
-            <p className="mt-3 prose lg:max-w-lg">
-              The Pro plan has a usage quota included and a spend cap turned on by default. If you
-              need to go beyond the inclusive limits, simply switch off your spend cap to pay for
-              additional usage and scale seamlessly. Note that your projects will run into
-              restrictions if you have the spend cap enabled and exhaust your quota.
+            <h2 className="text-foreground text-4xl mt-4">Predictable cost control</h2>
+            <p className="mt-2 mb-4 prose lg:max-w-lg">
+              The Pro plan has a spend cap enabled by default to keep costs under control. If you
+              expect a usage spike and need to go beyond the limits, simply switch off the spend cap
+              to pay for additional resources.
             </p>
+            <Button asChild size="tiny" type="default">
+              <Link href="/docs/guides/platform/spend-cap" target="_blank">
+                Learn about Cost Control
+              </Link>
+            </Button>
           </div>
           <div className="relative h-full min-h-[14rem]">
             <Image
