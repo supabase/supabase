@@ -1,8 +1,8 @@
+import { useParams } from 'common'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
 
-import { useParams } from 'common/hooks'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import AISettingsModal from 'components/ui/AISettingsModal'
 import Connecting from 'components/ui/Loading/Loading'
