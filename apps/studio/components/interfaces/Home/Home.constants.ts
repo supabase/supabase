@@ -54,13 +54,15 @@ export const EXAMPLE_PROJECTS = [
   {
     framework: 'nextjs',
     title: 'Next.js Realtime chat app',
-    description: 'Next.js Slack clone app using Supabase realtime subscriptions',
+    description:
+      'Next.js Slack clone app using Supabase realtime subscriptions',
     url: 'https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone',
   },
   {
     framework: 'nextjs',
     title: 'Next.js Subscription and Auth',
-    description: 'The all-in-one starter kit for high-performance SaaS applications.',
+    description:
+      'The all-in-one starter kit for high-performance SaaS applications.',
     url: 'https://github.com/vercel/nextjs-subscription-payments',
   },
   {
@@ -121,6 +123,6 @@ export const EXAMPLE_PROJECTS = [
     framework: 'NuxtJS',
     title: 'NuxtJS todo list app',
     description: 'NuxtJS todo app example',
-    url: 'https://github.com/nuxt-modules/supabase/tree/main/demo'
-  }
+    url: 'https://github.com/nuxt-modules/supabase/tree/main/demo',
+  },
 ]
