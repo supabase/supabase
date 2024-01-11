@@ -4,7 +4,6 @@ import { createClient } from '@supabase/supabase-js'
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { chunk, compact, find, findIndex, has, isEqual, some, uniq, uniqBy } from 'lodash'
 import { makeAutoObservable } from 'mobx'
-import { createContext, useContext } from 'react'
 import toast from 'react-hot-toast'
 
 import {
@@ -26,14 +25,6 @@ let store = null
 export function useStorageStore() {
   if (store === null) store = new StorageExplorerStore(null)
   return store
-}
-
-/**
- * Deprecated - it's preferable to use the useStorageStore() function above
- */
-export const StorageExplorerContext = createContext(null)
-export const useStorageExplorerStore = () => {
-  return useContext(StorageExplorerContext)
 }
 
 const CORRUPTED_THRESHOLD_MS = 15 * 60 * 1000 // 15 minutes

@@ -1,8 +1,10 @@
-import { useFlag } from 'hooks'
 import { isUndefined } from 'lodash'
 import Link from 'next/link'
 import { ReactNode } from 'react'
 import { Badge, IconArrowUpRight, IconLogOut, Menu } from 'ui'
+
+import { useFlag } from 'hooks'
+import { LayoutWrapper } from '../LayoutWrapper'
 import LayoutHeader from '../ProjectLayout/LayoutHeader'
 import { SidebarLink, SidebarSection } from './AccountLayout.types'
 
@@ -18,15 +20,6 @@ interface WithSidebarProps {
   children: ReactNode
 }
 
-/*
-The information hierarchy for WithSidebar is:
-  WithSidebar
-    SectionsWithHeaders
-      SidebarItem
-        SidebarLink
-    SidebarItem
-      SidebarLink
-*/
 const WithSidebar = ({
   title,
   header,
@@ -39,16 +32,13 @@ const WithSidebar = ({
   customSidebarContent,
 }: WithSidebarProps) => {
   const noContent = !sections && !customSidebarContent
-  const ongoingIncident = useFlag('ongoingIncident')
   const navLayoutV2 = useFlag('navigationLayoutV2')
-  const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
 
   return (
     <div className="flex max-h-full">
       {!hideSidebar && !noContent && (
-        <div
+        <LayoutWrapper
           id="with-sidebar"
-          style={{ height: maxHeight, maxHeight }}
           className={[
             'h-full bg-background',
             'hide-scrollbar w-64 overflow-auto border-r border-default',
@@ -87,7 +77,7 @@ const WithSidebar = ({
               })}
             </Menu>
           </div>
-        </div>
+        </LayoutWrapper>
       )}
       <div className="flex flex-1 flex-col">
         {!navLayoutV2 && <LayoutHeader breadcrumbs={breadcrumbs} />}

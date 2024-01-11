@@ -23,6 +23,7 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useCheckPermissions, useSelectedProject } from 'hooks'
 import BucketRow from './BucketRow'
+import { EmptyBucketModal } from 'components/to-be-cleaned/Storage/EmptyBucketModal'
 
 const StorageMenu = () => {
   const router = useRouter()
@@ -32,6 +33,7 @@ const StorageMenu = () => {
 
   const [showCreateBucketModal, setShowCreateBucketModal] = useState(false)
   const [selectedBucketToEdit, setSelectedBucketToEdit] = useState<StorageBucket>()
+  const [selectedBucketToEmpty, setSelectedBucketToEmpty] = useState<StorageBucket>()
   const [selectedBucketToDelete, setSelectedBucketToDelete] = useState<StorageBucket>()
   const canCreateBuckets = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
@@ -132,6 +134,7 @@ const StorageMenu = () => {
                       bucket={bucket}
                       projectRef={ref}
                       isSelected={isSelected}
+                      onSelectEmptyBucket={() => setSelectedBucketToEmpty(bucket)}
                       onSelectDeleteBucket={() => setSelectedBucketToDelete(bucket)}
                       onSelectEditBucket={() => setSelectedBucketToEdit(bucket)}
                     />
@@ -161,6 +164,12 @@ const StorageMenu = () => {
         visible={selectedBucketToEdit !== undefined}
         bucket={selectedBucketToEdit}
         onClose={() => setSelectedBucketToEdit(undefined)}
+      />
+
+      <EmptyBucketModal
+        visible={selectedBucketToEmpty !== undefined}
+        bucket={selectedBucketToEmpty}
+        onClose={() => setSelectedBucketToEmpty(undefined)}
       />
 
       <DeleteBucketModal
