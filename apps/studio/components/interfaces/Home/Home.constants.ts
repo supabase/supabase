@@ -117,4 +117,10 @@ export const EXAMPLE_PROJECTS = [
     description: 'Vue.js todo app using TypeScript',
     url: 'https://github.com/supabase/examples/tree/main/supabase-js-v1/todo-list/vue3-ts-todo-list',
   },
+  {
+    framework: 'NuxtJS',
+    title: 'NuxtJS todo list app',
+    description: 'NuxtJS todo app example',
+    url: 'https://github.com/nuxt-modules/supabase/tree/main/demo'
+  }
 ]
