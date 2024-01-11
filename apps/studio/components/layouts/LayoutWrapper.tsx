@@ -12,7 +12,9 @@ export const LayoutWrapper = ({
   children,
 }: PropsWithChildren<LayoutWrapperProps>) => {
   const ongoingIncident = useFlag('ongoingIncident')
-  const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
+  const showNoticeBanner = useFlag('showNoticeBanner')
+  const numBanners = [ongoingIncident, showNoticeBanner].filter(Boolean).length
+  const maxHeight = `calc(100vh - ${numBanners * 44}px)`
 
   return (
     <div id={id} className={className} style={{ height: maxHeight, maxHeight }}>
