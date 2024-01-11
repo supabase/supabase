@@ -1,12 +1,27 @@
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { Button, IconChevronRight, IconPlay, IconTrash, Modal } from 'ui'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  IconChevronRight,
+  IconEdit,
+  IconMoreHorizontal,
+  IconPenTool,
+  IconPlay,
+  IconTrash,
+  Modal,
+} from 'ui'
 import Table from 'components/to-be-cleaned/Table'
 import SqlSnippetCode from './Logs.SqlSnippetCode'
 import { timestampLocalFormatter } from './LogsFormatters'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import toast from 'react-hot-toast'
+import { UpdateSavedQueryModal } from './Logs.UpdateSavedQueryModal'
+import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 
 interface SavedQueriesItemProps {
   item: any
@@ -15,8 +30,10 @@ interface SavedQueriesItemProps {
 const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
   const [expand, setExpand] = useState<boolean>(false)
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false)
+  const [showUpdateModal, setShowUpdateModal] = useState<boolean>(false)
 
-  const { mutateAsync: deleteContent } = useContentDeleteMutation(item.id)
+  const { mutateAsync: deleteContent } = useContentDeleteMutation()
+  const { mutateAsync: updateContent } = useContentUpsertMutation({})
 
   const router = useRouter()
   const { ref } = router.query
@@ -28,6 +45,22 @@ const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
     }
     await deleteContent({ projectRef: ref, id: item.id })
     toast.success('Query deleted')
+  }
+
+  const onConfirmUpdate = async ({
+    name,
+    description,
+  }: {
+    name: string
+    description: string | null
+  }) => {
+    if (!ref || typeof ref !== 'string') {
+      console.error('Invalid project reference')
+      return
+    }
+    await updateContent({ projectRef: ref, payload: { ...item, name, description } })
+    setShowUpdateModal(false)
+    toast.success('Query updated')
   }
 
   return (
@@ -57,17 +90,32 @@ const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
         </Table.td>
         <Table.td className="flex items-center gap-2 justify-end">
           <div>
-            <Button
-              type="text"
-              icon={<IconTrash />}
-              title="Delete"
-              className="space-x-0 h-7"
-              onClick={() => {
-                setShowConfirmModal(true)
-              }}
-            >
-              <span className="sr-only">Delete</span>
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Button
+                  type="text"
+                  title="Actions"
+                  className="space-x-0 h-7 px-1.5"
+                  icon={<IconMoreHorizontal />}
+                >
+                  <div className="sr-only">Actions</div>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="max-w-[144px]">
+                <DropdownMenuItem onClick={() => setShowUpdateModal(true)}>
+                  <IconEdit size={10} className="mr-2" />
+                  Edit
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setShowConfirmModal(true)
+                  }}
+                >
+                  <IconTrash size={10} className="mr-2" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <ConfirmationModal
               danger
               visible={showConfirmModal}
@@ -87,6 +135,16 @@ const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
                 </p>
               </Modal.Content>
             </ConfirmationModal>
+            <UpdateSavedQueryModal
+              visible={showUpdateModal}
+              initialValues={{ name: item.name, description: item.description }}
+              onCancel={() => {
+                setShowUpdateModal(false)
+              }}
+              onSubmit={(newValues) => {
+                onConfirmUpdate(newValues)
+              }}
+            />
           </div>
           <Button
             type="alternative"
