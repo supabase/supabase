@@ -14,8 +14,6 @@ export const NoticeBanner = () => {
   const appBannerContext = useAppBannerContext()
   const { acknowledged, onUpdateAcknowledged } = appBannerContext
 
-  console.log({ acknowledged, onUpdateAcknowledged })
-
   if (isLoading || router.pathname.includes('sign-in') || acknowledged) return null
 
   return (
@@ -34,15 +32,7 @@ export const NoticeBanner = () => {
             Learn more
           </a>
         </Button>
-        <Button
-          type="text"
-          className="opacity-75"
-          onClick={() => {
-            console.log('dismiss')
-            // Why isn't this firing?
-            onUpdateAcknowledged(true)
-          }}
-        >
+        <Button type="text" className="opacity-75" onClick={() => onUpdateAcknowledged(true)}>
           Dismiss
         </Button>
       </div>

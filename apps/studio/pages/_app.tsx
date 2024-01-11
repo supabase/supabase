@@ -163,16 +163,16 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                   <TooltipProvider>
                     <RouteValidationWrapper>
                       <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
-                        <CommandMenuWrapper>
-                          <AppBannerWrapper>
-                            <AppBannerContextProvider>
+                        <AppBannerContextProvider>
+                          <CommandMenuWrapper>
+                            <AppBannerWrapper>
                               <FeaturePreviewContextProvider>
                                 {getLayout(<Component {...pageProps} />)}
                                 <FeaturePreviewModal />
                               </FeaturePreviewContextProvider>
-                            </AppBannerContextProvider>
-                          </AppBannerWrapper>
-                        </CommandMenuWrapper>
+                            </AppBannerWrapper>
+                          </CommandMenuWrapper>
+                        </AppBannerContextProvider>
                       </ThemeProvider>
                     </RouteValidationWrapper>
                   </TooltipProvider>
