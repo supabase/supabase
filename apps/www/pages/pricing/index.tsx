@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { useTheme } from 'next-themes'
-import { Accordion, Button, IconCheck, Select } from 'ui'
+import { Accordion, Button, IconArrowUpRight, IconCheck, Select } from 'ui'
 
 import AnnouncementBadge from '~/components/Announcement/Badge'
 import CTABanner from '~/components/CTABanner'
@@ -17,6 +17,7 @@ import Solutions from '~/data/Solutions'
 import pricingFaq from '~/data/PricingFAQ.json'
 import { pricing } from 'shared-data/pricing'
 import { plans } from 'shared-data/plans'
+import { ArrowDownIcon } from '@heroicons/react/outline'
 
 export default function IndexPage() {
   const router = useRouter()
@@ -267,7 +268,6 @@ export default function IndexPage() {
                           {plan.preface}
                         </p>
                       )}
-                      {/* <p className="text-foreground-lighter text-sm">Included with plan:</p> */}
                       <ul role="list" className="text-[13px] text-foreground-lighter">
                         {plan.features.map((feature) => (
                           <li key={feature} className="flex items-center py-2 first:mt-0">
@@ -276,7 +276,6 @@ export default function IndexPage() {
                               aria-hidden="true"
                               strokeWidth={3}
                             />
-                            {/* </div> */}
                             <span className="text-foreground mb-0 ml-3 ">{feature}</span>
                           </li>
                         ))}
@@ -302,12 +301,29 @@ export default function IndexPage() {
           </div>
         </div>
 
-        <div className="text-center mt-20">
-          <a href="#compare-plans">
-            <Button size="tiny" type="default">
-              Compare Plans
+        <div className="text-center mt-10 mx-auto max-w-lg flex flex-col gap-8">
+          <p className="text-foreground-lighter">
+            <strong className="font-normal text-foreground">Usage-based billing</strong> ensures you
+            pay only for the resources you consume, making it a cost-effective choice for projects
+            of all sizes.
+          </p>
+          <div className="flex justify-center gap-2">
+            <a href="#compare-plans">
+              <Button size="tiny" type="secondary" iconRight={<ArrowDownIcon className="w-3" />}>
+                Compare Plans
+              </Button>
+            </a>
+            <Button
+              size="tiny"
+              type="default"
+              asChild
+              iconRight={<IconArrowUpRight className="w-4" />}
+            >
+              <a href="/docs/guides/platform/org-based-billing" target="_blank">
+                Learn how billing works
+              </a>
             </Button>
-          </a>
+          </div>
         </div>
       </div>
 
