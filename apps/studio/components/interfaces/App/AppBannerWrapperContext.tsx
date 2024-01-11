@@ -31,7 +31,6 @@ export const AppBannerContextProvider = ({ children }: PropsWithChildren<{}>) =>
   const value = {
     acknowledged,
     onUpdateAcknowledged: (value: boolean) => {
-      console.log('YOOHOO')
       if (typeof window !== 'undefined') {
         window.localStorage.setItem(NOTICE_BANNER_KEY, value.toString())
       }
