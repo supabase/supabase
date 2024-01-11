@@ -32,7 +32,7 @@
     "@stripe/react-stripe-js": "^2.3.1",
     "@stripe/stripe-js": "^2.1.11",
     "@supabase/auth-helpers-react": "^0.4.2",
-    "@supabase/shared-types": "0.1.51",
+    "@supabase/shared-types": "0.1.55",
     "@supabase/supabase-js": "^2.38.2",
     "@tanstack/react-query": "^4.35.7",
     "@tanstack/react-query-devtools": "^4.35.7",
