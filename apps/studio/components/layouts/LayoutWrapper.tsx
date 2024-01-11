@@ -1,3 +1,4 @@
+import { useIsNoticeBannerShown } from 'components/interfaces/App/AppBannerWrapperContext'
 import { useFlag } from 'hooks'
 import { PropsWithChildren } from 'react'
 
@@ -13,7 +14,12 @@ export const LayoutWrapper = ({
 }: PropsWithChildren<LayoutWrapperProps>) => {
   const ongoingIncident = useFlag('ongoingIncident')
   const showNoticeBanner = useFlag('showNoticeBanner')
-  const numBanners = [ongoingIncident, showNoticeBanner].filter(Boolean).length
+
+  const noticeAcknowledged = useIsNoticeBannerShown()
+
+  const numBanners = [ongoingIncident, showNoticeBanner && !noticeAcknowledged].filter(
+    Boolean
+  ).length
   const maxHeight = `calc(100vh - ${numBanners * 44}px)`
 
   return (

@@ -1,8 +1,7 @@
-import { Button, IconExternalLink } from 'ui'
-import { useRouter } from 'next/router'
+import { useAppBannerContext } from 'components/interfaces/App/AppBannerWrapperContext'
 import { useProfile } from 'lib/profile'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { useLocalStorage } from 'hooks'
+import { useRouter } from 'next/router'
+import { Button, IconExternalLink } from 'ui'
 
 // [Joshen] For this notice specifically, just FYI
 // 1 month after 26th Jan we'll need to add some contextual information about this deprecation
@@ -12,12 +11,12 @@ export const NoticeBanner = () => {
   const router = useRouter()
   const { isLoading } = useProfile()
 
-  const [isDismissed, setIsDismissed] = useLocalStorage(
-    LOCAL_STORAGE_KEYS.PGBOUNCER_DEPRECATION_WARNING,
-    false
-  )
+  const appBannerContext = useAppBannerContext()
+  const { acknowledged, onUpdateAcknowledged } = appBannerContext
 
-  if (isLoading || router.pathname.includes('sign-in') || isDismissed) return null
+  console.log({ acknowledged, onUpdateAcknowledged })
+
+  if (isLoading || router.pathname.includes('sign-in') || acknowledged) return null
 
   return (
     <div
@@ -35,7 +34,15 @@ export const NoticeBanner = () => {
             Learn more
           </a>
         </Button>
-        <Button type="text" className="opacity-75" onClick={() => setIsDismissed(true)}>
+        <Button
+          type="text"
+          className="opacity-75"
+          onClick={() => {
+            console.log('dismiss')
+            // Why isn't this firing?
+            onUpdateAcknowledged(true)
+          }}
+        >
           Dismiss
         </Button>
       </div>
