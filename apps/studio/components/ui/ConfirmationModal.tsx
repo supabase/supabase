@@ -67,7 +67,7 @@ const ConfirmationModal = ({
             disabled={loading || buttonDisabled}
             onClick={onConfirm}
           >
-            {loading ? buttonLoadingLabel || buttonLabel : buttonLabel}
+            {(loading && buttonLoadingLabel) || buttonLabel}
           </Button>
         </div>
       }
