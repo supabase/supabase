@@ -1,15 +1,9 @@
 import { CloudProvider, PROVIDERS } from 'lib/constants'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
-import toast from 'react-hot-toast'
-import { IconLoader, Listbox } from 'ui'
+import { useEffect } from 'react'
+import { Listbox } from 'ui'
 
-import { getDistanceLatLonKM } from 'lib/helpers'
-import {
-  AWS_REGIONS_LAT_LON,
-  COUNTRY_LAT_LON,
-  FLY_REGIONS_LAT_LON,
-} from './ProjectCreation.constants'
+import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
 import { getAvailableRegions } from './ProjectCreation.utils'
 
 interface RegionSelectorProps {
@@ -24,38 +18,12 @@ export const RegionSelector = ({
   onSelectRegion,
 }: RegionSelectorProps) => {
   const router = useRouter()
-  const [retrievingLocation, setRetrievingLocation] = useState(false)
-
   const availableRegions = getAvailableRegions(PROVIDERS[cloudProvider].id)
-  const locations = cloudProvider === 'AWS' ? AWS_REGIONS_LAT_LON : FLY_REGIONS_LAT_LON
+  const { data: region, isLoading, isSuccess } = useDefaultRegionQuery({ cloudProvider })
 
-  async function getClosestRegion() {
-    setRetrievingLocation(true)
-
-    try {
-      const data = await fetch('https://www.cloudflare.com/cdn-cgi/trace').then((res) => res.text())
-      const locationCode: keyof typeof COUNTRY_LAT_LON = Object.fromEntries(
-        data.split('\n').map((item) => item.split('='))
-      )['loc']
-      const locLatLon = COUNTRY_LAT_LON[locationCode]
-
-      if (locLatLon !== undefined) {
-        const distances = Object.keys(locations).map((reg) => {
-          const region: { lat: number; lon: number } = locations[reg as keyof typeof locations]
-          return getDistanceLatLonKM(locLatLon.lat, locLatLon.lon, region.lat, region.lon)
-        })
-        const shortestDistance = Math.min(...distances)
-        const closestRegion = Object.keys(locations)[distances.indexOf(shortestDistance)]
-        onSelectRegion(closestRegion)
-        toast.success(`Selected ${closestRegion} as the region closest to your location`)
-        setRetrievingLocation(false)
-      } else {
-        throw new Error()
-      }
-    } catch (error) {
-      toast.error('Unable to retrieve your current location')
-    }
-  }
+  useEffect(() => {
+    if (isSuccess && region) onSelectRegion(region)
+  }, [isSuccess])
 
   return (
     <Listbox
@@ -63,27 +31,9 @@ export const RegionSelector = ({
       label="Region"
       type="select"
       value={selectedRegion}
+      disabled={isLoading}
       onChange={(value) => onSelectRegion(value)}
-      descriptionText={
-        <div>
-          <p>
-            Select the region closest to your users for the best performance. You may also{' '}
-            <span
-              className="text-brand opacity-50 underline hover:opacity-100 transition cursor-pointer relative"
-              onClick={getClosestRegion}
-            >
-              select the region closest to your location.
-              {retrievingLocation && (
-                <IconLoader
-                  className="absolute top-0.5 -right-5 text-foreground animate-spin"
-                  size={14}
-                  strokeWidth={2}
-                />
-              )}
-            </span>
-          </p>
-        </div>
-      }
+      descriptionText="Select the region closest to your users for the best performance."
     >
       <Listbox.Option disabled key="empty" label="---" value="">
         <span className="text-foreground">Select a region for your project</span>

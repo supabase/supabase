@@ -53,7 +53,7 @@ const Wizard: NextPageWithLayout = () => {
   const [cloudProvider, setCloudProvider] = useState<CloudProvider>(PROVIDERS[DEFAULT_PROVIDER].id)
 
   const [dbPass, setDbPass] = useState('')
-  // Auto select region on staging/local as there's only one supported
+  // Auto select region on staging/local for convenience as there's only one supported
   const [dbRegion, setDbRegion] = useState(
     ['staging', 'local'].includes(process.env.NEXT_PUBLIC_ENVIRONMENT ?? '')
       ? PROVIDERS[cloudProvider].default_region

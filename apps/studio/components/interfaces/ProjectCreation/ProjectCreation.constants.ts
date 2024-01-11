@@ -1,24 +1,4 @@
-import { AWS_REGIONS, FLY_REGIONS } from 'lib/constants'
-
-export const AWS_REGIONS_LAT_LON = {
-  [AWS_REGIONS.WEST_US]: { lat: 38.8375, lon: 120.8958 },
-  [AWS_REGIONS.EAST_US]: { lat: 38.8051, lon: 77.047 },
-  [AWS_REGIONS.CENTRAL_CANADA]: { lat: 56.1304, lon: 106.3468 },
-  [AWS_REGIONS.WEST_EU]: { lat: 53.7798, lon: 7.3055 },
-  [AWS_REGIONS.WEST_EU_2]: { lat: 51.5072, lon: 0.1276 },
-  [AWS_REGIONS.CENTRAL_EU]: { lat: 50.119, lon: 8.6821 },
-  [AWS_REGIONS.SOUTH_ASIA]: { lat: 19.076, lon: 72.8777 },
-  [AWS_REGIONS.SOUTHEAST_ASIA]: { lat: 1.3521, lon: 103.8198 },
-  [AWS_REGIONS.NORTHEAST_ASIA]: { lat: 35.6764, lon: 139.65 },
-  [AWS_REGIONS.NORTHEAST_ASIA_2]: { lat: 37.5519, lon: 126.9918 },
-  [AWS_REGIONS.OCEANIA]: { lat: 33.8688, lon: 151.2093 },
-  [AWS_REGIONS.SOUTH_AMERICA]: { lat: 23.5558, lon: 46.6396 },
-}
-
-export const FLY_REGIONS_LAT_LON = {
-  [FLY_REGIONS.SOUTHEAST_ASIA]: { lat: 1.3521, lon: 103.8198 },
-}
-
+// [Joshen] Obtained from https://gist.github.com/tadast/8827699
 export const COUNTRY_LAT_LON = {
   AF: { lat: 33, lon: 65 },
   AX: { lat: 60.116667, lon: 19.9 },
