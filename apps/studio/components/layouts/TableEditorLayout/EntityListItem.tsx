@@ -18,7 +18,9 @@ import {
   IconTrash,
 } from 'ui'
 
+import { IS_PLATFORM } from 'common'
 import { parseSupaTable } from 'components/grid'
+import { ItemRenderer } from 'components/ui/InfiniteList'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { Entity } from 'data/entity-types/entity-type-query'
 import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
@@ -27,16 +29,19 @@ import { useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
-import { IS_PLATFORM } from 'common'
 
 export interface EntityListItemProps {
   id: number
   projectRef: string
-  item: Entity
   isLocked: boolean
 }
 
-const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListItemProps) => {
+const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
+  id,
+  projectRef,
+  item: entity,
+  isLocked,
+}) => {
   const { ui } = useStore()
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()

@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { Settings2Icon, SlidersHorizontal } from 'lucide-react'
+import { Settings2Icon } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
 import {
   Button,
@@ -7,8 +7,6 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   Command_Shadcn_,
-  IconAlertCircle,
-  IconAlertTriangle,
   IconCheck,
   IconInbox,
   PopoverContent_Shadcn_,
@@ -21,6 +19,7 @@ import AlertError from 'components/ui/AlertError'
 import InfiniteList from 'components/ui/InfiniteList'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useNotificationsV2Query } from 'data/notifications/notifications-v2-query'
+import { useNotificationsSummaryQuery } from 'data/notifications/notifications-v2-summary-query'
 import { useNotificationsV2UpdateMutation } from 'data/notifications/notifications-v2-update-mutation'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
@@ -31,7 +30,6 @@ import {
   NOTIFICATION_FILTER_TYPE,
   WarningIcon,
 } from './NotificationsPopover.constants'
-import { useNotificationsSummaryQuery } from 'data/notifications/notifications-v2-summary-query'
 
 const NotificationsPopverV2 = () => {
   const [open, setOpen] = useState(false)
@@ -220,8 +218,8 @@ const NotificationsPopverV2 = () => {
                         rowHeights.current = { ...rowHeights.current, [idx]: height }
                       }
                     },
-                    getProject: (ref: string) => projects?.find((project) => project.ref === ref),
-                    getOrganization: (id: number) => organizations?.find((org) => org.id === id),
+                    getProject: (ref: string) => projects?.find((project) => project.ref === ref)!,
+                    getOrganization: (id: number) => organizations?.find((org) => org.id === id)!,
                     onArchiveNotification: (id: string) =>
                       updateNotifications({ ids: [id], status: 'archived' }),
                     queueMarkRead: (id: string) => {

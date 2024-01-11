@@ -7,23 +7,21 @@ import { useInView } from 'react-intersection-observer'
 import { Button, IconArchive, IconExternalLink } from 'ui'
 
 import { Markdown } from 'components/interfaces/Markdown'
+import { ItemRenderer } from 'components/ui/InfiniteList'
 import { Notification, NotificationData } from 'data/notifications/notifications-v2-query'
-import { Project } from 'data/projects/project-detail-query'
+import { ProjectInfo } from 'data/projects/projects-query'
 import { Organization } from 'types'
 import { CriticalIcon, WarningIcon } from './NotificationsPopover.constants'
 
 interface NotificationRowProps {
-  index: number
-  listRef: any
-  item: Notification
   setRowHeight: (idx: number, height: number) => void
-  getProject: (ref: string) => Project
+  getProject: (ref: string) => ProjectInfo
   getOrganization: (id: number) => Organization
   onArchiveNotification: (id: string) => void
   queueMarkRead: (id: string) => void
 }
 
-const NotificationRow = ({
+const NotificationRow: ItemRenderer<Notification, NotificationRowProps> = ({
   index,
   listRef,
   item: notification,
@@ -32,7 +30,7 @@ const NotificationRow = ({
   getOrganization,
   onArchiveNotification,
   queueMarkRead,
-}: NotificationRowProps) => {
+}) => {
   const ref = useRef<HTMLDivElement>(null)
   const { ref: viewRef, inView } = useInView()
   const { status, priority } = notification
@@ -52,7 +50,7 @@ const NotificationRow = ({
 
   useEffect(() => {
     if (ref.current) {
-      listRef.current.resetAfterIndex(0)
+      listRef?.current?.resetAfterIndex(0)
       setRowHeight(index, ref.current.clientHeight)
     }
   }, [ref])
