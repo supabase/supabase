@@ -152,7 +152,11 @@ export default function IndexPage() {
           <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
             <div className="mx-auto max-w-3xl space-y-2 lg:max-w-none">
               <h1 className="text-brand text-base">Pricing</h1>
-              <h2 className="h1">Predictable pricing, no surprises</h2>
+              <h2 className="h1">
+                Predictable pricing,
+                <br />
+                designed to scale
+              </h2>
               <p className="p text-lg">
                 Start building for free, collaborate with a team, then scale to millions of users.
               </p>
@@ -161,14 +165,7 @@ export default function IndexPage() {
         </div>
 
         <div className="mx-auto lg:container lg:px-16 xl:px-12 flex flex-col">
-          {/* <div className="absolute inset-0 shadow-sm bg-background h-3/5" /> */}
-
-          <div
-            className="relative z-10 mx-auto -mt-8 w-full px-4 sm:px-6
-
-            lg:px-8
-          "
-          >
+          <div className="relative z-10 mx-auto -mt-8 w-full px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-md grid lg:max-w-none lg:grid-cols-2 xl:grid-cols-4 gap-4 xl:gap-2 2xl:gap-5">
               {plans.map((plan) => (
                 <div
