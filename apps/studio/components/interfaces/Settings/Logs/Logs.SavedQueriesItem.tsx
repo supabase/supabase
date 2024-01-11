@@ -6,7 +6,6 @@ import SqlSnippetCode from './Logs.SqlSnippetCode'
 import { timestampLocalFormatter } from './LogsFormatters'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
-import { isString } from 'lodash'
 import toast from 'react-hot-toast'
 
 interface SavedQueriesItemProps {

@@ -258,9 +258,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
               visibility: 'user' as const,
             }
 
-            if (!projectRef) return;
-
-            createContent({ projectRef, payload })
+            createContent({ projectRef: projectRef!, payload })
           }}
         >
           {() => (
