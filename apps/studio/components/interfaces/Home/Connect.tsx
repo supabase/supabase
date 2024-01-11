@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Plug } from 'lucide-react'
+import { ChevronDown, Home, Plug } from 'lucide-react'
 import { useState } from 'react'
 import {
   Alert,
@@ -25,6 +25,8 @@ import {
 import { DATA, LIBS } from './Connect.utils'
 import CopyButton from 'components/ui/CopyButton'
 import DatabaseConnectionString from '../Settings/Database/DatabaseSettings/DatabaseConnectionString'
+import { BASE_PATH } from 'lib/constants'
+import Image from 'next/image'
 
 const Connect = () => {
   const [hoveredItem, setHoveredItem] = useState(DATA[0])
@@ -37,7 +39,7 @@ const Connect = () => {
   }
   return (
     <div>
-      <Dialog_Shadcn_>
+      <Dialog_Shadcn_ open={true}>
         <DialogTrigger_Shadcn_ asChild>
           <Button type="secondary">
             <span className="flex items-center gap-2">
@@ -84,6 +86,7 @@ const Connect = () => {
               </div>
             </div>
           </div>
+
           <Tabs type="underlined" size="small">
             <Tabs.Panel id="api_keys" label="API Keys" key="keys">
               <div className="bg-surface-300 p-4">
@@ -92,25 +95,31 @@ const Connect = () => {
                   onOpenChange={setLibSelectorOpen}
                   modal={false}
                 >
-                  <PopoverTrigger_Shadcn_ asChild>
-                    <Button
-                      size={'small'}
-                      type="text"
-                      iconRight={
-                        <IconChevronDown
-                          className="text-foreground-light"
-                          strokeWidth={1.5}
-                          size={14}
-                        />
-                      }
-                    >
-                      <div className="w-full flex space-x-3 py-0.5">
-                        <p className="text-xs text-foreground-light">
-                          {LIBS.find((lib) => lib.key === selectedLib)?.label}
-                        </p>
-                      </div>
-                    </Button>
-                  </PopoverTrigger_Shadcn_>
+                  <div className="flex items-center">
+                    <span className="flex items-center text-foreground-muted bg-button px-3 rounded-md rounded-r-none text-xs h-[26px] border border-r-0">
+                      Framework
+                    </span>
+                    <PopoverTrigger_Shadcn_ asChild>
+                      <Button
+                        size="tiny"
+                        type="default"
+                        className="h-[26px] pr-3 gap-0 rounded-l-none"
+                      >
+                        <div className="flex items-center gap-1">
+                          <span className="text-xs text-foreground-light flex items-center gap-1  pl-1">
+                            <Image
+                              src={`${BASE_PATH}/img/icons/frameworks/nextjs.svg`}
+                              width={14}
+                              height={14}
+                              alt={`icon`}
+                            />
+                            {LIBS.find((lib) => lib.key === selectedLib)?.label}
+                          </span>
+                          <ChevronDown className="text-muted" strokeWidth={1} size={12} />
+                        </div>
+                      </Button>
+                    </PopoverTrigger_Shadcn_>
+                  </div>
                   <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
                     <Command_Shadcn_>
                       <CommandList_Shadcn_>
@@ -118,7 +127,6 @@ const Connect = () => {
                           <CommandItem_Shadcn_
                             key={lib.key}
                             value={lib.key}
-                            className=""
                             onSelect={() => {
                               onSelectLib(lib.key)
                               setLibSelectorOpen(false)
@@ -128,7 +136,15 @@ const Connect = () => {
                               setLibSelectorOpen(false)
                             }}
                           >
-                            {lib.label}
+                            <span className="flex items-center gap-1">
+                              <Image
+                                src={`${BASE_PATH}/img/icons/frameworks/nextjs.svg`}
+                                width={14}
+                                height={14}
+                                alt={`icon`}
+                              />
+                              {lib.label}
+                            </span>
                           </CommandItem_Shadcn_>
                         ))}
                       </CommandList_Shadcn_>
@@ -136,7 +152,7 @@ const Connect = () => {
                   </PopoverContent_Shadcn_>
                 </Popover_Shadcn_>
 
-                <div className="bg-surface bg-surface-100 p-4 rounded-md">
+                <div className="bg-surface bg-surface-100 p-4 rounded-md mt-4">
                   <Tabs type="underlined" size="small">
                     {LIBS.find((lib) => lib.key === selectedLib)?.files?.map((file) => (
                       <Tabs.Panel
