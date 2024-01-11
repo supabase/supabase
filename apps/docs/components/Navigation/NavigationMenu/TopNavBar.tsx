@@ -1,16 +1,58 @@
 import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
-import { FC } from 'react'
+import { useRouter } from 'next/router'
+import { FC, useState } from 'react'
 import { Button, IconCommand, IconGitHub, IconSearch, SearchButton } from 'ui'
 import { useIsLoggedIn, useIsUserLoading } from 'common'
 
+import { getPageType } from '~/lib/helpers'
+import { REFERENCES } from './NavigationMenu.constants'
 import ThemeToggle from '@ui/components/ThemeProvider/ThemeToggle'
 
 const TopNavBar: FC = () => {
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
   const { resolvedTheme } = useTheme()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  const { asPath, push } = useRouter()
+  const pathSegments = asPath.split('/')
+
+  const library = pathSegments.length >= 3 ? pathSegments[2] : undefined
+  const libraryMeta = REFERENCES?.[library] ?? undefined
+  const versions = libraryMeta?.versions ?? []
+
+  const version = versions.includes(pathSegments[pathSegments.indexOf(library) + 1])
+    ? pathSegments[pathSegments.indexOf(library) + 1]
+    : versions[0]
+
+  const pageType = getPageType(asPath)
+
+  const pageLinks = [
+    { text: 'Guides', key: 'docs', link: '/' },
+    { text: 'Reference', key: 'reference', link: '/reference' },
+  ]
+
+  const onSelectVersion = (version: string) => {
+    // [Joshen] Ideally we use <Link> but this works for now
+    if (!library) return
+    if (version === versions[0]) {
+      push(`/reference/${library}`)
+    } else {
+      push(`/reference/${library}/${version}`)
+    }
+  }
+
+  // [Joshen] Kaizen: Use UI library's SidePanel for this
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen)
+    const sidebar = document.querySelector('.sidebar-menu-container')
+    const contentPane = document.querySelector('.main-content-pane')
+
+    sidebar.classList.toggle('hidden')
+    contentPane.classList.toggle('hidden')
+  }
 
   return (
     <nav className="h-[60px] border-b backdrop-blur backdrop-filter bg bg-opacity-75">
@@ -74,11 +116,6 @@ const TopNavBar: FC = () => {
               <a href="https://supabase.com/dashboard" target="_blank" rel="noreferrer noopener">
                 {isLoggedIn ? 'Dashboard' : 'Sign up'}
               </a>
-            </Button>
-          )}
-          {process.env.NEXT_PUBLIC_DEV_AUTH_PAGE === 'true' && (
-            <Button asChild>
-              <Link href="/__dev-secret-auth">Dev-only secret signin</Link>
             </Button>
           )}
           <Link

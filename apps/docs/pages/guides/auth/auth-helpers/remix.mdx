@@ -285,13 +285,15 @@ const {
 } = await supabaseClient.auth.getSession()
 ```
 
-The session contains a user property.
+The session contains a user property. This is the user metadata saved, unencoded, to the local storage medium. It's unverified and can be tampered by the user, so don't use it for authorization or sensitive purposes.
+
+<GetSessionWarning />
 
 ```jsx
 const user = session?.user
 ```
 
-Or, if you don't need the session, you can call the `getUser()` function.
+Or, if you need trusted user data, you can call the `getUser()` function, which retrieves the trusted user data by making a request to the Supabase Auth server.
 
 ```jsx
 const {
