@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { SlidersHorizontal } from 'lucide-react'
+import { Settings2Icon, SlidersHorizontal } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
 import {
   Button,
@@ -25,7 +25,12 @@ import { useNotificationsV2UpdateMutation } from 'data/notifications/notificatio
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import NotificationRow from './NotificationRow'
-import { NOTIFICATION_FILTERS, NOTIFICATION_FILTER_TYPE } from './NotificationsPopover.constants'
+import {
+  CriticalIcon,
+  NOTIFICATION_FILTERS,
+  NOTIFICATION_FILTER_TYPE,
+  WarningIcon,
+} from './NotificationsPopover.constants'
 import { useNotificationsSummaryQuery } from 'data/notifications/notifications-v2-summary-query'
 
 const NotificationsPopverV2 = () => {
@@ -104,23 +109,9 @@ const NotificationsPopverV2 = () => {
           )}
           icon={
             hasCritical ? (
-              <IconAlertTriangle
-                size={16}
-                strokeWidth={3}
-                className={clsx(
-                  'transition-all -mr-3 group-hover:-mr-1',
-                  'z-10 rounded p-0.5 text-destructive-400 bg-destructive-600'
-                )}
-              />
+              <CriticalIcon className="transition-all -mr-3.5 group-hover:-mr-1 z-10" />
             ) : hasWarning ? (
-              <IconAlertCircle
-                size={16}
-                strokeWidth={3}
-                className={clsx(
-                  'transition-all -mr-3 group-hover:-mr-1',
-                  'z-10 rounded p-0.5 text-warning-400 bg-warning-600'
-                )}
-              />
+              <WarningIcon className="transition-all -mr-3.5 group-hover:-mr-1 z-10" />
             ) : hasNewNotifications ? (
               <div
                 className={clsx(
@@ -174,7 +165,7 @@ const NotificationsPopverV2 = () => {
             </Tabs>
             <Popover_Shadcn_ modal={false} open={openFilters} onOpenChange={setOpenFilters}>
               <PopoverTrigger_Shadcn_ asChild>
-                <Button type="text" icon={<SlidersHorizontal size={14} />}>
+                <Button type="text" icon={<Settings2Icon size={14} />}>
                   View {selectedFilter}
                 </Button>
               </PopoverTrigger_Shadcn_>
