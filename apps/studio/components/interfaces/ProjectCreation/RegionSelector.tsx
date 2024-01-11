@@ -23,7 +23,7 @@ export const RegionSelector = ({
 
   useEffect(() => {
     if (isSuccess && region) onSelectRegion(region)
-  }, [isSuccess])
+  }, [isSuccess, region])
 
   return (
     <Listbox
