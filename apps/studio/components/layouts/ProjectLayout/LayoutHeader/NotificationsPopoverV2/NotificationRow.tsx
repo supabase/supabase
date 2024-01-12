@@ -11,6 +11,7 @@ import { Notification, NotificationData } from 'data/notifications/notifications
 import { Project } from 'data/projects/project-detail-query'
 import { Organization } from 'types'
 import { CriticalIcon, WarningIcon } from './NotificationsPopover.constants'
+import { ArchiveRestoreIcon } from 'lucide-react'
 
 interface NotificationRowProps {
   index: number
@@ -19,7 +20,7 @@ interface NotificationRowProps {
   setRowHeight: (idx: number, height: number) => void
   getProject: (ref: string) => Project
   getOrganization: (id: number) => Organization
-  onArchiveNotification: (id: string) => void
+  onUpdateNotificationStatus: (id: string, status: 'archived' | 'seen') => void
   queueMarkRead: (id: string) => void
 }
 
@@ -30,7 +31,7 @@ const NotificationRow = ({
   setRowHeight,
   getProject,
   getOrganization,
-  onArchiveNotification,
+  onUpdateNotificationStatus,
   queueMarkRead,
 }: NotificationRowProps) => {
   const ref = useRef<HTMLDivElement>(null)
@@ -164,14 +165,40 @@ const NotificationRow = ({
       <div className="flex flex-col items-center gap-y-2">
         {priority === 'Warning' && <WarningIcon className="w-5 h-5" />}
         {priority === 'Critical' && <CriticalIcon className="w-5 h-5" />}
-        {notification.status !== 'archived' && (
+        {notification.status === 'archived' ? (
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger asChild>
+              <Button
+                type="outline"
+                icon={
+                  <ArchiveRestoreIcon size={13} strokeWidth={2} className="text-foreground-light" />
+                }
+                className="p-1.5 group-hover:opacity-100 opacity-0 transition rounded-full"
+                onClick={() => onUpdateNotificationStatus(notification.id, 'seen')}
+              />
+            </Tooltip.Trigger>
+            <Tooltip.Portal>
+              <Tooltip.Content side="bottom">
+                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                <div
+                  className={[
+                    'rounded bg-alternative py-1 px-2 leading-none shadow',
+                    'border border-background',
+                  ].join(' ')}
+                >
+                  <span className="text-xs text-foreground">Unarchive</span>
+                </div>
+              </Tooltip.Content>
+            </Tooltip.Portal>
+          </Tooltip.Root>
+        ) : (
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger asChild>
               <Button
                 type="outline"
                 icon={<IconArchive size={13} strokeWidth={2} className="text-foreground-light" />}
                 className="p-1.5 group-hover:opacity-100 opacity-0 transition rounded-full"
-                onClick={() => onArchiveNotification(notification.id)}
+                onClick={() => onUpdateNotificationStatus(notification.id, 'archived')}
               />
             </Tooltip.Trigger>
             <Tooltip.Portal>
