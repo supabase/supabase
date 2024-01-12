@@ -5150,9 +5150,7 @@ export interface operations {
   NotificationsController_archiveAllNotifications: {
     responses: {
       200: {
-        content: {
-          'application/json': Record<string, never>
-        }
+        content: never
       }
       /** @description Failed to archive all notifications */
       500: {
