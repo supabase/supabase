@@ -1,12 +1,13 @@
 import { format } from 'sql-formatter'
 import { CodeEditorContainer } from './CodeEditorContainer'
 import { MonacoEditor } from './MonacoEditor'
+import { ThreadPageProps } from './[message_id]/page'
+import { getMessage } from './getMessage'
 
-interface CodeEditorProps {
-  code: string
-}
+export async function CodeEditor({ params }: ThreadPageProps) {
+  const { message_id } = params
+  const code = await getMessage(message_id)
 
-export async function CodeEditor({ code }: CodeEditorProps) {
   // strip the ```sql ``` from the code
   // not sure why we need this & can't get openai to stop returning it
   const strippedCode = code.replace('```sql\n', '').replace('\n```', '')
