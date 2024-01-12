@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { useTheme } from 'next-themes'
-import { Accordion, Button, IconArrowUpRight, IconCheck, IconInfo, Select, cn } from 'ui'
+import { Accordion, Button, IconArrowUpRight, IconCheck, Select, cn } from 'ui'
 
 import AnnouncementBadge from '~/components/Announcement/Badge'
 import CTABanner from '~/components/CTABanner'
@@ -21,9 +21,7 @@ import { pricing } from 'shared-data/pricing'
 import { plans } from 'shared-data/plans'
 import { ArrowDownIcon, InformationCircleIcon } from '@heroicons/react/outline'
 
-const CostControlAnimation = dynamic(
-  () => import('~/components/Pricing/CostControlAnimation/CostControlAnimation')
-)
+const CostControlAnimation = dynamic(() => import('~/components/Pricing/CostControlAnimation'))
 
 export default function IndexPage() {
   const router = useRouter()

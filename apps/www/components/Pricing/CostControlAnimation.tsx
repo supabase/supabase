@@ -1,8 +1,7 @@
 import React, { FC, useRef, useState } from 'react'
-import { Switch, cn } from 'ui'
-import styles from './CostControlAnimation.module.scss'
 import { AnimatePresence, motion, useInView } from 'framer-motion'
-import { DEFAULT_EASE } from '../../../lib/animations'
+import { Switch, cn } from 'ui'
+import { DEFAULT_EASE } from '~/lib/animations'
 
 interface Props {
   className?: string
@@ -45,7 +44,7 @@ const CostControlAnimation: FC<Props> = ({ className }) => {
       height: '100%',
       opacity: 1,
       transition: {
-        ease: DEFAULT_EASE,
+        ease: [0.11, 0.04, 0, 1],
         duration: 0.17,
         delay: i * 0.075,
       },
@@ -56,7 +55,6 @@ const CostControlAnimation: FC<Props> = ({ className }) => {
     <div
       ref={ref}
       className={cn(
-        styles['active'],
         'relative w-full aspect-video border rounded-xl bg-surface-100 overflow-hidden pointer-events-none',
         hasSpendCap ? 'spendcap-enabled' : 'spendcap-disabled',
         className
@@ -87,6 +85,7 @@ const CostControlAnimation: FC<Props> = ({ className }) => {
             >
               {bars.map((bar, index) => (
                 <div
+                  key={`enabled-${index}`}
                   className="w-[6%] h-full overflow-hidden flex flex-col justify-end"
                   style={{ height: (bar.y > 50 ? 50 : bar.y) + '%' }}
                 >
@@ -112,6 +111,7 @@ const CostControlAnimation: FC<Props> = ({ className }) => {
             >
               {bars.map((bar, index) => (
                 <div
+                  key={`disabled-gold-${index}`}
                   className="w-[6%] h-full overflow-hidden flex flex-col justify-end transition-all"
                   style={{ height: bar.y + '%' }}
                 >
@@ -128,6 +128,7 @@ const CostControlAnimation: FC<Props> = ({ className }) => {
                 <div className="absolute inset-0 w-full h-[200%] flex justify-between items-end px-16 p-8">
                   {bars.map((bar, index) => (
                     <div
+                      key={`disabled-gold-${index}`}
                       className="relative w-[6%] h-full flex flex-col justify-end transition-all"
                       style={{ height: bar.y + '%' }}
                     >
