@@ -1,15 +1,10 @@
 'use client'
 
-import { useAppStateSnapshot } from '@/lib/state'
-import { Database } from '@/types/supabase'
-import { pull } from 'lodash'
+import { Message } from 'ai/react'
 import Link from 'next/link'
-import { useParams, usePathname, useRouter } from 'next/navigation'
+import { useParams, usePathname } from 'next/navigation'
 
-import { useEffect } from 'react'
 import { cn } from 'ui'
-
-type Message = Database['public']['Tables']['messages']['Row']
 
 interface UserChatProps {
   message: Message
@@ -31,7 +26,7 @@ const UserChat = ({ message, isLatest, times }: UserChatProps) => {
   const { hoursFromNow, formattedTimeFromNow, formattedCreatedAt, replyDuration } = times
 
   // chat shown as selected when url matches
-  const isSelected = usePathname().includes(message.message_id)
+  const isSelected = usePathname().includes(message.id)
 
   return (
     <Link
@@ -41,7 +36,7 @@ const UserChat = ({ message, isLatest, times }: UserChatProps) => {
         isSelected && 'bg-surface-200',
         isSelected ? 'border-r-foreground' : 'border-r border-r-transparent'
       )}
-      href={`/${thread_id}/${message.message_id}`}
+      href={`/${thread_id}/${message.id}`}
     >
       <div className="flex flex-col justify-between items-center relative top-3">
         <div
@@ -98,7 +93,7 @@ const UserChat = ({ message, isLatest, times }: UserChatProps) => {
                 isSelected ? 'text-foreground' : 'text-light group-hover:text-foreground'
               )}
             >
-              {message.message_input}
+              {message.content}
             </p>
             {isLoading && <div className="chat-shimmering-loader w-full h-0.5 absolute bottom-0" />}
           </div>

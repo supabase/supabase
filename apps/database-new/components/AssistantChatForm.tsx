@@ -2,12 +2,9 @@ import { ExternalLink } from 'lucide-react'
 import { cn } from 'ui'
 
 import ChatLoadingAnimation from '@/app/[thread_id]/ChatLoadingAnimation'
-import { createThread } from '@/app/actions'
 import { CHAT_EXAMPLES } from '@/data/chat-examples'
-import { Message } from 'ai'
-import { useChat } from 'ai/react'
 import { Loader2 } from 'lucide-react'
-import React, { Dispatch, forwardRef, useEffect, useRef } from 'react'
+import React, { ChangeEventHandler, Dispatch, FormEventHandler, forwardRef, useRef } from 'react'
 import { TextArea_Shadcn_ } from 'ui'
 
 export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
@@ -15,7 +12,6 @@ export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
   disabled?: boolean
   message?: string
   children?: React.ReactNode
-  threadId?: string
   chatContext: 'new' | 'edit'
 }
 
@@ -89,87 +85,85 @@ const SubmitButton = forwardRef<HTMLButtonElement, { isLoading: boolean; input: 
 
 SubmitButton.displayName = 'SubmitButton'
 
-const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
-  ({ loading, disabled, message, threadId, chatContext, ...props }, ref) => {
-    const textAreaRef = useRef<HTMLTextAreaElement>(null)
-    const submitRef = useRef<HTMLButtonElement>(null)
+interface AssistantChatFormProps {
+  value: string
+  onChange: ChangeEventHandler<HTMLTextAreaElement>
+  onSubmit: FormEventHandler<HTMLFormElement>
+  disabled: boolean
+  chatContext: string
+  placeholder: string
+}
 
-    const { messages, input, setInput, handleInputChange, handleSubmit, isLoading } = useChat({
-      onFinish: redirectOnFinish,
-    })
+const AssistantChatForm = ({
+  value,
+  onChange,
+  onSubmit,
+  disabled,
+  chatContext,
+  placeholder,
+}: AssistantChatFormProps) => {
+  const textAreaRef = useRef<HTMLTextAreaElement>(null)
+  const submitRef = useRef<HTMLButtonElement>(null)
 
-    async function redirectOnFinish(message: Message) {
-      createThread(input, message, threadId)
+  // useEffect(() => {
+  //   if (textAreaRef) {
+  //     textAreaRef?.current?.focus()
+
+  //     if (!input && textAreaRef && textAreaRef.current) {
+  //       textAreaRef.current.style.height = '40px'
+  //     } else if (textAreaRef && textAreaRef.current) {
+  //       const newHeight = textAreaRef.current.scrollHeight + 'px'
+  //       textAreaRef.current.style.height = newHeight
+  //     }
+  //   }
+  // }, [input, textAreaRef])
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+    // Check if the pressed key is "Enter" (key code 13) without the "Shift" key
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      if (submitRef.current) {
+        submitRef.current.click()
+      }
     }
 
-    useEffect(() => {
-      if (textAreaRef) {
-        textAreaRef?.current?.focus()
-
-        if (!input && textAreaRef && textAreaRef.current) {
-          textAreaRef.current.style.height = '40px'
-        } else if (textAreaRef && textAreaRef.current) {
-          const newHeight = textAreaRef.current.scrollHeight + 'px'
-          textAreaRef.current.style.height = newHeight
-        }
-      }
-    }, [input, textAreaRef])
-
-    function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-      // Check if the pressed key is "Enter" (key code 13) without the "Shift" key
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault()
-        if (submitRef.current) {
-          submitRef.current.click()
-        }
-      }
-
-      // Cast e.target to HTMLTextAreaElement to access the 'value' property
-      const textarea = e.target as HTMLTextAreaElement
-      setInput(textarea.value)
-    }
-
-    return (
-      <>
-        {/* {messages.map((m) => (
-          <div key={m.id}>
-            {m.role === 'user' ? 'User: ' : 'AI: '}
-            {m.content}
-          </div>
-        ))} */}
-        {isLoading && <ChatLoadingAnimation />}
-        <form ref={ref} className="relative" onSubmit={handleSubmit}>
-          <div
-            className={cn('absolute', 'top-2 left-2', 'ml-1 w-6 h-6 rounded-full bg-dbnew')}
-          ></div>
-          <TextArea_Shadcn_
-            name="value"
-            ref={textAreaRef}
-            autoFocus
-            rows={1}
-            disabled={disabled || submitRef.current?.disabled}
-            contentEditable
-            required
-            className={
-              'transition-all text-sm pl-12 pr-10 rounded-[18px] resize-none box-border leading-6'
-            }
-            placeholder={props.placeholder}
-            spellCheck={false}
-            value={input}
-            onChange={handleInputChange}
-            onKeyDown={(e) => handleKeyDown(e)}
-          />
-          {props.children}
-          <SubmitButton input={input} isLoading={isLoading} ref={submitRef} />
-          <p aria-live="polite" className="sr-only" role="status">
-            {message}
-          </p>
-        </form>
-        {chatContext === 'new' && <ChatSuggestions setInput={setInput} />}
-      </>
-    )
+    // Cast e.target to HTMLTextAreaElement to access the 'value' property
+    const textarea = e.target as HTMLTextAreaElement
+    // setInput(textarea.value)
   }
-)
+
+  return (
+    <>
+      {disabled && <ChatLoadingAnimation />}
+      <form className="relative" onSubmit={onSubmit}>
+        <div className={cn('absolute', 'top-2 left-2', 'ml-1 w-6 h-6 rounded-full bg-dbnew')}></div>
+        <TextArea_Shadcn_
+          name="value"
+          ref={textAreaRef}
+          autoFocus
+          rows={1}
+          disabled={disabled || submitRef.current?.disabled}
+          contentEditable
+          required
+          className={
+            'transition-all text-sm pl-12 pr-10 rounded-[18px] resize-none box-border leading-6'
+          }
+          placeholder={placeholder}
+          spellCheck={false}
+          value={value}
+          onChange={onChange}
+          onKeyDown={(e) => handleKeyDown(e)}
+        />
+        {/* {props.children} */}
+        <SubmitButton input={value} isLoading={disabled} ref={submitRef} />
+        {/* <p aria-live="polite" className="sr-only" role="status">
+            {message}
+          </p> */}
+      </form>
+      {/* {chatContext === 'new' && <ChatSuggestions setInput={setInput} />} */}
+    </>
+  )
+}
 
 AssistantChatForm.displayName = 'AssistantChatForm'
 

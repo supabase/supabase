@@ -1,6 +1,15 @@
 import { proxy, snapshot, useSnapshot } from 'valtio'
 
 export const appState = proxy({
+  code: '',
+  setCode: (value: string) => {
+    appState.code = value
+  },
+  isCodeStreaming: false,
+  setIsCodeStreaming: (value: boolean) => {
+    appState.isCodeStreaming = value
+  },
+
   hideCode: false,
   setHideCode: (value: boolean) => {
     appState.hideCode = value

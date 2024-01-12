@@ -13,6 +13,7 @@ export const getMessage = cache(async (message_id: string) => {
     .eq('message_id', message_id)
     .single()
   if (error) {
+    console.log(error)
     throw new Error('Failed to fetch message')
   }
 

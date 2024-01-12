@@ -1,11 +1,9 @@
 import { Suspense } from 'react'
-import { ScrollArea } from 'ui'
 
 import { cn } from '@ui/lib/utils/cn'
 
-import { Messages } from './Messages'
-import { ChatInput } from './ChatInput'
-import { BottomMarker } from './BottomMarker'
+import { ClientMessages } from './ClientMessages'
+import { getMessages } from './getMessages'
 
 async function Chat({ params }: { params: { thread_id: string } }) {
   return (
@@ -19,18 +17,22 @@ async function Chat({ params }: { params: { thread_id: string } }) {
       )}
     >
       <div className="flex flex-col grow items-between">
-        <ScrollArea className="grow h-px">
-          <div className="flex flex-col py-2 xl:py-6">
-            <Suspense fallback={<p> loading</p>}>
-              <Messages params={params} />
-            </Suspense>
-            <BottomMarker />
-          </div>
-        </ScrollArea>
-        <ChatInput params={params} />
+        <Suspense fallback={<p>hello loading</p>}>
+          <ServerMessages threadId={params.thread_id} />
+        </Suspense>
       </div>
     </div>
   )
+}
+
+const ServerMessages = async ({ threadId }: { threadId: string }) => {
+  const { data: messages, error } = await getMessages(threadId)
+
+  if (error) {
+    return <>Error happened</>
+  }
+
+  return <ClientMessages threadId={threadId} messages={messages} />
 }
 
 export { Chat }

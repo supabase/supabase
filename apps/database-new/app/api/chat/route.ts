@@ -1,6 +1,6 @@
-import OpenAI from 'openai'
 import { OpenAIStream, StreamingTextResponse } from 'ai'
 import { stripIndent } from 'common-tags'
+import OpenAI from 'openai'
 
 // import is weird, what's up with this?
 import { ContextLengthError } from '../../../../../packages/ai-commands/src/errors'
@@ -19,10 +19,7 @@ export type AiAssistantMessage = {
 }
 
 export async function POST(req: Request) {
-  // @TODO need to pass existing messages here too
-  let messages: AiAssistantMessage[] = []
-
-  const { prompt } = await req.json()
+  const { messages, prompt } = await req.json()
 
   const initMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
     {
