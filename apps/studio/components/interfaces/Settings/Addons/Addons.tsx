@@ -24,7 +24,7 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useFlag, useProjectByRef } from 'hooks'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { BASE_PATH } from 'lib/constants'
-import { getSemanticVersion } from 'lib/helpers'
+import { getDatabaseMajorVersion, getSemanticVersion } from 'lib/helpers'
 import { SUBSCRIPTION_PANEL_KEYS, useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import {
   Alert,
@@ -40,6 +40,7 @@ import Image from 'next/image'
 import ComputeInstanceSidePanel from './ComputeInstanceSidePanel'
 import PITRSidePanel from './PITRSidePanel'
 import CustomDomainSidePanel from './CustomDomainSidePanel'
+import { ProjectAddonVariantMeta } from 'data/subscriptions/types'
 
 const Addons = () => {
   const { resolvedTheme } = useTheme()
@@ -58,7 +59,11 @@ const Addons = () => {
 
   const cpuArchitecture = getCloudProviderArchitecture(selectedProject?.cloud_provider)
   // Only projects of version greater than supabase-postgrest-14.1.0.44 can use PITR
-  const sufficientPgVersion = getSemanticVersion(selectedProject?.dbVersion ?? '') >= 141044
+  const sufficientPgVersion =
+    // introduced as generatedSemantic version could be < 141044 even if actual version is indeed past it
+    // eg. 15.1.1.2 leads to 15112
+    getDatabaseMajorVersion(selectedProject?.dbVersion ?? '') > 14 ||
+    getSemanticVersion(selectedProject?.dbVersion ?? '') >= 141044
 
   // [Joshen] We could possibly look into reducing the interval to be more "realtime"
   // I tried setting the interval to 1m but no data was returned, may need to experiment
@@ -82,6 +87,8 @@ const Addons = () => {
   } = useProjectAddonsQuery({ projectRef })
   const selectedAddons = addons?.selected_addons ?? []
   const { computeInstance, pitr, customDomain } = getAddons(selectedAddons)
+
+  const meta = computeInstance?.variant?.meta as ProjectAddonVariantMeta | undefined
 
   return (
     <>
@@ -193,7 +200,7 @@ const Addons = () => {
                   </div>
                   <div className="flex-grow">
                     <p className="text-sm text-foreground-light">Current option:</p>
-                    <p className="">{computeInstance?.variant.name ?? 'Micro'}</p>
+                    <p>{computeInstance?.variant.name ?? 'Micro'}</p>
                     <ProjectUpdateDisabledTooltip
                       projectUpdateDisabled={projectUpdateDisabled}
                       projectNotActive={!isProjectActive}
@@ -217,9 +224,8 @@ const Addons = () => {
                       >
                         <p>
                           Your workload is currently running at the baseline disk IO bandwidth at{' '}
-                          {computeInstance?.variant?.meta?.baseline_disk_io_mbs?.toLocaleString() ??
-                            87}{' '}
-                          Mbps and may suffer degradation in performance.
+                          {meta?.baseline_disk_io_mbs?.toLocaleString() ?? 87} Mbps and may suffer
+                          degradation in performance.
                         </p>
                         <p className="mt-1">
                           Consider upgrading to a larger compute instance for a higher baseline
@@ -236,9 +242,8 @@ const Addons = () => {
                         <p>
                           If the disk IO budget drops to zero, your workload will run at the
                           baseline disk IO bandwidth at{' '}
-                          {computeInstance?.variant?.meta?.baseline_disk_io_mbs?.toLocaleString() ??
-                            87}{' '}
-                          Mbps and may suffer degradation in performance.
+                          {meta?.baseline_disk_io_mbs?.toLocaleString() ?? 87} Mbps and may suffer
+                          degradation in performance.
                         </p>
                         <p className="mt-1">
                           Consider upgrading to a larger compute instance for a higher baseline
@@ -260,7 +265,7 @@ const Addons = () => {
                           />
                         </div>
                       </Link>
-                      <p className="text-sm">{computeInstance?.variant?.meta?.memory_gb ?? 1} GB</p>
+                      <p className="text-sm">{meta?.memory_gb ?? 1} GB</p>
                     </div>
                     <div className="w-full flex items-center justify-between border-b py-2">
                       <Link href={`/project/${projectRef}/settings/infrastructure#cpu`}>
@@ -276,21 +281,17 @@ const Addons = () => {
                         </div>
                       </Link>
                       <p className="text-sm">
-                        {computeInstance?.variant?.meta?.cpu_cores ?? 2}-core {cpuArchitecture}{' '}
-                        {computeInstance?.variant?.meta?.cpu_dedicated ? '(Dedicated)' : '(Shared)'}
+                        {meta?.cpu_cores ?? 2}-core {cpuArchitecture}{' '}
+                        {meta?.cpu_dedicated ? '(Dedicated)' : '(Shared)'}
                       </p>
                     </div>
                     <div className="w-full flex items-center justify-between border-b py-2">
                       <p className="text-sm text-foreground-light">No. of direct connections</p>
-                      <p className="text-sm">
-                        {computeInstance?.variant?.meta?.connections_direct ?? 60}
-                      </p>
+                      <p className="text-sm">{meta?.connections_direct ?? 60}</p>
                     </div>
                     <div className="w-full flex items-center justify-between border-b py-2">
                       <p className="text-sm text-foreground-light">No. of pooler connections</p>
-                      <p className="text-sm">
-                        {computeInstance?.variant?.meta?.connections_pooler ?? 200}
-                      </p>
+                      <p className="text-sm">{meta?.connections_pooler ?? 200}</p>
                     </div>
                     <div className="w-full flex items-center justify-between border-b py-2">
                       <Link href={`/project/${projectRef}/settings/infrastructure#disk_io`}>
@@ -306,9 +307,7 @@ const Addons = () => {
                         </div>
                       </Link>
                       <p className="text-sm">
-                        {computeInstance?.variant?.meta?.max_disk_io_mbs?.toLocaleString() ??
-                          '2,085'}{' '}
-                        Mbps
+                        {meta?.max_disk_io_mbs?.toLocaleString() ?? '2,085'} Mbps
                       </p>
                     </div>
                     <div className="w-full flex items-center justify-between py-2">
@@ -325,9 +324,7 @@ const Addons = () => {
                         </div>
                       </Link>
                       <p className="text-sm">
-                        {computeInstance?.variant?.meta?.baseline_disk_io_mbs?.toLocaleString() ??
-                          87}{' '}
-                        Mbps
+                        {meta?.baseline_disk_io_mbs?.toLocaleString() ?? 87} Mbps
                       </p>
                     </div>
                   </div>
@@ -382,7 +379,7 @@ const Addons = () => {
                   </div>
                   <div>
                     <p className="text-sm text-foreground-light">Current option:</p>
-                    <p className="">
+                    <p>
                       {pitr !== undefined
                         ? `Point in time recovery of ${pitr.variant.meta?.backup_duration_days} days is enabled`
                         : 'Point in time recovery is not enabled'}
@@ -477,7 +474,7 @@ const Addons = () => {
                   </div>
                   <div>
                     <p className="text-sm text-foreground-light">Current option:</p>
-                    <p className="">
+                    <p>
                       {customDomain !== undefined
                         ? 'Custom domain is enabled'
                         : 'Custom domain is not enabled'}

@@ -137,7 +137,6 @@ const AddRestrictionModal = ({
                         id="ipAddress"
                         name="ipAddress"
                         placeholder="0.0.0.0"
-                        className=""
                       />
                     </div>
                     <div className="flex-grow">

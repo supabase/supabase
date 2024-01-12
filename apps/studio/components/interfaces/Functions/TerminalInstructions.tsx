@@ -40,7 +40,7 @@ const TerminalInstructions = ({
 
   // get the .co or .net TLD from the restUrl
   const restUrl = settings?.autoApiService.restUrl
-  const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : ''
+  const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : 'co'
 
   const commands: Commands[] = [
     {

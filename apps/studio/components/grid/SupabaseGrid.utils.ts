@@ -74,8 +74,8 @@ export async function initTable(
   sort?: string[], // Comes directly from URL param
   filter?: string[] // Comes directly from URL param
 ): Promise<{ savedState: { sorts?: string[]; filters?: string[] } }> {
-  const savedState = props.storageRef
-    ? onLoadStorage(props.storageRef, props.table.name, props.table.schema)
+  const savedState = props.projectRef
+    ? onLoadStorage(props.projectRef, props.table.name, props.table.schema)
     : undefined
 
   // Check for saved state on initial load and also, load sort and filters via URL param only if given
@@ -95,6 +95,8 @@ export async function initTable(
   }
 
   const gridColumns = getGridColumns(props.table, {
+    projectRef: props.projectRef,
+    tableId: props.tableId,
     editable: props.editable,
     defaultWidth: props.gridProps?.defaultColumnWidth,
     onAddColumn: props.editable ? props.onAddColumn : undefined,
@@ -177,7 +179,7 @@ export function parseSupaTable(
   }
 }
 
-export function onLoadStorage(storageRef: string, tableName: string, schema?: string | null) {
+function onLoadStorage(storageRef: string, tableName: string, schema?: string | null) {
   const storageKey = getStorageKey(STORAGE_KEY_PREFIX, storageRef)
   const jsonStr = localStorage.getItem(storageKey)
   if (!jsonStr) return

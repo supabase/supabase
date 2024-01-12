@@ -2,13 +2,7 @@ import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscri
 import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { isError } from 'data/utils/error-check'
-import {
-  useFlag,
-  useLocalStorageQuery,
-  useSelectedOrganization,
-  useSelectedProject,
-  useStore,
-} from 'hooks'
+import { useLocalStorageQuery, useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
 import { IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
 import { format } from 'sql-formatter'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'

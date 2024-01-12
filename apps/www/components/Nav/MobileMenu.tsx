@@ -10,6 +10,7 @@ import MenuItem from './MenuItem'
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 import { useKey } from 'react-use'
+import { useIsLoggedIn, useIsUserLoading } from 'common'
 
 interface Props {
   open: boolean
@@ -19,6 +20,8 @@ interface Props {
 }
 
 const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
+  const isLoggedIn = useIsLoggedIn()
+  const isUserLoading = useIsUserLoading()
   const container = {
     hidden: { opacity: 0 },
     show: { opacity: 1, transition: { duration: 0.15, staggerChildren: 0.05, ease: DEFAULT_EASE } },
@@ -171,20 +174,36 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
               <Menu />
             </div>
             <div className="absolute bottom-0 left-0 right-0 top-auto w-full bg-alternative flex items-stretch p-4 gap-4">
-              <Link href="https://supabase.com/dashboard" passHref legacyBehavior>
-                <Button block type="default" asChild>
-                  <a type={undefined} className="">
-                    Sign in
-                  </a>
-                </Button>
-              </Link>
-              <Link href="https://supabase.com/dashboard" passHref legacyBehavior>
-                <Button block asChild>
-                  <a type={undefined} className="h-10 py-4">
-                    Start your project
-                  </a>
-                </Button>
-              </Link>
+              {!isUserLoading && (
+                <>
+                  {isLoggedIn ? (
+                    <Link href="/dashboard/projects" passHref legacyBehavior>
+                      <Button block asChild>
+                        <a type={undefined} className="h-10 py-4">
+                          Dashboard
+                        </a>
+                      </Button>
+                    </Link>
+                  ) : (
+                    <>
+                      <Link href="https://supabase.com/dashboard" passHref legacyBehavior>
+                        <Button block type="default" asChild>
+                          <a type={undefined} className="">
+                            Sign in
+                          </a>
+                        </Button>
+                      </Link>
+                      <Link href="https://supabase.com/dashboard" passHref legacyBehavior>
+                        <Button block asChild>
+                          <a type={undefined} className="h-10 py-4">
+                            Start your project
+                          </a>
+                        </Button>
+                      </Link>
+                    </>
+                  )}
+                </>
+              )}
             </div>
           </m.div>
         )}

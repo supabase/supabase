@@ -7,7 +7,7 @@ docker
 examples
 i18n
 **/node_modules
-spec
+apps/docs/spec
 supabase
 tests
 

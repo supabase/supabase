@@ -27,7 +27,7 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useFlag, useSelectedOrganization } from 'hooks'
-import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants'
+import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { INFRA_ACTIVITY_METRICS } from './Infrastructure.constants'
 
 const InfrastructureActivity = () => {

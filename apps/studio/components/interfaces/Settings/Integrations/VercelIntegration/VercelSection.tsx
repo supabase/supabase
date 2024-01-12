@@ -120,9 +120,11 @@ You can change the scope of the access for Supabase by configuring
       : ''
 
   const integrationUrl =
-    process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-      ? 'https://vercel.com/integrations/supabase-v2-staging'
-      : 'https://vercel.com/integrations/supabase-v2'
+    process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
+      ? 'https://vercel.com/integrations/supabase'
+      : process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+      ? `https://vercel.com/integrations/supabase-v2-staging`
+      : 'https://vercel.com/integrations/supabase-v2-local'
 
   let connections =
     (isProjectScoped

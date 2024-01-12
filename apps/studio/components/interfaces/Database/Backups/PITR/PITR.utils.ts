@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { ALL_TIMEZONES } from './PITR.constants'
-import { Time, Timezone } from './PITR.types'
-import { ProjectSelectedAddon } from 'data/subscriptions/project-addons-query'
+import { Time } from './PITR.types'
+import { ProjectSelectedAddon } from 'data/subscriptions/types'
 
 export const getPITRRetentionDuration = (addons: ProjectSelectedAddon[]) => {
   const pitrAddon = addons.find((addon) => addon.type === 'pitr')
@@ -38,14 +38,6 @@ export const formatTimeToTimeString = (time: Time) => {
   return `${formatNumberToTwoDigits(time.h)}:${formatNumberToTwoDigits(
     time.m
   )}:${formatNumberToTwoDigits(time.s)}`
-}
-
-export const getTimezoneOffsetText = (timezone: Timezone) => {
-  return timezone.text.split(')')[0].slice(1)
-}
-
-export const getTimezoneOffset = (timezone: Timezone) => {
-  return timezone.text.split(')')[0].slice(4)
 }
 
 export function constrainDateToRange(current: dayjs.Dayjs, lower: dayjs.Dayjs, upper: dayjs.Dayjs) {
