@@ -4,12 +4,13 @@ import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
 import { useInView } from 'react-intersection-observer'
-import { Button, IconAlertCircle, IconAlertTriangle, IconArchive, IconExternalLink } from 'ui'
+import { Button, IconArchive, IconExternalLink } from 'ui'
 
 import { Markdown } from 'components/interfaces/Markdown'
 import { Notification, NotificationData } from 'data/notifications/notifications-v2-query'
-import { Organization } from 'types'
 import { Project } from 'data/projects/project-detail-query'
+import { Organization } from 'types'
+import { CriticalIcon, WarningIcon } from './NotificationsPopover.constants'
 
 interface NotificationRowProps {
   index: number
@@ -66,12 +67,12 @@ const NotificationRow = ({
     <div
       ref={ref}
       className={clsx(
-        `p-4 flex justify-between gap-x-3`,
+        `p-4 flex justify-between gap-x-3 group`,
         index !== 0 ? 'border-t' : '',
         status !== 'new' ? 'bg-background' : ''
       )}
     >
-      <div ref={viewRef} className="flex flex-col gap-y-2 w-full">
+      <div ref={viewRef} className="flex flex-col gap-y-2.5 w-full py-0.5">
         {(project !== undefined || organization !== undefined) && (
           <div className="flex items-center max-w-[350px]">
             {organization !== undefined && (
@@ -161,27 +162,15 @@ const NotificationRow = ({
         )}
       </div>
       <div className="flex flex-col items-center gap-y-2">
-        {priority === 'Warning' && (
-          <IconAlertCircle
-            size={22}
-            strokeWidth={2}
-            className="rounded p-0.5 text-warning-400 bg-warning-600"
-          />
-        )}
-        {priority === 'Critical' && (
-          <IconAlertTriangle
-            size={22}
-            strokeWidth={2}
-            className="rounded p-0.5 text-destructive-400 bg-destructive-600"
-          />
-        )}
+        {priority === 'Warning' && <WarningIcon className="w-5 h-5" />}
+        {priority === 'Critical' && <CriticalIcon className="w-5 h-5" />}
         {notification.status !== 'archived' && (
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger asChild>
               <Button
                 type="outline"
-                icon={<IconArchive />}
-                className="px-1"
+                icon={<IconArchive size={13} strokeWidth={2} className="text-foreground-light" />}
+                className="p-1.5 group-hover:opacity-100 opacity-0 transition rounded-full"
                 onClick={() => onArchiveNotification(notification.id)}
               />
             </Tooltip.Trigger>

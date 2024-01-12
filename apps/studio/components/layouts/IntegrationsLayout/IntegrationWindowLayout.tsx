@@ -1,9 +1,11 @@
-import { useFlag, withAuth } from 'hooks'
-import { BASE_PATH } from 'lib/constants'
-import { PropsWithChildren, ReactNode, forwardRef } from 'react'
-import { IconX, cn, LoadingLine, IconBook, IconLifeBuoy } from 'ui'
-import { ScaffoldContainer } from '../Scaffold'
 import Link from 'next/link'
+import { PropsWithChildren, ReactNode, forwardRef } from 'react'
+import { IconBook, IconLifeBuoy, IconX, LoadingLine, cn } from 'ui'
+
+import { withAuth } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
+import { LayoutWrapper } from '../LayoutWrapper'
+import { ScaffoldContainer } from '../Scaffold'
 
 export type IntegrationWindowLayoutProps = {
   title: string
@@ -19,11 +21,8 @@ const IntegrationWindowLayout = ({
   loading = false,
   docsHref,
 }: PropsWithChildren<IntegrationWindowLayoutProps>) => {
-  const ongoingIncident = useFlag('ongoingIncident')
-  const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
-
   return (
-    <div className="flex w-full flex-col" style={{ height: maxHeight, maxHeight }}>
+    <LayoutWrapper className="flex w-full flex-col">
       <Header title={title} integrationIcon={integrationIcon} />
       <LoadingLine loading={loading} />
       <main className="overflow-auto flex flex-col h-full bg">{children}</main>
@@ -49,7 +48,7 @@ const IntegrationWindowLayout = ({
           Support
         </Link>
       </ScaffoldContainer>
-    </div>
+    </LayoutWrapper>
   )
 }
 
