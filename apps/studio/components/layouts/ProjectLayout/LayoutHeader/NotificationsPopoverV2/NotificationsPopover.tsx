@@ -244,7 +244,7 @@ const NotificationsPopoverV2 = () => {
             )}
           </div>
           {notifications.length > 0 && activeTab === 'inbox' && (
-            <div className="flex items-center justify-center p-1.5">
+            <div className="flex items-center justify-center p-1.5 border-t">
               <Button
                 disabled={isArchiving}
                 loading={isArchiving}
