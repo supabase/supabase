@@ -1,0 +1,18 @@
+.active .spendcap-enabled {
+  height: 100%;
+  opacity: 1;
+}
+.bar {
+  opacity: 0;
+}
+.active .bar {
+  opacity: 1;
+}
+.spendcap-enabled {
+  height: 100%;
+  opacity: 1;
+}
+.spendcap-disabled {
+  height: 100%;
+  opacity: 1;
+}

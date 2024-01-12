@@ -181,7 +181,7 @@ const Repos = ({ tabs }: Props) => {
         </div>
       </div>
       <div className="relative w-full h-fit grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <AnimatePresence exitBeforeEnter>
+        <AnimatePresence mode="wait">
           {repos === null ? (
             <div className="col-span-full flex justify-center items-center min-h-[300px]">
               <LogoLoader />

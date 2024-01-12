@@ -14,11 +14,16 @@ import DefaultLayout from '~/components/Layouts/Default'
 import PricingAddons from '~/components/Pricing/PricingAddons'
 import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/Pricing/PricingTableRow'
 
+import dynamic from 'next/dynamic'
 import Solutions from '~/data/Solutions'
 import pricingFaq from '~/data/PricingFAQ.json'
 import { pricing } from 'shared-data/pricing'
 import { plans } from 'shared-data/plans'
 import { ArrowDownIcon, InformationCircleIcon } from '@heroicons/react/outline'
+
+const CostControlAnimation = dynamic(
+  () => import('~/components/Pricing/CostControlAnimation/CostControlAnimation')
+)
 
 export default function IndexPage() {
   const router = useRouter()
@@ -117,11 +122,7 @@ export default function IndexPage() {
           <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
             <div className="mx-auto max-w-3xl space-y-2 lg:max-w-none">
               <h1 className="text-brand text-base">Pricing</h1>
-              <h2 className="h1">
-                Predictable pricing,
-                <br />
-                designed to scale
-              </h2>
+              <h2 className="h1">Predictable pricing, designed to scale</h2>
               <p className="p text-lg">
                 Start building for free, collaborate with a team, then scale to millions of users.
               </p>
@@ -329,15 +330,7 @@ export default function IndexPage() {
             </Button>
           </div>
           <div className="relative h-full min-h-[14rem]">
-            <Image
-              layout="fill"
-              objectFit="contain"
-              className="w-full"
-              src={`${basePath}/images/pricing/spend-cap${
-                resolvedTheme?.includes('dark') ? '' : '-light'
-              }.png`}
-              alt=""
-            />
+            <CostControlAnimation className="w-full h-full" />
           </div>
         </div>
       </div>
