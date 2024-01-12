@@ -7,10 +7,10 @@ export const notificationsState = proxy({
   filterProjects: [] as string[],
   get numFiltersApplied() {
     return [
-      ...notificationsState.filterStatuses,
-      ...notificationsState.filterPriorities,
-      ...notificationsState.filterOrganizations,
-      ...notificationsState.filterProjects,
+      ...this.filterStatuses,
+      ...this.filterPriorities,
+      ...this.filterOrganizations,
+      ...this.filterProjects,
     ].length
   },
   setFilters: (value: string, type: 'status' | 'priority' | 'organizations' | 'projects') => {
