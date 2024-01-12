@@ -9,7 +9,7 @@ import { useDispatch, useTrackedState } from 'components/grid/store'
 import { Filter, Sort, SupaTable } from 'components/grid/types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
-import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
+import { fetchAllTableRows, useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useCheckPermissions, useStore, useUrlState } from 'hooks'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
@@ -305,9 +305,25 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
       return setIsExporting(false)
     }
 
+    if (!project) {
+      ui.setNotification({
+        category: 'error',
+        message: 'Project is required',
+      })
+      return setIsExporting(false)
+    }
+
     const rows = allRowsSelected
-      ? await state.rowService!.fetchAllData(filters, sorts)
+      ? await fetchAllTableRows({
+          projectRef: project.ref,
+          connectionString: project.connectionString,
+          table,
+          filters,
+          sorts,
+          impersonatedRole: roleImpersonationState.role,
+        })
       : allRows.filter((x) => selectedRows.has(x.idx))
+    console.log('rows:', rows)
     const formattedRows = rows.map((row) => {
       const formattedRow = row
       Object.keys(row).map((column) => {
@@ -353,14 +369,42 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
             : `${selectedRows.size} row selected`}
         </span>
         {!allRowsSelected && totalRows > allRows.length && (
+          <Button type="link" onClick={() => onSelectAllRows()}>
+            Select all {totalRows} rows
+          </Button>
+        )}
+      </div>
+      <div className="h-[20px] border-r border-gray-700" />
+      <div className="flex items-center gap-2">
+        <Button
+          type="primary"
+          size="tiny"
+          icon={<IconDownload />}
+          loading={isExporting}
+          disabled={isExporting}
+          onClick={onRowsExportCSV}
+        >
+          Export to CSV
+        </Button>
+        {editable && (
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger asChild>
-              <Button type="link" onClick={() => onSelectAllRows()} disabled={isImpersonatingRole}>
-                Select all {totalRows} rows
+              <Button
+                type="default"
+                size="tiny"
+                icon={<IconTrash size="tiny" />}
+                onClick={onRowsDelete}
+                disabled={allRowsSelected && isImpersonatingRole}
+              >
+                {allRowsSelected
+                  ? `Delete ${totalRows} rows`
+                  : selectedRows.size > 1
+                  ? `Delete ${selectedRows.size} rows`
+                  : `Delete ${selectedRows.size} row`}
               </Button>
             </Tooltip.Trigger>
 
-            {isImpersonatingRole && (
+            {allRowsSelected && isImpersonatingRole && (
               <Tooltip.Portal>
                 <Tooltip.Content side="bottom">
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
@@ -378,33 +422,6 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
               </Tooltip.Portal>
             )}
           </Tooltip.Root>
-        )}
-      </div>
-      <div className="h-[20px] border-r border-gray-700" />
-      <div className="flex items-center gap-2">
-        <Button
-          type="primary"
-          size="tiny"
-          icon={<IconDownload />}
-          loading={isExporting}
-          disabled={isExporting}
-          onClick={onRowsExportCSV}
-        >
-          Export to CSV
-        </Button>
-        {editable && (
-          <Button
-            type="default"
-            size="tiny"
-            icon={<IconTrash size="tiny" />}
-            onClick={onRowsDelete}
-          >
-            {allRowsSelected
-              ? `Delete ${totalRows} rows`
-              : selectedRows.size > 1
-              ? `Delete ${selectedRows.size} rows`
-              : `Delete ${selectedRows.size} row`}
-          </Button>
         )}
       </div>
     </div>
