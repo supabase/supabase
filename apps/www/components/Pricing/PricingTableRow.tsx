@@ -85,7 +85,12 @@ export const PricingTableRowDesktop = (props: any) => {
           </Fragment>
         )
       })}
-      <ReactTooltip effect={'solid'} className="!max-w-[320px] whitespace-pre-line" />
+      <ReactTooltip
+        effect={'solid'}
+        backgroundColor="hsl(var(--background-alternative-default))"
+        textColor="hsl(var(--foreground-light))"
+        className="!max-w-[320px] !px-3 whitespace-pre-line"
+      />
     </>
   )
 }

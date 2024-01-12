@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { useTheme } from 'next-themes'
-import { Accordion, Button, IconArrowUpRight, IconCheck, Select, cn } from 'ui'
+import { Accordion, Button, IconArrowUpRight, IconCheck, IconInfo, Select, cn } from 'ui'
 
 import AnnouncementBadge from '~/components/Announcement/Badge'
 import CTABanner from '~/components/CTABanner'
@@ -18,7 +18,7 @@ import Solutions from '~/data/Solutions'
 import pricingFaq from '~/data/PricingFAQ.json'
 import { pricing } from 'shared-data/pricing'
 import { plans } from 'shared-data/plans'
-import { ArrowDownIcon } from '@heroicons/react/outline'
+import { ArrowDownIcon, InformationCircleIcon } from '@heroicons/react/outline'
 
 export default function IndexPage() {
   const router = useRouter()
@@ -146,34 +146,39 @@ export default function IndexPage() {
                   )}
                   <div
                     key={plan.name}
-                    className={[
+                    className={cn(
                       'flex flex-col overflow-hidden',
-                      plan.name === 'Pro' ? '' : 'border h-full rounded-[4px]',
-                    ].join(' ')}
+                      plan.name === 'Pro' ? '' : 'border h-full rounded-[4px]'
+                    )}
                   >
                     <div
                       className={`bg-surface-100 px-8 xl:px-4 2xl:px-8 pt-6 rounded-tr-[4px] rounded-tl-[4px] ${
                         plan.name === 'Pro' ? 'rounded-tr-[4px] rounded-tl-[4px]' : ''
                       }`}
                     >
-                      <div className="mb-2 flex items-center gap-2">
-                        <div className="flex items-center gap-2">
-                          <h3
-                            className="text-brand-600 text-2xl font-normal
-                           uppercase flex items-center gap-4 font-mono"
-                          >
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 pb-2">
+                          <h3 className="text-2xl font-normal uppercase flex items-center gap-4 font-mono">
                             {plan.name}
                           </h3>
                           {plan.nameBadge && (
-                            <span className="bg-brand-300 text-brand-600 rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4">
+                            <span className="bg-brand-500 text-brand-600 rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4 inline-flex gap-1 items-center">
                               {plan.nameBadge}
                             </span>
                           )}
                         </div>
                       </div>
-                      <p className="text-foreground-light my-4 text-sm border-b border-default pb-4 2xl:pr-4">
+                      <p className="text-foreground-light mb-4 text-sm 2xl:pr-4">
                         {plan.description}
                       </p>
+                      <Button
+                        block
+                        size="small"
+                        type={plan.name === 'Enterprise' ? 'default' : 'alternative'}
+                        asChild
+                      >
+                        <a href={plan.href}>{plan.cta}</a>
+                      </Button>
 
                       <div
                         className={`
@@ -184,7 +189,7 @@ export default function IndexPage() {
                         xl:text-4xl
                         border-b
                         border-default
-                        min-h-[175px] ${plan.priceLabel ? 'pt-6' : 'pt-10'}`}
+                        min-h-[155px] ${plan.priceLabel ? 'pt-6' : 'pt-10'}`}
                       >
                         <div className="flex flex-col gap-1">
                           <div className="flex items-end gap-2">
@@ -197,8 +202,8 @@ export default function IndexPage() {
 
                               <div className="flex items-end">
                                 <p
-                                  className={`mt-2 gradient-text-500 pb-1 ${
-                                    plan.name !== 'Enterprise' ? 'text-5xl' : 'text-4xl'
+                                  className={`mt-2 pb-1 font-mono ${
+                                    plan.name !== 'Enterprise' ? 'text-4xl' : 'text-4xl'
                                   }`}
                                 >
                                   {plan.name !== 'Enterprise' ? '$' : ''}
@@ -210,11 +215,20 @@ export default function IndexPage() {
                               </div>
 
                               {plan.warning && (
-                                <p className="-mt-2">
-                                  <span className="bg-background text-brand-600 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4">
+                                <div className="-mt-2">
+                                  <span
+                                    data-tip={plan.warningTooltip}
+                                    className={cn(
+                                      'bg-brand-500 text-brand-600 rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4 inline-flex gap-1 items-center',
+                                      plan.warningTooltip && 'hover:cursor-pointer'
+                                    )}
+                                  >
+                                    {plan.warningTooltip && (
+                                      <InformationCircleIcon className="w-3 h-3" />
+                                    )}
                                     {plan.warning}
                                   </span>
-                                </p>
+                                </div>
                               )}
                             </div>
                           </div>
@@ -222,13 +236,13 @@ export default function IndexPage() {
                       </div>
                     </div>
                     <div
-                      className={[
-                        `border-default bg-surface-100 flex h-full rounded-bl-[4px] rounded-br-[4px] flex-1 flex-col px-8 xl:px-4 2xl:px-8 py-6`,
-                        plan.name === 'Pro' ? 'mb-0.5 rounded-bl-[4px] rounded-br-[4px]' : '',
-                      ].join(' ')}
+                      className={cn(
+                        'border-default bg-surface-100 flex h-full rounded-bl-[4px] rounded-br-[4px] flex-1 flex-col px-8 xl:px-4 2xl:px-8 py-6',
+                        plan.name === 'Pro' && 'mb-0.5 rounded-bl-[4px] rounded-br-[4px]'
+                      )}
                     >
                       {plan.preface && (
-                        <p className="text-foreground-light text-[13px] mt-2 mb-4">
+                        <p className="text-foreground-lighter text-[13px] mt-2 mb-4">
                           {plan.preface}
                         </p>
                       )}
@@ -248,14 +262,11 @@ export default function IndexPage() {
                       <div className="flex flex-col gap-6 mt-auto prose">
                         <div className="space-y-2 mt-12">
                           {plan.footer && (
-                            <p className="text-[13px] whitespace-pre-wrap">{plan.footer}</p>
+                            <p className="text-[13px] leading-5 text-foreground-lighter whitespace-pre-wrap mb-0">
+                              {plan.footer}
+                            </p>
                           )}
                         </div>
-                        <a href={plan.href}>
-                          <Button block size="small">
-                            {plan.cta}
-                          </Button>
-                        </a>
                       </div>
                     </div>
                   </div>
@@ -333,15 +344,6 @@ export default function IndexPage() {
 
       <div className="bg-background">
         <div className="sm:py-18 container relative mx-auto px-4 py-16 md:py-24 lg:px-16 lg:py-24 xl:px-20">
-          <div className="text-center">
-            <h2 className="text-foreground text-3xl scroll-m-20" id="compare-plans">
-              Compare Plans
-            </h2>
-            <p className="text-foreground-light mt-4 mb-8 lg:mb-16 text-lg">
-              Start with a hobby project, collaborate with a team, and scale to millions of users.
-            </p>
-          </div>
-
           <div className="sm:mb-18 mb-16 md:mb-24 lg:mb-24">
             {/* <!-- xs to lg --> */}
 
@@ -602,39 +604,13 @@ export default function IndexPage() {
 
                     {plans.map((plan) => (
                       <th
-                        className="text-foreground w-1/4 px-6 pr-2 pt-2 pb-2 text-left text-sm font-normal"
+                        className="text-foreground w-1/4 px-6 pr-2 pt-2 text-left text-sm font-normal"
                         scope="col"
                         key={plan.name}
                       >
-                        <h3 className="text-brand-600 text-2xl font-mono font-normal uppercase flex items-center gap-4">
+                        <h3 className="text-2xl font-mono font-normal uppercase flex items-center gap-4">
                           {plan.name}
                         </h3>
-                        <div
-                          className="h-0.25 absolute bottom-0 left-0 w-full"
-                          style={{ height: '1px' }}
-                        ></div>
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <thead>
-                  <tr className="descriptions">
-                    <th
-                      className="text-foreground w-1/3 px-6 pt-2 pb-2 text-left text-sm font-normal"
-                      scope="col"
-                    ></th>
-
-                    {plans.map((plan) => (
-                      <th
-                        className="text-foreground w-1/4 px-6 pt-2 pb-2 text-left text-sm font-normal"
-                        scope="col"
-                        key={`th-${plan.name}`}
-                      >
-                        <p className="p text-sm border-b border-default pb-4">{plan.description}</p>
-                        <div
-                          className="h-0.25 absolute bottom-0 left-0 w-full"
-                          style={{ height: '1px' }}
-                        ></div>
                       </th>
                     ))}
                   </tr>
@@ -650,36 +626,28 @@ export default function IndexPage() {
                       <td className="h-full px-6 py-2 align-top" key={`price-${plan.name}`}>
                         <div className="relative h-full w-full">
                           <div className="flex flex-col justify-between h-full">
-                            <>
+                            <p className="text-foreground-lighter">
                               <span
-                                className={`text-foreground ${
-                                  plan.name !== 'Enterprise' ? 'text-5xl' : 'text-4xl'
-                                }`}
+                                className={cn(
+                                  'text-foreground font-mono text-4xl mr-1',
+                                  plan.name === 'Enterprise'
+                                    ? 'text-2xl tracking-tighter'
+                                    : 'text-3xl'
+                                )}
                               >
                                 {plan.name !== 'Enterprise' && '$'}
                                 {plan.priceMonthly}
                               </span>
-                              {['Pro', 'Free'].includes(plan.name) && (
-                                <p className="p text-[13px] leading-4 mt-1">/ month / org</p>
+                              {['Free', 'Pro', 'Team'].includes(plan.name) && (
+                                <span className="text-[13px] leading-4 mt-1">{plan.costUnit}</span>
                               )}
-                              {['Team'].includes(plan.name) && (
-                                <p className="p text-[13px] leading-4 mt-1">/ month / org</p>
-                              )}
-                            </>
+                            </p>
 
-                            {plan.warning && (
-                              <p className="-mt-2">
-                                <span className="bg-alternative text-brand-600 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4">
-                                  {plan.warning}
-                                </span>
-                              </p>
-                            )}
-
-                            <div className={plan.name === 'Enterprise' ? 'mt-auto' : 'mt-8'}>
+                            <div className={plan.name === 'Enterprise' ? 'mt-auto' : 'mt-4'}>
                               <Button
                                 asChild
                                 size="tiny"
-                                type={plan.name === 'Enterprise' ? 'default' : 'primary'}
+                                type={plan.name === 'Enterprise' ? 'default' : 'alternative'}
                                 block
                               >
                                 <Link href={plan.href} as={plan.href}>

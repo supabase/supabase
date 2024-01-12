@@ -7,6 +7,7 @@ export interface PricingInformation {
   priceLabel?: string
   priceMonthly: number | string
   warning?: string
+  warningTooltip?: string
   description: string
   preface: string
   features: string[]
@@ -23,7 +24,7 @@ export const plans: PricingInformation[] = [
     href: 'https://supabase.com/dashboard/new?plan=free',
     priceLabel: '',
     priceMonthly: 0,
-    warning: 'Limit of 2 free organizations',
+    warning: '2 free organizations',
     description: 'Perfect for passion projects & simple websites.',
     preface: 'Get started with:',
     features: [
@@ -41,16 +42,18 @@ export const plans: PricingInformation[] = [
       'Community support',
     ],
     footer: 'Free projects are paused after 1 week of inactivity.',
-    cta: 'Get Started',
+    cta: 'Start for Free',
   },
   {
     id: 'tier_pro',
     name: 'Pro',
-    nameBadge: '',
+    nameBadge: 'Most Popular',
     costUnit: '/ month / org',
     href: 'https://supabase.com/dashboard/new?plan=pro',
     priceLabel: 'From',
     warning: 'Usage-based plan',
+    warningTooltip:
+      'We bill based on compute runtime hours where usage exeeds the resources included in the plan, only if you disable Spend Cap.',
     priceMonthly: 25,
     description: 'For production applications with the option to scale.',
     features: [
@@ -74,17 +77,19 @@ export const plans: PricingInformation[] = [
   {
     id: 'tier_team',
     name: 'Team',
-    nameBadge: 'New',
+    nameBadge: '',
     costUnit: '/ month / org',
     href: 'https://supabase.com/dashboard/new?plan=team',
     priceLabel: 'From',
     warning: 'Usage-based plan',
+    warningTooltip:
+      'We bill based on compute runtime hours where usage exeeds the resources included in the plan.',
     priceMonthly: 599,
     description: 'Collaborate with different permissions and access patterns.',
     features: [
       'Additional Organization member roles',
       'Daily backups stored for 14 days',
-      `SSO/SAML`,
+      'SSO/SAML',
       'Standardised Security Questionnaire',
       'SOC2',
       'HIPAA available as paid add-on',
@@ -92,7 +97,7 @@ export const plans: PricingInformation[] = [
       'Priority email support & SLAs',
       '28-day log retention',
     ],
-    footer: 'Additional fees apply for usage beyond included usage.',
+    footer: 'Additional fees apply for usage beyond plan limits.',
     preface: 'Everything in the Pro plan, plus:',
     cta: 'Get Started',
   },
@@ -102,14 +107,14 @@ export const plans: PricingInformation[] = [
     href: 'https://forms.supabase.com/enterprise',
     description: 'For large-scale applications managing serious workloads.',
     features: [
-      `Designated Support manager & SLAs`,
-      `On-premise support`,
-      `24×7×365 premium enterprise support`,
+      'Designated Support manager & SLAs',
+      'On-premise support',
+      '24×7×365 premium enterprise support',
       'Custom Security Questionnaires',
-      `Private Slack channel`,
+      'Private Slack channel',
     ],
     priceLabel: '',
-    priceMonthly: 'Contact us',
+    priceMonthly: 'Custom',
     preface: '',
     footer: '',
     cta: 'Contact Us',
