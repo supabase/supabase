@@ -4,11 +4,14 @@ import IncidentBanner from 'components/layouts/AppLayout/IncidentBanner'
 import { getTheme } from 'components/ui/CodeEditor'
 import { useFlag } from 'hooks'
 import { PropsWithChildren, useEffect } from 'react'
+import { NoticeBanner } from 'components/layouts/AppLayout/NoticeBanner'
 
 const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   const monaco = useMonaco()
   const { resolvedTheme } = useTheme()
+
   const ongoingIncident = useFlag('ongoingIncident')
+  const showNoticeBanner = useFlag('showNoticeBanner')
 
   useEffect(() => {
     if (monaco && resolvedTheme) {
@@ -20,7 +23,7 @@ const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   return (
     <div className="min-h-full flex flex-col">
       {ongoingIncident && <IncidentBanner />}
-
+      {showNoticeBanner && <NoticeBanner />}
       {children}
     </div>
   )

@@ -104,7 +104,7 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
       ? snap.snippets[snippetID]
       : null
 
-  const isSnippetOwner = profile?.id === snippet?.snippet?.owner?.id
+  const isSnippetOwner = profile?.id === snippet?.snippet.owner_id
 
   const { mutate: deleteContent, isLoading: isDeleting } = useContentDeleteMutation({
     onSuccess(data) {
