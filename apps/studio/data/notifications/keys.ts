@@ -1,6 +1,6 @@
 export const notificationKeys = {
   list: () => ['notifications'] as const,
-  listV2: (options?: { status?: string; priority?: string; limit: number }) =>
+  listV2: (options?: { status?: string; limit: number; filters: any }) =>
     ['notifications', options] as const,
   summary: () => ['notifications', 'summary'] as const,
 }
