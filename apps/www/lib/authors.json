@@ -399,6 +399,14 @@
     "author_image_url": "/images/philipp-steinrotter.jpg"
   },
   {
+    "author_id": "giancarlo",
+    "author": "Giancarlo Buomprisco",
+    "username": "giancarlo",
+    "position": "Guest Author",
+    "author_url": "https://twitter.com/gc_psk",
+    "author_image_url": "https://github.com/Gbuomprisco.png"
+  },
+  {
     "author_id": "filipe",
     "author": "Filipe Cabaço",
     "username": "filipe",
