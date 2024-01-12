@@ -1,14 +1,14 @@
 import { ExternalLink } from 'lucide-react'
 import { cn } from 'ui'
 
+import ChatLoadingAnimation from '@/app/[thread_id]/ChatLoadingAnimation'
 import { createThread } from '@/app/actions'
 import { CHAT_EXAMPLES } from '@/data/chat-examples'
 import { Message } from 'ai'
 import { useChat } from 'ai/react'
 import { Loader2 } from 'lucide-react'
-import React, { createRef, useEffect } from 'react'
+import React, { Dispatch, forwardRef, useEffect, useRef } from 'react'
 import { TextArea_Shadcn_ } from 'ui'
-import ChatLoadingAnimation from '@/app/[thread_id]/ChatLoadingAnimation'
 
 export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
   loading?: boolean
@@ -19,10 +19,80 @@ export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
   chatContext: 'new' | 'edit'
 }
 
+const ChatSuggestions = ({ setInput }: { setInput: Dispatch<React.SetStateAction<string>> }) => {
+  const suggestions = CHAT_EXAMPLES
+  return (
+    <div className="flex gap-3 mt-4">
+      {suggestions.map((suggestion, idx) => (
+        <button
+          key={idx}
+          type="button"
+          className={cn(
+            'text-xs',
+            'flex items-center gap-3 !pr-3',
+            'transition border rounded-full px-3 py-1.5',
+            'text-light',
+            'hover:border-stronger hover:text'
+          )}
+          onClick={(event) => {
+            setInput(suggestion.prompt)
+            event.preventDefault()
+          }}
+        >
+          {suggestion.label}
+          <ExternalLink size={12} />
+        </button>
+      ))}
+    </div>
+  )
+}
+
+const SubmitButton = forwardRef<HTMLButtonElement, { isLoading: boolean; input: string }>(
+  ({ isLoading, input }, ref) => {
+    return (
+      <div className="absolute right-1.5 top-1.5 flex gap-3 items-center">
+        {isLoading && (
+          <Loader2 size={22} className="animate-spin w-7 h-7 text-muted" strokeWidth={1} />
+        )}
+
+        <button
+          title="Send AI prompt"
+          ref={ref}
+          type="submit"
+          disabled={isLoading}
+          className={cn(
+            'transition-all',
+            'flex items-center justify-center w-7 h-7 border border-control rounded-full mr-0.5 p-1.5 background-alternative',
+            !input ? 'text-muted opacity-50' : 'text-default opacity-100',
+            isLoading ? 'hidden' : ''
+          )}
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              fillRule="evenodd"
+              clipRule="evenodd"
+              d="M13.5 3V2.25H15V3V10C15 10.5523 14.5522 11 14 11H3.56062L5.53029 12.9697L6.06062 13.5L4.99996 14.5607L4.46963 14.0303L1.39641 10.9571C1.00588 10.5666 1.00588 9.93342 1.39641 9.54289L4.46963 6.46967L4.99996 5.93934L6.06062 7L5.53029 7.53033L3.56062 9.5H13.5V3Z"
+              fill="currentColor"
+            ></path>
+          </svg>
+        </button>
+      </div>
+    )
+  }
+)
+
+SubmitButton.displayName = 'SubmitButton'
+
 const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
   ({ loading, disabled, message, threadId, chatContext, ...props }, ref) => {
-    const textAreaRef = createRef<HTMLTextAreaElement>()
-    const submitRef = createRef<HTMLButtonElement>()
+    const textAreaRef = useRef<HTMLTextAreaElement>(null)
+    const submitRef = useRef<HTMLButtonElement>(null)
 
     const { messages, input, setInput, handleInputChange, handleSubmit, isLoading } = useChat({
       onFinish: redirectOnFinish,
@@ -44,72 +114,6 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
         }
       }
     }, [input, textAreaRef])
-
-    const ChatSuggestions = () => {
-      const suggestions = CHAT_EXAMPLES
-      return (
-        <div className="flex gap-3 mt-4">
-          {suggestions.map((suggestion, idx) => (
-            <button
-              key={idx}
-              type="button"
-              className={cn(
-                'text-xs',
-                'flex items-center gap-3 !pr-3',
-                'transition border rounded-full px-3 py-1.5',
-                'text-light',
-                'hover:border-stronger hover:text'
-              )}
-              onClick={(event) => {
-                setInput(suggestion.prompt)
-                event.preventDefault()
-              }}
-            >
-              {suggestion.label}
-              <ExternalLink size={12} />
-            </button>
-          ))}
-        </div>
-      )
-    }
-
-    const SubmitButton = () => {
-      return (
-        <div className="absolute right-1.5 top-1.5 flex gap-3 items-center">
-          {isLoading && (
-            <Loader2 size={22} className="animate-spin w-7 h-7 text-muted" strokeWidth={1} />
-          )}
-
-          <button
-            title="Send AI prompt"
-            ref={submitRef}
-            type="submit"
-            disabled={isLoading}
-            className={cn(
-              'transition-all',
-              'flex items-center justify-center w-7 h-7 border border-control rounded-full mr-0.5 p-1.5 background-alternative',
-              !input ? 'text-muted opacity-50' : 'text-default opacity-100',
-              isLoading ? 'hidden' : ''
-            )}
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fillRule="evenodd"
-                clipRule="evenodd"
-                d="M13.5 3V2.25H15V3V10C15 10.5523 14.5522 11 14 11H3.56062L5.53029 12.9697L6.06062 13.5L4.99996 14.5607L4.46963 14.0303L1.39641 10.9571C1.00588 10.5666 1.00588 9.93342 1.39641 9.54289L4.46963 6.46967L4.99996 5.93934L6.06062 7L5.53029 7.53033L3.56062 9.5H13.5V3Z"
-                fill="currentColor"
-              ></path>
-            </svg>
-          </button>
-        </div>
-      )
-    }
 
     function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
       // Check if the pressed key is "Enter" (key code 13) without the "Shift" key
@@ -156,12 +160,12 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
             onKeyDown={(e) => handleKeyDown(e)}
           />
           {props.children}
-          <SubmitButton />
+          <SubmitButton input={input} isLoading={isLoading} ref={submitRef} />
           <p aria-live="polite" className="sr-only" role="status">
             {message}
           </p>
         </form>
-        {chatContext === 'new' && <ChatSuggestions />}
+        {chatContext === 'new' && <ChatSuggestions setInput={setInput} />}
       </>
     )
   }
