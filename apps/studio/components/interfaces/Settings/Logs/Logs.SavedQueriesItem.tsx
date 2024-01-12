@@ -8,8 +8,7 @@ import {
   DropdownMenuTrigger,
   IconChevronRight,
   IconEdit,
-  IconMoreHorizontal,
-  IconPenTool,
+  IconMoreVertical,
   IconPlay,
   IconTrash,
   Modal,
@@ -39,12 +38,18 @@ const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
   const { ref } = router.query
 
   const onConfirmDelete = async () => {
-    if (!ref || typeof ref !== 'string') {
-      console.error('Invalid project reference')
-      return
+    try {
+      if (!ref || typeof ref !== 'string') {
+        console.error('Invalid project reference')
+        return
+      }
+      await deleteContent({ projectRef: ref, id: item.id })
+      setShowConfirmModal(false)
+      toast.success('Query deleted')
+    } catch (error) {
+      toast.error(`Failed to delete saved query. Check the console for more details.`)
+      console.error('Failed to delete saved query', error)
     }
-    await deleteContent({ projectRef: ref, id: item.id })
-    toast.success('Query deleted')
   }
 
   const onConfirmUpdate = async ({
@@ -89,6 +94,15 @@ const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
           <span className="text-foreground-light">{timestampLocalFormatter(item.updated_at)}</span>
         </Table.td>
         <Table.td className="flex items-center gap-2 justify-end">
+          <Button
+            type="alternative"
+            iconRight={<IconPlay size={10} />}
+            onClick={() =>
+              router.push(`/project/${ref}/logs/explorer?q=${encodeURIComponent(item.content.sql)}`)
+            }
+          >
+            Run
+          </Button>
           <div>
             <DropdownMenu>
               <DropdownMenuTrigger>
@@ -96,7 +110,7 @@ const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
                   type="text"
                   title="Actions"
                   className="space-x-0 h-7 px-1.5"
-                  icon={<IconMoreHorizontal />}
+                  icon={<IconMoreVertical />}
                 >
                   <div className="sr-only">Actions</div>
                 </Button>
@@ -124,10 +138,7 @@ const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
               onSelectCancel={() => {
                 setShowConfirmModal(false)
               }}
-              onSelectConfirm={() => {
-                setShowConfirmModal(false)
-                onConfirmDelete()
-              }}
+              onSelectConfirm={onConfirmDelete}
             >
               <Modal.Content>
                 <p className="py-4 text-sm text-foreground-light">
@@ -146,15 +157,6 @@ const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
               }}
             />
           </div>
-          <Button
-            type="alternative"
-            iconRight={<IconPlay size={10} />}
-            onClick={() =>
-              router.push(`/project/${ref}/logs/explorer?q=${encodeURIComponent(item.content.sql)}`)
-            }
-          >
-            Run
-          </Button>
         </Table.td>
       </Table.tr>
       <Table.td
