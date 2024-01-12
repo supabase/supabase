@@ -11,7 +11,10 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { fetchAllTableRows, useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useCheckPermissions, useStore, useUrlState } from 'hooks'
-import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
+import {
+  useRoleImpersonationStateSnapshot,
+  useSubscribeToImpersonatedRole,
+} from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   Button,
@@ -323,7 +326,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
           impersonatedRole: roleImpersonationState.role,
         })
       : allRows.filter((x) => selectedRows.has(x.idx))
-    console.log('rows:', rows)
+
     const formattedRows = rows.map((row) => {
       const formattedRow = row
       Object.keys(row).map((column) => {
@@ -351,6 +354,12 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
   const allRows = data?.rows ?? []
   const totalRows = countData?.count ?? 0
   const { selectedRows, editable, allRowsSelected } = state
+
+  useSubscribeToImpersonatedRole(() => {
+    if (allRowsSelected || selectedRows.size > 0) {
+      deselectRows()
+    }
+  })
 
   return (
     <div className="flex items-center gap-6">
