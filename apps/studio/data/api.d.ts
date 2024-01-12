@@ -724,7 +724,7 @@ export interface paths {
     get: operations['VercelAccessTokenController_getAccessToken']
   }
   '/platform/vercel/projects': {
-    /** Gets the project with the given ID if provided, otherwise gets the list of projects */
+    /** Gets the list of Vercel projects */
     get: operations['VercelProjectsController_getVercelProjects']
   }
   '/platform/vercel/projects/{id}': {
@@ -1610,6 +1610,10 @@ export interface paths {
     /** Enables Database Webhooks on the project */
     post: operations['V1DatabaseWebhooksController_v1EnableDatabaseWebhooks']
   }
+  '/v1/projects/{ref}/database/backups': {
+    /** Lists all backups */
+    get: operations['V1BackupsController_getBackups']
+  }
   '/v1/projects/{ref}/database/backups/restore-pitr': {
     /** Restores a PITR backup for a database */
     post: operations['V1RestorePitrController_v1RestorePitr']
@@ -1649,6 +1653,10 @@ export interface paths {
      * @description Retrieves a function body for the specified slug and project.
      */
     get: operations['FunctionSlugController_getFunctionBody']
+  }
+  '/v1/projects/{ref}/storage/buckets': {
+    /** Lists all buckets */
+    get: operations['V1StorageBucketsController_getBuckets']
   }
   '/v1/organizations': {
     /**
@@ -4789,6 +4797,22 @@ export interface components {
       created_at?: string
       updated_at?: string
     }
+    V1Backup: {
+      /** @enum {string} */
+      status: 'COMPLETED' | 'FAILED' | 'PENDING' | 'REMOVED' | 'ARCHIVED'
+      is_physical_backup: boolean
+      inserted_at: string
+    }
+    V1BackupsResponse: {
+      region: string
+      walg_enabled: boolean
+      pitr_enabled: boolean
+      backups: components['schemas']['V1Backup'][]
+      physical_backup_data: {
+        earliest_physical_backup_date_unix?: number
+        latest_physical_backup_date_unix?: number
+      }
+    }
     V1RestorePitrBody: {
       recovery_time_target_unix: number
     }
@@ -4805,6 +4829,14 @@ export interface components {
       import_map?: boolean
       entrypoint_path?: string
       import_map_path?: string
+    }
+    V1StorageBucketResponse: {
+      id: string
+      name: string
+      owner: string
+      created_at: string
+      updated_at: string
+      public: boolean
     }
     OrganizationResponseV1: {
       id: string
@@ -5040,6 +5072,8 @@ export interface operations {
       query: {
         status: 'new' | 'seen' | 'archived'
         priority: 'Critical' | 'Warning' | 'Info'
+        org_slug: string[]
+        project_ref: string[]
         offset: number
         limit: number
       }
@@ -10055,7 +10089,7 @@ export interface operations {
       }
     }
   }
-  /** Gets the project with the given ID if provided, otherwise gets the list of projects */
+  /** Gets the list of Vercel projects */
   VercelProjectsController_getVercelProjects: {
     parameters: {
       query: {
@@ -10069,10 +10103,10 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': Record<string, never>
+          'application/json': Record<string, never>[]
         }
       }
-      /** @description Failed to get project(s) */
+      /** @description Failed to get projects */
       500: {
         content: never
       }
@@ -12334,6 +12368,26 @@ export interface operations {
       }
     }
   }
+  /** Lists all backups */
+  V1BackupsController_getBackups: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['V1BackupsResponse']
+        }
+      }
+      /** @description Failed to get backups */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Restores a PITR backup for a database */
   V1RestorePitrController_v1RestorePitr: {
     parameters: {
@@ -12470,6 +12524,29 @@ export interface operations {
         content: never
       }
       /** @description Failed to retrieve function body with given slug */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Lists all buckets */
+  V1StorageBucketsController_getBuckets: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['V1StorageBucketResponse'][]
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to get list of buckets */
       500: {
         content: never
       }
