@@ -4,13 +4,14 @@ import clsx from 'clsx'
 import saveAs from 'file-saver'
 import Papa from 'papaparse'
 import { ReactNode, useState } from 'react'
+import toast from 'react-hot-toast'
 
 import { useDispatch, useTrackedState } from 'components/grid/store'
 import { Filter, Sort, SupaTable } from 'components/grid/types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { fetchAllTableRows, useTableRowsQuery } from 'data/table-rows/table-rows-query'
-import { useCheckPermissions, useStore, useUrlState } from 'hooks'
+import { useCheckPermissions, useUrlState } from 'hooks'
 import {
   useRoleImpersonationStateSnapshot,
   useSubscribeToImpersonatedRole,
@@ -236,7 +237,6 @@ type RowHeaderProps = {
   filters: Filter[]
 }
 const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
-  const { ui } = useStore()
   const state = useTrackedState()
   const dispatch = useDispatch()
 
@@ -301,18 +301,14 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
     setIsExporting(true)
 
     if (allRowsSelected && totalRows > MAX_EXPORT_ROW_COUNT) {
-      ui.setNotification({
-        category: 'error',
-        message: `Sorry! We're unable to support exporting of CSV for row counts larger than ${MAX_EXPORT_ROW_COUNT.toLocaleString()} at the moment.`,
-      })
+      toast.error(
+        `Sorry! We're unable to support exporting of CSV for row counts larger than ${MAX_EXPORT_ROW_COUNT.toLocaleString()} at the moment.`
+      )
       return setIsExporting(false)
     }
 
     if (!project) {
-      ui.setNotification({
-        category: 'error',
-        message: 'Project is required',
-      })
+      toast.error('Project is required')
       return setIsExporting(false)
     }
 
