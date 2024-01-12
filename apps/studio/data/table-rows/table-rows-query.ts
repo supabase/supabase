@@ -21,8 +21,6 @@ type GetTableRowsArgs = {
   impersonatedRole?: ImpersonationRole
 }
 
-// [Joshen] From components/grid/services/row/SqlRowService.ts, we should remove the logic from SqlRowService eventually
-// (currently used in csv export)
 export const fetchAllTableRows = async ({
   projectRef,
   connectionString,
