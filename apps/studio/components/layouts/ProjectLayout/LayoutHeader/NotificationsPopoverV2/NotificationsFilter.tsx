@@ -21,22 +21,16 @@ export const NotificationsFilter = ({ activeTab }: { activeTab: 'inbox' | 'archi
   const { data: organizations } = useOrganizationsQuery()
   const { data: projects } = useProjectsQuery()
 
-  const numFiltersApplied = [
-    ...snap.filterStatuses,
-    ...snap.filterPriorities,
-    ...snap.filterOrganizations,
-    ...snap.filterProjects,
-  ].length
-
   return (
     <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>
         <Button
-          type={numFiltersApplied > 0 ? 'default' : 'text'}
+          type={snap.numFiltersApplied > 0 ? 'default' : 'text'}
           icon={<Settings2Icon size={14} />}
           className="px-1"
         >
-          {numFiltersApplied > 0 && `${numFiltersApplied} filters applied`}
+          {snap.numFiltersApplied > 0 &&
+            `${snap.numFiltersApplied} filter${snap.numFiltersApplied > 1 ? 's' : ''} applied`}
         </Button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="p-0 w-64" side="bottom" align="end">

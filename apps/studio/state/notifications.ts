@@ -5,6 +5,14 @@ export const notificationsState = proxy({
   filterPriorities: [] as string[],
   filterOrganizations: [] as string[],
   filterProjects: [] as string[],
+  get numFiltersApplied() {
+    return [
+      ...notificationsState.filterStatuses,
+      ...notificationsState.filterPriorities,
+      ...notificationsState.filterOrganizations,
+      ...notificationsState.filterProjects,
+    ].length
+  },
   setFilters: (value: string, type: 'status' | 'priority' | 'organizations' | 'projects') => {
     switch (type) {
       case 'status':

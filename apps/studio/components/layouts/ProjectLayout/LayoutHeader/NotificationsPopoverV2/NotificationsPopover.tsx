@@ -20,15 +20,10 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { useNotificationsStateSnapshot } from 'state/notifications'
 import NotificationRow from './NotificationRow'
 import { NotificationsFilter } from './NotificationsFilter'
-import {
-  CriticalIcon,
-  NOTIFICATION_FILTER_TYPE,
-  WarningIcon,
-} from './NotificationsPopover.constants'
+import { CriticalIcon, WarningIcon } from './NotificationsPopover.constants'
 
 const NotificationsPopverV2 = () => {
   const [open, setOpen] = useState(false)
-  const [selectedFilter, setSelectedFilter] = useState<NOTIFICATION_FILTER_TYPE>('all')
   const [activeTab, setActiveTab] = useState<'inbox' | 'archived'>('inbox')
 
   const snap = useNotificationsStateSnapshot()
@@ -179,7 +174,7 @@ const NotificationsPopverV2 = () => {
           {isSuccess && (
             <div className="flex flex-1 h-[400px]">
               {notifications.length > 0 &&
-              !(activeTab === 'archived' && selectedFilter === 'unread') ? (
+              !(activeTab === 'archived' && snap.filterStatuses.includes('unread')) ? (
                 <InfiniteList
                   items={notifications}
                   ItemComponent={NotificationRow}
@@ -213,16 +208,22 @@ const NotificationsPopverV2 = () => {
                 <div className="flex flex-col gap-y-4 items-center flex-grow justify-center">
                   <IconInbox size={32} className="text-foreground-light" />
                   <div className="flex flex-col gap-y-1">
-                    <p className="text-foreground-light text-sm w-64 text-center">
+                    <p className="text-foreground-light text-sm mx-auto text-center">
                       {activeTab === 'archived'
-                        ? `No archived ${
-                            ['warning', 'critical'].includes(selectedFilter)
-                              ? `${selectedFilter} `
+                        ? `No archived notifications${
+                            snap.numFiltersApplied > 0
+                              ? ` based on the ${snap.numFiltersApplied} filter${
+                                  snap.numFiltersApplied > 1 ? 's' : ''
+                                } applied`
                               : ''
-                          }notifications`
+                          }`
+                        : snap.numFiltersApplied > 0
+                        ? `No notifications based on the ${snap.numFiltersApplied} filter${
+                            snap.numFiltersApplied > 1 ? 's' : ''
+                          } applied`
                         : 'All caught up'}
                     </p>
-                    <p className="text-foreground-lighter text-xs w-64 text-center">
+                    <p className="text-foreground-lighter text-xs w-60 mx-auto text-center">
                       {activeTab === 'archived'
                         ? 'Notifications that you have previously archived will be shown here'
                         : 'You will be notified here for any notices on your organizations and projects'}
