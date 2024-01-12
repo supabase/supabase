@@ -1,15 +1,7 @@
 import clsx from 'clsx'
-import { Settings2Icon, SlidersHorizontal } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
 import {
   Button,
-  CommandGroup_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Command_Shadcn_,
-  IconAlertCircle,
-  IconAlertTriangle,
-  IconCheck,
   IconInbox,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -21,23 +13,25 @@ import AlertError from 'components/ui/AlertError'
 import InfiniteList from 'components/ui/InfiniteList'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useNotificationsV2Query } from 'data/notifications/notifications-v2-query'
+import { useNotificationsSummaryQuery } from 'data/notifications/notifications-v2-summary-query'
 import { useNotificationsV2UpdateMutation } from 'data/notifications/notifications-v2-update-mutation'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
+import { useNotificationsStateSnapshot } from 'state/notifications'
 import NotificationRow from './NotificationRow'
+import { NotificationsFilter } from './NotificationsFilter'
 import {
   CriticalIcon,
-  NOTIFICATION_FILTERS,
   NOTIFICATION_FILTER_TYPE,
   WarningIcon,
 } from './NotificationsPopover.constants'
-import { useNotificationsSummaryQuery } from 'data/notifications/notifications-v2-summary-query'
 
 const NotificationsPopverV2 = () => {
   const [open, setOpen] = useState(false)
-  const [openFilters, setOpenFilters] = useState(false)
   const [selectedFilter, setSelectedFilter] = useState<NOTIFICATION_FILTER_TYPE>('all')
   const [activeTab, setActiveTab] = useState<'inbox' | 'archived'>('inbox')
+
+  const snap = useNotificationsStateSnapshot()
 
   // Storing in ref as no re-rendering required
   const markedRead = useRef<string[]>([])
@@ -59,26 +53,25 @@ const NotificationsPopverV2 = () => {
     isFetchingNextPage,
     fetchNextPage,
   } = useNotificationsV2Query({
-    status: activeTab === 'archived' ? 'archived' : selectedFilter === 'unread' ? 'new' : undefined,
-    priority:
-      selectedFilter === 'critical'
-        ? 'Critical'
-        : selectedFilter === 'warning'
-        ? 'Warning'
+    status:
+      activeTab === 'archived'
+        ? 'archived'
+        : snap.filterStatuses.includes('unread')
+        ? 'new'
         : undefined,
+    filters: {
+      priority: snap.filterPriorities,
+      organizations: snap.filterOrganizations,
+      projects: snap.filterProjects,
+    },
   })
-  const { data: summary } = useNotificationsSummaryQuery()
+  const { data: summary, isSuccess: isSuccessSummary } = useNotificationsSummaryQuery()
   const { mutate: updateNotifications } = useNotificationsV2UpdateMutation()
 
   const notifications = useMemo(() => data?.pages.flatMap((page) => page) ?? [], [data?.pages])
   const hasNewNotifications = summary?.unread_count ?? 0 > 0
   const hasWarning = summary?.has_warning
   const hasCritical = summary?.has_critical
-
-  const onSelectFilter = (value: 'all' | 'unread' | 'warning' | 'critical') => {
-    setSelectedFilter(value)
-    setOpenFilters(false)
-  }
 
   const markNotificationsRead = () => {
     if (markedRead.current.length > 0) {
@@ -145,50 +138,31 @@ const NotificationsPopverV2 = () => {
               activeId={activeTab}
               onChange={(tab: 'inbox' | 'archived') => {
                 setActiveTab(tab)
+                if (tab === 'archived' && snap.filterStatuses.includes('unread')) {
+                  snap.setFilters('unread', 'status')
+                }
               }}
             >
               <Tabs.Panel
                 id="inbox"
                 label="Inbox"
                 iconRight={
-                  <div
-                    className={clsx([
-                      'flex items-center justify-center text-xs rounded-full bg-surface-300 h-4',
-                      (summary?.unread_count ?? 0) > 9 ? 'px-0.5 w-auto' : 'w-4',
-                    ])}
-                  >
-                    {summary?.unread_count}
-                  </div>
+                  isSuccessSummary ? (
+                    <div
+                      className={clsx([
+                        'flex items-center justify-center text-xs rounded-full bg-surface-300 h-4',
+                        (summary?.unread_count ?? 0) > 9 ? 'px-0.5 w-auto' : 'w-4',
+                      ])}
+                    >
+                      {summary?.unread_count}
+                    </div>
+                  ) : null
                 }
               />
               <Tabs.Panel id="archived" label="Archived" />
             </Tabs>
-            <Popover_Shadcn_ modal={false} open={openFilters} onOpenChange={setOpenFilters}>
-              <PopoverTrigger_Shadcn_ asChild>
-                <Button type="text" icon={<Settings2Icon size={14} />}>
-                  View {selectedFilter}
-                </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ className="p-0 w-52" side="bottom" align="end">
-                <Command_Shadcn_>
-                  <CommandList_Shadcn_>
-                    <CommandGroup_Shadcn_>
-                      {NOTIFICATION_FILTERS.map((filter) => (
-                        <CommandItem_Shadcn_
-                          key={filter.id}
-                          className="cursor-pointer flex items-center justify-between"
-                          onSelect={() => onSelectFilter(filter.id)}
-                          onClick={() => onSelectFilter(filter.id)}
-                        >
-                          <p>{filter.label}</p>
-                          {selectedFilter === filter.id && <IconCheck />}
-                        </CommandItem_Shadcn_>
-                      ))}
-                    </CommandGroup_Shadcn_>
-                  </CommandList_Shadcn_>
-                </Command_Shadcn_>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+
+            <NotificationsFilter activeTab={activeTab} />
           </div>
         </div>
         <div className="border-t">
