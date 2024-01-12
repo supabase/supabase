@@ -7,7 +7,6 @@ import { Button, IconBookOpen, cn } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import HeroFrameworks from './HeroFrameworks'
 import styles from './hero.module.css'
-import AnnouncementBadge from '../Announcement/Badge'
 
 const Hero = () => {
   const router = useRouter()
@@ -29,13 +28,13 @@ const Hero = () => {
                 )}
               >
                 <div className="flex flex-col items-center">
-                  <div className="z-40 w-full flex justify-center mb-8 lg:mb-8">
+                  {/* <div className="z-40 w-full flex justify-center mb-8 lg:mb-8">
                     <AnnouncementBadge
-                      url="/launch-week"
-                      badge="Launch Week X"
-                      announcement="See everything we shipped"
+                      url=""
+                      badge=""
+                      announcement=""
                     />
-                  </div>
+                  </div> */}
                   <h1 className="text-foreground text-4xl sm:text-5xl sm:leading-none lg:text-7xl">
                     <span className="block text-[#F4FFFA00] bg-clip-text bg-gradient-to-b from-foreground to-foreground-light">
                       Build in a weekend
