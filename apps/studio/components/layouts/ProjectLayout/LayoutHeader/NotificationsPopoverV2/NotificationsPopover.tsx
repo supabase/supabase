@@ -22,7 +22,7 @@ import NotificationRow from './NotificationRow'
 import { NotificationsFilter } from './NotificationsFilter'
 import { CriticalIcon, WarningIcon } from './NotificationsPopover.constants'
 
-const NotificationsPopverV2 = () => {
+const NotificationsPopoverV2 = () => {
   const [open, setOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<'inbox' | 'archived'>('inbox')
 
@@ -239,4 +239,4 @@ const NotificationsPopverV2 = () => {
   )
 }
 
-export default NotificationsPopverV2
+export default NotificationsPopoverV2
