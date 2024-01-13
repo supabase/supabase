@@ -43,7 +43,12 @@ const JsonEdit = ({
 
   const validateJSON = async (resolve: () => void) => {
     try {
-      const minifiedJSON = minifyJSON(jsonStr)
+      /**
+       * Remove trailing commas: Delete any comma immediately preceding the closing brace '}' or
+       * bracket ']' in the newValue string using a regular expression.
+       */
+      const newJsonStr = jsonStr.replace(/,\s*(?=[\}\]])/g, '')
+      const minifiedJSON = minifyJSON(newJsonStr)
       if (onSaveJSON) onSaveJSON(minifiedJSON)
     } catch (error: any) {
       const message = error.message

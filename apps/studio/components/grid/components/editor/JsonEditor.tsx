@@ -36,8 +36,12 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   }, [])
 
   const saveChanges = useCallback((newValue: string | null) => {
-    if (newValue && newValue.slice(-3, -2) === ',') {
-      newValue = newValue.replace(/,(?=\s*?[\}\]])/g, '')
+    if (newValue) {
+      /**
+       * Remove trailing commas: Delete any comma immediately preceding the closing brace '}' or
+       * bracket ']' in the newValue string using a regular expression.
+       */
+      newValue = newValue.replace(/,\s*(?=[\}\]])/g, '')
     }
     if (newValue !== value) commitChange(newValue)
   }, [])
