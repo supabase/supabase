@@ -36,6 +36,8 @@ export interface EntityListItemProps {
   isLocked: boolean
 }
 
+const svgLoader = <span className="block w-4 h-4 bg-[#133929] rounded-sm" />
+
 const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListItemProps) => {
   const { ui } = useStore()
   const { project } = useProjectContext()
@@ -124,40 +126,47 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
         className="flex items-center py-1 px-3 w-full space-x-3 max-w-[90%]"
       >
         <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
-          <Tooltip.Trigger className="flex items-center">
-            {entity.type === ENTITY_TYPE.TABLE ? (
-              <SVG
-                className="table-icon"
-                src={`${BASE_PATH}/img/icons/table-icon.svg`}
-                style={{ width: `16px`, height: `16px`, strokeWidth: '1px' }}
-                preProcessor={(code: any) =>
-                  code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
-                }
-              />
-            ) : entity.type === ENTITY_TYPE.VIEW ? (
-              <SVG
-                className="view-icon"
-                src={`${BASE_PATH}/img/icons/view-icon.svg`}
-                style={{ width: `16px`, height: `16px`, strokeWidth: '1px' }}
-                preProcessor={(code: any) =>
-                  code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
-                }
-              />
-            ) : (
-              <div
-                className={clsx(
-                  'flex items-center justify-center text-xs h-4 w-4 rounded-[2px] font-bold',
-                  entity.type === ENTITY_TYPE.FOREIGN_TABLE && 'text-yellow-900 bg-yellow-500',
-                  entity.type === ENTITY_TYPE.MATERIALIZED_VIEW && 'text-purple-1000 bg-purple-500',
-                  entity.type === ENTITY_TYPE.PARTITIONED_TABLE &&
-                    'text-foreground-light bg-border-stronger'
-                )}
-              >
-                {Object.entries(ENTITY_TYPE)
-                  .find(([, value]) => value === entity.type)?.[0]?.[0]
-                  ?.toUpperCase()}
-              </div>
-            )}
+          <Tooltip.Trigger className="flex items-center" asChild>
+            <span>
+              {entity.type === ENTITY_TYPE.TABLE ? (
+                <SVG
+                  className="table-icon"
+                  src={`${BASE_PATH}/img/icons/table-icon.svg`}
+                  style={{ width: `16px`, height: `16px`, strokeWidth: '1px' }}
+                  preProcessor={(code: any) =>
+                    code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
+                  }
+                  loader={svgLoader}
+                  cacheRequests={true}
+                />
+              ) : entity.type === ENTITY_TYPE.VIEW ? (
+                <SVG
+                  className="view-icon"
+                  src={`${BASE_PATH}/img/icons/view-icon.svg`}
+                  style={{ width: `16px`, height: `16px`, strokeWidth: '1px' }}
+                  preProcessor={(code: any) =>
+                    code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
+                  }
+                  loader={svgLoader}
+                  cacheRequests={true}
+                />
+              ) : (
+                <div
+                  className={clsx(
+                    'flex items-center justify-center text-xs h-4 w-4 rounded-[2px] font-bold',
+                    entity.type === ENTITY_TYPE.FOREIGN_TABLE && 'text-yellow-900 bg-yellow-500',
+                    entity.type === ENTITY_TYPE.MATERIALIZED_VIEW &&
+                      'text-purple-1000 bg-purple-500',
+                    entity.type === ENTITY_TYPE.PARTITIONED_TABLE &&
+                      'text-foreground-light bg-border-stronger'
+                  )}
+                >
+                  {Object.entries(ENTITY_TYPE)
+                    .find(([, value]) => value === entity.type)?.[0]?.[0]
+                    ?.toUpperCase()}
+                </div>
+              )}
+            </span>
           </Tooltip.Trigger>
           <Tooltip.Portal>
             <Tooltip.Content side="bottom">
