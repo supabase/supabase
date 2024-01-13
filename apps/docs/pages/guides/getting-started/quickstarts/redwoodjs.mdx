@@ -29,12 +29,9 @@ export const meta = {
 
   <StepHikeCompact.Step step={2}>
     <StepHikeCompact.Details title="Gather Database Connection Strings">
-      After your project is ready, gather the following information about your [database connections](https://supabase.com/dashboard/project/_/settings/database):
+      After your project is ready, gather `Connection Pooling / Connection String` from your [database connections section](https://supabase.com/dashboard/project/_/settings/database) under `Database > Connection Pooling > Connection string`.
 
-      * Connection String (port 5432)
-      * Connection Pooling / Connection String (port 6543)
-
-    You will need these to setup environment variables in Step 5.
+      You will need these to setup environment variables in Step 5.
 
     <Admonition type="tip">
 
@@ -86,26 +83,19 @@ export const meta = {
 
   <StepHikeCompact.Step step={5}>
     <StepHikeCompact.Details title="Configure Environment Variables">
-      In your `.env` file, add the following environment variables for your database connection:
+      In your `.env` file, add the `DATABASE_URL` obtained from step 2 for your database connection. You also need to make the following modifications:
 
-      * The `DIRECT_URL` should use the `Connection String` from your Supabase project. Hint: the port is `5432`.
+      - Append `?pgbouncer=true` to the end of the connection string. This tells Prisma to not use named prepared statements.
+      - Append `&connection_limit=1`. This limits the amount of connections made from a serverless function.
+      - Change the port number from 6543 to 5432.
+      - Replace `[YOUR-PASSWORD]`, `[YOUR-PROJECT-REF]` and `[YOUR-PROJECT-REGION]` with your own.
 
-      * The `DATABASE_URL` should use the `Connection Pooling / Connection String` from your Supabase project. Hint: the port is `6543`.
-
-      <Admonition type="note">
-
-        Replace `[YOUR-PASSWORD]` and `[YOUR-PROJECT-REF]` with the password you used when creating your Supabase project and the project reference from the URL in your browser.
-
-      </Admonition>
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
       ```bash .env
-      # PostgreSQL connection string used for migrations
-      DIRECT_URL="postgres://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres"
-
       # PostgreSQL pooler connection string with Supavisor config — used by Prisma Client
-      DATABASE_URL="postgres://postgres.[YOUR-PROJECT-REF]:[YOUR-PASSWORD]@aws-0-[YOUR-PROJECT-REGION].pooler.supabase.com:6543/postgres"
+      DATABASE_URL="postgres://postgres.[YOUR-PROJECT-REF]:[YOUR-PASSWORD]@aws-0-[YOUR-PROJECT-REGION].pooler.supabase.com:5432/postgres?pgbouncer=true&connection_limit=1"
       ```
     </StepHikeCompact.Code>
 
@@ -123,7 +113,6 @@ export const meta = {
       datasource db {
         provider  = "postgresql"
         url       = env("DATABASE_URL")
-        directUrl = env("DIRECT_URL")
       }
       ```
     </StepHikeCompact.Code>
