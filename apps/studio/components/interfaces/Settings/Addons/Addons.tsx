@@ -368,9 +368,7 @@ const Addons = () => {
               <ScaffoldSectionContent>
                 {hasHipaaAddon && (
                   <Alert_Shadcn_>
-                    <AlertTitle_Shadcn_>
-                      PITR cannot be changed with HIPAA
-                    </AlertTitle_Shadcn_>
+                    <AlertTitle_Shadcn_>PITR cannot be changed with HIPAA</AlertTitle_Shadcn_>
                     <AlertDescription_Shadcn_>
                       All projects should have PITR enabled by default and cannot be changed with
                       HIPAA enabled. Contact support for further assistance.
