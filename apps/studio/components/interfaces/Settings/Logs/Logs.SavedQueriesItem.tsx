@@ -1,5 +1,11 @@
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+import toast from 'react-hot-toast'
+
+import Table from 'components/to-be-cleaned/Table'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
+import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 import {
   Button,
   DropdownMenu,
@@ -13,14 +19,9 @@ import {
   IconTrash,
   Modal,
 } from 'ui'
-import Table from 'components/to-be-cleaned/Table'
 import SqlSnippetCode from './Logs.SqlSnippetCode'
-import { timestampLocalFormatter } from './LogsFormatters'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
-import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
-import toast from 'react-hot-toast'
 import { UpdateSavedQueryModal } from './Logs.UpdateSavedQueryModal'
-import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
+import { timestampLocalFormatter } from './LogsFormatters'
 
 interface SavedQueriesItemProps {
   item: any
@@ -32,7 +33,7 @@ const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
   const [showUpdateModal, setShowUpdateModal] = useState<boolean>(false)
 
   const { mutateAsync: deleteContent } = useContentDeleteMutation()
-  const { mutateAsync: updateContent } = useContentUpsertMutation({})
+  const { mutateAsync: updateContent } = useContentUpsertMutation()
 
   const router = useRouter()
   const { ref } = router.query
