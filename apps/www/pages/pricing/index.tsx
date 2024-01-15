@@ -1,41 +1,39 @@
 import React, { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-import Image from 'next/image'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
-import { useTheme } from 'next-themes'
 import { Accordion, Button, IconArrowUpRight, IconCheck, Select, cn } from 'ui'
+import { ArrowDownIcon, InformationCircleIcon } from '@heroicons/react/outline'
 
-import AnnouncementBadge from '~/components/Announcement/Badge'
 import CTABanner from '~/components/CTABanner'
 import ComputePricingModal from '~/components/Pricing/ComputePricingModal'
 import DefaultLayout from '~/components/Layouts/Default'
 import PricingAddons from '~/components/Pricing/PricingAddons'
 import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/Pricing/PricingTableRow'
 
-import dynamic from 'next/dynamic'
 import Solutions from '~/data/Solutions'
 import pricingFaq from '~/data/PricingFAQ.json'
 import { pricing } from 'shared-data/pricing'
 import { plans } from 'shared-data/plans'
-import { ArrowDownIcon, InformationCircleIcon } from '@heroicons/react/outline'
 
 const CostControlAnimation = dynamic(() => import('~/components/Pricing/CostControlAnimation'))
 
 export default function IndexPage() {
   const router = useRouter()
-  const { basePath, asPath } = useRouter()
-  const { resolvedTheme } = useTheme()
+  const { asPath } = useRouter()
   const [showComputeModal, setShowComputeModal] = useState(false)
   const [activeMobilePlan, setActiveMobilePlan] = useState('Free')
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  })
 
   const meta_title = 'Pricing & fees | Supabase'
   const meta_description =
     'Explore Supabase fees and pricing information. Find our competitive pricing plans, with no hidden pricing. We have a generous free plan for those getting started, and Pay As You Go for those scaling up.'
-
-  const plansExceptEnterprise = plans.filter((it) => it.name !== 'Enterprise')
-  const planEnterprise = plans.find((it) => it.name === 'Enterprise')!
 
   // Ability to scroll into pricing sections like storage
   useEffect(() => {
@@ -58,8 +56,9 @@ export default function IndexPage() {
     }
   }, [asPath])
 
+  if (!mounted) return null
+
   const MobileHeader = ({
-    // title,
     description,
     priceDescription,
     price,
@@ -116,11 +115,14 @@ export default function IndexPage() {
       />
 
       <div>
-        <div className="relative z-10 py-16 lg:py-20">
+        <div className="relative z-10 py-8 xl:py-16 2xl:py-20">
           <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
             <div className="mx-auto max-w-3xl space-y-2 lg:max-w-none">
-              <h1 className="text-brand text-base">Pricing</h1>
-              <h2 className="h1">Predictable pricing, designed to scale</h2>
+              <p className="text-brand text-base">Pricing</p>
+              <h1 className="h1">
+                Predictable pricing,
+                <br className="block lg:hidden" /> designed to scale
+              </h1>
               <p className="p text-lg">
                 Start building for free, collaborate with a team, then scale to millions of users.
               </p>
@@ -129,143 +131,132 @@ export default function IndexPage() {
         </div>
 
         <div className="mx-auto lg:container lg:px-16 xl:px-12 flex flex-col">
-          <div className="relative z-10 mx-auto -mt-8 w-full px-4 sm:px-6 lg:px-8">
-            <div className="mx-auto max-w-md grid lg:max-w-none lg:grid-cols-2 xl:grid-cols-4 gap-4 xl:gap-2 2xl:gap-5">
+          <div className="relative z-10 mx-auto w-full px-4 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-md grid lg:max-w-none lg:grid-cols-2 xl:grid-cols-4 gap-4 xl:gap-0">
               {plans.map((plan) => (
                 <div
                   key={`row-${plan.name}`}
-                  className={[
-                    plan.name === 'Pro' ? 'bg-brand border px-0.5 lg:-mt-8 rounded-[6px]' : '',
-                  ].join(' ')}
-                >
-                  {plan.name === 'Pro' && (
-                    <p className="text-[13px] leading-4 text-center py-2 text-background">
-                      Most Popular
-                    </p>
+                  className={cn(
+                    'flex flex-col border border-r-0 last:border-r bg-surface-100 rounded-xl xl:rounded-none first:rounded-l-xl last:rounded-r-xl',
+                    plan.name === 'Pro' ? 'border-brand border-2 !rounded-xl xl:-my-8' : ''
                   )}
+                >
                   <div
-                    key={plan.name}
                     className={cn(
-                      'flex flex-col overflow-hidden',
-                      plan.name === 'Pro' ? '' : 'border h-full rounded-[4px]'
+                      'px-8 xl:px-4 2xl:px-8 pt-6',
+                      plan.name === 'Pro' ? 'rounded-tr-[9px] rounded-tl-[9px]' : ''
                     )}
                   >
-                    <div
-                      className={`bg-surface-100 px-8 xl:px-4 2xl:px-8 pt-6 rounded-tr-[4px] rounded-tl-[4px] ${
-                        plan.name === 'Pro' ? 'rounded-tr-[4px] rounded-tl-[4px]' : ''
-                      }`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-2 pb-2">
-                          <h3 className="text-2xl font-normal uppercase flex items-center gap-4 font-mono">
-                            {plan.name}
-                          </h3>
-                          {plan.nameBadge && (
-                            <span className="bg-brand-500 text-brand-600 rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4 inline-flex gap-1 items-center">
-                              {plan.nameBadge}
-                            </span>
-                          )}
-                        </div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 pb-2">
+                        <h3 className="text-2xl font-normal uppercase flex items-center gap-4 font-mono">
+                          {plan.name}
+                        </h3>
+                        {plan.nameBadge && (
+                          <span className="bg-brand-500 text-brand-600 rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4 inline-flex gap-1 items-center">
+                            {plan.nameBadge}
+                          </span>
+                        )}
                       </div>
-                      <p className="text-foreground-light mb-4 text-sm 2xl:pr-4">
-                        {plan.description}
-                      </p>
-                      <Button
-                        block
-                        size="small"
-                        type={plan.name === 'Enterprise' ? 'default' : 'alternative'}
-                        asChild
-                      >
-                        <a href={plan.href}>{plan.cta}</a>
-                      </Button>
+                    </div>
+                    <p
+                      className={cn(
+                        'text-foreground-light mb-4 text-sm 2xl:pr-4',
+                        plan.name === 'Pro' && 'xl:mb-12'
+                      )}
+                    >
+                      {plan.description}
+                    </p>
+                    <Button
+                      block
+                      size="small"
+                      type={plan.name === 'Enterprise' ? 'default' : 'alternative'}
+                      asChild
+                    >
+                      <a href={plan.href}>{plan.cta}</a>
+                    </Button>
 
-                      <div
-                        className={`
-                        text-foreground flex items-baseline
-                        text-5xl
-                        font-normal
-                        lg:text-4xl
-                        xl:text-4xl
-                        border-b
-                        border-default
-                        min-h-[155px] ${plan.priceLabel ? 'pt-6' : 'pt-10'}`}
-                      >
-                        <div className="flex flex-col gap-1">
-                          <div className="flex items-end gap-2">
-                            <div>
-                              {plan.priceLabel && (
-                                <p className="text-foreground-lighter ml-1 text-[13px] leading-4 font-normal">
-                                  {plan.priceLabel}
-                                </p>
-                              )}
+                    <div
+                      className={cn(
+                        'text-foreground flex items-baseline text-5xl font-normal lg:text-4xl xl:text-4xl border-b border-default min-h-[155px]',
+                        plan.priceLabel ? 'pt-6' : 'pt-10'
+                      )}
+                    >
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-end gap-2">
+                          <div>
+                            {plan.priceLabel && (
+                              <p className="text-foreground-lighter ml-1 text-[13px] leading-4 font-normal">
+                                {plan.priceLabel}
+                              </p>
+                            )}
 
-                              <div className="flex items-end">
-                                <p
-                                  className={`mt-2 pb-1 font-mono ${
-                                    plan.name !== 'Enterprise' ? 'text-4xl' : 'text-4xl'
-                                  }`}
-                                >
-                                  {plan.name !== 'Enterprise' ? '$' : ''}
-                                  {plan.priceMonthly}
-                                </p>
-                                <p className="text-foreground-lighter mb-1.5 ml-1 text-[13px] leading-4">
-                                  {plan.costUnit}
-                                </p>
-                              </div>
-
-                              {plan.warning && (
-                                <div className="-mt-2">
-                                  <span
-                                    data-tip={plan.warningTooltip}
-                                    className={cn(
-                                      'bg-brand-500 text-brand-600 rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4 inline-flex gap-1 items-center',
-                                      plan.warningTooltip && 'hover:cursor-pointer'
-                                    )}
-                                  >
-                                    {plan.warningTooltip && (
-                                      <InformationCircleIcon className="w-3 h-3" />
-                                    )}
-                                    {plan.warning}
-                                  </span>
-                                </div>
-                              )}
+                            <div className="flex items-end">
+                              <p
+                                className={`mt-2 pb-1 font-mono ${
+                                  plan.name !== 'Enterprise' ? 'text-4xl' : 'text-4xl'
+                                }`}
+                              >
+                                {plan.name !== 'Enterprise' ? '$' : ''}
+                                {plan.priceMonthly}
+                              </p>
+                              <p className="text-foreground-lighter mb-1.5 ml-1 text-[13px] leading-4">
+                                {plan.costUnit}
+                              </p>
                             </div>
+
+                            {plan.warning && (
+                              <div className="-mt-2">
+                                <span
+                                  data-tip={plan.warningTooltip}
+                                  className={cn(
+                                    'bg-brand-500 text-brand-600 rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4 inline-flex gap-1 items-center',
+                                    plan.warningTooltip && 'hover:cursor-pointer'
+                                  )}
+                                >
+                                  {plan.warningTooltip && (
+                                    <InformationCircleIcon className="w-3 h-3" />
+                                  )}
+                                  {plan.warning}
+                                </span>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div
-                      className={cn(
-                        'border-default bg-surface-100 flex h-full rounded-bl-[4px] rounded-br-[4px] flex-1 flex-col px-8 xl:px-4 2xl:px-8 py-6',
-                        plan.name === 'Pro' && 'mb-0.5 rounded-bl-[4px] rounded-br-[4px]'
-                      )}
-                    >
-                      {plan.preface && (
-                        <p className="text-foreground-lighter text-[13px] mt-2 mb-4">
-                          {plan.preface}
-                        </p>
-                      )}
-                      <ul role="list" className="text-[13px] text-foreground-lighter">
-                        {plan.features.map((feature) => (
-                          <li key={feature} className="flex items-center py-2 first:mt-0">
-                            <IconCheck
-                              className="text-brand h-4 w-4"
-                              aria-hidden="true"
-                              strokeWidth={3}
-                            />
-                            <span className="text-foreground mb-0 ml-3 ">{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
+                  </div>
+                  <div
+                    className={cn(
+                      'border-default flex rounded-bl-[4px] rounded-br-[4px] flex-1 flex-col px-8 xl:px-4 2xl:px-8 py-6',
+                      plan.name === 'Pro' && 'mb-0.5 rounded-bl-[4px] rounded-br-[4px]'
+                    )}
+                  >
+                    {plan.preface && (
+                      <p className="text-foreground-lighter text-[13px] mt-2 mb-4">
+                        {plan.preface}
+                      </p>
+                    )}
+                    <ul role="list" className="text-[13px] flex-1 text-foreground-lighter">
+                      {plan.features.map((feature) => (
+                        <li key={feature} className="flex items-center py-2 first:mt-0">
+                          <IconCheck
+                            className="text-brand h-4 w-4"
+                            aria-hidden="true"
+                            strokeWidth={3}
+                          />
+                          <span className="text-foreground mb-0 ml-3 ">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
 
-                      <div className="flex flex-col gap-6 mt-auto prose">
-                        <div className="space-y-2 mt-12">
-                          {plan.footer && (
-                            <p className="text-[13px] leading-5 text-foreground-lighter whitespace-pre-wrap mb-0">
-                              {plan.footer}
-                            </p>
-                          )}
-                        </div>
+                    <div className="flex flex-col gap-6 mt-auto prose">
+                      <div className="space-y-2 mt-12">
+                        {plan.footer && (
+                          <p className="text-[13px] leading-5 text-foreground-lighter whitespace-pre-wrap mb-0">
+                            {plan.footer}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -275,7 +266,7 @@ export default function IndexPage() {
           </div>
         </div>
 
-        <div className="text-center mt-10 mx-auto max-w-lg flex flex-col gap-8">
+        <div className="text-center mt-10 xl:mt-16 mx-auto max-w-lg flex flex-col gap-8">
           <p className="text-foreground-lighter">
             <strong className="font-normal text-foreground">Usage-based billing</strong> ensures you
             pay only for the resources you consume, making it a cost-effective choice for projects
@@ -318,8 +309,8 @@ export default function IndexPage() {
             <h2 className="text-foreground text-4xl mt-4">Predictable cost control</h2>
             <p className="mt-2 mb-4 prose lg:max-w-lg">
               The Pro plan has a spend cap enabled by default to keep costs under control. If you
-              expect a usage spike and need to go beyond the limits, simply switch off the spend cap
-              to pay for additional resources.
+              expect a usage spike and need to go beyond the plan limits, simply switch off the
+              spend cap to pay for additional resources.
             </p>
             <Button asChild size="tiny" type="default">
               <Link href="/docs/guides/platform/spend-cap" target="_blank">
