@@ -2,12 +2,9 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Fragment } from 'react'
+import { Fragment, useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Badge,
   Button,
   FormControl_Shadcn_,
@@ -18,7 +15,6 @@ import {
   FormMessage_Shadcn_,
   Form_Shadcn_,
   IconExternalLink,
-  IconHelpCircle,
   Input,
   Input_Shadcn_,
   Listbox,
@@ -37,6 +33,18 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useCheckPermissions, useStore } from 'hooks'
 
 const formId = 'connection-pooling-form'
+
+const DEFAULT_COMPUTE_POOLING_SIZE = {
+  ci_small: 15,
+  ci_medium: 15,
+  ci_large: 15,
+  ci_xlarge: 20,
+  ci_2xlarge: 25,
+  ci_4xlarge: 32,
+  ci_8xlarge: 64,
+  ci_12xlarge: 96,
+  ci_16xlarge: 128,
+}
 
 // This validator validates a string to be a positive integer or if it's an empty string, transforms it to a null
 const StringToPositiveNumber = z.union([
@@ -66,6 +74,7 @@ export const ConnectionPooling = () => {
 
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const computeInstance = addons?.selected_addons.find((addon) => addon.type === 'compute_instance')
+  computeInstance?.variant.identifier
 
   const {
     data: poolingInfo,
@@ -131,6 +140,17 @@ export const ConnectionPooling = () => {
     } finally {
     }
   }
+
+  useEffect(() => {
+    if (isSuccess) {
+      form.reset({
+        ignore_startup_parameters: poolingInfo?.ignore_startup_parameters,
+        pool_mode: poolingInfo?.pool_mode as 'transaction' | 'session' | 'statement',
+        default_pool_size: poolingInfo?.default_pool_size as number | undefined,
+        max_client_conn: poolingInfo?.max_client_conn as number | undefined,
+      })
+    }
+  }, [isSuccess])
 
   return (
     <section id="connection-pooler">
@@ -277,7 +297,10 @@ export const ConnectionPooling = () => {
                               placeholder={
                                 poolingInfo.supavisor_enabled && field.value === null
                                   ? `Default: ${
-                                      computeInstance?.variant.meta?.connections_pooler ?? '200'
+                                      DEFAULT_COMPUTE_POOLING_SIZE?.[
+                                        computeInstance?.variant
+                                          .identifier as keyof typeof DEFAULT_COMPUTE_POOLING_SIZE
+                                      ] ?? 15
                                     }`
                                   : ''
                               }
