@@ -1,0 +1,101 @@
+import { ChevronDown } from 'lucide-react'
+import {
+  Button,
+  CommandItem_Shadcn_,
+  CommandList_Shadcn_,
+  Command_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
+} from 'ui'
+
+import { BASE_PATH } from 'lib/constants'
+import Image from 'next/image'
+import { useState } from 'react'
+
+interface ConnectDropdownProps {
+  level?: 'parent' | 'child' | 'grandchild'
+  open: boolean
+  setOpen: (open: boolean) => void
+  state: string
+  updateState: (state: string) => void
+  label: string
+  items: any[]
+}
+
+const ConnectDropdown = ({
+  level,
+  state,
+  updateState,
+  label,
+  open,
+  setOpen,
+  items,
+}: ConnectDropdownProps) => {
+  function onSelectLib(key: string) {
+    updateState(key)
+    setOpen(false)
+  }
+
+  return (
+    <>
+      <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
+        <div className="flex items-center">
+          <span className="flex items-center text-foreground-muted bg-button px-3 rounded-md rounded-r-none text-xs h-[26px] border border-r-0">
+            {label}
+          </span>
+          <PopoverTrigger_Shadcn_ asChild>
+            <Button size="tiny" type="default" className="h-[26px] pr-3 gap-0 rounded-l-none">
+              <div className="flex items-center gap-1">
+                <span className="text-xs text-foreground-light flex items-center gap-2  pl-1">
+                  {level === 'parent' && (
+                    <Image
+                      src={`${BASE_PATH}/img/icons/frameworks/nextjs.svg`}
+                      width={14}
+                      height={14}
+                      alt={`icon`}
+                    />
+                  )}
+                  {items.find((item) => item.key === state)?.label}
+                </span>
+                <ChevronDown className="text-muted" strokeWidth={1} size={12} />
+              </div>
+            </Button>
+          </PopoverTrigger_Shadcn_>
+        </div>
+        <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
+          <Command_Shadcn_>
+            <CommandList_Shadcn_>
+              {items.map((item) => (
+                <CommandItem_Shadcn_
+                  key={item.key}
+                  value={item.key}
+                  onSelect={() => {
+                    onSelectLib(item.key)
+                    setOpen(false)
+                  }}
+                  onClick={() => {
+                    onSelectLib(item.key)
+                    setOpen(false)
+                  }}
+                >
+                  <span className="flex items-center gap-1">
+                    <Image
+                      src={`${BASE_PATH}/img/icons/frameworks/nextjs.svg`}
+                      width={14}
+                      height={14}
+                      alt={`icon`}
+                    />
+                    {item.label}
+                  </span>
+                </CommandItem_Shadcn_>
+              ))}
+            </CommandList_Shadcn_>
+          </Command_Shadcn_>
+        </PopoverContent_Shadcn_>
+      </Popover_Shadcn_>
+    </>
+  )
+}
+
+export default ConnectDropdown

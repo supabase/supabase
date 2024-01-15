@@ -12,7 +12,7 @@ import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { NextPageWithLayout } from 'types'
 import ProjectUsageSection from 'components/interfaces/Home/ProjectUsageSection'
-import Connect from 'components/interfaces/Home/Connect'
+import Connect from 'components/interfaces/Home/Connect/Connect'
 
 const Home: NextPageWithLayout = () => {
   const project = useSelectedProject()
