@@ -10,9 +10,9 @@ import {
   DropdownMenuItem,
   DropdownMenuPortal,
   DropdownMenuSeparator,
+  DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
-  DropdownMenuSub,
   DropdownMenuTrigger,
   IconAlertCircle,
   IconClipboard,
@@ -28,6 +28,7 @@ import {
   IconTrash2,
 } from 'ui'
 
+import { ItemRenderer } from 'components/ui/InfiniteList'
 import { useCheckPermissions } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
@@ -80,8 +81,6 @@ export const RowIcon = ({ view, status, fileType, mimeType }: any) => {
 }
 
 export interface FileExplorerRowProps {
-  index: number
-  item: any
   view: string
   columnIndex: number
   selectedItems: any[]
@@ -90,7 +89,7 @@ export interface FileExplorerRowProps {
   onCopyUrl: (name: string, url: string) => void
 }
 
-const FileExplorerRow = ({
+const FileExplorerRow: ItemRenderer<any, FileExplorerRowProps> = ({
   index: itemIndex,
   item = {},
   view = STORAGE_VIEWS.COLUMNS,
@@ -99,7 +98,7 @@ const FileExplorerRow = ({
   openedFolders = [],
   selectedFilePreview = {},
   onCopyUrl,
-}: FileExplorerRowProps) => {
+}) => {
   const storageExplorerStore = useStorageStore()
   const {
     getFileUrl,
