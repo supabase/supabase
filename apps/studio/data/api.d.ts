@@ -25,6 +25,10 @@ export interface paths {
     /** Get an aggregated data of interest across all notifications for the user */
     get: operations['NotificationsController_getNotificationsSummary']
   }
+  '/platform/notifications/archive-all': {
+    /** Archives all notifications */
+    patch: operations['NotificationsController_archiveAllNotifications']
+  }
   '/platform/reset-password': {
     /** Reset password for email */
     post: operations['ResetPasswordController_resetPassword']
@@ -937,6 +941,10 @@ export interface paths {
   '/v0/notifications/summary': {
     /** Get an aggregated data of interest across all notifications for the user */
     get: operations['NotificationsController_getNotificationsSummary']
+  }
+  '/v0/notifications/archive-all': {
+    /** Archives all notifications */
+    patch: operations['NotificationsController_archiveAllNotifications']
   }
   '/v0/status': {
     /** Get infrastructure status */
@@ -5072,8 +5080,8 @@ export interface operations {
       query: {
         status: 'new' | 'seen' | 'archived'
         priority: 'Critical' | 'Warning' | 'Info'
-        org_slug: string[]
-        project_ref: string[]
+        org_slug?: string[]
+        project_ref?: string[]
         offset: number
         limit: number
       }
@@ -5135,6 +5143,18 @@ export interface operations {
         content: {
           'application/json': components['schemas']['NotificationsSummary']
         }
+      }
+    }
+  }
+  /** Archives all notifications */
+  NotificationsController_archiveAllNotifications: {
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to archive all notifications */
+      500: {
+        content: never
       }
     }
   }
