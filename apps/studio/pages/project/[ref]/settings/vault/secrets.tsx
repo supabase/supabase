@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { Tabs } from 'ui'
+import { TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn_ } from 'ui'
 
 import { useParams } from 'common/hooks'
 import { SecretsManagement, VaultToggle } from 'components/interfaces/Settings/Vault'
@@ -35,19 +35,22 @@ const VaultSettingsSecrets: NextPageWithLayout = () => {
       ) : !isEnabled ? (
         <VaultToggle />
       ) : (
-        <Tabs
-          size="small"
-          type="underlined"
-          activeId="secrets"
-          onChange={(id: any) => {
-            if (id === 'keys') router.push(`/project/${ref}/settings/vault/keys`)
+        <Tabs_Shadcn_
+          defaultValue="secrets"
+          value={router.query.tab as string}
+          onValueChange={(e) => {
+            router.push(`/project/${ref}/settings/vault/${e}`)
           }}
         >
-          <Tabs.Panel id="secrets" label="Secrets Management">
+          <TabsList_Shadcn_>
+            <TabsTrigger_Shadcn_ value="secrets">Secrets Management</TabsTrigger_Shadcn_>
+            <TabsTrigger_Shadcn_ value="keys">Encryption Keys</TabsTrigger_Shadcn_>
+          </TabsList_Shadcn_>
+          <TabsContent_Shadcn_ value="secrets">
             <SecretsManagement />
-          </Tabs.Panel>
-          <Tabs.Panel id="keys" label="Encryption Keys" />
-        </Tabs>
+          </TabsContent_Shadcn_>
+          <TabsContent_Shadcn_ value="keys"></TabsContent_Shadcn_>
+        </Tabs_Shadcn_>
       )}
     </div>
   )
