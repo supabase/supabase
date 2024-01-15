@@ -269,6 +269,7 @@ export default function IndexPage() {
                         <div className="space-y-2 mt-12">
                           {plan.footer && (
                             <p className="text-[13px] leading-5 text-foreground-lighter whitespace-pre-wrap mb-0">
+                              {isPromoPlan && '* '}
                               {plan.footer}
                             </p>
                           )}
