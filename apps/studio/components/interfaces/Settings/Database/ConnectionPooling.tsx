@@ -1,10 +1,13 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { zodResolver } from '@hookform/resolvers/zod'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Fragment } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Badge,
   FormControl_Shadcn_,
   FormDescription_Shadcn_,
@@ -13,6 +16,7 @@ import {
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
   Form_Shadcn_,
+  IconHelpCircle,
   Input,
   Input_Shadcn_,
   Listbox,
@@ -27,8 +31,8 @@ import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { usePoolingConfigurationUpdateMutation } from 'data/database/pooling-configuration-update-mutation'
-import { useCheckPermissions, useStore } from 'hooks'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useCheckPermissions, useStore } from 'hooks'
 
 const formId = 'connection-pooling-form'
 
@@ -224,17 +228,25 @@ export const ConnectionPooling = () => {
                               </Listbox.Option>
                             </Listbox>
                           </FormControl_Shadcn_>
-                          <FormDescription_Shadcn_ className="col-start-5 col-span-8">
-                            Specify when a connection can be returned to the pool. Please refer to
-                            our{' '}
-                            <a
-                              href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pool"
-                              target="_blank"
-                              className="underline"
-                            >
-                              documentation
-                            </a>{' '}
-                            to find out the most suitable mode for your use case.
+                          <FormDescription_Shadcn_ className="col-start-5 col-span-8 flex flex-col gap-y-2">
+                            <p>
+                              Specify when a connection can be returned to the pool. Please refer to
+                              our{' '}
+                              <a
+                                href="https://supabase.com/docs/guides/database/connecting-to-postgres#how-connection-pooling-works"
+                                target="_blank"
+                                className="underline"
+                              >
+                                documentation
+                              </a>{' '}
+                              to find out the most suitable mode for your use case.
+                            </p>
+                            <p>
+                              If you're using{' '}
+                              <span className="text-foreground">prepared statements</span> in your
+                              database, use the <span className="text-foreground">Session</span>{' '}
+                              pool mode.
+                            </p>
                           </FormDescription_Shadcn_>
                           <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
                         </FormItem_Shadcn_>
