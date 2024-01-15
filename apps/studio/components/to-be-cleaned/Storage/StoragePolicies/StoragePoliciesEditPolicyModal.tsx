@@ -219,6 +219,7 @@ const StoragePoliciesEditPolicyModal = ({
             description="PostgreSQL policies control access to your files and folders"
             onViewTemplates={onViewTemplates}
             onViewEditor={() => onViewEditor('new')}
+            onSelectCancel={onSelectCancel}
           />
         ) : view === POLICY_MODAL_VIEWS.EDITOR ? (
           <StoragePoliciesEditor
@@ -235,6 +236,7 @@ const StoragePoliciesEditPolicyModal = ({
             templates={STORAGE_POLICY_TEMPLATES as any[]}
             onUseTemplate={onUseTemplate}
             templatesNote={''}
+            onSelectCancel={onSelectBackFromTemplates}
           />
         ) : view === POLICY_MODAL_VIEWS.REVIEW ? (
           <StoragePoliciesReview
