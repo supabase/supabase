@@ -39,14 +39,14 @@ const PITR_CATEGORY_OPTIONS: {
   {
     id: 'off',
     name: 'Disable PITR',
-    imageUrl: `${BASE_PATH}/img/pitr-off.png?v=2`,
-    imageUrlLight: `${BASE_PATH}/img/pitr-off--light.png?v=2`,
+    imageUrl: `${BASE_PATH}/img/pitr-off.svg?v=2`,
+    imageUrlLight: `${BASE_PATH}/img/pitr-off--light.svg?v=2`,
   },
   {
     id: 'on',
     name: 'Enable PITR',
-    imageUrl: `${BASE_PATH}/img/pitr-on.png?v=2`,
-    imageUrlLight: `${BASE_PATH}/img/pitr-on--light.png?v=2`,
+    imageUrl: `${BASE_PATH}/img/pitr-on.svg?v=2`,
+    imageUrlLight: `${BASE_PATH}/img/pitr-on--light.svg?v=2`,
   },
 ]
 

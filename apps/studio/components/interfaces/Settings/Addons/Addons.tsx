@@ -45,6 +45,7 @@ import { SUBSCRIPTION_PANEL_KEYS, useSubscriptionPageStateSnapshot } from 'state
 import ComputeInstanceSidePanel from './ComputeInstanceSidePanel'
 import CustomDomainSidePanel from './CustomDomainSidePanel'
 import PITRSidePanel from './PITRSidePanel'
+import IPv4SidePanel from './IPv4SidePanel'
 
 const Addons = () => {
   const { resolvedTheme } = useTheme()
@@ -94,7 +95,7 @@ const Addons = () => {
     isSuccess,
   } = useProjectAddonsQuery({ projectRef })
   const selectedAddons = addons?.selected_addons ?? []
-  const { computeInstance, pitr, customDomain } = getAddons(selectedAddons)
+  const { computeInstance, pitr, customDomain, ipv4 } = getAddons(selectedAddons)
 
   const meta = computeInstance?.variant?.meta as ProjectAddonVariantMeta | undefined
 
@@ -189,7 +190,7 @@ const Addons = () => {
               <ScaffoldSectionContent>
                 <div className="flex space-x-6">
                   <div>
-                    <div className="rounded-md bg-surface-200 w-[160px] h-[96px] shadow">
+                    <div className="rounded-md bg-surface-100 border border-muted w-[160px] h-[96px] overflow-hidden">
                       <Image
                         alt="Optimized Compute"
                         width={160}
@@ -198,10 +199,10 @@ const Addons = () => {
                           computeInstance !== undefined
                             ? `${BASE_PATH}/img/optimized-compute-on${
                                 resolvedTheme?.includes('dark') ? '' : '--light'
-                              }.png`
+                              }.svg`
                             : `${BASE_PATH}/img/optimized-compute-off${
                                 resolvedTheme?.includes('dark') ? '' : '--light'
-                              }.png`
+                              }.svg`
                         }
                       />
                     </div>
@@ -347,6 +348,83 @@ const Addons = () => {
             <ScaffoldSection>
               <ScaffoldSectionDetail>
                 <div className="space-y-6">
+                  <p className="m-0">IPv4</p>
+                  <div className="space-y-2">
+                    <p className="text-sm text-foreground-light m-0">More information</p>
+                    <div>
+                      <Link
+                        href="https://github.com/orgs/supabase/discussions/17817"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
+                          <p className="text-sm m-0">About IPv4</p>
+                          <IconExternalLink size={16} strokeWidth={1.5} />
+                        </div>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </ScaffoldSectionDetail>
+              <ScaffoldSectionContent>
+                <Alert_Shadcn_ variant="warning">
+                  <IconAlertTriangle className="h-4 w-4" />
+                  <AlertTitle_Shadcn_>
+                    PGBouncer and IPv4 Deprecation on January, 26th
+                  </AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_>
+                    Direct connections via db.{projectRef}.supabase.co will resolve to an IPv6
+                    address starting from January 26th. If you plan on not using our connection
+                    pooler and your environment does not support IPv6, consider enabling the add-on.
+                  </AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
+                <div className="flex space-x-6">
+                  <div>
+                    <div className="rounded-md bg-surface-100 border border-muted w-[160px] h-[96px] overflow-hidden">
+                      <img
+                        alt="IPv4"
+                        width={160}
+                        height={96}
+                        src={
+                          ipv4 !== undefined
+                            ? `${BASE_PATH}/img/ipv4-on${
+                                resolvedTheme?.includes('dark') ? '' : '--light'
+                              }.svg?v=2`
+                            : `${BASE_PATH}/img/ipv4-off${
+                                resolvedTheme?.includes('dark') ? '' : '--light'
+                              }.svg?v=2`
+                        }
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-sm text-foreground-light">Current option:</p>
+                    <p>{ipv4 !== undefined ? 'IPv4 is enabled' : 'IPv4 is not enabled'}</p>
+                    <ProjectUpdateDisabledTooltip
+                      projectUpdateDisabled={projectUpdateDisabled}
+                      projectNotActive={!isProjectActive}
+                    >
+                      <Button
+                        type="default"
+                        className="mt-2 pointer-events-auto"
+                        onClick={() => snap.setPanelKey('ipv4')}
+                        disabled={isBranch || !isProjectActive || projectUpdateDisabled}
+                      >
+                        Change IPv4
+                      </Button>
+                    </ProjectUpdateDisabledTooltip>
+                  </div>
+                </div>
+              </ScaffoldSectionContent>
+            </ScaffoldSection>
+          </ScaffoldContainer>
+
+          <ScaffoldDivider />
+
+          <ScaffoldContainer>
+            <ScaffoldSection>
+              <ScaffoldSectionDetail>
+                <div className="space-y-6">
                   <p className="m-0">Point in time recovery</p>
                   <div className="space-y-2">
                     <p className="text-sm text-foreground-light m-0">More information</p>
@@ -382,7 +460,7 @@ const Addons = () => {
                 )}
                 <div className="flex space-x-6">
                   <div>
-                    <div className="rounded-md bg-surface-200 w-[160px] h-[96px] shadow">
+                    <div className="rounded-md bg-surface-100 border border-muted w-[160px] h-[96px] overflow-hidden">
                       <Image
                         alt="Point-In-Time-Recovery"
                         width={160}
@@ -391,10 +469,10 @@ const Addons = () => {
                           pitr !== undefined
                             ? `${BASE_PATH}/img/pitr-on${
                                 resolvedTheme?.includes('dark') ? '' : '--light'
-                              }.png?v=2`
+                              }.svg`
                             : `${BASE_PATH}/img/pitr-off${
                                 resolvedTheme?.includes('dark') ? '' : '--light'
-                              }.png?v=2`
+                              }.svg`
                         }
                       />
                     </div>
@@ -478,7 +556,7 @@ const Addons = () => {
               <ScaffoldSectionContent>
                 <div className="flex space-x-6">
                   <div>
-                    <div className="rounded-md bg-surface-200 w-[160px] h-[96px] shadow">
+                    <div className="rounded-md bg-surface-100 border border-muted w-[160px] h-[96px] overflow-hidden">
                       <img
                         alt="Custom Domain"
                         width={160}
@@ -487,10 +565,10 @@ const Addons = () => {
                           customDomain !== undefined
                             ? `${BASE_PATH}/img/custom-domain-on${
                                 resolvedTheme?.includes('dark') ? '' : '--light'
-                              }.png`
+                              }.svg`
                             : `${BASE_PATH}/img/custom-domain-off${
                                 resolvedTheme?.includes('dark') ? '' : '--light'
-                              }.png`
+                              }.svg`
                         }
                       />
                     </div>
@@ -526,6 +604,7 @@ const Addons = () => {
       <ComputeInstanceSidePanel />
       <PITRSidePanel />
       <CustomDomainSidePanel />
+      <IPv4SidePanel />
     </>
   )
 }
