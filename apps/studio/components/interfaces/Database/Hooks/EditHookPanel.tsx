@@ -108,6 +108,7 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
       ? 'supabase_function'
       : 'http_request',
     timeout_ms: Number(selectedHook?.function_args?.[4] ?? 1000),
+    max_retries: Number(selectedHook?.function_args?.[5] ?? 0),
   }
 
   useEffect(() => {
@@ -184,6 +185,10 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
       errors['timeout_ms'] = 'Timeout should be between 1000ms and 5000ms'
     }
 
+    if (values.max_retries < 0 || values.max_retries > 5) {
+      errors['max_retries'] = 'Number of retries should be between 0 and 5'
+    }
+
     if (JSON.stringify(values) !== JSON.stringify(initialValues)) setIsEdited(true)
     return errors
   }
@@ -237,6 +242,7 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
         JSON.stringify(headers),
         JSON.stringify(parameters),
         values.timeout_ms.toString(),
+        values.max_retries.toString(),
       ],
     }
 

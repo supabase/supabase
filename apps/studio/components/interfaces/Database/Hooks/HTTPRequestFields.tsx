@@ -123,6 +123,14 @@ const HTTPRequestFields = ({
             type="number"
             actions={<p className="text-foreground-light pr-2">ms</p>}
           />
+          <Input
+            id="max_retries"
+            name="max_retries"
+            label="Number of retries"
+            labelOptional="Between 0 and 5"
+            type="number"
+            actions={<p className="text-foreground-light pr-2"></p>}
+          />
         </FormSectionContent>
       </FormSection>
       <SidePanel.Separator />

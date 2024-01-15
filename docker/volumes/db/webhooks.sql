@@ -205,4 +205,116 @@ BEGIN;
   ALTER function supabase_functions.http_request() SET search_path = supabase_functions;
   REVOKE ALL ON FUNCTION supabase_functions.http_request() FROM PUBLIC;
   GRANT EXECUTE ON FUNCTION supabase_functions.http_request() TO postgres, anon, authenticated, service_role;
+  INSERT INTO supabase_functions.migrations (version) VALUES ('20240115163000_add_retry_to_http_request');
+  CREATE OR REPLACE FUNCTION supabase_functions.http_request()
+    RETURNS trigger
+    LANGUAGE plpgsql
+    SECURITY DEFINER
+    SET search_path TO 'supabase_functions'
+    AS $function$
+        DECLARE
+          request_id bigint;
+          payload jsonb;
+          url text := TG_ARGV[0]::text;
+          method text := TG_ARGV[1]::text;
+          headers jsonb DEFAULT '{}'::jsonb;
+          params jsonb DEFAULT '{}'::jsonb;
+          timeout_ms integer DEFAULT 1000;
+          retry_count integer DEFAULT 0;
+          max_retries integer := COALESCE(TG_ARGV[5]::integer, 0);
+          response RECORD;
+          succeeded boolean := FALSE;
+        BEGIN
+          IF url IS NULL OR url = 'null' THEN
+            RAISE EXCEPTION 'url argument is missing';
+          END IF;
+
+          IF method IS NULL OR method = 'null' THEN
+            RAISE EXCEPTION 'method argument is missing';
+          END IF;
+
+          IF TG_ARGV[2] IS NULL OR TG_ARGV[2] = 'null' THEN
+            headers = '{"Content-Type": "application/json"}'::jsonb;
+          ELSE
+            headers = TG_ARGV[2]::jsonb;
+          END IF;
+
+          IF TG_ARGV[3] IS NULL OR TG_ARGV[3] = 'null' THEN
+            params = '{}'::jsonb;
+          ELSE
+            params = TG_ARGV[3]::jsonb;
+          END IF;
+
+          IF TG_ARGV[4] IS NULL OR TG_ARGV[4] = 'null' THEN
+            timeout_ms = 1000;
+          ELSE
+            timeout_ms = TG_ARGV[4]::integer;
+          END IF;
+
+          -- Retry loop
+          WHILE NOT succeeded AND retry_count <= max_retries LOOP
+            BEGIN
+              CASE
+                WHEN method = 'GET' THEN
+                  SELECT http_get INTO request_id FROM net.http_get(
+                    url,
+                    params,
+                    headers,
+                    timeout_ms
+                  );
+                WHEN method = 'POST' THEN
+                  payload = jsonb_build_object(
+                    'old_record', OLD,
+                    'record', NEW,
+                    'type', TG_OP,
+                    'table', TG_TABLE_NAME,
+                    'schema', TG_TABLE_SCHEMA
+                  );
+
+                  SELECT http_post INTO request_id FROM net.http_post(
+                    url,
+                    payload,
+                    params,
+                    headers,
+                    timeout_ms
+                  );
+                ELSE
+                  RAISE EXCEPTION 'method argument % is invalid', method;
+              END CASE;
+
+              IF request_id IS NOT NULL THEN
+                -- Check the HTTP status code
+                SELECT * INTO response FROM supabase_functions.hooks WHERE request_id = request_id;
+                IF response.status_code < 400 THEN
+                  succeeded := TRUE;
+                END IF;
+              END IF;
+              -- Exit loop on successful request
+              EXIT WHEN succeeded;
+            EXCEPTION
+              WHEN OTHERS THEN
+                GET STACKED DIAGNOSTICS
+                  response.MESSAGE_TEXT = MESSAGE_TEXT,
+                  response.PG_EXCEPTION_DETAIL = PG_EXCEPTION_DETAIL,
+                  response.PG_EXCEPTION_HINT = PG_EXCEPTION_HINT,
+                  response.PG_EXCEPTION_CONTEXT = PG_EXCEPTION_CONTEXT;
+                IF retry_count >= max_retries THEN
+                  -- If retries exhausted, re-raise exception
+                  RAISE EXCEPTION 'HTTP request failed after % retries. %, %, %',
+                    max_retries, response.MESSAGE_TEXT, response.PG_EXCEPTION_DETAIL, response.PG_EXCEPTION_HINT USING ERRCODE = 'XX000';
+                END IF;
+                -- Otherwise, continue to next iteration to retry
+            END;
+            retry_count := retry_count + 1;
+          END LOOP;
+
+          INSERT INTO supabase_functions.hooks
+            (hook_table_id, hook_name, request_id)
+          VALUES
+            (TG_RELID, TG_NAME, request_id);
+
+          RETURN NEW;
+        END
+    $function$;
+
 COMMIT;
