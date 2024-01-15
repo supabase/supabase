@@ -1,10 +1,22 @@
-const { withSentryConfig } = require('@sentry/nextjs')
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
+import { withSentryConfig } from '@sentry/nextjs'
+import configureBundleAnalyzer from '@next/bundle-analyzer'
+import nextMdx from '@next/mdx'
+import remarkGfm from 'remark-gfm'
+
+const withBundleAnalyzer = configureBundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
 })
 
+const withMDX = nextMdx({
+  extension: /\.mdx?$/,
+  options: {
+    remarkPlugins: [remarkGfm],
+    providerImportSource: '@mdx-js/react',
+  },
+})
+
 // Required for nextjs standalone build
-const path = require('path')
+// const path = require('path')
 
 // This file sets a custom webpack configuration to use your Next.js app
 // with Sentry.
@@ -355,34 +367,36 @@ const nextConfig = {
   },
 }
 
-// module.exports = withBundleAnalyzer(nextConfig)
-// Make sure adding Sentry options is the last code to run before exporting, to
-// ensure that your source maps include changes from all other Webpack plugins
-module.exports =
-  process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
-    ? withSentryConfig(
-        withBundleAnalyzer(nextConfig),
-        {
-          silent: true,
-        },
-        {
-          // For all available options, see:
-          // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+const sentryConfig = {
+  silent: true,
 
-          // Upload a larger set of source maps for prettier stack traces (increases build time)
-          widenClientFileUpload: true,
+  // For all available options, see:
+  // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+  // Upload a larger set of source maps for prettier stack traces (increases build time)
+  widenClientFileUpload: true,
 
-          // Transpiles SDK to be compatible with IE11 (increases bundle size)
-          transpileClientSDK: false,
+  // Transpiles SDK to be compatible with IE11 (increases bundle size)
+  transpileClientSDK: false,
 
-          // Routes browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers (increases server load)
-          tunnelRoute: '/monitoring',
+  // Hides source maps from generated client bundles
+  hideSourceMaps: true,
 
-          // Hides source maps from generated client bundles
-          hideSourceMaps: true,
+  // Automatically tree-shake Sentry logger statements to reduce bundle size
+  disableLogger: true,
 
-          // Automatically tree-shake Sentry logger statements to reduce bundle size
-          disableLogger: true,
-        }
-      )
-    : nextConfig
+  // Routes browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers (increases server load)
+  tunnelRoute: '/monitoring',
+}
+
+const configExport = () => {
+  const plugins = [withMDX, withBundleAnalyzer]
+  const baseConfig = plugins.reduce((acc, next) => next(acc), nextConfig)
+
+  if (process.env.NEXT_PUBLIC_IS_PLATFORM === 'true') {
+    return withSentryConfig(baseConfig, sentryConfig)
+  } else {
+    return baseConfig
+  }
+}
+
+export default configExport
