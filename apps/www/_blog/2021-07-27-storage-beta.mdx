@@ -4,6 +4,8 @@ description: Supabase Storage moves into Beta.
 author: inian
 image: launch-week-sql-day-2/supabase-storage-beta-og.jpg
 thumb: launch-week-sql-day-2/supabase-storage-beta.jpg
+categories:
+  - product
 tags:
   - storage
   - launch-week
@@ -36,7 +38,7 @@ You can make objects public in S3 via multiple mechanisms (e.g. tags, or prefixe
 
 Objects in public buckets can be accessed via a URL without any Authorization tokens or headers. This makes them perfect for hosting assets for your web or mobile application.
 
-Public buckets still require [Auth Policies](/docs/guides/storage#policy-examples) to upload and delete objects, allowing you to securely manage their contents.
+Public buckets still require [Auth Policies](/docs/guides/storage/security/access-control#policy-examples) to upload and delete objects, allowing you to securely manage their contents.
 
 <video width="99%" autoPlay muted playsInline controls={true}>
   <source src="/images/blog/2021-june/public-buckets.mp4" type="video/mp4" />
@@ -129,7 +131,7 @@ Supabase Storage now supports `upsert`. Shoutout to [@ankitjena](https://github.
 
 ![Storage now supports upserts](/images/blog/2021-june/supabase-storage-upsert.png)
 
-We also have automated API docs generated [here](https://supabase.github.io/storage-api/#/) if you want to use the Storage API directly.
+We also have automated API docs generated [here](https://supabase.github.io/storage/#/) if you want to use the Storage API directly.
 
 ### Storage in the wild
 
@@ -160,4 +162,4 @@ We have a few production applications using Supabase Storage. Wataru is using St
 
 We're planning a Content Delivery Network for faster downloads, as well as basic transformation and optimization support for media files (like resizing, etc). We will continue our Kaizen on smaller improvements like allowing configurable upload limits and improving service stability and scalability.
 
-Anything else you want to see or can help implement in Storage? Reach out on our [Discord channel](https://discord.supabase.com/) and give Storage a try by [creating a project](https://app.supabase.com/) on Supabase!
+Anything else you want to see or can help implement in Storage? Reach out on our [Discord channel](https://discord.supabase.com/) and give Storage a try by [creating a project](https://supabase.com/dashboard/) on Supabase!

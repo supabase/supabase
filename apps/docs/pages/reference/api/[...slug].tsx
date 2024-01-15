@@ -1,5 +1,5 @@
-import apiCommonSections from '~/../../spec/common-api-sections.json' assert { type: 'json' }
-import specFile from '~/../../spec/transforms/api_v0_openapi_deparsed.json' assert { type: 'json' }
+import apiCommonSections from '~/spec/common-api-sections.json' assert { type: 'json' }
+import specFile from '~/spec/transforms/api_v0_openapi_deparsed.json' assert { type: 'json' }
 import RefSectionHandler from '~/components/reference/RefSectionHandler'
 import { flattenSections } from '~/lib/helpers'
 import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'

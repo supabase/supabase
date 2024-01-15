@@ -1,0 +1,109 @@
+---
+title: Supabase Beta June 2023
+description: A plethora of announcements... read till the end to find out when is the new Launch Week
+author: ant_wilson
+image: 2023-07-06-beta-update-june/beta-update-june-2023.png
+thumb: 2023-07-06-beta-update-june/beta-update-june-2023.png
+categories:
+  - product
+tags:
+  - release-notes
+date: '2023-07-06'
+toc_depth: 3
+---
+
+Guess what? We've got some sizzling updates for you this month! Our partnership with Mozilla, Native mobile auth support, revamped billinx experience, real-time debugging magic, and great stuff from the community. Dive in now 🤿
+
+## Mozilla uses Supabase to build AI Help.
+
+![Mozilla uses Supabase to build AI Help.](https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/marketing-emails/july2023/mdn_search.png)
+
+MDN is one of the richest sources of developer documentation on the internet, and it just received an upgrade. Mozilla built AI Help, an AI chatbot to help with search and discovery. Mozilla chose Supabase Vector and OpenAI to power their new tool which you can try for free.
+
+[Read the announcement](https://developer.mozilla.org/en-US/blog/introducing-ai-help/)
+
+## Native Mobile Auth Support for Google and Apple Sign in
+
+![Native Mobile Auth Support for Google and Apple Sign in](https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/marketing-emails/july2023/native-phone-support.png)
+
+Supabase Auth now has full native support for Sign in with Apple and Google, which means it can now be used with one-tap sign in methods like Sign in with Apple JS, Sign in with Google for Web, or even in Chrome extensions.
+
+[Learn more](https://supabase.com/blog/native-mobile-auth)
+
+## Supabase CLI: what is new?
+
+![Supabase CLI: what is new?](https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/marketing-emails/july2023/supabase-cli-cache-hi.png)
+
+It’s been a busy month for the Supabase CLI. We have added a tonne of new features:
+
+- **Migrations:** view all your migrations inside the Dashboard with the SQL [code that was executed](https://github.com/supabase/cli/pull/1181).
+- **Functions:** the CLI now [serves all Functions](https://github.com/supabase/cli/pull/1171) when developing locally.
+- **Database monitoring**: we’ve added a `usage` flag for [monitoring key Postgres statistics](https://github.com/supabase/cli/pull/1070).
+
+[See all updates](https://github.com/supabase/cli/releases)
+
+## Revamped billing experience
+
+![Revamped billing experience](https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/marketing-emails/july2023/billing.png)
+
+We have made huge improvements to the billing tooling inside Supabase Studio, including:
+
+- Easy monitoring of current usage, overage, and plan limits.
+- Streamlined subscription management for upgrades or downgrades.
+- Detailed usage billing breakdowns and compute instance specifications.
+- And more!
+
+[New subscription page](https://app.supabase.com/org/_/billing) | [New usage page](https://app.supabase.com/org/_/usage)
+
+## Login with Kakao
+
+![Login with Kakao](https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/marketing-emails/july2023/kakao-social-login.png?t=2023-07-06T13%3A26%3A11.108Z)
+
+Added the popular social platform Kakao as new social provider. Allow your users to effortlessly sign in using their Kakao accounts and make authentication a breeze while expanding your app's reach to a wider audience.
+
+[Login with Kakao](https://supabase.com/docs/guides/auth/social-login/auth-kakao)
+
+## Quick product updates
+
+- [**Postgres Tooling**] Implemented parallel Index build in regular and recovery state into OrioleDB. [[PR](https://github.com/orioledb/orioledb/commit/8c4a50175cf39a97ac0555ea3f969fe7e40dba21)]
+- [**Edge Functions**] Edge Functions troubleshooting guide. [[Doc](https://supabase.com/docs/guides/functions/troubleshooting)]
+- [**Storage**] Object id is now returned in the response when uploading an object. [[PR](https://github.com/supabase/storage-api/pull/332)]
+- [**Realtime**] A new debugging tool to test your realtime endpoints together with your JWTs and Row Level Security policies. [[Realtime Inspector](https://realtime.supabase.com/inspector/new)]
+- [**Docs**] A full guide on database partitions for developers looking to scale up. [[Guide](https://supabase.com/docs/guides/database/partitions)]
+
+## Made with Supabase
+
+![Chat Thing is Made with Supabase](https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/chatting-ai.png)
+
+[Chat Thing](https://chatthing.ai/), is an innovative project that allows you to create AI chatbots using your existing data from Notion, uploaded files, websites and more. Built by [pixelhop](https://twitter.com/pixelhopio) using Vue, Nuxt, Railway, and Supabase for database, auth, and vector store.
+
+## Extended Community Highlights
+
+![Some of the faces from the community](https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/marketing-emails/july2023/flutter_auth.png)
+
+- Using Supabase with Cloudflare Workers. [Cloudflare TV](https://cloudflare.tv/event/using-supabase-with-cloudflare-workers/dgM90RgD)
+- Build a Chatbot with Next.js, LangChain, OpenAI, and Supabase Vector. [Video Tutorial](https://www.youtube.com/watch?v=Tt45NrVIBn8)
+- The refine open source Hackathon is in full swing. [Join now](https://discord.com/channels/@me/1118414473108148296/1123933930702262312)
+- Flutter database and user authentication. [Video guide](https://www.youtube.com/watch?v=r7ysVtZ5Row)
+- Google authentication with Expo & Supabase. [Tutorial](https://blog.spirokit.com/google-authentication-with-expo-supabase)
+- Building Stripe integrations with Supabase. [Video](https://www.youtube.com/watch?v=D5kOnnB72WA)
+- Build a Supabase + Drizzle-orm + Express backend. [Video Tutorial](https://www.youtube.com/watch?v=k0uC35J_xJ4)
+- LogRocker blog: Authenticate React Applications: Supabase Auth. [Tutorial](https://blog.logrocket.com/authenticate-react-applications-supabase-auth/)
+- Using Supabase Vault to store secrets. [Tutorial](https://makerkit.dev/blog/tutorials/supabase-vault)
+- Nuxt + Supabase = Technology Stack of Dreams. [Blog post](https://dev.to/jacobandrewsky/nuxt-supabase-technology-stack-of-dreams-4dop)
+- Build a to-do app with toddle and Supabase. [Video](https://www.youtube.com/watch?v=SHJ3EadcrgY)
+
+## We're Hiring
+
+Come join one of the fastest-growing open source projects ever:
+
+- [Front-End Developer (o11y focus)](https://boards.greenhouse.io/supabase/jobs/4910374004)
+- [Rust developer](https://boards.greenhouse.io/supabase/jobs/4917893004)
+
+## ⚠️ Baking hot meme zone ⚠️
+
+![Our favorite meme from June 2023](https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/marketing-emails/july2023/beta-update-june-2023-meme.png)
+
+## Launch Week alert: save the date
+
+![Launch Week 8 is announced - From Monday 07/08 till Friday 11/08](https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/marketing-emails/july2023/lw8-teaser.jpg)

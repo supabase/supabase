@@ -44,7 +44,20 @@ Supabase places very few guard-rails around your database. That gives you a lot 
 
 You are responsible for using best-practices to optimize and manage your database: adding indexes, adding filters on large queries, using caching strategies, optimizing your database queries, and managing connections to the database.
 
-You are responsible of provisioning enough compute to run the workload that your application requires. The Supabase Dashboard provides [observability tooling](https://app.supabase.com/project/_/reports/database) to help with this.
+You are responsible of provisioning enough compute to run the workload that your application requires. The Supabase Dashboard provides [observability tooling](https://supabase.com/dashboard/project/_/reports/database) to help with this.
+
+## Managing healthcare data
+
+You can use Supabase to store and process Protected Health Information (PHI). You are responsible for the following
+
+- Signing a Business Associate Agreement (BAA) with Supabase. Submit a [HIPAA add-on request](https://forms.supabase.com/hipaa2) to get started. You will need to be at least on the [Team plan](https://supabase.com/pricing) to sign a BAA with us.
+- Enabling [Point in Time Recovery](/docs/guides/platform/backups#point-in-time-recovery) which requires at least a [small compute add-on](/docs/guides/platform/compute-add-ons).
+- Turning on [SSL Enforcement](/docs/guides/platform/ssl-enforcement).
+- Enabling [Network Restrictions](/docs/guides/platform/network-restrictions).
+- Disabling [Supabase AI editor](https://supabase.com/dashboard/org/_/general) in our dashboard.
+- Complying with encryption requirements in the HIPAA Security Rule. Data is encrypted at rest and in transit by Supabase. You can consider encrypting the data at your application layer.
+- Not using [Edge functions](/docs/guides/functions) to process PHI.
+- Not storing PHI in [public Storage buckets](/docs/guides/storage/buckets/fundamentals#public-buckets).
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

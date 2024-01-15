@@ -1,0 +1,207 @@
+[
+  {
+    "title": "CLI and Management API",
+    "shipped": true,
+    "date": "15th Aug 2022",
+    "description": "We are moving Supabase CLI v1 out of beta, and releasing Management API beta.",
+    "d": 1,
+    "dd": "Monday",
+    "youtube_id": "OpPOaJI_Z28",
+    "articles": [
+      {
+        "title": "Supabase CLI v1 and Management API Beta",
+        "url": "/blog/supabase-cli-v1-and-admin-api-beta",
+        "description": "Read our blog post outlining the new CLI and Management API.",
+        "products": [
+          {
+            "title": "CLI Docs",
+            "url": "/docs/reference/cli",
+            "description": "Learn how to install the CLI"
+          },
+          {
+            "title": "Management API Docs",
+            "url": "/docs/reference/api",
+            "description": "Learn how to use the new Management API"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "supabase-js v2",
+    "shipped": true,
+    "date": "16th Aug 2022",
+    "description": "Today we're releasing supabase-js v2, which focuses on “quality-of-life” improvements for developers.",
+    "d": 2,
+    "dd": "Tuesday",
+    "youtube_id": "iqZlPtl_b-I",
+    "articles": [
+      {
+        "title": "supabase-js v2 Release Candidate",
+        "url": "/blog/supabase-js-v2",
+        "description": "First peek of supabase-js v2, which focuses on quality-of-life improvements for developers.",
+        "products": [
+          {
+            "title": "Supabase.js v2 Docs",
+            "url": "/docs/reference/javascript/installing",
+            "description": "Updated documentation for supabase-js"
+          },
+          {
+            "title": "TypeScript support",
+            "url": "/docs/reference/javascript/typescript-support",
+            "description": "Using types generated directly from your database."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "Security",
+    "shipped": true,
+    "date": "17th Aug 2022",
+    "description": "An update on the ongoing security improvements of Supabase.",
+    "d": 3,
+    "dd": "Wednesday",
+    "youtube_id": "6bGQotxisoY",
+    "announcements": [
+      {
+        "title": "Supabase is now SOC2 compliant",
+        "url": "Something",
+        "description": "Outline of the community changes",
+        "type": "soc2"
+      }
+    ],
+    "articles": [
+      {
+        "title": "Supabase is SOC2 compliant",
+        "url": "/blog/supabase-soc2",
+        "description": "Supabase is now SOC2 Type 1 compliant. Let’s dig into what that means, and explain the process we went through to get there. If you’re building a SaaS product, this blog post should provide a rough guide to getting your SOC2 certification.",
+        "products": [
+          {
+            "title": "Security portal",
+            "url": "https://security.supabase.com/",
+            "description": "Monitor security at Supabase."
+          },
+          {
+            "title": "SOC 2 Document",
+            "url": "https://security.supabase.com/",
+            "description": "Request the SOC 2 Type I document through the Security Portal."
+          },
+          {
+            "title": "DPA Document",
+            "url": "https://security.supabase.com/",
+            "description": "Request Data Processing Agreement document through the Security Portal."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "Realtime: Multiplayer Edition",
+    "shipped": true,
+    "date": "18th Aug 2022",
+    "description": "Announcing the general availability of Realtime's Broadcast and Presence.",
+    "d": 4,
+    "dd": "Thursday",
+    "youtube_id": "CGZr5tybW18",
+    "articles": [
+      {
+        "title": "Realtime: Multiplayer Edition",
+        "url": "/blog/supabase-realtime-multiplayer-general-availability",
+        "description": "Origin story of Realtime, Broadcast and Presence features with examples, and one more thing.",
+        "products": [
+          {
+            "title": "Realtime Overview",
+            "url": "/docs/guides/realtime",
+            "description": "Realtime Overview"
+          },
+          {
+            "title": "Broadcast Guide",
+            "url": "/docs/guides/realtime/broadcast",
+            "description": "Guide on how to use Broadcast feature"
+          },
+          {
+            "title": "Presence Guide",
+            "url": "/docs/guides/realtime/presence",
+            "description": "Guide on how to use Presence feature"
+          },
+          {
+            "title": "Postgres Changes Guide",
+            "url": "/docs/guides/realtime/postgres-changes",
+            "description": "Guide on how to use Postgres Changes feature"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "Community and One more thing...",
+    "shipped": true,
+    "date": "19th Aug 2022",
+    "description": "We finish Launch Week 5 with an update on the community and some more product updates.",
+    "d": 5,
+    "dd": "Friday",
+    "youtube_id": "s9UePQjLT0U",
+    "articles": [
+      {
+        "title": "Community Day",
+        "url": "/blog/launch-week-5-community-day",
+        "description": "Outline of the community changes",
+        "products": [
+          {
+            "title": "pg_jsonschema: 0.1.0",
+            "url": "/blog/launch-week-5-community-day#pg_jsonschema",
+            "description": "For our Open Source Spotlight we're hearing from Dmitry Dygalo. "
+          },
+          {
+            "title": "Postgrest v10: Native Types",
+            "url": "/blog/launch-week-5-community-day#postgrest-v10-native-types",
+            "description": "EXPLAIN, Query Planners, Improved Relationship Detection, and Computed relationships."
+          },
+          {
+            "title": "Egghead course",
+            "url": "/blog/launch-week-5-community-day#free-egghead-course-cache-supabase-data-at-the-edge-with-cloudflare-workers-and-kv-storage",
+            "description": "Cache Supabase data at the Edge with Cloudflare Workers and KV Storage."
+          }
+        ]
+      },
+      {
+        "title": "One more thing",
+        "url": "/blog/launch-week-5-one-more-thing",
+        "description": "It's never just one more thing...",
+        "products": [
+          {
+            "title": "Supabase Vault",
+            "url": "/blog/supabase-vault",
+            "description": "Postgres extension for managing secrets and encryption inside your database."
+          },
+          {
+            "title": "Auth UI",
+            "url": "/blog/launch-week-5-one-more-thing#auth-ui",
+            "description": "Customizable React UI component for Supabase Auth."
+          },
+          {
+            "title": "Dashboard permissions",
+            "url": "/blog/launch-week-5-one-more-thing#dashboard-permissions",
+            "description": "We've released granular permissions on our Supabase dashboard."
+          },
+          {
+            "title": "JSON schema validation",
+            "url": "/blog/launch-week-5-one-more-thing#json-schema-validation",
+            "description": "We've released a new Postgres extension on the Supabase platform today, pg_jsonschema."
+          },
+          {
+            "title": "pg_graphql v0.4.0",
+            "url": "/blog/launch-week-5-one-more-thing#pg_graphql-v040",
+            "description": "We've released a new version of pg_graphql, our GraphQL extension for Postgres."
+          },
+          {
+            "title": "Auth | Multi Factor Authentication",
+            "url": "/blog/launch-week-5-one-more-thing#multi-factor-authentication",
+            "description": "We've opened early-access signups for Multi-Factor Authentication (MFA)."
+          }
+        ]
+      }
+    ]
+  }
+]

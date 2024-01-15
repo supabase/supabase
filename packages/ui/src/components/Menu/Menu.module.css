@@ -26,7 +26,7 @@
 }
 
 .sbui-menu__item--active--bar {
-  @apply border-l-4 border-brand-500;
+  @apply border-l-4 border-brand-300;
   border-left-style: solid;
 }
 

@@ -1,8 +1,8 @@
 import clsx from 'clsx'
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { FormLayout } from '../../lib/Layout/FormLayout'
-import { useFormContext } from '../Form/FormContext'
 import styleHandler from '../../lib/theme/styleHandler'
+import { useFormContext } from '../Form/FormContext'
 
 interface Props extends Omit<React.HTMLAttributes<HTMLButtonElement>, 'size'> {
   name?: string
@@ -11,7 +11,7 @@ interface Props extends Omit<React.HTMLAttributes<HTMLButtonElement>, 'size'> {
   error?: string
   descriptionText?: string | React.ReactNode
   label?: string | React.ReactNode
-  afterLabel?: string
+  afterLabel?: string | React.ReactNode
   beforeLabel?: string
   labelOptional?: string
   className?: any
@@ -63,7 +63,9 @@ function Toggle({
   }, [])
 
   function handleBlurEvent(e: React.FocusEvent<HTMLButtonElement>) {
-    if (handleBlur) handleBlur(e)
+    setTimeout(() => {
+      if (handleBlur) handleBlur(e)
+    }, 100)
     if (onBlur) onBlur(e)
   }
 

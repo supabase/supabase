@@ -1,29 +1,26 @@
-import { CommandGroup } from 'cmdk-supabase'
+import { CommandGroup } from 'cmdk'
 import { useCommandMenu } from './CommandMenuProvider'
 import ChildItem from './ChildItem'
+import { useTheme } from 'next-themes'
+import { Theme, themes } from 'ui'
 
 const ThemeOptions = ({ isSubItem = false }) => {
-  const { setIsOpen, actions } = useCommandMenu()
+  const { setIsOpen } = useCommandMenu()
+  const { setTheme } = useTheme()
   return (
     <CommandGroup>
-      <ChildItem
-        isSubItem={isSubItem}
-        onSelect={() => {
-          actions.toggleTheme(true)
-          setIsOpen(false)
-        }}
-      >
-        Change Theme to dark
-      </ChildItem>
-      <ChildItem
-        isSubItem={isSubItem}
-        onSelect={() => {
-          actions.toggleTheme(false)
-          setIsOpen(false)
-        }}
-      >
-        Change Theme to light
-      </ChildItem>
+      {themes.map((theme: Theme) => (
+        <ChildItem
+          key={theme.value}
+          isSubItem={isSubItem}
+          onSelect={() => {
+            setTheme(theme.value)
+            setIsOpen(false)
+          }}
+        >
+          Change Theme to {theme.name === 'System' ? 'System Default' : theme.name}
+        </ChildItem>
+      ))}
     </CommandGroup>
   )
 }

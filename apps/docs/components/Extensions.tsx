@@ -1,16 +1,27 @@
 import Link from 'next/link'
 import React, { useState } from 'react'
-import { GlassPanel, IconLink, IconX, Input } from 'ui'
-import extensions from '../data/extensions.json'
+import { extensions } from 'shared-data'
+import { GlassPanel, IconX, Input } from 'ui'
 
-type extension = {
+type Extension = {
   name: string
   comment: string
   tags: string[]
-  link?: string
+  link: string
 }
 
-function getUniqueTags(json: extension[]) {
+type LinkTarget = React.ComponentProps<'a'>['target']
+
+function getLinkTarget(link: string): LinkTarget {
+  // Link is relative, open in the same tab
+  if (link.startsWith('/')) {
+    return '_self'
+  }
+  // Link is external, open in a new tab
+  return '_blank'
+}
+
+function getUniqueTags(json: Extension[]): string[] {
   const tags = []
   for (const item of json) {
     if (item.tags) {
@@ -21,12 +32,12 @@ function getUniqueTags(json: extension[]) {
 }
 
 export default function Extensions() {
-  const [searchTerm, setSearchTerm] = useState('')
-  const [filters, setFilters] = useState([])
+  const [searchTerm, setSearchTerm] = useState<string>('')
+  const [filters, setFilters] = useState<string[]>([])
 
   const tags = getUniqueTags(extensions)
 
-  function handleChecked(tag) {
+  function handleChecked(tag: string) {
     if (filters.includes(tag)) {
       setFilters(filters.filter((x) => x !== tag))
     } else {
@@ -37,7 +48,7 @@ export default function Extensions() {
   return (
     <>
       <div className="mb-8 grid">
-        <label className="mb-2 text-xs text-scale-1100">Search extensions</label>
+        <label className="mb-2 text-xs text-foreground-light">Search extensions</label>
         <Input
           type="text"
           placeholder="Extension name"
@@ -47,14 +58,14 @@ export default function Extensions() {
       <div className="lg:grid lg:grid-cols-12">
         <div className="col-span-3 not-prose">
           <div className="lg:sticky top-24">
-            <h3 className="text-sm text-scale-1100">Filter</h3>
+            <h3 className="text-sm text-foreground-light">Filter</h3>
             <ul className="mt-3 flex flex-wrap lg:grid gap-2 grow">
               {tags.sort().map((tag) => (
                 <li key={tag}>
                   <label
                     htmlFor={tag}
-                    className={`text-sm text-scale-1000 py-0.5 px-2 capitalize inline-block rounded-lg hover:bg-slate-400  hover:border-slate-400 cursor-pointer border ${
-                      filters.includes(tag) ? 'bg-slate-400 ' : ''
+                    className={`text-sm text-foreground-lighter py-0.5 px-2 capitalize inline-block rounded-lg hover:bg-surface-100 cursor-pointer border ${
+                      filters.includes(tag) ? 'bg-surface-100 ' : ''
                     }`}
                   >
                     <span className="flex items-center gap-1">
@@ -95,20 +106,15 @@ export default function Extensions() {
               )
               .map((extension) => (
                 <Link
-                  passHref
-                  href={`${
-                    extension.link
-                      ? `/guides/database/extensions/${extension.name}`
-                      : '/guides/database/extensions#full-list-of-extensions'
-                  }`}
+                  href={extension.link}
+                  target={getLinkTarget(extension.link)}
+                  className="no-underline"
                 >
-                  <a target={`${extension.link ? '_blank' : '_self'}`} className="no-underline">
-                    <GlassPanel title={extension.name} background={false} key={extension.name}>
-                      <p className="mt-4">
-                        {extension.comment.charAt(0).toUpperCase() + extension.comment.slice(1)}
-                      </p>
-                    </GlassPanel>
-                  </a>
+                  <GlassPanel title={extension.name} background={false} key={extension.name}>
+                    <p className="mt-4">
+                      {extension.comment.charAt(0).toUpperCase() + extension.comment.slice(1)}
+                    </p>
+                  </GlassPanel>
                 </Link>
                 // <div className="my-2 px-2 relative" key={extension.name}>
                 //   <div className="border rounded-sm p-4">

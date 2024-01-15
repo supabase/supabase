@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { Button, Form, IconDownload, Input } from 'ui'
 
-import supabase from '~/lib/supabase'
+import supabase from '~/lib/supabaseMisc'
 import CTABanner from 'components/CTABanner/index'
 import Layout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -30,7 +30,7 @@ const DPA = () => {
 
       resetForm()
       setFormSubmitted(true)
-      window.open('https://supabase.com/downloads/docs/Supabase+DPA+220503.pdf', '_blank')
+      window.open('https://supabase.com/downloads/docs/Supabase+DPA+231211.pdf', '_blank')
     } catch (error: any) {
       setError(error.message)
     }
@@ -41,7 +41,7 @@ const DPA = () => {
         <SectionContainer>
           <div className="mx-auto grid max-w-2xl grid-cols-12 rounded-lg">
             <div className="col-span-12 flex items-center lg:col-span-12">
-              <div className="prose flex flex-col space-y-8 p-16">
+              <div className="prose flex flex-col space-y-8 pb-16">
                 <h1 className="text-center text-5xl">DPA</h1>
                 <p>
                   We have a long-standing commitment to customer privacy and data protection, and as
@@ -49,10 +49,21 @@ const DPA = () => {
                   ("DPA").
                 </p>
 
-                <p>You can download our latest DPA document by submitting your email here.</p>
+                <p>
+                  You can download our latest DPA document by submitting your email here. For the
+                  document to be considered executed, you must return the signed DPA document to{' '}
+                  <a
+                    href="mailto:privacy@supabase.com"
+                    target="_blank"
+                    className="text-brand hover:text-brand"
+                  >
+                    privacy@supabase.com
+                  </a>
+                  .
+                </p>
 
                 {formSubmitted ? (
-                  <p className="text-brand-900">
+                  <p className="text-brand">
                     Thank you for your submission! A new tab should have opened with the DPA
                     document
                   </p>
@@ -82,7 +93,7 @@ const DPA = () => {
                               className="mr-1"
                               loading={isSubmitting}
                             >
-                              Download DPA document
+                              Download DPA
                             </Button>
                           }
                         />

@@ -17,10 +17,11 @@ PGAudit grants fine grain control over which statements and objects are emitted 
   size="small"
   type="underlined"
   defaultActiveId="dashboard"
+  queryGroup="database-method"
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Database](https://app.supabase.com/project/_/database/tables) page in the Dashboard.
+1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
 3. Search for "pgaudit" and enable the extension.
 
@@ -57,6 +58,14 @@ The `pgaudit.log` setting controls which statements to log. Available values inc
 - **all**: Include all of the above.
 
 For a full list of available settings see [settings docs](https://github.com/pgaudit/pgaudit/blob/master/README.md#settings). Be aware that the `all` setting will generate a very large volume of logs.
+
+<Admonition type="note">
+
+We don't currently support configuring `pgaudit.log_parameter` because it may log secrets in encrypted columns if you are using [pgsodium](/docs/guides/database/extensions/pgsodium) or [Vault](/docs/guides/database/vault).
+
+You can upvote this [feature request](https://github.com/orgs/supabase/discussions/20183) if you'd like this restriction lifted.
+
+</Admonition>
 
 ## Example
 

@@ -24,8 +24,8 @@ async function generate() {
     '!pages/*/index.tsx',
     '!pages/api',
     '!pages/404.js',
-    //get the generated partner pages
-    '.next/server/pages/partners/*.html',
+    '.next/server/pages/partners/integrations/*.html',
+    '.next/server/pages/partners/experts/*.html',
   ])
 
   const blogUrl = 'blog'
@@ -39,9 +39,9 @@ async function generate() {
           .filter((page) => !page.includes('_document.tsx'))
           .map((page) => {
             const path = page
-              //replace the path for the generated partner pages
-              .replace('.next/server/pages/partners/', '/partners/')
+              .replace('.next/server/pages', '')
               .replace('pages', '')
+              .replace('.html', '')
               // add a `/` for blog posts
               .replace('_blog', `/${blogUrl}`)
               .replace('_case-studies', `/${caseStudiesUrl}`)
@@ -49,7 +49,6 @@ async function generate() {
               .replace('_alternatives', '/alternatives')
               .replace('.tsx', '')
               .replace('.mdx', '')
-              .replace('.html', '')
               // replace the paths for nested 'index' based routes
               .replace('/auth/Auth', '/auth')
               .replace('/database/Database', '/database')
@@ -102,6 +101,27 @@ async function generate() {
     parser: 'html',
   })
 
+  /**
+   * generate sitemap router
+   *
+   * this points to www and docs sitemaps
+   */
+  const sitemapRouter = `<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>https://supabase.com/sitemap_www.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://supabase.com/docs/sitemap.xml</loc>
+  </sitemap>
+</sitemapindex>
+`
+
+  /**
+   * write sitemaps
+   */
+  // eslint-disable-next-line no-sync
+  writeFileSync('public/sitemap.xml', sitemapRouter)
   // eslint-disable-next-line no-sync
   writeFileSync('public/sitemap_www.xml', formatted)
 }

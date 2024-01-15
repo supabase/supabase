@@ -1,33 +1,15 @@
-"use client";
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
+import LoginForm from './login-form'
 
-import { useSupabase } from "./supabase-provider";
+import type { Database } from '@/lib/database.types'
 
-export default function Login() {
-  const { supabase } = useSupabase();
+export default async function Login() {
+  const supabase = createServerComponentClient<Database>({ cookies })
 
-  const handleSignUp = async () => {
-    await supabase.auth.signUp({
-      email: "jon@supabase.com",
-      password: "sup3rs3cur3",
-    });
-  };
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
 
-  const handleLogin = async () => {
-    await supabase.auth.signInWithPassword({
-      email: "jon@supabase.com",
-      password: "sup3rs3cur3",
-    });
-  };
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-  };
-
-  return (
-    <div>
-      <button onClick={handleSignUp}>Sign Up</button>
-      <button onClick={handleLogin}>Login</button>
-      <button onClick={handleLogout}>Logout</button>
-    </div>
-  );
+  return <LoginForm session={session} />
 }

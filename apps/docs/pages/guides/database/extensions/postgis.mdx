@@ -4,6 +4,7 @@ export const meta = {
   id: 'postgis',
   title: 'PostGIS: Geo queries',
   description: 'Working with geo-spatial data in Postgres',
+  tocVideo: 'agFsGDJxjwA',
 }
 
 [PostGIS](https://postgis.net/) is a Postgres extension that allows you to interact with Geo data within Postgres. You can sort your data by geographic location, get data within certain geographic boundaries, and do much more with it.
@@ -23,10 +24,11 @@ You can get started with PostGIS by enabling the PostGIS extension in your Supab
   size="small"
   type="underlined"
   defaultActiveId="dashboard"
+  queryGroup="database-method"
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Database](https://app.supabase.com/project/_/database/tables) page in the Dashboard.
+1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
 3. Search for "postgis" and enable the extension.
 
@@ -75,6 +77,7 @@ You can insert geographical data through SQL or through our API.
   size="small"
   type="underlined"
   defaultActiveId="data"
+  queryGroup="language"
 >
 <TabPanel id="data" label="Data">
 
@@ -149,7 +152,8 @@ At this point, if you go into your Supabase dashboard and look at the data, you 
 0101000020E6100000A4DFBE0E9C91614044FAEDEBC0494240
 ```
 
-We can query the `restaurants` table directly, but it will return the `location` column in the format you see above. We will create [database functions](https://supabase.com/docs/guides/database/functions) so that we can use the [st_astext()](https://postgis.net/docs/ST_AsText.html) function to convert it back to a human-readable format like `POINT(-73.946713 40.807313)`.
+We can query the `restaurants` table directly, but it will return the `location` column in the format you see above.
+We will create [database functions](https://supabase.com/docs/guides/database/functions) so that we can use the [st_y()](https://postgis.net/docs/ST_Y.html) and [st_x()](https://postgis.net/docs/ST_X.html) function to convert it back to lat and long floating values.
 
 ### Order by distance
 
@@ -157,10 +161,10 @@ Sorting datasets from closest to farthest, sometimes called nearest-neighbor sor
 
 ```sql
 create or replace function nearby_restaurants(lat float, long float)
-returns setof record
+returns table (id public.restaurants.id%TYPE, name public.restaurants.name%TYPE, lat float, long float, dist_meters float)
 language sql
 as $$
-  select id, name, st_astext(location) as location, st_distance(location, st_point(long, lat)::geography) as dist_meters
+  select id, name, st_y(location::geometry) as lat, st_x(location::geometry) as long, st_distance(location, st_point(long, lat)::geography) as dist_meters
   from public.restaurants
   order by location <-> st_point(long, lat)::geography;
 $$;
@@ -173,6 +177,7 @@ You can call this function from your client using `rpc()` like this:
   size="small"
   type="underlined"
   defaultActiveId="js"
+  queryGroup="language"
 >
 <TabPanel id="js" label="JavaScript">
 
@@ -201,19 +206,22 @@ final data = await supabase.rpc('nearby_restaurants',params: {
   {
     "id": 1,
     "name": "Supa Burger",
-    "location": "POINT(-73.946823 40.807416)",
+    "lat": 40.807416,
+    "long": -73.946823,
     "dist_meters": 14.73033739
   },
   {
     "id": 2,
     "name": "Supa Pizza",
-    "location": "POINT(-73.94581 40.807475)",
+    "lat": 40.807475,
+    "long": -73.94581,
     "dist_meters": 78.28980007
   },
   {
     "id": 3,
     "name": "Supa Taco",
-    "location": "POINT(-73.945826 40.80629)",
+    "lat": 40.80629,
+    "long": -73.945826,
     "dist_meters": 136.04329002
   }
 ]
@@ -226,23 +234,23 @@ final data = await supabase.rpc('nearby_restaurants',params: {
 
 ![Searching within a bounding box of a map](/docs/img/guides/database/extensions/postgis/map.png)
 
-When you are working on a map-based application where the user scrolls through your map, you might want to load the that lies within the bounding box of the map every time your users scroll. PostGIS can return the rows that are within the bounding box just by supplying the bottom left and the top right coordinates. Let’s look at what the function would look like.
+When you are working on a map-based application where the user scrolls through your map, you might want to load the data that lies within the bounding box of the map every time your users scroll. PostGIS can return the rows that are within the bounding box just by supplying the bottom left and the top right coordinates. Let’s look at what the function would look like:
 
 ```sql
 create or replace function restaurants_in_view(min_lat float, min_long float, max_lat float, max_long float)
-returns setof record
+returns table (id public.restaurants.id%TYPE, name public.restaurants.name%TYPE, lat float, long float)
 language sql
 as $$
-	select id, name, st_astext(location) as location
+	select id, name, st_y(location::geometry) as lat, st_x(location::geometry) as long
 	from public.restaurants
-	where location && ST_SetSRID(ST_MakeBox2D(ST_Point(min_long, min_lat), ST_Point(max_long, max_lat)),4326)
+	where location && ST_SetSRID(ST_MakeBox2D(ST_Point(min_long, min_lat), ST_Point(max_long, max_lat)), 4326)
 $$;
 ```
 
-[`&&`](https://postgis.net/docs/geometry_overlaps.html) operator used in the `where` statement here returns a boolean of whether the bounding box of the two geometries intersect or not. We basically are creating a bounding box from the two points and finding those points that fall under the bounding box. We are also utilizing a few different PostGIS functions here.
+The [`&&`](https://postgis.net/docs/geometry_overlaps.html) operator used in the `where` statement here returns a boolean of whether the bounding box of the two geometries intersect or not. We are basically creating a bounding box from the two points and finding those points that fall under the bounding box. We are also utilizing a few different PostGIS functions:
 
 - [ST_MakeBox2D](https://postgis.net/docs/ST_MakeBox2D.html): Creates a 2-dimensional box from two points.
-- [ST_SetSRID](https://postgis.net/docs/ST_SetSRID.html): Sets the [SRID](https://postgis.net/docs/manual-dev/using_postgis_dbmanagement.html#spatial_ref_sys), which is an identifier of what coordinate system to use, for the geometry. 4326 the standard longitude and latitude coordinate systems.
+- [ST_SetSRID](https://postgis.net/docs/ST_SetSRID.html): Sets the [SRID](https://postgis.net/docs/manual-dev/using_postgis_dbmanagement.html#spatial_ref_sys), which is an identifier of what coordinate system to use for the geometry. 4326 is the standard longitude and latitude coordinate system.
 
 You can call this function from your client using `rpc()` like this:
 
@@ -251,6 +259,7 @@ You can call this function from your client using `rpc()` like this:
   size="small"
   type="underlined"
   defaultActiveId="js"
+  queryGroup="language"
 >
 <TabPanel id="js" label="JavaScript">
 
@@ -283,7 +292,8 @@ final data = await supabase.rpc('restaurants_in_view', params: {
   {
     "id": 2,
     "name": "Supa Pizza",
-    "location": "POINT(-73.94581 40.807475)"
+    "lat": 40.807475,
+    "long": -73.94581
   }
 ]
 ```

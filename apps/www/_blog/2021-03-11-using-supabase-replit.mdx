@@ -8,6 +8,8 @@ author_image_url: https://github.com/awalias.png
 authorURL: https://github.com/awalias
 image: replit-og.jpg
 thumb: replit-og.jpg
+categories:
+  - engineering
 tags:
   - replit
   - node-js
@@ -77,7 +79,7 @@ supabase.
 // or...
 // async/await syntax
 const main = async() => {
-  let { data, error } = supabase
+  const { data, error } = supabase
     .from('countries')
     .select('*')
     .limit(5)
@@ -133,4 +135,4 @@ We look forward to showing off some more Supabase + Replit examples.
 
 You can find my example repl here: [https://repl.it/@awalias/supabase-test#index.js](https://repl.it/@awalias/supabase-test#index.js)
 
-Supabase has a free tier, head over to [https://app.supabase.com](https://app.supabase.com) to get started.
+Supabase has a free plan, head over to [https://supabase.com/dashboard](https://supabase.com/dashboard) to get started.

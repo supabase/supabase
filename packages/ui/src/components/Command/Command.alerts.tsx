@@ -6,7 +6,7 @@ export const AiWarning = ({ className }: { className?: string }) => (
     variant="info"
     title="Supabase AI is experimental and may produce incorrect answers."
     className={className}
-    icon={<Microscope strokeWidth={1.5} size={18} className="text-scale-900" />}
+    icon={<Microscope strokeWidth={1.5} size={18} className="text-foreground-muted" />}
   >
     <p>Always verify the output before executing.</p>
   </Alert>

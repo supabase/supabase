@@ -40,15 +40,18 @@
 
 			const file = files[0]
 			const fileExt = file.name.split('.').pop()
-			url = `${Math.random()}.${fileExt}`
+			const filePath = `${Math.random()}.${fileExt}`
 
-			let { error } = await supabase.storage.from('avatars').upload(url, file)
+			let { error } = await supabase.storage.from('avatars').upload(filePath, file)
 
 			if (error) {
 				throw error
 			}
 
-			dispatch('upload')
+			url = filePath
+			setTimeout(() => {
+				dispatch('upload')
+			}, 100)
 		} catch (error) {
 			if (error instanceof Error) {
 				alert(error.message)

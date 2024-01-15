@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 // @ts-ignore
 import defaultTheme from '../../theme/defaultTheme'
 // @ts-ignore
@@ -19,7 +19,7 @@ type Props = {
   responsive?: boolean
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
   beforeLabel?: string
-  afterLabel?: string
+  afterLabel?: string | React.ReactNode
   nonBoxInput?: boolean
   labelLayout?: 'horizontal' | 'vertical'
 }
@@ -125,12 +125,12 @@ export function FormLayout({
   )
 
   const renderDescription = descriptionText && (
-    <p
+    <div
       className={[__styles.description.base, __styles.description.size[size]].join(' ')}
       id={id + '-description'}
     >
       {descriptionText}
-    </p>
+    </div>
   )
 
   return (
