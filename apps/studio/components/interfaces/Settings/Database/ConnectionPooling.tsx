@@ -28,6 +28,7 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { usePoolingConfigurationUpdateMutation } from 'data/database/pooling-configuration-update-mutation'
 import { useCheckPermissions, useStore } from 'hooks'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 
 const formId = 'connection-pooling-form'
 
@@ -56,6 +57,9 @@ export const ConnectionPooling = () => {
   const { ui } = useStore()
   const { ref: projectRef } = useParams()
   const { project } = useProjectContext()
+
+  const { data: addons } = useProjectAddonsQuery({ projectRef })
+  const computeInstance = addons?.selected_addons.find((addon) => addon.type === 'compute_instance')
 
   const {
     data: poolingInfo,
@@ -249,6 +253,13 @@ export const ConnectionPooling = () => {
                               className="w-full"
                               {...field}
                               value={field.value || undefined}
+                              placeholder={
+                                poolingInfo.supavisor_enabled && field.value === null
+                                  ? `Default: ${
+                                      computeInstance?.variant.meta?.connections_pooler ?? '200'
+                                    }`
+                                  : ''
+                              }
                             />
                           </FormControl_Shadcn_>
                           <FormDescription_Shadcn_ className="col-start-5 col-span-8">

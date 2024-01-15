@@ -1,9 +1,20 @@
+import { useParams } from 'common'
 import dayjs from 'dayjs'
+import { useTheme } from 'next-themes'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useMemo } from 'react'
+import {
+  Alert,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconAlertCircle,
+  IconChevronRight,
+  IconExternalLink,
+} from 'ui'
 
-import { useParams } from 'common'
-import { useTheme } from 'next-themes'
 import {
   getAddons,
   subscriptionHasHipaaAddon,
@@ -23,28 +34,17 @@ import {
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { ProjectAddonVariantMeta } from 'data/subscriptions/types'
 import { useFlag, useProjectByRef, useSelectedOrganization } from 'hooks'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { BASE_PATH } from 'lib/constants'
 import { getDatabaseMajorVersion, getSemanticVersion } from 'lib/helpers'
 import { SUBSCRIPTION_PANEL_KEYS, useSubscriptionPageStateSnapshot } from 'state/subscription-page'
-import {
-  Alert,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertCircle,
-  IconChevronRight,
-  IconExternalLink,
-} from 'ui'
-import Image from 'next/image'
 import ComputeInstanceSidePanel from './ComputeInstanceSidePanel'
-import PITRSidePanel from './PITRSidePanel'
 import CustomDomainSidePanel from './CustomDomainSidePanel'
-import { ProjectAddonVariantMeta } from 'data/subscriptions/types'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import PITRSidePanel from './PITRSidePanel'
 
 const Addons = () => {
   const { resolvedTheme } = useTheme()
