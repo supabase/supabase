@@ -35,7 +35,7 @@ const PricingAddOnTable = ({ icon, pricing }: PricingAddOnTableProps) => {
         <Collapsible.Trigger asChild>
           <button
             className={classNames(
-              'text-foreground bg-blue-500 border-background-surface-100 group flex w-full flex-col items-start rounded-t-md dark:border lg:flex-row lg:items-center',
+              'text-foreground bg-blue-500 border border-overlay group flex w-full flex-col items-start rounded-t-md lg:flex-row lg:items-center',
               !isAddOnOpen && 'rounded-b-md'
             )}
             type="button"

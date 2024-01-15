@@ -30,7 +30,7 @@ const Footer = () => (
             <p>{text}</p>
             <Link
               href={url}
-              className="text-brand hover:underline"
+              className="text-brand-link hover:underline"
               target="_blank"
               rel="noreferrer noopener"
             >
@@ -58,7 +58,10 @@ const Footer = () => (
             </Link>
           ) : (
             Component && (
-              <Component className="text-xs text-foreground-lighter hover:underline">
+              <Component
+                key={item.title}
+                className="text-xs text-foreground-lighter hover:underline"
+              >
                 {item.title}
               </Component>
             )

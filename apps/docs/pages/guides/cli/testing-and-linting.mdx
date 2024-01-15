@@ -11,7 +11,7 @@ The Supabase CLI provides a set of tools to help you test and lint your Postgres
 
 ## Testing your database
 
-The Supabase CLI provides Postgres liniting using the `supabase test db` command.
+The Supabase CLI provides Postgres linting using the `supabase test db` command.
 
 {/* prettier-ignore */}
 ```markdown
@@ -44,13 +44,13 @@ The Supabase CLI uses [Inbucket](https://github.com/inbucket/inbucket) to captur
 
 By default, Inbucket is available at [localhost:54324](http://localhost:54324) when you run `supabase start`. Simply open this URL in your browser to view the emails.
 
-### Going into Production
+### Going into production
 
 The "default" email provided by Supabase is only for development purposes. It is [heavily restricted](/docs/guides/platform/going-into-prod#auth-rate-limits) to ensure that it is not used for spam. Before going into production, you must configure your own email provider. This is as simple as enabling a new SMTP credentials in your [project settings](https://supabase.com/dashboard/project/_/settings/auth).
 
 ## Linting your database
 
-The Supabase CLI provides Postgres liniting using the `supabase db lint` command:
+The Supabase CLI provides Postgres linting using the `supabase db lint` command:
 
 {/* prettier-ignore */}
 ```markdown
@@ -73,7 +73,7 @@ This is powered by [plpgsql_check](https://github.com/okbob/plpgsql_check), whic
 - detection of dead code (any code after an `RETURN` command)
 - detection of missing `RETURN` commands with your Postgres function
 - identifies unwanted hidden casts, which can be a performance issue
-- checks `EXECUTE` statements agaist SQL injection vulnerability
+- checks `EXECUTE` statements against SQL injection vulnerability
 
 Check the Reference Docs for [more information](/docs/reference/cli/supabase-db-lint).
 

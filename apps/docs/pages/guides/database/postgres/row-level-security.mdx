@@ -46,13 +46,13 @@ alter table "table_name" enable row level security;
 
 Once you have enabled RLS, no data will be accessible via the [API](/docs/guides/api) when using the public `anon` key, until you create policies.
 
-## Creating Policies
+## Creating policies
 
 Policies are simply SQL logic that you attach to a Postgres table. You can attach as many policies as you want to each table.
 
 Supabase provides some [helpers](/docs/guides/auth/row-level-security#helper-functions) that simplify RLS if you're using Supabase Auth. We'll use these helpers to illustrate some basic policies:
 
-### SELECT Policies
+### SELECT policies
 
 You can specify select policies with the `using` clause.
 
@@ -84,7 +84,7 @@ on profiles
 for select using ( auth.uid() = user_id );
 ```
 
-### INSERT Policies
+### INSERT policies
 
 You can specify insert policies with the `with check` clause.
 
@@ -108,7 +108,7 @@ to authenticated                          -- the Postgres Role (recommended)
 with check ( auth.uid() = user_id );      -- the actual Policy
 ```
 
-### UPDATE Policies
+### UPDATE policies
 
 You can specify update policies with the `using` clause.
 
@@ -132,7 +132,7 @@ to authenticated                     -- the Postgres Role (recommended)
 using ( auth.uid() = user_id );      -- the actual Policy
 ```
 
-### DELETE Policies
+### DELETE policies
 
 You can specify delete policies with the `using` clause.
 
@@ -166,7 +166,7 @@ grant bypassrls on "table_name" to "role_name";
 
 This can be useful for system-level access. You should _never_ share login credentials for any Postgres Role with this privilege.
 
-## RLS Performance Recommendations
+## RLS performance recommendations
 
 Every authorization system has an impact on performance. While row level security is powerful, the performance impact is important to keep in mind. This is especially true for queries that scan every row in a table - like many `select` operations, including those using limit, offset, and ordering.
 
@@ -351,7 +351,7 @@ If the list exceeds 1000 items, a different approach may be needed or you may ne
 | --------------------------------------------------------------------------------------------------- | ----------- | ---------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [test5-fixed-join](https://github.com/GaryAustin1/RLS-Performance/tree/main/tests/test5-fixed-join) | 9,000       | 20         | 99.78%        | <details className="cursor-pointer">Before:<br/>`auth.uid()` in table join on col<br/><br/>After:<br/>col in table join on `auth.uid()`</details> |
 
-### Specify Roles in your Policies
+### Specify roles in your policies
 
 Always use the Role of inside your policies, specified by the `TO` operator. For example, instead of this query:
 

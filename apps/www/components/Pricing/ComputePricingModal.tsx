@@ -38,13 +38,13 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
         <div className="p-5">
           <div className="grid lg:flex gap-8">
             <div className="prose">
-              <div className="bg-brand-200 dark:bg-brand-200 rounded-xl w-12 h-12 flex justify-center items-center">
+              <div className="bg-brand-200 rounded-xl w-12 h-12 flex justify-center items-center">
                 <Image
                   width={24}
                   height={24}
                   className="w-6"
                   src={`${basePath}/images/pricing/compute-upgrade${
-                    resolvedTheme === 'dark' ? '-green' : '-light'
+                    resolvedTheme?.includes('dark') ? '-green' : '-light'
                   }.svg`}
                   alt=""
                 />
@@ -86,7 +86,7 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
         <div className="p-5">
           <table className="text-foreground m-0 hidden w-full table-auto overflow-hidden rounded-b lg:table text-xs">
             <thead>
-              <tr className="">
+              <tr>
                 {columnNames.map((column) => (
                   <th key={column.key} className="p-3 text-left font-medium">
                     {column.title}
@@ -98,9 +98,9 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
               {pricingAddOn.database.rows.map((row, i) => (
                 <Fragment key={`row-${i}`}>
                   {i === 0 && (
-                    <tr className="">
+                    <tr>
                       <td className="pb-1 bg-border-strong px-3 py-1 -mr-1 border-l-4 border-strong">
-                        <span className="">First instance is free on paid plans</span>
+                        <span>First instance is free on paid plans</span>
                       </td>
                     </tr>
                   )}

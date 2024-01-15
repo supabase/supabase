@@ -21,7 +21,7 @@ The number of dimensions in your embeddings is the most important factor in choo
 
 ## HNSW
 
-### 384 Dimensions
+### 384 dimensions
 
 This benchmark uses the dbpedia-entities-openai-1M dataset containing 1,000,000 embeddings of text, regenerated for 384 dimension embeddings. Each embedding is generated using [gte-small](https://huggingface.co/Supabase/gte-small).
 
@@ -52,7 +52,7 @@ Accuracy was 0.99 for benchmarks.
 </TabPanel>
 </Tabs>
 
-### 960 Dimensions
+### 960 dimensions
 
 This benchmark uses the [gist-960](http://corpus-texmex.irisa.fr/) dataset, which contains 1,000,000 embeddings of images. Each embedding is 960 dimensions.
 
@@ -85,7 +85,7 @@ QPS can also be improved by increasing [`m` and `ef_construction`](/docs/guides/
 </TabPanel>
 </Tabs>
 
-### 1536 Dimensions
+### 1536 dimensions
 
 This benchmark uses the [dbpedia-entities-openai-1M](https://huggingface.co/datasets/KShivendu/dbpedia-entities-openai-1M) dataset, which contains 1,000,000 embeddings of text. And 224,482 embeddings from [Wikipedia articles](https://huggingface.co/datasets/Supabase/wikipedia-en-embeddings) for compute add-ons `large` and below. Each embedding is 1536 dimensions created with the [OpenAI Embeddings API](https://platform.openai.com/docs/guides/embeddings).
 
@@ -125,21 +125,18 @@ It is possible to upload more vectors to a single table if Memory allows it (for
 </Admonition>
 
 <div>
-  <img
+  <Image
     alt="multi database"
-    className="dark:hidden"
-    src="/docs/img/ai/instance-type/hnsw-dims--light.png"
-  />
-  <img
-    alt="multi database"
-    className="hidden dark:block"
-    src="/docs/img/ai/instance-type/hnsw-dims--dark.png"
+    src={{
+      light: '/docs/img/ai/instance-type/hnsw-dims--light.png',
+      dark: '/docs/img/ai/instance-type/hnsw-dims--dark.png',
+    }}
   />
 </div>
 
 ## IVFFlat
 
-### 384 Dimensions
+### 384 dimensions
 
 This benchmark uses the dbpedia-entities-openai-1M dataset containing 1,000,000 embeddings of text, regenerated for 384 dimension embeddings. Each embedding is generated using [gte-small](https://huggingface.co/Supabase/gte-small).
 
@@ -184,7 +181,7 @@ This benchmark uses the dbpedia-entities-openai-1M dataset containing 1,000,000 
 </TabPanel>
 </Tabs>
 
-### 960 Dimensions
+### 960 dimensions
 
 This benchmark uses the [gist-960](http://corpus-texmex.irisa.fr/) dataset, which contains 1,000,000 embeddings of images. Each embedding is 960 dimensions.
 
@@ -213,7 +210,7 @@ This benchmark uses the [gist-960](http://corpus-texmex.irisa.fr/) dataset, whic
 </TabPanel>
 </Tabs>
 
-### 1536 Dimensions
+### 1536 dimensions
 
 This benchmark uses the [dbpedia-entities-openai-1M](https://huggingface.co/datasets/KShivendu/dbpedia-entities-openai-1M) dataset, which contains 1,000,000 embeddings of text. Each embedding is 1536 dimensions created with the [OpenAI Embeddings API](https://platform.openai.com/docs/guides/embeddings).
 
@@ -263,15 +260,12 @@ For 1,000,000 vectors 40 probes results to accuracy of 0.98. Note that exact val
 </Tabs>
 
 <div>
-  <img
+  <Image
     alt="multi database"
-    className="dark:hidden"
-    src="/docs/img/ai/going-prod/size-to-rps--light.png"
-  />
-  <img
-    alt="multi database"
-    className="hidden dark:block"
-    src="/docs/img/ai/going-prod/size-to-rps--dark.png"
+    src={{
+      light: '/docs/img/ai/going-prod/size-to-rps--light.png',
+      dark: '/docs/img/ai/going-prod/size-to-rps--dark.png',
+    }}
   />
 </div>
 
@@ -303,30 +297,24 @@ You can increase the Requests per Second by increasing `m` and `ef_construction`
 <TabPanel id="hnsw" label="HNSW">
 
 <div>
-  <img
-    alt="dbpedia embeddings comparing hnsw queries-per-second using different build parameters (light)"
-    className="dark:hidden"
-    src="/docs/img/ai/going-prod/dbpedia-hnsw-build-parameters--light.png"
-  />
-  <img
-    alt="dbpedia embeddings comparing hnsw queries-per-second using different build parameters (dark)"
-    className="hidden dark:block"
-    src="/docs/img/ai/going-prod/dbpedia-hnsw-build-parameters--dark.png"
+  <Image
+    alt="multi database"
+    src={{
+      light: '/docs/img/ai/going-prod/dbpedia-hnsw-build-parameters--light.png',
+      dark: '/docs/img/ai/going-prod/dbpedia-hnsw-build-parameters--dark.png',
+    }}
   />
 </div>
 
 </TabPanel>
 <TabPanel id="ivfflat" label="IVFFlat">
 <div>
-  <img
+  <Image
     alt="multi database"
-    className="dark:hidden"
-    src="/docs/img/ai/instance-type/lists-for-1m--light.png"
-  />
-  <img
-    alt="multi database"
-    className="hidden dark:block"
-    src="/docs/img/ai/instance-type/lists-for-1m--dark.png"
+    src={{
+      light: '/docs/img/ai/instance-type/lists-for-1m--light.png',
+      dark: '/docs/img/ai/instance-type/lists-for-1m--dark.png',
+    }}
   />
 </div>
 </TabPanel>
@@ -334,20 +322,17 @@ You can increase the Requests per Second by increasing `m` and `ef_construction`
 
 Check out more tips and the complete step-by-step guide in [Going to Production for AI applications](going-to-prod).
 
-## Benchmark Methodology
+## Benchmark methodology
 
 We follow techniques outlined in the [ANN Benchmarks](https://github.com/erikbern/ann-benchmarks) methodology. A Python test runner is responsible for uploading the data, creating the index, and running the queries. The pgvector engine is implemented using [vecs](https://github.com/supabase/vecs), a Python client for pgvector.
 
 <div>
-  <img
+  <Image
     alt="multi database"
-    className="dark:hidden"
-    src="/docs/img/ai/instance-type/vecs-benchmark--light.png"
-  />
-  <img
-    alt="multi database"
-    className="hidden dark:block"
-    src="/docs/img/ai/instance-type/vecs-benchmark--dark.png"
+    src={{
+      light: '/docs/img/ai/instance-type/vecs-benchmark--light.png',
+      dark: '/docs/img/ai/instance-type/vecs-benchmark--dark.png',
+    }}
   />
 </div>
 

@@ -1,6 +1,5 @@
 import { useRouter } from 'next/router'
 import * as React from 'react'
-import { ElementRef, useRef } from 'react'
 import { IconHome } from '../Icon/icons/IconHome'
 
 import { IconArrowRight } from './../Icon/icons/IconArrowRight'
@@ -24,6 +23,7 @@ import {
   CommandItem,
   CommandLabel,
   CommandList,
+  FORCE_MOUNT_ITEM,
   copyToClipboard,
 } from './Command.utils'
 import { COMMAND_ROUTES } from './Command.constants'
@@ -38,6 +38,7 @@ import CommandMenuShortcuts from './CommandMenuShortcuts'
 import { BadgeExperimental } from './Command.Badges'
 import { AiIconAnimation } from '@ui/layout/ai-icon-animation'
 import ChildItem from './ChildItem'
+import { useParams } from 'common'
 
 export const CHAT_ROUTES = [
   COMMAND_ROUTES.AI, // this one is temporary
@@ -58,16 +59,22 @@ const iconPicker: { [key: string]: React.ReactNode } = {
   products: <IconColumns />,
 }
 
-interface CommandMenuProps {
-  projectRef?: string
-}
-
-const CommandMenu = ({ projectRef }: CommandMenuProps) => {
+const CommandMenu = () => {
   const router = useRouter()
+  const { ref: projectRef } = useParams()
 
-  const commandInputRef = useRef<ElementRef<typeof CommandInput>>(null)
-  const { isOpen, setIsOpen, search, setSearch, pages, setPages, currentPage, site, project } =
-    useCommandMenu()
+  const {
+    isOpen,
+    setIsOpen,
+    search,
+    setSearch,
+    pages,
+    setPages,
+    currentPage,
+    site,
+    project,
+    inputRef: commandInputRef,
+  } = useCommandMenu()
   const showCommandInput = !currentPage || !CHAT_ROUTES.includes(currentPage)
 
   // This function has been added to prevent the use of double quotes in the search docs input due to an issue with the cmdk-supabase module. This function can be removed when we transition to using cmdk.
@@ -75,6 +82,9 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
     const newValue = value.replace(/"/g, '') // Remove double quotes
     setSearch(newValue)
   }
+
+  const commandListMaxHeight =
+    currentPage === COMMAND_ROUTES.DOCS_SEARCH ? 'min(600px, 50vh)' : '300px'
 
   return (
     <>
@@ -100,15 +110,22 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
             onValueChange={handleInputChange}
           />
         )}
-        <CommandList className={['my-2', showCommandInput && 'max-h-[300px]'].join(' ')}>
+        <CommandList
+          style={{
+            maxHeight: commandListMaxHeight,
+            height: currentPage === COMMAND_ROUTES.DOCS_SEARCH ? commandListMaxHeight : 'auto',
+          }}
+          className="my-2"
+        >
           {!currentPage && (
             <>
               <CommandGroup heading="Documentation">
                 <CommandItem
                   type="command"
+                  value={site === 'docs' ? `${FORCE_MOUNT_ITEM}--docs-search` : undefined}
                   onSelect={() => setPages([...pages, COMMAND_ROUTES.DOCS_SEARCH])}
                 >
-                  <IconBook className="" />
+                  <IconBook />
 
                   <span>
                     Search the docs
@@ -124,7 +141,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                 </CommandItem>
                 <CommandItem
                   type="command"
-                  badge={<BadgeExperimental />}
+                  value={site === 'docs' ? `${FORCE_MOUNT_ITEM}--ai-info` : undefined}
                   onSelect={() => {
                     setPages([...pages, COMMAND_ROUTES.AI])
                   }}
@@ -160,7 +177,13 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
               {site === 'docs' && (
                 <CommandGroup heading="Projects">
                   {sharedItems.projectTools.map((item) => (
-                    <CommandItem key={item.url} type="link" onSelect={() => router.push(item.url)}>
+                    <CommandItem
+                      key={item.url}
+                      type="link"
+                      onSelect={() =>
+                        window.open(`https://supabase.com/dashboard${item.url}`, '_blank')
+                      }
+                    >
                       <IconArrowRight className="text-foreground-muted" />
                       <CommandLabel>
                         <span className="font-bold"> {item.label}</span>
@@ -173,7 +196,13 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
               {site === 'docs' && (
                 <CommandGroup heading="Studio tools">
                   {sharedItems.tools.map((item) => (
-                    <CommandItem key={item.url} type="link" onSelect={() => router.push(item.url)}>
+                    <CommandItem
+                      key={item.url}
+                      type="link"
+                      onSelect={() =>
+                        window.open(`https://supabase.com/dashboard${item.url}`, '_blank')
+                      }
+                    >
                       <IconArrowRight className="text-foreground-muted" />
                       <CommandLabel>
                         Go to <span className="font-bold"> {item.label}</span>
@@ -227,9 +256,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
               {site === 'studio' && (
                 <CommandGroup heading="Navigate">
                   {sharedItems.tools.map((item) => {
-                    const itemUrl = (
-                      projectRef ? item.url.replace('_', projectRef) : item.url
-                    ).split('https://supabase.com/dashboard')[1]
+                    const itemUrl = projectRef ? item.url.replace('_', projectRef) : item.url
 
                     return (
                       <CommandItem

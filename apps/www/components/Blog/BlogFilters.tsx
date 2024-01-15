@@ -36,6 +36,7 @@ const BlogFilters = ({ posts, setPosts, setCategory, allCategories, handlePosts 
   const is2XL = useBreakpoint(1535)
   const [showSearchInput, setShowSearchInput] = useState<boolean>(false)
   const router = useRouter()
+  const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
     setShowSearchInput(!isMobile)
@@ -71,6 +72,12 @@ const BlogFilters = ({ posts, setPosts, setCategory, allCategories, handlePosts 
     activeCategory && setCategory('all')
     setSearchKey(event.target.value)
   }
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  if (!isMounted) return null
 
   return (
     <div className="flex flex-row items-center justify-between gap-2">

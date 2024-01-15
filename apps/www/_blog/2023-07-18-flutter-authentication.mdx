@@ -2,7 +2,7 @@
 title: 'Getting started with Flutter authentication'
 description: Learn how authentication on Flutter works through Google sign in with Supabase auth.
 categories:
-  - engineering
+  - developers
 tags:
   - flutter
   - auth
@@ -208,7 +208,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     return supabase.auth.signInWithIdToken(
-      provider: Provider.google,
+      provider: OAuthProvider.google,
       idToken: idToken,
       accessToken: accessToken,
     );

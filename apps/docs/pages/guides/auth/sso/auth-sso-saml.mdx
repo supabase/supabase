@@ -13,7 +13,7 @@ Looking for guides on how to use Single Sign-On with the Supabase dashboard? Hea
 
 </Admonition>
 
-Supabase Auth supports enterprise-level Single Sign-On (SSO) for any identity providers compatible with the using the SAML 2.0 protocol. This is a non-exclusive list of supported identity providers:
+Supabase Auth supports enterprise-level Single Sign-On (SSO) for any identity providers compatible with the SAML 2.0 protocol. This is a non-exclusive list of supported identity providers:
 
 - Google Workspaces (formerly known as GSuite)
 - Okta, Auth0
@@ -208,10 +208,12 @@ Calling [`signInWithSSO`](/docs/reference/javascript/auth-signinwithsso) starts 
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-supabase.gotrue.loginWith(SSO.withDomain("company.com"))
+supabase.auth.signInWith(SSO) {
+    domain = "company.com"
+}
 ```
 
-Calling [`loginWith(SSO)`](/docs/reference/kotlin/auth-signinwithsso) starts the sign-in process using the identity provider registered for the `company.com` domain name. It is not required that identity providers be assigned one or multiple domain names, in which case you can use the provider's unique ID instead.
+Calling [`signInWith(SSO)`](/docs/reference/kotlin/auth-signinwithsso) starts the sign-in process using the identity provider registered for the `company.com` domain name. It is not required that identity providers be assigned one or multiple domain names, in which case you can use the provider's unique ID instead.
 
 </TabPanel>
 </Tabs>
@@ -360,7 +362,7 @@ supabase sso show <provider-id> --project-ref <your-project>
 
 You can use the `-o json` flag to output the information as JSON, should you need to. Other formats may be supported, please use `--help` to see all available options.
 
-## Frequently Asked Questions
+## Frequently asked questions
 
 ### How do I publish my application to an identity provider's marketplace?
 
@@ -372,7 +374,7 @@ Please refer to the relevant documentation for each cloud-based identity provide
 - [Azure Active Directory App Gallery](https://learn.microsoft.com/en-us/azure/active-directory-b2c/publish-app-to-azure-ad-app-gallery)
 - [Google Workspaces Pre-integrated SAML apps catalog](https://support.google.com/a/table/9217027)
 
-### Why do some users get: SAML Assertion does not contain email address?
+### Why do some users get: SAML assertion does not contain email address?
 
 Identity providers do not have to send back and email address for the user, though they often do. Supabase Auth requires that an email address is present.
 

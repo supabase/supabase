@@ -18,11 +18,11 @@ Custom domains allow you to present a branded experience to your users. Custom d
   ></iframe>
 </div>
 
-## Configure a Custom Domain using the Supabase Dashboard
+## Configure a custom domain using the Supabase dashboard
 
 Follow the **Custom Domains** steps in the [General Settings](https://supabase.com/dashboard/project/_/settings/general) page in the Dashboard to set up a custom domain for your project.
 
-## Configure a Custom Domain using the Supabase CLI
+## Configure a custom domain using the Supabase CLI
 
 This example assumes your Supabase project is `foobarbaz` with a corresponding API URL `foobarbaz.supabase.co` and configures a custom domain at `api.example.com`.
 
@@ -35,7 +35,7 @@ To get started:
 
 Set up a CNAME record for `api.example.com`, resolving to `foobarbaz.supabase.co.`, with as low a TTL as possible.
 
-### Configure TXT Verification
+### Configure TXT verification
 
 Use the `create` subcommand of the CLI to notify Supabase of your domain and retrieve TXT verification records:
 
@@ -89,7 +89,7 @@ Finally, you can use the `activate` subcommand to reconfigure your project:
 supabase domains activate --project-ref foobarbaz --experimental
 ```
 
-## Remove a Custom Domain
+## Remove a custom domain
 
 If you have a custom domain (`api.example.com`) set up for your Supabase project (ref `foobarbaz`, with assigned endpoints at `foobarbaz.supabase.co`), and would like to go back to using the Supabase-provisioned endpoints (`foobarbaz.supabase.co`), you can use the `delete` subcommand:
 
@@ -99,7 +99,7 @@ supabase domains delete --project-ref foobarbaz --experimental
 
 As with the final activation stage of the process for setting up a custom domain, you'll need to update any references in your client code and OAuth providers from the custom domain to the Supabase-provisioned endpoints.
 
-## Vanity Subdomains
+## Vanity subdomains
 
 Vanity Subdomains allow you to present a basic branded experience, compared to custom domains. They allow you to host your services at a custom subdomain on Supabase (e.g., `my-example-brand.supabase.co`) instead of the default, randomly-assigned `foobarbaz.supabase.co`.
 
@@ -110,7 +110,7 @@ To get started:
 1. Ensure that you have [Owner or Admin permissions](/docs/guides/platform/access-control#manage-team-members) for the project you'd like to set up a vanity subdomain for.
 1. Ensure that your organization is on a paid plan (Pro/Team/Enterprise plan) in the [Billing page of the Dashboard](https://supabase.com/dashboard/org/_/billing).
 
-## Configure a Vanity Subdomain
+## Configure a vanity subdomain
 
 This example assumes your Supabase project is `foobarbaz` with a corresponding API URL `foobarbaz.supabase.co` and configures a vanity subdomain at `my-example-brand.supabase.co`.
 
@@ -137,7 +137,7 @@ The `activate` subcommand can be used to initiate the activation:
 supabase vanity-subdomains --project-ref fwmssjhjgszhnavvqxnt activate --desired-subdomain my-example-subdomain --experimental
 ```
 
-## Remove a Vanity Subdomain
+## Remove a vanity subdomain
 
 If you have a vanity subdomain (`my-example-brand.supabase.co`) set up for your Supabase project (ref `foobarbaz`, with assigned endpoints at `foobarbaz.supabase.co`), and would like to go back to using the Supabase-provisioned endpoints (`foobarbaz.supabase.co`), you can use the `delete` subcommand:
 

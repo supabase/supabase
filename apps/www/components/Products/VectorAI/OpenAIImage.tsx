@@ -23,17 +23,17 @@ const OpenAIImage = ({ isHovered }: { isHovered: boolean }) => {
   }
 
   const colors = {
-    glow: resolvedTheme === 'dark' ? '#009C77' : '#00FFD9',
-    rectStart: resolvedTheme === 'dark' ? '#17FDDF' : '#49615E',
-    rectEnd: resolvedTheme === 'dark' ? '#10FFE0' : '#202020',
-    cardBgStart: resolvedTheme === 'dark' ? '#171717' : 'white',
-    cardBgEnd: resolvedTheme === 'dark' ? '#171717' : 'white',
-    openAIStart: resolvedTheme === 'dark' ? '#89FFCA' : '#4FD7B6',
-    openAIEnd: resolvedTheme === 'dark' ? '#D0FAE6' : '#4F7362',
-    openAIStrokeStart: resolvedTheme === 'dark' ? '#A5FFD6' : '#5F5F5F',
-    openAIStrokeEnd: resolvedTheme === 'dark' ? '#D0FAE6' : '#D6D6D6',
-    openAIAltStart: resolvedTheme === 'dark' ? '#00DBA7' : '#00DBA7',
-    openAIAltEnd: resolvedTheme === 'dark' ? '#171717' : '#DFDFDF',
+    glow: resolvedTheme?.includes('dark') ? '#009C77' : '#00FFD9',
+    rectStart: resolvedTheme?.includes('dark') ? '#17FDDF' : '#49615E',
+    rectEnd: resolvedTheme?.includes('dark') ? '#10FFE0' : '#202020',
+    cardBgStart: resolvedTheme?.includes('dark') ? '#171717' : 'white',
+    cardBgEnd: resolvedTheme?.includes('dark') ? '#171717' : 'white',
+    openAIStart: resolvedTheme?.includes('dark') ? '#89FFCA' : '#4FD7B6',
+    openAIEnd: resolvedTheme?.includes('dark') ? '#D0FAE6' : '#4F7362',
+    openAIStrokeStart: resolvedTheme?.includes('dark') ? '#A5FFD6' : '#5F5F5F',
+    openAIStrokeEnd: resolvedTheme?.includes('dark') ? '#D0FAE6' : '#D6D6D6',
+    openAIAltStart: resolvedTheme?.includes('dark') ? '#00DBA7' : '#00DBA7',
+    openAIAltEnd: resolvedTheme?.includes('dark') ? '#171717' : '#DFDFDF',
   }
 
   const RenderedSVG = () => (
@@ -281,7 +281,7 @@ const OpenAIImage = ({ isHovered }: { isHovered: boolean }) => {
       <div className="w-[44%] h-[44%] -translate-x-[2px] absolute z-10 inset-0 top-auto bottom-[16%] m-auto">
         <Image
           src={
-            resolvedTheme === 'dark'
+            resolvedTheme?.includes('dark')
               ? '/images/product/vector/openai-logo-dark.png'
               : '/images/product/vector/openai-logo-light.png'
           }

@@ -1,6 +1,7 @@
 import { useTheme } from 'next-themes'
 import * as React from 'react'
 import Image from 'next/image'
+import { cn } from '../../lib/utils'
 
 interface Props {
   title: string
@@ -9,6 +10,7 @@ interface Props {
   children?: React.ReactNode
   header?: string
   background?: boolean
+  className?: string
   logo?: string
   logoInverse?: string
   hasLightIcon?: boolean
@@ -28,19 +30,20 @@ const GlassPanel = ({
   hasLightIcon,
   showLink = false,
   showIconBg = false,
+  className,
 }: Props) => {
   const { resolvedTheme } = useTheme()
-  const showLogoInverse = logoInverse && resolvedTheme === 'dark'
+  const showLogoInverse = logoInverse && resolvedTheme?.includes('dark')
   const showLogo = !showLogoInverse && logo
 
   const IconBackground: React.FC<React.PropsWithChildren> = (props) => (
     <div
-      className={[
+      className={cn(
         'shrink-0',
         showIconBg
           ? 'bg-brand-300 border border-brand-400 w-8 h-8 flex items-center justify-center rounded'
-          : '',
-      ].join(' ')}
+          : ''
+      )}
     >
       {props.children}
     </div>
@@ -52,10 +55,8 @@ const GlassPanel = ({
         <Image
           src={logoImage}
           alt={title}
-          layout="fill"
-          objectFit="contain"
-          objectPosition="left"
-          className={className}
+          fill
+          className={cn('object-contain object-left', className)}
         />
       </div>
     </div>
@@ -63,7 +64,7 @@ const GlassPanel = ({
 
   return (
     <div
-      className={[
+      className={cn(
         'relative',
         'h-full',
         'group',
@@ -75,7 +76,8 @@ const GlassPanel = ({
           ? 'hover:border-strong bg-surface-100'
           : 'border-muted hover:border-default bg-transparent',
         'transition',
-      ].join(' ')}
+        className
+      )}
     >
       {showLogoInverse && <LogoComponent logoImage={logoInverse} className="opacity-50" />}
       {showLogo && <LogoComponent logoImage={logo} className="opacity-75" />}
@@ -93,12 +95,12 @@ const GlassPanel = ({
         style={{ background: `radial-gradient(100% 100% at 0% 0%, #3EACCF18, transparent)` }}
       />
       <div
-        className={[
+        className={cn(
           'px-8 pb-8 relative',
           'flex flex-col h-full',
           icon ? 'gap-6' : 'gap-2',
-          !header ? 'pt-8' : '',
-        ].join(' ')}
+          !header ? 'pt-8' : ''
+        )}
       >
         <div className="flex items-center gap-3">
           {icon && typeof icon === 'string' ? (
@@ -106,7 +108,9 @@ const GlassPanel = ({
               <img
                 className="w-5"
                 alt={title}
-                src={`${icon}${hasLightIcon && resolvedTheme !== 'dark' ? '-light' : ''}.svg`}
+                src={`${icon}${
+                  hasLightIcon && !resolvedTheme?.includes('dark') ? '-light' : ''
+                }.svg`}
               />
             </IconBackground>
           ) : (

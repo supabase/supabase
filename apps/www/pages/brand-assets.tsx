@@ -47,7 +47,7 @@ const Index = () => {
             </div>
           </SectionContainer>
           <SectionContainer>
-            <div className="shadow-small grid grid-cols-12 rounded-lg border dark:border-gray-600">
+            <div className="shadow-small grid grid-cols-12 rounded-lg border border-default">
               <div className="relative col-span-12 h-60 w-full overflow-auto rounded-lg lg:col-span-5">
                 <Image
                   src={supabaseLogoPreview}
@@ -78,7 +78,7 @@ const Index = () => {
             </div>
           </SectionContainer>
           <SectionContainer className="sm:pt-0 md:pt-0 lg:pt-0 xl:pt-0">
-            <div className="shadow-small grid grid-cols-12 rounded-lg border dark:border-gray-600">
+            <div className="shadow-small grid grid-cols-12 rounded-lg border border-default">
               <div className="relative col-span-12 h-60 w-full overflow-auto rounded-lg lg:col-span-5 flex items-center justify-center">
                 <Image
                   src="https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/supabase-brand-assets/connect-supabase/connect-supabase-dark.svg"
