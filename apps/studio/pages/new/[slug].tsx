@@ -148,19 +148,12 @@ const Wizard: NextPageWithLayout = () => {
 
   function onCloudProviderChange(cloudProviderId: CloudProvider) {
     setCloudProvider(cloudProviderId)
-    if (cloudProviderId === PROVIDERS.AWS.id) {
-      setDbRegion(
-        ['staging', 'local'].includes(process.env.NEXT_PUBLIC_ENVIRONMENT ?? '')
-          ? PROVIDERS['AWS'].default_region
-          : ''
-      )
-    } else {
-      setDbRegion(
-        ['staging', 'local'].includes(process.env.NEXT_PUBLIC_ENVIRONMENT ?? '')
-          ? PROVIDERS['FLY'].default_region
-          : ''
-      )
-    }
+    // on local/staging quick-select the default region, don't wait for the cloudflare location
+    setDbRegion(
+      ['staging', 'local'].includes(process.env.NEXT_PUBLIC_ENVIRONMENT ?? '')
+        ? PROVIDERS[cloudProviderId].default_region
+        : ''
+    )
   }
 
   async function checkPasswordStrength(value: any) {
