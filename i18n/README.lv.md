@@ -247,7 +247,7 @@ Mūsu pieeja klientu bibliotēkām ir modulāra. Katra apakšbibliotēka ir atse
 - [Vienkāršotā ķīniešu valoda / 简体中文](/i18n/README.zh-cn.md)
 - [zviedru valodā / Svenska](/i18n/README.sv.md)
 - [Thai / ไทย](/i18n/README.th.md)
-- [Tradicionālā ķīniešu valoda / 繁体中文](/i18n/README.zh-tw.md)
+- [Tradicionālā ķīniešu valoda / 繁體中文](/i18n/README.zh-tw.md)
 - [Turkish / Türkçe](/i18n/README.tr.md)
 - [ukraiņu / Українська](/i18n/README.uk.md)
 - [Vjetnamiešu / Tiếng Việt](/i18n/README.vi-vn.md)

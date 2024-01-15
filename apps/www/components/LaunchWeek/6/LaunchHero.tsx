@@ -9,21 +9,17 @@ export default function LaunchHero() {
         <h1 className="text-foreground text-4xl font-semibold tracking-tight md:text-5xl lg:text-7xl">
           {Controller.hero_header}
         </h1>
-        <h2 className="text-light text-sm lg:text-xl">
+        <h2 className="text-foreground-light text-sm lg:text-xl">
           Stay tuned all week for daily announcements
         </h2>
       </div>
       <div className="flex gap-3">
-        <Link href="#launch-week-5-day-5">
-          <Button type="primary" size="small" className="text-white">
-            Latest release
-          </Button>
-        </Link>
-        <Link href="#launch-week--hackathon">
-          <Button type="default" size="small">
-            Join the Hackathon
-          </Button>
-        </Link>
+        <Button asChild type="primary" size="small" className="text-white">
+          <Link href="#launch-week-5-day-5">Latest release</Link>
+        </Button>
+        <Button asChild type="default" size="small">
+          <Link href="#launch-week--hackathon">Join the Hackathon</Link>
+        </Button>
       </div>
     </div>
   )

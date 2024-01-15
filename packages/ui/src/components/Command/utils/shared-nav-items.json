@@ -153,18 +153,6 @@
           "url": "/project/_/settings/storage"
         },
         {
-          "label": "Subscription settings",
-          "url": "/project/_/settings/billing/subscription"
-        },
-        {
-          "label": "Project Usage",
-          "url": "/project/_/settings/billing/usage"
-        },
-        {
-          "label": "Project Invoices",
-          "url": "/project/_/settings/billing/invoices"
-        },
-        {
           "label": "Custom Domains",
           "url": "/project/_/settings/general#custom-domains"
         },

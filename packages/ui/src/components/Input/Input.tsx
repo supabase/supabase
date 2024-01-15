@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { IconCopy } from '../Icon/icons/IconCopy'
 import { Button } from '../Button'
+import { IconCopy } from '../Icon/icons/IconCopy'
 
 import { FormLayout } from '../../lib/Layout/FormLayout'
 
@@ -9,6 +9,7 @@ import InputIconContainer from '../../lib/Layout/InputIconContainer'
 
 import { HIDDEN_PLACEHOLDER } from './../../lib/constants'
 
+import { cn } from '@ui/lib/utils/cn'
 import styleHandler from '../../lib/theme/styleHandler'
 import { useFormContext } from '../Form/FormContext'
 
@@ -136,8 +137,8 @@ function Input({
 
   if (error) inputClasses.push(__styles.variants.error)
   if (!error) inputClasses.push(__styles.variants.standard)
-  if (icon) inputClasses.push(__styles.with_icon)
   if (size) inputClasses.push(__styles.size[size])
+  if (icon) inputClasses.push(__styles.with_icon)
   if (disabled) inputClasses.push(__styles.disabled)
   if (inputClassName) inputClasses.push(inputClassName)
 
@@ -170,7 +171,7 @@ function Input({
           ref={inputRef}
           type={type}
           value={reveal && hidden ? HIDDEN_PLACEHOLDER : value}
-          className={inputClasses.join(' ')}
+          className={cn(inputClasses)}
           {...props}
         />
         {icon && <InputIconContainer icon={icon} className={iconContainerClassName} />}
@@ -198,13 +199,13 @@ function Input({
 export interface TextAreaProps
   extends Omit<React.InputHTMLAttributes<HTMLTextAreaElement>, 'size' | 'onCopy'> {
   textAreaClassName?: string
-  descriptionText?: string
+  descriptionText?: string | React.ReactNode | undefined
   error?: string
   icon?: any
   label?: string | React.ReactNode
   afterLabel?: string
   beforeLabel?: string
-  labelOptional?: string
+  labelOptional?: string | React.ReactNode
   layout?: 'horizontal' | 'vertical'
   rows?: number
   limit?: number
@@ -337,9 +338,7 @@ function TextArea({
           className={classes.join(' ')}
           maxLength={limit}
           {...props}
-        >
-          {value}
-        </textarea>
+        />
         {copy || error || actions ? (
           <div className={__styles['textarea_actions_container']}>
             <div className={__styles['textarea_actions_container_items']}>

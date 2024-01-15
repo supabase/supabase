@@ -16,7 +16,7 @@ function ProductsCta(props: Props) {
         <h2 className="heading-gradient text-2xl sm:text-3xl xl:text-4xl">
           Pick your SupaPower(s)
         </h2>
-        <p className="mx-auto text-muted">
+        <p className="mx-auto text-foreground-lighter">
           Supabase products are built to work both in isolation and seamlessly together
           <br className="hidden md:block" /> to ensure the most flexible and scalable developer
           experience.

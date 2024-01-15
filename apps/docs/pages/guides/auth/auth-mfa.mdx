@@ -1,4 +1,5 @@
 import Layout from '~/layouts/DefaultGuideLayout'
+import { Mermaid } from 'mdx-mermaid/lib/Mermaid'
 
 export const meta = {
   id: 'auth-mfa',
@@ -234,8 +235,9 @@ Below is an example that creates a new `UnenrollMFA` component that illustrates 
   which creates a confirmation modal.
 
 <Admonition type="note">
-Unenrolling a factor will downgrade the assurance level from `aal2` to `aal1` only after the refresh interval has lapsed.
-For an immediate downgrade from `aal2` to `aal1` after enrolling one will need to manually call `refreshSession()`
+
+Unenrolling a factor will downgrade the assurance level from `aal2` to `aal1` only after the refresh interval has lapsed. For an immediate downgrade from `aal2` to `aal1` after enrolling one will need to manually call `refreshSession()`
+
 </Admonition>
 
 ```tsx

@@ -1,8 +1,8 @@
-import spec from '~/../../spec/cli_v1_commands.yaml' assert { type: 'yml' }
+import spec from '~/spec/cli_v1_commands.yaml' assert { type: 'yml' }
 
 import { flattenSections } from '~/lib/helpers'
 
-import cliCommonSections from '~/../../spec/common-cli-sections.json' assert { type: 'json' }
+import cliCommonSections from '~/spec/common-cli-sections.json' assert { type: 'json' }
 import RefSectionHandler from '~/components/reference/RefSectionHandler'
 import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'
 import handleRefStaticProps from '~/lib/mdx/handleRefStaticProps'

@@ -85,7 +85,7 @@ API:
 - [`has_column()`](https://pgtap.org/documentation.html#has_column): Tests whether or not a column exists in a given table, view, materialized view or composite type.
 - [`col_is_pk()`](https://pgtap.org/documentation.html#col_is_pk): Tests whether the specified column or columns in a table is/are the primary key for that table.
 
-## Testing RLS Policies
+## Testing RLS policies
 
 ```sql
 begin;
@@ -132,15 +132,17 @@ API:
 - [`results_eq()`](https://pgtap.org/documentation.html#results_eq)
 - [`results_ne()`](https://pgtap.org/documentation.html#results_ne)
 
-## Testing Functions
+## Testing functions
 
 ```sql
-begin;
-select plan( 1 );
+prepare hello_expr as select 'hello'
 
-select function_returns( 'hello_world', 'text' );                   # test if the function "hello_world" returns text
-select function_returns( 'is_even', ARRAY['integer'], 'boolean' );  # test if the function "is_even" returns a boolean
-select results_eq('select * from hello_world()', 'hello');          # test if the function "hello_world" returns "hello"
+begin;
+select plan(3);
+-- You'll need to create a hello_world and is_even function
+select function_returns( 'hello_world', 'text' );                   -- test if the function "hello_world" returns text
+select function_returns( 'is_even', ARRAY['integer'], 'boolean' );  -- test if the function "is_even" returns a boolean
+select results_eq('select * from hello_world()', 'hello_expr');          -- test if the function "hello_world" returns "hello"
 
 select * from finish();
 rollback;

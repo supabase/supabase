@@ -65,8 +65,7 @@ class _GamePageState extends State<GamePage> {
       onGameStateUpdate: (position, health) async {
         ChannelResponse response;
         do {
-          response = await _gameChannel!.send(
-            type: RealtimeListenTypes.broadcast,
+          response = await _gameChannel!.sendBroadcastMessage(
             event: 'game_state',
             payload: {'x': position.x, 'y': position.y, 'health': health},
           );
@@ -124,23 +123,27 @@ class _GamePageState extends State<GamePage> {
               _gameChannel = supabase.channel(gameId,
                   opts: const RealtimeChannelConfig(ack: true));
 
-              _gameChannel!.on(RealtimeListenTypes.broadcast,
-                  ChannelFilter(event: 'game_state'), (payload, [_]) {
-                final position =
-                    Vector2(payload['x'] as double, payload['y'] as double);
-                final opponentHealth = payload['health'] as int;
-                _game.updateOpponent(
-                  position: position,
-                  health: opponentHealth,
-                );
+              _gameChannel!
+                  .onBroadcast(
+                    event: 'game_state',
+                    callback: (payload, [_]) {
+                      final position = Vector2(
+                          payload['x'] as double, payload['y'] as double);
+                      final opponentHealth = payload['health'] as int;
+                      _game.updateOpponent(
+                        position: position,
+                        health: opponentHealth,
+                      );
 
-                if (opponentHealth <= 0) {
-                  if (!_game.isGameOver) {
-                    _game.isGameOver = true;
-                    _game.onGameOver(true);
-                  }
-                }
-              }).subscribe();
+                      if (opponentHealth <= 0) {
+                        if (!_game.isGameOver) {
+                          _game.isGameOver = true;
+                          _game.onGameOver(true);
+                        }
+                      }
+                    },
+                  )
+                  .subscribe();
             },
           );
         });
@@ -175,33 +178,36 @@ class _LobbyDialogState extends State<_LobbyDialog> {
       'lobby',
       opts: const RealtimeChannelConfig(self: true),
     );
-    _lobbyChannel.on(RealtimeListenTypes.presence, ChannelFilter(event: 'sync'),
-        (payload, [ref]) {
-      // Update the lobby count
-      final presenceState = _lobbyChannel.presenceState();
+    _lobbyChannel
+        .onPresenceSync((payload, [ref]) {
+          // Update the lobby count
+          final presenceStates = _lobbyChannel.presenceState();
 
-      setState(() {
-        _userids = presenceState.values
-            .map((presences) =>
-                (presences.first as Presence).payload['user_id'] as String)
-            .toList();
-      });
-    }).on(RealtimeListenTypes.broadcast, ChannelFilter(event: 'game_start'),
-        (payload, [_]) {
-      // Start the game if someone has started a game with you
-      final participantIds = List<String>.from(payload['participants']);
-      if (participantIds.contains(myUserId)) {
-        final gameId = payload['game_id'] as String;
-        widget.onGameStarted(gameId);
-        Navigator.of(context).pop();
-      }
-    }).subscribe(
-      (status, [ref]) async {
-        if (status == 'SUBSCRIBED') {
-          await _lobbyChannel.track({'user_id': myUserId});
-        }
-      },
-    );
+          setState(() {
+            _userids = presenceStates
+                .map((presenceState) => (presenceState.presences.first)
+                    .payload['user_id'] as String)
+                .toList();
+          });
+        })
+        .onBroadcast(
+            event: 'game_start',
+            callback: (payload, [_]) {
+              // Start the game if someone has started a game with you
+              final participantIds = List<String>.from(payload['participants']);
+              if (participantIds.contains(myUserId)) {
+                final gameId = payload['game_id'] as String;
+                widget.onGameStarted(gameId);
+                Navigator.of(context).pop();
+              }
+            })
+        .subscribe(
+          (status, _) async {
+            if (status == RealtimeSubscribeStatus.subscribed) {
+              await _lobbyChannel.track({'user_id': myUserId});
+            }
+          },
+        );
   }
 
   @override
@@ -232,8 +238,7 @@ class _LobbyDialogState extends State<_LobbyDialog> {
                   final opponentId =
                       _userids.firstWhere((userId) => userId != myUserId);
                   final gameId = const Uuid().v4();
-                  await _lobbyChannel.send(
-                    type: RealtimeListenTypes.broadcast,
+                  await _lobbyChannel.sendBroadcastMessage(
                     event: 'game_start',
                     payload: {
                       'participants': [

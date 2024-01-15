@@ -15,7 +15,9 @@ export const meta = {
       [Create a new project](https://supabase.com/dashboard) in the Supabase Dashboard.
 
       <Admonition type="important">
-        Be sure to make note of the Database Password you used as you will need this later to connect to your database.
+
+      Be sure to make note of the Database Password you used as you will need this later to connect to your database.
+
       </Admonition>
     </StepHikeCompact.Details>
 
@@ -35,7 +37,9 @@ export const meta = {
     You will need these to setup environment variables in Step 5.
 
     <Admonition type="tip">
-      You can copy and paste these connection strings from the Supabase Dashboard when needed in later steps.
+
+    You can copy and paste these connection strings from the Supabase Dashboard when needed in later steps.
+
     </Admonition>
     </StepHikeCompact.Details>
 
@@ -50,9 +54,11 @@ export const meta = {
       Create a RedwoodJS app with TypeScript.
 
       <Admonition type="note">
+
         The [`yarn` package manager](https://yarnpkg.com) is required to create a RedwoodJS app. You will use it to run RedwoodJS commands later.
 
         While TypeScript is recommended, If you want a JavaScript app, omit the `--ts` flag.
+
       </Admonition>
     </StepHikeCompact.Details>
 
@@ -84,11 +90,12 @@ export const meta = {
 
       * The `DIRECT_URL` should use the `Connection String` from your Supabase project. Hint: the port is `5432`.
 
-      * The `DATABASE_URL` should use the `Connection Pooling / Connection String` from your Supabase project. Hint: the port is `6432`.
+      * The `DATABASE_URL` should use the `Connection Pooling / Connection String` from your Supabase project. Hint: the port is `6543`.
 
       <Admonition type="note">
-        Be sure to append `?pgbouncer=true` to the end of the `DATABASE_URL` connection string.
+
         Also, replace `[YOUR-PASSWORD]` and `[YOUR-PROJECT-REF]` with the password you used when creating your Supabase project and the project reference from the URL in your browser.
+
       </Admonition>
     </StepHikeCompact.Details>
 
@@ -97,8 +104,8 @@ export const meta = {
       # PostgreSQL connection string used for migrations
       DIRECT_URL="postgres://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres"
 
-      # PostgreSQL connection string with pgBouncer config — used by Prisma Client
-      DATABASE_URL="postgres://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:6543/postgres?pgbouncer=true"
+      # PostgreSQL pooler connection string with Supavisor config — used by Prisma Client
+      DATABASE_URL="postgres://postgres.[YOUR-PROJECT-REF]:[YOUR-PASSWORD]@aws-0-[YOUR-PROJECT-REGION].pooler.supabase.com:6543/postgres"
       ```
     </StepHikeCompact.Code>
 
@@ -179,7 +186,9 @@ export const meta = {
       Run the seed database command to populate the `Country` table with the countries you just created.
 
       <Admonition type="tip">
+
         The reset database command `yarn rw prisma db reset` will recreate the tables and will also run the seed script.
+
       </Admonition>
     </StepHikeCompact.Details>
 
@@ -227,7 +236,7 @@ export const meta = {
       ![RedwoodJS Splash Page](/docs/img/redwoodjs-qs-countries-ui.png)
     </StepHikeCompact.Code>
 
-  </StepHikeCompact.Step>  
+  </StepHikeCompact.Step>
 </StepHikeCompact>
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} hideToc={true} />
