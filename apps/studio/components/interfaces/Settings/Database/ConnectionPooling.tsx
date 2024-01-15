@@ -43,7 +43,7 @@ const ConnectionPooling = () => {
   } = usePoolingConfigurationQuery({ projectRef: projectRef! })
 
   return (
-    <>
+    <div id="connection-pooler">
       {isLoading && (
         <Panel
           title={
@@ -93,7 +93,7 @@ const ConnectionPooling = () => {
           )}
         </>
       )}
-    </>
+    </div>
   )
 }
 

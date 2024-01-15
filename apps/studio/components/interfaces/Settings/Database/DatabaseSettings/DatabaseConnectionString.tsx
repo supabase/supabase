@@ -1,7 +1,16 @@
 import { useParams, useTelemetryProps } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
-import { Input, Tabs } from 'ui'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconAlertTriangle,
+  IconExternalLink,
+  Input,
+  Tabs,
+} from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
@@ -129,13 +138,58 @@ export const DatabaseConnectionString = () => {
             {isLoading && <ShimmeringLoader className="h-8 w-full" />}
             {isError && <AlertError error={error} subject="Failed to retrieve database settings" />}
             {isSuccess && (
-              <Input
-                copy
-                readOnly
-                disabled
-                value={connectionStrings[selectedTab]}
-                onCopy={() => handleCopy(selectedTab)}
-              />
+              <div className="flex flex-col gap-y-4">
+                <Alert_Shadcn_ variant="warning">
+                  <IconAlertTriangle strokeWidth={2} />
+                  <AlertTitle_Shadcn_>
+                    Direct database access via IPv4 and pgBouncer will be deprecated from January
+                    26th 2024
+                  </AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_ className="space-y-3">
+                    <p>
+                      We strongly recommend using{' '}
+                      <a
+                        href="https://github.com/supabase/supavisor"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-foreground underline underline-offset-[4px] decoration-brand-500 hover:decoration-foreground"
+                      >
+                        Supavisor
+                      </a>{' '}
+                      to connect to your database. You'll only need to change the connection string
+                      that you're using in your application to the pooler's connection string which
+                      can be found in the connection pooling settings{' '}
+                      <span
+                        tabIndex={0}
+                        className="cursor-pointer text-foreground underline underline-offset-[4px] decoration-brand-500 hover:decoration-foreground"
+                        onClick={() => {
+                          const connectionPooler = document.getElementById('connection-pooler')
+                          connectionPooler?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+                        }}
+                      >
+                        here
+                      </span>
+                      .
+                    </p>
+                    <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                      <a
+                        href="https://github.com/orgs/supabase/discussions/17817"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Learn more
+                      </a>
+                    </Button>
+                  </AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
+                <Input
+                  copy
+                  readOnly
+                  disabled
+                  value={connectionStrings[selectedTab]}
+                  onCopy={() => handleCopy(selectedTab)}
+                />
+              </div>
             )}
           </Panel.Content>
         </Panel>
