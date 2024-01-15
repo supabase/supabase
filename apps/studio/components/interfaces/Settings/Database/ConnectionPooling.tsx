@@ -9,6 +9,7 @@ import {
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Badge,
+  Button,
   FormControl_Shadcn_,
   FormDescription_Shadcn_,
   FormField_Shadcn_,
@@ -16,6 +17,7 @@ import {
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
   Form_Shadcn_,
+  IconExternalLink,
   IconHelpCircle,
   Input,
   Input_Shadcn_,
@@ -131,24 +133,31 @@ export const ConnectionPooling = () => {
   }
 
   return (
-    <div id="connection-pooler">
+    <section id="connection-pooler">
       <Panel
-        className="mb-8"
+        className="!mb-0"
         title={
-          <div className="flex items-center gap-x-2">
-            <p>
-              {connectionPoolingUnavailable
-                ? 'Connection Pooling is not available for this project'
-                : 'Connection Pooling'}
-            </p>
-            {isSuccess && (
-              <div className="flex items-center gap-x-1">
-                <Badge color={poolingInfo?.supavisor_enabled ? 'green' : 'scale'}>
-                  With {poolingInfo?.supavisor_enabled ? 'Supavisor' : 'PGBouncer'}
-                </Badge>
-                <Badge color="scale">Resolves to IPv4</Badge>
-              </div>
-            )}
+          <div className="w-full flex items-center justify-between">
+            <div className="flex items-center gap-x-2">
+              <p>
+                {connectionPoolingUnavailable
+                  ? 'Connection Pooling is not available for this project'
+                  : 'Connect to your database via connection pooling'}
+              </p>
+              {isSuccess && (
+                <div className="flex items-center gap-x-1">
+                  <Badge color={poolingInfo?.supavisor_enabled ? 'green' : 'scale'}>
+                    With {poolingInfo?.supavisor_enabled ? 'Supavisor' : 'PGBouncer'}
+                  </Badge>
+                  <Badge color="scale">Resolves to IPv4</Badge>
+                </div>
+              )}
+            </div>
+            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+              <a href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler">
+                Documentation
+              </a>
+            </Button>
           </div>
         }
         footer={
@@ -501,6 +510,6 @@ export const ConnectionPooling = () => {
           </>
         )}
       </Panel>
-    </div>
+    </section>
   )
 }
