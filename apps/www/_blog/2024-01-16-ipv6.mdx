@@ -14,7 +14,7 @@ image: 2024/ipv6/ipv4-ipv6.png
 thumb: 2024/ipv6/ipv4-ipv6.png
 ---
 
-On February 1st 2024, AWS will [start charging for IPv4 addresses](https://aws.amazon.com/blogs/aws/new-aws-public-ipv4-address-charge-public-ip-insights/). This will cost $0.005 per hour - around $4 month. 
+On February 1st 2024, AWS will [start charging for IPv4 addresses](https://aws.amazon.com/blogs/aws/new-aws-public-ipv4-address-charge-public-ip-insights/). This will cost $0.005 per hour - around $4 month.
 
 A more accurate title for this post would be “Brace yourself, IPv4 is leaving”, because I can't imagine many companies will pay to keep using the IPv4 address. While $4 is relatively small for an individual, my hypothesis is that AWS is a foundational layer to many infrastructure companies, like Supabase - we offer a full EC2 instance for every Postgres database, so this would add millions to our AWS bill.
 
@@ -32,14 +32,14 @@ As a quick primer, an IPv4 looks like this: `93.184.216.34`. It is the “addres
 
 An IPv6 looks like this: `2607:f8b0:4006:819::200e`**.** It functions the same as an IPv4, except that there are 340 undecillion of them - that's more than the grains of sand on the planet (by many orders of magnitude). We won't run out any time soon.
 
-IPv6 is clearly a *good* thing, so what's the challenge? It mostly comes down to:
+IPv6 is clearly a _good_ thing, so what's the challenge? It mostly comes down to:
 
 1. ISP support
 2. Tooling support
 
 ## ISP support
 
-The biggest challenge to global adoptions is ISP support. Does your Internet Service Provider [support IPv6](https://test-ipv6.com/)? Probably not. 
+The biggest challenge to global adoptions is ISP support. Does your Internet Service Provider [support IPv6](https://test-ipv6.com/)? Probably not.
 
 When you type a website's domain name, it's translated into an IP address. Traditionally, these addresses have been IPv4:
 
@@ -54,7 +54,7 @@ After your ISP receives this address, it is responsible for routing all traffic 
 Here are some of the ways that you will be affected when domains/servers start resolving to IPv6 instead of IPv4, if your ISP doesn't support IPv6:
 
 - Do you have a web server set up in AWS? You won't be able to SSH into it.
-- Are you connected to a Supabase database from your local machine using the [direct connection](https://supabase.com/docs/guides/database/connecting-to-postgres#direct-connections)? You need to use the [connection pooler](https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler)  which will resolve as IPv4 instead (we will pay for IPv4 addresses on these).
+- Are you connected to a Supabase database from your local machine using the [direct connection](https://supabase.com/docs/guides/database/connecting-to-postgres#direct-connections)? You need to use the [connection pooler](https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler) which will resolve as IPv4 instead (we will pay for IPv4 addresses on these).
 - Are you connecting to any AWS server from Vercel? That will start [failing](https://github.com/orgs/vercel/discussions/47) soon if you don't set up an IPv4 address for that server.
 
 ## Tooling support
@@ -65,7 +65,7 @@ A lot of developer tools simply aren't set up for IPv6 yet. We can use Supabase 
 - Add IPv6 support to our Airflow VM.
 - Add IPv6 support to Docker and Compose.
 
-These seem small, so to really convey what a PITA this can be, here were the steps for Docker: 
+These seem small, so to really convey what a PITA this can be, here were the steps for Docker:
 
 1/ Update `/etc/docker/daemon.json`:
 
@@ -103,9 +103,9 @@ networks:
   default:
     enable_ipv6: true
     ipam:
-       config:
-         - subnet: fd00:c16a:601e::/80
-           gateway: fd00:c16a:601e::1
+      config:
+        - subnet: fd00:c16a:601e::/80
+          gateway: fd00:c16a:601e::1
 ```
 
 6/ Check if it is working from a container
@@ -115,7 +115,7 @@ docker exec -it "airflow_airflow-worker_1" bash
 curl -6 https://ifconfig.co/ip
 ```
 
-That's … a lot more complicated than it should be for a tool as ubiquitous as Docker. 
+That's … a lot more complicated than it should be for a tool as ubiquitous as Docker.
 
 ## Get ahead of the curve
 
@@ -130,5 +130,5 @@ If you want to ensure your company continues to run smoothly, start making as ma
 If you are a Supabase customer, we have 3 simple solutions:
 
 1. Switch your “direct” database connection to our new Supavisor database proxy. You can find these details in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database).
-2. We will bring out a paid add-on for IPv4. This will be $4/m - we will simply pass on the AWS cost to you. 
+2. We will bring out a paid add-on for IPv4. This will be $4/m - we will simply pass on the AWS cost to you.
 3. We'll support you. We know that this period will be difficult for many. If you encounter any issues, simply reach out to us via [supabase.help](https://supabase.help) and we will make sure you databases continue to run smoothly.
