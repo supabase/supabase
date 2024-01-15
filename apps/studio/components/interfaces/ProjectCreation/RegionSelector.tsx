@@ -19,11 +19,24 @@ export const RegionSelector = ({
 }: RegionSelectorProps) => {
   const router = useRouter()
   const availableRegions = getAvailableRegions(PROVIDERS[cloudProvider].id)
-  const { data: region, isLoading, isSuccess } = useDefaultRegionQuery({ cloudProvider })
+  const {
+    data: region,
+    isSuccess,
+    isError,
+  } = useDefaultRegionQuery(
+    { cloudProvider },
+    { refetchOnMount: false, refetchOnWindowFocus: false, refetchInterval: false }
+  )
 
   useEffect(() => {
-    if (isSuccess && region) onSelectRegion(region)
-  }, [isSuccess, region])
+    // only pick a region if one hasn't already been selected
+    if (isSuccess && region && !selectedRegion) {
+      onSelectRegion(region)
+    } else if (isError && !selectedRegion) {
+      // if an error happened, and the user haven't selected a region, just select the default one for him
+      onSelectRegion(PROVIDERS[cloudProvider].default_region)
+    }
+  }, [cloudProvider, isError, isSuccess, region, selectedRegion])
 
   return (
     <Listbox
@@ -31,7 +44,6 @@ export const RegionSelector = ({
       label="Region"
       type="select"
       value={selectedRegion}
-      disabled={isLoading}
       onChange={(value) => onSelectRegion(value)}
       descriptionText="Select the region closest to your users for the best performance."
     >
