@@ -292,8 +292,9 @@ const TableEditorMenu = () => {
                     items={entityTypes}
                     ItemComponent={EntityListItem}
                     itemProps={{
-                      projectRef: project?.ref,
+                      projectRef: project?.ref!,
                       id: Number(id),
+                      isLocked,
                     }}
                     getItemSize={() => 28}
                     hasNextPage={hasNextPage}
