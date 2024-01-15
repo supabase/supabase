@@ -46,7 +46,7 @@ export const DatabaseConnectionString = () => {
   const state = useDatabaseSelectorStateSnapshot()
 
   // [Joshen] TODO this needs to be obtained from BE as 26th Jan is when we'll start - projects will be affected at different rates
-  const resolvesToIpV6 = Number(new Date()) < Number(dayjs.utc('01-26-2024', 'MM-DD-YYYY').toDate())
+  const resolvesToIpV6 = false // Number(new Date()) > Number(dayjs.utc('01-26-2024', 'MM-DD-YYYY').toDate())
   const readReplicasEnabled = useFlag('readReplicas') && projectDetails?.is_read_replicas_enabled
   const connectionStringsRef = useRef<HTMLDivElement>(null)
   const [selectedTab, setSelectedTab] = useState<
@@ -123,8 +123,8 @@ export const DatabaseConnectionString = () => {
                   <h5 key="panel-title" className="mb-0">
                     Connection string
                   </h5>
-                  <Badge color={resolvesToIpV6 ? 'gray' : 'amber'}>
-                    {resolvesToIpV6 ? 'Resolves to IPv4' : 'Resolves to IPv6'}
+                  <Badge color={resolvesToIpV6 ? 'amber' : 'scale'}>
+                    {resolvesToIpV6 ? 'Resolves to IPv6' : 'Resolves to IPv4'}
                   </Badge>
                 </div>
                 {readReplicasEnabled && <DatabaseSelector />}
