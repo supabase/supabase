@@ -1,5 +1,7 @@
 export const LOCAL_STORAGE_KEYS = {
-  SAVED_ORG_PROJECT_BRANCH: 'docs.ui.user.selected.org_project_branch',
+  SAVED_ORG: 'docs.ui.user.selected.org',
+  SAVED_PROJECT: 'docs.ui.user.selected.project',
+  SAVED_BRANCH: 'docs.ui.user.selected.branch',
 } as const
 
 type LocalStorageKey = (typeof LOCAL_STORAGE_KEYS)[keyof typeof LOCAL_STORAGE_KEYS]
