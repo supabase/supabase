@@ -122,8 +122,6 @@ export const ConnectionPooling = () => {
     }
   }
 
-  console.log({ poolingInfo })
-
   return (
     <div id="connection-pooler">
       <Panel
@@ -136,9 +134,12 @@ export const ConnectionPooling = () => {
                 : 'Connection Pooling'}
             </p>
             {isSuccess && (
-              <Badge color={poolingInfo?.supavisor_enabled ? 'green' : 'scale'}>
-                With {poolingInfo?.supavisor_enabled ? 'Supavisor' : 'PGBouncer'}
-              </Badge>
+              <div className="flex items-center gap-x-1">
+                <Badge color={poolingInfo?.supavisor_enabled ? 'green' : 'scale'}>
+                  With {poolingInfo?.supavisor_enabled ? 'Supavisor' : 'PGBouncer'}
+                </Badge>
+                <Badge color="scale">Resolves to IPv4</Badge>
+              </div>
             )}
           </div>
         }
@@ -376,7 +377,30 @@ export const ConnectionPooling = () => {
                           </Tooltip.Portal>
                         </Tooltip.Portal>
                       </Tooltip.Root>
-                      .{project?.ref}:
+                      .
+                      <Tooltip.Root delayDuration={0}>
+                        <Tooltip.Trigger asChild>
+                          <span className="text-foreground">{project?.ref}</span>
+                        </Tooltip.Trigger>
+                        <Tooltip.Portal>
+                          <Tooltip.Portal>
+                            <Tooltip.Content side="bottom">
+                              <Tooltip.Arrow className="radix-tooltip-arrow" />
+                              <div
+                                className={[
+                                  'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                  'border border-background',
+                                ].join(' ')}
+                              >
+                                <span className="text-xs text-foreground">
+                                  Your project's reference ID
+                                </span>
+                              </div>
+                            </Tooltip.Content>
+                          </Tooltip.Portal>
+                        </Tooltip.Portal>
+                      </Tooltip.Root>
+                      :
                       <Tooltip.Root delayDuration={0}>
                         <Tooltip.Trigger asChild>
                           <span className="text-foreground">[db-password]</span>
@@ -399,7 +423,29 @@ export const ConnectionPooling = () => {
                           </Tooltip.Portal>
                         </Tooltip.Portal>
                       </Tooltip.Root>
-                      @aws-0-{project?.region}
+                      @aws-0-
+                      <Tooltip.Root delayDuration={0}>
+                        <Tooltip.Trigger asChild>
+                          <span className="text-foreground">{project?.region}</span>
+                        </Tooltip.Trigger>
+                        <Tooltip.Portal>
+                          <Tooltip.Portal>
+                            <Tooltip.Content side="bottom">
+                              <Tooltip.Arrow className="radix-tooltip-arrow" />
+                              <div
+                                className={[
+                                  'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                  'border border-background',
+                                ].join(' ')}
+                              >
+                                <span className="text-xs text-foreground">
+                                  Your project's region
+                                </span>
+                              </div>
+                            </Tooltip.Content>
+                          </Tooltip.Portal>
+                        </Tooltip.Portal>
+                      </Tooltip.Root>
                       .pooler.supabase.com:
                       {poolingInfo.db_port}/
                       <Tooltip.Root delayDuration={0}>
