@@ -10,6 +10,8 @@ export const LIBS = [
       { key: 'supabasejs', label: 'supabase-js' },
       { key: 'postgresjs', label: 'Postgres.js' },
     ],
+    // determines file display order
+    files: ['env'],
   },
   {
     key: 'vue',
