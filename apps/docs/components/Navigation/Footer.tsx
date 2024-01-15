@@ -58,7 +58,10 @@ const Footer = () => (
             </Link>
           ) : (
             Component && (
-              <Component className="text-xs text-foreground-lighter hover:underline">
+              <Component
+                key={item.title}
+                className="text-xs text-foreground-lighter hover:underline"
+              >
                 {item.title}
               </Component>
             )

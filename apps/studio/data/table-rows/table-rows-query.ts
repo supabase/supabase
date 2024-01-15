@@ -1,11 +1,16 @@
 import { QueryKey, UseQueryOptions } from '@tanstack/react-query'
+
+import { IS_PLATFORM } from 'common'
 import { Filter, Query, Sort, SupaRow, SupaTable } from 'components/grid'
-import { ImpersonationRole, wrapWithRoleImpersonation } from 'lib/role-impersonation'
+import {
+  ImpersonationRole,
+  ROLE_IMPERSONATION_NO_RESULTS,
+  wrapWithRoleImpersonation,
+} from 'lib/role-impersonation'
 import { useIsRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import { ExecuteSqlData, executeSql, useExecuteSqlQuery } from '../sql/execute-sql-query'
 import { getPagination } from '../utils/pagination'
 import { formatFilterValue } from './utils'
-import { IS_PLATFORM } from 'common'
 
 type GetTableRowsArgs = {
   table?: SupaTable
@@ -16,20 +21,20 @@ type GetTableRowsArgs = {
   impersonatedRole?: ImpersonationRole
 }
 
-// [Joshen] From components/grid/services/row/SqlRowService.ts, we should remove the logic from SqlRowService eventually
-// (currently used in csv export)
 export const fetchAllTableRows = async ({
   projectRef,
   connectionString,
   table,
   filters = [],
   sorts = [],
+  impersonatedRole,
 }: {
   projectRef: string
   connectionString?: string
   table: SupaTable
   filters?: Filter[]
   sorts?: Sort[]
+  impersonatedRole?: ImpersonationRole
 }) => {
   if (IS_PLATFORM && !connectionString) {
     console.error('Connection string is required')
@@ -62,7 +67,10 @@ export const fetchAllTableRows = async ({
       page += 1
       from = page * rowsPerPage
       to = (page + 1) * rowsPerPage - 1
-      const query = queryChains.range(from, to).toSql()
+      const query = wrapWithRoleImpersonation(queryChains.range(from, to).toSql(), {
+        projectRef,
+        role: impersonatedRole,
+      })
 
       try {
         const { result } = await executeSql({ projectRef, connectionString, sql: query })
@@ -74,7 +82,7 @@ export const fetchAllTableRows = async ({
     } while (pageData.length === rowsPerPage)
   })()
 
-  return rows
+  return rows.filter((row) => row[ROLE_IMPERSONATION_NO_RESULTS] !== 1)
 }
 
 export const getTableRowsSqlQuery = ({

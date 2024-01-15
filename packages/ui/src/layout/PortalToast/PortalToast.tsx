@@ -34,13 +34,13 @@ const PortalToast = () => (
             return (
               <>
                 {icon}
-                <div className="flex items-center">
+                <div className="w-full">
                   <div
                     className={`toast-message w-full ${
                       t.type === 'loading'
                         ? 'max-w-[380px]'
                         : isConsentToast
-                        ? 'max-w-[800px]'
+                        ? 'max-w-none sm:max-w-[800px]'
                         : 'max-w-[260px]'
                     }`}
                   >
