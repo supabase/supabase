@@ -289,7 +289,10 @@ const PlanUpdateSidePanel = () => {
 
                     <ul role="list">
                       {plan.features.map((feature) => (
-                        <li key={feature} className="flex py-2">
+                        <li
+                          key={typeof feature === 'string' ? feature : feature[0]}
+                          className="flex py-2"
+                        >
                           <div className="w-[12px]">
                             <IconCheck
                               className="h-3 w-3 text-brand translate-y-[2.5px]"
@@ -297,7 +300,9 @@ const PlanUpdateSidePanel = () => {
                               strokeWidth={3}
                             />
                           </div>
-                          <p className="ml-3 text-xs text-foreground-light">{feature}</p>
+                          <p className="ml-3 text-xs text-foreground-light">
+                            {typeof feature === 'string' ? feature : feature[0]}
+                          </p>
                         </li>
                       ))}
                     </ul>

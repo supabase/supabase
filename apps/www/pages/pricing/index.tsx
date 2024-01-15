@@ -133,135 +133,151 @@ export default function IndexPage() {
         <div className="mx-auto lg:container lg:px-16 xl:px-12 flex flex-col">
           <div className="relative z-10 mx-auto w-full px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-md grid lg:max-w-none lg:grid-cols-2 xl:grid-cols-4 gap-4 xl:gap-0">
-              {plans.map((plan) => (
-                <div
-                  key={`row-${plan.name}`}
-                  className={cn(
-                    'flex flex-col border border-r-0 last:border-r bg-surface-100 rounded-xl xl:rounded-none first:rounded-l-xl last:rounded-r-xl',
-                    plan.name === 'Pro' ? 'border-brand border-2 !rounded-xl xl:-my-8' : ''
-                  )}
-                >
+              {plans.map((plan) => {
+                const isPromoPlan = plan.name === 'Pro'
+
+                return (
                   <div
+                    key={`row-${plan.name}`}
                     className={cn(
-                      'px-8 xl:px-4 2xl:px-8 pt-6',
-                      plan.name === 'Pro' ? 'rounded-tr-[9px] rounded-tl-[9px]' : ''
+                      'flex flex-col border border-r-0 last:border-r bg-surface-100 rounded-xl xl:rounded-none first:rounded-l-xl last:rounded-r-xl',
+                      isPromoPlan ? 'border-brand border-2 !rounded-xl xl:-my-8' : ''
                     )}
                   >
-                    <div className="flex items-center gap-2">
-                      <div className="flex items-center gap-2 pb-2">
-                        <h3 className="text-2xl font-normal uppercase flex items-center gap-4 font-mono">
-                          {plan.name}
-                        </h3>
-                        {plan.nameBadge && (
-                          <span className="bg-brand-500 text-brand-600 rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4 inline-flex gap-1 items-center">
-                            {plan.nameBadge}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <p
-                      className={cn(
-                        'text-foreground-light mb-4 text-sm 2xl:pr-4',
-                        plan.name === 'Pro' && 'xl:mb-12'
-                      )}
-                    >
-                      {plan.description}
-                    </p>
-                    <Button
-                      block
-                      size="small"
-                      type={plan.name === 'Enterprise' ? 'default' : 'alternative'}
-                      asChild
-                    >
-                      <a href={plan.href}>{plan.cta}</a>
-                    </Button>
-
                     <div
                       className={cn(
-                        'text-foreground flex items-baseline text-5xl font-normal lg:text-4xl xl:text-4xl border-b border-default min-h-[155px]',
-                        plan.priceLabel ? 'pt-6' : 'pt-10'
+                        'px-8 xl:px-4 2xl:px-8 pt-6',
+                        isPromoPlan ? 'rounded-tr-[9px] rounded-tl-[9px]' : ''
                       )}
                     >
-                      <div className="flex flex-col gap-1">
-                        <div className="flex items-end gap-2">
-                          <div>
-                            {plan.priceLabel && (
-                              <p className="text-foreground-lighter ml-1 text-[13px] leading-4 font-normal">
-                                {plan.priceLabel}
-                              </p>
-                            )}
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 pb-2">
+                          <h3 className="text-2xl font-normal uppercase flex items-center gap-4 font-mono">
+                            {plan.name}
+                          </h3>
+                          {plan.nameBadge && (
+                            <span className="bg-brand-500 text-brand-600 rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4 inline-flex gap-1 items-center">
+                              {plan.nameBadge}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <p
+                        className={cn(
+                          'text-foreground-light mb-4 text-sm 2xl:pr-4',
+                          isPromoPlan && 'xl:mb-12'
+                        )}
+                      >
+                        {plan.description}
+                      </p>
+                      <Button
+                        block
+                        size="small"
+                        type={plan.name === 'Enterprise' ? 'default' : 'alternative'}
+                        asChild
+                      >
+                        <a href={plan.href}>{plan.cta}</a>
+                      </Button>
 
-                            <div className="flex items-end">
-                              <p
-                                className={`mt-2 pb-1 font-mono ${
-                                  plan.name !== 'Enterprise' ? 'text-4xl' : 'text-4xl'
-                                }`}
-                              >
-                                {plan.name !== 'Enterprise' ? '$' : ''}
-                                {plan.priceMonthly}
-                              </p>
-                              <p className="text-foreground-lighter mb-1.5 ml-1 text-[13px] leading-4">
-                                {plan.costUnit}
-                              </p>
-                            </div>
+                      <div
+                        className={cn(
+                          'text-foreground flex items-baseline text-5xl font-normal lg:text-4xl xl:text-4xl border-b border-default min-h-[155px]',
+                          plan.priceLabel ? 'pt-6' : 'pt-10'
+                        )}
+                      >
+                        <div className="flex flex-col gap-1">
+                          <div className="flex items-end gap-2">
+                            <div>
+                              {plan.priceLabel && (
+                                <p className="text-foreground-lighter ml-1 text-[13px] leading-4 font-normal">
+                                  {plan.priceLabel}
+                                </p>
+                              )}
 
-                            {plan.warning && (
-                              <div className="-mt-2">
-                                <span
-                                  data-tip={plan.warningTooltip}
-                                  className={cn(
-                                    'bg-brand-500 text-brand-600 rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4 inline-flex gap-1 items-center',
-                                    plan.warningTooltip && 'hover:cursor-pointer'
-                                  )}
+                              <div className="flex items-end">
+                                <p
+                                  className={`mt-2 pb-1 font-mono ${
+                                    plan.name !== 'Enterprise' ? 'text-4xl' : 'text-4xl'
+                                  }`}
                                 >
-                                  {plan.warningTooltip && (
-                                    <InformationCircleIcon className="w-3 h-3" />
-                                  )}
-                                  {plan.warning}
-                                </span>
+                                  {plan.name !== 'Enterprise' ? '$' : ''}
+                                  {plan.priceMonthly}
+                                </p>
+                                <p className="text-foreground-lighter mb-1.5 ml-1 text-[13px] leading-4">
+                                  {plan.costUnit}
+                                </p>
                               </div>
-                            )}
+
+                              {plan.warning && (
+                                <div className="-mt-2">
+                                  <span
+                                    data-tip={plan.warningTooltip}
+                                    className={cn(
+                                      'bg-brand-500 text-brand-600 rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4 inline-flex gap-1 items-center',
+                                      plan.warningTooltip && 'hover:cursor-pointer'
+                                    )}
+                                  >
+                                    {plan.warningTooltip && (
+                                      <InformationCircleIcon className="w-3 h-3" />
+                                    )}
+                                    {plan.warning}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                  <div
-                    className={cn(
-                      'border-default flex rounded-bl-[4px] rounded-br-[4px] flex-1 flex-col px-8 xl:px-4 2xl:px-8 py-6',
-                      plan.name === 'Pro' && 'mb-0.5 rounded-bl-[4px] rounded-br-[4px]'
-                    )}
-                  >
-                    {plan.preface && (
-                      <p className="text-foreground-lighter text-[13px] mt-2 mb-4">
-                        {plan.preface}
-                      </p>
-                    )}
-                    <ul role="list" className="text-[13px] flex-1 text-foreground-lighter">
-                      {plan.features.map((feature) => (
-                        <li key={feature} className="flex items-center py-2 first:mt-0">
-                          <IconCheck
-                            className="text-brand h-4 w-4"
-                            aria-hidden="true"
-                            strokeWidth={3}
-                          />
-                          <span className="text-foreground mb-0 ml-3 ">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
+                    <div
+                      className={cn(
+                        'border-default flex rounded-bl-[4px] rounded-br-[4px] flex-1 flex-col px-8 xl:px-4 2xl:px-8 py-6',
+                        isPromoPlan && 'mb-0.5 rounded-bl-[4px] rounded-br-[4px]'
+                      )}
+                    >
+                      {plan.preface && (
+                        <p className="text-foreground-lighter text-[13px] mt-2 mb-4">
+                          {plan.preface}
+                        </p>
+                      )}
+                      <ul role="list" className="text-[13px] flex-1 text-foreground-lighter">
+                        {plan.features.map((feature) => (
+                          <li
+                            key={typeof feature === 'string' ? feature : feature[0]}
+                            className="flex flex-col py-2 first:mt-0"
+                          >
+                            <div className="flex items-center">
+                              <div className="flex w-6">
+                                <IconCheck
+                                  className="text-brand h-4 w-4"
+                                  aria-hidden="true"
+                                  strokeWidth={3}
+                                />
+                              </div>
+                              <span className="text-foreground mb-0">
+                                {typeof feature === 'string' ? feature : feature[0]}
+                              </span>
+                            </div>
+                            {typeof feature !== 'string' && (
+                              <p className="ml-6 text-foreground-lighter">{feature[1]} *</p>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
 
-                    <div className="flex flex-col gap-6 mt-auto prose">
-                      <div className="space-y-2 mt-12">
-                        {plan.footer && (
-                          <p className="text-[13px] leading-5 text-foreground-lighter whitespace-pre-wrap mb-0">
-                            {plan.footer}
-                          </p>
-                        )}
+                      <div className="flex flex-col gap-6 mt-auto prose">
+                        <div className="space-y-2 mt-12">
+                          {plan.footer && (
+                            <p className="text-[13px] leading-5 text-foreground-lighter whitespace-pre-wrap mb-0">
+                              {plan.footer}
+                            </p>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
         </div>

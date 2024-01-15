@@ -10,7 +10,7 @@ export interface PricingInformation {
   warningTooltip?: string
   description: string
   preface: string
-  features: string[]
+  features: (string | string[])[]
   footer?: string
   cta: string
 }
@@ -30,14 +30,14 @@ export const plans: PricingInformation[] = [
     features: [
       'Unlimited API requests',
       'Social OAuth providers',
-      'Up to 500MB database space',
-      'Up to 1GB file storage',
-      'Up to 5GB bandwidth',
-      'Up to 50MB file uploads',
-      'Up to 50,000 monthly active users',
-      'Up to 500K Edge Function invocations',
-      'Up to 200 concurrent Realtime connections',
-      'Up to 2 million Realtime messages',
+      '500MB database space',
+      '1GB file storage',
+      '5GB bandwidth',
+      '50MB file uploads',
+      '50,000 monthly active users',
+      '500K Edge Function invocations',
+      '200 concurrent Realtime connections',
+      '2 million Realtime messages',
       '1-day log retention',
       'Community support',
     ],
@@ -59,14 +59,14 @@ export const plans: PricingInformation[] = [
     features: [
       'No project pausing',
       'Daily backups stored for 7 days',
-      '8GB database space included',
-      '100GB file storage included',
-      '250GB bandwidth included',
-      '5GB file uploads included',
-      '100,000 monthly active users included',
-      '2M Edge Function invocations included',
-      '500 concurrent Realtime connections included',
-      '5 million Realtime messages included',
+      '8GB database space',
+      ['100GB file storage', 'then $0.021 per GB'],
+      ['250GB bandwidth', 'then $0.09 per GB'],
+      '5GB file uploads',
+      ['100,000 monthly active users', 'then $0.00325 per MAU'],
+      ['2M Edge Function invocations', 'then $2 per 1 Million invocations'],
+      ['500 concurrent Realtime connections', 'then $10 per 1000'],
+      ['5 million Realtime messages', 'then $2.50 per Million'],
       '7-day log retention',
       'Email support',
     ],
