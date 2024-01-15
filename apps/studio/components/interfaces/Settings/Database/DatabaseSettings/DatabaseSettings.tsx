@@ -25,8 +25,8 @@ import {
   Input,
 } from 'ui'
 import ConfirmDisableReadOnlyModeModal from './ConfirmDisableReadOnlyModal'
-import DatabaseConnectionString from './DatabaseConnectionString'
 import ResetDbPassword from './ResetDbPassword'
+import { DatabaseConnectionString } from './DatabaseConnectionString'
 
 const DatabaseSettings = () => {
   const router = useRouter()
