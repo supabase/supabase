@@ -9,6 +9,7 @@ import { IS_PLATFORM } from 'lib/constants'
 import SettingsLayout from '../SettingsLayout/SettingsLayout'
 import { SidebarSection } from './AccountLayout.types'
 import WithSidebar from './WithSidebar'
+import { LayoutWrapper } from '../LayoutWrapper'
 
 export interface AccountLayoutProps {
   title: string
@@ -23,9 +24,7 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
   const { data: organizations } = useOrganizationsQuery()
   const selectedOrganization = useSelectedOrganization()
 
-  const ongoingIncident = useFlag('ongoingIncident')
   const navLayoutV2 = useFlag('navigationLayoutV2')
-  const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
 
   const signOut = useSignOut()
   const onClickLogout = async () => {
@@ -153,10 +152,7 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
         <meta name="description" content="Supabase Studio" />
       </Head>
       <div className="flex h-full">
-        <main
-          style={{ height: maxHeight, maxHeight }}
-          className="flex flex-col flex-1 w-full overflow-y-auto"
-        >
+        <LayoutWrapper className="flex flex-col flex-1 w-full overflow-y-auto">
           <WithSidebar
             hideSidebar={navLayoutV2}
             title={title}
@@ -165,7 +161,7 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
           >
             {children}
           </WithSidebar>
-        </main>
+        </LayoutWrapper>
       </div>
     </>
   )

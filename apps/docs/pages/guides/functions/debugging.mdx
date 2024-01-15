@@ -39,27 +39,30 @@ When [developing locally](/docs/guides/functions/local-development) you will see
 
 Here is an example of how to use custom logs events in your function:
 
-```
+```typescript
 Deno.serve(async (req) => {
   try {
-    const { name } = await req.json();
+    const { name } = await req.json()
 
     if (!name) {
-      console.warn("Empty name provided");
+      console.warn('Empty name provided')
     }
 
     const data = {
       message: `Hello ${name || 'Guest'}!`, // Provide a default value if name is empty
-    };
+    }
 
-    console.log(`Name: ${name}`);
+    console.log(`Name: ${name}`)
 
-    return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } });
+    return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } })
   } catch (error) {
-    console.error(`Error processing request: ${error.message}`);
-    return new Response(JSON.stringify({ error: 'Internal Server Error' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+    console.error(`Error processing request: ${error.message}`)
+    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    })
   }
-});
+})
 ```
 
 ## Troubleshooting
