@@ -349,7 +349,7 @@ const Addons = () => {
             <ScaffoldSection>
               <ScaffoldSectionDetail>
                 <div className="space-y-6">
-                  <p className="m-0">Dedicated IPv4 address</p>
+                  <p className="m-0">IPv4 address</p>
                   <div className="space-y-2">
                     <p className="text-sm text-foreground-light m-0">More information</p>
                     <div>
@@ -359,7 +359,7 @@ const Addons = () => {
                         rel="noreferrer"
                       >
                         <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                          <p className="text-sm m-0">About IPv4</p>
+                          <p className="text-sm m-0">About IPv4 deprecation</p>
                           <IconExternalLink size={16} strokeWidth={1.5} />
                         </div>
                       </Link>
@@ -416,8 +416,8 @@ const Addons = () => {
                     <p className="text-sm text-foreground-light">Current option:</p>
                     <p>
                       {ipv4 !== undefined
-                        ? 'Dedicated IPv4 address is enabled'
-                        : 'Dedicated IPv4 address is not enabled'}
+                        ? 'IPv4 address is enabled'
+                        : 'IPv4 address is not enabled'}
                     </p>
                     <ProjectUpdateDisabledTooltip
                       projectUpdateDisabled={projectUpdateDisabled}
@@ -429,7 +429,7 @@ const Addons = () => {
                         onClick={() => snap.setPanelKey('ipv4')}
                         disabled={isBranch || !isProjectActive || projectUpdateDisabled}
                       >
-                        Change dedicated IPv4 address
+                        Change IPv4 address
                       </Button>
                     </ProjectUpdateDisabledTooltip>
                   </div>

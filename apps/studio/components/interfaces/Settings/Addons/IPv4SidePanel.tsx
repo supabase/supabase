@@ -129,7 +129,7 @@ const IPv4SidePanel = () => {
       }
       header={
         <div className="flex items-center justify-between">
-          <h4>Dedicated IPv4 address</h4>
+          <h4>IPv4 address</h4>
           <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
             <Link
               href="https://github.com/orgs/supabase/discussions/17817"
@@ -212,11 +212,11 @@ const IPv4SidePanel = () => {
                 >
                   <div className="w-full group">
                     <div className="border-b border-default px-4 py-2 group-hover:border-control">
-                      <p className="text-sm">Dedicated IPv4 address</p>
+                      <p className="text-sm">IPv4 address</p>
                     </div>
                     <div className="px-4 py-2">
                       <p className="text-foreground-light">
-                        Allow direct database connections via dedicated IPv4 address
+                        Allow direct database connections via IPv4 address
                       </p>
                       <div className="flex items-center space-x-1 mt-2">
                         <p className="text-foreground text-sm">${option.price}</p>
@@ -260,7 +260,7 @@ const IPv4SidePanel = () => {
                 </Button>
               }
             >
-              Upgrade your plan to enable a dedicated IPv4 address for your project
+              Upgrade your plan to enable a IPv4 address for your project
             </Alert>
           )}
         </div>
