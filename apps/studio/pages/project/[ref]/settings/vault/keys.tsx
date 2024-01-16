@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { useRouter } from 'next/router'
-import { Tabs } from 'ui'
+import { Tabs, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn_ } from 'ui'
 
 import { EncryptionKeysManagement, VaultToggle } from 'components/interfaces/Settings/Vault'
 import { SettingsLayout } from 'components/layouts'
@@ -9,6 +9,7 @@ import { FormHeader } from 'components/ui/Forms'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { NextPageWithLayout } from 'types'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import Link from 'next/link'
 
 const VaultSettingsSecrets: NextPageWithLayout = () => {
   const router = useRouter()
@@ -35,19 +36,32 @@ const VaultSettingsSecrets: NextPageWithLayout = () => {
       ) : !isEnabled ? (
         <VaultToggle />
       ) : (
-        <Tabs
-          size="small"
-          type="underlined"
-          activeId="keys"
-          onChange={(id: any) => {
-            if (id === 'secrets') router.push(`/project/${ref}/settings/vault/secrets`)
-          }}
-        >
-          <Tabs.Panel id="secrets" label="Secrets Management" />
-          <Tabs.Panel id="keys" label="Encryption Keys">
+        // <Tabs
+        //   size="small"
+        //   type="underlined"
+        //   activeId="keys"
+        //   onChange={(id: any) => {
+        //     if (id === 'secrets') router.replace(`/project/${ref}/settings/vault/secrets`)
+        //   }}
+        // >
+        //   <Tabs.Panel id="secrets" label="Secrets Management" />
+        //   <Tabs.Panel id="keys" label="Encryption Keys">
+        //     <EncryptionKeysManagement />
+        //   </Tabs.Panel>
+        // </Tabs>
+        <Tabs_Shadcn_ defaultValue="keys">
+          <TabsList_Shadcn_>
+            <TabsTrigger_Shadcn_ asChild value="secrets">
+              <Link href={`/project/${ref}/settings/vault/secrets`}>Secrets Management</Link>
+            </TabsTrigger_Shadcn_>
+            <TabsTrigger_Shadcn_ asChild value="keys">
+              <Link href={`/project/${ref}/settings/vault/keys`}>Encryption Keys</Link>
+            </TabsTrigger_Shadcn_>
+          </TabsList_Shadcn_>
+          <TabsContent_Shadcn_ value="keys">
             <EncryptionKeysManagement />
-          </Tabs.Panel>
-        </Tabs>
+          </TabsContent_Shadcn_>
+        </Tabs_Shadcn_>
       )}
     </div>
   )

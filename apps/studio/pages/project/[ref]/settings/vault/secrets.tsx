@@ -9,6 +9,7 @@ import { FormHeader } from 'components/ui/Forms'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { NextPageWithLayout } from 'types'
+import Link from 'next/link'
 
 const VaultSettingsSecrets: NextPageWithLayout = () => {
   const router = useRouter()
@@ -35,21 +36,18 @@ const VaultSettingsSecrets: NextPageWithLayout = () => {
       ) : !isEnabled ? (
         <VaultToggle />
       ) : (
-        <Tabs_Shadcn_
-          defaultValue="secrets"
-          value={router.query.tab as string}
-          onValueChange={(e) => {
-            router.push(`/project/${ref}/settings/vault/${e}`)
-          }}
-        >
+        <Tabs_Shadcn_ defaultValue="secrets">
           <TabsList_Shadcn_>
-            <TabsTrigger_Shadcn_ value="secrets">Secrets Management</TabsTrigger_Shadcn_>
-            <TabsTrigger_Shadcn_ value="keys">Encryption Keys</TabsTrigger_Shadcn_>
+            <TabsTrigger_Shadcn_ asChild value="secrets">
+              <Link href={`/project/${ref}/settings/vault/secrets`}>Secrets Management</Link>
+            </TabsTrigger_Shadcn_>
+            <TabsTrigger_Shadcn_ asChild value="keys">
+              <Link href={`/project/${ref}/settings/vault/keys`}>Encryption Keys</Link>
+            </TabsTrigger_Shadcn_>
           </TabsList_Shadcn_>
           <TabsContent_Shadcn_ value="secrets">
             <SecretsManagement />
           </TabsContent_Shadcn_>
-          <TabsContent_Shadcn_ value="keys"></TabsContent_Shadcn_>
         </Tabs_Shadcn_>
       )}
     </div>
