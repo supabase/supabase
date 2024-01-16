@@ -79,6 +79,7 @@ export const ConnectionPooling = () => {
   const poolerConnStringSyntax = isSuccess
     ? constructConnStringSyntax(poolingInfo?.connectionString, {
         ref: projectRef as string,
+        cloudProvider: project!.cloud_provider,
         region: project!.region,
         tld: poolerTld,
         portNumber: poolingInfo.db_port.toString(),
