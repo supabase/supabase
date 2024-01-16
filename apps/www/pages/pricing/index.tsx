@@ -58,7 +58,6 @@ export default function IndexPage() {
 
   const telemetryProps = useTelemetryProps()
   const sendTelemetryEvent = async (event: TelemetryEvent) => {
-    console.log('event', event)
     await Telemetry.sendEvent(event, telemetryProps, router)
   }
 
