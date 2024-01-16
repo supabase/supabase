@@ -224,6 +224,7 @@ BEGIN;
           max_retries integer := COALESCE(TG_ARGV[5]::integer, 0);
           response RECORD;
           succeeded boolean := FALSE;
+          retry_delays integer[] := ARRAY[0, 100, 250, 500, 1000, 2500];
         BEGIN
           IF url IS NULL OR url = 'null' THEN
             RAISE EXCEPTION 'url argument is missing';
@@ -253,6 +254,7 @@ BEGIN;
 
           -- Retry loop
           WHILE NOT succeeded AND retry_count <= max_retries LOOP
+            PERFORM pg_sleep(retry_delays[retry_count] / 1000.0);
             BEGIN
               CASE
                 WHEN method = 'GET' THEN

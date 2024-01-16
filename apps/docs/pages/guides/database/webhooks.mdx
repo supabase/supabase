@@ -78,6 +78,24 @@ type DeletePayload = {
 }
 ```
 
+## Timeout
+
+The timeout is the maximum time in milliseconds that the webhook will wait for a response from the server. If the timeout is exceeded, the webhook will fail.
+
+## Retrying failed webhooks
+
+The webhook will retry up to 5 times if it fails depending on the settings you choose. Webhooks with a response code of 400 and above are considered failed.
+The retries follow an exponential backoff strategy, following this delay table:
+
+| Retry # | Timeout          |
+| ------- | ---------------- |
+| 0       | 0ms (no timeout) |
+| 1       | 100ms            |
+| 2       | 250ms            |
+| 3       | 500ms            |
+| 4       | 1000ms           |
+| 5       | 2500ms           |
+
 ## Monitoring
 
 Logging history of webhook calls is available under the `net` schema of your database. For more info, see the [GitHub Repo](https://github.com/supabase/pg_net).

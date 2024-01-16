@@ -20,6 +20,7 @@ import {
   Input,
   Listbox,
   SidePanel,
+  IconExternalLink,
 } from 'ui'
 import { HTTPArgument } from './EditHookPanel'
 
@@ -127,10 +128,24 @@ const HTTPRequestFields = ({
             id="max_retries"
             name="max_retries"
             label="Number of retries"
-            labelOptional="Between 0 and 5"
+            labelOptional="Between 0 to 5"
             type="number"
             actions={<p className="text-foreground-light pr-2"></p>}
           />
+          <Button
+            asChild
+            type="text"
+            className="text-foreground-light hover:text-foreground"
+            icon={<IconExternalLink size={12} strokeWidth={2} />}
+          >
+            <Link
+              href="https://supabase.com/docs/guides/database/webhooks#timeout"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Learn more about timeouts and retries on webhooks
+            </Link>
+          </Button>
         </FormSectionContent>
       </FormSection>
       <SidePanel.Separator />
