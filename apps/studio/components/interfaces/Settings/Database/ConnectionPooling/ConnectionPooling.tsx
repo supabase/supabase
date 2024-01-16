@@ -32,6 +32,7 @@ import { usePoolingConfigurationUpdateMutation } from 'data/database/pooling-con
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useCheckPermissions, useStore } from 'hooks'
 import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
+import { constructConnStringSyntax, getPoolerTld } from './ConnectionPooling.utils'
 
 const formId = 'connection-pooling-form'
 
@@ -72,8 +73,18 @@ export const ConnectionPooling = () => {
     isSuccess,
   } = usePoolingConfigurationQuery({ projectRef: projectRef })
 
+  const poolerTld = isSuccess ? getPoolerTld(poolingInfo.connectionString) : 'com'
   const connectionPoolingUnavailable =
     !poolingInfo?.pgbouncer_enabled && poolingInfo?.pool_mode === null
+  const poolerConnStringSyntax = isSuccess
+    ? constructConnStringSyntax(poolingInfo?.connectionString, {
+        ref: projectRef as string,
+        cloudProvider: project!.cloud_provider,
+        region: project!.region,
+        tld: poolerTld,
+        portNumber: poolingInfo.db_port.toString(),
+      })
+    : []
 
   // [Joshen] TODO this needs to be obtained from BE as 26th Jan is when we'll start - projects will be affected at different rates
   const resolvesToIpV6 = !poolingInfo?.supavisor_enabled && false // Number(new Date()) > Number(dayjs.utc('01-26-2024', 'MM-DD-YYYY').toDate())
@@ -417,142 +428,39 @@ export const ConnectionPooling = () => {
                       You may also connect to another database or with another user via Supavisor
                       with the following URI format:
                     </p>
-                    <p className="text-sm font-mono tracking-tighter">
-                      postgres://
-                      <Tooltip.Root delayDuration={0}>
-                        <Tooltip.Trigger asChild>
-                          <span className="text-foreground">[db-user]</span>
-                        </Tooltip.Trigger>
-                        <Tooltip.Portal>
-                          <Tooltip.Portal>
-                            <Tooltip.Content side="bottom">
-                              <Tooltip.Arrow className="radix-tooltip-arrow" />
-                              <div
-                                className={[
-                                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                  'border border-background',
-                                ].join(' ')}
-                              >
-                                <span className="text-xs text-foreground">
-                                  Database user (e.g postgres)
-                                </span>
-                              </div>
-                            </Tooltip.Content>
-                          </Tooltip.Portal>
-                        </Tooltip.Portal>
-                      </Tooltip.Root>
-                      .
-                      <Tooltip.Root delayDuration={0}>
-                        <Tooltip.Trigger asChild>
-                          <span className="text-foreground">{project?.ref}</span>
-                        </Tooltip.Trigger>
-                        <Tooltip.Portal>
-                          <Tooltip.Portal>
-                            <Tooltip.Content side="bottom">
-                              <Tooltip.Arrow className="radix-tooltip-arrow" />
-                              <div
-                                className={[
-                                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                  'border border-background',
-                                ].join(' ')}
-                              >
-                                <span className="text-xs text-foreground">
-                                  Project's reference ID
-                                </span>
-                              </div>
-                            </Tooltip.Content>
-                          </Tooltip.Portal>
-                        </Tooltip.Portal>
-                      </Tooltip.Root>
-                      :
-                      <Tooltip.Root delayDuration={0}>
-                        <Tooltip.Trigger asChild>
-                          <span className="text-foreground">[db-password]</span>
-                        </Tooltip.Trigger>
-                        <Tooltip.Portal>
-                          <Tooltip.Portal>
-                            <Tooltip.Content side="bottom">
-                              <Tooltip.Arrow className="radix-tooltip-arrow" />
-                              <div
-                                className={[
-                                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                  'border border-background',
-                                ].join(' ')}
-                              >
-                                <span className="text-xs text-foreground">Database password</span>
-                              </div>
-                            </Tooltip.Content>
-                          </Tooltip.Portal>
-                        </Tooltip.Portal>
-                      </Tooltip.Root>
-                      @aws-0-
-                      <Tooltip.Root delayDuration={0}>
-                        <Tooltip.Trigger asChild>
-                          <span className="text-foreground">{project?.region}</span>
-                        </Tooltip.Trigger>
-                        <Tooltip.Portal>
-                          <Tooltip.Portal>
-                            <Tooltip.Content side="bottom">
-                              <Tooltip.Arrow className="radix-tooltip-arrow" />
-                              <div
-                                className={[
-                                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                  'border border-background',
-                                ].join(' ')}
-                              >
-                                <span className="text-xs text-foreground">Project's region</span>
-                              </div>
-                            </Tooltip.Content>
-                          </Tooltip.Portal>
-                        </Tooltip.Portal>
-                      </Tooltip.Root>
-                      .pooler.supabase.com:
-                      <Tooltip.Root delayDuration={0}>
-                        <Tooltip.Trigger asChild>
-                          <span className="text-foreground">{poolingInfo.db_port}</span>
-                        </Tooltip.Trigger>
-                        <Tooltip.Portal>
-                          <Tooltip.Portal>
-                            <Tooltip.Content side="bottom">
-                              <Tooltip.Arrow className="radix-tooltip-arrow" />
-                              <div
-                                className={[
-                                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                  'border border-background w-[200px] text-center',
-                                ].join(' ')}
-                              >
-                                <span className="text-xs text-foreground">
-                                  Database port number (Use 5432 if using prepared statements)
-                                </span>
-                              </div>
-                            </Tooltip.Content>
-                          </Tooltip.Portal>
-                        </Tooltip.Portal>
-                      </Tooltip.Root>
-                      /
-                      <Tooltip.Root delayDuration={0}>
-                        <Tooltip.Trigger asChild>
-                          <span className="text-foreground">[db-name]</span>
-                        </Tooltip.Trigger>
-                        <Tooltip.Portal>
-                          <Tooltip.Portal>
-                            <Tooltip.Content side="bottom">
-                              <Tooltip.Arrow className="radix-tooltip-arrow" />
-                              <div
-                                className={[
-                                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                  'border border-background',
-                                ].join(' ')}
-                              >
-                                <span className="text-xs text-foreground">
-                                  Database name (e.g postgres)
-                                </span>
-                              </div>
-                            </Tooltip.Content>
-                          </Tooltip.Portal>
-                        </Tooltip.Portal>
-                      </Tooltip.Root>
-                    </p>
+
+                    {poolerConnStringSyntax.length > 0 && (
+                      <p className="text-sm font-mono tracking-tighter">
+                        {poolerConnStringSyntax.map((x, idx) => {
+                          if (x.tooltip) {
+                            return (
+                              <Tooltip.Root key={`syntax-${idx}`} delayDuration={0}>
+                                <Tooltip.Trigger asChild>
+                                  <span className="text-foreground">{x.value}</span>
+                                </Tooltip.Trigger>
+                                <Tooltip.Portal>
+                                  <Tooltip.Portal>
+                                    <Tooltip.Content side="bottom">
+                                      <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                      <div
+                                        className={[
+                                          'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                          'border border-background',
+                                        ].join(' ')}
+                                      >
+                                        <span className="text-xs text-foreground">{x.tooltip}</span>
+                                      </div>
+                                    </Tooltip.Content>
+                                  </Tooltip.Portal>
+                                </Tooltip.Portal>
+                              </Tooltip.Root>
+                            )
+                          } else {
+                            return x.value
+                          }
+                        })}
+                      </p>
+                    )}
                   </div>
                 )
               }
