@@ -1,6 +1,6 @@
-import { isBrowser, useIsLoggedIn, useIsUserLoading } from 'common'
+import { useIsLoggedIn, useIsUserLoading } from 'common'
 import Link from 'next/link'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { Button_Shadcn_ as Button, Input_Shadcn_ as Input, cn, IconCopy, IconCheck } from 'ui'
 import { proxy, useSnapshot } from 'valtio'
@@ -15,10 +15,10 @@ import { useOnLogout } from '~/lib/userAuth'
 
 import { ComboBox, ComboBoxOption } from './ProjectConfigVariables.ComboBox'
 import {
-  Branch,
-  Org,
-  Project,
-  Variable,
+  type Branch,
+  type Org,
+  type Project,
+  type Variable,
   fromBranchValue,
   fromOrgProjectValue,
   prettyFormatVariable,
@@ -44,9 +44,15 @@ type BranchesDataState =
   | 'loggedIn.branches.dataSuccess.hasData'
   | 'loggedIn.branches.dataSuccess.noData'
 
+type VariableDataState =
+  | 'userLoading'
+  | 'loggedOut'
+  | 'loggedIn.noSelectedProject'
+  | 'loggedIn.selectedProject.dataPending'
+  | 'loggedIn.selectedProject.dataError'
+  | 'loggedIn.selectedProject.dataSuccess'
+
 const projectsStore = proxy({
-  // Local storage keys are cleared globally at the app level,
-  // so don't need to worry about clearing them here.
   selectedOrg: null as Org | null,
   selectedProject: null as Project | null,
   setSelectedOrgProject: (org: Org | null, project: Project | null) => {
@@ -128,26 +134,29 @@ function OrgProjectSelector() {
     [organizations, projects, stateSummary]
   )
 
-  if (
-    isBrowser &&
-    stateSummary === 'loggedIn.dataSuccess.hasData' &&
-    (!selectedOrg || !selectedProject)
-  ) {
-    const storedMaybeOrgId = retrieve('local', LOCAL_STORAGE_KEYS.SAVED_ORG)
-    const storedMaybeProjectRef = retrieve('local', LOCAL_STORAGE_KEYS.SAVED_PROJECT)
-    // @ts-ignore -- problem in OpenAPI spec -- org id is returend as number, not string
-    const storedOrg = organizations.find((org) => org.id === Number(storedMaybeOrgId))
-    // @ts-ignore -- problem in OpenAPI spec -- project has ref property
-    const storedProject = projects.find((project) => project.ref === storedMaybeProjectRef)
+  useEffect(() => {
+    if (stateSummary === 'loggedIn.dataSuccess.hasData' && (!selectedOrg || !selectedProject)) {
+      const storedMaybeOrgId = retrieve('local', LOCAL_STORAGE_KEYS.SAVED_ORG)
+      const storedMaybeProjectRef = retrieve('local', LOCAL_STORAGE_KEYS.SAVED_PROJECT)
 
-    if (storedOrg && storedProject && storedProject.organization_id === storedOrg.id) {
-      setSelectedOrgProject(storedOrg, storedProject)
-    } else {
-      const firstProject = projects[0]
-      const matchingOrg = organizations.find((org) => org.id === firstProject.organization_id)
-      if (matchingOrg) setSelectedOrgProject(matchingOrg, firstProject)
+      let storedOrg: Org
+      let storedProject: Project
+      if (storedMaybeOrgId && storedMaybeProjectRef) {
+        // @ts-ignore -- problem in OpenAPI spec -- org id is returned as number, not string
+        storedOrg = organizations.find((org) => org.id === Number(storedMaybeOrgId))
+        // @ts-ignore -- problem in OpenAPI spec -- project has ref property
+        storedProject = projects.find((project) => project.ref === storedMaybeProjectRef)
+      }
+
+      if (storedOrg && storedProject && storedProject.organization_id === storedOrg.id) {
+        setSelectedOrgProject(storedOrg, storedProject)
+      } else {
+        const firstProject = projects[0]
+        const matchingOrg = organizations.find((org) => org.id === firstProject.organization_id)
+        if (matchingOrg) setSelectedOrgProject(matchingOrg, firstProject)
+      }
     }
-  }
+  }, [organizations, projects, selectedOrg, selectedProject, setSelectedOrgProject, stateSummary])
 
   return (
     <ComboBox
@@ -217,25 +226,36 @@ function BranchSelector() {
           value: toBranchValue(branch),
         }))
 
-  if (isBrowser && stateSummary === 'loggedIn.branches.dataSuccess.hasData' && !selectedBranch) {
-    const storedMaybeBranchId = retrieve('local', LOCAL_STORAGE_KEYS.SAVED_BRANCH)
-    const storedBranch = data.find((branch) => branch.id === storedMaybeBranchId)
+  useEffect(() => {
+    if (stateSummary === 'loggedIn.branches.dataSuccess.hasData' && !selectedBranch) {
+      const storedMaybeBranchId = retrieve('local', LOCAL_STORAGE_KEYS.SAVED_BRANCH)
 
-    if (storedBranch) {
-      setSelectedBranch(storedBranch)
-    } else {
-      const productionBranch = data.find(
-        (branch) => branch.project_ref === branch.parent_project_ref
-      )
-      setSelectedBranch(productionBranch ?? data[0])
+      let storedBranch: Branch
+      if (storedMaybeBranchId) {
+        storedBranch = data.find((branch) => branch.id === storedMaybeBranchId)
+      }
+
+      if (storedBranch) {
+        setSelectedBranch(storedBranch)
+      } else {
+        const productionBranch = data.find(
+          (branch) => branch.project_ref === branch.parent_project_ref
+        )
+        setSelectedBranch(productionBranch ?? data[0])
+      }
     }
-  }
+  }, [data, selectedBranch, setSelectedBranch, stateSummary])
 
   return hasBranches ? (
     <ComboBox
       name="branch"
       isLoading={stateSummary === 'userLoading' || stateSummary === 'loggedIn.branches.dataPending'}
-      disabled={stateSummary !== 'loggedIn.branches.dataSuccess.hasData'}
+      disabled={
+        stateSummary === 'loggedOut' ||
+        stateSummary === 'loggedIn.noBranches' ||
+        stateSummary === 'loggedIn.branches.dataError' ||
+        stateSummary === 'loggedIn.branches.dataSuccess.noData'
+      }
       options={formattedData}
       selectedOption={selectedBranch ? toBranchValue(selectedBranch) : undefined}
       onSelectOption={(option) => {
@@ -263,7 +283,7 @@ function VariableView({ variable, className }: { variable: Variable; className?:
   const {
     data: apiData,
     isPending,
-    isSuccess,
+    isError,
   } = useProjectApiQuery(
     {
       projectRef: ref,
@@ -271,10 +291,20 @@ function VariableView({ variable, className }: { variable: Variable; className?:
     { enabled: isLoggedIn && !!ref }
   )
 
-  const { copied, handleCopy } = useCopy()
+  const stateSummary: VariableDataState = isUserLoading
+    ? 'userLoading'
+    : !isLoggedIn
+    ? 'loggedOut'
+    : !ref
+    ? 'loggedIn.noSelectedProject'
+    : isPending
+    ? 'loggedIn.selectedProject.dataPending'
+    : isError
+    ? 'loggedIn.selectedProject.dataError'
+    : 'loggedIn.selectedProject.dataSuccess'
 
   let variableValue: string = null
-  if (isLoggedIn && isSuccess) {
+  if (stateSummary === 'loggedIn.selectedProject.dataSuccess') {
     switch (variable) {
       case 'url':
         variableValue = `${apiData.autoApiService.protocol || 'https'}://${
@@ -287,6 +317,8 @@ function VariableView({ variable, className }: { variable: Variable; className?:
     }
   }
 
+  const { copied, handleCopy } = useCopy()
+
   return (
     <>
       <div className={cn('flex items-center gap-2', className)}>
@@ -295,11 +327,12 @@ function VariableView({ variable, className }: { variable: Variable; className?:
           type="text"
           className="font-mono"
           value={
-            isUserLoading || (isLoggedIn && isPending)
+            stateSummary === 'userLoading' ||
+            stateSummary === 'loggedIn.selectedProject.dataPending'
               ? 'Loading...'
-              : isLoggedIn && isSuccess
-              ? variableValue
-              : `YOUR ${prettyFormatVariable[variable].toUpperCase()}`
+              : stateSummary === 'loggedIn.noSelectedProject'
+              ? 'Select a project...'
+              : variableValue ?? `YOUR ${prettyFormatVariable[variable].toUpperCase()}`
           }
         />
         <CopyToClipboard text={variableValue ?? ''}>
@@ -314,7 +347,7 @@ function VariableView({ variable, className }: { variable: Variable; className?:
           </Button>
         </CopyToClipboard>
       </div>
-      {!variableValue && (
+      {stateSummary === 'loggedIn.selectedProject.dataError' && (
         <p className="text-foreground-muted text-sm mt-2 mb-0 ml-1">
           You can also copy your {prettyFormatVariable[variable]} from the{' '}
           <Link

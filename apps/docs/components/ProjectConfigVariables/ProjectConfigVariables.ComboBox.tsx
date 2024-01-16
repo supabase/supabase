@@ -38,14 +38,13 @@ export function ComboBox<Opt extends ComboBoxOption>({
   options: Opt[]
   selectedOption?: string
   onSelectOption?: (newValue: string) => void
-  checkEqualsOptions?: (old: string, candidate: string) => boolean
   className?: string
 }) {
   const [open, setOpen] = useState(false)
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <div className={cn('flex items-center', className)}>
+      <div className={className}>
         <PopoverTrigger asChild aria-label={`Select ${name}`} disabled={disabled}>
           <Button
             variant="outline"
@@ -61,7 +60,7 @@ export function ComboBox<Opt extends ComboBoxOption>({
           >
             {isLoading
               ? 'Loading...'
-              : (selectedOption && fromOrgProjectValue(selectedOption)[2]) ?? 'Select a project...'}
+              : (selectedOption && fromOrgProjectValue(selectedOption)[2]) ?? `Select a ${name}...`}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
