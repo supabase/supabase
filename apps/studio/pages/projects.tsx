@@ -11,6 +11,7 @@ import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
 import { useFlag, useIsFeatureEnabled } from 'hooks'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { NextPageWithLayout } from 'types'
+import Connect from 'components/interfaces/Home/Connect/Connect'
 
 const ProjectsPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -50,7 +51,7 @@ const ProjectsPage: NextPageWithLayout = () => {
           <Connecting />
         </div>
       )}
-
+      <Connect />
       {!navLayoutV2 && (
         <div className="py-4 px-5">
           {IS_PLATFORM && projectCreationEnabled && isSuccess && organizations.length !== 0 && (

@@ -12,23 +12,24 @@ import {
   Tabs,
 } from 'ui'
 import dynamic from 'next/dynamic'
-
+import { get, find } from 'lodash'
 import CopyButton from 'components/ui/CopyButton'
 import DatabaseConnectionString from 'components/interfaces/Settings/Database/DatabaseSettings/DatabaseConnectionString'
 import { LIBS } from '../Connect.utils'
 import ConnectDropdown from './ConnectDropdown'
 import { Markdown } from 'components/interfaces/Markdown'
-import { get } from 'data/fetchers'
+
 import { BASE_PATH } from 'lib/constants'
 import { SqlDebugResponse } from 'data/ai/sql-debug-mutation'
+import ConnectTabContent from './ConnectTabContent'
 
-export async function getContentFileNames() {
-  'hello getcontentfilenames'
-  const req = await fetch(BASE_PATH + '/api/connect')
+// export async function getContentFileNames() {
+//   'hello getcontentfilenames'
+//   const req = await fetch(BASE_PATH + '/api/connect')
 
-  const res = await req.json()
-  console.log({ res })
-}
+//   const res = await req.json()
+//   console.log({ res })
+// }
 
 const Connect = () => {
   const [parentSelectorOpen, setParentSelectorOpen] = useState(false)
@@ -39,28 +40,71 @@ const Connect = () => {
   // nextjs -> app router -> supabase-js
   const [selectedParent, setSelectedParent] = useState(LIBS[0].key)
   const [selectedChild, setSelectedChild] = useState('')
-  const [selectedGrandChild, setSelectedGrandChild] = useState('')
+  const [selectedGrandchild, setSelectedGrandchild] = useState('')
+  // the key of the Libs item that has the files we want to display
 
-  useEffect(() => {
-    'hello useeffect'
-    getContentFileNames()
-  })
+  const [contentFiles, setContentFiles] = useState(LIBS[0]?.children[0]?.grandchildren[0].files)
 
   useEffect(() => {
     const selectedParentItem = LIBS.find((item) => item.key === selectedParent)
 
-    if (selectedParentItem && selectedParentItem.variants) {
-      setSelectedChild(selectedParentItem.variants[0]?.key || '')
+    // if parent has child, set that as the selected child
+    if (selectedParentItem && selectedParentItem.children) {
+      setSelectedChild(selectedParentItem.children[0]?.key)
+    } else {
+      setSelectedChild('')
     }
 
-    if (selectedParentItem && selectedParentItem.clients) {
-      setSelectedGrandChild(selectedParentItem.clients[0]?.key || '')
+    // if parent has grandchild, set that as the selected grandchild
+    if (selectedParentItem && selectedParentItem.children) {
+      const selectedChildItem = selectedParentItem.children.find(
+        (childItem) => childItem.key === selectedChild
+      )
+      if (selectedChildItem && selectedChildItem.grandchildren) {
+        setSelectedGrandchild(selectedChildItem.grandchildren[0]?.key)
+      } else {
+        setSelectedGrandchild('')
+      }
     }
-  }, [selectedParent])
 
-  // get a list of all content files
+    // set the current contentFiles
+    const selectedGrandchildItem = LIBS.find((item) => {
+      return (
+        item.children &&
+        item.children.some((child) => {
+          return (
+            child.grandchildren &&
+            child.grandchildren.some((grandchild) => {
+              return grandchild.key === selectedGrandchild
+            })
+          )
+        })
+      )
+    })
 
-  const ContentFile = dynamic(() => import(`./content/parent/${selectedParent}/supabase-js/client`))
+    if (
+      selectedGrandchildItem &&
+      get(selectedGrandchildItem, 'children[0].grandchildren[0].files')
+    ) {
+      setContentFiles(get(selectedGrandchildItem, 'children[0].grandchildren[0].files', []))
+    } else {
+      // If selectedGrandchild is not found, check for selectedChild.files
+      const selectedChildItem = LIBS.find((item) => {
+        return (
+          item.children &&
+          item.children.some((child) => {
+            return child.key === selectedChild
+          })
+        )
+      })
+
+      if (selectedChildItem && get(selectedChildItem, 'children[0].files')) {
+        setContentFiles(get(selectedChildItem, 'children[0].files', []))
+      }
+    }
+  }, [selectedParent, selectedChild, selectedGrandchild])
+
+  console.log({ selectedParent, selectedChild, selectedGrandchild })
 
   return (
     <div>
@@ -94,7 +138,7 @@ const Connect = () => {
                     items={LIBS}
                   />
 
-                  {selectedParent && LIBS.find((item) => item.key === selectedParent)?.variants && (
+                  {selectedParent && LIBS.find((item) => item.key === selectedParent)?.children && (
                     <ConnectDropdown
                       level="child"
                       open={childDropdownOpen}
@@ -102,51 +146,44 @@ const Connect = () => {
                       state={selectedChild as string}
                       updateState={setSelectedChild}
                       label="Using"
-                      items={LIBS.find((item) => item.key === selectedParent)?.variants || []}
+                      items={get(find(LIBS, { key: selectedParent }), 'children', [])}
                     />
                   )}
 
-                  {selectedParent && LIBS.find((item) => item.key === selectedParent)?.clients && (
-                    <ConnectDropdown
-                      level="grandchild"
-                      open={grandChildDropdownOpen}
-                      setOpen={setGrandChildDropdownOpen}
-                      state={selectedGrandChild as string}
-                      updateState={setSelectedChild}
-                      label="Client"
-                      items={LIBS.find((item) => item.key === selectedParent)?.clients || []}
-                    />
-                  )}
+                  {/* if item has grandchildren show them */}
+                  {selectedGrandchild &&
+                    get(find(LIBS, { key: selectedParent }), `children[0].grandchildren`) && (
+                      <>
+                        <ConnectDropdown
+                          level="grandchild"
+                          open={grandChildDropdownOpen}
+                          setOpen={setGrandChildDropdownOpen}
+                          state={selectedGrandchild as string}
+                          updateState={setSelectedChild}
+                          label="Client"
+                          items={get(
+                            find(LIBS, { key: selectedParent }),
+                            'children[0].grandchildren',
+                            []
+                          )}
+                        />
+                      </>
+                    )}
                 </div>
 
                 <div className="bg-surface bg-surface-100 p-4 rounded-md mt-4">
                   <Tabs type="underlined" size="small">
-                    <Tabs.Panel
-                      id="1"
-                      label="file name"
-                      key={1}
-                      className="flex items-center gap-1 relative"
-                    >
-                      <CopyButton
-                        text="file.content"
-                        type="default"
-                        title="Copy log to clipboard"
-                        className="absolute right-1 top-1"
-                      />
-                      <ContentFile />
-                      {/* <Markdown
-                        className="text-foreground-light"
-                        content={`Move the GraphiQL interface the Database section of the dashboard [here](/project/_/database/graphiql).`}
-                      /> */}
-                    </Tabs.Panel>
+                    {contentFiles?.map((file) => (
+                      <Tabs.Panel id={file.fileName} label={file.displayName} key={file.fileName}>
+                        <ConnectTabContent path={file.path} />
+                      </Tabs.Panel>
+                    ))}
                   </Tabs>
                 </div>
               </div>
             </Tabs.Panel>
             <Tabs.Panel id="connection_strings" label="Connection strings" key="connection_strings">
-              <div className="bg-surface-300 p-4">
-                <DatabaseConnectionString />
-              </div>
+              <div className="bg-surface-300 p-4">hello</div>
             </Tabs.Panel>
           </Tabs>
 
