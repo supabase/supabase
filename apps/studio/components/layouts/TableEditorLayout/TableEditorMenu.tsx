@@ -34,8 +34,10 @@ import {
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
+import { useRouter } from 'next/router'
 
 const TableEditorMenu = () => {
+  const router = useRouter()
   const { id } = useParams()
   const snap = useTableEditorStateSnapshot()
 
@@ -108,6 +110,7 @@ const TableEditorMenu = () => {
           onSelectSchema={(name: string) => {
             setSearchText('')
             snap.setSelectedSchemaName(name)
+            router.push(`/project/${project?.ref}/editor`)
           }}
           onSelectCreateSchema={() => snap.onAddSchema()}
         />
