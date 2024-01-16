@@ -210,10 +210,10 @@ BEGIN;
     RETURNS trigger
     LANGUAGE plpgsql
     SECURITY DEFINER
-    SET search_path TO 'supabase_functions'
+    SET search_path TO 'supabase_functions','net'
     AS $function$
         DECLARE
-          request_id bigint;
+          local_request_id bigint;
           payload jsonb;
           url text := TG_ARGV[0]::text;
           method text := TG_ARGV[1]::text;
@@ -222,9 +222,9 @@ BEGIN;
           timeout_ms integer DEFAULT 1000;
           retry_count integer DEFAULT 0;
           max_retries integer := COALESCE(TG_ARGV[5]::integer, 0);
-          response RECORD;
           succeeded boolean := FALSE;
-          retry_delays integer[] := ARRAY[0, 100, 250, 500, 1000, 2500];
+          retry_delays double precision[] := ARRAY[0, 0.100, 0.250, 0.500, 1.000, 2.500];
+          status_code integer :=0;
         BEGIN
           IF url IS NULL OR url = 'null' THEN
             RAISE EXCEPTION 'url argument is missing';
@@ -254,11 +254,11 @@ BEGIN;
 
           -- Retry loop
           WHILE NOT succeeded AND retry_count <= max_retries LOOP
-            PERFORM pg_sleep(retry_delays[retry_count] / 1000.0);
+            PERFORM pg_sleep(retry_delays[retry_count]);
             BEGIN
               CASE
                 WHEN method = 'GET' THEN
-                  SELECT http_get INTO request_id FROM net.http_get(
+                  SELECT http_get INTO local_request_id FROM net.http_get(
                     url,
                     params,
                     headers,
@@ -273,7 +273,7 @@ BEGIN;
                     'schema', TG_TABLE_SCHEMA
                   );
 
-                  SELECT http_post INTO request_id FROM net.http_post(
+                  SELECT http_post INTO local_request_id FROM net.http_post(
                     url,
                     payload,
                     params,
@@ -284,10 +284,11 @@ BEGIN;
                   RAISE EXCEPTION 'method argument % is invalid', method;
               END CASE;
 
-              IF request_id IS NOT NULL THEN
-                -- Check the HTTP status code
-                SELECT * INTO response FROM supabase_functions.hooks WHERE request_id = request_id;
-                IF response.status_code < 400 THEN
+              IF local_request_id IS NOT NULL THEN
+                SELECT (response).status_code::integer 
+                  INTO status_code 
+                  FROM net._http_collect_response(local_request_id);
+                IF status_code < 400 THEN
                   succeeded := TRUE;
                 END IF;
               END IF;
@@ -295,17 +296,11 @@ BEGIN;
               EXIT WHEN succeeded;
             EXCEPTION
               WHEN OTHERS THEN
-                GET STACKED DIAGNOSTICS
-                  response.MESSAGE_TEXT = MESSAGE_TEXT,
-                  response.PG_EXCEPTION_DETAIL = PG_EXCEPTION_DETAIL,
-                  response.PG_EXCEPTION_HINT = PG_EXCEPTION_HINT,
-                  response.PG_EXCEPTION_CONTEXT = PG_EXCEPTION_CONTEXT;
                 IF retry_count >= max_retries THEN
                   -- If retries exhausted, re-raise exception
-                  RAISE EXCEPTION 'HTTP request failed after % retries. %, %, %',
-                    max_retries, response.MESSAGE_TEXT, response.PG_EXCEPTION_DETAIL, response.PG_EXCEPTION_HINT USING ERRCODE = 'XX000';
+                  RAISE EXCEPTION 'HTTP request failed after % retries. SQL Error: { %, % }',
+                    max_retries, SQLERRM, SQLSTATE;
                 END IF;
-                -- Otherwise, continue to next iteration to retry
             END;
             retry_count := retry_count + 1;
           END LOOP;
@@ -313,10 +308,11 @@ BEGIN;
           INSERT INTO supabase_functions.hooks
             (hook_table_id, hook_name, request_id)
           VALUES
-            (TG_RELID, TG_NAME, request_id);
+            (TG_RELID, TG_NAME, local_request_id);
 
           RETURN NEW;
         END
     $function$;
+
 
 COMMIT;
