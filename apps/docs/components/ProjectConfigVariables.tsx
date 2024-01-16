@@ -317,7 +317,7 @@ function BranchSelector() {
   )
 
   const formattedData: ComboBoxOption[] =
-    !hasBranches || !isSuccess || data.length === 0
+    !hasBranches || !isSuccess || !data || data.length === 0
       ? []
       : data.map((branch) => ({
           id: branch.id,
