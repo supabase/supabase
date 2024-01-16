@@ -103,12 +103,12 @@ const AddonCard = ({ addon, setShowComputeModal }: any) => {
         >
           <Image
             className="w-full object-cover object-top"
-            layout="fill"
+            fill
             quality={100}
             src={`${basePath}/images/pricing/${addon.heroImg}${
               resolvedTheme?.includes('dark') ? '' : '-light'
             }.png`}
-            alt=""
+            alt="Supabase Compute Addon"
           />
         </button>
       )}

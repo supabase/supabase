@@ -9,7 +9,11 @@ export const PricingTableRowDesktop = (props: any) => {
 
   return (
     <>
-      <tr className="divide-border" style={{ borderTop: 'none' }} id={`${props.sectionId}-desktop`}>
+      <tr
+        className="divide-border scroll-mt-24"
+        style={{ borderTop: 'none' }}
+        id={`${props.sectionId}-desktop`}
+      >
         <th
           className="bg-background text-foreground sticky top-[108px] xl:top-[90px] z-10 py-3 pl-6 text-left text-sm font-medium"
           scope="colgroup"
