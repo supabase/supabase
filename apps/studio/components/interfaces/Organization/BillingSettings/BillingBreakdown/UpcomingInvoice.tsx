@@ -198,6 +198,34 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
             <tfoot>
               <tr>
                 <td className="py-4 text-sm font-medium">
+                  <span className="mr-2">Current Costs</span>
+                  <Tooltip.Root delayDuration={0}>
+                    <Tooltip.Trigger>
+                      <IconInfo size={12} strokeWidth={2} />
+                    </Tooltip.Trigger>
+                    <Tooltip.Portal>
+                      <Tooltip.Content side="bottom">
+                        <Tooltip.Arrow className="radix-tooltip-arrow" />
+                        <div
+                          className={[
+                            'rounded bg-alternative py-1 px-2 leading-none shadow',
+                            'border border-background',
+                          ].join(' ')}
+                        >
+                          <span className="text-xs text-foreground">
+                            Costs accumulated from the beginning of the billing cycle up to now.
+                          </span>
+                        </div>
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
+                  </Tooltip.Root>
+                </td>
+                <td className="py-4 text-sm text-right font-medium" colSpan={3}>
+                  ${upcomingInvoice?.amount_total ?? '-'}
+                </td>
+              </tr>
+              <tr>
+                <td className="py-4 text-sm font-medium">
                   <span className="mr-2">Projected Costs</span>
                   <Tooltip.Root delayDuration={0}>
                     <Tooltip.Trigger>
