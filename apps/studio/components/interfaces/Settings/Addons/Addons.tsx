@@ -4,7 +4,10 @@ import { useMemo } from 'react'
 
 import { useParams } from 'common'
 import { useTheme } from 'next-themes'
-import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
+import {
+  getAddons,
+  subscriptionHasHipaaAddon,
+} from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import ProjectUpdateDisabledTooltip from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
 import {
   useIsProjectActive,
@@ -21,7 +24,7 @@ import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useFlag, useProjectByRef } from 'hooks'
+import { useFlag, useProjectByRef, useSelectedOrganization } from 'hooks'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { BASE_PATH } from 'lib/constants'
 import { getDatabaseMajorVersion, getSemanticVersion } from 'lib/helpers'
@@ -41,6 +44,7 @@ import ComputeInstanceSidePanel from './ComputeInstanceSidePanel'
 import PITRSidePanel from './PITRSidePanel'
 import CustomDomainSidePanel from './CustomDomainSidePanel'
 import { ProjectAddonVariantMeta } from 'data/subscriptions/types'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 const Addons = () => {
   const { resolvedTheme } = useTheme()
@@ -48,6 +52,8 @@ const Addons = () => {
   const snap = useSubscriptionPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
   const { project: selectedProject } = useProjectContext()
+  const selectedOrg = useSelectedOrganization()
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
 
   const parentProject = useProjectByRef(selectedProject?.parent_project_ref)
   const isBranch = parentProject !== undefined
@@ -56,6 +62,8 @@ const Addons = () => {
   if (panel && typeof panel === 'string' && allowedPanelValues.includes(panel)) {
     snap.setPanelKey(panel as SUBSCRIPTION_PANEL_KEYS)
   }
+
+  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
   const cpuArchitecture = getCloudProviderArchitecture(selectedProject?.cloud_provider)
   // Only projects of version greater than supabase-postgrest-14.1.0.44 can use PITR
@@ -358,6 +366,20 @@ const Addons = () => {
                 </div>
               </ScaffoldSectionDetail>
               <ScaffoldSectionContent>
+                {hasHipaaAddon && (
+                  <Alert_Shadcn_>
+                    <AlertTitle_Shadcn_>PITR cannot be changed with HIPAA</AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_>
+                      All projects should have PITR enabled by default and cannot be changed with
+                      HIPAA enabled. Contact support for further assistance.
+                    </AlertDescription_Shadcn_>
+                    <div className="mt-4">
+                      <Button type="default" asChild>
+                        <Link href="/support/new">Contact support</Link>
+                      </Button>
+                    </div>
+                  </Alert_Shadcn_>
+                )}
                 <div className="flex space-x-6">
                   <div>
                     <div className="rounded-md bg-surface-200 w-[160px] h-[96px] shadow">
@@ -415,7 +437,8 @@ const Addons = () => {
                             isBranch ||
                             !isProjectActive ||
                             projectUpdateDisabled ||
-                            !sufficientPgVersion
+                            !sufficientPgVersion ||
+                            hasHipaaAddon
                           }
                         >
                           Change point in time recovery

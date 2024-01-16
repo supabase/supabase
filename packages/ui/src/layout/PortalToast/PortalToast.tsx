@@ -34,7 +34,7 @@ const PortalToast = () => (
             return (
               <>
                 {icon}
-                <div className="w-full">
+                <div className="w-full flex items-center">
                   <div
                     className={`toast-message w-full ${
                       t.type === 'loading'

@@ -73,7 +73,7 @@ Due to provider restrictions, disk expansions can occur only once every six hour
 
 <Admonition type="note">
 
-A Supabase (or Postgres) update will "right-size" your disk based on the current size of the database. For example, if your database is 100GB in size, and you have a 200GB disk, a Supabase update will reduce the disk size to 120GB (1.2x the size of your database).
+Disks don't automatically downsize during normal operation. They _will_ automatically "right-size" when a Supabase (or Postgres) update is applied. Their final size after the update is 1.2x the size of the database. For example, if your database is 100GB in size, and you have a 200GB disk, the size after a Supabase update will be 120GB.
 
 </Admonition>
 

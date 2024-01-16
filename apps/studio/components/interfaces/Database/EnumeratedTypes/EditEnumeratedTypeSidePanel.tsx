@@ -131,6 +131,12 @@ const EditEnumeratedTypeSidePanel = ({
         values: originalEnumeratedTypes,
       })
     }
+
+    if (selectedEnumeratedType == undefined) {
+      form.reset({
+        values: originalEnumeratedTypes,
+      })
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedEnumeratedType])
 
