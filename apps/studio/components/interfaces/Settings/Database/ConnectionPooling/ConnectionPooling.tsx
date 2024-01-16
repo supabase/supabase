@@ -261,8 +261,10 @@ export const ConnectionPooling = () => {
                             <p>
                               If you're using{' '}
                               <span className="text-foreground">prepared statements</span> in your
-                              database, use the <span className="text-foreground">Session</span>{' '}
-                              pool mode.
+                              database, you will need to either use the{' '}
+                              <span className="text-foreground">Session</span> pool mode or use port{' '}
+                              <span className="text-foreground">5432</span> in the connection
+                              string.
                             </p>
                           </FormDescription_Shadcn_>
                           <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
@@ -390,7 +392,7 @@ export const ConnectionPooling = () => {
               copy
               disabled
               value={poolingInfo?.db_port}
-              label="Port"
+              label="Port Number"
             />
 
             <div className="border-muted border-t"></div>
@@ -427,7 +429,7 @@ export const ConnectionPooling = () => {
                                 ].join(' ')}
                               >
                                 <span className="text-xs text-foreground">
-                                  Your database user (e.g postgres)
+                                  Database user (e.g postgres)
                                 </span>
                               </div>
                             </Tooltip.Content>
@@ -450,7 +452,7 @@ export const ConnectionPooling = () => {
                                 ].join(' ')}
                               >
                                 <span className="text-xs text-foreground">
-                                  Your project's reference ID
+                                  Project's reference ID
                                 </span>
                               </div>
                             </Tooltip.Content>
@@ -472,9 +474,7 @@ export const ConnectionPooling = () => {
                                   'border border-background',
                                 ].join(' ')}
                               >
-                                <span className="text-xs text-foreground">
-                                  Your database password
-                                </span>
+                                <span className="text-xs text-foreground">Database password</span>
                               </div>
                             </Tooltip.Content>
                           </Tooltip.Portal>
@@ -495,16 +495,36 @@ export const ConnectionPooling = () => {
                                   'border border-background',
                                 ].join(' ')}
                               >
-                                <span className="text-xs text-foreground">
-                                  Your project's region
-                                </span>
+                                <span className="text-xs text-foreground">Project's region</span>
                               </div>
                             </Tooltip.Content>
                           </Tooltip.Portal>
                         </Tooltip.Portal>
                       </Tooltip.Root>
                       .pooler.supabase.com:
-                      {poolingInfo.db_port}/
+                      <Tooltip.Root delayDuration={0}>
+                        <Tooltip.Trigger asChild>
+                          <span className="text-foreground">{poolingInfo.db_port}</span>
+                        </Tooltip.Trigger>
+                        <Tooltip.Portal>
+                          <Tooltip.Portal>
+                            <Tooltip.Content side="bottom">
+                              <Tooltip.Arrow className="radix-tooltip-arrow" />
+                              <div
+                                className={[
+                                  'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                  'border border-background w-[200px] text-center',
+                                ].join(' ')}
+                              >
+                                <span className="text-xs text-foreground">
+                                  Database port number (Use 5432 if using prepared statements)
+                                </span>
+                              </div>
+                            </Tooltip.Content>
+                          </Tooltip.Portal>
+                        </Tooltip.Portal>
+                      </Tooltip.Root>
+                      /
                       <Tooltip.Root delayDuration={0}>
                         <Tooltip.Trigger asChild>
                           <span className="text-foreground">[db-name]</span>
@@ -520,7 +540,7 @@ export const ConnectionPooling = () => {
                                 ].join(' ')}
                               >
                                 <span className="text-xs text-foreground">
-                                  Your database name (e.g postgres)
+                                  Database name (e.g postgres)
                                 </span>
                               </div>
                             </Tooltip.Content>
