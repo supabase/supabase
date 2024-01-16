@@ -3,19 +3,19 @@
 
 export const POOLING_OPTIMIZATIONS = {
   ci_small: {
-    maxClientConn: 1000,
+    maxClientConn: 200,
     poolSize: 15,
   },
   ci_medium: {
-    maxClientConn: 1000,
+    maxClientConn: 200,
     poolSize: 15,
   },
   ci_large: {
-    maxClientConn: 1000,
+    maxClientConn: 300,
     poolSize: 15,
   },
   ci_xlarge: {
-    maxClientConn: 1000,
+    maxClientConn: 700,
     poolSize: 20,
   },
   ci_2xlarge: {
