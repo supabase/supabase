@@ -250,7 +250,7 @@ BEGIN
         ALTER INDEX app."chats_created_at"
             ATTACH PARTITION app."chats_%1$s_created_at";
 
-        -- Droping the now unnecessary check constraint they were just needed
+        -- Dropping the now unnecessary check constraint they were just needed
         -- to prevent the attachment from forcing a scan to do the same check
         ALTER TABLE app."chats_%1$s" DROP CONSTRAINT
             "chats_partition_by_range_check_%1$s";
@@ -314,7 +314,7 @@ END;
 $$;
 --
 -- This procedure loops over all days in the old table, copying each day
--- and then commiting the transaction.
+-- and then committing the transaction.
 --
 CREATE OR REPLACE PROCEDURE app.load_chats_partitions()
     LANGUAGE plpgsql AS
