@@ -310,14 +310,14 @@ function BranchSelector() {
   const hasBranches = selectedProject?.is_branch_enabled ?? false
   if (!hasBranches) setSelectedBranch(null)
 
-  const { data, isPending, isSuccess, isError } = useBranchesQuery(
+  const { data, isPending, isSuccess } = useBranchesQuery(
     // @ts-ignore -- problem in OpenAPI spec -- project has ref property
     { projectRef: selectedProject?.ref },
     { enabled: isLoggedIn && hasBranches }
   )
 
   const formattedData: ComboBoxOption[] =
-    !hasBranches || !isSuccess || !data || data.length === 0
+    !hasBranches || !isSuccess || data.length === 0
       ? []
       : data.map((branch) => ({
           id: branch.id,
@@ -343,7 +343,7 @@ function BranchSelector() {
     <ComboBox
       name="branch"
       isLoading={isPending}
-      disabled={isError || data.length === 0}
+      disabled={!isPending && data?.length === 0}
       options={formattedData}
       selectedOption={toBranchValue(selectedBranch)}
       onSelectOption={(option) => {
@@ -358,7 +358,9 @@ function BranchSelector() {
 }
 
 function VariableView({ variable, className }: { variable: Variable; className?: string }) {
+  const isUserLoading = useIsUserLoading()
   const isLoggedIn = useIsLoggedIn()
+
   const { selectedProject, selectedBranch } = useSnapshot(projectsStore)
 
   // @ts-ignore -- problem in OpenAPI spec -- project has is_branch-enabled property
@@ -380,7 +382,7 @@ function VariableView({ variable, className }: { variable: Variable; className?:
   const { copied, handleCopy } = useCopy()
 
   let variableValue: string = null
-  if (isSuccess) {
+  if (isLoggedIn && isSuccess) {
     switch (variable) {
       case 'url':
         variableValue = `${apiData.autoApiService.protocol || 'https'}://${
@@ -394,31 +396,47 @@ function VariableView({ variable, className }: { variable: Variable; className?:
   }
 
   return (
-    <div className={cn('flex items-center gap-2', className)}>
-      <Input
-        disabled
-        type="text"
-        className="font-mono"
-        value={
-          isPending
-            ? 'Loading...'
-            : isSuccess
-            ? variableValue
-            : `YOUR ${prettyFormatVariable[variable].toUpperCase()}`
-        }
-      />
-      <CopyToClipboard text={variableValue ?? ''}>
-        <Button
-          disabled={!variableValue}
-          variant="ghost"
-          className="px-0"
-          onClick={handleCopy}
-          aria-label="Copy"
-        >
-          {copied ? <IconCheck /> : <IconCopy />}
-        </Button>
-      </CopyToClipboard>
-    </div>
+    <>
+      <div className={cn('flex items-center gap-2', className)}>
+        <Input
+          disabled
+          type="text"
+          className="font-mono"
+          value={
+            isUserLoading || (isLoggedIn && isPending)
+              ? 'Loading...'
+              : isLoggedIn && isSuccess
+              ? variableValue
+              : `YOUR ${prettyFormatVariable[variable].toUpperCase()}`
+          }
+        />
+        <CopyToClipboard text={variableValue ?? ''}>
+          <Button
+            disabled={!variableValue}
+            variant="ghost"
+            className="px-0"
+            onClick={handleCopy}
+            aria-label="Copy"
+          >
+            {copied ? <IconCheck /> : <IconCopy />}
+          </Button>
+        </CopyToClipboard>
+      </div>
+      {!variableValue && (
+        <p className="text-foreground-muted text-sm mt-2 mb-0 ml-1">
+          You can also copy your {prettyFormatVariable[variable]} from the{' '}
+          <Link
+            className="text-foreground-muted"
+            href="https://supabase.com/dashboard/project/_/settings/api"
+            rel="noreferrer noopener"
+            target="_blank"
+          >
+            dashboard
+          </Link>
+          .
+        </p>
+      )}
+    </>
   )
 }
 
