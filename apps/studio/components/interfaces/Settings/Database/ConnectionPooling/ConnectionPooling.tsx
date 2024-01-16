@@ -60,7 +60,7 @@ const FormSchema = z.object({
 export const ConnectionPooling = () => {
   const { ui } = useStore()
   const { ref: projectRef } = useParams()
-  const { project } = useProjectContext()
+  const { project, isLoading: projectIsLoading } = useProjectContext()
 
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const computeInstance = addons?.selected_addons.find((addon) => addon.type === 'compute_instance')
@@ -74,13 +74,15 @@ export const ConnectionPooling = () => {
   } = usePoolingConfigurationQuery({ projectRef: projectRef })
 
   const poolerTld = isSuccess ? getPoolerTld(poolingInfo.connectionString) : 'com'
+
   const connectionPoolingUnavailable =
     !poolingInfo?.pgbouncer_enabled && poolingInfo?.pool_mode === null
+
   const poolerConnStringSyntax = isSuccess
     ? constructConnStringSyntax(poolingInfo?.connectionString, {
         ref: projectRef as string,
-        cloudProvider: project!.cloud_provider,
-        region: project!.region,
+        cloudProvider: projectIsLoading ? '' : project?.cloud_provider || '',
+        region: projectIsLoading ? '' : project?.region || '',
         tld: poolerTld,
         portNumber: poolingInfo.db_port.toString(),
       })
@@ -268,6 +270,7 @@ export const ConnectionPooling = () => {
                               <a
                                 href="https://supabase.com/docs/guides/database/connecting-to-postgres#how-connection-pooling-works"
                                 target="_blank"
+                                rel="noreferrer"
                                 className="underline"
                               >
                                 documentation
@@ -319,6 +322,7 @@ export const ConnectionPooling = () => {
                             <a
                               href="https://supabase.com/docs/guides/platform/custom-postgres-config#pooler-config"
                               target="_blank"
+                              rel="noreferrer"
                               className="underline"
                             >
                               documentation
@@ -386,6 +390,7 @@ export const ConnectionPooling = () => {
                             <a
                               href="https://supabase.com/docs/guides/platform/custom-postgres-config#pooler-config"
                               target="_blank"
+                              rel="noreferrer"
                               className="underline"
                             >
                               documentation
