@@ -633,7 +633,7 @@ export default function IndexPage() {
                             <Button
                               asChild
                               size="tiny"
-                              type={plan.name === 'Enterprise' ? 'default' : 'alternative'}
+                              type={plan.name === 'Enterprise' ? 'default' : 'primary'}
                               block
                             >
                               <Link href={plan.href} as={plan.href}>
