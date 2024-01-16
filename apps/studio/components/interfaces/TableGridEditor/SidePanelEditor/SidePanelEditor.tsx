@@ -381,8 +381,6 @@ const SidePanelEditor = ({
 
         onTableCreated(table)
       } else if (isNewRecord) {
-        // for creating a new table
-
         toastId = ui.setNotification({
           category: 'loading',
           message: `Creating new table: ${payload.name}...`,
