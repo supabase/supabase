@@ -184,7 +184,6 @@ function BranchSelector() {
 
   // @ts-ignore -- problem in OpenAPI spec -- project has is_branch_enabled property
   const hasBranches = selectedProject?.is_branch_enabled ?? false
-  if (!hasBranches) setSelectedBranch(null)
 
   const { data, isPending, isError } = useBranchesQuery(
     // @ts-ignore -- problem in OpenAPI spec -- project has ref property
