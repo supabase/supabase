@@ -19,10 +19,12 @@ import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
+  Badge,
   Button,
   IconAlertTriangle,
   IconExternalLink,
   Input,
+  Separator,
 } from 'ui'
 import ConfirmDisableReadOnlyModeModal from './ConfirmDisableReadOnlyModal'
 import ResetDbPassword from './ResetDbPassword'
@@ -40,6 +42,9 @@ const DatabaseSettings = () => {
   const showReadReplicasUI = readReplicasEnabled && selectedProject?.is_read_replicas_enabled
   const connectionStringsRef = useRef<HTMLDivElement>(null)
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
+
+  // [Joshen] TODO this needs to be obtained from BE as 26th Jan is when we'll start - projects will be affected at different rates
+  const resolvesToIpV6 = false // Number(new Date()) > Number(dayjs.utc('01-26-2024', 'MM-DD-YYYY').toDate())
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const {
@@ -150,9 +155,12 @@ const DatabaseSettings = () => {
         <Panel
           title={
             <div className="w-full flex items-center justify-between">
-              <h5 key="panel-title" className="mb-0">
-                Connect to your database directly
-              </h5>
+              <div className="flex items-center gap-x-2">
+                <h5 className="mb-0">Connect to your database directly</h5>
+                <Badge color={resolvesToIpV6 ? 'amber' : 'scale'}>
+                  {resolvesToIpV6 ? 'Resolves to IPv6' : 'Resolves to IPv4'}
+                </Badge>
+              </div>
               {showReadReplicasUI && <DatabaseSelector />}
             </div>
           }
@@ -172,6 +180,51 @@ const DatabaseSettings = () => {
             {isError && <AlertError error={error} subject="Failed to retrieve databases" />}
             {isSuccess && (
               <>
+                <Alert_Shadcn_ variant="warning">
+                  <IconAlertTriangle strokeWidth={2} />
+                  <AlertTitle_Shadcn_>
+                    Direct database access via IPv4 and pgBouncer will be removed from January 26th
+                    2024
+                  </AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_ className="space-y-3">
+                    <p>
+                      We strongly recommend using{' '}
+                      <span
+                        tabIndex={0}
+                        className="cursor-pointer text-foreground underline underline-offset-[4px] decoration-brand-500 hover:decoration-foreground"
+                        onClick={() => {
+                          const connectionPooler = document.getElementById('connection-pooler')
+                          connectionPooler?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+                        }}
+                      >
+                        connection pooling
+                      </span>{' '}
+                      to connect to your database. You'll only need to change the connection string
+                      that you're using in your application to the pooler's connection string which
+                      can be found in the{' '}
+                      <span
+                        tabIndex={0}
+                        className="cursor-pointer text-foreground underline underline-offset-[4px] decoration-brand-500 hover:decoration-foreground"
+                        onClick={() => {
+                          const connectionPooler = document.getElementById('connection-pooler')
+                          connectionPooler?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+                        }}
+                      >
+                        connection pooling settings
+                      </span>
+                      .
+                    </p>
+                    <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                      <a
+                        href="https://github.com/orgs/supabase/discussions/17817"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Learn more
+                      </a>
+                    </Button>
+                  </AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
                 <Input
                   className="input-mono"
                   layout="horizontal"
@@ -230,10 +283,10 @@ const DatabaseSettings = () => {
               </>
             )}
           </Panel.Content>
+          <Separator />
+          <DatabaseConnectionString />
         </Panel>
       </section>
-
-      <DatabaseConnectionString />
 
       <ResetDbPassword disabled={isLoading || isError} />
 

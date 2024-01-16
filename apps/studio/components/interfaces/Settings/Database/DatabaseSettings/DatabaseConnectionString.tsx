@@ -1,23 +1,11 @@
 import { useParams, useTelemetryProps } from 'common'
-import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Badge,
-  Button,
-  IconAlertTriangle,
-  IconExternalLink,
-  Input,
-  Tabs,
-} from 'ui'
+import { Input, Separator, Tabs } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
-import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
@@ -45,8 +33,6 @@ export const DatabaseConnectionString = () => {
   const telemetryProps = useTelemetryProps()
   const state = useDatabaseSelectorStateSnapshot()
 
-  // [Joshen] TODO this needs to be obtained from BE as 26th Jan is when we'll start - projects will be affected at different rates
-  const resolvesToIpV6 = false // Number(new Date()) > Number(dayjs.utc('01-26-2024', 'MM-DD-YYYY').toDate())
   const readReplicasEnabled = useFlag('readReplicas') && projectDetails?.is_read_replicas_enabled
   const connectionStringsRef = useRef<HTMLDivElement>(null)
   const [selectedTab, setSelectedTab] = useState<
@@ -113,96 +99,40 @@ export const DatabaseConnectionString = () => {
 
   return (
     <div id="connection-string">
-      <Panel
-        className="!m-0 [&>div:nth-child(1)>div]:!pb-0"
-        title={
-          <div ref={connectionStringsRef} className="flex flex-col gap-y-2">
-            <div className="w-full flex items-center justify-between">
-              <div className="flex items-center gap-x-2">
-                <h5 key="panel-title" className="mb-0">
-                  Connection string
-                </h5>
-                <Badge color={resolvesToIpV6 ? 'amber' : 'scale'}>
-                  {resolvesToIpV6 ? 'Resolves to IPv6' : 'Resolves to IPv4'}
-                </Badge>
-              </div>
-              {readReplicasEnabled && <DatabaseSelector />}
-            </div>
-            <Tabs
-              type="underlined"
-              size="tiny"
-              activeId={selectedTab}
-              baseClassNames="!space-y-0 -mb-[1px]"
-              onChange={setSelectedTab}
-            >
-              {CONNECTION_TYPES.map((type) => (
-                <Tabs.Panel key={type.id} id={type.id} label={type.label} />
-              ))}
-            </Tabs>
-          </div>
-        }
-      >
-        <Panel.Content>
-          {isLoading && <ShimmeringLoader className="h-8 w-full" />}
-          {isError && <AlertError error={error} subject="Failed to retrieve database settings" />}
-          {isSuccess && (
-            <div className="flex flex-col gap-y-4">
-              <Alert_Shadcn_ variant="warning">
-                <IconAlertTriangle strokeWidth={2} />
-                <AlertTitle_Shadcn_>
-                  Direct database access via IPv4 and pgBouncer will be removed from January 26th
-                  2024
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_ className="space-y-3">
-                  <p>
-                    We strongly recommend using{' '}
-                    <span
-                      tabIndex={0}
-                      className="cursor-pointer text-foreground underline underline-offset-[4px] decoration-brand-500 hover:decoration-foreground"
-                      onClick={() => {
-                        const connectionPooler = document.getElementById('connection-pooler')
-                        connectionPooler?.scrollIntoView({ block: 'center', behavior: 'smooth' })
-                      }}
-                    >
-                      connection pooling
-                    </span>{' '}
-                    to connect to your database. You'll only need to change the connection string
-                    that you're using in your application to the pooler's connection string which
-                    can be found in the{' '}
-                    <span
-                      tabIndex={0}
-                      className="cursor-pointer text-foreground underline underline-offset-[4px] decoration-brand-500 hover:decoration-foreground"
-                      onClick={() => {
-                        const connectionPooler = document.getElementById('connection-pooler')
-                        connectionPooler?.scrollIntoView({ block: 'center', behavior: 'smooth' })
-                      }}
-                    >
-                      connection pooling settings
-                    </span>
-                    .
-                  </p>
-                  <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                    <a
-                      href="https://github.com/orgs/supabase/discussions/17817"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Learn more
-                    </a>
-                  </Button>
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
-              <Input
-                copy
-                readOnly
-                disabled
-                value={connectionStrings[selectedTab]}
-                onCopy={() => handleCopy(selectedTab)}
-              />
-            </div>
-          )}
-        </Panel.Content>
-      </Panel>
+      <div ref={connectionStringsRef} className="flex flex-col py-4">
+        <div className="px-6 mb-2">
+          <h5 key="panel-title" className="mb-0">
+            Connection string
+          </h5>
+          {readReplicasEnabled && <DatabaseSelector />}
+        </div>
+        <Tabs
+          type="underlined"
+          size="tiny"
+          activeId={selectedTab}
+          baseClassNames="!space-y-0 -mb-[1px] px-6"
+          onChange={setSelectedTab}
+        >
+          {CONNECTION_TYPES.map((type) => (
+            <Tabs.Panel key={type.id} id={type.id} label={type.label} />
+          ))}
+        </Tabs>
+        <Separator />
+      </div>
+
+      <div className="px-6 pb-4">
+        {isLoading && <ShimmeringLoader className="h-8 w-full" />}
+        {isError && <AlertError error={error} subject="Failed to retrieve database settings" />}
+        {isSuccess && (
+          <Input
+            copy
+            readOnly
+            disabled
+            value={connectionStrings[selectedTab]}
+            onCopy={() => handleCopy(selectedTab)}
+          />
+        )}
+      </div>
     </div>
   )
 }
