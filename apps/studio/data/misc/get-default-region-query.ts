@@ -67,5 +67,11 @@ export const useDefaultRegionQuery = <TData = DefaultRegionData>(
   useQuery<DefaultRegionData, DefaultRegionError, TData>(
     miscKeys.defaultRegion(cloudProvider, useRestrictedPool ?? true),
     () => getDefaultRegionOption({ cloudProvider, useRestrictedPool }),
-    { enabled: enabled && typeof cloudProvider !== 'undefined', ...options }
+    {
+      enabled: enabled && typeof cloudProvider !== 'undefined',
+      retry(failureCount) {
+        return failureCount < 1
+      },
+      ...options,
+    }
   )
