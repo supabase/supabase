@@ -31,20 +31,9 @@ import { usePoolingConfigurationQuery } from 'data/database/pooling-configuratio
 import { usePoolingConfigurationUpdateMutation } from 'data/database/pooling-configuration-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useCheckPermissions, useStore } from 'hooks'
+import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
 
 const formId = 'connection-pooling-form'
-
-const DEFAULT_COMPUTE_POOLING_SIZE = {
-  ci_small: 15,
-  ci_medium: 15,
-  ci_large: 15,
-  ci_xlarge: 20,
-  ci_2xlarge: 25,
-  ci_4xlarge: 32,
-  ci_8xlarge: 64,
-  ci_12xlarge: 96,
-  ci_16xlarge: 128,
-}
 
 // This validator validates a string to be a positive integer or if it's an empty string, transforms it to a null
 const StringToPositiveNumber = z.union([
@@ -297,10 +286,10 @@ export const ConnectionPooling = () => {
                               placeholder={
                                 poolingInfo.supavisor_enabled && field.value === null
                                   ? `Default: ${
-                                      DEFAULT_COMPUTE_POOLING_SIZE?.[
+                                      POOLING_OPTIMIZATIONS?.[
                                         computeInstance?.variant
-                                          .identifier as keyof typeof DEFAULT_COMPUTE_POOLING_SIZE
-                                      ] ?? 15
+                                          .identifier as keyof typeof POOLING_OPTIMIZATIONS
+                                      ]?.poolSize ?? 15
                                     }`
                                   : ''
                               }
@@ -324,58 +313,72 @@ export const ConnectionPooling = () => {
                       )}
                     />
                     {!poolingInfo?.supavisor_enabled && (
-                      <>
-                        <FormField_Shadcn_
-                          control={form.control}
-                          name="ignore_startup_parameters"
-                          render={({ field }) => (
-                            <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
-                              <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
-                                Ignore Startup Parameters
-                              </FormLabel_Shadcn_>
-                              <FormControl_Shadcn_ className="col-span-8">
-                                <Input_Shadcn_ {...field} className="w-full" />
-                              </FormControl_Shadcn_>
-                              <FormDescription_Shadcn_ className="col-start-5 col-span-8">
-                                Defaults are either blank or "extra_float_digits"
-                              </FormDescription_Shadcn_>
-                              <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
-                            </FormItem_Shadcn_>
-                          )}
-                        />
-                        <FormField_Shadcn_
-                          control={form.control}
-                          name="max_client_conn"
-                          render={({ field }) => (
-                            <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
-                              <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
-                                Max Client Connections
-                              </FormLabel_Shadcn_>
-                              <FormControl_Shadcn_ className="col-span-8">
-                                <Input_Shadcn_
-                                  {...field}
-                                  value={field.value || undefined}
-                                  className="w-full"
-                                />
-                              </FormControl_Shadcn_>
-                              <FormDescription_Shadcn_ className="col-start-5 col-span-8">
-                                The maximum number of concurrent client connections allowed.
-                                Overrides default optimizations; Please refer to our{' '}
-                                <a
-                                  href="https://supabase.com/docs/guides/platform/custom-postgres-config#pooler-config"
-                                  target="_blank"
-                                  className="underline"
-                                >
-                                  documentation
-                                </a>{' '}
-                                to found out more.
-                              </FormDescription_Shadcn_>
-                              <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
-                            </FormItem_Shadcn_>
-                          )}
-                        />
-                      </>
+                      <FormField_Shadcn_
+                        control={form.control}
+                        name="ignore_startup_parameters"
+                        render={({ field }) => (
+                          <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
+                            <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
+                              Ignore Startup Parameters
+                            </FormLabel_Shadcn_>
+                            <FormControl_Shadcn_ className="col-span-8">
+                              <Input_Shadcn_ {...field} className="w-full" />
+                            </FormControl_Shadcn_>
+                            <FormDescription_Shadcn_ className="col-start-5 col-span-8">
+                              Defaults are either blank or "extra_float_digits"
+                            </FormDescription_Shadcn_>
+                            <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
+                          </FormItem_Shadcn_>
+                        )}
+                      />
                     )}
+                    <FormField_Shadcn_
+                      control={form.control}
+                      disabled={poolingInfo.supavisor_enabled}
+                      name="max_client_conn"
+                      render={({ field }) => (
+                        <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
+                          <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
+                            Max Client Connections
+                          </FormLabel_Shadcn_>
+                          <FormControl_Shadcn_ className="col-span-8">
+                            <Input_Shadcn_
+                              {...field}
+                              value={field.value || undefined}
+                              className="w-full"
+                              placeholder={
+                                poolingInfo.supavisor_enabled
+                                  ? poolingInfo.supavisor_enabled && field.value === null
+                                    ? `${
+                                        POOLING_OPTIMIZATIONS?.[
+                                          computeInstance?.variant
+                                            .identifier as keyof typeof POOLING_OPTIMIZATIONS
+                                        ]?.maxClientConn ?? 200
+                                      }`
+                                    : ''
+                                  : ''
+                              }
+                            />
+                          </FormControl_Shadcn_>
+                          <FormDescription_Shadcn_ className="col-start-5 col-span-8">
+                            The maximum number of concurrent client connections allowed.{' '}
+                            {poolingInfo.supavisor_enabled
+                              ? 'This value is fixed and cannot be changed. '
+                              : 'Overrides default optimizations. '}
+                            Please refer to our{' '}
+                            <a
+                              href="https://supabase.com/docs/guides/platform/custom-postgres-config#pooler-config"
+                              target="_blank"
+                              className="underline"
+                            >
+                              documentation
+                            </a>{' '}
+                            to found out more.
+                          </FormDescription_Shadcn_>
+                          <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
+                        </FormItem_Shadcn_>
+                      )}
+                    />
                   </form>
                 </Form_Shadcn_>
                 <div className="border-muted border-t"></div>
