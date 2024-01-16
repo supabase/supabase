@@ -48,7 +48,7 @@ const BranchingWaitlistPopover = ({ isNewNav = false }: BranchingWaitlistPopover
               Contact support
             </Link>
           </Button>
-          <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+          <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />} asChild>
             <a
               target="_blank"
               rel="noreferrer"
