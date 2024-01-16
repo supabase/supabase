@@ -63,7 +63,6 @@ export const ConnectionPooling = () => {
 
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const computeInstance = addons?.selected_addons.find((addon) => addon.type === 'compute_instance')
-  computeInstance?.variant.identifier
 
   const {
     data: poolingInfo,
