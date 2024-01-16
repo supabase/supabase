@@ -20,7 +20,6 @@ import { getTables } from 'data/tables/tables-query'
 import { getViews } from 'data/views/views-query'
 import { useStore } from 'hooks'
 import { timeout, tryParseJson } from 'lib/helpers'
-import { IUiStore } from 'stores/UiStore'
 import { IMetaStore } from 'stores/pgmeta/MetaStore'
 import {
   generateCreateColumnPayload,
@@ -404,7 +403,6 @@ export const duplicateTable = async (
 export const createTable = async (
   projectRef: string,
   connectionString: string | undefined,
-  ui: IUiStore,
   toastId: string,
   payload: {
     name: string
@@ -441,11 +439,7 @@ export const createTable = async (
     // Then insert the columns - we don't do Promise.all as we want to keep the integrity
     // of the column order during creation. Note that we add primary key constraints separately
     // via the query endpoint to support composite primary keys as pg-meta does not support that OOB
-    ui.setNotification({
-      id: toastId,
-      category: 'loading',
-      message: `Adding ${columns.length} columns to ${table.name}...`,
-    })
+    toast.loading(`Adding ${columns.length} columns to ${table.name}...`, { id: toastId })
 
     for (const column of columns) {
       // We create all columns without primary keys first
@@ -485,13 +479,11 @@ export const createTable = async (
           importContent.file,
           table as PostgresTable,
           importContent.selectedHeaders,
-          (progress: number) => {
-            ui.setNotification({
-              id: toastId,
-              progress,
-              category: 'loading',
-              message: `Adding ${importContent.rowCount.toLocaleString()} rows to ${table.name}`,
-            })
+          () => {
+            toast.loading(
+              `Adding ${importContent.rowCount.toLocaleString()} rows to ${table.name}`,
+              { id: toastId }
+            )
           }
         )
 
@@ -520,13 +512,11 @@ export const createTable = async (
           table as PostgresTable,
           importContent.rows,
           importContent.selectedHeaders,
-          (progress: number) => {
-            ui.setNotification({
-              id: toastId,
-              progress,
-              category: 'loading',
-              message: `Adding ${importContent.rows.length.toLocaleString()} rows to ${table.name}`,
-            })
+          () => {
+            toast.loading(
+              `Adding ${importContent.rows.length.toLocaleString()} rows to ${table.name}`,
+              { id: toastId }
+            )
           }
         )
 
@@ -558,7 +548,6 @@ export const createTable = async (
 export const updateTable = async (
   projectRef: string,
   connectionString: string | undefined,
-  ui: IUiStore,
   toastId: string,
   table: PostgresTable,
   payload: any,
@@ -597,11 +586,7 @@ export const updateTable = async (
   // Delete any removed columns
   const columnsToRemove = originalColumns.filter((column) => !columnIds.includes(column.id))
   for (const column of columnsToRemove) {
-    ui.setNotification({
-      id: toastId,
-      category: 'loading',
-      message: `Removing column ${column.name} from ${updatedTable.name}`,
-    })
+    toast.loading(`Removing column ${column.name} from ${updatedTable.name}`, { id: toastId })
     await deleteDatabaseColumn({
       projectRef,
       connectionString,
@@ -613,11 +598,7 @@ export const updateTable = async (
   let hasError = false
   for (const column of columns) {
     if (!column.id.includes(table.id.toString())) {
-      ui.setNotification({
-        id: toastId,
-        category: 'loading',
-        message: `Adding column ${column.name} to ${updatedTable.name}`,
-      })
+      toast.loading(`Adding column ${column.name} to ${updatedTable.name}`, { id: toastId })
       // Ensure that columns do not created as primary key first, cause the primary key will
       // be added later on further down in the code
       const columnPayload = generateCreateColumnPayload(updatedTable.id, {

@@ -58,7 +58,7 @@ const SidePanelEditor = ({
   const snap = useTableEditorStateSnapshot()
   const [_, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
 
-  const { meta, ui } = useStore()
+  const { ui } = useStore()
   const queryClient = useQueryClient()
   const { project } = useProjectContext()
 
@@ -401,7 +401,6 @@ const SidePanelEditor = ({
         const table = await createTable(
           project?.ref!,
           project?.connectionString,
-          ui,
           toastId,
           payload,
           columns,
@@ -431,7 +430,6 @@ const SidePanelEditor = ({
         const { table, hasError } = await updateTable(
           project?.ref!,
           project?.connectionString,
-          ui,
           toastId,
           selectedTable,
           payload,
