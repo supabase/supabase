@@ -40,6 +40,15 @@ export const BranchingEmptyState = () => {
               Contact support
             </Link>
           </Button>
+          <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+            <a
+              target="_blank"
+              rel="noreferrer"
+              href="https://supabase.com/docs/guides/platform/branching"
+            >
+              View the docs
+            </a>
+          </Button>
         </div>
       )}
     </ProductEmptyState>
