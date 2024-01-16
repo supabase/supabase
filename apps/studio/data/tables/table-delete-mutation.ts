@@ -1,7 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
+import { entityTypeKeys } from 'data/entity-types/keys'
 import { del } from 'data/fetchers'
+import { viewKeys } from 'data/views/keys'
 import { ResponseError } from 'types'
 import { tableKeys } from './keys'
 
@@ -55,6 +57,11 @@ export const useTableDeleteMutation = ({
         await Promise.all([
           queryClient.invalidateQueries(tableKeys.list(projectRef, schema)),
           queryClient.invalidateQueries(tableKeys.table(projectRef, id)),
+          queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
+          // invalidate all views from this schema
+          queryClient.invalidateQueries(viewKeys.listBySchema(projectRef, schema)),
+          // invalidate the view if there's a view with this id
+          queryClient.invalidateQueries(viewKeys.view(projectRef, id)),
         ])
 
         await onSuccess?.(data, variables, context)

@@ -50,7 +50,17 @@ const Policies = ({
 
   const { mutateAsync: createDatabasePolicy } = useDatabasePolicyCreateMutation()
   const { mutateAsync: updateDatabasePolicy } = useDatabasePolicyUpdateMutation()
-  const { mutateAsync: updateTable } = useTableUpdateMutation()
+  const { mutate: updateTable } = useTableUpdateMutation({
+    onSuccess: () => {
+      closeConfirmModal()
+    },
+    onError: (error) => {
+      return ui.setNotification({
+        category: 'error',
+        message: `Failed to toggle RLS: ${error.message}`,
+      })
+    },
+  })
   const { mutate: deleteDatabasePolicy } = useDatabasePolicyDeleteMutation({
     onSuccess: () => {
       toast.success('Successfully deleted policy!')
@@ -104,24 +114,13 @@ const Policies = ({
       rls_enabled: !selectedTableToToggleRLS.rls_enabled,
     }
 
-    try {
-      await updateTable({
-        projectRef: project?.ref!,
-        connectionString: project?.connectionString,
-        id: payload.id,
-        schema: (selectedTableToToggleRLS as PostgresTable).schema,
-        payload: payload,
-      })
-    } catch (error: any) {
-      if (error) {
-        return ui.setNotification({
-          category: 'error',
-          message: `Failed to toggle RLS: ${error.message}`,
-        })
-      }
-    }
-
-    closeConfirmModal()
+    updateTable({
+      projectRef: project?.ref!,
+      connectionString: project?.connectionString,
+      id: payload.id,
+      schema: (selectedTableToToggleRLS as PostgresTable).schema,
+      payload: payload,
+    })
   }
 
   const onCreatePolicy = useCallback(
