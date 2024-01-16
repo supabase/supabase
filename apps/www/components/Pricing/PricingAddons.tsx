@@ -9,7 +9,7 @@ const addons = [
   {
     id: 'addon-compute',
     name: 'Scale each project up to 256 GB',
-    heroImg: 'addons-compute-hero',
+    heroImg: 'addons-compute',
     icon: 'compute-upgrade',
     price: 'Starts from $10/month',
     description:
@@ -102,9 +102,9 @@ const AddonCard = ({ addon, setShowComputeModal }: any) => {
           className="overflow-hidden rounded-lg relative lg:h-full"
         >
           <Image
-            className="w-full"
+            className="w-full object-cover object-top"
             layout="fill"
-            objectFit="cover"
+            quality={100}
             src={`${basePath}/images/pricing/${addon.heroImg}${
               resolvedTheme?.includes('dark') ? '' : '-light'
             }.png`}
