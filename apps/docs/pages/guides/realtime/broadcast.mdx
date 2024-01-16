@@ -388,12 +388,6 @@ Use this to guarantee that the server has received the message before resolving 
 
 ### Send messages using REST calls
 
-<Admonition type="note">
-
-This is currently available only in the Supabase JavaScript client version 2.37.0 and later.
-
-</Admonition>
-
 You can also send a Broadcast message by making an HTTP request to Realtime servers. This is useful when you want to send messages from your server or client without having to first establish a WebSocket connection.
 
 <Tabs
@@ -404,6 +398,12 @@ You can also send a Broadcast message by making an HTTP request to Realtime serv
   queryGroup="language"
 >
   <TabPanel id="js" label="JavaScript">
+    <Admonition type="note">
+
+    This is currently available only in the Supabase JavaScript client version 2.37.0 and later.
+
+    </Admonition>
+
     ```js
     const channel = client.channel('test-channel')
 
