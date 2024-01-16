@@ -191,7 +191,7 @@ const IPv4SidePanel = () => {
                   </div>
                   <div className="px-4 py-2 flex flex-col justify-between">
                     <p className="text-foreground-light">
-                      Use provided connection pooler or IPv6 for direct connections
+                      Use connection pooler or IPv6 for direct connections
                     </p>
                     <div className="flex items-center space-x-1 mt-2">
                       <p className="text-foreground text-sm">$0</p>
