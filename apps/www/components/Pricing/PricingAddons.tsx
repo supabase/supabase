@@ -8,7 +8,7 @@ import Link from 'next/link'
 const addons = [
   {
     id: 'addon-compute',
-    name: 'Scale each project up to 256 GB',
+    name: 'Scale compute up to 256GB per project',
     heroImg: 'addons-compute',
     icon: 'compute-upgrade',
     price: 'Starts from $10/month',
