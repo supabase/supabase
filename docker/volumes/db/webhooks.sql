@@ -254,7 +254,11 @@ BEGIN;
 
           -- Retry loop
           WHILE NOT succeeded AND retry_count <= max_retries LOOP
-            PERFORM pg_sleep(retry_delays[retry_count]);
+            PERFORM pg_sleep(retry_delays[retry_count+1]);
+            CASE WHEN retry_delays[retry_count+1]>0 THEN
+               RAISE WARNING 'Retrying HTTP request {%, %, %}', retry_count, url,retry_delays[retry_count+1];
+            END CASE;
+            retry_count := retry_count + 1;
             BEGIN
               CASE
                 WHEN method = 'GET' THEN
@@ -285,8 +289,8 @@ BEGIN;
               END CASE;
 
               IF local_request_id IS NOT NULL THEN
-                SELECT (response).status_code::integer 
-                  INTO status_code 
+                SELECT (response).status_code::integer
+                  INTO status_code
                   FROM net._http_collect_response(local_request_id);
                 IF status_code < 400 THEN
                   succeeded := TRUE;
@@ -296,20 +300,17 @@ BEGIN;
               EXIT WHEN succeeded;
             EXCEPTION
               WHEN OTHERS THEN
-                IF retry_count >= max_retries THEN
+                IF retry_count > max_retries THEN
                   -- If retries exhausted, re-raise exception
                   RAISE EXCEPTION 'HTTP request failed after % retries. SQL Error: { %, % }',
                     max_retries, SQLERRM, SQLSTATE;
                 END IF;
             END;
-            retry_count := retry_count + 1;
           END LOOP;
-
           INSERT INTO supabase_functions.hooks
             (hook_table_id, hook_name, request_id)
           VALUES
             (TG_RELID, TG_NAME, local_request_id);
-
           RETURN NEW;
         END
     $function$;
