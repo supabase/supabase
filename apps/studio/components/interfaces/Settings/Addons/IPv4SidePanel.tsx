@@ -11,16 +11,7 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import Telemetry from 'lib/telemetry'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
-import {
-  Alert,
-  AlertDescription_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertTriangle,
-  IconExternalLink,
-  Radio,
-  SidePanel,
-} from 'ui'
+import { Alert, Button, IconExternalLink, Radio, SidePanel } from 'ui'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { AddonVariantId } from 'data/subscriptions/types'
 
@@ -138,14 +129,14 @@ const IPv4SidePanel = () => {
       }
       header={
         <div className="flex items-center justify-between">
-          <h4>IPv4</h4>
+          <h4>Dedicated IPv4 address</h4>
           <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
             <Link
               href="https://github.com/orgs/supabase/discussions/17817"
               target="_blank"
               rel="noreferrer"
             >
-              About IPv4
+              About IPv4 deprecation
             </Link>
           </Button>
         </div>
@@ -156,11 +147,11 @@ const IPv4SidePanel = () => {
           <p className="text-sm">
             Direct connections to the database only work if your client is able to resolve IPv6
             addresses from January 26th. Enabling the IPv4 add-on allows you to directly connect to
-            your database via a IPv4 address. If you are connecting via our connection Pooler, you
+            your database via a IPv4 address. If you are connecting via our connection pooler, you
             do not need this add-on as our pooler resolves to IPv4 addresses. You can check your
             connection info in your{' '}
             <Link href={`/project/${projectRef}/settings/database`} className="text-brand">
-              Project database Settings
+              project database settings
             </Link>
             .
           </p>
@@ -196,11 +187,11 @@ const IPv4SidePanel = () => {
               >
                 <div className="w-full group">
                   <div className="border-b border-default px-4 py-2 group-hover:border-control">
-                    <p className="text-sm">No IPv4</p>
+                    <p className="text-sm">No IPv4 address</p>
                   </div>
-                  <div className="px-4 py-2">
+                  <div className="px-4 py-2 flex flex-col justify-between">
                     <p className="text-foreground-light">
-                      Use connection pooler or IPv6 for direct connections
+                      Use provided connection pooler or IPv6 for direct connections
                     </p>
                     <div className="flex items-center space-x-1 mt-2">
                       <p className="text-foreground text-sm">$0</p>
@@ -221,11 +212,11 @@ const IPv4SidePanel = () => {
                 >
                   <div className="w-full group">
                     <div className="border-b border-default px-4 py-2 group-hover:border-control">
-                      <p className="text-sm">{option.name}</p>
+                      <p className="text-sm">Dedicated IPv4 address</p>
                     </div>
                     <div className="px-4 py-2">
                       <p className="text-foreground-light">
-                        Allow direct database connections via IPv4
+                        Allow direct database connections via dedicated IPv4 address
                       </p>
                       <div className="flex items-center space-x-1 mt-2">
                         <p className="text-foreground text-sm">${option.price}</p>
@@ -269,7 +260,7 @@ const IPv4SidePanel = () => {
                 </Button>
               }
             >
-              Upgrade your plan to add a IPv4 to your project
+              Upgrade your plan to enable a dedicated IPv4 address for your project
             </Alert>
           )}
         </div>

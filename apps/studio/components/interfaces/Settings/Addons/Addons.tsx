@@ -349,7 +349,7 @@ const Addons = () => {
             <ScaffoldSection>
               <ScaffoldSectionDetail>
                 <div className="space-y-6">
-                  <p className="m-0">IPv4</p>
+                  <p className="m-0">Dedicated IPv4 address</p>
                   <div className="space-y-2">
                     <p className="text-sm text-foreground-light m-0">More information</p>
                     <div>
@@ -374,9 +374,23 @@ const Addons = () => {
                     PGBouncer and IPv4 Deprecation on January, 26th
                   </AlertTitle_Shadcn_>
                   <AlertDescription_Shadcn_>
-                    Direct connections via db.{projectRef}.supabase.co will resolve to an IPv6
-                    address starting from January 26th. If you plan on not using our connection
-                    pooler and your environment does not support IPv6, consider enabling the add-on.
+                    <p>
+                      Direct connections via db.{projectRef}.supabase.co will resolve to an IPv6
+                      address starting from January 26th. If you plan on not using our connection
+                      pooler and your environment does not support IPv6, consider enabling the
+                      add-on.
+                    </p>
+                    <div className="mt-2">
+                      <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                        <a
+                          href="https://github.com/orgs/supabase/discussions/17817"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Learn more
+                        </a>
+                      </Button>
+                    </div>
                   </AlertDescription_Shadcn_>
                 </Alert_Shadcn_>
                 <div className="flex space-x-6">
@@ -400,7 +414,11 @@ const Addons = () => {
                   </div>
                   <div>
                     <p className="text-sm text-foreground-light">Current option:</p>
-                    <p>{ipv4 !== undefined ? 'IPv4 is enabled' : 'IPv4 is not enabled'}</p>
+                    <p>
+                      {ipv4 !== undefined
+                        ? 'Dedicated IPv4 address is enabled'
+                        : 'Dedicated IPv4 address is not enabled'}
+                    </p>
                     <ProjectUpdateDisabledTooltip
                       projectUpdateDisabled={projectUpdateDisabled}
                       projectNotActive={!isProjectActive}
@@ -411,7 +429,7 @@ const Addons = () => {
                         onClick={() => snap.setPanelKey('ipv4')}
                         disabled={isBranch || !isProjectActive || projectUpdateDisabled}
                       >
-                        Change IPv4
+                        Change dedicated IPv4 address
                       </Button>
                     </ProjectUpdateDisabledTooltip>
                   </div>
