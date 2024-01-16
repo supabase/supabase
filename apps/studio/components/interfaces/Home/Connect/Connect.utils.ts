@@ -21,15 +21,40 @@ export const FRAMEWORKS = [
     files: [
       {
         // omit .tsx extension
-        path: 'nextjs/supabase-js/env.local',
+        path: 'nextjs/app/supabase-js/env.local',
         name: '.env.local',
         displayPath: '/.env.local',
       },
       {
         // omit .tsx extension
-        path: 'nextjs/supabase-js/client',
+        path: 'nextjs/app/supabase-js/client',
         name: 'client.tsx',
         displayPath: '/utils/supabase/client.tsx',
+      },
+    ],
+  },
+  {
+    key: 'pages',
+    label: 'Pages router',
+    files: [],
+    parentKey: 'nextjs',
+    grandparentKey: null,
+  },
+  {
+    key: 'supabasejs',
+    label: 'Supabase-js',
+    parentKey: 'nextjs',
+    grandparentKey: 'pages',
+    files: [
+      {
+        path: 'nextjs/pages/supabase-js/env.local',
+        name: '.env.local',
+        displayPath: '/.env.local',
+      },
+      {
+        path: 'nextjs/pages/supabase-js/app',
+        name: 'app.tsx',
+        displayPath: '/app.tsx',
       },
     ],
   },

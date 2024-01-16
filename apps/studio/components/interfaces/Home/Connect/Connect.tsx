@@ -46,17 +46,34 @@ const Connect = () => {
   // listen for changes to parent / child / grandchild
   useEffect(() => {
     const child = connectionObject.find(
-      (item) => item.parentKey === selectedParent && item.parentKey
+      (item) => item.parentKey === selectedParent && item.key === selectedChild
     )
+
     const grandchild = connectionObject.find(
       (item) => item.grandparentKey === selectedChild && item.grandparentKey
     )
-
+    //setSelectedChild(child?.key || '')
     if (selectedParent) {
-      setSelectedChild(child?.key || '')
-      setSelectedGrandchild(grandchild?.key || '')
+      if (child?.key !== selectedChild) {
+        setSelectedChild(child?.key || '')
+      }
+      if (grandchild?.key !== selectedGrandchild) {
+        setSelectedGrandchild(grandchild?.key || '')
+      }
     }
-  }, [selectedParent, selectedChild, selectedGrandchild])
+  }, [selectedChild, selectedGrandchild])
+
+  useEffect(() => {
+    // when the parent changes, reset all the dropdowns
+    const child = connectionObject.find(
+      (item) => item.parentKey === selectedParent && item.parentKey
+    )
+    if (selectedParent) {
+      if (child?.key !== selectedChild) {
+        setSelectedChild(child?.key || '')
+      }
+    }
+  }, [selectedParent])
 
   // set the selected contentFiles
   useEffect(() => {
@@ -68,7 +85,7 @@ const Connect = () => {
       (item) => item.grandparentKey === selectedChild && item.grandparentKey
     )
 
-    // check grandchild first, then child, then parent  for files[]
+    // check grandchild first, then child, then parent for files[]
     if (grandchild) {
       setContentFiles(grandchild?.files || [])
     } else if (child) {
@@ -112,10 +129,7 @@ const Connect = () => {
       setSelectedChild('')
       setSelectedGrandchild('')
     }
-    console.log('connection type change', value)
   }
-
-  console.log({ contentFiles })
 
   return (
     <div>

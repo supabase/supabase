@@ -3,7 +3,6 @@ const ContentFile = () => {
     <div>
       <pre className="text-sm">
         {`
-// app/page.tsx
 import { createClient } from '@/utils/supabase/server';
 import { cookies } from 'next/headers';
 
