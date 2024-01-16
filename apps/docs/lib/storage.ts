@@ -34,3 +34,16 @@ export function remove(storageType: StorageType, key: LocalStorageKey) {
   const storage = getStorage(storageType)
   return storage.removeItem(key)
 }
+
+export function storeOrRemoveNull(
+  storageType: StorageType,
+  key: LocalStorageKey,
+  value: string | null
+) {
+  if (typeof window === 'undefined') return
+  if (value === null) {
+    remove(storageType, key)
+  } else {
+    store(storageType, key, value)
+  }
+}

@@ -10,7 +10,7 @@ import { useBranchesQuery } from '~/lib/fetch/branches'
 import { useOrganizationsQuery } from '~/lib/fetch/organizations'
 import { useProjectApiQuery } from '~/lib/fetch/projectApi'
 import { useProjectsQuery } from '~/lib/fetch/projects'
-import { LOCAL_STORAGE_KEYS, remove, retrieve, store } from '~/lib/storage'
+import { LOCAL_STORAGE_KEYS, retrieve, storeOrRemoveNull } from '~/lib/storage'
 import { useOnLogout } from '~/lib/userAuth'
 
 import { ComboBox, ComboBoxOption } from './ProjectConfigVariables.ComboBox'
@@ -57,28 +57,16 @@ const projectsStore = proxy({
   selectedProject: null as Project | null,
   setSelectedOrgProject: (org: Org | null, project: Project | null) => {
     projectsStore.selectedOrg = org
-    if (org) {
-      store('local', LOCAL_STORAGE_KEYS.SAVED_ORG, org.id)
-    } else {
-      remove('local', LOCAL_STORAGE_KEYS.SAVED_ORG)
-    }
+    storeOrRemoveNull('local', LOCAL_STORAGE_KEYS.SAVED_ORG, org.id)
 
     projectsStore.selectedProject = project
-    if (project) {
-      // @ts-ignore -- problem in OpenAPI spec -- project has ref property
-      store('local', LOCAL_STORAGE_KEYS.SAVED_PROJECT, project.ref)
-    } else {
-      remove('local', LOCAL_STORAGE_KEYS.SAVED_PROJECT)
-    }
+    // @ts-ignore -- problem in OpenAPI spec -- project has ref property
+    storeOrRemoveNull('local', LOCAL_STORAGE_KEYS.SAVED_PROJECT, project.ref)
   },
   selectedBranch: null as Branch | null,
   setSelectedBranch: (branch: Branch | null) => {
     projectsStore.selectedBranch = branch
-    if (branch) {
-      store('local', LOCAL_STORAGE_KEYS.SAVED_BRANCH, branch.id)
-    } else {
-      remove('local', LOCAL_STORAGE_KEYS.SAVED_BRANCH)
-    }
+    storeOrRemoveNull('local', LOCAL_STORAGE_KEYS.SAVED_BRANCH, branch.id)
   },
   clear: () => {
     projectsStore.setSelectedOrgProject(null, null)
@@ -279,8 +267,6 @@ function VariableView({ variable, className }: { variable: Variable; className?:
   const hasBranches = selectedProject?.is_branch_enabled ?? false
   // @ts-ignore -- problem in OpenAPI spec -- project has ref property
   const ref = hasBranches ? selectedBranch?.project_ref : selectedProject?.ref
-  console.log('has branches?', hasBranches)
-  console.log('ref:', ref)
 
   const {
     data: apiData,
@@ -306,7 +292,6 @@ function VariableView({ variable, className }: { variable: Variable; className?:
     : 'loggedIn.selectedProject.dataSuccess'
 
   let variableValue: string = null
-  console.log(stateSummary)
   if (stateSummary === 'loggedIn.selectedProject.dataSuccess') {
     switch (variable) {
       case 'url':
