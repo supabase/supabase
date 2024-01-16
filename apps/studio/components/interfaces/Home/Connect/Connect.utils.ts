@@ -48,13 +48,13 @@ export const FRAMEWORKS = [
     files: [
       {
         // omit .tsx extension
-        path: 'nextjs/supabase-js/env.local',
+        path: 'vue/supabase-js/env.local',
         name: '.env.local',
         displayPath: '/.env.local',
       },
       {
         // omit .tsx extension
-        path: 'nextjs/supabase-js/client',
+        path: 'vue/supabase-js/client',
         name: 'client.tsx',
         displayPath: '/utils/supabase/client.tsx',
       },

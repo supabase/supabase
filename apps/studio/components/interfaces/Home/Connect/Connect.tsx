@@ -10,6 +10,7 @@ import {
   DialogTrigger_Shadcn_,
   Dialog_Shadcn_,
   Tabs,
+  Toggle,
 } from 'ui'
 import { DIRECT, FRAMEWORKS, GRAPHQL, ORMS } from './Connect.utils'
 import ConnectDropdown from './ConnectDropdown'
@@ -24,6 +25,7 @@ const Connect = () => {
   const [parentSelectorOpen, setParentSelectorOpen] = useState(false)
   const [childDropdownOpen, setChildDropdownOpen] = useState(false)
   const [grandChildDropdownOpen, setGrandChildDropdownOpen] = useState(false)
+  const [useConnectionPooler, setUseConnectionPooler] = useState(false)
 
   // Parent -> child -> grandchild
   // nextjs -> app router -> supabase-js
@@ -141,7 +143,7 @@ const Connect = () => {
             <Tabs.Panel id="framework" label="App Framework" key="framework">
               <div className="bg-surface-300 p-4">
                 <div className="flex items-center gap-2">
-                  {/* first dropdown is every LIB item without a parentKey or grandparentKey */}
+                  {/* first dropdown is every FRAMEWORK item without a parentKey or grandparentKey */}
                   <ConnectDropdown
                     level="parent"
                     open={parentSelectorOpen}
@@ -201,8 +203,25 @@ const Connect = () => {
                     items={ORMS.filter((item) => !item.parentKey && !item.grandparentKey)}
                   />
                 </div>
+                <div className="mt-4 flex gap-4">
+                  <div className="mt-1">
+                    <Toggle
+                      size="tiny"
+                      layout="flex"
+                      defaultChecked={useConnectionPooler}
+                      // @ts-ignore
+                      onChange={() => setUseConnectionPooler(!useConnectionPooler)}
+                    />
+                  </div>
+                  <div className="text-sm">
+                    <p>Use connection pooler </p>
+                    <p className="text-light">
+                      A connection pooler is used to manage a large number of temporary connections
+                    </p>
+                  </div>
+                </div>
 
-                <TabsContent files={contentFiles} />
+                <TabsContent files={contentFiles} pooler={useConnectionPooler} />
               </div>
             </Tabs.Panel>
 
@@ -252,13 +271,13 @@ const Connect = () => {
   )
 }
 
-const TabsContent = ({ files }: any) => {
+const TabsContent = ({ files, pooler }: { files: any; pooler?: boolean }) => {
   return (
     <div className="bg-surface bg-surface-100 p-4 rounded-md mt-4">
       <Tabs type="underlined" size="small">
         {files?.map((file: { path: string; name: string; displayPath: string }) => (
           <Tabs.Panel id={file.path} label={file.name} key={file.displayPath}>
-            <ConnectTabContent path={file.path} />
+            <ConnectTabContent path={file.path} pooler={pooler} />
           </Tabs.Panel>
         ))}
       </Tabs>
