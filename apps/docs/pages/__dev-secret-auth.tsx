@@ -1,5 +1,4 @@
 import { useRouter } from 'next/router'
-import { useState } from 'react'
 import { Button_Shadcn_ } from 'ui'
 import { auth } from '~/lib/userAuth'
 
@@ -17,7 +16,6 @@ export function getServerSideProps() {
 
 export default function DevOnlySecretAuth() {
   const router = useRouter()
-  const [email, setEmail] = useState('')
 
   function signInWithGitHub() {
     auth.signInWithOAuth({

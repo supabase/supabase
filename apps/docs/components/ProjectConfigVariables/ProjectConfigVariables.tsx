@@ -279,6 +279,8 @@ function VariableView({ variable, className }: { variable: Variable; className?:
   const hasBranches = selectedProject?.is_branch_enabled ?? false
   // @ts-ignore -- problem in OpenAPI spec -- project has ref property
   const ref = hasBranches ? selectedBranch?.project_ref : selectedProject?.ref
+  console.log('has branches?', hasBranches)
+  console.log('ref:', ref)
 
   const {
     data: apiData,
@@ -304,6 +306,7 @@ function VariableView({ variable, className }: { variable: Variable; className?:
     : 'loggedIn.selectedProject.dataSuccess'
 
   let variableValue: string = null
+  console.log(stateSummary)
   if (stateSummary === 'loggedIn.selectedProject.dataSuccess') {
     switch (variable) {
       case 'url':
@@ -331,8 +334,12 @@ function VariableView({ variable, className }: { variable: Variable; className?:
             stateSummary === 'loggedIn.selectedProject.dataPending'
               ? 'Loading...'
               : stateSummary === 'loggedIn.noSelectedProject'
-              ? 'Select a project...'
-              : variableValue ?? `YOUR ${prettyFormatVariable[variable].toUpperCase()}`
+              ? hasBranches
+                ? 'Select a project and branch...'
+                : 'Select a project...'
+              : stateSummary === 'loggedIn.selectedProject.dataSuccess'
+              ? variableValue
+              : `YOUR ${prettyFormatVariable[variable].toUpperCase()}`
           }
         />
         <CopyToClipboard text={variableValue ?? ''}>
