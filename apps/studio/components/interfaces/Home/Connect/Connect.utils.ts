@@ -14,13 +14,6 @@ export const FRAMEWORKS = [
     grandparentKey: null,
   },
   {
-    key: 'pages',
-    label: 'Pages router',
-    parentKey: 'nextjs',
-    grandparentKey: null,
-    files: [],
-  },
-  {
     key: 'supabasejs',
     label: 'Supabase-js',
     parentKey: 'nextjs',
@@ -93,6 +86,54 @@ export const ORMS = [
       {
         // omit .tsx extension
         path: 'drizzle/env.local',
+        name: '.env.local',
+        displayPath: '/.env.local',
+      },
+    ],
+  },
+]
+
+export const DIRECT = [
+  {
+    key: 'psql',
+    label: 'Psql',
+    parentKey: null,
+    grandparentKey: null,
+    files: [
+      {
+        // omit .tsx extension
+        path: 'psql/env.local',
+        name: '.env.local',
+        displayPath: '/.env.local',
+      },
+    ],
+  },
+  {
+    key: 'php',
+    label: 'PHP',
+    parentKey: null,
+    grandparentKey: null,
+    files: [
+      {
+        // omit .tsx extension
+        path: 'php/env.local',
+        name: '.env.local',
+        displayPath: '/.env.local',
+      },
+    ],
+  },
+]
+
+export const GRAPHQL = [
+  {
+    key: 'graphql',
+    label: 'GraphQL',
+    parentKey: null,
+    grandparentKey: null,
+    files: [
+      {
+        // omit .tsx extension
+        path: 'graphql/env.local',
         name: '.env.local',
         displayPath: '/.env.local',
       },

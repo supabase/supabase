@@ -1,4 +1,4 @@
-import { ChevronDown } from 'lucide-react'
+import { ArrowBigDown, ArrowBigLeft, ArrowBigRight, ArrowBigUp, ChevronDown } from 'lucide-react'
 import {
   Button,
   CommandItem_Shadcn_,
@@ -11,7 +11,7 @@ import {
 
 import { BASE_PATH } from 'lib/constants'
 import Image from 'next/image'
-import { useState } from 'react'
+import ConnectionIcon from './ConnectionIcon'
 
 interface ConnectDropdownProps {
   level?: 'parent' | 'child' | 'grandchild'
@@ -48,14 +48,7 @@ const ConnectDropdown = ({
             <Button size="tiny" type="default" className="h-[26px] pr-3 gap-0 rounded-l-none">
               <div className="flex items-center gap-1">
                 <span className="text-xs text-foreground-light flex items-center gap-2  pl-1">
-                  {level === 'parent' && (
-                    <Image
-                      src={`${BASE_PATH}/img/icons/frameworks/nextjs.svg`}
-                      width={14}
-                      height={14}
-                      alt={`icon`}
-                    />
-                  )}
+                  {level === 'parent' && <ConnectionIcon connection={state} />}
                   {items.find((item) => item.key === state)?.label}
                 </span>
                 <ChevronDown className="text-muted" strokeWidth={1} size={12} />
@@ -80,12 +73,7 @@ const ConnectDropdown = ({
                   }}
                 >
                   <span className="flex items-center gap-1">
-                    <Image
-                      src={`${BASE_PATH}/img/icons/frameworks/nextjs.svg`}
-                      width={14}
-                      height={14}
-                      alt={`icon`}
-                    />
+                    <ConnectionIcon connection={item.key} />
                     {item.label}
                   </span>
                 </CommandItem_Shadcn_>

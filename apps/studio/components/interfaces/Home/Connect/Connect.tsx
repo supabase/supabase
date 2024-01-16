@@ -11,12 +11,12 @@ import {
   Dialog_Shadcn_,
   Tabs,
 } from 'ui'
-import { FRAMEWORKS, ORMS } from '../Connect.utils'
+import { DIRECT, FRAMEWORKS, GRAPHQL, ORMS } from './Connect.utils'
 import ConnectDropdown from './ConnectDropdown'
 
 import ConnectTabContent from './ConnectTabContent'
 
-type ConnectionType = 'frameworks' | 'orms' | 'direct' | 'graphql'
+//type ConnectionType = 'frameworks' | 'orms' | 'direct' | 'graphql'
 
 const Connect = () => {
   //const [connectionType, setConnectionType] = useState<ConnectionType>('frameworks')
@@ -65,7 +65,7 @@ const Connect = () => {
     const grandchild = connectionObject.find(
       (item) => item.grandparentKey === selectedChild && item.grandparentKey
     )
-    console.log({ grandchild })
+
     // check grandchild first, then child, then parent  for files[]
     if (grandchild) {
       setContentFiles(grandchild?.files || [])
@@ -74,13 +74,14 @@ const Connect = () => {
     } else {
       setContentFiles(parent?.files || [])
     }
-  }, [selectedParent, selectedChild, selectedGrandchild])
+  }, [selectedParent, selectedChild, selectedGrandchild, connectionObject])
 
-  console.log({ selectedParent, selectedChild, selectedGrandchild })
+  console.log({ selectedParent, selectedChild, selectedGrandchild, connectionObject })
 
   function handleConnectionTypeChange(value: string) {
     // set the selectedParent to the first item in the current connectionObject
 
+    // do this properly...just hardcoding for now
     if (value === 'framework') {
       setconnectionObject(FRAMEWORKS)
       setSelectedParent('nextjs')
@@ -90,6 +91,22 @@ const Connect = () => {
       // @ts-ignore
       setconnectionObject(ORMS)
       setSelectedParent('prisma')
+      setSelectedChild('')
+      setSelectedGrandchild('')
+    }
+
+    if (value === 'direct') {
+      // @ts-ignore
+      setconnectionObject(DIRECT)
+      setSelectedParent('psql')
+      setSelectedChild('')
+      setSelectedGrandchild('')
+    }
+
+    if (value === 'graphql') {
+      // @ts-ignore
+      setconnectionObject(GRAPHQL)
+      setSelectedParent('graphql')
       setSelectedChild('')
       setSelectedGrandchild('')
     }
@@ -168,15 +185,7 @@ const Connect = () => {
                   )}
                 </div>
 
-                <div className="bg-surface bg-surface-100 p-4 rounded-md mt-4">
-                  <Tabs type="underlined" size="small" defaultActiveId={contentFiles[0].path}>
-                    {contentFiles?.map((file) => (
-                      <Tabs.Panel id={file.path} label={file.name} key={file.displayPath}>
-                        <ConnectTabContent path={file.path} />
-                      </Tabs.Panel>
-                    ))}
-                  </Tabs>
-                </div>
+                <TabsContent files={contentFiles} />
               </div>
             </Tabs.Panel>
             <Tabs.Panel id="orm" label="Postgres ORM" key="orm">
@@ -192,25 +201,45 @@ const Connect = () => {
                     items={ORMS.filter((item) => !item.parentKey && !item.grandparentKey)}
                   />
                 </div>
-              </div>
 
-              <div className="bg-surface bg-surface-100 p-4 rounded-md mt-4">
-                <Tabs type="underlined" size="small" defaultActiveId={contentFiles[0].path}>
-                  {contentFiles?.map((file) => (
-                    <Tabs.Panel id={file.path} label={file.name} key={file.displayPath}>
-                      <ConnectTabContent path={file.path} />
-                    </Tabs.Panel>
-                  ))}
-                </Tabs>
+                <TabsContent files={contentFiles} />
               </div>
             </Tabs.Panel>
 
-            <Tabs.Panel id="direct_connection" label="Direct Connection" key="direct_connection">
-              <div className="bg-surface-300 p-4">hello</div>
+            <Tabs.Panel id="direct" label="Direct connection" key="direct">
+              <div className="bg-surface-300 p-4">
+                <div className="flex items-center gap-2">
+                  <ConnectDropdown
+                    level="parent"
+                    open={parentSelectorOpen}
+                    setOpen={setParentSelectorOpen}
+                    state={selectedParent}
+                    updateState={setSelectedParent}
+                    label="Direct"
+                    items={DIRECT.filter((item) => !item.parentKey && !item.grandparentKey)}
+                  />
+                </div>
+
+                <TabsContent files={contentFiles} />
+              </div>
             </Tabs.Panel>
 
             <Tabs.Panel id="graphql" label="GraphQL" key="graphql">
-              <div className="bg-surface-300 p-4">hello</div>
+              <div className="bg-surface-300 p-4">
+                <div className="flex items-center gap-2">
+                  <ConnectDropdown
+                    level="parent"
+                    open={parentSelectorOpen}
+                    setOpen={setParentSelectorOpen}
+                    state={selectedParent}
+                    updateState={setSelectedParent}
+                    label="Direct"
+                    items={GRAPHQL.filter((item) => !item.parentKey && !item.grandparentKey)}
+                  />
+                </div>
+
+                <TabsContent files={contentFiles} />
+              </div>
             </Tabs.Panel>
           </Tabs>
 
@@ -219,6 +248,20 @@ const Connect = () => {
           </DialogFooter_Shadcn_>
         </DialogContent_Shadcn_>
       </Dialog_Shadcn_>
+    </div>
+  )
+}
+
+const TabsContent = ({ files }: any) => {
+  return (
+    <div className="bg-surface bg-surface-100 p-4 rounded-md mt-4">
+      <Tabs type="underlined" size="small">
+        {files?.map((file: { path: string; name: string; displayPath: string }) => (
+          <Tabs.Panel id={file.path} label={file.name} key={file.displayPath}>
+            <ConnectTabContent path={file.path} />
+          </Tabs.Panel>
+        ))}
+      </Tabs>
     </div>
   )
 }
