@@ -148,7 +148,9 @@ function getCellEditor(
         return { label: x, value: x }
       })
       // eslint-disable-next-line react/display-name
-      return (p: any) => <SelectEditor {...p} options={options} />
+      return (p: any) => (
+        <SelectEditor {...p} options={options} isNullable={columnDefinition.isNullable} />
+      )
     }
     case 'array':
     case 'json': {
