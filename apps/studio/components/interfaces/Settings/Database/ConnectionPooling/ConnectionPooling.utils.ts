@@ -28,7 +28,6 @@ export const constructConnStringSyntax = (
       { value: `?options=reference%3D`, tooltip: undefined },
       { value: ref, tooltip: "Project's reference ID" },
     ]
-    // postgres://[db-user]:[db-password]@aws-0-[aws-region].pooler.supabase.com:6543/[db-name]?options=reference%3D[project-ref]
   } else {
     return [
       { value: 'postgres://', tooltip: undefined },
