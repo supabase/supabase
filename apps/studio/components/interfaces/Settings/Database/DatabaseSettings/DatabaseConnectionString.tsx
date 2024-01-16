@@ -150,23 +150,12 @@ export const DatabaseConnectionString = () => {
               <Alert_Shadcn_ variant="warning">
                 <IconAlertTriangle strokeWidth={2} />
                 <AlertTitle_Shadcn_>
-                  Direct database access via IPv4 and pgBouncer will be deprecated from January 26th
+                  Direct database access via IPv4 and pgBouncer will be removed from January 26th
                   2024
                 </AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_ className="space-y-3">
                   <p>
                     We strongly recommend using{' '}
-                    <a
-                      href="https://github.com/supabase/supavisor"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-foreground underline underline-offset-[4px] decoration-brand-500 hover:decoration-foreground"
-                    >
-                      Supavisor
-                    </a>{' '}
-                    to connect to your database. You'll only need to change the connection string
-                    that you're using in your application to the pooler's connection string which
-                    can be found in the connection pooling settings{' '}
                     <span
                       tabIndex={0}
                       className="cursor-pointer text-foreground underline underline-offset-[4px] decoration-brand-500 hover:decoration-foreground"
@@ -175,7 +164,20 @@ export const DatabaseConnectionString = () => {
                         connectionPooler?.scrollIntoView({ block: 'center', behavior: 'smooth' })
                       }}
                     >
-                      here
+                      connection pooling
+                    </span>{' '}
+                    to connect to your database. You'll only need to change the connection string
+                    that you're using in your application to the pooler's connection string which
+                    can be found in the{' '}
+                    <span
+                      tabIndex={0}
+                      className="cursor-pointer text-foreground underline underline-offset-[4px] decoration-brand-500 hover:decoration-foreground"
+                      onClick={() => {
+                        const connectionPooler = document.getElementById('connection-pooler')
+                        connectionPooler?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+                      }}
+                    >
+                      connection pooling settings
                     </span>
                     .
                   </p>
