@@ -70,7 +70,7 @@ const TableEditorMenu = () => {
       sort,
     },
     {
-      keepPreviousData: true,
+      keepPreviousData: Boolean(searchText),
     }
   )
 
