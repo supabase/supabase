@@ -65,12 +65,13 @@ const DeleteConfirmationDialogs = ({
       const selectedColumnToDelete = snap.confirmationDialog.column
       removeDeletedColumnFromFiltersAndSorts(selectedColumnToDelete.name)
       toast.success(`Successfully deleted column "${selectedColumnToDelete.name}"`)
-      snap.closeConfirmationDialog()
     },
     onError: (error) => {
       if (!(snap.confirmationDialog?.type === 'column')) return
       const selectedColumnToDelete = snap.confirmationDialog.column
       toast.error(`Failed to delete ${selectedColumnToDelete!.name}: ${error.message}`)
+    },
+    onSettled: () => {
       snap.closeConfirmationDialog()
     },
   })
@@ -79,10 +80,11 @@ const DeleteConfirmationDialogs = ({
       const tables = await getTables(snap.selectedSchemaName)
       onAfterDeleteTable(tables)
       toast.success(`Successfully deleted table "${selectedTable?.name}"`)
-      snap.closeConfirmationDialog()
     },
     onError: (error) => {
       toast.error(`Failed to delete ${selectedTable?.name}: ${error.message}`)
+    },
+    onSettled: () => {
       snap.closeConfirmationDialog()
     },
   })
@@ -93,10 +95,11 @@ const DeleteConfirmationDialogs = ({
         snap.confirmationDialog.callback?.()
       }
       toast.success(`Successfully deleted selected row(s)`)
-      snap.closeConfirmationDialog()
     },
     onError: (error) => {
       toast.error(`Failed to delete row: ${error.message}`)
+    },
+    onSettled: () => {
       snap.closeConfirmationDialog()
     },
   })
@@ -107,10 +110,11 @@ const DeleteConfirmationDialogs = ({
         snap.confirmationDialog.callback?.()
       }
       toast.success(`Successfully deleted selected rows`)
-      snap.closeConfirmationDialog()
     },
     onError: (error) => {
       toast.error(`Failed to delete rows: ${error.message}`)
+    },
+    onSettled: () => {
       snap.closeConfirmationDialog()
     },
   })
@@ -121,10 +125,11 @@ const DeleteConfirmationDialogs = ({
         snap.confirmationDialog.callback?.()
       }
       toast.success(`Successfully deleted all rows from table`)
-      snap.closeConfirmationDialog()
     },
     onError: (error) => {
       toast.error(`Failed to delete rows: ${error.message}`)
+    },
+    onSettled: () => {
       snap.closeConfirmationDialog()
     },
   })
