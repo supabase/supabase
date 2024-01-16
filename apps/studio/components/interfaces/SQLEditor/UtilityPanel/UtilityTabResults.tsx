@@ -95,7 +95,7 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
               </p>
             </div>
           ) : (
-            <div>
+            <div className="max-w-[54rem]">
               {formattedError.length > 0 ? (
                 formattedError.map((x: string, i: number) => (
                   <pre key={`error-${i}`} className="font-mono text-sm">
@@ -103,7 +103,7 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
                   </pre>
                 ))
               ) : (
-                <p className="font-mono text-sm">{result.error?.message}</p>
+                <p className="font-mono text-sm break-words">{result.error?.message}</p>
               )}
             </div>
           )}
