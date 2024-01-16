@@ -79,7 +79,7 @@ const SidePanelEditor = ({
   })
   const { mutateAsync: createPublication } = useDatabasePublicationCreateMutation()
   const { mutateAsync: updatePublication } = useDatabasePublicationUpdateMutation({
-    onError: () => { },
+    onError: () => {},
   })
 
   const getImpersonatedRole = useGetImpersonatedRole()
@@ -161,7 +161,7 @@ const SidePanelEditor = ({
           toast.error(error?.message ?? 'Something went wrong while trying to save the JSON value')
         }
       })
-    } catch (error: any) { }
+    } catch (error: any) {}
   }
 
   const onSaveForeignRow = async (value: any) => {
@@ -177,8 +177,8 @@ const SidePanelEditor = ({
       const isNewRecord = false
       const configuration = { identifiers, rowIdx: row.idx }
 
-      saveRow(payload, isNewRecord, configuration, () => { })
-    } catch (error) { }
+      saveRow(payload, isNewRecord, configuration, () => {})
+    } catch (error) {}
   }
 
   const saveColumn = async (
@@ -193,20 +193,20 @@ const SidePanelEditor = ({
     const { columnId } = configuration
     const response = isNewRecord
       ? await createColumn({
-        projectRef: project?.ref!,
-        connectionString: project?.connectionString,
-        payload: payload as CreateColumnPayload,
-        selectedTable: selectedTable as PostgresTable,
-        foreignKey,
-      })
+          projectRef: project?.ref!,
+          connectionString: project?.connectionString,
+          payload: payload as CreateColumnPayload,
+          selectedTable: selectedTable as PostgresTable,
+          foreignKey,
+        })
       : await updateColumn({
-        projectRef: project?.ref!,
-        connectionString: project?.connectionString,
-        id: columnId as string,
-        payload: payload as UpdateColumnPayload,
-        selectedTable: selectedTable as PostgresTable,
-        foreignKey,
-      })
+          projectRef: project?.ref!,
+          connectionString: project?.connectionString,
+          id: columnId as string,
+          payload: payload as UpdateColumnPayload,
+          selectedTable: selectedTable as PostgresTable,
+          foreignKey,
+        })
 
     if (response?.error) {
       ui.setNotification({ category: 'error', message: response.error.message })
@@ -295,8 +295,8 @@ const SidePanelEditor = ({
         const realtimeTables = enabled
           ? publicTables.map((t: any) => `${t.schema}.${t.name}`)
           : publicTables
-            .filter((t: any) => t.id !== table.id)
-            .map((t: any) => `${t.schema}.${t.name}`)
+              .filter((t: any) => t.id !== table.id)
+              .map((t: any) => `${t.schema}.${t.name}`)
         await updatePublication({
           id,
           projectRef: project.ref,
@@ -308,15 +308,15 @@ const SidePanelEditor = ({
         const realtimeTables =
           isAlreadyEnabled && !enabled
             ? // Toggle realtime off
-            publicationTables
-              .filter((t: any) => t.id !== table.id)
-              .map((t: any) => `${t.schema}.${t.name}`)
+              publicationTables
+                .filter((t: any) => t.id !== table.id)
+                .map((t: any) => `${t.schema}.${t.name}`)
             : !isAlreadyEnabled && enabled
-              ? // Toggle realtime on
+            ? // Toggle realtime on
               [`${table.schema}.${table.name}`].concat(
                 publicationTables.map((t: any) => `${t.schema}.${t.name}`)
               )
-              : null
+            : null
         if (realtimeTables === null) return
         await updatePublication({
           id,
@@ -381,7 +381,6 @@ const SidePanelEditor = ({
 
         onTableCreated(table)
       } else if (isNewRecord) {
-
         // for creating a new table
 
         toastId = ui.setNotification({
@@ -503,8 +502,9 @@ const SidePanelEditor = ({
             id: toastId,
             progress,
             category: 'loading',
-            message: `Adding ${importContent.rows.length.toLocaleString()} rows to ${selectedTable.name
-              }`,
+            message: `Adding ${importContent.rows.length.toLocaleString()} rows to ${
+              selectedTable.name
+            }`,
           })
         }
       )
@@ -570,7 +570,7 @@ const SidePanelEditor = ({
       <TableEditor
         table={
           snap.sidePanel?.type === 'table' &&
-            (snap.sidePanel.mode === 'edit' || snap.sidePanel.mode === 'duplicate')
+          (snap.sidePanel.mode === 'edit' || snap.sidePanel.mode === 'duplicate')
             ? selectedTable
             : undefined
         }
@@ -583,7 +583,7 @@ const SidePanelEditor = ({
       <SchemaEditor
         visible={snap.sidePanel?.type === 'schema'}
         closePanel={onClosePanel}
-        saveChanges={() => { }}
+        saveChanges={() => {}}
       />
       <JsonEdit
         visible={snap.sidePanel?.type === 'json'}

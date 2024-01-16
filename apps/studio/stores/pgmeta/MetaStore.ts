@@ -342,8 +342,9 @@ export default class MetaStore implements IMetaStore {
                 id: toastId,
                 progress,
                 category: 'loading',
-                message: `Adding ${importContent.rows.length.toLocaleString()} rows to ${table.name
-                  }`,
+                message: `Adding ${importContent.rows.length.toLocaleString()} rows to ${
+                  table.name
+                }`,
               })
             }
           )
