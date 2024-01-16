@@ -186,26 +186,24 @@ function RealtimePage() {
             </p>
           </div>
           <div className="grid gap-10 grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
-            {AppExamples.map((example) => {
+            {AppExamples.map((example, index) => {
               return (
-                <>
-                  <div className="flex flex-col gap-3">
-                    <ThemeImage
-                      alt={example.title}
-                      src={{
-                        light: `/images/realtime/example-apps/light/${example.img}?type=1`,
-                        dark: `/images/realtime/example-apps/dark/${example.img}`,
-                      }}
-                      className="bg-surface-100 rounded-lg"
-                      layout="fill"
-                      objectFit="contain"
-                    />
-                    <div className="prose">
-                      <h4>{example.title}</h4>
-                      <p className="text-sm">{example.description}</p>
-                    </div>
+                <div key={index} className="flex flex-col gap-3">
+                  <ThemeImage
+                    alt={example.title}
+                    src={{
+                      light: `/images/realtime/example-apps/light/${example.img}?type=1`,
+                      dark: `/images/realtime/example-apps/dark/${example.img}`,
+                    }}
+                    className="bg-surface-100 rounded-lg"
+                    layout="fill"
+                    objectFit="contain"
+                  />
+                  <div className="prose">
+                    <h4>{example.title}</h4>
+                    <p className="text-sm">{example.description}</p>
                   </div>
-                </>
+                </div>
               )
             })}
           </div>
