@@ -255,9 +255,10 @@ BEGIN;
           -- Retry loop
           WHILE NOT succeeded AND retry_count <= max_retries LOOP
             PERFORM pg_sleep(retry_delays[retry_count+1]);
-            CASE WHEN retry_delays[retry_count+1]>0 THEN
-               RAISE WARNING 'Retrying HTTP request {%, %, %}', retry_count, url,retry_delays[retry_count+1];
-            END CASE;
+            IF retry_delays[retry_count+1]>0 THEN
+               RAISE WARNING 'Retrying HTTP request: {retry_attempt: %, url: "%", timeout_ms: %, retry_delay_ms: %}',
+                 retry_count, url,timeout_ms,retry_delays[retry_count+1]*1000;
+            END IF;
             retry_count := retry_count + 1;
             BEGIN
               CASE
