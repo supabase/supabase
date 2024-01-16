@@ -46,8 +46,7 @@ export default function DevOnlySecretAuth() {
           the same domain.
         </p>
         <form className="flex flex-col gap-2 max-w-sm">
-          <Button_Shadcn_ type="button" onClick={() => signInWithGitHub()}>
-            {' '}
+          <Button_Shadcn_ type="button" onClick={signInWithGitHub}>
             Sign in with GitHub
           </Button_Shadcn_>
           <Button_Shadcn_ type="button" onClick={signOut}>

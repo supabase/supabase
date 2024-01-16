@@ -30,7 +30,7 @@ export function fromOrgProjectValue(
     if (!Array.isArray(data) || data.length !== 3) {
       throw Error("Shape of parsed JSON doesn't match form of org and project value")
     }
-    return [data[0], data[1], data[2]]
+    return data as [string, string, string]
   } catch {
     return [null, null, null]
   }
@@ -46,7 +46,7 @@ export function fromBranchValue(maybeBranch: string): [string, string] | [null, 
     if (!Array.isArray(data) || data.length !== 2) {
       throw Error("Shape of parsed JSON doesn't match form of branch value")
     }
-    return [data[0], data[1]]
+    return data as [string, string]
   } catch {
     return [null, null]
   }

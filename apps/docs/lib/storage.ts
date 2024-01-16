@@ -38,10 +38,10 @@ export function remove(storageType: StorageType, key: LocalStorageKey) {
 export function storeOrRemoveNull(
   storageType: StorageType,
   key: LocalStorageKey,
-  value: string | null
+  value: string | null | undefined
 ) {
   if (typeof window === 'undefined') return
-  if (value === null) {
+  if (value === null || value === undefined) {
     remove(storageType, key)
   } else {
     store(storageType, key, value)

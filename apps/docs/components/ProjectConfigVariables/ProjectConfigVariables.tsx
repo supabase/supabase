@@ -2,6 +2,7 @@ import { useIsLoggedIn, useIsUserLoading } from 'common'
 import Link from 'next/link'
 import { useEffect, useMemo } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
+import { withErrorBoundary } from 'react-error-boundary'
 import { Button_Shadcn_ as Button, Input_Shadcn_ as Input, cn, IconCopy, IconCheck } from 'ui'
 import { proxy, useSnapshot } from 'valtio'
 
@@ -57,16 +58,16 @@ const projectsStore = proxy({
   selectedProject: null as Project | null,
   setSelectedOrgProject: (org: Org | null, project: Project | null) => {
     projectsStore.selectedOrg = org
-    storeOrRemoveNull('local', LOCAL_STORAGE_KEYS.SAVED_ORG, org.id)
+    storeOrRemoveNull('local', LOCAL_STORAGE_KEYS.SAVED_ORG, org?.id)
 
     projectsStore.selectedProject = project
     // @ts-ignore -- problem in OpenAPI spec -- project has ref property
-    storeOrRemoveNull('local', LOCAL_STORAGE_KEYS.SAVED_PROJECT, project.ref)
+    storeOrRemoveNull('local', LOCAL_STORAGE_KEYS.SAVED_PROJECT, project?.ref)
   },
   selectedBranch: null as Branch | null,
   setSelectedBranch: (branch: Branch | null) => {
     projectsStore.selectedBranch = branch
-    storeOrRemoveNull('local', LOCAL_STORAGE_KEYS.SAVED_BRANCH, branch.id)
+    storeOrRemoveNull('local', LOCAL_STORAGE_KEYS.SAVED_BRANCH, branch?.id)
   },
   clear: () => {
     projectsStore.setSelectedOrgProject(null, null)
@@ -318,10 +319,6 @@ function VariableView({ variable, className }: { variable: Variable; className?:
             stateSummary === 'userLoading' ||
             stateSummary === 'loggedIn.selectedProject.dataPending'
               ? 'Loading...'
-              : stateSummary === 'loggedIn.noSelectedProject'
-              ? hasBranches
-                ? 'Select a project and branch...'
-                : 'Select a project...'
               : stateSummary === 'loggedIn.selectedProject.dataSuccess'
               ? variableValue
               : `YOUR ${prettyFormatVariable[variable].toUpperCase()}`
@@ -379,7 +376,7 @@ function LoginHint({ variable }: { variable: Variable }) {
   )
 }
 
-export function ProjectConfigVariables({ variable }: { variable: Variable }) {
+function ProjectConfigVariablesInternal({ variable }: { variable: Variable }) {
   const { clear: clearSharedStoreData } = useSnapshot(projectsStore)
   useOnLogout(clearSharedStoreData)
 
@@ -395,3 +392,19 @@ export function ProjectConfigVariables({ variable }: { variable: Variable }) {
     </div>
   )
 }
+
+export const ProjectConfigVariables = withErrorBoundary(ProjectConfigVariablesInternal, {
+  fallback: (
+    <p>
+      Couldn&apos;t display your API settings. You can get them from the{' '}
+      <Link
+        href="https://supabase.com/dashboard/project/_/settings/api"
+        rel="noreferrer noopener"
+        target="_blank"
+      >
+        dashboard
+      </Link>
+      .
+    </p>
+  ),
+})

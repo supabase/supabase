@@ -4,7 +4,6 @@ import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 
 const branchKeys = {
   list: (projectRef: string | undefined) => ['projects', projectRef, 'branches'] as const,
-  listAll: () => ['all-projects', 'all-branches'] as const,
 }
 
 export interface BranchVariables {
