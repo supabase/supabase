@@ -188,7 +188,7 @@ function BranchSelector() {
   const hasBranches = selectedProject?.is_branch_enabled ?? false
   if (!hasBranches) setSelectedBranch(null)
 
-  const { data, isPending, isSuccess, isError } = useBranchesQuery(
+  const { data, isPending, isError } = useBranchesQuery(
     // @ts-ignore -- problem in OpenAPI spec -- project has ref property
     { projectRef: selectedProject?.ref },
     { enabled: isLoggedIn && hasBranches }
@@ -237,7 +237,7 @@ function BranchSelector() {
       isLoading={stateSummary === 'userLoading' || stateSummary === 'loggedIn.branches.dataPending'}
       disabled={stateSummary !== 'loggedIn.branches.dataSuccess.hasData'}
       options={formattedData}
-      selectedOption={toBranchValue(selectedBranch)}
+      selectedOption={selectedBranch ? toBranchValue(selectedBranch) : undefined}
       onSelectOption={(option) => {
         const [branchId] = fromBranchValue(option)
         if (branchId) {
