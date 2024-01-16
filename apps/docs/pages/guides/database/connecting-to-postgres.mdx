@@ -151,6 +151,86 @@ You can obtain your connection info and Server root certificate from your applic
   </StepHikeCompact.Step>
 
 </StepHikeCompact>
+### Connecting with Prisma
+
+[Prisma](https://www.prisma.io/) is a TypeScript ORM for SQL databases focused on .
+Currently there's a limitation where you can't use prepared statements with Prisma and Supabase. This is a known issue and we're working on the fix.
+
+<StepHikeCompact>
+  <StepHikeCompact.Step step={1}>
+
+    <StepHikeCompact.Details title="Set your connection pool to Transaction">
+
+    Change the connection pool in your project to `Transaction` by following changing it in the [Pool Mode](https://supabase.com/dashboard/project/_/settings/database) dropbox.
+
+    </StepHikeCompact.Details>
+    <StepHikeCompact.Code>
+
+     ![Change Connection pool to Transaction](/docs/img/guides/database/pool-mode-transaction.png)
+
+    </StepHikeCompact.Code>
+  </StepHikeCompact.Step>
+  <StepHikeCompact.Step step={2}>
+
+    <StepHikeCompact.Details title="Install">
+
+    Install Prisma and related dependencies.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+     ```shell
+     npm i prisma --save-dev
+     npx prisma init --datasource-provider postgresql
+     ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+
+ <StepHikeCompact.Step step={3}>
+
+    <StepHikeCompact.Details title="Create your environment file">
+
+    Create a `.env` file and define your environment variables with your Supabase URLs.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+    ```bash
+    # 6543 is the port for the connection pooler to use your pool settings and pgbouncer=true will ensure that prepared statements are disabled
+    DATABASE_URL='postgres://postgres.[YOUR-PROJECT-REF]:[YOUR-PASSWORD]@aws-0-eu-west-2.pooler.supabase.com:6543/postgres?pgbouncer=true'
+    # 5432 is the port that will force the connection to use session mode for your connection which is required for migrations
+    DIRECT_DATABASE_URL='postgres://postgres.[YOUR-PROJECT-REF]:[YOUR-PASSWORD]@aws-0-eu-west-2.pooler.supabase.com:5432/postgres'
+    ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+  <StepHikeCompact.Step step={4}>
+
+    <StepHikeCompact.Details title="Connect">
+
+    Connect to your database using the Connection Pooler for serverless environments, and the Direct Connection for long-running servers.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+    ```ts
+    import { PrismaClient } from '@prisma/client'
+
+    const prisma = new PrismaClient()
+    ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>
 
 ### Connecting with pgAdmin
 
