@@ -75,6 +75,9 @@ export const ConnectionPooling = () => {
   const connectionPoolingUnavailable =
     !poolingInfo?.pgbouncer_enabled && poolingInfo?.pool_mode === null
 
+  // [Joshen] TODO this needs to be obtained from BE as 26th Jan is when we'll start - projects will be affected at different rates
+  const resolvesToIpV6 = !poolingInfo?.supavisor_enabled && false // Number(new Date()) > Number(dayjs.utc('01-26-2024', 'MM-DD-YYYY').toDate())
+
   const canUpdateConnectionPoolingConfiguration = useCheckPermissions(
     PermissionAction.UPDATE,
     'projects',
@@ -157,7 +160,9 @@ export const ConnectionPooling = () => {
                   <Badge color={poolingInfo?.supavisor_enabled ? 'green' : 'scale'}>
                     With {poolingInfo?.supavisor_enabled ? 'Supavisor' : 'PGBouncer'}
                   </Badge>
-                  <Badge color="scale">Resolves to IPv4</Badge>
+                  <Badge color={resolvesToIpV6 ? 'amber' : 'scale'}>
+                    {resolvesToIpV6 ? 'Resolves to IPv6' : 'Resolves to IPv4'}
+                  </Badge>
                 </div>
               )}
             </div>
