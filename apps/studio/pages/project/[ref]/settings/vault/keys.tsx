@@ -36,19 +36,6 @@ const VaultSettingsSecrets: NextPageWithLayout = () => {
       ) : !isEnabled ? (
         <VaultToggle />
       ) : (
-        // <Tabs
-        //   size="small"
-        //   type="underlined"
-        //   activeId="keys"
-        //   onChange={(id: any) => {
-        //     if (id === 'secrets') router.replace(`/project/${ref}/settings/vault/secrets`)
-        //   }}
-        // >
-        //   <Tabs.Panel id="secrets" label="Secrets Management" />
-        //   <Tabs.Panel id="keys" label="Encryption Keys">
-        //     <EncryptionKeysManagement />
-        //   </Tabs.Panel>
-        // </Tabs>
         <Tabs_Shadcn_ defaultValue="keys">
           <TabsList_Shadcn_>
             <TabsTrigger_Shadcn_ asChild value="secrets">
