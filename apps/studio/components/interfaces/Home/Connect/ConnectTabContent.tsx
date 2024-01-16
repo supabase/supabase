@@ -1,5 +1,3 @@
-import CopyButton from 'components/ui/CopyButton'
-
 import dynamic from 'next/dynamic'
 import ConnectPath from './ConnectPath'
 
@@ -8,13 +6,12 @@ interface ConnectContentTabProps {
 }
 
 const ConnectTabContent = ({ path }: ConnectContentTabProps) => {
-  const ContentFile = dynamic(() => import(`./content/${path}`), {
-    loading: (path) => <p>loading</p>,
-  })
+  console.log({ path })
+  const ContentFile = dynamic(() => import(`./content/${path}`))
 
   return (
     <div className="bg-surface-300 p-4">
-      <ConnectPath path={'utils/supabase/client.tsx'} />
+      <ConnectPath path={path} />
       <ContentFile />
     </div>
   )
