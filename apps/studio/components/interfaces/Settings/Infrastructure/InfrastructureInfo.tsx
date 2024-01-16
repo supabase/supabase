@@ -215,7 +215,8 @@ const InfrastructureInfo = () => {
                         <p>
                           Once the above objects are exported and removed, you can proceed to
                           upgrade your project, and re-import the objects after the upgrade
-                          operation is complete.
+                          operation is complete. Please refer to the docs on additional extensions
+                          that might also need to be dropped.
                         </p>
                         <div>
                           <Button size="tiny" type="default" asChild>

@@ -15,8 +15,11 @@ const ProjectSettings: NextPageWithLayout = () => {
   return (
     <div className="1xl:px-28 mx-auto flex flex-col px-5 pt-6 pb-14 lg:px-16 xl:px-24 2xl:px-32">
       <div className="content h-full w-full overflow-y-auto space-y-10">
-        <DatabaseSettings />
-        <ConnectionPooling />
+        <h3 className="text-foreground text-xl">Database Settings</h3>
+        <div className="flex flex-col gap-y-4 !mt-6">
+          <ConnectionPooling />
+          <DatabaseSettings />
+        </div>
         <SSLConfiguration />
         <DiskSizeConfiguration />
         <NetworkRestrictions />

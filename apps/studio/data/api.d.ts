@@ -2786,7 +2786,7 @@ export interface components {
       price: number
     }
     /** @enum {string} */
-    ProjectAddonType: 'custom_domain' | 'compute_instance' | 'pitr'
+    ProjectAddonType: 'custom_domain' | 'compute_instance' | 'pitr' | 'ipv4'
     /** @enum {string} */
     AddonVariantId:
       | 'ci_small'
@@ -2802,6 +2802,7 @@ export interface components {
       | 'pitr_7'
       | 'pitr_14'
       | 'pitr_28'
+      | 'ipv4_default'
     /** @enum {string} */
     ProjectAddonVariantPricingType: 'fixed' | 'usage'
     /** @enum {string} */
@@ -4548,6 +4549,7 @@ export interface components {
     }
     NetworkRestrictionsRequest: {
       dbAllowedCidrs: string[]
+      dbAllowedCidrsV6?: string[]
     }
     NetworkRestrictionsResponse: {
       /** @enum {string} */
