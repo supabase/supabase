@@ -506,16 +506,11 @@ export const createTable = async (
         }
 
         if (error !== undefined) {
-          ui.setNotification({
-            category: 'error',
-            message: 'Do check your spreadsheet if there are any discrepancies.',
-          })
-          ui.setNotification({
-            category: 'error',
-            message: `Table ${table.name} has been created but we ran into an error while inserting rows:
-          ${error.message}`,
-            error,
-          })
+          toast.error('Do check your spreadsheet if there are any discrepancies.')
+
+          const message = `Table ${table.name} has been created but we ran into an error while inserting rows: ${error.message}`
+          toast.error(message)
+          console.error('Error:', { error, message })
         }
       } else {
         // Via text copy and paste
@@ -651,11 +646,7 @@ export const updateTable = async (
         })
         const hasForeignKeyUpdated = !isEqual(originalForeignKey, column.foreignKey)
         if (!isEmpty(columnPayload) || hasForeignKeyUpdated) {
-          ui.setNotification({
-            id: toastId,
-            category: 'loading',
-            message: `Updating column ${column.name} from ${updatedTable.name}`,
-          })
+          toast.loading(`Updating column ${column.name} from ${updatedTable.name}`, { id: toastId })
           const skipPKCreation = true
           const skipSuccessMessage = true
           const res = await updateColumn({
@@ -670,10 +661,7 @@ export const updateTable = async (
           })
           if (res?.error) {
             hasError = true
-            ui.setNotification({
-              category: 'error',
-              message: `Failed to update column "${column.name}": ${res.error.message}`,
-            })
+            toast.error(`Failed to update column "${column.name}": ${res.error.message}`)
           }
         }
       }
