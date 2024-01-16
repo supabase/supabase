@@ -11,7 +11,7 @@ export const PricingTableRowDesktop = (props: any) => {
     <>
       <tr className="divide-border" style={{ borderTop: 'none' }} id={`${props.sectionId}-desktop`}>
         <th
-          className="bg-background text-foreground sticky top-[62px] z-10 py-3 pl-6 text-left text-sm font-medium"
+          className="bg-background text-foreground sticky top-[108px] xl:top-[90px] z-10 py-3 pl-6 text-left text-sm font-medium"
           scope="colgroup"
         >
           <div className="flex items-center gap-4">

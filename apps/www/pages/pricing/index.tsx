@@ -173,7 +173,7 @@ export default function IndexPage() {
                       <Button
                         block
                         size="small"
-                        type={plan.name === 'Enterprise' ? 'default' : 'alternative'}
+                        type={plan.name === 'Enterprise' ? 'default' : 'primary'}
                         asChild
                       >
                         <a href={plan.href}>{plan.cta}</a>
@@ -259,7 +259,9 @@ export default function IndexPage() {
                               </span>
                             </div>
                             {typeof feature !== 'string' && (
-                              <p className="ml-6 text-foreground-lighter">{feature[1]} *</p>
+                              <p className="ml-6 text-foreground-lighter">
+                                {feature[1]} {isPromoPlan && ' *'}
+                              </p>
                             )}
                           </li>
                         ))}
@@ -335,8 +337,8 @@ export default function IndexPage() {
               </Link>
             </Button>
           </div>
-          <div className="relative h-full min-h-[14rem]">
-            <CostControlAnimation className="w-full h-full" />
+          <div className="relative h-full min-h-[14rem] flex items-center justify-end">
+            <CostControlAnimation className="w-full lg:max-w-md aspect-video" />
           </div>
         </div>
       </div>
@@ -603,37 +605,22 @@ export default function IndexPage() {
 
                     {plans.map((plan) => (
                       <th
-                        className="text-foreground w-1/4 px-6 pr-2 pt-2 text-left text-sm font-normal"
+                        className="text-foreground w-1/4 px-0 text-left text-sm font-normal"
                         scope="col"
                         key={plan.name}
                       >
-                        <h3 className="text-2xl font-mono font-normal uppercase flex items-center gap-4">
-                          {plan.name}
-                        </h3>
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="border-default divide-border divide-y">
-                  <tr>
-                    <th
-                      className="text-foreground-light px-6 py-8 text-left align-top text-sm font-medium"
-                      scope="row"
-                    ></th>
-
-                    {plans.map((plan) => (
-                      <td className="h-full px-6 py-2 align-top" key={`price-${plan.name}`}>
-                        <div className="relative h-full w-full">
-                          <div className="flex flex-col justify-between h-full">
-                            <p className="text-foreground-lighter">
-                              <span
-                                className={cn(
-                                  'text-foreground font-mono text-4xl mr-1',
-                                  plan.name === 'Enterprise'
-                                    ? 'text-2xl tracking-tighter'
-                                    : 'text-3xl'
-                                )}
-                              >
+                        <div className="flex flex-col px-6 pr-2 pt-2 gap-1.5">
+                          <div className="flex flex-col xl:flex-row xl:items-end gap-1">
+                            <h3 className="text-lg xl:text-xl 2xl:text-2xl leading-5 font-mono font-normal flex items-center">
+                              {plan.name}
+                            </h3>
+                            <p
+                              className={cn(
+                                'text-foreground-lighter -my-1 xl:m-0',
+                                plan.name === 'Enterprise' && 'xl:opacity-0'
+                              )}
+                            >
+                              <span className="text-foreground-lighter font-mono text-xl mr-1 tracking-tighter">
                                 {plan.name !== 'Enterprise' && '$'}
                                 {plan.priceMonthly}
                               </span>
@@ -641,25 +628,25 @@ export default function IndexPage() {
                                 <span className="text-[13px] leading-4 mt-1">{plan.costUnit}</span>
                               )}
                             </p>
-
-                            <div className={plan.name === 'Enterprise' ? 'mt-auto' : 'mt-4'}>
-                              <Button
-                                asChild
-                                size="tiny"
-                                type={plan.name === 'Enterprise' ? 'default' : 'alternative'}
-                                block
-                              >
-                                <Link href={plan.href} as={plan.href}>
-                                  {plan.cta}
-                                </Link>
-                              </Button>
-                            </div>
+                          </div>
+                          <div className="flex flex-col justify-between h-full pb-2">
+                            <Button
+                              asChild
+                              size="tiny"
+                              type={plan.name === 'Enterprise' ? 'default' : 'alternative'}
+                              block
+                            >
+                              <Link href={plan.href} as={plan.href}>
+                                {plan.cta}
+                              </Link>
+                            </Button>
                           </div>
                         </div>
-                      </td>
+                      </th>
                     ))}
                   </tr>
-
+                </thead>
+                <tbody className="border-default divide-border divide-y first:divide-y-0">
                   <PricingTableRowDesktop
                     category={pricing.database}
                     icon={Solutions['database'].icon}

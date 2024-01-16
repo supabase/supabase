@@ -62,7 +62,9 @@ const CostControlAnimation: FC<Props> = ({ className }) => {
     >
       <div className="absolute border left-2 top-2 rounded-full pointer-events-auto bg-alternative p-1 shadow flex items-center gap-1">
         <Switch checked={hasSpendCap} onCheckedChange={toggleSpendCap} />
-        <span className="text-sm text-foreground-light mr-1">Spend Cap</span>
+        <span className="text-sm text-foreground-light mr-1">
+          Spend Cap {hasSpendCap ? 'On' : 'Off'}
+        </span>
       </div>
       <div className="absolute inset-0 z-20 w-full h-full flex items-center justify-center">
         <span
