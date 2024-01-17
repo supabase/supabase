@@ -9,6 +9,7 @@ const path = require('path')
 const API_URL = new URL(process.env.NEXT_PUBLIC_API_URL).origin
 const SUPABASE_URL = new URL(process.env.SUPABASE_URL).origin
 const SUPABASE_MISC_PROJECT_URL = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).origin
+const SUPABASE_COM_URL = 'https://supabase.com'
 const CLOUDFLARE_CDN_URL = 'https://cdnjs.cloudflare.com'
 const HCAPTCHA_ASSET_URL = 'https://newassets.hcaptcha.com'
 const HCAPTCHA_JS_URL = 'https://js.hcaptcha.com'
@@ -18,7 +19,7 @@ const csp = [
   `default-src 'self' ${API_URL} ${SUPABASE_URL} ${SUPABASE_MISC_PROJECT_URL} ${CONFIGCAT_URL};`,
   `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${CLOUDFLARE_CDN_URL} ${HCAPTCHA_JS_URL};`,
   `style-src 'self' 'unsafe-inline' ${CLOUDFLARE_CDN_URL};`,
-  `img-src 'self' blob: data:;`,
+  `img-src 'self' blob: data: ${SUPABASE_COM_URL};`,
   `font-src 'self' ${CLOUDFLARE_CDN_URL};`,
   `frame-src 'self' ${HCAPTCHA_ASSET_URL};`,
   `object-src 'none';`,
