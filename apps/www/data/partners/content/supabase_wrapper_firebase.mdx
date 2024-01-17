@@ -1,7 +1,7 @@
 [Firebase](https://firebase.google.com/) is an app development platform built around non-relational technologies. The Firebase Wrapper supports connecting to below objects.
 
-1. [Authentication Users](https://firebase.google.com/docs/auth/users) (*read only*)
-2. [Firestore Database Documents](https://firebase.google.com/docs/firestore) (*read only*)
+1. [Authentication Users](https://firebase.google.com/docs/auth/users) (_read only_)
+2. [Firestore Database Documents](https://firebase.google.com/docs/firestore) (_read only_)
 
 ## Preparation
 
@@ -25,15 +25,17 @@ By default, Postgres stores FDW credentials inide `pg_catalog.pg_foreign_server`
 
 ```sql
 -- Save your Firebase credentials in Vault and retrieve the `key_id`
-insert into vault.secrets (name, secret)
-values (
-  'firebase',
-  '{
+insert into vault.secrets
+  (name, secret)
+values
+  (
+    'firebase',
+    '{
       "type": "service_account",
       "project_id": "your_gcp_project_id",
       ...
   }'
-)
+  )
 returning key_id;
 ```
 

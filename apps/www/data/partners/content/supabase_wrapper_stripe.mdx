@@ -9,9 +9,9 @@ select
 from
    stripe.customers;
 
-    customer_id     | currency 
+    customer_id     | currency
 --------------------+-----------
- cus_MJiBtCqOF1Bb3F | usd      
+ cus_MJiBtCqOF1Bb3F | usd
 (1 row)
 ```
 
@@ -39,11 +39,10 @@ By default, Postgres stores FDW credentials inide `pg_catalog.pg_foreign_server`
 
 ```sql
 -- Save your Stripe API key in Vault and retrieve the `key_id`
-insert into vault.secrets (name, secret)
-values (
-  'stripe',
-  'YOUR_SECRET'
-)
+insert into vault.secrets
+  (name, secret)
+values
+  ('stripe', 'YOUR_SECRET')
 returning key_id;
 ```
 

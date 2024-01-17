@@ -82,8 +82,7 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey)
 const Home: NextPage = () => {
   const [user, setUser] = useState<User | null>(null)
 
-  const [oneSignalInitialized, setOneSignalInitialized] =
-    useState<boolean>(false)
+  const [oneSignalInitialized, setOneSignalInitialized] = useState<boolean>(false)
 
   /**
    * Initializes OneSignal SDK for a given Supabase User ID
@@ -125,9 +124,7 @@ const Home: NextPage = () => {
     const { price } = Object.fromEntries(new FormData(event.currentTarget))
     if (typeof price !== 'string') return
 
-    const { error } = await supabase
-      .from('orders')
-      .insert({ price: Number(price) })
+    const { error } = await supabase.from('orders').insert({ price: Number(price) })
     if (error) {
       alert(error.message)
     }
@@ -144,15 +141,13 @@ const Home: NextPage = () => {
 
     initialize()
 
-    const authListener = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        const user = session?.user ?? null
-        setUser(user)
-        if (user) {
-          initializeOneSignal(user.id)
-        }
+    const authListener = supabase.auth.onAuthStateChange(async (event, session) => {
+      const user = session?.user ?? null
+      setUser(user)
+      if (user) {
+        initializeOneSignal(user.id)
       }
-    )
+    })
 
     return () => {
       authListener.data.subscription.unsubscribe()
@@ -177,10 +172,7 @@ const Home: NextPage = () => {
               <option value="200">$200</option>
               <option value="300">$300</option>
             </select>
-            <button
-              type="submit"
-              className="py-1 px-4 text-lg bg-green-400 rounded"
-            >
+            <button type="submit" className="py-1 px-4 text-lg bg-green-400 rounded">
               Place an Order
             </button>
           </form>
@@ -192,10 +184,7 @@ const Home: NextPage = () => {
               name="email"
               placeholder="Email"
             />
-            <button
-              type="submit"
-              className="py-1 px-4 text-lg bg-green-400 rounded"
-            >
+            <button type="submit" className="py-1 px-4 text-lg bg-green-400 rounded">
               Send Magic Link
             </button>
           </form>
@@ -265,12 +254,9 @@ serve(async (req) => {
     }
     const onesignalApiRes = await onesignal.createNotification(notification)
 
-    return new Response(
-      JSON.stringify({ onesignalResponse: onesignalApiRes }),
-      {
-        headers: { 'Content-Type': 'application/json' },
-      }
-    )
+    return new Response(JSON.stringify({ onesignalResponse: onesignalApiRes }), {
+      headers: { 'Content-Type': 'application/json' },
+    })
   } catch (err) {
     console.error('Failed to create OneSignal notification', err)
     return new Response('Server error.', {

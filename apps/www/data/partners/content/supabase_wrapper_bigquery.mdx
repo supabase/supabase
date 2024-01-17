@@ -4,17 +4,17 @@ The BigQuery Wrapper allows you to read and write data from BigQuery within your
 
 ## Supported Data Types
 
-| Postgres Type      | BigQuery Type   |
-| ------------------ | --------------- |
-| boolean            | BOOL            |
-| bigint             | INT64           |
-| double precision   | FLOAT64         |
-| numeric            | NUMERIC         |
-| text               | STRING          |
-| varchar            | STRING          |
-| date               | DATE            |
-| timestamp          | DATETIME        |
-| timestamp          | TIMESTAMP       |
+| Postgres Type    | BigQuery Type |
+| ---------------- | ------------- |
+| boolean          | BOOL          |
+| bigint           | INT64         |
+| double precision | FLOAT64       |
+| numeric          | NUMERIC       |
+| text             | STRING        |
+| varchar          | STRING        |
+| date             | DATE          |
+| timestamp        | DATETIME      |
+| timestamp        | TIMESTAMP     |
 
 ## Preparation
 
@@ -38,10 +38,12 @@ By default, Postgres stores FDW credentials inide `pg_catalog.pg_foreign_server`
 
 ```sql
 -- Save your BigQuery service account json in Vault and retrieve the `key_id`
-insert into vault.secrets (name, secret)
-values (
-  'bigquery',
-  '
+insert into vault.secrets
+  (name, secret)
+values
+  (
+    'bigquery',
+    '
     {
       "type": "service_account",
       "project_id": "your_gcp_project_id",
@@ -50,7 +52,7 @@ values (
       ...
     }
   '
-)
+  )
 returning key_id;
 ```
 
