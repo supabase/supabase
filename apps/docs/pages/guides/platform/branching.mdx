@@ -157,7 +157,7 @@ You can use the [Supabase CLI](/docs/guides/cli) to manage changes inside a loca
             supabase db pull --db-url <db_url>
 
             # Your Database URL looks something like:
-            # postgresql://username:password@db.ref.supabase.co:5432/postgres
+            # postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:6543/postgres
             ```
 
             </CH.Code>
@@ -487,7 +487,7 @@ Dashboard changes aren't automatically reflected in your Git repository. If you'
          <CH.Code lineNumbers={false}>
 
         ```bash
-        supabase db pull --db-url "postgres://postgres:[password]@db.[branch-ref].supabase.co:5432/postgres"
+        supabase db pull --db-url "postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:6543/postgres"
         ```
 
         </CH.Code>

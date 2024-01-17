@@ -1,6 +1,6 @@
+import { useParams } from 'common'
 import { Button, Modal } from 'ui'
 
-import { useParams } from 'common/hooks'
 import InformationBox from 'components/ui/InformationBox'
 import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
 
@@ -38,7 +38,7 @@ const DisallowAllModal = ({ visible, onClose }: DisallowAllModalProps) => {
             defaultVisibility
             hideCollapse
             title="Note: Restrictions only apply to direct connections to your database and PgBouncer"
-            description="They do not currently apply to Supavisor and to APIs offered over HTTPS, such as PostgREST, Storage, or Authentication"
+            description="They do not currently apply to APIs offered over HTTPS, such as PostgREST, Storage, or Authentication. Supavisor will start enforcing network restrictions from January 19th 2024."
           />
         </div>
       </Modal.Content>
