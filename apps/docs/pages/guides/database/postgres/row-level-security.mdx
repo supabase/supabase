@@ -84,8 +84,6 @@ on profiles
 for select using ( auth.uid() = user_id );
 ```
 
-[comment]: <> (TODO: Improve the RLS docs)
-
 ### INSERT Policies
 
 You can specify insert policies with the `with check` clause.
@@ -116,7 +114,7 @@ with check ( auth.id() = user_id ); -- the actual Policy
 
 You can specify update policies by combining both the `using` and `with check` expressions.
 
-The `using` represents the condition that must be true for the update to be allowed, and `with check` ensures that the updates made adhere to the policy constraints.
+The `using` clause represents the condition that must be true for the update to be allowed, and `with check` clause ensures that the updates made adhere to the policy constraints.
 
 Let's say you have a table called `profiles` in the public schema and you only want users to be able to update their own profile. 
 
@@ -136,8 +134,8 @@ alter table profiles enable row level security;
 create policy "Users can update their own profile."
 on profiles for update
 to authenticated                    -- the Postgres Role (recommended)
-using ( auth.id() = user_id )       -- Policy to check the current user's right to update the row.
-with check ( auth.id() = user_id ); -- Policy to ensure the resultant row still complies with the ownership condition.
+using ( auth.id() = user_id )       -- checks if the existing row complies with the policy expression
+with check ( auth.id() = user_id ); -- checks if the new row complies with the policy expression
 ```
 If no `with check` expression is defined, then the `using` expression will be used both to determine which rows are visible (normal USING case) and which new rows will be allowed to be added (WITH CHECK case).
 
