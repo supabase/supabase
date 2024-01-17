@@ -98,8 +98,9 @@ We will need to update the email templates to handle the sign in from the server
 <h2>Confirm your signup</h2>
 
 <p>Follow this link to confirm your user:</p>
-<p><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email">Confirm your mail</a></p>
-
+<p>
+  <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email">Confirm your mail</a>
+</p>
 ```
 
 **Magic Link template**
@@ -109,7 +110,6 @@ We will need to update the email templates to handle the sign in from the server
 
 <p>Follow this link to login:</p>
 <p><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email">Log In</a></p>
-
 ```
 
 Both of these now point to the `auth/confirm` endpoint we created earlier and the two query parameters we require. The `{{ .TokenHash }}` variable is provided by Supabase Auth itself.
