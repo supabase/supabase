@@ -30,12 +30,15 @@ export const meta = {
   <StepHikeCompact.Step step={2}>
     <StepHikeCompact.Details title="Gather Database Connection Strings">
 
-      After your project is ready, gather the following information about your [database connections](https://supabase.com/dashboard/project/_/settings/database):
+    Go to the [database settings page](https://supabase.com/dashboard/project/_/settings/database). In this quickstart, we are going to connect via the connection pooler. If your network supports IPv6, you can connect to the database directly without using the connection pooler.
 
-      * Connection String (port 5432)
-      * Connection Pooling / Connection String (port 6543)
+    We will use the pooler both in `Transaction` and `Session` mode. `Transaction` mode is used for application queries and `Session` mode is used for running migrations with Prisma.
 
-    You will need these to setup environment variables in Step 5.
+    To do this, set the connection mode to `Transaction` in the [database settings page](https://supabase.com/dashboard/project/_/settings/database) and copy the connection string and append `?pgbouncer=true&&connection_limit=1`. `pgbouncer=true` disables Prisma from generating prepared statements. This is required since our connection pooler does not support prepared statements in transaction mode yet. The `connection_limit=1` parameter is only required if you are using Prisma from a serverless environment. This is the Transaction mode connection string.
+
+    To get the Session mode connection pooler string, change the port of the connection string from the dashboard to 5432.
+
+    You will need the Transaction mode connection string and the Session mode connection string to setup environment variables in Step 5.
 
     <Admonition type="tip">
 
@@ -90,28 +93,19 @@ export const meta = {
 
       In your `.env` file, add the following environment variables for your database connection:
 
-      * The `DIRECT_URL` should use the `Connection String` from your Supabase project. Hint: the port is `5432`.
+      * The `DIRECT_URL` should use the Transaction mode connection string you copied in Step 1.
 
-      * The `DATABASE_URL` should use the `Connection Pooling / Connection String` from your Supabase project. Hint: the port is `6543`. Edit the `DATABASE_URL` as follows:
-        - Append `?pgbouncer=true` to the end of the connection string. This tells Prisma to not use named prepared statements.
-        - Append `&connection_limit=1`. This limits the amount of connections made from a serverless function.
-        - Change the port number from 6543 to 5432.
-      
-      <Admonition type="note">
-
-        Be sure to replace `[YOUR-PASSWORD]`, `[YOUR-PROJECT-REF]` and `[YOUR-PROJECT-REGION]` with your own.
-
-      </Admonition>
+      * The `DATABASE_URL` should use the Session mode connection string you copied in Step 1.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
       ```bash .env
-      # PostgreSQL connection string used for migrations
-      DIRECT_URL="postgres://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres"
+      # Transaction mode connection string used for migrations
+      DIRECT_URL="postgres://postgres.[project-ref]:[db-password]@xxx.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1"
 
-      # PostgreSQL pooler connection string with Supavisor config — used by Prisma Client
-      DATABASE_URL="postgres://postgres.[YOUR-PROJECT-REF]:[YOUR-PASSWORD]@aws-0-[YOUR-PROJECT-REGION].pooler.supabase.com:5432/postgres?pgbouncer=true&connection_limit=1"
+      # Session mode connection string — used by Prisma Client
+      DATABASE_URL="postgres://postgres.[project-ref]:[db-password]@xxx.pooler.supabase.com:5432/postgres"
       ```
     </StepHikeCompact.Code>
 
