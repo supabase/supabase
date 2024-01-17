@@ -14,13 +14,6 @@
   <description>Supabase Wrappers v0.2 brings more Wrappers, query pushdown, remote subquery, and more</description>
   <pubDate>Wed, 13 Dec 2023 23:00:00 GMT</pubDate>
 </item>
-<item>
-  <guid>https://supabase.com/blog/postgres-foreign-data-wrappers-rust</guid>
-  <title>Supabase Wrappers, a Postgres FDW framework written in Rust</title>
-  <link>https://supabase.com/blog/postgres-foreign-data-wrappers-rust</link>
-  <description>A framework for building Postgres Foreign Data Wrappers which connects to Stripe, Firebase, Clickhouse, and more.</description>
-  <pubDate>Wed, 14 Dec 2022 23:00:00 GMT</pubDate>
-</item>
 
     </channel>
   </rss>
