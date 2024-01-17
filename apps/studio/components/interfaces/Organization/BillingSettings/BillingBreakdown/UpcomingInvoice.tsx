@@ -25,7 +25,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
 
   const fixedFees = useMemo(() => {
     return (upcomingInvoice?.lines || [])
-      .filter((item) => !item.breakdown)
+      .filter((item) => !item.breakdown || !item.breakdown.length)
       .sort((a, b) => {
         // Prorations should be below regular usage fees
         return Number(a.proration) - Number(b.proration)
@@ -108,7 +108,11 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                   )}
                   {!item.proration && (
                     <td className="py-2 text-sm">
-                      {item.unit_price === 0 ? 'FREE' : `$${item.unit_price}`}
+                      {item.unit_price === 0
+                        ? 'FREE'
+                        : item.unit_price
+                        ? `$${item.unit_price}`
+                        : null}
                     </td>
                   )}
                   <td className="py-2 text-sm text-right">${item.amount}</td>
