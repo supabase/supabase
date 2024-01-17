@@ -14,6 +14,10 @@ Network Restrictions is currently in beta and is slowly being made available to 
 
 Each Supabase project comes with configurable restrictions on the IP ranges that are allowed to connect to Postgres and its pooler ("your database"). These restrictions are enforced before traffic reaches your database. If a connection is not restricted by IP, it still needs to authenticate successfully with valid database credentials.
 
+If direct connections to your database [resolve to a IPv6 address](https://supabase.com/dashboard/project/_/settings/database), you need to add both IPv4 and IPv6 CIDRs to the list of allowed CIDRs. Network Restrictions will be applied to all database connection routes, whether pooled or direct. You will need to add both the IPv4 and IPv6 networks you want to allow. There are two exceptions: If you have been granted an extension on the IPv6 migration OR if you have purchased the IPv4 add-on, you need only add IPv4 CIDRs.
+
+If your project has not been migrated to IPv6 or if you have purchased the IPv4 address add-on, just adding IPv4 CIDRs is sufficient.
+
 To get started:
 
 1. [Install](/docs/guides/cli) the Supabase CLI 1.22.0+.
@@ -68,7 +72,7 @@ Restrictions applied successfully: true
 
 - The current iteration of Network Restrictions applies to connections to Postgres and the database pooler; it doesn't currently apply to APIs offered over HTTPS (e.g., PostgREST, Storage, and Auth). This includes using Supabase client libraries like [supabase-js](https://supabase.com/docs/reference/javascript).
 - Network Restrictions should not be used if you need to connect to your Postgres database using Edge Functions.
-- [Supavisor](https://github.com/supabase/supavisor/) does not currently support Network Restrictions.
+- [Supavisor](https://github.com/supabase/supavisor/) does not currently support Network Restrictions. Network restrictions support will be enabled from 24th January 2024. Any changes to the network restrictions configuration will apply to both Supavisor and direct connections to Postgres after this date.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
