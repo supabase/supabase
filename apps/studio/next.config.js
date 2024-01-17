@@ -27,7 +27,7 @@ const csp = [
     ? [
         `default-src 'self' ${API_URL} ${SUPABASE_URL} ${GOTRUE_URL} ${SUPABASE_PROJECTS_URL} ${SUPABASE_STAGING_PROJECTS_URL} ${CONFIGCAT_URL} ${VERCEL_LIVE_URL} ${PUSHER_URL};`,
         `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${CLOUDFLARE_CDN_URL} ${HCAPTCHA_JS_URL} ${STRIPE_JS_URL} ${VERCEL_LIVE_URL};`,
-        `frame-src 'self' ${HCAPTCHA_ASSET_URL} ${VERCEL_LIVE_URL};`,
+        `frame-src 'self' ${HCAPTCHA_ASSET_URL} ${STRIPE_JS_URL} ${VERCEL_LIVE_URL};`,
         `img-src 'self' blob: data: ${SUPABASE_COM_URL} ${VERCEL_URL};`,
         `style-src 'self' 'unsafe-inline' ${CLOUDFLARE_CDN_URL} ${VERCEL_LIVE_URL};`,
         `font-src 'self' ${CLOUDFLARE_CDN_URL} ${VERCEL_LIVE_URL};`,
@@ -35,7 +35,7 @@ const csp = [
     : [
         `default-src 'self' ${API_URL} ${SUPABASE_URL} ${GOTRUE_URL} ${SUPABASE_PROJECTS_URL} ${CONFIGCAT_URL};`,
         `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${CLOUDFLARE_CDN_URL} ${HCAPTCHA_JS_URL} ${STRIPE_JS_URL};`,
-        `frame-src 'self' ${HCAPTCHA_ASSET_URL};`,
+        `frame-src 'self' ${HCAPTCHA_ASSET_URL} ${STRIPE_JS_URL};`,
         `img-src 'self' blob: data: ${SUPABASE_COM_URL};`,
         `style-src 'self' 'unsafe-inline' ${CLOUDFLARE_CDN_URL};`,
         `font-src 'self' ${CLOUDFLARE_CDN_URL};`,
