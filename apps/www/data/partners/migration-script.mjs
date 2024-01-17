@@ -26,6 +26,7 @@ async function main() {
 
   if (error || !partners) {
     console.error("Didn't fetch any data:", error)
+    return
   }
 
   try {
