@@ -46,7 +46,7 @@ export function ComboBox<Opt extends ComboBoxOption>({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild disabled={disabled}>
+      <PopoverTrigger asChild>
         <Button
           variant="outline"
           role="combobox"
