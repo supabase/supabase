@@ -35,7 +35,7 @@ const BranchingWaitlistPopover = ({ isNewNav = false }: BranchingWaitlistPopover
           <p>Database Branching</p>
         </div>
         <p className="text-xs text-foreground-light">
-          Database Branching is currently in early access and not available to projects yet.
+          Database Branching is currently in early access and not available publicly yet.
         </p>
         <div className="flex items-center gap-2">
           <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />} asChild>
