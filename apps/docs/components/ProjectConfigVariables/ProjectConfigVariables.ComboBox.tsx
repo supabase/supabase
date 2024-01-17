@@ -46,30 +46,30 @@ export function ComboBox<Opt extends ComboBoxOption>({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <div className={className}>
-        <PopoverTrigger asChild aria-label={`Select ${name}`} disabled={disabled}>
-          <Button
-            variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            className={cn(
-              'overflow-hidden',
-              'h-auto min-h-10',
-              'flex justify-between',
-              'border-none',
-              'py-0 pl-0 pr-1 text-left'
-            )}
-          >
-            {isLoading
-              ? 'Loading...'
-              : options.length === 0
-              ? `No ${name} found`
-              : selectedOptionDisplayName ?? `Select a ${name}...`}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </Button>
-        </PopoverTrigger>
-      </div>
-      <PopoverContent className="z-[999999] p-0" side="bottom">
+      <PopoverTrigger asChild disabled={disabled}>
+        <Button
+          variant="outline"
+          role="combobox"
+          disabled={disabled}
+          aria-expanded={open}
+          className={cn(
+            'overflow-hidden',
+            'h-auto min-h-10',
+            'flex justify-between',
+            'border-none',
+            'py-0 pl-0 pr-1 text-left',
+            className
+          )}
+        >
+          {isLoading
+            ? 'Loading...'
+            : options.length === 0
+            ? `No ${name} found`
+            : selectedOptionDisplayName ?? `Select a ${name}...`}
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="p-0" side="bottom">
         <Command>
           <CommandInput placeholder="Search project..." className="border-none ring-0" />
           <CommandEmpty>No project found.</CommandEmpty>
