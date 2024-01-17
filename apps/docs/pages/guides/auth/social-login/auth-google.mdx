@@ -279,7 +279,7 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
       }
 
       return supabase.auth.signInWithIdToken(
-        provider: Provider.google,
+        provider: OAuthProvider.google,
         idToken: idToken,
         accessToken: accessToken,
       );
