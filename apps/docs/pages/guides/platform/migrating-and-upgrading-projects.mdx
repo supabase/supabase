@@ -139,6 +139,12 @@ Migrating projects can be achieved using the Supabase CLI. This is particularly 
 - Set environment variables for the old project's database URL as `$OLD_DB_URL` and the new project's as `$NEW_DB_URL`.
   To find the database URL for a project, go to the project's dashboard page [Project Settings/Database](https://supabase.com/dashboard/project/_/settings/database) and look at `Connection string / URI`. For example, to set the `$OLD_DB_URL` you would run `export OLD_DB_URL=postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF#].supabase.co:5432/postgres`.
 
+<Admonition type="tip">
+
+Note that this direct connection string to the database uses IPv6. If your network provider doesn't yet support IPv6, you can connect via the pooler connection string, available under the **Connection pooling** section of [**Database settings**](https://supabase.com/dashboard/project/_/settings/database). The connection string has the format `postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:6543/postgres`.
+
+</Admonition>
+
 ### Backup your old database
 
 1. Run the following command from your terminal:
