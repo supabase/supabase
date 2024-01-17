@@ -1,0 +1,39 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'storage-custom-roles',
+  title: 'Custom Roles',
+  description: 'Learn about the storage schema',
+  subtitle: 'Use custom roles with Storage',
+  sidebar_label: 'Schema',
+}
+
+Storage's role-based access control can dynamically adjust to the role specified in the incoming authorization header. By default, it supports:
+
+- **anon**: For unauthenticated access.
+- **authenticated**: For standard user access.
+- **service_role**: For server side access.
+
+For applications where JWTs contain custom roles, Storage can be configured to recognize and switch to these roles for finer-grained permission control.
+
+## Custom Role Setup
+
+Define a Custom Role
+Create roles as per your application's needs. Example:
+
+```sql
+CREATE ROLE "manager";
+```
+
+#### Assign Permissions
+
+Grant necessary permissions so that Storage can switch to this role
+
+```sql
+GRANT manager TO authenticator;
+GRANT anon TO manager;
+```
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

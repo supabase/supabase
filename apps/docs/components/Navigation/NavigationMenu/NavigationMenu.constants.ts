@@ -1123,6 +1123,7 @@ export const storage: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Database Design', url: '/guides/storage/schema/design' },
+        { name: 'Custom Roles', url: '/guides/storage/schema/custom-roles' },
         { name: 'Helper Functions', url: '/guides/storage/schema/helper-functions' },
       ],
     },
