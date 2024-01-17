@@ -114,9 +114,10 @@ You can specify update policies by combining both the `using` and `with check` e
 
 The `using` clause represents the condition that must be true for the update to be allowed, and `with check` clause ensures that the updates made adhere to the policy constraints.
 
-Let's say you have a table called `profiles` in the public schema and you only want users to be able to update their own profile. 
+Let's say you have a table called `profiles` in the public schema and you only want users to be able to update their own profile.
 
 You can create a policy where the `using` clause checks if the user owns the profile being updated. And the `with check` clause ensures that, in the resultant row, users do not change the `user_id` to a value that is not equal to their User ID, maintaining that the modified profile still meets the ownership condition.
+
 ```sql
 -- 1. Create table
 create table profiles (
