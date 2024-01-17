@@ -6,13 +6,26 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 // Required for nextjs standalone build
 const path = require('path')
 
-// This file sets a custom webpack configuration to use your Next.js app
-// with Sentry.
-// https://nextjs.org/docs/api-reference/next.config.js/introduction
-// https://docs.sentry.io/platforms/javascript/guides/nextjs/
+const API_URL = new URL(process.env.NEXT_PUBLIC_API_URL).origin
+const SUPABASE_URL = new URL(process.env.SUPABASE_URL).origin
+const SUPABASE_MISC_PROJECT_URL = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).origin
+const CLOUDFLARE_CDN_URL = 'https://cdnjs.cloudflare.com'
+const HCAPTCHA_ASSET_URL = 'https://newassets.hcaptcha.com'
+const HCAPTCHA_JS_URL = 'https://js.hcaptcha.com'
+const CONFIGCAT_URL = 'https://cdn-global.configcat.com'
 
 const csp = [
-  "frame-ancestors 'none';",
+  `default-src 'self' ${API_URL} ${SUPABASE_URL} ${SUPABASE_MISC_PROJECT_URL} ${CONFIGCAT_URL};`,
+  `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${CLOUDFLARE_CDN_URL} ${HCAPTCHA_JS_URL};`,
+  `style-src 'self' 'unsafe-inline' ${CLOUDFLARE_CDN_URL};`,
+  `img-src 'self' blob: data:;`,
+  `font-src 'self' ${CLOUDFLARE_CDN_URL};`,
+  `frame-src 'self' ${HCAPTCHA_ASSET_URL};`,
+  `object-src 'none';`,
+  `base-uri 'self';`,
+  `form-action 'self';`,
+  `frame-ancestors 'none';`,
+  'block-all-mixed-content;',
   // IS_PLATFORM
   process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' && process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
     ? 'upgrade-insecure-requests;'
