@@ -18,9 +18,9 @@ In the digital landscape, ensuring secure access is paramount, and that's where 
 
 As organizations scale, their HR and IT departments struggle to keep employee and identity records across various applications. Typically they use an identity provider, like GSuite, Microsoft Active Directory, or Okta, to consolidate all of their employee data and permissions in one place.
 
-Using an **identity provider** allows them to easily automate the on-boarding and off-boarding processes for employees. Without an identity provider, adding or removing (typically called provisioning) access to 3rd-party applications for each employee can quickly turn into an administrative nightmare. 
+Using an **identity provider** allows them to easily automate the on-boarding and off-boarding processes for employees. Without an identity provider, adding or removing (typically called provisioning) access to 3rd-party applications for each employee can quickly turn into an administrative nightmare.
 
-These 3rd-party applications, also known as **service providers,** have Single Sign On (SSO) integrated to allow users to sign into the app. For an identity provider to authenticate with a service provider, an authentication protocol needs to be established first. SAML (Security Assertion Markup Language) is one such protocol that helps to facilitate SSO between an identity provider and a service provider. 
+These 3rd-party applications, also known as **service providers,** have Single Sign On (SSO) integrated to allow users to sign into the app. For an identity provider to authenticate with a service provider, an authentication protocol needs to be established first. SAML (Security Assertion Markup Language) is one such protocol that helps to facilitate SSO between an identity provider and a service provider.
 
 The SAML protocol uses the XML format to store encrypted data related to the authenticated user, also known as SAML assertions. Before the identity provider and the service provider can establish a successful SAML authorization flow, both providers need to exchange their public keys, which come in the form of an X.509 certificate. This allows the identity provider to verify the incoming SAML request and allows the service provider to verify the SAML response returned by the identity provider.
 
@@ -52,7 +52,7 @@ Supabase and Bob need to exchange some information to establish a SAML Connectio
 - A Site URL where employees in GSuite can pick Supabase and get instant access to it.
 - Supabase’s logo/icon so that the application shows up nicely in the list of 3rd-party apps approved by ACME.
 - A list of mandatory attributes to be included in the SAML Assertion, without which Supabase couldn’t work properly.
-    - Usually email, name, department, phone, …
+  - Usually email, name, department, phone, …
 
 ### What does Bob need from Alice?
 
@@ -69,7 +69,7 @@ The list of employees that should be able to access Supabase - so that Bob can g
 
 ### Summary
 
-Both parties need to exchange almost the same information: 
+Both parties need to exchange almost the same information:
 
 - X.509 certificates so that the systems trust each other.
 - Entity IDs so that the systems know each other.
@@ -78,7 +78,7 @@ Both parties need to exchange almost the same information:
 
 ## SAML Metadata XML
 
-Since much of this information is tricky to communicate and requires manual input, there exists the SAML Metadata XML document which exposes *most* but not all of the information. Both systems, the Identity Provider (GSuite) and the Service Provider (Supabase) each have their own SAML Metadata that needs to be exchanged.
+Since much of this information is tricky to communicate and requires manual input, there exists the SAML Metadata XML document which exposes _most_ but not all of the information. Both systems, the Identity Provider (GSuite) and the Service Provider (Supabase) each have their own SAML Metadata that needs to be exchanged.
 
 Often this document is available publicly at a URL. Note though, that sometimes Identity Providers (typically Microsoft Active Directory) may not be accessible over the internet (as they’re behind a VPN) so a URL can’t be used and a file needs to be exchanged in that case. Service Providers may also be isolated in their network, so a file exchange is necessary here too, albeit uncommon.
 
@@ -90,9 +90,9 @@ Inside this XML document, you can find most of the information required by Bob a
 
 However, both parties still need to agree over email about the email domains of ACME, and about the attributes that they have in their system.
 
-First, Supabase and Bob exchange some of the information over email. Then Bob goes to GSuite and creates a new SAML Application. 
+First, Supabase and Bob exchange some of the information over email. Then Bob goes to GSuite and creates a new SAML Application.
 
-Finally, once Bob registers ACME’s Identity Provider (GSuite), the connection is established and ACME employees can access Supabase — directly by visiting Supabase’s site (SP-initiated) or by picking it in the GSuite Applications menu (IdP-initiated). 
+Finally, once Bob registers ACME’s Identity Provider (GSuite), the connection is established and ACME employees can access Supabase — directly by visiting Supabase’s site (SP-initiated) or by picking it in the GSuite Applications menu (IdP-initiated).
 
 This is how the SAML SP-initiated authorization flow looks like when Alice visits Supabase and enters her email to sign in with SAML SSO.
 
@@ -117,7 +117,6 @@ Combining SAML with Row-Level Security (RLS) allows for fine-grained control ove
 Since Supabase is “just Postgres”™, it enables us to easily leverage the power of RLS policies to restrict access to the data. You can access the user’s JWT claims by invoking the `auth.jwt()` function in your RLS policy. In the scenario provided above, this allows Supabase to restrict developers from ACME Inc. from inviting someone else outside of the company to join their Supabase organization.
 
 For example, assuming we have a table to store all invited users in a Supabase organization:
-
 
 ```sql
 create table invited_users (
