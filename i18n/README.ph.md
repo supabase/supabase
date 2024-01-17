@@ -3,66 +3,74 @@
 <img src="https://user-images.githubusercontent.com/8291514/213727225-56186826-bee8-43b5-9b15-86e839d89393.png#gh-dark-mode-only">
 </p>
 
+---
+
 # Supabase
 
-[Supabase](https://supabase.com) is an open source Firebase alternative. We're building the features of Firebase using enterprise-grade open source tools.
+[Supabase](https://supabase.com) ay isang alternatibo ng Firebase. Kami ay gumagawa ng mga feature ng Firebase gamit ang mga enterprise-grade na open source tools.
 
-- [x] Hosted Postgres Database. [Docs](https://supabase.com/docs/guides/database)
-- [x] Authentication and Authorization. [Docs](https://supabase.com/docs/guides/auth)
-- [x] Auto-generated APIs.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/api)
+[x] In-host na Postgres Database [Docs](https://supabase.com/docs/guides/database)
+- [x] Authentication at Authorization [Docs](https://supabase.com/docs/guides/auth)
+- [x] Auto-generated na mga API
+  - [x] REST [Docs](https://supabase.com/docs/guides/api)
   - [x] GraphQL. [Docs](https://supabase.com/docs/guides/graphql)
-  - [x] Realtime subscriptions. [Docs](https://supabase.com/docs/guides/realtime)
-- [x] Functions.
-  - [x] Database Functions. [Docs](https://supabase.com/docs/guides/database/functions)
-  - [x] Edge Functions [Docs](https://supabase.com/docs/guides/functions)
-- [x] File Storage. [Docs](https://supabase.com/docs/guides/storage)
-- [x] AI + Vector/Embeddings Toolkit. [Docs](https://supabase.com/docs/guides/ai)
+  - [x] Realtime na mga subscription [Docs](https://supabase.com/docs/guides/realtime)
+- [x] Mga Function
+  - [x] Mga Function ng Database [Docs](https://supabase.com/docs/guides/database/functions)
+  - [x] Mga Edge functions [Docs](https://supabase.com/docs/guides/functions)
+- [x] Imbakan ng File [Docs](https://supabase.com/docs/guides/storage)
+- [x] AI + Vector/Embeddings Toolkit [Docs](https://supabase.com/docs/guides/ai)
 - [x] Dashboard
+
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
-Watch "releases" of this repo to get notified of major updates.
+Tumingin sa 'releases' ng repository na ito upang maabisuhan ng mga malalaking pag-update.
 
 <kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
-## Documentation
+## Teknikal na Dokumentasyon
 
-For full documentation, visit [supabase.com/docs](https://supabase.com/docs)
+Para sa buong dokumentasyon, bisitahin lamang ang [supabase.com/docs](https://supabase.com/docs).
 
-To see how to Contribute, visit [Getting Started](./DEVELOPERS.md)
-
-## Community & Support
-
-- [Community Forum](https://github.com/supabase/supabase/discussions). Best for: help with building, discussion about database best practices.
-- [GitHub Issues](https://github.com/supabase/supabase/issues). Best for: bugs and errors you encounter using Supabase.
-- [Email Support](https://supabase.com/docs/support#business-support). Best for: problems with your database or infrastructure.
-- [Discord](https://discord.supabase.com). Best for: sharing your applications and hanging out with the community.
+Upang malaman kung paano makatulong, bisitahin ang [Paano mag simula](./DEVELOPERS.md).
 
 
-## How it works
+## Komunidad at Suporta
 
-Supabase is a combination of open source tools. We’re building the features of Firebase using enterprise-grade, open source products. If the tools and communities exist, with an MIT, Apache 2, or equivalent open license, we will use and support that tool. If the tool doesn't exist, we build and open source it ourselves. Supabase is not a 1-to-1 mapping of Firebase. Our aim is to give developers a Firebase-like developer experience using open source tools.
+- [Komunidad na Forum](https://github.com/supabase/supabase/discussions) Pinakamabuti para sa: tulong sa pagbuo, diskusyon tungkol sa mga pinakamahusay na praktika sa database.
+- [Mga Isyu sa GitHub](https://github.com/supabase/supabase/issues) Pinakamabuti para sa: mga bug at error na iyong nae-encounter gamit ng Supabase.
+- [Suporta sa Email](https://supabase.com/docs/support#business-support) Pinakamabuti para sa: mga problema sa iyong database o infrastructure.
+- [Discord](https://discord.supabase.com) Pinakamabuti para sa: pagbabahagi ng iyong mga aplikasyon at pakikipag-ugnayan sa komunidad.
 
-**Architecture**
 
-Supabase is a [hosted platform](https://supabase.com/dashboard). You can sign up and start using Supabase without installing anything.
-You can also [self-host](https://supabase.com/docs/guides/hosting/overview) and [develop locally](https://supabase.com/docs/guides/local-development).
+## Paano ito gumagana 
 
-![Architecture](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+Supabase ay combinasyon ng mga open source tools. Kami ay nag gumagawa ng fetures open source gamit ang 
+enterprice-grade open source na producto kung ang kumunidad ay nag exist, with an MIT,MIT, Apache 2, or equivalent open license, at kami gumagamit at sumosuporta sa tool na ito. kung ang tool ay hindi nag exist 
+kami ang gumagawa at ini open namin ito sa aming sarili. Supabase ay hindi 1-to-1 mapping ng Firebase. Ang  Layunin namin na bigyan ang mga developer ng isang Firebase-like na karanasan sa pag-develop gamit ang open source tools  
 
-- [Postgres](https://www.postgresql.org/) is an object-relational database system with over 30 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance.
-- [Realtime](https://github.com/supabase/realtime) is an Elixir server that allows you to listen to PostgreSQL inserts, updates, and deletes using websockets. Realtime polls Postgres' built-in replication functionality for database changes, converts changes to JSON, then broadcasts the JSON over websockets to authorized clients.
-- [PostgREST](http://postgrest.org/) is a web server that turns your PostgreSQL database directly into a RESTful API
-- [GoTrue](https://github.com/supabase/gotrue) is a JWT based API for managing users and issuing JWT tokens.
-- [Storage](https://github.com/supabase/storage-api) provides a RESTful interface for managing Files stored in S3, using Postgres to manage permissions.
-- [pg_graphql](http://github.com/supabase/pg_graphql/) a PostgreSQL extension that exposes a GraphQL API
-- [postgres-meta](https://github.com/supabase/postgres-meta) is a RESTful API for managing your Postgres, allowing you to fetch tables, add roles, and run queries, etc.
-- [Kong](https://github.com/Kong/kong) is a cloud-native API gateway.
+**Arkitektura**
+
+# Supabase
+
+Ang Supabase ay isang [hosted platform](https://supabase.com/dashboard). Pwedeng kang mag-sign up at magsimula gamitin ang Supabase nang walang kahit anong installation. Pwedeng mo rin [i-self-host](https://supabase.com/docs/guides/hosting/overview) at [i-develop locally](https://supabase.com/docs/guides/local-development).
+
+![Arkitektura ng Supabase](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+
+- [**Postgres**](https://www.postgresql.org/): Isang object-relational database system na may mahigit 30 taon ng aktibong development, na kumita ng malakas na reputasyon sa reliability, robustness ng features, at performance.
+- [**Realtime**](https://github.com/supabase/realtime): Isang Elixir server na nagbibigay-daan sa iyo na makinig sa PostgreSQL inserts, updates, at deletes gamit ang websockets. Ang Realtime ay humihingi ng database changes mula sa built-in replication functionality ng Postgres, binabago ang mga changes sa JSON, at itinatapon ang JSON gamit ang websockets sa mga autorisadong cliente.
+- [**PostgREST**](http://postgrest.org/): Isang web server na direktang nagpapabago sa iyong PostgreSQL database tungo sa isang RESTful API.
+- [**GoTrue**](https://github.com/supabase/gotrue): Isang JWT based na API para sa pamamahala ng mga users at paglalabas ng JWT tokens.
+- [**Storage**](https://github.com/supabase/storage-api): Nagbibigay ng isang RESTful interface para sa pamamahala ng mga files na naka-store sa S3, gamit ang Postgres para pamahalaan ang mga pahintulot.
+- [**pg_graphql**](http://github.com/supabase/pg_graphql/): Isang PostgreSQL extension na nag-eexpose ng GraphQL API.
+- [**postgres-meta**](https://github.com/supabase/postgres-meta): Isang RESTful na API para sa pamamahala ng iyong Postgres, na nagbibigay-daan sa iyo na kumuha ng mga tables, magdagdag ng mga roles, tumakbo ng mga queries, etc.
+- [**Kong**](https://github.com/Kong/kong): Isang cloud-native API gateway.
+
 
 #### Client libraries
 
-Our approach for client libraries is modular. Each sub-library is a standalone implementation for a single external system. This is one of the ways we support existing tools.
+Ang aming pamamaraan para sa mga client libraries ay modular. Bawat sub-libraries ay isang indipendent na implementasyon para sa  single external systema single external system. Ito ay isa sa mga paraan na aming ginagamit upang suportahan ang mga umiiral na mga kagamitan
 
 <table style="table-layout:fixed; white-space: nowrap;">
   <tr>
@@ -282,7 +290,7 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
 - [Simplified Chinese / 简体中文](/i18n/README.zh-cn.md)
 - [Swedish / Svenska](/i18n/README.sv.md)
 - [Thai / ไทย](/i18n/README.th.md)
-- [Traditional Chinese / 繁體中文](/i18n/README.zh-tw.md)
+- [Traditional Chinese / 繁体中文](/i18n/README.zh-tw.md)
 - [Turkish / Türkçe](/i18n/README.tr.md)
 - [Ukrainian / Українська](/i18n/README.uk.md)
 - [Vietnamese / Tiếng Việt](/i18n/README.vi-vn.md)

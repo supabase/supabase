@@ -32,6 +32,7 @@
 - [Polish / Polski](/i18n/README.pl.md)
 - [Portuguese / Portuguese](/i18n/README.pt.md)
 - [Portuguese (Brazilian) / Português Brasileiro](/i18n/README.pt-br.md)
+- [Philippines (Tagalog) / Philippines Tagalog](/i18n/README.ph.md)
 - [Romanian / Română](/i18n/README.ro.md)
 - [Russian / Pусский](/i18n/README.ru.md)
 - [Serbian / Srpski](/i18n/README.sr.md)
