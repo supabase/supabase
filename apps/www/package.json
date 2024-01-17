@@ -80,6 +80,7 @@
     "@types/three": "^0.136.0",
     "autoprefixer": "^10.4.14",
     "config": "*",
+    "dotenv": "^16.3.1",
     "postcss": "^8.4.31",
     "tsconfig": "*"
   },

@@ -7,6 +7,8 @@ import { serialize } from 'next-mdx-remote/serialize'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
+import { readFile } from 'node:fs/promises'
+import { join } from 'node:path'
 import { Dispatch, SetStateAction, useState } from 'react'
 import remarkGfm from 'remark-gfm'
 import { Swiper, SwiperSlide } from 'swiper/react'
@@ -44,7 +46,7 @@ function Partner({
   overview,
 }: {
   partner: Partner
-  overview: MDXRemoteSerializeResult<Record<string, unknown>, Record<string, unknown>>
+  overview: MDXRemoteSerializeResult<Record<string, unknown>, Record<string, unknown>> | null
 }) {
   const [focusedImage, setFocusedImage] = useState<string | null>(null)
 
@@ -183,7 +185,9 @@ function Partner({
                 </h2>
 
                 <div className="prose">
-                  <MDXRemote {...overview} components={mdxComponents(setFocusedImage)} />
+                  {overview && (
+                    <MDXRemote {...overview} components={mdxComponents(setFocusedImage)} />
+                  )}
                 </div>
               </div>
 
@@ -317,21 +321,31 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     }
   }
 
-  const codeHikeOptions: CodeHikeConfig = {
-    theme: codeHikeTheme,
-    lineNumbers: true,
-    showCopyButton: true,
-    skipLanguages: [],
-    autoImport: false,
-  }
+  let overview: MDXRemoteSerializeResult | null = null
+  try {
+    const markdown = await readFile(
+      join(process.cwd(), 'data/partners/content', `${params!.slug}.mdx`),
+      'utf-8'
+    )
 
-  // Parse markdown
-  const overview = await serialize(partner.overview, {
-    mdxOptions: {
-      useDynamicImport: true,
-      remarkPlugins: [remarkGfm, [remarkCodeHike, codeHikeOptions]],
-    },
-  })
+    const codeHikeOptions: CodeHikeConfig = {
+      theme: codeHikeTheme,
+      lineNumbers: true,
+      showCopyButton: true,
+      skipLanguages: [],
+      autoImport: false,
+    }
+
+    // Parse markdown
+    overview = await serialize(markdown, {
+      mdxOptions: {
+        useDynamicImport: true,
+        remarkPlugins: [remarkGfm, [remarkCodeHike, codeHikeOptions]],
+      },
+    })
+  } catch {
+    console.error("Couldn't produce MDX content for slug:", params!.slug)
+  }
 
   return {
     props: { partner, overview },

@@ -1,0 +1,95 @@
+[BigQuery](https://cloud.google.com/bigquery) is a completely serverless and cost-effective enterprise data warehouse that works across clouds and scales with your data, with BI, machine learning and AI built in.
+
+The BigQuery Wrapper allows you to read and write data from BigQuery within your Postgres database.
+
+## Supported Data Types
+
+| Postgres Type      | BigQuery Type   |
+| ------------------ | --------------- |
+| boolean            | BOOL            |
+| bigint             | INT64           |
+| double precision   | FLOAT64         |
+| numeric            | NUMERIC         |
+| text               | STRING          |
+| varchar            | STRING          |
+| date               | DATE            |
+| timestamp          | DATETIME        |
+| timestamp          | TIMESTAMP       |
+
+## Preparation
+
+Before you get started, make sure the `wrappers` extension is installed on your database:
+
+```sql
+create extension if not exists wrappers with schema extensions;
+```
+
+and then create the foreign data wrapper:
+
+```sql
+create foreign data wrapper bigquery_wrapper
+  handler big_query_fdw_handler
+  validator big_query_fdw_validator;
+```
+
+### Secure your credentials (optional)
+
+By default, Postgres stores FDW credentials inide `pg_catalog.pg_foreign_server` in plain text. Anyone with access to this table will be able to view these credentials. Wrappers is designed to work with [Vault](https://supabase.com/docs/guides/database/vault), which provides an additional level of security for storing credentials. We recommend using Vault to store your credentials.
+
+```sql
+-- Save your BigQuery service account json in Vault and retrieve the `key_id`
+insert into vault.secrets (name, secret)
+values (
+  'bigquery',
+  '
+    {
+      "type": "service_account",
+      "project_id": "your_gcp_project_id",
+      "private_key_id": "your_private_key_id",
+      "private_key": "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n",
+      ...
+    }
+  '
+)
+returning key_id;
+```
+
+### Connecting to BigQuery
+
+We need to provide Postgres with the credentials to connect to BigQuery, and any additional options. We can do this using the `create server` command:
+
+With Vault:
+
+    ```sql
+    create server bigquery_server
+      foreign data wrapper bigquery_wrapper
+      options (
+        sa_key_id '<key_ID>', -- The Key ID from above.
+        project_id 'your_gcp_project_id',
+        dataset_id 'your_gcp_dataset_id'
+      );
+    ```
+
+Without Vault:
+
+    ```sql
+    create server bigquery_server
+      foreign data wrapper bigquery_wrapper
+      options (
+        sa_key '
+        {
+           "type": "service_account",
+           "project_id": "your_gcp_project_id",
+           ...
+        }
+       ',
+        project_id 'your_gcp_project_id',
+        dataset_id 'your_gcp_dataset_id'
+      );
+    ```
+
+Learn more on our [doc page](https://supabase.com/docs/guides/database/extensions/wrappers/bigquery).
+
+## Resources
+
+- Official [`supabase/wrappers` documentation](https://supabase.github.io/wrappers/)

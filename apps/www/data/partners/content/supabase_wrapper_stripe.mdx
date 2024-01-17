@@ -1,0 +1,78 @@
+[supabase/wrappers](https://supabase.github.io/wrappers/) is a PostgreSQL extension that provides integrations with external sources so you can interact with third-party data using SQL.
+
+For example, the [Stripe wrapper](https://supabase.github.io/wrappers/stripe/) connects to [Stripe's API](https://stripe.com/docs/api) and exposes each endpoint as a SQL table.
+
+```sql
+select
+  customer_id
+  currency
+from
+   stripe.customers;
+
+    customer_id     | currency 
+--------------------+-----------
+ cus_MJiBtCqOF1Bb3F | usd      
+(1 row)
+```
+
+## Usage
+
+## Preparation
+
+Before you get started, make sure the `wrappers` extension is installed on your database:
+
+```sql
+create extension if not exists wrappers with schema extensions;
+```
+
+and then create the foreign data wrapper:
+
+```sql
+create foreign data wrapper stripe_wrapper
+  handler stripe_fdw_handler
+  validator stripe_fdw_validator;
+```
+
+### Secure your credentials (optional)
+
+By default, Postgres stores FDW credentials inide `pg_catalog.pg_foreign_server` in plain text. Anyone with access to this table will be able to view these credentials. Wrappers is designed to work with [Vault](https://supabase.com/docs/guides/database/vault), which provides an additional level of security for storing credentials. We recommend using Vault to store your credentials.
+
+```sql
+-- Save your Stripe API key in Vault and retrieve the `key_id`
+insert into vault.secrets (name, secret)
+values (
+  'stripe',
+  'YOUR_SECRET'
+)
+returning key_id;
+```
+
+### Connecting to Stripe
+
+We need to provide Postgres with the credentials to connect to Stripe, and any additional options. We can do this using the `create server` command:
+
+With Vault:
+
+    ```sql
+    create server stripe_server
+      foreign data wrapper stripe_wrapper
+      options (
+        api_key_id '<key_ID>' -- The Key ID from above.
+      );
+    ```
+
+Without Vault:
+
+    ```sql
+    create server stripe_server
+      foreign data wrapper stripe_wrapper
+      options (
+        api_key '<Stripe API Key>'  -- Stripe API key, required
+      );
+    ```
+
+Learn more on our [docs page](https://supabase.com/docs/guides/database/extensions/wrappers/stripe).
+
+## Resources
+
+- Official [`supabase/wrappers` documentation](https://supabase.github.io/wrappers/)
