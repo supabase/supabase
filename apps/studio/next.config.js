@@ -17,18 +17,20 @@ const CONFIGCAT_URL = 'https://cdn-global.configcat.com'
 const VERCEL_LIVE_URL = 'https://vercel.live'
 
 const csp = [
-  `default-src 'self' ${API_URL} ${SUPABASE_URL} ${SUPABASE_MISC_PROJECT_URL} ${CONFIGCAT_URL};`,
   ...(process.env.VERCEL_ENV === 'preview'
     ? [
+        `default-src 'self' ${API_URL} ${SUPABASE_URL} ${SUPABASE_MISC_PROJECT_URL} ${CONFIGCAT_URL} ${VERCEL_LIVE_URL};`,
         `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${CLOUDFLARE_CDN_URL} ${HCAPTCHA_JS_URL} ${VERCEL_LIVE_URL};`,
+        `frame-src 'self' ${HCAPTCHA_ASSET_URL}; ${VERCEL_LIVE_URL}`,
       ]
     : [
+        `default-src 'self' ${API_URL} ${SUPABASE_URL} ${SUPABASE_MISC_PROJECT_URL} ${CONFIGCAT_URL};`,
         `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${CLOUDFLARE_CDN_URL} ${HCAPTCHA_JS_URL};`,
+        `frame-src 'self' ${HCAPTCHA_ASSET_URL};`,
       ]),
   `style-src 'self' 'unsafe-inline' ${CLOUDFLARE_CDN_URL};`,
   `img-src 'self' blob: data: ${SUPABASE_COM_URL};`,
   `font-src 'self' ${CLOUDFLARE_CDN_URL};`,
-  `frame-src 'self' ${HCAPTCHA_ASSET_URL};`,
   `object-src 'none';`,
   `base-uri 'self';`,
   `form-action 'self';`,
