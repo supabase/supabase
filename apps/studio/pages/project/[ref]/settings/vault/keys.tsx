@@ -10,9 +10,9 @@ import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-ex
 import { NextPageWithLayout } from 'types'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import Link from 'next/link'
+import VaultNavTabs from 'components/interfaces/Settings/Vault/VaultNavTabs'
 
 const VaultSettingsSecrets: NextPageWithLayout = () => {
-  const router = useRouter()
   const { ref } = useParams()
   const { project } = useProjectContext()
 
@@ -36,19 +36,10 @@ const VaultSettingsSecrets: NextPageWithLayout = () => {
       ) : !isEnabled ? (
         <VaultToggle />
       ) : (
-        <Tabs_Shadcn_ defaultValue="keys">
-          <TabsList_Shadcn_>
-            <TabsTrigger_Shadcn_ asChild value="secrets">
-              <Link href={`/project/${ref}/settings/vault/secrets`}>Secrets Management</Link>
-            </TabsTrigger_Shadcn_>
-            <TabsTrigger_Shadcn_ asChild value="keys">
-              <Link href={`/project/${ref}/settings/vault/keys`}>Encryption Keys</Link>
-            </TabsTrigger_Shadcn_>
-          </TabsList_Shadcn_>
-          <TabsContent_Shadcn_ value="keys">
-            <EncryptionKeysManagement />
-          </TabsContent_Shadcn_>
-        </Tabs_Shadcn_>
+        <>
+          <VaultNavTabs projRef={ref || ''} activeTab={'keys'} />
+          <EncryptionKeysManagement />
+        </>
       )}
     </div>
   )

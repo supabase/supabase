@@ -1,6 +1,4 @@
 import { useRouter } from 'next/router'
-import { TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn_ } from 'ui'
-
 import { useParams } from 'common/hooks'
 import { SecretsManagement, VaultToggle } from 'components/interfaces/Settings/Vault'
 import { SettingsLayout } from 'components/layouts'
@@ -9,7 +7,7 @@ import { FormHeader } from 'components/ui/Forms'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { NextPageWithLayout } from 'types'
-import Link from 'next/link'
+import VaultNavTabs from 'components/interfaces/Settings/Vault/VaultNavTabs'
 
 const VaultSettingsSecrets: NextPageWithLayout = () => {
   const router = useRouter()
@@ -36,19 +34,10 @@ const VaultSettingsSecrets: NextPageWithLayout = () => {
       ) : !isEnabled ? (
         <VaultToggle />
       ) : (
-        <Tabs_Shadcn_ defaultValue="secrets">
-          <TabsList_Shadcn_>
-            <TabsTrigger_Shadcn_ asChild value="secrets">
-              <Link href={`/project/${ref}/settings/vault/secrets`}>Secrets Management</Link>
-            </TabsTrigger_Shadcn_>
-            <TabsTrigger_Shadcn_ asChild value="keys">
-              <Link href={`/project/${ref}/settings/vault/keys`}>Encryption Keys</Link>
-            </TabsTrigger_Shadcn_>
-          </TabsList_Shadcn_>
-          <TabsContent_Shadcn_ value="secrets">
-            <SecretsManagement />
-          </TabsContent_Shadcn_>
-        </Tabs_Shadcn_>
+        <>
+          <VaultNavTabs projRef={ref || ''} activeTab="secrets" />
+          <SecretsManagement />
+        </>
       )}
     </div>
   )
