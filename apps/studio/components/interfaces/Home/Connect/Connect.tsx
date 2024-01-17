@@ -195,7 +195,8 @@ const Connect = () => {
                       updateState={setSelectedChild}
                       label="With"
                       items={connectionObject.filter(
-                        (item) => item.parentKey && item.grandparentKey
+                        (item) =>
+                          item.parentKey === selectedParent && item.grandparentKey === selectedChild
                       )}
                     />
                   )}
