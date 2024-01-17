@@ -35,6 +35,7 @@ export * from './src/components/CodeBlock'
 // NAV
 
 export * from './src/components/Menu'
+export * from './src/components/NavMenu'
 
 // OVERLAYS
 
