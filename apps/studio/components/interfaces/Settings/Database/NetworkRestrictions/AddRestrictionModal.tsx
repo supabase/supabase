@@ -1,13 +1,17 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Address4 } from 'ip-address'
+import { useParams } from 'common'
 import { useState } from 'react'
+import toast from 'react-hot-toast'
 import { Button, Form, IconHelpCircle, Input, Modal } from 'ui'
 
-import { useParams } from 'common/hooks'
 import InformationBox from 'components/ui/InformationBox'
 import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
-import { useStore } from 'hooks'
-import { checkIfPrivate, getAddressEndRange } from './NetworkRestrictions.utils'
+import {
+  checkIfPrivate,
+  getAddressEndRange,
+  isValidAddress,
+  normalize,
+} from './NetworkRestrictions.utils'
 
 interface AddRestrictionModalProps {
   restrictedIps: string[]
@@ -23,7 +27,6 @@ const AddRestrictionModal = ({
   onClose,
 }: AddRestrictionModalProps) => {
   const formId = 'add-restriction-form'
-  const { ui } = useStore()
   const { ref } = useParams()
   const { mutate: applyNetworkRestrictions, isLoading: isApplying } =
     useNetworkRestrictionsApplyMutation({ onSuccess: () => onClose() })
@@ -39,7 +42,7 @@ const AddRestrictionModal = ({
     }
 
     // Validate IP address
-    const isValid = Address4.isValid(ipAddress)
+    const isValid = isValidAddress(ipAddress)
     if (!isValid) {
       errors.ipAddress = 'Please enter a valid IP address'
       return errors
@@ -54,22 +57,21 @@ const AddRestrictionModal = ({
   const onSubmit = async (values: any) => {
     if (!ref) return console.error('Project ref is required')
 
-    const cidr = `${values.ipAddress}/${values.cidrBlockSize}`
-    const alreadyExists = restrictedIps.includes(cidr)
+    const address = `${values.ipAddress}/${values.cidrBlockSize}`
+    const normalizedAddress = normalize(address)
+
+    const alreadyExists =
+      restrictedIps.includes(address) || restrictedIps.includes(normalizedAddress)
     if (alreadyExists) {
-      return ui.setNotification({
-        category: 'info',
-        message: `The address ${cidr} is already restricted`,
-      })
+      return toast(`The address ${address} is already restricted`)
     }
 
-    const dbAllowedCidrs = hasOverachingRestriction ? [cidr] : [...restrictedIps, cidr]
+    const dbAllowedCidrs = hasOverachingRestriction ? [address] : [...restrictedIps, address]
     applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs })
   }
 
   return (
     <Modal
-      closable
       hideFooter
       size="medium"
       visible={visible}
@@ -85,7 +87,7 @@ const AddRestrictionModal = ({
         onSubmit={onSubmit}
       >
         {({ values, resetForm }: any) => {
-          const isPrivate = Address4.isValid(values.ipAddress)
+          const isPrivate = isValidAddress(values.ipAddress)
             ? checkIfPrivate(values.ipAddress)
             : false
           const isValidBlockSize =
@@ -94,6 +96,9 @@ const AddRestrictionModal = ({
           const addressRange = getAddressEndRange(`${values.ipAddress}/${values.cidrBlockSize}`)
 
           const isValidCIDR = isValidBlockSize && !isPrivate && addressRange !== undefined
+          const normalizedAddress = isValidCIDR
+            ? normalize(`${values.ipAddress}/${values.cidrBlockSize}`)
+            : `{values.ipAddress}/{values.cidrBlockSize}`
 
           // [Alaister] although this "technically" is breaking the rules of React hooks
           // it won't error because the hooks are always rendered in the same order
@@ -102,20 +107,20 @@ const AddRestrictionModal = ({
 
           const getClientIpAddress = async () => {
             setIsFetchingAddress(true)
-            const res = await fetch('http://www.geoplugin.net/json.gp', { method: 'GET' })
-            const { geoplugin_request } = await res.json()
-
-            if (geoplugin_request) {
-              const updatedValues = { ...values, ipAddress: geoplugin_request, cidrBlockSize: 32 }
-              resetForm({ initialValues: updatedValues, values: updatedValues })
-            } else {
-              ui.setNotification({
-                category: 'error',
-                duration: 4000,
-                message: 'Failed to retrieve client IP address, please enter address manually',
-              })
+            try {
+              const res = await fetch('http://www.geoplugin.net/json.gp', { method: 'GET' })
+              const { geoplugin_request } = await res.json()
+              if (geoplugin_request) {
+                const updatedValues = { ...values, ipAddress: geoplugin_request, cidrBlockSize: 32 }
+                resetForm({ initialValues: updatedValues, values: updatedValues })
+              } else {
+                toast.error('Failed to retrieve client IP address, please enter address manually')
+              }
+            } catch (error) {
+              toast.error('Failed to retrieve client IP address, please enter address manually')
+            } finally {
+              setIsFetchingAddress(false)
             }
-            setIsFetchingAddress(false)
           }
 
           return (
@@ -193,11 +198,8 @@ const AddRestrictionModal = ({
                 <Modal.Content>
                   <div className="space-y-1 pt-2 pb-4">
                     <p className="text-sm">
-                      The address range{' '}
-                      <code className="text-xs">
-                        {values.ipAddress}/{values.cidrBlockSize}
-                      </code>{' '}
-                      will be restricted
+                      The address range <code className="text-xs">{normalizedAddress}</code> will be
+                      restricted
                     </p>
                     <p className="text-sm text-foreground-light">
                       Selected address space: <code className="text-xs">{addressRange.start}</code>{' '}
@@ -214,7 +216,7 @@ const AddRestrictionModal = ({
                     <div className="h-[68px] flex items-center">
                       <p className="text-sm text-foreground-light">
                         A summary of your restriction will be shown here after entering a valid IP
-                        address and CIDR block size
+                        address and CIDR block size. IP addresses will also be normalized.
                       </p>
                     </div>
                   </div>

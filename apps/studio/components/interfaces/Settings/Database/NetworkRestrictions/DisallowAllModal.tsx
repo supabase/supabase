@@ -1,6 +1,6 @@
+import { useParams } from 'common'
 import { Button, Modal } from 'ui'
 
-import { useParams } from 'common/hooks'
 import InformationBox from 'components/ui/InformationBox'
 import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
 
