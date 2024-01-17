@@ -53,7 +53,7 @@ const FormSchema = z.object({
   return_type: z.string().trim(),
   security_definer: z.boolean(),
   config_params: z
-    .array(z.object({ name: z.string().trim().min(1), type: z.string().trim().min(1) }))
+    .array(z.object({ name: z.string().trim().min(1), value: z.string().trim().min(1) }))
     .optional(),
 })
 
@@ -291,96 +291,102 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
               />
             </SidePanel.Content>
             <SidePanel.Separator />
-            <SidePanel.Content>
-              <div className="space-y-8 rounded bg-background py-4 px-6 border border-overlay">
-                <Toggle
-                  onChange={() => setAdvancedSettingsShown(!advancedSettingsShown)}
-                  label="Show advanced settings"
-                  checked={advancedSettingsShown}
-                  labelOptional="These are settings that might be familiar for postgres heavy users "
-                />
-              </div>
-            </SidePanel.Content>
-            {advancedSettingsShown && (
+            {isEditing ? (
+              <></>
+            ) : (
               <>
                 <SidePanel.Content>
-                  <div className="space-y-2">
-                    <FormFieldLanguage form={form} />
-                    <FormField_Shadcn_
-                      control={form.control}
-                      name="behavior"
-                      render={({ field }) => (
-                        <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
-                          <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
-                            Behavior
-                          </FormLabel_Shadcn_>
-                          <FormControl_Shadcn_ className="col-span-8">
-                            <Listbox
-                              size="small"
-                              value={field.value}
-                              onChange={(value) => field.onChange(value)}
-                            >
-                              <Listbox.Option value="IMMUTABLE" label="immutable">
-                                immutable
-                              </Listbox.Option>
-                              <Listbox.Option value="STABLE" label="stable">
-                                stable
-                              </Listbox.Option>
-                              <Listbox.Option value="VOLATILE" label="volatile">
-                                volatile
-                              </Listbox.Option>
-                            </Listbox>
-                          </FormControl_Shadcn_>
-                          <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
-                        </FormItem_Shadcn_>
-                      )}
+                  <div className="space-y-8 rounded bg-background py-4 px-6 border border-overlay">
+                    <Toggle
+                      onChange={() => setAdvancedSettingsShown(!advancedSettingsShown)}
+                      label="Show advanced settings"
+                      checked={advancedSettingsShown}
+                      labelOptional="These are settings that might be familiar for postgres heavy users "
                     />
                   </div>
                 </SidePanel.Content>
-                <SidePanel.Separator />
-                <SidePanel.Content>
-                  <FormFieldConfigParams readonly={isEditing} />
-                </SidePanel.Content>
-                <SidePanel.Separator />
-                <SidePanel.Content>
-                  <div className="space-y-4">
-                    <FormField_Shadcn_
-                      control={form.control}
-                      name="security_definer"
-                      render={({ field }) => (
-                        <FormItem_Shadcn_>
-                          <FormControl_Shadcn_ className="col-span-8">
-                            <Radio.Group
-                              type="cards"
-                              label="Type of security"
-                              layout="vertical"
-                              onChange={(event) =>
-                                field.onChange(event.target.value == 'SECURITY_DEFINER')
-                              }
-                              value={field.value ? 'SECURITY_DEFINER' : 'SECURITY_INVOKER'}
-                            >
-                              <Radio
-                                id="SECURITY_INVOKER"
-                                label="SECURITY INVOKER"
-                                value="SECURITY_INVOKER"
-                                checked={!field.value}
-                                description="Function is to be executed with the privileges of the user that calls it."
-                              />
-                              <Radio
-                                id="SECURITY_DEFINER"
-                                label="SECURITY DEFINER"
-                                value="SECURITY_DEFINER"
-                                checked={field.value}
-                                description="Function is to be executed with the privileges of the user that created it."
-                              />
-                            </Radio.Group>
-                          </FormControl_Shadcn_>
-                          <FormMessage_Shadcn_ />
-                        </FormItem_Shadcn_>
-                      )}
-                    />
-                  </div>
-                </SidePanel.Content>
+                {advancedSettingsShown && (
+                  <>
+                    <SidePanel.Content>
+                      <div className="space-y-2">
+                        <FormFieldLanguage />
+                        <FormField_Shadcn_
+                          control={form.control}
+                          name="behavior"
+                          render={({ field }) => (
+                            <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
+                              <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
+                                Behavior
+                              </FormLabel_Shadcn_>
+                              <FormControl_Shadcn_ className="col-span-8">
+                                <Listbox
+                                  size="small"
+                                  value={field.value}
+                                  onChange={(value) => field.onChange(value)}
+                                >
+                                  <Listbox.Option value="IMMUTABLE" label="immutable">
+                                    immutable
+                                  </Listbox.Option>
+                                  <Listbox.Option value="STABLE" label="stable">
+                                    stable
+                                  </Listbox.Option>
+                                  <Listbox.Option value="VOLATILE" label="volatile">
+                                    volatile
+                                  </Listbox.Option>
+                                </Listbox>
+                              </FormControl_Shadcn_>
+                              <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
+                            </FormItem_Shadcn_>
+                          )}
+                        />
+                      </div>
+                    </SidePanel.Content>
+                    <SidePanel.Separator />
+                    <SidePanel.Content>
+                      <FormFieldConfigParams readonly={isEditing} />
+                    </SidePanel.Content>
+                    <SidePanel.Separator />
+                    <SidePanel.Content>
+                      <div className="space-y-4">
+                        <FormField_Shadcn_
+                          control={form.control}
+                          name="security_definer"
+                          render={({ field }) => (
+                            <FormItem_Shadcn_>
+                              <FormControl_Shadcn_ className="col-span-8">
+                                <Radio.Group
+                                  type="cards"
+                                  label="Type of security"
+                                  layout="vertical"
+                                  onChange={(event) =>
+                                    field.onChange(event.target.value == 'SECURITY_DEFINER')
+                                  }
+                                  value={field.value ? 'SECURITY_DEFINER' : 'SECURITY_INVOKER'}
+                                >
+                                  <Radio
+                                    id="SECURITY_INVOKER"
+                                    label="SECURITY INVOKER"
+                                    value="SECURITY_INVOKER"
+                                    checked={!field.value}
+                                    description="Function is to be executed with the privileges of the user that calls it."
+                                  />
+                                  <Radio
+                                    id="SECURITY_DEFINER"
+                                    label="SECURITY DEFINER"
+                                    value="SECURITY_DEFINER"
+                                    checked={field.value}
+                                    description="Function is to be executed with the privileges of the user that created it."
+                                  />
+                                </Radio.Group>
+                              </FormControl_Shadcn_>
+                              <FormMessage_Shadcn_ />
+                            </FormItem_Shadcn_>
+                          )}
+                        />
+                      </div>
+                    </SidePanel.Content>
+                  </>
+                )}
               </>
             )}
           </form>
@@ -414,7 +420,7 @@ interface FormFieldConfigParamsProps {
 }
 
 const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove } = useFieldArray<z.infer<typeof FormSchema>>({
     name: 'args',
   })
 
@@ -438,7 +444,7 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
                 render={({ field }) => (
                   <FormItem_Shadcn_ className="flex-1">
                     <FormControl_Shadcn_>
-                      <Input_Shadcn_ {...field} />
+                      <Input_Shadcn_ {...field} readOnly disabled={readonly} />
                     </FormControl_Shadcn_>
                     <FormMessage_Shadcn_ />
                   </FormItem_Shadcn_>
@@ -450,7 +456,7 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
                   <FormItem_Shadcn_ className="flex-1">
                     <FormControl_Shadcn_>
                       {readonly ? (
-                        <Input_Shadcn_ {...field} disabled readOnly className="h-auto" />
+                        <Input_Shadcn_ value={field.value} disabled readOnly className="h-auto" />
                       ) : (
                         <Listbox
                           size="medium"
@@ -509,7 +515,7 @@ interface FormFieldConfigParamsProps {
 }
 
 const FormFieldConfigParams = ({ readonly }: FormFieldConfigParamsProps) => {
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove } = useFieldArray<z.infer<typeof FormSchema>>({
     name: 'config_params',
   })
 
@@ -537,7 +543,7 @@ const FormFieldConfigParams = ({ readonly }: FormFieldConfigParamsProps) => {
                 )}
               />
               <FormField_Shadcn_
-                name={`config_params.${index}.type`}
+                name={`config_params.${index}.value`}
                 render={({ field }) => (
                   <FormItem_Shadcn_ className="flex-1">
                     <FormControl_Shadcn_>
