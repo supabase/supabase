@@ -66,7 +66,9 @@ const AddRestrictionModal = ({
       return toast(`The address ${address} is already restricted`)
     }
 
-    const dbAllowedCidrs = hasOverachingRestriction ? [address] : [...restrictedIps, address]
+    const dbAllowedCidrs = hasOverachingRestriction
+      ? [normalizedAddress]
+      : [...restrictedIps, normalizedAddress]
     applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs })
   }
 
