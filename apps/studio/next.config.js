@@ -16,23 +16,29 @@ const CLOUDFLARE_CDN_URL = 'https://cdnjs.cloudflare.com'
 const HCAPTCHA_ASSET_URL = 'https://newassets.hcaptcha.com'
 const HCAPTCHA_JS_URL = 'https://js.hcaptcha.com'
 const CONFIGCAT_URL = 'https://cdn-global.configcat.com'
+const VERCEL_URL = 'https://vercel.com'
 const VERCEL_LIVE_URL = 'https://vercel.live'
+// used by vercel live preview
+const PUSHER_URL = 'https://*.pusher.com'
 
 const csp = [
   ...(process.env.VERCEL_ENV === 'preview' || process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
     ? [
-        `default-src 'self' ${API_URL} ${SUPABASE_URL} ${GOTRUE_URL} ${SUPABASE_PROJECTS_URL} ${SUPABASE_STAGING_PROJECTS_URL} ${CONFIGCAT_URL} ${VERCEL_LIVE_URL};`,
+        `default-src 'self' ${API_URL} ${SUPABASE_URL} ${GOTRUE_URL} ${SUPABASE_PROJECTS_URL} ${SUPABASE_STAGING_PROJECTS_URL} ${CONFIGCAT_URL} ${VERCEL_LIVE_URL} ${PUSHER_URL};`,
         `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${CLOUDFLARE_CDN_URL} ${HCAPTCHA_JS_URL} ${VERCEL_LIVE_URL};`,
         `frame-src 'self' ${HCAPTCHA_ASSET_URL} ${VERCEL_LIVE_URL};`,
+        `img-src 'self' blob: data: ${SUPABASE_COM_URL} ${VERCEL_URL};`,
+        `style-src 'self' 'unsafe-inline' ${CLOUDFLARE_CDN_URL} ${VERCEL_LIVE_URL};`,
+        `font-src 'self' ${CLOUDFLARE_CDN_URL} ${VERCEL_LIVE_URL};`,
       ]
     : [
         `default-src 'self' ${API_URL} ${SUPABASE_URL} ${GOTRUE_URL} ${SUPABASE_PROJECTS_URL} ${CONFIGCAT_URL};`,
         `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${CLOUDFLARE_CDN_URL} ${HCAPTCHA_JS_URL};`,
         `frame-src 'self' ${HCAPTCHA_ASSET_URL};`,
+        `img-src 'self' blob: data: ${SUPABASE_COM_URL};`,
+        `style-src 'self' 'unsafe-inline' ${CLOUDFLARE_CDN_URL};`,
+        `font-src 'self' ${CLOUDFLARE_CDN_URL};`,
       ]),
-  `style-src 'self' 'unsafe-inline' ${CLOUDFLARE_CDN_URL};`,
-  `img-src 'self' blob: data: ${SUPABASE_COM_URL};`,
-  `font-src 'self' ${CLOUDFLARE_CDN_URL};`,
   `object-src 'none';`,
   `base-uri 'self';`,
   `form-action 'self';`,
