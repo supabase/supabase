@@ -50,7 +50,7 @@ const TicketCustomizationForm = ({ supabase, user }: Props) => {
     <form className="w-full flex flex-col gap-2 mt-4" onChange={() => debouncedChangeHandler()}>
       <div className="flex items-center justify-between">
         {!IS_SAVED && !HAS_ERROR && (
-          <span className="opacity-0 animate-fade-in text-scale-1000 text-xs">
+          <span className="opacity-0 animate-fade-in text-foreground-lighter text-xs">
             Connected account
           </span>
         )}
@@ -63,7 +63,7 @@ const TicketCustomizationForm = ({ supabase, user }: Props) => {
         <Badge color="brand">@{user.username}</Badge>
       </div>
       <Input
-        className="[&_input]:border-scale-200"
+        className="[&_input]:border-background"
         size="small"
         type="text"
         required
@@ -73,7 +73,7 @@ const TicketCustomizationForm = ({ supabase, user }: Props) => {
         icon={<IconCheck strokeWidth={2} className="w-3 text-brand" />}
       />
       <Input
-        className="[&_input]:border-scale-200"
+        className="[&_input]:border-background"
         size="small"
         type="text"
         placeholder="role (optional)"
@@ -88,14 +88,14 @@ const TicketCustomizationForm = ({ supabase, user }: Props) => {
             strokeWidth={2}
             className={[
               'w-3',
-              IS_SAVING && 'text-scale-300',
-              !!formData.role ? 'text-brand' : 'text-scale-300',
+              IS_SAVING && 'text-background-surface-300',
+              !!formData.role ? 'text-brand' : 'text-background-surface-300',
             ].join(' ')}
           />
         }
       />
       <Input
-        className="[&_input]:border-scale-200"
+        className="[&_input]:border-background"
         size="small"
         type="text"
         placeholder="company (optional)"
@@ -110,14 +110,14 @@ const TicketCustomizationForm = ({ supabase, user }: Props) => {
             strokeWidth={2}
             className={[
               'w-3',
-              IS_SAVING && 'text-scale-300',
-              !!formData.company ? 'text-brand' : 'text-scale-300',
+              IS_SAVING && 'text-background-surface-300',
+              !!formData.company ? 'text-brand' : 'text-background-surface-300',
             ].join(' ')}
           />
         }
       />
       <Input
-        className="[&_input]:border-scale-200"
+        className="[&_input]:border-background"
         size="small"
         type="text"
         placeholder="location (optional)"
@@ -132,8 +132,8 @@ const TicketCustomizationForm = ({ supabase, user }: Props) => {
             strokeWidth={2}
             className={[
               'w-3 flex spin',
-              IS_SAVING && 'text-scale-300',
-              !!formData.location ? 'text-brand' : 'text-scale-300',
+              IS_SAVING && 'text-background-surface-300',
+              !!formData.location ? 'text-brand' : 'text-background-surface-300',
             ].join(' ')}
           />
         }

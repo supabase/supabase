@@ -8,5 +8,5 @@
     }
   },
   "include": ["."],
-  "exclude": ["dist", "build", "node_modules"]
+  "exclude": ["dist", "build", "node_modules", "**/*.stories.tsx"]
 }

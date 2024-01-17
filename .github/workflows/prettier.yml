@@ -17,8 +17,7 @@ jobs:
       - name: Check out repo
         uses: actions/checkout@v4
         with:
-          sparse-checkout: |
-            apps
+          sparse-checkout: apps
       - name: Setup node
         uses: actions/setup-node@v3
         with:
@@ -32,7 +31,6 @@ jobs:
       - name: Run prettier
         run: |-
           npx prettier -c 'apps/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'
-
 
   # i18n is not a node package, so we handle that one separately
   format-i18n:

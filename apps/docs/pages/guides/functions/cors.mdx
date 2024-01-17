@@ -24,12 +24,11 @@ export const corsHeaders = {
 You can then import and use the CORS headers within your functions:
 
 ```ts index.ts
-import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { corsHeaders } from '../_shared/cors.ts'
 
 console.log(`Function "browser-with-cors" up and running!`)
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   // This is needed if you're planning to invoke your function from a browser.
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })

@@ -62,8 +62,9 @@ Once the extension is enabled, you now have access to a `uuid` type.
 Creates a UUID value based on the combination of computer’s MAC address, current timestamp, and a random value.
 
 <Admonition type="note">
-  UUIDv1 leaks identifiable details, which might make it unsuitable for certain security-sensitive
-  applications.
+
+UUIDv1 leaks identifiable details, which might make it unsuitable for certain security-sensitive applications.
+
 </Admonition>
 
 ## `uuid_generate_v4()`
@@ -78,7 +79,7 @@ Creates UUID values based solely on random numbers. You can also use Postgres's 
 select uuid_generate_v4();
 ```
 
-### As a Primary Key
+### As a primary key
 
 Automatically create a unique, random ID in a table:
 
