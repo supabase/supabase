@@ -40,6 +40,11 @@ const TelemetryEvents: TelemetryEventType = {
     category: 'link',
     label: '',
   },
+  www_hp_subhero_products_vector: {
+    action: 'www_hp_subhero_products_vector',
+    category: 'link',
+    label: '',
+  },
   www_pricing_hero_plan_free: {
     action: 'www_pricing_hero_plan_free',
     category: 'link',
