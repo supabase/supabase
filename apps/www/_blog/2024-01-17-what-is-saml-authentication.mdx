@@ -1,6 +1,6 @@
 ---
 title: What is SAML? A practical guide to the authentication protocol
-description: ''
+description: Learn what is SAML authentication, how it differentiates from SSO, SAML with Postgres, and more.
 author: kangmingtay
 image: what-is-saml/what-is-saml-og.png
 thumb: what-is-saml/what-is-saml-thumb.png
@@ -22,7 +22,7 @@ Using an **identity provider** allows them to easily automate the on-boarding an
 
 These 3rd-party applications, also known as **service providers,** have Single Sign On (SSO) integrated to allow users to sign into the app. For an identity provider to authenticate with a service provider, an authentication protocol needs to be established first. SAML (Security Assertion Markup Language) is one such protocol that helps to facilitate SSO between an identity provider and a service provider. 
 
-It uses the XML format to store encrypted data related to the authenticated user, also known as SAML assertions. Before the identity provider and the service provider can establish a successful SAML authorization flow, both providers need to exchange their public keys, which come in the form of an X.509 certificate. This allows the identity provider to verify the incoming SAML request and allows the service provider to verify the SAML response returned by the identity provider.
+The SAML protocol uses the XML format to store encrypted data related to the authenticated user, also known as SAML assertions. Before the identity provider and the service provider can establish a successful SAML authorization flow, both providers need to exchange their public keys, which come in the form of an X.509 certificate. This allows the identity provider to verify the incoming SAML request and allows the service provider to verify the SAML response returned by the identity provider.
 
 ## SAML vs SSO
 
@@ -48,7 +48,7 @@ Supabase and Bob need to exchange some information to establish a SAML Connectio
 
 - An X.509 certificate that GSuite can use to identify SAML SSO requests as originating from Supabase.
 - An Entity ID that uniquely identifies Supabase’s authentication system.
-- An ACS URL, a location where GSuite will send SAML Responses for validation.
+- An ACS URL, a callback API endpoint where GSuite will send SAML Responses for validation.
 - A Site URL where employees in GSuite can pick Supabase and get instant access to it.
 - Supabase’s logo/icon so that the application shows up nicely in the list of 3rd-party apps approved by ACME.
 - A list of mandatory attributes to be included in the SAML Assertion, without which Supabase couldn’t work properly.
@@ -56,15 +56,14 @@ Supabase and Bob need to exchange some information to establish a SAML Connectio
 
 ### What does Bob need from Alice?
 
-- The list of employees that should be able to access Supabase - so that Bob can get Supabase to show up to the correct people.
+The list of employees that should be able to access Supabase - so that Bob can get Supabase to show up to the correct people.
 
 ### What Supabase needs from Bob?
 
 - An X.509 certificate that Supabase can use to identify SAML Responses as originating from ACME’s GSuite.
 - An Entity ID that uniquely identifies ACME’s GSuite setup.
-    - Essentially their GSuite account number.
-- ACME’s email domains: acme.com, acme.org.
-- A Redirect URL, where Supabase can redirect users attempting to sign in with `alice@acme.com` or `alice@acme.org`.
+- ACME’s allowed email domains: acme.com, acme.org.
+- A Redirect URL, where Supabase can redirect users attempting to sign in with `alice@acme.com` or `alice@acme.org` to log into GSuite.
 - A Single Log-Out URL where Supabase can send log-out requests by ACME’s employees.
 - A list of all attributes that ACME’s GSuite system will send to Supabase; specifically the attributes about the employee’s email, name, and groups (are they a developer or not).
 
@@ -77,13 +76,11 @@ Both parties need to exchange almost the same information:
 - URLs so that they can talk to each other.
 - Information about the structure of data passing between them (attribute mappings).
 
-## **SAML Metadata XML**
+## SAML Metadata XML
 
-Because much of this information is tricky to communicate and manually input, there exists the SAML Metadata XML document which exposes *most* but not all of the information.
+Since much of this information is tricky to communicate and requires manual input, there exists the SAML Metadata XML document which exposes *most* but not all of the information. Both systems, the Identity Provider (GSuite) and the Service Provider (Supabase) each have their own SAML Metadata that needs to be exchanged.
 
-Often this document is available publicly at a URL. Note though, that sometimes Identity Providers (typically Microsoft Active Directory) may not be accessible over the internet (as they’re behind a VPN) so a URL can’t be used and a file needs to be exchanged in that case. Very rarely Service Providers may be isolated in their network, so a file exchange is necessary here too.
-
-Both systems, the Identity Provider (GSuite) and the Service Provider (Supabase) have their own SAML Metadata.
+Often this document is available publicly at a URL. Note though, that sometimes Identity Providers (typically Microsoft Active Directory) may not be accessible over the internet (as they’re behind a VPN) so a URL can’t be used and a file needs to be exchanged in that case. Service Providers may also be isolated in their network, so a file exchange is necessary here too, albeit uncommon.
 
 Inside this XML document, you can find most of the information required by Bob and Supabase:
 
@@ -107,17 +104,20 @@ This is how the SAML SP-initiated authorization flow looks like when Alice visit
   alt="How the SAML SP-initiated authorization flow looks like when Alice visits Supabase and enters her email to sign in with SAML SSO"
 />
 
+In the IdP-initiated flow, the employee signs into GSuite first and selects the application to sign into from a list of allowed 3rd-party applications instead of being redirected from the service provider.
+
 ## SAML Authentication with Supabase
 
-At Supabase, you can easily enable SAML for your project and use the `signInWithSSO` method to start the authentication flow. Both IdP-initiated and SP-initiated flows are supported. When a user signs in with SAML SSO, the JWT issued contains a unique ID to identify the identity provider. If you are already using Postgres on Supabase, this also ties in nicely with your existing [row-level security (RLS) policies](https://supabase.com/docs/guides/auth/row-level-security), since you can use that ID to restrict access to the data.
+At Supabase, you can easily enable SAML for your project and use the signInWithSSO method to start the authentication flow. Both IdP-initiated and SP-initiated flows are supported. When a user signs in with SAML SSO, the JWT issued contains a unique ID to identify the identity provider. If you are already using Postgres on Supabase, this also ties in nicely with your existing row-level security (RLS) policies, since you can use that ID to restrict access to the data.
 
 ### SAML with Row Level Security
 
 Combining SAML with Row-Level Security (RLS) allows for fine-grained control over data access, ensuring that users only interact with the specific data rows aligned with their roles or attributes. This improves security and helps meet regulatory requirements while allowing flexible adjustments to access permissions over time.
 
-Since Supabase is just Postgres™, it enables us to easily leverage the power of RLS policies to restrict access to the data. You can access the user’s JWT claims by invoking the `auth.jwt()` function in your RLS policy. In the scenario provided above, this allows Supabase to restrict developers from ACME Inc. from inviting someone else outside of the company to join their Supabase organization.
+Since Supabase is “just Postgres”™, it enables us to easily leverage the power of RLS policies to restrict access to the data. You can access the user’s JWT claims by invoking the `auth.jwt()` function in your RLS policy. In the scenario provided above, this allows Supabase to restrict developers from ACME Inc. from inviting someone else outside of the company to join their Supabase organization.
 
 For example, assuming we have a table to store all invited users in a Supabase organization:
+
 
 ```sql
 create table invited_users (
