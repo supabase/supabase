@@ -9,7 +9,8 @@ const path = require('path')
 const API_URL = new URL(process.env.NEXT_PUBLIC_API_URL).origin
 const SUPABASE_URL = new URL(process.env.SUPABASE_URL).origin
 const GOTRUE_URL = new URL(process.env.NEXT_PUBLIC_GOTRUE_URL).origin
-const SUPABASE_MISC_PROJECT_URL = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).origin
+const SUPABASE_PROJECTS_URL = 'https://*.supabase.co'
+const SUPABASE_STAGING_PROJECTS_URL = 'https://*.supabase.red'
 const SUPABASE_COM_URL = 'https://supabase.com'
 const CLOUDFLARE_CDN_URL = 'https://cdnjs.cloudflare.com'
 const HCAPTCHA_ASSET_URL = 'https://newassets.hcaptcha.com'
@@ -18,14 +19,14 @@ const CONFIGCAT_URL = 'https://cdn-global.configcat.com'
 const VERCEL_LIVE_URL = 'https://vercel.live'
 
 const csp = [
-  ...(process.env.VERCEL_ENV === 'preview'
+  ...(process.env.VERCEL_ENV === 'preview' || process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
     ? [
-        `default-src 'self' ${API_URL} ${SUPABASE_URL} ${GOTRUE_URL} ${SUPABASE_MISC_PROJECT_URL} ${CONFIGCAT_URL} ${VERCEL_LIVE_URL};`,
+        `default-src 'self' ${API_URL} ${SUPABASE_URL} ${GOTRUE_URL} ${SUPABASE_PROJECTS_URL} ${SUPABASE_STAGING_PROJECTS_URL} ${CONFIGCAT_URL} ${VERCEL_LIVE_URL};`,
         `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${CLOUDFLARE_CDN_URL} ${HCAPTCHA_JS_URL} ${VERCEL_LIVE_URL};`,
         `frame-src 'self' ${HCAPTCHA_ASSET_URL} ${VERCEL_LIVE_URL};`,
       ]
     : [
-        `default-src 'self' ${API_URL} ${SUPABASE_URL} ${GOTRUE_URL} ${SUPABASE_MISC_PROJECT_URL} ${CONFIGCAT_URL};`,
+        `default-src 'self' ${API_URL} ${SUPABASE_URL} ${GOTRUE_URL} ${SUPABASE_PROJECTS_URL} ${CONFIGCAT_URL};`,
         `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${CLOUDFLARE_CDN_URL} ${HCAPTCHA_JS_URL};`,
         `frame-src 'self' ${HCAPTCHA_ASSET_URL};`,
       ]),
