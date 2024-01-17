@@ -193,8 +193,6 @@ export {
   TabsTrigger as TabsTrigger_Shadcn_,
 } from './src/components/shadcn/ui/tabs/tabs'
 
-export { NavigationTabs, NavigationTabsItem } from './src/components/shadcn/ui/tabs/navigation-tabs'
-
 export { ScrollArea, ScrollBar } from './src/components/shadcn/ui/scroll-area'
 
 export { Separator } from './src/components/shadcn/ui/separator'
