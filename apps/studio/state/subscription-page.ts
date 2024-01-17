@@ -7,6 +7,7 @@ export type SUBSCRIPTION_PANEL_KEYS =
   | 'computeInstance'
   | 'pitr'
   | 'customDomain'
+  | 'ipv4'
 
 export const subscriptionPageState = proxy({
   panelKey: undefined as SUBSCRIPTION_PANEL_KEYS,
