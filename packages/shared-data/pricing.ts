@@ -19,10 +19,10 @@ type PricingFeature = {
   title: string
   tooltips?: { main?: string; pro?: string; team?: string; enterprise?: string }
   plans: {
-    free: boolean | string
-    pro: boolean | string
-    team: boolean | string
-    enterprise: boolean | string
+    free: boolean | string | string[]
+    pro: boolean | string | string[]
+    team: boolean | string | string[]
+    enterprise: boolean | string | string[]
   }
   usage_based: boolean
 }
@@ -62,8 +62,8 @@ export const pricing: Pricing = {
         },
         plans: {
           free: '500 MB included',
-          pro: '8 GB included, then $0.125 per GB',
-          team: '8 GB included, then $0.125 per GB',
+          pro: ['8 GB included', 'then $0.125 per GB'],
+          team: ['8 GB included', 'then $0.125 per GB'],
           enterprise: 'Custom',
         },
         usage_based: true,
@@ -116,8 +116,8 @@ export const pricing: Pricing = {
         },
         plans: {
           free: '5GB included',
-          pro: '250 GB included, then $0.09 per GB',
-          team: '250 GB included, then $0.09 per GB',
+          pro: ['250 GB included', 'then $0.09 per GB'],
+          team: ['250 GB included', 'then $0.09 per GB'],
           enterprise: 'Custom',
         },
         usage_based: true,
@@ -146,8 +146,8 @@ export const pricing: Pricing = {
         },
         plans: {
           free: '50,000 included',
-          pro: '100,000 included, then $0.00325 per MAU',
-          team: '100,000 included, then $0.00325 per MAU',
+          pro: ['100,000 included', 'then $0.00325 per MAU'],
+          team: ['100,000 included', 'then $0.00325 per MAU'],
           enterprise: 'Custom',
         },
         usage_based: true,
@@ -196,8 +196,8 @@ export const pricing: Pricing = {
         title: 'Single Sign-On (SAML 2.0)',
         plans: {
           free: false,
-          pro: '50 included, then $0.015 per MAU',
-          team: '50 included, then $0.015 per MAU',
+          pro: ['50 included', 'then $0.015 per MAU'],
+          team: ['50 included', 'then $0.015 per MAU'],
           enterprise: 'Contact Us',
         },
         usage_based: false,
@@ -266,8 +266,8 @@ export const pricing: Pricing = {
         },
         plans: {
           free: '1 GB included',
-          pro: '100 GB included, then $0.021 per GB',
-          team: '100 GB included, then $0.021 per GB',
+          pro: ['100 GB included', 'then $0.021 per GB'],
+          team: ['100 GB included', 'then $0.021 per GB'],
           enterprise: 'Custom',
         },
         usage_based: true,
@@ -300,8 +300,8 @@ export const pricing: Pricing = {
         },
         plans: {
           free: false,
-          pro: '100 origin images, then $5 per 1000 origin images',
-          team: '100 origin images, then $5 per 1000 origin images',
+          pro: ['100 origin images', 'then $5 per 1000 origin images'],
+          team: ['100 origin images', 'then $5 per 1000 origin images'],
           enterprise: 'Custom',
         },
         usage_based: true,
@@ -329,8 +329,8 @@ export const pricing: Pricing = {
         },
         plans: {
           free: '500K/month included',
-          pro: '2 Million included, then $2 per 1 Million',
-          team: '2 Million included, then $2 per 1 Million',
+          pro: ['2 Million included', 'then $2 per 1 Million'],
+          team: ['2 Million included', 'then $2 per 1 Million'],
           enterprise: 'Custom',
         },
         usage_based: true,
@@ -352,8 +352,8 @@ export const pricing: Pricing = {
         },
         plans: {
           free: '10 included',
-          pro: '100 included, then $10 per additional 100',
-          team: '100 included, then $10 per additional 100',
+          pro: ['100 included', 'then $10 per additional 100'],
+          team: ['100 included', 'then $10 per additional 100'],
           enterprise: 'Custom',
         },
         usage_based: true,
@@ -381,8 +381,8 @@ export const pricing: Pricing = {
         },
         plans: {
           free: '200 included',
-          pro: '500 included, then $10 per 1000',
-          team: '500 included, then $10 per 1000',
+          pro: ['500 included', 'then $10 per 1000'],
+          team: ['500 included', 'then $10 per 1000'],
           enterprise: 'Custom concurrent connections and volume discount',
         },
         usage_based: true,
@@ -394,8 +394,8 @@ export const pricing: Pricing = {
         },
         plans: {
           free: '2 Million included',
-          pro: '5 Million included, then $2.50 per Million',
-          team: '5 Million included, then $2.50 per Million',
+          pro: ['5 Million included', 'then $2.50 per Million'],
+          team: ['5 Million included', 'then $2.50 per Million'],
           enterprise: 'Volume discounts on messages',
         },
         usage_based: true,

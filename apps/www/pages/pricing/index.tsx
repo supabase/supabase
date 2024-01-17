@@ -123,7 +123,7 @@ export default function IndexPage() {
                 Predictable pricing,
                 <br className="block lg:hidden" /> designed to scale
               </h1>
-              <p className="p text-lg">
+              <p className="p text-lg leading-5">
                 Start building for free, collaborate with a team, then scale to millions of users.
               </p>
             </div>
