@@ -299,10 +299,9 @@ export default function IndexPage() {
                             <p className="text-[13px] whitespace-pre-wrap">{plan.footer}</p>
                           )}
                         </div>
-                        <a href={plan.href}>
-                          <Button
-                            block
-                            size="small"
+                        <Button block size="small" asChild>
+                          <Link
+                            href={plan.href}
                             onClick={() =>
                               sendTelemetryEvent(
                                 gaEvents[`www_pricing_hero_plan_${plan.name.toLowerCase()}`]
@@ -310,8 +309,8 @@ export default function IndexPage() {
                             }
                           >
                             {plan.cta}
-                          </Button>
-                        </a>
+                          </Link>
+                        </Button>
                       </div>
                     </div>
                   </div>
