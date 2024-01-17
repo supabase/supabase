@@ -35,19 +35,9 @@ const BranchingWaitlistPopover = ({ isNewNav = false }: BranchingWaitlistPopover
           <p>Database Branching</p>
         </div>
         <p className="text-xs text-foreground-light">
-          Database Branching is currently in early access and not available to projects yet. If
-          you're interested, you may reach out to us via support.
+          Database Branching is currently in early access and not available publicly yet.
         </p>
         <div className="flex items-center gap-2">
-          <Button asChild>
-            <Link
-              href={`/support/new?category=sales&slug=${org?.slug}&subject=Enquiry%20on%20database%20branching`}
-              rel="noreferrer"
-              target="_blank"
-            >
-              Contact support
-            </Link>
-          </Button>
           <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />} asChild>
             <a
               target="_blank"
