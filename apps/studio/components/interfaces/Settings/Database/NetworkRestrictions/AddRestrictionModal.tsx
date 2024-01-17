@@ -29,7 +29,12 @@ const AddRestrictionModal = ({
   const formId = 'add-restriction-form'
   const { ref } = useParams()
   const { mutate: applyNetworkRestrictions, isLoading: isApplying } =
-    useNetworkRestrictionsApplyMutation({ onSuccess: () => onClose() })
+    useNetworkRestrictionsApplyMutation({
+      onSuccess: () => {
+        toast.success('Successfully added restriction')
+        onClose()
+      },
+    })
 
   const validate = (values: any) => {
     const errors: any = {}
@@ -110,10 +115,10 @@ const AddRestrictionModal = ({
           const getClientIpAddress = async () => {
             setIsFetchingAddress(true)
             try {
-              const res = await fetch('http://www.geoplugin.net/json.gp', { method: 'GET' })
-              const { geoplugin_request } = await res.json()
-              if (geoplugin_request) {
-                const updatedValues = { ...values, ipAddress: geoplugin_request, cidrBlockSize: 32 }
+              const res = await fetch('https://api.ipify.org?format=json', { method: 'GET' })
+              const { ip } = await res.json()
+              if (ip) {
+                const updatedValues = { ...values, ipAddress: ip, cidrBlockSize: 32 }
                 resetForm({ initialValues: updatedValues, values: updatedValues })
               } else {
                 toast.error('Failed to retrieve client IP address, please enter address manually')
