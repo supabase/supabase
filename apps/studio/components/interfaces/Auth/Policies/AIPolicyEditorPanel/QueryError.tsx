@@ -15,6 +15,9 @@ import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscri
 import { QueryResponseError } from 'data/sql/execute-sql-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks'
+import Telemetry from 'lib/telemetry'
+import { useTelemetryProps } from 'common'
+import { useRouter } from 'next/router'
 
 const QueryError = ({
   error,
@@ -34,6 +37,8 @@ const QueryError = ({
   const organization = useSelectedOrganization()
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
+  const router = useRouter()
+  const telemetryProps = useTelemetryProps()
 
   return (
     <div className="flex flex-col gap-y-3 px-5">
@@ -77,7 +82,18 @@ const QueryError = ({
                     'group',
                     styles['ai-icon__container--allow-hover-effect h-[21px] !py-0']
                   )}
-                  onClick={() => onSelectDebug()}
+                  onClick={() => {
+                    onSelectDebug()
+                    Telemetry.sendEvent(
+                      {
+                        category: 'rls_editor',
+                        action: 'ai_debugger_requested',
+                        label: 'rls-ai-assistant',
+                      },
+                      telemetryProps,
+                      router
+                    )
+                  }}
                 >
                   Fix with Assistant
                 </Button>

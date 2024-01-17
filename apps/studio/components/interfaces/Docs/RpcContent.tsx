@@ -32,7 +32,6 @@ const RpcContent = ({
   const rpcParams = Object.entries(rpcParamsObject)
     .map(([k, v]: any) => ({ name: k, ...v }))
     .filter((x) => !!x.name)
-  const paramList = rpcParams.map((x) => x.type).join(', ')
 
   return (
     <>

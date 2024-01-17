@@ -18,6 +18,7 @@ import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
+import LWXSummary from '../../components/LaunchWeek/X/LWXSummary'
 
 type Post = ReturnType<typeof getSortedPosts>[number]
 
@@ -32,7 +33,7 @@ type BlogData = {
   thumb?: string
   youtubeHero?: string
   author_url?: string
-  launchweek?: number
+  launchweek?: number | string
   meta_title?: string
   meta_description?: string
   video?: string
@@ -122,6 +123,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
   const authorArray = props.blog.author.split(',')
   useActiveAnchors('h2, h3, h4', '.prose-toc a')
   const isLaunchWeek7 = props.blog.launchweek === 7
+  const isLaunchWeekX = props.blog.launchweek?.toString().toLocaleLowerCase() === 'x'
 
   const author = authorArray
     .map((authorId) => {
@@ -331,6 +333,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                     </div>
                   </article>
                   {isLaunchWeek7 && <BlogLinks />}
+                  {isLaunchWeekX && <LWXSummary />}
                   <div className="block lg:hidden py-8">
                     <div className="text-foreground-lighter text-sm">Share this article</div>
                     <ShareArticleActions title={props.blog.title} slug={props.blog.slug} />

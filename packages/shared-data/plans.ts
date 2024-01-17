@@ -84,6 +84,7 @@ export const plans: PricingInformation[] = [
     features: [
       'Additional Organization member roles',
       'Daily backups stored for 14 days',
+      `SSO/SAML`,
       'Standardised Security Questionnaire',
       'SOC2',
       'HIPAA available as paid add-on',
@@ -102,7 +103,6 @@ export const plans: PricingInformation[] = [
     description: 'For large-scale applications managing serious workloads.',
     features: [
       `Designated Support manager & SLAs`,
-      `SSO/SAML`,
       `On-premise support`,
       `24×7×365 premium enterprise support`,
       'Custom Security Questionnaires',

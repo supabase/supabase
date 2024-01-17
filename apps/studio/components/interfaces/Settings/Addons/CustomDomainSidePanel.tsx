@@ -22,6 +22,7 @@ import {
   SidePanel,
 } from 'ui'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { AddonVariantId } from 'data/subscriptions/types'
 
 const CustomDomainSidePanel = () => {
   const { ui } = useStore()
@@ -39,7 +40,10 @@ const CustomDomainSidePanel = () => {
   const snap = useSubscriptionPageStateSnapshot()
   const visible = snap.panelKey === 'customDomain'
   const onClose = () => {
-    router.push(router.asPath.split('?')[0], undefined, { shallow: true })
+    const { panel, ...queryWithoutPanel } = router.query
+    router.push({ pathname: router.pathname, query: queryWithoutPanel }, undefined, {
+      shallow: true,
+    })
     snap.setPanelKey(undefined)
   }
 
@@ -118,7 +122,7 @@ const CustomDomainSidePanel = () => {
     if (selectedOption === 'cd_none' && subscriptionCDOption !== undefined) {
       removeAddon({ projectRef, variant: subscriptionCDOption.variant.identifier })
     } else {
-      updateAddon({ projectRef, type: 'custom_domain', variant: selectedOption })
+      updateAddon({ projectRef, type: 'custom_domain', variant: selectedOption as AddonVariantId })
     }
   }
 
@@ -240,19 +244,32 @@ const CustomDomainSidePanel = () => {
             <>
               {selectedOption === 'cd_none' ||
               (selectedCustomDomain?.price ?? 0) < (subscriptionCDOption?.variant.price ?? 0) ? (
-                <p className="text-sm text-foreground-light">
-                  Upon clicking confirm, the amount of that's unused during the current billing
-                  cycle will be returned as credits that can be used for subsequent billing cycles
-                </p>
+                subscription?.billing_via_partner === false && (
+                  <p className="text-sm text-foreground-light">
+                    Upon clicking confirm, the add-on is removed immediately and any unused time in
+                    the current billing cycle is added as prorated credits to your organization and
+                    used in subsequent billing cycles.
+                  </p>
+                )
               ) : (
                 <p className="text-sm text-foreground-light">
                   Upon clicking confirm, the amount of{' '}
                   <span className="text-foreground">
                     ${selectedCustomDomain?.price.toLocaleString()}
                   </span>{' '}
-                  will be added to your monthly invoice. You're immediately charged for the
-                  remaining days of your billing cycle. The addon is prepaid per month and in case
-                  of a downgrade, you get credits for the remaining time.
+                  will be added to your monthly invoice.{' '}
+                  {subscription?.billing_via_partner ? (
+                    <>
+                      For the current billing cycle you'll be charged a prorated amount at the end
+                      of the cycle.{' '}
+                    </>
+                  ) : (
+                    <>
+                      The addon is prepaid per month and in case of a downgrade, you get credits for
+                      the remaining time. For the current billing cycle you're immediately charged a
+                      prorated amount for the remaining days.
+                    </>
+                  )}
                 </p>
               )}
 

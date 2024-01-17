@@ -52,9 +52,8 @@ const ProductDropdown = () => {
                     <Image
                       src={`${basePath}/${customer.imgUrl}`}
                       alt={customer.title}
-                      layout="fill"
-                      objectFit="contain"
-                      className="!p-4 brightness-70 contrast-[.35] filter"
+                      fill
+                      className="!p-4 object-contain brightness-70 contrast-[.35] filter"
                     />
                   </div>
                   <div className="flex flex-col">

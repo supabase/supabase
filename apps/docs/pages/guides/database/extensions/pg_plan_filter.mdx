@@ -29,7 +29,7 @@ alter database some_db set session_preload_libraries = 'plan_filter';
 `plan_filter.statement_cost_limit`: restricts the maximum total cost for executed statements
 `plan_filter.limit_select_only`: restricts to `select` statements
 
-Note that `limit_select_only = true` is not the same as read-only because `select` statements may modfiy data e.g. through a function call.
+Note that `limit_select_only = true` is not the same as read-only because `select` statements may modify data e.g. through a function call.
 
 ## Example
 

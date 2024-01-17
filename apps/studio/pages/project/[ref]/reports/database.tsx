@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 
-import { TIME_PERIODS_INFRA } from 'lib/constants'
+import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
 import { formatBytes } from 'lib/helpers'
 import { NextPageWithLayout } from 'types'
 import {

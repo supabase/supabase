@@ -51,7 +51,7 @@ const AuthVisual = () => {
             <a href="mailto:teverett@outlook.com">
               <rect
                 fill="black"
-                fill-opacity="0"
+                fillOpacity="0"
                 x="0.0546875"
                 y="8.08293"
                 width="167.896"
@@ -97,7 +97,7 @@ const AuthVisual = () => {
             <a href="mailto:teverett@outlook.com">
               <rect
                 fill="black"
-                fill-opacity="0"
+                fillOpacity="0"
                 x="0.0546875"
                 y="8.08293"
                 width="167.896"
@@ -166,9 +166,9 @@ const AuthVisual = () => {
             width="202.244"
             height="49.4399"
             filterUnits="userSpaceOnUse"
-            color-interpolation-filters="sRGB"
+            colorInterpolationFilters="sRGB"
           >
-            <feFlood flood-opacity="0" result="BackgroundImageFix" />
+            <feFlood floodOpacity="0" result="BackgroundImageFix" />
             <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
             <feGaussianBlur stdDeviation="9" result="effect1_foregroundBlur_493_53350" />
           </filter>
@@ -179,9 +179,9 @@ const AuthVisual = () => {
             width="202.594"
             height="47.9282"
             filterUnits="userSpaceOnUse"
-            color-interpolation-filters="sRGB"
+            colorInterpolationFilters="sRGB"
           >
-            <feFlood flood-opacity="0" result="BackgroundImageFix" />
+            <feFlood floodOpacity="0" result="BackgroundImageFix" />
             <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
             <feGaussianBlur stdDeviation="9" result="effect1_foregroundBlur_493_53350" />
           </filter>

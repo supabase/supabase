@@ -1,6 +1,5 @@
 import { UseQueryOptions } from '@tanstack/react-query'
-import { useCallback } from 'react'
-import { ExecuteSqlData, useExecuteSqlPrefetch, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { ExecuteSqlData, useExecuteSqlQuery } from '../sql/execute-sql-query'
 import { CREATE_PG_GET_TABLEDEF_SQL } from './database-query-constants'
 
 export const getEntityDefinitionsQuery = (limit = 100) => {
@@ -104,20 +103,5 @@ export const useEntityDefinitionsQuery = <
       },
       ...options,
     }
-  )
-}
-
-export const useEntityDefinitionsQueryPrefetch = () => {
-  const prefetch = useExecuteSqlPrefetch()
-
-  return useCallback(
-    ({ projectRef, connectionString }: EntityDefinitionsVariables) =>
-      prefetch({
-        projectRef,
-        connectionString,
-        sql: getEntityDefinitionsQuery(),
-        queryKey: ['entity-definitions'],
-      }),
-    [prefetch]
   )
 }

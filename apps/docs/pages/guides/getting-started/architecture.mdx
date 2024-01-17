@@ -23,21 +23,21 @@ Each Supabase project consists of several tools:
 
 ![Supabase Architecture](/docs/img/supabase-architecture.png)
 
-### PostgreSQL (Database)
+### PostgreSQL (database)
 
 PostgreSQL is the core of Supabase. We do not abstract the PostgreSQL database — you can access it and use it with full privileges. We simply provide tools which makes PostgreSQL as easy to use as Firebase.
 
 - Official Docs: [postgresql.org/docs](https://www.postgresql.org/docs/current/index.html)
 - Source code: [github.com/postgres/postgres](https://github.com/postgres/postgres) (mirror)
-- License: [PostgreSQL Licence](https://www.postgresql.org/about/licence/)
+- License: [PostgreSQL License](https://www.postgresql.org/about/licence/)
 - Language: C
 
-### Studio (Dashboard)
+### Studio (dashboard)
 
 An open source Dashboard for managing your database and services.
 
 - Official Docs: [Supabase docs](/docs)
-- Source code: [github.com/supabase/supabase](https://github.com/supabase/supabase/tree/master/studio)
+- Source code: [github.com/supabase/supabase](https://github.com/supabase/supabase/tree/master/apps/studio)
 - License: [Apache 2](https://github.com/supabase/supabase/blob/master/LICENSE)
 - Language: TypeScript
 
@@ -87,7 +87,7 @@ A modern runtime for JavaScript and TypeScript.
 - License: [MIT](https://github.com/denoland/deno/blob/main/LICENSE.md)
 - Language: TypeScript / Rust
 
-### postgres-meta (Database management)
+### `postgres-meta` (database management)
 
 A RESTful API for managing your Postgres. Fetch tables, add roles, and run queries.
 
@@ -96,16 +96,16 @@ A RESTful API for managing your Postgres. Fetch tables, add roles, and run queri
 - License: [Apache 2.0](https://github.com/supabase/postgres-meta/blob/master/LICENSE)
 - Language: NodeJS / TypeScript
 
-### PgBouncer
+### Supavisor
 
-A lightweight connection pooler for PostgreSQL. This is useful for connecting to Postgres when using Serverless functions.
+A cloud-native, multi-tenant Postgres connection pooler.
 
-- Official Docs: [pgbouncer.org](http://www.pgbouncer.org/)
-- Source code: [pgbouncer/pgbouncer](https://github.com/pgbouncer/pgbouncer)
-- License: [ISC](https://github.com/pgbouncer/pgbouncer/blob/master/COPYRIGHT)
-- Language: C
+- Official Docs: [Supavisor Github Pages](https://supabase.github.io/supavisor/)
+- Source code: [supabase/supavisor](https://github.com/supabase/supavisor)
+- License: [Apache 2.0](https://github.com/supabase/supavisor/blob/main/LICENSE)
+- Language: Elixir
 
-### Kong (API Gateway)
+### Kong (API gateway)
 
 A cloud-native API gateway, built on top of Nginx.
 
@@ -114,7 +114,7 @@ A cloud-native API gateway, built on top of Nginx.
 - License: [Apache 2.0](https://github.com/Kong/kong/blob/master/LICENSE)
 - Language: Lua
 
-## Product Principles
+## Product principles
 
 It is our goal to provide an architecture that any large-scale company would design for themselves,
 and then provide tooling around that architecture that is easy-to-use for indie-developers and small teams.

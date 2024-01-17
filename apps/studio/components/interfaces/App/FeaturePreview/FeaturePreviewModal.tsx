@@ -10,6 +10,7 @@ import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import Telemetry from 'lib/telemetry'
 import { useAppStateSnapshot } from 'state/app-state'
 import APISidePanelPreview from './APISidePanelPreview'
+import CLSPreview from './CLSPreview'
 import { useFeaturePreviewContext } from './FeaturePreviewContext'
 import RLSAIAssistantPreview from './RLSAIAssistantPreview'
 
@@ -34,6 +35,12 @@ const FeaturePreviewModal = () => {
           },
         ]
       : []),
+    {
+      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,
+      name: 'Column-level privileges',
+      content: <CLSPreview />,
+      discussionsUrl: 'https://github.com/orgs/supabase/discussions/20295',
+    },
   ]
 
   const router = useRouter()

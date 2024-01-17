@@ -201,7 +201,7 @@ function RealtimePage() {
                       objectFit="contain"
                     />
                     <div className="prose">
-                      <h4 className="">{example.title}</h4>
+                      <h4>{example.title}</h4>
                       <p className="text-sm">{example.description}</p>
                     </div>
                   </div>

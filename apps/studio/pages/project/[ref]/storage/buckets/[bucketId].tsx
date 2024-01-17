@@ -29,7 +29,6 @@ const PageLayout: NextPageWithLayout = () => {
             <p className="text-sm text-foreground-light">Bucket {bucketId} cannot be found</p>
           </div>
         ) : (
-          // @ts-ignore
           <StorageExplorer bucket={bucket} />
         )
       ) : (

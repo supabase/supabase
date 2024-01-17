@@ -28,6 +28,7 @@ import {
   Modal,
 } from 'ui'
 
+import DownloadSnippetModal from 'components/interfaces/SQLEditor/DownloadSnippetModal'
 import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
 import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
@@ -38,7 +39,6 @@ import { IS_PLATFORM } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import DownloadSnippetModal from 'components/interfaces/SQLEditor/DownloadSnippetModal'
 
 export interface QueryItemProps {
   tabInfo: SqlSnippet
@@ -97,6 +97,14 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
 
   const snap = useSqlEditorStateSnapshot()
   const project = useSelectedProject()
+
+  const { id: snippetID } = tabInfo || {}
+  const snippet =
+    snippetID !== undefined && snap.snippets && snap.snippets[snippetID] !== undefined
+      ? snap.snippets[snippetID]
+      : null
+
+  const isSnippetOwner = profile?.id === snippet?.snippet.owner_id
 
   const { mutate: deleteContent, isLoading: isDeleting } = useContentDeleteMutation({
     onSuccess(data) {
@@ -218,10 +226,13 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
             </span>
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom" align="end">
-            <DropdownMenuItem onClick={onClickRename} className="space-x-2">
-              <IconEdit2 size="tiny" />
-              <p>Rename query</p>
-            </DropdownMenuItem>
+            {isSnippetOwner && (
+              <DropdownMenuItem onClick={onClickRename} className="space-x-2">
+                <IconEdit2 size="tiny" />
+                <p>Rename query</p>
+              </DropdownMenuItem>
+            )}
+
             {visibility === 'user' && canCreateSQLSnippet && (
               <DropdownMenuItem onClick={onClickShare} className="space-x-2">
                 <IconShare size="tiny" />
@@ -244,13 +255,15 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
                 <p>Download as migration file</p>
               </DropdownMenuItem>
             )}
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={onClickDelete} className="space-x-2">
-                <IconTrash size="tiny" />
-                <p>Delete query</p>
-              </DropdownMenuItem>
-            </>
+            {isSnippetOwner && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={onClickDelete} className="space-x-2">
+                  <IconTrash size="tiny" />
+                  <p>Delete query</p>
+                </DropdownMenuItem>
+              </>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       ) : (
@@ -312,17 +325,17 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
                     This SQL query will become public to all team members
                   </AlertTitle_Shadcn_>
                   <AlertDescription_Shadcn_>
-                    Anyone with access to the project can edit or delete this query.
+                    Anyone with access to the project can view it
                   </AlertDescription_Shadcn_>
                 </Alert_Shadcn_>
                 <ul className="mt-4 space-y-5">
                   <li className="flex gap-3">
                     <IconEye />
-                    <span>Anyone with access to this project will be able to view it.</span>
+                    <span>Project members will have read-only access to this query.</span>
                   </li>
                   <li className="flex gap-3">
                     <IconUnlock />
-                    <span>Anyone will be able to modify or delete it.</span>
+                    <span>Anyone will be able to duplicate it to their personal snippets.</span>
                   </li>
                 </ul>
               </div>

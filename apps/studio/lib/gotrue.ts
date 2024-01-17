@@ -1,8 +1,6 @@
 import { Session, User } from '@supabase/gotrue-js'
 import { gotrueClient } from 'common'
 
-export { STORAGE_KEY } from 'common'
-
 export const auth = gotrueClient
 
 let currentSession: Session | null = null

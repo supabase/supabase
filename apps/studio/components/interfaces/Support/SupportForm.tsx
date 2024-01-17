@@ -30,11 +30,11 @@ import { useFlag, useStore } from 'hooks'
 import useLatest from 'hooks/misc/useLatest'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import { Project } from 'types'
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
 import { CATEGORY_OPTIONS, SERVICE_OPTIONS, SEVERITY_OPTIONS } from './Support.constants'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { Project } from 'data/projects/project-detail-query'
 
 const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
@@ -46,7 +46,7 @@ export interface SupportFormProps {
 const SupportForm = ({ setSentCategory }: SupportFormProps) => {
   const { ui } = useStore()
   const { isReady } = useRouter()
-  const { ref, subject, category, message } = useParams()
+  const { ref, slug, subject, category, message } = useParams()
 
   const uploadButtonRef = useRef()
   const enableFreeSupport = useFlag('enableFreeSupport')
@@ -90,6 +90,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
 
   const projects = [...(allProjects ?? []), ...projectDefaults]
   const selectedProjectFromUrl = projects.find((project) => project.ref === ref)
+  const selectedOrganizationFromUrl = organizations?.find((org) => org.slug === slug)
   const selectedCategoryFromUrl = CATEGORY_OPTIONS.find((option) => {
     if (option.value.toLowerCase() === ((category as string) ?? '').toLowerCase()) return option
   })
@@ -103,7 +104,9 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
   )
 
   const selectedOrganizationSlug =
-    selectedProjectRef !== 'no-project'
+    selectedOrganizationFromUrl !== undefined
+      ? selectedOrganizationFromUrl.slug
+      : selectedProjectRef !== 'no-project'
       ? organizations?.find((org) => {
           const project = projects.find((project) => project.ref === selectedProjectRef)
           return org.id === project?.organization_id
@@ -347,6 +350,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                             key={`option-${option.ref}`}
                             label={option.name || ''}
                             value={option.ref}
+                            className="!w-72"
                           >
                             <span>{option.name}</span>
                             <span className="block text-xs opacity-50">{organization?.name}</span>
@@ -362,6 +366,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                           key={`option-${option.value}`}
                           label={option.label}
                           value={option.value}
+                          className="!w-72"
                         >
                           <span>{option.label}</span>
                           <span className="block text-xs opacity-50">{option.description}</span>
@@ -383,6 +388,13 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                   </div>
                 ) : (
                   <></>
+                )}
+                {(values.severity === 'Urgent' || values.severity === 'High') && (
+                  <p className="text-sm text-foreground-light mt-2">
+                    We do our best to respond to everyone as quickly as possible; however,
+                    prioritization will be based on production status. We ask that you reserve High
+                    and Urgent severity for production-impacting issues only.
+                  </p>
                 )}
               </div>
             )}
@@ -428,19 +440,44 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                 </div>
               )}
 
-            {subscription?.plan.id === 'free' && values.category !== 'Login_issues' && (
+            {subscription?.plan.id !== 'enterprise' && values.category !== 'Login_issues' && (
               <div className="px-6">
                 <InformationBox
                   icon={<IconAlertCircle strokeWidth={2} />}
+                  defaultVisibility={true}
+                  hideCollapse={true}
                   title="Expected response times are based on your project's plan"
                   description={
                     <div className="space-y-4 mb-1">
-                      <p>
-                        Free plan support is available within the community and officially by the
-                        team on a best efforts basis, though we cannot guarantee a response time.
-                        For a guaranteed response time we recommend upgrading to the Pro plan.
-                        Enhanced SLAs for support are available on our Enterprise Plan.
-                      </p>
+                      {subscription?.plan.id === 'free' && (
+                        <p>
+                          Free plan support is available within the community and officially by the
+                          team on a best efforts basis. For a guaranteed response we recommend
+                          upgrading to the Pro plan. Enhanced SLAs for support are available on our
+                          Enterprise Plan.
+                        </p>
+                      )}
+
+                      {subscription?.plan.id === 'pro' && (
+                        <p>
+                          Pro Plan includes email-based support. You can expect an answer within 1
+                          business day in most situation for all severities. We recommend upgrading
+                          to the Team plan for prioritized ticketing on all issues and prioritized
+                          escalation to product engineering teams. Enhanced SLAs for support are
+                          available on our Enterprise Plan.
+                        </p>
+                      )}
+
+                      {subscription?.plan.id === 'team' && (
+                        <p>
+                          Team plan includes email-based support. You get prioritized ticketing on
+                          all issues and prioritized escalation to product engineering teams. Low,
+                          Normal, and High severity tickets will generally be handled within 1
+                          business day, while Urgent issues, we respond within 1 day, 365 days a
+                          year. Enhanced SLAs for support are available on our Enterprise Plan.
+                        </p>
+                      )}
+
                       <div className="flex items-center space-x-2">
                         <Button asChild>
                           <Link

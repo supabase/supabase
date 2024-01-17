@@ -1,22 +1,30 @@
 import { PostgresTable } from '@supabase/postgres-meta'
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { get } from 'data/fetchers'
+import { sortBy } from 'lodash'
 import { useCallback } from 'react'
 import { ResponseError } from 'types'
 import { tableKeys } from './keys'
-import { Table } from './table-query'
 
 export type TablesVariables = {
   projectRef?: string
   connectionString?: string
   schema?: string
+  /**
+   * Defaults to false
+   */
+  includeColumns?: boolean
+  sortByProperty?: keyof PostgresTable
 }
 
-export type TablesResponse = Table[] | { error?: any }
-
 export async function getTables(
-  { projectRef, connectionString, schema }: TablesVariables,
+  {
+    projectRef,
+    connectionString,
+    schema,
+    includeColumns = false,
+    sortByProperty = 'name',
+  }: TablesVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) {
@@ -26,35 +34,49 @@ export async function getTables(
   let headers = new Headers()
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
-  let queryParams = new URLSearchParams()
-  if (schema) queryParams.set('included_schemas', schema)
-  const searchStr = queryParams.toString()
-
-  const response = (await get(
-    `${API_URL}/pg-meta/${projectRef}/tables${searchStr ? `?${searchStr}` : ''}`,
-    {
-      headers: Object.fromEntries(headers),
-      signal,
-    }
-  )) as TablesResponse
-
-  if (!Array.isArray(response) && response.error) {
-    throw response.error
+  let queryParams: Record<string, string> = {
+    //include_columns is a string, even though it's true or false
+    include_columns: `${includeColumns}`,
+  }
+  if (schema) {
+    queryParams.included_schemas = schema
   }
 
-  return response as PostgresTable[]
+  const { data, error } = await get('/platform/pg-meta/{ref}/tables', {
+    params: {
+      header: {
+        'x-connection-encrypted': connectionString!,
+      },
+      path: {
+        ref: projectRef,
+      },
+      query: queryParams as any,
+    },
+    headers,
+    signal,
+  })
+
+  if (!Array.isArray(data) && error) {
+    throw error
+  }
+
+  // Sort the data if the sortByName option is true
+  if (Array.isArray(data) && sortByProperty) {
+    return sortBy(data, (t) => t[sortByProperty]) as PostgresTable[]
+  }
+  return data as Omit<PostgresTable, 'columns'>[]
 }
 
 export type TablesData = Awaited<ReturnType<typeof getTables>>
 export type TablesError = ResponseError
 
 export const useTablesQuery = <TData = TablesData>(
-  { projectRef, connectionString, schema }: TablesVariables,
+  { projectRef, connectionString, schema, includeColumns }: TablesVariables,
   { enabled = true, ...options }: UseQueryOptions<TablesData, TablesError, TData> = {}
 ) =>
   useQuery<TablesData, TablesError, TData>(
-    tableKeys.list(projectRef, schema),
-    ({ signal }) => getTables({ projectRef, connectionString, schema }, signal),
+    tableKeys.list(projectRef, schema, includeColumns),
+    ({ signal }) => getTables({ projectRef, connectionString, schema, includeColumns }, signal),
     { enabled: enabled && typeof projectRef !== 'undefined', ...options }
   )
 
@@ -69,9 +91,9 @@ export function useGetTables({
   const queryClient = useQueryClient()
 
   return useCallback(
-    (schema?: TablesVariables['schema']) => {
+    (schema?: TablesVariables['schema'], includeColumns?: TablesVariables['includeColumns']) => {
       return queryClient.fetchQuery({
-        queryKey: tableKeys.list(projectRef, schema),
+        queryKey: tableKeys.list(projectRef, schema, includeColumns),
         queryFn: ({ signal }) => getTables({ projectRef, connectionString, schema }, signal),
       })
     },

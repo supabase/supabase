@@ -1,7 +1,6 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
-import { useParams } from 'common'
 import { useTheme } from 'next-themes'
 import { observer } from 'mobx-react-lite'
 import { useCallback, useEffect, useState } from 'react'

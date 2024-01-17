@@ -1,10 +1,25 @@
+import { useParams } from 'common'
 import dayjs from 'dayjs'
+import { useTheme } from 'next-themes'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useMemo } from 'react'
+import {
+  Alert,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconAlertCircle,
+  IconAlertTriangle,
+  IconChevronRight,
+  IconExternalLink,
+} from 'ui'
 
-import { useParams } from 'common'
-import { useTheme } from 'next-themes'
-import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
+import {
+  getAddons,
+  subscriptionHasHipaaAddon,
+} from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import ProjectUpdateDisabledTooltip from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
 import {
   useIsProjectActive,
@@ -20,26 +35,18 @@ import {
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useFlag, useProjectByRef } from 'hooks'
+import { ProjectAddonVariantMeta } from 'data/subscriptions/types'
+import { useFlag, useProjectByRef, useSelectedOrganization } from 'hooks'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { BASE_PATH } from 'lib/constants'
-import { getSemanticVersion } from 'lib/helpers'
+import { getDatabaseMajorVersion, getSemanticVersion } from 'lib/helpers'
 import { SUBSCRIPTION_PANEL_KEYS, useSubscriptionPageStateSnapshot } from 'state/subscription-page'
-import {
-  Alert,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertCircle,
-  IconChevronRight,
-  IconExternalLink,
-} from 'ui'
-import Image from 'next/image'
 import ComputeInstanceSidePanel from './ComputeInstanceSidePanel'
-import PITRSidePanel from './PITRSidePanel'
 import CustomDomainSidePanel from './CustomDomainSidePanel'
+import PITRSidePanel from './PITRSidePanel'
+import IPv4SidePanel from './IPv4SidePanel'
 
 const Addons = () => {
   const { resolvedTheme } = useTheme()
@@ -47,6 +54,8 @@ const Addons = () => {
   const snap = useSubscriptionPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
   const { project: selectedProject } = useProjectContext()
+  const selectedOrg = useSelectedOrganization()
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
 
   const parentProject = useProjectByRef(selectedProject?.parent_project_ref)
   const isBranch = parentProject !== undefined
@@ -56,9 +65,15 @@ const Addons = () => {
     snap.setPanelKey(panel as SUBSCRIPTION_PANEL_KEYS)
   }
 
+  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
+
   const cpuArchitecture = getCloudProviderArchitecture(selectedProject?.cloud_provider)
   // Only projects of version greater than supabase-postgrest-14.1.0.44 can use PITR
-  const sufficientPgVersion = getSemanticVersion(selectedProject?.dbVersion ?? '') >= 141044
+  const sufficientPgVersion =
+    // introduced as generatedSemantic version could be < 141044 even if actual version is indeed past it
+    // eg. 15.1.1.2 leads to 15112
+    getDatabaseMajorVersion(selectedProject?.dbVersion ?? '') > 14 ||
+    getSemanticVersion(selectedProject?.dbVersion ?? '') >= 141044
 
   // [Joshen] We could possibly look into reducing the interval to be more "realtime"
   // I tried setting the interval to 1m but no data was returned, may need to experiment
@@ -81,7 +96,9 @@ const Addons = () => {
     isSuccess,
   } = useProjectAddonsQuery({ projectRef })
   const selectedAddons = addons?.selected_addons ?? []
-  const { computeInstance, pitr, customDomain } = getAddons(selectedAddons)
+  const { computeInstance, pitr, customDomain, ipv4 } = getAddons(selectedAddons)
+
+  const meta = computeInstance?.variant?.meta as ProjectAddonVariantMeta | undefined
 
   return (
     <>
@@ -174,7 +191,7 @@ const Addons = () => {
               <ScaffoldSectionContent>
                 <div className="flex space-x-6">
                   <div>
-                    <div className="rounded-md bg-surface-200 w-[160px] h-[96px] shadow">
+                    <div className="rounded-md bg-surface-100 border border-muted w-[160px] h-[96px] overflow-hidden">
                       <Image
                         alt="Optimized Compute"
                         width={160}
@@ -183,17 +200,17 @@ const Addons = () => {
                           computeInstance !== undefined
                             ? `${BASE_PATH}/img/optimized-compute-on${
                                 resolvedTheme?.includes('dark') ? '' : '--light'
-                              }.png`
+                              }.svg`
                             : `${BASE_PATH}/img/optimized-compute-off${
                                 resolvedTheme?.includes('dark') ? '' : '--light'
-                              }.png`
+                              }.svg`
                         }
                       />
                     </div>
                   </div>
                   <div className="flex-grow">
                     <p className="text-sm text-foreground-light">Current option:</p>
-                    <p className="">{computeInstance?.variant.name ?? 'Micro'}</p>
+                    <p>{computeInstance?.variant.name ?? 'Micro'}</p>
                     <ProjectUpdateDisabledTooltip
                       projectUpdateDisabled={projectUpdateDisabled}
                       projectNotActive={!isProjectActive}
@@ -217,9 +234,8 @@ const Addons = () => {
                       >
                         <p>
                           Your workload is currently running at the baseline disk IO bandwidth at{' '}
-                          {computeInstance?.variant?.meta?.baseline_disk_io_mbs?.toLocaleString() ??
-                            87}{' '}
-                          Mbps and may suffer degradation in performance.
+                          {meta?.baseline_disk_io_mbs?.toLocaleString() ?? 87} Mbps and may suffer
+                          degradation in performance.
                         </p>
                         <p className="mt-1">
                           Consider upgrading to a larger compute instance for a higher baseline
@@ -236,9 +252,8 @@ const Addons = () => {
                         <p>
                           If the disk IO budget drops to zero, your workload will run at the
                           baseline disk IO bandwidth at{' '}
-                          {computeInstance?.variant?.meta?.baseline_disk_io_mbs?.toLocaleString() ??
-                            87}{' '}
-                          Mbps and may suffer degradation in performance.
+                          {meta?.baseline_disk_io_mbs?.toLocaleString() ?? 87} Mbps and may suffer
+                          degradation in performance.
                         </p>
                         <p className="mt-1">
                           Consider upgrading to a larger compute instance for a higher baseline
@@ -260,7 +275,7 @@ const Addons = () => {
                           />
                         </div>
                       </Link>
-                      <p className="text-sm">{computeInstance?.variant?.meta?.memory_gb ?? 1} GB</p>
+                      <p className="text-sm">{meta?.memory_gb ?? 1} GB</p>
                     </div>
                     <div className="w-full flex items-center justify-between border-b py-2">
                       <Link href={`/project/${projectRef}/settings/infrastructure#cpu`}>
@@ -276,21 +291,17 @@ const Addons = () => {
                         </div>
                       </Link>
                       <p className="text-sm">
-                        {computeInstance?.variant?.meta?.cpu_cores ?? 2}-core {cpuArchitecture}{' '}
-                        {computeInstance?.variant?.meta?.cpu_dedicated ? '(Dedicated)' : '(Shared)'}
+                        {meta?.cpu_cores ?? 2}-core {cpuArchitecture}{' '}
+                        {meta?.cpu_dedicated ? '(Dedicated)' : '(Shared)'}
                       </p>
                     </div>
                     <div className="w-full flex items-center justify-between border-b py-2">
                       <p className="text-sm text-foreground-light">No. of direct connections</p>
-                      <p className="text-sm">
-                        {computeInstance?.variant?.meta?.connections_direct ?? 60}
-                      </p>
+                      <p className="text-sm">{meta?.connections_direct ?? 60}</p>
                     </div>
                     <div className="w-full flex items-center justify-between border-b py-2">
                       <p className="text-sm text-foreground-light">No. of pooler connections</p>
-                      <p className="text-sm">
-                        {computeInstance?.variant?.meta?.connections_pooler ?? 200}
-                      </p>
+                      <p className="text-sm">{meta?.connections_pooler ?? 200}</p>
                     </div>
                     <div className="w-full flex items-center justify-between border-b py-2">
                       <Link href={`/project/${projectRef}/settings/infrastructure#disk_io`}>
@@ -306,9 +317,7 @@ const Addons = () => {
                         </div>
                       </Link>
                       <p className="text-sm">
-                        {computeInstance?.variant?.meta?.max_disk_io_mbs?.toLocaleString() ??
-                          '2,085'}{' '}
-                        Mbps
+                        {meta?.max_disk_io_mbs?.toLocaleString() ?? '2,085'} Mbps
                       </p>
                     </div>
                     <div className="w-full flex items-center justify-between py-2">
@@ -325,11 +334,104 @@ const Addons = () => {
                         </div>
                       </Link>
                       <p className="text-sm">
-                        {computeInstance?.variant?.meta?.baseline_disk_io_mbs?.toLocaleString() ??
-                          87}{' '}
-                        Mbps
+                        {meta?.baseline_disk_io_mbs?.toLocaleString() ?? 87} Mbps
                       </p>
                     </div>
+                  </div>
+                </div>
+              </ScaffoldSectionContent>
+            </ScaffoldSection>
+          </ScaffoldContainer>
+
+          <ScaffoldDivider />
+
+          <ScaffoldContainer>
+            <ScaffoldSection>
+              <ScaffoldSectionDetail>
+                <div className="space-y-6">
+                  <p className="m-0">IPv4 address</p>
+                  <div className="space-y-2">
+                    <p className="text-sm text-foreground-light m-0">More information</p>
+                    <div>
+                      <Link
+                        href="https://github.com/orgs/supabase/discussions/17817"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
+                          <p className="text-sm m-0">About IPv4 deprecation</p>
+                          <IconExternalLink size={16} strokeWidth={1.5} />
+                        </div>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </ScaffoldSectionDetail>
+              <ScaffoldSectionContent>
+                <Alert_Shadcn_ variant="warning">
+                  <IconAlertTriangle className="h-4 w-4" />
+                  <AlertTitle_Shadcn_>
+                    PGBouncer and IPv4 Deprecation on January, 26th
+                  </AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_>
+                    <p>
+                      Direct connections via db.{projectRef}.supabase.co will resolve to an IPv6
+                      address starting from January 26th. If you plan on not using our connection
+                      pooler and your environment does not support IPv6, consider enabling the
+                      add-on.
+                    </p>
+                    <div className="mt-2">
+                      <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                        <a
+                          href="https://github.com/orgs/supabase/discussions/17817"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Learn more
+                        </a>
+                      </Button>
+                    </div>
+                  </AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
+                <div className="flex space-x-6">
+                  <div>
+                    <div className="rounded-md bg-surface-100 border border-muted w-[160px] h-[96px] overflow-hidden">
+                      <img
+                        alt="IPv4"
+                        width={160}
+                        height={96}
+                        src={
+                          ipv4 !== undefined
+                            ? `${BASE_PATH}/img/ipv4-on${
+                                resolvedTheme?.includes('dark') ? '' : '--light'
+                              }.svg?v=2`
+                            : `${BASE_PATH}/img/ipv4-off${
+                                resolvedTheme?.includes('dark') ? '' : '--light'
+                              }.svg?v=2`
+                        }
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-sm text-foreground-light">Current option:</p>
+                    <p>
+                      {ipv4 !== undefined
+                        ? 'IPv4 address is enabled'
+                        : 'IPv4 address is not enabled'}
+                    </p>
+                    <ProjectUpdateDisabledTooltip
+                      projectUpdateDisabled={projectUpdateDisabled}
+                      projectNotActive={!isProjectActive}
+                    >
+                      <Button
+                        type="default"
+                        className="mt-2 pointer-events-auto"
+                        onClick={() => snap.setPanelKey('ipv4')}
+                        disabled={isBranch || !isProjectActive || projectUpdateDisabled}
+                      >
+                        Change IPv4 address
+                      </Button>
+                    </ProjectUpdateDisabledTooltip>
                   </div>
                 </div>
               </ScaffoldSectionContent>
@@ -361,9 +463,23 @@ const Addons = () => {
                 </div>
               </ScaffoldSectionDetail>
               <ScaffoldSectionContent>
+                {hasHipaaAddon && (
+                  <Alert_Shadcn_>
+                    <AlertTitle_Shadcn_>PITR cannot be changed with HIPAA</AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_>
+                      All projects should have PITR enabled by default and cannot be changed with
+                      HIPAA enabled. Contact support for further assistance.
+                    </AlertDescription_Shadcn_>
+                    <div className="mt-4">
+                      <Button type="default" asChild>
+                        <Link href="/support/new">Contact support</Link>
+                      </Button>
+                    </div>
+                  </Alert_Shadcn_>
+                )}
                 <div className="flex space-x-6">
                   <div>
-                    <div className="rounded-md bg-surface-200 w-[160px] h-[96px] shadow">
+                    <div className="rounded-md bg-surface-100 border border-muted w-[160px] h-[96px] overflow-hidden">
                       <Image
                         alt="Point-In-Time-Recovery"
                         width={160}
@@ -372,17 +488,17 @@ const Addons = () => {
                           pitr !== undefined
                             ? `${BASE_PATH}/img/pitr-on${
                                 resolvedTheme?.includes('dark') ? '' : '--light'
-                              }.png?v=2`
+                              }.svg`
                             : `${BASE_PATH}/img/pitr-off${
                                 resolvedTheme?.includes('dark') ? '' : '--light'
-                              }.png?v=2`
+                              }.svg`
                         }
                       />
                     </div>
                   </div>
                   <div>
                     <p className="text-sm text-foreground-light">Current option:</p>
-                    <p className="">
+                    <p>
                       {pitr !== undefined
                         ? `Point in time recovery of ${pitr.variant.meta?.backup_duration_days} days is enabled`
                         : 'Point in time recovery is not enabled'}
@@ -418,7 +534,8 @@ const Addons = () => {
                             isBranch ||
                             !isProjectActive ||
                             projectUpdateDisabled ||
-                            !sufficientPgVersion
+                            !sufficientPgVersion ||
+                            hasHipaaAddon
                           }
                         >
                           Change point in time recovery
@@ -458,7 +575,7 @@ const Addons = () => {
               <ScaffoldSectionContent>
                 <div className="flex space-x-6">
                   <div>
-                    <div className="rounded-md bg-surface-200 w-[160px] h-[96px] shadow">
+                    <div className="rounded-md bg-surface-100 border border-muted w-[160px] h-[96px] overflow-hidden">
                       <img
                         alt="Custom Domain"
                         width={160}
@@ -467,17 +584,17 @@ const Addons = () => {
                           customDomain !== undefined
                             ? `${BASE_PATH}/img/custom-domain-on${
                                 resolvedTheme?.includes('dark') ? '' : '--light'
-                              }.png`
+                              }.svg`
                             : `${BASE_PATH}/img/custom-domain-off${
                                 resolvedTheme?.includes('dark') ? '' : '--light'
-                              }.png`
+                              }.svg`
                         }
                       />
                     </div>
                   </div>
                   <div>
                     <p className="text-sm text-foreground-light">Current option:</p>
-                    <p className="">
+                    <p>
                       {customDomain !== undefined
                         ? 'Custom domain is enabled'
                         : 'Custom domain is not enabled'}
@@ -506,6 +623,7 @@ const Addons = () => {
       <ComputeInstanceSidePanel />
       <PITRSidePanel />
       <CustomDomainSidePanel />
+      <IPv4SidePanel />
     </>
   )
 }

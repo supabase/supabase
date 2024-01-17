@@ -75,8 +75,7 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
             <Alert_Shadcn_>
               <IconAlertCircle className="text-foreground-light" strokeWidth={1.5} />
               <AlertTitle_Shadcn_>
-                Do remember to restore the original CNAME record from the first step before
-                activating
+                Remember to restore the original CNAME record from the first step before activating
               </AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_>
                 <p className="col-span-12 text-sm lg:col-span-7 leading-6">
@@ -88,7 +87,7 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
                     "your project's API URL"
                   )}
                   , with as low a TTL as possible. If you're using Cloudflare as your DNS provider,
-                  do disable the proxy option.
+                  disable the proxy option.
                 </p>
               </AlertDescription_Shadcn_>
             </Alert_Shadcn_>

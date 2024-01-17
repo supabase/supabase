@@ -4,7 +4,7 @@ import { IconMoon, IconSun, Listbox, Theme, themes } from 'ui'
 import Panel from 'components/ui/Panel'
 
 const ThemeSettings = () => {
-  const { theme, setTheme } = useTheme()
+  const { theme, resolvedTheme, setTheme } = useTheme()
 
   return (
     <Panel title={<h5 key="panel-title">Theme</h5>}>
@@ -15,7 +15,7 @@ const ThemeSettings = () => {
           descriptionText="Choose a theme preference"
           layout="horizontal"
           style={{ width: '50%' }}
-          icon={theme ? <IconMoon /> : <IconSun />}
+          icon={resolvedTheme === 'dark' ? <IconMoon /> : <IconSun />}
           onChange={(value: string) => setTheme(value)}
         >
           {themes.map((theme: Theme) => (

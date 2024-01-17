@@ -71,15 +71,12 @@ const LWXStickyNav: FC = () => {
                 <li key={day.id}>
                   <Link
                     href={`#${day.id}`}
-                    className={cn(
-                      'p-1 transition-colors hover:text-foreground flex items-center',
-                      day.shipped && 'text-foreground-light'
-                    )}
+                    className={cn('p-1 transition-colors hover:text-foreground flex items-center')}
                   >
                     {day.dd}{' '}
                     {day.isToday && (
                       <span
-                        title="Is Live"
+                        title="Live"
                         className="w-1 h-1 ml-1 animate-pulse rounded-full bg-brand mb-2 block"
                       />
                     )}

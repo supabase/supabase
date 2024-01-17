@@ -1,4 +1,4 @@
-import { boolean, number, object, string, date, ValidationError } from 'yup'
+import { boolean, number, object, string } from 'yup'
 import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
 
 const parseBase64URL = (b64url: string) => {
