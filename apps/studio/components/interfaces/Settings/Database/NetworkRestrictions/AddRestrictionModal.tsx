@@ -107,29 +107,6 @@ const AddRestrictionModal = ({
             ? normalize(`${values.ipAddress}/${values.cidrBlockSize}`)
             : `{values.ipAddress}/{values.cidrBlockSize}`
 
-          // [Alaister] although this "technically" is breaking the rules of React hooks
-          // it won't error because the hooks are always rendered in the same order
-          // eslint-disable-next-line react-hooks/rules-of-hooks
-          const [isFetchingAddress, setIsFetchingAddress] = useState(false)
-
-          const getClientIpAddress = async () => {
-            setIsFetchingAddress(true)
-            try {
-              const res = await fetch('https://api.ipify.org?format=json', { method: 'GET' })
-              const { ip } = await res.json()
-              if (ip) {
-                const updatedValues = { ...values, ipAddress: ip, cidrBlockSize: 32 }
-                resetForm({ initialValues: updatedValues, values: updatedValues })
-              } else {
-                toast.error('Failed to retrieve client IP address, please enter address manually')
-              }
-            } catch (error) {
-              toast.error('Failed to retrieve client IP address, please enter address manually')
-            } finally {
-              setIsFetchingAddress(false)
-            }
-          }
-
           return (
             <>
               <Modal.Content>
@@ -190,14 +167,6 @@ const AddRestrictionModal = ({
                       />
                     </div>
                   </div>
-                  <Button
-                    type="default"
-                    loading={isFetchingAddress}
-                    disabled={isFetchingAddress}
-                    onClick={() => getClientIpAddress()}
-                  >
-                    Use my IP address
-                  </Button>
                 </div>
               </Modal.Content>
               <Modal.Separator />
