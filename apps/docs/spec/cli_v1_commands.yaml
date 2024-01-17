@@ -312,12 +312,11 @@ commands:
         code: supabase stop
         response: |
           Stopped supabase local development setup.
-      - id: with-backup
-        name: Backup local database before stopping
-        code: supabase stop --backup
+          Local data are backed up to docker volume.
+      - id: clean-up
+        name: Clean up local data after stopping
+        code: supabase stop --no-backup
         response: |
-          Postgres database saved to volume: supabase_db_cli
-          Storage directory saved to volume: supabase_storage_cli
           Stopped supabase local development setup.
     tags:
       - local-dev
@@ -1344,7 +1343,7 @@ commands:
 
       If your local and remote migration history goes out of sync, you can repair the remote history by marking specific migrations as `--status applied` or `--status reverted`. Marking as `reverted` will delete an existing record from the migration history table while marking as `applied` will insert a new record.
 
-      For example, your migration history table may look like this after running `db remote commit` for the first time.
+      For example, your migration history table may look like this after running `db pull` for the first time.
 
       ```bash
       $ supabase migration list
@@ -1373,7 +1372,7 @@ commands:
         ─────────────────┼────────────────┼──────────────────────
       ```
 
-      Now you can run `db remote commit` again to dump the remote schema as a local migration file.
+      Now you can run `db pull` again to dump the remote schema as a local migration file.
     examples:
       - id: basic-usage
         name: Mark a migration as reverted
@@ -1560,7 +1559,7 @@ commands:
 
       > If you do not want to be prompted for the database password, such as in a CI environment, you may specify it explicitly via the `SUPABASE_DB_PASSWORD` environment variable.
 
-      Some commands like `db dump`, `db push`, and `db remote commit` require your project to be linked first.
+      Some commands like `db dump`, `db push`, and `db pull` require your project to be linked first.
     examples:
       - id: basic-usage
         name: Basic usage
