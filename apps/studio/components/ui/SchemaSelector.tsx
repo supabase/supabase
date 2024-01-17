@@ -22,6 +22,7 @@ import {
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useSchemasQuery } from 'data/database/schemas-query'
+import { sortBy } from 'lodash'
 
 interface SchemaSelectorProps {
   className?: string
@@ -30,6 +31,7 @@ interface SchemaSelectorProps {
   showError?: boolean
   selectedSchemaName: string
   supportSelectAll?: boolean
+  excludedSchemas?: string[]
   onSelectSchema: (name: string) => void
   onSelectCreateSchema?: () => void
 }
@@ -41,6 +43,7 @@ const SchemaSelector = ({
   showError = true,
   selectedSchemaName,
   supportSelectAll = false,
+  excludedSchemas = [],
   onSelectSchema,
   onSelectCreateSchema,
 }: SchemaSelectorProps) => {
@@ -59,7 +62,10 @@ const SchemaSelector = ({
     connectionString: project?.connectionString,
   })
 
-  const schemas = (data ?? []).sort((a, b) => (a.name > b.name ? 0 : -1))
+  const schemas = sortBy(
+    (data || []).filter((schema) => !excludedSchemas.includes(schema.name)),
+    (s) => s.name
+  )
 
   return (
     <div className={className}>

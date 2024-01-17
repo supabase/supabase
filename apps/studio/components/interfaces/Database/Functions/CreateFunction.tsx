@@ -32,6 +32,7 @@ import SqlEditor from 'components/ui/SqlEditor'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useDatabaseFunctionCreateMutation } from 'data/database-functions/database-functions-create-mutation'
 import { useDatabaseFunctionUpdateMutation } from 'data/database-functions/database-functions-update-mutation'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { FormSchema } from 'types'
 import { convertArgumentTypes, convertConfigParams } from './Functions.utils'
 
@@ -201,6 +202,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                     <FormControl_Shadcn_ className="col-span-8">
                       <SchemaSelector
                         selectedSchemaName={field.value}
+                        excludedSchemas={EXCLUDED_SCHEMAS}
                         size="small"
                         onSelectSchema={(name) => field.onChange(name)}
                       />
