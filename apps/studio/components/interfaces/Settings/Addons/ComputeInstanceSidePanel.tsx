@@ -43,14 +43,14 @@ const COMPUTE_CATEGORY_OPTIONS: {
   {
     id: 'micro',
     name: 'Micro Compute',
-    imageUrl: `${BASE_PATH}/img/optimized-compute-off.png`,
-    imageUrlLight: `${BASE_PATH}/img/optimized-compute-off--light.png`,
+    imageUrl: `${BASE_PATH}/img/optimized-compute-off.svg`,
+    imageUrlLight: `${BASE_PATH}/img/optimized-compute-off--light.svg`,
   },
   {
     id: 'optimized',
     name: 'Optimized Compute',
-    imageUrl: `${BASE_PATH}/img/optimized-compute-on.png`,
-    imageUrlLight: `${BASE_PATH}/img/optimized-compute-on--light.png`,
+    imageUrl: `${BASE_PATH}/img/optimized-compute-on.svg`,
+    imageUrlLight: `${BASE_PATH}/img/optimized-compute-on--light.svg`,
   },
 ]
 

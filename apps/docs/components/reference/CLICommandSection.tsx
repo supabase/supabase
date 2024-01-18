@@ -110,19 +110,17 @@ const CliCommandSection = (props) => {
                 <h3 className="text-lg text-foreground mb-3">Flags</h3>
                 <ul>
                   {commandFlags.map((flag: Flag) => (
-                    <>
-                      <li className="mt-0">
-                        <Param {...flag} isOptional={!flag.required}>
-                          {flag?.accepted_values && (
-                            <Options>
-                              {flag?.accepted_values.map((value) => {
-                                return <Options.Option {...value} />
-                              })}
-                            </Options>
-                          )}
-                        </Param>
-                      </li>
-                    </>
+                    <li key={flag.id} className="mt-0">
+                      <Param {...flag} isOptional={!flag.required}>
+                        {flag?.accepted_values && (
+                          <Options>
+                            {flag?.accepted_values.map((value) => {
+                              return <Options.Option key={value.id} {...value} />
+                            })}
+                          </Options>
+                        )}
+                      </Param>
+                    </li>
                   ))}
                 </ul>
               </>

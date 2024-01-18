@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.123.0
+  version: 1.131.5
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -17,6 +17,10 @@ info:
     - id: other-commands
       title: Additional Commands
 flags:
+  - id: create-ticket
+    name: --create-ticket
+    description: create a support ticket for any CLI error
+    default_value: 'false'
   - id: debug
     name: --debug
     description: output debug logs to stderr
@@ -196,9 +200,22 @@ commands:
           Result: PASS
     tags: []
     links: []
-    usage: supabase test db
+    usage: supabase test db [path] ... [flags]
     subcommands: []
-    flags: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: |
+          Tests the database specified by the connection string (must be percent-encoded).
+        default_value: ''
+      - id: linked
+        name: --linked
+        description: Runs pgTAP tests on the linked project.
+        default_value: 'false'
+      - id: local
+        name: --local
+        description: Runs pgTAP tests on the local database.
+        default_value: 'true'
   - id: supabase-storage
     title: supabase storage
     summary: Manage Supabase Storage objects
@@ -295,12 +312,11 @@ commands:
         code: supabase stop
         response: |
           Stopped supabase local development setup.
-      - id: with-backup
-        name: Backup local database before stopping
-        code: supabase stop --backup
+          Local data are backed up to docker volume.
+      - id: clean-up
+        name: Clean up local data after stopping
+        code: supabase stop --no-backup
         response: |
-          Postgres database saved to volume: supabase_db_cli
-          Storage directory saved to volume: supabase_storage_cli
           Stopped supabase local development setup.
     tags:
       - local-dev
@@ -438,7 +454,7 @@ commands:
       - id: exclude
         name: -x, --exclude <strings>
         description: |
-          Names of containers to not start. [gotrue,realtime,storage-api,imgproxy,kong,inbucket,postgrest,pgadmin-schema-diff,migra,postgres-meta,studio,edge-runtime,logflare,vector,pgbouncer]
+          Names of containers to not start. [gotrue,realtime,storage-api,imgproxy,kong,inbucket,postgrest,pgadmin-schema-diff,migra,postgres-meta,studio,edge-runtime,logflare,vector,pgbouncer,pg_prove]
         default_value: '[]'
       - id: ignore-health-check
         name: --ignore-health-check
@@ -1327,7 +1343,7 @@ commands:
 
       If your local and remote migration history goes out of sync, you can repair the remote history by marking specific migrations as `--status applied` or `--status reverted`. Marking as `reverted` will delete an existing record from the migration history table while marking as `applied` will insert a new record.
 
-      For example, your migration history table may look like this after running `db remote commit` for the first time.
+      For example, your migration history table may look like this after running `db pull` for the first time.
 
       ```bash
       $ supabase migration list
@@ -1356,7 +1372,7 @@ commands:
         ─────────────────┼────────────────┼──────────────────────
       ```
 
-      Now you can run `db remote commit` again to dump the remote schema as a local migration file.
+      Now you can run `db pull` again to dump the remote schema as a local migration file.
     examples:
       - id: basic-usage
         name: Mark a migration as reverted
@@ -1543,7 +1559,7 @@ commands:
 
       > If you do not want to be prompted for the database password, such as in a CI environment, you may specify it explicitly via the `SUPABASE_DB_PASSWORD` environment variable.
 
-      Some commands like `db dump`, `db push`, and `db remote commit` require your project to be linked first.
+      Some commands like `db dump`, `db push`, and `db pull` require your project to be linked first.
     examples:
       - id: basic-usage
         name: Basic usage
@@ -2302,9 +2318,9 @@ commands:
         name: --use-orioledb
         description: Use OrioleDB storage engine for Postgres
         default_value: 'false'
-      - id: with-vscode-workspace
-        name: --with-vscode-workspace
-        description: Generate VS Code workspace.
+      - id: with-vscode-settings
+        name: --with-vscode-settings
+        description: Generate VS Code settings for Deno.
         default_value: 'false'
   - id: supabase-gen
     title: supabase gen
@@ -2458,6 +2474,10 @@ commands:
     usage: supabase functions download <Function name> [flags]
     subcommands: []
     flags:
+      - id: legacy-bundle
+        name: --legacy-bundle
+        description: Use legacy bundling mechanism.
+        default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
