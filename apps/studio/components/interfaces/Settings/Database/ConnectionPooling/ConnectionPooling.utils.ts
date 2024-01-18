@@ -49,7 +49,11 @@ export const constructConnStringSyntax = (
 }
 
 export const getPoolerTld = (connString: string) => {
-  const segment = connString.split('pooler.supabase.')[1]
-  const tld = segment.split(':6543')[0]
-  return tld
+  try {
+    const segment = connString.split('pooler.supabase.')[1]
+    const tld = segment.split(':6543')[0]
+    return tld
+  } catch {
+    return 'com'
+  }
 }

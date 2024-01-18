@@ -117,7 +117,7 @@ const AddRestrictionModal = ({
                   </p>
                   <InformationBox
                     title="Note: Restrictions only apply to direct connections to your database and PgBouncer"
-                    description="They do not currently apply to APIs offered over HTTPS, such as PostgREST, Storage, or Authentication. Supavisor will start enforcing network restrictions from January 19th 2024."
+                    description="They do not currently apply to APIs offered over HTTPS, such as PostgREST, Storage, or Authentication. Supavisor will start enforcing network restrictions from January 24th 2024."
                   />
                   <div className="flex space-x-4">
                     <div className="w-[55%]">
