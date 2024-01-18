@@ -1,4 +1,5 @@
-import { ArrowBigDown, ArrowBigLeft, ArrowBigRight, ArrowBigUp, ChevronDown } from 'lucide-react'
+import { Box, ChevronDown } from 'lucide-react'
+import ConnectionIcon from './ConnectionIcon'
 import {
   Button,
   CommandItem_Shadcn_,
@@ -8,10 +9,6 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
-
-import { BASE_PATH } from 'lib/constants'
-import Image from 'next/image'
-import ConnectionIcon from './ConnectionIcon'
 
 interface ConnectDropdownProps {
   level?: 'parent' | 'child' | 'grandchild'
@@ -37,6 +34,8 @@ const ConnectDropdown = ({
     setOpen(false)
   }
 
+  const selectedItem = items.find((item) => item.key === state)
+
   return (
     <>
       <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
@@ -48,8 +47,12 @@ const ConnectDropdown = ({
             <Button size="tiny" type="default" className="h-[26px] pr-3 gap-0 rounded-l-none">
               <div className="flex items-center gap-1">
                 <span className="text-xs text-foreground-light flex items-center gap-2  pl-1">
-                  {level === 'parent' && <ConnectionIcon connection={state} />}
-                  {items.find((item) => item.key === state)?.label}
+                  {selectedItem?.icon ? (
+                    <ConnectionIcon connection={selectedItem.icon} />
+                  ) : (
+                    <Box size={12} />
+                  )}
+                  {selectedItem?.label}
                 </span>
                 <ChevronDown className="text-muted" strokeWidth={1} size={12} />
               </div>
@@ -73,7 +76,9 @@ const ConnectDropdown = ({
                   }}
                 >
                   <span className="flex items-center gap-1">
-                    <ConnectionIcon connection={item.key} />
+                    {item.icon ? <ConnectionIcon connection={item.icon} /> : <Box size={12} />}
+
+                    {/* <ConnectionIcon connection={item.key} /> */}
                     {item.label}
                   </span>
                 </CommandItem_Shadcn_>

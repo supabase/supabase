@@ -1,5 +1,6 @@
 export type Parent = {
   key: string
+  icon: string
   label: string
   files: File[]
   children: Parent[]
@@ -11,16 +12,19 @@ export const FRAMEWORKS: Parent[] = [
   {
     key: 'nextjs',
     label: 'Next.JS',
+    icon: 'nextjs',
     files: [],
     children: [
       {
         key: 'app',
         label: 'App router',
+        icon: '',
         files: [],
         children: [
           {
             key: 'supabasejs',
             label: 'supabase-js',
+            icon: 'supabase',
             children: [],
             files: [
               {
@@ -34,6 +38,7 @@ export const FRAMEWORKS: Parent[] = [
           {
             key: 'postgresjs',
             label: 'Postgres.js',
+            icon: 'postgres',
             children: [],
             files: [
               {
@@ -49,12 +54,14 @@ export const FRAMEWORKS: Parent[] = [
       {
         key: 'pages',
         label: 'Pages router',
+        icon: '',
         files: [],
         children: [
           {
             key: 'supabasejs',
             label: 'pages Supabase-js',
             children: [],
+            icon: 'supabase',
             files: [
               {
                 // omit .tsx extension
@@ -67,6 +74,7 @@ export const FRAMEWORKS: Parent[] = [
           {
             key: 'postgresjs',
             label: 'pages Postgres.js',
+            icon: 'postgres',
             children: [],
             files: [
               {
@@ -82,8 +90,9 @@ export const FRAMEWORKS: Parent[] = [
     ],
   },
   {
-    key: 'vue',
+    key: 'vuejs',
     label: 'Vue.JS',
+    icon: 'vuejs',
     files: [
       {
         // omit .tsx extension
@@ -97,11 +106,13 @@ export const FRAMEWORKS: Parent[] = [
   {
     key: 'svelte',
     label: 'Svelte.JS',
+    icon: 'svelte',
     files: [],
     children: [
       {
         key: 'svelterouter',
         label: 'Svelte router',
+        icon: 'svelte',
         files: [
           {
             // omit .tsx extension
@@ -115,6 +126,7 @@ export const FRAMEWORKS: Parent[] = [
       {
         key: 'svelterouter2',
         label: 'Svelte router2',
+        icon: 'svelte',
         files: [
           {
             // omit .tsx extension
@@ -134,6 +146,7 @@ export const ORMS: Parent[] = [
   {
     key: 'prisma',
     label: 'Prisma',
+    icon: 'prisma',
     children: [],
     files: [
       {
@@ -147,6 +160,7 @@ export const ORMS: Parent[] = [
   {
     key: 'drizzle',
     label: 'Drizzle',
+    icon: 'drizzle',
     children: [],
     files: [
       {
@@ -154,6 +168,39 @@ export const ORMS: Parent[] = [
         path: 'drizzle/env.local',
         name: 'drizzle.env.local',
         displayPath: 'drizzle/.env.local',
+      },
+    ],
+  },
+]
+
+export const DIRECT: Parent[] = [
+  {
+    key: 'direct',
+    label: 'Direct',
+    icon: '',
+    children: [],
+    files: [
+      {
+        // omit .tsx extension
+        path: 'direct/env.local',
+        name: 'direct.env.local',
+        displayPath: 'direct/.env.local',
+      },
+    ],
+  },
+]
+export const GRAPHQL: Parent[] = [
+  {
+    key: 'graphql',
+    label: 'GraphQL',
+    icon: 'graphql',
+    children: [],
+    files: [
+      {
+        // omit .tsx extension
+        path: 'graphql/env.local',
+        name: 'graphql.env.local',
+        displayPath: 'graphql/.env.local',
       },
     ],
   },

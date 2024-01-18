@@ -1,46 +1,29 @@
-import {
-  ArrowBigDown,
-  ArrowBigLeft,
-  ArrowBigRight,
-  ArrowBigUp,
-  ArrowDownCircle,
-  ArrowUpRightFromCircleIcon,
-} from 'lucide-react'
+import { BASE_PATH } from 'lib/constants'
 
+import { useTheme } from 'next-themes'
+import Image from 'next/image'
 interface ConnectionIconProps {
   connection: any
 }
 
-// FPO — need to get the actual icons
 const ConnectionIcon = ({ connection }: ConnectionIconProps) => {
-  let iconComponent = null
+  const { resolvedTheme } = useTheme()
 
-  switch (connection) {
-    case 'nextjs':
-      iconComponent = <ArrowBigDown size={12} />
-      break
-    case 'vue':
-      iconComponent = <ArrowBigLeft size={12} />
-      break
-    case 'prisma':
-      iconComponent = <ArrowBigRight size={12} />
-      break
-    case 'drizzle':
-      iconComponent = <ArrowBigUp size={12} />
-      break
-    case 'psql':
-      iconComponent = <ArrowUpRightFromCircleIcon size={12} />
-      break
-    case 'php':
-      iconComponent = <ArrowDownCircle size={12} />
-      break
-    default:
-      // You can provide a default icon or empty element for unknown connections
-      iconComponent = null
-      break
-  }
-
-  return iconComponent
+  return (
+    <Image
+      className="transition-all group-hover:scale-110"
+      src={`${BASE_PATH}/img/libraries/${connection.toLowerCase()}${
+        ['expo', 'nextjs'].includes(connection.toLowerCase())
+          ? resolvedTheme?.includes('dark')
+            ? '-dark'
+            : ''
+          : ''
+      }-icon.svg`}
+      alt={`${connection} logo`}
+      width={12}
+      height={12}
+    />
+  )
 }
 
 export default ConnectionIcon
