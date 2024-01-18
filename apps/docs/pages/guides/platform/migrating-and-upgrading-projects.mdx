@@ -153,6 +153,7 @@ Note that this direct connection string to the database uses IPv6. If your netwo
 supabase db dump --db-url "$OLD_DB_URL" -f roles.sql --role-only
 supabase db dump --db-url "$OLD_DB_URL" -f schema.sql
 supabase db dump --db-url "$OLD_DB_URL" -f data.sql --use-copy --data-only
+supabase db dump --db-url "$OLD_DB_URL" -f history.sql --use-copy --data-only --schema supabase_migrations
 ```
 
 ### Restore to your new project
@@ -186,6 +187,7 @@ psql \
   --file schema.sql \
   --command 'SET session_replication_role = replica' \
   --file data.sql \
+  --file history.sql \
   --dbname "$NEW_DB_URL"
 ```
 
