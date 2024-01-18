@@ -1,7 +1,7 @@
 import { format } from 'sql-formatter'
 
 import { MonacoEditor } from '@/components/MonacoEditor'
-import { cn } from '@ui/lib/utils/cn'
+import { CodeEditorContainer } from './CodeEditorContainer'
 
 export async function CodeEditor({ promisedMessage }: { promisedMessage: Promise<string> }) {
   const code = await promisedMessage
@@ -17,15 +17,8 @@ export async function CodeEditor({ promisedMessage }: { promisedMessage: Promise
    * - MonacoEditor is a server component injected into it
    */
   return (
-    <div
-      className={cn(
-        hideCode ? 'max-w-0' : 'max-w-lg 2xl:max-w-xl',
-        // 'max-w-lg 2xl:max-w-xl',
-        'w-full xl:border-l',
-        'grow flex flex-col h-full'
-      )}
-    >
+    <CodeEditorContainer>
       <MonacoEditor id="sql-editor" language="pgsql" value={formattedCode} />
-    </div>
+    </CodeEditorContainer>
   )
 }

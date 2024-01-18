@@ -1,9 +1,9 @@
 import { stripIndent } from 'common-tags'
+import { cookies } from 'next/headers'
 import OpenAI from 'openai'
 
 // import is weird, what's up with this?
 import { createClient } from '@/lib/supabase/server'
-import { cookies } from 'next/headers'
 import { ContextLengthError } from '../../../../../packages/ai-commands/src/errors'
 import { getMessages } from './getMessages'
 

@@ -1,8 +1,8 @@
+import { createClient } from '@/lib/supabase/server'
 import { Database } from '@/types/supabase'
+import { cookies } from 'next/headers'
 import EmptyState from './EmptyState'
 import Thread from './Thread'
-import { cookies } from 'next/headers'
-import { createClient } from '@/lib/supabase/server'
 
 export type ThreadType = Database['public']['Views']['profile_threads']['Row']
 
@@ -21,9 +21,7 @@ async function Threads() {
     .select()
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
-  console.log('userid', user.id)
   const threads = data ?? []
-  console.log('the threads data', { threads })
 
   return (
     <div className="flex flex-col gap-y-3">

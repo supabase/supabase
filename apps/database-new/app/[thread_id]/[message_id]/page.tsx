@@ -18,9 +18,6 @@ export interface ThreadPageProps {
 }
 
 export default async function ThreadPage({ params }: ThreadPageProps) {
-  // const promise = new Promise<string>((resolve) =>
-  //   setTimeout(() => resolve(getAssistantMessage(params.thread_id, params.message_id)), 5000)
-  // )
   const promise = getAssistantResponse(params.thread_id, params.message_id)
 
   return (

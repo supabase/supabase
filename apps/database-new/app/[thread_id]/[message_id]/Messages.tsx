@@ -46,14 +46,10 @@ export const Messages = async ({ threadId }: { threadId: string }) => {
 
             const formattedCreatedAt = dayjs(createdAtTimestamp).format('DD MMM YYYY, HH:mm')
 
-            // const replyDuration =
-            //   reply !== undefined ? reply.created_at - message.created_at : undefined
-
             const times = {
               hoursFromNow,
               formattedTimeFromNow,
               formattedCreatedAt,
-              replyDuration: 5, // not sure what this is yet so hardcoding for now
             }
 
             return (

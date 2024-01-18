@@ -12,7 +12,6 @@ interface MessageItemProps {
     hoursFromNow: number
     formattedTimeFromNow: string
     formattedCreatedAt: string
-    replyDuration: number | undefined
   }
 }
 
@@ -21,7 +20,7 @@ const MessageItem = ({ message, isLatest, times }: MessageItemProps) => {
   // using the local state for run loading
   const isLoading = false
 
-  const { hoursFromNow, formattedTimeFromNow, formattedCreatedAt, replyDuration } = times
+  const { hoursFromNow, formattedTimeFromNow, formattedCreatedAt } = times
 
   // chat shown as selected when url matches
   const isSelected = usePathname().includes(message.id)
@@ -46,15 +45,17 @@ const MessageItem = ({ message, isLatest, times }: MessageItemProps) => {
           )}
         />
 
-        {/* <span
-          className={cn(
-            'absolute w-4 h-4 -top-0.5',
-            'after:content-spinner after:t-0 after:block after:absolute after:h-4 after:w-4 after:border-r after:border-r-dbnew after:rounded-[50%] after:rotate-45 z-10',
-            'animate-spin'
-          )}
-        >
-          <div className="absolute border w-4 h-4 rounded-full z-0" />
-        </span> */}
+        {isLoading && (
+          <span
+            className={cn(
+              'absolute w-4 h-4 -top-0.5',
+              'after:content-spinner after:t-0 after:block after:absolute after:h-4 after:w-4 after:border-r after:border-r-dbnew after:rounded-[50%] after:rotate-45 z-10',
+              'animate-spin'
+            )}
+          >
+            <div className="absolute border w-4 h-4 rounded-full z-0" />
+          </span>
+        )}
 
         {/* Node line*/}
         {!isLatest && <div className="border-l border-strong flex-grow" />}
@@ -76,7 +77,7 @@ const MessageItem = ({ message, isLatest, times }: MessageItemProps) => {
             </svg>
           </span>
           <div
-            //title={text}
+            title={message.content}
             className={cn(
               'cursor-pointer transition relative overflow-hidden',
               'w-full rounded-lg rounded-tl-none',
@@ -105,11 +106,6 @@ const MessageItem = ({ message, isLatest, times }: MessageItemProps) => {
             )}
           >
             Sent {hoursFromNow > 6 ? `on ${formattedCreatedAt}` : formattedTimeFromNow}
-            {/* {replyDuration !== undefined
-              ? ` with ${replyDuration}s response`
-              : isLoading
-              ? ', generating response...'
-              : ''} */}
           </p>
         )}
       </div>

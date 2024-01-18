@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, createRef } from 'react'
+import { deleteThread } from '@/app/actions'
+import { createRef, useEffect } from 'react'
 import { useFormState, useFormStatus } from 'react-dom'
 import { Button, Input_Shadcn_, Modal } from 'ui'
-import { deleteThread } from '@/app/actions'
 import { ThreadType } from './Threads'
 
 const ConfirmDeleteThreadModal = ({
@@ -16,7 +16,6 @@ const ConfirmDeleteThreadModal = ({
   visible: boolean
 }) => {
   const formRef = createRef<HTMLFormElement>()
-  console.log('thread.thread_id', thread.thread_id)
 
   const initialState = {
     message: '',
