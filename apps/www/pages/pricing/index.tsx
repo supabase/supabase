@@ -7,14 +7,14 @@ import { NextSeo } from 'next-seo'
 import { Accordion, Button, IconArrowUpRight, IconCheck, Select, cn } from 'ui'
 import { ArrowDownIcon, InformationCircleIcon } from '@heroicons/react/outline'
 
-import CTABanner from '~/components/CTABanner'
-import DefaultLayout from '~/components/Layouts/Default'
-import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/Pricing/PricingTableRow'
-
 import Solutions from '~/data/Solutions'
 import pricingFaq from '~/data/PricingFAQ.json'
 import { pricing } from 'shared-data/pricing'
 import { plans } from 'shared-data/plans'
+
+import CTABanner from '~/components/CTABanner'
+import DefaultLayout from '~/components/Layouts/Default'
+import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/Pricing/PricingTableRow'
 
 const PricingComputeSection = dynamic(() => import('~/components/Pricing/PricingComputeSection'))
 const PricingAddons = dynamic(() => import('~/components/Pricing/PricingAddons'))
@@ -31,7 +31,7 @@ export default function IndexPage() {
     setMounted(true)
   })
 
-  const meta_title = 'Pricing & fees | Supabase'
+  const meta_title = 'Pricing & Fees | Supabase'
   const meta_description =
     'Explore Supabase fees and pricing information. Find our competitive pricing plans, with no hidden pricing. We have a generous free plan for those getting started, and Pay As You Go for those scaling up.'
 
@@ -287,9 +287,8 @@ export default function IndexPage() {
 
         <div className="text-center mt-10 xl:mt-16 mx-auto max-w-lg flex flex-col gap-8">
           <p className="text-foreground-lighter">
-            <strong className="font-normal text-foreground">Usage-based billing</strong> ensures you
-            pay only for the resources you consume, making it a cost-effective choice for projects
-            of all sizes.
+            We bill extra only for the resources you consume
+            <br className="hidden md:block" /> that exceed the quota included in a paid plan.
           </p>
           <div className="flex justify-center gap-2">
             <a href="#compare-plans">
@@ -312,44 +311,16 @@ export default function IndexPage() {
       </div>
       <div
         id="addon-compute"
-        className="container relative mx-auto px-4 lg:px-12 pt-16 md:pt-24 lg:pt-32 lg:pb-0"
+        className="container relative mx-auto px-4 lg:px-12 pt-16 md:pt-24 lg:pt-32 lg:pb-16"
       >
         <PricingComputeSection />
       </div>
-      <div
-        id="addons"
-        className="sm:py-18 container relative mx-auto px-4 py-16 shadow-sm md:py-24 lg:px-12 lg:pt-32 lg:pb-12"
-      >
-        {/* <div
-          id="cost-control"
-          className="grid lg:grid-cols-2 gap-8 items-center mt-12 lg:mt-8 max-w-6xl mx-auto"
-        >
-          <div className="lg:py-12">
-            <span className="bg-brand-400 text-brand-600 rounded-md bg-opacity-30 inline-block py-0.5 px-2 text-[13px] leading-4 mt-2">
-              Available for Pro plan
-            </span>
-            <h2 className="text-foreground text-4xl mt-4">Predictable cost control</h2>
-            <p className="mt-2 mb-4 prose lg:max-w-lg">
-              The Pro plan has a spend cap enabled by default to keep costs under control. If you
-              expect a usage spike and need to go beyond the plan limits, simply switch off the
-              spend cap to pay for additional resources.
-            </p>
-            <Button asChild size="tiny" type="default">
-              <Link href="/docs/guides/platform/spend-cap" target="_blank">
-                Learn about Cost Control
-              </Link>
-            </Button>
-          </div>
-          <div className="relative h-full min-h-[14rem] flex items-center justify-end">
-            <CostControlAnimation className="w-full lg:max-w-md aspect-video" />
-          </div>
-        </div> */}
-
+      <div id="addons" className="sm:py-18 container relative mx-auto px-4 py-16 md:py-24 lg:px-12">
         <PricingAddons setShowComputeModal={setShowComputeModal} />
       </div>
 
       <div className="bg-background">
-        <div className="sm:py-18 container relative mx-auto px-4 py-16 md:py-24 lg:px-16 lg:py-24 xl:px-20">
+        <div className="sm:pb-18 container relative mx-auto px-4 pb-16 md:pb-24 lg:px-16 lg:pb-24 xl:px-20">
           <div className="sm:mb-18 mb-16 md:mb-24 lg:mb-24">
             {/* <!-- xs to lg --> */}
 

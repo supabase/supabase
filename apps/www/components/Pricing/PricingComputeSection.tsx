@@ -86,11 +86,48 @@ const PricingComputeSection = () => {
           />
           <div ref={ref} className="pb-4 lg:pb-0">
             <ComputePricingTable />
+
+            <div className="grid md:grid-cols-2 gap-4 md:gap-8 p-4 mt-4 md:mt-0 md:p-8">
+              <div className="max-w-4xl prose">
+                <h4 className="text-lg">Choose best compute setup for you</h4>
+                <p className="text-sm">
+                  Every project on the Supabase Platform comes with its own dedicated Postgres
+                  instance running inside a virtual machine (VM). The table above describes the base
+                  instance with additional compute add-ons available if you need extra performance
+                  when scaling up Supabase.
+                </p>
+                <p className="text-sm">
+                  Compute instances are billed hourly and you can scale up or down at any time.
+                  You'll only be charged at the end of the month for the hours you've used. Paid
+                  plans come with $10 in Compute Credits per month to cover one Starter instance or
+                  parts of any other instance.
+                </p>
+                <p className="text-sm">
+                  Read more on{' '}
+                  <Link
+                    href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
+                    target="_blank"
+                    className="transition text-brand hover:text-brand-600"
+                  >
+                    usage-based billing for compute
+                  </Link>{' '}
+                  or{' '}
+                  <Link
+                    href="https://supabase.com/docs/guides/platform/compute-add-ons"
+                    target="_blank"
+                    className="transition text-brand hover:text-brand-600"
+                  >
+                    Compute Add-ons
+                  </Link>
+                  .
+                </p>
+              </div>
+            </div>
           </div>
         </div>
         <button
           onClick={() => setShowTable(!showTable)}
-          className="w-full p-2 text-foreground focus-visible:outline-brand-600 focus-visible:rounded-b-xl text-sm bg-alternative flex items-center justify-center gap-2"
+          className="w-full p-2 border-t border-muted text-foreground focus-visible:outline-brand-600 focus-visible:rounded-b-xl text-sm bg-alternative flex items-center justify-center gap-2"
         >
           <ChevronDownIcon
             className={cn(
