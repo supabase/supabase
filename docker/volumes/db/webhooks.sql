@@ -42,7 +42,7 @@ BEGIN;
           retry_count integer DEFAULT 0;
           max_retries integer := COALESCE(TG_ARGV[5]::integer, 0);
           succeeded boolean := FALSE;
-          retry_delays double precision[] := ARRAY[0, 0.100, 0.250, 0.500, 1.000, 2.500];
+          retry_delays double precision[] := ARRAY[0, 0.250, 0.500, 1.000, 2.500, 5.000];
           status_code integer :=0;
         BEGIN
           IF url IS NULL OR url = 'null' THEN
@@ -66,7 +66,7 @@ BEGIN;
           END IF;
 
           IF TG_ARGV[4] IS NULL OR TG_ARGV[4] = 'null' THEN
-            timeout_ms = 1000;
+            timeout_ms = 3000; -- 3 seconds
           ELSE
             timeout_ms = TG_ARGV[4]::integer;
           END IF;

@@ -81,20 +81,20 @@ type DeletePayload = {
 ## Timeout
 
 The timeout is the maximum time in milliseconds that the webhook will wait for a response from the server. If the timeout is exceeded, the webhook will fail.
-
+The default timeout for webhooks is set for 3000ms (3 seconds).
 ## Retrying failed webhooks
 
 The webhook will retry up to 5 times if it fails depending on the settings you choose. Webhooks with a response code of 400 and above are considered failed.
 The retries follow an exponential backoff strategy, following this delay table:
 
-| Retry # | Timeout          |
-| ------- | ---------------- |
+| Retry # |      Timeout      |
+| ------- | ----------------- |
 | 0       | 0ms (no timeout) |
-| 1       | 100ms            |
-| 2       | 250ms            |
-| 3       | 500ms            |
-| 4       | 1000ms           |
-| 5       | 2500ms           |
+| 1       | 250ms            |
+| 2       | 500ms            |
+| 3       | 1000ms           |
+| 4       | 2500ms           |
+| 5       | 5000ms           |
 
 ## Monitoring
 

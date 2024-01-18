@@ -107,7 +107,7 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
     function_type: isEdgeFunction(selectedHook?.function_args?.[0] ?? '')
       ? 'supabase_function'
       : 'http_request',
-    timeout_ms: Number(selectedHook?.function_args?.[4] ?? 1000),
+    timeout_ms: Number(selectedHook?.function_args?.[4] ?? 3000),
     max_retries: Number(selectedHook?.function_args?.[5] ?? 0),
   }
 
