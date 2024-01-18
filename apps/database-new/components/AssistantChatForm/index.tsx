@@ -1,11 +1,11 @@
 'use client'
 
 import { Loader2 } from 'lucide-react'
-import { FormHTMLAttributes, KeyboardEvent, ReactNode, forwardRef, useRef } from 'react'
+import { useParams } from 'next/navigation'
+import { ChangeEvent, FormHTMLAttributes, ReactNode, forwardRef, useRef } from 'react'
+import { useFormStatus } from 'react-dom'
 import { TextArea_Shadcn_, cn } from 'ui'
 
-import { useParams } from 'next/navigation'
-import ChatLoadingAnimation from './ChatLoadingAnimation'
 import { ChatSuggestions } from './ChatSuggestions'
 import { upsertMessageFormAction } from './action'
 
@@ -17,11 +17,13 @@ export interface FormProps extends FormHTMLAttributes<HTMLFormElement> {
   chatContext: 'new' | 'edit'
 }
 
-const SubmitButton = forwardRef<HTMLButtonElement, { isLoading: boolean; input: string }>(
-  ({ isLoading, input }, ref) => {
+const SubmitButton = forwardRef<HTMLButtonElement, { isLoading: boolean; canSubmit: boolean }>(
+  ({ canSubmit }, ref) => {
+    const { pending } = useFormStatus()
+
     return (
       <div className="absolute right-1.5 top-1.5 flex gap-3 items-center">
-        {isLoading && (
+        {pending && (
           <Loader2 size={22} className="animate-spin w-7 h-7 text-muted" strokeWidth={1} />
         )}
 
@@ -29,12 +31,12 @@ const SubmitButton = forwardRef<HTMLButtonElement, { isLoading: boolean; input: 
           title="Send AI prompt"
           ref={ref}
           type="submit"
-          disabled={isLoading}
+          disabled={pending || canSubmit}
           className={cn(
             'transition-all',
             'flex items-center justify-center w-7 h-7 border border-control rounded-full mr-0.5 p-1.5 background-alternative',
-            !input ? 'text-muted opacity-50' : 'text-default opacity-100',
-            isLoading ? 'hidden' : ''
+            canSubmit ? 'text-default opacity-100' : 'text-muted opacity-50',
+            pending ? 'hidden' : ''
           )}
         >
           <svg
@@ -72,36 +74,30 @@ const AssistantChatForm = ({
 }: AssistantChatFormProps) => {
   const { thread_id } = useParams()
   const textAreaRef = useRef<HTMLTextAreaElement>(null)
-  const submitRef = useRef<HTMLButtonElement>(null)
 
   const disabled = false
 
-  // useEffect(() => {
-  //   if (textAreaRef) {
-  //     textAreaRef?.current?.focus()
-
-  //     if (!input && textAreaRef && textAreaRef.current) {
-  //       textAreaRef.current.style.height = '40px'
-  //     } else if (textAreaRef && textAreaRef.current) {
-  //       const newHeight = textAreaRef.current.scrollHeight + 'px'
-  //       textAreaRef.current.style.height = newHeight
-  //     }
-  //   }
-  // }, [input, textAreaRef])
-
-  function handleKeyDown(e: KeyboardEvent<HTMLTextAreaElement>) {
-    // Check if the pressed key is "Enter" (key code 13) without the "Shift" key
-    if (e.key === 'Enter' && !e.shiftKey) {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (!e.shiftKey && (e.key === 'Enter' || e.key === 'NumpadEnter')) {
       e.preventDefault()
-      if (submitRef.current) {
-        submitRef.current.click()
-      }
+      e.currentTarget.form?.requestSubmit()
+    }
+  }
+
+  const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    const target = e.target
+    let newHeight = target.scrollHeight + 'px'
+    const input = target.value
+    if (!input) {
+      newHeight = '40px'
+    }
+    if (target.style.height !== newHeight) {
+      target.style.height = newHeight
     }
   }
 
   return (
     <>
-      {disabled && <ChatLoadingAnimation />}
       <form
         className="relative"
         action={async (formData) => {
@@ -119,21 +115,22 @@ const AssistantChatForm = ({
           autoFocus
           rows={1}
           defaultValue=""
-          disabled={disabled || submitRef.current?.disabled}
+          disabled={disabled}
           contentEditable
           required
           className={
             'transition-all text-sm pl-12 pr-10 rounded-[18px] resize-none box-border leading-6'
           }
+          style={{ height: '40px' }}
           placeholder={placeholder}
           spellCheck={false}
-          onKeyDown={(e) => handleKeyDown(e)}
+          onKeyDown={handleKeyDown}
+          onChange={handleChange}
         />
-        {/* {props.children} */}
-        <SubmitButton input={''} isLoading={disabled} ref={submitRef} />
-        {/* <p aria-live="polite" className="sr-only" role="status">
-            {message}
-          </p> */}
+        <SubmitButton
+          canSubmit={(textAreaRef?.current?.value || '').length > 0}
+          isLoading={disabled}
+        />
       </form>
       {chatContext === 'new' && (
         <ChatSuggestions
