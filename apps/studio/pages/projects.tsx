@@ -11,7 +11,6 @@ import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
 import { useFlag, useIsFeatureEnabled } from 'hooks'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { NextPageWithLayout } from 'types'
-import Connect from 'components/interfaces/Home/Connect/Connect'
 
 const ProjectsPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -62,7 +61,6 @@ const ProjectsPage: NextPageWithLayout = () => {
               </div>
             </div>
           )}
-          <Connect />
           <div className="my-8 space-y-8">
             <ProjectList />
           </div>
