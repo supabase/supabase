@@ -525,6 +525,38 @@ functions:
             redirectTo: kIsWeb ? null : 'io.supabase.flutter://reset-callback/',
           );
           ```
+  - id: set-session
+    title: 'setSession()'
+    notes: |
+      - `setSession()` takes in a refresh token and uses it to get a new session.
+      - The refresh token can only be used once to obtain a new session.
+      - [Refresh token rotation](/docs/guides/cli/config#auth.enable_refresh_token_rotation) is enabled by default on all projects to guard against replay attacks.
+      - You can configure the [`REFRESH_TOKEN_REUSE_INTERVAL`](/docs/guides/cli/config#auth.refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
+    examples:
+      - id: refresh-the-session
+        name: Refresh the session
+        description: Sets the session data from refresh_token and returns current session or an error if the refresh_token is invalid.
+        isSpotlight: true
+        code: |
+          ```dart
+          final refreshToken = supabase.currentSession?.refreshToken ?? '';
+          final AuthResponse response = await supabase.auth.setSession(refreshToken);
+
+          final session = res.session;
+          ```  
+  - id: refresh-session
+    title: 'refreshSession()'
+    notes: |
+      - This method will refresh and return a new session whether the current one is expired or not.
+    examples:
+      - id: refresh-session-using-the-current-session
+        name: Refresh session using the current session
+        isSpotlight: true
+        code: |
+          ```dart
+          final AuthResponse res = await supabase.auth.refreshSession();
+          final session = res.session;
+          ```
   - id: auth-mfa-api
     title: 'Overview'
     notes: |

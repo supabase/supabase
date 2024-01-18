@@ -59,7 +59,7 @@ const DaySection = ({ day }: { day: WeekDayProps }) => {
             <div className="relative p-4 sm:p-6 md:p-8 z-20 flex-grow flex flex-col items-start justify-between gap-2 w-full lg:w-3/5 text-left">
               <div className="relative w-full flex items-center gap-2 text-sm translate-x-0 !ease-[.24,0,.22,.99] duration-200 group-hover:-translate-x-6 transition-transform">
                 <IconEdit2 className="w-4 min-w-4 group-hover:opacity-0 transition-opacity" />
-                <span className="">Blog post</span>
+                <span>Blog post</span>
                 <ArrowRightIcon className="w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
               <h2 className="text-lg leading-7 [&_strong]:font-normal [&_strong]:text-foreground">

@@ -35,6 +35,7 @@ export * from './src/components/CodeBlock'
 // NAV
 
 export * from './src/components/Menu'
+export * from './src/components/NavMenu'
 
 // OVERLAYS
 
@@ -146,6 +147,17 @@ export {
   AccordionContent as AccordionContent_Shadcn_,
 } from './src/components/shadcn/ui/accordion'
 
+export {
+  Select as Select_Shadcn_,
+  SelectContent as SelectContent_Shadcn_,
+  SelectGroup as SelectGroup_Shadcn_,
+  SelectItem as SelectItem_Shadcn_,
+  SelectLabel as SelectLabel_Shadcn_,
+  SelectSeparator as SelectSeparator_Shadcn_,
+  SelectTrigger as SelectTrigger_Shadcn_,
+  SelectValue as SelectValue_Shadcn_,
+} from './src/components/shadcn/ui/select'
+
 export { Input as Input_Shadcn_ } from './src/components/shadcn/ui/input'
 
 export { TextArea as TextArea_Shadcn_ } from './src/components/shadcn/ui/text-area'
@@ -174,6 +186,13 @@ export {
   SheetTitle as SheetTitle_Shadcn_,
   SheetDescription as SheetDescription_Shadcn_,
 } from './src/components/shadcn/ui/sheet'
+
+export {
+  Tabs as Tabs_Shadcn_,
+  TabsContent as TabsContent_Shadcn_,
+  TabsList as TabsList_Shadcn_,
+  TabsTrigger as TabsTrigger_Shadcn_,
+} from './src/components/shadcn/ui/tabs/tabs'
 
 export { ScrollArea, ScrollBar } from './src/components/shadcn/ui/scroll-area'
 

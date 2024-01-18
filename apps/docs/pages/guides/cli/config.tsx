@@ -32,7 +32,7 @@ export default function Config() {
       <div className="grid grid-cols-12 relative gap-4 px-5 max-w-7xl mx-auto py-16">
         <div className="relative col-span-12 md:col-span-9 transition-all ease-out duration-100">
           <div className="w-full prose">
-            <h1 className="">CLI configuration</h1>
+            <h1>CLI configuration</h1>
             <div className="max-w-xs w-32 h-[1px] bg-gradient-to-r from-brand-300 to-brand my-8"></div>
             <ReactMarkdown>{specFile.info.description}</ReactMarkdown>
             <div>{content}</div>
@@ -61,7 +61,7 @@ function Info({ parameter }: { parameter: Parameter }) {
 
         <div className="border-b pb-8" key={parameter.id}>
           <div className=" mb-16">
-            <div className="">
+            <div>
               <table className="table-auto">
                 <thead>
                   <tr>
