@@ -6,7 +6,12 @@ export type Parent = {
   children: Parent[]
 }
 
-export type File = { path: string; name: string; displayPath: string }
+//export type File = { location: string; destinationFilename: string; label: string }
+export type File = {
+  location: string // location on the filesystem
+  destinationFilename: string // where the user should put the file
+  destinationLocation: string // label for the ui
+}
 
 export const CONNECTION_TYPES = [
   { key: 'frameworks', label: 'App Frameworks' },
@@ -34,9 +39,15 @@ export const FRAMEWORKS: Parent[] = [
             files: [
               {
                 // omit .tsx extension
-                path: 'app-supabasejs/env.local',
-                name: 'app-supabasejs.env.local',
-                displayPath: 'app-supabasejs/.env.local',
+                location: 'nextjs/app/supabasejs/env.local',
+                destinationLocation: '.env.local',
+                destinationFilename: '.env.local',
+              },
+              {
+                // omit .tsx extension
+                location: 'nextjs/app/supabasejs/page', // location on local disk
+                destinationLocation: 'app/page.tsx', // label for the ui
+                destinationFilename: 'page.tsx', // where the user should put the file
               },
             ],
           },
@@ -48,9 +59,9 @@ export const FRAMEWORKS: Parent[] = [
             files: [
               {
                 // omit .tsx extension
-                path: 'app-postgresjs/env.local',
-                name: 'app-postgresjs.env.local',
-                displayPath: 'app-postgresjs/.env.local',
+                location: 'app-postgresjs/env.local',
+                destinationFilename: 'app-postgresjs.env.local',
+                destinationLocation: 'app-postgresjs/.env.local',
               },
             ],
           },
@@ -70,9 +81,9 @@ export const FRAMEWORKS: Parent[] = [
             files: [
               {
                 // omit .tsx extension
-                path: 'pages-supabasejs/env.local',
-                name: 'pages-supabasejs.env.local',
-                displayPath: 'pages-supabasejs/.env.local',
+                location: 'pages-supabasejs/env.local',
+                destinationFilename: 'pages-supabasejs.env.local',
+                destinationLocation: 'pages-supabasejs/.env.local',
               },
             ],
           },
@@ -84,9 +95,9 @@ export const FRAMEWORKS: Parent[] = [
             files: [
               {
                 // omit .tsx extension
-                path: 'pages-postgresjs/env.local',
-                name: 'pages-postgresjs.env.local',
-                displayPath: 'pages-postgresjs/.env.local',
+                location: 'pages-postgresjs/env.local',
+                destinationFilename: 'pages-postgresjs.env.local',
+                destinationLocation: 'pages-postgresjs/.env.local',
               },
             ],
           },
@@ -101,9 +112,9 @@ export const FRAMEWORKS: Parent[] = [
     files: [
       {
         // omit .tsx extension
-        path: 'vue1/env.local',
-        name: 'vue1.env.local',
-        displayPath: 'vue1/.env.local',
+        location: 'vue1/env.local',
+        destinationFilename: 'vue1.env.local',
+        destinationLocation: 'vue1/.env.local',
       },
     ],
     children: [],
@@ -121,9 +132,9 @@ export const FRAMEWORKS: Parent[] = [
         files: [
           {
             // omit .tsx extension
-            path: 'svelte1/env.local',
-            name: 'svelte1.env.local',
-            displayPath: 'svelte1/.env.local',
+            location: 'svelte1/env.local',
+            destinationFilename: 'svelte1.env.local',
+            destinationLocation: 'svelte1/.env.local',
           },
         ],
         children: [],
@@ -135,9 +146,9 @@ export const FRAMEWORKS: Parent[] = [
         files: [
           {
             // omit .tsx extension
-            path: 'svelte2/env.local',
-            name: 'svelte2.env.local',
-            displayPath: 'svelte2/.env.local',
+            location: 'svelte2/env.local',
+            destinationFilename: 'svelte2.env.local',
+            destinationLocation: 'svelte2/.env.local',
           },
         ],
 
@@ -156,9 +167,9 @@ export const ORMS: Parent[] = [
     files: [
       {
         // omit .tsx extension
-        path: 'prisma/env.local',
-        name: 'prisma.env.local',
-        displayPath: 'prisma/.env.local',
+        location: 'prisma/env.local',
+        destinationFilename: 'prisma.env.local',
+        destinationLocation: 'prisma/.env.local',
       },
     ],
   },
@@ -170,9 +181,9 @@ export const ORMS: Parent[] = [
     files: [
       {
         // omit .tsx extension
-        path: 'drizzle/env.local',
-        name: 'drizzle.env.local',
-        displayPath: 'drizzle/.env.local',
+        location: 'drizzle/env.local',
+        destinationFilename: 'drizzle.env.local',
+        destinationLocation: 'drizzle/.env.local',
       },
     ],
   },
@@ -187,9 +198,9 @@ export const DIRECT: Parent[] = [
     files: [
       {
         // omit .tsx extension
-        path: 'direct/env.local',
-        name: 'direct.env.local',
-        displayPath: 'direct/.env.local',
+        location: 'direct/env.local',
+        destinationFilename: 'direct.env.local',
+        destinationLocation: 'direct/.env.local',
       },
     ],
   },
@@ -203,9 +214,9 @@ export const GRAPHQL: Parent[] = [
     files: [
       {
         // omit .tsx extension
-        path: 'graphql/env.local',
-        name: 'graphql.env.local',
-        displayPath: 'graphql/.env.local',
+        location: 'graphql/env.local',
+        destinationFilename: 'graphql.env.local',
+        destinationLocation: 'graphql/.env.local',
       },
     ],
   },

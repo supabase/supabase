@@ -17,7 +17,7 @@ import {
   TabsTrigger_Shadcn_,
   Tabs_Shadcn_,
 } from 'ui'
-import { Plug } from 'lucide-react'
+import { FileJson2, Plug } from 'lucide-react'
 
 const Connect = () => {
   const [parentSelectorOpen, setParentSelectorOpen] = useState(false)
@@ -255,21 +255,29 @@ const Connect = () => {
   )
 }
 const TabsContent = ({ files, pooler }: { files: File[]; pooler?: boolean }) => {
-  console.log('files?', files[0].path)
   return (
     <div className="bg-surface bg-surface-100 p-4 rounded-md mt-4">
-      <Tabs_Shadcn_ defaultValue={files[0].path}>
+      <Tabs_Shadcn_ defaultValue={files[0].location}>
         <TabsList_Shadcn_>
           {files?.map((file: File) => (
-            <TabsTrigger_Shadcn_ key={file.path} value={file.path}>
-              {file.displayPath}
+            <TabsTrigger_Shadcn_
+              key={file.location}
+              value={file.location}
+              className="flex items-center gap-1"
+            >
+              <FileJson2 size={15} className="text-lighter" />
+              {file.destinationFilename}
             </TabsTrigger_Shadcn_>
           ))}
         </TabsList_Shadcn_>
 
         {files?.map((file: File) => (
-          <TabsContent_Shadcn_ key={file.path} value={file.path}>
-            <ConnectTabContent path={file.path} pooler={pooler} />
+          <TabsContent_Shadcn_ key={file.location} value={file.location}>
+            <ConnectTabContent
+              destinationLocation={file.destinationLocation}
+              path={file.location}
+              pooler={pooler}
+            />
           </TabsContent_Shadcn_>
         ))}
       </Tabs_Shadcn_>

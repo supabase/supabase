@@ -5,7 +5,7 @@ interface ConnectPathProps {
 }
 const ConnectPath = ({ path }: ConnectPathProps) => {
   return (
-    <div className="items-center gap-2 font-mono text-sm bg-surface-200 p-2 inline-flex rounded-lg">
+    <div className="items-center gap-2 font-mono text-sm bg-surface-200 p-2 inline-flex rounded-lg mb-4">
       <FolderTree size={14} />
       {path}
     </div>

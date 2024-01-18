@@ -1,7 +1,9 @@
+import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
+
 const ContentFile = () => {
   return (
     <div>
-      <pre>
+      <SimpleCodeBlock className="typescript">
         {`
 import { createBrowserClient } from "@supabase/ssr";
 
@@ -11,7 +13,7 @@ export const createClient = () =>
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
   );
 `}
-      </pre>
+      </SimpleCodeBlock>
     </div>
   )
 }
