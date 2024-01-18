@@ -80,11 +80,11 @@ const AddonCard = ({ addon, setShowComputeModal }: any) => {
 
   const HighlightCard = () => (
     <>
-      <div className="relative order-last lg:order-first lg:h-full aspect-[2/1] lg:aspect-[3/2] p-4 md:p-8 pt-0 lg:pt-8 lg:pr-0">
+      <div className="relative order-last lg:order-first lg:h-full aspect-[2/1] lg:aspect-[3/2] p-4 pt-0 lg:pt-4 lg:pr-0">
         {addon.heroImg}
       </div>
 
-      <div className="p-4 md:p-8 gap-4 flex flex-col justify-center">
+      <div className="p-4 gap-4 flex flex-col justify-center">
         <div className="flex flex-col gap-2">
           <p className="text-[13px] text-foreground-lighter">{addon.price}</p>
           <div className="flex items-center gap-2">
@@ -95,7 +95,12 @@ const AddonCard = ({ addon, setShowComputeModal }: any) => {
           </p>
         </div>
         <div className="flex items-center gap-4 mt-4">
-          <Button asChild size="tiny" type="default">
+          <Button
+            asChild
+            size="tiny"
+            type="default"
+            iconRight={<IconArrowUpRight className="w-4 h-4" />}
+          >
             <Link href={addon.leftCtaLink}>{addon.leftCtaText}</Link>
           </Button>
         </div>
@@ -133,7 +138,7 @@ const AddonCard = ({ addon, setShowComputeModal }: any) => {
           <p className="text-foreground-lighter text-[13px]">{addon.description}</p>
         </div>
       </div>
-      <div className="absolute right-0 flex justify-end p-8">
+      <div className="absolute right-0 flex justify-end p-4">
         <IconArrowUpRight className="w-5 h-5 text-foreground-lighter group-hover:text-foreground transition-colors" />
       </div>
     </>
