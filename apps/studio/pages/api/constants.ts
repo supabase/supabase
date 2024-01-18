@@ -19,6 +19,11 @@ export const DEFAULT_PROJECT = {
   status: 'ACTIVE_HEALTHY',
   region: 'local',
   inserted_at: '2021-08-02T06:40:40.646Z',
+  serviceVersions: {
+    gotrue: '2.132.3',
+    postgrest: '12.0.1',
+    'supabase-postgres': '15.1.0.147',
+  },
 }
 
 /**
