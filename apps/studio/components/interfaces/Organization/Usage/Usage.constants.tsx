@@ -1,6 +1,6 @@
 import { USAGE_APPROACHING_THRESHOLD } from 'components/interfaces/Billing/Billing.constants'
 import { EgressType, PricingMetric } from 'data/analytics/org-daily-stats-query'
-import { OrgSubscription } from 'data/subscriptions/org-subscription-query'
+import { OrgSubscription } from 'data/subscriptions/types'
 import { OrgUsageResponse } from 'data/usage/org-usage-query'
 import { Alert } from 'ui'
 
@@ -17,8 +17,6 @@ export const COLOR_MAP = {
   'dark-red': { bar: 'fill-red-1000', marker: 'bg-red-1000' },
   purple: { bar: 'fill-purple-900', marker: 'bg-purple-900' },
 }
-
-export const Y_DOMAIN_CEILING_MULTIPLIER = 4 / 3
 
 export const USAGE_STATUS = {
   NORMAL: 'NORMAL',

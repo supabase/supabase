@@ -28,6 +28,11 @@ const sendEvent = (
 
   const { category, action, label, value } = event
 
+  // remove # section from router.asPath as it
+  // often includes sensitive information
+  // such as access/refresh tokens
+  const page_location = router.asPath.split('#')[0]
+
   return post(`${API_URL}/telemetry/event`, {
     action: action,
     category: category,
@@ -35,7 +40,7 @@ const sendEvent = (
     value: value,
     page_referrer: document?.referrer,
     page_title: document?.title,
-    page_location: router.asPath,
+    page_location,
     ga: {
       screen_resolution: gaProps?.screenResolution,
       language: gaProps?.language,

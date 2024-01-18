@@ -45,7 +45,7 @@ SUPABASE_URL=YOUR_SUPABASE_URL
 SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 ```
 
-### Code Exchange Route
+### Code Exchange route
 
 The `Code Exchange` route is required for the [server-side auth flow](https://supabase.com/docs/guides/auth/server-side-rendering) implemented by the Remix Auth Helpers. It exchanges an auth `code` for the user's `session`, which is set as a cookie for future requests made to Supabase.
 
@@ -275,7 +275,7 @@ export const action = async ({ request }: ActionArgs) => {
 </TabPanel>
 </Tabs>
 
-## Session and User
+## Session and user
 
 You can determine if a user is authenticated by checking their session using the `getSession` function.
 
@@ -285,13 +285,15 @@ const {
 } = await supabaseClient.auth.getSession()
 ```
 
-The session contains a user property.
+The session contains a user property. This is the user metadata saved, unencoded, to the local storage medium. It's unverified and can be tampered by the user, so don't use it for authorization or sensitive purposes.
+
+<GetSessionWarning />
 
 ```jsx
 const user = session?.user
 ```
 
-Or, if you don't need the session, you can call the `getUser()` function.
+Or, if you need trusted user data, you can call the `getUser()` function, which retrieves the trusted user data by making a request to the Supabase Auth server.
 
 ```jsx
 const {
@@ -759,11 +761,11 @@ export default function Index() {
 
 > Ensure you have [enabled replication](https://supabase.com/dashboard/project/_/database/replication) on the table you are subscribing to.
 
-## Migration Guide
+## Migration guide
 
 ### Migrating to v0.2.0
 
-#### PKCE Auth Flow
+#### PKCE Auth flow
 
 PKCE is the new server-side auth flow implemented by the Remix Auth Helpers. It requires a new `loader` route for `/auth/callback` that exchanges an auth `code` for the user's `session`.
 

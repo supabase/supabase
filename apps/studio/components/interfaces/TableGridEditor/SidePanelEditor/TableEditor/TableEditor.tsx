@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { usePostgresTypesQuery } from 'data/database/types-query'
 import { useIsFeatureEnabled, useStore } from 'hooks'
@@ -56,11 +57,11 @@ const TableEditor = ({
   updateEditorDirty = noop,
 }: TableEditorProps) => {
   const snap = useTableEditorStateSnapshot()
-  const { ui, meta } = useStore()
+  const { ui } = useStore()
   const { project } = useProjectContext()
   const isNewRecord = isUndefined(table)
-
   const realtimeEnabled = useIsFeatureEnabled('realtime:all')
+
   const { data: types } = usePostgresTypesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -69,8 +70,11 @@ const TableEditor = ({
     (type) => !EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS.includes(type.schema)
   )
 
-  const publications = meta.publications.list()
-  const realtimePublication = publications.find(
+  const { data: publications } = useDatabasePublicationsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const realtimePublication = (publications ?? []).find(
     (publication) => publication.name === 'supabase_realtime'
   )
   const realtimeEnabledTables = realtimePublication?.tables ?? []

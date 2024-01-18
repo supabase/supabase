@@ -1,22 +1,21 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { post } from 'lib/common/fetch'
-import { API_ADMIN_URL } from 'lib/constants'
-import { customDomainKeys } from './keys'
+
+import { post } from 'data/fetchers'
 import { toast } from 'react-hot-toast'
 import { ResponseError } from 'types'
+import { customDomainKeys } from './keys'
 
 export type CustomDomainReverifyVariables = {
   projectRef: string
 }
 
 export async function reverifyCustomDomain({ projectRef }: CustomDomainReverifyVariables) {
-  const response = await post(
-    `${API_ADMIN_URL}/projects/${projectRef}/custom-hostname/reverify`,
-    {}
-  )
+  const { data, error } = await post(`/v1/projects/{ref}/custom-hostname/reverify`, {
+    params: { path: { ref: projectRef } },
+  })
 
-  if (response.error) throw response.error
-  return response
+  if (error) throw error
+  return data
 }
 
 type CustomDomainReverifyData = Awaited<ReturnType<typeof reverifyCustomDomain>>

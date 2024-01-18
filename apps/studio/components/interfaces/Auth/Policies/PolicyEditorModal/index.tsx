@@ -1,4 +1,3 @@
-import type { PostgresRole } from '@supabase/postgres-meta'
 import { isEmpty, noop } from 'lodash'
 import { useEffect, useState } from 'react'
 import { Modal } from 'ui'
@@ -26,7 +25,6 @@ import PolicyEditorModalTitle from './PolicyEditorModalTitle'
 
 interface PolicyEditorModalProps {
   visible: boolean
-  roles?: PostgresRole[]
   schema: string
   table: string
   selectedPolicyToEdit: any
@@ -38,7 +36,6 @@ interface PolicyEditorModalProps {
 
 const PolicyEditorModal = ({
   visible = false,
-  roles = [],
   schema = '',
   table = '',
   selectedPolicyToEdit = {},
@@ -191,7 +188,7 @@ const PolicyEditorModal = ({
       ]}
       onCancel={isClosingPolicyEditor}
     >
-      <div className="">
+      <div>
         <ConfirmationModal
           visible={isClosingPolicyEditorModal}
           header="Discard changes"
@@ -219,7 +216,6 @@ const PolicyEditorModal = ({
         ) : view === POLICY_MODAL_VIEWS.EDITOR ? (
           <PolicyEditor
             isNewPolicy={isNewPolicy}
-            roles={roles}
             policyFormFields={policyFormFields}
             onUpdatePolicyFormFields={onUpdatePolicyFormFields}
             onViewTemplates={onViewTemplates}

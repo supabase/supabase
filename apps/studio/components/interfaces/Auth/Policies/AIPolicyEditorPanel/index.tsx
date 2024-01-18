@@ -1,5 +1,8 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
+import { useQueryClient } from '@tanstack/react-query'
 import { useChat } from 'ai/react'
+import { useParams } from 'common'
+import { uniqBy } from 'lodash'
 import { FileDiff } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -12,12 +15,12 @@ import {
 } from 'components/interfaces/SQLEditor/SQLEditor.types'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
+import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
+import { useSelectedOrganization, useSelectedProject } from 'hooks'
 import { BASE_PATH, OPT_IN_TAGS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
-import { uniqBy } from 'lodash'
 import { AIPolicyChat } from './AIPolicyChat'
 import {
   MessageWithDebug,
@@ -29,6 +32,9 @@ import { AIPolicyHeader } from './AIPolicyHeader'
 import PolicyDetails from './PolicyDetails'
 import QueryError from './QueryError'
 import RLSCodeEditor from './RLSCodeEditor'
+import Telemetry from 'lib/telemetry'
+import { useTelemetryProps } from 'common'
+import { useRouter } from 'next/router'
 
 const DiffEditor = dynamic(
   () => import('@monaco-editor/react').then(({ DiffEditor }) => DiffEditor),
@@ -49,9 +55,12 @@ export const AIPolicyEditorPanel = memo(function ({
   selectedPolicy,
   onSelectCancel,
 }: AIPolicyEditorPanelProps) {
-  const { meta } = useStore()
+  const { ref } = useParams()
+  const queryClient = useQueryClient()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
+  const router = useRouter()
+  const telemetryProps = useTelemetryProps()
 
   // use chat id because useChat doesn't have a reset function to clear all messages
   const [chatId, setChatId] = useState(uuidv4())
@@ -108,7 +117,7 @@ export const AIPolicyEditorPanel = memo(function ({
   const { mutate: executeMutation, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess: () => {
       // refresh all policies
-      meta.policies.load()
+      queryClient.invalidateQueries(databasePoliciesKeys.list(ref))
       toast.success('Successfully created new policy')
       onSelectCancel()
     },
@@ -259,10 +268,38 @@ export const AIPolicyEditorPanel = memo(function ({
                     <span className="text-sm">Accept changes from assistant</span>
                   </div>
                   <div className="flex gap-3">
-                    <Button type="default" onClick={() => setIncomingChange(undefined)}>
+                    <Button
+                      type="default"
+                      onClick={() => {
+                        setIncomingChange(undefined)
+                        Telemetry.sendEvent(
+                          {
+                            category: 'rls_editor',
+                            action: 'ai_suggestion_discarded',
+                            label: 'rls-ai-assistant',
+                          },
+                          telemetryProps,
+                          router
+                        )
+                      }}
+                    >
                       Discard
                     </Button>
-                    <Button type="primary" onClick={() => acceptChange()}>
+                    <Button
+                      type="primary"
+                      onClick={() => {
+                        acceptChange()
+                        Telemetry.sendEvent(
+                          {
+                            category: 'rls_editor',
+                            action: 'ai_suggestion_accepted',
+                            label: 'rls-ai-assistant',
+                          },
+                          telemetryProps,
+                          router
+                        )
+                      }}
+                    >
                       Accept
                     </Button>
                   </div>

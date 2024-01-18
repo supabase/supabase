@@ -11,11 +11,7 @@ Use branching to safely and easily experiment with changes to your Supabase proj
 
 <Admonition type="caution" label="Branching available for Early Access, available on the Pro Plan and above.">
 
-We do not recommended Branching in a production environment while it is in Early Access. To try branching, [request access here](https://forms.supabase.com/branching-request). We are working our upstream provider to improve the stability in the following regions:
-
-- South East Asia (Singapore)
-- South Asia (Mumbai)
-- Central EU (Frankfurt)
+We do not recommended Branching in a production environment while it is in Early Access. To try branching, [request access here](https://forms.supabase.com/branching-request).
 
 </Admonition>
 
@@ -75,11 +71,11 @@ Supabase Branching follows the [Trunk Based Development](https://trunkbaseddevel
 
 </figure>
 
-### Production Branch
+### Production branch
 
 In Git, you have a Production Branch (typically this is `main`, `master`, `prod`, etc). This should also be your Supabase project's Production Branch.
 
-### Preview Branches
+### Preview branches
 
 After connecting your Supabase project to one of the supported [Git providers](#git-providers), a corresponding Supabase Preview will be created whenever a new Git branch is created.
 
@@ -109,7 +105,7 @@ For security reasons, Preview Branches do not contain production data. Future ve
 
 <Admonition type="note" label="Data changes are not merged into production." />
 
-### Merging Production changes
+### Merging production changes
 
 When you merge your Git branch into the production branch, all changes will be applied to your Production environment.
 
@@ -117,7 +113,7 @@ When you merge your Git branch into the production branch, all changes will be a
 
 We currently support [GitHub](#branching-with-github). If you are interested in other Git providers, join the [discussion](<(https://github.com/orgs/supabase/discussions/18936)>) for GitLab, BitBucket, and non-Git based Branching.
 
-## How to use Supabase Branching
+## How to use Supabase branching
 
 Supabase Branching requires a hosted [Git provider](#git-providers). Follow these steps to connect your Supabase project to a Git provider, and enable branching.
 
@@ -161,7 +157,7 @@ You can use the [Supabase CLI](/docs/guides/cli) to manage changes inside a loca
             supabase db pull --db-url <db_url>
 
             # Your Database URL looks something like:
-            # postgresql://username:password@db.ref.supabase.co:5432/postgres
+            # postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:6543/postgres
             ```
 
             </CH.Code>
@@ -204,7 +200,7 @@ Push your new project to a GitHub repo. For more information, see the GitHub gui
 </TabPanel>
 </Tabs>
 
-### Enable Supabase Branching
+### Enable Supabase branching
 
 Once your repository is [correctly prepared](#preparing-your-git-repository), you can enable branching from the Supabase dashboard.
 
@@ -491,7 +487,7 @@ Dashboard changes aren't automatically reflected in your Git repository. If you'
          <CH.Code lineNumbers={false}>
 
         ```bash
-        supabase db pull --db-url "postgres://postgres:[password]@db.[branch-ref].supabase.co:5432/postgres"
+        supabase db pull --db-url "postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:6543/postgres"
         ```
 
         </CH.Code>
@@ -576,9 +572,9 @@ If you have multiple preview branches, each preview branch might contain differe
 
 When a preview branch is merged into the production branch, it creates a schema drift between the production branch and the preview branches you haven't merged yet.
 
-You can solve thse conflicts the way you would solve normal Git Conflicts: merge or rebase from your production Git branch to your preview Git branch. Since migrations are applied sequentially, ensure that migration files are timestamped correctly after the rebase. Changes that build on top of earlier changes should always have later timestamps.
+You can solve these conflicts the way you would solve normal Git Conflicts: merge or rebase from your production Git branch to your preview Git branch. Since migrations are applied sequentially, ensure that migration files are timestamped correctly after the rebase. Changes that build on top of earlier changes should always have later timestamps.
 
-### Changing Production Branch
+### Changing production branch
 
 It's not possible to change the Git branch used as the Production branch for Supabase Branching. The only way to change it is to disable and re-enable branching. See [Disable Branching](#disable-branching).
 
@@ -598,7 +594,7 @@ With the Supabase branching integration, you can sync the Git branch used by the
 
 Install the Vercel integration:
 
-- From the [Vercel marketplace](https://vercel.com/integrations/supabase-v2) or
+- From the [Vercel marketplace](https://vercel.com/integrations/supabase) or
 - By clicking the blue `Deploy` button in a Supabase example app's `README` file
 
 <Admonition type="note" label="Vercel GitHub integration also required.">
@@ -628,6 +624,15 @@ If you prefer not to use branching, you can manage your environments and tests i
    Create a single project to host your production instance. Test any changes locally, then run the migrations against your hosted production project.
 
 You can also combine both strategies to perform both local and staging tests.
+
+## Early access pricing
+
+Branching is available on the Pro Plan and above for Early Access users. The price during Early Access is:
+
+- Each Preview branch costs $0.32 per day
+- Each Preview branch is billed until it is removed
+
+Prices listed are for Early Access and are subject to change.
 
 ## Feedback
 

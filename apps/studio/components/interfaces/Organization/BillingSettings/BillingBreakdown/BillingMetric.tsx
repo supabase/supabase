@@ -1,7 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import Link from 'next/link'
 
-import { OrgSubscription } from 'data/subscriptions/org-subscription-query'
+import { OrgSubscription } from 'data/subscriptions/types'
 import { OrgUsageResponse } from 'data/usage/org-usage-query'
 import { Button, IconChevronRight, IconPieChart } from 'ui'
 import { Metric, USAGE_APPROACHING_THRESHOLD } from './BillingBreakdown.constants'
@@ -125,8 +125,8 @@ const BillingMetric = ({
             <Tooltip.Portal>
               <Tooltip.Content side="bottom">
                 <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div className="rounded bg-alternative py-1 px-2 leading-none shadow border border-background min-w-[250px]">
-                  <div className="text-xs text-foreground max-w-sm space-y-2">
+                <div className="rounded bg-alternative py-1 px-2 leading-none shadow border border-background min-w-[300px] max-w-[450px] max-h-[300px] overflow-y-auto">
+                  <div className="text-xs text-foreground space-y-2">
                     <p className="font-medium">{usageMeta.unit_price_desc}</p>
 
                     {usageMeta.project_allocations && usageMeta.project_allocations.length > 0 && (

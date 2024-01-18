@@ -118,7 +118,7 @@ Read on for some common development tips.
 
 Here are a few recommendations when developing Edge Functions.
 
-### Skipping Authorization checks
+### Skipping authorization checks
 
 By default, Edge Functions require a valid JWT in the authorization header. If you want to use Edge Functions without Authorization checks (commonly used for Stripe webhooks), you can pass the `--no-verify-jwt` flag when serving your Edge Functions locally.
 
@@ -128,7 +128,7 @@ supabase functions serve hello-world --no-verify-jwt
 
 Be careful when using this flag, as it will allow anyone to invoke your Edge Function without a valid JWT. The Supabase client libraries automatically handle authorization.
 
-### Using HTTP Methods
+### Using HTTP methods
 
 Edge Functions support `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, and `OPTIONS`. A Function can be designed to perform different actions based on a request's HTTP method. See the [example on building a RESTful service](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/restful-tasks) to learn how to handle different HTTP methods in your Function.
 
@@ -176,7 +176,7 @@ verify_jwt = false
 import_map = './import_map.json'
 ```
 
-### Error Handling
+### Error handling
 
 The `supabase-js` library provides several error types that you can use to handle errors that might occur when invoking Edge Functions:
 

@@ -1,11 +1,11 @@
-import { observer } from 'mobx-react-lite'
-import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect } from 'react'
-
 import { useParams } from 'common'
+import { useRouter } from 'next/router'
+import { PropsWithChildren } from 'react'
+
+import { useIsColumnLevelPrivilegesEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import ProductMenu from 'components/ui/ProductMenu'
 import { useAuthConfigPrefetch } from 'data/auth/auth-config-query'
-import { useStore, withAuth, useFlag } from 'hooks'
+import { useFlag, withAuth } from 'hooks'
 import ProjectLayout from '../'
 import { generateAuthMenu } from './AuthLayout.utils'
 
@@ -15,21 +15,13 @@ export interface AuthLayoutProps {
 
 const AuthLayout = ({ title, children }: PropsWithChildren<AuthLayoutProps>) => {
   const { ref: projectRef = 'default' } = useParams()
-  const { ui, meta } = useStore()
-
   const hooksReleased = useFlag('authHooksReleased')
+  const columnLevelPrivileges = useIsColumnLevelPrivilegesEnabled()
 
   useAuthConfigPrefetch({ projectRef })
 
   const router = useRouter()
   const page = router.pathname.split('/')[4]
-
-  useEffect(() => {
-    if (ui.selectedProjectRef) {
-      meta.policies.load()
-      meta.roles.load()
-    }
-  }, [ui.selectedProjectRef])
 
   return (
     <ProjectLayout
@@ -38,9 +30,10 @@ const AuthLayout = ({ title, children }: PropsWithChildren<AuthLayoutProps>) => 
       productMenu={
         <ProductMenu
           page={page}
-          menu={generateAuthMenu(projectRef ?? 'default', { hooksReleased })}
+          menu={generateAuthMenu(projectRef ?? 'default', { hooksReleased, columnLevelPrivileges })}
         />
       }
+      isBlocking={false}
     >
       <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
         {children}
@@ -49,4 +42,4 @@ const AuthLayout = ({ title, children }: PropsWithChildren<AuthLayoutProps>) => 
   )
 }
 
-export default withAuth(observer(AuthLayout))
+export default withAuth(AuthLayout)

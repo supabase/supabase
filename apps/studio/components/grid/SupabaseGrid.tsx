@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import { useEffect, useRef, useState } from 'react'
 import { DataGridHandle } from 'react-data-grid'
 import { DndProvider } from 'react-dnd'
@@ -41,7 +42,7 @@ export const SupabaseGrid = (props: SupabaseGridProps) => {
 const SupabaseGridLayout = (props: SupabaseGridProps) => {
   const {
     editable,
-    storageRef,
+    projectRef,
     gridProps,
     headerActions,
     showCustomChildren,
@@ -53,6 +54,7 @@ const SupabaseGridLayout = (props: SupabaseGridProps) => {
     onEditForeignKeyColumnValue,
     onImportData,
   } = props
+  const { id: tableId } = useParams()
   const dispatch = useDispatch()
   const state = useTrackedState()
   const snap = useTableEditorStateSnapshot()
@@ -83,6 +85,20 @@ const SupabaseGridLayout = (props: SupabaseGridProps) => {
     },
     {
       keepPreviousData: true,
+      retryDelay: (retryAttempt, error: any) => {
+        if (error && error.message?.includes('does not exist')) {
+          setParams((prevParams) => {
+            return {
+              ...prevParams,
+              ...{ sort: undefined },
+            }
+          })
+        }
+        if (retryAttempt > 3) {
+          return Infinity
+        }
+        return 5000
+      },
       onSuccess(data) {
         dispatch({
           type: 'SET_ROWS_COUNT',
@@ -109,8 +125,8 @@ const SupabaseGridLayout = (props: SupabaseGridProps) => {
   }, [JSON.stringify(sorts)])
 
   useEffect(() => {
-    if (state.isInitialComplete && storageRef && state.table) {
-      saveStorageDebounced(state, storageRef, sort as string[], filter as string[])
+    if (state.isInitialComplete && projectRef && state.table) {
+      saveStorageDebounced(state, projectRef, sort as string[], filter as string[])
     }
   }, [
     state.table,
@@ -118,7 +134,7 @@ const SupabaseGridLayout = (props: SupabaseGridProps) => {
     state.gridColumns,
     JSON.stringify(sorts),
     JSON.stringify(filters),
-    storageRef,
+    projectRef,
   ])
 
   useEffect(() => {
@@ -131,7 +147,7 @@ const SupabaseGridLayout = (props: SupabaseGridProps) => {
   useEffect(() => {
     const initializeData = async () => {
       const { savedState } = await initTable(
-        props,
+        { ...props, tableId },
         state,
         dispatch,
         sort as string[],

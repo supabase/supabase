@@ -5,7 +5,7 @@ author: tyler_shukert
 image: flutter-mfa/flutter-mfa-thumb-og.png
 thumb: flutter-mfa/flutter-mfa-thumb.jpg
 categories:
-  - engineering
+  - developers
 tags:
   - flutter
   - auth
@@ -668,8 +668,7 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final privatePostsFuture =
-        supabase.from('private_posts').select<List<Map<String, dynamic>>>();
+    final privatePostsFuture = supabase.from('private_posts').select();
 
     return Scaffold(
       appBar: AppBar(

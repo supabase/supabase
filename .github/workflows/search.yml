@@ -8,7 +8,6 @@ on:
       - '.github/workflows/search.yml'
       - 'supabase/migrations/**'
       - 'apps/docs/**'
-      - 'spec/**'
   workflow_dispatch:
     inputs:
       refresh:
@@ -39,7 +38,6 @@ jobs:
         with:
           sparse-checkout: |
             apps/docs
-            spec
             supabase
 
       - name: Setup node

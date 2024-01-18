@@ -195,6 +195,11 @@ export async function middleware(request: NextRequest) {
               headers: request.headers,
             },
           })
+          response.cookies.set({
+            name,
+            value,
+            ...options,
+          })
         },
         remove(name: string, options: CookieOptions) {
           request.cookies.set({
@@ -207,14 +212,32 @@ export async function middleware(request: NextRequest) {
               headers: request.headers,
             },
           })
+          response.cookies.set({
+            name,
+            value: '',
+            ...options,
+          })
         },
       },
     }
   )
 
-  await supabase.auth.getSession()
+  await supabase.auth.getUser()
 
   return response
+}
+
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * Feel free to modify this pattern to include more paths.
+     */
+    '/((?!_next/static|_next/image|favicon.ico).*)',
+  ],
 }
 ```
 
@@ -400,7 +423,13 @@ export default function Index () {
 </TabPanel>
 <TabPanel id="sveltekit" label="SvelteKit">
 
-Creating a Supabase client with the `ssr` package automatically configures it to use Cookies. This means your user's session is available throughout the entire SvelteKit stack - page, layout, server, hooks. It just works!
+Creating a Supabase client with the `ssr` package automatically configures it to use Cookies. This means your user's session is available throughout the entire SvelteKit stack - page, layout, server, hooks.
+
+<Admonition type="danger">
+
+Beware when accessing the session object on the server, because it is not revalidated on every request from the client. That means the sender can tamper with unencoded data in the session object. If you need to verify the integrity of user data for server logic, call `auth.getUser` instead, which will query the Supabase Auth server for trusted user data.
+
+</Admonition>
 
 <Tabs
   scrollable
@@ -468,7 +497,7 @@ Page components can get access to the supabase client from the `data` object due
 ```ts +layout.ts
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
 import type { LayoutLoad } from './$types'
-import { combineChunks, createBrowserClient, isBrowser, parse } from '@supabase/ssr'
+import { createBrowserClient, isBrowser, parse } from '@supabase/ssr'
 
 export const load: LayoutLoad = async ({ fetch, data, depends }) => {
   depends('supabase:auth')
@@ -483,11 +512,8 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
           return JSON.stringify(data.session)
         }
 
-        const cookie = combineChunks(key, (name) => {
-          const cookies = parse(document.cookie)
-          return cookies[name]
-        })
-        return cookie
+        const cookie = parse(document.cookie)
+        return cookie[key]
       },
     },
   })

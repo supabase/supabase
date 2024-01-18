@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import generator from 'generate-password'
+import generator from 'generate-password-browser'
 import { debounce } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -10,6 +10,7 @@ import {
   FreeProjectLimitWarning,
   NotOrganizationOwnerWarning,
 } from 'components/interfaces/Organization/NewProject'
+import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
 import { WizardLayoutWithoutAuth } from 'components/layouts'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
 import InformationBox from 'components/ui/InformationBox'
@@ -52,7 +53,12 @@ const Wizard: NextPageWithLayout = () => {
   const [cloudProvider, setCloudProvider] = useState<CloudProvider>(PROVIDERS[DEFAULT_PROVIDER].id)
 
   const [dbPass, setDbPass] = useState('')
-  const [dbRegion, setDbRegion] = useState(PROVIDERS[cloudProvider].default_region)
+  // Auto select region on staging/local for convenience as there's only one supported
+  const [dbRegion, setDbRegion] = useState(
+    ['staging', 'local'].includes(process.env.NEXT_PUBLIC_ENVIRONMENT ?? '')
+      ? PROVIDERS[cloudProvider].default_region
+      : ''
+  )
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
   const [passwordStrengthWarning, setPasswordStrengthWarning] = useState('')
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(0)
@@ -77,10 +83,6 @@ const Wizard: NextPageWithLayout = () => {
   const orgProjectCount = (allProjects || []).filter(
     (proj) => proj.organization_id === currentOrg?.id
   ).length
-
-  const [availableRegions, setAvailableRegions] = useState(
-    getAvailableRegions(PROVIDERS[cloudProvider].id)
-  )
 
   const isAdmin = useCheckPermissions(PermissionAction.CREATE, 'projects')
   const isInvalidSlug = isOrganizationsSuccess && currentOrg === undefined
@@ -146,13 +148,12 @@ const Wizard: NextPageWithLayout = () => {
 
   function onCloudProviderChange(cloudProviderId: CloudProvider) {
     setCloudProvider(cloudProviderId)
-    if (cloudProviderId === PROVIDERS.AWS.id) {
-      setAvailableRegions(getAvailableRegions(PROVIDERS['AWS'].id))
-      setDbRegion(PROVIDERS['AWS'].default_region)
-    } else {
-      setAvailableRegions(getAvailableRegions(PROVIDERS['FLY'].id))
-      setDbRegion(PROVIDERS['FLY'].default_region)
-    }
+    // on local/staging quick-select the default region, don't wait for the cloudflare location
+    setDbRegion(
+      ['staging', 'local'].includes(process.env.NEXT_PUBLIC_ENVIRONMENT ?? '')
+        ? PROVIDERS[cloudProviderId].default_region
+        : ''
+    )
   }
 
   async function checkPasswordStrength(value: any) {
@@ -393,36 +394,11 @@ const Wizard: NextPageWithLayout = () => {
                 </Panel.Content>
 
                 <Panel.Content className="border-b border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark">
-                  <Listbox
-                    layout="horizontal"
-                    label="Region"
-                    type="select"
-                    value={dbRegion}
-                    onChange={(value) => setDbRegion(value)}
-                    descriptionText="Select a region close to your users for the best performance."
-                  >
-                    {Object.keys(availableRegions).map((option: string, i) => {
-                      const label = Object.values(availableRegions)[i] as string
-                      return (
-                        <Listbox.Option
-                          key={option}
-                          label={label}
-                          value={label}
-                          addOnBefore={() => (
-                            <img
-                              alt="region icon"
-                              className="w-5 rounded-sm"
-                              src={`${router.basePath}/img/regions/${
-                                Object.keys(availableRegions)[i]
-                              }.svg`}
-                            />
-                          )}
-                        >
-                          <span className="text-foreground">{label}</span>
-                        </Listbox.Option>
-                      )
-                    })}
-                  </Listbox>
+                  <RegionSelector
+                    cloudProvider={cloudProvider}
+                    selectedRegion={dbRegion}
+                    onSelectRegion={setDbRegion}
+                  />
                 </Panel.Content>
               </>
             )}

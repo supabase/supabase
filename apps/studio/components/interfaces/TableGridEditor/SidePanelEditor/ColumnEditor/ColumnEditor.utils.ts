@@ -1,12 +1,9 @@
-import { find, isUndefined, isEqual, isNull } from 'lodash'
-import { Dictionary } from 'components/grid'
-import type {
-  PostgresColumn,
-  PostgresRelationship,
-  PostgresTable,
-  PostgresType,
-} from '@supabase/postgres-meta'
+import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
+import { find, isEqual, isNull } from 'lodash'
+import { Dictionary } from 'types'
 
+import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
+import { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import { uuidv4 } from 'lib/helpers'
 import {
   ColumnField,
@@ -14,8 +11,6 @@ import {
   ExtendedPostgresRelationship,
   UpdateColumnPayload,
 } from '../SidePanelEditor.types'
-import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
-import { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 
 const isSQLExpression = (input: string) => {
   if (['CURRENT_DATE'].includes(input)) return true
@@ -61,7 +56,6 @@ export const generateColumnFieldFromPostgresColumn = (
   foreignKeys: ForeignKeyConstraint[]
 ): ColumnField => {
   const { primary_keys } = table
-  // @ts-ignore
   const primaryKeyColumns = primary_keys.map((key) => key.name)
   const foreignKey = getColumnForeignKey(column, table, foreignKeys)
   const isArray = column?.data_type === 'ARRAY'
@@ -90,7 +84,7 @@ export const generateCreateColumnPayload = (
   field: ColumnField
 ): CreateColumnPayload => {
   const isIdentity = field.format.includes('int') ? field.isIdentity : false
-  const defaultValue = field.defaultValue
+  const defaultValue = field.defaultValue as any
   const payload: CreateColumnPayload = {
     tableId,
     isIdentity,
@@ -121,12 +115,10 @@ export const generateUpdateColumnPayload = (
   table: PostgresTable,
   field: ColumnField
 ): Partial<UpdateColumnPayload> => {
-  // @ts-ignore
   const primaryKeyColumns = table.primary_keys.map((key) => key.name)
   const isOriginallyPrimaryKey = primaryKeyColumns.includes(originalColumn.name)
 
   // Only append the properties which are getting updated
-  const defaultValue = field.defaultValue
   const type = field.isArray ? `${field.format}[]` : field.format
   const comment = (field.comment?.length ?? '') === 0 ? null : field.comment
 
@@ -135,17 +127,18 @@ export const generateUpdateColumnPayload = (
     payload.name = field.name
   }
   if (!isEqual(originalColumn.comment, comment)) {
-    payload.comment = comment
+    payload.comment = comment as string | undefined
   }
   if (!isEqual(originalColumn.check?.trim(), field.check?.trim())) {
-    payload.check = field.check?.trim() || null
+    payload.check = field.check?.trim()
   }
 
   if (!isEqual(originalColumn.format, type)) {
     payload.type = type
   }
-  if (!isEqual(originalColumn.default_value as string, defaultValue)) {
-    payload.defaultValue = defaultValue
+  if (!isEqual(originalColumn.default_value, field.defaultValue)) {
+    const defaultValue = field.defaultValue
+    payload.defaultValue = defaultValue as unknown as Record<string, never> | undefined
     payload.defaultValueFormat =
       isNull(defaultValue) || isSQLExpression(defaultValue)
         ? 'expression'
@@ -174,12 +167,6 @@ export const validateFields = (field: ColumnField) => {
   }
   if (field.format.length === 0) {
     errors['format'] = `Please select a type for your column`
-  }
-  if (field.isEncrypted && field.keyId === 'create-new' && (field?.keyName ?? '').length === 0) {
-    errors['keyName'] = 'Please provide a name for your new key'
-  }
-  if (field.isEncrypted && field.format !== 'text') {
-    errors['isEncrypted'] = 'Only columns of type text can be encrypted'
   }
   return errors
 }

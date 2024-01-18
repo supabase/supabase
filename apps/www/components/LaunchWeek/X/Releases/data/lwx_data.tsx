@@ -49,7 +49,7 @@ export interface WeekDayProps {
   steps: StepProps[] | []
 }
 
-export const endOfLWX = '2023-12-15T23:59:59.999-08:00'
+export const endOfLWXHackathon = '2023-12-17T23:59:59.999-08:00'
 
 const days: WeekDayProps[] = [
   {
@@ -107,7 +107,6 @@ const days: WeekDayProps[] = [
     dd: 'Tue',
     title: 'Edge Functions',
     shipped: true,
-    isToday: true,
     hasCountdown: false,
     blog: '/blog/edge-functions-node-npm',
     date: '12 Dec',
@@ -149,56 +148,131 @@ const days: WeekDayProps[] = [
     id: 'day-3',
     d: 3,
     dd: 'Wed',
-    title: '',
-    shipped: false,
-    hasCountdown: true,
-    blog: '',
+    title: 'Supabase Branching',
+    shipped: true,
+    hasCountdown: false,
+    blog: '/blog/supabase-branching',
     date: '13 Dec',
     published_at: '2023-12-13T08:00:00.000-08:00',
-    description: '',
+    description: (
+      <>
+        Introducing Supabase <strong>Branching</strong>, a Postgres database for every pull request
+      </>
+    ),
     links: [
+      {
+        type: 'blog',
+        href: '/blog/supabase-branching',
+      },
+      {
+        type: 'video',
+        href: 'peXKxavGnBo',
+      },
       {
         type: 'xSpace',
         href: 'https://twitter.com/i/spaces/1eaKbgDBgyoGX',
       },
     ],
-    steps: [],
+    steps: [
+      {
+        title: '',
+        blog: '/blog/supabase-branching',
+        bg_layers: [
+          {
+            img: '/images/launchweek/lwx/day3/branching.svg',
+            mobileImg: '/images/launchweek/lwx/day3/branching_mobile.svg',
+          },
+        ],
+        steps: [],
+      },
+    ],
   },
   {
     id: 'day-4',
     d: 4,
     dd: 'Thu',
     title: '',
-    shipped: false,
-    blog: '',
+    shipped: true,
+    hasCountdown: false,
+    blog: '/blog/supabase-auth-identity-linking-hooks',
     date: '14 Dec',
     published_at: '2023-12-14T08:00:00.000-08:00',
-    description: '',
+    description: (
+      <>
+        Supabase Auth: <strong>Identity Linking</strong>, <strong>Session Control</strong>,{' '}
+        <strong>Password Protection</strong> and <strong>Hooks</strong>
+      </>
+    ),
     links: [
+      {
+        type: 'blog',
+        href: '/blog/supabase-auth-identity-linking-hooks',
+      },
+      {
+        type: 'video',
+        href: 'LF8GABnAFyE',
+      },
       {
         type: 'xSpace',
         href: 'https://twitter.com/i/spaces/1ypKdkWjkjrxW',
       },
     ],
-    steps: [],
+    steps: [
+      {
+        title: '',
+        blog: '/blog/supabase-auth-identity-linking-hooks',
+        bg_layers: [
+          {
+            img: '/images/launchweek/lwx/day4/d4_auth.svg',
+            mobileImg: '/images/launchweek/lwx/day4/d4_auth_mobile.svg',
+          },
+        ],
+        steps: [],
+      },
+    ],
   },
   {
     id: 'day-5',
     d: 5,
     dd: 'Fri',
     title: '',
-    shipped: false,
-    blog: '',
+    shipped: true,
+    hasCountdown: false,
+    blog: '/blog/introducing-read-replicas',
     date: '15 Dec',
     published_at: '2023-12-15T08:00:00.000-08:00',
-    description: '',
+    description: (
+      <>
+        Introducing <strong>Read Replicas</strong> for low latency
+      </>
+    ),
     links: [
+      {
+        type: 'blog',
+        href: '/blog/introducing-read-replicas',
+      },
+      {
+        type: 'video',
+        href: 'PX3R1fXjJ2M',
+      },
       {
         type: 'xSpace',
         href: 'https://twitter.com/i/spaces/1vAxRvjmvRgxl',
       },
     ],
-    steps: [],
+    steps: [
+      {
+        title: '',
+        blog: '/blog/introducing-read-replicas',
+        bg_layers: [
+          {
+            img: '/images/launchweek/lwx/day5/d5_read_replicas.svg',
+            mobileImg: '/images/launchweek/lwx/day5/d5_read_replicas_mobile.svg',
+          },
+        ],
+        steps: [],
+      },
+    ],
   },
 ]
 

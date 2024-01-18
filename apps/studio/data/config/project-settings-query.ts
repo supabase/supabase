@@ -1,7 +1,6 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
 import { API_URL, DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
-import { useCallback } from 'react'
 import { configKeys } from './keys'
 import { ResponseError } from 'types'
 
@@ -104,15 +103,3 @@ export const useProjectSettingsQuery = <TData = ProjectSettingsData>(
       ...options,
     }
   )
-
-export const useProjectSettingsPrefetch = ({ projectRef }: ProjectSettingsVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (projectRef) {
-      client.prefetchQuery(configKeys.settings(projectRef), ({ signal }) =>
-        getProjectSettings({ projectRef }, signal)
-      )
-    }
-  }, [projectRef])
-}

@@ -35,7 +35,8 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
 import { MouseEventHandler, useCallback, useEffect, useState } from 'react'
 
-import { useCheckPermissions, useFlag, useLocalStorage } from 'hooks'
+import { useCheckPermissions, useLocalStorage } from 'hooks'
+import { XIcon } from 'lucide-react'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -45,7 +46,7 @@ import {
 } from 'ui'
 import { RoleImpersonationSelector } from '../RoleImpersonationSelector'
 import styles from './graphiql.module.css'
-import { XIcon } from 'lucide-react'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 export interface GraphiQLProps {
   fetcher: Fetcher
@@ -71,7 +72,7 @@ interface GraphiQLInterfaceProps {
   theme: 'dark' | 'light'
 }
 
-export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
+const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
   const editorContext = useEditorContext({ nonNull: true })
   const executionContext = useExecutionContext({ nonNull: true })
   const schemaContext = useSchemaContext({ nonNull: true })
@@ -81,11 +82,10 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
   const merge = useMergeQuery()
   const prettify = usePrettifyEditors()
 
-  const roleImpersonationEnabledFlag = useFlag('roleImpersonation')
   const canReadJWTSecret = useCheckPermissions(PermissionAction.READ, 'field.jwt_secret')
 
   const [rlsBypassedWarningDismissed, setRlsBypassedWarningDismissed] = useLocalStorage(
-    'graphiql-rls-bypass-warning-dismissed',
+    LOCAL_STORAGE_KEYS.GRAPHIQL_RLS_BYPASS_WARNING,
     false
   )
 
@@ -101,7 +101,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
     direction: 'horizontal',
     initiallyHidden: pluginContext?.visiblePlugin ? undefined : 'second',
     onHiddenElementChange: (resizableElement) => {
-      if (resizableElement === 'first') {
+      if (resizableElement === 'second') {
         pluginContext?.setVisiblePlugin(null)
       }
     },
@@ -208,7 +208,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
         <div className="graphiql-main">
           <div
             ref={pluginResize.firstRef}
-            style={{ minWidth: 0 }}
+            style={{ minWidth: '750px' }}
             className={clsx('graphiql-sessions', styles.graphiqlSessions)}
           >
             <div
@@ -315,7 +315,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                         Headers
                       </UnStyledButton>
 
-                      {canReadJWTSecret && roleImpersonationEnabledFlag && (
+                      {canReadJWTSecret && (
                         <UnStyledButton
                           type="button"
                           className={
@@ -370,7 +370,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
 
                       <HeaderEditor isHidden={activeSecondaryEditor !== 'headers'} />
 
-                      {canReadJWTSecret && roleImpersonationEnabledFlag && (
+                      {canReadJWTSecret && (
                         <div
                           className={clsx(
                             'graphiql-editor px-1',
@@ -412,9 +412,8 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                         <span className="text-amber-900">RLS will be bypassed.</span>
                       </AlertTitle_Shadcn_>
                       <AlertDescription_Shadcn_>
-                        {roleImpersonationEnabledFlag
-                          ? 'You can send queries as a specific role/user by using the role impersonation tab.'
-                          : 'You can send queries as a specific role/user by changing the "Authorization" header.'}
+                        You can send queries as a specific role/user by using the role impersonation
+                        tab.
                       </AlertDescription_Shadcn_>
                       <Button
                         type="outline"

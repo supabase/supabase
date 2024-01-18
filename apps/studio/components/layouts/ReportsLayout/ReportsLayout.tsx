@@ -20,7 +20,7 @@ const ReportsLayout = ({ title, children }: PropsWithChildren<ReportsLayoutProps
 
   const menuItems = [
     {
-      title: '',
+      key: 'reports',
       items: [
         {
           name: 'Custom reports',
@@ -31,6 +31,7 @@ const ReportsLayout = ({ title, children }: PropsWithChildren<ReportsLayoutProps
       ],
     },
     {
+      key: 'builtin-reports',
       items: [
         {
           name: 'API',
@@ -38,14 +39,17 @@ const ReportsLayout = ({ title, children }: PropsWithChildren<ReportsLayoutProps
           url: `/project/${ref}/reports/api-overview`,
           items: [],
         },
-
-        {
-          name: 'Storage',
-          key: 'storage',
-          url: `/project/${ref}/reports/storage`,
-          items: [],
-          label: 'NEW',
-        },
+        ...(storageEnabled
+          ? [
+              {
+                name: 'Storage',
+                key: 'storage',
+                url: `/project/${ref}/reports/storage`,
+                items: [],
+                label: 'NEW',
+              },
+            ]
+          : []),
 
         {
           name: 'Database',

@@ -57,6 +57,7 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { RootStore } from 'stores'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
+import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -129,7 +130,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
       }
 
       const hasAcknowledgedConsent = localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
-      if (hasAcknowledgedConsent === null) {
+      if (IS_PLATFORM && hasAcknowledgedConsent === null) {
         consentToastId.current = toast(
           <ConsentToast onAccept={onAcceptConsent} onOptOut={onOptOut} />,
           {
@@ -162,14 +163,16 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                   <TooltipProvider>
                     <RouteValidationWrapper>
                       <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
-                        <CommandMenuWrapper>
-                          <AppBannerWrapper>
-                            <FeaturePreviewContextProvider>
-                              {getLayout(<Component {...pageProps} />)}
-                              <FeaturePreviewModal />
-                            </FeaturePreviewContextProvider>
-                          </AppBannerWrapper>
-                        </CommandMenuWrapper>
+                        <AppBannerContextProvider>
+                          <CommandMenuWrapper>
+                            <AppBannerWrapper>
+                              <FeaturePreviewContextProvider>
+                                {getLayout(<Component {...pageProps} />)}
+                                <FeaturePreviewModal />
+                              </FeaturePreviewContextProvider>
+                            </AppBannerWrapper>
+                          </CommandMenuWrapper>
+                        </AppBannerContextProvider>
                       </ThemeProvider>
                     </RouteValidationWrapper>
                   </TooltipProvider>

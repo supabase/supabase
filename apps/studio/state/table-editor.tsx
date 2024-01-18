@@ -1,5 +1,6 @@
 import { PostgresColumn } from '@supabase/postgres-meta'
-import { Dictionary, SupaRow } from 'components/grid'
+import { SupaRow } from 'components/grid'
+import { Dictionary } from 'types'
 import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
 import { JsonEditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
 import { PropsWithChildren, createContext, useContext, useRef } from 'react'

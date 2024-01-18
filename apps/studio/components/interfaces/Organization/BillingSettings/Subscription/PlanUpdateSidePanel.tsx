@@ -2,22 +2,23 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import { plans as subscriptionsPlans } from 'shared-data/plans'
 
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
+import InformationBox from 'components/ui/InformationBox'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useOrganizationBillingSubscriptionPreview } from 'data/organizations/organization-billing-subscription-preview'
 import { useOrgPlansQuery } from 'data/subscriptions/org-plans-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
-import { SubscriptionTier } from 'data/subscriptions/types'
+import { OrgPlan, SubscriptionTier } from 'data/subscriptions/types'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import Telemetry from 'lib/telemetry'
-import { useRouter } from 'next/router'
-import { plans as subscriptionsPlans } from 'shared-data/plans'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
 import {
   Button,
@@ -33,7 +34,6 @@ import EnterpriseCard from './EnterpriseCard'
 import ExitSurveyModal from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import PaymentMethodSelection from './PaymentMethodSelection'
-import InformationBox from 'components/ui/InformationBox'
 
 const PlanUpdateSidePanel = () => {
   const { ui } = useStore()
@@ -54,7 +54,13 @@ const PlanUpdateSidePanel = () => {
 
   const snap = useOrgSettingsPageStateSnapshot()
   const visible = snap.panelKey === 'subscriptionPlan'
-  const onClose = () => snap.setPanelKey(undefined)
+  const onClose = () => {
+    const { panel, ...queryWithoutPanel } = router.query
+    router.push({ pathname: router.pathname, query: queryWithoutPanel }, undefined, {
+      shallow: true,
+    })
+    snap.setPanelKey(undefined)
+  }
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
   const { data: plans, isLoading: isLoadingPlans } = useOrgPlansQuery({ orgSlug: slug })
@@ -90,7 +96,7 @@ const PlanUpdateSidePanel = () => {
     isSuccess: subscriptionPreviewInitialized,
   } = useOrganizationBillingSubscriptionPreview({ tier: selectedTier, organizationSlug: slug })
 
-  const availablePlans = plans ?? []
+  const availablePlans: OrgPlan[] = plans?.plans ?? []
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
   const subscriptionPlanMeta = subscriptionsPlans.find((tier) => tier.id === selectedTier)
 
@@ -512,7 +518,7 @@ const PlanUpdateSidePanel = () => {
           ) : (
             <div className="py-4 space-y-2">
               <p className="text-sm">
-                This organization is billed through one of our partners and you will be charged by
+                This organization is billed through our partner Fly.io and you will be charged by
                 them directly.
               </p>
               {subscriptionPreview?.billed_via_partner &&

@@ -1,6 +1,5 @@
-import update from 'immutability-helper'
 import { TOTAL_ROWS_INITIAL, TOTAL_ROWS_RESET } from '../../constants'
-import { Dictionary, SupaRow } from '../../types'
+import { SupaRow } from '../../types'
 import { INIT_ACTIONTYPE } from './base'
 
 export interface RowInitialState {
