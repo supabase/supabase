@@ -1,6 +1,4 @@
 import { useRouter } from 'next/router'
-import { Tabs } from 'ui'
-
 import { useParams } from 'common/hooks'
 import { SecretsManagement, VaultToggle } from 'components/interfaces/Settings/Vault'
 import { SettingsLayout } from 'components/layouts'
@@ -9,6 +7,7 @@ import { FormHeader } from 'components/ui/Forms'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { NextPageWithLayout } from 'types'
+import VaultNavTabs from 'components/interfaces/Settings/Vault/VaultNavTabs'
 
 const VaultSettingsSecrets: NextPageWithLayout = () => {
   const router = useRouter()
@@ -35,19 +34,10 @@ const VaultSettingsSecrets: NextPageWithLayout = () => {
       ) : !isEnabled ? (
         <VaultToggle />
       ) : (
-        <Tabs
-          size="small"
-          type="underlined"
-          activeId="secrets"
-          onChange={(id: any) => {
-            if (id === 'keys') router.push(`/project/${ref}/settings/vault/keys`)
-          }}
-        >
-          <Tabs.Panel id="secrets" label="Secrets Management">
-            <SecretsManagement />
-          </Tabs.Panel>
-          <Tabs.Panel id="keys" label="Encryption Keys" />
-        </Tabs>
+        <>
+          <VaultNavTabs projRef={ref || ''} activeTab="secrets" />
+          <SecretsManagement />
+        </>
       )}
     </div>
   )
