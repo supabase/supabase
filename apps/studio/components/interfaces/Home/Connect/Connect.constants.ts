@@ -1,18 +1,11 @@
 export type Parent = {
   key: string
   label: string
-  files: string[]
+  files: File[]
   children: Parent[]
 }
 
-export const ORMS: Parent[] = [
-  {
-    key: 'prisma',
-    label: 'Prisma',
-    files: ['prisma-env.local', 'prisma-server.tsx'],
-    children: [],
-  },
-]
+export type File = { path: string; name: string; displayPath: string }
 
 export const FRAMEWORKS: Parent[] = [
   {
@@ -27,15 +20,29 @@ export const FRAMEWORKS: Parent[] = [
         children: [
           {
             key: 'supabasejs',
-            label: 'Supabase-js',
+            label: 'supabase-js',
             children: [],
-            files: ['app-sb-js-env.local', 'app-sb-js-server.tsx'],
+            files: [
+              {
+                // omit .tsx extension
+                path: 'app-supabasejs/env.local',
+                name: 'app-supabasejs.env.local',
+                displayPath: 'app-supabasejs/.env.local',
+              },
+            ],
           },
           {
             key: 'postgresjs',
             label: 'Postgres.js',
             children: [],
-            files: ['app-pg-env.local', 'app-pg-page.tsx'],
+            files: [
+              {
+                // omit .tsx extension
+                path: 'app-postgresjs/env.local',
+                name: 'app-postgresjs.env.local',
+                displayPath: 'app-postgresjs/.env.local',
+              },
+            ],
           },
         ],
       },
@@ -48,13 +55,27 @@ export const FRAMEWORKS: Parent[] = [
             key: 'supabasejs',
             label: 'pages Supabase-js',
             children: [],
-            files: ['pages-supabase-js-env.local', 'pages-supabase-js-app.tsx'],
+            files: [
+              {
+                // omit .tsx extension
+                path: 'pages-supabasejs/env.local',
+                name: 'pages-supabasejs.env.local',
+                displayPath: 'pages-supabasejs/.env.local',
+              },
+            ],
           },
           {
             key: 'postgresjs',
             label: 'pages Postgres.js',
             children: [],
-            files: ['pages-postgres-js-env.local', 'pages-postgres-js-app.tsx'],
+            files: [
+              {
+                // omit .tsx extension
+                path: 'pages-postgresjs/env.local',
+                name: 'pages-postgresjs.env.local',
+                displayPath: 'pages-postgresjs/.env.local',
+              },
+            ],
           },
         ],
       },
@@ -63,7 +84,14 @@ export const FRAMEWORKS: Parent[] = [
   {
     key: 'vue',
     label: 'Vue.JS',
-    files: ['vue-env.local', 'vue-server.tsx'],
+    files: [
+      {
+        // omit .tsx extension
+        path: 'vue1/env.local',
+        name: 'vue1.env.local',
+        displayPath: 'vue1/.env.local',
+      },
+    ],
     children: [],
   },
   {
@@ -74,14 +102,58 @@ export const FRAMEWORKS: Parent[] = [
       {
         key: 'svelterouter',
         label: 'Svelte router',
-        files: ['svelte1-env.local', 'svelterouter1-app.tsx'],
+        files: [
+          {
+            // omit .tsx extension
+            path: 'svelte1/env.local',
+            name: 'svelte1.env.local',
+            displayPath: 'svelte1/.env.local',
+          },
+        ],
         children: [],
       },
       {
         key: 'svelterouter2',
         label: 'Svelte router2',
-        files: ['svelte2-env.local', 'svelte2-server.tsx'],
+        files: [
+          {
+            // omit .tsx extension
+            path: 'svelte2/env.local',
+            name: 'svelte2.env.local',
+            displayPath: 'svelte2/.env.local',
+          },
+        ],
+
         children: [],
+      },
+    ],
+  },
+]
+
+export const ORMS: Parent[] = [
+  {
+    key: 'prisma',
+    label: 'Prisma',
+    children: [],
+    files: [
+      {
+        // omit .tsx extension
+        path: 'prisma/env.local',
+        name: 'prisma.env.local',
+        displayPath: 'prisma/.env.local',
+      },
+    ],
+  },
+  {
+    key: 'drizzle',
+    label: 'Drizzle',
+    children: [],
+    files: [
+      {
+        // omit .tsx extension
+        path: 'drizzle/env.local',
+        name: 'drizzle.env.local',
+        displayPath: 'drizzle/.env.local',
       },
     ],
   },
