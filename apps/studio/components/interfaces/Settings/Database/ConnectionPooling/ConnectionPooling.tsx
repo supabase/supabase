@@ -395,7 +395,7 @@ export const ConnectionPooling = () => {
                             >
                               documentation
                             </a>{' '}
-                            to found out more.
+                            to find out more.
                           </FormDescription_Shadcn_>
                           <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
                         </FormItem_Shadcn_>
