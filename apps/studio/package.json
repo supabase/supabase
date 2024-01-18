@@ -53,7 +53,7 @@
     "generate-password-browser": "^1.1.0",
     "html-to-image": "^1.10.8",
     "immutability-helper": "^3.1.1",
-    "ip-address": "^8.1.0",
+    "ip-num": "^1.5.1",
     "json-logic-js": "^2.0.2",
     "jsonrepair": "^3.2.3",
     "jwt-simple": "^0.5.6",
