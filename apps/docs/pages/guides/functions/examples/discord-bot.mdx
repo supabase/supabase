@@ -16,7 +16,7 @@ export const meta = {
   ></iframe>
 </div>
 
-## Create an application on Discord Developer Portal
+## Create an application on Discord Developer portal
 
 1. Go to [https://discord.com/developers/applications](https://discord.com/developers/applications) (login using your discord account if required).
 2. Click on **New Application** button available at left side of your profile picture.
@@ -47,10 +47,10 @@ This will register a Slash Command named `hello` that accepts a parameter named 
 // Sift is a small routing library that abstracts away details like starting a
 // listener on a port, and provides a simple function (serve) that has an API
 // to invoke a function for a specific path.
-import { json, serve, validateRequest } from 'sift'
+import { json, serve, validateRequest } from 'https://deno.land/x/sift@0.6.0/mod.ts'
 // TweetNaCl is a cryptography library that we use to verify requests
 // from Discord.
-import nacl from 'tweetnacl'
+import nacl from 'https://cdn.skypack.dev/tweetnacl@v1.0.3?dts'
 
 enum DiscordCommandType {
   Ping = 1,
@@ -140,7 +140,7 @@ function hexToUint8Array(hex: string) {
 }
 ```
 
-## Deploy the Slash Command Handler
+## Deploy the Slash Command handler
 
 ```bash
 supabase functions deploy discord-bot --no-verify-jwt

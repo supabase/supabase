@@ -46,7 +46,7 @@ const Panel = ({
       const activeGlow =
         hasActiveOnHover && isActive
           ? `radial-gradient(65rem circle at ${x}px ${y}px, ${
-              activeColor === 'brand' ? 'var(--colors-brand9)' : 'hsl(var(--foreground-muted))'
+              activeColor === 'brand' ? 'var(--colors-brand9)' : 'hsl(var(--border-stronger))'
             }, transparent), `
           : ''
       outerElement.style.backgroundImage = `
@@ -79,7 +79,7 @@ const Panel = ({
         !trackCursor && hasActiveOnHover
           ? activeColor === 'brand'
             ? 'hover:bg-none hover:!bg-brand'
-            : 'hover:bg-none hover:!bg-foreground-muted'
+            : 'hover:bg-none hover:!bg-border-stronger'
           : '',
         outerClassName
       )}

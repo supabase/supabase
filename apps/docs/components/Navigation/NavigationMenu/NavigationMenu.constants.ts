@@ -58,7 +58,7 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
   ],
   [
     {
-      label: 'API',
+      label: 'Data API',
     },
     {
       label: 'REST',
@@ -190,7 +190,7 @@ export const REFERENCES: References = {
   dart: {
     name: 'Flutter',
     library: 'supabase-dart',
-    versions: ['v1', 'v0'],
+    versions: ['v2', 'v1'],
     icon: '/docs/img/libraries/flutter-icon.svg',
   },
   csharp: {
@@ -202,13 +202,13 @@ export const REFERENCES: References = {
   swift: {
     name: 'Swift',
     library: 'supabase-swift',
-    versions: ['v0'],
+    versions: ['v2', 'v1'],
     icon: '/docs/img/libraries/swift-icon.svg',
   },
   kotlin: {
     name: 'Kotlin',
     library: 'supabase-kt',
-    versions: ['v0'],
+    versions: ['v2', 'v1'],
     icon: '/docs/img/libraries/kotlin-icon.svg',
   },
   cli: {
@@ -237,12 +237,14 @@ export const gettingstarted: NavMenuConstant = {
         { name: 'Next.js', url: '/guides/getting-started/quickstarts/nextjs' },
         { name: 'React', url: '/guides/getting-started/quickstarts/reactjs' },
         { name: 'NuxtJS', url: '/guides/getting-started/quickstarts/nuxtjs' },
-        { name: 'RedwoodJS', url: '/guides/getting-started/quickstarts/redwoodjs' },
+        { name: 'Vue', url: '/guides/getting-started/quickstarts/vue' },
         { name: 'Flutter', url: '/guides/getting-started/quickstarts/flutter' },
         { name: 'Android Kotlin', url: '/guides/getting-started/quickstarts/kotlin' },
         { name: 'SvelteKit', url: '/guides/getting-started/quickstarts/sveltekit' },
+        { name: 'Laravel PHP', url: '/guides/getting-started/quickstarts/laravel' },
+        { name: 'Ruby on Rails', url: '/guides/getting-started/quickstarts/ruby-on-rails' },
         { name: 'SolidJS', url: '/guides/getting-started/quickstarts/solidjs' },
-        { name: 'Vue', url: '/guides/getting-started/quickstarts/vue' },
+        { name: 'RedwoodJS', url: '/guides/getting-started/quickstarts/redwoodjs' },
         { name: 'refine', url: '/guides/getting-started/quickstarts/refine' },
       ],
     },
@@ -317,6 +319,10 @@ export const gettingstarted: NavMenuConstant = {
         {
           name: 'Ionic Angular',
           url: '/guides/getting-started/tutorials/with-ionic-angular',
+        },
+        {
+          name: 'Swift',
+          url: '/guides/getting-started/tutorials/with-swift',
         },
       ],
     },
@@ -490,6 +496,7 @@ export const auth = {
       items: [
         { name: 'Next.js', url: '/guides/auth/quickstarts/nextjs', items: [] },
         { name: 'React', url: '/guides/auth/quickstarts/react', items: [] },
+        { name: 'React Native', url: '/guides/auth/quickstarts/react-native', items: [] },
       ],
     },
     {
@@ -497,16 +504,30 @@ export const auth = {
       url: undefined,
       items: [
         { name: 'Email Login', url: '/guides/auth/auth-email' },
-        { name: 'Magic Link Login', url: '/guides/auth/auth-magic-link' },
+        {
+          name: 'Passwordless Login',
+          url: '/guides/auth/passwordless-login',
+          items: [
+            { name: 'Email Magic Link', url: '/guides/auth/passwordless-login/auth-magic-link' },
+            { name: 'Email OTP', url: '/guides/auth/passwordless-login/auth-email-otp' },
+            { name: 'Phone OTP', url: '/guides/auth/phone-login' },
+          ],
+        },
         {
           name: 'Phone Login',
           url: '/guides/auth/phone-login',
           items: [...PhoneLoginsItems],
         },
         {
-          name: 'Social Login',
+          name: 'Social Login (OAuth)',
           url: '/guides/auth/social-login',
-          items: [...SocialLoginItems],
+          items: [
+            {
+              name: 'Native Mobile OAuth',
+              url: '/guides/auth/native-mobile-deep-linking',
+            },
+            ...SocialLoginItems,
+          ],
         },
         {
           name: 'Native Mobile Login',
@@ -514,8 +535,23 @@ export const auth = {
           items: [
             ...NativeMobileLoginItems,
             {
-              name: 'Deep Linking',
+              name: 'OAuth Deep Linking',
               url: '/guides/auth/native-mobile-deep-linking',
+            },
+          ],
+        },
+        {
+          name: 'User Sessions',
+          url: '/guides/auth/sessions',
+        },
+        { name: 'Passwords', url: '/guides/auth/passwords' },
+        {
+          name: 'User Management',
+          url: '/guides/auth/auth-user-management',
+          items: [
+            {
+              name: 'Identity Linking',
+              url: '/guides/auth/auth-identity-linking',
             },
           ],
         },
@@ -529,8 +565,8 @@ export const auth = {
             },
           ],
         },
-        { name: 'Password Reset', url: '/guides/auth/auth-password-reset' },
         { name: 'Email Templates', url: '/guides/auth/auth-email-templates' },
+        { name: 'Auth Hooks', url: '/guides/auth/auth-hooks' },
       ],
     },
     {
@@ -542,6 +578,7 @@ export const auth = {
         { name: 'Managing User Data', url: '/guides/auth/managing-user-data' },
         { name: 'Multi-Factor Authentication', url: '/guides/auth/auth-mfa' },
         { name: 'Row Level Security', url: '/guides/auth/row-level-security' },
+        { name: 'Column Level Security', url: '/guides/auth/column-level-security' },
       ],
     },
     {
@@ -607,13 +644,34 @@ export const database: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Connecting to your database', url: '/guides/database/connecting-to-postgres' },
+        { name: 'Importing data', url: '/guides/database/import-data' },
+        { name: 'Securing your data', url: '/guides/database/secure-data' },
+      ],
+    },
+    {
+      name: 'Working with your database (basics)',
+      url: undefined,
+      items: [
         { name: 'Managing tables, views, and data', url: '/guides/database/tables' },
-        { name: 'JSON and unstructured data', url: '/guides/database/json' },
-        { name: 'Managing database functions', url: '/guides/database/functions' },
         { name: 'Managing indexes', url: '/guides/database/postgres/indexes' },
+        {
+          name: 'Querying joins and nested tables',
+          url: '/guides/database/joins-and-nesting',
+        },
+        { name: 'JSON and unstructured data', url: '/guides/database/json' },
+      ],
+    },
+    {
+      name: 'Working with your database (intermediate)',
+      url: undefined,
+      items: [
+        { name: 'Implementing cascade deletes', url: '/guides/database/postgres/cascade-deletes' },
+        { name: 'Managing enums', url: '/guides/database/postgres/enums' },
+        { name: 'Managing database functions', url: '/guides/database/functions' },
         { name: 'Managing database triggers', url: '/guides/database/postgres/triggers' },
         { name: 'Managing database webhooks', url: '/guides/database/webhooks' },
         { name: 'Using Full Text Search', url: '/guides/database/full-text-search' },
+        { name: 'Partitioning your tables', url: '/guides/database/partitions' },
       ],
     },
     {
@@ -626,16 +684,15 @@ export const database: NavMenuConstant = {
       ],
     },
     {
-      name: 'Postgres Guides',
+      name: 'Configuration, optimization, and testing',
       url: undefined,
       items: [
-        { name: 'Query Optimization', url: '/guides/database/query-optimization' },
-        { name: 'Debugging and monitoring', url: '/guides/database/inspect' },
-        { name: 'Partitioning your tables', url: '/guides/database/partitions' },
-        { name: 'Implementing Cascade Deletes', url: '/guides/database/postgres/cascade-deletes' },
+        { name: 'Database configuration', url: '/guides/database/postgres/configuration' },
         { name: 'Managing database replication', url: '/guides/database/replication' },
+        { name: 'Query optimization', url: '/guides/database/query-optimization' },
+        { name: 'Debugging and monitoring', url: '/guides/database/inspect' },
+        { name: 'Debugging performance issues', url: '/guides/database/debugging-performance' },
         { name: 'Testing your database', url: '/guides/database/testing' },
-        { name: 'Database Configuration', url: '/guides/database/postgres/configuration' },
       ],
     },
     {
@@ -786,20 +843,45 @@ export const api: NavMenuConstant = {
     { name: 'Quickstart', url: '/guides/api/quickstart', items: [] },
     { name: 'Client Libraries', url: '/guides/api/rest/client-libs', items: [] },
     { name: 'Auto-generated Docs', url: '/guides/api/rest/auto-generated-docs', items: [] },
-    { name: 'Generating Types', url: '/guides/api/rest/generating-types', items: [] },
+    { name: 'Generating TypeScript Types', url: '/guides/api/rest/generating-types', items: [] },
     {
       name: 'Guides',
       url: '/guides/api',
       items: [
-        { name: 'Creating API routes', url: '/guides/api/creating-routes', items: [] },
-        { name: 'How API Keys work', url: '/guides/api/api-keys', items: [] },
-        { name: 'Securing your API', url: '/guides/api/securing-your-api', items: [] },
+        { name: 'Creating API routes', url: '/guides/api/creating-routes' },
+        { name: 'How API Keys work', url: '/guides/api/api-keys' },
+        { name: 'Securing your API', url: '/guides/api/securing-your-api' },
+      ],
+    },
+    {
+      name: 'Using the Data APIs',
+      url: '/guides/api/data-apis',
+      items: [
+        {
+          name: 'Managing tables, views, and data',
+          url: '/guides/api/data-apis#managing-tables-views-and-data',
+        },
         {
           name: 'Querying joins and nested tables',
-          url: '/guides/api/joins-and-nesting',
-          items: [],
+          url: '/guides/api/data-apis#querying-joins-and-nested-tables',
         },
-        { name: 'Using custom schemas', url: '/guides/api/using-custom-schemas', items: [] },
+        {
+          name: 'JSON and unstructured data',
+          url: '/guides/api/data-apis#json-and-unstructured-data',
+        },
+        {
+          name: 'Managing database functions',
+          url: '/guides/api/data-apis#managing-database-functions',
+        },
+        {
+          name: 'Using full-text search',
+          url: '/guides/api/data-apis#using-full-text-search',
+        },
+        {
+          name: 'Debugging performance issues',
+          url: '/guides/api/data-apis#debugging-performance-issues',
+        },
+        { name: 'Using custom schemas', url: '/guides/api/using-custom-schemas' },
       ],
     },
   ],
@@ -812,6 +894,17 @@ export const graphql: NavMenuConstant = {
   items: [
     { name: 'Overview', url: '/guides/graphql', items: [] },
     { name: 'API', url: '/guides/graphql/api', items: [] },
+    { name: 'Views', url: '/guides/graphql/views', items: [] },
+    { name: 'Functions', url: '/guides/graphql/functions', items: [] },
+    { name: 'Configuration & Customization', url: '/guides/graphql/configuration', items: [] },
+    { name: 'Security', url: '/guides/graphql/security', items: [] },
+    {
+      name: 'Integrations',
+      items: [
+        { name: 'With Apollo', url: '/guides/graphql/with-apollo' },
+        { name: 'With Relay', url: '/guides/graphql/with-relay' },
+      ],
+    },
   ],
 }
 
@@ -872,6 +965,10 @@ export const functions: NavMenuConstant = {
       items: [
         { name: 'CORS support for invoking from the browser', url: '/guides/functions/cors' },
         { name: 'Scheduling Functions', url: '/guides/functions/schedule-functions' },
+        {
+          name: 'Sending Push Notifications',
+          url: '/guides/functions/examples/push-notifications',
+        },
         { name: 'Generating OG images ', url: '/guides/functions/examples/og-image' },
         {
           name: 'CAPTCHA support with Cloudflare Turnstile',
@@ -1149,6 +1246,10 @@ export const ai = {
           name: 'LlamaIndex',
           url: '/guides/ai/integrations/llamaindex',
         },
+        {
+          name: 'Roboflow',
+          url: '/guides/ai/integrations/roboflow',
+        },
       ],
     },
   ],
@@ -1225,6 +1326,7 @@ export const platform: NavMenuConstant = {
         { name: 'Compute Add-ons', url: '/guides/platform/compute-add-ons' },
         { name: 'Custom Domains', url: '/guides/platform/custom-domains' },
         { name: 'Database Backups', url: '/guides/platform/backups' },
+        { name: 'Read Replicas', url: '/guides/platform/read-replicas' },
       ],
     },
     {
@@ -1234,6 +1336,7 @@ export const platform: NavMenuConstant = {
         { name: 'Access Control', url: '/guides/platform/access-control' },
         { name: 'Custom Postgres Config', url: '/guides/platform/custom-postgres-config' },
         { name: 'Database Size', url: '/guides/platform/database-size' },
+        { name: 'Fly Postgres', url: '/guides/platform/fly-postgres' },
         { name: 'HTTP Status Codes', url: '/guides/platform/http-status-codes' },
         { name: 'Logging', url: '/guides/platform/logs' },
         { name: 'Metrics', url: '/guides/platform/metrics' },
@@ -1253,6 +1356,7 @@ export const platform: NavMenuConstant = {
         { name: 'Performance Tuning', url: '/guides/platform/performance' },
         { name: 'Permissions', url: '/guides/platform/permissions' },
         { name: 'SSL Enforcement', url: '/guides/platform/ssl-enforcement' },
+        { name: 'Branching', url: '/guides/platform/branching' },
       ],
     },
     {
@@ -1537,14 +1641,14 @@ export const reference_javascript_v2 = {
   parent: '/reference',
 }
 
-export const reference_dart_v0 = {
+export const reference_dart_v1 = {
   icon: 'reference-dart',
   title: 'Flutter',
   url: '/guides/reference/dart',
   parent: '/reference',
 }
 
-export const reference_dart_v1 = {
+export const reference_dart_v2 = {
   icon: 'reference-dart',
   title: 'Flutter',
   url: '/guides/reference/dart',
@@ -1565,14 +1669,28 @@ export const reference_python_v2 = {
   parent: '/reference',
 }
 
-export const reference_swift_v0 = {
+export const reference_swift_v1 = {
   icon: 'reference-swift',
   title: 'swift',
   url: 'guides/reference/swift',
   parent: '/reference',
 }
 
-export const reference_kotlin_v0 = {
+export const reference_swift_v2 = {
+  icon: 'reference-swift',
+  title: 'swift',
+  url: 'guides/reference/swift',
+  parent: '/reference',
+}
+
+export const reference_kotlin_v1 = {
+  icon: 'reference-kotlin',
+  title: 'kotlin',
+  url: 'guides/reference/kotlin',
+  parent: '/reference',
+}
+
+export const reference_kotlin_v2 = {
   icon: 'reference-kotlin',
   title: 'kotlin',
   url: 'guides/reference/kotlin',
@@ -1627,41 +1745,6 @@ export const reference_self_hosting_functions = {
   parent: '/reference',
 }
 
-// export const reference: [
-//   {
-//     label: 'Official'
-//     items: [
-//       { name: 'Reference Documentation'; url: '/reference'; },
-//       { name: 'Supabase JavaScript Library'; url: '/reference/javascript'; },
-//       { name: 'Supabase Flutter Library'; url: '/reference/dart'; },
-//       { name: 'Supabase CLI'; url: '/reference/cli'; },
-//       { name: 'Management API'; url: '/reference/api'; }
-//     ]
-//   },
-//   {
-//     label: 'Self-hosting'
-//     items: [
-//       { name: 'Auth Server'; url: '/reference/auth'; },
-//       { name: 'Storage Server'; url: '/reference/storage'; }
-//     ]
-//   }
-//     {
-//       label: 'Clients',
-//       items: [
-//         { name: 'Auth Server', url: '/reference/auth'},
-//         { name: 'Storage Server', url: '/reference/storage'},
-//       ],
-//     },
-//   'reference/javascript': SupabaseJsV2Nav,
-//   'reference/javascript/v1': SupabaseJsV1Nav,
-//   'reference/dart': SupabaseDartV1Nav,
-//   'reference/dart/v0': SupabaseDartV0Nav,
-//   'reference/cli': SupabaseCLINav,
-//   'reference/api': SupabaseAPINav,
-//   'reference/auth': AuthServerNav,
-//   'reference/storage': StorageServerNav,
-// ]
-
 export const references = [
   {
     label: 'Client libraries',
@@ -1695,14 +1778,14 @@ export const references = [
       },
       {
         label: 'supabase-swift',
-        versions: ['v0'],
+        versions: ['v2', 'v1'],
         description: 'something about the reference',
         icon: '/docs/img/icons/swift-icon.svg',
         url: '/reference/swift/start',
       },
       {
         label: 'supabase-kt',
-        versions: ['v0'],
+        versions: ['v2', 'v1'],
         description: 'something about the reference',
         icon: '/docs/img/icons/kotlin-icon.svg',
         url: '/reference/kotlin/start',

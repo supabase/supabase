@@ -1,10 +1,12 @@
+'use client'
+
 import { Slot } from '@radix-ui/react-slot'
 import { VariantProps, cva } from 'class-variance-authority'
-import React from 'react'
 import { IconContext } from '@ui/components/Icon/IconContext'
 import { IconLoader } from '@ui/components/Icon/icons/IconLoader'
 import { sizes } from '@ui/lib/commonCva'
 import { cn } from '@ui/lib/utils'
+import { cloneElement, forwardRef, isValidElement } from 'react'
 
 export type ButtonVariantProps = VariantProps<typeof buttonVariants>
 const buttonVariants = cva(
@@ -30,9 +32,9 @@ const buttonVariants = cva(
     variants: {
       type: {
         primary: `
-            bg-brand-600 dark:bg-brand/70 hover:bg-brand-600/80 dark:hover:bg-brand
+            bg-brand-button hover:bg-brand-button/80
             text-white
-            border-brand dark:border-brand
+            border-brand
             focus-visible:outline-brand-600
             shadow-sm`,
         secondary: `
@@ -44,10 +46,8 @@ const buttonVariants = cva(
             shadow-sm`,
         default: `
             text-foreground
-            bg-surface-100 hover:bg-selection
-            dark:bg-surface-300 hover:dark:bg-selection
-            border-control hover:border-strong
-            dark:border-strong hover:dark:border-stronger
+            bg-button hover:bg-selection
+            border-button hover:border-button-hover
             focus-visible:outline-brand-600
             shadow-sm`,
         alternative: `
@@ -76,7 +76,7 @@ const buttonVariants = cva(
             border-transparent
             hover:bg-brand-400
             border-opacity-0
-            bg-opacity-0 dark:bg-opacity-0
+            bg-opacity-0
             shadow-none
             focus-visible:outline-border-strong`,
         text: `
@@ -115,6 +115,9 @@ const buttonVariants = cva(
       disabled: {
         true: 'opacity-50 cursor-default',
       },
+      rounded: {
+        true: 'rounded-full',
+      },
       defaultVariants: {
         //   variant: 'default',
         //   size: 'default',
@@ -146,9 +149,10 @@ export interface ButtonProps
   icon?: React.ReactNode
   iconLeft?: React.ReactNode
   iconRight?: React.ReactNode
+  rounded?: boolean
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
       asChild = false,
@@ -161,6 +165,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       iconRight,
       iconLeft,
       htmlType = 'button',
+      rounded,
       ...props
     },
     ref
@@ -178,11 +183,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         type={htmlType}
         {...props}
-        className={cn(buttonVariants({ type, size, disabled, block }), className)}
+        className={cn(buttonVariants({ type, size, disabled, block, rounded }), className)}
       >
         {asChild ? (
-          React.isValidElement(children) ? (
-            React.cloneElement(
+          isValidElement(children) ? (
+            cloneElement(
               children,
               undefined,
               showIcon &&

@@ -50,12 +50,11 @@ export default function handler(req: Request) {
 Create an `index.ts` file to execute the handler on incoming requests:
 
 ```ts index.ts
-import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import handler from './handler.tsx'
 
 console.log('Hello from og-image Function!')
 
-serve(handler)
+Deno.serve(handler)
 ```
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />

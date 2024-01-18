@@ -247,7 +247,7 @@ Meie lähenemine kliendiraamatukogudele on modulaarne. Iga alamraamatukogu on is
 - [Lihtsustatud hiina keel / 简体中文](/i18n/README.zh-cn.md)
 - [Rootsi / Svenska](/i18n/README.sv.md)
 - [Tai / ไทย](/i18n/README.th.md)
-- [Traditsiooniline hiina keel / 繁体中文](/i18n/README.zh-tw.md)
+- [Traditsiooniline hiina keel / 繁體中文](/i18n/README.zh-tw.md)
 - [Turkish / Türkçe](/i18n/README.tr.md)
 - [Ukraina / Українська](/i18n/README.uk.md)
 - [Vietnami keel / Tiếng Việt](/i18n/README.vi-vn.md)

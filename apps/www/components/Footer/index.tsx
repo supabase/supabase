@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
 import { Badge, IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid, cn } from 'ui'
@@ -19,15 +20,34 @@ const Footer = (props: Props) => {
   const { resolvedTheme } = useTheme()
   const { pathname } = useRouter()
 
-  const isLaunchWeekPage = pathname.includes('launch-week') || pathname === '/'
+  const isLaunchWeek = pathname.includes('launch-week')
+  const forceDark = isLaunchWeek || pathname === '/'
+
+  /**
+   * Temporary fix for next-theme client side bug
+   * https://github.com/pacocoursey/next-themes/issues/169
+   * TODO: remove when bug has been fixed
+   */
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return null
+  }
 
   return (
-    <footer className={cn('bg-alternative', props.className)} aria-labelledby="footerHeading">
+    <footer
+      className={cn('bg-alternative', isLaunchWeek && 'bg-[#060809]', props.className)}
+      aria-labelledby="footerHeading"
+    >
       <h2 id="footerHeading" className="sr-only">
         Footer
       </h2>
       <div className="w-full !py-0">
-        <SectionContainer className="grid grid-cols-2 md:flex items-center justify-between md:justify-center gap-8 md:gap-16 xl:gap-28 !py-6 md:!py-10 text-sm">
+        <SectionContainer className="grid grid-cols-2 md:flex items-center justify-between text-foreground md:justify-center gap-8 md:gap-16 xl:gap-28 !py-6 md:!py-10 text-sm">
           <div className="flex flex-col md:flex-row gap-2 md:items-center">
             We protect your data.
             <Link href="/security" className="text-brand hover:underline">
@@ -53,9 +73,9 @@ const Footer = (props: Props) => {
             <Link href="#" as="/" className="w-40">
               <Image
                 src={
-                  isLaunchWeekPage
+                  forceDark
                     ? supabaseLogoWordmarkDark
-                    : resolvedTheme === 'dark'
+                    : mounted && resolvedTheme?.includes('dark')
                     ? supabaseLogoWordmarkDark
                     : supabaseLogoWordmarkLight
                 }
@@ -131,9 +151,7 @@ const Footer = (props: Props) => {
                               link.url.startsWith('https') ? (
                                 <a href={link.url}>{children}</a>
                               ) : (
-                                <Link href={link.url} legacyBehavior>
-                                  {children}
-                                </Link>
+                                <Link href={link.url}>{children}</Link>
                               )
                             ) : (
                               Component && <Component>{children}</Component>
@@ -150,7 +168,9 @@ const Footer = (props: Props) => {
         </div>
         <div className="border-default mt-32 flex justify-between border-t pt-8">
           <small className="small">&copy; Supabase Inc</small>
-          <ThemeToggle forceDark={isLaunchWeekPage} />
+          <div className={cn(forceDark && 'hidden')}>
+            <ThemeToggle forceDark={forceDark} />
+          </div>
         </div>
       </SectionContainer>
     </footer>

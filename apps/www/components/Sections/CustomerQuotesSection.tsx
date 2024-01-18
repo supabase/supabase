@@ -41,7 +41,7 @@ const CustomerQuotesSection = (props: Props) => {
 
   const Card = ({ customer, index }: Card) => {
     const { resolvedTheme } = useTheme()
-    const logo = `/images/customers/logos/${resolvedTheme !== 'dark' ? '' : 'light/'}${
+    const logo = `/images/customers/logos/${!resolvedTheme?.includes('dark') ? '' : 'light/'}${
       customer.customer
     }.png`
 

@@ -77,12 +77,11 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                   >
                     <Image
                       src={!!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img}
-                      className={[`absolute w-full h-full -z-10 transition-all duration-300`].join(
-                        ' '
-                      )}
-                      layout="fill"
+                      className={[
+                        `absolute w-full h-full -z-10 transition-all duration-300 object-cover`,
+                      ].join(' ')}
+                      fill
                       objectPosition={!!layer.mobileImg && isTablet ? '50% 50%' : '50% 50%'}
-                      objectFit="cover"
                       quality={100}
                       alt=""
                     />
@@ -138,12 +137,11 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                   >
                     <Image
                       src={!!layer.mobileImg && isMobile ? (layer.mobileImg as any) : layer.img}
-                      className={[`absolute w-full h-full -z-10 transition-all duration-300`].join(
-                        ' '
-                      )}
-                      layout="fill"
+                      className={[
+                        `absolute w-full h-full -z-10 transition-all duration-300 object-cover`,
+                      ].join(' ')}
+                      fill
                       objectPosition={!!layer.mobileImg && isMobile ? '50% 50%' : '80% 50%'}
-                      objectFit="cover"
                       quality={100}
                       alt=""
                     />
@@ -188,12 +186,11 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                   >
                     <Image
                       src={!!layer.mobileImg && isMobile ? (layer.mobileImg as any) : layer.img}
-                      className={[`absolute w-full h-full -z-10 transition-all duration-300`].join(
-                        ' '
-                      )}
-                      layout="fill"
+                      className={[
+                        `absolute w-full h-full -z-10 transition-all duration-300 object-cover`,
+                      ].join(' ')}
+                      fill
                       objectPosition={!!layer.mobileImg && isMobile ? '50% 50%' : '80% 50%'}
-                      objectFit="cover"
                       quality={100}
                       alt=""
                     />
@@ -240,12 +237,11 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                   >
                     <Image
                       src={!!layer.mobileImg && isMobile ? (layer.mobileImg as any) : layer.img}
-                      className={[`absolute w-full h-full -z-10 transition-all duration-300`].join(
-                        ' '
-                      )}
-                      layout="fill"
+                      className={[
+                        `absolute w-full h-full -z-10 transition-all duration-300 object-cover`,
+                      ].join(' ')}
+                      fill
                       objectPosition={isMobile ? '50% 70%' : '50% 50%'}
-                      objectFit="cover"
                       quality={100}
                       alt=""
                     />
@@ -292,12 +288,11 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                   >
                     <Image
                       src={!!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img}
-                      className={[`absolute w-full h-full -z-10 transition-all duration-300`].join(
-                        ' '
-                      )}
-                      layout="fill"
+                      className={[
+                        `absolute w-full h-full -z-10 transition-all duration-300 object-cover`,
+                      ].join(' ')}
+                      fill
                       objectPosition={isMobile ? '50% 90%' : '50% 50%'}
-                      objectFit="cover"
                       quality={100}
                       alt=""
                     />
@@ -344,12 +339,11 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                   >
                     <Image
                       src={!!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img}
-                      className={[`absolute w-full h-full -z-10 transition-all duration-300`].join(
-                        ' '
-                      )}
-                      layout="fill"
+                      className={[
+                        `absolute w-full h-full -z-10 transition-all duration-300 object-cover`,
+                      ].join(' ')}
+                      fill
                       objectPosition={!!layer.mobileImg && isTablet ? '50% 50%' : '50% 50%'}
-                      objectFit="cover"
                       quality={100}
                       alt=""
                     />
@@ -396,12 +390,11 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                   >
                     <Image
                       src={!!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img}
-                      className={[`absolute w-full h-full -z-10 transition-all duration-300`].join(
-                        ' '
-                      )}
-                      layout="fill"
+                      className={[
+                        `absolute w-full h-full -z-10 transition-all duration-300 object-cover`,
+                      ].join(' ')}
+                      fill
                       objectPosition={!!layer.mobileImg && isTablet ? '50% 50%' : '50% 50%'}
-                      objectFit="cover"
                       quality={100}
                       alt=""
                     />
@@ -451,7 +444,7 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                       className={[`absolute w-full h-full -z-10 transition-all duration-300`].join(
                         ' '
                       )}
-                      layout="fill"
+                      fill
                       objectPosition={isMobile ? '0% 50%' : isDesktop ? '100% 50%' : '0% 50%'}
                       objectFit={isMobile ? 'cover' : isDesktop ? 'contain' : 'cover'}
                       quality={100}
@@ -500,12 +493,11 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                   >
                     <Image
                       src={!!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img}
-                      className={[`absolute w-full h-full -z-10 transition-all duration-300`].join(
-                        ' '
-                      )}
-                      layout="fill"
+                      className={[
+                        `absolute w-full h-full -z-10 transition-all duration-300 object-cover`,
+                      ].join(' ')}
+                      fill
                       objectPosition={!!layer.mobileImg && isTablet ? '50% 50%' : '50% 50%'}
-                      objectFit="cover"
                       quality={100}
                       alt=""
                     />
@@ -552,12 +544,11 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                   >
                     <Image
                       src={!!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img}
-                      className={[`absolute w-full h-full -z-10 transition-all duration-300`].join(
-                        ' '
-                      )}
-                      layout="fill"
+                      className={[
+                        `absolute w-full h-full -z-10 transition-all duration-300 object-cover`,
+                      ].join(' ')}
+                      fill
                       objectPosition={!!layer.mobileImg && isTablet ? '50% 50%' : '50% 50%'}
-                      objectFit="cover"
                       quality={100}
                       alt=""
                     />
@@ -604,12 +595,11 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                   >
                     <Image
                       src={!!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img}
-                      className={[`absolute w-full h-full -z-10 transition-all duration-300`].join(
-                        ' '
-                      )}
-                      layout="fill"
+                      className={[
+                        `absolute w-full h-full -z-10 transition-all duration-300 object-cover`,
+                      ].join(' ')}
+                      fill
                       objectPosition={!!layer.mobileImg && isTablet ? '50% 50%' : '50% 50%'}
-                      objectFit="cover"
                       quality={100}
                       alt=""
                     />
@@ -656,12 +646,11 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                   >
                     <Image
                       src={!!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img}
-                      className={[`absolute w-full h-full -z-10 transition-all duration-300`].join(
-                        ' '
-                      )}
-                      layout="fill"
+                      className={[
+                        `absolute w-full h-full -z-10 transition-all duration-300 object-cover`,
+                      ].join(' ')}
+                      fill
                       objectPosition={!!layer.mobileImg && isTablet ? '50% 50%' : '50% 50%'}
-                      objectFit="cover"
                       quality={100}
                       alt=""
                     />
@@ -703,12 +692,11 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                   >
                     <Image
                       src={!!layer.mobileImg && isMobile ? (layer.mobileImg as any) : layer.img}
-                      className={[`absolute w-full h-full -z-10 transition-all duration-300`].join(
-                        ' '
-                      )}
-                      layout="fill"
+                      className={[
+                        `absolute w-full h-full -z-10 transition-all duration-300 object-cover`,
+                      ].join(' ')}
+                      fill
                       objectPosition={!!layer.mobileImg && isMobile ? '50% 50%' : '80% 50%'}
-                      objectFit="cover"
                       quality={100}
                       alt=""
                     />
@@ -747,7 +735,7 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                       className={[`absolute w-full h-full -z-10 transition-all duration-300`].join(
                         ' '
                       )}
-                      layout="fill"
+                      fill
                       objectPosition={
                         i == 1 && !!layer.mobileImg && isMobile ? '50% 60%' : '80% 50%'
                       }

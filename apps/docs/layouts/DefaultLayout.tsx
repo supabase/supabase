@@ -62,7 +62,7 @@ const Layout: FC<Props> = (props: Props) => {
       />
       <LayoutMainContent>
         <div className={['relative transition-all ease-out', 'duration-150 '].join(' ')}>
-          <article className="prose dark:prose-dar max-w-none">
+          <article className="prose max-w-none">
             <h1>{props.meta.title}</h1>
             <MDXProvider components={components}>{props.children}</MDXProvider>
           </article>

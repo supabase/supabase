@@ -383,7 +383,7 @@ One way to solve this is to reassign the owner of those tables to `postgres` rol
 ALTER TABLE users OWNER TO postgres;
 ```
 
-Apart from tables, you also need to reassign owner of other entities using their respective commands, including [types](https://www.postgresql.org/docs/current/sql-alterschema.html), [functions](https://www.postgresql.org/docs/current/sql-alterroutine.html), and [schemas](https://www.postgresql.org/docs/current/sql-altertype.html).
+Apart from tables, you also need to reassign owner of other entities using their respective commands, including [types](https://www.postgresql.org/docs/current/sql-altertype.html), [functions](https://www.postgresql.org/docs/current/sql-alterroutine.html), and [schemas](https://www.postgresql.org/docs/current/sql-alterschema.html).
 
 ### Rebasing new migrations
 

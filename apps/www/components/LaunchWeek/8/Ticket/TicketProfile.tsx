@@ -8,7 +8,7 @@ type Props = {
   golden?: boolean
 }
 
-export default function TicketProfile({ user, ticketGenerationState, golden = false }: Props) {
+export default function TicketProfile({ user }: Props) {
   const { username, name, metadata } = user
 
   const HAS_ROLE = !!metadata?.role

@@ -15,11 +15,11 @@ High memory usage doesn't necessarily mean that your instance is at risk. Memory
 
 </Admonition>
 
-## Base Memory Usage
+## Base memory usage
 
 You may observe elevated memory usage even when your database has little to no load. Supabase requires a wide range of services other than Postgres to operate, which can result in an elevated base memory usage. Especially on the smallest compute instance that comes with 1 GB of RAM, it is not unusual for your project to have a base memory usage of ~50%.
 
-## Issues with High Memory Usage
+## Issues with high memory usage
 
 Every Supabase project runs in its own dedicated virtual machine. Your instance will have a different set of hardware provisioned depending on your [compute add-on](https://supabase.com/docs/guides/platform/compute-add-ons). Depending on your workload, your compute hardware may not be suitable and can result in high RAM usage.
 

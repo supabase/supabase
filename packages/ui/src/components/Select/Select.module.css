@@ -34,7 +34,7 @@
 }
 
 .sbui-select--error {
-  @apply border-red-500 dark:border-red-500;
+  @apply border-red-500;
 }
 
 .sbui-select--borderless {

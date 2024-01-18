@@ -23,8 +23,13 @@ module.exports = config({
         slideIn: {
           '0%, 100%': { transform: 'translate3d(0,0,0)' },
         },
-        spin: {
-          '0%, 100%': { transform: 'rotate(360deg)' },
+        spinner: {
+          '0%': {
+            transform: 'rotate(0deg)',
+          },
+          '100%': {
+            transform: 'rotate(360deg)',
+          },
         },
         marquee: {
           '0%': { transform: 'translateX(0%)' },
@@ -39,7 +44,7 @@ module.exports = config({
       animation: {
         'flash-code': 'flash-code 1s forwards',
         'flash-code-slow': 'flash-code 2s forwards',
-        spin: 'spin 1s both infinite',
+        spinner: 'spinner 1s both infinite',
         marquee: 'marquee 35s linear infinite',
         'pulse-radar': 'pulse-radar 3s linear infinite',
       },

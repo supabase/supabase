@@ -39,7 +39,7 @@ const RepoCard = ({ repo, activeTab, index }: { repo: any; activeTab: number; in
         </div>
         <p className="text-sm flex-1 text-foreground-lighter">{repo.description}</p>
         <div className="text-sm w-full flex justify-between text-foreground-lighter mt-8">
-          <p className="">{repo.full_name}</p>
+          <p>{repo.full_name}</p>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1">
               <span>{repo.forks.toLocaleString()}</span>

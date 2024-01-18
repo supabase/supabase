@@ -86,7 +86,7 @@ export default function TicketsPage({ users }: Props) {
     window.addEventListener('scroll', handleDebouncedScroll)
 
     return () => {
-      document.body.className = resolvedTheme === 'dark' ? 'dark' : 'light'
+      document.body.className = resolvedTheme?.includes('dark') ? 'dark' : 'light'
       window.removeEventListener('scroll', handleDebouncedScroll)
     }
   }, [])

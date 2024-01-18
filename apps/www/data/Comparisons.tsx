@@ -11,6 +11,11 @@ export const data = {
       description: '',
       url: '/alternatives/supabase-vs-heroku-postgres',
     },
+    {
+      text: 'Supabase vs Auth0',
+      description: '',
+      url: '/alternatives/supabase-vs-auth0',
+    },
   ],
 }
 

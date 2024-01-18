@@ -20,6 +20,7 @@ const PortalToast = () => (
           paddingLeft: '16px',
           paddingRight: '16px',
           fontSize: '0.875rem',
+          opacity: '1',
         },
         error: {
           duration: 8000,
@@ -33,13 +34,13 @@ const PortalToast = () => (
             return (
               <>
                 {icon}
-                <div className="flex items-center">
+                <div className="w-full flex items-center">
                   <div
                     className={`toast-message w-full ${
                       t.type === 'loading'
                         ? 'max-w-[380px]'
                         : isConsentToast
-                        ? 'max-w-[800px]'
+                        ? 'max-w-none sm:max-w-[800px]'
                         : 'max-w-[260px]'
                     }`}
                   >

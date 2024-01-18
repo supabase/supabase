@@ -10,7 +10,7 @@ function ProductIcon({ icon, color }: ProductIcon) {
     switch (color) {
       case 'green':
         return {
-          container: 'bg-brand-600 dark:bg-brand-500 text-brand-100',
+          container: 'bg-brand-600 text-brand-100',
           svg: 'stroke-brand',
         }
       case 'alt':
@@ -27,7 +27,7 @@ function ProductIcon({ icon, color }: ProductIcon) {
       default:
         return {
           container: 'bg-foreground text-background-alternative',
-          svg: 'stroke-white dark:stroke-black',
+          svg: 'stroke-background',
         }
     }
   }
@@ -38,7 +38,7 @@ function ProductIcon({ icon, color }: ProductIcon) {
         'inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md',
         !color || color === 'black' ? 'bg-foreground text-background-alternative' : '',
         color && color === 'gray' ? 'bg-border-strong text-foreground-light' : '',
-        color && color === 'green' ? 'bg-brand dark:bg-brand-500 text-brand-100' : '',
+        color && color === 'green' ? 'bg-brand text-brand-100' : '',
         color && color === 'alt' ? 'bg-alternative text-brand' : '',
         // color && color === 'alt' ? 'bg-surface-300 text-brand' : '',
       ].join(' ')}
@@ -46,9 +46,9 @@ function ProductIcon({ icon, color }: ProductIcon) {
       <svg
         className={[
           'h-5 w-5',
-          !color || color === 'black' ? 'stroke-white dark:stroke-black' : '',
+          !color || color === 'black' ? 'stroke-background' : '',
           color && color === 'gray' ? 'stroke-foreground-light' : '',
-          color && color === 'green' ? 'stroke-brand-200 dark:stroke-brand' : '',
+          color && color === 'green' ? 'stroke-brand-200' : '',
           color && color === 'alt' ? 'stroke-brand' : '',
         ].join(' ')}
         xmlns="http://www.w3.org/2000/svg"

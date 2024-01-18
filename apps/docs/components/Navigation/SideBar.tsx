@@ -80,7 +80,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                   'py-1.5 px-5 rounded text-sm transition',
                   `${
                     item.url === asPath
-                      ? 'bg-background text-brand'
+                      ? 'bg-background text-brand-link'
                       : 'text-foreground-light hover:text-foreground'
                   }`,
                 ].join(' ')}

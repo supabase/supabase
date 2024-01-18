@@ -2,7 +2,6 @@ import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import BecomeAPartner from '~/components/Partners/BecomeAPartner'
 import PartnerLinkBox from '~/components/Partners/PartnerLinkBox'
 import supabase from '~/lib/supabaseMisc'
 import { Partner } from '~/types/partners'
@@ -88,28 +87,6 @@ function ExpertPartnersPage(props: Props) {
                         </svg>
                       }
                     />
-                    <PartnerLinkBox
-                      title="Become a partner"
-                      color="brand"
-                      description="Fill out a quick 30 second form to apply to become a partner"
-                      href={`/partners/integrations#become-a-partner`}
-                      icon={
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth="1"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                          />
-                        </svg>
-                      }
-                    />
                   </div>
                 </div>
               </div>
@@ -126,8 +103,6 @@ function ExpertPartnersPage(props: Props) {
             </div>
           </div>
         </SectionContainer>
-        {/* Become a partner form */}
-        <BecomeAPartner />
       </DefaultLayout>
     </>
   )
