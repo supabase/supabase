@@ -62,9 +62,14 @@ SubmitButton.displayName = 'SubmitButton'
 interface AssistantChatFormProps {
   chatContext: string
   placeholder: string
+  canSubmit?: () => Promise<boolean>
 }
 
-const AssistantChatForm = ({ chatContext, placeholder }: AssistantChatFormProps) => {
+const AssistantChatForm = ({
+  chatContext,
+  placeholder,
+  canSubmit = () => Promise.resolve(true),
+}: AssistantChatFormProps) => {
   const { thread_id } = useParams()
   const textAreaRef = useRef<HTMLTextAreaElement>(null)
   const submitRef = useRef<HTMLButtonElement>(null)
@@ -101,7 +106,15 @@ const AssistantChatForm = ({ chatContext, placeholder }: AssistantChatFormProps)
   return (
     <>
       {disabled && <ChatLoadingAnimation />}
-      <form className="relative" action={upsertMessageFormAction}>
+      <form
+        className="relative"
+        action={async (formData) => {
+          const flag = await canSubmit()
+          if (flag) {
+            upsertMessageFormAction(formData)
+          }
+        }}
+      >
         <div className={cn('absolute', 'top-2 left-2', 'ml-1 w-6 h-6 rounded-full bg-dbnew')}></div>
         <input hidden name="threadId" defaultValue={thread_id} />
         <TextArea_Shadcn_
@@ -129,7 +142,7 @@ const AssistantChatForm = ({ chatContext, placeholder }: AssistantChatFormProps)
       {chatContext === 'new' && (
         <ChatSuggestions
           setInput={(v) => {
-            if (textAreaRef?.current) textAreaRef.current.value = 'v'
+            if (textAreaRef?.current) textAreaRef.current.value = v
           }}
         />
       )}
