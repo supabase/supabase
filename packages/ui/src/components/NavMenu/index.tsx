@@ -1,20 +1,21 @@
 import { cn } from '@ui/lib/utils'
-import { PropsWithChildren } from 'react'
+import { HTMLAttributes, PropsWithChildren, forwardRef } from 'react'
 
-export const NavMenu = ({
-  children,
-  className,
-  label,
-}: PropsWithChildren<{
-  className?: string
-  label: string
-}>) => {
-  return (
-    <nav aria-label={label} dir="ltr" role="menu" className={cn('flex border-b', className)}>
-      <ul role="menu">{children}</ul>
-    </nav>
-  )
-}
+interface NavMenuProps extends HTMLAttributes<HTMLDivElement> {}
+
+export const NavMenu = forwardRef<HTMLDivElement, NavMenuProps>(
+  (
+    props: PropsWithChildren<{
+      className?: string
+    }>
+  ) => {
+    return (
+      <nav dir="ltr" role="menu" {...props} className={cn('flex border-b', props.className)}>
+        <ul role="menu">{props.children}</ul>
+      </nav>
+    )
+  }
+)
 
 export const NavMenuItem = ({
   children,

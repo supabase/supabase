@@ -9,7 +9,7 @@ type Props = {
 
 const VaultNavTabs = (props: PropsWithChildren<Props>) => {
   return (
-    <NavMenu className="mb-4" label={'Vault menu'}>
+    <NavMenu className="mb-4" aria-label="Vault menu">
       <NavMenuItem active={props.activeTab === 'secrets'}>
         <Link href={`/project/${props.projRef}/settings/vault/secrets`}>Secrets Management</Link>
       </NavMenuItem>
