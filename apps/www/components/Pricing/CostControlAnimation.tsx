@@ -55,7 +55,7 @@ const CostControlAnimation: FC<Props> = ({ className }) => {
     <div
       ref={ref}
       className={cn(
-        'relative w-full aspect-video border rounded-xl bg-surface-100 overflow-hidden pointer-events-none',
+        'relative w-full aspect-video border rounded-lg bg-alternative overflow-hidden pointer-events-none',
         hasSpendCap ? 'spendcap-enabled' : 'spendcap-disabled',
         className
       )}

@@ -310,7 +310,6 @@ export default function IndexPage() {
           </div>
         </div>
       </div>
-
       <div
         id="addons"
         className="sm:py-18 container relative mx-auto px-4 py-16 shadow-sm md:py-24 lg:px-12 lg:pt-32 lg:pb-12"
@@ -688,47 +687,6 @@ export default function IndexPage() {
                     sectionId="support"
                   />
                 </tbody>
-                <tfoot>
-                  <tr className="border-default border-t">
-                    <th className="sr-only" scope="row">
-                      Choose your plan
-                    </th>
-
-                    <td className="px-6 pt-5">
-                      <Button asChild size="tiny" type="primary" block>
-                        <Link
-                          href="https://supabase.com/dashboard/new?plan=free"
-                          as="https://supabase.com/dashboard/new?plan=free"
-                        >
-                          Get Started
-                        </Link>
-                      </Button>
-                    </td>
-
-                    <td className="px-6 pt-5">
-                      <Button asChild size="tiny" type="primary" block>
-                        <Link
-                          href="https://supabase.com/dashboard/new?plan=pro"
-                          as="https://supabase.com/dashboard/new?plan=pro"
-                        >
-                          Get Started
-                        </Link>
-                      </Button>
-                    </td>
-
-                    <td className="px-6 pt-5">
-                      <Button asChild size="tiny" type="primary" block>
-                        <Link href="https://supabase.com/dashboard/new?plan=team">Get Started</Link>
-                      </Button>
-                    </td>
-
-                    <td className="px-6 pt-5">
-                      <Button asChild size="tiny" type="default" block>
-                        <Link href="https://forms.supabase.com/enterprise">Contact Us</Link>
-                      </Button>
-                    </td>
-                  </tr>
-                </tfoot>
               </table>
             </div>
           </div>
