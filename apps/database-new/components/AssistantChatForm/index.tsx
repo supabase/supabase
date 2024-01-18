@@ -1,46 +1,20 @@
-import { ExternalLink } from 'lucide-react'
-import { cn } from 'ui'
+'use client'
 
-import ChatLoadingAnimation from '@/app/[thread_id]/ChatLoadingAnimation'
-import { CHAT_EXAMPLES } from '@/data/chat-examples'
 import { Loader2 } from 'lucide-react'
-import React, { ChangeEventHandler, Dispatch, FormEventHandler, forwardRef, useRef } from 'react'
-import { TextArea_Shadcn_ } from 'ui'
+import { FormHTMLAttributes, KeyboardEvent, ReactNode, forwardRef, useRef } from 'react'
+import { TextArea_Shadcn_, cn } from 'ui'
 
-export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
+import { useParams } from 'next/navigation'
+import ChatLoadingAnimation from './ChatLoadingAnimation'
+import { ChatSuggestions } from './ChatSuggestions'
+import { upsertMessageFormAction } from './action'
+
+export interface FormProps extends FormHTMLAttributes<HTMLFormElement> {
   loading?: boolean
   disabled?: boolean
   message?: string
-  children?: React.ReactNode
+  children?: ReactNode
   chatContext: 'new' | 'edit'
-}
-
-const ChatSuggestions = ({ setInput }: { setInput: Dispatch<React.SetStateAction<string>> }) => {
-  const suggestions = CHAT_EXAMPLES
-  return (
-    <div className="flex gap-3 mt-4">
-      {suggestions.map((suggestion, idx) => (
-        <button
-          key={idx}
-          type="button"
-          className={cn(
-            'text-xs',
-            'flex items-center gap-3 !pr-3',
-            'transition border rounded-full px-3 py-1.5',
-            'text-light',
-            'hover:border-stronger hover:text'
-          )}
-          onClick={(event) => {
-            setInput(suggestion.prompt)
-            event.preventDefault()
-          }}
-        >
-          {suggestion.label}
-          <ExternalLink size={12} />
-        </button>
-      ))}
-    </div>
-  )
 }
 
 const SubmitButton = forwardRef<HTMLButtonElement, { isLoading: boolean; input: string }>(
@@ -86,24 +60,16 @@ const SubmitButton = forwardRef<HTMLButtonElement, { isLoading: boolean; input: 
 SubmitButton.displayName = 'SubmitButton'
 
 interface AssistantChatFormProps {
-  value: string
-  onChange: ChangeEventHandler<HTMLTextAreaElement>
-  onSubmit: FormEventHandler<HTMLFormElement>
-  disabled: boolean
   chatContext: string
   placeholder: string
 }
 
-const AssistantChatForm = ({
-  value,
-  onChange,
-  onSubmit,
-  disabled,
-  chatContext,
-  placeholder,
-}: AssistantChatFormProps) => {
+const AssistantChatForm = ({ chatContext, placeholder }: AssistantChatFormProps) => {
+  const { thread_id } = useParams()
   const textAreaRef = useRef<HTMLTextAreaElement>(null)
   const submitRef = useRef<HTMLButtonElement>(null)
+
+  const disabled = false
 
   // useEffect(() => {
   //   if (textAreaRef) {
@@ -118,7 +84,7 @@ const AssistantChatForm = ({
   //   }
   // }, [input, textAreaRef])
 
-  function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+  function handleKeyDown(e: KeyboardEvent<HTMLTextAreaElement>) {
     // Check if the pressed key is "Enter" (key code 13) without the "Shift" key
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
@@ -135,13 +101,15 @@ const AssistantChatForm = ({
   return (
     <>
       {disabled && <ChatLoadingAnimation />}
-      <form className="relative" onSubmit={onSubmit}>
+      <form className="relative" action={upsertMessageFormAction}>
         <div className={cn('absolute', 'top-2 left-2', 'ml-1 w-6 h-6 rounded-full bg-dbnew')}></div>
+        <input hidden name="threadId" defaultValue={thread_id} />
         <TextArea_Shadcn_
-          name="value"
+          name="prompt"
           ref={textAreaRef}
           autoFocus
           rows={1}
+          defaultValue=""
           disabled={disabled || submitRef.current?.disabled}
           contentEditable
           required
@@ -150,17 +118,21 @@ const AssistantChatForm = ({
           }
           placeholder={placeholder}
           spellCheck={false}
-          value={value}
-          onChange={onChange}
           onKeyDown={(e) => handleKeyDown(e)}
         />
         {/* {props.children} */}
-        <SubmitButton input={value} isLoading={disabled} ref={submitRef} />
+        <SubmitButton input={''} isLoading={disabled} ref={submitRef} />
         {/* <p aria-live="polite" className="sr-only" role="status">
             {message}
           </p> */}
       </form>
-      {/* {chatContext === 'new' && <ChatSuggestions setInput={setInput} />} */}
+      {chatContext === 'new' && (
+        <ChatSuggestions
+          setInput={(v) => {
+            if (textAreaRef?.current) textAreaRef.current.value = 'v'
+          }}
+        />
+      )}
     </>
   )
 }

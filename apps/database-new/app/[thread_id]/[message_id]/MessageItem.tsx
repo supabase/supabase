@@ -1,13 +1,12 @@
 'use client'
 
-import { Message } from 'ai/react'
+import { Message as MessageItem } from 'ai/react'
 import Link from 'next/link'
 import { useParams, usePathname } from 'next/navigation'
-
 import { cn } from 'ui'
 
-interface UserChatProps {
-  message: Message
+interface MessageItemProps {
+  message: MessageItem
   isLatest: boolean
   times: {
     hoursFromNow: number
@@ -17,9 +16,8 @@ interface UserChatProps {
   }
 }
 
-const UserChat = ({ message, isLatest, times }: UserChatProps) => {
+const MessageItem = ({ message, isLatest, times }: MessageItemProps) => {
   const { thread_id } = useParams()
-
   // using the local state for run loading
   const isLoading = false
 
@@ -119,4 +117,4 @@ const UserChat = ({ message, isLatest, times }: UserChatProps) => {
   )
 }
 
-export default UserChat
+export default MessageItem

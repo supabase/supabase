@@ -1,6 +1,5 @@
 'use client'
 
-import { PostgresTable } from '@/lib/types'
 import { useTheme } from 'next-themes'
 import { useEffect, useMemo, useState } from 'react'
 import ReactFlow, {
@@ -10,18 +9,15 @@ import ReactFlow, {
   useReactFlow,
 } from 'reactflow'
 import 'reactflow/dist/style.css'
-import { cn } from 'ui'
 
+import { PostgresTable } from '@/lib/types'
+import { parseTables } from '@/lib/utils'
 import { getGraphDataFromTables } from './SchemaFlow.utils'
 import TableNode from './TableNode'
-import { useAppStateSnapshot } from '@/lib/state'
-import { useParams } from 'next/navigation'
-import { set } from 'lodash'
-import { parseTables } from '@/lib/utils'
 
 interface SchemaGraphProps {
   tables?: PostgresTable[]
-  content: any
+  content: string
 }
 
 const SchemaFlowHandler = ({ content }: SchemaGraphProps) => {

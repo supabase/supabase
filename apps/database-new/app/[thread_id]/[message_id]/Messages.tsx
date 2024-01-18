@@ -1,37 +1,68 @@
-'use client'
-import { Message } from 'ai/react'
+import { ScrollArea } from 'ui'
+
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import UserChat from './UserChat'
+import { BottomMarker } from './BottomMarker'
+import { getMessages } from './getMessages'
+
+import MessageItem from './MessageItem'
 
 dayjs.extend(relativeTime)
 
-function Messages({ messages }: { messages: Message[] }) {
+export const Messages = async ({ threadId }: { threadId: string }) => {
+  const { data: messages, error } = await getMessages(threadId)
+
+  if (error) {
+    return <>Error happened</>
+  }
+
+  const initialMessages = messages.flatMap((m) => [
+    {
+      id: m.message_id,
+      content: m.message_input,
+      role: 'user' as const,
+      createdAt: new Date(m.created_at),
+    },
+    {
+      id: m.message_id,
+      content: m.message_content,
+      role: 'assistant' as const,
+      createdAt: new Date(m.created_at),
+    },
+  ])
+
+  const userMessages = initialMessages.filter((m) => m.role === 'user')
+
   return (
-    <div className="flex flex-col py-2 xl:py-6">
-      {messages.map((message, idx) => {
-        const createdAtTimestamp = dayjs(message.createdAt)
-        const isLatest = Array.isArray(messages) && idx === messages.length - 1
+    <ScrollArea className="grow h-px">
+      <div className="flex flex-col py-2 xl:py-6">
+        <div className="flex flex-col py-2 xl:py-6">
+          {userMessages.map((message, idx) => {
+            const createdAtTimestamp = dayjs(message.createdAt)
+            const isLatest = Array.isArray(messages) && idx === messages.length - 1
 
-        const hoursFromNow = dayjs().diff(createdAtTimestamp, 'hour')
-        const formattedTimeFromNow = dayjs(createdAtTimestamp).fromNow()
+            const hoursFromNow = dayjs().diff(createdAtTimestamp, 'hour')
+            const formattedTimeFromNow = dayjs(createdAtTimestamp).fromNow()
 
-        const formattedCreatedAt = dayjs(createdAtTimestamp).format('DD MMM YYYY, HH:mm')
+            const formattedCreatedAt = dayjs(createdAtTimestamp).format('DD MMM YYYY, HH:mm')
 
-        // const replyDuration =
-        //   reply !== undefined ? reply.created_at - message.created_at : undefined
+            // const replyDuration =
+            //   reply !== undefined ? reply.created_at - message.created_at : undefined
 
-        const times = {
-          hoursFromNow,
-          formattedTimeFromNow,
-          formattedCreatedAt,
-          replyDuration: 5, // not sure what this is yet so hardcoding for now
-        }
+            const times = {
+              hoursFromNow,
+              formattedTimeFromNow,
+              formattedCreatedAt,
+              replyDuration: 5, // not sure what this is yet so hardcoding for now
+            }
 
-        return <UserChat key={message.id} message={message} isLatest={isLatest} times={times} />
-      })}
-    </div>
+            return (
+              <MessageItem key={message.id} message={message} isLatest={isLatest} times={times} />
+            )
+          })}
+        </div>
+        <BottomMarker />
+      </div>
+    </ScrollArea>
   )
 }
-
-export { Messages }

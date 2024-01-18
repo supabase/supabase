@@ -1,10 +1,10 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { Message } from 'ai'
 import { revalidatePath } from 'next/cache'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { Message } from 'ai'
 
 import { z } from 'zod'
 
@@ -72,6 +72,78 @@ export async function createThread(input: string, message: Message, currentThrea
         .insert({
           thread_id,
           message_content: message.content,
+          message_input: input,
+          message_role: 'assistant',
+          user_id: user.id,
+        })
+        .select()
+
+      if (error) throw error
+      if (data) {
+        message_id = data[0].message_id
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  } catch (error: any) {
+    console.error(error)
+    return {
+      success: false,
+      message: 'Failed to update title to update title',
+      data: undefined,
+    }
+  }
+  redirect(`/${thread_id}/${message_id}`)
+}
+
+export async function upsertThreadMessage(input: string, currentThread?: string) {
+  const cookieStore = cookies()
+  const supabase = createClient(cookieStore)
+
+  let thread_id = currentThread ?? ''
+  let message_id = ''
+
+  try {
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser()
+
+    if (userError || !user) {
+      return {
+        success: false,
+        message: 'Failed to get user',
+        data: undefined,
+      }
+    }
+
+    // create a new thread
+    if (!thread_id) {
+      try {
+        const { data, error } = await supabase
+          .from('threads')
+          .insert({ user_id: user.id, thread_title: input })
+          .select()
+
+        if (error) throw error
+
+        if (data) {
+          console.log({ data })
+          thread_id = data[0].id
+          // message_id = data[0].message_id
+        }
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    //insert the message from the completion
+    try {
+      const { data, error } = await supabase
+        .from('messages')
+        .insert({
+          thread_id,
+          message_content: '',
           message_input: input,
           message_role: 'assistant',
           user_id: user.id,
