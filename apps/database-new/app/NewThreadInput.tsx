@@ -3,11 +3,9 @@
 import { AssistantChatForm } from '@/components/AssistantChatForm'
 import { useAppStateSnapshot } from '@/lib/state'
 import { createClient } from '@/lib/supabase/client'
-import { useState } from 'react'
 
 const NewThreadInput = () => {
   const supabase = createClient()
-  const [prompt, setPrompt] = useState('')
   const snap = useAppStateSnapshot()
 
   return (
