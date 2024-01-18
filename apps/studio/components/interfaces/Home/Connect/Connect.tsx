@@ -11,7 +11,6 @@ import {
   DialogTitle_Shadcn_,
   DialogTrigger_Shadcn_,
   Dialog_Shadcn_,
-  Tabs,
   Toggle,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
@@ -284,7 +283,7 @@ const Connect = () => {
   )
 }
 const TabsContent = ({ files, pooler }: { files: File[]; pooler?: boolean }) => {
-  console.log(files[0].path)
+  console.log('files?', files[0].path)
   return (
     <div className="bg-surface bg-surface-100 p-4 rounded-md mt-4">
       <Tabs_Shadcn_ defaultValue={files[0].path}>
