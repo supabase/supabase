@@ -86,7 +86,7 @@ systemctl restart docker
 
 ```bash
 docker network create --ipv6 --subnet fd00:ffff::/80 ip6net
-docker run --rm -it busybox ping6 google.com -c3
+docker run --rm -it --network ip6net busybox ping6 google.com -c3
 ```
 
 4/ Check IPv6 iptables config (FORWARD)
