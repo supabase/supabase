@@ -8,6 +8,11 @@ export type Parent = {
 
 export type File = { path: string; name: string; displayPath: string }
 
+export const CONNECTION_TYPES = [
+  { key: 'frameworks', label: 'App Frameworks' },
+  { key: 'orms', label: 'ORMs' },
+]
+
 export const FRAMEWORKS: Parent[] = [
   {
     key: 'nextjs',

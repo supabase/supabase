@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { FRAMEWORKS, File, ORMS, Parent } from './Connect.constants'
+import { CONNECTION_TYPES, FRAMEWORKS, File, ORMS, Parent } from './Connect.constants'
 import ConnectDropdown from './ConnectDropdown'
 import ConnectTabContent from './ConnectTabContent'
 import {
@@ -185,93 +185,65 @@ const Connect = () => {
             onValueChange={(value) => handleConnectionType(value)}
           >
             <TabsList_Shadcn_>
-              <TabsTrigger_Shadcn_ value="frameworks">App Frameworks</TabsTrigger_Shadcn_>
-              <TabsTrigger_Shadcn_ value="orms">ORMs</TabsTrigger_Shadcn_>
+              {CONNECTION_TYPES.map((type) => (
+                <TabsTrigger_Shadcn_ key={type.key} value={type.key}>
+                  {type.label}
+                </TabsTrigger_Shadcn_>
+              ))}
             </TabsList_Shadcn_>
 
-            <TabsContent_Shadcn_ value="frameworks">
-              <div className="bg-surface-300 p-4">
-                <div className="flex items-center gap-2">
-                  {/* all parents */}
-                  <ConnectDropdown
-                    level="parent"
-                    open={parentSelectorOpen}
-                    setOpen={setParentSelectorOpen}
-                    state={selectedParent}
-                    updateState={handleParentChange}
-                    label="Framework"
-                    items={connectionObject}
-                  />
+            {CONNECTION_TYPES.map((type) => (
+              <TabsContent_Shadcn_ key={`content-${type.key}`} value={type.key}>
+                <div className="bg-surface-300 p-4">
+                  <div className="flex items-center gap-2">
+                    {/* all parents */}
+                    <ConnectDropdown
+                      level="parent"
+                      open={parentSelectorOpen}
+                      setOpen={setParentSelectorOpen}
+                      state={selectedParent}
+                      updateState={handleParentChange}
+                      label="Framework"
+                      items={connectionObject}
+                    />
 
-                  {/* children of those parents */}
-                  {selectedParent &&
-                    (connectionObject.find((parent) => parent.key === selectedParent)?.children
-                      .length || 0) > 0 && (
-                      <ConnectDropdown
-                        level="child"
-                        open={childDropdownOpen}
-                        setOpen={setChildDropdownOpen}
-                        state={selectedChild}
-                        updateState={handleChildChange}
-                        label="Using"
-                        items={getChildOptions()}
-                      />
-                    )}
+                    {/* children of those parents */}
+                    {selectedParent &&
+                      (connectionObject.find((parent) => parent.key === selectedParent)?.children
+                        .length || 0) > 0 && (
+                        <ConnectDropdown
+                          level="child"
+                          open={childDropdownOpen}
+                          setOpen={setChildDropdownOpen}
+                          state={selectedChild}
+                          updateState={handleChildChange}
+                          label="Using"
+                          items={getChildOptions()}
+                        />
+                      )}
 
-                  {/* grandchildren if any */}
-                  {selectedChild &&
-                    (connectionObject
-                      .find((parent) => parent.key === selectedParent)
-                      ?.children.find((child) => child.key === selectedChild)?.children.length ||
-                      0) > 0 && (
-                      <ConnectDropdown
-                        level="grandchild"
-                        open={grandChildDropdownOpen}
-                        setOpen={setGrandChildDropdownOpen}
-                        state={selectedGrandchild}
-                        updateState={handleGrandchildChange}
-                        label="With"
-                        items={getGrandchildrenOptions()}
-                      />
-                    )}
+                    {/* grandchildren if any */}
+                    {selectedChild &&
+                      (connectionObject
+                        .find((parent) => parent.key === selectedParent)
+                        ?.children.find((child) => child.key === selectedChild)?.children.length ||
+                        0) > 0 && (
+                        <ConnectDropdown
+                          level="grandchild"
+                          open={grandChildDropdownOpen}
+                          setOpen={setGrandChildDropdownOpen}
+                          state={selectedGrandchild}
+                          updateState={handleGrandchildChange}
+                          label="With"
+                          items={getGrandchildrenOptions()}
+                        />
+                      )}
+                  </div>
+
+                  <TabsContent files={contentFiles} />
                 </div>
-
-                <TabsContent files={contentFiles} />
-              </div>
-            </TabsContent_Shadcn_>
-            <TabsContent_Shadcn_ value="orms">
-              <div className="bg-surface-300 p-4">
-                <div className="flex items-center gap-2">
-                  {/* all parents */}
-                  <ConnectDropdown
-                    level="parent"
-                    open={parentSelectorOpen}
-                    setOpen={setParentSelectorOpen}
-                    state={selectedParent}
-                    updateState={handleParentChange}
-                    label="Framework"
-                    items={connectionObject}
-                  />
-
-                  {/* children of those parents */}
-                  {selectedParent &&
-                    (connectionObject.find((parent) => parent.key === selectedParent)?.children
-                      .length || 0) > 0 && (
-                      <ConnectDropdown
-                        level="child"
-                        open={childDropdownOpen}
-                        setOpen={setChildDropdownOpen}
-                        state={selectedChild}
-                        updateState={handleChildChange}
-                        label="Using"
-                        items={getChildOptions()}
-                      />
-                    )}
-                </div>
-
-                <TabsContent files={contentFiles} />
-              </div>
-            </TabsContent_Shadcn_>
+              </TabsContent_Shadcn_>
+            ))}
           </Tabs_Shadcn_>
 
           <DialogFooter_Shadcn_>

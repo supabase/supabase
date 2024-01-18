@@ -77,7 +77,6 @@ const ConnectDropdown = ({
                 >
                   <span className="flex items-center gap-1">
                     {item.icon ? <ConnectionIcon connection={item.icon} /> : <Box size={12} />}
-
                     {/* <ConnectionIcon connection={item.key} /> */}
                     {item.label}
                   </span>
