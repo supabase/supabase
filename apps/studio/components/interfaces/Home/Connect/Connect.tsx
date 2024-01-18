@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { FRAMEWORKS, ORMS, Parent } from './Connect.constants'
+import { FRAMEWORKS, File, ORMS, Parent } from './Connect.constants'
 import ConnectDropdown from './ConnectDropdown'
 import ConnectTabContent from './ConnectTabContent'
 import {
@@ -13,6 +13,10 @@ import {
   Dialog_Shadcn_,
   Tabs,
   Toggle,
+  TabsContent_Shadcn_,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
+  Tabs_Shadcn_,
 } from 'ui'
 import { Plug } from 'lucide-react'
 
@@ -177,12 +181,16 @@ const Connect = () => {
             </DialogDescription_Shadcn_>
           </DialogHeader_Shadcn_>
 
-          <Tabs
-            type="underlined"
-            size="small"
-            onChange={(value: string) => handleConnectionType(value)}
+          <Tabs_Shadcn_
+            defaultValue="frameworks"
+            onValueChange={(value) => handleConnectionType(value)}
           >
-            <Tabs.Panel id="frameworks" label="App Frameworks" key="frameworks">
+            <TabsList_Shadcn_>
+              <TabsTrigger_Shadcn_ value="frameworks">App Frameworks</TabsTrigger_Shadcn_>
+              <TabsTrigger_Shadcn_ value="orms">ORMs</TabsTrigger_Shadcn_>
+            </TabsList_Shadcn_>
+
+            <TabsContent_Shadcn_ value="frameworks">
               <div className="bg-surface-300 p-4">
                 <div className="flex items-center gap-2">
                   {/* all parents */}
@@ -231,8 +239,8 @@ const Connect = () => {
 
                 <TabsContent files={contentFiles} />
               </div>
-            </Tabs.Panel>
-            <Tabs.Panel id="orms" label="ORMs" key="orms">
+            </TabsContent_Shadcn_>
+            <TabsContent_Shadcn_ value="orms">
               <div className="bg-surface-300 p-4">
                 <div className="flex items-center gap-2">
                   {/* all parents */}
@@ -264,41 +272,36 @@ const Connect = () => {
 
                 <TabsContent files={contentFiles} />
               </div>
-            </Tabs.Panel>
-          </Tabs>
+            </TabsContent_Shadcn_>
+          </Tabs_Shadcn_>
 
           <DialogFooter_Shadcn_>
             <Button type="secondary">Close</Button>
           </DialogFooter_Shadcn_>
         </DialogContent_Shadcn_>
       </Dialog_Shadcn_>
-
-      <div className="my-4 flex gap-3">
-        <button onClick={() => handleConnectionType('frameworks')}>frameworks</button>
-        <button onClick={() => handleConnectionType('orms')}>orms</button>
-      </div>
-
-      <div className="mt-12">
-        <h2>Connection files: </h2>
-        <ul>
-          {contentFiles.map((file) => (
-            <li key={file.name}>{file.displayPath}</li>
-          ))}
-        </ul>
-      </div>
     </div>
   )
 }
-const TabsContent = ({ files, pooler }: { files: any; pooler?: boolean }) => {
+const TabsContent = ({ files, pooler }: { files: File[]; pooler?: boolean }) => {
+  console.log(files[0].path)
   return (
     <div className="bg-surface bg-surface-100 p-4 rounded-md mt-4">
-      <Tabs type="underlined" size="small">
-        {files?.map((file: { path: string; name: string; displayPath: string }) => (
-          <Tabs.Panel id={file.path} label={file.name} key={file.displayPath}>
+      <Tabs_Shadcn_ defaultValue={files[0].path}>
+        <TabsList_Shadcn_>
+          {files?.map((file: File) => (
+            <TabsTrigger_Shadcn_ key={file.path} value={file.path}>
+              {file.displayPath}
+            </TabsTrigger_Shadcn_>
+          ))}
+        </TabsList_Shadcn_>
+
+        {files?.map((file: File) => (
+          <TabsContent_Shadcn_ key={file.path} value={file.path}>
             <ConnectTabContent path={file.path} pooler={pooler} />
-          </Tabs.Panel>
+          </TabsContent_Shadcn_>
         ))}
-      </Tabs>
+      </Tabs_Shadcn_>
     </div>
   )
 }
