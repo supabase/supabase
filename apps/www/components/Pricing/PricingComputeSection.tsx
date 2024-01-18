@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Panel from '../Panel'
 import { Button, cn } from 'ui'
 import Image from 'next/image'
@@ -6,15 +6,23 @@ import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { ChevronDownIcon } from '@heroicons/react/outline'
 import ComputePricingTable from './ComputePricingTable'
+import { useWindowSize } from 'react-use'
 
 const PricingComputeSection = () => {
+  const ref = useRef<HTMLDivElement>(null)
   const { resolvedTheme } = useTheme()
   const [showTable, setShowTable] = useState(false)
+  const { width } = useWindowSize()
+  const [height, setHeight] = useState(ref?.current?.clientHeight)
+
+  useEffect(() => {
+    setHeight(ref?.current?.clientHeight)
+  }, [width])
 
   return (
     <Panel outerClassName="w-full mx-auto max-w-6xl" innerClassName="flex flex-col gap-4">
-      <div className="grid lg:grid-cols-2 gap-8">
-        <div className="p-8 gap-4">
+      <div className="grid lg:grid-cols-2 lg:gap-8">
+        <div className="p-4 lg:p-8 gap-4">
           <div className="flex flex-col gap-2">
             <div className="flex flex-col gap-2">
               <div className="flex items-center justify-center h-12 w-12 bg-alternative rounded-lg mb-3">
@@ -60,17 +68,29 @@ const PricingComputeSection = () => {
               resolvedTheme?.includes('dark') ? 'dark' : 'light'
             }.svg`}
             alt="Compute addon illustration"
-            className="object-contain object-center p-8"
+            className="object-contain object-center p-4 lg:p-8"
           />
         </div>
       </div>
       <hr className="mx-4 border-0 border-t" />
       <div className="flex flex-col">
-        <ComputePricingTable />
-
+        <div
+          className="relative w-full overflow-hidden transition-all !ease-[.76,0,.23,1] duration-300"
+          style={{ height: showTable ? `${height}px` : '200px' }}
+        >
+          <div
+            className={cn(
+              'absolute inset-0 top-auto w-full h-40 bg-gradient-to-t from-background-surface-100 z-20 to-transparent transition-opacity pointer-events-none not-sr-only',
+              showTable ? 'opacity-0 delay-200' : 'opacity-100'
+            )}
+          />
+          <div ref={ref} className="pb-4 lg:pb-0">
+            <ComputePricingTable />
+          </div>
+        </div>
         <button
           onClick={() => setShowTable(!showTable)}
-          className="w-full p-2 text-foreground text-sm bg-alternative flex items-center justify-center gap-2"
+          className="w-full p-2 text-foreground focus-visible:outline-brand-600 focus-visible:rounded-b-xl text-sm bg-alternative flex items-center justify-center gap-2"
         >
           <ChevronDownIcon
             className={cn(

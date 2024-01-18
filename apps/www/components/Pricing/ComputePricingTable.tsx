@@ -1,4 +1,4 @@
-import React, { Fragment, useMemo } from 'react'
+import React, { Fragment, forwardRef, useMemo } from 'react'
 import pricingAddOn from '~/data/PricingAddOnTable.json'
 import { IconPricingIncludedCheck, IconPricingMinus } from './PricingIcons'
 
@@ -61,7 +61,7 @@ const ComputePricingTable = () => {
         </table>
       </div>
 
-      <table className="text-foreground m-0 w-full table-auto overflow-hidden rounded-b lg:hidden text-xs">
+      <table className="text-foreground m-0 -mt-20 lg:mt-0 w-full table-auto overflow-hidden rounded-b lg:hidden text-xs">
         <tbody>
           {pricingAddOn.database.rows.map((row, i) => (
             <Fragment key={i}>
