@@ -3,7 +3,7 @@ import { PropsWithChildren } from 'react'
 
 import { useParams } from 'common'
 import { useFlag, useIsFeatureEnabled, useSelectedOrganization } from 'hooks'
-import { NavMenu, NavMenuItem, Tabs } from 'ui'
+import { NavMenu, NavMenuItem } from 'ui'
 import { AccountLayout } from './'
 import { ScaffoldContainer, ScaffoldDivider, ScaffoldHeader, ScaffoldTitle } from './Scaffold'
 import SettingsLayout from './SettingsLayout/SettingsLayout'
