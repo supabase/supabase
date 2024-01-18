@@ -11,7 +11,6 @@ export async function CodeEditor({ promisedMessage }: { promisedMessage: Promise
   const strippedCode = code.replace('```sql\n', '').replace('\n```', '')
   const formattedCode = format(strippedCode, { language: 'postgresql' })
 
-  const hideCode = false
   /**
    * - CodeEditorContainer is a client component, which uses valtio state
    * - MonacoEditor is a server component injected into it

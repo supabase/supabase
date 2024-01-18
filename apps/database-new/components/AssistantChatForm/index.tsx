@@ -97,10 +97,6 @@ const AssistantChatForm = ({
         submitRef.current.click()
       }
     }
-
-    // Cast e.target to HTMLTextAreaElement to access the 'value' property
-    const textarea = e.target as HTMLTextAreaElement
-    // setInput(textarea.value)
   }
 
   return (
