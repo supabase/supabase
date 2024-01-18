@@ -23,9 +23,15 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
 
   const [usageFeesExpanded, setUsageFeesExpanded] = useState<string[]>([])
 
+  const computeCredits = useMemo(() => {
+    return (upcomingInvoice?.lines || []).find((item) =>
+      item.description.startsWith('Compute Credits')
+    )
+  }, [upcomingInvoice])
+
   const fixedFees = useMemo(() => {
     return (upcomingInvoice?.lines || [])
-      .filter((item) => !item.breakdown || !item.breakdown.length)
+      .filter((item) => item !== computeCredits && (!item.breakdown || !item.breakdown.length))
       .sort((a, b) => {
         // Prorations should be below regular usage fees
         return Number(a.proration) - Number(b.proration)
@@ -34,7 +40,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
 
   const feesWithBreakdown = useMemo(() => {
     return (upcomingInvoice?.lines || [])
-      .filter((item) => item.breakdown?.length)
+      .filter((item) => item !== computeCredits && item.breakdown?.length)
       .sort((a, b) => Number(a.usage_based) - Number(b.usage_based) || b.amount - a.amount)
   }, [upcomingInvoice])
 
@@ -198,6 +204,15 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                   </tbody>
                 </Collapsible>
               ))}
+
+            {computeCredits && (
+              <tr className="border-b">
+                <td className="py-2 text-sm max-w-[200px]">{computeCredits.description}</td>
+                <td className="py-2 text-sm text-right pr-4">{null}</td>
+                <td className="py-2 text-sm">{null}</td>
+                <td className="py-2 text-sm text-right">${computeCredits.amount}</td>
+              </tr>
+            )}
 
             <tfoot>
               <tr>
