@@ -62,6 +62,7 @@ const ProjectsPage: NextPageWithLayout = () => {
               </div>
             </div>
           )}
+          <Connect />
           <div className="my-8 space-y-8">
             <ProjectList />
           </div>
