@@ -63,6 +63,8 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
     },
   ]
 
+  const filteredNavMenuItems = navMenuItems.filter((item) => !item.hidden)
+
   return (
     <AccountLayout
       title={selectedOrganization?.name ?? 'Supabase'}
@@ -74,13 +76,11 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
         </ScaffoldContainer>
         <ScaffoldContainer>
           <NavMenu className="border-none" aria-label="Organization menu navigation">
-            {navMenuItems.map((item) =>
-              item.hidden ? null : (
-                <NavMenuItem key={item.label} active={item.href === router.asPath}>
-                  <Link href={item.href}>{item.label}</Link>
-                </NavMenuItem>
-              )
-            )}
+            {filteredNavMenuItems.map((item) => (
+              <NavMenuItem key={item.label} active={item.href === router.asPath}>
+                <Link href={item.href}>{item.label}</Link>
+              </NavMenuItem>
+            ))}
           </NavMenu>
         </ScaffoldContainer>
       </ScaffoldHeader>
