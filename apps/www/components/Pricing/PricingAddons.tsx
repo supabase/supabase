@@ -10,8 +10,8 @@ const addons = [
   {
     id: 'addon-cost-control',
     name: 'Cost Control',
-    heroImg: 'addons-cost-control',
-    icon: 'compute-upgrade',
+    // heroImg: 'addons-cost-control',
+    // icon: 'compute-upgrade',
     price: 'Available on Pro Plan',
     description:
       'The Pro plan has a spend cap enabled by default to keep costs under control. If you expect a usage spike and need to go beyond the plan limits, simply switch off the spend cap to pay for additional resources.',
@@ -118,7 +118,14 @@ const AddonCard = ({ addon, setShowComputeModal }: any) => {
               {addon.name}
             </h3>
           </div>
-          <p className="text-foreground-lighter text-[13px]">{addon.description}</p>
+          <p
+            className={cn(
+              'text-foreground-lighter text-[13px]',
+              isHighlightCard && 'text-base pr-8'
+            )}
+          >
+            {addon.description}
+          </p>
         </div>
         {isHighlightCard && (
           <div className="flex items-center gap-4 mt-4">

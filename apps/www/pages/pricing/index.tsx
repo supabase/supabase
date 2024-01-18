@@ -8,9 +8,7 @@ import { Accordion, Button, IconArrowUpRight, IconCheck, Select, cn } from 'ui'
 import { ArrowDownIcon, InformationCircleIcon } from '@heroicons/react/outline'
 
 import CTABanner from '~/components/CTABanner'
-import ComputePricingModal from '~/components/Pricing/ComputePricingModal'
 import DefaultLayout from '~/components/Layouts/Default'
-import PricingAddons from '~/components/Pricing/PricingAddons'
 import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/Pricing/PricingTableRow'
 
 import Solutions from '~/data/Solutions'
@@ -18,7 +16,9 @@ import pricingFaq from '~/data/PricingFAQ.json'
 import { pricing } from 'shared-data/pricing'
 import { plans } from 'shared-data/plans'
 
-const CostControlAnimation = dynamic(() => import('~/components/Pricing/CostControlAnimation'))
+const PricingComputeSection = dynamic(() => import('~/components/Pricing/PricingComputeSection'))
+const PricingAddons = dynamic(() => import('~/components/Pricing/PricingAddons'))
+const ComputePricingModal = dynamic(() => import('~/components/Pricing/ComputePricingModal'))
 
 export default function IndexPage() {
   const router = useRouter()
@@ -311,12 +311,16 @@ export default function IndexPage() {
         </div>
       </div>
       <div
+        id="addon-compute"
+        className="container relative mx-auto px-4 lg:px-12 pt-16 md:pt-24 lg:pt-32 lg:pb-0"
+      >
+        <PricingComputeSection />
+      </div>
+      <div
         id="addons"
         className="sm:py-18 container relative mx-auto px-4 py-16 shadow-sm md:py-24 lg:px-12 lg:pt-32 lg:pb-12"
       >
-        <PricingAddons setShowComputeModal={setShowComputeModal} />
-
-        <div
+        {/* <div
           id="cost-control"
           className="grid lg:grid-cols-2 gap-8 items-center mt-12 lg:mt-8 max-w-6xl mx-auto"
         >
@@ -339,7 +343,9 @@ export default function IndexPage() {
           <div className="relative h-full min-h-[14rem] flex items-center justify-end">
             <CostControlAnimation className="w-full lg:max-w-md aspect-video" />
           </div>
-        </div>
+        </div> */}
+
+        <PricingAddons setShowComputeModal={setShowComputeModal} />
       </div>
 
       <div className="bg-background">
