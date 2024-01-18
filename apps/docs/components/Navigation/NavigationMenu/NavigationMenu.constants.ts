@@ -586,6 +586,10 @@ export const auth = {
       url: undefined,
       items: [
         { name: 'Overview', url: '/guides/auth/server-side/overview' },
+        {
+          name: 'Next.js guide',
+          url: '/guides/auth/server-side/nextjs',
+        },
         { name: 'Creating a client', url: '/guides/auth/server-side/creating-a-client' },
         {
           name: 'Email Auth with PKCE flow',
