@@ -86,7 +86,7 @@ for select using ( auth.uid() = user_id );
 
 ### INSERT policies
 
-You can specify insert policies with the `with check` clause.
+You can specify insert policies with the `with check` clause. The `with check` expression ensures that any new row data adheres to the policy constraints.
 
 Let's say you have a table called `profiles` in the public schema and you only want users to be able to create a profile for themselves. In that case, we want to check their User ID matches the value that they are trying to insert:
 
@@ -110,9 +110,13 @@ with check ( auth.uid() = user_id );      -- the actual Policy
 
 ### UPDATE policies
 
-You can specify update policies with the `using` clause.
+You can specify update policies by combining both the `using` and `with check` expressions.
 
-Let's say you have a table called `profiles` in the public schema and you only want users to be able to update their own profile:
+The `using` clause represents the condition that must be true for the update to be allowed, and `with check` clause ensures that the updates made adhere to the policy constraints.
+
+Let's say you have a table called `profiles` in the public schema and you only want users to be able to update their own profile.
+
+You can create a policy where the `using` clause checks if the user owns the profile being updated. And the `with check` clause ensures that, in the resultant row, users do not change the `user_id` to a value that is not equal to their User ID, maintaining that the modified profile still meets the ownership condition.
 
 ```sql
 -- 1. Create table
@@ -128,9 +132,12 @@ alter table profiles enable row level security;
 -- 3. Create Policy
 create policy "Users can update their own profile."
 on profiles for update
-to authenticated                     -- the Postgres Role (recommended)
-using ( auth.uid() = user_id );      -- the actual Policy
+to authenticated                    -- the Postgres Role (recommended)
+using ( auth.uid() = user_id )       -- checks if the existing row complies with the policy expression
+with check ( auth.uid() = user_id ); -- checks if the new row complies with the policy expression
 ```
+
+If no `with check` expression is defined, then the `using` expression will be used both to determine which rows are visible (normal USING case) and which new rows will be allowed to be added (WITH CHECK case).
 
 ### DELETE policies
 
