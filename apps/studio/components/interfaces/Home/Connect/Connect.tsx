@@ -19,14 +19,48 @@ import {
 } from 'ui'
 import { FileJson2, Plug } from 'lucide-react'
 
+type GetContentFilesArgs = {
+  selectedParent: string
+  selectedChild: string
+  selectedGrandchild: string
+  connectionObject: Parent[]
+}
+const getContentFiles = ({
+  connectionObject,
+  selectedParent,
+  selectedChild,
+  selectedGrandchild,
+}: GetContentFilesArgs) => {
+  const parent = connectionObject.find((item) => item.key === selectedParent)
+
+  if (parent) {
+    const child = parent.children.find((child) => child.key === selectedChild)
+
+    // check grandchild first, then child, then parent as the fallback
+    if (child) {
+      const grandchild = child.children.find((grandchild) => grandchild.key === selectedGrandchild)
+
+      if (grandchild) {
+        return grandchild.files || []
+      } else {
+        return child.files || []
+      }
+    } else {
+      return parent.files || []
+    }
+  }
+
+  return []
+}
+
 const Connect = () => {
   const [parentSelectorOpen, setParentSelectorOpen] = useState(false)
   const [childDropdownOpen, setChildDropdownOpen] = useState(false)
   const [grandChildDropdownOpen, setGrandChildDropdownOpen] = useState(false)
   const [useConnectionPooler, setUseConnectionPooler] = useState(false)
 
-  const [connectionObject, setConnectionObject] = useState(FRAMEWORKS)
-  const [selectedParent, setSelectedParent] = useState(connectionObject[0].key)
+  const [connectionObject, setConnectionObject] = useState<Parent[]>(FRAMEWORKS)
+  const [selectedParent, setSelectedParent] = useState(connectionObject[0].key) // aka nextjs
   const [selectedChild, setSelectedChild] = useState(
     connectionObject.find((item) => item.key === selectedParent)?.children[0]?.key ?? ''
   )
@@ -42,44 +76,17 @@ const Connect = () => {
       ?.children.find((child) => child.key === selectedChild)
       ?.children.find((grandchild) => grandchild.key === selectedGrandchild)?.files || []
   )
-  console.log(
-    { selectedParent },
-    { selectedChild },
-    { selectedGrandchild },
-    { contentFiles },
-    contentFiles
-  )
-
-  function getContentFiles() {
-    const parent = connectionObject.find((item) => item.key === selectedParent)
-
-    if (parent) {
-      const child = parent.children.find((child) => child.key === selectedChild)
-
-      // check grandchild first, then child, then parent as the fallback
-      if (child) {
-        const grandchild = child.children.find(
-          (grandchild) => grandchild.key === selectedGrandchild
-        )
-
-        if (grandchild) {
-          return grandchild.files || []
-        } else {
-          return child.files || []
-        }
-      } else {
-        return parent.files || []
-      }
-    }
-
-    return []
-  }
 
   // set the content files when the parent/child/grandchild changes
   useEffect(() => {
-    const files = getContentFiles()
+    const files = getContentFiles({
+      connectionObject,
+      selectedParent,
+      selectedChild,
+      selectedGrandchild,
+    })
     setContentFiles(files)
-  }, [selectedParent, selectedChild, selectedGrandchild])
+  }, [selectedParent, selectedChild, selectedGrandchild, connectionObject])
 
   const handleParentChange = (value: string) => {
     setSelectedParent(value)
@@ -109,11 +116,6 @@ const Connect = () => {
   const handleGrandchildChange = (value: string) => {
     setSelectedGrandchild(value)
   }
-
-  useEffect(() => {
-    const files = getContentFiles()
-    setContentFiles(files)
-  }, [connectionObject])
 
   // reset the parent/child/grandchild when the connection type (tab) changes
   function handleConnectionTypeChange(connections: Parent[]) {
@@ -240,7 +242,10 @@ const Connect = () => {
                       )}
                   </div>
 
-                  <TabsContent files={contentFiles} />
+                  <ConnectTabsContent
+                    files={contentFiles}
+                    defaultValue={contentFiles[0].location}
+                  />
                 </div>
               </TabsContent_Shadcn_>
             ))}
@@ -254,12 +259,32 @@ const Connect = () => {
     </div>
   )
 }
-const TabsContent = ({ files, pooler }: { files: File[]; pooler?: boolean }) => {
+const ConnectTabsContent = ({
+  files,
+  pooler,
+  defaultValue,
+}: {
+  files: File[]
+  pooler?: boolean
+  defaultValue: string
+}) => {
+  // Crappy hack to get the tabs to re-render when the defaultValue changes
+  // I can't figure out why it doesn't re-render with the correct tab selected - jordi
+  const [syncedDefaultValue, setSyncedDefaultValue] = useState(defaultValue)
+
+  useEffect(() => {
+    setSyncedDefaultValue(defaultValue)
+  }, [defaultValue])
+
   return (
     <div className="bg-surface bg-surface-100 p-4 rounded-md mt-4">
-      <Tabs_Shadcn_ defaultValue={files[0].location}>
+      <Tabs_Shadcn_
+        value={syncedDefaultValue}
+        onValueChange={setSyncedDefaultValue}
+        defaultValue={syncedDefaultValue}
+      >
         <TabsList_Shadcn_>
-          {files?.map((file: File) => (
+          {files.map((file) => (
             <TabsTrigger_Shadcn_
               key={file.location}
               value={file.location}
@@ -271,7 +296,7 @@ const TabsContent = ({ files, pooler }: { files: File[]; pooler?: boolean }) => 
           ))}
         </TabsList_Shadcn_>
 
-        {files?.map((file: File) => (
+        {files.map((file) => (
           <TabsContent_Shadcn_ key={file.location} value={file.location}>
             <ConnectTabContent
               destinationLocation={file.destinationLocation}

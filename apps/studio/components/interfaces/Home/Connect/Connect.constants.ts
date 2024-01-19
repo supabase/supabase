@@ -156,7 +156,7 @@ export const FRAMEWORKS: Parent[] = [
       },
     ],
   },
-]
+] as const
 
 export const ORMS: Parent[] = [
   {
