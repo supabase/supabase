@@ -17,12 +17,14 @@ import { useDatabasePublicationsQuery } from 'data/database-publications/databas
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
 import { useCheckPermissions, useIsFeatureEnabled } from 'hooks'
 import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 
 export interface GridHeaderActionsProps {
   table: PostgresTable
 }
 
 const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
+  const snap = useTableEditorStateSnapshot()
   const { ref } = useParams()
   const { project } = useProjectContext()
   const realtimeEnabled = useIsFeatureEnabled('realtime:all')
@@ -146,7 +148,9 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
               )
             }
           >
-            <Link href={`/project/${projectRef}/auth/policies?search=${table.id}`}>
+            <Link
+              href={`/project/${projectRef}/auth/policies?search=${table.id}&schema=${snap.selectedSchemaName}`}
+            >
               {!table.rls_enabled
                 ? 'RLS is not enabled'
                 : `${policies.length == 0 ? 'No' : policies.length} active RLS polic${
