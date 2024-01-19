@@ -87,20 +87,18 @@ const AddRestrictionModal = ({
       return toast(`The address ${address} is already restricted`)
     }
 
-    const dbAllowedCidrs =
-      hasOverachingRestriction && type === 'IPv4'
-        ? [normalizedAddress]
-        : type === 'IPv4'
-        ? [...ipv4Restrictions, normalizedAddress]
-        : ipv4Restrictions
-    const dbAllowedCidrsV6 =
-      hasOverachingRestriction && type === 'IPv6'
-        ? [normalizedAddress]
-        : type === 'IPv6'
-        ? [...ipv6Restrictions, normalizedAddress]
-        : ipv6Restrictions
-
-    applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs, dbAllowedCidrsV6 })
+    // Need to replace over arching restriction (allow all / disallow all)
+    if (hasOverachingRestriction) {
+      const dbAllowedCidrs = type === 'IPv4' ? [normalizedAddress] : []
+      const dbAllowedCidrsV6 = type === 'IPv6' ? [normalizedAddress] : []
+      applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs, dbAllowedCidrsV6 })
+    } else {
+      const dbAllowedCidrs =
+        type === 'IPv4' ? [...ipv4Restrictions, normalizedAddress] : ipv4Restrictions
+      const dbAllowedCidrsV6 =
+        type === 'IPv6' ? [...ipv6Restrictions, normalizedAddress] : ipv6Restrictions
+      applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs, dbAllowedCidrsV6 })
+    }
   }
 
   return (
