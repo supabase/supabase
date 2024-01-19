@@ -1,5 +1,6 @@
 export default {
   "background": [
+    "bg-200",
     "bg",
     "bg-alternative-200",
     "bg-alternative",

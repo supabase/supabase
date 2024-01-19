@@ -405,19 +405,23 @@ module.exports = {
 },
 "foreground-light": {
   cssVariable: "var(--foreground-light)",
-  value: "hsl(0, 0%, 65.1%)"
+  value: "hsl(30, 6.7%, 70.6%)"
 },
 "foreground-lighter": {
   cssVariable: "var(--foreground-lighter)",
-  value: "hsl(0, 0%, 49.4%)"
+  value: "hsl(21.80000000000001, 4.7%, 53.9%)"
 },
 "foreground-muted": {
   cssVariable: "var(--foreground-muted)",
-  value: "hsl(0, 0%, 43.9%)"
+  value: "hsl(21.80000000000001, 4.4%, 49.2%)"
 },
 "foreground-contrast": {
   cssVariable: "var(--foreground-contrast)",
   value: "hsl(0, 0%, 8.6%)"
+},
+"background-200": {
+  cssVariable: "var(--background-200)",
+  value: "hsl(0, 0%, 9.4%)"
 },
 "background-DEFAULT": {
   cssVariable: "var(--background-default)",
@@ -429,15 +433,15 @@ module.exports = {
 },
 "background-alternative-DEFAULT": {
   cssVariable: "var(--background-alternative-default)",
-  value: "hsl(60, 4%, 4.9%)"
+  value: "hsl(60, 3.4%, 5.7%)"
 },
 "background-selection": {
   cssVariable: "var(--background-selection)",
-  value: "hsl(0, 0%, 20.4%)"
+  value: "hsl(34.30000000000001, 5.3%, 25.7%)"
 },
 "background-control": {
   cssVariable: "var(--background-control)",
-  value: "hsl(60, 2.2%, 8.8%)"
+  value: "hsl(20, 3.8%, 15.5%)"
 },
 "background-surface-100": {
   cssVariable: "var(--background-surface-100)",
@@ -465,7 +469,7 @@ module.exports = {
 },
 "background-muted": {
   cssVariable: "var(--background-muted)",
-  value: "hsl(0, 1.4%, 13.9%)"
+  value: "hsl(0, 4%, 14.7%)"
 },
 "background-button-DEFAULT": {
   cssVariable: "var(--background-button-default)",
@@ -473,7 +477,7 @@ module.exports = {
 },
 "border-DEFAULT": {
   cssVariable: "var(--border-default)",
-  value: "hsl(0, 0%, 14.9%)"
+  value: "hsl(36, 5.4%, 18.2%)"
 },
 "border-muted": {
   cssVariable: "var(--border-muted)",
@@ -481,7 +485,7 @@ module.exports = {
 },
 "border-secondary": {
   cssVariable: "var(--border-secondary)",
-  value: "hsl(30, 2.2%, 18%)"
+  value: "hsl(40, 3.6%, 16.3%)"
 },
 "border-overlay": {
   cssVariable: "var(--border-overlay)",
@@ -489,7 +493,7 @@ module.exports = {
 },
 "border-control": {
   cssVariable: "var(--border-control)",
-  value: "hsl(0, 1.5%, 25.9%)"
+  value: "hsl(30, 1.8%, 22.4%)"
 },
 "border-alternative": {
   cssVariable: "var(--border-alternative)",
