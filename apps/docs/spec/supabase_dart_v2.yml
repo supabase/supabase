@@ -305,6 +305,33 @@ functions:
           final Session? session = supabase.auth.currentSession;
           final String? oAuthToken = session?.providerToken;
           ```
+  - id: sign-in-with-sso
+    title: 'signInWithSSO()'
+    notes: |
+      - Before you can call this method you need to [establish a connection](/docs/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to an identity provider. Use the [CLI commands](/docs/reference/cli/supabase-sso) to do this.
+      - If you've associated an email domain to the identity provider, you can use the `domain` property to start a sign-in flow.
+      - In case you need to use a different way to start the authentication flow with an identity provider, you can use the `providerId` property. For example:
+          - Mapping specific user email addresses with an identity provider.
+          - Using different hints to identify the correct identity provider, like a company-specific page, IP address or other tracking information.
+    examples:
+      - id: sign-in-with-domain
+        name: Sign in with email domain
+        isSpotlight: true
+        code: |
+          ```dart
+          await supabase.auth.signInWithSSO(
+            domain: 'company.com',
+          );
+          ```
+      - id: sign-in-with-provider-uuid
+        name: Sign in with provider UUID
+        isSpotlight: true
+        code: |
+          ```dart
+          await supabase.auth.signInWithSSO(
+            providerId: '21648a9d-8d5a-4555-a9d1-d6375dc14e92',
+          );
+          ```
   - id: sign-out
     title: 'signOut()'
     description: |
