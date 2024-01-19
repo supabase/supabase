@@ -178,16 +178,17 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                               billingMetricUnit(fee.usage_metric) &&
                               ` (${billingMetricUnit(fee.usage_metric)})`}
                           </span>
-                          {feeTooltipData.map(
-                            (tooltipData) =>
-                              fee.usage_metric?.startsWith(tooltipData.identifier) && (
-                                <InvoiceTooltip
-                                  text={tooltipData.text}
-                                  linkRef={tooltipData.linkRef}
-                                  key={tooltipData.identifier}
-                                />
-                              )
-                          )}
+                          {(() => {
+                            const matchingTooltipData = feeTooltipData.find((it) =>
+                              fee.usage_metric?.startsWith(it.identifier)
+                            )
+                            return matchingTooltipData ? (
+                              <InvoiceTooltip
+                                text={matchingTooltipData.text}
+                                linkRef={matchingTooltipData.linkRef}
+                              ></InvoiceTooltip>
+                            ) : null
+                          })()}
                         </td>
                         <td className="py-2 pr-4 text-sm text-right tabular-nums max-w-[100px]">
                           {fee.usage_original
