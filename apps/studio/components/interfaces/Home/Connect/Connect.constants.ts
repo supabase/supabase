@@ -13,11 +13,6 @@ export type File = {
   destinationLocation: string // label for the ui
 }
 
-export const CONNECTION_TYPES = [
-  { key: 'frameworks', label: 'App Frameworks' },
-  { key: 'orms', label: 'ORMs' },
-]
-
 export const FRAMEWORKS: Parent[] = [
   {
     key: 'nextjs',
@@ -106,6 +101,21 @@ export const FRAMEWORKS: Parent[] = [
     ],
   },
   {
+    key: 'react',
+    label: 'React',
+    icon: 'react',
+    files: [
+      {
+        // omit .tsx extension
+        location: 'react/env.local',
+        destinationFilename: 'react.env.local',
+        destinationLocation: 'react/.env.local',
+      },
+    ],
+    children: [],
+  },
+
+  {
     key: 'vuejs',
     label: 'Vue.JS',
     icon: 'vuejs',
@@ -119,6 +129,7 @@ export const FRAMEWORKS: Parent[] = [
     ],
     children: [],
   },
+
   {
     key: 'svelte',
     label: 'Svelte.JS',
@@ -221,3 +232,37 @@ export const GRAPHQL: Parent[] = [
     ],
   },
 ]
+
+// having duplicate keys will mess up the tabs and dropdowns
+// check that each item has a unique top-level item
+// example: frameworks need to be unique: next/react/vue/svelte/nuxt/etc
+function checkParentsForDuplicates(item: Parent[]) {
+  const topLevelKeys = new Set()
+  let hasDuplicates = false
+  let duplicateKey = null
+
+  item.forEach((item: Parent, i: number) => {
+    const key = item.key
+    if (topLevelKeys.has(key)) {
+      hasDuplicates = true
+      duplicateKey = key
+      console.error(`Duplicate keys found: ${duplicateKey}`)
+    } else {
+      topLevelKeys.add(key)
+    }
+  })
+
+  if (hasDuplicates) {
+    throw new Error(`Duplicate keys found. Each top-level item must be unique.`)
+  }
+}
+
+export const CONNECTION_TYPES = [
+  { key: 'frameworks', label: 'App Frameworks', obj: FRAMEWORKS },
+  { key: 'orms', label: 'ORMs', obj: ORMS },
+  { key: 'direct', label: 'Direct Connection', obj: DIRECT },
+  { key: 'graphql', label: 'GraphQL', obj: GRAPHQL },
+]
+
+// Call the function with the GRAPHQL item
+CONNECTION_TYPES.map((item) => item.obj).map((item) => checkParentsForDuplicates(item))
