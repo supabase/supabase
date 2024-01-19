@@ -41,6 +41,7 @@ export const UsePoolerCheckbox = ({ id, checked, onCheckedChange }: UsePoolerChe
           </Badge>
         </label>
         <Markdown
+          extLinks
           className="[&>p]:m-0 space-y-1 text-foreground-lighter max-w-full"
           content={`
 IPv4 and IPv6 connections will resolve while using connection pooling\n

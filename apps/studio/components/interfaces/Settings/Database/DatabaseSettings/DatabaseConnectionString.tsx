@@ -85,7 +85,10 @@ export const DatabaseConnectionString = () => {
   const connectionInfo = readReplicasEnabled
     ? pluckObjectFields(selectedDatabase || emptyState, DB_FIELDS)
     : pluckObjectFields(project || emptyState, DB_FIELDS)
-  const connectionTld = new URL(projectDetails?.restUrl ?? '').hostname.split('.').pop() ?? 'co'
+  const connectionTld =
+    projectDetails?.restUrl !== undefined
+      ? new URL(projectDetails?.restUrl ?? '').hostname.split('.').pop() ?? 'co'
+      : 'co'
 
   const handleCopy = (id: string) => {
     const labelValue = CONNECTION_TYPES.find((type) => type.id === id)?.label

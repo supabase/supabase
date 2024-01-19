@@ -163,7 +163,11 @@ export const ConnectionPooling = () => {
               )}
             </div>
             <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-              <a href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler">
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler"
+              >
                 Documentation
               </a>
             </Button>
@@ -239,10 +243,20 @@ export const ConnectionPooling = () => {
                                 label="Transaction"
                                 value="transaction"
                               >
-                                Transaction
+                                <p>Transaction mode</p>
+                                <p className="text-xs text-foreground-lighter">
+                                  Connection is assigned to the client for the duration of a
+                                  transaction. Some session-based Postgres features such as prepared
+                                  statements are not available with this option.
+                                </p>
                               </Listbox.Option>
                               <Listbox.Option key="session" label="Session" value="session">
-                                Session
+                                <p>Session mode</p>
+                                <p className="text-xs text-foreground-lighter">
+                                  When a new client connects, a connection is assigned to the
+                                  clilent until it disconnects. All Postgres features can be used
+                                  with this option.
+                                </p>
                               </Listbox.Option>
                             </Listbox>
                           </FormControl_Shadcn_>
