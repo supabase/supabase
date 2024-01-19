@@ -20,7 +20,7 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
     ? apiService.serviceApiKey
     : undefined
 
-  const anonServiceRoleKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
+  const anonRoleKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
     ? apiService.serviceApiKey
     : undefined
 
@@ -41,7 +41,7 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
       snap.role !== undefined &&
       snap.role.type === 'postgrest'
     ) {
-      token = anonServiceRoleKey
+      token = anonRoleKey
       bearer = getRoleImpersonationJWT(config.projectRef, jwtSecret, snap.role)
     } else {
       token = serviceRoleKey
