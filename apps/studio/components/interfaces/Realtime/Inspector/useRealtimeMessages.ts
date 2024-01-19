@@ -193,14 +193,19 @@ export const useRealtimeMessages = ({
   ])
 
   const sendMessage = useCallback(
-    (message: string, payload: any) => {
+    async (message: string, payload: any, callback: () => void) => {
       if (channel) {
-        channel.send({
+        const res = await channel.send({
           type: 'broadcast',
           event: message,
           payload,
         })
-        toast.success('Successfully broadcasted message')
+        if (res === 'error') {
+          toast.error('Failed to broadcast message')
+        } else {
+          toast.success('Successfully broadcasted message')
+          callback()
+        }
       } else {
         toast.error('Failed to broadcast message: channel has not been set')
       }

@@ -28,7 +28,7 @@
     "@octokit/plugin-paginate-graphql": "^4.0.0",
     "@radix-ui/react-accordion": "^1.1.2",
     "@supabase/auth-helpers-react": "^0.4.2",
-    "@supabase/supabase-js": "^2.38.2",
+    "@supabase/supabase-js": "^2.39.3",
     "common": "*",
     "config": "*",
     "framer-motion": "^6.5.1",
