@@ -79,20 +79,20 @@ const DatabaseSettings = () => {
   const { project } = data ?? {}
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user']
   const emptyState = { db_user: '', db_host: '', db_port: '', db_name: '' }
-  const dbConnectionInfo = showReadReplicasUI
+  const connectionInfo = showReadReplicasUI
     ? pluckObjectFields(selectedDatabase || emptyState, DB_FIELDS)
     : pluckObjectFields(project || emptyState, DB_FIELDS)
 
-  const connectionInfo = usePoolerConnection
-    ? {
-        db_host: isSuccessPoolingInfo
-          ? getHostFromConnectionString(poolingInfo?.connectionString)
-          : '',
-        db_name: poolingInfo?.db_name,
-        db_port: poolingInfo?.db_port,
-        db_user: `postgres.${projectRef}`,
-      }
-    : dbConnectionInfo
+  // const connectionInfo = usePoolerConnection
+  //   ? {
+  //       db_host: isSuccessPoolingInfo
+  //         ? getHostFromConnectionString(poolingInfo?.connectionString)
+  //         : '',
+  //       db_name: poolingInfo?.db_name,
+  //       db_port: poolingInfo?.db_port,
+  //       db_user: `postgres.${projectRef}`,
+  //     }
+  //   : dbConnectionInfo
 
   const handleCopy = (labelValue?: string) =>
     Telemetry.sendEvent(
