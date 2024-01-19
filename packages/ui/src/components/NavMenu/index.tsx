@@ -7,10 +7,11 @@ export const NavMenu = forwardRef<HTMLDivElement, NavMenuProps>(
   (
     props: PropsWithChildren<{
       className?: string
-    }>
+    }>,
+    forwardedRef
   ) => {
     return (
-      <nav dir="ltr" role="menu" {...props} className={cn('flex border-b', props.className)}>
+      <nav ref={forwardedRef} dir="ltr" {...props} className={cn('border-b', props.className)}>
         <ul role="menu">{props.children}</ul>
       </nav>
     )
@@ -26,7 +27,6 @@ export const NavMenuItem = ({
   active: boolean
 }>) => (
   <li
-    role="menuitem"
     aria-selected={props.active}
     data-state={props.active ? 'active' : 'inactive'}
     className={cn(
