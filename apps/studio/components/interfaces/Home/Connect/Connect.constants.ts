@@ -129,6 +129,48 @@ export const FRAMEWORKS: Parent[] = [
     ],
     children: [],
   },
+  {
+    key: 'solidjs',
+    label: 'Solid.js',
+    icon: 'solidjs',
+    files: [
+      {
+        // omit .tsx extension
+        location: 'vue1/env.local',
+        destinationFilename: 'vue1.env.local',
+        destinationLocation: 'vue1/.env.local',
+      },
+    ],
+    children: [],
+  },
+  {
+    key: 'redwoodjs',
+    label: 'RedwoodJS',
+    icon: 'redwoodjs',
+    children: [],
+    files: [
+      {
+        // omit .tsx extension
+        location: 'vue1/env.local',
+        destinationFilename: 'vue1.env.local',
+        destinationLocation: 'vue1/.env.local',
+      },
+    ],
+  },
+  {
+    key: 'refine',
+    label: 'refine',
+    icon: 'refine',
+    children: [],
+    files: [
+      {
+        // omit .tsx extension
+        location: 'refine/env.local',
+        destinationFilename: 'refine.env.local',
+        destinationLocation: 'refine/.env.local',
+      },
+    ],
+  },
 
   {
     key: 'svelte',
