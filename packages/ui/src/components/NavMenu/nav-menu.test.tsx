@@ -1,7 +1,8 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import { NavMenu } from '.'
+import { NavMenu, NavMenuItem } from '.'
+import Link from 'next/link'
 
 describe('NavMenu Component', () => {
   it('renders without crashing', () => {
@@ -20,5 +21,16 @@ describe('NavMenu Component', () => {
 
     render(<NavMenu ref={ref}>test</NavMenu>)
     expect(ref.current).toBeInTheDocument()
+  })
+
+  it('renders children', () => {
+    render(
+      <NavMenu>
+        <NavMenuItem active={false}>
+          <Link href="/">Home</Link>
+        </NavMenuItem>
+      </NavMenu>
+    )
+    expect(screen.getByText('Home')).toBeInTheDocument()
   })
 })
