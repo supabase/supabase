@@ -37,7 +37,13 @@ const DatabaseSettings = () => {
   const connectionStringsRef = useRef<HTMLDivElement>(null)
   const [usePoolerConnection, setUsePoolerConnection] = useState(true)
 
-  const { data: poolingInfo, isSuccess: isSuccessPoolingInfo } = usePoolingConfigurationQuery({
+  const {
+    data: poolingInfo,
+    error: poolingInfoError,
+    isLoading: isLoadingPoolingInfo,
+    isError: isErrorPoolingInfo,
+    isSuccess: isSuccessPoolingInfo,
+  } = usePoolingConfigurationQuery({
     projectRef,
   })
   const {
@@ -54,18 +60,21 @@ const DatabaseSettings = () => {
     isError: isErrorReadReplicas,
     isSuccess: isSuccessReadReplicas,
   } = useReadReplicasQuery({ projectRef })
-  const error = showReadReplicasUI ? readReplicasError : projectSettingsError
-  const isLoading = showReadReplicasUI ? isLoadingReadReplicas : isLoadingProjectSettings
-  const isError = showReadReplicasUI ? isErrorReadReplicas : isErrorProjectSettings
-  const isSuccess = showReadReplicasUI ? isSuccessReadReplicas : isSuccessProjectSettings
+  const error = showReadReplicasUI ? readReplicasError : projectSettingsError || poolingInfoError
+  const isLoading = showReadReplicasUI
+    ? isLoadingReadReplicas
+    : isLoadingProjectSettings || isLoadingPoolingInfo
+  const isError = showReadReplicasUI
+    ? isErrorReadReplicas
+    : isErrorProjectSettings || isErrorPoolingInfo
+  const isSuccess = showReadReplicasUI
+    ? isSuccessReadReplicas
+    : isSuccessProjectSettings || isSuccessPoolingInfo
 
   const selectedDatabase = (databases ?? []).find(
     (db) => db.identifier === state.selectedDatabaseId
   )
   const isMd5 = poolingInfo?.connectionString.includes('?options=reference')
-  const pgMajorVersion = Number(
-    selectedProject?.serviceVersions?.['supabase-postgres'].split('.')[0]
-  )
 
   const { project } = data ?? {}
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user']
