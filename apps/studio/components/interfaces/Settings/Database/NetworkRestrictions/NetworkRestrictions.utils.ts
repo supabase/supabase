@@ -22,7 +22,7 @@ export const checkIfPrivate = (type: 'IPv4' | 'IPv6', cidr: string) => {
     const res = privateIPv4Ranges.map((range) => address.inside(range))
     return res.includes(true)
   } else {
-    const address = IPv6CidrRange.fromCidr(`${cidr}/32`)
+    const address = IPv6CidrRange.fromCidr(`${cidr}/128`)
     const res = privateIPv6Ranges.map((range) => address.inside(range))
     return res.includes(true)
   }
