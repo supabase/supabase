@@ -7,24 +7,42 @@ export const meta = {
   sidebar_label: 'Cognito Auth',
 }
 
-This guide describes how to perform a bulk migration of your Amazon Web Services (AWS) Cognito User Pool to Supabase Auth. Unfortunately, this guide does not handle the migration of secrets such as
-Single Sign On (SSO) Identity Providers and Multi Factor Authentication devices. You will need to re-register MFA factors and SSO IDPs (to include link here).
+This guide describes how to perform a bulk migration of your Amazon Web Services (AWS) Cognito User Pool to Supabase Auth. Unfortunately, this guide does not handle the migration of secrets such as Single Sign On (SSO) Identity Providers and Multi Factor Authentication devices. You will need to re-register [MFA factors](https://supabase.com/docs/guides/auth/auth-mfa) and [Single Sign On Identity Provider](https://supabase.com/docs/guides/auth/sso/auth-sso-saml)
+
+We primarily focus on two cases:
+
+1. You have email password logins
+2. You have email and password logins in addition to OAuth logins.
+
+You can export users via any one of the three approaches:
+
+1. Lambda Trigger
+2. Bulk Export Script
+3. Foreign Data Wrapper
 
 ## Export Users From Cognito
 
-Use this script to export users from a User Pool to CSV. // insert script after figuring out where to store it
-
-## Load Cognito Users into Supabase
-
-Use a script to iterate through the CSV file and create users via the `supabase.auth.admin.createUser`. We provide a sample for reference but you can also write your own.
-
-Here's how [Cognito User fields](https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_UserType.html) map to Supabase fields map to fields on our `auth.users` schema.
-This can change as both services evolve. We recommend that you experiment with a few users in a local environment via [a local AWS Cognito emulator](https://hub.docker.com/r/jagregory/cognito-local) and the local Supabase setup.
+// List case with three tabs
 
 
 ### How are current users impacted?
 
 Users with a linked password sign in method will have to reset their password.
 
+## Bulk Export Script
+
+
+### How are current users impacted?
+
+Users with a linked password sign in method will have to reset their password.
+
+## Foreign Data Wrapper
+
+### How are current users impacted?
+
+Users with a linked password sign in method will have to reset their password.
+
+
+### Refrences
 
 AWS also provides a [reference architecture for user exports](https://aws.amazon.com/solutions/implementations/cognito-user-profiles-export-reference-architecture/)
