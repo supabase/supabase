@@ -191,8 +191,8 @@ export const DatabaseConnectionString = () => {
               {poolerConnStringSyntax.length > 0 && poolingInfo?.supavisor_enabled && (
                 <div className="flex flex-col gap-y-1 text-foreground-light">
                   <p className="text-sm">
-                    You may also connect to another database or with another user via connection
-                    pooling with the following URI format:
+                    You can use the following URI format to switch to a different database or user
+                    when using connection pooling.
                   </p>
                   <p className="text-sm font-mono tracking-tight text-foreground-lighter">
                     {poolerConnStringSyntax.map((x, idx) => {
