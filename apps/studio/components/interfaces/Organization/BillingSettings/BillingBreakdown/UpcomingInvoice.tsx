@@ -262,9 +262,9 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                       link={computeCreditTooltipData.link}
                     />
                   </td>
-                  <td className="py-2 text-sm text-right pr-4">{null}</td>
-                  <td className="py-2 text-sm">{null}</td>
-                  <td className="py-2 text-sm text-right">${computeCredits.amount}</td>
+                  <td className="py-2 text-sm text-right" colSpan={3}>
+                    ${computeCredits.amount}
+                  </td>
                 </tr>
               </tbody>
             )}
@@ -280,11 +280,11 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                 </td>
               </tr>
               <tr>
-                <td className="py-4 text-sm font-medium">
+                <td className="text-sm font-medium">
                   <span className="mr-2">Projected Costs</span>
                   <Tooltips text={projectedCostsTooltipText} />
                 </td>
-                <td className="py-4 text-sm text-right font-medium" colSpan={3}>
+                <td className="text-sm text-right font-medium" colSpan={3}>
                   ${upcomingInvoice?.amount_projected ?? '-'}
                 </td>
               </tr>
