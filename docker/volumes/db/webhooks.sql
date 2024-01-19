@@ -38,7 +38,7 @@ BEGIN;
           method text := TG_ARGV[1]::text;
           headers jsonb DEFAULT '{}'::jsonb;
           params jsonb DEFAULT '{}'::jsonb;
-          timeout_ms integer DEFAULT 1000;
+          timeout_ms integer;
           retry_count integer DEFAULT 0;
           max_retries integer := COALESCE(TG_ARGV[5]::integer, 0);
           succeeded boolean := FALSE;
@@ -65,9 +65,7 @@ BEGIN;
             params = TG_ARGV[3]::jsonb;
           END IF;
 
-          IF TG_ARGV[4] IS NULL OR TG_ARGV[4] = 'null' THEN
-            timeout_ms = 3000; -- 3 seconds
-          ELSE
+          IF TG_ARGV[4] IS NOT NULL OR TG_ARGV[4] <> 'null' THEN
             timeout_ms = TG_ARGV[4]::integer;
           END IF;
 
