@@ -16,13 +16,15 @@ export interface UpcomingInvoiceProps {
 interface TooltipData {
   identifier: string
   text: string
-  link?: {
-    href: string
-    text: string
-  }
+  link?: TooltipLink
 }
 
-const tooltips: TooltipData[] = [
+interface TooltipLink {
+  href: string
+  text: string
+}
+
+const feeTooltipData: TooltipData[] = [
   {
     identifier: 'COMPUTE',
     text: 'Every project is a dedicated server and database. For every hour your project is active, it incurs compute costs based on the instance size of your project. Paused projects do not incur compute costs.',
@@ -32,6 +34,20 @@ const tooltips: TooltipData[] = [
     },
   },
 ]
+
+const computeCreditTooltipData: Omit<TooltipData, ['identifier']> = {
+  text: 'Paid plans come with $10 in Compute Credits to cover one Starter instance or parts of any other instance. Compute Credits are given to you not only for the first month but for every month while you are on a paid plan.',
+  link: {
+    href: 'https://supabase.com/docs/guides/platform/org-based-billing#compute-credits',
+    text: 'Compute Credits',
+  },
+}
+
+const currentCostsTooltipText =
+  'Costs accumulated from the beginning of the billing cycle up to now.'
+
+const projectedCostsTooltipText =
+  ' Estimated costs at the end of the billing cycle. Final amounts may vary depending on your usage.'
 
 const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
   const {
@@ -183,44 +199,14 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                               billingMetricUnit(fee.usage_metric) &&
                               ` (${billingMetricUnit(fee.usage_metric)})`}
                           </span>
-                          {tooltips.map(
-                            (tip) =>
-                              fee.usage_metric?.startsWith(tip.identifier) && (
-                                <Tooltip.Root delayDuration={0} key={tip.identifier}>
-                                  <Tooltip.Trigger>
-                                    <IconInfo size={12} strokeWidth={2} />
-                                  </Tooltip.Trigger>
-                                  <Tooltip.Portal>
-                                    <Tooltip.Content side="bottom">
-                                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                      <div
-                                        className={[
-                                          'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                          'border border-background min-w-[300px] max-w-[450px] max-h-[300px] overflow-y-auto',
-                                        ].join(' ')}
-                                      >
-                                        <span className="text-xs text-foreground">
-                                          <p>
-                                            {tip.text}{' '}
-                                            {tip.link && (
-                                              <>
-                                                Read more on{' '}
-                                                <Link
-                                                  href={tip.link?.href!!}
-                                                  target="_blank"
-                                                  className="transition text-brand hover:text-brand-600"
-                                                >
-                                                  {tip.link?.text}
-                                                </Link>
-                                                .
-                                              </>
-                                            )}
-                                          </p>
-                                        </span>
-                                      </div>
-                                    </Tooltip.Content>
-                                  </Tooltip.Portal>
-                                </Tooltip.Root>
+                          {feeTooltipData.map(
+                            (tooltipData) =>
+                              fee.usage_metric?.startsWith(tooltipData.identifier) && (
+                                <Tooltips
+                                  text={tooltipData.text}
+                                  link={tooltipData.link}
+                                  key={tooltipData.identifier}
+                                />
                               )
                           )}
                         </td>
@@ -271,39 +257,10 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                 <tr className="border-b">
                   <td className="py-2 text-sm max-w-[200px]">
                     <span className="mr-2">{computeCredits.description}</span>
-                    <Tooltip.Root delayDuration={0}>
-                      <Tooltip.Trigger>
-                        <IconInfo size={12} strokeWidth={2} />
-                      </Tooltip.Trigger>
-                      <Tooltip.Portal>
-                        <Tooltip.Content side="bottom">
-                          <Tooltip.Arrow className="radix-tooltip-arrow" />
-                          <div
-                            className={[
-                              'rounded bg-alternative py-1 px-2 leading-none shadow',
-                              'border border-background min-w-[300px] max-w-[450px] max-h-[300px] overflow-y-auto',
-                            ].join(' ')}
-                          >
-                            <span className="text-xs text-foreground">
-                              <p>
-                                Paid plans come with $10 in Compute Credits to cover one Starter
-                                instance or parts of any other instance. Compute Credits are given
-                                to you not only for the first month but for every month while you
-                                are on a paid plan. Read more on{' '}
-                                <Link
-                                  href="https://supabase.com/docs/guides/platform/org-based-billing#compute-credits"
-                                  target="_blank"
-                                  className="transition text-brand hover:text-brand-600"
-                                >
-                                  Compute Credits
-                                </Link>
-                                .
-                              </p>
-                            </span>
-                          </div>
-                        </Tooltip.Content>
-                      </Tooltip.Portal>
-                    </Tooltip.Root>
+                    <Tooltips
+                      text={computeCreditTooltipData.text}
+                      link={computeCreditTooltipData.link}
+                    />
                   </td>
                   <td className="py-2 text-sm text-right pr-4">{null}</td>
                   <td className="py-2 text-sm">{null}</td>
@@ -316,26 +273,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
               <tr>
                 <td className="py-4 text-sm font-medium">
                   <span className="mr-2">Current Costs</span>
-                  <Tooltip.Root delayDuration={0}>
-                    <Tooltip.Trigger>
-                      <IconInfo size={12} strokeWidth={2} />
-                    </Tooltip.Trigger>
-                    <Tooltip.Portal>
-                      <Tooltip.Content side="bottom">
-                        <Tooltip.Arrow className="radix-tooltip-arrow" />
-                        <div
-                          className={[
-                            'rounded bg-alternative py-1 px-2 leading-none shadow',
-                            'border border-background',
-                          ].join(' ')}
-                        >
-                          <span className="text-xs text-foreground">
-                            Costs accumulated from the beginning of the billing cycle up to now.
-                          </span>
-                        </div>
-                      </Tooltip.Content>
-                    </Tooltip.Portal>
-                  </Tooltip.Root>
+                  <Tooltips text={currentCostsTooltipText} />
                 </td>
                 <td className="py-4 text-sm text-right font-medium" colSpan={3}>
                   ${upcomingInvoice?.amount_total ?? '-'}
@@ -344,27 +282,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
               <tr>
                 <td className="py-4 text-sm font-medium">
                   <span className="mr-2">Projected Costs</span>
-                  <Tooltip.Root delayDuration={0}>
-                    <Tooltip.Trigger>
-                      <IconInfo size={12} strokeWidth={2} />
-                    </Tooltip.Trigger>
-                    <Tooltip.Portal>
-                      <Tooltip.Content side="bottom">
-                        <Tooltip.Arrow className="radix-tooltip-arrow" />
-                        <div
-                          className={[
-                            'rounded bg-alternative py-1 px-2 leading-none shadow',
-                            'border border-background',
-                          ].join(' ')}
-                        >
-                          <span className="text-xs text-foreground">
-                            Estimated costs at the end of the billing cycle. Final amounts may vary
-                            depending on your usage.
-                          </span>
-                        </div>
-                      </Tooltip.Content>
-                    </Tooltip.Portal>
-                  </Tooltip.Root>
+                  <Tooltips text={projectedCostsTooltipText} />
                 </td>
                 <td className="py-4 text-sm text-right font-medium" colSpan={3}>
                   ${upcomingInvoice?.amount_projected ?? '-'}
@@ -375,6 +293,46 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
         </div>
       )}
     </>
+  )
+}
+
+const Tooltips = ({ text, link }: { text: string; link?: TooltipLink }) => {
+  return (
+    <Tooltip.Root delayDuration={0}>
+      <Tooltip.Trigger>
+        <IconInfo size={12} strokeWidth={2} />
+      </Tooltip.Trigger>
+      <Tooltip.Portal>
+        <Tooltip.Content side="bottom">
+          <Tooltip.Arrow className="radix-tooltip-arrow" />
+          <div
+            className={[
+              'rounded bg-alternative py-1 px-2 leading-none shadow',
+              'border border-background min-w-[300px] max-w-[450px] max-h-[300px] overflow-y-auto',
+            ].join(' ')}
+          >
+            <span className="text-xs text-foreground">
+              <p>
+                {text}{' '}
+                {link && (
+                  <>
+                    Read more on{' '}
+                    <Link
+                      href={link.href}
+                      target="_blank"
+                      className="transition text-brand hover:text-brand-600"
+                    >
+                      {link.text}
+                    </Link>
+                    .
+                  </>
+                )}
+              </p>
+            </span>
+          </div>
+        </Tooltip.Content>
+      </Tooltip.Portal>
+    </Tooltip.Root>
   )
 }
 
