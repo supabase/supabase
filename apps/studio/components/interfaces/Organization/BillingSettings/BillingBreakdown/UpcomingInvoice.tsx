@@ -201,15 +201,20 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                                       >
                                         <span className="text-xs text-foreground">
                                           <p>
-                                            {tip.text} Read more on{' '}
-                                            <Link
-                                              href={tip.link?.href}
-                                              target="_blank"
-                                              className="transition text-brand hover:text-brand-600"
-                                            >
-                                              {tip.link?.text}
-                                            </Link>
-                                            .
+                                            {tip.text}{' '}
+                                            {tip.link && (
+                                              <>
+                                                Read more on{' '}
+                                                <Link
+                                                  href={tip.link?.href!!}
+                                                  target="_blank"
+                                                  className="transition text-brand hover:text-brand-600"
+                                                >
+                                                  {tip.link?.text}
+                                                </Link>
+                                                .
+                                              </>
+                                            )}
                                           </p>
                                         </span>
                                       </div>
