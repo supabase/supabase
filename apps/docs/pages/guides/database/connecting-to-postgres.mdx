@@ -22,46 +22,39 @@ Supabase provides auto-updating Data APIs. These are the easiest way to get star
 - [GraphQL](/docs/guides/graphql/api): interact with your database through a GraphQL interface.
 - [Realtime](/docs/guides/realtime#realtime-api): listen to database changes over websockets.
 
-## Direct connections
-
-Every Supabase project provides a full Postgres database. You can connect to the database using any tool which supports Postgres. Direct connections are on port `5432`. You can find the connection string in the [Database settings](https://supabase.com/dashboard/project/_/settings/database) inside the dashboard:
-
-1. Go to the `Settings` section.
-2. Click `Database`.
-3. Find your Connection Info and Connection String.
-
-<video width="99%" muted playsInline controls={true}>
-  <source
-    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/postgres-connection.mp4"
-    type="video/mp4"
-  />
-</video>
-
 ## Connection pooler
 
-Every Supabase project comes with a connection pooler for managing connections to your Postgres database. A connection pooler is useful for managing a large number of _temporary_ connections - for example, if you are using Prisma, Drizzle, Kysely, or anything deployed to a Serverless environment (AWS Lambdas or Edge Functions). You can find the connection pool config in the [Database settings](/dashboard/project/_/settings/database) inside the dashboard:
+Every Supabase project comes with a connection pooler for managing connections to your Postgres database.
+
+A connection pooler is useful for managing a large number of _temporary_ connections - for example, if you are using Prisma, Drizzle, Kysely, or anything deployed to a Serverless environment (AWS Lambdas or Edge Functions). Supabase's connection pooler also supports ipv4 out of the box.
+
+You can find the connection pool config in the [Database settings](/dashboard/project/_/settings/database) inside the dashboard:
 
 1. Go to the `Settings` section.
 2. Click `Database`.
-3. Find your Connection Info and Connection String. Connection pooling is on port `6543`.
+3. Under `Connect to your database via connection pooling`, copy your `Connection string`.
 
-<video width="99%" muted playsInline controls={true}>
-  <source
-    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/connection-pool-config.mp4"
-    type="video/mp4"
-  />
-</video>
+## Direct connections
+
+You can use a direct connection to connect directly to your Postgres database. By default, this connection uses ipv6, which isn't supported by all network providers. If you need an ipv4 address, use the [connection pooler](#connection-pooler) instead.
+
+You can find the direct connection string in the [Database settings](https://supabase.com/dashboard/project/_/settings/database) inside the dashboard:
+
+1. Go to the `Settings` section.
+2. Click `Database`.
+3. Under `Connect to your database directly`, copy your `Connection string`.
 
 ## Choosing a connection method
 
 - The Data APIs provide programmatic access and have [built-in connection pooling](https://postgrest.org/en/stable/references/connection_pool.html). You can use these for all browser and application interactions. We recommend using these wherever possible.
-- A "direct connection" is Postgres' native connection system. You should use this for tools which are always alive - usually installed on a long-running server, like Node.js, Ruby, Python, etc.
-- A "connection pooler" is a tool which keeps connections "alive". You should use this for serverless functions and tools which disconnect from the database frequently, like Prisma, Drizzle, Kysely, etc.
+- A "connection pooler" is a tool which keeps connections "alive". You should use this for serverless functions and tools which disconnect from the database frequently, like Prisma, Drizzle, Kysely, etc. You should also use this if your network doesn't support ipv6.
+- A "direct connection" is Postgres' native connection system. You can use this for tools which are always alive, such as long-running server, as long as your network supports ipv6.
 
 Why would you use a connection pool? Primarily because the way that Postgres handles connections isn't very scalable for a large number of _temporary_ connections. You can use these simple questions to determine which connection method to use:
 
-- Are you connecting to a database and _maintaining_ a connection? If yes, use a direct connection.
-- Are you connecting to your database and then _disconnecting_ immediately (e.g. a serverless environment)? If yes, use a connection pool.
+- Are you on a network that doesn't support ipv6? Use the connection pooler.
+- Are you connecting to your database and then _disconnecting_ immediately (e.g. a serverless environment)? Use the connection pooler.
+- Are you connecting to a database and _maintaining_ a connection, and does your network support ipv6? If yes, use a direct connection.
 
 ## Connecting with SSL
 
@@ -69,7 +62,7 @@ You should connect to your database using SSL wherever possible, to prevent snoo
 
 You can obtain your connection info and Server root certificate from your application's dashboard:
 
-![Connection Info and Certificate.](/docs/img/guides/database/connection-info-cert.png)
+![Connection Info and Certificate.](/docs/img/database/database-settings-ssl.png)
 
 ## Integrations
 
@@ -233,6 +226,10 @@ Assuming you've downloaded your SSL certificate to `$HOME/Downloads/prod-supabas
 ```shell
 psql "sslmode=verify-full sslrootcert=$HOME/Downloads/prod-supabase.cer host=db.ref.supabase.co dbname=postgres user=postgres"
 ```
+
+### Connecting with Prisma
+
+Refer to our [Prisma integration guide](https://supabase.com/partners/integrations/prisma) for more details.
 
 ### Connecting with Postgres.js
 

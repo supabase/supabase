@@ -28,7 +28,7 @@ Supabase's core is Postgres, enabling the use of row-level security and providin
 1. Under **Connection Info**, note your Host (`$SUPABASE_HOST`).
 1. Save your password or [reset it](https://supabase.com/dashboard/project/_/settings/database) if you forgot it.
 
-![Finding Supabase host address](/docs/img/guides/resources/migrating-to-supabase/amazon-rds/supabase_dashboard.png)
+![Finding Supabase host address](/docs/img/database/database-settings-host.png)
 
 ## Migrate the database
 
@@ -60,7 +60,7 @@ Alternatively, you can use [pgloader](https://github.com/dimitri/pgloader), a fl
 ```sql
 load database
   from mysql://user:password@host/source_db
-  into postgres://postgres:password@db.xxxx.supabase.co:6543/postgres
+  into postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:6543/postgres
 alter schema 'public' owner to 'postgres';
 set wal_buffers = '64MB', max_wal_senders = 0, statement_timeout = 0, work_mem to '2GB';
 ```
@@ -80,7 +80,7 @@ pgloader config.load
 ```sql
 LOAD DATABASE
     FROM mssql://USER:PASSWORD@HOST/SOURCE_DB
-    INTO postgres://postgres:password@db.xxxx.supabase.co:6543/postgres
+    INTO postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:6543/postgres
 ALTER SCHEMA 'public' OWNER TO 'postgres';
 set wal_buffers = '64MB', max_wal_senders = 0, statement_timeout = 0, work_mem to '2GB';
 ```

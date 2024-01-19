@@ -162,37 +162,13 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
             "
               >
                 <div className="mx-auto my-6 max-w-lg space-y-6">
-                  {provider.title === 'LinkedIn (Deprecated)' && (
-                    <Alert_Shadcn_ variant="warning">
-                      <IconAlertTriangle strokeWidth={2} />
-                      <AlertTitle_Shadcn_>LinkedIn (Deprecated) Provider</AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_>
-                        As of 1st August, LinkedIn has updated their OAuth API scopes. Please use
-                        the new LinkedIn provider below. Developers using this provider should move
-                        over to the new provider. Please refer to our{' '}
-                        <a
-                          href="https://supabase.com/docs/guides/auth/social-login/auth-linkedin"
-                          className="underline"
-                          target="_blank"
-                        >
-                          documentation
-                        </a>{' '}
-                        for more details.
-                      </AlertDescription_Shadcn_>
-                    </Alert_Shadcn_>
-                  )}
-
                   {Object.keys(provider.properties).map((x: string) => (
                     <FormField
                       key={x}
                       name={x}
                       properties={provider.properties[x]}
                       formValues={values}
-                      // TODO (Joel): Remove after 30th November when we disable the provider
-                      disabled={
-                        ['EXTERNAL_LINKEDIN_CLIENT_ID', 'EXTERNAL_LINKEDIN_SECRET'].includes(x) ||
-                        !canUpdateConfig
-                      }
+                      disabled={!canUpdateConfig}
                     />
                   ))}
 
