@@ -16,38 +16,17 @@ export interface UpcomingInvoiceProps {
 interface TooltipData {
   identifier: string
   text: string
-  link?: TooltipLink
-}
-
-interface TooltipLink {
-  href: string
-  text: string
+  linkRef?: string
 }
 
 const feeTooltipData: TooltipData[] = [
   {
     identifier: 'COMPUTE',
     text: 'Every project is a dedicated server and database. For every hour your project is active, it incurs compute costs based on the instance size of your project. Paused projects do not incur compute costs.',
-    link: {
-      href: 'https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute',
-      text: 'Compute Hours',
-    },
+    linkRef:
+      'https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute',
   },
 ]
-
-const computeCreditTooltipData: Omit<TooltipData, 'identifier'> = {
-  text: 'Paid plans come with $10 in Compute Credits to cover one Starter instance or parts of any other instance. Compute Credits are given to you not only for the first month but for every month while you are on a paid plan.',
-  link: {
-    href: 'https://supabase.com/docs/guides/platform/org-based-billing#compute-credits',
-    text: 'Compute Credits',
-  },
-}
-
-const currentCostsTooltipText =
-  'Costs accumulated from the beginning of the billing cycle up to now.'
-
-const projectedCostsTooltipText =
-  ' Estimated costs at the end of the billing cycle. Final amounts may vary depending on your usage.'
 
 const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
   const {
@@ -73,13 +52,13 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
         // Prorations should be below regular usage fees
         return Number(a.proration) - Number(b.proration)
       })
-  }, [upcomingInvoice])
+  }, [upcomingInvoice, computeCredits])
 
   const feesWithBreakdown = useMemo(() => {
     return (upcomingInvoice?.lines || [])
       .filter((item) => item !== computeCredits && item.breakdown?.length)
       .sort((a, b) => Number(a.usage_based) - Number(b.usage_based) || b.amount - a.amount)
-  }, [upcomingInvoice])
+  }, [upcomingInvoice, computeCredits])
 
   const expandUsageFee = (fee: string) => {
     setUsageFeesExpanded([...usageFeesExpanded, fee])
@@ -202,9 +181,9 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                           {feeTooltipData.map(
                             (tooltipData) =>
                               fee.usage_metric?.startsWith(tooltipData.identifier) && (
-                                <Tooltips
+                                <InvoiceTooltip
                                   text={tooltipData.text}
-                                  link={tooltipData.link}
+                                  linkRef={tooltipData.linkRef}
                                   key={tooltipData.identifier}
                                 />
                               )
@@ -257,9 +236,9 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                 <tr className="border-b">
                   <td className="py-2 text-sm max-w-[200px]">
                     <span className="mr-2">{computeCredits.description}</span>
-                    <Tooltips
-                      text={computeCreditTooltipData.text}
-                      link={computeCreditTooltipData.link}
+                    <InvoiceTooltip
+                      text="Paid plans come with $10 in Compute Credits to cover one Starter instance or parts of any other instance. Compute Credits are given to you not only for the first month but for every month while you are on a paid plan."
+                      linkRef="https://supabase.com/docs/guides/platform/org-based-billing#compute-credits"
                     />
                   </td>
                   <td className="py-2 text-sm text-right" colSpan={3}>
@@ -273,7 +252,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
               <tr>
                 <td className="py-4 text-sm font-medium">
                   <span className="mr-2">Current Costs</span>
-                  <Tooltips text={currentCostsTooltipText} />
+                  <InvoiceTooltip text="Costs accumulated from the beginning of the billing cycle up to now." />
                 </td>
                 <td className="py-4 text-sm text-right font-medium" colSpan={3}>
                   ${upcomingInvoice?.amount_total ?? '-'}
@@ -282,7 +261,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
               <tr>
                 <td className="text-sm font-medium">
                   <span className="mr-2">Projected Costs</span>
-                  <Tooltips text={projectedCostsTooltipText} />
+                  <InvoiceTooltip text="Estimated costs at the end of the billing cycle. Final amounts may vary depending on your usage." />
                 </td>
                 <td className="text-sm text-right font-medium" colSpan={3}>
                   ${upcomingInvoice?.amount_projected ?? '-'}
@@ -296,7 +275,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
   )
 }
 
-const Tooltips = ({ text, link }: { text: string; link?: TooltipLink }) => {
+const InvoiceTooltip = ({ text, linkRef }: { text: string; linkRef?: string }) => {
   return (
     <Tooltip.Root delayDuration={0}>
       <Tooltip.Trigger>
@@ -314,18 +293,14 @@ const Tooltips = ({ text, link }: { text: string; link?: TooltipLink }) => {
             <span className="text-xs text-foreground">
               <p>
                 {text}{' '}
-                {link && (
-                  <>
-                    Read more on{' '}
-                    <Link
-                      href={link.href}
-                      target="_blank"
-                      className="transition text-brand hover:text-brand-600"
-                    >
-                      {link.text}
-                    </Link>
-                    .
-                  </>
+                {linkRef && (
+                  <Link
+                    href={linkRef}
+                    target="_blank"
+                    className="transition text-brand hover:text-brand-600"
+                  >
+                    Read more
+                  </Link>
                 )}
               </p>
             </span>
