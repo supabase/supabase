@@ -35,7 +35,7 @@ const feeTooltipData: TooltipData[] = [
   },
 ]
 
-const computeCreditTooltipData: Omit<TooltipData, ['identifier']> = {
+const computeCreditTooltipData: Omit<TooltipData, 'identifier'> = {
   text: 'Paid plans come with $10 in Compute Credits to cover one Starter instance or parts of any other instance. Compute Credits are given to you not only for the first month but for every month while you are on a paid plan.',
   link: {
     href: 'https://supabase.com/docs/guides/platform/org-based-billing#compute-credits',
