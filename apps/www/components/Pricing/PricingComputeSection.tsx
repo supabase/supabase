@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { ChevronDownIcon } from '@heroicons/react/outline'
 import ComputePricingTable from './ComputePricingTable'
 import { useWindowSize } from 'react-use'
+import PricingComputeAnimation from './PricingComputeAnimation'
 
 const PricingComputeSection = () => {
   const ref = useRef<HTMLDivElement>(null)
@@ -20,7 +21,7 @@ const PricingComputeSection = () => {
   }, [width])
 
   return (
-    <Panel outerClassName="w-full mx-auto max-w-6xl" innerClassName="flex flex-col gap-4">
+    <Panel outerClassName="w-full mx-auto max-w-6xl" innerClassName="flex flex-col">
       <div className="grid lg:grid-cols-2 lg:gap-8">
         <div className="p-4 lg:p-8 gap-4">
           <div className="flex flex-col gap-2">
@@ -49,8 +50,9 @@ const PricingComputeSection = () => {
               </h3>
             </div>
             <p className="text-foreground-lighter text-[13px]">
-              Paid plans include one Starter instance for free, additional compute add-ons are
-              available if you need extra performance when scaling up Supabase.
+              Paid plans include 10$ in compute credits that can be spent on one or more instances.
+              Additional compute add-ons are available if you need extra performance when scaling up
+              Supabase.
             </p>
           </div>
           <div className="flex items-center gap-4 mt-4">
@@ -62,17 +64,10 @@ const PricingComputeSection = () => {
           </div>
         </div>
         <div className="relative h-full w-full">
-          <Image
-            fill
-            src={`/images/pricing/compute-${
-              resolvedTheme?.includes('dark') ? 'dark' : 'light'
-            }.svg`}
-            alt="Compute addon illustration"
-            className="object-contain object-center p-4 lg:p-8"
-          />
+          <PricingComputeAnimation />
         </div>
       </div>
-      <hr className="mx-4 border-0 border-t" />
+      <hr className="border-0 border-t" />
       <div className="flex flex-col">
         <div
           className="relative w-full overflow-hidden transition-all !ease-[.76,0,.23,1] duration-300"

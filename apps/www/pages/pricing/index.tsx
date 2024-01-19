@@ -115,8 +115,8 @@ export default function IndexPage() {
       />
 
       <div>
-        <div className="relative z-10 py-8 xl:py-16 2xl:py-20">
-          <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+        <div className="relative z-10 pt-8 pb-4 xl:py-16">
+          <div className="mx-auto max-w-7xl px-8 text-center sm:px-6 lg:px-8">
             <div className="mx-auto max-w-3xl space-y-2 lg:max-w-none">
               <p className="text-brand text-base">Pricing</p>
               <h1 className="h1">
@@ -197,7 +197,7 @@ export default function IndexPage() {
                               <div className="flex items-end">
                                 <p
                                   className={`mt-2 pb-1 font-mono ${
-                                    plan.name !== 'Enterprise' ? 'text-4xl' : 'text-4xl'
+                                    plan.name !== 'Enterprise' ? 'text-5xl' : 'text-4xl'
                                   }`}
                                 >
                                   {plan.name !== 'Enterprise' ? '$' : ''}
@@ -259,9 +259,7 @@ export default function IndexPage() {
                               </span>
                             </div>
                             {typeof feature !== 'string' && (
-                              <p className="ml-6 text-foreground-lighter">
-                                {feature[1]} {isPromoPlan && ' *'}
-                              </p>
+                              <p className="ml-6 text-foreground-lighter">{feature[1]}</p>
                             )}
                           </li>
                         ))}
@@ -271,7 +269,6 @@ export default function IndexPage() {
                         <div className="space-y-2 mt-12">
                           {plan.footer && (
                             <p className="text-[13px] leading-5 text-foreground-lighter whitespace-pre-wrap mb-0">
-                              {isPromoPlan && '* '}
                               {plan.footer}
                             </p>
                           )}

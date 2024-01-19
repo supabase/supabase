@@ -1,7 +1,6 @@
 import React, { FC, useRef, useState } from 'react'
 import { AnimatePresence, motion, useInView } from 'framer-motion'
 import { Switch, cn } from 'ui'
-import { DEFAULT_EASE } from '~/lib/animations'
 
 interface Props {
   className?: string
