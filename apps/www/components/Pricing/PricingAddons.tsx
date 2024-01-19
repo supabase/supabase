@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { FC } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useTheme } from 'next-themes'
@@ -44,11 +44,7 @@ const addons = [
   },
 ]
 
-interface Props {
-  setShowComputeModal: any
-}
-
-const PricingAddons = ({ setShowComputeModal }: Props) => {
+const PricingAddons: FC = () => {
   return (
     <div>
       <div className="text-center">
@@ -59,14 +55,14 @@ const PricingAddons = ({ setShowComputeModal }: Props) => {
       </div>
       <div className="grid lg:grid-cols-2 gap-4 mb-16 mx-auto max-w-6xl">
         {addons.map((addon) => (
-          <AddonCard key={addon.name} addon={addon} setShowComputeModal={setShowComputeModal} />
+          <AddonCard key={addon.name} addon={addon} />
         ))}
       </div>
     </div>
   )
 }
 
-const AddonCard = ({ addon, setShowComputeModal }: any) => {
+const AddonCard = ({ addon }: any) => {
   const { basePath } = useRouter()
   const { resolvedTheme } = useTheme()
 
@@ -110,14 +106,19 @@ const AddonCard = ({ addon, setShowComputeModal }: any) => {
 
   const Content = () => (
     <>
-      <div className="relative w-full md:aspect-[1.53/1] md:h-auto max-w-[200px]">
+      <div
+        className={cn(
+          'relative w-full md:aspect-[1.53/1] md:h-auto max-w-[200px]',
+          addon.id === 'addon-pitr' && 'flex items-end'
+        )}
+      >
         <Image
           src={`${basePath}/images/pricing/${addon.heroImg}${
             resolvedTheme?.includes('dark') ? '' : '-light'
           }.svg`}
           alt={`${addon.name} illustration`}
           fill
-          className="object-contain"
+          className={cn('object-contain', addon.id === 'addon-pitr' && 'object-bottom')}
         />
       </div>
       <div className="p-4 md:pl-0 gap-4 col-span-2">
