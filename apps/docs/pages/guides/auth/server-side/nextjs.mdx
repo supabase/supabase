@@ -123,9 +123,7 @@ export function createClient() {
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
-export function createClient() {
-  const cookieStore = cookies()
-
+export function createClient(cookieStore: ReturnType<typeof cookies>) {
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -144,9 +142,7 @@ export function createClient() {
 import { type CookieOptions, createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
-export function createClient() {
-  const cookieStore = cookies()
-
+export function createClient(cookieStore: ReturnType<typeof cookies>) {
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -316,6 +312,7 @@ export default function LoginPage() {
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
 
@@ -327,7 +324,8 @@ const schema = z.object({
 })
 
 export async function login(formData: FormData) {
-  const supabase = createClient()
+  const cookieStore = cookies()
+  const supabase = createClient(cookieStore)
 
   let data
   try {
@@ -350,7 +348,8 @@ export async function login(formData: FormData) {
 }
 
 export async function signup(formData: FormData) {
-  const supabase = createClient()
+  const cookieStore = cookies()
+  const supabase = createClient(cookieStore)
 
   let data
   try {
@@ -375,11 +374,14 @@ export async function signup(formData: FormData) {
 
 ```ts app/auth/confirm/route.ts
 import { type EmailOtpType } from '@supabase/supabase-js'
+import { cookies } from 'next/headers'
 import { type NextRequest, NextResponse } from 'next/server'
 
 import { createClient } from '@/utils/supabase/actions'
 
 export async function GET(request: NextRequest) {
+  const cookieStore = cookies()
+
   const { searchParams } = new URL(request.url)
   const token_hash = searchParams.get('token_hash')
   const type = searchParams.get('type') as EmailOtpType | null
@@ -391,7 +393,7 @@ export async function GET(request: NextRequest) {
   redirectTo.searchParams.delete('type')
 
   if (token_hash && type) {
-    const supabase = createClient()
+    const supabase = createClient(cookieStore)
 
     const { error } = await supabase.auth.verifyOtp({
       type,
@@ -442,12 +444,14 @@ It's safe to trust `getUser()` because it sends a request to the Supabase Auth s
 <StepHikeCompact.Code>
 
 ```ts app/private/page.tsx
+import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
 import { createClient } from '@/utils/supabase/server'
 
 export default async function PrivatePage() {
-  const supabase = createClient()
+  const cookieStore = cookies()
+  const supabase = createClient(cookieStore)
 
   const { data, error } = await supabase.auth.getUser()
   if (error || !data?.user) {
