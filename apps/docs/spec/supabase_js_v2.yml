@@ -4643,7 +4643,7 @@ functions:
       Explain is not enabled by default as it can reveal sensitive information about your database.
       It's best to only enable this for testing environments but if you wish to enable it for production you can provide additional protection by using a `pre-request` function.
 
-      Follow the [Performance Debugging Guide](/docs/guides/api/rest/debugging-performance) to enable the functionality on your project.
+      Follow the [Performance Debugging Guide](/docs/guides/database/debugging-performance) to enable the functionality on your project.
     examples:
       - id: get-execution-plan
         name: Get the execution plan
