@@ -254,7 +254,7 @@ export const ConnectionPooling = () => {
                                 <p>Session mode</p>
                                 <p className="text-xs text-foreground-lighter">
                                   When a new client connects, a connection is assigned to the
-                                  clilent until it disconnects. All Postgres features can be used
+                                  client until it disconnects. All Postgres features can be used
                                   with this option.
                                 </p>
                               </Listbox.Option>
