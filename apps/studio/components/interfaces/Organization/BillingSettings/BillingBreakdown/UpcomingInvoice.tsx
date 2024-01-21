@@ -47,7 +47,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
 
   const fixedFees = useMemo(() => {
     return (upcomingInvoice?.lines || [])
-      .filter((item) => item !== computeCredits && (!item.breakdown || !item.breakdown.length))
+      .filter((item) => item !== computeCredits && !item.breakdown)
       .sort((a, b) => {
         // Prorations should be below regular usage fees
         return Number(a.proration) - Number(b.proration)
@@ -56,9 +56,9 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
 
   const feesWithBreakdown = useMemo(() => {
     return (upcomingInvoice?.lines || [])
-      .filter((item) => item !== computeCredits && item.breakdown?.length)
+      .filter((item) => item.breakdown?.length)
       .sort((a, b) => Number(a.usage_based) - Number(b.usage_based) || b.amount - a.amount)
-  }, [upcomingInvoice, computeCredits])
+  }, [upcomingInvoice])
 
   const expandUsageFee = (fee: string) => {
     setUsageFeesExpanded([...usageFeesExpanded, fee])
@@ -133,11 +133,11 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                       {item.unit_price === 0
                         ? 'FREE'
                         : item.unit_price
-                        ? `$${item.unit_price}`
+                        ? formatToCurrency(item.unit_price)
                         : null}
                     </td>
                   )}
-                  <td className="py-2 text-sm text-right">${item.amount}</td>
+                  <td className="py-2 text-sm text-right">{formatToCurrency(item.amount)}</td>
                 </tr>
               ))}
             </tbody>
@@ -186,7 +186,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                               <InvoiceTooltip
                                 text={matchingTooltipData.text}
                                 linkRef={matchingTooltipData.linkRef}
-                              ></InvoiceTooltip>
+                              />
                             ) : null
                           })()}
                         </td>
@@ -201,10 +201,12 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                           {fee.unit_price_desc
                             ? `${fee.unit_price_desc}`
                             : fee.unit_price
-                            ? `$${fee.unit_price}`
+                            ? formatToCurrency(fee.unit_price)
                             : null}
                         </td>
-                        <td className="py-2 text-sm text-right max-w-[70px]">${fee.amount ?? 0}</td>
+                        <td className="py-2 text-sm text-right max-w-[70px]">
+                          {formatToCurrency(fee.amount) ?? formatToCurrency(0)}
+                        </td>
                       </tr>
                     </Collapsible.Trigger>
 
@@ -243,7 +245,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                     />
                   </td>
                   <td className="py-2 text-sm text-right" colSpan={3}>
-                    ${computeCredits.amount}
+                    {formatToCurrency(computeCredits.amount)}
                   </td>
                 </tr>
               </tbody>
@@ -256,7 +258,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                   <InvoiceTooltip text="Costs accumulated from the beginning of the billing cycle up to now." />
                 </td>
                 <td className="py-4 text-sm text-right font-medium" colSpan={3}>
-                  ${upcomingInvoice?.amount_total ?? '-'}
+                  {formatToCurrency(upcomingInvoice?.amount_total) ?? '-'}
                 </td>
               </tr>
               <tr>
@@ -265,7 +267,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                   <InvoiceTooltip text="Estimated costs at the end of the billing cycle. Final amounts may vary depending on your usage." />
                 </td>
                 <td className="text-sm text-right font-medium" colSpan={3}>
-                  ${upcomingInvoice?.amount_projected ?? '-'}
+                  {formatToCurrency(upcomingInvoice?.amount_projected) ?? '-'}
                 </td>
               </tr>
             </tfoot>
@@ -285,12 +287,7 @@ const InvoiceTooltip = ({ text, linkRef }: { text: string; linkRef?: string }) =
       <Tooltip.Portal>
         <Tooltip.Content side="bottom">
           <Tooltip.Arrow className="radix-tooltip-arrow" />
-          <div
-            className={[
-              'rounded bg-alternative py-1 px-2 leading-none shadow',
-              'border border-background min-w-[300px] max-w-[450px] max-h-[300px] overflow-y-auto',
-            ].join(' ')}
-          >
+          <div className="rounded bg-alternative py-1 px-2 leading-none shadow border border-background min-w-[300px] max-w-[450px] max-h-[300px] overflow-y-auto">
             <span className="text-xs text-foreground">
               <p>
                 {text}{' '}
@@ -298,7 +295,7 @@ const InvoiceTooltip = ({ text, linkRef }: { text: string; linkRef?: string }) =
                   <Link
                     href={linkRef}
                     target="_blank"
-                    className="transition text-brand hover:text-brand-600"
+                    className="transition text-brand hover:text-brand-600 underline"
                   >
                     Read more
                   </Link>
@@ -310,6 +307,18 @@ const InvoiceTooltip = ({ text, linkRef }: { text: string; linkRef?: string }) =
       </Tooltip.Portal>
     </Tooltip.Root>
   )
+}
+
+const formatToCurrency = (amount: number | undefined | null): string | null => {
+  if (amount === undefined || amount === null) {
+    return null
+  } else {
+    return Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+    }).format(amount)
+  }
 }
 
 export default UpcomingInvoice
