@@ -253,9 +253,9 @@ export const ConnectionPooling = () => {
                               <Listbox.Option key="session" label="Session" value="session">
                                 <p>Session mode</p>
                                 <p className="text-xs text-foreground-lighter">
-                                  When a new client connects, a connection is assigned to the
-                                  client until it disconnects. All Postgres features can be used
-                                  with this option.
+                                  When a new client connects, a connection is assigned to the client
+                                  until it disconnects. All Postgres features can be used with this
+                                  option.
                                 </p>
                               </Listbox.Option>
                             </Listbox>
