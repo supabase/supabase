@@ -136,7 +136,7 @@ export const DatabaseConnectionString = () => {
   }, [connectionString])
 
   return (
-    <div id="connection-string">
+    <div id="connection-string" className="w-full">
       <Panel
         className="!m-0 [&>div:nth-child(1)]:!border-0 [&>div:nth-child(1)>div]:!p-0"
         title={

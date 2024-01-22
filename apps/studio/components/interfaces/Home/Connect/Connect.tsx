@@ -18,6 +18,19 @@ import {
   Tabs_Shadcn_,
 } from 'ui'
 import { FileJson2, Plug } from 'lucide-react'
+import { DatabaseConnectionString } from 'components/interfaces/Settings/Database/DatabaseSettings/DatabaseConnectionString'
+
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
+import { IconAlertCircle, IconBookOpen, IconLoader, Input } from 'ui'
+
+import { useParams } from 'common/hooks'
+import Panel from 'components/ui/Panel'
+import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
+import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { useCheckPermissions } from 'hooks'
+import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
+import { useProjectApiQuery } from 'data/config/project-api-query'
 
 type GetContentFilesArgs = {
   selectedParent: string
@@ -54,6 +67,8 @@ const getContentFiles = ({
 }
 
 const Connect = () => {
+  const { ref: projectRef } = useParams()
+
   const [parentSelectorOpen, setParentSelectorOpen] = useState(false)
   const [childDropdownOpen, setChildDropdownOpen] = useState(false)
   const [grandChildDropdownOpen, setGrandChildDropdownOpen] = useState(false)
@@ -164,6 +179,31 @@ const Connect = () => {
     return []
   }
 
+  const { data: projectSettings } = useProjectSettingsQuery({ projectRef })
+
+  const { data: apiSettings } = useProjectApiQuery({
+    projectRef,
+  })
+
+  // Get the API service
+  const apiService = (projectSettings?.services ?? []).find(
+    (x: any) => x.app.id == DEFAULT_PROJECT_API_SERVICE_ID
+  )
+
+  const canReadAPIKeys = useCheckPermissions(PermissionAction.READ, 'service_api_keys')
+
+  // Get the API service
+  const apiHost = canReadAPIKeys
+    ? `${apiSettings?.autoApiService?.protocol ?? 'https'}://${
+        apiSettings?.autoApiService?.endpoint ?? '-'
+      }`
+    : ''
+  const apiUrl = canReadAPIKeys ? apiHost : ''
+
+  const anonKey = canReadAPIKeys
+    ? apiService?.service_api_keys.find((key) => key.tags === 'anon')?.api_key ?? ''
+    : ''
+
   return (
     <div>
       <Dialog_Shadcn_ open={true}>
@@ -253,9 +293,7 @@ const Connect = () => {
               </TabsContent_Shadcn_>
             ))}
             <TabsContent_Shadcn_ key="direct" value="direct">
-              <div className="bg-surface-300 p-4">
-                <div className="flex items-center gap-2">direct connection ui</div>
-              </div>
+              <DatabaseConnectionString />
             </TabsContent_Shadcn_>
           </Tabs_Shadcn_>
 
