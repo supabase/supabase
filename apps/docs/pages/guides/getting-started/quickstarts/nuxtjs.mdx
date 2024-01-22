@@ -78,7 +78,10 @@ export const meta = {
   <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Query data from the app">
 
-    In `src/App.vue`, create a Supabase client using your [Project URL and public API (anon) key](https://supabase.com/dashboard/project/_/settings/api).
+    In `src/App.vue`, create a Supabase client using your project URL and public API (anon) key:
+
+    <ProjectConfigVariables variable="url" />
+    <ProjectConfigVariables variable="anonKey" />
 
     Replace the existing content in your `src/App.vue` file with the following code.
 

@@ -66,15 +66,18 @@ export const meta = {
   <StepHikeCompact.Step step={3}>
     <StepHikeCompact.Details title="Declare Supabase Environment Variables">
 
-    Rename `.env.local.example` to `.env.local` and populate with [your project's URL and Anon Key](https://supabase.com/dashboard/project/_/settings/api).
+    Rename `.env.local.example` to `.env.local` and populate with your Supabase connection variables:
+
+    <ProjectConfigVariables variable="url" />
+    <ProjectConfigVariables variable="anonKey" />
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
       ```text .env.local
-        NEXT_PUBLIC_SUPABASE_URL=your-project-url
-        NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+        NEXT_PUBLIC_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
+        NEXT_PUBLIC_SUPABASE_ANON_KEY=<SUBSTITUTE_SUPABASE_ANON_KEY>
       ```
 
     </StepHikeCompact.Code>
