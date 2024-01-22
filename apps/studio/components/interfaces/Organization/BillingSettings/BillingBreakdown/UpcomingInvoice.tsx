@@ -8,6 +8,7 @@ import { Button, Collapsible, IconChevronRight, IconInfo } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { billingMetricUnit, formatUsage } from '../helpers'
 import Link from 'next/link'
+import { formatCurrency } from 'lib/helpers'
 
 export interface UpcomingInvoiceProps {
   slug?: string
@@ -133,11 +134,11 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                       {item.unit_price === 0
                         ? 'FREE'
                         : item.unit_price
-                        ? formatToCurrency(item.unit_price)
+                        ? formatCurrency(item.unit_price)
                         : null}
                     </td>
                   )}
-                  <td className="py-2 text-sm text-right">{formatToCurrency(item.amount)}</td>
+                  <td className="py-2 text-sm text-right">{formatCurrency(item.amount)}</td>
                 </tr>
               ))}
             </tbody>
@@ -201,11 +202,11 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                           {fee.unit_price_desc
                             ? `${fee.unit_price_desc}`
                             : fee.unit_price
-                            ? formatToCurrency(fee.unit_price)
+                            ? formatCurrency(fee.unit_price)
                             : null}
                         </td>
                         <td className="py-2 text-sm text-right max-w-[70px]">
-                          {formatToCurrency(fee.amount) ?? formatToCurrency(0)}
+                          {formatCurrency(fee.amount) ?? formatCurrency(0)}
                         </td>
                       </tr>
                     </Collapsible.Trigger>
@@ -245,7 +246,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                     />
                   </td>
                   <td className="py-2 text-sm text-right" colSpan={3}>
-                    {formatToCurrency(computeCredits.amount)}
+                    {formatCurrency(computeCredits.amount)}
                   </td>
                 </tr>
               </tbody>
@@ -258,7 +259,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                   <InvoiceTooltip text="Costs accumulated from the beginning of the billing cycle up to now." />
                 </td>
                 <td className="py-4 text-sm text-right font-medium" colSpan={3}>
-                  {formatToCurrency(upcomingInvoice?.amount_total) ?? '-'}
+                  {formatCurrency(upcomingInvoice?.amount_total) ?? '-'}
                 </td>
               </tr>
               <tr>
@@ -267,7 +268,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                   <InvoiceTooltip text="Estimated costs at the end of the billing cycle. Final amounts may vary depending on your usage." />
                 </td>
                 <td className="text-sm text-right font-medium" colSpan={3}>
-                  {formatToCurrency(upcomingInvoice?.amount_projected) ?? '-'}
+                  {formatCurrency(upcomingInvoice?.amount_projected) ?? '-'}
                 </td>
               </tr>
             </tfoot>
@@ -307,18 +308,6 @@ const InvoiceTooltip = ({ text, linkRef }: { text: string; linkRef?: string }) =
       </Tooltip.Portal>
     </Tooltip.Root>
   )
-}
-
-const formatToCurrency = (amount: number | undefined | null): string | null => {
-  if (amount === undefined || amount === null) {
-    return null
-  } else {
-    return Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-    }).format(amount)
-  }
 }
 
 export default UpcomingInvoice
