@@ -2429,8 +2429,8 @@ functions:
       - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
       - To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
       - If signUpWith() is called for an existing confirmed user:
-        - If **Confirm email** is enabled in [your project](https://supabase.com/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
-        - If **Confirm email** is disabled, the error message, `User already registered` is returned.
+        - When both **Confirm email** and **Confirm phone** (even when phone provider is disabled) are enabled in [your project](/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
+        - When either **Confirm email** or **Confirm phone** (even when phone provider is disabled) is disabled, the error message, `User already registered` is returned.
     examples:
       - id: sign-up-email
         name: Sign up with email
