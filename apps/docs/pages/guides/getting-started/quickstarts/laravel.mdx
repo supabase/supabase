@@ -70,6 +70,38 @@ export const meta = {
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="Change the default schema">
+
+    By default Laravel uses the `public` schema. We recommend changing this as supabase exposes the `public` schema as a [data API](/docs/guides/api).
+
+    You can change the schema of your Laravel application by modifying the `search_path` variable `app/config/database.php`.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+    ```php app/config/database.php
+    'pgsql' => [
+        'driver' => 'pgsql',
+        'url' => env('DATABASE_URL'),
+        'host' => env('DB_HOST', '127.0.0.1'),
+        'port' => env('DB_PORT', '5432'),
+        'database' => env('DB_DATABASE', 'forge'),
+        'username' => env('DB_USERNAME', 'forge'),
+        'password' => env('DB_PASSWORD', ''),
+        'charset' => 'utf8',
+        'prefix' => '',
+        'prefix_indexes' => true,
+        'search_path' => 'laravel',
+        'sslmode' => 'prefer',
+    ],
+    ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={5}>
     <StepHikeCompact.Details title="Run the database migrations">
 
     Laravel ships with database migration files that set up the required tables for Laravel Authentication and User Management.
@@ -88,7 +120,7 @@ export const meta = {
 
   </StepHikeCompact.Step>
 
-  <StepHikeCompact.Step step={5}>
+  <StepHikeCompact.Step step={6}>
     <StepHikeCompact.Details title="Start the app">
 
     Run the development server. Go to http://127.0.0.1:8000 in a browser to see your application. You can also nvaigate to http://127.0.0.1:8000/register and http://127.0.0.1:8000/login to register and log in users.
