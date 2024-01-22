@@ -3,6 +3,7 @@ import { Button, IconCheck, cn } from 'ui'
 import { InformationCircleIcon } from '@heroicons/react/outline'
 
 import { plans } from 'shared-data/plans'
+import Link from 'next/link'
 
 const PricingPlans: FC = () => {
   return (
@@ -85,19 +86,23 @@ const PricingPlans: FC = () => {
                           </div>
 
                           {plan.warning && (
-                            <div className="-mt-2">
+                            <div className="mt-1 flex flex-col gap-1">
                               <span
                                 data-tip={plan.warningTooltip}
                                 className={cn(
-                                  'bg-brand-500 text-brand-600 rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4 inline-flex gap-1 items-center',
-                                  plan.warningTooltip && 'hover:cursor-pointer'
+                                  'text-[13px] leading-4 inline-flex gap-1 items-center'
                                 )}
                               >
-                                {plan.warningTooltip && (
-                                  <InformationCircleIcon className="w-3 h-3" />
-                                )}
                                 {plan.warning}
                               </span>
+                              {(plan.name === 'Pro' || plan.name === 'Team') && (
+                                <Link
+                                  href="#addon-compute"
+                                  className="hover:underline text-foreground-lighter text-[13px] m-0 p-0 leading-3"
+                                >
+                                  Need more compute?
+                                </Link>
+                              )}
                             </div>
                           )}
                         </div>
