@@ -17,7 +17,7 @@ If you get stuck while working through this guide, refer to the [full example on
 
 <ProjectSetup />
 
-## Building the App
+## Building the app
 
 Let's start building the Svelte app from scratch.
 
@@ -92,6 +92,10 @@ export const handle: Handle = async ({ event, resolve }) => {
 }
 ```
 
+<GetSessionWarning />
+
+In this case, the session information from `getSession` is supplied to the Supabase client so it can retrieve the auth token. This is safe, since the auth token signature will be revalidated on the Auth server. But you shouldn't trust the unsigned data that is stored alongside the JWT.
+
 If you are using TypeScript the compiler might complain about `event.locals.supabase` and `event.locals.getSession`, this can be fixed by updating your `src/app.d.ts` with the content below:
 
 ```ts src/app.d.ts
@@ -131,7 +135,6 @@ Create a new `src/routes/+layout.ts` file to handle the session and the supabase
 
 ```ts src/routes/+layout.ts
 // src/routes/+layout.ts
-import { invalidate } from '$app/navigation'
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
 import { createSupabaseLoadClient } from '@supabase/auth-helpers-sveltekit'
 
@@ -164,7 +167,7 @@ Update your `src/routes/+layout.svelte`:
 
 	export let data
 
-	const { supabase, session } = data
+	let { supabase, session } = data
 	$: ({ supabase, session } = data)
 
 	onMount(() => {
@@ -187,7 +190,7 @@ Update your `src/routes/+layout.svelte`:
 </div>
 ```
 
-### Set up a Login page
+### Set up a login page
 
 #### Supabase Auth UI
 
@@ -309,12 +312,13 @@ Create a new `src/routes/account/+page.svelte` file with the content below.
 ```svelte src/routes/account/+page.svelte
 <!-- src/routes/account/+page.svelte -->
 <script lang="ts">
-	import { enhance, type SubmitFunction } from '$app/forms'
+	import { enhance } from '$app/forms';
+	import type { SubmitFunction } from '@sveltejs/kit';
 
 	export let data
 	export let form
 
-	const { session, supabase, profile } = data
+	let { session, supabase, profile } = data
 	$: ({ session, supabase, profile } = data)
 
 	let profileForm: HTMLFormElement

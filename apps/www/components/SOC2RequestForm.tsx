@@ -169,7 +169,7 @@ const SOC2RequestForm = () => {
                     />
                   </div>
 
-                  <div className="">
+                  <div>
                     <Input.TextArea
                       id="details"
                       name="details"

@@ -30,7 +30,7 @@ const Error404 = () => {
                 <a href="/">
                   <Image
                     src={
-                      resolvedTheme === 'dark'
+                      resolvedTheme?.includes('dark')
                         ? supabaseLogoWordmarkDark
                         : supabaseLogoWordmarkLight
                     }
@@ -64,13 +64,9 @@ const Error404 = () => {
             </p>
           </div>
           <div className="flex items-center space-x-4">
-            <Link href="/">
-              <a>
-                <Button size="small" className="text-white">
-                  Head back
-                </Button>
-              </a>
-            </Link>
+            <Button asChild size="small" className="text-white">
+              <Link href="/">Head back</Link>
+            </Button>
           </div>
         </div>
       </div>

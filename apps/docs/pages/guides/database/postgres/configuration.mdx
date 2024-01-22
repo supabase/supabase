@@ -29,13 +29,13 @@ You can also update the statement timeout for a session:
 set statement_timeout to 60000; -- 1 minute in milliseconds
 ```
 
-### Statement Optimization
+### Statement optimization
 
 All Supabase projects come with the [`pg_stat_statements`](https://www.postgresql.org/docs/current/pgstatstatements.html) extension installed, which tracks planning and execution statistics for all statements executed against it. These statistics can be used in order to diagnose the performance of your project.
 
 This data can further be used in conjunction with the [`explain`](https://www.postgresql.org/docs/current/using-explain.html) functionality of Postgres to optimize your usage.
 
-## Managing Timezones
+## Managing timezones
 
 Every Supabase database is set to UTC timezone by default. We strongly recommend keeping it this way, even if your users are in a different location.
 This is because it makes it much easier to calculate differences between timezones if you adopt the mental model that "everything in my database is in UTC time".

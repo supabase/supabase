@@ -222,9 +222,22 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  await supabase.auth.getSession()
+  await supabase.auth.getUser()
 
   return response
+}
+
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * Feel free to modify this pattern to include more paths.
+     */
+    '/((?!_next/static|_next/image|favicon.ico).*)',
+  ],
 }
 ```
 
@@ -302,39 +315,27 @@ export default async function Page () {
 
 <TabPanel id="get-server-side-props" label="getServerSideProps">
 
-Cookies have many edge cases when not using a helper function, therefore we recommend using the `cookies` package in `getServerSideProps` to provide a similar API to the Next.js `cookies` function in the App Router.
-
-```bash
-npm install cookies
-```
-
-Types can optionally be installed as well.
-
-```bash
-npm install --save-dev @types/cookies
-```
-
 ```ts index.tsx
 import { type GetServerSidePropsContext } from 'next'
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
-import Cookies from 'cookies'
+import { createServerClient, type CookieOptions, serialize } from '@supabase/ssr'
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
-  const cookies = new Cookies(context.req, context.res)
-
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         get(name: string) {
-          return cookies.get(name)
+          return context.req.cookies[name];
         },
         set(name: string, value: string, options: CookieOptions) {
-          cookies.set(name, value, options)
+          context.res.appendHeader(
+            "Set-Cookie",
+            serialize(name, value, options)
+          );
         },
         remove(name: string, options: CookieOptions) {
-          cookies.set(name, '', options)
+          context.res.appendHeader("Set-Cookie", serialize(name, "", options));
         },
       },
     }
@@ -356,8 +357,6 @@ from `supabase-js`.
 import { createClient } from '@supabase/supabase-js'
 
 export const getStaticProps = async () => {
-  const cookies = new Cookies(context.req, context.res)
-
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -371,42 +370,27 @@ export const getStaticProps = async () => {
 
 <TabPanel id="api-route" label="API Route">
 
-Cookies have many edge cases when not using a helper function, therefore, we recommend using the `cookies` package in API Routes to provide a similar API to the Next.js `cookies` function in the App Router.
-
-```bash
-npm install cookies
-```
-
-Types can optionally be installed as well.
-
-```bash
-npm install --save-dev @types/cookies
-```
-
 ```ts index.tsx
-import { createServerClient, type CookieOptions } from "@supabase/ssr"
+import { createServerClient, type CookieOptions, serialize } from "@supabase/ssr"
 import { type NextApiRequest, type NextApiResponse } from "next"
-import Cookies from "cookies"
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const cookies = new Cookies(req, res)
-
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         get(name: string) {
-          return cookies.get(name)
+          return req.cookies[name];
         },
         set(name: string, value: string, options: CookieOptions) {
-          cookies.set(name, value, options)
+          res.setHeader("Set-Cookie", serialize(name, value, options));
         },
         remove(name: string, options: CookieOptions) {
-          cookies.set(name, "", options)
+          res.setHeader("Set-Cookie", serialize(name, "", options));
         },
       },
     }
@@ -439,7 +423,13 @@ export default function Index () {
 </TabPanel>
 <TabPanel id="sveltekit" label="SvelteKit">
 
-Creating a Supabase client with the `ssr` package automatically configures it to use Cookies. This means your user's session is available throughout the entire SvelteKit stack - page, layout, server, hooks. It just works!
+Creating a Supabase client with the `ssr` package automatically configures it to use Cookies. This means your user's session is available throughout the entire SvelteKit stack - page, layout, server, hooks.
+
+<Admonition type="danger">
+
+Beware when accessing the session object on the server, because it is not revalidated on every request from the client. That means the sender can tamper with unencoded data in the session object. If you need to verify the integrity of user data for server logic, call `auth.getUser` instead, which will query the Supabase Auth server for trusted user data.
+
+</Admonition>
 
 <Tabs
   scrollable
@@ -465,11 +455,17 @@ export const handle: Handle = async ({ event, resolve }) => {
   event.locals.supabase = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
     cookies: {
       get: (key) => event.cookies.get(key),
+      /**
+       * Note: You have to add the `path` variable to the
+       * set and remove method due to sveltekit's cookie API
+       * requiring this to be set, setting the path to an empty string
+       * will replicate previous/standard behaviour (https://kit.svelte.dev/docs/types#public-types-cookies)
+       */
       set: (key, value, options) => {
-        event.cookies.set(key, value, options)
+        event.cookies.set(key, value, { ...options, path: '' })
       },
       remove: (key, options) => {
-        event.cookies.delete(key, options)
+        event.cookies.delete(key, { ...options, path: '' })
       },
     },
   })
@@ -496,7 +492,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 </TabPanel>
 
-<TabPanel id="layout" label="Layout Load">
+<TabPanel id="layout" label="Root Layout Load">
 
 <Admonition type="note">
 
@@ -533,6 +529,20 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
   } = await supabase.auth.getSession()
 
   return { supabase, session }
+}
+```
+
+</TabPanel>
+
+<TabPanel id="layout-server" label="Root Server Layout">
+
+```ts +layout.server.ts
+import type { LayoutServerLoad } from './$types'
+
+export const load: LayoutServerLoad = async ({ locals: { getSession } }) => {
+  return {
+    session: await getSession(),
+  }
 }
 ```
 
@@ -589,6 +599,16 @@ export const actions: Actions = {
 </TabPanel>
 <TabPanel id="astro" label="Astro">
 
+By default, Astro apps are static. This means the requests for data happen at build time, rather than when the user requests a page. At build time, there is no user, session or cookies. Therefore, we need to configure Astro for Server-side Rendering (SSR) if you want data to be fetched dynamically per request.
+
+```js astro.config.mjs
+import { defineConfig } from 'astro/config'
+
+export default defineConfig({
+  output: 'server',
+})
+```
+
 <Tabs
   scrollable
   size="small"
@@ -600,7 +620,7 @@ export const actions: Actions = {
 
 ```ts index.astro
 ---
-import { createServerClient, type CookieOptions } from "@suapbase/ssr";
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
 
 const supabase = createServerClient(
   import.meta.env.PUBLIC_SUPABASE_URL,
@@ -633,6 +653,37 @@ const supabase = createServerClient(
     import.meta.env.PUBLIC_SUPABASE_ANON_KEY
   );
 </script>
+```
+
+</TabPanel>
+
+<TabPanel id="astro-server-endpoint" label="Server Endpoint">
+
+```ts route.ts
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import type { APIContext } from "astro";
+
+export async function GET(context: APIContext) {
+  const supabase = createServerClient(
+    import.meta.env.PUBLIC_SUPABASE_URL,
+    import.meta.env.PUBLIC_SUPABASE_ANON_KEY,
+    {
+      cookies: {
+        get(key: string) {
+          return context.cookies.get(key)?.value;
+        },
+        set(key: string, value: string, options: CookieOptions) {
+          context.cookies.set(key, value, options);
+        },
+        remove(key: string, options) {
+          context.cookies.delete(key, options);
+        },
+      },
+    }
+  );
+
+  return ...
+}
 ```
 
 </TabPanel>

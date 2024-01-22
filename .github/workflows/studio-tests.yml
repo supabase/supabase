@@ -7,12 +7,12 @@ on:
   push:
     branches: [master, studio]
     paths:
-      - 'studio/**'
+      - 'apps/studio/**'
       - 'package-lock.json'
   pull_request:
     branches: [master, studio]
     paths:
-      - 'studio/**'
+      - 'apps/studio/**'
       - 'package-lock.json'
 
 # Cancel old builds on new commit for same workflow + branch/PR
@@ -35,7 +35,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           sparse-checkout: |
-            studio
+            apps/studio
             packages
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3

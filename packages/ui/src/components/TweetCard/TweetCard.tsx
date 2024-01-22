@@ -10,15 +10,15 @@ function TweetCard(props: TweetCard) {
   return (
     <div
       className="
-      dark:bg-scale-300 border-scale-300 dark:border-scale-400
-      rounded-2xl border bg-white p-6
+      bg-surface-100 border-overlay
+      rounded-2xl border p-6
       drop-shadow-sm
     "
     >
       <div className="relative">
         <div className="flex items-center gap-2">
           {props.img_url ? (
-            <div className="h-10 w-10 overflow-hidden rounded-full border dark:border-gray-600">
+            <div className="h-10 w-10 overflow-hidden rounded-full border border-control">
               <Image
                 src={props.img_url}
                 layout="responsive"
@@ -30,7 +30,7 @@ function TweetCard(props: TweetCard) {
           ) : (
             <div className="w-6" />
           )}
-          <p className="text-scale-1200 text-sm font-medium">{props.handle}</p>
+          <p className="text-foreground text-sm font-medium">{props.handle}</p>
           <div
             className="absolute -left-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full"
             style={{ background: '#000' }}
@@ -47,7 +47,7 @@ function TweetCard(props: TweetCard) {
         </div>
       </div>
 
-      <p className="text-scale-900 mt-3 text-base">"{props.quote}"</p>
+      <p className="text-foreground-muted mt-3 text-base">"{props.quote}"</p>
     </div>
   )
 }

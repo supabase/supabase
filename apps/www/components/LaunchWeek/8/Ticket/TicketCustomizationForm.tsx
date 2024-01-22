@@ -50,7 +50,9 @@ const TicketCustomizationForm = ({ supabase, user }: Props) => {
     <form className="w-full flex flex-col gap-2 mt-4" onChange={() => debouncedChangeHandler()}>
       <div className="flex items-center justify-between">
         {!IS_SAVED && !HAS_ERROR && (
-          <span className="opacity-0 animate-fade-in text-lighter text-xs">Connected account</span>
+          <span className="opacity-0 animate-fade-in text-foreground-lighter text-xs">
+            Connected account
+          </span>
         )}
         {IS_SAVED && <span className="opacity-0 animate-fade-in text-xs text-brand">Saved</span>}
         {HAS_ERROR && (
@@ -86,8 +88,8 @@ const TicketCustomizationForm = ({ supabase, user }: Props) => {
             strokeWidth={2}
             className={[
               'w-3',
-              IS_SAVING && 'text-scale-300',
-              !!formData.role ? 'text-brand' : 'text-scale-300',
+              IS_SAVING && 'text-background-surface-300',
+              !!formData.role ? 'text-brand' : 'text-background-surface-300',
             ].join(' ')}
           />
         }
@@ -108,8 +110,8 @@ const TicketCustomizationForm = ({ supabase, user }: Props) => {
             strokeWidth={2}
             className={[
               'w-3',
-              IS_SAVING && 'text-scale-300',
-              !!formData.company ? 'text-brand' : 'text-scale-300',
+              IS_SAVING && 'text-background-surface-300',
+              !!formData.company ? 'text-brand' : 'text-background-surface-300',
             ].join(' ')}
           />
         }
@@ -130,8 +132,8 @@ const TicketCustomizationForm = ({ supabase, user }: Props) => {
             strokeWidth={2}
             className={[
               'w-3 flex spin',
-              IS_SAVING && 'text-scale-300',
-              !!formData.location ? 'text-brand' : 'text-scale-300',
+              IS_SAVING && 'text-background-surface-300',
+              !!formData.location ? 'text-brand' : 'text-background-surface-300',
             ].join(' ')}
           />
         }
