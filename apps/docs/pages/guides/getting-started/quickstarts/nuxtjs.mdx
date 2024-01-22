@@ -57,29 +57,62 @@ export const meta = {
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={3}>
-    <StepHikeCompact.Details title="Install the Supabase client library">
+    <StepHikeCompact.Details title="Install the Supabase Nuxt Module">
 
-      The fastest way to get started is to use the `supabase-js` client library which provides a convenient interface for working with Supabase from a NuxtJS app.
+      The fastest way to get started is to use the `@nuxtjs/supabase` Module which provides a convenient set of composables for working with Supabase from a NuxtJS app.
 
-      Navigate to the NuxtJS app and install `supabase-js`.
+      Navigate to the NuxtJS app and install `@nuxtjs/supabase`.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
       ```bash Terminal
-      cd my-app && npm install @supabase/supabase-js
+      cd my-app && npm install @nuxtjs/supabase
       ```
 
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
-
   <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="Add the module">
+      
+      Add `@nuxtjs/supabase` to the modules list in `nuxt.config.ts`.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```ts nuxt.config.ts
+      export default defineNuxtConfig({
+        modules: ['@nuxtjs/supabase'],
+      })
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+  <StepHikeCompact.Step step={5}>
+    <StepHikeCompact.Details title="Add your environment variables">
+
+    In `src/.env`, create two vairables using your [Project URL and public API (anon) key](https://supabase.com/dashboard/project/_/settings/api).
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```env src/.env
+      SUPABASE_URL="https://example.supabase.co"
+      SUPABASE_KEY="<your_key>"
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+  <StepHikeCompact.Step step={6}>
     <StepHikeCompact.Details title="Query data from the app">
 
-    In `src/App.vue`, create a Supabase client using your [Project URL and public API (anon) key](https://supabase.com/dashboard/project/_/settings/api).
-
+    In `src/App.vue`, use the [useSupabaseClient](https://supabase.nuxtjs.org/usage/composables/usesupabaseclient) composable to create a supabase client.
     Replace the existing content in your `src/App.vue` file with the following code.
 
     </StepHikeCompact.Details>
@@ -88,8 +121,7 @@ export const meta = {
 
       ```vue src/App.vue
       <script setup>
-      import { createClient } from '@supabase/supabase-js'
-      const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
+      const supabase = useSupabaseClient()
       const countries = ref([])
 
       async function getCountries() {
@@ -113,7 +145,7 @@ export const meta = {
 
   </StepHikeCompact.Step>
 
-  <StepHikeCompact.Step step={5}>
+  <StepHikeCompact.Step step={7}>
     <StepHikeCompact.Details title="Start the app">
 
     Start the app, navigate to http://localhost:3000 in the browser, open the browser console, and you should see the list of countries.
