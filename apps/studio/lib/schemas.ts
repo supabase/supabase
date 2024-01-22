@@ -9,6 +9,6 @@ export const passwordSchema = yup.object({
     .string()
     .password()
     .required()
-    .max(72, 'Password must be at most 72 characters')
+    .max(72, 'Password cannot exceed 72 characters')
     .label('Password'),
 })
