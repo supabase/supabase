@@ -46,7 +46,7 @@ export interface SupportFormProps {
 const SupportForm = ({ setSentCategory }: SupportFormProps) => {
   const { ui } = useStore()
   const { isReady } = useRouter()
-  const { ref, subject, category, message } = useParams()
+  const { ref, slug, subject, category, message } = useParams()
 
   const uploadButtonRef = useRef()
   const enableFreeSupport = useFlag('enableFreeSupport')
@@ -90,6 +90,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
 
   const projects = [...(allProjects ?? []), ...projectDefaults]
   const selectedProjectFromUrl = projects.find((project) => project.ref === ref)
+  const selectedOrganizationFromUrl = organizations?.find((org) => org.slug === slug)
   const selectedCategoryFromUrl = CATEGORY_OPTIONS.find((option) => {
     if (option.value.toLowerCase() === ((category as string) ?? '').toLowerCase()) return option
   })
@@ -103,7 +104,9 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
   )
 
   const selectedOrganizationSlug =
-    selectedProjectRef !== 'no-project'
+    selectedOrganizationFromUrl !== undefined
+      ? selectedOrganizationFromUrl.slug
+      : selectedProjectRef !== 'no-project'
       ? organizations?.find((org) => {
           const project = projects.find((project) => project.ref === selectedProjectRef)
           return org.id === project?.organization_id
@@ -347,6 +350,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                             key={`option-${option.ref}`}
                             label={option.name || ''}
                             value={option.ref}
+                            className="!w-72"
                           >
                             <span>{option.name}</span>
                             <span className="block text-xs opacity-50">{organization?.name}</span>
@@ -362,6 +366,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                           key={`option-${option.value}`}
                           label={option.label}
                           value={option.value}
+                          className="!w-72"
                         >
                           <span>{option.label}</span>
                           <span className="block text-xs opacity-50">{option.description}</span>

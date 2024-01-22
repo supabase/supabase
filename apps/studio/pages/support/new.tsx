@@ -7,24 +7,18 @@ import { Button, IconLoader, IconTool } from 'ui'
 
 import Success from 'components/interfaces/Support/Success'
 import SupportForm from 'components/interfaces/Support/SupportForm'
+import { LayoutWrapper } from 'components/layouts/LayoutWrapper'
 import { usePlatformStatusQuery } from 'data/platform/platform-status-query'
-import { useFlag, withAuth } from 'hooks'
+import { withAuth } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 
 const SupportPage = () => {
   const [sentCategory, setSentCategory] = useState<string>()
-
-  const ongoingIncident = useFlag('ongoingIncident')
-  const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
-
   const { data, isLoading } = usePlatformStatusQuery()
   const isHealthy = data?.isHealthy
 
   return (
-    <div
-      className="relative flex overflow-y-auto overflow-x-hidden"
-      style={{ height: maxHeight, maxHeight }}
-    >
+    <LayoutWrapper className="relative flex overflow-y-auto overflow-x-hidden">
       <div className="mx-auto my-8 max-w-2xl px-4 lg:px-6">
         <div className="space-y-12 py-8">
           <div className="flex justify-between items-center">
@@ -97,7 +91,7 @@ const SupportPage = () => {
           </div>
         </div>
       </div>
-    </div>
+    </LayoutWrapper>
   )
 }
 

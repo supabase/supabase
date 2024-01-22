@@ -62,7 +62,8 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
                 Compute instances are billed hourly and you can scale up or down at any time if you
                 need extra performance. You'll only be charged at the end of the month for the hours
                 you've used. Paid plans come with $10 in Compute Credits to cover one Starter
-                instance or parts of any other instance. Read more on{' '}
+                instance or parts of any other instance. Compute Credits are given to you not only
+                for the first month but for every month while you are on a paid plan. Read more on{' '}
                 <Link
                   href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
                   target="_blank"

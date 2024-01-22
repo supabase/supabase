@@ -1,8 +1,8 @@
+import { useParams } from 'common'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
 
-import { useParams } from 'common/hooks'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import AISettingsModal from 'components/ui/AISettingsModal'
 import Connecting from 'components/ui/Loading/Loading'
@@ -31,11 +31,13 @@ const routesToIgnoreProjectDetailsRequest = [
   '/project/[ref]/settings/database',
   '/project/[ref]/settings/storage',
   '/project/[ref]/settings/infrastructure',
+  '/project/[ref]/settings/addons',
 ]
 
 const routesToIgnoreDBConnection = [
   '/project/[ref]/branches',
   '/project/[ref]/database/backups/scheduled',
+  '/project/[ref]/settings/addons',
 ]
 
 const routesToIgnorePostgrestConnection = [
@@ -43,6 +45,7 @@ const routesToIgnorePostgrestConnection = [
   '/project/[ref]/settings/general',
   '/project/[ref]/settings/database',
   '/project/[ref]/settings/infrastructure',
+  '/project/[ref]/settings/addons',
 ]
 
 export interface ProjectLayoutProps {
