@@ -36,6 +36,7 @@ import { ImportContent } from './TableEditor/TableEditor.types'
 export interface SidePanelEditorProps {
   editable?: boolean
   selectedTable?: PostgresTable
+  includeColumns?: boolean // This is mainly used for invalidating useTablesQuery
 
   // Because the panel is shared between grid editor and database pages
   // Both require different responses upon success of these events
@@ -45,6 +46,7 @@ export interface SidePanelEditorProps {
 const SidePanelEditor = ({
   editable = true,
   selectedTable,
+  includeColumns = false,
   onTableCreated = noop,
 }: SidePanelEditorProps) => {
   const snap = useTableEditorStateSnapshot()
@@ -268,7 +270,7 @@ const SidePanelEditor = ({
     if (!project) return console.error('Project is required')
     let realtimePublication = (publications ?? []).find((pub) => pub.name === 'supabase_realtime')
     const publicTables = await queryClient.fetchQuery({
-      queryKey: tableKeys.list(project.ref, 'public'),
+      queryKey: tableKeys.list(project.ref, 'public', includeColumns),
       queryFn: ({ signal }) =>
         getTables(
           { projectRef: project.ref, connectionString: project.connectionString, schema: 'public' },
@@ -369,7 +371,7 @@ const SidePanelEditor = ({
         if (isRealtimeEnabled) await updateTableRealtime(table, isRealtimeEnabled)
 
         await Promise.all([
-          queryClient.invalidateQueries(tableKeys.list(project?.ref, table.schema)),
+          queryClient.invalidateQueries(tableKeys.list(project?.ref, table.schema, includeColumns)),
           queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
         ])
 
@@ -390,7 +392,7 @@ const SidePanelEditor = ({
         if (isRealtimeEnabled) await updateTableRealtime(table, true)
 
         await Promise.all([
-          queryClient.invalidateQueries(tableKeys.list(project?.ref, table.schema)),
+          queryClient.invalidateQueries(tableKeys.list(project?.ref, table.schema, includeColumns)),
           queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
         ])
 
