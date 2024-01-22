@@ -182,9 +182,17 @@ const PlanUpdateSidePanel = () => {
               const price = planMeta?.price ?? 0
               const isDowngradeOption = planMeta?.change_type === 'downgrade'
               const isCurrentPlan = planMeta?.id === subscription?.plan?.id
+              const features = billingViaPartner ? plan.featuresPartner : plan.features
 
               if (plan.id === 'tier_enterprise') {
-                return <EnterpriseCard key={plan.id} plan={plan} isCurrentPlan={isCurrentPlan} />
+                return (
+                  <EnterpriseCard
+                    key={plan.id}
+                    plan={plan}
+                    isCurrentPlan={isCurrentPlan}
+                    billingViaPartner={billingViaPartner}
+                  />
+                )
               }
 
               return (
@@ -287,7 +295,7 @@ const PlanUpdateSidePanel = () => {
                     <div className="border-t my-6" />
 
                     <ul role="list">
-                      {plan.features.map((feature) => (
+                      {features.map((feature) => (
                         <li key={feature} className="flex py-2">
                           <div className="w-[12px]">
                             <IconCheck
