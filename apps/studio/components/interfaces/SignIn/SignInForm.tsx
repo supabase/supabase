@@ -16,7 +16,7 @@ const signInSchema = object({
   email: string().email('Must be a valid email').required('Email is required'),
   password: string()
     .required('Password is required')
-    .max(72, 'Password must be at most 72 characters'),
+    .max(72, 'Password cannot exceed 72 characters'),
 })
 
 const SignInForm = () => {
