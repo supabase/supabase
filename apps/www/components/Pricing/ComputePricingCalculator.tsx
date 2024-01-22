@@ -1,4 +1,6 @@
+import { InformationCircleIcon } from '@heroicons/react/outline'
 import React, { useEffect, useState } from 'react'
+import ReactTooltip from 'react-tooltip'
 import {
   Badge,
   Button,
@@ -7,6 +9,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   IconChevronDown,
+  IconInfo,
+  IconTrash2,
   Slider_Shadcn_,
   cn,
 } from 'ui'
@@ -56,14 +60,20 @@ const ComputePricingCalculator = () => {
     setActiveInstances(newArray)
   }
 
-  const calculatePrice = () => {
-    let aggregatePrice = 0
+  const calculateComputeAggregate = (price: number) => {
     activeInstances.map(
       (activeInstance: any) =>
-        (aggregatePrice += parsePrice(findIntanceValueByColumn(activeInstance, 'pricing')))
+        (price += parsePrice(findIntanceValueByColumn(activeInstance, 'pricing')))
     )
 
-    return setActivePrice(aggregatePrice + activePlan.price - COMPUTE_CREDITS)
+    return price
+  }
+
+  const calculatePrice = () => {
+    let aggregatePrice = 0
+    const computeAggregate = calculateComputeAggregate(aggregatePrice)
+
+    return setActivePrice(computeAggregate + activePlan.price - COMPUTE_CREDITS)
   }
 
   useEffect(() => {
@@ -81,18 +91,35 @@ const ComputePricingCalculator = () => {
     setActiveInstances(newArray)
   }
 
+  const PriceSummary = () => (
+    <div className="flex flex-col gap-1 text-lighter text-right leading-4 text-xs w-full border-b pb-1 mb-1">
+      <div className="flex items-center justify-between">
+        <span>Plan</span>
+        <span className="text-light font-mono">{activePlan.price}</span>
+      </div>
+      <div className="flex items-center justify-between">
+        <span>Compute</span>
+        <span className="text-light font-mono">{calculateComputeAggregate(0)}</span>
+      </div>
+      <div className="flex items-center justify-between">
+        <span>Compute credits</span>
+        <span className="text-light font-mono">-{COMPUTE_CREDITS}</span>
+      </div>
+    </div>
+  )
+
   return (
-    <div className="flex flex-col gap-4 items-start xl:pl-20 mt-4 md:mt-0">
-      <div className="pb-4 flex justify-between items-center border-b mb-1 w-full">
+    <div className="flex flex-col lg:flex-row gap-4 items-start mt-4 md:mt-0">
+      <div className="flex flex-col gap-4 items-start flex-1 w-full lg:w-auto border-b lg:border-b-0 lg:border-r p-0 lg:pr-4">
         <DropdownMenu>
           <DropdownMenuTrigger>
             <Button
               size="tiny"
               type="outline"
               iconRight={<IconChevronDown />}
-              className="w-full min-w-[100px] flex justify-between items-center py-2"
+              className="w-full min-w-[130px] flex justify-between items-center py-2"
             >
-              {activePlan.name}
+              Plan: {activePlan.name}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom" align="start">
@@ -103,79 +130,88 @@ const ComputePricingCalculator = () => {
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
-        <div className="flex flex-col text-lighter text-right leading-4 text-sm">
-          Estimated Price<span className="text-foreground text-base font-mono">{activePrice}$</span>
-        </div>
-      </div>
-      <div
-        className={cn(
-          'w-full flex flex-col items-start gap-4',
-          activeInstances.length === 1 && 'border-none'
-        )}
-      >
-        {activeInstances.map((activeInstance, index) => (
-          <div
-            className={cn(
-              'w-full flex flex-col gap-4 border-b border-muted pb-3 mb-1',
-              activeInstances.length === 1 && 'border-none'
-            )}
-            key={`instance-${activeInstance.position}`}
-          >
-            <Slider_Shadcn_
-              onValueChange={(value) => handleUpdateInstance(activeInstance.position, value)}
-              min={1}
-              max={priceSteps.length}
-              step={1}
-              className="w-full"
-            />
-            <div className="flex items-center justify-between text-sm">
-              <div className="flex items-center gap-2">
-                <Badge
-                  className="rounded-md w-16 text-center flex justify-center"
-                  color={
-                    findIntanceValueByColumn(activeInstance, 'plan') === 'Starter'
-                      ? 'scale'
-                      : 'brand'
-                  }
-                >
-                  {findIntanceValueByColumn(activeInstance, 'plan')}
-                </Badge>
-                <span className="text-lighter">
-                  {findIntanceValueByColumn(activeInstance, 'memory')} /{' '}
-                  {findIntanceValueByColumn(activeInstance, 'cpu')} CPU
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                {activeInstance.position !== 0 && (
-                  <button
-                    className="text-xs p-1 text-lighter hover:text-foreground rounded"
-                    onClick={() => removeInstance(activeInstance.position)}
+        <div
+          className={cn(
+            'w-full flex flex-col items-start gap-4 mt-2',
+            activeInstances.length === 1 && 'border-none'
+          )}
+        >
+          {activeInstances.map((activeInstance) => (
+            <div
+              className={cn(
+                'w-full flex flex-col gap-4 border-b border-muted pb-3 mb-1',
+                activeInstances.length === 1 && 'border-none'
+              )}
+              key={`instance-${activeInstance.position}`}
+            >
+              <Slider_Shadcn_
+                onValueChange={(value) => handleUpdateInstance(activeInstance.position, value)}
+                min={1}
+                max={priceSteps.length}
+                step={1}
+                className="w-full"
+              />
+              <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center gap-2">
+                  <Badge
+                    className="rounded-md w-16 text-center flex justify-center"
+                    color={
+                      findIntanceValueByColumn(activeInstance, 'plan') === 'Starter'
+                        ? 'scale'
+                        : 'brand'
+                    }
                   >
-                    Remove
-                  </button>
-                )}
+                    {findIntanceValueByColumn(activeInstance, 'plan')}
+                  </Badge>
+                  <span className="text-lighter text-[13px] inline lg:hidden xl:inline">
+                    {findIntanceValueByColumn(activeInstance, 'memory')} /{' '}
+                    {findIntanceValueByColumn(activeInstance, 'cpu')} CPU
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  {activeInstance.position !== 0 && (
+                    <button
+                      aria-label="Remove item"
+                      title="Remove item"
+                      className="text-xs p-1 text-lighter hover:text-foreground rounded"
+                      onClick={() => removeInstance(activeInstance.position)}
+                    >
+                      <IconTrash2 className="w-3" />
+                    </button>
+                  )}
 
-                <span>{findIntanceValueByColumn(activeInstance, 'pricing')}$</span>
+                  <span>{findIntanceValueByColumn(activeInstance, 'pricing')}</span>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
+        <div>
+          {activeInstances.length < 3 && (
+            <Button
+              size="tiny"
+              type="outline"
+              onClick={() =>
+                setActiveInstances([
+                  ...activeInstances,
+                  { ...computeInstances[0], position: activeInstances.length },
+                ])
+              }
+            >
+              Add Instance
+            </Button>
+          )}
+        </div>
       </div>
-      <div>
-        {activeInstances.length < 3 && (
-          <Button
-            size="tiny"
-            type="outline"
-            onClick={() =>
-              setActiveInstances([
-                ...activeInstances,
-                { ...computeInstances[0], position: activeInstances.length },
-              ])
-            }
-          >
-            Add Instance
-          </Button>
-        )}
+      <div className="pb-4 flex justify-between items-center mb-1 w-full lg:w-1/3">
+        <div className="flex flex-col text-lighter items-end text-right leading-4 text-xs w-full">
+          <PriceSummary />
+          <div className="flex items-center gap-1 w-full justify-between">
+            <span>Estimate</span>
+            <span className="text-foreground font-mono text-base">${activePrice}</span>
+          </div>
+          <ReactTooltip effect="solid" className="!max-w-[320px] whitespace-pre-line" />
+        </div>
       </div>
     </div>
   )
