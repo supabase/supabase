@@ -171,9 +171,9 @@ function CaseStudyPage(props: any) {
                           </span>
                         </div>
 
-                        {props.blog.misc.map((x: any) => {
+                        {props.blog.misc.map((x: any, i: number) => {
                           return (
-                            <div className="flex flex-col gap-0">
+                            <div  key={i}className="flex flex-col gap-0">
                               <span className="text-foreground-lighter">{x.label}</span>
                               <span className="text-foreground-light">{x.text}</span>
                             </div>
