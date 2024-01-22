@@ -32,8 +32,8 @@ const PricingComputeAnimation = () => {
         }-active.svg`}
         alt="Compute addon grid"
         className={cn(
-          'absolute inset-0 z-20 transition-all opacity-0 !ease-[.76,0,.23,1] duration-500 delay-500 -translate-y-[18%]',
-          triggerAnimation && 'opacity-100 -translate-y-[8%]'
+          'absolute inset-0 z-20 transition-all opacity-0 !ease-[.76,0,.23,1] duration-500 delay-500 -translate-y-[18%] blur-md',
+          triggerAnimation && 'opacity-100 -translate-y-[8%] blur-none'
         )}
       />
       <Image
@@ -43,8 +43,8 @@ const PricingComputeAnimation = () => {
         }-active.svg`}
         alt="Compute addon grid"
         className={cn(
-          'absolute inset-0 z-20 transition-all opacity-0 !ease-[.76,0,.23,1] duration-500 delay-1000 -translate-y-[24%]',
-          triggerAnimation && 'opacity-100 -translate-y-[16%]'
+          'absolute inset-0 z-20 transition-all opacity-0 !ease-[.76,0,.23,1] duration-500 delay-1000 -translate-y-[24%] blur-md',
+          triggerAnimation && 'opacity-100 -translate-y-[16%] blur-none'
         )}
       />
       <Image
