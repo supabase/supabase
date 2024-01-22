@@ -7,6 +7,7 @@ export interface PricingInformation {
   priceLabel?: string
   priceMonthly: number | string
   warning?: string
+  warningPartner?: string
   description: string
   preface: string
   features: string[]
@@ -25,6 +26,7 @@ export const plans: PricingInformation[] = [
     priceLabel: '',
     priceMonthly: 0,
     warning: 'Limit of 2 free organizations',
+    warningPartner: 'Limit of 1 free organization',
     description: 'Perfect for passion projects & simple websites.',
     preface: 'Get started with:',
     features: [

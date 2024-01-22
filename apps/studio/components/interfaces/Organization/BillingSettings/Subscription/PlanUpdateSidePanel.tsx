@@ -178,11 +178,14 @@ const PlanUpdateSidePanel = () => {
           <div className="py-6 grid grid-cols-12 gap-3">
             {subscriptionsPlans.map((plan) => {
               const planMeta = availablePlans.find((p) => p.id === plan.id.split('tier_')[1])
-              const tierMeta = subscriptionsPlans.find((it) => it.id === plan.id)
               const price = planMeta?.price ?? 0
               const isDowngradeOption = planMeta?.change_type === 'downgrade'
               const isCurrentPlan = planMeta?.id === subscription?.plan?.id
               const features = billingViaPartner ? plan.featuresPartner : plan.features
+              const warning =
+                billingViaPartner && plan.warningPartner
+                  ? plan.warningPartner
+                  : plan.warning ?? null
 
               if (plan.id === 'tier_enterprise') {
                 return (
@@ -228,11 +231,11 @@ const PlanUpdateSidePanel = () => {
                       ) : (
                         <p className="text-foreground text-lg">${price}</p>
                       )}
-                      <p className="text-foreground-light text-sm">{tierMeta?.costUnit}</p>
+                      <p className="text-foreground-light text-sm">{plan.costUnit}</p>
                     </div>
-                    <div className={clsx('flex mt-1 mb-4', !tierMeta?.warning && 'opacity-0')}>
+                    <div className={clsx('flex mt-1 mb-4', !warning && 'opacity-0')}>
                       <div className="bg-background text-brand-600 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-xs">
-                        {tierMeta?.warning}
+                        {warning}
                       </div>
                     </div>
                     {isCurrentPlan ? (
