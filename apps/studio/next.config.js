@@ -6,20 +6,63 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 // Required for nextjs standalone build
 const path = require('path')
 
-// This file sets a custom webpack configuration to use your Next.js app
-// with Sentry.
-// https://nextjs.org/docs/api-reference/next.config.js/introduction
-// https://docs.sentry.io/platforms/javascript/guides/nextjs/
+const API_URL = new URL(process.env.NEXT_PUBLIC_API_URL).origin
+const SUPABASE_URL = new URL(process.env.SUPABASE_URL).origin
+const GOTRUE_URL = new URL(process.env.NEXT_PUBLIC_GOTRUE_URL).origin
+const SUPABASE_PROJECTS_URL = 'https://*.supabase.co'
+const SUPABASE_STAGING_PROJECTS_URL = 'https://*.supabase.red'
+const SUPABASE_COM_URL = 'https://supabase.com'
+const CLOUDFLARE_CDN_URL = 'https://cdnjs.cloudflare.com'
+const HCAPTCHA_SUBDOMAINS_URL = 'https://*.hcaptcha.com'
+const HCAPTCHA_ASSET_URL = 'https://newassets.hcaptcha.com'
+const HCAPTCHA_JS_URL = 'https://js.hcaptcha.com'
+const CONFIGCAT_URL = 'https://cdn-global.configcat.com'
+const STRIPE_SUBDOMAINS_URL = 'https://*.stripe.com'
+const STRIPE_JS_URL = 'https://js.stripe.com'
+const STRIPE_NETWORK_URL = 'https://*.stripe.network'
+const CLOUDFLARE_URL = 'https://www.cloudflare.com'
+const ONE_ONE_ONE_ONE_URL = 'https://1.1.1.1'
+const VERCEL_URL = 'https://vercel.com'
+const VERCEL_INSIGHTS_URL = 'https://*.vercel-insights.com'
+const VERCEL_LIVE_URL = 'https://vercel.live'
+// used by vercel live preview
+const PUSHER_URL = 'https://*.pusher.com'
+
+const DEFAULT_SRC_URLS = `${API_URL} ${SUPABASE_URL} ${GOTRUE_URL} ${SUPABASE_PROJECTS_URL} ${HCAPTCHA_SUBDOMAINS_URL} ${CONFIGCAT_URL} ${STRIPE_SUBDOMAINS_URL} ${STRIPE_NETWORK_URL} ${CLOUDFLARE_URL} ${ONE_ONE_ONE_ONE_URL} ${VERCEL_INSIGHTS_URL}`
+const SCRIPT_SRC_URLS = `${CLOUDFLARE_CDN_URL} ${HCAPTCHA_JS_URL} ${STRIPE_JS_URL}`
+const FRAME_SRC_URLS = `${HCAPTCHA_ASSET_URL} ${STRIPE_JS_URL}`
+const IMG_SRC_URLS = `${SUPABASE_COM_URL}`
+const STYLE_SRC_URLS = `${CLOUDFLARE_CDN_URL}`
+const FONT_SRC_URLS = `${CLOUDFLARE_CDN_URL}`
 
 const csp = [
-  "frame-ancestors 'none';",
-  // IS_PLATFORM
-  process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' && process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
-    ? 'upgrade-insecure-requests;'
-    : '',
-]
-  .filter(Boolean)
-  .join(' ')
+  ...(process.env.VERCEL_ENV === 'preview' || process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
+    ? [
+        `default-src 'self' ${DEFAULT_SRC_URLS} ${SUPABASE_STAGING_PROJECTS_URL} ${VERCEL_LIVE_URL} ${PUSHER_URL};`,
+        `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${SCRIPT_SRC_URLS} ${VERCEL_LIVE_URL};`,
+        `frame-src 'self' ${FRAME_SRC_URLS} ${VERCEL_LIVE_URL};`,
+        `img-src 'self' blob: data: ${IMG_SRC_URLS} ${VERCEL_URL};`,
+        `style-src 'self' 'unsafe-inline' ${STYLE_SRC_URLS} ${VERCEL_LIVE_URL};`,
+        `font-src 'self' ${FONT_SRC_URLS} ${VERCEL_LIVE_URL};`,
+      ]
+    : [
+        `default-src 'self' ${DEFAULT_SRC_URLS};`,
+        `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${SCRIPT_SRC_URLS};`,
+        `frame-src 'self' ${FRAME_SRC_URLS};`,
+        `img-src 'self' blob: data: ${IMG_SRC_URLS};`,
+        `style-src 'self' 'unsafe-inline' ${STYLE_SRC_URLS};`,
+        `font-src 'self' ${FONT_SRC_URLS};`,
+      ]),
+  `object-src 'none';`,
+  `base-uri 'self';`,
+  `form-action 'self';`,
+  `frame-ancestors 'none';`,
+  `block-all-mixed-content;`,
+  ...(process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' &&
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
+    ? [`upgrade-insecure-requests;`]
+    : []),
+].join(' ')
 
 /**
  * @type {import('next').NextConfig}
