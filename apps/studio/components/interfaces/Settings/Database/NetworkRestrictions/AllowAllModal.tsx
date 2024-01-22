@@ -17,7 +17,11 @@ const AllowAllModal = ({ visible, onClose }: AllowAllModalProps) => {
 
   const onSubmit = async () => {
     if (!ref) return console.error('Project ref is required')
-    applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs: ['0.0.0.0/0'] })
+    applyNetworkRestrictions({
+      projectRef: ref,
+      dbAllowedCidrs: ['0.0.0.0/0'],
+      dbAllowedCidrsV6: ['::/0'],
+    })
   }
 
   return (
