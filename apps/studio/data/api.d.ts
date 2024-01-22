@@ -774,7 +774,7 @@ export interface paths {
   }
   '/platform/integrations/vercel/connections/{connection_id}/sync-envs': {
     /** Syncs supabase project envs with given connection id */
-    post: operations['VercelConnectionsController_syncVercelConnectionEnvs']
+    post: operations['VercelConnectionsController_syncVercelConnectionEnvironments']
   }
   '/platform/integrations/vercel/connections/{connection_id}': {
     /** Deletes vercel project connection */
@@ -3796,6 +3796,8 @@ export interface components {
       app_config?: components['schemas']['ProjectAppConfigResponse']
       jwt_secret?: string
       service_api_keys?: components['schemas']['ProjectServiceApiKeyResponse'][]
+      /** @enum {string|null} */
+      db_ip_addr_config: 'legacy' | 'static-ipv4' | 'concurrent-ipv6' | 'ipv6' | null
     }
     TransferProjectBody: {
       target_organization_slug: string
@@ -4613,7 +4615,6 @@ export interface components {
       current_app_version: string
       latest_app_version: string
       target_upgrade_versions: components['schemas']['ProjectVersion'][]
-      requires_manual_intervention: string | null
       potential_breaking_changes: string[]
       duration_estimate_hours: number
       legacy_auth_custom_roles: string[]
@@ -4634,6 +4635,7 @@ export interface components {
         | '8_upgrade_completion_failed'
       /** @enum {string} */
       progress?:
+        | '0_requested'
         | '1_started'
         | '2_launched_upgraded_instance'
         | '3_detached_volume_from_upgraded_instance'
@@ -4966,6 +4968,11 @@ export interface components {
        * @example postgresql://postgres:dbpass@db.abcdefghijklmnop.supabase.co:5432/postgres
        */
       DATABASE_URL: string
+      /**
+       * @description Pooler connection string
+       * @example postgres://postgres.abcdefghijklmnop:dbpass@aws-0-us-east-1.pooler.supabase.com:6543/postgres
+       */
+      DATABASE_POOLER_URL: string
     }
     ResourceProvisioningResponse: {
       /** @description Supabase envs config */
@@ -10347,7 +10354,7 @@ export interface operations {
     }
   }
   /** Syncs supabase project envs with given connection id */
-  VercelConnectionsController_syncVercelConnectionEnvs: {
+  VercelConnectionsController_syncVercelConnectionEnvironments: {
     parameters: {
       path: {
         connection_id: string
