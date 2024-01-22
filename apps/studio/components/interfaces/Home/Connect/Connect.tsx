@@ -27,6 +27,7 @@ import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useCheckPermissions } from 'hooks'
 import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
+import { projectKeys } from './Connect.types'
 
 type GetContentFilesArgs = {
   selectedParent: string
@@ -194,11 +195,13 @@ const Connect = () => {
         apiSettings?.autoApiService?.endpoint ?? '-'
       }`
     : ''
-  const apiUrl = canReadAPIKeys ? apiHost : ''
+  const apiUrl = canReadAPIKeys ? apiHost : null
 
   const anonKey = canReadAPIKeys
-    ? apiService?.service_api_keys.find((key) => key.tags === 'anon')?.api_key ?? ''
-    : ''
+    ? apiService?.service_api_keys.find((key) => key.tags === 'anon')?.api_key ?? null
+    : null
+
+  const projectKeys = { apiUrl, anonKey }
 
   return (
     <div>
@@ -284,6 +287,7 @@ const Connect = () => {
                   <ConnectTabsContent
                     files={contentFiles}
                     defaultValue={contentFiles[0].location}
+                    projectKeys={projectKeys}
                   />
                 </div>
               </TabsContent_Shadcn_>
@@ -301,15 +305,19 @@ const Connect = () => {
     </div>
   )
 }
+
+interface ConnectTabsContentProps {
+  files: File[]
+  pooler?: boolean
+  defaultValue: string
+  projectKeys: projectKeys
+}
 const ConnectTabsContent = ({
   files,
   pooler,
   defaultValue,
-}: {
-  files: File[]
-  pooler?: boolean
-  defaultValue: string
-}) => {
+  projectKeys,
+}: ConnectTabsContentProps) => {
   // Crappy hack to get the tabs to re-render when the defaultValue changes
   // I can't figure out why it doesn't re-render with the correct tab selected - jordi
   const [syncedDefaultValue, setSyncedDefaultValue] = useState(defaultValue)
@@ -344,6 +352,7 @@ const ConnectTabsContent = ({
               destinationLocation={file.destinationLocation}
               path={file.location}
               pooler={pooler}
+              projectKeys={projectKeys}
             />
           </TabsContent_Shadcn_>
         ))}

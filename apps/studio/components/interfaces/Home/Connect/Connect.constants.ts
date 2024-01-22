@@ -136,9 +136,9 @@ export const FRAMEWORKS: Parent[] = [
     files: [
       {
         // omit .tsx extension
-        location: 'vue1/env.local',
-        destinationFilename: 'vue1.env.local',
-        destinationLocation: 'vue1/.env.local',
+        location: 'solidjs/env.local',
+        destinationFilename: 'solidjs.env.local',
+        destinationLocation: 'solidjs/.env.local',
       },
     ],
     children: [],
