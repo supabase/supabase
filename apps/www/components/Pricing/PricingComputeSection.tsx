@@ -44,11 +44,16 @@ const PricingComputeSection = () => {
                   />
                 </svg>
               </div>
-              <p className="text-brand text-sm">Optimized compute</p>
               <h3 className="text-foreground text-2xl">
                 Scale each project
                 <br className="hidden md:block" /> up to 256 GB compute
               </h3>
+              <div className="flex items-center gap-1">
+                <p className="text-sm">Optimized compute</p>
+                <span className="border bg-alternative px-3 py-0.5 text-foreground text-sm rounded-full">
+                  Starts from $10/month
+                </span>
+              </div>
             </div>
             <p className="text-foreground-lighter text-[13px]">
               Paid plans include 10$ in compute credits that can be spent on one or more instances.
@@ -59,7 +64,7 @@ const PricingComputeSection = () => {
           <div className="flex items-center gap-4 mt-4">
             <Button asChild size="tiny" type="default">
               <Link href="https://supabase.com/docs/guides/platform/compute-add-ons">
-                Learn about compute
+                Learn about Compute add-ons
               </Link>
             </Button>
           </div>
