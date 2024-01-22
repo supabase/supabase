@@ -12,9 +12,17 @@ To control access to your data, you can use [Policies](/docs/guides/auth#policie
 
 ## Enabling row level security
 
-Any table you create in the `public` schema will be accessible via the Supabase Serverless API.
+Any table you create in the `public` schema will be accessible via the Supabase Data API.
 
-To only give the right amount of access to users of your API to the tables, views and functions in the `public` schema you should enable Row Level Security Policies. Any table created through the Supabase Dashboard will have RLS enabled by default. If you created the tables via the SQL editor or via another way, enable RLS like so:
+To restrict access, enable Row Level Security (RLS) on all tables, views, and functions in the `public` schema. You can then write RLS policies to grant users access to specific database rows or functions based on their authentication token.
+
+<Admonition type="danger">
+
+Always enable Row Level Security on tables, views, and functions in the `public` schema to protect your data.
+
+</Admonition>
+
+Any table created through the Supabase Dashboard will have RLS enabled by default. If you created the tables via the SQL editor or via another way, enable RLS like so:
 
 <Tabs
   scrollable
@@ -71,7 +79,7 @@ The expected value for `useconfig` should be:
 
 Using Row Level Security policies may not always be adequate or sufficient to protect APIs.
 
-Some of the most common situations when this is necessary are:
+Here are some common situations where additional protections are necessary:
 
 - Enforcing per-IP or per-user rate limits.
 - Checking custom or additional API keys before allowing further access.
@@ -94,14 +102,14 @@ END;
 $$;
 ```
 
-And register it to run on every serverless API request using:
+And register it to run on every Data API request using:
 
 ```sql
 ALTER ROLE authenticator
   SET pgrst.db_pre_request = 'public.check_request';
 ```
 
-This configures the `public.check_request` function to run on every serverless API request. To have the changes take effect, you should run:
+This configures the `public.check_request` function to run on every Data API request. To have the changes take effect, you should run:
 
 ```sql
 NOTIFY pgrst, 'reload config';
@@ -137,7 +145,7 @@ X-Powered-By: Nerd Rage
 }
 ```
 
-Please look into using [JSON operator functions](https://www.postgresql.org/docs/current/functions-json.html) to build rich and dynamic responses from exceptions.
+Use the [JSON operator functions](https://www.postgresql.org/docs/current/functions-json.html) to build rich and dynamic responses from exceptions.
 
 If you use a custom HTTP status code like 419, you can supply the `status_text` key in the `detail` clause of the exception to describe the HTTP status.
 
@@ -259,7 +267,7 @@ ALTER ROLE authenticator
 NOTIFY pgrst, 'reload config';
 ```
 
-To clear old entries in the `private.rate_limits` table setup a [pg_cron](/guides/database/extensions/pg_cron) job to clean them up.
+To clear old entries in the `private.rate_limits` table, set up a [pg_cron](/guides/database/extensions/pg_cron) job to clean them up.
 
 </TabPanel>
 
@@ -267,12 +275,12 @@ To clear old entries in the `private.rate_limits` table setup a [pg_cron](/guide
 
 Some applications can benefit from using additional API keys managed by the application **in addition to the [Supabase API keys](/docs/guides/api/api-keys)**. This is commonly necessary in cases like:
 
-- Applications that use the serverless API without RLS policies.
+- Applications that use the Data API without RLS policies.
 - Applications that do not use [Supabase Auth](/auth) or any other authentication system and rely on the `anon` role.
 
-<Admonition type="hint">
+<Admonition type="tip">
 
-Using the `apikey` header with the [Supabase API keys](/docs/guides/api/api-keys) is mandatory and not configurable. If you use additional API keys, you would have to distribute both the `anon` API key and your application's custom API key.
+Using the `apikey` header with the [Supabase API keys](/docs/guides/api/api-keys) is mandatory and not configurable. If you use additional API keys, you have to distribute both the `anon` API key and your application's custom API key.
 
 </Admonition>
 
@@ -280,9 +288,9 @@ Outline:
 
 - Your application requires the presence of the `x-app-api-key` header when the `anon` role is used to prevent abuse of your API.
 - These API keys are stored in the `private.anon_api_keys` table, and are distributed independently.
-- Each request using the `anon` role, it will be blocked with HTTP 403 if the `x-app-api-key` header is not registered in the table.
+- Each request using the `anon` role will be blocked with HTTP 403 if the `x-app-api-key` header is not registered in the table.
 
-Setup the table:
+Set up the table:
 
 ```sql
 CREATE TABLE private.anon_api_keys (
@@ -329,7 +337,7 @@ END;
   $$;
 ```
 
-Finally, configure the `public.check_request()` function to run on every serverless API request:
+Finally, configure the `public.check_request()` function to run on every Data API request:
 
 ```sql
 ALTER ROLE authenticator
@@ -377,7 +385,7 @@ END;
   $$;
 ```
 
-Finally, configure the `public._check_request()` function to run on every serverless API request:
+Finally, configure the `public._check_request()` function to run on every Data API request:
 
 ```sql
 ALTER ROLE authenticator
