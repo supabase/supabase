@@ -51,7 +51,7 @@ export const IPv4DeprecationBanner = () => {
           Dismiss
         </Button>
       </p>
-      <div className="hidden sm:flex items-center gap-x-1">
+      <div className="max-sm:sr-only sm:flex items-center gap-x-1">
         <Button asChild type="link" iconRight={<IconExternalLink />}>
           <a
             href="https://github.com/orgs/supabase/discussions/17817"
