@@ -175,7 +175,7 @@ export const constructConnStringSyntax = (
     }
   }
 
-  if (selectedTab === 'golang' || selectedTab === 'php') {
+  if (selectedTab === 'golang' || selectedTab === 'php' || selectedTab === 'python') {
     if (isMd5) {
       return [
         { value: 'user=', tooltip: undefined },
@@ -297,48 +297,6 @@ export const constructConnStringSyntax = (
         { value: ';Port=', tooltip: undefined },
         { value: portNumber, tooltip: 'Port number (Use 5432 if using prepared statements)' },
         { value: ';Database=', tooltip: undefined },
-        { value: '[db-name]', tooltip: 'Database name (e.g postgres)' },
-      ]
-    }
-  }
-
-  if ('python') {
-    if (isMd5) {
-      return [
-        { value: 'user=', tooltip: undefined },
-        { value: '[user]', tooltip: 'Database user (e.g postgres)' },
-        { value: ' password=', tooltip: undefined },
-        { value: '[password]', tooltip: 'Database password' },
-        { value: ' host=', tooltip: undefined },
-        ...(usePoolerConnection ? poolerHostDetails : dbHostDetails),
-        { value: ' port=', tooltip: undefined },
-        { value: portNumber, tooltip: 'Port number (Use 5432 if using prepared statements)' },
-        { value: ' database=', tooltip: undefined },
-        { value: '[db-name]', tooltip: 'Database name (e.g postgres)' },
-        ...(usePoolerConnection
-          ? [
-              { value: ' options=reference=', tooltip: undefined },
-              { value: ref, tooltip: "Project's reference ID" },
-            ]
-          : []),
-      ]
-    } else {
-      return [
-        { value: 'user=', tooltip: undefined },
-        { value: '[user]', tooltip: 'Database user (e.g postgres)' },
-        ...(usePoolerConnection
-          ? [
-              { value: '.', tooltip: undefined },
-              { value: ref, tooltip: "Project's reference ID" },
-            ]
-          : []),
-        { value: ' password=', tooltip: undefined },
-        { value: '[password]', tooltip: 'Database password' },
-        { value: ' host=', tooltip: undefined },
-        ...(usePoolerConnection ? poolerHostDetails : dbHostDetails),
-        { value: ' port=', tooltip: undefined },
-        { value: portNumber, tooltip: 'Port number (Use 5432 if using prepared statements)' },
-        { value: ' database=', tooltip: undefined },
         { value: '[db-name]', tooltip: 'Database name (e.g postgres)' },
       ]
     }
