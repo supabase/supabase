@@ -58,7 +58,7 @@ const PricingPlans: FC = () => {
 
                   <div
                     className={cn(
-                      'text-foreground flex items-baseline text-5xl font-normal lg:text-4xl xl:text-4xl border-b border-default min-h-[155px]',
+                      'text-foreground flex items-baseline text-5xl font-normal lg:text-4xl xl:text-4xl border-b border-default min-h-[175px]',
                       plan.priceLabel ? 'pt-6' : 'pt-10'
                     )}
                   >
@@ -86,7 +86,7 @@ const PricingPlans: FC = () => {
                           </div>
 
                           {plan.warning && (
-                            <div className="mt-1 flex flex-col gap-1">
+                            <div className="mt-4 flex flex-col gap-1">
                               <span
                                 data-tip={plan.warningTooltip}
                                 className={cn(
