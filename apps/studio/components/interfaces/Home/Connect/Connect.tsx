@@ -192,6 +192,9 @@ const Connect = () => {
                   {type.label}
                 </TabsTrigger_Shadcn_>
               ))}
+              <TabsTrigger_Shadcn_ key="direct" value="direct">
+                Direct Connection
+              </TabsTrigger_Shadcn_>
             </TabsList_Shadcn_>
 
             {CONNECTION_TYPES.map((type) => (
@@ -249,6 +252,11 @@ const Connect = () => {
                 </div>
               </TabsContent_Shadcn_>
             ))}
+            <TabsContent_Shadcn_ key="direct" value="direct">
+              <div className="bg-surface-300 p-4">
+                <div className="flex items-center gap-2">direct connection ui</div>
+              </div>
+            </TabsContent_Shadcn_>
           </Tabs_Shadcn_>
 
           <DialogFooter_Shadcn_>

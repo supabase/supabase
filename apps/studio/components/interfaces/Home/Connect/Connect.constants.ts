@@ -242,22 +242,6 @@ export const ORMS: Parent[] = [
   },
 ]
 
-export const DIRECT: Parent[] = [
-  {
-    key: 'direct',
-    label: 'Direct',
-    icon: '',
-    children: [],
-    files: [
-      {
-        // omit .tsx extension
-        location: 'direct/env.local',
-        destinationFilename: 'direct.env.local',
-        destinationLocation: 'direct/.env.local',
-      },
-    ],
-  },
-]
 export const GRAPHQL: Parent[] = [
   {
     key: 'graphql',
@@ -303,7 +287,6 @@ function checkParentsForDuplicates(item: Parent[]) {
 export const CONNECTION_TYPES = [
   { key: 'frameworks', label: 'App Frameworks', obj: FRAMEWORKS },
   { key: 'orms', label: 'ORMs', obj: ORMS },
-  { key: 'direct', label: 'Direct Connection', obj: DIRECT },
   { key: 'graphql', label: 'GraphQL', obj: GRAPHQL },
 ]
 
