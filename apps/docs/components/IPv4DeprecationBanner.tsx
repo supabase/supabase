@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { useEffect, useReducer } from 'react'
+import { memo, useEffect, useReducer } from 'react'
 
 import { Button, IconExternalLink, cn } from 'ui'
 
@@ -7,14 +7,16 @@ import { LOCAL_STORAGE_KEYS, retrieve, store } from '~/lib/storage'
 
 const DISMISSAL_STORAGE_KEY = LOCAL_STORAGE_KEYS.IPV4_DEPRECATION_DISMISSAL
 
-export const IPv4DeprecationBanner = () => {
-  const [isBannerVisible, setIsBannerVisible] = useReducer((_, isVisible: boolean) => {
-    if (isVisible) {
-      return true
-    }
-    store('local', DISMISSAL_STORAGE_KEY, 'true')
-    return false
-  }, false)
+function changeBannerVsibility(_, isVisible: boolean) {
+  if (isVisible) {
+    return true
+  }
+  store('local', DISMISSAL_STORAGE_KEY, 'true')
+  return false
+}
+
+export const IPv4DeprecationBanner = memo(() => {
+  const [isBannerVisible, setIsBannerVisible] = useReducer(changeBannerVsibility, false)
 
   useEffect(() => {
     const acknowledged = retrieve('local', DISMISSAL_STORAGE_KEY) === 'true'
@@ -67,4 +69,5 @@ export const IPv4DeprecationBanner = () => {
       </div>
     </div>
   )
-}
+})
+IPv4DeprecationBanner.displayName = 'IPv4DeprecationBanner'
