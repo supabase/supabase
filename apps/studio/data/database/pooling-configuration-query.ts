@@ -2,10 +2,13 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { databaseKeys } from './keys'
+import { components } from 'data/api'
 
 export type PoolingConfigurationVariables = {
   projectRef?: string
 }
+
+export type PoolingConfiguration = components['schemas']['PgbouncerConfigResponse']
 
 export async function getPoolingConfiguration(
   { projectRef }: PoolingConfigurationVariables,
