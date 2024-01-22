@@ -8,6 +8,7 @@ import { ChevronDownIcon } from '@heroicons/react/outline'
 import ComputePricingTable from './ComputePricingTable'
 import { useWindowSize } from 'react-use'
 import PricingComputeAnimation from './PricingComputeAnimation'
+import ComputePricingCalculator from './ComputePricingCalculator'
 
 const PricingComputeSection = () => {
   const ref = useRef<HTMLDivElement>(null)
@@ -116,6 +117,9 @@ const PricingComputeSection = () => {
                   </Link>
                   .
                 </p>
+              </div>
+              <div>
+                <ComputePricingCalculator />
               </div>
             </div>
           </div>
