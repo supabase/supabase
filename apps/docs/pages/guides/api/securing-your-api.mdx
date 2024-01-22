@@ -40,8 +40,8 @@ Any table created through the Supabase Dashboard will have RLS enabled by defaul
 <TabPanel id="sql" label="SQL">
 
 ```sql
-ALTER TABLE
-  todos ENABLE ROW LEVEL SECURITY;
+alter table
+  todos enable row level security;
 ```
 
 </TabPanel>
@@ -91,34 +91,34 @@ You can build these cases in your application by creating a Postgres function th
 Define a function like so:
 
 ```sql
-CREATE FUNCTION public.check_request()
-  RETURNS VOID
-  LANGUAGE plpgsql
-  SECURITY DEFINER
-  AS $$
-BEGIN
+create function public.check_request()
+  returns void
+  language plpgsql
+  security definer
+  as $$
+begin
   -- your logic here
-END;
+end;
 $$;
 ```
 
 And register it to run on every Data API request using:
 
 ```sql
-ALTER ROLE authenticator
-  SET pgrst.db_pre_request = 'public.check_request';
+alter role authenticator
+  set pgrst.db_pre_request = 'public.check_request';
 ```
 
 This configures the `public.check_request` function to run on every Data API request. To have the changes take effect, you should run:
 
 ```sql
-NOTIFY pgrst, 'reload config';
+notify pgrst, 'reload config';
 ```
 
 Inside the function you can perform any additional checks on the request headers or JWT and raise an exception to prevent the request from completing. For example, this exception raises a HTTP 402 Payment Required response with a `hint` and additional `X-Powered-By` header:
 
 ```sql
-RAISE sqlstate 'PGRST' USING
+raise sqlstate 'PGRST' using
   message = json_build_object(
     'code',    '123',
     'message', 'Payment Required',
@@ -221,50 +221,50 @@ The `private` schema is used as it cannot be accessed over the API!
 Create the `public.check_request` function:
 
 ```sql
-CREATE FUNCTION public.check_request()
-  RETURNS VOID
-  LANGUAGE plpgsql
-  SECURITY DEFINER
-  AS $$
-DECLARE
+create function public.check_request()
+  returns void
+  language plpgsql
+  security definer
+  as $$
+declare
   req_method text := current_setting('request.method', true);
   req_ip inet := split_part(
     current_setting('request.headers', true)::json->>'x-forwarded-for',
     ',', 1)::inet;
   count_in_five_mins integer;
-BEGIN
-  IF req_method = 'GET' OR req_method = 'HEAD' OR req_method IS NULL THEN
+begin
+  if req_method = 'GET' or req_method = 'HEAD' or req_method is null then
     -- rate limiting can't be done on GET and HEAD requests
-    RETURN;
-  END IF;
+    return;
+  end if;
 
-  SELECT
-    count(*) INTO count_in_five_mins
-  FROM private.rate_limits
-  WHERE
-    ip = req_ip AND request_at BETWEEN now() - interval '5 minutes' AND now();
+  select
+    count(*) into count_in_five_mins
+  from private.rate_limits
+  where
+    ip = req_ip and request_at between now() - interval '5 minutes' and now();
 
-  IF count_in_five_mins > 100 THEN
-    RAISE sqlstate 'PGRST' USING
+  if count_in_five_mins > 100 then
+    raise sqlstate 'PGRST' using
       message = json_build_object(
         'message', 'Rate limit exceeded, try again after a while')::text,
       detail = json_build_object(
         'status',  420,
         'status_text', 'Enhance Your Calm')::text;
-  END IF;
+  end if;
 
-  INSERT INTO private.rate_limits (ip, request_at) VALUES (req_ip, now());
-END;
+  insert into private.rate_limits (ip, request_at) values (req_ip, now());
+end;
   $$;
 ```
 
 Finally, configure the `public.check_request()` function to run on every Data API request:
 
 ```sql
-ALTER ROLE authenticator
-  SET pgrst.db_pre_request = 'public.check_request';
+alter role authenticator
+  set pgrst.db_pre_request = 'public.check_request';
 
-NOTIFY pgrst, 'reload config';
+notify pgrst, 'reload config';
 ```
 
 To clear old entries in the `private.rate_limits` table, set up a [pg_cron](/guides/database/extensions/pg_cron) job to clean them up.
@@ -293,7 +293,7 @@ Outline:
 Set up the table:
 
 ```sql
-CREATE TABLE private.anon_api_keys (
+create table private.anon_api_keys (
   id uuid primary key,
   -- other relevant fields
 );
@@ -302,96 +302,48 @@ CREATE TABLE private.anon_api_keys (
 Create the `public.check_request` function:
 
 ```sql
-CREATE FUNCTION public.check_request()
-  RETURNS VOID
-  LANGUAGE plpgsql
-  SECURITY DEFINER
-  AS $$
-DECLARE
+create function public.check_request()
+  returns void
+  language plpgsql
+  security definer
+  as $$
+declare
   req_app_api_key text := current_setting('request.headers', true)::json->>'x-app-api-key';
   is_app_api_key_registered boolean;
-BEGIN
-  IF current_role <> 'anon' THEN
+begin
+  if current_role <> 'anon' then
     -- not `anon` role, allow the request to pass
-    RETURN;
-  END IF;
+    return;
+  end if;
 
-  SELECT
-    true INTO is_app_api_key_registered
-  FROM private.anon_api_keys
-  WHERE
+  select
+    true into is_app_api_key_registered
+  from private.anon_api_keys
+  where
     id = req_app_api_key
-  LIMIT 1;
+  limit 1;
 
-  IF is_app_api_key_registered IS TRUE THEN
+  if is_app_api_key_registered is true then
     -- api key is registered, allow the request to pass
-    RETURN;
-  END IF;
+    return;
+  end if;
 
-  RAISE sqlstate 'PGRST' USING
+  raise sqlstate 'PGRST' using
     message = json_build_object(
       'message', 'No registered API key found in x-app-api-key header.')::text,
     detail = json_build_object(
       'status', 403)::text;
-END;
+end;
   $$;
 ```
 
 Finally, configure the `public.check_request()` function to run on every Data API request:
 
 ```sql
-ALTER ROLE authenticator
-  SET pgrst.db_pre_request = 'public.check_request';
+alter role authenticator
+  set pgrst.db_pre_request = 'public.check_request';
 
-NOTIFY pgrst, 'reload config';
-```
-
-</TabPanel>
-
-<TabPanel id="hide-private-tables-functions" label="Hide private tables, views and functions">
-
-Sometimes you want to prevent direct access to certain tables, views and functions in your `public` schema, so that they're used only through other views or functions. One way to achieve this is to prefix all such tables and functions with an underscore (`_`). Then you can create a function that raises a 404 exception if they're accessed directly.
-
-Outline:
-
-- The `request.path` setting contains the path of the table or view used or the function's name.
-  | Type | Name | API request path | `current_setting('request.path', true)` |
-  | -------- | ------------------ | ----------------------------- | --------------------------------------- |
-  | Table | `profiles` | `/rest/v1/profiles` | `profiles` |
-  | View | `view` | `/rest/v1/view` | `view` |
-  | Function | `create_profile()` | `/rest/v1/rpc/create_profile` | `rpc/create_profile` |
-- You can create a function that checks the `request.path` prefix and raise an exception if its not meant to be used.
-
-Create the `public.check_request` function. But, because this function is not meant to be called directly, you should name it suitably `public._check_request`:
-
-```sql
-CREATE FUNCTION public._check_request()
-  RETURNS VOID
-  LANGUAGE plpgsql
-  SECURITY DEFINER
-  AS $$
-DECLARE
-  req_path text := current_setting('request.path', true);
-BEGIN
-  -- in SQL, position 1 is the first character in the string
-  IF position('_' in req_path) = 1 OR position('rpc/_' in req_path) = 1 THEN
-    RAISE sqlstate 'PGRST' USING
-      message = json_build_object(
-        'message', 'This is a private object. Cannot be used directly.')::text,
-      detail = json_build_object(
-        'status', 404)::text;
-  END IF;
-END;
-  $$;
-```
-
-Finally, configure the `public._check_request()` function to run on every Data API request:
-
-```sql
-ALTER ROLE authenticator
-  SET pgrst.db_pre_request = 'public._check_request';
-
-NOTIFY pgrst, 'reload config';
+notify pgrst, 'reload config';
 ```
 
 </TabPanel>
