@@ -71,8 +71,8 @@ export function ComboBox<Opt extends ComboBoxOption>({
       </PopoverTrigger>
       <PopoverContent className="p-0" side="bottom">
         <Command>
-          <CommandInput placeholder="Search project..." className="border-none ring-0" />
-          <CommandEmpty>No project found.</CommandEmpty>
+          <CommandInput placeholder=`Search ${name}...` className="border-none ring-0" />
+          <CommandEmpty>No {name} found.</CommandEmpty>
           <CommandGroup>
             <ScrollArea className={options.length > 10 ? 'h-[280px]' : ''}>
               {options.map((option) => (
