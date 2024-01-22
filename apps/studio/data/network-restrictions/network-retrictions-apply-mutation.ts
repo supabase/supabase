@@ -1,29 +1,30 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { post } from 'lib/common/fetch'
-import { API_ADMIN_URL } from 'lib/constants'
+import { post } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { networkRestrictionKeys } from './keys'
 
 export type NetworkRestrictionsApplyVariables = {
   projectRef: string
   dbAllowedCidrs: string[]
+  dbAllowedCidrsV6: string[]
 }
 
 export async function applyNetworkRestrictions({
   projectRef,
   dbAllowedCidrs,
+  dbAllowedCidrsV6,
 }: NetworkRestrictionsApplyVariables) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const response = await post(
-    `${API_ADMIN_URL}/projects/${projectRef}/network-restrictions/apply`,
-    { dbAllowedCidrs }
-  )
-  if (response.error) throw response.error
+  const { data, error } = await post('/v1/projects/{ref}/network-restrictions/apply', {
+    params: { path: { ref: projectRef } },
+    body: { dbAllowedCidrs, dbAllowedCidrsV6 },
+  })
 
-  return response
+  if (error) throw error
+  return data
 }
 
 type NetworkRestrictionsApplyData = Awaited<ReturnType<typeof applyNetworkRestrictions>>
