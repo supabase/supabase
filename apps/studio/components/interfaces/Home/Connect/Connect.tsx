@@ -1,7 +1,6 @@
+import { DatabaseConnectionString } from 'components/interfaces/Settings/Database/DatabaseSettings/DatabaseConnectionString'
+import { FileJson2, Plug } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { CONNECTION_TYPES, FRAMEWORKS, File, ORMS, Parent } from './Connect.constants'
-import ConnectDropdown from './ConnectDropdown'
-import ConnectTabContent from './ConnectTabContent'
 import {
   Button,
   DialogContent_Shadcn_,
@@ -11,26 +10,23 @@ import {
   DialogTitle_Shadcn_,
   DialogTrigger_Shadcn_,
   Dialog_Shadcn_,
-  Toggle,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
   Tabs_Shadcn_,
 } from 'ui'
-import { FileJson2, Plug } from 'lucide-react'
-import { DatabaseConnectionString } from 'components/interfaces/Settings/Database/DatabaseSettings/DatabaseConnectionString'
+import { CONNECTION_TYPES, FRAMEWORKS, File, ORMS, Parent } from './Connect.constants'
+import ConnectDropdown from './ConnectDropdown'
+import ConnectTabContent from './ConnectTabContent'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
-import { IconAlertCircle, IconBookOpen, IconLoader, Input } from 'ui'
 
 import { useParams } from 'common/hooks'
-import Panel from 'components/ui/Panel'
-import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
+
+import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useCheckPermissions } from 'hooks'
 import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
-import { useProjectApiQuery } from 'data/config/project-api-query'
 
 type GetContentFilesArgs = {
   selectedParent: string
