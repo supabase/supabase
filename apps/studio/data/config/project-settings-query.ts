@@ -9,10 +9,20 @@ export type ProjectSettingsVariables = {
   projectRef?: string
 }
 
-// [Joshen] API typing needs to be fixed
+// [Joshen] API typing needs to be fixed - this is completely wrong
 type ProjectSettingsInfo = components['schemas']['SettingsResponse']['project']
 interface ProjectSettingsInfoExtended extends ProjectSettingsInfo {
   cloud_provider: string
+  inserted_at: string
+  db_dns_name: string
+  db_host: string
+  db_name: string
+  db_port: number
+  db_ssl: boolean
+  db_user: string
+  jwt_secret: string
+  ref: string
+  status: string
   // [Joshen] Based on the enums here
   // https://github.com/supabase/infrastructure/blob/95dc09fe077dba7817bb112fa72b6814a620ecd3/shared/src/projects.ts#L177
   db_ip_addr_config: 'legacy' | 'static-ipv4' | 'concurrent-ipv6' | 'ipv6'
