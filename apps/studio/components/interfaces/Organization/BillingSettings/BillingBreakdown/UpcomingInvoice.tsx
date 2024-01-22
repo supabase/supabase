@@ -3,14 +3,31 @@ import clsx from 'clsx'
 import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrgUpcomingInvoiceQuery } from 'data/invoices/org-invoice-upcoming-query'
-import { useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { Button, Collapsible, IconChevronRight, IconInfo } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { billingMetricUnit, formatUsage } from '../helpers'
+import Link from 'next/link'
+import { formatCurrency } from 'lib/helpers'
 
 export interface UpcomingInvoiceProps {
   slug?: string
 }
+
+interface TooltipData {
+  identifier: string
+  text: string
+  linkRef?: string
+}
+
+const feeTooltipData: TooltipData[] = [
+  {
+    identifier: 'COMPUTE',
+    text: 'Every project is a dedicated server and database. For every hour your project is active, it incurs compute costs based on the instance size of your project. Paused projects do not incur compute costs.',
+    linkRef:
+      'https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute',
+  },
+]
 
 const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
   const {
@@ -23,14 +40,20 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
 
   const [usageFeesExpanded, setUsageFeesExpanded] = useState<string[]>([])
 
+  const computeCredits = useMemo(() => {
+    return (upcomingInvoice?.lines || []).find((item) =>
+      item.description.startsWith('Compute Credits')
+    )
+  }, [upcomingInvoice])
+
   const fixedFees = useMemo(() => {
     return (upcomingInvoice?.lines || [])
-      .filter((item) => !item.breakdown)
+      .filter((item) => item !== computeCredits && !item.breakdown)
       .sort((a, b) => {
         // Prorations should be below regular usage fees
         return Number(a.proration) - Number(b.proration)
       })
-  }, [upcomingInvoice])
+  }, [upcomingInvoice, computeCredits])
 
   const feesWithBreakdown = useMemo(() => {
     return (upcomingInvoice?.lines || [])
@@ -108,10 +131,14 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                   )}
                   {!item.proration && (
                     <td className="py-2 text-sm">
-                      {item.unit_price === 0 ? 'FREE' : `$${item.unit_price}`}
+                      {item.unit_price === 0
+                        ? 'FREE'
+                        : item.unit_price
+                        ? formatCurrency(item.unit_price)
+                        : null}
                     </td>
                   )}
-                  <td className="py-2 text-sm text-right">${item.amount}</td>
+                  <td className="py-2 text-sm text-right">{formatCurrency(item.amount)}</td>
                 </tr>
               ))}
             </tbody>
@@ -146,12 +173,23 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                               />
                             }
                           />{' '}
-                          <span>
+                          <span className="mr-2">
                             {fee.description}
                             {fee.usage_metric &&
                               billingMetricUnit(fee.usage_metric) &&
                               ` (${billingMetricUnit(fee.usage_metric)})`}
                           </span>
+                          {(() => {
+                            const matchingTooltipData = feeTooltipData.find((it) =>
+                              fee.usage_metric?.startsWith(it.identifier)
+                            )
+                            return matchingTooltipData ? (
+                              <InvoiceTooltip
+                                text={matchingTooltipData.text}
+                                linkRef={matchingTooltipData.linkRef}
+                              />
+                            ) : null
+                          })()}
                         </td>
                         <td className="py-2 pr-4 text-sm text-right tabular-nums max-w-[100px]">
                           {fee.usage_original
@@ -164,10 +202,12 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                           {fee.unit_price_desc
                             ? `${fee.unit_price_desc}`
                             : fee.unit_price
-                            ? `$${fee.unit_price}`
+                            ? formatCurrency(fee.unit_price)
                             : null}
                         </td>
-                        <td className="py-2 text-sm text-right max-w-[70px]">${fee.amount ?? 0}</td>
+                        <td className="py-2 text-sm text-right max-w-[70px]">
+                          {formatCurrency(fee.amount) ?? formatCurrency(0)}
+                        </td>
                       </tr>
                     </Collapsible.Trigger>
 
@@ -195,34 +235,40 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                 </Collapsible>
               ))}
 
+            {computeCredits && (
+              <tbody>
+                <tr className="border-b">
+                  <td className="py-2 text-sm max-w-[200px]">
+                    <span className="mr-2">{computeCredits.description}</span>
+                    <InvoiceTooltip
+                      text="Paid plans come with $10 in Compute Credits to cover one Starter instance or parts of any other instance. Compute Credits are given to you every month and do not stack up while you are on a paid plan."
+                      linkRef="https://supabase.com/docs/guides/platform/org-based-billing#compute-credits"
+                    />
+                  </td>
+                  <td className="py-2 text-sm text-right" colSpan={3}>
+                    {formatCurrency(computeCredits.amount)}
+                  </td>
+                </tr>
+              </tbody>
+            )}
+
             <tfoot>
               <tr>
                 <td className="py-4 text-sm font-medium">
-                  <span className="mr-2">Projected Costs</span>
-                  <Tooltip.Root delayDuration={0}>
-                    <Tooltip.Trigger>
-                      <IconInfo size={12} strokeWidth={2} />
-                    </Tooltip.Trigger>
-                    <Tooltip.Portal>
-                      <Tooltip.Content side="bottom">
-                        <Tooltip.Arrow className="radix-tooltip-arrow" />
-                        <div
-                          className={[
-                            'rounded bg-alternative py-1 px-2 leading-none shadow',
-                            'border border-background',
-                          ].join(' ')}
-                        >
-                          <span className="text-xs text-foreground">
-                            Estimated costs at the end of the billing cycle. Final amounts may vary
-                            depending on your usage.
-                          </span>
-                        </div>
-                      </Tooltip.Content>
-                    </Tooltip.Portal>
-                  </Tooltip.Root>
+                  <span className="mr-2">Current Costs</span>
+                  <InvoiceTooltip text="Costs accumulated from the beginning of the billing cycle up to now." />
                 </td>
                 <td className="py-4 text-sm text-right font-medium" colSpan={3}>
-                  ${upcomingInvoice?.amount_projected ?? '-'}
+                  {formatCurrency(upcomingInvoice?.amount_total) ?? '-'}
+                </td>
+              </tr>
+              <tr>
+                <td className="text-sm font-medium">
+                  <span className="mr-2">Projected Costs</span>
+                  <InvoiceTooltip text="Estimated costs at the end of the billing cycle. Final amounts may vary depending on your usage." />
+                </td>
+                <td className="text-sm text-right font-medium" colSpan={3}>
+                  {formatCurrency(upcomingInvoice?.amount_projected) ?? '-'}
                 </td>
               </tr>
             </tfoot>
@@ -230,6 +276,37 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
         </div>
       )}
     </>
+  )
+}
+
+const InvoiceTooltip = ({ text, linkRef }: { text: string; linkRef?: string }) => {
+  return (
+    <Tooltip.Root delayDuration={0}>
+      <Tooltip.Trigger>
+        <IconInfo size={12} strokeWidth={2} />
+      </Tooltip.Trigger>
+      <Tooltip.Portal>
+        <Tooltip.Content side="bottom">
+          <Tooltip.Arrow className="radix-tooltip-arrow" />
+          <div className="rounded bg-alternative py-1 px-2 leading-none shadow border border-background min-w-[300px] max-w-[450px] max-h-[300px] overflow-y-auto">
+            <span className="text-xs text-foreground">
+              <p>
+                {text}{' '}
+                {linkRef && (
+                  <Link
+                    href={linkRef}
+                    target="_blank"
+                    className="transition text-brand hover:text-brand-600 underline"
+                  >
+                    Read more
+                  </Link>
+                )}
+              </p>
+            </span>
+          </div>
+        </Tooltip.Content>
+      </Tooltip.Portal>
+    </Tooltip.Root>
   )
 }
 
