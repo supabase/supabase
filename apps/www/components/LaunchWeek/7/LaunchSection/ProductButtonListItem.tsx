@@ -12,14 +12,14 @@ export const ProductButtonListItem = (props: Article) => {
           group
           flex items-start gap-3 bg-transparent
           transition
-          dark:drop-shadow-sm"
+          drop-shadow-sm"
         >
           <div className="w-5">
             <SparklesIcon strokeWidth={1} />
           </div>
           <div className="flex flex-col items-start gap-0">
             <span className="group-hover:text-brand text-sm">{props.title}</span>
-            <p className="text-scale-1100 text-left text-sm">{props.description}</p>
+            <p className="text-foreground-light text-left text-sm">{props.description}</p>
           </div>
         </button>
       </div>

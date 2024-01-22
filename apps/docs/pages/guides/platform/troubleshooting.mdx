@@ -1,14 +1,14 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-  id: 'troubeshooting',
+  id: 'troubleshooting',
   title: 'Troubleshooting',
   description: 'Diagnosing and fixing issues with your hosted Supabase project.',
 }
 
 Learn how to diagnose and fix common issues with your Supabase project.
 
-## HTTP API Issues
+## HTTP API issues
 
 Symptoms:
 
@@ -26,14 +26,14 @@ You can view the resource utilization of your Supabase Project using the [report
 
 Some common solutions for this issue are:
 
-- [Upgrading](https://supabase.com/dashboard/project/_/settings/billing/subscription) to a [larger compute add-on](../platform/compute-add-ons) in order to serve higher volumes of traffic.
+- [Upgrading](https://supabase.com/dashboard/project/_/settings/addons?panel=computeInstance) to a [larger compute add-on](../platform/compute-add-ons) in order to serve higher volumes of traffic.
 - [Optimizing the queries](../platform/performance#examining-query-performance) being executed.
 - [Using fewer Postgres connections](../platform/performance#configuring-clients-to-use-fewer-connections) can reduce the amount of resources needed on the project.
 - [Restarting](https://supabase.com/dashboard/project/_/settings/general) the database. This only temporarily solves the issue by terminating any ongoing workloads that might be tying up your compute resources.
 
 If your [Disk IO budget](../platform/compute-add-ons#disk-io) has been drained, you will need to either wait for it to be replenished the next day, or upgrade to a larger compute add-on to increase the budget available to your project.
 
-## Unable to connect to your Supabase Project
+## Unable to connect to your Supabase project
 
 Symptom: You're unable to connect to your Postgres database directly, but can open the Project in the [Supabase Dashboard](https://supabase.com/dashboard/project/_/).
 
@@ -43,7 +43,7 @@ Errors about too many open connections can be _temporarily_ resolved by [restart
 
 - If you're receiving a `No more connections allowed (max_client_conn)` error:
   - Configure your applications and services to [use fewer connections](../platform/performance#configuring-clients-to-use-fewer-connections).
-  - [Upgrade](https://supabase.com/dashboard/project/_/settings/billing/subscription) to a [larger compute add-on](../platform/compute-add-ons) to increase the number of available connections.
+  - [Upgrade](https://supabase.com/dashboard/project/_/settings/addons?panel=computeInstance) to a [larger compute add-on](../platform/compute-add-ons) to increase the number of available connections.
 - If you're receiving a `sorry, too many clients already` or `remaining connection slots are reserved for non-replication superuser connections` error message in addition to the above suggestions, switch to using the [connection pooler](/docs/guides/database/connecting-to-postgres#connection-pool) instead.
 
 ### Connection refused

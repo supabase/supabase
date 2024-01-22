@@ -3,12 +3,12 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'api-keys',
   title: 'Understanding API Keys',
-  description: 'Securing your Serverless API with Postgres Row Level Security.',
+  description: 'Securing your Data API with Postgres Row Level Security.',
 }
 
 Supabase provides two default keys when you create a project: an `anon` key, and a `service_role` key. You can find both keys in the [API Settings](https://supabase.com/dashboard/project/_/settings/api).
 
-The Serverless APIs are designed to work with Postgres Row Level Security (RLS). These keys both map to Postgres roles. You can find an `anon` user and a `service_role` user in the [Roles](http://supabase.com/dashboard/project/_/database/roles) section of the dashboard.
+The data APIs are designed to work with Postgres Row Level Security (RLS). These keys both map to Postgres roles. You can find an `anon` user and a `service_role` user in the [Roles](http://supabase.com/dashboard/project/_/database/roles) section of the dashboard.
 
 The keys are both long-lived JWTs. If you decode these keys, you will see that they contain the "role", an "issued date", and an "expiry date" ~10 years in the future.
 
@@ -51,7 +51,9 @@ select
 The "service_role" is a predefined Postgres role with elevated privileges, designed to perform various administrative and service-related tasks. It can bypass Row Level Security, so it should only be used on a private server.
 
 <Admonition type="caution">
-  Never expose the `service_role` key in a browser or anywhere where a user can see it.
+
+Never expose the `service_role` key in a browser or anywhere where a user can see it.
+
 </Admonition>
 
 A common use case for the `service_role` key is running data analytics jobs on the backend. To support joins on user id, it is often useful to grant the service role read access to `auth.users` table.
