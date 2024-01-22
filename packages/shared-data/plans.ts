@@ -10,6 +10,7 @@ export interface PricingInformation {
   description: string
   preface: string
   features: string[]
+  featuresPartner: string[]
   footer?: string
   cta: string
 }
@@ -40,6 +41,13 @@ export const plans: PricingInformation[] = [
       '1-day log retention',
       'Community support',
     ],
+    featuresPartner: [
+      'Unlimited API requests',
+      'Up to 500MB database space',
+      'Up to 5GB bandwidth',
+      '1-day log retention',
+      'Community support',
+    ],
     footer: 'Free projects are paused after 1 week of inactivity.',
     cta: 'Get Started',
   },
@@ -64,6 +72,14 @@ export const plans: PricingInformation[] = [
       '2M Edge Function invocations included',
       '500 concurrent Realtime connections included',
       '5 million Realtime messages included',
+      '7-day log retention',
+      'Email support',
+    ],
+    featuresPartner: [
+      'No project pausing',
+      'Daily backups stored for 7 days',
+      '8GB database space included',
+      '250GB bandwidth included',
       '7-day log retention',
       'Email support',
     ],
@@ -92,6 +108,16 @@ export const plans: PricingInformation[] = [
       'Priority email support & SLAs',
       '28-day log retention',
     ],
+    featuresPartner: [
+      'Additional Organization member roles',
+      'Daily backups stored for 14 days',
+      'Standardised Security Questionnaire',
+      'SOC2',
+      'HIPAA available as paid add-on',
+      'SSO for Supabase Dashboard',
+      'Priority email support & SLAs',
+      '28-day log retention',
+    ],
     footer: 'Additional fees apply for usage beyond included usage.',
     preface: 'Everything in the Pro plan, plus:',
     cta: 'Get Started',
@@ -104,6 +130,12 @@ export const plans: PricingInformation[] = [
     features: [
       `Designated Support manager & SLAs`,
       `On-premise support`,
+      `24×7×365 premium enterprise support`,
+      'Custom Security Questionnaires',
+      `Private Slack channel`,
+    ],
+    featuresPartner: [
+      `Designated Support manager & SLAs`,
       `24×7×365 premium enterprise support`,
       'Custom Security Questionnaires',
       `Private Slack channel`,
