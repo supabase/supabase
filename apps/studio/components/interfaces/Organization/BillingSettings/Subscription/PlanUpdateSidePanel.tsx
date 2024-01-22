@@ -201,11 +201,9 @@ const PlanUpdateSidePanel = () => {
               return (
                 <div
                   key={plan.id}
-                  className={clsx(
-                    'border rounded-md px-4 py-4 flex flex-col items-start justify-between',
-                    plan.id === 'tier_enterprise' ? 'col-span-12' : 'col-span-12 md:col-span-4',
-                    plan.id === 'tier_enterprise' ? 'bg-background' : 'bg-surface-200'
-                  )}
+                  className={
+                    'border rounded-md px-4 py-4 flex flex-col items-start justify-between col-span-12 md:col-span-4 bg-surface-200'
+                  }
                 >
                   <div className="w-full">
                     <div className="flex items-center space-x-2">
