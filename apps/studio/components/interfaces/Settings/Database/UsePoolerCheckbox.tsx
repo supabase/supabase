@@ -3,6 +3,7 @@ import { Badge, Checkbox_Shadcn_ } from 'ui'
 
 import { Markdown } from 'components/interfaces/Markdown'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
+import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 
 interface UsePoolerCheckboxInterface {
   id: string
@@ -13,9 +14,9 @@ interface UsePoolerCheckboxInterface {
 export const UsePoolerCheckbox = ({ id, checked, onCheckedChange }: UsePoolerCheckboxInterface) => {
   const { ref: projectRef } = useParams()
   const { data, isSuccess } = usePoolingConfigurationQuery({ projectRef })
+  const { data: settings, isSuccess: isSuccessSettings } = useProjectSettingsQuery({ projectRef })
 
-  // [Joshen] TODO this needs to be obtained from BE as 26th Jan is when we'll start - projects will be affected at different rates
-  const resolvesToIpV6 = !data?.supavisor_enabled && false // Number(new Date()) > Number(dayjs.utc('01-26-2024', 'MM-DD-YYYY').toDate())
+  const resolvesToIpV6 = !data?.supavisor_enabled && settings?.project.db_ip_addr_config === 'ipv6'
 
   return (
     <div className="flex gap-x-3">
@@ -32,13 +33,15 @@ export const UsePoolerCheckbox = ({ id, checked, onCheckedChange }: UsePoolerChe
               Supavisor
             </Badge>
           )}
-          <Badge color="scale" className="ml-2">
-            {checked
-              ? 'Resolves to IPv4'
-              : resolvesToIpV6
-              ? 'Resolves to IPv6'
-              : 'Resolves to IPv4'}
-          </Badge>
+          {isSuccessSettings && (
+            <Badge color="scale" className="ml-2">
+              {checked
+                ? 'Resolves to IPv4'
+                : resolvesToIpV6
+                ? 'Resolves to IPv6'
+                : 'Will resolve to IPv6'}
+            </Badge>
+          )}
         </label>
         <Markdown
           extLinks

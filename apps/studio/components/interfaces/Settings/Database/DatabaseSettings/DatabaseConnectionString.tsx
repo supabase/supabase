@@ -192,7 +192,7 @@ export const DatabaseConnectionString = () => {
                 <div className="flex flex-col gap-y-1 text-foreground-light">
                   <p className="text-sm">
                     You can use the following URI format to switch to a different database or user
-                    when using connection pooling.
+                    {usePoolerConnection ? ' when using connection pooling' : ''}.
                   </p>
                   <p className="text-sm font-mono tracking-tight text-foreground-lighter">
                     {poolerConnStringSyntax.map((x, idx) => {

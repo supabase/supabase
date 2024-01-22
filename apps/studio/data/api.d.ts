@@ -1764,13 +1764,8 @@ export interface components {
       actions?: components['schemas']['NotificationAction'][]
     }
     NotificationResponseV2: {
-      /** @enum {string} */
-      type:
-        | 'project.tier-limit-exceeded'
-        | 'postgresql.upgrade-available'
-        | 'postgresql.upgrade-completed'
-        | 'project.update-completed'
-        | 'project.informational'
+      /** @deprecated */
+      type: string | null
       /** @enum {string} */
       status: 'new' | 'seen' | 'archived'
       /** @enum {string} */
@@ -4550,7 +4545,7 @@ export interface components {
       ipv4_addresses: string[]
     }
     NetworkRestrictionsRequest: {
-      dbAllowedCidrs: string[]
+      dbAllowedCidrs?: string[]
       dbAllowedCidrsV6?: string[]
     }
     NetworkRestrictionsResponse: {
@@ -4815,15 +4810,16 @@ export interface components {
       is_physical_backup: boolean
       inserted_at: string
     }
+    PhysicalBackup: {
+      earliest_physical_backup_date_unix?: number
+      latest_physical_backup_date_unix?: number
+    }
     V1BackupsResponse: {
       region: string
       walg_enabled: boolean
       pitr_enabled: boolean
       backups: components['schemas']['V1Backup'][]
-      physical_backup_data: {
-        earliest_physical_backup_date_unix?: number
-        latest_physical_backup_date_unix?: number
-      }
+      physical_backup_data: components['schemas']['PhysicalBackup']
     }
     V1RestorePitrBody: {
       recovery_time_target_unix: number
