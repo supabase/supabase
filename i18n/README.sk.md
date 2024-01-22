@@ -247,7 +247,7 @@ Náš prístup ku klientskym knižniciam je modulárny. Každá čiastková kni�
 - [Zjednodušená čínština / 简体中文](/i18n/README.zh-cn.md)
 - [Švédčina / Svenska](/i18n/README.sv.md)
 - [Thai / ไทย](/i18n/README.th.md)
-- [Tradičná čínština / 繁体中文](/i18n/README.zh-tw.md)
+- [Tradičná čínština / 繁體中文](/i18n/README.zh-tw.md)
 - [Turečtina / Türkçe](/i18n/README.tr.md)
 - [Ukrajinčina / Українська](/i18n/README.uk.md)
 - [Vietnamčina / Tiếng Việt](/i18n/README.vi-vn.md)

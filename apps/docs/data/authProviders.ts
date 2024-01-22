@@ -182,6 +182,16 @@ const authProviders = [
     authType: 'social',
   },
   {
+    name: 'WorkOS',
+    logo: '/docs/img/icons/workos-icon',
+    href: '/guides/auth/social-login/auth-workos',
+    official: true,
+    supporter: 'Supabase',
+    platform: true,
+    selfHosted: true,
+    authType: 'social',
+  },
+  {
     name: 'Zoom',
     logo: '/docs/img/icons/zoom-icon',
     href: '/guides/auth/social-login/auth-zoom',

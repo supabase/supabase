@@ -1,7 +1,7 @@
 import { Button, Form, Input, Select } from 'ui'
 import { useState } from 'react'
 import countries from '~/data/Countries.json'
-import supabase from '~/lib/supabase'
+import supabase from '~/lib/supabaseMisc'
 
 const INITIAL_VALUES = {
   companyName: '',
@@ -169,7 +169,7 @@ const SOC2RequestForm = () => {
                     />
                   </div>
 
-                  <div className="">
+                  <div>
                     <Input.TextArea
                       id="details"
                       name="details"

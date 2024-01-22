@@ -1,6 +1,5 @@
 import Layout from '~/layouts/DefaultGuideLayout'
-
-import { useRouter } from 'next/router'
+import AuthProviders from '~/components/AuthProviders'
 
 export const meta = {
   id: 'auth',
@@ -33,10 +32,10 @@ Here's a quick, 2 minute tour of the Auth features built-in to Supabase:
 
 You can authenticate your users in several ways:
 
-- Email & password.
-- Magic links (one-click logins).
-- Social providers.
-- Phone logins.
+- Password-based methods such as email or phone and password
+- Passwordless methods such as sending a magiclink or one-time password (OTP)
+- OAuth social providers
+- SAML SSO
 
 ### Providers
 
@@ -104,7 +103,7 @@ With policies, your database becomes the rules engine. Instead of repetitively f
 
 ```js
 const loggedInUserId = 'd0714948'
-let { data, error } = await supabase
+const { data, error } = await supabase
   .from('users')
   .select('user_id, name')
   .eq('user_id', loggedInUserId)
@@ -116,13 +115,13 @@ let { data, error } = await supabase
 ... you can simply define a rule on your database table, `auth.uid() = user_id`, and your request will return the rows which pass the rule, even when you remove the filter from your middleware:
 
 ```js
-let { data, error } = await supabase.from('users').select('user_id, name')
+const { data, error } = await supabase.from('users').select('user_id, name')
 
 // console.log(data)
 // Still => { id: 'd0714948', name: 'Jane' }
 ```
 
-### How It Works
+### How it works
 
 1. A user signs up. Supabase creates a new user in the `auth.users` table.
 2. Supabase returns a new JWT, which contains the user's `UUID`.
@@ -132,7 +131,7 @@ let { data, error } = await supabase.from('users').select('user_id, name')
 
 Supabase provides a special function in Postgres, `auth.uid()`, which extracts the user's UID from the JWT. This is especially useful when creating policies.
 
-## User Management
+## User management
 
 Supabase provides multiple endpoints to authenticate and manage your users:
 

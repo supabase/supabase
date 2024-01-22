@@ -1,0 +1,255 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import '~ui/build/css/source/global.css';
+@import '~ui/build/css/themes/dark.css';
+@import '~ui/build/css/themes/light.css';
+
+@layer utilities {
+  .btn-primary {
+    @apply inline-block rounded border border-green-500 bg-green-500 py-1 px-3 text-sm;
+    color: #fff !important;
+    font-weight: 600;
+    line-height: 20px;
+    text-align: center;
+  }
+
+  .btn-primary-hover {
+    @apply bg-green-600;
+    cursor: pointer;
+  }
+}
+
+html,
+body,
+#__next,
+.main {
+  @apply bg-background;
+  @apply text-foreground;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.form-group .form-text,
+.Form .form-text {
+  @apply text-foreground-lighter;
+}
+
+.form-group input,
+.form-group input[type='text'],
+.form-group input[type='email'],
+.form-group input[type='url'],
+.form-group input[type='password'],
+.form-group input[type='number'],
+.form-group input[type='date'],
+.form-group input[type='datetime-local'],
+.form-group input[type='month'],
+.form-group input[type='search'],
+.form-group input[type='tel'],
+.form-group input[type='time'],
+.form-group input[type='week'],
+.form-group input[multiple],
+.form-group textarea,
+.form-group select,
+input.form-control,
+.form-control input,
+.form-control textarea {
+  @apply block;
+  @apply box-border;
+  // @apply  w-full ;
+  @apply rounded-md;
+  @apply shadow-sm;
+  @apply transition-all;
+  @apply text-foreground;
+  @apply border;
+  @apply focus:shadow-md;
+
+  @apply focus:border-stronger;
+  @apply focus:ring-border-overlay;
+
+  @apply bg-background;
+  @apply border-strong border;
+
+  @apply outline-none;
+  @apply focus:ring-2 focus:ring-current;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  @apply px-4 py-2;
+}
+
+.form-group input:focus,
+.form-group input[type='text']:focus,
+.form-group input[type='email']:focus,
+.form-group input[type='url']:focus,
+.form-group input[type='password']:focus,
+.form-group input[type='number']:focus,
+.form-group input[type='date']:focus,
+.form-group input[type='datetime-local']:focus,
+.form-group input[type='month']:focus,
+.form-group input[type='search']:focus,
+.form-group input[type='tel']:focus,
+.form-group input[type='time']:focus,
+.form-group input[type='week']:focus,
+.form-group input[multiple]:focus,
+.form-group textarea:focus,
+.form-group select:focus,
+.form-group input:focus .form-control:focus {
+  box-shadow: 0 0 0 2px rgba(62, 207, 142, 0.1);
+}
+
+// icons in date / time inputs
+.dark input[type='date']::-webkit-calendar-picker-indicator,
+.dark input[type='datetime-local']::-webkit-calendar-picker-indicator,
+.dark input[type='time']::-webkit-calendar-picker-indicator {
+  filter: invert(0.8);
+}
+
+input.is-invalid {
+  @apply bg-red-100;
+  @apply border border-red-700;
+  @apply focus:ring-red-500;
+  @apply placeholder:text-red-600;
+}
+
+input[type='submit'] {
+  @apply btn-primary;
+}
+
+input[type='submit']:hover {
+  @apply btn-primary-hover;
+}
+
+input::placeholder {
+  @apply text-foreground-lighter;
+}
+
+.form-group input::placeholder {
+  @apply text-foreground-lighter;
+}
+
+.billing-input-fixed {
+  @apply w-full appearance-none rounded border bg-gray-700 py-2 px-3 leading-tight text-gray-300 shadow;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.input-mono {
+  input,
+  textarea {
+    @apply font-mono;
+  }
+}
+
+.input-xs {
+  input,
+  textarea {
+    @apply text-xs;
+  }
+}
+
+input[type='radio'] {
+  @apply p-0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield; /* Firefox, Not included in tailwind styles reset */
+}
+
+// TODO: It doesnt' work, need to check
+.hide-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+code {
+  // use supabase-ui code style
+  @apply text-code;
+}
+
+div[data-radix-portal]:not(.portal--toast) {
+  z-index: 2147483646 !important;
+}
+
+.billing-compute-radio {
+  label {
+    @apply items-center justify-between;
+    &:last-child {
+      opacity: 100 !important;
+    }
+  }
+}
+
+.recharts-tooltip-cursor {
+  @apply fill-transparent;
+}
+
+.expandable-tr {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.expanded-row-content {
+  display: grid;
+  grid-column: 1/-1;
+  justify-content: flex-start;
+}
+
+.multi-select {
+  button {
+    display: block;
+    width: 100%;
+  }
+}
+
+.text-area-text-sm {
+  textarea {
+    @apply text-sm;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+}
+
+.text-area-resize-none {
+  textarea {
+    @apply resize-none;
+  }
+}
+
+.capitalize-sentence:first-letter {
+  text-transform: capitalize;
+}
+
+.input-clear {
+  input {
+    @apply pr-7;
+  }
+}
+
+// to do: remove this CSS and do the same thing in a reusable tooltip component
+[data-radix-popper-content-wrapper] {
+  @apply z-50 #{!important};
+}

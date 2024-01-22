@@ -247,7 +247,7 @@ Lähestymistapamme asiakaskirjastoihin on modulaarinen. Jokainen osakirjasto on 
 - [Yksinkertaistettu kiina / 简体中文](/i18n/README.zh-cn.md)
 - [Ruotsiksi / Svenska](/i18n/README.sv.md)
 - [Thai / ไทย](/i18n/README.th.md)
-- [Perinteinen kiina / 繁体中文](/i18n/README.zh-tw.md)
+- [Perinteinen kiina / 繁體中文](/i18n/README.zh-tw.md)
 - [Turkin kieli / Türkçe](/i18n/README.tr.md)
 - [Ukrainaksi / Українська](/i18n/README.uk.md)
 - [Vietnamin kieli / Tiếng Việt](/i18n/README.vi-vn.md)

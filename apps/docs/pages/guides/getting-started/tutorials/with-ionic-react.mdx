@@ -10,13 +10,14 @@ export const meta = {
 ![Supabase User Management example](/docs/img/ionic-demos/ionic-angular-account.png)
 
 <Admonition type="note">
-  If you get stuck while working through this guide, refer to the [full example on
-  GitHub](https://github.com/mhartington/supabase-ionic-react).
+
+If you get stuck while working through this guide, refer to the [full example on GitHub](https://github.com/mhartington/supabase-ionic-react).
+
 </Admonition>
 
 <ProjectSetup />
 
-## Building the App
+## Building the app
 
 Let's start building the React app from scratch.
 
@@ -57,7 +58,7 @@ const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 ```
 
-### Set up a Login route
+### Set up a login route
 
 Let's set up a React component to manage logins and sign ups. We'll use Magic Links, so users can sign in with their email without using passwords.
 
@@ -223,7 +224,7 @@ export function AccountPage() {
         updated_at: new Date(),
       };
 
-      let { error } = await supabase.from('profiles').upsert(updates, {
+      const { error } = await supabase.from('profiles').upsert(updates, {
         returning: 'minimal', // Don't return the value after inserting
       });
 
@@ -368,11 +369,11 @@ First install two packages in order to interact with the user's camera.
 npm install @ionic/pwa-elements @capacitor/camera
 ```
 
-[CapacitorJS](https://capacitorjs.com) is a cross platform native runtime from Ionic that enables web apps to be deployed through the app store and provides access to native deavice API.
+[CapacitorJS](https://capacitorjs.com) is a cross platform native runtime from Ionic that enables web apps to be deployed through the app store and provides access to native device API.
 
 Ionic PWA elements is a companion package that will polyfill certain browser APIs that provide no user interface with custom Ionic UI.
 
-With those packages installed we can update our `index.tsx` to include an additional bootstapping call for the Ionic PWA Elements.
+With those packages installed we can update our `index.tsx` to include an additional bootstrapping call for the Ionic PWA Elements.
 
 ```ts src/index.tsx
 import React from 'react'
@@ -434,7 +435,7 @@ export function Avatar({
       const fileName = `${Math.random()}-${new Date().getTime()}.${
         photo.format
       }`;
-      let { error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(fileName, file);
       if (uploadError) {

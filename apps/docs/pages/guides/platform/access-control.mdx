@@ -13,24 +13,27 @@ For each organization, a member can have one of the following roles:
 - Administrator
 - Developer
 
-A default organization is created when you first sign in and
-you'll be assigned the **Owner** role.
-Each member can access all projects under the organization.
-Project level invites are not available at this time.
-Create a separate organization if you need to restrict access to certain projects.
+<Admonition type="note">
+
+Additional roles (Read-only and Billing) are available on the [team and enterprise plans](https://supabase.com/pricing).
+
+</Admonition>
+
+A default organization is created when you first sign in, at which point you'll be assigned the **Owner** role. Keep in mind that members can access all projects within the organization and that project level access control is not available at this time. Create a separate organization if you need to restrict access to certain projects.
 
 ## Manage team members
 
-To invite others to collaborate, visit your organization's team settings in the
-[Dashboard](https://supabase.com/dashboard/projects) to send an invite link to
-another user's email. The invite expires after 24 hours.
+To invite others to collaborate, visit your organization's team [settings](/dashboard/org/_/team) to send an invite link to another user's email. The invite expires after 24 hours.
+
+<Admonition type="note">
+
+Invites sent from a SAML SSO account can only be accepted by another SAML SSO account from the same identity provider. This is a security measure to prevent accidental invites to accounts not managed by your enterprise's identity provider.
+
+</Admonition>
 
 ### Transferring ownership of an organization
 
-Each Supabase organization can have one or more owners. If you no longer want be an owner of an organization, click **Leave team** in the members view (`https://supabase.com/dashboard/org/<org-slug>/settings#team`) of your organization.
-However, you can only leave an organization when there is _at least one other owner_.
-
-If you are transferring ownership of your organization to someone else, you will need to invite the new member with the **Owner** role. You can leave the organization after they've accepted the invitation.
+Each Supabase organization can have one or more owners. If you no longer want be an owner of an organization, click **Leave team** in your organization's team [settings](/dashboard/org/_/team). You can only leave an organization if there is _at least one other owner_. If you are transferring ownership of your organization to someone else, you will need to invite the new member with the **Owner** role. You can leave the organization after they've accepted the invitation.
 
 ### Permissions across roles [#permission-across-roles]
 

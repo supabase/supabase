@@ -1,4 +1,4 @@
-import selfHostingFunctionsCommonSections from '~/../../spec/common-self-hosting-functions-sections.json'
+import selfHostingFunctionsCommonSections from '~/spec/common-self-hosting-functions-sections.json'
 
 import RefSectionHandler from '~/components/reference/RefSectionHandler'
 import { flattenSections } from '~/lib/helpers'

@@ -33,7 +33,7 @@
       {
         "title": "Image Transformations",
         "blog": "/blog/storage-image-resizing-smart-cdn",
-        "docs": "/docs/guides/storage/image-transformations",
+        "docs": "/docs/guides/storage/cdn/fundamentals",
         "isNew": true,
         "description": ""
       },
@@ -41,7 +41,7 @@
         "title": "Smart CDN",
         "description": "Faster asset delivery, now even faster.",
         "blog": "/blog/storage-image-resizing-smart-cdn",
-        "docs": "/docs/guides/storage/cdn",
+        "docs": "/docs/guides/storage/cdn/fundamentals",
         "isNew": true
       }
     ]

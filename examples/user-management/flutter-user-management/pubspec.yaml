@@ -12,8 +12,8 @@ dependencies:
   flutter:
     sdk: flutter
 
-  image_picker: ^0.8.4
-  supabase_flutter: ^1.10.3
+  image_picker: ^1.0.5
+  supabase_flutter: ^2.0.0
 
 dev_dependencies:
   flutter_test:

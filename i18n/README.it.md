@@ -247,7 +247,7 @@ Il nostro approccio alle librerie client è modulare. Ogni sotto-libreria è un'
 - [Cinese semplificato / 简体中文](/i18n/README.zh-cn.md)
 - [Svedese / Svenska](/i18n/README.sv.md)
 - [Thai / ไทย](/i18n/README.th.md)
-- [Cinese tradizionale / 繁体中文](/i18n/README.zh-tw.md)
+- [Cinese tradizionale / 繁體中文](/i18n/README.zh-tw.md)
 - [Turco / Türkçe](/i18n/README.tr.md)
 - [Ucraino / Українська](/i18n/README.uk.md)
 - [Vietnamita / Tiếng Việt](/i18n/README.vi-vn.md)

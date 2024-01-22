@@ -43,7 +43,7 @@ export function Default() {
           variant={'outline'}
           className={cn(
             'w-[280px] justify-start text-left font-normal',
-            !date && 'text-muted-foreground'
+            !date && 'text-foreground-muted'
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
@@ -72,7 +72,7 @@ export function DatePickerWithRange({ className }: React.HTMLAttributes<HTMLDivE
             variant={'outline'}
             className={cn(
               'w-[300px] justify-start text-left font-normal',
-              !date && 'text-muted-foreground'
+              !date && 'text-foreground-muted'
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
@@ -132,7 +132,7 @@ export function DatePickerWithPresets() {
           variant={'outline'}
           className={cn(
             'w-[280px] justify-start text-left font-normal',
-            !date && 'text-muted-foreground'
+            !date && 'text-foreground-muted'
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
@@ -197,7 +197,7 @@ export function DatePickerForm() {
                       variant={'outline'}
                       className={cn(
                         'w-[240px] pl-3 text-left font-normal',
-                        !field.value && 'text-muted-foreground'
+                        !field.value && 'text-foreground-muted'
                       )}
                     >
                       {field.value ? format(field.value, 'PPP') : <span>Pick a date</span>}
