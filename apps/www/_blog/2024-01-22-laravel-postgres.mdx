@@ -10,7 +10,7 @@ tags:
   - postgres
   - developers
   - php
-date: '2024-01-17'
+date: '2024-01-22'
 toc_depth: 3
 ---
 
@@ -33,7 +33,7 @@ If you prefer video guide, you can follow along below. And make sure to subscrib
 <div className="video-container">
   <iframe
     className="w-full"
-    src="https://www.youtube-nocookie.com/embed/Z4L_UE0hVmo"
+    src="https://www.youtube-nocookie.com/embed/dg1suKt-7D4"
     title="YouTube video player"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
     allowfullscreen
@@ -71,7 +71,30 @@ Laravel ships with a Postgres adapter out of the box, you can simply configure i
 
 ```bash .env
 DB_CONNECTION=pgsql
-DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres
+DATABASE_URL=postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:6543/postgres
+```
+
+### Change the default schema
+
+By default Laravel uses the `public` schema. We recommend changing this as supabase exposes the `public` schema as a [data API](/docs/guides/api).
+
+You can change the schema of your Laravel application by modifying the `search_path` variable `app/config/database.php`:
+
+```php app/config/database.php
+'pgsql' => [
+    'driver' => 'pgsql',
+    'url' => env('DATABASE_URL'),
+    'host' => env('DB_HOST', '127.0.0.1'),
+    'port' => env('DB_PORT', '5432'),
+    'database' => env('DB_DATABASE', 'forge'),
+    'username' => env('DB_USERNAME', 'forge'),
+    'password' => env('DB_PASSWORD', ''),
+    'charset' => 'utf8',
+    'prefix' => '',
+    'prefix_indexes' => true,
+    'search_path' => 'laravel',
+    'sslmode' => 'prefer',
+],
 ```
 
 ## Run the database migrations
@@ -97,3 +120,6 @@ Supabase is the ideal platform for powering your Postgres database for your Lara
 Try it out now at [database.new](https://database.new)!
 
 ## More Supabase
+
+- [Migration guides](/docs/guides/resources#migrate-to-supabase)
+-
