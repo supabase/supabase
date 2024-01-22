@@ -275,6 +275,7 @@ export const GRAPHQL: Parent[] = [
   },
 ]
 
+// move this to /tests/
 // having duplicate keys will mess up the tabs and dropdowns
 // check that each item has a unique top-level item
 // example: frameworks need to be unique: next/react/vue/svelte/nuxt/etc
