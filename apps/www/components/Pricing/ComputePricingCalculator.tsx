@@ -198,7 +198,7 @@ const ComputePricingCalculator = () => {
                 ])
               }
             >
-              Add Instance
+              Add Compute Instance
             </Button>
           )}
         </div>
@@ -208,9 +208,13 @@ const ComputePricingCalculator = () => {
           <PriceSummary />
           <div className="flex items-center gap-1 w-full justify-between">
             <span>Estimate</span>
-            <span className="text-foreground font-mono text-base">${activePrice}</span>
+            <span
+              className="text-foreground font-mono text-base flex items-center gap-1"
+              data-tip="This estimate only includes Plan and Compute add-on costs. Other resources might concur in the final invoice."
+            >
+              <InformationCircleIcon className="w-3 h-3" /> ${activePrice}
+            </span>
           </div>
-          <ReactTooltip effect="solid" className="!max-w-[320px] whitespace-pre-line" />
         </div>
       </div>
     </div>
