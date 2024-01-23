@@ -1,8 +1,8 @@
 import React, { FC } from 'react'
+import Link from 'next/link'
 import { Button, IconCheck, cn } from 'ui'
 
 import { plans } from 'shared-data/plans'
-import Link from 'next/link'
 
 const PricingPlans: FC = () => {
   return (

@@ -1,5 +1,5 @@
-import { InformationCircleIcon } from '@heroicons/react/outline'
 import React, { useEffect, useState } from 'react'
+import { InformationCircleIcon } from '@heroicons/react/outline'
 import ReactTooltip from 'react-tooltip'
 import {
   Badge,

@@ -1,18 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react'
-import Panel from '../Panel'
-import { Button, cn } from 'ui'
-import Image from 'next/image'
-import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { ChevronDownIcon } from '@heroicons/react/outline'
-import ComputePricingTable from './ComputePricingTable'
 import { useWindowSize } from 'react-use'
+
+import { Button, cn } from 'ui'
+import Panel from '../Panel'
+import ComputePricingTable from './ComputePricingTable'
 import PricingComputeAnimation from './PricingComputeAnimation'
 import ComputePricingCalculator from './ComputePricingCalculator'
 
 const PricingComputeSection = () => {
   const ref = useRef<HTMLDivElement>(null)
-  const { resolvedTheme } = useTheme()
   const [showTable, setShowTable] = useState(false)
   const { width } = useWindowSize()
   const [height, setHeight] = useState(ref?.current?.clientHeight)
@@ -27,25 +25,7 @@ const PricingComputeSection = () => {
         <div className="p-4 pb-0 lg:p-8 gap-4">
           <div className="flex flex-col gap-2">
             <div className="flex flex-col gap-2">
-              {/* <div className="flex items-center justify-center h-12 w-12 bg-alternative rounded-lg mb-3">
-                <svg
-                  width="25"
-                  height="24"
-                  viewBox="0 0 25 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M11.7075 8.99963H6.4232V14.9996M20 16.7328V20C20 20.5523 19.5523 21 19 21H6C5.44772 21 5 20.5523 5 20V16C5 15.4477 5.44772 15 6 15H13.5937M12.8637 9H6C5.44772 9 5 8.55229 5 8V4C5 3.44772 5.44772 3 6 3H19C19.5523 3 20 3.44772 20 4V7.99585M14.0817 17.2045V11.1907H10.7459L16.9259 4.92151L20.0159 8.05613L23.1059 11.1907H20.0033V18M16.9077 11.9619V18.7052"
-                    stroke="hsl(var(--brand-default))"
-                    strokeMiterlimit="10"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </div> */}
               <div className="flex items-center gap-1">
-                {/* <p className="text-sm">Optimized compute</p> */}
                 <span className="border bg-alternative px-3 py-0.5 text-foreground text-sm rounded-full">
                   Starts from $10/month
                 </span>
