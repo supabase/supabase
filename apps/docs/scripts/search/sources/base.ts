@@ -25,7 +25,7 @@ export abstract class BaseSource {
 
   constructor(public source: string, public path: string) {}
 
-  abstract process(): { checksum: string; meta?: Json; sections: Section[] }
+  abstract process(): { checksum: string; meta?: Json; ragIgnore?: boolean; sections: Section[] }
 
   abstract extractIndexedContent(): string
 }
