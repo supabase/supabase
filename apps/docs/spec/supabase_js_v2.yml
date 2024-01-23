@@ -234,8 +234,8 @@ functions:
         - If **Confirm email** is disabled, both a `user` and a `session` are returned.
       - When the user confirms their email address, they are redirected to the [`SITE_URL`](/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](/dashboard/project/_/auth/url-configuration).
       - If signUp() is called for an existing confirmed user:
-          - If **Confirm email** is enabled in [your project](/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
-          - If **Confirm email** is disabled, the error message, `User already registered` is returned.
+        - When both **Confirm email** and **Confirm phone** (even when phone provider is disabled) are enabled in [your project](/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
+        - When either **Confirm email** or **Confirm phone** (even when phone provider is disabled) is disabled, the error message, `User already registered` is returned.
       - To fetch the currently logged-in user, refer to [`getUser()`](/docs/reference/javascript/auth-getuser).
     examples:
       - id: sign-up
@@ -748,6 +748,56 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase.auth.getSession()
+          ```
+  - id: start-auto-refresh
+    title: 'startAutoRefresh()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.startAutoRefresh'
+    notes: |
+      - Only useful in non-browser environments such as React Native or Electron.
+      - The Supabase Auth library automatically starts and stops proactively refreshing the session when a tab is focused or not.
+      - On non-browser platforms, such as mobile or desktop apps built with web technologies, the library is not able to effectively determine whether the application is _focused_ or not.
+      - To give this hint to the application, you should be calling this method when the app is in focus and calling `supabase.auth.stopAutoRefresh()` when it's out of focus.
+    examples:
+      - id: start-stop-auto-refresh-react-native
+        name: Start and stop auto refresh in React Native
+        isSpotlight: true
+        code: |
+          ```js
+          import { AppState } from 'react-native'
+
+          // make sure you register this only once!
+          AppState.addEventListener('change', (state) => {
+            if (state === 'active') {
+              supabase.auth.startAutoRefresh()
+            } else {
+              supabase.auth.stopAutoRefresh()
+            }
+          })
+          ```
+  - id: stop-auto-refresh
+    title: 'stopAutoRefresh()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.stopAutoRefresh'
+    notes: |
+      - Only useful in non-browser environments such as React Native or Electron.
+      - The Supabase Auth library automatically starts and stops proactively refreshing the session when a tab is focused or not.
+      - On non-browser platforms, such as mobile or desktop apps built with web technologies, the library is not able to effectively determine whether the application is _focused_ or not.
+      - When your application goes in the background or out of focus, call this method to stop the proactive refreshing of the session.
+    examples:
+      - id: start-stop-auto-refresh-react-native
+        name: Start and stop auto refresh in React Native
+        isSpotlight: true
+        code: |
+          ```js
+          import { AppState } from 'react-native'
+
+          // make sure you register this only once!
+          AppState.addEventListener('change', (state) => {
+            if (state === 'active') {
+              supabase.auth.startAutoRefresh()
+            } else {
+              supabase.auth.stopAutoRefresh()
+            }
+          })
           ```
   - id: get-user
     title: 'getUser()'

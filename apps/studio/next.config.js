@@ -10,7 +10,9 @@ const API_URL = new URL(process.env.NEXT_PUBLIC_API_URL).origin
 const SUPABASE_URL = new URL(process.env.SUPABASE_URL).origin
 const GOTRUE_URL = new URL(process.env.NEXT_PUBLIC_GOTRUE_URL).origin
 const SUPABASE_PROJECTS_URL = 'https://*.supabase.co'
+const SUPABASE_PROJECTS_URL_WS = 'wss://*.supabase.co'
 const SUPABASE_STAGING_PROJECTS_URL = 'https://*.supabase.red'
+const SUPABASE_STAGING_PROJECTS_URL_WS = 'wss://*.supabase.red'
 const SUPABASE_COM_URL = 'https://supabase.com'
 const CLOUDFLARE_CDN_URL = 'https://cdnjs.cloudflare.com'
 const HCAPTCHA_SUBDOMAINS_URL = 'https://*.hcaptcha.com'
@@ -27,23 +29,27 @@ const VERCEL_INSIGHTS_URL = 'https://*.vercel-insights.com'
 const VERCEL_LIVE_URL = 'https://vercel.live'
 // used by vercel live preview
 const PUSHER_URL = 'https://*.pusher.com'
+const PUSHER_URL_WS = 'wss://*.pusher.com'
 
-const DEFAULT_SRC_URLS = `${API_URL} ${SUPABASE_URL} ${GOTRUE_URL} ${SUPABASE_PROJECTS_URL} ${HCAPTCHA_SUBDOMAINS_URL} ${CONFIGCAT_URL} ${STRIPE_SUBDOMAINS_URL} ${STRIPE_NETWORK_URL} ${CLOUDFLARE_URL} ${ONE_ONE_ONE_ONE_URL} ${VERCEL_INSIGHTS_URL}`
+const DEFAULT_SRC_URLS = `${API_URL} ${SUPABASE_URL} ${GOTRUE_URL} ${SUPABASE_PROJECTS_URL} ${SUPABASE_PROJECTS_URL_WS} ${HCAPTCHA_SUBDOMAINS_URL} ${CONFIGCAT_URL} ${STRIPE_SUBDOMAINS_URL} ${STRIPE_NETWORK_URL} ${CLOUDFLARE_URL} ${ONE_ONE_ONE_ONE_URL} ${VERCEL_INSIGHTS_URL}`
 const SCRIPT_SRC_URLS = `${CLOUDFLARE_CDN_URL} ${HCAPTCHA_JS_URL} ${STRIPE_JS_URL}`
 const FRAME_SRC_URLS = `${HCAPTCHA_ASSET_URL} ${STRIPE_JS_URL}`
-const IMG_SRC_URLS = `${SUPABASE_COM_URL}`
+const IMG_SRC_URLS = `${SUPABASE_COM_URL} ${SUPABASE_PROJECTS_URL}`
 const STYLE_SRC_URLS = `${CLOUDFLARE_CDN_URL}`
 const FONT_SRC_URLS = `${CLOUDFLARE_CDN_URL}`
 
 const csp = [
-  ...(process.env.VERCEL_ENV === 'preview' || process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
+  ...(process.env.VERCEL_ENV === 'preview' ||
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
     ? [
-        `default-src 'self' ${DEFAULT_SRC_URLS} ${SUPABASE_STAGING_PROJECTS_URL} ${VERCEL_LIVE_URL} ${PUSHER_URL};`,
+        `default-src 'self' ${DEFAULT_SRC_URLS} ${SUPABASE_STAGING_PROJECTS_URL} ${SUPABASE_STAGING_PROJECTS_URL_WS} ${VERCEL_LIVE_URL} ${PUSHER_URL} ${PUSHER_URL_WS};`,
         `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${SCRIPT_SRC_URLS} ${VERCEL_LIVE_URL};`,
         `frame-src 'self' ${FRAME_SRC_URLS} ${VERCEL_LIVE_URL};`,
-        `img-src 'self' blob: data: ${IMG_SRC_URLS} ${VERCEL_URL};`,
+        `img-src 'self' blob: data: ${IMG_SRC_URLS} ${SUPABASE_STAGING_PROJECTS_URL} ${VERCEL_URL};`,
         `style-src 'self' 'unsafe-inline' ${STYLE_SRC_URLS} ${VERCEL_LIVE_URL};`,
         `font-src 'self' ${FONT_SRC_URLS} ${VERCEL_LIVE_URL};`,
+        `worker-src 'self' blob: data:;`,
       ]
     : [
         `default-src 'self' ${DEFAULT_SRC_URLS};`,
@@ -52,6 +58,7 @@ const csp = [
         `img-src 'self' blob: data: ${IMG_SRC_URLS};`,
         `style-src 'self' 'unsafe-inline' ${STYLE_SRC_URLS};`,
         `font-src 'self' ${FONT_SRC_URLS};`,
+        `worker-src 'self' blob: data:;`,
       ]),
   `object-src 'none';`,
   `base-uri 'self';`,
