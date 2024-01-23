@@ -32,6 +32,7 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useCheckPermissions, useStore } from 'hooks'
 import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
 import { SESSION_MODE_DESCRIPTION, TRANSACTION_MODE_DESCRIPTION } from '../Database.constants'
+import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 
 const formId = 'connection-pooling-form'
 
@@ -59,7 +60,8 @@ const FormSchema = z.object({
 export const ConnectionPooling = () => {
   const { ui } = useStore()
   const { ref: projectRef } = useParams()
-  const { project, isLoading: projectIsLoading } = useProjectContext()
+  const { project } = useProjectContext()
+  const snap = useDatabaseSettingsStateSnapshot()
 
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const computeInstance = addons?.selected_addons.find((addon) => addon.type === 'compute_instance')
@@ -74,9 +76,6 @@ export const ConnectionPooling = () => {
 
   const connectionPoolingUnavailable =
     !poolingInfo?.pgbouncer_enabled && poolingInfo?.pool_mode === null
-
-  // [Joshen] TODO this needs to be obtained from BE as 26th Jan is when we'll start - projects will be affected at different rates
-  const resolvesToIpV6 = !poolingInfo?.supavisor_enabled && false // Number(new Date()) > Number(dayjs.utc('01-26-2024', 'MM-DD-YYYY').toDate())
 
   const canUpdateConnectionPoolingConfiguration = useCheckPermissions(
     PermissionAction.UPDATE,
@@ -259,25 +258,14 @@ export const ConnectionPooling = () => {
                           </FormControl_Shadcn_>
                           <FormDescription_Shadcn_ className="col-start-5 col-span-8 flex flex-col gap-y-2">
                             <p>
-                              Specify when a connection can be returned to the pool. Please refer to
-                              our{' '}
-                              <a
-                                href="https://supabase.com/docs/guides/database/connecting-to-postgres#how-connection-pooling-works"
-                                target="_blank"
-                                rel="noreferrer"
-                                className="underline"
+                              Specify when a connection can be returned to the pool.{' '}
+                              <span
+                                tabIndex={0}
+                                onClick={() => snap.setShowPoolingModeHelper(true)}
+                                className="cursor-pointer underline underline-offset-2"
                               >
-                                documentation
-                              </a>{' '}
-                              to find out the most suitable mode for your use case.
-                            </p>
-                            <p>
-                              If you're using{' '}
-                              <span className="text-foreground">prepared statements</span> in your
-                              database, you will need to either use the{' '}
-                              <span className="text-foreground">Session</span> pool mode or use port{' '}
-                              <span className="text-foreground">5432</span> in the connection
-                              string.
+                                Unsure which pooling mode to use?
+                              </span>
                             </p>
                           </FormDescription_Shadcn_>
                           <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
