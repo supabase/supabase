@@ -2,7 +2,6 @@ export const LOCAL_STORAGE_KEYS = {
   SAVED_ORG: 'docs.ui.user.selected.org',
   SAVED_PROJECT: 'docs.ui.user.selected.project',
   SAVED_BRANCH: 'docs.ui.user.selected.branch',
-  IPV4_DEPRECATION_DISMISSAL: 'pgbouncer-deprecation-warning-dismissed',
 } as const
 
 type LocalStorageKey = (typeof LOCAL_STORAGE_KEYS)[keyof typeof LOCAL_STORAGE_KEYS]

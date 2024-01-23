@@ -1,30 +1,9 @@
 import Link from 'next/link'
-import { memo, useEffect, useReducer } from 'react'
+import { memo } from 'react'
 
 import { Button, IconExternalLink, cn } from 'ui'
 
-import { LOCAL_STORAGE_KEYS, retrieve, store } from '~/lib/storage'
-
-const DISMISSAL_STORAGE_KEY = LOCAL_STORAGE_KEYS.IPV4_DEPRECATION_DISMISSAL
-
-function changeBannerVsibility(_, isVisible: boolean) {
-  if (isVisible) {
-    return true
-  }
-  store('local', DISMISSAL_STORAGE_KEY, 'true')
-  return false
-}
-
 export const IPv4DeprecationBanner = memo(() => {
-  const [isBannerVisible, setIsBannerVisible] = useReducer(changeBannerVsibility, false)
-
-  useEffect(() => {
-    const acknowledged = retrieve('local', DISMISSAL_STORAGE_KEY) === 'true'
-    if (!acknowledged) setIsBannerVisible(true)
-  }, [])
-
-  if (!isBannerVisible) return null
-
   return (
     <div className="flex items-center justify-center gap-x-4 bg-surface-100 p-3 transition text-foreground box-border border-b border-default">
       <p className="text-sm">
@@ -44,14 +23,6 @@ export const IPv4DeprecationBanner = memo(() => {
         >
           Learn more
         </Link>
-        <Button
-          type="text"
-          className="sm:hidden opacity-75"
-          aria-hidden="true"
-          onClick={() => setIsBannerVisible(false)}
-        >
-          Dismiss
-        </Button>
       </p>
       <div className="max-sm:sr-only sm:flex items-center gap-x-1">
         <Button asChild type="link" iconRight={<IconExternalLink />}>
@@ -62,9 +33,6 @@ export const IPv4DeprecationBanner = memo(() => {
           >
             Learn more
           </a>
-        </Button>
-        <Button type="text" className="opacity-75" onClick={() => setIsBannerVisible(false)}>
-          Dismiss
         </Button>
       </div>
     </div>
