@@ -47,7 +47,6 @@ const csp = [
         `style-src 'self' 'unsafe-inline' ${STYLE_SRC_URLS} ${VERCEL_LIVE_URL};`,
         `font-src 'self' ${FONT_SRC_URLS} ${VERCEL_LIVE_URL};`,
         `worker-src 'self' blob: data:;`
-
       ]
       : [
         `default-src 'self' ${DEFAULT_SRC_URLS};`,
