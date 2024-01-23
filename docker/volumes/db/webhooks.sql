@@ -125,6 +125,7 @@ BEGIN;
                 END IF;
             END;
           END LOOP;
+          -- Failed retries are not logged
           INSERT INTO supabase_functions.hooks
             (hook_table_id, hook_name, request_id)
           VALUES
