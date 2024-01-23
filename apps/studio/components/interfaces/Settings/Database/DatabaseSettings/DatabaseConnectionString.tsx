@@ -218,7 +218,7 @@ export const DatabaseConnectionString = () => {
                 onClick={() => setShowUriSyntax(!showUriSyntax)}
               >
                 <p className="text-xs text-foreground">
-                  How to connect to a different database or user
+                  How to connect to a different database or switch to another user
                 </p>
                 <IconChevronDown
                   strokeWidth={1.5}
