@@ -27,7 +27,7 @@ const PricingComputeSection = () => {
         <div className="p-4 pb-0 lg:p-8 gap-4">
           <div className="flex flex-col gap-2">
             <div className="flex flex-col gap-2">
-              <div className="flex items-center justify-center h-12 w-12 bg-alternative rounded-lg mb-3">
+              {/* <div className="flex items-center justify-center h-12 w-12 bg-alternative rounded-lg mb-3">
                 <svg
                   width="25"
                   height="24"
@@ -43,17 +43,17 @@ const PricingComputeSection = () => {
                     strokeLinejoin="round"
                   />
                 </svg>
+              </div> */}
+              <div className="flex items-center gap-1">
+                {/* <p className="text-sm">Optimized compute</p> */}
+                <span className="border bg-alternative px-3 py-0.5 text-foreground text-sm rounded-full">
+                  Starts from $10/month
+                </span>
               </div>
               <h3 className="text-foreground text-2xl">
                 Scale each project
                 <br className="hidden md:block" /> up to 256 GB compute
               </h3>
-              <div className="flex items-center gap-1">
-                <p className="text-sm">Optimized compute</p>
-                <span className="border bg-alternative px-3 py-0.5 text-foreground text-sm rounded-full">
-                  Starts from $10/month
-                </span>
-              </div>
             </div>
             <p className="text-foreground-lighter text-[13px]">
               Paid plans include 10$ in compute credits that can be spent on one or more instances.
