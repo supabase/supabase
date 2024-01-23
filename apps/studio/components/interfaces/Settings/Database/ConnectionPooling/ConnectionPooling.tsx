@@ -36,7 +36,6 @@ const formId = 'connection-pooling-form'
 
 // This validator validates a string to be a positive integer or if it's an empty string, transforms it to a null
 const StringToPositiveNumber = (max: number) => {
-  console.log({ max })
   return z.union([
     // parse the value if it's a number
     z.number().positive().int().max(max, `Must not be greater than ${max}`),
