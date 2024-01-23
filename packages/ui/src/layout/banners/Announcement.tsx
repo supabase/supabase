@@ -61,7 +61,7 @@ const Announcement = ({
     return (
       <div
         onClick={() => window.location.assign(announcement.link)}
-        className={cn('relative z-40 w-full cursor-pointer', className)}
+        className={cn('relative z-40 w-full', className)}
       >
         {dismissable && !isLaunchWeekSection && (
           <div
