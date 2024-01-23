@@ -462,7 +462,7 @@ const PlanUpdateSidePanel = () => {
                   <div>
                     <p className="text-sm mt-2">
                       Each project is a dedicated server and database. Paid plans come with $10 of
-                      Compute Credits to cover one project on the default Starter Compute size or
+                      Compute Credits to cover one project on the default Micro Compute size or
                       parts of any compute addon. Additional unpaused projects on paid plans will
                       incur compute usage costs starting at $10 per month, billed hourly.
                     </p>
