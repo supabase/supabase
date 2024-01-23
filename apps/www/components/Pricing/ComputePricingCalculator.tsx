@@ -1,5 +1,6 @@
 import { InformationCircleIcon } from '@heroicons/react/outline'
 import React, { useEffect, useState } from 'react'
+import ReactTooltip from 'react-tooltip'
 import {
   Badge,
   Button,
@@ -263,6 +264,11 @@ const ComputePricingCalculator = () => {
            )} */}
         </div>
       </div>
+      <ReactTooltip
+        effect="solid"
+        className="!max-w-[320px] whitespace-pre-line"
+        backgroundColor="hsl(var(--background-alternative))"
+      />
     </div>
   )
 }
