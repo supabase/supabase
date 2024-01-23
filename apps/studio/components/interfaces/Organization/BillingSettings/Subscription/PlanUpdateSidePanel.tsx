@@ -178,23 +178,32 @@ const PlanUpdateSidePanel = () => {
           <div className="py-6 grid grid-cols-12 gap-3">
             {subscriptionsPlans.map((plan) => {
               const planMeta = availablePlans.find((p) => p.id === plan.id.split('tier_')[1])
-              const tierMeta = subscriptionsPlans.find((it) => it.id === plan.id)
               const price = planMeta?.price ?? 0
               const isDowngradeOption = planMeta?.change_type === 'downgrade'
               const isCurrentPlan = planMeta?.id === subscription?.plan?.id
+              const features = billingViaPartner ? plan.featuresPartner : plan.features
+              const warning =
+                billingViaPartner && plan.warningPartner
+                  ? plan.warningPartner
+                  : plan.warning ?? null
 
               if (plan.id === 'tier_enterprise') {
-                return <EnterpriseCard key={plan.id} plan={plan} isCurrentPlan={isCurrentPlan} />
+                return (
+                  <EnterpriseCard
+                    key={plan.id}
+                    plan={plan}
+                    isCurrentPlan={isCurrentPlan}
+                    billingViaPartner={billingViaPartner}
+                  />
+                )
               }
 
               return (
                 <div
                   key={plan.id}
-                  className={clsx(
-                    'border rounded-md px-4 py-4 flex flex-col items-start justify-between',
-                    plan.id === 'tier_enterprise' ? 'col-span-12' : 'col-span-12 md:col-span-4',
-                    plan.id === 'tier_enterprise' ? 'bg-background' : 'bg-surface-200'
-                  )}
+                  className={
+                    'border rounded-md px-4 py-4 flex flex-col items-start justify-between col-span-12 md:col-span-4 bg-surface-200'
+                  }
                 >
                   <div className="w-full">
                     <div className="flex items-center space-x-2">
@@ -220,11 +229,11 @@ const PlanUpdateSidePanel = () => {
                       ) : (
                         <p className="text-foreground text-lg">${price}</p>
                       )}
-                      <p className="text-foreground-light text-sm">{tierMeta?.costUnit}</p>
+                      <p className="text-foreground-light text-sm">{plan.costUnit}</p>
                     </div>
-                    <div className={clsx('flex mt-1 mb-4', !tierMeta?.warning && 'opacity-0')}>
+                    <div className={clsx('flex mt-1 mb-4', !warning && 'opacity-0')}>
                       <div className="bg-background text-brand-600 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-xs">
-                        {tierMeta?.warning}
+                        {warning}
                       </div>
                     </div>
                     {isCurrentPlan ? (
@@ -287,7 +296,7 @@ const PlanUpdateSidePanel = () => {
                     <div className="border-t my-6" />
 
                     <ul role="list">
-                      {plan.features.map((feature) => (
+                      {features.map((feature) => (
                         <li key={feature} className="flex py-2">
                           <div className="w-[12px]">
                             <IconCheck
@@ -453,7 +462,7 @@ const PlanUpdateSidePanel = () => {
                   <div>
                     <p className="text-sm mt-2">
                       Each project is a dedicated server and database. Paid plans come with $10 of
-                      Compute Credits to cover one project on the default Starter Compute size or
+                      Compute Credits to cover one project on the default Micro Compute size or
                       parts of any compute addon. Additional unpaused projects on paid plans will
                       incur compute usage costs starting at $10 per month, billed hourly.
                     </p>

@@ -8,10 +8,11 @@ import { observer } from 'mobx-react-lite'
 import { NextPageWithLayout } from 'types'
 
 import BannedIPs from 'components/interfaces/Settings/Database/BannedIPs'
+import { DatabaseReadOnlyAlert } from 'components/interfaces/Settings/Database/DatabaseReadOnlyAlert'
 import { DatabaseConnectionString } from 'components/interfaces/Settings/Database/DatabaseSettings/DatabaseConnectionString'
 import DiskSizeConfiguration from 'components/interfaces/Settings/Database/DiskSizeConfiguration'
+import { PoolingModesModal } from 'components/interfaces/Settings/Database/PoolingModesModal'
 import SSLConfiguration from 'components/interfaces/Settings/Database/SSLConfiguration'
-import { DatabaseReadOnlyAlert } from 'components/interfaces/Settings/Database/DatabaseReadOnlyAlert'
 
 const ProjectSettings: NextPageWithLayout = () => {
   return (
@@ -32,6 +33,7 @@ const ProjectSettings: NextPageWithLayout = () => {
           <BannedIPs />
         </div>
       </div>
+      <PoolingModesModal />
     </div>
   )
 }
