@@ -8,7 +8,7 @@ const index = memo(() => {
       <div className="relative z-10 flex items-center justify-center">
         <div className="w-full flex gap-4 items-center md:justify-center text-sm">
           <div className="flex gap-2 items-center">
-            <p>Prepare for the pgBouncer and IPv4 deprecations on 26th January 2024</p>
+            <p>Prepare for the PgBouncer and IPv4 deprecations on 26th January 2024</p>
           </div>
           <Button asChild type="link" iconRight={<IconExternalLink className="hidden sm:block" />}>
             <a
