@@ -29,6 +29,7 @@ export enum PricingMetric {
 
 export enum ComputeUsageMetric {
   COMPUTE_HOURS_BRANCH = 'COMPUTE_HOURS_BRANCH',
+  COMPUTE_HOURS_XXS = 'COMPUTE_HOURS_XXS',
   COMPUTE_HOURS_XS = 'COMPUTE_HOURS_XS',
   COMPUTE_HOURS_SM = 'COMPUTE_HOURS_SM',
   COMPUTE_HOURS_MD = 'COMPUTE_HOURS_MD',
@@ -45,6 +46,8 @@ export const computeUsageMetricLabel = (computeUsageMetric: ComputeUsageMetric) 
   switch (computeUsageMetric) {
     case 'COMPUTE_HOURS_BRANCH':
       return 'Branches'
+    case 'COMPUTE_HOURS_XXS':
+      return 'Nano'
     case 'COMPUTE_HOURS_XS':
       return 'Micro'
     case 'COMPUTE_HOURS_SM':

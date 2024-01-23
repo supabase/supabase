@@ -6,6 +6,8 @@ import { Alert } from 'ui'
 
 export const COLOR_MAP = {
   white: { bar: 'fill-foreground', marker: 'bg-foreground' },
+  // todo(kevin): actually find a gray color
+  gray: { bar: 'fill-foreground', marker: 'bg-foreground' },
   green: { bar: 'fill-green-800', marker: 'bg-green-800' },
   'dark-green': { bar: 'fill-green-1000', marker: 'bg-green-1000' },
   blue: { bar: 'fill-blue-900', marker: 'bg-blue-900' },
@@ -36,6 +38,7 @@ export type AttributeColor =
   | 'dark-orange'
   | 'dark-yellow'
   | 'dark-green'
+  | 'gray'
 
 export interface Attribute {
   key: string
