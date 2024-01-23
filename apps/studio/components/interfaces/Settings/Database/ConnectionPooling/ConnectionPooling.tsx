@@ -4,6 +4,9 @@ import { useParams } from 'common'
 import { Fragment, useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Badge,
   Button,
   FormControl_Shadcn_,
@@ -13,6 +16,7 @@ import {
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
   Form_Shadcn_,
+  IconAlertTriangle,
   IconExternalLink,
   Input,
   Input_Shadcn_,
@@ -37,23 +41,18 @@ import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 const formId = 'connection-pooling-form'
 
 // This validator validates a string to be a positive integer or if it's an empty string, transforms it to a null
-const StringToPositiveNumber = (max: number) => {
-  return z.union([
-    // parse the value if it's a number
-    z.number().positive().int().max(max, `Must not be greater than ${max}`),
-    // parse the value if it's a non-empty string
-    z
-      .string()
-      .min(1)
-      .pipe(z.coerce.number().positive().int().max(max, `Must not be greater than ${max}`)),
-    // transform a non-empty string into a null value
-    z
-      .string()
-      .max(0, 'The field accepts only a number')
-      .transform((v) => null),
-    z.null(),
-  ])
-}
+const StringToPositiveNumber = z.union([
+  // parse the value if it's a number
+  z.number().positive().int(),
+  // parse the value if it's a non-empty string
+  z.string().min(1).pipe(z.coerce.number().positive().int()),
+  // transform a non-empty string into a null value
+  z
+    .string()
+    .max(0, 'The field accepts only a number')
+    .transform((v) => null),
+  z.null(),
+])
 
 export const ConnectionPooling = () => {
   const { ui } = useStore()
@@ -63,10 +62,14 @@ export const ConnectionPooling = () => {
 
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const computeInstance = addons?.selected_addons.find((addon) => addon.type === 'compute_instance')
-  const maxPoolSizeByInstance =
+  const defaultPoolSize =
     POOLING_OPTIMIZATIONS?.[
       computeInstance?.variant.identifier as keyof typeof POOLING_OPTIMIZATIONS
     ]?.poolSize ?? 15 // [TODO] 15 is for micro, need to change to 10 for nano
+  const defaultMaxClientConn =
+    POOLING_OPTIMIZATIONS?.[
+      computeInstance?.variant.identifier as keyof typeof POOLING_OPTIMIZATIONS
+    ]?.maxClientConn ?? 200
 
   const {
     data: poolingInfo,
@@ -79,8 +82,8 @@ export const ConnectionPooling = () => {
   const FormSchema = z.object({
     ignore_startup_parameters: z.string(),
     pool_mode: z.union([z.literal('transaction'), z.literal('session'), z.literal('statement')]),
-    default_pool_size: StringToPositiveNumber(maxPoolSizeByInstance),
-    max_client_conn: StringToPositiveNumber(200),
+    default_pool_size: StringToPositiveNumber,
+    max_client_conn: StringToPositiveNumber,
   })
 
   const connectionPoolingUnavailable =
@@ -291,21 +294,36 @@ export const ConnectionPooling = () => {
                           </FormLabel_Shadcn_>
                           <FormControl_Shadcn_ className="col-span-8">
                             <Input_Shadcn_
-                              className="w-full"
                               {...field}
+                              type="number"
+                              className="w-full"
                               value={field.value || undefined}
                               placeholder={
                                 poolingInfo.supavisor_enabled && field.value === null
-                                  ? `Default: ${maxPoolSizeByInstance}`
+                                  ? `${defaultPoolSize}`
                                   : ''
                               }
                             />
                           </FormControl_Shadcn_>
+                          {Number(form.getValues('default_pool_size') ?? 15) >
+                            defaultMaxClientConn && (
+                            <div className="col-start-5 col-span-8">
+                              <Alert_Shadcn_ variant="warning">
+                                <IconAlertTriangle strokeWidth={2} />
+                                <AlertTitle_Shadcn_>
+                                  Pool size exceeds the max client connections
+                                </AlertTitle_Shadcn_>
+                                <AlertDescription_Shadcn_>
+                                  Explain what might happen here
+                                </AlertDescription_Shadcn_>
+                              </Alert_Shadcn_>
+                            </div>
+                          )}
                           <FormDescription_Shadcn_ className="col-start-5 col-span-8">
                             The maximum number of connections made to the underlying Postgres
-                            cluster, per user+db combination. Overrides default optimizations. Max
-                            pool size for {computeInstance?.variant.name ?? 'Micro'} compute is{' '}
-                            {maxPoolSizeByInstance}.
+                            cluster, per user+db combination. Pool size has a default of{' '}
+                            {defaultPoolSize} based on your compute size of{' '}
+                            {computeInstance?.variant.name ?? 'Micro'}.
                           </FormDescription_Shadcn_>
                           <FormDescription_Shadcn_ className="col-start-5 col-span-8">
                             Please refer to our{' '}
@@ -355,17 +373,13 @@ export const ConnectionPooling = () => {
                           <FormControl_Shadcn_ className="col-span-8">
                             <Input_Shadcn_
                               {...field}
+                              type="number"
                               value={field.value || undefined}
                               className="w-full"
                               placeholder={
                                 poolingInfo.supavisor_enabled
                                   ? poolingInfo.supavisor_enabled && field.value === null
-                                    ? `${
-                                        POOLING_OPTIMIZATIONS?.[
-                                          computeInstance?.variant
-                                            .identifier as keyof typeof POOLING_OPTIMIZATIONS
-                                        ]?.maxClientConn ?? 200
-                                      }`
+                                    ? `${defaultMaxClientConn}`
                                     : ''
                                   : ''
                               }
@@ -374,8 +388,12 @@ export const ConnectionPooling = () => {
                           <FormDescription_Shadcn_ className="col-start-5 col-span-8">
                             The maximum number of concurrent client connections allowed.{' '}
                             {poolingInfo.supavisor_enabled
-                              ? 'This value is fixed and cannot be changed. '
-                              : 'Overrides default optimizations. '}
+                              ? `This value is fixed at ${defaultMaxClientConn} based on your compute size of ${
+                                  computeInstance?.variant.name ?? 'Micro'
+                                } and cannot be changed.`
+                              : 'Overrides default optimizations. '}{' '}
+                          </FormDescription_Shadcn_>
+                          <FormDescription_Shadcn_ className="col-start-5 col-span-8">
                             Please refer to our{' '}
                             <a
                               href="https://supabase.com/docs/guides/platform/custom-postgres-config#pooler-config"
