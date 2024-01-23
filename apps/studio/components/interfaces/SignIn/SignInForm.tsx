@@ -14,9 +14,7 @@ import { Button, Form, Input } from 'ui'
 
 const signInSchema = object({
   email: string().email('Must be a valid email').required('Email is required'),
-  password: string()
-    .required('Password is required')
-    .max(72, 'Password cannot exceed 72 characters'),
+  password: string().required('Password is required'),
 })
 
 const SignInForm = () => {
