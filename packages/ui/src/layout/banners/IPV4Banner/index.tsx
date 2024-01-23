@@ -1,14 +1,7 @@
 import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { AlertTitle_Shadcn_ } from '../../../..'
 import { AlertTriangle } from 'react-feather'
 
 const index = () => {
-  const router = useRouter()
-  const isHomePage = router.pathname === '/'
-
-  if (isHomePage) return null
-
   return (
     <Link
       href="https://github.com/orgs/supabase/discussions/17817"

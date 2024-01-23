@@ -34,7 +34,7 @@ const Announcement = ({
   const isLaunchWeekSection = router.pathname.includes('launch-week')
 
   // override to hide announcement
-  if (!show || !announcement.show || isHomePage || isLaunchWeekSection) return null
+  if (!show || !announcement.show) return null
 
   // construct the key for the announcement, based on the title text
   const announcementKey = 'announcement_' + announcement.text.replace(/ /g, '')

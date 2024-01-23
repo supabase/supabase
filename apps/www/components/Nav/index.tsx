@@ -72,7 +72,7 @@ const Nav = () => {
 
   return (
     <>
-      <Announcement dismissable={false}>
+      <Announcement dismissable={false} show>
         <IPV4Banner />
       </Announcement>
       <div
