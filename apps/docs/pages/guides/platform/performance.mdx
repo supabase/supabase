@@ -215,10 +215,6 @@ Depending on the clients involved, you might be able to configure them to work w
 
 You can configure Postgres connection limit among other parameters by using [Custom Postgres Config](/docs/guides/platform/custom-postgres-config#custom-postgres-config).
 
-export const Page = ({ children }) => <Layout meta={meta} children={children} />
-
-export default Page
-
 ### Connecting to Supavisor with your own Connection Pooler
 
 In situations where you have your own Connection Pooler, for example [Prisma Accelerate](https://www.prisma.io/data-platform/accelerate), you need to be aware of the number of connections you are creating against your Supabase database.
@@ -266,3 +262,7 @@ group by
   application_name
 order by application_name desc;
 ```
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
