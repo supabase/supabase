@@ -9,7 +9,7 @@ import { createClient } from '@supabase/supabase-js'
 import { QueryClientProvider, useQueryClient } from '@tanstack/react-query'
 import { AuthProvider, ThemeProvider, useTelemetryProps, useThemeSandbox } from 'common'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useCallback, useEffect, useState } from 'react'
+import { type PropsWithChildren, useCallback, useEffect, useState } from 'react'
 import { AppPropsWithLayout } from 'types'
 import { CommandMenuProvider, PortalToast, useConsent } from 'ui'
 import { TabsProvider } from 'ui/src/components/Tabs'
@@ -45,14 +45,7 @@ function SignOutHandler({ children }: PropsWithChildren) {
   return <>{children}</>
 }
 
-function MyApp({ Component, pageProps }: AppPropsWithLayout) {
-  const router = useRouter()
-  const telemetryProps = useTelemetryProps()
-  const { consentValue, hasAcceptedConsent } = useConsent()
-  const queryClient = useRootQueryClient()
-
-  useThemeSandbox()
-
+function AuthContainer({ children }: PropsWithChildren) {
   const [supabase] = useState(() =>
     IS_PLATFORM
       ? createClient(
@@ -61,6 +54,23 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
         )
       : undefined
   )
+
+  return IS_PLATFORM ? (
+    <SessionContextProvider supabaseClient={supabase}>
+      <AuthProvider>{children}</AuthProvider>
+    </SessionContextProvider>
+  ) : (
+    <AuthProvider>{children}</AuthProvider>
+  )
+}
+
+function MyApp({ Component, pageProps }: AppPropsWithLayout) {
+  const router = useRouter()
+  const telemetryProps = useTelemetryProps()
+  const { consentValue, hasAcceptedConsent } = useConsent()
+  const queryClient = useRootQueryClient()
+
+  useThemeSandbox()
 
   const handlePageTelemetry = useCallback(
     (route: string) => {
@@ -176,16 +186,6 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       window.removeEventListener('popstate', handler)
     }
   }, [router])
-
-  const AuthContainer = ({ children }) => {
-    return IS_PLATFORM ? (
-      <SessionContextProvider supabaseClient={supabase}>
-        <AuthProvider>{children}</AuthProvider>
-      </SessionContextProvider>
-    ) : (
-      <AuthProvider>{children}</AuthProvider>
-    )
-  }
 
   return (
     <>
