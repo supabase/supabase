@@ -47,6 +47,7 @@ import ComputeInstanceSidePanel from './ComputeInstanceSidePanel'
 import CustomDomainSidePanel from './CustomDomainSidePanel'
 import PITRSidePanel from './PITRSidePanel'
 import IPv4SidePanel from './IPv4SidePanel'
+import { capitalize } from 'lodash'
 
 const Addons = () => {
   const { resolvedTheme } = useTheme()
@@ -98,7 +99,33 @@ const Addons = () => {
   const selectedAddons = addons?.selected_addons ?? []
   const { computeInstance, pitr, customDomain, ipv4 } = getAddons(selectedAddons)
 
-  const meta = computeInstance?.variant?.meta as ProjectAddonVariantMeta | undefined
+  const meta = useMemo(() => {
+    const computeMeta = computeInstance?.variant?.meta as ProjectAddonVariantMeta | undefined
+
+    if (!computeMeta && selectedProject?.infra_compute_size === 'nano') {
+      return {
+        baseline_disk_io_mbs: 43,
+        connections_direct: 30,
+        connections_pooler: 200,
+        cpu_cores: 2,
+        cpu_dedicated: false,
+        max_disk_io_mbs: 2085,
+        memory_gb: 0.5,
+      }
+    } else if (selectedProject?.infra_compute_size === 'micro') {
+      return {
+        baseline_disk_io_mbs: 87,
+        connections_direct: 60,
+        connections_pooler: 200,
+        cpu_cores: 2,
+        cpu_dedicated: false,
+        max_disk_io_mbs: 2085,
+        memory_gb: 1,
+      }
+    }
+
+    return computeMeta
+  }, [selectedProject, computeInstance])
 
   return (
     <>
@@ -210,7 +237,11 @@ const Addons = () => {
                   </div>
                   <div className="flex-grow">
                     <p className="text-sm text-foreground-light">Current option:</p>
-                    <p>{computeInstance?.variant.name ?? 'Micro'}</p>
+                    <p>
+                      {computeInstance?.variant.name ??
+                        capitalize(selectedProject?.infra_compute_size) ??
+                        'Micro'}
+                    </p>
                     <ProjectUpdateDisabledTooltip
                       projectUpdateDisabled={projectUpdateDisabled}
                       projectNotActive={!isProjectActive}

@@ -36,7 +36,7 @@ import {
 } from 'lib/constants'
 import { passwordStrength, pluckObjectFields } from 'lib/helpers'
 import { NextPageWithLayout } from 'types'
-import { Button, IconExternalLink, IconInfo, IconUsers, Input, Listbox } from 'ui'
+import { Button, IconInfo, IconUsers, Input, Listbox } from 'ui'
 
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
@@ -393,7 +393,13 @@ const Wizard: NextPageWithLayout = () => {
                   />
                 </Panel.Content>
 
-                <Panel.Content className="border-b border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark">
+                <Panel.Content
+                  className={
+                    orgSubscription?.plan?.id !== 'free'
+                      ? 'border-b border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark'
+                      : ''
+                  }
+                >
                   <RegionSelector
                     cloudProvider={cloudProvider}
                     selectedRegion={dbRegion}
@@ -403,65 +409,57 @@ const Wizard: NextPageWithLayout = () => {
               </>
             )}
 
-            <Panel.Content>
-              <InformationBox
-                icon={<IconInfo size="large" strokeWidth={1.5} />}
-                defaultVisibility={true}
-                hideCollapse
-                title="Billed via organization"
-                description={
-                  <div className="space-y-3">
-                    <p className="text-sm leading-normal">
-                      This organization uses the new organization-based billing and is on the{' '}
-                      <span className="text-brand">{orgSubscription?.plan?.name} plan</span>.
-                    </p>
+            {orgSubscription?.plan?.id !== 'free' && (
+              <Panel.Content>
+                <InformationBox
+                  icon={<IconInfo size="large" strokeWidth={1.5} />}
+                  defaultVisibility={true}
+                  hideCollapse
+                  title="Billed via organization"
+                  description={
+                    <div className="space-y-3">
+                      {/* Show info when launching a new project in a paid org that has no project yet */}
+                      {orgProjectCount === 0 && (
+                        <div>
+                          {orgSubscription?.nano_enabled === true ? (
+                            <p>
+                              This is the first project you're launching in this organization. You
+                              can launch one project on the Micro instance or two projects on the
+                              Nano instance for no additional costs.
+                            </p>
+                          ) : (
+                            <p>
+                              As this is the first project you're launching in this organization, it
+                              comes with no additional compute costs.
+                            </p>
+                          )}
+                        </div>
+                      )}
 
-                    {/* Show info when launching a new project in a paid org that has no project yet */}
-                    {orgSubscription?.plan?.id !== 'free' && orgProjectCount === 0 && (
-                      <div>
-                        <p>
-                          As this is the first project you're launching in this organization, it
-                          comes with no additional compute costs.
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Show info when launching a new project in a paid org that already has at least one project */}
-                    {orgSubscription?.plan?.id !== 'free' && orgProjectCount > 0 && (
-                      <div>
-                        <p>
-                          Launching another project incurs additional compute costs, starting at
-                          $0.01344 per hour (~$10/month). You can also create a new organization
-                          under the free plan in case you have not exceeded your 2 free project
-                          limit.
-                        </p>
-                      </div>
-                    )}
-
-                    <div className="space-x-3">
-                      <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                        <Link
-                          href="https://supabase.com/blog/organization-based-billing"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          Announcement
-                        </Link>
-                      </Button>
-                      <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                        <Link
-                          href="https://supabase.com/docs/guides/platform/org-based-billing"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          Documentation
-                        </Link>
-                      </Button>
+                      {/* Show info when launching a new project in a paid org that already has at least one project */}
+                      {orgProjectCount > 0 && (
+                        <div>
+                          {orgSubscription?.nano_enabled === true ? (
+                            <p>
+                              Launching another project starts at $0.0067 per hour (~$5/month). You
+                              can launch one project on the Micro instance or two projects on the
+                              Nano instance for no additional costs.
+                            </p>
+                          ) : (
+                            <p>
+                              Launching another project incurs additional compute costs, starting at
+                              $0.01344 per hour (~$10/month). You can also create a new organization
+                              under the free plan in case you have not exceeded your 2 free project
+                              limit.
+                            </p>
+                          )}
+                        </div>
+                      )}
                     </div>
-                  </div>
-                }
-              />
-            </Panel.Content>
+                  }
+                />
+              </Panel.Content>
+            )}
 
             {isAdmin && (
               <Panel.Content>
