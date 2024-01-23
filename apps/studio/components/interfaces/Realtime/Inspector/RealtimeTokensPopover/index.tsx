@@ -1,9 +1,12 @@
+import { useTelemetryProps } from 'common'
+import { useRouter } from 'next/router'
 import { Dispatch, SetStateAction, useEffect } from 'react'
 
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { getRoleImpersonationJWT } from 'lib/role-impersonation'
+import Telemetry from 'lib/telemetry'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { RealtimeConfig } from '../useRealtimeMessages'
 
@@ -14,6 +17,8 @@ interface RealtimeTokensPopoverProps {
 
 export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokensPopoverProps) => {
   const { data: settings } = useProjectApiQuery({ projectRef: config.projectRef })
+  const telemetryProps = useTelemetryProps()
+  const router = useRouter()
 
   const apiService = settings?.autoApiService
   const serviceRoleKey = apiService?.service_api_keys.find((x) => x.name === 'service_role key')
@@ -49,6 +54,15 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
 
     if (token) {
       onChangeConfig({ ...config, token, bearer })
+      Telemetry.sendEvent(
+        {
+          category: 'realtime_inspector',
+          action: 'changed_database_role',
+          label: 'realtime_inspector_config',
+        },
+        telemetryProps,
+        router
+      )
     }
   }, [config.projectRef, jwtSecret, serviceRoleKey, snap.role])
 

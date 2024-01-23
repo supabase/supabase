@@ -1,7 +1,10 @@
+import { useTelemetryProps } from 'common'
+import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 import { Button, IconX, cn } from 'ui'
 
 import CopyButton from 'components/ui/CopyButton'
+import Telemetry from 'lib/telemetry'
 import { LogData } from './Messages.types'
 import { SelectedRealtimeMessagePanel } from './SelectedRealtimeMessagePanel'
 
@@ -11,6 +14,9 @@ export interface MessageSelectionProps {
 }
 
 const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
+  const telemetryProps = useTelemetryProps()
+  const router = useRouter()
+
   const selectionText = useMemo(() => {
     return JSON.stringify(log, null, 2)
   }, [log])
@@ -64,7 +70,22 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
         <div className="pt-4 flex flex-col gap-4">
           <div className="px-4 flex flex-row justify-between items-center">
             <div className="transition">
-              <CopyButton text={selectionText} type="default" title="Copy log to clipboard" />
+              <CopyButton
+                text={selectionText}
+                type="default"
+                title="Copy log to clipboard"
+                onClick={() => {
+                  Telemetry.sendEvent(
+                    {
+                      category: 'realtime_inspector',
+                      action: 'copied_message',
+                      label: 'realtime_inspector_results',
+                    },
+                    telemetryProps,
+                    router
+                  )
+                }}
+              />
             </div>
             <Button
               type="text"
