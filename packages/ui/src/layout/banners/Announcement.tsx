@@ -28,14 +28,10 @@ const Announcement = ({
   children,
 }: PropsWithChildren<AnnouncementComponentProps>) => {
   const [hidden, setHidden] = useState(false)
-  const [mounted, setMounted] = useState(false)
 
   const router = useRouter()
   const isLaunchWeekSection = router.pathname.includes('launch-week')
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
   // override to hide announcement
   if (!show || !announcement.show) return null
 
@@ -56,8 +52,6 @@ const Announcement = ({
     window.localStorage.setItem(announcementKey, 'hidden')
     return setHidden(true)
   }
-
-  if (!mounted) return null
 
   // Always show if on LW section
   if (!isLaunchWeekSection && hidden) {
