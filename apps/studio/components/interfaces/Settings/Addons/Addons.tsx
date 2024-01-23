@@ -354,7 +354,7 @@ const Addons = () => {
                     <p className="text-sm text-foreground-light m-0">More information</p>
                     <div>
                       <Link
-                        href="https://github.com/orgs/supabase/discussions/17817"
+                        href="https://supabase.com/docs/guides/platform/ipv4-address"
                         target="_blank"
                         rel="noreferrer"
                       >
@@ -383,7 +383,7 @@ const Addons = () => {
                     <div className="mt-2">
                       <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                         <a
-                          href="https://github.com/orgs/supabase/discussions/17817"
+                          href="https://supabase.com/docs/guides/platform/ipv4-address"
                           target="_blank"
                           rel="noreferrer"
                         >
