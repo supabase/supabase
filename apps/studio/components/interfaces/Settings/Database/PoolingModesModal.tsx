@@ -53,7 +53,13 @@ by allocating connections whenever clients make requests. Each pooling mode hand
 connections differently.
 
 ### Transaction mode
-Recommended if you are connecting from *serverless environments*. A connection is assigned to the client for the duration of a transaction. Two consecutive transactions from the same client could be executed over two different connections. Some session-based Postgres features such as prepared statements are *not available* with this option.
+This mode is recommended if you are connecting from *serverless environments*. A connection is assigned to the client for the duration of a transaction. Two consecutive transactions from the same client could be executed over two different connections. Some session-based Postgres features such as prepared statements are *not available* with this option.
+
+### Session mode
+This mode is similar to connecting to your database directly. There is full support for prepared statements in this mode. When a new client connects, a connection is assigned to the client until it disconnects. You *might run into pooler connection limits* since the connection is held till the client disconnects.
+
+### Using session and transaction modes at the same time
+To get the best of both worlds, as a starting point, we recommend using session mode just when you need support for prepared statements and transaction mode in other cases.
 `}
         />
         {data?.pool_mode === 'session' && (
@@ -79,17 +85,6 @@ Recommended if you are connecting from *serverless environments*. A connection i
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
         )}
-
-        <Markdown
-          className="max-w-full [&>h3]:text-sm"
-          content={`
-### Session mode
-This mode is similar to connecting to your database directly. There is full support for prepared statements in this mode. When a new client connects, a connection is assigned to the client until it disconnects. You *might run into pooler connection limits* since the connection is held till the client disconnects.
-
-### Using session and transaction modes at the same time
-To get the best of both worlds, as a starting point, we recommend using session mode just when you need support for prepared statements and transaction mode in other cases.
-`}
-        />
       </Modal.Content>
       <Modal.Separator />
       <Modal.Content className="flex items-center justify-end pb-2">
