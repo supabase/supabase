@@ -110,7 +110,7 @@ BEGIN;
                 SELECT (response).status_code::integer
                   INTO status_code
                   FROM net._http_collect_response(local_request_id);
-                IF status_code < 400 THEN
+                IF status_code < 500 THEN
                   succeeded := TRUE;
                 END IF;
               END IF;
