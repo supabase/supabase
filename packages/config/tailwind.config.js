@@ -247,7 +247,7 @@ const uiConfig = ui({
               opacity: 1,
               color: 'hsl(var(--foreground-default))',
               textDecorationLine: 'underline',
-              textDecorationColor: 'hsl(var(--foreground-lighter))',
+              textDecorationColor: 'hsl(var(--foreground-muted))',
               textDecorationThickness: '1px',
               textUnderlineOffset: '2px',
             },
