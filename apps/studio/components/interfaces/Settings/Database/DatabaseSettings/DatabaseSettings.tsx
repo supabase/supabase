@@ -36,7 +36,9 @@ const DatabaseSettings = () => {
   const showReadReplicasUI = readReplicasEnabled && selectedProject?.is_read_replicas_enabled
   const connectionStringsRef = useRef<HTMLDivElement>(null)
   const [usePoolerConnection, setUsePoolerConnection] = useState(true)
-  const [poolingMode, setPoolingMode] = useState<'transaction' | 'session'>('transaction')
+  const [poolingMode, setPoolingMode] = useState<'transaction' | 'session' | 'statement'>(
+    'transaction'
+  )
 
   const {
     data: poolingInfo,
@@ -112,6 +114,12 @@ const DatabaseSettings = () => {
       connectionStringsRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' })
     }
   }, [connectionString])
+
+  useEffect(() => {
+    if (poolingInfo?.pool_mode !== undefined) {
+      setPoolingMode(poolingInfo.pool_mode)
+    }
+  }, [poolingInfo?.pool_mode])
 
   return (
     <>
