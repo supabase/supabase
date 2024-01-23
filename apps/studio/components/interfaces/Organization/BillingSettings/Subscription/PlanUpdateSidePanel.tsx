@@ -24,10 +24,12 @@ import {
   Button,
   IconCheck,
   IconChevronRight,
+  IconCpu,
   IconExternalLink,
   IconInfo,
   Modal,
   SidePanel,
+  Toggle,
 } from 'ui'
 import DowngradeModal from './DowngradeModal'
 import EnterpriseCard from './EnterpriseCard'
@@ -462,9 +464,10 @@ const PlanUpdateSidePanel = () => {
                   <div>
                     <p className="text-sm mt-2">
                       Each project is a dedicated server and database. Paid plans come with $10 of
-                      Compute Credits to cover one project on the default Micro Compute size or
-                      parts of any compute addon. Additional unpaused projects on paid plans will
-                      incur compute usage costs starting at $10 per month, billed hourly.
+                      Compute Credits to cover one project on the Micro Compute size, two projects
+                      on the Nano Compute size or parts of any compute addon. Additional unpaused
+                      projects on paid plans will incur compute usage costs starting at $5 per
+                      month, billed hourly.
                     </p>
 
                     {subscription?.plan?.id === 'free' && (
@@ -500,6 +503,31 @@ const PlanUpdateSidePanel = () => {
                           </Link>
                         </Button>
                       )}
+                    </div>
+                  </div>
+                }
+              />
+
+              <InformationBox
+                className="mt-4"
+                title="Scale up to Micro Compute size (recommended for production usages)"
+                icon={<IconCpu />}
+                defaultVisibility={true}
+                hideCollapse={true}
+                description={
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-start">
+                      <p className="text-sm mt-2">
+                        Free plan only had Nano available, but with your plan upgrade, you can now
+                        scale up to Micro or larger compute sizes, which is recommended for
+                        production usages. Your project(s) will need to be restarted when changing
+                        to Micro and will be unavailable for up to 2 minutes while the changes take
+                        place. You may instead upgrade your projects' compute size at any time under
+                        "Project Settings: Add Ons".
+                      </p>
+                    </div>
+                    <div>
+                      <Toggle />
                     </div>
                   </div>
                 }
