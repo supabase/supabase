@@ -5,7 +5,6 @@ import DataGrid, { DataGridHandle, RowsChangeData } from 'react-data-grid'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { forwardRef, useRef } from 'react'
 import { memo } from 'react-tracked'
-
 import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
@@ -108,16 +107,19 @@ export const Grid = memo(
         copyToClipboard(text)
       }
 
-      useKeyboardShortcuts({
-        'Command+c': (event: KeyboardEvent) => {
-          event.stopPropagation()
-          copyCellValue()
+      useKeyboardShortcuts(
+        {
+          'Command+c': (event: KeyboardEvent) => {
+            event.stopPropagation()
+            copyCellValue()
+          },
+          'Control+c': (event: KeyboardEvent) => {
+            event.stopPropagation()
+            copyCellValue()
+          },
         },
-        'Control+c': (event: KeyboardEvent) => {
-          event.stopPropagation()
-          copyCellValue()
-        },
-      })
+        ['INPUT', 'TEXTAREA']
+      )
 
       function onSelectedCellChange(args: { rowIdx: number; row: any; column: any }) {
         selectedCellRef.current = args
