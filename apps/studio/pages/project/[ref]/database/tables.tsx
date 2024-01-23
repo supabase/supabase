@@ -51,8 +51,12 @@ const DatabaseTables: NextPageWithLayout = () => {
         </ScaffoldSection>
       </ScaffoldContainer>
 
-      <DeleteConfirmationDialogs projectRef={projectRef} selectedTable={selectedTableToEdit} />
-      <SidePanelEditor selectedTable={selectedTable || selectedTableToEdit} />
+      <DeleteConfirmationDialogs
+        includeColumns
+        projectRef={projectRef}
+        selectedTable={selectedTableToEdit}
+      />
+      <SidePanelEditor includeColumns selectedTable={selectedTable || selectedTableToEdit} />
     </>
   )
 }

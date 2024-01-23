@@ -1,4 +1,5 @@
 import Layout from '~/layouts/DefaultGuideLayout'
+import { DateFormat } from '~/components/DateFormat'
 import StepHikeCompact from '~/components/StepHikeCompact'
 
 export const meta = {
@@ -13,6 +14,12 @@ Supabase provides several options for programmatically connecting to your Postgr
 1. Programmatic access using the Data APIs
 1. Direct connections using the built-in Postgres connection system
 1. Connection pooling for scalable connections
+
+<Admonition type="caution">
+
+Starting on <DateFormat date="2024-01-26" options={{ dateStyle: "long", timeZone: "UTC" }} />, direct database connections will start resolving to an IPv6 address. If you connect to your database using the REST and GraphQL endpoints, this doesn't affect you. If you use the database connection string, see the GitHub discussion on [how to prepare for IPv6](https://github.com/orgs/supabase/discussions/17817).
+
+</Admonition>
 
 ## Data APIs
 
