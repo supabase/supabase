@@ -43,7 +43,7 @@ BEGIN;
           max_retries integer := COALESCE(TG_ARGV[5]::integer, 0);
           succeeded boolean := FALSE;
           retry_delays double precision[] := ARRAY[0, 0.250, 0.500, 1.000, 2.500, 5.000];
-          status_code integer :=0;
+          status_code integer := 0;
         BEGIN
           IF url IS NULL OR url = 'null' THEN
             RAISE EXCEPTION 'url argument is missing';
