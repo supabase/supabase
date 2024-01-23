@@ -35,25 +35,24 @@ import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
 const formId = 'connection-pooling-form'
 
 // This validator validates a string to be a positive integer or if it's an empty string, transforms it to a null
-const StringToPositiveNumber = z.union([
-  // parse the value if it's a number
-  z.number().positive().int(),
-  // parse the value if it's a non-empty string
-  z.string().min(1).pipe(z.coerce.number().positive().int()),
-  // transform a non-empty string into a null value
-  z
-    .string()
-    .max(0, 'The field accepts only a number')
-    .transform((v) => null),
-  z.null(),
-])
-
-const FormSchema = z.object({
-  default_pool_size: StringToPositiveNumber,
-  ignore_startup_parameters: z.string(),
-  pool_mode: z.union([z.literal('transaction'), z.literal('session'), z.literal('statement')]),
-  max_client_conn: StringToPositiveNumber,
-})
+const StringToPositiveNumber = (max: number) => {
+  console.log({ max })
+  return z.union([
+    // parse the value if it's a number
+    z.number().positive().int().max(max, `Must not be greater than ${max}`),
+    // parse the value if it's a non-empty string
+    z
+      .string()
+      .min(1)
+      .pipe(z.coerce.number().positive().int().max(max, `Must not be greater than ${max}`)),
+    // transform a non-empty string into a null value
+    z
+      .string()
+      .max(0, 'The field accepts only a number')
+      .transform((v) => null),
+    z.null(),
+  ])
+}
 
 export const ConnectionPooling = () => {
   const { ui } = useStore()
@@ -62,6 +61,10 @@ export const ConnectionPooling = () => {
 
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const computeInstance = addons?.selected_addons.find((addon) => addon.type === 'compute_instance')
+  const maxPoolSizeByInstance =
+    POOLING_OPTIMIZATIONS?.[
+      computeInstance?.variant.identifier as keyof typeof POOLING_OPTIMIZATIONS
+    ]?.poolSize ?? 15 // [TODO] 15 is for micro, need to change to 10 for nano
 
   const {
     data: poolingInfo,
@@ -70,6 +73,13 @@ export const ConnectionPooling = () => {
     isError,
     isSuccess,
   } = usePoolingConfigurationQuery({ projectRef: projectRef })
+
+  const FormSchema = z.object({
+    ignore_startup_parameters: z.string(),
+    pool_mode: z.union([z.literal('transaction'), z.literal('session'), z.literal('statement')]),
+    default_pool_size: StringToPositiveNumber(maxPoolSizeByInstance),
+    max_client_conn: StringToPositiveNumber(200),
+  })
 
   const connectionPoolingUnavailable =
     !poolingInfo?.pgbouncer_enabled && poolingInfo?.pool_mode === null
@@ -302,19 +312,18 @@ export const ConnectionPooling = () => {
                               value={field.value || undefined}
                               placeholder={
                                 poolingInfo.supavisor_enabled && field.value === null
-                                  ? `Default: ${
-                                      POOLING_OPTIMIZATIONS?.[
-                                        computeInstance?.variant
-                                          .identifier as keyof typeof POOLING_OPTIMIZATIONS
-                                      ]?.poolSize ?? 15
-                                    }`
+                                  ? `Default: ${maxPoolSizeByInstance}`
                                   : ''
                               }
                             />
                           </FormControl_Shadcn_>
                           <FormDescription_Shadcn_ className="col-start-5 col-span-8">
                             The maximum number of connections made to the underlying Postgres
-                            cluster, per user+db combination. Overrides default optimizations;
+                            cluster, per user+db combination. Overrides default optimizations. Max
+                            pool size for {computeInstance?.variant.name ?? 'Micro'} compute is{' '}
+                            {maxPoolSizeByInstance}.
+                          </FormDescription_Shadcn_>
+                          <FormDescription_Shadcn_ className="col-start-5 col-span-8">
                             Please refer to our{' '}
                             <a
                               href="https://supabase.com/docs/guides/platform/custom-postgres-config#pooler-config"

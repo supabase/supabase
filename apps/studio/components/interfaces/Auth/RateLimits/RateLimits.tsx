@@ -63,19 +63,19 @@ const RateLimits = () => {
     RATE_LIMIT_TOKEN_REFRESH: z.coerce
       .number()
       .min(0, 'Must be not be lower than 0')
-      .max(32767, 'Must not be more than 32,767 an 5 minutes'),
+      .max(32767, 'Must not be more than 32,767 per 5 minutes'),
     RATE_LIMIT_VERIFY: z.coerce
       .number()
       .min(0, 'Must be not be lower than 0')
-      .max(32767, 'Must not be more than 32,767 an 5 minutes'),
+      .max(32767, 'Must not be more than 32,767 per 5 minutes'),
     RATE_LIMIT_EMAIL_SENT: z.coerce
       .number()
       .min(0, 'Must be not be lower than 0')
-      .max(32767, 'Must not be more than 32,767 an hour'),
+      .max(32767, 'Must not be more than 32,767 per hour'),
     RATE_LIMIT_SMS_SENT: z.coerce
       .number()
       .min(0, 'Must be not be lower than 0')
-      .max(32767, 'Must not be more than 32,767 an hour'),
+      .max(32767, 'Must not be more than 32,767 per hour'),
   })
 
   const form = useForm<z.infer<typeof FormSchema>>({
