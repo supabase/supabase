@@ -9,6 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   IconChevronDown,
+  IconPlus,
   IconTrash2,
   Slider_Shadcn_,
   cn,
@@ -173,7 +174,7 @@ const ComputePricingCalculator = () => {
           <div>
             <PriceSummary />
             <div className="flex items-center gap-1 w-full justify-between">
-              <span>Estimate</span>
+              <span>Total Estimate</span>
               <span
                 className="text-foreground font-mono flex items-center gap-1"
                 data-tip="This estimate only includes Plan and Compute add-on costs. Other resources might concur in the final invoice."
@@ -249,6 +250,7 @@ const ComputePricingCalculator = () => {
             size="tiny"
             type="outline"
             block
+            icon={<IconPlus />}
             onClick={() =>
               setActiveInstances([
                 ...activeInstances,
