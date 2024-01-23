@@ -10,7 +10,7 @@ const index = memo(() => {
           <div className="flex gap-2 items-center">
             <p>Prepare for the pgBouncer and IPv4 deprecations on 26th January 2024</p>
           </div>
-          <Button asChild type="link" iconRight={<IconExternalLink />}>
+          <Button asChild type="link" iconRight={<IconExternalLink className="hidden sm:block" />}>
             <a
               href="https://github.com/orgs/supabase/discussions/17817"
               target="_blank"
