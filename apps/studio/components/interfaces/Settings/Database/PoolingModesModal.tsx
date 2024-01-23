@@ -77,7 +77,7 @@ export const PoolingModesModal = () => {
                     navigateToPoolerSettings()
                   }}
                 >
-                  connection pooling configuration settings
+                  connection pooling settings
                 </span>
                 .
               </AlertDescription_Shadcn_>
@@ -104,7 +104,7 @@ export const PoolingModesModal = () => {
               navigateToPoolerSettings()
             }}
           >
-            connection pooling configuration settings
+            connection pooling settings
           </span>
           . You can then connect to session mode on port 5432 and transaction mode on port 6543.
         </p>
