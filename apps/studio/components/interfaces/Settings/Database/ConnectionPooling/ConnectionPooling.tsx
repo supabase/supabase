@@ -18,7 +18,6 @@ import {
   Form_Shadcn_,
   IconAlertTriangle,
   IconExternalLink,
-  Input,
   Input_Shadcn_,
   Listbox,
 } from 'ui'
@@ -34,9 +33,9 @@ import { usePoolingConfigurationQuery } from 'data/database/pooling-configuratio
 import { usePoolingConfigurationUpdateMutation } from 'data/database/pooling-configuration-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useCheckPermissions, useStore } from 'hooks'
-import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
-import { SESSION_MODE_DESCRIPTION, TRANSACTION_MODE_DESCRIPTION } from '../Database.constants'
 import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
+import { SESSION_MODE_DESCRIPTION, TRANSACTION_MODE_DESCRIPTION } from '../Database.constants'
+import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
 
 const formId = 'connection-pooling-form'
 
