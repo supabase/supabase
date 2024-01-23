@@ -1,6 +1,5 @@
 import React, { FC } from 'react'
 import { Button, IconCheck, cn } from 'ui'
-import { InformationCircleIcon } from '@heroicons/react/outline'
 
 import { plans } from 'shared-data/plans'
 import Link from 'next/link'
