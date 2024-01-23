@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import _announcement from './data/Announcement.json'
-import { IconX } from 'ui'
+import { IconX, cn } from 'ui'
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
@@ -17,15 +17,17 @@ const announcement = _announcement as AnnouncementProps
 
 interface AnnouncementComponentProps {
   show?: boolean
+  dismissable?: boolean
   className?: string
 }
 
 const Announcement = ({
   show = true,
+  dismissable = true,
   className,
   children,
 }: PropsWithChildren<AnnouncementComponentProps>) => {
-  const [hidden, setHidden] = useState(true)
+  const [hidden, setHidden] = useState(false)
 
   const router = useRouter()
   const isHomePage = router.pathname === '/'
@@ -59,9 +61,9 @@ const Announcement = ({
     return (
       <div
         onClick={() => window.location.assign(announcement.link)}
-        className={['relative z-40 h-[55px] w-full cursor-pointer', className].join(' ')}
+        className={cn('relative z-40 w-full cursor-pointer', className)}
       >
-        {!isLaunchWeekSection && (
+        {dismissable && !isLaunchWeekSection && (
           <div
             className="absolute z-50 right-4 flex h-full items-center opacity-100 text-white transition-opacity hover:opacity-100"
             onClick={handleClose}
