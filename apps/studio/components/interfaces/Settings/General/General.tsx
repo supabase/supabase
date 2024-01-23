@@ -120,6 +120,29 @@ const General = () => {
         <>
           <div className="mt-6" id="restart-project">
             <FormPanel>
+              <Alert_Shadcn_ variant="warning" className="mb-6">
+                <IconAlertCircle strokeWidth={2} />
+                <AlertTitle_Shadcn_>
+                  Shifting to Nano Compute size for Free plan projects
+                </AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_>
+                  <p>
+                    We have <a href="#">announced</a> that Free plan projects with lower resource
+                    requirements will be migrated to the recently introduced Nano Compute size,
+                    which requires a restart.
+                  </p>{' '}
+                  <p>
+                    If you don't take any action, we plan to do the restart automatically during the
+                    following 30-minute maintenance window, where your project has historically had
+                    the least database queries across the previous six weeks:
+                  </p>{' '}
+                  <p>2024-02-02 02:00 to 02:30 UTC</p>{' '}
+                  <p>
+                    You may also restart your project manually below at any time before the
+                    maintenance window. It will be restarted as a Nano Compute instance.
+                  </p>
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
               <div className="flex w-full items-center justify-between px-8 py-4">
                 <div>
                   <p className="text-sm">Restart project</p>
