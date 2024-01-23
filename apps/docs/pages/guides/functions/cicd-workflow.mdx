@@ -48,7 +48,6 @@ jobs:
 Here is the sample pipeline configuration to deploy via GitLab CI.
 
 ```yaml
-
 image: node:18
 
 # List of stages for jobs, and their order of execution
@@ -96,13 +95,13 @@ pipelines:
         script:
           - npm i supabase
     - parallel:
-      - step:
-          name: Functions Deploy
-          script:
-            - npx supabase init
-            - npx supabase functions deploy --debug
-          services:
-            - docker
+        - step:
+            name: Functions Deploy
+            script:
+              - npx supabase init
+              - npx supabase functions deploy --debug
+            services:
+              - docker
 ```
 
 ## Declarative configuration
