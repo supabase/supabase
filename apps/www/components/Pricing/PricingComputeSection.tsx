@@ -23,8 +23,8 @@ const PricingComputeSection = () => {
 
   return (
     <Panel outerClassName="w-full mx-auto max-w-6xl" innerClassName="flex flex-col">
-      <div className="grid lg:grid-cols-2 lg:gap-8">
-        <div className="p-4 lg:p-8 gap-4">
+      <div className="flex flex-col xl:grid xl:grid-cols-3 xl:gap-4">
+        <div className="p-4 pb-0 lg:px-8 lg:pt-8 gap-4">
           <div className="flex flex-col gap-2">
             <div className="flex flex-col gap-2">
               <div className="flex items-center justify-center h-12 w-12 bg-alternative rounded-lg mb-3">
@@ -69,8 +69,8 @@ const PricingComputeSection = () => {
             </Button>
           </div>
         </div>
-        <div className="relative h-full w-full">
-          <PricingComputeAnimation />
+        <div className="relative col-span-2 h-full w-full p-4 md:p-8">
+          <ComputePricingCalculator />
         </div>
       </div>
       <hr className="border-0 border-t" />
@@ -85,11 +85,11 @@ const PricingComputeSection = () => {
               showTable ? 'opacity-0 delay-200' : 'opacity-100'
             )}
           />
-          <div ref={ref} className="pb-4 lg:pb-0">
+          <div ref={ref} className="">
             <ComputePricingTable />
 
-            <div className="grid md:grid-cols-2 gap-4 md:gap-8 p-4 mt-4 md:mt-0 md:p-8">
-              <div className="max-w-4xl prose">
+            <div className="grid lg:grid-cols-2 gap-4 md:gap-8 mt-4 md:mt-0 border-t">
+              <div className="max-w-4xl prose p-4 md:p-8 relative z-10">
                 <h4 className="text-lg">Choose best compute setup for you</h4>
                 <p className="text-sm">
                   Every project on the Supabase Platform comes with its own dedicated Postgres
@@ -123,8 +123,8 @@ const PricingComputeSection = () => {
                   .
                 </p>
               </div>
-              <div>
-                <ComputePricingCalculator />
+              <div className="relative -mt-8 lg:mt-0 z-0">
+                <PricingComputeAnimation />
               </div>
             </div>
           </div>
