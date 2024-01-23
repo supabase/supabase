@@ -14,6 +14,7 @@ import { AppPropsWithLayout } from 'types'
 import { CommandMenuProvider, PortalToast, useConsent } from 'ui'
 import { TabsProvider } from 'ui/src/components/Tabs'
 import Favicons from '~/components/Favicons'
+import { IPv4DeprecationBanner } from '~/components/IPv4DeprecationBanner'
 import SiteLayout from '~/layouts/SiteLayout'
 import { IS_PLATFORM } from '~/lib/constants'
 import { unauthedAllowedPost } from '~/lib/fetch/fetchWrappers'
@@ -190,6 +191,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     <>
       <QueryClientProvider client={queryClient}>
         <Favicons />
+        <IPv4DeprecationBanner />
         <AuthContainer>
           <SignOutHandler>
             <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
