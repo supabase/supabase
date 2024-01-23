@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { observer } from 'mobx-react-lite'
 import { useMemo, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { Form, Input } from 'ui'
+import { Form, IconCode, IconMonitor, Tabs, Input } from 'ui'
 
 import CodeEditor from 'components/ui/CodeEditor'
 import { FormActions, FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
@@ -38,7 +38,6 @@ const TemplateEditor = ({ template, authConfig }: TemplateEditorProps) => {
   const messageSlug = `MAILER_TEMPLATES_${id}_CONTENT`
   const messageProperty = properties[messageSlug]
   const [bodyValue, setBodyValue] = useState((authConfig && authConfig[messageSlug]) ?? '')
-
   const onSubmit = (values: any, { resetForm }: any) => {
     const payload = { ...values }
 
@@ -130,17 +129,28 @@ const TemplateEditor = ({ template, authConfig }: TemplateEditorProps) => {
                         }
                       />
                     </div>
-                    <div className="relative h-96">
-                      <CodeEditor
-                        id="code-id"
-                        language="html"
-                        isReadOnly={!canUpdateConfig}
-                        className="!mb-0 h-96 overflow-hidden rounded border"
-                        onInputChange={(e: string | undefined) => setBodyValue(e ?? '')}
-                        options={{ wordWrap: 'off', contextmenu: false }}
-                        value={bodyValue}
-                      />
-                    </div>
+                    <Tabs defaultActiveId="preview" type="rounded-pills" size="tiny">
+                      <Tabs.Panel id={'preview'} icon={<IconMonitor />} label="Preview">
+                        <iframe
+                          className="!mb-0 overflow-hidden h-96 w-full rounded border"
+                          title={id}
+                          srcDoc={bodyValue}
+                        />
+                      </Tabs.Panel>
+                      <Tabs.Panel id={'source'} icon={<IconCode />} label="Source">
+                        <div className="relative h-96">
+                          <CodeEditor
+                            id="code-id"
+                            language="html"
+                            isReadOnly={!canUpdateConfig}
+                            className="!mb-0 h-96 overflow-hidden rounded border"
+                            onInputChange={(e: string | undefined) => setBodyValue(e ?? '')}
+                            options={{ wordWrap: 'off', contextmenu: false }}
+                            value={bodyValue}
+                          />
+                        </div>
+                      </Tabs.Panel>
+                    </Tabs>
                   </>
                 )}
                 <div className="col-span-12 flex w-full">
