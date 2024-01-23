@@ -241,7 +241,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                   <td className="py-2 text-sm max-w-[200px]">
                     <span className="mr-2">{computeCredits.description}</span>
                     <InvoiceTooltip
-                      text="Paid plans come with $10 in Compute Credits to cover one Starter instance or parts of any other instance. Compute Credits are given to you every month and do not stack up while you are on a paid plan."
+                      text="Paid plans come with $10 in Compute Credits to cover one Micro instance or parts of any other instance. Compute Credits are given to you every month and do not stack up while you are on a paid plan."
                       linkRef="https://supabase.com/docs/guides/platform/org-based-billing#compute-credits"
                     />
                   </td>
