@@ -30,11 +30,11 @@ const Hero = () => {
               >
                 <div className="flex flex-col items-center">
                   <div className="z-40 w-full flex justify-center mb-8 lg:mb-8">
-                    {/* <AnnouncementBadge
+                    {/*<AnnouncementBadge
                       url=""
                       badge=""
                       announcement=""
-                    /> */}
+                    />*/}
                   </div>
                   <h1 className="text-foreground text-4xl sm:text-5xl sm:leading-none lg:text-7xl">
                     <span className="block text-[#F4FFFA00] bg-clip-text bg-gradient-to-b from-foreground to-foreground-light">
