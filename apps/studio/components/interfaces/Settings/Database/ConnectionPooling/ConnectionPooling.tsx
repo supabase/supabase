@@ -313,7 +313,8 @@ export const ConnectionPooling = () => {
                                   Pool size exceeds the max client connections
                                 </AlertTitle_Shadcn_>
                                 <AlertDescription_Shadcn_>
-                                  Explain what might happen here
+                                  This may result in instability and unreliability with your
+                                  database connections
                                 </AlertDescription_Shadcn_>
                               </Alert_Shadcn_>
                             </div>
