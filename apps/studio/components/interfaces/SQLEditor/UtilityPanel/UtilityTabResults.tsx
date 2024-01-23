@@ -68,9 +68,9 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
 
     return (
       <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark">
-        <div className="flex flex-row justify-between items-start py-4 px-6">
+        <div className="grid grid-cols-3 gap-12 py-4 px-8">
           {isTimeout ? (
-            <div className="flex flex-col gap-y-1">
+            <div className="col-span-2">
               <p className="font-mono text-sm">SQL query ran into an upstream timeout</p>
               <p className="font-mono text-sm text-foreground-light">
                 You can either{' '}
@@ -95,7 +95,7 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
               </p>
             </div>
           ) : (
-            <div className="max-w-[54rem]">
+            <div className="col-span-2">
               {formattedError.length > 0 ? (
                 formattedError.map((x: string, i: number) => (
                   <pre key={`error-${i}`} className="font-mono text-sm">
@@ -108,46 +108,48 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
             </div>
           )}
           {!hasHipaaAddon && (
-            <Button
-              icon={
-                <div className="scale-75">
-                  <AiIconAnimation className="w-3 h-3" loading={isDebugSqlLoading} />
-                </div>
-              }
-              disabled={!!sqlDiff || isDebugSqlLoading}
-              onClick={async () => {
-                try {
-                  const { solution, sql } = await debugSql({
-                    sql: snippet.snippet.content.sql.replace(sqlAiDisclaimerComment, '').trim(),
-                    errorMessage: result.error.message,
-                    entityDefinitions,
-                  })
-
-                  const formattedSql =
-                    sqlAiDisclaimerComment +
-                    '\n\n' +
-                    format(sql, {
-                      language: 'postgresql',
-                      keywordCase: 'lower',
-                    })
-                  setAiInput('')
-                  setDebugSolution(solution)
-                  setSqlDiff({
-                    original: snippet.snippet.content.sql,
-                    modified: formattedSql,
-                  })
-                } catch (error: unknown) {
-                  if (isError(error)) {
-                    ui.setNotification({
-                      category: 'error',
-                      message: `Failed to debug: ${error.message}`,
-                    })
-                  }
+            <div className="flex justify-end items-start">
+              <Button
+                icon={
+                  <div className="scale-75">
+                    <AiIconAnimation className="w-3 h-3" loading={isDebugSqlLoading} />
+                  </div>
                 }
-              }}
-            >
-              Debug with Supabase AI
-            </Button>
+                disabled={!!sqlDiff || isDebugSqlLoading}
+                onClick={async () => {
+                  try {
+                    const { solution, sql } = await debugSql({
+                      sql: snippet.snippet.content.sql.replace(sqlAiDisclaimerComment, '').trim(),
+                      errorMessage: result.error.message,
+                      entityDefinitions,
+                    })
+
+                    const formattedSql =
+                      sqlAiDisclaimerComment +
+                      '\n\n' +
+                      format(sql, {
+                        language: 'postgresql',
+                        keywordCase: 'lower',
+                      })
+                    setAiInput('')
+                    setDebugSolution(solution)
+                    setSqlDiff({
+                      original: snippet.snippet.content.sql,
+                      modified: formattedSql,
+                    })
+                  } catch (error: unknown) {
+                    if (isError(error)) {
+                      ui.setNotification({
+                        category: 'error',
+                        message: `Failed to debug: ${error.message}`,
+                      })
+                    }
+                  }
+                }}
+              >
+                Debug with Supabase AI
+              </Button>
+            </div>
           )}
         </div>
       </div>
