@@ -1,5 +1,7 @@
+import { useTelemetryProps } from 'common'
 import { PlusCircle } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { Dispatch, SetStateAction, useState } from 'react'
 import {
   Badge,
