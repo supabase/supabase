@@ -36,6 +36,7 @@ const DatabaseSettings = () => {
   const showReadReplicasUI = readReplicasEnabled && selectedProject?.is_read_replicas_enabled
   const connectionStringsRef = useRef<HTMLDivElement>(null)
   const [usePoolerConnection, setUsePoolerConnection] = useState(true)
+  const [poolingMode, setPoolingMode] = useState<'transaction' | 'session'>('transaction')
 
   const {
     data: poolingInfo,
@@ -144,7 +145,9 @@ const DatabaseSettings = () => {
                   <UsePoolerCheckbox
                     id="connection-params"
                     checked={usePoolerConnection}
+                    poolingMode={poolingMode}
                     onCheckedChange={setUsePoolerConnection}
+                    onSelectPoolingMode={setPoolingMode}
                   />
                   {!usePoolerConnection && <IPv4DeprecationNotice />}
                   {isMd5 && (
@@ -188,7 +191,7 @@ const DatabaseSettings = () => {
                   readOnly
                   copy
                   disabled
-                  value={connectionInfo.db_port}
+                  value={poolingMode === 'transaction' ? connectionInfo.db_port : '5432'}
                   label="Port"
                 />
                 {isMd5 && (

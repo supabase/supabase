@@ -31,6 +31,7 @@ import { usePoolingConfigurationUpdateMutation } from 'data/database/pooling-con
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useCheckPermissions, useStore } from 'hooks'
 import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
+import { SESSION_MODE_DESCRIPTION, TRANSACTION_MODE_DESCRIPTION } from '../Database.constants'
 
 const formId = 'connection-pooling-form'
 
@@ -245,17 +246,13 @@ export const ConnectionPooling = () => {
                               >
                                 <p>Transaction mode</p>
                                 <p className="text-xs text-foreground-lighter">
-                                  Connection is assigned to the client for the duration of a
-                                  transaction. Some session-based Postgres features such as prepared
-                                  statements are not available with this option.
+                                  {TRANSACTION_MODE_DESCRIPTION}
                                 </p>
                               </Listbox.Option>
                               <Listbox.Option key="session" label="Session" value="session">
                                 <p>Session mode</p>
                                 <p className="text-xs text-foreground-lighter">
-                                  When a new client connects, a connection is assigned to the client
-                                  until it disconnects. All Postgres features can be used with this
-                                  option.
+                                  {SESSION_MODE_DESCRIPTION}
                                 </p>
                               </Listbox.Option>
                             </Listbox>

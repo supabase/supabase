@@ -46,6 +46,7 @@ export const DatabaseConnectionString = () => {
 
   const connectionStringsRef = useRef<HTMLDivElement>(null)
   const [usePoolerConnection, setUsePoolerConnection] = useState(true)
+  const [poolingMode, setPoolingMode] = useState<'transaction' | 'session'>('transaction')
   const [selectedTab, setSelectedTab] = useState<
     'uri' | 'psql' | 'golang' | 'jdbc' | 'dotnet' | 'nodejs' | 'php' | 'python'
   >('uri')
@@ -119,7 +120,9 @@ export const DatabaseConnectionString = () => {
         region: isProjectLoading ? '' : project?.region || '',
         tld: usePoolerConnection ? poolerTld : connectionTld,
         portNumber: usePoolerConnection
-          ? poolingInfo.db_port.toString()
+          ? poolingMode === 'transaction'
+            ? poolingInfo.db_port.toString()
+            : '5432'
           : connectionInfo.db_port.toString(),
       })
     : []
@@ -177,7 +180,9 @@ export const DatabaseConnectionString = () => {
               <UsePoolerCheckbox
                 id="connection-string"
                 checked={usePoolerConnection}
+                poolingMode={poolingMode}
                 onCheckedChange={setUsePoolerConnection}
+                onSelectPoolingMode={setPoolingMode}
               />
               {!usePoolerConnection && <IPv4DeprecationNotice />}
               <Input
@@ -185,7 +190,11 @@ export const DatabaseConnectionString = () => {
                 readOnly
                 disabled
                 className="input-mono [&>div>div>div>input]:text-xs [&>div>div>div>input]:opacity-100"
-                value={connectionStrings[selectedTab]}
+                value={
+                  poolingMode === 'transaction'
+                    ? connectionStrings[selectedTab]
+                    : connectionStrings[selectedTab].replace('6543', '5432')
+                }
                 onCopy={() => handleCopy(selectedTab)}
               />
               {poolerConnStringSyntax.length > 0 && poolingInfo?.supavisor_enabled && (
