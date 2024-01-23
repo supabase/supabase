@@ -218,3 +218,51 @@ You can configure Postgres connection limit among other parameters by using [Cus
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
 export default Page
+
+### Connecting to Supavisor with your own Connection Pooler
+
+In situations where you have your own Connection Pooler, for example [Prisma Accelerate](https://www.prisma.io/data-platform/accelerate), you need to be aware of the number of connections you are creating against your Supabase database.
+
+By default, Supavisor creates a pool of 10 connections per user, database, pool mode combination so if you configure your pool with 10 connections from your service pool it means you will actually create 100 connections total on your Supabase database.
+
+#### Example use case
+
+You have your service that uses a pool configured with two urls and 5 connections each:
+
+One using `postgres://postgres.[YOUR-PROJECT]:[YOUR-PASSWORD]@aws-0-eu-west-2.pooler.supabase.com:6543/database`
+One using `postgres://postgres.[YOUR-PROJECT]:[YOUR-PASSWORD]@aws-0-eu-west-2.pooler.supabase.com:6543/another_database`
+
+This means that Supavisor will connect to your instance with `5 + 5 = 10` connections total if your pool is being fully used
+
+If you had 10 max_connections set in your Supabase instance, you would start to see `too_many_connections` errors. Plus, other Supabase services will also connect to your database which will also be impacted by the lack of available connections.
+
+#### How to prepare your database for your service
+
+Be aware of the limitations set by your database by checking the max number of connections your database can accept
+
+```sql
+show max_connections;
+```
+
+You should also check how many connections are currently active in your database
+
+```sql
+select count(*) from pg_stat_activity;
+```
+
+Based on this information you should configure your services accordingly and be sure you have enough max connections on your database to cope with your settings.
+
+Finally you can run the following query to determine how many connections are being used by Supavisor:
+
+```sql
+select
+  count(*) as count,
+  usename,
+  application_name
+from pg_stat_activity
+where application_name ilike '%Supavisor%'
+group by
+  usename,
+  application_name
+order by application_name desc;
+```
