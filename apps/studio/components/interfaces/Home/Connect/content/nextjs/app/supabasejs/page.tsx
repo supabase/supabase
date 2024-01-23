@@ -5,13 +5,24 @@ const ContentFile = () => {
     <div>
       <SimpleCodeBlock className="typescript">
         {`
-import { createBrowserClient } from "@supabase/ssr";
+import { createClient } from '@/utils/supabase/server'
+import { cookies } from 'next/headers'
 
-export const createClient = () =>
-  createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  );
+export default async function Page() {
+  const cookieStore = cookies()
+  const supabase = createClient(cookieStore)
+
+  const { data: todos } = await supabase.from('todos').select('*')
+
+  return (
+    <ul>
+      {todos?.map((todo) => (
+        <li>{todo}</li>
+      ))}
+    </ul>
+  )
+}
+
 `}
       </SimpleCodeBlock>
     </div>

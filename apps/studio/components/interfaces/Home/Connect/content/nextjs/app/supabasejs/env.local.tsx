@@ -1,11 +1,5 @@
+import { ContentFileProps } from 'components/interfaces/Home/Connect/Connect.types'
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
-
-interface ContentFileProps {
-  projectKeys: {
-    apiUrl: string
-    anonKey: string
-  }
-}
 
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
   return (

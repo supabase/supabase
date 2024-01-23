@@ -34,29 +34,29 @@ export const FRAMEWORKS: Parent[] = [
             files: [
               {
                 // omit .tsx extension
-                location: 'nextjs/app/supabasejs/env.local',
-                destinationLocation: '.env.local',
-                destinationFilename: '.env.local',
+                location: 'nextjs/app/supabasejs/env.local',// location on local disk
+                destinationLocation: '.env.local', // label for the ui
+                destinationFilename: '.env.local', // where the user should put the file
               },
               {
-                // omit .tsx extension
-                location: 'nextjs/app/supabasejs/page', // location on local disk
-                destinationLocation: 'app/page.tsx', // label for the ui
-                destinationFilename: 'page.tsx', // where the user should put the file
+                location: 'nextjs/app/supabasejs/page',
+                destinationLocation: 'app/page.tsx',
+                destinationFilename: 'page.tsx',
               },
-            ],
-          },
-          {
-            key: 'postgresjs',
-            label: 'Postgres.js',
-            icon: 'postgres',
-            children: [],
-            files: [
               {
-                // omit .tsx extension
-                location: 'app-postgresjs/env.local',
-                destinationFilename: 'app-postgresjs.env.local',
-                destinationLocation: 'app-postgresjs/.env.local',
+                location: 'nextjs/app/supabasejs/server',
+                destinationLocation: 'utils/supabase/server.ts',
+                destinationFilename: 'server.ts',
+              },
+              {
+                location: 'nextjs/app/supabasejs/client',
+                destinationLocation: 'utils/supabase/client.ts',
+                destinationFilename: 'client.ts',
+              },
+              {
+                location: 'nextjs/app/supabasejs/middleware',
+                destinationLocation: 'utils/supabase/middleware.ts',
+                destinationFilename: 'middleware.ts',
               },
             ],
           },
