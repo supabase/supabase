@@ -188,7 +188,7 @@ const ComputePricingCalculator = () => {
       <div className="flex flex-col gap-2 col-span-3 items-start flex-1 w-full lg:w-auto border-t lg:border-t-0 lg:border-l  lg:pl-4">
         <div
           className={cn(
-            'w-full flex flex-col items-start gap-y-2 lg:min-h-[306px]',
+            'w-full flex flex-col items-start gap-y-2',
             activeInstances.length === 1 && 'border-none'
           )}
         >
@@ -198,16 +198,19 @@ const ComputePricingCalculator = () => {
               key={`instance-${activeInstance.position}`}
             >
               <div className="w-full flex justify-between items-center">
-                <Badge
-                  className="rounded-md w-16 text-center flex justify-center"
-                  color={
-                    findIntanceValueByColumn(activeInstance, 'plan') === 'Starter'
-                      ? 'scale'
-                      : 'brand'
-                  }
-                >
-                  {findIntanceValueByColumn(activeInstance, 'plan')}
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <Badge
+                    className="rounded-md w-16 text-center flex justify-center"
+                    color={
+                      findIntanceValueByColumn(activeInstance, 'plan') === 'Starter'
+                        ? 'scale'
+                        : 'brand'
+                    }
+                  >
+                    {findIntanceValueByColumn(activeInstance, 'plan')}
+                  </Badge>
+                  <p className="text-xs">Project {activeInstance.position + 1}</p>
+                </div>
                 <span className="leading-3 text-sm">
                   {findIntanceValueByColumn(activeInstance, 'pricing')}
                 </span>
