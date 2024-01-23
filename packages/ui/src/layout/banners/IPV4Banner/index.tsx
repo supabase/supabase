@@ -1,7 +1,8 @@
+import { memo } from 'react'
 import { IconExternalLink } from '../../../components/Icon/icons/IconExternalLink'
 import { Button } from '../../../components/Button'
 
-const index = () => {
+const index = memo(() => {
   return (
     <div className="relative w-full h-auto min-h-[44px] border-b p-2 flex items-center group justify-center text-foreground bg-surface-100 transition-colors overflow-hidden">
       <div className="relative z-10 flex items-center justify-center">
@@ -22,6 +23,6 @@ const index = () => {
       </div>
     </div>
   )
-}
+})
 
 export default index
