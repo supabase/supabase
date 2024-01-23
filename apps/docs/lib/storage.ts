@@ -1,5 +1,7 @@
 export const LOCAL_STORAGE_KEYS = {
-  SAVED_ORG_PROJECT_BRANCH: 'docs.ui.user.selected.org_project_branch',
+  SAVED_ORG: 'docs.ui.user.selected.org',
+  SAVED_PROJECT: 'docs.ui.user.selected.project',
+  SAVED_BRANCH: 'docs.ui.user.selected.branch',
 } as const
 
 type LocalStorageKey = (typeof LOCAL_STORAGE_KEYS)[keyof typeof LOCAL_STORAGE_KEYS]
@@ -31,4 +33,17 @@ export function remove(storageType: StorageType, key: LocalStorageKey) {
   if (typeof window === 'undefined') return
   const storage = getStorage(storageType)
   return storage.removeItem(key)
+}
+
+export function storeOrRemoveNull(
+  storageType: StorageType,
+  key: LocalStorageKey,
+  value: string | null | undefined
+) {
+  if (typeof window === 'undefined') return
+  if (value === null || value === undefined) {
+    remove(storageType, key)
+  } else {
+    store(storageType, key, value)
+  }
 }

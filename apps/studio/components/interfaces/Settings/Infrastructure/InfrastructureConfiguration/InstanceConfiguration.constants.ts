@@ -13,7 +13,8 @@ export const NODE_ROW_HEIGHT = 50
 export const NODE_SEP = 20
 
 // [Joshen] Coordinates from https://github.com/jsonmaur/aws-regions/issues/11
-const AWS_REGIONS_COORDINATES: { [key: string]: [number, number] } = {
+// In the format of [lon, lat]
+export const AWS_REGIONS_COORDINATES: { [key: string]: [number, number] } = {
   SOUTHEAST_ASIA: [103.8, 1.37],
   NORTHEAST_ASIA: [139.42, 35.41],
   NORTHEAST_ASIA_2: [126.98, 37.56],
@@ -26,6 +27,10 @@ const AWS_REGIONS_COORDINATES: { [key: string]: [number, number] } = {
   SOUTH_ASIA: [72.88, 19.08],
   OCEANIA: [151.2, -33.86],
   SOUTH_AMERICA: [-46.38, -23.34],
+}
+
+export const FLY_REGIONS_COORDINATES: { [key: string]: [number, number] } = {
+  SOUTHEAST_ASIA: [103.8, 1.37],
 }
 
 export const AWS_REGIONS_VALUES: { [key: string]: string } = {

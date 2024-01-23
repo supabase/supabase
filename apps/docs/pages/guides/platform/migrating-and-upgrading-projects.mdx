@@ -74,28 +74,14 @@ When upgrading, the Supabase platform will "right-size" your disk based on the c
 pg_upgrade does not support upgrading of databases containing reg\* data types referencing system OIDs.
 If you have created any objects that depend on the following extensions, you will need to recreate them after the upgrade.
 
-Extensions registering system OID-specific reg\* data types:
+#### Extensions
 
-- `plv8`
-- `plcoffee`
-- `plls`
+pg_upgrade does not currently support upgrading of databases using extensions older than the following versions:
 
-As these extensions offer support to create functions in different languages, you will only need to check for functions using the languages enabled by the above extensions.
-Any objects depending on the detected objects (e.g. triggers, views, tables, etc.) will need to be modified to exclude references to them.
+- TimescaleDB 2.9.1
+- plv8 3.1.5
 
-The following query returns the function name and their definitions, to help in recreating them post-upgrade.
-
-```sql
-SELECT
-  pn.nspname || '.' || objid::regproc AS function_name,
-  pg_get_functiondef(objid) || ';' AS function_definition
-FROM pg_depend d
-  JOIN pg_language l on (d.refobjid = l.oid)
-  JOIN pg_proc pp on (d.objid = pp.oid)
-  JOIN pg_namespace pn on (pp.pronamespace = pn.oid)
-WHERE l.lanname in ('plls', 'plcoffee', 'plv8')
-  AND pn.nspname <> 'pg_catalog';
-```
+To upgrade to a newer version of Postgres, you will need to drop the extensions before the upgrade, and recreate them after the upgrade.
 
 #### Authentication method changes - deprecating md5 in favor of scram-sha-256
 
@@ -139,6 +125,12 @@ Migrating projects can be achieved using the Supabase CLI. This is particularly 
 - Set environment variables for the old project's database URL as `$OLD_DB_URL` and the new project's as `$NEW_DB_URL`.
   To find the database URL for a project, go to the project's dashboard page [Project Settings/Database](https://supabase.com/dashboard/project/_/settings/database) and look at `Connection string / URI`. For example, to set the `$OLD_DB_URL` you would run `export OLD_DB_URL=postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF#].supabase.co:5432/postgres`.
 
+<Admonition type="tip">
+
+Note that this direct connection string to the database uses IPv6. If your network provider doesn't yet support IPv6, you can connect via the pooler connection string, available under the **Connection pooling** section of [**Database settings**](https://supabase.com/dashboard/project/_/settings/database). The connection string has the format `postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:6543/postgres`.
+
+</Admonition>
+
 ### Backup your old database
 
 1. Run the following command from your terminal:
@@ -147,6 +139,7 @@ Migrating projects can be achieved using the Supabase CLI. This is particularly 
 supabase db dump --db-url "$OLD_DB_URL" -f roles.sql --role-only
 supabase db dump --db-url "$OLD_DB_URL" -f schema.sql
 supabase db dump --db-url "$OLD_DB_URL" -f data.sql --use-copy --data-only
+supabase db dump --db-url "$OLD_DB_URL" -f history.sql --use-copy --data-only --schema supabase_migrations
 ```
 
 ### Restore to your new project
@@ -180,6 +173,7 @@ psql \
   --file schema.sql \
   --command 'SET session_replication_role = replica' \
   --file data.sql \
+  --file history.sql \
   --dbname "$NEW_DB_URL"
 ```
 
