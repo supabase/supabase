@@ -60,7 +60,7 @@ stages:
 setup-npm:
   stage: setup
   script:
-    - npm i supabase@beta
+    - npm i supabase
   cache:
     paths:
       - node_modules/
@@ -94,7 +94,7 @@ pipelines:
         caches:
           - node
         script:
-          - npm i supabase@beta
+          - npm i supabase
     - parallel:
       - step:
           name: Functions Deploy
