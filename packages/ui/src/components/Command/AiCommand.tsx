@@ -357,7 +357,7 @@ const AiCommand = () => {
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
-      <div className={cn('relative mb-[145px] py-4 max-h-[720px] overflow-auto')}>
+      <div className={cn('relative mb-[145px] py-4 max-h-[720px]')}>
         {messages.map((message, index) => {
           switch (message.role) {
             case MessageRole.User:
