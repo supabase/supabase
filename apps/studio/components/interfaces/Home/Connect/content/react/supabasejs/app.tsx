@@ -32,7 +32,6 @@ function Page() {
   )
 }
 export default Page
-
 `}
       </SimpleCodeBlock>
     </div>

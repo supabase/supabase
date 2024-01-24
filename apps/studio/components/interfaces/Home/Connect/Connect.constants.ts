@@ -114,17 +114,66 @@ export const FRAMEWORKS: ConnectionType[] = [
     key: 'react',
     label: 'React',
     icon: 'react',
-    files: [
+    files: [],
+    children: [
       {
-        // omit .tsx extension
-        location: 'react/env.local',
-        destinationFilename: 'react.env.local',
-        destinationLocation: 'react/.env.local',
+        key: 'supabasejs',
+        label: 'Supabase-js',
+        children: [],
+        icon: 'supabase',
+        files: [
+          {
+            // omit .tsx extension
+            location: 'react/supabasejs/env.local', // location on local disk
+            destinationLocation: '.env.local', // label for the ui
+            destinationFilename: '.env.local', // where the user should put the file
+          },
+          {
+            location: 'react/supabasejs/supabase',
+            destinationLocation: 'utils/supabase.ts',
+            destinationFilename: 'supabase.ts',
+          },
+          {
+            location: 'react/supabasejs/app',
+            destinationLocation: 'App.tsx',
+            destinationFilename: 'App.tsx',
+          },
+        ],
       },
     ],
-    children: [],
   },
-
+  {
+    key: 'nuxt',
+    label: 'Nuxt',
+    icon: 'nuxt',
+    files: [],
+    children: [
+      {
+        key: 'supabasejs',
+        label: 'Supabase-js',
+        children: [],
+        icon: 'supabase',
+        files: [
+          {
+            // omit .tsx extension
+            location: 'nuxt/supabasejs/env.local', // location on local disk
+            destinationLocation: '.env.local', // label for the ui
+            destinationFilename: '.env.local', // where the user should put the file
+          },
+          {
+            location: 'nuxt/supabasejs/supabase',
+            destinationLocation: 'utils/supabase.ts',
+            destinationFilename: 'supabase.ts',
+          },
+          {
+            location: 'nuxt/supabasejs/app',
+            destinationLocation: 'App.tsx',
+            destinationFilename: 'App.tsx',
+          },
+        ],
+      },
+    ],
+  },
   {
     key: 'vuejs',
     label: 'Vue.JS',
