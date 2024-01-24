@@ -100,7 +100,7 @@ const QueryItem = ({ tabInfo }: QueryItemProps) => {
         >
           <p className="text-xs">Query preview:</p>
           <div className="bg-surface-300 py-2 px-3 rounded relative">
-            {content.sql ? (
+            {content.sql.trim() ? (
               <SimpleCodeBlock
                 showCopy={false}
                 className="sql"
@@ -112,7 +112,7 @@ const QueryItem = ({ tabInfo }: QueryItemProps) => {
             ) : (
               <p className="text-xs text-foreground-lighter">This query is empty</p>
             )}
-            {content.sql && (
+            {content.sql.trim() && (
               <CopyButton
                 iconOnly
                 type="default"
