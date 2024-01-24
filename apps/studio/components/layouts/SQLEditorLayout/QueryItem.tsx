@@ -72,14 +72,17 @@ const QueryItem = ({ tabInfo }: QueryItemProps) => {
           key={id}
           className={clsx(
             'flex items-center justify-between rounded-md group',
-            isActive && 'text-foreground bg-surface-300 -active'
+            isActive ? 'bg-surface-300' : 'hover:bg-surface-200'
           )}
           ref={isActive ? (activeItemRef as React.RefObject<HTMLDivElement>) : null}
         >
           <Link href={`/project/${ref}/sql/${id}`} className="py-1 px-3 w-full overflow-hidden">
             <p
               title={description || name}
-              className="text-sm text-foreground-light group-hover:text-foreground transition overflow-hidden text-ellipsis"
+              className={clsx(
+                isActive ? 'text-foreground' : 'text-foreground-light',
+                'text-sm group-hover:text-foreground transition overflow-hidden text-ellipsis'
+              )}
             >
               {name}
             </p>
@@ -88,7 +91,11 @@ const QueryItem = ({ tabInfo }: QueryItemProps) => {
         </div>
       </TooltipTrigger_Shadcn_>
       {!isActive && (
-        <TooltipContent_Shadcn_ side="right" className="w-96 flex flex-col gap-y-2 py-3">
+        <TooltipContent_Shadcn_
+          side="right"
+          align="start"
+          className="w-96 flex flex-col gap-y-2 py-3 -translate-y-[4px]"
+        >
           <p className="text-xs">Query preview:</p>
           <div className="bg-surface-300 py-2 px-3 rounded relative">
             {content.sql ? (
