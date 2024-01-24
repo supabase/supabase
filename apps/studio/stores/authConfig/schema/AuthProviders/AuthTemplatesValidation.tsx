@@ -127,7 +127,6 @@ export const EMAIL_CHANGE: FormSchema = {
 - \`{{ .Email }}\` : The original user's email address
 - \`{{ .NewEmail }}\` : The user's new email address
 - \`{{ .Data }}\` : The user's \`user_metadata\`
-- \`{{ .SendingTo }}\: The recipient of the email. Relevant for Secure Email Change.`
 `,
     },
   },

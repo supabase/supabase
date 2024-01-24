@@ -86,26 +86,20 @@ Send users different emails based on the domain that they signed up for your ser
 
 ```
 {{ if eq .Data.Domain "http://www.example.com" }}
-<insert content for Pro Tier users>
+<h1>Welcome to Our Database Service!</h1>
+  <p>Dear Developer,</p>
+  <p>Welcome to Billy, the scalable developer platform!</p>
+  <p>Best Regards,<br>
+Billy Team</p>
 {{ else if eq .Data.Domain "http://www.specialsite.com" }}
-<insert content for Free Tier users>
+<h1>Welcome to Our Database Service!</h1>
+  <p>Dear Developer,</p>
+  <p>Welcome to Pro Plan of Billy, the scalable developer platform!</p>
+  <p> As a Pro Plan member of Billy, you have access to select features like Point In Time Restoration.</p>
+  <p>Best Regards,<br>
+Billy Team</p>
 {{end }}
 ```
-
-
-### Custom Email Content For Secure Email Change Flow
-
-Send two distinct emails: one customized for the new email account and another for the email the user is currently using.
-```
-{{ if eq .Email .SendingTo }}
-<insert content which will be received by current email>
-{{ else }}
-<insert content which will be received by new email>
-{{end}}
-
-```
-
-
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
