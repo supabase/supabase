@@ -243,8 +243,8 @@ serve(async (req) => {
     const textEncoder = new TextEncoder()
 
     for await (const chunk of response) {
-      const text = chunk.choices[0].delta.content ?? ''
-      writer.write(textEncoder.encode(text))
+      const text = chunk.choices[0].delta.content
+      if (text) writer.write(textEncoder.encode(text))
     }
 
     writer.close()
