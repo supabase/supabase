@@ -1,14 +1,8 @@
+import OpenAI from 'https://deno.land/x/openai@v4.25.0/mod.ts'
 import { serve } from 'https://deno.land/std@0.170.0/http/server.ts'
 import 'https://deno.land/x/xhr@0.2.1/mod.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.5.0'
 import { codeBlock, oneLine } from 'https://esm.sh/common-tags@1.8.2'
-import {
-  ChatCompletionRequestMessage,
-  ChatCompletionRequestMessageRoleEnum,
-  Configuration,
-  CreateChatCompletionRequest,
-  OpenAIApi,
-} from 'https://esm.sh/openai@3.2.1'
 import { ApplicationError, UserError } from '../common/errors.ts'
 import { getChatRequestTokenCount, getMaxTokenCount, tokenizer } from '../common/tokenizer.ts'
 
@@ -70,21 +64,18 @@ serve(async (req) => {
     console.log({ messages })
 
     // TODO: better sanitization
-    const contextMessages: ChatCompletionRequestMessage[] = messages.map(({ role, content }) => {
-      if (
-        ![
-          ChatCompletionRequestMessageRoleEnum.User,
-          ChatCompletionRequestMessageRoleEnum.Assistant,
-        ].includes(role)
-      ) {
-        throw new Error(`Invalid message role '${role}'`)
-      }
+    const contextMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = messages.map(
+      ({ role, content }) => {
+        if (!['user', 'assistant'].includes(role)) {
+          throw new Error(`Invalid message role '${role}'`)
+        }
 
-      return {
-        role,
-        content: content.trim(),
+        return {
+          role,
+          content: content.trim(),
+        }
       }
-    })
+    )
 
     const [userMessage] = contextMessages.filter(({ role }) => role === MessageRole.User).slice(-1)
 
@@ -94,18 +85,24 @@ serve(async (req) => {
 
     const supabaseClient = createClient(supabaseUrl, supabaseServiceKey)
 
-    const configuration = new Configuration({ apiKey: openAiKey })
-    const openai = new OpenAIApi(configuration)
+    const openai = new OpenAI({
+      apiKey: openAiKey,
+    })
 
-    // Moderate the content to comply with OpenAI T&C
-    const moderationResponses = await Promise.all(
-      contextMessages.map((message) => openai.createModeration({ input: message.content }))
-    )
+    let moderationResponses
+    try {
+      // Moderate the content to comply with OpenAI T&C
+      moderationResponses = await Promise.all(
+        contextMessages.map((message) => openai.moderations.create({ input: message.content }))
+      )
+    } catch (err) {
+      throw new ApplicationError('Failed to get moerations for query', err)
+    }
 
     for (const moderationResponse of moderationResponses) {
-      const [results] = moderationResponse.data.results
+      const { results } = moderationResponse
 
-      if (results.flagged) {
+      if (results.some((result) => result.flagged)) {
         throw new UserError('Flagged content', {
           flagged: true,
           categories: results.categories,
@@ -113,16 +110,17 @@ serve(async (req) => {
       }
     }
 
-    const embeddingResponse = await openai.createEmbedding({
-      model: 'text-embedding-ada-002',
-      input: userMessage.content.replaceAll('\n', ' '),
-    })
-
-    if (embeddingResponse.status !== 200) {
-      throw new ApplicationError('Failed to create embedding for query', embeddingResponse)
+    let embeddingResponse
+    try {
+      embeddingResponse = await openai.embeddings.create({
+        model: 'text-embedding-ada-002',
+        input: userMessage.content.replaceAll('\n', ' '),
+      })
+    } catch (err) {
+      throw new ApplicationError('Failed to create embedding for query', err)
     }
 
-    const [{ embedding }] = embeddingResponse.data.data
+    const [{ embedding }] = embeddingResponse.data
 
     const { error: matchError, data: pageSections } = await supabaseClient
       .rpc('match_page_sections_v2', {
@@ -154,9 +152,9 @@ serve(async (req) => {
       contextText += `${content.trim()}\n---\n`
     }
 
-    const initMessages: ChatCompletionRequestMessage[] = [
+    const initMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
       {
-        role: ChatCompletionRequestMessageRoleEnum.System,
+        role: 'system',
         content: codeBlock`
           ${oneLine`
             You are a very enthusiastic Supabase AI who loves
@@ -170,14 +168,14 @@ serve(async (req) => {
         `,
       },
       {
-        role: ChatCompletionRequestMessageRoleEnum.User,
+        role: 'user',
         content: codeBlock`
           Here is the Supabase documentation:
           ${contextText}
         `,
       },
       {
-        role: ChatCompletionRequestMessageRoleEnum.User,
+        role: 'user',
         content: codeBlock`
           ${oneLine`
             Answer all future questions using only the above documentation.
@@ -219,37 +217,39 @@ serve(async (req) => {
     const model = 'gpt-3.5-turbo-0301'
     const maxCompletionTokenCount = 1024
 
-    const completionMessages: ChatCompletionRequestMessage[] = capMessages(
+    const completionMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = capMessages(
       initMessages,
       contextMessages,
       maxCompletionTokenCount,
       model
     )
 
-    const completionOptions: CreateChatCompletionRequest = {
-      model,
-      messages: completionMessages,
-      max_tokens: 1024,
-      temperature: 0,
-      stream: true,
+    let response
+    try {
+      response = await openai.chat.completions.create({
+        model,
+        messages: completionMessages,
+        max_tokens: 1024,
+        temperature: 0,
+        stream: true,
+      })
+    } catch (err) {
+      throw new ApplicationError('Failed to generate chat completions', err)
     }
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      headers: {
-        Authorization: `Bearer ${openAiKey}`,
-        'Content-Type': 'application/json',
-      },
-      method: 'POST',
-      body: JSON.stringify(completionOptions),
-    })
+    let { readable, writable } = new TransformStream()
 
-    if (!response.ok) {
-      const error = await response.json()
-      throw new ApplicationError('Failed to generate completion', error)
+    let writer = writable.getWriter()
+    const textEncoder = new TextEncoder()
+
+    for await (const chunk of response) {
+      const text = chunk.choices[0].delta.content ?? ''
+      writer.write(textEncoder.encode(text))
     }
 
-    // Proxy the streamed SSE response from OpenAI
-    return new Response(response.body, {
+    writer.close()
+
+    return new Response(readable, {
       headers: {
         ...corsHeaders,
         'Content-Type': 'text/event-stream',
@@ -295,8 +295,8 @@ serve(async (req) => {
  * Accounts for both message and completion token counts.
  */
 function capMessages(
-  initMessages: ChatCompletionRequestMessage[],
-  contextMessages: ChatCompletionRequestMessage[],
+  initMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[],
+  contextMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[],
   maxCompletionTokenCount: number,
   model: string
 ) {

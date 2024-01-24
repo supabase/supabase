@@ -144,7 +144,7 @@ export function useAiChat({
   messageTemplate = (message) => message,
   setIsLoading,
 }: UseAiChatOptions) {
-  const eventSourceRef = useRef<SSE>()
+  const [textDecoder] = useState(() => new TextDecoder())
 
   const [isResponding, setIsResponding] = useState(false)
   const [hasError, setHasError] = useState(false)
@@ -176,33 +176,28 @@ export function useAiChat({
       setHasError(false)
       setIsLoading?.(true)
 
-      const eventSource = new SSE(`${edgeFunctionUrl}/ai-docs`, {
-        headers: {
-          apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        payload: JSON.stringify({
-          messages: messages
-            .filter(({ status }) => status === MessageStatus.Complete)
-            .map(({ role, content }) => ({ role, content }))
-            .concat({ role: MessageRole.User, content: messageTemplate(query) }),
-        }),
-      })
+      try {
+        const response = await fetch(`${edgeFunctionUrl}/ai-docs`, {
+          method: 'POST',
+          headers: {
+            apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
+            Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            messages: messages
+              .filter(({ status }) => status === MessageStatus.Complete)
+              .map(({ role, content }) => ({ role, content }))
+              .concat({ role: MessageRole.User, content: messageTemplate(query) }),
+          }),
+        })
 
-      function handleError<T>(err: T) {
-        setIsLoading?.(false)
-        setIsResponding(false)
-        setHasError(true)
-        console.error(err)
-      }
-
-      eventSource.addEventListener('error', handleError)
-      eventSource.addEventListener('message', (e) => {
-        try {
+        const reader = response.body?.getReader()
+        // If reader exists, functions as while (true)
+        while (reader) {
+          const { done, value } = await reader.read()
           setIsLoading?.(false)
-
-          if (e.data === '[DONE]') {
+          if (done) {
             setIsResponding(false)
             dispatchMessage({
               type: 'update',
@@ -214,7 +209,6 @@ export function useAiChat({
             setCurrentMessageIndex((x) => x + 2)
             return
           }
-
           dispatchMessage({
             type: 'update',
             index: currentMessageIndex,
@@ -225,37 +219,27 @@ export function useAiChat({
 
           setIsResponding(true)
 
-          const completionChunk: OpenAI.Chat.Completions.ChatCompletionChunk = JSON.parse(e.data)
-          const [
-            {
-              delta: { content },
-            },
-          ] = completionChunk.choices
+          const decodedValue = textDecoder.decode(value)
 
-          if (content) {
+          if (decodedValue) {
             dispatchMessage({
               type: 'append-content',
               index: currentMessageIndex,
-              content,
+              content: decodedValue,
             })
           }
-        } catch (err) {
-          handleError(err)
         }
-      })
-
-      eventSource.stream()
-
-      eventSourceRef.current = eventSource
-
-      setIsLoading?.(true)
+      } catch (err) {
+        setIsLoading?.(false)
+        setIsResponding(false)
+        setHasError(true)
+        console.error(err)
+      }
     },
     [currentMessageIndex, messages, messageTemplate]
   )
 
   function reset() {
-    eventSourceRef.current?.close()
-    eventSourceRef.current = undefined
     setIsResponding(false)
     setHasError(false)
     dispatchMessage({
