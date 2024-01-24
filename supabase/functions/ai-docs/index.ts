@@ -154,8 +154,6 @@ serve(async (req) => {
       contextText += `${content.trim()}\n---\n`
     }
 
-    console.log(contextText)
-
     const initMessages: ChatCompletionRequestMessage[] = [
       {
         role: ChatCompletionRequestMessageRoleEnum.System,
