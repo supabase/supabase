@@ -87,7 +87,6 @@ const PricingPlans: FC = () => {
                           {plan.warning && (
                             <div className="mt-4 flex flex-col gap-1">
                               <span
-                                data-tip={plan.warningTooltip}
                                 className={cn(
                                   'text-[13px] leading-4 inline-flex gap-1 items-center'
                                 )}

@@ -36,9 +36,9 @@ const PricingComputeSection = () => {
               </h3>
             </div>
             <p className="text-foreground-lighter text-[13px]">
-              Paid plans include $10 in compute credits that can be spent on one or more instances.
-              Additional compute add-ons are available if you need extra performance when scaling up
-              Supabase.
+              Paid plans include $10/month in compute credits that can be spent on one or more
+              instances. Additional compute add-ons are available if you need extra performance when
+              scaling up Supabase.
             </p>
           </div>
           <div className="flex items-center gap-4 mt-4">

@@ -44,8 +44,6 @@ export const plans: PricingInformation[] = [
     href: 'https://supabase.com/dashboard/new?plan=pro',
     priceLabel: 'From',
     warning: '$10 in compute credits included',
-    warningTooltip:
-      'We bill based on compute runtime hours where usage exeeds the resources included in the plan, only if you disable Spend Cap.',
     priceMonthly: 25,
     description: 'For production applications with the option to scale.',
     features: [
@@ -68,8 +66,6 @@ export const plans: PricingInformation[] = [
     href: 'https://supabase.com/dashboard/new?plan=team',
     priceLabel: 'From',
     warning: '$10 in compute credits included',
-    warningTooltip:
-      'We bill based on compute runtime hours where usage exeeds the resources included in the plan.',
     priceMonthly: 599,
     description: 'Collaborate with different permissions and access patterns.',
     features: [
