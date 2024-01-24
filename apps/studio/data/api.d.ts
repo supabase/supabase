@@ -786,9 +786,21 @@ export interface paths {
     /** Create github integration */
     post: operations['GitHubIntegrationController_createGitHubIntegration']
   }
+  '/platform/integrations/github/authorization': {
+    /** Create GitHub authorization */
+    post: operations['GitHubIntegrationController_createGitHubAuthorization']
+  }
+  '/platform/integrations/github/repositories': {
+    /** Gets GitHub repositories for user */
+    get: operations['GitHubIntegrationController_listRepositories']
+  }
   '/platform/integrations/github/connections/{organization_integration_id}': {
     /** Gets installed github project connections for the given organization integration */
     get: operations['GitHubConnectionsController_getGitHubConnections']
+  }
+  '/platform/integrations/github/connections/organization/{organization_id}': {
+    /** List organization GitHub connections */
+    get: operations['GitHubConnectionsController_listOrganizationGitHubConnections']
   }
   '/platform/integrations/github/connections': {
     /** Connects a GitHub project to a supabase project */
@@ -812,6 +824,14 @@ export interface paths {
     /** Gets a specific github branch for a given repo */
     get: operations['GitHubBranchController_getBranchByName']
   }
+  '/platform/integrations/github/branches/{connectionId}': {
+    /** List GitHub connection branches */
+    get: operations['GitHubBranchController_listConnectionBranches']
+  }
+  '/platform/integrations/github/branches/{connectionId}/{branchName}': {
+    /** Get GitHub connection branch */
+    get: operations['GitHubBranchController_getConnectionBranch']
+  }
   '/platform/integrations/github/pull-requests/{organization_integration_id}/{repo_owner}/{repo_name}': {
     /** Gets github pull requests for a given repo */
     get: operations['GitHubPullRequestController_getPullRequestsByNumber']
@@ -819,6 +839,14 @@ export interface paths {
   '/platform/integrations/github/pull-requests/{organization_integration_id}/{repo_owner}/{repo_name}/{target}': {
     /** Gets github pull requests for a given repo */
     get: operations['GitHubPullRequestController_getPullRequests']
+  }
+  '/platform/integrations/github/pull-requests/{connectionId}': {
+    /** List GitHub connection pull requests */
+    get: operations['GitHubPullRequestController_getConnectionPullRequests']
+  }
+  '/platform/integrations/github/pull-requests/{connectionId}/{branchName}': {
+    /** List GitHub pull requests for a specific branch */
+    get: operations['GitHubPullRequestController_validateConnectionBranch']
   }
   '/platform/cli/login': {
     /** Create CLI login session */
@@ -3503,6 +3531,19 @@ export interface components {
       is_read_replicas_enabled: boolean
       preview_branch_refs: string[]
       disk_volume_size_gb?: number
+      /** @enum {string} */
+      infra_compute_size?:
+        | 'nano'
+        | 'micro'
+        | 'small'
+        | 'medium'
+        | 'large'
+        | 'xlarge'
+        | '2xlarge'
+        | '4xlarge'
+        | '8xlarge'
+        | '12xlarge'
+        | '16xlarge'
     }
     GetProjectByFlyExtensionIdResponse: {
       ref: string
@@ -3565,6 +3606,19 @@ export interface components {
       is_read_replicas_enabled: boolean
       preview_branch_refs: string[]
       disk_volume_size_gb?: number
+      /** @enum {string} */
+      infra_compute_size?:
+        | 'nano'
+        | 'micro'
+        | 'small'
+        | 'medium'
+        | 'large'
+        | 'xlarge'
+        | '2xlarge'
+        | '4xlarge'
+        | '8xlarge'
+        | '12xlarge'
+        | '16xlarge'
       endpoint: string
       anon_key: string
       service_key: string
@@ -4340,17 +4394,8 @@ export interface components {
       organization_slug: string
       metadata: Record<string, never>
     }
-    CreateGitHubIntegrationResponse: {
-      id: string
-    }
-    GetGitHubConnections: {
-      id: string
-      inserted_at: string
-      updated_at: string
-      organization_integration_id: string
-      supabase_project_ref: string
-      foreign_project_id: string
-      metadata: Record<string, never>
+    CreateGitHubAuthorizationBody: {
+      code: string
     }
     CreateGitHubConnectionsBody: {
       organization_integration_id: string
@@ -4358,29 +4403,6 @@ export interface components {
     }
     UpdateGitHubConnectionsBody: {
       metadata: Record<string, never>
-    }
-    GetGithubRepo: {
-      id: number
-      full_name: string
-    }
-    GetGithubBranch: {
-      name: string
-    }
-    GitRef: {
-      repo: string
-      branch: string
-      label?: string
-    }
-    GetGithubPullRequest: {
-      id: number
-      url: string
-      title: string
-      target: components['schemas']['GitRef']
-      created_at: string
-      created_by?: string
-      repo: string
-      branch: string
-      label?: string
     }
     CreateCliLoginSessionBody: {
       session_id: string
@@ -10416,11 +10438,40 @@ export interface operations {
     }
     responses: {
       201: {
-        content: {
-          'application/json': components['schemas']['CreateGitHubIntegrationResponse']
-        }
+        content: never
       }
       /** @description Failed to create github integration */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Create GitHub authorization */
+  GitHubIntegrationController_createGitHubAuthorization: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateGitHubAuthorizationBody']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': Record<string, never>
+        }
+      }
+      /** @description Failed to create GitHub authorization */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets GitHub repositories for user */
+  GitHubIntegrationController_listRepositories: {
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to get GitHub repositories for user */
       500: {
         content: never
       }
@@ -10436,10 +10487,27 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['GetGitHubConnections'][]
+          'application/json': Record<string, never>[]
         }
       }
       /** @description Failed to get installed github connections for the given organization integration */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** List organization GitHub connections */
+  GitHubConnectionsController_listOrganizationGitHubConnections: {
+    parameters: {
+      path: {
+        organization_id: number
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to list organization GitHub connections */
       500: {
         content: never
       }
@@ -10514,9 +10582,7 @@ export interface operations {
     }
     responses: {
       200: {
-        content: {
-          'application/json': components['schemas']['GetGithubRepo'][]
-        }
+        content: never
       }
       /** @description Failed to get github repos for the given organization */
       500: {
@@ -10540,7 +10606,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['GetGithubBranch'][]
+          'application/json': Record<string, never>[]
         }
       }
       /** @description Failed to get github branches for a given repo */
@@ -10562,10 +10628,53 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['GetGithubBranch']
+          'application/json': Record<string, never>
         }
       }
       /** @description Failed to get github branch for a given repo */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** List GitHub connection branches */
+  GitHubBranchController_listConnectionBranches: {
+    parameters: {
+      query?: {
+        per_page?: number
+        page?: number
+      }
+      path: {
+        connectionId: number
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': Record<string, never>[]
+        }
+      }
+      /** @description Failed to list GitHub connection branches */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Get GitHub connection branch */
+  GitHubBranchController_getConnectionBranch: {
+    parameters: {
+      path: {
+        connectionId: number
+        branchName: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': Record<string, never>
+        }
+      }
+      /** @description Failed to get GitHub connection branch */
       500: {
         content: never
       }
@@ -10586,7 +10695,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['GetGithubPullRequest'][]
+          'application/json': Record<string, never>[]
         }
       }
       /** @description Failed to get github pull requests for a given repo */
@@ -10612,10 +10721,56 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['GetGithubPullRequest'][]
+          'application/json': Record<string, never>[]
         }
       }
       /** @description Failed to get github pull requests for a given repo */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** List GitHub connection pull requests */
+  GitHubPullRequestController_getConnectionPullRequests: {
+    parameters: {
+      query: {
+        pr_number: number[]
+      }
+      path: {
+        connectionId: number
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': Record<string, never>[]
+        }
+      }
+      /** @description Failed to list GitHub connection pull requests */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** List GitHub pull requests for a specific branch */
+  GitHubPullRequestController_validateConnectionBranch: {
+    parameters: {
+      query?: {
+        per_page?: number
+        page?: number
+      }
+      path: {
+        connectionId: number
+        branchName: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': Record<string, never>[]
+        }
+      }
+      /** @description Failed to validate GitHub connection branch */
       500: {
         content: never
       }

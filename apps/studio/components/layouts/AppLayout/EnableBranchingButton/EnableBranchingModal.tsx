@@ -73,6 +73,7 @@ const EnableBranchingModal = () => {
 
   const hasGithubIntegrationInstalled =
     integrations?.some((integration) => integration.integration.name === 'GitHub') ?? false
+  console.log('integrations:', integrations)
   const githubIntegration = integrations?.find(
     (integration) =>
       integration.integration.name === 'GitHub' &&
