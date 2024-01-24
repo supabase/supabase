@@ -146,7 +146,7 @@ export const RESOURCE_WARNING_MESSAGES = {
         title:
           'Your project has exceeded email rate limits in the past 24 hours, and performance of Auth may be affected',
         description:
-          'You will need to set up custom SMTP and adjust rate limits where necessary. You may also wish to set up CAPTCHA',
+          'You will need to set up custom SMTP and adjust rate limits where necessary. View the linked guide for further infromation.',
       },
     },
     cardContent: {
@@ -155,7 +155,7 @@ export const RESOURCE_WARNING_MESSAGES = {
         description: `You will need to set up a custom SMTP provider and adjust rate limits where necessary`,
       },
     },
-    docsUrl: undefined,
+    docsUrl: 'https://supabase.com/docs/guides/platform/going-into-prod#auth-rate-limits',
     buttonText: 'Enable Custom SMTP',
     metric: 'auth_email_rate_limit',
   },
