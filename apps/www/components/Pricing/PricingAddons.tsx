@@ -13,7 +13,7 @@ const addons = [
     price: 'Available on Pro Plan',
     heroImg: <CostControlAnimation className="h-full lg:max-w-md aspect-video" />,
     description:
-      'The Pro plan has a spend cap enabled by default to keep costs under control. If you expect a usage spike and need to go beyond the plan limits, simply switch off the spend cap to pay for additional resources.',
+      'The Pro plan has a spend cap enabled by default to keep costs under control. If you want to scale beyond the plans included quota, simply switch off the spend cap to pay for additional resources.',
     leftCtaText: 'Learn about Cost Control',
     leftCtaLink: 'https://supabase.com/docs/guides/platform/spend-cap',
   },
@@ -24,7 +24,7 @@ const addons = [
     icon: 'custom-domain-upgrade',
     price: 'Flat fee $10/month',
     description:
-      'Use your own domain for your Supabase project to present a more polished product to your users.',
+      'Use your own domain for your Supabase project to present a branded experience to your users.',
     leftCtaText: 'Documentation',
     leftCtaLink: 'https://supabase.com/docs/guides/platform/custom-domains',
     rightCtaText: 'See more',
@@ -36,7 +36,7 @@ const addons = [
     heroImg: 'pitr-on',
     icon: 'pitr-upgrade',
     price: 'Starts from $100/month',
-    description: 'Roll back to any specific point in time and ensure that data is not lost.',
+    description: 'Roll back to any specific point in time up to seconds in granularity.',
     leftCtaText: 'Documentation',
     leftCtaLink: 'https://supabase.com/docs/guides/platform/backups',
     rightCtaText: 'See Pricing breakdown',
@@ -71,7 +71,8 @@ const AddonCard = ({ addon }: any) => {
   const containerClasses = cn(
     'group relative bg-surface-100 border rounded-lg gap-4 transition-colors',
     isHighlightCard && 'flex flex-col lg:flex-row lg:h-[300px] col-span-2',
-    !isHighlightCard && 'flex flex-col lg:flex-row hover:border-stronger hover:bg-surface-200'
+    !isHighlightCard &&
+      'flex flex-col lg:flex-row hover:border-stronger hover:bg-surface-200 col-span-2 sm:col-span-1'
   )
 
   const HighlightCard = () => (
@@ -97,19 +98,21 @@ const AddonCard = ({ addon }: any) => {
             type="default"
             iconRight={<IconArrowUpRight className="w-4 h-4" />}
           >
-            <Link href={addon.leftCtaLink}>{addon.leftCtaText}</Link>
+            <Link href={addon.leftCtaLink} target="_blank">
+              {addon.leftCtaText}
+            </Link>
           </Button>
         </div>
       </div>
     </>
   )
 
-  const Content = () => (
+  const SmallCard = () => (
     <>
       <div
         className={cn(
-          'relative w-full md:aspect-[1.53/1] md:h-auto max-w-[200px]',
-          addon.id === 'addon-pitr' && 'flex items-end'
+          'relative w-full hidden lg:block md:aspect-[1.53/1] md:h-auto max-w-[200px]',
+          addon.id === 'addon-pitr' && 'lg:flex items-end'
         )}
       >
         <Image
@@ -121,7 +124,7 @@ const AddonCard = ({ addon }: any) => {
           className={cn('object-contain', addon.id === 'addon-pitr' && 'object-bottom')}
         />
       </div>
-      <div className="p-4 md:pl-0 gap-4 col-span-2">
+      <div className="p-4 lg:pl-0 lg:-ml-2 xl:ml-0 gap-4 col-span-2">
         <div className="flex flex-col gap-2">
           <p className="text-[13px] text-foreground-lighter">{addon.price}</p>
           <div className="flex items-center gap-2">
@@ -129,7 +132,6 @@ const AddonCard = ({ addon }: any) => {
               src={`${basePath}/images/pricing/${addon.icon}${
                 resolvedTheme?.includes('dark') ? '' : '-light'
               }.svg`}
-              className=""
               width={14}
               height={14}
               alt="Compute"
@@ -151,7 +153,7 @@ const AddonCard = ({ addon }: any) => {
     </div>
   ) : (
     <Link href={addon.leftCtaLink} className={containerClasses}>
-      <Content />
+      <SmallCard />
     </Link>
   )
 }

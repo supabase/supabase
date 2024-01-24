@@ -28,7 +28,7 @@ export const plans: PricingInformation[] = [
     preface: 'Get started with:',
     features: [
       '50,000 monthly active users',
-      ['500MB Database space', '2 Core ARM • 1 GB'],
+      ['500MB Database space', '2 Core shared CPU • 1 GB RAM'],
       '5GB bandwidth',
       '1GB file storage',
       'Community support',
@@ -43,7 +43,7 @@ export const plans: PricingInformation[] = [
     costUnit: '/ month',
     href: 'https://supabase.com/dashboard/new?plan=pro',
     priceLabel: 'From',
-    warning: '$10 of compute credits included',
+    warning: '$10 in compute credits included',
     warningTooltip:
       'We bill based on compute runtime hours where usage exeeds the resources included in the plan, only if you disable Spend Cap.',
     priceMonthly: 25,
@@ -67,7 +67,7 @@ export const plans: PricingInformation[] = [
     costUnit: '/ month',
     href: 'https://supabase.com/dashboard/new?plan=team',
     priceLabel: 'From',
-    warning: '$10 of compute credits included',
+    warning: '$10 in compute credits included',
     warningTooltip:
       'We bill based on compute runtime hours where usage exeeds the resources included in the plan.',
     priceMonthly: 599,

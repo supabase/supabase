@@ -22,7 +22,7 @@ const plans = [
     price: 25,
   },
   {
-    name: 'Teams',
+    name: 'Team',
     price: 599,
   },
 ]
@@ -47,11 +47,11 @@ const ComputePricingCalculator = () => {
     setActivePrice(activePlan.price + priceSteps[0] - COMPUTE_CREDITS)
   }, [])
 
-  const handleUpdateInstance = (index: number, value: number[]) => {
+  const handleUpdateInstance = (position: number, value: number[]) => {
     const newArray = activeInstances.map((activeInstance) => {
       // only update the instance corresponding to the correct slider
-      if (activeInstance.position === index) {
-        return { ...computeInstances[value[0] - 1], position: index }
+      if (activeInstance.position === position) {
+        return { ...computeInstances[value[0] - 1], position }
       } else {
         return activeInstance
       }
@@ -109,7 +109,7 @@ const ComputePricingCalculator = () => {
   )
 
   return (
-    <div className="flex flex-col lg:grid grid-cols-4 gap-4 h-full mt-4 md:mt-0 border rounded-xl shadow p-4">
+    <div className="flex flex-col lg:grid grid-cols-4 gap-4 h-full mt-4 md:mt-0 border rounded-xl p-4">
       <div className="flex justify-between w-full">
         <div className="flex flex-col text-lighter leading-4 text-xs w-full gap-4">
           <div className="h-full w-full flex flex-col justify-between">
@@ -117,44 +117,70 @@ const ComputePricingCalculator = () => {
               <DropdownMenuTrigger>
                 <Button
                   size="tiny"
-                  // block
                   type="outline"
                   iconRight={<IconChevronDown />}
                   icon={
-                    <svg
-                      width="13"
-                      height="14"
-                      viewBox="0 0 13 14"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <rect
-                        x="3.26953"
-                        y="3.61279"
-                        width="6.77393"
-                        height="6.77393"
-                        rx="1.5"
-                        stroke="hsl(var(--foreground-muted))"
-                      />
-                      <rect
-                        x="1.08984"
-                        y="1.43359"
-                        width="11.1323"
-                        height="11.1323"
-                        rx="3.5"
-                        stroke="hsl(var(--foreground-default))"
-                      />
-                      <rect
-                        x="5.32031"
-                        y="5.66406"
-                        width="2.67139"
-                        height="2.67139"
-                        rx="1.33569"
-                        stroke="hsl(var(--foreground-muted))"
-                      />
-                    </svg>
+                    activePlan.name === 'Pro' ? (
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 14 14"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <rect
+                          x="3.5"
+                          y="3.5"
+                          width="6.77393"
+                          height="6.77393"
+                          rx="1.5"
+                          stroke="hsl(var(--foreground-default))"
+                        />
+                        <rect
+                          x="5.55078"
+                          y="5.55127"
+                          width="2.67139"
+                          height="2.67139"
+                          rx="1.33569"
+                          stroke="hsl(var(--foreground-muted))"
+                        />
+                      </svg>
+                    ) : (
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 13 14"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <rect
+                          x="3.26953"
+                          y="3.61279"
+                          width="6.77393"
+                          height="6.77393"
+                          rx="1.5"
+                          stroke="hsl(var(--foreground-muted))"
+                        />
+                        <rect
+                          x="1.08984"
+                          y="1.43359"
+                          width="11.1323"
+                          height="11.1323"
+                          rx="3.5"
+                          stroke="hsl(var(--foreground-default))"
+                        />
+                        <rect
+                          x="5.32031"
+                          y="5.66406"
+                          width="2.67139"
+                          height="2.67139"
+                          rx="1.33569"
+                          stroke="hsl(var(--foreground-muted))"
+                        />
+                      </svg>
+                    )
                   }
-                  className="w-full py-2"
+                  className="w-full pl-1 py-2"
                 >
                   <div className="lg:min-w-[80px] flex items-center flex-1 grow w-full gap-1">
                     <span className="text-foreground-light">Plan</span>{' '}
@@ -202,14 +228,17 @@ const ComputePricingCalculator = () => {
                   <Badge
                     className="rounded-md w-16 text-center flex justify-center"
                     color={
-                      findIntanceValueByColumn(activeInstance, 'plan') === 'Starter'
+                      findIntanceValueByColumn(activeInstance, 'plan') ===
+                      findIntanceValueByColumn(computeInstances[0], 'plan')
                         ? 'scale'
                         : 'brand'
                     }
                   >
                     {findIntanceValueByColumn(activeInstance, 'plan')}
                   </Badge>
-                  <p className="text-xs">Project {activeInstance.position + 1}</p>
+                  <p className="text-xs text-foreground-lighter">
+                    Project {activeInstance.position + 1}
+                  </p>
                 </div>
                 <span className="leading-3 text-sm">
                   {findIntanceValueByColumn(activeInstance, 'pricing')}
@@ -225,7 +254,7 @@ const ComputePricingCalculator = () => {
               <div className="flex items-center justify-between text-sm">
                 <div className="w-full flex items-center gap-2">
                   <span className="text-lighter text-xs md:text-[13px]">
-                    {findIntanceValueByColumn(activeInstance, 'memory')} /{' '}
+                    {findIntanceValueByColumn(activeInstance, 'memory')} RAM /{' '}
                     {findIntanceValueByColumn(activeInstance, 'cpu')} CPU / Connections: Direct{' '}
                     {findIntanceValueByColumn(activeInstance, 'directConnections')}, Pooler{' '}
                     {findIntanceValueByColumn(activeInstance, 'poolerConnections')}
@@ -248,7 +277,6 @@ const ComputePricingCalculator = () => {
           ))}
         </div>
         <div className="w-full">
-          {/* {activeInstances.length < 3 ? ( */}
           <Button
             size="tiny"
             type="outline"
@@ -260,13 +288,10 @@ const ComputePricingCalculator = () => {
                 { ...computeInstances[0], position: activeInstances.length },
               ])
             }
-            className="w-full border-dashed"
+            className="w-full border-dashed text-foreground-light hover:text-foreground"
           >
             <div className="w-full text-left">Add Compute Instance</div>
           </Button>
-          {/*  ) : (
-             <p className="text-foreground-muted text-xs">And so forth...</p>
-           )} */}
         </div>
       </div>
       <ReactTooltip
