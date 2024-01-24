@@ -107,7 +107,7 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
     function_type: isEdgeFunction(selectedHook?.function_args?.[0] ?? '')
       ? 'supabase_function'
       : 'http_request',
-    timeout_ms: Number(selectedHook?.function_args?.[4] ?? 3000),
+    timeout_ms: Number(selectedHook?.function_args?.[4] ?? 5000),
     max_retries: Number(selectedHook?.function_args?.[5] ?? 0),
   }
 
@@ -181,8 +181,8 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
       }
     }
 
-    if (values.timeout_ms < 1000 || values.timeout_ms > 5000) {
-      errors['timeout_ms'] = 'Timeout should be between 1000ms and 5000ms'
+    if (values.timeout_ms < 1000 || values.timeout_ms > 10_000) {
+      errors['timeout_ms'] = 'Timeout should be between 1000ms and 10000ms'
     }
 
     if (values.max_retries < 0 || values.max_retries > 5) {

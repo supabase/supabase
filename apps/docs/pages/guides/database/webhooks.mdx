@@ -81,7 +81,7 @@ type DeletePayload = {
 ## Timeout
 
 The timeout is the maximum time in milliseconds that the webhook will wait for a response from the server. If the timeout is exceeded, the webhook will fail.
-The default timeout for webhooks is set for 3000ms (3 seconds).
+The default timeout for webhooks is set for 5000ms (5 seconds).
 
 ## Retrying failed webhooks
 
@@ -100,6 +100,11 @@ The retries follow an exponential backoff strategy, following this delay table:
 ## Monitoring
 
 Logging history of webhook calls is available under the `net` schema of your database. For more info, see the [GitHub Repo](https://github.com/supabase/pg_net).
+You can also query the `supabase_functions.hooks` table:
+
+  ```sql
+  select * from supabase_functions.hooks;
+  ```
 
 ## Resources
 
