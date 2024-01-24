@@ -1,20 +1,39 @@
+import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
+
 const ContentFile = () => {
   return (
     <div>
-      <pre className="text-sm">
+      <SimpleCodeBlock className="typescript">
         {`
-import { createClient } from '@/utils/supabase/server';
-import { cookies } from 'next/headers';
+import { useState, useEffect } from 'react'
+import { supabase } from '../utils/supabase'
 
-export default async function Notes() {
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore);
-  const { data: notes } = await supabase.from("notes").select();
+function Page() {
+  const [todos, setTodos] = useState([])
 
-  return <pre>{JSON.stringify(notes, null, 2)}</pre>
+  useEffect(() => {
+    function getTodos() {
+      const { data: todos } = await supabase.from('todos').select()
+
+      if (todos.length > 1) {
+        setTodos(todos)
+      }
+    }
+
+    getTodos()
+  }, [])
+
+  return (
+    <div>
+      {todos.map((todo) => (
+        <li key={todo}>{todo}</li>
+      ))}
+    </div>
+  )
 }
-        `}
-      </pre>
+export default Page
+`}
+      </SimpleCodeBlock>
     </div>
   )
 }

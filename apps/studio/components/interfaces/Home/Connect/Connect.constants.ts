@@ -1,19 +1,18 @@
-export type Parent = {
+export type ConnectionType = {
   key: string
   icon: string
   label: string
   files: File[]
-  children: Parent[]
+  children: ConnectionType[]
 }
 
-//export type File = { location: string; destinationFilename: string; label: string }
 export type File = {
   location: string // location on the filesystem
   destinationFilename: string // where the user should put the file
   destinationLocation: string // label for the ui
 }
 
-export const FRAMEWORKS: Parent[] = [
+export const FRAMEWORKS: ConnectionType[] = [
   {
     key: 'nextjs',
     label: 'Next.JS',
@@ -34,7 +33,7 @@ export const FRAMEWORKS: Parent[] = [
             files: [
               {
                 // omit .tsx extension
-                location: 'nextjs/app/supabasejs/env.local',// location on local disk
+                location: 'nextjs/app/supabasejs/env.local', // location on local disk
                 destinationLocation: '.env.local', // label for the ui
                 destinationFilename: '.env.local', // where the user should put the file
               },
@@ -70,18 +69,29 @@ export const FRAMEWORKS: Parent[] = [
         children: [
           {
             key: 'supabasejs',
-            label: 'pages Supabase-js',
+            label: 'Supabase-js',
             children: [],
             icon: 'supabase',
             files: [
               {
                 // omit .tsx extension
-                location: 'pages-supabasejs/env.local',
-                destinationFilename: 'pages-supabasejs.env.local',
-                destinationLocation: 'pages-supabasejs/.env.local',
+                location: 'nextjs/pages/supabasejs/env.local', // location on local disk
+                destinationLocation: '.env.local', // label for the ui
+                destinationFilename: '.env.local', // where the user should put the file
+              },
+              {
+                location: 'nextjs/pages/supabasejs/supabase',
+                destinationLocation: 'utils/supabase.ts',
+                destinationFilename: 'supabase.ts',
+              },
+              {
+                location: 'nextjs/pages/supabasejs/app',
+                destinationLocation: '_app.tsx',
+                destinationFilename: '_app.tsx',
               },
             ],
           },
+
           {
             key: 'postgresjs',
             label: 'pages Postgres.js',
@@ -211,7 +221,7 @@ export const FRAMEWORKS: Parent[] = [
   },
 ] as const
 
-export const ORMS: Parent[] = [
+export const ORMS: ConnectionType[] = [
   {
     key: 'prisma',
     label: 'Prisma',
@@ -242,7 +252,7 @@ export const ORMS: Parent[] = [
   },
 ]
 
-export const GRAPHQL: Parent[] = [
+export const GRAPHQL: ConnectionType[] = [
   {
     key: 'graphql',
     label: 'GraphQL',
@@ -263,12 +273,12 @@ export const GRAPHQL: Parent[] = [
 // having duplicate keys will mess up the tabs and dropdowns
 // check that each item has a unique top-level item
 // example: frameworks need to be unique: next/react/vue/svelte/nuxt/etc
-function checkParentsForDuplicates(item: Parent[]) {
+function checkParentsForDuplicates(item: ConnectionType[]) {
   const topLevelKeys = new Set()
   let hasDuplicates = false
   let duplicateKey = null
 
-  item.forEach((item: Parent, i: number) => {
+  item.forEach((item: ConnectionType, i: number) => {
     const key = item.key
     if (topLevelKeys.has(key)) {
       hasDuplicates = true

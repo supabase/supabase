@@ -1,6 +1,8 @@
 import { ContentFileProps } from 'components/interfaces/Home/Connect/Connect.types'
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 
+
+
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
   return (
     <div>
@@ -47,4 +49,3 @@ export const createClient = (cookieStore: ReturnType<typeof cookies>) => {
 }
 
 export default ContentFile
-
