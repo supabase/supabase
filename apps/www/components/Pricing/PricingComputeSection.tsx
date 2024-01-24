@@ -49,7 +49,7 @@ const PricingComputeSection = () => {
             </Button>
           </div>
         </div>
-        <div className="relative col-span-2 h-full w-full p-4 md:p-8">
+        <div className="relative col-span-2 h-full w-full p-4 lg:p-8">
           <ComputePricingCalculator />
         </div>
       </div>
