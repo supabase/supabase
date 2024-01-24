@@ -2,7 +2,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { useParams, useTelemetryProps } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
-import { Button, IconExternalLink, Input, Separator, Tabs } from 'ui'
+import { Button, IconChevronDown, IconExternalLink, Input, Separator, Tabs } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
@@ -46,6 +46,10 @@ export const DatabaseConnectionString = () => {
 
   const connectionStringsRef = useRef<HTMLDivElement>(null)
   const [usePoolerConnection, setUsePoolerConnection] = useState(true)
+  const [poolingMode, setPoolingMode] = useState<'transaction' | 'session' | 'statement'>(
+    'transaction'
+  )
+  const [showUriSyntax, setShowUriSyntax] = useState(false)
   const [selectedTab, setSelectedTab] = useState<
     'uri' | 'psql' | 'golang' | 'jdbc' | 'dotnet' | 'nodejs' | 'php' | 'python'
   >('uri')
@@ -119,7 +123,9 @@ export const DatabaseConnectionString = () => {
         region: isProjectLoading ? '' : project?.region || '',
         tld: usePoolerConnection ? poolerTld : connectionTld,
         portNumber: usePoolerConnection
-          ? poolingInfo.db_port.toString()
+          ? poolingMode === 'transaction'
+            ? poolingInfo.db_port.toString()
+            : '5432'
           : connectionInfo.db_port.toString(),
       })
     : []
@@ -134,6 +140,12 @@ export const DatabaseConnectionString = () => {
       connectionStringsRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' })
     }
   }, [connectionString])
+
+  useEffect(() => {
+    if (poolingInfo?.pool_mode !== undefined) {
+      setPoolingMode(poolingInfo.pool_mode)
+    }
+  }, [poolingInfo?.pool_mode])
 
   return (
     <div id="connection-string">
@@ -177,7 +189,9 @@ export const DatabaseConnectionString = () => {
               <UsePoolerCheckbox
                 id="connection-string"
                 checked={usePoolerConnection}
+                poolingMode={poolingMode}
                 onCheckedChange={setUsePoolerConnection}
+                onSelectPoolingMode={setPoolingMode}
               />
               {!usePoolerConnection && <IPv4DeprecationNotice />}
               <Input
@@ -185,12 +199,35 @@ export const DatabaseConnectionString = () => {
                 readOnly
                 disabled
                 className="input-mono [&>div>div>div>input]:text-xs [&>div>div>div>input]:opacity-100"
-                value={connectionStrings[selectedTab]}
+                value={
+                  poolingMode === 'transaction'
+                    ? connectionStrings[selectedTab]
+                    : connectionStrings[selectedTab].replace('6543', '5432')
+                }
                 onCopy={() => handleCopy(selectedTab)}
               />
-              {poolerConnStringSyntax.length > 0 && poolingInfo?.supavisor_enabled && (
-                <div className="flex flex-col gap-y-1 text-foreground-light">
-                  <p className="text-sm">
+            </div>
+          )}
+        </Panel.Content>
+        {poolerConnStringSyntax.length > 0 && poolingInfo?.supavisor_enabled && (
+          <>
+            <Separator />
+            <Panel.Content className="!py-3 space-y-2">
+              <div
+                className="flex items-center gap-x-2 transition cursor-pointer opacity-75 hover:opacity-100"
+                onClick={() => setShowUriSyntax(!showUriSyntax)}
+              >
+                <p className="text-xs text-foreground">
+                  How to connect to a different database or switch to another user
+                </p>
+                <IconChevronDown
+                  strokeWidth={1.5}
+                  className={`transition ${showUriSyntax ? '-rotate-180' : ''}`}
+                />
+              </div>
+              {showUriSyntax && (
+                <div className="text-foreground-light">
+                  <p className="text-xs">
                     You can use the following URI format to switch to a different database or user
                     {usePoolerConnection ? ' when using connection pooling' : ''}.
                   </p>
@@ -230,9 +267,9 @@ export const DatabaseConnectionString = () => {
                   </p>
                 </div>
               )}
-            </div>
-          )}
-        </Panel.Content>
+            </Panel.Content>
+          </>
+        )}
       </Panel>
     </div>
   )
