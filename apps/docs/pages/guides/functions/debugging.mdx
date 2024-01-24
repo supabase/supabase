@@ -39,27 +39,30 @@ When [developing locally](/docs/guides/functions/local-development) you will see
 
 Here is an example of how to use custom logs events in your function:
 
-```
+```typescript
 Deno.serve(async (req) => {
   try {
-    const { name } = await req.json();
+    const { name } = await req.json()
 
     if (!name) {
-      console.warn("Empty name provided");
+      console.warn('Empty name provided')
     }
 
     const data = {
       message: `Hello ${name || 'Guest'}!`, // Provide a default value if name is empty
-    };
+    }
 
-    console.log(`Name: ${name}`);
+    console.log(`Name: ${name}`)
 
-    return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } });
+    return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } })
   } catch (error) {
-    console.error(`Error processing request: ${error.message}`);
-    return new Response(JSON.stringify({ error: 'Internal Server Error' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+    console.error(`Error processing request: ${error.message}`)
+    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    })
   }
-});
+})
 ```
 
 ## Troubleshooting
@@ -162,7 +165,7 @@ deno info --import-map=/path/to/import_map.json /path/to/function/index.ts
 - Deno and Node file system APIs are not available.
 - Memory limit for the function: 150 MB (heap) + 150 MB (external - array buffers/ WASM)
 - Wall clock limit: 400 s
-- CPU Time: 200 s
+- CPU Time: 2 s
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

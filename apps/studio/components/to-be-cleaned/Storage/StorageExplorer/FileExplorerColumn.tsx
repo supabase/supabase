@@ -238,11 +238,12 @@ const FileExplorerColumn = ({
         column.status !== STORAGE_ROW_STATUS.LOADING && (
           <div className="h-full w-full flex flex-col items-center justify-center">
             <img
+              alt="storage-placeholder"
               src={`${BASE_PATH}/img/storage-placeholder.svg`}
               className="opacity-75 pointer-events-none"
             />
-            <p className="my-3 opacity-75">Drop your files here</p>
-            <p className="w-40 text-center text-sm text-foreground-light">
+            <p className="text-sm my-3 opacity-75">Drop your files here</p>
+            <p className="w-40 text-center text-xs text-foreground-light">
               Or upload them via the "Upload file" button above
             </p>
           </div>

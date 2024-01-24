@@ -289,7 +289,12 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
                     >
                       Cancel
                     </Button>
-                    <Button size="tiny" loading={isSubmitting} htmlType="submit">
+                    <Button
+                      size="tiny"
+                      loading={isSubmitting}
+                      disabled={isSubmitting}
+                      htmlType="submit"
+                    >
                       Save
                     </Button>
                   </div>

@@ -34,6 +34,7 @@ import EmailRateLimitsAlert from '../EmailRateLimitsAlert'
 import { urlRegex } from './../Auth.constants'
 import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
 import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
+import { Markdown } from 'components/interfaces/Markdown'
 
 const SmtpForm = () => {
   const { ui } = useStore()
@@ -202,39 +203,43 @@ const SmtpForm = () => {
               }
             >
               <FormSection>
-                <FormSectionContent loading={isLoading}>
+                <FormSectionContent className="!col-span-12 !gap-y-2" loading={isLoading}>
                   <Toggle
-                    name="ENABLE_SMTP"
                     size="small"
-                    label="Enable Custom SMTP"
                     layout="flex"
+                    name="ENABLE_SMTP"
+                    label="Enable Custom SMTP"
                     checked={enableSmtp}
                     disabled={!canUpdateConfig}
                     // @ts-ignore
                     onChange={(value: boolean) => setEnableSmtp(value)}
-                    descriptionText="Emails will be sent using your custom SMTP provider"
+                    descriptionText={
+                      <Markdown
+                        className="max-w-full [&>p]:text-foreground-lighter"
+                        content={`Emails will be sent using your custom SMTP provider. Email rate limits can be adjusted [here](/project/${projectRef}/auth/rate-limits).`}
+                      />
+                    }
                   />
+                  {enableSmtp ? (
+                    !isValidSmtpConfig && (
+                      <div className="">
+                        <Alert_Shadcn_ variant="warning">
+                          <IconAlertTriangle strokeWidth={2} />
+                          <AlertTitle_Shadcn_>All fields below must be filled</AlertTitle_Shadcn_>
+                          <AlertDescription_Shadcn_>
+                            The following fields must be filled before custom SMTP can be properly
+                            enabled
+                          </AlertDescription_Shadcn_>
+                        </Alert_Shadcn_>
+                      </div>
+                    )
+                  ) : (
+                    <div className="">
+                      <EmailRateLimitsAlert />
+                    </div>
+                  )}
                 </FormSectionContent>
               </FormSection>
-
-              {enableSmtp ? (
-                !isValidSmtpConfig && (
-                  <div className="mx-8 mb-8 -mt-4">
-                    <Alert_Shadcn_ variant="warning">
-                      <IconAlertTriangle strokeWidth={2} />
-                      <AlertTitle_Shadcn_>All fields below must be filled</AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_>
-                        The following fields must be filled before custom SMTP can be properly
-                        enabled
-                      </AlertDescription_Shadcn_>
-                    </Alert_Shadcn_>
-                  </div>
-                )
-              ) : (
-                <div className="mx-8 mb-8 -mt-4">
-                  <EmailRateLimitsAlert />
-                </div>
-              )}
 
               <FormSection
                 visible={enableSmtp}

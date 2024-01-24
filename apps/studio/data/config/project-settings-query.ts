@@ -1,79 +1,52 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
+import { get } from 'data/fetchers'
 import { API_URL, DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
 import { configKeys } from './keys'
 import { ResponseError } from 'types'
+import { components } from 'data/api'
 
 export type ProjectSettingsVariables = {
   projectRef?: string
 }
 
-export type Project = {
-  id: number
-  name: string
-  ref: string
-  status: string
+// [Joshen] API typing needs to be fixed - this is completely wrong
+type ProjectSettingsInfo = components['schemas']['SettingsResponse']['project']
+interface ProjectSettingsInfoExtended extends ProjectSettingsInfo {
+  cloud_provider: string
   inserted_at: string
   db_dns_name: string
-  db_port: number
-  db_name: string
-  db_ssl: boolean
   db_host: string
+  db_name: string
+  db_port: number
+  db_ssl: boolean
   db_user: string
-  cloud_provider: string
-  region: string
-  services: Service[]
   jwt_secret: string
+  ref: string
+  status: string
+  // [Joshen] Based on the enums here
+  // https://github.com/supabase/infrastructure/blob/95dc09fe077dba7817bb112fa72b6814a620ecd3/shared/src/projects.ts#L177
+  db_ip_addr_config: 'legacy' | 'static-ipv4' | 'concurrent-ipv6' | 'ipv6'
 }
 
-export type Service = {
-  id: number
-  name: string
-  app_config: AppConfig
-  app: App
-  service_api_keys: ServiceApiKey[]
-}
-
-export type AppConfig = {
-  protocol: 'https' | 'http'
-  endpoint: string
-  db_schema: string
-  realtime_multitenant_enabled: boolean
-}
-
-export type App = {
-  id: number
-  name: string
-}
-
-export type ServiceApiKey = {
-  api_key_encrypted: string
-  tags: string
-  name: string
-  api_key: string
-}
-
-export type ProjectSettingsResponse = {
-  project: Project
-  services: Service[]
+export type ProjectSettings = {
+  project: ProjectSettingsInfoExtended
+  services: components['schemas']['SettingsResponse']['services']
 }
 
 export async function getProjectSettings(
   { projectRef }: ProjectSettingsVariables,
   signal?: AbortSignal
 ) {
-  if (!projectRef) {
-    throw new Error('projectRef is required')
-  }
+  if (!projectRef) throw new Error('projectRef is required')
 
-  const response = await get(`${API_URL}/props/project/${projectRef}/settings`, {
+  // [Joshen] API typing is wrong here
+  const { data, error } = await get('/platform/props/project/{ref}/settings', {
+    params: { path: { ref: projectRef } },
     signal,
   })
-  if (response.error) {
-    throw response.error
-  }
 
-  return response as ProjectSettingsResponse
+  if (error) throw error
+  return data as unknown as ProjectSettings
 }
 
 export type ProjectSettingsData = Awaited<ReturnType<typeof getProjectSettings>>
@@ -91,10 +64,10 @@ export const useProjectSettingsQuery = <TData = ProjectSettingsData>(
     ({ signal }) => getProjectSettings({ projectRef }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
-      refetchInterval(data, query) {
-        const apiService = (
-          (data as unknown as ProjectSettingsData | undefined)?.services ?? []
-        ).find((x) => x.app.id == DEFAULT_PROJECT_API_SERVICE_ID)
+      refetchInterval(data) {
+        const apiService = ((data as ProjectSettings)?.services ?? []).find(
+          (x) => x.app.id == DEFAULT_PROJECT_API_SERVICE_ID
+        )
         const apiKeys = apiService?.service_api_keys ?? []
         const interval = apiKeys.length === 0 ? 2000 : 0
 

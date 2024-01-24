@@ -397,5 +397,29 @@
     "position": "Guest Author",
     "author_url": "https://twitter.com/psteinroe",
     "author_image_url": "/images/philipp-steinrotter.jpg"
+  },
+  {
+    "author_id": "giancarlo",
+    "author": "Giancarlo Buomprisco",
+    "username": "giancarlo",
+    "position": "Guest Author",
+    "author_url": "https://twitter.com/gc_psk",
+    "author_image_url": "https://github.com/Gbuomprisco.png"
+  },
+  {
+    "author_id": "filipe",
+    "author": "Filipe Cabaço",
+    "username": "filipe",
+    "position": "Engineering",
+    "author_url": "https://twitter.com/filipecabaco",
+    "author_image_url": "https://github.com/filipecabaco.png"
+  },
+  {
+    "author_id": "raminder_singh",
+    "author": "Raminder Singh",
+    "username": "imor",
+    "position": "Engineering",
+    "author_url": "https://github.com/imor",
+    "author_image_url": "https://github.com/imor.png"
   }
 ]

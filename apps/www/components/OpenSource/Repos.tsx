@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { AnimatePresence } from 'framer-motion'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import { Octokit } from 'octokit'
+import { Octokit } from '@octokit/core'
 import { cn } from 'ui'
 import LogoLoader from 'ui/src/components/LogoLoader'
 

@@ -8,18 +8,18 @@ export const meta = {
 
 Every project on the Supabase Platform comes with its own dedicated Postgres instance running inside a virtual machine (VM). The following table describes the base instance with additional compute add-ons available if you need extra performance when scaling up Supabase.
 
-| Plan    | Hourly Price USD | Monthly Price USD | CPU                     | Memory | Connections: Direct | Connections: Pooler |
-| ------- | ---------------- | ----------------- | ----------------------- | ------ | ------------------- | ------------------- |
-| Starter | $0.01344         | ~$10              | 2-core ARM (shared)     | 1 GB   | 60                  | 200                 |
-| Small   | $0.0206          | ~$15              | 2-core ARM (shared)     | 2 GB   | 90                  | 200                 |
-| Medium  | $0.0822          | ~$60              | 2-core ARM (shared)     | 4 GB   | 120                 | 200                 |
-| Large   | $0.1517          | ~$110             | 2-core ARM (dedicated)  | 8 GB   | 160                 | 300                 |
-| XL      | $0.2877          | ~$210             | 4-core ARM (dedicated)  | 16 GB  | 240                 | 700                 |
-| 2XL     | $0.562           | ~$410             | 8-core ARM (dedicated)  | 32 GB  | 380                 | 1500                |
-| 4XL     | $1.32            | ~$960             | 16-core ARM (dedicated) | 64 GB  | 480                 | 3000                |
-| 8XL     | $2.562           | ~$1,870           | 32-core ARM (dedicated) | 128 GB | 490                 | 6000                |
-| 12XL    | $3.836           | ~$2,800           | 48-core ARM (dedicated) | 192 GB | 500                 | 9000                |
-| 16XL    | $5.12            | ~$3,730           | 64-core ARM (dedicated) | 256 GB | 500                 | 12,000              |
+| Plan   | Hourly Price USD | Monthly Price USD | CPU                     | Memory | Connections: Direct | Connections: Pooler |
+| ------ | ---------------- | ----------------- | ----------------------- | ------ | ------------------- | ------------------- |
+| Micro  | $0.01344         | ~$10              | 2-core ARM (shared)     | 1 GB   | 60                  | 200                 |
+| Small  | $0.0206          | ~$15              | 2-core ARM (shared)     | 2 GB   | 90                  | 200                 |
+| Medium | $0.0822          | ~$60              | 2-core ARM (shared)     | 4 GB   | 120                 | 200                 |
+| Large  | $0.1517          | ~$110             | 2-core ARM (dedicated)  | 8 GB   | 160                 | 300                 |
+| XL     | $0.2877          | ~$210             | 4-core ARM (dedicated)  | 16 GB  | 240                 | 700                 |
+| 2XL    | $0.562           | ~$410             | 8-core ARM (dedicated)  | 32 GB  | 380                 | 1500                |
+| 4XL    | $1.32            | ~$960             | 16-core ARM (dedicated) | 64 GB  | 480                 | 3000                |
+| 8XL    | $2.562           | ~$1,870           | 32-core ARM (dedicated) | 128 GB | 490                 | 6000                |
+| 12XL   | $3.836           | ~$2,800           | 48-core ARM (dedicated) | 192 GB | 500                 | 9000                |
+| 16XL   | $5.12            | ~$3,730           | 64-core ARM (dedicated) | 256 GB | 500                 | 12,000              |
 
 Number of connections above are recommended values.
 
@@ -39,18 +39,18 @@ When considering compute upgrades, assess whether your bottlenecks are hardware-
 
 SSD Disks are attached to your servers and the disk performance depends on the compute add-on of your instance. Disk IO refers to two metrics: throughput (Megabits per Second) and IOPS (Input/Output Operations per Second).
 
-| Plan    | Max Disk Throughput | Baseline Disk Throughput | Max IOPS    | Baseline IOPS |
-| ------- | ------------------- | ------------------------ | ----------- | ------------- |
-| Starter | 2,085 Mbps          | 87 Mbps                  | 11,800 IOPS | 500 IOPS      |
-| Small   | 2,085 Mbps          | 174 Mbps                 | 11,800 IOPS | 1,000 IOPS    |
-| Medium  | 2,085 Mbps          | 347 Mbps                 | 11,800 IOPS | 2,000 IOPS    |
-| Large   | 4,750 Mbps          | 630 Mbps                 | 20,000 IOPS | 3,600 IOPS    |
-| XL      | 4,750 Mbps          | 1,188 Mbps               | 20,000 IOPS | 6,000 IOPS    |
-| 2XL     | 4,750 Mbps          | 2,375 Mbps               | 20,000 IOPS | 12,000 IOPS   |
-| 4XL     | 4,750 Mbps          | 4,750 Mbps               | 20,000 IOPS | 20,000 IOPS   |
-| 8XL     | 9,500 Mbps          | 9,500 Mbps               | 40,000 IOPS | 40,000 IOPS   |
-| 12XL    | 14,250 Mbps         | 14,250 Mbps              | 50,000 IOPS | 50,000 IOPS   |
-| 16XL    | 19,000 Mbps         | 19,000 Mbps              | 80,000 IOPS | 80,000 IOPS   |
+| Plan   | Max Disk Throughput | Baseline Disk Throughput | Max IOPS    | Baseline IOPS |
+| ------ | ------------------- | ------------------------ | ----------- | ------------- |
+| Micro  | 2,085 Mbps          | 87 Mbps                  | 11,800 IOPS | 500 IOPS      |
+| Small  | 2,085 Mbps          | 174 Mbps                 | 11,800 IOPS | 1,000 IOPS    |
+| Medium | 2,085 Mbps          | 347 Mbps                 | 11,800 IOPS | 2,000 IOPS    |
+| Large  | 4,750 Mbps          | 630 Mbps                 | 20,000 IOPS | 3,600 IOPS    |
+| XL     | 4,750 Mbps          | 1,188 Mbps               | 20,000 IOPS | 6,000 IOPS    |
+| 2XL    | 4,750 Mbps          | 2,375 Mbps               | 20,000 IOPS | 12,000 IOPS   |
+| 4XL    | 4,750 Mbps          | 4,750 Mbps               | 20,000 IOPS | 20,000 IOPS   |
+| 8XL    | 9,500 Mbps          | 9,500 Mbps               | 40,000 IOPS | 40,000 IOPS   |
+| 12XL   | 14,250 Mbps         | 14,250 Mbps              | 50,000 IOPS | 50,000 IOPS   |
+| 16XL   | 19,000 Mbps         | 19,000 Mbps              | 80,000 IOPS | 80,000 IOPS   |
 
 [Contact us](https://supabase.com/contact/enterprise) if you require a custom plan.
 
@@ -68,18 +68,18 @@ If you're unsure of how much throughput or IOPS your application requires, you c
 
 The maximum number of replication slots and WAL senders depends on your compute add-on plan, as follows:
 
-| Plan    | Max Replication Slots | Max WAL Senders |
-| ------- | --------------------- | --------------- |
-| Starter | 5                     | 5               |
-| Small   | 5                     | 5               |
-| Medium  | 5                     | 5               |
-| Large   | 8                     | 8               |
-| XL      | 24                    | 24              |
-| 2XL     | 80                    | 80              |
-| 4XL     | 80                    | 80              |
-| 8XL     | 80                    | 80              |
-| 12XL    | 80                    | 80              |
-| 16XL    | 80                    | 80              |
+| Plan   | Max Replication Slots | Max WAL Senders |
+| ------ | --------------------- | --------------- |
+| Micro  | 5                     | 5               |
+| Small  | 5                     | 5               |
+| Medium | 5                     | 5               |
+| Large  | 8                     | 8               |
+| XL     | 24                    | 24              |
+| 2XL    | 80                    | 80              |
+| 4XL    | 80                    | 80              |
+| 8XL    | 80                    | 80              |
+| 12XL   | 80                    | 80              |
+| 16XL   | 80                    | 80              |
 
 <Admonition type="caution">
 
