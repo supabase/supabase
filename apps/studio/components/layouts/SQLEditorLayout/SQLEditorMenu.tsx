@@ -40,7 +40,6 @@ const SideBarContent = observer(() => {
   })
 
   const snippets = useSnippets(ref)
-  console.log({ snippets })
 
   const projectSnippets = useMemo(() => {
     return snippets.filter((snippet) => snippet.visibility === 'project')
