@@ -29,8 +29,9 @@ import { useCommandMenu } from './CommandMenuProvider'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { cn } from './../../lib/utils'
+import { useRouter } from 'next/router'
 
-const questions = [
+const defaultQuestions = [
   'How do I get started with Supabase?',
   'How do I run Supabase locally?',
   'How do I connect to my database?',
@@ -38,6 +39,8 @@ const questions = [
   'How do I listen to changes in a table?',
   'How do I set up authentication?',
 ]
+
+const supportQuestions = ['What is the problem you are having?']
 
 function getEdgeFunctionUrl() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '')
@@ -68,12 +71,15 @@ export enum MessageStatus {
   Pending = 'pending',
   InProgress = 'in-progress',
   Complete = 'complete',
+  UserFeedback = 'user-feedback',
+  RequestFeedback = 'request-feedback', // Add this line
 }
 
 export interface Message {
   role: MessageRole
   content: string
   status: MessageStatus
+  feedback?: 'yes' | 'no' // Add this line
 }
 
 interface NewMessageAction {
@@ -97,7 +103,19 @@ interface ResetAction {
   type: 'reset'
 }
 
-type MessageAction = NewMessageAction | UpdateMessageAction | AppendContentAction | ResetAction
+interface SetFeedbackAction {
+  type: 'set-feedback'
+  index: number
+  feedback: 'yes' | 'no'
+}
+
+type MessageAction =
+  | NewMessageAction
+  | UpdateMessageAction
+  | AppendContentAction
+  | ResetAction
+  | SetFeedbackAction
+  | RequestFeedbackAction
 
 function messageReducer(state: Message[], messageAction: MessageAction) {
   let current = [...state]
@@ -127,6 +145,20 @@ function messageReducer(state: Message[], messageAction: MessageAction) {
       current = []
       break
     }
+    case 'set-feedback': {
+      const { index, feedback } = messageAction
+      if (current[index]) {
+        current[index].feedback = feedback
+      }
+      break
+    }
+    case 'request-feedback': {
+      const { index } = messageAction
+      if (current[index]) {
+        current[index].status = MessageStatus.RequestFeedback
+      }
+      break
+    }
     default: {
       throw new Error(`Unknown message action '${type}'`)
     }
@@ -151,6 +183,31 @@ export function useAiChat({
 
   const [currentMessageIndex, setCurrentMessageIndex] = useState(1)
   const [messages, dispatchMessage] = useReducer(messageReducer, [])
+
+  const [isFeedbackRequested, setIsFeedbackRequested] = useState(false)
+
+  const router = useRouter()
+  const projectRef = router.query.ref
+
+  const handleFeedback = useCallback(
+    (feedback: 'yes' | 'no') => {
+      // If feedback is 'no', open the link
+      if (feedback === 'no') {
+        window.open(`/support/new${projectRef ? `?ref=${projectRef}` : ''}`, '_blank')
+      } else {
+        // If feedback is 'yes', dispatch a new message
+        dispatchMessage({
+          type: 'new',
+          message: {
+            status: MessageStatus.Complete,
+            role: MessageRole.Assistant,
+            content: 'Dispatching new message...',
+          },
+        })
+      }
+    },
+    [currentMessageIndex]
+  )
 
   const submit = useCallback(
     async (query: string) => {
@@ -269,6 +326,8 @@ export function useAiChat({
     messages,
     isResponding,
     hasError,
+    isFeedbackRequested,
+    handleFeedback,
   }
 }
 
@@ -337,9 +396,13 @@ export function queryAi(messages: Message[], timeout = 0) {
 }
 
 const AiCommand = () => {
-  const { isLoading, setIsLoading, search, setSearch } = useCommandMenu()
+  const { isLoading, setIsLoading, search, setSearch, aiVariant } = useCommandMenu()
 
   const { submit, reset, messages, isResponding, hasError } = useAiChat({
+    setIsLoading,
+  })
+
+  const { isFeedbackRequested, requestFeedback, handleFeedback } = useAiChat({
     setIsLoading,
   })
 
@@ -375,67 +438,80 @@ const AiCommand = () => {
   // Detect an IME composition (so that we can ignore Enter keypress)
   const [isImeComposing, setIsImeComposing] = useState(false)
 
+  const questions = aiVariant === 'support' ? supportQuestions : defaultQuestions
+
   return (
     <div onClick={(e) => e.stopPropagation()}>
       <div className={cn('relative mb-[145px] py-4 max-h-[720px] overflow-auto')}>
-        {!hasError &&
-          messages.map((message, index) => {
-            switch (message.role) {
-              case MessageRole.User:
-                return (
-                  <div key={index} className="flex gap-6 mx-4 [overflow-anchor:none] mb-6">
-                    <div
-                      className="
+        {messages.map((message, index) => {
+          switch (message.role) {
+            case MessageRole.User:
+              return (
+                <div key={index} className="flex gap-6 mx-4 [overflow-anchor:none] mb-6">
+                  <div
+                    className="
                   w-7 h-7 bg-background rounded-full border border-muted flex items-center justify-center text-foreground-lighter first-letter:
                   ring-background
                   ring-1
                   shadow-sm
               "
-                    >
-                      <IconUser strokeWidth={1.5} size={16} />
-                    </div>
-                    <div className="prose text-foreground-lighter">{message.content}</div>
+                  >
+                    <IconUser strokeWidth={1.5} size={16} />
                   </div>
-                )
-              case MessageRole.Assistant:
-                return (
-                  <div key={index} className="px-4 [overflow-anchor:none] mb-6">
-                    <div className="flex gap-6 [overflow-anchor:none] mb-6">
-                      <AiIconChat
-                        loading={
-                          message.status === MessageStatus.Pending ||
-                          message.status === MessageStatus.InProgress
-                        }
-                      />
-                      <>
-                        {message.status === MessageStatus.Pending ? (
-                          <div className="bg-border-strong h-[21px] w-[13px] mt-1 animate-pulse animate-bounce"></div>
-                        ) : (
-                          <ReactMarkdown
-                            remarkPlugins={[remarkGfm]}
-                            components={markdownComponents}
-                            linkTarget="_blank"
-                            className="prose dark:prose-dark"
-                            transformLinkUri={(href) => {
-                              const supabaseUrl = new URL('https://supabase.com')
-                              const linkUrl = new URL(href, 'https://supabase.com')
+                  <div className="prose text-foreground-lighter">{message.content}</div>
+                </div>
+              )
+            case MessageRole.Assistant:
+              return (
+                <div key={index} className="px-4 [overflow-anchor:none] mb-6">
+                  <div className="flex gap-6 [overflow-anchor:none] mb-6">
+                    <AiIconChat
+                      loading={
+                        message.status === MessageStatus.Pending ||
+                        message.status === MessageStatus.InProgress
+                      }
+                    />
+                    <>
+                      {message.status === MessageStatus.Pending ? (
+                        <div className="bg-border-strong h-[21px] w-[13px] mt-1 animate-pulse animate-bounce"></div>
+                      ) : (
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          components={markdownComponents}
+                          linkTarget="_blank"
+                          className="prose dark:prose-dark"
+                          transformLinkUri={(href) => {
+                            const supabaseUrl = new URL('https://supabase.com')
+                            const linkUrl = new URL(href, 'https://supabase.com')
 
-                              if (linkUrl.origin === supabaseUrl.origin) {
-                                return linkUrl.toString()
-                              }
+                            if (linkUrl.origin === supabaseUrl.origin) {
+                              return linkUrl.toString()
+                            }
 
-                              return href
-                            }}
-                          >
-                            {message.content}
-                          </ReactMarkdown>
-                        )}
-                      </>
-                    </div>
+                            return href
+                          }}
+                        >
+                          {message.content}
+                        </ReactMarkdown>
+                      )}
+                    </>
                   </div>
-                )
-            }
-          })}
+
+                  {message.status === MessageStatus.Complete && (
+                    <div className="flex items-center justify-center mt-4 space-x-2">
+                      <p className="prose dark:prose-dark">Was this answer helpful?</p>
+                      <Button size="tiny" type="default" onClick={() => handleFeedback('yes')}>
+                        Yes
+                      </Button>
+                      <Button size="tiny" type="default" onClick={() => handleFeedback('no')}>
+                        No
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              )
+          }
+        })}
 
         {messages.length === 0 && !hasError && (
           <CommandGroup heading="Examples">

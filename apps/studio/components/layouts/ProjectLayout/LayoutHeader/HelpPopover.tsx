@@ -15,7 +15,10 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
+  useCommandMenu,
 } from 'ui'
+import { HelpCircle } from 'lucide-react'
+import { COMMAND_ROUTES } from '@ui/components/Command/Command.constants'
 
 interface HelpPopoverProps {
   alt?: boolean
@@ -24,7 +27,7 @@ interface HelpPopoverProps {
 const HelpPopover = ({ alt = false }: HelpPopoverProps) => {
   const router = useRouter()
   const projectRef = router.query.ref
-  const supportUrl = `/support/new${projectRef ? `?ref=${projectRef}` : ''}`
+  const { setIsOpen, setAiVariant, setPages } = useCommandMenu()
 
   return (
     <Popover_Shadcn_>
@@ -98,8 +101,16 @@ const HelpPopover = ({ alt = false }: HelpPopoverProps) => {
             prioritized.
           </p>
           <div>
-            <Button asChild type="default" icon={<IconMail />}>
-              <Link href={supportUrl}>Contact Support</Link>
+            <Button
+              type="default"
+              icon={<HelpCircle size={15} strokeWidth={2.5} className="text-light" />}
+              onClick={() => {
+                setAiVariant('support')
+                setPages([COMMAND_ROUTES.AI])
+                setIsOpen(true)
+              }}
+            >
+              Contact Support
             </Button>
           </div>
         </div>

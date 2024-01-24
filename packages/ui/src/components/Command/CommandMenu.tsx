@@ -84,7 +84,7 @@ const CommandMenu = () => {
   }
 
   const commandListMaxHeight =
-    currentPage === COMMAND_ROUTES.DOCS_SEARCH ? 'min(600px, 50vh)' : '300px'
+    currentPage === COMMAND_ROUTES.DOCS_SEARCH ? 'min(600px, 50vh)' : '600px'
 
   return (
     <>
@@ -298,6 +298,19 @@ const CommandMenu = () => {
                       <CommandLabel>{item.label}</CommandLabel>
                     </CommandItem>
                   ))}
+                </CommandGroup>
+              )}
+
+              {site === 'support' && (
+                <CommandGroup heading="Experimental">
+                  <CommandItem
+                    type="command"
+                    badge={<BadgeExperimental />}
+                    onSelect={() => setPages([...pages, COMMAND_ROUTES.GENERATE_SQL])}
+                  >
+                    <AiIcon className="text-foreground-light" />
+                    <CommandLabel>Generate SQL with Supabase AI</CommandLabel>
+                  </CommandItem>
                 </CommandGroup>
               )}
 

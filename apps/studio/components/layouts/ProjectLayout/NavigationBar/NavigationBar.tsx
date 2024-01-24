@@ -47,7 +47,7 @@ const NavigationBar = () => {
   const snap = useAppStateSnapshot()
   const { theme, setTheme } = useTheme()
   const { ref: projectRef } = useParams()
-  const { setIsOpen } = useCommandMenu()
+  const { setIsOpen, setAiVariant } = useCommandMenu()
 
   const { project } = useProjectContext()
   const navLayoutV2 = useFlag('navigationLayoutV2')
@@ -174,7 +174,10 @@ const NavigationBar = () => {
                 <Button
                   type="text"
                   size="tiny"
-                  onClick={() => setIsOpen(true)}
+                  onClick={() => {
+                    setAiVariant('default')
+                    setIsOpen(true)
+                  }}
                   className="border-none"
                 >
                   <div className="py-1">
