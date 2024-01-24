@@ -224,30 +224,38 @@ serve(async (req) => {
       model
     )
 
-    let response
-    try {
-      response = await openai.chat.completions.create({
+    let { readable, writable } = new TransformStream()
+
+    let writer = writable.getWriter()
+    const textEncoder = new TextEncoder()
+
+    openai.chat.completions
+      .create({
         model,
         messages: completionMessages,
         max_tokens: 1024,
         temperature: 0,
         stream: true,
       })
-    } catch (err) {
-      throw new ApplicationError('Failed to generate chat completions', err)
-    }
-
-    let { readable, writable } = new TransformStream()
-
-    let writer = writable.getWriter()
-    const textEncoder = new TextEncoder()
-
-    for await (const chunk of response) {
-      const text = chunk.choices[0].delta.content
-      if (text) writer.write(textEncoder.encode(text))
-    }
-
-    writer.close()
+      .then(async (response) => {
+        for await (const chunk of response) {
+          const text = chunk.choices[0].delta.content
+          if (text) writer.write(textEncoder.encode(text))
+        }
+        writer.close()
+      })
+      .catch((err) => {
+        console.error('Error getting chat completion:', err)
+        return new Response(
+          JSON.stringify({
+            error: 'There was an error processing your request',
+          }),
+          {
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        )
+      })
 
     return new Response(readable, {
       headers: {

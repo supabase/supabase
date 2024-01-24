@@ -197,6 +197,7 @@ export function useAiChat({
         while (reader) {
           const { done, value } = await reader.read()
           setIsLoading?.(false)
+
           if (done) {
             setIsResponding(false)
             dispatchMessage({
@@ -209,6 +210,7 @@ export function useAiChat({
             setCurrentMessageIndex((x) => x + 2)
             return
           }
+
           dispatchMessage({
             type: 'update',
             index: currentMessageIndex,
