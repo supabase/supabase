@@ -1,15 +1,4 @@
-import type OpenAI from 'openai'
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useReducer,
-  useRef,
-  useState,
-} from 'react'
-
-import { SSE } from 'sse.js'
+import { Dispatch, SetStateAction, useCallback, useEffect, useReducer, useState } from 'react'
 
 import {
   AiIconAnimation,
@@ -38,6 +27,8 @@ const questions = [
   'How do I listen to changes in a table?',
   'How do I set up authentication?',
 ]
+
+const textDecoder = new TextDecoder()
 
 function getEdgeFunctionUrl() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '')
@@ -144,8 +135,6 @@ export function useAiChat({
   messageTemplate = (message) => message,
   setIsLoading,
 }: UseAiChatOptions) {
-  const [textDecoder] = useState(() => new TextDecoder())
-
   const [isResponding, setIsResponding] = useState(false)
   const [hasError, setHasError] = useState(false)
 
@@ -262,21 +251,22 @@ export function useAiChat({
  * Perform a one-off query to AI based on a snapshot of messages
  */
 export function queryAi(messages: Message[], timeout = 0) {
-  return new Promise<string>((resolve, reject) => {
-    const eventSource = new SSE(`${edgeFunctionUrl}/ai-docs`, {
+  return new Promise<string>(async (resolve, reject) => {
+    const response = await fetch(`${edgeFunctionUrl}/ai-docs`, {
+      method: 'POST',
       headers: {
         apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
         Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
         'Content-Type': 'application/json',
       },
-      payload: JSON.stringify({
+      body: JSON.stringify({
         messages: messages.map(({ role, content }) => ({ role, content })),
       }),
     })
 
     let timeoutId: number | undefined
 
-    function handleError<T>(err: T) {
+    function handleError(err: unknown) {
       if (timeoutId) {
         clearTimeout(timeoutId)
       }
@@ -292,10 +282,13 @@ export function queryAi(messages: Message[], timeout = 0) {
 
     let answer = ''
 
-    eventSource.addEventListener('error', handleError)
-    eventSource.addEventListener('message', (e) => {
-      try {
-        if (e.data === '[DONE]') {
+    try {
+      const reader = response.body?.getReader()
+      // If reader exists, functions as while (true)
+      while (reader) {
+        const { done, value } = await reader.read()
+
+        if (done) {
           if (timeoutId) {
             clearTimeout(timeoutId)
           }
@@ -303,22 +296,15 @@ export function queryAi(messages: Message[], timeout = 0) {
           return
         }
 
-        const completionChunk: OpenAI.Chat.Completions.ChatCompletionChunk = JSON.parse(e.data)
-        const [
-          {
-            delta: { content },
-          },
-        ] = completionChunk.choices
+        const decodedValue = textDecoder.decode(value)
 
-        if (content) {
-          answer += content
+        if (decodedValue) {
+          answer += decodedValue
         }
-      } catch (err) {
-        handleError(err)
       }
-    })
-
-    eventSource.stream()
+    } catch (err) {
+      handleError(err)
+    }
   })
 }
 
