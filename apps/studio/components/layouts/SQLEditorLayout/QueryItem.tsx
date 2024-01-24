@@ -80,8 +80,10 @@ const QueryItem = ({ tabInfo }: QueryItemProps) => {
             <p
               title={description || name}
               className={clsx(
-                isActive ? 'text-foreground' : 'text-foreground-light',
-                'text-sm group-hover:text-foreground transition overflow-hidden text-ellipsis'
+                isActive
+                  ? 'text-foreground'
+                  : 'text-foreground-light group-hover:text-foreground/80',
+                'text-sm transition overflow-hidden text-ellipsis'
               )}
             >
               {name}
