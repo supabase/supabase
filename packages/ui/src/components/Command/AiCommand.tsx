@@ -378,63 +378,64 @@ const AiCommand = () => {
   return (
     <div onClick={(e) => e.stopPropagation()}>
       <div className={cn('relative mb-[145px] py-4 max-h-[720px] overflow-auto')}>
-        {messages.map((message, index) => {
-          switch (message.role) {
-            case MessageRole.User:
-              return (
-                <div key={index} className="flex gap-6 mx-4 [overflow-anchor:none] mb-6">
-                  <div
-                    className="
+        {!hasError &&
+          messages.map((message, index) => {
+            switch (message.role) {
+              case MessageRole.User:
+                return (
+                  <div key={index} className="flex gap-6 mx-4 [overflow-anchor:none] mb-6">
+                    <div
+                      className="
                   w-7 h-7 bg-background rounded-full border border-muted flex items-center justify-center text-foreground-lighter first-letter:
                   ring-background
                   ring-1
                   shadow-sm
               "
-                  >
-                    <IconUser strokeWidth={1.5} size={16} />
+                    >
+                      <IconUser strokeWidth={1.5} size={16} />
+                    </div>
+                    <div className="prose text-foreground-lighter">{message.content}</div>
                   </div>
-                  <div className="prose text-foreground-lighter">{message.content}</div>
-                </div>
-              )
-            case MessageRole.Assistant:
-              return (
-                <div key={index} className="px-4 [overflow-anchor:none] mb-6">
-                  <div className="flex gap-6 [overflow-anchor:none] mb-6">
-                    <AiIconChat
-                      loading={
-                        message.status === MessageStatus.Pending ||
-                        message.status === MessageStatus.InProgress
-                      }
-                    />
-                    <>
-                      {message.status === MessageStatus.Pending ? (
-                        <div className="bg-border-strong h-[21px] w-[13px] mt-1 animate-pulse animate-bounce"></div>
-                      ) : (
-                        <ReactMarkdown
-                          remarkPlugins={[remarkGfm]}
-                          components={markdownComponents}
-                          linkTarget="_blank"
-                          className="prose dark:prose-dark"
-                          transformLinkUri={(href) => {
-                            const supabaseUrl = new URL('https://supabase.com')
-                            const linkUrl = new URL(href, 'https://supabase.com')
+                )
+              case MessageRole.Assistant:
+                return (
+                  <div key={index} className="px-4 [overflow-anchor:none] mb-6">
+                    <div className="flex gap-6 [overflow-anchor:none] mb-6">
+                      <AiIconChat
+                        loading={
+                          message.status === MessageStatus.Pending ||
+                          message.status === MessageStatus.InProgress
+                        }
+                      />
+                      <>
+                        {message.status === MessageStatus.Pending ? (
+                          <div className="bg-border-strong h-[21px] w-[13px] mt-1 animate-pulse animate-bounce"></div>
+                        ) : (
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            components={markdownComponents}
+                            linkTarget="_blank"
+                            className="prose dark:prose-dark"
+                            transformLinkUri={(href) => {
+                              const supabaseUrl = new URL('https://supabase.com')
+                              const linkUrl = new URL(href, 'https://supabase.com')
 
-                            if (linkUrl.origin === supabaseUrl.origin) {
-                              return linkUrl.toString()
-                            }
+                              if (linkUrl.origin === supabaseUrl.origin) {
+                                return linkUrl.toString()
+                              }
 
-                            return href
-                          }}
-                        >
-                          {message.content}
-                        </ReactMarkdown>
-                      )}
-                    </>
+                              return href
+                            }}
+                          >
+                            {message.content}
+                          </ReactMarkdown>
+                        )}
+                      </>
+                    </div>
                   </div>
-                </div>
-              )
-          }
-        })}
+                )
+            }
+          })}
 
         {messages.length === 0 && !hasError && (
           <CommandGroup heading="Examples">

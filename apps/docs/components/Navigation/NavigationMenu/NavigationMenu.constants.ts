@@ -1093,7 +1093,7 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/regional-invocation',
         },
         {
-          name: 'Deploying with GitHub Actions',
+          name: 'Deploying with CI / CD pipelines',
           url: '/guides/functions/cicd-workflow',
         },
       ],
@@ -1563,6 +1563,7 @@ export const platform: NavMenuConstant = {
         { name: 'Compute Add-ons', url: '/guides/platform/compute-add-ons' },
         { name: 'Custom Domains', url: '/guides/platform/custom-domains' },
         { name: 'Database Backups', url: '/guides/platform/backups' },
+        { name: 'IPv4 Address', url: '/guides/platform/ipv4-address' },
         { name: 'Read Replicas', url: '/guides/platform/read-replicas' },
       ],
     },

@@ -4,6 +4,9 @@ import { useParams } from 'common'
 import { Fragment, useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Badge,
   Button,
   FormControl_Shadcn_,
@@ -13,8 +16,8 @@ import {
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
   Form_Shadcn_,
+  IconAlertTriangle,
   IconExternalLink,
-  Input,
   Input_Shadcn_,
   Listbox,
 } from 'ui'
@@ -30,7 +33,10 @@ import { usePoolingConfigurationQuery } from 'data/database/pooling-configuratio
 import { usePoolingConfigurationUpdateMutation } from 'data/database/pooling-configuration-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useCheckPermissions, useStore } from 'hooks'
+import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
+import { SESSION_MODE_DESCRIPTION, TRANSACTION_MODE_DESCRIPTION } from '../Database.constants'
 import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
+import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 
 const formId = 'connection-pooling-form'
 
@@ -58,10 +64,19 @@ const FormSchema = z.object({
 export const ConnectionPooling = () => {
   const { ui } = useStore()
   const { ref: projectRef } = useParams()
-  const { project, isLoading: projectIsLoading } = useProjectContext()
+  const { project } = useProjectContext()
+  const snap = useDatabaseSettingsStateSnapshot()
 
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const computeInstance = addons?.selected_addons.find((addon) => addon.type === 'compute_instance')
+  const defaultPoolSize =
+    POOLING_OPTIMIZATIONS?.[
+      computeInstance?.variant.identifier as keyof typeof POOLING_OPTIMIZATIONS
+    ]?.poolSize ?? 15 // [TODO] 15 is for micro, need to change to 10 for nano
+  const defaultMaxClientConn =
+    POOLING_OPTIMIZATIONS?.[
+      computeInstance?.variant.identifier as keyof typeof POOLING_OPTIMIZATIONS
+    ]?.maxClientConn ?? 200
 
   const {
     data: poolingInfo,
@@ -71,11 +86,13 @@ export const ConnectionPooling = () => {
     isSuccess,
   } = usePoolingConfigurationQuery({ projectRef: projectRef })
 
+  const { data: maxConnData } = useMaxConnectionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
   const connectionPoolingUnavailable =
     !poolingInfo?.pgbouncer_enabled && poolingInfo?.pool_mode === null
-
-  // [Joshen] TODO this needs to be obtained from BE as 26th Jan is when we'll start - projects will be affected at different rates
-  const resolvesToIpV6 = !poolingInfo?.supavisor_enabled && false // Number(new Date()) > Number(dayjs.utc('01-26-2024', 'MM-DD-YYYY').toDate())
 
   const canUpdateConnectionPoolingConfiguration = useCheckPermissions(
     PermissionAction.UPDATE,
@@ -245,42 +262,27 @@ export const ConnectionPooling = () => {
                               >
                                 <p>Transaction mode</p>
                                 <p className="text-xs text-foreground-lighter">
-                                  Connection is assigned to the client for the duration of a
-                                  transaction. Some session-based Postgres features such as prepared
-                                  statements are not available with this option.
+                                  {TRANSACTION_MODE_DESCRIPTION}
                                 </p>
                               </Listbox.Option>
                               <Listbox.Option key="session" label="Session" value="session">
                                 <p>Session mode</p>
                                 <p className="text-xs text-foreground-lighter">
-                                  When a new client connects, a connection is assigned to the client
-                                  until it disconnects. All Postgres features can be used with this
-                                  option.
+                                  {SESSION_MODE_DESCRIPTION}
                                 </p>
                               </Listbox.Option>
                             </Listbox>
                           </FormControl_Shadcn_>
                           <FormDescription_Shadcn_ className="col-start-5 col-span-8 flex flex-col gap-y-2">
                             <p>
-                              Specify when a connection can be returned to the pool. Please refer to
-                              our{' '}
-                              <a
-                                href="https://supabase.com/docs/guides/database/connecting-to-postgres#how-connection-pooling-works"
-                                target="_blank"
-                                rel="noreferrer"
-                                className="underline"
+                              Specify when a connection can be returned to the pool.{' '}
+                              <span
+                                tabIndex={0}
+                                onClick={() => snap.setShowPoolingModeHelper(true)}
+                                className="cursor-pointer underline underline-offset-2"
                               >
-                                documentation
-                              </a>{' '}
-                              to find out the most suitable mode for your use case.
-                            </p>
-                            <p>
-                              If you're using{' '}
-                              <span className="text-foreground">prepared statements</span> in your
-                              database, you will need to either use the{' '}
-                              <span className="text-foreground">Session</span> pool mode or use port{' '}
-                              <span className="text-foreground">5432</span> in the connection
-                              string.
+                                Unsure which pooling mode to use?
+                              </span>
                             </p>
                           </FormDescription_Shadcn_>
                           <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
@@ -293,28 +295,45 @@ export const ConnectionPooling = () => {
                       render={({ field }) => (
                         <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
                           <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
-                            Default Pool Size
+                            Pool Size
                           </FormLabel_Shadcn_>
                           <FormControl_Shadcn_ className="col-span-8">
                             <Input_Shadcn_
-                              className="w-full"
                               {...field}
+                              type="number"
+                              className="w-full"
                               value={field.value || undefined}
                               placeholder={
                                 poolingInfo.supavisor_enabled && field.value === null
-                                  ? `Default: ${
-                                      POOLING_OPTIMIZATIONS?.[
-                                        computeInstance?.variant
-                                          .identifier as keyof typeof POOLING_OPTIMIZATIONS
-                                      ]?.poolSize ?? 15
-                                    }`
+                                  ? `${defaultPoolSize}`
                                   : ''
                               }
                             />
                           </FormControl_Shadcn_>
+                          {maxConnData !== undefined &&
+                            Number(form.getValues('default_pool_size') ?? 15) >
+                              maxConnData.maxConnections * 0.8 && (
+                              <div className="col-start-5 col-span-8">
+                                <Alert_Shadcn_ variant="warning">
+                                  <IconAlertTriangle strokeWidth={2} />
+                                  <AlertTitle_Shadcn_>
+                                    Pool size is greater than 80% of the max connections (
+                                    {maxConnData.maxConnections}) on your database
+                                  </AlertTitle_Shadcn_>
+                                  <AlertDescription_Shadcn_>
+                                    This may result in instability and unreliability with your
+                                    database connections.
+                                  </AlertDescription_Shadcn_>
+                                </Alert_Shadcn_>
+                              </div>
+                            )}
                           <FormDescription_Shadcn_ className="col-start-5 col-span-8">
                             The maximum number of connections made to the underlying Postgres
-                            cluster, per user+db combination. Overrides default optimizations;
+                            cluster, per user+db combination. Pool size has a default of{' '}
+                            {defaultPoolSize} based on your compute size of{' '}
+                            {computeInstance?.variant.name ?? 'Micro'}.
+                          </FormDescription_Shadcn_>
+                          <FormDescription_Shadcn_ className="col-start-5 col-span-8">
                             Please refer to our{' '}
                             <a
                               href="https://supabase.com/docs/guides/platform/custom-postgres-config#pooler-config"
@@ -367,12 +386,7 @@ export const ConnectionPooling = () => {
                               placeholder={
                                 poolingInfo.supavisor_enabled
                                   ? poolingInfo.supavisor_enabled && field.value === null
-                                    ? `${
-                                        POOLING_OPTIMIZATIONS?.[
-                                          computeInstance?.variant
-                                            .identifier as keyof typeof POOLING_OPTIMIZATIONS
-                                        ]?.maxClientConn ?? 200
-                                      }`
+                                    ? `${defaultMaxClientConn}`
                                     : ''
                                   : ''
                               }
@@ -381,8 +395,12 @@ export const ConnectionPooling = () => {
                           <FormDescription_Shadcn_ className="col-start-5 col-span-8">
                             The maximum number of concurrent client connections allowed.{' '}
                             {poolingInfo.supavisor_enabled
-                              ? 'This value is fixed and cannot be changed. '
+                              ? `This value is fixed at ${defaultMaxClientConn} based on your compute size of ${
+                                  computeInstance?.variant.name ?? 'Micro'
+                                } and cannot be changed.`
                               : 'Overrides default optimizations. '}
+                          </FormDescription_Shadcn_>
+                          <FormDescription_Shadcn_ className="col-start-5 col-span-8">
                             Please refer to our{' '}
                             <a
                               href="https://supabase.com/docs/guides/platform/custom-postgres-config#pooler-config"

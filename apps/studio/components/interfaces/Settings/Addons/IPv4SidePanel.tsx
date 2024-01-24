@@ -132,7 +132,7 @@ const IPv4SidePanel = () => {
           <h4>IPv4 address</h4>
           <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
             <Link
-              href="https://github.com/orgs/supabase/discussions/17817"
+              href="https://supabase.com/docs/guides/platform/ipv4-address"
               target="_blank"
               rel="noreferrer"
             >
@@ -238,11 +238,18 @@ const IPv4SidePanel = () => {
                   the future.
                 </p>
               ) : (
-                <p className="text-sm text-foreground-light">
-                  Upon clicking confirm, the amount of{' '}
-                  <span className="text-foreground">${selectedIPv4?.price.toLocaleString()}</span>{' '}
-                  will be added to your monthly invoice.
-                </p>
+                <>
+                  <Alert withIcon variant="info" title="Potential downtime">
+                    There might be some downtime when enabling the add-on since some DNS clients
+                    might have cached the old DNS entry. Generally, this should be less than a
+                    minute.
+                  </Alert>
+                  <p className="text-sm text-foreground-light">
+                    Upon clicking confirm, the amount of{' '}
+                    <span className="text-foreground">${selectedIPv4?.price.toLocaleString()}</span>{' '}
+                    will be added to your monthly invoice.
+                  </p>
+                </>
               )}
             </>
           )}
