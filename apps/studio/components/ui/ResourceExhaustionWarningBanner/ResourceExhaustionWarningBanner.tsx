@@ -81,6 +81,8 @@ const ResourceExhaustionWarningBanner = () => {
       ? '/project/[ref]/settings/[infra-path]'
       : metric === 'disk_space' || metric === 'read_only'
       ? '/project/[ref]/settings/database'
+      : metric === 'auth_email_rate_limit'
+      ? '/project/[ref]/settings/auth'
       : `/project/[ref]/settings/[infra-path]#${metric}`
   )
     ?.replace('[ref]', ref ?? 'default')
