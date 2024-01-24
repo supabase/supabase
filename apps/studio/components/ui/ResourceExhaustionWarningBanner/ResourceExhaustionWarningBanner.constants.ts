@@ -140,11 +140,11 @@ export const RESOURCE_WARNING_MESSAGES = {
     metric: 'ram',
   },
   auth_rate_limit_exhaustion: {
-    // There is no notion of critical rate limits for auth at the moment
+    // There is no critical warning as there is no notion of critical rate limits for auth at the moment
     bannerContent: {
       warning: {
         title:
-          'Your project has exceeded email rate limits in the past 24 hours, and performance of the Auth system may be affected',
+          'Your project has exceeded email rate limits in the past 24 hours, and performance of Auth may be affected',
         description:
           'You will need to set up custom SMTP and adjust rate limits where necessary. You may also wish to set up CAPTCHA',
       },
@@ -152,7 +152,7 @@ export const RESOURCE_WARNING_MESSAGES = {
     cardContent: {
       warning: {
         title: 'Your project has exceeded email rate limits, and its performance is affected',
-        description: `You will need to set up a custom SMTP and adjust rate limits where necessary`,
+        description: `You will need to set up a custom SMTP provider and adjust rate limits where necessary`,
       },
     },
     docsUrl: undefined,
