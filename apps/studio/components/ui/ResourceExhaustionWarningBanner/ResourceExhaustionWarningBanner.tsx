@@ -81,6 +81,8 @@ const ResourceExhaustionWarningBanner = () => {
       ? '/project/[ref]/settings/[infra-path]'
       : metric === 'disk_space' || metric === 'read_only'
       ? '/project/[ref]/settings/database'
+      : metric === 'auth_email_rate_limit'
+      ? '/project/[ref]/settings/auth'
       : `/project/[ref]/settings/[infra-path]#${metric}`
   )
     ?.replace('[ref]', ref ?? 'default')
@@ -115,7 +117,9 @@ const ResourceExhaustionWarningBanner = () => {
       <div className="absolute top-5 right-5 flex items-center space-x-2">
         {learnMoreUrl !== undefined && (
           <Button asChild type="default" icon={<IconExternalLink />}>
-            <Link href={learnMoreUrl}>Learn more</Link>
+            <a href={learnMoreUrl} target="_blank" rel="noreferrer">
+              Learn more
+            </a>
           </Button>
         )}
         {correctionUrl !== undefined && (
