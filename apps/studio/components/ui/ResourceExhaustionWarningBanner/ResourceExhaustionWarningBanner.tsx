@@ -117,7 +117,9 @@ const ResourceExhaustionWarningBanner = () => {
       <div className="absolute top-5 right-5 flex items-center space-x-2">
         {learnMoreUrl !== undefined && (
           <Button asChild type="default" icon={<IconExternalLink />}>
-            <Link href={learnMoreUrl}>Learn more</Link>
+            <a href={learnMoreUrl} target="_blank" rel="noreferrer">
+              Learn more
+            </a>
           </Button>
         )}
         {correctionUrl !== undefined && (
