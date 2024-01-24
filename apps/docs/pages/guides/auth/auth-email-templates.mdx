@@ -78,23 +78,22 @@ const { data: { session }, error } = await supabase.auth.verifyOtp({ token_hash,
 
 Supabase Auth makes use of [Go Templates](https://pkg.go.dev/text/template). This means it is possible to conditionally render information based on template properties.You may wish to checkout this [guide by Hugo](https://gohugo.io/templates/introduction/) for a guide on the templating language.
 
+### Send different email to early access users
 
-### Different Email Based on Signup Domain
-
-Send users different emails based on the domain that they signed up for your service with.
+Send a different email to users who signed up via an early access domain (`https://www.earlyaccess.trial.com`).
 
 ```
-{{ if eq .Data.Domain "http://www.example.com" }}
+{{ if eq .Data.Domain "https://www.example.com" }}
 <h1>Welcome to Our Database Service!</h1>
   <p>Dear Developer,</p>
   <p>Welcome to Billy, the scalable developer platform!</p>
   <p>Best Regards,<br>
 Billy Team</p>
-{{ else if eq .Data.Domain "http://www.specialsite.com" }}
+{{ else if eq .Data.Domain "https://www.earlyaccess.trial.com" }}
 <h1>Welcome to Our Database Service!</h1>
   <p>Dear Developer,</p>
-  <p>Welcome to Pro Plan of Billy, the scalable developer platform!</p>
-  <p> As a Pro Plan member of Billy, you have access to select features like Point In Time Restoration.</p>
+  <p>Welcome Billy, the scalable developer platform!</p>
+  <p> As an early access member, you have access to select features like Point To Space Restoration.</p>
   <p>Best Regards,<br>
 Billy Team</p>
 {{end }}
