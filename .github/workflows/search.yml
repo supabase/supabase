@@ -57,7 +57,7 @@ jobs:
 
       # Need the miscellaneous use API, which is available publicly (by design) in www
       - name: Copy environment variables
-        run: cp apps/www/env.local.example apps/docs/.env
+        run: cp apps/www/.env.local.example apps/docs/.env
 
       - name: Update embeddings
         working-directory: ./apps/docs
