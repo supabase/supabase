@@ -1,20 +1,12 @@
-import { Button, ButtonProps } from 'ui'
+import { Button, ButtonProps, IconCheck, IconClipboard } from 'ui'
 import { copyToClipboard } from 'lib/helpers'
-import { IconClipboard } from 'ui'
 import { useEffect, useState } from 'react'
 
 export interface CopyButtonProps extends ButtonProps {
   text: string
-  // used for text-less feedback
-  bounceIconOnCopy?: boolean
+  iconOnly?: boolean
 }
-const CopyButton: React.FC<CopyButtonProps> = ({
-  text,
-  children,
-  onClick,
-  bounceIconOnCopy,
-  ...props
-}) => {
+const CopyButton = ({ text, iconOnly = false, children, onClick, ...props }: CopyButtonProps) => {
   const [showCopied, setShowCopied] = useState(false)
 
   useEffect(() => {
@@ -31,16 +23,15 @@ const CopyButton: React.FC<CopyButtonProps> = ({
         onClick?.(e)
       }}
       icon={
-        <IconClipboard
-          size="tiny"
-          className={[showCopied && bounceIconOnCopy ? 'animate-bounce' : '', 'transition'].join(
-            ' '
-          )}
-        />
+        showCopied ? (
+          <IconCheck size="tiny" strokeWidth={2} className="text-brand" />
+        ) : (
+          <IconClipboard size="tiny" />
+        )
       }
       {...props}
     >
-      {children ?? (showCopied ? 'Copied' : 'Copy')}
+      {!iconOnly && <>{children ?? (showCopied ? 'Copied' : 'Copy')}</>}
     </Button>
   )
 }
