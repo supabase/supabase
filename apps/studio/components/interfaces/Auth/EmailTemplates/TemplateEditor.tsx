@@ -2,7 +2,16 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { observer } from 'mobx-react-lite'
 import { useMemo, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { Form, IconCode, IconMonitor, Tabs, Input } from 'ui'
+import {
+  Form,
+  IconCode,
+  IconMonitor,
+  Tabs,
+  Input,
+  Alert_Shadcn_,
+  IconInfo,
+  AlertTitle_Shadcn_,
+} from 'ui'
 
 import CodeEditor from 'components/ui/CodeEditor'
 import { FormActions, FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
@@ -129,14 +138,7 @@ const TemplateEditor = ({ template, authConfig }: TemplateEditorProps) => {
                         }
                       />
                     </div>
-                    <Tabs defaultActiveId="preview" type="rounded-pills" size="tiny">
-                      <Tabs.Panel id={'preview'} icon={<IconMonitor />} label="Preview">
-                        <iframe
-                          className="!mb-0 overflow-hidden h-96 w-full rounded border"
-                          title={id}
-                          srcDoc={bodyValue}
-                        />
-                      </Tabs.Panel>
+                    <Tabs defaultActiveId="source" type="underlined" size="tiny">
                       <Tabs.Panel id={'source'} icon={<IconCode />} label="Source">
                         <div className="relative h-96">
                           <CodeEditor
@@ -149,6 +151,20 @@ const TemplateEditor = ({ template, authConfig }: TemplateEditorProps) => {
                             value={bodyValue}
                           />
                         </div>
+                      </Tabs.Panel>
+                      <Tabs.Panel id={'preview'} icon={<IconMonitor />} label="Preview">
+                        <Alert_Shadcn_ className="mb-2" variant="default">
+                          <IconInfo />
+                          <AlertTitle_Shadcn_>
+                            The preview may differ slightly from the actual rendering in the email
+                            client.
+                          </AlertTitle_Shadcn_>
+                        </Alert_Shadcn_>
+                        <iframe
+                          className="!mb-0 overflow-hidden h-96 w-full rounded border"
+                          title={id}
+                          srcDoc={bodyValue}
+                        />
                       </Tabs.Panel>
                     </Tabs>
                   </>
