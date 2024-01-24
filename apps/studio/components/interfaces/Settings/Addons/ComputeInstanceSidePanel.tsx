@@ -3,7 +3,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import clsx from 'clsx'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { useTheme } from 'next-themes'
@@ -34,26 +34,6 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { AddonVariantId } from 'data/subscriptions/types'
 
-const COMPUTE_CATEGORY_OPTIONS: {
-  id: 'micro' | 'optimized'
-  name: string
-  imageUrl: string
-  imageUrlLight: string
-}[] = [
-  {
-    id: 'micro',
-    name: 'Micro Compute',
-    imageUrl: `${BASE_PATH}/img/optimized-compute-off.svg`,
-    imageUrlLight: `${BASE_PATH}/img/optimized-compute-off--light.svg`,
-  },
-  {
-    id: 'optimized',
-    name: 'Optimized Compute',
-    imageUrl: `${BASE_PATH}/img/optimized-compute-on.svg`,
-    imageUrlLight: `${BASE_PATH}/img/optimized-compute-on--light.svg`,
-  },
-]
-
 const ComputeInstanceSidePanel = () => {
   const queryClient = useQueryClient()
   const { ui } = useStore()
@@ -64,8 +44,7 @@ const ComputeInstanceSidePanel = () => {
   const organization = useSelectedOrganization()
 
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
-  const [selectedCategory, setSelectedCategory] = useState<'micro' | 'optimized'>('micro')
-  const [selectedOption, setSelectedOption] = useState<string>('ci_micro')
+  const [selectedCategory, setSelectedCategory] = useState<'off' | 'optimized'>('off')
 
   const canUpdateCompute = useCheckPermissions(
     PermissionAction.BILLING_WRITE,
@@ -108,7 +87,7 @@ const ComputeInstanceSidePanel = () => {
       ui.setNotification({
         duration: 8000,
         category: 'success',
-        message: `Successfully updated compute instance to Micro. Your project is currently being restarted to update its instance`,
+        message: `Successfully updated compute instance. Your project is currently being restarted to update its instance`,
       })
       setProjectStatus(queryClient, projectRef!, PROJECT_STATUS.RESTORING)
       onClose()
@@ -122,6 +101,44 @@ const ComputeInstanceSidePanel = () => {
       })
     },
   })
+
+  const defaultInstanceSize = useMemo(() => {
+    if (!addons) return ''
+
+    const microAvailableAsAddon = addons?.available_addons.some((addon) =>
+      addon.variants.some((variant) => variant.identifier === 'ci_micro')
+    )
+
+    return microAvailableAsAddon ? 'ci_nano' : 'ci_micro'
+  }, [addons])
+
+  const [selectedOption, setSelectedOption] = useState<string>(defaultInstanceSize || '')
+
+  const COMPUTE_CATEGORY_OPTIONS: {
+    id: 'off' | 'optimized'
+    name: string
+    imageUrl: string
+    imageUrlLight: string
+  }[] = useMemo(() => {
+    if (!defaultInstanceSize) return []
+
+    return [
+      {
+        id: 'off',
+        // If micro is available as add-on, the default compute will be nano instead of micro
+        name: defaultInstanceSize === 'ci_nano' ? 'Nano Compute' : 'Micro Compute',
+        imageUrl: `${BASE_PATH}/img/optimized-compute-off.svg`,
+        imageUrlLight: `${BASE_PATH}/img/optimized-compute-off--light.svg`,
+      },
+      {
+        id: 'optimized',
+        name: 'Optimized Compute',
+        imageUrl: `${BASE_PATH}/img/optimized-compute-on.svg`,
+        imageUrlLight: `${BASE_PATH}/img/optimized-compute-on--light.svg`,
+      },
+    ]
+  }, [defaultInstanceSize])
+
   const isSubmitting = isUpdating || isRemoving
 
   const projectId = selectedProject?.id
@@ -135,10 +152,11 @@ const ComputeInstanceSidePanel = () => {
   const availableOptions =
     availableAddons.find((addon) => addon.type === 'compute_instance')?.variants ?? []
   const selectedCompute = availableOptions.find((option) => option.identifier === selectedOption)
-  const hasChanges = selectedOption !== (subscriptionCompute?.variant.identifier ?? 'ci_micro')
+  const hasChanges =
+    selectedOption !== (subscriptionCompute?.variant.identifier ?? defaultInstanceSize)
 
-  const blockMicroDowngradeDueToPitr =
-    pitrAddon !== undefined && selectedOption === 'ci_micro' && hasChanges
+  const blockDowngradeDueToPitr =
+    pitrAddon !== undefined && ['ci_micro', 'ci_nano'].includes(selectedOption) && hasChanges
 
   useEffect(() => {
     if (visible) {
@@ -146,8 +164,8 @@ const ComputeInstanceSidePanel = () => {
         setSelectedCategory('optimized')
         setSelectedOption(subscriptionCompute.variant.identifier)
       } else {
-        setSelectedCategory('micro')
-        setSelectedOption('ci_micro')
+        setSelectedCategory('off')
+        setSelectedOption(defaultInstanceSize)
       }
       Telemetry.sendActivity(
         {
@@ -168,7 +186,7 @@ const ComputeInstanceSidePanel = () => {
     if (!projectRef) return console.error('Project ref is required')
     if (!projectId) return console.error('Project ID is required')
 
-    if (selectedOption === 'ci_micro' && subscriptionCompute !== undefined) {
+    if (selectedOption === defaultInstanceSize && subscriptionCompute !== undefined) {
       removeAddon({ projectRef, variant: subscriptionCompute.variant.identifier })
     } else {
       updateAddon({
@@ -188,11 +206,7 @@ const ComputeInstanceSidePanel = () => {
         onConfirm={() => setShowConfirmationModal(true)}
         loading={isLoading}
         disabled={
-          isFreePlan ||
-          isLoading ||
-          !hasChanges ||
-          blockMicroDowngradeDueToPitr ||
-          !canUpdateCompute
+          isFreePlan || isLoading || !hasChanges || blockDowngradeDueToPitr || !canUpdateCompute
         }
         tooltip={
           isFreePlan
@@ -233,7 +247,7 @@ const ComputeInstanceSidePanel = () => {
                       className={clsx('col-span-3 group space-y-1', isFreePlan && 'opacity-75')}
                       onClick={() => {
                         setSelectedCategory(option.id)
-                        if (option.id === 'micro') setSelectedOption('ci_micro')
+                        if (option.id === 'off') setSelectedOption(defaultInstanceSize)
                         Telemetry.sendActivity(
                           {
                             activity: 'Option Selected',
@@ -376,14 +390,16 @@ const ComputeInstanceSidePanel = () => {
               </div>
             )}
 
-            {selectedCategory === 'micro' && (
+            {selectedCategory === 'off' && (
               <p className="text-sm text-foreground-light">
-                Your database will use the standard Micro size instance of 2-core {cpuArchitecture}{' '}
-                CPU (Shared) with 1GB of memory.
+                Your database will use the standard{' '}
+                {defaultInstanceSize === 'ci_nano' ? 'Nano' : 'Micro'} size instance of 2-core{' '}
+                {cpuArchitecture} CPU (Shared) with{' '}
+                {defaultInstanceSize === 'ci_nano' ? '0.5' : '1'}GB of memory.
               </p>
             )}
 
-            {hasChanges && selectedCategory !== 'micro' && (
+            {hasChanges && selectedCategory !== 'off' && (
               <p className="text-sm text-foreground-light">
                 There are no immediate charges when changing compute. Compute Hours are a
                 usage-based item and you're billed at the end of your billing cycle based on your
@@ -400,7 +416,7 @@ const ComputeInstanceSidePanel = () => {
               </p>
             )}
 
-            {hasChanges && !blockMicroDowngradeDueToPitr && (
+            {hasChanges && !blockDowngradeDueToPitr && (
               <Alert
                 withIcon
                 variant="info"
@@ -410,12 +426,12 @@ const ComputeInstanceSidePanel = () => {
               </Alert>
             )}
 
-            {blockMicroDowngradeDueToPitr && (
+            {blockDowngradeDueToPitr && (
               <Alert
                 withIcon
                 variant="info"
                 className="mb-4"
-                title="Disable PITR before downgrading to Micro Compute"
+                title="Disable PITR before downgrading"
                 actions={
                   <Button type="default" onClick={() => snap.setPanelKey('pitr')}>
                     Change PITR
@@ -426,7 +442,10 @@ const ComputeInstanceSidePanel = () => {
                   You currently have PITR enabled. The minimum compute instance size for using PITR
                   is the Small Compute.
                 </p>
-                <p>You need to disable PITR before downgrading to Micro Compute.</p>
+                <p>
+                  You need to disable PITR before downgrading Compute as it requires at least a
+                  Small compute instance.
+                </p>
               </Alert>
             )}
 
