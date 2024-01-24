@@ -26,9 +26,10 @@ import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
-import { useFlag, useSelectedOrganization, useSelectedProject } from 'hooks'
+import { useSelectedOrganization, useSelectedProject } from 'hooks'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { INFRA_ACTIVITY_METRICS } from './Infrastructure.constants'
+import { capitalize } from 'lodash'
 
 const InfrastructureActivity = () => {
   const { ref: projectRef } = useParams()
@@ -283,7 +284,11 @@ const InfrastructureActivity = () => {
                         <p className="text-sm mb-2">Overview</p>
                         <div className="flex items-center justify-between border-b py-1">
                           <p className="text-xs text-foreground-light">Current compute instance</p>
-                          <p className="text-xs">{computeInstance?.variant?.name ?? 'Micro'}</p>
+                          <p className="text-xs">
+                            {computeInstance?.variant?.name ??
+                              capitalize(project?.infra_compute_size) ??
+                              'Micro'}
+                          </p>
                         </div>
                         <div className="flex items-center justify-between border-b py-1">
                           <p className="text-xs text-foreground-light">
