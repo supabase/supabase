@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Fragment, useEffect } from 'react'
@@ -32,7 +31,8 @@ import { usePoolingConfigurationUpdateMutation } from 'data/database/pooling-con
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useCheckPermissions, useStore } from 'hooks'
 import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
-import { constructConnStringSyntax, getPoolerTld } from './ConnectionPooling.utils'
+import { SESSION_MODE_DESCRIPTION, TRANSACTION_MODE_DESCRIPTION } from '../Database.constants'
+import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 
 const formId = 'connection-pooling-form'
 
@@ -60,7 +60,8 @@ const FormSchema = z.object({
 export const ConnectionPooling = () => {
   const { ui } = useStore()
   const { ref: projectRef } = useParams()
-  const { project, isLoading: projectIsLoading } = useProjectContext()
+  const { project } = useProjectContext()
+  const snap = useDatabaseSettingsStateSnapshot()
 
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const computeInstance = addons?.selected_addons.find((addon) => addon.type === 'compute_instance')
@@ -73,23 +74,8 @@ export const ConnectionPooling = () => {
     isSuccess,
   } = usePoolingConfigurationQuery({ projectRef: projectRef })
 
-  const poolerTld = isSuccess ? getPoolerTld(poolingInfo.connectionString) : 'com'
-
   const connectionPoolingUnavailable =
     !poolingInfo?.pgbouncer_enabled && poolingInfo?.pool_mode === null
-
-  const poolerConnStringSyntax = isSuccess
-    ? constructConnStringSyntax(poolingInfo?.connectionString, {
-        ref: projectRef as string,
-        cloudProvider: projectIsLoading ? '' : project?.cloud_provider || '',
-        region: projectIsLoading ? '' : project?.region || '',
-        tld: poolerTld,
-        portNumber: poolingInfo.db_port.toString(),
-      })
-    : []
-
-  // [Joshen] TODO this needs to be obtained from BE as 26th Jan is when we'll start - projects will be affected at different rates
-  const resolvesToIpV6 = !poolingInfo?.supavisor_enabled && false // Number(new Date()) > Number(dayjs.utc('01-26-2024', 'MM-DD-YYYY').toDate())
 
   const canUpdateConnectionPoolingConfiguration = useCheckPermissions(
     PermissionAction.UPDATE,
@@ -166,21 +152,22 @@ export const ConnectionPooling = () => {
               <p>
                 {connectionPoolingUnavailable
                   ? 'Connection Pooling is not available for this project'
-                  : 'Connect to your database via connection pooling'}
+                  : 'Connection pooling configuration'}
               </p>
               {isSuccess && (
                 <div className="flex items-center gap-x-1">
-                  <Badge color={poolingInfo?.supavisor_enabled ? 'green' : 'scale'}>
-                    With {poolingInfo?.supavisor_enabled ? 'Supavisor' : 'PGBouncer'}
-                  </Badge>
-                  <Badge color={resolvesToIpV6 ? 'amber' : 'scale'}>
-                    {resolvesToIpV6 ? 'Resolves to IPv6' : 'Resolves to IPv4'}
+                  <Badge color="scale">
+                    {poolingInfo?.supavisor_enabled ? 'Supavisor' : 'PGBouncer'}
                   </Badge>
                 </div>
               )}
             </div>
             <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-              <a href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler">
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler"
+              >
                 Documentation
               </a>
             </Button>
@@ -256,34 +243,29 @@ export const ConnectionPooling = () => {
                                 label="Transaction"
                                 value="transaction"
                               >
-                                Transaction
+                                <p>Transaction mode</p>
+                                <p className="text-xs text-foreground-lighter">
+                                  {TRANSACTION_MODE_DESCRIPTION}
+                                </p>
                               </Listbox.Option>
                               <Listbox.Option key="session" label="Session" value="session">
-                                Session
+                                <p>Session mode</p>
+                                <p className="text-xs text-foreground-lighter">
+                                  {SESSION_MODE_DESCRIPTION}
+                                </p>
                               </Listbox.Option>
                             </Listbox>
                           </FormControl_Shadcn_>
                           <FormDescription_Shadcn_ className="col-start-5 col-span-8 flex flex-col gap-y-2">
                             <p>
-                              Specify when a connection can be returned to the pool. Please refer to
-                              our{' '}
-                              <a
-                                href="https://supabase.com/docs/guides/database/connecting-to-postgres#how-connection-pooling-works"
-                                target="_blank"
-                                rel="noreferrer"
-                                className="underline"
+                              Specify when a connection can be returned to the pool.{' '}
+                              <span
+                                tabIndex={0}
+                                onClick={() => snap.setShowPoolingModeHelper(true)}
+                                className="cursor-pointer underline underline-offset-2"
                               >
-                                documentation
-                              </a>{' '}
-                              to find out the most suitable mode for your use case.
-                            </p>
-                            <p>
-                              If you're using{' '}
-                              <span className="text-foreground">prepared statements</span> in your
-                              database, you will need to either use the{' '}
-                              <span className="text-foreground">Session</span> pool mode or use port{' '}
-                              <span className="text-foreground">5432</span> in the connection
-                              string.
+                                Unsure which pooling mode to use?
+                              </span>
                             </p>
                           </FormDescription_Shadcn_>
                           <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
@@ -406,70 +388,6 @@ export const ConnectionPooling = () => {
                 <div className="border-muted border-t"></div>
               </>
             )}
-            <Input
-              className="input-mono w-full px-8 py-8 flex items-center"
-              layout="horizontal"
-              readOnly
-              copy
-              disabled
-              value={poolingInfo?.db_port}
-              label="Port Number"
-            />
-
-            <div className="border-muted border-t"></div>
-
-            <Input
-              className="input-mono w-full px-8 py-8"
-              layout="vertical"
-              readOnly
-              copy
-              disabled
-              label="Connection string"
-              value={poolingInfo?.connectionString}
-              descriptionText={
-                poolingInfo.supavisor_enabled && (
-                  <div className="flex flex-col gap-y-1">
-                    <p className="text-sm">
-                      You may also connect to another database or with another user via Supavisor
-                      with the following URI format:
-                    </p>
-
-                    {poolerConnStringSyntax.length > 0 && (
-                      <p className="text-sm font-mono tracking-tighter">
-                        {poolerConnStringSyntax.map((x, idx) => {
-                          if (x.tooltip) {
-                            return (
-                              <Tooltip.Root key={`syntax-${idx}`} delayDuration={0}>
-                                <Tooltip.Trigger asChild>
-                                  <span className="text-foreground">{x.value}</span>
-                                </Tooltip.Trigger>
-                                <Tooltip.Portal>
-                                  <Tooltip.Portal>
-                                    <Tooltip.Content side="bottom">
-                                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                      <div
-                                        className={[
-                                          'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                          'border border-background',
-                                        ].join(' ')}
-                                      >
-                                        <span className="text-xs text-foreground">{x.tooltip}</span>
-                                      </div>
-                                    </Tooltip.Content>
-                                  </Tooltip.Portal>
-                                </Tooltip.Portal>
-                              </Tooltip.Root>
-                            )
-                          } else {
-                            return x.value
-                          }
-                        })}
-                      </p>
-                    )}
-                  </div>
-                )
-              }
-            />
           </>
         )}
       </Panel>

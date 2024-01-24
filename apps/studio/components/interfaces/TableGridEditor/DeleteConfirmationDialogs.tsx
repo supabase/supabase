@@ -19,16 +19,19 @@ import { TableLike } from 'hooks/misc/useTable'
 import { noop } from 'lib/void'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { tableKeys } from 'data/tables/keys'
 
 export type DeleteConfirmationDialogsProps = {
   projectRef?: string
   selectedTable?: TableLike
+  includeColumns?: boolean
   onAfterDeleteTable?: (tables: TableLike[]) => void
 }
 
 const DeleteConfirmationDialogs = ({
   projectRef,
   selectedTable,
+  includeColumns = false,
   onAfterDeleteTable = noop,
 }: DeleteConfirmationDialogsProps) => {
   const { meta } = useStore()
@@ -163,6 +166,9 @@ const DeleteConfirmationDialogs = ({
       const tables = await getTables(snap.selectedSchemaName)
 
       await Promise.all([
+        queryClient.invalidateQueries(
+          tableKeys.list(project?.ref, selectedTableToDelete.schema, includeColumns)
+        ),
         queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
         // invalidate all views from this schema
         snap.selectedSchemaName
