@@ -53,7 +53,7 @@ query {
 
 It will be turned into the following tokens by the tokenizer: `query`, `{`, `bookCollection`, `{`, `edges`, `{`, `node`, `{`, `id`, `}`, `}`, `}` and `}`. How does the tokenizer know where a token starts and ends? The tokenizer relies on [lexical grammar](https://spec.graphql.org/October2021/#sec-Appendix-Grammar-Summary) to figure out token boundaries. It looks at the next character in the text to first find the kind of token to expect and then uses the grammar rules for that token to find where it ends. For example, the first character in our example is `q` which means it must be a `[Name](https://spec.graphql.org/October2021/#Name)` because its grammar looks like this:
 
-![lexical grammar](how-pg-graphql-works/lexical-grammar.png)
+![lexical grammar](images/blog/how-pg-graphql-works/lexical-grammar.png)
 
 The grammar tells the tokenizer that if the next character is a `[Letter](https://spec.graphql.org/October2021/#Letter)` or an underscore then it is the start of a `Name`. And when the tokenizer finds a character that is not a `[NameContinue](https://spec.graphql.org/October2021/#NameContinue)` it ends the token. In our example, the `Name` token ends before the first whitespace after `query`.
 
@@ -80,19 +80,19 @@ It’s possible you haven’t heard that before. We suggest not abusing the comm
 
 The list of tokens produced by the tokenizer are consumed by the parser to generate the AST. The [parsing grammar](https://spec.graphql.org/October2021/#sec-Document-Syntax) dictates how the parser makes sense of the tokens. Since `pg_graphql` needs to execute the query, it expects an `[ExecutableDocument](https://spec.graphql.org/October2021/#ExecutableDocument)`. So the parser tries to parse an `ExecutableDocument` which is defined in the grammar like this:
 
-![executable document](how-pg-graphql-works/executable-document.png)
+![executable document](images/blog/how-pg-graphql-works/executable-document.png)
 
 An `ExecutableDocument` contains a list of `[ExecutableDefinition](https://spec.graphql.org/October2021/#ExecutableDefinition)`s which is defined like this:
 
-![executable definitions](how-pg-graphql-works/executable-definitions.png)
+![executable definitions](images/blog/how-pg-graphql-works/executable-definitions.png)
 
 An `ExecutableDefinition` can be either an `[OperationDefinition](https://spec.graphql.org/October2021/#OperationDefinition)` or a `[FragmentDefinition](https://spec.graphql.org/October2021/#FragmentDefinition)`. Which one should the parser try to parse? Similar to how the tokenizer looks at the next character, the parser can look at the next token to know which definition lies next. The next token in our example is `query`. Can `query` appear at the beginning of `OperationDefinition`? Let’s check its definition:
 
-![operation definition](how-pg-graphql-works/operation-definition.png)
+![operation definition](images/blog/how-pg-graphql-works/operation-definition.png)
 
 The parser again has two choices since `OperationDefinition` can either be an `OperationType Name(opt) VariableDefinitions(opt) Directives(opt) SelectionSet` or a `[SelectionSet](https://spec.graphql.org/October2021/#SelectionSet)`. So which of those two can start with `query?` The first one starts with `[OperationType](https://spec.graphql.org/October2021/#OperationType)` which is defined like this:
 
-![operation definition](how-pg-graphql-works/operation-type.png)
+![operation definition](images/blog/how-pg-graphql-works/operation-type.png)
 
 Et voilà! The `query` token can start an `OperationType`, which means the parser now knows that it has to parse the first arm of the `OperationDefinition`. Which in turn means that it is going to parse an `OperationDefinition` arm of the `ExecutableDefinition`. Can’t the other arm of the definition also start with `query`? No, the language designers designed the grammar to avoid such ambiguities.
 
@@ -103,7 +103,7 @@ Et voilà! The `query` token can start an `OperationType`, which means the parse
 
 Now that the parser knows it will parse `OperationType Name(opt) VariableDefinitions(opt) Directives(opt) SelectionSet`, it skips the `query` token and looks at the next token, which is `{`. A `{` It can’t appear in the beginning of `Name(opt)`, `VariableDefinitions(opt)` or `Directives(opt)`, but it can start a `SelectionSet`:
 
-![operation definition](how-pg-graphql-works/selection-set.png)
+![operation definition](images/blog/how-pg-graphql-works/selection-set.png)
 
 So the parser skips past the `{` token and then tries to parse a list of `Selection`s. The parser parses the rest of the input string using the same process. It rejects an invalid list of tokens like `}`, `query` and `{` because no grammar rule starts with an `}`. For our example query, the parser generates the following AST:
 
