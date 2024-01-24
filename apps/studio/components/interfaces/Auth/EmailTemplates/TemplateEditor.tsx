@@ -154,7 +154,7 @@ const TemplateEditor = ({ template, authConfig }: TemplateEditorProps) => {
                       </Tabs.Panel>
                       <Tabs.Panel id={'preview'} icon={<IconMonitor />} label="Preview">
                         <Alert_Shadcn_ className="mb-2" variant="default">
-                          <IconInfo />
+                          <IconInfo strokeWidth={1.5} />
                           <AlertTitle_Shadcn_>
                             The preview may differ slightly from the actual rendering in the email
                             client.
