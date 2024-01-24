@@ -21,6 +21,7 @@ import {
   Alert,
   AlertDescription_Shadcn_,
   Alert_Shadcn_,
+  Badge,
   Button,
   IconAlertTriangle,
   IconExternalLink,
@@ -112,7 +113,7 @@ const ComputeInstanceSidePanel = () => {
     return microAvailableAsAddon ? 'ci_nano' : 'ci_micro'
   }, [addons])
 
-  const [selectedOption, setSelectedOption] = useState<string>(defaultInstanceSize || '')
+  const [selectedOption, setSelectedOption] = useState<string>('')
 
   const COMPUTE_CATEGORY_OPTIONS: {
     id: 'off' | 'optimized'
@@ -330,7 +331,12 @@ const ComputeInstanceSidePanel = () => {
                     >
                       <div className="w-full group">
                         <div className="border-b border-default px-4 py-2">
-                          <p className="text-sm">{option.name}</p>
+                          <p className="text-sm flex justify-between">
+                            {option.name}{' '}
+                            {subscriptionCompute?.variant.identifier === option.identifier && (
+                              <Badge>Current</Badge>
+                            )}
+                          </p>
                         </div>
                         <div className="px-4 py-2">
                           <p className="text-foreground-light">
