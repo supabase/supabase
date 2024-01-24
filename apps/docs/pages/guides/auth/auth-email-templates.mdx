@@ -78,7 +78,6 @@ const { data: { session }, error } = await supabase.auth.verifyOtp({ token_hash,
 
 Supabase Auth makes use of [Go Templates](https://pkg.go.dev/text/template). This means it is possible to conditionally render information based on template properties.You may wish to checkout this [guide by Hugo](https://gohugo.io/templates/introduction/) for a guide on the templating language.
 
-Let's demonstrate some ways of using the templating system below:
 
 ### Different Email Based on Signup Domain
 
