@@ -146,7 +146,7 @@ export const RESOURCE_WARNING_MESSAGES = {
         title:
           'Your project has exceeded email rate limits in the past 24 hours, and performance of Auth may be affected',
         description:
-          'You will need to set up custom SMTP and adjust rate limits where necessary. View the linked guide for further infromation.',
+          'You will need to set up custom SMTP and adjust rate limits where necessary. View the linked guide for further information.',
       },
     },
     cardContent: {
