@@ -48,26 +48,57 @@ async function main() {
         const meta = mdxTree.children.find(
           (node) => node.type === 'mdxjsEsm' && node.value.trim().startsWith('export const meta')
         )
-        if (!meta) return
 
-        const linesIncl = [meta.position.start.line, meta.position.end.line]
+        let yamlString = ''
+        if (meta) {
+          // @ts-ignore
+          const parsedMeta = parse(meta.value, { ecmaVersion: 2020, sourceType: 'module' })
+          yamlString = convertToYaml(
+            // @ts-ignore
+            parsedMeta.body[0].declaration.declarations[0].init.properties
+          )
+        }
 
-        const parsedMeta = parse(meta.value, { ecmaVersion: 2020, sourceType: 'module' })
-        const yamlString = convertToYaml(
-          parsedMeta.body[0].declaration.declarations[0].init.properties
+        const importStatements = mdxTree.children.filter(
+          (node) => node.type === 'mdxjsEsm' && node.value.trim().match(/^import \w+ from/)
         )
+
+        const exportStatements = mdxTree.children.filter(
+          (node) =>
+            node.type === 'mdxjsEsm' &&
+            (node.value.trim().match(/^export const (?!meta)/) ||
+              node.value.trim().startsWith('export default'))
+        )
+
+        const positions = [meta, ...importStatements, ...exportStatements]
+          // @ts-ignore
+          .map(({ position }) => [position.start.line, position.end.line])
+          // splicing them out in reverse order means we don't have to worry about line numbers shifting
+          .sort((a, b) => b[0] - a[0])
+
+        let index = 0
+        while (index < positions.length - 1) {
+          const overlapsNext = positions[index][0] <= positions[index + 1][1]
+          if (overlapsNext) {
+            positions[index][0] = positions[index + 1][0]
+            positions.splice(index + 1, 1)
+          } else {
+            index++
+          }
+        }
 
         const lines = content.split('\n')
-        lines.splice(
-          meta.position.start.line - 1,
-          meta.position.end.line - meta.position.start.line + 1
-        )
-        const contentWithoutMeta = lines.join('\n')
-        const contentWithFrontmatter = yamlString + contentWithoutMeta
+        for (const position of positions) {
+          console.log(filename, position)
+          const spliced = lines.splice(position[0] - 1, position[1] - position[0] + 1)
+          console.log(spliced)
+        }
+        const splicedLines = lines.join('\n')
+        const splicedWithFrontmatter = yamlString + splicedLines
 
         const destinationPath = join(CONTENT_DIR, filename)
         await mkdir(dirname(destinationPath), { recursive: true })
-        writeFile(destinationPath, contentWithFrontmatter)
+        writeFile(destinationPath, splicedWithFrontmatter)
       })
     )
   } catch (err) {
