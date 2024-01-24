@@ -29,7 +29,7 @@ This article will give you a deeper understanding of `pg_graphql` , helping you 
 
 When a client sends a GraphQL request to `pg_graphql` it gets a response back. But do you know what happens inside `pg_graphql` to serve that request? Let’s take a look at the life of a GraphQL request.
 
-The entry point of a request is the `[graphql.resolve(query, ..)](https://github.com/supabase/pg_graphql/blob/master/sql/resolve.sql)` function. This function calls the `[graphql._internal_resolve(query)](https://github.com/supabase/pg_graphql/blob/941c7c7ae1d8e06dd4891d75fb1615a863d0c0e6/src/lib.rs#L25)` function which is written in Rust and where the real magic starts. The [first line](https://github.com/supabase/pg_graphql/blob/941c7c7ae1d8e06dd4891d75fb1615a863d0c0e6/src/lib.rs#L33) in that function uses the `[graphql-parser` crate](https://github.com/graphql-rust/graphql-parser) to parse the GraphQL query into a tree structure. Let’s see how that works.
+The entry point of a request is the [`graphql.resolve(query, ..)`](https://github.com/supabase/pg_graphql/blob/master/sql/resolve.sql)` function. This function calls the `[graphql._internal_resolve(query)](https://github.com/supabase/pg_graphql/blob/941c7c7ae1d8e06dd4891d75fb1615a863d0c0e6/src/lib.rs#L25)` function which is written in Rust and where the real magic starts. The [first line](https://github.com/supabase/pg_graphql/blob/941c7c7ae1d8e06dd4891d75fb1615a863d0c0e6/src/lib.rs#L33) in that function uses the `[graphql-parser` crate](https://github.com/graphql-rust/graphql-parser) to parse the GraphQL query into a tree structure. Let’s see how that works.
 
 ## Parsing GraphQL
 
