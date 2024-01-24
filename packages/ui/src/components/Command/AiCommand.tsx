@@ -181,6 +181,10 @@ export function useAiChat({
           }),
         })
 
+        if (!response.ok) {
+          throw Error('Bad response from AI endpoint')
+        }
+
         const reader = response.body?.getReader()
         // If reader exists, functions as while (true)
         while (reader) {
@@ -263,6 +267,10 @@ export function queryAi(messages: Message[], timeout = 0) {
         messages: messages.map(({ role, content }) => ({ role, content })),
       }),
     })
+
+    if (!response.ok) {
+      throw Error('Bad response from AI endpoint')
+    }
 
     let timeoutId: number | undefined
 
