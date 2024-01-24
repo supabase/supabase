@@ -413,5 +413,13 @@
     "position": "Engineering",
     "author_url": "https://twitter.com/filipecabaco",
     "author_image_url": "https://github.com/filipecabaco.png"
+  },
+  {
+    "author_id": "raminder_singh",
+    "author": "Raminder Singh",
+    "username": "imor",
+    "position": "Engineering",
+    "author_url": "https://github.com/imor",
+    "author_image_url": "https://github.com/imor.png"
   }
 ]
