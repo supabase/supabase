@@ -325,7 +325,6 @@ export function queryAi(messages: Message[], timeout = 0) {
         ] = completionChunk.choices
 
         if (content) {
-          console.log(content)
           answer += content
         }
       } catch (err) {
