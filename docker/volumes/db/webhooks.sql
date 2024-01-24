@@ -238,6 +238,5 @@ BEGIN;
   ALTER function supabase_functions.http_request() SET search_path = supabase_functions;
   REVOKE ALL ON FUNCTION supabase_functions.http_request() FROM PUBLIC;
   GRANT EXECUTE ON FUNCTION supabase_functions.http_request() TO postgres, anon, authenticated, service_role;
-  INSERT INTO supabase_functions.migrations (version) VALUES ('20240115163000_add_retry_to_http_request');
 
 COMMIT;
