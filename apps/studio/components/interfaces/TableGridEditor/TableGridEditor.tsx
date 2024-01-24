@@ -332,6 +332,7 @@ const TableGridEditor = ({
         onExpandJSONEditor={(column, row) =>
           snap.onExpandJSONEditor({ column, row, jsonString: JSON.stringify(row[column]) || '' })
         }
+        onExpandTextEditor={(column, row) => console.log({ column, row })}
         onEditForeignKeyColumnValue={snap.onEditForeignKeyColumnValue}
         showCustomChildren={(isViewSelected || isTableSelected) && selectedView === 'definition'}
         customHeader={
