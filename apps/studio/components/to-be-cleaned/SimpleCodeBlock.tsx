@@ -20,6 +20,7 @@ const prism = {
 }
 
 interface SimpleCodeBlockProps {
+  parentClassName?: string
   className?: string
   metastring?: string
   showCopy?: boolean
@@ -27,6 +28,7 @@ interface SimpleCodeBlockProps {
 
 const SimpleCodeBlock = ({
   children,
+  parentClassName,
   className: languageClassName,
   metastring,
   showCopy = true,
@@ -67,7 +69,7 @@ const SimpleCodeBlock = ({
       {({ className, tokens, getLineProps, getTokenProps }) => {
         return (
           <div className="Code codeBlockWrapper group">
-            <pre ref={target} className={`codeBlock ${className}`}>
+            <pre ref={target} className={`codeBlock ${className} ${parentClassName}`}>
               {tokens.map((line, i) => {
                 const lineProps = getLineProps({ line, key: i })
 

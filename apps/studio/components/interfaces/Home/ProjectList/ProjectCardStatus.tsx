@@ -100,7 +100,7 @@ export const ProjectCardStatus = ({
       ) : (
         <AlertTriangle strokeWidth={1.5} size={12} />
       )}
-      <div className="flex justify-between items-center w-full">
+      <div className="flex justify-between items-center w-full gap-x-1">
         <AlertTitle_Shadcn_ className="text-xs mb-0">{alertTitle}</AlertTitle_Shadcn_>
         <Tooltip.Root delayDuration={0}>
           <Tooltip.Trigger>
@@ -112,7 +112,7 @@ export const ProjectCardStatus = ({
               <div
                 className={[
                   'rounded bg-alternative py-1 px-2 leading-none shadow',
-                  'border bg-background',
+                  'border bg-background w-[280px]',
                 ].join(' ')}
               >
                 <span className="text-xs text-foreground">{alertDescription}</span>
