@@ -5,7 +5,7 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
   return (
     <div>
       <SimpleCodeBlock className="bash">
-{`
+        {`
 import { createBrowserClient } from "@supabase/ssr";
 
 export const createClient = () =>
@@ -20,8 +20,3 @@ export const createClient = () =>
 }
 
 export default ContentFile
-
-
-
-
-

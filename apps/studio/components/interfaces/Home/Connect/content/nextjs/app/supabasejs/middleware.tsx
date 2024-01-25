@@ -5,7 +5,7 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
   return (
     <div>
       <SimpleCodeBlock className="bash">
-{`
+        {`
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
@@ -75,9 +75,3 @@ export const createClient = (request: NextRequest) => {
 }
 
 export default ContentFile
-
-
-
-
-
-

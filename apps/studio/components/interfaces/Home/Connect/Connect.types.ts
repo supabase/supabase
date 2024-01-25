@@ -4,7 +4,7 @@ export type projectKeys = {
 }
 
 export interface ContentFileProps {
-      projectKeys: {
+  projectKeys: {
     apiUrl: string
     anonKey: string
   }
