@@ -7,6 +7,7 @@ export const GUIDES_DIRECTORY = join(DOCS_DIRECTORY, 'content/guides')
 type GuideFrontmatter = {
   title: string
   description?: string
+  hideToc?: boolean
 }
 
 export function isValidGuideFrontmatter(obj: object): obj is GuideFrontmatter {

@@ -3,7 +3,11 @@
 /**
  * Copies MDX files from the `pages` directory to the `content` directory,
  * replacing frontmatter in `meta` with YAML frontmatter.
+ *
+ * Also deletes import and export statements.
  */
+
+let SUB_DIR = 'auth'
 
 import { parse } from 'acorn'
 import { fromMarkdown } from 'mdast-util-from-markdown'
@@ -15,8 +19,13 @@ import { fileURLToPath } from 'node:url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT_DIR = join(__dirname, '../..')
-const PAGES_DIR = join(ROOT_DIR, 'pages/guides')
-const CONTENT_DIR = join(ROOT_DIR, 'content/guides')
+let PAGES_DIR = join(ROOT_DIR, 'pages/guides')
+let CONTENT_DIR = join(ROOT_DIR, 'content/guides')
+
+if (SUB_DIR) {
+  PAGES_DIR = join(PAGES_DIR, SUB_DIR)
+  CONTENT_DIR = join(CONTENT_DIR, SUB_DIR)
+}
 
 function convertToYaml(properties) {
   let result = '---\n'
@@ -89,9 +98,7 @@ async function main() {
 
         const lines = content.split('\n')
         for (const position of positions) {
-          console.log(filename, position)
-          const spliced = lines.splice(position[0] - 1, position[1] - position[0] + 1)
-          console.log(spliced)
+          lines.splice(position[0] - 1, position[1] - position[0] + 1)
         }
         const splicedLines = lines.join('\n')
         const splicedWithFrontmatter = yamlString + splicedLines

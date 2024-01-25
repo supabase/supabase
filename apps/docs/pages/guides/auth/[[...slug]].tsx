@@ -1,12 +1,18 @@
+import { type CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
 import matter from 'gray-matter'
 import { serialize } from 'next-mdx-remote/serialize'
 import type { GetStaticPaths, GetStaticProps, InferGetStaticPropsType } from 'next'
 import { MDXRemote } from 'next-mdx-remote'
+import type { SerializeOptions } from 'next-mdx-remote/dist/types'
 import { existsSync } from 'node:fs'
 import { readdir, readFile } from 'node:fs/promises'
 import { join, extname, sep } from 'node:path'
+import remarkGfm from 'remark-gfm'
+
+import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 
 import components from '~/components'
+import Layout from '~/layouts/DefaultGuideLayout'
 import { GUIDES_DIRECTORY, isValidGuideFrontmatter } from '~/lib/docs'
 
 export const getStaticPaths = (async () => {
@@ -51,7 +57,22 @@ export const getStaticProps = (async ({ params }) => {
   if (!isValidGuideFrontmatter(frontmatter)) {
     throw Error('Type of frontmatter is not valid')
   }
-  const mdxSource = await serialize(content)
+
+  const codeHikeOptions: CodeHikeConfig = {
+    theme: codeHikeTheme,
+    lineNumbers: true,
+    showCopyButton: true,
+    skipLanguages: [],
+    autoImport: false,
+  }
+
+  const mdxOptions: SerializeOptions = {
+    mdxOptions: {
+      useDynamicImport: true,
+      remarkPlugins: [remarkGfm, [remarkCodeHike, codeHikeOptions]],
+    },
+  }
+  const mdxSource = await serialize(content, mdxOptions)
 
   return {
     props: {
@@ -65,10 +86,11 @@ export default function AuthGuide({
   frontmatter,
   mdxSource,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
+  const { hideToc, ...meta } = frontmatter
+
   return (
-    <div>
-      <h1>Auth Guide</h1>
+    <Layout meta={meta} hideToc={hideToc}>
       <MDXRemote {...mdxSource} components={components} />
-    </div>
+    </Layout>
   )
 }

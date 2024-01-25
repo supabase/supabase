@@ -1,11 +1,21 @@
 import Link from 'next/link'
-import { Alert, Button, CodeBlock, GlassPanel, markdownComponents, Tabs } from 'ui'
+import {
+  Accordion,
+  Alert,
+  Button,
+  CodeBlock,
+  GlassPanel,
+  IconPanel,
+  markdownComponents,
+  Tabs,
+} from 'ui'
 import StepHikeCompact from '~/components/StepHikeCompact'
 // Common components
 import ButtonCard from './ButtonCard'
 
 // Other components
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
+import AuthProviders from '~/components/AuthProviders'
 import { Heading } from './CustomHTMLElements'
 import DatabaseSetup from './MDX/database_setup.mdx'
 import ProjectSetup from './MDX/project_setup.mdx'
@@ -48,16 +58,23 @@ import {
   IconMenuApi,
   IconMenuCli,
 } from './Navigation/NavigationMenu/HomeMenuIcons'
+import { AppleSecretGenerator } from './AppleSecretGenerator'
+import { Mermaid } from './Mermaid'
 
 const components = {
   ...markdownComponents,
+  Accordion,
   Admonition,
+  AuthProviders,
+  AppleSecretGenerator,
   Button,
   ButtonCard,
   CH,
   CodeBlock,
   GlassPanel,
+  IconPanel,
   Link,
+  Mermaid,
   QuickstartIntro,
   DatabaseSetup,
   ProjectSetup,
