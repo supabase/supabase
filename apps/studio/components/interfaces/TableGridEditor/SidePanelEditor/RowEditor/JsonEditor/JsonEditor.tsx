@@ -50,14 +50,6 @@ const JsonEdit = ({
     }
   }
 
-  function onInputChange(value: string | undefined) {
-    setJsonStr(value ?? '')
-  }
-
-  function onToggleClick(option: 'edit' | 'view') {
-    setView(option)
-  }
-
   function prettify() {
     const res = prettifyJSON(jsonStr)
     setJsonStr(res)
@@ -107,7 +99,7 @@ const JsonEdit = ({
               options={['view', 'edit']}
               activeOption={view}
               borderOverride="border-gray-500"
-              onClickOption={onToggleClick}
+              onClickOption={setView}
             />
           </div>
         </div>
@@ -130,7 +122,7 @@ const JsonEdit = ({
             <JsonCodeEditor
               key={jsonString}
               readOnly={readOnly}
-              onInputChange={onInputChange}
+              onInputChange={(val) => setJsonStr(val ?? '')}
               value={jsonStr.toString()}
             />
           </div>

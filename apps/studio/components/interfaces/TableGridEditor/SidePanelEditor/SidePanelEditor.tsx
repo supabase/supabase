@@ -32,7 +32,7 @@ import {
 } from './SidePanelEditor.types'
 import { createColumn, updateColumn } from './SidePanelEditor.utils'
 import { ImportContent } from './TableEditor/TableEditor.types'
-import { TextEditor } from './RowEditor/TextEditor/TextEditor'
+import { TextEditor } from './RowEditor/TextEditor'
 
 export interface SidePanelEditorProps {
   editable?: boolean
