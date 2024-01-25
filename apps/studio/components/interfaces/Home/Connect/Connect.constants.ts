@@ -167,8 +167,8 @@ export const FRAMEWORKS: ConnectionType[] = [
           },
           {
             location: 'nuxt/supabasejs/app',
-            destinationLocation: 'App.tsx',
-            destinationFilename: 'App.tsx',
+            destinationLocation: 'src/App.vue',
+            destinationFilename: 'App.vue',
           },
         ],
       },
@@ -178,30 +178,108 @@ export const FRAMEWORKS: ConnectionType[] = [
     key: 'vuejs',
     label: 'Vue.JS',
     icon: 'vuejs',
-    files: [
+    files: [],
+    children: [
       {
-        // omit .tsx extension
-        location: 'vue1/env.local',
-        destinationFilename: 'vue1.env.local',
-        destinationLocation: 'vue1/.env.local',
+        key: 'supabasejs',
+        label: 'Supabase-js',
+        children: [],
+        icon: 'supabase',
+        files: [
+          {
+            // omit .tsx extension
+            location: 'vue/supabasejs/env.local', // location on local disk
+            destinationLocation: '.env.local', // label for the ui
+            destinationFilename: '.env.local', // where the user should put the file
+          },
+          {
+            location: 'vue/supabasejs/supabase',
+            destinationLocation: 'utils/supabase.ts',
+            destinationFilename: 'supabase.ts',
+          },
+          {
+            location: 'vue/supabasejs/app',
+            destinationLocation: 'src/App.vue',
+            destinationFilename: 'App.vue',
+          },
+        ],
       },
     ],
-    children: [],
+  },
+
+  {
+    key: 'sveltekit',
+    label: 'SvelteKit',
+    icon: 'sveltekit',
+    files: [],
+    children: [
+      {
+        key: 'supabasejs',
+        label: 'Supabase-js',
+        children: [],
+        icon: 'supabase',
+        files: [
+          {
+            // omit .tsx extension
+            location: 'sveltekit/supabasejs/env.local',
+            destinationFilename: '.env.local',
+            destinationLocation: '.env.local',
+          },
+          {
+            location: 'sveltekit/supabasejs/supabase',
+            destinationLocation: 'src/lib/supabaseClient.js',
+            destinationFilename: 'supabase.js',
+          },
+          {
+            // omit .tsx extension
+            location: 'sveltekit/supabasejs/server',
+            destinationFilename: '+page.server.js',
+            destinationLocation: 'src/routes/+page.server.js',
+          },
+          {
+            // omit .tsx extension
+            location: 'sveltekit/supabasejs/page',
+            destinationFilename: '+page.server.js',
+            destinationLocation: 'src/routes/+page.server.js',
+          },
+        ],
+      },
+    ],
   },
   {
     key: 'solidjs',
     label: 'Solid.js',
     icon: 'solidjs',
-    files: [
+    files: [],
+    children: [
       {
-        // omit .tsx extension
-        location: 'solidjs/env.local',
-        destinationFilename: 'solidjs.env.local',
-        destinationLocation: 'solidjs/.env.local',
+        key: 'supabasejs',
+        label: 'Supabase-js',
+        children: [],
+        icon: 'supabase',
+        files: [
+          {
+            // omit .tsx extension
+            location: 'solidjs/supabasejs/env.local',
+            destinationFilename: '.env.local',
+            destinationLocation: '.env.local',
+          },
+          {
+            location: 'solidjs/supabasejs/supabase',
+            destinationLocation: 'utils/supabase.ts',
+            destinationFilename: 'supabase.ts',
+          },
+          {
+            // omit .tsx extension
+            location: 'solidjs/supabasejs/app',
+            destinationFilename: 'App.tsx',
+            destinationLocation: 'src/App.jsx',
+          },
+        ],
       },
     ],
-    children: [],
   },
+
   {
     key: 'redwoodjs',
     label: 'RedwoodJS',
@@ -220,51 +298,27 @@ export const FRAMEWORKS: ConnectionType[] = [
     key: 'refine',
     label: 'refine',
     icon: 'refine',
-    children: [],
-    files: [
-      {
-        // omit .tsx extension
-        location: 'refine/env.local',
-        destinationFilename: 'refine.env.local',
-        destinationLocation: 'refine/.env.local',
-      },
-    ],
-  },
-
-  {
-    key: 'svelte',
-    label: 'Svelte.JS',
-    icon: 'svelte',
     files: [],
     children: [
       {
-        key: 'svelterouter',
-        label: 'Svelte router',
-        icon: 'svelte',
+        key: 'supabasejs',
+        label: 'Supabase-js',
+        children: [],
+        icon: 'supabase',
         files: [
           {
             // omit .tsx extension
-            location: 'svelte1/env.local',
-            destinationFilename: 'svelte1.env.local',
-            destinationLocation: 'svelte1/.env.local',
+            location: 'refine/supabasejs/env.local',
+            destinationFilename: 'env.local',
+            destinationLocation: '.env.local',
           },
-        ],
-        children: [],
-      },
-      {
-        key: 'svelterouter2',
-        label: 'Svelte router2',
-        icon: 'svelte',
-        files: [
           {
             // omit .tsx extension
-            location: 'svelte2/env.local',
-            destinationFilename: 'svelte2.env.local',
-            destinationLocation: 'svelte2/.env.local',
+            location: 'refine/supabasejs/supabase',
+            destinationFilename: 'supabase.tsx',
+            destinationLocation: 'utility/supabase.tsx',
           },
         ],
-
-        children: [],
       },
     ],
   },
@@ -301,6 +355,9 @@ export const ORMS: ConnectionType[] = [
   },
 ]
 
+// @todo
+// maybe we need a "command?" prop for files
+// ie: it's not a file, but a terminal command
 export const GRAPHQL: ConnectionType[] = [
   {
     key: 'graphql',
@@ -310,9 +367,9 @@ export const GRAPHQL: ConnectionType[] = [
     files: [
       {
         // omit .tsx extension
-        location: 'graphql/env.local',
-        destinationFilename: 'graphql.env.local',
-        destinationLocation: 'graphql/.env.local',
+        location: 'graphql/terminal',
+        destinationFilename: '',
+        destinationLocation: '',
       },
     ],
   },

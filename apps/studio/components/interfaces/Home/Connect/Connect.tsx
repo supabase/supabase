@@ -15,7 +15,14 @@ import {
   TabsTrigger_Shadcn_,
   Tabs_Shadcn_,
 } from 'ui'
-import { CONNECTION_TYPES, FRAMEWORKS, File, ORMS, Parent } from './Connect.constants'
+import {
+  CONNECTION_TYPES,
+  FRAMEWORKS,
+  File,
+  ORMS,
+  ConnectionType,
+  GRAPHQL,
+} from './Connect.constants'
 import ConnectDropdown from './ConnectDropdown'
 import ConnectTabContent from './ConnectTabContent'
 
@@ -33,7 +40,7 @@ type GetContentFilesArgs = {
   selectedParent: string
   selectedChild: string
   selectedGrandchild: string
-  connectionObject: Parent[]
+  connectionObject: ConnectionType[]
 }
 const getContentFiles = ({
   connectionObject,
@@ -71,7 +78,7 @@ const Connect = () => {
   const [grandChildDropdownOpen, setGrandChildDropdownOpen] = useState(false)
   const [useConnectionPooler, setUseConnectionPooler] = useState(false)
 
-  const [connectionObject, setConnectionObject] = useState<Parent[]>(FRAMEWORKS)
+  const [connectionObject, setConnectionObject] = useState<ConnectionType[]>(FRAMEWORKS)
   const [selectedParent, setSelectedParent] = useState(connectionObject[0].key) // aka nextjs
   const [selectedChild, setSelectedChild] = useState(
     connectionObject.find((item) => item.key === selectedParent)?.children[0]?.key ?? ''
@@ -130,7 +137,7 @@ const Connect = () => {
   }
 
   // reset the parent/child/grandchild when the connection type (tab) changes
-  function handleConnectionTypeChange(connections: Parent[]) {
+  function handleConnectionTypeChange(connections: ConnectionType[]) {
     setSelectedParent(connections[0].key)
 
     if (connections[0]?.children.length > 0) {
@@ -156,6 +163,11 @@ const Connect = () => {
     if (type === 'orms') {
       setConnectionObject(ORMS)
       handleConnectionTypeChange(ORMS)
+    }
+
+    if (type === 'graphql') {
+      setConnectionObject(GRAPHQL)
+      handleConnectionTypeChange(GRAPHQL)
     }
   }
 
@@ -247,7 +259,7 @@ const Connect = () => {
                       setOpen={setParentSelectorOpen}
                       state={selectedParent}
                       updateState={handleParentChange}
-                      label="Framework"
+                      label={connectionObject === FRAMEWORKS ? 'Frameworks' : 'Tool'}
                       items={connectionObject}
                     />
 

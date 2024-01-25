@@ -6,8 +6,19 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
     <div>
       <SimpleCodeBlock className="bash">
         {`
-SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}
-SUPABASE_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
+import { createClient } from "@refinedev/supabase";
+
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_KEY
+
+export const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY, {
+  db: {
+    schema: "public",
+  },
+  auth: {
+    persistSession: true,
+  },
+});
         `}
       </SimpleCodeBlock>
     </div>

@@ -7,7 +7,7 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
       <SimpleCodeBlock className="bash">
         {`
 SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}
-SUPABASE_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
+SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
         `}
       </SimpleCodeBlock>
     </div>

@@ -6,8 +6,12 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
     <div>
       <SimpleCodeBlock className="bash">
         {`
-SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}
-SUPABASE_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
+import { createClient } from "@supabase/supabase-js";
+
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
+
+export const supabase = createClient(supabaseUrl, supabaseKey);
         `}
       </SimpleCodeBlock>
     </div>
