@@ -16,12 +16,15 @@ const DisallowAllModal = ({ visible, onClose }: DisallowAllModalProps) => {
 
   const onSubmit = async () => {
     if (!ref) return console.error('Project ref is required')
-    await applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs: ['127.0.0.1/32'] })
+    await applyNetworkRestrictions({
+      projectRef: ref,
+      dbAllowedCidrs: ['127.0.0.1/32'],
+      dbAllowedCidrsV6: ['::1/128'],
+    })
   }
 
   return (
     <Modal
-      closable
       hideFooter
       size="medium"
       visible={visible}

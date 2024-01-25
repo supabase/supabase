@@ -77,7 +77,7 @@
     "react-tooltip": "^4.2.17",
     "reactflow": "^11.10.1",
     "remark-gfm": "^3.0.1",
-    "sse.js": "^0.6.1",
+    "sse.js": "^2.2.0",
     "tailwind-merge": "^1.13.2",
     "tailwindcss": "^3.4.1",
     "tailwindcss-animate": "^1.0.6",

@@ -85,7 +85,7 @@ const CreateEnumeratedTypeSidePanel = ({
       schema,
       name: data.name,
       description: data.description?.replaceAll("'", "''"),
-      values: data.values.filter((x) => x.value.length > 0).map((x) => x.value),
+      values: data.values.filter((x) => x.value.length > 0).map((x) => x.value.trim()),
     })
   }
 

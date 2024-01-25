@@ -11,7 +11,7 @@ Use branching to safely and easily experiment with changes to your Supabase proj
 
 <Admonition type="caution" label="Branching available for Early Access, available on the Pro Plan and above.">
 
-We do not recommended Branching in a production environment while it is in Early Access. To try branching, [request access here](https://forms.supabase.com/branching-request).
+We do not recommended Branching in a production environment while it is in Early Access.
 
 </Admonition>
 
@@ -147,9 +147,9 @@ You can use the [Supabase CLI](/docs/guides/cli) to manage changes inside a loca
     </StepHikeCompact.Step>
 
     <StepHikeCompact.Step step={2}>
-        <StepHikeCompact.Details title="Sync your database migration" fullWidth>
+        <StepHikeCompact.Details title="Pull your database migration" fullWidth>
 
-            Sync your database changes using `supabase db pull`. You can find your database URL in your [database settings](https://supabase.com/dashboard/project/_/settings/database), under the URI tab of the Connection String settings panel.
+            Pull your database changes using `supabase db pull`. You can find your database URL in your [database settings](https://supabase.com/dashboard/project/_/settings/database), under the URI tab of the Connection String settings panel.
 
             <CH.Code lineNumbers={false}>
 
@@ -394,7 +394,7 @@ The Supabase CLI provides two options: [manual migrations](https://supabase.com/
 
             This will create a SQL file called `./supabase/migrations/[timestamp]add_employees_table.sql`. This file will reflect the changes that you made in your local dashboard.
 
-            If you want to continue making change, you can manually edit this migration file, then use the `db reset` command to pick up your edits:
+            If you want to continue making changes, you can manually edit this migration file, then use the `db reset` command to pick up your edits:
 
             <CH.Code lineNumbers={false}>
 

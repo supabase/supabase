@@ -46,7 +46,7 @@ export const computeUsageMetricLabel = (computeUsageMetric: ComputeUsageMetric) 
     case 'COMPUTE_HOURS_BRANCH':
       return 'Branches'
     case 'COMPUTE_HOURS_XS':
-      return 'Starter'
+      return 'Micro'
     case 'COMPUTE_HOURS_SM':
       return 'Small'
     case 'COMPUTE_HOURS_MD':
