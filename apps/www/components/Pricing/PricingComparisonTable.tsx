@@ -1,14 +1,24 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { Button, Select, cn } from 'ui'
 import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/Pricing/PricingTableRow'
+import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
+import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
 
+import gaEvents from '~/lib/gaEvents'
 import Solutions from '~/data/Solutions'
 import { pricing } from 'shared-data/pricing'
 import { plans } from 'shared-data/plans'
 
 const PricingComparisonTable = () => {
+  const router = useRouter()
+  const telemetryProps = useTelemetryProps()
   const [activeMobilePlan, setActiveMobilePlan] = useState('Free')
+
+  const sendTelemetryEvent = async (event: TelemetryEvent) => {
+    await Telemetry.sendEvent(event, telemetryProps, router)
+  }
 
   const MobileHeader = ({
     description,
@@ -338,7 +348,14 @@ const PricingComparisonTable = () => {
                         type={plan.name === 'Enterprise' ? 'default' : 'primary'}
                         block
                       >
-                        <Link href={plan.href} as={plan.href}>
+                        <Link
+                          href={plan.href}
+                          onClick={() =>
+                            sendTelemetryEvent(
+                              gaEvents[`www_pricing_comparison_${plan.name.toLowerCase()}`]
+                            )
+                          }
+                        >
                           {plan.cta}
                         </Link>
                       </Button>

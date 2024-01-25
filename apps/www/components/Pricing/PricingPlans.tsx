@@ -1,10 +1,21 @@
 import React, { FC } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { Button, IconCheck, cn } from 'ui'
+import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
+import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
 
+import gaEvents from '~/lib/gaEvents'
 import { plans } from 'shared-data/plans'
 
 const PricingPlans: FC = () => {
+  const router = useRouter()
+  const telemetryProps = useTelemetryProps()
+
+  const sendTelemetryEvent = async (event: TelemetryEvent) => {
+    await Telemetry.sendEvent(event, telemetryProps, router)
+  }
+
   return (
     <div className="mx-auto lg:container lg:px-16 xl:px-12 flex flex-col">
       <div className="relative z-10 mx-auto w-full px-4 sm:px-6 lg:px-8">
@@ -52,7 +63,16 @@ const PricingPlans: FC = () => {
                     type={plan.name === 'Enterprise' ? 'default' : 'primary'}
                     asChild
                   >
-                    <a href={plan.href}>{plan.cta}</a>
+                    <Link
+                      href={plan.href}
+                      onClick={() =>
+                        sendTelemetryEvent(
+                          gaEvents[`www_pricing_hero_plan_${plan.name.toLowerCase()}`]
+                        )
+                      }
+                    >
+                      {plan.cta}
+                    </Link>
                   </Button>
 
                   <div
