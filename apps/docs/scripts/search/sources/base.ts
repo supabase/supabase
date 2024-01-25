@@ -9,12 +9,23 @@ export type Section = {
   slug?: string
 }
 
+export abstract class BaseLoader {
+  type: string
+
+  constructor(public source: string, public path: string) {}
+
+  abstract load(): Promise<BaseSource[]>
+}
+
 export abstract class BaseSource {
+  type: string
   checksum?: string
   meta?: Json
   sections?: Section[]
 
-  constructor(public source: string, public path: string, public parentPath?: string) {}
+  constructor(public source: string, public path: string) {}
 
-  abstract load(): Promise<{ checksum: string; meta?: Json; sections: Section[] }>
+  abstract process(): { checksum: string; meta?: Json; sections: Section[] }
+
+  abstract extractIndexedContent(): string
 }

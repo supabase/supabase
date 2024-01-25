@@ -58,9 +58,11 @@ const VectorVisual = () => {
           xmlns="http://www.w3.org/2000/svg"
           className="absolute w-full h-full z-20 m-auto"
         >
+          {/* Animated ouline */}
           <path
             d="M195.918 125.344L276.779 172.029V265.399L195.918 312.084L115.057 265.399V172.029L195.918 125.344Z"
             stroke="url(#paint0_radial_484_53266)"
+            strokeWidth={2}
           />
           <defs>
             {isActive && (
@@ -72,24 +74,15 @@ const VectorVisual = () => {
                 gradientUnits="userSpaceOnUse"
                 gradientTransform={`translate(${gradientPos?.x} ${gradientPos.y}) rotate(56.4303) scale(132.019)`}
               >
-                <stop stopColor="#3FCF8E" />
-                <stop offset="1" stopColor="#3FCF8E" stopOpacity="0" />
+                <stop stopColor="hsl(var(--brand-default))" />
+                <stop offset="1" stopColor="hsl(var(--brand-default))" stopOpacity="0" />
               </radialGradient>
             )}
           </defs>
         </svg>
 
         <Image
-          src={`/images/index/products/vector2.svg`}
-          alt="Supabase Vector graph"
-          layout="fill"
-          objectFit="contain"
-          objectPosition="center"
-          className="absolute inset-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity"
-          quality={100}
-        />
-        <Image
-          src={`/images/index/products/vector1.svg`}
+          src={`/images/index/products/vector.svg`}
           alt="Supabase Vector graph"
           layout="fill"
           objectFit="contain"

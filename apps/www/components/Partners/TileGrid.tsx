@@ -42,17 +42,17 @@ export default function TileGrid({
                       <Image
                         layout="fill"
                         objectFit="cover"
-                        className="bg-gray-300"
+                        className="bg-surface-100"
                         src={p.logo}
                         alt={p.title}
                       />
                     </div>
                     <div>
-                      <h3 className="text-light group-hover:text-foreground mb-2 text-xl transition-colors">
+                      <h3 className="text-foreground-light group-hover:text-foreground mb-2 text-xl transition-colors">
                         {p.title}
                       </h3>
                       <p
-                        className="text-lighter text-sm line-clamp-4 min-h-[80px]"
+                        className="text-foreground-lighter text-sm line-clamp-4 min-h-[80px]"
                         title={p.description}
                       >
                         {p.description}
@@ -85,7 +85,7 @@ export default function TileGrid({
                       <Image
                         layout="fill"
                         objectFit="cover"
-                        className="bg-gray-300"
+                        className="bg-surface-100"
                         src={p.logo}
                         alt={p.title}
                       />
@@ -95,7 +95,7 @@ export default function TileGrid({
                         {p.title}
                       </h3>
                       <p
-                        className="text-lighter text-sm line-clamp-4 min-h-[80px]"
+                        className="text-foreground-lighter text-sm line-clamp-4 min-h-[80px]"
                         title={p.description}
                       >
                         {p.description}

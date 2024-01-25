@@ -62,8 +62,8 @@ const data = {
     title: "Can't find what you're looking for?",
     paragraph: (
       <>
-        <p className="text-light">The Supabase Support Team is ready to help.</p>
-        <p className="text-lighter text-sm">
+        <p className="text-foreground-light">The Supabase Support Team is ready to help.</p>
+        <p className="text-foreground-lighter text-sm">
           Response time for support tickets will vary depending on plan type and severity of the
           issue.
         </p>
@@ -81,7 +81,7 @@ const data = {
         link: 'https://supabase.com/dashboard/support/new',
         target: '_blank',
         icon: <IconArrowUpRight />,
-        className: '!text-light hover:!text-foreground',
+        className: '!text-foreground-light hover:!text-foreground',
         type: 'text',
       },
     ],

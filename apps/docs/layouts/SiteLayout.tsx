@@ -82,13 +82,13 @@ const levelsData = {
     icon: '/docs/img/icons/menu/reference-javascript',
     name: 'Javascript Reference v2.0',
   },
-  reference_dart_v0: {
-    icon: '/docs/img/icons/menu/reference-dart',
-    name: 'Dart Reference v0.0',
-  },
   reference_dart_v1: {
     icon: '/docs/img/icons/menu/reference-dart',
-    name: 'Dart Reference v0.0',
+    name: 'Dart Reference v1.0',
+  },
+  reference_dart_v2: {
+    icon: '/docs/img/icons/menu/reference-dart',
+    name: 'Dart Reference v2.0',
   },
   reference_csharp_v0: {
     icon: '/docs/img/icons/menu/reference-csharp',
@@ -98,13 +98,21 @@ const levelsData = {
     icon: '/docs/img/icons/menu/reference-python',
     name: 'Python Reference v2.0',
   },
-  reference_swift_v0: {
+  reference_swift_v1: {
     icon: '/docs/img/icons/menu/reference-swift',
-    name: 'Swift Reference v0.0',
+    name: 'Swift Reference v1.0',
   },
-  reference_kotlin_v0: {
+  reference_swift_v2: {
+    icon: '/docs/img/icons/menu/reference-swift',
+    name: 'Swift Reference v2.0',
+  },
+  reference_kotlin_v1: {
     icon: '/docs/img/icons/menu/reference-kotlin',
-    name: 'Kotlin Reference v0.0',
+    name: 'Kotlin Reference v1.0',
+  },
+  reference_kotlin_v2: {
+    icon: '/docs/img/icons/menu/reference-kotlin',
+    name: 'Kotlin Reference v2.0',
   },
   reference_cli: {
     icon: '/docs/img/icons/menu/reference-cli',
@@ -162,13 +170,13 @@ const MobileHeader = memo(function MobileHeader() {
         >
           <span
             className={[
-              'transition-all ease-out block w-4 h-px bg-scale-900 group-hover:bg-scale-1200',
+              'transition-all ease-out block w-4 h-px bg-foreground-muted group-hover:bg-foreground',
               !mobileMenuOpen ? 'w-4' : 'absolute rotate-45 top-[6px]',
             ].join(' ')}
           ></span>
           <span
             className={[
-              'transition-all ease-out block h-px bg-scale-900 group-hover:bg-scale-1200',
+              'transition-all ease-out block h-px bg-foreground-muted group-hover:bg-foreground',
               !mobileMenuOpen ? 'w-3 group-hover:w-4' : 'absolute w-4 -rotate-45 top-[2px]',
             ].join(' ')}
           ></span>
@@ -186,7 +194,7 @@ const MobileHeader = memo(function MobileHeader() {
       <span
         className={[
           'transition-all duration-200',
-          'text-scale-1200',
+          'text-foreground',
           mobileMenuOpen ? 'text-xs' : 'text-sm',
         ].join(' ')}
       >
@@ -222,7 +230,7 @@ const MobileMenuBackdrop = memo(function MobileMenuBackdrop() {
         'left-0',
         'right-0',
         'z-10',
-        'backdrop-blur-sm backdrop-filter bg-white-1200 dark:bg-scale-200/90',
+        'backdrop-blur-sm backdrop-filter bg-alternative/90',
         mobileMenuOpen ? 'absolute h-full w-full top-0 left-0' : 'hidden h-0',
         // always hide on desktop
         'lg:hidden',
@@ -238,12 +246,14 @@ const HeaderLogo = memo(function HeaderLogo() {
     <Link href="/" className="px-10 flex items-center gap-2">
       <Image
         className="cursor-pointer"
-        src={resolvedTheme === 'dark' ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'}
+        src={
+          resolvedTheme?.includes('dark') ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'
+        }
         width={96}
         height={24}
         alt="Supabase Logo"
       />
-      <span className="font-mono text-sm font-medium text-brand">DOCS</span>
+      <span className="font-mono text-sm font-medium text-brand-link">DOCS</span>
     </Link>
   )
 })
@@ -259,9 +269,7 @@ const Container = memo(function Container(props: PropsWithChildren) {
         // 'overflow-x-auto',
         'w-full h-screen transition-all ease-out',
         // 'absolute lg:relative',
-        mobileMenuOpen
-          ? '!w-auto ml-[75%] sm:ml-[50%] md:ml-[33%] overflow-hidden'
-          : 'overflow-auto',
+        mobileMenuOpen ? 'ml-[75%] sm:ml-[50%] md:ml-[33%] overflow-hidden' : 'overflow-auto',
         // desktop override any margin styles
         'lg:ml-0',
       ].join(' ')}
@@ -275,7 +283,8 @@ const NavContainer = memo(function NavContainer() {
   const mobileMenuOpen = useMenuMobileOpen()
 
   return (
-    <div
+    <nav
+      aria-labelledby="main-nav-title"
       className={[
         // 'hidden',
         'absolute lg:relative',
@@ -295,23 +304,26 @@ const NavContainer = memo(function NavContainer() {
           'relative',
           'w-auto',
           'border-r overflow-auto h-screen',
-          'backdrop-blur backdrop-filter bg-white-1200 dark:bg-scale-200',
+          'backdrop-blur backdrop-filter bg-background',
           'flex flex-col',
         ].join(' ')}
       >
+        <h1 id="main-nav-title" className="sr-only">
+          Main menu
+        </h1>
         <div className="top-0 sticky z-10">
           <div>
             <div>
               <div
                 className={[
                   'hidden lg:flex lg:height-auto',
-                  'pt-8 bg-scale-200 flex-col gap-8',
+                  'pt-8 bg-background flex-col gap-8',
                 ].join(' ')}
               >
                 <HeaderLogo />
               </div>
-              <div className="h-4 bg-scale-200 w-full"></div>
-              <div className="bg-gradient-to-b from-scale-200 to-transparent h-4 w-full"></div>
+              <div className="h-4 bg-background w-full"></div>
+              <div className="bg-gradient-to-b from-background to-transparent h-4 w-full"></div>
             </div>
           </div>
         </div>
@@ -321,7 +333,7 @@ const NavContainer = memo(function NavContainer() {
             'absolute left-0 right-0 h-screen',
             'px-5 pl-5 py-16',
             'top-[0px]',
-            'bg-scale-200',
+            'bg-background',
             // desktop styles
             'lg:relative lg:top-0 lg:left-0 lg:pb-10 lg:px-10 lg:pt-0 lg:flex',
             'lg:opacity-100 lg:visible',
@@ -330,7 +342,7 @@ const NavContainer = memo(function NavContainer() {
           <NavigationMenu />
         </div>
       </div>
-    </div>
+    </nav>
   )
 })
 
@@ -351,7 +363,7 @@ const SiteLayout = ({ children }: PropsWithChildren<{}>) => {
               className={[
                 'sticky transition-all top-0',
                 'z-10',
-                'backdrop-blur backdrop-filter bg-white-1200 dark:bg-scale-200',
+                'backdrop-blur backdrop-filter bg-background',
               ].join(' ')}
             >
               <div className={['lg:hidden', 'px-5 ', 'border-b z-10'].join(' ')}>

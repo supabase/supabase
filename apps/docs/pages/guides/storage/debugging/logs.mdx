@@ -9,7 +9,7 @@ export const meta = {
 
 Accessing the [Storage Logs](https://supabase.green/dashboard/project/__/logs/explorer?q=select+id%2C+storage_logs.timestamp%2C+event_message+from+storage_logs%0A++%0A++order+by+timestamp+desc%0A++limit+100%0A++) allows you to examine all incoming request logs to your Storage service. You can also filter logs and delve into specific aspects of your requests.
 
-### Common Log Queries
+### Common log queries
 
 #### Filter by status 5XX error
 
@@ -37,7 +37,7 @@ select id, storage_logs.timestamp, event_message, r.statusCode, e.message as err
   limit 100
 ```
 
-#### Filter by Method
+#### Filter by method
 
 ```sql
 select id, storage_logs.timestamp, event_message, r.method
@@ -50,7 +50,7 @@ order by timestamp desc
 limit 100;
 ```
 
-#### Filter by IP Address
+#### Filter by IP address
 
 ```sql
 select id, storage_logs.timestamp, event_message, r.remoteAddress

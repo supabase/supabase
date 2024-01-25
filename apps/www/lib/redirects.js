@@ -36,6 +36,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/database/column-encryption',
+    destination: '/docs/guides/database/extensions/pgsodium',
+  },
+  {
+    permanent: true,
     source: '/edge-functions/edge-functions',
     destination: '/edge-functions',
   },
@@ -624,6 +629,11 @@ module.exports = [
     permanent: true,
     source: '/join',
     destination: 'https://supabase.com/',
+  },
+  {
+    permanent: true,
+    source: '/blog/supavisor-postgres-connection-pooler-ga',
+    destination: '/blog/supavisor-postgres-connection-pooler',
   },
   {
     permanent: true,
@@ -2322,5 +2332,45 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/functions/global-deployments',
     destination: '/docs/guides/functions/regional-invocation',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/functions/typescript-support',
+    destination: '/docs/guides/functions',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/functions/troubleshooting',
+    destination: '/docs/guides/functions/debugging',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-magic-link',
+    destination: '/docs/guides/auth/passwordless-login/auth-magic-link',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-password-reset',
+    destination: '/docs/guides/auth/passwords',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/dart/sign-in-with-apple',
+    destination: '/docs/reference/dart/sign-in-with-id-token',
+  },
+  {
+    permanent: true,
+    source: '/guides/database/large-datasets',
+    destination: '/guides/database/import-data',
+  },
+  {
+    permanent: true,
+    source: '/guides/api/rest/debugging-performance',
+    destination: '/guides/database/debugging-performance',
+  },
+  {
+    permanent: true,
+    source: '/guides/api/rest/joins-and-nesting',
+    destination: '/guides/database/joins-and-nesting',
   },
 ]

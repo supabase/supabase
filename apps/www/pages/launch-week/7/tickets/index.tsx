@@ -86,7 +86,7 @@ export default function TicketsPage({ users }: Props) {
     window.addEventListener('scroll', handleDebouncedScroll)
 
     return () => {
-      document.body.className = resolvedTheme === 'dark' ? 'dark' : 'light'
+      document.body.className = resolvedTheme?.includes('dark') ? 'dark' : 'light'
       window.removeEventListener('scroll', handleDebouncedScroll)
     }
   }, [])
@@ -129,7 +129,7 @@ export default function TicketsPage({ users }: Props) {
                 <h2 className="text-4xl">
                   Check out <span className="gradient-text-pink-500">all the tickets</span>
                 </h2>
-                <p className="radial-gradient-text-scale-500">Submissions are closed.</p>
+                <p className="radial-gradient-text-500">Submissions are closed.</p>
                 <div className="mt-1">
                   <Button asChild type="outline" size="medium">
                     <Link href="/launch-week/7">Go to Launch Week 7</Link>

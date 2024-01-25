@@ -3,6 +3,7 @@ TEAM
 Supabase is 100% remote.
 
 Alaister Young
+Alexander Korotkov
 Amy Q
 Andrew Smith
 Angelico de los Reyes
@@ -32,6 +33,7 @@ Jess Shears
 Joel Lee
 Jon M
 Jonny Summers-Muir
+Jordi Enric
 Joshen Lim
 Kamil Ogórek
 Kang Ming Tay
@@ -43,7 +45,7 @@ Laura C
 Leo T
 Long Hoang
 Margarita Sandomirskaia
-Marijana Šimag
+Marijana Pavlinić
 Mark Burggraf
 Monica El Khoury
 Nikita Kotlyarov
@@ -63,7 +65,9 @@ Steve Chavez
 Stojan Dimitrovski
 Supun Sudaraka Kalidasa
 Terry Sutton
+Thomas E
 Thor Schaeff
+Tom Ashley
 Tyler Fontaine
 Tyler Shukert
 TzeYiing L

@@ -247,7 +247,7 @@ Unser Ansatz für Client-Bibliotheken ist modular. Jede Unterbibliothek ist eine
 - [Vereinfachtes Chinesisch / 简体中文](/i18n/README.zh-cn.md)
 - [Schwedisch / Svenska](/i18n/README.sv.md)
 - [Thai / ไทย](/i18n/README.th.md)
-- [Traditionelles Chinesisch / 繁体中文](/i18n/README.zh-tw.md)
+- [Traditionelles Chinesisch / 繁體中文](/i18n/README.zh-tw.md)
 - [Türkisch / Türkçe](/i18n/README.tr.md)
 - [Ukrainisch / Українська](/i18n/README.uk.md)
 - [Vietnamesisch / Tiếng Việt](/i18n/README.vi-vn.md)

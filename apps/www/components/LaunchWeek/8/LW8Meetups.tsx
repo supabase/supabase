@@ -2,6 +2,7 @@ import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import { Badge } from 'ui'
 import useConfData from '../hooks/use-conf-data'
+import { SupabaseClient } from '@supabase/supabase-js'
 
 export interface Meetup {
   id?: any
@@ -16,7 +17,7 @@ const LW8Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
   const { supabase } = useConfData()
   const [meets, setMeets] = useState<Meetup[]>(meetups ?? [])
   const [realtimeChannel, setRealtimeChannel] = useState<ReturnType<
-    (typeof supabase)['channel']
+    SupabaseClient['channel']
   > | null>(null)
 
   useEffect(() => {
@@ -33,7 +34,7 @@ const LW8Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
           },
           async () => {
             const { data: newMeets } = await supabase.from('lw8_meetups').select('*')
-            setMeets(newMeets)
+            setMeets(newMeets!)
           }
         )
         .subscribe()
@@ -65,7 +66,7 @@ const LW8Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
                 className={[
                   'w-full group py-0 flex items-center gap-2 md:gap-4 text-lg sm:text-2xl xl:text-4xl border-b border-[#111718]',
                   'hover:text-foreground',
-                  isLive ? 'text-light' : 'text-[#56646B]',
+                  isLive ? 'text-foreground-light' : 'text-[#56646B]',
                   !link && 'pointer-events-none',
                 ].join(' ')}
               >

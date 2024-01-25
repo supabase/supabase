@@ -80,6 +80,8 @@ export const useConsent = () => {
           id: 'consent-toast',
           position: 'bottom-right',
           duration: Infinity,
+          className:
+            '!w-screen !-m-4 !border-t !rounded-none !max-w-none !bg-overlay !text sm:!m-0 sm:!rounded-lg sm:!w-auto sm:!max-w-[400px] sm:border',
         }
       )
     }

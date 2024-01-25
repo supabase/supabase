@@ -18,7 +18,7 @@ export default function TicketBrickWall({ users }: Props) {
     <div className="relative pb-16 pt-16 md:pt-28">
       <div className="mx-auto">
         <div className="max-w-[38rem] mb-8 mx-auto">
-          <h2 className="text-center radial-gradient-text-scale-500">Tickets from the community</h2>
+          <h2 className="text-center radial-gradient-text-500">Tickets from the community</h2>
         </div>
         <div
           className="grid py-4 relative
@@ -41,7 +41,7 @@ export default function TicketBrickWall({ users }: Props) {
             onClick={() => window.scrollTo(0, 0)}
             className="text-white"
           >
-            <Link href="/launch-week/tickets">View all tickets</Link>
+            <Link href="/launch-week/8/tickets">View all tickets</Link>
           </Button>
         </div>
       </div>

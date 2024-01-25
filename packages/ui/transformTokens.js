@@ -251,7 +251,8 @@ themeFiles.map(function (filePath, i) {
             options: {
               showFileHeader: false,
               outputReferences: true,
-              selector: `.${fileName}`,
+              selector: `[data-theme='${fileName}'],
+.${fileName}`,
             },
             filter: (token) => token.filePath === filePath,
           },

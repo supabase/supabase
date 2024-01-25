@@ -95,7 +95,7 @@ function ImageCarousel(props: ImageCarouselProps) {
             </Tabs>
           </div>
           <div
-            className={`overflow-hidden rounded-md border border-gray-100 bg-gray-800 dark:border-gray-600 ${ImageCarouselStyles['gradient-bg']}`}
+            className={`overflow-hidden rounded-md border border-control bg-border-stronger ${ImageCarouselStyles['gradient-bg']}`}
           >
             <Swiper
               // @ts-ignore

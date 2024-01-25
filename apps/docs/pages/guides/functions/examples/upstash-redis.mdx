@@ -41,12 +41,11 @@ supabase functions new upstash-redis-counter
 And add the code to the `index.ts` file:
 
 ```ts index.ts
-import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { Redis } from 'https://deno.land/x/upstash_redis@v1.19.3/mod.ts'
 
 console.log(`Function "upstash-redis-counter" up and running!`)
 
-serve(async (_req) => {
+Deno.serve(async (_req) => {
   try {
     const redis = new Redis({
       url: Deno.env.get('UPSTASH_REDIS_REST_URL')!,
