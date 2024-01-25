@@ -3689,7 +3689,7 @@ functions:
           
           //This flow will automatically emit the user's initial data and then emits new values on update. The flow ends on deletion
           val user: Flow<User> = channel.postgresSingleDataFlow(schema = "public", table = "users", primaryKey = User::id) {
-              //This is the same filter as used in postgrest, so you could use complex queries, but only one entry is fetched.
+              //This is the same filter as used in postgrest, so you could use complex queries, but only one entry is fetched
               eq("id", 1)
           }
           
