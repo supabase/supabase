@@ -32,7 +32,7 @@ git clone https://github.com/supabase-community/firebase-to-supabase.git
 }
 ```
 
-1. Go to the [Database settings](https://app.supabase.com/project/_/settings/database) for your project in the Supabase Dashboard.
+1. Go to the [Database settings](https://supabase.com/dashboard/project/_/settings/database) for your project in the Supabase Dashboard.
 1. Under **Connection Info**, copy the Host string and replace the entry in your `supabase-service.json` file.
 1. Enter the password you used when you created your Supabase project in the `password` entry in the `supabase-service.json` file.
 
@@ -52,7 +52,7 @@ git clone https://github.com/supabase-community/firebase-to-supabase.git
 1. At the top right of the users list, open the menu (3 dots) and click **Password hash parameters**.
 1. Copy and save the parameters for `base64_signer_key`, `base64_salt_separator`, `rounds`, and `mem_cost`.
 
-```bash title=Sample%20password%20hash%20parameters
+```text Sample
 hash_config {
   algorithm: SCRYPT,
   base64_signer_key: XXXX/XXX+XXXXXXXXXXXXXXXXX+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX==,

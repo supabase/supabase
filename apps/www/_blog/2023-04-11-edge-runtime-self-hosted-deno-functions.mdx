@@ -1,0 +1,216 @@
+---
+title: 'Supabase Edge Runtime: Self-hosted Deno Functions'
+description: We are open-sourcing Supabase Edge Runtime allowing you to host your Edge Functions anywhere.
+launchweek: 7
+categories:
+  - product
+tags:
+  - launch-week
+  - functions
+date: '2023-04-11'
+toc_depth: 3
+author: laktek,inian
+image: launch-week-7/day-2-edge-runtime/edge-runtime-og.jpg
+thumb: launch-week-7/day-2-edge-runtime/edge-runtime-thumb.jpeg
+---
+
+<div className="bg-gray-300 rounded-lg px-6 py-2 bold">
+
+🆕✨ Edge Functions now natively supports npm modules and Node built-in APIs. [Learn more](https://supabase.com/blog/edge-functions-node-npm)
+
+</div>
+
+Today we’re open-sourcing [Supabase Edge Runtime](https://github.com/supabase/edge-runtime) for self-hosting Deno Edge Functions.
+
+Edge Runtime is MIT licensed, written in Rust, and based on the latest Deno Runtime (1.32+). If you’ve been using the Supabase CLI to serve functions then you’re already one of our Beta testers (thanks!).
+
+<div className="video-container">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/cPGxPl1lx4Y"
+    title="YouTube video player"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+  ></iframe>
+</div>
+
+## Host your Edge Functions anywhere
+
+![Self-hosted functions tweet](/images/blog/launch-week-7/day-2-edge-runtime/self-hosted-functions-tweet.png)
+
+We [launched](/blog/supabase-edge-functions) Supabase Edge Functions a little more than a year ago. We use [Deno Deploy](https://deno.com/deploy) to host your edge functions globally across 30+ data centers, so your users get super fast responses. This setup works great for us! We didn’t have an easy solution for self-hosting Edge Functions. We’re releasing Edge Runtime to address this.
+
+<div className="bg-gray-300 rounded-lg px-6 py-2 italic">
+
+One of our core principles is “[Everything is portable](/docs/guides/getting-started/architecture#everything-is-portable)”, meaning you should be able to take any part of the Supabase stack and host it yourself.
+
+</div>
+
+Supabase Edge Runtime is a web server written in Rust that uses a custom Deno runtime. It can serve TypeScript, JavaScript, and WASM functions. All your existing Edge Functions run on Edge Runtime without changing a single line of code.
+
+## Better local development experience
+
+Self-hosting is not the only benefit of Edge Runtime. It will improve the local development experience of Edge Functions.
+
+### Serve all functions
+
+Supabase CLI can now serve all local Edge Functions by running `supabase functions serve`. Previously, you could only serve a single Edge Function at a time. This was not a great experience for local development. Some of you even devised [clever hacks](https://github.com/orgs/supabase/discussions/6786) to get around this limitation.
+
+When you run `supabase functions serve`, the CLI uses Edge Runtime to serve all functions. It supports JWT verification, import maps, and passing custom environment variables. It hot-reloads local changes, giving you a seamless development experience.
+
+### Dev/Prod parity
+
+Edge Runtime improves Dev/Prod parity for Edge Functions. You may have encountered issues where an Edge Function works locally but fails when deployed. The main cause for this is Deno Deploy Runtime is more restrictive and [only supports](https://deno.com/deploy/docs/runtime-api) a subset of Deno APIs. Edge Runtime exposes the same APIs available in the Deno Deploy Runtime. This will help you spot issues faster while developing and avoid surprises when deploying.
+
+### Enforcing memory/duration limits
+
+Another neat feature we built into Edge Runtime is the option to enforce limits on memory and wall-clock durations. Currently, we are setting them to sensible defaults (memory set to 150 MB and execution duration set to 60s). This will allow you to simulate your functions’ resource usage and handle the behavior if they run into the limits. Soon we will allow configuring these limits via CLI config so that you can match them with the real limits of the deployment platform.
+
+## How to self-host Edge Functions
+
+We have put together a demo on how to self-host edge functions on [Fly.io](http://Fly.io) (you can also use other providers like Digital Ocean or AWS).
+
+To try it yourself:
+
+1. Sign up for an [Fly.io](http://Fly.io) account and install [flyctl](https://fly.io/docs/hands-on/install-flyctl/)
+2. Clone the [demo repository](https://github.com/supabase/self-hosted-edge-functions-demo) to your machine
+3. Copy your Edge Function into the `./functions` directory in the demo repo.
+4. Update the Dockerfile to pull the latest edge-runtime image (check [releases](https://github.com/supabase/edge-runtime/pkgs/container/edge-runtime))
+5. Optionally edit `./functions/main/index.ts`, adding any other request preprocessing logic (for example, you can enable JWT validation, handle CORS requests)
+6. Run `fly launch` to create a new app to serve your Edge Functions
+7. Access your Edge Function by visiting:
+
+   `https://{your-app-name}.fly.dev/{your-function-name}`
+
+View the logs for the Edge Runtime by visiting Fly.io’s Dashboard > Your App > Metrics. You can serve Edge Runtime from multiple regions by running `fly regions add [REGION]`.
+
+## Standing on the shoulders of Deno
+
+You may wonder why we cannot use Deno Runtime to self-host functions. Isn’t it open-source and available as a Docker container?
+
+[Deno Runtime](https://deno.com/runtime), by default, includes a wide array of built-in APIs, making it easy to use for multiple use cases out of the box. However, this makes it difficult to use for serving web requests. You need the runtime embedded within a web server that can boot fast and, for security, has a more restricted API.
+
+However, Deno’s architecture makes it easy to extend its core capabilities and create a customized runtime to match our needs. Deno provides a Rust crate called `deno_core`, which abstracts the interactions with V8 JavaScript engine. Using `deno_core` we can create a JS context (known as a V8 Isolate). A V8 isolate has minimal overhead to boot up and a single process can host multiple V8 isolates. When you load a web page that contains scripts from multiple domains in a browser, each of them runs in a separate v8 isolate.
+
+<div className="bg-gray-300 rounded-lg px-6 py-2 italic">
+
+Deno team has a detailed 2-part blog post on [how to create a custom runtime](https://deno.com/blog/roll-your-own-javascript-runtime).
+
+</div>
+
+Edge Runtime implements an HTTP server (using [hyper](https://github.com/hyperium/hyper)) that listens to incoming requests. When Edge Runtime is booted, it spins up a JS context (V8 isolate), which we call the `Main Worker`. Main Worker runs in a separate thread, executing the provided main module. When a new HTTP request is received, the Rust runtime will forward it to the Main Worker.
+
+You can write a main module to handle all incoming requests. This would look like a typical Deno Edge Function. The main difference is that it has access to a global object called “`EdgeRuntime`”.
+
+`EdgeRuntime` global provides methods to create and access `UserWorkers`. `Main Worker` can optionally delegate a request to a UserWorker to handle and respond.
+
+User Workers are separate JS contexts (V8 isolates) that can run a given Edge Function. They have a restricted API (for example, they don’t get access to the host machine’s environment variables). You can also control the memory and duration a User Worker can run.
+
+<Img
+  alt="diagram reference"
+  className="!m-0"
+  src={{
+    light: '/images/blog/launch-week-7/day-2-edge-runtime/edge-runtime-light-mode.svg',
+    dark: '/images/blog/launch-week-7/day-2-edge-runtime/edge-runtime-dark-mode.svg',
+  }}
+/>
+
+Here’s a simple implementation of a Main Worker that receives a request, then creates a User Worker and passes the handling of request to the worker.
+
+```jsx
+serve(async (req: Request) => {
+  const memoryLimitMb = 150
+  const workerTimeoutMs = 1 * 60 * 1000
+  const noModuleCache = false
+  const importMapPath = null
+  const envVars = [
+    ['USER', 'foo'],
+    ['PASSWORD', 'BAR'],
+  ]
+
+  try {
+    const worker = await EdgeRuntime.userWorkers.create({
+      servicePath,
+      memoryLimitMb,
+      workerTimeoutMs,
+      noModuleCache,
+      importMapPath,
+      envVars,
+    })
+    return await worker.fetch(req)
+  } catch (e) {
+    const error = { msg: e.toString() }
+    return new Response(JSON.stringify(error), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+})
+```
+
+## What’s Next?
+
+Open-sourcing Edge Runtime is the first step of an exciting roadmap we have planned for Edge Functions. In the coming months, you will see tighter integrations with the rest of the Supabase ecosystem. Here are some sneak peeks at what is to come next.
+
+### API Gateway to other Supabase services
+
+We plan to use Edge Runtime as a replacement for Kong, acting as an API gateway to other Supabase services. This will not only simplify the self-hosting setup but also give you the option to do Request pre/post-processing using JavaScript.
+
+Here’s a simple example of re-routing a request to a different endpoint using Edge Runtime.
+
+```jsx
+serve(async (req) => {
+  try {
+    if (req.url.endsWith('/rest/v1/old_table')) {
+      return await fetch('http://rest:3000/rest/v1/new_table', {
+        headers: req.headers,
+        method: req.method,
+        body: req.body,
+      })
+    }
+  } catch (e) {
+    const error = { msg: e.toString() }
+    return new Response(JSON.stringify(error), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+})
+```
+
+### Scheduled Functions
+
+Since Edge Runtime’s Main Worker runs in the background as long as the server is running, we can utilize it to run periodic tasks.
+
+For example, here’s a naive implementation of how it can be used to trigger a function every 2 minutes. In production, you need to account for server restarts and timer resetting.
+
+```jsx
+const interval = 2 * 60 * 1000 // 2 minutes
+try {
+  const worker = await EdgeRuntime.userWorkers.create({
+    servicePath,
+    memoryLimitMb,
+    workerTimeoutMs,
+    noModuleCache,
+    importMapPath,
+    envVars,
+  })
+  const req = new Request('http://localhost/scheduled-job')
+  setInterval(() => worker.fetch(req), interval)
+} catch (e) {
+  console.error(e)
+}
+```
+
+### Custom Global Objects
+
+Another exciting thing about shipping a custom JavaScript runtime is that we can control the available global objects in the runtime. In previous examples, you may noticed we used `EdgeRuntime` without importing a specific module to our function, this was possible because we exposed it as a global object in the runtime.
+
+We can introduce a `Supabase` global object that can provide platform specific features. For example, similar to `Deno.writeTextFile` , we can expose a `Supabase.writeTextFile` which can directly write a file to Supabase Storage.
+
+## We 💚 Contributions
+
+We are excited to build Edge Runtime in public and involve the Supabase community in the process. As an initial beta release, there are still bugs and performance quirks to be ironed out. Don’t shy away from trying it though.
+
+You can report any issues you encounter in repo’s [GitHub issues](https://github.com/supabase/edge-runtime/issues). If you have ideas on how to make edge-runtime better, reach out via [Twitter](https://twitter.com/supabase) or [Discord](http://discord.supabase.com).

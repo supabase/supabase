@@ -6,7 +6,13 @@ import SideBar from '~/components/Navigation/SideBar'
 import TableOfContents from '~/components/TableOfContents'
 
 interface Props {
-  meta: { title: string; description?: string; hide_table_of_contents?: boolean; video?: string }
+  meta: {
+    title: string
+    description?: string
+    hide_table_of_contents?: boolean
+    video?: string
+    tocVideo?: string
+  }
   children: any
   toc?: any
   menuItems: any
@@ -14,18 +20,7 @@ interface Props {
 }
 
 const Layout: FC<Props> = (props: Props) => {
-  // const contentString = renderToString(props.children)
   const [active, setActive] = useState(false)
-
-  useEffect(() => {
-    const key = localStorage.getItem('supabaseDarkMode')
-    if (!key) {
-      // Default to dark mode if no preference config
-      document.documentElement.className = 'dark'
-    } else {
-      document.documentElement.className = key === 'true' ? 'dark' : ''
-    }
-  }, [])
 
   useEffect(() => {
     setTimeout(function () {
@@ -50,7 +45,7 @@ const Layout: FC<Props> = (props: Props) => {
       <Head>
         <title>{props.meta?.title} | Supabase</title>
         <meta name="description" content={props.meta?.description} />
-        <meta content="width=device-width, initial-scale=1" name="viewport" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="icon" href="/docs/favicon.ico" />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content={props.meta?.title} />
@@ -66,10 +61,10 @@ const Layout: FC<Props> = (props: Props) => {
         ].join(' ')}
       >
         <div>
-          <p className="text-brand-900 tracking-wider">Tutorials</p>
-          <article className={['prose dark:prose-dark ', 'max-w-none'].join(' ')}>
+          <p className="text-brand tracking-wider">Tutorials</p>
+          <article className={['prose', 'max-w-none'].join(' ')}>
             <h1>{props.meta.title}</h1>
-            <div className="max-w-xs w-32 h-[1px] bg-gradient-to-r from-brand-800 to-brand-900 my-16"></div>
+            <div className="max-w-xs w-32 h-[1px] bg-gradient-to-r from-brand-300 to-brand my-16"></div>
 
             <MDXProvider components={components} children={props.children} />
           </article>
@@ -77,7 +72,7 @@ const Layout: FC<Props> = (props: Props) => {
         {hasTableOfContents && !props.meta?.hide_table_of_contents && (
           <div
             className={[
-              'border-scale-400 dark:bg-scale-200 table-of-contents-height border-l',
+              'border-overlay bg-background table-of-contents-height border-l',
               'thin-scrollbar overflow-y-auto sticky hidden md:block md:col-span-3 px-2',
             ].join(' ')}
           >

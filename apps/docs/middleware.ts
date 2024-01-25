@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server'
 import isbot from 'isbot'
 
 export function middleware(request: NextRequest) {
-  const specs = ['javascript', 'dart']
+  const specs = ['javascript', 'dart', 'csharp']
 
   let version = ''
   if (request.url.includes('/v1/')) {

@@ -18,7 +18,7 @@
       }
 
       .cls-2 {
-        stroke-dasharray: 0 0 4.17 2.08;
+        strokeDasharray: 0 0 4.17 2.08;
       }
 
       .cls-3 {

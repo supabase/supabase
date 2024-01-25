@@ -5,6 +5,10 @@
 - https://deno.com/deploy/docs/tutorial-discord-slash
 - https://discord.com/developers/docs/interactions/application-commands#slash-commands
 
+## Watch the Video Tutorial
+
+[![video tutorial](https://img.youtube.com/vi/J24Bvo_m7DM/0.jpg)](https://www.youtube.com/watch?v=J24Bvo_m7DM)
+
 ## Create an application on Discord Developer Portal
 
 1. Go to [https://discord.com/developers/applications](https://discord.com/developers/applications) (login using your discord account if required).
@@ -58,7 +62,11 @@ Open Discord, type `/Promise` and press **Enter**.
 
 ## Run locally
 
+First, start the bot on your local machine
 ```bash
-supabase functions serve discord-bot --no-verify-jwt --env-file ./supabase/functions/discord-bot/.env
-ngrok http 54321
+supabase functions serve discord-bot --no-verify-jwt --env-file ./supabase/.env.local
 ```
+
+To use it with Discord you'll need a Public URL. There are a couple of options. 
+1. [Tunnelmole](https://github.com/robbie-cahill/tunnelmole-client), an open source tunneling tool that will create a public URL that forwards traffic to your local development environment through a secure tunnel. View the [README](https://github.com/robbie-cahill/tunnelmole-client) for installation instructions then run `tmole 54321` 
+2. [ngrok](https://ngrok.com/) is a popular closed source tunneling tool. Go to the website to download and install it, then run `ngrok http 54321`

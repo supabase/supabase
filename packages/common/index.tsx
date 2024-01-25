@@ -1,10 +1,7 @@
-import React from 'react'
-
-import SidebarLayout from './layouts/SidebarLayout'
-
-export * from './Button'
 export * from './Providers'
-
-export const Layouts = {
-  SidebarLayout,
-}
+export * from './constants'
+export * from './helpers'
+export * from './hooks'
+export * from './gotrue'
+export * from './auth'
+export * from './telemetry'

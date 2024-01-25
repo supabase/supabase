@@ -1,0 +1,415 @@
+---
+id: installing
+title: 'Installing & Initialization'
+slug: installing
+custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+---
+
+### Add one or more modules to your project
+
+<RefSubLayout.EducationRow>
+    <RefSubLayout.Examples>
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            <a href="https://github.com/supabase-community/supabase-kt/releases" style={{ marginRight: '8px' }}>
+                <img src="https://img.shields.io/github/release/supabase-community/supabase-kt?label=stable" alt="latest stable supabase-kt version"/>
+            </a>
+            <a href="https://github.com/supabase-community/supabase-kt/releases">
+                <img src="https://img.shields.io/maven-central/v/io.github.jan-tennert.supabase/supabase-kt?label=experimental" alt="latest supabase-kt version"/>
+            </a>
+        </div>
+        Add dependency to your build file:
+        <Tabs
+            size="small"
+            type="underlined"
+            defaultActiveId="kotlin"
+            queryGroup="build-file"
+        >
+            <TabPanel id="kotlin" label="build.gradle.kts">
+
+                ```kotlin
+                implementation("io.github.jan-tennert.supabase:[module]:VERSION")
+                ```
+
+            </TabPanel>
+            <TabPanel id="groovy" label="build.gradle">
+
+                ```groovy
+                implementation 'io.github.jan-tennert.supabase:[module]:VERSION'
+                ```
+
+            </TabPanel>
+            <TabPanel id="xml" label="pom.xml">
+
+                ```xml
+                <dependency>
+                    <groupId>io.github.jan-tennert.supabase</groupId>
+                    <artifactId>[module]</artifactId>
+                    <version>VERSION</version>
+                </dependency>
+                ```
+
+            </TabPanel>
+        </Tabs>
+
+        The available modules are:
+        - [**gotrue-kt**](https://github.com/supabase-community/supabase-kt/tree/master/GoTrue)
+        - [**realtime-kt**](https://github.com/supabase-community/supabase-kt/tree/master/Realtime)
+        - [**storage-kt**](https://github.com/supabase-community/supabase-kt/tree/master/Storage)
+        - [**functions-kt**](https://github.com/supabase-community/supabase-kt/tree/master/Functions)
+        - [**postgrest-kt**](https://github.com/supabase-community/supabase-kt/tree/master/Postgrest)
+        - [apollo-graphql](https://github.com/supabase-community/supabase-kt/tree/master/plugins/ApolloGraphQL) - Creates an [Apollo GraphQL Client](https://github.com/apollographql/apollo-kotlin) for interacting with the Supabase API.
+        - [compose-auth](https://github.com/supabase-community/supabase-kt/tree/master/plugins/ComposeAuth) - Provides easy Native Google & Apple Auth for Compose Multiplatform targets.
+        - [compose-auth-ui](https://github.com/supabase-community/supabase-kt/tree/master/plugins/ComposeAuthUI) - Provides UI Components for Compose Multiplatform.
+        - [coil-integration](https://github.com/supabase-community/supabase-kt/tree/master/plugins/CoilIntegration) - Provides a [Coil](https://github.com/coil-kt/coil) Integration for displaying images stored in Supabase Storage.
+        - [imageloader-integration](https://github.com/supabase-community/supabase-kt/tree/master/plugins/ImageLoaderIntegration) - Provides a [Compose ImageLoader](https://github.com/qdsfdhvh/compose-imageloader) Integration for displaying images stored in Supabase Storage.
+
+        When using multiple modules, you can also use the BOM dependency to ensure that all modules use the same version:
+
+        <Tabs
+            size="small"
+            type="underlined"
+            defaultActiveId="kotlin"
+            queryGroup="build-file"
+        >
+            <TabPanel id="kotlin" label="build.gradle.kts">
+
+                ```kotlin
+                implementation(platform("io.github.jan-tennert.supabase:bom:VERSION"))
+                implementation("io.github.jan-tennert.supabase:postgrest-kt")
+                implementation("io.github.jan-tennert.supabase:realtime-kt")
+                ```
+
+            </TabPanel>
+            <TabPanel id="groovy" label="build.gradle">
+
+                ```groovy
+                implementation platform("io.github.jan-tennert.supabase:bom:VERSION")
+                implementation 'io.github.jan-tennert.supabase:postgrest-kt'
+                implementation 'io.github.jan-tennert.supabase:realtime-kt'
+                ```
+
+            </TabPanel>
+            <TabPanel id="xml" label="pom.xml">
+
+                ```xml
+                <dependency>
+                    <groupId>io.github.jan-tennert.supabase</groupId>
+                    <artifactId>bom</artifactId>
+                    <version>VERSION</version>
+                    <type>pom</type>
+                    <scope>import</scope>
+                </dependency>
+                <dependency>
+                    <groupId>io.github.jan-tennert.supabase</groupId>
+                    <artifactId>postgrest-kt</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>io.github.jan-tennert.supabase</groupId>
+                    <artifactId>realtime-kt</artifactId>
+                </dependency>
+                ```
+
+            </TabPanel>
+        </Tabs>
+
+    </RefSubLayout.Examples>
+
+</RefSubLayout.EducationRow>
+
+### Add Ktor Client Engine to each of your Kotlin targets (required)
+
+<RefSubLayout.EducationRow>
+    <RefSubLayout.Examples>
+
+        You can find a list of engines [here](https://ktor.io/docs/http-client-engines.html)
+
+        <Tabs
+            size="small"
+            type="underlined"
+            defaultActiveId="kotlin"
+            queryGroup="build-file"
+        >
+            <TabPanel id="kotlin" label="build.gradle.kts">
+
+                ```kotlin
+                implementation("io.ktor:ktor-client-[engine]:KTOR_VERSION")
+                ```
+
+            </TabPanel>
+            <TabPanel id="groovy" label="build.gradle">
+
+                ```groovy
+                implementation 'io.ktor:ktor-client-[engine]:KTOR_VERSION'
+                ```
+
+            </TabPanel>
+            <TabPanel id="xml" label="pom.xml">
+
+                ```xml
+                <dependency>
+                    <groupId>io.ktor</groupId>
+                    <artifactId>ktor-client-[engine]</artifactId>
+                    <version>KTOR_VERSION</version>
+                </dependency>
+                ```
+
+            </TabPanel>
+        </Tabs>
+
+        Multiplatform example:
+
+        <Tabs
+            size="small"
+            type="underlined"
+            defaultActiveId="kotlin"
+            queryGroup="build-file"
+        >
+            <TabPanel id="kotlin" label="build.gradle.kts">
+
+                ```kotlin
+                val commonMain by getting {
+                    dependencies {
+                        //supabase modules
+                    }
+                }
+                val jvmMain by getting {
+                    dependencies {
+                        implementation("io.ktor:ktor-client-cio:KTOR_VERSION")
+                    }
+                }
+                val androidMain by getting {
+                    dependsOn(jvmMain)
+                }
+                val jsMain by getting {
+                    dependencies {
+                        implementation("io.ktor:ktor-client-js:KTOR_VERSION")
+                    }
+                }
+                val iosMain by getting {
+                    dependencies {
+                        implementation("io.ktor:ktor-client-darwin:KTOR_VERSION")
+                    }
+                }
+                ```
+
+            </TabPanel>
+        </Tabs>
+
+    </RefSubLayout.Examples>
+
+</RefSubLayout.EducationRow>
+
+### Serialization
+
+supabase-kt provides several different ways to encode and decode your custom objects.
+By default, [KotlinX Serialization](https://github.com/Kotlin/kotlinx.serialization) is used.
+
+<RefSubLayout.EducationRow>
+    <RefSubLayout.Details>
+
+        Use [KotlinX Serialization](https://github.com/Kotlin/kotlinx.serialization).
+
+    </RefSubLayout.Details>
+    <RefSubLayout.Examples>
+
+        <Tabs
+            size="small"
+            type="underlined"
+            defaultActiveId="kotlin"
+            queryGroup="build-file"
+        >
+            <TabPanel id="kotlin" label="build.gradle.kts">
+
+                ```kotlin
+                plugins {
+                    kotlin("plugin.serialization") version "KOTLIN_VERSION"
+                }
+                ```
+
+            </TabPanel>
+            <TabPanel id="groovy" label="build.gradle">
+
+                ```groovy
+                plugins {
+                    id 'org.jetbrains.kotlin.plugin.serialization' version 'KOTLIN_VERSION'
+                }
+                ```
+
+            </TabPanel>
+            <TabPanel id="xml" label="pom.xml">
+
+                ```xml
+                <build>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.jetbrains.kotlin</groupId>
+                            <artifactId>kotlin-maven-plugin</artifactId>
+                            <version>${kotlin.version}</version>
+                            <executions>
+                                <execution>
+                                    <id>compile</id>
+                                    <phase>compile</phase>
+                                    <goals>
+                                        <goal>compile</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                            <configuration>
+                                <compilerPlugins>
+                                    <plugin>kotlinx-serialization</plugin>
+                                </compilerPlugins>
+                            </configuration>
+                            <dependencies>
+                                <dependency>
+                                    <groupId>org.jetbrains.kotlin</groupId>
+                                    <artifactId>kotlin-maven-serialization</artifactId>
+                                    <version>${kotlin.version}</version>
+                                </dependency>
+                            </dependencies>
+                        </plugin>
+                    </plugins>
+                </build>
+                ```
+
+            </TabPanel>
+        </Tabs>
+        ```kotlin
+        val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
+            //Already the default serializer, but you can provide a custom Json instance (optional):
+            defaultSerializer = KotlinXSerializer(Json {
+                //apply your custom config
+            })
+        }
+        ```
+    </RefSubLayout.Examples>
+
+</RefSubLayout.EducationRow>
+<RefSubLayout.EducationRow>
+    <RefSubLayout.Details>
+
+        Use [Moshi](https://github.com/square/moshi).
+
+    </RefSubLayout.Details>
+    <RefSubLayout.Examples>
+
+        <Tabs
+            size="small"
+            type="underlined"
+            defaultActiveId="kotlin"
+            queryGroup="build-file"
+        >
+            <TabPanel id="kotlin" label="build.gradle.kts">
+
+                ```kotlin
+                implementation("io.github.jan-tennert.supabase:serializer-moshi:VERSION")
+                ```
+
+            </TabPanel>
+            <TabPanel id="groovy" label="build.gradle">
+
+                ```groovy
+                implementation 'io.github.jan-tennert.supabase:serializer-moshi:VERSION'
+                ```
+
+            </TabPanel>
+            <TabPanel id="xml" label="pom.xml">
+
+                ```xml
+                <dependency>
+                    <groupId>io.github.jan-tennert.supabase</groupId>
+                    <artifactId>serializer-moshi</artifactId>
+                    <version>VERSION</version>
+                </dependency>
+                ```
+
+            </TabPanel>
+        </Tabs>
+        ```kotlin
+        val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
+            defaultSerializer = MoshiSerializer()
+        }
+        ```
+
+    </RefSubLayout.Examples>
+
+</RefSubLayout.EducationRow>
+<RefSubLayout.EducationRow>
+    <RefSubLayout.Details>
+
+        Use [Jackson](https://github.com/FasterXML/jackson-module-kotlin).
+
+    </RefSubLayout.Details>
+    <RefSubLayout.Examples>
+
+        <Tabs
+            size="small"
+            type="underlined"
+            defaultActiveId="kotlin"
+            queryGroup="build-file"
+        >
+            <TabPanel id="kotlin" label="build.gradle.kts">
+
+                ```kotlin
+                implementation("io.github.jan-tennert.supabase:serializer-jackson:VERSION")
+                ```
+
+            </TabPanel>
+            <TabPanel id="groovy" label="build.gradle">
+
+                ```groovy
+                implementation 'io.github.jan-tennert.supabase:serializer-jackson:VERSION'
+                ```
+
+            </TabPanel>
+            <TabPanel id="xml" label="pom.xml">
+
+                ```xml
+                <dependency>
+                    <groupId>io.github.jan-tennert.supabase</groupId>
+                    <artifactId>serializer-jackson</artifactId>
+                    <version>VERSION</version>
+                </dependency>
+                ```
+
+            </TabPanel>
+        </Tabs>
+        ```kotlin
+        val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
+            defaultSerializer = JacksonSerializer()
+        }
+        ```
+
+    </RefSubLayout.Examples>
+
+</RefSubLayout.EducationRow>
+<RefSubLayout.EducationRow>
+    <RefSubLayout.Details>
+
+        Use custom serializer.
+
+    </RefSubLayout.Details>
+    <RefSubLayout.Examples>
+
+        ```kotlin
+        class CustomSerializer: SupabaseSerializer {
+
+            override fun <T : Any> encode(type: KType, value: T): String {
+                //encode value to string
+            }
+
+            override fun <T : Any> decode(type: KType, value: String): T {
+                //decode value
+            }
+
+        }
+        ```
+
+        ```kotlin
+        val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
+            defaultSerializer = CustomSerializer()
+        }
+        ```
+
+    </RefSubLayout.Examples>
+
+</RefSubLayout.EducationRow>

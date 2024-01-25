@@ -8,11 +8,18 @@ author_image_url: https://github.com/dragarcia.png
 authorURL: https://github.com/dragarcia
 image: bouncer/pgbouncer-og.jpg
 thumb: bouncer/pgbouncer-thumb.jpg
+categories:
+  - product
 tags:
   - database
   - engineering
 date: '2021-04-02'
 ---
+
+<Admonition type="caution">
+  PgBouncer is now deprecated. Use
+  [Supavisor](https://supabase.com/blog/supavisor-postgres-connection-pooler) instead.
+</Admonition>
 
 Javascript Frameworks like [Next.js,](https://nextjs.org/) [Redwood](https://redwoodjs.com/), [Blitz](https://blitzjs.com/), and tools
 like [Prisma](https://www.prisma.io/docs/guides/deployment/deployment#pgbouncer) are all moving in one direction. Serverless.
@@ -92,7 +99,7 @@ This is the most granular option. Connections are returned to the pool after eve
 
 ## What's next?
 
-Try out connection pooling now with a new project in the [dashboard.](https://app.supabase.com) For now, we do not have any plans to port this over to older projects.
+Try out connection pooling now with a new project in the [dashboard.](https://supabase.com/dashboard) For now, we do not have any plans to port this over to older projects.
 
 Eventually, we will expose more PgBouncer settings to the UI such as `Pool Size`. At the moment it is set to `15`.
 

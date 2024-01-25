@@ -9,7 +9,7 @@ import SwiperCore, { Navigation, Pagination } from 'swiper'
 import Link from 'next/link'
 import { Button, IconGitHub, IconArrowLeft, IconArrowRight, IconBookOpen } from 'ui'
 
-import Examples from '../../data/Examples.json'
+import Examples from '~/data/Examples'
 import ExampleCard from '../ExampleCard'
 
 // install Swiper modules
@@ -31,20 +31,17 @@ function GithubExamples() {
             Supported by a network of early advocates, contributors, and champions.
           </p>
           <div className="flex items-center justify-center gap-2 py-4">
-            <Link href="/docs/guides/auth/overview" passHref>
-              <Button size="small" as="a" type="default" icon={<IconBookOpen size={12} />}>
-                View guides
-              </Button>
-            </Link>
-            <Link
-              href="https://github.com/supabase/supabase/tree/master/examples"
-              as="https://github.com/supabase/supabase/tree/master/examples"
-              passHref
-            >
-              <Button size="small" as="a" type="default" icon={<IconGitHub size={12} />}>
+            <Button asChild size="small" type="default" icon={<IconBookOpen size={12} />}>
+              <Link href="/docs/guides/auth/overview">View guides</Link>
+            </Button>
+            <Button asChild size="small" type="default" icon={<IconGitHub size={12} />}>
+              <Link
+                href="https://github.com/supabase/supabase/tree/master/examples"
+                as="https://github.com/supabase/supabase/tree/master/examples"
+              >
                 Official GitHub library
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         </div>
       </div>
@@ -53,6 +50,7 @@ function GithubExamples() {
         <div className={'lg:-mr-32 lg:-ml-32'}>
           <Swiper
             style={{ overflow: 'visible' }}
+            loop={true}
             initialSlide={3}
             spaceBetween={0}
             slidesPerView={4}

@@ -7,23 +7,11 @@ export const meta = {
   sidebar_label: 'Overview',
 }
 
-Every Supabase project comes with a full [Postgres](https://www.postgresql.org/) database, a free and open source
-database which is considered one of the world's most stable and advanced databases.
-
-## Postgres or PostgreSQL?
-
-PostgreSQL the database was derived from the POSTGRES Project, a package written at the University of California at Berkeley in 1986.
-This package included a query language called "PostQUEL".
-
-In 1994, Postgres95 was built on top of POSTGRES code, adding an SQL language interpreter as a replacement for PostQUEL.
-Eventually, Postgres95 was renamed to PostgreSQL to reflect the SQL query capability.
-
-After this, many people referred to it as Postgres since it's less prone to confusion. Supabase is all about
-simplicity, so we also refer to it as Postgres.
+Every Supabase project comes with a full [Postgres](https://www.postgresql.org/) database, a free and open source database which is considered one of the world's most stable and advanced databases.
 
 ## Features
 
-### Table View
+### Table view
 
 You don't have to be a database expert to start using Supabase. Our table view makes Postgres as easy to use as a spreadsheet.
 
@@ -33,8 +21,11 @@ You don't have to be a database expert to start using Supabase. Our table view m
 
 Dig into the relationships within your data.
 
-<video width="99%" loop="" muted="" playsInline="" controls="true">
-  <source src="/docs/videos/relational-drilldown-zoom.mp4" type="video/mp4" />
+<video width="99%" loop muted playsInline controls={true}>
+  <source
+    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/relational-drilldown-zoom.mp4"
+    type="video/mp4"
+  />
 </video>
 
 ### Clone tables
@@ -42,15 +33,21 @@ Dig into the relationships within your data.
 You can duplicate your tables, just like you would inside a spreadsheet.
 
 <video width="99%" muted playsInline controls={true}>
-  <source src="/docs/videos/duplicate-tables.mp4" type="video/mp4" muted playsInline />
+  <source
+    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/duplicate-tables.mp4"
+    type="video/mp4"
+  />
 </video>
 
-### The SQL Editor
+### The SQL editor
 
 Supabase comes with a SQL Editor. You can also save your favorite queries to run later!
 
 <video width="99%" muted playsInline controls={true}>
-  <source src="/docs/videos/favorites.mp4" type="video/mp4" muted playsInline />
+  <source
+    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/favorites.mp4"
+    type="video/mp4"
+  />
 </video>
 
 ### Additional features
@@ -62,9 +59,7 @@ Supabase comes with a SQL Editor. You can also save your favorite queries to run
 
 <Admonition type="note">
 
-Database backups **do not** include objects stored via the Storage API, as the database only
-includes metadata about these objects. Restoring an old backup does not restore objects that have
-been deleted since then.
+Database backups **do not** include objects stored via the Storage API, as the database only includes metadata about these objects. Restoring an old backup does not restore objects that have been deleted since then.
 
 </Admonition>
 
@@ -74,10 +69,25 @@ To expand the functionality of your Postgres database, you can use extensions.
 You can enable Postgres extensions with the click of a button within the Supabase dashboard.
 
 <video width="99%" muted playsInline controls={true}>
-  <source src="/docs/videos/toggle-extensions.mp4" type="video/mp4" muted playsInline />
+  <source
+    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/toggle-extensions.mp4"
+    type="video/mp4"
+  />
 </video>
 
 [Learn more](/docs/guides/database/extensions) about all the extensions provided on Supabase.
+
+## Terminology
+
+### Postgres or PostgreSQL?
+
+PostgreSQL the database was derived from the POSTGRES Project, a package written at the University of California at Berkeley in 1986.
+This package included a query language called "PostQUEL".
+
+In 1994, Postgres95 was built on top of POSTGRES code, adding an SQL language interpreter as a replacement for PostQUEL.
+Eventually, Postgres95 was renamed to PostgreSQL to reflect the SQL query capability.
+
+After this, many people referred to it as Postgres since it's less prone to confusion. Supabase is all about simplicity, so we also refer to it as Postgres.
 
 ## Tips
 
@@ -86,7 +96,7 @@ Read about resetting your database password [here](/docs/guides/database/managin
 ## Next steps
 
 - Read more about [Postgres](https://www.postgresql.org/about/)
-- Sign in: [app.supabase.com](https://app.supabase.com)
+- Sign in: [supabase.com/dashboard](https://supabase.com/dashboard)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

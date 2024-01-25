@@ -1,5 +1,7 @@
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 import * as React from 'react'
+import Image from 'next/image'
+import { cn } from '../../lib/utils'
 
 interface Props {
   title: string
@@ -8,11 +10,11 @@ interface Props {
   children?: React.ReactNode
   header?: string
   background?: boolean
-  img?: string
+  className?: string
+  logo?: string
+  logoInverse?: string
   hasLightIcon?: boolean
-
   showLink?: boolean
-
   showIconBg?: boolean
 }
 
@@ -23,27 +25,46 @@ const GlassPanel = ({
   children,
   header,
   background = true,
-  img,
+  logo,
+  logoInverse,
   hasLightIcon,
   showLink = false,
   showIconBg = false,
+  className,
 }: Props) => {
-  const { isDarkMode } = useTheme()
+  const { resolvedTheme } = useTheme()
+  const showLogoInverse = logoInverse && resolvedTheme?.includes('dark')
+  const showLogo = !showLogoInverse && logo
 
-  const IconBackground: React.FC = (props) => (
+  const IconBackground: React.FC<React.PropsWithChildren> = (props) => (
     <div
-      className={[
+      className={cn(
         'shrink-0',
-        showIconBg ? 'bg-green-600 w-8 h-8 flex items-center justify-center rounded' : '',
-      ].join(' ')}
+        showIconBg
+          ? 'bg-brand-300 border border-brand-400 w-8 h-8 flex items-center justify-center rounded'
+          : ''
+      )}
     >
       {props.children}
     </div>
   )
 
+  const LogoComponent = ({ logoImage, className }: { logoImage: string; className?: string }) => (
+    <div className="relative box-content p-8 pb-0">
+      <div className="relative h-[33px] w-auto max-w-[145px]">
+        <Image
+          src={logoImage}
+          alt={title}
+          fill
+          className={cn('object-contain object-left', className)}
+        />
+      </div>
+    </div>
+  )
+
   return (
     <div
-      className={[
+      className={cn(
         'relative',
         'h-full',
         'group',
@@ -52,11 +73,15 @@ const GlassPanel = ({
         'border rounded-lg',
         'text-left',
         background
-          ? 'border-scale-500 hover:border-scale-700 bg-white dark:bg-scale-300'
-          : 'border-scale-400 hover:border-scale-500 bg-transparent',
+          ? 'hover:border-strong bg-surface-100'
+          : 'border-muted hover:border-default bg-transparent',
         'transition',
-      ].join(' ')}
+        className
+      )}
     >
+      {showLogoInverse && <LogoComponent logoImage={logoInverse} className="opacity-50" />}
+      {showLogo && <LogoComponent logoImage={logo} className="opacity-75" />}
+
       {header && (
         <img
           src={`${header}`}
@@ -65,37 +90,37 @@ const GlassPanel = ({
             "
         />
       )}
-      <img
-        src={`/docs/img/gradient-bg.png`}
-        className="transition-all absolute left-0 -top-64 w-[258px]
-            duration-700 ease-out
-            group-hover:w-[320px]
-            "
+      <div
+        className="absolute left-0 top-0 w-[250px] h-[150px] transform scale-100 opacity-50 group-hover:scale-150 group-hover:opacity-100 transition-all duration-700 ease-out"
+        style={{ background: `radial-gradient(100% 100% at 0% 0%, #3EACCF18, transparent)` }}
       />
       <div
-        className={[
+        className={cn(
           'px-8 pb-8 relative',
           'flex flex-col h-full',
           icon ? 'gap-6' : 'gap-2',
-          !header ? 'pt-8' : '',
-        ].join(' ')}
+          !header ? 'pt-8' : ''
+        )}
       >
         <div className="flex items-center gap-3">
           {icon && typeof icon === 'string' ? (
             <IconBackground>
               <img
                 className="w-5"
-                src={`${icon}${hasLightIcon && !isDarkMode ? '-light' : ''}.svg`}
+                alt={title}
+                src={`${icon}${
+                  hasLightIcon && !resolvedTheme?.includes('dark') ? '-light' : ''
+                }.svg`}
               />
             </IconBackground>
           ) : (
             icon && <IconBackground>{icon}</IconBackground>
           )}
-          <h5 className="text-base text-scale-1200">{title}</h5>
+          <p className="text-base text-foreground">{title}</p>
         </div>
 
-        {children && <span className="text-sm text-scale-1100 flex-grow">{children}</span>}
-        {showLink && <span className="text-brand-900 justify-end text-sm">Learn more</span>}
+        {children && <span className="text-sm text-foreground-light flex-grow">{children}</span>}
+        {showLink && <span className="text-brand justify-end text-sm">Learn more</span>}
       </div>
     </div>
   )

@@ -41,7 +41,7 @@ export default [
     img: 'whiteboard.svg',
     title: 'Shared whiteboard',
     description:
-      'Allow users to collaorate on a shared whiteboard, sharing positions and states of any kind of object in Realtime.',
+      'Allow users to collaborate on a shared whiteboard, sharing positions and states of any kind of object in Realtime.',
   },
   {
     img: 'location.svg',
@@ -52,7 +52,7 @@ export default [
     img: 'multiplayer-game.svg',
     title: 'Multiplayer games',
     description:
-      "Keep track of how long a player has been playing, who's turn it is and even share to other clients what the pllayer is doing.",
+      "Keep track of how long a player has been playing, who's turn it is and even share to other clients what the player is doing.",
   },
   {
     img: 'form-presence.svg',

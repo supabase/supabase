@@ -1,0 +1,139 @@
+---
+title: 'Supabase Integrations Marketplace'
+description: 'Become a Supabase Integrations Partner: Publish OAuth Apps and Build with Supabase.'
+launchweek: 8
+categories:
+  - product
+tags:
+  - launch-week
+  - integrations
+date: '2023-08-10'
+published_at: '2023-08-10T09:00:00.001-07:00'
+toc_depth: 3
+author: thor_schaeff
+image: launch-week-8/day-4/integration-marketplace-og.jpg
+thumb: launch-week-8/day-4/integration-marketplace-thumb.jpg
+---
+
+We've been running our [Integrations Marketplace](/partners) in “stealth mode” for about a year now. What started as a dog-fooding project has now transformed into a marketplace with [over 60 integrations](/partners/integrations). (It's also an [open source template](https://vercel.com/templates/next.js/supabase-partner-gallery) that you can use yourself).
+
+![Featured](/images/blog/launch-week-8/day-4/featured-integrations.png)
+
+Supabase Integrations allows Partners to extend the Supabase platform with useful tooling. Today we're adding [OAuth2.0 Applications](https://supabase.com/docs/guides/platform/oauth-apps/publish-an-oauth-app). For Supabase users, this makes it even easier to connect their favorite tools to their Supabase projects. Within minutes you can:
+
+- Add your favorite [Low Code](https://supabase.com/partners/integrations#low-code) tools on top of your Supabase database.
+- Integrate your favorite [DevTools](https://supabase.com/partners/integrations#devtools): including secrets managers and database management tools.
+- Add [caching](https://supabase.com/partners/integrations#caching%20/%20offline-first) to your Supabase database.
+- Not a fan of the Supabase admin dashboard? Try [one of these](https://supabase.com/partners/integrations#data%20platform).
+- Try out a different [SMS and email provider](https://supabase.com/partners/integrations#messaging).
+
+## Featured Partners
+
+For the initial launch we've started with a few partners to help us build and test the OAuth functionality.
+
+### Cloudflare
+
+![Cloudflare x Supabase](/images/blog/launch-week-8/day-4/marketplace-cloudflare.jpg)
+
+We worked with Cloudflare to build [support for databases](https://blog.cloudflare.com/announcing-database-integrations/) inside Cloudflare Workers. The Cloudflare integration makes it incredibly easy to connect to your Supabase database directly from the Cloudflare Dashboard.
+
+Check out the [latest episode](https://cloudflare.tv/event/using-supabase-with-cloudflare-workers/dgM90RgD) on Cloudflare TV to see it in action.
+
+### Resend
+
+![Resend x Supabase](/images/blog/launch-week-8/day-4/marketplace-resend.jpg)
+
+[Resend](https://resend.com) (YC [W23](https://www.ycombinator.com/companies/resend)) is building the modern email sending platform. If you're using Supabase for Auth, then you'll know already that we handle all your Auth emails. But did you know that the email configuration we provide you is only for testing purposes? When you're [going into production](https://supabase.com/docs/guides/platform/going-into-prod#restricted-access-levels-for-team-members), you need to integrate your own email provider. That's where Resend come in. They've built a one-click integration to add Resend as a custom SMTP provider for Supabase.
+
+Read more on [Resend's blog](https://resend.com/blog/how-to-configure-supabase-to-send-emails-from-your-domain).
+
+### Snaplet
+
+![Snaplet x Supabase](/images/blog/launch-week-8/day-4/marketplace-snaplet.jpg)
+
+Snaplet is a tool for Typescript developers to copy your database, transform sensitive data, and share it with your team without worrying about PII. If you followed our [Tuesday launch](https://supabase.com/blog/supabase-local-dev#database-seeding) you'll be familiar with Snaplet - they are one of the best tools for [generating seed data](https://supabase.com/docs/guides/cli/seeding-your-database#generating-seed-data) for your local development environment. Now they are making it even easier, with their official OAuth App, to spin up production-like development environments for your team.
+
+[Learn more on snaplet.dev](https://www.snaplet.dev/post/now-live-supabase-x-snaplet-integration).
+
+### Trigger.dev
+
+![Trigger x Supabase](/images/blog/launch-week-8/day-4/marketplace-triggerdev.jpg)
+
+[Trigger.dev](http://trigger.dev/) (YC [W23](https://www.ycombinator.com/companies/trigger-dev)) is the open source Background Jobs framework for Next.js. You can create long-running Jobs directly in your codebase with features like API integrations, webhooks, scheduling and delays. And today you can use their one-click integration to [trigger anything from a database change](https://trigger.dev/supabase) in Supabase.
+
+Learn more about their integration at: [trigger.dev/supabase](http://trigger.dev/supabase)
+
+### Vercel
+
+![Vercel x Supabase](/images/blog/launch-week-8/day-4/marketplace-vercel.jpg)
+
+One that requires no introduction - since so many of you use Vercel, we've dedicated an entire blog post to the upgraded Vercel integration.
+
+Learn more about the Vercel integration [updates we're launching](/blog/using-supabase-with-vercel) today.
+
+### Windmill
+
+![Windmill x Supabase](/images/blog/launch-week-8/day-4/marketplace-windmill.jpg)
+
+[Windmill](https://windmill.dev) (YC [S22](https://www.ycombinator.com/companies/windmill)) is an open source alternative to Retool and a modern Airflow. They provide a developer platform to quickly build production-grade complex workflows and integrations from minimal Python and Typescript scripts. Their one-click integration with Supabase makes it simple to launch new databases, process large quantities of data (maybe even convert them into [embeddings](https://supabase.com/vector)), and build internal dashboards.
+
+Read the [official blog post on windmill.dev](https://www.windmill.dev/blog/2023/08/10/supabase-partnership).
+
+## Building Supabase Integrations
+
+We've released full instructions in our [Build with Supabase](https://supabase.com/docs/guides/platform/oauth-apps/build-a-supabase-integration) documentation so that you can build your own Supabase OAuth application for your users. Simply visit your [Organization settings](https://supabase.com/dashboard/org/_/apps) and click “Add application” to get started:
+
+<div className="video-container">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/gtJo1lTxHfs"
+    title="YouTube video player"
+    frameBorder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+  ></iframe>
+</div>
+
+The Integrations marketplace is open to everyone. After your submission is complete, you can share the integration with your own users - simply create a button to launch your new app. We've provided some [brand assets](https://supabase.com/brand-assets) so that developers can quickly identify the integration on your site.
+
+## Building custom integrations
+
+You don't actually need to build an OAuth Application to build an integration with Supabase. If you're building something for yourself or your team, the [Management API](https://supabase.com/docs/reference/api/introduction) is the way to go.
+
+The [Trigger.dev](https://trigger.dev) team deserve a special shout out. While developing their Integration they also developed [supabase-management-js](https://github.com/supabase-community/supabase-management-js), a Typescript library for the [Supabase Management API](/docs/reference/api/introduction). This makes it even easier to get started with the Supabase API.
+
+It's useful beyond just integrations. Want to programmatically spin up databases? Easy:
+
+```tsx
+import { SupabaseManagementAPI } from "supabase-management-js";
+
+const client = new SupabaseManagementAPI({
+	accessToken: "<access token>"
+})
+
+const newProject = await client.createProject({
+	  name: 'staging',
+		db_pass: 'XXX',
+    organization_id: 'XXX'
+		plan: 'free',
+    region: 'us-east-1'
+})
+```
+
+## Become a Partner
+
+Supabase is a collaborative company. We love working with other communities (especially open source ones!), and we'd love to work with you. Get started today:
+
+- [Build an OAuth integration](/docs/guides/platform/oauth-apps/build-a-supabase-integration)
+- [Learn more about our Management API](/docs/reference/api/introduction)
+
+![Partner with Supabase](/images/blog/launch-week-8/day-4/partner-with-supabase.png)
+
+## More Launch Week 8
+
+- [Supabase Local Dev: migrations, branching, and observability](/blog/supabase-local-dev)
+- [Hugging Face is now supported in Supabase](/blog/hugging-face-supabase)
+- [Launch Week 8](/launch-week)
+- [Coding the stars - an interactive constellation with Three.js and React Three Fiber](/blog/interactive-constellation-threejs-react-three-fiber)
+- [Why we'll stay remote](/blog/why-supabase-remote)
+- [Postgres Language Server](https://github.com/supabase/postgres_lsp)

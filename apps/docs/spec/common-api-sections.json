@@ -1,0 +1,200 @@
+[
+  {
+    "title": "Introduction",
+    "id": "introduction",
+    "slug": "introduction",
+    "type": "markdown"
+  },
+  {
+    "type": "category",
+    "title": "Projects",
+    "items": [
+      {
+        "id": "list-all-projects",
+        "title": "List all projects",
+        "slug": "list-all-projects",
+        "type": "operation"
+      },
+      {
+        "id": "create-a-project",
+        "title": "Create a project",
+        "slug": "create-a-project",
+        "type": "operation"
+      },
+      {
+        "id": "list-all-organizations",
+        "title": "List all organizations",
+        "slug": "list-all-organizations",
+        "type": "operation"
+      },
+      {
+        "id": "create-an-organization",
+        "title": "Create an organization",
+        "slug": "create-an-organization",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Secrets",
+    "items": [
+      {
+        "id": "list-all-secrets",
+        "title": "List all secrets",
+        "slug": "list-all-secrets",
+        "type": "operation"
+      },
+      {
+        "id": "bulk-create-secrets",
+        "title": "Bulk create secrets",
+        "slug": "bulk-create-secrets",
+        "type": "operation"
+      },
+      {
+        "id": "bulk-delete-secrets",
+        "title": "Bulk delete secrets",
+        "slug": "bulk-delete-secrets",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Typescript",
+    "items": [
+      {
+        "id": "generate-typescript-types",
+        "title": "Generate TypeScript types",
+        "slug": "generate-typescript-types",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Functions",
+    "items": [
+      {
+        "id": "create-a-function",
+        "title": "Create a function",
+        "slug": "create-a-function",
+        "type": "operation"
+      },
+      {
+        "id": "list-all-functions",
+        "title": "List all functions",
+        "slug": "list-all-functions",
+        "type": "operation"
+      },
+      {
+        "id": "retrieve-a-function",
+        "title": "Retrieve a function",
+        "slug": "retrieve-a-function",
+        "type": "operation"
+      },
+      {
+        "id": "update-a-function",
+        "title": "Update a function",
+        "slug": "update-a-function",
+        "type": "operation"
+      },
+      {
+        "id": "delete-a-function",
+        "title": "Delete a function",
+        "slug": "delete-a-function",
+        "type": "operation"
+      },
+      {
+        "id": "retrieve-a-function-body",
+        "title": "Retrieve a function body",
+        "slug": "retrieve-a-function-body",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Custom Hostname",
+    "items": [
+      {
+        "id": "gets-projects-custom-hostname-config",
+        "title": "Retrieve hostname configuration",
+        "slug": "gets-projects-custom-hostname-config",
+        "type": "operation"
+      },
+      {
+        "id": "deletes-a-projects-custom-hostname-configuration",
+        "title": "Delete hostname configuration",
+        "slug": "deletes-a-projects-custom-hostname-configuration",
+        "type": "operation"
+      },
+      {
+        "id": "updates-projects-custom-hostname-configuration",
+        "title": "Update hostname configuration",
+        "slug": "updates-projects-custom-hostname-configuration",
+        "type": "operation"
+      },
+      {
+        "id": "attempts-to-verify-the-dns-configuration-for-projects-custom-hostname-configuration",
+        "title": "Verify DNS configuration",
+        "slug": "attempts-to-verify-the-dns-configuration-for-projects-custom-hostname-configuration",
+        "type": "operation"
+      },
+      {
+        "id": "activates-a-custom-hostname-for-a-project",
+        "title": "Activate custom hostname",
+        "slug": "activates-a-custom-hostname-for-a-project",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "pgsodium",
+    "items": [
+      {
+        "id": "gets-projects-pgsodium-config",
+        "title": "Retrieve pgsodium config",
+        "slug": "gets-projects-pgsodium-config",
+        "type": "operation"
+      },
+      {
+        "id": "updates-projects-pgsodium-config-updating-the-root_key-can-cause-all-data-encrypted-with-the-older-key-to-become-inaccessible",
+        "title": "Update pgsodium config",
+        "slug": "updates-projects-pgsodium-config-updating-the-root_key-can-cause-all-data-encrypted-with-the-older-key-to-become-inaccessible",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Network",
+    "items": [
+      {
+        "id": "gets-projects-network-bans",
+        "title": "Retrieve network bans",
+        "slug": "gets-projects-network-bans",
+        "type": "operation"
+      },
+      {
+        "id": "remove-network-bans",
+        "title": "Delete network bans",
+        "slug": "remove-network-bans",
+        "type": "operation"
+      },
+      {
+        "id": "gets-projects-network-restrictions",
+        "title": "Retrieve network restrictions",
+        "slug": "gets-projects-network-restrictions",
+        "type": "operation"
+      },
+      {
+        "id": "updates-projects-network-restrictions",
+        "title": "Update network restrictions",
+        "slug": "updates-projects-network-restrictions",
+        "type": "operation"
+      }
+    ]
+  }
+]

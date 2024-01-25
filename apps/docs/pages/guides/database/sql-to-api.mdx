@@ -11,10 +11,11 @@ export const meta = {
 Select a set of columns from a single table with where, order by, and limit clauses.
 
 ```sql
-select first_name, last_name, team_id, age from players
+select first_name, last_name, team_id, age
+from players
 where age between 20 and 24 and team_id <> 'STL'
 order by last_name, first_name desc
-limit 20
+limit 20;
 ```
 
 ```js
@@ -32,8 +33,9 @@ const { data, error } = await supabase
 Select all columns from a single table with a complex where clause: OR AND OR
 
 ```sql
-select * from players
-where ((team_id = 'CHN' or team_id is null) and (age > 35 or age is null))
+select *
+from players
+where ((team_id = 'CHN' or team_id is null) and (age > 35 or age is null));
 ```
 
 ```js
@@ -48,8 +50,9 @@ const { data, error } = await supabase
 Select all columns from a single table with a complex where clause: AND OR AND
 
 ```sql
-select * from players
-where ((team_id = 'CHN' and age > 35) or (team_id <> 'CHN' and age is not null))
+select *
+from players
+where ((team_id = 'CHN' and age > 35) or (team_id <> 'CHN' and age is not null));
 ```
 
 ```js
@@ -62,12 +65,13 @@ const { data, error } = await supabase
 Get a count of rows, but don't return any data.
 
 ```sql
-select count(*) from players
-where team_id = 'NYM'
+select count(*)
+from players
+where team_id = 'NYM';
 ```
 
 ```js
-const { data, error } = await supabase
+const { count, error } = await supabase
   .from('players')
   .select('*', { count: 'exact', head: true }) // exact, planned, or executed
   .eq('team_id', 'NYM')
@@ -75,7 +79,7 @@ const { data, error } = await supabase
 
 ## Resources
 
-- [Supabase Account - Free Tier OK](https://supabase.com)
+- [Supabase Account - Free Plan OK](https://supabase.com)
 - [Postgrest Operators](https://postgrest.org/en/stable/api.html#operators)
 - [Supabase API: JavaScript select](/docs/reference/javascript/select)
 - [Supabase API: JavaScript modifiers](/docs/reference/javascript/using-modifiers)

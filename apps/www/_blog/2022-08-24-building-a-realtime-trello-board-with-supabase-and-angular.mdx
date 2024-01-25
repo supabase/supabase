@@ -2,14 +2,17 @@
 title: 'Building a Realtime Trello Board with Supabase and Angular'
 description: Go beyond the hello world example with this real world project.
 author: simon_grimm
-image: simon-grimm-angular-realtime/angular-supabase.png
-thumb: simon-grimm-angular-realtime/angular-supabase.png
+image: simon-grimm-angular-realtime/angular-supabase.jpg
+thumb: simon-grimm-angular-realtime/angular-supabase.jpg
+categories:
+  - engineering
 tags:
   - angular
   - realtime
   - community
 date: '2022-08-24'
 toc_depth: 2
+video: https://www.youtube.com/v/jmCiI_OSarA
 ---
 
 Everyone can code up a little hello world example quickly with a platform like [Supabase](https://supabase.com/) - but what about a _real world_ project of bigger scale?
@@ -26,15 +29,16 @@ Along our jurney we will:
 - implement **magic link sign in** and user authentication with Angular
 - make use of **the realtime capabilities**!
 
-<iframe
-  width="560"
-  height="315"
-  src="https://www.youtube-nocookie.com/embed/jmCiI_OSarA"
-  title="YouTube video player"
-  frameborder="0"
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-  allowfullscreen
-></iframe> Watch the video version of the tutorial.
+<div className="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/jmCiI_OSarA"
+    title="YouTube video player"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen
+  ></iframe>
+</div>
+Watch the video version of the tutorial.
 
 Since there are quite some code snippets we need I've put together the [full source code on Github](https://github.com/saimon24/supabase-trello-angular) so you can easily run the project yourself!
 
@@ -44,7 +48,7 @@ Ready for a wild adventure? Then let's begin inside our Supabase account!
 
 ## Creating the Supabase Project
 
-First of all we need a new Supabase project. If you don't have a Supabase account yet, you can [get started for free](https://app.supabase.com/)!
+First of all we need a new Supabase project. If you don't have a Supabase account yet, you can [get started for free](https://supabase.com/dashboard/)!
 
 In your dashboard, click "New Project" and leave it to the default settings, but make sure you keep a copy o your Database password!
 
@@ -678,7 +682,7 @@ Our first function will simplye insert an empty object into the `boards` table, 
 
 Because we defined a default value for new rows in our SQL in the beginning, we don't have to pass any other data here.
 
-To load all tables of a user could simply query the `user_boards` table, but we might want more information about the related board so we can also [query foreign tables](https://supabase.com/docs/reference/javascript/select#query-foreign-tables) to load the board information!
+To load all tables of a user could simply query the `user_boards` table, but we might want more information about the related board so we can also [query referenced tables](https://supabase.com/docs/reference/javascript/select?example=query-referenced-tables) to load the board information!
 
 Go ahead and begin the **src/app/services/data.service.ts** with this:
 

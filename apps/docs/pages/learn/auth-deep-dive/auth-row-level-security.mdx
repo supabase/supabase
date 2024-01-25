@@ -4,6 +4,7 @@ export const meta = {
   id: 'auth-row-level-security',
   title: 'Part Two: Row Level Security',
   description: 'Supabase Auth Deep Dive Part Two - Row Level Security',
+  video: 'https://www.youtube.com/v/qY_iQ10IUhs',
 }
 
 ### About
@@ -44,12 +45,16 @@ Let's say we create a leaderboard table. We want people on our website to be abl
 
 ```sql
 create table leaderboard (
-    name text,
-    score int
+  name text,
+  score int
 );
 
-insert into leaderboard(name, score)
-values ('Paul', 100), ('Leto', 50), ('Chani', 200);
+insert into leaderboard
+  (name, score)
+values
+  ('Paul', 100),
+  ('Leto', 50),
+  ('Chani', 200);
 ```
 
 Now let's set up a client to read the data, I've created a repl here to show a living example: [https://replit.com/@awalias/supabase-leaderboard-demo#index.js](https://replit.com/@awalias/supabase-leaderboard-demo#index.js). If you copy the snippet you can plug in your own Supabase URL and anon key.
@@ -58,10 +63,10 @@ You can see that it's possible to freely read from and write to the table by usi
 
 ```js
 // Writing
-let { data, error } = await supabase.from('leaderboard').insert({ name: 'Bob', score: 99999 })
+const { data, error } = await supabase.from('leaderboard').insert({ name: 'Bob', score: 99999 })
 
 // Reading
-let { data, error } = await supabase
+const { data, error } = await supabase
   .from('leaderboard')
   .select('name, score')
   .order('score', { ascending: false })
@@ -77,7 +82,7 @@ or via the Supabase Dashboard, by navigating to Auth > Policies, and clicking th
 
 ![Enable row level security in Supabase](/docs/img/auth-deep-dive-2.png)
 
-You'll notice that both reading and writing now fail with an error like:
+You'll notice that reading will return no rows and writing will now fail with an error like:
 
 ```jsx
 {
@@ -105,6 +110,12 @@ If you'd prefer to use the dashboard to add your policy you can do so by clickin
 
 ![Add a read only policy in Supabase](/docs/img/auth-deep-dive-2-2.png)
 
+<Admonition type="caution">
+
+Please note that comments are not supported when using RLS policies via the dashboard.
+
+</Admonition>
+
 You should now be able to read from your leaderboard, but will still not be able to write, update, or delete from it, which is exactly what we wanted!
 
 A quick reminder that you can always use your `service_role` API key to bypass these row level security policies. But be extra careful that you don't leak this key by including it in the client. This can be useful if you're building internal admin tools, or if you need to bulk insert or delete data via the API.
@@ -123,7 +134,7 @@ In the next guide we will look at using Policies in combination with User Accoun
 - Watch [Part Three: Policies](../../learn/auth-deep-dive/auth-policies)
 - Watch [Part Four: GoTrue](../../learn/auth-deep-dive/auth-gotrue)
 - Watch [Part Five: Google Oauth](../../learn/auth-deep-dive/auth-google-oauth)
-- Sign up for Supabase: [app.supabase.com](https://app.supabase.com)
+- Sign up for Supabase: [supabase.com/dashboard](https://supabase.com/dashboard)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

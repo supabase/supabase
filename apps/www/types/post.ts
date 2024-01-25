@@ -20,6 +20,7 @@ type PostTypes = {
   path: string
   tags?: []
   logo?: string
+  logo_inverse?: string
   hideAuthor?: boolean
 }
 

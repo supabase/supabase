@@ -1,12 +1,11 @@
-import { useTheme } from 'common/Providers'
-import Image from 'next/image'
+import { useTheme } from 'next-themes'
+import Image from 'next/legacy/image'
 import Link from 'next/link'
 import NavigationMenu from '~/components/Navigation/NavigationMenu/NavigationMenu'
-import TopNavBarRef from '~/components/Navigation/NavigationMenu/TopNavBarRef'
+import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
 
-import FooterHelpCallout from '~/components/FooterHelpCallout'
-
-import { memo, useEffect } from 'react'
+import Head from 'next/head'
+import { PropsWithChildren, memo, useEffect } from 'react'
 import Footer from '~/components/Navigation/Footer'
 import { menuState, useMenuLevelId, useMenuMobileOpen } from '~/hooks/useMenuState'
 
@@ -23,6 +22,14 @@ const levelsData = {
     icon: '/docs/img/icons/menu/database',
     name: 'Database',
   },
+  api: {
+    icon: '/docs/img/icons/menu/rest',
+    name: 'REST API',
+  },
+  graphql: {
+    icon: '/docs/img/icons/menu/graphql',
+    name: 'GraphQL',
+  },
   auth: {
     icon: '/docs/img/icons/menu/auth',
     name: 'Auth',
@@ -35,9 +42,17 @@ const levelsData = {
     icon: '/docs/img/icons/menu/realtime',
     name: 'Realtime',
   },
+  analytics: {
+    icon: '/docs/img/icons/menu/analytics',
+    name: 'Analytics',
+  },
   storage: {
     icon: '/docs/img/icons/menu/storage',
     name: 'Storage',
+  },
+  ai: {
+    icon: '/docs/img/icons/menu/ai',
+    name: 'AI & Vectors',
   },
   supabase_cli: {
     icon: '/docs/img/icons/menu/reference-cli',
@@ -67,17 +82,37 @@ const levelsData = {
     icon: '/docs/img/icons/menu/reference-javascript',
     name: 'Javascript Reference v2.0',
   },
-  reference_dart_v0: {
-    icon: '/docs/img/icons/menu/reference-dart',
-    name: 'Dart Reference v0.0',
-  },
   reference_dart_v1: {
     icon: '/docs/img/icons/menu/reference-dart',
-    name: 'Dart Reference v0.0',
+    name: 'Dart Reference v1.0',
+  },
+  reference_dart_v2: {
+    icon: '/docs/img/icons/menu/reference-dart',
+    name: 'Dart Reference v2.0',
+  },
+  reference_csharp_v0: {
+    icon: '/docs/img/icons/menu/reference-csharp',
+    name: 'C# Reference v0.0',
   },
   reference_python_v2: {
     icon: '/docs/img/icons/menu/reference-python',
     name: 'Python Reference v2.0',
+  },
+  reference_swift_v1: {
+    icon: '/docs/img/icons/menu/reference-swift',
+    name: 'Swift Reference v1.0',
+  },
+  reference_swift_v2: {
+    icon: '/docs/img/icons/menu/reference-swift',
+    name: 'Swift Reference v2.0',
+  },
+  reference_kotlin_v1: {
+    icon: '/docs/img/icons/menu/reference-kotlin',
+    name: 'Kotlin Reference v1.0',
+  },
+  reference_kotlin_v2: {
+    icon: '/docs/img/icons/menu/reference-kotlin',
+    name: 'Kotlin Reference v2.0',
   },
   reference_cli: {
     icon: '/docs/img/icons/menu/reference-cli',
@@ -98,6 +133,14 @@ const levelsData = {
   reference_self_hosting_realtime: {
     icon: '/docs/img/icons/menu/reference-realtime',
     name: 'Realtime Server Reference',
+  },
+  reference_self_hosting_analytics: {
+    icon: '/docs/img/icons/menu/reference-analytics',
+    name: 'Analytics Server Reference',
+  },
+  reference_self_hosting_functions: {
+    icon: '/docs/img/icons/menu/reference-functions',
+    name: 'Functions Server Reference',
   },
 }
 
@@ -127,13 +170,13 @@ const MobileHeader = memo(function MobileHeader() {
         >
           <span
             className={[
-              'transition-all ease-out block w-4 h-px bg-scale-900 group-hover:bg-scale-1200',
+              'transition-all ease-out block w-4 h-px bg-foreground-muted group-hover:bg-foreground',
               !mobileMenuOpen ? 'w-4' : 'absolute rotate-45 top-[6px]',
             ].join(' ')}
           ></span>
           <span
             className={[
-              'transition-all ease-out block h-px bg-scale-900 group-hover:bg-scale-1200',
+              'transition-all ease-out block h-px bg-foreground-muted group-hover:bg-foreground',
               !mobileMenuOpen ? 'w-3 group-hover:w-4' : 'absolute w-4 -rotate-45 top-[2px]',
             ].join(' ')}
           ></span>
@@ -151,7 +194,7 @@ const MobileHeader = memo(function MobileHeader() {
       <span
         className={[
           'transition-all duration-200',
-          'text-scale-1200',
+          'text-foreground',
           mobileMenuOpen ? 'text-xs' : 'text-sm',
         ].join(' ')}
       >
@@ -167,6 +210,19 @@ const MobileHeader = memo(function MobileHeader() {
 
 const MobileMenuBackdrop = memo(function MobileMenuBackdrop() {
   const mobileMenuOpen = useMenuMobileOpen()
+
+  useEffect(() => {
+    window.addEventListener('resize', (e: UIEvent) => {
+      const w = e.target as Window
+      if (mobileMenuOpen && w.innerWidth >= 1024) {
+        menuState.setMenuMobileOpen(!mobileMenuOpen)
+      }
+    })
+    return () => {
+      window.removeEventListener('resize', () => {})
+    }
+  }, [mobileMenuOpen])
+
   return (
     <div
       className={[
@@ -174,7 +230,7 @@ const MobileMenuBackdrop = memo(function MobileMenuBackdrop() {
         'left-0',
         'right-0',
         'z-10',
-        'backdrop-blur-sm backdrop-filter bg-white-1200 dark:bg-blackA-600',
+        'backdrop-blur-sm backdrop-filter bg-alternative/90',
         mobileMenuOpen ? 'absolute h-full w-full top-0 left-0' : 'hidden h-0',
         // always hide on desktop
         'lg:hidden',
@@ -184,44 +240,25 @@ const MobileMenuBackdrop = memo(function MobileMenuBackdrop() {
   )
 })
 
-const SideMenu = memo(function SideMenu() {
-  return (
-    <div
-      className={[
-        'transition-all ease-out duration-200',
-        'absolute left-0 right-0 h-screen',
-        'px-5 pl-5 py-16',
-        'top-[0px]',
-        'bg-scale-200',
-        // desktop styles
-        'lg:relative lg:top-0 lg:left-0 lg:pb-10 lg:px-10 lg:pt-0 lg:flex',
-        'lg:opacity-100 lg:visible',
-      ].join(' ')}
-    >
-      <NavigationMenu />
-    </div>
-  )
-})
-
 const HeaderLogo = memo(function HeaderLogo() {
-  const { isDarkMode } = useTheme()
+  const { resolvedTheme } = useTheme()
   return (
-    <Link href="/">
-      <a className="px-10 flex items-center gap-2">
-        <Image
-          className="cursor-pointer"
-          src={isDarkMode ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'}
-          width={96}
-          height={24}
-          alt="Supabase Logo"
-        />
-        <span className="font-mono text-sm font-medium text-brand-900">DOCS</span>
-      </a>
+    <Link href="/" className="px-10 flex items-center gap-2">
+      <Image
+        className="cursor-pointer"
+        src={
+          resolvedTheme?.includes('dark') ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'
+        }
+        width={96}
+        height={24}
+        alt="Supabase Logo"
+      />
+      <span className="font-mono text-sm font-medium text-brand-link">DOCS</span>
     </Link>
   )
 })
 
-const Container = memo(function Container(props) {
+const Container = memo(function Container(props: PropsWithChildren) {
   const mobileMenuOpen = useMenuMobileOpen()
 
   return (
@@ -231,10 +268,8 @@ const Container = memo(function Container(props) {
       className={[
         // 'overflow-x-auto',
         'w-full h-screen transition-all ease-out',
-        'absolute lg:relative',
-        mobileMenuOpen
-          ? '!w-auto ml-[75%] sm:ml-[50%] md:ml-[33%] overflow-hidden'
-          : 'overflow-auto',
+        // 'absolute lg:relative',
+        mobileMenuOpen ? 'ml-[75%] sm:ml-[50%] md:ml-[33%] overflow-hidden' : 'overflow-auto',
         // desktop override any margin styles
         'lg:ml-0',
       ].join(' ')}
@@ -248,7 +283,8 @@ const NavContainer = memo(function NavContainer() {
   const mobileMenuOpen = useMenuMobileOpen()
 
   return (
-    <div
+    <nav
+      aria-labelledby="main-nav-title"
       className={[
         // 'hidden',
         'absolute lg:relative',
@@ -268,75 +304,81 @@ const NavContainer = memo(function NavContainer() {
           'relative',
           'w-auto',
           'border-r overflow-auto h-screen',
-          'backdrop-blur backdrop-filter bg-white-1200 dark:bg-blackA-300',
+          'backdrop-blur backdrop-filter bg-background',
           'flex flex-col',
         ].join(' ')}
       >
+        <h1 id="main-nav-title" className="sr-only">
+          Main menu
+        </h1>
         <div className="top-0 sticky z-10">
           <div>
             <div>
               <div
                 className={[
                   'hidden lg:flex lg:height-auto',
-                  'pt-8 bg-scale-200 flex-col gap-8',
+                  'pt-8 bg-background flex-col gap-8',
                 ].join(' ')}
               >
                 <HeaderLogo />
               </div>
-              <div className="h-4 bg-scale-200 w-full"></div>
-              <div className="bg-gradient-to-b from-scale-200 to-transparent h-4 w-full"></div>
+              <div className="h-4 bg-background w-full"></div>
+              <div className="bg-gradient-to-b from-background to-transparent h-4 w-full"></div>
             </div>
           </div>
         </div>
-        <SideMenu />
+        <div
+          className={[
+            'transition-all ease-out duration-200',
+            'absolute left-0 right-0 h-screen',
+            'px-5 pl-5 py-16',
+            'top-[0px]',
+            'bg-background',
+            // desktop styles
+            'lg:relative lg:top-0 lg:left-0 lg:pb-10 lg:px-10 lg:pt-0 lg:flex',
+            'lg:opacity-100 lg:visible',
+          ].join(' ')}
+        >
+          <NavigationMenu />
+        </div>
       </div>
-    </div>
+    </nav>
   )
 })
 
-const SiteLayout = ({ children }) => {
-  // const mobileMenuOpen = useMenuMobileOpen()
-
-  useEffect(() => {
-    const key = localStorage.getItem('supabaseDarkMode')
-    if (!key) {
-      // Default to dark mode if no preference config
-      document.documentElement.className = 'dark'
-      document.documentElement.style.colorScheme = 'dark'
-    } else {
-      document.documentElement.className = key === 'true' ? 'dark' : ''
-      document.documentElement.style.colorScheme = key === 'true' ? 'dark' : ''
-    }
-  }, [])
-
+const SiteLayout = ({ children }: PropsWithChildren<{}>) => {
   return (
-    <main>
-      <div className="flex flex-row h-screen">
-        <NavContainer />
-        <Container>
-          <div className={['lg:sticky top-0 z-10 overflow-hidden'].join(' ')}>
-            <TopNavBarRef />
-          </div>
-          <div
-            className={[
-              'sticky transition-all top-0',
-              'z-10',
-              'backdrop-blur backdrop-filter bg-white-1200 dark:bg-blackA-300',
-            ].join(' ')}
-          >
-            <div className={['lg:hidden', 'px-5 ', 'border-b z-10'].join(' ')}>
-              <MobileHeader />
+    <>
+      <Head>
+        <title>Supabase Docs</title>
+      </Head>
+      <main>
+        <div className="flex flex-row h-screen">
+          <NavContainer />
+          <Container>
+            <div className={['lg:sticky top-0 z-10 overflow-hidden'].join(' ')}>
+              <TopNavBar />
             </div>
-          </div>
-          <div className="grow px-5 max-w-7xl mx-auto py-16">
-            {children}
-            <FooterHelpCallout />
-            <Footer />
-          </div>
-          <MobileMenuBackdrop />
-        </Container>
-      </div>
-    </main>
+            <div
+              className={[
+                'sticky transition-all top-0',
+                'z-10',
+                'backdrop-blur backdrop-filter bg-background',
+              ].join(' ')}
+            >
+              <div className={['lg:hidden', 'px-5 ', 'border-b z-10'].join(' ')}>
+                <MobileHeader />
+              </div>
+            </div>
+            <div className="grow">
+              {children}
+              <Footer />
+            </div>
+            <MobileMenuBackdrop />
+          </Container>
+        </div>
+      </main>
+    </>
   )
 }
 

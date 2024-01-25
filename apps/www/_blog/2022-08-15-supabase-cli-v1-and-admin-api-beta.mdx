@@ -4,10 +4,13 @@ description: We are moving Supabase CLI v1 out of beta, and releasing Management
 author: soedirgo,qiao
 image: lw5-cli/thumbnail.jpg
 thumb: lw5-cli/thumbnail.jpg
+categories:
+  - product
 tags:
   - launch-week
 date: '2022-08-15'
 toc_depth: 3
+video: https://www.youtube.com/v/OpPOaJI_Z28
 ---
 
 Today we are moving the Supabase CLI v1 out of beta. The Supabase CLI is capable of managing database migrations and generating TypeScript types. Follow these [install instructions](https://supabase.com/docs/guides/cli) to get started.
@@ -16,16 +19,16 @@ In addition, we are releasing a Management API (in beta). The Management API is 
 
 (Note: The Management API was previously called the Admin API.)
 
-<iframe
-  className="w-full"
-  width="560"
-  height="315"
-  src="https://www.youtube-nocookie.com/embed/OpPOaJI_Z28"
-  title="YouTube video player"
-  frameborder="0"
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-  allowfullscreen
-></iframe>
+<div className="video-container">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/OpPOaJI_Z28"
+    title="YouTube video player"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen
+  ></iframe>
+</div>
 
 <small>
   <i>Watch the CLI team announcing the new features.</i>
@@ -120,11 +123,11 @@ Of course, the types aren't very useful on its own, you need some way to consume
 
 The CLI is the first consumer of our new Management API. Over the next few weeks, we'll be adding the endpoints needed to programmatically manage your Supabase projects and organizations. This is ideal for CI/CD workflows and spinning up test environments.
 
-Here's an example of deploying a new project from the command line (generate your access token from the [Supabase Dashboard](https://app.supabase.com/account/tokens)).
+Here's an example of deploying a new project from the command line (generate your access token from the [Supabase Dashboard](https://supabase.com/dashboard/account/tokens)).
 
 ```bash
 curl 'https://api.supabase.com/v1/projects' \
-  -H 'Authorization: Bearer <[your-access-token](https://app.supabase.com/account/tokens)>' \
+  -H 'Authorization: Bearer <[your-access-token](https://supabase.com/dashboard/account/tokens)>' \
   -H "Content-Type: application/json" \
   -d '{"name": "my-project", "organization_id": "cool-green-pqdr0qc", "region": "us-east-1", "plan": "free", "db_pass": "********"}'
 ```

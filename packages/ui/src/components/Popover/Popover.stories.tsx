@@ -1,10 +1,7 @@
 import { Button } from '../Button'
-import { Divider } from '../Divider'
-import { IconChevronDown } from '../../index'
-import Typography from '../Typography'
+import { IconChevronDown } from '../Icon/icons/IconChevronDown'
 
 import { Popover } from '.'
-import { IconLogIn } from '../Icon/icons/IconLogIn'
 import { Input } from '../Input'
 
 export default {
@@ -19,14 +16,13 @@ export const Default = (args: any) => (
       side="bottom"
       align="end"
       size="content"
-      portalled
       showClose
       header={
         <div className="flex justify-between items-center">
           <Button type="default" size="tiny">
             Clear
           </Button>
-          <h5 className="text-sm text-scale-1200">Filter</h5>
+          <h5 className="text-sm text-foreground">Filter</h5>
           <Button type="primary">Save</Button>
         </div>
       }
@@ -63,8 +59,8 @@ export const Default = (args: any) => (
         </>,
       ]}
     >
-      <Button as="span" type="default" iconRight={<IconChevronDown />}>
-        Click for Popover
+      <Button asChild type="default" iconRight={<IconChevronDown />}>
+        <span>Click for Popover</span>
       </Button>
     </Popover>
   </div>

@@ -1,21 +1,30 @@
 import React, { useEffect, useState } from 'react'
-import { Button, IconCopy } from '../../../index'
+import { Button } from '../Button'
+import { IconCopy } from '../Icon/icons/IconCopy'
+
 import { FormLayout } from '../../lib/Layout/FormLayout'
+
 import InputErrorIcon from '../../lib/Layout/InputErrorIcon'
 import InputIconContainer from '../../lib/Layout/InputIconContainer'
+
 import { HIDDEN_PLACEHOLDER } from './../../lib/constants'
 
+import { cn } from '@ui/lib/utils/cn'
 import styleHandler from '../../lib/theme/styleHandler'
 import { useFormContext } from '../Form/FormContext'
 
-export interface Props extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
+export interface Props
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'onCopy'> {
+  inputClassName?: string
+  iconContainerClassName?: string
   copy?: boolean
+  onCopy?: () => void
   defaultValue?: string | number
   descriptionText?: string | React.ReactNode | undefined
   disabled?: boolean
   error?: string
   icon?: any
-  inputRef?: string
+  inputRef?: React.LegacyRef<HTMLInputElement>
   label?: string | React.ReactNode
   afterLabel?: string
   beforeLabel?: string
@@ -32,6 +41,8 @@ function Input({
   autoComplete,
   autoFocus,
   className,
+  inputClassName,
+  iconContainerClassName,
   copy,
   defaultValue,
   descriptionText,
@@ -48,6 +59,7 @@ function Input({
   layout,
   onChange,
   onBlur,
+  onCopy,
   placeholder,
   type = 'text',
   value = undefined,
@@ -70,7 +82,11 @@ function Input({
   if (values && !value) value = values[id || name]
 
   function handleBlurEvent(e: React.FocusEvent<HTMLInputElement>) {
-    if (handleBlur) handleBlur(e)
+    if (handleBlur) {
+      setTimeout(() => {
+        handleBlur(e)
+      }, 100)
+    }
     if (onBlur) onBlur(e)
   }
 
@@ -96,14 +112,15 @@ function Input({
   //   error = touched && touched[id] ? error : undefined
   // }, [errors, touched])
 
-  function onCopy(value: any) {
-    navigator.clipboard.writeText(value).then(
+  function _onCopy(value: any) {
+    navigator.clipboard.writeText(value)?.then(
       function () {
         /* clipboard successfully set */
         setCopyLabel('Copied')
         setTimeout(function () {
           setCopyLabel('Copy')
         }, 3000)
+        onCopy?.()
       },
       function () {
         /* clipboard write failed */
@@ -116,13 +133,14 @@ function Input({
     setHidden(false)
   }
 
-  let inputClasses = [__styles.base]
+  let inputClasses = ['peer/input', __styles.base]
 
   if (error) inputClasses.push(__styles.variants.error)
   if (!error) inputClasses.push(__styles.variants.standard)
-  if (icon) inputClasses.push(__styles.with_icon)
   if (size) inputClasses.push(__styles.size[size])
+  if (icon) inputClasses.push(__styles.with_icon)
   if (disabled) inputClasses.push(__styles.disabled)
+  if (inputClassName) inputClasses.push(inputClassName)
 
   return (
     <FormLayout
@@ -148,19 +166,20 @@ function Input({
           name={name}
           onChange={onInputChange}
           onBlur={handleBlurEvent}
+          onCopy={onCopy}
           placeholder={placeholder}
           ref={inputRef}
           type={type}
           value={reveal && hidden ? HIDDEN_PLACEHOLDER : value}
-          className={inputClasses.join(' ')}
+          className={cn(inputClasses)}
           {...props}
         />
-        {icon && <InputIconContainer icon={icon} />}
+        {icon && <InputIconContainer icon={icon} className={iconContainerClassName} />}
         {copy || error || actions ? (
           <div className={__styles.actions_container}>
             {error && <InputErrorIcon size={size} />}
             {copy && !(reveal && hidden) ? (
-              <Button size="tiny" type="default" icon={<IconCopy />} onClick={() => onCopy(value)}>
+              <Button size="tiny" type="default" icon={<IconCopy />} onClick={() => _onCopy(value)}>
                 {copyLabel}
               </Button>
             ) : null}
@@ -178,14 +197,15 @@ function Input({
 }
 
 export interface TextAreaProps
-  extends Omit<React.InputHTMLAttributes<HTMLTextAreaElement>, 'size'> {
-  descriptionText?: string
+  extends Omit<React.InputHTMLAttributes<HTMLTextAreaElement>, 'size' | 'onCopy'> {
+  textAreaClassName?: string
+  descriptionText?: string | React.ReactNode | undefined
   error?: string
   icon?: any
   label?: string | React.ReactNode
   afterLabel?: string
   beforeLabel?: string
-  labelOptional?: string
+  labelOptional?: string | React.ReactNode
   layout?: 'horizontal' | 'vertical'
   rows?: number
   limit?: number
@@ -193,11 +213,13 @@ export interface TextAreaProps
   borderless?: boolean
   validation?: (x: any) => void
   copy?: boolean
+  onCopy?: () => void
   actions?: React.ReactNode
 }
 
 function TextArea({
   className,
+  textAreaClassName,
   descriptionText,
   disabled,
   error,
@@ -220,13 +242,14 @@ function TextArea({
   borderless = false,
   validation,
   copy = false,
+  onCopy,
   actions,
   ...props
 }: TextAreaProps) {
   const [charLength, setCharLength] = useState(0)
   const [copyLabel, setCopyLabel] = useState('Copy')
 
-  function onCopy(value: any) {
+  function _onCopy(value: any) {
     navigator.clipboard.writeText(value).then(
       function () {
         /* clipboard successfully set */
@@ -234,6 +257,7 @@ function TextArea({
         setTimeout(function () {
           setCopyLabel('Copy')
         }, 3000)
+        onCopy?.()
       },
       function () {
         /* clipboard write failed */
@@ -248,7 +272,11 @@ function TextArea({
   if (values && !value) value = values[id || name]
 
   function handleBlurEvent(e: React.FocusEvent<HTMLTextAreaElement>) {
-    if (handleBlur) handleBlur(e)
+    if (handleBlur) {
+      setTimeout(() => {
+        handleBlur(e)
+      }, 100)
+    }
     if (onBlur) onBlur(e)
   }
 
@@ -279,6 +307,7 @@ function TextArea({
   if (icon) classes.push(__styles.with_icon)
   if (size) classes.push(__styles.size[size])
   if (disabled) classes.push(__styles.disabled)
+  if (textAreaClassName) classes.push(textAreaClassName)
 
   return (
     <FormLayout
@@ -304,13 +333,12 @@ function TextArea({
           placeholder={placeholder}
           onChange={onInputChange}
           onBlur={handleBlurEvent}
+          onCopy={onCopy}
           value={value}
           className={classes.join(' ')}
           maxLength={limit}
           {...props}
-        >
-          {value}
-        </textarea>
+        />
         {copy || error || actions ? (
           <div className={__styles['textarea_actions_container']}>
             <div className={__styles['textarea_actions_container_items']}>
@@ -319,7 +347,7 @@ function TextArea({
                 <Button
                   size="tiny"
                   type="default"
-                  onClick={() => onCopy(value)}
+                  onClick={() => _onCopy(value)}
                   icon={<IconCopy />}
                 >
                   {copyLabel}

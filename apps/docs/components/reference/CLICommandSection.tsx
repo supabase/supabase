@@ -1,8 +1,6 @@
 import ReactMarkdown from 'react-markdown'
-import { IconChevronRight, Tabs } from '~/../../packages/ui'
-// @ts-expect-error
-import spec from '~/../../spec/cli_v1_commands.yaml' assert { type: 'yml' }
-import CodeBlock from '~/components/CodeBlock/CodeBlock'
+import { CodeBlock, IconChevronRight, Tabs } from 'ui'
+import spec from '~/spec/cli_v1_commands.yaml' assert { type: 'yml' }
 import Options from '~/components/Options'
 import Param from '~/components/Params'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
@@ -15,6 +13,8 @@ export type Flag = {
   default_value: string
   accepted_values: AcceptedValue[]
   required?: boolean
+  /** Whether subcommands inherit this flag. */
+  inherit?: boolean
 }
 
 export type AcceptedValue = {
@@ -47,6 +47,14 @@ export type Command = {
 
 const CliCommandSection = (props) => {
   const command = spec.commands.find((x: any) => x.id === props.funcData.id)
+  const parentCommand = spec.commands.find(
+    (x: any) => x.subcommands && x.subcommands.find((y: any) => y === props.funcData.id)
+  )
+
+  const commandFlags = [
+    ...(parentCommand?.flags?.filter((x: any) => x.inherit) || []),
+    ...command.flags,
+  ]
 
   return (
     <RefSubLayout.Section
@@ -71,24 +79,24 @@ const CliCommandSection = (props) => {
                   <ReactMarkdown>{command.description}</ReactMarkdown>
                 </div>
               ) : (
-                <p className="capitalize mb-4 scroll-mt-16 mt-0 text-scale-1100 text-base">
+                <p className="capitalize mb-4 scroll-mt-16 mt-0 text-foreground-light text-base">
                   {command.summary}
                 </p>
               )}
             </header>
 
-            {command.subcommands.length > 0 && (
+            {command.subcommands?.length > 0 && (
               <div className="mb-3">
-                <h3 className="text-lg text-scale-1200 mb-3">Available Commands</h3>
+                <h3 className="text-lg text-foreground mb-3">Available Commands</h3>
                 <ul>
                   {command.subcommands.map((subcommand) => (
                     <li key={subcommand} className="flex items-center gap-3">
-                      <div className="text-scale-900">
+                      <div className="text-foreground-muted">
                         <IconChevronRight size={14} strokeWidth={2} />
                       </div>
                       <a
                         href={`#${subcommand}`}
-                        className="transition text-scale-1100 hover:text-brand-900"
+                        className="transition text-foreground-light hover:text-brand"
                       >
                         $ {subcommand.replace(/-/g, ' ')}
                       </a>
@@ -97,24 +105,22 @@ const CliCommandSection = (props) => {
                 </ul>
               </div>
             )}
-            {command.flags.length > 0 && (
+            {commandFlags.length > 0 && (
               <>
-                <h3 className="text-lg text-scale-1200 mb-3">Flags</h3>
-                <ul className="">
-                  {command.flags.map((flag: Flag) => (
-                    <>
-                      <li className="mt-0">
-                        <Param {...flag} isOptional={!flag.required}>
-                          {flag?.accepted_values && (
-                            <Options>
-                              {flag?.accepted_values.map((value) => {
-                                return <Options.Option {...value} />
-                              })}
-                            </Options>
-                          )}
-                        </Param>
-                      </li>
-                    </>
+                <h3 className="text-lg text-foreground mb-3">Flags</h3>
+                <ul>
+                  {commandFlags.map((flag: Flag) => (
+                    <li key={flag.id} className="mt-0">
+                      <Param {...flag} isOptional={!flag.required}>
+                        {flag?.accepted_values && (
+                          <Options>
+                            {flag?.accepted_values.map((value) => {
+                              return <Options.Option key={value.id} {...value} />
+                            })}
+                          </Options>
+                        )}
+                      </Param>
+                    </li>
                   ))}
                 </ul>
               </>
@@ -130,6 +136,7 @@ const CliCommandSection = (props) => {
               size="tiny"
               type="rounded-pills"
               scrollable
+              queryGroup="example"
             >
               {command.examples ? (
                 command.examples.map((example) => {
@@ -155,7 +162,7 @@ const CliCommandSection = (props) => {
                         defaultOpen={false}
                       >
                         <CodeBlock
-                          className="useless-code-block-class rounded !rounded-tl-none !rounded-tr-none border border-scale-500"
+                          className="useless-code-block-class rounded !rounded-tl-none !rounded-tr-none border border-DEFAULT"
                           language="bash"
                           hideLineNumbers={true}
                         >
@@ -169,7 +176,7 @@ const CliCommandSection = (props) => {
                           label="Notes"
                           defaultOpen={false}
                         >
-                          <div className="bg-scale-300 border border-scale-500 rounded !rounded-tl-none !rounded-tr-none prose max-w-none px-5 py-2">
+                          <div className="bg-overlay border border-overlay rounded !rounded-tl-none !rounded-tr-none prose max-w-none px-5 py-2">
                             <ReactMarkdown className="text-sm">{example.description}</ReactMarkdown>
                           </div>
                         </RefDetailCollapse>

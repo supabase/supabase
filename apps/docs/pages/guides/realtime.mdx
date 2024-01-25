@@ -3,55 +3,171 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'realtime',
   title: 'Realtime',
-  description: 'Supabase Realtime with Broadcast, Presence, and Postgres Changes.',
+  description: 'Send and receive messages to connected clients.',
+  subtitle: 'Send and receive messages to connected clients.',
   sidebar_label: 'Overview',
 }
 
 Supabase provides a globally distributed cluster of [Realtime](https://github.com/supabase/realtime) servers that enable the following functionality:
 
-- [Broadcast](#broadcast): Send ephemeral messages from client to clients with low latency.
-- [Presence](#presence): Track and synchronize shared state between clients.
-- [Postgres Changes](#postgres-changes): Listen to Postgres database changes and send them to authorized clients.
+- [Broadcast](/docs/guides/realtime/broadcast): Send ephemeral messages from client to clients with low latency.
+- [Presence](/docs/guides/realtime/presence): Track and synchronize shared state between clients.
+- [Postgres Changes](/docs/guides/realtime/postgres-changes): Listen to Postgres database changes and send them to authorized clients.
 
-A [channel](https://hexdocs.pm/phoenix/channels.html) is the basic building block of Realtime and narrows the scope of data flow to subscribed clients. You can think of a channel as a chatroom where participants are able to see who's online and send and receive messages; similar to a Discord or Slack channel.
+### Realtime API
 
-All clients can connect to a channel and take advantage of the built-in features, Broadcast and Presence, while extensions, like Postgres Changes, must be enabled prior to use.
+By default Realtime is disabled on your database. Let's turn on Realtime for a `todos` table.
 
-## Broadcast
+ <Tabs
+   scrollable
+   size="small"
+   type="underlined"
+   defaultActiveId="dashboard"
+ >
+ <TabPanel id="dashboard" label="Dashboard">
 
-Broadcast follows the [publish-subscribe pattern](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) where a client publishes messages to a channel with a unique identifier. For example, a user could send a message to a channel with id `room-1`.
+1.  Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
+2.  Click on **Replication** in the sidebar.
+3.  Control which database events are sent by toggling **Insert**, **Update**, and **Delete**.
+4.  Control which tables broadcast changes by selecting **Source** and toggling each table.
 
-Other clients can elect to receive the message in real-time by subscribing to the channel with id `room-1`. If these clients are online and subscribed then they will receive the message.
+{' '}
 
-Broadcast works by connecting your client to the nearest Realtime server, which will communicate with other servers to relay messages to other clients.
+<video width="99%" muted playsInline controls={true}>
+  <source
+    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/api/api-realtime.mp4"
+    type="video/mp4"
+  />
+</video>
 
-A common use-case is sharing a user's cursor position with other clients in an online game.
+ </TabPanel>
+ <TabPanel id="sql" label="SQL">
 
-## Presence
+```sql
+alter
+  publication supabase_realtime add table todos;
+```
 
-Presence utilizes an in-memory conflict-free replicated data type (CRDT) to track and synchronize shared state in an eventually consistent manner. It computes the difference between existing state and new state changes and sends the necessary updates to clients via Broadcast.
+ </TabPanel>
+ </Tabs>
 
-When a new client subscribes to a channel, it will immediately receive the channel's latest state in a single message instead of waiting for all other clients to send their individual states.
+From the client, we can listen to any new data that is inserted into the `todos` table:
 
-Clients are free to come-and-go as they please, and as long as they are all subscribed to the same channel then they will all have the same Presence state as each other.
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
 
-The neat thing about Presence is that if a client is suddenly disconnected (for example, they go offline), their state will be automatically removed from the shared state. If you've ever tried to build an “I'm online” feature which handles unexpected disconnects, you'll appreciate how useful this is.
+```js
+// Initialize the JS client
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-## Postgres Changes
+// Create a function to handle inserts
+const handleInserts = (payload) => {
+  console.log('Change received!', payload)
+}
 
-Postgres Changes enable you to listen to database changes and have them broadcast to authorized clients based on [Row Level Security (RLS)](/docs/guides/auth/row-level-security) policies.
+// Listen to inserts
+supabase
+  .channel('todos')
+  .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'todos' }, handleInserts)
+  .subscribe()
+```
 
-This works by Realtime polling your database's logical replication slot for changes, passing those changes to the [apply_rls](https://github.com/supabase/walrus#reading-wal) SQL function to determine which clients have permission, and then using Broadcast to send those changes to clients.
+</TabPanel>
+<TabPanel id="dart" label="Dart">
 
-Realtime requires a publication called `supabase_realtime` to determine which tables to poll. You must add tables to this publication prior to clients subscribing to channels that want to listen for database changes.
+```dart
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-We strongly encourage you to enable RLS on your database tables and have RLS policies in place to prevent unauthorized parties from accessing your data.
+void main() async {
+  // Initialize the Flutter client
+  Supabase.initialize(
+    url: 'https://<project>.supabase.co',
+    anonKey: '<your-anon-key>',
+    realtimeClientOptions: const RealtimeClientOptions(
+      eventsPerSecond: 2,
+    ),
+  );
+  runApp(const MyApp());
+}
 
-## See Also
+final supabase = Supabase.instance.client;
 
-- [Realtime quickstart](/docs/guides/realtime/quickstart)
-- [Realtime: Multiplayer Edition](https://supabase.com/blog/supabase-realtime-multiplayer-general-availability) blog post
+void handleInserts(payload) {
+  print('Change received! $payload');
+}
 
-export const Page = ({ children }) => <Layout meta={meta} children={children} />
+// Listen to inserts
+supabase
+    .channel('todos')
+    .onPostgresChanges(
+        event: PostgresChangeEvent.insert,
+        schema: 'public',
+        table: 'todos',
+        callback: handleInserts)
+    .subscribe();
+```
+
+</TabPanel>
+</Tabs>
+
+Use [subscribe()](/docs/reference/javascript/subscribe) to listen to database changes.
+The Realtime API works through PostgreSQL's replication functionality. Postgres sends database changes to a [publication](/docs/guides/database/replication#publications)
+called `supabase_realtime`, and by managing this publication you can control which data is broadcast.
+
+## Examples
+
+<div className="grid md:grid-cols-12 gap-4 not-prose">
+  {examples.map((x) => (
+    <div className="col-span-12" key={x.href}>
+      <Link href={x.href} passHref>
+        <GlassPanel title={x.name}>{x.description}</GlassPanel>
+      </Link>
+    </div>
+  ))}
+</div>
+
+export const examples = [
+  {
+    name: 'Multiplayer.dev',
+    description: 'Mouse movements and chat messages.',
+    href: 'https://multiplayer.dev',
+  },
+]
+
+## Resources
+
+Find the source code and documentation in the Supabase GitHub repository.
+
+<div className="grid md:grid-cols-12 gap-4 not-prose">
+  {resources.map((x) => (
+    <div className="col-span-6" key={x.href}>
+      <Link href={x.href} passHref>
+        <GlassPanel title={x.name}>{x.description}</GlassPanel>
+      </Link>
+    </div>
+  ))}
+</div>
+
+export const resources = [
+  {
+    name: 'Supabase Realtime',
+    description: 'View the source code.',
+    href: 'https://github.com/supabase/realtime',
+  },
+  {
+    name: 'Realtime: Multiplayer Edition',
+    description: 'Read more about Supabase Realtime.',
+    href: 'https://supabase.com/blog/supabase-realtime-multiplayer-general-availability',
+  },
+]
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} hideToc={true} />
 
 export default Page

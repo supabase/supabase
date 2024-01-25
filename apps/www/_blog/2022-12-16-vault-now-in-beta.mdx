@@ -4,6 +4,8 @@ description: 'A Postgres extension to store encrypted secrets and encrypt data.'
 author: michel
 image: launch-week-6/vault/og-vault.png
 thumb: launch-week-6/vault/og-vault.png
+categories:
+  - product
 tags:
   - launch-week
   - postgres
@@ -11,11 +13,20 @@ tags:
   - planetpg
 date: '2022-12-16'
 toc_depth: 3
+video: https://www.youtube.com/v/QHLPNDrdN2w
 ---
 
 During our last Launch Week we [announced](/blog/supabase-vault) Supabase Vault as our “one more thing”. Today we're releasing it progressively across the platform.
 
 Vault is a new Postgres extension and accompanying Supabase UI that makes it safe and easy to store encrypted secrets and encrypt other stored data in your database. This foundation opens up a lot of possibilities for Postgres that go beyond what is available in a stock distribution. From a product perspective we're grouping various features under the “Vault banner”. Let's explore a few of these features.
+
+<div className="bg-gray-300 rounded-lg px-6 py-2 bold">
+
+❇️ UPDATE JUNE 2023 ❇️
+
+Supabase Vault is now available on every Supabase project. [Check it out](https://supabase.com/dashboard/project/_/settings/vault/secrets)
+
+</div>
 
 ## Secrets Management
 
@@ -23,13 +34,8 @@ Practically speaking, the Vault is a table of Secrets and Encryption Keys that a
 
 We've created a dashboard UI for the Vault that makes storing secrets easy. Click a button and type in your secret, optionally create a new key that is referenced by id (or use the existing default), and submit. Your secret is now stored on disk encrypted using the specified key id.
 
-<video width="99%" muted playsInline controls="true">
-  <source
-    src="/images/blog/launch-week-6/vault/vault-hello-compressed.mp4"
-    type="video/mp4"
-    muted
-    playsInline
-  />
+<video width="99%" muted playsInline controls={true}>
+  <source src="/images/blog/launch-week-6/vault/vault-hello-compressed.mp4" type="video/mp4" />
 </video>
 
 There are two main parts to the Vault UI, Secrets and Encryption Keys:
@@ -57,15 +63,15 @@ Decrypted data can be accessed by a special view that is automatically created w
 
 ## Deep Dive on How The Vault works
 
-<iframe
-  width="560"
-  height="315"
-  src="https://www.youtube-nocookie.com/embed/QHLPNDrdN2w"
-  title="YouTube video player"
-  frameborder="0"
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-  allowfullscreen
-></iframe>
+<div className="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/QHLPNDrdN2w"
+    title="YouTube video player"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen
+  ></iframe>
+</div>
 
 As we mentioned, the Vault uses pgsodium's Transparent Column Encryption (TCE) to store secrets in an authenticated encrypted form. There are some details around that you may be curious about, what does authenticated mean, and where are encryption keys store? This section explains those details.
 
@@ -85,7 +91,7 @@ Privacy is becoming one of the most important features in a modern product. Supa
 
 ### Using the Vault
 
-You'll see the Vault appear in the Dashboard over the next month. If you want to use Vault today, email growth@supabase.com and we'll enable it on your account. Vault is available for all customers (including the Free-tier).
+To learn how to use Supabase Vault, check out the [docs](https://supabase.com/docs/guides/database/vault). Supabase Vault is now available on all [Supabase projects](https://supabase.com/dashboard/project/_/settings/vault/secrets) (some projects will have to enable via request).
 
 ## More Launch Week 6
 

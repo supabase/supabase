@@ -939,6 +939,10 @@
     "name": "Tablet",
     "path": "react-feather/dist/icons/tablet"
   },
+  "Table": {
+    "name": "Table",
+    "path": "react-feather/dist/icons/table"
+  },
   "Tag": {
     "name": "Tag",
     "path": "react-feather/dist/icons/tag"

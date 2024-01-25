@@ -1,10 +1,7 @@
 import { useState, useEffect } from 'react'
-import { createClient } from '@supabase/supabase-js'
+import { createPagesBrowserClient } from '@supabase/auth-helpers-nextjs'
 
-export const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_KEY
-)
+export const supabase = createPagesBrowserClient()
 
 /**
  * @param {number} channelId the currently selected Channel
@@ -62,9 +59,9 @@ export const useStore = (props) => {
       .subscribe()
     // Cleanup on unmount
     return () => {
-      supabase.removeChannel('public:messages')
-      supabase.removeChannel('public:users')
-      supabase.removeChannel('public:channels')
+      supabase.removeChannel(supabase.channel(messageListener))
+      supabase.removeChannel(supabase.channel(userListener))
+      supabase.removeChannel(supabase.channel(channelListener))
     }
   }, [])
 
@@ -179,7 +176,7 @@ export const fetchMessages = async (channelId, setState) => {
       .from('messages')
       .select(`*, author:user_id(*)`)
       .eq('channel_id', channelId)
-      .order('inserted_at', true)
+      .order('inserted_at', { ascending: true })
     if (setState) setState(data)
     return data
   } catch (error) {

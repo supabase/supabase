@@ -1,44 +1,114 @@
-// module.exports = {
-//   content: [
-//     "../../packages/ui/components/**/*.{ts,tsx}",
-//     "./src/**/*.{ts,tsx}",
-//   ],
-//   theme: {
-//     extend: {},
-//   },
-//   plugins: [],
-// }
-
 const ui = require('./ui.config.js')
-const svgToDataUri = require('mini-svg-data-uri')
+const deepMerge = require('deepmerge')
 
-module.exports = ui({
+const color = require('./../ui/build/css/tw-extend/color')
+
+/**
+ *
+ */
+let colorExtend = {}
+Object.values(color).map((x, i) => {
+  colorExtend[Object.keys(color)[i]] = `hsl(${x.cssVariable} / <alpha-value>)` // x.cssVariable
+})
+
+// console.log('colorExtend', colorExtend)
+// console.log('colorExtend kebabToNested', kebabToNested(colorExtend))
+
+// console.log('colorExtend', kebabToNested(colorExtend).colors.gray)
+
+/**
+ * Generates Tailwind colors for the theme
+ * adds <alpha-value> as part of the hsl value
+ */
+function generateTwColorClasses(globalKey, twAttributes) {
+  let classes = {}
+  Object.values(twAttributes).map((attr, i) => {
+    const attrKey = Object.keys(twAttributes)[i]
+
+    if (attrKey.includes(globalKey)) {
+      const keySplit = attrKey.split('-').splice(1).join('-')
+
+      let payload = {
+        [keySplit]: `hsl(${attr.cssVariable} / <alpha-value>)`,
+      }
+
+      if (keySplit == 'DEFAULT') {
+        // includes a 'default' duplicate
+        // this allows for classes like `border-default` which is the same as `border`
+        payload = {
+          ...payload,
+          default: `hsl(${attr.cssVariable} / <alpha-value>)`,
+        }
+      }
+
+      classes = {
+        ...classes,
+        ...payload,
+      }
+    }
+  })
+  /**
+   * mutate object into nested object for tailwind theme structure
+   */
+  const nestedClasses = kebabToNested(classes)
+  // return, but nest the keys if they are kebab case named
+  return nestedClasses
+}
+
+/**
+ * Helper to convert kebab named keys in object to nested nodes
+ */
+function kebabToNested(obj) {
+  const result = {}
+  for (const [key, value] of Object.entries(obj)) {
+    const parts = key.split('-')
+    let currentObj = result
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i] === 'DEFAULT' ? parts[i] : parts[i].toLowerCase() // convert key to lowercase
+      if (!currentObj[part]) {
+        currentObj[part] = {}
+      }
+      if (i === parts.length - 1) {
+        if (typeof value === 'object') {
+          currentObj[part] = kebabToNested(value) // recursively convert nested objects
+        } else {
+          currentObj[part] = value.toString().toLowerCase() // convert value to lowercase
+        }
+      } else {
+        currentObj = currentObj[part]
+      }
+    }
+  }
+  return result
+}
+
+/**
+ * Main theme config
+ */
+const uiConfig = ui({
   mode: 'JIT',
-  content: [
-    '../../packages/common/**/*.{ts,tsx}',
-    '../../packages/ui/**/*.{tsx,ts,js}',
-    './src/**/*.{ts,tsx,mdx}',
-    './components/**/*.tsx',
-    './layouts/**/*.tsx',
-    './pages/**/*.{tsx,mdx}',
-    './docs/**/*.{tsx,mdx}',
-    './_blog/*.mdx',
-    // purge styles from supabase ui theme
-  ],
-  darkMode: 'class', // 'media' or 'class'
-  // mode: 'jit',
+  darkMode: ['class', '[data-theme*="dark"]'],
   theme: {
+    /**
+     * Spread all theme colors and custom generated colors into theme
+     */
+    textColor: (theme) => ({
+      ...theme('colors'),
+      ...generateTwColorClasses('foreground', color),
+    }),
+    backgroundColor: (theme) => ({
+      ...theme('colors'),
+      ...generateTwColorClasses('background', color),
+    }),
     borderColor: (theme) => ({
       ...theme('colors'),
-      DEFAULT: theme('colors.scale.300', 'currentColor'),
-      dark: theme('colors.scale.1200', 'currentColor'),
-    }),
-    divideColor: (theme) => ({
-      ...theme('colors'),
-      DEFAULT: theme('colors.scale.300', 'currentColor'),
-      dark: theme('colors.scale.600', 'currentColor'),
+      ...generateTwColorClasses('border', color),
     }),
     extend: {
+      colors: {
+        ...kebabToNested(colorExtend),
+      },
+
       typography: ({ theme }) => ({
         // Removal of backticks in code blocks for tailwind v3.0
         // https://github.com/tailwindlabs/tailwindcss-typography/issues/135
@@ -50,41 +120,50 @@ module.exports = ui({
             'code::after': {
               content: '""',
             },
-            '--tw-prose-body': theme('colors.scale[1100]'),
-            '--tw-prose-headings': theme('colors.scale[1200]'),
-            '--tw-prose-lead': theme('colors.scale[1100]'),
-            '--tw-prose-links': theme('colors.scale[1100]'),
-            '--tw-prose-bold': theme('colors.scale[1100]'),
-            '--tw-prose-counters': theme('colors.scale[1100]'),
-            '--tw-prose-bullets': theme('colors.scale[900]'),
-            '--tw-prose-hr': theme('colors.scale[500]'),
-            '--tw-prose-quotes': theme('colors.scale[1100]'),
-            '--tw-prose-quote-borders': theme('colors.scale[500]'),
-            '--tw-prose-captions': theme('colors.scale[700]'),
-            '--tw-prose-code': theme('colors.scale[1200]'),
-            '--tw-prose-pre-code': theme('colors.scale[900]'),
-            '--tw-prose-pre-bg': theme('colors.scale[400]'),
-            '--tw-prose-th-borders': theme('colors.scale[500]'),
-            '--tw-prose-td-borders': theme('colors.scale[200]'),
-            '--tw-prose-invert-body': theme('colors.scale[200]'),
+            '--tw-prose-body': 'hsl(var(--foreground-light))',
+            '--tw-prose-headings': 'hsl(var(--foreground-default))',
+            '--tw-prose-lead': 'hsl(var(--foreground-light))',
+            '--tw-prose-links': 'hsl(var(--foreground-light))',
+            '--tw-prose-bold': 'hsl(var(--foreground-light))',
+            '--tw-prose-counters': 'hsl(var(--foreground-light))',
+            '--tw-prose-bullets': 'hsl(var(--foreground-muted))',
+            '--tw-prose-hr': 'hsl(var(--background-surface-300))',
+            '--tw-prose-quotes': 'hsl(var(--foreground-light))',
+            '--tw-prose-quote-borders': 'hsl(var(--background-surface-300))',
+            '--tw-prose-captions': 'hsl(var(--border-strong))',
+            '--tw-prose-code': 'hsl(var(--foreground-default))',
+            '--tw-prose-pre-code': 'hsl(var(--foreground-muted))',
+            '--tw-prose-pre-bg': 'hsl(var(--background-surface-200))',
+            '--tw-prose-th-borders': 'hsl(var(--background-surface-300))',
+            '--tw-prose-td-borders': 'hsl(var(--background-default))',
+            '--tw-prose-invert-body': 'hsl(var(--background-default))',
             '--tw-prose-invert-headings': theme('colors.white'),
-            '--tw-prose-invert-lead': theme('colors.scale[500]'),
+            '--tw-prose-invert-lead': 'hsl(var(--background-surface-300))',
             '--tw-prose-invert-links': theme('colors.white'),
             '--tw-prose-invert-bold': theme('colors.white'),
-            '--tw-prose-invert-counters': theme('colors.scale[400]'),
-            '--tw-prose-invert-bullets': theme('colors.scale[600]'),
-            '--tw-prose-invert-hr': theme('colors.scale[700]'),
-            '--tw-prose-invert-quotes': theme('colors.scale[100]'),
-            '--tw-prose-invert-quote-borders': theme('colors.scale[700]'),
-            '--tw-prose-invert-captions': theme('colors.scale[400]'),
+            '--tw-prose-invert-counters': 'hsl(var(--background-surface-200))',
+            '--tw-prose-invert-bullets': 'hsl(var(--background-selection))',
+            '--tw-prose-invert-hr': 'hsl(var(--border-strong))',
+            '--tw-prose-invert-quotes': 'hsl(var(--background-alternative-default))',
+            '--tw-prose-invert-quote-borders': 'hsl(var(--border-strong))',
+            '--tw-prose-invert-captions': 'hsl(var(--background-surface-200))',
             // the following are typography overrides
             // examples can be seen here —> https://github.com/tailwindlabs/tailwindcss-typography/blob/master/src/styles.js
             // reset all header font weights
-            'h1, h2, h3, h4, h5': {
+            h4: {
+              // override font size
+              fontSize: '1.15em',
+            },
+            h5: {
+              // h5 not included in --tw-prose-headings
+              color: theme('colors.scale[1200]'),
+            },
+            'h1, h2, h3, h4, h5, h6': {
               fontWeight: '400',
             },
-            h2: {
-              fontWeight: '400',
+            'article h2, article h3, article h4, article h5, article h6': {
+              marginTop: '2em',
+              marginBottom: '1em',
             },
             p: {
               fontWeight: '400',
@@ -108,35 +187,40 @@ module.exports = ui({
               height: '0.125rem',
               width: '0.5rem',
               borderRadius: '0.25rem',
-              backgroundColor: 'var(--colors-scale7)',
+              backgroundColor: 'hsl(var(--border-strong))',
               content: '""',
             },
             ol: {
               paddingLeft: '1rem',
               counterReset: 'item',
               listStyleType: 'none',
+              marginBottom: '3rem',
             },
-            'ol li': { display: 'block', position: 'relative', paddingLeft: '1rem' },
-            'ol li::before': {
+            'ol>li': {
+              display: 'block',
+              position: 'relative',
+              paddingLeft: '1rem',
+            },
+            'ol>li::before': {
               position: 'absolute',
               top: '0.25rem',
               left: '-1rem',
               height: '1.2rem',
               width: '1.2rem',
               borderRadius: '0.25rem',
-              backgroundColor: 'var(--colors-scale3)',
-              border: '1px solid var(--colors-scale5)',
+              backgroundColor: 'hsl(var(--background-surface-100))',
+              border: '1px solid hsl(var(--border-default))',
               content: 'counter(item) "  "',
               counterIncrement: 'item',
               fontSize: '12px',
-              color: 'var(--colors-scale9)',
+              color: 'hsl(var(--foreground-muted))',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
             },
 
             'p img': {
-              border: '1px solid var(--colors-scale4)',
+              border: '1px solid hsl(var(--border-muted))',
               borderRadius: '4px',
               overflow: 'hidden',
             },
@@ -145,13 +229,13 @@ module.exports = ui({
               borderRadius: theme('borderRadius.lg'),
             },
             td: {
-              borderBottom: '1px solid ' + theme('colors.scale[400]'),
+              borderBottom: '1px solid ' + 'hsl(var(--background-surface-200))',
             },
             code: {
               fontWeight: '400',
               padding: '0.2rem 0.4rem',
-              backgroundColor: theme('colors.scale[400]'),
-              border: '1px solid ' + theme('colors.scale[500]'),
+              backgroundColor: 'hsl(var(--background-surface-200))',
+              border: '1px solid ' + 'hsl(var(--background-surface-300))',
               borderRadius: theme('borderRadius.lg'),
               wordBreak: 'break-all',
             },
@@ -160,14 +244,30 @@ module.exports = ui({
               transition: 'color 0.3s ease-in-out',
               paddingBottom: '2px',
               fontWeight: '400',
-              color: 'var(--colors-scale12)',
+              color: 'hsl(var(--foreground-default))',
               textDecorationLine: 'underline',
-              textDecorationColor: 'var(--colors-brand7)',
+              textDecorationColor: 'hsl(var(--brand-500))',
               textDecorationThickness: '1px',
               textUnderlineOffset: '4px',
             },
             'a:hover': {
-              textDecorationColor: 'var(--colors-brand9)',
+              textDecorationColor: 'hsl(var(--colors-scale12))',
+            },
+            figcaption: {
+              color: 'hsl(var(--foreground-muted))',
+              fontFamily: 'Office Code Pro, monospace',
+            },
+            'figure.quote-figure p:first-child': {
+              marginTop: '0 !important',
+            },
+            'figure.quote-figure p:last-child': {
+              marginBottom: '0 !important',
+            },
+            figure: {
+              margin: '3rem 0',
+            },
+            'figure img': {
+              margin: '0 !important',
             },
           },
         },
@@ -187,9 +287,9 @@ module.exports = ui({
                 'text-decoration': 'none',
                 fontSize: '0.8rem',
                 fontWeight: '200',
-                color: theme('colors.scale[1100]'),
+                color: 'hsl(var(--foreground-light))',
                 '&:hover': {
-                  color: theme('colors.scale[1200]'),
+                  color: 'hsl(var(--foreground-default))',
                 },
                 'font-weight': '400',
               },
@@ -204,108 +304,63 @@ module.exports = ui({
                 },
                 a: {
                   fontWeight: '200',
-                  color: theme('colors.scale[1000]'),
+                  color: 'hsl(var(--foreground-lighter))',
                   '&:hover': {
-                    color: theme('colors.scale[1200]'),
+                    color: 'hsl(var(--foreground-default))',
                   },
                 },
               },
             },
           },
         },
+        // used in auto docs
+        docs: {
+          css: {
+            '--tw-prose-body': 'hsl(var(--foreground-light))',
+            '--tw-prose-headings': 'hsl(var(--foreground-default))',
+            '--tw-prose-lead': 'hsl(var(--foreground-light))',
+            '--tw-prose-links': 'hsl(var(--brand-500))',
+            '--tw-prose-bold': 'hsl(var(--foreground-light))',
+            '--tw-prose-counters': 'hsl(var(--foreground-light))',
+            '--tw-prose-bullets': 'hsl(var(--foreground-muted))',
+            '--tw-prose-hr': 'hsl(var(--background-surface-300))',
+            '--tw-prose-quotes': 'hsl(var(--foreground-light))',
+            '--tw-prose-quote-borders': 'hsl(var(--background-surface-300))',
+            '--tw-prose-captions': 'hsl(var(--border-strong))',
+            '--tw-prose-code': 'hsl(var(--foreground-default))',
+            '--tw-prose-pre-code': 'hsl(var(--foreground-muted))',
+            '--tw-prose-pre-bg': 'hsl(var(--background-surface-200))',
+            '--tw-prose-th-borders': 'hsl(var(--background-surface-300))',
+            '--tw-prose-td-borders': 'hsl(var(--background-default))',
+            '--tw-prose-invert-body': 'hsl(var(--background-default))',
+            '--tw-prose-invert-headings': theme('colors.white'),
+            '--tw-prose-invert-lead': 'hsl(var(--background-surface-300))',
+            '--tw-prose-invert-links': theme('colors.white'),
+            '--tw-prose-invert-bold': theme('colors.white'),
+            '--tw-prose-invert-counters': 'hsl(var(--background-surface-200))',
+            '--tw-prose-invert-bullets': 'hsl(var(--background-selection))',
+            '--tw-prose-invert-hr': 'hsl(var(--border-strong))',
+            '--tw-prose-invert-quotes': 'hsl(var(--background-alternative-default))',
+            '--tw-prose-invert-quote-borders': 'hsl(var(--border-strong))',
+            '--tw-prose-invert-captions': 'hsl(var(--background-surface-200))',
+            // the following are typography overrides
+            // examples can be seen here —> https://github.com/tailwindlabs/tailwindcss-typography/blob/master/src/styles.js
+            // reset all header font weights
+            'h1, h2, h3, h4, h5': {
+              fontWeight: '400',
+            },
+          },
+        },
       }),
       screens: {
         xs: '480px',
-        //   sm: '640px',
-        //   // => @media (min-width: 640px) { ... }
-        //   md: '768px',
-        //   // => @media (min-width: 768px) { ... }
-        //   lg: '1024px',
-        //   // => @media (min-width: 1024px) { ... }
-        //   xl: '1280px',
-        //   // => @media (min-width: 1280px) { ... }
-        //   '2xl': '1536px',
-        //   // => @media (min-width: 1536px) { ... }
       },
-      // colors: {
-      //   'gray-light': '#7B7F86',
-      //   'gray-dark': '#7B7F86',
-      //   'accent-1': '#FAFAFA',
-      //   'accent-2': '#EAEAEA',
-      //   'accent-7': '#333',
-      //   success: '#0070f3',
-      //   cyan: '#79FFE1',
-      //   // brand: {
-      //   //   100: '#82dab0',
-      //   //   200: '#69d3a0',
-      //   //   300: '#50cb90',
-      //   //   400: '#C5F1DD',
-      //   //   500: '#9FE7C7',
-      //   //   600: '#65D9A5',
-      //   //   700: '#3ECF8E',
-      //   //   800: '#38BC81',
-      //   //   900: '#10633E',
-      //   // },
-      //   // Joshen TODO: At the end just rearrange the values
-      //   dark: {
-      //     100: '#eeeeee',
-      //     200: '#e0e0e0',
-      //     300: '#bbbbbb',
-      //     400: '#666666',
-      //     500: '#444444',
-      //     600: '#2a2a2a',
-      //     700: '#1f1f1f',
-      //     800: '#181818',
-      //     900: '#0f0f0f',
-      //   },
-      //   // gray: {
-      //   //   100: '#eeeeee',
-      //   //   200: '#e0e0e0',
-      //   //   300: '#bbbbbb',
-      //   //   400: '#666666',
-      //   //   500: '#444444',
-      //   //   600: '#2a2a2a',
-      //   //   700: '#1f1f1f',
-      //   //   800: '#181818',
-      //   //   900: '#0f0f0f',
-      //   // },
-      // },
-      // spacing: {
-      //   28: '7rem',
-      // },
-      // letterSpacing: {
-      //   tighter: '-.04em',
-      // },
-      // lineHeight: {
-      //   tight: 1.2,
-      // },
-      // fontSize: {
-      //   '5xl': '2.5rem',
-      //   '6xl': '2.75rem',
-      //   '7xl': '4.5rem',
-      //   '8xl': '6.25rem',
-      // },
-      // boxShadow: {
-      //   'light-small': '0px 4px 8px 2px rgba(107, 114, 128, 0.08)',
-      //   small: '0 5px 10px rgba(0, 0, 0, 0.12)',
-      //   medium: '0 8px 30px rgba(0, 0, 0, 0.12)',
-      //   override: '0px 0px 0px rgba(0, 0, 0, 0)',
-      // },
       fontFamily: {
-        sans: ['custom-font', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
+        sans: ['Circular', 'custom-font', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
         mono: ['Office Code Pro', 'Source Code Pro', 'Menlo', 'monospace'],
       },
-      // stroke: (theme) => ({
-      //   white: theme('colors.white'),
-      //   black: theme('colors.black'),
-      // }),
-      backgroundImage: (theme) => ({
-        squiggle: `url("${svgToDataUri(
-          `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 3" enable-background="new 0 0 6 3" width="6" height="3" fill="${theme(
-            'colors.yellow.400'
-          )}"><polygon points="5.5,0 2.5,3 1.1,3 4.1,0"/><polygon points="4,0 6,2 6,0.6 5.4,0"/><polygon points="0,2 1,3 2.4,3 0,0.6"/></svg>`
-        )}")`,
-      }),
+
+      // shadcn defaults START
       keyframes: {
         'flash-code': {
           '0%': { backgroundColor: 'rgba(63, 207, 142, 0.1)' },
@@ -316,14 +371,46 @@ module.exports = ui({
         'flash-code': 'flash-code 1s forwards',
         'flash-code-slow': 'flash-code 2s forwards',
       },
+      // borderRadius: {
+      //   lg: `var(--radius)`,
+      //   md: `calc(var(--radius) - 2px)`,
+      //   sm: 'calc(var(--radius) - 4px)',
+      // },
+      // fontFamily: {
+      //   sans: ['var(--font-sans)', ...fontFamily.sans],
+      // },
+      keyframes: {
+        'accordion-down': {
+          from: { height: 0 },
+          to: { height: 'var(--radix-accordion-content-height)' },
+        },
+        'accordion-up': {
+          from: { height: 'var(--radix-accordion-content-height)' },
+          to: { height: 0 },
+        },
+      },
+      // shadcn defaults END
     },
   },
-  // variants: {
-  //   extend: {
-  //     inset: ['group-hover'],
-  //     stroke: ['dark'],
-  //     height: ['hover'],
-  //   },
-  // },
-  plugins: [require('@tailwindcss/typography')],
+  plugins: [require('@tailwindcss/typography'), require('tailwindcss-animate')],
 })
+
+function arrayMergeFn(destinationArray, sourceArray) {
+  return destinationArray.concat(sourceArray).reduce((acc, cur) => {
+    if (acc.includes(cur)) return acc
+    return [...acc, cur]
+  }, [])
+}
+
+/**
+ * Merge Supabase UI and Tailwind CSS configurations
+ * @param {object} tailwindConfig - Tailwind config object
+ * @return {object} new config object
+ */
+function wrapper(tailwindConfig) {
+  return deepMerge({ ...tailwindConfig }, uiConfig, {
+    arrayMerge: arrayMergeFn,
+  })
+}
+
+module.exports = wrapper

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 // @ts-ignore
 import defaultTheme from '../../theme/defaultTheme'
 // @ts-ignore
@@ -19,7 +19,7 @@ type Props = {
   responsive?: boolean
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
   beforeLabel?: string
-  afterLabel?: string
+  afterLabel?: string | React.ReactNode
   nonBoxInput?: boolean
   labelLayout?: 'horizontal' | 'vertical'
 }
@@ -86,9 +86,7 @@ export function FormLayout({
   } else {
     dataInputContainerClasses.push(__styles.data_input_vertical_layout)
     if (align === 'right') {
-      dataInputContainerClasses.push(
-        __styles.data_input_vertical_layout__align_right
-      )
+      dataInputContainerClasses.push(__styles.data_input_vertical_layout__align_right)
     }
   }
 
@@ -127,15 +125,12 @@ export function FormLayout({
   )
 
   const renderDescription = descriptionText && (
-    <p
-      className={[
-        __styles.description.base,
-        __styles.description.size[size],
-      ].join(' ')}
+    <div
+      className={[__styles.description.base, __styles.description.size[size]].join(' ')}
       id={id + '-description'}
     >
       {descriptionText}
-    </p>
+    </div>
   )
 
   return (
@@ -153,19 +148,14 @@ export function FormLayout({
         >
           {labelled && (
             <label
-              className={[
-                __styles.label.base,
-                __styles.label.size[size],
-                'break-all',
-              ].join(' ')}
+              className={[__styles.label.base, __styles.label.size[size]].join(' ')}
               htmlFor={id}
             >
               {beforeLabel && (
                 <span
-                  className={[
-                    __styles.label_before.base,
-                    __styles.label_before.size[size],
-                  ].join(' ')}
+                  className={[__styles.label_before.base, __styles.label_before.size[size]].join(
+                    ' '
+                  )}
                   id={id + '-before'}
                 >
                   {beforeLabel}
@@ -174,10 +164,7 @@ export function FormLayout({
               {label}
               {afterLabel && (
                 <span
-                  className={[
-                    __styles.label_after.base,
-                    __styles.label_after.size[size],
-                  ].join(' ')}
+                  className={[__styles.label_after.base, __styles.label_after.size[size]].join(' ')}
                   id={id + '-after'}
                 >
                   {afterLabel}
@@ -187,10 +174,9 @@ export function FormLayout({
           )}
           {labelOptional && (
             <span
-              className={[
-                __styles.label_optional.base,
-                __styles.label_optional.size[size],
-              ].join(' ')}
+              className={[__styles.label_optional.base, __styles.label_optional.size[size]].join(
+                ' '
+              )}
               id={id + '-optional'}
             >
               {labelOptional}

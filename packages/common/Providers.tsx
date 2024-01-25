@@ -1,44 +1,7 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { ThemeProvider as NextThemesProvider } from 'next-themes'
+import { type ThemeProviderProps } from 'next-themes/dist/types'
 
-interface UseThemeProps {
-  isDarkMode?: boolean
-  toggleTheme: () => void
-}
-
-interface ThemeProviderProps {
-  children?: any
-}
-
-export const ThemeContext = createContext<UseThemeProps>({
-  isDarkMode: true,
-  toggleTheme: () => {},
-})
-
-export const useTheme = () => useContext(ThemeContext)
-
-export const ThemeProvider = ({ children }: ThemeProviderProps) => {
-  const [isDarkMode, setIsDarkMode] = useState(false)
-
-  useEffect(() => {
-    const key = localStorage.getItem('supabaseDarkMode')
-    // Default to dark mode if no preference config
-    setIsDarkMode(!key || key === 'true')
-  }, [])
-
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode)
-  }
-
-  return (
-    <>
-      <ThemeContext.Provider
-        value={{
-          isDarkMode,
-          toggleTheme,
-        }}
-      >
-        {children}
-      </ThemeContext.Provider>
-    </>
-  )
+export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
+  // @ts-ignore next-themes is old :/
+  return <NextThemesProvider {...props}>{children}</NextThemesProvider>
 }

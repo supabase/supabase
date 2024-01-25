@@ -13,4 +13,4 @@ Note: `SMTP_PORT` must be a port other than `25`, `465`, and `587` as Deno Deplo
 ## Test locally
 
 - `cp ./supabase/.env.local.example ./supabase/.env.local`
-- `supabase functions serve send-email-smtp --env-file ./supabase/.env.local`
+- `supabase functions serve --env-file ./supabase/.env.local`

@@ -15,19 +15,18 @@ While Postgres natively runs SQL, it can also run other "procedural languages".
 
 It can be used for database functions, triggers, queries and more.
 
-## Usage
-
-### Enable the extension
+## Enable the extension
 
 <Tabs
   scrollable
   size="small"
   type="underlined"
   defaultActiveId="dashboard"
+  queryGroup="database-method"
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Database](https://app.supabase.com/project/_/database/tables) page in the Dashboard.
+1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
 3. Search for "plv8" and enable the extension.
 
@@ -50,7 +49,7 @@ Procedural languages are automatically installed within `pg_catalog`, so you don
 </TabPanel>
 </Tabs>
 
-### Create `plv8` functions
+## Create `plv8` functions
 
 Functions written in `plv8` are written just like any other PostgreSQL functions, only
 with the `language` identifier set to `plv8`.
@@ -71,6 +70,7 @@ You can call `plv8` functions like any other Postgres function:
   size="small"
   type="underlined"
   defaultActiveId="sql"
+  queryGroup="language"
 >
 <TabPanel id="sql" label="SQL">
 
@@ -135,6 +135,8 @@ returns setof messages as $$
 
     return json_result;
 $$ language plv8;
+
+select * from get_messages();
 ```
 
 ## Resources

@@ -1,0 +1,22 @@
+.react-contexify {
+  @apply border border-default;
+  background-color: hsl(var(--background-surface-100)) !important;
+
+  .react-contexify__item {
+    .react-contexify__item__content {
+      @apply text-foreground-light text-sm;
+    }
+    .react-contexify__submenu {
+      @apply bg-surface-100 border;
+    }
+  }
+  .react-contexify__item:not(.react-contexify__item--disabled):hover
+    > .react-contexify__item__content,
+  .react-contexify__item:not(.react-contexify__item--disabled):focus
+    > .react-contexify__item__content {
+    @apply bg-overlay-hover text-foreground;
+  }
+  .react-contexify__separator {
+    @apply bg-surface-300;
+  }
+}

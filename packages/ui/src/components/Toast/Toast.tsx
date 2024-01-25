@@ -1,28 +1,26 @@
+import * as Portal from '@radix-ui/react-portal'
 import React, { ComponentProps } from 'react'
 import {
+  Toast as HotToastProps,
   Toaster as HotToaster,
+  ToastType,
   toast as hotToast,
   resolveValue,
 } from 'react-hot-toast'
-import {
-  Toast as HotToastProps,
-  ToastType,
-} from 'react-hot-toast/dist/core/types'
-import * as Portal from '@radix-ui/react-portal'
+import { IconAlertCircle } from '../Icon/icons/IconAlertCircle'
 import { IconCheck } from '../Icon/icons/IconCheck'
 import { IconLoader } from '../Icon/icons/IconLoader'
 import { IconX } from '../Icon/icons/IconX'
-import { IconAlertCircle } from '../Icon/icons/IconAlertCircle'
 // @ts-ignore
-import ToastStyles from './Toast.module.css'
 import Typography from '../Typography'
+import ToastStyles from './Toast.module.css'
 
 const icons: Partial<{ [key in ToastType]: any }> = {
   error: <IconAlertCircle size="medium" strokeWidth={2} />,
   success: <IconCheck size="medium" strokeWidth={2} />,
 }
 
-export interface ToastProps extends Partial<HotToastProps> {
+export interface ToastProps extends HotToastProps {
   description?: string
   closable?: boolean
   actions?: React.ReactNode
@@ -30,10 +28,7 @@ export interface ToastProps extends Partial<HotToastProps> {
   width?: 'xs' | 'sm' | 'md'
 }
 
-function Message({
-  children,
-  ...props
-}: ComponentProps<typeof Typography.Text>) {
+function Message({ children, ...props }: ComponentProps<typeof Typography.Text>) {
   return (
     <Typography.Text className={ToastStyles['sbui-toast-message']} {...props}>
       {children}
@@ -41,15 +36,9 @@ function Message({
   )
 }
 
-function Description({
-  children,
-  ...props
-}: ComponentProps<typeof Typography.Text>) {
+function Description({ children, ...props }: ComponentProps<typeof Typography.Text>) {
   return (
-    <Typography.Text
-      className={ToastStyles['sbui-toast-description']}
-      {...props}
-    >
+    <Typography.Text className={ToastStyles['sbui-toast-description']} {...props}>
       {children}
     </Typography.Text>
   )
@@ -103,15 +92,11 @@ function Toast({
     typeof message === 'string' ? (
       <Message>{message}</Message>
     ) : (
-      resolveValue(message, rest)
+      resolveValue(message, { id, type, message, visible, ...rest })
     )
 
   return (
-    <div
-      className={`${containerClasses.join(' ')} ${
-        visible ? 'animate-enter' : 'animate-leave'
-      }`}
-    >
+    <div className={`${containerClasses.join(' ')} ${visible ? 'animate-enter' : 'animate-leave'}`}>
       <div>
         <Typography.Text className={ToastStyles['sbui-toast-icon-container']}>
           {type === 'loading' ? (
@@ -129,28 +114,21 @@ function Toast({
             {_message}
             {description && <Description>{description}</Description>}
           </div>
-          {actions && (
-            <div className={ToastStyles['sbui-toast-details__actions']}>
-              {actions}
-            </div>
-          )}
+          {actions && <div className={ToastStyles['sbui-toast-details__actions']}>{actions}</div>}
         </div>
         {closable && (
           <div className={ToastStyles['sbui-toast-close-container']}>
             <button
               aria-label="Close alert"
               className={closeButtonClasses.join(' ')}
-              onClick={() => {
+              onClick={(event) => {
+                event.preventDefault()
+                event.stopPropagation()
                 hotToast.dismiss(id)
               }}
             >
               <span className="sr-only">Close</span>
-              <IconX
-                className="h-5 w-5"
-                aria-hidden="true"
-                size="small"
-                strokeWidth={2}
-              />
+              <IconX className="h-5 w-5" aria-hidden="true" size="small" strokeWidth={2} />
             </button>
           </div>
         )}
@@ -171,7 +149,7 @@ function Toaster({ children }: ToasterProps) {
           typeof message === 'string' ? (
             <Toast message={message} {...t} />
           ) : (
-            <>{resolveValue(message, t)}</>
+            <>{resolveValue(message, { message, ...t })}</>
           )
         }
       </HotToaster>
@@ -200,8 +178,7 @@ type ToastOptions = Partial<
 >
 
 export function toast(message: string, opts?: ToastOptions) {
-  const { description, closable, actions, actionsPosition, type, ...rest } =
-    opts || {}
+  const { description, closable, actions, actionsPosition, type, ...rest } = opts || {}
 
   return hotToast(
     ({ message: _m, type: _t, ...t }) => (
@@ -211,7 +188,7 @@ export function toast(message: string, opts?: ToastOptions) {
         closable={closable}
         actions={actions}
         actionsPosition={actionsPosition}
-        type={type}
+        type={type || 'success'}
         {...t}
       />
     ),
@@ -219,16 +196,13 @@ export function toast(message: string, opts?: ToastOptions) {
   )
 }
 
-const createToastType = (type: ToastType) => (
-  message: string,
-  opts?: Omit<ToastOptions, 'type'>
-) => toast(message, { ...opts, type })
+const createToastType = (type: ToastType) => (message: string, opts?: Omit<ToastOptions, 'type'>) =>
+  toast(message, { ...opts, type })
 
 toast.success = createToastType('success')
 toast.error = createToastType('error')
 toast.loading = createToastType('loading')
-toast.promise = (...args: Parameters<typeof hotToast.promise>) =>
-  hotToast.promise(...args)
+toast.promise = (...args: Parameters<typeof hotToast.promise>) => hotToast.promise(...args)
 
 Toast.Toaster = Toaster
 Toast.toast = toast

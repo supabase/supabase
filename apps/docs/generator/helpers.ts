@@ -1,7 +1,8 @@
-import * as _ from 'lodash'
 import * as fs from 'fs'
+import { mapValues, values } from 'lodash'
 
 export const slugify = (text: string) => {
+  if (!text) return ''
   return text
     .toString()
     .toLowerCase()
@@ -33,8 +34,8 @@ export const writeToDisk = (fileName: string, content: any) => {
  * Convert Object to Array of values
  */
 export const toArrayWithKey = (obj: object, keyAs: string) =>
-  _.values(
-    _.mapValues(obj, (value: any, key: string) => {
+  values(
+    mapValues(obj, (value: any, key: string) => {
       value[keyAs] = key
       return value
     })

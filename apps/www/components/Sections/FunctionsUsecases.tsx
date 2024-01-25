@@ -36,7 +36,7 @@ function FunctionsUsecases(props: Props) {
     <div className="grid grid-cols-12 lg:gap-16">
       <div className="col-span-12 pb-8 lg:col-span-5 xl:col-span-5">
         <h2 className="h3">{props.title}</h2>
-        <p className="p">{props.text}</p>
+        <div className="p">{props.text}</div>
 
         <div className="flex flex-col gap-3">
           {props.content.map((feat, i) => {
@@ -45,8 +45,8 @@ function FunctionsUsecases(props: Props) {
               <button
                 key={`featureHighlighted-${i}`}
                 className={
-                  'bg-scale-200 hover:bg-scale-100 hover:dark:bg-scale-300 hover:boder group rounded-md border px-6 py-4 text-left transition-all' +
-                  (active ? ' dark:bg-scale-400 border-scale-500 bg-white' : ' border-scale-300')
+                  'bg-background hover:bg-surface-100 hover:border group rounded-md border px-6 py-4 text-left transition-all' +
+                  (active ? ' bg-surface-200 border-foreground-lighter' : '')
                 }
                 // onClick={() => setCurrentSelection(feat.highlightLines)}
                 onClick={() => handleApiSwiperNavChange(i)}
@@ -54,7 +54,9 @@ function FunctionsUsecases(props: Props) {
                 <div
                   className={
                     'transition-colors ' +
-                    (active ? ' text-scale-1200' : ' text-scale-900 group-hover:text-scale-1200')
+                    (active
+                      ? ' text-foreground'
+                      : ' text-foreground-light group-hover:text-foreground')
                   }
                 >
                   {feat.title}
@@ -62,7 +64,9 @@ function FunctionsUsecases(props: Props) {
                 <div
                   className={
                     'text-sm transition-colors ' +
-                    (active ? ' text-scale-1100' : ' text-scale-800 group-hover:text-scale-1100 ')
+                    (active
+                      ? ' text-foreground-light'
+                      : ' text-foreground-light group-hover:text-foreground-light ')
                   }
                 >
                   {/*
@@ -73,13 +77,17 @@ function FunctionsUsecases(props: Props) {
             )
           })}
           {props.documentation_link && (
-            <Link href={props.documentation_link} as={props.documentation_link}>
-              <a>
-                <Button size="small" className="mt-4" type="default" icon={<IconArrowUpRight />}>
-                  Explore documentation
-                </Button>
-              </a>
-            </Link>
+            <Button
+              asChild
+              size="small"
+              className="mt-4"
+              type="default"
+              icon={<IconArrowUpRight />}
+            >
+              <Link href={props.documentation_link} as={props.documentation_link}>
+                Explore documentation
+              </Link>
+            </Button>
           )}
         </div>
       </div>

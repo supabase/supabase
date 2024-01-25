@@ -1,18 +1,17 @@
+import clsx from 'clsx'
 import React, { useEffect, useState } from 'react'
 import { FormLayout } from '../../lib/Layout/FormLayout'
-import { useFormContext } from '../Form/FormContext'
-
-import defaultTheme from '../../lib/theme/defaultTheme'
 import styleHandler from '../../lib/theme/styleHandler'
+import { useFormContext } from '../Form/FormContext'
 
 interface Props extends Omit<React.HTMLAttributes<HTMLButtonElement>, 'size'> {
   name?: string
   disabled?: boolean
   layout?: 'horizontal' | 'vertical' | 'flex'
   error?: string
-  descriptionText?: string
-  label?: string
-  afterLabel?: string
+  descriptionText?: string | React.ReactNode
+  label?: string | React.ReactNode
+  afterLabel?: string | React.ReactNode
   beforeLabel?: string
   labelOptional?: string
   className?: any
@@ -64,7 +63,9 @@ function Toggle({
   }, [])
 
   function handleBlurEvent(e: React.FocusEvent<HTMLButtonElement>) {
-    if (handleBlur) handleBlur(e)
+    setTimeout(() => {
+      if (handleBlur) handleBlur(e)
+    }, 100)
     if (onBlur) onBlur(e)
   }
 
@@ -129,7 +130,7 @@ function Toggle({
         type="button"
         id={id}
         name={name}
-        className={toggleClasses.join(' ')}
+        className={clsx(...toggleClasses, disabled && 'opacity-50 cursor-default')}
         onClick={onClick}
         disabled={disabled}
         onBlur={handleBlurEvent}

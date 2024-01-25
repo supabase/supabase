@@ -15,6 +15,8 @@ async function generate() {
     'pages/*/*.tsx',
     'data/**/*.mdx',
     '_blog/*.mdx',
+    '_case-studies/*.mdx',
+    '_customers/*.mdx',
     '_alternatives/*.mdx',
     '!pages/index.tsx',
     '!data/*.mdx',
@@ -22,7 +24,13 @@ async function generate() {
     '!pages/*/index.tsx',
     '!pages/api',
     '!pages/404.js',
+    '.next/server/pages/partners/integrations/*.html',
+    '.next/server/pages/partners/experts/*.html',
   ])
+
+  const blogUrl = 'blog'
+  const caseStudiesUrl = 'case-studies'
+  const customerStoriesUrl = 'customers'
 
   const sitemap = `
     <?xml version="1.0" encoding="UTF-8"?>
@@ -31,9 +39,13 @@ async function generate() {
           .filter((page) => !page.includes('_document.tsx'))
           .map((page) => {
             const path = page
+              .replace('.next/server/pages', '')
               .replace('pages', '')
+              .replace('.html', '')
               // add a `/` for blog posts
-              .replace('_blog', '/blog')
+              .replace('_blog', `/${blogUrl}`)
+              .replace('_case-studies', `/${caseStudiesUrl}`)
+              .replace('_customers', `/${customerStoriesUrl}`)
               .replace('_alternatives', '/alternatives')
               .replace('.tsx', '')
               .replace('.mdx', '')
@@ -49,15 +61,19 @@ async function generate() {
 
             if (route === '/alternatives/[slug]') return null
             if (route === '/partners/[slug]') return null
+            if (route === '/case-studies/[slug]') return null
+            if (route === '/customers/[slug]') return null
+            if (route === '/launch-week/ticket-image') return null
 
             /**
              * Blog based urls
+             * handle removal of dates in filename
              */
-            if (route.includes('/blog/')) {
+            if (route.includes(`/${blogUrl}/`)) {
               /**
                * remove directory from route
                */
-              const _route = route.replace('/blog/', '')
+              const _route = route.replace(`/${blogUrl}/`, '')
               /**
                * remove the date from the file name
                */
@@ -65,7 +81,7 @@ async function generate() {
               /**
                * reconsruct the route
                */
-              route = '/blog/' + substring
+              route = `/${blogUrl}/` + substring
             }
 
             return `
@@ -85,6 +101,27 @@ async function generate() {
     parser: 'html',
   })
 
+  /**
+   * generate sitemap router
+   *
+   * this points to www and docs sitemaps
+   */
+  const sitemapRouter = `<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>https://supabase.com/sitemap_www.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://supabase.com/docs/sitemap.xml</loc>
+  </sitemap>
+</sitemapindex>
+`
+
+  /**
+   * write sitemaps
+   */
+  // eslint-disable-next-line no-sync
+  writeFileSync('public/sitemap.xml', sitemapRouter)
   // eslint-disable-next-line no-sync
   writeFileSync('public/sitemap_www.xml', formatted)
 }

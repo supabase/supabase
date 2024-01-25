@@ -1,0 +1,110 @@
+
+  <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <title>Blog - Supabase</title>
+      <link>https://supabase.com</link>
+      <description>Latest news from Supabase</description>
+      <language>en</language>
+      <lastBuildDate>Wed, 29 Nov 2023 23:00:00 GMT</lastBuildDate>
+      <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
+      <item>
+  <guid>https://supabase.com/customers/shotgun</guid>
+  <title>Supabase migration delivers an 83% reduction in data infrastructure costs for Shotgun</title>
+  <link>https://supabase.com/customers/shotgun</link>
+  <description>Discover how Shotgun, an event ticketing platform with over 3 million users, reduced costs and consolidated systems through migration to Supabase.</description>
+  <pubDate>Wed, 29 Nov 2023 23:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/next-door-lending</guid>
+  <title>How Next Door Lending leveraged Supabase to become a top 10 mortgage broker</title>
+  <link>https://supabase.com/customers/next-door-lending</link>
+  <description>Discover how Supabase empowered NextDoorLending to move quickly and scale as required, leading to their surpassing other mortgage brokers and expanding their business.</description>
+  <pubDate>Tue, 07 Nov 2023 23:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/good-tape</guid>
+  <title>Good Tape migrates to Supabase managed Postgres and Authentication and achieves database efficiency and a 60% cost reduction.</title>
+  <link>https://supabase.com/customers/good-tape</link>
+  <description>Explore how Good Tape achieved remarkable database efficiency and reduced costs by 60% through their successful migration to Supabase&apos;s managed services.</description>
+  <pubDate>Mon, 30 Oct 2023 23:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/pebblely</guid>
+  <title>Scaling securely: one million users in 7 months with Supabase Auth</title>
+  <link>https://supabase.com/customers/pebblely</link>
+  <description>Learn how Pebblely, an AI image generation company, used Supabase Auth to handle Single Sign On for their rapidly growing user base.</description>
+  <pubDate>Thu, 28 Sep 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/chatbase</guid>
+  <title>Bootstrapped founder builds an AI app with Supabase and scales to $1M in 5 months</title>
+  <link>https://supabase.com/customers/chatbase</link>
+  <description>How Yasser leveraged Supabase to build Chatbase and became one of the most successful single-founder AI products.</description>
+  <pubDate>Tue, 05 Sep 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/quivr</guid>
+  <title>Quivr launch 5,000 Vector databases on Supabase.</title>
+  <link>https://supabase.com/customers/quivr</link>
+  <description>Learn how one of the most popular Generative AI projects uses Supabase as their Vector Store.</description>
+  <pubDate>Mon, 04 Sep 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/berriai</guid>
+  <title>Berri AI boosts productivity by migrating from AWS RDS to Supabase Vector</title>
+  <link>https://supabase.com/customers/berriai</link>
+  <description>Learn how Berri AI overcame challenges with self-hosting their vector database on AWS RDS and successfully migrated to Supabase.</description>
+  <pubDate>Mon, 05 Jun 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/markprompt</guid>
+  <title>Markprompt and Supabase - GDPR-compliant AI chatbots for docs and websites.</title>
+  <link>https://supabase.com/customers/markprompt</link>
+  <description>AI-powered chatbot platform, Markprompt, empowers developers to deliver efficient and GDPR-compliant prompt experiences on top of their content, by leveraging Supabase&apos;s secure and privacy-focused vector database and authentication solutions.</description>
+  <pubDate>Tue, 16 May 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/mendableai</guid>
+  <title>Mendable switches from Pinecone to Supabase Vector for PostgreSQL vector embeddings.</title>
+  <link>https://supabase.com/customers/mendableai</link>
+  <description>How Mendable boosts efficiency and accuracy of chat powered search for documentation using Supabase Vector.</description>
+  <pubDate>Thu, 04 May 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/happyteams</guid>
+  <title>HappyTeams unlocks better performance and reduces cost with Supabase.</title>
+  <link>https://supabase.com/customers/happyteams</link>
+  <description>How a bootstrapped startup migrated from Heroku to Supabase in 30 minutes and never looked back.</description>
+  <pubDate>Wed, 15 Feb 2023 23:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/xendit</guid>
+  <title>Xendit use Supabase and create a full solution shipped to production in less than one week.</title>
+  <link>https://supabase.com/customers/xendit</link>
+  <description>As a payment processor, Xendit are responsible for verifying that all transactions are legal.</description>
+  <pubDate>Mon, 13 Feb 2023 23:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/replenysh</guid>
+  <title>Replenysh uses Supabase to implement OTP in less than 24 hours.</title>
+  <link>https://supabase.com/customers/replenysh</link>
+  <description>With Supabase, Replenysh gets a slick auth experience, reduces DevOps overhead, and continues to scale with Postgres.</description>
+  <pubDate>Mon, 13 Feb 2023 23:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/mobbin</guid>
+  <title>How Mobbin migrated 200,000 users from Firebase for a better authentication experience.</title>
+  <link>https://supabase.com/customers/mobbin</link>
+  <description>Mobbin helps over 200,000 creators globally search and view the latest design patterns from well-known apps.</description>
+  <pubDate>Mon, 13 Feb 2023 23:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/epsilon3</guid>
+  <title>Epsilon3 digitize paper-based procedures in the space industry using telemetry data, simplifying testing and operations.</title>
+  <link>https://supabase.com/customers/epsilon3</link>
+  <description>Epsilon3 uses Supabase to help teams execute secure and reliable operations in an industry where project spend runs into the billions.</description>
+  <pubDate>Mon, 13 Feb 2023 23:00:00 GMT</pubDate>
+</item>
+
+    </channel>
+  </rss>

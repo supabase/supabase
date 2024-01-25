@@ -1,6 +1,6 @@
-import React from 'https://esm.sh/react@18.2.0?deno-std=0.140.0'
+import React from 'https://esm.sh/react@18.2.0?deno-std=0.177.0'
 import { ImageResponse } from 'https://deno.land/x/og_edge@0.0.4/mod.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
 import { corsHeaders } from '../_shared/cors.ts'
 
 const STORAGE_URL = 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw6'
@@ -20,11 +20,12 @@ export async function handler(req: Request) {
   const name = url.searchParams.get('name') ?? url.searchParams.get('amp;name')
   const golden = url.searchParams.get('golden') ?? url.searchParams.get('amp;golden')
 
-  if (!username || !ticketNumber || !name)
+  if (!username || !ticketNumber || !name) {
     return new Response(JSON.stringify({ error: 'missing params' }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 400,
     })
+  }
 
   try {
     // Try to get image from Supabase Storage CDN.
@@ -213,7 +214,7 @@ export async function handler(req: Request) {
       })
     if (error) throw error
 
-    return generatedImage
+    return await fetch(`${STORAGE_URL}/tickets/${username}.png?v=3`)
   } catch (error) {
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

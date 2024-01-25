@@ -12,7 +12,7 @@
 }
 
 .sbui-tab-button-underline--active {
-  @apply border-brand-700;
+  @apply border-brand-400;
   @apply rounded-none;
   @apply text-gray-600;
   @apply dark:text-white;

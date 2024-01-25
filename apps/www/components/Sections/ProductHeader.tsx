@@ -22,7 +22,7 @@ const ProductHeader = (props: Types) => (
             <div className="mb-4 flex items-center gap-3">
               {props.icon && <ProductIcon icon={props.icon} />}
               {props.title && (
-                <span className="text-scale-1200" key={`product-name-${props.title}`}>
+                <span className="text-foreground" key={`product-name-${props.title}`}>
                   {props.title}
                 </span>
               )}
@@ -43,21 +43,17 @@ const ProductHeader = (props: Types) => (
             })}
         </div>
         <div className="flex flex-row md:flex-row md:items-center">
-          <Link href="https://app.supabase.com/" as="https://app.supabase.com/">
-            <a>
-              <Button size="medium" className="text-white">
-                Start a project
-              </Button>
-            </a>
-          </Link>
-          {props.documentation_url && (
-            <Link href={props.documentation_url} as={props.documentation_url}>
-              <a className="ml-2">
-                <Button type="default" size="medium" icon={<IconBookOpen />}>
-                  See documentation
-                </Button>
-              </a>
+          <Button asChild size="medium" className="text-white">
+            <Link href="https://supabase.com/dashboard" as="https://supabase.com/dashboard">
+              Start a project
             </Link>
+          </Button>
+          {props.documentation_url && (
+            <Button asChild type="default" size="medium" icon={<IconBookOpen />}>
+              <Link href={props.documentation_url} as={props.documentation_url} className="ml-2">
+                See documentation
+              </Link>
+            </Button>
           )}
         </div>
         {props.footer && <div className="mb-4">{props.footer}</div>}

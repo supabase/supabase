@@ -1,10 +1,6 @@
 import React, { useState } from 'react'
 
-// import * as RadixContextMenu from '@radix-ui/react-dropdown-menu'
 import { IconCheck } from '../Icon/icons/IconCheck'
-
-// @ts-ignore
-// import ContextMenuStyles from './ContextMenu.module.css'
 
 import type * as RadixContextMenuTypes from '@radix-ui/react-context-menu/'
 
@@ -43,7 +39,7 @@ function ContextMenu({
       </RadixContextMenu.Trigger>
 
       <RadixContextMenu.Content
-        sideOffset={alignOffset}
+        alignOffset={alignOffset}
         // className={classes.join(' ')}
         style={style}
       >
@@ -152,11 +148,7 @@ interface RadioGroupProps {
   onChange?(x: string): void
 }
 
-export function RadioGroup({
-  children,
-  value: propsValue,
-  onChange,
-}: RadioGroupProps) {
+export function RadioGroup({ children, value: propsValue, onChange }: RadioGroupProps) {
   const [value, setValue] = useState(propsValue ? propsValue : '')
 
   const handleChange = (e: string) => {

@@ -2,6 +2,10 @@
 
 Turnstile is Cloudflare's CAPTCHA alternative: https://developers.cloudflare.com/turnstile/get-started/
 
+## Watch the Video Tutorial
+
+[![video tutorial](https://img.youtube.com/vi/OwW0znboh60/0.jpg)](https://www.youtube.com/watch?v=OwW0znboh60)
+
 ## Setup
 
 - Follow these steps to set up a new site: https://developers.cloudflare.com/turnstile/get-started/

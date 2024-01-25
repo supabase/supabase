@@ -54,7 +54,7 @@ Nonce means number used once. In reality though, it is a unique and difficult to
 
 ## OAuth
 
-OAuth is a protocol allowing third-party applications to request and receive authorization from their users. It is typically used to implement social login, and serves as a base for enterprise single-sign on in the OIDC protocol. Applications can request various level of access, and this includes some user identification information at least (name, email address, user identification number).
+OAuth is a protocol allowing third-party applications to request and receive authorization from their users. It is typically used to implement social login, and serves as a base for enterprise single-sign on in the OIDC protocol. Applications can request different levels of access, including basic user identification information such as name, email address, and user ID.
 
 ## OIDC
 
@@ -117,7 +117,6 @@ Single-sign on allows enterprises to centrally manage accounts and access to app
 ## Time-based one-time password (TOTP)
 
 A time-based one-time password is a one-time password generated at regular time intervals from a secret, usually from an application in a mobile device (e.g., Google Authenticator, 1Password).
-
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

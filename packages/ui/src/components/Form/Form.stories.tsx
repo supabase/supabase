@@ -1,14 +1,5 @@
 import { Form } from '.'
-import {
-  Input,
-  Button,
-  InputNumber,
-  Toggle,
-  Checkbox,
-  Radio,
-  Select,
-  Listbox,
-} from '../../index'
+import { Input, Button, InputNumber, Toggle, Checkbox, Radio, Select, Listbox } from '../../index'
 
 import * as Yup from 'yup'
 import { User } from '../Icon/IconImportHandler'
@@ -103,14 +94,8 @@ export const InputLevelValidation = () => {
 export const InputLevelValidationYip = () => {
   // validation schema
   const SignupSchema = Yup.object().shape({
-    firstname: Yup.string()
-      .min(2, 'Too Short!')
-      .max(50, 'Too Long!')
-      .required('Required'),
-    lastname: Yup.string()
-      .min(2, 'Too Short!')
-      .max(50, 'Too Long!')
-      .required('Required'),
+    firstname: Yup.string().min(2, 'Too Short!').max(50, 'Too Long!').required('Required'),
+    lastname: Yup.string().min(2, 'Too Short!').max(50, 'Too Long!').required('Required'),
     email: Yup.string().email('Invalid email').required('Required'),
   })
 
@@ -131,24 +116,9 @@ export const InputLevelValidationYip = () => {
     >
       {({ isSubmitting }: any) => (
         <div className="space-y-4">
-          <Input
-            id="firstname"
-            name="firstname"
-            label="firstname"
-            placeholder="firstname"
-          />
-          <Input
-            id="lastname"
-            name="lastname"
-            label="lastname"
-            placeholder="lastname"
-          />
-          <Input
-            id="email"
-            name="email"
-            label="Email"
-            placeholder="This is your email"
-          />
+          <Input id="firstname" name="firstname" label="firstname" placeholder="firstname" />
+          <Input id="lastname" name="lastname" label="lastname" placeholder="lastname" />
+          <Input id="email" name="email" label="Email" placeholder="This is your email" />
           <Button loading={isSubmitting} type="primary" htmlType="submit">
             Submit
           </Button>
@@ -239,9 +209,7 @@ export const LargerExample = () => {
 
           if (!values.email) {
             errors.email = 'Required'
-          } else if (
-            !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)
-          ) {
+          } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)) {
             errors.email = 'Invalid email address'
           }
 
@@ -286,21 +254,9 @@ export const LargerExample = () => {
           <>
             <div className="space-y-8">
               <p>{isSubmitting ? 'submitting' : 'not submitting'}</p>
-              <Input
-                id="email"
-                label="Email"
-                placeholder="something@gmail.com"
-              />
-              <Input
-                id="last_name"
-                label="last name"
-                placeholder="something in here"
-              />
-              <Select
-                id="profession"
-                label="Profession"
-                placeholder="something in here"
-              >
+              <Input id="email" label="Email" placeholder="something@gmail.com" />
+              <Input id="last_name" label="last name" placeholder="something in here" />
+              <Select id="profession" label="Profession" placeholder="something in here">
                 <Select.Option key="empty-enum" value="">
                   ---
                 </Select.Option>
@@ -349,11 +305,7 @@ export const LargerExample = () => {
                 type="list"
               >
                 <Radio value="pizza" label="Pizza" description="hello world" />
-                <Radio
-                  value="burger"
-                  label="Burger"
-                  description="hello world"
-                />
+                <Radio value="burger" label="Burger" description="hello world" />
                 <Radio value="fries" label="Fries" description="hello world" />
               </Radio.Group>
 
@@ -370,20 +322,12 @@ export const LargerExample = () => {
                       value={person.value}
                       label={person.label}
                       addOnBefore={({ active, selected }: any) => (
-                        <img
-                          src={person.avatar}
-                          alt=""
-                          className="h-6 w-6 rounded-full"
-                        />
+                        <img src={person.avatar} alt="" className="h-6 w-6 rounded-full" />
                       )}
                       children={({ active, selected }: any) => {
                         // console.log('selected', selected)
                         // console.log('active', active)
-                        return (
-                          <span className={'font-normal block truncate'}>
-                            {person.label}
-                          </span>
-                        )
+                        return <span className={'font-normal block truncate'}>{person.label}</span>
                       }}
                     />
                   )
@@ -412,12 +356,8 @@ export const CardForm = () => {
     header?: React.ReactNode
     footer?: React.ReactNode
   }) => (
-    <div className="bg-scale-300 border border-scale-400 rounded-md w-3/4 mx-auto my-8 shadow overflow-hidden">
-      {header && (
-        <div className="bg-scale-100 dark:bg-scale-200 px-8 py-4 border-b border-scale-400">
-          {header}
-        </div>
-      )}
+    <div className="bg-surface-100 border border-overlay rounded-md w-3/4 mx-auto my-8 shadow overflow-hidden">
+      {header && <div className="bg-surface-100 px-8 py-4 border-b border-overlay">{header}</div>}
       <div className="space-y-6 py-6">{children}</div>
       {footer}
     </div>
@@ -456,31 +396,21 @@ export const CardForm = () => {
           <Panel
             header={
               <>
-                <h3 className="text-scale-1200 text-xl font-semibold">
-                  Custom Options
-                </h3>
-                <p className="text-scale-900">
-                  These settings apply to payment pages you create using Stripe
-                  Checkout and Payment Links.
+                <h3 className="text-foreground text-xl font-semibold">Custom Options</h3>
+                <p className="text-foreground-muted">
+                  These settings apply to payment pages you create using Stripe Checkout and Payment
+                  Links.
                 </p>
               </>
             }
             footer={
               <>
-                <div className="border-t border-scale-400"></div>
+                <div className="border-t border-muted"></div>
                 <div className="py-3 px-6 flex gap-2 justify-end">
-                  <Button
-                    loading={isSubmitting}
-                    type="secondary"
-                    htmlType="submit"
-                  >
+                  <Button loading={isSubmitting} type="secondary" htmlType="submit">
                     Cancel
                   </Button>
-                  <Button
-                    loading={isSubmitting}
-                    type="primary"
-                    htmlType="submit"
-                  >
+                  <Button loading={isSubmitting} type="primary" htmlType="submit">
                     Save
                   </Button>
                 </div>
@@ -488,13 +418,9 @@ export const CardForm = () => {
             }
           >
             {/* <p>{isSubmitting ? 'submitting' : 'not submitting'}</p> */}
-            {/* <div className="border-t border-scale-400"></div> */}
+            {/* <div className="border-t border-muted"></div> */}
             <Section
-              header={
-                <label className="text-sm text-scale-1200 col-span-4">
-                  Faster checkout
-                </label>
-              }
+              header={<label className="text-sm text-foreground col-span-4">Faster checkout</label>}
             >
               <Toggle
                 className="col-span-8"
@@ -504,13 +430,9 @@ export const CardForm = () => {
                 descriptionText="Go to Payment methods settings to configure Apple Pay and Google Pay."
               />
             </Section>
-            <div className="border-t border-scale-400"></div>
+            <div className="border-t border-muted"></div>
             <Section
-              header={
-                <label className="text-sm text-scale-1200 col-span-4">
-                  Faster checkout
-                </label>
-              }
+              header={<label className="text-sm text-foreground col-span-4">Faster checkout</label>}
             >
               <Radio.Group
                 className="col-span-8"
@@ -535,13 +457,9 @@ export const CardForm = () => {
                 />
               </Radio.Group>
             </Section>
-            <div className="border-t border-scale-400"></div>
+            <div className="border-t border-muted"></div>
             <Section
-              header={
-                <label className="text-sm text-scale-1200 col-span-4">
-                  Faster checkout
-                </label>
-              }
+              header={<label className="text-sm text-foreground col-span-4">Faster checkout</label>}
             >
               <div className="col-span-8 space-y-4">
                 <Input name="app_id" label="Application ID in Stripe" />
@@ -551,7 +469,7 @@ export const CardForm = () => {
                   descriptionText={
                     <span>
                       This can be found in{' '}
-                      <span className="text-brand-900 underline cursor-pointer transition hover:text-brand-800">
+                      <span className="text-brand underline cursor-pointer transition hover:text-brand-300">
                         the developer settings
                       </span>
                     </span>

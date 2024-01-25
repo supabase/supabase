@@ -81,11 +81,11 @@
 <feGaussianBlur stdDeviation="67.4384" result="effect1_foregroundBlur_1208_54618"/>
 </filter>
 <radialGradient id="paint0_radial_1208_54618" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(231.088 218.979) rotate(90) scale(525.744 525.744)">
-<stop stop-color="white" stop-opacity="0"/>
+<stop stopColor="white" stop-opacity="0"/>
 <stop offset="1" stop-color="white"/>
 </radialGradient>
 <linearGradient id="paint1_linear_1208_54618" x1="56.1093" y1="-410.907" x2="215.69" y2="125.046" gradientUnits="userSpaceOnUse">
-<stop stop-color="#39617D" stop-opacity="0.49"/>
+<stop stopColor="#39617D" stop-opacity="0.49"/>
 <stop offset="0.9999" stop-color="#00DED1" stop-opacity="0.46"/>
 <stop offset="1" stop-color="white" stop-opacity="0.51"/>
 </linearGradient>

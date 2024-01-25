@@ -1,0 +1,63 @@
+---
+title: 'Trusted Language Extensions for Postgres'
+description: We're collaborating with AWS to bring Trusted Language Extensions to Postgres.
+launchweek: 7
+categories:
+  - postgres
+tags:
+  - launch-week
+  - postgres
+date: '2023-04-14'
+published_at: '2023-04-14T07:00:00.000-07:00'
+to_depth: 3
+author: michel,daltjoh-aws
+image: launch-week-7/day-5-supabase-pg-tle/day-5-postgres-tle-thumb.jpg
+thumb: launch-week-7/day-5-supabase-pg-tle/day-5-postgres-tle-thumb.jpg
+---
+
+Most PostgreSQL cloud providers, such as Supabase and AWS RDS, do not allow users to install Postgres extensions into their databases until they have been rigorously vetted. Because of this, many useful Postgres extensions cannot be used on cloud platforms. To solve this, the RDS team has developed a new kind of extension called a **Trusted Language Extension** (TLE).
+
+A TLE is a Postgres extension that is written in a Trusted Language, and it can be installed in any Postgres provider that has the [pg_tle](https://github.com/aws/pg_tle) extension installed. The goal is to make more extensions available to developers, even if your database is hosted on the cloud.
+
+## How Postgres extensions work
+
+Before exploring what a Trusted Language Extension is, let’s cover the basics of Postgres Extensions and the notion of “Trusted Languages” in general.
+
+A Postgres Extension is a bundle of SQL and other code, primarily [Data Definition Language](https://www.postgresql.org/docs/current/ddl.html) (DDL) code installed into the server’s filesystem, and instantiated in a database with the [`CREATE EXTENSION`](https://www.postgresql.org/docs/current/sql-createextension.html) command. This code can contain any SQL, but almost always includes additional function objects created with the [`CREATE FUNCTION`](https://www.postgresql.org/docs/current/sql-createfunction.html) DDL statement that expose the core features of the extension to the database in some programming language, including an external library function written in C.
+
+Extensions provide a variety of additional functionality and allow third-party feature distribution without requiring changes to the Postgres database itself - including new data types, storage engines, helper functions, and even entire language runtimes like Javascript or Python.
+
+Some examples of popular Postgres extensions include:
+
+- [PostGIS](https://postgis.net/): for working with geospatial data
+- [Timescale DB](https://www.timescale.com/): for working with timeseries data
+- [Citus](https://www.citusdata.com/): for working with distributed tables
+- [plv8](https://plv8.github.io/): for running Node.js inside Postgres
+- [pgsodium](https://github.com/michelp/pgsodium): for accessing the libsodium encryption API
+
+Before extensions can be created, they must first be installed on the filesystem of the database server, which is an important security measure because in some cases extensions may require external libraries and can interact with Postgres internals. Their installation is something that requires careful consideration.
+
+## Trusted vs Untrusted
+
+Many extensions provide functions whose implementation is written in C, and creating them in a database means that the compiled C code is “dynamically linked” into your running Postgres process. These dynamically-loaded libraries can now access every aspect of your running database process, right down to raw memory. They are essentially database superusers on steroids. Because of this, C is an “untrusted language” and installing extensions written in C requires filesystem access.
+
+However there are several _trusted_ languages in Postgres that don’t provide raw access to process memory, the filesytem, or other system functions. These languages obey the security rules of Postgres. The most obvious example of these trusted languages is SQL itself. Another built-in trusted language in Postgres is called [pl/pgsql](https://www.postgresql.org/docs/current/plpgsql.html). It looks a lot like SQL but with some imperative programming features like `IF` blocks and `FOR` loops. The aforementioned plv8 is also a trusted language, as are the languages [pl/perl](https://www.postgresql.org/docs/current/plperl.html) and [pl/tcl](https://www.postgresql.org/docs/current/pltcl.html). Other languages like [pl/python](https://www.postgresql.org/docs/current/plpython.html) are **_not_** trusted because of the way they are integrated into Postgres, they do not obey the “rules” of Postgres security, and so are not included in most cloud provider platforms since they would allow database users to effectively act as a superuser.
+
+## Trusted Language Extensions
+
+Near the end of 2022, we got a surprise gift from the team at Amazon Web Services, a new Postgres extension called `pg_tle`, that allows you to **Trusted Language Extensions (TLEs).** A TLE is just like a regular Postgres extension, except that **does not need to be installed on the server filesystem** it is written in a **trusted language** you can install extensions from any database client using the function `pgtle.install_extension()`, just like you can create other objects like tables and views.
+
+Of course, TLEs _must_ be written in trusted languages as described above, hence the name, so no extensions that are written in C can be TLEs. There are still many extensions that are already written in trusted languages, and soon many more to come with some exciting progress in more performant trusted languages like [pl/rust](https://github.com/tcdi/plrust) which recently reached an official 1.0.0 version release. By removing the constraint that extensions must be installed on the server filesystem, TLEs open up a whole new world of possibilities for packaging and distributing new and modular functionality for Postgres.
+
+## Collaborating with AWS
+
+Because untrusted extensions are, by nature, able to break the security rules of Postgres, cloud providers are quite conservative about what extensions to provide to their customers. New extensions are rarely adopted quickly. This slows down the speed that new software can be created and shared. Open source requires opportunity and momentum, and by closing off the opportunity for Postgres users to quickly create, install, evaluate and iterate extensions, progress is slowed. TLEs offer an opportunity for open source developers to create and share code without having to wait for cloud providers or other gatekeepers to install it.
+
+When AWS released `pg_tle`, we realized immediately how powerful the tool is, and how it will change the way people release and install trusted extensions forever. We started collaborating with the TLE team at AWS, exchanging ideas and resources to further promote TLEs in both our database platform and theirs. By providing the TLE extension in both Supabase and AWS, we are unifying a standard package platform across two of the largest Postgres providers. We hope that other Postgres cloud providers will join the collaboration so that extension developers can leverage a large community base that greatly multiplies the reach of their efforts.
+
+## Installing TLEs with database.dev
+
+pg_tle is available on new Supabase projects and on Amazon RDS for Postgres 14.5 and higher. Supabase also includes an extension called [pgsql-http](https://github.com/pramsey/pgsql-http) for making HTTP calls from SQL to REST APIs. So, naturally putting two and two together, we thought it would be cool to see if it’s possible to install TLEs from a REST API using only SQL!
+
+We've created a new package registry, dbdev, that makes it easy to install extensions in your database migrations - as easy as: `select dbdev.install('langchain-embedding_search')`.
+You can read more about dbdev in our other blog post: [dbdev: a PostgreSQL Package Manager](/blog/dbdev).

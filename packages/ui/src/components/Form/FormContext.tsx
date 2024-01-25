@@ -4,7 +4,7 @@ interface ContextProps {
   formContextOnChange: any
   values: any
   errors: any
-  handleBlur: React.FocusEventHandler | null
+  handleBlur: ((e: React.FocusEvent<any, any>) => void) | null
   touched: any
   fieldLevelValidation: any
 }
@@ -25,14 +25,7 @@ const FormContext = createContext<ContextProps>({
 })
 
 export const FormContextProvider = (props: Provider) => {
-  const {
-    formContextOnChange,
-    values,
-    errors,
-    handleBlur,
-    touched,
-    fieldLevelValidation,
-  } = props
+  const { formContextOnChange, values, errors, handleBlur, touched, fieldLevelValidation } = props
 
   const value = {
     formContextOnChange: formContextOnChange,
@@ -43,18 +36,14 @@ export const FormContextProvider = (props: Provider) => {
     fieldLevelValidation: fieldLevelValidation,
   }
 
-  return (
-    <FormContext.Provider value={value}>{props.children}</FormContext.Provider>
-  )
+  return <FormContext.Provider value={value}>{props.children}</FormContext.Provider>
 }
 
 // context helper to avoid using a consumer component
 export const useFormContext = () => {
   const context = useContext(FormContext)
   if (context === undefined) {
-    throw new Error(
-      `useFormContextOnChange must be used within a FormContextProvider.`
-    )
+    throw new Error(`useFormContextOnChange must be used within a FormContextProvider.`)
   }
   return context
 }

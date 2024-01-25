@@ -2,7 +2,7 @@ import fs from 'fs'
 import { join } from 'path'
 import matter from 'gray-matter'
 import nonGeneratedReferencePages from 'data/nonGeneratedReferencePages'
-import { REFERENCES } from 'components/Navigation/Navigation.constants'
+import { REFERENCES } from '~/components/Navigation/NavigationMenu/NavigationMenu.constants'
 
 const docsDirectory = process.cwd()
 

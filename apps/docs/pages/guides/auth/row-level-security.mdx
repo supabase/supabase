@@ -3,12 +3,16 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'row-level-security',
   title: 'Row Level Security',
-  description: 'Secure your data using Postgres Row Level Security.',
+  description: 'Using Row Level Security with Supabase Auth.',
+  subtitle: 'Using Row Level Security with Supabase Auth.',
+  tocVideo: 'Ow_Uzedfohk',
 }
 
-When you need granular authorization rules, nothing beats PostgreSQL's [Row Level Security (RLS)](https://www.postgresql.org/docs/current/ddl-rowsecurity.html).
+[Postgres Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS) is a feature of Postgres that allows you to control which users are permitted to perform SELECT/INSERT/UPDATE/DELETE statements on specific rows within tables and views. For example, you could restrict a `blog_post` table such that the current user is only allowed to UPDATE rows where their user id is set in the table's `author_id` column.
 
-[Policies](https://www.postgresql.org/docs/current/sql-createpolicy.html) are PostgreSQL's rule engine. They are incredibly powerful and flexible, allowing you to write complex SQL rules which fit your unique business needs.
+Supabase Auth is designed to work perfectly with RLS.
+
+You can use RLS to create [Policies](https://www.postgresql.org/docs/current/sql-createpolicy.html) that are incredibly powerful and flexible, allowing you to write complex SQL rules which fit your unique business needs.
 
 <div className="video-container">
   <iframe
@@ -21,14 +25,12 @@ When you need granular authorization rules, nothing beats PostgreSQL's [Row Leve
 
 ## Policies
 
-Policies are easy to understand once you get the hang of them. Each policy is attached to a table, and the policy is executed
-every time a table is accessed.
-You can just think of them as adding a `WHERE` clause to every query. For example a policy like this ...
+Policies are easy to understand once you get the hang of them. Each policy is attached to a table, and the policy is executed every time a table is accessed. You can just think of them as adding a `WHERE` clause to every query. For example a policy like this ...
 
 ```sql
 create policy "Individuals can view their own todos."
-    on todos for select
-    using ( auth.uid() = user_id );
+on todos for select
+using ( auth.uid() = user_id );
 ```
 
 .. would translate to this whenever a user tries to select from the todos table:
@@ -39,9 +41,33 @@ from todos
 where auth.uid() = todos.user_id; -- Policy is implicitly added.
 ```
 
-## Helper Functions
+## Authenticated and anonymous roles 
 
-Supabase provides you with a few easy functions that you can use with your policies.
+Supabase Auth maps every request to one of the roles:
+
+- `anon`: an anonymous request (the user is not logged in)
+- `authenticated`: an authenticated request (the user is logged in)
+
+These are actually [Postgres Roles](/docs/guides/database/postgres/roles), and so they have significant value for the [performance](/docs/guides/database/postgres/row-level-security#specify-roles-in-your-policies) of your RLS Policies. You can use these roles within your Policies using the `TO` clause:
+
+```sql
+create policy "Profiles are viewable by everyone"
+on profiles for select
+to authenticated, anon
+using ( true );
+
+-- OR 
+
+create policy "Public profiles are viewable only by authenticated users"
+on profiles for select
+to authenticated
+using ( true );
+```
+
+
+## Helper functions
+
+Supabase provides some helper functions that make it easier to write Policies.
 
 ### `auth.uid()`
 
@@ -49,78 +75,118 @@ Returns the ID of the user making the request.
 
 ### `auth.jwt()`
 
-Returns the JWT of the user making the request.
+Returns the JWT of the user making the request. Anything that you store in the user's `app_metadata` column or the `user_metadata` column will be accessible using this function. It's important to know the distinction between these two:
 
-## Examples
+- `user_metadata` - can be updated by the authenticated user using the `supabase.auth.update()` function. It is not a good place to store authorization data.
+- `app_metadata` - cannot be updated by the user, so it's a good place to store authorization data.
 
-Here are some examples to show you the power of PostgreSQL's RLS.
+The `auth.jwt()` function is extremely versatile. For example, if you store some team data inside `app_metadata`, you can use it to determine whether a particular user belongs to a team. For example, if this was an array of IDs:
 
-### Allow read access
-
-```sql
--- 1. Create table
-create table profiles (
-  id uuid references auth.users,
-  avatar_url text
-);
-
--- 2. Enable RLS
-alter table profiles
-  enable row level security;
-
--- 3. Create Policy
-create policy "Public profiles are viewable by everyone."
-  on profiles for select using (
-    true
-  );
+```sql 
+create policy "User is in team" 
+on my_table
+to authenticated
+using ( team_id in (select auth.jwt() -> 'app_metadata' -> 'teams'));
 ```
 
-1. Creates a table called `profiles` in the public schema (default schema).
-2. Enables Row Level Security.
-3. Creates a policy which allows all `select` queries to run.
+<Admonition type="caution">
 
-### Restrict updates
+Keep in mind that a JWT is not always "fresh". In the example above, even if you remove a user from a team and update the `app_metadata` field, that will not be reflected using `auth.jwt()` until the user's JWT is refreshed. 
+
+Also, if you are using Cookies for Auth, then you must be mindful of the JWT size. Some browsers are limited to 4096 bytes for each cookie, and so the total size of your JWT should be small enough to fit inside this limitation.
+
+</Admonition>
+
+## Important considerations
+
+We recommend reading the [Row Level Security](/docs/guides/database/postgres/row-level-security) guide in the database section to learn more about Postgres RLS. When using Postgres on Supabase there are some important things to keep in mind to maintain data security.
+
+### Never use a service key on the client
+
+Supabase provides special "Service" keys, which can be used to bypass RLS. These should never be used in the browser or exposed to customers, but they are useful for administrative tasks.
+
+<Admonition type="note">
+
+Supabase will adhere to the RLS policy of the signed-in user, even if the client library is initialized with a Service Key.
+
+</Admonition>
+
+### Always enable RLS on public tables
+
+You should _always_ enable RLS on tables created in a public schema. This is considered "default safe". Unfortunately this is not enabled by default on Postgres, so you will need to keep this in mind - especially if you are using the SQL Editor or database migrations. RLS is already enabled by default if you create a table using the Table Editor. If you want to allow public access to a table, just add a Policy with `true`:
 
 ```sql
--- 1. Create table
+create policy "Allow public access"
+on my_table for select
+using ( true );
+```
+
+### Using external authorization systems
+
+If you want to use another authorization method for your applications that's also fine. Supabase is "just Postgres", so if your application works with Postgres, then it also works with Supabase. If you take this path, don't put your tables in the `public` schema - instead create a new schema for your tables and functions:
+
+```sql 
+create schema private;
+
+create table private.employees (
+  id serial primary key,
+  name text
+);
+```
+
+If you do put anything in the `public` schema, make sure to enable RLS (you don't need to add any policies):
+
+```sql
 create table profiles (
-  id uuid references auth.users,
-  avatar_url text
+  id serial primary key,
+  email text
 );
 
--- 2. Enable RLS
-alter table profiles
-  enable row level security;
-
--- 3. Create Policy
-create policy "Users can update their own profiles."
-  on profiles for update using (
-    auth.uid() = id
-  );
+alter table profiles enable row level security;
 ```
+
+This makes the tables inaccessible via the [APIs](/docs/guides/api).
+
+
+## Usage
+
+Row Level Security is extremely versatile, since it simply uses SQL to express access rules for your data. 
+
+### Using functions
+
+You can use any Postgres function inside a Policy. The [Helper Functions](#helper-functions) above are simply Postgres functions we've made available in the `auth` schema. This is an example which:
 
 1. Creates a table called `profiles` in the public schema (default schema).
 2. Enables RLS.
-3. Creates a policy which allows logged in users to update their own data.
-
-### Only anon or authenticated access
-
-You can add a Postgres role
+3. Creates a policy which allows logged in users to update their own data, using the `auth.uid()` function.
 
 ```sql
-create policy "Public profiles are viewable by everyone."
-on profiles for select
-to authenticated, anon
+-- 1. Create table
+create table profiles (
+  id uuid references auth.users,
+  avatar_url text
+);
+
+-- 2. Enable RLS
+alter table profiles enable row level security;
+
+-- 3. Create Policy
+create policy "Users can update their own profiles"
+on profiles for update
+to authenticated
 using (
-  true
+  auth.uid() = id
 );
 ```
 
-### Policies with joins
+**Note:** If you want to use [upsert](/docs/reference/javascript/upsert) operations, the user needs to have `INSERT`, `UPDATE`, and `SELECT` permissions.
 
-Policies can even include table joins. This example shows how you can query "external" tables to build more advanced rules.
+### Using joins
+
+Policies can include table joins. This example shows how you can query "external" tables to build more advanced rules. RLS policies are executed on every access of the table, so be careful to make sure that policies are efficient.
 
 ```sql
+-- 1. Create a table of teams
 create table teams (
   id serial primary key,
   name text
@@ -133,11 +199,10 @@ create table members (
 );
 
 -- 3. Enable RLS
-alter table teams
-  enable row level security;
+alter table teams enable row level security;
 
 -- 4. Create Policy
-create policy "Team members can update team details if they belong to the team."
+create policy "Team members can update team details if they belong to the team"
   on teams
   for update using (
     auth.uid() in (
@@ -147,224 +212,85 @@ create policy "Team members can update team details if they belong to the team."
   );
 ```
 
-**Note:** If RLS is also enabled for _members_, the user must also have read (_select_) access to _members_. Otherwise the joined query will not yield any results.
+An important note here: if RLS is also enabled for `members`, the user must also have read (`select`) access to members. Otherwise the joined query will not yield any results. Another alternative is to use a "security definer" function which is created by a user with [bypassrls](/docs/guides/database/postgres/row-level-security#specify-roles-in-your-policies) privileges.
 
-### Policies with security definer functions
+### Using security definer functions
 
-Policies can also make use of `security definer functions`. This is useful in a many-to-many relationship where you want to restrict access to the linking table. Following the `teams` and `members` example from above, this example shows how you can use the security definer function in combination with a policy to control access to the `members` table.
+You can use `security definer` functions inside Policies. This is useful in a many-to-many relationships, and [important for performance](/docs/guides/database/postgres/row-level-security#use-security-definer-functions). Following the `teams` and `members` example from above, this example shows how you can use the security definer function in combination with a policy to control access to the `members` table.
 
 ```sql
--- 1. Follow example for 'Policies with joins' above
+-- 1. Create a table of teams
+create table teams (
+  id serial primary key,
+  name text
+);
+
+-- 2. Create many to many join
+create table members (
+  team_id bigint references teams,
+  user_id uuid references auth.users
+);
 
 -- 2.  Enable RLS
-alter table members
-  enable row level security
+alter table teams enable row level security;
+alter table members enable row level security;
 
--- 3.  Create security definer function
-create or replace function get_teams_for_authenticated_user()
+-- 3.  Create security definer function, which should be run as "postgres"
+create function private.get_teams_for_authenticated_user()
 returns setof bigint
 language sql
 security definer
 set search_path = public
 stable
 as $$
-    select team_id
-    from members
-    where user_id = auth.uid()
+  select team_id
+  from members
+  where user_id = auth.uid()
 $$;
 
 -- 4. Create Policy
 create policy "Team members can update team members if they belong to the team."
-  on members
-  for all using (
-    team_id in (
-      select get_teams_for_authenticated_user()
-    )
-  );
-
-```
-
-### Verifying email domains
-
-Postgres has a function `right(string, n)` that returns the rightmost n characters of a string.
-You could use this to match staff member's email domains.
-
-```sql
--- 1. Create table
-create table leaderboard (
-  id uuid references auth.users,
-  high_score bigint
-);
-
--- 2. Enable RLS
-alter table leaderboard
-  enable row level security;
-
--- 3. Create Policy
-create policy "Only Blizzard staff can update leaderboard"
-  on leaderboard
-  for update using (
-    right(auth.jwt() ->> 'email', 13) = '@blizzard.com'
-  );
-```
-
-### Time to live for rows
-
-Policies can also be used to implement TTL or time to live feature that you see in Instagram stories or Snapchat.
-In the following example, rows of `stories` table are available only if they have been created within the last 24 hours.
-
-```sql
--- 1. Create table
-create table if not exists stories (
-  id uuid not null primary key DEFAULT uuid_generate_v4(),
-  created_at timestamp with time zone default timezone('utc' :: text, now()) not null,
-  content text not null
-);
-
--- 2. Enable RLS
-alter table stories
-  enable row level security;
-
--- 3. Create Policy
-create policy "Stories are live for a day"
-  on stories
-  for select using (
-    created_at > (current_timestamp - interval '1 day')
-  );
-```
-
-### Advanced policies
-
-Use the full power of SQL to build extremely advanced rules.
-
-In this example, we will create a `posts` and `comments` tables and then create a policy that depends on another policy.
-(In this case, the comments policy depends on the posts policy.)
-
-```sql
-create table posts (
-  id            serial    primary key,
-  creator_id    uuid      not null     references auth.users(id),
-  title         text      not null,
-  body          text      not null,
-  publish_date  date      not null     default now(),
-  audience      uuid[]    null -- many to many table omitted for brevity
-);
-
-create table comments (
-  id            serial    primary key,
-  post_id       int       not null     references posts(id)  on delete cascade,
-  user_id       uuid      not null     references auth.users(id),
-  body          text      not null,
-  comment_date  date      not null     default now()
-);
-
-create policy "Creator can see their own posts"
-on posts
-for select
-using (
-  auth.uid() = posts.creator_id
-);
-
-create policy "Logged in users can see the posts if they belong to the post 'audience'."
-on posts
-for select
-using (
-  auth.uid() = any (posts.audience)
-);
-
-create policy "Users can see all comments for posts they have access to."
-on comments
-for select
-using (
-  exists (
-    select 1 from posts
-    where posts.id = comments.post_id
+on members
+for all using (
+  team_id in (
+    select private.get_teams_for_authenticated_user()
   )
 );
 ```
 
-## Tips
+### Using built-in functions
 
-### Enable Realtime for database tables
+Postgres has a number of built-in functions. Most commonly you'll use `in()` and `any()` which will match a column's value to a list of values.
 
-Realtime server broadcasts database changes to authorized users depending on your Row Level Security (RLS) policies.
-We recommend that you enable row level security and set row security policies on tables that you add to the publication.
-However, you may choose to disable RLS on a table and have changes broadcast to all connected clients.
+You can use any Postgres functions inside Policies. For example, we can use the `right(string, n)` function to match email domains:
 
 ```sql
-/**
- * REALTIME SUBSCRIPTIONS
- * Realtime enables listening to any table in your public schema.
- */
-
-begin;
-  -- remove the realtime publication
-  drop publication if exists supabase_realtime;
-
-  -- re-create the publication but don't enable it for any tables
-  create publication supabase_realtime;
-commit;
-
--- add a table to the publication
-alter publication supabase_realtime add table products;
-
--- add other tables to the publication
-alter publication supabase_realtime add table posts;
-```
-
-### You don't have to use policies
-
-You can also put your authorization rules in your middleware, similar to how you would create security rules with any other `backend <-> middleware <-> frontend` architecture.
-
-Policies are a tool. In the case of "serverless/Jamstack" setups, they are especially effective because you don't have to deploy any middleware at all.
-
-However, if you want to use another authorization method for your applications, that's also fine. Supabase is "just Postgres", so if your application
-works with Postgres, then it also works with Supabase.
-
-Tip: Make sure to enable RLS for all your tables, so that your tables are inaccessible. Then use the "Service" which we provide, which is designed to bypass RLS.
-
-### Never use a service key on the client
-
-Supabase provides special "Service" keys, which can be used to bypass all RLS.
-These should never be used in the browser or exposed to customers, but they are useful for administrative tasks.
-
-## Deprecated features
-
-We have deprecate some functions to ensure better performance and extensibilty of RLS policies.
-
-### `auth.role()`
-
-<Admonition type="caution">
-
-Deprecated: The `auth.role()` function has been deprecated in favour of using the `TO` field, natively supported within Postgres.
-
-</Admonition>
-
-```sql
--- DEPRECATED
-create policy "Public profiles are viewable by everyone."
-on profiles for select using (
-  auth.role() = 'authenticated' or auth.role() = 'anon'
-);
-
--- RECOMMENDED
-create policy "Public profiles are viewable by everyone."
-on profiles for select
-to authenticated, anon
-using (
-  true
+create policy "Only Supabase staff can update the leaderboard"
+on leaderboard
+to authenticated
+for update using (
+  right(auth.jwt() ->> 'email', 13) = '@supabase.com'
 );
 ```
 
-### `auth.email()`
+### Using Multi-factor Authentication
 
-<Admonition type="caution">
+RLS can be [combined with Multi-Factor Authentication](/docs/guides/auth/auth-mfa#enforce-rules-for-mfa-logins) in Supabase Auth. For example, you could restrict a user from updating their profile unless they have at least 2 levels of authentication (Assurance Level 2):
 
-Deprecated. Use `auth.jwt() ->> 'email'` instead.
+```sql
+create policy "Restrict updates."
+on profiles
+as restrictive
+for update
+to authenticated using (
+  auth.jwt()->>'aal' = 'aal2'
+);
+```
 
-</Admonition>
+## More resources
 
-Returns the email of the user making the request.
+- [Testing your database](/docs/guides/database/testing)
+- Community repo on testing RLS using [pgTAP and dbdev](https://github.com/usebasejump/supabase-test-helpers/tree/main)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
