@@ -1,26 +1,14 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-import {
-  Alert,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  Collapsible,
-  Form,
-  IconAlertTriangle,
-  IconCheck,
-  IconChevronUp,
-  Input,
-} from 'ui'
+import { Alert, Button, Collapsible, Form, IconCheck, IconChevronUp, Input } from 'ui'
 
-import { useParams } from 'common'
 import { components } from 'data/api'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useFlag, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
 import { Provider } from './AuthProvidersForm.types'
@@ -37,6 +25,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
   const { ref: projectRef } = useParams()
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
+  const allowUnverifiedEmailSignIns = useFlag('allowUnverifiedEmailSignIns')
   const doubleNegativeKeys = ['MAILER_AUTOCONFIRM', 'SMS_AUTOCONFIRM']
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
@@ -162,15 +151,25 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
             "
               >
                 <div className="mx-auto my-6 max-w-lg space-y-6">
-                  {Object.keys(provider.properties).map((x: string) => (
-                    <FormField
-                      key={x}
-                      name={x}
-                      properties={provider.properties[x]}
-                      formValues={values}
-                      disabled={!canUpdateConfig}
-                    />
-                  ))}
+                  {Object.keys(provider.properties).map((x) => {
+                    // if the feature flag is false, don't render the form field
+                    if (
+                      x === 'MAILER_ALLOW_UNVERIFIED_EMAIL_SIGN_INS' &&
+                      !allowUnverifiedEmailSignIns
+                    ) {
+                      return null
+                    }
+
+                    return (
+                      <FormField
+                        key={x}
+                        name={x}
+                        properties={provider.properties[x]}
+                        formValues={values}
+                        disabled={!canUpdateConfig}
+                      />
+                    )
+                  })}
 
                   {provider?.misc?.alert && (
                     <Alert title={provider.misc.alert.title} variant="warning" withIcon>
