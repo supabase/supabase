@@ -1,5 +1,4 @@
-import { AiIconAnimation } from '@ui/layout/ai-icon-animation'
-import { cn } from '@ui/lib/utils'
+import { AiIconAnimation } from '../../layout/ai-icon-animation/ai-icon-animation'
 
 interface AiIconProps {
   className?: string

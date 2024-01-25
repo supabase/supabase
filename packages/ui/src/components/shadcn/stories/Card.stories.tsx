@@ -18,8 +18,8 @@ import {
   SelectValue,
 } from '@ui/components/shadcn/ui/select'
 import { Switch } from '@ui/components/shadcn/ui/switch'
-import { cn } from '@ui/lib/utils'
 import { BellRing, Check } from 'lucide-react'
+import { cn } from '../../lib/utils/cn'
 
 const meta: Meta = {
   title: 'shadcn/Card',

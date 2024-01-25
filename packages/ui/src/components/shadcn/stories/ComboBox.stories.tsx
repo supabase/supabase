@@ -33,7 +33,6 @@ import {
 } from '@ui/components/shadcn/ui/form'
 import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
 import { toast } from '@ui/components/shadcn/ui/use-toast'
-import { cn } from '@ui/lib/utils'
 import {
   ArrowUpCircle,
   Calendar,
@@ -52,6 +51,7 @@ import {
 import React from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
+import { cn } from '../../lib/utils/cn'
 
 const meta: Meta<typeof DropdownMenu> = {
   /* 👇 The title prop is optional.
