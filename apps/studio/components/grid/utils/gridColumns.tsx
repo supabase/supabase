@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { CalculatedColumn } from 'react-data-grid'
 import { ColumnType, SupaColumn, SupaRow, SupaTable } from '../types'
 import {
@@ -46,6 +45,7 @@ export function getGridColumns(
     defaultWidth?: string | number
     onAddColumn?: () => void
     onExpandJSONEditor: (column: string, row: SupaRow) => void
+    onExpandTextEditor: (column: string, row: SupaRow) => void
   }
 ): any[] {
   const columns = table.columns.map((x, idx) => {
@@ -81,7 +81,13 @@ export function getGridColumns(
         />
       ),
       renderEditCell: options
-        ? getCellEditor(x, columnType, options?.editable ?? false, options.onExpandJSONEditor)
+        ? getCellEditor(
+            x,
+            columnType,
+            options?.editable ?? false,
+            options.onExpandJSONEditor,
+            options.onExpandTextEditor
+          )
         : undefined,
       renderCell: getCellRenderer(x, columnType, {
         projectRef: options?.projectRef,
@@ -110,7 +116,8 @@ function getCellEditor(
   columnDefinition: SupaColumn,
   columnType: ColumnType,
   isEditable: boolean,
-  onExpandJSONEditor: (column: string, row: any) => void
+  onExpandJSONEditor: (column: string, row: any) => void,
+  onExpandTextEditor: (column: string, row: any) => void
 ) {
   if (!isEditable) {
     if (['array', 'json'].includes(columnType)) {
@@ -120,7 +127,9 @@ function getCellEditor(
       )
     } else if (!['number', 'boolean'].includes(columnType)) {
       // eslint-disable-next-line react/display-name
-      return (p: any) => <TextEditor {...p} isEditable={isEditable} />
+      return (p: any) => (
+        <TextEditor {...p} isEditable={isEditable} onExpandEditor={onExpandTextEditor} />
+      )
     } else {
       return
     }
@@ -164,7 +173,12 @@ function getCellEditor(
     case 'text': {
       // eslint-disable-next-line react/display-name
       return (p: any) => (
-        <TextEditor {...p} isEditable={isEditable} isNullable={columnDefinition.isNullable} />
+        <TextEditor
+          {...p}
+          isEditable={isEditable}
+          isNullable={columnDefinition.isNullable}
+          onExpandEditor={onExpandTextEditor}
+        />
       )
     }
     default: {
