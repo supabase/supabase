@@ -61,24 +61,26 @@ const HomeLayout: FC<Props> = (props: Props) => {
           },
         }}
       />
-      <HomePageCover meta={props.meta} />
-      <LayoutMainContent>
-        <div className={['relative transition-all ease-out', 'duration-150 '].join(' ')}>
-          <article className="prose max-w-none">
-            <MDXProvider components={components}>{props.children}</MDXProvider>
-          </article>
-        </div>
-        {hasTableOfContents && !props.meta?.hide_table_of_contents && (
-          <div
-            className={[
-              'border-default bg-background table-of-contents-height border-l',
-              'thin-scrollbar overflow-y-auto sticky hidden md:block md:col-span-3 px-2',
-            ].join(' ')}
-          >
-            <TableOfContents toc={props.toc} video={props.meta.video} />
+      <article>
+        <HomePageCover meta={props.meta} />
+        <LayoutMainContent>
+          <div className={['relative transition-all ease-out', 'duration-150 '].join(' ')}>
+            <div className="prose max-w-none">
+              <MDXProvider components={components}>{props.children}</MDXProvider>
+            </div>
           </div>
-        )}
-      </LayoutMainContent>
+          {hasTableOfContents && !props.meta?.hide_table_of_contents && (
+            <div
+              className={[
+                'border-default bg-background table-of-contents-height border-l',
+                'thin-scrollbar overflow-y-auto sticky hidden md:block md:col-span-3 px-2',
+              ].join(' ')}
+            >
+              <TableOfContents toc={props.toc} video={props.meta.video} />
+            </div>
+          )}
+        </LayoutMainContent>
+      </article>
     </>
   )
 }

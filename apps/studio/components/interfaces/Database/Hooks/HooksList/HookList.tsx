@@ -60,18 +60,23 @@ const HookList = ({ schema, filterString, editHook = noop, deleteHook = noop }: 
           <Table.tr key={x.id}>
             <Table.td>
               <div className="flex items-center space-x-4">
-                <Image
-                  src={
-                    isEdgeFunction(url)
-                      ? `${BASE_PATH}/img/function-providers/supabase-severless-function.png`
-                      : `${BASE_PATH}/img/function-providers/http-request.png`
-                  }
-                  layout="fixed"
-                  width="20"
-                  height="20"
-                  title={isEdgeFunction(url) ? 'Supabase Edge Function' : 'HTTP Request'}
-                />
-                <p title={x.name}>{x.name}</p>
+                <div>
+                  <Image
+                    src={
+                      isEdgeFunction(url)
+                        ? `${BASE_PATH}/img/function-providers/supabase-severless-function.png`
+                        : `${BASE_PATH}/img/function-providers/http-request.png`
+                    }
+                    alt="hook-type"
+                    layout="fixed"
+                    width="20"
+                    height="20"
+                    title={isEdgeFunction(url) ? 'Supabase Edge Function' : 'HTTP Request'}
+                  />
+                </div>
+                <p title={x.name} className="truncate">
+                  {x.name}
+                </p>
               </div>
             </Table.td>
             <Table.td className="hidden space-x-2 lg:table-cell">

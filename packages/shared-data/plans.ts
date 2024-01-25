@@ -7,10 +7,12 @@ export interface PricingInformation {
   priceLabel?: string
   priceMonthly: number | string
   warning?: string
+  warningPartner?: string
   warningTooltip?: string
   description: string
   preface: string
   features: (string | string[])[]
+  featuresPartner: string[]
   footer?: string
   cta: string
 }
@@ -31,6 +33,13 @@ export const plans: PricingInformation[] = [
       ['500MB Database space', '2 Core shared CPU • 1 GB RAM'],
       '5GB bandwidth',
       '1GB file storage',
+      'Community support',
+    ],
+    featuresPartner: [
+      'Unlimited API requests',
+      'Up to 500MB database space',
+      'Up to 5GB bandwidth',
+      '1-day log retention',
       'Community support',
     ],
     footer: 'Free projects are paused after 1 week of inactivity.',
@@ -92,6 +101,12 @@ export const plans: PricingInformation[] = [
       'On-premise support',
       '24×7×365 premium enterprise support',
       'Private Slack channel',
+    ],
+    featuresPartner: [
+      `Designated Support manager & SLAs`,
+      `24×7×365 premium enterprise support`,
+      'Custom Security Questionnaires',
+      `Private Slack channel`,
     ],
     priceLabel: '',
     priceMonthly: 'Custom',

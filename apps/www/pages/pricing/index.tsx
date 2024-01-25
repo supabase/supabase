@@ -4,7 +4,6 @@ import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { Button, IconArrowUpRight } from 'ui'
 import { ArrowDownIcon } from '@heroicons/react/outline'
-
 import DefaultLayout from '~/components/Layouts/Default'
 import PricingPlans from '~/components/Pricing/PricingPlans'
 

@@ -260,21 +260,21 @@ function getMenuElement(menu: Menu) {
 const NavigationMenu = () => {
   const router = useRouter()
 
-  function handleRouteChange(url: string) {
-    const menu = getMenuByUrl(router.basePath, url)
-    if (menu) {
-      menuState.setMenuLevelId(menu.id)
-    }
-  }
-
   useEffect(() => {
+    function handleRouteChange(url: string) {
+      const menu = getMenuByUrl(router.basePath, url)
+      if (menu) {
+        menuState.setMenuLevelId(menu.id)
+      }
+    }
+
     handleRouteChange(router.basePath + router.asPath)
     // Listen for page changes after a navigation or when the query changes
     router.events.on('routeChangeComplete', handleRouteChange)
     return () => {
       router.events.off('routeChangeComplete', handleRouteChange)
     }
-  }, [router.events])
+  }, [router.asPath, router.basePath, router.events])
 
   const level = useMenuLevelId()
   const menu = getMenuById(level)

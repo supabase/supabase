@@ -26,7 +26,7 @@
     "@react-three/fiber": "^7.0.29",
     "@supabase/auth-helpers-react": "^0.4.2",
     "@supabase/auth-ui-react": "^0.4.5",
-    "@supabase/supabase-js": "^2.38.2",
+    "@supabase/supabase-js": "^2.39.3",
     "classnames": "^2.3.1",
     "cobe": "^0.6.2",
     "common": "*",

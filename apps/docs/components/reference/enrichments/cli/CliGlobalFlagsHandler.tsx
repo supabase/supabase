@@ -2,7 +2,6 @@ import RefSubLayout from '~/layouts/ref/RefSubLayout'
 
 import spec from '~/spec/cli_v1_commands.yaml' assert { type: 'yaml' }
 import Param from '~/components/Params'
-import Options from '~/components/Options'
 
 const CliGlobalFlagsHandler = () => {
   return (
@@ -14,6 +13,7 @@ const CliGlobalFlagsHandler = () => {
             return (
               <Param
                 {...flag}
+                key={flag.id}
                 id={`${spec.id}-${flag.id}`}
                 isOptional={flag.required === undefined ? true : !flag.required}
               ></Param>

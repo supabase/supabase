@@ -25,6 +25,7 @@ The templating system provides the following variables for use:
 | `{{ .TokenHash }}`       | Contains a hashed version of the `{{ .Token }}`. This is useful for constructing your own email link in the email template.                                                                                       |
 | `{{ .SiteURL }}`         | Contains your application's Site URL. This can be configured in your project's [authentication settings](/dashboard/project/_/auth/url-configuration).                                                                                                           |
 | `{{ .RedirectTo }}`      | Contains the redirect URL passed when `signUp`, `signInWithOtp`, `signInWithOAuth`, `resetPasswordForEmail` or `inviteUserByEmail` is called. The redirect URL allow list can be configured in your project's [authentication settings](/dashboard/project/_/auth/url-configuration).                                                                                                           |
+| `{{ .Data }}`            | Contains metadata from `auth.users.user_metadata`. Use this to personalize the email message.
 
 ## Limitations
 
@@ -71,6 +72,31 @@ const { data: { session }, error } = await supabase.auth.verifyOtp({ token_hash,
 // subsequently redirect the user back to the client using the redirect_to param
 // ...
 
+```
+
+## Customization
+
+Supabase Auth makes use of [Go Templates](https://pkg.go.dev/text/template). This means it is possible to conditionally render information based on template properties.You may wish to checkout this [guide by Hugo](https://gohugo.io/templates/introduction/) for a guide on the templating language.
+
+### Send different email to early access users
+
+Send a different email to users who signed up via an early access domain (`https://www.earlyaccess.trial.com`).
+
+```
+{{ if eq .Data.Domain "https://www.example.com" }}
+<h1>Welcome to Our Database Service!</h1>
+  <p>Dear Developer,</p>
+  <p>Welcome to Billy, the scalable developer platform!</p>
+  <p>Best Regards,<br>
+Billy Team</p>
+{{ else if eq .Data.Domain "https://www.earlyaccess.trial.com" }}
+<h1>Welcome to Our Database Service!</h1>
+  <p>Dear Developer,</p>
+  <p>Welcome Billy, the scalable developer platform!</p>
+  <p> As an early access member, you have access to select features like Point To Space Restoration.</p>
+  <p>Best Regards,<br>
+Billy Team</p>
+{{ end }}
 ```
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />

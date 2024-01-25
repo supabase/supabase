@@ -12,7 +12,11 @@ import TooltipListener from 'components/to-be-cleaned/TooltipListener'
  * @param {Array} whitelistClasses  If target class is in the whitelist classes array, will not
  *                                  trigger shortcut event
  */
-function useKeyboardShortcuts(keyMap: any, whitelistNodes = [], whitelistClasses = []) {
+function useKeyboardShortcuts(
+  keyMap: any,
+  whitelistNodes: string[] = [],
+  whitelistClasses: string[] = []
+) {
   const [lastKeydown, setLastKeydown] = useState()
 
   const handleKeydown = (event: any) => {

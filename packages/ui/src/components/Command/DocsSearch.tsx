@@ -218,24 +218,30 @@ function reducer(state: SearchState, action: Action): SearchState {
 const DocsSearch = () => {
   const [state, dispatch] = useReducer(reducer, { status: 'initial', key: 0 })
   const supabaseClient = useSupabaseClient()
-  const { search, setSearch, inputRef, site } = useCommandMenu()
+  const { search, setSearch, inputRef, site, setIsOpen } = useCommandMenu()
   const key = useRef(0)
   const initialLoad = useRef(true)
   const router = useRouter()
 
-  function openLink(pageType: PageType, link: string) {
+  async function openLink(pageType: PageType, link: string) {
     switch (pageType) {
       case PageType.Markdown:
       case PageType.Reference:
         if (site === 'docs') {
-          return router.push(link)
+          await router.push(link)
+          return setIsOpen(false)
         } else if (site === 'website') {
-          return router.push(`/docs${link}`)
+          await router.push(`/docs${link}`)
+          setIsOpen(false)
         } else {
-          return window.open(`https://supabase.com/docs${link}`, '_blank')
+          window.open(`https://supabase.com/docs${link}`, '_blank')
+          setIsOpen(false)
         }
+        break
       case PageType.GithubDiscussion:
-        return window.open(link, '_blank')
+        window.open(link, '_blank')
+        setIsOpen(false)
+        break
       default:
         throw new Error(`Unknown page type '${pageType}'`)
     }

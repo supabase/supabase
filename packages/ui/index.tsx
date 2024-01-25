@@ -35,6 +35,7 @@ export * from './src/components/CodeBlock'
 // NAV
 
 export * from './src/components/Menu'
+export * from './src/components/NavMenu'
 
 // OVERLAYS
 
@@ -161,6 +162,8 @@ export { Slider as Slider_Shadcn_ } from './src/components/shadcn/ui/slider'
 
 export { Input as Input_Shadcn_ } from './src/components/shadcn/ui/input'
 
+export { Button as Button_Shadcn_ } from './src/components/shadcn/ui/button'
+
 export { TextArea as TextArea_Shadcn_ } from './src/components/shadcn/ui/text-area'
 
 export { Label as Label_Shadcn_ } from './src/components/shadcn/ui/label'
@@ -187,6 +190,20 @@ export {
   SheetTitle as SheetTitle_Shadcn_,
   SheetDescription as SheetDescription_Shadcn_,
 } from './src/components/shadcn/ui/sheet'
+
+export {
+  Tabs as Tabs_Shadcn_,
+  TabsContent as TabsContent_Shadcn_,
+  TabsList as TabsList_Shadcn_,
+  TabsTrigger as TabsTrigger_Shadcn_,
+} from './src/components/shadcn/ui/tabs/tabs'
+
+export {
+  TooltipProvider as TooltipProvider_Shadcn_,
+  Tooltip as Tooltip_Shadcn_,
+  TooltipTrigger as TooltipTrigger_Shadcn_,
+  TooltipContent as TooltipContent_Shadcn_,
+} from './src/components/shadcn/ui/tooltip'
 
 export { ScrollArea, ScrollBar } from './src/components/shadcn/ui/scroll-area'
 

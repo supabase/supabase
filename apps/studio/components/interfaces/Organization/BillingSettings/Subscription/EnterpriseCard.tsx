@@ -5,9 +5,12 @@ import { Button, IconCheck } from 'ui'
 export interface EnterpriseCardProps {
   plan: PricingInformation
   isCurrentPlan: boolean
+  billingViaPartner: boolean
 }
 
-const EnterpriseCard = ({ plan, isCurrentPlan }: EnterpriseCardProps) => {
+const EnterpriseCard = ({ plan, isCurrentPlan, billingViaPartner }: EnterpriseCardProps) => {
+  const features = billingViaPartner ? plan.featuresPartner : plan.features
+
   return (
     <div
       key={plan.id}
