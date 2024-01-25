@@ -333,9 +333,15 @@ export const ORMS: ConnectionType[] = [
     files: [
       {
         // omit .tsx extension
-        location: 'prisma/env.local',
-        destinationFilename: 'prisma.env.local',
-        destinationLocation: 'prisma/.env.local',
+        location: 'prisma/env',
+        destinationFilename: '.env',
+        destinationLocation: '.env',
+      },
+      {
+        // omit .tsx extension
+        location: 'prisma/schema.prisma',
+        destinationFilename: 'schema.prisma',
+        destinationLocation: 'schema.prisma',
       },
     ],
   },
@@ -347,9 +353,21 @@ export const ORMS: ConnectionType[] = [
     files: [
       {
         // omit .tsx extension
-        location: 'drizzle/env.local',
-        destinationFilename: 'drizzle.env.local',
-        destinationLocation: 'drizzle/.env.local',
+        location: 'drizzle/env',
+        destinationFilename: '.env',
+        destinationLocation: '.env',
+      },
+      {
+        // omit .tsx extension
+        location: 'drizzle/schema',
+        destinationFilename: 'schema.tsx',
+        destinationLocation: 'schema.tsx',
+      },
+      {
+        // omit .tsx extension
+        location: 'drizzle/index',
+        destinationFilename: 'index.tsx',
+        destinationLocation: 'index.tsx',
       },
     ],
   },
