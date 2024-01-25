@@ -1,10 +1,10 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { useEffect, useState } from 'react'
 import { Button, IconAlignLeft, SidePanel } from 'ui'
-import * as Tooltip from '@radix-ui/react-tooltip'
 
 import TwoOptionToggle from 'components/ui/TwoOptionToggle'
-import { useStore } from 'hooks'
 import { minifyJSON, prettifyJSON, tryParseJson } from 'lib/helpers'
+import toast from 'react-hot-toast'
 import ActionBar from '../../ActionBar'
 import DrilldownViewer from './DrilldownViewer'
 import JsonCodeEditor from './JsonCodeEditor'
@@ -17,7 +17,7 @@ interface JsonEditProps {
   applyButtonLabel?: string
   readOnly?: boolean
   closePanel: () => void
-  onSaveJSON: (value: string | number | null) => void
+  onSaveJSON: (value: string | number | null, resolve: () => void) => void
 }
 
 const JsonEdit = ({
@@ -30,7 +30,6 @@ const JsonEdit = ({
   closePanel,
   onSaveJSON,
 }: JsonEditProps) => {
-  const { ui } = useStore()
   const [view, setView] = useState<'edit' | 'view'>('edit')
   const [jsonStr, setJsonStr] = useState('')
 
@@ -44,14 +43,10 @@ const JsonEdit = ({
   const validateJSON = async (resolve: () => void) => {
     try {
       const minifiedJSON = minifyJSON(jsonStr)
-      if (onSaveJSON) onSaveJSON(minifiedJSON)
+      if (onSaveJSON) onSaveJSON(minifiedJSON, resolve)
     } catch (error: any) {
-      const message = error.message
-        ? `Error: ${error.message}`
-        : 'JSON seems to have an invalid structure.'
-      ui.setNotification({ category: 'error', message, duration: 4000 })
-    } finally {
       resolve()
+      toast.error('JSON seems to have an invalid structure.')
     }
   }
 
