@@ -64,7 +64,27 @@ const HTTPRequestFields = ({
     <>
       <FormSection
         header={
-          <FormSectionLabel className="lg:!col-span-4">
+          <FormSectionLabel
+            className="lg:!col-span-4"
+            description={
+              <div>
+                <Button
+                  asChild
+                  type="default"
+                  className="text-foreground-light hover:text-foreground"
+                  icon={<IconExternalLink size={12} strokeWidth={2} />}
+                >
+                  <a
+                    href="https://supabase.com/docs/guides/database/webhooks#timeout"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    About timeouts and retries
+                  </a>
+                </Button>
+              </div>
+            }
+          >
             {type === 'http_request'
               ? 'HTTP Request'
               : type === 'supabase_function'
@@ -132,20 +152,6 @@ const HTTPRequestFields = ({
             type="number"
             actions={<p className="text-foreground-light pr-2"></p>}
           />
-          <Button
-            asChild
-            type="text"
-            className="text-foreground-light hover:text-foreground"
-            icon={<IconExternalLink size={12} strokeWidth={2} />}
-          >
-            <Link
-              href="https://supabase.com/docs/guides/database/webhooks#timeout"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Learn more about timeouts and retries on webhooks
-            </Link>
-          </Button>
         </FormSectionContent>
       </FormSection>
       <SidePanel.Separator />
