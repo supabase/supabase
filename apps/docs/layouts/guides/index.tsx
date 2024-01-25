@@ -30,7 +30,7 @@ interface Props {
   hideToc?: boolean
 }
 
-const Layout: FC<Props> = (props, test) => {
+const Layout: FC<Props> = (props) => {
   const [hash] = useHash()
 
   const articleRef = useRef()
