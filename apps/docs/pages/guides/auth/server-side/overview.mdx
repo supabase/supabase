@@ -11,11 +11,11 @@ When using Supabase with server-side languages and frameworks - such as Next.js,
 
 ## Framework quickstarts
 
-<div className="grid lg:grid-cols-12 gap-6 not-prose">
+<div className="grid cols-[repeat(auto-fit,min-max(250px,1fr)] gap-6 mb-6 not-prose">
   {quickstarts.map((item) => {
     return (
-      <Link href={`${item.href}`} key={item.title} passHref className={'col-span-4'}>
-        <GlassPanel title={item.title} span="col-span-6" background={false} icon={item.icon}>
+      <Link href={`${item.href}`} key={item.title} passHref>
+        <GlassPanel title={item.title} background={false} icon={item.icon}>
           {item.description}
         </GlassPanel>
       </Link>
@@ -39,7 +39,7 @@ If you're currently using the [Auth Helpers package](https://github.com/supabase
 export const quickstarts = [
   {
     title: 'Next.js',
-    href: '/guides/auth/quickstarts/nextjs',
+    href: '/guides/auth/server-side/nextjs',
     description:
       'Automatically configure Supabase to use cookies, making your user and their session available on the client and server.',
     icon: '/docs/img/icons/nextjs-icon',
