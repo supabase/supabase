@@ -322,7 +322,7 @@ export const FRAMEWORKS: ConnectionType[] = [
       },
     ],
   },
-] as const
+]
 
 export const ORMS: ConnectionType[] = [
   {
