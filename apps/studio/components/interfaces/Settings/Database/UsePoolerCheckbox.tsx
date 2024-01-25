@@ -68,7 +68,7 @@ export const UsePoolerCheckbox = ({
                               <Button
                                 type="outline"
                                 className="py-0.5 pr-1.5"
-                                iconRight={<IconChevronDown strokeWidth={1.5} />}
+                                iconRight={<IconChevronDown strokeWidth={1} />}
                               >
                                 <span className="capitalize">Mode: {poolingMode}</span>
                               </Button>
@@ -76,7 +76,6 @@ export const UsePoolerCheckbox = ({
                             <DropdownMenuContent side="bottom" align="start">
                               <DropdownMenuItem
                                 key="transaction"
-                                className="text-foreground"
                                 onClick={() => onSelectPoolingMode('transaction')}
                               >
                                 <Tooltip.Root delayDuration={0}>
@@ -109,7 +108,6 @@ export const UsePoolerCheckbox = ({
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 key="session"
-                                className="text-foreground"
                                 onClick={() => onSelectPoolingMode('session')}
                               >
                                 Session mode
@@ -117,7 +115,6 @@ export const UsePoolerCheckbox = ({
                               <Separator className="my-1" />
                               <DropdownMenuItem
                                 key="more-info"
-                                className="hover:text-foreground"
                                 onClick={() => snap.setShowPoolingModeHelper(true)}
                               >
                                 How to choose pooling modes?
