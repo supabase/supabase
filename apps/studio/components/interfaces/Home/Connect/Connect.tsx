@@ -1,5 +1,5 @@
 import { DatabaseConnectionString } from 'components/interfaces/Settings/Database/DatabaseSettings/DatabaseConnectionString'
-import { FileJson2, Plug } from 'lucide-react'
+import { ArrowUpRight, FileJson2, Plug } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
   Button,
@@ -35,6 +35,7 @@ import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useCheckPermissions } from 'hooks'
 import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
 import { projectKeys } from './Connect.types'
+import Link from 'next/link'
 
 type GetContentFilesArgs = {
   selectedParent: string
@@ -251,49 +252,63 @@ const Connect = () => {
             {CONNECTION_TYPES.map((type) => (
               <TabsContent_Shadcn_ key={`content-${type.key}`} value={type.key}>
                 <div className="bg-surface-300 p-4">
-                  <div className="flex items-center gap-2">
-                    {/* all parents */}
-                    <ConnectDropdown
-                      level="parent"
-                      open={parentSelectorOpen}
-                      setOpen={setParentSelectorOpen}
-                      state={selectedParent}
-                      updateState={handleParentChange}
-                      label={connectionObject === FRAMEWORKS ? 'Frameworks' : 'Tool'}
-                      items={connectionObject}
-                    />
-
-                    {/* children of those parents */}
-                    {selectedParent &&
-                      (connectionObject.find((parent) => parent.key === selectedParent)?.children
-                        .length || 0) > 0 && (
-                        <ConnectDropdown
-                          level="child"
-                          open={childDropdownOpen}
-                          setOpen={setChildDropdownOpen}
-                          state={selectedChild}
-                          updateState={handleChildChange}
-                          label="Using"
-                          items={getChildOptions()}
-                        />
-                      )}
-
-                    {/* grandchildren if any */}
-                    {selectedChild &&
-                      (connectionObject
-                        .find((parent) => parent.key === selectedParent)
-                        ?.children.find((child) => child.key === selectedChild)?.children.length ||
-                        0) > 0 && (
-                        <ConnectDropdown
-                          level="grandchild"
-                          open={grandChildDropdownOpen}
-                          setOpen={setGrandChildDropdownOpen}
-                          state={selectedGrandchild}
-                          updateState={handleGrandchildChange}
-                          label="With"
-                          items={getGrandchildrenOptions()}
-                        />
-                      )}
+                  <div className="flex justify-between">
+                    <div className="flex items-center gap-2">
+                      {/* all parents */}
+                      <ConnectDropdown
+                        level="parent"
+                        open={parentSelectorOpen}
+                        setOpen={setParentSelectorOpen}
+                        state={selectedParent}
+                        updateState={handleParentChange}
+                        label={connectionObject === FRAMEWORKS ? 'Frameworks' : 'Tool'}
+                        items={connectionObject}
+                      />
+                      {/* children of those parents */}
+                      {selectedParent &&
+                        (connectionObject.find((parent) => parent.key === selectedParent)?.children
+                          .length || 0) > 0 && (
+                          <ConnectDropdown
+                            level="child"
+                            open={childDropdownOpen}
+                            setOpen={setChildDropdownOpen}
+                            state={selectedChild}
+                            updateState={handleChildChange}
+                            label="Using"
+                            items={getChildOptions()}
+                          />
+                        )}
+                      {/* grandchildren if any */}
+                      {selectedChild &&
+                        (connectionObject
+                          .find((parent) => parent.key === selectedParent)
+                          ?.children.find((child) => child.key === selectedChild)?.children
+                          .length || 0) > 0 && (
+                          <ConnectDropdown
+                            level="grandchild"
+                            open={grandChildDropdownOpen}
+                            setOpen={setGrandChildDropdownOpen}
+                            state={selectedGrandchild}
+                            updateState={handleGrandchildChange}
+                            label="With"
+                            items={getGrandchildrenOptions()}
+                          />
+                        )}
+                    </div>
+                    {connectionObject.find((item) => item.key === selectedParent)?.guideLink && (
+                      <Link
+                        href={
+                          connectionObject.find((item) => item.key === selectedParent)?.guideLink ||
+                          ''
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-sm hover:underline mr-1 text-light"
+                      >
+                        {connectionObject.find((item) => item.key === selectedParent)?.label} guide
+                        <ArrowUpRight size={14} />
+                      </Link>
+                    )}
                   </div>
 
                   <ConnectTabsContent

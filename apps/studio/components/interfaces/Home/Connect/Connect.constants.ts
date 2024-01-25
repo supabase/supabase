@@ -3,6 +3,7 @@ export type ConnectionType = {
   icon: string
   label: string
   files: File[]
+  guideLink?: string
   children: ConnectionType[]
 }
 
@@ -17,6 +18,7 @@ export const FRAMEWORKS: ConnectionType[] = [
     key: 'nextjs',
     label: 'Next.JS',
     icon: 'nextjs',
+    guideLink: 'https://supabase.com/docs/guides/getting-started/quickstarts/nextjs',
     files: [],
     children: [
       {
@@ -114,6 +116,7 @@ export const FRAMEWORKS: ConnectionType[] = [
     key: 'react',
     label: 'React',
     icon: 'react',
+    guideLink: 'https://supabase.com/docs/guides/getting-started/quickstarts/reactjs',
     files: [],
     children: [
       {
@@ -146,6 +149,7 @@ export const FRAMEWORKS: ConnectionType[] = [
     key: 'nuxt',
     label: 'Nuxt',
     icon: 'nuxt',
+    guideLink: 'https://supabase.com/docs/guides/getting-started/quickstarts/nuxtjs',
     files: [],
     children: [
       {
@@ -178,6 +182,7 @@ export const FRAMEWORKS: ConnectionType[] = [
     key: 'vuejs',
     label: 'Vue.JS',
     icon: 'vuejs',
+    guideLink: 'https://supabase.com/docs/guides/getting-started/quickstarts/vue',
     files: [],
     children: [
       {
@@ -211,6 +216,7 @@ export const FRAMEWORKS: ConnectionType[] = [
     key: 'sveltekit',
     label: 'SvelteKit',
     icon: 'sveltekit',
+    guideLink: 'https://supabase.com/docs/guides/getting-started/quickstarts/sveltekit',
     files: [],
     children: [
       {
@@ -250,6 +256,7 @@ export const FRAMEWORKS: ConnectionType[] = [
     key: 'solidjs',
     label: 'Solid.js',
     icon: 'solidjs',
+    guideLink: 'https://supabase.com/docs/guides/getting-started/quickstarts/solidjs',
     files: [],
     children: [
       {
@@ -279,11 +286,11 @@ export const FRAMEWORKS: ConnectionType[] = [
       },
     ],
   },
-
   {
     key: 'redwoodjs',
     label: 'RedwoodJS',
     icon: 'redwoodjs',
+    guideLink: 'https://supabase.com/docs/guides/getting-started/quickstarts/redwoodjs',
     children: [],
     files: [
       {
@@ -298,6 +305,7 @@ export const FRAMEWORKS: ConnectionType[] = [
     key: 'refine',
     label: 'refine',
     icon: 'refine',
+    guideLink: 'https://supabase.com/docs/guides/getting-started/quickstarts/refine',
     files: [],
     children: [
       {
@@ -329,6 +337,7 @@ export const ORMS: ConnectionType[] = [
     key: 'prisma',
     label: 'Prisma',
     icon: 'prisma',
+    guideLink: 'https://supabase.com/partners/integrations/prisma',
     children: [],
     files: [
       {
@@ -349,6 +358,8 @@ export const ORMS: ConnectionType[] = [
     key: 'drizzle',
     label: 'Drizzle',
     icon: 'drizzle',
+    guideLink:
+      'https://supabase.com/docs/guides/database/connecting-to-postgres#connecting-with-drizzle',
     children: [],
     files: [
       {
@@ -381,6 +392,7 @@ export const GRAPHQL: ConnectionType[] = [
     key: 'graphql',
     label: 'GraphQL',
     icon: 'graphql',
+    guideLink: 'https://supabase.com/docs/guides/graphql',
     children: [],
     files: [
       {
