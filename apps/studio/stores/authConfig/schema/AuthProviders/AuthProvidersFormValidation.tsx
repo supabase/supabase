@@ -1,5 +1,5 @@
-import { boolean, number, object, string } from 'yup'
 import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
+import { boolean, number, object, string } from 'yup'
 
 const parseBase64URL = (b64url: string) => {
   return atob(b64url.replace(/[-]/g, '+').replace(/[_]/g, '/'))
@@ -20,6 +20,11 @@ const PROVIDER_EMAIL = {
     MAILER_AUTOCONFIRM: {
       title: 'Confirm email',
       description: `Users will need to confirm their email address before signing in for the first time.`,
+      type: 'boolean',
+    },
+    MAILER_ALLOW_UNVERIFIED_EMAIL_SIGN_INS: {
+      title: 'Allow unverified email sign-ins',
+      description: `Users will be allowed to sign in even if they have an unverified email address.`,
       type: 'boolean',
     },
     MAILER_SECURE_EMAIL_CHANGE_ENABLED: {
