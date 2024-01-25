@@ -211,7 +211,7 @@ const ComputePricingCalculator = () => {
           </div>
         </div>
       </div>
-      <div className="flex flex-col gap-2 col-span-3 items-start flex-1 w-full lg:w-auto border-t lg:border-t-0 lg:border-l  lg:pl-4">
+      <div className="flex flex-col gap-2 col-span-3 items-start flex-1 w-full lg:w-auto lg:border-l lg:pl-4">
         <div
           className={cn(
             'w-full flex flex-col items-start gap-y-2',
