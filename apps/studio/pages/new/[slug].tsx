@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import generator from 'generate-password-browser'
-import { debounce } from 'lodash'
+import { debounce, set } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
@@ -37,6 +37,7 @@ import {
 import { passwordStrength, pluckObjectFields } from 'lib/helpers'
 import { NextPageWithLayout } from 'types'
 import { Button, IconInfo, IconUsers, Input, Listbox } from 'ui'
+import { InstanceSizeSelector } from 'components/interfaces/ProjectCreation/InstanceSizeSelector'
 
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
@@ -59,11 +60,15 @@ const Wizard: NextPageWithLayout = () => {
       ? PROVIDERS[cloudProvider].default_region
       : ''
   )
+
+  const [instanceSize, setInstanceSize] = useState('')
+
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
   const [passwordStrengthWarning, setPasswordStrengthWarning] = useState('')
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(0)
 
   const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
+
   const currentOrg = organizations?.find((o: any) => o.slug === slug)
 
   const { data: orgSubscription } = useOrgSubscriptionQuery({ orgSlug: slug })
@@ -79,6 +84,16 @@ const Wizard: NextPageWithLayout = () => {
       router.push(`/project/${res.ref}/building`)
     },
   })
+
+  useEffect(() => {
+    if (!orgSubscription) return
+
+    if (orgSubscription.plan.id !== 'free') {
+      setInstanceSize('micro')
+    } else {
+      setInstanceSize(orgSubscription.nano_enabled ? 'nano' : 'micro')
+    }
+  }, [orgSubscription])
 
   const orgProjectCount = (allProjects || []).filter(
     (proj) => proj.organization_id === currentOrg?.id
@@ -390,6 +405,14 @@ const Wizard: NextPageWithLayout = () => {
                       />
                     }
                     error={passwordStrengthWarning}
+                  />
+                </Panel.Content>
+
+                <Panel.Content className="border-b border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark">
+                  <InstanceSizeSelector
+                    subscription={orgSubscription!}
+                    selectedInstanceSize={instanceSize}
+                    onSelectInstanceSize={setInstanceSize}
                   />
                 </Panel.Content>
 
