@@ -405,15 +405,15 @@ module.exports = {
 },
 "foreground-light": {
   cssVariable: "var(--foreground-light)",
-  value: "hsl(30, 6.7%, 70.6%)"
+  value: "hsl(0, 0%, 70.6%)"
 },
 "foreground-lighter": {
   cssVariable: "var(--foreground-lighter)",
-  value: "hsl(21.80000000000001, 4.7%, 53.9%)"
+  value: "hsl(0, 0%, 53.7%)"
 },
 "foreground-muted": {
   cssVariable: "var(--foreground-muted)",
-  value: "hsl(21.80000000000001, 4.4%, 49.2%)"
+  value: "hsl(0, 0%, 30.2%)"
 },
 "foreground-contrast": {
   cssVariable: "var(--foreground-contrast)",
@@ -421,7 +421,7 @@ module.exports = {
 },
 "background-200": {
   cssVariable: "var(--background-200)",
-  value: "hsl(0, 0%, 9.4%)"
+  value: "hsl(0, 0%, 9%)"
 },
 "background-DEFAULT": {
   cssVariable: "var(--background-default)",
@@ -433,35 +433,35 @@ module.exports = {
 },
 "background-alternative-DEFAULT": {
   cssVariable: "var(--background-alternative-default)",
-  value: "hsl(60, 3.4%, 5.7%)"
+  value: "hsl(0, 0%, 5.9%)"
 },
 "background-selection": {
   cssVariable: "var(--background-selection)",
-  value: "hsl(34.30000000000001, 5.3%, 25.7%)"
+  value: "hsl(0, 0%, 25.9%)"
 },
 "background-control": {
   cssVariable: "var(--background-control)",
-  value: "hsl(20, 3.8%, 15.5%)"
+  value: "hsl(0, 0%, 14.1%)"
 },
 "background-surface-100": {
   cssVariable: "var(--background-surface-100)",
-  value: "hsl(0, 0%, 9.4%)"
+  value: "hsl(0, 0%, 9%)"
 },
 "background-surface-200": {
   cssVariable: "var(--background-surface-200)",
-  value: "hsl(0, 0%, 13.7%)"
+  value: "hsl(0, 0%, 12.2%)"
 },
 "background-surface-300": {
   cssVariable: "var(--background-surface-300)",
-  value: "hsl(0, 0%, 16.1%)"
+  value: "hsl(0, 0%, 12.9%)"
 },
 "background-surface-400": {
   cssVariable: "var(--background-surface-400)",
-  value: "hsl(0, 0%, 23.9%)"
+  value: "hsl(0, 0%, 16.1%)"
 },
 "background-overlay-DEFAULT": {
   cssVariable: "var(--background-overlay-default)",
-  value: "hsl(0, 0%, 5.9%)"
+  value: "hsl(0, 0%, 14.1%)"
 },
 "background-overlay-hover": {
   cssVariable: "var(--background-overlay-hover)",
@@ -469,7 +469,7 @@ module.exports = {
 },
 "background-muted": {
   cssVariable: "var(--background-muted)",
-  value: "hsl(0, 4%, 14.7%)"
+  value: "hsl(0, 0%, 14.1%)"
 },
 "background-button-DEFAULT": {
   cssVariable: "var(--background-button-default)",
@@ -477,35 +477,35 @@ module.exports = {
 },
 "border-DEFAULT": {
   cssVariable: "var(--border-default)",
-  value: "hsl(36, 5.4%, 18.2%)"
+  value: "hsl(0, 0%, 16.1%)"
 },
 "border-muted": {
   cssVariable: "var(--border-muted)",
-  value: "hsl(60, 1.4%, 13.9%)"
+  value: "hsl(0, 0%, 14.1%)"
 },
 "border-secondary": {
   cssVariable: "var(--border-secondary)",
-  value: "hsl(40, 3.6%, 16.3%)"
+  value: "hsl(0, 0%, 14.1%)"
 },
 "border-overlay": {
   cssVariable: "var(--border-overlay)",
-  value: "hsl(30, 1.8%, 22.4%)"
+  value: "hsl(0, 0%, 20%)"
 },
 "border-control": {
   cssVariable: "var(--border-control)",
-  value: "hsl(30, 1.8%, 22.4%)"
+  value: "hsl(0, 0%, 22.4%)"
 },
 "border-alternative": {
   cssVariable: "var(--border-alternative)",
-  value: "hsl(0, 1.5%, 26.7%)"
+  value: "hsl(0, 0%, 26.7%)"
 },
 "border-strong": {
   cssVariable: "var(--border-strong)",
-  value: "hsl(30, 1.8%, 22.4%)"
+  value: "hsl(0, 0%, 20%)"
 },
 "border-stronger": {
   cssVariable: "var(--border-stronger)",
-  value: "hsl(0, 1.5%, 26.7%)"
+  value: "hsl(0, 0%, 22%)"
 },
 "border-button-DEFAULT": {
   cssVariable: "var(--border-button-default)",
@@ -585,7 +585,7 @@ module.exports = {
 },
 "brand-DEFAULT": {
   cssVariable: "var(--brand-default)",
-  value: "hsl(155, 100%, 38.6%)"
+  value: "hsl(153.10000000000002, 60.2%, 52.7%)"
 },
 "brand-button": {
   cssVariable: "var(--brand-button)",

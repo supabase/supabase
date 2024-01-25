@@ -1,5 +1,6 @@
 [data-theme='dark'],
 .dark {
+  --helpers-os-appearance: Dark;
   --code-block-5: 0deg 0% 100%;
   --code-block-4: 0deg 0% 100%;
   --code-block-3: 0deg 0% 100%;
@@ -30,9 +31,9 @@
   --destructive-200: 10.9deg 23.4% 9.2%;
   --background-200: 0deg 0% 11%;
   --foreground-contrast: 0deg 0% 11%;
-  --foreground-muted: 0deg 0% 48.2%;
-  --foreground-lighter: 0deg 0% 62%;
-  --foreground-light: 0deg 0% 80.8%;
+  --foreground-muted: 0deg 0% 50.2%;
+  --foreground-lighter: 0deg 0% 72.9%;
+  --foreground-light: 0deg 0% 83.1%;
   --border-button-hover: var(--colors-gray-dark-800);
   --border-button-default: var(--colors-gray-dark-700);
   --border-stronger: var(--colors-gray-dark-800);
