@@ -155,6 +155,7 @@ const InstanceConfigurationUI = () => {
                 fitViewOptions={{ minZoom: 0.9, maxZoom: 1 }}
                 className="instance-configuration"
                 zoomOnPinch={false}
+                zoomOnScroll={false}
                 nodesDraggable={false}
                 nodesConnectable={false}
                 zoomOnDoubleClick={false}

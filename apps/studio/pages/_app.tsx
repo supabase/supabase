@@ -14,6 +14,7 @@ import 'styles/stripe.scss'
 import 'styles/toast.scss'
 import 'styles/ui.scss'
 import 'styles/reactflow.scss'
+import 'styles/markdown-preview.scss'
 
 import { loader } from '@monaco-editor/react'
 import { TooltipProvider } from '@radix-ui/react-tooltip'
@@ -57,6 +58,7 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { RootStore } from 'stores'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
+import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -162,14 +164,16 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                   <TooltipProvider>
                     <RouteValidationWrapper>
                       <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
-                        <CommandMenuWrapper>
-                          <AppBannerWrapper>
-                            <FeaturePreviewContextProvider>
-                              {getLayout(<Component {...pageProps} />)}
-                              <FeaturePreviewModal />
-                            </FeaturePreviewContextProvider>
-                          </AppBannerWrapper>
-                        </CommandMenuWrapper>
+                        <AppBannerContextProvider>
+                          <CommandMenuWrapper>
+                            <AppBannerWrapper>
+                              <FeaturePreviewContextProvider>
+                                {getLayout(<Component {...pageProps} />)}
+                                <FeaturePreviewModal />
+                              </FeaturePreviewContextProvider>
+                            </AppBannerWrapper>
+                          </CommandMenuWrapper>
+                        </AppBannerContextProvider>
                       </ThemeProvider>
                     </RouteValidationWrapper>
                   </TooltipProvider>

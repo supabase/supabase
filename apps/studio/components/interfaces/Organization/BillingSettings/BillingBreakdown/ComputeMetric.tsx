@@ -6,7 +6,7 @@ import { IconChevronRight, IconPieChart } from 'ui'
 import { Metric } from './BillingBreakdown.constants'
 import { formatUsage } from '../helpers'
 import { PricingMetric } from 'data/analytics/org-daily-stats-query'
-import { useMemo } from 'react'
+import React, { useMemo } from 'react'
 
 export interface ComputeMetricProps {
   slug?: string
@@ -93,7 +93,14 @@ const ComputeMetric = ({ slug, metric, usage, relativeToSubscription }: ComputeM
                     <p className="text-xs">
                       Every project is a dedicated server and database. For every hour your project
                       is active, it incurs compute costs based on the instance size of your project.
-                      Paused projects do not incur compute costs.
+                      Paused projects do not incur compute costs.{' '}
+                      <Link
+                        href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
+                        target="_blank"
+                        className="transition text-brand hover:text-brand-600 underline"
+                      >
+                        Read more
+                      </Link>
                     </p>
                   </div>
                 </div>

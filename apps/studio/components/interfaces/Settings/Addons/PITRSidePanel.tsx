@@ -28,6 +28,7 @@ import {
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { AlertTriangleIcon } from 'lucide-react'
 import { AddonVariantId } from 'data/subscriptions/types'
+import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 
 const PITR_CATEGORY_OPTIONS: {
   id: 'off' | 'on'
@@ -38,14 +39,14 @@ const PITR_CATEGORY_OPTIONS: {
   {
     id: 'off',
     name: 'Disable PITR',
-    imageUrl: `${BASE_PATH}/img/pitr-off.png?v=2`,
-    imageUrlLight: `${BASE_PATH}/img/pitr-off--light.png?v=2`,
+    imageUrl: `${BASE_PATH}/img/pitr-off.svg?v=2`,
+    imageUrlLight: `${BASE_PATH}/img/pitr-off--light.svg?v=2`,
   },
   {
     id: 'on',
     name: 'Enable PITR',
-    imageUrl: `${BASE_PATH}/img/pitr-on.png?v=2`,
-    imageUrlLight: `${BASE_PATH}/img/pitr-on--light.png?v=2`,
+    imageUrl: `${BASE_PATH}/img/pitr-on.svg?v=2`,
+    imageUrlLight: `${BASE_PATH}/img/pitr-on--light.svg?v=2`,
   },
 ]
 
@@ -76,6 +77,8 @@ const PITRSidePanel = () => {
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
+  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
+
   const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
       ui.setNotification({
@@ -162,9 +165,13 @@ const PITRSidePanel = () => {
       onCancel={onClose}
       onConfirm={onConfirm}
       loading={isLoading || isSubmitting}
-      disabled={isFreePlan || isLoading || !hasChanges || isSubmitting || !canUpdatePitr}
+      disabled={
+        isFreePlan || isLoading || !hasChanges || isSubmitting || !canUpdatePitr || hasHipaaAddon
+      }
       tooltip={
-        isFreePlan
+        hasHipaaAddon
+          ? 'Unable to change PITR with HIPAA add-on'
+          : isFreePlan
           ? 'Unable to enable point in time recovery on a free plan'
           : !canUpdatePitr
           ? 'You do not have permission to update PITR'
@@ -186,6 +193,20 @@ const PITRSidePanel = () => {
       }
     >
       <SidePanel.Content>
+        {hasHipaaAddon && (
+          <Alert_Shadcn_>
+            <AlertTitle_Shadcn_>PITR cannot be changed with HIPAA</AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              All projects should have PITR enabled by default and cannot be changed with HIPAA
+              enabled. Contact support for further assistance.
+            </AlertDescription_Shadcn_>
+            <div className="mt-4">
+              <Button type="default" asChild>
+                <Link href="/support/new">Contact support</Link>
+              </Button>
+            </div>
+          </Alert_Shadcn_>
+        )}
         <div className="py-6 space-y-4">
           <p className="text-sm">
             Point-in-Time Recovery (PITR) allows a project to be backed up at much shorter
