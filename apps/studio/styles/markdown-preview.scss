@@ -185,7 +185,7 @@
   font-weight: var(--base-text-weight-semibold, 600);
   padding-bottom: .3em;
   font-size: 2em;
-  border-bottom: 1px solid var(--color-border-muted);
+  @apply border-b;
 }
 
 .markdown-body mark {
@@ -236,7 +236,7 @@
   box-sizing: content-box;
   overflow: hidden;
   background: transparent;
-  border-bottom: 1px solid var(--color-border-muted);
+  @apply border-b;
   height: .25em;
   padding: 0;
   margin: 24px 0;
@@ -394,7 +394,7 @@
   font-weight: var(--base-text-weight-semibold, 600);
   padding-bottom: .3em;
   font-size: 1.5em;
-  border-bottom: 1px solid var(--color-border-muted);
+  @apply border-b;
 }
 
 .markdown-body h3 {
