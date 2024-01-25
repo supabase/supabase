@@ -21,7 +21,9 @@ export const NoticeBanner = () => {
       className="flex items-center justify-center gap-x-4 bg-surface-100 py-3 transition text-foreground box-border border-b border-default"
       style={{ height: '44px' }}
     >
-      <p className="text-sm">PgBouncer and IPv4 will be deprecated after 26th January 2024</p>
+      <p className="text-sm">
+        Prepare for the PgBouncer and IPv4 deprecations on 26th January 2024
+      </p>
       <div className="flex items-center gap-x-1">
         <Button asChild type="link" iconRight={<IconExternalLink />}>
           <a

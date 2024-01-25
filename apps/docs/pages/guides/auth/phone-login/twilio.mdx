@@ -415,18 +415,11 @@ Twilio Verify can be used with WhatsApp OTPs with no additional configuration.
 Complete the following steps to use WhatsApp OTP with Twilio Programmable Messaging:
 
 1. Go through the [Twilio self sign up guide for WhatsApp](https://www.twilio.com/docs/whatsapp/self-sign-up).
-2. Follow the [Twilio Guide for Submitting Templates](https://www.twilio.com/docs/whatsapp/tutorial/send-whatsapp-notification-messages-templates#creating-message-templates-and-submitting-them-for-approval) and submit a Basic Authentication Message for approval.
+2. Register a Twilio Content Template via the [API](https://www.twilio.com/docs/content/whatsappauthentication) and note the corresponding Twilio Content SID. You can also use the Template Builder on the Twilio dashboard to create a Content Template
+   ![Twilio Content SID Image](/docs/img/guides/auth-twilio/twilio_content_sid.png)
+3. Register the Twilio Content SID on the Supabase dashboard under Authentication > Providers > Phone > Twilio Content SID. Ensure you have Twilio selected as your phone provider.
 
-Alternatively, you can register a Twilio Content SID which corresponds to a message template.
-![Twilio Content SID Image](/docs/img/guides/auth-twilio/twilio_content_sid.png)
-
-Note that you may only use one Twilio Content SID at a time. Use Twilio Verify or the Basic Authentication Message if you require internationalization for your message template.
-
-<Admonition type="caution">
-
-Twilio Programmable Messaging (WhatsApp) can only be used with the Basic Authentication Message. For advanced customization options, please use Twilio Verify.
-
-</Admonition>
+Note that you may only use one Twilio Content SID at a time and that Supabase Auth will use the Content Template over the `SMS Message` field when sending WhatsApp messages. Use Twilio Verify if you need to use more than one message template.
 
 The sign in process with WhatsApp is similar to the sign in process for SMS. Do note the additional `whatsapp` parameter added:
 
