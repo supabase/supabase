@@ -47,7 +47,7 @@ const EnterpriseCard = ({ plan, isCurrentPlan, billingViaPartner }: EnterpriseCa
           role="list"
           className="text-xs text-foreground-light md:grid md:grid-cols-2 md:gap-x-10"
         >
-          {plan.features.map((feature) => (
+          {features.map((feature) => (
             <li
               key={typeof feature === 'string' ? feature : feature[0]}
               className="flex items-center py-2 first:mt-0"

@@ -296,7 +296,7 @@ const PlanUpdateSidePanel = () => {
                     <div className="border-t my-6" />
 
                     <ul role="list">
-                      {plan.features.map((feature) => (
+                      {features.map((feature) => (
                         <li
                           key={typeof feature === 'string' ? feature : feature[0]}
                           className="flex py-2"

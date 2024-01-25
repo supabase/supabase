@@ -12,7 +12,7 @@ export interface PricingInformation {
   description: string
   preface: string
   features: (string | string[])[]
-  featuresPartner: string[]
+  featuresPartner: (string | string[])[]
   footer?: string
   cta: string
 }
@@ -37,8 +37,8 @@ export const plans: PricingInformation[] = [
     ],
     featuresPartner: [
       'Unlimited API requests',
-      'Up to 500MB database space',
-      'Up to 5GB bandwidth',
+      ['500MB Database space', '2 Core shared CPU • 1 GB RAM'],
+      '5GB bandwidth',
       '1-day log retention',
       'Community support',
     ],
@@ -60,6 +60,13 @@ export const plans: PricingInformation[] = [
       ['8GB Database space', 'then $0.125 per GB'],
       ['250GB bandwidth', 'then $0.09 per GB'],
       ['100GB file storage', 'then $0.021 per GB'],
+      'Daily backups stored for 7 days',
+      '7-day log retention',
+    ],
+    featuresPartner: [
+      'No project pausing',
+      '8GB database space included',
+      '250GB bandwidth included',
       'Daily backups stored for 7 days',
       '7-day log retention',
     ],
@@ -86,6 +93,16 @@ export const plans: PricingInformation[] = [
       'Daily backups stored for 14 days',
       '28-day log retention',
     ],
+    featuresPartner: [
+      'SOC2',
+      'HIPAA available as paid add-on',
+      'Additional member roles',
+      'SSO for Supabase Dashboard',
+      'Standardised Security Questionnaire',
+      'Priority email support & SLAs',
+      'Daily backups stored for 14 days',
+      '28-day log retention',
+    ],
     footer: 'Additional fees apply for usage beyond plan limits.',
     preface: 'Everything in the Pro plan, plus:',
     cta: 'Get Started',
@@ -103,7 +120,8 @@ export const plans: PricingInformation[] = [
       'Private Slack channel',
     ],
     featuresPartner: [
-      `Designated Support manager & SLAs`,
+      `Designated Support manager`,
+      'Up to 99.9% uptime SLAs',
       `24×7×365 premium enterprise support`,
       'Custom Security Questionnaires',
       `Private Slack channel`,
