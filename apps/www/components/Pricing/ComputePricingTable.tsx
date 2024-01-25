@@ -1,6 +1,7 @@
-import React, { Fragment, forwardRef, useMemo } from 'react'
+import React, { Fragment, useMemo } from 'react'
 import pricingAddOn from '~/data/PricingAddOnTable.json'
 import { IconPricingIncludedCheck, IconPricingMinus } from './PricingIcons'
+import { cn } from 'ui'
 
 const ComputePricingTable = () => {
   const columnNames = useMemo(
@@ -36,10 +37,10 @@ const ComputePricingTable = () => {
                 )}
                 <tr
                   key={i}
-                  className={[
+                  className={cn(
                     i % 2 === 0 ? 'bg-surface-100 rounded-lg' : '',
-                    i === 0 ? 'border-4 border-strong' : '',
-                  ].join(' ')}
+                    i === 0 ? 'border-4 border-strong' : ''
+                  )}
                 >
                   {row.columns.map((column) => (
                     <td key={column.key} className="p-3">
