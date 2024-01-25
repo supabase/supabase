@@ -147,9 +147,9 @@ You can use the [Supabase CLI](/docs/guides/cli) to manage changes inside a loca
     </StepHikeCompact.Step>
 
     <StepHikeCompact.Step step={2}>
-        <StepHikeCompact.Details title="Sync your database migration" fullWidth>
+        <StepHikeCompact.Details title="Pull your database changes to local" fullWidth>
 
-            Sync your database changes using `supabase db pull`. You can find your database URL in your [database settings](https://supabase.com/dashboard/project/_/settings/database), under the URI tab of the Connection String settings panel.
+            Pull your database changes using `supabase db pull`. You can find your database URL in your [database settings](https://supabase.com/dashboard/project/_/settings/database), under the URI tab of the Connection String settings panel.
 
             <CH.Code lineNumbers={false}>
 
@@ -440,9 +440,9 @@ The Supabase CLI provides two options: [manual migrations](https://supabase.com/
 
 As an alternative to developing locally, you can make changes on your remote Supabase dashboard. You can then pull these changes to your local machine and commit them to GitHub.
 
-<Admonition type="note" label="Changes must be locally pulled and committed to keep your Git repository state in sync.">
+<Admonition type="note" label="Changes must be locally pulled and committed to keep your Git repository state in sync with your remote Preview Branch.">
 
-Dashboard changes aren't automatically reflected in your Git repository. If you'd like to see automatic syncing in a future release, [join the discussion](https://github.com/orgs/supabase/discussions/18937).
+Remote Supabase Dashboard changes aren't automatically reflected in your Git repository. If you'd like to see migration file automation in a future release, [join the discussion](https://github.com/orgs/supabase/discussions/18937).
 
 </Admonition>
 
