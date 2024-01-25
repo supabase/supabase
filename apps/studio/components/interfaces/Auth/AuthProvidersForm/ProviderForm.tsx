@@ -210,7 +210,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                       Cancel
                     </Button>
                     <Tooltip.Root delayDuration={0}>
-                      <Tooltip.Trigger type="button">
+                      <Tooltip.Trigger asChild>
                         <Button
                           htmlType="submit"
                           loading={isUpdatingConfig}
