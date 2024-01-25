@@ -3563,7 +3563,7 @@ functions:
           }
           val changeFlow = channel.postgresChangeFlow<PostgresAction>(schema = "public")
 
-          //in a new coroutine (or use Flow.onEach().launchIn(scope)):
+          //Collect the flow
           changeFlow.collect {
               when(it) {
                   is PostgresAction.Delete -> println("Deleted: ${it.oldRecord}")
@@ -3619,7 +3619,7 @@ functions:
               table = "users"
           }
 
-          //in a new coroutine (or use Flow.onEach().launchIn(scope)):
+          //Collect the flow
           changeFlow.collect {
               println(it.record)
           }
@@ -3645,7 +3645,7 @@ functions:
               table = "users"
           }
 
-          //in a new coroutine (or use Flow.onEach().launchIn(scope)):
+          //Collect the flow
           changeFlow.collect {
               println(it.record)
               println(it.oldRecord)
@@ -3672,7 +3672,7 @@ functions:
               table = "users"
           }
 
-          //in a new coroutine (or use Flow.onEach().launchIn(scope)):
+          //Collect the flow
           changeFlow.collect {
               println(it.oldRecord)
           }
