@@ -4,7 +4,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 
 import TwoOptionToggle from 'components/ui/TwoOptionToggle'
 import { useStore } from 'hooks'
-import { minifyJSON, prettifyJSON, tryParseJson } from 'lib/helpers'
+import { minifyJSON, prettifyJSON, removeJSONTrailingComma, tryParseJson } from 'lib/helpers'
 import ActionBar from '../../ActionBar'
 import DrilldownViewer from './DrilldownViewer'
 import JsonCodeEditor from './JsonCodeEditor'
@@ -47,7 +47,7 @@ const JsonEdit = ({
        * Remove trailing commas: Delete any comma immediately preceding the closing brace '}' or
        * bracket ']' in the newValue string using a regular expression.
        */
-      const newJsonStr = jsonStr.replace(/,\s*(?=[\}\]])/g, '')
+      const newJsonStr = removeJSONTrailingComma(jsonStr)
       const minifiedJSON = minifyJSON(newJsonStr)
       if (onSaveJSON) onSaveJSON(minifiedJSON)
     } catch (error: any) {
