@@ -22,13 +22,15 @@ const PricingPlans: FC = () => {
         <div className="mx-auto max-w-md grid lg:max-w-none lg:grid-cols-2 xl:grid-cols-4 gap-4 xl:gap-0">
           {plans.map((plan) => {
             const isPromoPlan = plan.name === 'Pro'
+            const isTeamPlan = plan.name === 'Team'
 
             return (
               <div
                 key={`row-${plan.name}`}
                 className={cn(
-                  'flex flex-col border border-r-0 last:border-r bg-surface-100 rounded-xl xl:rounded-none first:rounded-l-xl last:rounded-r-xl',
-                  isPromoPlan ? 'border-brand border-2 !rounded-xl xl:-my-8' : ''
+                  'flex flex-col border xl:border-r-0 last:border-r bg-surface-100 rounded-xl xl:rounded-none first:rounded-l-xl last:rounded-r-xl',
+                  isPromoPlan && 'border-brand !border-2 !rounded-xl xl:-my-8',
+                  isTeamPlan && 'xl:border-l-0'
                 )}
               >
                 <div
