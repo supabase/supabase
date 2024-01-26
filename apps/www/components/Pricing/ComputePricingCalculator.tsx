@@ -109,7 +109,7 @@ const ComputePricingCalculator = () => {
   )
 
   return (
-    <div className="flex flex-col lg:grid grid-cols-4 gap-4 h-full mt-4 lg:mt-0 border rounded-xl p-4">
+    <div className="flex flex-col lg:grid grid-cols-4 gap-4 h-full mt-4 lg:mt-0 border border-strong rounded-xl p-4">
       <div className="flex justify-between w-full">
         <div className="flex flex-col text-lighter leading-4 text-xs w-full gap-4">
           <div className="h-full w-full flex flex-col justify-between">
