@@ -73,7 +73,6 @@ const BuildingState = () => {
             <p className="text-sm text-foreground-light"> This may take a few minutes</p>
           </div>
         </div>
-        <Connect />
         <div>
           <div className=" grid grid-cols-12 gap-12">
             <div className="col-span-12 space-y-12 lg:col-span-4">
