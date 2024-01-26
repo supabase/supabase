@@ -34,6 +34,8 @@ import EnterpriseCard from './EnterpriseCard'
 import ExitSurveyModal from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import PaymentMethodSelection from './PaymentMethodSelection'
+import { formatCurrency } from 'lib/helpers'
+import { useProjectsQuery } from 'data/projects/projects-query'
 
 const PlanUpdateSidePanel = () => {
   const { ui } = useStore()
@@ -50,6 +52,10 @@ const PlanUpdateSidePanel = () => {
   const canUpdateSubscription = useCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
+  )
+  const { data: allProjects } = useProjectsQuery()
+  const orgProjects = (allProjects || []).filter(
+    (it) => it.organization_id === selectedOrganization?.id
   )
 
   const snap = useOrgSettingsPageStateSnapshot()
@@ -227,7 +233,7 @@ const PlanUpdateSidePanel = () => {
                           <ShimmeringLoader className="w-[30px] h-[24px]" />
                         </div>
                       ) : (
-                        <p className="text-foreground text-lg">${price}</p>
+                        <p className="text-foreground text-lg">{formatCurrency(price)}</p>
                       )}
                       <p className="text-foreground-light text-sm">{plan.costUnit}</p>
                     </div>
@@ -329,6 +335,7 @@ const PlanUpdateSidePanel = () => {
         subscription={subscription}
         onClose={() => setSelectedTier(undefined)}
         onConfirm={onConfirmDowngrade}
+        projects={orgProjects}
       />
 
       <Modal
@@ -410,10 +417,12 @@ const PlanUpdateSidePanel = () => {
                               : item.unit_price === 0
                               ? 'FREE'
                               : item.unit_price
-                              ? `$${item.unit_price}`
+                              ? `${formatCurrency(item.unit_price)}`
                               : ''}
                           </Table.td>
-                          <Table.td className="text-right">${item.total_price}</Table.td>
+                          <Table.td className="text-right">
+                            {formatCurrency(item.total_price)}
+                          </Table.td>
                         </Table.tr>
 
                         {usageFeesExpanded.includes(item.description) &&
@@ -439,13 +448,14 @@ const PlanUpdateSidePanel = () => {
                       <Table.td />
                       <Table.td />
                       <Table.td className="text-right font-medium">
-                        $
-                        {Math.round(
-                          subscriptionPreview.breakdown.reduce(
-                            (prev, cur) => prev + cur.total_price,
-                            0
-                          )
-                        ) ?? 0}
+                        {formatCurrency(
+                          Math.round(
+                            subscriptionPreview.breakdown.reduce(
+                              (prev, cur) => prev + cur.total_price,
+                              0
+                            )
+                          ) ?? 0
+                        )}
                       </Table.td>
                     </Table.tr>
                   </>

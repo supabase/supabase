@@ -33,6 +33,7 @@ import {
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { AddonVariantId } from 'data/subscriptions/types'
+import { formatCurrency } from 'lib/helpers'
 
 const COMPUTE_CATEGORY_OPTIONS: {
   id: 'micro' | 'optimized'
@@ -329,7 +330,7 @@ const ComputeInstanceSidePanel = () => {
                           <div className="flex justify-between items-center mt-2">
                             <div className="flex items-center space-x-1">
                               <span className="text-foreground text-sm">
-                                ${option.price.toLocaleString()}
+                                {formatCurrency(option.price)}
                               </span>
                               <span className="text-foreground-light translate-y-[1px]">
                                 {' '}
