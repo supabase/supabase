@@ -23,6 +23,7 @@ import {
 } from 'ui'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { AddonVariantId } from 'data/subscriptions/types'
+import { formatCurrency } from 'lib/helpers'
 
 const CustomDomainSidePanel = () => {
   const { ui } = useStore()
@@ -230,7 +231,7 @@ const CustomDomainSidePanel = () => {
                         Present a branded experience to your users
                       </p>
                       <div className="flex items-center space-x-1 mt-2">
-                        <p className="text-foreground text-sm">${option.price}</p>
+                        <p className="text-foreground text-sm">{formatCurrency(option.price)}</p>
                         <p className="text-foreground-light translate-y-[1px]"> / month</p>
                       </div>
                     </div>
@@ -255,7 +256,7 @@ const CustomDomainSidePanel = () => {
                 <p className="text-sm text-foreground-light">
                   Upon clicking confirm, the amount of{' '}
                   <span className="text-foreground">
-                    ${selectedCustomDomain?.price.toLocaleString()}
+                    {formatCurrency(selectedCustomDomain?.price)}
                   </span>{' '}
                   will be added to your monthly invoice.{' '}
                   {subscription?.billing_via_partner ? (
