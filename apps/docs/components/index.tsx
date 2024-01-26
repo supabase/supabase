@@ -1,6 +1,12 @@
+/**
+ * This entire file could do with a cleanup and better code-splitting, but one thing at a time.
+ */
+
+// Basic UI things
 import Link from 'next/link'
 import {
   Accordion,
+  Admonition,
   Alert,
   Button,
   CodeBlock,
@@ -8,57 +14,65 @@ import {
   IconPanel,
   markdownComponents,
   Tabs,
+  ThemeImage,
 } from 'ui'
-import StepHikeCompact from '~/components/StepHikeCompact'
+import { Heading } from './CustomHTMLElements'
+
 // Common components
+import { CH } from '@code-hike/mdx/components'
+import StepHikeCompact from '~/components/StepHikeCompact'
 import ButtonCard from './ButtonCard'
 
-// Other components
+// Reference guide specific
+// [Charis] I think we can factor these out so they aren't in the bundle for absolutely everything
+import CliGlobalFlagsHandler from '~/components/reference/enrichments/cli/CliGlobalFlagsHandler'
+import RefHeaderSection from './reference/RefHeaderSection'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
+
+// Other components
 import AuthProviders from '~/components/AuthProviders'
-import { Heading } from './CustomHTMLElements'
+import { ProjectConfigVariables } from './ProjectConfigVariables'
+import Options from '~/components/Options'
+import Param from '~/components/Params'
+
+// Data wrappers
+import { NavData } from './NavData'
+
+// Partials
 import DatabaseSetup from './MDX/database_setup.mdx'
+import GetSessionWarning from './MDX/get_session_warning.mdx'
+import MigrationWarnings from './MDX/migration_warnings.mdx'
 import ProjectSetup from './MDX/project_setup.mdx'
 import QuickstartIntro from './MDX/quickstart_intro.mdx'
 import SocialProviderSettingsSupabase from './MDX/social_provider_settings_supabase.mdx'
 import SocialProviderSetup from './MDX/social_provider_setup.mdx'
 import StorageManagement from './MDX/storage_management.mdx'
-import MigrationWarnings from './MDX/migration_warnings.mdx'
-import GetSessionWarning from './MDX/get_session_warning.mdx'
-import { CH } from '@code-hike/mdx/components'
-import RefHeaderSection from './reference/RefHeaderSection'
-import { ProjectConfigVariables } from './ProjectConfigVariables'
 
-// Ref version specific
-import CliGlobalFlagsHandler from '~/components/reference/enrichments/cli/CliGlobalFlagsHandler'
-
-import Options from '~/components/Options'
-import Param from '~/components/Params'
-import { NavData } from './NavData'
-
-import { Admonition, ThemeImage } from 'ui'
+// Icons
 import {
-  IconMenuJavascript,
-  IconMenuHome,
-  IconMenuGettingStarted,
-  IconMenuDatabase,
-  IconMenuRestApis,
-  IconMenuAuth,
-  IconMenuEdgeFunctions,
-  IconMenuRealtime,
-  IconMenuStorage,
-  IconMenuPlatform,
-  IconMenuResources,
-  IconMenuSelfHosting,
-  IconMenuIntegrations,
-  IconMenuFlutter,
-  IconMenuPython,
-  IconMenuCsharp,
-  IconMenuSwift,
-  IconMenuKotlin,
   IconMenuApi,
+  IconMenuAuth,
   IconMenuCli,
+  IconMenuCsharp,
+  IconMenuDatabase,
+  IconMenuEdgeFunctions,
+  IconMenuFlutter,
+  IconMenuGettingStarted,
+  IconMenuHome,
+  IconMenuIntegrations,
+  IconMenuJavascript,
+  IconMenuKotlin,
+  IconMenuPlatform,
+  IconMenuPython,
+  IconMenuRealtime,
+  IconMenuResources,
+  IconMenuRestApis,
+  IconMenuSelfHosting,
+  IconMenuStorage,
+  IconMenuSwift,
 } from './Navigation/NavigationMenu/HomeMenuIcons'
+
+// Heavy/rare (lazy-loaded)
 import { AppleSecretGenerator } from './AppleSecretGenerator'
 import { Mermaid } from './Mermaid'
 
@@ -66,34 +80,21 @@ const components = {
   ...markdownComponents,
   Accordion,
   Admonition,
-  AuthProviders,
-  AppleSecretGenerator,
-  Button,
-  ButtonCard,
-  CH,
-  CodeBlock,
-  GlassPanel,
-  IconPanel,
-  Link,
-  Mermaid,
-  QuickstartIntro,
-  DatabaseSetup,
-  NavData,
-  ProjectSetup,
-  MigrationWarnings,
-  GetSessionWarning,
-  SocialProviderSetup,
-  SocialProviderSettingsSupabase,
-  StepHikeCompact,
-  ProjectConfigVariables,
-  StorageManagement,
   Alert: (props: any) => (
     <Alert {...props} className="not-prose">
       {props.children}
     </Alert>
   ),
-  Tabs: (props: any) => <Tabs wrappable {...props} />,
-  TabPanel: (props: any) => <Tabs.Panel {...props}>{props.children}</Tabs.Panel>,
+  AppleSecretGenerator,
+  AuthProviders,
+  Button,
+  ButtonCard,
+  CH,
+  CliGlobalFlagsHandler: () => <CliGlobalFlagsHandler />,
+  CodeBlock,
+  DatabaseSetup,
+  GetSessionWarning,
+  GlassPanel,
   h2: (props: any) => (
     <Heading tag="h2" {...props}>
       {props.children}
@@ -109,32 +110,45 @@ const components = {
       {props.children}
     </Heading>
   ),
+  IconMenuApi,
+  IconMenuAuth,
+  IconMenuCli,
+  IconMenuCsharp,
+  IconMenuDatabase,
+  IconMenuEdgeFunctions,
+  IconMenuFlutter,
+  IconMenuGettingStarted,
+  IconMenuHome,
+  IconMenuIntegrations,
+  IconMenuJavascript,
+  IconMenuKotlin,
+  IconMenuPlatform,
+  IconMenuPython,
+  IconMenuRealtime,
+  IconMenuResources,
+  IconMenuRestApis,
+  IconMenuSelfHosting,
+  IconMenuStorage,
+  IconMenuSwift,
+  IconPanel,
   Image: (props: any) => <ThemeImage fill className="object-contain" {...props} />,
-  RefSubLayout,
-  RefHeaderSection: (props: any) => <RefHeaderSection {...props} />,
-  CliGlobalFlagsHandler: () => <CliGlobalFlagsHandler />,
+  Link,
+  Mermaid,
+  MigrationWarnings,
+  NavData,
   Options,
   Param,
-  IconMenuJavascript,
-  IconMenuHome,
-  IconMenuGettingStarted,
-  IconMenuDatabase,
-  IconMenuRestApis,
-  IconMenuAuth,
-  IconMenuEdgeFunctions,
-  IconMenuRealtime,
-  IconMenuStorage,
-  IconMenuPlatform,
-  IconMenuResources,
-  IconMenuSelfHosting,
-  IconMenuIntegrations,
-  IconMenuFlutter,
-  IconMenuPython,
-  IconMenuCsharp,
-  IconMenuKotlin,
-  IconMenuSwift,
-  IconMenuApi,
-  IconMenuCli,
+  ProjectConfigVariables,
+  ProjectSetup,
+  QuickstartIntro,
+  RefHeaderSection: (props: any) => <RefHeaderSection {...props} />,
+  RefSubLayout,
+  SocialProviderSettingsSupabase,
+  SocialProviderSetup,
+  StepHikeCompact,
+  StorageManagement,
+  TabPanel: (props: any) => <Tabs.Panel {...props}>{props.children}</Tabs.Panel>,
+  Tabs: (props: any) => <Tabs wrappable {...props} />,
 }
 
 export default components
