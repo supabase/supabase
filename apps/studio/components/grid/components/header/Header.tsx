@@ -370,8 +370,8 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
           {allRowsSelected
             ? `${totalRows} rows selected`
             : selectedRows.size > 1
-            ? `${selectedRows.size} rows selected`
-            : `${selectedRows.size} row selected`}
+              ? `${selectedRows.size} rows selected`
+              : `${selectedRows.size} row selected`}
         </span>
         {!allRowsSelected && totalRows > allRows.length && (
           <Button type="link" onClick={() => onSelectAllRows()}>
@@ -404,8 +404,8 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
                 {allRowsSelected
                   ? `Delete ${totalRows} rows`
                   : selectedRows.size > 1
-                  ? `Delete ${selectedRows.size} rows`
-                  : `Delete ${selectedRows.size} row`}
+                    ? `Delete ${selectedRows.size} rows`
+                    : `Delete ${selectedRows.size} row`}
               </Button>
             </Tooltip.Trigger>
 
