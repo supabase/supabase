@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react'
 import { Button, IconAlignLeft, SidePanel } from 'ui'
 
 import TwoOptionToggle from 'components/ui/TwoOptionToggle'
-import { useStore } from 'hooks'
 import { minifyJSON, prettifyJSON, removeJSONTrailingComma, tryParseJson } from 'lib/helpers'
 import toast from 'react-hot-toast'
 import ActionBar from '../../ActionBar'
