@@ -20,32 +20,28 @@ There are several reasons why you might want to add social login to your applica
 ## Set up a native social login with Supabase Auth
 
 <div className="grid grid-cols-12 gap-10 not-prose py-8">
-  {[
-  {
-    name: 'Apple',
-    icon: '/docs/img/icons/apple-icon',
-    url: '/guides/auth/social-login/auth-apple?platform=react-native',
-  },
-  {
-    name: 'Google',
-    icon: '/docs/img/icons/google-icon',
-    url: '/guides/auth/social-login/auth-google?platform=react-native',
-  },
-].map((item) => (
-    <Link href={`${item.url}`} key={item.name} passHref className="col-span-6 lg:col-span-4 xl:col-span-3">
-      <IconPanel
-        title={item.name}
-        span="col-span-6"
-        icon={item.icon}
-        isDarkMode={item.isDarkMode}
-        hasLightIcon={item.hasLightIcon}
-      >
-        {item.description}
-      </IconPanel>
-    </Link>
-
-))}
-
+  <NavData data="nativeMobileLoginItems">
+    {(data) =>
+      data.map((item) => (
+        <Link
+          href={`${item.url}`}
+          key={item.name}
+          passHref
+          className="col-span-6 lg:col-span-4 xl:col-span-3"
+        >
+          <IconPanel
+            title={item.name}
+            span="col-span-6"
+            icon={item.icon}
+            isDarkMode={item.isDarkMode}
+            hasLightIcon={item.hasLightIcon}
+          >
+            {item.description}
+          </IconPanel>
+        </Link>
+      ))
+    }
+  </NavData>
 </div>
 
 ## Provider tokens

@@ -34,6 +34,7 @@ import CliGlobalFlagsHandler from '~/components/reference/enrichments/cli/CliGlo
 
 import Options from '~/components/Options'
 import Param from '~/components/Params'
+import { NavData } from './NavData'
 
 import { Admonition, ThemeImage } from 'ui'
 import {
@@ -77,6 +78,7 @@ const components = {
   Mermaid,
   QuickstartIntro,
   DatabaseSetup,
+  NavData,
   ProjectSetup,
   MigrationWarnings,
   GetSessionWarning,

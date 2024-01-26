@@ -21,119 +21,28 @@ There are several reasons why you might want to add social login to your applica
 Supabase supports a suite of social providers. Follow these guides to configure a social provider for your platform.
 
 <div className="grid grid-cols-12 gap-10 not-prose py-8">
-  {[
-  {
-    name: 'Google',
-    icon: '/docs/img/icons/google-icon',
-    url: '/guides/auth/social-login/auth-google',
-  },
-  {
-    name: 'Facebook',
-    icon: '/docs/img/icons/facebook-icon',
-    url: '/guides/auth/social-login/auth-facebook',
-  },
-  {
-    name: 'Apple',
-    icon: '/docs/img/icons/apple-icon',
-    url: '/guides/auth/social-login/auth-apple',
-  },
-  {
-    name: 'Azure (Microsoft)',
-    icon: '/docs/img/icons/microsoft-icon',
-    url: '/guides/auth/social-login/auth-azure',
-  },
-  {
-    name: 'Twitter',
-    icon: '/docs/img/icons/twitter-icon',
-    url: '/guides/auth/social-login/auth-twitter',
-    hasLightIcon: true,
-  },
-  {
-    name: 'GitHub',
-    icon: '/docs/img/icons/github-icon',
-    url: '/guides/auth/social-login/auth-github',
-    isDarkMode: true,
-    hasLightIcon: true,
-  },
-  {
-    name: 'Gitlab',
-    icon: '/docs/img/icons/gitlab-icon',
-    url: '/guides/auth/social-login/auth-gitlab',
-  },
-  {
-    name: 'Bitbucket',
-    icon: '/docs/img/icons/bitbucket-icon',
-    url: '/guides/auth/social-login/auth-bitbucket',
-  },
-  {
-    name: 'Discord',
-    icon: '/docs/img/icons/discord-icon',
-    url: '/guides/auth/social-login/auth-discord',
-  },
-  {
-    name: 'Figma',
-    icon: '/docs/img/icons/figma-icon',
-    url: '/guides/auth/social-login/auth-figma',
-  },
-  {
-    name: 'Kakao',
-    icon: '/docs/img/icons/kakao-icon',
-    url: '/guides/auth/social-login/auth-kakao',
-  },
-  {
-    name: 'Keycloak',
-    icon: '/docs/img/icons/keycloak-icon',
-    url: '/guides/auth/social-login/auth-keycloak',
-  },
-  {
-    name: 'LinkedIn',
-    icon: '/docs/img/icons/linkedin-icon',
-    url: '/guides/auth/social-login/auth-linkedin',
-  },
-  {
-    name: 'Notion',
-    icon: '/docs/img/icons/notion-icon',
-    url: '/guides/auth/social-login/auth-notion',
-  },
-  {
-    name: 'Slack',
-    icon: '/docs/img/icons/slack-icon',
-    url: '/guides/auth/social-login/auth-slack',
-  },
-  {
-    name: 'Spotify',
-    icon: '/docs/img/icons/spotify-icon',
-    url: '/guides/auth/social-login/auth-spotify',
-  },
-  {
-    name: 'Twitch',
-    icon: '/docs/img/icons/twitch-icon',
-    url: '/guides/auth/social-login/auth-twitch',
-  },
-  {
-    name: 'WorkOS',
-    icon: '/docs/img/icons/workos-icon',
-    url: '/guides/auth/social-login/auth-workos',
-  },
-  {
-    name: 'Zoom',
-    icon: '/docs/img/icons/zoom-icon',
-    url: '/guides/auth/social-login/auth-zoom',
-  },
-].map((item) => (
-    <Link href={`${item.url}`} key={item.name} passHref className="col-span-6 lg:col-span-4 xl:col-span-3">
-      <IconPanel
-        title={item.name}
-        span="col-span-6"
-        icon={item.icon}
-        isDarkMode={item.isDarkMode}
-        hasLightIcon={item.hasLightIcon}
-      >
-        {item.description}
-      </IconPanel>
-    </Link>
-))}
-
+  <NavData data="socialLoginItems">
+    {(data) =>
+      data.map((item) => (
+        <Link
+          href={`${item.url}`}
+          key={item.name}
+          passHref
+          className="col-span-6 lg:col-span-4 xl:col-span-3"
+        >
+          <IconPanel
+            title={item.name}
+            span="col-span-6"
+            icon={item.icon}
+            isDarkMode={item.isDarkMode}
+            hasLightIcon={item.hasLightIcon}
+          >
+            {item.description}
+          </IconPanel>
+        </Link>
+      ))
+    }
+  </NavData>
 </div>
 
 ## Provider tokens
