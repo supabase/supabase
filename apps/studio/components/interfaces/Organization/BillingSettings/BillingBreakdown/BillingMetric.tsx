@@ -8,6 +8,7 @@ import { Metric, USAGE_APPROACHING_THRESHOLD } from './BillingBreakdown.constant
 import { billingMetricUnit, formatUsage } from '../helpers'
 import { PricingMetric } from 'data/analytics/org-daily-stats-query'
 import { useMemo } from 'react'
+import { formatCurrency } from 'lib/helpers'
 
 export interface BillingMetricProps {
   idx: number
@@ -75,7 +76,7 @@ const BillingMetric = ({
         </Link>
         <span className="text-sm">{usageLabel}</span>&nbsp;
         {usageMeta.cost && usageMeta.cost > 0 ? (
-          <span className="text-sm">(${usageMeta.cost})</span>
+          <span className="text-sm">({formatCurrency(usageMeta.cost)})</span>
         ) : usageMeta.available_in_plan && !usageMeta.unlimited && relativeToSubscription ? (
           <span className="text-sm">({percentageLabel})</span>
         ) : null}

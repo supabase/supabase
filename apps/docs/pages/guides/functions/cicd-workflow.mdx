@@ -2,15 +2,17 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   id: 'cicd-workflow',
-  title: 'Deploying with GitHub Actions',
-  description: 'Use GitHub Actions as a CI / CD pipeline to deploy your Edge Functions.',
-  subtitle: 'Use GitHub Actions as a CI / CD pipeline to deploy your Edge Functions.',
+  title: 'Deploying with CI / CD pipelines',
+  description: 'Use GitHub Actions, Bitbucket, and GitLab CI to deploy your Edge Functions.',
+  subtitle: 'Use GitHub Actions, Bitbucket, and GitLab CI to deploy your Edge Functions.',
   tocVideo: '6OMVWiiycLs',
 }
 
-You can use the official [`setup-cli` GitHub Action](https://github.com/marketplace/actions/supabase-cli-action) to run Supabase CLI commands in your GitHub Actions.
+You can use popular CI / CD tools like GitHub Actions, Bitbucket, and GitLab CI to automate Edge Function deployments.
 
-## Sample workflow
+## GitHub Actions
+
+You can use the official [`setup-cli` GitHub Action](https://github.com/marketplace/actions/supabase-cli-action) to run Supabase CLI commands in your GitHub Actions.
 
 The following GitHub Action deploys all Edge Functions any time code is merged into the `main` branch:
 
@@ -39,6 +41,67 @@ jobs:
           version: latest
 
       - run: supabase functions deploy --project-ref $PROJECT_ID
+```
+
+## GitLab CI
+
+Here is the sample pipeline configuration to deploy via GitLab CI.
+
+```yaml
+image: node:18
+
+# List of stages for jobs, and their order of execution
+stages:
+  - setup
+  - deploy
+
+# This job runs in the setup stage, which runs first.
+setup-npm:
+  stage: setup
+  script:
+    - npm i supabase
+  cache:
+    paths:
+      - node_modules/
+  artifacts:
+    paths:
+      - node_modules/
+
+# This job runs in the deploy stage, which only starts when the job in the build stage completes successfully.
+deploy-function:
+  stage: deploy
+  script:
+    - npx supabase init
+    - npx supabase functions deploy --debug
+  services:
+    - docker:dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+```
+
+## Bitbucket Pipelines
+
+Here is the sample pipeline configuration to deploy via Bitbucket.
+
+```yaml
+image: node:18
+
+pipelines:
+  default:
+    - step:
+        name: Setup
+        caches:
+          - node
+        script:
+          - npm i supabase
+    - parallel:
+        - step:
+            name: Functions Deploy
+            script:
+              - npx supabase init
+              - npx supabase functions deploy --debug
+            services:
+              - docker
 ```
 
 ## Declarative configuration

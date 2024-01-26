@@ -1,9 +1,10 @@
-import { PropsWithChildren } from 'react'
-import AppLayout from '../AppLayout/AppLayout'
 import { useParams } from 'common'
-import OrganizationSettingsMenu from './OrganizationSettingsMenu'
-import AccountSettingsMenu from './AccountSettingsMenu'
 import { useRouter } from 'next/router'
+import { PropsWithChildren } from 'react'
+
+import AppLayout from '../AppLayout/AppLayout'
+import AccountSettingsMenu from './AccountSettingsMenu'
+import OrganizationSettingsMenu from './OrganizationSettingsMenu'
 
 const SettingsLayout = ({ children }: PropsWithChildren<{}>) => {
   const router = useRouter()

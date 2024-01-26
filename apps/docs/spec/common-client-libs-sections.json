@@ -613,6 +613,20 @@
         "type": "function"
       },
       {
+        "id": "start-auto-refresh",
+        "title": "Start auto-refresh session (non-browser)",
+        "slug": "auth-startautorefresh",
+        "product": "auth",
+        "type": "function"
+      },
+      {
+        "id": "stop-auto-refresh",
+        "title": "Stop auto-refresh session (non-browser)",
+        "slug": "auth-stopautorefresh",
+        "product": "auth",
+        "type": "function"
+      },
+      {
         "id": "auth-mfa-api",
         "title": "Auth MFA",
         "slug": "auth-mfa-api",

@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import { useTheme } from 'next-themes'
 import { useWindowSize } from 'react-use'
 
-import { Announcement, Button, LWXCountdownBanner, cn } from 'ui'
+import { Announcement, Button, IPV4Banner, cn } from 'ui'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -72,8 +72,8 @@ const Nav = () => {
 
   return (
     <>
-      <Announcement>
-        <LWXCountdownBanner />
+      <Announcement dismissable={false} show>
+        <IPV4Banner />
       </Announcement>
       <div
         className={cn('sticky top-0 z-40 transform', isLaunchWeekXPage && 'relative')}

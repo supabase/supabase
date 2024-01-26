@@ -1,12 +1,12 @@
-import { useParams } from 'common'
 import { isEqual } from 'lodash'
-import { Loader2 } from 'lucide-react'
+import { Loader2, MegaphoneIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Key, useEffect, useState } from 'react'
 import DataGrid, { RenderRowProps, Row } from 'react-data-grid'
-import { Button, IconBroadcast, IconDatabaseChanges, IconExternalLink, IconPresence, cn } from 'ui'
 
+import { useParams } from 'common'
 import ShimmerLine from 'components/ui/ShimmerLine'
+import { Button, IconBroadcast, IconDatabaseChanges, IconExternalLink, IconPresence, cn } from 'ui'
 import MessageSelection from './MessageSelection'
 import { LogData } from './Messages.types'
 import NoChannelEmptyState from './NoChannelEmptyState'
@@ -33,7 +33,7 @@ const NoResultAlert = ({
         <NoChannelEmptyState />
       ) : (
         <>
-          {enabled ? <p>No Realtime messages found</p> : null}
+          {enabled && <p className="text-foreground">No Realtime messages found</p>}
           <p className="text-foreground-lighter">Realtime message logs will be shown here</p>
 
           <div className="mt-4 border bg-surface-100 border-border rounded-md justify-start items-center flex flex-col w-full">
@@ -136,7 +136,7 @@ const MessagesTable = ({
         <div className={cn('flex h-full flex-row', enabled ? 'border-brand-400' : null)}>
           <div className="flex flex-grow flex-col">
             {enabled && (
-              <div className="w-full h-8 px-4 bg-surface-100 border-b items-center inline-flex justify-between text-foreground-light">
+              <div className="w-full h-9 px-4 bg-surface-100 border-b items-center inline-flex justify-between text-foreground-light">
                 <div className="inline-flex gap-2.5 text-xs">
                   <Loader2 size="16" className="animate-spin" />
                   <div>Listening</div>
@@ -149,10 +149,12 @@ const MessagesTable = ({
                       : `No message found yet...`}
                   </div>
                 </div>
-                <Button type="text" onClick={showSendMessage} className="group">
-                  <span className="text-foreground-light group-hover:text-foreground transition">
-                    Broadcast a message
-                  </span>
+                <Button
+                  type="default"
+                  onClick={showSendMessage}
+                  icon={<MegaphoneIcon size={14} strokeWidth={1.5} />}
+                >
+                  <span>Broadcast a message</span>
                 </Button>
               </div>
             )}

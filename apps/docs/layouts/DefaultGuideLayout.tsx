@@ -13,6 +13,7 @@ interface Props {
   children: any
   toc?: any
   currentPage?: string
+  editLink?: string
 }
 
 const Layout: FC<Props> = (props) => {
