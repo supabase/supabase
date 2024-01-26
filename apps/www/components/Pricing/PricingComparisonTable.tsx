@@ -35,13 +35,15 @@ const PricingComparisonTable = () => {
     showDollarSign?: boolean
     from?: boolean
   }) => {
+    const selectedPlan = plans.find((p) => p.name === plan)!
+
     return (
       <div className="mt-8 px-4 mobile-header">
-        <h2 className="text-brand text-3xl font-medium uppercase font-mono">{plan}</h2>
+        <h2 className="text-foreground text-3xl font-medium uppercase font-mono">{plan}</h2>
         <div className="flex items-baseline gap-2">
           {from && <span className="text-foreground text-base">From</span>}
           {showDollarSign ? (
-            <span className="h1">
+            <span className="h1 font-mono">
               {plan !== 'Enterprise' ? '$' : ''}
               {price}
             </span>
@@ -52,8 +54,15 @@ const PricingComparisonTable = () => {
           <p className="p">{priceDescription}</p>
         </div>
         <p className="p">{description}</p>
-        <Button asChild size="medium" block>
-          <Link href="https://supabase.com/dashboard/new">Get started</Link>
+        <Button asChild size="medium" type={plan === 'Enterprise' ? 'default' : 'primary'} block>
+          <Link
+            href={selectedPlan.href}
+            onClick={() =>
+              sendTelemetryEvent(gaEvents[`www_pricing_comparison_${plan.toLowerCase()}_mobile`])
+            }
+          >
+            {selectedPlan.cta}
+          </Link>
         </Button>
       </div>
     )
@@ -64,15 +73,15 @@ const PricingComparisonTable = () => {
       {/* <!-- xs to lg --> */}
       <div className="lg:hidden">
         {/* Free - Mobile  */}
-        <div className="bg-slate-200 p-2 sticky top-14 z-10 pt-4">
-          <div className="bg-slate-300 rounded-lg border border-slate-500 py-2 px-4 flex justify-between items-center">
+        <div className="bg-background p-2 sticky top-14 z-10 pt-4">
+          <div className="bg-surface-100 rounded-lg border py-2 px-4 flex justify-between items-center">
             <label className="text-foreground-lighter">Change plan</label>
             <Select
               id="change-plan"
               name="Change plan"
               layout="vertical"
               value={activeMobilePlan}
-              className="min-w-[120px] bg-slate-400 text-red-500"
+              className="min-w-[120px] bg-surface-300 text-red-500"
               onChange={(e) => setActiveMobilePlan(e.target.value)}
             >
               <Select.Option value="Free">Free</Select.Option>
