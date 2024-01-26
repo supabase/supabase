@@ -9,6 +9,7 @@ import {
   Button,
   Input,
 } from 'ui'
+import { useRouter } from 'next/router'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
@@ -33,6 +34,7 @@ import {
 
 const InfrastructureInfo = () => {
   const { ref } = useParams()
+  const router = useRouter()
   const { project, isLoading } = useProjectContext()
 
   const authEnabled = useIsFeatureEnabled('project_auth:all')
@@ -106,6 +108,15 @@ const InfrastructureInfo = () => {
                   <Input
                     readOnly
                     disabled
+                    icon={
+                      regionKey !== undefined ? (
+                        <img
+                          alt="region icon"
+                          className="w-5 rounded-sm"
+                          src={`${router.basePath}/img/regions/${regionKey}.svg`}
+                        />
+                      ) : null
+                    }
                     value={
                       region !== undefined ? `${region} (${project?.region})` : project?.region
                     }
