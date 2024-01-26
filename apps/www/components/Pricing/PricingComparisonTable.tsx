@@ -81,7 +81,7 @@ const PricingComparisonTable = () => {
               name="Change plan"
               layout="vertical"
               value={activeMobilePlan}
-              className="min-w-[120px] bg-surface-300 text-red-500"
+              className="min-w-[120px]"
               onChange={(e) => setActiveMobilePlan(e.target.value)}
             >
               <Select.Option value="Free">Free</Select.Option>
