@@ -66,39 +66,6 @@ export const PROVIDERS = {
     DEFAULT_SSH_KEY: 'supabase-app-instance',
     default_region: AWS_REGIONS_DEFAULT,
     regions: { ...AWS_REGIONS },
-    // regions: {
-    //   EAST_US: 'us-east-1', // North Virginia
-    //   // 'North EU': 'eu-north-1', // Stockholm
-    //   WEST_US: 'us-west-1', // North California
-    //   SOUTHEAST_ASIA: 'ap-southeast-1', // Singapore
-    //   NORTHEAST_ASIA: 'ap-northeast-1', // Tokyo
-    //   NORTHEAST_ASIA_2: 'ap-northeast-2', //Seoul
-    //   OCEANIA: 'ap-southeast-2', // Sydney
-    //   WEST_EU: 'eu-west-1', // Ireland
-    //   WEST_EU_2: 'eu-west-2', // London
-    //   CENTRAL_EU: 'eu-central-1', // Frankfurt
-    //   CENTRAL_CANADA: 'ca-central-1', // Central Canada
-    //   SOUTH_ASIA: 'ap-south-1', // Mumbai
-    //   SOUTH_AMERICA: 'sa-east-1', // Sao Paulo
-    //   // SOUTH_AFRICA: 'af-south-1', // Cape Town
-    // },
-    sizes: {
-      nano: {
-        x86_64: 't3.nano',
-        arm64: 't4g.nano',
-        description: '512mb RAM',
-      },
-      micro: {
-        x86_64: 't3.micro',
-        arm64: 't4g.micro',
-        description: '1gb RAM',
-      },
-      medium: {
-        x86_64: 'm5a.large',
-        arm64: 'm6g.medium',
-        description: '4gb RAM',
-      },
-    },
   },
 } as const
 
