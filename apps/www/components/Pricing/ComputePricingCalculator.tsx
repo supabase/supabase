@@ -203,7 +203,7 @@ const ComputePricingCalculator = () => {
               <span>Total Estimate</span>
               <span
                 className="text-foreground font-mono flex items-center gap-1"
-                data-tip="This estimate only includes Plan and Compute add-on costs. Other resources might concur in the final invoice."
+                data-tip="This estimate only includes Plan and Compute add-on monthly costs. Other resources might concur in the final invoice."
               >
                 <InformationCircleIcon className="w-3 h-3" /> ${activePrice}
               </span>
