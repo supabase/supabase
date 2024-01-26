@@ -1,4 +1,5 @@
 import * as React from 'react'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import {
   CalculatedColumn,
   RenderCellProps,
@@ -137,14 +138,31 @@ function SelectCellFormatter({
         onClick={onClick}
       />
       {onEditRow && row && (
-        <Button
-          type="text"
-          size="tiny"
-          className="rdg-row__select-column__edit-action"
-          icon={<IconMaximize2 size="tiny" />}
-          onClick={onEditClick}
-          style={{ padding: '3px' }}
-        />
+        <Tooltip.Root delayDuration={0}>
+          <Tooltip.Trigger asChild>
+            <Button
+              type="text"
+              size="tiny"
+              className="rdg-row__select-column__edit-action"
+              icon={<IconMaximize2 size="tiny" strokeWidth={1.5} className="text-foreground" />}
+              onClick={onEditClick}
+              style={{ padding: '3px' }}
+            />
+          </Tooltip.Trigger>
+          <Tooltip.Portal>
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'rounded bg-alternative py-1 px-2 leading-none shadow',
+                  'border border-background',
+                ].join(' ')}
+              >
+                <span className="text-xs text-foreground">Expand row</span>
+              </div>
+            </Tooltip.Content>
+          </Tooltip.Portal>
+        </Tooltip.Root>
       )}
     </div>
   )
