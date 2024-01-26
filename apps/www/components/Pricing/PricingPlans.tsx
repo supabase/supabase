@@ -146,7 +146,10 @@ const PricingPlans: FC = () => {
                         <div className="flex items-center">
                           <div className="flex w-6">
                             <IconCheck
-                              className="text-brand h-4 w-4"
+                              className={cn(
+                                'h-4 w-4',
+                                plan.name === 'Enterprise' ? 'text-foreground' : 'text-brand'
+                              )}
                               aria-hidden="true"
                               strokeWidth={3}
                             />
