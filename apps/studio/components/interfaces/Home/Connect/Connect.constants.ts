@@ -397,9 +397,15 @@ export const GRAPHQL: ConnectionType[] = [
     files: [
       {
         // omit .tsx extension
-        location: 'graphql/terminal',
-        destinationFilename: '',
-        destinationLocation: '',
+        location: 'graphql/env',
+        destinationFilename: '.env',
+        destinationLocation: '.env',
+      },
+      {
+        // omit .tsx extension
+        location: 'graphql/app',
+        destinationFilename: 'app.tsx',
+        destinationLocation: 'app.tsx',
       },
     ],
   },

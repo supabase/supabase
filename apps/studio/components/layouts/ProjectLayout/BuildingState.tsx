@@ -13,6 +13,7 @@ import { invalidateProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedProject } from 'hooks'
 import { getWithTimeout } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
+import Connect from 'components/interfaces/Home/Connect/Connect'
 
 const BuildingState = () => {
   const { ref } = useParams()
@@ -72,6 +73,7 @@ const BuildingState = () => {
             <p className="text-sm text-foreground-light"> This may take a few minutes</p>
           </div>
         </div>
+        <Connect />
         <div>
           <div className=" grid grid-cols-12 gap-12">
             <div className="col-span-12 space-y-12 lg:col-span-4">
