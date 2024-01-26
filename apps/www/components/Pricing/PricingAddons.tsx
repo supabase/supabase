@@ -79,7 +79,7 @@ const AddonCard = ({ addon }: any) => {
 
   const HighlightCard = () => (
     <>
-      <div className="relative order-last lg:order-first lg:h-full aspect-[2/1] lg:aspect-[3/2] p-4 pt-0 lg:pt-4 lg:pr-0">
+      <div className="relative order-last lg:order-first w-full max-w-full lg:w-auto lg:h-full aspect-[2/1] lg:aspect-[3/2] p-4 pt-0 lg:pt-4 lg:pr-0">
         {addon.heroImg}
       </div>
 
