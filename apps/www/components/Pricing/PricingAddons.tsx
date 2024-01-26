@@ -11,7 +11,9 @@ const addons = [
     id: 'addon-cost-control',
     name: 'Cost Control',
     price: 'Available on Pro Plan',
-    heroImg: <CostControlAnimation className="w-full lg:h-full lg:max-w-md aspect-video" />,
+    heroImg: (
+      <CostControlAnimation className="relative w-full lg:h-full lg:max-w-md aspect-video" />
+    ),
     description:
       'The Pro plan has a spend cap enabled by default to keep costs under control. If you want to scale beyond the plans included quota, simply switch off the spend cap to pay for additional resources.',
     leftCtaText: 'Learn about Cost Control',
