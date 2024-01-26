@@ -80,12 +80,11 @@ interface WrappersDocsProps {
     title: string
     description?: string
   }
-  editLink?: string
 }
 
-export default function WrappersDocs({ source, meta, editLink }: WrappersDocsProps) {
+export default function WrappersDocs({ source, meta }: WrappersDocsProps) {
   return (
-    <Layout meta={meta} editLink={editLink}>
+    <Layout meta={meta}>
       <MDXRemote {...source} components={components} />
     </Layout>
   )
@@ -102,9 +101,10 @@ export const getStaticProps: GetStaticProps<WrappersDocsProps> = async ({ params
   }
 
   const { remoteFile, meta } = page
-  const repoPath = `${org}/${repo}/${branch}/${docsDir}/${remoteFile}`
-  const repoEditPath = `${org}/${repo}/blob/${branch}/${docsDir}/${remoteFile}`
-  const response = await fetch(`https://raw.githubusercontent.com/${repoPath}`)
+
+  const response = await fetch(
+    `https://raw.githubusercontent.com/${org}/${repo}/${branch}/${docsDir}/${remoteFile}`
+  )
 
   const source = await response.text()
 
@@ -119,6 +119,7 @@ export const getStaticProps: GetStaticProps<WrappersDocsProps> = async ({ params
       if (hostname !== placeholderHostname || pathname === '/') {
         return url
       }
+
       const relativePage = (
         pathname.endsWith('.md')
           ? pathname.replace(/\.md$/, '')
@@ -165,7 +166,7 @@ export const getStaticProps: GetStaticProps<WrappersDocsProps> = async ({ params
     },
   })
 
-  return { props: { source: mdxSource, meta, editLink: repoEditPath } }
+  return { props: { source: mdxSource, meta } }
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {

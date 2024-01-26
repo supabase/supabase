@@ -9,9 +9,10 @@ import ActionBar from './ActionBar'
 interface SchemaEditorProps {
   visible: boolean
   closePanel: () => void
+  saveChanges: (resolve: any) => void
 }
 
-const SchemaEditor = ({ visible, closePanel }: SchemaEditorProps) => {
+const SchemaEditor = ({ visible, closePanel, saveChanges }: SchemaEditorProps) => {
   const { project } = useProjectContext()
 
   const [errors, setErrors] = useState<{ name?: string }>({ name: undefined })

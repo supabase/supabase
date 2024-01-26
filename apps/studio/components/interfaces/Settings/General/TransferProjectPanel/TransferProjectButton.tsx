@@ -19,7 +19,6 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectTransferMutation } from 'data/projects/project-transfer-mutation'
 import { useProjectTransferPreviewQuery } from 'data/projects/project-transfer-preview-query'
 import { useCheckPermissions, useFlag, useSelectedProject, useStore } from 'hooks'
-import { formatCurrency } from 'lib/helpers'
 
 const TransferProjectButton = () => {
   const { ui } = useStore()
@@ -298,7 +297,7 @@ const TransferProjectButton = () => {
                           {' '}
                           The target organization will be billed{' '}
                           <span className="text-brand">
-                            {formatCurrency(transferPreviewData.costs_on_target_organization)}
+                            ${transferPreviewData.costs_on_target_organization}
                           </span>{' '}
                           immediately to prorate for the remainder of the billing period.
                         </span>

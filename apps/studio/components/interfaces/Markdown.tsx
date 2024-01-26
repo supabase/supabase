@@ -1,7 +1,8 @@
-import { ReactMarkdown, ReactMarkdownOptions } from 'react-markdown/lib/react-markdown'
+import { ReactMarkdownProps } from 'react-markdown/lib/complex-types'
+import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 import { cn } from 'ui'
 
-interface Props extends Omit<ReactMarkdownOptions, 'children' | 'node'> {
+interface Props extends Omit<ReactMarkdownProps, 'children' | 'node'> {
   className?: string
   content: string
   extLinks?: boolean

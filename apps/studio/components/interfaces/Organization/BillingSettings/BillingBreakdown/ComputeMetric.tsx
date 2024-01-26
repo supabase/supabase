@@ -7,7 +7,6 @@ import { Metric } from './BillingBreakdown.constants'
 import { formatUsage } from '../helpers'
 import { PricingMetric } from 'data/analytics/org-daily-stats-query'
 import React, { useMemo } from 'react'
-import { formatCurrency } from 'lib/helpers'
 
 export interface ComputeMetricProps {
   slug?: string
@@ -42,7 +41,7 @@ const ComputeMetric = ({ slug, metric, usage, relativeToSubscription }: ComputeM
         </Link>
         <span className="text-sm">{usageLabel}</span>&nbsp;
         {relativeToSubscription && usageMeta?.cost && usageMeta.cost > 0 ? (
-          <span className="text-sm">({formatCurrency(usageMeta?.cost)})</span>
+          <span className="text-sm">(${usageMeta?.cost})</span>
         ) : null}
       </div>
       <div>

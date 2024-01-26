@@ -69,7 +69,6 @@ export interface SupabaseGridProps {
   onEditRow?: (row: SupaRow) => void
   onError?: (error: any) => void
   onExpandJSONEditor: (column: string, row: SupaRow) => void
-  onExpandTextEditor: (column: string, row: SupaRow) => void
   updateTableRow: (previousRow: any, updatedData: any) => void
   onEditForeignKeyColumnValue: (args: {
     foreignKey: NonNullable<ForeignRowSelectorProps['foreignKey']>

@@ -13,7 +13,6 @@ type ForeignKey = {
 }
 
 export type SidePanel =
-  | { type: 'cell'; value?: { column: string; row: Dictionary<any> } }
   | { type: 'row'; row?: Dictionary<any> }
   | { type: 'column'; column?: PostgresColumn }
   | { type: 'table'; mode: 'new' | 'edit' | 'duplicate' }
@@ -169,12 +168,6 @@ export const createTableEditorState = () => {
       state.ui = {
         open: 'side-panel',
         sidePanel: { type: 'json', jsonValue },
-      }
-    },
-    onExpandTextEditor: (column: string, row: Dictionary<any>) => {
-      state.ui = {
-        open: 'side-panel',
-        sidePanel: { type: 'cell', value: { column, row } },
       }
     },
     onEditForeignKeyColumnValue: (foreignKey: ForeignKey) => {

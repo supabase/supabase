@@ -32,7 +32,6 @@ import {
 } from './SidePanelEditor.types'
 import { createColumn, updateColumn } from './SidePanelEditor.utils'
 import { ImportContent } from './TableEditor/TableEditor.types'
-import { TextEditor } from './RowEditor/TextEditor'
 
 export interface SidePanelEditorProps {
   editable?: boolean
@@ -146,42 +145,25 @@ const SidePanelEditor = ({
     }
   }
 
-  const onSaveColumnValue = async (value: string | number | null, resolve: () => void) => {
-    if (selectedTable === undefined) return
+  const onSaveJSON = async (value: string | number | null) => {
+    if (selectedTable === undefined || !(snap.sidePanel?.type === 'json')) return
+    const selectedValueForJsonEdit = snap.sidePanel.jsonValue
 
-    let payload
-    let configuration
-    const isNewRecord = false
-    const identifiers = {} as Dictionary<any>
-    if (snap.sidePanel?.type === 'json') {
-      const selectedValueForJsonEdit = snap.sidePanel.jsonValue
+    try {
       const { row, column } = selectedValueForJsonEdit
-      payload = { [column]: value === null ? null : JSON.parse(value as any) }
+      const payload = { [column]: value === null ? null : JSON.parse(value as any) }
+      const identifiers = {} as Dictionary<any>
       selectedTable.primary_keys.forEach((column) => (identifiers[column.name] = row![column.name]))
-      configuration = { identifiers, rowIdx: row.idx }
-    } else if (snap.sidePanel?.type === 'cell') {
-      const column = snap.sidePanel.value?.column
-      const row = snap.sidePanel.value?.row
 
-      if (!column || !row) return
-      payload = { [column]: value === null ? null : value }
-      selectedTable.primary_keys.forEach((column) => (identifiers[column.name] = row![column.name]))
-      configuration = { identifiers, rowIdx: row.idx }
-    }
+      const isNewRecord = false
+      const configuration = { identifiers, rowIdx: row.idx }
 
-    if (payload !== undefined && configuration !== undefined) {
-      try {
-        await saveRow(payload, isNewRecord, configuration, (error) => {
-          if (error) {
-            toast.error(
-              error?.message ?? 'Something went wrong while trying to save the column value'
-            )
-          }
-        })
-      } finally {
-        resolve()
-      }
-    }
+      saveRow(payload, isNewRecord, configuration, (error) => {
+        if (error) {
+          toast.error(error?.message ?? 'Something went wrong while trying to save the JSON value')
+        }
+      })
+    } catch (error: any) {}
   }
 
   const onSaveForeignRow = async (value: any) => {
@@ -598,7 +580,11 @@ const SidePanelEditor = ({
         saveChanges={saveTable}
         updateEditorDirty={() => setIsEdited(true)}
       />
-      <SchemaEditor visible={snap.sidePanel?.type === 'schema'} closePanel={onClosePanel} />
+      <SchemaEditor
+        visible={snap.sidePanel?.type === 'schema'}
+        closePanel={onClosePanel}
+        saveChanges={() => {}}
+      />
       <JsonEdit
         visible={snap.sidePanel?.type === 'json'}
         column={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.column) || ''}
@@ -607,12 +593,7 @@ const SidePanelEditor = ({
         applyButtonLabel="Save changes"
         readOnly={!editable}
         closePanel={onClosePanel}
-        onSaveJSON={onSaveColumnValue}
-      />
-      <TextEditor
-        visible={snap.sidePanel?.type === 'cell'}
-        closePanel={onClosePanel}
-        onSaveField={onSaveColumnValue}
+        onSaveJSON={onSaveJSON}
       />
       <ForeignRowSelector
         visible={snap.sidePanel?.type === 'foreign-row-selector'}

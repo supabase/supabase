@@ -29,7 +29,6 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { AlertTriangleIcon } from 'lucide-react'
 import { AddonVariantId } from 'data/subscriptions/types'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import { formatCurrency } from 'lib/helpers'
 
 const PITR_CATEGORY_OPTIONS: {
   id: 'off' | 'on'
@@ -347,7 +346,9 @@ const PITRSidePanel = () => {
                           {option.identifier.split('_')[1]} days ago
                         </p>
                         <div className="flex items-center space-x-1 mt-2">
-                          <p className="text-foreground text-sm">{formatCurrency(option.price)}</p>
+                          <p className="text-foreground text-sm">
+                            ${option.price.toLocaleString()}
+                          </p>
                           <p className="text-foreground-light translate-y-[1px]"> / month</p>
                         </div>
                       </div>
@@ -372,7 +373,7 @@ const PITRSidePanel = () => {
               ) : (
                 <p className="text-sm text-foreground-light">
                   Upon clicking confirm, the amount of{' '}
-                  <span className="text-foreground">{formatCurrency(selectedPitr?.price)}</span>{' '}
+                  <span className="text-foreground">${selectedPitr?.price.toLocaleString()}</span>{' '}
                   will be added to your monthly invoice.{' '}
                   {subscription?.billing_via_partner ? (
                     <>
