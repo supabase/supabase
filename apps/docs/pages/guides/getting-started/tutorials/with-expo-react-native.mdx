@@ -514,6 +514,10 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
         mode: 'open',
       })
 
+      if(!file.name){
+        throw Error("empty filename");
+      }
+
       const photo = {
         uri: file.fileCopyUri,
         type: file.type,
@@ -521,7 +525,7 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
       }
 
       const formData = new FormData()
-      formData.append('file', photo)
+      formData.append('file', photo as {} as Blob)
 
       const fileExt = file.name.split('.').pop()
       const filePath = `${Math.random()}.${fileExt}`
@@ -583,7 +587,9 @@ const styles = StyleSheet.create({
   },
   noImage: {
     backgroundColor: '#333',
-    border: '1px solid rgb(200, 200, 200)',
+    borderWidth: 1,
+    borderStyle: 'solid',
+    borderColor: 'rgb(200, 200, 200)',
     borderRadius: 5,
   },
 })
