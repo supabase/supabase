@@ -335,7 +335,6 @@ const PlanUpdateSidePanel = () => {
         subscription={subscription}
         onClose={() => setSelectedTier(undefined)}
         onConfirm={onConfirmDowngrade}
-        projects={orgProjects}
       />
 
       <Modal
