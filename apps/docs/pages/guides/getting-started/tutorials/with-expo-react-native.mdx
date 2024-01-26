@@ -454,7 +454,7 @@ photos and videos.
 You will need a file picker that works on the environment you will build the project for, we will use react-native-document-picker in this example.
 
 ```bash
-expo install react-native-document-picker
+expo install expo-document-picker
 ```
 
 ### Create an upload widget
@@ -466,7 +466,7 @@ We can start by creating a new component:
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { StyleSheet, View, Alert, Image, Button } from 'react-native'
-import DocumentPicker, { isCancel, isInProgress, types } from 'react-native-document-picker'
+import * as DocumentPicker from 'expo-document-picker'
 
 interface Props {
   size: number
@@ -507,20 +507,22 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
     try {
       setUploading(true)
 
-      const file = await DocumentPicker.pickSingle({
-        presentationStyle: 'fullScreen',
-        copyTo: 'cachesDirectory',
-        type: types.images,
-        mode: 'open',
+      const {assets, canceled} = await DocumentPicker.getDocumentAsync({
+        copyToCacheDirectory: true,
+        multiple: false,
+        type: 'image/*',
       })
 
-      if(!file.name){
-        throw Error("empty filename");
+      if(canceled || !assets){
+        console.warn('cancelled')
+        return
       }
 
+      const file = assets[0]
+
       const photo = {
-        uri: file.fileCopyUri,
-        type: file.type,
+        uri: file.uri,
+        type: file.mimeType,
         name: file.name,
       }
 
@@ -538,12 +540,7 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
 
       onUpload(filePath)
     } catch (error) {
-      if (isCancel(error)) {
-        console.warn('cancelled')
-        // User cancelled the picker, exit any dialogs or menus and move on
-      } else if (isInProgress(error)) {
-        console.warn('multiple pickers were opened, only the last will be considered')
-      } else if (error instanceof Error) {
+      if (error instanceof Error) {
         Alert.alert(error.message)
       } else {
         throw error
