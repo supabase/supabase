@@ -1,9 +1,12 @@
-import { PropsWithChildren, useEffect, useState } from 'react'
-import Link from 'next/link'
-import { Modal, Toggle, useConsentValue } from 'ui'
 import { LOCAL_STORAGE_KEYS } from 'common'
+import Link from 'next/link'
+import { PropsWithChildren, useEffect, useState } from 'react'
+import { Modal, Toggle, useConsentValue } from 'ui'
 
-const PrivacySettings = ({ children, ...props }: PropsWithChildren<{ className?: string }>) => {
+export const PrivacySettings = ({
+  children,
+  ...props
+}: PropsWithChildren<{ className?: string }>) => {
   const [isOpen, setIsOpen] = useState(false)
   const { hasAccepted, handleConsent } = useConsentValue(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
   const [telemetryValue, setTelemetryValue] = useState(hasAccepted)
@@ -91,5 +94,3 @@ const PrivacySettings = ({ children, ...props }: PropsWithChildren<{ className?:
     </>
   )
 }
-
-export default PrivacySettings
