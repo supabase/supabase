@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    if: ${{ github.event_name == 'pull_request' && (github.event.label.name == 'autofix' == 'autofix-squash') }}
+    if: ${{ github.event_name == 'pull_request' && (github.event.label.name == 'autofix' || github.event.label.name == 'autofix-squash') }}
     steps:
       - name: Calculate number of commits
         run: echo "PR_FETCH_DEPTH=$(( ${{ github.event.pull_request.commits }} + 1 ))" >> "${GITHUB_ENV}"
