@@ -18,6 +18,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
+          sparse-checkout: apps
           fetch-depth: ${{ env.PR_FETCH_DEPTH }}
 
       - uses: actions/setup-node@v4
@@ -33,7 +34,7 @@ jobs:
 
       - name: Run Prettier in fix mode
         run: |
-          npx prettier --write 'i18n/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'
+          npx prettier --write 'apps/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'
 
       - name: Commit changes and push to existing branch
         env:
