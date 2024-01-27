@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   autofix:
-    runs-on: [larger-runner-4cpu]
+    runs-on: ubuntu-latest
     permissions:
       contents: write
     if: ${{ github.event_name == 'pull_request' && (github.event.label.name == 'autofix' || github.event.label.name == 'autofix-squash') }}
