@@ -39,6 +39,7 @@ const questions = [
 export enum PageType {
   Markdown = 'markdown',
   Reference = 'reference',
+  Integration = 'partner-integration',
   GithubDiscussion = 'github-discussions',
 }
 
@@ -235,6 +236,15 @@ const DocsSearch = () => {
           setIsOpen(false)
         } else {
           window.open(`https://supabase.com/docs${link}`, '_blank')
+          setIsOpen(false)
+        }
+        break
+      case PageType.Integration:
+        if (site === 'website') {
+          router.push(link)
+          setIsOpen(false)
+        } else {
+          window.open(`https://supabase.com${link}`, '_blank')
           setIsOpen(false)
         }
         break
@@ -531,6 +541,7 @@ export function formatPageUrl(page: Page) {
   switch (page.type) {
     case PageType.Markdown:
     case PageType.Reference:
+    case PageType.Integration:
     case PageType.GithubDiscussion:
       return page.path
     default:
@@ -545,6 +556,9 @@ export function formatSectionUrl(page: Page, section: PageSection) {
       return `${formatPageUrl(page)}#${section.slug ?? ''}`
     case PageType.Reference:
       return `${formatPageUrl(page)}/${section.slug ?? ''}`
+    case PageType.Integration:
+      // [Charis] Markdown headings on integrations pages don't have slugs yet
+      return formatPageUrl(page)
     default:
       throw new Error(`Unknown page type '${page.type}'`)
   }
@@ -554,6 +568,7 @@ export function getPageIcon(page: Page) {
   switch (page.type) {
     case PageType.Markdown:
     case PageType.Reference:
+    case PageType.Integration:
       return <IconBook strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
     case PageType.GithubDiscussion:
       return <IconGitHub strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
@@ -566,6 +581,7 @@ export function getPageSectionIcon(page: Page) {
   switch (page.type) {
     case PageType.Markdown:
     case PageType.Reference:
+    case PageType.Integration:
       return <IconHash strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
     case PageType.GithubDiscussion:
       return <IconMessageSquare strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
