@@ -5,9 +5,14 @@ on:
     types:
       - labeled
 
+# Cancel old builds on new commit for same workflow + branch/PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   autofix:
-    runs-on: ubuntu-latest
+    runs-on: [larger-runner-4cpu]
     permissions:
       contents: write
     if: ${{ github.event_name == 'pull_request' && (github.event.label.name == 'autofix' || github.event.label.name == 'autofix-squash') }}
