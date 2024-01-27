@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    if: ${{ github.event_name == 'pull_request' && (github.event.label.name == 'autofix' || github.event.label.name == 'autofix-squash') }}
+    if: ${{ github.event_name == 'pull_request' && (github.event.label.name == 'autofix') }}
     steps:
       - name: Calculate number of commits
         run: echo "PR_FETCH_DEPTH=$(( ${{ github.event.pull_request.commits }} + 1 ))" >> "${GITHUB_ENV}"
@@ -42,8 +42,6 @@ jobs:
           npx prettier --write 'apps/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'
 
       - name: Commit changes and push to existing branch
-        env:
-          SHOULD_SQUASH: ${{ github.event.label.name == 'autofix-squash' }}
         run: |
           git checkout -- package.json
           git checkout -- package-lock.json
@@ -51,16 +49,10 @@ jobs:
           git config --global user.email 'github-tidy-bot@supabase.com'
           if [[ `git status --porcelain` ]]; then
             echo "[bot] Changes detected, committing."
-            if [[ "$SHOULD_SQUASH" == "true" ]]; then
-              echo "[bot] Running in squash mode."
-              git add -A
-              git commit --amend --no-edit
-              git push --force
-            else
-              echo "[bot] Running in non-squash mode."
-              git commit -am "ci: Autofix updates from GitHub workflow"
-              git push
-            fi
+       
+            echo "[bot] Running in non-squash mode."
+            git commit -am "ci: Autofix updates from GitHub workflow"
+            git push
           else
             echo "[bot] No changes detected, nothing to commit."
           fi
