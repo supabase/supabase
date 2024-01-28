@@ -507,13 +507,13 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
     try {
       setUploading(true)
 
-      const {assets, canceled} = await DocumentPicker.getDocumentAsync({
+      const { assets, canceled } = await DocumentPicker.getDocumentAsync({
         copyToCacheDirectory: true,
         multiple: false,
         type: 'image/*',
       })
 
-      if(canceled || !assets){
+      if (canceled || !assets) {
         console.warn('cancelled')
         return
       }
