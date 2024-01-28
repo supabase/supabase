@@ -451,10 +451,10 @@ photos and videos.
 
 ### Additional dependency installation
 
-You will need a file picker that works on the environment you will build the project for, we will use expo-document-picker in this example.
+You will need an image picker that works on the environment you will build the project for, we will use `expo-image-picker` in this example.
 
 ```bash
-expo install expo-document-picker
+expo install expo-image-picker
 ```
 
 ### Create an upload widget
@@ -466,7 +466,7 @@ We can start by creating a new component:
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { StyleSheet, View, Alert, Image, Button } from 'react-native'
-import * as DocumentPicker from 'expo-document-picker'
+import * as ImagePicker from 'expo-image-picker'
 
 interface Props {
   size: number
@@ -507,38 +507,38 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
     try {
       setUploading(true)
 
-      const { assets, canceled } = await DocumentPicker.getDocumentAsync({
-        copyToCacheDirectory: true,
-        multiple: false,
-        type: 'image/*',
+      const result = await ImagePicker.launchImageLibraryAsync({ 
+        mediaTypes: ImagePicker.MediaTypeOptions.Images, // Restrict to only images
+        allowsMultipleSelection: false, // Can only select one image
+        allowsEditing: true, // Allows the user to crop / rotate their photo before uploading it
+        quality: 1,
+        exif: false // We don't want nor need that data.
       })
 
-      if (canceled || !assets) {
-        console.warn('cancelled')
-        return
+      if (result.canceled || !result.assets || result.assets.length === 0) {
+        console.log("User cancelled image picker.");
+        return;
       }
 
-      const file = assets[0]
+      const image = result.assets[0]
+      console.log("Got image", image)
 
-      const photo = {
-        uri: file.uri,
-        type: file.mimeType,
-        name: file.name,
+      if (!image.uri) {
+        throw new Error("No image uri!") // Realistically, this should never happen, but just in case...
       }
 
-      const formData = new FormData()
-      formData.append('file', photo as {} as Blob)
+      const arraybuffer = await fetch(image.uri).then(res => res.arrayBuffer())
 
-      const fileExt = file.name.split('.').pop()
-      const filePath = `${Math.random()}.${fileExt}`
+      const fileExt = image.fileName?.split(".").pop()?.toLowerCase() ?? "jpeg"
+      const path = `${Date.now()}.${fileExt}`
+      const { data, error: uploadError } = await supabase.storage.from("avatars")
+        .upload(path, arraybuffer)
 
-      const { error } = await supabase.storage.from('avatars').upload(filePath, formData)
-
-      if (error) {
-        throw error
+      if (uploadError) {
+        throw uploadError;
       }
 
-      onUpload(filePath)
+      onUpload(data.path);
     } catch (error) {
       if (error instanceof Error) {
         Alert.alert(error.message)
@@ -617,7 +617,6 @@ import Avatar from './Avatar'
       {/* ... */}
     </View>
   )
-}
 // ...
 ```
 
