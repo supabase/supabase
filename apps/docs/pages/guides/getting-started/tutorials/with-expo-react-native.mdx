@@ -507,38 +507,41 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
     try {
       setUploading(true)
 
-      const result = await ImagePicker.launchImageLibraryAsync({ 
+      const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images, // Restrict to only images
         allowsMultipleSelection: false, // Can only select one image
         allowsEditing: true, // Allows the user to crop / rotate their photo before uploading it
         quality: 1,
-        exif: false // We don't want nor need that data.
+        exif: false, // We don't want nor need that data.
       })
 
       if (result.canceled || !result.assets || result.assets.length === 0) {
-        console.log("User cancelled image picker.");
-        return;
+        console.log('User cancelled image picker.')
+        return
       }
 
       const image = result.assets[0]
-      console.log("Got image", image)
+      console.log('Got image', image)
 
       if (!image.uri) {
-        throw new Error("No image uri!") // Realistically, this should never happen, but just in case...
+        throw new Error('No image uri!') // Realistically, this should never happen, but just in case...
       }
 
-      const arraybuffer = await fetch(image.uri).then(res => res.arrayBuffer())
+      const arraybuffer = await fetch(image.uri).then((res) => res.arrayBuffer())
 
-      const fileExt = image.fileName?.split(".").pop()?.toLowerCase() ?? "jpeg"
+      const fileExt = image.uri?.split('.').pop()?.toLowerCase() ?? 'jpeg'
       const path = `${Date.now()}.${fileExt}`
-      const { data, error: uploadError } = await supabase.storage.from("avatars")
-        .upload(path, arraybuffer)
+      const { data, error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(path, arraybuffer, {
+          contentType: image.mimeType ?? 'image/jpeg',
+        })
 
       if (uploadError) {
-        throw uploadError;
+        throw uploadError
       }
 
-      onUpload(data.path);
+      onUpload(data.path)
     } catch (error) {
       if (error instanceof Error) {
         Alert.alert(error.message)
@@ -601,22 +604,22 @@ And then we can add the widget to the Account page:
 import Avatar from './Avatar'
 
 // ...
-  return (
+return (
+  <View>
+    {/* Add to the body */}
     <View>
-      {/* Add to the body */}
-      <View>
-        <Avatar
-          size={200}
-          url={avatarUrl}
-          onUpload={(url: string) => {
-            setAvatarUrl(url)
-            updateProfile({ username, website, avatar_url: url })
-          }}
-        />
-      </View>
-      {/* ... */}
+      <Avatar
+        size={200}
+        url={avatarUrl}
+        onUpload={(url: string) => {
+          setAvatarUrl(url)
+          updateProfile({ username, website, avatar_url: url })
+        }}
+      />
     </View>
-  )
+    {/* ... */}
+  </View>
+)
 // ...
 ```
 
