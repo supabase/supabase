@@ -119,7 +119,7 @@ Migrating projects can be achieved using the Supabase CLI. This is particularly 
 ### Before you begin
 
 - Install [Postgres](https://www.postgresql.org/download/) so you can run `psql` and `pg_dump`.
-- Install [Supabase CLI](/docs/guides/cli#installation).
+- Install the latest version of [Supabase CLI](/docs/guides/cli#installation).
 - Create a new [Supabase project](https://supabase.com/dashboard).
 - Install [Docker Desktop](https://www.docker.com) for your platform.
 - Set environment variables for the old project's database URL as `$OLD_DB_URL` and the new project's as `$NEW_DB_URL`.
@@ -139,7 +139,6 @@ Note that this direct connection string to the database uses IPv6. If your netwo
 supabase db dump --db-url "$OLD_DB_URL" -f roles.sql --role-only
 supabase db dump --db-url "$OLD_DB_URL" -f schema.sql
 supabase db dump --db-url "$OLD_DB_URL" -f data.sql --use-copy --data-only
-supabase db dump --db-url "$OLD_DB_URL" -f history.sql --use-copy --data-only --schema supabase_migrations
 ```
 
 ### Restore to your new project
@@ -183,6 +182,21 @@ Troubleshooting notes:
 
 - If you have created any [custom roles](https://supabase.com/dashboard/project/_/database/roles) with `login` attribute, you have to manually set their passwords in the new project.
 - If you run into any permission errors related to `supabase_admin` during restore, edit the `schema.sql` file and comment out any lines containing `ALTER ... OWNER TO "supabase_admin"`.
+
+### Preserving migration history
+
+If you were using Supabase CLI for managing migrations on your old database and would like to preserve the migration history in your newly restored project, you need to insert the migration records separately using the following commands.
+
+```bash
+supabase db dump --db-url "$OLD_DB_URL" -f history_schema.sql --schema supabase_migrations
+supabase db dump --db-url "$OLD_DB_URL" -f history_data.sql --use-copy --data-only --schema supabase_migrations
+psql \
+  --single-transaction \
+  --variable ON_ERROR_STOP=1 \
+  --file history_schema.sql \
+  --file history_data.sql \
+  --dbname "$NEW_DB_URL"
+```
 
 ### Schema changes to `auth` and `storage`
 
