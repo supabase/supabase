@@ -90,7 +90,12 @@ const CreateEnumeratedTypeSidePanel = ({
   }
 
   useEffect(() => {
-    if (visible) form.reset()
+    form.reset({
+      name: '',
+      description: '',
+      values: [{ value: '' }],
+    })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible])
 
   return (
