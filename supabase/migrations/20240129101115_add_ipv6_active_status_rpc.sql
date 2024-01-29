@@ -4,13 +4,17 @@ declare
   pgbouncer_active boolean;
   vercel_active boolean;
 begin
-  select exists(1) into pgbouncer_active
-  from active_pgbouncer_projects
-  where project_ref = $1;
+  select exists (
+    select 1 
+    from active_pgbouncer_projects
+    where project_ref = $1
+  ) into pgbouncer_active;
 
-  select exists(1) into vercel_active
-  from vercel_project_connections_without_supavisor
-  where project_ref = $1;
+  select exists (
+    select 1
+    from vercel_project_connections_without_supavisor
+    where project_ref = $1
+  ) into vercel_active;
 
   return query select pgbouncer_active, vercel_active;
 end;
