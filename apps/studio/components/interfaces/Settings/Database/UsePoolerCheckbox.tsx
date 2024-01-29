@@ -17,6 +17,7 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
+import { usePgBouncerStatus } from 'data/config/pgbouncer-enabled-query'
 
 interface UsePoolerCheckboxInterface {
   id: string
@@ -39,6 +40,10 @@ export const UsePoolerCheckbox = ({
 
   const { data, isLoading, isSuccess } = usePoolingConfigurationQuery({ projectRef })
   const { data: settings, isSuccess: isSuccessSettings } = useProjectSettingsQuery({ projectRef })
+  const { data: pgBouncerStatus } = usePgBouncerStatus(
+    { projectRef: projectRef!, dbHost: settings?.project.db_host! },
+    { enabled: !!settings?.project.db_host }
+  )
 
   const resolvesToIpV6 = settings?.project.db_ip_addr_config === 'ipv6'
 
@@ -140,6 +145,7 @@ export const UsePoolerCheckbox = ({
                       : 'Will resolve to IPv6'}
                   </Badge>
                 )}
+                {pgBouncerStatus && <Badge color="amber">PGBouncer pending removal</Badge>}
               </div>
             </div>
           </div>
