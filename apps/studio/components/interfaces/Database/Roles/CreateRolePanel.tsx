@@ -88,7 +88,10 @@ const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
             form={formId}
             isSubmitting={isCreating}
             hasChanges={form.formState.isDirty}
-            handleReset={() => form.reset()}
+            handleReset={() =>{
+              form.reset()
+              handleClose()
+            }}
           />
         </div>
       }
