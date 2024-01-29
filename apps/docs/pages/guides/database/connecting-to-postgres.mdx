@@ -35,21 +35,15 @@ Every Supabase project comes with a connection pooler for managing connections t
 
 A connection pooler is useful for managing a large number of _temporary_ connections - for example, if you are using Prisma, Drizzle, Kysely, or anything deployed to a Serverless environment (AWS Lambdas or Edge Functions). Supabase's connection pooler also supports ipv4 out of the box.
 
-You can find the connection pool config in the [Database settings](/dashboard/project/_/settings/database) inside the dashboard:
-
-1. Go to the `Settings` section.
-2. Click `Database`.
-3. Under `Connect to your database via connection pooling`, copy your `Connection string`.
+You can find the connection pooler in the [Database settings page](/dashboard/project/_/settings/database) under "Database string".
+Make sure "Use connection pooling" is checked and copy the connection string.
 
 ## Direct connections
 
 You can use a direct connection to connect directly to your Postgres database. By default, this connection uses ipv6, which isn't supported by all network providers. If you need an ipv4 address, use the [connection pooler](#connection-pooler) instead.
 
-You can find the direct connection string in the [Database settings](https://supabase.com/dashboard/project/_/settings/database) inside the dashboard:
-
-1. Go to the `Settings` section.
-2. Click `Database`.
-3. Under `Connect to your database directly`, copy your `Connection string`.
+You can find the direct connection string in the [Database settings page](/dashboard/project/_/settings/database) under "Database string".
+Make sure "Use connection pooling" is unchecked and copy the connection string.
 
 ## Choosing a connection method
 
