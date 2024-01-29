@@ -69,7 +69,7 @@ Rails includes Active Record as the ORM as well as database migration tooling wh
 Create an example `Article` model and generate the migration files.
 
 ```bash Terminal
-bin/rails generate model Article title:string body:text
+bin/rails generate scaffold Article title:string body:text
 bin/rails db:migrate
 ```
 
@@ -96,6 +96,49 @@ bin/rails server
 
 Run the development server. Go to http://127.0.0.1:3000 in a browser to see your application running.
 
+## Update the app to show articles
+
+Currently the app shows a nice development splash screen, let's update this to show our articles from the database:
+
+```rb config/routes.rb
+Rails.application.routes.draw do
+  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+
+  # Defines the root path route ("/")
+  root "articles#index"
+end
+```
+
+## Deploy to Fly.io
+
+In order to start working with Fly.io, you will need `flyctl`, our CLI app for managing apps. If you've already installed it, carry on. If not, hop over to the [installation guide](https://fly.io/docs/hands-on/install-flyctl/). Once that's installed you'll want to [log in to Fly](https://fly.io/docs/getting-started/log-in-to-fly/).
+
+### Provision Rails with fly launch
+
+To configure and launch the app, you can use `fly launch` and follow the wizard.
+
+When asked "Do you want to tweak these settings before proceeding?" select `y` and set Postgres to `none` as we will be providing the Supabase database URL as a secret.
+
+### Set the connection string as secret
+
+`fly secrets set DATABASE_URL=$DATABASE_URL`
+
+### Deploy the app
+
+Deploying your application is done with the following command:
+
+```bash Terminal
+fly deploy
+```
+
+This will take a few seconds as it uploads your application, builds a machine image, deploys the images, and then monitors to ensure it starts successfully. Once complete visit your app with the following command:
+
+```bash Terminal
+fly apps open
+```
+
+That's it! You're Rails app is up and running with Supabase Postgres and Fly.io!
+
 ## Conclusion
 
 Supabase is the ideal platform for powering your Postgres database for your Ruby on Rails applications! Every Supabase project comes with a full Postgres database and a good number of [useful extensions](/docs/guides/database/extensions)!
@@ -103,3 +146,6 @@ Supabase is the ideal platform for powering your Postgres database for your Ruby
 Try it out now at [database.new](https://database.new)!
 
 ## More Supabase
+
+- [Migration guides](/docs/guides/resources#migrate-to-supabase)
+- [Options for connecting to your Postgres database](/docs/guides/database/connecting-to-postgres)
