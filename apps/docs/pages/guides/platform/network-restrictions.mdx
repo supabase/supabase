@@ -78,7 +78,6 @@ Restrictions applied successfully: true
 
 - The current iteration of Network Restrictions applies to connections to Postgres and the database pooler; it doesn't currently apply to APIs offered over HTTPS (e.g., PostgREST, Storage, and Auth). This includes using Supabase client libraries like [supabase-js](https://supabase.com/docs/reference/javascript).
 - If network restrictions are enabled, direct access to your database from edge functions will always be blocked. Using the Supabase client library [supabase-js](https://supabase.com/docs/reference/javascript) is recommended to connect to a database with network restrictions from edge functions.
-- [Supavisor](https://github.com/supabase/supavisor/) does not currently support Network Restrictions. Network restrictions support will be enabled from 24th January 2024. Any changes to the network restrictions configuration will apply to both Supavisor and direct connections to Postgres after this date.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
