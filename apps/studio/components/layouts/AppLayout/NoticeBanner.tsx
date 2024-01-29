@@ -16,7 +16,15 @@ export const NoticeBanner = () => {
   const { isLoading: isLoadingProfile } = useProfile()
 
   const appBannerContext = useAppBannerContext()
-  const { acknowledged, onUpdateAcknowledged } = appBannerContext
+  const {
+    ipv6BannerAcknowledged,
+    pgbouncerBannerAcknowledged,
+    vercelBannerAcknowledged,
+    onUpdateAcknowledged,
+  } = appBannerContext
+
+  const allAcknowledged =
+    ipv6BannerAcknowledged && pgbouncerBannerAcknowledged && vercelBannerAcknowledged
 
   const supabase = useSupabaseClient()
   const { ref: projectRef } = useParams()
@@ -68,10 +76,17 @@ export const NoticeBanner = () => {
     isLoadingPgbouncerEnabled ||
     isLoadingVercelWithoutSupavisorEnabled ||
     router.pathname.includes('sign-in') ||
-    acknowledged
+    allAcknowledged
   ) {
     return null
   }
+
+  const currentlyViewing =
+    pgbouncerEnabled && !pgbouncerBannerAcknowledged
+      ? ('pgbouncer' as const)
+      : vercelWithoutSupavisorEnabled && !vercelBannerAcknowledged
+      ? ('vercel' as const)
+      : ('ipv6' as const)
 
   return (
     <div
@@ -79,17 +94,18 @@ export const NoticeBanner = () => {
       style={{ height: '44px' }}
     >
       <p className="text-sm">
-        {pgbouncerEnabled
-          ? 'Our logs on 26th Jan show that you have accessed PgBouncer. Please migrate now. You can ignore this warning if you have already migrated.'
-          : vercelWithoutSupavisorEnabled
-          ? "To prepare for the IPv4 migration, please redeploy your Vercel application to detect the updated environment variables if it hasn't been deployed since 27th January."
-          : 'We are migrating our infrastructure from IPv4 to IPv6. Please migrate now. You can ignore this warning if you have already migrated.'}
+        {currentlyViewing === 'pgbouncer' &&
+          'Our logs on 26th Jan show that you have accessed PgBouncer. Please migrate now. You can ignore this warning if you have already migrated.'}
+        {currentlyViewing === 'vercel' &&
+          "To prepare for the IPv4 migration, please redeploy your Vercel application to detect the updated environment variables if it hasn't been deployed since 27th January."}
+        {currentlyViewing === 'ipv6' &&
+          'We are migrating our infrastructure from IPv4 to IPv6. Please migrate now. You can ignore this warning if you have already migrated.'}
       </p>
       <div className="flex items-center gap-x-1">
         <Button asChild type="link" iconRight={<IconExternalLink />}>
           <a
             href={
-              vercelWithoutSupavisorEnabled
+              currentlyViewing === 'vercel'
                 ? 'https://supabase.com/partners/integrations/vercel'
                 : 'https://github.com/orgs/supabase/discussions/17817'
             }
@@ -99,7 +115,11 @@ export const NoticeBanner = () => {
             Learn more
           </a>
         </Button>
-        <Button type="text" className="opacity-75" onClick={() => onUpdateAcknowledged(true)}>
+        <Button
+          type="text"
+          className="opacity-75"
+          onClick={() => onUpdateAcknowledged(currentlyViewing, true)}
+        >
           Dismiss
         </Button>
       </div>

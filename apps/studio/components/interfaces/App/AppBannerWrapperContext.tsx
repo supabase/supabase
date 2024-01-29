@@ -3,38 +3,66 @@ import { PropsWithChildren, createContext, useContext, useEffect, useState } fro
 
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
-const NOTICE_BANNER_KEY = LOCAL_STORAGE_KEYS.PGBOUNCER_DEPRECATION_WARNING
+const PGBOUNCER_BANNER_KEY = LOCAL_STORAGE_KEYS.PGBOUNCER_IPV6_DEPRECATION_WARNING
+const VERCEL_BANNER_KEY = LOCAL_STORAGE_KEYS.VERCEL_IPV6_DEPRECATION_WARNING
+const DEFAULT_NOTICE_BANNER_KEY = LOCAL_STORAGE_KEYS.PGBOUNCER_DEPRECATION_WARNING
 
 // [Joshen] Update this as and when we need to use the NoticeBanner
 
 type AppBannerContextType = {
-  acknowledged: boolean
-  onUpdateAcknowledged: (value: boolean) => void
+  ipv6BannerAcknowledged: boolean
+  pgbouncerBannerAcknowledged: boolean
+  vercelBannerAcknowledged: boolean
+  onUpdateAcknowledged: (key: 'ipv6' | 'pgbouncer' | 'vercel', value: boolean) => void
 }
 
 const AppBannerContext = createContext<AppBannerContextType>({
-  acknowledged: false,
+  ipv6BannerAcknowledged: false,
+  pgbouncerBannerAcknowledged: false,
+  vercelBannerAcknowledged: false,
   onUpdateAcknowledged: noop,
 })
 
 export const useAppBannerContext = () => useContext(AppBannerContext)
 
 export const AppBannerContextProvider = ({ children }: PropsWithChildren<{}>) => {
-  const [acknowledged, setAcknowledged] = useState(false)
+  const [ipv6BannerAcknowledged, setIpv6BannerAcknowledged] = useState(false)
+  const [pgbouncerBannerAcknowledged, setPgbouncerBannerAcknowledged] = useState(false)
+  const [vercelBannerAcknowledged, setVercelBannerAcknowledged] = useState(false)
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      setAcknowledged(localStorage.getItem(NOTICE_BANNER_KEY) === 'true')
+      setIpv6BannerAcknowledged(localStorage.getItem(DEFAULT_NOTICE_BANNER_KEY) === 'true')
+      setPgbouncerBannerAcknowledged(localStorage.getItem(PGBOUNCER_BANNER_KEY) === 'true')
+      setVercelBannerAcknowledged(localStorage.getItem(VERCEL_BANNER_KEY) === 'true')
     }
   }, [])
 
   const value = {
-    acknowledged,
-    onUpdateAcknowledged: (value: boolean) => {
-      if (typeof window !== 'undefined') {
-        window.localStorage.setItem(NOTICE_BANNER_KEY, value.toString())
+    ipv6BannerAcknowledged,
+    pgbouncerBannerAcknowledged,
+    vercelBannerAcknowledged,
+    onUpdateAcknowledged: (key: 'ipv6' | 'pgbouncer' | 'vercel', value: boolean) => {
+      if (key === 'ipv6') {
+        if (typeof window !== 'undefined') {
+          window.localStorage.setItem(DEFAULT_NOTICE_BANNER_KEY, value.toString())
+        }
+        setIpv6BannerAcknowledged(value)
       }
-      setAcknowledged(value)
+
+      if (key === 'pgbouncer') {
+        if (typeof window !== 'undefined') {
+          window.localStorage.setItem(PGBOUNCER_BANNER_KEY, value.toString())
+        }
+        setPgbouncerBannerAcknowledged(value)
+      }
+
+      if (key === 'vercel') {
+        if (typeof window !== 'undefined') {
+          window.localStorage.setItem(VERCEL_BANNER_KEY, value.toString())
+        }
+        setVercelBannerAcknowledged(value)
+      }
     },
   }
 
@@ -42,6 +70,7 @@ export const AppBannerContextProvider = ({ children }: PropsWithChildren<{}>) =>
 }
 
 export const useIsNoticeBannerShown = () => {
-  const { acknowledged } = useAppBannerContext()
-  return acknowledged
+  const { ipv6BannerAcknowledged, pgbouncerBannerAcknowledged, vercelBannerAcknowledged } =
+    useAppBannerContext()
+  return ipv6BannerAcknowledged && pgbouncerBannerAcknowledged && vercelBannerAcknowledged
 }
