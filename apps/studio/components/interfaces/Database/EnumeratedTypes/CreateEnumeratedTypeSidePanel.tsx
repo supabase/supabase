@@ -95,7 +95,7 @@ const CreateEnumeratedTypeSidePanel = ({
       description: '',
       values: [{ value: '' }],
     })
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible])
 
   return (
