@@ -93,7 +93,7 @@ const VercelIntegration: NextPageWithLayout = () => {
   function handleRouteChange() {
     const orgSlug = selectedOrg?.slug
 
-    if (externalId) {
+    if (source === 'deploy-button') {
       router.push({
         pathname: `/integrations/vercel/${orgSlug}/deploy-button/new-project`,
         query: router.query,
