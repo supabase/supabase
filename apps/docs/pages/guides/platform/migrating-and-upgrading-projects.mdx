@@ -74,28 +74,14 @@ When upgrading, the Supabase platform will "right-size" your disk based on the c
 pg_upgrade does not support upgrading of databases containing reg\* data types referencing system OIDs.
 If you have created any objects that depend on the following extensions, you will need to recreate them after the upgrade.
 
-Extensions registering system OID-specific reg\* data types:
+#### Extensions
 
-- `plv8`
-- `plcoffee`
-- `plls`
+pg_upgrade does not currently support upgrading of databases using extensions older than the following versions:
 
-As these extensions offer support to create functions in different languages, you will only need to check for functions using the languages enabled by the above extensions.
-Any objects depending on the detected objects (e.g. triggers, views, tables, etc.) will need to be modified to exclude references to them.
+- TimescaleDB 2.9.1
+- plv8 3.1.5
 
-The following query returns the function name and their definitions, to help in recreating them post-upgrade.
-
-```sql
-SELECT
-  pn.nspname || '.' || objid::regproc AS function_name,
-  pg_get_functiondef(objid) || ';' AS function_definition
-FROM pg_depend d
-  JOIN pg_language l on (d.refobjid = l.oid)
-  JOIN pg_proc pp on (d.objid = pp.oid)
-  JOIN pg_namespace pn on (pp.pronamespace = pn.oid)
-WHERE l.lanname in ('plls', 'plcoffee', 'plv8')
-  AND pn.nspname <> 'pg_catalog';
-```
+To upgrade to a newer version of Postgres, you will need to drop the extensions before the upgrade, and recreate them after the upgrade.
 
 #### Authentication method changes - deprecating md5 in favor of scram-sha-256
 
@@ -133,11 +119,17 @@ Migrating projects can be achieved using the Supabase CLI. This is particularly 
 ### Before you begin
 
 - Install [Postgres](https://www.postgresql.org/download/) so you can run `psql` and `pg_dump`.
-- Install [Supabase CLI](/docs/guides/cli#installation).
+- Install the latest version of [Supabase CLI](/docs/guides/cli#installation).
 - Create a new [Supabase project](https://supabase.com/dashboard).
 - Install [Docker Desktop](https://www.docker.com) for your platform.
 - Set environment variables for the old project's database URL as `$OLD_DB_URL` and the new project's as `$NEW_DB_URL`.
   To find the database URL for a project, go to the project's dashboard page [Project Settings/Database](https://supabase.com/dashboard/project/_/settings/database) and look at `Connection string / URI`. For example, to set the `$OLD_DB_URL` you would run `export OLD_DB_URL=postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF#].supabase.co:5432/postgres`.
+
+<Admonition type="tip">
+
+Note that this direct connection string to the database uses IPv6. If your network provider doesn't yet support IPv6, you can connect via the pooler connection string, available under the **Connection pooling** section of [**Database settings**](https://supabase.com/dashboard/project/_/settings/database). The connection string has the format `postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:6543/postgres`.
+
+</Admonition>
 
 ### Backup your old database
 
@@ -180,6 +172,7 @@ psql \
   --file schema.sql \
   --command 'SET session_replication_role = replica' \
   --file data.sql \
+  --file history.sql \
   --dbname "$NEW_DB_URL"
 ```
 
@@ -189,6 +182,21 @@ Troubleshooting notes:
 
 - If you have created any [custom roles](https://supabase.com/dashboard/project/_/database/roles) with `login` attribute, you have to manually set their passwords in the new project.
 - If you run into any permission errors related to `supabase_admin` during restore, edit the `schema.sql` file and comment out any lines containing `ALTER ... OWNER TO "supabase_admin"`.
+
+### Preserving migration history
+
+If you were using Supabase CLI for managing migrations on your old database and would like to preserve the migration history in your newly restored project, you need to insert the migration records separately using the following commands.
+
+```bash
+supabase db dump --db-url "$OLD_DB_URL" -f history_schema.sql --schema supabase_migrations
+supabase db dump --db-url "$OLD_DB_URL" -f history_data.sql --use-copy --data-only --schema supabase_migrations
+psql \
+  --single-transaction \
+  --variable ON_ERROR_STOP=1 \
+  --file history_schema.sql \
+  --file history_data.sql \
+  --dbname "$NEW_DB_URL"
+```
 
 ### Schema changes to `auth` and `storage`
 

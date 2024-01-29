@@ -3,6 +3,7 @@ import specFile from '~/spec/transforms/storage_v0_openapi_deparsed.json' assert
 import { gen_v3 } from '~/lib/refGenerator/helpers'
 
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
+import React from 'react'
 
 export type AcceptedValue = {
   id: string
@@ -44,11 +45,11 @@ export default function Config() {
           </div>
 
           <div className="grid gap-32 mx-auto max-w-5xl mt-24">
-            {generatedSpec.sections.map((section) => (
-              <>
+            {generatedSpec.sections.map((section, i) => (
+              <React.Fragment key={i}>
                 <h2 className="text-3xl">{section.title}</h2>
-                {section.operations.map((operation: any) => (
-                  <div className="border-b pb-8">
+                {section.operations.map((operation: any, index) => (
+                  <div key={index} className="border-b pb-8">
                     <RefSubLayout.Section
                       slug={operation.id}
                       title={operation.summary}
@@ -72,8 +73,8 @@ export default function Config() {
                                 {operation.parameters &&
                                   operation.parameters
                                     .filter((parameter: any) => parameter.in === 'path')
-                                    .map((parameter: any) => (
-                                      <li className="mt-8 border-b pb-6">
+                                    .map((parameter: any, indx: number) => (
+                                      <li key={indx} className="mt-8 border-b pb-6">
                                         <div className="flex gap-4 items-center">
                                           <span className="font-bold">{parameter.name}</span>
                                           <span className="font-mono text-xs break-all">
@@ -106,8 +107,8 @@ export default function Config() {
                                 {operation.parameters &&
                                   operation.parameters
                                     .filter((parameter: any) => parameter.in === 'header')
-                                    .map((parameter: any) => (
-                                      <li className="mt-8 border-b pb-6">
+                                    .map((parameter: any, i: number) => (
+                                      <li key={i} className="mt-8 border-b pb-6">
                                         <div className="flex gap-4 items-center">
                                           <span className="font-bold">{parameter.name}</span>
                                           <span className="font-mono text-xs break-all">
@@ -135,8 +136,12 @@ export default function Config() {
                           defaultActiveId={operation.responseList[0].responseCode}
                           queryGroup="response-status"
                         >
-                          {operation.responseList.map((response: any) => (
-                            <Tabs.Panel id={response.responseCode} label={response.responseCode}>
+                          {operation.responseList.map((response: any, i: number) => (
+                            <Tabs.Panel
+                              key={i}
+                              id={response.responseCode}
+                              label={response.responseCode}
+                            >
                               <p>{response.description}</p>
                               {response?.content && response?.content['application/json'] && (
                                 <div className="mt-8">
@@ -152,7 +157,7 @@ export default function Config() {
                     </RefSubLayout.Section>
                   </div>
                 ))}
-              </>
+              </React.Fragment>
             ))}
           </div>
         </div>

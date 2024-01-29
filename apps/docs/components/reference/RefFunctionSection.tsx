@@ -149,7 +149,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                       return (
                         <Tabs.Panel
                           id={example.id}
-                          key={example.id}
+                          key={exampleIndex}
                           label={example.name}
                           className="flex flex-col gap-3"
                         >

@@ -82,7 +82,9 @@ To make sure that sessions expire after a period of inactivity, you can set a po
 
 You can also enforce only one active session per user per device or browser. When this is enabled, the session from the most recent sign in will remain active, while the rest are terminated. Enable this via the _Single session per user_ option in the [Auth settings](/dashboard/project/_/settings/auth).
 
-Sessions are not proactively destroyed when you change these settings, but rather the check is enforced whenever a session is refreshed next. Otherwise sessions are progressively cleaned up 24 hours after they expire, which prevents you from causing a high load on your database by accident and allows you some freedom to undo changes without adversely affecting all users.
+Sessions are not proactively destroyed when you change these settings, but rather the check is enforced whenever a session is refreshed next. This can confuse developers because the actual druation of a session is the configured timeout plus the JWT expiration time. For single session per user, the effect will only be noticed at intervals of the JWT expiration time. Please make sure you adjust this setting depending on your needs. We do not recommend going below 5 minutes for the JWT expiration time.
+
+Otherwise sessions are progressively deleted from the database 24 hours after they expire, which prevents you from causing a high load on your project by accident and allows you some freedom to undo changes without adversely affecting all users.
 
 ## Frequently asked questions
 

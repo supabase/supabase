@@ -46,7 +46,11 @@ PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 >
 <TabPanel id="js" label="JavaScript">
 
-Create a new `hooks.server.js` file in the root of your project and populate with the following:
+Create a new `hooks.server.js` file in the root of your project and populate with the following to retrieve the user session.
+
+The session information from `getSession` is supplied to the Supabase client so it can retrieve the auth token. This is safe, since the auth token signature will be revalidated on the Auth server. But you shouldn't trust the unsigned data that is stored alongside the auth token:
+
+<GetSessionWarning />
 
 ```js src/hooks.server.js
 // src/hooks.server.js

@@ -36,13 +36,7 @@ const ActionBar = ({
 
   return (
     <div className="flex w-full justify-end space-x-3 border-t border-default px-3 py-4">
-      <Button
-        size="small"
-        type="default"
-        htmlType="button"
-        onClick={closePanel}
-        disabled={isRunning || loading}
-      >
+      <Button type="default" htmlType="button" onClick={closePanel} disabled={isRunning || loading}>
         {backButtonLabel}
       </Button>
 
@@ -51,7 +45,6 @@ const ActionBar = ({
       {applyFunction !== undefined ? (
         // Old solution, necessary when loading is handled by this component itself
         <Button
-          size="small"
           onClick={onSelectApply}
           disabled={disableApply || isRunning || loading}
           loading={isRunning || loading}
@@ -62,7 +55,6 @@ const ActionBar = ({
         // New solution, when using the Form component, loading is handled by the Form itself
         // Does not require applyFunction() callback
         <Button
-          size="small"
           disabled={loading || disableApply}
           loading={loading}
           htmlType="submit"

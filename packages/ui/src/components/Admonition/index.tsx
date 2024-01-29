@@ -100,7 +100,9 @@ export const Admonition = ({
           )}
         </>
       ) : (
-        <div className="text mt [&_p]:mb-1.5 [&_p]:mt-0 mt-0.5 [&_p]:last:mb-0">{children}</div>
+        <div className="text mt [&_p]:mb-1.5 [&_p]:mt-0 mt-0.5 [&_p:last-child]:mb-0">
+          {children}
+        </div>
       )}
     </Alert>
   )
