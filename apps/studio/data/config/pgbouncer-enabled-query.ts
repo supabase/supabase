@@ -1,23 +1,26 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
 import { configKeys } from './keys'
 import { ResponseError } from 'types'
+import { get } from 'lib/common/fetch'
+import { API_URL, BASE_PATH } from 'lib/constants'
 
 type PgBouncerVariables = {
   projectRef: string
   dbHost: string
 }
 
-export async function getPgBouncerStatus({ dbHost }: PgBouncerVariables, signal?: AbortSignal) {
+export async function getPgBouncerStatus(
+  { projectRef, dbHost }: PgBouncerVariables,
+  signal?: AbortSignal
+) {
   if (!dbHost) {
     throw new Error('dbHost is required')
   }
 
-  const response = await fetch(`http://${dbHost}:6543`, {
+  const response = await get(`${BASE_PATH}/api/database/${projectRef}/pg-bouncer?host=${dbHost}`, {
     signal,
   })
 
-  console.log(response)
   return !!response
 }
 
