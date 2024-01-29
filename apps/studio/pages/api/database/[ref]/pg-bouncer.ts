@@ -20,12 +20,14 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
 
   try {
     const url = `http://${host}:6543`
-    const response = await fetch(url)
-    console.log('response', response)
+    await fetch(url)
   } catch (error) {
-    console.log('error', error)
-    return res.status(200).json(false)
+    // the response is text which make fetch fail because it's trying to parse it as JSON. But if there's a response,
+    // it means the pgBouncer is still active
+    if ((error as any).cause.data) {
+      return res.status(200).json(true)
+    }
   }
 
-  return res.status(200).json(true)
+  return res.status(200).json(false)
 }

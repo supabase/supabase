@@ -9,6 +9,7 @@ type PgBouncerVariables = {
   dbHost: string
 }
 
+// This API call describes whether PgBouncer is still present on the instance. Eventually PgBouncer will be removed.
 export async function getPgBouncerStatus(
   { projectRef, dbHost }: PgBouncerVariables,
   signal?: AbortSignal
