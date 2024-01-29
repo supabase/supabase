@@ -615,6 +615,10 @@ export const auth = {
       items: [
         { name: 'Overview', url: '/guides/auth/server-side/overview' },
         {
+          name: 'Next.js guide',
+          url: '/guides/auth/server-side/nextjs',
+        },
+        {
           name: 'Creating a client',
           url: '/guides/auth/server-side/creating-a-client',
         },
@@ -1093,7 +1097,7 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/regional-invocation',
         },
         {
-          name: 'Deploying with GitHub Actions',
+          name: 'Deploying with CI / CD pipelines',
           url: '/guides/functions/cicd-workflow',
         },
       ],

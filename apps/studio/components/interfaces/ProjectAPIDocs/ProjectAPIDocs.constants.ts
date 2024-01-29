@@ -745,8 +745,8 @@ let { data: ${resourceId}, error } = await supabase
   .neq('column', 'Not equal to')
 
   // Arrays
-  .cs('array_column', ['array', 'contains'])
-  .cd('array_column', ['contained', 'by'])
+  .contains('array_column', ['array', 'contains'])
+  .containedBy('array_column', ['contained', 'by'])
           `,
         },
       ]

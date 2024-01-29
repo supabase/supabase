@@ -19,7 +19,7 @@ const NavigationMenuHome = () => {
                   {section.map((link, i) => {
                     if (!link.href) {
                       return (
-                        <div
+                        <h2
                           key={link.label}
                           className={cn(
                             'font-mono uppercase text-xs text-foreground-lighter',
@@ -27,7 +27,7 @@ const NavigationMenuHome = () => {
                           )}
                         >
                           {link.label}
-                        </div>
+                        </h2>
                       )
                     } else {
                       return (

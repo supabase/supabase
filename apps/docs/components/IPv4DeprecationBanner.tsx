@@ -5,7 +5,11 @@ import { Button, IconExternalLink, cn } from 'ui'
 
 export const IPv4DeprecationBanner = memo(() => {
   return (
-    <div className="flex items-center justify-center gap-x-4 bg-surface-100 p-2 transition text-foreground box-border border-b border-default">
+    <div
+      role="region"
+      aria-label="Deprecation notice"
+      className="flex items-center justify-center gap-x-4 bg-surface-100 p-2 transition text-foreground box-border border-b border-default"
+    >
       <p className="text-sm">
         Prepare for the PgBouncer and IPv4 deprecations on 26th January 2024{' '}
         <Link

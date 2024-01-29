@@ -38,7 +38,6 @@ export const SelectionDetailedRow = ({
         {valueRender ?? value}
       </span>
       <CopyButton
-        bounceIconOnCopy
         text={value}
         className="group-hover:opacity-100 opacity-0 my-auto transition col-span-2  h-4 w-4 px-0 py-0"
         type="text"

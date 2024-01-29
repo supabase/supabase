@@ -84,7 +84,11 @@ const CommandMenu = () => {
   }
 
   const commandListMaxHeight =
-    currentPage === COMMAND_ROUTES.DOCS_SEARCH ? 'min(600px, 50vh)' : '300px'
+    currentPage === COMMAND_ROUTES.DOCS_SEARCH ||
+    currentPage === COMMAND_ROUTES.AI ||
+    currentPage === COMMAND_ROUTES.GENERATE_SQL
+      ? 'min(600px, 50vh)'
+      : '300px'
 
   return (
     <>
@@ -113,7 +117,12 @@ const CommandMenu = () => {
         <CommandList
           style={{
             maxHeight: commandListMaxHeight,
-            height: currentPage === COMMAND_ROUTES.DOCS_SEARCH ? commandListMaxHeight : 'auto',
+            height:
+              currentPage === COMMAND_ROUTES.DOCS_SEARCH ||
+              currentPage === COMMAND_ROUTES.AI ||
+              currentPage === COMMAND_ROUTES.GENERATE_SQL
+                ? commandListMaxHeight
+                : 'auto',
           }}
           className="my-2"
         >

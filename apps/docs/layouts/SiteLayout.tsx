@@ -283,7 +283,8 @@ const NavContainer = memo(function NavContainer() {
   const mobileMenuOpen = useMenuMobileOpen()
 
   return (
-    <div
+    <nav
+      aria-labelledby="main-nav-title"
       className={[
         // 'hidden',
         'absolute lg:relative',
@@ -307,6 +308,9 @@ const NavContainer = memo(function NavContainer() {
           'flex flex-col',
         ].join(' ')}
       >
+        <h1 id="main-nav-title" className="sr-only">
+          Main menu
+        </h1>
         <div className="top-0 sticky z-10">
           <div>
             <div>
@@ -338,7 +342,7 @@ const NavContainer = memo(function NavContainer() {
           <NavigationMenu />
         </div>
       </div>
-    </div>
+    </nav>
   )
 })
 

@@ -14,6 +14,7 @@ import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconExternalLink, Radio, SidePanel } from 'ui'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { AddonVariantId } from 'data/subscriptions/types'
+import { formatCurrency } from 'lib/helpers'
 
 const IPv4SidePanel = () => {
   const { ui } = useStore()
@@ -132,7 +133,7 @@ const IPv4SidePanel = () => {
           <h4>IPv4 address</h4>
           <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
             <Link
-              href="https://github.com/orgs/supabase/discussions/17817"
+              href="https://supabase.com/docs/guides/platform/ipv4-address"
               target="_blank"
               rel="noreferrer"
             >
@@ -219,7 +220,7 @@ const IPv4SidePanel = () => {
                         Allow direct database connections via IPv4 address
                       </p>
                       <div className="flex items-center space-x-1 mt-2">
-                        <p className="text-foreground text-sm">${option.price}</p>
+                        <p className="text-foreground text-sm">{formatCurrency(option.price)}</p>
                         <p className="text-foreground-light translate-y-[1px]"> / month</p>
                       </div>
                     </div>
@@ -238,11 +239,18 @@ const IPv4SidePanel = () => {
                   the future.
                 </p>
               ) : (
-                <p className="text-sm text-foreground-light">
-                  Upon clicking confirm, the amount of{' '}
-                  <span className="text-foreground">${selectedIPv4?.price.toLocaleString()}</span>{' '}
-                  will be added to your monthly invoice.
-                </p>
+                <>
+                  <Alert withIcon variant="info" title="Potential downtime">
+                    There might be some downtime when enabling the add-on since some DNS clients
+                    might have cached the old DNS entry. Generally, this should be less than a
+                    minute.
+                  </Alert>
+                  <p className="text-sm text-foreground-light">
+                    Upon clicking confirm, the amount of{' '}
+                    <span className="text-foreground">{formatCurrency(selectedIPv4?.price)}</span>{' '}
+                    will be added to your monthly invoice.
+                  </p>
+                </>
               )}
             </>
           )}

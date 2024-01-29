@@ -196,6 +196,13 @@ export {
   TabsTrigger as TabsTrigger_Shadcn_,
 } from './src/components/shadcn/ui/tabs/tabs'
 
+export {
+  TooltipProvider as TooltipProvider_Shadcn_,
+  Tooltip as Tooltip_Shadcn_,
+  TooltipTrigger as TooltipTrigger_Shadcn_,
+  TooltipContent as TooltipContent_Shadcn_,
+} from './src/components/shadcn/ui/tooltip'
+
 export { ScrollArea, ScrollBar } from './src/components/shadcn/ui/scroll-area'
 
 export { Separator } from './src/components/shadcn/ui/separator'
