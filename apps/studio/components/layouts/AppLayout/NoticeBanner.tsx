@@ -1,6 +1,10 @@
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
+import { useQuery } from '@tanstack/react-query'
+import { useRouter } from 'next/router'
+
+import { useParams } from 'common'
 import { useAppBannerContext } from 'components/interfaces/App/AppBannerWrapperContext'
 import { useProfile } from 'lib/profile'
-import { useRouter } from 'next/router'
 import { Button, IconExternalLink } from 'ui'
 
 // [Joshen] For this notice specifically, just FYI
@@ -9,12 +13,65 @@ import { Button, IconExternalLink } from 'ui'
 
 export const NoticeBanner = () => {
   const router = useRouter()
-  const { isLoading } = useProfile()
+  const { isLoading: isLoadingProfile } = useProfile()
 
   const appBannerContext = useAppBannerContext()
   const { acknowledged, onUpdateAcknowledged } = appBannerContext
 
-  if (isLoading || router.pathname.includes('sign-in') || acknowledged) return null
+  const supabase = useSupabaseClient()
+  const { ref: projectRef } = useParams()
+
+  // [Alaister]: using inline queries here since this is temporary
+  const { data: pgbouncerEnabled, isLoading: isLoadingPgbouncerEnabled } = useQuery(
+    ['projects', projectRef, 'pgbouncer-enabled'],
+    async ({ signal }) => {
+      let query = supabase
+        .from('active_pgbouncer_projects')
+        .select('*')
+        .eq('project_ref', projectRef)
+        .limit(1)
+
+      if (signal) {
+        query = query.abortSignal(signal)
+      }
+
+      const result = await query.maybeSingle()
+
+      return Boolean(result.data)
+    },
+    { enabled: Boolean(projectRef) }
+  )
+
+  const { data: vercelWithoutSupavisorEnabled, isLoading: isLoadingVercelWithoutSupavisorEnabled } =
+    useQuery(
+      ['projects', projectRef, 'vercel-without-supavisor-enabled'],
+      async ({ signal }) => {
+        let query = supabase
+          .from('vercel_project_connections_without_supavisor')
+          .select('*')
+          .eq('project_ref', projectRef)
+          .limit(1)
+
+        if (signal) {
+          query = query.abortSignal(signal)
+        }
+
+        const result = await query.maybeSingle()
+
+        return Boolean(result.data)
+      },
+      { enabled: Boolean(projectRef) }
+    )
+
+  if (
+    isLoadingProfile ||
+    isLoadingPgbouncerEnabled ||
+    isLoadingVercelWithoutSupavisorEnabled ||
+    router.pathname.includes('sign-in') ||
+    acknowledged
+  ) {
+    return null
+  }
 
   return (
     <div
@@ -22,12 +79,20 @@ export const NoticeBanner = () => {
       style={{ height: '44px' }}
     >
       <p className="text-sm">
-        Prepare for the PgBouncer and IPv4 deprecations on 26th January 2024
+        {pgbouncerEnabled
+          ? 'Our logs on 26th Jan show that you have accessed PgBouncer. Please migrate now. You can ignore this warning if you have already migrated.'
+          : vercelWithoutSupavisorEnabled
+          ? "To prepare for the IPv4 migration, please redeploy your Vercel application to detect the updated environment variables if it hasn't been deployed since 27th January."
+          : 'We are migrating our infrastructure from IPv4 to IPv6. Please migrate now. You can ignore this warning if you have already migrated.'}
       </p>
       <div className="flex items-center gap-x-1">
         <Button asChild type="link" iconRight={<IconExternalLink />}>
           <a
-            href="https://github.com/orgs/supabase/discussions/17817"
+            href={
+              vercelWithoutSupavisorEnabled
+                ? 'https://supabase.com/partners/integrations/vercel'
+                : 'https://github.com/orgs/supabase/discussions/17817'
+            }
             target="_blank"
             rel="noreferrer"
           >
