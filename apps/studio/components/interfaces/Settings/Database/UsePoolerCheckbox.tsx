@@ -40,7 +40,7 @@ export const UsePoolerCheckbox = ({
   const { data, isLoading, isSuccess } = usePoolingConfigurationQuery({ projectRef })
   const { data: settings, isSuccess: isSuccessSettings } = useProjectSettingsQuery({ projectRef })
 
-  const resolvesToIpV6 = !data?.supavisor_enabled && settings?.project.db_ip_addr_config === 'ipv6'
+  const resolvesToIpV6 = settings?.project.db_ip_addr_config === 'ipv6'
 
   return (
     <>
