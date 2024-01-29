@@ -30,51 +30,40 @@ export const NoticeBanner = () => {
   const { ref: projectRef } = useParams()
 
   // [Alaister]: using inline queries here since this is temporary
-  const { data: pgbouncerEnabled, isLoading: isLoadingPgbouncerEnabled } = useQuery(
+  const { data, isLoading: isLoadingIpv6Enabled } = useQuery(
     ['projects', projectRef, 'pgbouncer-enabled'],
     async ({ signal }) => {
-      let query = supabase
-        .from('active_pgbouncer_projects')
-        .select('*')
-        .eq('project_ref', projectRef)
-        .limit(1)
+      let query = supabase.rpc('ipv6_active_status', { project_ref: projectRef }).returns<
+        {
+          pgbouncer_active: boolean
+          vercel_active: boolean
+        }[]
+      >()
 
       if (signal) {
         query = query.abortSignal(signal)
       }
 
-      const result = await query.maybeSingle()
+      const result = await query
 
-      return Boolean(result.data)
+      if (result.data === null) {
+        return {
+          pgbouncer_active: false,
+          vercel_active: false,
+        }
+      }
+
+      return result.data[0]
     },
     { enabled: Boolean(projectRef) }
   )
 
-  const { data: vercelWithoutSupavisorEnabled, isLoading: isLoadingVercelWithoutSupavisorEnabled } =
-    useQuery(
-      ['projects', projectRef, 'vercel-without-supavisor-enabled'],
-      async ({ signal }) => {
-        let query = supabase
-          .from('vercel_project_connections_without_supavisor')
-          .select('*')
-          .eq('project_ref', projectRef)
-          .limit(1)
-
-        if (signal) {
-          query = query.abortSignal(signal)
-        }
-
-        const result = await query.maybeSingle()
-
-        return Boolean(result.data)
-      },
-      { enabled: Boolean(projectRef) }
-    )
+  const pgbouncerEnabled = data?.pgbouncer_active ?? false
+  const vercelWithoutSupavisorEnabled = data?.vercel_active ?? false
 
   if (
     isLoadingProfile ||
-    isLoadingPgbouncerEnabled ||
-    isLoadingVercelWithoutSupavisorEnabled ||
+    isLoadingIpv6Enabled ||
     router.pathname.includes('sign-in') ||
     allAcknowledged
   ) {
