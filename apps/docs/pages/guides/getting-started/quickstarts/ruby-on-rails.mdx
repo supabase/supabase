@@ -36,6 +36,8 @@ export const meta = {
 
     When your project is up and running, navigate to the [database settings](https://supabase.com/dashboard/project/_/settings/database) to find the URI connection string.
 
+    In this quickstart, we are going to connect via the connection pooler. Make sure to select `Session mode`! If your network supports IPv6, you can connect to the database directly without using the connection pooler.
+
     Rails ships with a Postgres adapter included, you can simply configure it via the environment variables. You can find the database URL in your [Supabase Dashboard](/dashboard/project/_/settings/database).
 
     </StepHikeCompact.Details>
@@ -43,7 +45,7 @@ export const meta = {
     <StepHikeCompact.Code>
 
     ```bash Terminal
-    export DATABASE_URL=postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:6543/postgres
+    export DATABASE_URL=postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:5432/postgres
     ```
 
     </StepHikeCompact.Code>
