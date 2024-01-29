@@ -120,14 +120,16 @@ const IPv4SidePanel = () => {
       onCancel={onClose}
       onConfirm={onConfirm}
       loading={isLoading || isSubmitting}
-      disabled={isFreePlan || isLoading || !hasChanges || isSubmitting || !canUpdateIPv4}
+      disabled={true}
+      tooltip="Temporarily disabled while we are migrating to IPv6, please check back later."
+      /*disabled={isFreePlan || isLoading || !hasChanges || isSubmitting || !canUpdateIPv4}
       tooltip={
         isFreePlan
           ? 'Unable to enable IPv4 on a free plan'
           : !canUpdateIPv4
           ? 'You do not have permission to update IPv4'
           : undefined
-      }
+      }*/
       header={
         <div className="flex items-center justify-between">
           <h4>IPv4 address</h4>
