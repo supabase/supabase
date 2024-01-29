@@ -121,7 +121,11 @@ When asked "Do you want to tweak these settings before proceeding?" select `y` a
 
 ### Set the connection string as secret
 
-`fly secrets set DATABASE_URL=$DATABASE_URL`
+Use the fly CLI to set the Supabase database connection URI from above as a sevret which is exposed as an environment variable to the Rails app.
+
+```bash Terminal
+fly secrets set DATABASE_URL=$DATABASE_URL
+```
 
 ### Deploy the app
 
