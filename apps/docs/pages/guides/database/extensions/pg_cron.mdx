@@ -147,6 +147,24 @@ Unschedules a job called `'nightly-vacuum'`
 select cron.unschedule('nightly-vacuum');
 ```
 
+### Viewing previously ran jobs
+
+View the last ten jobs that have ran
+
+```sql
+select
+  *
+from cron.job_run_details
+order by start_time desc
+limit 10;
+```
+
+<Admonition type="note">
+
+The records in cron.job_run_details are not cleaned automatically which will take up disk space in your datbabase.
+
+</Admonition>
+
 ## Resources
 
 - [pg_cron GitHub Repository](https://github.com/citusdata/pg_cron)

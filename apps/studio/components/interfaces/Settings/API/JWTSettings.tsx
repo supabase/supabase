@@ -232,7 +232,8 @@ const JWTSettings = () => {
               Generating a new JWT secret will invalidate <u className="text-foreground">all</u> of
               your API keys, including your <code className="text-xs">service_role</code> and{' '}
               <code className="text-xs">anon</code> keys. Your project will also be restarted during
-              this process, which will terminate any existing connections.
+              this process, which will terminate any existing connections. You may receive API
+              errors for up to 2 minutes while the new secret is deployed.
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
           <p className="text-foreground text-sm">
