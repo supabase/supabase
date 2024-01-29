@@ -21,7 +21,9 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const url = `http://${host}:6543`
     const response = await fetch(url)
-  } catch (e) {
+    console.log('response', response)
+  } catch (error) {
+    console.log('error', error)
     return res.status(200).json(false)
   }
 
