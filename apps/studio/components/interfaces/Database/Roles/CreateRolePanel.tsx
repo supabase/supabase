@@ -87,7 +87,7 @@ const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
           <FormActions
             form={formId}
             isSubmitting={isCreating}
-            hasChanges={undefined}
+            hasChanges={form.formState.isDirty ? form.formState.isDirty : undefined}
             handleReset={handleClose}
           />
         </div>
