@@ -362,7 +362,7 @@ Connection pooler logs are found [here](https://supabase.com/dashboard/project/_
 - Subscribe error: \{:error, :worker_not_found}
   This log event is emitted when the client tries to connect to the database, but Supavisor does not have the necessary information to route the connection. Try reconnecting to the database as it can take some time for the project information to propagate to Supavisor.
 
-- Subscribe error: \{:error, {:badrpc, {:error, {:erpc, :timeout}}}}
+- Subscribe error: \{:error, \{:badrpc, \{:error, \{:erpc, :timeout}}}}
   This is a timeout error when the communication between different Supavisor nodes takes longer than expected. Try reconnecting to the database.
 
 - Terminating with reason :client_termination when state was :busy
