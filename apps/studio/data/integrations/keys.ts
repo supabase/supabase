@@ -21,16 +21,13 @@ export const integrationKeys = {
     repo_name,
     branch_name,
   ],
-  githubBranchesList: (
-    organization_integration_id: string | undefined,
-    repo_owner: string,
-    repo_name: string
-  ) => ['organizations', organization_integration_id, 'branches', repo_owner, repo_name],
-  githubPullRequestsList: (
-    organization_integration_id: string | undefined,
-    repo_owner: string,
-    repo_name: string
-  ) => ['organizations', organization_integration_id, 'pull-requests', repo_owner, repo_name],
-  githubConnectionsList: (organization_integration_id: string | undefined) =>
-    ['organizations', organization_integration_id, 'github-connections'] as const,
+  githubRepositoriesList: () => ['github-repositories'] as const,
+  githubBranchesList: (connectionId: number | undefined) => ['github-branches', connectionId],
+  githubPullRequestsList: (connectionId: number | undefined, prNumbers: number[] | undefined) => [
+    'github-pull-requests',
+    connectionId,
+    { prNumbers },
+  ],
+  githubConnectionsList: (organizationId: number | undefined) =>
+    ['organizations', organizationId, 'github-connections'] as const,
 }

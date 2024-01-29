@@ -33,7 +33,7 @@ import * as z from 'zod'
 import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useGithubConnectionUpdateMutation } from 'data/integrations/github-connection-update-mutate'
-import { useGithubBranchesQuery } from 'data/integrations/integrations-github-branches-query'
+import { useGitHubBranchesQuery } from 'data/integrations/github-branches-query'
 import { Integration, IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useSelectedProject, useStore } from 'hooks'
 
@@ -55,10 +55,11 @@ const GitHubIntegrationConnectionForm = ({
 
   const [repoOwner, repoName] = githubProjectIntegration?.metadata.name.split('/') ?? []
 
-  const { data: githubBranches, isLoading: isLoadingBranches } = useGithubBranchesQuery({
-    organizationIntegrationId: integration?.id,
-    repoOwner,
-    repoName,
+  const { data: githubBranches, isLoading: isLoadingBranches } = useGitHubBranchesQuery({
+    connectionId: Number(),
+    // organizationIntegrationId: integration?.id,
+    // repoOwner,
+    // repoName,
   })
 
   const { mutate: updateBranch, isLoading: isUpdatingProdBranch } = useBranchUpdateMutation({

@@ -18,7 +18,7 @@ import {
 
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { Branch } from 'data/branches/branches-query'
-import { GitHubPullRequest } from 'data/integrations/integrations-github-pull-requests-query'
+import { GitHubPullRequest } from 'data/integrations/github-pull-requests-query'
 import { GitPullRequest } from 'lucide-react'
 
 interface BranchManagementSectionProps {
