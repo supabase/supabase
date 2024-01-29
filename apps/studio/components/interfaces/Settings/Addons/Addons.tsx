@@ -443,8 +443,8 @@ const Addons = () => {
                             ].join(' ')}
                           >
                             <span className="text-xs text-foreground">
-                              Temporarily disabled while we are migrating to IPv6, please check
-                              back later.
+                              Temporarily disabled while we are migrating to IPv6, please check back
+                              later.
                             </span>
                           </div>
                         </Tooltip.Content>
