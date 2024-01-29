@@ -17,7 +17,8 @@ export async function getPgBouncerStatus({ dbHost }: PgBouncerVariables, signal?
     signal,
   })
 
-  return response
+  console.log(response)
+  return !!response
 }
 
 export type PgBouncerStatusData = boolean
