@@ -332,11 +332,11 @@ const SidePanelEditor = ({
                 .filter((t: any) => t.id !== table.id)
                 .map((t: any) => `${t.schema}.${t.name}`)
             : !isAlreadyEnabled && enabled
-            ? // Toggle realtime on
-              [`${table.schema}.${table.name}`].concat(
-                publicationTables.map((t: any) => `${t.schema}.${t.name}`)
-              )
-            : null
+              ? // Toggle realtime on
+                [`${table.schema}.${table.name}`].concat(
+                  publicationTables.map((t: any) => `${t.schema}.${t.name}`)
+                )
+              : null
         if (realtimeTables === null) return
         await updatePublication({
           id,
