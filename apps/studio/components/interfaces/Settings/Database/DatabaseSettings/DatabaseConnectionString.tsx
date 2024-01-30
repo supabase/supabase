@@ -50,6 +50,7 @@ export const DatabaseConnectionString = () => {
     'transaction'
   )
   const [showUriSyntax, setShowUriSyntax] = useState(false)
+  const [showSQLAlchemy, setShowSQLAlchemy] = useState(false)
   const [selectedTab, setSelectedTab] = useState<
     'uri' | 'psql' | 'golang' | 'jdbc' | 'dotnet' | 'nodejs' | 'php' | 'python'
   >('uri')
@@ -273,6 +274,30 @@ export const DatabaseConnectionString = () => {
                 </div>
               )}
             </Panel.Content>
+            {selectedTab === 'python' && (
+              <Panel.Content className="!py-3 space-y-2">
+                <div
+                  className="flex items-center gap-x-2 transition cursor-pointer opacity-75 hover:opacity-100"
+                  onClick={() => setShowSQLAlchemy(!showSQLAlchemy)}
+                >
+                  <p className="text-xs text-foreground">Connecting to SQL Alchemy</p>
+                  <IconChevronDown
+                    strokeWidth={1.5}
+                    className={`transition ${showUriSyntax ? '-rotate-180' : ''}`}
+                  />
+                </div>
+                {showSQLAlchemy && (
+                  <div className="text-foreground-light">
+                    <p className="text-xs">
+                      Please use postgresql:// instead of postgres:// as your dialect when
+                      connecting via SQLAlchemy. For example:
+                      create_engine("postgresql+psycopg2://...")
+                    </p>
+                    <p className="text-sm font-mono tracking-tight text-foreground-lighter"></p>
+                  </div>
+                )}
+              </Panel.Content>
+            )}
           </>
         )}
       </Panel>
