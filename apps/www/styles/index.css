@@ -19,7 +19,8 @@
 
 @font-face {
   font-family: 'custom-font';
-  src: url(../../../packages/common/assets/fonts/CustomFont-Book.woff2) format('woff2'),
+  src:
+    url(../../../packages/common/assets/fonts/CustomFont-Book.woff2) format('woff2'),
     url(../../../packages/common/assets/fonts/CustomFont-Book.woff) format('woff');
   font-weight: 400;
   font-style: normal;
@@ -28,7 +29,8 @@
 
 @font-face {
   font-family: 'custom-font';
-  src: url(../../../packages/common/assets/fonts/CustomFont-Medium.woff2) format('woff2'),
+  src:
+    url(../../../packages/common/assets/fonts/CustomFont-Medium.woff2) format('woff2'),
     url(../../../packages/common/assets/fonts/CustomFont-Medium.woff) format('woff');
   font-weight: 500;
   font-style: normal;

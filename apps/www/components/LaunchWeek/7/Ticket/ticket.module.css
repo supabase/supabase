@@ -5,8 +5,11 @@
     rgba(255, 255, 255, 0) 103.29%
   );
   z-index: 10;
-  box-shadow: 0 1px 1px rgba(131, 6, 184, 0.08), 0 2px 2px rgba(128, 6, 184, 0.08),
-    inset 0 0.5px 0px 0.5px rgba(255, 255, 255, 0.1), inset 0 -3px 0 -2px rgba(255, 255, 255, 0.08),
+  box-shadow:
+    0 1px 1px rgba(131, 6, 184, 0.08),
+    0 2px 2px rgba(128, 6, 184, 0.08),
+    inset 0 0.5px 0px 0.5px rgba(255, 255, 255, 0.1),
+    inset 0 -3px 0 -2px rgba(255, 255, 255, 0.08),
     0px 4px 20px rgba(118, 7, 170, 0.1);
 }
 
@@ -136,7 +139,9 @@
 
 .gold-text {
   color: #f4cf72;
-  text-shadow: 0 0 1px rgba(0, 0, 0, 0.5), 0 0 4px rgba(0, 0, 0, 0.1);
+  text-shadow:
+    0 0 1px rgba(0, 0, 0, 0.5),
+    0 0 4px rgba(0, 0, 0, 0.1);
 }
 
 @media (min-width: 768px) {

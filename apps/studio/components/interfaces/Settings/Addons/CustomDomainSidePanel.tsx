@@ -139,8 +139,8 @@ const CustomDomainSidePanel = () => {
         isFreePlan
           ? 'Unable to enable custom domain on a free plan'
           : !canUpdateCustomDomain
-          ? 'You do not have permission to update custom domain'
-          : undefined
+            ? 'You do not have permission to update custom domain'
+            : undefined
       }
       header={
         <div className="flex items-center justify-between">

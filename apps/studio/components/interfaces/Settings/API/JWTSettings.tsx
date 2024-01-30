@@ -112,10 +112,10 @@ const JWTSettings = () => {
                   !canReadJWTSecret
                     ? 'You need additional permissions to view the JWT secret'
                     : isJwtSecretUpdateFailed
-                    ? 'JWT secret update failed'
-                    : isUpdatingJwtSecret
-                    ? 'Updating JWT secret...'
-                    : config?.jwt_secret || ''
+                      ? 'JWT secret update failed'
+                      : isUpdatingJwtSecret
+                        ? 'Updating JWT secret...'
+                        : config?.jwt_secret || ''
                 }
                 className="input-mono"
                 descriptionText={

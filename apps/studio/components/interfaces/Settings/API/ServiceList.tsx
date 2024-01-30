@@ -78,8 +78,8 @@ const ServiceList = () => {
   const endpoint = !showReadReplicasUI
     ? primaryEndpoint
     : isCustomDomainActive && state.selectedDatabaseId === projectRef
-    ? `https://${customDomainData.customDomain.hostname}`
-    : selectedDatabase?.restUrl
+      ? `https://${customDomainData.customDomain.hostname}`
+      : selectedDatabase?.restUrl
 
   return (
     <div>
