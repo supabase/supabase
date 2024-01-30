@@ -56,7 +56,9 @@ const FeaturePreviewModal = () => {
   // this modal can be triggered on other pages
   // Update local state when valtio state changes
   useEffect(() => {
-    setSelectedFeatureKey(snap.selectedFeaturePreview)
+    if (snap.selectedFeaturePreview !== '') {
+      setSelectedFeatureKey(snap.selectedFeaturePreview)
+    }
   }, [snap.selectedFeaturePreview])
 
   const { flags, onUpdateFlag } = featurePreviewContext
