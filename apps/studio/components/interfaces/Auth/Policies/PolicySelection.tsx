@@ -11,31 +11,25 @@ import {
 } from 'ui'
 
 import CardButton from 'components/ui/CardButton'
-import { FlaskConical, Info } from 'lucide-react'
-import Link from 'next/link'
+import { FlaskConical } from 'lucide-react'
 import { useAppStateSnapshot } from 'state/app-state'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 interface PolicySelectionProps {
   description: string
+  showAssistantPreview: boolean
   onViewTemplates: () => void
   onViewEditor: () => void
-  onSelectCancel?: () => void
+  onToggleFeaturePreviewModal?: () => void
 }
 
 const PolicySelection = ({
   description = '',
+  showAssistantPreview,
   onViewTemplates = noop,
   onViewEditor = noop,
-  onSelectCancel = noop,
+  onToggleFeaturePreviewModal,
 }: PolicySelectionProps) => {
   const snap = useAppStateSnapshot()
-
-  function toggleFeaturePreviewModal() {
-    snap.setSelectedFeaturePreview(LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT)
-    snap.setShowFeaturePreviewModal(!snap.showFeaturePreviewModal)
-    onSelectCancel()
-  }
 
   return (
     <Modal.Content className="space-y-4 py-4">
@@ -81,27 +75,29 @@ const PolicySelection = ({
         </div>
       </div>
 
-      <Alert_Shadcn_>
-        <FlaskConical />
-        <AlertTitle_Shadcn_>Try the new Supabase Assistant for RLS policies</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>
-          Create RLS policies for your tables with the help of AI
-        </AlertDescription_Shadcn_>
-        <div className="flex items-center gap-x-2 mt-3">
-          <Button type="default" onClick={toggleFeaturePreviewModal}>
-            Toggle feature preview
-          </Button>
-          <Button asChild type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
-            <a
-              href="https://supabase.com/blog/studio-introducing-assistant#introducing-the-supabase-assistant"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Learn more
-            </a>
-          </Button>
-        </div>
-      </Alert_Shadcn_>
+      {showAssistantPreview && onToggleFeaturePreviewModal !== undefined && (
+        <Alert_Shadcn_>
+          <FlaskConical />
+          <AlertTitle_Shadcn_>Try the new Supabase Assistant for RLS policies</AlertTitle_Shadcn_>
+          <AlertDescription_Shadcn_>
+            Create RLS policies for your tables with the help of AI
+          </AlertDescription_Shadcn_>
+          <div className="flex items-center gap-x-2 mt-3">
+            <Button type="default" onClick={onToggleFeaturePreviewModal}>
+              Toggle feature preview
+            </Button>
+            <Button asChild type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
+              <a
+                href="https://supabase.com/blog/studio-introducing-assistant#introducing-the-supabase-assistant"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Learn more
+              </a>
+            </Button>
+          </div>
+        </Alert_Shadcn_>
+      )}
     </Modal.Content>
   )
 }

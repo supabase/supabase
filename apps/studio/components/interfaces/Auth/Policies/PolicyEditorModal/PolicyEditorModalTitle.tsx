@@ -2,13 +2,17 @@ import { noop } from 'lodash'
 import { Button, IconChevronLeft, IconExternalLink } from 'ui'
 
 import { POLICY_MODAL_VIEWS } from 'components/interfaces/Auth/Policies'
+import { FlaskConical } from 'lucide-react'
+import { useAppStateSnapshot } from 'state/app-state'
 
 interface PolicyEditorModalTitleProps {
   view: string
   schema: string
   table: string
   isNewPolicy: boolean
+  showAssistantPreview: boolean
   onSelectBackFromTemplates: () => void
+  onToggleFeaturePreviewModal: () => void
 }
 
 const PolicyEditorModalTitle = ({
@@ -16,8 +20,12 @@ const PolicyEditorModalTitle = ({
   schema,
   table,
   isNewPolicy,
+  showAssistantPreview,
   onSelectBackFromTemplates = noop,
+  onToggleFeaturePreviewModal,
 }: PolicyEditorModalTitleProps) => {
+  const snap = useAppStateSnapshot()
+
   const getTitle = () => {
     if (view === POLICY_MODAL_VIEWS.EDITOR || view === POLICY_MODAL_VIEWS.SELECTION) {
       return `${isNewPolicy ? 'Adding new policy to' : 'Editing policy from'} ${schema}.${table}`
@@ -26,6 +34,7 @@ const PolicyEditorModalTitle = ({
       return `Reviewing policy to be ${isNewPolicy ? 'created' : 'updated'} on ${schema}.${table}`
     }
   }
+
   if (view === POLICY_MODAL_VIEWS.TEMPLATES) {
     return (
       <div>
@@ -46,16 +55,27 @@ const PolicyEditorModalTitle = ({
       <h4 className="truncate" title={getTitle()}>
         {getTitle()}
       </h4>
-      <Button asChild type="default" icon={<IconExternalLink size={14} />}>
-        <a
-          href="https://supabase.com/docs/learn/auth-deep-dive/auth-policies"
-          target="_blank"
-          rel="noreferrer"
-        >
-          {' '}
-          Documentation
-        </a>
-      </Button>
+      <div className="flex items-center gap-x-2">
+        {showAssistantPreview && view === POLICY_MODAL_VIEWS.EDITOR && (
+          <Button
+            type="default"
+            icon={<FlaskConical size={14} />}
+            onClick={onToggleFeaturePreviewModal}
+          >
+            Try Supabase Assistant
+          </Button>
+        )}
+        <Button asChild type="default" icon={<IconExternalLink size={14} />}>
+          <a
+            href="https://supabase.com/docs/learn/auth-deep-dive/auth-policies"
+            target="_blank"
+            rel="noreferrer"
+          >
+            {' '}
+            Documentation
+          </a>
+        </Button>
+      </div>
     </div>
   )
 }
