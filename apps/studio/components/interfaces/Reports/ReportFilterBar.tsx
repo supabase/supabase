@@ -121,7 +121,7 @@ const ReportFilterBar = ({
           key: productFilter.filterKey,
           compare: 'matches',
           value: productFilter.filterValue,
-        } as ReportFilterItem)
+        }) as ReportFilterItem
     )
     onRemoveFilters(toRemove)
     if (nextProductFilter) {

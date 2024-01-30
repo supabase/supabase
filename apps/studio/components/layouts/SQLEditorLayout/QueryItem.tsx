@@ -26,12 +26,17 @@ import {
   IconTrash,
   IconUnlock,
   Modal,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
 } from 'ui'
 
 import DownloadSnippetModal from 'components/interfaces/SQLEditor/DownloadSnippetModal'
 import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
 import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
+import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
+import CopyButton from 'components/ui/CopyButton'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useCheckPermissions, useSelectedProject, useStore } from 'hooks'
@@ -46,7 +51,7 @@ export interface QueryItemProps {
 
 const QueryItem = ({ tabInfo }: QueryItemProps) => {
   const { ref, id: activeId } = useParams()
-  const { id, name, description } = tabInfo || {}
+  const { id, name, description, content } = tabInfo || {}
   const isActive = id === activeId
   const activeItemRef = useRef<HTMLElement | null>(null)
 
@@ -61,24 +66,64 @@ const QueryItem = ({ tabInfo }: QueryItemProps) => {
   })
 
   return (
-    <div
-      key={id}
-      className={clsx(
-        'flex items-center justify-between rounded-md group',
-        isActive && 'text-foreground bg-surface-300 -active'
-      )}
-      ref={isActive ? (activeItemRef as React.RefObject<HTMLDivElement>) : null}
-    >
-      <Link href={`/project/${ref}/sql/${id}`} className="py-1 px-3 w-full overflow-hidden">
-        <p
-          title={description || name}
-          className="text-sm text-foreground-light group-hover:text-foreground transition overflow-hidden text-ellipsis"
+    <Tooltip_Shadcn_ delayDuration={100}>
+      <TooltipTrigger_Shadcn_ asChild>
+        <div
+          key={id}
+          className={clsx(
+            'flex items-center justify-between rounded-md group',
+            isActive ? 'bg-surface-300' : 'hover:bg-surface-200'
+          )}
+          ref={isActive ? (activeItemRef as React.RefObject<HTMLDivElement>) : null}
         >
-          {name}
-        </p>
-      </Link>
-      <div className="pr-1">{<QueryItemActions tabInfo={tabInfo} activeId={activeId} />}</div>
-    </div>
+          <Link href={`/project/${ref}/sql/${id}`} className="py-1 px-3 w-full overflow-hidden">
+            <p
+              title={description || name}
+              className={clsx(
+                isActive
+                  ? 'text-foreground'
+                  : 'text-foreground-light group-hover:text-foreground/80',
+                'text-sm transition overflow-hidden text-ellipsis'
+              )}
+            >
+              {name}
+            </p>
+          </Link>
+          <div className="pr-1">{<QueryItemActions tabInfo={tabInfo} activeId={activeId} />}</div>
+        </div>
+      </TooltipTrigger_Shadcn_>
+      {!isActive && (
+        <TooltipContent_Shadcn_
+          side="right"
+          align="start"
+          className="w-96 flex flex-col gap-y-2 py-3 -translate-y-[4px]"
+        >
+          <p className="text-xs">Query preview:</p>
+          <div className="bg-surface-300 py-2 px-3 rounded relative">
+            {content.sql.trim() ? (
+              <SimpleCodeBlock
+                showCopy={false}
+                className="sql"
+                parentClassName="!p-0 [&>div>span]:text-xs [&>div>span]:tracking-tighter"
+              >
+                {content.sql.replaceAll('\n', ' ').replaceAll(/\s+/g, ' ').slice(0, 43) +
+                  `${content.sql.length > 43 ? '...' : ''}`}
+              </SimpleCodeBlock>
+            ) : (
+              <p className="text-xs text-foreground-lighter">This query is empty</p>
+            )}
+            {content.sql.trim() && (
+              <CopyButton
+                iconOnly
+                type="default"
+                className="px-1 absolute top-1.5 right-1.5"
+                text={content.sql}
+              />
+            )}
+          </div>
+        </TooltipContent_Shadcn_>
+      )}
+    </Tooltip_Shadcn_>
   )
 }
 
@@ -225,7 +270,7 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
               <IconChevronDown size="tiny" strokeWidth={2} />
             </span>
           </DropdownMenuTrigger>
-          <DropdownMenuContent side="bottom" align="end">
+          <DropdownMenuContent side="bottom" align="end" className=" w-52 translate-x-[4px]">
             {isSnippetOwner && (
               <DropdownMenuItem onClick={onClickRename} className="space-x-2">
                 <IconEdit2 size="tiny" />
