@@ -334,17 +334,17 @@ A "connection pool" is a system (external to Postgres) which manages Postgres co
 When a client makes a request, the pooler "allocates" an available connection to the client. When the client transaction or session is completed the connection is returned to the pool and is free to be used by another client.
 
 <figure>
-    <Image
-        className="hidden dark:block"
-        alt="New migration files trigger migrations on the preview instance."
-        src="/docs/img/guides/database/connecting-to-postgres/how-connection-pooling-works.png"
-    />
-    <Image
-        className="dark:hidden"
-        alt="New migration files trigger migrations on the preview instance."
-        src="/docs/img/guides/database/connecting-to-postgres/how-connection-pooling-works--light.png"
-    />
-    <figcaption>How the connections change when the Supavisor pooler is used.</figcaption>
+  <Image
+    className="hidden dark:block"
+    alt="New migration files trigger migrations on the preview instance."
+    src="/docs/img/guides/database/connecting-to-postgres/how-connection-pooling-works.png"
+  />
+  <Image
+    className="dark:hidden"
+    alt="New migration files trigger migrations on the preview instance."
+    src="/docs/img/guides/database/connecting-to-postgres/how-connection-pooling-works--light.png"
+  />
+  <figcaption>How the connections change when the Supavisor pooler is used.</figcaption>
 </figure>
 
 There are 2 pool modes, each handling connections differently:
