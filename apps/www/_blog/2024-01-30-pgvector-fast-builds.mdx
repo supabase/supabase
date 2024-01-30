@@ -14,7 +14,7 @@ date: '2024-01-30'
 toc_depth: 3
 ---
 
-pgvector 0.6.0 was released today, with a significant improvement: parallel index builds for HNSW. Building an HNSW index is now up to 30x faster for unlogged tables.
+pgvector 0.6.0 was released today, with a significant improvement: parallel builds for HNSW indexes. Building an HNSW index is now up to 30x faster for unlogged tables.
 
 This release is a huge step forward for pgvector, making it easier to tune HNSW build parameters and increase search accuracy and performance.
 
@@ -26,7 +26,7 @@ We explored [how HNSW works](https://supabase.com/blog/increase-performance-pgve
 
 Prior to 0.6.0, pgvector only supported building indexes using a single thread - a big bottleneck for large datasets. For example, building an index for 1 million vectors of 1536 dimensions would take around 1 hour and 27 minutes (with `'m'=16, 'ef_construction'=200`).
 
-With parallel index builds you can build an index on 1 million vectors of 1536 dimensions in 9.5 minutes (with `'m'=16, 'ef_construction'=200`) - 9 times faster.
+With parallel index builds you can build an index for the same dataset in 9.5 minutes - 9 times faster:
 
 <div>
   <Img
@@ -154,7 +154,9 @@ One of the steps of index creation is the final scan and WAL writing. This is ge
 | 100             | 1h 06m 59s         | 2m 10s                        | 31x         |
 | 200             | 1h 27m 45s         | 3m 37s                        | 24x         |
 
-pgvector 0.6.0 was [just released](https://github.com/pgvector/pgvector/releases/tag/v0.6.0) and will soon be available for Supabase projects! Again, a special shout out to Andrew Kane and everyone else who [worked on parallel index builds](https://github.com/pgvector/pgvector/issues/409).
+## Getting started
+
+pgvector 0.6.0 was [just released](https://github.com/pgvector/pgvector/releases/tag/v0.6.0) and will be available on Supabase projects soon. Again, a special shout out to Andrew Kane and everyone else who [worked on parallel index builds](https://github.com/pgvector/pgvector/issues/409).
 
 ## More pgvector and AI resources
 
