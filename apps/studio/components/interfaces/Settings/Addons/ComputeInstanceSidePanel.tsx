@@ -199,8 +199,8 @@ const ComputeInstanceSidePanel = () => {
           isFreePlan
             ? 'Unable to update compute instance on a free plan'
             : !canUpdateCompute
-            ? 'You do not have permission to update compute instance'
-            : undefined
+              ? 'You do not have permission to update compute instance'
+              : undefined
         }
         header={
           <div className="flex items-center justify-between">

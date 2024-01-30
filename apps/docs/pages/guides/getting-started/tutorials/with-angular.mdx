@@ -230,7 +230,10 @@ export class AccountComponent implements OnInit {
     avatar_url: '',
   })
 
-  constructor(private readonly supabase: SupabaseService, private formBuilder: FormBuilder) {}
+  constructor(
+    private readonly supabase: SupabaseService,
+    private formBuilder: FormBuilder
+  ) {}
 
   async ngOnInit(): Promise<void> {
     await this.getProfile()
@@ -421,7 +424,10 @@ export class AvatarComponent {
 
   @Output() upload = new EventEmitter<string>()
 
-  constructor(private readonly supabase: SupabaseService, private readonly dom: DomSanitizer) {}
+  constructor(
+    private readonly supabase: SupabaseService,
+    private readonly dom: DomSanitizer
+  ) {}
 
   async downloadImage(path: string) {
     try {

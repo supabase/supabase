@@ -34,11 +34,13 @@ export const meta = {
 
     Go to [database.new](https://database.new) and create a new Supabase project. Save your database password securely.
 
-    When your project is up and running, navigate to the [database settings](https://supabase.com/dashboard/project/_/settings/database) to find the URI connection string.
+    When your project is up and running, navigate to the [database settings](https://supabase.com/dashboard/project/_/settings/database) to find the URI connection string. Make sure **Use connection pooling** is checked and **Session mode** is selected. Then copy the URI. Replace the password placeholder with your saved database password.
 
-    In this quickstart, we are going to connect via the connection pooler. Make sure to select `Session mode`! If your network supports IPv6, you can connect to the database directly without using the connection pooler.
+    <Admonition type="tip">
 
-    Rails ships with a Postgres adapter included, you can simply configure it via the environment variables. You can find the database URL in your [Supabase Dashboard](/dashboard/project/_/settings/database).
+    If your network supports IPv6 connections, you can also use the direct connection string. Uncheck **Use connection pooling** and copy the new URI.
+
+    </Admonition>
 
     </StepHikeCompact.Details>
 

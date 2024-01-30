@@ -21,13 +21,13 @@ Example:
 %env PSQL_COMMAND=PGPASSWORD=RgaMDfTS_password_FTPa7 psql -h dpg-a_server_in.oregon-postgres.provider.com -U my_db_pxl0_user my_db_pxl0
 ```
 
-## Retrieve your Supabase host [#retrieve-supabase-host]
+## Retrieve your Supabase connection string [#retrieve-supabase-connection-string]
 
 1. If you're new to Supabase, [create a project](https://supabase.com/dashboard).
    Make a note of your password, you will need this later. If you forget it, you can [reset it here](https://supabase.com/dashboard/project/_/settings/database).
 
 1. Go to the [Database settings](https://supabase.com/dashboard/project/_/settings/database) for your project in the Supabase Dashboard.
-1. Under **Connection Info**, note your Host (`$SUPABASE_HOST`).
+1. Under **Connection string**, make sure `Use connection pooling` is enabled. Copy the URI and replace the password placeholder with your database password.
 
 ![Finding Supabase host address](/docs/img/guides/resources/migrating-to-supabase/postgres/database-settings-host.png)
 
@@ -66,7 +66,7 @@ pg_dump --clean --if-exists --quote-all-identifiers \
 Use `psql` to import the Postgres database file to your Supabase project.
 
 ```bash
-psql -h $SUPA_URL -U postgres --file dump.sql -p 6543 -d postgres
+psql -d "$YOUR_CONNECTION_STRING" -f dump.sql
 ```
 
 ### Additional options

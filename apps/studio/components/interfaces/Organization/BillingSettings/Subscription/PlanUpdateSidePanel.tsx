@@ -408,10 +408,10 @@ const PlanUpdateSidePanel = () => {
                             {item.unit_price_desc
                               ? item.unit_price_desc
                               : item.unit_price === 0
-                              ? 'FREE'
-                              : item.unit_price
-                              ? `${formatCurrency(item.unit_price)}`
-                              : ''}
+                                ? 'FREE'
+                                : item.unit_price
+                                  ? `${formatCurrency(item.unit_price)}`
+                                  : ''}
                           </Table.td>
                           <Table.td className="text-right">
                             {formatCurrency(item.total_price)}

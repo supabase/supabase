@@ -99,19 +99,19 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
     selectedProjectFromUrl !== undefined
       ? selectedProjectFromUrl.ref
       : projects.length > 0
-      ? projects[0].ref
-      : 'no-project'
+        ? projects[0].ref
+        : 'no-project'
   )
 
   const selectedOrganizationSlug =
     selectedOrganizationFromUrl !== undefined
       ? selectedOrganizationFromUrl.slug
       : selectedProjectRef !== 'no-project'
-      ? organizations?.find((org) => {
-          const project = projects.find((project) => project.ref === selectedProjectRef)
-          return org.id === project?.organization_id
-        })?.slug
-      : organizations?.[0]?.slug
+        ? organizations?.find((org) => {
+            const project = projects.find((project) => project.ref === selectedProjectRef)
+            return org.id === project?.organization_id
+          })?.slug
+        : organizations?.[0]?.slug
 
   const { data: subscription, isLoading: isLoadingSubscription } = useOrgSubscriptionQuery({
     orgSlug: selectedOrganizationSlug,

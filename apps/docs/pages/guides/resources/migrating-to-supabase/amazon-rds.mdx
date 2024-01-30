@@ -58,10 +58,12 @@ Alternatively, you can use [pgloader](https://github.com/dimitri/pgloader), a fl
     Install pgloader.
     Create a configuration file (e.g., config.load).
 
+    For your destination, use your Supabase connection string with `Use connection pooling` enabled, and the mode set to `Session`. You can get the string from your [`Database Settings`](https://supabase.com/dashboard/project/_/settings/general).
+
 ```sql
 load database
   from mysql://user:password@host/source_db
-  into postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:6543/postgres
+  into postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:5432/postgres
 alter schema 'public' owner to 'postgres';
 set wal_buffers = '64MB', max_wal_senders = 0, statement_timeout = 0, work_mem to '2GB';
 ```
