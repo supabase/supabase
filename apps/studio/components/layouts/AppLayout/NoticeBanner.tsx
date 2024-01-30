@@ -60,8 +60,9 @@ export const NoticeBanner = () => {
 
   // [Joshen] Pgbouncer list and vercel list are mutually exclusive
   const allAcknowledged =
-    (ipv6BannerAcknowledged && pgbouncerBannerAcknowledged) ||
-    (ipv6BannerAcknowledged && vercelBannerAcknowledged)
+    (!pgbouncerEnabled && !vercelWithoutSupavisorEnabled && ipv6BannerAcknowledged) ||
+    (ipv6BannerAcknowledged && pgbouncerEnabled && pgbouncerBannerAcknowledged) ||
+    (ipv6BannerAcknowledged && vercelWithoutSupavisorEnabled && vercelBannerAcknowledged)
 
   if (
     isLoadingProfile ||
