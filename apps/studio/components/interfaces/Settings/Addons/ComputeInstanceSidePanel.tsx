@@ -33,6 +33,7 @@ import {
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { AddonVariantId } from 'data/subscriptions/types'
+import { formatCurrency } from 'lib/helpers'
 
 const COMPUTE_CATEGORY_OPTIONS: {
   id: 'micro' | 'optimized'
@@ -198,8 +199,8 @@ const ComputeInstanceSidePanel = () => {
           isFreePlan
             ? 'Unable to update compute instance on a free plan'
             : !canUpdateCompute
-            ? 'You do not have permission to update compute instance'
-            : undefined
+              ? 'You do not have permission to update compute instance'
+              : undefined
         }
         header={
           <div className="flex items-center justify-between">
@@ -329,7 +330,7 @@ const ComputeInstanceSidePanel = () => {
                           <div className="flex justify-between items-center mt-2">
                             <div className="flex items-center space-x-1">
                               <span className="text-foreground text-sm">
-                                ${option.price.toLocaleString()}
+                                {formatCurrency(option.price)}
                               </span>
                               <span className="text-foreground-light translate-y-[1px]">
                                 {' '}

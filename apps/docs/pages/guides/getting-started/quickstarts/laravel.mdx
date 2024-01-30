@@ -54,6 +54,8 @@ export const meta = {
 
     When your project is up and running, navigate to the [database settings](https://supabase.com/dashboard/project/_/settings/database) to find the URI connection string.
 
+    In this quickstart, we are going to connect via the connection pooler. Make sure to select `Session mode`! If your network supports IPv6, you can connect to the database directly without using the connection pooler.
+
     Laravel ships with a Postgres adapter out of the box, you can simply configure it via the environment variables. You can find the database URL in your [Supabase Dashboard](/dashboard/project/_/settings/database).
 
     </StepHikeCompact.Details>
@@ -62,7 +64,7 @@ export const meta = {
 
     ```bash .env
     DB_CONNECTION=pgsql
-    DATABASE_URL=postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:6543/postgres
+    DATABASE_URL=postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:5432/postgres
     ```
 
     </StepHikeCompact.Code>
@@ -123,7 +125,7 @@ export const meta = {
   <StepHikeCompact.Step step={6}>
     <StepHikeCompact.Details title="Start the app">
 
-    Run the development server. Go to http://127.0.0.1:8000 in a browser to see your application. You can also nvaigate to http://127.0.0.1:8000/register and http://127.0.0.1:8000/login to register and log in users.
+    Run the development server. Go to http://127.0.0.1:8000 in a browser to see your application. You can also navigate to http://127.0.0.1:8000/register and http://127.0.0.1:8000/login to register and log in users.
 
     </StepHikeCompact.Details>
 

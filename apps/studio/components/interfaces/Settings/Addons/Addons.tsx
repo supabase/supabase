@@ -1,3 +1,4 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { useTheme } from 'next-themes'
@@ -419,7 +420,37 @@ const Addons = () => {
                         ? 'IPv4 address is enabled'
                         : 'IPv4 address is not enabled'}
                     </p>
-                    <ProjectUpdateDisabledTooltip
+                    <Tooltip.Root delayDuration={0}>
+                      <Tooltip.Trigger asChild>
+                        <div>
+                          <Button
+                            type="default"
+                            className="mt-2 pointer-events-auto"
+                            onClick={() => snap.setPanelKey('ipv4')}
+                            disabled={true}
+                          >
+                            Change IPv4 address
+                          </Button>
+                        </div>
+                      </Tooltip.Trigger>
+                      <Tooltip.Portal>
+                        <Tooltip.Content side="bottom">
+                          <Tooltip.Arrow className="radix-tooltip-arrow" />
+                          <div
+                            className={[
+                              'rounded bg-alternative py-1 px-2 leading-none shadow',
+                              'border border-background',
+                            ].join(' ')}
+                          >
+                            <span className="text-xs text-foreground">
+                              Temporarily disabled while we are migrating to IPv6, please check back
+                              later.
+                            </span>
+                          </div>
+                        </Tooltip.Content>
+                      </Tooltip.Portal>
+                    </Tooltip.Root>
+                    {/*<ProjectUpdateDisabledTooltip
                       projectUpdateDisabled={projectUpdateDisabled}
                       projectNotActive={!isProjectActive}
                     >
@@ -431,7 +462,7 @@ const Addons = () => {
                       >
                         Change IPv4 address
                       </Button>
-                    </ProjectUpdateDisabledTooltip>
+                      </ProjectUpdateDisabledTooltip>*/}
                   </div>
                 </div>
               </ScaffoldSectionContent>

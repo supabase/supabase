@@ -79,10 +79,10 @@ serve(async (req) => {
     input.table === 'partner_contacts'
       ? PARTNER_FORM_ID
       : input.table === 'dpa_downloads'
-      ? DPA_FORM_ID
-      : input.table === 'soc2_requests'
-      ? SOC2_FORM_ID
-      : ENTERPRISE_FORM_ID
+        ? DPA_FORM_ID
+        : input.table === 'soc2_requests'
+          ? SOC2_FORM_ID
+          : ENTERPRISE_FORM_ID
 
   // Using HubSpot's submit data to a form API
   // https://legacydocs.hubspot.com/docs/methods/forms/submit_form
