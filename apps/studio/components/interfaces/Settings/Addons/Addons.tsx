@@ -442,7 +442,7 @@ const Addons = () => {
                               'border border-background',
                             ].join(' ')}
                           >
-                            <span className="text-xs text-foreground">
+                              <span className="text-xs text-foreground">
                               Temporarily disabled while we are migrating to IPv6, please check back
                               later.
                             </span>
