@@ -225,7 +225,10 @@ console.log(`Building Theme Styles...`)
 console.log(`\n`)
 
 themeFiles.map(function (filePath, i) {
-  const fileName = fileNameCleaner(filePath)
+  let fileName = fileNameCleaner(filePath)
+
+  // rename concept-one to dark-new
+  fileName = fileName === 'concept-one' ? 'dark-new' : fileName
 
   let configTailwindFilesByType = []
 
