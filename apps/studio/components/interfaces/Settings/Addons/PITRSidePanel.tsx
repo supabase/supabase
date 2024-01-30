@@ -173,10 +173,10 @@ const PITRSidePanel = () => {
         hasHipaaAddon
           ? 'Unable to change PITR with HIPAA add-on'
           : isFreePlan
-          ? 'Unable to enable point in time recovery on a free plan'
-          : !canUpdatePitr
-          ? 'You do not have permission to update PITR'
-          : undefined
+            ? 'Unable to enable point in time recovery on a free plan'
+            : !canUpdatePitr
+              ? 'You do not have permission to update PITR'
+              : undefined
       }
       header={
         <div className="flex items-center justify-between">

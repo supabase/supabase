@@ -13,7 +13,7 @@ Select a set of columns from a single table with where, order by, and limit clau
 ```sql
 select first_name, last_name, team_id, age
 from players
-where age between 20 and 24 and team_id <> 'STL'
+where age between 20 and 24 and team_id != 'STL'
 order by last_name, first_name desc
 limit 20;
 ```
@@ -52,7 +52,7 @@ Select all columns from a single table with a complex where clause: AND OR AND
 ```sql
 select *
 from players
-where ((team_id = 'CHN' and age > 35) or (team_id <> 'CHN' and age is not null));
+where ((team_id = 'CHN' and age > 35) or (team_id != 'CHN' and age is not null));
 ```
 
 ```js

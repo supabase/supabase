@@ -19,7 +19,7 @@ import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useSelectedOrganization, useSelectedProject } from 'hooks'
-import { BASE_PATH, OPT_IN_TAGS } from 'lib/constants'
+import { BASE_PATH, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { AIPolicyChat } from './AIPolicyChat'
 import {
@@ -35,6 +35,7 @@ import RLSCodeEditor from './RLSCodeEditor'
 import Telemetry from 'lib/telemetry'
 import { useTelemetryProps } from 'common'
 import { useRouter } from 'next/router'
+import { useAppStateSnapshot } from 'state/app-state'
 
 const DiffEditor = dynamic(
   () => import('@monaco-editor/react').then(({ DiffEditor }) => DiffEditor),
@@ -60,6 +61,7 @@ export const AIPolicyEditorPanel = memo(function ({
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
   const router = useRouter()
+  const snap = useAppStateSnapshot()
   const telemetryProps = useTelemetryProps()
 
   // use chat id because useChat doesn't have a reset function to clear all messages
@@ -174,6 +176,12 @@ export const AIPolicyEditorPanel = memo(function ({
     // remove the incoming change to revert to the original editor
     setIncomingChange(undefined)
   }, [incomingChange])
+
+  function toggleFeaturePreviewModal() {
+    snap.setSelectedFeaturePreview(LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT)
+    snap.setShowFeaturePreviewModal(!snap.showFeaturePreviewModal)
+    onSelectCancel()
+  }
 
   const onClosingPanel = useCallback(() => {
     const policy = editorRef.current?.getValue()
@@ -347,8 +355,11 @@ export const AIPolicyEditorPanel = memo(function ({
                     setOpen={setErrorPanelOpen}
                   />
                 )}
-                <SheetFooter_Shadcn_ className="flex flex-col gap-12 px-5 py-4 w-full">
-                  <div className="flex justify-end gap-x-2">
+                <SheetFooter_Shadcn_ className="flex items-center !justify-between px-5 py-4 w-full">
+                  <Button type="text" onClick={toggleFeaturePreviewModal}>
+                    Toggle feature preview
+                  </Button>
+                  <div className="flex items-center gap-x-2">
                     <Button type="default" disabled={isExecuting} onClick={() => onSelectCancel()}>
                       Cancel
                     </Button>

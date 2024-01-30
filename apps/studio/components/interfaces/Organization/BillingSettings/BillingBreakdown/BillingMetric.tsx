@@ -112,10 +112,10 @@ const BillingMetric = ({
                       isUsageBillingEnabled
                         ? 'text-gray-dark-800'
                         : isExceededLimit
-                        ? 'text-red-900'
-                        : isApproachingLimit
-                        ? 'text-yellow-1000'
-                        : 'text-gray-dark-800'
+                          ? 'text-red-900'
+                          : isApproachingLimit
+                            ? 'text-yellow-1000'
+                            : 'text-gray-dark-800'
                     }
                   />
                 </svg>

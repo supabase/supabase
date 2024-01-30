@@ -138,8 +138,8 @@ const Repos = ({ tabs }: Props) => {
                 slider.isEnd
                   ? SWIPER_STATE.END
                   : slider.isBeginning
-                  ? SWIPER_STATE.START
-                  : SWIPER_STATE.MIDDLE
+                    ? SWIPER_STATE.START
+                    : SWIPER_STATE.MIDDLE
               )
             }
             className="relative flex md:hidden justify-center max-w-full w-full overflow-hidden items-center rounded-full bg-surface-100 p-2"
