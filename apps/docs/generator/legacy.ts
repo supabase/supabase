@@ -259,10 +259,10 @@ function extractParamTypeAsString(paramDefinition) {
         x.value
           ? `<code>${x.value}</code>`
           : x.name
-          ? `<code>${x.name}</code>`
-          : x.type
-          ? `<code>${x.type}</code>`
-          : ''
+            ? `<code>${x.name}</code>`
+            : x.type
+              ? `<code>${x.type}</code>`
+              : ''
       )
       .join(' | ')
   }

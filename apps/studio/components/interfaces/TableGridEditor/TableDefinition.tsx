@@ -61,8 +61,8 @@ const TableDefinition = ({ id }: TableDefinitionProps) => {
     entityType?.type === ENTITY_TYPE.VIEW
       ? `create view ${entityType.schema}.${entityType.name} as\n`
       : entityType?.type === ENTITY_TYPE.MATERIALIZED_VIEW
-      ? `create materialized view ${entityType.schema}.${entityType.name} as\n`
-      : ''
+        ? `create materialized view ${entityType.schema}.${entityType.name} as\n`
+        : ''
 
   const formattedDefinition = useMemo(
     () =>

@@ -117,18 +117,18 @@ export const addForeignKey = async (
     deletion_action === FOREIGN_KEY_CASCADE_ACTION.CASCADE
       ? 'ON DELETE CASCADE'
       : deletion_action === FOREIGN_KEY_CASCADE_ACTION.RESTRICT
-      ? 'ON DELETE RESTRICT'
-      : deletion_action === FOREIGN_KEY_CASCADE_ACTION.SET_DEFAULT
-      ? 'ON DELETE SET DEFAULT'
-      : deletion_action === FOREIGN_KEY_CASCADE_ACTION.SET_NULL
-      ? 'ON DELETE SET NULL'
-      : ''
+        ? 'ON DELETE RESTRICT'
+        : deletion_action === FOREIGN_KEY_CASCADE_ACTION.SET_DEFAULT
+          ? 'ON DELETE SET DEFAULT'
+          : deletion_action === FOREIGN_KEY_CASCADE_ACTION.SET_NULL
+            ? 'ON DELETE SET NULL'
+            : ''
   const updateAction =
     update_action === FOREIGN_KEY_CASCADE_ACTION.CASCADE
       ? 'ON UPDATE CASCADE'
       : update_action === FOREIGN_KEY_CASCADE_ACTION.RESTRICT
-      ? 'ON UPDATE RESTRICT'
-      : ''
+        ? 'ON UPDATE RESTRICT'
+        : ''
 
   const query = `
     ALTER TABLE "${relationship.source_schema}"."${relationship.source_table_name}"
