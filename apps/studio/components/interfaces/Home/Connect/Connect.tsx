@@ -235,18 +235,18 @@ const Connect = () => {
           </DialogHeader_Shadcn_>
 
           <Tabs_Shadcn_
-            defaultValue="frameworks"
+            defaultValue="direct"
             onValueChange={(value) => handleConnectionType(value)}
           >
             <TabsList_Shadcn_>
+              <TabsTrigger_Shadcn_ key="direct" value="direct">
+                Direct Connection
+              </TabsTrigger_Shadcn_>
               {CONNECTION_TYPES.map((type) => (
                 <TabsTrigger_Shadcn_ key={type.key} value={type.key}>
                   {type.label}
                 </TabsTrigger_Shadcn_>
               ))}
-              <TabsTrigger_Shadcn_ key="direct" value="direct">
-                Direct Connection
-              </TabsTrigger_Shadcn_>
             </TabsList_Shadcn_>
 
             {CONNECTION_TYPES.map((type) => (
