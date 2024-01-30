@@ -130,8 +130,8 @@ const NotificationRow: ItemRenderer<Notification, NotificationRowProps> = ({
                 const url = action.url.includes('[ref]')
                   ? action.url.replace('[ref]', project?.ref ?? '_')
                   : action.url.includes('[slug]')
-                  ? action.url.replace('[slug]', organization?.slug ?? '_')
-                  : action.url
+                    ? action.url.replace('[slug]', organization?.slug ?? '_')
+                    : action.url
                 return (
                   <Button
                     key={key}
