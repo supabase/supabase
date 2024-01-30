@@ -158,8 +158,8 @@ export default function RealtimeLimitsEstimater({}) {
                     {computeAddOn === 'micro'
                       ? 'Micro'
                       : computeAddOn === 'small'
-                      ? 'Small to medium'
-                      : 'Large to 16XL'}
+                        ? 'Small to medium'
+                        : 'Large to 16XL'}
                   </h4>
                   <table className="table-auto">
                     <thead>

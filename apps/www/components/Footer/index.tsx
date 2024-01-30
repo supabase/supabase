@@ -76,8 +76,8 @@ const Footer = (props: Props) => {
                   forceDark
                     ? supabaseLogoWordmarkDark
                     : mounted && resolvedTheme?.includes('dark')
-                    ? supabaseLogoWordmarkDark
-                    : supabaseLogoWordmarkLight
+                      ? supabaseLogoWordmarkDark
+                      : supabaseLogoWordmarkLight
                 }
                 width={160}
                 height={30}

@@ -138,8 +138,8 @@ const UserChat = ({ message, isLatest, times, run }: UserChatProps) => {
             {replyDuration !== undefined
               ? ` with ${replyDuration}s response`
               : isLoading
-              ? ', generating response...'
-              : ''}
+                ? ', generating response...'
+                : ''}
           </p>
         )}
       </div>

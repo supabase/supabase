@@ -55,8 +55,8 @@ const SupportPage = () => {
                       {isLoading
                         ? 'Checking status'
                         : isHealthy
-                        ? 'All systems operational'
-                        : 'Active incident ongoing'}
+                          ? 'All systems operational'
+                          : 'Active incident ongoing'}
                     </Link>
                   </Button>
                 </Tooltip.Trigger>
