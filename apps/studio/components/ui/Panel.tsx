@@ -16,7 +16,7 @@ function Panel(props: PropsWithChildren<PanelProps>) {
   let headerClasses: string[] = []
 
   if (!props.hideHeaderStyling) {
-    headerClasses = [`bg-surface-100 border-b border-overlay`]
+    headerClasses = [`bg-surface-100 border-b`]
   } else {
     headerClasses = [`bg-surface-100`]
   }
@@ -24,8 +24,8 @@ function Panel(props: PropsWithChildren<PanelProps>) {
   const content = (
     <div
       className={`
-        ${props.noHideOverflow ? '' : 'overflow-hidden'} rounded-md border
-        border-overlay shadow-sm ${props.noMargin ? '' : 'mb-8'} ${props.className}`}
+        ${props.noHideOverflow ? '' : 'overflow-hidden'} rounded-md
+        border shadow-sm ${props.noMargin ? '' : 'mb-8'} ${props.className}`}
     >
       {props.title && (
         <div className={headerClasses.join(' ')}>

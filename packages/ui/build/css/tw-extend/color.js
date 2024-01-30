@@ -443,17 +443,21 @@ module.exports = {
   cssVariable: "var(--background-control)",
   value: "hsl(0, 0%, 14.1%)"
 },
+"background-surface-75": {
+  cssVariable: "var(--background-surface-75)",
+  value: "hsl(0, 0%, 9%)"
+},
 "background-surface-100": {
   cssVariable: "var(--background-surface-100)",
-  value: "hsl(0, 0%, 9%)"
+  value: "hsl(0, 0%, 12.2%)"
 },
 "background-surface-200": {
   cssVariable: "var(--background-surface-200)",
-  value: "hsl(0, 0%, 12.2%)"
+  value: "hsl(0, 0%, 12.9%)"
 },
 "background-surface-300": {
   cssVariable: "var(--background-surface-300)",
-  value: "hsl(0, 0%, 12.9%)"
+  value: "hsl(0, 0%, 16.1%)"
 },
 "background-surface-400": {
   cssVariable: "var(--background-surface-400)",

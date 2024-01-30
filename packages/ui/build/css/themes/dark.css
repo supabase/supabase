@@ -49,6 +49,7 @@
   --background-surface-300: var(--colors-gray-dark-500);
   --background-surface-200: var(--colors-gray-dark-400);
   --background-surface-100: var(--colors-gray-dark-300);
+  --background-surface-75: var(--colors-gray-dark-200);
   --background-control: var(--colors-gray-dark-300);
   --background-selection: var(--colors-gray-dark-600);
   --background-alternative-default: var(--colors-gray-dark-100);

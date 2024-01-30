@@ -6,6 +6,7 @@ export default {
     "bg-alternative",
     "bg-selection",
     "bg-control",
+    "bg-surface-75",
     "bg-surface-100",
     "bg-surface-200",
     "bg-surface-300",
