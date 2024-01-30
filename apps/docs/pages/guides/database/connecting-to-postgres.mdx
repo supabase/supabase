@@ -175,7 +175,7 @@ You can obtain your connection info and Server root certificate from your applic
 
     <StepHikeCompact.Code>
 
-     ![Register a new postgres server.](/docs/img/guides/database/register-server-pgAdmin.png)
+     ![Register a new postgres server.](/docs/img/guides/database/connecting-to-postgres/pgadmin/register-server-pgAdmin.png)
 
     </StepHikeCompact.Code>
 
@@ -191,7 +191,7 @@ You can obtain your connection info and Server root certificate from your applic
 
     <StepHikeCompact.Code>
 
-     ![Name Postgres Server.](/docs/img/guides/database/name-pg-server.png)
+     ![Name Postgres Server.](/docs/img/guides/database/connecting-to-postgres/pgadmin/name-pg-server.png)
 
     </StepHikeCompact.Code>
 
@@ -207,7 +207,7 @@ You can obtain your connection info and Server root certificate from your applic
 
     <StepHikeCompact.Code>
 
-     ![Add Connection Info.](/docs/img/guides/database/add-pg-server-conn-info-2.png)
+     ![Add Connection Info.](/docs/img/guides/database/connecting-to-postgres/pgadmin/add-pg-server-conn-info.png)
 
     </StepHikeCompact.Code>
 
@@ -223,7 +223,7 @@ You can obtain your connection info and Server root certificate from your applic
 
     <StepHikeCompact.Code>
 
-     ![Add Connection Info.](/docs/img/guides/database/add-ssl-config-parameter.png)
+     ![Add Connection Info.](/docs/img/guides/database/connecting-to-postgres/pgadmin/database-settings-host.png)
 
     </StepHikeCompact.Code>
 
@@ -332,6 +332,20 @@ Refer to our [Prisma integration guide](https://supabase.com/partners/integratio
 A "connection pool" is a system (external to Postgres) which manages Postgres connections.
 
 When a client makes a request, the pooler "allocates" an available connection to the client. When the client transaction or session is completed the connection is returned to the pool and is free to be used by another client.
+
+<figure>
+    <Image
+        className="hidden dark:block"
+        alt="New migration files trigger migrations on the preview instance."
+        src="/docs/img/guides/database/connecting-to-postgres/how-connection-pooling-works.png"
+    />
+    <Image
+        className="dark:hidden"
+        alt="New migration files trigger migrations on the preview instance."
+        src="/docs/img/guides/database/connecting-to-postgres/how-connection-pooling-works--light.png"
+    />
+    <figcaption>How the connections change when the Supavisor pooler is used.</figcaption>
+</figure>
 
 There are 2 pool modes, each handling connections differently:
 
