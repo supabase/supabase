@@ -212,6 +212,7 @@ const PolicyEditorModal = ({
             description="Write rules with PostgreSQL's policies to fit your unique business needs."
             onViewTemplates={onViewTemplates}
             onViewEditor={onViewEditor}
+            onSelectCancel={onSelectCancel}
           />
         ) : view === POLICY_MODAL_VIEWS.EDITOR ? (
           <PolicyEditor

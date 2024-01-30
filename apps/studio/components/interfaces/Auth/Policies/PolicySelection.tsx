@@ -1,19 +1,33 @@
 import { noop } from 'lodash'
-import { IconEdit, IconGrid, Modal } from 'ui'
+import { Button, IconEdit, IconExternalLink, IconGrid, Modal } from 'ui'
 
 import CardButton from 'components/ui/CardButton'
+import { Info } from 'lucide-react'
+import Link from 'next/link'
+import { useAppStateSnapshot } from 'state/app-state'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 interface PolicySelectionProps {
   description: string
   onViewTemplates: () => void
   onViewEditor: () => void
+  onSelectCancel: () => void
 }
 
 const PolicySelection = ({
   description = '',
   onViewTemplates = noop,
   onViewEditor = noop,
+  onSelectCancel = noop,
 }: PolicySelectionProps) => {
+  const snap = useAppStateSnapshot()
+
+  function toggleFeaturePreviewModal() {
+    snap.setSelectedFeaturePreview(LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT)
+    snap.setShowFeaturePreviewModal(!snap.showFeaturePreviewModal)
+    onSelectCancel()
+  }
+
   return (
     <Modal.Content>
       <div className="space-y-6 py-8">
@@ -30,7 +44,7 @@ const PolicySelection = ({
                   className="
                   flex h-8 w-8 items-center
                   justify-center
-                  rounded bg-foreground text-background  
+                  rounded bg-foreground text-background
                 "
                 >
                   <IconGrid size={14} strokeWidth={2} />
@@ -48,7 +62,7 @@ const PolicySelection = ({
                   className="
                   flex h-8 w-8 items-center
                   justify-center
-                  rounded bg-foreground text-background  
+                  rounded bg-foreground text-background
                 "
                 >
                   <IconEdit size={14} strokeWidth={2} />
@@ -57,6 +71,33 @@ const PolicySelection = ({
             }
             onClick={onViewEditor}
           />
+        </div>
+        <div className="bg-surface-200 rounded-md p-4 flex items-center  gap-2 text-sm">
+          <Info size={16} strokeWidth={2} />
+          <p>Try the new RLS Assistant</p>
+
+          <ul className="flex items-center gap-1.5 ml-auto">
+            <li>
+              <Button type="default" onClick={toggleFeaturePreviewModal}>
+                Enable
+              </Button>
+            </li>
+            <li>
+              <Button
+                type="default"
+                icon={<IconExternalLink size={14} strokeWidth={1.5} />}
+                asChild
+              >
+                <Link
+                  href="https://supabase.com/blog/studio-introducing-assistant#introducing-the-supabase-assistant"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Read more
+                </Link>
+              </Button>
+            </li>
+          </ul>
         </div>
         <p className="text-sm text-foreground-light">
           Not sure what policies are? Check out our resources{' '}
