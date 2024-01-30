@@ -1,6 +1,6 @@
 import { Meta } from '@storybook/react'
-import { Slider } from '@ui/components/shadcn/ui/slider'
-import { cn } from '../../lib/utils/cn'
+import { cn } from '../../../lib/utils/cn'
+import { Slider } from '../ui/slider'
 
 const meta: Meta = {
   title: 'shadcn/Slider',

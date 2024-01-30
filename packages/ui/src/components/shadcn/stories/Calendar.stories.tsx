@@ -1,6 +1,6 @@
 import { Meta } from '@storybook/react'
-import { Calendar } from '@ui/components/shadcn/ui/calendar'
 import * as React from 'react'
+import { Calendar } from '../ui/calendar'
 
 const meta: Meta = {
   title: 'shadcn/Calendar',
