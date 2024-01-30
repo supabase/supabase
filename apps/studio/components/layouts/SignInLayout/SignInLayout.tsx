@@ -91,7 +91,7 @@ const SignInLayout = ({
       <div className="flex flex-col flex-1 bg-alternative">
         <div
           className={`absolute top-0 w-full px-8 mx-auto sm:px-6 lg:px-8 ${
-            ongoingIncident ? 'pt-16' : 'pt-6'
+            ongoingIncident ? 'mt-14' : 'mt-6'
           }`}
         >
           <nav className="relative flex items-center justify-between sm:h-10">

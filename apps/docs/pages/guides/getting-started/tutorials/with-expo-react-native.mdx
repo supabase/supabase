@@ -451,10 +451,10 @@ photos and videos.
 
 ### Additional dependency installation
 
-You will need a file picker that works on the environment you will build the project for, we will use react-native-document-picker in this example.
+You will need an image picker that works on the environment you will build the project for, we will use `expo-image-picker` in this example.
 
 ```bash
-expo install react-native-document-picker
+expo install expo-image-picker
 ```
 
 ### Create an upload widget
@@ -466,7 +466,7 @@ We can start by creating a new component:
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { StyleSheet, View, Alert, Image, Button } from 'react-native'
-import DocumentPicker, { isCancel, isInProgress, types } from 'react-native-document-picker'
+import * as ImagePicker from 'expo-image-picker'
 
 interface Props {
   size: number
@@ -507,39 +507,43 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
     try {
       setUploading(true)
 
-      const file = await DocumentPicker.pickSingle({
-        presentationStyle: 'fullScreen',
-        copyTo: 'cachesDirectory',
-        type: types.images,
-        mode: 'open',
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images, // Restrict to only images
+        allowsMultipleSelection: false, // Can only select one image
+        allowsEditing: true, // Allows the user to crop / rotate their photo before uploading it
+        quality: 1,
+        exif: false, // We don't want nor need that data.
       })
 
-      const photo = {
-        uri: file.fileCopyUri,
-        type: file.type,
-        name: file.name,
+      if (result.canceled || !result.assets || result.assets.length === 0) {
+        console.log('User cancelled image picker.')
+        return
       }
 
-      const formData = new FormData()
-      formData.append('file', photo)
+      const image = result.assets[0]
+      console.log('Got image', image)
 
-      const fileExt = file.name.split('.').pop()
-      const filePath = `${Math.random()}.${fileExt}`
-
-      const { error } = await supabase.storage.from('avatars').upload(filePath, formData)
-
-      if (error) {
-        throw error
+      if (!image.uri) {
+        throw new Error('No image uri!') // Realistically, this should never happen, but just in case...
       }
 
-      onUpload(filePath)
+      const arraybuffer = await fetch(image.uri).then((res) => res.arrayBuffer())
+
+      const fileExt = image.uri?.split('.').pop()?.toLowerCase() ?? 'jpeg'
+      const path = `${Date.now()}.${fileExt}`
+      const { data, error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(path, arraybuffer, {
+          contentType: image.mimeType ?? 'image/jpeg',
+        })
+
+      if (uploadError) {
+        throw uploadError
+      }
+
+      onUpload(data.path)
     } catch (error) {
-      if (isCancel(error)) {
-        console.warn('cancelled')
-        // User cancelled the picker, exit any dialogs or menus and move on
-      } else if (isInProgress(error)) {
-        console.warn('multiple pickers were opened, only the last will be considered')
-      } else if (error instanceof Error) {
+      if (error instanceof Error) {
         Alert.alert(error.message)
       } else {
         throw error
@@ -583,7 +587,9 @@ const styles = StyleSheet.create({
   },
   noImage: {
     backgroundColor: '#333',
-    border: '1px solid rgb(200, 200, 200)',
+    borderWidth: 1,
+    borderStyle: 'solid',
+    borderColor: 'rgb(200, 200, 200)',
     borderRadius: 5,
   },
 })
@@ -598,23 +604,22 @@ And then we can add the widget to the Account page:
 import Avatar from './Avatar'
 
 // ...
-  return (
+return (
+  <View>
+    {/* Add to the body */}
     <View>
-      {/* Add to the body */}
-      <View>
-        <Avatar
-          size={200}
-          url={avatarUrl}
-          onUpload={(url: string) => {
-            setAvatarUrl(url)
-            updateProfile({ username, website, avatar_url: url })
-          }}
-        />
-      </View>
-      {/* ... */}
+      <Avatar
+        size={200}
+        url={avatarUrl}
+        onUpload={(url: string) => {
+          setAvatarUrl(url)
+          updateProfile({ username, website, avatar_url: url })
+        }}
+      />
     </View>
-  )
-}
+    {/* ... */}
+  </View>
+)
 // ...
 ```
 

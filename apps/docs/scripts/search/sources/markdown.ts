@@ -192,7 +192,10 @@ export type ProcessedMdx = {
 export class MarkdownLoader extends BaseLoader {
   type = 'markdown' as const
 
-  constructor(source: string, public filePath: string) {
+  constructor(
+    source: string,
+    public filePath: string
+  ) {
     const path = filePath.replace(/^pages/, '').replace(/\.mdx?$/, '')
     super(source, path)
   }
@@ -206,7 +209,11 @@ export class MarkdownLoader extends BaseLoader {
 export class MarkdownSource extends BaseSource {
   type = 'markdown' as const
 
-  constructor(source: string, path: string, public contents: string) {
+  constructor(
+    source: string,
+    path: string,
+    public contents: string
+  ) {
     super(source, path)
   }
 

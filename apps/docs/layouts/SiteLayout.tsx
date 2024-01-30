@@ -201,8 +201,8 @@ const MobileHeader = memo(function MobileHeader() {
         {mobileMenuOpen
           ? 'Close'
           : menuLevel
-          ? levelsData[menuLevel].name
-          : levelsData['home'].name}
+            ? levelsData[menuLevel].name
+            : levelsData['home'].name}
       </span>
     </div>
   )
@@ -267,7 +267,7 @@ const Container = memo(function Container(props: PropsWithChildren) {
       id="docs-content-container"
       className={[
         // 'overflow-x-auto',
-        'w-full h-screen transition-all ease-out',
+        'w-full transition-all ease-out',
         // 'absolute lg:relative',
         mobileMenuOpen ? 'ml-[75%] sm:ml-[50%] md:ml-[33%] overflow-hidden' : 'overflow-auto',
         // desktop override any margin styles
@@ -294,7 +294,6 @@ const NavContainer = memo(function NavContainer() {
         'lg:left-0',
         'transition-all',
         'top-0',
-        'h-screen',
         'flex flex-col ml-0',
       ].join(' ')}
     >
@@ -352,8 +351,8 @@ const SiteLayout = ({ children }: PropsWithChildren<{}>) => {
       <Head>
         <title>Supabase Docs</title>
       </Head>
-      <main>
-        <div className="flex flex-row h-screen">
+      <main className="grow overflow-hidden">
+        <div className="flex flex-row h-full">
           <NavContainer />
           <Container>
             <div className={['lg:sticky top-0 z-10 overflow-hidden'].join(' ')}>

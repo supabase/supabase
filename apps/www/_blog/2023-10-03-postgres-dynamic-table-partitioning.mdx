@@ -38,20 +38,20 @@ Partitioning is a simple solution, but for Postgres this usually requires settin
 Let’s explore a working example showing how to escape this situation using dynamic table partitioning. We’ll setup a simulated “chat app” that has to store possibly millions of chat messages per day. The first step is to set up a fake “Large Table” problem to simulate a data set that has grown past where Postgres can handle it all in one table. So first, we’ll add a couple of new tables for our example chat app:
 
 ```sql
-CREATE TABLE chats(
+create table chats (
   id bigserial,
-  created_at timestamptz NOT NULL DEFAULT now(),
-  PRIMARY KEY (id)
+  created_at timestamptz not null default now(),
+  primary key (id)
 );
 
-CREATE TABLE chat_messages(
+create table chat_messages (
   id bigserial,
-  created_at timestamptz NOT NULL,
-  chat_id bigint NOT NULL,
-  chat_created_at timestamptz NOT NULL,
-  message text NOT NULL,
-  PRIMARY KEY (id),
-  FOREIGN KEY (chat_id) REFERENCES chats(id)
+  created_at timestamptz not null,
+  chat_id bigint not null,
+  chat_created_at timestamptz not null,
+  message text not null,
+  primary key (id),
+  foreign key (chat_id) references chats (id)
 );
 ```
 
