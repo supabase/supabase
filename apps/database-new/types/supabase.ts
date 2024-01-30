@@ -46,7 +46,7 @@ export interface Database {
             columns: ['user_id']
             referencedRelation: 'users'
             referencedColumns: ['id']
-          }
+          },
         ]
       }
       responses_ai: {
@@ -92,7 +92,7 @@ export interface Database {
             columns: ['user_id']
             referencedRelation: 'users'
             referencedColumns: ['id']
-          }
+          },
         ]
       }
       threads: {
@@ -132,7 +132,7 @@ export interface Database {
             columns: ['user_id']
             referencedRelation: 'users'
             referencedColumns: ['id']
-          }
+          },
         ]
       }
     }

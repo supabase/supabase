@@ -141,8 +141,8 @@ export const UsePoolerCheckbox = ({
                     {checked
                       ? 'Resolves to IPv4'
                       : resolvesToIpV6
-                      ? 'Resolves to IPv6'
-                      : 'Will resolve to IPv6'}
+                        ? 'Resolves to IPv6'
+                        : 'Will resolve to IPv6'}
                   </Badge>
                 )}
                 {pgBouncerStatus && <Badge color="amber">PGBouncer pending removal</Badge>}

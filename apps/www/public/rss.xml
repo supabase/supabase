@@ -5,9 +5,23 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Sun, 21 Jan 2024 23:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Thu, 25 Jan 2024 23:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/flutter-figma-clone</guid>
+  <title>Create a Figma Clone app with Flutter and Supabase Realtime</title>
+  <link>https://supabase.com/blog/flutter-figma-clone</link>
+  <description>A tutorial on how to build a collaborative design app like Figma using Flutter and Supabase Realtime.</description>
+  <pubDate>Thu, 25 Jan 2024 23:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/how-pg-graphql-works</guid>
+  <title>How pg_graphql works</title>
+  <link>https://supabase.com/blog/how-pg-graphql-works</link>
+  <description>An insight into the internals of GraphQL in Postgres using pg_graphql, and how you can contribute.</description>
+  <pubDate>Tue, 23 Jan 2024 23:00:00 GMT</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/laravel-postgres</guid>
   <title>Getting started with Laravel and Postgres</title>
   <link>https://supabase.com/blog/laravel-postgres</link>

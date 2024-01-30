@@ -30,8 +30,8 @@ const MoveItemsModal = ({
   const title = multipleFiles
     ? `Moving ${selectedItemsToMove.length} items within ${bucketName}`
     : selectedItemsToMove.length === 1
-    ? `Moving ${selectedItemsToMove[0]?.name} within ${bucketName}`
-    : ``
+      ? `Moving ${selectedItemsToMove[0]?.name} within ${bucketName}`
+      : ``
 
   const description = `Enter the path to where you'd like to move the file${
     multipleFiles ? 's' : ''
