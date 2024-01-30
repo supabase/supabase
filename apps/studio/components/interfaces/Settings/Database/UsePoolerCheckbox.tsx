@@ -39,10 +39,7 @@ export const UsePoolerCheckbox = ({
 
   const { data, isLoading, isSuccess } = usePoolingConfigurationQuery({ projectRef })
   const { data: settings, isSuccess: isSuccessSettings } = useProjectSettingsQuery({ projectRef })
-  const { data: pgBouncerStatus } = usePgBouncerStatus({
-    projectRef: projectRef!,
-    tld: settings ? settings.project.db_host.split('.').pop() : 'co',
-  })
+  const { data: pgBouncerStatus } = usePgBouncerStatus({ projectRef: projectRef })
 
   const resolvesToIpV6 = settings?.project.db_ip_addr_config === 'ipv6'
 
@@ -144,7 +141,7 @@ export const UsePoolerCheckbox = ({
                         : 'Will resolve to IPv6'}
                   </Badge>
                 )}
-                {pgBouncerStatus && <Badge color="amber">PgBouncer pending removal</Badge>}
+                {pgBouncerStatus?.active && <Badge color="amber">PgBouncer pending removal</Badge>}
               </div>
             </div>
           </div>

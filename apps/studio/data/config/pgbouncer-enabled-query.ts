@@ -1,42 +1,37 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { configKeys } from './keys'
 import { ResponseError } from 'types'
-import { get } from 'lib/common/fetch'
-import { API_URL, BASE_PATH } from 'lib/constants'
+import { get } from 'data/fetchers'
+import { IS_PLATFORM } from 'lib/constants'
 
 type PgBouncerVariables = {
-  projectRef: string
-  tld?: string
+  projectRef?: string
 }
 
 // This API call describes whether PgBouncer is still present on the instance. Eventually PgBouncer will be removed.
-export async function getPgBouncerStatus(
-  { projectRef, tld }: PgBouncerVariables,
-  signal?: AbortSignal
-) {
-  if (!tld) {
-    throw new Error('tld is required')
-  }
+export async function getPgBouncerStatus({ projectRef }: PgBouncerVariables, signal?: AbortSignal) {
+  if (projectRef === undefined) throw new Error('Project ref is required')
 
-  const response = await get(`${BASE_PATH}/api/database/${projectRef}/pg-bouncer?tld=${tld}`, {
-    signal,
+  const { data, error } = await get('/platform/projects/{ref}/config/pgbouncer/status', {
+    params: { path: { ref: projectRef } },
   })
 
-  return !!response
+  if (error) throw error
+  return data
 }
 
-export type PgBouncerStatusData = boolean
+export type PgBouncerStatusData = Awaited<ReturnType<typeof getPgBouncerStatus>>
 export type PgBouncerStatusError = ResponseError
 
 export const usePgBouncerStatus = <TData = PgBouncerStatusData>(
-  { projectRef, tld }: PgBouncerVariables,
+  { projectRef }: PgBouncerVariables,
   { enabled, ...options }: UseQueryOptions<PgBouncerStatusData, PgBouncerStatusError, TData> = {}
 ) =>
   useQuery<PgBouncerStatusData, PgBouncerStatusError, TData>(
     configKeys.pgBouncerStatus(projectRef),
-    ({ signal }) => getPgBouncerStatus({ projectRef, tld }, signal),
+    ({ signal }) => getPgBouncerStatus({ projectRef }, signal),
     {
-      enabled: enabled && typeof projectRef !== 'undefined' && typeof tld !== 'undefined',
+      enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined',
       ...options,
     }
   )
