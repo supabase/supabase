@@ -151,8 +151,8 @@ const CustomDomainSidePanel = () => {
         isFreePlan
           ? 'Unable to enable custom domain on a free plan'
           : !canUpdateCustomDomain
-            ? 'You do not have permission to update custom domain'
-            : undefined
+          ? 'You do not have permission to update custom domain'
+          : undefined
       }
       header={
         <div className="flex items-center justify-between">
@@ -180,8 +180,8 @@ const CustomDomainSidePanel = () => {
                   Adding new custom domains temporarily disabled
                 </AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_ className="flex flex-col gap-3">
-                  Supabase has reached quotas with one of our service providers and are working with
-                  them for an increase. Please try again soon or contact support.
+                  We are working with our upstream DNS provider before we are able to sign up new
+                  custom domains. Please check back in a few hours.
                 </AlertDescription_Shadcn_>
               </Alert_Shadcn_>
             )}
