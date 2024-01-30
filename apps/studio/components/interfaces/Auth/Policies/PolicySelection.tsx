@@ -11,7 +11,7 @@ import {
 } from 'ui'
 
 import CardButton from 'components/ui/CardButton'
-import { Info } from 'lucide-react'
+import { FlaskConical, Info } from 'lucide-react'
 import Link from 'next/link'
 import { useAppStateSnapshot } from 'state/app-state'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
@@ -38,57 +38,58 @@ const PolicySelection = ({
   }
 
   return (
-    <Modal.Content className="space-y-6 py-6">
-      <div>
+    <Modal.Content className="space-y-4 py-4">
+      <div className="flex flex-col gap-y-2">
         <p className="text-sm text-foreground-light">{description}</p>
-      </div>
-      <div className="grid grid-cols-1 gap-2 lg:grid-cols-1">
-        <CardButton
-          title="Get started quickly"
-          description="Create a policy from a template"
-          icon={
-            <div className="flex">
-              <div
-                className="
+        <div className="grid grid-cols-1 gap-2 lg:grid-cols-1">
+          <CardButton
+            title="Get started quickly"
+            description="Create a policy from a template"
+            icon={
+              <div className="flex">
+                <div
+                  className="
                   flex h-8 w-8 items-center
                   justify-center
                   rounded bg-foreground text-background
                 "
-              >
-                <IconGrid size={14} strokeWidth={2} />
+                >
+                  <IconGrid size={14} strokeWidth={2} />
+                </div>
               </div>
-            </div>
-          }
-          onClick={onViewTemplates}
-        />
-        <CardButton
-          title="For full customization"
-          description="Create a policy from scratch"
-          icon={
-            <div className="flex">
-              <div
-                className="
+            }
+            onClick={onViewTemplates}
+          />
+          <CardButton
+            title="For full customization"
+            description="Create a policy from scratch"
+            icon={
+              <div className="flex">
+                <div
+                  className="
                   flex h-8 w-8 items-center
                   justify-center
                   rounded bg-foreground text-background
                 "
-              >
-                <IconEdit size={14} strokeWidth={2} />
+                >
+                  <IconEdit size={14} strokeWidth={2} />
+                </div>
               </div>
-            </div>
-          }
-          onClick={onViewEditor}
-        />
+            }
+            onClick={onViewEditor}
+          />
+        </div>
       </div>
 
       <Alert_Shadcn_>
+        <FlaskConical />
         <AlertTitle_Shadcn_>Try the new Supabase Assistant for RLS policies</AlertTitle_Shadcn_>
         <AlertDescription_Shadcn_>
           Create RLS policies for your tables with the help of AI
         </AlertDescription_Shadcn_>
         <div className="flex items-center gap-x-2 mt-3">
           <Button type="default" onClick={toggleFeaturePreviewModal}>
-            See feature preview
+            Toggle feature preview
           </Button>
           <Button asChild type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
             <a
@@ -101,19 +102,6 @@ const PolicySelection = ({
           </Button>
         </div>
       </Alert_Shadcn_>
-
-      <p className="text-sm text-foreground-light">
-        Not sure what policies are? Check out our resources{' '}
-        <a
-          target="_blank"
-          rel="noreferrer"
-          className="text-brand transition-colors hover:text-brand-600"
-          href="https://supabase.com/docs/guides/auth#policies"
-        >
-          here
-        </a>
-        .
-      </p>
     </Modal.Content>
   )
 }
