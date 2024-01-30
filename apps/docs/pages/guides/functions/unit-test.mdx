@@ -15,7 +15,7 @@ Deno has a built-in test runner that you can use for testing JavaScript or TypeS
 
 ## Folder structure
 
-We recommend creating your testing in a `supabase/tests` directory, using the same name as the Function followed by `-test.ts`:
+We recommend creating your testing in a `supabase/functions/tests` directory, using the same name as the Function followed by `-test.ts`:
 
 ```bash
 └── supabase
@@ -38,7 +38,6 @@ The following script is a good example to get started with testing your Edge Fun
 // Import required libraries and modules
 import {
   assert,
-  assertExists,
   assertEquals,
 } from 'https://deno.land/std@0.192.0/testing/asserts.ts'
 import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.23.0'
@@ -102,7 +101,7 @@ Deno.test('Hello-world Function Test', testHelloWorld)
 
 This test case consists of two parts. The first part tests the client library and verifies that the database can be connected to and returns values from a table (`my_table`). The second part tests the edge function and checks if the received value matches the expected value. Here's a brief overview of the code:
 
-- We import various testing functions from the Deno standard library, including `assert`, `assertExists`, and `assertEquals`.
+- We import various testing functions from the Deno standard library, including `assert` and `assertEquals`.
 - We import the `createClient` and `SupabaseClient` classes from the `@supabase/supabase-js` library to interact with the Supabase client.
 - We define the necessary configuration for the Supabase client, including the Supabase URL, API key, and authentication options.
 - The `testClientCreation` function tests the creation of a Supabase client instance and queries the database for data from a table. It verifies that data is returned from the query.
@@ -149,7 +148,7 @@ To locally test and debug Edge Functions, you can utilize the Supabase CLI. Let'
 4. To run the tests, use the following command in your terminal:
 
    ```bash
-   deno test --allow-all supabase/functions/function-one-test.ts --env-file .env.local
+   deno test --allow-all  --env=.env.local supabase/functions/tests/function-one-test.ts
    ```
 
 ## Resources
