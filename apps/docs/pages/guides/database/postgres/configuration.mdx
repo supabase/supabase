@@ -12,7 +12,35 @@ Postgres provides a set of sensible defaults for you database size. In some case
 
 ## Timeouts
 
-By default, Supabase limits the maximum statement execution time to _8 seconds_ for users accessing the API. Additionally, all users are subject to a global limit of _2 minutes_. This serves as a backstop against resource exhaustion due to either poorly written queries, or abusive usage. This can be overridden using [Custom Postgres configuration](https://supabase.com/docs/guides/platform/custom-postgres-config#supported-parameters).
+By default, Supabase limits the maximum statement execution time to _8 seconds_ for users accessing the API. All role timeouts can be viewed with the following query:
+
+```sql
+SELECT
+  rolname, rolconfig
+FROM pg_roles
+WHERE rolname IN (
+  'anon',
+  'authenticated'
+  'postgres',
+  'service_role',
+);
+```
+
+Additionally, all users are subject to a global limit of _2 minutes_. This serves as a backstop against resource exhaustion due to either poorly written queries, or abusive usage. The current global timeout can be view with the following query:
+
+```sql
+SHOW statement_timeout;
+```
+
+This can be overridden using [Custom Postgres configuration](https://supabase.com/docs/guides/platform/custom-postgres-config#supported-parameters). The below example is for changing the global timeout with NPX:
+
+```bash
+#Logs you into the Supabase CLI
+npx supabase login
+
+#Change database timeout to 3 minutes
+npx supabase --experimental --project-ref <YOUR PROJECT REF> postgres-config update --config statement_timeout='3min'
+```
 
 ### Changing the default timeout
 
@@ -20,7 +48,7 @@ The timeout values were picked as a reasonable default for the majority of use-c
 
 ```sql
 -- For API users
-alter role authenticator set statement_timeout = '15s';
+alter role authenticated set statement_timeout = '15s';
 ```
 
 You can also update the statement timeout for a session:
