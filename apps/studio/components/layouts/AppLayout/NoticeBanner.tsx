@@ -76,8 +76,8 @@ export const NoticeBanner = () => {
     pgbouncerEnabled && !pgbouncerBannerAcknowledged
       ? ('pgbouncer' as const)
       : vercelWithoutSupavisorEnabled && !vercelBannerAcknowledged
-        ? ('vercel' as const)
-        : ('ipv6' as const)
+      ? ('vercel' as const)
+      : ('ipv6' as const)
 
   return (
     <div

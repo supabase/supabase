@@ -43,7 +43,6 @@ export const AppBannerContextProvider = ({ children }: PropsWithChildren<{}>) =>
     pgbouncerBannerAcknowledged,
     vercelBannerAcknowledged,
     onUpdateAcknowledged: (key: 'ipv6' | 'pgbouncer' | 'vercel', value: boolean) => {
-      console.log('onUpdateAcknowledged', key)
       if (key === 'ipv6') {
         if (typeof window !== 'undefined') {
           window.localStorage.setItem(DEFAULT_NOTICE_BANNER_KEY, value.toString())
