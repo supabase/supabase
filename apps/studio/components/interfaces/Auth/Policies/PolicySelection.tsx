@@ -88,7 +88,7 @@ const PolicySelection = ({
         </AlertDescription_Shadcn_>
         <div className="flex items-center gap-x-2 mt-3">
           <Button type="default" onClick={toggleFeaturePreviewModal}>
-            Enable feature preview
+            See feature preview
           </Button>
           <Button asChild type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
             <a
