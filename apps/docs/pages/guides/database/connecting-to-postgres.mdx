@@ -12,12 +12,12 @@ export const meta = {
 Supabase provides several options for programmatically connecting to your Postgres database:
 
 1. Programmatic access using the Data APIs
-1. Direct connections using the built-in Postgres connection system
 1. Connection pooling for scalable connections
+1. Direct connections using the built-in Postgres connection system
 
 <Admonition type="caution">
 
-Starting on <DateFormat date="2024-01-26" options={{ dateStyle: "long", timeZone: "UTC" }} />, direct database connections will start resolving to an IPv6 address. If you connect to your database using the REST and GraphQL endpoints, this doesn't affect you. If you use the database connection string, see the GitHub discussion on [how to prepare for IPv6](https://github.com/orgs/supabase/discussions/17817).
+Direct database connections will start resolving to an IPv6 address. Starting from January 26, 2024, projects will be gradually migrated to this behaviour. If you connect to your database using the REST or GraphQL endpoints, this doesn't affect you. If you use the database connection string, see the GitHub discussion on [how to prepare for IPv6](https://github.com/orgs/supabase/discussions/17817).
 
 </Admonition>
 
@@ -31,10 +31,38 @@ Supabase provides auto-updating Data APIs. These are the easiest way to get star
 
 ## Connection pooler
 
+A "connection pool" is a system (external to Postgres) which manages Postgres connections.
+
+When a client makes a request, the pooler "allocates" an available connection to the client. When the client transaction or session is completed the connection is returned to the pool and is free to be used by another client.
+
+<figure>
+  <Image
+    className="hidden dark:block"
+    alt="New migration files trigger migrations on the preview instance."
+    src="/docs/img/guides/database/connecting-to-postgres/how-connection-pooling-works.png"
+  />
+  <Image
+    className="dark:hidden"
+    alt="New migration files trigger migrations on the preview instance."
+    src="/docs/img/guides/database/connecting-to-postgres/how-connection-pooling-works--light.png"
+  />
+  <figcaption>Connecting to the database directly vs using a Connection Pooler</figcaption>
+</figure>
+
 Every Supabase project comes with a connection pooler for managing connections to your database. The pooler provides 2 important services:
 
-1. It manages connections for tools that connect and disconnect from the database frequently. For example, serverless functions and tools such as Prisma, Drizzle, and Kysely often make and drop connections to the database. If they connected directly each time, they would quickly exhaust your database server's memory. To connect to your database efficiently with such tools, you need a pooler.
+1. It manages connections for applications that connect and disconnect from the database frequently. For example, serverless functions and ORMs such as Prisma, Drizzle, and Kysely often make and drop connections to the database. If they connected directly each time, they would quickly exhaust your database server's memory. To connect to your database efficiently with such tools, you need a pooler.
 2. It provides an IPv4 endpoint to connect to your database, which you can use if your network provider doesn't support IPv6. This is unlike the direct database connection, which resolves to an IPv6 address, unless you've enabled the [IPv4 add-on](https://supabase.com/docs/guides/platform/ipv4-address).
+
+<Admonition type="tip">
+
+The connection pooler is available in 2 modes: `Transaction` and `Session`.
+
+</Admonition>
+
+Transaction mode is recommended if you are connecting from serverless environments. A connection is assigned to the client for the duration of a transaction. Two consecutive transactions from the same client can be executed over two different connections. Some session-based Postgres features such as prepared statements are _not available_ with this option.
+
+Session mode is similar to connecting to your database directly. There is full support for prepared statements in this mode. When a new client connects, a connection is assigned to the client until it disconnects. You might run into pooler connection limits since the connection is held till the client disconnects.
 
 You can find the connection pool config in the [Database settings](/dashboard/project/_/settings/database) inside the dashboard:
 
@@ -42,19 +70,9 @@ You can find the connection pool config in the [Database settings](/dashboard/pr
 2. Click `Database`.
 3. Under `Connection string`, make sure `Use connection pooling` is checked. Copy the URI.
 
-<Admonition type="tip">
-
-The connection pooler is available in 2 modes: `transaction` and `session`.
-
-Transaction mode gives you the traditional benefit of a pooler: managing tools which disconnect frequently. You usually want this mode if you're connecting from a serverless function, or during normal operation for tools like Prisma.
-
-Session mode mimics a direct connection. The connection to the database is kept alive until explicitly closed. Use this mode if you need session-based Postgres features, such as prepared statements.
-
-</Admonition>
-
 ## Direct connections
 
-You can also use a direct connection to connect directly to your Postgres database. By default, this connection uses IPv6, which isn't supported by all network providers. If you need an IPv4 address, use the [connection pooler](#connection-pooler) instead.
+You can also use a direct connection to connect directly to your Postgres database. By default, you can connect to it via IPv6, which isn't supported by all networks. If you need an IPv4 address, use the [connection pooler](#connection-pooler) instead or enable the [IPv4 add-on](https://supabase.com/docs/guides/platform/ipv4-address).
 
 You can find the direct connection string in the [Database settings](https://supabase.com/dashboard/project/_/settings/database) inside the dashboard:
 
@@ -235,12 +253,12 @@ You can obtain your connection info and Server root certificate from your applic
 
 [`psql`](https://www.postgresql.org/docs/current/app-psql.html) is a command-line tool that comes with Postgres.
 
-Download your [SSL certificate](#connecting-with-ssl) to `$HOME/Downloads/prod-supabase.cer`.
+Download your [SSL certificate](#connecting-with-ssl) to `/path/to/prod-supabase.cer`.
 
 Find your connection settings. Go to your [`Database Settings`](https://supabase.com/dashboard/project/_/settings/database) and make sure `Use connection pooling` is checked. Change the connection mode to `Session`, and copy the parameters into the connection string:
 
 ```shell
-psql "sslmode=verify-full sslrootcert=$HOME/Downloads/prod-supabase.cer host=[CLOUD_PROVIDER]-0-[REGION]-1.pooler.supabase.com dbname=postgres user=postgres.[PROJECT_REF]"
+psql "sslmode=verify-full sslrootcert=/path/to/prod-supabase.cer host=[CLOUD_PROVIDER]-0-[REGION]-1.pooler.supabase.com dbname=postgres user=postgres.[PROJECT_REF]"
 ```
 
 ### Connecting with Prisma
@@ -326,38 +344,6 @@ Refer to our [Prisma integration guide](https://supabase.com/partners/integratio
   </StepHikeCompact.Step>
 
 </StepHikeCompact>
-
-## How connection pooling works
-
-A "connection pool" is a system (external to Postgres) which manages Postgres connections.
-
-When a client makes a request, the pooler "allocates" an available connection to the client. When the client transaction or session is completed the connection is returned to the pool and is free to be used by another client.
-
-<figure>
-  <Image
-    className="hidden dark:block"
-    alt="New migration files trigger migrations on the preview instance."
-    src="/docs/img/guides/database/connecting-to-postgres/how-connection-pooling-works.png"
-  />
-  <Image
-    className="dark:hidden"
-    alt="New migration files trigger migrations on the preview instance."
-    src="/docs/img/guides/database/connecting-to-postgres/how-connection-pooling-works--light.png"
-  />
-  <figcaption>How the connections change when the Supavisor pooler is used.</figcaption>
-</figure>
-
-There are 2 pool modes, each handling connections differently:
-
-### Session
-
-When a new client connects, a connection is assigned to the client until it disconnects. Afterward, the connection is returned back to the pool.
-
-All Postgres features can be used with this option.
-
-### Transaction
-
-This is the suggested option for serverless functions. A connection is assigned to the client for the duration of a transaction. Two consecutive transactions from the same client could be executed over two different connections. Some session-based Postgres features such as prepared statements are not available with this option.
 
 ## Troubleshooting Supavisor
 
