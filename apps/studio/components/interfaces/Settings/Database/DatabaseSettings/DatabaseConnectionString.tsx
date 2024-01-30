@@ -257,11 +257,6 @@ export const DatabaseConnectionString = () => {
                             </Tooltip.Portal>
                           </Tooltip.Root>
                         )
-                        {
-                          selectedTab === 'python' && (
-                            <p>Please uses `postgresql://` instead of `postgres://` if you are using sqlalchemy</p>
-                          )
-                        }
                       } else {
                         return (
                           <span key={`syntax-${idx}`} className="text-xs">
