@@ -11,7 +11,7 @@ interface PolicySelectionProps {
   description: string
   onViewTemplates: () => void
   onViewEditor: () => void
-  onSelectCancel: () => void
+  onSelectCancel?: () => void
 }
 
 const PolicySelection = ({
