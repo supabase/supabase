@@ -26,7 +26,7 @@ import {
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { AddonVariantId } from 'data/subscriptions/types'
 import { formatCurrency } from 'lib/helpers'
-import { useFlag } from '../../../../hooks'
+import { useFlag } from 'hooks'
 
 const CustomDomainSidePanel = () => {
   const { ui } = useStore()
