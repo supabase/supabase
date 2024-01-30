@@ -172,7 +172,6 @@ psql \
   --file schema.sql \
   --command 'SET session_replication_role = replica' \
   --file data.sql \
-  --file history.sql \
   --dbname "$NEW_DB_URL"
 ```
 
