@@ -94,7 +94,7 @@ const FeaturePreviewModal = () => {
       {FEATURE_PREVIEWS.length > 0 ? (
         <div className="flex border-t">
           <div>
-            <ScrollArea className="h-[550px] w-[240px] border-r">
+            <ScrollArea className="h-[550px] w-[280px] border-r">
               {FEATURE_PREVIEWS.map((feature) => {
                 const isEnabled = flags[feature.key] ?? false
 
@@ -112,7 +112,9 @@ const FeaturePreviewModal = () => {
                     ) : (
                       <IconEyeOff size={14} strokeWidth={1.5} className="text-foreground-light" />
                     )}
-                    <p className="text-sm">{feature.name}</p>
+                    <p className="text-sm truncate" title={feature.name}>
+                      {feature.name}
+                    </p>
                   </div>
                 )
               })}
