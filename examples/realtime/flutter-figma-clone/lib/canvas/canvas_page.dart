@@ -227,8 +227,7 @@ class _CanvasPageState extends State<CanvasPage> {
               onPanUpdate: _onPanUpdate,
               onPanEnd: onPanEnd,
               child: CustomPaint(
-                size: Size(MediaQuery.of(context).size.width,
-                    MediaQuery.of(context).size.height),
+                size: MediaQuery.of(context).size,
                 painter: CanvasPainter(
                   userCursors: _userCursors,
                   canvasObjects: _canvasObjects,

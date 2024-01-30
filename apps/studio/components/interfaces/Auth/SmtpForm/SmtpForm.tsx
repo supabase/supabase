@@ -216,7 +216,7 @@ const SmtpForm = () => {
                     descriptionText={
                       <Markdown
                         className="max-w-full [&>p]:text-foreground-lighter"
-                        content={`Emails will be sent using your custom SMTP provider. Email rate limits can be adjusted [here](/project/${projectRef}/auth/rate-limits).`}
+                        content={`Emails will be sent using your custom SMTP provider. Email rate limits can be adjusted [here](/dashboard/project/${projectRef}/auth/rate-limits).`}
                       />
                     }
                   />
