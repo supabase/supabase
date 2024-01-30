@@ -124,7 +124,7 @@ Let's say you want to read the names of all the rows in a table `colors`. We wou
 
 ```bash
 curl 'https://xscduanzzfseqszwzhcy.supabase.co/rest/v1/colors?select=name' \
--H "apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYxNDIwNTE3NCwiZXhwIjoxOTI5NzgxMTc0fQ.-NBR1WnZyQGpRLdXJfgfpszoZ0EeE6KHatJsDPLIX8c"
+-H "apikey: XXX"
 ```
 
 If we put this token into https://jwt.io, we see it decodes to:
@@ -157,8 +157,8 @@ This token should be passed in addition to the `apikey` header as an `Authorizat
 
 ```bash
 curl 'https://xscduanzzfseqszwzhcy.supabase.co/rest/v1/colors?select=name' \
--H "apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYxNDIwNTE3NCwiZXhwIjoxOTI5NzgxMTc0fQ.-NBR1WnZyQGpRLdXJfgfpszoZ0EeE6KHatJsDPLIX8c" \
--H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNjE1ODI0Mzg4LCJzdWIiOiIwMzM0NzQ0YS1mMmEyLTRhYmEtOGM4YS02ZTc0OGY2MmExNzIiLCJlbWFpbCI6InNvbWVvbmVAZW1haWwuY29tIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwifSwidXNlcl9tZXRhZGF0YSI6bnVsbCwicm9sZSI6ImF1dGhlbnRpY2F0ZWQifQ.I-_oSsJamtinGxniPETBf-ezAUwDW2sY9bJIThvdX9s"
+-H "apikey: XXX" \
+-H "Authorization: Bearer XXX"
 ```
 
 You'll notice that this token is quite a bit longer, since it contains information specific to the user such as:
