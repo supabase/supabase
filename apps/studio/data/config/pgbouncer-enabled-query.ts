@@ -6,19 +6,19 @@ import { API_URL, BASE_PATH } from 'lib/constants'
 
 type PgBouncerVariables = {
   projectRef: string
-  dbHost: string
+  tld?: string
 }
 
 // This API call describes whether PgBouncer is still present on the instance. Eventually PgBouncer will be removed.
 export async function getPgBouncerStatus(
-  { projectRef, dbHost }: PgBouncerVariables,
+  { projectRef, tld }: PgBouncerVariables,
   signal?: AbortSignal
 ) {
-  if (!dbHost) {
-    throw new Error('dbHost is required')
+  if (!tld) {
+    throw new Error('tld is required')
   }
 
-  const response = await get(`${BASE_PATH}/api/database/${projectRef}/pg-bouncer?host=${dbHost}`, {
+  const response = await get(`${BASE_PATH}/api/database/${projectRef}/pg-bouncer?tld=${tld}`, {
     signal,
   })
 
@@ -29,11 +29,14 @@ export type PgBouncerStatusData = boolean
 export type PgBouncerStatusError = ResponseError
 
 export const usePgBouncerStatus = <TData = PgBouncerStatusData>(
-  { projectRef, dbHost }: PgBouncerVariables,
-  { ...options }: UseQueryOptions<PgBouncerStatusData, PgBouncerStatusError, TData> = {}
+  { projectRef, tld }: PgBouncerVariables,
+  { enabled, ...options }: UseQueryOptions<PgBouncerStatusData, PgBouncerStatusError, TData> = {}
 ) =>
   useQuery<PgBouncerStatusData, PgBouncerStatusError, TData>(
     configKeys.pgBouncerStatus(projectRef),
-    ({ signal }) => getPgBouncerStatus({ projectRef, dbHost }, signal),
-    options
+    ({ signal }) => getPgBouncerStatus({ projectRef, tld }, signal),
+    {
+      enabled: enabled && typeof projectRef !== 'undefined' && typeof tld !== 'undefined',
+      ...options,
+    }
   )

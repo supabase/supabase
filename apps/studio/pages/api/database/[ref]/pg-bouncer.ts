@@ -16,9 +16,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
-  const host = req.query.host
-
+  const { ref, tld } = req.query
   try {
+    const host = `db.${ref}.supabase.${tld}`
     const url = `http://${host}:6543`
     await fetch(url)
   } catch (error) {
