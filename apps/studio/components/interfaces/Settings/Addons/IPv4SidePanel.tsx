@@ -127,8 +127,8 @@ const IPv4SidePanel = () => {
         isFreePlan
           ? 'Unable to enable IPv4 on a free plan'
           : !canUpdateIPv4
-          ? 'You do not have permission to update IPv4'
-          : undefined
+            ? 'You do not have permission to update IPv4'
+            : undefined
       }*/
       header={
         <div className="flex items-center justify-between">

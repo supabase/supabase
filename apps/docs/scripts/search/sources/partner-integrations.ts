@@ -34,7 +34,10 @@ export async function fetchPartners() {
 export class IntegrationLoader extends BaseLoader {
   type = 'partner-integration' as const
 
-  constructor(source: string, public partnerData: PartnerData) {
+  constructor(
+    source: string,
+    public partnerData: PartnerData
+  ) {
     const relPath = `/partners/integrations/${partnerData.slug}`
     super(source, relPath)
   }
@@ -47,7 +50,11 @@ export class IntegrationLoader extends BaseLoader {
 export class IntegrationSource extends BaseSource {
   type = 'partner-integration' as const
 
-  constructor(source: string, path: string, public partnerData: PartnerData) {
+  constructor(
+    source: string,
+    path: string,
+    public partnerData: PartnerData
+  ) {
     super(source, path)
   }
 

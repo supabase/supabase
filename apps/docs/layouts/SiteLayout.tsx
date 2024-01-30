@@ -201,8 +201,8 @@ const MobileHeader = memo(function MobileHeader() {
         {mobileMenuOpen
           ? 'Close'
           : menuLevel
-          ? levelsData[menuLevel].name
-          : levelsData['home'].name}
+            ? levelsData[menuLevel].name
+            : levelsData['home'].name}
       </span>
     </div>
   )

@@ -85,7 +85,7 @@ export type EntityDefinitionsData = EntityDefinition[]
 export type EntityDefinitionsError = unknown
 
 export const useEntityDefinitionsQuery = <
-  TData extends EntityDefinitionsData = EntityDefinitionsData
+  TData extends EntityDefinitionsData = EntityDefinitionsData,
 >(
   { limit, projectRef, connectionString }: EntityDefinitionsVariables,
   options: UseQueryOptions<ExecuteSqlData, EntityDefinitionsError, TData> = {}

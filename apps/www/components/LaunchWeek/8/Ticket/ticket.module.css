@@ -2,11 +2,15 @@
   background: linear-gradient(137.46deg, rgba(125, 196, 176, 0.04) 0%, rgba(255, 255, 255, 0) 100%),
     linear-gradient(137.46deg, rgba(255, 255, 255, 0) 6.19%, rgba(255, 255, 255, 0) 103.29%);
   z-index: 10;
-  box-shadow: 0 1px 1px rgba(131, 6, 184, 0.1), 0 1px 1px rgba(128, 6, 184, 0.1),
-    0 20px 30px -30px rgba(76, 195, 138, 0.05), 0 80px 40px -40px rgba(128, 6, 184, 0.04),
+  box-shadow:
+    0 1px 1px rgba(131, 6, 184, 0.1),
+    0 1px 1px rgba(128, 6, 184, 0.1),
+    0 20px 30px -30px rgba(76, 195, 138, 0.05),
+    0 80px 40px -40px rgba(128, 6, 184, 0.04),
     inset 0.25px 0.3px 0px 0.3px rgba(209, 243, 227, 0.1),
     inset 0.25px 0.3px 0px 0.3px rgba(76, 195, 138, 0.02),
-    inset 0 -3px 0 -2px rgba(255, 255, 255, 0.08), 0px 4px 20px rgba(118, 7, 170, 0.1);
+    inset 0 -3px 0 -2px rgba(255, 255, 255, 0.08),
+    0px 4px 20px rgba(118, 7, 170, 0.1);
 }
 
 .hero {
@@ -131,7 +135,9 @@
 
 .gold-text {
   color: #f4cf72;
-  text-shadow: 0 0 1px rgba(0, 0, 0, 0.5), 0 0 4px rgba(0, 0, 0, 0.1);
+  text-shadow:
+    0 0 1px rgba(0, 0, 0, 0.5),
+    0 0 4px rgba(0, 0, 0, 0.1);
 }
 
 @media (min-width: 768px) {
@@ -141,10 +147,14 @@
 }
 
 .ticket-number {
-  text-shadow: 0 0px 2px rgba(22, 22, 22, 0.9), 0 0px 6px rgba(131, 6, 184, 0.9),
+  text-shadow:
+    0 0px 2px rgba(22, 22, 22, 0.9),
+    0 0px 6px rgba(131, 6, 184, 0.9),
     0 0px 12px rgba(217, 195, 226, 0.5);
 }
 .ticket-number-gold {
-  text-shadow: 0 0px 2px rgba(22, 22, 22, 0.9), 0 0px 6px rgba(255, 195, 125, 0.9),
+  text-shadow:
+    0 0px 2px rgba(22, 22, 22, 0.9),
+    0 0px 6px rgba(255, 195, 125, 0.9),
     0 0px 12px rgba(226, 224, 195, 0.5);
 }
