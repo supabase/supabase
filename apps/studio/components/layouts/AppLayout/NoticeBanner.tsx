@@ -1,8 +1,8 @@
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
-
 import { useParams } from 'common'
+
 import { useAppBannerContext } from 'components/interfaces/App/AppBannerWrapperContext'
 import { useProfile } from 'lib/profile'
 import { Button, IconExternalLink } from 'ui'
@@ -59,10 +59,12 @@ export const NoticeBanner = () => {
   const vercelWithoutSupavisorEnabled = data?.vercel_active ?? false
 
   // [Joshen] Pgbouncer list and vercel list are mutually exclusive
+  const pgbouncerProjectAcknowledged = pgbouncerBannerAcknowledged.includes(projectRef ?? '')
+  const vercelProjectAcknowledged = vercelBannerAcknowledged.includes(projectRef ?? '')
   const allAcknowledged =
     (!pgbouncerEnabled && !vercelWithoutSupavisorEnabled && ipv6BannerAcknowledged) ||
-    (ipv6BannerAcknowledged && pgbouncerEnabled && pgbouncerBannerAcknowledged) ||
-    (ipv6BannerAcknowledged && vercelWithoutSupavisorEnabled && vercelBannerAcknowledged)
+    (ipv6BannerAcknowledged && pgbouncerEnabled && pgbouncerProjectAcknowledged) ||
+    (ipv6BannerAcknowledged && vercelWithoutSupavisorEnabled && vercelProjectAcknowledged)
 
   if (
     isLoadingProfile ||
@@ -74,9 +76,9 @@ export const NoticeBanner = () => {
   }
 
   const currentlyViewing =
-    pgbouncerEnabled && !pgbouncerBannerAcknowledged
+    pgbouncerEnabled && !pgbouncerProjectAcknowledged
       ? ('pgbouncer' as const)
-      : vercelWithoutSupavisorEnabled && !vercelBannerAcknowledged
+      : vercelWithoutSupavisorEnabled && !vercelProjectAcknowledged
         ? ('vercel' as const)
         : ('ipv6' as const)
 
@@ -110,7 +112,12 @@ export const NoticeBanner = () => {
         <Button
           type="text"
           className="opacity-75"
-          onClick={() => onUpdateAcknowledged(currentlyViewing, true)}
+          onClick={() =>
+            onUpdateAcknowledged(
+              currentlyViewing,
+              currentlyViewing === 'ipv6' ? true : projectRef ?? ''
+            )
+          }
         >
           Dismiss
         </Button>
