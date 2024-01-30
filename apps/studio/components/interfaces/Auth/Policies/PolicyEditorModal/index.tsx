@@ -171,9 +171,8 @@ const PolicyEditorModal = ({
 
   return (
     <Modal
-      size={view === POLICY_MODAL_VIEWS.SELECTION ? 'medium' : 'xxlarge'}
-      closable
       hideFooter
+      size={view === POLICY_MODAL_VIEWS.SELECTION ? 'medium' : 'xxlarge'}
       visible={visible}
       contentStyle={{ padding: 0 }}
       header={[

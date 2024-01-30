@@ -1,5 +1,5 @@
 import { noop } from 'lodash'
-import { IconChevronLeft } from 'ui'
+import { Button, IconChevronLeft, IconExternalLink } from 'ui'
 
 import { POLICY_MODAL_VIEWS } from 'components/interfaces/Auth/Policies'
 
@@ -36,14 +36,26 @@ const PolicyEditorModalTitle = ({
           >
             <IconChevronLeft strokeWidth={2} size={14} />
           </span>
-          <h4 className="m-0 text-lg">Select a template to use for your new policy</h4>
+          <h4>Select a template to use for your new policy</h4>
         </div>
       </div>
     )
   }
   return (
-    <div className="flex items-center space-x-3">
-      <h4 className="m-0 truncate text-lg">{getTitle()}</h4>
+    <div className="w-full flex items-center justify-between gap-x-4">
+      <h4 className="truncate" title={getTitle()}>
+        {getTitle()}
+      </h4>
+      <Button asChild type="default" icon={<IconExternalLink size={14} />}>
+        <a
+          href="https://supabase.com/docs/learn/auth-deep-dive/auth-policies"
+          target="_blank"
+          rel="noreferrer"
+        >
+          {' '}
+          Documentation
+        </a>
+      </Button>
     </div>
   )
 }
