@@ -55,8 +55,8 @@ const NotificationsPopoverV2 = () => {
       activeTab === 'archived'
         ? 'archived'
         : snap.filterStatuses.includes('unread')
-        ? 'new'
-        : undefined,
+          ? 'new'
+          : undefined,
     filters: {
       priority: snap.filterPriorities,
       organizations: snap.filterOrganizations,
@@ -100,8 +100,8 @@ const NotificationsPopoverV2 = () => {
               hasCritical
                 ? 'border-destructive-500 hover:border-destructive-600 hover:bg-destructive-300'
                 : hasWarning
-                ? 'border-warning-500 hover:border-warning-600 hover:bg-warning-300'
-                : ''
+                  ? 'border-warning-500 hover:border-warning-600 hover:bg-warning-300'
+                  : ''
             )}
             icon={
               hasCritical ? (
@@ -228,10 +228,10 @@ const NotificationsPopoverV2 = () => {
                                 : ''
                             }`
                           : snap.numFiltersApplied > 0
-                          ? `No notifications based on the ${snap.numFiltersApplied} filter${
-                              snap.numFiltersApplied > 1 ? 's' : ''
-                            } applied`
-                          : 'All caught up'}
+                            ? `No notifications based on the ${snap.numFiltersApplied} filter${
+                                snap.numFiltersApplied > 1 ? 's' : ''
+                              } applied`
+                            : 'All caught up'}
                       </p>
                       <p className="text-foreground-lighter text-xs w-60 mx-auto text-center">
                         {activeTab === 'archived'

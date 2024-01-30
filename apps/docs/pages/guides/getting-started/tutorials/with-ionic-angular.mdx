@@ -70,7 +70,10 @@ export interface Profile {
 export class SupabaseService {
   private supabase: SupabaseClient
 
-  constructor(private loadingCtrl: LoadingController, private toastCtrl: ToastController) {
+  constructor(
+    private loadingCtrl: LoadingController,
+    private toastCtrl: ToastController
+  ) {
     this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey)
   }
 
@@ -252,7 +255,10 @@ export class AccountPage implements OnInit {
 
   email = ''
 
-  constructor(private readonly supabase: SupabaseService, private router: Router) {}
+  constructor(
+    private readonly supabase: SupabaseService,
+    private router: Router
+  ) {}
   ngOnInit() {
     this.getEmail()
     this.getProfile()
@@ -319,7 +325,10 @@ import { SupabaseService } from './supabase.service'
   styleUrls: ['app.component.scss'],
 })
 export class AppComponent {
-  constructor(private supabase: SupabaseService, private router: Router) {
+  constructor(
+    private supabase: SupabaseService,
+    private router: Router
+  ) {
     this.supabase.authChanges((_, session) => {
       console.log(session)
       if (session?.user) {
@@ -474,7 +483,10 @@ export class AvatarComponent {
 
   @Output() upload = new EventEmitter<string>()
 
-  constructor(private readonly supabase: SupabaseService, private readonly dom: DomSanitizer) {
+  constructor(
+    private readonly supabase: SupabaseService,
+    private readonly dom: DomSanitizer
+  ) {
     addIcons({ person })
   }
 
