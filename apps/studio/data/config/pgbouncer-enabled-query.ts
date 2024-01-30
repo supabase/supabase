@@ -2,6 +2,7 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { configKeys } from './keys'
 import { ResponseError } from 'types'
 import { get } from 'data/fetchers'
+import { IS_PLATFORM } from 'lib/constants'
 
 type PgBouncerVariables = {
   projectRef?: string
@@ -30,7 +31,7 @@ export const usePgBouncerStatus = <TData = PgBouncerStatusData>(
     configKeys.pgBouncerStatus(projectRef),
     ({ signal }) => getPgBouncerStatus({ projectRef }, signal),
     {
-      enabled: enabled && typeof projectRef !== 'undefined',
+      enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined',
       ...options,
     }
   )
