@@ -2,8 +2,17 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { useParams, useTelemetryProps } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
-import { Button, CollapsibleContent_Shadcn_, CollapsibleTrigger_Shadcn_, Collapsible_Shadcn_, IconChevronDown, IconExternalLink, Input, Separator, Tabs,
- } from 'ui'
+import {
+  Button,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
+  Collapsible_Shadcn_,
+  IconChevronDown,
+  IconExternalLink,
+  Input,
+  Separator,
+  Tabs,
+} from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
@@ -215,66 +224,65 @@ export const DatabaseConnectionString = () => {
           <>
             <Separator />
             <Panel.Content className="!py-3 space-y-2">
-              <Collapsible_Shadcn_ >
-                  <CollapsibleTrigger_Shadcn_ className="group [&[data-state=open]>div>svg]:!-rotate-180">
-                    <div className="flex items-center gap-x-2 w-full">
-                      <p className="text-xs text-foreground-light group-hover:text-foreground transition">
-                        How to connect to a different database or switch to another user
-                      </p>
-                      <IconChevronDown
-                        className="transition-transform duration-200"
-                        strokeWidth={1.5}
-                        size={14}
-                      />
-                    </div>
-                  </CollapsibleTrigger_Shadcn_>
-                  <CollapsibleContent_Shadcn_ className="my-2">
-                    <div className="text-foreground-light">
-                  <p className="text-xs">
-                    You can use the following URI format to switch to a different database or user
-                    {usePoolerConnection ? ' when using connection pooling' : ''}.
-                  </p>
-                  <p className="text-sm font-mono tracking-tight text-foreground-lighter">
-                    {poolerConnStringSyntax.map((x, idx) => {
-                      if (x.tooltip) {
-                        return (
-                          <Tooltip.Root key={`syntax-${idx}`} delayDuration={0}>
-                            <Tooltip.Trigger asChild>
-                              <span className="text-foreground text-xs">{x.value}</span>
-                            </Tooltip.Trigger>
-                            <Tooltip.Portal>
+              <Collapsible_Shadcn_>
+                <CollapsibleTrigger_Shadcn_ className="group [&[data-state=open]>div>svg]:!-rotate-180">
+                  <div className="flex items-center gap-x-2 w-full">
+                    <p className="text-xs text-foreground-light group-hover:text-foreground transition">
+                      How to connect to a different database or switch to another user
+                    </p>
+                    <IconChevronDown
+                      className="transition-transform duration-200"
+                      strokeWidth={1.5}
+                      size={14}
+                    />
+                  </div>
+                </CollapsibleTrigger_Shadcn_>
+                <CollapsibleContent_Shadcn_ className="my-2">
+                  <div className="text-foreground-light">
+                    <p className="text-xs">
+                      You can use the following URI format to switch to a different database or user
+                      {usePoolerConnection ? ' when using connection pooling' : ''}.
+                    </p>
+                    <p className="text-sm font-mono tracking-tight text-foreground-lighter">
+                      {poolerConnStringSyntax.map((x, idx) => {
+                        if (x.tooltip) {
+                          return (
+                            <Tooltip.Root key={`syntax-${idx}`} delayDuration={0}>
+                              <Tooltip.Trigger asChild>
+                                <span className="text-foreground text-xs">{x.value}</span>
+                              </Tooltip.Trigger>
                               <Tooltip.Portal>
-                                <Tooltip.Content side="bottom">
-                                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                  <div
-                                    className={[
-                                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                      'border border-background',
-                                    ].join(' ')}
-                                  >
-                                    <span className="text-xs text-foreground">{x.tooltip}</span>
-                                  </div>
-                                </Tooltip.Content>
+                                <Tooltip.Portal>
+                                  <Tooltip.Content side="bottom">
+                                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                    <div
+                                      className={[
+                                        'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                        'border border-background',
+                                      ].join(' ')}
+                                    >
+                                      <span className="text-xs text-foreground">{x.tooltip}</span>
+                                    </div>
+                                  </Tooltip.Content>
+                                </Tooltip.Portal>
                               </Tooltip.Portal>
-                            </Tooltip.Portal>
-                          </Tooltip.Root>
-                        )
-                      } else {
-                        return (
-                          <span key={`syntax-${idx}`} className="text-xs">
-                            {x.value}
-                          </span>
-                        )
-                      }
-                    })}
-                  </p>
-                </div>
-                  </CollapsibleContent_Shadcn_>
-                </Collapsible_Shadcn_>
+                            </Tooltip.Root>
+                          )
+                        } else {
+                          return (
+                            <span key={`syntax-${idx}`} className="text-xs">
+                              {x.value}
+                            </span>
+                          )
+                        }
+                      })}
+                    </p>
+                  </div>
+                </CollapsibleContent_Shadcn_>
+              </Collapsible_Shadcn_>
 
-            {selectedTab === 'python' && (
-
-              <Collapsible_Shadcn_ >
+              {selectedTab === 'python' && (
+                <Collapsible_Shadcn_>
                   <CollapsibleTrigger_Shadcn_ className="group [&[data-state=open]>div>svg]:!-rotate-180">
                     <div className="flex items-center gap-x-2 w-full">
                       <p className="text-xs text-foreground-light group-hover:text-foreground transition">
@@ -284,28 +292,28 @@ export const DatabaseConnectionString = () => {
                         className="transition-transform duration-200"
                         strokeWidth={1.5}
                         size={14}
-                        />
+                      />
                     </div>
                   </CollapsibleTrigger_Shadcn_>
                   <CollapsibleContent_Shadcn_ className="my-2">
                     <div className="text-foreground-light text-xs grid gap-2">
                       <p>
-                        Please use <code>postgresql://</code> instead of <code>postgres://</code> as your dialect when
-                        connecting via SQLAlchemy.
+                        Please use <code>postgresql://</code> instead of <code>postgres://</code> as
+                        your dialect when connecting via SQLAlchemy.
                       </p>
-                        <p>
-                          Example:
+                      <p>
+                        Example:
                         <code>create_engine("postgresql+psycopg2://...")</code>
-                          </p>
+                      </p>
                       <p className="text-sm font-mono tracking-tight text-foreground-lighter"></p>
                     </div>
                   </CollapsibleContent_Shadcn_>
                 </Collapsible_Shadcn_>
-)}
-        </Panel.Content>
+              )}
+            </Panel.Content>
           </>
         )}
       </Panel>
     </div>
-    )
+  )
 }
