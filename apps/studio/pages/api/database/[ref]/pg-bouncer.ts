@@ -19,7 +19,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   const { ref, tld } = req.query
   try {
     // [Joshen] Additional safety checks on project ref just to be sure
-    if ((ref ?? '').length !== 20 || !/^[a-z]+$/.test(ref as string)) {
+    if ((ref ?? '').length !== 20 || !/^[a-zA-Z]+$/.test(ref as string)) {
       throw new Error('Invalid project ref')
     }
     if (!['co', 'red'].includes(tld as string)) {
