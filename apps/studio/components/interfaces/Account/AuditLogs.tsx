@@ -247,8 +247,8 @@ const AuditLogs = () => {
                             {project?.name
                               ? 'Project: '
                               : organization?.name
-                              ? 'Organization: '
-                              : null}
+                                ? 'Organization: '
+                                : null}
                             {project?.name ?? organization?.name ?? '-'}
                           </p>
                           <p
@@ -258,8 +258,8 @@ const AuditLogs = () => {
                             {log.target.metadata.project_ref
                               ? 'Ref: '
                               : log.target.metadata.org_slug
-                              ? 'Slug: '
-                              : null}
+                                ? 'Slug: '
+                                : null}
                             {log.target.metadata.project_ref ?? log.target.metadata.org_slug}
                           </p>
                         </Table.td>

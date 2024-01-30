@@ -191,16 +191,18 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     <>
       <QueryClientProvider client={queryClient}>
         <Favicons />
-        <IPv4DeprecationBanner />
         <AuthContainer>
           <SignOutHandler>
             <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
               <CommandMenuProvider site="docs">
                 <TabsProvider>
-                  <SiteLayout>
-                    <PortalToast />
-                    <Component {...pageProps} />
-                  </SiteLayout>
+                  <div className="h-screen flex flex-col">
+                    <IPv4DeprecationBanner />
+                    <SiteLayout>
+                      <PortalToast />
+                      <Component {...pageProps} />
+                    </SiteLayout>
+                  </div>
                 </TabsProvider>
               </CommandMenuProvider>
             </ThemeProvider>

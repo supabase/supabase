@@ -73,7 +73,7 @@ export type OrganizationBillingSubscriptionPreviewData = Awaited<
 >
 
 export const useOrganizationBillingSubscriptionPreview = <
-  TData = OrganizationBillingSubscriptionPreviewData
+  TData = OrganizationBillingSubscriptionPreviewData,
 >(
   { organizationSlug, tier }: OrganizationBillingSubscriptionPreviewVariables,
   {

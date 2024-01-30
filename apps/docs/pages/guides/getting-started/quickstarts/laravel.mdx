@@ -52,9 +52,13 @@ export const meta = {
 
     Go to [database.new](https://database.new) and create a new Supabase project. Save your database password securely.
 
-    When your project is up and running, navigate to the [database settings](https://supabase.com/dashboard/project/_/settings/database) to find the URI connection string.
+    When your project is up and running, navigate to the [database settings](https://supabase.com/dashboard/project/_/settings/database) to find the URI connection string. Make sure **Use connection pooling** is checked and **Session mode** is selected. Then copy the URI. Replace the password placeholder with your saved database password.
 
-    Laravel ships with a Postgres adapter out of the box, you can simply configure it via the environment variables. You can find the database URL in your [Supabase Dashboard](/dashboard/project/_/settings/database).
+    <Admonition type="tip">
+
+    If your network supports IPv6 connections, you can also use the direct connection string. Uncheck **Use connection pooling** and copy the new URI.
+
+    </Admonition>
 
     </StepHikeCompact.Details>
 
@@ -62,7 +66,7 @@ export const meta = {
 
     ```bash .env
     DB_CONNECTION=pgsql
-    DATABASE_URL=postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:6543/postgres
+    DATABASE_URL=postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:5432/postgres
     ```
 
     </StepHikeCompact.Code>
@@ -123,7 +127,7 @@ export const meta = {
   <StepHikeCompact.Step step={6}>
     <StepHikeCompact.Details title="Start the app">
 
-    Run the development server. Go to http://127.0.0.1:8000 in a browser to see your application. You can also nvaigate to http://127.0.0.1:8000/register and http://127.0.0.1:8000/login to register and log in users.
+    Run the development server. Go to http://127.0.0.1:8000 in a browser to see your application. You can also navigate to http://127.0.0.1:8000/register and http://127.0.0.1:8000/login to register and log in users.
 
     </StepHikeCompact.Details>
 

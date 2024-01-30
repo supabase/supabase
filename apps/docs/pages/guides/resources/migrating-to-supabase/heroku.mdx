@@ -34,11 +34,11 @@ Alternatively, use the [Heroku to Supabase migration tool](https://migrate.supab
    - User (`$HEROKU_USER`)
    - Password (`$HEROKU_PASSWORD`)
 
-## Retrieve your Supabase host [#retrieve-supabase-host]
+## Retrieve your Supabase connection string [#retrieve-supabase-connection-string]
 
 1. If you're new to Supabase, [create a project](https://supabase.com/dashboard).
 1. Go to the [Database settings](https://supabase.com/dashboard/project/_/settings/database) for your project in the Supabase Dashboard.
-1. Under **Connection Info**, note your Host (`$SUPABASE_HOST`).
+1. Under **Connection string**, make sure `Use connection pooling` is enabled. Copy the URI and replace the password placeholder with your database password.
 
 ## Export your Heroku database to a file [#export-heroku-database]
 
@@ -55,7 +55,7 @@ pg_dump --clean --if-exists --quote-all-identifiers \
 Use `psql` to import the Heroku database file to your Supabase project.
 
 ```bash
-psql -h $SUPABASE_HOST -U postgres -f heroku_dump.sql
+psql -d "$YOUR_CONNECTION_STRING" -f heroku_dump.sql
 ```
 
 ## Additional options
