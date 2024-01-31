@@ -480,13 +480,12 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                       location: any
                       employment: string
                       description: string
-                      absolute_url: string
-                    },
-                    i: number
+                      id: number,
+                    }
                   ) => {
                     return (
-                      <div className="cursor-pointer md:cursor-default" key={i}>
-                        <Link href={job.absolute_url}>
+                      <div className="cursor-pointer md:cursor-default" key={job.id}>
+                        <Link href={`careers/${job.id}`}>
                           <div className="bg-alternative border-muted drop-shadow-sm border p-4 px-7 rounded-md sm:flex sm:items-center transition ease-out hover:bg-surface-100 hover:drop-shadow-md hover:cursor-pointer">
                             <h2 className="text-base min-w-[240px] lg:min-w-[316px] truncate mr-6">
                               {job.title}
