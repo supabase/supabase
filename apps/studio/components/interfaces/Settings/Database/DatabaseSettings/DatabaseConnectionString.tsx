@@ -1,5 +1,4 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-
 import { useParams, useTelemetryProps } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
