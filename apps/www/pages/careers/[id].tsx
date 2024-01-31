@@ -1,5 +1,6 @@
 import { NextPage } from "next"
 import { NextSeo } from 'next-seo'
+import DefaultLayout from "~/components/Layouts/Default"
 
 export const getServerSideProps = (context: any) => {
   const params = context.params
@@ -26,7 +27,9 @@ const Job: NextPage = ({ id }: any) => {
           // ],
         }}
       />
-    <div>{id}</div>
+      <DefaultLayout>
+        <div>{id}</div>
+      </DefaultLayout>
     </>
   )
 }
