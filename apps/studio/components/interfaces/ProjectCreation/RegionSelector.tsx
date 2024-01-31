@@ -37,9 +37,7 @@ export const RegionSelector = ({
       onSelectRegion(region)
     } else if (isError && !selectedRegion) {
       // if an error happened, and the user haven't selected a region, just select the default one for him
-      // [Joshen] TEMP FIX BLOCK APSE 1 ON PROD, no need for undefined check
-      const defaultRegion = PROVIDERS[cloudProvider].default_region
-      if (defaultRegion !== undefined) onSelectRegion(defaultRegion)
+      onSelectRegion(PROVIDERS[cloudProvider].default_region)
     }
   }, [cloudProvider, isError, isSuccess, region, selectedRegion])
 
