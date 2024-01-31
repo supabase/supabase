@@ -1,4 +1,5 @@
 import { components } from 'data/api'
+import { IS_PLATFORM } from '.'
 
 export type CloudProvider = 'FLY' | 'AWS'
 export type Region = typeof AWS_REGIONS | typeof FLY_REGIONS
@@ -16,7 +17,11 @@ export const AWS_REGIONS = {
   // 'North EU': 'North EU',
   CENTRAL_EU: 'Central EU (Frankfurt)',
   SOUTH_ASIA: 'South Asia (Mumbai)',
-  SOUTHEAST_ASIA: 'Southeast Asia (Singapore)',
+  // [Joshen] Temp block apse1 for prod
+  ...(process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging' ||
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
+    ? { SOUTHEAST_ASIA: 'Southeast Asia (Singapore)' }
+    : {}),
   NORTHEAST_ASIA: 'Northeast Asia (Tokyo)',
   NORTHEAST_ASIA_2: 'Northeast Asia (Seoul)',
   OCEANIA: 'Oceania (Sydney)',
