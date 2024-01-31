@@ -755,7 +755,10 @@ export const database: NavMenuConstant = {
           url: '/guides/database/postgres/roles',
         },
         { name: 'Managing secrets with Vault', url: '/guides/database/vault' },
-        { name: 'Superuser Access and Unsupported Operations', url: '/guides/database/postgres/roles-superuser'}
+        {
+          name: 'Superuser Access and Unsupported Operations',
+          url: '/guides/database/postgres/roles-superuser',
+        },
       ],
     },
     {
@@ -945,8 +948,8 @@ export const database: NavMenuConstant = {
         },
         {
           name: 'Replicating from Supabase to External Postgres',
-          url: '/guides/database/postgres/setp-replication-external'
-        }
+          url: '/guides/database/postgres/setp-replication-external',
+        },
       ],
     },
   ],
