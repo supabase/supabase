@@ -1,30 +1,30 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
-import { delete_, isResponseOk } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import { ResponseError, UserContent } from 'types'
+
+import { del } from 'data/fetchers'
+import { ResponseError } from 'types'
 import { contentKeys } from './keys'
 
-type DeleteContentVariables = { projectRef: string; id: string }
+type DeleteContentVariables = { projectRef: string; ids: string[] }
 
-export async function deleteContent(
-  { projectRef, id }: DeleteContentVariables,
+export async function deleteContents(
+  { projectRef, ids }: DeleteContentVariables,
   signal?: AbortSignal
 ) {
-  const response = await delete_<UserContent>(
-    `${API_URL}/projects/${projectRef}/content?id=${id}`,
-    undefined,
-    { signal }
-  )
+  const { data, error } = await del('/platform/projects/{ref}/content', {
+    headers: { Version: '2' },
+    params: {
+      path: { ref: projectRef },
+      query: { ids },
+    },
+    signal,
+  })
 
-  if (!isResponseOk(response)) {
-    throw response.error
-  }
-
-  return response
+  if (error) throw error
+  return data.map((x) => x.id)
 }
 
-type DeleteContentData = Awaited<ReturnType<typeof deleteContent>>
+type DeleteContentData = Awaited<ReturnType<typeof deleteContents>>
 
 export const useContentDeleteMutation = ({
   onSuccess,
@@ -37,7 +37,7 @@ export const useContentDeleteMutation = ({
   const queryClient = useQueryClient()
 
   return useMutation<DeleteContentData, ResponseError, DeleteContentVariables>(
-    (args) => deleteContent(args),
+    (args) => deleteContents(args),
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
@@ -46,7 +46,7 @@ export const useContentDeleteMutation = ({
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          toast.error(`Failed to delete content: ${data.message}`)
+          toast.error(`Failed to delete contents: ${data.message}`)
         } else {
           onError(data, variables, context)
         }

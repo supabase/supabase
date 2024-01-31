@@ -153,7 +153,7 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
 
   const { mutate: deleteContent, isLoading: isDeleting } = useContentDeleteMutation({
     onSuccess(data) {
-      if (data.id) snap.removeSnippet(data.id)
+      if (data.length > 0) snap.removeSnippet(data[0])
 
       const existingSnippetIds = (snap.orders[ref!] ?? []).filter((x) => x !== id)
       if (existingSnippetIds.length === 0) {
@@ -164,7 +164,7 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
     },
     onError(error, data) {
       if (error.code === 404 && error.message.includes('Content not found')) {
-        if (data.id) snap.removeSnippet(data.id)
+        if (data.ids) snap.removeSnippet(data.ids[0])
         const existingSnippetIds = (snap.orders[ref!] ?? []).filter((x) => x !== id)
         if (existingSnippetIds.length === 0) {
           router.push(`/project/${ref}/sql/new`)
@@ -229,7 +229,7 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
   const onConfirmDelete = async () => {
     if (!ref) return console.error('Project ref is required')
     if (!id) return console.error('Snippet ID is required')
-    deleteContent({ projectRef: ref, id })
+    deleteContent({ projectRef: ref, ids: [id] })
   }
 
   const createPersonalCopy = async () => {
