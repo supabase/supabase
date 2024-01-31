@@ -46,9 +46,7 @@ export const DatabaseConnectionString = () => {
 
   const connectionStringsRef = useRef<HTMLDivElement>(null)
   const [usePoolerConnection, setUsePoolerConnection] = useState(true)
-  const [poolingMode, setPoolingMode] = useState<'transaction' | 'session' | 'statement'>(
-    'transaction'
-  )
+  const [poolingMode, setPoolingMode] = useState<'transaction' | 'session' | 'statement'>('session')
   const [showUriSyntax, setShowUriSyntax] = useState(false)
   const [selectedTab, setSelectedTab] = useState<
     'uri' | 'psql' | 'golang' | 'jdbc' | 'dotnet' | 'nodejs' | 'php' | 'python'
@@ -140,12 +138,6 @@ export const DatabaseConnectionString = () => {
       connectionStringsRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' })
     }
   }, [connectionString])
-
-  useEffect(() => {
-    if (poolingInfo?.pool_mode !== undefined) {
-      setPoolingMode(poolingInfo.pool_mode)
-    }
-  }, [poolingInfo?.pool_mode])
 
   return (
     <div id="connection-string">

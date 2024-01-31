@@ -1,6 +1,5 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useParams } from 'common'
-import { useState } from 'react'
 import {
   Badge,
   Button,
@@ -14,10 +13,10 @@ import {
 } from 'ui'
 
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { usePgBouncerStatus } from 'data/config/pgbouncer-enabled-query'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
-import { usePgBouncerStatus } from 'data/config/pgbouncer-enabled-query'
 
 interface UsePoolerCheckboxInterface {
   id: string
@@ -76,6 +75,12 @@ export const UsePoolerCheckbox = ({
                             </DropdownMenuTrigger>
                             <DropdownMenuContent side="bottom" align="start">
                               <DropdownMenuItem
+                                key="session"
+                                onClick={() => onSelectPoolingMode('session')}
+                              >
+                                Session mode
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
                                 key="transaction"
                                 onClick={() => onSelectPoolingMode('transaction')}
                               >
@@ -106,12 +111,6 @@ export const UsePoolerCheckbox = ({
                                     </Tooltip.Portal>
                                   )}
                                 </Tooltip.Root>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                key="session"
-                                onClick={() => onSelectPoolingMode('session')}
-                              >
-                                Session mode
                               </DropdownMenuItem>
                               <Separator className="my-1" />
                               <DropdownMenuItem
