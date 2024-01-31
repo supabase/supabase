@@ -20,7 +20,6 @@ const ConnectTabContent = ({
   pooler = false,
   projectKeys,
 }: ConnectContentTabProps) => {
-  console.log('out here', { projectKeys })
   const ContentFile = dynamic<ContentFileProps>(() => import(`./content/${path}`))
 
   return (

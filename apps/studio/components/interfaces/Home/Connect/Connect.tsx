@@ -1,6 +1,6 @@
 import { DatabaseConnectionString } from 'components/interfaces/Settings/Database/DatabaseSettings/DatabaseConnectionString'
-import { ArrowUpRight, FileJson2, Plug } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { ArrowUpRight, Plug } from 'lucide-react'
+import { useState } from 'react'
 import {
   Button,
   DialogContent_Shadcn_,
@@ -15,16 +15,8 @@ import {
   TabsTrigger_Shadcn_,
   Tabs_Shadcn_,
 } from 'ui'
-import {
-  CONNECTION_TYPES,
-  FRAMEWORKS,
-  File,
-  ORMS,
-  ConnectionType,
-  GRAPHQL,
-} from './Connect.constants'
+import { CONNECTION_TYPES, ConnectionType, FRAMEWORKS, ORMS } from './Connect.constants'
 import ConnectDropdown from './ConnectDropdown'
-import ConnectTabContent from './ConnectTabContent'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
@@ -34,8 +26,9 @@ import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useCheckPermissions } from 'hooks'
 import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
-import { projectKeys } from './Connect.types'
 import Link from 'next/link'
+import { projectKeys } from './Connect.types'
+import ConnectTabContentNew from './ConnectTabContentNew'
 
 type GetContentFilesArgs = {
   selectedParent: string
@@ -43,7 +36,35 @@ type GetContentFilesArgs = {
   selectedGrandchild: string
   connectionObject: ConnectionType[]
 }
-const getContentFiles = ({
+// const getContentFiles = ({
+//   connectionObject,
+//   selectedParent,
+//   selectedChild,
+//   selectedGrandchild,
+// }: GetContentFilesArgs) => {
+//   const parent = connectionObject.find((item) => item.key === selectedParent)
+
+//   if (parent) {
+//     const child = parent.children.find((child) => child.key === selectedChild)
+
+//     // check grandchild first, then child, then parent as the fallback
+//     if (child) {
+//       const grandchild = child.children.find((grandchild) => grandchild.key === selectedGrandchild)
+
+//       if (grandchild) {
+//         return grandchild.files || []
+//       } else {
+//         return child.files || []
+//       }
+//     } else {
+//       return parent.files || []
+//     }
+//   }
+
+//   return []
+// }
+
+const getContentFilePath = ({
   connectionObject,
   selectedParent,
   selectedChild,
@@ -59,26 +80,23 @@ const getContentFiles = ({
       const grandchild = child.children.find((grandchild) => grandchild.key === selectedGrandchild)
 
       if (grandchild) {
-        return grandchild.files || []
+        return `${selectedParent}/${selectedChild}/${selectedGrandchild}`
       } else {
-        return child.files || []
+        return `${selectedParent}/${selectedChild}`
       }
     } else {
-      return parent.files || []
+      return selectedParent
     }
   }
 
-  return []
+  return ''
 }
-
 const Connect = () => {
   const { ref: projectRef } = useParams()
 
   const [parentSelectorOpen, setParentSelectorOpen] = useState(false)
   const [childDropdownOpen, setChildDropdownOpen] = useState(false)
   const [grandChildDropdownOpen, setGrandChildDropdownOpen] = useState(false)
-  const [useConnectionPooler, setUseConnectionPooler] = useState(false)
-
   const [connectionObject, setConnectionObject] = useState<ConnectionType[]>(FRAMEWORKS)
   const [selectedParent, setSelectedParent] = useState(connectionObject[0].key) // aka nextjs
   const [selectedChild, setSelectedChild] = useState(
@@ -90,23 +108,23 @@ const Connect = () => {
     )?.children[0]?.key || ''
   )
 
-  const [contentFiles, setContentFiles] = useState(
-    connectionObject
-      .find((item) => item.key === selectedParent)
-      ?.children.find((child) => child.key === selectedChild)
-      ?.children.find((grandchild) => grandchild.key === selectedGrandchild)?.files || []
-  )
-
+  // const [contentFiles, setContentFiles] = useState(
+  //   connectionObject
+  //     .find((item) => item.key === selectedParent)
+  //     ?.children.find((child) => child.key === selectedChild)
+  //     ?.children.find((grandchild) => grandchild.key === selectedGrandchild)?.files || []
+  // )
+  console.log(selectedParent, selectedChild, selectedGrandchild)
   // set the content files when the parent/child/grandchild changes
-  useEffect(() => {
-    const files = getContentFiles({
-      connectionObject,
-      selectedParent,
-      selectedChild,
-      selectedGrandchild,
-    })
-    setContentFiles(files)
-  }, [selectedParent, selectedChild, selectedGrandchild, connectionObject])
+  // useEffect(() => {
+  //   const files = getContentFiles({
+  //     connectionObject,
+  //     selectedParent,
+  //     selectedChild,
+  //     selectedGrandchild,
+  //   })
+  //   //setContentFiles(files)
+  // }, [selectedParent, selectedChild, selectedGrandchild, connectionObject])
 
   const handleParentChange = (value: string) => {
     setSelectedParent(value)
@@ -166,10 +184,10 @@ const Connect = () => {
       handleConnectionTypeChange(ORMS)
     }
 
-    if (type === 'graphql') {
-      setConnectionObject(GRAPHQL)
-      handleConnectionTypeChange(GRAPHQL)
-    }
+    // if (type === 'graphql') {
+    //   setConnectionObject(GRAPHQL)
+    //   handleConnectionTypeChange(GRAPHQL)
+    // }
   }
 
   const getChildOptions = () => {
@@ -215,6 +233,13 @@ const Connect = () => {
     : null
 
   const projectKeys = { apiUrl, anonKey }
+
+  const filePath = getContentFilePath({
+    connectionObject,
+    selectedParent,
+    selectedChild,
+    selectedGrandchild,
+  })
 
   return (
     <div>
@@ -311,11 +336,7 @@ const Connect = () => {
                     )}
                   </div>
 
-                  <ConnectTabsContent
-                    files={contentFiles}
-                    defaultValue={contentFiles[0].location}
-                    projectKeys={projectKeys}
-                  />
+                  <ConnectTabsContent projectKeys={projectKeys} filePath={filePath} />
                 </div>
               </TabsContent_Shadcn_>
             ))}
@@ -334,57 +355,23 @@ const Connect = () => {
 }
 
 interface ConnectTabsContentProps {
-  files: File[]
-  pooler?: boolean
-  defaultValue: string
+  filePath: string
   projectKeys: projectKeys
 }
-const ConnectTabsContent = ({
-  files,
-  pooler,
-  defaultValue,
-  projectKeys,
-}: ConnectTabsContentProps) => {
+
+const ConnectTabsContent = ({ filePath, projectKeys }: ConnectTabsContentProps) => {
   // Crappy hack to get the tabs to re-render when the defaultValue changes
   // I can't figure out why it doesn't re-render with the correct tab selected - jordi
-  const [syncedDefaultValue, setSyncedDefaultValue] = useState(defaultValue)
-
-  useEffect(() => {
-    setSyncedDefaultValue(defaultValue)
-  }, [defaultValue])
+  // const [syncedDefaultValue, setSyncedDefaultValue] = useState(defaultValue)
+  // const filePath = useEffect(() => {
+  //   setSyncedDefaultValue(defaultValue)
+  // }, [defaultValue])
 
   return (
     <div className="bg-surface bg-surface-100 p-4 rounded-md mt-4">
-      <Tabs_Shadcn_
-        value={syncedDefaultValue}
-        onValueChange={setSyncedDefaultValue}
-        defaultValue={syncedDefaultValue}
-      >
-        <TabsList_Shadcn_>
-          {files.map((file) => (
-            <TabsTrigger_Shadcn_
-              key={file.location}
-              value={file.location}
-              className="flex items-center gap-1"
-            >
-              <FileJson2 size={15} className="text-lighter" />
-              {file.destinationFilename}
-            </TabsTrigger_Shadcn_>
-          ))}
-        </TabsList_Shadcn_>
-
-        {files.map((file) => (
-          <TabsContent_Shadcn_ key={file.location} value={file.location}>
-            <ConnectTabContent
-              destinationLocation={file.destinationLocation}
-              path={file.location}
-              pooler={pooler}
-              projectKeys={projectKeys}
-            />
-          </TabsContent_Shadcn_>
-        ))}
-      </Tabs_Shadcn_>
+      <ConnectTabContentNew projectKeys={projectKeys} filePath={filePath} />
     </div>
   )
 }
+
 export default Connect
