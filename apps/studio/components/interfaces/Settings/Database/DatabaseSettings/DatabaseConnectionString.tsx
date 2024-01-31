@@ -1,4 +1,5 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
+
 import { useParams, useTelemetryProps } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
@@ -59,8 +60,6 @@ export const DatabaseConnectionString = () => {
   const [poolingMode, setPoolingMode] = useState<'transaction' | 'session' | 'statement'>(
     'transaction'
   )
-  const [showUriSyntax, setShowUriSyntax] = useState(false)
-  const [showSQLAlchemy, setShowSQLAlchemy] = useState(false)
   const [selectedTab, setSelectedTab] = useState<
     'uri' | 'psql' | 'golang' | 'jdbc' | 'dotnet' | 'nodejs' | 'php' | 'python'
   >('uri')
