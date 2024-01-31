@@ -82,7 +82,15 @@ export const UsePoolerCheckbox = ({
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 key="transaction"
-                                onClick={() => onSelectPoolingMode('transaction')}
+                                className={
+                                  data.pool_mode === 'session'
+                                    ? 'cursor-not-allowed focus:bg-transparent'
+                                    : ''
+                                }
+                                onClick={() =>
+                                  data.pool_mode === 'transaction' &&
+                                  onSelectPoolingMode('transaction')
+                                }
                               >
                                 <Tooltip.Root delayDuration={0}>
                                   <Tooltip.Trigger asChild>
