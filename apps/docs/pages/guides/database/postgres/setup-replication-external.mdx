@@ -1,0 +1,58 @@
+import { createDecipheriv } from 'crypto'
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  title: 'Replicate to another Postgres database using Logical Replication',
+  description: 'Example to setup logical replication using publish-subscribe to a Postgres database outside of Supabase',
+  footerHelpType: 'postgres',
+}
+
+For this example, you will need:
+- A Supabase project
+- A PostgreSQL database (running v10 or newer)
+
+We will be running commands on both of these databases to publish changes from our Supabase database to our external database.
+
+1. We need to create our `publication` so let's run this on our **Supabase database**:
+
+```sql
+CREATE PUBLICATION example_pub;
+```
+
+2. Also on our **Supabase database**, let's create a `replication slot`:
+
+```sql
+SELECT pg_create_logical_replication_slot('example_slot', 'pgoutput');
+```
+
+3. Now we will connect to our **external database** and subscribe to our `publication` Note: This will need a direct connection to your database and you can find the connection info in the [Dashboard](https://supabase.com/dashboard/project/_/settings/database)):
+
+```sql
+CREATE SUBSCRIPTION example_sub
+CONNECTION 'host=db.oaguxblfdassqxvvwtfe.supabase.co user=postgres password=YOUR_PASS dbname=postgres'
+PUBLICATION example_pub
+WITH (copy_data = true, create_slot=false, slot_name=example_slot);
+```
+
+<Admonition type="info">
+
+We have set `create_slot` to `false` because we have already made a `replication slot` on our **Supabase database** so we provide the name in `slot_name`. 
+If we want to copy all the data that existed before the slot was created, then we set `copy_data` to `true`
+
+</Admonition>
+
+4. Now we have a `publication` and a `subscription`, we can add all of the tables to the publication and we are done.
+
+```sql
+ALTER PUBLICATION example_pub ADD TABLE example_table;
+```
+
+5. We can check the replication status using `pg_stat_replication`
+
+```sql
+SELECT * FROM pg_stat_replication;
+```
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
