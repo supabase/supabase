@@ -1,7 +1,11 @@
+import { AccordionContent } from '@ui/components/shadcn/ui/accordion'
 import { useParams } from 'common'
+import SortPopover from 'components/grid/components/header/sort'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
+import ReportQueryPerformanceTableRow from 'components/interfaces/Reports/ReportQueryPerformanceTableRow'
 import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
+import { useSearchReportsQuery } from 'components/interfaces/Reports/Reports.queries'
 import { Presets } from 'components/interfaces/Reports/Reports.types'
 import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
 import { ReportsLayout } from 'components/layouts'
@@ -11,12 +15,33 @@ import CopyButton from 'components/ui/CopyButton'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { useFlag } from 'hooks'
+import { ChevronDown } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { NextPageWithLayout } from 'types'
-import { Accordion, Button, IconAlertCircle, IconCheckCircle, Tabs } from 'ui'
+import {
+  Accordion,
+  AccordionContent_Shadcn_,
+  AccordionItem_Shadcn_,
+  AccordionTrigger_Shadcn_,
+  Accordion_Shadcn_,
+  Button,
+  Button_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  IconAlertCircle,
+  IconCheckCircle,
+  IconList,
+  IconRefreshCw,
+  IconSearch,
+  Input,
+  Tabs,
+} from 'ui'
 
 const QueryPerformanceReport: NextPageWithLayout = () => {
   const { project } = useProjectContext()
@@ -24,11 +49,17 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   const tableIndexEfficiencyEnabled = useFlag('tableIndexEfficiency')
   const config = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
   const { ref: projectRef } = useParams()
+  const router = useRouter()
   const hooks = queriesFactory(config.queries, projectRef ?? 'default')
   const mostFrequentlyInvoked = hooks.mostFrequentlyInvoked()
   const mostTimeConsuming = hooks.mostTimeConsuming()
   const slowestExecutionTime = hooks.slowestExecutionTime()
   const queryHitRate = hooks.queryHitRate()
+  const searchByQuery = useSearchReportsQuery({
+    searchQuery: (router.query.search as string) || '',
+    projectRef: project?.ref!,
+  })
+  const defaultSearchQueryValue = router.query.search ? String(router.query.search) : ''
 
   const isLoading = [
     mostFrequentlyInvoked.isLoading,
@@ -96,6 +127,26 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
 `
   const panelClassNames = 'text-sm max-w-none flex flex-col gap-8 py-4'
   const helperTextClassNames = 'prose text-sm max-w-2xl text-foreground-light'
+
+  function onSortChange(sort: 'lat_desc' | 'lat_asc') {
+    router.push({
+      ...router,
+      query: {
+        ...router.query,
+        sort,
+      },
+    })
+  }
+
+  function getSortButtonLabel() {
+    const sort = router.query.sort as 'lat_desc' | 'lat_asc'
+
+    if (sort === 'lat_desc') {
+      return 'Sorted by latency - high to low'
+    } else {
+      return 'Sorted by latency - low to high'
+    }
+  }
 
   return (
     <ReportPadding>
@@ -205,7 +256,107 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
               <ReactMarkdown className={helperTextClassNames}>
                 {TimeConsumingHelperText}
               </ReactMarkdown>
-              <div className="thin-scrollbars max-w-full overflow-scroll">
+              <div className="thin-scrollbars max-w-full overflow-auto">
+                <div className="flex justify-between items-center">
+                  <form
+                    className="py-3 flex gap-4"
+                    id="log-panel-search"
+                    onSubmit={(e) => {
+                      e.preventDefault()
+                      const formData = new FormData(e.target as HTMLFormElement)
+                      const searchQuery = formData.get('search')
+
+                      if (!searchQuery || typeof searchQuery !== 'string') return
+
+                      router.push({
+                        ...router,
+                        query: {
+                          ...router.query,
+                          search: searchQuery,
+                        },
+                      })
+                    }}
+                  >
+                    <Input
+                      className="w-60"
+                      size="tiny"
+                      placeholder="Search roles or queries"
+                      name="search"
+                      defaultValue={defaultSearchQueryValue}
+                      autoComplete="off"
+                      icon={
+                        <div className="text-foreground-lighter">
+                          <IconSearch size={14} />
+                        </div>
+                      }
+                      actions={
+                        true && (
+                          <button
+                            onClick={() => {}}
+                            className="mx-2 text-foreground-light hover:text-foreground"
+                          >
+                            {'↲'}
+                          </button>
+                        )
+                      }
+                    />
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button icon={<IconList />}>{getSortButtonLabel()}</Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="w-56">
+                        <DropdownMenuItem>
+                          <label>
+                            <input
+                              className=""
+                              type="radio"
+                              value="lat_desc"
+                              defaultChecked={router.query.sort === 'lat_desc'}
+                              onChange={(e) => {
+                                if (e.target.value === 'lat_desc') {
+                                  onSortChange(e.target.value)
+                                }
+                              }}
+                            />
+                            Sort by latency - high to low
+                          </label>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <label>
+                            <input
+                              type="radio"
+                              value="lat_asc"
+                              className=""
+                              defaultChecked={router.query.sort === 'lat_asc'}
+                              onChange={(e) => {
+                                if (e.target.value === 'lat_asc') {
+                                  onSortChange(e.target.value)
+                                }
+                              }}
+                            />
+                            Sort by latency - low to high
+                          </label>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </form>
+                  <div>
+                    <Button
+                      type="default"
+                      size="tiny"
+                      onClick={handleRefresh}
+                      disabled={isLoading ? true : false}
+                      icon={
+                        <IconRefreshCw
+                          size="tiny"
+                          className={`text-foreground-light ${isLoading ? 'animate-spin' : ''}`}
+                        />
+                      }
+                    >
+                      {isLoading ? 'Refreshing' : 'Refresh'}
+                    </Button>
+                  </div>
+                </div>
                 <Table
                   head={
                     <>
@@ -214,33 +365,19 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                       <Table.th className="table-cell">Calls</Table.th>
                       <Table.th className="table-cell">Total Time</Table.th>
                       <Table.th className="table-cell">Query</Table.th>
+                      <Table.th className="table-cell">
+                        <div className="sr-only">Actions</div>
+                      </Table.th>
                     </>
                   }
                   body={
                     !isLoading && mostTimeConsuming && mostTimeConsuming?.data ? (
                       mostTimeConsuming?.data?.map((item, i) => {
                         return (
-                          <Table.tr key={i} hoverable className="relative">
-                            <Table.td className="table-cell whitespace-nowrap w-36">
-                              {item.rolname}
-                            </Table.td>
-                            <Table.td className="table-cell whitespace-nowrap">
-                              {item.prop_total_time}
-                            </Table.td>
-                            <Table.td className="table-cell whitespace-nowrap">
-                              {item.calls}
-                            </Table.td>
-                            <Table.td className="table-cell whitespace-nowrap">
-                              {item.total_time.toFixed(2)}ms
-                            </Table.td>
-                            <Table.td className="relative table-cell whitespace-nowrap w-36">
-                              <p className="w-96 block truncate font-mono">{item.query}</p>
-                              <QueryActions
-                                sql={item.query}
-                                className="absolute inset-y-0 right-0"
-                              />
-                            </Table.td>
-                          </Table.tr>
+                          <ReportQueryPerformanceTableRow
+                            key={i + '-rqptr'}
+                            item={item}
+                          ></ReportQueryPerformanceTableRow>
                         )
                       })
                     ) : (
@@ -256,7 +393,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
               <ReactMarkdown className={helperTextClassNames}>
                 {MostFrequentHelperText}
               </ReactMarkdown>
-              <div className="thin-scrollbars max-w-full overflow-scroll">
+              <div className="thin-scrollbars max-w-full overflow-auto">
                 <Table
                   head={
                     <>
@@ -320,7 +457,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
               <ReactMarkdown className={helperTextClassNames}>
                 {SlowestExecutionHelperText}
               </ReactMarkdown>
-              <div className="thin-scrollbars max-w-full overflow-scroll">
+              <div className="thin-scrollbars max-w-full overflow-auto">
                 <Table
                   head={
                     <>
@@ -388,7 +525,7 @@ const QueryActions = ({ sql, className }: { sql: string; className: string }) =>
   if (sql.includes('insufficient privilege')) return null
 
   return (
-    <div className={[className, 'flex justify-center items-center mr-4'].join(' ')}>
+    <div className={[className, 'flex justify-end items-center'].join(' ')}>
       <CopyButton type="default" text={sql} />
     </div>
   )

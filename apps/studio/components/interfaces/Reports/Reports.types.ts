@@ -45,4 +45,5 @@ export interface ReportFilterItem {
   key: string
   value: string | number
   compare: 'matches' | 'is'
+  query?: string
 }

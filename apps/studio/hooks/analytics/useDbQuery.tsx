@@ -21,7 +21,7 @@ export interface DbQueryHook<T = any> {
 }
 
 const useDbQuery = (
-  sql: ReportQuery['sql'],
+  sql: ReportQuery['sql'] | string,
   params: BaseReportParams = DEFAULT_QUERY_PARAMS
 ): DbQueryHook => {
   const { project } = useProjectContext()

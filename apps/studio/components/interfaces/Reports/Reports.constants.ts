@@ -33,7 +33,7 @@ export const DEFAULT_QUERY_PARAMS = {
   iso_timestamp_end: REPORTS_DATEPICKER_HELPERS[0].calcTo(),
 }
 
-const generateRegexpWhere = (filters: ReportFilterItem[], prepend = true) => {
+export const generateRegexpWhere = (filters: ReportFilterItem[], prepend = true) => {
   if (filters.length === 0) return ''
   const conditions = filters
     .map((filter) => {
@@ -296,6 +296,33 @@ select
     statements.rows / statements.calls as avg_rows
   from pg_stat_statements as statements
     inner join pg_authid as auth on statements.userid = auth.oid
+  order by
+    statements.calls desc
+  limit 10;`,
+      },
+      searchByQueryOrOwner: {
+        queryType: 'db',
+        sql: (filters) => `
+-- Search by query
+-- A limit of 100 has been added below
+select
+    auth.rolname,
+    statements.query,
+    statements.calls,
+    -- -- Postgres 13, 14, 15
+    statements.total_exec_time + statements.total_plan_time as total_time,
+    statements.min_exec_time + statements.min_plan_time as min_time,
+    statements.max_exec_time + statements.max_plan_time as max_time,
+    statements.mean_exec_time + statements.mean_plan_time as mean_time,
+    -- -- Postgres <= 12
+    -- total_time,
+    -- min_time,
+    -- max_time,
+    -- mean_time,
+    statements.rows / statements.calls as avg_rows
+  from pg_stat_statements as statements
+    inner join pg_authid as auth on statements.userid = auth.oid
+        ${generateRegexpWhere(filters)}
   order by
     statements.calls desc
   limit 10;`,
