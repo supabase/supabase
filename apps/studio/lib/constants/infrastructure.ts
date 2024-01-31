@@ -17,8 +17,11 @@ export const AWS_REGIONS = {
   // 'North EU': 'North EU',
   CENTRAL_EU: 'Central EU (Frankfurt)',
   SOUTH_ASIA: 'South Asia (Mumbai)',
-  // [Joshen] Temp block apse1 for prod
-  // SOUTHEAST_ASIA: 'Southeast Asia (Singapore)'
+  // [Joshen] TEMP FIX BLOCK APSE 1 ON PROD
+  ...(process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+    ? { SOUTHEAST_ASIA: 'Southeast Asia (Singapore)' }
+    : {}),
   NORTHEAST_ASIA: 'Northeast Asia (Tokyo)',
   NORTHEAST_ASIA_2: 'Northeast Asia (Seoul)',
   OCEANIA: 'Oceania (Sydney)',
@@ -32,9 +35,9 @@ export const FLY_REGIONS = {
   SOUTHEAST_ASIA: 'Singapore',
 } as const
 
-// [Joshen] TEMP FIX, CHANGE BACK TO APSE1
+// [Joshen] TEMP FIX BLOCK APSE 1 ON PROD
 export const AWS_REGIONS_DEFAULT =
-  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? AWS_REGIONS.NORTHEAST_ASIA : AWS_REGIONS.WEST_US
+  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? AWS_REGIONS.SOUTHEAST_ASIA : AWS_REGIONS.WEST_US
 
 // TO DO, change default to US region for prod
 const FLY_REGIONS_DEFAULT = FLY_REGIONS.SOUTHEAST_ASIA
