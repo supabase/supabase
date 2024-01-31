@@ -288,8 +288,7 @@ export const ConnectionPooling = () => {
                             {field.value === 'session' && (
                               <Alert_Shadcn_>
                                 <AlertTitle_Shadcn_ className="text-foreground">
-                                  Set to transaction mode to allow using both pooling modes
-                                  concurrently
+                                  Set to transaction mode to use both pooling modes concurrently
                                 </AlertTitle_Shadcn_>
                                 <AlertDescription_Shadcn_>
                                   Session mode can be used concurrently with transaction mode by
