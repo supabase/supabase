@@ -31,37 +31,28 @@ const ReportQueryPerformanceTableRow = ({ item }: Props) => {
 
   return (
     <>
-      <Collapsible asChild open={expanded} onOpenChange={setExpanded}>
-        <>
-          <Table.tr
-            onClick={() => setExpanded(!expanded)}
-            className="relative *:table-cell *:whitespace-nowrap *:h-12"
-          >
-            <CollapsibleTrigger asChild>
-              <Table.td className="table-cell  whitespace-nowrap w-36">{item.rolname}</Table.td>
-            </CollapsibleTrigger>
-            <Table.td>{item.prop_total_time}</Table.td>
-            <Table.td>{item.calls}</Table.td>
-            <Table.td>{item.total_time.toFixed(2)}ms</Table.td>
-            <Table.td className="relative w-36">
-              <p className="w-96 block truncate font-mono">{item.query}</p>
-            </Table.td>
-            <Table.td className="">
-              <QueryActions sql={item.query} className="" />
-            </Table.td>
-          </Table.tr>
+      <Table.tr
+        onClick={() => setExpanded(!expanded)}
+        className="expandable-tr *:flex *:items-center *:text-ellipsis *:overflow-hidden"
+      >
+        <Table.td className="whitespace-nowrap">{item.rolname}</Table.td>
+        <Table.td>{item.prop_total_time}</Table.td>
+        <Table.td>{item.calls}</Table.td>
+        <Table.td>{item.total_time.toFixed(2)}ms</Table.td>
+        <Table.td className="relative w-full">
+          <p className="w-96 block truncate font-mono">{item.query}</p>
+          <QueryActions sql={item.query} className="" />
+        </Table.td>
+      </Table.tr>
 
-          <CollapsibleContent asChild>
-            <tr className="">
-              <td colSpan={6} className="!p-0">
-                <pre className="max-h-80 w-full overflow-auto bg-background-alternative-200 text-foreground text-sm break-words py-4 px-3">
-                  {item.query}
-                </pre>
-              </td>
-            </tr>
-          </CollapsibleContent>
-        </>
-      </Collapsible>
+      <Table.td
+        className={`${
+          expanded ? 'h-auto opacity-100' : 'h-0 opacity-0'
+        } expanded-row-content border-l border-r bg-alternative !pt-0 !pb-0 transition-all`}
+        colSpan={5}
+      >
+        {expanded && <pre className="overflow-auto">{item.query}</pre>}
+      </Table.td>
     </>
   )
 }

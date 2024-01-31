@@ -358,16 +358,14 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                   </div>
                 </div>
                 <Table
+                  headTrClasses="expandable-tr"
                   head={
                     <>
-                      <Table.th className="table-cell">Role</Table.th>
-                      <Table.th className="table-cell">Time Consumed</Table.th>
-                      <Table.th className="table-cell">Calls</Table.th>
-                      <Table.th className="table-cell">Total Time</Table.th>
-                      <Table.th className="table-cell">Query</Table.th>
-                      <Table.th className="table-cell">
-                        <div className="sr-only">Actions</div>
-                      </Table.th>
+                      <Table.th>Role</Table.th>
+                      <Table.th>Time Consumed</Table.th>
+                      <Table.th>Calls</Table.th>
+                      <Table.th>Total Time</Table.th>
+                      <Table.th>Query</Table.th>
                     </>
                   }
                   body={
