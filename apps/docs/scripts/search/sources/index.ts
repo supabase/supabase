@@ -1,16 +1,17 @@
 import {
   GitHubDiscussionLoader,
-  GitHubDiscussionSource,
+  type GitHubDiscussionSource,
   fetchDiscussions,
 } from './github-discussion'
-import { MarkdownLoader, MarkdownSource } from './markdown'
+import { MarkdownLoader, type MarkdownSource } from './markdown'
+import { IntegrationLoader, type IntegrationSource, fetchPartners } from './partner-integrations'
 import {
   CliReferenceLoader,
-  CliReferenceSource,
+  type CliReferenceSource,
   ClientLibReferenceLoader,
-  ClientLibReferenceSource,
+  type ClientLibReferenceSource,
   OpenApiReferenceLoader,
-  OpenApiReferenceSource,
+  type OpenApiReferenceSource,
 } from './reference-doc'
 import { walk } from './util'
 
@@ -22,6 +23,7 @@ export type SearchSource =
   | ClientLibReferenceSource
   | CliReferenceSource
   | GitHubDiscussionSource
+  | IntegrationSource
 
 /**
  * Fetches all the sources we want to index for search
@@ -96,6 +98,10 @@ export async function fetchSources() {
     .filter(({ path }) => !ignoredFiles.includes(path))
     .map((entry) => new MarkdownLoader('guide', entry.path).load())
 
+  const partnerIntegrationSources = (await fetchPartners()).map((partner) =>
+    new IntegrationLoader(partner.slug, partner).load()
+  )
+
   const githubDiscussionSources = (
     await fetchDiscussions(
       'supabase',
@@ -115,6 +121,7 @@ export async function fetchSources() {
       ktLibReferenceSource,
       cliReferenceSource,
       ...githubDiscussionSources,
+      ...partnerIntegrationSources,
       ...guideSources,
     ])
   ).flat()

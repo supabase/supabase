@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { AnimatePresence } from 'framer-motion'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import { Octokit } from 'octokit'
+import { Octokit } from '@octokit/core'
 import { cn } from 'ui'
 import LogoLoader from 'ui/src/components/LogoLoader'
 
@@ -138,8 +138,8 @@ const Repos = ({ tabs }: Props) => {
                 slider.isEnd
                   ? SWIPER_STATE.END
                   : slider.isBeginning
-                  ? SWIPER_STATE.START
-                  : SWIPER_STATE.MIDDLE
+                    ? SWIPER_STATE.START
+                    : SWIPER_STATE.MIDDLE
               )
             }
             className="relative flex md:hidden justify-center max-w-full w-full overflow-hidden items-center rounded-full bg-surface-100 p-2"

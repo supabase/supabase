@@ -24,6 +24,16 @@ Database performance is a large topic and many factors can contribute. Some of t
 
 Thankfully there are solutions to all these issues, which we will cover in the following sections.
 
+<Admonition type="note">
+
+If you're seeing an `insufficient privilege` error when viewing the Query Performance page from the dashboard, run this command:
+
+```shell
+$ grant pg_read_all_stats to postgres;
+```
+
+</Admonition>
+
 ### Postgres cumulative statistics system
 
 Postgres collects data about its own operations using the [cumulative statistics system](https://www.postgresql.org/docs/current/monitoring-stats.html). In addition to this, every Supabase project has the [pg_stat_statements extension](/docs/guides/database/extensions/pg_stat_statements) enabled by default. This extension records query execution performance details and is the best way to find inefficient queries. This information can be combined with the Postgres query plan analyzer to develop more efficient queries.

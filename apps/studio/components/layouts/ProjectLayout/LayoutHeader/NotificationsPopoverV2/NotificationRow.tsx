@@ -1,37 +1,37 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import clsx from 'clsx'
 import dayjs from 'dayjs'
+import { ArchiveRestoreIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
 import { useInView } from 'react-intersection-observer'
-import { Button, IconAlertCircle, IconAlertTriangle, IconArchive, IconExternalLink } from 'ui'
+import { Button, IconArchive, IconExternalLink } from 'ui'
 
 import { Markdown } from 'components/interfaces/Markdown'
+import { CriticalIcon, WarningIcon } from 'components/ui/Icons'
+import { ItemRenderer } from 'components/ui/InfiniteList'
 import { Notification, NotificationData } from 'data/notifications/notifications-v2-query'
+import { ProjectInfo } from 'data/projects/projects-query'
 import { Organization } from 'types'
-import { Project } from 'data/projects/project-detail-query'
 
 interface NotificationRowProps {
-  index: number
-  listRef: any
-  item: Notification
   setRowHeight: (idx: number, height: number) => void
-  getProject: (ref: string) => Project
+  getProject: (ref: string) => ProjectInfo
   getOrganization: (id: number) => Organization
-  onArchiveNotification: (id: string) => void
+  onUpdateNotificationStatus: (id: string, status: 'archived' | 'seen') => void
   queueMarkRead: (id: string) => void
 }
 
-const NotificationRow = ({
+const NotificationRow: ItemRenderer<Notification, NotificationRowProps> = ({
   index,
   listRef,
   item: notification,
   setRowHeight,
   getProject,
   getOrganization,
-  onArchiveNotification,
+  onUpdateNotificationStatus,
   queueMarkRead,
-}: NotificationRowProps) => {
+}) => {
   const ref = useRef<HTMLDivElement>(null)
   const { ref: viewRef, inView } = useInView()
   const { status, priority } = notification
@@ -51,7 +51,7 @@ const NotificationRow = ({
 
   useEffect(() => {
     if (ref.current) {
-      listRef.current.resetAfterIndex(0)
+      listRef?.current?.resetAfterIndex(0)
       setRowHeight(index, ref.current.clientHeight)
     }
   }, [ref])
@@ -66,12 +66,12 @@ const NotificationRow = ({
     <div
       ref={ref}
       className={clsx(
-        `p-4 flex justify-between gap-x-3`,
+        `p-4 flex justify-between gap-x-3 group`,
         index !== 0 ? 'border-t' : '',
         status !== 'new' ? 'bg-background' : ''
       )}
     >
-      <div ref={viewRef} className="flex flex-col gap-y-2 w-full">
+      <div ref={viewRef} className="flex flex-col gap-y-2.5 w-full py-0.5">
         {(project !== undefined || organization !== undefined) && (
           <div className="flex items-center max-w-[350px]">
             {organization !== undefined && (
@@ -130,8 +130,8 @@ const NotificationRow = ({
                 const url = action.url.includes('[ref]')
                   ? action.url.replace('[ref]', project?.ref ?? '_')
                   : action.url.includes('[slug]')
-                  ? action.url.replace('[slug]', organization?.slug ?? '_')
-                  : action.url
+                    ? action.url.replace('[slug]', organization?.slug ?? '_')
+                    : action.url
                 return (
                   <Button
                     key={key}
@@ -161,28 +161,42 @@ const NotificationRow = ({
         )}
       </div>
       <div className="flex flex-col items-center gap-y-2">
-        {priority === 'Warning' && (
-          <IconAlertCircle
-            size={22}
-            strokeWidth={2}
-            className="rounded p-0.5 text-warning-400 bg-warning-600"
-          />
-        )}
-        {priority === 'Critical' && (
-          <IconAlertTriangle
-            size={22}
-            strokeWidth={2}
-            className="rounded p-0.5 text-destructive-400 bg-destructive-600"
-          />
-        )}
-        {notification.status !== 'archived' && (
+        {priority === 'Warning' && <WarningIcon className="w-5 h-5" />}
+        {priority === 'Critical' && <CriticalIcon className="w-5 h-5" />}
+        {notification.status === 'archived' ? (
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger asChild>
               <Button
                 type="outline"
-                icon={<IconArchive />}
-                className="px-1"
-                onClick={() => onArchiveNotification(notification.id)}
+                icon={
+                  <ArchiveRestoreIcon size={13} strokeWidth={2} className="text-foreground-light" />
+                }
+                className="p-1.5 group-hover:opacity-100 opacity-0 transition rounded-full"
+                onClick={() => onUpdateNotificationStatus(notification.id, 'seen')}
+              />
+            </Tooltip.Trigger>
+            <Tooltip.Portal>
+              <Tooltip.Content side="bottom">
+                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                <div
+                  className={[
+                    'rounded bg-alternative py-1 px-2 leading-none shadow',
+                    'border border-background',
+                  ].join(' ')}
+                >
+                  <span className="text-xs text-foreground">Unarchive</span>
+                </div>
+              </Tooltip.Content>
+            </Tooltip.Portal>
+          </Tooltip.Root>
+        ) : (
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger asChild>
+              <Button
+                type="outline"
+                icon={<IconArchive size={13} strokeWidth={2} className="text-foreground-light" />}
+                className="p-1.5 group-hover:opacity-100 opacity-0 transition rounded-full"
+                onClick={() => onUpdateNotificationStatus(notification.id, 'archived')}
               />
             </Tooltip.Trigger>
             <Tooltip.Portal>

@@ -1,5 +1,4 @@
 import { useRouter } from 'next/router'
-import { useState } from 'react'
 import { Button_Shadcn_ } from 'ui'
 import { auth } from '~/lib/userAuth'
 
@@ -17,7 +16,6 @@ export function getServerSideProps() {
 
 export default function DevOnlySecretAuth() {
   const router = useRouter()
-  const [email, setEmail] = useState('')
 
   function signInWithGitHub() {
     auth.signInWithOAuth({
@@ -48,8 +46,7 @@ export default function DevOnlySecretAuth() {
           the same domain.
         </p>
         <form className="flex flex-col gap-2 max-w-sm">
-          <Button_Shadcn_ type="button" onClick={() => signInWithGitHub()}>
-            {' '}
+          <Button_Shadcn_ type="button" onClick={signInWithGitHub}>
             Sign in with GitHub
           </Button_Shadcn_>
           <Button_Shadcn_ type="button" onClick={signOut}>
