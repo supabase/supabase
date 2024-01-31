@@ -26,6 +26,7 @@ import {
   generateTableFieldFromPostgresTable,
   validateFields,
 } from './TableEditor.utils'
+import { ForeignKeysManagement } from './ForeignKeysManagement'
 
 export interface TableEditorProps {
   table?: PostgresTable
@@ -370,6 +371,12 @@ const TableEditor = ({
               </Modal.Content>
             </ConfirmationModal>
           </div>
+        </SidePanel.Content>
+
+        <SidePanel.Separator />
+
+        <SidePanel.Content>
+          <ForeignKeysManagement />
         </SidePanel.Content>
       </>
     </SidePanel>

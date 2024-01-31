@@ -143,24 +143,36 @@ const ColumnManagement = ({
       <div className="w-full space-y-4 table-editor-columns">
         <div className="flex items-center justify-between w-full">
           <h5>Columns</h5>
-          {isNewRecord && (
-            <>
-              {hasImportContent ? (
-                <div className="flex items-center space-x-3">
-                  <Button type="default" icon={<IconEdit />} onClick={onSelectImportData}>
-                    Edit content
+          <div className="flex items-center gap-x-2">
+            <Button asChild type="default" icon={<IconExternalLink size={12} strokeWidth={2} />}>
+              <a
+                href="https://supabase.com/docs/guides/database/tables#data-types"
+                target="_blank"
+                rel="noreferrer"
+              >
+                About data types
+              </a>
+            </Button>
+            {isNewRecord && (
+              <>
+                <div className="py-3 border-r" />
+                {hasImportContent ? (
+                  <div className="flex items-center gap-x-2">
+                    <Button type="default" icon={<IconEdit />} onClick={onSelectImportData}>
+                      Edit content
+                    </Button>
+                    <Button type="danger" icon={<IconTrash />} onClick={onClearImportContent}>
+                      Remove content
+                    </Button>
+                  </div>
+                ) : (
+                  <Button type="default" onClick={onSelectImportData}>
+                    Import data via spreadsheet
                   </Button>
-                  <Button type="danger" icon={<IconTrash />} onClick={onClearImportContent}>
-                    Remove content
-                  </Button>
-                </div>
-              ) : (
-                <Button type="default" onClick={onSelectImportData}>
-                  Import data via spreadsheet
-                </Button>
-              )}
-            </>
-          )}
+                )}
+              </>
+            )}
+          </div>
         </div>
 
         {hasImportContent && (
@@ -207,7 +219,7 @@ const ColumnManagement = ({
                     <div
                       className={[
                         'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                        'border border-background', //border
+                        'border border-background w-[300px]', //border
                       ].join(' ')}
                     >
                       <span className="text-xs text-foreground">
@@ -237,7 +249,7 @@ const ColumnManagement = ({
                     <div
                       className={[
                         'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                        'border border-background', //border
+                        'border border-background w-[300px]', //border
                       ].join(' ')}
                     >
                       <span className="text-xs text-foreground">
@@ -336,24 +348,10 @@ const ColumnManagement = ({
 
         <div className="flex items-center justify-between">
           {!hasImportContent && (
-            <Button type="default" onClick={() => onAddColumn()}>
+            <Button block type="outline" className="py-2" onClick={() => onAddColumn()}>
               Add column
             </Button>
           )}
-          <Button
-            asChild
-            type="text"
-            className="text-foreground-light hover:text-foreground"
-            icon={<IconExternalLink size={12} strokeWidth={2} />}
-          >
-            <Link
-              href="https://supabase.com/docs/guides/database/tables#data-types"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Learn more about data types
-            </Link>
-          </Button>
         </div>
       </div>
       <ForeignKeySelector
