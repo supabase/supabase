@@ -1,5 +1,5 @@
-import { Badge, BadgeProps } from '@ui/components/shadcn/ui/badge'
 import { Meta } from '@storybook/react'
+import { Badge, BadgeProps } from '../ui/badge'
 
 const meta: Meta = {
   title: 'shadcn/Badge',
