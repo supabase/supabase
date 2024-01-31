@@ -16,7 +16,7 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { usePgBouncerStatus } from 'data/config/pgbouncer-enabled-query'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 
 interface UsePoolerCheckboxInterface {

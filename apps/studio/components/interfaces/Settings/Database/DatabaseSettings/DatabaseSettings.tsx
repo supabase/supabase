@@ -113,6 +113,12 @@ const DatabaseSettings = () => {
     }
   }, [connectionString])
 
+  useEffect(() => {
+    if (poolingInfo?.pool_mode === 'session') {
+      setPoolingMode(poolingInfo.pool_mode)
+    }
+  }, [poolingInfo?.pool_mode])
+
   return (
     <>
       <section id="direct-connection">
