@@ -165,6 +165,7 @@ const Wizard: NextPageWithLayout = () => {
 
   const onClickNext = async () => {
     if (!currentOrg) return console.error('Unable to retrieve current organization')
+    if (!dbRegion) return console.error('Region is required')
 
     const data: ProjectCreateVariables = {
       cloudProvider,
