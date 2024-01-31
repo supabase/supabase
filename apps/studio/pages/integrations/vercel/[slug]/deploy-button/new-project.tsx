@@ -156,6 +156,7 @@ const CreateProject = () => {
     if (!foreignProjectId) return console.error('No foreignProjectId ID set')
     if (!configurationId) return console.error('No configurationId ID set')
     if (!organization) return console.error('No organization ID set')
+    if (!dbRegion) return console.error('No region set')
 
     snapshot.setLoading(true)
 
