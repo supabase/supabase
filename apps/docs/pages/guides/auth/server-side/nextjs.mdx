@@ -155,10 +155,10 @@ export function createClient(cookieStore: ReturnType<typeof cookies>) {
           return cookieStore.get(name)?.value
         },
         set(name: string, value: string, options: CookieOptions) {
-          return cookieStore.set({ name, value, ...options })
+          cookieStore.set({ name, value, ...options })
         },
         remove(name: string, options: CookieOptions) {
-          return cookieStore.set({ name, value: '', ...options })
+          cookieStore.set({ name, value: '', ...options })
         },
       },
     }
@@ -284,9 +284,7 @@ export const config = {
 
 Create a login page for your app. Use a Server Action to call the Supabase signup function.
 
-If you have email confirmations turned on (the default), a new user will receive a confirmation email after signing up. When they click the link, they are directed to the Auth callback route at `auth/confirm` with a secure code. A Route Handler at this route finishes the signup process by exchanging the code for an Auth token.
-
-Since Supabase is being called from an Action and a Route Handler, use the client defined in `@/utils/supabase/actions.ts`.
+Since Supabase is being called from an Action, use the client defined in `@/utils/supabase/actions.ts`.
 
 </StepHikeCompact.Details>
 
@@ -369,7 +367,39 @@ export default function ErrorPage() {
 }
 ```
 
-```ts app/auth/confirm/route.ts
+</CH.Code>
+
+</StepHikeCompact.Code>
+
+</StepHikeCompact.Step>
+
+<StepHikeCompact.Step step={6}>
+
+<StepHikeCompact.Details title="Change the Auth confirmation path">
+
+If you have email confirmation turned on (the default), a new user will receive an email confirmation after signing up.
+
+Change the email template to support a server-side authentication flow.
+
+Go to the [Auth templates](https://supabase.com/dashboard/project/_/auth/templates) page in your dashboard. In each email template, change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=signup`.
+
+</StepHikeCompact.Details>
+
+</StepHikeCompact.Step>
+
+<StepHikeCompact.Step step={7}>
+
+<StepHikeCompact.Details title="Create a route handler for Auth confirmation">
+
+Create a Route Handler for `auth/callback`. When a user clicks their confirmation email link, exchange their secure code for an Auth token.
+
+Since this is a Router Handler, use the Supabase client from `@/utils/supabase/actions.ts`.
+
+</StepHikeCompact.Details>
+
+<StepHikeCompact.Code>
+
+```ts app/auth/callback/route.ts
 import { type EmailOtpType } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { type NextRequest, NextResponse } from 'next/server'
@@ -408,13 +438,11 @@ export async function GET(request: NextRequest) {
 }
 ```
 
-</CH.Code>
-
 </StepHikeCompact.Code>
 
 </StepHikeCompact.Step>
 
-<StepHikeCompact.Step step={6}>
+<StepHikeCompact.Step step={8}>
 
 <StepHikeCompact.Details title="Access user info from Server Component">
 
@@ -772,11 +800,11 @@ export default function LoginPage() {
 
 <StepHikeCompact.Details title="Change the Auth confirmation path">
 
-If you have email confirmation turned on (the default), a new user will receive an email confirmation after signing up. By default, the link in this email goes to the path `auth/confirm`.
+If you have email confirmation turned on (the default), a new user will receive an email confirmation after signing up.
 
-Change this to `api/auth/confirm`.
+Change the email template to support a server-side authentication flow.
 
-Go to the [Auth templates](https://supabase.com/dashboard/project/_/auth/templates) page in your dashboard. In each email template, change `{{ .SiteURL }}/auth/confirm` to `{{ .SiteURL }}/api/auth/confirm`.
+Go to the [Auth templates](https://supabase.com/dashboard/project/_/auth/templates) page in your dashboard. In each email template, change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/api/auth/callback?token_hash={{ .TokenHash }}&type=signup`.
 
 </StepHikeCompact.Details>
 
@@ -786,7 +814,7 @@ Go to the [Auth templates](https://supabase.com/dashboard/project/_/auth/templat
 
 <StepHikeCompact.Details title="Create a route handler for Auth confirmation">
 
-Create an API route for `api/auth/confirm`. When a user clicks their confirmation email link, exchange their secure code for an Auth token.
+Create an API route for `api/auth/callback`. When a user clicks their confirmation email link, exchange their secure code for an Auth token.
 
 Since this is an API route, use the Supabase client from `@/utils/supabase/api.ts`.
 
@@ -796,7 +824,7 @@ Since this is an API route, use the Supabase client from `@/utils/supabase/api.t
 
 <CH.Code>
 
-```ts pages/api/auth/confirm.tsx
+```ts pages/api/auth/callback.tsx
 import { type EmailOtpType } from '@supabase/supabase-js'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
