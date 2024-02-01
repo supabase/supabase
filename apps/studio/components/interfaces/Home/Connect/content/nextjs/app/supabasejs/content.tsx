@@ -52,7 +52,7 @@ export default async function Page() {
         </SimpleCodeBlock>
       </ConnectTabContent>
 
-      <ConnectTabContent value="server.ts">
+      <ConnectTabContent value="utils/supabase/server.ts">
         <SimpleCodeBlock className="bash">
           {`
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
@@ -92,7 +92,7 @@ export const createClient = (cookieStore: ReturnType<typeof cookies>) => {
 `}
         </SimpleCodeBlock>
       </ConnectTabContent>
-      <ConnectTabContent value="client.ts">
+      <ConnectTabContent value="utils/supabase/client.ts">
         <SimpleCodeBlock className="bash">
           {`
 import { createBrowserClient } from "@supabase/ssr";
@@ -106,7 +106,7 @@ export const createClient = () =>
         </SimpleCodeBlock>
       </ConnectTabContent>
 
-      <ConnectTabContent value="middleware.ts">
+      <ConnectTabContent value="utils/supabase/middleware.ts">
         <SimpleCodeBlock className="bash">
           {`
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
