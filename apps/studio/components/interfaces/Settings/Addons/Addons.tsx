@@ -435,7 +435,7 @@ const Addons = () => {
                               isBranch ||
                               !isProjectActive ||
                               projectUpdateDisabled ||
-                              !canUpdateIPv4
+                              !(canUpdateIPv4 && ipv4)
                             }
                           >
                             Change IPv4 address
