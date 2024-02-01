@@ -36,6 +36,7 @@ import {
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
+import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { ProjectAddonVariantMeta } from 'data/subscriptions/types'
@@ -46,9 +47,8 @@ import { getDatabaseMajorVersion, getSemanticVersion } from 'lib/helpers'
 import { SUBSCRIPTION_PANEL_KEYS, useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import ComputeInstanceSidePanel from './ComputeInstanceSidePanel'
 import CustomDomainSidePanel from './CustomDomainSidePanel'
-import PITRSidePanel from './PITRSidePanel'
 import IPv4SidePanel from './IPv4SidePanel'
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import PITRSidePanel from './PITRSidePanel'
 
 const Addons = () => {
   const { resolvedTheme } = useTheme()
@@ -103,9 +103,7 @@ const Addons = () => {
 
   const meta = computeInstance?.variant?.meta as ProjectAddonVariantMeta | undefined
 
-  const canEnableIPv4 = ['concurrent-ipv6', 'ipv6'].includes(
-    projectSettings?.project.db_ip_addr_config || ''
-  )
+  const canUpdateIPv4 = projectSettings?.project.db_ip_addr_config === 'ipv6'
 
   return (
     <>
@@ -437,7 +435,7 @@ const Addons = () => {
                               isBranch ||
                               !isProjectActive ||
                               projectUpdateDisabled ||
-                              !canEnableIPv4
+                              !canUpdateIPv4
                             }
                           >
                             Change IPv4 address
@@ -445,7 +443,7 @@ const Addons = () => {
                         </div>
                       </Tooltip.Trigger>
                       <Tooltip.Portal>
-                        {!canEnableIPv4 && (
+                        {!canUpdateIPv4 && (
                           <Tooltip.Content side="bottom">
                             <Tooltip.Arrow className="radix-tooltip-arrow" />
                             <div
