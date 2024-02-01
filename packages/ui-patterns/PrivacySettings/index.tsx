@@ -1,7 +1,9 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
 import Link from 'next/link'
 import { PropsWithChildren, useEffect, useState } from 'react'
-import { Modal, Toggle, useConsentValue } from 'ui'
+import { Modal, Toggle } from 'ui'
+
+import { useConsentValue } from '../ConsentToast'
 
 export const PrivacySettings = ({
   children,

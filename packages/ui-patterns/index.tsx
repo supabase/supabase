@@ -3,3 +3,4 @@
  * import directly from here.
  */
 export * from './PrivacySettings'
+export * from './ConsentToast'
