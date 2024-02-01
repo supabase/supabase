@@ -2,10 +2,6 @@
 
 import * as React from 'react'
 
-// Providers
-
-export * from './src/providers'
-
 // Markdown components
 
 export * from './src/lib/Markdown'
