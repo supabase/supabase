@@ -1,5 +1,7 @@
 import Link from 'next/link'
-import { Alert, Button, CodeBlock, GlassPanel, markdownComponents, Tabs } from 'ui'
+import { Alert, Button, CodeBlock, markdownComponents, Tabs } from 'ui'
+import { GlassPanel } from 'ui-patterns/GlassPanel'
+
 import StepHikeCompact from '~/components/StepHikeCompact'
 // Common components
 import ButtonCard from './ButtonCard'
