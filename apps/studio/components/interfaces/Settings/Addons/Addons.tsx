@@ -443,7 +443,8 @@ const Addons = () => {
                         </div>
                       </Tooltip.Trigger>
                       <Tooltip.Portal>
-                        {!canUpdateIPv4 && (
+                        {/* Only show the tooltip if the user can't add the addon and ipv4 is not currently applied */}
+                        {!(canUpdateIPv4 || ipv4) && (
                           <Tooltip.Content side="bottom">
                             <Tooltip.Arrow className="radix-tooltip-arrow" />
                             <div
