@@ -1,5 +1,5 @@
 import { DatabaseConnectionString } from 'components/interfaces/Settings/Database/DatabaseSettings/DatabaseConnectionString'
-import { ArrowUpRight, Plug } from 'lucide-react'
+import { Plug } from 'lucide-react'
 import { useState } from 'react'
 import {
   Button,
@@ -10,6 +10,7 @@ import {
   DialogTitle_Shadcn_,
   DialogTrigger_Shadcn_,
   Dialog_Shadcn_,
+  IconExternalLink,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
@@ -28,7 +29,7 @@ import { useCheckPermissions } from 'hooks'
 import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
 import Link from 'next/link'
 import { projectKeys } from './Connect.types'
-import ConnectTabContentNew from './ConnectTabContentNew'
+import ConnectTabContent from './ConnectTabContent'
 
 type GetContentFilesArgs = {
   selectedParent: string
@@ -276,7 +277,7 @@ const Connect = () => {
 
             {CONNECTION_TYPES.map((type) => (
               <TabsContent_Shadcn_ key={`content-${type.key}`} value={type.key}>
-                <div className="bg-surface-300 p-4">
+                <div className="p-3">
                   <div className="flex justify-between">
                     <div className="flex items-center gap-2">
                       {/* all parents */}
@@ -286,7 +287,7 @@ const Connect = () => {
                         setOpen={setParentSelectorOpen}
                         state={selectedParent}
                         updateState={handleParentChange}
-                        label={connectionObject === FRAMEWORKS ? 'Frameworks' : 'Tool'}
+                        label={connectionObject === FRAMEWORKS ? 'Framework' : 'Tool'}
                         items={connectionObject}
                       />
                       {/* children of those parents */}
@@ -321,21 +322,28 @@ const Connect = () => {
                         )}
                     </div>
                     {connectionObject.find((item) => item.key === selectedParent)?.guideLink && (
-                      <Link
-                        href={
-                          connectionObject.find((item) => item.key === selectedParent)?.guideLink ||
-                          ''
-                        }
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-sm hover:underline mr-1 text-light"
+                      <Button
+                        asChild
+                        type="default"
+                        icon={<IconExternalLink size={14} strokeWidth={1.5} />}
                       >
-                        {connectionObject.find((item) => item.key === selectedParent)?.label} guide
-                        <ArrowUpRight size={14} />
-                      </Link>
+                        <Link
+                          href={
+                            connectionObject.find((item) => item.key === selectedParent)
+                              ?.guideLink || ''
+                          }
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {connectionObject.find((item) => item.key === selectedParent)?.label}{' '}
+                          guide
+                        </Link>
+                      </Button>
                     )}
                   </div>
-
+                  <p className="text-xs text-foreground-lighter my-3">
+                    Add the following files below to your application
+                  </p>
                   <ConnectTabsContent projectKeys={projectKeys} filePath={filePath} />
                 </div>
               </TabsContent_Shadcn_>
@@ -368,8 +376,8 @@ const ConnectTabsContent = ({ filePath, projectKeys }: ConnectTabsContentProps) 
   // }, [defaultValue])
 
   return (
-    <div className="bg-surface bg-surface-100 p-4 rounded-md mt-4">
-      <ConnectTabContentNew projectKeys={projectKeys} filePath={filePath} />
+    <div className=" border rounded-lg mt-4">
+      <ConnectTabContent projectKeys={projectKeys} filePath={filePath} />
     </div>
   )
 }

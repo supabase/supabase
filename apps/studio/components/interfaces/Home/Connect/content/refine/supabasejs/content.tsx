@@ -1,9 +1,10 @@
 import { ContentFileProps } from 'components/interfaces/Home/Connect/Connect.types'
-import { ConnectTabContent } from 'components/interfaces/Home/Connect/ConnectFilesContent'
+
 import {
   ConnectTabs,
   ConnectTabTrigger,
   ConnectTabTriggers,
+  ConnectTabContent,
 } from 'components/interfaces/Home/Connect/ConnectTabs'
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 
@@ -12,11 +13,11 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
     <ConnectTabs>
       <ConnectTabTriggers>
         <ConnectTabTrigger value=".env.local" />
-        <ConnectTabTrigger value="supabaseClient.ts" />
-        <ConnectTabTrigger value="App.tsx" />
+        <ConnectTabTrigger value="src/utility/supabaseClient.ts" />
+        <ConnectTabTrigger value="src/App.tsx" />
       </ConnectTabTriggers>
 
-      <ConnectTabContent value=".env.local" location=".env.local">
+      <ConnectTabContent value=".env.local">
         <SimpleCodeBlock className="bash">
           {`
 SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}
@@ -25,7 +26,7 @@ SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
         </SimpleCodeBlock>
       </ConnectTabContent>
 
-      <ConnectTabContent value="supabaseClient.ts" location="src/utility/supabaseClient.ts">
+      <ConnectTabContent value="src/utility/supabaseClient.ts">
         <SimpleCodeBlock className="bash">
           {`
 import { createClient } from "@refinedev/supabase";
@@ -45,7 +46,7 @@ export const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY, {
         </SimpleCodeBlock>
       </ConnectTabContent>
 
-      <ConnectTabContent value="App.tsx" location="src/App.tsx">
+      <ConnectTabContent value="src/App.tsx">
         <SimpleCodeBlock className="typescript">
           {`
 import { Refine, WelcomePage } from "@refinedev/core";

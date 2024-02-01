@@ -1,9 +1,10 @@
 import { ContentFileProps } from 'components/interfaces/Home/Connect/Connect.types'
-import { ConnectTabContent } from 'components/interfaces/Home/Connect/ConnectFilesContent'
+
 import {
   ConnectTabs,
-  ConnectTabTrigger,
   ConnectTabTriggers,
+  ConnectTabTrigger,
+  ConnectTabContent,
 } from 'components/interfaces/Home/Connect/ConnectTabs'
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 
@@ -12,12 +13,12 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
     <ConnectTabs>
       <ConnectTabTriggers>
         <ConnectTabTrigger value=".env.local" />
-        <ConnectTabTrigger value="supabaseClient.js" />
-        <ConnectTabTrigger value="+page.server.js" />
-        <ConnectTabTrigger value="+page.svelte" />
+        <ConnectTabTrigger value="src/lib/supabaseClient.js" />
+        <ConnectTabTrigger value="src/routes/+page.server.js" />
+        <ConnectTabTrigger value="src/routes/+page.svelte" />
       </ConnectTabTriggers>
 
-      <ConnectTabContent value=".env.local" location=".env.local">
+      <ConnectTabContent value=".env.local">
         <SimpleCodeBlock className="bash">
           {`
 SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}
@@ -26,7 +27,7 @@ SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
         </SimpleCodeBlock>
       </ConnectTabContent>
 
-      <ConnectTabContent value="supabaseClient.js" location="src/lib/supabaseClient.js">
+      <ConnectTabContent value="src/lib/supabaseClient.js">
         <SimpleCodeBlock className="bash">
           {`
 import { createClient } from "@supabase/supabase-js";
@@ -39,7 +40,7 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
         </SimpleCodeBlock>
       </ConnectTabContent>
 
-      <ConnectTabContent value="+page.server.js" location="src/routes/+page.server.js">
+      <ConnectTabContent value="src/routes/+page.server.js">
         <SimpleCodeBlock className="typescript">
           {`
   import { supabase } from "$lib/supabaseClient";
@@ -54,7 +55,7 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
         </SimpleCodeBlock>
       </ConnectTabContent>
 
-      <ConnectTabContent value="+page.svelte" location="src/routes/+page.svelte">
+      <ConnectTabContent value="src/routes/+page.svelte">
         <SimpleCodeBlock className="typescript">
           {`
   <script>

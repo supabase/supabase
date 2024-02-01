@@ -159,50 +159,10 @@ export const ORMS: ConnectionType[] = [
 //     icon: 'graphql',
 //     guideLink: 'https://supabase.com/docs/guides/graphql',
 //     children: [],
-//     files: [
-//       {
-//         location: 'graphql/env',
-//         destinationFilename: '.env',
-//         destinationLocation: '.env',
-//       },
-//       {
-//         location: 'graphql/app',
-//         destinationFilename: 'app.tsx',
-//         destinationLocation: 'app.tsx',
-//       },
-//     ],
 //   },
 // ]
-
-// move this to /tests/
-// having duplicate keys will mess up the tabs and dropdowns
-// check that each item has a unique top-level item
-// example: frameworks need to be unique: next/react/vue/svelte/nuxt/etc
-function checkParentsForDuplicates(item: ConnectionType[]) {
-  const topLevelKeys = new Set()
-  let hasDuplicates = false
-  let duplicateKey = null
-
-  item.forEach((item: ConnectionType, i: number) => {
-    const key = item.key
-    if (topLevelKeys.has(key)) {
-      hasDuplicates = true
-      duplicateKey = key
-      console.error(`Duplicate keys found: ${duplicateKey}`)
-    } else {
-      topLevelKeys.add(key)
-    }
-  })
-
-  if (hasDuplicates) {
-    throw new Error(`Duplicate keys found. Each top-level item must be unique.`)
-  }
-}
 
 export const CONNECTION_TYPES = [
   { key: 'frameworks', label: 'App Frameworks', obj: FRAMEWORKS },
   { key: 'orms', label: 'ORMs', obj: ORMS },
 ]
-
-// Call the function with the GRAPHQL item
-CONNECTION_TYPES.map((item) => item.obj).map((item) => checkParentsForDuplicates(item))

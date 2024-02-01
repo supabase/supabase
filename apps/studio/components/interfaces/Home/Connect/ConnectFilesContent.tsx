@@ -1,17 +1,10 @@
 import { FileJson2 } from 'lucide-react'
 import { TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
-import ConnectPath from './ConnectPath'
 
-interface ConnectFileTabProps {
+interface ConnectTabContentProps {
   children: any
-  location: string
   value: string
 }
-export const ConnectTabContent = ({ value, children, location }: ConnectFileTabProps) => {
-  return (
-    <TabsContent_Shadcn_ value={value}>
-      <ConnectPath path={location} />
-      {children}
-    </TabsContent_Shadcn_>
-  )
+export const ConnectTabContent = ({ value, children }: ConnectTabContentProps) => {
+  return <TabsContent_Shadcn_ value={value}>{children}</TabsContent_Shadcn_>
 }

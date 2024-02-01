@@ -1,9 +1,10 @@
 import { ContentFileProps } from 'components/interfaces/Home/Connect/Connect.types'
-import { ConnectTabContent } from 'components/interfaces/Home/Connect/ConnectFilesContent'
+
 import {
   ConnectTabs,
   ConnectTabTrigger,
   ConnectTabTriggers,
+  ConnectTabContent,
 } from 'components/interfaces/Home/Connect/ConnectTabs'
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 
@@ -13,12 +14,12 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
       <ConnectTabTriggers>
         <ConnectTabTrigger value=".env.local" />
         <ConnectTabTrigger value="page.tsx" />
-        <ConnectTabTrigger value="server.ts" />
-        <ConnectTabTrigger value="client.ts" />
-        <ConnectTabTrigger value="middleware.ts" />
+        <ConnectTabTrigger value="utils/supabase/server.ts" />
+        <ConnectTabTrigger value="utils/supabase/client.ts" />
+        <ConnectTabTrigger value="utils/supabase/middleware.ts" />
       </ConnectTabTriggers>
 
-      <ConnectTabContent value=".env.local" location=".env.local">
+      <ConnectTabContent value=".env.local">
         <SimpleCodeBlock className="bash">
           {`
 NEXT_PUBLIC_SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}
@@ -27,7 +28,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
         </SimpleCodeBlock>
       </ConnectTabContent>
 
-      <ConnectTabContent value="page.tsx" location="page.tsx">
+      <ConnectTabContent value="page.tsx">
         <SimpleCodeBlock className="typescript">
           {`
 import { createClient } from '@/utils/supabase/server'
@@ -51,7 +52,7 @@ export default async function Page() {
         </SimpleCodeBlock>
       </ConnectTabContent>
 
-      <ConnectTabContent value="server.ts" location="utils/supabase/server.ts">
+      <ConnectTabContent value="server.ts">
         <SimpleCodeBlock className="bash">
           {`
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
@@ -91,7 +92,7 @@ export const createClient = (cookieStore: ReturnType<typeof cookies>) => {
 `}
         </SimpleCodeBlock>
       </ConnectTabContent>
-      <ConnectTabContent value="client.ts" location="utils/supabase/client.ts">
+      <ConnectTabContent value="client.ts">
         <SimpleCodeBlock className="bash">
           {`
 import { createBrowserClient } from "@supabase/ssr";
@@ -105,7 +106,7 @@ export const createClient = () =>
         </SimpleCodeBlock>
       </ConnectTabContent>
 
-      <ConnectTabContent value="middleware.ts" location="utils/supabase/middleware.ts">
+      <ConnectTabContent value="middleware.ts">
         <SimpleCodeBlock className="bash">
           {`
 import { createServerClient, type CookieOptions } from "@supabase/ssr";

@@ -1,6 +1,7 @@
 import { Tabs_Shadcn_ } from 'ui'
 import { FileJson2 } from 'lucide-react'
 import { TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+import { TabsContent_Shadcn_ } from 'ui'
 
 interface ConnectTabTriggerProps {
   value: string
@@ -13,6 +14,10 @@ interface ConnectFileTabProps {
   children: any
 }
 
+interface ConnectTabContentProps {
+  children: any
+  value: string
+}
 const ConnectTabs = ({ children }: ConnectFileTabProps) => {
   const defaultValue = children[0].props.children[0].props.value
   return <Tabs_Shadcn_ defaultValue={defaultValue}>{children}</Tabs_Shadcn_>
@@ -20,7 +25,10 @@ const ConnectTabs = ({ children }: ConnectFileTabProps) => {
 
 const ConnectTabTrigger = ({ value }: ConnectTabTriggerProps) => {
   return (
-    <TabsTrigger_Shadcn_ value={value} className="flex items-center gap-1">
+    <TabsTrigger_Shadcn_
+      value={value}
+      className="flex items-center gap-1 text-xs p-2 py-3 data-[state=active]:bg-transparent"
+    >
       <FileJson2 size={15} className="text-lighter" />
       {value}
     </TabsTrigger_Shadcn_>
@@ -28,7 +36,22 @@ const ConnectTabTrigger = ({ value }: ConnectTabTriggerProps) => {
 }
 
 const ConnectTabTriggers = ({ children }: ConnectTabTriggersProps) => {
-  return <TabsList_Shadcn_ defaultValue={'one'}>{children}</TabsList_Shadcn_>
+  return (
+    <TabsList_Shadcn_
+      defaultValue={'one'}
+      className="bg-surface-100 px-1.5 rounded-lg rounded-b-none"
+    >
+      {children}
+    </TabsList_Shadcn_>
+  )
+}
+
+export const ConnectTabContent = ({ value, children }: ConnectTabContentProps) => {
+  return (
+    <TabsContent_Shadcn_ value={value} className="p-3 mt-1">
+      {children}
+    </TabsContent_Shadcn_>
+  )
 }
 
 export { ConnectTabTrigger, ConnectTabTriggers, ConnectTabs }

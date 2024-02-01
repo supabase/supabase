@@ -20,8 +20,8 @@ const ConnectionIcon = ({ connection }: ConnectionIconProps) => {
           : ''
       }-icon.svg`}
       alt={`${connection} logo`}
-      width={12}
-      height={12}
+      width={14}
+      height={14}
     />
   )
 }

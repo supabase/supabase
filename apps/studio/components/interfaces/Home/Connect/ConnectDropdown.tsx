@@ -1,13 +1,15 @@
-import { Box, ChevronDown } from 'lucide-react'
+import { Box, Check, ChevronDown } from 'lucide-react'
 import ConnectionIcon from './ConnectionIcon'
 import {
   Button,
+  CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   Command_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
+  cn,
 } from 'ui'
 
 interface ConnectDropdownProps {
@@ -39,12 +41,12 @@ const ConnectDropdown = ({
   return (
     <>
       <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-        <div className="flex items-center">
-          <span className="flex items-center text-foreground-muted bg-button px-3 rounded-md rounded-r-none text-xs h-[26px] border border-r-0">
+        <div className="flex ">
+          <span className="flex items-center text-foreground-light bg-surface-100 px-3 rounded-lg rounded-r-none text-sm border border-button border-r-0">
             {label}
           </span>
           <PopoverTrigger_Shadcn_ asChild>
-            <Button size="tiny" type="default" className="h-[26px] pr-3 gap-0 rounded-l-none">
+            <Button size="medium" type="default" className=" gap-0 rounded-l-none">
               <div className="flex items-center gap-1">
                 <span className="text-xs text-foreground-light flex items-center gap-2  pl-1">
                   {selectedItem?.icon ? (
@@ -59,8 +61,9 @@ const ConnectDropdown = ({
             </Button>
           </PopoverTrigger_Shadcn_>
         </div>
-        <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
+        <PopoverContent_Shadcn_ className="p-0 max-w-48" side="bottom" align="start">
           <Command_Shadcn_>
+            <CommandInput_Shadcn_ placeholder="Search..." className="h-9" />
             <CommandList_Shadcn_>
               {items.map((item) => (
                 <CommandItem_Shadcn_
@@ -70,16 +73,17 @@ const ConnectDropdown = ({
                     onSelectLib(item.key)
                     setOpen(false)
                   }}
-                  onClick={() => {
-                    onSelectLib(item.key)
-                    setOpen(false)
-                  }}
                 >
-                  <span className="flex items-center gap-1">
+                  <div className="flex items-center gap-2 py-0.5 w-full">
                     {item.icon ? <ConnectionIcon connection={item.icon} /> : <Box size={12} />}
-                    {/* <ConnectionIcon connection={item.key} /> */}
+
                     {item.label}
-                  </span>
+
+                    <Check
+                      size={15}
+                      className={cn('ml-auto  ', item.key === state ? 'opacity-100' : 'opacity-0')}
+                    />
+                  </div>
                 </CommandItem_Shadcn_>
               ))}
             </CommandList_Shadcn_>

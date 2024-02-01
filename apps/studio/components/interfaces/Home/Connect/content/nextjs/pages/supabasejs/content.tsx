@@ -1,9 +1,10 @@
 import { ContentFileProps } from 'components/interfaces/Home/Connect/Connect.types'
-import { ConnectTabContent } from 'components/interfaces/Home/Connect/ConnectFilesContent'
+
 import {
   ConnectTabs,
   ConnectTabTrigger,
   ConnectTabTriggers,
+  ConnectTabContent,
 } from 'components/interfaces/Home/Connect/ConnectTabs'
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 
