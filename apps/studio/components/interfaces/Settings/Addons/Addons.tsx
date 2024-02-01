@@ -433,7 +433,12 @@ const Addons = () => {
                             type="default"
                             className="mt-2 pointer-events-auto"
                             onClick={() => snap.setPanelKey('ipv4')}
-                            disabled={!canEnableIPv4}
+                            disabled={
+                              isBranch ||
+                              !isProjectActive ||
+                              projectUpdateDisabled ||
+                              !canEnableIPv4
+                            }
                           >
                             Change IPv4 address
                           </Button>
