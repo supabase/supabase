@@ -28,7 +28,7 @@ SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
       </ConnectTabContent>
 
       <ConnectTabContent value="src/lib/supabaseClient.js">
-        <SimpleCodeBlock className="bash">
+        <SimpleCodeBlock className="js">
           {`
 import { createClient } from "@supabase/supabase-js";
 
@@ -41,7 +41,7 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
       </ConnectTabContent>
 
       <ConnectTabContent value="src/routes/+page.server.js">
-        <SimpleCodeBlock className="typescript">
+        <SimpleCodeBlock className="js">
           {`
   import { supabase } from "$lib/supabaseClient";
 
@@ -56,7 +56,7 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
       </ConnectTabContent>
 
       <ConnectTabContent value="src/routes/+page.svelte">
-        <SimpleCodeBlock className="typescript">
+        <SimpleCodeBlock className="js">
           {`
   <script>
     export let data;

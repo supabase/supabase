@@ -113,6 +113,7 @@ export {
   DialogContent as DialogContent_Shadcn_,
   DialogHeader as DialogHeader_Shadcn_,
   DialogFooter as DialogFooter_Shadcn_,
+  DialogClose as DialogClose_Shadcn_,
   DialogTitle as DialogTitle_Shadcn_,
   DialogDescription as DialogDescription_Shadcn_,
 } from './src/components/shadcn/ui/dialog'

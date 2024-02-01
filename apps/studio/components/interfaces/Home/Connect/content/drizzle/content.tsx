@@ -26,7 +26,7 @@ DATABASE_URL='your-database-url'
       </ConnectTabContent>
 
       <ConnectTabContent value="drizzle/schema.tsx">
-        <SimpleCodeBlock className="javascript">
+        <SimpleCodeBlock className="js">
           {`
 import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
 
@@ -40,7 +40,7 @@ export const users = pgTable('users', {
       </ConnectTabContent>
 
       <ConnectTabContent value="index.tsx">
-        <SimpleCodeBlock className="javascript">
+        <SimpleCodeBlock className="js">
           {`
 import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'

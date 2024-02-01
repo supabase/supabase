@@ -27,7 +27,7 @@ SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
       </ConnectTabContent>
 
       <ConnectTabContent value="src/utility/supabaseClient.ts">
-        <SimpleCodeBlock className="bash">
+        <SimpleCodeBlock className="js">
           {`
 import { createClient } from "@refinedev/supabase";
 
@@ -47,7 +47,7 @@ export const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY, {
       </ConnectTabContent>
 
       <ConnectTabContent value="src/App.tsx">
-        <SimpleCodeBlock className="typescript">
+        <SimpleCodeBlock className="js">
           {`
 import { Refine, WelcomePage } from "@refinedev/core";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
