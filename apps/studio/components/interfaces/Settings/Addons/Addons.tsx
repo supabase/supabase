@@ -48,6 +48,7 @@ import ComputeInstanceSidePanel from './ComputeInstanceSidePanel'
 import CustomDomainSidePanel from './CustomDomainSidePanel'
 import PITRSidePanel from './PITRSidePanel'
 import IPv4SidePanel from './IPv4SidePanel'
+import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 
 const Addons = () => {
   const { resolvedTheme } = useTheme()
@@ -55,6 +56,7 @@ const Addons = () => {
   const snap = useSubscriptionPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
   const { project: selectedProject } = useProjectContext()
+  const { data: projectSettings } = useProjectSettingsQuery({ projectRef })
   const selectedOrg = useSelectedOrganization()
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
 
@@ -100,6 +102,10 @@ const Addons = () => {
   const { computeInstance, pitr, customDomain, ipv4 } = getAddons(selectedAddons)
 
   const meta = computeInstance?.variant?.meta as ProjectAddonVariantMeta | undefined
+
+  const canEnableIPv4 = ['concurrent-ipv6', 'ipv6'].includes(
+    projectSettings?.project.db_ip_addr_config || ''
+  )
 
   return (
     <>
@@ -427,27 +433,29 @@ const Addons = () => {
                             type="default"
                             className="mt-2 pointer-events-auto"
                             onClick={() => snap.setPanelKey('ipv4')}
-                            disabled={true}
+                            disabled={!canEnableIPv4}
                           >
                             Change IPv4 address
                           </Button>
                         </div>
                       </Tooltip.Trigger>
                       <Tooltip.Portal>
-                        <Tooltip.Content side="bottom">
-                          <Tooltip.Arrow className="radix-tooltip-arrow" />
-                          <div
-                            className={[
-                              'rounded bg-alternative py-1 px-2 leading-none shadow',
-                              'border border-background',
-                            ].join(' ')}
-                          >
-                            <span className="text-xs text-foreground">
-                              Temporarily disabled while we are migrating to IPv6, please check back
-                              later.
-                            </span>
-                          </div>
-                        </Tooltip.Content>
+                        {!canEnableIPv4 && (
+                          <Tooltip.Content side="bottom">
+                            <Tooltip.Arrow className="radix-tooltip-arrow" />
+                            <div
+                              className={[
+                                'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                'border border-background',
+                              ].join(' ')}
+                            >
+                              <span className="text-xs text-foreground">
+                                Temporarily disabled while we are migrating to IPv6, please check
+                                back later.
+                              </span>
+                            </div>
+                          </Tooltip.Content>
+                        )}
                       </Tooltip.Portal>
                     </Tooltip.Root>
                     {/*<ProjectUpdateDisabledTooltip
