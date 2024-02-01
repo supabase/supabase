@@ -61,9 +61,6 @@ export * from './src/components/Form'
 // CMD+K
 export * from './src/components/Command'
 
-// Widgets
-export * from './src/components/CountdownWidget'
-
 // layout
 export * from './src/components/LoadingLine'
 
