@@ -27,7 +27,7 @@ import CliGlobalFlagsHandler from '~/components/reference/enrichments/cli/CliGlo
 import Options from '~/components/Options'
 import Param from '~/components/Params'
 
-import { Admonition, ThemeImage } from 'ui'
+import { Admonition } from 'ui'
 import {
   IconMenuJavascript,
   IconMenuHome,
@@ -50,6 +50,7 @@ import {
   IconMenuApi,
   IconMenuCli,
 } from './Navigation/NavigationMenu/HomeMenuIcons'
+import { ThemeImage } from 'ui-patterns/ThemeImage'
 
 const components = {
   ...markdownComponents,
