@@ -73,10 +73,7 @@ export * from './src/layout/ai-icon-animation'
 export * from './src/lib/utils'
 
 // theme switcher
-export * from './src/components/ThemeProvider/ThemeToggle'
 export * from './src/components/ThemeProvider/themes'
-
-// animated ui
 
 // shadcn
 export * from './src/components/shadcn/ui/dropdown-menu'
