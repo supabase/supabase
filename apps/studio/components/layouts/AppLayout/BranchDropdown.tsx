@@ -15,6 +15,7 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
+  CommandSeparator_Shadcn_,
   Command_Shadcn_,
   IconAlertCircle,
   IconCheck,
@@ -25,6 +26,7 @@ import {
   ScrollArea,
 } from 'ui'
 import { sanitizeRoute } from './ProjectDropdown'
+import { CommandSeparator } from '@ui/components/Command/Command.utils'
 
 const BranchLink = ({
   branch,
@@ -130,7 +132,8 @@ const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
                       ))}
                     </ScrollArea>
                   </CommandGroup_Shadcn_>
-                  <CommandGroup_Shadcn_ className="border-t">
+                  <CommandSeparator_Shadcn_ />
+                  <CommandGroup_Shadcn_>
                     <CommandItem_Shadcn_
                       className="cursor-pointer w-full"
                       onSelect={(e) => {
@@ -148,7 +151,8 @@ const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
                       </Link>
                     </CommandItem_Shadcn_>
                   </CommandGroup_Shadcn_>
-                  <CommandGroup_Shadcn_ className="border-t">
+                  <CommandSeparator_Shadcn_ />
+                  <CommandGroup_Shadcn_>
                     <CommandItem_Shadcn_
                       className="cursor-pointer w-full"
                       onSelect={() => {
