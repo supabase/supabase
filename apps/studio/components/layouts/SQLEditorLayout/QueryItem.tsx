@@ -9,6 +9,7 @@ import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
+  Checkbox,
   Checkbox_Shadcn_,
   IconAlertCircle,
   IconAlertTriangle,
@@ -34,7 +35,7 @@ export interface QueryItemProps {
   tabInfo: SqlSnippet
   isSelected?: boolean
   hasQueriesSelected?: boolean
-  onSelectQuery?: () => void
+  onSelectQuery?: (isShiftHeld: boolean) => void
   onDeleteQuery?: (ids: string[]) => void
 }
 
@@ -117,13 +118,15 @@ const QueryItem = ({
             ref={isActive ? (activeItemRef as React.RefObject<HTMLDivElement>) : null}
           >
             {visibility === 'user' && (
-              <Checkbox_Shadcn_
+              <Checkbox
                 className={clsx(
-                  'transition absolute left-2.5 border-foreground-lighter',
+                  'transition absolute left-2.5 [&>input]:border-foreground-lighter',
                   hasQueriesSelected ? '' : 'opacity-0 group-hover:opacity-100'
                 )}
                 checked={isSelected}
-                onCheckedChange={() => onSelectQuery()}
+                onChange={(event) => {
+                  onSelectQuery((event.nativeEvent as KeyboardEvent).shiftKey)
+                }}
               />
             )}
             <div className="flex items-center justify-between w-full gap-x-2">

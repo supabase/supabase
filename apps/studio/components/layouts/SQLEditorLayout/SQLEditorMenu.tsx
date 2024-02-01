@@ -34,6 +34,8 @@ import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import QueryItem from './QueryItem'
+import { partition, uniq, uniqBy } from 'lodash'
+import { selectItemsInRange } from './SQLEditorLayout.utils'
 
 const SideBarContent = observer(() => {
   const { ui } = useStore()
@@ -122,13 +124,50 @@ const SideBarContent = observer(() => {
     subject: { id: profile?.id },
   })
 
-  const onSelectQuery = (id?: string) => {
-    if (id !== undefined) {
-      if (selectedQueries.includes(id)) {
-        setSelectedQueries(selectedQueries.filter((x) => x !== id))
+  const onSelectQuery = (id?: string, isShiftHeld: boolean = false) => {
+    if (id === undefined) return
+
+    if (isShiftHeld) {
+      const [selectedFavSnippets, selectedOtherSnippets] = partition(
+        selectedQueries,
+        (id) => snippets.find((x) => x.id === id)?.content.favorite
+      )
+      const selectedSnippet = snippets.find((x) => x.id === id)
+      const isFavourite = selectedSnippet?.content.favorite
+
+      if (isFavourite) {
+        if (selectedFavSnippets.length > 0) {
+          const updatedSelectedFavSnippets = selectItemsInRange(
+            id,
+            filteredFavoriteSnippets,
+            selectedFavSnippets
+          )
+          setSelectedQueries(updatedSelectedFavSnippets.concat(selectedOtherSnippets))
+        } else {
+          selectQuery(id)
+        }
       } else {
-        setSelectedQueries(selectedQueries.concat([id]))
+        if (selectedOtherSnippets.length > 0) {
+          const updatedSelectedOtherSnippets = selectItemsInRange(
+            id,
+            personalSnippets,
+            selectedOtherSnippets
+          )
+          setSelectedQueries(updatedSelectedOtherSnippets.concat(selectedFavSnippets))
+        } else {
+          selectQuery(id)
+        }
       }
+    } else {
+      selectQuery(id)
+    }
+  }
+
+  const selectQuery = (id: string) => {
+    if (selectedQueries.includes(id)) {
+      setSelectedQueries(selectedQueries.filter((x) => x !== id))
+    } else {
+      setSelectedQueries(selectedQueries.concat([id]))
     }
   }
 
@@ -295,7 +334,7 @@ const SideBarContent = observer(() => {
                             tabInfo={tabInfo}
                             isSelected={selectedQueries.includes(id as string)}
                             hasQueriesSelected={selectedQueries.length > 0}
-                            onSelectQuery={() => onSelectQuery(id)}
+                            onSelectQuery={(isShiftHeld) => onSelectQuery(id, isShiftHeld)}
                             onDeleteQuery={postDeleteCleanup}
                           />
                         )
@@ -316,7 +355,7 @@ const SideBarContent = observer(() => {
                             tabInfo={tabInfo}
                             isSelected={selectedQueries.includes(id as string)}
                             hasQueriesSelected={selectedQueries.length > 0}
-                            onSelectQuery={() => onSelectQuery(id)}
+                            onSelectQuery={(isShiftHeld) => onSelectQuery(id, isShiftHeld)}
                             onDeleteQuery={postDeleteCleanup}
                           />
                         )
