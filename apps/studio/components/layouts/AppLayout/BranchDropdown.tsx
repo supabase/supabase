@@ -167,7 +167,7 @@ const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
                       >
                         <MessageCircle size={14} strokeWidth={1} className="text-muted mt-0.5" />
                         <div>
-                          <p>Feedback on branching?</p>
+                          <p>Branching feedback</p>
                           <p className="text-lighter">Join Github Discussion</p>
                         </div>
                       </Link>
