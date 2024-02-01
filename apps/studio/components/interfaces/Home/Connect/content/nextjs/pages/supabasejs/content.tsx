@@ -13,11 +13,11 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
     <ConnectTabs>
       <ConnectTabTriggers>
         <ConnectTabTrigger value=".env.local" />
+        <ConnectTabTrigger value="utils/supabase.ts" />
         <ConnectTabTrigger value="_app.tsx" />
-        <ConnectTabTrigger value="supabase.ts" />
       </ConnectTabTriggers>
 
-      <ConnectTabContent value=".env.local" location=".env.local">
+      <ConnectTabContent value=".env.local">
         <SimpleCodeBlock className="bash">
           {`
 NEXT_PUBLIC_SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}
@@ -26,7 +26,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
         </SimpleCodeBlock>
       </ConnectTabContent>
 
-      <ConnectTabContent value="supabase.ts" location="utils/supabase.ts">
+      <ConnectTabContent value="utils/supabase.ts">
         <SimpleCodeBlock className="bash">
           {`
 import { createClient } from "@supabase/supabase-js";
@@ -39,7 +39,7 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
         </SimpleCodeBlock>
       </ConnectTabContent>
 
-      <ConnectTabContent value="_app.tsx" location="_app.tsx">
+      <ConnectTabContent value="_app.tsx">
         <SimpleCodeBlock className="typescript">
           {`
 import { useState, useEffect } from 'react'

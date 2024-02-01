@@ -26,7 +26,7 @@ SUPABASE_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
         </SimpleCodeBlock>
       </ConnectTabContent>
 
-      <ConnectTabContent value="supabase.ts">
+      <ConnectTabContent value="utils/supabase.ts">
         <SimpleCodeBlock className="bash">
           {`
 import { createClient } from "@supabase/supabase-js";

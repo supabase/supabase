@@ -14,7 +14,7 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
         <ConnectTabTrigger value=".env.local" />
       </ConnectTabTriggers>
 
-      <ConnectTabContent value=".env.local" location=".env.local">
+      <ConnectTabContent value=".env.local">
         <SimpleCodeBlock className="bash">
           {`
 SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}

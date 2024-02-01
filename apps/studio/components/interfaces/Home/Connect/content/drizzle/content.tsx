@@ -13,11 +13,11 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
     <ConnectTabs>
       <ConnectTabTriggers>
         <ConnectTabTrigger value=".env" />
-        <ConnectTabTrigger value="schema.tsx" />
+        <ConnectTabTrigger value="drizzle/schema.tsx" />
         <ConnectTabTrigger value="index.tsx" />
       </ConnectTabTriggers>
 
-      <ConnectTabContent value=".env" location=".env">
+      <ConnectTabContent value=".env">
         <SimpleCodeBlock className="bash">
           {`
 DATABASE_URL='your-database-url'
@@ -25,7 +25,7 @@ DATABASE_URL='your-database-url'
         </SimpleCodeBlock>
       </ConnectTabContent>
 
-      <ConnectTabContent value="schema.tsx" location="drizzle/schema.tsx">
+      <ConnectTabContent value="drizzle/schema.tsx">
         <SimpleCodeBlock className="javascript">
           {`
 import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
@@ -39,7 +39,7 @@ export const users = pgTable('users', {
         </SimpleCodeBlock>
       </ConnectTabContent>
 
-      <ConnectTabContent value="index.tsx" location="index.tsx">
+      <ConnectTabContent value="index.tsx">
         <SimpleCodeBlock className="javascript">
           {`
 import { drizzle } from 'drizzle-orm/postgres-js'
