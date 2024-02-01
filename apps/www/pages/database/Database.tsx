@@ -23,7 +23,7 @@ import ProductIcon from '~/components/ProductIcon'
 import APISection from '~/components/Sections/APISection'
 import GithubExamples from '~/components/Sections/GithubExamples'
 import ProductHeader from '~/components/Sections/ProductHeader'
-import { TweetCard } from 'ui'
+import { TweetCard } from 'ui-patterns/TweetCard'
 
 // install Swiper's Controller component
 // SwiperCore.use([Controller])

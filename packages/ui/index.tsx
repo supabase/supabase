@@ -18,7 +18,6 @@ export * from './src/components/ThemeImage'
 // DISPLAYS
 
 export * from './src/components/Card'
-export * from './src/components/TweetCard'
 export * from './src/components/Badge'
 export * from './src/components/Tabs'
 export * from './src/components/Alert'
