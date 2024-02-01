@@ -1,5 +1,6 @@
 import clsx from 'clsx'
 import { useParams } from 'common'
+import { noop } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
@@ -8,6 +9,7 @@ import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
+  Checkbox_Shadcn_,
   IconAlertCircle,
   IconAlertTriangle,
   IconEye,
@@ -30,10 +32,19 @@ import { QueryItemActions } from './QueryItemActions'
 
 export interface QueryItemProps {
   tabInfo: SqlSnippet
+  isSelected?: boolean
+  hasQueriesSelected?: boolean
+  onSelectQuery?: () => void
+  onDeleteQuery?: (ids: string[]) => void
 }
 
-const QueryItem = ({ tabInfo }: QueryItemProps) => {
-  const router = useRouter()
+const QueryItem = ({
+  tabInfo,
+  isSelected = false,
+  hasQueriesSelected = false,
+  onSelectQuery = noop,
+  onDeleteQuery = noop,
+}: QueryItemProps) => {
   const [open, setOpen] = useState(false)
   const [renameModalOpen, setRenameModalOpen] = useState(false)
   const [shareModalOpen, setShareModalOpen] = useState(false)
@@ -42,7 +53,7 @@ const QueryItem = ({ tabInfo }: QueryItemProps) => {
 
   const { ref, id: activeId } = useParams()
   const snap = useSqlEditorStateSnapshot()
-  const { id, name, description, content } = tabInfo || {}
+  const { id, name, description, content, visibility } = tabInfo || {}
   const isActive = id === activeId
   const activeItemRef = useRef<HTMLElement | null>(null)
 
@@ -55,25 +66,10 @@ const QueryItem = ({ tabInfo }: QueryItemProps) => {
     isDownloadSnippetModalOpen
 
   const { mutate: deleteContent, isLoading: isDeleting } = useContentDeleteMutation({
-    onSuccess(data) {
-      if (data.length > 0) snap.removeSnippet(data[0])
-
-      const existingSnippetIds = (snap.orders[ref!] ?? []).filter((x) => x !== id)
-      if (existingSnippetIds.length === 0) {
-        router.push(`/project/${ref}/sql/new`)
-      } else {
-        router.push(`/project/${ref}/sql/${existingSnippetIds[0]}`)
-      }
-    },
-    onError(error, data) {
+    onSuccess: (data) => onDeleteQuery(data),
+    onError: (error, data) => {
       if (error.code === 404 && error.message.includes('Content not found')) {
-        if (data.ids) snap.removeSnippet(data.ids[0])
-        const existingSnippetIds = (snap.orders[ref!] ?? []).filter((x) => x !== id)
-        if (existingSnippetIds.length === 0) {
-          router.push(`/project/${ref}/sql/new`)
-        } else {
-          router.push(`/project/${ref}/sql/${existingSnippetIds[0]}`)
-        }
+        onDeleteQuery(data.ids)
       } else {
         toast.error(`Failed to delete query: ${error.message}`)
       }
@@ -114,26 +110,42 @@ const QueryItem = ({ tabInfo }: QueryItemProps) => {
           <div
             key={id}
             className={clsx(
-              'flex items-center justify-between rounded-md group',
+              'h-7 pl-3 pr-2',
+              'flex items-center justify-between rounded-md group relative',
               isActive ? 'bg-surface-300' : 'hover:bg-surface-200'
             )}
             ref={isActive ? (activeItemRef as React.RefObject<HTMLDivElement>) : null}
           >
-            <Link href={`/project/${ref}/sql/${id}`} className="py-1 px-3 w-full overflow-hidden">
-              <p
-                title={description || name}
+            {visibility === 'user' && (
+              <Checkbox_Shadcn_
                 className={clsx(
+                  'transition absolute left-2.5 border-foreground-lighter',
+                  hasQueriesSelected ? '' : 'opacity-0 group-hover:opacity-100'
+                )}
+                checked={isSelected}
+                onCheckedChange={() => onSelectQuery()}
+              />
+            )}
+            <div className="flex items-center justify-between w-full gap-x-2">
+              <Link
+                title={description || name}
+                href={`/project/${ref}/sql/${id}`}
+                className={clsx(
+                  'w-full overflow-hidden truncate',
                   isActive
                     ? 'text-foreground'
                     : 'text-foreground-light group-hover:text-foreground/80',
-                  'text-sm transition overflow-hidden text-ellipsis'
+                  'text-sm transition-all overflow-hidden text-ellipsis',
+                  hasQueriesSelected && visibility === 'user'
+                    ? 'ml-5'
+                    : visibility === 'user'
+                      ? 'group-hover:ml-5'
+                      : ''
                 )}
               >
                 {name}
-              </p>
-            </Link>
-            <div className="pr-1">
-              {
+              </Link>
+              {!hasQueriesSelected && (
                 <QueryItemActions
                   tabInfo={tabInfo}
                   activeId={activeId}
@@ -144,7 +156,7 @@ const QueryItem = ({ tabInfo }: QueryItemProps) => {
                   onSelectShareQuery={() => setShareModalOpen(true)}
                   onSelectDownloadQuery={() => setIsDownloadSnippetModalOpen(true)}
                 />
-              }
+              )}
             </div>
           </div>
         </TooltipTrigger_Shadcn_>
@@ -200,7 +212,7 @@ const QueryItem = ({ tabInfo }: QueryItemProps) => {
           <div className="my-6">
             <div className="text-sm text-foreground-light grid gap-4">
               <div className="grid gap-1">
-                {tabInfo.visibility === 'project' && (
+                {visibility === 'project' && (
                   <Alert_Shadcn_ variant="destructive">
                     <IconAlertCircle strokeWidth={2} />
                     <AlertTitle_Shadcn_>This SQL snippet will be lost forever</AlertTitle_Shadcn_>

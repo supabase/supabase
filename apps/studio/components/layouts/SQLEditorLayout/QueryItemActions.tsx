@@ -54,7 +54,6 @@ export const QueryItemActions = ({
   const project = useSelectedProject()
 
   const { id, name, visibility, content } = tabInfo || {}
-  const isActive = id === activeId
 
   const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'sql', owner_id: profile?.id },
@@ -111,20 +110,13 @@ export const QueryItemActions = ({
       {IS_PLATFORM ? (
         <DropdownMenu open={open} onOpenChange={setOpen}>
           <DropdownMenuTrigger asChild>
-            <span
-              tabIndex={0}
-              onClick={() => setOpen(true)}
-              className={clsx(
-                'rounded p-1 cursor-pointer',
-                isActive
-                  ? 'text-foreground-light hover:bg-border-stronger'
-                  : 'text-background hover:bg-overlay-hover group-hover:text-foreground-light'
-              )}
-            >
-              <IconChevronDown size="tiny" strokeWidth={2} />
-            </span>
+            <Button
+              type="text"
+              className="px-1 opacity-50 hover:opacity-100"
+              icon={<IconChevronDown size="tiny" strokeWidth={2} />}
+            />
           </DropdownMenuTrigger>
-          <DropdownMenuContent side="bottom" align="end" className=" w-52 translate-x-[4px]">
+          <DropdownMenuContent side="bottom" align="end" className=" w-52 translate-x-2">
             {isSnippetOwner && (
               <DropdownMenuItem onClick={onClickRename} className="space-x-2">
                 <IconEdit2 size="tiny" />
