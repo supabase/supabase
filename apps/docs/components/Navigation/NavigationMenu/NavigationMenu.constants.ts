@@ -948,7 +948,7 @@ export const database: NavMenuConstant = {
         },
         {
           name: 'Replicating from Supabase to External Postgres',
-          url: '/guides/database/postgres/setp-replication-external',
+          url: '/guides/database/postgres/setup-replication-external',
         },
       ],
     },
