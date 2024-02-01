@@ -1,17 +1,21 @@
-import { CollapsibleContent, CollapsibleTrigger } from '@ui/components/shadcn/ui/collapsible'
 import Table from 'components/to-be-cleaned/Table'
-import CodeEditor from 'components/ui/CodeEditor'
 import CopyButton from 'components/ui/CopyButton'
-import SqlEditor from 'components/ui/SqlEditor'
 import React from 'react'
-import { Collapsible } from 'ui'
+import { cn } from 'ui'
 
 const QueryActions = ({ sql, className }: { sql: string; className: string }) => {
   if (sql.includes('insufficient privilege')) return null
 
   return (
     <div className={[className, 'flex justify-end items-center'].join(' ')}>
-      <CopyButton type="default" text={sql} />
+      <CopyButton
+        onClick={(e) => {
+          e.stopPropagation()
+        }}
+        copyLabel="Copy query"
+        type="default"
+        text={sql}
+      />
     </div>
   )
 }
@@ -31,28 +35,35 @@ const ReportQueryPerformanceTableRow = ({ item }: Props) => {
 
   return (
     <>
-      <Table.tr
-        onClick={() => setExpanded(!expanded)}
-        className="expandable-tr *:flex *:items-center *:text-ellipsis *:overflow-hidden"
-      >
-        <Table.td className="whitespace-nowrap">{item.rolname}</Table.td>
-        <Table.td>{item.prop_total_time}</Table.td>
-        <Table.td>{item.calls}</Table.td>
-        <Table.td>{item.total_time.toFixed(2)}ms</Table.td>
-        <Table.td className="relative w-full">
-          <p className="w-96 block truncate font-mono">{item.query}</p>
+      <Table.tr onClick={() => setExpanded(!expanded)}>
+        <Table.td>{item.rolname}</Table.td>
+        <Table.td className="overflow-hidden max-w-xs">
+          <p className="font-mono line-clamp-2 text-xs">{item.query}</p>
+        </Table.td>
+        <Table.td className="text-right">{item.calls}</Table.td>
+        <Table.td className="text-right">{item.prop_total_time}</Table.td>
+        <Table.td className="text-right">{item.total_time.toFixed(2)}ms</Table.td>
+        <Table.td>
           <QueryActions sql={item.query} className="" />
         </Table.td>
       </Table.tr>
-
-      <Table.td
-        className={`${
-          expanded ? 'h-auto opacity-100' : 'h-0 opacity-0'
-        } expanded-row-content border-l border-r bg-alternative !pt-0 !pb-0 transition-all`}
-        colSpan={5}
+      <tr
+        className={cn(
+          {
+            'h-0 opacity-0': !expanded,
+            'h-4 opacity-100': expanded,
+          },
+          'transition-all'
+        )}
       >
-        {expanded && <pre className="overflow-auto">{item.query}</pre>}
-      </Table.td>
+        {expanded && (
+          <td colSpan={6} className="!p-0">
+            <div className="overflow-auto p-3 max-h-[400px] bg-background-alternative-200">
+              <pre className="">{item.query}</pre>
+            </div>
+          </td>
+        )}
+      </tr>
     </>
   )
 }

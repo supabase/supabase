@@ -100,6 +100,7 @@
     "@storybook/addon-styling": "^1.3.7",
     "@storybook/react": "^7.5.3",
     "@storybook/react-webpack5": "^7.5.3",
+    "@tailwindcss/line-clamp": "^0.4.4",
     "@testing-library/jest-dom": "^6.1.3",
     "@testing-library/react": "^14.0.0",
     "@tokens-studio/sd-transforms": "^0.8.5",
