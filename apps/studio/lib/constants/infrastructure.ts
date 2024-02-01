@@ -1,5 +1,4 @@
 import { components } from 'data/api'
-import { IS_PLATFORM } from '.'
 
 export type CloudProvider = 'FLY' | 'AWS'
 export type Region = typeof AWS_REGIONS | typeof FLY_REGIONS
@@ -17,10 +16,7 @@ export const AWS_REGIONS = {
   // 'North EU': 'North EU',
   CENTRAL_EU: 'Central EU (Frankfurt)',
   SOUTH_ASIA: 'South Asia (Mumbai)',
-  // [Joshen] TEMP FIX BLOCK APSE 1 ON PROD
-  ...(process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
-    ? { SOUTHEAST_ASIA: 'Southeast Asia (Singapore)' }
-    : {}),
+  SOUTHEAST_ASIA: 'Southeast Asia (Singapore)',
   NORTHEAST_ASIA: 'Northeast Asia (Tokyo)',
   NORTHEAST_ASIA_2: 'Northeast Asia (Seoul)',
   OCEANIA: 'Oceania (Sydney)',
@@ -34,11 +30,8 @@ export const FLY_REGIONS = {
   SOUTHEAST_ASIA: 'Singapore',
 } as const
 
-// [Joshen] TEMP FIX BLOCK APSE 1 ON PROD, remove as string
 export const AWS_REGIONS_DEFAULT =
-  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
-    ? (AWS_REGIONS.SOUTHEAST_ASIA as string)
-    : AWS_REGIONS.WEST_US
+  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? AWS_REGIONS.SOUTHEAST_ASIA : AWS_REGIONS.WEST_US
 
 // TO DO, change default to US region for prod
 const FLY_REGIONS_DEFAULT = FLY_REGIONS.SOUTHEAST_ASIA
