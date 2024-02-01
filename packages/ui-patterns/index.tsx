@@ -4,6 +4,7 @@
  */
 export * from './ConsentToast'
 export * from './CountdownWidget'
+export * from './ExpandableVideo'
 export * from './GlassPanel'
 export * from './IconPanel'
 export * from './PrivacySettings'

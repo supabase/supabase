@@ -1,7 +1,8 @@
-import { Badge, ExpandableVideo } from 'ui'
+import { Badge } from 'ui'
 
 import Link from 'next/link'
 import Image from 'next/image'
+import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
 
 export const PencilSvg = () => (
   <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
