@@ -178,11 +178,12 @@ const SideBarContent = observer(() => {
                   </div>
                 )}
 
-              {filteredFavoriteSnippets.length > 0 ? (
+              {filteredProjectSnippets.length > 0 ? (
                 <div className="editor-product-menu">
-                  <Menu.Group title="Favorites" />
+                  <Menu.Group title="Project queries" />
+
                   <div className="space-y-1">
-                    {filteredFavoriteSnippets.map((tabInfo) => {
+                    {filteredProjectSnippets.map((tabInfo) => {
                       const { id } = tabInfo || {}
                       return <QueryItem key={id} tabInfo={tabInfo} />
                     })}
@@ -190,12 +191,11 @@ const SideBarContent = observer(() => {
                 </div>
               ) : null}
 
-              {filteredProjectSnippets.length > 0 ? (
+              {filteredFavoriteSnippets.length > 0 ? (
                 <div className="editor-product-menu">
-                  <Menu.Group title="Project queries" />
-
+                  <Menu.Group title="Favorites" />
                   <div className="space-y-1">
-                    {filteredProjectSnippets.map((tabInfo) => {
+                    {filteredFavoriteSnippets.map((tabInfo) => {
                       const { id } = tabInfo || {}
                       return <QueryItem key={id} tabInfo={tabInfo} />
                     })}
