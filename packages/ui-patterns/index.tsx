@@ -4,4 +4,5 @@
  */
 export * from './ConsentToast'
 export * from './GlassPanel'
+export * from './IconPanel'
 export * from './PrivacySettings'

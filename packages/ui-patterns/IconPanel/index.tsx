@@ -1,6 +1,6 @@
 import { useTheme } from 'next-themes'
 import * as React from 'react'
-import { ChevronRight } from 'react-feather'
+import { IconChevronRight } from 'ui'
 import ReactTooltip from 'react-tooltip'
 
 interface Props {
@@ -19,7 +19,7 @@ interface Props {
   hideArrow?: boolean
 }
 
-const IconPanel = ({
+export const IconPanel = ({
   title,
   tooltip,
   icon,
@@ -74,8 +74,8 @@ const IconPanel = ({
                     title !== undefined
                       ? `${title} Icon`
                       : tooltip !== undefined
-                      ? `${tooltip} Icon`
-                      : 'Icon'
+                        ? `${tooltip} Icon`
+                        : 'Icon'
                   }
                 />
               </IconContainer>
@@ -93,7 +93,7 @@ const IconPanel = ({
                 group-hover:opacity-100
                 group-hover:ml-0"
                   >
-                    <ChevronRight strokeWidth={2} size={14} />
+                    <IconChevronRight strokeWidth={2} size={14} />
                   </div>
                 )}
               </div>
@@ -122,5 +122,3 @@ const IconPanel = ({
     </>
   )
 }
-
-export default IconPanel
