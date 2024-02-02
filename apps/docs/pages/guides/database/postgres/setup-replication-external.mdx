@@ -27,7 +27,15 @@ CREATE PUBLICATION example_pub;
 select pg_create_logical_replication_slot('example_slot', 'pgoutput');
 ```
 
-3. Now we will connect to our **external database** and subscribe to our `publication` Note: This will need a direct connection to your database and you can find the connection info in the [Dashboard](https://supabase.com/dashboard/project/_/settings/database)):
+3. Now we will connect to our **external database** and subscribe to our `publication` Note: ):
+
+<Admonition type="info">
+
+This will need a direct connection to your database and you can find the connection info in the [Dashboard](https://supabase.com/dashboard/project/_/settings/database).
+
+You will also need to ensure that ipv6 is supported by your replication destination.
+
+</Admonition>
 
 ```sql
 CREATE SUBSCRIPTION example_sub
