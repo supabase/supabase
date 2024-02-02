@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Button } from 'ui'
-import { Octokit } from '@octokit/core'
+import { Octokit } from 'octokit'
 
 const GitHubButton = () => {
   const [stars, setStars] = useState<string>('60.8')

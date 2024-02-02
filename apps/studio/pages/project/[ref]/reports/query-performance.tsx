@@ -153,8 +153,8 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                       {indexHitRate >= 0.99
                         ? checkAlert
                         : indexHitRate >= 0.95
-                        ? warnAlert
-                        : dangerAlert}
+                          ? warnAlert
+                          : dangerAlert}
                       <div className="flex items-baseline">
                         <span className="text-3xl">
                           {queryHitRate?.data && (queryHitRate?.data[0]?.ratio * 100).toFixed(2)}
@@ -170,8 +170,8 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                       {tableHitRate >= 0.99
                         ? checkAlert
                         : tableHitRate >= 0.95
-                        ? warnAlert
-                        : dangerAlert}
+                          ? warnAlert
+                          : dangerAlert}
                       <div className="flex items-baseline">
                         <span className="text-3xl">
                           {queryHitRate?.data && (queryHitRate?.data[1]?.ratio * 100).toFixed(2)}

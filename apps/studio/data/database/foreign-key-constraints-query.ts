@@ -82,7 +82,7 @@ export type ForeignKeyConstraintsData = ForeignKeyConstraint[]
 export type ForeignKeyConstraintsError = unknown
 
 export const useForeignKeyConstraintsQuery = <
-  TData extends ForeignKeyConstraintsData = ForeignKeyConstraintsData
+  TData extends ForeignKeyConstraintsData = ForeignKeyConstraintsData,
 >(
   { projectRef, connectionString, schema }: ForeignKeyConstraintsVariables,
   options: UseQueryOptions<ExecuteSqlData, ForeignKeyConstraintsError, TData> = {}

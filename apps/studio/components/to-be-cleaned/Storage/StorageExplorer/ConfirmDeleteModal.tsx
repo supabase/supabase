@@ -26,14 +26,14 @@ const ConfirmDeleteModal = ({
   const title = multipleFiles
     ? `Confirm deletion of ${selectedItemsToDelete.length} items`
     : selectedItemsToDelete.length === 1
-    ? `Confirm deletion of ${selectedItemsToDelete[0].name}`
-    : ``
+      ? `Confirm deletion of ${selectedItemsToDelete[0].name}`
+      : ``
 
   const description = multipleFiles
     ? `Are you sure you want to delete the selected ${selectedItemsToDelete.length} items?`
     : selectedItemsToDelete.length === 1
-    ? `Are you sure you want to delete the selected ${selectedItemsToDelete[0].type.toLowerCase()}?`
-    : ``
+      ? `Are you sure you want to delete the selected ${selectedItemsToDelete[0].type.toLowerCase()}?`
+      : ``
 
   const onConfirmDelete = () => {
     setDeleting(true)

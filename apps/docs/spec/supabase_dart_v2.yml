@@ -477,7 +477,7 @@ functions:
     notes: |
       - Resends a signup confirmation, email change, or phone change email to the user.
       - Passwordless sign-ins can be resent by calling the `signInWithOtp()` method again.
-      - Password recovery emails can be resent by calling the `resetPassswordForEmail()` method again.
+      - Password recovery emails can be resent by calling the `resetPasswordForEmail()` method again.
       - This method only resend an email or phone OTP to the user if an initial signup, email change, or phone change request was made.
     examples:
       - id: resend-email-signup-confirmation

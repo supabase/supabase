@@ -74,9 +74,8 @@ const StorageConfig = ({ config, projectRef, organizationSlug }: any) => {
   const onValidate = (values: any) => {
     const errors = {} as any
     if (values.fileSizeLimit > formattedMaxLimit) {
-      errors[
-        'fileSizeLimit'
-      ] = `Maximum limit is up to ${formattedMaxLimit.toLocaleString()} ${selectedUnit}.`
+      errors['fileSizeLimit'] =
+        `Maximum limit is up to ${formattedMaxLimit.toLocaleString()} ${selectedUnit}.`
     }
     return errors
   }

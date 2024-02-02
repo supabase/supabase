@@ -3502,6 +3502,7 @@ functions:
       - Realtime is disabled by default for new Projects for better database performance and security. You can turn it on by [managing replication](/docs/guides/database/api#managing-realtime).
       - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
       - When using a method with a generic type like `track`, `broadcast` or `broadcastFlow`, you have to provide a [serializable class](/docs/reference/kotlin/installing#serialization) as the type parameter.
+      - Presence, Broadcast and Database updates are sent through a [Flow](https://kotlinlang.org/docs/flow.html)
     examples:
       - id: liste-to-broadcasts
         name: Listen to broadcasts
@@ -3516,7 +3517,7 @@ functions:
 
           val broadcastFlow = channel.broadcastFlow<Message>(event = "message")
 
-          //in a new coroutine (or use Flow.onEach().launchIn(scope)):
+          //Collect the flow
           broadcastFlow.collect { //it: Message
               println(it)
           }
@@ -3532,22 +3533,27 @@ functions:
           @Serializable
           data class PresenceState(val username: String)
 
-          val connectedUsers = mutableSetOf<PresenceState>()
           val channel = supabase.channel("channelId") {
               //optional config
           }
+          
+          //if you want more control and want to receive the raw data, use the `presenceChangeFlow` method
+          val presenceFlow = channel.presenceDataFlow<PresenceState>() 
 
-          val presenceChangeFlow = channel.presenceChangeFlow()
-
-          //in a new coroutine (or use Flow.onEach().launchIn(scope)):
-          presenceChangeFlow.collect {
-              connectedUsers += it.decodeJoinsAs<PresenceState>()
-              connectedUsers -= it.decodeLeavesAs<PresenceState>()
+          //Collect the flow
+          presenceFlow.collect {
+              for (presence in it) {
+                  println(presence.username)
+              }
           }
 
           channel.subscribe(blockUntilSubscribed = true)
-          //send own state
+          //send your own state
           channel.track(PresenceState(username = "John"))
+        description: |
+          You have two methods you can use to listen for presence updates:
+          - `presenceDataFlow` takes care of caching presences based on their id and automatically emits the updated list.
+          - `presenceChangeFlow` emits the raw data received by realtime. Can be used if more control is required.
       - id: listen-to-all-database-changes
         name: Listen to all database changes
         code: |
@@ -3557,7 +3563,7 @@ functions:
           }
           val changeFlow = channel.postgresChangeFlow<PostgresAction>(schema = "public")
 
-          //in a new coroutine (or use Flow.onEach().launchIn(scope)):
+          //Collect the flow
           changeFlow.collect {
               when(it) {
                   is PostgresAction.Delete -> println("Deleted: ${it.oldRecord}")
@@ -3576,11 +3582,17 @@ functions:
           val channel = supabase.channel("channelId") {
               //optional config
           }
+          
+          //This flow will automatically emit the initial data of all messages (which can be restricted by specifying a filter) and then listens for updates.
+          //The data is cached automatically by the primary key you specify
+          val users: Flow<List<User>> = channel.postgresListDataFlow(schema = "public", table = "users", primaryKey = User::id)
+          
+          //If you want more control and want to receive the raw data use the `postgresChangeFlow` method:
           val changeFlow = channel.postgresChangeFlow<PostgresAction>(schema = "public") {
               table = "users"
           }
 
-          //in a new coroutine (or use Flow.onEach().launchIn(scope)):
+          //Collect the flow
           changeFlow.collect {
               when(it) {
                   is PostgresAction.Delete -> println("Deleted: ${it.oldRecord}")
@@ -3592,6 +3604,10 @@ functions:
 
           channel.subscribe()
           ```
+        description: |
+          You have two methods you can use if you want to listen for database updates on a specific table:
+          - `postgresListDataFlow` fetches the initial data of all database entries matching your filter (or all entries if you didn't specify one) and then caches the data based on their primary key. Inserts, Updates and Deletes are handled automatically and you will get the updated list through the flow.
+          - `postgresChangeFlow` emits the raw data received by realtime. Events can be filtered by specifying a `PostgresAction` type parameter (see examples), or all by specifying only `PostgresAction`. Can be used if more control is required.
       - id: listen-to-inserts
         name: Listen to inserts
         code: |
@@ -3603,7 +3619,7 @@ functions:
               table = "users"
           }
 
-          //in a new coroutine (or use Flow.onEach().launchIn(scope)):
+          //Collect the flow
           changeFlow.collect {
               println(it.record)
           }
@@ -3624,11 +3640,12 @@ functions:
           val channel = supabase.channel("channelId") {
               //optional config
           }
+          
           val changeFlow = channel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
               table = "users"
           }
 
-          //in a new coroutine (or use Flow.onEach().launchIn(scope)):
+          //Collect the flow
           changeFlow.collect {
               println(it.record)
               println(it.oldRecord)
@@ -3650,11 +3667,12 @@ functions:
           val channel = supabase.channel("channelId") {
               //optional config
           }
+          
           val changeFlow = channel.postgresChangeFlow<PostgresAction.Delete>(schema = "public") {
               table = "users"
           }
 
-          //in a new coroutine (or use Flow.onEach().launchIn(scope)):
+          //Collect the flow
           changeFlow.collect {
               println(it.oldRecord)
           }
@@ -3663,24 +3681,35 @@ functions:
           ```
       - id: listening-to-row-level-changes
         name: Listen to row level changes
-        description: You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
         code: |
           ```kotlin
           val channel = supabase.channel("channelId") {
              //optional config
           }
+          
+          //This flow will automatically emit the user's initial data and then emits new values on update. The flow ends on deletion
+          val user: Flow<User> = channel.postgresSingleDataFlow(schema = "public", table = "users", primaryKey = User::id) {
+              //This is the same filter as used in postgrest, so you could use complex queries, but only one entry is fetched
+              eq("id", 1)
+          }
+          
+          //If you want more control, use the `postgresChangeFlow` method which works the same as the other examples
           val changeFlow = channel.postgresChangeFlow<PostgresAction.Delete>(schema = "public") {
               table = "users"
-              filter = "id=eq.1"
+              filter("id", FilterOperator.EQ, 1)
           }
 
-          //in a new coroutine:
+          //Collect the flow
           changeFlow.collect {
               println(it.oldRecord)
           }
 
           channel.subscribe()
           ```
+        description: |
+          You have two methods you can use if you want to listen for updates on a specific database row:
+          - `postgresSingleDataFlow` fetches the initial data matching the filter and then emits updates based on realtime events.
+          - `postgresChangeFlow` emits the raw data received by realtime. To filter the realtime queries, use the `filter` method.
 
   - id: remove-channel
     description: |
@@ -3689,6 +3718,7 @@ functions:
     notes: |
       - Removing a channel is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes.
       - Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
+      - If you removed all channels, the client automatically disconnects from the Realtime websocket. This can be disabled in the Realtime config by setting `disconnectOnNoSubscriptions` to false.
     examples:
       - id: removes-a-channel
         name: Remove a channel
@@ -3718,6 +3748,7 @@ functions:
     notes: |
       Unsubscribes and removes all Realtime channels from Realtime client.
       - Removing channels is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
+      - If you removed all channels, the client automatically disconnects from the Realtime websocket. This can be disabled in the Realtime config by setting `disconnectOnNoSubscriptions` to false.
     examples:
       - id: remove-all-channels
         name: Remove all channels

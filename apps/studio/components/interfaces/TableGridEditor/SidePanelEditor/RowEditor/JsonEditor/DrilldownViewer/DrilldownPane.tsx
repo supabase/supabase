@@ -72,8 +72,8 @@ const DrilldownPane = ({ pane, jsonData, activeKey, onSelectKey = noop }: Drilld
             {isNull(jsonData[key])
               ? 'null'
               : typeof jsonData[key] === 'string'
-              ? `"${jsonData[key]}"`
-              : jsonData[key].toString()}
+                ? `"${jsonData[key]}"`
+                : jsonData[key].toString()}
           </p>
         </div>
       ))}
