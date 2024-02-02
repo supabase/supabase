@@ -34,7 +34,6 @@ import {
   IconRefreshCw,
   IconSearch,
   Input,
-  Loading,
   Tabs,
 } from 'ui'
 
@@ -154,8 +153,8 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                       {indexHitRate >= 0.99
                         ? checkAlert
                         : indexHitRate >= 0.95
-                          ? warnAlert
-                          : dangerAlert}
+                        ? warnAlert
+                        : dangerAlert}
                       <div className="flex items-baseline">
                         <span className="text-3xl">
                           {queryHitRate?.data && (queryHitRate?.data[0]?.ratio * 100).toFixed(2)}
@@ -171,8 +170,8 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                       {tableHitRate >= 0.99
                         ? checkAlert
                         : tableHitRate >= 0.95
-                          ? warnAlert
-                          : dangerAlert}
+                        ? warnAlert
+                        : dangerAlert}
                       <div className="flex items-baseline">
                         <span className="text-3xl">
                           {queryHitRate?.data && (queryHitRate?.data[1]?.ratio * 100).toFixed(2)}
@@ -270,13 +269,17 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                             sql={item.query}
                             colSpan={5}
                           >
-                            <Table.td>{item.rolname}</Table.td>
-                            <Table.td className="overflow-hidden max-w-xs">
+                            <Table.td className="truncate" title={item.rolname}>
+                              {item.rolname}
+                            </Table.td>
+                            <Table.td className="max-w-xs">
                               <p className="font-mono line-clamp-2 text-xs">{item.query}</p>
                             </Table.td>
-                            <Table.td className="text-right">{item.calls}</Table.td>
-                            <Table.td className="text-right">{item.prop_total_time}</Table.td>
-                            <Table.td className="text-right">
+                            <Table.td className="truncate text-right">{item.calls}</Table.td>
+                            <Table.td className="truncate text-right">
+                              {item.prop_total_time}
+                            </Table.td>
+                            <Table.td className="truncate text-right">
                               {item.total_time.toFixed(2)}ms
                             </Table.td>
                           </ReportQueryPerformanceTableRow>
@@ -321,22 +324,24 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                             sql={item.query}
                             colSpan={8}
                           >
-                            <Table.td>{item.rolname}</Table.td>
-                            <Table.td className="min-w-xs overflow-hidden">
+                            <Table.td className="truncate" title={item.rolname}>
+                              {item.rolname}
+                            </Table.td>
+                            <Table.td className="min-w-xs">
                               <p className="text-xs font-mono line-clamp-2">{item.query}</p>
                             </Table.td>
-                            <Table.td className="text-right">{item.avg_rows}</Table.td>
-                            <Table.td className="text-right">{item.calls}</Table.td>
-                            <Table.td className="text-right">
+                            <Table.td className="truncate text-right">{item.avg_rows}</Table.td>
+                            <Table.td className="truncate text-right">{item.calls}</Table.td>
+                            <Table.td className="truncate text-right">
                               {item.max_time?.toFixed(2)}ms
                             </Table.td>
-                            <Table.td className="text-right">
+                            <Table.td className="text-right truncate">
                               {item.mean_time?.toFixed(2)}ms
                             </Table.td>
-                            <Table.td className="text-right">
+                            <Table.td className="text-right truncate">
                               {item.min_time?.toFixed(2)}ms
                             </Table.td>
-                            <Table.td className="text-right">
+                            <Table.td className="text-right truncate">
                               {item.total_time?.toFixed(2)}ms
                             </Table.td>
                           </ReportQueryPerformanceTableRow>
@@ -379,16 +384,20 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                             sql={item.query}
                             colSpan={8}
                           >
-                            <Table.td>{item.rolname}</Table.td>
-                            <Table.td className="overflow-hidden max-w-xs">
+                            <Table.td className="truncate" title={item.rolname}>
+                              {item.rolname}
+                            </Table.td>
+                            <Table.td className="max-w-xs">
                               <p className="font-mono line-clamp-2 text-xs">{item.query}</p>
                             </Table.td>
-                            <Table.td>{item.avg_rows}</Table.td>
-                            <Table.td>{item.calls}</Table.td>
-                            <Table.td>{item.max_time?.toFixed(2)}ms</Table.td>
-                            <Table.td>{item.mean_time?.toFixed(2)}ms</Table.td>
-                            <Table.td>{item.min_time?.toFixed(2)}ms</Table.td>
-                            <Table.td>{item.total_time?.toFixed(2)}ms</Table.td>
+                            <Table.td className="truncate">{item.avg_rows}</Table.td>
+                            <Table.td className="truncate">{item.calls}</Table.td>
+                            <Table.td className="truncate">{item.max_time?.toFixed(2)}ms</Table.td>
+                            <Table.td className="truncate">{item.mean_time?.toFixed(2)}ms</Table.td>
+                            <Table.td className="truncate">{item.min_time?.toFixed(2)}ms</Table.td>
+                            <Table.td className="truncate">
+                              {item.total_time?.toFixed(2)}ms
+                            </Table.td>
                           </ReportQueryPerformanceTableRow>
                         )
                       })
