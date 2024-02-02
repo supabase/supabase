@@ -11,6 +11,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import Table from 'components/to-be-cleaned/Table'
 import CopyButton from 'components/ui/CopyButton'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
+import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { useFlag } from 'hooks'
 import { observer } from 'mobx-react-lite'
@@ -247,7 +248,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
               <ReactMarkdown className={helperTextClassNames}>
                 {TimeConsumingHelperText}
               </ReactMarkdown>
-              <div className="thin-scrollbars max-w-full overflow-auto">
+              <div className="thin-scrollbars max-w-full overflow-auto min-h-[800px]">
                 <QueryPerformanceFilterBar onRefreshClick={handleRefresh} isLoading={isLoading} />
                 <Table
                   className="table-fixed"
@@ -282,13 +283,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                         )
                       })
                     ) : (
-                      <tr>
-                        <td colSpan={5}>
-                          <Loading active={true}>
-                            <div className="h-[400px] flex justify-center items-center"></div>
-                          </Loading>
-                        </td>
-                      </tr>
+                      <QueryPerformanceLoadingRow colSpan={5} />
                     )
                   }
                 />
@@ -300,7 +295,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
               <ReactMarkdown className={helperTextClassNames}>
                 {MostFrequentHelperText}
               </ReactMarkdown>
-              <div className="thin-scrollbars max-w-full overflow-auto">
+              <div className="thin-scrollbars max-w-full overflow-auto min-h-[800px]">
                 <QueryPerformanceFilterBar onRefreshClick={handleRefresh} isLoading={isLoading} />
                 <Table
                   head={
@@ -317,13 +312,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                   }
                   body={
                     queryPerformanceQuery.isLoading ? (
-                      <tr>
-                        <td colSpan={8}>
-                          <Loading active={true}>
-                            <div className="h-[400px] flex justify-center items-center"></div>
-                          </Loading>
-                        </td>
-                      </tr>
+                      <QueryPerformanceLoadingRow colSpan={8} />
                     ) : (
                       queryPerformanceQuery.data?.map((item, i) => {
                         return (
@@ -364,7 +353,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
               <ReactMarkdown className={helperTextClassNames}>
                 {SlowestExecutionHelperText}
               </ReactMarkdown>
-              <div className="thin-scrollbars max-w-full overflow-auto">
+              <div className="thin-scrollbars max-w-full overflow-auto min-h-[800px]">
                 <QueryPerformanceFilterBar onRefreshClick={handleRefresh} isLoading={isLoading} />
                 <Table
                   head={
@@ -381,13 +370,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                   }
                   body={
                     queryPerformanceQuery.isLoading ? (
-                      <tr>
-                        <td colSpan={8}>
-                          <Loading active={true}>
-                            <div className="h-[400px] flex justify-center items-center"></div>
-                          </Loading>
-                        </td>
-                      </tr>
+                      <QueryPerformanceLoadingRow colSpan={8} />
                     ) : (
                       queryPerformanceQuery.data?.map((item, i) => {
                         return (
@@ -545,6 +528,22 @@ function QueryPerformanceFilterBar({
           </Button>
         </div>
       </div>
+    </>
+  )
+}
+
+function QueryPerformanceLoadingRow({ colSpan }: { colSpan: number }) {
+  return (
+    <>
+      {Array(4)
+        .fill('')
+        .map((_, i) => (
+          <tr key={'loading-' + { i }}>
+            <td colSpan={colSpan}>
+              <ShimmeringLoader />
+            </td>
+          </tr>
+        ))}
     </>
   )
 }
