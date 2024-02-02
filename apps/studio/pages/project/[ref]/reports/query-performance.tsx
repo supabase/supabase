@@ -46,9 +46,6 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
   const router = useRouter()
   const hooks = queriesFactory(config.queries, projectRef ?? 'default')
-  const mostFrequentlyInvoked = hooks.mostFrequentlyInvoked()
-  const mostTimeConsuming = hooks.mostTimeConsuming()
-  const slowestExecutionTime = hooks.slowestExecutionTime()
   const queryHitRate = hooks.queryHitRate()
 
   const orderBy = (router.query.sort as 'lat_desc' | 'lat_asc') || 'lat_desc'
@@ -62,21 +59,16 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
 
   const queryPerformanceQuery = useQueryPerformanceQuery({
     searchQuery,
-    orderBy: orderBy,
+    orderBy,
     preset,
   })
 
-  const isLoading = [
-    mostFrequentlyInvoked.isLoading,
-    mostTimeConsuming.isLoading,
-    slowestExecutionTime.isLoading,
-    queryHitRate.isLoading,
-  ].every((value) => value)
+  const isLoading = [queryPerformanceQuery.isLoading, queryHitRate.isLoading].every(
+    (value) => value
+  )
 
   const handleRefresh = async () => {
-    mostFrequentlyInvoked.runQuery()
-    mostTimeConsuming.runQuery()
-    slowestExecutionTime.runQuery()
+    queryPerformanceQuery.runQuery()
     queryHitRate.runQuery()
   }
 
