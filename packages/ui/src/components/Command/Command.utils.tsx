@@ -1,5 +1,7 @@
 import { Command as CommandPrimitive } from 'cmdk'
 import * as React from 'react'
+import { ErrorBoundary } from 'react-error-boundary'
+import { IconAlertTriangle } from 'ui'
 
 import { cn } from './../../lib/utils'
 
@@ -9,6 +11,7 @@ import { Modal } from '../Modal'
 import { ModalProps } from '../Modal/Modal'
 import { useCommandMenu } from './CommandMenuProvider'
 import { commandScore } from './command-score'
+import { Button } from '../Button'
 
 type CommandPrimitiveElement = React.ElementRef<typeof CommandPrimitive>
 type CommandPrimitiveProps = React.ComponentPropsWithoutRef<typeof CommandPrimitive>
@@ -34,6 +37,10 @@ function commandFilter(value: string, search: string) {
     : commandScore(value.replace(FORCE_MOUNT_ITEM, ''), search)
 }
 
+export function escapeDoubleQuotes(str: string) {
+  return str.replaceAll('"', '\\"')
+}
+
 export const Command = React.forwardRef<CommandPrimitiveElement, CommandPrimitiveProps>(
   ({ className, ...props }, ref) => (
     <CommandPrimitive
@@ -46,6 +53,23 @@ export const Command = React.forwardRef<CommandPrimitiveElement, CommandPrimitiv
 )
 
 Command.displayName = CommandPrimitive.displayName
+
+export function CommandError({ resetErrorBoundary }: { resetErrorBoundary: () => void }) {
+  return (
+    <div className={cn('min-h-64', 'flex items-center justify-center')}>
+      <div className="p-10 flex flex-col items-center gap-6 mt-4">
+        <IconAlertTriangle strokeWidth={1.5} size={40} />
+        <p className="text-lg text-center">
+          Sorry, looks like we&apos;re having some issues with the command menu!
+        </p>
+        <p className="text-sm text-center">Please try again in a bit.</p>
+        <Button size="tiny" type="secondary" onClick={resetErrorBoundary}>
+          Try again?
+        </Button>
+      </div>
+    </div>
+  )
+}
 
 export interface CommandDialogProps extends ModalProps {
   onKeyDown?: KeyboardEventHandler<HTMLDivElement>
@@ -72,19 +96,21 @@ export const CommandDialog = ({ children, onKeyDown, page, ...props }: CommandDi
         animateBounce ? 'scale-[101.5%]' : 'scale-100'
       )}
     >
-      <Command
-        className={[
-          '[&_[cmdk-group]]:px-2 [&_[cmdk-group]]:!bg-transparent [&_[cmdk-group-heading]]:!bg-transparent [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-border-stronger [&_[cmdk-input]]:h-12',
-          '[&_[cmdk-item]_svg]:h-5',
-          '[&_[cmdk-item]_svg]:w-5',
-          '[&_[cmdk-input-wrapper]_svg]:h-5',
-          '[&_[cmdk-input-wrapper]_svg]:w-5',
+      <ErrorBoundary FallbackComponent={CommandError}>
+        <Command
+          className={[
+            '[&_[cmdk-group]]:px-2 [&_[cmdk-group]]:!bg-transparent [&_[cmdk-group-heading]]:!bg-transparent [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-border-stronger [&_[cmdk-input]]:h-12',
+            '[&_[cmdk-item]_svg]:h-5',
+            '[&_[cmdk-item]_svg]:w-5',
+            '[&_[cmdk-input-wrapper]_svg]:h-5',
+            '[&_[cmdk-input-wrapper]_svg]:w-5',
 
-          '[&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0',
-        ].join(' ')}
-      >
-        {children}
-      </Command>
+            '[&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0',
+          ].join(' ')}
+        >
+          {children}
+        </Command>
+      </ErrorBoundary>
     </Modal>
   )
 }

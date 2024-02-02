@@ -20,6 +20,7 @@ import {
   CommandLabel,
   FORCE_MOUNT_ITEM,
   TextHighlighter,
+  escapeDoubleQuotes,
 } from './Command.utils'
 import { useRouter } from 'next/router'
 
@@ -416,11 +417,11 @@ const DocsSearch = () => {
             <CommandGroup
               heading=""
               key={`${page.path}-group`}
-              value={`${FORCE_MOUNT_ITEM}--${page.title}-group-index-${i}`}
+              value={`${FORCE_MOUNT_ITEM}--${escapeDoubleQuotes(page.title)}-group-index-${i}`}
             >
               <CommandItem
                 key={`${page.path}-item`}
-                value={`${FORCE_MOUNT_ITEM}--${page.title}-item-index-${i}`}
+                value={`${FORCE_MOUNT_ITEM}--${escapeDoubleQuotes(page.title)}-item-index-${i}`}
                 type="block-link"
                 onSelect={() => {
                   openLink(page.type, formatPageUrl(page))
@@ -454,7 +455,9 @@ const DocsSearch = () => {
                         openLink(page.type, formatSectionUrl(page, section))
                       }}
                       key={`${page.path}__${section.heading}-item`}
-                      value={`${FORCE_MOUNT_ITEM}--${page.title}__${section.heading}-item-index-${i}`}
+                      value={`${FORCE_MOUNT_ITEM}--${escapeDoubleQuotes(
+                        page.title
+                      )}__${escapeDoubleQuotes(section.heading)}-item-index-${i}`}
                       type="block-link"
                     >
                       <div className="grow flex gap-3 items-center">
