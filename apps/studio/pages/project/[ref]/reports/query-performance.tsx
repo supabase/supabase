@@ -503,12 +503,7 @@ function QueryPerformanceFilterBar({
               </div>
             }
             actions={
-              <button
-                onClick={() => {}}
-                className="mx-2 text-foreground-light hover:text-foreground"
-              >
-                {'↲'}
-              </button>
+              <button className="mx-2 text-foreground-light hover:text-foreground">{'↲'}</button>
             }
           />
           <DropdownMenu>
