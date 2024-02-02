@@ -38,7 +38,7 @@ WITH (copy_data = true, create_slot=false, slot_name=example_slot);
 
 <Admonition type="info">
 
-We have set `create_slot` to `false` because we have already made a `replication slot` on our **Supabase database** so we provide the name in `slot_name`.
+`create_slot` is set to `false` because `slot_name` is provided and the slot was already created in Step 2.
 If we want to copy all the data that existed before the slot was created, then we set `copy_data` to `true`
 
 </Admonition>
