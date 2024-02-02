@@ -118,6 +118,7 @@ export const ConnectionPooling = () => {
           form.reset({
             pool_mode: data.pool_mode,
             default_pool_size: data.default_pool_size,
+            max_client_conn: poolingInfo?.max_client_conn,
           })
         }
 
