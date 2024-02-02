@@ -37,6 +37,7 @@ import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 import { SESSION_MODE_DESCRIPTION, TRANSACTION_MODE_DESCRIPTION } from '../Database.constants'
 import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
+import { CriticalIcon } from 'components/ui/Icons'
 
 const formId = 'connection-pooling-form'
 
@@ -284,6 +285,19 @@ export const ConnectionPooling = () => {
                                 Unsure which pooling mode to use?
                               </span>
                             </p>
+                            {field.value === 'session' && (
+                              <Alert_Shadcn_>
+                                <AlertTitle_Shadcn_ className="text-foreground">
+                                  Set to transaction mode to use both pooling modes concurrently
+                                </AlertTitle_Shadcn_>
+                                <AlertDescription_Shadcn_>
+                                  Session mode can be used concurrently with transaction mode by
+                                  using 5432 for session and 6543 for session. However, by
+                                  configuring the pooler mode to session here, you will not be able
+                                  to use transaction mode at the same time.
+                                </AlertDescription_Shadcn_>
+                              </Alert_Shadcn_>
+                            )}
                           </FormDescription_Shadcn_>
                           <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
                         </FormItem_Shadcn_>

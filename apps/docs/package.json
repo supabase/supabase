@@ -39,7 +39,7 @@
     "gray-matter": "^4.0.3",
     "hast-util-has-property": "^2.0.1",
     "isbot": "^3.6.5",
-    "jsrsasign": "^10.5.26",
+    "jsrsasign": "^11.0.0",
     "lodash": "^4.17.21",
     "markdown-toc": "^1.2.0",
     "mdast": "^3.0.0",

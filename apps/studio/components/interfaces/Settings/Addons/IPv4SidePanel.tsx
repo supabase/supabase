@@ -5,16 +5,16 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { AddonVariantId } from 'data/subscriptions/types'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { formatCurrency } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconExternalLink, Radio, SidePanel } from 'ui'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { AddonVariantId } from 'data/subscriptions/types'
-import { formatCurrency } from 'lib/helpers'
 
 const IPv4SidePanel = () => {
   const { ui } = useStore()
@@ -120,16 +120,14 @@ const IPv4SidePanel = () => {
       onCancel={onClose}
       onConfirm={onConfirm}
       loading={isLoading || isSubmitting}
-      disabled={true}
-      tooltip="Temporarily disabled while we are migrating to IPv6, please check back later."
-      /*disabled={isFreePlan || isLoading || !hasChanges || isSubmitting || !canUpdateIPv4}
+      disabled={isFreePlan || isLoading || !hasChanges || isSubmitting || !canUpdateIPv4}
       tooltip={
         isFreePlan
           ? 'Unable to enable IPv4 on a free plan'
           : !canUpdateIPv4
             ? 'You do not have permission to update IPv4'
             : undefined
-      }*/
+      }
       header={
         <div className="flex items-center justify-between">
           <h4>IPv4 address</h4>

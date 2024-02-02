@@ -36,6 +36,7 @@ import {
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
+import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { ProjectAddonVariantMeta } from 'data/subscriptions/types'
@@ -46,8 +47,8 @@ import { getDatabaseMajorVersion, getSemanticVersion } from 'lib/helpers'
 import { SUBSCRIPTION_PANEL_KEYS, useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import ComputeInstanceSidePanel from './ComputeInstanceSidePanel'
 import CustomDomainSidePanel from './CustomDomainSidePanel'
-import PITRSidePanel from './PITRSidePanel'
 import IPv4SidePanel from './IPv4SidePanel'
+import PITRSidePanel from './PITRSidePanel'
 
 const Addons = () => {
   const { resolvedTheme } = useTheme()
@@ -55,6 +56,7 @@ const Addons = () => {
   const snap = useSubscriptionPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
   const { project: selectedProject } = useProjectContext()
+  const { data: projectSettings } = useProjectSettingsQuery({ projectRef })
   const selectedOrg = useSelectedOrganization()
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
 
@@ -100,6 +102,8 @@ const Addons = () => {
   const { computeInstance, pitr, customDomain, ipv4 } = getAddons(selectedAddons)
 
   const meta = computeInstance?.variant?.meta as ProjectAddonVariantMeta | undefined
+
+  const canUpdateIPv4 = projectSettings?.project.db_ip_addr_config === 'ipv6'
 
   return (
     <>
@@ -427,27 +431,34 @@ const Addons = () => {
                             type="default"
                             className="mt-2 pointer-events-auto"
                             onClick={() => snap.setPanelKey('ipv4')}
-                            disabled={true}
+                            disabled={
+                              isBranch ||
+                              !isProjectActive ||
+                              projectUpdateDisabled ||
+                              !canUpdateIPv4
+                            }
                           >
                             Change IPv4 address
                           </Button>
                         </div>
                       </Tooltip.Trigger>
                       <Tooltip.Portal>
-                        <Tooltip.Content side="bottom">
-                          <Tooltip.Arrow className="radix-tooltip-arrow" />
-                          <div
-                            className={[
-                              'rounded bg-alternative py-1 px-2 leading-none shadow',
-                              'border border-background',
-                            ].join(' ')}
-                          >
-                            <span className="text-xs text-foreground">
-                              Temporarily disabled while we are migrating to IPv6, please check back
-                              later.
-                            </span>
-                          </div>
-                        </Tooltip.Content>
+                        {!canUpdateIPv4 && (
+                          <Tooltip.Content side="bottom">
+                            <Tooltip.Arrow className="radix-tooltip-arrow" />
+                            <div
+                              className={[
+                                'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                'border border-background',
+                              ].join(' ')}
+                            >
+                              <span className="text-xs text-foreground">
+                                Temporarily disabled while we are migrating to IPv6, please check
+                                back later.
+                              </span>
+                            </div>
+                          </Tooltip.Content>
+                        )}
                       </Tooltip.Portal>
                     </Tooltip.Root>
                     {/*<ProjectUpdateDisabledTooltip
