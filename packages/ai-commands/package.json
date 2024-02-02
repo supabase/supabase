@@ -13,8 +13,10 @@
     "ai": "^2.2.29",
     "common-tags": "^1.8.2",
     "config": "*",
+    "js-tiktoken": "^1.0.10",
     "jsonrepair": "^3.5.0",
-    "openai": "^4.20.1"
+    "openai": "^4.20.1",
+    "@supabase/supabase-js": "*"
   },
   "devDependencies": {
     "@babel/core": "^7.23.6",
