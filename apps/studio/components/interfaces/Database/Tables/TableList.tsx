@@ -5,7 +5,6 @@ import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import SchemaSelector from 'components/ui/SchemaSelector'
@@ -15,6 +14,7 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useCheckPermissions } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { useRouter } from 'next/router'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   Button,
@@ -34,7 +34,6 @@ import {
   Input,
 } from 'ui'
 import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
-import { useRouter } from 'next/router'
 
 interface TableListProps {
   onAddTable: () => void
@@ -308,59 +307,59 @@ const TableList = ({
                                   </Tooltip.Root>
                                 </DropdownMenuItem>
 
-                                  <DropdownMenuItem
-                                    onClick={() =>
-                                      router.push(`/project/${project?.ref}/editor/${x.id}`)
-                                    }
-                                  >
-                                    <Tooltip.Root delayDuration={0}>
-                                      <Tooltip.Trigger className="flex items-center space-x-2">
-                                        <IconEye size="tiny" />
-                                        <p>View table</p>
-                                      </Tooltip.Trigger>
-                                    </Tooltip.Root>
-                                  </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    router.push(`/project/${project?.ref}/editor/${x.id}`)
+                                  }
+                                >
+                                  <Tooltip.Root delayDuration={0}>
+                                    <Tooltip.Trigger className="flex items-center space-x-2">
+                                      <IconEye size="tiny" />
+                                      <p>View table</p>
+                                    </Tooltip.Trigger>
+                                  </Tooltip.Root>
+                                </DropdownMenuItem>
 
-                                  <DropdownMenuItem
-                                    disabled={!canUpdateTables || isLocked}
-                                    onClick={() => onDeleteTable(x)}
-                                  >
-                                    <Tooltip.Root delayDuration={0}>
-                                      <Tooltip.Trigger className="flex items-center space-x-2">
-                                        <IconTrash stroke="red" size="tiny" />
-                                        <p>Delete table</p>
-                                      </Tooltip.Trigger>
-                                      {!canUpdateTables && (
-                                        <Tooltip.Portal>
-                                          <Tooltip.Content side="bottom">
-                                            <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                            <div
-                                              className={[
-                                                'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                                'border border-background',
-                                              ].join(' ')}
-                                            >
-                                              <span className="text-xs text-foreground">
-                                                Additional permissions required to delete table
-                                              </span>
-                                            </div>
-                                          </Tooltip.Content>
-                                        </Tooltip.Portal>
-                                      )}
-                                    </Tooltip.Root>
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            )}
-                          </div>
-                        </Table.td>
-                      </Table.tr>
-                    ))}
-                </>
-              }
-            />
-          </div>
-        ))}
+                                <DropdownMenuItem
+                                  disabled={!canUpdateTables || isLocked}
+                                  onClick={() => onDeleteTable(x)}
+                                >
+                                  <Tooltip.Root delayDuration={0}>
+                                    <Tooltip.Trigger className="flex items-center space-x-2">
+                                      <IconTrash stroke="red" size="tiny" />
+                                      <p>Delete table</p>
+                                    </Tooltip.Trigger>
+                                    {!canUpdateTables && (
+                                      <Tooltip.Portal>
+                                        <Tooltip.Content side="bottom">
+                                          <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                          <div
+                                            className={[
+                                              'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                              'border border-background',
+                                            ].join(' ')}
+                                          >
+                                            <span className="text-xs text-foreground">
+                                              Additional permissions required to delete table
+                                            </span>
+                                          </div>
+                                        </Tooltip.Content>
+                                      </Tooltip.Portal>
+                                    )}
+                                  </Tooltip.Root>
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          )}
+                        </div>
+                      </Table.td>
+                    </Table.tr>
+                  ))}
+              </>
+            }
+          />
+        </div>
+      )}
     </div>
   )
 }
