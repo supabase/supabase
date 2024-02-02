@@ -1,0 +1,49 @@
+// .ide {
+  // background: #242322;
+  // font-size: 16px;
+  // color: white;
+  // user-select: none;
+  // border-radius: 0.4em;
+// }
+
+// .ide .tree,
+// .ide .tree-node,
+// .ide .tree-node-group {
+//   list-style: none;
+//   margin: 0;
+//   padding: 0;
+// }
+
+// .ide .tree-branch-wrapper,
+// .ide .tree-node__leaf {
+//   @apply outline-none;
+// }
+
+// .ide .tree-node {
+//   @apply cursor-pointer transition text-sm text-foreground-light px-5 h-7 flex items-center;
+// }
+
+// .ide .tree-node:hover {
+//   @apply bg-surface-200 text-foreground/80;
+// }
+
+.ide .tree .tree-node--selected {
+  @apply bg-surface-300 text-foreground;
+}
+
+.ide .tree .tree-leaf-list-item--selected {
+  @apply bg-surface-300 text-foreground;
+}
+
+.ide .tree .tree-node--focused {
+  @apply bg-surface-300;
+}
+
+// .ide .tree-node__branch {
+//   display: block;
+// }
+
+// .ide .icon {
+//   vertical-align: middle;
+//   margin-right: 5px;
+// }

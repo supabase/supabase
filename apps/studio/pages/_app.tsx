@@ -15,6 +15,7 @@ import 'styles/toast.scss'
 import 'styles/ui.scss'
 import 'styles/reactflow.scss'
 import 'styles/markdown-preview.scss'
+import 'styles/treeview.scss'
 
 import { loader } from '@monaco-editor/react'
 import { TooltipProvider } from '@radix-ui/react-tooltip'

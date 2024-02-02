@@ -20,6 +20,7 @@ import {
   TooltipTrigger_Shadcn_,
   Tooltip_Shadcn_,
 } from 'ui'
+import { partition } from 'lodash'
 
 import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
@@ -34,8 +35,8 @@ import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import QueryItem from './QueryItem'
-import { partition, uniq, uniqBy } from 'lodash'
 import { selectItemsInRange } from './SQLEditorLayout.utils'
+import { FileDirectory } from './FileDirectory'
 
 const SideBarContent = observer(() => {
   const { ui } = useStore()
@@ -277,8 +278,15 @@ const SideBarContent = observer(() => {
                       </Button>
                     </div>
                   )}
+              </div>
 
-                {filteredProjectSnippets.length > 0 ? (
+              <div className="flex flex-col gap-y-2">
+                <p className="px-5 text-foreground-lighter text-sm">Project queries</p>
+                <FileDirectory snippets={filteredProjectSnippets} />
+              </div>
+
+              <div className="flex flex-col gap-y-6 px-2">
+                {/* {filteredProjectSnippets.length > 0 ? (
                   <div className="editor-product-menu">
                     <Menu.Group title="Project queries" />
 
@@ -295,7 +303,7 @@ const SideBarContent = observer(() => {
                       })}
                     </div>
                   </div>
-                ) : null}
+                ) : null} */}
 
                 {selectedQueries.length > 0 && (
                   <>
