@@ -704,10 +704,10 @@ export default function createClient(req: NextApiRequest, res: NextApiResponse) 
           return req.cookies[name]
         },
         set(name: string, value: string, options: CookieOptions) {
-          res.setHeader('Set-Cookie', serialize(name, value, options))
+          res.appendHeader('Set-Cookie', serialize(name, value, options))
         },
         remove(name: string, options: CookieOptions) {
-          res.setHeader('Set-Cookie', serialize(name, '', options))
+          res.appendHeader('Set-Cookie', serialize(name, '', options))
         },
       },
     }
