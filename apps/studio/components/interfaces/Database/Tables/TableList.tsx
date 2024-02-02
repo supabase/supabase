@@ -308,16 +308,13 @@ const TableList = ({
                                 </DropdownMenuItem>
 
                                 <DropdownMenuItem
+                                  className="flex items-center space-x-2"
                                   onClick={() =>
                                     router.push(`/project/${project?.ref}/editor/${x.id}`)
                                   }
                                 >
-                                  <Tooltip.Root delayDuration={0}>
-                                    <Tooltip.Trigger className="flex items-center space-x-2">
-                                      <IconEye size="tiny" />
-                                      <p>View table</p>
-                                    </Tooltip.Trigger>
-                                  </Tooltip.Root>
+                                  <IconEye size="tiny" />
+                                  <p>View table</p>
                                 </DropdownMenuItem>
 
                                 <DropdownMenuItem
