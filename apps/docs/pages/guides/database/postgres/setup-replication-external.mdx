@@ -21,7 +21,7 @@ We will be running commands on both of these databases to publish changes from o
 CREATE PUBLICATION example_pub;
 ```
 
-2. Also on our **Supabase database**, let's create a `replication slot`:
+2. Also on the **Supabase database**, create a `replication slot`:
 
 ```sql
 select pg_create_logical_replication_slot('example_slot', 'pgoutput');
