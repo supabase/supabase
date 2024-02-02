@@ -6,7 +6,7 @@ export default config({
     './components/**/*.{ts,tsx}',
     './app/**/*.{ts,tsx}',
     '../../packages/ui/src/**/*.{tsx,ts,js}',
-    '../../packages/ui-patterns/src/**/*.{tsx,ts,js}',
+    '../../packages/ui-patterns/**/*.{tsx,ts,js}',
   ],
   theme: {
     extend: {
