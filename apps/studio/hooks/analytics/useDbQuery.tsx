@@ -22,7 +22,9 @@ export interface DbQueryHook<T = any> {
 
 const useDbQuery = (
   sql: ReportQuery['sql'] | string,
-  params: BaseReportParams = DEFAULT_QUERY_PARAMS
+  params: BaseReportParams = DEFAULT_QUERY_PARAMS,
+  where?: string,
+  orderBy?: string
 ): DbQueryHook => {
   const { project } = useProjectContext()
 
@@ -35,7 +37,7 @@ const useDbQuery = (
     isRefetching,
     refetch,
   } = useQuery(
-    ['projects', project?.ref, 'db', { ...params, sql: resolvedSql }],
+    ['projects', project?.ref, 'db', { ...params, sql: resolvedSql }, where, orderBy],
     ({ signal }) => {
       return executeSql(
         {
