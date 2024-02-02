@@ -474,15 +474,13 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
               <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-1.5px]">Open positions</h2>
               <div className="mt-10 space-y-4">
                 {jobs.map(
-                  (
-                    job: {
-                      title: string
-                      location: any
-                      employment: string
-                      description: string
-                      id: number,
-                    }
-                  ) => {
+                  (job: {
+                    title: string
+                    location: any
+                    employment: string
+                    description: string
+                    id: number
+                  }) => {
                     return (
                       <div className="cursor-pointer md:cursor-default" key={job.id}>
                         <Link href={`careers/${job.id}`}>
