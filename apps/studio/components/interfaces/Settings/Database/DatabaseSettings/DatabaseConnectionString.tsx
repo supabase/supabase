@@ -216,7 +216,7 @@ export const DatabaseConnectionString = () => {
             </div>
           )}
         </Panel.Content>
-        {poolerConnStringSyntax.length > 0 && poolingInfo?.supavisor_enabled && (
+        {poolerConnStringSyntax.length > 0 && (
           <>
             <Separator />
             <Panel.Content className="!py-3 space-y-2">
