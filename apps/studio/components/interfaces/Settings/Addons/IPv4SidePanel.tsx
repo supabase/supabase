@@ -5,15 +5,16 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { AddonVariantId } from 'data/subscriptions/types'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { formatCurrency } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconExternalLink, Radio, SidePanel } from 'ui'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { AddonVariantId } from 'data/subscriptions/types'
 
 const IPv4SidePanel = () => {
   const { ui } = useStore()
@@ -124,8 +125,8 @@ const IPv4SidePanel = () => {
         isFreePlan
           ? 'Unable to enable IPv4 on a free plan'
           : !canUpdateIPv4
-          ? 'You do not have permission to update IPv4'
-          : undefined
+            ? 'You do not have permission to update IPv4'
+            : undefined
       }
       header={
         <div className="flex items-center justify-between">
@@ -219,7 +220,7 @@ const IPv4SidePanel = () => {
                         Allow direct database connections via IPv4 address
                       </p>
                       <div className="flex items-center space-x-1 mt-2">
-                        <p className="text-foreground text-sm">${option.price}</p>
+                        <p className="text-foreground text-sm">{formatCurrency(option.price)}</p>
                         <p className="text-foreground-light translate-y-[1px]"> / month</p>
                       </div>
                     </div>
@@ -246,7 +247,7 @@ const IPv4SidePanel = () => {
                   </Alert>
                   <p className="text-sm text-foreground-light">
                     Upon clicking confirm, the amount of{' '}
-                    <span className="text-foreground">${selectedIPv4?.price.toLocaleString()}</span>{' '}
+                    <span className="text-foreground">{formatCurrency(selectedIPv4?.price)}</span>{' '}
                     will be added to your monthly invoice.
                   </p>
                 </>
