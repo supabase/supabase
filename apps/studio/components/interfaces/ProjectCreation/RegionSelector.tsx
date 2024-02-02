@@ -31,9 +31,6 @@ export const RegionSelector = ({
   useEffect(() => {
     // only pick a region if one hasn't already been selected
     if (isSuccess && region && !selectedRegion) {
-      // [Joshen] TEMP FIX BLOCK APSE 1 ON PROD
-      if (process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod' && region === 'Southeast Asia (Singapore)')
-        return
       onSelectRegion(region)
     } else if (isError && !selectedRegion) {
       // if an error happened, and the user haven't selected a region, just select the default one for him
