@@ -1208,17 +1208,17 @@ functions:
           ```swift
           struct City: Decodable {
             let name: String
-            let countries: [Country]
           }
 
           struct Country: Decodable {
             let name: String
+            let cities: [City]
           }
 
-          let cities: [City] = try await supabase.database
-            .from("cities")
-            .select("name, countries!inner(name)")
-            .eq("countries.name", value: "Indonesia")
+          let countries: [Country] = try await supabase.database
+            .from("countries")
+            .select("name, cities!inner(name)")
+            .eq("name", value: "united kingdom")
             .execute()
             .value
           ```
@@ -1251,8 +1251,21 @@ functions:
           {
             "data": [
               {
-                "name": "Bali",
-                "countries": {"name": "Indonesia"}
+                "name": "united kingdom",
+                "cities": [
+                  {
+                    "name": "London"
+                  },
+                  {
+                    "name": "Manchester"
+                  },
+                  {
+                    "name": "Liverpool"
+                  },
+                  {
+                    "name": "Bristol"
+                  }
+                ]
               }
             ],
             "status": 200,
