@@ -202,7 +202,7 @@ values
 </TabPanel>
 <TabPanel id="js" label="JavaScript">
 
-```sql
+```js
 const { data, error } = await supabase
   .from('movies')
   .insert([{
@@ -217,7 +217,7 @@ const { data, error } = await supabase
 </TabPanel>
 <TabPanel id="dart" label="Dart">
 
-```sql
+```dart
 await supabase
   .from('movies')
   .insert([{
@@ -227,6 +227,26 @@ await supabase
     name: 'Return of the Jedi',
     description: 'After a daring mission to rescue Han Solo from Jabba the Hutt, the Rebels dispatch to Endor to destroy the second Death Star.'
   }]);
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+@Serializable
+data class Movie(
+    val name: String,
+    val description: String
+)
+```
+
+```kotlin
+supabase
+    .from("movies")
+    .insert(listOf(
+        Movie("The Empire Strikes Back", "After the Rebels are brutally overpowered by the Empire on the ice planet Hoth, Luke Skywalker begins Jedi training with Yoda."),
+        Movie("Return of the Jedi", "After a daring mission to rescue Han Solo from Jabba the Hutt, the Rebels dispatch to Endor to destroy the second Death Star."),
+    ))
 ```
 
 </TabPanel>
