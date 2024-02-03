@@ -1,11 +1,11 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-  title: 'Email Auth with PKCE flow for SSR',
+  title: 'Email Auth with PKCE flow for SSR using a third-party email provider',
   description:
-    'Learn how to configure email authentication in your server-side rendering (SSR) application to work with the PKCE flow.',
+    'Learn how to configure email authentication in your server-side rendering (SSR) application to work with the PKCE flow using a third-party email provider.',
   subtitle:
-    'Learn how to configure email authentication in your server-side rendering (SSR) application to work with the PKCE flow.',
+    'Learn how to configure email authentication in your server-side rendering (SSR) application to work with the PKCE flow using a third-party email provider.',
 }
 
 ### Setting up SSR client
@@ -237,74 +237,94 @@ app.get("/auth/confirm", async function (req, res) {
 </TabPanel>
 </Tabs>
 
-### Update email templates with URL for API endpoint
+### Generate link for sending with third-party email provider
 
-Let's update the URL in our email templates to point to our new confirmation endpoint for the user to get confirmed.
+If you use a third-party email provider to manually send the emails, for example for implementing i18n for emails, you can generate the link to send to the user with the following code
 
 **Confirm signup template**
 
-```html
-<h2>Confirm your signup</h2>
+```ts
+const linkResult = await supabase.auth.admin.generateLink({
+    email: "current@email.com",
+    type: "signup",
+});
 
-<p>Follow this link to confirm your user:</p>
-<p>
-  <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email"
-    >Confirm your email</a
-  >
-</p>
+const tokenHash = linkResult.data.properties.hashed_token;
+
+const link = `<site_url>/auth/confirm?type=signup&token_hash=${tokenHash}`;
+
 ```
 
 **Invite user template**
 
-```html
-<h2>You have been invited</h2>
+```ts
+const linkResult = await supabase.auth.admin.generateLink({
+    email: "new@email.com",
+    type: "invite",
+});
 
-<p>
-  You have been invited to create a user on {{ .SiteURL }}. Follow this link to accept the invite:
-</p>
+const tokenHash = linkResult.data.properties.hashed_token;
 
-<p>
-  <a
-    href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=invite&next=/path-to-your-update-password-page"
-    >Accept the invite</a
-  >
-</p>
+const link = `<site_url>/auth/confirm?type=invite&token_hash=${tokenHash}`;
+
 ```
 
 **Magic Link template**
 
-```html
-<h2>Magic Link</h2>
+```ts
+const linkResult = await supabase.auth.admin.generateLink({
+    email: "current@email.com",
+    type: "magiclink",
+});
 
-<p>Follow this link to login:</p>
-<p><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email">Log In</a></p>
+const tokenHash = linkResult.data.properties.hashed_token;
+
+const link = `<site_url>/auth/confirm?type=magiclink&token_hash=${tokenHash}`;
+
 ```
 
-**Change Email Address template**
+**Change Email Address template sent to current email**
 
-```html
-<h2>Confirm Change of Email</h2>
+```ts
+const linkResult = await ctx.supabaseServerClient.auth.admin.generateLink({
+  email: "current@email.com",
+  newEmail: "new@email.com",
+  type: "email_change_current",
+});
 
-<p>Follow this link to confirm the update of your email from {{ .Email }} to {{ .NewEmail }}:</p>
-<p>
-  <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email_change">
-    Change Email
-  </a>
-</p>
+const tokenHash = linkResult.data.properties.hashed_token;
+
+const link = `<site_url>/auth/confirm?type=email_change_current&token_hash=${tokenHash}`;
+
+```
+
+**Change Email Address template sent to new email**
+
+```ts
+const linkResult = await ctx.supabaseServerClient.auth.admin.generateLink({
+  email: "current@email.com",
+  newEmail: "new@email.com",
+  type: "email_change_new",
+});
+
+const tokenHash = linkResult.data.properties.hashed_token;
+
+const link = `<site_url>/auth/confirm?type=email_change_new&token_hash=${tokenHash}`;
+
 ```
 
 **Reset Password template**
 
-```html
-<h2>Reset Password</h2>
+```ts
+const linkResult = await supabase.auth.admin.generateLink({
+    email: "current@email.com",
+    type: "recovery",
+});
 
-<p>Follow this link to reset the password for your user:</p>
-<p>
-  <a
-    href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/path-to-your-update-password-page"
-    >Reset Password</a
-  >
-</p>
+const tokenHash = linkResult.data.properties.hashed_token;
+
+const link = `<site_url>/auth/confirm?type=recovery&token_hash=${tokenHash}`;
+
 ```
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
