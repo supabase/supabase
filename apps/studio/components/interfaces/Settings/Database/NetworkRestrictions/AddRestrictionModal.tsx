@@ -1,6 +1,5 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useParams } from 'common'
-import { useState } from 'react'
 import toast from 'react-hot-toast'
 import { Button, Form, IconHelpCircle, Input, Modal } from 'ui'
 
@@ -12,22 +11,31 @@ import {
   isValidAddress,
   normalize,
 } from './NetworkRestrictions.utils'
+import { useNetworkRestrictionsQuery } from 'data/network-restrictions/network-restrictions-query'
+
+const IPV4_MAX_CIDR_BLOCK_SIZE = 32
+const IPV6_MAX_CIDR_BLOCK_SIZE = 128
 
 interface AddRestrictionModalProps {
-  restrictedIps: string[]
-  visible: boolean
+  type?: 'IPv4' | 'IPv6'
   hasOverachingRestriction: boolean
   onClose: () => void
 }
 
 const AddRestrictionModal = ({
-  restrictedIps,
-  visible,
+  type,
   hasOverachingRestriction,
   onClose,
 }: AddRestrictionModalProps) => {
   const formId = 'add-restriction-form'
   const { ref } = useParams()
+
+  const { data } = useNetworkRestrictionsQuery({ projectRef: ref })
+  const ipv4Restrictions = data?.config?.dbAllowedCidrs ?? []
+  // @ts-ignore [Joshen] API typing issue
+  const ipv6Restrictions = data?.config?.dbAllowedCidrsV6 ?? []
+  const restrictedIps = ipv4Restrictions.concat(ipv6Restrictions)
+
   const { mutate: applyNetworkRestrictions, isLoading: isApplying } =
     useNetworkRestrictionsApplyMutation({
       onSuccess: () => {
@@ -38,12 +46,20 @@ const AddRestrictionModal = ({
 
   const validate = (values: any) => {
     const errors: any = {}
+
+    if (type === undefined) return errors
+
     const { ipAddress, cidrBlockSize } = values
 
     // Validate CIDR block size
-    const isOutOfCidrSizeRange = cidrBlockSize < 0 || cidrBlockSize > 32
+    const isOutOfCidrSizeRange =
+      type === 'IPv4'
+        ? cidrBlockSize < 0 || cidrBlockSize > IPV4_MAX_CIDR_BLOCK_SIZE
+        : cidrBlockSize < 0 || cidrBlockSize > IPV6_MAX_CIDR_BLOCK_SIZE
     if (cidrBlockSize.length === 0 || isOutOfCidrSizeRange) {
-      errors.cidrBlockSize = 'Size has to be between 0 to 32'
+      errors.cidrBlockSize = `Size has to be between 0 to ${
+        type === 'IPv4' ? IPV4_MAX_CIDR_BLOCK_SIZE : IPV6_MAX_CIDR_BLOCK_SIZE
+      }`
     }
 
     // Validate IP address
@@ -53,7 +69,7 @@ const AddRestrictionModal = ({
       return errors
     }
 
-    const isPrivate = checkIfPrivate(ipAddress)
+    const isPrivate = checkIfPrivate(type, ipAddress)
     if (isPrivate) errors.ipAddress = 'Private IP addresses are not supported'
 
     return errors
@@ -71,41 +87,68 @@ const AddRestrictionModal = ({
       return toast(`The address ${address} is already restricted`)
     }
 
-    const dbAllowedCidrs = hasOverachingRestriction
-      ? [normalizedAddress]
-      : [...restrictedIps, normalizedAddress]
-    applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs })
+    // Need to replace over arching restriction (allow all / disallow all)
+    if (hasOverachingRestriction) {
+      const dbAllowedCidrs = type === 'IPv4' ? [normalizedAddress] : []
+      const dbAllowedCidrsV6 = type === 'IPv6' ? [normalizedAddress] : []
+      applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs, dbAllowedCidrsV6 })
+    } else {
+      const dbAllowedCidrs =
+        type === 'IPv4' ? [...ipv4Restrictions, normalizedAddress] : ipv4Restrictions
+      const dbAllowedCidrsV6 =
+        type === 'IPv6' ? [...ipv6Restrictions, normalizedAddress] : ipv6Restrictions
+      applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs, dbAllowedCidrsV6 })
+    }
   }
 
   return (
     <Modal
       hideFooter
       size="medium"
-      visible={visible}
+      visible={type !== undefined}
       onCancel={onClose}
-      header="Add a new restriction"
+      header={`Add a new ${type} restriction`}
     >
       <Form
         validateOnBlur
         id={formId}
         className="!border-t-0"
-        initialValues={{ ipAddress: '', cidrBlockSize: 32 }}
+        initialValues={{
+          ipAddress: '',
+          cidrBlockSize:
+            type === 'IPv4'
+              ? IPV4_MAX_CIDR_BLOCK_SIZE.toString()
+              : IPV6_MAX_CIDR_BLOCK_SIZE.toString(),
+        }}
         validate={validate}
         onSubmit={onSubmit}
       >
-        {({ values, resetForm }: any) => {
-          const isPrivate = isValidAddress(values.ipAddress)
-            ? checkIfPrivate(values.ipAddress)
-            : false
+        {({ values }: any) => {
+          const isPrivate =
+            type !== undefined && isValidAddress(values.ipAddress)
+              ? checkIfPrivate(type, values.ipAddress)
+              : false
           const isValidBlockSize =
-            values.cidrBlockSize !== '' && values.cidrBlockSize >= 0 && values.cidrBlockSize <= 32
-          const availableAddresses = Math.pow(2, 32 - (values?.cidrBlockSize ?? 0))
-          const addressRange = getAddressEndRange(`${values.ipAddress}/${values.cidrBlockSize}`)
+            values.cidrBlockSize !== '' &&
+            ((type === 'IPv4' &&
+              values.cidrBlockSize >= 0 &&
+              values.cidrBlockSize <= IPV4_MAX_CIDR_BLOCK_SIZE) ||
+              (type === 'IPv6' &&
+                values.cidrBlockSize >= 0 &&
+                values.cidrBlockSize <= IPV6_MAX_CIDR_BLOCK_SIZE))
+          const availableAddresses =
+            type === 'IPv4'
+              ? Math.pow(2, IPV4_MAX_CIDR_BLOCK_SIZE - (values?.cidrBlockSize ?? 0))
+              : Math.pow(2, IPV6_MAX_CIDR_BLOCK_SIZE - (values?.cidrBlockSize ?? 0))
+          const addressRange =
+            type !== undefined
+              ? getAddressEndRange(type, `${values.ipAddress}/${values.cidrBlockSize}`)
+              : undefined
 
           const isValidCIDR = isValidBlockSize && !isPrivate && addressRange !== undefined
           const normalizedAddress = isValidCIDR
             ? normalize(`${values.ipAddress}/${values.cidrBlockSize}`)
-            : `{values.ipAddress}/{values.cidrBlockSize}`
+            : `${values.ipAddress}/${values.cidrBlockSize}`
 
           return (
             <>
@@ -113,19 +156,21 @@ const AddRestrictionModal = ({
                 <div className="py-6 space-y-4">
                   <p className="text-sm text-foreground-light">
                     This will add an IP address range to a list of allowed ranges that can access
-                    your database. Only IPv4 addresses are supported at the moment.
+                    your database.
                   </p>
                   <InformationBox
-                    title="Note: Restrictions only apply to direct connections to your database and PgBouncer"
+                    title="Note: Restrictions only apply to direct connections to your database and connection pooler"
                     description="They do not currently apply to APIs offered over HTTPS, such as PostgREST, Storage, or Authentication. Supavisor will start enforcing network restrictions from January 24th 2024."
+                    urlLabel="Learn more"
+                    url="https://supabase.com/docs/guides/platform/network-restrictions#limitations"
                   />
                   <div className="flex space-x-4">
                     <div className="w-[55%]">
                       <Input
-                        label="IPv4 address"
+                        label={`${type} address`}
                         id="ipAddress"
                         name="ipAddress"
-                        placeholder="0.0.0.0"
+                        placeholder={type === 'IPv4' ? '0.0.0.0' : '::0'}
                       />
                     </div>
                     <div className="flex-grow">
@@ -150,7 +195,11 @@ const AddRestrictionModal = ({
                                       Classless inter-domain routing (CIDR) notation is the notation
                                       used to identify networks and hosts in the networks. The block
                                       size tells us how many bits we need to take for the network
-                                      prefix, and is a value between 0 to 32.
+                                      prefix, and is a value between 0 to{' '}
+                                      {type === 'IPv4'
+                                        ? IPV4_MAX_CIDR_BLOCK_SIZE
+                                        : IPV6_MAX_CIDR_BLOCK_SIZE}
+                                      .
                                     </span>
                                   </div>
                                 </Tooltip.Content>
@@ -161,9 +210,13 @@ const AddRestrictionModal = ({
                         id="cidrBlockSize"
                         name="cidrBlockSize"
                         type="number"
-                        placeholder="32"
+                        placeholder={
+                          type === 'IPv4'
+                            ? IPV4_MAX_CIDR_BLOCK_SIZE.toString()
+                            : IPV6_MAX_CIDR_BLOCK_SIZE.toString()
+                        }
                         min={0}
-                        max={32}
+                        max={type === 'IPv4' ? IPV4_MAX_CIDR_BLOCK_SIZE : IPV6_MAX_CIDR_BLOCK_SIZE}
                       />
                     </div>
                   </div>

@@ -61,8 +61,8 @@ functions:
         - If **Confirm email** is disabled, both a `user` and a `session` are returned.
       - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
       - If signUp() is called for an existing confirmed user:
-          - If **Confirm email** is enabled in [your project](https://supabase.com/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
-          - If **Confirm email** is disabled, the error message, `User already registered` is returned.
+        - When both **Confirm email** and **Confirm phone** (even when phone provider is disabled) are enabled in [your project](/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
+        - When either **Confirm email** or **Confirm phone** (even when phone provider is disabled) is disabled, the error message, `User already registered` is returned.
     examples:
       - id: sign-up
         name: Sign up.
@@ -305,6 +305,33 @@ functions:
           final Session? session = supabase.auth.currentSession;
           final String? oAuthToken = session?.providerToken;
           ```
+  - id: sign-in-with-sso
+    title: 'signInWithSSO()'
+    notes: |
+      - Before you can call this method you need to [establish a connection](/docs/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to an identity provider. Use the [CLI commands](/docs/reference/cli/supabase-sso) to do this.
+      - If you've associated an email domain to the identity provider, you can use the `domain` property to start a sign-in flow.
+      - In case you need to use a different way to start the authentication flow with an identity provider, you can use the `providerId` property. For example:
+          - Mapping specific user email addresses with an identity provider.
+          - Using different hints to identify the correct identity provider, like a company-specific page, IP address or other tracking information.
+    examples:
+      - id: sign-in-with-domain
+        name: Sign in with email domain
+        isSpotlight: true
+        code: |
+          ```dart
+          await supabase.auth.signInWithSSO(
+            domain: 'company.com',
+          );
+          ```
+      - id: sign-in-with-provider-uuid
+        name: Sign in with provider UUID
+        isSpotlight: true
+        code: |
+          ```dart
+          await supabase.auth.signInWithSSO(
+            providerId: '21648a9d-8d5a-4555-a9d1-d6375dc14e92',
+          );
+          ```
   - id: sign-out
     title: 'signOut()'
     description: |
@@ -450,7 +477,7 @@ functions:
     notes: |
       - Resends a signup confirmation, email change, or phone change email to the user.
       - Passwordless sign-ins can be resent by calling the `signInWithOtp()` method again.
-      - Password recovery emails can be resent by calling the `resetPassswordForEmail()` method again.
+      - Password recovery emails can be resent by calling the `resetPasswordForEmail()` method again.
       - This method only resend an email or phone OTP to the user if an initial signup, email change, or phone change request was made.
     examples:
       - id: resend-email-signup-confirmation

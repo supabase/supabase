@@ -2,7 +2,7 @@ import { useTelemetryProps } from 'common'
 import { FlaskConical } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button, IconExternalLink, IconEye, IconEyeOff, Modal, ScrollArea, cn } from 'ui'
 
 import { useFlag } from 'hooks'
@@ -47,7 +47,19 @@ const FeaturePreviewModal = () => {
   const snap = useAppStateSnapshot()
   const telemetryProps = useTelemetryProps()
   const featurePreviewContext = useFeaturePreviewContext()
-  const [selectedFeatureKey, setSelectedFeatureKey] = useState<string>(FEATURE_PREVIEWS?.[0]?.key)
+
+  const selectedFeaturePreview =
+    snap.selectedFeaturePreview === '' ? FEATURE_PREVIEWS[0].key : snap.selectedFeaturePreview
+
+  const [selectedFeatureKey, setSelectedFeatureKey] = useState<string>(selectedFeaturePreview)
+
+  // this modal can be triggered on other pages
+  // Update local state when valtio state changes
+  useEffect(() => {
+    if (snap.selectedFeaturePreview !== '') {
+      setSelectedFeatureKey(snap.selectedFeaturePreview)
+    }
+  }, [snap.selectedFeaturePreview])
 
   const { flags, onUpdateFlag } = featurePreviewContext
   const selectedFeature = FEATURE_PREVIEWS.find((preview) => preview.key === selectedFeatureKey)
@@ -66,6 +78,11 @@ const FeaturePreviewModal = () => {
     )
   }
 
+  function handleCloseFeaturePreviewModal() {
+    snap.setShowFeaturePreviewModal(false)
+    snap.setSelectedFeaturePreview(FEATURE_PREVIEWS[0].key)
+  }
+
   return (
     <Modal
       hideFooter
@@ -74,12 +91,12 @@ const FeaturePreviewModal = () => {
       className="max-w-4xl"
       header="Dashboard feature previews"
       visible={snap.showFeaturePreviewModal}
-      onCancel={() => snap.setShowFeaturePreviewModal(false)}
+      onCancel={handleCloseFeaturePreviewModal}
     >
       {FEATURE_PREVIEWS.length > 0 ? (
         <div className="flex border-t">
           <div>
-            <ScrollArea className="h-[550px] w-[240px] border-r">
+            <ScrollArea className="h-[550px] w-[280px] border-r">
               {FEATURE_PREVIEWS.map((feature) => {
                 const isEnabled = flags[feature.key] ?? false
 
@@ -97,7 +114,9 @@ const FeaturePreviewModal = () => {
                     ) : (
                       <IconEyeOff size={14} strokeWidth={1.5} className="text-foreground-light" />
                     )}
-                    <p className="text-sm">{feature.name}</p>
+                    <p className="text-sm truncate" title={feature.name}>
+                      {feature.name}
+                    </p>
                   </div>
                 )
               })}

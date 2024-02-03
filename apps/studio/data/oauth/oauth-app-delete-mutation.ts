@@ -2,7 +2,7 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'react-hot-toast'
 
 import { delete_ } from 'lib/common/fetch'
-import { API_ADMIN_URL } from 'lib/constants'
+import { API_URL } from 'lib/constants'
 import { ResponseError } from 'types'
 import { oauthAppKeys } from './keys'
 
@@ -15,9 +15,7 @@ export async function deleteOAuthApp({ id, slug }: OAuthAppDeleteVariables) {
   if (!id) throw new Error('OAuth app ID is required')
   if (!slug) throw new Error('Organization slug is required')
 
-  const response = await delete_(
-    `${API_ADMIN_URL}/organizations/${slug}/oauth/apps/${id}?type=published`
-  )
+  const response = await delete_(`${API_URL}/organizations/${slug}/oauth/apps/${id}?type=published`)
   if (response.error) throw response.error
   return response
 }

@@ -46,8 +46,12 @@ const Heading: React.FC<React.PropsWithChildren<Props>> = ({ tag, customAnchor, 
     <HeadingTag id={anchor} ref={ref} className="group scroll-mt-24">
       {removeAnchor(children)}
       {anchor && (
-        <a href={link} className="ml-2 opacity-0 group-hover:opacity-100 transition">
-          #
+        <a
+          href={link}
+          aria-hidden="true"
+          className="ml-2 opacity-0 group-hover:opacity-100 transition"
+        >
+          <span aria-hidden="true">#</span>
         </a>
       )}
     </HeadingTag>

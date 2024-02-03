@@ -32,10 +32,12 @@ import {
 } from './SidePanelEditor.types'
 import { createColumn, updateColumn } from './SidePanelEditor.utils'
 import { ImportContent } from './TableEditor/TableEditor.types'
+import { TextEditor } from './RowEditor/TextEditor'
 
 export interface SidePanelEditorProps {
   editable?: boolean
   selectedTable?: PostgresTable
+  includeColumns?: boolean // This is mainly used for invalidating useTablesQuery
 
   // Because the panel is shared between grid editor and database pages
   // Both require different responses upon success of these events
@@ -45,6 +47,7 @@ export interface SidePanelEditorProps {
 const SidePanelEditor = ({
   editable = true,
   selectedTable,
+  includeColumns = false,
   onTableCreated = noop,
 }: SidePanelEditorProps) => {
   const snap = useTableEditorStateSnapshot()
@@ -143,25 +146,42 @@ const SidePanelEditor = ({
     }
   }
 
-  const onSaveJSON = async (value: string | number | null) => {
-    if (selectedTable === undefined || !(snap.sidePanel?.type === 'json')) return
-    const selectedValueForJsonEdit = snap.sidePanel.jsonValue
+  const onSaveColumnValue = async (value: string | number | null, resolve: () => void) => {
+    if (selectedTable === undefined) return
 
-    try {
+    let payload
+    let configuration
+    const isNewRecord = false
+    const identifiers = {} as Dictionary<any>
+    if (snap.sidePanel?.type === 'json') {
+      const selectedValueForJsonEdit = snap.sidePanel.jsonValue
       const { row, column } = selectedValueForJsonEdit
-      const payload = { [column]: value === null ? null : JSON.parse(value as any) }
-      const identifiers = {} as Dictionary<any>
+      payload = { [column]: value === null ? null : JSON.parse(value as any) }
       selectedTable.primary_keys.forEach((column) => (identifiers[column.name] = row![column.name]))
+      configuration = { identifiers, rowIdx: row.idx }
+    } else if (snap.sidePanel?.type === 'cell') {
+      const column = snap.sidePanel.value?.column
+      const row = snap.sidePanel.value?.row
 
-      const isNewRecord = false
-      const configuration = { identifiers, rowIdx: row.idx }
+      if (!column || !row) return
+      payload = { [column]: value === null ? null : value }
+      selectedTable.primary_keys.forEach((column) => (identifiers[column.name] = row![column.name]))
+      configuration = { identifiers, rowIdx: row.idx }
+    }
 
-      saveRow(payload, isNewRecord, configuration, (error) => {
-        if (error) {
-          toast.error(error?.message ?? 'Something went wrong while trying to save the JSON value')
-        }
-      })
-    } catch (error: any) {}
+    if (payload !== undefined && configuration !== undefined) {
+      try {
+        await saveRow(payload, isNewRecord, configuration, (error) => {
+          if (error) {
+            toast.error(
+              error?.message ?? 'Something went wrong while trying to save the column value'
+            )
+          }
+        })
+      } finally {
+        resolve()
+      }
+    }
   }
 
   const onSaveForeignRow = async (value: any) => {
@@ -268,7 +288,7 @@ const SidePanelEditor = ({
     if (!project) return console.error('Project is required')
     let realtimePublication = (publications ?? []).find((pub) => pub.name === 'supabase_realtime')
     const publicTables = await queryClient.fetchQuery({
-      queryKey: tableKeys.list(project.ref, 'public'),
+      queryKey: tableKeys.list(project.ref, 'public', includeColumns),
       queryFn: ({ signal }) =>
         getTables(
           { projectRef: project.ref, connectionString: project.connectionString, schema: 'public' },
@@ -312,11 +332,11 @@ const SidePanelEditor = ({
                 .filter((t: any) => t.id !== table.id)
                 .map((t: any) => `${t.schema}.${t.name}`)
             : !isAlreadyEnabled && enabled
-            ? // Toggle realtime on
-              [`${table.schema}.${table.name}`].concat(
-                publicationTables.map((t: any) => `${t.schema}.${t.name}`)
-              )
-            : null
+              ? // Toggle realtime on
+                [`${table.schema}.${table.name}`].concat(
+                  publicationTables.map((t: any) => `${t.schema}.${t.name}`)
+                )
+              : null
         if (realtimeTables === null) return
         await updatePublication({
           id,
@@ -369,7 +389,7 @@ const SidePanelEditor = ({
         if (isRealtimeEnabled) await updateTableRealtime(table, isRealtimeEnabled)
 
         await Promise.all([
-          queryClient.invalidateQueries(tableKeys.list(project?.ref, table.schema)),
+          queryClient.invalidateQueries(tableKeys.list(project?.ref, table.schema, includeColumns)),
           queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
         ])
 
@@ -390,7 +410,7 @@ const SidePanelEditor = ({
         if (isRealtimeEnabled) await updateTableRealtime(table, true)
 
         await Promise.all([
-          queryClient.invalidateQueries(tableKeys.list(project?.ref, table.schema)),
+          queryClient.invalidateQueries(tableKeys.list(project?.ref, table.schema, includeColumns)),
           queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
         ])
 
@@ -578,11 +598,7 @@ const SidePanelEditor = ({
         saveChanges={saveTable}
         updateEditorDirty={() => setIsEdited(true)}
       />
-      <SchemaEditor
-        visible={snap.sidePanel?.type === 'schema'}
-        closePanel={onClosePanel}
-        saveChanges={() => {}}
-      />
+      <SchemaEditor visible={snap.sidePanel?.type === 'schema'} closePanel={onClosePanel} />
       <JsonEdit
         visible={snap.sidePanel?.type === 'json'}
         column={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.column) || ''}
@@ -591,7 +607,12 @@ const SidePanelEditor = ({
         applyButtonLabel="Save changes"
         readOnly={!editable}
         closePanel={onClosePanel}
-        onSaveJSON={onSaveJSON}
+        onSaveJSON={onSaveColumnValue}
+      />
+      <TextEditor
+        visible={snap.sidePanel?.type === 'cell'}
+        closePanel={onClosePanel}
+        onSaveField={onSaveColumnValue}
       />
       <ForeignRowSelector
         visible={snap.sidePanel?.type === 'foreign-row-selector'}

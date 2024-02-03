@@ -1,18 +1,18 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import clsx from 'clsx'
 import dayjs from 'dayjs'
+import { ArchiveRestoreIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
 import { useInView } from 'react-intersection-observer'
 import { Button, IconArchive, IconExternalLink } from 'ui'
 
 import { Markdown } from 'components/interfaces/Markdown'
+import { CriticalIcon, WarningIcon } from 'components/ui/Icons'
 import { ItemRenderer } from 'components/ui/InfiniteList'
 import { Notification, NotificationData } from 'data/notifications/notifications-v2-query'
 import { ProjectInfo } from 'data/projects/projects-query'
-import { ArchiveRestoreIcon } from 'lucide-react'
 import { Organization } from 'types'
-import { CriticalIcon, WarningIcon } from './NotificationsPopover.constants'
 
 interface NotificationRowProps {
   setRowHeight: (idx: number, height: number) => void
@@ -130,8 +130,8 @@ const NotificationRow: ItemRenderer<Notification, NotificationRowProps> = ({
                 const url = action.url.includes('[ref]')
                   ? action.url.replace('[ref]', project?.ref ?? '_')
                   : action.url.includes('[slug]')
-                  ? action.url.replace('[slug]', organization?.slug ?? '_')
-                  : action.url
+                    ? action.url.replace('[slug]', organization?.slug ?? '_')
+                    : action.url
                 return (
                   <Button
                     key={key}

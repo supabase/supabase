@@ -55,8 +55,8 @@ export const getURL = () => {
     process?.env?.NEXT_PUBLIC_SITE_URL && process.env.NEXT_PUBLIC_SITE_URL !== ''
       ? process.env.NEXT_PUBLIC_SITE_URL
       : process?.env?.VERCEL_URL && process.env.VERCEL_URL !== ''
-      ? process.env.VERCEL_URL
-      : 'https://supabase.com/dashboard'
+        ? process.env.VERCEL_URL
+        : 'https://supabase.com/dashboard'
   return url.includes('http') ? url : `https://${url}`
 }
 
@@ -297,4 +297,18 @@ export const getDistanceLatLonKM = (lat1: number, lon1: number, lat2: number, lo
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
   const d = R * c // Distance in KM
   return d
+}
+
+const currencyFormatter = Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  minimumFractionDigits: 0,
+})
+
+export const formatCurrency = (amount: number | undefined | null): string | null => {
+  if (amount === undefined || amount === null) {
+    return null
+  } else {
+    return currencyFormatter.format(amount)
+  }
 }

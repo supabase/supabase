@@ -89,8 +89,8 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
       defaultSchema !== undefined && defaultSchema !== null
         ? defaultSchema
         : values.schema === 'custom'
-        ? values.name
-        : values.schema
+          ? values.name
+          : values.schema
 
     enableExtension({
       projectRef: project.ref,

@@ -1,7 +1,7 @@
-import ConsentToast from '@ui/components/ConsentToast'
 import { LOCAL_STORAGE_KEYS, handlePageTelemetry, isBrowser, useTelemetryProps } from 'common'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'react-hot-toast'
+import ConsentToast from '../components/ConsentToast/ConsentToast'
 
 /*
   reference https://usehooks.com/useOnClickOutside/

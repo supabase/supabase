@@ -335,7 +335,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   return {
     props: { partner, overview },
-    revalidate: 18000, // In seconds - refresh every 5 hours
+    revalidate: 1800, // 5 hours
   }
 }
 
