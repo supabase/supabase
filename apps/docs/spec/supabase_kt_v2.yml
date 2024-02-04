@@ -2528,6 +2528,7 @@ functions:
       - Requires either an email or phone number.
       - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
       - If the user doesn't exist, `signInWith(OTP)` will signup the user instead. To restrict this behavior, you can set `createUser` to `false`.
+      - The method `signUpWith(OTP)` does the exact same thing as `signInWith(OTP)`, so it doesn't matter which one you use.
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](/docs/reference/auth/config#site_url).
@@ -2677,7 +2678,7 @@ functions:
     title: 'Verify OTPs'
     $ref: '@supabase/gotrue-js.GoTrueClient.verifyOtp'
     notes: |
-      - Verifying an OTP is done through either `verifyPhoneOtp` or `verifyEmailOtp`. For `verifyPhoneOtp`, the type can either be `OtpType.Phone.SMS` or `OtpType.Phone.PHONE_CHANGE`. For `verifyEmailOtp`, the type can be one of the following: `OtpType.Email.EMAIL`, `OtpType.Email.RECOVERY`, `OtpType.Email.INVITE` or `OtpType.Email.EMAIL_CHANGE` (`SIGNUP` and `MAGIC_LINK` types are deprecated).
+      - Verifying an OTP is done through either `verifyPhoneOtp` or `verifyEmailOtp`.     
       - The verification type used should be determined based on the corresponding auth method called before using `verifyPhoneOtp`/`verifyEmailOtp` to sign up / sign-in a user.
     examples:
       - id: verify-email-otp(otp)
