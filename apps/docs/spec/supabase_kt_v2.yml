@@ -2677,22 +2677,24 @@ functions:
     title: 'Verify OTPs'
     $ref: '@supabase/gotrue-js.GoTrueClient.verifyOtp'
     notes: |
-      Log in a user given a User supplied OTP received via mobile.
+      - Verifying an OTP is done through either `verifyPhoneOtp` or `verifyEmailOtp`. For `verifyPhoneOtp`, the type can either be `OtpType.Phone.SMS` or `OtpType.Phone.PHONE_CHANGE`. For `verifyEmailOtp`, the type can be one of the following: `OtpType.Email.EMAIL`, `OtpType.Email.RECOVERY`, `OtpType.Email.INVITE` or `OtpType.Email.EMAIL_CHANGE` (`SIGNUP` and `MAGIC_LINK` types are deprecated).
+      - The verification type used should be determined based on the corresponding auth method called before using `verifyPhoneOtp`/`verifyEmailOtp` to sign up / sign-in a user.
     examples:
       - id: verify-email-otp(otp)
         name: Verify an Email OTP
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.auth.verifyEmailOtp(type = OtpType.Email.INVITE, email = "example@email.com", token = "token")
+          supabase.auth.verifyEmailOtp(type = OtpType.Email.EMAIL, email = "example@email.com", token = "token")
           ```
         description: |
           Available types are:
-            - `OtpType.Email.MAGIC_LINK`
-            - `OtpType.Email.SIGNUP`
+            - `OtpType.Email.MAGIC_LINK` (deprecated)
+            - `OtpType.Email.SIGNUP` (deprecated)
             - `OtpType.Email.INVITE`
             - `OtpType.Email.RECOVERY`
             - `OtpType.Email.EMAIL_CHANGE`
+            - `OtpType.Email.EMAIL`
       - id: verify-phone-otp(otp)
         name: Verify an Phone OTP
         isSpotlight: false
