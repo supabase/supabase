@@ -111,7 +111,7 @@ const {
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
-Provide an input field for the user to key in the one-time code. To verify the code and complete the user's sign in, call [verifyOtp()](/docs/reference/kotlin/auth-verifyotp) with their email address, the code, and `OtpType.Email.EMAIL` as the type:
+Provide an input field for the user to key in the one-time code. To verify the code and complete the user's sign in, call [verifyEmailOtp()](/docs/reference/kotlin/auth-verifyotp) with their email address, the code, and `OtpType.Email.EMAIL` as the type:
 
 ```kotlin
 supabase.auth.verifyEmailOtp(type = OtpType.Email.EMAIL, email = "email", token = "151345")
