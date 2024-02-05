@@ -7,9 +7,11 @@ export interface PricingInformation {
   priceLabel?: string
   priceMonthly: number | string
   warning?: string
+  warningPartner?: string
   description: string
   preface: string
   features: string[]
+  featuresPartner: string[]
   footer?: string
   cta: string
 }
@@ -24,6 +26,7 @@ export const plans: PricingInformation[] = [
     priceLabel: '',
     priceMonthly: 0,
     warning: 'Limit of 2 free organizations',
+    warningPartner: 'Limit of 1 free organization',
     description: 'Perfect for passion projects & simple websites.',
     preface: 'Get started with:',
     features: [
@@ -37,6 +40,13 @@ export const plans: PricingInformation[] = [
       'Up to 500K Edge Function invocations',
       'Up to 200 concurrent Realtime connections',
       'Up to 2 million Realtime messages',
+      '1-day log retention',
+      'Community support',
+    ],
+    featuresPartner: [
+      'Unlimited API requests',
+      'Up to 500MB database space',
+      'Up to 5GB bandwidth',
       '1-day log retention',
       'Community support',
     ],
@@ -67,6 +77,14 @@ export const plans: PricingInformation[] = [
       '7-day log retention',
       'Email support',
     ],
+    featuresPartner: [
+      'No project pausing',
+      'Daily backups stored for 7 days',
+      '8GB database space included',
+      '250GB bandwidth included',
+      '7-day log retention',
+      'Email support',
+    ],
     footer: 'Your cost control settings determine if you allow over-usage.',
     preface: 'Everything in the Free plan, plus:',
     cta: 'Get Started',
@@ -82,6 +100,17 @@ export const plans: PricingInformation[] = [
     priceMonthly: 599,
     description: 'Collaborate with different permissions and access patterns.',
     features: [
+      'Additional Organization member roles',
+      'Daily backups stored for 14 days',
+      `SSO/SAML`,
+      'Standardised Security Questionnaire',
+      'SOC2',
+      'HIPAA available as paid add-on',
+      'SSO for Supabase Dashboard',
+      'Priority email support & SLAs',
+      '28-day log retention',
+    ],
+    featuresPartner: [
       'Additional Organization member roles',
       'Daily backups stored for 14 days',
       'Standardised Security Questionnaire',
@@ -102,8 +131,13 @@ export const plans: PricingInformation[] = [
     description: 'For large-scale applications managing serious workloads.',
     features: [
       `Designated Support manager & SLAs`,
-      `SSO/SAML`,
       `On-premise support`,
+      `24×7×365 premium enterprise support`,
+      'Custom Security Questionnaires',
+      `Private Slack channel`,
+    ],
+    featuresPartner: [
+      `Designated Support manager & SLAs`,
       `24×7×365 premium enterprise support`,
       'Custom Security Questionnaires',
       `Private Slack channel`,

@@ -38,11 +38,6 @@ const UtilityActions = ({
 
       {IS_PLATFORM && <FavoriteButton id={id} />}
 
-      {/* [Joshen] Am opting to remove this - i don't think its useful? */}
-      {/* [Joshen] Keeping in mind to not sprawl controls everywhere */}
-      {/* [Joshen] There's eventually gonna be user impersonation here as well so let's see */}
-      {/* <SizeToggleButton id={id} /> */}
-
       <Tooltip.Root delayDuration={0}>
         <Tooltip.Trigger asChild>
           <Button

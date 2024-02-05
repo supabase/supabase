@@ -1,12 +1,10 @@
 import React, { useEffect } from 'react'
-import { FormLayout } from '../../lib/Layout/FormLayout'
+
+import { FormLayout } from '../../lib/Layout/FormLayout/FormLayout'
 import InputErrorIcon from '../../lib/Layout/InputErrorIcon'
 import InputIconContainer from '../../lib/Layout/InputIconContainer'
-
-import { useFormContext } from '../Form/FormContext'
-
-import defaultTheme from '../../lib/theme/defaultTheme'
 import styleHandler from '../../lib/theme/styleHandler'
+import { useFormContext } from '../Form/FormContext'
 
 interface OptionProps {
   value: string
@@ -38,7 +36,7 @@ export interface Props extends Omit<React.InputHTMLAttributes<HTMLSelectElement>
   validation?: (x: any) => void
 }
 
-export const ColLayout = (props: any) => <div className="">{props.children}</div>
+export const ColLayout = (props: any) => <div>{props.children}</div>
 
 function Select({
   autoComplete,

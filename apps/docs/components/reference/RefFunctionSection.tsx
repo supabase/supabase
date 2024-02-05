@@ -55,7 +55,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
             {parameters && (
               <div className="not-prose mt-12">
                 <h5 className="mb-3 text-base text-foreground">Parameters</h5>
-                <ul className="">
+                <ul>
                   {parameters.map((param) => {
                     // grab override params from yaml file
                     const overrideParams = item.overrideParams
@@ -126,14 +126,14 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                       const codeBlockLang = example?.code?.startsWith('```js')
                         ? 'js'
                         : example?.code?.startsWith('```ts')
-                        ? 'ts'
-                        : example?.code?.startsWith('```dart')
-                        ? 'dart'
-                        : example?.code?.startsWith('```c#')
-                        ? 'csharp'
-                        : example?.code?.startsWith('```kotlin')
-                        ? 'kotlin'
-                        : 'js'
+                          ? 'ts'
+                          : example?.code?.startsWith('```dart')
+                            ? 'dart'
+                            : example?.code?.startsWith('```c#')
+                              ? 'csharp'
+                              : example?.code?.startsWith('```kotlin')
+                                ? 'kotlin'
+                                : 'js'
                       //                     `
                       // import { createClient } from '@supabase/supabase-js'
 
@@ -149,7 +149,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                       return (
                         <Tabs.Panel
                           id={example.id}
-                          key={example.id}
+                          key={exampleIndex}
                           label={example.name}
                           className="flex flex-col gap-3"
                         >

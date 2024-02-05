@@ -2,12 +2,12 @@ import type { PostgresColumn, PostgresSchema, PostgresTable } from '@supabase/po
 import { find, get, isEmpty, sortBy } from 'lodash'
 import { useEffect, useState } from 'react'
 
-import { Dictionary } from 'types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import InformationBox from 'components/ui/InformationBox'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
+import { Dictionary } from 'types'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -63,10 +63,12 @@ const ForeignKeySelector = ({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const { data: tables } = useTablesQuery({
+  // change the return type because of the includeColumns param
+  const { data: tables } = useTablesQuery<PostgresTable[] | undefined>({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     schema: selectedForeignKey.schema,
+    includeColumns: true,
   })
 
   const foreignKey = column?.foreignKey
@@ -188,7 +190,6 @@ const ForeignKeySelector = ({
       size="medium"
       visible={visible}
       onCancel={closePanel}
-      // @ts-ignore
       header={
         <span>
           Edit foreign key relation{' '}
@@ -256,8 +257,7 @@ const ForeignKeySelector = ({
             <Listbox.Option key="empty" value={1} label="---">
               ---
             </Listbox.Option>
-            {/* @ts-ignore */}
-            {sortBy(tables, ['schema']).map((table: PostgresTable) => {
+            {sortBy(tables, ['schema']).map((table) => {
               return (
                 <Listbox.Option key={table.id} value={table.id} label={table.name}>
                   <div className="flex items-center gap-2">

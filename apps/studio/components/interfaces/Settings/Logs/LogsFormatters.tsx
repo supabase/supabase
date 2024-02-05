@@ -38,7 +38,6 @@ export const SelectionDetailedRow = ({
         {valueRender ?? value}
       </span>
       <CopyButton
-        bounceIconOnCopy
         text={value}
         className="group-hover:opacity-100 opacity-0 my-auto transition col-span-2  h-4 w-4 px-0 py-0"
         type="text"
@@ -242,20 +241,6 @@ export const TimestampLocalFormatter = ({
 export const timestampLocalFormatter = (value: string | number) => {
   const timestamp = isUnixMicro(value) ? unixMicroToIsoTimestamp(value) : value
   return dayjs(timestamp).format('DD MMM  HH:mm:ss')
-}
-
-/*
- * Header Formatter
- *
- * for http response codes
- */
-
-export const HeaderFormmater = ({ value }: any) => {
-  return (
-    <div className="flex h-full items-center text-xs font-normal text-foreground-lighter">
-      {value}
-    </div>
-  )
 }
 
 /*

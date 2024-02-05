@@ -14,8 +14,6 @@ import PublicationsTables from './Publications/PublicationsTables'
 
 import BackupsList from './Backups/BackupsList'
 
-import ConnectionPooling from '../Settings/Database/ConnectionPooling'
-
 import CreateTrigger from './Triggers/CreateTrigger'
 import DeleteTrigger from './Triggers/DeleteTrigger'
 
@@ -27,7 +25,6 @@ import EnumeratedTypes from './EnumeratedTypes/EnumeratedTypes'
 export {
   BackupsList,
   ColumnList,
-  ConnectionPooling,
   CreateFunction,
   CreateTrigger,
   CreateWrapper,

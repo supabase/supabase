@@ -1,6 +1,5 @@
 import { User } from '@supabase/supabase-js'
 import { PropsWithChildren, useEffect, useState } from 'react'
-import * as configcat from 'configcat-js'
 
 import { IS_PLATFORM } from 'lib/constants'
 import FlagContext from './FlagContext'

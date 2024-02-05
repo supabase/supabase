@@ -33,7 +33,8 @@ export async function getEnumeratedTypes(
   })
 
   if (error) throw error
-  return data
+  const enumeratedTypes = data.filter((type) => type.enums.length > 0)
+  return enumeratedTypes
 }
 
 export type EnumeratedTypesData = Awaited<ReturnType<typeof getEnumeratedTypes>>

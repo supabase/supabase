@@ -27,7 +27,7 @@ jobs:
         run: |
           rm package.json
           rm package-lock.json
-          npm i prettier@2 prettier-plugin-sql-cst
+          npm i prettier@4.0.0-alpha.8 prettier-plugin-sql-cst
       - name: Run prettier
         run: |-
           npx prettier -c 'apps/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'
@@ -50,7 +50,7 @@ jobs:
         run: |
           rm package.json
           rm package-lock.json
-          npm i prettier@2 prettier-plugin-sql-cst
+          npm i prettier@4.0.0-alpha.8 prettier-plugin-sql-cst
       - name: Run prettier
         run: |-
           npx prettier -c 'i18n/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'
@@ -68,7 +68,7 @@ jobs:
         run: |
           rm package.json
           rm package-lock.json
-          npm i prettier@2 prettier-plugin-sql-cst
+          npm i prettier@4.0.0-alpha.8 prettier-plugin-sql-cst
       - name: Run prettier
         run: |-
           # Check mdx files which contain sql code blocks

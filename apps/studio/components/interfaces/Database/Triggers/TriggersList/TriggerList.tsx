@@ -100,7 +100,7 @@ const TriggerList = ({
           </Table.td>
 
           <Table.td className="hidden xl:table-cell">
-            <div className="flex space-x-2">
+            <div className="flex gap-2 flex-wrap">
               {x.events.map((event: string) => (
                 <Badge key={event}>{`${x.activation} ${event}`}</Badge>
               ))}

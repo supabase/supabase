@@ -5,17 +5,21 @@ import { useState } from 'react'
 import { toast } from 'react-hot-toast'
 import { Modal } from 'ui'
 
-import { Dictionary } from 'types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { useDatabasePublicationCreateMutation } from 'data/database-publications/database-publications-create-mutation'
+import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
+import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { sqlKeys } from 'data/sql/keys'
 import { useTableRowCreateMutation } from 'data/table-rows/table-row-create-mutation'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
 import { tableKeys } from 'data/tables/keys'
+import { getTables } from 'data/tables/tables-query'
 import { useStore, useUrlState } from 'hooks'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { Dictionary } from 'types'
 import { ColumnEditor, RowEditor, SpreadsheetImport, TableEditor } from '.'
 import ForeignRowSelector from './RowEditor/ForeignRowSelector/ForeignRowSelector'
 import JsonEdit from './RowEditor/JsonEditor/JsonEditor'
@@ -26,15 +30,14 @@ import {
   ExtendedPostgresRelationship,
   UpdateColumnPayload,
 } from './SidePanelEditor.types'
+import { createColumn, updateColumn } from './SidePanelEditor.utils'
 import { ImportContent } from './TableEditor/TableEditor.types'
-import { useDatabasePublicationCreateMutation } from 'data/database-publications/database-publications-create-mutation'
-import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
-import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
-import { getTables } from 'data/tables/tables-query'
+import { TextEditor } from './RowEditor/TextEditor'
 
 export interface SidePanelEditorProps {
   editable?: boolean
   selectedTable?: PostgresTable
+  includeColumns?: boolean // This is mainly used for invalidating useTablesQuery
 
   // Because the panel is shared between grid editor and database pages
   // Both require different responses upon success of these events
@@ -44,6 +47,7 @@ export interface SidePanelEditorProps {
 const SidePanelEditor = ({
   editable = true,
   selectedTable,
+  includeColumns = false,
   onTableCreated = noop,
 }: SidePanelEditorProps) => {
   const snap = useTableEditorStateSnapshot()
@@ -142,25 +146,42 @@ const SidePanelEditor = ({
     }
   }
 
-  const onSaveJSON = async (value: string | number | null) => {
-    if (selectedTable === undefined || !(snap.sidePanel?.type === 'json')) return
-    const selectedValueForJsonEdit = snap.sidePanel.jsonValue
+  const onSaveColumnValue = async (value: string | number | null, resolve: () => void) => {
+    if (selectedTable === undefined) return
 
-    try {
+    let payload
+    let configuration
+    const isNewRecord = false
+    const identifiers = {} as Dictionary<any>
+    if (snap.sidePanel?.type === 'json') {
+      const selectedValueForJsonEdit = snap.sidePanel.jsonValue
       const { row, column } = selectedValueForJsonEdit
-      const payload = { [column]: value === null ? null : JSON.parse(value as any) }
-      const identifiers = {} as Dictionary<any>
+      payload = { [column]: value === null ? null : JSON.parse(value as any) }
       selectedTable.primary_keys.forEach((column) => (identifiers[column.name] = row![column.name]))
+      configuration = { identifiers, rowIdx: row.idx }
+    } else if (snap.sidePanel?.type === 'cell') {
+      const column = snap.sidePanel.value?.column
+      const row = snap.sidePanel.value?.row
 
-      const isNewRecord = false
-      const configuration = { identifiers, rowIdx: row.idx }
+      if (!column || !row) return
+      payload = { [column]: value === null ? null : value }
+      selectedTable.primary_keys.forEach((column) => (identifiers[column.name] = row![column.name]))
+      configuration = { identifiers, rowIdx: row.idx }
+    }
 
-      saveRow(payload, isNewRecord, configuration, (error) => {
-        if (error) {
-          toast.error(error?.message ?? 'Something went wrong while trying to save the JSON value')
-        }
-      })
-    } catch (error: any) {}
+    if (payload !== undefined && configuration !== undefined) {
+      try {
+        await saveRow(payload, isNewRecord, configuration, (error) => {
+          if (error) {
+            toast.error(
+              error?.message ?? 'Something went wrong while trying to save the column value'
+            )
+          }
+        })
+      } finally {
+        resolve()
+      }
+    }
   }
 
   const onSaveForeignRow = async (value: any) => {
@@ -191,17 +212,21 @@ const SidePanelEditor = ({
 
     const { columnId } = configuration
     const response = isNewRecord
-      ? await meta.createColumn(
-          payload as CreateColumnPayload,
-          selectedTable as PostgresTable,
-          foreignKey
-        )
-      : await meta.updateColumn(
-          columnId as string,
-          payload as UpdateColumnPayload,
-          selectedTable as PostgresTable,
-          foreignKey
-        )
+      ? await createColumn({
+          projectRef: project?.ref!,
+          connectionString: project?.connectionString,
+          payload: payload as CreateColumnPayload,
+          selectedTable: selectedTable as PostgresTable,
+          foreignKey,
+        })
+      : await updateColumn({
+          projectRef: project?.ref!,
+          connectionString: project?.connectionString,
+          id: columnId as string,
+          payload: payload as UpdateColumnPayload,
+          selectedTable: selectedTable as PostgresTable,
+          foreignKey,
+        })
 
     if (response?.error) {
       ui.setNotification({ category: 'error', message: response.error.message })
@@ -263,7 +288,7 @@ const SidePanelEditor = ({
     if (!project) return console.error('Project is required')
     let realtimePublication = (publications ?? []).find((pub) => pub.name === 'supabase_realtime')
     const publicTables = await queryClient.fetchQuery({
-      queryKey: tableKeys.list(project.ref, 'public'),
+      queryKey: tableKeys.list(project.ref, 'public', includeColumns),
       queryFn: ({ signal }) =>
         getTables(
           { projectRef: project.ref, connectionString: project.connectionString, schema: 'public' },
@@ -307,11 +332,11 @@ const SidePanelEditor = ({
                 .filter((t: any) => t.id !== table.id)
                 .map((t: any) => `${t.schema}.${t.name}`)
             : !isAlreadyEnabled && enabled
-            ? // Toggle realtime on
-              [`${table.schema}.${table.name}`].concat(
-                publicationTables.map((t: any) => `${t.schema}.${t.name}`)
-              )
-            : null
+              ? // Toggle realtime on
+                [`${table.schema}.${table.name}`].concat(
+                  publicationTables.map((t: any) => `${t.schema}.${t.name}`)
+                )
+              : null
         if (realtimeTables === null) return
         await updatePublication({
           id,
@@ -364,7 +389,7 @@ const SidePanelEditor = ({
         if (isRealtimeEnabled) await updateTableRealtime(table, isRealtimeEnabled)
 
         await Promise.all([
-          queryClient.invalidateQueries(tableKeys.list(project?.ref, table.schema)),
+          queryClient.invalidateQueries(tableKeys.list(project?.ref, table.schema, includeColumns)),
           queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
         ])
 
@@ -385,7 +410,7 @@ const SidePanelEditor = ({
         if (isRealtimeEnabled) await updateTableRealtime(table, true)
 
         await Promise.all([
-          queryClient.invalidateQueries(tableKeys.list(project?.ref, table.schema)),
+          queryClient.invalidateQueries(tableKeys.list(project?.ref, table.schema, includeColumns)),
           queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
         ])
 
@@ -402,12 +427,7 @@ const SidePanelEditor = ({
           message: `Updating table: ${selectedTable?.name}...`,
         })
 
-        const { table, hasError }: any = await meta.updateTable(
-          toastId,
-          selectedTable,
-          payload,
-          columns
-        )
+        const { table, hasError } = await meta.updateTable(toastId, selectedTable, payload, columns)
 
         await updateTableRealtime(table, isRealtimeEnabled)
 
@@ -578,11 +598,7 @@ const SidePanelEditor = ({
         saveChanges={saveTable}
         updateEditorDirty={() => setIsEdited(true)}
       />
-      <SchemaEditor
-        visible={snap.sidePanel?.type === 'schema'}
-        closePanel={onClosePanel}
-        saveChanges={() => {}}
-      />
+      <SchemaEditor visible={snap.sidePanel?.type === 'schema'} closePanel={onClosePanel} />
       <JsonEdit
         visible={snap.sidePanel?.type === 'json'}
         column={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.column) || ''}
@@ -591,7 +607,12 @@ const SidePanelEditor = ({
         applyButtonLabel="Save changes"
         readOnly={!editable}
         closePanel={onClosePanel}
-        onSaveJSON={onSaveJSON}
+        onSaveJSON={onSaveColumnValue}
+      />
+      <TextEditor
+        visible={snap.sidePanel?.type === 'cell'}
+        closePanel={onClosePanel}
+        onSaveField={onSaveColumnValue}
       />
       <ForeignRowSelector
         visible={snap.sidePanel?.type === 'foreign-row-selector'}

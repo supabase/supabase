@@ -18,7 +18,7 @@ export const BranchingEmptyState = () => {
       <p className="text-sm text-light">
         {hasAccessToBranching
           ? 'Create preview branches to experiment changes to your database schema in a safe, non-destructible environment.'
-          : "Register for early access and you'll be contacted by email when your organization is enrolled in database branching."}
+          : 'Database Branching is currently in early access and not available publicly yet.'}
       </p>
       {hasAccessToBranching ? (
         <div className="!mt-4">
@@ -31,15 +31,14 @@ export const BranchingEmptyState = () => {
         </div>
       ) : (
         <div className="flex items-center space-x-2 !mt-4">
-          <Button asChild>
-            <Link
-              passHref
-              rel="noreferrer"
+          <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />} asChild>
+            <a
               target="_blank"
-              href="https://forms.supabase.com/branching-request"
+              rel="noreferrer"
+              href="https://supabase.com/docs/guides/platform/branching"
             >
-              Join waitlist
-            </Link>
+              View the docs
+            </a>
           </Button>
         </div>
       )}

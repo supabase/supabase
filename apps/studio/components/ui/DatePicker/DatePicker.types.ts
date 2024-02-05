@@ -17,11 +17,3 @@ export interface TimeSplitInputProps {
   startDate: any
   endDate: any
 }
-
-export type Date = {
-  YYYY: string
-  MM: string
-  DD: string
-}
-
-export type DateType = 'YYYY' | 'MM' | 'DD'

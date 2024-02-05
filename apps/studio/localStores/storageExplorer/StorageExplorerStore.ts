@@ -4,7 +4,6 @@ import { createClient } from '@supabase/supabase-js'
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { chunk, compact, find, findIndex, has, isEqual, some, uniq, uniqBy } from 'lodash'
 import { makeAutoObservable } from 'mobx'
-import { createContext, useContext } from 'react'
 import toast from 'react-hot-toast'
 
 import {
@@ -26,14 +25,6 @@ let store = null
 export function useStorageStore() {
   if (store === null) store = new StorageExplorerStore(null)
   return store
-}
-
-/**
- * Deprecated - it's preferable to use the useStorageStore() function above
- */
-export const StorageExplorerContext = createContext(null)
-export const useStorageExplorerStore = () => {
-  return useContext(StorageExplorerContext)
 }
 
 const CORRUPTED_THRESHOLD_MS = 15 * 60 * 1000 // 15 minutes
@@ -389,20 +380,24 @@ class StorageExplorerStore {
       return filePreview.url
     } else {
       const signedUrl = await this.fetchFilePreview(file.name, expiresIn)
-      const formattedUrl = new URL(signedUrl)
-      formattedUrl.searchParams.set('t', new Date().toISOString())
-      const fileUrl = formattedUrl.toString()
+      try {
+        const formattedUrl = new URL(signedUrl)
+        formattedUrl.searchParams.set('t', new Date().toISOString())
+        const fileUrl = formattedUrl.toString()
 
-      // Also save it to cache
-      const fileCache = {
-        id: file.id,
-        url: fileUrl,
-        expiresIn: DEFAULT_EXPIRY,
-        fetchedAt: Date.now(),
+        // Also save it to cache
+        const fileCache = {
+          id: file.id,
+          url: fileUrl,
+          expiresIn: DEFAULT_EXPIRY,
+          fetchedAt: Date.now(),
+        }
+        this.addFileToPreviewCache(fileCache)
+        return fileUrl
+      } catch (error) {
+        console.error('Failed to get file URL', error)
+        return ''
       }
-      this.addFileToPreviewCache(fileCache)
-
-      return fileUrl
     }
   }
 
@@ -721,7 +716,7 @@ class StorageExplorerStore {
     this.clearSelectedItemsToMove()
   }
 
-  fetchFilePreview = async (fileName, expiresIn = 0) => {
+  fetchFilePreview = async (fileName, expiresIn = 0): Promise<string | null> => {
     const includeBucket = false
     const pathToFile = this.getPathAlongOpenedFolders(includeBucket)
     const formattedPathToFile = pathToFile.length > 0 ? `${pathToFile}/${fileName}` : fileName

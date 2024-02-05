@@ -195,7 +195,8 @@ const StoragePolicies = () => {
               find(formattedStorageObjectPolicies, { name: bucket.name }),
               ['policies'],
               []
-            )
+            ).sort((a: any, b: any) => a.name.localeCompare(b.name))
+
             return (
               <StoragePoliciesBucketRow
                 key={bucket.name}
@@ -249,8 +250,8 @@ const StoragePolicies = () => {
 
       {/* Adding policies to objets/buckets table or editting any policy uses the general policy editor */}
       <PolicyEditorModal
-        visible={showGeneralPolicyEditor}
         schema="storage"
+        visible={showGeneralPolicyEditor}
         table={isEditingPolicyForBucket.table}
         selectedPolicyToEdit={selectedPolicyToEdit}
         onSelectCancel={onCancelPolicyEdit}

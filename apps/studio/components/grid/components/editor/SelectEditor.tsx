@@ -5,6 +5,7 @@ import { useTrackedState } from 'components/grid/store'
 
 interface SelectEditorProps<TRow, TSummaryRow = unknown>
   extends RenderEditCellProps<TRow, TSummaryRow> {
+  isNullable?: boolean
   options: { label: string; _value: string }[]
 }
 
@@ -14,6 +15,7 @@ export function SelectEditor<TRow, TSummaryRow = unknown>({
   onRowChange,
   onClose,
   options,
+  isNullable,
 }: SelectEditorProps<TRow, TSummaryRow>) {
   const state = useTrackedState()
   const gridColumn = state.gridColumns.find((x) => x.name == column.key)
@@ -46,7 +48,7 @@ export function SelectEditor<TRow, TSummaryRow = unknown>({
       onChange={onChange}
       onBlur={onBlur}
     >
-      <Select.Option value="">NULL</Select.Option>
+      {isNullable && <Select.Option value="">NULL</Select.Option>}
       {options.map(({ label, _value }) => (
         <Select.Option key={_value} value={_value} selected={_value === value}>
           {label}
