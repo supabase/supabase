@@ -2,17 +2,17 @@
   "folders": [
     {
       "name": "www",
-      "path": "./",
+      "path": "./"
     },
     {
       "name": "supabase-functions",
-      "path": "supabase/functions",
-    },
+      "path": "supabase/functions"
+    }
   ],
   "settings": {
     "files.exclude": {
       "node_modules/": true,
-      "supabase/functions/": true,
-    },
-  },
+      "supabase/functions/": true
+    }
+  }
 }
