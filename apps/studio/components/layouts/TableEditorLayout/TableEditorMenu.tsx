@@ -191,7 +191,7 @@ const TableEditorMenu = () => {
               size="tiny"
               actions={
                 searchText && (
-                  <Button type="text" className="px-1" onClick={() => setSearchText('')}>
+                  <Button size="tiny" type="text" onClick={() => setSearchText('')}>
                     <IconX size={12} strokeWidth={2} />
                   </Button>
                 )
