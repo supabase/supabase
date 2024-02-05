@@ -1,8 +1,9 @@
-import { useParams } from 'common'
 import { partition } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+
+import { useParams } from 'common'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -15,7 +16,6 @@ import {
   Input,
   Modal,
 } from 'ui'
-
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
@@ -23,7 +23,7 @@ import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
 import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
 import { useBranchesDisableMutation } from 'data/branches/branches-disable-mutation'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
-import { useGithubPullRequestsQuery } from 'data/integrations/github-pull-requests-query'
+import { useGitHubPullRequestsQuery } from 'data/integrations/github-pull-requests-query'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
 import { BranchLoader, BranchManagementSection, BranchRow } from './BranchPanels'
@@ -95,10 +95,8 @@ const BranchManagement = () => {
     isLoading: isLoadingPullRequests,
     isError: isErrorPullRequests,
     isSuccess: isSuccessPullRequests,
-  } = useGithubPullRequestsQuery({
-    organizationIntegrationId: githubIntegration?.id,
-    repoOwner,
-    repoName,
+  } = useGitHubPullRequestsQuery({
+    connectionId: githubConnection?.id,
     prNumbers,
   })
   const pullRequests = allPullRequests ?? []
