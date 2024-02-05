@@ -36,10 +36,8 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   }, [])
 
   const saveChanges = useCallback((newValue: string | null) => {
-    if (newValue) {
-      newValue = removeJSONTrailingComma(newValue)
-    }
-    if (newValue !== value) commitChange(newValue)
+    const updatedValue = newValue !== null ? removeJSONTrailingComma(newValue) : newValue
+    if (updatedValue !== value) commitChange(newValue)
   }, [])
 
   const onChange = (_value: string | undefined) => {
