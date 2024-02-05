@@ -12,6 +12,7 @@ import {
 } from 'ui'
 
 import AlertError from 'components/ui/AlertError'
+import { CriticalIcon, WarningIcon } from 'components/ui/Icons'
 import InfiniteList from 'components/ui/InfiniteList'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useNotificationsArchiveAllMutation } from 'data/notifications/notifications-v2-archive-all-mutation'
@@ -23,7 +24,6 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { useNotificationsStateSnapshot } from 'state/notifications'
 import NotificationRow from './NotificationRow'
 import { NotificationsFilter } from './NotificationsFilter'
-import { CriticalIcon, WarningIcon } from './NotificationsPopover.constants'
 
 const NotificationsPopoverV2 = () => {
   const [open, setOpen] = useState(false)
@@ -55,8 +55,8 @@ const NotificationsPopoverV2 = () => {
       activeTab === 'archived'
         ? 'archived'
         : snap.filterStatuses.includes('unread')
-        ? 'new'
-        : undefined,
+          ? 'new'
+          : undefined,
     filters: {
       priority: snap.filterPriorities,
       organizations: snap.filterOrganizations,
@@ -100,8 +100,8 @@ const NotificationsPopoverV2 = () => {
               hasCritical
                 ? 'border-destructive-500 hover:border-destructive-600 hover:bg-destructive-300'
                 : hasWarning
-                ? 'border-warning-500 hover:border-warning-600 hover:bg-warning-300'
-                : ''
+                  ? 'border-warning-500 hover:border-warning-600 hover:bg-warning-300'
+                  : ''
             )}
             icon={
               hasCritical ? (
@@ -228,10 +228,10 @@ const NotificationsPopoverV2 = () => {
                                 : ''
                             }`
                           : snap.numFiltersApplied > 0
-                          ? `No notifications based on the ${snap.numFiltersApplied} filter${
-                              snap.numFiltersApplied > 1 ? 's' : ''
-                            } applied`
-                          : 'All caught up'}
+                            ? `No notifications based on the ${snap.numFiltersApplied} filter${
+                                snap.numFiltersApplied > 1 ? 's' : ''
+                              } applied`
+                            : 'All caught up'}
                       </p>
                       <p className="text-foreground-lighter text-xs w-60 mx-auto text-center">
                         {activeTab === 'archived'
