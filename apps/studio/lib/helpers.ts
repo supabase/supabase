@@ -42,6 +42,14 @@ export const prettifyJSON = (minifiedJSON: string) => {
   }
 }
 
+export const removeJSONTrailingComma = (jsonString: string) => {
+  /**
+   * Remove trailing commas: Delete any comma immediately preceding the closing brace '}' or
+   * bracket ']' using a regular expression.
+   */
+  return jsonString.replace(/,\s*(?=[\}\]])/g, '')
+}
+
 export const uuidv4 = () => {
   return _uuidV4()
 }
