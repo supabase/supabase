@@ -9,10 +9,11 @@ import {
   ScrollArea,
   Separator,
 } from 'ui'
-import { CriticalIcon, WarningIcon } from './NotificationsPopover.constants'
+
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useNotificationsStateSnapshot } from 'state/notifications'
+import { CriticalIcon, WarningIcon } from 'components/ui/Icons'
 
 export const NotificationsFilter = ({ activeTab }: { activeTab: 'inbox' | 'archived' }) => {
   const [open, setOpen] = useState(false)

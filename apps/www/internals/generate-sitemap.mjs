@@ -9,6 +9,7 @@ import prettier from 'prettier'
 
 async function generate() {
   const prettierConfig = await prettier.resolveConfig('./.prettierrc.js')
+
   const pages = await globby([
     'pages/*.js',
     'pages/*.tsx',
@@ -96,7 +97,7 @@ async function generate() {
     </urlset>
     `
 
-  const formatted = prettier.format(sitemap, {
+  const formatted = await prettier.format(sitemap, {
     ...prettierConfig,
     parser: 'html',
   })

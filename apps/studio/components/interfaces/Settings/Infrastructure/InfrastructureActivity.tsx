@@ -71,8 +71,8 @@ const InfrastructureActivity = () => {
     subscription === undefined
       ? `/`
       : subscription.plan.id === 'free'
-      ? `/org/${organization?.slug ?? '[slug]'}/billing#subscription`
-      : `/project/${projectRef}/settings/addons`
+        ? `/org/${organization?.slug ?? '[slug]'}/billing#subscription`
+        : `/project/${projectRef}/settings/addons`
 
   const categoryMeta = INFRA_ACTIVITY_METRICS.find((category) => category.key === 'infra')
 

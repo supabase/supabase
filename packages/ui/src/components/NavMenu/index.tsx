@@ -1,5 +1,5 @@
-import { cn } from '@ui/lib/utils'
 import { HTMLAttributes, PropsWithChildren, forwardRef } from 'react'
+import { cn } from '../../lib/utils/cn'
 
 interface NavMenuProps extends HTMLAttributes<HTMLDivElement> {}
 

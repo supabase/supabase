@@ -73,8 +73,8 @@ export const ProjectCardStatus = ({
   const alertType = isCritical
     ? 'destructive'
     : projectStatus === 'isPaused'
-    ? 'default'
-    : 'warning'
+      ? 'default'
+      : 'warning'
 
   if (
     (activeWarnings.length === 0 || warningContent === undefined) &&
