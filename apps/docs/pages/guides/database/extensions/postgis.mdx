@@ -151,6 +151,7 @@ data class Restaurant(
     val location: String //you could also use a custom type with a custom serializer for more type safety
 )
 ```
+
 ```kotlin
 val data = supabase.from("restaurants").insert(listOf(
     Restaurant("Supa Burger", "POINT(-73.946823 40.807416)"),

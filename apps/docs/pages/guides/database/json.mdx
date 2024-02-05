@@ -197,6 +197,7 @@ data class Book(
     val metadata: BookMetadata
 )
 ```
+
 ```kotlin
 val data = supabase.from("books").insert(listOf(
     Book("The Poky Little Puppy", "Janette Sebring Lowrey", BookMetadata("Puppy is slower than other, bigger animals.", 5.95, listOf(3, 6))),

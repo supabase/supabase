@@ -203,15 +203,18 @@ values
 <TabPanel id="js" label="JavaScript">
 
 ```js
-const { data, error } = await supabase
-  .from('movies')
-  .insert([{
+const { data, error } = await supabase.from('movies').insert([
+  {
     name: 'The Empire Strikes Back',
-    description: 'After the Rebels are brutally overpowered by the Empire on the ice planet Hoth, Luke Skywalker begins Jedi training with Yoda.'
-  }, {
+    description:
+      'After the Rebels are brutally overpowered by the Empire on the ice planet Hoth, Luke Skywalker begins Jedi training with Yoda.',
+  },
+  {
     name: 'Return of the Jedi',
-    description: 'After a daring mission to rescue Han Solo from Jabba the Hutt, the Rebels dispatch to Endor to destroy the second Death Star.'
-  }])
+    description:
+      'After a daring mission to rescue Han Solo from Jabba the Hutt, the Rebels dispatch to Endor to destroy the second Death Star.',
+  },
+])
 ```
 
 </TabPanel>
