@@ -1,6 +1,6 @@
 import * as Popover from '@radix-ui/react-popover'
 import { motion } from 'framer-motion'
-import { useLocalStorageQuery, useSelectedOrganization, useSelectedProject } from 'hooks'
+import { useLocalStorageQuery, useSelectedOrganization } from 'hooks'
 import { IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import { Button, IconInfo } from 'ui'

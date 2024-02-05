@@ -247,12 +247,6 @@ limit 100
   },
 ]
 
-export const LOG_TYPE_LABEL_MAPPING: { [k: string]: string } = {
-  explorer: 'Explorer',
-  api: 'API',
-  database: 'Database',
-}
-
 const _SQL_FILTER_COMMON = {
   search_query: (value: string) => `regexp_contains(event_message, '${value}')`,
 }
@@ -664,10 +658,15 @@ export const PREVIEWER_DATEPICKER_HELPERS: DatetimeHelper[] = [
 ]
 export const EXPLORER_DATEPICKER_HELPERS: DatetimeHelper[] = [
   {
+    text: 'Last hour',
+    calcFrom: () => dayjs().subtract(1, 'hour').startOf('hour').toISOString(),
+    calcTo: () => '',
+    default: true,
+  },
+  {
     text: 'Last 24 hours',
     calcFrom: () => dayjs().subtract(1, 'day').startOf('day').toISOString(),
     calcTo: () => '',
-    default: true,
   },
   {
     text: 'Last 3 days',

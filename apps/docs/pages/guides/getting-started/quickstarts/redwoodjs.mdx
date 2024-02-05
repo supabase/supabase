@@ -22,19 +22,23 @@ export const meta = {
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
-      ![New Project](/docs/img/redwoodjs-qs-new-project.png)
+      ![New project for redwoodjs](/docs/img/guides/getting-started/quickstarts/redwoodjs/new-project.png)
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={2}>
     <StepHikeCompact.Details title="Gather Database Connection Strings">
-      After your project is ready, gather the following information about your [database connections](https://supabase.com/dashboard/project/_/settings/database):
 
-      * Connection String (port 5432)
-      * Connection Pooling / Connection String (port 6543)
+    Go to the [database settings page](https://supabase.com/dashboard/project/_/settings/database). In this quickstart, we are going to connect via the connection pooler. If your network supports IPv6, you can connect to the database directly without using the connection pooler.
 
-    You will need these to setup environment variables in Step 5.
+    We will use the pooler both in `Transaction` and `Session` mode. `Transaction` mode is used for application queries and `Session` mode is used for running migrations with Prisma.
+
+    To do this, set the connection mode to `Transaction` in the [database settings page](https://supabase.com/dashboard/project/_/settings/database) and copy the connection string and append `?pgbouncer=true&&connection_limit=1`. `pgbouncer=true` disables Prisma from generating prepared statements. This is required since our connection pooler does not support prepared statements in transaction mode yet. The `connection_limit=1` parameter is only required if you are using Prisma from a serverless environment. This is the Transaction mode connection string.
+
+    To get the Session mode connection pooler string, change the port of the connection string from the dashboard to 5432.
+
+    You will need the Transaction mode connection string and the Session mode connection string to setup environment variables in Step 5.
 
     <Admonition type="tip">
 
@@ -44,7 +48,7 @@ export const meta = {
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
-      ![New Project](/docs/img/redwoodjs-qs-connection-strings-pool.png)
+      ![pooled connection for redwoodjs](/docs/img/guides/getting-started/quickstarts/redwoodjs/pooled-connection-strings.png)
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
@@ -86,28 +90,22 @@ export const meta = {
 
   <StepHikeCompact.Step step={5}>
     <StepHikeCompact.Details title="Configure Environment Variables">
+
       In your `.env` file, add the following environment variables for your database connection:
 
-      * The `DIRECT_URL` should use the `Connection String` from your Supabase project. Hint: the port is `5432`.
+      * The `DIRECT_URL` should use the Transaction mode connection string you copied in Step 1.
 
-      * The `DATABASE_URL` should use the `Connection Pooling / Connection String` from your Supabase project. Hint: the port is `6432`.
+      * The `DATABASE_URL` should use the Session mode connection string you copied in Step 1.
 
-      <Admonition type="note">
-
-        Be sure to append `?pgbouncer=true` to the end of the `DATABASE_URL` connection string.
-
-        Also, replace `[YOUR-PASSWORD]` and `[YOUR-PROJECT-REF]` with the password you used when creating your Supabase project and the project reference from the URL in your browser.
-
-      </Admonition>
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
       ```bash .env
-      # PostgreSQL connection string used for migrations
-      DIRECT_URL="postgres://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres"
+      # Transaction mode connection string used for migrations
+      DIRECT_URL="postgres://postgres.[project-ref]:[db-password]@xxx.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1"
 
-      # PostgreSQL connection string with pgBouncer config — used by Prisma Client
-      DATABASE_URL="postgres://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:6543/postgres?pgbouncer=true"
+      # Session mode connection string — used by Prisma Client
+      DATABASE_URL="postgres://postgres.[project-ref]:[db-password]@xxx.pooler.supabase.com:5432/postgres"
       ```
     </StepHikeCompact.Code>
 
@@ -238,7 +236,7 @@ export const meta = {
       ![RedwoodJS Splash Page](/docs/img/redwoodjs-qs-countries-ui.png)
     </StepHikeCompact.Code>
 
-  </StepHikeCompact.Step>  
+  </StepHikeCompact.Step>
 </StepHikeCompact>
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} hideToc={true} />

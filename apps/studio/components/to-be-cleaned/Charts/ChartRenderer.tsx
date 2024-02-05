@@ -41,8 +41,8 @@ const Header = ({
   let FOCUS_FORMAT = customDateFormat
     ? customDateFormat
     : format == '%'
-    ? DATE_FORMAT__WITH_TIME
-    : DATE_FORMAT__DATE_ONLY
+      ? DATE_FORMAT__WITH_TIME
+      : DATE_FORMAT__DATE_ONLY
 
   let title = ''
 

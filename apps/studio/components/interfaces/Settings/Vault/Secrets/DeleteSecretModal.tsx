@@ -1,22 +1,36 @@
 import { useState } from 'react'
 import { Modal } from 'ui'
 
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useVaultSecretDeleteMutation } from 'data/vault/vault-secret-delete-mutation'
 import { useStore } from 'hooks'
 import { VaultSecret } from 'types'
 
 interface DeleteSecretModalProps {
-  selectedSecret: VaultSecret
+  selectedSecret: VaultSecret | undefined
   onClose: () => void
 }
 
 const DeleteSecretModal = ({ selectedSecret, onClose }: DeleteSecretModalProps) => {
-  const { vault, ui } = useStore()
+  const { ui } = useStore()
+  const { project } = useProjectContext()
 
   const [isDeleting, setIsDeleting] = useState(false)
 
+  const { mutateAsync: deleteSecret } = useVaultSecretDeleteMutation()
+
   const onConfirmDeleteSecret = async () => {
+    if (!project) return console.error('Project is required')
+
     setIsDeleting(true)
-    const res = await vault.deleteSecret(selectedSecret.id)
+    if (!selectedSecret) {
+      return
+    }
+    const res = await deleteSecret({
+      projectRef: project.ref,
+      connectionString: project?.connectionString,
+      id: selectedSecret.id,
+    })
     if (res.error) {
       ui.setNotification({
         error: res.error,

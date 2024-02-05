@@ -10,6 +10,7 @@ import {
   Button,
   Checkbox,
   IconAlertCircle,
+  IconAlertTriangle,
   IconExternalLink,
   IconPlus,
   Input,
@@ -17,13 +18,12 @@ import {
   Toggle,
 } from 'ui'
 
-import { Dictionary } from 'types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { usePostgresTypesQuery } from 'data/database/types-query'
-import { useStore } from 'hooks'
 import { EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
+import { Dictionary } from 'types'
 import { ForeignKeySelector } from '..'
 import ActionBar from '../ActionBar'
 import { TEXT_TYPES } from '../SidePanelEditor.constants'
@@ -72,7 +72,6 @@ const ColumnEditor = ({
   updateEditorDirty = noop,
 }: ColumnEditorProps) => {
   const { ref } = useParams()
-  const { vault } = useStore()
   const { project } = useProjectContext()
 
   const [errors, setErrors] = useState<Dictionary<any>>({})
@@ -94,8 +93,6 @@ const ColumnEditor = ({
   })
   const foreignKeyMeta = data || []
 
-  const keys = vault.listKeys()
-
   const isNewRecord = column === undefined
   const originalForeignKey = column
     ? getColumnForeignKey(column, selectedTable, foreignKeyMeta)
@@ -105,7 +102,7 @@ const ColumnEditor = ({
     if (visible) {
       setErrors({})
       const columnFields = isNewRecord
-        ? { ...generateColumnField(), keyId: keys.length > 0 ? keys[0].id : 'create-new' }
+        ? generateColumnField()
         : generateColumnFieldFromPostgresColumn(column!, selectedTable, foreignKeyMeta)
       setColumnFields(columnFields)
     }
@@ -391,6 +388,35 @@ const ColumnEditor = ({
                       Learn more
                     </Link>
                   </Button>
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
+            </FormSectionContent>
+          </FormSection>
+          <SidePanel.Separator />
+
+          {/* TODO: need to pull column privileges in here
+          if any columns are using column-level privileges, show this warning */}
+          <FormSection
+            header={
+              <FormSectionLabel className="lg:!col-span-4">Column privileges</FormSectionLabel>
+            }
+          >
+            <FormSectionContent loading={false} className="lg:!col-span-8">
+              <Alert_Shadcn_ variant="warning">
+                <IconAlertTriangle strokeWidth={2} />
+                <AlertTitle_Shadcn_>This table uses column-privileges</AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_>
+                  <p>
+                    Several columns in this table have column-level privileges. This new column will
+                    have privileges set to on by default.
+                  </p>
+                  <p className="mt-3">
+                    <Link href={`/project/${ref}/database/privileges`} passHref>
+                      <Button asChild type="default" size="tiny">
+                        <a>Column-level privileges</a>
+                      </Button>
+                    </Link>
+                  </p>
                 </AlertDescription_Shadcn_>
               </Alert_Shadcn_>
             </FormSectionContent>

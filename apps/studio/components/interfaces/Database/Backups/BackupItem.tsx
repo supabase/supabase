@@ -74,7 +74,7 @@ const BackupItem = ({ index, isHealthy, backup, projectRef, onSelectBackup }: Ba
       }`}
     >
       <p className="text-sm text-foreground ">{generateBackupName(backup)}</p>
-      <div className="">{generateSideButtons(backup)}</div>
+      <div>{generateSideButtons(backup)}</div>
     </div>
   )
 }

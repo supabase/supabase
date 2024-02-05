@@ -75,8 +75,8 @@ const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) =
                     const href = router.pathname.includes('[slug]')
                       ? router.pathname.replace('[slug]', org.slug)
                       : isNewNav
-                      ? `/org/${org.slug}`
-                      : `/org/${org.slug}/general`
+                        ? `/org/${org.slug}`
+                        : `/org/${org.slug}/general`
                     return (
                       <CommandItem_Shadcn_
                         key={org.slug}

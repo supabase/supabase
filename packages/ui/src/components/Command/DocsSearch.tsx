@@ -39,6 +39,7 @@ const questions = [
 export enum PageType {
   Markdown = 'markdown',
   Reference = 'reference',
+  Integration = 'partner-integration',
   GithubDiscussion = 'github-discussions',
 }
 
@@ -218,19 +219,39 @@ function reducer(state: SearchState, action: Action): SearchState {
 const DocsSearch = () => {
   const [state, dispatch] = useReducer(reducer, { status: 'initial', key: 0 })
   const supabaseClient = useSupabaseClient()
-  const { search, setSearch, inputRef, site } = useCommandMenu()
+  const { search, setSearch, inputRef, site, setIsOpen } = useCommandMenu()
   const key = useRef(0)
   const initialLoad = useRef(true)
   const router = useRouter()
 
-  function openLink(pageType: PageType, link: string) {
+  async function openLink(pageType: PageType, link: string) {
     switch (pageType) {
       case PageType.Markdown:
       case PageType.Reference:
-        const docsLink = site === 'docs' ? link : `https://supabase.com/docs${link}`
-        return router.push(docsLink)
+        if (site === 'docs') {
+          await router.push(link)
+          return setIsOpen(false)
+        } else if (site === 'website') {
+          await router.push(`/docs${link}`)
+          setIsOpen(false)
+        } else {
+          window.open(`https://supabase.com/docs${link}`, '_blank')
+          setIsOpen(false)
+        }
+        break
+      case PageType.Integration:
+        if (site === 'website') {
+          router.push(link)
+          setIsOpen(false)
+        } else {
+          window.open(`https://supabase.com${link}`, '_blank')
+          setIsOpen(false)
+        }
+        break
       case PageType.GithubDiscussion:
-        return window.open(link, '_blank')
+        window.open(link, '_blank')
+        setIsOpen(false)
+        break
       default:
         throw new Error(`Unknown page type '${pageType}'`)
     }
@@ -520,6 +541,7 @@ export function formatPageUrl(page: Page) {
   switch (page.type) {
     case PageType.Markdown:
     case PageType.Reference:
+    case PageType.Integration:
     case PageType.GithubDiscussion:
       return page.path
     default:
@@ -534,6 +556,9 @@ export function formatSectionUrl(page: Page, section: PageSection) {
       return `${formatPageUrl(page)}#${section.slug ?? ''}`
     case PageType.Reference:
       return `${formatPageUrl(page)}/${section.slug ?? ''}`
+    case PageType.Integration:
+      // [Charis] Markdown headings on integrations pages don't have slugs yet
+      return formatPageUrl(page)
     default:
       throw new Error(`Unknown page type '${page.type}'`)
   }
@@ -543,6 +568,7 @@ export function getPageIcon(page: Page) {
   switch (page.type) {
     case PageType.Markdown:
     case PageType.Reference:
+    case PageType.Integration:
       return <IconBook strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
     case PageType.GithubDiscussion:
       return <IconGitHub strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
@@ -555,6 +581,7 @@ export function getPageSectionIcon(page: Page) {
   switch (page.type) {
     case PageType.Markdown:
     case PageType.Reference:
+    case PageType.Integration:
       return <IconHash strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
     case PageType.GithubDiscussion:
       return <IconMessageSquare strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />

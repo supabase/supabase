@@ -23,8 +23,9 @@ import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
-import { useCheckPermissions, useFlag, useIsFeatureEnabled, useStore } from 'hooks'
+import { useCheckPermissions, useIsFeatureEnabled, useStore } from 'hooks'
 import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
+
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useQueryClient } from '@tanstack/react-query'
 import { tableKeys } from 'data/tables/keys'
@@ -151,7 +152,6 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
             </Tooltip.Portal>
           </Tooltip.Root>
         )}
-
         {table.rls_enabled ? (
           <div className="flex items-center gap-1">
             {policies.length < 1 ? (

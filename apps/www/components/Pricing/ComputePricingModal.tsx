@@ -61,8 +61,9 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
               <p className="text-sm">
                 Compute instances are billed hourly and you can scale up or down at any time if you
                 need extra performance. You'll only be charged at the end of the month for the hours
-                you've used. Paid plans come with $10 in Compute Credits to cover one Starter
-                instance or parts of any other instance. Read more on{' '}
+                you've used. Paid plans come with $10 in Compute Credits to cover one Micro instance
+                or parts of any other instance. Compute Credits are given to you not only for the
+                first month but for every month while you are on a paid plan. Read more on{' '}
                 <Link
                   href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
                   target="_blank"
@@ -86,7 +87,7 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
         <div className="p-5">
           <table className="text-foreground m-0 hidden w-full table-auto overflow-hidden rounded-b lg:table text-xs">
             <thead>
-              <tr className="">
+              <tr>
                 {columnNames.map((column) => (
                   <th key={column.key} className="p-3 text-left font-medium">
                     {column.title}
@@ -98,9 +99,9 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
               {pricingAddOn.database.rows.map((row, i) => (
                 <Fragment key={`row-${i}`}>
                   {i === 0 && (
-                    <tr className="">
+                    <tr>
                       <td className="pb-1 bg-border-strong px-3 py-1 -mr-1 border-l-4 border-strong">
-                        <span className="">First instance is free on paid plans</span>
+                        <span>First instance is free on paid plans</span>
                       </td>
                     </tr>
                   )}

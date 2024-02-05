@@ -1,17 +1,21 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'data/fetchers'
-import { useCallback } from 'react'
 import { ResponseError } from 'types'
 import { databaseKeys } from './keys'
+import { components } from 'data/api'
 
 export type PoolingConfigurationVariables = {
-  projectRef: string
+  projectRef?: string
 }
+
+export type PoolingConfiguration = components['schemas']['PgbouncerConfigResponse']
 
 export async function getPoolingConfiguration(
   { projectRef }: PoolingConfigurationVariables,
   signal?: AbortSignal
 ) {
+  if (!projectRef) throw new Error('Project ref is required')
+
   const { data, error } = await get(`/platform/projects/{ref}/config/pgbouncer`, {
     params: { path: { ref: projectRef } },
     signal,
@@ -38,15 +42,3 @@ export const usePoolingConfigurationQuery = <TData = PoolingConfigurationData>(
       ...options,
     }
   )
-
-export const usePoolingConfigurationPrefetch = ({ projectRef }: PoolingConfigurationVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (projectRef) {
-      client.prefetchQuery(databaseKeys.poolingConfiguration(projectRef), ({ signal }) =>
-        getPoolingConfiguration({ projectRef }, signal)
-      )
-    }
-  }, [projectRef])
-}

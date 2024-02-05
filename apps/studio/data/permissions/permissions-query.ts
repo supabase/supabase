@@ -1,5 +1,4 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
-import { useCallback } from 'react'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { get } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
@@ -32,11 +31,3 @@ export const usePermissionsQuery = <TData = PermissionsData>(
       staleTime: 30 * 60 * 1000,
     }
   )
-
-export const usePermissionsPrefetch = () => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    client.prefetchQuery(permissionKeys.list(), ({ signal }) => getPermissions(signal))
-  }, [])
-}

@@ -33,8 +33,8 @@ const PolicyDetails = ({ policy, showDetails, toggleShowDetails }: PolicyDetails
           />
         </div>
       </CollapsibleTrigger_Shadcn_>
-      <CollapsibleContent_Shadcn_ className="pl-[3.6rem] my-2 grid gap-1.5">
-        <div className="flex">
+      <CollapsibleContent_Shadcn_ className="pl-[3.6rem] grid gap-1.5">
+        <div className="flex my-2">
           <div>
             <div className="text-xs flex items-start space-x-2 border-b py-1.5">
               <p className="w-[110px] text-foreground-light">Name:</p>

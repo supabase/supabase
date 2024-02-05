@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { CalculatedColumn } from 'react-data-grid'
 import { ColumnType, SupaColumn, SupaRow, SupaTable } from '../types'
 import {
@@ -40,10 +39,13 @@ export const ESTIMATED_CHARACTER_PIXEL_WIDTH = 9
 export function getGridColumns(
   table: SupaTable,
   options?: {
+    projectRef?: string
+    tableId?: string
     editable?: boolean
     defaultWidth?: string | number
     onAddColumn?: () => void
     onExpandJSONEditor: (column: string, row: SupaRow) => void
+    onExpandTextEditor: (column: string, row: SupaRow) => void
   }
 ): any[] {
   const columns = table.columns.map((x, idx) => {
@@ -54,8 +56,8 @@ export function getGridColumns(
     const columnWidth = options?.defaultWidth
       ? options.defaultWidth
       : columnDefaultWidth < columnWidthBasedOnName
-      ? columnWidthBasedOnName
-      : columnDefaultWidth
+        ? columnWidthBasedOnName
+        : columnDefaultWidth
 
     const columnDefinition: CalculatedColumn<SupaRow> = {
       key: x.name,
@@ -79,9 +81,18 @@ export function getGridColumns(
         />
       ),
       renderEditCell: options
-        ? getColumnEditor(x, columnType, options?.editable ?? false, options.onExpandJSONEditor)
+        ? getCellEditor(
+            x,
+            columnType,
+            options?.editable ?? false,
+            options.onExpandJSONEditor,
+            options.onExpandTextEditor
+          )
         : undefined,
-      renderCell: getColumnFormatter(x, columnType),
+      renderCell: getCellRenderer(x, columnType, {
+        projectRef: options?.projectRef,
+        tableId: options?.tableId,
+      }),
 
       // [Next 18 Refactor] Double check if this is correct
       parent: undefined,
@@ -101,11 +112,12 @@ export function getGridColumns(
   return gridColumns
 }
 
-function getColumnEditor(
+function getCellEditor(
   columnDefinition: SupaColumn,
   columnType: ColumnType,
   isEditable: boolean,
-  onExpandJSONEditor: (column: string, row: any) => void
+  onExpandJSONEditor: (column: string, row: any) => void,
+  onExpandTextEditor: (column: string, row: any) => void
 ) {
   if (!isEditable) {
     if (['array', 'json'].includes(columnType)) {
@@ -115,7 +127,9 @@ function getColumnEditor(
       )
     } else if (!['number', 'boolean'].includes(columnType)) {
       // eslint-disable-next-line react/display-name
-      return (p: any) => <TextEditor {...p} isEditable={isEditable} />
+      return (p: any) => (
+        <TextEditor {...p} isEditable={isEditable} onExpandEditor={onExpandTextEditor} />
+      )
     } else {
       return
     }
@@ -143,7 +157,9 @@ function getColumnEditor(
         return { label: x, value: x }
       })
       // eslint-disable-next-line react/display-name
-      return (p: any) => <SelectEditor {...p} options={options} />
+      return (p: any) => (
+        <SelectEditor {...p} options={options} isNullable={columnDefinition.isNullable} />
+      )
     }
     case 'array':
     case 'json': {
@@ -157,7 +173,12 @@ function getColumnEditor(
     case 'text': {
       // eslint-disable-next-line react/display-name
       return (p: any) => (
-        <TextEditor {...p} isEditable={isEditable} isNullable={columnDefinition.isNullable} />
+        <TextEditor
+          {...p}
+          isEditable={isEditable}
+          isNullable={columnDefinition.isNullable}
+          onExpandEditor={onExpandTextEditor}
+        />
       )
     }
     default: {
@@ -166,7 +187,11 @@ function getColumnEditor(
   }
 }
 
-function getColumnFormatter(columnDef: SupaColumn, columnType: ColumnType) {
+function getCellRenderer(
+  columnDef: SupaColumn,
+  columnType: ColumnType,
+  metadata: { projectRef?: string; tableId?: string }
+) {
   switch (columnType) {
     case 'boolean': {
       return BooleanFormatter
@@ -175,7 +200,10 @@ function getColumnFormatter(columnDef: SupaColumn, columnType: ColumnType) {
       if (columnDef.isPrimaryKey || !columnDef.isUpdatable) {
         return DefaultFormatter
       } else {
-        return ForeignKeyFormatter
+        // eslint-disable-next-line react/display-name
+        return (p: any) => (
+          <ForeignKeyFormatter {...p} projectRef={metadata.projectRef} tableId={metadata.tableId} />
+        )
       }
     }
     case 'json': {

@@ -217,6 +217,7 @@ const Policies = ({
       )}
 
       <PolicyEditorModal
+        showAssistantPreview
         visible={!isEmpty(selectedSchemaAndTable)}
         schema={selectedSchemaAndTable.schema}
         table={selectedSchemaAndTable.table}

@@ -1,7 +1,7 @@
-import ConsentToast from '@ui/components/ConsentToast'
 import { LOCAL_STORAGE_KEYS, handlePageTelemetry, isBrowser, useTelemetryProps } from 'common'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'react-hot-toast'
+import ConsentToast from '../components/ConsentToast/ConsentToast'
 
 /*
   reference https://usehooks.com/useOnClickOutside/
@@ -80,6 +80,8 @@ export const useConsent = () => {
           id: 'consent-toast',
           position: 'bottom-right',
           duration: Infinity,
+          className:
+            '!w-screen !-m-4 !border-t !rounded-none !max-w-none !bg-overlay !text sm:!m-0 sm:!rounded-lg sm:!w-auto sm:!max-w-[400px] sm:border',
         }
       )
     }

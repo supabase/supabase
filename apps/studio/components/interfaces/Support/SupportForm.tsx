@@ -5,6 +5,9 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Button,
   Checkbox,
   Form,
@@ -35,6 +38,7 @@ import { CATEGORY_OPTIONS, SERVICE_OPTIONS, SEVERITY_OPTIONS } from './Support.c
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { Project } from 'data/projects/project-detail-query'
+import { HelpCircle } from 'lucide-react'
 
 const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
@@ -46,7 +50,7 @@ export interface SupportFormProps {
 const SupportForm = ({ setSentCategory }: SupportFormProps) => {
   const { ui } = useStore()
   const { isReady } = useRouter()
-  const { ref, subject, category, message } = useParams()
+  const { ref, slug, subject, category, message } = useParams()
 
   const uploadButtonRef = useRef()
   const enableFreeSupport = useFlag('enableFreeSupport')
@@ -54,6 +58,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [uploadedDataUrls, setUploadedDataUrls] = useState<string[]>([])
   const [selectedServices, setSelectedServices] = useState<string[]>([])
+  const [textAreaValue, setTextAreaValue] = useState('')
 
   const {
     data: organizations,
@@ -90,6 +95,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
 
   const projects = [...(allProjects ?? []), ...projectDefaults]
   const selectedProjectFromUrl = projects.find((project) => project.ref === ref)
+  const selectedOrganizationFromUrl = organizations?.find((org) => org.slug === slug)
   const selectedCategoryFromUrl = CATEGORY_OPTIONS.find((option) => {
     if (option.value.toLowerCase() === ((category as string) ?? '').toLowerCase()) return option
   })
@@ -98,17 +104,19 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
     selectedProjectFromUrl !== undefined
       ? selectedProjectFromUrl.ref
       : projects.length > 0
-      ? projects[0].ref
-      : 'no-project'
+        ? projects[0].ref
+        : 'no-project'
   )
 
   const selectedOrganizationSlug =
-    selectedProjectRef !== 'no-project'
-      ? organizations?.find((org) => {
-          const project = projects.find((project) => project.ref === selectedProjectRef)
-          return org.id === project?.organization_id
-        })?.slug
-      : organizations?.[0]?.slug
+    selectedOrganizationFromUrl !== undefined
+      ? selectedOrganizationFromUrl.slug
+      : selectedProjectRef !== 'no-project'
+        ? organizations?.find((org) => {
+            const project = projects.find((project) => project.ref === selectedProjectRef)
+            return org.id === project?.organization_id
+          })?.slug
+        : organizations?.[0]?.slug
 
   const { data: subscription, isLoading: isLoadingSubscription } = useOrgSubscriptionQuery({
     orgSlug: selectedOrganizationSlug,
@@ -209,6 +217,27 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
 
     submitSupportTicket(payload)
   }
+
+  const handleTextMessageChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setTextAreaValue(event.target.value)
+  }
+
+  const ipv4MigrationStrings = [
+    'ipv4',
+    'ipv6',
+    'supavisor',
+    'pgbouncer',
+    '5432',
+    'ENETUNREACH',
+    'ECONNREFUSED',
+    'P1001',
+    'connect: no route to',
+    'network is unreac',
+    'could not translate host name',
+    'address family not supported by protocol',
+  ]
+
+  const ipv4MigrationStringMatched = ipv4MigrationStrings.some((str) => textAreaValue.includes(str))
 
   return (
     <Form id="support-form" initialValues={initialValues} validate={onValidate} onSubmit={onSubmit}>
@@ -347,6 +376,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                             key={`option-${option.ref}`}
                             label={option.name || ''}
                             value={option.ref}
+                            className="!w-72"
                           >
                             <span>{option.name}</span>
                             <span className="block text-xs opacity-50">{organization?.name}</span>
@@ -362,6 +392,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                           key={`option-${option.value}`}
                           label={option.label}
                           value={option.value}
+                          className="!w-72"
                         >
                           <span>{option.label}</span>
                           <span className="block text-xs opacity-50">{option.description}</span>
@@ -650,14 +681,47 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                         />
                       </div>
                     )}
-                    <div className="text-area-text-sm px-6">
+                    <div className="text-area-text-sm px-6 grid gap-4">
                       <Input.TextArea
                         id="message"
                         label="Message"
                         placeholder="Describe the issue you're facing, along with any relevant information. Please be as detailed and specific as possible."
                         limit={5000}
                         labelOptional="5000 character limit"
+                        value={textAreaValue}
+                        onChange={(e) => handleTextMessageChange(e)}
                       />
+                      {ipv4MigrationStringMatched && (
+                        <Alert_Shadcn_ variant="default">
+                          <HelpCircle strokeWidth={2} />
+                          <AlertTitle_Shadcn_>Connection issues?</AlertTitle_Shadcn_>
+                          <AlertDescription_Shadcn_ className="grid gap-3">
+                            <p>
+                              Having trouble connecting to your project? It could be related to our
+                              migration from PGBouncer and IPv4.
+                            </p>
+                            <p>
+                              Please review this GitHub discussion. It's up to date and covers many
+                              frequently asked questions.
+                            </p>
+                            <p>
+                              <Button
+                                asChild
+                                type="default"
+                                icon={<IconExternalLink strokeWidth={1.5} />}
+                              >
+                                <Link
+                                  href="https://github.com/orgs/supabase/discussions/17817"
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  PGBouncer and IPv4 Deprecation #17817
+                                </Link>
+                              </Button>
+                            </p>
+                          </AlertDescription_Shadcn_>
+                        </Alert_Shadcn_>
+                      )}
                     </div>
                     {['Problem', 'Database_unresponsive', 'Performance'].includes(
                       values.category

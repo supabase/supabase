@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { isEqual, partition } from 'lodash'
+import { partition } from 'lodash'
 import { Globe2, Loader2, Network } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -155,6 +155,7 @@ const InstanceConfigurationUI = () => {
                 fitViewOptions={{ minZoom: 0.9, maxZoom: 1 }}
                 className="instance-configuration"
                 zoomOnPinch={false}
+                zoomOnScroll={false}
                 nodesDraggable={false}
                 nodesConnectable={false}
                 zoomOnDoubleClick={false}

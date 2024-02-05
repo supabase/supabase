@@ -46,7 +46,11 @@ PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 >
 <TabPanel id="js" label="JavaScript">
 
-Create a new `hooks.server.js` file in the root of your project and populate with the following:
+Create a new `hooks.server.js` file in the root of your project and populate with the following to retrieve the user session.
+
+The session information from `getSession` is supplied to the Supabase client so it can retrieve the auth token. This is safe, since the auth token signature will be revalidated on the Auth server. But you shouldn't trust the unsigned data that is stored alongside the auth token:
+
+<GetSessionWarning />
 
 ```js src/hooks.server.js
 // src/hooks.server.js
@@ -633,7 +637,7 @@ async function supabase({ event, resolve }) {
 
 async function authorization({ event, resolve }) {
   // protect requests to all routes that start with /protected-routes
-  if (event.url.pathname.startsWith('/protected-routes')) {
+  if (event.url.pathname.startsWith('/protected-routes') && event.request.method === 'GET') {
     const session = await event.locals.getSession()
     if (!session) {
       // the user is not signed in
@@ -695,7 +699,7 @@ async function supabase({ event, resolve }) {
 
 async function authorization({ event, resolve }) {
   // protect requests to all routes that start with /protected-routes
-  if (event.url.pathname.startsWith('/protected-routes')) {
+  if (event.url.pathname.startsWith('/protected-routes') && event.request.method === 'GET') {
     const session = await event.locals.getSession()
     if (!session) {
       // the user is not signed in

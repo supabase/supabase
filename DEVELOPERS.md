@@ -1,15 +1,25 @@
 # Developing Supabase
 
-1. [Getting started](#getting-started)
-   - [Install dependencies](#install-dependencies)
-2. [Local development](#local-development)
-   - [Fork the repo](#fork-the-repo)
-   - [Clone the repo](#clone-the-repo)
-   - [Running turborepo](#running-turborepo)
-     - [Shared components](#shared-components)
-     - [Installing packages](#installing-packages)
-   - [New Supabase docs](#new-supabase-docs)
-3. [Create a pull request](#create-a-pull-request)
+- [Developing Supabase](#developing-supabase)
+  - [Getting started](#getting-started)
+    - [Install dependencies](#install-dependencies)
+  - [Local development](#local-development)
+    - [Fork the repo](#fork-the-repo)
+    - [Clone the repo](#clone-the-repo)
+    - [Install dependencies](#install-dependencies-1)
+      - [Running sites individually](#running-sites-individually)
+      - [Shared components](#shared-components)
+      - [Installing packages](#installing-packages)
+  - [Running Docker for Supabase Studio](#running-docker-for-supabase-studio)
+      - [Prerequsites](#prerequsites)
+      - [Get Started](#get-started)
+  - [Create a pull request](#create-a-pull-request)
+  - [Issue assignment](#issue-assignment)
+  - [Common tasks](#common-tasks)
+    - [Add a redirect](#add-a-redirect)
+    - [Federated docs](#federated-docs)
+  - [Community channels](#community-channels)
+  - [Contributors](#contributors)
 
 - [Common tasks](#common-tasks)
   - [Add a redirect](#add-a-redirect)
@@ -61,7 +71,13 @@ To contribute code to [Supabase](https://supabase.com), you must fork the [Supab
    npm install # install dependencies
    ```
 
-2. After that you can run the apps simultaneously with the following.
+2. Copy the example `.env.local.example` to `.env.local`
+
+   ```sh
+   cp apps/www/.env.local.example apps/www/.env.local
+   ```
+
+3. After that you can run the apps simultaneously with the following.
    ```sh
    npm run dev # start all the applications
    ```
@@ -82,14 +98,18 @@ You can run any of the sites individually by using the scope name. For example:
 npm run dev:www
 ```
 
+Note: Particularly for `www` make sure you have copied `apps/www/.env.local.example` to `apps/www/.env.local`
+
 #### Shared components
 
 The monorepo has a set of shared components under `/packages`:
 
-- `/packages/common`: Common React components, shared between all sites.
+- `/packages/ai-commands`: Helpers/Commands for AI related functions
+- `/packages/common`: Common React components, shared between all sites
 - `/packages/config`: All shared config
-- `/packages/spec`: Generates documentation using spec files.
+- `/packages/shared-data`: Shared data that can be used across all apps
 - `/packages/tsconfig`: Shared Typescript settings
+- `/packages/ui`: Common UI components
 
 #### Installing packages
 

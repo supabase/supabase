@@ -3,7 +3,7 @@ import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
-import { Button, cn, IconPlus, IconSearch, IconX, Input, Menu } from 'ui'
+import { Button, IconPlus, IconSearch, IconX, Input, Menu, cn } from 'ui'
 
 import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
