@@ -126,7 +126,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   const helperTextClassNames = 'prose text-sm max-w-2xl text-foreground-light'
 
   return (
-    <ReportPadding>
+    <div className="p-4 py-3">
       <ReportHeader title="Query Performance" isLoading={isLoading} onRefresh={handleRefresh} />
       {tableIndexEfficiencyEnabled && (
         <Accordion
@@ -409,7 +409,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
           </Tabs.Panel>
         </Tabs>
       </div>
-    </ReportPadding>
+    </div>
   )
 }
 
@@ -427,6 +427,7 @@ function QueryPerformanceFilterBar({
   onRefreshClick: () => void
 }) {
   const router = useRouter()
+  const [searchInputVal, setSearchInputVal] = useState('')
   const defaultSearchQueryValue = router.query.search ? String(router.query.search) : ''
   const sortBy = router.query.sort ? String(router.query.sort) : 'lat_desc'
 
@@ -487,6 +488,8 @@ function QueryPerformanceFilterBar({
             size="tiny"
             placeholder="Search roles or queries"
             name="search"
+            value={searchInputVal}
+            onChange={(e) => setSearchInputVal(e.target.value)}
             defaultValue={defaultSearchQueryValue}
             autoComplete="off"
             icon={
