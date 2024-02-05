@@ -32,14 +32,15 @@ export interface Project {
 export interface ForeignProject {
   id: string
   name: string
+  installation_id?: number
 }
 
 export interface ProjectLinkerProps {
-  organizationIntegrationId: string | undefined
+  organizationIntegrationId?: string
   foreignProjects: ForeignProject[]
   supabaseProjects: Project[]
   onCreateConnections: (variables: IntegrationConnectionsCreateVariables) => void
-  installedConnections: IntegrationProjectConnection[] | undefined
+  installedConnections?: IntegrationProjectConnection[]
   isLoading?: boolean
   integrationIcon: ReactNode
   getForeignProjectIcon?: (project: ForeignProject) => ReactNode
@@ -106,7 +107,6 @@ const ProjectLinker = ({
   function onCreateConnections() {
     const projectDetails = selectedForeignProject
 
-    if (!organizationIntegrationId) return console.error('No integration ID set')
     if (!selectedForeignProject?.id) return console.error('No Foreign project ID set')
     if (!selectedSupabaseProject?.ref) return console.error('No Supabase project ref set')
 
@@ -118,7 +118,7 @@ const ProjectLinker = ({
     }
 
     _onCreateConnections({
-      organizationIntegrationId,
+      organizationIntegrationId: organizationIntegrationId!,
       connection: {
         foreign_project_id: selectedForeignProject?.id,
         supabase_project_ref: selectedSupabaseProject?.ref,
@@ -127,6 +127,11 @@ const ProjectLinker = ({
         },
       },
       orgSlug: selectedOrganization?.slug,
+      new: {
+        installation_id: selectedForeignProject.installation_id!,
+        project_id: Number(selectedSupabaseProject.id),
+        repository_id: Number(selectedForeignProject.id),
+      },
     })
   }
 

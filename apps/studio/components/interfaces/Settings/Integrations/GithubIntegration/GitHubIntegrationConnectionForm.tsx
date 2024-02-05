@@ -2,12 +2,18 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { GitBranch, RotateCcw, Shield } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import * as z from 'zod'
+
+import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
+import { useBranchesQuery } from 'data/branches/branches-query'
+import { useGitHubBranchesQuery } from 'data/integrations/github-branches-query'
+import { Integration, IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import { useSelectedProject, useStore } from 'hooks'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  cn,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
@@ -27,15 +33,8 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
+  cn,
 } from 'ui'
-import * as z from 'zod'
-
-import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
-import { useBranchesQuery } from 'data/branches/branches-query'
-import { useGithubConnectionUpdateMutation } from 'data/integrations/github-connection-update-mutate'
-import { useGitHubBranchesQuery } from 'data/integrations/github-branches-query'
-import { Integration, IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { useSelectedProject, useStore } from 'hooks'
 
 const GitHubIntegrationConnectionForm = ({
   connection,
@@ -102,28 +101,20 @@ const GitHubIntegrationConnectionForm = ({
     },
   })
 
-  const { mutate: updateGithubConnection, isLoading: isUpdatingGithubConnection } =
-    useGithubConnectionUpdateMutation({
-      onSuccess: () => {
-        ui.setNotification({ category: 'success', message: `Updated Supabase directory` })
-        setOpen(false)
-      },
-    })
-
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    const metadata = {
-      ...connection.metadata,
-      supabaseConfig: {
-        ...connection.metadata?.supabaseConfig,
-        supabaseDirectory: data.supabaseDirectory,
-      },
-    }
-
-    updateGithubConnection({
-      id: connection.id,
-      metadata,
-      organizationIntegrationId: integration.id,
-    })
+    // TODO: This functionality isn't implemented yet
+    // const metadata = {
+    //   ...connection.metadata,
+    //   supabaseConfig: {
+    //     ...connection.metadata?.supabaseConfig,
+    //     supabaseDirectory: data.supabaseDirectory,
+    //   },
+    // }
+    // updateGithubConnection({
+    //   id: connection.id,
+    //   metadata,
+    //   organizationIntegrationId: integration.id,
+    // })
   }
 
   return (
@@ -251,8 +242,8 @@ const GitHubIntegrationConnectionForm = ({
                         'text-foreground-lighter transition hover:text cursor-pointer',
                         'w-4 h-4 absolute right-3 top-3',
                         'duration-150',
-                        isUpdatingGithubConnection ||
-                          field.value !== connection.metadata?.supabaseConfig?.supabaseDirectory
+
+                        field.value !== connection.metadata?.supabaseConfig?.supabaseDirectory
                           ? 'opacity-100 transition'
                           : 'opacity-0'
                       )}
@@ -263,19 +254,15 @@ const GitHubIntegrationConnectionForm = ({
                 <Button
                   className={cn(
                     'duration-150',
-                    isUpdatingGithubConnection ||
-                      field.value !== connection.metadata?.supabaseConfig?.supabaseDirectory
+
+                    field.value !== connection.metadata?.supabaseConfig?.supabaseDirectory
                       ? 'opacity-100 transition'
                       : 'opacity-0'
                   )}
                   htmlType="submit"
                   type="secondary"
                   size="medium"
-                  loading={isUpdatingGithubConnection}
-                  disabled={
-                    field.value === connection.metadata?.supabaseConfig?.supabaseDirectory ||
-                    isUpdatingGithubConnection
-                  }
+                  disabled={field.value === connection.metadata?.supabaseConfig?.supabaseDirectory}
                 >
                   Update
                 </Button>

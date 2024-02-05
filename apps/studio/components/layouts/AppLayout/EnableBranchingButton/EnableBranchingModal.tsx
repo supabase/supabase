@@ -30,6 +30,8 @@ import GithubRepositorySelection from './GithubRepositorySelection'
 import Link from 'next/link'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import BranchingPlanNotice from './BranchingPlanNotice'
+import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
+import { useGitHubRepositoriesQuery } from 'data/integrations/github-repositories-query'
 
 const EnableBranchingModal = () => {
   const { ui } = useStore()
@@ -42,14 +44,35 @@ const EnableBranchingModal = () => {
   // and makes the validation run onChange instead. This is a workaround
   const [isValid, setIsValid] = useState(false)
 
+  // const {
+  //   data: integrations,
+  //   error: integrationsError,
+  //   isLoading: isLoadingIntegrations,
+  //   isSuccess: isSuccessIntegrations,
+  //   isError: isErrorIntegrations,
+  // } = useOrgIntegrationsQuery({
+  //   orgSlug: selectedOrg?.slug,
+  // })
+
   const {
-    data: integrations,
-    error: integrationsError,
-    isLoading: isLoadingIntegrations,
-    isSuccess: isSuccessIntegrations,
-    isError: isErrorIntegrations,
-  } = useOrgIntegrationsQuery({
-    orgSlug: selectedOrg?.slug,
+    data: repositories,
+    error: repositoriesError,
+    isLoading: isLoadingRepositories,
+    isSuccess: isSuccessRepositories,
+    isError: isErrorRepositories,
+  } = useGitHubRepositoriesQuery()
+
+  console.log('repositories:', repositories)
+
+  // [Alaister]: temp override with <any> until the typegen is fixed
+  const {
+    data: connections,
+    error: connectionsError,
+    isLoading: isLoadingConnections,
+    isSuccess: isSuccessConnections,
+    isError: isErrorConnections,
+  } = useGitHubConnectionsQuery<any[]>({
+    organizationId: selectedOrg?.id,
   })
 
   const {
@@ -71,17 +94,7 @@ const EnableBranchingModal = () => {
   const hasPitrEnabled =
     (addons?.selected_addons ?? []).find((addon) => addon.type === 'pitr') !== undefined
 
-  const hasGithubIntegrationInstalled =
-    integrations?.some((integration) => integration.integration.name === 'GitHub') ?? false
-  console.log('integrations:', integrations)
-  const githubIntegration = integrations?.find(
-    (integration) =>
-      integration.integration.name === 'GitHub' &&
-      integration.organization.slug === selectedOrg?.slug
-  )
-  const githubConnection = githubIntegration?.connections.find(
-    (connection) => connection.supabase_project_ref === ref
-  )
+  const githubConnection = connections?.find((connection) => connection.project_id === ref)
   const [repoOwner, repoName] = githubConnection?.metadata.name.split('/') ?? []
 
   const { mutateAsync: checkGithubBranchValidity, isLoading: isChecking } =
@@ -102,12 +115,12 @@ const EnableBranchingModal = () => {
       .refine(async (val) => {
         try {
           if (val.length > 0) {
-            await checkGithubBranchValidity({
-              organizationIntegrationId: githubIntegration?.id,
-              repoOwner,
-              repoName,
-              branchName: val,
-            })
+            // await checkGithubBranchValidity({
+            //   organizationIntegrationId: githubIntegration?.id,
+            //   repoOwner,
+            //   repoName,
+            //   branchName: val,
+            // })
             setIsValid(true)
           }
           return true
@@ -124,9 +137,9 @@ const EnableBranchingModal = () => {
     defaultValues: { branchName: '' },
   })
 
-  const isLoading = isLoadingIntegrations || isLoadingUpgradeEligibility
-  const isError = isErrorIntegrations || isErrorUpgradeEligibility
-  const isSuccess = isSuccessIntegrations && isSuccessUpgradeEligibility
+  const isLoading = isLoadingRepositories || isLoadingUpgradeEligibility
+  const isError = isErrorRepositories || isErrorUpgradeEligibility
+  const isSuccess = isSuccessRepositories && isSuccessUpgradeEligibility
 
   const canSubmit = form.getValues('branchName').length > 0 && !isChecking && isValid
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
@@ -189,10 +202,10 @@ const EnableBranchingModal = () => {
               <>
                 <Modal.Separator />
                 <Modal.Content className="px-7 py-6">
-                  {isErrorIntegrations ? (
+                  {isErrorRepositories ? (
                     <AlertError
-                      error={integrationsError}
-                      subject="Failed to retrieve integrations"
+                      error={repositoriesError}
+                      subject="Failed to retrieve repositories"
                     />
                   ) : isErrorUpgradeEligibility ? (
                     <AlertError
@@ -217,8 +230,6 @@ const EnableBranchingModal = () => {
                       form={form}
                       isChecking={isChecking}
                       isValid={canSubmit}
-                      integration={githubIntegration}
-                      hasGithubIntegrationInstalled={hasGithubIntegrationInstalled}
                     />
                     {!hasPitrEnabled && <BranchingPITRNotice />}
                   </>

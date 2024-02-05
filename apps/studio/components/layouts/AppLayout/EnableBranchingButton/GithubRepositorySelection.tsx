@@ -26,46 +26,30 @@ interface GithubRepositorySelectionProps {
   form: any
   isChecking: boolean
   isValid: boolean
-  integration?: Integration
-  hasGithubIntegrationInstalled: boolean
 }
 
 const GithubRepositorySelection = ({
   form,
   isChecking,
   isValid,
-  integration,
-  hasGithubIntegrationInstalled,
 }: GithubRepositorySelectionProps) => {
   const { ref } = useParams()
   const org = useSelectedOrganization()
-
-  const githubConnection = integration?.connections.find(
-    (connection) => connection.supabase_project_ref === ref
-  )
 
   const sidePanels = useSidePanelsStateSnapshot()
   const githubIntegrationAppUrl =
     process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
       ? `https://github.com/apps/supabase/installations/new?state=${ref}`
       : process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-        ? `https://github.com/apps/supabase-staging/installations/new?state=${ref}`
-        : `https://github.com/apps/supabase-local-testing/installations/new?state=${ref}`
+      ? `https://github.com/apps/supabase-staging/installations/new?state=${ref}`
+      : `https://github.com/apps/supabase-local-testing/installations/new?state=${ref}`
 
   function onSelectConnectRepo() {
-    if (integration) {
-      sidePanels.setGithubConnectionsOpen(true)
-      sidePanels.setGithubConnectionsIntegrationId(integration.id)
-    }
+    sidePanels.setGithubConnectionsOpen(true)
   }
 
   return (
-    <div
-      className={clsx(
-        'border-t border-b',
-        !hasGithubIntegrationInstalled ? 'border-warning-300 bg-warning-200' : ''
-      )}
-    >
+    <div className="border-t border-b">
       <Modal.Content className="px-7">
         <div className="py-6">
           <div className="flex items-center space-x-2">
@@ -73,23 +57,17 @@ const GithubRepositorySelection = ({
             <Badge color="amber">Required</Badge>
           </div>
           <p className="text-sm text-foreground-light !mb-4">
-            {githubConnection !== undefined
-              ? 'Your database preview branches will be based on the branches in the following repository that your project is connected with:'
-              : 'Your database preview branches will be based on the branches in the Git repository that your project is connected with.'}
+            Your database preview branches will be based on the branches in the following repository
+            that your project is connected with:
           </p>
-          {!hasGithubIntegrationInstalled && (
-            <Button asChild type="default" className="!mt-3">
-              <Link href={githubIntegrationAppUrl}>Install Github Integration</Link>
-            </Button>
-          )}
-          {hasGithubIntegrationInstalled && !githubConnection && (
-            <EmptyIntegrationConnection
-              showNode={false}
-              onClick={() => onSelectConnectRepo()}
-              orgSlug={org?.slug}
-            />
-          )}
-          {integration && githubConnection && (
+
+          <EmptyIntegrationConnection
+            showNode={false}
+            onClick={() => onSelectConnectRepo()}
+            orgSlug={org?.slug}
+          />
+
+          {/* {integration && githubConnection && (
             <>
               <ul className="mb-3">
                 <IntegrationConnection
@@ -129,7 +107,7 @@ const GithubRepositorySelection = ({
                 )}
               />
             </>
-          )}
+          )} */}
         </div>
       </Modal.Content>
     </div>

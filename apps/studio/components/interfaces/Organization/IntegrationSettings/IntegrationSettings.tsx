@@ -1,12 +1,8 @@
 import { useCallback } from 'react'
 
-import {
-  EmptyIntegrationConnection,
-  IntegrationConnectionHeader,
-  IntegrationInstallation,
-} from 'components/interfaces/Integrations/IntegrationPanels'
-import VercelSection from 'components/interfaces/Settings/Integrations/VercelIntegration/VercelSection'
+import { EmptyIntegrationConnection } from 'components/interfaces/Integrations/IntegrationPanels'
 import { Markdown } from 'components/interfaces/Markdown'
+import VercelSection from 'components/interfaces/Settings/Integrations/VercelIntegration/VercelSection'
 import {
   ScaffoldContainer,
   ScaffoldDivider,
@@ -14,17 +10,17 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
-import { useIntegrationsGitHubInstalledConnectionDeleteMutation } from 'data/integrations/integrations-github-connection-delete-mutation'
-import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
+import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
+import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-connection-delete-mutation'
 import { IntegrationName, IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedOrganization, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
-import { pluralize } from 'lib/helpers'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
+import { Button, IconExternalLink } from 'ui'
 import { IntegrationConnectionItem } from '../../Integrations/IntegrationConnection'
 import SidePanelGitHubRepoLinker from './SidePanelGitHubRepoLinker'
 import SidePanelVercelProjectLinker from './SidePanelVercelProjectLinker'
-import { Button, IconExternalLink } from 'ui'
 
 const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
   return (
@@ -39,41 +35,41 @@ const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
 const IntegrationSettings = () => {
   const { ui } = useStore()
   const org = useSelectedOrganization()
-  const { data } = useOrgIntegrationsQuery({ orgSlug: org?.slug })
+  // [Alaister]: temp override with <any> until the typegen is fixed
+  const { data: connections } = useGitHubConnectionsQuery<any>({ organizationId: org?.id })
+
+  const { data: projects } = useProjectsQuery()
+  const projectIdsToRef = Object.fromEntries(
+    projects?.map((project) => [project.id, project.ref]) ?? []
+  )
+
   const sidePanelsStateSnapshot = useSidePanelsStateSnapshot()
 
-  const { mutate: deleteGitHubConnection } = useIntegrationsGitHubInstalledConnectionDeleteMutation(
-    {
-      onSuccess: () => {
-        ui.setNotification({
-          category: 'success',
-          message: 'Successfully deleted Github connection',
-        })
-      },
-    }
-  )
-
-  const githubIntegrations = data?.filter(
-    (integration) => integration.integration.name === 'GitHub'
-  )
-
-  const onAddGitHubConnection = useCallback(
-    (integrationId: string) => {
-      sidePanelsStateSnapshot.setGithubConnectionsIntegrationId(integrationId)
-      sidePanelsStateSnapshot.setGithubConnectionsOpen(true)
+  const { mutate: deleteGitHubConnection } = useGitHubConnectionDeleteMutation({
+    onSuccess: () => {
+      ui.setNotification({
+        category: 'success',
+        message: 'Successfully deleted Github connection',
+      })
     },
-    [sidePanelsStateSnapshot]
-  )
+  })
+
+  const onAddGitHubConnection = useCallback(() => {
+    sidePanelsStateSnapshot.setGithubConnectionsOpen(true)
+  }, [sidePanelsStateSnapshot])
 
   const onDeleteGitHubConnection = useCallback(
     async (connection: IntegrationProjectConnection) => {
+      if (!org?.id) {
+        throw new Error('Organization not found')
+      }
+
       deleteGitHubConnection({
         connectionId: connection.id,
-        integrationId: connection.organization_integration_id,
-        orgSlug: org?.slug,
+        organizationId: org.id,
       })
     },
-    [deleteGitHubConnection, org?.slug]
+    [deleteGitHubConnection, org?.id]
   )
 
   /**
@@ -146,7 +142,7 @@ The GitHub app will watch for changes in your repository such as file changes, b
           >
             Install GitHub Integration
           </Button>
-          {githubIntegrations &&
+          {/* {githubIntegrations &&
             githubIntegrations.length > 0 &&
             githubIntegrations.map((integration, i) => {
               const ConnectionHeaderTitle = `${integration.connections.length} project ${pluralize(
@@ -163,16 +159,6 @@ The GitHub app will watch for changes in your repository such as file changes, b
                         title={ConnectionHeaderTitle}
                         markdown={`Repository connections for GitHub`}
                       />
-                      <ul className="flex flex-col">
-                        {integration.connections.map((connection) => (
-                          <IntegrationConnectionItem
-                            key={connection.id}
-                            connection={connection}
-                            type={'GitHub' as IntegrationName}
-                            onDeleteConnection={onDeleteGitHubConnection}
-                          />
-                        ))}
-                      </ul>
                     </>
                   ) : (
                     <IntegrationConnectionHeader
@@ -182,15 +168,37 @@ The GitHub app will watch for changes in your repository such as file changes, b
                       )} Repository connections for GitHub`}
                     />
                   )}
-                  <EmptyIntegrationConnection
-                    onClick={() => onAddGitHubConnection(integration.id)}
-                    orgSlug={org?.slug}
-                  >
-                    Add new project connection
-                  </EmptyIntegrationConnection>
                 </div>
               )
-            })}
+            })} */}
+          <ul className="flex flex-col">
+            {connections?.map((connection: any) => (
+              <IntegrationConnectionItem
+                key={connection.id}
+                connection={{
+                  id: String(connection.id),
+                  added_by: {
+                    id: String(1),
+                    username: 'placeholder',
+                    primary_email: 'placeholder@supabase.io',
+                  },
+                  foreign_project_id: String(connection.repository.id),
+                  supabase_project_ref: projectIdsToRef[connection.project_id],
+                  organization_integration_id: 'unused',
+                  inserted_at: connection.inserted_at,
+                  updated_at: connection.updated_at,
+                  metadata: {
+                    name: connection.repository.name,
+                  } as any,
+                }}
+                type={'GitHub' as IntegrationName}
+                onDeleteConnection={onDeleteGitHubConnection}
+              />
+            ))}
+          </ul>
+          <EmptyIntegrationConnection onClick={onAddGitHubConnection} orgSlug={org?.slug}>
+            Add new project connection
+          </EmptyIntegrationConnection>
         </ScaffoldSectionContent>
       </ScaffoldSection>
     </ScaffoldContainer>

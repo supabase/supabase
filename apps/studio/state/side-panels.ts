@@ -23,11 +23,6 @@ export const sidePanelsState = proxy({
   setGithubConnectionsOpen: (bool: boolean) => {
     sidePanelsState.githubConnectionsOpen = bool
   },
-  // ID to determine which github integration installation to use
-  githubConnectionsIntegrationId: undefined as undefined | string,
-  setGithubConnectionsIntegrationId: (id: string) => {
-    sidePanelsState.githubConnectionsIntegrationId = id
-  },
 })
 
 export const getSidePanelsState = () => snapshot(sidePanelsState)

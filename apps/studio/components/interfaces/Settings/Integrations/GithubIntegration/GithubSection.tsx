@@ -13,7 +13,7 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
-import { useIntegrationsGitHubInstalledConnectionDeleteMutation } from 'data/integrations/integrations-github-connection-delete-mutation'
+import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-connection-delete-mutation'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { IntegrationName, IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
@@ -50,26 +50,28 @@ const GitHubSection = () => {
     (integration) => integration.integration.name === 'GitHub'
   )
 
-  const { mutate: deleteGitHubConnection } = useIntegrationsGitHubInstalledConnectionDeleteMutation(
-    {
-      onSuccess: () => {
-        ui.setNotification({
-          category: 'success',
-          message: 'Successfully deleted Github connection',
-        })
-      },
-    }
-  )
+  const { mutate: deleteGitHubConnection } = useGitHubConnectionDeleteMutation({
+    onSuccess: () => {
+      ui.setNotification({
+        category: 'success',
+        message: 'Successfully deleted Github connection',
+      })
+    },
+  })
 
   const onDeleteGitHubConnection = useCallback(
     async (connection: IntegrationProjectConnection) => {
+      if (!org?.id) {
+        throw new Error('Organization not found')
+      }
+
       deleteGitHubConnection({
         connectionId: connection.id,
-        integrationId: connection.organization_integration_id,
-        orgSlug: org?.slug,
+        organizationId: org.id,
+        // integrationId: connection.organization_integration_id,
       })
     },
-    [deleteGitHubConnection, org?.slug]
+    [deleteGitHubConnection, org?.id]
   )
 
   return (

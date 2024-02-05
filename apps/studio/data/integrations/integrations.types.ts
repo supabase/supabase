@@ -248,6 +248,20 @@ export type IntegrationConnectionsCreateVariables = {
     metadata: any
   }
   orgSlug: string | undefined
+  new: {
+    installation_id: number
+    project_id: number
+    repository_id: number
+  }
+}
+
+export type GitHubConnectionCreateVariables = {
+  organizationId: number
+  connection: {
+    installation_id: number
+    project_id: number
+    repository_id: number
+  }
 }
 
 export type UpdateConnectionPayload = {
