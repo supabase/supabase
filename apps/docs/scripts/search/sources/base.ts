@@ -12,7 +12,10 @@ export type Section = {
 export abstract class BaseLoader {
   type: string
 
-  constructor(public source: string, public path: string) {}
+  constructor(
+    public source: string,
+    public path: string
+  ) {}
 
   abstract load(): Promise<BaseSource[]>
 }
@@ -23,7 +26,10 @@ export abstract class BaseSource {
   meta?: Json
   sections?: Section[]
 
-  constructor(public source: string, public path: string) {}
+  constructor(
+    public source: string,
+    public path: string
+  ) {}
 
   abstract process(): { checksum: string; meta?: Json; ragIgnore?: boolean; sections: Section[] }
 
