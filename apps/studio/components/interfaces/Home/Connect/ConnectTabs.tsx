@@ -2,24 +2,30 @@ import { Tabs_Shadcn_ } from 'ui'
 import { FileJson2 } from 'lucide-react'
 import { TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 import { TabsContent_Shadcn_ } from 'ui'
+import React, { ReactNode } from 'react'
 
 interface ConnectTabTriggerProps {
   value: string
 }
 interface ConnectTabTriggersProps {
-  children: any
+  children: ReactNode[]
 }
 
 interface ConnectFileTabProps {
-  children: any
+  children: ReactNode[]
 }
 
 interface ConnectTabContentProps {
-  children: any
+  children: ReactNode
   value: string
 }
 const ConnectTabs = ({ children }: ConnectFileTabProps) => {
-  const defaultValue = children[0].props.children[0].props.value
+  const firstChild = children[0]
+
+  const defaultValue = React.isValidElement(firstChild)
+    ? (firstChild.props as any)?.children[0]?.props?.value || ''
+    : null
+
   return <Tabs_Shadcn_ defaultValue={defaultValue}>{children}</Tabs_Shadcn_>
 }
 

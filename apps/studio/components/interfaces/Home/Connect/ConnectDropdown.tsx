@@ -13,7 +13,6 @@ import {
 } from 'ui'
 
 interface ConnectDropdownProps {
-  level?: 'parent' | 'child' | 'grandchild'
   open: boolean
   setOpen: (open: boolean) => void
   state: string
@@ -23,7 +22,6 @@ interface ConnectDropdownProps {
 }
 
 const ConnectDropdown = ({
-  level,
   state,
   updateState,
   label,

@@ -39,33 +39,6 @@ type GetContentFilesArgs = {
   selectedGrandchild: string
   connectionObject: ConnectionType[]
 }
-// const getContentFiles = ({
-//   connectionObject,
-//   selectedParent,
-//   selectedChild,
-//   selectedGrandchild,
-// }: GetContentFilesArgs) => {
-//   const parent = connectionObject.find((item) => item.key === selectedParent)
-
-//   if (parent) {
-//     const child = parent.children.find((child) => child.key === selectedChild)
-
-//     // check grandchild first, then child, then parent as the fallback
-//     if (child) {
-//       const grandchild = child.children.find((grandchild) => grandchild.key === selectedGrandchild)
-
-//       if (grandchild) {
-//         return grandchild.files || []
-//       } else {
-//         return child.files || []
-//       }
-//     } else {
-//       return parent.files || []
-//     }
-//   }
-
-//   return []
-// }
 
 const getContentFilePath = ({
   connectionObject,
@@ -110,24 +83,6 @@ const Connect = () => {
       (child) => child.key === selectedChild
     )?.children[0]?.key || ''
   )
-
-  // const [contentFiles, setContentFiles] = useState(
-  //   connectionObject
-  //     .find((item) => item.key === selectedParent)
-  //     ?.children.find((child) => child.key === selectedChild)
-  //     ?.children.find((grandchild) => grandchild.key === selectedGrandchild)?.files || []
-  // )
-  console.log(selectedParent, selectedChild, selectedGrandchild)
-  // set the content files when the parent/child/grandchild changes
-  // useEffect(() => {
-  //   const files = getContentFiles({
-  //     connectionObject,
-  //     selectedParent,
-  //     selectedChild,
-  //     selectedGrandchild,
-  //   })
-  //   //setContentFiles(files)
-  // }, [selectedParent, selectedChild, selectedGrandchild, connectionObject])
 
   const handleParentChange = (value: string) => {
     setSelectedParent(value)
@@ -186,11 +141,6 @@ const Connect = () => {
       setConnectionObject(ORMS)
       handleConnectionTypeChange(ORMS)
     }
-
-    // if (type === 'graphql') {
-    //   setConnectionObject(GRAPHQL)
-    //   handleConnectionTypeChange(GRAPHQL)
-    // }
   }
 
   const getChildOptions = () => {
@@ -285,7 +235,6 @@ const Connect = () => {
                       <div className="flex items-center gap-2">
                         {/* all parents */}
                         <ConnectDropdown
-                          level="parent"
                           open={parentSelectorOpen}
                           setOpen={setParentSelectorOpen}
                           state={selectedParent}
@@ -298,7 +247,6 @@ const Connect = () => {
                           (connectionObject.find((parent) => parent.key === selectedParent)
                             ?.children.length || 0) > 0 && (
                             <ConnectDropdown
-                              level="child"
                               open={childDropdownOpen}
                               setOpen={setChildDropdownOpen}
                               state={selectedChild}
@@ -314,7 +262,6 @@ const Connect = () => {
                             ?.children.find((child) => child.key === selectedChild)?.children
                             .length || 0) > 0 && (
                             <ConnectDropdown
-                              level="grandchild"
                               open={grandChildDropdownOpen}
                               setOpen={setGrandChildDropdownOpen}
                               state={selectedGrandchild}
@@ -375,13 +322,6 @@ interface ConnectTabsContentProps {
 }
 
 const ConnectTabsContent = ({ filePath, projectKeys }: ConnectTabsContentProps) => {
-  // Crappy hack to get the tabs to re-render when the defaultValue changes
-  // I can't figure out why it doesn't re-render with the correct tab selected - jordi
-  // const [syncedDefaultValue, setSyncedDefaultValue] = useState(defaultValue)
-  // const filePath = useEffect(() => {
-  //   setSyncedDefaultValue(defaultValue)
-  // }, [defaultValue])
-
   return (
     <div className=" border rounded-lg mt-4">
       <ConnectTabContent projectKeys={projectKeys} filePath={filePath} />

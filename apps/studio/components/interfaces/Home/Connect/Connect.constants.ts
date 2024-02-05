@@ -152,16 +152,6 @@ export const ORMS: ConnectionType[] = [
   },
 ]
 
-// export const GRAPHQL: ConnectionType[] = [
-//   {
-//     key: 'graphql',
-//     label: 'GraphQL',
-//     icon: 'graphql',
-//     guideLink: 'https://supabase.com/docs/guides/graphql',
-//     children: [],
-//   },
-// ]
-
 export const CONNECTION_TYPES = [
   { key: 'frameworks', label: 'App Frameworks', obj: FRAMEWORKS },
   { key: 'orms', label: 'ORMs', obj: ORMS },
