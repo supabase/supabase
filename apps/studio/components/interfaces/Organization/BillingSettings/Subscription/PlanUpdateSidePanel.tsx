@@ -35,6 +35,7 @@ import ExitSurveyModal from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import PaymentMethodSelection from './PaymentMethodSelection'
 import { formatCurrency } from 'lib/helpers'
+import { useProjectsQuery } from 'data/projects/projects-query'
 
 const PlanUpdateSidePanel = () => {
   const { ui } = useStore()
@@ -52,6 +53,11 @@ const PlanUpdateSidePanel = () => {
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )
+  const { data: allProjects } = useProjectsQuery()
+  const orgProjects = (allProjects || []).filter(
+    (it) => it.organization_id === selectedOrganization?.id
+  )
+
   const snap = useOrgSettingsPageStateSnapshot()
   const visible = snap.panelKey === 'subscriptionPlan'
   const onClose = () => {
@@ -329,6 +335,7 @@ const PlanUpdateSidePanel = () => {
         subscription={subscription}
         onClose={() => setSelectedTier(undefined)}
         onConfirm={onConfirmDowngrade}
+        projects={orgProjects}
       />
 
       <Modal
