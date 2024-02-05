@@ -1007,7 +1007,7 @@ functions:
         isSpotlight: true
         code: |
           ```js
-            const { data, error } = supabase.auth.setSession({
+            const { data, error } = await supabase.auth.setSession({
               access_token,
               refresh_token
             })

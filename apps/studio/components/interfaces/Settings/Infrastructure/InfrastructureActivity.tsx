@@ -26,14 +26,17 @@ import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
-import { useFlag, useSelectedOrganization } from 'hooks'
+import { useSelectedOrganization, useSelectedProject } from 'hooks'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { INFRA_ACTIVITY_METRICS } from './Infrastructure.constants'
+import { capitalize } from 'lodash'
+import { INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
 
 const InfrastructureActivity = () => {
   const { ref: projectRef } = useParams()
   const organization = useSelectedOrganization()
   const [dateRange, setDateRange] = useState<any>()
+  const project = useSelectedProject()
 
   const { data: subscription, isLoading: isLoadingSubscription } = useOrgSubscriptionQuery({
     orgSlug: organization?.slug,
@@ -47,13 +50,10 @@ const InfrastructureActivity = () => {
   const selectedAddons = addons?.selected_addons ?? []
 
   const { computeInstance } = getAddons(selectedAddons)
-  const currentComputeInstanceSpecs = computeInstance?.variant?.meta ?? {
-    baseline_disk_io_mbs: 87,
-    max_disk_io_mbs: 2085,
-    cpu_cores: 2,
-    cpu_dedicated: true,
-    memory_gb: 1,
-  }
+  const currentComputeInstanceSpecs =
+    computeInstance?.variant?.meta ?? project?.infra_compute_size === 'nano'
+      ? INSTANCE_NANO_SPECS
+      : INSTANCE_MICRO_SPECS
 
   const currentBillingCycleSelected = useMemo(() => {
     // Selected by default
@@ -273,7 +273,11 @@ const InfrastructureActivity = () => {
                         <p className="text-sm mb-2">Overview</p>
                         <div className="flex items-center justify-between border-b py-1">
                           <p className="text-xs text-foreground-light">Current compute instance</p>
-                          <p className="text-xs">{computeInstance?.variant?.name ?? 'Micro'}</p>
+                          <p className="text-xs">
+                            {computeInstance?.variant?.name ??
+                              capitalize(project?.infra_compute_size) ??
+                              'Micro'}
+                          </p>
                         </div>
                         <div className="flex items-center justify-between border-b py-1">
                           <p className="text-xs text-foreground-light">
