@@ -6,7 +6,9 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 // Required for nextjs standalone build
 const path = require('path')
 
-const API_URL = new URL(process.env.NEXT_PUBLIC_API_URL).origin
+const API_URL = process.env.NEXT_PUBLIC_API_URL
+  ? new URL(process.env.NEXT_PUBLIC_API_URL).origin
+  : ''
 const SUPABASE_URL = new URL(process.env.SUPABASE_URL).origin
 const GOTRUE_URL = new URL(process.env.NEXT_PUBLIC_GOTRUE_URL).origin
 const SUPABASE_PROJECTS_URL = 'https://*.supabase.co'
