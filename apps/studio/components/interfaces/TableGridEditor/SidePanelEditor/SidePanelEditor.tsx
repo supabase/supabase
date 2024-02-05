@@ -616,6 +616,7 @@ const SidePanelEditor = ({
       />
       <ForeignRowSelector
         visible={snap.sidePanel?.type === 'foreign-row-selector'}
+        // @ts-ignore
         foreignKey={
           snap.sidePanel?.type === 'foreign-row-selector'
             ? snap.sidePanel.foreignKey.foreignKey

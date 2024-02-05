@@ -346,13 +346,13 @@ const ColumnManagement = ({
           </DragDropContext>
         </div>
 
-        <div className="flex items-center justify-between">
-          {!hasImportContent && (
-            <Button block type="outline" className="py-2" onClick={() => onAddColumn()}>
+        {!hasImportContent && (
+          <div className="flex items-center justify-center rounded border border-strong border-dashed py-3">
+            <Button type="default" onClick={() => onAddColumn()}>
               Add column
             </Button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
       <ForeignKeySelector
         column={selectedColumnToEditRelation as ColumnField}
