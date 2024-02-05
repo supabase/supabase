@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { Button, IconAlignLeft, SidePanel } from 'ui'
 
 import TwoOptionToggle from 'components/ui/TwoOptionToggle'
-import { minifyJSON, prettifyJSON, tryParseJson } from 'lib/helpers'
+import { minifyJSON, prettifyJSON, tryParseJson, removeJSONTrailingComma } from 'lib/helpers'
 import toast from 'react-hot-toast'
 import ActionBar from '../../ActionBar'
 import DrilldownViewer from './DrilldownViewer'
@@ -42,7 +42,8 @@ const JsonEdit = ({
 
   const validateJSON = async (resolve: () => void) => {
     try {
-      const minifiedJSON = minifyJSON(jsonStr)
+      const newJsonStr = removeJSONTrailingComma(jsonStr)
+      const minifiedJSON = minifyJSON(newJsonStr)
       if (onSaveJSON) onSaveJSON(minifiedJSON, resolve)
     } catch (error: any) {
       resolve()
