@@ -427,8 +427,8 @@ function QueryPerformanceFilterBar({
   onRefreshClick: () => void
 }) {
   const router = useRouter()
-  const [searchInputVal, setSearchInputVal] = useState('')
   const defaultSearchQueryValue = router.query.search ? String(router.query.search) : ''
+  const [searchInputVal, setSearchInputVal] = useState(defaultSearchQueryValue)
   const sortBy = router.query.sort ? String(router.query.sort) : 'lat_desc'
 
   function getSortButtonLabel() {
@@ -490,7 +490,6 @@ function QueryPerformanceFilterBar({
             name="search"
             value={searchInputVal}
             onChange={(e) => setSearchInputVal(e.target.value)}
-            defaultValue={defaultSearchQueryValue}
             autoComplete="off"
             icon={
               <div className="text-foreground-lighter">
@@ -498,7 +497,9 @@ function QueryPerformanceFilterBar({
               </div>
             }
             actions={
-              <button className="mx-2 text-foreground-light hover:text-foreground">{'↲'}</button>
+              searchInputVal !== '' && (
+                <button className="mx-2 text-foreground-light hover:text-foreground">{'↲'}</button>
+              )
             }
           />
           <DropdownMenu>
