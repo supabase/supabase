@@ -26,6 +26,75 @@ There are several reasons why you might want to add phone login to your applicat
 
 - **Reduced support burden**: Phone login can also help reduce the support burden for your team by eliminating the need to handle password recovery flows or deal with other password-related issues. This can free up your team to focus on other important tasks and improve the efficiency of your operation.
 
+## Sign up the user 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+To sign up the user, call [`signUp()`](/docs/reference/javascript/auth-signup) with their phone number and password:
+
+```js
+async function signUpNewUser() {
+  const { data, error } = await supabase.auth.signUp({
+    phone: '123456789',
+    password: 'example-password'
+  })
+}
+```
+</TabPanel>
+</Tabs>
+
+## Update a user's phone number
+To update a user's phone number, the user must first be logged in to call [`updateUser()`](/docs/reference/javascript/auth-updateuser) with their phone number:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const { data, error } = await supabase.auth.updateUser({
+  phone: '123456789'
+})
+```
+
+</TabPanel>
+</Tabs>
+
+
+## Verify the user
+
+To verify the one-time password (OTP) sent to the user's phone number, call [`verifyOtp()`](/docs/reference/javascript/auth-verifyotp) with the phone number and OTP:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const { data, error } = await supabase.auth.verifyOtp({
+  phone: '123456789',
+  token: '123456',
+  type: 'sms'
+})
+```
+
+</TabPanel>
+</Tabs>
+
 ## Set up a provider with Supabase Auth
 
 Supabase supports Phone Login with several communications platforms. Follow the guides below to set up a provider with Supabase Auth.

@@ -241,8 +241,6 @@ functions:
       - id: sign-up
         name: Sign up
         isSpotlight: true
-        description: |
-          If the password is larger than 72 chars, it will be truncated to the first 72 chars.
         code: |
           ```js
           const { data, error } = await supabase.auth.signUp({
@@ -836,7 +834,19 @@ functions:
         isSpotlight: false
         code: |
           ```js
-          const { data, error } = await supabase.auth.updateUser({email: 'new@email.com'})
+          const { data, error } = await supabase.auth.updateUser({
+            email: 'new@email.com'
+          })
+          ```
+      - id: update-the-phone-for-an-authenticated-user
+        name: Update the phone number for an authenticated user
+        description: Sends a one-time password (OTP) to the new phone number.
+        isSpotlight: false
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.updateUser({
+            phone: '123456789'
+          })
           ```
       - id: update-the-password-for-an-authenticated-user
         name: Update the password for an authenticated user
@@ -845,7 +855,9 @@ functions:
           If the password is larger than 72 chars, it will be truncated to the first 72 chars.
         code: |
           ```js
-          const { data, error } = await supabase.auth.updateUser({password: 'new password'})
+          const { data, error } = await supabase.auth.updateUser({
+            password: 'new password'
+          })
           ```
       - id: update-the-users-metadata
         name: Update the user's metadata
