@@ -257,7 +257,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                       <Table.th className="w-[300px]">Query</Table.th>
                       <Table.th className="text-right">Calls</Table.th>
                       <Table.th className="text-right">Time Consumed</Table.th>
-                      <Table.th className="text-right">Total Time</Table.th>
+                      <Table.th className="text-right">Total Time (Latency)</Table.th>
                     </>
                   }
                   body={
@@ -310,7 +310,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                       <Table.th className="text-right">Max Time</Table.th>
                       <Table.th className="text-right">Mean Time</Table.th>
                       <Table.th className="text-right">Min Time</Table.th>
-                      <Table.th className="text-right">Total Time</Table.th>
+                      <Table.th className="text-right">Total Time (Latency)</Table.th>
                     </>
                   }
                   body={
@@ -370,7 +370,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                       <Table.th className="table-cell">Max Time</Table.th>
                       <Table.th className="table-cell">Mean Time</Table.th>
                       <Table.th className="table-cell">Min Time</Table.th>
-                      <Table.th className="table-cell">Total Time</Table.th>
+                      <Table.th className="table-cell">Total Time (Latency)</Table.th>
                     </>
                   }
                   body={
