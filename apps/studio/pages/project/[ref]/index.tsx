@@ -13,6 +13,7 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { NextPageWithLayout } from 'types'
 import ProjectUsageSection from 'components/interfaces/Home/ProjectUsageSection'
 import Connect from 'components/interfaces/Home/Connect/Connect'
+import { PoolingModesModal } from 'components/interfaces/Settings/Database/PoolingModesModal'
 
 const Home: NextPageWithLayout = () => {
   const project = useSelectedProject()
@@ -40,7 +41,12 @@ const Home: NextPageWithLayout = () => {
         <h1 className="text-3xl">{projectName}</h1>
         <div className="flex items-center gap-3">
           {IS_PLATFORM && project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && <ServiceStatus />}
-          {IS_PLATFORM && project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && <Connect />}
+          {IS_PLATFORM && project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && (
+            <>
+              <PoolingModesModal />
+              <Connect />
+            </>
+          )}
         </div>
       </div>
 
