@@ -201,19 +201,19 @@ In certain auth scenarios you will need to handle linking back into your applica
       Setting up deep links in Windows has few more steps than other platforms.
       [Learn more](https://pub.dev/packages/app_links#windows)
 
-      Declare this method in `<PROJECT_DIR>\windows\runner\win32_window.h`
+      Declare this method in `<PROJECT_DIR>\windows\runner\win32_window.h` as private method.
 
       ```cpp
         // Dispatches link if any.
         // This method enables our app to be with a single instance too.
-        // This is optional but mandatory if you want to catch further links in same app.
+        // This is mandatory if you want to catch further links in same app.
         bool SendAppLinkToInstance(const std::wstring& title);
       ```
 
       Add this inclusion at the top of `<PROJECT_DIR>\windows\runner\win32_window.cpp`
 
       ```cpp
-      #include "app_links_windows/app_links_windows_plugin.h"
+      #include "app_links/app_links_plugin_c_api.h"
       ```
 
       Add this method in `<PROJECT_DIR>\windows\runner\win32_window.cpp`
@@ -230,6 +230,7 @@ In certain auth scenarios you will need to handle linking back into your applica
           // (Optional) Restore our window to front in same state
           WINDOWPLACEMENT place = { sizeof(WINDOWPLACEMENT) };
           GetWindowPlacement(hwnd, &place);
+
           switch(place.showCmd) {
             case SW_SHOWMAXIMIZED:
                 ShowWindow(hwnd, SW_SHOWMAXIMIZED);
@@ -241,6 +242,7 @@ In certain auth scenarios you will need to handle linking back into your applica
                 ShowWindow(hwnd, SW_NORMAL);
                 break;
           }
+
           SetWindowPos(0, HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOSIZE | SWP_NOMOVE);
           SetForegroundWindow(hwnd);
           // END Restore
@@ -253,15 +255,17 @@ In certain auth scenarios you will need to handle linking back into your applica
       }
       ```
 
-      Add the call to the previous method in `CreateAndShow`
+      Add the call to the previous method in `Create`
 
       ```cpp
-      bool Win32Window::CreateAndShow(const std::wstring& title,
+      bool Win32Window::Create(const std::wstring& title,
                                       const Point& origin,
                                       const Size& size) {
       if (SendAppLinkToInstance(title)) {
           return false;
       }
+
+      Destroy();
 
       ...
       ```
@@ -271,10 +275,30 @@ In certain auth scenarios you will need to handle linking back into your applica
 
       This package won't do it for you.
 
-      You can achieve it with [url_protocol](https://pub.dev/packages/url_protocol) inside you app.
+      You may achieve it with using the win32_registry package with the following code to register the URL protocol:
 
-      The most relevant solution is to include those registry modifications into your installer to allow
-      for deregistration.
+      ```cpp
+      Future<void> register(String scheme) async {
+        String appPath = Platform.resolvedExecutable;
+
+        String protocolRegKey = 'Software\\Classes\\$scheme';
+        RegistryValue protocolRegValue = const RegistryValue(
+          'URL Protocol',
+          RegistryValueType.string,
+          '',
+        );
+        String protocolCmdRegKey = 'shell\\open\\command';
+        RegistryValue protocolCmdRegValue = RegistryValue(
+          '',
+          RegistryValueType.string,
+          '"$appPath" "%1"',
+        );
+
+        final regKey = Registry.currentUser.createKey(protocolRegKey);
+        regKey.createValue(protocolRegValue);
+        regKey.createKey(protocolCmdRegKey).createValue(protocolCmdRegValue);
+      }
+      ```
 
     </TabPanel>
     <TabPanel id="macos" label="MacOS">
