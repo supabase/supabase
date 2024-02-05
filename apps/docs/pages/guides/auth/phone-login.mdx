@@ -39,12 +39,10 @@ There are several reasons why you might want to add phone login to your applicat
 To sign up the user, call [`signUp()`](/docs/reference/javascript/auth-signup) with their phone number and password:
 
 ```js
-async function signUpNewUser() {
-  const { data, error } = await supabase.auth.signUp({
-    phone: '123456789',
-    password: 'example-password'
-  })
-}
+const { data, error } = await supabase.auth.signUp({
+  phone: '123456789',
+  password: 'example-password'
+})
 ```
 </TabPanel>
 </Tabs>
