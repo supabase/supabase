@@ -25,7 +25,7 @@
     "@types/lodash": "^4.14.202",
     "json-stringify-safe": "^5.0.1",
     "lodash": "^4.17.21",
-    "prettier": "^2.8.8",
+    "prettier": "^4.0.0-alpha.8",
     "tsx": "^4.7.0"
   },
   "prettier": {

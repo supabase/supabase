@@ -5,7 +5,6 @@ import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import SchemaSelector from 'components/ui/SchemaSelector'
@@ -15,6 +14,7 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useCheckPermissions } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { useRouter } from 'next/router'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   Button,
@@ -25,6 +25,7 @@ import {
   IconCheck,
   IconColumns,
   IconEdit,
+  IconEye,
   IconMoreVertical,
   IconPlus,
   IconSearch,
@@ -47,6 +48,7 @@ const TableList = ({
   onDeleteTable = noop,
   onOpenTable = noop,
 }: TableListProps) => {
+  const router = useRouter()
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
 
@@ -303,6 +305,16 @@ const TableList = ({
                                       </Tooltip.Portal>
                                     )}
                                   </Tooltip.Root>
+                                </DropdownMenuItem>
+
+                                <DropdownMenuItem
+                                  className="flex items-center space-x-2"
+                                  onClick={() =>
+                                    router.push(`/project/${project?.ref}/editor/${x.id}`)
+                                  }
+                                >
+                                  <IconEye size="tiny" />
+                                  <p>View table</p>
                                 </DropdownMenuItem>
 
                                 <DropdownMenuItem

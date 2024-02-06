@@ -30,8 +30,8 @@ const ProjectUpdateDisabledTooltip = ({
                 {projectUpdateDisabled
                   ? 'Subscription changes are currently disabled. Our engineers are working on a fix.'
                   : projectNotActive
-                  ? 'Unable to update subscription as project is currently not active'
-                  : ''}
+                    ? 'Unable to update subscription as project is currently not active'
+                    : ''}
               </span>
             </div>
           </Tooltip.Content>

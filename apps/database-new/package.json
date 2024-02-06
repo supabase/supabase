@@ -17,7 +17,7 @@
     "common": "*",
     "config": "*",
     "dayjs": "^1.11.10",
-    "eslint-config-next": "^14.0.3",
+    "eslint-config-next": "^14.1.0",
     "lodash": "^4.17.21",
     "lucide-react": "^0.292.0",
     "next": "^14.0.3",

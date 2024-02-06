@@ -125,8 +125,8 @@ const BlogFilters = ({ posts, setPosts, setCategory, allCategories, handlePosts 
                 category === 'all' && !searchKey && !activeCategory
                   ? 'alternative'
                   : category === activeCategory
-                  ? 'alternative'
-                  : 'outline'
+                    ? 'alternative'
+                    : 'outline'
               }
               onClick={() => setCategory(category)}
               size={is2XL ? 'tiny' : 'small'}
