@@ -69,7 +69,7 @@ export const CommandDialog = ({ children, onKeyDown, page, ...props }: CommandDi
         '!border-overlay/90',
         'transition ease-out',
         'place-self-start mx-auto top-24',
-        'max-w-[80%] xs:max-w-[50%]',
+        'max-w-[calc(100vw-60px)] xs:max-w-[50%]',
         animateBounce ? 'scale-[101.5%]' : 'scale-100'
       )}
     >
