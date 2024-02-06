@@ -46,7 +46,7 @@ const ReportQueryPerformanceTableRow = ({ sql, colSpan, children }: Props) => {
             <div className="absolute right-2 top-2">
               <QueryActions sql={sql} className="mb-2" />
             </div>
-            <div className="overflow-auto p-3 max-h-[400px] bg-background-alternative-200">
+            <div className="overflow-auto p-3 px-6 max-h-[400px] bg-background-alternative-200">
               <pre>{sql}</pre>
             </div>
           </td>
