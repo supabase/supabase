@@ -301,8 +301,8 @@ const LogTable = ({
                 queryType
                   ? 'flex w-1/2 flex-col'
                   : focusedLog
-                  ? 'flex w-1/2 flex-col'
-                  : 'hidden w-0'
+                    ? 'flex w-1/2 flex-col'
+                    : 'hidden w-0'
               }
             >
               <LogSelection

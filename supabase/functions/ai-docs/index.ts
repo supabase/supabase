@@ -130,8 +130,8 @@ serve(async (req) => {
         match_threshold: 0.78,
         min_content_length: 50,
       })
-      .not('page.path', 'like', '/guides/integrations/%')
-      .select('content,page!inner(path)')
+      .neq('rag_ignore', true)
+      .select('content,page!inner(path),rag_ignore')
       .limit(10)
 
     if (matchError) {

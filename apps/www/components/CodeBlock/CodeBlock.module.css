@@ -4,7 +4,9 @@
 
 .code-line {
   @apply block;
-  transition: filter 500ms ease, opacity 500ms ease;
+  transition:
+    filter 500ms ease,
+    opacity 500ms ease;
   transition-delay: 200ms;
 }
 

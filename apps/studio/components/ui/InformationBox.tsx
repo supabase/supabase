@@ -65,11 +65,13 @@ const InformationBox = ({
             <div className="text-foreground-light text-sm">{description}</div>
 
             {url && (
-              <Button asChild type="default" icon={<IconExternalLink />}>
-                <Link href={url} target="_blank" rel="noreferrer" className="pt-2">
-                  {urlLabel}
-                </Link>
-              </Button>
+              <div>
+                <Button asChild type="default" icon={<IconExternalLink />}>
+                  <Link href={url} target="_blank" rel="noreferrer">
+                    {urlLabel}
+                  </Link>
+                </Button>
+              </div>
             )}
 
             {button && <div>{button}</div>}

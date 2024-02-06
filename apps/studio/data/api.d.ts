@@ -9,8 +9,8 @@ type XOR<T, U> = T | U extends object ? (Without<T, U> & U) | (Without<U, T> & T
 type OneOf<T extends any[]> = T extends [infer Only]
   ? Only
   : T extends [infer A, infer B, ...infer Rest]
-  ? OneOf<[XOR<A, B>, ...Rest]>
-  : never
+    ? OneOf<[XOR<A, B>, ...Rest]>
+    : never
 
 export interface paths {
   '/platform/notifications': {
@@ -491,6 +491,10 @@ export interface paths {
     /** Gets project health check */
     get: operations['HealthCheckController_projectHealthCheck']
   }
+  '/platform/projects/{ref}/load-balancers': {
+    /** Gets non-removed databases of a specified project */
+    get: operations['LoadBalancersController_getLoadBalancers']
+  }
   '/platform/projects/{ref}/api/rest': {
     /** Gets project OpenApi */
     get: operations['ApiController_projectOpenApi']
@@ -585,6 +589,10 @@ export interface paths {
     /** Updates project's pgbouncer config */
     patch: operations['PgbouncerConfigController_updatePgbouncerConfig']
   }
+  '/platform/projects/{ref}/config/pgbouncer/status': {
+    /** Gets project's pgbouncer status */
+    get: operations['PgbouncerConfigController_getPgbouncerStatus']
+  }
   '/platform/projects/{ref}/config/postgrest': {
     /** Gets project's postgrest config */
     get: operations['PostgrestConfigController_getPostgRESTConfig']
@@ -606,6 +614,10 @@ export interface paths {
     get: operations['StorageConfigController_getConfig']
     /** Updates project's storage config */
     patch: operations['StorageConfigController_updateConfig']
+  }
+  '/platform/projects/{ref}/config/supavisor': {
+    /** Gets project's supavisor config */
+    get: operations['SupavisorConfigController_getSupavisorConfig']
   }
   '/platform/projects/{ref}/billing/addons': {
     /** Gets project addons */
@@ -774,7 +786,7 @@ export interface paths {
   }
   '/platform/integrations/vercel/connections/{connection_id}/sync-envs': {
     /** Syncs supabase project envs with given connection id */
-    post: operations['VercelConnectionsController_syncVercelConnectionEnvs']
+    post: operations['VercelConnectionsController_syncVercelConnectionEnvironments']
   }
   '/platform/integrations/vercel/connections/{connection_id}': {
     /** Deletes vercel project connection */
@@ -1247,6 +1259,10 @@ export interface paths {
     /** Gets project health check */
     get: operations['HealthCheckController_projectHealthCheck']
   }
+  '/v0/projects/{ref}/load-balancers': {
+    /** Gets non-removed databases of a specified project */
+    get: operations['LoadBalancersController_getLoadBalancers']
+  }
   '/v0/projects/{ref}/api/rest': {
     /** Gets project OpenApi */
     get: operations['ApiController_projectOpenApi']
@@ -1325,6 +1341,10 @@ export interface paths {
     /** Updates project's pgbouncer config */
     patch: operations['PgbouncerConfigController_updatePgbouncerConfig']
   }
+  '/v0/projects/{ref}/config/pgbouncer/status': {
+    /** Gets project's pgbouncer status */
+    get: operations['PgbouncerConfigController_getPgbouncerStatus']
+  }
   '/v0/projects/{ref}/config/postgrest': {
     /** Gets project's postgrest config */
     get: operations['PostgrestConfigController_getPostgRESTConfig']
@@ -1346,6 +1366,10 @@ export interface paths {
     get: operations['StorageConfigController_getConfig']
     /** Updates project's storage config */
     patch: operations['StorageConfigController_updateConfig']
+  }
+  '/v0/projects/{ref}/config/supavisor': {
+    /** Gets project's supavisor config */
+    get: operations['SupavisorConfigController_getSupavisorConfig']
   }
   '/v0/projects/{ref}/billing/addons': {
     /** Gets project addons */
@@ -1764,13 +1788,8 @@ export interface components {
       actions?: components['schemas']['NotificationAction'][]
     }
     NotificationResponseV2: {
-      /** @enum {string} */
-      type:
-        | 'project.tier-limit-exceeded'
-        | 'postgresql.upgrade-available'
-        | 'postgresql.upgrade-completed'
-        | 'project.update-completed'
-        | 'project.informational'
+      /** @deprecated */
+      type: string | null
       /** @enum {string} */
       status: 'new' | 'seen' | 'archived'
       /** @enum {string} */
@@ -2402,8 +2421,8 @@ export interface components {
       id: number
       slug: string
       name: string
-      billing_email: string
-      stripe_customer_id: string
+      billing_email?: string
+      stripe_customer_id?: string
       opt_in_tags: string[]
     }
     CustomerResponse: {
@@ -2786,9 +2805,10 @@ export interface components {
       price: number
     }
     /** @enum {string} */
-    ProjectAddonType: 'custom_domain' | 'compute_instance' | 'pitr'
+    ProjectAddonType: 'custom_domain' | 'compute_instance' | 'pitr' | 'ipv4'
     /** @enum {string} */
     AddonVariantId:
+      | 'ci_micro'
       | 'ci_small'
       | 'ci_medium'
       | 'ci_large'
@@ -2802,6 +2822,7 @@ export interface components {
       | 'pitr_7'
       | 'pitr_14'
       | 'pitr_28'
+      | 'ipv4_default'
     /** @enum {string} */
     ProjectAddonVariantPricingType: 'fixed' | 'usage'
     /** @enum {string} */
@@ -2899,6 +2920,7 @@ export interface components {
       billing_partner: 'fly'
       scheduled_plan_change: components['schemas']['ScheduledPlanChange'] | null
       customer_balance: number
+      nano_enabled: boolean
     }
     UpdateSubscriptionBody: {
       payment_method?: string
@@ -3033,7 +3055,7 @@ export interface components {
       /** @enum {string} */
       behavior: 'VOLATILE' | 'STABLE' | 'IMMUTABLE'
       security_definer: boolean
-      config_params: Record<string, unknown> | null
+      config_params: unknown
     }
     CreateFunctionBody: {
       slug: string
@@ -3456,7 +3478,7 @@ export interface components {
         | 'tenant:Sql:Write:Update'
         | 'write:Update'
       )[]
-      condition: Record<string, unknown> | null
+      condition: unknown
       organization_id: number
       resources: string[]
     }
@@ -3493,7 +3515,21 @@ export interface components {
       first_name: string
       last_name: string
     }
+    /** @enum {string} */
+    DbInstanceSize:
+      | 'nano'
+      | 'micro'
+      | 'small'
+      | 'medium'
+      | 'large'
+      | 'xlarge'
+      | '2xlarge'
+      | '4xlarge'
+      | '8xlarge'
+      | '12xlarge'
+      | '16xlarge'
     ProjectInfo: {
+      infra_compute_size?: components['schemas']['DbInstanceSize']
       cloud_provider: string
       id: number
       inserted_at: string
@@ -3556,6 +3592,7 @@ export interface components {
       kps_enabled?: boolean
     }
     CreateProjectResponse: {
+      infra_compute_size?: components['schemas']['DbInstanceSize']
       cloud_provider: string
       id: number
       inserted_at: string
@@ -3684,6 +3721,16 @@ export interface components {
     UpdatePasswordBody: {
       password: string
     }
+    Database: {
+      identifier: string
+      /** @enum {string} */
+      type: 'PRIMARY' | 'READ_REPLICA'
+      status: string
+    }
+    LoadBalancerDetailResponse: {
+      endpoint: string
+      databases: components['schemas']['Database'][]
+    }
     Buffer: Record<string, never>
     ResizeBody: {
       volume_size_gb: number
@@ -3694,6 +3741,7 @@ export interface components {
       'supabase-postgres': string
     }
     ProjectDetailResponse: {
+      infra_compute_size?: components['schemas']['DbInstanceSize']
       cloud_provider: string
       db_host: string
       id: number
@@ -3795,6 +3843,8 @@ export interface components {
       app_config?: components['schemas']['ProjectAppConfigResponse']
       jwt_secret?: string
       service_api_keys?: components['schemas']['ProjectServiceApiKeyResponse'][]
+      /** @enum {string|null} */
+      db_ip_addr_config: 'legacy' | 'static-ipv4' | 'concurrent-ipv6' | 'ipv6' | null
     }
     TransferProjectBody: {
       target_organization_slug: string
@@ -3845,7 +3895,7 @@ export interface components {
             message?: string
             status?: string
           },
-          string
+          string,
         ]
       >
       result?: Record<string, never>[]
@@ -3868,6 +3918,9 @@ export interface components {
       /** @enum {string} */
       pgbouncer_status: 'COMING_DOWN' | 'COMING_UP' | 'DISABLED' | 'ENABLED' | 'RELOADING'
       connectionString: string
+    }
+    PgbouncerStatusResponse: {
+      active: boolean
     }
     UpdatePgbouncerConfigBody: {
       default_pool_size?: number
@@ -3943,6 +3996,21 @@ export interface components {
     }
     UpdateStorageConfigResponse: {
       fileSizeLimit: number
+    }
+    SupavisorConfigResponse: {
+      identifier: string
+      /** @enum {string} */
+      database_type: 'PRIMARY' | 'READ_REPLICA'
+      is_using_scram_auth: boolean
+      db_user: string
+      db_host: string
+      db_port: number
+      db_name: string
+      connectionString: string
+      default_pool_size: number | null
+      max_client_conn: number | null
+      /** @enum {string|null} */
+      pool_mode: 'transaction' | 'session' | 'statement' | null
     }
     AvailableAddonResponse: {
       type: components['schemas']['ProjectAddonType']
@@ -4547,7 +4615,8 @@ export interface components {
       ipv4_addresses: string[]
     }
     NetworkRestrictionsRequest: {
-      dbAllowedCidrs: string[]
+      dbAllowedCidrs?: string[]
+      dbAllowedCidrsV6?: string[]
     }
     NetworkRestrictionsResponse: {
       /** @enum {string} */
@@ -4611,7 +4680,6 @@ export interface components {
       current_app_version: string
       latest_app_version: string
       target_upgrade_versions: components['schemas']['ProjectVersion'][]
-      requires_manual_intervention: string | null
       potential_breaking_changes: string[]
       duration_estimate_hours: number
       legacy_auth_custom_roles: string[]
@@ -4632,6 +4700,7 @@ export interface components {
         | '8_upgrade_completion_failed'
       /** @enum {string} */
       progress?:
+        | '0_requested'
         | '1_started'
         | '2_launched_upgraded_instance'
         | '3_detached_volume_from_upgraded_instance'
@@ -4811,15 +4880,16 @@ export interface components {
       is_physical_backup: boolean
       inserted_at: string
     }
+    PhysicalBackup: {
+      earliest_physical_backup_date_unix?: number
+      latest_physical_backup_date_unix?: number
+    }
     V1BackupsResponse: {
       region: string
       walg_enabled: boolean
       pitr_enabled: boolean
       backups: components['schemas']['V1Backup'][]
-      physical_backup_data: {
-        earliest_physical_backup_date_unix?: number
-        latest_physical_backup_date_unix?: number
-      }
+      physical_backup_data: components['schemas']['PhysicalBackup']
     }
     V1RestorePitrBody: {
       recovery_time_target_unix: number
@@ -4964,6 +5034,11 @@ export interface components {
        * @example postgresql://postgres:dbpass@db.abcdefghijklmnop.supabase.co:5432/postgres
        */
       DATABASE_URL: string
+      /**
+       * @description Pooler connection string
+       * @example postgres://postgres.abcdefghijklmnop:dbpass@aws-0-us-east-1.pooler.supabase.com:6543/postgres
+       */
+      DATABASE_POOLER_URL: string
     }
     ResourceProvisioningResponse: {
       /** @description Supabase envs config */
@@ -8688,6 +8763,22 @@ export interface operations {
       }
     }
   }
+  /** Gets non-removed databases of a specified project */
+  LoadBalancersController_getLoadBalancers: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['LoadBalancerDetailResponse'][]
+        }
+      }
+    }
+  }
   /** Gets project OpenApi */
   ApiController_projectOpenApi: {
     parameters: {
@@ -9245,6 +9336,26 @@ export interface operations {
       }
     }
   }
+  /** Gets project's pgbouncer status */
+  PgbouncerConfigController_getPgbouncerStatus: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['PgbouncerStatusResponse']
+        }
+      }
+      /** @description Failed to retrieve project's pgbouncer status */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Gets project's postgrest config */
   PostgrestConfigController_getPostgRESTConfig: {
     parameters: {
@@ -9412,6 +9523,26 @@ export interface operations {
         content: never
       }
       /** @description Failed to update project's storage config */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets project's supavisor config */
+  SupavisorConfigController_getSupavisorConfig: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['SupavisorConfigResponse'][]
+        }
+      }
+      /** @description Failed to retrieve project's supavisor config */
       500: {
         content: never
       }
@@ -10345,7 +10476,7 @@ export interface operations {
     }
   }
   /** Syncs supabase project envs with given connection id */
-  VercelConnectionsController_syncVercelConnectionEnvs: {
+  VercelConnectionsController_syncVercelConnectionEnvironments: {
     parameters: {
       path: {
         connection_id: string
@@ -11135,11 +11266,6 @@ export interface operations {
         'x-vercel-signature': string
       }
     }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['Buffer']
-      }
-    }
     responses: {
       201: {
         content: never
@@ -11157,11 +11283,6 @@ export interface operations {
         'x-github-delivery': string
         'x-github-event': string
         'x-hub-signature-256': string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['Buffer']
       }
     }
     responses: {
