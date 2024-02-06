@@ -652,11 +652,6 @@ export const updateTable = async (
         })
 
         const hasForeignKeyUpdated = !isEqual(originalForeignKey, column.foreignKey)
-        console.log(column.name, {
-          hasForeignKeyUpdated,
-          originalForeignKey,
-          updatedForeignKey: column.foreignKey,
-        })
         if (!isEmpty(columnPayload) || hasForeignKeyUpdated) {
           toast.loading(`Updating column ${column.name} from ${updatedTable.name}`, { id: toastId })
           const skipPKCreation = true
