@@ -269,8 +269,8 @@ supabase.auth.verifyPhoneOtp(
 <TabPanel id="http" label="HTTP">
 
 ```bash
-curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/verify' \
--H "apikey: SUPABASE_KEY" \
+curl -X POST 'https://<PROJECT_REF>.supabase.co/auth/v1/verify' \
+-H "apikey: <SUPABASE_KEY>" \
 -H "Content-Type: application/json" \
 -d '{
   "type": "sms",
@@ -286,10 +286,10 @@ If successful the user will now be logged in and you should receive a valid sess
 
 ```json
 {
-  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNjI3MjkxNTc3LCJzdWIiOiJmYTA2NTQ1Zi1kYmI1LTQxY2EtYjk1NC1kOGUyOTg4YzcxOTEiLCJlbWFpbCI6IiIsInBob25lIjoiNjU4NzUyMjAyOSIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6InBob25lIn0sInVzZXJfbWV0YWRhdGEiOnt9LCJyb2xlIjoiYXV0aGVudGljYXRlZCJ9.1BqRi0NbS_yr1f6hnr4q3s1ylMR3c1vkiJ4e_N55dhM",
+  "access_token": "<ACCESS_TOKEN>",
   "token_type": "bearer",
   "expires_in": 3600,
-  "refresh_token": "LSp8LglPPvf0DxGMSj-vaQ"
+  "refresh_token": "<REFRESH_TOKEN>"
 }
 ```
 
