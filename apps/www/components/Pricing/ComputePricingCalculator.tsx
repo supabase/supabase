@@ -37,11 +37,13 @@ const ComputePricingCalculator = () => {
   const priceSteps = computeInstances.map((instance) =>
     parsePrice(findIntanceValueByColumn(instance, 'pricing'))
   )
+  // Base discount credits that come with every paid plan
   const COMPUTE_CREDITS = 10
 
   const [activePlan, setActivePlan] = useState(plans[0])
   const [activeInstances, setActiveInstances] = useState([{ ...computeInstances[0], position: 0 }])
-  const [activePrice, setActivePrice] = useState(activePlan.price)
+  // Final calculated price: plan cost + compute aggregate - compute credits
+  const [activePrice, setActivePrice] = useState(activePlan.price + priceSteps[0] - COMPUTE_CREDITS)
 
   useEffect(() => {
     setActivePrice(activePlan.price + priceSteps[0] - COMPUTE_CREDITS)
@@ -89,6 +91,15 @@ const ComputePricingCalculator = () => {
       })
 
     setActiveInstances(newArray)
+  }
+
+  const findSliderComputeValue = (activeInstance: any) => {
+    // find index of compute based on active compute name
+    const selectedCompute = computeInstances
+      .map((compute) => findIntanceValueByColumn(compute, 'plan'))
+      .indexOf(findIntanceValueByColumn(activeInstance, 'plan'))
+
+    return [selectedCompute + 1]
   }
 
   const PriceSummary = () => (
@@ -218,10 +229,10 @@ const ComputePricingCalculator = () => {
             activeInstances.length === 1 && 'border-none'
           )}
         >
-          {activeInstances.map((activeInstance) => (
+          {activeInstances.map((activeInstance, index) => (
             <div
               className="group w-full flex flex-col gap-3 p-3 bg-surface-200 rounded border"
-              key={`instance-${activeInstance.position}`}
+              key={`instance-${index}`}
             >
               <div className="w-full flex justify-between items-center">
                 <div className="flex items-center gap-2">
@@ -246,7 +257,9 @@ const ComputePricingCalculator = () => {
               </div>
               <Slider_Shadcn_
                 onValueChange={(value) => handleUpdateInstance(activeInstance.position, value)}
+                value={findSliderComputeValue(activeInstance)}
                 min={1}
+                key={`${index}-${activeInstance.position}`}
                 max={priceSteps.length}
                 step={1}
                 className="w-full mt-1"
@@ -261,7 +274,7 @@ const ComputePricingCalculator = () => {
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  {activeInstance.position !== 0 && (
+                  {activeInstances.length > 1 && (
                     <button
                       aria-label="Remove item"
                       title="Remove item"
