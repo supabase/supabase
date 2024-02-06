@@ -17,6 +17,23 @@ const Job: NextPage = ({ data }: any) => {
   const meta_title = 'Careers | Supabase'
   const meta_description = 'Help build software developers love'
 
+  function decodeHtml(html: string): string {
+    const entityMap: Record<string, string> = {
+      '&amp;': '&',
+      '&lt;': '<',
+      '&gt;': '>',
+      '&quot;': '"',
+      '&#39;': "'",
+      '&#x2F;': '/',
+      '&#x60;': '`',
+      '&#x3D;': '=',
+    }
+
+    return html.replace(/&[^\s;]+;/g, match => {
+      return entityMap[match] || match
+    })
+  }
+
   console.log(data)
 
   return (
@@ -53,7 +70,7 @@ const Job: NextPage = ({ data }: any) => {
             allow="autoplay; modestbranding; encrypted-media"
             allowFullScreen
           />
-          <div dangerouslySetInnerHTML={{ __html: data.content }} />
+          <div dangerouslySetInnerHTML={{ __html: decodeHtml(data.content) }} />
         </div>
         <div
           id="application"
