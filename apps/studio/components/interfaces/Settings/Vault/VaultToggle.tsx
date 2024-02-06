@@ -17,7 +17,7 @@ import { BASE_PATH } from 'lib/constants'
 
 const VaultToggle = () => {
   const { ref } = useParams()
-  const { meta, ui } = useStore()
+  const { ui } = useStore()
   const { resolvedTheme } = useTheme()
   const { project } = useProjectContext()
   const [isEnabling, setIsEnabling] = useState(false)

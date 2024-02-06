@@ -1,4 +1,5 @@
 import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
+import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common/hooks'
 import { PolicyEditorModal, PolicyTableRow } from 'components/interfaces/Auth/Policies'
 import { isEmpty } from 'lodash'
@@ -6,6 +7,7 @@ import { useRouter } from 'next/router'
 import { useCallback, useState } from 'react'
 import toast from 'react-hot-toast'
 import { IconHelpCircle } from 'ui'
+import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 
 import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import ProtectedSchemaWarning from 'components/interfaces/Database/ProtectedSchemaWarning'
@@ -17,8 +19,8 @@ import { useDatabasePolicyCreateMutation } from 'data/database-policies/database
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
 import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
+import { useStore } from 'hooks'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 
 interface PoliciesProps {
   tables: PostgresTable[]
@@ -38,6 +40,8 @@ const Policies = ({
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
 
+  const { ui } = useStore()
+  const queryClient = useQueryClient()
   const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
 
   const [selectedSchemaAndTable, setSelectedSchemaAndTable] = useState<any>({})

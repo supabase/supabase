@@ -47,7 +47,7 @@ const TableGridEditor = ({
   selectedTable,
 }: TableGridEditorProps) => {
   const router = useRouter()
-  const { meta, ui } = useStore()
+  const { ui } = useStore()
   const { ref: projectRef, id } = useParams()
 
   const { project } = useProjectContext()

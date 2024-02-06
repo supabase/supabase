@@ -30,7 +30,7 @@ interface DescrptionProps {
 }
 
 const Description = ({ content, metadata, onChange = noop }: DescrptionProps) => {
-  const { meta, ui } = useStore()
+  const { ui } = useStore()
 
   const contentText = temp_removePostgrestText(content || '').trim()
   const [value, setValue] = useState(contentText)

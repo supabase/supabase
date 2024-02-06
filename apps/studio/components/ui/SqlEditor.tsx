@@ -2,7 +2,6 @@ import Editor, { OnChange, useMonaco } from '@monaco-editor/react'
 import { noop } from 'lodash'
 import { useEffect, useRef } from 'react'
 
-import { useStore } from 'hooks'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { formatQuery } from 'data/sql/format-sql-query'
 
@@ -26,7 +25,6 @@ const SqlEditor = ({
   onInputChange = noop,
 }: SqlEditorProps) => {
   const monaco = useMonaco()
-  const { meta } = useStore()
   const { project } = useProjectContext()
   const editorRef = useRef<any>()
 
