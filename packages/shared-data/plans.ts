@@ -98,7 +98,7 @@ export const plans: PricingInformation[] = [
     featuresPartner: [
       'SOC2',
       'HIPAA available as paid add-on',
-      'Additional member roles',
+      'Read only and Billing member roles',
       'SSO for Supabase Dashboard',
       'Standardised Security Questionnaire',
       'Priority email support & SLAs',
