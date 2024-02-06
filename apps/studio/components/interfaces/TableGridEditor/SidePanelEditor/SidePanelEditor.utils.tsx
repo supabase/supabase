@@ -132,49 +132,6 @@ export const removePrimaryKey = async (
   })
 }
 
-// [Joshen TODO] Eventually need to extend this to composite foreign keys
-/** @deprecated Use addForeignKeyV2 */
-export const addForeignKey = async (
-  projectRef: string,
-  connectionString: string | undefined,
-  relationship: ExtendedPostgresRelationship
-) => {
-  const { deletion_action, update_action } = relationship
-  const deletionAction =
-    deletion_action === FOREIGN_KEY_CASCADE_ACTION.CASCADE
-      ? 'ON DELETE CASCADE'
-      : deletion_action === FOREIGN_KEY_CASCADE_ACTION.RESTRICT
-        ? 'ON DELETE RESTRICT'
-        : deletion_action === FOREIGN_KEY_CASCADE_ACTION.SET_DEFAULT
-          ? 'ON DELETE SET DEFAULT'
-          : deletion_action === FOREIGN_KEY_CASCADE_ACTION.SET_NULL
-            ? 'ON DELETE SET NULL'
-            : ''
-  const updateAction =
-    update_action === FOREIGN_KEY_CASCADE_ACTION.CASCADE
-      ? 'ON UPDATE CASCADE'
-      : update_action === FOREIGN_KEY_CASCADE_ACTION.RESTRICT
-        ? 'ON UPDATE RESTRICT'
-        : ''
-
-  const query = `
-    ALTER TABLE "${relationship.source_schema}"."${relationship.source_table_name}"
-    ADD CONSTRAINT "${relationship.source_table_name}_${relationship.source_column_name}_fkey"
-    FOREIGN KEY ("${relationship.source_column_name}")
-    REFERENCES "${relationship.target_table_schema}"."${relationship.target_table_name}" ("${relationship.target_column_name}")
-    ${updateAction}
-    ${deletionAction};
-  `
-    .replace(/\s+/g, ' ')
-    .trim()
-  return await executeSql({
-    projectRef: projectRef,
-    connectionString: connectionString,
-    sql: query,
-    queryKey: ['foreign-keys'],
-  })
-}
-
 export const getAddForeignKeySQL = ({
   table,
   foreignKeys,
@@ -219,7 +176,6 @@ export const getAddForeignKeySQL = ({
   )
 }
 
-// [Joshen] Considers composite foreign keys
 export const addForeignKeyV2 = async ({
   projectRef,
   connectionString,
@@ -232,29 +188,6 @@ export const addForeignKeyV2 = async ({
   foreignKeys: ForeignKey[]
 }) => {
   const query = getAddForeignKeySQL({ table, foreignKeys })
-  return await executeSql({
-    projectRef: projectRef,
-    connectionString: connectionString,
-    sql: query,
-    queryKey: ['foreign-keys'],
-  })
-}
-
-/** @deprecated Use removeForeignKeyV2 */
-export const removeForeignKey = async (
-  projectRef: string,
-  connectionString: string | undefined,
-  relationship: Partial<PostgresRelationship>
-) => {
-  const constraintName =
-    relationship.constraint_name ||
-    `${relationship.source_table_name}_${relationship.source_column_name}_fkey`
-  const query = `
-    ALTER TABLE "${relationship.source_schema}"."${relationship.source_table_name}"
-    DROP CONSTRAINT IF EXISTS "${constraintName}"
-  `
-    .replace(/\s+/g, ' ')
-    .trim()
   return await executeSql({
     projectRef: projectRef,
     connectionString: connectionString,
