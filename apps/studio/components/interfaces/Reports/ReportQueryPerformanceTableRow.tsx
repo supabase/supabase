@@ -52,9 +52,6 @@ const ReportQueryPerformanceTableRow = ({ sql, colSpan, children }: Props) => {
       >
         {expanded && (
           <td colSpan={colSpan} className="!p-0 max-w-xl relative">
-            <div className="absolute right-2 top-2">
-              <QueryActions sql={sql} className="mb-2" />
-            </div>
             <div className="overflow-auto max-h-[400px] bg-background-alternative-200">
               <Editor
                 className={cn('monaco-editor h-80')}
