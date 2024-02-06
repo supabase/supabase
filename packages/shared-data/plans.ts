@@ -58,7 +58,7 @@ export const plans: PricingInformation[] = [
     description: 'For production applications with the option to scale.',
     features: [
       ['100,000 monthly active users', 'then $0.00325 per MAU'],
-      ['8GB dedicated Database space', 'then $0.125 per GB'],
+      ['8GB Database space', 'then $0.125 per GB'],
       ['250GB bandwidth', 'then $0.09 per GB'],
       ['100GB file storage', 'then $0.021 per GB'],
       'Daily backups stored for 7 days',
