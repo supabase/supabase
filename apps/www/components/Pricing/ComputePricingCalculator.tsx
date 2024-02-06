@@ -33,6 +33,7 @@ const findIntanceValueByColumn = (instance: any, column: string) =>
 const parsePrice = (price: string) => parseInt(price?.toString().replace('$', '').replace(',', ''))
 
 const ComputePricingCalculator = () => {
+  const [mount, setMount] = useState(false)
   const computeInstances = pricingAddOn.database.rows
   const priceSteps = computeInstances.map((instance) =>
     parsePrice(findIntanceValueByColumn(instance, 'pricing'))
@@ -118,6 +119,12 @@ const ComputePricingCalculator = () => {
       </div>
     </div>
   )
+
+  useEffect(() => {
+    setMount(true)
+  }, [])
+
+  if (!mount) return null
 
   return (
     <div className="flex flex-col lg:grid grid-cols-4 gap-4 h-full mt-4 lg:mt-0 border border-strong rounded-xl p-4">
@@ -237,11 +244,11 @@ const ComputePricingCalculator = () => {
               <div className="w-full flex justify-between items-center">
                 <div className="flex items-center gap-2">
                   <Badge
-                    className="rounded-md w-16 text-center flex justify-center"
+                    className="rounded-md w-16 text-center flex justify-center font-mono uppercase"
                     color={
                       findIntanceValueByColumn(activeInstance, 'plan') ===
                       findIntanceValueByColumn(computeInstances[0], 'plan')
-                        ? 'scale'
+                        ? 'gray'
                         : 'brand'
                     }
                   >
@@ -309,8 +316,9 @@ const ComputePricingCalculator = () => {
       </div>
       <ReactTooltip
         effect="solid"
-        className="!max-w-[320px] whitespace-pre-line"
-        backgroundColor="hsl(var(--background-alternative))"
+        backgroundColor="hsl(var(--background-alternative-default))"
+        textColor="hsl(var(--foreground-light))"
+        className="!max-w-[320px] !px-3 whitespace-pre-line"
       />
     </div>
   )
