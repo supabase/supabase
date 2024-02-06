@@ -156,9 +156,10 @@ const Layout: FC<Props> = (props) => {
           {!props.hideToc && hasTableOfContents && !props.meta?.hide_table_of_contents && (
             <div
               className={[
-                'col-span-3',
-                'border-overlay bg-background table-of-contents-height',
-                'thin-scrollbar overflow-y-auto sticky hidden md:block md:col-span-3 px-2',
+                'col-span-3 self-start',
+                'border-overlay bg-background',
+                'thin-scrollbar overflow-y-auto hidden md:block md:col-span-3 px-2',
+                'sticky top-[calc(var(--mobile-header-height,40px)+2rem)] lg:top-[calc(var(--desktop-header-height,60px)+2rem)]',
                 'transition-all ease-out',
                 'duration-100',
               ].join(' ')}
