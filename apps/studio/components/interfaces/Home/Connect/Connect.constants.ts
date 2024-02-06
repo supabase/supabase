@@ -37,12 +37,6 @@ export const FRAMEWORKS: ConnectionType[] = [
             children: [],
             icon: 'supabase',
           },
-          {
-            key: 'postgresjs',
-            label: 'pages Postgres.js',
-            icon: 'postgres',
-            children: [],
-          },
         ],
       },
     ],

@@ -79,9 +79,9 @@ const Connect = () => {
     connectionObject.find((item) => item.key === selectedParent)?.children[0]?.key ?? ''
   )
   const [selectedGrandchild, setSelectedGrandchild] = useState(
-    FRAMEWORKS.find((item) => item.key === selectedParent)?.children.find(
-      (child) => child.key === selectedChild
-    )?.children[0]?.key || ''
+    connectionObject
+      .find((item) => item.key === selectedParent)
+      ?.children.find((child) => child.key === selectedChild)?.children[0]?.key || ''
   )
 
   const handleParentChange = (value: string) => {
@@ -197,7 +197,7 @@ const Connect = () => {
   return (
     <>
       <div>
-        <Dialog_Shadcn_>
+        <Dialog_Shadcn_ open={true}>
           <DialogTrigger_Shadcn_ asChild>
             <Button type="default">
               <span className="flex items-center gap-2">
@@ -205,7 +205,7 @@ const Connect = () => {
               </span>
             </Button>
           </DialogTrigger_Shadcn_>
-          <DialogContent_Shadcn_ className="sm:max-w-5xl">
+          <DialogContent_Shadcn_ className="sm:max-w-5xl translate-y-0 top-24">
             <DialogHeader_Shadcn_>
               <DialogTitle_Shadcn_>Connect to your project</DialogTitle_Shadcn_>
               <DialogDescription_Shadcn_>

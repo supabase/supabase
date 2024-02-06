@@ -33,8 +33,8 @@ DIRECT_URL="postgres://postgres:[password]@db.[your-supabase-project].supabase.c
           {`
 datasource db {
   provider  = "postgresql"
-  url       = env(${projectKeys.apiUrl ?? '"DATABASE_URL"'})
-  directUrl = env(${projectKeys.apiUrl ?? '"DIRECT_URL"'})
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
         `}
         </SimpleCodeBlock>
