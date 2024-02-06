@@ -7,7 +7,10 @@ import { Alert, Badge, Button, Checkbox, IconBookOpen, Input, Modal, SidePanel }
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
-import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
+import {
+  ForeignKeyConstraint,
+  useForeignKeyConstraintsQuery,
+} from 'data/database/foreign-key-constraints-query'
 import { usePostgresTypesQuery } from 'data/database/types-query'
 import { useIsFeatureEnabled, useStore } from 'hooks'
 import { EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
@@ -49,6 +52,7 @@ export interface TableEditorProps {
       isRLSEnabled: boolean
       isRealtimeEnabled: boolean
       isDuplicateRows: boolean
+      existingForeignKeyRelations: ForeignKeyConstraint[]
     },
     resolve: any
   ) => void
@@ -103,6 +107,9 @@ const TableEditor = ({
     connectionString: project?.connectionString,
     schema: table?.schema,
   })
+  const foreignKeys = (foreignKeyMeta ?? []).filter(
+    (fk) => fk.source_schema === table?.schema && fk.source_table === table?.name
+  )
 
   useEffect(() => {
     if (visible) {
@@ -121,12 +128,12 @@ const TableEditor = ({
           isRealtimeEnabled
         )
         setTableFields(tableFields)
-
-        const foreignKeys = (foreignKeyMeta ?? []).filter((fk) => fk.source_table === table?.name)
         setFkRelations(
           foreignKeys.map((x) => {
             return {
               id: x.id,
+              name: x.constraint_name,
+              tableId: x.target_id,
               schema: x.target_schema,
               table: x.target_table,
               columns: x.source_columns.map((y, i) => ({ source: y, target: x.target_columns[i] })),
@@ -179,6 +186,7 @@ const TableEditor = ({
           isRLSEnabled: tableFields.isRLSEnabled,
           isRealtimeEnabled: tableFields.isRealtimeEnabled,
           isDuplicateRows: isDuplicateRows,
+          existingForeignKeyRelations: foreignKeys,
         }
 
         saveChanges(payload, tableFields.columns, fkRelations, isNewRecord, configuration, resolve)
@@ -259,7 +267,7 @@ const TableEditor = ({
           <Alert
             withIcon
             variant="info"
-            className="!px-4 !py-3 mt-3"
+            className="!px-4 !py-3 !mt-3"
             title="Policies are required to query data"
           >
             <p>
@@ -374,16 +382,19 @@ const TableEditor = ({
         </ConfirmationModal>
       </SidePanel.Content>
 
-      <SidePanel.Separator />
-
-      <SidePanel.Content className="py-6">
-        <ForeignKeysManagement
-          table={tableFields}
-          relations={fkRelations}
-          closePanel={closePanel}
-          onUpdateFkRelations={setFkRelations}
-        />
-      </SidePanel.Content>
+      {!isDuplicating && (
+        <>
+          <SidePanel.Separator />
+          <SidePanel.Content className="py-6">
+            <ForeignKeysManagement
+              table={tableFields}
+              relations={fkRelations}
+              closePanel={closePanel}
+              onUpdateFkRelations={setFkRelations}
+            />
+          </SidePanel.Content>
+        </>
+      )}
     </SidePanel>
   )
 }

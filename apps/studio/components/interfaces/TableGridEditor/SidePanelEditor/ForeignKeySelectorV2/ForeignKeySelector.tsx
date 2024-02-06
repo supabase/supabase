@@ -85,6 +85,7 @@ export const ForeignKeySelector = ({
     if (table)
       setFk({
         ...EMPTY_STATE,
+        tableId: table.id,
         schema: table.schema,
         table: table.name,
         columns: [{ source: '', target: '' }],
@@ -245,19 +246,21 @@ export const ForeignKeySelector = ({
                           <Listbox.Option key="empty" value={''} label="---" className="!w-[170px]">
                             ---
                           </Listbox.Option>
-                          {(table?.columns ?? []).map((column) => (
-                            <Listbox.Option
-                              key={column.id}
-                              value={column.name}
-                              label={column.name}
-                              className="!w-[170px]"
-                            >
-                              <div className="flex items-center gap-2">
-                                <span className="text-foreground">{column.name}</span>
-                                <span className="text-foreground-lighter">{column.format}</span>
-                              </div>
-                            </Listbox.Option>
-                          ))}
+                          {(table?.columns ?? [])
+                            .filter((x) => x.name.length !== 0)
+                            .map((column) => (
+                              <Listbox.Option
+                                key={column.id}
+                                value={column.name}
+                                label={column.name}
+                                className="!w-[170px]"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <span className="text-foreground">{column.name}</span>
+                                  <span className="text-foreground-lighter">{column.format}</span>
+                                </div>
+                              </Listbox.Option>
+                            ))}
                         </Listbox>
                       </div>
                       <div className="col-span-1 flex justify-center items-center">

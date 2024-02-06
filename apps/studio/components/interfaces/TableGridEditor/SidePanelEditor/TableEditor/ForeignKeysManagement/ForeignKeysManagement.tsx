@@ -11,6 +11,7 @@ import { ForeignKeySelector } from '../../ForeignKeySelectorV2/ForeignKeySelecto
 import { TableField } from '../TableEditor.types'
 import { ForeignKeyRow } from './ForeignKeyRow'
 import { ForeignKey } from '../../ForeignKeySelectorV2/ForeignKeySelector.types'
+import { checkIfRelationChanged } from './ForeignKeysManagement.utils'
 
 interface ForeignKeysManagementProps {
   table: TableField
@@ -36,19 +37,17 @@ export const ForeignKeysManagement = ({
     connectionString: project?.connectionString,
     schema: snap.selectedSchemaName,
   })
-  const existingForeignKeyIds = (data ?? []).map((x) => x.id)
 
   const getRelationStatus = (fk: ForeignKey) => {
     const existingRelation = (data ?? []).find((x) => x.id === fk.id)
     const stateRelation = relations.find((x) => x.id === fk.id)
-    if (typeof fk.id === 'string') {
-      return 'ADD'
-    } else if (typeof fk.id === 'number') {
-      if (existingRelation !== undefined && stateRelation === undefined) {
-        return 'REMOVE'
-      } else {
-        // [Joshen] Logic to determine if update, or no change
-      }
+
+    if (stateRelation?.toRemove) return 'REMOVE'
+    if (existingRelation === undefined && stateRelation !== undefined) return 'ADD'
+    if (existingRelation !== undefined && stateRelation !== undefined) {
+      const hasUpdated = checkIfRelationChanged(existingRelation, stateRelation)
+      if (hasUpdated) return 'UPDATE'
+      else return undefined
     }
   }
 
@@ -69,19 +68,36 @@ export const ForeignKeysManagement = ({
         {isSuccess && (
           <div>
             {relations.map((fk) => {
+              const status = getRelationStatus(fk)
               return (
                 <ForeignKeyRow
                   key={fk.id}
-                  status={''}
+                  status={status}
                   foreignKey={fk}
                   closePanel={closePanel}
                   onSelectEdit={() => {
                     setOpen(true)
                     setSelectedFk(fk)
                   }}
-                  onSelectRemove={() =>
-                    onUpdateFkRelations(relations.filter((x) => x.id !== fk.id))
-                  }
+                  onSelectRemove={() => {
+                    if (fk.id === undefined) {
+                      const updatedRelations = relations.filter((x) => x.id !== fk.id)
+                      onUpdateFkRelations(updatedRelations)
+                    } else {
+                      const updatedRelations = relations.map((x) => {
+                        if (x.id === fk.id) return { ...x, toRemove: true }
+                        else return x
+                      })
+                      onUpdateFkRelations(updatedRelations)
+                    }
+                  }}
+                  onSelectUndoRemove={() => {
+                    const updatedRelations = relations.map((x) => {
+                      if (x.id === fk.id) return { ...x, toRemove: false }
+                      else return x
+                    })
+                    onUpdateFkRelations(updatedRelations)
+                  }}
                 />
               )
             })}
@@ -104,7 +120,7 @@ export const ForeignKeysManagement = ({
         }}
         onSaveRelation={(fk) => {
           const existingRelationIds = relations.map((x) => x.id)
-          if (existingRelationIds.includes(fk.id)) {
+          if (fk.id !== undefined && existingRelationIds.includes(fk.id)) {
             onUpdateFkRelations(
               relations.map((x) => {
                 if (x.id === fk.id) return fk

@@ -42,6 +42,7 @@ import {
 import { ImportContent } from './TableEditor/TableEditor.types'
 import { TextEditor } from './RowEditor/TextEditor'
 import { ForeignKey } from './ForeignKeySelectorV2/ForeignKeySelector.types'
+import { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 
 export interface SidePanelEditorProps {
   editable?: boolean
@@ -212,7 +213,7 @@ const SidePanelEditor = ({
 
   const saveColumn = async (
     payload: CreateColumnPayload | UpdateColumnPayload,
-    foreignKey: ExtendedPostgresRelationship | undefined,
+    foreignKey: ExtendedPostgresRelationship | undefined, // [Joshen TODO] Deprecate this param
     isNewRecord: boolean,
     configuration: { columnId?: string },
     resolve: any
@@ -226,7 +227,6 @@ const SidePanelEditor = ({
           connectionString: project?.connectionString,
           payload: payload as CreateColumnPayload,
           selectedTable: selectedTable as PostgresTable,
-          foreignKey,
         })
       : await updateColumn({
           projectRef: project?.ref!,
@@ -234,7 +234,6 @@ const SidePanelEditor = ({
           id: columnId as string,
           payload: payload as UpdateColumnPayload,
           selectedTable: selectedTable as PostgresTable,
-          foreignKey,
         })
 
     if (response?.error) {
@@ -375,12 +374,19 @@ const SidePanelEditor = ({
       isRLSEnabled: boolean
       isRealtimeEnabled: boolean
       isDuplicateRows: boolean
+      existingForeignKeyRelations: ForeignKeyConstraint[]
     },
     resolve: any
   ) => {
     let toastId
     let saveTableError = false
-    const { importContent, isRLSEnabled, isRealtimeEnabled, isDuplicateRows } = configuration
+    const {
+      importContent,
+      isRLSEnabled,
+      isRealtimeEnabled,
+      isDuplicateRows,
+      existingForeignKeyRelations,
+    } = configuration
 
     try {
       if (
@@ -390,15 +396,13 @@ const SidePanelEditor = ({
       ) {
         const tableToDuplicate = selectedTable
 
-        toastId = ui.setNotification({
-          category: 'loading',
-          message: `Duplicating table: ${tableToDuplicate.name}...`,
-        })
+        toastId = toast.loading(`Duplicating table: ${tableToDuplicate.name}...`)
 
         const table = await duplicateTable(project?.ref!, project?.connectionString, payload, {
           isRLSEnabled,
           isDuplicateRows,
           duplicateTable: tableToDuplicate,
+          foreignKeyRelations,
         })
         if (isRealtimeEnabled) await updateTableRealtime(table, isRealtimeEnabled)
 
@@ -407,28 +411,24 @@ const SidePanelEditor = ({
           queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
         ])
 
-        ui.setNotification({
-          id: toastId,
-          category: 'success',
-          message: `Table ${tableToDuplicate.name} has been successfully duplicated into ${table.name}!`,
-        })
-
+        toast.success(
+          `Table ${tableToDuplicate.name} has been successfully duplicated into ${table.name}!`,
+          { id: toastId }
+        )
         onTableCreated(table)
       } else if (isNewRecord) {
-        toastId = ui.setNotification({
-          category: 'loading',
-          message: `Creating new table: ${payload.name}...`,
-        })
+        toastId = toast.loading(`Creating new table: ${payload.name}...`)
 
-        const table = await createTable(
-          project?.ref!,
-          project?.connectionString,
+        const table = await createTable({
+          projectRef: project?.ref!,
+          connectionString: project?.connectionString,
           toastId,
           payload,
           columns,
+          foreignKeyRelations,
           isRLSEnabled,
-          importContent
-        )
+          importContent,
+        })
         if (isRealtimeEnabled) await updateTableRealtime(table as PostgresTable, true)
 
         await Promise.all([
@@ -436,36 +436,26 @@ const SidePanelEditor = ({
           queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
         ])
 
-        ui.setNotification({
-          id: toastId,
-          category: 'success',
-          message: `Table ${table.name} is good to go!`,
-        })
-
+        toast.success(`Table ${table.name} is good to go!`, { id: toastId })
         onTableCreated(table as PostgresTable)
       } else if (selectedTable) {
-        toastId = ui.setNotification({
-          category: 'loading',
-          message: `Updating table: ${selectedTable?.name}...`,
-        })
+        toastId = toast.loading(`Updating table: ${selectedTable?.name}...`)
 
-        const { table, hasError } = await updateTable(
-          project?.ref!,
-          project?.connectionString,
+        const { table, hasError } = await updateTable({
+          projectRef: project?.ref!,
+          connectionString: project?.connectionString,
           toastId,
-          selectedTable,
+          table: selectedTable,
           payload,
-          columns
-        )
+          columns,
+          foreignKeyRelations,
+          existingForeignKeyRelations,
+        })
 
         await updateTableRealtime(table, isRealtimeEnabled)
 
         if (hasError) {
-          ui.setNotification({
-            id: toastId,
-            category: 'info',
-            message: `Table ${table.name} has been updated, but there were some errors`,
-          })
+          toast(`Table ${table.name} has been updated, but there were some errors`, { id: toastId })
         } else {
           queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints']))
           await Promise.all([
@@ -483,16 +473,12 @@ const SidePanelEditor = ({
             queryClient.invalidateQueries(tableKeys.table(project?.ref, table.id)),
           ])
 
-          ui.setNotification({
-            id: toastId,
-            category: 'success',
-            message: `Successfully updated ${table.name}!`,
-          })
+          toast.success(`Successfully updated ${table.name}!`, { id: toastId })
         }
       }
     } catch (error: any) {
       saveTableError = true
-      ui.setNotification({ error, id: toastId, category: 'error', message: error.message })
+      toast.error(error.message, { id: toastId })
     }
 
     if (!saveTableError) {

@@ -5,12 +5,16 @@ import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { Query } from 'components/grid/query/Query'
+import SparkBar from 'components/ui/SparkBar'
 import { createDatabaseColumn } from 'data/database-columns/database-column-create-mutation'
 import { deleteDatabaseColumn } from 'data/database-columns/database-column-delete-mutation'
 import { updateDatabaseColumn } from 'data/database-columns/database-column-update-mutation'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
+import { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
+import { entityTypeKeys } from 'data/entity-types/keys'
 import { getQueryClient } from 'data/query-client'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { sqlKeys } from 'data/sql/keys'
 import { tableKeys } from 'data/tables/keys'
 import { createTable as createTableMutation } from 'data/tables/table-create-mutation'
 import { deleteTable as deleteTableMutation } from 'data/tables/table-delete-mutation'
@@ -25,16 +29,15 @@ import {
   generateCreateColumnPayload,
   generateUpdateColumnPayload,
 } from './ColumnEditor/ColumnEditor.utils'
+import { ForeignKey } from './ForeignKeySelectorV2/ForeignKeySelector.types'
 import {
   ColumnField,
   CreateColumnPayload,
   ExtendedPostgresRelationship,
   UpdateColumnPayload,
 } from './SidePanelEditor.types'
+import { checkIfRelationChanged } from './TableEditor/ForeignKeysManagement/ForeignKeysManagement.utils'
 import { ImportContent } from './TableEditor/TableEditor.types'
-import { sqlKeys } from 'data/sql/keys'
-import { entityTypeKeys } from 'data/entity-types/keys'
-import SparkBar from 'components/ui/SparkBar'
 
 const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
@@ -130,6 +133,7 @@ export const removePrimaryKey = async (
 }
 
 // [Joshen TODO] Eventually need to extend this to composite foreign keys
+/** @deprecated Use addForeignKeyV2 */
 export const addForeignKey = async (
   projectRef: string,
   connectionString: string | undefined,
@@ -171,6 +175,72 @@ export const addForeignKey = async (
   })
 }
 
+export const getAddForeignKeySQL = ({
+  table,
+  foreignKeys,
+}: {
+  table: { schema: string; name: string }
+  foreignKeys: ForeignKey[]
+}) => {
+  const getOnDeleteSql = (action: string) =>
+    action === FOREIGN_KEY_CASCADE_ACTION.CASCADE
+      ? 'ON DELETE CASCADE'
+      : action === FOREIGN_KEY_CASCADE_ACTION.RESTRICT
+        ? 'ON DELETE RESTRICT'
+        : action === FOREIGN_KEY_CASCADE_ACTION.SET_DEFAULT
+          ? 'ON DELETE SET DEFAULT'
+          : action === FOREIGN_KEY_CASCADE_ACTION.SET_NULL
+            ? 'ON DELETE SET NULL'
+            : ''
+  const getOnUpdateSql = (action: string) =>
+    action === FOREIGN_KEY_CASCADE_ACTION.CASCADE
+      ? 'ON UPDATE CASCADE'
+      : action === FOREIGN_KEY_CASCADE_ACTION.RESTRICT
+        ? 'ON UPDATE RESTRICT'
+        : ''
+  return (
+    foreignKeys
+      .map((relation) => {
+        const { deletionAction, updateAction } = relation
+        const onDeleteSql = getOnDeleteSql(deletionAction)
+        const onUpdateSql = getOnUpdateSql(updateAction)
+        return `
+      ALTER TABLE "${table.schema}"."${table.name}"
+      ADD CONSTRAINT "${table.schema}_${table.name}_${relation.columns.map((x) => x.source).join('_')}_fkey"
+      FOREIGN KEY (${relation.columns.map((column) => `"${column.source}"`).join(',')})
+      REFERENCES "${relation.schema}"."${relation.table}" (${relation.columns.map((column) => `"${column.target}"`).join(',')})
+      ${onUpdateSql}
+      ${onDeleteSql}
+    `
+          .replace(/\s+/g, ' ')
+          .trim()
+      })
+      .join(';') + ';'
+  )
+}
+
+// [Joshen] Considers composite foreign keys
+export const addForeignKeyV2 = async ({
+  projectRef,
+  connectionString,
+  table,
+  foreignKeys,
+}: {
+  projectRef: string
+  connectionString: string | undefined
+  table: { schema: string; name: string }
+  foreignKeys: ForeignKey[]
+}) => {
+  const query = getAddForeignKeySQL({ table, foreignKeys })
+  return await executeSql({
+    projectRef: projectRef,
+    connectionString: connectionString,
+    sql: query,
+    queryKey: ['foreign-keys'],
+  })
+}
+
+/** @deprecated Use removeForeignKeyV2 */
 export const removeForeignKey = async (
   projectRef: string,
   connectionString: string | undefined,
@@ -193,6 +263,72 @@ export const removeForeignKey = async (
   })
 }
 
+export const getRemoveForeignKeySQL = ({
+  table,
+  foreignKeys,
+}: {
+  table: { schema: string; name: string }
+  foreignKeys: ForeignKey[]
+}) => {
+  return (
+    foreignKeys
+      .map((relation) =>
+        `
+ALTER TABLE IF EXISTS "${table.schema}"."${table.name}"
+DROP CONSTRAINT IF EXISTS "${relation.name}"
+`
+          .replace(/\s+/g, ' ')
+          .trim()
+      )
+      .join(';') + ';'
+  )
+}
+
+export const removeForeignKeyV2 = async ({
+  projectRef,
+  connectionString,
+  table,
+  foreignKeys,
+}: {
+  projectRef: string
+  connectionString: string | undefined
+  table: { schema: string; name: string }
+  foreignKeys: ForeignKey[]
+}) => {
+  const query = getRemoveForeignKeySQL({ table, foreignKeys })
+  return await executeSql({
+    projectRef: projectRef,
+    connectionString: connectionString,
+    sql: query,
+    queryKey: ['foreign-keys'],
+  })
+}
+
+export const updateForeignKeyV2 = async ({
+  projectRef,
+  connectionString,
+  table,
+  foreignKeys,
+}: {
+  projectRef: string
+  connectionString: string | undefined
+  table: { schema: string; name: string }
+  foreignKeys: ForeignKey[]
+}) => {
+  const query = `
+  ${getRemoveForeignKeySQL({ table, foreignKeys })}
+  ${getAddForeignKeySQL({ table, foreignKeys })}
+  `
+    .replace(/\s+/g, ' ')
+    .trim()
+  return await executeSql({
+    projectRef: projectRef,
+    connectionString: connectionString,
+    sql: query,
+    queryKey: ['foreign-keys'],
+  })
+}
+
 /**
  * The methods below involve several contexts due to the UI flow of the
  * dashboard and hence do not sit within their own stores
@@ -202,13 +338,11 @@ export const createColumn = async ({
   connectionString,
   payload,
   selectedTable,
-  foreignKey,
 }: {
   projectRef: string
   connectionString: string | undefined
   payload: CreateColumnPayload
   selectedTable: PostgresTable
-  foreignKey?: ExtendedPostgresRelationship
 }) => {
   const toastId = toast.loading(`Creating column "${payload.name}"...`)
   try {
@@ -239,12 +373,6 @@ export const createColumn = async ({
         primaryKeyColumns
       )
     }
-
-    if (foreignKey !== undefined) {
-      toast.loading('Adding foreign key to column...', { id: toastId })
-      await addForeignKey(projectRef, connectionString, foreignKey)
-    }
-
     toast.success(`Successfully created column "${column.name}"`, { id: toastId })
   } catch (error: any) {
     toast.error(`An error occurred while creating the column "${payload.name}"`, { id: toastId })
@@ -258,7 +386,6 @@ export const updateColumn = async ({
   id,
   payload,
   selectedTable,
-  foreignKey,
   skipPKCreation,
   skipSuccessMessage = false,
 }: {
@@ -267,7 +394,6 @@ export const updateColumn = async ({
   id: string
   payload: UpdateColumnPayload
   selectedTable: PostgresTable
-  foreignKey?: ExtendedPostgresRelationship
   skipPKCreation?: boolean
   skipSuccessMessage?: boolean
 }) => {
@@ -279,11 +405,6 @@ export const updateColumn = async ({
       id,
       payload: formattedPayload,
     })
-
-    const originalColumn = selectedTable.columns?.find((c) => c.id === id)
-    const existingForeignKey = selectedTable.relationships.find(
-      (r) => r.source_column_name === originalColumn!.name
-    )
 
     if (!skipPKCreation && isPrimaryKey !== undefined) {
       const existingPrimaryKeys = selectedTable.primary_keys.map((x) => x.name)
@@ -307,20 +428,7 @@ export const updateColumn = async ({
         )
       }
     }
-
-    // For updating of foreign key relationship, we remove the original one by default
-    // Then just add whatever was in foreignKey - simplicity over trying to derive whether to update or not
-    if (existingForeignKey !== undefined) {
-      await removeForeignKey(projectRef, connectionString, existingForeignKey)
-    }
-
-    if (foreignKey !== undefined) {
-      await addForeignKey(projectRef, connectionString, foreignKey)
-    }
-
-    if (!skipSuccessMessage) {
-      toast.success(`Successfully updated column "${column.name}"`)
-    }
+    if (!skipSuccessMessage) toast.success(`Successfully updated column "${column.name}"`)
   } catch (error: any) {
     return { error }
   }
@@ -334,9 +442,11 @@ export const duplicateTable = async (
     duplicateTable: PostgresTable
     isRLSEnabled: boolean
     isDuplicateRows: boolean
+    foreignKeyRelations: ForeignKey[]
   }
 ) => {
-  const { duplicateTable, isRLSEnabled, isDuplicateRows } = metadata
+  const queryClient = getQueryClient()
+  const { duplicateTable, isRLSEnabled, isDuplicateRows, foreignKeyRelations } = metadata
   const { name: sourceTableName, schema: sourceTableSchema } = duplicateTable
   const duplicatedTableName = payload.name
 
@@ -347,23 +457,21 @@ export const duplicateTable = async (
     connectionString,
     sql: `CREATE TABLE "${sourceTableSchema}"."${duplicatedTableName}" (LIKE "${sourceTableSchema}"."${sourceTableName}" INCLUDING ALL);`,
   })
+  await queryClient.invalidateQueries(tableKeys.list(projectRef, sourceTableSchema))
 
   // Duplicate foreign key constraints over
-  const relationships = duplicateTable.relationships
-  if (relationships.length > 0) {
-    relationships.map(async (relationship: PostgresRelationship) => {
-      await addForeignKey(projectRef, connectionString, {
-        ...relationship,
-        source_table_name: duplicatedTableName,
-        deletion_action: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
-        update_action: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
-      })
+  if (foreignKeyRelations.length > 0) {
+    await addForeignKeyV2({
+      projectRef,
+      connectionString,
+      table: { ...duplicateTable, name: payload.name },
+      foreignKeys: foreignKeyRelations,
     })
   }
 
   // Duplicate rows if needed
   if (isDuplicateRows) {
-    const rows = await executeSql({
+    await executeSql({
       projectRef,
       connectionString,
       sql: `INSERT INTO "${sourceTableSchema}"."${duplicatedTableName}" SELECT * FROM "${sourceTableSchema}"."${sourceTableName}";`,
@@ -373,7 +481,7 @@ export const duplicateTable = async (
     const columns = duplicateTable.columns ?? []
     const identityColumns = columns.filter((column) => column.identity_generation !== null)
     identityColumns.map(async (column) => {
-      const identity = await executeSql({
+      await executeSql({
         projectRef,
         connectionString,
         sql: `SELECT setval('"${sourceTableSchema}"."${duplicatedTableName}_${column.name}_seq"', (SELECT MAX("${column.name}") FROM "${sourceTableSchema}"."${sourceTableName}"));`,
@@ -381,7 +489,6 @@ export const duplicateTable = async (
     })
   }
 
-  const queryClient = getQueryClient()
   const tables = await queryClient.fetchQuery({
     queryKey: tableKeys.list(projectRef, sourceTableSchema),
     queryFn: ({ signal }) =>
@@ -403,19 +510,29 @@ export const duplicateTable = async (
   return duplicatedTable
 }
 
-export const createTable = async (
-  projectRef: string,
-  connectionString: string | undefined,
-  toastId: string,
+export const createTable = async ({
+  projectRef,
+  connectionString,
+  toastId,
+  payload,
+  columns = [],
+  foreignKeyRelations,
+  isRLSEnabled,
+  importContent,
+}: {
+  projectRef: string
+  connectionString: string | undefined
+  toastId: string
   payload: {
     name: string
     schema: string
     comment?: string | undefined
-  },
-  columns: ColumnField[] = [],
-  isRLSEnabled: boolean,
+  }
+  columns: ColumnField[]
+  foreignKeyRelations: ForeignKey[]
+  isRLSEnabled: boolean
   importContent?: ImportContent
-) => {
+}) => {
   // Create the table first. Error may be thrown.
   const table = await createTableMutation({
     projectRef: projectRef,
@@ -466,10 +583,13 @@ export const createTable = async (
     }
 
     // Then add the foreign key constraints here
-    for (const column of columns) {
-      if (column.foreignKey !== undefined) {
-        await addForeignKey(projectRef, connectionString, column.foreignKey)
-      }
+    if (foreignKeyRelations.length > 0) {
+      await addForeignKeyV2({
+        projectRef,
+        connectionString,
+        table: { schema: table.schema, name: table.name },
+        foreignKeys: foreignKeyRelations,
+      })
     }
 
     // If the user is importing data via a spreadsheet
@@ -570,14 +690,25 @@ export const createTable = async (
   }
 }
 
-export const updateTable = async (
-  projectRef: string,
-  connectionString: string | undefined,
-  toastId: string,
-  table: PostgresTable,
-  payload: any,
+export const updateTable = async ({
+  projectRef,
+  connectionString,
+  toastId,
+  table,
+  payload,
+  columns,
+  foreignKeyRelations,
+  existingForeignKeyRelations,
+}: {
+  projectRef: string
+  connectionString: string | undefined
+  toastId: string
+  table: PostgresTable
+  payload: any
   columns: ColumnField[]
-) => {
+  foreignKeyRelations: ForeignKey[]
+  existingForeignKeyRelations: ForeignKeyConstraint[]
+}) => {
   // Prepare a check to see if primary keys to the tables were updated or not
   const primaryKeyColumns = columns
     .filter((column) => column.isPrimaryKey)
@@ -635,7 +766,6 @@ export const updateTable = async (
         connectionString: connectionString,
         payload: columnPayload,
         selectedTable: updatedTable as PostgresTable,
-        foreignKey: column.foreignKey,
       })
     } else {
       const originalColumn = find(originalColumns, { id: column.id })
@@ -645,14 +775,7 @@ export const updateTable = async (
           updatedTable as PostgresTable,
           column
         )
-        const originalForeignKey = find(table.relationships, {
-          source_schema: originalColumn.schema,
-          source_table_name: originalColumn.table,
-          source_column_name: originalColumn.name,
-        })
-
-        const hasForeignKeyUpdated = !isEqual(originalForeignKey, column.foreignKey)
-        if (!isEmpty(columnPayload) || hasForeignKeyUpdated) {
+        if (!isEmpty(columnPayload)) {
           toast.loading(`Updating column ${column.name} from ${updatedTable.name}`, { id: toastId })
           const skipPKCreation = true
           const skipSuccessMessage = true
@@ -662,7 +785,6 @@ export const updateTable = async (
             id: column.id,
             payload: columnPayload,
             selectedTable: updatedTable as PostgresTable,
-            foreignKey: column.foreignKey,
             skipPKCreation,
             skipSuccessMessage,
           })
@@ -684,6 +806,43 @@ export const updateTable = async (
       updatedTable.name,
       primaryKeyColumns
     )
+  }
+
+  // Foreign keys will get updated here accordingly
+  const relationsToAdd = foreignKeyRelations.filter((x) => x.id === undefined)
+  if (relationsToAdd.length > 0) {
+    await addForeignKeyV2({
+      projectRef,
+      connectionString,
+      table: updatedTable,
+      foreignKeys: relationsToAdd,
+    })
+  }
+
+  const relationsToRemove = foreignKeyRelations.filter((x) => x.toRemove)
+  if (relationsToRemove.length > 0) {
+    await removeForeignKeyV2({
+      projectRef,
+      connectionString,
+      table: updatedTable,
+      foreignKeys: relationsToRemove,
+    })
+  }
+
+  const remainingRelations = foreignKeyRelations.filter((x) => x.id !== undefined && !x.toRemove)
+  const relationsToUpdate = remainingRelations.filter((x) => {
+    const existingRelation = existingForeignKeyRelations.find((y) => x.id === y.id)
+    if (existingRelation !== undefined) {
+      return checkIfRelationChanged(existingRelation as unknown as ForeignKeyConstraint, x)
+    } else return false
+  })
+  if (relationsToUpdate.length > 0) {
+    await updateForeignKeyV2({
+      projectRef,
+      connectionString,
+      table: updatedTable,
+      foreignKeys: relationsToUpdate,
+    })
   }
 
   const queryClient = getQueryClient()

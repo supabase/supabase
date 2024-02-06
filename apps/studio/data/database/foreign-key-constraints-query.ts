@@ -25,11 +25,11 @@ export type ForeignKeyConstraint = {
   constraint_name: string
   deletion_action: string
   update_action: string
-  source_id: string
+  source_id: number
   source_schema: string
   source_table: string
   source_columns: string[]
-  target_id: string
+  target_id: number
   target_schema: string
   target_table: string
   target_columns: string[]

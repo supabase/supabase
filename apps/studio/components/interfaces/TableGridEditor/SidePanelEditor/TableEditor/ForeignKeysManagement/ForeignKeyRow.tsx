@@ -2,24 +2,27 @@ import clsx from 'clsx'
 import { useParams } from 'common'
 import Link from 'next/link'
 import SVG from 'react-inlinesvg'
-import { Button, IconArrowRight } from 'ui'
+import { Badge, Button, IconArrowRight } from 'ui'
 
 import { BASE_PATH } from 'lib/constants'
 import { ForeignKey } from '../../ForeignKeySelectorV2/ForeignKeySelector.types'
 
 interface ForeignKeyProps {
   foreignKey: ForeignKey
-  status: string
+  status?: 'ADD' | 'UPDATE' | 'REMOVE'
   closePanel: () => void
   onSelectEdit: () => void
   onSelectRemove: () => void
+  onSelectUndoRemove: () => void
 }
 
 export const ForeignKeyRow = ({
   foreignKey,
+  status,
   closePanel,
   onSelectEdit,
   onSelectRemove,
+  onSelectUndoRemove,
 }: ForeignKeyProps) => {
   const { ref } = useParams()
 
@@ -31,33 +34,47 @@ export const ForeignKeyRow = ({
       )}
     >
       <div className="flex flex-col gap-y-2">
-        <div className="flex items-center gap-x-2">
-          <p className="text-sm text-foreground-light">
-            {foreignKey.columns.length > 1 ? 'Composite foreign' : 'Foreign'} key relation to
-          </p>
-          <Button
-            asChild
-            type="default"
-            className="py-0.5 px-1.5 font-mono"
-            icon={
-              <SVG
-                className="table-icon"
-                src={`${BASE_PATH}/img/icons/table-icon.svg`}
-                style={{ width: `16px`, height: `16px`, strokeWidth: '1px' }}
-                preProcessor={(code: any) =>
-                  code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
-                }
-                loader={<span className="block w-4 h-4 bg-[#133929] rounded-sm" />}
-                cacheRequests={true}
-              />
-            }
-          >
-            {/* [Joshen TODO] Fix this */}
-            <Link href={`/project/${ref}/editor/${0}`} onClick={() => closePanel()}>
-              {foreignKey.schema}.{foreignKey.table}
-            </Link>
-          </Button>
+        <div className="flex flex-col gap-y-1">
+          {foreignKey.name && (
+            <p className="text-xs text-foreground font-mono">{foreignKey.name}</p>
+          )}
+          <div className="flex items-center gap-x-2">
+            {status !== undefined && (
+              <Badge color={status === 'ADD' ? 'green' : status === 'UPDATE' ? 'amber' : 'red'}>
+                {status}
+              </Badge>
+            )}
+            <p className="text-sm text-foreground-light">
+              {foreignKey.columns.length > 1 ? 'Composite foreign' : 'Foreign'} key relation to:
+            </p>
+            <Button
+              asChild
+              type="default"
+              title={`${foreignKey.schema}.${foreignKey.table}`}
+              className="py-0.5 px-1.5 font-mono"
+              icon={
+                <SVG
+                  className="table-icon"
+                  src={`${BASE_PATH}/img/icons/table-icon.svg`}
+                  style={{ width: `16px`, height: `16px`, strokeWidth: '1px' }}
+                  preProcessor={(code: any) =>
+                    code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
+                  }
+                  loader={<span className="block w-4 h-4 bg-[#133929] rounded-sm" />}
+                  cacheRequests={true}
+                />
+              }
+            >
+              <Link
+                href={`/project/${ref}/editor/${foreignKey.tableId}`}
+                onClick={() => closePanel()}
+              >
+                {foreignKey.schema}.{foreignKey.table}
+              </Link>
+            </Button>
+          </div>
         </div>
+
         <div className="flex flex-col gap-y-1">
           {foreignKey.columns.map((x, idx) => (
             <div key={`relation-${idx}}`} className="flex items-center gap-x-2">
@@ -74,9 +91,15 @@ export const ForeignKeyRow = ({
         <Button type="default" onClick={onSelectEdit}>
           Edit
         </Button>
-        <Button type="default" onClick={onSelectRemove}>
-          Remove
-        </Button>
+        {foreignKey.toRemove ? (
+          <Button type="default" onClick={onSelectUndoRemove}>
+            Undo remove
+          </Button>
+        ) : (
+          <Button type="default" onClick={onSelectRemove}>
+            Remove
+          </Button>
+        )}
       </div>
     </div>
   )
