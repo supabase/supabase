@@ -70,7 +70,7 @@ const LogTable = ({
         }
       },
       renderHeaderCell: (props) => {
-        return v
+        return <div className="flex items-center">{v}</div>
       },
       minWidth: 128,
     }
