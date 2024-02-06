@@ -6,6 +6,8 @@ import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { useTheme } from 'next-themes'
 import { Accordion, Button, IconCheck, Select } from 'ui'
+import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
+import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
 
 import AnnouncementBadge from '~/components/Announcement/Badge'
 import CTABanner from '~/components/CTABanner'
@@ -13,6 +15,7 @@ import ComputePricingModal from '~/components/Pricing/ComputePricingModal'
 import DefaultLayout from '~/components/Layouts/Default'
 import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/Pricing/PricingTableRow'
 
+import gaEvents from '~/lib/gaEvents'
 import Solutions from '~/data/Solutions'
 import pricingFaq from '~/data/PricingFAQ.json'
 import { pricing } from 'shared-data/pricing'
@@ -52,6 +55,11 @@ export default function IndexPage() {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
   }, [asPath])
+
+  const telemetryProps = useTelemetryProps()
+  const sendTelemetryEvent = async (event: TelemetryEvent) => {
+    await Telemetry.sendEvent(event, telemetryProps, router)
+  }
 
   const addons = [
     {
@@ -291,11 +299,18 @@ export default function IndexPage() {
                             <p className="text-[13px] whitespace-pre-wrap">{plan.footer}</p>
                           )}
                         </div>
-                        <a href={plan.href}>
-                          <Button block size="small">
+                        <Button block size="small" asChild>
+                          <Link
+                            href={plan.href}
+                            onClick={() =>
+                              sendTelemetryEvent(
+                                gaEvents[`www_pricing_hero_plan_${plan.name.toLowerCase()}`]
+                              )
+                            }
+                          >
                             {plan.cta}
-                          </Button>
-                        </a>
+                          </Link>
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -773,7 +788,14 @@ export default function IndexPage() {
                                 type={plan.name === 'Enterprise' ? 'default' : 'primary'}
                                 block
                               >
-                                <Link href={plan.href} as={plan.href}>
+                                <Link
+                                  href={plan.href}
+                                  onClick={() =>
+                                    sendTelemetryEvent(
+                                      gaEvents[`www_pricing_comparison_${plan.name.toLowerCase()}`]
+                                    )
+                                  }
+                                >
                                   {plan.cta}
                                 </Link>
                               </Button>

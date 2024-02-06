@@ -17,6 +17,7 @@ import MigrationWarnings from './MDX/migration_warnings.mdx'
 import GetSessionWarning from './MDX/get_session_warning.mdx'
 import { CH } from '@code-hike/mdx/components'
 import RefHeaderSection from './reference/RefHeaderSection'
+import { ProjectConfigVariables } from './ProjectConfigVariables'
 
 // Ref version specific
 import CliGlobalFlagsHandler from '~/components/reference/enrichments/cli/CliGlobalFlagsHandler'
@@ -65,6 +66,7 @@ const components = {
   SocialProviderSetup,
   SocialProviderSettingsSupabase,
   StepHikeCompact,
+  ProjectConfigVariables,
   StorageManagement,
   Alert: (props: any) => (
     <Alert {...props} className="not-prose">

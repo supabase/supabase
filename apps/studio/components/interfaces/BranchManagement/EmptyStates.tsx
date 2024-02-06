@@ -18,7 +18,7 @@ export const BranchingEmptyState = () => {
       <p className="text-sm text-light">
         {hasAccessToBranching
           ? 'Create preview branches to experiment changes to your database schema in a safe, non-destructible environment.'
-          : "Database Branching is currently in early access and not available to projects yet. If you're interested, you may reach out to us via support."}
+          : 'Database Branching is currently in early access and not available publicly yet.'}
       </p>
       {hasAccessToBranching ? (
         <div className="!mt-4">
@@ -31,15 +31,6 @@ export const BranchingEmptyState = () => {
         </div>
       ) : (
         <div className="flex items-center space-x-2 !mt-4">
-          <Button asChild>
-            <Link
-              rel="noreferrer"
-              target="_blank"
-              href={`/support/new?category=sales&slug=${selectedOrg?.slug}&subject=Enquiry%20on%20database%20branching`}
-            >
-              Contact support
-            </Link>
-          </Button>
           <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />} asChild>
             <a
               target="_blank"

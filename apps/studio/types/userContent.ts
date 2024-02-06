@@ -1,5 +1,5 @@
 export interface UserContent<
-  T = Dashboards.Content | SqlSnippets.Content | LogSqlSnippets.Content
+  T = Dashboards.Content | SqlSnippets.Content | LogSqlSnippets.Content,
 > {
   id?: string
   name: string

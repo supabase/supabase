@@ -1,25 +1,12 @@
 import { Meta } from '@storybook/react'
-import { Button } from '@ui/components/shadcn/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@ui/components/shadcn/ui/card'
-import { Input } from '@ui/components/shadcn/ui/input'
-import { Label } from '@ui/components/shadcn/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@ui/components/shadcn/ui/select'
-import { Switch } from '@ui/components/shadcn/ui/switch'
-import { cn } from '@ui/lib/utils'
 import { BellRing, Check } from 'lucide-react'
+import { cn } from '../../../lib/utils/cn'
+import { Button } from '../ui/button'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card'
+import { Input } from '../ui/input'
+import { Label } from '../ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
+import { Switch } from '../ui/switch'
 
 const meta: Meta = {
   title: 'shadcn/Card',
