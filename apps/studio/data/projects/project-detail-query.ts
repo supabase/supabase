@@ -45,7 +45,9 @@ export const useProjectDetailQuery = <TData = ProjectDetailData>(
       enabled: enabled && typeof ref !== 'undefined',
       staleTime: 30 * 1000, // 30 seconds
       refetchInterval(data) {
-        if (data && (data as unknown as ProjectDetailData).status === 'COMING_UP') {
+        const status = data && (data as unknown as ProjectDetailData).status
+
+        if (status === 'COMING_UP' || status === 'UNKNOWN') {
           return 5 * 1000 // 5 seconds
         }
 
