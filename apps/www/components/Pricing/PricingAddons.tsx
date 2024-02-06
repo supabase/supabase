@@ -28,7 +28,6 @@ const addons = [
     leftCtaText: 'Documentation',
     leftCtaLink: 'https://supabase.com/docs/guides/platform/custom-domains',
     rightCtaText: 'See more',
-    rightCtaLink: 'http://',
   },
   {
     id: 'addon-pitr',
@@ -40,7 +39,6 @@ const addons = [
     leftCtaText: 'Documentation',
     leftCtaLink: 'https://supabase.com/docs/guides/platform/backups',
     rightCtaText: 'See Pricing breakdown',
-    rightCtaLink: 'http://',
   },
 ]
 
