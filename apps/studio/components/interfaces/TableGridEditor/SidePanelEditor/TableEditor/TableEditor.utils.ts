@@ -35,6 +35,7 @@ export const generateTableField = (): TableField => {
   }
 }
 
+// [Joshen TODO] Columns no longer need foreign keys in them
 export const generateTableFieldFromPostgresTable = (
   table: PostgresTable,
   foreignKeys: ForeignKeyConstraint[],

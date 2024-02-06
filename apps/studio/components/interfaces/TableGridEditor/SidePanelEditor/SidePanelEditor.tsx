@@ -33,6 +33,7 @@ import {
 import { createColumn, updateColumn } from './SidePanelEditor.utils'
 import { ImportContent } from './TableEditor/TableEditor.types'
 import { TextEditor } from './RowEditor/TextEditor'
+import { ForeignKey } from './ForeignKeySelectorV2/ForeignKeySelector.types'
 
 export interface SidePanelEditorProps {
   editable?: boolean
@@ -354,6 +355,7 @@ const SidePanelEditor = ({
   const saveTable = async (
     payload: any,
     columns: ColumnField[],
+    foreignKeyRelations: ForeignKey[],
     isNewRecord: boolean,
     configuration: {
       tableId?: number

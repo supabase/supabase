@@ -27,6 +27,7 @@ import {
   generateTableFieldFromPostgresTable,
   validateFields,
 } from './TableEditor.utils'
+import { ForeignKey } from '../ForeignKeySelectorV2/ForeignKeySelector.types'
 
 export interface TableEditorProps {
   table?: PostgresTable
@@ -36,6 +37,7 @@ export interface TableEditorProps {
   saveChanges: (
     payload: any,
     columns: ColumnField[],
+    foreignKeyRelations: ForeignKey[],
     isNewRecord: boolean,
     configuration: {
       tableId?: number
@@ -85,17 +87,18 @@ const TableEditor = ({
 
   const [errors, setErrors] = useState<any>({})
   const [tableFields, setTableFields] = useState<TableField>()
+  const [fkRelations, setFkRelations] = useState<ForeignKey[]>([])
+
   const [isDuplicateRows, setIsDuplicateRows] = useState<boolean>(false)
   const [importContent, setImportContent] = useState<ImportContent>()
   const [isImportingSpreadsheet, setIsImportingSpreadsheet] = useState<boolean>(false)
   const [rlsConfirmVisible, setRlsConfirmVisible] = useState<boolean>(false)
 
-  const { data } = useForeignKeyConstraintsQuery({
+  const { data: foreignKeyMeta } = useForeignKeyConstraintsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     schema: table?.schema,
   })
-  const foreignKeyMeta = data || []
 
   useEffect(() => {
     if (visible) {
@@ -105,14 +108,29 @@ const TableEditor = ({
       if (isNewRecord) {
         const tableFields = generateTableField()
         setTableFields(tableFields)
+        setFkRelations([])
       } else {
         const tableFields = generateTableFieldFromPostgresTable(
           table!,
-          foreignKeyMeta,
+          foreignKeyMeta || [],
           isDuplicating,
           isRealtimeEnabled
         )
         setTableFields(tableFields)
+
+        const foreignKeys = (foreignKeyMeta ?? []).filter((fk) => fk.source_table === table?.name)
+        setFkRelations(
+          foreignKeys.map((x) => {
+            return {
+              id: x.id,
+              schema: x.target_schema,
+              table: x.target_table,
+              columns: x.source_columns.map((y, i) => ({ source: y, target: x.target_columns[i] })),
+              deletionAction: x.deletion_action,
+              updateAction: x.update_action,
+            }
+          })
+        )
       }
     }
   }, [visible])
@@ -151,15 +169,6 @@ const TableEditor = ({
           comment: tableFields.comment,
           ...(!isNewRecord && { rls_enabled: tableFields.isRLSEnabled }),
         }
-        const columns = tableFields.columns.map((column) => {
-          if (column.foreignKey) {
-            return {
-              ...column,
-              foreignKey: { ...column.foreignKey, source_table_name: tableFields.name },
-            }
-          }
-          return column
-        })
         const configuration = {
           tableId: table?.id,
           importContent,
@@ -168,7 +177,7 @@ const TableEditor = ({
           isDuplicateRows: isDuplicateRows,
         }
 
-        saveChanges(payload, columns, isNewRecord, configuration, resolve)
+        saveChanges(payload, tableFields.columns, fkRelations, isNewRecord, configuration, resolve)
       } else {
         resolve()
       }
@@ -364,7 +373,12 @@ const TableEditor = ({
       <SidePanel.Separator />
 
       <SidePanel.Content className="py-6">
-        <ForeignKeysManagement table={tableFields} closePanel={closePanel} />
+        <ForeignKeysManagement
+          table={tableFields}
+          relations={fkRelations}
+          closePanel={closePanel}
+          onUpdateFkRelations={setFkRelations}
+        />
       </SidePanel.Content>
     </SidePanel>
   )

@@ -4,35 +4,53 @@ import { Button } from 'ui'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import {
-  ForeignKeyConstraint,
-  useForeignKeyConstraintsQuery,
-} from 'data/database/foreign-key-constraints-query'
+import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { ResponseError } from 'types'
 import { ForeignKeySelector } from '../../ForeignKeySelectorV2/ForeignKeySelector'
 import { TableField } from '../TableEditor.types'
-import { ForeignKey } from './ForeignKey'
+import { ForeignKeyRow } from './ForeignKeyRow'
+import { ForeignKey } from '../../ForeignKeySelectorV2/ForeignKeySelector.types'
 
 interface ForeignKeysManagementProps {
   table: TableField
+  relations: ForeignKey[]
   closePanel: () => void
+  onUpdateFkRelations: (relations: ForeignKey[]) => void
 }
 
-export const ForeignKeysManagement = ({ table, closePanel }: ForeignKeysManagementProps) => {
+export const ForeignKeysManagement = ({
+  table,
+  relations,
+  closePanel,
+  onUpdateFkRelations,
+}: ForeignKeysManagementProps) => {
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
 
   const [open, setOpen] = useState(false)
-  const [selectedFk, setSelectedFk] = useState<ForeignKeyConstraint>()
+  const [selectedFk, setSelectedFk] = useState<ForeignKey>()
 
   const { data, error, isLoading, isSuccess, isError } = useForeignKeyConstraintsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     schema: snap.selectedSchemaName,
   })
+  const existingForeignKeyIds = (data ?? []).map((x) => x.id)
 
-  const foreignKeys = (data ?? []).filter((fk) => fk.source_table === table.name)
+  const getRelationStatus = (fk: ForeignKey) => {
+    const existingRelation = (data ?? []).find((x) => x.id === fk.id)
+    const stateRelation = relations.find((x) => x.id === fk.id)
+    if (typeof fk.id === 'string') {
+      return 'ADD'
+    } else if (typeof fk.id === 'number') {
+      if (existingRelation !== undefined && stateRelation === undefined) {
+        return 'REMOVE'
+      } else {
+        // [Joshen] Logic to determine if update, or no change
+      }
+    }
+  }
 
   return (
     <>
@@ -50,18 +68,23 @@ export const ForeignKeysManagement = ({ table, closePanel }: ForeignKeysManageme
 
         {isSuccess && (
           <div>
-            {foreignKeys.map((fk) => (
-              <ForeignKey
-                key={fk.id}
-                foreignKey={fk}
-                closePanel={closePanel}
-                onSelectEdit={() => {
-                  setOpen(true)
-                  setSelectedFk(fk)
-                }}
-                onSelectRemove={() => {}}
-              />
-            ))}
+            {relations.map((fk) => {
+              return (
+                <ForeignKeyRow
+                  key={fk.id}
+                  status={''}
+                  foreignKey={fk}
+                  closePanel={closePanel}
+                  onSelectEdit={() => {
+                    setOpen(true)
+                    setSelectedFk(fk)
+                  }}
+                  onSelectRemove={() =>
+                    onUpdateFkRelations(relations.filter((x) => x.id !== fk.id))
+                  }
+                />
+              )
+            })}
           </div>
         )}
 
@@ -78,6 +101,19 @@ export const ForeignKeysManagement = ({ table, closePanel }: ForeignKeysManageme
         onClose={() => {
           setOpen(false)
           setSelectedFk(undefined)
+        }}
+        onSaveRelation={(fk) => {
+          const existingRelationIds = relations.map((x) => x.id)
+          if (existingRelationIds.includes(fk.id)) {
+            onUpdateFkRelations(
+              relations.map((x) => {
+                if (x.id === fk.id) return fk
+                return x
+              })
+            )
+          } else {
+            onUpdateFkRelations(relations.concat([fk]))
+          }
         }}
       />
     </>

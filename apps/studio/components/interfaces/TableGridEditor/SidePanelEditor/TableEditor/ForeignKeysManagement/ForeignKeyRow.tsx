@@ -1,20 +1,21 @@
+import clsx from 'clsx'
 import { useParams } from 'common'
 import Link from 'next/link'
 import SVG from 'react-inlinesvg'
 import { Button, IconArrowRight } from 'ui'
 
-import { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import { BASE_PATH } from 'lib/constants'
-import clsx from 'clsx'
+import { ForeignKey } from '../../ForeignKeySelectorV2/ForeignKeySelector.types'
 
 interface ForeignKeyProps {
-  foreignKey: ForeignKeyConstraint
+  foreignKey: ForeignKey
+  status: string
   closePanel: () => void
   onSelectEdit: () => void
   onSelectRemove: () => void
 }
 
-export const ForeignKey = ({
+export const ForeignKeyRow = ({
   foreignKey,
   closePanel,
   onSelectEdit,
@@ -26,13 +27,13 @@ export const ForeignKey = ({
     <div
       className={clsx(
         'flex items-center justify-between gap-x-2 border border-strong px-4 py-4',
-        'first:border-b-0 first:rounded-t-md last:rounded-b-md'
+        'border-b-0 last:border-b first:rounded-t-md last:rounded-b-md'
       )}
     >
       <div className="flex flex-col gap-y-2">
         <div className="flex items-center gap-x-2">
           <p className="text-sm text-foreground-light">
-            {foreignKey.source_columns.length > 1 ? 'Composite foreign' : 'Foreign'} key relation to
+            {foreignKey.columns.length > 1 ? 'Composite foreign' : 'Foreign'} key relation to
           </p>
           <Button
             asChild
@@ -51,22 +52,19 @@ export const ForeignKey = ({
               />
             }
           >
-            <Link
-              href={`/project/${ref}/editor/${foreignKey.target_id}`}
-              onClick={() => closePanel()}
-            >
-              {foreignKey.target_schema}.{foreignKey.target_table}
+            {/* [Joshen TODO] Fix this */}
+            <Link href={`/project/${ref}/editor/${0}`} onClick={() => closePanel()}>
+              {foreignKey.schema}.{foreignKey.table}
             </Link>
           </Button>
         </div>
         <div className="flex flex-col gap-y-1">
-          {foreignKey.source_columns.map((x, idx) => (
-            <div key={x} className="flex items-center gap-x-2">
-              <code className="text-xs">{x}</code>
+          {foreignKey.columns.map((x, idx) => (
+            <div key={`relation-${idx}}`} className="flex items-center gap-x-2">
+              <code className="text-xs">{x.source}</code>
               <IconArrowRight />
               <code className="text-xs">
-                {foreignKey.target_schema}.{foreignKey.target_table}.
-                {foreignKey.target_columns[idx]}
+                {foreignKey.schema}.{foreignKey.table}.{x.target}
               </code>
             </div>
           ))}
