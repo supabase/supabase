@@ -7,13 +7,5 @@
   "endOfLine": "lf",
   "sqlKeywordCase": "lower",
   "pluginSearchDirs": false,
-  "plugins": ["prettier-plugin-sql-cst"],
-  "overrides": [ 
-	  {
-		  "files": "**/tsconfig.json",
-		  "options": {
-			  "trailingComma": "none"
-		  }
-	  }
-  ]
+  "plugins": ["prettier-plugin-sql-cst"]
 }
