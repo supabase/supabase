@@ -31,8 +31,6 @@ export class RootStore implements IRootStore {
    * This method will also trigger project detail loading when it's not available
    */
   setProject(project: Project) {
-    this.meta.setProjectDetails(project)
-    // ui set must come last
     this.ui.setProjectRef(project.ref)
   }
 }

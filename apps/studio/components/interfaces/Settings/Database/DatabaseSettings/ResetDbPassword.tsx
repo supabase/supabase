@@ -10,7 +10,6 @@ import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectCont
 import Panel from 'components/ui/Panel'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useDatabasePasswordResetMutation } from 'data/database/database-password-reset-mutation'
-import { getProjectDetail } from 'data/projects/project-detail-query'
 import { useCheckPermissions, useStore } from 'hooks'
 import { DEFAULT_MINIMUM_PASSWORD_STRENGTH } from 'lib/constants'
 import { passwordStrength } from 'lib/helpers'
@@ -38,9 +37,6 @@ const ResetDbPassword = ({ disabled = false }) => {
   const { mutate: resetDatabasePassword, isLoading: isUpdatingPassword } =
     useDatabasePasswordResetMutation({
       onSuccess: async () => {
-        const project = await getProjectDetail({ ref })
-        if (project) meta.setProjectDetails(project)
-
         ui.setNotification({
           category: 'success',
           message: 'Successfully updated database password',

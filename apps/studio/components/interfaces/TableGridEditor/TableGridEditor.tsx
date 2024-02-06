@@ -16,6 +16,7 @@ import {
   useForeignKeyConstraintsQuery,
 } from 'data/database/foreign-key-constraints-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
 import { useCheckPermissions, useLatest, useStore, useUrlState } from 'hooks'
@@ -188,11 +189,15 @@ const TableGridEditor = ({
   }
 
   const onSqlQuery = async (query: string) => {
-    const res = await meta.query(query)
-    if (res.error) {
-      return { error: res.error }
-    } else {
+    try {
+      const res = await executeSql({
+        projectRef,
+        connectionString: project?.connectionString,
+        sql: query,
+      })
       return { data: res }
+    } catch (error) {
+      return { error }
     }
   }
 

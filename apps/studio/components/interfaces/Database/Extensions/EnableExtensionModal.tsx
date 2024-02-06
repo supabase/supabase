@@ -8,6 +8,7 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useStore } from 'hooks'
+import { executeSql } from 'data/sql/execute-sql-query'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -62,10 +63,15 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
           setFetchingSchemaInfo(true)
           setDefaultSchema(undefined)
         }
-        const res = await meta.query(
-          `select * from pg_available_extension_versions where name = '${extension.name}'`
-        )
-        if (!res.error && !cancel) setDefaultSchema(res[0].schema)
+        try {
+          const res = await executeSql({
+            projectRef: project?.ref,
+            connectionString: project?.connectionString,
+            sql: `select * from pg_available_extension_versions where name = '${extension.name}'`,
+          })
+          if (!cancel) setDefaultSchema(res.result[0].schema)
+        } catch (error) {}
+
         setFetchingSchemaInfo(false)
       }
       checkExtensionSchema()
