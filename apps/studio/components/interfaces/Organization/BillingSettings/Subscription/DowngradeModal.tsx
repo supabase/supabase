@@ -1,3 +1,4 @@
+import { ProjectInfo } from 'data/projects/projects-query'
 import { OrgSubscription, ProjectAddon } from 'data/subscriptions/types'
 import { PricingInformation } from 'shared-data'
 import { Alert, IconAlertOctagon, IconMinusCircle, IconPauseCircle, Modal } from 'ui'
@@ -8,6 +9,7 @@ export interface DowngradeModalProps {
   subscription?: OrgSubscription
   onClose: () => void
   onConfirm: () => void
+  projects: ProjectInfo[]
 }
 
 const ProjectDowngradeListItem = ({ projectAddon }: { projectAddon: ProjectAddon }) => {
@@ -39,7 +41,26 @@ const DowngradeModal = ({
   subscription,
   onClose,
   onConfirm,
+  projects,
 }: DowngradeModalProps) => {
+  // Filter out the micro addon as we're dealing with that separately
+  const previousProjectAddons =
+    subscription?.project_addons.flatMap((projectAddons) => {
+      const addons = projectAddons.addons.filter((it) => it.variant.identifier !== 'ci_micro')
+      if (!addons.length) {
+        return []
+      } else {
+        return {
+          ...projectAddons,
+          // Overwrite addons, filtered out the micro addon
+          addons,
+        }
+      }
+    }) || []
+
+  const hasInstancesOnMicro = projects.some((project) => project.infra_compute_size === 'micro')
+  const downgradingToNano = subscription?.nano_enabled === true
+
   return (
     <Modal
       size="large"
@@ -63,19 +84,25 @@ const DowngradeModal = ({
               </p>
             </Alert>
 
-            {(subscription?.project_addons.length ?? 0) > 0 && (
-              <Alert
-                title={`A total of ${subscription?.project_addons.length} project(s) will be affected from the downgrade`}
-                variant="warning"
-                withIcon
-              >
-                <ul className="space-y-1 max-h-[100px] overflow-y-auto">
-                  {subscription?.project_addons.map((project) => (
-                    <ProjectDowngradeListItem key={project.ref} projectAddon={project} />
-                  ))}
-                </ul>
-              </Alert>
-            )}
+            {(previousProjectAddons.length ?? 0) > 0 ||
+              (hasInstancesOnMicro && downgradingToNano && (
+                <Alert title={`Projects affected by the downgrade`} variant="warning" withIcon>
+                  <ul className="space-y-1 max-h-[100px] overflow-y-auto">
+                    {previousProjectAddons.map((project) => (
+                      <ProjectDowngradeListItem key={project.ref} projectAddon={project} />
+                    ))}
+
+                    {projects
+                      .filter((it) => it.infra_compute_size === 'micro')
+                      .map((project) => (
+                        <li className="list-disc ml-6" key={project.id}>
+                          {project.name}: Compute will be downgraded. Project will also{' '}
+                          <span className="font-bold">need to be restarted</span>.
+                        </li>
+                      ))}
+                  </ul>
+                </Alert>
+              ))}
           </div>
 
           <ul className="mt-4 space-y-5 text-sm">
