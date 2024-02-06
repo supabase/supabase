@@ -150,7 +150,7 @@ const AddonCard = ({ addon }: any) => {
       <HighlightCard />
     </div>
   ) : (
-    <Link href={addon.leftCtaLink} className={containerClasses}>
+    <Link href={addon.leftCtaLink} className={containerClasses} target="_blank">
       <SmallCard />
     </Link>
   )

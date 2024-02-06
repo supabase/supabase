@@ -43,9 +43,9 @@ export const plans: PricingInformation[] = [
       '5 GB bandwidth',
       'Community support',
     ],
-    footer: 'Free projects are paused after 1 week of inactivity. Limited to 2 active projects.',
+    footer: 'Free projects are paused after 1 week of inactivity. Limit of 2 active projects.',
     footerPartner:
-      'Free projects are paused after 1 week of inactivity. Limited to 1 active project.',
+      'Free projects are paused after 1 week of inactivity. Limit of 1 active project.',
     cta: 'Start for Free',
   },
   {

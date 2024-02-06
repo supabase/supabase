@@ -303,7 +303,7 @@ const ComputePricingCalculator = () => {
             }
             className="w-full border-dashed text-foreground-light hover:text-foreground"
           >
-            <span className="w-full text-left">Add Compute Instance</span>
+            <span className="w-full text-left">Add Project</span>
           </Button>
         </div>
       </div>

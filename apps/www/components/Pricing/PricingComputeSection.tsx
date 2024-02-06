@@ -37,7 +37,7 @@ const PricingComputeSection = () => {
             </div>
             <p className="text-foreground-lighter text-[13px]">
               Paid plans include $10/month in compute credits that can be spent on one or more
-              instances. Additional compute add-ons are available if you need extra performance when
+              instances. Additional compute power is available if you need extra performance when
               scaling up Supabase.
             </p>
           </div>
@@ -70,7 +70,7 @@ const PricingComputeSection = () => {
 
             <div className="grid lg:grid-cols-2 gap-4 md:gap-8 mt-4 md:mt-0 border-t">
               <div className="max-w-4xl prose p-4 md:p-8 relative z-10">
-                <h4 className="text-lg">Choose best compute setup for you</h4>
+                <h4 className="text-lg">Choose best compute size you</h4>
                 <p className="text-[13px] text-foreground-lighter">
                   Every project on the Supabase Platform comes with its own dedicated Postgres
                   instance running inside a virtual machine (VM). The table above describes the base
