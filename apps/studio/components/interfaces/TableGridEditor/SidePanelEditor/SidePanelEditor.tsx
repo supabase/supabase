@@ -209,8 +209,8 @@ const SidePanelEditor = ({
     resolve: any
   ) => {
     const selectedColumnToEdit = snap.sidePanel?.type === 'column' && snap.sidePanel.column
-
     const { columnId } = configuration
+
     const response = isNewRecord
       ? await createColumn({
           projectRef: project?.ref!,
