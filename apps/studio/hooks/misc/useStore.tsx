@@ -8,8 +8,6 @@ import { IUiStore } from 'stores/UiStore'
 const StoreContext = createContext<{ ui: IUiStore }>(undefined!)
 
 /**
- *
- * @returns
  * @deprecated use the toast.success/loading/error functions, imported from 'react-hot-toast'
  */
 export function useStore() {
