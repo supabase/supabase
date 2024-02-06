@@ -32,6 +32,8 @@ import {
   UpdateColumnPayload,
 } from './SidePanelEditor.types'
 import { ImportContent } from './TableEditor/TableEditor.types'
+import { sqlKeys } from 'data/sql/keys'
+import { entityTypeKeys } from 'data/entity-types/keys'
 
 const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
@@ -662,7 +664,16 @@ export const updateTable = async (
 
   const queryClient = getQueryClient()
 
-  queryClient.invalidateQueries(tableKeys.table(projectRef, table.id))
+  await Promise.all([
+    queryClient.invalidateQueries(sqlKeys.query(projectRef, ['foreign-key-constraints'])),
+    // invalidate list of tables, as well as visible individual tables
+    queryClient.invalidateQueries(['projects', projectRef, 'tables']),
+    queryClient.invalidateQueries(sqlKeys.query(projectRef, [table.schema, table.name])),
+    queryClient.invalidateQueries(
+      sqlKeys.query(projectRef, ['table-definition', table.schema, table.name])
+    ),
+    queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
+  ])
 
   return {
     table: await getTable({
