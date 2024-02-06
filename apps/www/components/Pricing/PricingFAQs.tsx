@@ -38,23 +38,12 @@ const PricingFAQs = () => {
           Can&apos;t find the answer to your question?{' '}
           <a
             target="_blank"
-            href="https://supabase.com/dashboard/support/new"
+            href="https://supabase.help"
             className="transition underline text-brand-link hover:text-brand-600"
           >
             Open a support ticket
           </a>{' '}
-          to receive help from our team of experts.
-        </p>
-        <p className="p text-center">
-          For enterprise enquiries,{' '}
-          <a
-            target="_blank"
-            href="https://forms.supabase.com/enterprise"
-            className="transition underline text-brand-link hover:text-brand-600"
-          >
-            you can contact the team here
-          </a>
-          .
+          to receive help from our team.
         </p>
       </div>
     </div>

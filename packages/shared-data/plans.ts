@@ -14,6 +14,7 @@ export interface PricingInformation {
   features: (string | string[])[]
   featuresPartner: (string | string[])[]
   footer?: string
+  footerPartner?: string
   cta: string
 }
 
@@ -33,17 +34,18 @@ export const plans: PricingInformation[] = [
       '50,000 monthly active users',
       ['500 MB database space', '2 Core shared CPU • 1 GB RAM'],
       '5 GB bandwidth',
-      '1GB file storage',
+      '1 GB file storage',
       'Community support',
     ],
     featuresPartner: [
       'Unlimited API requests',
+      '50,000 monthly active users',
       ['500 MB database space', '2 Core shared CPU • 1 GB RAM'],
       '5 GB bandwidth',
-      '1-day log retention',
       'Community support',
     ],
-    footer: 'Free projects are paused after 1 week of inactivity.',
+    footer: 'Free projects are paused after 1 week of inactivity. Limited to 2 active projects.',
+    footerPartner: 'Free projects are paused after 1 week of inactivity. Limited to 1 active project.',
     cta: 'Start for Free',
   },
   {
@@ -61,17 +63,16 @@ export const plans: PricingInformation[] = [
       ['8 GB database space', 'then $0.125 per GB'],
       ['250 GB bandwidth', 'then $0.09 per GB'],
       ['100 GB file storage', 'then $0.021 per GB'],
+      'Email support',
       'Daily backups stored for 7 days',
       '7-day log retention',
-      'Email support',
     ],
     featuresPartner: [
-      'No project pausing',
-      '8 GB database space included',
-      '250 GB bandwidth included',
+      ['8 GB database space', 'then $0.125 per GB'],
+      ['250 GB bandwidth', 'then $0.09 per GB'],
+      'Email support',
       'Daily backups stored for 7 days',
       '7-day log retention',
-      'Email support',
     ],
     preface: 'Everything in the Free plan, plus:',
     cta: 'Get Started',
@@ -100,12 +101,10 @@ export const plans: PricingInformation[] = [
       'HIPAA available as paid add-on',
       'Read only and Billing member roles',
       'SSO for Supabase Dashboard',
-      'Standardised Security Questionnaire',
       'Priority email support & SLAs',
       'Daily backups stored for 14 days',
       '28-day log retention',
     ],
-    footer: 'Additional fees apply for usage beyond plan limits.',
     preface: 'Everything in the Pro plan, plus:',
     cta: 'Get Started',
   },
@@ -120,13 +119,15 @@ export const plans: PricingInformation[] = [
       'On-premise support',
       '24×7×365 premium enterprise support',
       'Private Slack channel',
+      'Custom Security Questionnaires',
     ],
     featuresPartner: [
-      `Designated Support manager`,
+      'Designated Support manager',
       'Up to 99.9% uptime SLAs',
-      `24×7×365 premium enterprise support`,
+      'On-premise support',
+      '24×7×365 premium enterprise support',
+      'Private Slack channel',
       'Custom Security Questionnaires',
-      `Private Slack channel`,
     ],
     priceLabel: '',
     priceMonthly: 'Custom',
