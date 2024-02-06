@@ -22,7 +22,6 @@ import {
 } from 'ui'
 import { IPv4DeprecationNotice } from '../IPv4DeprecationNotice'
 import { UsePoolerCheckbox } from '../UsePoolerCheckbox'
-import { getHostFromConnectionString } from './DatabaseSettings.utils'
 import ResetDbPassword from './ResetDbPassword'
 
 const DatabaseSettings = () => {
@@ -86,9 +85,7 @@ const DatabaseSettings = () => {
 
   const connectionInfo = usePoolerConnection
     ? {
-        db_host: isSuccessPoolingInfo
-          ? getHostFromConnectionString(poolingInfo?.connectionString)
-          : '',
+        db_host: poolingInfo?.db_host,
         db_name: poolingInfo?.db_name,
         db_port: poolingInfo?.db_port,
         db_user: `postgres.${projectRef}`,
