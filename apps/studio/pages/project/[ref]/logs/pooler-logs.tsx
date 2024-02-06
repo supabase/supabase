@@ -9,22 +9,17 @@ import Connecting from 'components/ui/Loading/Loading'
 
 export const LogPage: NextPageWithLayout = () => {
   const { ref } = useParams()
-  const { data: poolingConfiguration, isLoading } = usePoolingConfigurationQuery({
-    projectRef: ref ?? 'default',
-  })
+  const { isLoading } = usePoolingConfigurationQuery({ projectRef: ref ?? 'default' })
 
-  // this prevents initial load of pgbouncer logs before config has been retrieved
-  if (isLoading) {
-    return <Connecting />
-  }
-  const isSupavisorEnabled = poolingConfiguration?.supavisor_enabled ?? false
+  // this prevents initial load of pooler logs before config has been retrieved
+  if (isLoading) return <Connecting />
 
   return (
     <LogsPreviewer
       projectRef={ref as string}
       condensedLayout={true}
-      tableName={isSupavisorEnabled ? LogsTableName.SUPAVISOR : LogsTableName.PGBOUNCER}
-      queryType={isSupavisorEnabled ? 'supavisor' : 'pgbouncer'}
+      tableName={LogsTableName.SUPAVISOR}
+      queryType={'supavisor'}
     />
   )
 }

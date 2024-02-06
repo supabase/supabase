@@ -30,7 +30,15 @@ import {
   ExtendedPostgresRelationship,
   UpdateColumnPayload,
 } from './SidePanelEditor.types'
-import { createColumn, updateColumn } from './SidePanelEditor.utils'
+import {
+  createColumn,
+  createTable,
+  duplicateTable,
+  insertRowsViaSpreadsheet,
+  insertTableRows,
+  updateColumn,
+  updateTable,
+} from './SidePanelEditor.utils'
 import { ImportContent } from './TableEditor/TableEditor.types'
 import { TextEditor } from './RowEditor/TextEditor'
 
@@ -53,7 +61,7 @@ const SidePanelEditor = ({
   const snap = useTableEditorStateSnapshot()
   const [_, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
 
-  const { meta, ui } = useStore()
+  const { ui } = useStore()
   const queryClient = useQueryClient()
   const { project } = useProjectContext()
 
@@ -209,8 +217,8 @@ const SidePanelEditor = ({
     resolve: any
   ) => {
     const selectedColumnToEdit = snap.sidePanel?.type === 'column' && snap.sidePanel.column
-
     const { columnId } = configuration
+
     const response = isNewRecord
       ? await createColumn({
           projectRef: project?.ref!,
@@ -352,7 +360,11 @@ const SidePanelEditor = ({
   }
 
   const saveTable = async (
-    payload: any,
+    payload: {
+      name: string
+      schema: string
+      comment?: string | undefined
+    },
     columns: ColumnField[],
     isNewRecord: boolean,
     configuration: {
@@ -374,17 +386,17 @@ const SidePanelEditor = ({
         snap.sidePanel.mode === 'duplicate' &&
         selectedTable
       ) {
-        const duplicateTable = selectedTable
+        const tableToDuplicate = selectedTable
 
         toastId = ui.setNotification({
           category: 'loading',
-          message: `Duplicating table: ${duplicateTable.name}...`,
+          message: `Duplicating table: ${tableToDuplicate.name}...`,
         })
 
-        const table: any = await meta.duplicateTable(payload, {
+        const table = await duplicateTable(project?.ref!, project?.connectionString, payload, {
           isRLSEnabled,
           isDuplicateRows,
-          duplicateTable,
+          duplicateTable: tableToDuplicate,
         })
         if (isRealtimeEnabled) await updateTableRealtime(table, isRealtimeEnabled)
 
@@ -396,7 +408,7 @@ const SidePanelEditor = ({
         ui.setNotification({
           id: toastId,
           category: 'success',
-          message: `Table ${duplicateTable.name} has been successfully duplicated into ${table.name}!`,
+          message: `Table ${tableToDuplicate.name} has been successfully duplicated into ${table.name}!`,
         })
 
         onTableCreated(table)
@@ -406,8 +418,16 @@ const SidePanelEditor = ({
           message: `Creating new table: ${payload.name}...`,
         })
 
-        const table = await meta.createTable(toastId, payload, columns, isRLSEnabled, importContent)
-        if (isRealtimeEnabled) await updateTableRealtime(table, true)
+        const table = await createTable(
+          project?.ref!,
+          project?.connectionString,
+          toastId,
+          payload,
+          columns,
+          isRLSEnabled,
+          importContent
+        )
+        if (isRealtimeEnabled) await updateTableRealtime(table as PostgresTable, true)
 
         await Promise.all([
           queryClient.invalidateQueries(tableKeys.list(project?.ref, table.schema, includeColumns)),
@@ -420,14 +440,21 @@ const SidePanelEditor = ({
           message: `Table ${table.name} is good to go!`,
         })
 
-        onTableCreated(table)
+        onTableCreated(table as PostgresTable)
       } else if (selectedTable) {
         toastId = ui.setNotification({
           category: 'loading',
           message: `Updating table: ${selectedTable?.name}...`,
         })
 
-        const { table, hasError } = await meta.updateTable(toastId, selectedTable, payload, columns)
+        const { table, hasError } = await updateTable(
+          project?.ref!,
+          project?.connectionString,
+          toastId,
+          selectedTable,
+          payload,
+          columns
+        )
 
         await updateTableRealtime(table, isRealtimeEnabled)
 
@@ -451,7 +478,7 @@ const SidePanelEditor = ({
               ])
             ),
             queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
-            queryClient.invalidateQueries(tableKeys.table(project?.ref, table.schema)),
+            queryClient.invalidateQueries(tableKeys.table(project?.ref, table.id)),
           ])
 
           ui.setNotification({
@@ -487,53 +514,63 @@ const SidePanelEditor = ({
 
     if (file && rowCount > 0) {
       // CSV file upload
-      const { error }: any = await meta.insertRowsViaSpreadsheet(
-        file,
-        selectedTable,
-        selectedHeaders,
-        (progress: number) => {
+      try {
+        await insertRowsViaSpreadsheet(
+          project.ref!,
+          project.connectionString,
+          file,
+          selectedTable,
+          selectedHeaders,
+          (progress: number) => {
+            ui.setNotification({
+              id: toastId,
+              progress,
+              category: 'loading',
+              message: `Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`,
+            })
+          }
+        )
+      } catch (error: any) {
+        if (error) {
           ui.setNotification({
+            error,
             id: toastId,
-            progress,
-            category: 'loading',
-            message: `Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`,
+            category: 'error',
+            message: `Failed to import data: ${error.message}`,
           })
+          return resolve()
         }
-      )
-      if (error) {
-        ui.setNotification({
-          error,
-          id: toastId,
-          category: 'error',
-          message: `Failed to import data: ${error.message}`,
-        })
-        return resolve()
       }
     } else {
       // Text paste
-      const { error } = await meta.insertTableRows(
-        selectedTable,
-        importContent.rows,
-        selectedHeaders,
-        (progress: number) => {
+      try {
+        await insertTableRows(
+          project.ref!,
+          project.connectionString,
+          selectedTable,
+          importContent.rows,
+          selectedHeaders,
+          (progress: number) => {
+            ui.setNotification({
+              id: toastId,
+              progress,
+              category: 'loading',
+              message: `Adding ${importContent.rows.length.toLocaleString()} rows to ${
+                selectedTable.name
+              }`,
+            })
+          }
+        )
+      } catch (error: any) {
+        if (error) {
           ui.setNotification({
+            error,
             id: toastId,
-            progress,
-            category: 'loading',
-            message: `Adding ${importContent.rows.length.toLocaleString()} rows to ${
-              selectedTable.name
-            }`,
+            category: 'error',
+            message: `Failed to import data: ${error.message}`,
           })
+          return resolve()
         }
-      )
-      if (error) {
-        ui.setNotification({
-          error,
-          id: toastId,
-          category: 'error',
-          message: `Failed to import data: ${error.message}`,
-        })
-        return resolve()
       }
     }
 
