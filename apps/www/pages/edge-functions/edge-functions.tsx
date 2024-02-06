@@ -21,7 +21,7 @@ const featureBlocks = [
   },
   {
     title: 'Global',
-    description: 'Deployed to 29 regions worldwide',
+    description: 'Deployed to 14 regions worldwide',
     highlightLines: '8',
     icon: <IconGlobe strokeWidth={1.5} />,
   },
