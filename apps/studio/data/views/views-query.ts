@@ -48,6 +48,7 @@ export const useViewsQuery = <TData = ViewsData>(
     ({ signal }) => getViews({ projectRef, connectionString, schema }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
+      staleTime: 0,
       ...options,
     }
   )

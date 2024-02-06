@@ -33,8 +33,10 @@ import { ImportContent } from 'components/interfaces/TableGridEditor/SidePanelEd
 import { createDatabaseColumn } from 'data/database-columns/database-column-create-mutation'
 import { deleteDatabaseColumn } from 'data/database-columns/database-column-delete-mutation'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
+import { entityTypeKeys } from 'data/entity-types/keys'
 import { getCachedProjectDetail } from 'data/projects/project-detail-query'
 import { getQueryClient } from 'data/query-client'
+import { sqlKeys } from 'data/sql/keys'
 import { tableKeys } from 'data/tables/keys'
 import { getTable } from 'data/tables/table-query'
 import { getTables } from 'data/tables/tables-query'
@@ -487,7 +489,16 @@ export default class MetaStore implements IMetaStore {
     const projectRef = project?.ref
     const connectionString = project?.connectionString
 
-    queryClient.invalidateQueries(tableKeys.table(projectRef, table.id))
+    await Promise.all([
+      queryClient.invalidateQueries(sqlKeys.query(projectRef, ['foreign-key-constraints'])),
+      // invalidate list of tables, as well as visible individual tables
+      queryClient.invalidateQueries(['projects', projectRef, 'tables']),
+      queryClient.invalidateQueries(sqlKeys.query(projectRef, [table.schema, table.name])),
+      queryClient.invalidateQueries(
+        sqlKeys.query(projectRef, ['table-definition', table.schema, table.name])
+      ),
+      queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
+    ])
 
     return {
       table: await getTable({
