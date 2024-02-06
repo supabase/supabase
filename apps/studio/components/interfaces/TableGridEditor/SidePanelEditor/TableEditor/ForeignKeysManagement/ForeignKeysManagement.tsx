@@ -17,6 +17,7 @@ interface ForeignKeysManagementProps {
   table: TableField
   relations: ForeignKey[]
   closePanel: () => void
+  setEditorDirty: () => void
   onUpdateFkRelations: (relations: ForeignKey[]) => void
 }
 
@@ -24,6 +25,7 @@ export const ForeignKeysManagement = ({
   table,
   relations,
   closePanel,
+  setEditorDirty,
   onUpdateFkRelations,
 }: ForeignKeysManagementProps) => {
   const { project } = useProjectContext()
@@ -80,6 +82,7 @@ export const ForeignKeysManagement = ({
                     setSelectedFk(fk)
                   }}
                   onSelectRemove={() => {
+                    setEditorDirty()
                     if (fk.id === undefined) {
                       const updatedRelations = relations.filter((x) => x.id !== fk.id)
                       onUpdateFkRelations(updatedRelations)
@@ -92,6 +95,7 @@ export const ForeignKeysManagement = ({
                     }
                   }}
                   onSelectUndoRemove={() => {
+                    setEditorDirty()
                     const updatedRelations = relations.map((x) => {
                       if (x.id === fk.id) return { ...x, toRemove: false }
                       else return x
@@ -119,6 +123,7 @@ export const ForeignKeysManagement = ({
           setSelectedFk(undefined)
         }}
         onSaveRelation={(fk) => {
+          setEditorDirty()
           const existingRelationIds = relations.map((x) => x.id)
           if (fk.id !== undefined && existingRelationIds.includes(fk.id)) {
             onUpdateFkRelations(

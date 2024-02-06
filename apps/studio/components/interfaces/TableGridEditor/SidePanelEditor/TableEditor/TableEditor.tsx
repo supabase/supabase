@@ -390,6 +390,7 @@ const TableEditor = ({
               table={tableFields}
               relations={fkRelations}
               closePanel={closePanel}
+              setEditorDirty={() => updateEditorDirty()}
               onUpdateFkRelations={setFkRelations}
             />
           </SidePanel.Content>
