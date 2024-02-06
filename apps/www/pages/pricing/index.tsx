@@ -4,6 +4,8 @@ import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { Button, IconArrowUpRight } from 'ui'
 import { ArrowDownIcon } from '@heroicons/react/outline'
+import ReactTooltip from 'react-tooltip'
+
 import DefaultLayout from '~/components/Layouts/Default'
 import PricingPlans from '~/components/Pricing/PricingPlans'
 
@@ -117,6 +119,13 @@ export default function IndexPage() {
         <PricingFAQs />
       </div>
       <CTABanner />
+      <ReactTooltip
+        wrapper="span"
+        effect="solid"
+        backgroundColor="hsl(var(--background-alternative-default))"
+        textColor="hsl(var(--foreground-light))"
+        className="!max-w-[320px] !px-3 whitespace-pre-line"
+      />
     </DefaultLayout>
   )
 }

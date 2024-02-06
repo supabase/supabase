@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { InformationCircleIcon } from '@heroicons/react/outline'
-import ReactTooltip from 'react-tooltip'
 import {
   Badge,
   Button,
@@ -33,7 +32,6 @@ const findIntanceValueByColumn = (instance: any, column: string) =>
 const parsePrice = (price: string) => parseInt(price?.toString().replace('$', '').replace(',', ''))
 
 const ComputePricingCalculator = () => {
-  const [mount, setMount] = useState(false)
   const computeInstances = pricingAddOn.database.rows
   const priceSteps = computeInstances.map((instance) =>
     parsePrice(findIntanceValueByColumn(instance, 'pricing'))
@@ -120,19 +118,13 @@ const ComputePricingCalculator = () => {
     </div>
   )
 
-  useEffect(() => {
-    setMount(true)
-  }, [])
-
-  if (!mount) return null
-
   return (
     <div className="flex flex-col lg:grid grid-cols-4 gap-4 h-full mt-4 lg:mt-0 border border-strong rounded-xl p-4">
       <div className="flex justify-between w-full">
         <div className="flex flex-col text-lighter leading-4 text-xs w-full gap-4">
           <div className="h-full w-full flex flex-col justify-between">
             <DropdownMenu>
-              <DropdownMenuTrigger>
+              <DropdownMenuTrigger asChild>
                 <Button
                   size="tiny"
                   type="outline"
@@ -200,7 +192,7 @@ const ComputePricingCalculator = () => {
                   }
                   className="w-full pl-1 py-2"
                 >
-                  <div className="lg:min-w-[80px] flex items-center flex-1 grow w-full gap-1">
+                  <div className="lg:min-w-[80px] flex items-center grow w-full gap-1">
                     <span className="text-foreground-light">Plan</span>{' '}
                     <span>{activePlan.name}</span>
                   </div>
@@ -219,11 +211,12 @@ const ComputePricingCalculator = () => {
             <PriceSummary />
             <div className="flex items-center gap-1 w-full justify-between">
               <span>Total Estimate</span>
-              <span
-                className="text-foreground font-mono flex items-center gap-1"
-                data-tip="This estimate only includes Plan and Compute add-on monthly costs. Other resources might concur in the final invoice."
-              >
-                <InformationCircleIcon className="w-3 h-3" /> ${activePrice}
+              <span className="text-foreground font-mono flex items-center gap-1">
+                <InformationCircleIcon
+                  data-tip="This estimate only includes Plan and Compute add-on monthly costs. Other resources might concur in the final invoice."
+                  className="w-3 h-3"
+                />{' '}
+                ${activePrice}
               </span>
             </div>
           </div>
@@ -310,16 +303,10 @@ const ComputePricingCalculator = () => {
             }
             className="w-full border-dashed text-foreground-light hover:text-foreground"
           >
-            <div className="w-full text-left">Add Compute Instance</div>
+            <span className="w-full text-left">Add Compute Instance</span>
           </Button>
         </div>
       </div>
-      <ReactTooltip
-        effect="solid"
-        backgroundColor="hsl(var(--background-alternative-default))"
-        textColor="hsl(var(--foreground-light))"
-        className="!max-w-[320px] !px-3 whitespace-pre-line"
-      />
     </div>
   )
 }

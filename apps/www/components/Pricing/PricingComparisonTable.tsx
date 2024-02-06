@@ -318,10 +318,10 @@ const PricingComparisonTable = () => {
                 scope="col"
               >
                 <span className="sr-only">Feature by</span>
-                <div
+                <span
                   className="h-0.25 absolute bottom-0 left-0 w-full"
                   style={{ height: '1px' }}
-                ></div>
+                />
               </th>
 
               {plans.map((plan) => (
@@ -330,8 +330,8 @@ const PricingComparisonTable = () => {
                   scope="col"
                   key={plan.name}
                 >
-                  <div className="flex flex-col px-6 pr-2 pt-2 gap-1.5">
-                    <div className="flex flex-col xl:flex-row xl:items-end gap-1">
+                  <span className="flex flex-col px-6 pr-2 pt-2 gap-1.5">
+                    <span className="flex flex-col xl:flex-row xl:items-end gap-1">
                       <h3 className="text-lg xl:text-xl 2xl:text-2xl leading-5 uppercase font-mono font-normal flex items-center">
                         {plan.name}
                       </h3>
@@ -349,8 +349,8 @@ const PricingComparisonTable = () => {
                           <span className="text-[13px] leading-4 mt-1">{plan.costUnit}</span>
                         )}
                       </p>
-                    </div>
-                    <div className="flex flex-col justify-between h-full pb-2">
+                    </span>
+                    <span className="flex flex-col justify-between h-full pb-2">
                       <Button
                         asChild
                         size="tiny"
@@ -368,8 +368,8 @@ const PricingComparisonTable = () => {
                           {plan.cta}
                         </Link>
                       </Button>
-                    </div>
-                  </div>
+                    </span>
+                  </span>
                 </th>
               ))}
             </tr>

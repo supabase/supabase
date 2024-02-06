@@ -139,7 +139,7 @@ const PricingPlans: FC = () => {
                   {plan.preface && (
                     <p className="text-foreground-lighter text-[13px] mt-2 mb-4">{plan.preface}</p>
                   )}
-                  <ul role="list" className="text-[13px] flex-1 text-foreground-lighter">
+                  <ul className="text-[13px] flex-1 text-foreground-lighter">
                     {plan.features.map((feature) => (
                       <li
                         key={typeof feature === 'string' ? feature : feature[0]}
