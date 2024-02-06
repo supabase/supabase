@@ -125,6 +125,7 @@ export default function IndexPage() {
         backgroundColor="hsl(var(--background-alternative-default))"
         textColor="hsl(var(--foreground-light))"
         className="!max-w-[320px] !px-3 whitespace-pre-line"
+        uuid="pricingtt"
       />
     </DefaultLayout>
   )
