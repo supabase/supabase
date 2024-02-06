@@ -56,7 +56,7 @@ const DatabaseTables: NextPageWithLayout = () => {
         projectRef={projectRef}
         selectedTable={selectedTableToEdit}
       />
-      <SidePanelEditor includeColumns selectedTable={selectedTable || selectedTableToEdit} />
+      <SidePanelEditor includeColumns selectedTable={selectedTableToEdit || selectedTable} />
     </>
   )
 }
