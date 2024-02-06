@@ -12,6 +12,7 @@ import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { useFlag } from 'hooks'
+import { sortBy } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -27,6 +28,8 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
   IconAlertCircle,
+  IconArrowDown,
+  IconArrowUp,
   IconCheckCircle,
   IconList,
   IconRefreshCw,
@@ -426,8 +429,9 @@ function QueryPerformanceFilterBar({
 }) {
   const router = useRouter()
   const defaultSearchQueryValue = router.query.search ? String(router.query.search) : ''
+  const defaultSortByValue = router.query.sort ? String(router.query.sort) : 'lat_desc'
   const [searchInputVal, setSearchInputVal] = useState(defaultSearchQueryValue)
-  const sortBy = router.query.sort ? String(router.query.sort) : 'lat_desc'
+  const [sortByValue, setSortByValue] = useState(defaultSortByValue)
 
   function getSortButtonLabel() {
     const sort = router.query.sort as 'lat_desc' | 'lat_asc'
@@ -440,6 +444,7 @@ function QueryPerformanceFilterBar({
   }
 
   function onSortChange(sort: string) {
+    setSortByValue(sort)
     router.push({
       ...router,
       query: {
@@ -448,6 +453,8 @@ function QueryPerformanceFilterBar({
       },
     })
   }
+
+  const ButtonIcon = sortByValue === 'lat_desc' ? IconArrowDown : IconArrowUp
 
   return (
     <>
@@ -502,10 +509,10 @@ function QueryPerformanceFilterBar({
           />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button icon={<IconList />}>{getSortButtonLabel()}</Button>
+              <Button icon={<ButtonIcon />}>{getSortButtonLabel()}</Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
-              <DropdownMenuRadioGroup value={sortBy} onValueChange={onSortChange}>
+              <DropdownMenuRadioGroup value={sortByValue} onValueChange={onSortChange}>
                 <DropdownMenuRadioItem
                   defaultChecked={router.query.sort === 'lat_desc'}
                   value={'lat_desc'}
