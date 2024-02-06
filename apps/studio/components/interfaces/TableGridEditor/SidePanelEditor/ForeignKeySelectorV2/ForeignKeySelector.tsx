@@ -116,6 +116,25 @@ export const ForeignKeySelector = ({
     setFk({ ...fk, [action]: value })
   }
 
+  const validateSelection = (resolve: any) => {
+    const errors: any = {}
+    const incompleteColumns = fk.columns.filter(
+      (column) => column.source === '' || column.target === ''
+    )
+    if (incompleteColumns.length > 0) errors['columns'] = 'Please ensure that columns are selected'
+
+    console.log({ fk })
+    if (Object.keys(errors).length > 0) {
+      setErrors(errors)
+      resolve()
+      return
+    } else {
+      if (fk.table !== '') onSaveRelation(fk)
+      onClose()
+      resolve()
+    }
+  }
+
   useEffect(() => {
     if (visible) {
       if (foreignKey !== undefined) setFk(foreignKey)
@@ -135,11 +154,7 @@ export const ForeignKeySelector = ({
           disableApply={false}
           applyButtonLabel="Save"
           closePanel={onClose}
-          applyFunction={(resolve: any) => {
-            onSaveRelation(fk)
-            onClose()
-            resolve()
-          }}
+          applyFunction={(resolve: any) => validateSelection(resolve)}
         />
       }
     >
@@ -296,16 +311,18 @@ export const ForeignKeySelector = ({
                           type="default"
                           className="px-1"
                           icon={<IconX />}
+                          disabled={fk.columns.length === 1}
                           onClick={() => onRemoveColumn(idx)}
                         />
                       </div>
                     </Fragment>
                   ))}
                 </div>
-                <div>
+                <div className="space-y-2">
                   <Button type="default" onClick={addColumn}>
                     Add another column
                   </Button>
+                  {errors.columns && <p className="text-red-900 text-sm">{errors.columns}</p>}
                 </div>
               </div>
 

@@ -328,7 +328,6 @@ const TableEditor = ({
       <SidePanel.Content className="space-y-10 py-6">
         {!isDuplicating && (
           <ColumnManagement
-            table={{ name: tableFields.name, schema: snap.selectedSchemaName }}
             columns={tableFields?.columns}
             enumTypes={enumTypes}
             isNewRecord={isNewRecord}

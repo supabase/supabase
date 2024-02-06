@@ -93,7 +93,7 @@ export const ForeignKeyRow = ({
         </Button>
         {foreignKey.toRemove ? (
           <Button type="default" onClick={onSelectUndoRemove}>
-            Undo remove
+            Cancel remove
           </Button>
         ) : (
           <Button type="default" onClick={onSelectRemove}>
