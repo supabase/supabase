@@ -1,46 +1,75 @@
 import { useParams } from 'common'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
-import ReportPadding from 'components/interfaces/Reports/ReportPadding'
+import ReportQueryPerformanceTableRow from 'components/interfaces/Reports/ReportQueryPerformanceTableRow'
 import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
+import { useQueryPerformanceQuery } from 'components/interfaces/Reports/Reports.queries'
 import { Presets } from 'components/interfaces/Reports/Reports.types'
 import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
 import { ReportsLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
-import CopyButton from 'components/ui/CopyButton'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { useFlag } from 'hooks'
+import { sortBy } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { NextPageWithLayout } from 'types'
-import { Accordion, Button, IconAlertCircle, IconCheckCircle, Tabs } from 'ui'
+import {
+  Accordion,
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+  IconAlertCircle,
+  IconArrowDown,
+  IconArrowUp,
+  IconCheckCircle,
+  IconList,
+  IconRefreshCw,
+  IconSearch,
+  Input,
+  Tabs,
+} from 'ui'
 
+type QueryPerformancePreset = 'time' | 'frequent' | 'slowest'
 const QueryPerformanceReport: NextPageWithLayout = () => {
   const { project } = useProjectContext()
   const [showResetgPgStatStatements, setShowResetgPgStatStatements] = useState(false)
   const tableIndexEfficiencyEnabled = useFlag('tableIndexEfficiency')
   const config = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
   const { ref: projectRef } = useParams()
+  const router = useRouter()
   const hooks = queriesFactory(config.queries, projectRef ?? 'default')
-  const mostFrequentlyInvoked = hooks.mostFrequentlyInvoked()
-  const mostTimeConsuming = hooks.mostTimeConsuming()
-  const slowestExecutionTime = hooks.slowestExecutionTime()
   const queryHitRate = hooks.queryHitRate()
 
-  const isLoading = [
-    mostFrequentlyInvoked.isLoading,
-    mostTimeConsuming.isLoading,
-    slowestExecutionTime.isLoading,
-    queryHitRate.isLoading,
-  ].every((value) => value)
+  const orderBy = (router.query.sort as 'lat_desc' | 'lat_asc') || 'lat_desc'
+  const searchQuery = (router.query.search as string) || ''
+  const presetMap = {
+    time: 'mostTimeConsuming',
+    frequent: 'mostFrequentlyInvoked',
+    slowest: 'slowestExecutionTime',
+  } as const
+  const preset = presetMap[router.query.preset as QueryPerformancePreset] || 'mostTimeConsuming'
+
+  const queryPerformanceQuery = useQueryPerformanceQuery({
+    searchQuery,
+    orderBy,
+    preset,
+  })
+
+  const isLoading = [queryPerformanceQuery.isLoading, queryHitRate.isLoading].every(
+    (value) => value
+  )
 
   const handleRefresh = async () => {
-    mostFrequentlyInvoked.runQuery()
-    mostTimeConsuming.runQuery()
-    slowestExecutionTime.runQuery()
+    queryPerformanceQuery.runQuery()
     queryHitRate.runQuery()
   }
 
@@ -98,7 +127,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   const helperTextClassNames = 'prose text-sm max-w-2xl text-foreground-light'
 
   return (
-    <ReportPadding>
+    <div className="p-4 py-3">
       <ReportHeader title="Query Performance" isLoading={isLoading} onRefresh={handleRefresh} />
       {tableIndexEfficiencyEnabled && (
         <Accordion
@@ -129,7 +158,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                           : dangerAlert}
                       <div className="flex items-baseline">
                         <span className="text-3xl">
-                          {(queryHitRate?.data![0]?.ratio * 100).toFixed(2)}
+                          {queryHitRate?.data && (queryHitRate?.data[0]?.ratio * 100).toFixed(2)}
                         </span>
                         <span className="text-xl">%</span>
                       </div>
@@ -146,7 +175,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                           : dangerAlert}
                       <div className="flex items-baseline">
                         <span className="text-3xl">
-                          {(queryHitRate?.data![1]?.ratio * 100).toFixed(2)}
+                          {queryHitRate?.data && (queryHitRate?.data[1]?.ratio * 100).toFixed(2)}
                         </span>
                         <span className="text-xl">%</span>
                       </div>
@@ -199,179 +228,180 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
       />
 
       <div className="flex flex-col">
-        <Tabs type="underlined" size="medium">
-          <Tabs.Panel key={1} id="1" label="Most time consuming">
+        <Tabs
+          type="underlined"
+          size="medium"
+          onChange={(e: string) => {
+            // To reset the search and sort query params when switching tabs
+            const { sort, search, ...rest } = router.query
+            router.push({
+              ...router,
+              query: {
+                ...rest,
+                preset: e,
+              },
+            })
+          }}
+        >
+          <Tabs.Panel key={'time'} id="time" label="Most time consuming">
             <div className={panelClassNames}>
               <ReactMarkdown className={helperTextClassNames}>
                 {TimeConsumingHelperText}
               </ReactMarkdown>
-              <div className="thin-scrollbars max-w-full overflow-scroll">
+              <div className="thin-scrollbars max-w-full overflow-auto min-h-[800px]">
+                <QueryPerformanceFilterBar onRefreshClick={handleRefresh} isLoading={isLoading} />
                 <Table
+                  className="table-fixed"
                   head={
                     <>
-                      <Table.th className="table-cell">Role</Table.th>
-                      <Table.th className="table-cell">Time Consumed</Table.th>
-                      <Table.th className="table-cell">Calls</Table.th>
-                      <Table.th className="table-cell">Total Time</Table.th>
-                      <Table.th className="table-cell">Query</Table.th>
+                      <Table.th className="text-ellipsis overflow-hidden">Role</Table.th>
+                      <Table.th className="w-[300px]">Query</Table.th>
+                      <Table.th className="text-right">Calls</Table.th>
+                      <Table.th className="text-right">Time Consumed</Table.th>
+                      <Table.th className="text-right">Total Time (Latency)</Table.th>
                     </>
                   }
                   body={
-                    !isLoading && mostTimeConsuming && mostTimeConsuming?.data ? (
-                      mostTimeConsuming?.data?.map((item, i) => {
+                    !queryPerformanceQuery.isLoading ? (
+                      queryPerformanceQuery?.data?.map((item, i) => {
                         return (
-                          <Table.tr key={i} hoverable className="relative">
-                            <Table.td className="table-cell whitespace-nowrap w-36">
+                          <ReportQueryPerformanceTableRow
+                            key={i + '-mosttimeconsumed'}
+                            sql={item.query}
+                            colSpan={5}
+                          >
+                            <Table.td className="truncate" title={item.rolname}>
                               {item.rolname}
                             </Table.td>
-                            <Table.td className="table-cell whitespace-nowrap">
+                            <Table.td className="max-w-xs">
+                              <p className="font-mono line-clamp-2 text-xs">{item.query}</p>
+                            </Table.td>
+                            <Table.td className="truncate text-right">{item.calls}</Table.td>
+                            <Table.td className="truncate text-right">
                               {item.prop_total_time}
                             </Table.td>
-                            <Table.td className="table-cell whitespace-nowrap">
-                              {item.calls}
-                            </Table.td>
-                            <Table.td className="table-cell whitespace-nowrap">
+                            <Table.td className="truncate text-right">
                               {item.total_time.toFixed(2)}ms
                             </Table.td>
-                            <Table.td className="relative table-cell whitespace-nowrap w-36">
-                              <p className="w-96 block truncate font-mono">{item.query}</p>
-                              <QueryActions
-                                sql={item.query}
-                                className="absolute inset-y-0 right-0"
-                              />
-                            </Table.td>
-                          </Table.tr>
+                          </ReportQueryPerformanceTableRow>
                         )
                       })
                     ) : (
-                      <></>
+                      <QueryPerformanceLoadingRow colSpan={5} />
                     )
                   }
                 />
               </div>
             </div>
           </Tabs.Panel>
-          <Tabs.Panel key={2} id="2" label="Most frequent">
+          <Tabs.Panel key={'frequent'} id="frequent" label="Most frequent">
             <div className={panelClassNames}>
               <ReactMarkdown className={helperTextClassNames}>
                 {MostFrequentHelperText}
               </ReactMarkdown>
-              <div className="thin-scrollbars max-w-full overflow-scroll">
+              <div className="thin-scrollbars max-w-full overflow-auto min-h-[800px]">
+                <QueryPerformanceFilterBar onRefreshClick={handleRefresh} isLoading={isLoading} />
                 <Table
                   head={
                     <>
-                      {/* <Table.th className="table-cell">source</Table.th> */}
-                      <Table.th className="table-cell">Role</Table.th>
-                      <Table.th className="table-cell">Avg. Roles</Table.th>
-                      <Table.th className="table-cell">Calls</Table.th>
-                      <Table.th className="table-cell">Max Time</Table.th>
-                      <Table.th className="table-cell">Mean Time</Table.th>
-                      <Table.th className="table-cell">Min Time</Table.th>
-                      <Table.th className="table-cell">Total Time</Table.th>
-                      <Table.th className="table-cell">Query</Table.th>
+                      <Table.th className="">Role</Table.th>
+                      <Table.th className="w-[300px]">Query</Table.th>
+                      <Table.th className="text-right">Avg. Roles</Table.th>
+                      <Table.th className="text-right">Calls</Table.th>
+                      <Table.th className="text-right">Max Time</Table.th>
+                      <Table.th className="text-right">Mean Time</Table.th>
+                      <Table.th className="text-right">Min Time</Table.th>
+                      <Table.th className="text-right">Total Time (Latency)</Table.th>
                     </>
                   }
                   body={
-                    !isLoading && mostFrequentlyInvoked && mostFrequentlyInvoked?.data ? (
-                      mostFrequentlyInvoked.data?.map((item, i) => {
+                    queryPerformanceQuery.isLoading ? (
+                      <QueryPerformanceLoadingRow colSpan={8} />
+                    ) : (
+                      queryPerformanceQuery.data?.map((item, i) => {
                         return (
-                          <Table.tr key={i} hoverable className="relative">
-                            <Table.td className="table-cell whitespace-nowrap w-28">
+                          <ReportQueryPerformanceTableRow
+                            key={i + '-mostfreq'}
+                            sql={item.query}
+                            colSpan={8}
+                          >
+                            <Table.td className="truncate" title={item.rolname}>
                               {item.rolname}
                             </Table.td>
-                            <Table.td className="table-cell whitespace-nowrap">
-                              {item.avg_rows}
+                            <Table.td className="min-w-xs">
+                              <p className="text-xs font-mono line-clamp-2">{item.query}</p>
                             </Table.td>
-                            <Table.td className="table-cell whitespace-nowrap">
-                              {item.calls}
+                            <Table.td className="truncate text-right">{item.avg_rows}</Table.td>
+                            <Table.td className="truncate text-right">{item.calls}</Table.td>
+                            <Table.td className="truncate text-right">
+                              {item.max_time?.toFixed(2)}ms
                             </Table.td>
-                            <Table.td className="table-cell whitespace-nowrap">
-                              {item.max_time.toFixed(2)}ms
+                            <Table.td className="text-right truncate">
+                              {item.mean_time?.toFixed(2)}ms
                             </Table.td>
-                            <Table.td className="table-cell whitespace-nowrap truncate">
-                              {item.mean_time.toFixed(2)}ms
+                            <Table.td className="text-right truncate">
+                              {item.min_time?.toFixed(2)}ms
                             </Table.td>
-                            <Table.td className="table-cell whitespace-nowrap truncate">
-                              {item.min_time.toFixed(2)}ms
+                            <Table.td className="text-right truncate">
+                              {item.total_time?.toFixed(2)}ms
                             </Table.td>
-                            <Table.td className="table-cell whitespace-nowrap truncate">
-                              {item.total_time.toFixed(2)}ms
-                            </Table.td>
-                            <Table.td className="relative table-cell whitespace-nowrap  w-24">
-                              <p className="w-48 block truncate font-mono ">{item.query}</p>
-                              <QueryActions
-                                sql={item.query}
-                                className="absolute inset-y-0 right-0"
-                              />
-                            </Table.td>
-                          </Table.tr>
+                          </ReportQueryPerformanceTableRow>
                         )
                       })
-                    ) : (
-                      <></>
                     )
                   }
                 />
               </div>
             </div>
           </Tabs.Panel>
-          <Tabs.Panel key={3} id="3" label="Slowest execution time">
+          <Tabs.Panel key={'slowest'} id="slowest" label="Slowest execution time">
             <div className={panelClassNames}>
               <ReactMarkdown className={helperTextClassNames}>
                 {SlowestExecutionHelperText}
               </ReactMarkdown>
-              <div className="thin-scrollbars max-w-full overflow-scroll">
+              <div className="thin-scrollbars max-w-full overflow-auto min-h-[800px]">
+                <QueryPerformanceFilterBar onRefreshClick={handleRefresh} isLoading={isLoading} />
                 <Table
                   head={
                     <>
                       <Table.th className="table-cell">Role</Table.th>
+                      <Table.th className="table-cell">Query</Table.th>
                       <Table.th className="table-cell">Avg Rows</Table.th>
                       <Table.th className="table-cell">Calls</Table.th>
                       <Table.th className="table-cell">Max Time</Table.th>
                       <Table.th className="table-cell">Mean Time</Table.th>
                       <Table.th className="table-cell">Min Time</Table.th>
-                      <Table.th className="table-cell">Total Time</Table.th>
-                      <Table.th className="table-cell">Query</Table.th>
+                      <Table.th className="table-cell">Total Time (Latency)</Table.th>
                     </>
                   }
                   body={
-                    !isLoading && slowestExecutionTime && slowestExecutionTime?.data ? (
-                      slowestExecutionTime.data?.map((item, i) => {
+                    queryPerformanceQuery.isLoading ? (
+                      <QueryPerformanceLoadingRow colSpan={8} />
+                    ) : (
+                      queryPerformanceQuery.data?.map((item, i) => {
                         return (
-                          <Table.tr key={i} hoverable className="relative">
-                            <Table.td className="table-cell whitespace-nowrap w-24">
+                          <ReportQueryPerformanceTableRow
+                            key={i + '-slowestexec'}
+                            sql={item.query}
+                            colSpan={8}
+                          >
+                            <Table.td className="truncate" title={item.rolname}>
                               {item.rolname}
                             </Table.td>
-                            <Table.td className="table-cell whitespace-nowrap">
-                              {item.avg_rows}
+                            <Table.td className="max-w-xs">
+                              <p className="font-mono line-clamp-2 text-xs">{item.query}</p>
                             </Table.td>
-                            <Table.td className="table-cell whitespace-nowrap">
-                              {item.calls}
+                            <Table.td className="truncate">{item.avg_rows}</Table.td>
+                            <Table.td className="truncate">{item.calls}</Table.td>
+                            <Table.td className="truncate">{item.max_time?.toFixed(2)}ms</Table.td>
+                            <Table.td className="truncate">{item.mean_time?.toFixed(2)}ms</Table.td>
+                            <Table.td className="truncate">{item.min_time?.toFixed(2)}ms</Table.td>
+                            <Table.td className="truncate">
+                              {item.total_time?.toFixed(2)}ms
                             </Table.td>
-                            <Table.td className="table-cell whitespace-nowrap">
-                              {item.max_time.toFixed(2)}ms
-                            </Table.td>
-                            <Table.td className="table-cell whitespace-nowrap truncate">
-                              {item.mean_time.toFixed(2)}ms
-                            </Table.td>
-                            <Table.td className="table-cell whitespace-nowrap truncate">
-                              {item.min_time.toFixed(2)}ms
-                            </Table.td>
-                            <Table.td className="table-cell whitespace-nowrap truncate">
-                              {item.total_time.toFixed(2)}ms
-                            </Table.td>
-                            <Table.td className="relative table-cell whitespace-nowrap">
-                              <p className="w-48 block truncate font-mono">{item.query}</p>
-                              <QueryActions
-                                sql={item.query}
-                                className="absolute inset-y-0 right-0"
-                              />
-                            </Table.td>
-                          </Table.tr>
+                          </ReportQueryPerformanceTableRow>
                         )
                       })
-                    ) : (
-                      <></>
                     )
                   }
                 />
@@ -380,16 +410,6 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
           </Tabs.Panel>
         </Tabs>
       </div>
-    </ReportPadding>
-  )
-}
-
-const QueryActions = ({ sql, className }: { sql: string; className: string }) => {
-  if (sql.includes('insufficient privilege')) return null
-
-  return (
-    <div className={[className, 'flex justify-center items-center mr-4'].join(' ')}>
-      <CopyButton type="default" text={sql} />
     </div>
   )
 }
@@ -399,3 +419,149 @@ QueryPerformanceReport.getLayout = (page) => (
 )
 
 export default observer(QueryPerformanceReport)
+
+function QueryPerformanceFilterBar({
+  isLoading,
+  onRefreshClick,
+}: {
+  isLoading: boolean
+  onRefreshClick: () => void
+}) {
+  const router = useRouter()
+  const defaultSearchQueryValue = router.query.search ? String(router.query.search) : ''
+  const defaultSortByValue = router.query.sort ? String(router.query.sort) : 'lat_desc'
+  const [searchInputVal, setSearchInputVal] = useState(defaultSearchQueryValue)
+  const [sortByValue, setSortByValue] = useState(defaultSortByValue)
+
+  function getSortButtonLabel() {
+    const sort = router.query.sort as 'lat_desc' | 'lat_asc'
+
+    if (sort === 'lat_desc') {
+      return 'Sorted by latency - high to low'
+    } else {
+      return 'Sorted by latency - low to high'
+    }
+  }
+
+  function onSortChange(sort: string) {
+    setSortByValue(sort)
+    router.push({
+      ...router,
+      query: {
+        ...router.query,
+        sort,
+      },
+    })
+  }
+
+  const ButtonIcon = sortByValue === 'lat_desc' ? IconArrowDown : IconArrowUp
+
+  return (
+    <>
+      <div className="flex justify-between items-center">
+        <form
+          className="py-3 flex gap-4"
+          id="log-panel-search"
+          onSubmit={(e) => {
+            e.preventDefault()
+            const formData = new FormData(e.target as HTMLFormElement)
+            const searchQuery = formData.get('search')
+
+            if (!searchQuery || typeof searchQuery !== 'string') {
+              // if user has deleted the search query, remove it from the url
+              const { search, ...rest } = router.query
+              router.push({
+                ...router,
+                query: {
+                  ...rest,
+                },
+              })
+              return
+            }
+
+            router.push({
+              ...router,
+              query: {
+                ...router.query,
+                search: searchQuery,
+              },
+            })
+          }}
+        >
+          <Input
+            className="w-60 group"
+            size="tiny"
+            placeholder="Search roles or queries"
+            name="search"
+            value={searchInputVal}
+            onChange={(e) => setSearchInputVal(e.target.value)}
+            autoComplete="off"
+            icon={
+              <div className="text-foreground-lighter">
+                <IconSearch size={14} />
+              </div>
+            }
+            actions={
+              searchInputVal !== '' && (
+                <button className="mx-2 text-foreground-light hover:text-foreground">{'↲'}</button>
+              )
+            }
+          />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button icon={<ButtonIcon />}>{getSortButtonLabel()}</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+              <DropdownMenuRadioGroup value={sortByValue} onValueChange={onSortChange}>
+                <DropdownMenuRadioItem
+                  defaultChecked={router.query.sort === 'lat_desc'}
+                  value={'lat_desc'}
+                >
+                  Sort by latency - high to low
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem
+                  value={'lat_asc'}
+                  defaultChecked={router.query.sort === 'lat_asc'}
+                >
+                  Sort by latency - low to high
+                </DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </form>
+        <div>
+          <Button
+            type="default"
+            size="tiny"
+            onClick={onRefreshClick}
+            disabled={isLoading ? true : false}
+            icon={
+              <IconRefreshCw
+                size="tiny"
+                className={`text-foreground-light ${isLoading ? 'animate-spin' : ''}`}
+              />
+            }
+          >
+            {isLoading ? 'Refreshing' : 'Refresh'}
+          </Button>
+        </div>
+      </div>
+    </>
+  )
+}
+
+function QueryPerformanceLoadingRow({ colSpan }: { colSpan: number }) {
+  return (
+    <>
+      {Array(4)
+        .fill('')
+        .map((_, i) => (
+          <tr key={'loading-' + { i }}>
+            <td colSpan={colSpan}>
+              <ShimmeringLoader />
+            </td>
+          </tr>
+        ))}
+    </>
+  )
+}
