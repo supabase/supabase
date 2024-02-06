@@ -29,6 +29,7 @@ export const plans: PricingInformation[] = [
     description: 'Perfect for passion projects & simple websites.',
     preface: 'Get started with:',
     features: [
+      'Unlimited API requests',
       '50,000 monthly active users',
       ['500MB Database space', '2 Core shared CPU • 1 GB RAM'],
       '5GB bandwidth',
@@ -57,7 +58,7 @@ export const plans: PricingInformation[] = [
     description: 'For production applications with the option to scale.',
     features: [
       ['100,000 monthly active users', 'then $0.00325 per MAU'],
-      ['8GB Database space', 'then $0.125 per GB'],
+      ['8GB dedicated Database space', 'then $0.125 per GB'],
       ['250GB bandwidth', 'then $0.09 per GB'],
       ['100GB file storage', 'then $0.021 per GB'],
       'Daily backups stored for 7 days',
@@ -70,7 +71,6 @@ export const plans: PricingInformation[] = [
       'Daily backups stored for 7 days',
       '7-day log retention',
     ],
-    // footer: 'Your cost control settings determine if you allow over-usage.',
     preface: 'Everything in the Free plan, plus:',
     cta: 'Get Started',
   },
@@ -87,7 +87,7 @@ export const plans: PricingInformation[] = [
     features: [
       'SOC2',
       'HIPAA available as paid add-on',
-      'Additional member roles',
+      'Read only and Billing member roles',
       'SSO for Supabase Dashboard',
       'Priority email support & SLAs',
       'Daily backups stored for 14 days',

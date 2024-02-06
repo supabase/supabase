@@ -86,8 +86,8 @@ export default function IndexPage() {
 
       <div className="text-center mt-10 xl:mt-16 mx-auto max-w-lg flex flex-col gap-8">
         <p className="text-foreground-lighter">
-          We bill extra only for the resources you consume
-          <br className="hidden md:block" /> that exceed the quota included in a paid plan.
+          We will only bill extra for resources consumed
+          <br className="hidden md:block" /> exceeding the inclusive quota limits in your paid plan
         </p>
         <div className="flex justify-center gap-2">
           <a href="#compare-plans">
