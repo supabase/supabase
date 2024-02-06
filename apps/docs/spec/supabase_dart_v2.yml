@@ -1920,7 +1920,7 @@ functions:
     description: |
       Filters allow you to only return rows that match certain conditions.
 
-      Filters can be used on `select()`, `update()`, and `delete()` queries.
+      Filters can be used on `select()`, `update()`, `upsert()`, and `delete()` queries.
 
       If a Database function returns a table response, you can also apply filters.
     examples:
@@ -1945,9 +1945,7 @@ functions:
       - id: chaining-filters
         name: Chaining Filters
         description: |
-          Filters must be applied after any of `select()`, `update()`, `upsert()`,
-          `delete()`, and `rpc()` and before
-          [modifiers](/docs/reference/dart/using-modifiers).
+          Filters can be chained together to produce advanced queries as shown in the example code.
         code: |
           ```dart
           final data = await supabase
@@ -1970,16 +1968,14 @@ functions:
             .from('cities')
             .select('name, country_id');
 
-          if (filterByName != null)  { query = query.eq('name', filterByName); }
-          if (filterPopLow != null)  { query = query.gte('population', filterPopLow); }
-          if (filterPopHigh != null) { query = query.lt('population', filterPopHigh); }
+          if (filterByName != null) query = query.eq('name', filterByName);
+          if (filterPopLow != null) query = query.gte('population', filterPopLow);
+          if (filterPopHigh != null) query = query.lt('population', filterPopHigh);
 
           final data = await query;
           ```
       - id: filter-by-value-within-json-column
         name: Filter by values within a JSON column
-        description: |
-          Filters can be built up one step at a time and then executed. For example:
         data:
           sql: |
             ```sql
@@ -1998,19 +1994,15 @@ functions:
             ```
         response: |
           ```json
-          {
-            "data": [
-              {
-                "id": 1,
-                "name": "Michael",
-                "address": {
-                  "postcode": 90210
-                }
+          [
+            {
+              "id": 1,
+              "name": "Michael",
+              "address": {
+                "postcode": 90210
               }
-            ],
-            "status": 200,
-            "statusText": "OK"
-          }
+            }
+          ]
           ```
         code: |
           ```dart
@@ -2056,23 +2048,22 @@ functions:
               (1, 2, 'Bali'),
               (2, 1, 'Munich');
             ```
-          response: |
+        response: |
             ```json
-            {
-              "data": [
-                {
-                  "name": "Indonesia",
-                  "cities": [
-                    {
-                      "name": "Bali"
-                    }
-                  ]
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
+            [
+              {
+                "name": "Indonesia",
+                "cities": [
+                  {
+                    "name": "Bali"
+                  }
+                ]
+              }
+            ]
             ```
+        description: |
+          You can filter on referenced tables in your `select()` query using dot
+          notation.
   - id: or
     title: or()
     description: |
