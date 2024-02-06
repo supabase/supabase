@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
@@ -16,12 +16,6 @@ const CTABanner = dynamic(() => import('~/components/CTABanner'))
 export default function IndexPage() {
   const router = useRouter()
   const { asPath } = useRouter()
-
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  })
 
   const meta_title = 'Pricing & Fees | Supabase'
   const meta_description =
@@ -44,11 +38,9 @@ export default function IndexPage() {
 
     const element = document.querySelector(`#${hash}-${device}`)
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      element.scrollIntoView({ behavior: 'smooth' })
     }
   }, [asPath])
-
-  if (!mounted) return null
 
   return (
     <DefaultLayout>

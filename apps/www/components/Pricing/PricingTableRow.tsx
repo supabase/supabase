@@ -10,7 +10,7 @@ export const PricingTableRowDesktop = (props: any) => {
   return (
     <>
       <tr
-        className="divide-border scroll-mt-24"
+        className="divide-border -scroll-mt-5"
         style={{ borderTop: 'none' }}
         id={`${props.sectionId}-desktop`}
       >
@@ -110,7 +110,7 @@ export const PricingTableRowMobile = (props: any) => {
 
   return (
     <>
-      <table className="mt-8 w-full" id={`${props.sectionId}-mobile`}>
+      <table className="mt-8 w-full -scroll-mt-5" id={`${props.sectionId}-mobile`}>
         <caption className="bg-background border-default border-t px-4 py-3 text-left text-sm font-medium text-foreground">
           <div className="flex items-center gap-2">
             {category.icon ? <ProductIcon icon={props.icon} /> : null}
