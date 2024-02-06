@@ -364,7 +364,7 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          const subscription = supabase.auth.onAuthStateChange((event, session) => {
+          const { data } = supabase.auth.onAuthStateChange((event, session) => {
             console.log(event, session)
 
             if (event === 'INITIAL_SESSION') {
@@ -383,7 +383,7 @@ functions:
           })
 
           // call unsubscribe to remove the callback
-          subscription.unsubscribe()
+          data.subscription.unsubscribe()
           ```
       - id: listen-to-sign-out
         name: Listen to sign out
