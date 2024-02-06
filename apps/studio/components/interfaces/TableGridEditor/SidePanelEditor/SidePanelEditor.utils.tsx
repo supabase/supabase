@@ -1,4 +1,4 @@
-import { PostgresPrimaryKey, PostgresRelationship, PostgresTable } from '@supabase/postgres-meta'
+import { PostgresPrimaryKey, PostgresTable } from '@supabase/postgres-meta'
 import { chunk, find, isEmpty, isEqual } from 'lodash'
 import Papa from 'papaparse'
 import { useEffect, useState } from 'react'
@@ -30,12 +30,7 @@ import {
   generateUpdateColumnPayload,
 } from './ColumnEditor/ColumnEditor.utils'
 import { ForeignKey } from './ForeignKeySelectorV2/ForeignKeySelector.types'
-import {
-  ColumnField,
-  CreateColumnPayload,
-  ExtendedPostgresRelationship,
-  UpdateColumnPayload,
-} from './SidePanelEditor.types'
+import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
 import { checkIfRelationChanged } from './TableEditor/ForeignKeysManagement/ForeignKeysManagement.utils'
 import { ImportContent } from './TableEditor/TableEditor.types'
 
