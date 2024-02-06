@@ -1,11 +1,6 @@
 import Table from 'components/to-be-cleaned/Table'
-import CopyButton from 'components/ui/CopyButton'
 import React from 'react'
 import { cn } from 'ui'
-import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
-import sqlTheme from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
-import { useTheme } from 'next-themes'
-import { monokaiCustomTheme } from '@ui/components/CodeBlock/CodeBlock.utils'
 import { Editor } from '@monaco-editor/react'
 
 type Props = {
@@ -14,29 +9,8 @@ type Props = {
   children: React.ReactNode
 }
 
-const QueryActions = ({ sql, className }: { sql: string; className: string }) => {
-  if (sql.includes('insufficient privilege')) return null
-
-  return (
-    <div className={[className, 'flex justify-end items-center'].join(' ')}>
-      <CopyButton
-        onClick={(e) => {
-          e.stopPropagation()
-        }}
-        copyLabel="Copy query"
-        type="default"
-        text={sql}
-      />
-    </div>
-  )
-}
-
 const ReportQueryPerformanceTableRow = ({ sql, colSpan, children }: Props) => {
   const [expanded, setExpanded] = React.useState(false)
-  const { resolvedTheme } = useTheme()
-  const isDarkTheme = resolvedTheme?.includes('dark')!
-  SyntaxHighlighter.registerLanguage('sql', sqlTheme)
-  const monokaiTheme = monokaiCustomTheme(isDarkTheme)
 
   return (
     <>
