@@ -14,8 +14,9 @@ const addons = [
     heroImg: <CostControlAnimation className="relative w-full h-full lg:max-w-md" />,
     description:
       'The Pro plan has a spend cap enabled by default to keep costs under control. If you want to scale beyond the plans included quota, simply switch off the spend cap to pay for additional resources.',
-    leftCtaText: 'Learn about Cost Control',
-    leftCtaLink: 'https://supabase.com/docs/guides/platform/spend-cap',
+    ctaText: 'Learn about Cost Control',
+    ctaLink: 'https://supabase.com/docs/guides/platform/spend-cap',
+    ctaTarget: '_blank',
   },
   {
     id: 'addon-custom-domain',
@@ -25,9 +26,9 @@ const addons = [
     price: 'Flat fee $10/month',
     description:
       'Use your own domain for your Supabase project to present a branded experience to your users.',
-    leftCtaText: 'Documentation',
-    leftCtaLink: 'https://supabase.com/docs/guides/platform/custom-domains',
-    rightCtaText: 'See more',
+    ctaText: 'Documentation',
+    ctaLink: 'https://supabase.com/docs/guides/platform/custom-domains',
+    ctaTarget: '_blank',
   },
   {
     id: 'addon-pitr',
@@ -36,9 +37,9 @@ const addons = [
     icon: 'pitr-upgrade',
     price: 'Starts from $100/month',
     description: 'Roll back to any specific point in time up to seconds in granularity.',
-    leftCtaText: 'Documentation',
-    leftCtaLink: 'https://supabase.com/docs/guides/platform/backups',
-    rightCtaText: 'See Pricing breakdown',
+    ctaText: 'Documentation',
+    ctaLink: 'https://supabase.com/docs/guides/platform/backups',
+    ctaTarget: '_blank',
   },
 ]
 
@@ -96,8 +97,8 @@ const AddonCard = ({ addon }: any) => {
             type="default"
             iconRight={<IconArrowUpRight className="w-4 h-4" />}
           >
-            <Link href={addon.leftCtaLink} target="_blank">
-              {addon.leftCtaText}
+            <Link href={addon.ctaLink} target={addon.ctaTarget}>
+              {addon.ctaText}
             </Link>
           </Button>
         </div>
@@ -150,7 +151,7 @@ const AddonCard = ({ addon }: any) => {
       <HighlightCard />
     </div>
   ) : (
-    <Link href={addon.leftCtaLink} className={containerClasses} target="_blank">
+    <Link href={addon.ctaLink} className={containerClasses} target={addon.ctaTarget}>
       <SmallCard />
     </Link>
   )
