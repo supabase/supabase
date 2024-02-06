@@ -189,10 +189,6 @@ const PlanUpdateSidePanel = () => {
               const isDowngradeOption = planMeta?.change_type === 'downgrade'
               const isCurrentPlan = planMeta?.id === subscription?.plan?.id
               const features = billingViaPartner ? plan.featuresPartner : plan.features
-              const warning =
-                billingViaPartner && plan.warningPartner
-                  ? plan.warningPartner
-                  : plan.warning ?? null
 
               if (plan.id === 'tier_enterprise') {
                 return (

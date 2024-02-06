@@ -7,7 +7,6 @@ export interface PricingInformation {
   priceLabel?: string
   priceMonthly: number | string
   warning?: string
-  warningPartner?: string
   warningTooltip?: string
   description: string
   preface: string
@@ -45,7 +44,8 @@ export const plans: PricingInformation[] = [
       'Community support',
     ],
     footer: 'Free projects are paused after 1 week of inactivity. Limited to 2 active projects.',
-    footerPartner: 'Free projects are paused after 1 week of inactivity. Limited to 1 active project.',
+    footerPartner:
+      'Free projects are paused after 1 week of inactivity. Limited to 1 active project.',
     cta: 'Start for Free',
   },
   {
