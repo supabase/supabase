@@ -64,7 +64,6 @@ export default function IndexPage() {
       <div className="relative z-10 pt-8 pb-4 xl:py-16">
         <div className="mx-auto max-w-7xl px-8 text-center sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl space-y-2 lg:max-w-none">
-            <p className="text-brand text-base">Pricing</p>
             <h1 className="h1">
               Predictable pricing,
               <br className="block lg:hidden" /> designed to scale
