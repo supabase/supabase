@@ -46,7 +46,7 @@ const PricingFAQs = () => {
           to receive help from our team of experts.
         </p>
         <p className="p text-center">
-          For enterprise enquries,{' '}
+          For enterprise enquiries,{' '}
           <a
             target="_blank"
             href="https://forms.supabase.com/enterprise"
