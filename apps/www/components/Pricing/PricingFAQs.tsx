@@ -49,7 +49,7 @@ const PricingFAQs = () => {
           For enterprise enquries,{' '}
           <a
             target="_blank"
-            href="https://supabase.com/dashboard/support/new"
+            href="https://forms.supabase.com/enterprise"
             className="transition underline text-brand-link hover:text-brand-600"
           >
             you can contact the team here
