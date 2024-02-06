@@ -79,8 +79,8 @@ const PricingPlans: FC = () => {
 
                   <div
                     className={cn(
-                      'text-foreground flex items-baseline text-5xl font-normal lg:text-4xl xl:text-4xl border-b border-default min-h-[175px]',
-                      plan.priceLabel ? 'pt-6' : 'pt-10'
+                      'text-foreground flex items-baseline text-5xl font-normal lg:text-4xl xl:text-4xl border-b border-default lg:min-h-[175px]',
+                      plan.priceLabel ? 'py-6 lg:pb-0 pt-6' : 'py-8 lg:pb-0 lg:pt-10'
                     )}
                   >
                     <div className="flex flex-col gap-1">
