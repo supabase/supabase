@@ -34,6 +34,7 @@ import {
 import { ImportContent } from './TableEditor/TableEditor.types'
 import { sqlKeys } from 'data/sql/keys'
 import { entityTypeKeys } from 'data/entity-types/keys'
+import SparkBar from 'components/ui/SparkBar'
 
 const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
@@ -481,9 +482,20 @@ export const createTable = async (
           importContent.file,
           table as PostgresTable,
           importContent.selectedHeaders,
-          () => {
+          (progress: number) => {
             toast.loading(
-              `Adding ${importContent.rowCount.toLocaleString()} rows to ${table.name}`,
+              <div className="flex flex-col space-y-2" style={{ minWidth: '220px' }}>
+                <SparkBar
+                  value={progress}
+                  max={100}
+                  type="horizontal"
+                  barClass="bg-brand"
+                  labelBottom={`Adding ${importContent.rowCount.toLocaleString()} rows to ${table.name}`}
+                  labelBottomClass=""
+                  labelTop={`${progress.toFixed(2)}%`}
+                  labelTopClass="tabular-nums"
+                />
+              </div>,
               { id: toastId }
             )
           }
@@ -514,9 +526,20 @@ export const createTable = async (
           table as PostgresTable,
           importContent.rows,
           importContent.selectedHeaders,
-          () => {
+          (progress: number) => {
             toast.loading(
-              `Adding ${importContent.rows.length.toLocaleString()} rows to ${table.name}`,
+              <div className="flex flex-col space-y-2" style={{ minWidth: '220px' }}>
+                <SparkBar
+                  value={progress}
+                  max={100}
+                  type="horizontal"
+                  barClass="bg-brand"
+                  labelBottom={`Adding ${importContent.rows.length.toLocaleString()} rows to ${table.name}`}
+                  labelBottomClass=""
+                  labelTop={`${progress.toFixed(2)}%`}
+                  labelTopClass="tabular-nums"
+                />
+              </div>,
               { id: toastId }
             )
           }
@@ -627,7 +650,13 @@ export const updateTable = async (
           source_table_name: originalColumn.table,
           source_column_name: originalColumn.name,
         })
+
         const hasForeignKeyUpdated = !isEqual(originalForeignKey, column.foreignKey)
+        console.log(column.name, {
+          hasForeignKeyUpdated,
+          originalForeignKey,
+          updatedForeignKey: column.foreignKey,
+        })
         if (!isEmpty(columnPayload) || hasForeignKeyUpdated) {
           toast.loading(`Updating column ${column.name} from ${updatedTable.name}`, { id: toastId })
           const skipPKCreation = true
