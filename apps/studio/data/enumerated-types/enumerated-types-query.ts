@@ -52,6 +52,7 @@ export const useEnumeratedTypesQuery = <TData = EnumeratedTypesData>(
     ({ signal }) => getEnumeratedTypes({ projectRef, connectionString }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
+      staleTime: 0,
       ...options,
     }
   )
