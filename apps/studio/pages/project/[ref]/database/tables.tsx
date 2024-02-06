@@ -54,7 +54,7 @@ const DatabaseTables: NextPageWithLayout = () => {
       <DeleteConfirmationDialogs
         includeColumns
         projectRef={projectRef}
-        selectedTable={selectedTableToEdit}
+        selectedTable={selectedTableToEdit || selectedTable}
       />
       <SidePanelEditor includeColumns selectedTable={selectedTableToEdit || selectedTable} />
     </>
