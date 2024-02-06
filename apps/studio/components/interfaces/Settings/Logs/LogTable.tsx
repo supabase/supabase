@@ -161,7 +161,7 @@ const LogTable = ({
   }
 
   const LogsExplorerTableHeader = () => (
-    <div className="flex w-full items-center justify-between rounded-tl rounded-tr border-t border-l border-r bg-surface-100 px-5 py-2">
+    <div className="flex w-full items-center justify-between border-t  bg-surface-100 px-5 py-2">
       <div className="flex items-center gap-2">
         {data && data.length ? (
           <>
