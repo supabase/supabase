@@ -134,9 +134,9 @@ Complete the following steps to use WhatsApp OTP with Twilio Programmable Messag
    ![Twilio Content SID Image](/docs/img/guides/auth-twilio/twilio_content_sid.png)
 3. Register the Twilio Content SID on the Supabase dashboard under Authentication > Providers > Phone > Twilio Content SID. Ensure you have Twilio selected as your phone provider.
 
-Note that you may only use one Twilio Content SID at a time and that Supabase Auth will use the Content Template over the `SMS Message` field when sending WhatsApp messages. Use Twilio Verify if you need to use more than one message template.
-
-To sign up and sign in your users, follow the instructions for [using Phone Login](/docs/guides/auth/phone-login#using-phone-login), but in the `signUp` and `signInWithOtp` methods, pass an `options` object with the `channel` set to `whatsapp`.
+<Admonition>
+  You may only use one Twilio Content SID at a time. Supabase Auth will use the Content Template over the `SMS Message` field when sending WhatsApp messages. Use Twilio Verify if you need to use more than one message template.
+</Admonition>
 
 ## Next steps
 
