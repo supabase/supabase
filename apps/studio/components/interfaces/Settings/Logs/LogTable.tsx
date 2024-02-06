@@ -52,10 +52,14 @@ const LogTable = ({
   const firstRow: LogData | undefined = data?.[0] as LogData
 
   // move timestamp to the first column
-  const { timestamp, ...rest } = firstRow || {}
-  const formattedFirstRow = { timestamp, ...rest }
+  function getFirstRow() {
+    if (!firstRow) return {}
 
-  const columnNames = Object.keys(formattedFirstRow || {})
+    const { timestamp, ...rest } = firstRow || {}
+    return { timestamp, ...rest }
+  }
+
+  const columnNames = Object.keys(getFirstRow() || {})
   const hasId = columnNames.includes('id')
   const hasTimestamp = columnNames.includes('timestamp')
 
@@ -221,7 +225,7 @@ const LogTable = ({
   }
 
   const renderNoResultAlert = () => (
-    <div className="mt-16 flex scale-100 flex-col items-center justify-center gap-6 text-center opacity-100">
+    <div className="mt-4 flex scale-100 flex-col items-center justify-center gap-6 text-center opacity-100">
       <div className="flex flex-col gap-1">
         <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-stronger px-2"></div>
         <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-stronger px-2">

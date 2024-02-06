@@ -8,16 +8,23 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  IconBookOpen,
+  IconCheck,
   IconChevronDown,
+  IconClipboard,
+  IconExternalLink,
   IconPlay,
+  IconX,
   Popover,
+  SidePanel,
+  Tabs,
 } from 'ui'
 
 import { useCheckPermissions, useIsFeatureEnabled } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import Link from 'next/link'
-import React from 'react'
+import React, { useState } from 'react'
 import {
   EXPLORER_DATEPICKER_HELPERS,
   LogsTableName,
@@ -26,6 +33,9 @@ import {
   LogTemplate,
 } from '.'
 import DatePickers from './Logs.DatePickers'
+import Table from 'components/to-be-cleaned/Table'
+import { logConstants } from 'shared-data'
+import { copyToClipboard } from 'lib/helpers'
 
 export interface LogsQueryPanelProps {
   templates?: LogTemplate[]
@@ -61,6 +71,7 @@ const LogsQueryPanel = ({
     resource: { type: 'log_sql', owner_id: profile?.id },
     subject: { id: profile?.id },
   })
+  const [showReference, setShowReference] = React.useState(false)
 
   const {
     projectAuthAll: authEnabled,
@@ -161,9 +172,89 @@ const LogsQueryPanel = ({
           <div>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
-                <Button type="default" onClick={onClear}>
-                  Clear query
-                </Button>
+                <SidePanel
+                  size="large"
+                  header={
+                    <div className="flex flex-row justify-between items-center">
+                      <h3>Field Reference</h3>
+                      <Button
+                        type="text"
+                        className="px-1"
+                        onClick={() => setShowReference(false)}
+                        icon={<IconX size={18} strokeWidth={1.5} />}
+                      />
+                    </div>
+                  }
+                  visible={showReference}
+                  cancelText="Close"
+                  onCancel={() => setShowReference(false)}
+                  hideFooter
+                  triggerElement={
+                    <Button
+                      type="default"
+                      onClick={() => setShowReference(true)}
+                      icon={<IconBookOpen strokeWidth={1.5} />}
+                    >
+                      Field Reference
+                    </Button>
+                  }
+                >
+                  <SidePanel.Content>
+                    <div className="pt-4 pb-2 space-y-1">
+                      <p className="text-sm">
+                        The following table shows all the available paths that can be queried from
+                        each respective source. Do note that to access nested keys, you would need
+                        to perform the necessary{' '}
+                        <Link
+                          href="https://supabase.com/docs/guides/platform/logs#unnesting-arrays"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-brand"
+                        >
+                          unnesting joins
+                          <IconExternalLink
+                            size="tiny"
+                            className="ml-1 inline -translate-y-[2px]"
+                            strokeWidth={1.5}
+                          />
+                        </Link>
+                      </p>
+                    </div>
+                  </SidePanel.Content>
+                  <SidePanel.Separator />
+                  <Tabs
+                    scrollable
+                    size="small"
+                    type="underlined"
+                    defaultActiveId="edge_logs"
+                    listClassNames="px-2"
+                  >
+                    {logConstants.schemas.map((schema) => (
+                      <Tabs.Panel
+                        key={schema.reference}
+                        id={schema.reference}
+                        label={schema.name}
+                        className="px-4 pb-4"
+                      >
+                        <Table
+                          head={[
+                            <Table.th className="text-xs !p-2" key="path">
+                              Path
+                            </Table.th>,
+                            <Table.th key="type" className="text-xs !p-2">
+                              Type
+                            </Table.th>,
+                          ]}
+                          body={schema.fields
+                            .sort((a: any, b: any) => a.path - b.path)
+                            .map((field) => (
+                              <Field key={field.path} field={field} />
+                            ))}
+                        />
+                      </Tabs.Panel>
+                    ))}
+                  </Tabs>
+                </SidePanel>
                 {IS_PLATFORM && onSave && (
                   <Tooltip.Root delayDuration={0}>
                     <Tooltip.Trigger asChild>
@@ -210,6 +301,73 @@ const LogsQueryPanel = ({
         </div>
       </div>
     </div>
+  )
+}
+
+const Field = ({
+  field,
+}: {
+  field: {
+    path: string
+    type: string
+  }
+}) => {
+  const [isCopied, setIsCopied] = useState(false)
+
+  return (
+    <Table.tr>
+      <Table.td
+        className="font-mono text-xs !p-2 cursor-pointer hover:text-foreground transition flex items-center space-x-2"
+        onClick={() =>
+          copyToClipboard(field.path, () => {
+            setIsCopied(true)
+            setTimeout(() => setIsCopied(false), 3000)
+          })
+        }
+      >
+        <span>{field.path}</span>
+        {isCopied ? (
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger>
+              <IconCheck size={14} strokeWidth={3} className="text-brand" />
+            </Tooltip.Trigger>
+            <Tooltip.Portal>
+              <Tooltip.Content side="bottom">
+                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                <div
+                  className={[
+                    'rounded bg-alternative py-1 px-2 leading-none shadow',
+                    'border border-background',
+                  ].join(' ')}
+                >
+                  <span className="text-xs text-foreground">Copied</span>
+                </div>
+              </Tooltip.Content>
+            </Tooltip.Portal>
+          </Tooltip.Root>
+        ) : (
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger>
+              <IconClipboard size="tiny" strokeWidth={1.5} />
+            </Tooltip.Trigger>
+            <Tooltip.Portal>
+              <Tooltip.Content side="bottom">
+                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                <div
+                  className={[
+                    'rounded bg-alternative py-1 px-2 leading-none shadow',
+                    'border border-background',
+                  ].join(' ')}
+                >
+                  <span className="text-xs text-foreground">Copy value</span>
+                </div>
+              </Tooltip.Content>
+            </Tooltip.Portal>
+          </Tooltip.Root>
+        )}
+      </Table.td>
+      <Table.td className="font-mono text-xs !p-2">{field.type}</Table.td>
+    </Table.tr>
   )
 }
 
