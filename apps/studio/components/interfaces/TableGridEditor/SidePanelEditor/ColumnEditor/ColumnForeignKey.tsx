@@ -64,6 +64,8 @@ const ColumnForeignKey = ({ column, relations, closePanel }: ColumnForeignKeyPro
               These are the foreign keys which the column{' '}
               <code className="text-xs">{column.name}</code> is included
             </>
+          ) : column.isNewColumn ? (
+            <>Foreign keys can be added after creating the column</>
           ) : (
             <>
               Foreign keys which include the column <code className="text-xs">{column.name}</code>{' '}
@@ -73,7 +75,10 @@ const ColumnForeignKey = ({ column, relations, closePanel }: ColumnForeignKeyPro
         </AlertTitle_Shadcn_>
         <AlertDescription_Shadcn_>
           All foreign keys on the table can be managed by editing the{' '}
-          <code className="text-xs">{column.table}</code> table.
+          <code className="text-xs">
+            {column.schema}.{column.table}
+          </code>{' '}
+          table.
         </AlertDescription_Shadcn_>
         <Button type="default" className="mt-3" onClick={() => snap.onEditTable()}>
           Edit table

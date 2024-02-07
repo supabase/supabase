@@ -86,6 +86,11 @@ const Column = ({
             showLabel={false}
             className="table-editor-column-type lg:gap-0 "
             disabled={column.foreignKey !== undefined}
+            description={
+              column.foreignKey !== undefined
+                ? 'Column type cannot be changed as it has a foreign key relation'
+                : ''
+            }
             onOptionSelect={(format: string) => {
               const defaultValue = format === 'uuid' ? 'gen_random_uuid()' : null
               onUpdateColumn({ format, defaultValue })

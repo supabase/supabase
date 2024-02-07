@@ -4,6 +4,7 @@ import { Table } from 'lucide-react'
 import { Fragment, useEffect, useState } from 'react'
 import {
   AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
   IconArrowRight,
@@ -26,6 +27,7 @@ import ActionBar from '../ActionBar'
 import { FOREIGN_KEY_CASCADE_OPTIONS } from './ForeignKeySelector.constants'
 import { ForeignKey } from './ForeignKeySelector.types'
 import { generateCascadeActionDescription } from './ForeignKeySelector.utils'
+import { NUMERICAL_TYPES, TEXT_TYPES } from '../SidePanelEditor.constants'
 
 const EMPTY_STATE: ForeignKey = {
   id: undefined,
@@ -56,6 +58,8 @@ export const ForeignKeySelector = ({
 
   const [fk, setFk] = useState(EMPTY_STATE)
   const [errors, setErrors] = useState<any>({})
+  const hasTypeErrors =
+    (errors?.types ?? []).filter((x: string | undefined) => x !== undefined).length > 0
 
   const { data: schemas } = useSchemasQuery({
     projectRef: project?.ref,
@@ -69,6 +73,8 @@ export const ForeignKeySelector = ({
   })
 
   const selectedTable = (tables ?? []).find((x) => x.name === fk.table && x.schema === fk.schema)
+
+  const disableApply = selectedTable === undefined || hasTypeErrors
 
   const updateSelectedSchema = (schema: string) => {
     const updatedFk = { ...EMPTY_STATE, schema }
@@ -122,7 +128,6 @@ export const ForeignKeySelector = ({
     )
     if (incompleteColumns.length > 0) errors['columns'] = 'Please ensure that columns are selected'
 
-    console.log({ fk })
     if (Object.keys(errors).length > 0) {
       setErrors(errors)
       resolve()
@@ -134,12 +139,51 @@ export const ForeignKeySelector = ({
     }
   }
 
+  const validateType = () => {
+    const typeErrors: any = []
+
+    fk.columns.forEach((column) => {
+      const { source, target } = column
+      const sourceType = table.columns.find((col) => col.name === source)?.format
+      const targetType = selectedTable?.columns?.find((col) => col.name === target)?.format ?? ''
+
+      // [Joshen] Doing this way so that its more readable
+      // If either source or target not selected yet, thats okay
+      if (sourceType === '' || targetType === '') {
+        return typeErrors.push(undefined)
+      }
+
+      // If source and target are in the same type of data types, thats okay
+      if (
+        (NUMERICAL_TYPES.includes(sourceType) && NUMERICAL_TYPES.includes(targetType)) ||
+        (TEXT_TYPES.includes(sourceType) && TEXT_TYPES.includes(targetType)) ||
+        (TEXT_TYPES.includes(sourceType) && TEXT_TYPES.includes(targetType)) ||
+        (sourceType === 'uuid' && targetType === 'uuid')
+      ) {
+        return typeErrors.push(undefined)
+      }
+
+      // Otherwise just check if the format is equal to each other
+      if (sourceType === targetType) {
+        return typeErrors.push(undefined)
+      }
+
+      typeErrors.push({ sourceType, targetType })
+    })
+
+    setErrors({ types: typeErrors })
+  }
+
   useEffect(() => {
     if (visible) {
       if (foreignKey !== undefined) setFk(foreignKey)
       else setFk({ ...EMPTY_STATE, id: uuidv4() })
     }
   }, [visible])
+
+  useEffect(() => {
+    if (visible) validateType()
+  }, [fk])
 
   return (
     <SidePanel
@@ -150,7 +194,7 @@ export const ForeignKeySelector = ({
       customFooter={
         <ActionBar
           backButtonLabel="Cancel"
-          disableApply={false}
+          disableApply={disableApply}
           applyButtonLabel="Save"
           closePanel={onClose}
           applyFunction={(resolve: any) => validateSelection(resolve)}
@@ -271,7 +315,9 @@ export const ForeignKeySelector = ({
                               >
                                 <div className="flex items-center gap-2">
                                   <span className="text-foreground">{column.name}</span>
-                                  <span className="text-foreground-lighter">{column.format}</span>
+                                  <span className="text-foreground-lighter">
+                                    {column.format === '' ? '-' : column.format}
+                                  </span>
                                 </div>
                               </Listbox.Option>
                             ))}
@@ -322,6 +368,27 @@ export const ForeignKeySelector = ({
                     Add another column
                   </Button>
                   {errors.columns && <p className="text-red-900 text-sm">{errors.columns}</p>}
+                  {hasTypeErrors && (
+                    <Alert_Shadcn_ variant="warning">
+                      <AlertTitle_Shadcn_>Column types do not match</AlertTitle_Shadcn_>
+                      <AlertDescription_Shadcn_>
+                        The following columns cannot be referenced as they are not of the same type:
+                      </AlertDescription_Shadcn_>
+                      <ul className="list-disc pl-5 mt-2 text-foreground-light">
+                        {(errors?.types ?? []).map((x: string | undefined, idx: number) => {
+                          if (x === undefined) return null
+                          return (
+                            <li key={`type-error-${idx}`}>
+                              <code className="text-xs">{fk.columns[idx]?.source}</code> (
+                              {errors.types[idx].sourceType}) and{' '}
+                              <code className="text-xs">{fk.columns[idx]?.target}</code>(
+                              {errors.types[idx].targetType})
+                            </li>
+                          )
+                        })}
+                      </ul>
+                    </Alert_Shadcn_>
+                  )}
                 </div>
               </div>
 

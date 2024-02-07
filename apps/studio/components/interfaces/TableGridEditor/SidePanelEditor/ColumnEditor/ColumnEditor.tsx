@@ -96,7 +96,7 @@ const ColumnEditor = ({
     if (visible) {
       setErrors({})
       const columnFields = isNewRecord
-        ? generateColumnField({ schema: selectedTable.schema })
+        ? generateColumnField({ schema: selectedTable.schema, table: selectedTable.name })
         : generateColumnFieldFromPostgresColumn(column!, selectedTable, foreignKeyMeta)
       setColumnFields(columnFields)
       setFkRelations(formatForeignKeys(foreignKeys))
@@ -237,7 +237,12 @@ const ColumnEditor = ({
             layout="vertical"
             enumTypes={enumTypes}
             error={errors.format}
-            disabled={columnFields?.foreignKey !== undefined}
+            description={
+              columnFields.foreignKey !== undefined
+                ? 'Column type cannot be changed as it has a foreign key relation'
+                : ''
+            }
+            disabled={columnFields.foreignKey !== undefined}
             onOptionSelect={(format: string) => onUpdateField({ format, defaultValue: null })}
           />
           {columnFields.foreignKey === undefined && (
