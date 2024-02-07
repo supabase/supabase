@@ -16,6 +16,9 @@ import {
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
   Tabs_Shadcn_,
+  cn,
+  DIALOG_PADDING_X_Shadcn_,
+  DIALOG_PADDING_Y_Shadcn_,
 } from 'ui'
 import { CONNECTION_TYPES, ConnectionType, FRAMEWORKS, ORMS } from './Connect.constants'
 import ConnectDropdown from './ConnectDropdown'
@@ -70,9 +73,6 @@ const getContentFilePath = ({
 const Connect = () => {
   const { ref: projectRef } = useParams()
 
-  const [parentSelectorOpen, setParentSelectorOpen] = useState(false)
-  const [childDropdownOpen, setChildDropdownOpen] = useState(false)
-  const [grandChildDropdownOpen, setGrandChildDropdownOpen] = useState(false)
   const [connectionObject, setConnectionObject] = useState<ConnectionType[]>(FRAMEWORKS)
   const [selectedParent, setSelectedParent] = useState(connectionObject[0].key) // aka nextjs
   const [selectedChild, setSelectedChild] = useState(
@@ -205,8 +205,8 @@ const Connect = () => {
               </span>
             </Button>
           </DialogTrigger_Shadcn_>
-          <DialogContent_Shadcn_ className="sm:max-w-5xl translate-y-0 top-24">
-            <DialogHeader_Shadcn_>
+          <DialogContent_Shadcn_ className={cn('sm:max-w-5xl p-0')}>
+            <DialogHeader_Shadcn_ className="pb-0">
               <DialogTitle_Shadcn_>Connect to your project</DialogTitle_Shadcn_>
               <DialogDescription_Shadcn_>
                 Get the connection strings and environment variables for your app
@@ -217,97 +217,91 @@ const Connect = () => {
               defaultValue="direct"
               onValueChange={(value) => handleConnectionType(value)}
             >
-              <TabsList_Shadcn_>
-                <TabsTrigger_Shadcn_ key="direct" value="direct">
+              <TabsList_Shadcn_ className={cn('flex gap-4', DIALOG_PADDING_X_Shadcn_)}>
+                <TabsTrigger_Shadcn_ key="direct" value="direct" className="px-0">
                   Direct Connection
                 </TabsTrigger_Shadcn_>
                 {CONNECTION_TYPES.map((type) => (
-                  <TabsTrigger_Shadcn_ key={type.key} value={type.key}>
+                  <TabsTrigger_Shadcn_ key={type.key} value={type.key} className="px-0">
                     {type.label}
                   </TabsTrigger_Shadcn_>
                 ))}
               </TabsList_Shadcn_>
 
               {CONNECTION_TYPES.map((type) => (
-                <TabsContent_Shadcn_ key={`content-${type.key}`} value={type.key}>
-                  <div className="p-3">
-                    <div className="flex justify-between">
-                      <div className="flex items-center gap-2">
-                        {/* all parents */}
-                        <ConnectDropdown
-                          open={parentSelectorOpen}
-                          setOpen={setParentSelectorOpen}
-                          state={selectedParent}
-                          updateState={handleParentChange}
-                          label={connectionObject === FRAMEWORKS ? 'Framework' : 'Tool'}
-                          items={connectionObject}
-                        />
-                        {/* children of those parents */}
-                        {selectedParent &&
-                          (connectionObject.find((parent) => parent.key === selectedParent)
-                            ?.children.length || 0) > 0 && (
-                            <ConnectDropdown
-                              open={childDropdownOpen}
-                              setOpen={setChildDropdownOpen}
-                              state={selectedChild}
-                              updateState={handleChildChange}
-                              label="Using"
-                              items={getChildOptions()}
-                            />
-                          )}
-                        {/* grandchildren if any */}
-                        {selectedChild &&
-                          (connectionObject
-                            .find((parent) => parent.key === selectedParent)
-                            ?.children.find((child) => child.key === selectedChild)?.children
-                            .length || 0) > 0 && (
-                            <ConnectDropdown
-                              open={grandChildDropdownOpen}
-                              setOpen={setGrandChildDropdownOpen}
-                              state={selectedGrandchild}
-                              updateState={handleGrandchildChange}
-                              label="With"
-                              items={getGrandchildrenOptions()}
-                            />
-                          )}
-                      </div>
-                      {connectionObject.find((item) => item.key === selectedParent)?.guideLink && (
-                        <Button
-                          asChild
-                          type="default"
-                          icon={<IconExternalLink size={14} strokeWidth={1.5} />}
-                        >
-                          <Link
-                            href={
-                              connectionObject.find((item) => item.key === selectedParent)
-                                ?.guideLink || ''
-                            }
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            {connectionObject.find((item) => item.key === selectedParent)?.label}{' '}
-                            guide
-                          </Link>
-                        </Button>
-                      )}
+                <TabsContent_Shadcn_
+                  key={`content-${type.key}`}
+                  value={type.key}
+                  className={cn(DIALOG_PADDING_X_Shadcn_, DIALOG_PADDING_Y_Shadcn_, '!mt-0')}
+                >
+                  <div className="flex justify-between">
+                    <div className="flex items-center gap-5">
+                      {/* all parents */}
+                      <ConnectDropdown
+                        state={selectedParent}
+                        updateState={handleParentChange}
+                        label={connectionObject === FRAMEWORKS ? 'Framework' : 'Tool'}
+                        items={connectionObject}
+                      />
+                      {/* children of those parents */}
+                      {selectedParent &&
+                        (connectionObject.find((parent) => parent.key === selectedParent)?.children
+                          .length || 0) > 0 && (
+                          <ConnectDropdown
+                            state={selectedChild}
+                            updateState={handleChildChange}
+                            label="Using"
+                            items={getChildOptions()}
+                          />
+                        )}
+                      {/* grandchildren if any */}
+                      {selectedChild &&
+                        (connectionObject
+                          .find((parent) => parent.key === selectedParent)
+                          ?.children.find((child) => child.key === selectedChild)?.children
+                          .length || 0) > 0 && (
+                          <ConnectDropdown
+                            state={selectedGrandchild}
+                            updateState={handleGrandchildChange}
+                            label="With"
+                            items={getGrandchildrenOptions()}
+                          />
+                        )}
                     </div>
-                    <p className="text-xs text-foreground-lighter my-3">
-                      Add the following files below to your application
-                    </p>
-                    <ConnectTabsContent projectKeys={projectKeys} filePath={filePath} />
+                    {connectionObject.find((item) => item.key === selectedParent)?.guideLink && (
+                      <Button
+                        asChild
+                        type="default"
+                        icon={<IconExternalLink size={14} strokeWidth={1.5} />}
+                      >
+                        <Link
+                          href={
+                            connectionObject.find((item) => item.key === selectedParent)
+                              ?.guideLink || ''
+                          }
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {connectionObject.find((item) => item.key === selectedParent)?.label}{' '}
+                          guide
+                        </Link>
+                      </Button>
+                    )}
                   </div>
+                  <p className="text-xs text-foreground-lighter my-3">
+                    Add the following files below to your application
+                  </p>
+                  <ConnectTabsContent projectKeys={projectKeys} filePath={filePath} />
                 </TabsContent_Shadcn_>
               ))}
-              <TabsContent_Shadcn_ key="direct" value="direct">
+              <TabsContent_Shadcn_
+                key="direct"
+                value="direct"
+                className={cn(DIALOG_PADDING_X_Shadcn_, DIALOG_PADDING_Y_Shadcn_, '!mt-0')}
+              >
                 <DatabaseConnectionString />
               </TabsContent_Shadcn_>
             </Tabs_Shadcn_>
-
-            <DialogFooter_Shadcn_>
-              <DialogClose_Shadcn_>
-                <Button type="secondary">Close</Button>
-              </DialogClose_Shadcn_>
-            </DialogFooter_Shadcn_>
           </DialogContent_Shadcn_>
         </Dialog_Shadcn_>
       </div>
@@ -323,7 +317,7 @@ interface ConnectTabsContentProps {
 
 const ConnectTabsContent = ({ filePath, projectKeys }: ConnectTabsContentProps) => {
   return (
-    <div className=" border rounded-lg mt-4">
+    <div className="border rounded-lg">
       <ConnectTabContent projectKeys={projectKeys} filePath={filePath} />
     </div>
   )

@@ -6,6 +6,9 @@ import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
 
+export const DIALOG_PADDING_Y = 'py-6'
+export const DIALOG_PADDING_X = 'px-7'
+
 const Dialog = DialogPrimitive.Root
 
 const DialogTrigger = DialogPrimitive.Trigger
@@ -22,7 +25,7 @@ const DialogOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      'fixed inset-0 z-50 bg-background/95 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+      'fixed inset-0 z-50 bg-black/30 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
       className
     )}
     {...props}
@@ -40,7 +43,7 @@ const DialogContent = React.forwardRef<
       ref={ref}
       className={cn(
         'fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg md:w-full',
-        'bg-surface-overlay border-overlay',
+        'bg border-overlay',
         className
       )}
       {...props}
@@ -56,7 +59,15 @@ const DialogContent = React.forwardRef<
 DialogContent.displayName = DialogPrimitive.Content.displayName
 
 const DialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn('flex flex-col space-y-1.5 text-center sm:text-left', className)} {...props} />
+  <div
+    className={cn(
+      'flex flex-col space-y-1.5 text-center sm:text-left',
+      DIALOG_PADDING_X,
+      DIALOG_PADDING_Y,
+      className
+    )}
+    {...props}
+  />
 )
 DialogHeader.displayName = 'DialogHeader'
 
@@ -74,11 +85,7 @@ const DialogTitle = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Title>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
 >(({ className, ...props }, ref) => (
-  <DialogPrimitive.Title
-    ref={ref}
-    className={cn('text-lg font-semibold leading-none tracking-tight', className)}
-    {...props}
-  />
+  <DialogPrimitive.Title ref={ref} className={cn('text-lg leading-none', className)} {...props} />
 ))
 DialogTitle.displayName = DialogPrimitive.Title.displayName
 
@@ -111,6 +118,15 @@ const DialogClose = React.forwardRef<
 ))
 DialogClose.displayName = DialogPrimitive.Close.displayName
 
+const DialogSection = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, children, ...props }, ref) => (
+    <div ref={ref} {...props} className={cn('px-5 py-3', className)}>
+      {children}
+    </div>
+  )
+)
+DialogSection.displayName = 'DialogSection'
+
 export {
   Dialog,
   DialogContent,
@@ -120,4 +136,5 @@ export {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogSection,
 }
