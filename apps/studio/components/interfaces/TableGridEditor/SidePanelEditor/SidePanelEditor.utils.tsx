@@ -171,7 +171,7 @@ export const getAddForeignKeySQL = ({
   )
 }
 
-export const addForeignKeyV2 = async ({
+export const addForeignKey = async ({
   projectRef,
   connectionString,
   table,
@@ -212,7 +212,7 @@ DROP CONSTRAINT IF EXISTS "${relation.name}"
   )
 }
 
-export const removeForeignKeyV2 = async ({
+export const removeForeignKey = async ({
   projectRef,
   connectionString,
   table,
@@ -232,7 +232,7 @@ export const removeForeignKeyV2 = async ({
   })
 }
 
-export const updateForeignKeyV2 = async ({
+export const updateForeignKey = async ({
   projectRef,
   connectionString,
   table,
@@ -389,7 +389,7 @@ export const duplicateTable = async (
 
   // Duplicate foreign key constraints over
   if (foreignKeyRelations.length > 0) {
-    await addForeignKeyV2({
+    await addForeignKey({
       projectRef,
       connectionString,
       table: { ...duplicateTable, name: payload.name },
@@ -512,7 +512,7 @@ export const createTable = async ({
 
     // Then add the foreign key constraints here
     if (foreignKeyRelations.length > 0) {
-      await addForeignKeyV2({
+      await addForeignKey({
         projectRef,
         connectionString,
         table: { schema: table.schema, name: table.name },
@@ -739,7 +739,7 @@ export const updateTable = async ({
   // Foreign keys will get updated here accordingly
   const relationsToAdd = foreignKeyRelations.filter((x) => x.id === undefined)
   if (relationsToAdd.length > 0) {
-    await addForeignKeyV2({
+    await addForeignKey({
       projectRef,
       connectionString,
       table: updatedTable,
@@ -749,7 +749,7 @@ export const updateTable = async ({
 
   const relationsToRemove = foreignKeyRelations.filter((x) => x.toRemove)
   if (relationsToRemove.length > 0) {
-    await removeForeignKeyV2({
+    await removeForeignKey({
       projectRef,
       connectionString,
       table: updatedTable,
@@ -765,7 +765,7 @@ export const updateTable = async ({
     } else return false
   })
   if (relationsToUpdate.length > 0) {
-    await updateForeignKeyV2({
+    await updateForeignKey({
       projectRef,
       connectionString,
       table: updatedTable,
