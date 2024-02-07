@@ -8,8 +8,6 @@ import { Suggestion } from '../ColumnEditor/ColumnEditor.types'
 import ColumnType from '../ColumnEditor/ColumnType'
 import InputWithSuggestions from '../ColumnEditor/InputWithSuggestions'
 import { ColumnField } from '../SidePanelEditor.types'
-import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 /**
  * [Joshen] For context:
@@ -50,7 +48,6 @@ const Column = ({
   onUpdateColumn = noop,
   onRemoveColumn = noop,
 }: ColumnProps) => {
-  console.log(column.name, { hasForeignKeys })
   const suggestions: Suggestion[] = typeExpressionSuggestions?.[column.format] ?? []
 
   const settingsCount = [

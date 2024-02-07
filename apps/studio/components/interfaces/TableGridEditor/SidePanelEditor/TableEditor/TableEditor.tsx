@@ -17,6 +17,8 @@ import { EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { SpreadsheetImport } from '../'
 import ActionBar from '../ActionBar'
+import { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
+import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
 import { ColumnField } from '../SidePanelEditor.types'
 import ColumnManagement from './ColumnManagement'
 import { ForeignKeysManagement } from './ForeignKeysManagement/ForeignKeysManagement'
@@ -30,8 +32,6 @@ import {
   generateTableFieldFromPostgresTable,
   validateFields,
 } from './TableEditor.utils'
-import { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
-import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
 
 export interface TableEditorProps {
   table?: PostgresTable
