@@ -29,7 +29,7 @@ import {
   generateCreateColumnPayload,
   generateUpdateColumnPayload,
 } from './ColumnEditor/ColumnEditor.utils'
-import { ForeignKey } from './ForeignKeySelectorV2/ForeignKeySelector.types'
+import { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
 import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
 import { checkIfRelationChanged } from './TableEditor/ForeignKeysManagement/ForeignKeysManagement.utils'
 import { ImportContent } from './TableEditor/TableEditor.types'

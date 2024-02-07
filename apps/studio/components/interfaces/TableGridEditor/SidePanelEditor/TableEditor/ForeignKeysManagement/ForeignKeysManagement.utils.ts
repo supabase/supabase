@@ -1,5 +1,5 @@
 import { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
-import { ForeignKey } from '../../ForeignKeySelectorV2/ForeignKeySelector.types'
+import { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
 import { isEqual } from 'lodash'
 
 export const checkIfRelationChanged = (existing: ForeignKeyConstraint, state: ForeignKey) => {

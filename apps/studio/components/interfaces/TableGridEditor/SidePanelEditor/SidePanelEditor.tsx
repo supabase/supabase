@@ -10,6 +10,7 @@ import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useDatabasePublicationCreateMutation } from 'data/database-publications/database-publications-create-mutation'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
+import { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { sqlKeys } from 'data/sql/keys'
 import { useTableRowCreateMutation } from 'data/table-rows/table-row-create-mutation'
@@ -21,15 +22,12 @@ import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { Dictionary } from 'types'
 import { ColumnEditor, RowEditor, SpreadsheetImport, TableEditor } from '.'
+import { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
 import ForeignRowSelector from './RowEditor/ForeignRowSelector/ForeignRowSelector'
 import JsonEdit from './RowEditor/JsonEditor/JsonEditor'
+import { TextEditor } from './RowEditor/TextEditor'
 import SchemaEditor from './SchemaEditor'
-import {
-  ColumnField,
-  CreateColumnPayload,
-  ExtendedPostgresRelationship,
-  UpdateColumnPayload,
-} from './SidePanelEditor.types'
+import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
 import {
   createColumn,
   createTable,
@@ -40,9 +38,6 @@ import {
   updateTable,
 } from './SidePanelEditor.utils'
 import { ImportContent } from './TableEditor/TableEditor.types'
-import { TextEditor } from './RowEditor/TextEditor'
-import { ForeignKey } from './ForeignKeySelectorV2/ForeignKeySelector.types'
-import { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 
 export interface SidePanelEditorProps {
   editable?: boolean
@@ -213,7 +208,6 @@ const SidePanelEditor = ({
 
   const saveColumn = async (
     payload: CreateColumnPayload | UpdateColumnPayload,
-    foreignKey: ExtendedPostgresRelationship | undefined, // [Joshen TODO] Deprecate this param
     isNewRecord: boolean,
     configuration: { columnId?: string },
     resolve: any

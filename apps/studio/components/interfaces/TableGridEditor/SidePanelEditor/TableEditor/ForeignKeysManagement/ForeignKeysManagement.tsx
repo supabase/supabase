@@ -7,10 +7,10 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { ResponseError } from 'types'
-import { ForeignKeySelector } from '../../ForeignKeySelectorV2/ForeignKeySelector'
+import { ForeignKeySelector } from '../../ForeignKeySelector/ForeignKeySelector'
 import { TableField } from '../TableEditor.types'
 import { ForeignKeyRow } from './ForeignKeyRow'
-import { ForeignKey } from '../../ForeignKeySelectorV2/ForeignKeySelector.types'
+import { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
 import { checkIfRelationChanged } from './ForeignKeysManagement.utils'
 
 interface ForeignKeysManagementProps {
@@ -116,7 +116,7 @@ export const ForeignKeysManagement = ({
       </div>
       <ForeignKeySelector
         visible={open}
-        table={table}
+        table={{ id: table.id, name: table.name, columns: table.columns }}
         foreignKey={selectedFk}
         onClose={() => {
           setOpen(false)

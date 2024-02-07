@@ -5,11 +5,13 @@ import SVG from 'react-inlinesvg'
 import { Badge, Button, IconArrowRight } from 'ui'
 
 import { BASE_PATH } from 'lib/constants'
-import { ForeignKey } from '../../ForeignKeySelectorV2/ForeignKeySelector.types'
+import { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
 
 interface ForeignKeyProps {
   foreignKey: ForeignKey
+  disabled?: boolean
   status?: 'ADD' | 'UPDATE' | 'REMOVE'
+  layout?: 'vertical' | 'horizontal'
   closePanel: () => void
   onSelectEdit: () => void
   onSelectRemove: () => void
@@ -18,7 +20,9 @@ interface ForeignKeyProps {
 
 export const ForeignKeyRow = ({
   foreignKey,
+  disabled = false,
   status,
+  layout = 'horizontal',
   closePanel,
   onSelectEdit,
   onSelectRemove,
@@ -29,14 +33,17 @@ export const ForeignKeyRow = ({
   return (
     <div
       className={clsx(
-        'flex items-center justify-between gap-x-2 border border-strong px-4 py-4',
+        layout === 'horizontal' ? 'items-center justify-between gap-x-2' : 'flex-col gap-y-3',
+        'flex border border-strong px-4 py-4',
         'border-b-0 last:border-b first:rounded-t-md last:rounded-b-md'
       )}
     >
       <div className="flex flex-col gap-y-2">
         <div className="flex flex-col gap-y-1">
           {foreignKey.name && (
-            <p className="text-xs text-foreground font-mono">{foreignKey.name}</p>
+            <p title={foreignKey.name} className="text-xs text-foreground font-mono">
+              {foreignKey.name}
+            </p>
           )}
           <div className="flex items-center gap-x-2">
             {status !== undefined && (
@@ -87,20 +94,22 @@ export const ForeignKeyRow = ({
           ))}
         </div>
       </div>
-      <div className="flex items-center gap-x-2">
-        <Button type="default" onClick={onSelectEdit}>
-          Edit
-        </Button>
-        {foreignKey.toRemove ? (
-          <Button type="default" onClick={onSelectUndoRemove}>
-            Cancel remove
+      {!disabled && (
+        <div className="flex items-center gap-x-2">
+          <Button type="default" onClick={onSelectEdit}>
+            Edit
           </Button>
-        ) : (
-          <Button type="default" onClick={onSelectRemove}>
-            Remove
-          </Button>
-        )}
-      </div>
+          {foreignKey.toRemove ? (
+            <Button type="default" onClick={onSelectUndoRemove}>
+              Cancel remove
+            </Button>
+          ) : (
+            <Button type="default" onClick={onSelectRemove}>
+              Remove
+            </Button>
+          )}
+        </div>
+      )}
     </div>
   )
 }

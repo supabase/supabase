@@ -1,212 +1,159 @@
-import type { PostgresColumn, PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
-import { find, get, isEmpty, sortBy } from 'lodash'
-import { useEffect, useState } from 'react'
+import { PostgresTable } from '@supabase/postgres-meta'
+import { sortBy } from 'lodash'
+import { Table } from 'lucide-react'
+import { Fragment, useEffect, useState } from 'react'
+import {
+  AlertDescription_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconArrowRight,
+  IconDatabase,
+  IconExternalLink,
+  IconHelpCircle,
+  IconX,
+  Listbox,
+  SidePanel,
+} from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import InformationBox from 'components/ui/InformationBox'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { Dictionary } from 'types'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  IconAlertCircle,
-  IconAlertTriangle,
-  IconDatabase,
-  IconHelpCircle,
-  Input,
-  Listbox,
-  SidePanel,
-} from 'ui'
+import { uuidv4 } from 'lib/helpers'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 import ActionBar from '../ActionBar'
-import { ColumnField } from '../SidePanelEditor.types'
 import { FOREIGN_KEY_CASCADE_OPTIONS } from './ForeignKeySelector.constants'
 import { ForeignKey } from './ForeignKeySelector.types'
 import { generateCascadeActionDescription } from './ForeignKeySelector.utils'
 
-interface ForeignKeySelectorProps {
-  column: ColumnField
-  metadata?: any
-  visible: boolean
-  closePanel: () => void
-  saveChanges: (
-    value:
-      | {
-          table: PostgresTable
-          column: PostgresColumn
-          deletionAction: string
-          updateAction: string
-        }
-      | undefined
-  ) => void
+const EMPTY_STATE: ForeignKey = {
+  id: undefined,
+  schema: 'public',
+  table: '',
+  columns: [] as { source: string; target: string }[],
+  deletionAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
+  updateAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
 }
 
-const ForeignKeySelector = ({
-  column,
-  visible = false,
-  closePanel,
-  saveChanges,
+interface ForeignKeySelectorProps {
+  visible: boolean
+  table: { id: number; name: string; columns: any[] }
+  foreignKey?: ForeignKey
+  onClose: () => void
+  onSaveRelation: (fk: ForeignKey) => void
+}
+
+export const ForeignKeySelector = ({
+  visible,
+  table,
+  foreignKey,
+  onClose,
+  onSaveRelation,
 }: ForeignKeySelectorProps) => {
   const { project } = useProjectContext()
+  const snap = useTableEditorStateSnapshot()
+
+  const [fk, setFk] = useState(EMPTY_STATE)
   const [errors, setErrors] = useState<any>({})
-  const [selectedForeignKey, setSelectedForeignKey] = useState<ForeignKey>({
-    schema: 'public',
-    table: '',
-    column: '',
-    deletionAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
-    updateAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
-  })
 
   const { data: schemas } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  // change the return type because of the includeColumns param
   const { data: tables } = useTablesQuery<PostgresTable[] | undefined>({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    schema: selectedForeignKey.schema,
+    schema: fk.schema,
     includeColumns: true,
   })
 
-  const foreignKey = column?.foreignKey
-  const selectedTable: PostgresTable | undefined = find(tables, {
-    name: selectedForeignKey?.table,
-    schema: selectedForeignKey?.schema,
-  })
-  const selectedColumn: PostgresColumn | undefined = find(selectedTable?.columns ?? [], {
-    name: selectedForeignKey?.column,
-  })
-
-  useEffect(() => {
-    // Reset the state of the side panel
-    if (visible) {
-      setErrors({})
-
-      if (foreignKey) {
-        setSelectedForeignKey({
-          schema: foreignKey.target_table_schema,
-          table: foreignKey.target_table_name,
-          column: foreignKey.target_column_name,
-          deletionAction: foreignKey.deletion_action,
-          updateAction: foreignKey.update_action,
-        })
-      } else {
-        setSelectedForeignKey({
-          schema: 'public',
-          table: '',
-          column: '',
-          deletionAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
-          updateAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
-        })
-      }
-    }
-  }, [visible])
+  const selectedTable = (tables ?? []).find((x) => x.name === fk.table && x.schema === fk.schema)
 
   const updateSelectedSchema = (schema: string) => {
-    const updatedForeignKey = {
-      schema,
-      table: '',
-      column: '',
-      deletionAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
-      updateAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
-    }
-    setSelectedForeignKey(updatedForeignKey)
+    const updatedFk = { ...EMPTY_STATE, schema }
+    setFk(updatedFk)
   }
 
   const updateSelectedTable = (tableId: number) => {
     setErrors({})
     if (!tableId) {
-      return setSelectedForeignKey({
-        schema: '',
-        table: '',
-        column: '',
-        deletionAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
-        updateAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
-      })
+      return setFk({ ...EMPTY_STATE, schema: fk.schema, columns: [{ source: '', target: '' }] })
     }
-
-    const table = find(tables, { id: tableId })
-    if (table) {
-      const primaryColumn = table.primary_keys[0]?.name
-      const firstColumn = table.columns?.length ? table.columns[0].name : undefined
-
-      setSelectedForeignKey({
+    const table = (tables ?? []).find((x) => x.id === tableId)
+    if (table)
+      setFk({
+        ...EMPTY_STATE,
+        tableId: table.id,
         schema: table.schema,
         table: table.name,
-        column: primaryColumn ?? firstColumn,
-        deletionAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
-        updateAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
+        columns: [{ source: '', target: '' }],
       })
-    }
   }
 
-  const updateSelectedColumn = (columnId: string) => {
-    setErrors({})
-    const column = find(selectedTable?.columns, { id: columnId })
-    if (column) {
-      const updatedForeignKey = { ...selectedForeignKey, column: column.name } as ForeignKey
-      setSelectedForeignKey(updatedForeignKey)
-    }
+  const addColumn = () => {
+    setFk({ ...fk, columns: fk.columns.concat([{ source: '', target: '' }]) })
+  }
+
+  const onRemoveColumn = (idx: number) => {
+    setFk({ ...fk, columns: fk.columns.filter((_, i) => i !== idx) })
+  }
+
+  const updateSelectedColumn = (idx: number, key: 'target' | 'source', value: string) => {
+    const updatedRelations = fk.columns.map((x, i) => {
+      if (i === idx) {
+        return { ...x, [key]: value }
+      } else {
+        return x
+      }
+    })
+    setFk({ ...fk, columns: updatedRelations })
   }
 
   const updateCascadeAction = (action: 'updateAction' | 'deletionAction', value: string) => {
     setErrors({})
-    setSelectedForeignKey({ ...selectedForeignKey, [action]: value })
+    setFk({ ...fk, [action]: value })
   }
 
-  const onSaveChanges = (resolve: () => void) => {
-    const errors = {} as Dictionary<any>
-    if (!selectedForeignKey?.table) {
-      errors['table'] = 'Please select a table'
+  const validateSelection = (resolve: any) => {
+    const errors: any = {}
+    const incompleteColumns = fk.columns.filter(
+      (column) => column.source === '' || column.target === ''
+    )
+    if (incompleteColumns.length > 0) errors['columns'] = 'Please ensure that columns are selected'
+
+    console.log({ fk })
+    if (Object.keys(errors).length > 0) {
+      setErrors(errors)
+      resolve()
+      return
+    } else {
+      if (fk.table !== '') onSaveRelation(fk)
+      onClose()
+      resolve()
     }
-    if (selectedForeignKey?.table && !selectedForeignKey.column) {
-      errors['column'] = `The table ${selectedForeignKey.table} has no columns`
-    }
-    setErrors(errors)
-    if (isEmpty(errors)) {
-      if (!selectedTable || !selectedColumn) {
-        // Remove foreign key since no table selected
-        saveChanges(undefined)
-      } else {
-        saveChanges({
-          table: selectedTable,
-          column: selectedColumn,
-          deletionAction: selectedForeignKey.deletionAction,
-          updateAction: selectedForeignKey.updateAction,
-        })
-      }
-    }
-    resolve()
   }
 
-  const matchingColumnTypes = selectedColumn?.format === column?.format
+  useEffect(() => {
+    if (visible) {
+      if (foreignKey !== undefined) setFk(foreignKey)
+      else setFk({ ...EMPTY_STATE, id: uuidv4() })
+    }
+  }, [visible])
 
   return (
     <SidePanel
-      key="ForeignKeySelector"
-      size="medium"
       visible={visible}
-      onCancel={closePanel}
-      header={
-        <span>
-          Edit foreign key relation{' '}
-          {column?.name && (
-            <>
-              for <span className="text-code">{get(column, ['name'], '')}</span>
-            </>
-          )}
-        </span>
-      }
+      onCancel={onClose}
+      className="max-w-[480px]"
+      header={`${foreignKey === undefined ? 'Add' : 'Manage'} foreign key relationship${foreignKey === undefined ? ' to' : 's for'} ${table.name.length > 0 ? table.name : 'new table'}`}
       customFooter={
         <ActionBar
           backButtonLabel="Cancel"
-          disableApply={!!column?.format && !matchingColumnTypes}
+          disableApply={false}
           applyButtonLabel="Save"
-          closePanel={closePanel}
-          applyFunction={onSaveChanges}
+          closePanel={onClose}
+          applyFunction={(resolve: any) => validateSelection(resolve)}
         />
       }
     >
@@ -225,11 +172,11 @@ const ForeignKeySelector = ({
           <Listbox
             id="schema"
             label="Select a schema"
-            value={selectedForeignKey.schema}
+            value={fk.schema}
             error={errors.schema}
             onChange={(value: string) => updateSelectedSchema(value)}
           >
-            {schemas?.map((schema: PostgresSchema) => {
+            {schemas?.map((schema) => {
               return (
                 <Listbox.Option
                   key={schema.id}
@@ -259,7 +206,12 @@ const ForeignKeySelector = ({
             </Listbox.Option>
             {sortBy(tables, ['schema']).map((table) => {
               return (
-                <Listbox.Option key={table.id} value={table.id} label={table.name}>
+                <Listbox.Option
+                  key={table.id}
+                  value={table.id}
+                  label={table.name}
+                  addOnBefore={() => <Table size={16} strokeWidth={1.5} />}
+                >
                   <div className="flex items-center gap-2">
                     {/* For aria searching to target the table name instead of schema */}
                     <span className="hidden">{table.name}</span>
@@ -271,86 +223,107 @@ const ForeignKeySelector = ({
             })}
           </Listbox>
 
-          {selectedForeignKey?.table && (
+          {fk.schema && fk.table && (
             <>
-              {(selectedTable?.columns ?? []).length === 0 ? (
-                <Input
-                  disabled
-                  label={
-                    <div>
-                      Select a column from{' '}
-                      <code className="text-xs">
-                        {selectedForeignKey?.schema}.{selectedForeignKey?.table}
-                      </code>{' '}
-                      to reference to
-                    </div>
-                  }
-                  error={errors.column}
-                  placeholder="This table has no columns available"
-                />
-              ) : (
-                <Listbox
-                  id="column"
-                  value={selectedColumn?.id}
-                  // @ts-ignore
-                  label={
-                    <div>
-                      Select a column from{' '}
-                      <code className="text-xs">
-                        {selectedForeignKey?.schema}.{selectedForeignKey?.table}
-                      </code>{' '}
-                      to reference to
-                    </div>
-                  }
-                  error={errors.column}
-                  onChange={(value: string) => updateSelectedColumn(value)}
-                >
-                  {(selectedTable?.columns ?? []).map((column: PostgresColumn) => (
-                    <Listbox.Option key={column.id} value={column.id} label={column.name}>
-                      <div className="flex items-center gap-2">
-                        <span className="text-foreground">{column.name}</span>
-                        <span className="text-foreground-lighter">{column.format}</span>
+              <div className="flex flex-col gap-y-3">
+                <label className="text-foreground-light text-sm">
+                  Select columns from{' '}
+                  <code className="text-xs">
+                    {fk.schema}.{fk.table}
+                  </code>
+                  to reference to
+                </label>
+                <div className="grid grid-cols-10 gap-y-2">
+                  <div className="col-span-5 text-xs text-foreground-lighter">
+                    {snap.selectedSchemaName}.
+                    {table.name.length > 0 ? table.name : '[unnamed table]'}
+                  </div>
+                  <div className="col-span-4 text-xs text-foreground-lighter text-right">
+                    {fk.schema}.{fk.table}
+                  </div>
+                  {fk.columns.length === 0 && (
+                    <Alert_Shadcn_ className="col-span-10 py-2 px-3">
+                      <AlertDescription_Shadcn_>
+                        There are no foreign key relations between the tables
+                      </AlertDescription_Shadcn_>
+                    </Alert_Shadcn_>
+                  )}
+                  {fk.columns.map((_, idx) => (
+                    <Fragment key={`${uuidv4}`}>
+                      <div className="col-span-4">
+                        <Listbox
+                          id="column"
+                          value={fk.columns[idx].source}
+                          error={errors.column}
+                          onChange={(value: string) => updateSelectedColumn(idx, 'source', value)}
+                        >
+                          <Listbox.Option key="empty" value={''} label="---" className="!w-[170px]">
+                            ---
+                          </Listbox.Option>
+                          {(table?.columns ?? [])
+                            .filter((x) => x.name.length !== 0)
+                            .map((column) => (
+                              <Listbox.Option
+                                key={column.id}
+                                value={column.name}
+                                label={column.name}
+                                className="!w-[170px]"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <span className="text-foreground">{column.name}</span>
+                                  <span className="text-foreground-lighter">{column.format}</span>
+                                </div>
+                              </Listbox.Option>
+                            ))}
+                        </Listbox>
                       </div>
-                    </Listbox.Option>
+                      <div className="col-span-1 flex justify-center items-center">
+                        <IconArrowRight />
+                      </div>
+                      <div className="col-span-4">
+                        <Listbox
+                          id="column"
+                          value={fk.columns[idx].target}
+                          error={errors.column}
+                          onChange={(value: string) => updateSelectedColumn(idx, 'target', value)}
+                        >
+                          <Listbox.Option key="empty" value={''} label="---" className="!w-[170px]">
+                            ---
+                          </Listbox.Option>
+                          {(selectedTable?.columns ?? []).map((column) => (
+                            <Listbox.Option
+                              key={column.id}
+                              value={column.name}
+                              label={column.name}
+                              className="!w-[170px]"
+                            >
+                              <div className="flex items-center gap-2">
+                                <span className="text-foreground">{column.name}</span>
+                                <span className="text-foreground-lighter">{column.format}</span>
+                              </div>
+                            </Listbox.Option>
+                          ))}
+                        </Listbox>
+                      </div>
+                      <div className="col-span-1 flex justify-end items-center">
+                        <Button
+                          type="default"
+                          className="px-1"
+                          icon={<IconX />}
+                          disabled={fk.columns.length === 1}
+                          onClick={() => onRemoveColumn(idx)}
+                        />
+                      </div>
+                    </Fragment>
                   ))}
-                </Listbox>
-              )}
-              {!matchingColumnTypes && !column?.format && (
-                <Alert_Shadcn_ variant="default">
-                  <IconAlertCircle className="h-4 w-4" />
-                  <AlertTitle_Shadcn_>
-                    The referenced column's type will be updated to {selectedColumn?.data_type}
-                  </AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_ className="leading-6">
-                    <span>The referenced column</span>
-                    {column?.name && <span className="text-code">{column.name}</span>}
-                    <span>
-                      {' '}
-                      must match the type of the selected foreign column when creating a foreign key
-                      relationship.
-                    </span>
-                  </AlertDescription_Shadcn_>
-                </Alert_Shadcn_>
-              )}
-              {!matchingColumnTypes && column?.format && (
-                <Alert_Shadcn_ variant="warning">
-                  <IconAlertTriangle strokeWidth={2} />
-                  <AlertTitle_Shadcn_>Column types do not match</AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_ className="leading-6">
-                    <span>The referenced column</span>
-                    {column?.name && <span className="text-code">{column.name}</span>}
-                    <span> is of type </span>
-                    <span className="text-code">{column.format}</span>
-                    <span> while the selected foreign column </span>
-                    <span className="text-code">
-                      {selectedTable?.name}.{selectedColumn?.name}
-                    </span>
-                    <span> has </span>
-                    <span className="text-code">{selectedColumn?.data_type}</span>type. These two
-                    columns can't be referenced until they are of the same type.
-                  </AlertDescription_Shadcn_>
-                </Alert_Shadcn_>
-              )}
+                </div>
+                <div className="space-y-2">
+                  <Button type="default" onClick={addColumn}>
+                    Add another column
+                  </Button>
+                  {errors.columns && <p className="text-red-900 text-sm">{errors.columns}</p>}
+                </div>
+              </div>
 
               <SidePanel.Separator />
 
@@ -392,14 +365,14 @@ const ForeignKeySelector = ({
 
               <Listbox
                 id="updateAction"
-                value={selectedForeignKey.updateAction}
+                value={fk.updateAction}
                 label="Action if referenced row is updated"
                 descriptionText={
                   <p>
                     {generateCascadeActionDescription(
                       'update',
-                      selectedForeignKey.updateAction,
-                      `${selectedForeignKey.schema}.${selectedForeignKey.table}`
+                      fk.updateAction,
+                      `${fk.schema}.${fk.table}`
                     )}
                   </p>
                 }
@@ -417,26 +390,29 @@ const ForeignKeySelector = ({
 
               <Listbox
                 id="deletionAction"
-                value={selectedForeignKey.deletionAction}
+                value={fk.deletionAction}
+                className="[&>div>label]:flex [&>div>label]:items-center"
                 label="Action if referenced row is removed"
+                // @ts-ignore
+                labelOptional={
+                  <Button asChild type="default" icon={<IconExternalLink />}>
+                    <a
+                      target="_blank"
+                      rel="noreferrer"
+                      href="https://supabase.com/docs/guides/database/postgres/cascade-deletes"
+                    >
+                      Documentation
+                    </a>
+                  </Button>
+                }
                 descriptionText={
                   <>
                     <p>
                       {generateCascadeActionDescription(
                         'delete',
-                        selectedForeignKey.deletionAction,
-                        `${selectedForeignKey.schema}.${selectedForeignKey.table}`
+                        fk.deletionAction,
+                        `${fk.schema}.${fk.table}`
                       )}
-                    </p>
-                    <p className="mt-2">
-                      <a
-                        href="https://supabase.com/docs/guides/database/postgres/cascade-deletes"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-brand opacity-75"
-                      >
-                        Learn more about cascade deletes
-                      </a>
                     </p>
                   </>
                 }
@@ -456,5 +432,3 @@ const ForeignKeySelector = ({
     </SidePanel>
   )
 }
-
-export default ForeignKeySelector

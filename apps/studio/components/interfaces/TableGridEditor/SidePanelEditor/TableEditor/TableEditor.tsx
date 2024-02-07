@@ -30,7 +30,8 @@ import {
   generateTableFieldFromPostgresTable,
   validateFields,
 } from './TableEditor.utils'
-import { ForeignKey } from '../ForeignKeySelectorV2/ForeignKeySelector.types'
+import { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
+import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
 
 export interface TableEditorProps {
   table?: PostgresTable
@@ -128,20 +129,7 @@ const TableEditor = ({
           isRealtimeEnabled
         )
         setTableFields(tableFields)
-        setFkRelations(
-          foreignKeys.map((x) => {
-            return {
-              id: x.id,
-              name: x.constraint_name,
-              tableId: x.target_id,
-              schema: x.target_schema,
-              table: x.target_table,
-              columns: x.source_columns.map((y, i) => ({ source: y, target: x.target_columns[i] })),
-              deletionAction: x.deletion_action,
-              updateAction: x.update_action,
-            }
-          })
-        )
+        setFkRelations(formatForeignKeys(foreignKeys))
       }
     }
   }, [visible])
