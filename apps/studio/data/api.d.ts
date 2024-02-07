@@ -4418,7 +4418,9 @@ export interface components {
     DeleteVercelConnectionResponse: {
       id: string
     }
-    CreateGitHubAuthorizationBody: Record<string, never>
+    CreateGitHubAuthorizationBody: {
+      code: string
+    }
     ListGitHubConnectionsProject: {
       id: number
       ref: string
@@ -4435,6 +4437,7 @@ export interface components {
     }
     ListGitHubConnectionsConnection: {
       id: number
+      inserted_at: string
       updated_at: string
       installation_id: number
       project: components['schemas']['ListGitHubConnectionsProject']
@@ -4444,7 +4447,14 @@ export interface components {
     ListGitHubConnectionsResponse: {
       connections: components['schemas']['ListGitHubConnectionsConnection'][]
     }
-    Function: Record<string, never>
+    CreateGitHubConnectionsBody: {
+      project_ref: string
+      installation_id: number
+      repository_id: number
+    }
+    UpdateGitHubConnectionsBody: {
+      placeholder: string
+    }
     CreateCliLoginSessionBody: {
       session_id: string
       public_key: string
@@ -10579,6 +10589,11 @@ export interface operations {
   }
   /** List organization GitHub connections */
   GitHubConnectionsController_listOrganizationGitHubConnections: {
+    parameters: {
+      query: {
+        organization_id: number
+      }
+    }
     responses: {
       200: {
         content: {
@@ -10595,7 +10610,7 @@ export interface operations {
   GitHubConnectionsController_createGitHubConnection: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['Function']
+        'application/json': components['schemas']['CreateGitHubConnectionsBody']
       }
     }
     responses: {
@@ -10634,7 +10649,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['Function']
+        'application/json': components['schemas']['UpdateGitHubConnectionsBody']
       }
     }
     responses: {

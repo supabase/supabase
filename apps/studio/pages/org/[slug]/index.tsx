@@ -7,6 +7,7 @@ import ShimmeringCard from 'components/interfaces/Home/ProjectList/ShimmeringCar
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
+import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedOrganization } from 'hooks'
@@ -27,9 +28,23 @@ const ProjectsPage: NextPageWithLayout = () => {
     .sort((a, b) => a.name.localeCompare(b.name))
 
   const { data: integrations } = useOrgIntegrationsQuery({ orgSlug: organization?.slug })
-  const githubConnections = integrations
-    ?.filter((integration) => integration.integration.name === 'GitHub')
-    .flatMap((integration) => integration.connections)
+  const { data: connections } = useGitHubConnectionsQuery({ organizationId: organization?.id })
+  const githubConnections = connections?.map((connection) => ({
+    id: String(connection.id),
+    added_by: {
+      id: String(connection.user?.id),
+      primary_email: connection.user?.primary_email ?? '',
+      username: connection.user?.username ?? '',
+    },
+    foreign_project_id: String(connection.repository.id),
+    supabase_project_ref: connection.project.ref,
+    organization_integration_id: 'unused',
+    inserted_at: connection.inserted_at,
+    updated_at: connection.updated_at,
+    metadata: {
+      name: connection.repository.name,
+    } as any,
+  }))
   const vercelConnections = integrations
     ?.filter((integration) => integration.integration.name === 'Vercel')
     .flatMap((integration) => integration.connections)

@@ -1,6 +1,11 @@
-import clsx from 'clsx'
 import { useParams } from 'common'
-import Link from 'next/link'
+import {
+  EmptyIntegrationConnection,
+  IntegrationConnection,
+} from 'components/interfaces/Integrations/IntegrationPanels'
+import { GitHubConnection } from 'data/integrations/github-connections-query'
+import { useSelectedOrganization } from 'hooks'
+import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import {
   Badge,
   Button,
@@ -12,26 +17,21 @@ import {
   IconLoader,
   Input_Shadcn_,
   Modal,
+  cn,
 } from 'ui'
-
-import {
-  EmptyIntegrationConnection,
-  IntegrationConnection,
-} from 'components/interfaces/Integrations/IntegrationPanels'
-import { Integration } from 'data/integrations/integrations.types'
-import { useSelectedOrganization } from 'hooks'
-import { useSidePanelsStateSnapshot } from 'state/side-panels'
 
 interface GithubRepositorySelectionProps {
   form: any
   isChecking: boolean
   isValid: boolean
+  githubConnection?: GitHubConnection
 }
 
 const GithubRepositorySelection = ({
   form,
   isChecking,
   isValid,
+  githubConnection,
 }: GithubRepositorySelectionProps) => {
   const { ref } = useParams()
   const org = useSelectedOrganization()
@@ -41,8 +41,8 @@ const GithubRepositorySelection = ({
     process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
       ? `https://github.com/apps/supabase/installations/new?state=${ref}`
       : process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-      ? `https://github.com/apps/supabase-staging/installations/new?state=${ref}`
-      : `https://github.com/apps/supabase-local-testing/installations/new?state=${ref}`
+        ? `https://github.com/apps/supabase-staging/installations/new?state=${ref}`
+        : `https://github.com/apps/supabase-local-testing/installations/new?state=${ref}`
 
   function onSelectConnectRepo() {
     sidePanels.setGithubConnectionsOpen(true)
@@ -57,22 +57,32 @@ const GithubRepositorySelection = ({
             <Badge color="amber">Required</Badge>
           </div>
           <p className="text-sm text-foreground-light !mb-4">
-            Your database preview branches will be based on the branches in the following repository
-            that your project is connected with:
+            {githubConnection !== undefined
+              ? 'Your database preview branches will be based on the branches in the following repository that your project is connected with:'
+              : 'Your database preview branches will be based on the branches in the Git repository that your project is connected with.'}
           </p>
 
-          <EmptyIntegrationConnection
-            showNode={false}
-            onClick={() => onSelectConnectRepo()}
-            orgSlug={org?.slug}
-          />
-
-          {/* {integration && githubConnection && (
+          {githubConnection ? (
             <>
               <ul className="mb-3">
                 <IntegrationConnection
                   type={'GitHub'}
-                  connection={githubConnection}
+                  connection={{
+                    id: String(githubConnection.id),
+                    added_by: {
+                      id: String(githubConnection.user?.id),
+                      primary_email: githubConnection.user?.primary_email ?? '',
+                      username: githubConnection.user?.username ?? '',
+                    },
+                    foreign_project_id: String(githubConnection.repository.id),
+                    supabase_project_ref: githubConnection.project.ref,
+                    organization_integration_id: 'unused',
+                    inserted_at: githubConnection.inserted_at,
+                    updated_at: githubConnection.updated_at,
+                    metadata: {
+                      name: githubConnection.repository.name,
+                    } as any,
+                  }}
                   showNode={false}
                   actions={
                     <Button type="default" onClick={() => onSelectConnectRepo()}>
@@ -107,7 +117,13 @@ const GithubRepositorySelection = ({
                 )}
               />
             </>
-          )} */}
+          ) : (
+            <EmptyIntegrationConnection
+              showNode={false}
+              onClick={() => onSelectConnectRepo()}
+              orgSlug={org?.slug}
+            />
+          )}
         </div>
       </Modal.Content>
     </div>

@@ -129,7 +129,7 @@ const ProjectLinker = ({
       orgSlug: selectedOrganization?.slug,
       new: {
         installation_id: selectedForeignProject.installation_id!,
-        project_id: Number(selectedSupabaseProject.id),
+        project_ref: selectedSupabaseProject.ref,
         repository_id: Number(selectedForeignProject.id),
       },
     })

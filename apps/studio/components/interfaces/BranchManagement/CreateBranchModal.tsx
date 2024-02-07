@@ -4,6 +4,15 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
+import * as z from 'zod'
+
+import AlertError from 'components/ui/AlertError'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
+import { useBranchesQuery } from 'data/branches/branches-query'
+import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
+import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
+import { useSelectedOrganization, useSelectedProject } from 'hooks'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -21,15 +30,6 @@ import {
   Input_Shadcn_,
   Modal,
 } from 'ui'
-import * as z from 'zod'
-
-import AlertError from 'components/ui/AlertError'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
-import { useBranchesQuery } from 'data/branches/branches-query'
-import { useCheckGithubBranchValidity } from 'data/integrations/integrations-github-branch-check'
-import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
-import { useSelectedOrganization, useSelectedProject } from 'hooks'
 
 interface CreateBranchModalProps {
   visible: boolean
@@ -51,13 +51,13 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
     projectDetails !== undefined ? (isBranch ? projectDetails.parent_project_ref : ref) : undefined
 
   const {
-    data: integrations,
-    error: integrationsError,
-    isLoading: isLoadingIntegrations,
-    isSuccess: isSuccessIntegrations,
-    isError: isErrorIntegrations,
-  } = useOrgIntegrationsQuery({
-    orgSlug: selectedOrg?.slug,
+    data: connections,
+    error: connectionsError,
+    isLoading: isLoadingConnections,
+    isSuccess: isSuccessConnections,
+    isError: isErrorConnections,
+  } = useGitHubConnectionsQuery({
+    organizationId: selectedOrg?.id,
   })
 
   const { data: branches } = useBranchesQuery({ projectRef })
@@ -73,17 +73,10 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
     },
   })
 
-  const githubIntegration = integrations?.find(
-    (integration) =>
-      integration.integration.name === 'GitHub' &&
-      integration.connections.some(
-        (connection) => connection.supabase_project_ref === projectDetails?.parentRef
-      )
+  const githubConnection = connections?.find(
+    (connection) => connection.project.ref === projectDetails?.parentRef
   )
-  const githubConnection = githubIntegration?.connections?.find(
-    (connection) => connection.supabase_project_ref === projectDetails?.parentRef
-  )
-  const [repoOwner, repoName] = githubConnection?.metadata.name.split('/') || []
+  const [repoOwner, repoName] = githubConnection?.repository.name.split('/') ?? []
 
   const formId = 'create-branch-form'
   const FormSchema = z.object({
@@ -98,10 +91,12 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
 
       if (val.length > 0) {
         try {
+          if (!githubConnection?.id) {
+            throw new Error('No GitHub connection found')
+          }
+
           await checkGithubBranchValidity({
-            organizationIntegrationId: githubIntegration?.id,
-            repoOwner,
-            repoName,
+            connectionId: githubConnection.id,
             branchName: val,
           })
           setIsValid(true)
@@ -154,20 +149,20 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
           confirmText="Create Preview Branch"
         >
           <Modal.Content className="pt-3 pb-1">
-            {isLoadingIntegrations && <GenericSkeletonLoader />}
-            {isErrorIntegrations && (
+            {isLoadingConnections && <GenericSkeletonLoader />}
+            {isErrorConnections && (
               <AlertError
-                error={integrationsError}
+                error={connectionsError}
                 subject="Failed to retrieve Github repository information"
               />
             )}
-            {isSuccessIntegrations && (
+            {isSuccessConnections && (
               <div>
                 <p className="text-sm text-foreground-light">
                   Your project is currently connected to the repository:
                 </p>
                 <div className="flex items-center space-x-2">
-                  <p>{githubConnection?.metadata.name}</p>
+                  <p>{githubConnection?.repository.name}</p>
                   <Link
                     href={`https://github.com/${repoOwner}/${repoName}`}
                     target="_blank"

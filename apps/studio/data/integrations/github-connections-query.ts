@@ -14,24 +14,25 @@ export async function getGitHubConnections(
 ) {
   if (!organizationId) throw new Error('organizationId is required')
 
-  const { data, error } = await get(
-    '/platform/integrations/github/connections/organization/{organization_id}',
-    {
-      params: {
-        path: { organization_id: organizationId },
+  const { data, error } = await get('/platform/integrations/github/connections', {
+    params: {
+      query: {
+        organization_id: organizationId,
       },
-      signal,
-    }
-  )
+    },
+    signal,
+  })
   if (error) {
     throw error
   }
 
-  return data
+  return data.connections
 }
 
 export type GitHubConnectionsData = Awaited<ReturnType<typeof getGitHubConnections>>
 export type GitHubConnectionsError = ResponseError
+
+export type GitHubConnection = GitHubConnectionsData[0]
 
 export const useGitHubConnectionsQuery = <TData = GitHubConnectionsData>(
   { organizationId }: GitHubConnectionsVariables,

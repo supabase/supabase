@@ -11,6 +11,7 @@ import { useSelectedOrganization } from 'hooks'
 import { EMPTY_ARR } from 'lib/void'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import { SidePanel } from 'ui'
+import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 
 const GITHUB_ICON = (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 98 96" className="w-6">
@@ -34,6 +35,10 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
   // [Alaister]: temp override with <any> until the typegen is fixed
   const { data: githubReposData, isLoading: isLoadingGitHubRepos } =
     useGitHubRepositoriesQuery<any[]>()
+
+  const { data: connections } = useGitHubConnectionsQuery({
+    organizationId: selectedOrganization?.id,
+  })
 
   /**
    * Supabase projects available
@@ -66,11 +71,24 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
       },
     })
 
-  const { mutate: deleteGitHubConnection } = useGitHubConnectionDeleteMutation()
+  const { mutateAsync: deleteGitHubConnection } = useGitHubConnectionDeleteMutation()
 
-  const createGithubConnection = (variables: IntegrationConnectionsCreateVariables) => {
+  const createGithubConnection = async (variables: IntegrationConnectionsCreateVariables) => {
     if (!selectedOrganization?.id) {
       throw new Error('No organization id')
+    }
+    if (!variables.new) {
+      throw new Error('No new connection')
+    }
+
+    const existingGithubConnection = connections?.find(
+      (connection) => connection.project.ref === variables.new?.project_ref
+    )
+    if (existingGithubConnection !== undefined && selectedOrganization !== undefined) {
+      await deleteGitHubConnection({
+        connectionId: existingGithubConnection.id,
+        organizationId: selectedOrganization.id,
+      })
     }
 
     createConnections({

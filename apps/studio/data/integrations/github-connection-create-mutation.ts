@@ -8,9 +8,7 @@ import { integrationKeys } from './keys'
 
 export async function createGitHubConnection({ connection }: GitHubConnectionCreateVariables) {
   const { data, error } = await post('/platform/integrations/github/connections', {
-    body: {
-      connection,
-    } as any,
+    body: connection,
   })
   if (error) {
     throw error

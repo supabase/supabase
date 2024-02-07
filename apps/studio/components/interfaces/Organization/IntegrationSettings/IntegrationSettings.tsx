@@ -35,13 +35,8 @@ const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
 const IntegrationSettings = () => {
   const { ui } = useStore()
   const org = useSelectedOrganization()
-  // [Alaister]: temp override with <any> until the typegen is fixed
-  const { data: connections } = useGitHubConnectionsQuery<any>({ organizationId: org?.id })
 
-  const { data: projects } = useProjectsQuery()
-  const projectIdsToRef = Object.fromEntries(
-    projects?.map((project) => [project.id, project.ref]) ?? []
-  )
+  const { data: connections } = useGitHubConnectionsQuery({ organizationId: org?.id })
 
   const sidePanelsStateSnapshot = useSidePanelsStateSnapshot()
 
@@ -100,13 +95,13 @@ The GitHub app will watch for changes in your repository such as file changes, b
     const width = window.innerWidth
       ? window.innerWidth
       : document.documentElement.clientWidth
-      ? document.documentElement.clientWidth
-      : screen.width
+        ? document.documentElement.clientWidth
+        : screen.width
     const height = window.innerHeight
       ? window.innerHeight
       : document.documentElement.clientHeight
-      ? document.documentElement.clientHeight
-      : screen.height
+        ? document.documentElement.clientHeight
+        : screen.height
 
     const systemZoom = width / window.screen.availWidth
     const left = (width - w) / 2 / systemZoom + dualScreenLeft
@@ -172,18 +167,18 @@ The GitHub app will watch for changes in your repository such as file changes, b
               )
             })} */}
           <ul className="flex flex-col">
-            {connections?.map((connection: any) => (
+            {connections?.map((connection) => (
               <IntegrationConnectionItem
                 key={connection.id}
                 connection={{
                   id: String(connection.id),
                   added_by: {
-                    id: String(1),
-                    username: 'placeholder',
-                    primary_email: 'placeholder@supabase.io',
+                    id: String(connection.user?.id),
+                    primary_email: connection.user?.primary_email ?? '',
+                    username: connection.user?.username ?? '',
                   },
                   foreign_project_id: String(connection.repository.id),
-                  supabase_project_ref: projectIdsToRef[connection.project_id],
+                  supabase_project_ref: connection.project.ref,
                   organization_integration_id: 'unused',
                   inserted_at: connection.inserted_at,
                   updated_at: connection.updated_at,

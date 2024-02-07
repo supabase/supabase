@@ -68,7 +68,6 @@ const GitHubSection = () => {
       deleteGitHubConnection({
         connectionId: connection.id,
         organizationId: org.id,
-        // integrationId: connection.organization_integration_id,
       })
     },
     [deleteGitHubConnection, org?.id]

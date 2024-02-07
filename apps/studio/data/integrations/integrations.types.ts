@@ -1,3 +1,5 @@
+import { components } from 'data/api'
+
 export type VercelFramework =
   | (
       | 'blitzjs'
@@ -248,20 +250,16 @@ export type IntegrationConnectionsCreateVariables = {
     metadata: any
   }
   orgSlug: string | undefined
-  new: {
+  new?: {
     installation_id: number
-    project_id: number
+    project_ref: string
     repository_id: number
   }
 }
 
 export type GitHubConnectionCreateVariables = {
   organizationId: number
-  connection: {
-    installation_id: number
-    project_id: number
-    repository_id: number
-  }
+  connection: components['schemas']['CreateGitHubConnectionsBody']
 }
 
 export type UpdateConnectionPayload = {

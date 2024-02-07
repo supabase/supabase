@@ -19,19 +19,18 @@ import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
 import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
-import { useCheckGithubBranchValidity } from 'data/integrations/integrations-github-branch-check'
-import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useSelectedOrganization, useStore } from 'hooks'
-import { useAppStateSnapshot } from 'state/app-state'
-import BranchingPITRNotice from './BranchingPITRNotice'
-import BranchingPostgresVersionNotice from './BranchingPostgresVersionNotice'
-import GithubRepositorySelection from './GithubRepositorySelection'
-import Link from 'next/link'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import BranchingPlanNotice from './BranchingPlanNotice'
+import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useGitHubRepositoriesQuery } from 'data/integrations/github-repositories-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useSelectedOrganization, useStore } from 'hooks'
+import Link from 'next/link'
+import { useAppStateSnapshot } from 'state/app-state'
+import BranchingPITRNotice from './BranchingPITRNotice'
+import BranchingPlanNotice from './BranchingPlanNotice'
+import BranchingPostgresVersionNotice from './BranchingPostgresVersionNotice'
+import GithubRepositorySelection from './GithubRepositorySelection'
 
 const EnableBranchingModal = () => {
   const { ui } = useStore()
@@ -44,16 +43,6 @@ const EnableBranchingModal = () => {
   // and makes the validation run onChange instead. This is a workaround
   const [isValid, setIsValid] = useState(false)
 
-  // const {
-  //   data: integrations,
-  //   error: integrationsError,
-  //   isLoading: isLoadingIntegrations,
-  //   isSuccess: isSuccessIntegrations,
-  //   isError: isErrorIntegrations,
-  // } = useOrgIntegrationsQuery({
-  //   orgSlug: selectedOrg?.slug,
-  // })
-
   const {
     data: repositories,
     error: repositoriesError,
@@ -62,16 +51,13 @@ const EnableBranchingModal = () => {
     isError: isErrorRepositories,
   } = useGitHubRepositoriesQuery()
 
-  console.log('repositories:', repositories)
-
-  // [Alaister]: temp override with <any> until the typegen is fixed
   const {
     data: connections,
     error: connectionsError,
     isLoading: isLoadingConnections,
     isSuccess: isSuccessConnections,
     isError: isErrorConnections,
-  } = useGitHubConnectionsQuery<any[]>({
+  } = useGitHubConnectionsQuery({
     organizationId: selectedOrg?.id,
   })
 
@@ -94,8 +80,8 @@ const EnableBranchingModal = () => {
   const hasPitrEnabled =
     (addons?.selected_addons ?? []).find((addon) => addon.type === 'pitr') !== undefined
 
-  const githubConnection = connections?.find((connection) => connection.project_id === ref)
-  const [repoOwner, repoName] = githubConnection?.metadata.name.split('/') ?? []
+  const githubConnection = connections?.find((connection) => connection.project.ref === ref)
+  const [repoOwner, repoName] = githubConnection?.repository.name.split('/') ?? []
 
   const { mutateAsync: checkGithubBranchValidity, isLoading: isChecking } =
     useCheckGithubBranchValidity({ onError: () => {} })
@@ -115,12 +101,14 @@ const EnableBranchingModal = () => {
       .refine(async (val) => {
         try {
           if (val.length > 0) {
-            // await checkGithubBranchValidity({
-            //   organizationIntegrationId: githubIntegration?.id,
-            //   repoOwner,
-            //   repoName,
-            //   branchName: val,
-            // })
+            if (!githubConnection?.id) {
+              throw new Error('No GitHub connection found')
+            }
+
+            await checkGithubBranchValidity({
+              connectionId: githubConnection.id,
+              branchName: val,
+            })
             setIsValid(true)
           }
           return true
@@ -230,6 +218,7 @@ const EnableBranchingModal = () => {
                       form={form}
                       isChecking={isChecking}
                       isValid={canSubmit}
+                      githubConnection={githubConnection}
                     />
                     {!hasPitrEnabled && <BranchingPITRNotice />}
                   </>

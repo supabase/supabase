@@ -6,13 +6,13 @@ import { ResponseError } from 'types'
 import { integrationKeys } from './keys'
 
 type DeleteVariables = {
-  connectionId: string
+  connectionId: string | number
   organizationId: number
 }
 
 export async function deleteConnection({ connectionId }: DeleteVariables, signal?: AbortSignal) {
   const { data, error } = await del('/platform/integrations/github/connections/{connection_id}', {
-    params: { path: { connection_id: connectionId } },
+    params: { path: { connection_id: String(connectionId) } },
     signal,
   })
   if (error) throw error
