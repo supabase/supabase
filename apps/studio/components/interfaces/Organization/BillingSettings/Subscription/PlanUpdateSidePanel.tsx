@@ -35,6 +35,8 @@ import ExitSurveyModal from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import PaymentMethodSelection from './PaymentMethodSelection'
 import { formatCurrency } from 'lib/helpers'
+import { useProjectsQuery } from 'data/projects/projects-query'
+import { isArray } from 'lodash'
 
 const PlanUpdateSidePanel = () => {
   const { ui } = useStore()
@@ -52,6 +54,11 @@ const PlanUpdateSidePanel = () => {
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )
+  const { data: allProjects } = useProjectsQuery()
+  const orgProjects = (allProjects || []).filter(
+    (it) => it.organization_id === selectedOrganization?.id
+  )
+
   const snap = useOrgSettingsPageStateSnapshot()
   const visible = snap.panelKey === 'subscriptionPlan'
   const onClose = () => {
@@ -182,10 +189,6 @@ const PlanUpdateSidePanel = () => {
               const isDowngradeOption = planMeta?.change_type === 'downgrade'
               const isCurrentPlan = planMeta?.id === subscription?.plan?.id
               const features = billingViaPartner ? plan.featuresPartner : plan.features
-              const warning =
-                billingViaPartner && plan.warningPartner
-                  ? plan.warningPartner
-                  : plan.warning ?? null
 
               if (plan.id === 'tier_enterprise') {
                 return (
@@ -220,7 +223,7 @@ const PlanUpdateSidePanel = () => {
                         <></>
                       )}
                     </div>
-                    <div className="mt-4 flex items-center space-x-1">
+                    <div className="mt-4 flex items-center space-x-1 mb-4">
                       {(price ?? 0) > 0 && <p className="text-foreground-light text-sm">From</p>}
                       {isLoadingPlans ? (
                         <div className="h-[28px] flex items-center justify-center">
@@ -231,11 +234,7 @@ const PlanUpdateSidePanel = () => {
                       )}
                       <p className="text-foreground-light text-sm">{plan.costUnit}</p>
                     </div>
-                    <div className={clsx('flex mt-1 mb-4', !warning && 'opacity-0')}>
-                      <div className="bg-background text-brand-600 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-xs">
-                        {warning}
-                      </div>
-                    </div>
+
                     {isCurrentPlan ? (
                       <Button block disabled type="default">
                         Current plan
@@ -293,11 +292,14 @@ const PlanUpdateSidePanel = () => {
                       </Tooltip.Root>
                     )}
 
-                    <div className="border-t my-6" />
+                    <div className="border-t my-4" />
 
                     <ul role="list">
                       {features.map((feature) => (
-                        <li key={feature} className="flex py-2">
+                        <li
+                          key={typeof feature === 'string' ? feature : feature[0]}
+                          className="flex py-2"
+                        >
                           <div className="w-[12px]">
                             <IconCheck
                               className="h-3 w-3 text-brand translate-y-[2.5px]"
@@ -305,15 +307,24 @@ const PlanUpdateSidePanel = () => {
                               strokeWidth={3}
                             />
                           </div>
-                          <p className="ml-3 text-xs text-foreground-light">{feature}</p>
+                          <div>
+                            <p className="ml-3 text-xs text-foreground-light">
+                              {typeof feature === 'string' ? feature : feature[0]}
+                            </p>
+                            {isArray(feature) && (
+                              <p className="ml-3 text-xs text-foreground-lighter">{feature[1]}</p>
+                            )}
+                          </div>
                         </li>
                       ))}
                     </ul>
                   </div>
 
-                  {plan.footer && (
+                  {(plan.footer || (billingViaPartner && plan.footerPartner)) && (
                     <div className="border-t pt-4 mt-4">
-                      <p className="text-foreground-light text-xs">{plan.footer}</p>
+                      <p className="text-foreground-light text-xs">
+                        {billingViaPartner ? plan.footerPartner || plan.footer : plan.footer}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -329,6 +340,7 @@ const PlanUpdateSidePanel = () => {
         subscription={subscription}
         onClose={() => setSelectedTier(undefined)}
         onConfirm={onConfirmDowngrade}
+        projects={orgProjects}
       />
 
       <Modal
@@ -339,9 +351,7 @@ const PlanUpdateSidePanel = () => {
         onCancel={() => setSelectedTier(undefined)}
         onConfirm={onUpdateSubscription}
         overlayClassName="pointer-events-none"
-        header={`Confirm ${planMeta?.change_type === 'downgrade' ? 'downgrade' : 'upgrade'} to ${
-          subscriptionPlanMeta?.name
-        }`}
+        header={`Confirm ${planMeta?.change_type === 'downgrade' ? 'downgrade' : 'upgrade'} to ${subscriptionPlanMeta?.name}`}
       >
         <Modal.Content className="mt-4">
           {subscriptionPreviewError && (

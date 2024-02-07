@@ -1,8 +1,6 @@
 import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
-import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common/hooks'
 import { PolicyEditorModal, PolicyTableRow } from 'components/interfaces/Auth/Policies'
-import { useStore } from 'hooks'
 import { isEmpty } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
@@ -19,7 +17,7 @@ import InformationBox from 'components/ui/InformationBox'
 import { useDatabasePolicyCreateMutation } from 'data/database-policies/database-policy-create-mutation'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
 import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
-import { tableKeys } from 'data/tables/keys'
+import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 
 interface PoliciesProps {
   tables: PostgresTable[]
@@ -38,8 +36,6 @@ const Policies = ({
   const { ref } = useParams()
   const { project } = useProjectContext()
 
-  const { ui, meta } = useStore()
-  const queryClient = useQueryClient()
   const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
 
   const [selectedSchemaAndTable, setSelectedSchemaAndTable] = useState<any>({})
@@ -50,9 +46,19 @@ const Policies = ({
 
   const { mutateAsync: createDatabasePolicy } = useDatabasePolicyCreateMutation()
   const { mutateAsync: updateDatabasePolicy } = useDatabasePolicyUpdateMutation()
+  const { mutate: updateTable } = useTableUpdateMutation({
+    onError: (error) => {
+      toast.error(`Failed to toggle RLS: ${error.message}`)
+    },
+    onSettled: () => {
+      closeConfirmModal()
+    },
+  })
   const { mutate: deleteDatabasePolicy } = useDatabasePolicyDeleteMutation({
     onSuccess: () => {
       toast.success('Successfully deleted policy!')
+    },
+    onSettled: () => {
       closeConfirmModal()
     },
   })
@@ -70,7 +76,7 @@ const Policies = ({
     setSelectedTableToToggleRLS({})
   }
 
-  const onSelectToggleRLS = (table: any) => {
+  const onSelectToggleRLS = (table: PostgresTable) => {
     setSelectedTableToToggleRLS(table)
   }
 
@@ -92,7 +98,7 @@ const Policies = ({
   }
 
   const onSavePolicySuccess = useCallback(async () => {
-    ui.setNotification({ category: 'success', message: 'Policy successfully saved!' })
+    toast.success('Policy successfully saved!')
     closePolicyEditorModal()
   }, [closePolicyEditorModal])
 
@@ -103,16 +109,13 @@ const Policies = ({
       rls_enabled: !selectedTableToToggleRLS.rls_enabled,
     }
 
-    const res: any = await meta.tables.update(payload.id, payload)
-    if (res.error) {
-      return ui.setNotification({
-        category: 'error',
-        message: `Failed to toggle RLS: ${res.error.message}`,
-      })
-    }
-
-    await queryClient.invalidateQueries(tableKeys.list(ref, selectedTableToToggleRLS.schema))
-    closeConfirmModal()
+    updateTable({
+      projectRef: project?.ref!,
+      connectionString: project?.connectionString,
+      id: payload.id,
+      schema: (selectedTableToToggleRLS as PostgresTable).schema,
+      payload: payload,
+    })
   }
 
   const onCreatePolicy = useCallback(
