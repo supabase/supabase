@@ -15,6 +15,7 @@ const generateSqlSchema = SchemaBuilder.emptySchema()
       - Prefer 'timestamp with time zone' over 'date'
       - Use vector(384) data type for any embedding/vector related query
       - Always use double apostrophe in SQL strings (eg. 'Night''s watch')
+      - Always use semicolons
     `,
   })
   .addString('title', {
@@ -36,6 +37,7 @@ const editSqlSchema = SchemaBuilder.emptySchema().addString('sql', {
       - Always use double apostrophe in SQL strings (eg. 'Night''s watch')
       - Use real examples when possible
       - Add constraints if requested
+      - Always use semicolons
     `,
 })
 
@@ -44,7 +46,8 @@ const debugSqlSchema = SchemaBuilder.emptySchema()
     description: 'A short suggested solution for the error (as concise as possible).',
   })
   .addString('sql', {
-    description: 'The SQL rewritten to apply the solution. Includes all the original logic, but modified to fix the issue.',
+    description:
+      'The SQL rewritten to apply the solution. Includes all the original logic, but modified to fix the issue.',
   })
 
 const generateTitleSchema = SchemaBuilder.emptySchema()
@@ -91,6 +94,7 @@ const completionFunctions = {
       - Prefer 'timestamp with time zone' over 'date'
       - Use vector(384) data type for any embedding/vector related query
       - Always use double apostrophe in SQL strings (eg. 'Night''s watch')
+      - Always use semicolons
     `,
     parameters: debugSqlSchema.schema as Record<string, unknown>,
   },
