@@ -71,7 +71,7 @@ const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
 
   const handleClose = () => {
     onClose()
-    form.reset()
+    form.reset(initialValues)
   }
 
   return (
