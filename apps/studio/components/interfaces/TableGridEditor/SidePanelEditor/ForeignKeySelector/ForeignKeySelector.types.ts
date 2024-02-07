@@ -5,7 +5,7 @@ export interface ForeignKey {
 
   schema: string
   table: string
-  columns: { source: string; target: string }[]
+  columns: { source: string; sourceType?: string; target: string; targetType?: string }[]
   deletionAction: string
   updateAction: string
   toRemove?: boolean

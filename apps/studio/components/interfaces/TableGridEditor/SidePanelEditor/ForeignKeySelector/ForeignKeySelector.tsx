@@ -108,7 +108,13 @@ export const ForeignKeySelector = ({
   const updateSelectedColumn = (idx: number, key: 'target' | 'source', value: string) => {
     const updatedRelations = fk.columns.map((x, i) => {
       if (i === idx) {
-        return { ...x, [key]: value }
+        if (key === 'target') {
+          const targetType = selectedTable?.columns?.find((col) => col.name === value)?.format
+          return { ...x, [key]: value, targetType }
+        } else {
+          const sourceType = table.columns.find((col) => col.name === value)?.format as string
+          return { ...x, [key]: value, sourceType }
+        }
       } else {
         return x
       }
@@ -143,9 +149,10 @@ export const ForeignKeySelector = ({
     const typeErrors: any = []
 
     fk.columns.forEach((column) => {
-      const { source, target } = column
-      const sourceType = table.columns.find((col) => col.name === source)?.format
-      const targetType = selectedTable?.columns?.find((col) => col.name === target)?.format ?? ''
+      const { source, target, sourceType: sType, targetType: tType } = column
+      const sourceType = sType ?? table.columns.find((col) => col.name === source)?.format
+      const targetType =
+        tType ?? selectedTable?.columns?.find((col) => col.name === target)?.format ?? ''
 
       // [Joshen] Doing this way so that its more readable
       // If either source or target not selected yet, thats okay

@@ -112,35 +112,6 @@ const TableEditor = ({
     (fk) => fk.source_schema === table?.schema && fk.source_table === table?.name
   )
 
-  useEffect(() => {
-    if (visible) {
-      setErrors({})
-      setImportContent(undefined)
-      setIsDuplicateRows(false)
-      if (isNewRecord) {
-        const tableFields = generateTableField()
-        setTableFields(tableFields)
-        setFkRelations([])
-      } else {
-        const tableFields = generateTableFieldFromPostgresTable(
-          table!,
-          foreignKeyMeta || [],
-          isDuplicating,
-          isRealtimeEnabled
-        )
-        setTableFields(tableFields)
-        setFkRelations(formatForeignKeys(foreignKeys))
-      }
-    }
-  }, [visible])
-
-  useEffect(() => {
-    if (importContent && !isEmpty(importContent)) {
-      const importedColumns = formatImportedContentToColumnFields(importContent)
-      onUpdateField({ columns: importedColumns })
-    }
-  }, [importContent])
-
   const onUpdateField = (changes: Partial<TableField>) => {
     const updatedTableFields = { ...tableFields, ...changes } as TableField
     setTableFields(updatedTableFields)
@@ -151,6 +122,33 @@ const TableEditor = ({
       delete updatedErrors[key]
     }
     setErrors(updatedErrors)
+  }
+
+  const onUpdateFkRelations = (relations: ForeignKey[]) => {
+    if (tableFields === undefined) return
+    const updatedColumns: ColumnField[] = []
+
+    relations.forEach((relation) => {
+      relation.columns.forEach((column) => {
+        const sourceColumn = tableFields.columns.find((col) => col.name === column.source)
+        if (sourceColumn?.isNewColumn && column.targetType) {
+          updatedColumns.push({ ...sourceColumn, format: column.targetType })
+        }
+      })
+    })
+
+    if (updatedColumns.length > 0) {
+      const updatedTableFields = {
+        ...tableFields,
+        columns: tableFields.columns.map((col) => {
+          const updatedColumn = updatedColumns.find((x) => x.id === col.id)
+          if (updatedColumn) return updatedColumn
+          else return col
+        }),
+      }
+      setTableFields(updatedTableFields)
+    }
+    setFkRelations(relations)
   }
 
   const onSaveChanges = (resolve: any) => {
@@ -183,6 +181,35 @@ const TableEditor = ({
       }
     }
   }
+
+  useEffect(() => {
+    if (visible) {
+      setErrors({})
+      setImportContent(undefined)
+      setIsDuplicateRows(false)
+      if (isNewRecord) {
+        const tableFields = generateTableField()
+        setTableFields(tableFields)
+        setFkRelations([])
+      } else {
+        const tableFields = generateTableFieldFromPostgresTable(
+          table!,
+          foreignKeyMeta || [],
+          isDuplicating,
+          isRealtimeEnabled
+        )
+        setTableFields(tableFields)
+        setFkRelations(formatForeignKeys(foreignKeys))
+      }
+    }
+  }, [visible])
+
+  useEffect(() => {
+    if (importContent && !isEmpty(importContent)) {
+      const importedColumns = formatImportedContentToColumnFields(importContent)
+      onUpdateField({ columns: importedColumns })
+    }
+  }, [importContent])
 
   if (!tableFields) return null
 
@@ -317,6 +344,7 @@ const TableEditor = ({
         {!isDuplicating && (
           <ColumnManagement
             columns={tableFields?.columns}
+            relations={fkRelations}
             enumTypes={enumTypes}
             isNewRecord={isNewRecord}
             importContent={importContent}
@@ -378,7 +406,7 @@ const TableEditor = ({
               relations={fkRelations}
               closePanel={closePanel}
               setEditorDirty={() => updateEditorDirty()}
-              onUpdateFkRelations={setFkRelations}
+              onUpdateFkRelations={onUpdateFkRelations}
             />
           </SidePanel.Content>
         </>

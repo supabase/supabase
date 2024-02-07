@@ -12,6 +12,7 @@ import { Alert, Button, IconEdit, IconExternalLink, IconHelpCircle, IconKey, Ico
 
 import InformationBox from 'components/ui/InformationBox'
 import { generateColumnField } from '../ColumnEditor/ColumnEditor.utils'
+import { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { TEXT_TYPES } from '../SidePanelEditor.constants'
 import { ColumnField, ExtendedPostgresRelationship } from '../SidePanelEditor.types'
 import Column from './Column'
@@ -19,6 +20,7 @@ import { ImportContent } from './TableEditor.types'
 
 interface ColumnManagementProps {
   columns?: ColumnField[]
+  relations: ForeignKey[]
   enumTypes: PostgresType[]
   importContent?: ImportContent
   isNewRecord: boolean
@@ -29,6 +31,7 @@ interface ColumnManagementProps {
 
 const ColumnManagement = ({
   columns = [],
+  relations,
   enumTypes = [],
   importContent,
   isNewRecord,
@@ -41,6 +44,13 @@ const ColumnManagement = ({
     columns,
     (column: ColumnField) => column.isPrimaryKey
   )
+
+  const checkIfHaveForeignKeys = (column: ColumnField) => {
+    return (
+      relations.find((relation) => relation.columns.find((x) => x.source === column.name)) !==
+      undefined
+    )
+  }
 
   const onUpdateColumn = (columnToUpdate: ColumnField, changes: Partial<ColumnField>) => {
     const updatedColumns = columns.map((column: ColumnField) => {
@@ -253,6 +263,7 @@ const ColumnManagement = ({
                             <Column
                               column={column}
                               enumTypes={enumTypes}
+                              hasForeignKeys={checkIfHaveForeignKeys(column)}
                               isNewRecord={isNewRecord}
                               hasImportContent={hasImportContent}
                               dragHandleProps={draggableProvided.dragHandleProps}
@@ -285,6 +296,7 @@ const ColumnManagement = ({
                             column={column}
                             enumTypes={enumTypes}
                             isNewRecord={isNewRecord}
+                            hasForeignKeys={checkIfHaveForeignKeys(column)}
                             hasImportContent={hasImportContent}
                             dragHandleProps={draggableProvided.dragHandleProps}
                             onUpdateColumn={(changes) => onUpdateColumn(column, changes)}

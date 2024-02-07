@@ -8,6 +8,8 @@ import { Suggestion } from '../ColumnEditor/ColumnEditor.types'
 import ColumnType from '../ColumnEditor/ColumnType'
 import InputWithSuggestions from '../ColumnEditor/InputWithSuggestions'
 import { ColumnField } from '../SidePanelEditor.types'
+import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 /**
  * [Joshen] For context:
@@ -31,6 +33,7 @@ interface ColumnProps {
   column: ColumnField
   enumTypes: PostgresType[]
   isNewRecord: boolean
+  hasForeignKeys: boolean
   hasImportContent: boolean
   dragHandleProps?: any
   onUpdateColumn: (changes: Partial<ColumnField>) => void
@@ -41,11 +44,13 @@ const Column = ({
   column = EMPTY_OBJ as ColumnField,
   enumTypes = EMPTY_ARR as PostgresType[],
   isNewRecord = false,
+  hasForeignKeys = false,
   hasImportContent = false,
   dragHandleProps = EMPTY_OBJ,
   onUpdateColumn = noop,
   onRemoveColumn = noop,
 }: ColumnProps) => {
+  console.log(column.name, { hasForeignKeys })
   const suggestions: Suggestion[] = typeExpressionSuggestions?.[column.format] ?? []
 
   const settingsCount = [
@@ -85,11 +90,9 @@ const Column = ({
             size="small"
             showLabel={false}
             className="table-editor-column-type lg:gap-0 "
-            disabled={column.foreignKey !== undefined}
+            disabled={hasForeignKeys}
             description={
-              column.foreignKey !== undefined
-                ? 'Column type cannot be changed as it has a foreign key relation'
-                : ''
+              hasForeignKeys ? 'Column type cannot be changed as it has a foreign key relation' : ''
             }
             onOptionSelect={(format: string) => {
               const defaultValue = format === 'uuid' ? 'gen_random_uuid()' : null
