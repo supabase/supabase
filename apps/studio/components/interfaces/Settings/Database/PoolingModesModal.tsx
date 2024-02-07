@@ -31,7 +31,10 @@ export const PoolingModesModal = () => {
 
   return (
     <>
-      <Dialog_Shadcn_ open={snap.showPoolingModeHelper}>
+      <Dialog_Shadcn_
+        open={snap.showPoolingModeHelper}
+        onOpenChange={snap.setShowPoolingModeHelper}
+      >
         <DialogContent_Shadcn_ className="sm:max-w-4xl">
           <DialogHeader_Shadcn_ className="pr-8">
             <DialogTitle_Shadcn_ className="mb-4">
@@ -56,7 +59,7 @@ export const PoolingModesModal = () => {
             </DialogDescription_Shadcn_>
           </DialogHeader_Shadcn_>
           <Markdown
-            className="max-w-full [&>h3]:text-sm"
+            className="px-6 max-w-full [&>h3]:text-sm"
             content={`
 Each pooling mode handles connections differently.
 
@@ -98,41 +101,8 @@ This mode is similar to connecting to your database directly. There is full supp
               </AlertDescription_Shadcn_>
             </Alert_Shadcn_>
           )}
-          <DialogFooter_Shadcn_>
-            <DialogClose_Shadcn_ onClick={() => snap.setShowPoolingModeHelper(false)}>
-              <Button type="secondary">Close</Button>
-            </DialogClose_Shadcn_>
-          </DialogFooter_Shadcn_>
         </DialogContent_Shadcn_>
       </Dialog_Shadcn_>
-      {/* <Modal
-        hideFooter
-        size="xlarge"
-        visible={snap.showPoolingModeHelper}
-        header={
-          <div className="w-full flex items-center justify-between">
-            <p>Which pooling mode should I use?</p>
-            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-              <a
-                href="https://supabase.com/docs/guides/database/connecting-to-postgres#how-connection-pooling-works"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Documentation
-              </a>
-            </Button>
-          </div>
-        }
-        onCancel={() => snap.setShowPoolingModeHelper(false)}
-      >
-        <Modal.Content className="py-4 text-sm flex flex-col gap-y-4"></Modal.Content>
-        <Modal.Separator />
-        <Modal.Content className="flex items-center justify-end pb-2">
-          <Button type="default" onClick={() => snap.setShowPoolingModeHelper(false)}>
-            Close
-          </Button>
-        </Modal.Content>
-      </Modal> */}
     </>
   )
 }

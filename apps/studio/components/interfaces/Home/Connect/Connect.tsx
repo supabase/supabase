@@ -195,7 +195,7 @@ const Connect = () => {
   return (
     <>
       <div>
-        <Dialog_Shadcn_ open={true}>
+        <Dialog_Shadcn_>
           <DialogTrigger_Shadcn_ asChild>
             <Button type="default">
               <span className="flex items-center gap-2">
