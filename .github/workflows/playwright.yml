@@ -39,7 +39,7 @@ jobs:
       - name: Cache Docker images
         uses: ScribeMD/docker-cache@0.3.7
         with:
-          key: docker-${{ runner.os }}-${{ ${{ steps.version.outputs.CLI_VERSION }} }}
+          key: docker-${{ runner.os }}-${{ steps.version.outputs.CLI_VERSION }}
       - name: Install dependencies
         run: npm ci
       - name: Install Playwright Browsers
