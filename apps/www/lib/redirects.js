@@ -2368,4 +2368,9 @@ module.exports = [
     source: '/guides/api/rest/joins-and-nesting',
     destination: '/guides/database/joins-and-nesting',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/uploads',
+    destination: '/docs/guides/storage/uploads/standard-uploads',
+  },
 ]
