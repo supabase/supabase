@@ -395,6 +395,51 @@ We have brought numerous updates behind the scenes to make the SDK work more int
   </RefSubLayout.Examples>
 </RefSubLayout.EducationRow>
 
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    #### Auth token is now stored in SharedPreferences by default
+
+    In v1, the auth token was persisted using [Hive](https://pub.dev/packages/hive) by default. In v2, the auth token is now persisted using [shared_preferences](https://pub.dev/packages/shared_preferences). 
+
+    You can also use your own custom storage by passing a custom `LocalStorage` object to `Supabase.initialize()`. You can read more on using a custom storage [here](https://pub.dev/packages/supabase_flutter#custom-localstorage).
+
+    If you are migrating an existing app from v1 to v2, you can create your own class to migrate the auth token from Hive to SharedPreferences. You can find an example of how to do so [here]().
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+    <Tabs
+      scrollable
+      size="small"
+      type="underlined"
+      defaultActiveId="1.0x"
+      queryGroup="version"
+    >
+      <TabPanel id="1.0x" label="Before">
+        ```dart
+        // Uses Hive to persist the auth token.
+        Supabase.initialize(
+          url: 'SUPABASE_URL',
+          anonKey: 'SUPABASE_ANON_KEY',
+        );
+        ```
+
+      </TabPanel>
+      <TabPanel id="2.0x" label="After">
+        ```dart
+        // Uses SharedPreferences to persist the auth token.
+        Supabase.initialize(
+          url: 'SUPABASE_URL',
+          anonKey: 'SUPABASE_ANON_KEY',
+        );
+        ```
+
+      </TabPanel>
+    </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
 ### Data methods
 
 <RefSubLayout.EducationRow>
