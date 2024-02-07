@@ -98,7 +98,7 @@ export const TwitterSpacesSvg = () => (
 
 export const ProductHuntSvg = () => (
   <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <g clip-path="url(#clip0_3061_22934)">
+    <g clipPath="url(#clip0_3061_22934)">
       <path
         fill-rule="evenodd"
         clip-rule="evenodd"
