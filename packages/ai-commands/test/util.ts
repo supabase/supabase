@@ -81,13 +81,13 @@ export async function getPolicyInfo(sql: string) {
 
   const formattedSql = formatSql(sql)
 
-  const usingMatch = formattedSql.match(/using\s*\((.*)\)/i)
+  const usingMatch = formattedSql.match(/using\s*\((.*)\)/is)
   let usingExpression
   if (usingMatch) {
     usingExpression = usingMatch[1]
   }
 
-  const withCheckMatch = formattedSql.match(/with check\s*\((.*)\)/i)
+  const withCheckMatch = formattedSql.match(/with check\s*\((.*)\)/is)
   let checkExpression
   if (withCheckMatch) {
     checkExpression = withCheckMatch[1]
