@@ -6,7 +6,7 @@
   "scripts": {
     "pretest": "supabase start -x studio",
     "test": "playwright test",
-    "posttest": "supabase stop",
+    "posttest": "supabase stop --no-backup",
     "test-with-ui": "playwright test --ui",
     "codegen": "playwright codegen"
   },
