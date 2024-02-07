@@ -132,7 +132,7 @@ export async function generateSql(openai: OpenAI, prompt: string, entityDefiniti
 
   try {
     const completionResponse = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo-1106',
+      model: 'gpt-3.5-turbo-0125',
       messages: completionMessages,
       max_tokens: 1024,
       temperature: 0,
@@ -218,7 +218,7 @@ export async function editSql(
 
   try {
     const completionResponse = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo-1106',
+      model: 'gpt-3.5-turbo-0125',
       messages: completionMessages,
       max_tokens: 2048,
       temperature: 0,
@@ -307,7 +307,7 @@ export async function debugSql(
 
   try {
     const completionResponse = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo-1106',
+      model: 'gpt-3.5-turbo-0125',
       messages: completionMessages,
       max_tokens: 2048,
       temperature: 0,
@@ -367,7 +367,7 @@ export async function titleSql(openai: OpenAI, sql: string) {
 
   try {
     const completionResponse = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo-1106',
+      model: 'gpt-3.5-turbo-0125',
       messages: completionMessages,
       max_tokens: 1024,
       temperature: 0,
