@@ -225,7 +225,7 @@ const LogTable = ({
   }
 
   const renderNoResultAlert = () => (
-    <div className="mt-4 flex scale-100 flex-col items-center justify-center gap-6 text-center opacity-100">
+    <div className="flex scale-100 flex-col items-center justify-center gap-6 text-center opacity-100">
       <div className="flex flex-col gap-1">
         <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-stronger px-2"></div>
         <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-stronger px-2">
