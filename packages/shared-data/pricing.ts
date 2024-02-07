@@ -99,10 +99,10 @@ export const pricing: Pricing = {
       {
         title: 'Pausing',
         tooltips: {
-          main: 'Projects that have no activity or API requests will be paused. They can be reactivated via the dashboard',
+          main: 'Projects that have no activity or API requests will be paused. They can be reactivated via the dashboard.',
         },
         plans: {
-          free: 'After 1 inactive week',
+          free: 'After 1 week of inactivity',
           pro: 'Never',
           team: 'Never',
           enterprise: 'Never',
@@ -300,8 +300,8 @@ export const pricing: Pricing = {
         },
         plans: {
           free: false,
-          pro: ['100 origin images', 'then $5 per 1000 origin images'],
-          team: ['100 origin images', 'then $5 per 1000 origin images'],
+          pro: ['100 origin images included', 'then $5 per 1000 origin images'],
+          team: ['100 origin images included', 'then $5 per 1000 origin images'],
           enterprise: 'Custom',
         },
         usage_based: true,
@@ -328,7 +328,7 @@ export const pricing: Pricing = {
           main: 'Billing is based on the sum of all invocations, independent of response status, throughout your billing period.',
         },
         plans: {
-          free: '500K/month included',
+          free: '500,000 included',
           pro: ['2 Million included', 'then $2 per 1 Million'],
           team: ['2 Million included', 'then $2 per 1 Million'],
           enterprise: 'Custom',
