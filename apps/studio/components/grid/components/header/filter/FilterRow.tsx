@@ -25,8 +25,8 @@ const FilterRow = ({ table, filter, filterIdx, onChange, onDelete, onKeyDown }: 
     column?.format === 'timestamptz'
       ? 'yyyy-mm-dd hh:mm:ss+zz'
       : column?.format === 'timestamp'
-      ? 'yyyy-mm-dd hh:mm:ss'
-      : 'Enter a value'
+        ? 'yyyy-mm-dd hh:mm:ss'
+        : 'Enter a value'
 
   return (
     <div className="sb-grid-filter-row px-3">

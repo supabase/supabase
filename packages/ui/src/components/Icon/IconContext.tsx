@@ -1,4 +1,5 @@
 import { createContext } from 'react'
+
 import { SizeVariantProps } from '../../lib/commonCva'
 
 type ContextValue = { contextSize?: SizeVariantProps; className?: string }

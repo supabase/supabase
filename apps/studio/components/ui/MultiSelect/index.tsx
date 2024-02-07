@@ -104,8 +104,8 @@ export default function MultiSelect({
     const updatedPayload = allowDuplicateSelection
       ? [..._selected.concat([option.value])]
       : isActive
-      ? [...without(_selected, option.value)]
-      : [..._selected.concat([option.value])]
+        ? [...without(_selected, option.value)]
+        : [..._selected.concat([option.value])]
 
     // Payload must always include disabled options
     const compulsoryOptions = options
