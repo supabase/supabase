@@ -26,20 +26,23 @@ There are several reasons why you might want to add phone login to your applicat
 To use Phone Login, you first need to set up a Phone provider. Supabase supports Phone Login with several communications platforms. Follow the guides below to set up your provider.
 
 <div className="grid grid-cols-1 md:grid-cols-12 gap-10 not-prose py-8">
-  {PhoneLoginsItems.map((item) => (
-    <Link href={`${item.url}`} key={item.name} passHref className="col-span-4">
-      <IconPanel
-        title={item.name}
-        span="col-span-6"
-        icon={item.icon}
-        isDarkMode={item.isDarkMode}
-        hasLightIcon={item.hasLightIcon}
-      >
-        {item.linkDescription}
-      </IconPanel>
-    </Link>
-))}
-
+  <NavData data="phoneLoginsItems">
+    {(data) =>
+      data.map((item) => (
+        <Link href={`${item.url}`} key={item.name} passHref className="col-span-4">
+          <IconPanel
+            title={item.name}
+            span="col-span-6"
+            icon={item.icon}
+            isDarkMode={item.isDarkMode}
+            hasLightIcon={item.hasLightIcon}
+          >
+            {item.linkDescription}
+          </IconPanel>
+        </Link>
+      ))
+    }
+  </NavData>
 </div>
 
 ## Using Phone Login
