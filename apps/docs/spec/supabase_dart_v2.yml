@@ -2549,16 +2549,12 @@ functions:
             ```
           response: |
             ```json
-            {
-              "data": [
-                {
-                  "id": 2,
-                  "name": "Albania"
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
+            [
+              {
+                "id": 2,
+                "name": "Albania"
+              }
+            ]
             ```
         hideCodeBlock: true
         isSpotlight: true
