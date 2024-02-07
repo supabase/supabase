@@ -4085,7 +4085,7 @@ functions:
                 name
               )
             `)
-            .or('country_id.eq.1,name.eq.Beijing', { referenceTable: 'cities' })
+            .or('country_id.eq.1,name.eq.Beijing', { referencedTable: 'cities' })
           ```
         data:
           sql: |
