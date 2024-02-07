@@ -53,6 +53,8 @@ export const getStaticProps = (async ({ params }) => {
   const fullPath = join(GUIDES_DIRECTORY, relPath + '.mdx')
   const mdx = await readFile(fullPath, 'utf-8')
 
+  const editLink = `https://github.com/supabase/supabase/blob/master/apps/docs/content/guides/${relPath}.mdx`
+
   const { data: frontmatter, content } = matter(mdx)
   if (!isValidGuideFrontmatter(frontmatter)) {
     throw Error('Type of frontmatter is not valid')
@@ -78,6 +80,7 @@ export const getStaticProps = (async ({ params }) => {
     props: {
       frontmatter,
       mdxSource,
+      editLink,
     },
   }
 }) satisfies GetStaticProps
@@ -85,11 +88,12 @@ export const getStaticProps = (async ({ params }) => {
 export default function AuthGuide({
   frontmatter,
   mdxSource,
+  editLink,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   const { hideToc, ...meta } = frontmatter
 
   return (
-    <Layout meta={meta} hideToc={hideToc}>
+    <Layout meta={meta} hideToc={hideToc} editLink={editLink}>
       <MDXRemote {...mdxSource} components={components} />
     </Layout>
   )
