@@ -53,7 +53,7 @@ export const getStaticProps = (async ({ params }) => {
   const fullPath = join(GUIDES_DIRECTORY, relPath + '.mdx')
   const mdx = await readFile(fullPath, 'utf-8')
 
-  const editLink = `https://github.com/supabase/supabase/blob/master/apps/docs/content/guides/${relPath}.mdx`
+  const editLink = `supabase/supabase/blob/master/apps/docs/content/guides/${relPath}.mdx`
 
   const { data: frontmatter, content } = matter(mdx)
   if (!isValidGuideFrontmatter(frontmatter)) {
