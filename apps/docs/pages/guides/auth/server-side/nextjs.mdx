@@ -61,11 +61,10 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=<your_supabase_anon_key>
 
 <StepHikeCompact.Details title="Write utility functions to create Supabase clients">
 
-To access Supabase from your Next.js app, you need 3 types of Supabase clients:
+To access Supabase from your Next.js app, you need 2 types of Supabase clients:
 
 1. **Client Component client** - To access Supabase from Client Components, which run in the browser.
-1. **Server Component client** - To access Supabase from Server Components, which run only on the server.
-1. **Server Action client** - To access Supabase from Server Actions and Route Handlers.
+1. **Server Component client** - To access Supabase from Server Components, Server Actions, and Route Handlers, which run only on the server.
 
 Create a `utils/supabase` folder with a file for each type of client. Then copy the utility functions for each client type.
 
@@ -77,28 +76,29 @@ Create a `utils/supabase` folder with a file for each type of client. Then copy 
   size="medium"
   className="text-foreground-light mt-8 mb-6"
 >
-  <div className="border-b pb-3">
+  <div className="border-b mt-3 pb-3">
     <Accordion.Item
-      header={<span className="text-foreground">Why do I need so many types of clients?</span>}
-      id="nextjs-clients"
+      header={<span className="text-foreground">What does the `cookies` object do?</span>}
+      id="utility-cookies"
     >
-     
-      A Supabase client reads and sets cookies in order to access and update the user session. Depending on where the client is used, it needs to interact with cookies in a different way:
 
-      - **Client Component** - Only reads cookies and doesn't set them. Accesses the cookies from browser storage. Behind the scenes, `createBrowserClient` reuses the same client instance if called multiple times, so don't worry about deduplicating the client yourself.
-      - **Server Component** - Only reads cookies and doesn't set them. (This limitation is set by Next.js, which doesn't allow cookies to be updated from a Server Component.) Accesses the cookies via the Next.js `cookies()` API, which reads the cookies from the request. Server clients should always be created afresh each time, because they need the cookies from the request.
-      - **Server Action or Route Handler** - Reads cookies and sets them. Accesses the cookies via the Next.js `cookies()` API, which reads the cookies from the request. Server Action clients should always be created afresh each time, because they need the cookies from the request.
+    The cookies object lets the Supabase client know how to access the cookies, so it can read and write the user session data. To make `@supabase/ssr` framework-agnostic, the cookies methods aren't hard-coded. These utility functions adapt `@supabase/ssr`'s cookie handling for Next.js.
+
+    The `set` and `remove` methods for the server client need error handlers, because Next.js throws an error if cookies are set from Server Components. You can safely ignore this error because you'll set up middleware in the next step to write refreshed cookies to storage.
 
     </Accordion.Item>
 
   </div>
   <div className="border-b mt-3 pb-3">
     <Accordion.Item
-      header={<span className="text-foreground">What does the `cookies` object do?</span>}
-      id="client-storage-cookies"
+      header={<span className="text-foreground">Do I need to create a new client for every route?</span>}
+      id="client-deduplication"
     >
 
-    The cookies object lets the Supabase client know how to access the cookies, so it can read and write the user session data. To make `@supabase/ssr` framework-agnostic, the cookies methods aren't hard-coded. But you only need to set them up once. You can then reuse your utility functions whenever you need a Supabase client.
+        Yes! Creating a Supabase client is lightweight.
+
+        - On the server, it basically configures a `fetch` call. You need to reconfigure the fetch call anew for every request to your server, because you need the cookies from the request.
+        - On the client, `createBrowserClient` already uses a singleton pattern, so you only ever create one instance, no matter how many times you call your `createClient` function.
 
     </Accordion.Item>
 
@@ -123,27 +123,8 @@ export function createClient() {
 ```
 
 ```ts utils/supabase/server.ts
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
-
-export function createClient(cookieStore: ReturnType<typeof cookies>) {
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value
-        },
-      },
-    }
-  )
-}
-```
-
-```ts utils/supabase/actions.ts
-import { type CookieOptions, createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { type cookies } from 'next/headers'
 
 export function createClient(cookieStore: ReturnType<typeof cookies>) {
   return createServerClient(
@@ -155,10 +136,22 @@ export function createClient(cookieStore: ReturnType<typeof cookies>) {
           return cookieStore.get(name)?.value
         },
         set(name: string, value: string, options: CookieOptions) {
-          cookieStore.set({ name, value, ...options })
+          try {
+            cookieStore.set({ name, value, ...options })
+          } catch (error) {
+            // The `set` method was called from a Server Component.
+            // This can be ignored if you have middleware refreshing
+            // user sessions.
+          }
         },
         remove(name: string, options: CookieOptions) {
-          cookieStore.set({ name, value: '', ...options })
+          try {
+            cookieStore.set({ name, value: '', ...options })
+          } catch (error) {
+            // The `delete` method was called from a Server Component.
+            // This can be ignored if you have middleware refreshing
+            // user sessions.
+          }
         },
       },
     }
@@ -178,7 +171,15 @@ export function createClient(cookieStore: ReturnType<typeof cookies>) {
 
 Create a `middleware.ts` file at the root of your project.
 
-Since Server Components can't write cookies, you need middleware to refresh expired Auth tokens and store them. Copy the code to refresh the Auth token whenever it's expired.
+Since Server Components can't write cookies, you need middleware to refresh expired Auth tokens and store them.
+
+The middleware is responsible for:
+
+1. Refreshing the Auth token (by calling `supabase.auth.getUser`).
+1. Passing the refreshed Auth token to Server Components, so they don't attempt to refresh the same token themselves. This is accomplished with `request.cookies.set`.
+1. Passing the refreshed Auth token to the browser, so it replaces the old token. This is accomplished with `response.cookies.set`.
+
+Copy the middleware code for your app.
 
 Add a [matcher](https://nextjs.org/docs/app/building-your-application/routing/middleware#matching-paths) so the middleware doesn't run on routes that don't access Supabase.
 
@@ -284,7 +285,15 @@ export const config = {
 
 Create a login page for your app. Use a Server Action to call the Supabase signup function.
 
-Since Supabase is being called from an Action, use the client defined in `@/utils/supabase/actions.ts`.
+Since Supabase is being called from an Action, use the client defined in `@/utils/supabase/server.ts`.
+
+<Admonition type="note">
+
+Note that `cookies` is called before any calls to Supabase, which opts fetch calls out of Next.js's caching. This is important for authenticated data fetches, to ensure that users get access only to their own data.
+
+See the Next.js docs to learn more about [opting out of data caching](https://nextjs.org/docs/app/building-your-application/data-fetching/fetching-caching-and-revalidating#opting-out-of-data-caching).
+
+</Admonition>
 
 </StepHikeCompact.Details>
 
@@ -316,7 +325,7 @@ import { revalidatePath } from 'next/cache'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
-import { createClient } from '@/utils/supabase/actions'
+import { createClient } from '@/utils/supabase/server'
 
 export async function login(formData: FormData) {
   const cookieStore = cookies()
@@ -393,7 +402,7 @@ Go to the [Auth templates](https://supabase.com/dashboard/project/_/auth/templat
 
 Create a Route Handler for `auth/callback`. When a user clicks their confirmation email link, exchange their secure code for an Auth token.
 
-Since this is a Router Handler, use the Supabase client from `@/utils/supabase/actions.ts`.
+Since this is a Router Handler, use the Supabase client from `@/utils/supabase/server.ts`.
 
 </StepHikeCompact.Details>
 
@@ -404,7 +413,7 @@ import { type EmailOtpType } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { type NextRequest, NextResponse } from 'next/server'
 
-import { createClient } from '@/utils/supabase/actions'
+import { createClient } from '@/utils/supabase/server'
 
 export async function GET(request: NextRequest) {
   const cookieStore = cookies()
@@ -497,14 +506,14 @@ export default async function PrivatePage() {
 
 You're done! To recap, you've successfully:
 
-- Called Supabase from a Server Action
-- Called Supabase from a Server Component
-- Set up a Supabase client utility to call Supabase from a Client Component
-- Set up middleware to automatically refresh the Supabase Auth session
+- Called Supabase from a Server Action.
+- Called Supabase from a Server Component.
+- Set up a Supabase client utility to call Supabase from a Client Component. You can use this if you need to call Supabase from a Client Component, for example to set up a realtime subscription.
+- Set up middleware to automatically refresh the Supabase Auth session.
 
 You can now use any Supabase features from your client or server code!
 
-## FAQ
+## Troubleshooting
 
 <Accordion
   type="default"
@@ -516,18 +525,12 @@ You can now use any Supabase features from your client or server code!
 >
   <div className="border-b pb-3">
     <Accordion.Item
-      header={<span className="text-foreground">Which type of Supabase client should I use?</span>}
-      id="choosing-client"
+      header={<span className="text-foreground">Getting the error <code>DynamicServerError: Dynamic server usage: cookies</code></span>}
+      id="troubleshooting-error-dynamic-cookies"
     >
-      In this tutorial, you wrote functions to create 3 different types of Supabase client: client, server, and action. Choose which one to use based on where your code is located:
+        This means Next.js has failed to detect that the route is dynamic until the `cookies` function is called. To fix this, make sure you call the `cookies` function directly in your Server Component, instead of abstracting it out.
 
-      | Code location | Type of Supabase client |
-      | - | - |
-      | Client Component | Client |
-      | Server Component | Server |
-      | Server Action | Action |
-      | Route Handler | Action |
-
+        Alternatively, you can mark the route as dynamic using `export const dynamic = 'force-dynamic'`.
     </Accordion.Item>
 
   </div>
