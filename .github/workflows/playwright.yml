@@ -33,6 +33,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
       - uses: supabase/setup-cli@v1
+      - name: Save the Supabase CLI version
         run: echo "CLI_VERSION=$(supabase -v)" >> $GITHUB_OUTPUT
         id: version
       - name: Cache Docker images
