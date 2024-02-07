@@ -260,16 +260,13 @@ const LogTable = ({
 
   return (
     <>
-      <section
-        className={'flex w-full flex-col ' + (!queryType ? 'shadow-lg' : '')}
-        style={{ maxHeight }}
-      >
+      <section className={'flex w-full flex-col ' + (!queryType ? '' : '')} style={{ maxHeight }}>
         {!queryType && <LogsExplorerTableHeader />}
-        <div className={`flex h-full flex-row ${!queryType ? 'border-l border-r' : ''}`}>
+        <div className={`flex flex-row ${!queryType ? 'border-l border-r' : ''}`}>
           <DataGrid
             style={{ height: '100%' }}
             className={`
-            flex-1 flex-grow
+            flex-1 flex-grow h-full
             ${!queryType ? 'data-grid--logs-explorer' : ' data-grid--simple-logs'}
           `}
             rowHeight={40}
