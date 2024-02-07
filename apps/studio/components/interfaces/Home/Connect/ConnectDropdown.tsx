@@ -1,5 +1,5 @@
 import { Box, Check, ChevronDown } from 'lucide-react'
-import ConnectionIcon from './ConnectionIcon'
+import { useState } from 'react'
 import {
   Button,
   CommandInput_Shadcn_,
@@ -11,10 +11,9 @@ import {
   Popover_Shadcn_,
   cn,
 } from 'ui'
+import ConnectionIcon from './ConnectionIcon'
 
 interface ConnectDropdownProps {
-  open: boolean
-  setOpen: (open: boolean) => void
   state: string
   updateState: (state: string) => void
   label: string
@@ -25,10 +24,11 @@ const ConnectDropdown = ({
   state,
   updateState,
   label,
-  open,
-  setOpen,
+
   items,
 }: ConnectDropdownProps) => {
+  const [open, setOpen] = useState(false)
+
   function onSelectLib(key: string) {
     updateState(key)
     setOpen(false)
@@ -40,20 +40,18 @@ const ConnectDropdown = ({
     <>
       <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
         <div className="flex ">
-          <span className="flex items-center text-foreground-light bg-surface-100 px-3 rounded-lg rounded-r-none text-sm border border-button border-r-0">
+          <span className="flex items-center text-foreground-muted px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
             {label}
           </span>
           <PopoverTrigger_Shadcn_ asChild>
-            <Button size="medium" type="default" className=" gap-0 rounded-l-none">
-              <div className="flex items-center gap-1">
-                <span className="text-xs text-foreground-light flex items-center gap-2  pl-1">
-                  {selectedItem?.icon ? (
-                    <ConnectionIcon connection={selectedItem.icon} />
-                  ) : (
-                    <Box size={12} />
-                  )}
-                  {selectedItem?.label}
-                </span>
+            <Button size="small" type="default" className="gap-0 rounded-l-none">
+              <div className="flex items-center gap-2">
+                {selectedItem?.icon ? (
+                  <ConnectionIcon connection={selectedItem.icon} />
+                ) : (
+                  <Box size={12} />
+                )}
+                {selectedItem?.label}
                 <ChevronDown className="text-muted" strokeWidth={1} size={12} />
               </div>
             </Button>

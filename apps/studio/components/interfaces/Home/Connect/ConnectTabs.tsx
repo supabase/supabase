@@ -33,9 +33,9 @@ const ConnectTabTrigger = ({ value }: ConnectTabTriggerProps) => {
   return (
     <TabsTrigger_Shadcn_
       value={value}
-      className="flex items-center gap-1 text-xs p-2 py-3 data-[state=active]:bg-transparent"
+      className="flex items-center gap-1 text-xs px-0 data-[state=active]:bg-transparent py-2.5"
     >
-      <FileJson2 size={15} className="text-lighter" />
+      <FileJson2 size={15} className="text-foreground-muted" />
       {value}
     </TabsTrigger_Shadcn_>
   )
@@ -43,7 +43,7 @@ const ConnectTabTrigger = ({ value }: ConnectTabTriggerProps) => {
 
 const ConnectTabTriggers = ({ children }: ConnectTabTriggersProps) => {
   return (
-    <TabsList_Shadcn_ className="bg-surface-100 px-1.5 rounded-lg rounded-b-none">
+    <TabsList_Shadcn_ className="bg-surface-100 px-5 rounded-lg rounded-b-none gap-5">
       {children}
     </TabsList_Shadcn_>
   )
