@@ -5,8 +5,6 @@ import {
   Button,
   DialogContent_Shadcn_,
   DialogDescription_Shadcn_,
-  DialogFooter_Shadcn_,
-  DialogClose_Shadcn_,
   DialogHeader_Shadcn_,
   DialogTitle_Shadcn_,
   DialogTrigger_Shadcn_,
