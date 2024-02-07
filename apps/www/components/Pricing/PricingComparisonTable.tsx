@@ -69,7 +69,10 @@ const PricingComparisonTable = () => {
   }
 
   return (
-    <div className="sm:pb-18 container relative mx-auto px-4 pb-16 md:pb-16 lg:px-16 xl:px-20">
+    <div
+      id="compare-plans"
+      className="sm:pb-18 container relative mx-auto px-4 pb-16 md:pb-16 lg:px-16 xl:px-20"
+    >
       {/* <!-- xs to lg --> */}
       <div className="lg:hidden">
         {/* Free - Mobile  */}
