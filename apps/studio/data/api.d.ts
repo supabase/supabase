@@ -466,8 +466,8 @@ export interface paths {
     put: operations['ContentController_updateWholeContent']
     /** Creates project's content */
     post: operations['ContentController_createContent']
-    /** Deletes project's content */
-    delete: operations['ContentController_deleteContent']
+    /** Deletes project's contents */
+    delete: operations['ContentController_deleteContents']
     /** Updates project's content */
     patch: operations['ContentController_updateContent']
   }
@@ -490,6 +490,10 @@ export interface paths {
   '/platform/projects/{ref}/live': {
     /** Gets project health check */
     get: operations['HealthCheckController_projectHealthCheck']
+  }
+  '/platform/projects/{ref}/load-balancers': {
+    /** Gets non-removed databases of a specified project */
+    get: operations['LoadBalancersController_getLoadBalancers']
   }
   '/platform/projects/{ref}/api/rest': {
     /** Gets project OpenApi */
@@ -585,6 +589,10 @@ export interface paths {
     /** Updates project's pgbouncer config */
     patch: operations['PgbouncerConfigController_updatePgbouncerConfig']
   }
+  '/platform/projects/{ref}/config/pgbouncer/status': {
+    /** Gets project's pgbouncer status */
+    get: operations['PgbouncerConfigController_getPgbouncerStatus']
+  }
   '/platform/projects/{ref}/config/postgrest': {
     /** Gets project's postgrest config */
     get: operations['PostgrestConfigController_getPostgRESTConfig']
@@ -606,6 +614,12 @@ export interface paths {
     get: operations['StorageConfigController_getConfig']
     /** Updates project's storage config */
     patch: operations['StorageConfigController_updateConfig']
+  }
+  '/platform/projects/{ref}/config/supavisor': {
+    /** Gets project's supavisor config */
+    get: operations['SupavisorConfigController_getSupavisorConfig']
+    /** Updates project's supavisor config */
+    patch: operations['SupavisorConfigController_updateSupavisorConfig']
   }
   '/platform/projects/{ref}/billing/addons': {
     /** Gets project addons */
@@ -782,27 +796,13 @@ export interface paths {
     /** Updates a Vercel connection for a supabase project */
     patch: operations['VercelConnectionsController_updateVercelConnection']
   }
-  '/platform/integrations/github': {
-    /** Create github integration */
-    post: operations['GitHubIntegrationController_createGitHubIntegration']
-  }
   '/platform/integrations/github/authorization': {
     /** Create GitHub authorization */
-    post: operations['GitHubIntegrationController_createGitHubAuthorization']
-  }
-  '/platform/integrations/github/repositories': {
-    /** Gets GitHub repositories for user */
-    get: operations['GitHubIntegrationController_listRepositories']
-  }
-  '/platform/integrations/github/connections/{organization_integration_id}': {
-    /** Gets installed github project connections for the given organization integration */
-    get: operations['GitHubConnectionsController_getGitHubConnections']
-  }
-  '/platform/integrations/github/connections/organization/{organization_id}': {
-    /** List organization GitHub connections */
-    get: operations['GitHubConnectionsController_listOrganizationGitHubConnections']
+    post: operations['GitHubAuthorizationsController_createGitHubAuthorization']
   }
   '/platform/integrations/github/connections': {
+    /** List organization GitHub connections */
+    get: operations['GitHubConnectionsController_listOrganizationGitHubConnections']
     /** Connects a GitHub project to a supabase project */
     post: operations['GitHubConnectionsController_createGitHubConnection']
   }
@@ -812,41 +812,25 @@ export interface paths {
     /** Updates a GitHub connection for a supabase project */
     patch: operations['GitHubConnectionsController_updateGitHubConnection']
   }
-  '/platform/integrations/github/repos/{organization_integration_id}': {
-    /** Gets github repos for the given organization */
-    get: operations['GitHubRepoController_getRepos']
-  }
-  '/platform/integrations/github/branches/{organization_integration_id}/{repo_owner}/{repo_name}': {
-    /** Gets github branches for a given repo */
-    get: operations['GitHubBranchController_getBranches']
-  }
-  '/platform/integrations/github/branches/{organization_integration_id}/{repo_owner}/{repo_name}/{branch_name}': {
-    /** Gets a specific github branch for a given repo */
-    get: operations['GitHubBranchController_getBranchByName']
-  }
   '/platform/integrations/github/branches/{connectionId}': {
     /** List GitHub connection branches */
-    get: operations['GitHubBranchController_listConnectionBranches']
+    get: operations['GitHubBranchesController_listConnectionBranches']
   }
   '/platform/integrations/github/branches/{connectionId}/{branchName}': {
     /** Get GitHub connection branch */
-    get: operations['GitHubBranchController_getConnectionBranch']
-  }
-  '/platform/integrations/github/pull-requests/{organization_integration_id}/{repo_owner}/{repo_name}': {
-    /** Gets github pull requests for a given repo */
-    get: operations['GitHubPullRequestController_getPullRequestsByNumber']
-  }
-  '/platform/integrations/github/pull-requests/{organization_integration_id}/{repo_owner}/{repo_name}/{target}': {
-    /** Gets github pull requests for a given repo */
-    get: operations['GitHubPullRequestController_getPullRequests']
+    get: operations['GitHubBranchesController_getConnectionBranch']
   }
   '/platform/integrations/github/pull-requests/{connectionId}': {
     /** List GitHub connection pull requests */
-    get: operations['GitHubPullRequestController_getConnectionPullRequests']
+    get: operations['GitHubPullRequestsController_getConnectionPullRequests']
   }
   '/platform/integrations/github/pull-requests/{connectionId}/{branchName}': {
     /** List GitHub pull requests for a specific branch */
-    get: operations['GitHubPullRequestController_validateConnectionBranch']
+    get: operations['GitHubPullRequestsController_validateConnectionBranch']
+  }
+  '/platform/integrations/github/repositories': {
+    /** Gets GitHub repositories for user */
+    get: operations['GitHubRepositoriesController_listRepositories']
   }
   '/platform/cli/login': {
     /** Create CLI login session */
@@ -1254,8 +1238,8 @@ export interface paths {
     put: operations['ContentController_updateWholeContent']
     /** Creates project's content */
     post: operations['ContentController_createContent']
-    /** Deletes project's content */
-    delete: operations['ContentController_deleteContent']
+    /** Deletes project's contents */
+    delete: operations['ContentController_deleteContents']
     /** Updates project's content */
     patch: operations['ContentController_updateContent']
   }
@@ -1274,6 +1258,10 @@ export interface paths {
   '/v0/projects/{ref}/live': {
     /** Gets project health check */
     get: operations['HealthCheckController_projectHealthCheck']
+  }
+  '/v0/projects/{ref}/load-balancers': {
+    /** Gets non-removed databases of a specified project */
+    get: operations['LoadBalancersController_getLoadBalancers']
   }
   '/v0/projects/{ref}/api/rest': {
     /** Gets project OpenApi */
@@ -1353,6 +1341,10 @@ export interface paths {
     /** Updates project's pgbouncer config */
     patch: operations['PgbouncerConfigController_updatePgbouncerConfig']
   }
+  '/v0/projects/{ref}/config/pgbouncer/status': {
+    /** Gets project's pgbouncer status */
+    get: operations['PgbouncerConfigController_getPgbouncerStatus']
+  }
   '/v0/projects/{ref}/config/postgrest': {
     /** Gets project's postgrest config */
     get: operations['PostgrestConfigController_getPostgRESTConfig']
@@ -1374,6 +1366,12 @@ export interface paths {
     get: operations['StorageConfigController_getConfig']
     /** Updates project's storage config */
     patch: operations['StorageConfigController_updateConfig']
+  }
+  '/v0/projects/{ref}/config/supavisor': {
+    /** Gets project's supavisor config */
+    get: operations['SupavisorConfigController_getSupavisorConfig']
+    /** Updates project's supavisor config */
+    patch: operations['SupavisorConfigController_updateSupavisorConfig']
   }
   '/v0/projects/{ref}/billing/addons': {
     /** Gets project addons */
@@ -2425,8 +2423,8 @@ export interface components {
       id: number
       slug: string
       name: string
-      billing_email: string
-      stripe_customer_id: string
+      billing_email?: string
+      stripe_customer_id?: string
       opt_in_tags: string[]
     }
     CustomerResponse: {
@@ -3057,7 +3055,7 @@ export interface components {
       /** @enum {string} */
       behavior: 'VOLATILE' | 'STABLE' | 'IMMUTABLE'
       security_definer: boolean
-      config_params: Record<string, unknown> | null
+      config_params: unknown
     }
     CreateFunctionBody: {
       slug: string
@@ -3480,7 +3478,7 @@ export interface components {
         | 'tenant:Sql:Write:Update'
         | 'write:Update'
       )[]
-      condition: Record<string, unknown> | null
+      condition: unknown
       organization_id: number
       resources: string[]
     }
@@ -3517,7 +3515,21 @@ export interface components {
       first_name: string
       last_name: string
     }
+    /** @enum {string} */
+    DbInstanceSize:
+      | 'nano'
+      | 'micro'
+      | 'small'
+      | 'medium'
+      | 'large'
+      | 'xlarge'
+      | '2xlarge'
+      | '4xlarge'
+      | '8xlarge'
+      | '12xlarge'
+      | '16xlarge'
     ProjectInfo: {
+      infra_compute_size?: components['schemas']['DbInstanceSize']
       cloud_provider: string
       id: number
       inserted_at: string
@@ -3531,19 +3543,6 @@ export interface components {
       is_read_replicas_enabled: boolean
       preview_branch_refs: string[]
       disk_volume_size_gb?: number
-      /** @enum {string} */
-      infra_compute_size?:
-        | 'nano'
-        | 'micro'
-        | 'small'
-        | 'medium'
-        | 'large'
-        | 'xlarge'
-        | '2xlarge'
-        | '4xlarge'
-        | '8xlarge'
-        | '12xlarge'
-        | '16xlarge'
     }
     GetProjectByFlyExtensionIdResponse: {
       ref: string
@@ -3593,6 +3592,7 @@ export interface components {
       kps_enabled?: boolean
     }
     CreateProjectResponse: {
+      infra_compute_size?: components['schemas']['DbInstanceSize']
       cloud_provider: string
       id: number
       inserted_at: string
@@ -3606,19 +3606,6 @@ export interface components {
       is_read_replicas_enabled: boolean
       preview_branch_refs: string[]
       disk_volume_size_gb?: number
-      /** @enum {string} */
-      infra_compute_size?:
-        | 'nano'
-        | 'micro'
-        | 'small'
-        | 'medium'
-        | 'large'
-        | 'xlarge'
-        | '2xlarge'
-        | '4xlarge'
-        | '8xlarge'
-        | '12xlarge'
-        | '16xlarge'
       endpoint: string
       anon_key: string
       service_key: string
@@ -3692,6 +3679,9 @@ export interface components {
       content?: Record<string, never>
       owner_id?: number
     }
+    BulkDeleteUserContentResponse: {
+      id: string
+    }
     DatabaseDetailResponse: {
       /** @enum {string} */
       status:
@@ -3734,6 +3724,16 @@ export interface components {
     UpdatePasswordBody: {
       password: string
     }
+    Database: {
+      identifier: string
+      /** @enum {string} */
+      type: 'PRIMARY' | 'READ_REPLICA'
+      status: string
+    }
+    LoadBalancerDetailResponse: {
+      endpoint: string
+      databases: components['schemas']['Database'][]
+    }
     Buffer: Record<string, never>
     ResizeBody: {
       volume_size_gb: number
@@ -3744,6 +3744,7 @@ export interface components {
       'supabase-postgres': string
     }
     ProjectDetailResponse: {
+      infra_compute_size?: components['schemas']['DbInstanceSize']
       cloud_provider: string
       db_host: string
       id: number
@@ -3839,7 +3840,7 @@ export interface components {
       db_name: string
       db_user: string
       db_port: string
-      db_ssl: boolean
+      ssl_enforced: boolean
       cloud_provider: string
       region: string
       app_config?: components['schemas']['ProjectAppConfigResponse']
@@ -3914,12 +3915,15 @@ export interface components {
       db_host: string
       db_port: number
       db_name: string
-      db_ssl: boolean
+      ssl_enforced: boolean
       pgbouncer_enabled: boolean
       supavisor_enabled: boolean
       /** @enum {string} */
       pgbouncer_status: 'COMING_DOWN' | 'COMING_UP' | 'DISABLED' | 'ENABLED' | 'RELOADING'
       connectionString: string
+    }
+    PgbouncerStatusResponse: {
+      active: boolean
     }
     UpdatePgbouncerConfigBody: {
       default_pool_size?: number
@@ -3995,6 +3999,31 @@ export interface components {
     }
     UpdateStorageConfigResponse: {
       fileSizeLimit: number
+    }
+    SupavisorConfigResponse: {
+      identifier: string
+      /** @enum {string} */
+      database_type: 'PRIMARY' | 'READ_REPLICA'
+      is_using_scram_auth: boolean
+      db_user: string
+      db_host: string
+      db_port: number
+      db_name: string
+      connectionString: string
+      default_pool_size: number | null
+      max_client_conn: number | null
+      /** @enum {string|null} */
+      pool_mode: 'transaction' | 'session' | 'statement' | null
+    }
+    UpdateSupavisorConfigBody: {
+      default_pool_size?: number
+      /** @enum {string} */
+      pool_mode: 'transaction' | 'session' | 'statement'
+    }
+    UpdateSupavisorConfigResponse: {
+      default_pool_size?: number
+      /** @enum {string} */
+      pool_mode: 'transaction' | 'session' | 'statement'
     }
     AvailableAddonResponse: {
       type: components['schemas']['ProjectAddonType']
@@ -4389,21 +4418,33 @@ export interface components {
     DeleteVercelConnectionResponse: {
       id: string
     }
-    CreateGitHubIntegrationBody: {
+    CreateGitHubAuthorizationBody: Record<string, never>
+    ListGitHubConnectionsProject: {
+      id: number
+      ref: string
+      name: string
+    }
+    ListGitHubConnectionsRepository: {
+      id: number
+      name: string
+    }
+    ListGitHubConnectionsUser: {
+      id: number
+      username: string
+      primary_email: string | null
+    }
+    ListGitHubConnectionsConnection: {
+      id: number
+      updated_at: string
       installation_id: number
-      organization_slug: string
-      metadata: Record<string, never>
+      project: components['schemas']['ListGitHubConnectionsProject']
+      repository: components['schemas']['ListGitHubConnectionsRepository']
+      user: components['schemas']['ListGitHubConnectionsUser'] | null
     }
-    CreateGitHubAuthorizationBody: {
-      code: string
+    ListGitHubConnectionsResponse: {
+      connections: components['schemas']['ListGitHubConnectionsConnection'][]
     }
-    CreateGitHubConnectionsBody: {
-      organization_integration_id: string
-      connection: components['schemas']['IntegrationConnection']
-    }
-    UpdateGitHubConnectionsBody: {
-      metadata: Record<string, never>
-    }
+    Function: Record<string, never>
     CreateCliLoginSessionBody: {
       session_id: string
       public_key: string
@@ -8563,20 +8604,24 @@ export interface operations {
       }
     }
   }
-  /** Deletes project's content */
-  ContentController_deleteContent: {
+  /** Deletes project's contents */
+  ContentController_deleteContents: {
     parameters: {
       query: {
-        id: string
+        ids: string[]
+      }
+      path: {
+        /** @description Project ref */
+        ref: string
       }
     }
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['UserContentObject']
+          'application/json': components['schemas']['BulkDeleteUserContentResponse'][]
         }
       }
-      /** @description Failed to delete project's content */
+      /** @description Failed to delete project's contents */
       500: {
         content: never
       }
@@ -8712,6 +8757,22 @@ export interface operations {
       /** @description Failed to get project health check */
       500: {
         content: never
+      }
+    }
+  }
+  /** Gets non-removed databases of a specified project */
+  LoadBalancersController_getLoadBalancers: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['LoadBalancerDetailResponse'][]
+        }
       }
     }
   }
@@ -9272,6 +9333,26 @@ export interface operations {
       }
     }
   }
+  /** Gets project's pgbouncer status */
+  PgbouncerConfigController_getPgbouncerStatus: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['PgbouncerStatusResponse']
+        }
+      }
+      /** @description Failed to retrieve project's pgbouncer status */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Gets project's postgrest config */
   PostgrestConfigController_getPostgRESTConfig: {
     parameters: {
@@ -9439,6 +9520,54 @@ export interface operations {
         content: never
       }
       /** @description Failed to update project's storage config */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets project's supavisor config */
+  SupavisorConfigController_getSupavisorConfig: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['SupavisorConfigResponse'][]
+        }
+      }
+      /** @description Failed to retrieve project's supavisor config */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Updates project's supavisor config */
+  SupavisorConfigController_updateSupavisorConfig: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateSupavisorConfigBody']
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['UpdateSupavisorConfigResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to update project's supavisor config */
       500: {
         content: never
       }
@@ -10429,25 +10558,8 @@ export interface operations {
       }
     }
   }
-  /** Create github integration */
-  GitHubIntegrationController_createGitHubIntegration: {
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateGitHubIntegrationBody']
-      }
-    }
-    responses: {
-      201: {
-        content: never
-      }
-      /** @description Failed to create github integration */
-      500: {
-        content: never
-      }
-    }
-  }
   /** Create GitHub authorization */
-  GitHubIntegrationController_createGitHubAuthorization: {
+  GitHubAuthorizationsController_createGitHubAuthorization: {
     requestBody: {
       content: {
         'application/json': components['schemas']['CreateGitHubAuthorizationBody']
@@ -10465,47 +10577,13 @@ export interface operations {
       }
     }
   }
-  /** Gets GitHub repositories for user */
-  GitHubIntegrationController_listRepositories: {
-    responses: {
-      200: {
-        content: never
-      }
-      /** @description Failed to get GitHub repositories for user */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Gets installed github project connections for the given organization integration */
-  GitHubConnectionsController_getGitHubConnections: {
-    parameters: {
-      path: {
-        organization_integration_id: string
-      }
-    }
+  /** List organization GitHub connections */
+  GitHubConnectionsController_listOrganizationGitHubConnections: {
     responses: {
       200: {
         content: {
-          'application/json': Record<string, never>[]
+          'application/json': components['schemas']['ListGitHubConnectionsResponse']
         }
-      }
-      /** @description Failed to get installed github connections for the given organization integration */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** List organization GitHub connections */
-  GitHubConnectionsController_listOrganizationGitHubConnections: {
-    parameters: {
-      path: {
-        organization_id: number
-      }
-    }
-    responses: {
-      200: {
-        content: never
       }
       /** @description Failed to list organization GitHub connections */
       500: {
@@ -10517,7 +10595,7 @@ export interface operations {
   GitHubConnectionsController_createGitHubConnection: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['CreateGitHubConnectionsBody']
+        'application/json': components['schemas']['Function']
       }
     }
     responses: {
@@ -10538,7 +10616,7 @@ export interface operations {
       }
     }
     responses: {
-      200: {
+      204: {
         content: never
       }
       /** @description Failed to delete github integration project connection */
@@ -10556,7 +10634,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateGitHubConnectionsBody']
+        'application/json': components['schemas']['Function']
       }
     }
     responses: {
@@ -10569,76 +10647,8 @@ export interface operations {
       }
     }
   }
-  /** Gets github repos for the given organization */
-  GitHubRepoController_getRepos: {
-    parameters: {
-      query?: {
-        per_page?: number
-        page?: number
-      }
-      path: {
-        organization_integration_id: string
-      }
-    }
-    responses: {
-      200: {
-        content: never
-      }
-      /** @description Failed to get github repos for the given organization */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Gets github branches for a given repo */
-  GitHubBranchController_getBranches: {
-    parameters: {
-      query?: {
-        per_page?: number
-        page?: number
-      }
-      path: {
-        organization_integration_id: string
-        repo_owner: string
-        repo_name: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>[]
-        }
-      }
-      /** @description Failed to get github branches for a given repo */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Gets a specific github branch for a given repo */
-  GitHubBranchController_getBranchByName: {
-    parameters: {
-      path: {
-        organization_integration_id: string
-        repo_owner: string
-        repo_name: string
-        branch_name: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>
-        }
-      }
-      /** @description Failed to get github branch for a given repo */
-      500: {
-        content: never
-      }
-    }
-  }
   /** List GitHub connection branches */
-  GitHubBranchController_listConnectionBranches: {
+  GitHubBranchesController_listConnectionBranches: {
     parameters: {
       query?: {
         per_page?: number
@@ -10661,7 +10671,7 @@ export interface operations {
     }
   }
   /** Get GitHub connection branch */
-  GitHubBranchController_getConnectionBranch: {
+  GitHubBranchesController_getConnectionBranch: {
     parameters: {
       path: {
         connectionId: number
@@ -10680,58 +10690,8 @@ export interface operations {
       }
     }
   }
-  /** Gets github pull requests for a given repo */
-  GitHubPullRequestController_getPullRequestsByNumber: {
-    parameters: {
-      query: {
-        pr_number: number[]
-      }
-      path: {
-        organization_integration_id: string
-        repo_owner: string
-        repo_name: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>[]
-        }
-      }
-      /** @description Failed to get github pull requests for a given repo */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Gets github pull requests for a given repo */
-  GitHubPullRequestController_getPullRequests: {
-    parameters: {
-      query?: {
-        per_page?: number
-        page?: number
-      }
-      path: {
-        organization_integration_id: string
-        repo_owner: string
-        repo_name: string
-        target: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>[]
-        }
-      }
-      /** @description Failed to get github pull requests for a given repo */
-      500: {
-        content: never
-      }
-    }
-  }
   /** List GitHub connection pull requests */
-  GitHubPullRequestController_getConnectionPullRequests: {
+  GitHubPullRequestsController_getConnectionPullRequests: {
     parameters: {
       query: {
         pr_number: number[]
@@ -10753,7 +10713,7 @@ export interface operations {
     }
   }
   /** List GitHub pull requests for a specific branch */
-  GitHubPullRequestController_validateConnectionBranch: {
+  GitHubPullRequestsController_validateConnectionBranch: {
     parameters: {
       query?: {
         per_page?: number
@@ -10771,6 +10731,18 @@ export interface operations {
         }
       }
       /** @description Failed to validate GitHub connection branch */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets GitHub repositories for user */
+  GitHubRepositoriesController_listRepositories: {
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to get GitHub repositories for user */
       500: {
         content: never
       }
@@ -11295,11 +11267,6 @@ export interface operations {
         'x-vercel-signature': string
       }
     }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['Buffer']
-      }
-    }
     responses: {
       201: {
         content: never
@@ -11317,11 +11284,6 @@ export interface operations {
         'x-github-delivery': string
         'x-github-event': string
         'x-hub-signature-256': string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['Buffer']
       }
     }
     responses: {
