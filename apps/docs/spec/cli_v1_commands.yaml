@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.131.5
+  version: 1.142.1
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -150,6 +150,15 @@ commands:
         name: --project-ref <string>
         description: Project ref of the Supabase project.
         default_value: ''
+  - id: supabase-unlink
+    title: supabase unlink
+    summary: Unlink a Supabase project
+    tags:
+      - local-dev
+    links: []
+    usage: supabase unlink
+    subcommands: []
+    flags: []
   - id: supabase-test
     title: supabase test
     summary: Run tests on local Supabase containers
@@ -287,6 +296,18 @@ commands:
     usage: supabase storage cp <src> <dst> [flags]
     subcommands: []
     flags:
+      - id: cache-control
+        name: --cache-control <string>
+        description: Custom Cache-Control header for HTTP upload.
+        default_value: max-age=3600
+      - id: content-type
+        name: --content-type <string>
+        description: Custom Content-Type header for HTTP upload.
+        default_value: auto-detect
+      - id: jobs
+        name: -j, --jobs <uint>
+        description: Maximum number of parallel jobs.
+        default_value: '1'
       - id: recursive
         name: -r, --recursive
         description: Recursively copy a directory.
@@ -1386,7 +1407,7 @@ commands:
           Repaired migration history: 20230222032233 => applied
     tags: []
     links: []
-    usage: supabase migration repair <version> [flags]
+    usage: supabase migration repair [version] ... [flags]
     subcommands: []
     flags:
       - id: db-url
@@ -2362,6 +2383,11 @@ commands:
         name: --local
         description: Generate types from the local dev database.
         default_value: 'false'
+      - id: postgrest-v9-compat
+        name: --postgrest-v9-compat
+        description: |
+          Generate types compatible with PostgREST v9 and below. Only use together with --db-url.
+        default_value: 'false'
       - id: project-id
         name: --project-id <string>
         description: Generate types from a project ID.
@@ -2960,6 +2986,10 @@ commands:
         name: --dry-run
         description: Prints the pg_dump script that would be executed.
         default_value: 'false'
+      - id: exclude
+        name: -x, --exclude <strings>
+        description: List of schema.tables to exclude from data-only dump.
+        default_value: '[]'
       - id: file
         name: -f, --file <string>
         description: File path to save the dumped contents.

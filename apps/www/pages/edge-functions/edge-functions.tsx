@@ -21,7 +21,7 @@ const featureBlocks = [
   },
   {
     title: 'Global',
-    description: 'Deployed to 29 regions worldwide',
+    description: 'Deploy worldwide for maximum resiliency and low latency',
     highlightLines: '8',
     icon: <IconGlobe strokeWidth={1.5} />,
   },

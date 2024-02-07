@@ -34,7 +34,7 @@
     "@tanstack/react-query": "^5.13.4",
     "common": "*",
     "config": "*",
-    "framer-motion": "^6.5.1",
+    "framer-motion": "^11.0.3",
     "github-slugger": "^2.0.0",
     "gray-matter": "^4.0.3",
     "hast-util-has-property": "^2.0.1",
