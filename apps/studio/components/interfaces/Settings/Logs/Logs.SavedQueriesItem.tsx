@@ -44,7 +44,7 @@ const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
         console.error('Invalid project reference')
         return
       }
-      await deleteContent({ projectRef: ref, id: item.id })
+      await deleteContent({ projectRef: ref, ids: [item.id] })
       setShowConfirmModal(false)
       toast.success('Query deleted')
     } catch (error) {
