@@ -153,9 +153,7 @@ export const UsePoolerCheckbox = ({
                 )}
               </div>
               <div className="flex items-center gap-x-1">
-                {isSuccess && checked && data.supavisor_enabled && (
-                  <Badge color="scale">Supavisor</Badge>
-                )}
+                {isSuccess && checked && <Badge color="scale">Supavisor</Badge>}
                 {isSuccessSettings && (
                   <Badge color="scale">
                     {checked

@@ -1,11 +1,5 @@
 import { PoolingConfiguration } from 'data/database/pooling-configuration-query'
 
-export const getHostFromConnectionString = (str: string) => {
-  const segment = str.split('[YOUR-PASSWORD]@')
-  const [output] = segment[1].split(':')
-  return output
-}
-
 export const getConnectionStrings = (
   connectionInfo: {
     db_user: string
@@ -22,13 +16,9 @@ export const getConnectionStrings = (
 ) => {
   const { usePoolerConnection, projectRef } = metadata
 
-  // Pooler: user, host port
   const user = usePoolerConnection ? `postgres.${projectRef}` : connectionInfo.db_user
   const port = usePoolerConnection ? poolingInfo?.db_port : connectionInfo.db_port
-  // [Joshen] Temp FE: extract host from pooler connection string
-  const host = usePoolerConnection
-    ? getHostFromConnectionString(poolingInfo.connectionString)
-    : connectionInfo.db_host
+  const host = usePoolerConnection ? poolingInfo.db_host : connectionInfo.db_host
   const name = usePoolerConnection ? poolingInfo?.db_name : connectionInfo.db_name
 
   const uriConnString = usePoolerConnection

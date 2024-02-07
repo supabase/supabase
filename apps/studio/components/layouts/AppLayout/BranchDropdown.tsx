@@ -26,7 +26,6 @@ import {
   ScrollArea,
 } from 'ui'
 import { sanitizeRoute } from './ProjectDropdown'
-import { CommandSeparator } from '@ui/components/Command/Command.utils'
 
 const BranchLink = ({
   branch,
