@@ -10,7 +10,9 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL
   ? new URL(process.env.NEXT_PUBLIC_API_URL).origin
   : ''
 const SUPABASE_URL = new URL(process.env.SUPABASE_URL).origin
-const GOTRUE_URL = new URL(process.env.NEXT_PUBLIC_GOTRUE_URL).origin
+const GOTRUE_URL = process.env.NEXT_PUBLIC_API_URL
+  ? new URL(process.env.NEXT_PUBLIC_GOTRUE_URL).origin
+  : ''
 const SUPABASE_PROJECTS_URL = 'https://*.supabase.co'
 const SUPABASE_PROJECTS_URL_WS = 'wss://*.supabase.co'
 const SUPABASE_STAGING_PROJECTS_URL = 'https://*.supabase.red'

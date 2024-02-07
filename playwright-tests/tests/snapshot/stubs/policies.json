@@ -1,0 +1,86 @@
+[
+  {
+    "id": 17197,
+    "schema": "public",
+    "table": "projects",
+    "table_id": 17165,
+    "name": "Enable access to all users",
+    "action": "PERMISSIVE",
+    "roles": ["public"],
+    "command": "SELECT",
+    "definition": "true",
+    "check": null
+  },
+  {
+    "id": 17199,
+    "schema": "public",
+    "table": "launches",
+    "table_id": 17134,
+    "name": "insert allowed only by yourself",
+    "action": "PERMISSIVE",
+    "roles": ["public"],
+    "command": "INSERT",
+    "definition": null,
+    "check": "((uid() = user_id) AND ((is_template = false) OR (uid() IN ( SELECT p.owner_id\n   FROM ((projects p\n     JOIN versions v ON ((v.project_id = p.id)))\n     JOIN launches l ON ((l.version_id = v.id)))))))"
+  },
+  {
+    "id": 17201,
+    "schema": "public",
+    "table": "launches",
+    "table_id": 17134,
+    "name": "Enable update for users by id",
+    "action": "PERMISSIVE",
+    "roles": ["public"],
+    "command": "UPDATE",
+    "definition": "(uid() = user_id)",
+    "check": "(uid() = user_id)"
+  },
+  {
+    "id": 17196,
+    "schema": "public",
+    "table": "launches",
+    "table_id": 17134,
+    "name": "Enable access to all users",
+    "action": "PERMISSIVE",
+    "roles": ["public"],
+    "command": "SELECT",
+    "definition": "true",
+    "check": null
+  },
+  {
+    "id": 17195,
+    "schema": "public",
+    "table": "versions",
+    "table_id": 17148,
+    "name": "Enable access to all users",
+    "action": "PERMISSIVE",
+    "roles": ["public"],
+    "command": "SELECT",
+    "definition": "true",
+    "check": null
+  },
+  {
+    "id": 17200,
+    "schema": "public",
+    "table": "results",
+    "table_id": 17182,
+    "name": "insert allowed only by yourself",
+    "action": "PERMISSIVE",
+    "roles": ["public"],
+    "command": "INSERT",
+    "definition": null,
+    "check": "(uid() IN ( SELECT launches.user_id\n   FROM launches\n  WHERE (launches.id = results.launch_id)))"
+  },
+  {
+    "id": 17198,
+    "schema": "public",
+    "table": "results",
+    "table_id": 17182,
+    "name": "Enable access to all users",
+    "action": "PERMISSIVE",
+    "roles": ["public"],
+    "command": "SELECT",
+    "definition": "true",
+    "check": null
+  }
+]
