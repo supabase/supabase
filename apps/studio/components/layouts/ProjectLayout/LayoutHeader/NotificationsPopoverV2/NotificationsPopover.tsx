@@ -191,7 +191,7 @@ const NotificationsPopoverV2 = () => {
               </div>
             )}
             {isSuccess && (
-              <div className="flex flex-1 h-[400px]">
+              <div className="flex flex-1 h-[400px] bg-background">
                 {notifications.length > 0 &&
                 !(activeTab === 'archived' && snap.filterStatuses.includes('unread')) ? (
                   <InfiniteList
