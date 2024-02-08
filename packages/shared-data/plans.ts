@@ -115,7 +115,7 @@ export const plans: PricingInformation[] = [
     description: 'For large-scale applications managing serious workloads.',
     features: [
       'Designated Support manager',
-      'Up to 99.9% uptime SLAs',
+      'Uptime SLAs',
       'On-premise support',
       '24×7×365 premium enterprise support',
       'Private Slack channel',
@@ -123,7 +123,7 @@ export const plans: PricingInformation[] = [
     ],
     featuresPartner: [
       'Designated Support manager',
-      'Up to 99.9% uptime SLAs',
+      'Uptime SLAs',
       'On-premise support',
       '24×7×365 premium enterprise support',
       'Private Slack channel',
