@@ -123,7 +123,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
     >
       <Link
         href={`/project/${projectRef}/editor/${entity.id}`}
-        className="flex items-center gap-2 py-1 pl-3 w-full max-w-[90%]"
+        className="flex items-center gap-2 py-1 pl-2 w-full max-w-[90%]"
       >
         <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
           <Tooltip.Trigger className="flex items-center">

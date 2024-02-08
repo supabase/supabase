@@ -34,6 +34,7 @@ import {
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
+import { Loader2 } from 'lucide-react'
 
 const TableEditorMenu = () => {
   const { id } = useParams()
@@ -47,6 +48,7 @@ const TableEditorMenu = () => {
   )
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const inputRef = useRef<HTMLInputElement | null>(null)
+  const [isSearchInputFocused, setIsSearchInputFocused] = useState(false)
 
   const { project } = useProjectContext()
   const {
@@ -107,6 +109,11 @@ const TableEditorMenu = () => {
       inputRef.current.focus()
     }
   }, [isSearchOpen])
+
+  const handleSearchInputFocusChange = () => {
+    setIsSearchInputFocused(inputRef.current === document.activeElement)
+  }
+
   return (
     <>
       <div
@@ -188,14 +195,35 @@ const TableEditorMenu = () => {
                     exit={{ x: 20, opacity: 0, transition: { duration: 0 } }}
                     className="absolute top-0 left-2"
                   >
-                    <input
-                      type="text"
-                      placeholder="Search..."
-                      className="bg-default text-foreground rounded-none px-0 py-0 h-8 focus:outline-none w-44 text-sm"
-                      onChange={(e) => setSearchText(e.target.value.trim())}
-                      value={searchText}
-                      ref={inputRef}
-                    />
+                    <label htmlFor={'search-tables'} className="relative">
+                      <span className="sr-only">Search tables</span>
+                      <input
+                        id="search-tables"
+                        type="text"
+                        placeholder="Search..."
+                        className={cn(
+                          'bg-default text-foreground rounded-none px-0 py-0 h-5 focus:outline-none w-44 text-sm',
+                          'border-b outline-none focus:outline-none',
+                          'border-transparent focus:border-transparent focus:ring-0',
+                          'focus:border-b-red'
+                        )}
+                        onChange={(e) => setSearchText(e.target.value.trim())}
+                        value={searchText}
+                        ref={(el) => {
+                          inputRef.current = el
+                          if (el) {
+                            el.addEventListener('focus', handleSearchInputFocusChange)
+                            el.addEventListener('blur', handleSearchInputFocusChange)
+                          }
+                        }}
+                      />
+                      <div
+                        className={cn(
+                          'absolute -bottom-1 w-full h-px bg-border transition-colors',
+                          isSearchInputFocused && 'bg-border-stronger'
+                        )}
+                      ></div>
+                    </label>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -214,20 +242,20 @@ const TableEditorMenu = () => {
               >
                 {isSearchOpen ? (
                   isSearching ? (
-                    <IconLoader
-                      className="animate-spin text-foreground-lighter"
+                    <Loader2
+                      className="w-4 h-4 animate-spin text-foreground"
                       size={15}
-                      strokeWidth={1.5}
+                      strokeWidth={1}
                     />
                   ) : (
-                    <IconX className={cn('hover:text-foreground transition-colors')} />
+                    <IconX className={cn('w-4  h-4 hover:text-foreground transition-colors')} />
                   )
                 ) : (
-                  <IconSearch className={cn('hover:text-foreground transition-colors')} />
+                  <IconSearch className={cn('w-4 h-4 hover:text-foreground transition-colors')} />
                 )}
               </motion.button>
             </div>
-            <div className="flex gap-3 items-center absolute right-2 top-1.5">
+            <div className="flex gap-3 items-center absolute right-1 top-1.5">
               <DropdownMenu>
                 <Tooltip.Root delayDuration={0}>
                   <DropdownMenuTrigger asChild>
