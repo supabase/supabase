@@ -6,7 +6,6 @@ import { IconChevronRight } from 'ui'
 import { withAuth } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { Organization, Project } from 'types'
-import { LayoutWrapper } from './LayoutWrapper'
 import FeedbackDropdown from './ProjectLayout/LayoutHeader/FeedbackDropdown'
 import HelpPopover from './ProjectLayout/LayoutHeader/HelpPopover'
 
@@ -21,14 +20,14 @@ const WizardLayout = ({
   children,
 }: PropsWithChildren<WizardLayoutProps>) => {
   return (
-    <LayoutWrapper className="flex w-full flex-col">
+    <div className="flex w-full flex-col">
       <Header organization={organization} project={project} />
       <div className="overflow-auto">
         <section className="has-slide-in slide-in relative mx-auto my-10 max-w-2xl">
           {children}
         </section>
       </div>
-    </LayoutWrapper>
+    </div>
   )
 }
 

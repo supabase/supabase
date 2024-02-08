@@ -69,7 +69,8 @@ const QueryItem = ({
   const { mutate: deleteContent, isLoading: isDeleting } = useContentDeleteMutation({
     onSuccess: (data) => onDeleteQuery(data),
     onError: (error, data) => {
-      if (error.code === 404 && error.message.includes('Content not found')) {
+      console.log({ error })
+      if (error.message.includes('Contents not found')) {
         onDeleteQuery(data.ids)
       } else {
         toast.error(`Failed to delete query: ${error.message}`)
