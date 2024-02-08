@@ -4,7 +4,6 @@ import { ReactNode } from 'react'
 import { Badge, IconArrowUpRight, IconLogOut, Menu } from 'ui'
 
 import { useFlag } from 'hooks'
-import { LayoutWrapper } from '../LayoutWrapper'
 import LayoutHeader from '../ProjectLayout/LayoutHeader'
 import { SidebarLink, SidebarSection } from './AccountLayout.types'
 
