@@ -267,7 +267,7 @@ export const config = {
      * - favicon.ico (favicon file)
      * Feel free to modify this pattern to include more paths.
      */
-    '/((?!_next/static|_next/image|favicon.ico).*)',
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
 ```
@@ -387,7 +387,7 @@ If you have email confirmation turned on (the default), a new user will receive 
 
 Change the email template to support a server-side authentication flow.
 
-Go to the [Auth templates](https://supabase.com/dashboard/project/_/auth/templates) page in your dashboard. In each email template, change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=signup`.
+Go to the [Auth templates](https://supabase.com/dashboard/project/_/auth/templates) page in your dashboard. In each email template, change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup`.
 
 </StepHikeCompact.Details>
 
@@ -397,7 +397,7 @@ Go to the [Auth templates](https://supabase.com/dashboard/project/_/auth/templat
 
 <StepHikeCompact.Details title="Create a route handler for Auth confirmation">
 
-Create a Route Handler for `auth/callback`. When a user clicks their confirmation email link, exchange their secure code for an Auth token.
+Create a Route Handler for `auth/confirm`. When a user clicks their confirmation email link, exchange their secure code for an Auth token.
 
 Since this is a Router Handler, use the Supabase client from `@/utils/supabase/server.ts`.
 
@@ -405,7 +405,7 @@ Since this is a Router Handler, use the Supabase client from `@/utils/supabase/s
 
 <StepHikeCompact.Code>
 
-```ts app/auth/callback/route.ts
+```ts app/auth/confirm/route.ts
 import { type EmailOtpType } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { type NextRequest, NextResponse } from 'next/server'
@@ -607,7 +607,7 @@ Create a `utils/supabase` folder with a file for each type of client. Then copy 
       header={<span className="text-foreground">Why do I need so many types of clients?</span>}
       id="nextjs-clients"
     >
-     
+
       A Supabase client reads and sets cookies in order to access and update the user session. Depending on where the client is used, it needs to interact with cookies in a different way:
 
       - **`getServerSideProps`** - Runs on the server. Reads cookies from the request, which is passed through from `GetServerSidePropsContext`.
@@ -804,7 +804,7 @@ If you have email confirmation turned on (the default), a new user will receive 
 
 Change the email template to support a server-side authentication flow.
 
-Go to the [Auth templates](https://supabase.com/dashboard/project/_/auth/templates) page in your dashboard. In each email template, change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/api/auth/callback?token_hash={{ .TokenHash }}&type=signup`.
+Go to the [Auth templates](https://supabase.com/dashboard/project/_/auth/templates) page in your dashboard. In each email template, change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/api/auth/confirm?token_hash={{ .TokenHash }}&type=signup`.
 
 </StepHikeCompact.Details>
 
@@ -814,7 +814,7 @@ Go to the [Auth templates](https://supabase.com/dashboard/project/_/auth/templat
 
 <StepHikeCompact.Details title="Create a route handler for Auth confirmation">
 
-Create an API route for `api/auth/callback`. When a user clicks their confirmation email link, exchange their secure code for an Auth token.
+Create an API route for `api/auth/confirm`. When a user clicks their confirmation email link, exchange their secure code for an Auth token.
 
 Since this is an API route, use the Supabase client from `@/utils/supabase/api.ts`.
 
@@ -824,7 +824,7 @@ Since this is an API route, use the Supabase client from `@/utils/supabase/api.t
 
 <CH.Code>
 
-```ts pages/api/auth/callback.tsx
+```ts pages/api/auth/confirm.tsx
 import { type EmailOtpType } from '@supabase/supabase-js'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
