@@ -19,7 +19,7 @@
   - [x] Veritabanı Fonksiyonları. [Dokümanlar](https://supabase.com/docs/guides/database/functions)
   - [x] Kenar İşlevleri [Dokümanlar](https://supabase.com/docs/guides/functions)
 - [x] Dosya Depolama. [Docs](https://supabase.com/docs/guides/storage)
-- [X] AI + Vektör / Gömme Araçları. [Dokümanlar](https://supabase.com/docs/guides/ai)
+- [x] AI + Vektör / Gömme Araçları. [Dokümanlar](https://supabase.com/docs/guides/ai)
 - [x] Gösterge Tablosu
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
