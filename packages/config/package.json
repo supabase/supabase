@@ -10,7 +10,6 @@
     "@mertasan/tailwindcss-variables": "^2.2.3",
     "@radix-ui/colors": "^0.1.8",
     "@tailwindcss/forms": "^0.5.0",
-    "@tailwindcss/line-clamp": "^0.4.4",
     "@tailwindcss/typography": "^0.5.9",
     "deepmerge": "^4.2.2",
     "eslint-config-next": "^14.1.0",
