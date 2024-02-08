@@ -1,7 +1,11 @@
-import { type Variants, motion, MotionConfig, useReducedMotion } from 'framer-motion'
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
+import { type Variants, motion, useReducedMotion } from 'framer-motion'
+import { useRouter } from 'next/router'
 import { useMemo, useRef, useState } from 'react'
 
-import { IconCheck, IconDiscussions, IconX, cn } from 'ui'
+import { IconCheck, IconDiscussions, IconX, cn, useConsent } from 'ui'
+
+import { sendTelemetryEvent } from '~/lib/telemetry'
 
 type Response = 'yes' | 'no'
 
@@ -79,13 +83,34 @@ function Feedback() {
   const feedbackButtonRef = useRef<HTMLButtonElement>(null)
   const reducedMotion = useReducedMotion()
 
+  const { hasAcceptedConsent } = useConsent()
+  const supabase = useSupabaseClient()
+  const router = useRouter()
+
   const isYes = response === 'yes'
   const isNo = response === 'no'
   const animate = isYes ? 'yes' : isNo ? 'no' : 'default'
 
   const noVariants = useMemo(() => createNoVariants(reducedMotion), [reducedMotion])
 
+  async function sendFeedbackVote(response: Response) {
+    const { error } = await supabase
+      .from('feedback')
+      .insert({ vote: response, page: router.asPath })
+    if (error) console.error(error)
+  }
+
   function handleResponse(response: Response) {
+    if (hasAcceptedConsent) {
+      sendTelemetryEvent({
+        category: 'docs',
+        action: 'feedback_voted',
+        label: response,
+        // check that this matches the shape of pageview events and other telemetry
+        page_location: router.asPath,
+      })
+    }
+    sendFeedbackVote(response)
     setResponse(response)
     feedbackButtonRef.current?.focus()
   }
