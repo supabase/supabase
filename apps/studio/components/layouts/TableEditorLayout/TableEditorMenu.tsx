@@ -208,13 +208,24 @@ const TableEditorMenu = () => {
                           'border-transparent focus:border-transparent focus:ring-0',
                           'focus:border-b-red'
                         )}
-                        onChange={(e) => setSearchText(e.target.value.trim())}
+                        onChange={(e) => {
+                          setSearchText(e.target.value.trim())
+                        }}
                         value={searchText}
                         ref={(el) => {
                           inputRef.current = el
                           if (el) {
                             el.addEventListener('focus', handleSearchInputFocusChange)
                             el.addEventListener('blur', handleSearchInputFocusChange)
+                          }
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Escape') {
+                            setIsSearchOpen(false)
+                            setSearchText('')
+                          }
+                          if (e.key === 'Backspace' && searchText.length === 0) {
+                            setIsSearchOpen(false)
                           }
                         }}
                       />
