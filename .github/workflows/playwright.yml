@@ -33,13 +33,6 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
       - uses: supabase/setup-cli@v1
-      - name: Save the Supabase CLI version
-        run: echo "CLI_VERSION=$(supabase -v)" >> $GITHUB_OUTPUT
-        id: version
-      - name: Cache Docker images
-        uses: ScribeMD/docker-cache@0.3.7
-        with:
-          key: docker-${{ runner.os }}-${{ steps.version.outputs.CLI_VERSION }}
       - name: Install dependencies
         run: npm ci
       - name: Install Playwright Browsers
