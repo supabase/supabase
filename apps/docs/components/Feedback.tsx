@@ -1,97 +1,26 @@
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
-import { type Variants, motion, useReducedMotion } from 'framer-motion'
 import { useRouter } from 'next/router'
-import { useMemo, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 
-import { IconCheck, IconDiscussions, IconX, cn, useConsent } from 'ui'
+import { Button, IconCheck, IconDiscussions, IconX, cn, useConsent } from 'ui'
 
 import { sendTelemetryEvent } from '~/lib/telemetry'
 
 type Response = 'yes' | 'no'
 
-const buttonClasses = cn(
-  'inline-flex items-center justify-center py-1 px-1',
-  'text-center font-regular text-foreground text-xs',
-  'ease-out duration-200 transition-all',
-  'rounded-md border border-strong hover:border-stronger bg-transparent',
-  'outline-none focus-visible:outline-4 focus-visible:outline-offset-1 focus-visible:outline-border-strong'
-)
-
-const yesVariants: Variants = {
-  yes: {
-    opacity: 1,
-  },
-  no: {
-    opacity: 0,
-    transitionEnd: {
-      visibility: 'hidden',
-    },
-  },
-  default: {
-    opacity: 1,
-  },
-}
-
-function createNoVariants(reducedMotion: boolean): Variants {
-  return {
-    yes: {
-      opacity: 0,
-      transitionEnd: {
-        visibility: 'hidden',
-      },
-    },
-    no: {
-      opacity: 1,
-      ...(reducedMotion
-        ? null
-        : {
-            translateX: 'calc(-1 * (100% + 0.5rem))',
-            transition: {
-              translateX: {
-                delay: 0.3,
-                duration: 0.5,
-                type: 'tween',
-              },
-            },
-          }),
-    },
-    default: {
-      opacity: 1,
-    },
-  }
-}
-
-const feedbackVariants: Variants = {
-  yes: {
-    opacity: 1,
-  },
-  no: {
-    opacity: 1,
-    // better coordination with sliding x button
-    transition: {
-      delay: 0.1,
-    },
-  },
-  default: {
-    opacity: 0,
-    visibility: 'hidden',
-  },
-}
-
 function Feedback() {
   const [response, setResponse] = useState<Response | null>(null)
   const feedbackButtonRef = useRef<HTMLButtonElement>(null)
-  const reducedMotion = useReducedMotion()
 
   const { hasAcceptedConsent } = useConsent()
   const supabase = useSupabaseClient()
   const router = useRouter()
 
+  const unanswered = response === null
   const isYes = response === 'yes'
   const isNo = response === 'no'
-  const animate = isYes ? 'yes' : isNo ? 'no' : 'default'
-
-  const noVariants = useMemo(() => createNoVariants(reducedMotion), [reducedMotion])
+  const showYes = unanswered || isYes
+  const showNo = unanswered || isNo
 
   async function sendFeedbackVote(response: Response) {
     const { error } = await supabase
@@ -118,42 +47,48 @@ function Feedback() {
   return (
     <>
       <div className="relative flex gap-2 items-center mb-2">
-        <motion.button
+        <Button
+          type="outline"
           className={cn(
-            buttonClasses,
+            'px-1',
             'hover:text-brand-600',
-            isYes && 'text-brand-600 border-stronger'
+            isYes && 'text-brand-600 border-stronger',
+            !showYes && 'opacity-0 invisible',
+            'transition-opacity'
           )}
           onClick={() => handleResponse('yes')}
-          variants={yesVariants}
-          animate={animate}
         >
           <IconCheck />
           <span className="sr-only">Yes</span>
-        </motion.button>
-        <motion.button
+        </Button>
+        <Button
+          type="outline"
           className={cn(
-            buttonClasses,
+            'px-1',
             'hover:text-warning-600',
-            isNo && 'text-warning-600 border-stronger'
+            isNo && 'text-warning-600 border-stronger -translate-x-[calc(100%+0.5rem)]',
+            !showNo && 'opacity-0 invisible',
+            '[transition-property:opacity,transform] [transition-duration:150ms,300ms] [transition-delay:0,150ms]'
           )}
           onClick={() => handleResponse('no')}
-          variants={noVariants}
-          animate={animate}
         >
           <IconX />
           <span className="sr-only">No</span>
-        </motion.button>
+        </Button>
       </div>
-      <motion.button
+      <button
         ref={feedbackButtonRef}
-        className={cn('flex items-center gap-2', 'text-[0.8rem] text-foreground-lighter')}
-        variants={feedbackVariants}
-        animate={animate}
+        className={cn(
+          'flex items-center gap-2',
+          'text-[0.8rem] text-foreground-lighter',
+          unanswered && 'opacity-0 invisible',
+          'transition-opacity',
+          isNo && 'delay-100'
+        )}
       >
         {isYes ? <>What went well?</> : <>How can we improve?</>}
         <IconDiscussions size="tiny" />
-      </motion.button>
+      </button>
     </>
   )
 }

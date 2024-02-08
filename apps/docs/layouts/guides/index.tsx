@@ -1,6 +1,7 @@
 import { MDXProvider } from '@mdx-js/react'
 import { NextSeo } from 'next-seo'
 import Head from 'next/head'
+import { usePathname } from 'next/navigation'
 import { useRouter } from 'next/router'
 import { FC, useEffect, useRef, useState } from 'react'
 import { ExpandableVideo, IconExternalLink } from 'ui'
@@ -33,6 +34,7 @@ interface Props {
 }
 
 const Layout: FC<Props> = (props) => {
+  const pathname = usePathname()
   const [hash] = useHash()
 
   const articleRef = useRef()
@@ -63,7 +65,7 @@ const Layout: FC<Props> = (props) => {
         return { text, link, level }
       })
     setTocList(newHeadings)
-  }, [])
+  }, [pathname]) // needed to recalculate the toc when path changes
 
   const hasTableOfContents = tocList.length > 0
   const tocVideoPreview = `http://img.youtube.com/vi/${props.meta.tocVideo}/0.jpg`
@@ -170,7 +172,7 @@ const Layout: FC<Props> = (props) => {
                     <ExpandableVideo imgUrl={tocVideoPreview} videoId={props.meta.tocVideo} />
                   </div>
                 )}
-                <div className="px-5 mb-5">
+                <div className="px-5 mb-6">
                   <span className="block font-mono text-xs uppercase text-foreground mb-4">
                     Is this helpful?
                   </span>
