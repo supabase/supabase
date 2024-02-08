@@ -81,7 +81,7 @@ const BlogFilters = ({ posts, setPosts, setCategory, allCategories, handlePosts 
 
   return (
     <div className="flex flex-row items-center justify-between gap-2">
-      <AnimatePresence exitBeforeEnter>
+      <AnimatePresence mode="wait">
         {!showSearchInput && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -125,8 +125,8 @@ const BlogFilters = ({ posts, setPosts, setCategory, allCategories, handlePosts 
                 category === 'all' && !searchKey && !activeCategory
                   ? 'alternative'
                   : category === activeCategory
-                  ? 'alternative'
-                  : 'outline'
+                    ? 'alternative'
+                    : 'outline'
               }
               onClick={() => setCategory(category)}
               size={is2XL ? 'tiny' : 'small'}

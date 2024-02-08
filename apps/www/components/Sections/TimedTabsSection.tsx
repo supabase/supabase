@@ -185,7 +185,7 @@ const TimedTabsSection = ({
         ))}
       </div>
       <div className="block md:hidden">
-        <AnimatePresence exitBeforeEnter>
+        <AnimatePresence mode="wait">
           <motion.p
             key={tabs[activeTab]?.paragraph}
             initial={{ opacity: 0 }}

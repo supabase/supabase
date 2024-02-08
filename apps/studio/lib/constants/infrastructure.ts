@@ -66,39 +66,6 @@ export const PROVIDERS = {
     DEFAULT_SSH_KEY: 'supabase-app-instance',
     default_region: AWS_REGIONS_DEFAULT,
     regions: { ...AWS_REGIONS },
-    // regions: {
-    //   EAST_US: 'us-east-1', // North Virginia
-    //   // 'North EU': 'eu-north-1', // Stockholm
-    //   WEST_US: 'us-west-1', // North California
-    //   SOUTHEAST_ASIA: 'ap-southeast-1', // Singapore
-    //   NORTHEAST_ASIA: 'ap-northeast-1', // Tokyo
-    //   NORTHEAST_ASIA_2: 'ap-northeast-2', //Seoul
-    //   OCEANIA: 'ap-southeast-2', // Sydney
-    //   WEST_EU: 'eu-west-1', // Ireland
-    //   WEST_EU_2: 'eu-west-2', // London
-    //   CENTRAL_EU: 'eu-central-1', // Frankfurt
-    //   CENTRAL_CANADA: 'ca-central-1', // Central Canada
-    //   SOUTH_ASIA: 'ap-south-1', // Mumbai
-    //   SOUTH_AMERICA: 'sa-east-1', // Sao Paulo
-    //   // SOUTH_AFRICA: 'af-south-1', // Cape Town
-    // },
-    sizes: {
-      nano: {
-        x86_64: 't3.nano',
-        arm64: 't4g.nano',
-        description: '512mb RAM',
-      },
-      micro: {
-        x86_64: 't3.micro',
-        arm64: 't4g.micro',
-        description: '1gb RAM',
-      },
-      medium: {
-        x86_64: 'm5a.large',
-        arm64: 'm6g.medium',
-        description: '4gb RAM',
-      },
-    },
   },
 } as const
 
@@ -148,3 +115,33 @@ export const PASSWORD_STRENGTH_PERCENTAGE = {
 }
 
 export const DEFAULT_PROJECT_API_SERVICE_ID = 1
+
+type InstanceSpecs = {
+  baseline_disk_io_mbs: number
+  connections_direct: number
+  connections_pooler: number
+  cpu_cores: number
+  cpu_dedicated: boolean
+  max_disk_io_mbs: number
+  memory_gb: number
+}
+
+export const INSTANCE_NANO_SPECS: InstanceSpecs = {
+  baseline_disk_io_mbs: 43,
+  connections_direct: 30,
+  connections_pooler: 200,
+  cpu_cores: 2,
+  cpu_dedicated: false,
+  max_disk_io_mbs: 2085,
+  memory_gb: 0.5,
+}
+
+export const INSTANCE_MICRO_SPECS: InstanceSpecs = {
+  baseline_disk_io_mbs: 87,
+  connections_direct: 60,
+  connections_pooler: 200,
+  cpu_cores: 2,
+  cpu_dedicated: false,
+  max_disk_io_mbs: 2085,
+  memory_gb: 1,
+}

@@ -501,7 +501,10 @@ export class StorePage implements OnInit {
     long: undefined,
   }
 
-  constructor(public modalCtrl: ModalController, private storesService: StoresService) {}
+  constructor(
+    public modalCtrl: ModalController,
+    private storesService: StoresService
+  ) {}
 
   ngOnInit() {}
 
@@ -629,7 +632,10 @@ export class HomePage {
   selectedMarker: StoreMarker | null = null
   selectedStore: StoreResult | null = null
 
-  constructor(private storesService: StoresService, private modalCtrl: ModalController) {}
+  constructor(
+    private storesService: StoresService,
+    private modalCtrl: ModalController
+  ) {}
 
   ionViewDidEnter() {
     this.createMap()

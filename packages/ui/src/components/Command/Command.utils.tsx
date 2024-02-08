@@ -8,7 +8,6 @@ import { LoadingLine } from '../LoadingLine/LoadingLine'
 import { Modal } from '../Modal'
 import { ModalProps } from '../Modal/Modal'
 import { useCommandMenu } from './CommandMenuProvider'
-import { commandScore } from './command-score'
 
 type CommandPrimitiveElement = React.ElementRef<typeof CommandPrimitive>
 type CommandPrimitiveProps = React.ComponentPropsWithoutRef<typeof CommandPrimitive>
@@ -22,24 +21,11 @@ export const copyToClipboard = (str: string, callback = () => {}) => {
   }
 }
 
-// `__forcemount__` must be lowercase because `cmdk` converts values to lowercase
-export const FORCE_MOUNT_ITEM = '__forcemount__'
-
-// A hack to implement force mounting while that option is not available
-// in an official release for `cmdk`.
-// See https://github.com/pacocoursey/cmdk/issues/164
-function commandFilter(value: string, search: string) {
-  return value.includes(FORCE_MOUNT_ITEM)
-    ? 1
-    : commandScore(value.replace(FORCE_MOUNT_ITEM, ''), search)
-}
-
 export const Command = React.forwardRef<CommandPrimitiveElement, CommandPrimitiveProps>(
   ({ className, ...props }, ref) => (
     <CommandPrimitive
       ref={ref}
       className={cn('flex h-full w-full flex-col overflow-hidden', className)}
-      filter={commandFilter}
       {...props}
     />
   )
@@ -69,6 +55,7 @@ export const CommandDialog = ({ children, onKeyDown, page, ...props }: CommandDi
         '!border-overlay/90',
         'transition ease-out',
         'place-self-start mx-auto top-24',
+        'max-w-[calc(100vw-60px)] xs:max-w-[50%]',
         animateBounce ? 'scale-[101.5%]' : 'scale-100'
       )}
     >
@@ -233,13 +220,13 @@ export const CommandItem = React.forwardRef<CommandPrimitiveItemElement, Command
         aria-selected:scale-[100.3%]
         data-[disabled]:pointer-events-none data-[disabled]:opacity-50`
           : type === 'link'
-          ? `
+            ? `
         px-2
         transition-all
         outline-none
         aria-selected:bg-overlay-hover/90
         data-[disabled]:pointer-events-none data-[disabled]:opacity-50`
-          : `
+            : `
         px-2
         aria-selected:bg-overlay-hover/80
         aria-selected:backdrop-filter

@@ -615,6 +615,10 @@ export const auth = {
       items: [
         { name: 'Overview', url: '/guides/auth/server-side/overview' },
         {
+          name: 'Next.js guide',
+          url: '/guides/auth/server-side/nextjs',
+        },
+        {
           name: 'Creating a client',
           url: '/guides/auth/server-side/creating-a-client',
         },
@@ -2110,3 +2114,9 @@ export const references = [
     ],
   },
 ]
+
+export const navDataForMdx = {
+  nativeMobileLoginItems: NativeMobileLoginItems,
+  phoneLoginsItems: PhoneLoginsItems,
+  socialLoginItems: SocialLoginItems,
+}

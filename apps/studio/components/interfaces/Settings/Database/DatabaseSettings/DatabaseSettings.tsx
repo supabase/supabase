@@ -7,6 +7,7 @@ import DatabaseSelector from 'components/ui/DatabaseSelector'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useFlag, useSelectedProject } from 'hooks'
 import { pluckObjectFields } from 'lib/helpers'
@@ -22,8 +23,6 @@ import {
 import { IPv4DeprecationNotice } from '../IPv4DeprecationNotice'
 import { UsePoolerCheckbox } from '../UsePoolerCheckbox'
 import ResetDbPassword from './ResetDbPassword'
-import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
-import { getHostFromConnectionString } from './DatabaseSettings.utils'
 
 const DatabaseSettings = () => {
   const router = useRouter()
@@ -36,9 +35,7 @@ const DatabaseSettings = () => {
   const showReadReplicasUI = readReplicasEnabled && selectedProject?.is_read_replicas_enabled
   const connectionStringsRef = useRef<HTMLDivElement>(null)
   const [usePoolerConnection, setUsePoolerConnection] = useState(true)
-  const [poolingMode, setPoolingMode] = useState<'transaction' | 'session' | 'statement'>(
-    'transaction'
-  )
+  const [poolingMode, setPoolingMode] = useState<'transaction' | 'session' | 'statement'>('session')
 
   const {
     data: poolingInfo,
@@ -88,9 +85,7 @@ const DatabaseSettings = () => {
 
   const connectionInfo = usePoolerConnection
     ? {
-        db_host: isSuccessPoolingInfo
-          ? getHostFromConnectionString(poolingInfo?.connectionString)
-          : '',
+        db_host: poolingInfo?.db_host,
         db_name: poolingInfo?.db_name,
         db_port: poolingInfo?.db_port,
         db_user: `postgres.${projectRef}`,
@@ -116,7 +111,7 @@ const DatabaseSettings = () => {
   }, [connectionString])
 
   useEffect(() => {
-    if (poolingInfo?.pool_mode !== undefined) {
+    if (poolingInfo?.pool_mode === 'session') {
       setPoolingMode(poolingInfo.pool_mode)
     }
   }, [poolingInfo?.pool_mode])

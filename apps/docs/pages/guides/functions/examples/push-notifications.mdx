@@ -189,7 +189,7 @@ Push notifications are an important part of any mobile app. They allow you to se
       const { data } = await supabase
         .from('profiles')
         .select('fcm_token')
-        .eq('id', payload.record.profile_id)
+        .eq('id', payload.record.user_id)
         .single()
 
       const fcmToken = data!.fcm_token as string

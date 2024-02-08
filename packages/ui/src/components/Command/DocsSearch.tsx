@@ -14,13 +14,7 @@ import {
   IconSearch,
   useCommandMenu,
 } from 'ui'
-import {
-  CommandGroup,
-  CommandItem,
-  CommandLabel,
-  FORCE_MOUNT_ITEM,
-  TextHighlighter,
-} from './Command.utils'
+import { CommandGroup, CommandItem, CommandLabel, TextHighlighter } from './Command.utils'
 import { useRouter } from 'next/router'
 
 const NUMBER_SOURCES = 2
@@ -39,6 +33,7 @@ const questions = [
 export enum PageType {
   Markdown = 'markdown',
   Reference = 'reference',
+  Integration = 'partner-integration',
   GithubDiscussion = 'github-discussions',
 }
 
@@ -238,6 +233,15 @@ const DocsSearch = () => {
           setIsOpen(false)
         }
         break
+      case PageType.Integration:
+        if (site === 'website') {
+          router.push(link)
+          setIsOpen(false)
+        } else {
+          window.open(`https://supabase.com${link}`, '_blank')
+          setIsOpen(false)
+        }
+        break
       case PageType.GithubDiscussion:
         window.open(link, '_blank')
         setIsOpen(false)
@@ -406,15 +410,17 @@ const DocsSearch = () => {
             <CommandGroup
               heading=""
               key={`${page.path}-group`}
-              value={`${FORCE_MOUNT_ITEM}--${page.title}-group-index-${i}`}
+              value={`${page.title}-group-index-${i}`}
+              forceMount={true}
             >
               <CommandItem
                 key={`${page.path}-item`}
-                value={`${FORCE_MOUNT_ITEM}--${page.title}-item-index-${i}`}
+                value={`${page.title}-item-index-${i}`}
                 type="block-link"
                 onSelect={() => {
                   openLink(page.type, formatPageUrl(page))
                 }}
+                forceMount={true}
               >
                 <div className="grow flex gap-3 items-center">
                   <IconContainer>{getPageIcon(page)}</IconContainer>
@@ -444,7 +450,8 @@ const DocsSearch = () => {
                         openLink(page.type, formatSectionUrl(page, section))
                       }}
                       key={`${page.path}__${section.heading}-item`}
-                      value={`${FORCE_MOUNT_ITEM}--${page.title}__${section.heading}-item-index-${i}`}
+                      value={`${page.title}__${section.heading}-item-index-${i}`}
+                      forceMount={true}
                       type="block-link"
                     >
                       <div className="grow flex gap-3 items-center">
@@ -531,6 +538,7 @@ export function formatPageUrl(page: Page) {
   switch (page.type) {
     case PageType.Markdown:
     case PageType.Reference:
+    case PageType.Integration:
     case PageType.GithubDiscussion:
       return page.path
     default:
@@ -545,6 +553,9 @@ export function formatSectionUrl(page: Page, section: PageSection) {
       return `${formatPageUrl(page)}#${section.slug ?? ''}`
     case PageType.Reference:
       return `${formatPageUrl(page)}/${section.slug ?? ''}`
+    case PageType.Integration:
+      // [Charis] Markdown headings on integrations pages don't have slugs yet
+      return formatPageUrl(page)
     default:
       throw new Error(`Unknown page type '${page.type}'`)
   }
@@ -554,6 +565,7 @@ export function getPageIcon(page: Page) {
   switch (page.type) {
     case PageType.Markdown:
     case PageType.Reference:
+    case PageType.Integration:
       return <IconBook strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
     case PageType.GithubDiscussion:
       return <IconGitHub strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
@@ -566,6 +578,7 @@ export function getPageSectionIcon(page: Page) {
   switch (page.type) {
     case PageType.Markdown:
     case PageType.Reference:
+    case PageType.Integration:
       return <IconHash strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
     case PageType.GithubDiscussion:
       return <IconMessageSquare strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
