@@ -63,8 +63,8 @@ export const LaunchSection = (props: WeekDayProps) => {
               nextDayNotShipped
                 ? 'launch-week-timeline-border--approaching'
                 : props.shipped
-                ? 'border-brand'
-                : 'border-purple-700',
+                  ? 'border-brand'
+                  : 'border-purple-700',
               className,
             ].join(' ')}
           ></div>
@@ -124,7 +124,7 @@ export const LaunchSection = (props: WeekDayProps) => {
                   </div>
                 }
               >
-                <div className="">
+                <div>
                   <div className="video-container">
                     <iframe
                       src={`https://www.youtube-nocookie.com/embed/${props.youtube_id}?autoplay=1`}

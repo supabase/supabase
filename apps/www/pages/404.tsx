@@ -30,7 +30,7 @@ const Error404 = () => {
                 <a href="/">
                   <Image
                     src={
-                      resolvedTheme === 'dark'
+                      resolvedTheme?.includes('dark')
                         ? supabaseLogoWordmarkDark
                         : supabaseLogoWordmarkLight
                     }

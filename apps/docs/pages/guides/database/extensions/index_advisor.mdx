@@ -6,7 +6,7 @@ export const meta = {
   description: 'Automatically optimize SQL queries',
 }
 
-[Index advisor](https://github.com/supabase/index_advisor) is a Postgres extension for recommending indexes to improve query performance.
+[Index advisor](https://database.dev/olirice/index_advisor) is a Postgres extension for recommending indexes to improve query performance.
 
 For example:
 
@@ -26,7 +26,7 @@ Features:
 
 - Supports generic parameters e.g. `$1`, `$2`
 - Supports materialized views
-- Identifies tables/columns obfuscaed by views
+- Identifies tables/columns obfuscated by views
 - Skips duplicate indexes
 
 ## Installation
@@ -154,7 +154,8 @@ from
 
 ## Resources
 
-- Official [`index_advisor` GitHub Repository](https://github.com/supabase/index_advisor)
+- dbdev [`index_advisor`](https://database.dev/olirice/index_advisor) docs
+- dbdev [Github Repository](https://github.com/supabase/dbdev)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

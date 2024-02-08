@@ -1,5 +1,6 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 import StepHikeCompact from '~/components/StepHikeCompact'
+import RealtimeLimitsEstimater from '~/components/RealtimeLimitsEstimater'
 
 export const meta = {
   title: 'Postgres Changes',
@@ -227,10 +228,24 @@ const changes = client
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+supabase
+    .channel('schema-db-changes')
+    .onPostgresChanges(
+        schema: 'public', // Subscribes to the "public" schema in Postgres
+        event: PostgresChangeEvent.all, // Listen to all changes
+
+        callback: (payload) => print(payload))
+    .subscribe();
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-val myChannel = supabase.realtime.createChannel("schema-db-changes")
+val myChannel = supabase.channel("schema-db-changes")
 
 val changes = myChannel.postgresChangeFlow<PostgresAction>(schema = "public")
 
@@ -244,8 +259,7 @@ changes
     }
     .launchIn(yourCoroutineScope)
 
-supabase.realtime.connect()
-myChannel.join()
+myChannel.subscribe()
 ```
 
 </TabPanel>
@@ -281,12 +295,25 @@ const changes = client
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final changes = supabase
+    .channel('schema-db-changes')
+    .onPostgresChanges(
+        event: PostgresChangeEvent.insert,
+        schema: 'public',
+        callback: (payload) => print(payload))
+    .subscribe();
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 Use `PostgresAction.Insert` as type to listen only to database `INSERT`s:
 
 ```kotlin
-val myChannel = supabase.realtime.createChannel("db-changes")
+val myChannel = supabase.channel("db-changes")
 
 val changes = myChannel.postgresChangeFlow<PostgresAction.Insert>(schema = "public")
 
@@ -296,8 +323,7 @@ changes
     }
     .launchIn(yourCoroutineScope)
 
-supabase.realtime.connect()
-myChannel.join()
+myChannel.subscribe()
 ```
 
 </TabPanel>
@@ -333,12 +359,25 @@ const changes = client
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+supabase
+    .channel('schema-db-changes')
+    .onPostgresChanges(
+        event: PostgresChangeEvent.update, // Listen only to UPDATEs
+        schema: 'public',
+        callback: (payload) => print(payload))
+    .subscribe();
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 Use `PostgresAction.Update` as type to listen only to database `UPDATE`s:
 
 ```kotlin
-val myChannel = supabase.realtime.createChannel("db-changes")
+val myChannel = supabase.channel("db-changes")
 
 val changes = myChannel.postgresChangeFlow<PostgresAction.Update>(schema = "public")
 
@@ -348,8 +387,7 @@ changes
     }
     .launchIn(yourCoroutineScope)
 
-supabase.realtime.connect()
-myChannel.join()
+myChannel.subscribe()
 ```
 
 </TabPanel>
@@ -385,12 +423,25 @@ const changes = client
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+supabase
+    .channel('schema-db-changes')
+    .onPostgresChanges(
+        event: PostgresChangeEvent.delete, // Listen only to DELETEs
+        schema: 'public',
+        callback: (payload) => print(payload))
+    .subscribe();
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 Use `PostgresAction.Delete` as type to listen only to database `DELETE`s:
 
 ```kotlin
-val myChannel = supabase.realtime.createChannel("db-changes")
+val myChannel = supabase.channel("db-changes")
 
 val changes = myChannel.postgresChangeFlow<PostgresAction.Delete>(schema = "public")
 
@@ -400,8 +451,7 @@ changes
     }
     .launchIn(yourCoroutineScope)
 
-supabase.realtime.connect()
-myChannel.join()
+myChannel.subscribe()
 ```
 
 </TabPanel>
@@ -438,10 +488,24 @@ const changes = client
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+supabase
+    .channel('table-db-changes')
+    .onPostgresChanges(
+        event: PostgresChangeEvent.all,
+        schema: 'public',
+        table: 'todos',
+        callback: (payload) => print(payload))
+    .subscribe();
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-val myChannel = supabase.realtime.createChannel("db-changes")
+val myChannel = supabase.channel("db-changes")
 
 val changes = myChannel.postgresChangeFlow<PostgresAction>(schema = "public") {
     table = "todos"
@@ -453,8 +517,7 @@ changes
     }
     .launchIn(yourCoroutineScope)
 
-supabase.realtime.connect()
-myChannel.join()
+myChannel.subscribe()
 ```
 
 </TabPanel>
@@ -500,18 +563,36 @@ const channel = supabase
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+supabase
+    .channel('db-changes')
+    .onPostgresChanges(
+        event: PostgresChangeEvent.all,
+        schema: 'public',
+        table: 'messages',
+        callback: (payload) => print(payload))
+    .onPostgresChanges(
+        event: PostgresChangeEvent.insert,
+        schema: 'public',
+        table: 'users',
+        callback: (payload) => print(payload))
+    .subscribe();
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-val myChannel = supabase.realtime.createChannel("db-changes")
+val myChannel = supabase.channel("db-changes")
 val messageChanges = myChannel.postgresChangeFlow<PostgresAction>(schema = "public") {
     table = "messages"
 }
 val userChanges = myChannel.postgresChangeFlow<PostgresAction.Insert>(schema = "public") {
     table = "users"
 }
-supabase.realtime.connect()
-myChannel.join()
+myChannel.subscribe()
 ```
 
 </TabPanel>
@@ -547,10 +628,29 @@ const changes = client
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+  supabase
+      .channel('table-filter-changes')
+      .onPostgresChanges(
+          event: PostgresChangeEvent.insert,
+          schema: 'public',
+          table: 'todos',
+          filter: PostgresChangeFilter(
+            type: PostgresChangeFilterType.eq,
+            column: 'id',
+            value: 1,
+          ),
+          callback: (payload) => print(payload))
+      .subscribe();
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-val myChannel = supabase.realtime.createChannel("db-changes")
+val myChannel = supabase.channel("db-changes")
 
 val changes = myChannel.postgresChangeFlow<PostgresAction.Insert>(schema = "public") {
     table = "todos"
@@ -563,8 +663,7 @@ changes
     }
     .launchIn(yourCoroutineScope)
 
-supabase.realtime.connect()
-myChannel.join()
+myChannel.subscribe()
 ```
 
 </TabPanel>
@@ -604,10 +703,29 @@ const channel = supabase
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+supabase
+    .channel('changes')
+    .onPostgresChanges(
+        event: PostgresChangeEvent.update,
+        schema: 'public',
+        table: 'messages',
+        filter: PostgresChangeFilter(
+          type: PostgresChangeFilterType.eq,
+          column: 'body',
+          value: 'hey',
+        ),
+        callback: (payload) => print(payload))
+    .subscribe();
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-val myChannel = supabase.realtime.createChannel("db-changes")
+val myChannel = supabase.channel("db-changes")
 
 val changes = myChannel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
     table = "messages"
@@ -620,8 +738,7 @@ changes
     }
     .launchIn(yourCoroutineScope)
 
-supabase.realtime.connect()
-myChannel.join()
+myChannel.subscribe()
 ```
 
 </TabPanel>
@@ -632,6 +749,15 @@ This filter uses Postgres's `=` filter.
 ### Not equal to (neq)
 
 To listen to changes when a column's value in a table does not equal a client-specified value:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
 
 ```js
 const channel = supabase
@@ -648,6 +774,49 @@ const channel = supabase
   )
   .subscribe()
 ```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+supabase
+    .channel('changes')
+    .onPostgresChanges(
+        event: PostgresChangeEvent.insert,
+        schema: 'public',
+        table: 'messages',
+        filter: PostgresChangeFilter(
+          type: PostgresChangeFilterType.neq,
+          column: 'body',
+          value: 'bye',
+        ),
+        callback: (payload) => print(payload))
+    .subscribe();
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val myChannel = supabase.realtime.createChannel("db-changes")
+
+val changes = myChannel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
+    table = "messages"
+    filter = "body=neq.bye"
+}
+
+changes
+    .onEach {
+        println(it.record)
+    }
+    .launchIn(yourCoroutineScope)
+
+supabase.realtime.connect()
+myChannel.join()
+```
+
+</TabPanel>
+</Tabs>
 
 This filter uses Postgres's `!=` filter.
 
@@ -681,10 +850,29 @@ const channel = supabase
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+supabase
+    .channel('changes')
+    .onPostgresChanges(
+        event: PostgresChangeEvent.insert,
+        schema: 'public',
+        table: 'profiles',
+        filter: PostgresChangeFilter(
+          type: PostgresChangeFilterType.lt,
+          column: 'age',
+          value: 65,
+        ),
+        callback: (payload) => print(payload))
+    .subscribe();
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-val myChannel = supabase.realtime.createChannel("db-changes")
+val myChannel = supabase.channel("db-changes")
 
 val changes = myChannel.postgresChangeFlow<PostgresAction.Insert>(schema = "public") {
     table = "profiles"
@@ -697,8 +885,7 @@ changes
     }
     .launchIn(yourCoroutineScope)
 
-supabase.realtime.connect()
-myChannel.join()
+myChannel.subscribe()
 ```
 
 </TabPanel>
@@ -736,10 +923,29 @@ const channel = supabase
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+supabase
+    .channel('changes')
+    .onPostgresChanges(
+        event: PostgresChangeEvent.insert,
+        schema: 'public',
+        table: 'profiles',
+        filter: PostgresChangeFilter(
+          type: PostgresChangeFilterType.lte,
+          column: 'age',
+          value: 65,
+        ),
+        callback: (payload) => print(payload))
+    .subscribe();
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-val myChannel = supabase.realtime.createChannel("db-changes")
+val myChannel = supabase.channel("db-changes")
 
 val changes = myChannel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
     table = "profiles"
@@ -752,8 +958,7 @@ changes
     }
     .launchIn(yourCoroutineScope)
 
-supabase.realtime.connect()
-myChannel.join()
+myChannel.subscribe()
 ```
 
 </TabPanel>
@@ -761,7 +966,7 @@ myChannel.join()
 
 This filter uses Postgres' `<=` filter, so it works for non-numeric types. Make sure to check the expected behavior of the compared data's type.
 
-### Greater thank (gt)
+### Greater than (gt)
 
 To listen to changes when a column's value in a table is greater than a client-specified value:
 
@@ -791,10 +996,29 @@ const channel = supabase
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+supabase
+    .channel('changes')
+    .onPostgresChanges(
+        event: PostgresChangeEvent.insert,
+        schema: 'public',
+        table: 'products',
+        filter: PostgresChangeFilter(
+          type: PostgresChangeFilterType.gt,
+          column: 'quantity',
+          value: 10,
+        ),
+        callback: (payload) => print(payload))
+    .subscribe();
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-val myChannel = supabase.realtime.createChannel("db-changes")
+val myChannel = supabase.channel("db-changes")
 
 val changes = myChannel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
     table = "products"
@@ -807,8 +1031,7 @@ changes
     }
     .launchIn(yourCoroutineScope)
 
-supabase.realtime.connect()
-myChannel.join()
+myChannel.subscribe()
 ```
 
 </TabPanel>
@@ -846,10 +1069,29 @@ const channel = supabase
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+supabase
+    .channel('changes')
+    .onPostgresChanges(
+        event: PostgresChangeEvent.insert,
+        schema: 'public',
+        table: 'products',
+        filter: PostgresChangeFilter(
+          type: PostgresChangeFilterType.gte,
+          column: 'quantity',
+          value: 10,
+        ),
+        callback: (payload) => print(payload))
+    .subscribe();
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-val myChannel = supabase.realtime.createChannel("db-changes")
+val myChannel = supabase.channel("db-changes")
 
 val changes = myChannel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
     table = "products"
@@ -862,8 +1104,7 @@ changes
     }
     .launchIn(yourCoroutineScope)
 
-supabase.realtime.connect()
-myChannel.join()
+myChannel.subscribe()
 ```
 
 </TabPanel>
@@ -901,10 +1142,29 @@ const channel = supabase
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+supabase
+    .channel('changes')
+    .onPostgresChanges(
+        event: PostgresChangeEvent.insert,
+        schema: 'public',
+        table: 'colors',
+        filter: PostgresChangeFilter(
+          type: PostgresChangeFilterType.lte,
+          column: 'name',
+          value: ['red', 'blue', 'yellow'],
+        ),
+        callback: (payload) => print(payload))
+    .subscribe();
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-val myChannel = supabase.realtime.createChannel("db-changes")
+val myChannel = supabase.channel("db-changes")
 
 val changes = myChannel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
     table = "products"
@@ -917,8 +1177,7 @@ changes
     }
     .launchIn(yourCoroutineScope)
 
-supabase.realtime.connect()
-myChannel.join()
+myChannel.subscribe()
 ```
 
 </TabPanel>
@@ -1002,6 +1261,28 @@ const channel = supabase
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+supabase.realtime.setAuth('your-custom-jwt');
+
+supabase
+    .channel('db-changes')
+    .onPostgresChanges(
+      event: PostgresChangeEvent.all,
+      schema: 'public',
+      table: 'messages',
+      filter: PostgresChangeFilter(
+        type: PostgresChangeFilterType.eq,
+        column: 'body',
+        value: 'bye',
+      ),
+      callback: (payload) => print(payload),
+    )
+    .subscribe();
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -1010,7 +1291,7 @@ val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
 		jwtToken = "your-custom-jwt"
 	}
 }
-val myChannel = supabase.realtime.createChannel("db-changes")
+val myChannel = supabase.channel("db-changes")
 
 val changes = myChannel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
     table = "products"
@@ -1023,8 +1304,7 @@ changes
     }
     .launchIn(yourCoroutineScope)
 
-supabase.realtime.connect()
-myChannel.join()
+myChannel.subscribe()
 ```
 
 </TabPanel>
@@ -1052,6 +1332,13 @@ supabase.realtime.setAuth('fresh-token')
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+supabase.realtime.setAuth('fresh-token');
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 In Kotlin, you have to update the token manually per channel:
@@ -1065,39 +1352,23 @@ myChannel.updateAuth("fresh-token")
 
 ## Limitations
 
-### Spaces in Table Names
+### Spaces in table names
 
 Realtime currently does not work when table names contain spaces.
 
-### Database Instance and Realtime Performance
+### Database instance and realtime performance
 
 Realtime systems usually require forethought because of their scaling dynamics. For the `Postgres Changes` feature, every change event must be checked to see if the subscribed user has access. For instance, if you have 100 users subscribed to a table where you make a single insert, it will then trigger 100 "reads": one for each user.
 
 There can be a database bottleneck which limits message throughput. If your database cannot authorize the changes rapidly enough, the changes will be delayed until you receive a timeout.
 
+Database changes are processed on a single thread to maintain the change order. That means compute upgrades don't have a large effect on the performance of Postgres change subscriptions. You can estimate the expected maximum throughput for your database below.
+
 If you are using Postgres Changes at scale, you should consider using separate "public" table without RLS and filters. Alternatively, you can use Realtime server-side only and then re-stream the changes to your clients using a Realtime Broadcast.
 
-From our observations, we recommend the following limits depending on your database size:
+Enter your database settings to estimate the maximum throughput for your instance:
 
-### Micro to medium
-
-| Filters | RLS Usage | Concurrent Clients | Records per second per client | Messages per second (total) | Latency p95 (ms) |
-| ------- | --------- | ------------------ | ----------------------------- | --------------------------- | ---------------- |
-| 🚫      | 🚫        | 500                | 10                            | 5,000                       | 257              |
-| 🚫      | 🚫        | 1,000              | 10                            | 10,000                      | 800              |
-| 🚫      | 🚫        | 5,000              | 2                             | 10,000                      | 1,120            |
-
-### Large and above
-
-| Filters | RLS Usage | Concurrent Clients | Records per second per client | Messages per second (total) | Latency p95 (ms) |
-| ------- | --------- | ------------------ | ----------------------------- | --------------------------- | ---------------- |
-| 🚫      | 🚫        | 1,000              | 10                            | 10,000                      | 261              |
-| 🚫      | 🚫        | 5,000              | 2                             | 10,000                      | 952              |
-| 🚫      | 🚫        | 10,000             | 1                             | 10,000                      | 949              |
-| 🚫      | 🚫        | 200,000            | 0.04 (1 in 25 seconds)        | 8,000                       | 15,709           |
-| ✅      | ✅        | 500                | 2                             | 1,000                       | 262              |
-| ✅      | ✅        | 1,000              | 1                             | 1,000                       | 431              |
-| ✅      | ✅        | 5,000              | 0.2 (1 in 5 seconds)          | 1,000                       | 702              |
+<RealtimeLimitsEstimater />
 
 Don't forget to run your own benchmarks to make sure that the performance is acceptable for your use case.
 

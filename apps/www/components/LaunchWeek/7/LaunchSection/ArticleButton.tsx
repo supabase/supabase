@@ -8,7 +8,7 @@ const ArticleButton = (props: Article) => {
         className="
             bg-background text-foreground 
             hover:bg-background-overlay 
-            dark:hover:bg-border-default border-default 
+            border-default 
             flex items-start gap-3 rounded-md 
             border p-3 
             px-6 drop-shadow-sm transition"

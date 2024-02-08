@@ -55,6 +55,7 @@ export const CommandDialog = ({ children, onKeyDown, page, ...props }: CommandDi
         '!border-overlay/90',
         'transition ease-out',
         'place-self-start mx-auto top-24',
+        'max-w-[calc(100vw-60px)] xs:max-w-[50%]',
         animateBounce ? 'scale-[101.5%]' : 'scale-100'
       )}
     >
@@ -219,13 +220,13 @@ export const CommandItem = React.forwardRef<CommandPrimitiveItemElement, Command
         aria-selected:scale-[100.3%]
         data-[disabled]:pointer-events-none data-[disabled]:opacity-50`
           : type === 'link'
-          ? `
+            ? `
         px-2
         transition-all
         outline-none
         aria-selected:bg-overlay-hover/90
         data-[disabled]:pointer-events-none data-[disabled]:opacity-50`
-          : `
+            : `
         px-2
         aria-selected:bg-overlay-hover/80
         aria-selected:backdrop-filter

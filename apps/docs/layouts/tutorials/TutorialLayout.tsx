@@ -62,7 +62,7 @@ const Layout: FC<Props> = (props: Props) => {
       >
         <div>
           <p className="text-brand tracking-wider">Tutorials</p>
-          <article className={['prose dark:prose-dark ', 'max-w-none'].join(' ')}>
+          <article className={['prose', 'max-w-none'].join(' ')}>
             <h1>{props.meta.title}</h1>
             <div className="max-w-xs w-32 h-[1px] bg-gradient-to-r from-brand-300 to-brand my-16"></div>
 

@@ -5,7 +5,7 @@ const Nav = [
       { name: 'Supabase JavaScript Library', url: '/reference/javascript', items: [] },
       { name: 'Installing', url: '/reference/javascript/installing', items: [] },
       { name: 'Initializing', url: '/reference/javascript/initializing', items: [] },
-      { name: 'Typescript Support', url: '/reference/javascript/typescript-support', items: [] },
+      { name: 'TypeScript support', url: '/reference/javascript/typescript-support', items: [] },
       { name: 'Release Notes', url: '/reference/javascript/release-notes', items: [] },
       {
         name: 'Upgrading to supabase-js v2',

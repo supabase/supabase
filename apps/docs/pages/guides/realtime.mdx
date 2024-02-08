@@ -53,7 +53,16 @@ alter
 
 From the client, we can listen to any new data that is inserted into the `todos` table:
 
-```javascript
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
 // Initialize the JS client
 import { createClient } from '@supabase/supabase-js'
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
@@ -69,6 +78,44 @@ supabase
   .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'todos' }, handleInserts)
   .subscribe()
 ```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+void main() async {
+  // Initialize the Flutter client
+  Supabase.initialize(
+    url: 'https://<project>.supabase.co',
+    anonKey: '<your-anon-key>',
+    realtimeClientOptions: const RealtimeClientOptions(
+      eventsPerSecond: 2,
+    ),
+  );
+  runApp(const MyApp());
+}
+
+final supabase = Supabase.instance.client;
+
+void handleInserts(payload) {
+  print('Change received! $payload');
+}
+
+// Listen to inserts
+supabase
+    .channel('todos')
+    .onPostgresChanges(
+        event: PostgresChangeEvent.insert,
+        schema: 'public',
+        table: 'todos',
+        callback: handleInserts)
+    .subscribe();
+```
+
+</TabPanel>
+</Tabs>
 
 Use [subscribe()](/docs/reference/javascript/subscribe) to listen to database changes.
 The Realtime API works through PostgreSQL's replication functionality. Postgres sends database changes to a [publication](/docs/guides/database/replication#publications)

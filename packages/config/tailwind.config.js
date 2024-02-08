@@ -1,15 +1,15 @@
-const ui = require('./ui.config.js')
-const deepMerge = require('deepmerge')
+const ui = require('./ui.config.js');
+const deepMerge = require('deepmerge');
 
-const color = require('./../ui/build/css/tw-extend/color')
+const color = require('./../ui/build/css/tw-extend/color');
 
 /**
  *
  */
-let colorExtend = {}
+let colorExtend = {};
 Object.values(color).map((x, i) => {
-  colorExtend[Object.keys(color)[i]] = `hsl(${x.cssVariable} / <alpha-value>)` // x.cssVariable
-})
+  colorExtend[ Object.keys(color)[ i ] ] = `hsl(${x.cssVariable} / <alpha-value>)`; // x.cssVariable
+});
 
 // console.log('colorExtend', colorExtend)
 // console.log('colorExtend kebabToNested', kebabToNested(colorExtend))
@@ -21,16 +21,16 @@ Object.values(color).map((x, i) => {
  * adds <alpha-value> as part of the hsl value
  */
 function generateTwColorClasses(globalKey, twAttributes) {
-  let classes = {}
+  let classes = {};
   Object.values(twAttributes).map((attr, i) => {
-    const attrKey = Object.keys(twAttributes)[i]
+    const attrKey = Object.keys(twAttributes)[ i ];
 
     if (attrKey.includes(globalKey)) {
-      const keySplit = attrKey.split('-').splice(1).join('-')
+      const keySplit = attrKey.split('-').splice(1).join('-');
 
       let payload = {
-        [keySplit]: `hsl(${attr.cssVariable} / <alpha-value>)`,
-      }
+        [ keySplit ]: `hsl(${attr.cssVariable} / <alpha-value>)`,
+      };
 
       if (keySplit == 'DEFAULT') {
         // includes a 'default' duplicate
@@ -38,48 +38,48 @@ function generateTwColorClasses(globalKey, twAttributes) {
         payload = {
           ...payload,
           default: `hsl(${attr.cssVariable} / <alpha-value>)`,
-        }
+        };
       }
 
       classes = {
         ...classes,
         ...payload,
-      }
+      };
     }
-  })
+  });
   /**
    * mutate object into nested object for tailwind theme structure
    */
-  const nestedClasses = kebabToNested(classes)
+  const nestedClasses = kebabToNested(classes);
   // return, but nest the keys if they are kebab case named
-  return nestedClasses
+  return nestedClasses;
 }
 
 /**
  * Helper to convert kebab named keys in object to nested nodes
  */
 function kebabToNested(obj) {
-  const result = {}
-  for (const [key, value] of Object.entries(obj)) {
-    const parts = key.split('-')
-    let currentObj = result
+  const result = {};
+  for (const [ key, value ] of Object.entries(obj)) {
+    const parts = key.split('-');
+    let currentObj = result;
     for (let i = 0; i < parts.length; i++) {
-      const part = parts[i] === 'DEFAULT' ? parts[i] : parts[i].toLowerCase() // convert key to lowercase
-      if (!currentObj[part]) {
-        currentObj[part] = {}
+      const part = parts[ i ] === 'DEFAULT' ? parts[ i ] : parts[ i ].toLowerCase(); // convert key to lowercase
+      if (!currentObj[ part ]) {
+        currentObj[ part ] = {};
       }
       if (i === parts.length - 1) {
         if (typeof value === 'object') {
-          currentObj[part] = kebabToNested(value) // recursively convert nested objects
+          currentObj[ part ] = kebabToNested(value); // recursively convert nested objects
         } else {
-          currentObj[part] = value.toString().toLowerCase() // convert value to lowercase
+          currentObj[ part ] = value.toString().toLowerCase(); // convert value to lowercase
         }
       } else {
-        currentObj = currentObj[part]
+        currentObj = currentObj[ part ];
       }
     }
   }
-  return result
+  return result;
 }
 
 /**
@@ -87,7 +87,7 @@ function kebabToNested(obj) {
  */
 const uiConfig = ui({
   mode: 'JIT',
-  darkMode: 'class',
+  darkMode: [ 'class', '[data-theme*="dark"]' ],
   theme: {
     /**
      * Spread all theme colors and custom generated colors into theme
@@ -120,41 +120,50 @@ const uiConfig = ui({
             'code::after': {
               content: '""',
             },
-            '--tw-prose-body': theme('colors.scale[1100]'),
-            '--tw-prose-headings': theme('colors.scale[1200]'),
-            '--tw-prose-lead': theme('colors.scale[1100]'),
-            '--tw-prose-links': theme('colors.scale[1100]'),
-            '--tw-prose-bold': theme('colors.scale[1100]'),
-            '--tw-prose-counters': theme('colors.scale[1100]'),
-            '--tw-prose-bullets': theme('colors.scale[900]'),
-            '--tw-prose-hr': theme('colors.scale[500]'),
-            '--tw-prose-quotes': theme('colors.scale[1100]'),
-            '--tw-prose-quote-borders': theme('colors.scale[500]'),
-            '--tw-prose-captions': theme('colors.scale[700]'),
-            '--tw-prose-code': theme('colors.scale[1200]'),
-            '--tw-prose-pre-code': theme('colors.scale[900]'),
-            '--tw-prose-pre-bg': theme('colors.scale[400]'),
-            '--tw-prose-th-borders': theme('colors.scale[500]'),
-            '--tw-prose-td-borders': theme('colors.scale[200]'),
-            '--tw-prose-invert-body': theme('colors.scale[200]'),
+            '--tw-prose-body': 'hsl(var(--foreground-light))',
+            '--tw-prose-headings': 'hsl(var(--foreground-default))',
+            '--tw-prose-lead': 'hsl(var(--foreground-light))',
+            '--tw-prose-links': 'hsl(var(--foreground-light))',
+            '--tw-prose-bold': 'hsl(var(--foreground-light))',
+            '--tw-prose-counters': 'hsl(var(--foreground-light))',
+            '--tw-prose-bullets': 'hsl(var(--foreground-muted))',
+            '--tw-prose-hr': 'hsl(var(--background-surface-300))',
+            '--tw-prose-quotes': 'hsl(var(--foreground-light))',
+            '--tw-prose-quote-borders': 'hsl(var(--background-surface-300))',
+            '--tw-prose-captions': 'hsl(var(--border-strong))',
+            '--tw-prose-code': 'hsl(var(--foreground-default))',
+            '--tw-prose-pre-code': 'hsl(var(--foreground-muted))',
+            '--tw-prose-pre-bg': 'hsl(var(--background-surface-200))',
+            '--tw-prose-th-borders': 'hsl(var(--background-surface-300))',
+            '--tw-prose-td-borders': 'hsl(var(--background-default))',
+            '--tw-prose-invert-body': 'hsl(var(--background-default))',
             '--tw-prose-invert-headings': theme('colors.white'),
-            '--tw-prose-invert-lead': theme('colors.scale[500]'),
+            '--tw-prose-invert-lead': 'hsl(var(--background-surface-300))',
             '--tw-prose-invert-links': theme('colors.white'),
             '--tw-prose-invert-bold': theme('colors.white'),
-            '--tw-prose-invert-counters': theme('colors.scale[400]'),
-            '--tw-prose-invert-bullets': theme('colors.scale[600]'),
-            '--tw-prose-invert-hr': theme('colors.scale[700]'),
-            '--tw-prose-invert-quotes': theme('colors.scale[100]'),
-            '--tw-prose-invert-quote-borders': theme('colors.scale[700]'),
-            '--tw-prose-invert-captions': theme('colors.scale[400]'),
+            '--tw-prose-invert-counters': 'hsl(var(--background-surface-200))',
+            '--tw-prose-invert-bullets': 'hsl(var(--background-selection))',
+            '--tw-prose-invert-hr': 'hsl(var(--border-strong))',
+            '--tw-prose-invert-quotes': 'hsl(var(--background-alternative-default))',
+            '--tw-prose-invert-quote-borders': 'hsl(var(--border-strong))',
+            '--tw-prose-invert-captions': 'hsl(var(--background-surface-200))',
             // the following are typography overrides
             // examples can be seen here —> https://github.com/tailwindlabs/tailwindcss-typography/blob/master/src/styles.js
             // reset all header font weights
-            'h1, h2, h3, h4, h5': {
+            h4: {
+              // override font size
+              fontSize: '1.15em',
+            },
+            h5: {
+              // h5 not included in --tw-prose-headings
+              color: theme('colors.scale[1200]'),
+            },
+            'h1, h2, h3, h4, h5, h6': {
               fontWeight: '400',
             },
-            h2: {
-              fontWeight: '400',
+            'article h2, article h3, article h4, article h5, article h6': {
+              marginTop: '2em',
+              marginBottom: '1em',
             },
             p: {
               fontWeight: '400',
@@ -185,8 +194,13 @@ const uiConfig = ui({
               paddingLeft: '1rem',
               counterReset: 'item',
               listStyleType: 'none',
+              marginBottom: '3rem',
             },
-            'ol>li': { display: 'block', position: 'relative', paddingLeft: '1rem' },
+            'ol>li': {
+              display: 'block',
+              position: 'relative',
+              paddingLeft: '1rem',
+            },
             'ol>li::before': {
               position: 'absolute',
               top: '0.25rem',
@@ -215,13 +229,13 @@ const uiConfig = ui({
               borderRadius: theme('borderRadius.lg'),
             },
             td: {
-              borderBottom: '1px solid ' + theme('colors.scale[400]'),
+              borderBottom: '1px solid ' + 'hsl(var(--background-surface-200))',
             },
             code: {
               fontWeight: '400',
               padding: '0.2rem 0.4rem',
-              backgroundColor: theme('colors.scale[400]'),
-              border: '1px solid ' + theme('colors.scale[500]'),
+              backgroundColor: 'hsl(var(--background-surface-200))',
+              border: '1px solid ' + 'hsl(var(--background-surface-300))',
               borderRadius: theme('borderRadius.lg'),
               wordBreak: 'break-all',
             },
@@ -230,23 +244,30 @@ const uiConfig = ui({
               transition: 'color 0.3s ease-in-out',
               paddingBottom: '2px',
               fontWeight: '400',
-              color: 'hsl(var(--colors-scale12))',
+              color: 'hsl(var(--foreground-default))',
               textDecorationLine: 'underline',
               textDecorationColor: 'hsl(var(--brand-500))',
               textDecorationThickness: '1px',
               textUnderlineOffset: '4px',
             },
             'a:hover': {
-              textDecorationColor: 'hsl(var(--brand-default))',
+              textDecorationColor: 'hsl(var(--colors-scale12))',
             },
             figcaption: {
               color: 'hsl(var(--foreground-muted))',
+              fontFamily: 'Office Code Pro, monospace',
             },
             'figure.quote-figure p:first-child': {
               marginTop: '0 !important',
             },
             'figure.quote-figure p:last-child': {
               marginBottom: '0 !important',
+            },
+            figure: {
+              margin: '3rem 0',
+            },
+            'figure img': {
+              margin: '0 !important',
             },
           },
         },
@@ -266,9 +287,9 @@ const uiConfig = ui({
                 'text-decoration': 'none',
                 fontSize: '0.8rem',
                 fontWeight: '200',
-                color: theme('colors.scale[1100]'),
+                color: 'hsl(var(--foreground-light))',
                 '&:hover': {
-                  color: theme('colors.scale[1200]'),
+                  color: 'hsl(var(--foreground-default))',
                 },
                 'font-weight': '400',
               },
@@ -283,9 +304,9 @@ const uiConfig = ui({
                 },
                 a: {
                   fontWeight: '200',
-                  color: theme('colors.scale[1000]'),
+                  color: 'hsl(var(--foreground-lighter))',
                   '&:hover': {
-                    color: theme('colors.scale[1200]'),
+                    color: 'hsl(var(--foreground-default))',
                   },
                 },
               },
@@ -295,33 +316,33 @@ const uiConfig = ui({
         // used in auto docs
         docs: {
           css: {
-            '--tw-prose-body': theme('colors.scale[1100]'),
-            '--tw-prose-headings': theme('colors.scale[1200]'),
-            '--tw-prose-lead': theme('colors.scale[1100]'),
-            '--tw-prose-links': theme('colors.brand[900]'),
-            '--tw-prose-bold': theme('colors.scale[1100]'),
-            '--tw-prose-counters': theme('colors.scale[1100]'),
-            '--tw-prose-bullets': theme('colors.scale[900]'),
-            '--tw-prose-hr': theme('colors.scale[500]'),
-            '--tw-prose-quotes': theme('colors.scale[1100]'),
-            '--tw-prose-quote-borders': theme('colors.scale[500]'),
-            '--tw-prose-captions': theme('colors.scale[700]'),
-            '--tw-prose-code': theme('colors.scale[1200]'),
-            '--tw-prose-pre-code': theme('colors.scale[900]'),
-            '--tw-prose-pre-bg': theme('colors.scale[400]'),
-            '--tw-prose-th-borders': theme('colors.scale[500]'),
-            '--tw-prose-td-borders': theme('colors.scale[200]'),
-            '--tw-prose-invert-body': theme('colors.scale[200]'),
+            '--tw-prose-body': 'hsl(var(--foreground-light))',
+            '--tw-prose-headings': 'hsl(var(--foreground-default))',
+            '--tw-prose-lead': 'hsl(var(--foreground-light))',
+            '--tw-prose-links': 'hsl(var(--brand-500))',
+            '--tw-prose-bold': 'hsl(var(--foreground-light))',
+            '--tw-prose-counters': 'hsl(var(--foreground-light))',
+            '--tw-prose-bullets': 'hsl(var(--foreground-muted))',
+            '--tw-prose-hr': 'hsl(var(--background-surface-300))',
+            '--tw-prose-quotes': 'hsl(var(--foreground-light))',
+            '--tw-prose-quote-borders': 'hsl(var(--background-surface-300))',
+            '--tw-prose-captions': 'hsl(var(--border-strong))',
+            '--tw-prose-code': 'hsl(var(--foreground-default))',
+            '--tw-prose-pre-code': 'hsl(var(--foreground-muted))',
+            '--tw-prose-pre-bg': 'hsl(var(--background-surface-200))',
+            '--tw-prose-th-borders': 'hsl(var(--background-surface-300))',
+            '--tw-prose-td-borders': 'hsl(var(--background-default))',
+            '--tw-prose-invert-body': 'hsl(var(--background-default))',
             '--tw-prose-invert-headings': theme('colors.white'),
-            '--tw-prose-invert-lead': theme('colors.scale[500]'),
+            '--tw-prose-invert-lead': 'hsl(var(--background-surface-300))',
             '--tw-prose-invert-links': theme('colors.white'),
             '--tw-prose-invert-bold': theme('colors.white'),
-            '--tw-prose-invert-counters': theme('colors.scale[400]'),
-            '--tw-prose-invert-bullets': theme('colors.scale[600]'),
-            '--tw-prose-invert-hr': theme('colors.scale[700]'),
-            '--tw-prose-invert-quotes': theme('colors.scale[100]'),
-            '--tw-prose-invert-quote-borders': theme('colors.scale[700]'),
-            '--tw-prose-invert-captions': theme('colors.scale[400]'),
+            '--tw-prose-invert-counters': 'hsl(var(--background-surface-200))',
+            '--tw-prose-invert-bullets': 'hsl(var(--background-selection))',
+            '--tw-prose-invert-hr': 'hsl(var(--border-strong))',
+            '--tw-prose-invert-quotes': 'hsl(var(--background-alternative-default))',
+            '--tw-prose-invert-quote-borders': 'hsl(var(--border-strong))',
+            '--tw-prose-invert-captions': 'hsl(var(--background-surface-200))',
             // the following are typography overrides
             // examples can be seen here —> https://github.com/tailwindlabs/tailwindcss-typography/blob/master/src/styles.js
             // reset all header font weights
@@ -335,8 +356,8 @@ const uiConfig = ui({
         xs: '480px',
       },
       fontFamily: {
-        sans: ['Circular', 'custom-font', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
-        mono: ['Office Code Pro', 'Source Code Pro', 'Menlo', 'monospace'],
+        sans: [ 'Circular', 'custom-font', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif' ],
+        mono: [ 'Office Code Pro', 'Source Code Pro', 'Menlo', 'monospace' ],
       },
 
       // shadcn defaults START
@@ -371,14 +392,14 @@ const uiConfig = ui({
       // shadcn defaults END
     },
   },
-  plugins: [require('@tailwindcss/typography'), require('tailwindcss-animate')],
-})
+  plugins: [ require('@tailwindcss/typography'), require('tailwindcss-animate') ],
+});
 
 function arrayMergeFn(destinationArray, sourceArray) {
   return destinationArray.concat(sourceArray).reduce((acc, cur) => {
-    if (acc.includes(cur)) return acc
-    return [...acc, cur]
-  }, [])
+    if (acc.includes(cur)) return acc;
+    return [ ...acc, cur ];
+  }, []);
 }
 
 /**
@@ -389,7 +410,7 @@ function arrayMergeFn(destinationArray, sourceArray) {
 function wrapper(tailwindConfig) {
   return deepMerge({ ...tailwindConfig }, uiConfig, {
     arrayMerge: arrayMergeFn,
-  })
+  });
 }
 
-module.exports = wrapper
+module.exports = wrapper;

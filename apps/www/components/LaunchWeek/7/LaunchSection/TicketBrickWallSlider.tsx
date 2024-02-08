@@ -75,12 +75,10 @@ export function TicketBrickWallSlider({ users, reverse, speed = 10000 }: Props) 
                     <Image
                       src={getOgUrl(user.username!, !!user.golden)}
                       alt={user.username ?? ''}
-                      layout="fill"
-                      objectFit="cover"
-                      objectPosition="center"
+                      fill
                       placeholder="blur"
                       blurDataURL="/images/blur.png"
-                      className="absolute inset-[1px] rounded-md md:rounded-lg"
+                      className="absolute inset-[1px] rounded-md md:rounded-lg object-cover object-center"
                     />
                   </div>
                 </div>

@@ -36,6 +36,7 @@ const BlogFilters = ({ posts, setPosts, setCategory, allCategories, handlePosts 
   const is2XL = useBreakpoint(1535)
   const [showSearchInput, setShowSearchInput] = useState<boolean>(false)
   const router = useRouter()
+  const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
     setShowSearchInput(!isMobile)
@@ -72,9 +73,15 @@ const BlogFilters = ({ posts, setPosts, setCategory, allCategories, handlePosts 
     setSearchKey(event.target.value)
   }
 
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  if (!isMounted) return null
+
   return (
     <div className="flex flex-row items-center justify-between gap-2">
-      <AnimatePresence exitBeforeEnter>
+      <AnimatePresence mode="wait">
         {!showSearchInput && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -118,8 +125,8 @@ const BlogFilters = ({ posts, setPosts, setCategory, allCategories, handlePosts 
                 category === 'all' && !searchKey && !activeCategory
                   ? 'alternative'
                   : category === activeCategory
-                  ? 'alternative'
-                  : 'outline'
+                    ? 'alternative'
+                    : 'outline'
               }
               onClick={() => setCategory(category)}
               size={is2XL ? 'tiny' : 'small'}

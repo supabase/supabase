@@ -129,7 +129,7 @@ const GenerateSQL = () => {
                 answer.replace(/^-- /, '') === "Sorry, I don't know how to help with that."
 
               return (
-                <div className="px-4 [overflow-anchor:none] mb-6">
+                <div className="px-4 [overflow-anchor:none] mb-[150px]">
                   <div className="flex gap-6 [overflow-anchor:none] mb-6">
                     <div>
                       <AiIconChat
@@ -163,7 +163,7 @@ const GenerateSQL = () => {
                               hideCopy
                               language="sql"
                               className="
-                                relative prose dark:prose-dark bg-surface-100 max-w-none !mb-0
+                                relative prose bg-surface-100 max-w-none !mb-0
                                 !rounded-b-none
                                 
                               "

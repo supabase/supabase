@@ -19,7 +19,7 @@ import * as yaml from 'js-yaml'
 import { flattenSections } from '../lib/helpers'
 
 const commonDocSpecJson = JSON.parse(
-  fs.readFileSync('../../spec/common-client-libs-sections.json', 'utf8')
+  fs.readFileSync('spec/common-client-libs-sections.json', 'utf8')
 )
 
 const flattenedCommonDocSpecJson = flattenSections(commonDocSpecJson)
@@ -259,10 +259,10 @@ function extractParamTypeAsString(paramDefinition) {
         x.value
           ? `<code>${x.value}</code>`
           : x.name
-          ? `<code>${x.name}</code>`
-          : x.type
-          ? `<code>${x.type}</code>`
-          : ''
+            ? `<code>${x.name}</code>`
+            : x.type
+              ? `<code>${x.type}</code>`
+              : ''
       )
       .join(' | ')
   }

@@ -79,7 +79,7 @@ Creates UUID values based solely on random numbers. You can also use Postgres's 
 select uuid_generate_v4();
 ```
 
-### As a Primary Key
+### As a primary key
 
 Automatically create a unique, random ID in a table:
 
@@ -88,7 +88,6 @@ create table contacts (
   id uuid default uuid_generate_v4(),
   first_name text,
   last_name text,
-
   primary key (id)
 );
 ```

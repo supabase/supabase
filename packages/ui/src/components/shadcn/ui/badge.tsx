@@ -1,7 +1,7 @@
-import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
+import * as React from 'react'
 
-import { cn } from '@ui/lib/utils'
+import { cn } from '../../../lib/utils/cn'
 
 const badgeVariants = cva(
   'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-opacity-10',
@@ -23,7 +23,7 @@ const badgeVariants = cva(
         violet: `bg-violet-200 text-violet-1100 border border-violet-700`,
         indigo: `bg-indigo-200 text-indigo-1100 border border-indigo-700`,
         blue: `bg-blue-200 text-blue-1100 border border-blue-700`,
-        green: `bg-green-200 text-green-1100 border border-green-700`,
+        green: `bg-brand-500 text-brand-600 border border-brand-400`,
         grass: `bg-grass-200 text-grass-1100 border border-grass-700`,
         orange: `bg-orange-200 text-orange-1100 border border-orange-700`,
         yellow: `bg-yellow-200 text-yellow-1100 border border-yellow-700`,
@@ -66,7 +66,7 @@ const badgeVariants = cva(
 //           violet: `bg-violet-200 text-violet-1100 border border-violet-700`,
 //           indigo: `bg-indigo-200 text-indigo-1100 border border-indigo-700`,
 //           blue: `bg-blue-200 text-blue-1100 border border-blue-700`,
-//           green: `bg-green-200 text-green-1100 border border-green-700`,
+//           green: `bg-opacity-10 bg-brand-500 text-brand-600 border border-brand-500`,
 //           grass: `bg-grass-200 text-grass-1100 border border-grass-700`,
 //           orange: `bg-orange-200 text-orange-1100 border border-orange-700`,
 //           yellow: `bg-yellow-200 text-yellow-1100 border border-yellow-700`,

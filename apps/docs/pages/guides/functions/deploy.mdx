@@ -5,7 +5,7 @@ export const meta = {
   title: 'Deploy to Production',
   description: 'Deploy your Edge Functions to your remote Supabase Project.',
   subtitle: 'Deploy your Edge Functions to your remote Supabase Project.',
-  tocVideo: 'rzglqRdZUQE',
+  tocVideo: '5OWH9c4u68M',
 }
 
 Once you have developed your Edge Functions locally, you can deploy them to your Supabase project.
@@ -24,7 +24,7 @@ See the [CLI Docs](/docs/guides/cli) to learn how to install the Supabase CLI on
 
 </Admonition>
 
-## Get your Project ID
+## Get your project ID
 
 Get the project ID associated with your function by running:
 
@@ -48,6 +48,12 @@ supabase link --project-ref your-project-id
 
 ## Deploy your Edge Functions
 
+<Admonition type="tip" label="Docker required">
+
+Since Supabase CLI version 1.123.4, you must have [Docker Desktop](https://docs.docker.com/desktop/) installed to deploy Edge Functions.
+
+</Admonition>
+
 You can deploy all of your Edge Functions with a single command:
 
 ```bash
@@ -68,7 +74,7 @@ supabase functions deploy hello-world --no-verify-jwt
 
 Be careful when using this flag, as it will allow anyone to invoke your Edge Function without a valid JWT. The Supabase client libraries automatically handle authorization.
 
-## Invoking remote Functions
+## Invoking remote functions
 
 You can now invoke your Edge Function using the project's `ANON_KEY`, which can be found in the [API settings](https://supabase.com/dashboard/project/_/settings/api) of the Supabase Dashboard.
 
