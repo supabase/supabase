@@ -8,7 +8,6 @@ import { LoadingLine } from '../LoadingLine/LoadingLine'
 import { Modal } from '../Modal'
 import { ModalProps } from '../Modal/Modal'
 import { useCommandMenu } from './CommandMenuProvider'
-import { commandScore } from './command-score'
 
 type CommandPrimitiveElement = React.ElementRef<typeof CommandPrimitive>
 type CommandPrimitiveProps = React.ComponentPropsWithoutRef<typeof CommandPrimitive>
@@ -22,24 +21,11 @@ export const copyToClipboard = (str: string, callback = () => {}) => {
   }
 }
 
-// `__forcemount__` must be lowercase because `cmdk` converts values to lowercase
-export const FORCE_MOUNT_ITEM = '__forcemount__'
-
-// A hack to implement force mounting while that option is not available
-// in an official release for `cmdk`.
-// See https://github.com/pacocoursey/cmdk/issues/164
-function commandFilter(value: string, search: string) {
-  return value.includes(FORCE_MOUNT_ITEM)
-    ? 1
-    : commandScore(value.replace(FORCE_MOUNT_ITEM, ''), search)
-}
-
 export const Command = React.forwardRef<CommandPrimitiveElement, CommandPrimitiveProps>(
   ({ className, ...props }, ref) => (
     <CommandPrimitive
       ref={ref}
       className={cn('flex h-full w-full flex-col overflow-hidden', className)}
-      filter={commandFilter}
       {...props}
     />
   )
