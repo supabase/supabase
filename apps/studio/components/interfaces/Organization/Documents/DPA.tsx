@@ -17,8 +17,8 @@ const DPA = () => {
             us.
           </p>
           <p>
-            Please review these details and modify any data fields that are not relevant to your use
-            of Supabase. Sign and return the signed DPA document to{' '}
+            Please review these details and add data specific to user processing where required.
+            Sign and return the signed DPA document to{' '}
             <a
               href="mailto:privacy@supabase.com"
               target="_blank"

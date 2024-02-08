@@ -14,15 +14,11 @@ export interface IRootStore {
   ui: IUiStore
   meta: IMetaStore
 
-  selectedProjectRef?: string
-
   setProject: (project: Project) => void
 }
 export class RootStore implements IRootStore {
   ui: IUiStore
   meta: IMetaStore
-
-  selectedProjectRef: string | undefined
 
   constructor() {
     this.ui = new UiStore(this)
@@ -35,16 +31,8 @@ export class RootStore implements IRootStore {
    * This method will also trigger project detail loading when it's not available
    */
   setProject(project: Project) {
-    if (this.selectedProjectRef === project.ref) return
-
-    // reset ui projectRef in case of switching projects
-    // this will show the loading screen instead of showing the previous project
-    this.ui.setProjectRef(undefined)
-
     this.meta.setProjectDetails(project)
     // ui set must come last
     this.ui.setProjectRef(project.ref)
-
-    this.selectedProjectRef = project.ref
   }
 }

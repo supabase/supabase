@@ -52,10 +52,10 @@ const buttonVariants = cva(
             focus-visible:outline-brand-600
             shadow-sm`,
         alternative: `
-            text-brand-600
-            bg-brand-200 hover:bg-brand-400
-            border-brand-600
-            focus-visible:border-brand-300
+            text-foreground
+            bg-brand-400 hover:bg-brand-500
+            border-brand-500
+            focus-visible:border-brand-500
             focus-visible:outline-brand-600
             shadow-sm`,
         outline: `

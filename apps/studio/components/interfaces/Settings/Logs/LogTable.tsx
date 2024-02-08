@@ -50,7 +50,12 @@ const LogTable = ({
   const { ui } = useStore()
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
   const firstRow: LogData | undefined = data?.[0] as LogData
-  const columnNames = Object.keys(data[0] || {})
+
+  // move timestamp to the first column
+  const { timestamp, ...rest } = firstRow || {}
+  const formattedFirstRow = { timestamp, ...rest }
+
+  const columnNames = Object.keys(formattedFirstRow || {})
   const hasId = columnNames.includes('id')
   const hasTimestamp = columnNames.includes('timestamp')
 
@@ -70,10 +75,12 @@ const LogTable = ({
         }
       },
       renderHeaderCell: (props) => {
-        return v
+        return <div className="flex items-center">{v}</div>
       },
       minWidth: 128,
+      maxWidth: v === 'timestamp' ? 240 : 600, // Without this, the column flickers on first render
     }
+
     return result
   })
 

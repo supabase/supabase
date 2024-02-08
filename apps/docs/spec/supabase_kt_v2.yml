@@ -2528,6 +2528,7 @@ functions:
       - Requires either an email or phone number.
       - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
       - If the user doesn't exist, `signInWith(OTP)` will signup the user instead. To restrict this behavior, you can set `createUser` to `false`.
+      - The method `signUpWith(OTP)` does the exact same thing as `signInWith(OTP)`, so it doesn't matter which one you use.
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](/docs/reference/auth/config#site_url).
@@ -2677,22 +2678,24 @@ functions:
     title: 'Verify OTPs'
     $ref: '@supabase/gotrue-js.GoTrueClient.verifyOtp'
     notes: |
-      Log in a user given a User supplied OTP received via mobile.
+      - Verifying an OTP is done through either `verifyPhoneOtp` or `verifyEmailOtp`.     
+      - The verification type used should be determined based on the corresponding auth method called before using `verifyPhoneOtp`/`verifyEmailOtp` to sign up / sign-in a user.
     examples:
       - id: verify-email-otp(otp)
         name: Verify an Email OTP
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.auth.verifyEmailOtp(type = OtpType.Email.INVITE, email = "example@email.com", token = "token")
+          supabase.auth.verifyEmailOtp(type = OtpType.Email.EMAIL, email = "example@email.com", token = "token")
           ```
         description: |
           Available types are:
-            - `OtpType.Email.MAGIC_LINK`
-            - `OtpType.Email.SIGNUP`
+            - `OtpType.Email.MAGIC_LINK` (deprecated)
+            - `OtpType.Email.SIGNUP` (deprecated)
             - `OtpType.Email.INVITE`
             - `OtpType.Email.RECOVERY`
             - `OtpType.Email.EMAIL_CHANGE`
+            - `OtpType.Email.EMAIL`
       - id: verify-phone-otp(otp)
         name: Verify an Phone OTP
         isSpotlight: false
