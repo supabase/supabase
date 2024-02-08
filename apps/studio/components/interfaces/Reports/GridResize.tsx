@@ -1,5 +1,4 @@
 import RGL, { WidthProvider } from 'react-grid-layout'
-import { motion } from 'framer-motion'
 import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 
