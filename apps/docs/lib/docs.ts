@@ -8,6 +8,8 @@ import { dirname, join, extname, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import remarkGfm from 'remark-gfm'
 
+import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
+
 const DOCS_DIRECTORY = join(dirname(fileURLToPath(import.meta.url)), '..')
 const GUIDES_DIRECTORY = join(DOCS_DIRECTORY, 'content/guides')
 
@@ -22,8 +24,6 @@ export function isValidGuideFrontmatter(obj: object): obj is GuideFrontmatter {
   if ('description' in obj && typeof obj.description !== 'string') return false
   return true
 }
-
-import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 
 export async function getGuidesStaticPaths(section: string) {
   const directory = join(GUIDES_DIRECTORY, section)
