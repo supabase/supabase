@@ -2114,3 +2114,9 @@ export const references = [
     ],
   },
 ]
+
+export const navDataForMdx = {
+  nativeMobileLoginItems: NativeMobileLoginItems,
+  phoneLoginsItems: PhoneLoginsItems,
+  socialLoginItems: SocialLoginItems,
+}
