@@ -151,8 +151,8 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
         <title>{title ? `${title} | Supabase` : 'Supabase'}</title>
         <meta name="description" content="Supabase Studio" />
       </Head>
-      <div className="flex h-full">
-        <LayoutWrapper className="flex flex-col flex-1 w-full overflow-y-auto">
+      <div className="h-full min-h-[0px] basis-0 flex-1">
+        <LayoutWrapper className="flex flex-col h-full min-h-[0px] basis-0 flex-1">
           <WithSidebar
             hideSidebar={navLayoutV2}
             title={title}

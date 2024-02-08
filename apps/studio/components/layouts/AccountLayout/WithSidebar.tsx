@@ -37,7 +37,7 @@ const WithSidebar = ({
   return (
     <div className="flex max-h-full">
       {!hideSidebar && !noContent && (
-        <LayoutWrapper
+        <div
           id="with-sidebar"
           className={[
             'h-full bg-background',
@@ -77,7 +77,7 @@ const WithSidebar = ({
               })}
             </Menu>
           </div>
-        </LayoutWrapper>
+        </div>
       )}
       <div className="flex flex-1 flex-col">
         {!navLayoutV2 && <LayoutHeader breadcrumbs={breadcrumbs} />}
