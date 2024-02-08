@@ -88,7 +88,7 @@ const DatabaseSettings = () => {
         db_host: poolingInfo?.db_host,
         db_name: poolingInfo?.db_name,
         db_port: poolingInfo?.db_port,
-        db_user: `postgres.${projectRef}`,
+        db_user: poolingInfo?.db_user,
       }
     : dbConnectionInfo
 
