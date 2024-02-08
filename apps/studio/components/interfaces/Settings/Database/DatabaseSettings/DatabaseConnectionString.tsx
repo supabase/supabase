@@ -12,6 +12,7 @@ import {
   Input,
   Separator,
   Tabs,
+  cn,
 } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -45,7 +46,11 @@ const CONNECTION_TYPES = [
   { id: 'python', label: 'Python' },
 ]
 
-export const DatabaseConnectionString = () => {
+interface DatabaseConnectionStringProps {
+  appearance: 'default' | 'minimal'
+}
+
+export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStringProps) => {
   const router = useRouter()
   const { project: projectDetails, isLoading: isProjectLoading } = useProjectContext()
   const { ref: projectRef, connectionString } = useParams()
@@ -159,16 +164,31 @@ export const DatabaseConnectionString = () => {
   return (
     <div id="connection-string" className="w-full">
       <Panel
-        className="!m-0 [&>div:nth-child(1)]:!border-0 [&>div:nth-child(1)>div]:!p-0"
+        className={cn(
+          '!m-0 [&>div:nth-child(1)]:!border-0 [&>div:nth-child(1)>div]:!p-0',
+          appearance === 'minimal' && 'border-0 shadow-none'
+        )}
+        bodyClassName={cn(appearance === 'minimal' && 'bg-transparent')}
+        headerClasses={cn(appearance === 'minimal' && 'bg-transparent')}
         title={
-          <div ref={connectionStringsRef} className="w-full flex flex-col pt-4">
+          <div
+            ref={connectionStringsRef}
+            className={cn('w-full flex flex-col', appearance === 'default' ? 'pt-4' : 'pt-0')}
+          >
             <div className="flex items-center justify-between px-6 mb-2">
-              <h5 key="panel-title" className="mb-0">
-                Connection string
-              </h5>
-              <div className="flex items-center gap-x-2">
+              {appearance === 'default' && (
+                <h5 key="panel-title" className="mb-0">
+                  Connection string
+                </h5>
+              )}
+              <div className="flex items-center gap-x-2 ml-auto">
                 {readReplicasEnabled && <DatabaseSelector />}
-                <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                <Button
+                  asChild
+                  type="default"
+                  icon={<IconExternalLink strokeWidth={1.5} />}
+                  className={cn(appearance === 'minimal' && 'absolute -top-1 right-0')}
+                >
                   <a href="https://supabase.com/docs/guides/database/connecting-to-postgres">
                     Documentation
                   </a>
@@ -179,7 +199,10 @@ export const DatabaseConnectionString = () => {
               type="underlined"
               size="tiny"
               activeId={selectedTab}
-              baseClassNames="!space-y-0 px-6 -mb-[1px]"
+              baseClassNames={cn(
+                '!space-y-0 px-6 -mb-[1px]',
+                appearance === 'minimal' && '-mt-1 px-0'
+              )}
               onChange={setSelectedTab}
             >
               {CONNECTION_TYPES.map((type) => (
@@ -190,7 +213,7 @@ export const DatabaseConnectionString = () => {
           </div>
         }
       >
-        <Panel.Content>
+        <Panel.Content className={appearance === 'minimal' && 'px-0'}>
           {isLoading && <ShimmeringLoader className="h-8 w-full" />}
           {isError && <AlertError error={error} subject="Failed to retrieve database settings" />}
           {isSuccess && (
@@ -221,7 +244,7 @@ export const DatabaseConnectionString = () => {
         {poolerConnStringSyntax.length > 0 && poolingInfo?.supavisor_enabled && (
           <>
             <Separator />
-            <Panel.Content className="!py-3 space-y-2">
+            <Panel.Content className={cn('!py-3 space-y-2', appearance === 'minimal' && 'px-0')}>
               <Collapsible_Shadcn_>
                 <CollapsibleTrigger_Shadcn_ className="group [&[data-state=open]>div>svg]:!-rotate-180">
                   <div className="flex items-center gap-x-2 w-full">

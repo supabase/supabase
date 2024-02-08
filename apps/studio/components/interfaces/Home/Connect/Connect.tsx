@@ -217,7 +217,7 @@ const Connect = () => {
             >
               <TabsList_Shadcn_ className={cn('flex gap-4', DIALOG_PADDING_X_Shadcn_)}>
                 <TabsTrigger_Shadcn_ key="direct" value="direct" className="px-0">
-                  Direct Connection
+                  Connection String
                 </TabsTrigger_Shadcn_>
                 {CONNECTION_TYPES.map((type) => (
                   <TabsTrigger_Shadcn_ key={type.key} value={type.key} className="px-0">
@@ -297,7 +297,7 @@ const Connect = () => {
                 value="direct"
                 className={cn(DIALOG_PADDING_X_Shadcn_, DIALOG_PADDING_Y_Shadcn_, '!mt-0')}
               >
-                <DatabaseConnectionString />
+                <DatabaseConnectionString appearance="minimal" />
               </TabsContent_Shadcn_>
             </Tabs_Shadcn_>
           </DialogContent_Shadcn_>
