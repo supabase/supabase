@@ -181,7 +181,7 @@ const InfrastructureActivity = () => {
           </div>
         </div>
       </ScaffoldContainer>
-      <ScaffoldContainer className="sticky top-0 py-6 border-b bg-background z-10">
+      <ScaffoldContainer className="sticky top-0 py-6 border-b bg-studio z-10">
         <div className="flex items-center gap-x-4">
           {/* [Joshen] Metrics for replicas not available yet */}
           {/* {readReplicasEnabled && <DatabaseSelector />} */}

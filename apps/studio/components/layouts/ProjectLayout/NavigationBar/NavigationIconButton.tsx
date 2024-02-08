@@ -21,7 +21,7 @@ const NavigationIconButton = ({ route, isActive = false }: NavigationIconButtonP
             className={[
               'transition-colors duration-200',
               'flex items-center justify-center h-10 w-10 rounded', // Layout
-              'bg-background hover:bg-overlay-hover', // Light mode
+              'bg-studio hover:bg-overlay-hover', // Light mode
               'text-foreground-lighter hover:text-foreground ', // Dark mode
               `${isActive ? 'bg-selection shadow-sm text-foreground' : ''}`,
             ].join(' ')}

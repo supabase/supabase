@@ -80,7 +80,7 @@ const NavigationBar = () => {
     <div
       className={[
         'hide-scrollbar flex w-14 flex-col justify-between p-2 overflow-y-auto',
-        'border-r bg-background border-default',
+        'border-r bg-studio border-default',
       ].join(' ')}
     >
       <ul className="flex flex-col space-y-2">

@@ -232,7 +232,7 @@ const PlanUpdateSidePanel = () => {
                       <p className="text-foreground-light text-sm">{plan.costUnit}</p>
                     </div>
                     <div className={clsx('flex mt-1 mb-4', !warning && 'opacity-0')}>
-                      <div className="bg-background text-brand-600 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-xs">
+                      <div className="bg-studio text-brand-600 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-xs">
                         {warning}
                       </div>
                     </div>

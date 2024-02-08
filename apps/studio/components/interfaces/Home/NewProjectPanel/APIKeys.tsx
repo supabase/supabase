@@ -165,7 +165,7 @@ const APIKeys = () => {
             />
           </Panel.Content>
           <div className="border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
-            <div className="flex items-center bg-background">
+            <div className="flex items-center bg-studio">
               {availableLanguages.map((language) => {
                 const isSelected = selectedLanguage.key === language.key
                 return (
@@ -173,7 +173,7 @@ const APIKeys = () => {
                     key={language.key}
                     className={[
                       'px-3 py-1 text-sm cursor-pointer transition',
-                      `${!isSelected ? 'bg-background text-foreground-light' : 'bg-surface-100'}`,
+                      `${!isSelected ? 'bg-studio text-foreground-light' : 'bg-surface-100'}`,
                     ].join(' ')}
                     onClick={() => setSelectedLanguage(language)}
                   >

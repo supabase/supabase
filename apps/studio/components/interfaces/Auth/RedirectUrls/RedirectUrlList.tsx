@@ -42,7 +42,7 @@ const RedirectUrlList = ({
       ) : (
         <div
           className={[
-            'flex items-center border-overlay bg-background text-foreground',
+            'flex items-center border-overlay bg-studio text-foreground',
             'justify-center gap-2 rounded border px-6 py-8 text-sm',
           ].join(' ')}
         >

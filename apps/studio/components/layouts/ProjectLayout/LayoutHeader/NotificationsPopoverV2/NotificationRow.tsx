@@ -68,7 +68,7 @@ const NotificationRow: ItemRenderer<Notification, NotificationRowProps> = ({
       className={clsx(
         `p-4 flex justify-between gap-x-3 group`,
         index !== 0 ? 'border-t' : '',
-        status !== 'new' ? 'bg-background' : ''
+        status !== 'new' ? 'bg-studio' : ''
       )}
     >
       <div ref={viewRef} className="flex flex-col gap-y-2.5 w-full py-0.5">

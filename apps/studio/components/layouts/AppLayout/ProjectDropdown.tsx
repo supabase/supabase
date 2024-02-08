@@ -16,6 +16,7 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
+  CommandSeparator_Shadcn_,
   Command_Shadcn_,
   IconCheck,
   IconCode,
@@ -142,7 +143,9 @@ const ProjectDropdown = ({ isNewNav = false }: ProjectDropdownProps) => {
                 </ScrollArea>
               </CommandGroup_Shadcn_>
               {projectCreationEnabled && (
-                <CommandGroup_Shadcn_ className="border-t">
+                <>
+                <CommandSeparator_Shadcn_/>
+                <CommandGroup_Shadcn_>
                   <CommandItem_Shadcn_
                     className="cursor-pointer w-full"
                     onSelect={() => {
@@ -163,6 +166,7 @@ const ProjectDropdown = ({ isNewNav = false }: ProjectDropdownProps) => {
                     </Link>
                   </CommandItem_Shadcn_>
                 </CommandGroup_Shadcn_>
+                </>
               )}
             </CommandList_Shadcn_>
           </Command_Shadcn_>
