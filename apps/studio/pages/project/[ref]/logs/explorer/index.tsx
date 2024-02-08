@@ -200,7 +200,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             onDateChange={handleDateChange}
             onSelectSource={handleInsertSource}
             onClear={handleClear}
-            onRun={handleRun}
             hasEditorValue={Boolean(editorValue)}
             templates={TEMPLATES.filter((template) => template.mode === 'custom')}
             onSelectTemplate={onSelectTemplate}
@@ -222,6 +221,9 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
           <LoadingOpacity active={isLoading}>
             <div className="flex flex-grow">
               <LogTable
+                onRun={handleRun}
+                onSave={handleOnSave}
+                hasEditorValue={Boolean(editorValue)}
                 params={params}
                 data={logData}
                 error={error}

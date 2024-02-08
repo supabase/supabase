@@ -13,7 +13,6 @@ import {
   IconChevronDown,
   IconClipboard,
   IconExternalLink,
-  IconPlay,
   IconX,
   Popover,
   SidePanel,
@@ -21,7 +20,6 @@ import {
 } from 'ui'
 
 import { useCheckPermissions, useIsFeatureEnabled } from 'hooks'
-import { IS_PLATFORM } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import Link from 'next/link'
 import React, { useState } from 'react'
@@ -41,7 +39,6 @@ export interface LogsQueryPanelProps {
   templates?: LogTemplate[]
   onSelectTemplate: (template: LogTemplate) => void
   onSelectSource: (source: LogsTableName) => void
-  onRun: (e: React.MouseEvent<HTMLButtonElement>) => void
   onClear: () => void
   onSave?: () => void
   hasEditorValue: boolean
@@ -55,22 +52,12 @@ export interface LogsQueryPanelProps {
 const LogsQueryPanel = ({
   templates = [],
   onSelectTemplate,
-  hasEditorValue,
-  onRun,
-  onClear,
-  onSave,
   onSelectSource,
-  isLoading,
   defaultFrom,
   defaultTo,
   onDateChange,
   warnings,
 }: LogsQueryPanelProps) => {
-  const { profile } = useProfile()
-  const canCreateLogQuery = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'log_sql', owner_id: profile?.id },
-    subject: { id: profile?.id },
-  })
   const [showReference, setShowReference] = React.useState(false)
 
   const {
@@ -255,47 +242,7 @@ const LogsQueryPanel = ({
                     ))}
                   </Tabs>
                 </SidePanel>
-                {IS_PLATFORM && onSave && (
-                  <Tooltip.Root delayDuration={0}>
-                    <Tooltip.Trigger asChild>
-                      <Button
-                        type="default"
-                        onClick={() => onSave()}
-                        disabled={!canCreateLogQuery || !hasEditorValue}
-                      >
-                        Save query
-                      </Button>
-                    </Tooltip.Trigger>
-                    {!canCreateLogQuery && (
-                      <Tooltip.Portal>
-                        <Tooltip.Content side="bottom">
-                          <Tooltip.Arrow className="radix-tooltip-arrow" />
-                          <div
-                            className={[
-                              'rounded bg-alternative py-1 px-2 leading-none shadow',
-                              'border border-background',
-                            ].join(' ')}
-                          >
-                            <span className="text-xs text-foreground">
-                              You need additional permissions to save your query
-                            </span>
-                          </div>
-                        </Tooltip.Content>
-                      </Tooltip.Portal>
-                    )}
-                  </Tooltip.Root>
-                )}
               </div>
-
-              <Button
-                type={hasEditorValue ? 'primary' : 'alternative'}
-                disabled={!hasEditorValue}
-                onClick={onRun}
-                iconRight={<IconPlay />}
-                loading={isLoading}
-              >
-                Run
-              </Button>
             </div>
           </div>
         </div>
