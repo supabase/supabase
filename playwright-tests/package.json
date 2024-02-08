@@ -4,11 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "pretest": "supabase start -x studio",
+    "env:setup": "supabase start -x studio && supabase status --output json > keys.json && node generate-env.js",
+    "pretest": "npm run env:setup",
     "test": "playwright test",
     "posttest": "supabase stop --no-backup",
-    "test-with-ui": "playwright test --ui",
-    "codegen": "playwright codegen"
+    "codegen:setup": "npm run env:setup && NODE_ENV=test npm --prefix ../apps/studio run dev",
+    "codegen": "playwright codegen http://localhost:8082/project/default"
   },
   "keywords": [],
   "author": "",
