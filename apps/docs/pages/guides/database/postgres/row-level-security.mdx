@@ -260,7 +260,7 @@ const { data } = supabase
   .eq('user_id', userId)
 ```
 
-Even though this duplicates the contents of the Policy, Postgres can use the to construct a better query plan.
+Even though this duplicates the contents of the Policy, Postgres can use the filter to construct a better query plan.
 
 #### Benchmarks
 

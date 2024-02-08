@@ -392,7 +392,7 @@ const uiConfig = ui({
       // shadcn defaults END
     },
   },
-  plugins: [require('@tailwindcss/typography'), require('tailwindcss-animate')],
+  plugins: [require('@tailwindcss/typography'), require('tailwindcss-animate'), require('@tailwindcss/line-clamp')],
 })
 
 function arrayMergeFn(destinationArray, sourceArray) {

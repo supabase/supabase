@@ -33,7 +33,7 @@
     "config": "*",
     "dat.gui": "^0.7.9",
     "dayjs": "^1.11.10",
-    "framer-motion": "^6.5.1",
+    "framer-motion": "^11.0.3",
     "globby": "^13.2.2",
     "gray-matter": "^4.0.3",
     "markdown-toc": "^1.2.0",

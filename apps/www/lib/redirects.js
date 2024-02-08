@@ -1909,11 +1909,6 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/reference/dart/upgrade-guide',
-    destination: '/docs/reference/dart/v0/upgrade-guide',
-  },
-  {
-    permanent: true,
     source: '/docs/guides/examples',
     destination: '/docs/guides/resources/examples',
   },

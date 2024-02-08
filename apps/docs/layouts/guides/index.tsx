@@ -10,6 +10,7 @@ import { FooterHelpCalloutType } from '~/components/FooterHelpCallout'
 import GuidesTableOfContents from '~/components/GuidesTableOfContents'
 import useHash from '~/hooks/useHash'
 import { LayoutMainContent } from '../DefaultLayout'
+import { usePathname } from 'next/navigation'
 
 interface Props {
   meta: {
@@ -31,6 +32,7 @@ interface Props {
 }
 
 const Layout: FC<Props> = (props) => {
+  const pathname = usePathname()
   const [hash] = useHash()
 
   const articleRef = useRef()
@@ -61,7 +63,7 @@ const Layout: FC<Props> = (props) => {
         return { text, link, level }
       })
     setTocList(newHeadings)
-  }, [])
+  }, [pathname]) // Needed to recalculate the ToC when the page changes
 
   const hasTableOfContents = tocList.length > 0
   const tocVideoPreview = `http://img.youtube.com/vi/${props.meta.tocVideo}/0.jpg`
