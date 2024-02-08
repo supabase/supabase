@@ -30,6 +30,7 @@ import {
   IconPlusCircle,
   IconSearch,
   IconX,
+  cn,
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
@@ -163,9 +164,7 @@ const TableEditorMenu = () => {
             </Tooltip.Root>
           ) : (
             <Alert_Shadcn_>
-              <AlertTitle_Shadcn_ className="text-xs tracking-normal">
-                Viewing protected schema
-              </AlertTitle_Shadcn_>
+              <AlertTitle_Shadcn_ className="text-sm">Viewing protected schema</AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_ className="text-xs">
                 <p className="mb-2">
                   This schema is managed by Supabase and is read-only through the table editor
@@ -192,7 +191,7 @@ const TableEditorMenu = () => {
                     <input
                       type="text"
                       placeholder="Search..."
-                      className="bg-default rounded-md px-2 py-0 h-8 focus:outline-none w-44 text-sm"
+                      className="bg-default text-foreground rounded-none px-0 py-0 h-8 focus:outline-none w-44 text-sm"
                       onChange={(e) => setSearchText(e.target.value.trim())}
                       value={searchText}
                       ref={inputRef}
@@ -201,7 +200,14 @@ const TableEditorMenu = () => {
                 )}
               </AnimatePresence>
               <motion.button
-                onClick={expandSearch}
+                onClick={
+                  !isSearchOpen
+                    ? () => expandSearch()
+                    : () => {
+                        setSearchText('')
+                        expandSearch()
+                      }
+                }
                 initial={{ x: 0 }}
                 animate={{ x: isSearchOpen ? 185 : 0, transition: { duration: 0 } }}
                 className="px-2 py-1 rounded-md mt-0.5 transition transform hover:scale-105 focus:outline-none"
@@ -214,14 +220,10 @@ const TableEditorMenu = () => {
                       strokeWidth={1.5}
                     />
                   ) : (
-                    <button onClick={() => setSearchText('')}>
-                      <IconX />
-                    </button>
+                    <IconX className={cn('hover:text-foreground transition-colors')} />
                   )
                 ) : (
-                  <button>
-                    <IconSearch />
-                  </button>
+                  <IconSearch className={cn('hover:text-foreground transition-colors')} />
                 )}
               </motion.button>
             </div>
@@ -230,22 +232,23 @@ const TableEditorMenu = () => {
                 <Tooltip.Root delayDuration={0}>
                   <DropdownMenuTrigger asChild>
                     <Tooltip.Trigger>
-                      <div className="text-foreground-lighter transition-colors hover:text-foreground">
-                        <IconChevronsDown size={18} strokeWidth={1} />
-                      </div>
+                      <IconChevronsDown
+                        size={18}
+                        strokeWidth={1}
+                        className="text-foreground-lighter transition-colors hover:text-foreground"
+                      />
                     </Tooltip.Trigger>
                   </DropdownMenuTrigger>
                   <Tooltip.Portal>
-                    <Tooltip.Content side="bottom">
+                    <Tooltip.Content
+                      side="bottom"
+                      className={[
+                        'rounded bg-alternative py-1 px-2 leading-none shadow',
+                        'border border-background text-xs',
+                      ].join(' ')}
+                    >
                       <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-alternative py-1 px-2 leading-none shadow',
-                          'border border-background',
-                        ].join(' ')}
-                      >
-                        <span className="text-xs">Sort By</span>
-                      </div>
+                      Sort By
                     </Tooltip.Content>
                   </Tooltip.Portal>
                 </Tooltip.Root>
