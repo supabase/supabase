@@ -1,29 +1,19 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
 import { useParams } from 'common'
-import { observer } from 'mobx-react-lite'
+import { noop } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
+import toast from 'react-hot-toast'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  Checkbox,
+  Checkbox_Shadcn_,
   IconAlertCircle,
   IconAlertTriangle,
-  IconChevronDown,
-  IconCopy,
-  IconDownload,
-  IconEdit2,
   IconEye,
-  IconShare,
-  IconTrash,
   IconUnlock,
   Modal,
   TooltipContent_Shadcn_,
@@ -33,27 +23,66 @@ import {
 
 import DownloadSnippetModal from 'components/interfaces/SQLEditor/DownloadSnippetModal'
 import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
-import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import CopyButton from 'components/ui/CopyButton'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
-import { useCheckPermissions, useSelectedProject, useStore } from 'hooks'
-import { IS_PLATFORM } from 'lib/constants'
-import { uuidv4 } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { QueryItemActions } from './QueryItemActions'
 
 export interface QueryItemProps {
   tabInfo: SqlSnippet
+  isSelected?: boolean
+  hasQueriesSelected?: boolean
+  onSelectQuery?: (isShiftHeld: boolean) => void
+  onDeleteQuery?: (ids: string[]) => void
 }
 
-const QueryItem = ({ tabInfo }: QueryItemProps) => {
+const QueryItem = ({
+  tabInfo,
+  isSelected = false,
+  hasQueriesSelected = false,
+  onSelectQuery = noop,
+  onDeleteQuery = noop,
+}: QueryItemProps) => {
+  const [open, setOpen] = useState(false)
+  const [renameModalOpen, setRenameModalOpen] = useState(false)
+  const [shareModalOpen, setShareModalOpen] = useState(false)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [isDownloadSnippetModalOpen, setIsDownloadSnippetModalOpen] = useState(false)
+
   const { ref, id: activeId } = useParams()
-  const { id, name, description, content } = tabInfo || {}
+  const snap = useSqlEditorStateSnapshot()
+  const { id, name, description, content, visibility } = tabInfo || {}
   const isActive = id === activeId
   const activeItemRef = useRef<HTMLElement | null>(null)
+
+  const hideTooltip =
+    open ||
+    isActive ||
+    renameModalOpen ||
+    shareModalOpen ||
+    deleteModalOpen ||
+    isDownloadSnippetModalOpen
+
+  const { mutate: deleteContent, isLoading: isDeleting } = useContentDeleteMutation({
+    onSuccess: (data) => onDeleteQuery(data),
+    onError: (error, data) => {
+      console.log({ error })
+      if (error.message.includes('Contents not found')) {
+        onDeleteQuery(data.ids)
+      } else {
+        toast.error(`Failed to delete query: ${error.message}`)
+      }
+    },
+  })
+
+  const onConfirmDelete = async () => {
+    if (!ref) return console.error('Project ref is required')
+    if (!id) return console.error('Snippet ID is required')
+    deleteContent({ projectRef: ref, ids: [id] })
+  }
 
   useEffect(() => {
     // scroll to active item
@@ -65,262 +94,113 @@ const QueryItem = ({ tabInfo }: QueryItemProps) => {
     }
   })
 
-  return (
-    <Tooltip_Shadcn_ delayDuration={100}>
-      <TooltipTrigger_Shadcn_ asChild>
-        <div
-          key={id}
-          className={clsx(
-            'flex items-center justify-between rounded-md group',
-            isActive ? 'bg-surface-300' : 'hover:bg-surface-200'
-          )}
-          ref={isActive ? (activeItemRef as React.RefObject<HTMLDivElement>) : null}
-        >
-          <Link href={`/project/${ref}/sql/${id}`} className="py-1 px-3 w-full overflow-hidden">
-            <p
-              title={description || name}
-              className={clsx(
-                isActive
-                  ? 'text-foreground'
-                  : 'text-foreground-light group-hover:text-foreground/80',
-                'text-sm transition overflow-hidden text-ellipsis'
-              )}
-            >
-              {name}
-            </p>
-          </Link>
-          <div className="pr-1">{<QueryItemActions tabInfo={tabInfo} activeId={activeId} />}</div>
-        </div>
-      </TooltipTrigger_Shadcn_>
-      {!isActive && (
-        <TooltipContent_Shadcn_
-          side="right"
-          align="start"
-          className="w-96 flex flex-col gap-y-2 py-3 -translate-y-[4px]"
-        >
-          <p className="text-xs">Query preview:</p>
-          <div className="bg-surface-300 py-2 px-3 rounded relative">
-            {content.sql.trim() ? (
-              <SimpleCodeBlock
-                showCopy={false}
-                className="sql"
-                parentClassName="!p-0 [&>div>span]:text-xs [&>div>span]:tracking-tighter"
-              >
-                {content.sql.replaceAll('\n', ' ').replaceAll(/\s+/g, ' ').slice(0, 43) +
-                  `${content.sql.length > 43 ? '...' : ''}`}
-              </SimpleCodeBlock>
-            ) : (
-              <p className="text-xs text-foreground-lighter">This query is empty</p>
-            )}
-            {content.sql.trim() && (
-              <CopyButton
-                iconOnly
-                type="default"
-                className="px-1 absolute top-1.5 right-1.5"
-                text={content.sql}
-              />
-            )}
-          </div>
-        </TooltipContent_Shadcn_>
-      )}
-    </Tooltip_Shadcn_>
-  )
-}
-
-export default QueryItem
-
-interface QueryItemActionsProps {
-  tabInfo: SqlSnippet
-  activeId: string | undefined
-}
-
-const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps) => {
-  const { ui } = useStore()
-  const { ref } = useParams()
-  const router = useRouter()
-  const { profile } = useProfile()
-
-  const snap = useSqlEditorStateSnapshot()
-  const project = useSelectedProject()
-
-  const { id: snippetID } = tabInfo || {}
-  const snippet =
-    snippetID !== undefined && snap.snippets && snap.snippets[snippetID] !== undefined
-      ? snap.snippets[snippetID]
-      : null
-
-  const isSnippetOwner = profile?.id === snippet?.snippet.owner_id
-
-  const { mutate: deleteContent, isLoading: isDeleting } = useContentDeleteMutation({
-    onSuccess(data) {
-      if (data.id) snap.removeSnippet(data.id)
-
-      const existingSnippetIds = (snap.orders[ref!] ?? []).filter((x) => x !== id)
-      if (existingSnippetIds.length === 0) {
-        router.push(`/project/${ref}/sql/new`)
-      } else {
-        router.push(`/project/${ref}/sql/${existingSnippetIds[0]}`)
-      }
-    },
-    onError(error, data) {
-      if (error.code === 404 && error.message.includes('Content not found')) {
-        if (data.id) snap.removeSnippet(data.id)
-        const existingSnippetIds = (snap.orders[ref!] ?? []).filter((x) => x !== id)
-        if (existingSnippetIds.length === 0) {
-          router.push(`/project/${ref}/sql/new`)
-        } else {
-          router.push(`/project/${ref}/sql/${existingSnippetIds[0]}`)
-        }
-      } else {
-        ui.setNotification({
-          category: 'error',
-          message: `Failed to delete query: ${error.message}`,
-        })
-      }
-    },
-  })
-
-  const { id, name, visibility, content } = tabInfo || {}
-  const [renameModalOpen, setRenameModalOpen] = useState(false)
-  const [shareModalOpen, setShareModalOpen] = useState(false)
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
-  const [isDownloadSnippetModalOpen, setIsDownloadSnippetModalOpen] = useState(false)
-  const isActive = id === activeId
-
-  const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'sql', owner_id: profile?.id },
-    subject: { id: profile?.id },
-  })
-
-  const onCloseRenameModal = () => {
-    setRenameModalOpen(false)
-  }
-
-  const onClickRename = (e: any) => {
-    e.stopPropagation()
-    setRenameModalOpen(true)
-  }
-
-  const onClickShare = (e: any) => {
-    e.stopPropagation()
-    setShareModalOpen(true)
-  }
-
-  const onClickDelete = (e: any) => {
-    e.stopPropagation()
-    setDeleteModalOpen(true)
-  }
-
   const onConfirmShare = async () => {
     if (id) {
       try {
         snap.shareSnippet(id, 'project')
         return Promise.resolve()
       } catch (error: any) {
-        ui.setNotification({
-          error,
-          category: 'error',
-          message: `Failed to share query: ${error.message}`,
-        })
+        toast.error(`Failed to share query: ${error.message}`)
       }
     }
   }
 
-  const onConfirmDelete = async () => {
-    if (!ref) return console.error('Project ref is required')
-    if (!id) return console.error('Snippet ID is required')
-    deleteContent({ projectRef: ref, id })
-  }
-
-  const createPersonalCopy = async () => {
-    if (!ref) return console.error('Project ref is required')
-    if (!id) return console.error('Snippet ID is required')
-    try {
-      const snippet = createSqlSnippetSkeleton({
-        id: uuidv4(),
-        name,
-        sql: content.sql,
-        owner_id: profile?.id,
-        project_id: project?.id,
-      })
-      snap.addSnippet(snippet as SqlSnippet, ref)
-      snap.addNeedsSaving(snippet.id!)
-      router.push(`/project/${ref}/sql/${snippet.id}`)
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to create a personal copy of this query: ${error.message}`,
-      })
-    }
-  }
-
   return (
-    <div className="group [div&>button[data-state='open']>span]:text-foreground-lighter flex items-center">
-      {IS_PLATFORM ? (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <span
-              className={clsx(
-                'rounded p-1',
-                isActive
-                  ? 'text-foreground-light hover:bg-border-stronger'
-                  : 'text-background hover:bg-overlay-hover group-hover:text-foreground-light'
-              )}
-            >
-              <IconChevronDown size="tiny" strokeWidth={2} />
-            </span>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent side="bottom" align="end" className=" w-52 translate-x-[4px]">
-            {isSnippetOwner && (
-              <DropdownMenuItem onClick={onClickRename} className="space-x-2">
-                <IconEdit2 size="tiny" />
-                <p>Rename query</p>
-              </DropdownMenuItem>
+    <>
+      <Tooltip_Shadcn_ delayDuration={100}>
+        <TooltipTrigger_Shadcn_ asChild>
+          <div
+            key={id}
+            className={clsx(
+              'h-7 pl-3 pr-2',
+              'flex items-center justify-between rounded-md group relative',
+              isActive ? 'bg-surface-300' : 'hover:bg-surface-200'
             )}
-
-            {visibility === 'user' && canCreateSQLSnippet && (
-              <DropdownMenuItem onClick={onClickShare} className="space-x-2">
-                <IconShare size="tiny" />
-                <p>Share query</p>
-              </DropdownMenuItem>
+            ref={isActive ? (activeItemRef as React.RefObject<HTMLDivElement>) : null}
+          >
+            {visibility === 'user' && (
+              <Checkbox
+                className={clsx(
+                  'transition absolute left-2.5 [&>input]:border-foreground-lighter',
+                  hasQueriesSelected ? '' : 'opacity-0 group-hover:opacity-100'
+                )}
+                checked={isSelected}
+                onChange={(event) => {
+                  onSelectQuery((event.nativeEvent as KeyboardEvent).shiftKey)
+                }}
+              />
             )}
-            {visibility === 'project' && canCreateSQLSnippet && (
-              <DropdownMenuItem onClick={createPersonalCopy} className="space-x-2">
-                <IconCopy size="tiny" />
-                <p>Duplicate personal copy</p>
-              </DropdownMenuItem>
-            )}
-
-            {IS_PLATFORM && (
-              <DropdownMenuItem
-                onClick={() => setIsDownloadSnippetModalOpen(!isDownloadSnippetModalOpen)}
-                className="space-x-2"
+            <div className="flex items-center justify-between w-full gap-x-2">
+              <Link
+                title={description || name}
+                href={`/project/${ref}/sql/${id}`}
+                className={clsx(
+                  'w-full overflow-hidden truncate',
+                  isActive
+                    ? 'text-foreground'
+                    : 'text-foreground-light group-hover:text-foreground/80',
+                  'text-sm transition-all overflow-hidden text-ellipsis',
+                  hasQueriesSelected && visibility === 'user'
+                    ? 'ml-5'
+                    : visibility === 'user'
+                      ? 'group-hover:ml-5'
+                      : ''
+                )}
               >
-                <IconDownload size="tiny" />
-                <p>Download as migration file</p>
-              </DropdownMenuItem>
-            )}
-            {isSnippetOwner && (
-              <>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={onClickDelete} className="space-x-2">
-                  <IconTrash size="tiny" />
-                  <p>Delete query</p>
-                </DropdownMenuItem>
-              </>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ) : (
-        <Button asChild disabled type="text" style={{ padding: '3px' }}>
-          <span></span>
-        </Button>
-      )}
+                {name}
+              </Link>
+              {!hasQueriesSelected && (
+                <QueryItemActions
+                  tabInfo={tabInfo}
+                  activeId={activeId}
+                  open={open}
+                  setOpen={setOpen}
+                  onSelectDeleteQuery={() => setDeleteModalOpen(true)}
+                  onSelectRenameQuery={() => setRenameModalOpen(true)}
+                  onSelectShareQuery={() => setShareModalOpen(true)}
+                  onSelectDownloadQuery={() => setIsDownloadSnippetModalOpen(true)}
+                />
+              )}
+            </div>
+          </div>
+        </TooltipTrigger_Shadcn_>
+        {!hideTooltip && (
+          <TooltipContent_Shadcn_
+            side="right"
+            align="start"
+            className="w-96 flex flex-col gap-y-2 py-3 -translate-y-[4px]"
+          >
+            <p className="text-xs">Query preview:</p>
+            <div className="bg-surface-300 py-2 px-3 rounded relative">
+              {content.sql.trim() ? (
+                <SimpleCodeBlock
+                  showCopy={false}
+                  className="sql"
+                  parentClassName="!p-0 [&>div>span]:text-xs [&>div>span]:tracking-tighter"
+                >
+                  {content.sql.replaceAll('\n', ' ').replaceAll(/\s+/g, ' ').slice(0, 43) +
+                    `${content.sql.length > 43 ? '...' : ''}`}
+                </SimpleCodeBlock>
+              ) : (
+                <p className="text-xs text-foreground-lighter">This query is empty</p>
+              )}
+              {content.sql.trim() && (
+                <CopyButton
+                  iconOnly
+                  type="default"
+                  className="px-1 absolute top-1.5 right-1.5"
+                  text={content.sql}
+                />
+              )}
+            </div>
+          </TooltipContent_Shadcn_>
+        )}
+      </Tooltip_Shadcn_>
       <RenameQueryModal
         snippet={tabInfo}
         visible={renameModalOpen}
-        onCancel={onCloseRenameModal}
-        onComplete={onCloseRenameModal}
+        onCancel={() => setRenameModalOpen(false)}
+        onComplete={() => setRenameModalOpen(false)}
       />
       <ConfirmationModal
         header="Confirm to delete query"
@@ -393,6 +273,8 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
         visible={isDownloadSnippetModalOpen}
         onCancel={() => setIsDownloadSnippetModalOpen(false)}
       />
-    </div>
+    </>
   )
-})
+}
+
+export default QueryItem
