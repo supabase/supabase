@@ -62,8 +62,8 @@ const TableDefinition = ({ id }: TableDefinitionProps) => {
     entityType?.type === ENTITY_TYPE.VIEW
       ? `create view ${entityType.schema}.${entityType.name} as\n`
       : entityType?.type === ENTITY_TYPE.MATERIALIZED_VIEW
-        ? `create materialized view ${entityType.schema}.${entityType.name} as\n`
-        : ''
+      ? `create materialized view ${entityType.schema}.${entityType.name} as\n`
+      : ''
 
   const formattedDefinition = useMemo(
     () =>
@@ -96,8 +96,11 @@ const TableDefinition = ({ id }: TableDefinitionProps) => {
 
   if (isLoading) {
     return (
-      <div className="p-4 h-full">
+      <div className="p-4 pb-0 h-full grid">
         <GenericSkeletonLoader />
+        <div className="mt-auto">
+          <Footer />
+        </div>
       </div>
     )
   }
@@ -132,6 +135,7 @@ const TableDefinition = ({ id }: TableDefinitionProps) => {
           }}
         />
       </div>
+
       <Footer />
     </>
   )
