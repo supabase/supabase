@@ -47,7 +47,7 @@ const NavigationBar = () => {
   const snap = useAppStateSnapshot()
   const { theme, setTheme } = useTheme()
   const { ref: projectRef } = useParams()
-  const { setIsOpen } = useCommandMenu()
+  const { setIsOpen, setAiVariant } = useCommandMenu()
 
   const { project } = useProjectContext()
   const navLayoutV2 = useFlag('navigationLayoutV2')
@@ -145,7 +145,7 @@ const NavigationBar = () => {
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
                     <div
                       className={[
-                        'bg-alternative shadow-lg shadow-background-surface-100	py-1.5 px-3 rounded leading-none', // background
+                        'bg-alternative shadow-lg shadow-background-surface-100 py-1.5 px-3 rounded leading-none', // background
                         'border border-default', //border
                       ].join(' ')}
                     >
@@ -174,7 +174,10 @@ const NavigationBar = () => {
                 <Button
                   type="text"
                   size="tiny"
-                  onClick={() => setIsOpen(true)}
+                  onClick={() => {
+                    setAiVariant('default')
+                    setIsOpen(true)
+                  }}
                   className="border-none"
                 >
                   <div className="py-1">
@@ -187,7 +190,7 @@ const NavigationBar = () => {
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
                     className={[
-                      'bg-alternative shadow-lg shadow-background-surface-100	py-1.5 px-3 rounded leading-none', // background
+                      'bg-alternative shadow-lg shadow-background-surface-100 py-1.5 px-3 rounded leading-none', // background
                       'border border-default', // border
                       'flex items-center gap-1', // layout
                     ].join(' ')}

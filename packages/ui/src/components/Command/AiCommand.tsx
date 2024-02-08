@@ -29,8 +29,9 @@ import { useCommandMenu } from './CommandMenuProvider'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { cn } from './../../lib/utils'
+import { useRouter } from 'next/router'
 
-const questions = [
+const defaultQuestions = [
   'How do I get started with Supabase?',
   'How do I run Supabase locally?',
   'How do I connect to my database?',
@@ -38,6 +39,8 @@ const questions = [
   'How do I listen to changes in a table?',
   'How do I set up authentication?',
 ]
+
+const supportQuestions = ['What is the problem you are having?']
 
 function getEdgeFunctionUrl() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '')
@@ -74,6 +77,8 @@ export interface Message {
   role: MessageRole
   content: string
   status: MessageStatus
+  supportFirstPrompt?: boolean
+  supportSecondPrompt?: string
 }
 
 interface NewMessageAction {
@@ -83,13 +88,11 @@ interface NewMessageAction {
 
 interface UpdateMessageAction {
   type: 'update'
-  index: number
   message: Partial<Message>
 }
 
 interface AppendContentAction {
   type: 'append-content'
-  index: number
   content: string
 }
 
@@ -110,17 +113,14 @@ function messageReducer(state: Message[], messageAction: MessageAction) {
       break
     }
     case 'update': {
-      const { index, message } = messageAction
-      if (current[index]) {
-        Object.assign(current[index], message)
-      }
+      const { message } = messageAction
+      Object.assign(current[current.length - 1], message)
+
       break
     }
     case 'append-content': {
-      const { index, content } = messageAction
-      if (current[index]) {
-        current[index].content += content
-      }
+      const { content } = messageAction
+      current[current.length - 1].content += content
       break
     }
     case 'reset': {
@@ -149,8 +149,95 @@ export function useAiChat({
   const [isResponding, setIsResponding] = useState(false)
   const [hasError, setHasError] = useState(false)
 
-  const [currentMessageIndex, setCurrentMessageIndex] = useState(1)
   const [messages, dispatchMessage] = useReducer(messageReducer, [])
+
+  const router = useRouter()
+  const projectRef = router.query.ref
+
+  const [isInputDisabled, setIsInputDisabled] = useState(false)
+  const [submittedFeedback, setSubmittedFeedback] = useState<'yes' | 'no' | null>(null)
+
+  const handleFeedback = (feedback: 'yes' | 'no') => {
+    dispatchMessage({
+      type: 'update',
+      message: {
+        supportFirstPrompt: false,
+      },
+    })
+
+    if (feedback === 'no') {
+      dispatchMessage({
+        type: 'update',
+        message: {
+          supportSecondPrompt: 'no',
+        },
+      })
+    } else {
+      setIsInputDisabled(true)
+      dispatchMessage({
+        type: 'update',
+        message: {
+          supportSecondPrompt: undefined,
+        },
+      })
+      dispatchMessage({
+        type: 'new',
+        message: {
+          status: MessageStatus.Complete,
+          role: MessageRole.Assistant,
+          content: 'Great to hear I could help you resolve your issue!',
+        },
+      })
+    }
+  }
+
+  const handleSubmittedFeedback = (
+    submittedFeedback: 'Ask another question' | 'Please get me in touch with Supabase Support'
+  ) => {
+    dispatchMessage({
+      type: 'update',
+      message: {
+        supportFirstPrompt: false,
+      },
+    })
+
+    dispatchMessage({
+      type: 'update',
+      message: {
+        supportSecondPrompt: undefined,
+      },
+    })
+
+    if (submittedFeedback === 'Please get me in touch with Supabase Support') {
+      setIsInputDisabled(true)
+      dispatchMessage({
+        type: 'new',
+        message: {
+          status: MessageStatus.Complete,
+          role: MessageRole.Assistant,
+          content: 'Redirecting you to the support form. Please wait...',
+        },
+      })
+
+      const userFirstReply = messages.find(({ role }) => role === MessageRole.User)?.content || ''
+
+      setTimeout(() => {
+        const queryParams = projectRef
+          ? `?ref=${projectRef}&firstReply=${userFirstReply}`
+          : `?firstReply=${userFirstReply}`
+        window.open(`/support/new${queryParams}`, '_blank')
+      }, 3000)
+    } else {
+      dispatchMessage({
+        type: 'new',
+        message: {
+          status: MessageStatus.Complete,
+          role: MessageRole.Assistant,
+          content: 'Kindly provide all the necessary details so I can assist you more effectively!',
+        },
+      })
+    }
+  }
 
   const submit = useCallback(
     async (query: string) => {
@@ -164,6 +251,7 @@ export function useAiChat({
           content: query,
         },
       })
+
       dispatchMessage({
         type: 'new',
         message: {
@@ -172,6 +260,7 @@ export function useAiChat({
           content: '',
         },
       })
+
       setIsResponding(false)
       setHasError(false)
       setIsLoading?.(true)
@@ -193,12 +282,12 @@ export function useAiChat({
       function handleError<T>(err: T) {
         setIsLoading?.(false)
         setIsResponding(false)
-        setHasError(true)
+        setHasError(false)
         console.error(err)
       }
 
       eventSource.addEventListener('error', handleError)
-      eventSource.addEventListener('message', (e: MessageEvent) => {
+      eventSource.addEventListener('message', (e) => {
         try {
           setIsLoading?.(false)
 
@@ -206,18 +295,16 @@ export function useAiChat({
             setIsResponding(false)
             dispatchMessage({
               type: 'update',
-              index: currentMessageIndex,
               message: {
+                supportFirstPrompt: true,
                 status: MessageStatus.Complete,
               },
             })
-            setCurrentMessageIndex((x) => x + 2)
             return
           }
 
           dispatchMessage({
             type: 'update',
-            index: currentMessageIndex,
             message: {
               status: MessageStatus.InProgress,
             },
@@ -235,7 +322,6 @@ export function useAiChat({
           if (content) {
             dispatchMessage({
               type: 'append-content',
-              index: currentMessageIndex,
               content,
             })
           }
@@ -250,7 +336,7 @@ export function useAiChat({
 
       setIsLoading?.(true)
     },
-    [currentMessageIndex, messages, messageTemplate]
+    [messages, messageTemplate]
   )
 
   function reset() {
@@ -269,6 +355,10 @@ export function useAiChat({
     messages,
     isResponding,
     hasError,
+    handleFeedback,
+    submittedFeedback,
+    handleSubmittedFeedback,
+    isInputDisabled,
   }
 }
 
@@ -307,7 +397,7 @@ export function queryAi(messages: Message[], timeout = 0) {
     let answer = ''
 
     eventSource.addEventListener('error', handleError)
-    eventSource.addEventListener('message', (e: MessageEvent) => {
+    eventSource.addEventListener('message', (e) => {
       try {
         if (e.data === '[DONE]') {
           if (timeoutId) {
@@ -337,9 +427,19 @@ export function queryAi(messages: Message[], timeout = 0) {
 }
 
 const AiCommand = () => {
-  const { isLoading, setIsLoading, search, setSearch } = useCommandMenu()
+  const { isLoading, setIsLoading, search, setSearch, aiVariant } = useCommandMenu()
 
-  const { submit, reset, messages, isResponding, hasError } = useAiChat({
+  const {
+    submit,
+    reset,
+    messages,
+    isResponding,
+    hasError,
+    handleFeedback,
+    submittedFeedback,
+    handleSubmittedFeedback,
+    isInputDisabled,
+  } = useAiChat({
     setIsLoading,
   })
 
@@ -375,77 +475,118 @@ const AiCommand = () => {
   // Detect an IME composition (so that we can ignore Enter keypress)
   const [isImeComposing, setIsImeComposing] = useState(false)
 
+  const questions = aiVariant === 'support' ? supportQuestions : defaultQuestions
+
   return (
     <div onClick={(e) => e.stopPropagation()}>
       <div className={cn('relative mb-[145px] py-4 max-h-[720px] overflow-auto')}>
-        {!hasError &&
-          messages.map((message, index) => {
-            switch (message.role) {
-              case MessageRole.User:
-                return (
-                  <div key={index} className="flex gap-6 mx-4 [overflow-anchor:none] mb-6">
-                    <div
-                      className="
+        {messages.map((message, index) => {
+          switch (message.role) {
+            case MessageRole.User:
+              return (
+                <div key={index} className="flex gap-6 mx-4 [overflow-anchor:none] mb-6">
+                  <div
+                    className="
                   w-7 h-7 bg-background rounded-full border border-muted flex items-center justify-center text-foreground-lighter first-letter:
                   ring-background
                   ring-1
                   shadow-sm
               "
-                    >
-                      <IconUser strokeWidth={1.5} size={16} />
-                    </div>
-                    <div className="prose text-foreground-lighter">{message.content}</div>
+                  >
+                    <IconUser strokeWidth={1.5} size={16} />
                   </div>
-                )
-              case MessageRole.Assistant:
-                return (
-                  <div key={index} className="px-4 [overflow-anchor:none] mb-6">
-                    <div className="flex gap-6 [overflow-anchor:none] mb-6">
-                      <AiIconChat
-                        loading={
-                          message.status === MessageStatus.Pending ||
-                          message.status === MessageStatus.InProgress
-                        }
-                      />
-                      <>
-                        {message.status === MessageStatus.Pending ? (
-                          <div className="bg-border-strong h-[21px] w-[13px] mt-1 animate-pulse animate-bounce"></div>
-                        ) : (
-                          <ReactMarkdown
-                            remarkPlugins={[remarkGfm]}
-                            components={markdownComponents}
-                            linkTarget="_blank"
-                            className="prose dark:prose-dark"
-                            transformLinkUri={(href) => {
-                              const supabaseUrl = new URL('https://supabase.com')
-                              const linkUrl = new URL(href, 'https://supabase.com')
+                  <div className="prose text-foreground-lighter">{message.content}</div>
+                </div>
+              )
+            case MessageRole.Assistant:
+              return (
+                <div key={index} className="px-4 [overflow-anchor:none] mb-6">
+                  <div className="flex gap-6 [overflow-anchor:none] mb-6">
+                    <AiIconChat
+                      loading={
+                        message.status === MessageStatus.Pending ||
+                        message.status === MessageStatus.InProgress
+                      }
+                    />
+                    <>
+                      {message.status === MessageStatus.Pending ? (
+                        <div className="bg-border-strong h-[21px] w-[13px] mt-1 animate-pulse animate-bounce"></div>
+                      ) : (
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          components={markdownComponents}
+                          linkTarget="_blank"
+                          className="prose dark:prose-dark"
+                          transformLinkUri={(href) => {
+                            const supabaseUrl = new URL('https://supabase.com')
+                            const linkUrl = new URL(href, 'https://supabase.com')
 
-                              if (linkUrl.origin === supabaseUrl.origin) {
-                                return linkUrl.toString()
-                              }
+                            if (linkUrl.origin === supabaseUrl.origin) {
+                              return linkUrl.toString()
+                            }
 
-                              return href
-                            }}
-                          >
-                            {message.content}
-                          </ReactMarkdown>
-                        )}
-                      </>
-                    </div>
+                            return href
+                          }}
+                        >
+                          {message.content}
+                        </ReactMarkdown>
+                      )}
+                    </>
                   </div>
-                )
-            }
-          })}
+
+                  {message.status === MessageStatus.Complete &&
+                    message.supportFirstPrompt === true &&
+                    aiVariant === 'support' && (
+                      <div className="flex items-center justify-center mt-4 space-x-2">
+                        <p className="prose dark:prose-dark">Was this answer helpful?</p>
+                        <Button size="tiny" type="default" onClick={() => handleFeedback('yes')}>
+                          Yes
+                        </Button>
+                        <Button size="tiny" type="default" onClick={() => handleFeedback('no')}>
+                          No
+                        </Button>
+                      </div>
+                    )}
+
+                  {message.status === MessageStatus.Complete &&
+                    message.supportFirstPrompt === false &&
+                    message.supportSecondPrompt !== undefined &&
+                    aiVariant === 'support' && (
+                      <div className="flex items-center justify-center mt-4 space-x-2">
+                        <p className="prose dark:prose-dark">I'm sorry to hear that.</p>
+                        <Button
+                          size="tiny"
+                          type="default"
+                          onClick={() => handleSubmittedFeedback('Ask another question')}
+                        >
+                          Ask another question
+                        </Button>
+                        <Button
+                          size="tiny"
+                          type="default"
+                          onClick={() =>
+                            handleSubmittedFeedback('Please get me in touch with Supabase Support')
+                          }
+                        >
+                          Please get me in touch with Supabase Support
+                        </Button>
+                      </div>
+                    )}
+                </div>
+              )
+          }
+        })}
 
         {messages.length === 0 && !hasError && (
-          <CommandGroup heading="Examples">
+          <CommandGroup heading={aiVariant !== 'support' ? 'Examples' : 'Support AI Bot'}>
             {questions.map((question) => {
               const key = question.replace(/\s+/g, '_')
+
               return (
                 <CommandItem
                   type="command"
                   onSelect={() => {
-                    if (!search) {
+                    if (!search && question !== supportQuestions[0]) {
                       handleSubmit(question)
                     }
                   }}
@@ -483,6 +624,7 @@ const AiCommand = () => {
             isLoading || isResponding ? 'Waiting on an answer...' : 'Ask Supabase AI a question...'
           }
           value={search}
+          disabled={isInputDisabled}
           actions={
             <>
               {!isLoading && !isResponding ? (

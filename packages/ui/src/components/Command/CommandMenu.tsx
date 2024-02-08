@@ -84,7 +84,7 @@ const CommandMenu = () => {
   }
 
   const commandListMaxHeight =
-    currentPage === COMMAND_ROUTES.DOCS_SEARCH ? 'min(600px, 50vh)' : '300px'
+    currentPage === COMMAND_ROUTES.DOCS_SEARCH ? 'min(600px, 50vh)' : '600px'
 
   return (
     <>

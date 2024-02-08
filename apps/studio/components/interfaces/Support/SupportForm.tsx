@@ -283,6 +283,12 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
               category: selectedCategoryFromUrl?.value ?? initialValues.category,
               message: message ?? initialValues.message,
             }
+            const urlSearchParams = new URLSearchParams(window.location.search)
+            const firstReplyValue = urlSearchParams.get('firstReply')
+
+            if (firstReplyValue) {
+              updatedValues.message = firstReplyValue
+            }
             resetForm({ values: updatedValues, initialValues: updatedValues })
           }
         }, [isReady])

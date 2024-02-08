@@ -27,6 +27,8 @@ export interface CommandMenuContextValue {
   currentPage?: string
   inputRef: React.RefObject<HTMLInputElement>
   site: 'studio' | 'docs' | 'website'
+  aiVariant: 'default' | 'support'
+  setAiVariant: React.Dispatch<React.SetStateAction<'default' | 'support'>>
 
   /**
    * Project metadata for easy retrieval
@@ -91,6 +93,7 @@ const CommandMenuProvider = ({
   const [isLoading, setIsLoading] = useState(false)
   const [search, setSearch] = useState('')
   const [pages, setPages] = useState<string[]>([])
+  const [aiVariant, setAiVariant] = useState<'default' | 'support'>('default')
   const inputRef = useRef<ElementRef<typeof CommandInput>>(null)
   const currentPage = pages[pages.length - 1]
 
@@ -116,6 +119,8 @@ const CommandMenuProvider = ({
         isOptedInToAI,
         saveGeneratedSQL,
         inputRef,
+        aiVariant,
+        setAiVariant,
       }}
     >
       {children}
