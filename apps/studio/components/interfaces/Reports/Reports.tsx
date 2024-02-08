@@ -20,6 +20,13 @@ import {
   IconPlus,
   IconSave,
   IconSettings,
+  Dialog_Shadcn_,
+  DialogTrigger_Shadcn_,
+  DialogContent_Shadcn_,
+  Label_Shadcn_,
+  Input_Shadcn_,
+  Button_Shadcn_,
+  Input,
 } from 'ui'
 
 import { useParams } from 'common/hooks'
@@ -314,9 +321,10 @@ const Reports = () => {
   }
 
   return (
-    <div className="mx-6 flex flex-col space-y-4" style={{ maxHeight: '100%' }}>
-      <h1 className="text-xl text-foreground">Reports</h1>
-
+    <div className="flex flex-col space-y-4" style={{ maxHeight: '100%' }}>
+      <div className="flex justify-between">
+        <h1 className="text-xl text-foreground">{report.name || 'Reports'}</h1>
+      </div>
       <div className="mb-4 flex items-center justify-between space-x-3">
         <div className="flex items-center space-x-3">
           <DateRangePicker
