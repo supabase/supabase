@@ -44,17 +44,17 @@ Find the source code and documentation in the Supabase GitHub repository.
 
 <div className="grid md:grid-cols-12 gap-4 not-prose">
   {[
-  {
-    name: 'Supabase Storage API',
-    description: 'View the source code.',
-    href: 'https://github.com/supabase/storage-api',
-  },
-  {
-    name: 'OpenAPI Spec',
-    description: 'See the Swagger Documentation for Supabase Storage.',
-    href: 'https://supabase.github.io/storage/',
-  },
-].map((x) => (
+    {
+      name: 'Supabase Storage API',
+      description: 'View the source code.',
+      href: 'https://github.com/supabase/storage-api',
+    },
+    {
+      name: 'OpenAPI Spec',
+      description: 'See the Swagger Documentation for Supabase Storage.',
+      href: 'https://supabase.github.io/storage/',
+    },
+  ].map((x) => (
     <div className="col-span-6" key={x.href}>
       <Link href={x.href} passHref>
         <GlassPanel title={x.name}>{x.description}</GlassPanel>
