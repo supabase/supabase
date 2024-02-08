@@ -47,9 +47,9 @@ interface Props {
   queryType?: QueryType
   projectRef: string
   params: LogSelectionProps['params']
-  onRun: () => void
-  onSave: () => void
-  hasEditorValue: boolean
+  onRun?: () => void
+  onSave?: () => void
+  hasEditorValue?: boolean
 }
 type LogMap = { [id: string]: LogData }
 
@@ -352,7 +352,7 @@ const LogTable = ({
     <>
       <section className={'flex w-full flex-col ' + (!queryType ? '' : '')} style={{ maxHeight }}>
         {!queryType && <LogsExplorerTableHeader />}
-        <div className={`flex flex-row ${!queryType ? 'border-l border-r' : ''}`}>
+        <div className={`flex h-full flex-row ${!queryType ? 'border-l border-r' : ''}`}>
           <DataGrid
             style={{ height: '100%' }}
             className={`
