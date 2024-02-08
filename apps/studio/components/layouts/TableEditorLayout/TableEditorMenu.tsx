@@ -199,6 +199,7 @@ const TableEditorMenu = () => {
                       <span className="sr-only">Search tables</span>
                       <input
                         id="search-tables"
+                        name="search-tables"
                         type="text"
                         placeholder="Search..."
                         className={cn(
