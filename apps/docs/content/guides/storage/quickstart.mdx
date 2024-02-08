@@ -1,13 +1,11 @@
-import Layout from '~/layouts/DefaultGuideLayout'
-
-export const meta = {
-  id: 'storage-quickstart',
-  title: 'Storage Quickstart',
-  description: 'Learn how to use Supabase to store and serve files.',
-  subtitle: 'Learn how to use Supabase to store and serve files.',
-  sidebar_label: 'Quickstart',
-  tocVideo: 'J9mTPY8rIXE',
-}
+---
+id: 'storage-quickstart'
+title: 'Storage Quickstart'
+description: 'Learn how to use Supabase to store and serve files.'
+subtitle: 'Learn how to use Supabase to store and serve files.'
+sidebar_label: 'Quickstart'
+tocVideo: 'J9mTPY8rIXE'
+---
 
 This guide shows the basic functionality of Supabase Storage. Find a full [example application on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/nextjs-user-management).
 
@@ -238,7 +236,3 @@ create policy "Public Access"
     allowFullScreen
   ></iframe>
 </div>
-
-export const Page = ({ children }) => <Layout meta={meta} children={children} />
-
-export default Page

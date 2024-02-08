@@ -1,12 +1,10 @@
-import Layout from '~/layouts/DefaultGuideLayout'
-
-export const meta = {
-  id: 'resumable-uploads',
-  title: 'Resumable Uploads',
-  description: 'Learn how to upload files to Supabase Storage.',
-  subtitle: 'Learn how to upload files to Supabase Storage.',
-  sidebar_label: 'Uploads',
-}
+---
+id: 'resumable-uploads'
+title: 'Resumable Uploads'
+description: 'Learn how to upload files to Supabase Storage.'
+subtitle: 'Learn how to upload files to Supabase Storage.'
+sidebar_label: 'Uploads'
+---
 
 The resumable upload method is recommended when:
 
@@ -149,7 +147,3 @@ We do advise against overwriting files when possible, as the CDN will take some 
 Uploading a file to a new path is the recommended way to avoid propagation delays and stale content.
 
 To learn more, see the [CDN](/docs/guides/storage/cdn/fundamentals) guide.
-
-export const Page = ({ children }) => <Layout meta={meta} children={children} />
-
-export default Page

@@ -1,11 +1,9 @@
-import Layout from '~/layouts/DefaultGuideLayout'
-
-export const meta = {
-  id: 'storage-errors-codes',
-  title: 'Error Codes',
-  description: 'Supabase Error Codes',
-  sidebar_label: 'Debugging',
-}
+---
+id: 'storage-errors-codes'
+title: 'Error Codes'
+description: 'Supabase Error Codes'
+sidebar_label: 'Debugging'
+---
 
 Here's a list of the most common error codes and their potential resolutions:
 
@@ -57,7 +55,3 @@ This issue occurs where there is a unhandled error.
 **Resolution:**
 
 - File a support ticket to Storage team [here](https://supabase.com/dashboard/support/new)
-
-export const Page = ({ children }) => <Layout meta={meta} children={children} />
-
-export default Page

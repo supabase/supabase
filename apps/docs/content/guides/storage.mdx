@@ -1,12 +1,11 @@
-import Layout from '~/layouts/DefaultGuideLayout'
-
-export const meta = {
-  id: 'storage',
-  title: 'Storage',
-  description: 'Use Supabase to store and serve files.',
-  subtitle: 'Use Supabase to store and serve files.',
-  sidebar_label: 'Overview',
-}
+---
+id: 'storage'
+title: 'Storage'
+description: 'Use Supabase to store and serve files.'
+subtitle: 'Use Supabase to store and serve files.'
+sidebar_label: 'Overview'
+hideToc: true
+---
 
 Supabase Storage makes it simple to upload and serve files of any size, providing a robust framework for file access controls.
 
@@ -44,16 +43,7 @@ export const examples = [
 Find the source code and documentation in the Supabase GitHub repository.
 
 <div className="grid md:grid-cols-12 gap-4 not-prose">
-  {integrations.map((x) => (
-    <div className="col-span-6" key={x.href}>
-      <Link href={x.href} passHref>
-        <GlassPanel title={x.name}>{x.description}</GlassPanel>
-      </Link>
-    </div>
-  ))}
-</div>
-
-export const integrations = [
+  {[
   {
     name: 'Supabase Storage API',
     description: 'View the source code.',
@@ -64,8 +54,11 @@ export const integrations = [
     description: 'See the Swagger Documentation for Supabase Storage.',
     href: 'https://supabase.github.io/storage/',
   },
-]
-
-export const Page = ({ children }) => <Layout meta={meta} children={children} hideToc={true} />
-
-export default Page
+].map((x) => (
+    <div className="col-span-6" key={x.href}>
+      <Link href={x.href} passHref>
+        <GlassPanel title={x.name}>{x.description}</GlassPanel>
+      </Link>
+    </div>
+  ))}
+</div>
