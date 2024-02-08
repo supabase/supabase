@@ -93,11 +93,16 @@ const CreateEnumeratedTypeSidePanel = ({
     if (visible) form.reset()
   }, [visible])
 
+  const onCancel = () => {
+    form.reset({ name: '', description: '', values: [{ value: '' }] })
+    onClose()
+  }
+
   return (
     <SidePanel
       loading={isCreating}
       visible={visible}
-      onCancel={onClose}
+      onCancel={onCancel}
       header="Create a new enumerated type"
       confirmText="Create type"
       onConfirm={() => {
