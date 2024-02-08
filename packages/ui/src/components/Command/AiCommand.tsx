@@ -287,7 +287,7 @@ export function useAiChat({
       }
 
       eventSource.addEventListener('error', handleError)
-      eventSource.addEventListener('message', (e) => {
+      eventSource.addEventListener('message', (e: MessageEvent) => {
         try {
           setIsLoading?.(false)
 
@@ -397,7 +397,7 @@ export function queryAi(messages: Message[], timeout = 0) {
     let answer = ''
 
     eventSource.addEventListener('error', handleError)
-    eventSource.addEventListener('message', (e) => {
+    eventSource.addEventListener('message', (e: MessageEvent) => {
       try {
         if (e.data === '[DONE]') {
           if (timeoutId) {
