@@ -48,9 +48,14 @@ const EnterpriseCard = ({ plan, isCurrentPlan, billingViaPartner }: EnterpriseCa
           className="text-xs text-foreground-light md:grid md:grid-cols-2 md:gap-x-10"
         >
           {features.map((feature) => (
-            <li key={feature} className="flex items-center py-2 first:mt-0">
+            <li
+              key={typeof feature === 'string' ? feature : feature[0]}
+              className="flex items-center py-2 first:mt-0"
+            >
               <IconCheck className="text-brand h-4 w-4" aria-hidden="true" strokeWidth={3} />
-              <span className="text-foreground mb-0 ml-3 ">{feature}</span>
+              <span className="text-foreground mb-0 ml-3 ">
+                {typeof feature === 'string' ? feature : feature[0]}
+              </span>
             </li>
           ))}
         </ul>

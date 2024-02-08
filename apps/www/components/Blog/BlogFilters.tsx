@@ -81,7 +81,7 @@ const BlogFilters = ({ posts, setPosts, setCategory, allCategories, handlePosts 
 
   return (
     <div className="flex flex-row items-center justify-between gap-2">
-      <AnimatePresence exitBeforeEnter>
+      <AnimatePresence mode="wait">
         {!showSearchInput && (
           <motion.div
             initial={{ opacity: 0 }}
