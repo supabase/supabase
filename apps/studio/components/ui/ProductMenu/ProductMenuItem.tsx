@@ -1,4 +1,3 @@
-import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode } from 'react'
 import { Button, Menu } from 'ui'
