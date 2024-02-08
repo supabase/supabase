@@ -15,6 +15,7 @@ import {
   IconEdit,
   IconLock,
   IconTrash,
+  cn,
 } from 'ui'
 
 import { parseSupaTable } from 'components/grid'
@@ -122,7 +123,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
     >
       <Link
         href={`/project/${projectRef}/editor/${entity.id}`}
-        className="flex items-center gap-2 py-1 pl-3 w-full max-w-[90%]"
+        className="flex items-center gap-2 py-1 pl-2 w-full max-w-[90%]"
       >
         <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
           <Tooltip.Trigger className="flex items-center">
@@ -147,22 +148,25 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
             )}
           </Tooltip.Trigger>
           <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
+            <Tooltip.Content
+              side="bottom"
+              className={[
+                'rounded bg-alternative py-1 px-2 leading-none shadow',
+                'border border-background',
+                'text-xs text-foreground capitalize',
+              ].join(' ')}
+            >
               <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                  'border border-background',
-                ].join(' ')}
-              >
-                <span className="text-xs text-foreground capitalize">
-                  {formatTooltipText(entity.type)}
-                </span>
-              </div>
+              {formatTooltipText(entity.type)}
             </Tooltip.Content>
           </Tooltip.Portal>
         </Tooltip.Root>
-        <div className="text-sm text-foreground-light group-hover:text-foreground transition max-w-[175px] overflow-hidden text-ellipsis whitespace-nowrap flex items-center justify-between gap-2 relative w-full">
+        <div
+          className={cn(
+            'text-sm text-foreground-light group-hover:text-foreground transition max-w-[175px] overflow-hidden text-ellipsis whitespace-nowrap flex items-center gap-2 relative w-full',
+            isActive && 'text-foreground'
+          )}
+        >
           {/* only show tooltips if required, to reduce noise */}
           {entity.name.length > 20 ? (
             <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
@@ -170,16 +174,16 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
                 {entity.name}
               </Tooltip.Trigger>
               <Tooltip.Portal>
-                <Tooltip.Content side="right">
+                <Tooltip.Content
+                  side="right"
+                  className={[
+                    'rounded bg-alternative py-1 px-2 leading-none shadow',
+                    'border border-background',
+                    'text-xs text-foreground',
+                  ].join(' ')}
+                >
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                      'border border-background',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-foreground">{entity.name}</span>
-                  </div>
+                  {entity.name}
                 </Tooltip.Content>
               </Tooltip.Portal>
             </Tooltip.Root>
@@ -187,9 +191,13 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
             entity.name
           )}
 
-          {entity.type === ENTITY_TYPE.TABLE && entity.rls_enabled && (
+          {entity.type === ENTITY_TYPE.TABLE && !entity.rls_enabled && (
             <div className="w-4 px-0.5">
-              <Unlock size={14} className="text-orange-700" />
+              <Unlock
+                size={14}
+                strokeWidth={1}
+                className={cn(isActive ? 'text-warning' : 'text-warning-500')}
+              />
             </div>
           )}
         </div>
@@ -212,7 +220,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
                 }}
               >
                 <IconEdit size="tiny" />
-                <p>Edit Table</p>
+                <span>Edit Table</span>
               </DropdownMenuItem>
               <DropdownMenuItem
                 key="duplicate-table"
@@ -223,7 +231,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
                 }}
               >
                 <IconCopy size="tiny" />
-                <p>Duplicate Table</p>
+                <span>Duplicate Table</span>
               </DropdownMenuItem>
               <DropdownMenuItem key="delete-table" className="space-x-2" asChild>
                 <Link
@@ -231,7 +239,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
                   href={`/project/${projectRef}/auth/policies?schema=${snap.selectedSchemaName}&search=${entity.id}`}
                 >
                   <IconLock size="tiny" />
-                  <p>View Policies</p>
+                  <span>View Policies</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem
@@ -243,7 +251,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
                 }}
               >
                 <IconDownload size="tiny" />
-                <p>Export as CSV</p>
+                <span>Export as CSV</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
@@ -255,7 +263,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
                 }}
               >
                 <IconTrash size="tiny" />
-                <p>Delete Table</p>
+                <span>Delete Table</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

@@ -30,9 +30,11 @@ import {
   IconPlusCircle,
   IconSearch,
   IconX,
+  cn,
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
+import { Loader2 } from 'lucide-react'
 
 const TableEditorMenu = () => {
   const { id } = useParams()
@@ -46,6 +48,7 @@ const TableEditorMenu = () => {
   )
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const inputRef = useRef<HTMLInputElement | null>(null)
+  const [isSearchInputFocused, setIsSearchInputFocused] = useState(false)
 
   const { project } = useProjectContext()
   const {
@@ -106,6 +109,11 @@ const TableEditorMenu = () => {
       inputRef.current.focus()
     }
   }, [isSearchOpen])
+
+  const handleSearchInputFocusChange = () => {
+    setIsSearchInputFocused(inputRef.current === document.activeElement)
+  }
+
   return (
     <>
       <div
@@ -163,9 +171,7 @@ const TableEditorMenu = () => {
             </Tooltip.Root>
           ) : (
             <Alert_Shadcn_>
-              <AlertTitle_Shadcn_ className="text-xs tracking-normal">
-                Viewing protected schema
-              </AlertTitle_Shadcn_>
+              <AlertTitle_Shadcn_ className="text-sm">Viewing protected schema</AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_ className="text-xs">
                 <p className="mb-2">
                   This schema is managed by Supabase and is read-only through the table editor
@@ -189,63 +195,100 @@ const TableEditorMenu = () => {
                     exit={{ x: 20, opacity: 0, transition: { duration: 0 } }}
                     className="absolute top-0 left-2"
                   >
-                    <input
-                      type="text"
-                      placeholder="Search..."
-                      className="bg-default rounded-md px-2 py-0 h-8 focus:outline-none w-44 text-sm"
-                      onChange={(e) => setSearchText(e.target.value.trim())}
-                      value={searchText}
-                      ref={inputRef}
-                    />
+                    <label htmlFor={'search-tables'} className="relative">
+                      <span className="sr-only">Search tables</span>
+                      <input
+                        id="search-tables"
+                        name="search-tables"
+                        type="text"
+                        placeholder="Search..."
+                        className={cn(
+                          'bg-default text-foreground rounded-none px-0 py-0 h-5 focus:outline-none w-44 text-sm',
+                          'border-b outline-none focus:outline-none',
+                          'border-transparent focus:border-transparent focus:ring-0',
+                          'focus:border-b-red'
+                        )}
+                        onChange={(e) => {
+                          setSearchText(e.target.value.trim())
+                        }}
+                        value={searchText}
+                        ref={(el) => {
+                          inputRef.current = el
+                          if (el) {
+                            el.addEventListener('focus', handleSearchInputFocusChange)
+                            el.addEventListener('blur', handleSearchInputFocusChange)
+                          }
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Escape') {
+                            setIsSearchOpen(false)
+                            setSearchText('')
+                          }
+                          if (e.key === 'Backspace' && searchText.length === 0) {
+                            setIsSearchOpen(false)
+                          }
+                        }}
+                      />
+                      <div
+                        className={cn(
+                          'absolute -bottom-1 w-full h-px bg-border transition-colors',
+                          isSearchInputFocused && 'bg-border-stronger'
+                        )}
+                      ></div>
+                    </label>
                   </motion.div>
                 )}
               </AnimatePresence>
               <motion.button
-                onClick={expandSearch}
+                onClick={
+                  !isSearchOpen
+                    ? () => expandSearch()
+                    : () => {
+                        setSearchText('')
+                        expandSearch()
+                      }
+                }
                 initial={{ x: 0 }}
                 animate={{ x: isSearchOpen ? 185 : 0, transition: { duration: 0 } }}
                 className="px-2 py-1 rounded-md mt-0.5 transition transform hover:scale-105 focus:outline-none"
               >
                 {isSearchOpen ? (
                   isSearching ? (
-                    <IconLoader
-                      className="animate-spin text-foreground-lighter"
+                    <Loader2
+                      className="w-4 h-4 animate-spin text-foreground"
                       size={15}
-                      strokeWidth={1.5}
+                      strokeWidth={1}
                     />
                   ) : (
-                    <button onClick={() => setSearchText('')}>
-                      <IconX />
-                    </button>
+                    <IconX className={cn('w-4  h-4 hover:text-foreground transition-colors')} />
                   )
                 ) : (
-                  <button>
-                    <IconSearch />
-                  </button>
+                  <IconSearch className={cn('w-4 h-4 hover:text-foreground transition-colors')} />
                 )}
               </motion.button>
             </div>
-            <div className="flex gap-3 items-center absolute right-2 top-1.5">
+            <div className="flex gap-3 items-center absolute right-1 top-1.5">
               <DropdownMenu>
                 <Tooltip.Root delayDuration={0}>
                   <DropdownMenuTrigger asChild>
                     <Tooltip.Trigger>
-                      <div className="text-foreground-lighter transition-colors hover:text-foreground">
-                        <IconChevronsDown size={18} strokeWidth={1} />
-                      </div>
+                      <IconChevronsDown
+                        size={18}
+                        strokeWidth={1}
+                        className="text-foreground-lighter transition-colors hover:text-foreground"
+                      />
                     </Tooltip.Trigger>
                   </DropdownMenuTrigger>
                   <Tooltip.Portal>
-                    <Tooltip.Content side="bottom">
+                    <Tooltip.Content
+                      side="bottom"
+                      className={[
+                        'rounded bg-alternative py-1 px-2 leading-none shadow',
+                        'border border-background text-xs',
+                      ].join(' ')}
+                    >
                       <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-alternative py-1 px-2 leading-none shadow',
-                          'border border-background',
-                        ].join(' ')}
-                      >
-                        <span className="text-xs">Sort By</span>
-                      </div>
+                      Sort By
                     </Tooltip.Content>
                   </Tooltip.Portal>
                 </Tooltip.Root>
