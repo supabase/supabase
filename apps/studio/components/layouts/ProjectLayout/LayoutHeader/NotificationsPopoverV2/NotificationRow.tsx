@@ -67,8 +67,8 @@ const NotificationRow: ItemRenderer<Notification, NotificationRowProps> = ({
       ref={ref}
       className={clsx(
         `p-4 flex justify-between gap-x-3 group`,
-        index !== 0 ? 'border-t' : '',
-        status !== 'new' ? 'bg-background' : ''
+        index !== 0 ? 'border-t border-overlay' : '',
+        status === 'new' ? 'bg-surface-100/50' : 'bg-background'
       )}
     >
       <div ref={viewRef} className="flex flex-col gap-y-2.5 w-full py-0.5">
@@ -135,8 +135,9 @@ const NotificationRow: ItemRenderer<Notification, NotificationRowProps> = ({
                 return (
                   <Button
                     key={key}
-                    type="outline"
+                    type="default"
                     icon={<IconExternalLink strokeWidth={1.5} size={14} />}
+                    asChild
                   >
                     <Link href={url} target="_blank" rel="noreferrer">
                       {action.label}
@@ -147,7 +148,7 @@ const NotificationRow: ItemRenderer<Notification, NotificationRowProps> = ({
                 return (
                   <Button
                     key={key}
-                    type="outline"
+                    type="default"
                     onClick={() => onButtonAction(action.action_type)}
                   >
                     {action.label}
