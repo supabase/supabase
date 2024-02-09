@@ -55,14 +55,7 @@ function Blog(props: any) {
 
         <div className="border-default border-t">
           <div className="container mx-auto mt-10 lg:mt-16 px-8 sm:px-16 xl:px-20">
-            <BlogFilters
-              allPosts={props.blogs}
-              posts={blogs}
-              setPosts={setBlogs}
-              // setCategory={setCategory}
-              // allCategories={allCategories}
-              // handlePosts={handlePosts}
-            />
+            <BlogFilters allPosts={props.blogs} posts={blogs} setPosts={setBlogs} />
 
             <ol className="grid grid-cols-12 py-10 lg:py-16 lg:gap-16">
               {blogs?.length ? (

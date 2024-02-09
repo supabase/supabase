@@ -1,6 +1,6 @@
 import { startCase } from 'lodash'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import {
   Button,
@@ -14,12 +14,10 @@ import {
   Input,
   cn,
 } from 'ui'
-import { useParams } from '~/hooks/useParams'
 
 import { useBreakpoint } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import PostTypes from '~/types/post'
-import { adaptEventsOfChild } from 'recharts/types/util/types'
 import { useSearchParams } from 'next/navigation'
 
 interface Props {
@@ -36,7 +34,7 @@ const MotionButton = motion(Button)
  * ✅ search via q param
  * ✅ search via category if no q
  * ✅ search via category and reset q if present
- * */
+ */
 
 function BlogFilters({ allPosts, posts, setPosts }: Props) {
   const [category, setCategory] = useState<string>('all')
