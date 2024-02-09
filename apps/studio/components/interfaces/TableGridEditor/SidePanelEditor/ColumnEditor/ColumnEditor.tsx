@@ -180,20 +180,6 @@ const ColumnEditor = ({
       </FormSection>
       <SidePanel.Separator />
       <FormSection
-        header={<FormSectionLabel className="lg:!col-span-4">Foreign Keys</FormSectionLabel>}
-      >
-        <FormSectionContent loading={false} className="lg:!col-span-8">
-          <div>
-            <ColumnForeignKey
-              column={columnFields}
-              relations={fkRelations}
-              closePanel={closePanel}
-            />
-          </div>
-        </FormSectionContent>
-      </FormSection>
-      <SidePanel.Separator />
-      <FormSection
         header={
           <FormSectionLabel
             className="lg:!col-span-4"
@@ -282,6 +268,20 @@ const ColumnEditor = ({
             enumTypes={enumTypes}
             onUpdateField={onUpdateField}
           />
+        </FormSectionContent>
+      </FormSection>
+      <SidePanel.Separator />
+      <FormSection
+        header={<FormSectionLabel className="lg:!col-span-4">Foreign Keys</FormSectionLabel>}
+      >
+        <FormSectionContent loading={false} className="lg:!col-span-8">
+          <div>
+            <ColumnForeignKey
+              column={columnFields}
+              relations={fkRelations}
+              closePanel={closePanel}
+            />
+          </div>
         </FormSectionContent>
       </FormSection>
       <SidePanel.Separator />
