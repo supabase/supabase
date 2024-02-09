@@ -131,6 +131,7 @@ const FunctionSelector = ({
                     {functions?.map((func) => (
                       <CommandItem_Shadcn_
                         key={func.id}
+                        value={func.name.replaceAll('"', '')}
                         className="cursor-pointer flex items-center justify-between space-x-2 w-full"
                         onSelect={() => {
                           onSelectFunction(func.name)
