@@ -8,7 +8,6 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
-  Tabs,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
   Tabs_Shadcn_,
