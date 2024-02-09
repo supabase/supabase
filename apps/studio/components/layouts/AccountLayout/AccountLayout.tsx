@@ -9,7 +9,6 @@ import { IS_PLATFORM } from 'lib/constants'
 import SettingsLayout from '../SettingsLayout/SettingsLayout'
 import { SidebarSection } from './AccountLayout.types'
 import WithSidebar from './WithSidebar'
-import { LayoutWrapper } from '../LayoutWrapper'
 
 export interface AccountLayoutProps {
   title: string
@@ -151,8 +150,8 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
         <title>{title ? `${title} | Supabase` : 'Supabase'}</title>
         <meta name="description" content="Supabase Studio" />
       </Head>
-      <div className="flex h-full">
-        <LayoutWrapper className="flex flex-col flex-1 w-full overflow-y-auto">
+      <div className="h-full min-h-[0px] basis-0 flex-1">
+        <div className="flex flex-col h-full min-h-[0px] basis-0 flex-1">
           <WithSidebar
             hideSidebar={navLayoutV2}
             title={title}
@@ -161,7 +160,7 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
           >
             {children}
           </WithSidebar>
-        </LayoutWrapper>
+        </div>
       </div>
     </>
   )

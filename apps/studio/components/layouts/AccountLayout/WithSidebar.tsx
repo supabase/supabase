@@ -4,7 +4,6 @@ import { ReactNode } from 'react'
 import { Badge, IconArrowUpRight, IconLogOut, Menu } from 'ui'
 
 import { useFlag } from 'hooks'
-import { LayoutWrapper } from '../LayoutWrapper'
 import LayoutHeader from '../ProjectLayout/LayoutHeader'
 import { SidebarLink, SidebarSection } from './AccountLayout.types'
 
@@ -37,7 +36,7 @@ const WithSidebar = ({
   return (
     <div className="flex max-h-full">
       {!hideSidebar && !noContent && (
-        <LayoutWrapper
+        <div
           id="with-sidebar"
           className={[
             'h-full bg-background',
@@ -77,7 +76,7 @@ const WithSidebar = ({
               })}
             </Menu>
           </div>
-        </LayoutWrapper>
+        </div>
       )}
       <div className="flex flex-1 flex-col">
         {!navLayoutV2 && <LayoutHeader breadcrumbs={breadcrumbs} />}

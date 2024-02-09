@@ -1,10 +1,24 @@
 import { isEqual } from 'lodash'
-import { Key, ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
+import { Key, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import DataGrid, { Column, RenderRowProps, Row } from 'react-data-grid'
-import { Alert, Button, IconClipboard, IconEye, IconEyeOff } from 'ui'
+import {
+  Alert,
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  IconChevronDown,
+  IconClipboard,
+  IconDownload,
+  IconEye,
+  IconEyeOff,
+  IconPlay,
+} from 'ui'
 
 import CSVButton from 'components/ui/CSVButton'
-import { useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { copyToClipboard } from 'lib/helpers'
 import { LogQueryError, isDefaultLogPreviewFormat } from '.'
 import AuthColumnRenderer from './LogColumnRenderers/AuthColumnRenderer'
@@ -17,6 +31,10 @@ import LogSelection, { LogSelectionProps } from './LogSelection'
 import { LogData, QueryType } from './Logs.types'
 import DefaultErrorRenderer from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
+import { CSVLink } from 'react-csv'
+import { IS_PLATFORM } from 'common'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useProfile } from 'lib/profile'
 
 interface Props {
   data?: Array<LogData | Object>
@@ -29,6 +47,9 @@ interface Props {
   queryType?: QueryType
   projectRef: string
   params: LogSelectionProps['params']
+  onRun?: () => void
+  onSave?: () => void
+  hasEditorValue?: boolean
 }
 type LogMap = { [id: string]: LogData }
 
@@ -46,18 +67,31 @@ const LogTable = ({
   error,
   projectRef,
   params,
+  onRun,
+  onSave,
+  hasEditorValue,
 }: Props) => {
   const { ui } = useStore()
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
   const firstRow: LogData | undefined = data?.[0] as LogData
+  const { profile } = useProfile()
+  const canCreateLogQuery = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
+    resource: { type: 'log_sql', owner_id: profile?.id },
+    subject: { id: profile?.id },
+  })
 
   // move timestamp to the first column
-  const { timestamp, ...rest } = firstRow || {}
-  const formattedFirstRow = { timestamp, ...rest }
+  function getFirstRow() {
+    if (!firstRow) return {}
 
-  const columnNames = Object.keys(formattedFirstRow || {})
+    const { timestamp, ...rest } = firstRow || {}
+    return { timestamp, ...rest }
+  }
+
+  const columnNames = Object.keys(getFirstRow() || {})
   const hasId = columnNames.includes('id')
   const hasTimestamp = columnNames.includes('timestamp')
+  const csvRef = useRef<CSVLink & HTMLAnchorElement & { link: HTMLAnchorElement }>(null)
 
   const DEFAULT_COLUMNS = columnNames.map((v: keyof LogData, idx) => {
     const result: Column<LogData> = {
@@ -167,18 +201,40 @@ const LogTable = ({
     })
   }
 
+  const downloadCsvRef = useRef<HTMLDivElement>(null)
+  function downloadCSV() {
+    downloadCsvRef.current?.click()
+  }
+
   const LogsExplorerTableHeader = () => (
-    <div className="flex w-full items-center justify-between rounded-tl rounded-tr border-t border-l border-r bg-surface-100 px-5 py-2">
+    <div className="flex w-full items-center justify-between border-t  bg-surface-100 px-5 py-2">
       <div className="flex items-center gap-2">
-        {data && data.length ? (
-          <>
-            <span className="text-sm text-foreground">Query results</span>
-            <span className="text-sm text-foreground-light">{data && data.length}</span>
-          </>
-        ) : (
-          <span className="text-xs text-foreground">Results will be shown below</span>
-        )}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button type="text" iconRight={<IconChevronDown />}>
+              Results {data && data.length ? `(${data.length})` : ''}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            <DropdownMenuItem onClick={downloadCSV} className="space-x-2">
+              <IconDownload size="tiny" />
+              <div>Download CSV</div>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={copyResultsToClipboard} className="space-x-2">
+              <IconClipboard size="tiny" />
+              <div>Copy to clipboard</div>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
+
+      {/* Using .hidden with a ref so I don't have to duplicate the code to download the CSV - Jordi */}
+      <div className="hidden">
+        <CSVButton buttonType={'text'} data={data}>
+          <div ref={downloadCsvRef}>Download CSV</div>
+        </CSVButton>
+      </div>
+
       <div className="flex items-center gap-2">
         {onHistogramToggle && (
           <Button
@@ -189,10 +245,48 @@ const LogTable = ({
             Histogram
           </Button>
         )}
-        <Button type="default" icon={<IconClipboard />} onClick={copyResultsToClipboard}>
-          Copy to clipboard
+      </div>
+
+      <div className="space-x-2">
+        {IS_PLATFORM && (
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger asChild>
+              <Button
+                type="default"
+                onClick={onSave}
+                disabled={!canCreateLogQuery || !hasEditorValue}
+              >
+                Save query
+              </Button>
+            </Tooltip.Trigger>
+            {!canCreateLogQuery && (
+              <Tooltip.Portal>
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-alternative py-1 px-2 leading-none shadow',
+                      'border border-background',
+                    ].join(' ')}
+                  >
+                    <span className="text-xs text-foreground">
+                      You need additional permissions to save your query
+                    </span>
+                  </div>
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            )}
+          </Tooltip.Root>
+        )}
+        <Button
+          type={hasEditorValue ? 'primary' : 'alternative'}
+          disabled={!hasEditorValue}
+          onClick={onRun}
+          iconRight={<IconPlay />}
+          loading={isLoading}
+        >
+          Run
         </Button>
-        <CSVButton data={data}>Download</CSVButton>
       </div>
     </div>
   )
@@ -221,7 +315,7 @@ const LogTable = ({
   }
 
   const renderNoResultAlert = () => (
-    <div className="mt-16 flex scale-100 flex-col items-center justify-center gap-6 text-center opacity-100">
+    <div className="flex scale-100 flex-col items-center justify-center gap-6 text-center opacity-100">
       <div className="flex flex-col gap-1">
         <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-stronger px-2"></div>
         <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-stronger px-2">
@@ -256,16 +350,13 @@ const LogTable = ({
 
   return (
     <>
-      <section
-        className={'flex w-full flex-col ' + (!queryType ? 'shadow-lg' : '')}
-        style={{ maxHeight }}
-      >
+      <section className={'flex w-full flex-col ' + (!queryType ? '' : '')} style={{ maxHeight }}>
         {!queryType && <LogsExplorerTableHeader />}
         <div className={`flex h-full flex-row ${!queryType ? 'border-l border-r' : ''}`}>
           <DataGrid
             style={{ height: '100%' }}
             className={`
-            flex-1 flex-grow
+            flex-1 flex-grow h-full
             ${!queryType ? 'data-grid--logs-explorer' : ' data-grid--simple-logs'}
           `}
             rowHeight={40}

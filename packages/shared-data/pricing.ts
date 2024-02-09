@@ -526,7 +526,7 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
-        title: '99.9% SLA',
+        title: 'Uptime SLAs',
         plans: {
           free: false,
           pro: false,
