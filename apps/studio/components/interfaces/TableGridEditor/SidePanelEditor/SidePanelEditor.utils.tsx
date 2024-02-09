@@ -782,8 +782,6 @@ export const insertTableRows = async (
   let insertError = undefined
   let insertProgress = 0
 
-  console.log('insertTableRows')
-
   const formattedRows = rows.map((row: any) => {
     const formattedRow: any = {}
     selectedHeaders.forEach((header) => {
