@@ -27,7 +27,6 @@ import {
   CommandItem,
   CommandLabel,
   CommandList,
-  FORCE_MOUNT_ITEM,
   copyToClipboard,
 } from './Command.utils'
 import { useCommandMenu } from './CommandMenuProvider'
@@ -126,11 +125,11 @@ const CommandMenu = () => {
         >
           {!currentPage && (
             <>
-              <CommandGroup heading="Documentation">
+              <CommandGroup heading="Documentation" forceMount={true}>
                 <CommandItem
                   type="command"
-                  value={site === 'docs' ? `${FORCE_MOUNT_ITEM}--docs-search` : undefined}
                   onSelect={() => setPages([...pages, COMMAND_ROUTES.DOCS_SEARCH])}
+                  forceMount={true}
                 >
                   <IconBook />
 
@@ -148,10 +147,10 @@ const CommandMenu = () => {
                 </CommandItem>
                 <CommandItem
                   type="command"
-                  value={site === 'docs' ? `${FORCE_MOUNT_ITEM}--ai-info` : undefined}
                   onSelect={() => {
                     setPages([...pages, COMMAND_ROUTES.AI])
                   }}
+                  forceMount={true}
                 >
                   <AiIconAnimation />
                   <span className="text-brand">
