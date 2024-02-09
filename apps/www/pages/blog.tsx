@@ -1,5 +1,5 @@
 import fs from 'fs'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { useRouter } from 'next/router'
 import Image from 'next/legacy/image'
@@ -45,51 +45,10 @@ export async function getStaticProps() {
 
 function Blog(props: any) {
   const [blogs, setBlogs] = useState(props.blogs)
-  const [category, setCategory] = useState<string>('all')
-
-  // Using hard-coded categories as they:
-  // - serve as a reference
-  // - are easier to reorder
-  const allCategories = [
-    'all',
-    'product',
-    'company',
-    'postgres',
-    'developers',
-    'engineering',
-    'launch-week',
-  ]
   const router = useRouter()
 
   const meta_title = 'Supabase Blog: Open Source Firebase alternative Blog'
   const meta_description = 'Get all your Supabase News on the Supabase blog.'
-
-  useEffect(() => {
-    handlePosts()
-  }, [category])
-
-  const handlePosts = () => {
-    // construct an array of blog posts
-    // not inluding the first blog post
-    const shiftedBlogs = [...props.blogs]
-    shiftedBlogs.shift()
-
-    if (category === 'all') {
-      router.replace('/blog', undefined, { shallow: true, scroll: false })
-    } else {
-      router.query.category = category
-      router.replace(router, undefined, { shallow: true, scroll: false })
-    }
-
-    setBlogs(
-      category === 'all'
-        ? shiftedBlogs
-        : props.blogs.filter((post: any) => {
-            const found = post.categories?.includes(category)
-            return found
-          })
-    )
-  }
 
   return (
     <>
@@ -129,11 +88,12 @@ function Blog(props: any) {
         <div className="border-default border-t">
           <div className="container mx-auto mt-10 lg:mt-16 px-8 sm:px-16 xl:px-20">
             <BlogFilters
+              allPosts={props.blogs}
               posts={blogs}
               setPosts={setBlogs}
-              setCategory={setCategory}
-              allCategories={allCategories}
-              handlePosts={handlePosts}
+              // setCategory={setCategory}
+              // allCategories={allCategories}
+              // handlePosts={handlePosts}
             />
 
             <ol className="grid grid-cols-12 py-10 lg:py-16 lg:gap-16">

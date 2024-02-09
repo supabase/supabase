@@ -12,72 +12,140 @@ import {
   IconSearch,
   IconX,
   Input,
+  cn,
 } from 'ui'
 import { useParams } from '~/hooks/useParams'
 
 import { useBreakpoint } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import PostTypes from '~/types/post'
+import { adaptEventsOfChild } from 'recharts/types/util/types'
+import { useSearchParams } from 'next/navigation'
 
 interface Props {
+  allPosts: PostTypes[]
   posts: PostTypes[]
   setPosts: (posts: any) => void
-  setCategory: (category: string) => void
-  allCategories: string[]
-  handlePosts: VoidFunction
 }
 
 const MotionButton = motion(Button)
 
-const BlogFilters = ({ posts, setPosts, setCategory, allCategories, handlePosts }: Props) => {
-  const activeCategory = useParams()?.category
+/**
+ * ✅ search via text input
+ * ✅ update search when deleting text input
+ * ✅ search via q param
+ * ✅ search via category if no q
+ * ✅ search via category and reset q if present
+ * */
+
+function BlogFilters({ allPosts, posts, setPosts }: Props) {
+  const [category, setCategory] = useState<string>('all')
   const [searchKey, setSearchKey] = useState<string>('')
+  const [showSearchInput, setShowSearchInput] = useState<boolean>(false)
+
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const q = searchParams.get('q')
+  const activeCategory = searchParams.get('category')
   const isMobile = useBreakpoint(1023)
   const is2XL = useBreakpoint(1535)
-  const [showSearchInput, setShowSearchInput] = useState<boolean>(false)
-  const router = useRouter()
-  const [isMounted, setIsMounted] = useState(false)
+
+  // Using hard-coded categories as they:
+  // - serve as a reference
+  // - are easier to reorder
+  const allCategories = [
+    'all',
+    'product',
+    'company',
+    'postgres',
+    'developers',
+    'engineering',
+    'launch-week',
+  ]
+
+  useEffect(() => {
+    if (!q) {
+      handlePosts()
+    }
+  }, [category])
+
+  useEffect(() => {
+    if (q) {
+      handleSearchByText(q)
+    }
+  }, [q])
+
+  const handleReplaceRouter = () => {
+    if (!searchKey && category !== 'all') {
+      router.query.category = category
+      router.replace(router, undefined, { shallow: true, scroll: false })
+    }
+  }
+
+  const handlePosts = () => {
+    // construct an array of blog posts
+    // not inluding the first blog post
+    const shiftedBlogs = [...allPosts]
+    shiftedBlogs.shift()
+
+    handleReplaceRouter()
+
+    setPosts(
+      category === 'all'
+        ? shiftedBlogs
+        : allPosts.filter((post: any) => {
+            const found = post.categories?.includes(category)
+            return found
+          })
+    )
+  }
 
   useEffect(() => {
     setShowSearchInput(!isMobile)
   }, [isMobile])
 
   useEffect(() => {
-    if (!!searchKey) {
-      setPosts(handleSearchByText)
-    } else {
-      handlePosts()
+    if (router.isReady && q) {
+      setSearchKey(q)
     }
-  }, [searchKey])
-
-  useEffect(() => {
     if (router.isReady && activeCategory && activeCategory !== 'all') {
       setCategory(activeCategory)
     }
-  }, [activeCategory, router.isReady])
+  }, [activeCategory, router.isReady, q])
 
-  const handleSearchByText = useCallback(() => {
-    if (!searchKey) return
-    const matches = posts.filter((post: any) => {
+  const handleSearchByText = (text: string) => {
+    setSearchKey(text)
+    searchParams.has('q') && router.replace('/blog', undefined, { shallow: true, scroll: false })
+    router.replace(`/blog?q=${text}`, undefined, { shallow: true, scroll: false })
+    if (text.length < 1) router.replace('/blog', undefined, { shallow: true, scroll: false })
+
+    const matches = allPosts.filter((post: any) => {
       const found =
-        post.tags?.join(' ').replaceAll('-', ' ').includes(searchKey.toLowerCase()) ||
-        post.title?.toLowerCase().includes(searchKey.toLowerCase()) ||
-        post.author?.includes(searchKey.toLowerCase())
+        post.tags?.join(' ').replaceAll('-', ' ').includes(text.toLowerCase()) ||
+        post.title?.toLowerCase().includes(text.toLowerCase()) ||
+        post.author?.includes(text.toLowerCase())
       return found
     })
-    return matches
-  }, [searchKey])
+
+    setPosts(matches)
+  }
+
+  const handleSetCategory = (category: string) => {
+    searchKey && handlePosts()
+    searchKey && setSearchKey('')
+    setCategory(category)
+    category === 'all'
+      ? router.replace('/blog', undefined, { shallow: true, scroll: false })
+      : router.replace(`/blog?category=${category}`, undefined, {
+          shallow: true,
+          scroll: false,
+        })
+  }
 
   const handleSearchChange = (event: any) => {
     activeCategory && setCategory('all')
-    setSearchKey(event.target.value)
+    handleSearchByText(event.target.value)
   }
-
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
-
-  if (!isMounted) return null
 
   return (
     <div className="flex flex-row items-center justify-between gap-2">
@@ -90,7 +158,7 @@ const BlogFilters = ({ posts, setPosts, setCategory, allCategories, handlePosts 
             className="flex lg:hidden"
           >
             <DropdownMenu>
-              <DropdownMenuTrigger>
+              <DropdownMenuTrigger asChild>
                 <Button
                   type="outline"
                   iconRight={<IconChevronDown />}
@@ -103,12 +171,12 @@ const BlogFilters = ({ posts, setPosts, setCategory, allCategories, handlePosts 
                 {allCategories.map((category: string) => (
                   <DropdownMenuItem
                     key="custom-expiry"
-                    onClick={() => setCategory(category)}
-                    className={[
+                    onClick={() => handleSetCategory(category)}
+                    className={cn(
                       (category === 'all' && !activeCategory) || category === activeCategory
                         ? 'text-brand-600'
-                        : '',
-                    ].join(' ')}
+                        : ''
+                    )}
                   >
                     {category === 'all' ? 'All Posts' : startCase(category.replaceAll('-', ' '))}
                   </DropdownMenuItem>
@@ -128,7 +196,7 @@ const BlogFilters = ({ posts, setPosts, setCategory, allCategories, handlePosts 
                     ? 'alternative'
                     : 'outline'
               }
-              onClick={() => setCategory(category)}
+              onClick={() => handleSetCategory(category)}
               size={is2XL ? 'tiny' : 'small'}
             >
               {category === 'all' ? 'All' : startCase(category.replaceAll('-', ' '))}
