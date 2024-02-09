@@ -23,7 +23,7 @@ test.describe('Table Editor page', () => {
     await page.getByText('Insert a new row into').click()
     await page.getByPlaceholder('NULL').click()
     await page.getByPlaceholder('NULL').fill('some text')
-    await page.getByTestId('save-row').click()
+    await page.getByTestId('action-bar-save-row').click()
     await page.locator('#toast').getByRole('button').click()
     await expect(page.getByRole('grid')).toContainText('some text')
   })
