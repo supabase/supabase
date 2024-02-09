@@ -1,6 +1,6 @@
 import { Button, Form, Input, Modal } from 'ui'
 
-export type Feedback = {
+export type FeedbackFields = {
   page: string
   comment: string
 }
@@ -9,7 +9,7 @@ type FeedbackModalProps = {
   visible: boolean
   page: string
   onCancel: () => void
-  onSubmit: (values: Feedback) => void
+  onSubmit: (values: FeedbackFields) => void
 }
 
 function FeedbackModal({ visible, page, onCancel, onSubmit }: FeedbackModalProps) {
@@ -20,7 +20,7 @@ function FeedbackModal({ visible, page, onCancel, onSubmit }: FeedbackModalProps
         validateOnBlur
         initialValues={{ page, comment: '' }}
         validate={(vals) => {
-          const errors: Partial<Feedback> = {}
+          const errors: Partial<FeedbackFields> = {}
 
           if (!vals.comment) {
             errors.comment = 'Required'

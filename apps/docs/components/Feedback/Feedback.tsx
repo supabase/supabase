@@ -5,7 +5,7 @@ import { useReducer, useRef, useState } from 'react'
 import { Button, IconCheck, IconDiscussions, IconX, cn, useConsent } from 'ui'
 
 import { sendTelemetryEvent } from '~/lib/telemetry'
-import { type Feedback, FeedbackModal } from './FeedbackModal'
+import { type FeedbackFields, FeedbackModal } from './FeedbackModal'
 
 type Response = 'yes' | 'no'
 
@@ -66,7 +66,7 @@ function Feedback() {
     feedbackButtonRef.current?.focus()
   }
 
-  function handleSubmit(feedback: Feedback) {
+  function handleSubmit(feedback: FeedbackFields) {
     console.log(feedback)
     setModalOpen(false)
   }
