@@ -1,24 +1,46 @@
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { useRouter } from 'next/router'
-import { useRef, useState } from 'react'
+import { useReducer, useRef, useState } from 'react'
 
 import { Button, IconCheck, IconDiscussions, IconX, cn, useConsent } from 'ui'
 
 import { sendTelemetryEvent } from '~/lib/telemetry'
+import { type Feedback, FeedbackModal } from './FeedbackModal'
 
 type Response = 'yes' | 'no'
 
+type State =
+  | { type: 'unanswered' }
+  | { type: 'followup'; response: Response }
+  | { type: 'final'; response: Response }
+
+type Action = { event: 'VOTED'; response: Response } | { event: 'FOLLOWUP_ANSWERED' }
+
+const initialState = { type: 'unanswered' } satisfies State
+
+function reducer(state: State, action: Action) {
+  switch (action.event) {
+    case 'VOTED':
+      if (state.type === 'unanswered') return { type: 'followup', response: action.response }
+    case 'FOLLOWUP_ANSWERED':
+      if (state.type === 'followup') return { type: 'final', response: state.response }
+    default:
+      return state
+  }
+}
+
 function Feedback() {
-  const [response, setResponse] = useState<Response | null>(null)
+  const [state, dispatch] = useReducer(reducer, initialState)
+  const [modalOpen, setModalOpen] = useState(false)
   const feedbackButtonRef = useRef<HTMLButtonElement>(null)
 
   const { hasAcceptedConsent } = useConsent()
   const supabase = useSupabaseClient()
   const router = useRouter()
 
-  const unanswered = response === null
-  const isYes = response === 'yes'
-  const isNo = response === 'no'
+  const unanswered = state.type === 'unanswered'
+  const isYes = 'response' in state && state.response === 'yes'
+  const isNo = 'response' in state && state.response === 'no'
   const showYes = unanswered || isYes
   const showNo = unanswered || isNo
 
@@ -29,7 +51,7 @@ function Feedback() {
     if (error) console.error(error)
   }
 
-  function handleResponse(response: Response) {
+  function handleVote(response: Response) {
     if (hasAcceptedConsent) {
       sendTelemetryEvent({
         category: 'docs',
@@ -40,8 +62,13 @@ function Feedback() {
       })
     }
     sendFeedbackVote(response)
-    setResponse(response)
+    dispatch({ event: 'VOTED', response })
     feedbackButtonRef.current?.focus()
+  }
+
+  function handleSubmit(feedback: Feedback) {
+    console.log(feedback)
+    setModalOpen(false)
   }
 
   return (
@@ -56,7 +83,7 @@ function Feedback() {
             !showYes && 'opacity-0 invisible',
             'transition-opacity'
           )}
-          onClick={() => handleResponse('yes')}
+          onClick={() => handleVote('yes')}
         >
           <IconCheck />
           <span className="sr-only">Yes</span>
@@ -70,7 +97,7 @@ function Feedback() {
             !showNo && 'opacity-0 invisible',
             '[transition-property:opacity,transform] [transition-duration:150ms,300ms] [transition-delay:0,150ms]'
           )}
-          onClick={() => handleResponse('no')}
+          onClick={() => handleVote('no')}
         >
           <IconX />
           <span className="sr-only">No</span>
@@ -85,10 +112,17 @@ function Feedback() {
           'transition-opacity',
           isNo && 'delay-100'
         )}
+        onClick={() => setModalOpen(true)}
       >
         {isYes ? <>What went well?</> : <>How can we improve?</>}
         <IconDiscussions size="tiny" />
       </button>
+      <FeedbackModal
+        visible={modalOpen}
+        page={router.asPath}
+        onCancel={() => setModalOpen(false)}
+        onSubmit={handleSubmit}
+      />
     </>
   )
 }
