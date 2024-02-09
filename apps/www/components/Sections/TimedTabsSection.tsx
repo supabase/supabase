@@ -136,9 +136,7 @@ const TimedTabsSection = ({
           <p className="text-foreground-muted mb-4 max-w-sm">{paragraph}</p>
           {cta && (
             <Button asChild type="default" size="small" icon={<IconArrowUpRight />}>
-              <Link href={cta.link} className="">
-                {cta.label ?? 'Explore more'}
-              </Link>
+              <Link href={cta.link}>{cta.label ?? 'Explore more'}</Link>
             </Button>
           )}
         </div>
@@ -187,7 +185,7 @@ const TimedTabsSection = ({
         ))}
       </div>
       <div className="block md:hidden">
-        <AnimatePresence exitBeforeEnter>
+        <AnimatePresence mode="wait">
           <motion.p
             key={tabs[activeTab]?.paragraph}
             initial={{ opacity: 0 }}

@@ -3,7 +3,7 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'react-hot-toast'
 
 import { post } from 'lib/common/fetch'
-import { API_ADMIN_URL } from 'lib/constants'
+import { API_URL } from 'lib/constants'
 import { ResponseError } from 'types'
 import { oauthAppKeys } from './keys'
 
@@ -30,7 +30,7 @@ export async function createOAuthApp({
   scopes,
   redirect_uris,
 }: OAuthAppCreateVariables) {
-  const response = await post(`${API_ADMIN_URL}/organizations/${slug}/oauth/apps`, {
+  const response = await post(`${API_URL}/organizations/${slug}/oauth/apps`, {
     name,
     website,
     icon,

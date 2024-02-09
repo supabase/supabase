@@ -139,6 +139,34 @@ export const RESOURCE_WARNING_MESSAGES = {
     buttonText: 'Check usage',
     metric: 'ram',
   },
+  auth_rate_limit_exhaustion: {
+    // [Joel] There is no critical warning as there is no notion of critical rate limits for auth at the moment
+    bannerContent: {
+      warning: {
+        title:
+          'Your project has exceeded email rate limits in the past 24 hours and may not reliably send auth related emails to users',
+        description:
+          'Set up a custom SMTP and adjust rate limits where necessary to ensure that emails are sent out reliably.',
+      },
+      critical: {
+        title: undefined,
+        description: undefined,
+      },
+    },
+    cardContent: {
+      warning: {
+        title: 'Your project has exceeded email rate limits',
+        description: `You will need to set up a custom SMTP provider and adjust rate limits where necessary`,
+      },
+      critical: {
+        title: undefined,
+        description: undefined,
+      },
+    },
+    docsUrl: 'https://supabase.com/docs/guides/platform/going-into-prod#auth-rate-limits',
+    buttonText: 'Enable Custom SMTP',
+    metric: 'auth_email_rate_limit',
+  },
   multiple_resource_warnings: {
     bannerContent: {
       warning: {

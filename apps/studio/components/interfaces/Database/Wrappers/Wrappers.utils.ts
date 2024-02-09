@@ -1,4 +1,4 @@
-import { WRAPPERS, WRAPPER_HANDLERS } from './Wrappers.constants'
+import { WRAPPER_HANDLERS } from './Wrappers.constants'
 import { WrapperMeta } from './Wrappers.types'
 
 export const makeValidateRequired = (options: { name: string; required: boolean }[]) => {

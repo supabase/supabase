@@ -17,6 +17,12 @@ You can follow the [Deno guide](https://deno.com/manual@v1.32.5/getting_started/
 
 When using VSCode, you should install both the Deno CLI and the the Deno language server [via this link](vscode:extension/denoland.vscode-deno) or by browsing the extensions in vscode and choosing to install the _Deno_ extension.
 
+<Admonition type="tip">
+
+The Supabase CLI can automatically create helpful Deno settings when running `supabase init`. Simply select `y` when prompted "Generate VS Code settings for Deno? [y/N]"!
+
+</Admonition>
+
 ## Deno support in subfolders
 
 You can enable the Deno language server for specific sub-paths in a workspace, while using VSCode's built-in JavaScript/TypeScript language server for all other files.
@@ -41,7 +47,7 @@ To enable the Deno language server only for the `supabase/functions` folder, add
 
 ## Multi-root workspaces in VSCode
 
-When developing with VS Code inside of an existing application, you can utilize [multi-root workspaces](https://code.visualstudio.com/docs/editor/workspaces#_multiroot-workspaces).
+We recommend using `deno.enablePaths` mentioned above as it's easier to manage, however if you like [multi-root workspaces](https://code.visualstudio.com/docs/editor/workspaces#_multiroot-workspaces) you can use these as an alternative.
 
 <div className="video-container">
   <iframe

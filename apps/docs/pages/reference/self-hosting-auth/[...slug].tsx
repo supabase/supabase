@@ -1,5 +1,5 @@
-import authSpec from '~/../../spec/auth_v1_openapi.json' assert { type: 'json' }
-import selfHostingAuthCommonSections from '~/../../spec/common-self-hosting-auth-sections.json'
+import authSpec from '~/spec/auth_v1_openapi.json' assert { type: 'json' }
+import selfHostingAuthCommonSections from '~/spec/common-self-hosting-auth-sections.json'
 import RefSectionHandler from '~/components/reference/RefSectionHandler'
 import { flattenSections } from '~/lib/helpers'
 import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'

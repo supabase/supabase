@@ -1,8 +1,22 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
 import saveAs from 'file-saver'
 import Papa from 'papaparse'
 import { ReactNode, useState } from 'react'
+import toast from 'react-hot-toast'
+
+import { useDispatch, useTrackedState } from 'components/grid/store'
+import { Filter, Sort, SupaTable } from 'components/grid/types'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
+import { fetchAllTableRows, useTableRowsQuery } from 'data/table-rows/table-rows-query'
+import { useCheckPermissions, useUrlState } from 'hooks'
+import {
+  useRoleImpersonationStateSnapshot,
+  useSubscribeToImpersonatedRole,
+} from 'state/role-impersonation-state'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   Button,
   DropdownMenu,
@@ -17,15 +31,6 @@ import {
   IconX,
   cn,
 } from 'ui'
-
-import { useDispatch, useTrackedState } from 'components/grid/store'
-import { Filter, Sort, SupaTable } from 'components/grid/types'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
-import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
-import { useCheckPermissions, useStore, useUrlState } from 'hooks'
-import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
 import RLSBannerWarning from './RLSBannerWarning'
 import RefreshButton from './RefreshButton'
 import FilterDropdown from './filter'
@@ -232,7 +237,6 @@ type RowHeaderProps = {
   filters: Filter[]
 }
 const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
-  const { ui } = useStore()
   const state = useTrackedState()
   const dispatch = useDispatch()
 
@@ -240,6 +244,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
   const snap = useTableEditorStateSnapshot()
 
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
+  const isImpersonatingRole = roleImpersonationState.role !== undefined
 
   const [isExporting, setIsExporting] = useState(false)
 
@@ -296,16 +301,28 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
     setIsExporting(true)
 
     if (allRowsSelected && totalRows > MAX_EXPORT_ROW_COUNT) {
-      ui.setNotification({
-        category: 'error',
-        message: `Sorry! We're unable to support exporting of CSV for row counts larger than ${MAX_EXPORT_ROW_COUNT.toLocaleString()} at the moment.`,
-      })
+      toast.error(
+        `Sorry! We're unable to support exporting of CSV for row counts larger than ${MAX_EXPORT_ROW_COUNT.toLocaleString()} at the moment.`
+      )
+      return setIsExporting(false)
+    }
+
+    if (!project) {
+      toast.error('Project is required')
       return setIsExporting(false)
     }
 
     const rows = allRowsSelected
-      ? await state.rowService!.fetchAllData(filters, sorts)
+      ? await fetchAllTableRows({
+          projectRef: project.ref,
+          connectionString: project.connectionString,
+          table,
+          filters,
+          sorts,
+          impersonatedRole: roleImpersonationState.role,
+        })
       : allRows.filter((x) => selectedRows.has(x.idx))
+
     const formattedRows = rows.map((row) => {
       const formattedRow = row
       Object.keys(row).map((column) => {
@@ -334,8 +351,14 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
   const totalRows = countData?.count ?? 0
   const { selectedRows, editable, allRowsSelected } = state
 
+  useSubscribeToImpersonatedRole(() => {
+    if (allRowsSelected || selectedRows.size > 0) {
+      deselectRows()
+    }
+  })
+
   return (
-    <div className="flex items-center gap-6">
+    <div className="flex items-center gap-4">
       <div className="flex items-center gap-3">
         <Button
           type="default"
@@ -347,8 +370,8 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
           {allRowsSelected
             ? `${totalRows} rows selected`
             : selectedRows.size > 1
-            ? `${selectedRows.size} rows selected`
-            : `${selectedRows.size} row selected`}
+              ? `${selectedRows.size} rows selected`
+              : `${selectedRows.size} row selected`}
         </span>
         {!allRowsSelected && totalRows > allRows.length && (
           <Button type="link" onClick={() => onSelectAllRows()}>
@@ -369,18 +392,41 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
           Export to CSV
         </Button>
         {editable && (
-          <Button
-            type="default"
-            size="tiny"
-            icon={<IconTrash size="tiny" />}
-            onClick={onRowsDelete}
-          >
-            {allRowsSelected
-              ? `Delete ${totalRows} rows`
-              : selectedRows.size > 1
-              ? `Delete ${selectedRows.size} rows`
-              : `Delete ${selectedRows.size} row`}
-          </Button>
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger asChild>
+              <Button
+                type="default"
+                size="tiny"
+                icon={<IconTrash size="tiny" />}
+                onClick={onRowsDelete}
+                disabled={allRowsSelected && isImpersonatingRole}
+              >
+                {allRowsSelected
+                  ? `Delete ${totalRows} rows`
+                  : selectedRows.size > 1
+                    ? `Delete ${selectedRows.size} rows`
+                    : `Delete ${selectedRows.size} row`}
+              </Button>
+            </Tooltip.Trigger>
+
+            {allRowsSelected && isImpersonatingRole && (
+              <Tooltip.Portal>
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-alternative py-1 px-2 leading-none shadow',
+                      'border border-background',
+                    ].join(' ')}
+                  >
+                    <span className="text-xs text-foreground">
+                      Table truncation is not supported when impersonating a role
+                    </span>
+                  </div>
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            )}
+          </Tooltip.Root>
         )}
       </div>
     </div>

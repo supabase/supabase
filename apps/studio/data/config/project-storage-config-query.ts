@@ -1,7 +1,6 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { useCallback } from 'react'
 import { configKeys } from './keys'
 
 export type ProjectStorageConfigVariables = {
@@ -44,15 +43,3 @@ export const useProjectStorageConfigQuery = <TData = ProjectStorageConfigData>(
     ({ signal }) => getProjectStorageConfig({ projectRef }, signal),
     { enabled: enabled && typeof projectRef !== 'undefined', ...options }
   )
-
-export const useProjectStorageConfigPrefetch = ({ projectRef }: ProjectStorageConfigVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (projectRef) {
-      client.prefetchQuery(configKeys.storage(projectRef), ({ signal }) =>
-        getProjectStorageConfig({ projectRef }, signal)
-      )
-    }
-  }, [projectRef])
-}

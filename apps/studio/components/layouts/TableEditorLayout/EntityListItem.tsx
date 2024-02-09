@@ -1,9 +1,10 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import clsx from 'clsx'
+import { IS_PLATFORM } from 'common'
 import saveAs from 'file-saver'
+import { Eye, MoreHorizontal, Table2, Unlock } from 'lucide-react'
 import Link from 'next/link'
 import Papa from 'papaparse'
-
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,6 +20,7 @@ import {
 } from 'ui'
 
 import { parseSupaTable } from 'components/grid'
+import { ItemRenderer } from 'components/ui/InfiniteList'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { Entity } from 'data/entity-types/entity-type-query'
 import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
@@ -26,18 +28,19 @@ import { getTable } from 'data/tables/table-query'
 import { useStore } from 'hooks'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
-import { IS_PLATFORM } from 'common'
-import { Eye, MoreHorizontal, Table2, Unlock } from 'lucide-react'
 
 export interface EntityListItemProps {
   id: number
   projectRef: string
-  item: Entity
   isLocked: boolean
-  rlsEnabled: boolean
 }
 
-const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListItemProps) => {
+const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
+  id,
+  projectRef,
+  item: entity,
+  isLocked,
+}) => {
   const { ui } = useStore()
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
@@ -233,7 +236,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
                 <IconCopy size="tiny" />
                 <span>Duplicate Table</span>
               </DropdownMenuItem>
-              <DropdownMenuItem key="delete-table" className="space-x-2" asChild>
+              <DropdownMenuItem key="view-policies" className="space-x-2" asChild>
                 <Link
                   key="view-policies"
                   href={`/project/${projectRef}/auth/policies?schema=${snap.selectedSchemaName}&search=${entity.id}`}

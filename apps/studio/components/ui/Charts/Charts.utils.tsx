@@ -1,4 +1,3 @@
-import { DATETIME_FORMAT } from 'components/interfaces/Reports/Reports.constants'
 import dayjs from 'dayjs'
 import React, { useMemo } from 'react'
 import { ResponsiveContainer } from 'recharts'
@@ -84,12 +83,11 @@ export const useChartSize = (
   const minHeight = sizeMap[size]
   const Container: React.FC<React.PropsWithChildren> = useMemo(
     () =>
-      ({ children }) =>
-        (
-          <ResponsiveContainer height={minHeight} minHeight={minHeight} width="100%">
-            {children as JSX.Element}
-          </ResponsiveContainer>
-        ),
+      ({ children }) => (
+        <ResponsiveContainer height={minHeight} minHeight={minHeight} width="100%">
+          {children as JSX.Element}
+        </ResponsiveContainer>
+      ),
     [size]
   )
   return {
@@ -112,17 +110,20 @@ export const useStacked = ({
 } & Pick<CommonChartProps<Record<string, number>>, 'data'>) => {
   const stackedData = useMemo(() => {
     if (!data) return []
-    const mapping = data.reduce((acc, datum) => {
-      const x = datum[xAxisKey]
-      const y = datum[yAxisKey]
-      const s = datum[stackKey]
-      if (!acc[x]) {
-        acc[x] = {}
-      }
+    const mapping = data.reduce(
+      (acc, datum) => {
+        const x = datum[xAxisKey]
+        const y = datum[yAxisKey]
+        const s = datum[stackKey]
+        if (!acc[x]) {
+          acc[x] = {}
+        }
 
-      acc[x][s] = y
-      return acc
-    }, {} as Record<string, Record<string, number>>)
+        acc[x][s] = y
+        return acc
+      },
+      {} as Record<string, Record<string, number>>
+    )
 
     const flattened = Object.entries(mapping).map(([x, sMap]) => ({
       ...sMap,

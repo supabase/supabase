@@ -247,12 +247,6 @@ limit 100
   },
 ]
 
-export const LOG_TYPE_LABEL_MAPPING: { [k: string]: string } = {
-  explorer: 'Explorer',
-  api: 'API',
-  database: 'Database',
-}
-
 const _SQL_FILTER_COMMON = {
   search_query: (value: string) => `regexp_contains(event_message, '${value}')`,
 }
@@ -338,7 +332,6 @@ export enum LogsTableName {
   AUTH = 'auth_logs',
   REALTIME = 'realtime_logs',
   STORAGE = 'storage_logs',
-  PGBOUNCER = 'pgbouncer_logs',
   POSTGREST = 'postgrest_logs',
   SUPAVISOR = 'supavisor_logs',
 }
@@ -352,7 +345,6 @@ export const LOGS_TABLES = {
   realtime: LogsTableName.REALTIME,
   storage: LogsTableName.STORAGE,
   postgrest: LogsTableName.POSTGREST,
-  pgbouncer: LogsTableName.PGBOUNCER,
   supavisor: LogsTableName.SUPAVISOR,
 }
 
@@ -364,7 +356,6 @@ export const LOGS_SOURCE_DESCRIPTION = {
   [LogsTableName.AUTH]: 'Authentication logs from GoTrue',
   [LogsTableName.REALTIME]: 'Realtime server for Postgres logical replication broadcasting',
   [LogsTableName.STORAGE]: 'Object storage logs',
-  [LogsTableName.PGBOUNCER]: 'Postgres connection pooler logs',
   [LogsTableName.POSTGREST]: 'RESTful API web server logs',
   [LogsTableName.SUPAVISOR]: 'Cloud-native Postgres connection pooler logs',
 }
@@ -664,10 +655,15 @@ export const PREVIEWER_DATEPICKER_HELPERS: DatetimeHelper[] = [
 ]
 export const EXPLORER_DATEPICKER_HELPERS: DatetimeHelper[] = [
   {
+    text: 'Last hour',
+    calcFrom: () => dayjs().subtract(1, 'hour').startOf('hour').toISOString(),
+    calcTo: () => '',
+    default: true,
+  },
+  {
     text: 'Last 24 hours',
     calcFrom: () => dayjs().subtract(1, 'day').startOf('day').toISOString(),
     calcTo: () => '',
-    default: true,
   },
   {
     text: 'Last 3 days',

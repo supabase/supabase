@@ -1,8 +1,9 @@
-import { useFlag } from 'hooks'
 import { isUndefined } from 'lodash'
 import Link from 'next/link'
 import { ReactNode } from 'react'
 import { Badge, IconArrowUpRight, IconLogOut, Menu } from 'ui'
+
+import { useFlag } from 'hooks'
 import LayoutHeader from '../ProjectLayout/LayoutHeader'
 import { SidebarLink, SidebarSection } from './AccountLayout.types'
 
@@ -18,15 +19,6 @@ interface WithSidebarProps {
   children: ReactNode
 }
 
-/*
-The information hierarchy for WithSidebar is:
-  WithSidebar
-    SectionsWithHeaders
-      SidebarItem
-        SidebarLink
-    SidebarItem
-      SidebarLink
-*/
 const WithSidebar = ({
   title,
   header,
@@ -39,16 +31,13 @@ const WithSidebar = ({
   customSidebarContent,
 }: WithSidebarProps) => {
   const noContent = !sections && !customSidebarContent
-  const ongoingIncident = useFlag('ongoingIncident')
   const navLayoutV2 = useFlag('navigationLayoutV2')
-  const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
 
   return (
     <div className="flex max-h-full">
       {!hideSidebar && !noContent && (
         <div
           id="with-sidebar"
-          style={{ height: maxHeight, maxHeight }}
           className={[
             'h-full bg-background',
             'hide-scrollbar w-64 overflow-auto border-r border-default',
@@ -67,7 +56,7 @@ const WithSidebar = ({
           <div className="-mt-1">
             <Menu>
               {customSidebarContent}
-              {sections.map((section, i) => {
+              {sections.map((section) => {
                 return Boolean(section.heading) ? (
                   <SectionWithHeaders
                     key={section.key}

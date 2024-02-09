@@ -3,7 +3,7 @@ import { IS_PLATFORM } from 'lib/constants'
 
 export const generateAuthMenu = (
   ref: string,
-  options: { hooksReleased?: boolean } = {}
+  options: { hooksReleased?: boolean; columnLevelPrivileges?: boolean } = {}
 ): ProductMenuGroup[] => {
   return [
     {
@@ -19,6 +19,17 @@ export const generateAuthMenu = (
           url: `/project/${ref}/auth/policies`,
           items: [],
         },
+        ...(options?.columnLevelPrivileges
+          ? [
+              {
+                name: 'Column Privileges',
+                key: 'column-privileges',
+                url: `/project/${ref}/auth/column-privileges`,
+                items: [],
+                label: 'ALPHA',
+              },
+            ]
+          : []),
         ...(IS_PLATFORM
           ? [
               {

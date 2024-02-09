@@ -35,8 +35,8 @@ const BlogListItem = ({ post }: Props) => {
                   !post.thumb
                     ? `/images/blog/blog-placeholder.png`
                     : post.type === 'casestudy'
-                    ? post.thumb
-                    : `/images/blog/${post.thumb}`
+                      ? post.thumb
+                      : `/images/blog/${post.thumb}`
                 }
                 className="scale-100 object-cover overflow-hidden transform transition-transform group-hover:scale-105"
                 alt={`${post.title} thumbnail`}

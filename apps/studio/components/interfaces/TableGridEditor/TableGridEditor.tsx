@@ -118,7 +118,7 @@ const TableGridEditor = ({
                 result: any[]
               }
             | undefined
-          )
+          ),
         ][]
       }
 
@@ -288,7 +288,7 @@ const TableGridEditor = ({
         key={gridKey}
         theme={theme}
         gridProps={{ height: '100%' }}
-        storageRef={projectRef}
+        projectRef={projectRef}
         editable={!isReadOnly && canEditViaTableEditor}
         schema={selectedTable.schema}
         table={gridTable}
@@ -329,9 +329,12 @@ const TableGridEditor = ({
         onImportData={snap.onImportData}
         onError={onError}
         onSqlQuery={onSqlQuery}
-        onExpandJSONEditor={(column, row) =>
+        onExpandJSONEditor={(column, row) => {
           snap.onExpandJSONEditor({ column, row, jsonString: JSON.stringify(row[column]) || '' })
-        }
+        }}
+        onExpandTextEditor={(column, row) => {
+          snap.onExpandTextEditor(column, row)
+        }}
         onEditForeignKeyColumnValue={snap.onEditForeignKeyColumnValue}
         showCustomChildren={(isViewSelected || isTableSelected) && selectedView === 'definition'}
         customHeader={

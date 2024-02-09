@@ -1,18 +1,14 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { delete_ } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { del } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { subscriptionKeys } from './keys'
+import { AddonVariantId } from './types'
 
 export type ProjectAddonRemoveVariables = {
   projectRef: string
-  variant: string
-}
-
-export type ProjectAddonRemoveResponse = {
-  error?: any
+  variant: AddonVariantId
 }
 
 export async function removeSubscriptionAddon({
@@ -22,12 +18,18 @@ export async function removeSubscriptionAddon({
   if (!projectRef) throw new Error('projectRef is required')
   if (!variant) throw new Error('variant is required')
 
-  const response = (await delete_(
-    `${API_URL}/projects/${projectRef}/billing/addons/${variant}`
-  )) as ProjectAddonRemoveResponse
-  if (response.error) throw response.error
+  const { data, error } = await del(`/platform/projects/{ref}/billing/addons/{addon_variant}`, {
+    params: {
+      path: {
+        ref: projectRef,
+        addon_variant: variant,
+      },
+    },
+  })
 
-  return response
+  if (error) throw error
+
+  return data
 }
 
 type ProjectAddonRemoveData = Awaited<ReturnType<typeof removeSubscriptionAddon>>

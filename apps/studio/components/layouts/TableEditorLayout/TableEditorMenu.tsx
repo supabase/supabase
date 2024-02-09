@@ -1,20 +1,11 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { AnimatePresence, motion } from 'framer-motion'
 import { partition } from 'lodash'
+import { Loader2 } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-
-import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
-import AlertError from 'components/ui/AlertError'
-import InfiniteList from 'components/ui/InfiniteList'
-import SchemaSelector from 'components/ui/SchemaSelector'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
-import { useCheckPermissions, useLocalStorage } from 'hooks'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -26,17 +17,27 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
   IconChevronsDown,
-  IconLoader,
   IconPlusCircle,
   IconSearch,
   IconX,
   cn,
 } from 'ui'
+
+import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
+import AlertError from 'components/ui/AlertError'
+import InfiniteList from 'components/ui/InfiniteList'
+import SchemaSelector from 'components/ui/SchemaSelector'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useSchemasQuery } from 'data/database/schemas-query'
+import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
+import { useCheckPermissions, useLocalStorage } from 'hooks'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
-import { Loader2 } from 'lucide-react'
 
 const TableEditorMenu = () => {
+  const router = useRouter()
   const { id } = useParams()
   const snap = useTableEditorStateSnapshot()
 
@@ -72,7 +73,7 @@ const TableEditorMenu = () => {
       sort,
     },
     {
-      keepPreviousData: true,
+      keepPreviousData: Boolean(searchText),
     }
   )
 
@@ -126,6 +127,7 @@ const TableEditorMenu = () => {
           onSelectSchema={(name: string) => {
             setSearchText('')
             snap.setSelectedSchemaName(name)
+            router.push(`/project/${project?.ref}/editor`)
           }}
           onSelectCreateSchema={() => snap.onAddSchema()}
         />
@@ -346,8 +348,9 @@ const TableEditorMenu = () => {
                     items={entityTypes}
                     ItemComponent={EntityListItem}
                     itemProps={{
-                      projectRef: project?.ref,
+                      projectRef: project?.ref!,
                       id: Number(id),
+                      isLocked,
                     }}
                     getItemSize={() => 28}
                     hasNextPage={hasNextPage}
