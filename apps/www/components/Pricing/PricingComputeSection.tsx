@@ -31,7 +31,7 @@ const PricingComputeSection = () => {
                 </span>
               </div>
               <h3 className="text-foreground text-2xl">
-                Scale compute to up to
+                Scale compute up to
                 <br className="hidden sm:block" /> 64 cores and 256 GB RAM
               </h3>
             </div>
@@ -70,7 +70,7 @@ const PricingComputeSection = () => {
 
             <div className="grid lg:grid-cols-2 gap-4 md:gap-8 mt-4 md:mt-0 border-t">
               <div className="max-w-4xl prose p-4 md:p-8 relative z-10">
-                <h4 className="text-lg">Choose best compute size you</h4>
+                <h4 className="text-lg">Choose the best compute size for you</h4>
                 <p className="text-[13px] text-foreground-lighter">
                   Every project on the Supabase Platform comes with its own dedicated Postgres
                   instance running inside a virtual machine (VM). The table above describes the base

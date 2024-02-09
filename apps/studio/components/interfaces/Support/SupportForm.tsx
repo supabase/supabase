@@ -314,7 +314,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
         }, [isReady])
 
         return (
-          <div className="space-y-8 w-[620px]">
+          <div className="space-y-8 max-w-[620px] overflow-hidden">
             <div className="px-6">
               <h3 className="text-xl">How can we help?</h3>
             </div>
@@ -342,7 +342,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
 
             {values.category !== 'Login_issues' && (
               <div className="px-6">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid sm:grid-cols-2 sm:grid-rows-1 gap-4 grid-cols-1 grid-rows-2">
                   {isLoadingProjects && (
                     <div className="space-y-2">
                       <p className="text-sm prose">Which project is affected?</p>
@@ -504,7 +504,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                         </p>
                       )}
 
-                      <div className="flex items-center space-x-2">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-y-2 sm:gap-x-2">
                         <Button asChild>
                           <Link
                             href={`/org/${values.organizationSlug}/billing?panel=subscriptionPlan`}
