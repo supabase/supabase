@@ -578,14 +578,14 @@ as $$
     if is_admin then
       claims := event->'claims';
 
-      -- Check if 'user_metadata' exists in claims
-      if jsonb_typeof(claims->'user_metadata') is null then
-        -- If 'user_metadata' does not exist, create an empty object
-        claims := jsonb_set(claims, '{user_metadata}', '{}');
+      -- Check if 'app_metadata' exists in claims
+      if jsonb_typeof(claims->'app_metadata') is null then
+        -- If 'app_metadata' does not exist, create an empty object
+        claims := jsonb_set(claims, '{app_metadata}', '{}');
       end if;
 
       -- Set a claim of 'admin'
-      claims := jsonb_set(claims, '{user_metadata, admin}', 'true');
+      claims := jsonb_set(claims, '{app_metadata, admin}', 'true');
 
       -- Update the 'claims' object in the original event
       event := jsonb_set(event, '{claims}', claims);
@@ -695,3 +695,21 @@ revoke execute
 
 </TabPanel>
 </Tabs>
+
+## Local Development
+
+Unlike the hosted platform, the local development dashboard does not have a user interface for linking a Hook. Instead, edit `config.toml` to link an Auth Hook and run it with your local setup. Modify the `auth.hook.<hook_name>` field and set `uri` to a value of `pg-functions://postgres/<schema>/<function_name>`
+
+For instance, the `config.toml` for a Custom Access Token Hook which uses the function `public.custom_access_token_hook`:
+
+```
+...
+
+[auth.hook.custom_access_token]
+enabled = true
+uri = "pg-functions://postgres/public/custom_access_token_hook"
+
+...
+```
+
+Save your Auth Hook as a migration in order to version the Auth Hook and share it with other team members. Run [`supabase migration new`](https://supabase.com/docs/reference/cli/supabase-migration-new) to create a migration.
