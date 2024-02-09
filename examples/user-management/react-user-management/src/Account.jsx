@@ -43,7 +43,7 @@ export default function Account({ session }) {
       id: user.id,
       username,
       website,
-      avatarUrl,
+      avatar_url,
       updated_at: new Date(),
     }
 
