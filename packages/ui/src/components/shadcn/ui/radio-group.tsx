@@ -35,4 +35,82 @@ const RadioGroupItem = React.forwardRef<
 })
 RadioGroupItem.displayName = RadioGroupPrimitive.Item.displayName
 
-export { RadioGroup, RadioGroupItem }
+interface RadioGroupLargeItemProps {
+  image?: React.ReactNode
+  label: string
+  showIndicator?: boolean
+}
+
+const RadioGroupLargeItem = React.forwardRef<
+  React.ElementRef<typeof RadioGroupPrimitive.Item>,
+  RadioGroupLargeItemProps & React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item>
+>(({ image, label, showIndicator = true, ...props }, ref) => {
+  return (
+    <RadioGroupPrimitive.Item
+      ref={ref}
+      {...props}
+      className={cn(
+        'flex flex-col gap-2',
+        'w-48',
+        'bg-surface-200',
+        'rounded-md border border-strong',
+        'p-2',
+        'shadow-sm',
+        'hover:border-stronger hover:bg-surface-300',
+        'data-[state=checked]:border-primary',
+        'data-[state=checked]:ring-1 data-[state=checked]:ring-border',
+        'data-[state=checked]:bg-selection data-[state=checked]:border-foreground',
+        'transition-colors',
+        'group',
+        props.className
+      )}
+    >
+      {props.children}
+      <div className="flex gap-2 w-full">
+        {showIndicator && (
+          <div className="relative w-3 h-3 min-w-3 mt-0.5">
+            <RadioGroupPrimitive.Indicator
+              className={cn(
+                'absolute',
+                'w-[10px] h-[10px]',
+                'left-[1px] top-[1px]',
+                'border border-background-surface-300',
+                'rounded-full',
+                'data-[state=checked]:border-background-surface-300',
+                'data-[state=checked]:ring-foreground',
+                'data-[state=checked]:bg-foreground'
+              )}
+            />
+            <div
+              className={cn(
+                'absolute',
+                'w-3 h-3',
+                'border border-stronger',
+                'rounded-full',
+                'group-hover:border-foreground-light',
+                'group-data-[state=checked]:border-foreground',
+                'transition-colors'
+              )}
+            ></div>
+          </div>
+        )}
+
+        <label
+          htmlFor={props.value}
+          className={cn(
+            'text-xs transition-colors text-left',
+            'text-light',
+            'group-hover:text-foreground group-data-[state=checked]:text-foreground',
+            'cursor-pointer'
+          )}
+        >
+          {label}
+        </label>
+      </div>
+    </RadioGroupPrimitive.Item>
+  )
+})
+
+RadioGroupLargeItem.displayName = RadioGroupPrimitive.Item.displayName
+
+export { RadioGroup, RadioGroupItem, RadioGroupLargeItem }

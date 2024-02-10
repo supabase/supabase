@@ -3,6 +3,7 @@ import { observer } from 'mobx-react-lite'
 import {
   AccountInformation,
   AnalyticsSettings,
+  ThemeSettingsOld,
   ThemeSettings,
 } from 'components/interfaces/Account/Preferences'
 import { ProfileInformation } from 'components/interfaces/Account/Preferences/ProfileInformation'
@@ -71,6 +72,10 @@ const ProfileCard = observer(() => {
       <section>
         <ThemeSettings />
       </section>
+
+      {/* <section>
+        <ThemeSettingsOld />
+      </section> */}
 
       <section>
         <AnalyticsSettings />
