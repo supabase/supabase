@@ -122,7 +122,7 @@ const ThemeSettings = () => {
 
         <div className="col-span-8 flex flex-col gap-4">
           <Select_Shadcn_
-            onValueChange={(value: string) => {
+            onValueChange={(value: 'system' | 'single-theme') => {
               setMode(value)
               if (value === 'system') {
                 setTheme('system')
