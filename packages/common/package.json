@@ -12,7 +12,8 @@
     "config": "*",
     "dat.gui": "^0.7.9",
     "lodash": "^4.17.21",
-    "next-themes": "^0.2.1",
+    "@mildtomato/next-themes": "^0.2.3",
+    "next-themes": "npm:@mildtomato/next-themes ^0.2.3",
     "react-hot-toast": "^2.4.1",
     "react-use": "^17.4.0"
   },
