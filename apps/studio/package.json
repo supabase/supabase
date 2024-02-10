@@ -65,7 +65,7 @@
     "monaco-editor": "0.33.0",
     "next": "^13.5.6",
     "@mildtomato/next-themes": "^0.2.3",
-    "next-themes": "npm:@mildtomato/next-themes ^0.2.3",
+    "next-themes": "npm:@mildtomato/next-themes@^0.2.3",
     "openai": "^4.20.1",
     "openapi-fetch": "^0.6.1",
     "p-queue": "^6.6.2",
