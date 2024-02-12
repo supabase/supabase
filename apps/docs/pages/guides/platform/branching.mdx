@@ -7,11 +7,26 @@ export const meta = {
   subtitle: 'Use Supabase Branches to test and preview changes',
 }
 
-Use branching to safely and easily experiment with changes to your Supabase projects.
+<Admonition type="caution" label="Do not use Branching in production">
 
-<Admonition type="caution" label="Branching available for Early Access, available on the Pro Plan and above.">
+Branching is an early access only feature, which must not be used in a production setting.
 
-We do not recommended Branching in a production environment while it is in Early Access.
+</Admonition>
+
+Use branching to safely and easily experiment with changes to your Supabase project.
+
+Supabase branches work like Git branches. They let you create and test changes like new configurations, database schemas, or features in a separate, temporary instance without affecting your production setup.
+
+When you're ready to ship your changes, merge your branch to update your production instance with the new changes.
+
+If you understand Git, you already understand Supabase Branching.
+
+<Admonition
+  type="note"
+  label="Branching is Early Access only, and only available on the Pro Plan and above."
+>
+
+Branching will move to Public Beta in future, but only available for Pro plan and above.
 
 </Admonition>
 

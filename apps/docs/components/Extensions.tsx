@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import React, { useState } from 'react'
 import { extensions } from 'shared-data'
-import { GlassPanel, IconX, Input } from 'ui'
+import { IconX, Input } from 'ui'
+import { GlassPanel } from 'ui-patterns/GlassPanel'
 
 type Extension = {
   name: string
