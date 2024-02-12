@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "env:setup": "supabase start -x studio && supabase status --output json > keys.json && node generate-env.js",
+    "env:setup": "supabase start -x studio && supabase status --output json > keys.json && node scripts/generate-env.js",
     "pretest": "npm run env:setup",
     "test": "playwright test",
     "posttest": "supabase stop --no-backup",

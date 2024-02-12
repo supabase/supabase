@@ -13,7 +13,7 @@ Before running the tests, make sure you've done the following:
 
 You can run the tests by running `npm run test` in this folder.
 
-When you run the command, it will include:
+When you run the command, it includes:
 
 1. Setting up the local environment using the `supabase` CLI
 2. Extracting the environment variables and saving them into a `.env.test` file in the studio app
@@ -40,3 +40,5 @@ which you can use to run and replay specific tests:
 ```bash
 npm run test -- --ui
 ```
+
+It will also record any failing tests when running `npm run test` in this folder.
