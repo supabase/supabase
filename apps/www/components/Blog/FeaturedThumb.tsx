@@ -20,8 +20,8 @@ function FeaturedThumb(blog: PostTypes) {
 
   return (
     <div key={blog.slug} className="w-full cursor-pointer">
-      <Link href={`${blog.path}`} className="grid gap-8 lg:grid-cols-2 lg:gap-16">
-        <div className="relative w-full aspect-[2/1] lg:aspect-[3/2] overflow-auto rounded-lg border">
+      <Link href={`${blog.path}`} className="grid gap-4 lg:grid-cols-7 lg:gap-8 xl:gap-12">
+        <div className="relative w-full aspect-[2/1] lg:col-span-3 lg:aspect-[3/2] overflow-auto rounded-lg border">
           <Image
             src={`/images/blog/` + (blog.thumb ? blog.thumb : blog.image)}
             layout="fill"
@@ -29,24 +29,24 @@ function FeaturedThumb(blog: PostTypes) {
             alt="blog thumbnail"
           />
         </div>
-        <div className="flex flex-col space-y-2">
-          <div className="text-light flex space-x-2 text-sm">
+        <div className="flex flex-col space-y-2 lg:col-span-4 xl:justify-center">
+          <div className="text-lighter flex space-x-2 text-sm">
             <span>{blog.date}</span>
             <span>•</span>
             <span>{blog.readingTime}</span>
           </div>
 
           <div>
-            <h2 className="h2">{blog.title}</h2>
-            <p className="p text-xl">{blog.description}</p>
+            <h2 className="h2 !mb-2">{blog.title}</h2>
+            <p className="p xl:text-lg">{blog.description}</p>
           </div>
 
           <div className="flex flex-col w-max gap-2">
             {author.map((author: any, i: number) => {
               return (
-                <div className="flex items-center space-x-3" key={i}>
+                <div className="flex items-center space-x-2" key={i}>
                   {author.author_image_url && (
-                    <div className="relative h-10 w-10 overflow-auto">
+                    <div className="relative h-6 w-6 overflow-auto">
                       <Image
                         src={author.author_image_url}
                         alt={`${author.author} avatar`}
@@ -57,7 +57,7 @@ function FeaturedThumb(blog: PostTypes) {
                   )}
                   <div className="flex flex-col">
                     <span className="text-foreground m-0 text-sm">{author.author}</span>
-                    <span className="text-light m-0 text-xs">{author.position}</span>
+                    {/* <span className="text-light m-0 text-xs">{author.position}</span> */}
                   </div>
                 </div>
               )

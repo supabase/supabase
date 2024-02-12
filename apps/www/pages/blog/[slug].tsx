@@ -234,7 +234,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
       <DefaultLayout className="overflow-x-hidden">
         <div
           className="
-            container mx-auto px-6 py-4 md:py-8 xl:py-16 sm:px-16
+            container mx-auto px-4 py-4 md:py-8 xl:py-10 sm:px-16
             xl:px-20
           "
         >
@@ -251,7 +251,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
             </div>
             <div className="col-span-12 lg:col-span-12 xl:col-span-10">
               {/* Title and description */}
-              <div className="mb-6 lg:mb-12 max-w-5xl space-y-8">
+              <div className="mb-6 lg:mb-10 max-w-5xl space-y-8">
                 <div className="space-y-4">
                   <Link href="/blog" className="text-brand hidden lg:inline">
                     Blog
@@ -263,7 +263,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                     <p>{generateReadingTime(props.blog.source)}</p>
                   </div>
                   <div className="hidden lg:flex justify-between">
-                    <div className="flex-1 flex flex-col gap-3 pt-6 md:flex-row md:gap-0 lg:gap-3">
+                    <div className="flex-1 flex flex-col gap-3 pt-2 md:flex-row md:gap-0 lg:gap-3">
                       {author.map((author: any, i: number) => {
                         return (
                           <div className="mr-4 w-max" key={i}>
@@ -303,7 +303,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
               </div>
               <div className="grid grid-cols-12 lg:gap-16 xl:gap-8">
                 {/* Content */}
-                <div className="col-span-12 lg:col-span-7 xl:col-span-7">
+                <div className="col-span-12 lg:col-span-7 xl:col-span-9">
                   <article>
                     <div className={['prose prose-docs'].join(' ')}>
                       {props.blog.youtubeHero ? (
@@ -352,8 +352,8 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                 {/* Sidebar */}
                 <div className="col-span-12 space-y-8 lg:col-span-5 xl:col-span-3 xl:col-start-9">
                   <div className="space-y-6 lg:sticky lg:top-24 lg:mb-48">
-                    <div className="hidden lg:block">{toc}</div>
-                    <div>
+                    {/* <div className="hidden lg:block">{toc}</div> */}
+                    {/* <div>
                       <div className="mb-4">
                         <p className="text-foreground text-sm">Related articles</p>
                       </div>
@@ -363,9 +363,6 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                             <div>
                               <div className="cursor-pointer">
                                 <div className="flex gap-2">
-                                  {/* <div className="text-foreground-lighter">
-                                    <IconFile size={'small'} style={{ minWidth: '1.2rem' }} />
-                                  </div> */}
                                   <span className="text-light hover:text-gray-1200 text-sm">
                                     {post.title}
                                   </span>
@@ -383,11 +380,11 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                             View all posts
                           </Link>
                         </div>
-                        <div className="py-4 hidden lg:block">
-                          <div className="text-foreground text-sm">Share this article</div>
-                          <ShareArticleActions title={props.blog.title} slug={props.blog.slug} />
-                        </div>
                       </div>
+                    </div> */}
+                    <div className="hidden lg:block">
+                      <div className="text-foreground text-sm">Share this article</div>
+                      <ShareArticleActions title={props.blog.title} slug={props.blog.slug} />
                     </div>
                   </div>
                 </div>

@@ -30,15 +30,15 @@ const MotionButton = motion(Button)
 
 /**
  * ✅ search via text input
- * ✅ update search when deleting text input
+ * ✅ update searchTerm when deleting text input
  * ✅ search via q param
- * ✅ search via category if no q
- * ✅ search via category and reset q if present
+ * ✅ search via category if no q param
+ * ✅ search via category and reset q param if present
  */
 
 function BlogFilters({ allPosts, posts, setPosts }: Props) {
   const [category, setCategory] = useState<string>('all')
-  const [searchKey, setSearchKey] = useState<string>('')
+  const [searchTerm, setSearchTerm] = useState<string>('')
   const [showSearchInput, setShowSearchInput] = useState<boolean>(false)
 
   const router = useRouter()
@@ -48,7 +48,7 @@ function BlogFilters({ allPosts, posts, setPosts }: Props) {
   const isMobile = useBreakpoint(1023)
   const is2XL = useBreakpoint(1535)
 
-  // Using hard-coded categories as they:
+  // Use hard-coded categories here as they:
   // - serve as a reference
   // - are easier to reorder
   const allCategories = [
@@ -74,7 +74,7 @@ function BlogFilters({ allPosts, posts, setPosts }: Props) {
   }, [q])
 
   const handleReplaceRouter = () => {
-    if (!searchKey && category !== 'all') {
+    if (!searchTerm && category !== 'all') {
       router.query.category = category
       router.replace(router, undefined, { shallow: true, scroll: false })
     }
@@ -104,7 +104,7 @@ function BlogFilters({ allPosts, posts, setPosts }: Props) {
 
   useEffect(() => {
     if (router.isReady && q) {
-      setSearchKey(q)
+      setSearchTerm(q)
     }
     if (router.isReady && activeCategory && activeCategory !== 'all') {
       setCategory(activeCategory)
@@ -112,7 +112,7 @@ function BlogFilters({ allPosts, posts, setPosts }: Props) {
   }, [activeCategory, router.isReady, q])
 
   const handleSearchByText = (text: string) => {
-    setSearchKey(text)
+    setSearchTerm(text)
     searchParams.has('q') && router.replace('/blog', undefined, { shallow: true, scroll: false })
     router.replace(`/blog?q=${text}`, undefined, { shallow: true, scroll: false })
     if (text.length < 1) router.replace('/blog', undefined, { shallow: true, scroll: false })
@@ -129,8 +129,8 @@ function BlogFilters({ allPosts, posts, setPosts }: Props) {
   }
 
   const handleSetCategory = (category: string) => {
-    searchKey && handlePosts()
-    searchKey && setSearchKey('')
+    searchTerm && handlePosts()
+    searchTerm && setSearchTerm('')
     setCategory(category)
     category === 'all'
       ? router.replace('/blog', undefined, { shallow: true, scroll: false })
@@ -188,7 +188,7 @@ function BlogFilters({ allPosts, posts, setPosts }: Props) {
             <Button
               key={category}
               type={
-                category === 'all' && !searchKey && !activeCategory
+                category === 'all' && !searchTerm && !activeCategory
                   ? 'alternative'
                   : category === activeCategory
                     ? 'alternative'
@@ -229,7 +229,7 @@ function BlogFilters({ allPosts, posts, setPosts }: Props) {
               autoComplete="off"
               type="search"
               placeholder="Search blog"
-              value={searchKey}
+              value={searchTerm}
               onChange={handleSearchChange}
               className="w-full"
               actions={
@@ -237,7 +237,7 @@ function BlogFilters({ allPosts, posts, setPosts }: Props) {
                   <Button
                     type="link"
                     onClick={() => {
-                      setSearchKey('')
+                      setSearchTerm('')
                       setShowSearchInput(false)
                     }}
                     className="text-foreground-light hover:text-foreground"
