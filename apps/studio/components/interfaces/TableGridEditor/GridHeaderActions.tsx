@@ -163,7 +163,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                       className="group !h-[28px] !py-0"
                       icon={<IconPlusCircle size={12} />}
                     >
-                      Auth policy
+                      Add RLS policy
                     </Button>
                   </Link>
                 </Tooltip.Trigger>
