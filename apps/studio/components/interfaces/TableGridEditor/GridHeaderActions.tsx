@@ -28,7 +28,8 @@ import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
 
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useQueryClient } from '@tanstack/react-query'
-import { tableKeys } from 'data/tables/keys'
+
+import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 
 export interface GridHeaderActionsProps {
   table: PostgresTable
@@ -38,6 +39,15 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   const { ref } = useParams()
   const { project } = useProjectContext()
   const realtimeEnabled = useIsFeatureEnabled('realtime:all')
+
+  const { mutate: updateTable } = useTableUpdateMutation({
+    onError: (error) => {
+      toast.error(`Failed to toggle RLS: ${error.message}`)
+    },
+    onSettled: () => {
+      closeConfirmModal()
+    },
+  })
 
   const { ui, meta } = useStore()
   const queryClient = useQueryClient()
@@ -105,24 +115,19 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   const closeConfirmModal = () => {
     setRlsConfirmModalOpen(false)
   }
-
   const onToggleRLS = async () => {
     const payload = {
       id: table.id,
       rls_enabled: !table.rls_enabled,
     }
 
-    const res: any = await meta.tables.update(payload.id, payload)
-    if (res.error) {
-      return ui.setNotification({
-        category: 'error',
-        message: `Failed to toggle RLS: ${res.error.message}`,
-      })
-    }
-
-    await queryClient.invalidateQueries(tableKeys.table(ref, table.id))
-
-    closeConfirmModal()
+    updateTable({
+      projectRef: project?.ref!,
+      connectionString: project?.connectionString,
+      id: payload.id,
+      schema: table.schema,
+      payload: payload,
+    })
   }
 
   return (
@@ -159,7 +164,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                 <Tooltip.Trigger className="w-full">
                   <Link passHref href={`/project/${projectRef}/auth/policies?search=${table.id}`}>
                     <Button
-                      type={'warning'}
+                      type="default"
                       className="group !h-[28px] !py-0"
                       icon={<IconPlusCircle size={12} />}
                     >
