@@ -14,7 +14,13 @@ import {
   IconSearch,
   useCommandMenu,
 } from 'ui'
-import { CommandGroup, CommandItem, CommandLabel, TextHighlighter } from './Command.utils'
+import {
+  CommandGroup,
+  CommandItem,
+  CommandLabel,
+  TextHighlighter,
+  escapeDoubleQuotes,
+} from './Command.utils'
 import { useRouter } from 'next/router'
 
 const NUMBER_SOURCES = 2
@@ -168,8 +174,8 @@ function reducer(state: SearchState, action: Action): SearchState {
                 'results' in state
                   ? state.results
                   : 'staleResults' in state
-                  ? state.staleResults
-                  : [],
+                    ? state.staleResults
+                    : [],
             }
       }
       return allSourcesLoaded
@@ -410,12 +416,12 @@ const DocsSearch = () => {
             <CommandGroup
               heading=""
               key={`${page.path}-group`}
-              value={`${page.title}-group-index-${i}`}
+              value={`${escapeDoubleQuotes(page.title)}-group-index-${i}`}
               forceMount={true}
             >
               <CommandItem
                 key={`${page.path}-item`}
-                value={`${page.title}-item-index-${i}`}
+                value={`${escapeDoubleQuotes(page.title)}-item-index-${i}`}
                 type="block-link"
                 onSelect={() => {
                   openLink(page.type, formatPageUrl(page))
@@ -450,7 +456,9 @@ const DocsSearch = () => {
                         openLink(page.type, formatSectionUrl(page, section))
                       }}
                       key={`${page.path}__${section.heading}-item`}
-                      value={`${page.title}__${section.heading}-item-index-${i}`}
+                      value={`${escapeDoubleQuotes(
+                        page.title
+                      )}__${escapeDoubleQuotes(section.heading)}-item-index-${i}`}
                       forceMount={true}
                       type="block-link"
                     >

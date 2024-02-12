@@ -228,7 +228,7 @@ const ProjectLinker = ({
                         {supabaseProjects.map((project, i) => {
                           return (
                             <CommandItem_Shadcn_
-                              value={`${project.name}-${i}`}
+                              value={`${project.name.replaceAll('"', '')}-${i}`}
                               key={project.ref}
                               className="flex gap-2 items-center"
                               onSelect={() => {
@@ -301,7 +301,7 @@ const ProjectLinker = ({
                           return (
                             <CommandItem_Shadcn_
                               key={project.id}
-                              value={`${project.name}-${i}`}
+                              value={`${project.name.replaceAll('"', '')}-${i}`}
                               className="flex gap-2 items-center"
                               onSelect={() => {
                                 if (project.id) setForeignProjectId(project.id)

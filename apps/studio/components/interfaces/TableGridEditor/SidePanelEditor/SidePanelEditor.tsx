@@ -514,63 +514,47 @@ const SidePanelEditor = ({
 
     if (file && rowCount > 0) {
       // CSV file upload
-      try {
-        await insertRowsViaSpreadsheet(
-          project.ref!,
-          project.connectionString,
-          file,
-          selectedTable,
-          selectedHeaders,
-          (progress: number) => {
-            ui.setNotification({
-              id: toastId,
-              progress,
-              category: 'loading',
-              message: `Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`,
-            })
-          }
-        )
-      } catch (error: any) {
-        if (error) {
+      const res: any = await insertRowsViaSpreadsheet(
+        project.ref!,
+        project.connectionString,
+        file,
+        selectedTable,
+        selectedHeaders,
+        (progress: number) => {
           ui.setNotification({
-            error,
             id: toastId,
-            category: 'error',
-            message: `Failed to import data: ${error.message}`,
+            progress,
+            category: 'loading',
+            message: `Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`,
           })
-          return resolve()
         }
+      )
+      if (res.error) {
+        toast.error(`Failed to import data: ${res.error.message}`, { id: toastId })
+        return resolve()
       }
     } else {
       // Text paste
-      try {
-        await insertTableRows(
-          project.ref!,
-          project.connectionString,
-          selectedTable,
-          importContent.rows,
-          selectedHeaders,
-          (progress: number) => {
-            ui.setNotification({
-              id: toastId,
-              progress,
-              category: 'loading',
-              message: `Adding ${importContent.rows.length.toLocaleString()} rows to ${
-                selectedTable.name
-              }`,
-            })
-          }
-        )
-      } catch (error: any) {
-        if (error) {
+      const res: any = await insertTableRows(
+        project.ref!,
+        project.connectionString,
+        selectedTable,
+        importContent.rows,
+        selectedHeaders,
+        (progress: number) => {
           ui.setNotification({
-            error,
             id: toastId,
-            category: 'error',
-            message: `Failed to import data: ${error.message}`,
+            progress,
+            category: 'loading',
+            message: `Adding ${importContent.rows.length.toLocaleString()} rows to ${
+              selectedTable.name
+            }`,
           })
-          return resolve()
         }
+      )
+      if (res.error) {
+        toast.error(`Failed to import data: ${res.error.message}`, { id: toastId })
+        return resolve()
       }
     }
 

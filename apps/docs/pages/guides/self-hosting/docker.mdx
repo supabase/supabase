@@ -187,7 +187,13 @@ Supabase is a combination of open source tools, each specifically chosen for Ent
 If the tools and communities already exist, with an MIT, Apache 2, or equivalent open license, we will use and support that tool.
 If the tool doesn't exist, we build and open source it ourselves.
 
-![Supabase Architecture](/docs/img/supabase-architecture.png)
+<Image
+  alt="Diagram showing the architecture of Supabase. The Kong API gateway sits in front of 7 services: GoTrue, PostgREST, Realtime, Storage, pg_meta, Functions, and pg_graphql. All the services talk to a single Postgres instance."
+  src={{
+    dark: '/docs/img/supabase-architecture.svg',
+    light: '/docs/img/supabase-architecture--light.svg',
+  }}
+/>
 
 - [Kong](https://github.com/Kong/kong) is a cloud-native API gateway.
 - [GoTrue](https://github.com/supabase/gotrue) is an JWT based API for managing users and issuing JWT tokens.

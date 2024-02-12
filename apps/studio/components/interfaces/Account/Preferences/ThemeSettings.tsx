@@ -1,5 +1,5 @@
 import { useTheme } from 'next-themes'
-import { IconMoon, IconSun, Listbox, Theme, themes } from 'ui'
+import { IconMoon, IconSun, Listbox, themes } from 'ui'
 
 import Panel from 'components/ui/Panel'
 
@@ -18,7 +18,7 @@ const ThemeSettings = () => {
           icon={resolvedTheme === 'dark' ? <IconMoon /> : <IconSun />}
           onChange={(value: string) => setTheme(value)}
         >
-          {themes.map((theme: Theme) => (
+          {themes.map((theme) => (
             <Listbox.Option key={theme.value} label={theme.name} value={theme.value}>
               {theme.name}
             </Listbox.Option>
