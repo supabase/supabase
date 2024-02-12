@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useRouter } from 'next/router'
-import { Button, IconMessageCircle, TweetCard } from 'ui'
+import { Button, IconMessageCircle } from 'ui'
 import Tweets from '../../data/tweets/Tweets.json'
 import Link from 'next/link'
+import { TweetCard } from 'ui-patterns/TweetCard'
 
 function TwitterSocialProof() {
   // base path for images

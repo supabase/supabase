@@ -60,7 +60,15 @@ const nextConfig = {
       transform: 'lodash/{{member}}',
     },
   },
-  transpilePackages: ['ui', 'common', 'mermaid', 'mdx-mermaid', 'dayjs', 'shared-data'],
+  transpilePackages: [
+    'ui',
+    'ui-patterns',
+    'common',
+    'mermaid',
+    'mdx-mermaid',
+    'dayjs',
+    'shared-data',
+  ],
   async headers() {
     return [
       {

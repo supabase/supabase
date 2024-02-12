@@ -1,8 +1,7 @@
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
-
-import { cn } from '../../lib/utils/cn'
+import { cn } from 'ui'
 
 export const ThemeImage = ({ src, ...props }: any) => {
   const { resolvedTheme } = useTheme()
@@ -26,12 +25,10 @@ export const ThemeImage = ({ src, ...props }: any) => {
           typeof src === 'string'
             ? src
             : mounted && resolvedTheme?.includes('dark')
-            ? src.dark
-            : src.light
+              ? src.dark
+              : src.light
         }
       />
     </span>
   )
 }
-
-export default ThemeImage

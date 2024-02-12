@@ -19,7 +19,7 @@ interface Props {
   hideArrow?: boolean
 }
 
-const IconPanel = ({
+export const IconPanel = ({
   title,
   tooltip,
   icon,
@@ -74,8 +74,8 @@ const IconPanel = ({
                     title !== undefined
                       ? `${title} Icon`
                       : tooltip !== undefined
-                      ? `${tooltip} Icon`
-                      : 'Icon'
+                        ? `${tooltip} Icon`
+                        : 'Icon'
                   }
                 />
               </IconContainer>
@@ -122,5 +122,3 @@ const IconPanel = ({
     </>
   )
 }
-
-export default IconPanel
