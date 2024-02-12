@@ -166,6 +166,8 @@ export {
   RadioGroupLargeItem as RadioGroupLargeItem_Shadcn_,
 } from './src/components/shadcn/ui/radio-group'
 
+export { Slider as Slider_Shadcn_ } from './src/components/shadcn/ui/slider'
+
 export { Input as Input_Shadcn_ } from './src/components/shadcn/ui/input'
 
 export { Button as Button_Shadcn_ } from './src/components/shadcn/ui/button'

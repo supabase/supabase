@@ -607,7 +607,7 @@ const SQLEditor = () => {
                   <AiIconAnimation loading={isAiLoading} />
                 </motion.div>
 
-                <AnimatePresence initial={false} exitBeforeEnter>
+                <AnimatePresence initial={false} mode="wait">
                   {debugSolution && (
                     <div className="h-full w-full flex flex-row items-center overflow-y-hidden text-sm text-white">
                       {debugSolution}

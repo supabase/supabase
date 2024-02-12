@@ -19,6 +19,7 @@
   - [x] Veritabanı Fonksiyonları. [Dokümanlar](https://supabase.com/docs/guides/database/functions)
   - [x] Kenar İşlevleri [Dokümanlar](https://supabase.com/docs/guides/functions)
 - [x] Dosya Depolama. [Docs](https://supabase.com/docs/guides/storage)
+- [x] AI + Vektör / Gömme Araçları. [Dokümanlar](https://supabase.com/docs/guides/ai)
 - [x] Gösterge Tablosu
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
@@ -35,19 +36,6 @@ Nasıl Katkıda bulunacağınızı görmek için [Başlarken](../DEVELOPERS.md) 
 - [GitHub Sorunları](https://github.com/supabase/supabase/issues). Supabase'i kullanırken karşılaştığınız hatalar ve hatalar için en iyisi.
 - [E-posta Desteği](https://supabase.com/docs/support#business-support). Veritabanınız veya altyapınızla ilgili sorunlar için en iyisi.
 - [Discord](https://discord.supabase.com). Uygulamalarınızı paylaşmak ve toplulukla takılmak için en iyisi.
-
-## Durum
-
-- [Alfa: Supabase'i kapalı bir müşteri grubuyla test ediyoruz
-- [Halka Açık Alfa: Herkes [supabase.com/dashboard](https://supabase.com/dashboard) adresinden kaydolabilir. Ama bize karşı sakin olun, birkaç karışıklık var
-- [x] Genel Beta: Kurumsal olmayan kullanım durumlarının çoğu için yeterince kararlı
-- [ ] Genel: Genel Kullanılabilirlik [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
-
-Şu anda Genel Beta aşamasındayız. Önemli güncellemelerden haberdar olmak için bu deponun "sürümlerini" izleyin.
-
-<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
-
----
 
 ## Nasıl çalışır
 
@@ -210,6 +198,42 @@ Ayrıca [self-host](https://supabase.com/docs/guides/hosting/overview) ve [yerel
 
 <!--- Remove this list if you're translating to another language, it's hard to keep updated across multiple files-->
 <!--- Keep only the link to the list of translation files-->
+
+## Rozetler
+
+![Made with Supabase](../apps/www/public/badge-made-with-supabase.svg)
+
+```md
+[![Made with Supabase](https://supabase.com/badge-made-with-supabase.svg)](https://supabase.com)
+```
+
+```html
+<a href="https://supabase.com">
+  <img
+    width="168"
+    height="30"
+    src="https://supabase.com/badge-made-with-supabase.svg"
+    alt="Made with Supabase"
+  />
+</a>
+```
+
+![Made with Supabase (dark)](../apps/www/public/badge-made-with-supabase-dark.svg)
+
+```md
+[![Made with Supabase](https://supabase.com/badge-made-with-supabase-dark.svg)](https://supabase.com)
+```
+
+```html
+<a href="https://supabase.com">
+  <img
+    width="168"
+    height="30"
+    src="https://supabase.com/badge-made-with-supabase-dark.svg"
+    alt="Made with Supabase"
+  />
+</a>
+```
 
 ## Çeviriler
 

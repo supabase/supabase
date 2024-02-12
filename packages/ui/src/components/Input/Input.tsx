@@ -1,17 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import { Button } from '../Button'
-import { IconCopy } from '../Icon/icons/IconCopy'
 
-import { FormLayout } from '../../lib/Layout/FormLayout'
-
+import { FormLayout } from '../../lib/Layout/FormLayout/FormLayout'
 import InputErrorIcon from '../../lib/Layout/InputErrorIcon'
 import InputIconContainer from '../../lib/Layout/InputIconContainer'
-
-import { HIDDEN_PLACEHOLDER } from './../../lib/constants'
-
-import { cn } from '@ui/lib/utils/cn'
+import { HIDDEN_PLACEHOLDER } from '../../lib/constants'
 import styleHandler from '../../lib/theme/styleHandler'
+import { cn } from '../../lib/utils/cn'
+import { Button } from '../Button'
 import { useFormContext } from '../Form/FormContext'
+import { IconCopy } from '../Icon/icons/IconCopy'
 
 export interface Props
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'onCopy'> {

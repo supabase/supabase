@@ -130,7 +130,7 @@ create table invited_users (
 We can create an RLS policy to enforce that a developer in ACME Inc. can only invite someone who is also a developer in the same company:
 
 ```sql
-create policy "View "
+create policy "Can only invite developers in the same organization"
 on invited_users
 as restrictive
 for insert

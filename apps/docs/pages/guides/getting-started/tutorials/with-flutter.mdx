@@ -47,7 +47,7 @@ Now that we have the dependencies installed let's setup deep links.
 Setting up deep links is required to bring back the user to the app when they click on the magic link to sign in.
 We can setup deep links with just a minor tweak on our Flutter application.
 
-We will use `io.supabase.flutterquickstart` as the scheme, and `login-callback` as the host for our deep link in this example, but you can change it to whatever you would like.
+We have to use `io.supabase.flutterquickstart` as the scheme. In this example, we will use `login-callback` as the host for our deep link, but you can change it to whatever you would like.
 
 First, add `io.supabase.flutterquickstart://login-callback/` as a new [redirect URL](https://supabase.com/dashboard/project/_/auth/url-configuration) in the Dashboard.
 
