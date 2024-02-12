@@ -132,4 +132,4 @@ const TableNode = ({ data, targetPosition, sourcePosition }: NodeProps<TableNode
   )
 }
 
-export { TableNode, TABLE_NODE_WIDTH, TABLE_NODE_ROW_HEIGHT }
+export { TABLE_NODE_ROW_HEIGHT, TABLE_NODE_WIDTH, TableNode }

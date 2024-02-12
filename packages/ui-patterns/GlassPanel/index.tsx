@@ -1,7 +1,7 @@
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import * as React from 'react'
-import { cn } from '../../lib/utils/cn'
+import { cn } from 'ui'
 
 interface Props {
   title: string
@@ -18,7 +18,7 @@ interface Props {
   showIconBg?: boolean
 }
 
-const GlassPanel = ({
+export const GlassPanel = ({
   title,
   span,
   icon,
@@ -125,5 +125,3 @@ const GlassPanel = ({
     </div>
   )
 }
-
-export default GlassPanel
