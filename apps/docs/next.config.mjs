@@ -1,11 +1,11 @@
 // @ts-check
-import nextMdx from '@next/mdx'
-import remarkGfm from 'remark-gfm'
-import rehypeSlug from 'rehype-slug'
 import { remarkCodeHike } from '@code-hike/mdx'
+import nextMdx from '@next/mdx'
+import rehypeSlug from 'rehype-slug'
+import remarkGfm from 'remark-gfm'
 
-import withYaml from 'next-plugin-yaml'
 import configureBundleAnalyzer from '@next/bundle-analyzer'
+import withYaml from 'next-plugin-yaml'
 
 import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 
@@ -34,25 +34,11 @@ const withMDX = nextMdx({
 
 /** @type {import('next').NextConfig} nextConfig */
 const nextConfig = {
-  outputFileTracing: true,
-  experimental: {
-    // Storybook 7.5 upgrade seems to causes dev deps to be included in build output, removing it here
-    outputFileTracingExcludes: {
-      '*': [
-        './node_modules/@swc/core-linux-x64-gnu',
-        './node_modules/@swc/core-linux-x64-musl',
-        './node_modules/esbuild/**/*',
-        './node_modules/webpack/**/*',
-        './node_modules/rollup/**/*',
-      ],
-    },
-  },
-
   // Append the default value with md extensions
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
   // reactStrictMode: true,
   // swcMinify: true,
-  basePath: '/docs',
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH || '/docs',
   images: {
     dangerouslyAllowSVG: true,
     domains: [
@@ -64,7 +50,7 @@ const nextConfig = {
       'weweb-changelog.ghost.io',
       'img.youtube.com',
       'archbee-image-uploads.s3.amazonaws.com',
-      'obuldanrptloktxcffvn.supabase.co'
+      'obuldanrptloktxcffvn.supabase.co',
     ],
   },
   // TODO: @next/mdx ^13.0.2 only supports experimental mdxRs flag. next ^13.0.2 will stop warning about this being unsupported.
