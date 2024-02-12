@@ -18,6 +18,7 @@ import {
 } from 'ui'
 
 const ThemeSettings = () => {
+  // @ts-expect-error // remove this ts error if you use this file
   const { theme, setTheme, setSystemPrefixResolve, themePrefix } = useTheme()
   const [mode, setMode] = useState<'system' | 'single-theme'>(
     theme === 'system' ? 'system' : 'single-theme'
