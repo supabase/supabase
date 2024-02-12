@@ -7,6 +7,7 @@ module.exports = config({
     './components/**/*.tsx',
     './layouts/**/*.tsx',
     './src/**/*.{ts,tsx,mdx}',
+    './content/**/*.{ts,tsx,mdx}',
     './docs/**/*.{tsx,mdx}',
   ],
   plugins: [

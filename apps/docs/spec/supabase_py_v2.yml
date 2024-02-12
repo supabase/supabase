@@ -144,7 +144,7 @@ functions:
         code: |
           ```
           data = supabase.auth.sign_in_with_otp({
-            phone: '+13334445555',
+            "phone": '+13334445555',
           })
           ```
   - id: sign-in-with-oauth
@@ -1906,7 +1906,7 @@ functions:
         name: Error handling
         description: |
           Returns one of the following errors:
-          
+
           - `FunctionsHttpError`: if your function throws an error
           - `FunctionsRelayError`: if the Supabase Relay encounters an error processing your function
         isSpotlight: true
@@ -1933,7 +1933,7 @@ functions:
         name: Passing custom headers
         description: |
           The library accepts custom headers via the `headers` option. 
-          
+
           Note: `supabase-py` automatically populates the `Authorization` header if there is a signed in user.
         isSpotlight: true
         code: |
