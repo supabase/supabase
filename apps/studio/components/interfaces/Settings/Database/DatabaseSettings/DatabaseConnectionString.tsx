@@ -61,9 +61,7 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
 
   const connectionStringsRef = useRef<HTMLDivElement>(null)
   const [usePoolerConnection, setUsePoolerConnection] = useState(true)
-  const [poolingMode, setPoolingMode] = useState<'transaction' | 'session' | 'statement'>(
-    'transaction'
-  )
+  const [poolingMode, setPoolingMode] = useState<'transaction' | 'session' | 'statement'>('session')
   const [selectedTab, setSelectedTab] = useState<
     'uri' | 'psql' | 'golang' | 'jdbc' | 'dotnet' | 'nodejs' | 'php' | 'python'
   >('uri')
@@ -156,7 +154,7 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
   }, [connectionString])
 
   useEffect(() => {
-    if (poolingInfo?.pool_mode !== undefined) {
+    if (poolingInfo?.pool_mode === 'session') {
       setPoolingMode(poolingInfo.pool_mode)
     }
   }, [poolingInfo?.pool_mode])
@@ -241,7 +239,7 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
             </div>
           )}
         </Panel.Content>
-        {poolerConnStringSyntax.length > 0 && poolingInfo?.supavisor_enabled && (
+        {poolerConnStringSyntax.length > 0 && (
           <>
             <Separator />
             <Panel.Content className={cn('!py-3 space-y-2', appearance === 'minimal' && 'px-0')}>

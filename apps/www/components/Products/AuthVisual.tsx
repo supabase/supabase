@@ -16,7 +16,7 @@ const AuthVisual = () => {
         xmlns="http://www.w3.org/2000/svg"
         className="absolute w-full h-auto inset-0 z-20 m-auto"
       >
-        <g clip-path="url(#clip0_493_53350)">
+        <g clipPath="url(#clip0_493_53350)">
           <g>
             <rect
               x="-78.0754"

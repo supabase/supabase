@@ -18,8 +18,8 @@ import {
   CommandGroup,
   CommandItem,
   CommandLabel,
-  FORCE_MOUNT_ITEM,
   TextHighlighter,
+  escapeDoubleQuotes,
 } from './Command.utils'
 import { useRouter } from 'next/router'
 
@@ -174,8 +174,8 @@ function reducer(state: SearchState, action: Action): SearchState {
                 'results' in state
                   ? state.results
                   : 'staleResults' in state
-                  ? state.staleResults
-                  : [],
+                    ? state.staleResults
+                    : [],
             }
       }
       return allSourcesLoaded
@@ -416,15 +416,17 @@ const DocsSearch = () => {
             <CommandGroup
               heading=""
               key={`${page.path}-group`}
-              value={`${FORCE_MOUNT_ITEM}--${page.title}-group-index-${i}`}
+              value={`${escapeDoubleQuotes(page.title)}-group-index-${i}`}
+              forceMount={true}
             >
               <CommandItem
                 key={`${page.path}-item`}
-                value={`${FORCE_MOUNT_ITEM}--${page.title}-item-index-${i}`}
+                value={`${escapeDoubleQuotes(page.title)}-item-index-${i}`}
                 type="block-link"
                 onSelect={() => {
                   openLink(page.type, formatPageUrl(page))
                 }}
+                forceMount={true}
               >
                 <div className="grow flex gap-3 items-center">
                   <IconContainer>{getPageIcon(page)}</IconContainer>
@@ -454,7 +456,10 @@ const DocsSearch = () => {
                         openLink(page.type, formatSectionUrl(page, section))
                       }}
                       key={`${page.path}__${section.heading}-item`}
-                      value={`${FORCE_MOUNT_ITEM}--${page.title}__${section.heading}-item-index-${i}`}
+                      value={`${escapeDoubleQuotes(
+                        page.title
+                      )}__${escapeDoubleQuotes(section.heading)}-item-index-${i}`}
+                      forceMount={true}
                       type="block-link"
                     >
                       <div className="grow flex gap-3 items-center">

@@ -80,7 +80,7 @@ const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) =
                     return (
                       <CommandItem_Shadcn_
                         key={org.slug}
-                        value={`${org.name} - ${org.slug}`}
+                        value={`${org.name.replaceAll('"', '')} - ${org.slug}`}
                         className="cursor-pointer w-full"
                         onSelect={() => {
                           setOpen(false)
