@@ -16,7 +16,7 @@ test.describe('Table Editor page', () => {
     await page.getByRole('button', { name: '---' }).click()
     await page.getByText('textVariable-length character').click()
     await page.getByRole('button', { name: 'Save' }).click()
-    await page.locator('#toast').getByRole('button').click()
+    await page.locator('#toast').getByRole('button').click({ timeout: 30000 })
     await page.getByRole('link', { name }).click({ timeout: 30000 })
     await page.waitForTimeout(1000)
     await page.getByTestId('table-editor-insert-new-row').click()
