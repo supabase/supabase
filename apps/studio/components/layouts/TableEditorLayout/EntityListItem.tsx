@@ -198,7 +198,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
             <div className="w-4 px-0.5">
               <Unlock
                 size={14}
-                strokeWidth={1}
+                strokeWidth={1.5}
                 className={cn(isActive ? 'text-warning' : 'text-warning-500')}
               />
             </div>
