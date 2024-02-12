@@ -46,8 +46,6 @@ const ProfileCard = observer(() => {
 
   const experimentalThemeEnabled = useFlag('enableExperimentalTheme')
 
-  console.log('experimentalThemeEnabled', experimentalThemeEnabled)
-
   return (
     <article className="max-w-4xl p-4">
       {isLoading && (
@@ -74,6 +72,9 @@ const ProfileCard = observer(() => {
       )}
 
       <section>{experimentalThemeEnabled ? <ThemeSettings /> : <ThemeSettingsOld />}</section>
+
+      {/* <section>
+      </section> */}
 
       <section>
         <AnalyticsSettings />
