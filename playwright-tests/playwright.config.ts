@@ -28,6 +28,8 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
+    // record a video for failed tests, but only for local testing. We can't store videos on CI atm.
+    video: process.env.CI ? 'off' : 'retain-on-failure',
   },
 
   /* Configure projects for major browsers */
