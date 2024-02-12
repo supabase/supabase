@@ -1,4 +1,4 @@
-import { useTheme } from '@mildtomato/next-themes'
+import { useTheme } from 'next-themes'
 import Panel from 'components/ui/Panel'
 import { BASE_PATH } from 'lib/constants'
 import { useState } from 'react'

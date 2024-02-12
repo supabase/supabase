@@ -1,4 +1,4 @@
-import { useTheme } from '@mildtomato/next-themes'
+import { useTheme } from 'next-themes'
 import { IconMoon, IconSun, Listbox, Theme, themes } from 'ui'
 
 import Panel from 'components/ui/Panel'
