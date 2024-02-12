@@ -1,4 +1,4 @@
-import { Badge, Button, IconArrowUpRight, IconX, Tabs, ThemeImage } from 'ui'
+import { Badge, Button, IconArrowUpRight, IconX, Tabs } from 'ui'
 // data
 import ApiExamplesData from 'data/products/database/api-examples'
 import ExtensionsExamplesData from 'data/products/database/extensions-examples'
@@ -23,7 +23,8 @@ import ProductIcon from '~/components/ProductIcon'
 import APISection from '~/components/Sections/APISection'
 import GithubExamples from '~/components/Sections/GithubExamples'
 import ProductHeader from '~/components/Sections/ProductHeader'
-import { TweetCard } from 'ui'
+import { ThemeImage } from 'ui-patterns/ThemeImage'
+import { TweetCard } from 'ui-patterns/TweetCard'
 
 // install Swiper's Controller component
 // SwiperCore.use([Controller])

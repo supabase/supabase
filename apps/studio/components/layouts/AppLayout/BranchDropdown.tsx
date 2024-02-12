@@ -44,7 +44,7 @@ const BranchLink = ({
   return (
     <Link passHref href={href}>
       <CommandItem_Shadcn_
-        value={branch.name}
+        value={branch.name.replaceAll('"', '')}
         className="cursor-pointer w-full flex items-center justify-between"
         onSelect={() => {
           setOpen(false)

@@ -68,7 +68,7 @@ const ProjectLink = ({
   return (
     <CommandItem_Shadcn_
       key={project.ref}
-      value={`${project.name}-${project.ref}`}
+      value={`${project.name.replaceAll('"', '')}-${project.ref}`}
       className="cursor-pointer w-full"
       onSelect={() => {
         router.push(href)

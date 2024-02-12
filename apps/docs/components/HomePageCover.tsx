@@ -1,7 +1,8 @@
 import Link from 'next/link'
-import { IconBackground, IconPanel, IconPlay } from 'ui'
+import { IconBackground, IconPlay } from 'ui'
 import { useBreakpoint } from 'common'
 import DocsCoverLogo from './DocsCoverLogo'
+import { IconPanel } from 'ui-patterns/IconPanel'
 
 const HomePageCover = (props) => {
   const isXs = useBreakpoint(639)
