@@ -74,8 +74,8 @@ const IconPanel = ({
                     title !== undefined
                       ? `${title} Icon`
                       : tooltip !== undefined
-                      ? `${tooltip} Icon`
-                      : 'Icon'
+                        ? `${tooltip} Icon`
+                        : 'Icon'
                   }
                 />
               </IconContainer>
