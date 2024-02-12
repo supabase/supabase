@@ -137,6 +137,17 @@ final result = await client
 ```
 
 </TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val data = supabase.from("books").select {
+    filter {
+        eq("title", "Harry")
+    }
+}
+```
+
+</TabPanel>
 </Tabs>
 
 The equality symbol above (`=`) is very "strict" on what it matches. In a full text search context, we might want to find all "Harry Potter" books and so we can rewrite the
@@ -172,6 +183,17 @@ final result = await client
   .from('books')
   .select()
   .textSearch('title', "'Harry'");
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val data = supabase.from("books").select {
+    filter {
+        textSearch("title", "'Harry'", TextSearchType.NONE)
+    }
+}
 ```
 
 </TabPanel>
@@ -217,6 +239,17 @@ final result = await client
   .from('books')
   .select()
   .textSearch('description', "'big'");
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val data = supabase.from("books").select {
+    filter {
+        textSearch("description", "'big'", TextSearchType.NONE)
+    }
+}
 ```
 
 </TabPanel>
@@ -288,6 +321,23 @@ final result = await client
 ```
 
 </TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```sql
+create function title_description(books) returns text as $$
+  select $1.title || ' ' || $1.description;
+$$ language sql immutable;
+```
+
+```kotlin
+val data = supabase.from("books").select {
+    filter {
+        textSearch("title_description", "title", TextSearchType.NONE)
+    }
+}
+```
+
+</TabPanel>
 <TabPanel id="data" label="Data">
 
 | id  | title                 | author                 | description                                 |
@@ -342,6 +392,17 @@ final result = await client
 ```
 
 </TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val data = supabase.from("books").select {
+    filter {
+        textSearch("description", "'title' & 'big'", TextSearchType.NONE)
+    }
+}
+```
+
+</TabPanel>
 <TabPanel id="data" label="Data">
 
 | id  | title  | author            | description                      |
@@ -392,6 +453,17 @@ final result = await client
   .from('books')
   .select()
   .textSearch('description', "'little' | 'big'");
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val data = supabase.from("books").select {
+    filter {
+        textSearch("description", "'title' | 'big'", TextSearchType.NONE)
+    }
+}
 ```
 
 </TabPanel>
@@ -495,6 +567,17 @@ final result = await client
 ```
 
 </TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val data = supabase.from("books").select {
+    filter {
+        textSearch("fts", "'title' & 'big'", TextSearchType.NONE)
+    }
+}
+```
+
+</TabPanel>
 <TabPanel id="data" label="Data">
 
 | id  | title  | author            | description                      | fts                                                     |
@@ -553,6 +636,17 @@ final result = await client
 ```
 
 </TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val data = supabase.from("books").select {
+    filter {
+        textSearch("description", "'big' <-> 'dreams'", TextSearchType.NONE)
+    }
+}
+```
+
+</TabPanel>
 </Tabs>
 
 We can also use the `<->` to find words within a certain distance of each other. For example to find `year` and `school` within 2 words of each other:
@@ -593,6 +687,17 @@ final result = await client
   .from('books')
   .select()
   .textSearch('description', "'year' <2> 'school'");
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val data = supabase.from("books").select {
+    filter {
+        textSearch("description", "'year' <2> 'school'", TextSearchType.NONE)
+    }
+}
 ```
 
 </TabPanel>
@@ -639,6 +744,17 @@ final result = await client
   .from('books')
   .select()
   .textSearch('description', "'big' & !'little'");
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val data = supabase.from("books").select {
+    filter {
+        textSearch("description", "'big' & !'little'", TextSearchType.NONE)
+    }
+}
 ```
 
 </TabPanel>

@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import { Button, ThemeImage } from 'ui'
+import { Button } from 'ui'
 import { useState } from 'react'
 // Import Swiper React components
 import { useRouter } from 'next/router'
@@ -9,6 +9,7 @@ import { ColorSwatchIcon, MenuIcon } from '@heroicons/react/outline'
 import { Auth } from '@supabase/auth-ui-react'
 import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { useTheme } from 'next-themes'
+import { ThemeImage } from 'ui-patterns/ThemeImage'
 
 function AuthWidgetSection() {
   const supabase = createClient(

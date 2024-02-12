@@ -7,7 +7,6 @@ import { Button, IconLoader, IconTool } from 'ui'
 
 import Success from 'components/interfaces/Support/Success'
 import SupportForm from 'components/interfaces/Support/SupportForm'
-import { LayoutWrapper } from 'components/layouts/LayoutWrapper'
 import { usePlatformStatusQuery } from 'data/platform/platform-status-query'
 import { withAuth } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
@@ -18,10 +17,10 @@ const SupportPage = () => {
   const isHealthy = data?.isHealthy
 
   return (
-    <LayoutWrapper className="relative flex overflow-y-auto overflow-x-hidden">
-      <div className="mx-auto my-8 max-w-2xl px-4 lg:px-6">
+    <div className="relative flex overflow-y-auto overflow-x-hidden">
+      <div className="mx-auto my-8 max-w-2xl w-full px-4 lg:px-6">
         <div className="space-y-12 py-8">
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-y-2">
             <div className="flex items-center space-x-3">
               <SVG src={`${BASE_PATH}/img/supabase-logo.svg`} className="h-4 w-4" />
               <h1 className="m-0 text-lg">Supabase support</h1>
@@ -78,7 +77,7 @@ const SupportPage = () => {
           </div>
           <div
             className={[
-              'min-w-full space-y-12 rounded border bg-panel-body-light shadow-md',
+              'min-w-full w-full space-y-12 rounded border bg-panel-body-light shadow-md',
               `${sentCategory === undefined ? 'py-8' : 'pt-8'}`,
               'border-default',
             ].join(' ')}
@@ -91,7 +90,7 @@ const SupportPage = () => {
           </div>
         </div>
       </div>
-    </LayoutWrapper>
+    </div>
   )
 }
 
