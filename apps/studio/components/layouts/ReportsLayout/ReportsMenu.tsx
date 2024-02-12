@@ -318,7 +318,9 @@ const ReportsMenu = () => {
             onCancel={() => {
               setShowNewReportModal(false)
             }}
-            onSubmit={(newVals) => createCustomReport(newVals)}
+            afterSubmit={() => {
+              setShowNewReportModal(false)
+            }}
           />
         </div>
       )}

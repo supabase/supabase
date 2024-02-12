@@ -1,13 +1,61 @@
+import { useContentInsertMutation } from 'data/content/content-insert-mutation'
+import { useSelectedProject } from 'hooks'
+import { uuidv4 } from 'lib/helpers'
+import { useRouter } from 'next/router'
+import toast from 'react-hot-toast'
 import { Button, Form, Input, Modal } from 'ui'
 
 type CustomReport = { name: string; description?: string }
 export interface CreateReportModal {
   visible: boolean
   onCancel: () => void
-  onSubmit: (values: CustomReport) => any
+  afterSubmit: () => void
 }
 
-export const CreateReportModal = ({ visible, onCancel, onSubmit }: CreateReportModal) => {
+export const CreateReportModal = ({ visible, onCancel, afterSubmit }: CreateReportModal) => {
+  const project = useSelectedProject()
+  const insertReport = useContentInsertMutation()
+  const ref = project?.ref ?? 'default'
+  const router = useRouter()
+
+  async function createCustomReport({ name, description }: { name: string; description?: string }) {
+    try {
+      if (!ref) return
+
+      const res = await insertReport.mutateAsync({
+        projectRef: ref,
+        payload: {
+          id: uuidv4(),
+          type: 'report',
+          name,
+          description: description || '',
+          visibility: 'project',
+          content: {
+            schema_version: 1,
+            period_start: {
+              time_period: '7d',
+              date: '',
+            },
+            period_end: {
+              time_period: 'today',
+              date: '',
+            },
+            interval: '1d',
+            layout: [],
+          },
+        },
+      })
+      toast.success('New report created')
+
+      const newReportId = res[0].id
+      router.push(`/project/${ref}/reports/${newReportId}`)
+      afterSubmit()
+    } catch (error) {
+      toast.error(`Failed to create report. Check console for more details.`)
+      console.error(error)
+    }
+  }
+
   return (
     <Modal
       visible={visible}
@@ -29,7 +77,7 @@ export const CreateReportModal = ({ visible, onCancel, onSubmit }: CreateReportM
 
           return errors
         }}
-        onSubmit={onSubmit}
+        onSubmit={(newVals) => createCustomReport(newVals)}
       >
         {({ isSubmitting }: { isSubmitting: boolean }) => (
           <div className="space-y-4 py-4">
