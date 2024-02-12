@@ -6,7 +6,7 @@ import { NextPageWithLayout } from 'types'
 
 const PageLayout: NextPageWithLayout = () => (
   <>
-    <div className="mx-auto flex flex-col gap-4 px-3 py-6">
+    <div className="mx-auto flex flex-col gap-4 p-3">
       <Reports />
     </div>
     <EditReportModal />
