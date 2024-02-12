@@ -4,18 +4,16 @@
 
 // Basic UI things
 import Link from 'next/link'
-import { Alert, Button, CodeBlock, markdownComponents, Tabs } from 'ui'
+import { Accordion, Admonition, Alert, Button, CodeBlock, markdownComponents, Tabs } from 'ui'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { IconPanel } from 'ui-patterns/IconPanel'
 import { ThemeImage } from 'ui-patterns/ThemeImage'
 
-import { Accordion, Admonition } from 'ui'
-import StepHikeCompact from '~/components/StepHikeCompact'
-import { Heading } from './CustomHTMLElements'
-
 // Common components
 import { CH } from '@code-hike/mdx/components'
+import StepHikeCompact from '~/components/StepHikeCompact'
 import ButtonCard from './ButtonCard'
+import { Heading } from './CustomHTMLElements'
 
 // Reference guide specific
 // [Charis] I think we can factor these out so they aren't in the bundle for absolutely everything
