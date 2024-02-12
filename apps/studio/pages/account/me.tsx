@@ -73,9 +73,6 @@ const ProfileCard = observer(() => {
 
       <section>{experimentalThemeEnabled ? <ThemeSettings /> : <ThemeSettingsOld />}</section>
 
-      {/* <section>
-      </section> */}
-
       <section>
         <AnalyticsSettings />
       </section>

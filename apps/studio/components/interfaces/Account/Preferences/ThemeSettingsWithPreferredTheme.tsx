@@ -24,8 +24,6 @@ const ThemeSettings = () => {
   )
   const [prefixedTheme, setPrefixedThemeState] = useState(themePrefix === '' ? 'dark' : themePrefix)
 
-  console.log('prefixedTheme', prefixedTheme)
-
   function SingleThemeSelection() {
     return (
       <form>
@@ -36,11 +34,13 @@ const ThemeSettings = () => {
           value={theme}
           className="flex flex-wrap gap-3"
         >
-          {singleThemes.map((theme: Theme) => (
-            <RadioGroupLargeItem_Shadcn_ key={theme.value} value={theme.value} label={theme.name}>
-              <SVG src={`${BASE_PATH}/img/themes/${theme.value}.svg`} />
-            </RadioGroupLargeItem_Shadcn_>
-          ))}
+          {singleThemes
+            .filter((x) => x.value !== 'system')
+            .map((theme: Theme) => (
+              <RadioGroupLargeItem_Shadcn_ key={theme.value} value={theme.value} label={theme.name}>
+                <SVG src={`${BASE_PATH}/img/themes/${theme.value}.svg`} />
+              </RadioGroupLargeItem_Shadcn_>
+            ))}
         </RadioGroup_Shadcn_>
       </form>
     )
