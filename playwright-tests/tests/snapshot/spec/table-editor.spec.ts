@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test'
 test.describe('Table Editor page', () => {
   test('should create a column and insert a row', async ({ page }) => {
     const name = 'TestTable' + Math.floor(Math.random() * 10)
+    console.log(name)
 
     await page.goto('/project/default/editor')
     await page.getByRole('button', { name: 'New table', exact: true }).click()
@@ -15,11 +16,10 @@ test.describe('Table Editor page', () => {
     await page.getByRole('textbox', { name: 'column_name' }).fill('textColumn')
     await page.getByRole('button', { name: '---' }).click()
     await page.getByText('textVariable-length character').click()
-    await page.getByRole('button', { name: 'Save' }).click()
+    await page.getByRole('button', { name: 'Save' }).click({ timeout: 30000 })
     await page.locator('#toast').getByRole('button').click({ timeout: 30000 })
     await page.getByRole('link', { name }).click({ timeout: 30000 })
-    await page.waitForTimeout(1000)
-    await page.getByTestId('table-editor-insert-new-row').click()
+    await page.getByTestId('table-editor-insert-new-row').click({ timeout: 30000 })
     await page.getByText('Insert a new row into').click()
     await page.getByPlaceholder('NULL').click()
     await page.getByPlaceholder('NULL').fill('some text')
