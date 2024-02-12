@@ -16,18 +16,16 @@ import {
   Popover_Shadcn_,
 } from 'ui'
 
-import { rlsAcknowledgedKey } from 'components/grid/constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import APIDocsButton from 'components/ui/APIDocsButton'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
-import { useCheckPermissions, useIsFeatureEnabled, useStore } from 'hooks'
+import { useCheckPermissions, useIsFeatureEnabled } from 'hooks'
 import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
 
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
-import { useQueryClient } from '@tanstack/react-query'
 
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 
@@ -48,9 +46,6 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
       closeConfirmModal()
     },
   })
-
-  const { ui, meta } = useStore()
-  const queryClient = useQueryClient()
 
   const [showEnableRealtime, setShowEnableRealtime] = useState(false)
   const [open, setOpen] = useState(false)
