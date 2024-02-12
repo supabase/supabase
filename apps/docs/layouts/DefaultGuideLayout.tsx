@@ -12,6 +12,8 @@ interface Props {
   }
   children: any
   toc?: any
+  // [Charis] Deprecate meta.hide_table_of_contents once the content migration is over
+  hideToc?: boolean
   currentPage?: string
   editLink?: string
 }

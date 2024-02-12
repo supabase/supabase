@@ -3,6 +3,7 @@ const config = require('config/tailwind.config')
 module.exports = config({
   content: [
     './components/**/*.tsx',
+    './content/**/*.{ts,tsx,mdx}',
     './docs/**/*.{tsx,mdx}',
     './layouts/**/*.tsx',
     './pages/**/*.{tsx,mdx}',
