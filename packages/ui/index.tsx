@@ -2,29 +2,21 @@
 
 import * as React from 'react'
 
-// Providers
-
-export * from './src/providers'
-
 // Markdown components
 
 export * from './src/lib/Markdown'
 
-// // GENERAL
+// GENERAL
 
 export * from './src/components/Admonition'
 export * from './src/components/Button'
 export * from './src/components/Icon'
 export * from './src/components/Icon/IconContext'
-export * from './src/components/GlassPanel'
-export * from './src/components/IconPanel'
 export * from './src/components/Icon/IconBackground'
-export * from './src/components/ThemeImage'
 
 // DISPLAYS
 
 export * from './src/components/Card'
-export * from './src/components/TweetCard'
 export * from './src/components/Badge'
 export * from './src/components/Tabs'
 export * from './src/components/Alert'
@@ -41,10 +33,7 @@ export * from './src/components/NavMenu'
 
 export * from './src/components/Modal'
 export * from './src/components/SidePanel'
-export * from './src/components/ConsentToast'
 export * from './src/components/ContextMenu'
-export * from './src/components/ExpandableVideo'
-export * from './src/components/PrivacySettings'
 export * from './src/components/PromoToast'
 export * from './src/components/Popover'
 export * from './src/layout/PortalToast'
@@ -71,9 +60,6 @@ export * from './src/components/Form'
 // CMD+K
 export * from './src/components/Command'
 
-// Widgets
-export * from './src/components/CountdownWidget'
-
 // layout
 export * from './src/components/LoadingLine'
 
@@ -87,10 +73,7 @@ export * from './src/layout/ai-icon-animation'
 export * from './src/lib/utils'
 
 // theme switcher
-export * from './src/components/ThemeProvider/ThemeToggle'
 export * from './src/components/ThemeProvider/themes'
-
-// animated ui
 
 // shadcn
 export * from './src/components/shadcn/ui/dropdown-menu'
@@ -208,10 +191,6 @@ export {
 export { ScrollArea, ScrollBar } from './src/components/shadcn/ui/scroll-area'
 
 export { Separator } from './src/components/shadcn/ui/separator'
-
-// patterns
-
-export * from './src/patterns/SchemaTableNode'
 
 // links
 

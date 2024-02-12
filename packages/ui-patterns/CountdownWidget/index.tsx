@@ -8,7 +8,13 @@ interface CountdownWidgetProps {
   showCard?: boolean
 }
 
-function CountdownWidget({ days, hours, minutes, seconds, showCard = true }: CountdownWidgetProps) {
+export function CountdownWidget({
+  days,
+  hours,
+  minutes,
+  seconds,
+  showCard = true,
+}: CountdownWidgetProps) {
   const Colon = () => <span className="text-xs mx-px text-foreground-lighter">:</span>
 
   const showItem = (item: string | undefined) => item !== undefined && item !== '0'
@@ -39,5 +45,3 @@ function CountdownWidget({ days, hours, minutes, seconds, showCard = true }: Cou
     </div>
   )
 }
-
-export default CountdownWidget

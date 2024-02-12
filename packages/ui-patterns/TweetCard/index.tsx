@@ -6,7 +6,7 @@ interface TweetCard {
   img_url: string
 }
 
-function TweetCard(props: TweetCard) {
+export function TweetCard(props: TweetCard) {
   return (
     <div
       className="
@@ -51,4 +51,3 @@ function TweetCard(props: TweetCard) {
     </div>
   )
 }
-export default TweetCard

@@ -100,6 +100,7 @@
     "sql-formatter": "^12.2.0",
     "sqlstring": "^2.3.2",
     "ui": "*",
+    "ui-patterns": "*",
     "uuid": "^9.0.1",
     "valtio": "^1.11.2",
     "yup": "^0.32.11",
