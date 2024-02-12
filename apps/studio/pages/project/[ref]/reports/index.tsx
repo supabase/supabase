@@ -49,7 +49,7 @@ export const UserReportPage: NextPageWithLayout = () => {
       ) : (
         <ProductEmptyState
           title="Reports"
-          ctaButtonLabel="Create report"
+          ctaButtonLabel="New custom report"
           onClickCta={() => {
             try {
               createReport({ router })
