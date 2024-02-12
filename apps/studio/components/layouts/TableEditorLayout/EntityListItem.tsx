@@ -129,7 +129,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
         className="flex items-center gap-2 py-1 pl-2 w-full max-w-[90%]"
       >
         <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
-          <Tooltip.Trigger className="flex items-center">
+          <Tooltip.Trigger className="flex items-center" asChild>
             {entity.type === ENTITY_TYPE.TABLE ? (
               <Table2 size={15} strokeWidth={1.5} className="text-foreground-light" />
             ) : entity.type === ENTITY_TYPE.VIEW ? (

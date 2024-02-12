@@ -205,10 +205,9 @@ const TableEditorMenu = () => {
                         type="text"
                         placeholder="Search..."
                         className={cn(
-                          'bg-default text-foreground rounded-none px-0 py-0 h-5 focus:outline-none w-44 text-sm',
-                          'border-b outline-none focus:outline-none',
-                          'border-transparent focus:border-transparent focus:ring-0',
-                          'focus:border-b-red'
+                          'bg-default text-foreground rounded-none px-1 py-1 h-5 w-44 text-sm',
+                          'border-b outline-none ',
+                          'border-transparent focus:border-transparent focus:ring-2'
                         )}
                         onChange={(e) => {
                           setSearchText(e.target.value.trim())
@@ -252,7 +251,7 @@ const TableEditorMenu = () => {
                 }
                 initial={{ x: 0 }}
                 animate={{ x: isSearchOpen ? 185 : 0, transition: { duration: 0 } }}
-                className="px-2 py-1 rounded-md mt-0.5 transition transform hover:scale-105 focus:outline-none"
+                className="px-2 py-0.5 rounded-md mt-1 transition transform hover:scale-105 focus:ring-2 "
               >
                 {isSearchOpen ? (
                   isSearching ? (
