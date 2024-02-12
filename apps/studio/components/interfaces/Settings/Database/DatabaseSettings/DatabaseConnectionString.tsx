@@ -173,20 +173,25 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
             ref={connectionStringsRef}
             className={cn('w-full flex flex-col', appearance === 'default' ? 'pt-4' : 'pt-0')}
           >
-            <div className="flex items-center justify-between px-6 mb-2">
+            <div
+              className={cn(
+                'flex items-center justify-between mb-2',
+                appearance === 'default' && 'px-6'
+              )}
+            >
               {appearance === 'default' && (
                 <h5 key="panel-title" className="mb-0">
                   Connection string
                 </h5>
               )}
-              <div className="flex items-center gap-x-2 ml-auto">
+              <div
+                className={cn(
+                  'flex items-center gap-x-2 ml-auto',
+                  appearance === 'minimal' ? 'absolute -top-1 right-0' : ''
+                )}
+              >
                 {readReplicasEnabled && <DatabaseSelector />}
-                <Button
-                  asChild
-                  type="default"
-                  icon={<IconExternalLink strokeWidth={1.5} />}
-                  className={cn(appearance === 'minimal' && 'absolute -top-1 right-0')}
-                >
+                <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                   <a href="https://supabase.com/docs/guides/database/connecting-to-postgres">
                     Documentation
                   </a>
