@@ -33,6 +33,7 @@ import { useProfile } from 'lib/profile'
 import { useProjectContentStore } from 'stores/projectContentStore'
 import GridResize from './GridResize'
 import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
+import { useContentQuery } from 'data/content/content-query'
 
 const DEFAULT_CHART_COLUMN_COUNT = 12
 const DEFAULT_CHART_ROW_COUNT = 4
@@ -45,6 +46,10 @@ const Reports = () => {
     'project_auth:all',
     'project_storage:all',
   ])
+
+  const reportQuery = useContentQuery(ref)
+  const currentReport =
+    reportQuery.data && reportQuery.data?.content.find((report) => report.id === id)
 
   const [report, setReport] = useState<any>()
 
@@ -314,9 +319,11 @@ const Reports = () => {
   }
 
   return (
-    <div className="mx-6 flex flex-col space-y-4" style={{ maxHeight: '100%' }}>
-      <h1 className="text-xl text-foreground">Reports</h1>
-
+    <div className="flex flex-col space-y-4" style={{ maxHeight: '100%' }}>
+      <div className="space-y-0.5">
+        <h1 className="text-xl text-foreground">{currentReport?.name || 'Reports'}</h1>
+        <p className="text-foreground-light">{currentReport?.description}</p>
+      </div>
       <div className="mb-4 flex items-center justify-between space-x-3">
         <div className="flex items-center space-x-3">
           <DateRangePicker
@@ -419,7 +426,6 @@ const Reports = () => {
       ) : (
         <div className="relative mb-16 max-w-7xl flex-grow">
           {config && startDate && endDate && (
-            // @ts-ignore
             <GridResize
               startDate={startDate}
               endDate={endDate}
