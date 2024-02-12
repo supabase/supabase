@@ -43,7 +43,7 @@ function Blog(props: any) {
       />
       <DefaultLayout>
         <h1 className="sr-only">Supabase blog</h1>
-        <div className="overflow-hidden py-6 lg:py-10">
+        <div className="overflow-hidden py-6 lg:py-8">
           <div className="md:container mx-auto px-6 sm:px-16 xl:px-20">
             <div className="mx-auto">
               {props.blogs.slice(0, 1).map((blog: any, i: number) => (
@@ -54,14 +54,14 @@ function Blog(props: any) {
         </div>
 
         <div className="border-default border-t">
-          <div className="md:container mx-auto mt-6 lg:mt-10 px-6 sm:px-16 xl:px-20">
+          <div className="md:container mx-auto mt-6 lg:mt-8 px-6 sm:px-16 xl:px-20">
             <BlogFilters allPosts={props.blogs} posts={blogs} setPosts={setBlogs} />
 
-            <ol className="grid grid-cols-12 -mx-2 sm:-mx-4 py-6 lg:py-8 lg:gap-4">
+            <ol className="grid grid-cols-12 -mx-2 sm:-mx-4 py-6 lg:py-6 lg:gap-4">
               {blogs?.length ? (
                 blogs?.map((blog: PostTypes, idx: number) => (
                   <div
-                    className="col-span-12 mb-4 md:col-span-12 lg:col-span-6 xl:col-span-4"
+                    className="col-span-12 mb-4 md:col-span-12 lg:col-span-6 xl:col-span-4 h-full"
                     key={idx}
                   >
                     <BlogListItem post={blog} />

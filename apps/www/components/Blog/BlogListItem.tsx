@@ -27,7 +27,7 @@ const BlogListItem = ({ post }: Props) => {
   return (
     <Link
       href={post.path}
-      className="group inline-block min-w-full p-2 sm:p-4 border border-transparent hover:border-overlay transition-all hover:bg-overlay rounded-lg"
+      className="group inline-block min-w-full p-2 sm:p-4 h-full border border-transparent hover:border-overlay transition-all hover:bg-overlay rounded-lg"
     >
       <div className="flex flex-col space-y-2">
         <div className="flex flex-col space-y-1">
@@ -58,7 +58,7 @@ const BlogListItem = ({ post }: Props) => {
             </div>
           )}
           <h3 className="text-foreground max-w-sm text-xl">{post.title}</h3>
-          <p className="text-foreground-light max-w-sm text-base">{post.description}</p>
+          <p className="text-foreground-light max-w-sm text-base !mb-0">{post.description}</p>
         </div>
         {/* <div className="flex items-center -space-x-2">
           {author.map((author: any, i: number) => {

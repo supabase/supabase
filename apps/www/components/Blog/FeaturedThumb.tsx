@@ -37,7 +37,7 @@ function FeaturedThumb(blog: PostTypes) {
           </div>
 
           <div>
-            <h2 className="h2 !mb-2">{blog.title}</h2>
+            <h2 className="h2 !text-2xl !mb-2">{blog.title}</h2>
             <p className="p xl:text-lg">{blog.description}</p>
           </div>
 
