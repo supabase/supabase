@@ -52,15 +52,14 @@ const VercelIntegrationConnectionForm = ({
     },
   })
 
-  const { mutate: updateVercelConnection, isLoading: isUpdatingVercelConnection } =
-    useVercelConnectionUpdateMutation({
-      onSuccess: (data) => {
-        ui.setNotification({
-          category: 'success',
-          message: `Updated Supabase directory`,
-        })
-      },
-    })
+  const { mutate: updateVercelConnection } = useVercelConnectionUpdateMutation({
+    onSuccess: (data) => {
+      ui.setNotification({
+        category: 'success',
+        message: `Updated Supabase directory`,
+      })
+    },
+  })
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     /**
@@ -93,7 +92,7 @@ const VercelIntegrationConnectionForm = ({
   return (
     <Form_Shadcn_ {...form}>
       <div className="py-4 px-8">
-        <Alert_Shadcn_ variant="default" className="">
+        <Alert_Shadcn_ variant="default">
           <IconClock className="h-4 w-4" strokeWidth={2} />
           <AlertTitle_Shadcn_>Vercel Connection configuration coming soon</AlertTitle_Shadcn_>
           <AlertDescription_Shadcn_>
@@ -116,7 +115,7 @@ const VercelIntegrationConnectionForm = ({
               name="environmentVariablesProduction"
               render={({ field }) => (
                 <FormItem_Shadcn_ className="flex flex-row items-center justify-between">
-                  <div className="">
+                  <div>
                     <FormLabel_Shadcn_ className="!text">
                       Sync environment variables for Vercel Production deployments
                     </FormLabel_Shadcn_>
@@ -143,7 +142,7 @@ const VercelIntegrationConnectionForm = ({
               name="authRedirectUrisProduction"
               render={({ field }) => (
                 <FormItem_Shadcn_ className="flex flex-row items-center justify-between">
-                  <div className="">
+                  <div>
                     <FormLabel_Shadcn_ className="!text">
                       Auto update Auth Redirect URIs for Vercel Production Deployments
                     </FormLabel_Shadcn_>
@@ -173,7 +172,7 @@ const VercelIntegrationConnectionForm = ({
               name="environmentVariablesPreview"
               render={({ field }) => (
                 <FormItem_Shadcn_ className="flex flex-row items-center justify-between">
-                  <div className="">
+                  <div>
                     <FormLabel_Shadcn_ className="!text">
                       Sync environment variables for Vercel Preview Deployments
                     </FormLabel_Shadcn_>
@@ -200,7 +199,7 @@ const VercelIntegrationConnectionForm = ({
               name="authRedirectUrisPreview"
               render={({ field }) => (
                 <FormItem_Shadcn_ className="flex flex-row items-center justify-between">
-                  <div className="">
+                  <div>
                     <FormLabel_Shadcn_ className="!text">
                       Auto update Auth Redirect URIs for Vercel Preview Deployments
                     </FormLabel_Shadcn_>

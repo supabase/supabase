@@ -16,9 +16,7 @@ const CTABanner = dynamic(() => import('components/CTABanner/index'))
 const CustomerStories = dynamic(() => import('components/CustomerStories'))
 const TwitterSocialSection = dynamic(() => import('~/components/TwitterSocialSection'))
 
-type Props = { customerStories: PostTypes[]; blogPosts: PostTypes[] }
-
-const Index = ({ customerStories }: Props) => {
+const Index = () => {
   return (
     <Layout>
       <Hero />
@@ -27,20 +25,10 @@ const Index = ({ customerStories }: Props) => {
       <BuiltExamples />
       <MadeForDevelopers />
       <AdminAccess />
-      <CustomerStories customerStories={customerStories} />
+      <CustomerStories />
       <CTABanner />
     </Layout>
   )
-}
-
-export async function getStaticProps() {
-  const customerStories = getSortedPosts({ directory: '_customers', limit: 3 })
-
-  return {
-    props: {
-      customerStories,
-    },
-  }
 }
 
 export default Index

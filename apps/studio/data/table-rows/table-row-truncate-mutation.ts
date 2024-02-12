@@ -4,14 +4,12 @@ import { toast } from 'react-hot-toast'
 import { Query, SupaTable } from 'components/grid'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
-import { ImpersonationRole, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { ResponseError } from 'types'
 
 export type TableRowTruncateVariables = {
   projectRef: string
   connectionString?: string
   table: SupaTable
-  impersonatedRole?: ImpersonationRole
 }
 
 export function getTableRowTruncateSql({ table }: Pick<TableRowTruncateVariables, 'table'>) {
@@ -24,14 +22,14 @@ export async function truncateTableRow({
   projectRef,
   connectionString,
   table,
-  impersonatedRole,
 }: TableRowTruncateVariables) {
-  const sql = wrapWithRoleImpersonation(getTableRowTruncateSql({ table }), {
-    projectRef,
-    role: impersonatedRole,
-  })
+  const sql = getTableRowTruncateSql({ table })
 
-  const { result } = await executeSql({ projectRef, connectionString, sql })
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+  })
 
   return result
 }

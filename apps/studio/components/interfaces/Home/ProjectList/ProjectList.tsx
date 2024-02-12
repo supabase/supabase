@@ -11,12 +11,12 @@ import {
 } from 'data/invoices/invoices-overdue-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
+import { ProjectInfo, useProjectsQuery } from 'data/projects/projects-query'
 import { ResourceWarning, useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useSelectedOrganization } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { makeRandomString } from 'lib/helpers'
-import { Organization, Project, ResponseError } from 'types'
+import { Organization, ResponseError } from 'types'
 import ProjectCard from './ProjectCard'
 import ShimmeringCard from './ShimmeringCard'
 
@@ -83,7 +83,7 @@ export default observer(ProjectList)
 
 type OrganizationProjectsProps = {
   organization: Organization
-  projects: Project[]
+  projects: ProjectInfo[]
   overdueInvoices: OverdueInvoicesResponse[]
   resourceWarnings: ResourceWarning[]
   isLoadingPermissions: boolean

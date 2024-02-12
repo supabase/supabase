@@ -7,6 +7,7 @@
   "private": true,
   "workspaces": [
     "apps/*",
+    "apps/docs/spec/parser",
     "tests",
     "packages/*"
   ],
@@ -34,13 +35,13 @@
     "generate:types": "supabase gen types typescript --local > ./supabase/functions/common/database-types.ts"
   },
   "devDependencies": {
-    "eslint": "^8.45.0",
+    "eslint": "^8.56.0",
     "eslint-config-custom": "*",
-    "prettier": "^2.8.8",
-    "prettier-plugin-sql-cst": "^0.5.0",
-    "sass": "^1.68.0",
-    "supabase": "^1.45.2",
-    "turbo": "^1.10.16"
+    "prettier": "^4.0.0-alpha.8",
+    "prettier-plugin-sql-cst": "^0.11.0",
+    "sass": "^1.70.0",
+    "supabase": "^1.142.1",
+    "turbo": "^1.12.3"
   },
   "repository": {
     "type": "git",

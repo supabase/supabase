@@ -14,20 +14,26 @@ import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import {
   Alert,
   AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
+  IconAlertCircle,
   IconAlertTriangle,
   IconExternalLink,
   Radio,
   SidePanel,
 } from 'ui'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { AddonVariantId } from 'data/subscriptions/types'
+import { formatCurrency } from 'lib/helpers'
+import { useFlag } from 'hooks'
 
 const CustomDomainSidePanel = () => {
   const { ui } = useStore()
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const organization = useSelectedOrganization()
+  const customDomainsDisabledDueToQuota = useFlag('customDomainsDisabledDueToQuota')
 
   const [selectedOption, setSelectedOption] = useState<string>('cd_none')
 
@@ -39,7 +45,10 @@ const CustomDomainSidePanel = () => {
   const snap = useSubscriptionPageStateSnapshot()
   const visible = snap.panelKey === 'customDomain'
   const onClose = () => {
-    router.push(router.asPath.split('?')[0], undefined, { shallow: true })
+    const { panel, ...queryWithoutPanel } = router.query
+    router.push({ pathname: router.pathname, query: queryWithoutPanel }, undefined, {
+      shallow: true,
+    })
     snap.setPanelKey(undefined)
   }
 
@@ -118,7 +127,7 @@ const CustomDomainSidePanel = () => {
     if (selectedOption === 'cd_none' && subscriptionCDOption !== undefined) {
       removeAddon({ projectRef, variant: subscriptionCDOption.variant.identifier })
     } else {
-      updateAddon({ projectRef, type: 'custom_domain', variant: selectedOption })
+      updateAddon({ projectRef, type: 'custom_domain', variant: selectedOption as AddonVariantId })
     }
   }
 
@@ -129,13 +138,21 @@ const CustomDomainSidePanel = () => {
       onCancel={onClose}
       onConfirm={onConfirm}
       loading={isLoading || isSubmitting}
-      disabled={isFreePlan || isLoading || !hasChanges || isSubmitting || !canUpdateCustomDomain}
+      disabled={
+        isFreePlan ||
+        isLoading ||
+        !hasChanges ||
+        isSubmitting ||
+        !canUpdateCustomDomain ||
+        // Allow disabling, but do not allow opting in
+        (subscriptionCDOption === undefined && customDomainsDisabledDueToQuota)
+      }
       tooltip={
         isFreePlan
           ? 'Unable to enable custom domain on a free plan'
           : !canUpdateCustomDomain
-          ? 'You do not have permission to update custom domain'
-          : undefined
+            ? 'You do not have permission to update custom domain'
+            : undefined
       }
       header={
         <div className="flex items-center justify-between">
@@ -154,6 +171,20 @@ const CustomDomainSidePanel = () => {
     >
       <SidePanel.Content>
         <div className="py-6 space-y-4">
+          {subscriptionCDOption === undefined &&
+            selectedCustomDomain !== undefined &&
+            customDomainsDisabledDueToQuota && (
+              <Alert_Shadcn_ variant="default" className="mb-2">
+                <IconAlertCircle className="h-4 w-4" />
+                <AlertTitle_Shadcn_>
+                  Adding new custom domains temporarily disabled
+                </AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+                  We are working with our upstream DNS provider before we are able to sign up new
+                  custom domains. Please check back in a few hours.
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
+            )}
           <p className="text-sm">
             Custom domains allow you to present a branded experience to your users. You may set up
             your custom domain in the{' '}
@@ -226,7 +257,7 @@ const CustomDomainSidePanel = () => {
                         Present a branded experience to your users
                       </p>
                       <div className="flex items-center space-x-1 mt-2">
-                        <p className="text-foreground text-sm">${option.price}</p>
+                        <p className="text-foreground text-sm">{formatCurrency(option.price)}</p>
                         <p className="text-foreground-light translate-y-[1px]"> / month</p>
                       </div>
                     </div>
@@ -240,19 +271,32 @@ const CustomDomainSidePanel = () => {
             <>
               {selectedOption === 'cd_none' ||
               (selectedCustomDomain?.price ?? 0) < (subscriptionCDOption?.variant.price ?? 0) ? (
-                <p className="text-sm text-foreground-light">
-                  Upon clicking confirm, the amount of that's unused during the current billing
-                  cycle will be returned as credits that can be used for subsequent billing cycles
-                </p>
+                subscription?.billing_via_partner === false && (
+                  <p className="text-sm text-foreground-light">
+                    Upon clicking confirm, the add-on is removed immediately and any unused time in
+                    the current billing cycle is added as prorated credits to your organization and
+                    used in subsequent billing cycles.
+                  </p>
+                )
               ) : (
                 <p className="text-sm text-foreground-light">
                   Upon clicking confirm, the amount of{' '}
                   <span className="text-foreground">
-                    ${selectedCustomDomain?.price.toLocaleString()}
+                    {formatCurrency(selectedCustomDomain?.price)}
                   </span>{' '}
-                  will be added to your monthly invoice. You're immediately charged for the
-                  remaining days of your billing cycle. The addon is prepaid per month and in case
-                  of a downgrade, you get credits for the remaining time.
+                  will be added to your monthly invoice.{' '}
+                  {subscription?.billing_via_partner ? (
+                    <>
+                      For the current billing cycle you'll be charged a prorated amount at the end
+                      of the cycle.{' '}
+                    </>
+                  ) : (
+                    <>
+                      The addon is prepaid per month and in case of a downgrade, you get credits for
+                      the remaining time. For the current billing cycle you're immediately charged a
+                      prorated amount for the remaining days.
+                    </>
+                  )}
                 </p>
               )}
 

@@ -127,7 +127,7 @@ const DocView = observer(() => {
             autoApiService={autoApiService}
           />
         </div>
-        <div className="">
+        <div>
           {resource ? (
             <ResourceContent
               autoApiService={autoApiService}

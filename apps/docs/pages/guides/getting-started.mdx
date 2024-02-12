@@ -1,6 +1,8 @@
 import Layout from '~/layouts/DefaultLayout'
 import Link from 'next/link'
-import { GlassPanel, IconPanel, Button, IconChevronRight } from 'ui'
+import { Button, IconChevronRight } from 'ui'
+import { GlassPanel } from 'ui-patterns/GlassPanel'
+import { IconPanel } from 'ui-patterns/IconPanel'
 
 export const meta = {
   id: 'getting-started',
@@ -35,7 +37,7 @@ export const meta = {
 
 </div>
 
-### Use Cases
+### Use cases
 
 <div className="grid lg:grid-cols-12 gap-6 not-prose">
   {useCases.map((item) => {
@@ -55,7 +57,7 @@ export const meta = {
   })}
 </div>
 
-### Framework Quickstarts
+### Framework quickstarts
 
 <div className="grid lg:grid-cols-12 gap-6 not-prose">
   {quickstarts.map((item) => {
@@ -75,7 +77,7 @@ export const meta = {
   })}
 </div>
 
-### Web App Tutorials
+### Web app tutorials
 
 <div className="grid lg:grid-cols-12 gap-6 not-prose">
   {webapps.map((item) => {
@@ -97,7 +99,7 @@ export const meta = {
 
 </div>
 
-### Mobile Tutorials
+### Mobile tutorials
 
 <div className="grid lg:grid-cols-12 gap-6 not-prose">
   {mobile.map((item) => {
@@ -122,7 +124,7 @@ export const meta = {
 export const useCases = [
   {
     title: 'AI, Vectors, and embeddings',
-    href: '/docs/guides/ai#examples',
+    href: '/guides/ai#examples',
     description: `Build AI-enabled applications using our Vector toolkit.`,
     icon: '/docs/img/icons/openai_logo',
     hasLightIcon: true,
@@ -304,6 +306,13 @@ export const mobile = [
     description:
       'Learn how to build a product management app with Android and Supabase Database, Auth, and Storage functionality.',
     icon: '/docs/img/icons/kotlin-icon',
+  },
+  {
+    title: 'iOS Swift',
+    href: '/guides/getting-started/tutorials/with-swift',
+    description:
+      'Learn how to build a user management app with iOS and Supabase Database, Auth, and Storage functionality.',
+    icon: '/docs/img/icons/swift-icon',
   },
   {
     title: 'Ionic React',

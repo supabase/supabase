@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { NextPageWithLayout } from 'types'
 import { SQLEditorLayout } from 'components/layouts'
-import { SQLTemplates } from 'components/interfaces/SQLEditor'
+import SQLTemplates from 'components/interfaces/SQLEditor/SQLTemplates/SQLTemplates'
 
 const SqlEditorWelcome: NextPageWithLayout = () => {
   return <SQLTemplates />

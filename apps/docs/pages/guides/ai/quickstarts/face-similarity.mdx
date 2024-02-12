@@ -1,5 +1,5 @@
+import { Admonition } from 'ui'
 import Layout from '~/layouts/DefaultGuideLayout'
-
 export const meta = {
   id: 'ai-vecs-python-client',
   title: 'Face similarity search',
@@ -43,7 +43,19 @@ DB_CONNECTION = "postgresql://<user>:<password>@<host>:<port>/<db_name>"
 vx = vecs.create_client(DB_CONNECTION)
 ```
 
-Replace the `DB_CONNECTION` with your own connection string for your database, which you set up in first step of this guide.
+Replace the `DB_CONNECTION` with your own connection string for your database. You can find the Postgres connection string in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database) of your Supabase project.
+
+<Admonition type='note'>
+
+SQLAlchemy requires the connection string to start with `postgresql://` (instead of `postgres://`). Don't forget to rename this after copying the string from the dashboard.
+
+</Admonition>
+
+<Admonition type='note'>
+
+You must use the "connection pooling" string (domain ending in `*.pooler.supabase.com`) with Google Colab since Colab does not support IPv6.
+
+</Admonition>
 
 ## Stepping through the notebook
 

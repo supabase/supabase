@@ -1,24 +1,27 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { PostgresRole } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { partition } from 'lodash'
-import { observer } from 'mobx-react-lite'
-import { useEffect, useState } from 'react'
+import { partition, sortBy } from 'lodash'
+import { useState } from 'react'
 import { Badge, Button, IconPlus, IconSearch, IconX, Input } from 'ui'
 
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormHeader } from 'components/ui/Forms'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import SparkBar from 'components/ui/SparkBar'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
+import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
+import { useCheckPermissions } from 'hooks'
 import CreateRolePanel from './CreateRolePanel'
 import DeleteRoleModal from './DeleteRoleModal'
 import RoleRow from './RoleRow'
+import RoleRowSkeleton from './RoleRowSkeleton'
 import { SUPABASE_ROLES } from './Roles.constants'
 
-const RolesList = ({}) => {
-  const { meta } = useStore()
+type SUPABASE_ROLE = (typeof SUPABASE_ROLES)[number]
 
-  const [maxConnectionLimit, setMaxConnectionLimit] = useState(0)
+const RolesList = () => {
+  const { project } = useProjectContext()
+
   const [filterString, setFilterString] = useState('')
   const [filterType, setFilterType] = useState<'all' | 'active'>('all')
   const [isCreatingRole, setIsCreatingRole] = useState(false)
@@ -26,32 +29,33 @@ const RolesList = ({}) => {
 
   const canUpdateRoles = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'roles')
 
-  useEffect(() => {
-    const getMaxConnectionLimit = async () => {
-      const res = await meta.query('show max_connections')
-      if (!res.error) {
-        setMaxConnectionLimit(Number(res[0]?.max_connections ?? 0))
-      }
-    }
-    getMaxConnectionLimit()
-  }, [])
+  const { data: maxConnData } = useMaxConnectionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const maxConnectionLimit = maxConnData?.maxConnections
 
-  const roles = meta.roles.list()
+  const { data, isLoading } = useDatabaseRolesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const roles = sortBy(data ?? [], (r) => r.name.toLocaleLowerCase())
+
   const filteredRoles = (
-    filterType === 'active'
-      ? meta.roles.list((role: PostgresRole) => role.active_connections > 0)
-      : meta.roles.list()
-  ).filter((role: PostgresRole) => role.name.includes(filterString))
-  const [supabaseRoles, otherRoles] = partition(filteredRoles, (role: PostgresRole) =>
-    SUPABASE_ROLES.includes(role.name)
+    filterType === 'active' ? roles.filter((role) => role.active_connections > 0) : roles
+  ).filter((role) => role.name.includes(filterString))
+  const [supabaseRoles, otherRoles] = partition(filteredRoles, (role) =>
+    SUPABASE_ROLES.includes(role.name as SUPABASE_ROLE)
   )
 
   const totalActiveConnections = roles
-    .map((role: PostgresRole) => role.active_connections)
+    .map((role) => role.active_connections)
     .reduce((a, b) => a + b, 0)
-  const rolesWithActiveConnections = roles
-    .filter((role: PostgresRole) => role.active_connections > 0)
-    .sort((a, b) => b.active_connections - a.active_connections)
+  // order the roles with active connections by number of connections, most connections first
+  const rolesWithActiveConnections = sortBy(
+    roles.filter((role) => role.active_connections > 0),
+    (r) => -r.active_connections
+  )
 
   return (
     <>
@@ -116,18 +120,24 @@ const RolesList = ({}) => {
                 <div className="w-42">
                   <SparkBar
                     type="horizontal"
-                    max={maxConnectionLimit}
+                    // if the maxConnectionLimit is undefined, set totalActiveConnections so that
+                    // the width of the bar is set to 100%
+                    max={maxConnectionLimit || totalActiveConnections}
                     value={totalActiveConnections}
                     barClass={
-                      maxConnectionLimit === 0
+                      maxConnectionLimit === 0 || maxConnectionLimit === undefined
                         ? 'bg-control'
                         : totalActiveConnections > 0.9 * maxConnectionLimit
-                        ? 'bg-red-800'
-                        : totalActiveConnections > 0.75 * maxConnectionLimit
-                        ? 'bg-amber-900'
-                        : 'bg-green-800'
+                          ? 'bg-red-800'
+                          : totalActiveConnections > 0.75 * maxConnectionLimit
+                            ? 'bg-amber-900'
+                            : 'bg-green-800'
                     }
-                    labelTop={`${totalActiveConnections}/${maxConnectionLimit}`}
+                    labelTop={
+                      Number.isInteger(maxConnectionLimit)
+                        ? `${totalActiveConnections}/${maxConnectionLimit}`
+                        : `${totalActiveConnections}`
+                    }
                     labelBottom="Active connections"
                   />
                 </div>
@@ -141,7 +151,7 @@ const RolesList = ({}) => {
                   ].join(' ')}
                 >
                   <p className="text-xs text-foreground-light pr-2">Connections by roles:</p>
-                  {rolesWithActiveConnections.map((role: PostgresRole) => (
+                  {rolesWithActiveConnections.map((role) => (
                     <div key={role.id} className="text-xs text-foreground">
                       {role.name}: {role.active_connections}
                     </div>
@@ -179,36 +189,38 @@ const RolesList = ({}) => {
 
         <div className="space-y-4">
           <div>
-            {supabaseRoles.length > 0 && (
-              <div className="bg-surface-100 border border-default px-6 py-3 rounded-t flex items-center space-x-4">
-                <p className="text-sm text-foreground-light">Roles managed by Supabase</p>
-                <Badge color="green">Protected</Badge>
-              </div>
-            )}
-            {supabaseRoles.map((role: PostgresRole, i: number) => (
-              <RoleRow
-                disabled
-                key={role.id}
-                role={role}
-                onSelectDelete={setSelectedRoleToDelete}
-              />
-            ))}
+            <div className="bg-surface-100 border border-default px-6 py-3 rounded-t flex items-center space-x-4">
+              <p className="text-sm text-foreground-light">Roles managed by Supabase</p>
+              <Badge color="green">Protected</Badge>
+            </div>
+
+            {isLoading
+              ? Array.from({ length: 5 }).map((_, i) => <RoleRowSkeleton key={i} index={i} />)
+              : supabaseRoles.map((role, i: number) => (
+                  <RoleRow
+                    disabled
+                    key={role.id}
+                    role={role}
+                    onSelectDelete={setSelectedRoleToDelete}
+                  />
+                ))}
           </div>
 
           <div>
-            {otherRoles.length > 0 && (
-              <div className="bg-surface-100 border border-default px-6 py-3 rounded-t">
-                <p className="text-sm text-foreground-light">Other database roles</p>
-              </div>
-            )}
-            {otherRoles.map((role: PostgresRole, i: number) => (
-              <RoleRow
-                key={role.id}
-                disabled={!canUpdateRoles}
-                role={role}
-                onSelectDelete={setSelectedRoleToDelete}
-              />
-            ))}
+            <div className="bg-surface-100 border border-default px-6 py-3 rounded-t">
+              <p className="text-sm text-foreground-light">Other database roles</p>
+            </div>
+
+            {isLoading
+              ? Array.from({ length: 3 }).map((_, i) => <RoleRowSkeleton key={i} index={i} />)
+              : otherRoles.map((role, i: number) => (
+                  <RoleRow
+                    key={role.id}
+                    disabled={!canUpdateRoles}
+                    role={role}
+                    onSelectDelete={setSelectedRoleToDelete}
+                  />
+                ))}
           </div>
         </div>
 
@@ -228,4 +240,4 @@ const RolesList = ({}) => {
   )
 }
 
-export default observer(RolesList)
+export default RolesList

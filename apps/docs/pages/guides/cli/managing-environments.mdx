@@ -11,7 +11,13 @@ export const meta = {
 
 This guide shows you how to set up your local Supabase development environment that integrates with GitHub Actions to automatically test and release schema changes to staging and production Supabase projects.
 
-![Deploy migration](/docs/img/guides/cli/cicd-github.png)
+<Image
+  alt="Diagram showing a possible environment setup for Supabase development. There are 3 branches and 3 corresponding databases: feature branch and local database, develop branch and staging database, and main branch and production database."
+  src={{
+    light: '/docs/img/local-dev-environment--light.svg',
+    dark: '/docs/img/local-dev-environment.svg',
+  }}
+/>
 
 ## Set up a local environment
 
@@ -153,7 +159,13 @@ Without the `-f` file flag, the output is written to stdout by default.
 
 In a production environment, we recommend using a CI/CD pipeline to deploy new migrations with GitHub Actions rather than deploying from your local machine.
 
-![Deploy migration](/docs/img/guides/cli/cicd-github.png)
+<Image
+  alt="Diagram showing a possible environment setup for Supabase development. There are 3 branches and 3 corresponding databases: feature branch and local database, develop branch and staging database, and main branch and production database."
+  src={{
+    light: '/docs/img/local-dev-environment--light.svg',
+    dark: '/docs/img/local-dev-environment.svg',
+  }}
+/>
 
 This example uses two Supabase projects, one for production and one for staging.
 
@@ -213,7 +225,7 @@ jobs:
       - name: Verify generated types are checked in
         run: |
           supabase gen types typescript --local > types.gen.ts
-          if git diff --ignore-space-at-eol --exit-code --quiet types.gen.ts; then
+          if ! git diff --ignore-space-at-eol --exit-code --quiet types.gen.ts; then
             echo "Detected uncommitted changes after build. See status below:"
             git diff
             exit 1
@@ -383,7 +395,7 @@ One way to solve this is to reassign the owner of those tables to `postgres` rol
 ALTER TABLE users OWNER TO postgres;
 ```
 
-Apart from tables, you also need to reassign owner of other entities using their respective commands, including [types](https://www.postgresql.org/docs/current/sql-alterschema.html), [functions](https://www.postgresql.org/docs/current/sql-alterroutine.html), and [schemas](https://www.postgresql.org/docs/current/sql-altertype.html).
+Apart from tables, you also need to reassign owner of other entities using their respective commands, including [types](https://www.postgresql.org/docs/current/sql-altertype.html), [functions](https://www.postgresql.org/docs/current/sql-alterroutine.html), and [schemas](https://www.postgresql.org/docs/current/sql-alterschema.html).
 
 ### Rebasing new migrations
 

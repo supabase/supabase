@@ -1,36 +1,24 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
+import { Message } from 'ai/react'
 import { uuidv4 } from 'lib/helpers'
-import { ThreadMessage } from 'openai/resources/beta/threads/messages/messages'
+
+export type MessageWithDebug = Message & { isDebug: boolean }
 
 export const generateThreadMessage = ({
   id,
-  threadId,
-  runId,
   content,
-  metadata = {},
+  isDebug,
 }: {
   id?: string
-  threadId?: string
-  runId?: string
   content: string
-  metadata?: any
+  isDebug: boolean
 }) => {
-  const message: ThreadMessage = {
+  const message: MessageWithDebug = {
     id: id ?? uuidv4(),
-    object: 'thread.message',
     role: 'assistant',
-    file_ids: [],
-    metadata,
-    content: [
-      {
-        type: 'text',
-        text: { value: content, annotations: [] },
-      },
-    ],
-    created_at: Math.floor(Number(new Date()) / 1000),
-    assistant_id: null,
-    thread_id: threadId ?? '',
-    run_id: runId ?? '',
+    content,
+    createdAt: new Date(),
+    isDebug: isDebug,
   }
   return message
 }
@@ -38,6 +26,8 @@ export const generateThreadMessage = ({
 export const generatePlaceholder = (policy?: PostgresPolicy) => {
   if (policy === undefined) {
     return `
+-- Press tab to use this code\n
+&nbsp;\n
 CREATE POLICY *name* ON *table_name*\n
 AS PERMISSIVE -- PERMISSIVE | RESTRICTIVE\n
 FOR ALL -- ALL | SELECT | INSERT | UPDATE | DELETE\n
@@ -57,6 +47,8 @@ WITH CHECK ( *check_expression* );
     }
 
     return `
+-- Press tab to use this code\n
+&nbsp;\n
 BEGIN;\n
 &nbsp;\n
 -- To update your policy definition\n

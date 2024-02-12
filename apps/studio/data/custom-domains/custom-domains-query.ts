@@ -1,21 +1,13 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { get } from 'lib/common/fetch'
-import { API_ADMIN_URL, IS_PLATFORM } from 'lib/constants'
+import { get } from 'data/fetchers'
+import { IS_PLATFORM } from 'lib/constants'
+import { ResponseError } from 'types'
 import { customDomainKeys } from './keys'
 
 export type CustomDomainsVariables = {
   projectRef?: string
 }
-
-type CustomDomainStatus =
-  | '0_not_allowed'
-  | '0_no_hostname_configured'
-  | '1_not_started'
-  | '2_initiated'
-  | '3_challenge_verified'
-  | '4_origin_setup_completed'
-  | '5_services_reconfigured'
 
 type Settings = {
   http2: string
@@ -76,28 +68,22 @@ export async function getCustomDomains(
     throw new Error('projectRef is required')
   }
 
-  const response = (await get(`${API_ADMIN_URL}/projects/${projectRef}/custom-hostname`, {
+  const { data, error: _error } = await get('/v1/projects/{ref}/custom-hostname', {
+    params: {
+      path: {
+        ref: projectRef,
+      },
+    },
     signal,
-  })) as {
-    data: {
-      errors: any[]
-      result: CustomDomainResponse
-      success: boolean
-      messages: any[]
-    }
-    status: CustomDomainStatus
-    error: unknown
-  }
+  })
 
-  if (response.error) {
+  if (_error) {
+    const error = _error as ResponseError
     // not allowed error and no hostname configured error are
     // valid steps in the process of setting up a custom domain
     // so we convert them to data instead of errors
 
-    const isNotAllowedError =
-      (response.error as any)?.code === 400 &&
-      (response.error as any)?.message?.includes('not allowed to set up custom domain')
-
+    const isNotAllowedError = error.message?.includes('not allowed to set up custom domain')
     if (isNotAllowedError) {
       return {
         customDomain: null,
@@ -105,10 +91,7 @@ export async function getCustomDomains(
       } as const
     }
 
-    const isNoHostnameConfiguredError =
-      (response.error as any)?.code === 400 &&
-      (response.error as any)?.message?.includes('custom hostname configuration')
-
+    const isNoHostnameConfiguredError = error.message?.includes('custom hostname configuration')
     if (isNoHostnameConfiguredError) {
       return {
         customDomain: null,
@@ -116,14 +99,14 @@ export async function getCustomDomains(
       } as const
     }
 
-    throw response.error
+    throw error
   }
 
-  return { customDomain: response?.data?.result, status: response.status }
+  return { customDomain: data.data.result as CustomDomainResponse, status: data.status }
 }
 
 export type CustomDomainsData = Awaited<ReturnType<typeof getCustomDomains>>
-export type CustomDomainsError = unknown
+export type CustomDomainsError = ResponseError
 
 export const useCustomDomainsQuery = <TData = CustomDomainsData>(
   { projectRef }: CustomDomainsVariables,

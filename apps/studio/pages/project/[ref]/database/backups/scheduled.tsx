@@ -1,7 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { IconInfo, Tabs } from 'ui'
 
 import { BackupsList } from 'components/interfaces/Database'
 import { DatabaseLayout } from 'components/layouts'
@@ -12,13 +10,14 @@ import InformationBox from 'components/ui/InformationBox'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBackupsQuery } from 'data/database/backups-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
 import { NextPageWithLayout } from 'types'
+import { IconInfo, Tabs } from 'ui'
+import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseBackupsNav'
 
 const DatabaseScheduledBackups: NextPageWithLayout = () => {
-  const router = useRouter()
   const { project } = useProjectContext()
-  const ref = project?.ref
+  const ref = project?.ref || 'default'
 
   const {
     data: backups,
@@ -30,6 +29,7 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
 
   const isPitrEnabled = backups?.pitr_enabled
   const canReadScheduledBackups = useCheckPermissions(PermissionAction.READ, 'back_ups')
+  const isPermissionsLoaded = usePermissionsLoaded()
 
   return (
     <ScaffoldContainer>
@@ -38,19 +38,8 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
           <div className="space-y-6">
             <h3 className="text-xl text-foreground">Database Backups</h3>
 
-            <Tabs
-              type="underlined"
-              size="small"
-              activeId="scheduled"
-              onChange={(id: any) => {
-                if (id === 'pitr') router.push(`/project/${ref}/database/backups/pitr`)
-              }}
-            >
-              <Tabs.Panel id="scheduled" label="Scheduled backups" />
-              <Tabs.Panel id="pitr" label="Point in Time" />
-            </Tabs>
-
-            <div className="space-y-4">
+            <DatabaseBackupsNav active="scheduled" projRef={ref} />
+            <div className="space-y-8">
               {isLoading && <GenericSkeletonLoader />}
 
               {isError && (
@@ -88,10 +77,10 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
                     />
                   )}
 
-                  {canReadScheduledBackups ? (
-                    <BackupsList />
-                  ) : (
+                  {isPermissionsLoaded && !canReadScheduledBackups ? (
                     <NoPermission resourceText="view scheduled backups" />
+                  ) : (
+                    <BackupsList />
                   )}
                 </>
               )}
@@ -107,4 +96,4 @@ DatabaseScheduledBackups.getLayout = (page) => (
   <DatabaseLayout title="Database">{page}</DatabaseLayout>
 )
 
-export default observer(DatabaseScheduledBackups)
+export default DatabaseScheduledBackups

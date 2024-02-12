@@ -1,9 +1,11 @@
 import { MDXProvider } from '@mdx-js/react'
 import { NextSeo } from 'next-seo'
 import Head from 'next/head'
+import { usePathname } from 'next/navigation'
 import { useRouter } from 'next/router'
 import { FC, useEffect, useRef, useState } from 'react'
-import { ExpandableVideo, IconExternalLink } from 'ui'
+import { IconExternalLink } from 'ui'
+import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
 import components from '~/components'
 import { highlightSelectedTocItem } from '~/components/CustomHTMLElements/CustomHTMLElements.utils'
 import { FooterHelpCalloutType } from '~/components/FooterHelpCallout'
@@ -23,6 +25,7 @@ interface Props {
     tocVideo?: string
     canonical?: string
   }
+  editLink?: string
   children: any
   toc?: any
   currentPage?: string
@@ -30,6 +33,7 @@ interface Props {
 }
 
 const Layout: FC<Props> = (props) => {
+  const pathname = usePathname()
   const [hash] = useHash()
 
   const articleRef = useRef()
@@ -60,7 +64,7 @@ const Layout: FC<Props> = (props) => {
         return { text, link, level }
       })
     setTocList(newHeadings)
-  }, [])
+  }, [pathname]) // Needed to recalculate the ToC when the page changes
 
   const hasTableOfContents = tocList.length > 0
   const tocVideoPreview = `http://img.youtube.com/vi/${props.meta.tocVideo}/0.jpg`
@@ -136,8 +140,12 @@ const Layout: FC<Props> = (props) => {
                 <div className="mt-16 not-prose">
                   <div>
                     <a
-                      href={`https://github.com/supabase/supabase/edit/master/apps/docs/pages${router.asPath}.mdx`}
-                      className="text-sm transition flex items-center gap-1 text-foreground-lighter hover:text-foreground w-fit"
+                      href={`https://github.com/${
+                        props.editLink ||
+                        `supabase/supabase/edit/master/apps/docs/pages${router.asPath}.mdx`
+                      }
+                    `}
+                      className="text-sm transition flex items-center gap-1 text-scale-1000 hover:text-scale-1200 w-fit"
                     >
                       Edit this page on GitHub <IconExternalLink size={14} strokeWidth={1.5} />
                     </a>

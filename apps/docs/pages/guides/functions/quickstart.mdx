@@ -5,7 +5,7 @@ export const meta = {
   title: 'Developing Edge Functions locally',
   description: 'Get started with Edge Functions on your local machine.',
   subtitle: 'Get started with Edge Functions on your local machine.',
-  tocVideo: 'rzglqRdZUQE',
+  tocVideo: '5OWH9c4u68M',
 }
 
 Let's create a basic Edge Function on your local machine and then invoke it using the Supabase CLI.
@@ -21,6 +21,12 @@ supabase init
 <Admonition type="tip" label="CLI not installed?">
 
 Check out the [CLI Docs](/docs/guides/cli) to learn how to install the Supabase CLI on your local machine.
+
+</Admonition>
+
+<Admonition type="tip">
+
+If you're using VS code you can have the CLI automatically create helpful Deno settings when running `supabase init`. Simply select `y` when prompted "Generate VS Code settings for Deno? [y/N]"!
 
 </Admonition>
 
@@ -72,7 +78,8 @@ The `functions serve` command has hot-reloading capabilities. It will watch for 
 
 ## Invoking Edge Functions locally
 
-While serving your local Edge Function, you can invoke it using curl or one of the client libraries:
+While serving your local Edge Function, you can invoke it using curl or one of the client libraries.
+To call the function from a browser you need to handle CORS requests. See [CORS](/docs/guides/functions/cors).
 
 <CH.Code>
 
@@ -117,7 +124,7 @@ Read on for some common development tips.
 
 Here are a few recommendations when developing Edge Functions.
 
-### Skipping Authorization checks
+### Skipping authorization checks
 
 By default, Edge Functions require a valid JWT in the authorization header. If you want to use Edge Functions without Authorization checks (commonly used for Stripe webhooks), you can pass the `--no-verify-jwt` flag when serving your Edge Functions locally.
 
@@ -127,7 +134,7 @@ supabase functions serve hello-world --no-verify-jwt
 
 Be careful when using this flag, as it will allow anyone to invoke your Edge Function without a valid JWT. The Supabase client libraries automatically handle authorization.
 
-### Using HTTP Methods
+### Using HTTP methods
 
 Edge Functions support `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, and `OPTIONS`. A Function can be designed to perform different actions based on a request's HTTP method. See the [example on building a RESTful service](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/restful-tasks) to learn how to handle different HTTP methods in your Function.
 
@@ -175,7 +182,7 @@ verify_jwt = false
 import_map = './import_map.json'
 ```
 
-### Error Handling
+### Error handling
 
 The `supabase-js` library provides several error types that you can use to handle errors that might occur when invoking Edge Functions:
 

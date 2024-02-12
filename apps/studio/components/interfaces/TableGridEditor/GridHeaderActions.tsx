@@ -1,42 +1,64 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { MousePointer2 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
+import toast from 'react-hot-toast'
 import { Button, IconAlertCircle, IconLock, Modal } from 'ui'
 
 import { rlsAcknowledgedKey } from 'components/grid/constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import APIDocsButton from 'components/ui/APIDocsButton'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
-import { useCheckPermissions, useFlag, useIsFeatureEnabled, useStore } from 'hooks'
+import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
+import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
+import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
+import { useCheckPermissions, useIsFeatureEnabled } from 'hooks'
 import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 
 export interface GridHeaderActionsProps {
   table: PostgresTable
 }
 
 const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
+  const snap = useTableEditorStateSnapshot()
   const { ref } = useParams()
-  const { meta, ui } = useStore()
   const { project } = useProjectContext()
   const realtimeEnabled = useIsFeatureEnabled('realtime:all')
-  const roleImpersonationEnabledFlag = useFlag('roleImpersonation')
 
-  const [isTogglingRealtime, setIsTogglingRealtime] = useState(false)
   const [showEnableRealtime, setShowEnableRealtime] = useState(false)
 
   const projectRef = project?.ref
-  const publications = meta.publications.list()
-  const policies = meta.policies.list((policy: PostgresPolicy) => policy.table_id === table.id)
+  const { data } = useDatabasePoliciesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const policies = (data ?? []).filter(
+    (policy) => policy.schema === table.schema && policy.table === table.name
+  )
 
-  const realtimePublication = publications.find(
+  const { data: publications } = useDatabasePublicationsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const realtimePublication = (publications ?? []).find(
     (publication) => publication.name === 'supabase_realtime'
   )
   const realtimeEnabledTables = realtimePublication?.tables ?? []
   const isRealtimeEnabled = realtimeEnabledTables.some((t: any) => t.id === table?.id)
+
+  const { mutate: updatePublications, isLoading: isTogglingRealtime } =
+    useDatabasePublicationUpdateMutation({
+      onSuccess: () => {
+        setShowEnableRealtime(false)
+      },
+      onError: (error) => {
+        toast.error(`Failed to toggle realtime for ${table.name}: ${error.message}`)
+      },
+    })
 
   const canSqlWriteTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
   const canSqlWriteColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
@@ -66,9 +88,9 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   }, [rlsKey])
 
   const toggleRealtime = async () => {
+    if (!project) return console.error('Project is required')
     if (!realtimePublication) return console.error('Unable to find realtime publication')
 
-    setIsTogglingRealtime(true)
     const exists = realtimeEnabledTables.some((x: any) => x.id == table.id)
     const tables = !exists
       ? [`${table.schema}.${table.name}`].concat(
@@ -78,20 +100,12 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
           .filter((x: any) => x.id != table.id)
           .map((x: any) => `${x.schema}.${x.name}`)
 
-    try {
-      const id = realtimePublication.id
-      const payload = { tables, id }
-      const { error } = await meta.publications.update(id, payload)
-      if (error) throw error
-      setShowEnableRealtime(false)
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to toggle realtime for ${table.name}: ${error.message}`,
-      })
-    } finally {
-      setIsTogglingRealtime(false)
-    }
+    updatePublications({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      id: realtimePublication.id,
+      tables,
+    })
   }
 
   return (
@@ -134,7 +148,9 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
               )
             }
           >
-            <Link href={`/project/${projectRef}/auth/policies?search=${table.id}`}>
+            <Link
+              href={`/project/${projectRef}/auth/policies?search=${table.id}&schema=${snap.selectedSchemaName}`}
+            >
               {!table.rls_enabled
                 ? 'RLS is not enabled'
                 : `${policies.length == 0 ? 'No' : policies.length} active RLS polic${
@@ -144,7 +160,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
           </Button>
         )}
 
-        {roleImpersonationEnabledFlag && <RoleImpersonationPopover serviceRoleLabel="postgres" />}
+        <RoleImpersonationPopover serviceRoleLabel="postgres" />
 
         {realtimeEnabled && (
           <Button

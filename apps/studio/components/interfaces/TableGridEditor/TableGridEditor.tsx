@@ -5,15 +5,8 @@ import { useParams } from 'common'
 import { find, isUndefined } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { useEffect, useRef, useState } from 'react'
 
-import {
-  Dictionary,
-  parseSupaTable,
-  SupabaseGrid,
-  SupabaseGridRef,
-  SupaTable,
-} from 'components/grid'
+import { parseSupaTable, SupabaseGrid, SupaTable } from 'components/grid'
 import { ERROR_PRIMARY_KEY_NOTFOUND } from 'components/grid/constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Connecting from 'components/ui/Loading/Loading'
@@ -31,13 +24,14 @@ import useEntityType from 'hooks/misc/useEntityType'
 import { TableLike } from 'hooks/misc/useTable'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { EMPTY_ARR } from 'lib/void'
-import { useAppStateSnapshot } from 'state/app-state'
-import { getImpersonatedRole } from 'state/role-impersonation-state'
+import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { SchemaView } from 'types'
+import { Dictionary, SchemaView } from 'types'
+import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
 import GridHeaderActions from './GridHeaderActions'
 import NotFoundState from './NotFoundState'
 import SidePanelEditor from './SidePanelEditor'
+import { useEncryptedColumns } from './SidePanelEditor/SidePanelEditor.utils'
 import TableDefinition from './TableDefinition'
 
 export interface TableGridEditorProps {
@@ -54,15 +48,13 @@ const TableGridEditor = ({
   selectedTable,
 }: TableGridEditorProps) => {
   const router = useRouter()
-  const { meta, ui, vault } = useStore()
+  const { meta, ui } = useStore()
   const { ref: projectRef, id } = useParams()
 
   const { project } = useProjectContext()
-  const appSnap = useAppStateSnapshot()
   const snap = useTableEditorStateSnapshot()
-  const gridRef = useRef<SupabaseGridRef>(null)
 
-  const [encryptedColumns, setEncryptedColumns] = useState([])
+  const getImpersonatedRole = useGetImpersonatedRole()
 
   const [{ view: selectedView = 'data' }, setUrlState] = useUrlState()
   const setSelectedView = (view: string) => {
@@ -77,10 +69,10 @@ const TableGridEditor = ({
   const canEditColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
   const isReadOnly = !canEditTables && !canEditColumns
 
-  const getEncryptedColumns = async (table: any) => {
-    const columns = await vault.listEncryptedColumns(table.schema, table.name)
-    setEncryptedColumns(columns)
-  }
+  const encryptedColumns = useEncryptedColumns({
+    schemaName: selectedTable?.schema,
+    tableName: selectedTable?.name,
+  })
 
   const queryClient = useQueryClient()
   const { mutate: mutateUpdateTableRow } = useTableRowUpdateMutation({
@@ -126,7 +118,7 @@ const TableGridEditor = ({
                 result: any[]
               }
             | undefined
-          )
+          ),
         ][]
       }
 
@@ -147,12 +139,6 @@ const TableGridEditor = ({
     schema: selectedTable?.schema,
   })
   const foreignKeyMeta = data || []
-
-  useEffect(() => {
-    if (selectedTable !== undefined && selectedTable.id !== undefined) {
-      getEncryptedColumns(selectedTable)
-    }
-  }, [selectedTable?.id])
 
   const entityType = useEntityType(selectedTable?.id)
   const columnsRef = useLatest(selectedTable?.columns ?? EMPTY_ARR)
@@ -207,14 +193,6 @@ const TableGridEditor = ({
         })
 
   const gridKey = `${selectedTable.schema}_${selectedTable.name}`
-
-  const onRowCreated = (row: Dictionary<any>) => {
-    if (gridRef.current) gridRef.current.rowAdded(row)
-  }
-
-  const onRowUpdated = (row: Dictionary<any>, idx: number) => {
-    if (gridRef.current) gridRef.current.rowEdited(row, idx)
-  }
 
   const onTableCreated = (table: PostgresTable) => {
     router.push(`/project/${projectRef}/editor/${table.id}`)
@@ -308,10 +286,9 @@ const TableGridEditor = ({
     <>
       <SupabaseGrid
         key={gridKey}
-        ref={gridRef}
         theme={theme}
         gridProps={{ height: '100%' }}
-        storageRef={projectRef}
+        projectRef={projectRef}
         editable={!isReadOnly && canEditViaTableEditor}
         schema={selectedTable.schema}
         table={gridTable}
@@ -323,9 +300,12 @@ const TableGridEditor = ({
               )}
               {(isTableSelected || isViewSelected) && (
                 <>
+                  {isViewSelected && <RoleImpersonationPopover serviceRoleLabel="postgres" />}
+
                   {canEditViaTableEditor && (
                     <div className="h-[20px] w-px border-r border-control"></div>
                   )}
+
                   <div>
                     <TwoOptionToggle
                       width={75}
@@ -349,9 +329,12 @@ const TableGridEditor = ({
         onImportData={snap.onImportData}
         onError={onError}
         onSqlQuery={onSqlQuery}
-        onExpandJSONEditor={(column, row) =>
+        onExpandJSONEditor={(column, row) => {
           snap.onExpandJSONEditor({ column, row, jsonString: JSON.stringify(row[column]) || '' })
-        }
+        }}
+        onExpandTextEditor={(column, row) => {
+          snap.onExpandTextEditor(column, row)
+        }}
         onEditForeignKeyColumnValue={snap.onEditForeignKeyColumnValue}
         showCustomChildren={(isViewSelected || isTableSelected) && selectedView === 'definition'}
         customHeader={
@@ -372,8 +355,6 @@ const TableGridEditor = ({
         <SidePanelEditor
           editable={!isReadOnly && canEditViaTableEditor}
           selectedTable={selectedTable as PostgresTable}
-          onRowCreated={onRowCreated}
-          onRowUpdated={onRowUpdated}
           onTableCreated={onTableCreated}
         />
       )}

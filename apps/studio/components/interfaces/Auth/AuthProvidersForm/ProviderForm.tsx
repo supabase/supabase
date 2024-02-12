@@ -41,7 +41,6 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
-
   const generateInitialValues = () => {
     const initialValues: { [x: string]: string | boolean } = {}
 
@@ -60,8 +59,8 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
           initialValues[key] = configValue
             ? configValue
             : provider.properties[key].type === 'boolean'
-            ? false
-            : ''
+              ? false
+              : ''
         }
       }
     })
@@ -163,41 +162,15 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
             "
               >
                 <div className="mx-auto my-6 max-w-lg space-y-6">
-                  {provider.title === 'LinkedIn (Deprecated)' && (
-                    <Alert_Shadcn_ variant="warning">
-                      <IconAlertTriangle strokeWidth={2} />
-                      <AlertTitle_Shadcn_>LinkedIn (Deprecated) Provider</AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_>
-                        As of 1st August, LinkedIn has updated their OAuth API scopes. Please use
-                        the new LinkedIn provider below. Developers using this provider should move
-                        over to the new provider. Please refer to our
-                        [docs](/docs/pages/guides/auth/social-login/auth-linkedin) for more details.
-                      </AlertDescription_Shadcn_>
-                    </Alert_Shadcn_>
-                  )}
-
-                  {/* TODO (Joel): Remove after 30th November when we disable the provider */}
-                  {provider.title === 'LinkedIn (Deprecated)' &&
-                    Object.keys(provider.properties).map((x: string) => (
-                      <FormField
-                        key={x}
-                        name={x}
-                        properties={provider.properties[x]}
-                        formValues={values}
-                        disabled={x === 'EXTERNAL_LINKEDIN_ENABLED' ? !canUpdateConfig : true}
-                      />
-                    ))}
-
-                  {provider.title !== 'LinkedIn (Deprecated)' &&
-                    Object.keys(provider.properties).map((x: string) => (
-                      <FormField
-                        key={x}
-                        name={x}
-                        properties={provider.properties[x]}
-                        formValues={values}
-                        disabled={!canUpdateConfig}
-                      />
-                    ))}
+                  {Object.keys(provider.properties).map((x: string) => (
+                    <FormField
+                      key={x}
+                      name={x}
+                      properties={provider.properties[x]}
+                      formValues={values}
+                      disabled={!canUpdateConfig}
+                    />
+                  ))}
 
                   {provider?.misc?.alert && (
                     <Alert title={provider.misc.alert.title} variant="warning" withIcon>

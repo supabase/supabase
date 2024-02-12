@@ -1,12 +1,11 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { IS_PLATFORM } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
-import { Button, IconAlignLeft, IconCommand, IconCornerDownLeft, cn } from 'ui'
+import { Button, IconAlignLeft, IconCommand, IconCornerDownLeft } from 'ui'
 
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
-import { useFlag } from 'hooks'
-import { useState } from 'react'
+import { useFlag, useSelectedProject } from 'hooks'
 import FavoriteButton from './FavoriteButton'
 import SavingIndicator from './SavingIndicator'
 
@@ -28,20 +27,16 @@ const UtilityActions = ({
   executeQuery,
 }: UtilityActionsProps) => {
   const os = detectOS()
+  const project = useSelectedProject()
   const readReplicasEnabled = useFlag('readReplicas')
-  const roleImpersonationEnabledFlag = useFlag('roleImpersonation')
-  const [selectedDatabaseId, setSelectedDatabaseId] = useState<string>('1')
+
+  const showReadReplicasUI = readReplicasEnabled && project?.is_read_replicas_enabled
 
   return (
     <>
       <SavingIndicator id={id} />
 
       {IS_PLATFORM && <FavoriteButton id={id} />}
-
-      {/* [Joshen] Am opting to remove this - i don't think its useful? */}
-      {/* [Joshen] Keeping in mind to not sprawl controls everywhere */}
-      {/* [Joshen] There's eventually gonna be user impersonation here as well so let's see */}
-      {/* <SizeToggleButton id={id} /> */}
 
       <Tooltip.Root delayDuration={0}>
         <Tooltip.Trigger asChild>
@@ -67,17 +62,13 @@ const UtilityActions = ({
       </Tooltip.Root>
 
       <div className="flex items-center justify-between gap-x-2 mx-2">
-        {readReplicasEnabled && (
-          <DatabaseSelector
-            selectedDatabaseId={selectedDatabaseId}
-            onChangeDatabaseId={setSelectedDatabaseId}
-          />
-        )}
-
         <div className="flex items-center">
-          {roleImpersonationEnabledFlag && (
-            <RoleImpersonationPopover serviceRoleLabel="postgres" variant="connected-on-right" />
-          )}
+          {showReadReplicasUI && <DatabaseSelector variant="connected-on-right" />}
+
+          <RoleImpersonationPopover
+            serviceRoleLabel="postgres"
+            variant={showReadReplicasUI ? 'connected-on-both' : 'connected-on-right'}
+          />
 
           <Button
             onClick={() => executeQuery()}
@@ -95,7 +86,7 @@ const UtilityActions = ({
                 <IconCornerDownLeft size={10} strokeWidth={1.5} />
               </div>
             }
-            className={cn(roleImpersonationEnabledFlag && 'rounded-l-none')}
+            className="rounded-l-none"
           >
             {hasSelection ? 'Run selected' : 'Run'}
           </Button>

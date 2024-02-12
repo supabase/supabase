@@ -124,17 +124,17 @@ const menus: Menu[] = [
     type: 'reference',
   },
   {
-    id: 'reference_dart_v0',
-    path: '/reference/dart/v0',
+    id: 'reference_dart_v1',
+    path: '/reference/dart/v1',
     commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_dart_v0.yml',
+    specFile: 'supabase_dart_v1.yml',
     type: 'reference',
   },
   {
-    id: 'reference_dart_v1',
+    id: 'reference_dart_v2',
     path: '/reference/dart',
     commonSectionsFile: 'common-client-libs-sections.json',
-    specFile: 'supabase_dart_v1.yml',
+    specFile: 'supabase_dart_v2.yml',
     type: 'reference',
   },
   {
@@ -159,10 +159,24 @@ const menus: Menu[] = [
     type: 'reference',
   },
   {
-    id: 'reference_kotlin_v0',
-    path: '/reference/kotlin',
+    id: 'reference_swift_v2',
+    path: '/reference/swift',
+    commonSectionsFile: 'common-client-libs-sections.json',
+    specFile: 'supabase_swift_v2.yml',
+    type: 'reference',
+  },
+  {
+    id: 'reference_kotlin_v1',
+    path: '/reference/kotlin/v1',
     commonSectionsFile: 'common-client-libs-sections.json',
     specFile: 'supabase_kt_v1.yml',
+    type: 'reference',
+  },
+  {
+    id: 'reference_kotlin_v2',
+    path: '/reference/kotlin',
+    commonSectionsFile: 'common-client-libs-sections.json',
+    specFile: 'supabase_kt_v2.yml',
     type: 'reference',
   },
   {
@@ -246,21 +260,21 @@ function getMenuElement(menu: Menu) {
 const NavigationMenu = () => {
   const router = useRouter()
 
-  function handleRouteChange(url: string) {
-    const menu = getMenuByUrl(router.basePath, url)
-    if (menu) {
-      menuState.setMenuLevelId(menu.id)
-    }
-  }
-
   useEffect(() => {
+    function handleRouteChange(url: string) {
+      const menu = getMenuByUrl(router.basePath, url)
+      if (menu) {
+        menuState.setMenuLevelId(menu.id)
+      }
+    }
+
     handleRouteChange(router.basePath + router.asPath)
     // Listen for page changes after a navigation or when the query changes
     router.events.on('routeChangeComplete', handleRouteChange)
     return () => {
       router.events.off('routeChangeComplete', handleRouteChange)
     }
-  }, [router.events])
+  }, [router.asPath, router.basePath, router.events])
 
   const level = useMenuLevelId()
   const menu = getMenuById(level)

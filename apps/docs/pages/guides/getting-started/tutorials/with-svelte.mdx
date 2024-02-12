@@ -17,7 +17,7 @@ If you get stuck while working through this guide, refer to the [full example on
 
 <ProjectSetup />
 
-## Building the App
+## Building the app
 
 Let's start building the Svelte app from scratch.
 
@@ -57,12 +57,12 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 ```
 
-### App Styling (Optional)
+### App styling (optional)
 
 An optional step is to update the CSS file `src/app.css` to make the app look nice.
 You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/svelte-user-management/src/app.css).
 
-### Set up a Login component
+### Set up a login component
 
 Let's set up a Svelte component to manage logins and sign ups. We'll use Magic Links, so users can sign in with their email without using passwords.
 
@@ -121,11 +121,11 @@ Let's create a new component for that called `Account.svelte`.
 
 ```html src/lib/Account.svelte
 <script lang="ts">
-  import { onMount } from "svelte";
-  import type { AuthSession } from "@supabase/supabase-js";
-  import { supabase } from "../supabaseClient";
+  import { onMount } from 'svelte'
+  import type { AuthSession } from '@supabase/supabase-js'
+  import { supabase } from '../supabaseClient'
 
-  export let session: AuthSession;
+  export let session: AuthSession
 
   let loading = false
   let username: string | null = null
@@ -191,23 +191,23 @@ Let's create a new component for that called `Account.svelte`.
   }
 </script>
 
-<form on:submit|preventDefault={updateProfile} class="form-widget">
+<form on:submit|preventDefault="{updateProfile}" class="form-widget">
   <div>Email: {session.user.email}</div>
   <div>
     <label for="username">Name</label>
-    <input id="username" type="text" bind:value={username} />
+    <input id="username" type="text" bind:value="{username}" />
   </div>
   <div>
     <label for="website">Website</label>
-    <input id="website" type="text" bind:value={website} />
+    <input id="website" type="text" bind:value="{website}" />
   </div>
   <div>
-    <button type="submit" class="button primary block" disabled={loading}>
+    <button type="submit" class="button primary block" disabled="{loading}">
       {loading ? 'Saving ...' : 'Update profile'}
     </button>
   </div>
-  <button type="button" class="button block" on:click={() => supabase.auth.signOut()}>
-    Sign Out
+  <button type="button" class="button block" on:click="{()" ="">
+    supabase.auth.signOut()}> Sign Out
   </button>
 </form>
 ```

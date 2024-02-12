@@ -68,7 +68,7 @@ export const meta = {
     <StepHikeCompact.Code>
 
       ```yaml pubspec.yaml
-      supabase_flutter: ^1.6.2
+      supabase_flutter: ^2.0.0
       ```
 
     </StepHikeCompact.Code>
@@ -79,7 +79,10 @@ export const meta = {
 
     <StepHikeCompact.Details title="Initialize the Supabase client">
 
-      Open `lib/main.dart` and edit the main function to initialize Supabase using your [project URL and public API (anon) key](https://supabase.com/dashboard/project/_/settings/api).
+      Open `lib/main.dart` and edit the main function to initialize Supabase using your project URL and public API (anon) key:
+
+      <ProjectConfigVariables variable="url" />
+      <ProjectConfigVariables variable="anonKey" />
 
     </StepHikeCompact.Details>
 
@@ -138,7 +141,7 @@ export const meta = {
       class _HomePageState extends State<HomePage> {
         final _future = Supabase.instance.client
             .from('countries')
-            .select<List<Map<String, dynamic>>>();
+            .select();
 
         @override
         Widget build(BuildContext context) {

@@ -1,5 +1,5 @@
 import { DataPoint } from 'data/analytics/constants'
-import { OrgSubscription } from 'data/subscriptions/org-subscription-query'
+import { OrgSubscription } from 'data/subscriptions/types'
 
 // [Joshen] This is just for development to generate some test data for chart rendering
 export const generateUsageData = (attribute: string, days: number): DataPoint[] => {
@@ -60,7 +60,7 @@ export const ChartTooltipValueFormatter = (number: number | string, unit: string
 
 const sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
 
-export const formatBytesCompact = (bytes: number) => {
+const formatBytesCompact = (bytes: number) => {
   if (bytes === 0 || bytes === undefined) return '0 bytes'
 
   const k = 1024
@@ -78,7 +78,7 @@ export const formatBytesCompact = (bytes: number) => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + unit
 }
 
-export const formatBytesPrecision = (bytes: any) => {
+const formatBytesPrecision = (bytes: any) => {
   if (bytes === 0 || bytes === undefined) return '0 bytes'
 
   const k = 1024

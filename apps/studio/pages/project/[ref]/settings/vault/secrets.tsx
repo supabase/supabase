@@ -1,30 +1,26 @@
-import { useEffect } from 'react'
 import { useRouter } from 'next/router'
-import { observer } from 'mobx-react-lite'
-import { Tabs } from 'ui'
-
-import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
-import { NextPageWithLayout } from 'types'
+import { SecretsManagement, VaultToggle } from 'components/interfaces/Settings/Vault'
 import { SettingsLayout } from 'components/layouts'
-import { VaultToggle, SecretsManagement } from 'components/interfaces/Settings/Vault'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormHeader } from 'components/ui/Forms'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
+import { NextPageWithLayout } from 'types'
+import VaultNavTabs from 'components/interfaces/Settings/Vault/VaultNavTabs'
 
 const VaultSettingsSecrets: NextPageWithLayout = () => {
   const router = useRouter()
-  const { meta, vault } = useStore()
   const { ref } = useParams()
+  const { project } = useProjectContext()
 
-  const vaultExtension = meta.extensions.byId('supabase_vault')
-  const isLoading = meta.extensions.isLoading
+  const { data, isLoading } = useDatabaseExtensionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
+  const vaultExtension = (data ?? []).find((ext) => ext.name === 'supabase_vault')
   const isEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null
-
-  useEffect(() => {
-    if (isEnabled) {
-      vault.load()
-    }
-  }, [isEnabled])
 
   return (
     <div className="1xl:px-28 mx-auto flex flex-col px-5 py-6 lg:px-16 xl:px-24 2xl:px-32 ">
@@ -38,23 +34,14 @@ const VaultSettingsSecrets: NextPageWithLayout = () => {
       ) : !isEnabled ? (
         <VaultToggle />
       ) : (
-        <Tabs
-          size="small"
-          type="underlined"
-          activeId="secrets"
-          onChange={(id: any) => {
-            if (id === 'keys') router.push(`/project/${ref}/settings/vault/keys`)
-          }}
-        >
-          <Tabs.Panel id="secrets" label="Secrets Management">
-            <SecretsManagement />
-          </Tabs.Panel>
-          <Tabs.Panel id="keys" label="Encryption Keys" />
-        </Tabs>
+        <>
+          <VaultNavTabs projRef={ref || ''} activeTab="secrets" />
+          <SecretsManagement />
+        </>
       )}
     </div>
   )
 }
 
 VaultSettingsSecrets.getLayout = (page) => <SettingsLayout title="Vault">{page}</SettingsLayout>
-export default observer(VaultSettingsSecrets)
+export default VaultSettingsSecrets

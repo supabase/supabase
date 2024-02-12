@@ -1,4 +1,4 @@
-import { Dictionary } from 'components/grid'
+import { Dictionary } from 'types'
 import { isUndefined } from 'lodash'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
@@ -111,12 +111,12 @@ const ChartHandler = ({
   highlightedValue = highlightedValue
     ? highlightedValue
     : provider === 'daily-stats' && !attribute.includes('ingress') && !attribute.includes('egress')
-    ? chartData?.maximum
-    : provider === 'daily-stats'
-    ? chartData?.total
-    : provider === 'log-stats'
-    ? chartData?.totalGrouped?.[attribute]
-    : chartData?.data[chartData?.data.length - 1]?.[attribute]
+      ? chartData?.maximum
+      : provider === 'daily-stats'
+        ? chartData?.total
+        : provider === 'log-stats'
+          ? chartData?.totalGrouped?.[attribute]
+          : chartData?.data[chartData?.data.length - 1]?.[attribute]
 
   if (loading) {
     return (

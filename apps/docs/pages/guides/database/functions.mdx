@@ -32,7 +32,7 @@ and run the SQL queries yourself.
 3. Enter the SQL to create or replace your Database function.
 4. Click "Run" or cmd+enter (ctrl+enter).
 
-## Simple Functions
+## Simple functions
 
 Let's create a basic Database Function which returns a string "hello world".
 
@@ -95,6 +95,15 @@ final data = await supabase
 ```
 
 Reference: [rpc()](../../reference/dart/rpc)
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val data = supabase.postgrest.rpc("hello_world")
+```
+
+Reference: [rpc()](../../reference/kotlin/rpc)
 
 </TabPanel>
 </Tabs>
@@ -210,6 +219,17 @@ final data = await supabase
 ```
 
 </TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val data = supabase.postgrest.rpc("get_planets") {
+    filter {
+        eq("id", 1)
+    }
+}
+```
+
+</TabPanel>
 </Tabs>
 
 ## Passing parameters
@@ -264,6 +284,18 @@ final data = await supabase
 ```
 
 </TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val data = supabase.postgrest.rpc(
+    function = "add_planet",
+    parameters = buildJsonObject { //You can put here any serializable object including your own classes
+        put("name", "Jakku")
+    }
+)
+```
+
+</TabPanel>
 </Tabs>
 
 ## Suggestions
@@ -313,7 +345,7 @@ GRANT EXECUTE ON FUNCTION hello_world TO service_role;
 - PostgreSQL Official Docs: [Chapter 9. Functions and Operators](https://www.postgresql.org/docs/current/functions.html)
 - PostgreSQL Reference: [CREATE FUNCTION](https://www.postgresql.org/docs/9.1/sql-createfunction.html)
 
-## Deep Dive
+## Deep dive
 
 ### Create Database Functions
 

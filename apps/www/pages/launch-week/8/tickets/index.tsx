@@ -116,7 +116,7 @@ export default function TicketsPage({ users }: Props) {
         }}
       />
       <DefaultLayout>
-        <div className="">
+        <div>
           <SectionContainer className="z-10">
             <div className="text-center relative z-10 text-white mb-4 lg:mb-10">
               <motion.div
@@ -151,12 +151,11 @@ export default function TicketsPage({ users }: Props) {
           <div className="absolute w-full aspect-[1/1] md:aspect-[1.5/1] lg:aspect-[2.5/1] inset-0 z-0 pointer-events-none">
             <Image
               src="/images/launchweek/8/LW8-gradient.png"
-              layout="fill"
-              objectFit="cover"
-              objectPosition="top"
+              fill
               priority
               draggable={false}
               alt=""
+              className="object-cover object-top"
             />
           </div>
         </div>

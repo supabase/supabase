@@ -82,13 +82,13 @@ const levelsData = {
     icon: '/docs/img/icons/menu/reference-javascript',
     name: 'Javascript Reference v2.0',
   },
-  reference_dart_v0: {
-    icon: '/docs/img/icons/menu/reference-dart',
-    name: 'Dart Reference v0.0',
-  },
   reference_dart_v1: {
     icon: '/docs/img/icons/menu/reference-dart',
-    name: 'Dart Reference v0.0',
+    name: 'Dart Reference v1.0',
+  },
+  reference_dart_v2: {
+    icon: '/docs/img/icons/menu/reference-dart',
+    name: 'Dart Reference v2.0',
   },
   reference_csharp_v0: {
     icon: '/docs/img/icons/menu/reference-csharp',
@@ -102,9 +102,17 @@ const levelsData = {
     icon: '/docs/img/icons/menu/reference-swift',
     name: 'Swift Reference v1.0',
   },
-  reference_kotlin_v0: {
+  reference_swift_v2: {
+    icon: '/docs/img/icons/menu/reference-swift',
+    name: 'Swift Reference v2.0',
+  },
+  reference_kotlin_v1: {
     icon: '/docs/img/icons/menu/reference-kotlin',
-    name: 'Kotlin Reference v0.0',
+    name: 'Kotlin Reference v1.0',
+  },
+  reference_kotlin_v2: {
+    icon: '/docs/img/icons/menu/reference-kotlin',
+    name: 'Kotlin Reference v2.0',
   },
   reference_cli: {
     icon: '/docs/img/icons/menu/reference-cli',
@@ -193,8 +201,8 @@ const MobileHeader = memo(function MobileHeader() {
         {mobileMenuOpen
           ? 'Close'
           : menuLevel
-          ? levelsData[menuLevel].name
-          : levelsData['home'].name}
+            ? levelsData[menuLevel].name
+            : levelsData['home'].name}
       </span>
     </div>
   )
@@ -259,7 +267,7 @@ const Container = memo(function Container(props: PropsWithChildren) {
       id="docs-content-container"
       className={[
         // 'overflow-x-auto',
-        'w-full h-screen transition-all ease-out',
+        'w-full transition-all ease-out',
         // 'absolute lg:relative',
         mobileMenuOpen ? 'ml-[75%] sm:ml-[50%] md:ml-[33%] overflow-hidden' : 'overflow-auto',
         // desktop override any margin styles
@@ -275,7 +283,8 @@ const NavContainer = memo(function NavContainer() {
   const mobileMenuOpen = useMenuMobileOpen()
 
   return (
-    <div
+    <nav
+      aria-labelledby="main-nav-title"
       className={[
         // 'hidden',
         'absolute lg:relative',
@@ -285,7 +294,6 @@ const NavContainer = memo(function NavContainer() {
         'lg:left-0',
         'transition-all',
         'top-0',
-        'h-screen',
         'flex flex-col ml-0',
       ].join(' ')}
     >
@@ -299,6 +307,9 @@ const NavContainer = memo(function NavContainer() {
           'flex flex-col',
         ].join(' ')}
       >
+        <h1 id="main-nav-title" className="sr-only">
+          Main menu
+        </h1>
         <div className="top-0 sticky z-10">
           <div>
             <div>
@@ -330,7 +341,7 @@ const NavContainer = memo(function NavContainer() {
           <NavigationMenu />
         </div>
       </div>
-    </div>
+    </nav>
   )
 })
 
@@ -340,8 +351,8 @@ const SiteLayout = ({ children }: PropsWithChildren<{}>) => {
       <Head>
         <title>Supabase Docs</title>
       </Head>
-      <main>
-        <div className="flex flex-row h-screen">
+      <main className="grow overflow-hidden">
+        <div className="flex flex-row h-full">
           <NavContainer />
           <Container>
             <div className={['lg:sticky top-0 z-10 overflow-hidden'].join(' ')}>

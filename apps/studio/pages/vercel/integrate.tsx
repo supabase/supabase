@@ -6,7 +6,7 @@ import { useRouter } from 'next/router'
 import { ChangeEvent, createContext, useContext, useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
 
-import { Dictionary } from 'components/grid'
+import { Dictionary } from 'types'
 import VercelIntegrationLayout from 'components/layouts/VercelIntegrationLayout'
 import {
   createVercelEnv,
@@ -154,16 +154,16 @@ class VercelIntegrationStore implements IVercelIntegrationStore {
     }
   }
   async getVercelProjects() {
-    const { data, error }: any = await fetchVercelProjects({
+    const { data, error } = await fetchVercelProjects({
       vercelTeamId: this.teamId,
       vercelToken: this.token,
     })
     if (error) {
       toast.error(error)
-    } else {
+    } else if (data) {
       this.vercelProjects = data
       // if currentProjectId available. Auto select it
-      if (data && this.currentProjectId) {
+      if (this.currentProjectId) {
         // @ts-ignore
         const found = data.find((x: { id: string }) => (x.id = this.currentProjectId))
         if (found) this.selectedVercelProjectId = found.id
@@ -616,8 +616,8 @@ const ProjectLinkItem = observer(
               result.status === 'waiting'
                 ? 'text-foreground-light'
                 : result.status === 'fail'
-                ? 'text-foreground-light'
-                : 'text-foreground'
+                  ? 'text-foreground-light'
+                  : 'text-foreground'
             }`}
           >
             {result?.message ?? 'Processing...'}

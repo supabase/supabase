@@ -1,13 +1,15 @@
-import { useParams } from 'common/hooks'
+import { useParams } from 'common'
+import Head from 'next/head'
+import { useRouter } from 'next/router'
+import { Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
+
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import AISettingsModal from 'components/ui/AISettingsModal'
 import Connecting from 'components/ui/Loading/Loading'
 import ResourceExhaustionWarningBanner from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
 import { useFlag, useSelectedOrganization, useSelectedProject, withAuth } from 'hooks'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
-import Head from 'next/head'
-import { useRouter } from 'next/router'
-import { Fragment, PropsWithChildren, ReactNode } from 'react'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import AppLayout from '../AppLayout/AppLayout'
 import EnableBranchingModal from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
 import BuildingState from './BuildingState'
@@ -29,11 +31,13 @@ const routesToIgnoreProjectDetailsRequest = [
   '/project/[ref]/settings/database',
   '/project/[ref]/settings/storage',
   '/project/[ref]/settings/infrastructure',
+  '/project/[ref]/settings/addons',
 ]
 
 const routesToIgnoreDBConnection = [
   '/project/[ref]/branches',
   '/project/[ref]/database/backups/scheduled',
+  '/project/[ref]/settings/addons',
 ]
 
 const routesToIgnorePostgrestConnection = [
@@ -41,6 +45,7 @@ const routesToIgnorePostgrestConnection = [
   '/project/[ref]/settings/general',
   '/project/[ref]/settings/database',
   '/project/[ref]/settings/infrastructure',
+  '/project/[ref]/settings/addons',
 ]
 
 export interface ProjectLayoutProps {
@@ -87,12 +92,12 @@ const ProjectLayout = ({
             {title
               ? `${title} | Supabase`
               : selectedTable
-              ? `${selectedTable} | ${projectName} | ${organizationName} | Supabase`
-              : projectName
-              ? `${projectName} | ${organizationName} | Supabase`
-              : organizationName
-              ? `${organizationName} | Supabase`
-              : 'Supabase'}
+                ? `${selectedTable} | ${projectName} | ${organizationName} | Supabase`
+                : projectName
+                  ? `${projectName} | ${organizationName} | Supabase`
+                  : organizationName
+                    ? `${organizationName} | Supabase`
+                    : 'Supabase'}
           </title>
           <meta name="description" content="Supabase Studio" />
         </Head>
@@ -181,6 +186,8 @@ interface ContentWrapperProps {
  */
 const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapperProps) => {
   const router = useRouter()
+  const { ref } = useParams()
+  const state = useDatabaseSelectorStateSnapshot()
   const selectedProject = useSelectedProject()
 
   const isSettingsPages = router.pathname.includes('/project/[ref]/settings')
@@ -200,6 +207,10 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
     selectedProject?.status === PROJECT_STATUS.GOING_DOWN ||
     selectedProject?.status === PROJECT_STATUS.PAUSING
   const isProjectOffline = selectedProject?.postgrestStatus === 'OFFLINE'
+
+  useEffect(() => {
+    if (ref) state.setSelectedDatabaseId(ref)
+  }, [ref])
 
   if (isBlocking && (isLoading || (requiresProjectDetails && selectedProject === undefined))) {
     return router.pathname.endsWith('[ref]') ? <LoadingState /> : <Connecting />

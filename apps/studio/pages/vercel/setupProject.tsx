@@ -1,4 +1,4 @@
-import generator from 'generate-password'
+import generator from 'generate-password-browser'
 import { debounce } from 'lodash'
 import { makeAutoObservable } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
@@ -7,7 +7,7 @@ import { ChangeEvent, createContext, useContext, useEffect, useRef, useState } f
 import { toast } from 'react-hot-toast'
 import { Button, Input, Listbox } from 'ui'
 
-import { Dictionary } from 'components/grid'
+import { Dictionary } from 'types'
 import VercelIntegrationLayout from 'components/layouts/VercelIntegrationLayout'
 import {
   createVercelEnv,
@@ -244,7 +244,7 @@ const CreateProject = observer(() => {
   }
 
   return (
-    <div className="">
+    <div>
       <p className="mb-2">Supabase project details</p>
       <div className="py-2">
         <Input

@@ -1,7 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import generator from 'generate-password'
+import generator from 'generate-password-browser'
 import { debounce } from 'lodash'
 import { useEffect, useRef, useState } from 'react'
 import { Button, Input, Modal } from 'ui'
@@ -135,8 +135,8 @@ const ResetDbPassword = ({ disabled = false }) => {
                           {!canResetDbPassword
                             ? 'You need additional permissions to reset the database password'
                             : !isProjectActive
-                            ? 'Unable to reset database password as project is not active'
-                            : ''}
+                              ? 'Unable to reset database password as project is not active'
+                              : ''}
                         </span>
                       </div>
                     </Tooltip.Content>

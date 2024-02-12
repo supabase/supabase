@@ -1,8 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { observer } from 'mobx-react-lite'
-import { useRouter } from 'next/router'
-import { Tabs } from 'ui'
-
 import { PITRNotice, PITRSelection } from 'components/interfaces/Database/Backups/PITR'
 import { DatabaseLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -12,12 +8,12 @@ import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useBackupsQuery } from 'data/database/backups-query'
-import { useCheckPermissions, useSelectedOrganization } from 'hooks'
-import { NextPageWithLayout } from 'types'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useCheckPermissions, usePermissionsLoaded, useSelectedOrganization } from 'hooks'
+import { NextPageWithLayout } from 'types'
+import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseBackupsNav'
 
 const DatabasePhysicalBackups: NextPageWithLayout = () => {
-  const router = useRouter()
   const { project } = useProjectContext()
   const ref = project?.ref ?? 'default'
 
@@ -27,19 +23,7 @@ const DatabasePhysicalBackups: NextPageWithLayout = () => {
         <div className="col-span-12">
           <div className="space-y-6">
             <h3 className="text-xl text-foreground">Database Backups</h3>
-
-            <Tabs
-              type="underlined"
-              size="small"
-              activeId="pitr"
-              onChange={(id: any) => {
-                if (id === 'scheduled') router.push(`/project/${ref}/database/backups/scheduled`)
-              }}
-            >
-              <Tabs.Panel id="scheduled" label="Scheduled backups" />
-              <Tabs.Panel id="pitr" label="Point in Time" />
-            </Tabs>
-
+            <DatabaseBackupsNav active="pitr" projRef={ref} />
             <div className="space-y-8">
               <PITR />
             </div>
@@ -54,7 +38,7 @@ DatabasePhysicalBackups.getLayout = (page) => (
   <DatabaseLayout title="Database">{page}</DatabaseLayout>
 )
 
-const PITR = observer(() => {
+const PITR = () => {
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
   const {
@@ -74,8 +58,11 @@ const PITR = observer(() => {
   const isEnabled = backups?.pitr_enabled
 
   const canReadPhysicalBackups = useCheckPermissions(PermissionAction.READ, 'physical_backups')
+  const isPermissionsLoaded = usePermissionsLoaded()
 
-  if (!canReadPhysicalBackups) return <NoPermission resourceText="view PITR backups" />
+  if (isPermissionsLoaded && !canReadPhysicalBackups) {
+    return <NoPermission resourceText="view PITR backups" />
+  }
 
   return (
     <>
@@ -105,6 +92,6 @@ const PITR = observer(() => {
       )}
     </>
   )
-})
+}
 
 export default DatabasePhysicalBackups

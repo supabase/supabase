@@ -1,3 +1,4 @@
+import { useSelectedOrganization } from 'hooks'
 import Link from 'next/link'
 import { useState } from 'react'
 import {
@@ -33,27 +34,17 @@ const BranchingWaitlistPopover = ({ isNewNav = false }: BranchingWaitlistPopover
           <p>Database Branching</p>
         </div>
         <p className="text-xs text-foreground-light">
-          Register for early access and you'll be contacted by email when your organization is
-          enrolled in database branching.
+          Database Branching is currently in early access and not available publicly yet.
         </p>
         <div className="flex items-center gap-2">
-          <Button asChild>
-            <Link
-              href="https://forms.supabase.com/branching-request"
-              rel="noreferrer"
-              target="_blank"
-            >
-              Join waitlist
-            </Link>
-          </Button>
-          <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-            <Link
+          <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />} asChild>
+            <a
               target="_blank"
               rel="noreferrer"
               href="https://supabase.com/docs/guides/platform/branching"
             >
               View the docs
-            </Link>
+            </a>
           </Button>
         </div>
       </PopoverContent_Shadcn_>

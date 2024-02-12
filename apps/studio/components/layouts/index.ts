@@ -1,4 +1,4 @@
-import AccountLayout, { AccountLayoutWithoutAuth } from './AccountLayout/AccountLayout'
+import AccountLayout from './AccountLayout/AccountLayout'
 import AuthLayout from './AuthLayout/AuthLayout'
 import BillingLayout from './BillingLayout'
 import DatabaseLayout from './DatabaseLayout/DatabaseLayout'
@@ -18,7 +18,6 @@ import WizardLayout, { WizardLayoutWithoutAuth } from './WizardLayout'
 
 export {
   AccountLayout,
-  AccountLayoutWithoutAuth,
   AuthLayout,
   BillingLayout,
   DatabaseLayout,

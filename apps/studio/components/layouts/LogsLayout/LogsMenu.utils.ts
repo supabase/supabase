@@ -1,5 +1,5 @@
-import { Project } from 'types'
 import { ProductMenuGroup, ProductMenuGroupItem } from 'components/ui/ProductMenu/ProductMenu.types'
+import { Project } from 'data/projects/project-detail-query'
 import { IS_PLATFORM } from 'lib/constants'
 
 export const generateLogsMenu = (
@@ -30,6 +30,7 @@ export const generateLogsMenu = (
       })),
     },
     {
+      title: 'Infrastructure',
       items: [
         {
           name: IS_PLATFORM ? 'API Edge Network' : 'Kong API',

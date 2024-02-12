@@ -9,6 +9,12 @@ export const meta = {
 
 The `pg_cron` extension is a simple cron-based job scheduler for PostgreSQL that runs inside the database.
 
+<Admonition type="note">
+
+pg_cron is not fully supported on Fly Postgres. Read more about this [Fly Postgres limitation here](/docs/guides/platform/fly-postgres#limitations).
+
+</Admonition>
+
 ## Usage
 
 ### Enable the extension
@@ -61,7 +67,7 @@ The schedule uses the standard cron syntax, in which \* means "run every time pe
 
 You can use [crontab.guru](https://crontab.guru/) to help validate your cron schedules.
 
-### Scheduling System Maintenance
+### Scheduling system maintenance
 
 Be extremely careful when setting up pg_cron jobs for system maintenance tasks as they can have unintended consequences. For instance, scheduling a command to terminate idle connections with `pg_terminate_backend(pid)` can disrupt critical background processes like nightly backups. Often, there is an existing Postgres setting e.g. `idle_session_timeout` that can perform these common maintenance tasks without the risk.
 
@@ -140,6 +146,24 @@ Unschedules a job called `'nightly-vacuum'`
 ```sql
 select cron.unschedule('nightly-vacuum');
 ```
+
+### Viewing previously ran jobs
+
+View the last ten jobs that have ran
+
+```sql
+select
+  *
+from cron.job_run_details
+order by start_time desc
+limit 10;
+```
+
+<Admonition type="note">
+
+The records in cron.job_run_details are not cleaned automatically which will take up disk space in your datbabase.
+
+</Admonition>
 
 ## Resources
 

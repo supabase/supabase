@@ -1,13 +1,14 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import Link from 'next/link'
 
-import { OrgSubscription } from 'data/subscriptions/org-subscription-query'
+import { OrgSubscription } from 'data/subscriptions/types'
 import { OrgUsageResponse } from 'data/usage/org-usage-query'
 import { Button, IconChevronRight, IconPieChart } from 'ui'
 import { Metric, USAGE_APPROACHING_THRESHOLD } from './BillingBreakdown.constants'
 import { billingMetricUnit, formatUsage } from '../helpers'
 import { PricingMetric } from 'data/analytics/org-daily-stats-query'
 import { useMemo } from 'react'
+import { formatCurrency } from 'lib/helpers'
 
 export interface BillingMetricProps {
   idx: number
@@ -75,7 +76,7 @@ const BillingMetric = ({
         </Link>
         <span className="text-sm">{usageLabel}</span>&nbsp;
         {usageMeta.cost && usageMeta.cost > 0 ? (
-          <span className="text-sm">(${usageMeta.cost})</span>
+          <span className="text-sm">({formatCurrency(usageMeta.cost)})</span>
         ) : usageMeta.available_in_plan && !usageMeta.unlimited && relativeToSubscription ? (
           <span className="text-sm">({percentageLabel})</span>
         ) : null}
@@ -111,10 +112,10 @@ const BillingMetric = ({
                       isUsageBillingEnabled
                         ? 'text-gray-dark-800'
                         : isExceededLimit
-                        ? 'text-red-900'
-                        : isApproachingLimit
-                        ? 'text-yellow-1000'
-                        : 'text-gray-dark-800'
+                          ? 'text-red-900'
+                          : isApproachingLimit
+                            ? 'text-yellow-1000'
+                            : 'text-gray-dark-800'
                     }
                   />
                 </svg>
@@ -125,8 +126,8 @@ const BillingMetric = ({
             <Tooltip.Portal>
               <Tooltip.Content side="bottom">
                 <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div className="rounded bg-alternative py-1 px-2 leading-none shadow border border-background min-w-[250px]">
-                  <div className="text-xs text-foreground max-w-sm space-y-2">
+                <div className="rounded bg-alternative py-1 px-2 leading-none shadow border border-background min-w-[300px] max-w-[450px] max-h-[300px] overflow-y-auto">
+                  <div className="text-xs text-foreground space-y-2">
                     <p className="font-medium">{usageMeta.unit_price_desc}</p>
 
                     {usageMeta.project_allocations && usageMeta.project_allocations.length > 0 && (

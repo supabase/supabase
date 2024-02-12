@@ -1,7 +1,8 @@
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { STORAGE_KEY_PREFIX } from './constants'
 import { InitialStateType } from './store/reducers'
-import { Dictionary, Sort, SupabaseGridProps, SupaColumn, SupaTable } from './types'
+import { Sort, SupabaseGridProps, SupaColumn, SupaTable } from './types'
+import type { Dictionary } from 'types'
 import { getGridColumns } from './utils/gridColumns'
 import { FilterOperatorOptions } from './components/header/filter'
 import { Filter } from 'components/grid/types'
@@ -73,8 +74,8 @@ export async function initTable(
   sort?: string[], // Comes directly from URL param
   filter?: string[] // Comes directly from URL param
 ): Promise<{ savedState: { sorts?: string[]; filters?: string[] } }> {
-  const savedState = props.storageRef
-    ? onLoadStorage(props.storageRef, props.table.name, props.table.schema)
+  const savedState = props.projectRef
+    ? onLoadStorage(props.projectRef, props.table.name, props.table.schema)
     : undefined
 
   // Check for saved state on initial load and also, load sort and filters via URL param only if given
@@ -94,10 +95,13 @@ export async function initTable(
   }
 
   const gridColumns = getGridColumns(props.table, {
+    projectRef: props.projectRef,
+    tableId: props.tableId,
     editable: props.editable,
     defaultWidth: props.gridProps?.defaultColumnWidth,
     onAddColumn: props.editable ? props.onAddColumn : undefined,
     onExpandJSONEditor: props.onExpandJSONEditor,
+    onExpandTextEditor: props.onExpandTextEditor,
   })
 
   dispatch({
@@ -176,7 +180,7 @@ export function parseSupaTable(
   }
 }
 
-export function onLoadStorage(storageRef: string, tableName: string, schema?: string | null) {
+function onLoadStorage(storageRef: string, tableName: string, schema?: string | null) {
   const storageKey = getStorageKey(STORAGE_KEY_PREFIX, storageRef)
   const jsonStr = localStorage.getItem(storageKey)
   if (!jsonStr) return

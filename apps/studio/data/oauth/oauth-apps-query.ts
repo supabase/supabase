@@ -1,8 +1,7 @@
 import { OAuthScope } from '@supabase/shared-types/out/constants'
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
-import { API_ADMIN_URL } from 'lib/constants'
-import { useCallback } from 'react'
+import { API_URL } from 'lib/constants'
 import { ResponseError } from 'types'
 import { oauthAppKeys } from './keys'
 
@@ -25,7 +24,7 @@ export type OAuthApp = {
 export async function getOAuthApps({ slug }: OAuthAppsVariables, signal?: AbortSignal) {
   if (!slug) throw new Error('Organization slug is required')
 
-  const response = await get(`${API_ADMIN_URL}/organizations/${slug}/oauth/apps?type=published`, {
+  const response = await get(`${API_URL}/organizations/${slug}/oauth/apps?type=published`, {
     signal,
   })
   if (response.error) throw response.error
@@ -47,15 +46,3 @@ export const useOAuthAppsQuery = <TData = OAuthAppsData>(
       ...options,
     }
   )
-
-export const useOAuthAppsPrefetch = ({ slug }: OAuthAppsVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (slug) {
-      client.prefetchQuery(oauthAppKeys.oauthApps(slug), ({ signal }) =>
-        getOAuthApps({ slug }, signal)
-      )
-    }
-  }, [slug])
-}

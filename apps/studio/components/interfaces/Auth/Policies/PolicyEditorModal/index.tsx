@@ -1,10 +1,11 @@
-import type { PostgresRole } from '@supabase/postgres-meta'
 import { isEmpty, noop } from 'lodash'
 import { useEffect, useState } from 'react'
 import { Modal } from 'ui'
 
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useStore } from 'hooks'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { useAppStateSnapshot } from 'state/app-state'
 import { POLICY_MODAL_VIEWS } from '../Policies.constants'
 import {
   PolicyFormField,
@@ -26,10 +27,10 @@ import PolicyEditorModalTitle from './PolicyEditorModalTitle'
 
 interface PolicyEditorModalProps {
   visible: boolean
-  roles?: PostgresRole[]
   schema: string
   table: string
   selectedPolicyToEdit: any
+  showAssistantPreview?: boolean
   onSelectCancel: () => void
   onCreatePolicy: (payload: PostgresPolicyCreatePayload) => Promise<boolean>
   onUpdatePolicy: (payload: PostgresPolicyUpdatePayload) => Promise<boolean>
@@ -38,16 +39,17 @@ interface PolicyEditorModalProps {
 
 const PolicyEditorModal = ({
   visible = false,
-  roles = [],
   schema = '',
   table = '',
   selectedPolicyToEdit = {},
+  showAssistantPreview = false,
   onSelectCancel = noop,
   onCreatePolicy,
   onUpdatePolicy,
   onSaveSuccess = noop,
 }: PolicyEditorModalProps) => {
   const { ui } = useStore()
+  const snap = useAppStateSnapshot()
 
   const newPolicyTemplate: PolicyFormField = {
     schema,
@@ -93,6 +95,12 @@ const PolicyEditorModal = ({
   }
   const onReviewPolicy = () => setView(POLICY_MODAL_VIEWS.REVIEW)
   const onSelectBackFromTemplates = () => setView(previousView)
+
+  const onToggleFeaturePreviewModal = () => {
+    snap.setSelectedFeaturePreview(LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT)
+    snap.setShowFeaturePreviewModal(!snap.showFeaturePreviewModal)
+    onSelectCancel()
+  }
 
   const onUseTemplate = (template: PolicyTemplate) => {
     setPolicyFormFields({
@@ -174,9 +182,8 @@ const PolicyEditorModal = ({
 
   return (
     <Modal
-      size={view === POLICY_MODAL_VIEWS.SELECTION ? 'medium' : 'xxlarge'}
-      closable
       hideFooter
+      size={view === POLICY_MODAL_VIEWS.SELECTION ? 'medium' : 'xxlarge'}
       visible={visible}
       contentStyle={{ padding: 0 }}
       header={[
@@ -186,12 +193,14 @@ const PolicyEditorModal = ({
           isNewPolicy={isNewPolicy}
           schema={schema}
           table={table}
+          showAssistantPreview={showAssistantPreview}
           onSelectBackFromTemplates={onSelectBackFromTemplates}
+          onToggleFeaturePreviewModal={onToggleFeaturePreviewModal}
         />,
       ]}
       onCancel={isClosingPolicyEditor}
     >
-      <div className="">
+      <div>
         <ConfirmationModal
           visible={isClosingPolicyEditorModal}
           header="Discard changes"
@@ -215,11 +224,12 @@ const PolicyEditorModal = ({
             description="Write rules with PostgreSQL's policies to fit your unique business needs."
             onViewTemplates={onViewTemplates}
             onViewEditor={onViewEditor}
+            showAssistantPreview={showAssistantPreview}
+            onToggleFeaturePreviewModal={onToggleFeaturePreviewModal}
           />
         ) : view === POLICY_MODAL_VIEWS.EDITOR ? (
           <PolicyEditor
             isNewPolicy={isNewPolicy}
-            roles={roles}
             policyFormFields={policyFormFields}
             onUpdatePolicyFormFields={onUpdatePolicyFormFields}
             onViewTemplates={onViewTemplates}

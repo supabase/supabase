@@ -1,11 +1,26 @@
 import type { PostgresExtension } from '@supabase/postgres-meta'
+import { ExternalLinkIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { Button, Form, IconDatabase, IconPlus, Input, Listbox, Modal } from 'ui'
+import toast from 'react-hot-toast'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useStore } from 'hooks'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  Form,
+  IconAlertTriangle,
+  IconDatabase,
+  IconPlus,
+  Input,
+  Listbox,
+  Modal,
+} from 'ui'
 
 interface EnableExtensionModalProps {
   visible: boolean
@@ -15,13 +30,22 @@ interface EnableExtensionModalProps {
 
 const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionModalProps) => {
   const { project } = useProjectContext()
-  const { ui, meta } = useStore()
+  const { meta } = useStore()
   const [defaultSchema, setDefaultSchema] = useState()
   const [fetchingSchemaInfo, setFetchingSchemaInfo] = useState(false)
 
   const { data: schemas, isLoading: isSchemasLoading } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
+  })
+  const { mutate: enableExtension, isLoading: isEnabling } = useDatabaseExtensionEnableMutation({
+    onSuccess: () => {
+      toast.success(`${extension.name} is on.`)
+      onCancel()
+    },
+    onError: (error) => {
+      toast.error(`Failed to enable ${extension.name}: ${error.message}`)
+    },
   })
 
   // [Joshen] Worth checking in with users - whether having this schema selection
@@ -58,55 +82,29 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
     return errors
   }
 
-  const onSubmit = async (values: any, { setSubmitting }: any) => {
-    setSubmitting(true)
+  const onSubmit = async (values: any) => {
+    if (project === undefined) return console.error('Project is required')
 
     const schema =
       defaultSchema !== undefined && defaultSchema !== null
         ? defaultSchema
         : values.schema === 'custom'
-        ? values.name
-        : values.schema
+          ? values.name
+          : values.schema
 
-    if (!schema.startsWith('pg_')) {
-      const { error: createSchemaError } = await meta.query(`create schema if not exists ${schema}`)
-      if (createSchemaError) {
-        return ui.setNotification({
-          error: createSchemaError,
-          category: 'error',
-          message: `Failed to create schema: ${createSchemaError.message}`,
-        })
-      }
-    }
-
-    const { error: createExtensionError } = await meta.extensions.create({
+    enableExtension({
+      projectRef: project.ref,
+      connectionString: project?.connectionString,
       schema,
       name: extension.name,
       version: extension.default_version,
       cascade: true,
+      createSchema: !schema.startsWith('pg_'),
     })
-    if (createExtensionError) {
-      ui.setNotification({
-        error: createExtensionError,
-        category: 'error',
-        message: `Failed to toggle ${extension.name.toUpperCase()}: ${
-          createExtensionError.message
-        }`,
-      })
-    } else {
-      ui.setNotification({
-        category: 'success',
-        message: `${extension.name.toUpperCase()} is on.`,
-      })
-    }
-
-    setSubmitting(false)
-    onCancel()
   }
 
   return (
     <Modal
-      closable
       hideFooter
       visible={visible}
       onCancel={onCancel}
@@ -126,7 +124,7 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
         validate={validate}
         onSubmit={onSubmit}
       >
-        {({ isSubmitting, values }: any) => {
+        {({ values }: any) => {
           return (
             <div className="space-y-4 py-4">
               <Modal.Content>
@@ -185,13 +183,45 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
                 </Modal.Content>
               )}
 
+              {extension.name === 'pg_cron' && project?.cloud_provider === 'FLY' && (
+                <Modal.Content>
+                  <Alert_Shadcn_ variant="warning">
+                    <IconAlertTriangle strokeWidth={2} />
+                    <AlertTitle_Shadcn_>
+                      The pg_cron extension is not fully supported for Fly projects
+                    </AlertTitle_Shadcn_>
+
+                    <AlertDescription_Shadcn_>
+                      You can still enable the extension, but pg_cron jobs may not run due to the
+                      behaviour of Fly projects.
+                    </AlertDescription_Shadcn_>
+
+                    <AlertDescription_Shadcn_ className="mt-3">
+                      <Button
+                        asChild
+                        type="default"
+                        iconRight={<ExternalLinkIcon width={12} height={12} />}
+                      >
+                        <a
+                          href="/docs/guides/platform/fly-postgres#limitations"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <span>Learn more</span>
+                        </a>
+                      </Button>
+                    </AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
+                </Modal.Content>
+              )}
+
               <Modal.Separator />
               <Modal.Content>
                 <div className="flex items-center justify-end space-x-2">
-                  <Button type="default" disabled={isSubmitting} onClick={() => onCancel()}>
+                  <Button type="default" disabled={isEnabling} onClick={() => onCancel()}>
                     Cancel
                   </Button>
-                  <Button htmlType="submit" disabled={isSubmitting} loading={isSubmitting}>
+                  <Button htmlType="submit" disabled={isEnabling} loading={isEnabling}>
                     Enable extension
                   </Button>
                 </div>

@@ -120,10 +120,10 @@
 
 /* edit button */
 .rdg-row__select-column__edit-action {
-  opacity: 0;
+  @apply opacity-0;
 }
 .rdg-row:hover .rdg-row__select-column__edit-action {
-  opacity: 0.5;
+  @apply opacity-100;
 }
 
 .rdg-row__select-column__edit-action:hover {
@@ -228,13 +228,6 @@
 .react-contexify__submenu-arrow {
   margin-left: auto;
   font-size: 12px;
-}
-.react-contexify__separator {
-  width: 100%;
-  height: 1px;
-  cursor: default;
-  margin: 4px 0;
-  background-color: rgba(0, 0, 0, 0.2);
 }
 .react-contexify__will-leave--disabled {
   pointer-events: none;

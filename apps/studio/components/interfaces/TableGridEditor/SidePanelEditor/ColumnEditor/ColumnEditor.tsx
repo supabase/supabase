@@ -1,4 +1,4 @@
-import type { PostgresColumn, PostgresTable, PostgresType } from '@supabase/postgres-meta'
+import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { useParams } from 'common'
 import { isEmpty, noop } from 'lodash'
 import Link from 'next/link'
@@ -10,6 +10,7 @@ import {
   Button,
   Checkbox,
   IconAlertCircle,
+  IconAlertTriangle,
   IconExternalLink,
   IconPlus,
   Input,
@@ -17,12 +18,12 @@ import {
   Toggle,
 } from 'ui'
 
-import { Dictionary } from 'components/grid'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
-import { useStore } from 'hooks'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { usePostgresTypesQuery } from 'data/database/types-query'
+import { EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
+import { Dictionary } from 'types'
 import { ForeignKeySelector } from '..'
 import ActionBar from '../ActionBar'
 import { TEXT_TYPES } from '../SidePanelEditor.constants'
@@ -71,12 +72,19 @@ const ColumnEditor = ({
   updateEditorDirty = noop,
 }: ColumnEditorProps) => {
   const { ref } = useParams()
-  const { meta, vault } = useStore()
   const { project } = useProjectContext()
 
   const [errors, setErrors] = useState<Dictionary<any>>({})
   const [columnFields, setColumnFields] = useState<ColumnField>()
   const [isEditingRelation, setIsEditingRelation] = useState<boolean>(false)
+
+  const { data: types } = usePostgresTypesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const enumTypes = (types ?? []).filter(
+    (type) => !EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS.includes(type.schema)
+  )
 
   const { data } = useForeignKeyConstraintsQuery({
     projectRef: project?.ref,
@@ -84,9 +92,6 @@ const ColumnEditor = ({
     schema: selectedTable?.schema,
   })
   const foreignKeyMeta = data || []
-
-  const keys = vault.listKeys()
-  const enumTypes = meta.types.list((type: PostgresType) => !EXCLUDED_SCHEMAS.includes(type.schema))
 
   const isNewRecord = column === undefined
   const originalForeignKey = column
@@ -97,7 +102,7 @@ const ColumnEditor = ({
     if (visible) {
       setErrors({})
       const columnFields = isNewRecord
-        ? { ...generateColumnField(), keyId: keys.length > 0 ? keys[0].id : 'create-new' }
+        ? generateColumnField()
         : generateColumnFieldFromPostgresColumn(column!, selectedTable, foreignKeyMeta)
       setColumnFields(columnFields)
     }
@@ -383,6 +388,35 @@ const ColumnEditor = ({
                       Learn more
                     </Link>
                   </Button>
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
+            </FormSectionContent>
+          </FormSection>
+          <SidePanel.Separator />
+
+          {/* TODO: need to pull column privileges in here
+          if any columns are using column-level privileges, show this warning */}
+          <FormSection
+            header={
+              <FormSectionLabel className="lg:!col-span-4">Column privileges</FormSectionLabel>
+            }
+          >
+            <FormSectionContent loading={false} className="lg:!col-span-8">
+              <Alert_Shadcn_ variant="warning">
+                <IconAlertTriangle strokeWidth={2} />
+                <AlertTitle_Shadcn_>This table uses column-privileges</AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_>
+                  <p>
+                    Several columns in this table have column-level privileges. This new column will
+                    have privileges set to on by default.
+                  </p>
+                  <p className="mt-3">
+                    <Link href={`/project/${ref}/database/privileges`} passHref>
+                      <Button asChild type="default" size="tiny">
+                        <a>Column-level privileges</a>
+                      </Button>
+                    </Link>
+                  </p>
                 </AlertDescription_Shadcn_>
               </Alert_Shadcn_>
             </FormSectionContent>

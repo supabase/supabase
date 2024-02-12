@@ -34,8 +34,10 @@ import {
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
+import { useRouter } from 'next/router'
 
 const TableEditorMenu = () => {
+  const router = useRouter()
   const { id } = useParams()
   const snap = useTableEditorStateSnapshot()
 
@@ -68,7 +70,7 @@ const TableEditorMenu = () => {
       sort,
     },
     {
-      keepPreviousData: true,
+      keepPreviousData: Boolean(searchText),
     }
   )
 
@@ -108,6 +110,7 @@ const TableEditorMenu = () => {
           onSelectSchema={(name: string) => {
             setSearchText('')
             snap.setSelectedSchemaName(name)
+            router.push(`/project/${project?.ref}/editor`)
           }}
           onSelectCreateSchema={() => snap.onAddSchema()}
         />
@@ -188,7 +191,7 @@ const TableEditorMenu = () => {
               size="tiny"
               actions={
                 searchText && (
-                  <Button size="tiny" type="text" onClick={() => setSearchText('')}>
+                  <Button type="text" className="px-1" onClick={() => setSearchText('')}>
                     <IconX size={12} strokeWidth={2} />
                   </Button>
                 )
@@ -292,8 +295,9 @@ const TableEditorMenu = () => {
                     items={entityTypes}
                     ItemComponent={EntityListItem}
                     itemProps={{
-                      projectRef: project?.ref,
+                      projectRef: project?.ref!,
                       id: Number(id),
+                      isLocked,
                     }}
                     getItemSize={() => 28}
                     hasNextPage={hasNextPage}

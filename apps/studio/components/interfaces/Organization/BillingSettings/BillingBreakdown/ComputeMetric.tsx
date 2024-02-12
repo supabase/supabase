@@ -6,7 +6,8 @@ import { IconChevronRight, IconPieChart } from 'ui'
 import { Metric } from './BillingBreakdown.constants'
 import { formatUsage } from '../helpers'
 import { PricingMetric } from 'data/analytics/org-daily-stats-query'
-import { useMemo } from 'react'
+import React, { useMemo } from 'react'
+import { formatCurrency } from 'lib/helpers'
 
 export interface ComputeMetricProps {
   slug?: string
@@ -41,7 +42,7 @@ const ComputeMetric = ({ slug, metric, usage, relativeToSubscription }: ComputeM
         </Link>
         <span className="text-sm">{usageLabel}</span>&nbsp;
         {relativeToSubscription && usageMeta?.cost && usageMeta.cost > 0 ? (
-          <span className="text-sm">(${usageMeta?.cost})</span>
+          <span className="text-sm">({formatCurrency(usageMeta?.cost)})</span>
         ) : null}
       </div>
       <div>
@@ -52,8 +53,8 @@ const ComputeMetric = ({ slug, metric, usage, relativeToSubscription }: ComputeM
           <Tooltip.Portal>
             <Tooltip.Content side="bottom">
               <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div className="rounded bg-alternative py-1 px-2 leading-none shadow border border-background min-w-[250px]">
-                <div className="text-xs text-foreground max-w-sm space-y-2">
+              <div className="rounded bg-alternative py-1 px-2 leading-none shadow border border-background min-w-[300px] max-w-[450px] max-h-[300px] overflow-y-auto">
+                <div className="text-xs text-foreground space-y-2">
                   <p className="font-medium">{usageMeta?.unit_price_desc}</p>
 
                   {usageMeta?.project_allocations && usageMeta.project_allocations.length > 0 && (
@@ -93,7 +94,14 @@ const ComputeMetric = ({ slug, metric, usage, relativeToSubscription }: ComputeM
                     <p className="text-xs">
                       Every project is a dedicated server and database. For every hour your project
                       is active, it incurs compute costs based on the instance size of your project.
-                      Paused projects do not incur compute costs.
+                      Paused projects do not incur compute costs.{' '}
+                      <Link
+                        href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
+                        target="_blank"
+                        className="transition text-brand hover:text-brand-600 underline"
+                      >
+                        Read more
+                      </Link>
                     </p>
                   </div>
                 </div>
