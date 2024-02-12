@@ -142,6 +142,25 @@ await supabase.from('restaurants').insert([
 ```
 
 </TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+@Serializable
+data class Restaurant(
+    val name: String,
+    val location: String //you could also use a custom type with a custom serializer for more type safety
+)
+```
+
+```kotlin
+val data = supabase.from("restaurants").insert(listOf(
+    Restaurant("Supa Burger", "POINT(-73.946823 40.807416)"),
+    Restaurant("Supa Pizza", "POINT(-73.94581 40.807475)"),
+    Restaurant("Supa Taco", "POINT(-73.945826 40.80629)"),
+))
+```
+
+</TabPanel>
 </Tabs>
 
 Notice the order in which you pass the latitude and longitude. Longitude comes first, and is because longitude represents the x-axis of the location. Another thing to watch for is when inserting data from the client library, there is no comma between the two values, just a single space.
@@ -196,6 +215,19 @@ final data = await supabase.rpc('nearby_restaurants',params: {
   'lat': 40.807313,
   'long': -73.946713,
 });
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val data = supabase.postgrest.rpc(
+    function = "nearby_restaurants",
+    parameters = buildJsonObject { //You can put here any serializable object including your own classes
+        put("lat", 40.807313)
+        put("lon", -73.946713)
+    }
+)
 ```
 
 </TabPanel>
@@ -282,6 +314,21 @@ final data = await supabase.rpc('restaurants_in_view', params: {
   'max_lat': 40.808,
   'max_long': -73.945,
 });
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val data = supabase.postgrest.rpc(
+    function = "restaurants_in_view",
+    parameters = buildJsonObject { //You can put here any serializable object including your own classes
+        put("min_lat", 40.807)
+        put("min_lon", -73.946)
+        put("max_lat", 40.808)
+        put("max_lon", -73.945)
+    }
+)
 ```
 
 </TabPanel>

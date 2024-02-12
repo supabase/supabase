@@ -41,8 +41,10 @@ export async function chatRlsPolicy(
         - If the user asks for something that's not related to SQL policies, explain to the user 
           that you can only help with policies.
         
-        The output should look like this: 
-        "CREATE POLICY user_policy ON users FOR INSERT USING (user_name = current_user) WITH (true);" 
+        The output should look like this:
+        \`\`\`sql
+        CREATE POLICY "My descriptive policy." ON users FOR INSERT USING (user_name = current_user) WITH (true);
+        \`\`\`
       `,
     },
   ]
@@ -72,7 +74,7 @@ export async function chatRlsPolicy(
 
   try {
     const response = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo-1106',
+      model: 'gpt-3.5-turbo-0125',
       messages: initMessages,
       max_tokens: 1024,
       temperature: 0,
