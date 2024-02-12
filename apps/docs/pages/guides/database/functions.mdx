@@ -97,6 +97,15 @@ final data = await supabase
 Reference: [rpc()](../../reference/dart/rpc)
 
 </TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val data = supabase.postgrest.rpc("hello_world")
+```
+
+Reference: [rpc()](../../reference/kotlin/rpc)
+
+</TabPanel>
 </Tabs>
 
 ## Returning data sets
@@ -210,6 +219,17 @@ final data = await supabase
 ```
 
 </TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val data = supabase.postgrest.rpc("get_planets") {
+    filter {
+        eq("id", 1)
+    }
+}
+```
+
+</TabPanel>
 </Tabs>
 
 ## Passing parameters
@@ -261,6 +281,18 @@ const { data, error } = await supabase.rpc('add_planet', { name: 'Jakku' })
 ```dart
 final data = await supabase
   .rpc('add_planet', params: { 'name': 'Jakku' });
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val data = supabase.postgrest.rpc(
+    function = "add_planet",
+    parameters = buildJsonObject { //You can put here any serializable object including your own classes
+        put("name", "Jakku")
+    }
+)
 ```
 
 </TabPanel>

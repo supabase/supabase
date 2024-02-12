@@ -14,7 +14,7 @@ import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { Alert, Badge, Button, Checkbox, IconBookOpen, Input, Modal, SidePanel } from 'ui'
 import { SpreadsheetImport } from '../'
 import ActionBar from '../ActionBar'
-import { ColumnField, CreateTablePayload, UpdateTablePayload } from '../SidePanelEditor.types'
+import { ColumnField } from '../SidePanelEditor.types'
 import ColumnManagement from './ColumnManagement'
 import HeaderTitle from './HeaderTitle'
 import RLSDisableModalContent from './RLSDisableModal'
@@ -33,7 +33,11 @@ export interface TableEditorProps {
   visible: boolean
   closePanel: () => void
   saveChanges: (
-    payload: any,
+    payload: {
+      name: string
+      schema: string
+      comment?: string | undefined
+    },
     columns: ColumnField[],
     isNewRecord: boolean,
     configuration: {
@@ -144,7 +148,7 @@ const TableEditor = ({
       setErrors(errors)
 
       if (isEmpty(errors)) {
-        const payload: CreateTablePayload | UpdateTablePayload = {
+        const payload = {
           name: tableFields.name,
           schema: snap.selectedSchemaName,
           comment: tableFields.comment,

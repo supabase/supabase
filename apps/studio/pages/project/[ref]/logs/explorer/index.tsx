@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { Button, Form, Input, Modal } from 'ui'
-
+import Split from 'react-split'
 import { useParams } from 'common/hooks'
 import {
   DatePickerToFrom,
@@ -21,7 +21,6 @@ import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import { LogsLayout } from 'components/layouts'
 import CodeEditor from 'components/ui/CodeEditor'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
-import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useContentInsertMutation } from 'data/content/content-insert-mutation'
 import { useLocalStorage, useSelectedOrganization, useStore } from 'hooks'
@@ -183,18 +182,24 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   })
 
   return (
-    <div className="w-full h-full px-5 py-6 mx-auto">
-      <LogsExplorerHeader />
-
-      <div className="flex flex-col flex-grow h-full gap-4">
-        <div className="border rounded">
+    <div className="w-full h-full mx-auto">
+      <Split
+        className="w-full"
+        style={{ height: '100%' }}
+        direction="vertical"
+        gutterSize={2}
+        sizes={[50, 50]}
+        minSize={44}
+        snapOffset={50}
+        expandToMin={true}
+      >
+        <div className="flex-grow overflow-y-auto border-b">
           <LogsQueryPanel
             defaultFrom={params.iso_timestamp_start || ''}
             defaultTo={params.iso_timestamp_end || ''}
             onDateChange={handleDateChange}
             onSelectSource={handleInsertSource}
             onClear={handleClear}
-            onRun={handleRun}
             hasEditorValue={Boolean(editorValue)}
             templates={TEMPLATES.filter((template) => template.mode === 'custom')}
             onSelectTemplate={onSelectTemplate}
@@ -202,21 +207,23 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             isLoading={isLoading}
             warnings={warnings}
           />
-          <div className="h-48 min-h-[7rem]">
-            <ShimmerLine active={isLoading} />
-            <CodeEditor
-              id={editorId}
-              language="pgsql"
-              defaultValue={editorValue}
-              onInputChange={(v) => setEditorValue(v || '')}
-              onInputRun={handleRun}
-            />
-          </div>
+
+          <ShimmerLine active={isLoading} />
+          <CodeEditor
+            id={editorId}
+            language="pgsql"
+            defaultValue={editorValue}
+            onInputChange={(v) => setEditorValue(v || '')}
+            onInputRun={handleRun}
+          />
         </div>
-        <div className="relative flex flex-col flex-grow">
+        <div className="flex flex-col flex-grow">
           <LoadingOpacity active={isLoading}>
-            <div className="flex flex-grow h-full">
+            <div className="flex flex-grow">
               <LogTable
+                onRun={handleRun}
+                onSave={handleOnSave}
+                hasEditorValue={Boolean(editorValue)}
                 params={params}
                 data={logData}
                 error={error}
@@ -228,7 +235,8 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             <UpgradePrompt show={showUpgradePrompt} setShowUpgradePrompt={setShowUpgradePrompt} />
           </div>
         </div>
-      </div>
+      </Split>
+
       <Modal
         size="medium"
         onCancel={() => setSaveModalOpen(!saveModalOpen)}

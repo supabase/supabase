@@ -45,8 +45,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
 
   const showOverUsageBadge =
     useFlag('overusageBadge') &&
-    subscription !== undefined &&
-    (subscription.plan.id === 'free' || subscription.plan.id === 'pro') &&
+    (subscription?.plan.id === 'free' || subscription?.plan.id === 'pro') &&
     !projectHasNoLimits &&
     exceedingLimits
 

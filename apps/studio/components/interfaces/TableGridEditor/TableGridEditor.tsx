@@ -118,7 +118,7 @@ const TableGridEditor = ({
                 result: any[]
               }
             | undefined
-          )
+          ),
         ][]
       }
 

@@ -49,8 +49,8 @@ const GithubRepositorySelection = ({
     process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
       ? `https://github.com/apps/supabase/installations/new?state=${ref}`
       : process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-      ? `https://github.com/apps/supabase-staging/installations/new?state=${ref}`
-      : `https://github.com/apps/supabase-local-testing/installations/new?state=${ref}`
+        ? `https://github.com/apps/supabase-staging/installations/new?state=${ref}`
+        : `https://github.com/apps/supabase-local-testing/installations/new?state=${ref}`
 
   function onSelectConnectRepo() {
     if (integration) {

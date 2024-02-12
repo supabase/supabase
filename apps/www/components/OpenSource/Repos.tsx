@@ -138,8 +138,8 @@ const Repos = ({ tabs }: Props) => {
                 slider.isEnd
                   ? SWIPER_STATE.END
                   : slider.isBeginning
-                  ? SWIPER_STATE.START
-                  : SWIPER_STATE.MIDDLE
+                    ? SWIPER_STATE.START
+                    : SWIPER_STATE.MIDDLE
               )
             }
             className="relative flex md:hidden justify-center max-w-full w-full overflow-hidden items-center rounded-full bg-surface-100 p-2"
@@ -181,7 +181,7 @@ const Repos = ({ tabs }: Props) => {
         </div>
       </div>
       <div className="relative w-full h-fit grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <AnimatePresence exitBeforeEnter>
+        <AnimatePresence mode="wait">
           {repos === null ? (
             <div className="col-span-full flex justify-center items-center min-h-[300px]">
               <LogoLoader />
