@@ -1317,7 +1317,7 @@ as $$
     select last_failed_at into last_failed_at
       from public.mfa_failed_verification_attempts
       where
-        user_id = event->'user_id'
+        user_id = (event->'user_id')::uuid
           and
         factor_id = event->'factor_id';
 
@@ -1367,7 +1367,9 @@ revoke execute
 
 revoke all
   on table public.mfa_failed_verification_attempts
-  from authenticated, anon;`.trim(),
+  from authenticated, anon;
+  
+grant usage on schema public to supabase_auth_admin;`.trim(),
   },
   {
     id: 27,
@@ -1391,7 +1393,7 @@ as $$
     select last_failed_at into last_failed_at
       from public.password_failed_verification_attempts
       where
-        user_id = event->'user_id';
+        user_id = (event->'user_id')::uuid;
 
     if last_failed_at is not null and now() - last_failed_at < interval '10 seconds' then
       -- last attempt was done too quickly
@@ -1437,7 +1439,9 @@ revoke execute
 
 revoke all
   on table public.password_failed_verification_attempts
-  from authenticated, anon;`.trim(),
+  from authenticated, anon;
+  
+grant usage on schema public to supabase_auth_admin;`.trim(),
   },
   {
     id: 28,
@@ -1455,7 +1459,7 @@ as $$
     is_admin boolean;
   begin
     -- Check if the user is marked as admin in the profiles table
-    select is_admin into is_admin from profiles where user_id = event->>'user_id';
+    select is_admin into is_admin from profiles where user_id = (event->>'user_id')::uuid;
 
     -- Proceed only if the user is an admin
     if is_admin then
@@ -1486,7 +1490,8 @@ grant execute
 revoke execute
   on function public.custom_access_token_hook
   from authenticated, anon;
-    `.trim(),
+
+grant usage on schema public to supabase_auth_admin;`.trim(),
   },
 
   {

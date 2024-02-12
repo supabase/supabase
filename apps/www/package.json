@@ -63,6 +63,7 @@
     "typed.js": "^2.0.16",
     "typescript": "^5.2.2",
     "ui": "*",
+    "ui-patterns": "*",
     "use-debounce": "^7.0.1",
     "vanilla-tilt": "1.7.0",
     "yup": "^0.32.11"
