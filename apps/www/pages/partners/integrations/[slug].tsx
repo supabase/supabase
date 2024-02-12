@@ -11,13 +11,14 @@ import { Dispatch, SetStateAction, useState } from 'react'
 import remarkGfm from 'remark-gfm'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/swiper.min.css'
-import { Admonition, Button, ExpandableVideo, IconChevronLeft, IconExternalLink } from 'ui'
+import { Admonition, Button, IconChevronLeft, IconExternalLink } from 'ui'
 import ImageModal from '~/components/ImageModal'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import supabase from '~/lib/supabaseMisc'
 import { Partner } from '~/types/partners'
 import Error404 from '../../404'
+import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
 
 /**
  * Returns custom components so that the markdown converts to a nice looking html.
@@ -335,7 +336,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   return {
     props: { partner, overview },
-    revalidate: 1800, // 5 hours
+    revalidate: 1800, // 30 minutes
   }
 }
 
