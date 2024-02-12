@@ -56,7 +56,7 @@
   --background-control: var(--colors-slate-light-300);
   --background-selection: var(--colors-gray-light-400);
   --background-alternative-default: var(--colors-slate-light-100);
-  --background-default: var(--colors-gray-light-200);
+  --background-default: var(--colors-gray-light-100);
   --background-200: var(--colors-gray-light-200);
   --foreground-default: var(--colors-slate-light-1200);
 }
