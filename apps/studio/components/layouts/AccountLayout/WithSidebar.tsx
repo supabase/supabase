@@ -34,7 +34,7 @@ const WithSidebar = ({
   const navLayoutV2 = useFlag('navigationLayoutV2')
 
   return (
-    <div className="flex h-full min-h-screen">
+    <div className="flex h-full">
       {!hideSidebar && !noContent && (
         <div
           id="with-sidebar"
