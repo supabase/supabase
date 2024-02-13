@@ -22,7 +22,7 @@ https://[project_id].supabase.co/storage/v1/object/public/[bucket]/[asset-name]
 You can also use the Supabase SDK `getPublicUrl` to generate this url for you
 
 ```js
-const { data, error } = supabase.storage
+const { data } = supabase.storage
   .from('bucket')
   .getPublicUrl('filePath.jpg')
 
