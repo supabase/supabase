@@ -47,7 +47,7 @@ const AppHeader = () => {
 
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-3">
-          <FeedbackDropdown alt />
+          <FeedbackDropdown />
           <NotificationsPopover alt />
           <HelpPopover />
           <SettingsButton />

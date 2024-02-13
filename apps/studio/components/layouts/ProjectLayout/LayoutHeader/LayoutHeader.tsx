@@ -15,7 +15,6 @@ import { IS_PLATFORM } from 'lib/constants'
 import BreadcrumbsView from './BreadcrumbsView'
 import FeedbackDropdown from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
-import NotificationsPopover from './NotificationsPopover'
 import NotificationsPopoverV2 from './NotificationsPopoverV2/NotificationsPopover'
 
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
@@ -24,7 +23,6 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
   const selectedOrganization = useSelectedOrganization()
 
   const enableBranchManagement = useFlag('branchManagement')
-  const notificationsV2 = useFlag('notificationsV2')
 
   const isBranchingEnabled =
     selectedProject?.is_branch_enabled === true || selectedProject?.parent_project_ref !== undefined
@@ -119,7 +117,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
       </div>
       <div className="flex items-center gap-x-2">
         {customHeaderComponents && customHeaderComponents}
-        {IS_PLATFORM && <FeedbackDropdown alt={notificationsV2} />}
+        {IS_PLATFORM && <FeedbackDropdown />}
         {IS_PLATFORM && (
           <>
             <NotificationsPopoverV2 />
