@@ -1,0 +1,102 @@
+---
+title: 'Email Templates'
+description: 'Learn how to manage the email templates in Supabase.'
+subtitle: 'Learn how to manage the email templates in Supabase.'
+---
+
+You can customize the email messages used for the authentication flows. You can edit the following email templates:
+
+- Confirm signup
+- Invite user
+- Magic Link
+- Change Email Address
+- Reset Password
+
+## Terminology
+
+The templating system provides the following variables for use:
+
+| Name                     | Description                                                                                                                                                                                                                                                                           |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `{{ .ConfirmationURL }}` | Contains the confirmation URL. For example, a signup confirmation URL would look like: `https://project-ref.supabase.co/auth/v1/verify?token={{ .TokenHash }}&type=signup&redirect_to=https://example.com/path` .                                                                     |
+| `{{ .Token }}`           | Contains a 6-digit One-Time-Password (OTP) that can be used instead of the `{{. ConfirmationURL }}` .                                                                                                                                                                                 |
+| `{{ .TokenHash }}`       | Contains a hashed version of the `{{ .Token }}`. This is useful for constructing your own email link in the email template.                                                                                                                                                           |
+| `{{ .SiteURL }}`         | Contains your application's Site URL. This can be configured in your project's [authentication settings](/dashboard/project/_/auth/url-configuration).                                                                                                                                |
+| `{{ .RedirectTo }}`      | Contains the redirect URL passed when `signUp`, `signInWithOtp`, `signInWithOAuth`, `resetPasswordForEmail` or `inviteUserByEmail` is called. The redirect URL allow list can be configured in your project's [authentication settings](/dashboard/project/_/auth/url-configuration). |
+| `{{ .Data }}`            | Contains metadata from `auth.users.user_metadata`. Use this to personalize the email message.                                                                                                                                                                                         |
+
+## Limitations
+
+### Email prefetching
+
+Certain email providers may have spam detection or other security features that prefetch URL links from incoming emails (e.g. [Safe Links in Microsoft Defender for Office 365](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-links-about?view=o365-worldwide)).
+In this scenario, the `{{ .ConfirmationURL }}` sent will be consumed instantly which leads to a "Token has expired or is invalid" error.
+To guard against this:
+
+- Use an email OTP instead by including `{{ .Token }}` in the email template.
+- Create your own custom email link to redirect the user to a page where they can click on a button to confirm the action.
+  For example, you can include the following in your email template:
+
+  ```html
+  <a href="{{ .SiteURL }}/confirm-signup?confirmation_url={{ .ConfirmationURL }}"
+    >Confirm your signup
+  </a>
+  ```
+
+  The user should be brought to a page on your site where they can confirm the action by clicking a button.
+  The button should contain the actual confirmation link which can be obtained from parsing the `confirmation_url={{ .ConfirmationURL }}` query parameter in the URL.
+
+### Email tracking
+
+If you are using an external email provider that enables "email tracking", the links inside the Supabase email templates will be overwritten and won't perform as expected. We recommend disabling email tracking to ensure email links are not overwritten.
+
+### Redirecting the user to a server-side endpoint
+
+If you intend to use [Server-side rendering](/docs/guides/auth/server-side-rendering), you might want the email link to redirect the user to a server-side endpoint to check if they are authenticated before returning the page. However, the default email link will redirect the user after verification to the redirect URL with the session in the query fragments. Since the session is returned in the query fragments by default, you won't be able to access it on the server-side.
+
+You can customize the email link in the email template to redirect the user to a server-side endpoint successfully. For example:
+
+```html
+<a
+  href="https://api.example.com/v1/authenticate?token_hash={{ .TokenHash }}&type=invite&redirect_to={{ .RedirectTo }}"
+  >Accept the invite
+</a>
+```
+
+When the user clicks on the link, the request will hit `https://api.example.com/v1/authenticate` and you can grab the `token_hash`, `type` and `redirect_to` query parameters from the URL. Then, you can call the [`verifyOtp`](/docs/reference/javascript/auth-verifyotp) method to get back an authenticated session before redirecting the user back to the client. Since the `verifyOtp` method makes a `POST` request to Supabase Auth to verify the user, the session will be returned in the response body, which can be read by the server. For example:
+
+```js
+const { token_hash, type } = Object.fromEntries(new URLSearchParams(window.location.search))
+const {
+  data: { session },
+  error,
+} = await supabase.auth.verifyOtp({ token_hash, type })
+
+// subsequently redirect the user back to the client using the redirect_to param
+// ...
+```
+
+## Customization
+
+Supabase Auth makes use of [Go Templates](https://pkg.go.dev/text/template). This means it is possible to conditionally render information based on template properties.You may wish to checkout this [guide by Hugo](https://gohugo.io/templates/introduction/) for a guide on the templating language.
+
+### Send different email to early access users
+
+Send a different email to users who signed up via an early access domain (`https://www.earlyaccess.trial.com`).
+
+```
+{{ if eq .Data.Domain "https://www.example.com" }}
+<h1>Welcome to Our Database Service!</h1>
+  <p>Dear Developer,</p>
+  <p>Welcome to Billy, the scalable developer platform!</p>
+  <p>Best Regards,<br>
+Billy Team</p>
+{{ else if eq .Data.Domain "https://www.earlyaccess.trial.com" }}
+<h1>Welcome to Our Database Service!</h1>
+  <p>Dear Developer,</p>
+  <p>Welcome Billy, the scalable developer platform!</p>
+  <p> As an early access member, you have access to select features like Point To Space Restoration.</p>
+  <p>Best Regards,<br>
+Billy Team</p>
+{{ end }}
+```

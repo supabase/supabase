@@ -4,8 +4,7 @@ import Link from 'next/link'
 import { FC } from 'react'
 import { Button, IconCommand, IconGitHub, IconSearch, SearchButton } from 'ui'
 import { useIsLoggedIn, useIsUserLoading } from 'common'
-
-import ThemeToggle from '@ui/components/ThemeProvider/ThemeToggle'
+import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 
 const TopNavBar: FC = () => {
   const isLoggedIn = useIsLoggedIn()

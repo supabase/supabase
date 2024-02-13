@@ -1,4 +1,5 @@
 import { Meta } from '@storybook/react'
+import React from 'react'
 import { cn } from '../../../lib/utils/cn'
 import { Slider } from '../ui/slider'
 

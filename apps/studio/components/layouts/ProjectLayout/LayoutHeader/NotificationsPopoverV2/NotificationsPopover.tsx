@@ -8,7 +8,9 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
-  Tabs,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
+  Tabs_Shadcn_,
 } from 'ui'
 
 import AlertError from 'components/ui/AlertError'
@@ -82,7 +84,8 @@ const NotificationsPopoverV2 = () => {
   }
 
   return (
-    <>
+    <div>
+      {/* wrapped in a div to stop space-x class impacting popover content */}
       <Popover_Shadcn_
         modal={false}
         open={open}
@@ -95,6 +98,8 @@ const NotificationsPopoverV2 = () => {
           <Button
             type={hasNewNotifications ? 'outline' : 'text'}
             className={clsx(
+              'h-[26px]',
+              // !hasCritical || !hasWarning || !hasNewNotifications ? 'w-[26px]' : '',
               'group',
               hasNewNotifications ? 'rounded-full px-1.5' : 'px-1',
               hasCritical
@@ -105,9 +110,9 @@ const NotificationsPopoverV2 = () => {
             )}
             icon={
               hasCritical ? (
-                <CriticalIcon className="transition-all -mr-3.5 group-hover:-mr-1 z-10" />
+                <CriticalIcon className="!w-3.5 !h-3.5 transition-all -mr-3.5 group-hover:-mr-1 z-10" />
               ) : hasWarning ? (
-                <WarningIcon className="transition-all -mr-3.5 group-hover:-mr-1 z-10" />
+                <WarningIcon className="!w-3.5 !h-3.5 transition-all -mr-3.5 group-hover:-mr-1 z-10" />
               ) : hasNewNotifications ? (
                 <div
                   className={clsx(
@@ -133,24 +138,24 @@ const NotificationsPopoverV2 = () => {
           <div className="px-4">
             <p className="pt-4 pb-1 text-sm">Notifications</p>
             <div className="flex items-center">
-              <Tabs
-                size="medium"
-                type="underlined"
-                baseClassNames="!space-y-0"
-                listClassNames="[&>button>span]:text-xs"
-                activeId={activeTab}
-                onChange={(tab: 'inbox' | 'archived') => {
-                  setActiveTab(tab)
+              <Tabs_Shadcn_
+                className="w-full"
+                onValueChange={(tab: string) => {
+                  setActiveTab(tab as 'inbox' | 'archived')
                   if (tab === 'archived' && snap.filterStatuses.includes('unread')) {
                     snap.setFilters('unread', 'status')
                   }
                 }}
+                value={activeTab}
               >
-                <Tabs.Panel
-                  id="inbox"
-                  label="Inbox"
-                  iconRight={
-                    isSuccessSummary ? (
+                <div className="flex items-center">
+                  <TabsList_Shadcn_ className="flex gap-5 grow border-none">
+                    <TabsTrigger_Shadcn_
+                      id="inbox"
+                      value="inbox"
+                      className="px-0 data-[state=active]:bg-transparent flex gap-2"
+                    >
+                      Inbox
                       <div
                         className={clsx([
                           'flex items-center justify-center text-xs rounded-full bg-surface-300 h-4',
@@ -159,13 +164,18 @@ const NotificationsPopoverV2 = () => {
                       >
                         {summary?.unread_count}
                       </div>
-                    ) : null
-                  }
-                />
-                <Tabs.Panel id="archived" label="Archived" />
-              </Tabs>
-
-              <NotificationsFilter activeTab={activeTab} />
+                    </TabsTrigger_Shadcn_>
+                    <TabsTrigger_Shadcn_
+                      id="archived"
+                      value="archived"
+                      className="px-0 data-[state=active]:bg-transparent"
+                    >
+                      Archived
+                    </TabsTrigger_Shadcn_>
+                  </TabsList_Shadcn_>
+                  <NotificationsFilter activeTab={activeTab} />
+                </div>
+              </Tabs_Shadcn_>
             </div>
           </div>
           <div className="border-t">
@@ -180,7 +190,7 @@ const NotificationsPopoverV2 = () => {
               </div>
             )}
             {isSuccess && (
-              <div className="flex flex-1 h-[400px]">
+              <div className="flex flex-1 h-[400px] bg-background">
                 {notifications.length > 0 &&
                 !(activeTab === 'archived' && snap.filterStatuses.includes('unread')) ? (
                   <InfiniteList
@@ -259,7 +269,7 @@ const NotificationsPopoverV2 = () => {
           )}
         </PopoverContent_Shadcn_>
       </Popover_Shadcn_>
-    </>
+    </div>
   )
 }
 
