@@ -42,6 +42,7 @@ export type Entity = {
   name: string
   type: ENTITY_TYPE
   comment: string | null
+  rls_enabled: boolean
 }
 
 export type EntityType = Entity | null
