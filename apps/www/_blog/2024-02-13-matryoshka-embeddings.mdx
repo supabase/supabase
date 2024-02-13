@@ -337,20 +337,20 @@ begin
 
   return (
     with unnormed(elem) as (
-        select x from unnest(v::float4[]) with ordinality v(x, ix)
-        where ix <= dimensions
+      select x from unnest(v::float4[]) with ordinality v(x, ix)
+      where ix <= dimensions
     ),
     norm(factor) as (
-        select
-            sqrt(sum(pow(elem, 2)))
-        from
-            unnormed
+      select
+        sqrt(sum(pow(elem, 2)))
+      from
+        unnormed
     )
     select
-        array_agg(u.elem / r.factor)::vector
+      array_agg(u.elem / r.factor)::vector
     from
-        norm r, unnormed u
-	);
+      norm r, unnormed u
+  );
 end;
 $$;
 ```
@@ -383,26 +383,26 @@ Finally we can create our Adaptive Retrieval match function:
 
 ```sql
 create or replace function match_documents_adaptive(
-	query_embedding vector(3072),
-	match_count int
+  query_embedding vector(3072),
+  match_count int
 )
 returns setof documents
 language sql
 as $$
 begin
   with shortlist as (
-		select *
-		from documents,
-		order by
-			sub_vector(embedding, 512)::vector(512) <#> (
-				select sub_vector(query_embedding, 512)::vector(512)
-			) asc
-		limit final_count * 8
-	)
-	select *
-	from shortlist
-	order by embedding <#> query_embedding asc
-	limit least(final_count, 200);
+    select *
+    from documents,
+    order by
+      sub_vector(embedding, 512)::vector(512) <#> (
+        select sub_vector(query_embedding, 512)::vector(512)
+      ) asc
+    limit match_count * 8
+  )
+  select *
+  from shortlist
+  order by embedding <#> query_embedding asc
+  limit least(match_count, 200);
 end;
 $$;
 ```
