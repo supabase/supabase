@@ -17,7 +17,6 @@ import {
   IconLoader,
   Input_Shadcn_,
   Modal,
-  cn,
 } from 'ui'
 
 interface GithubRepositorySelectionProps {
@@ -37,12 +36,6 @@ const GithubRepositorySelection = ({
   const org = useSelectedOrganization()
 
   const sidePanels = useSidePanelsStateSnapshot()
-  const githubIntegrationAppUrl =
-    process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
-      ? `https://github.com/apps/supabase/installations/new?state=${ref}`
-      : process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-        ? `https://github.com/apps/supabase-staging/installations/new?state=${ref}`
-        : `https://github.com/apps/supabase-local-testing/installations/new?state=${ref}`
 
   function onSelectConnectRepo() {
     sidePanels.setGithubConnectionsOpen(true)
