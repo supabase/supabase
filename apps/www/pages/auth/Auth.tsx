@@ -1,13 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import {
-  Button,
-  IconArrowUpRight,
-  IconBriefcase,
-  IconEye,
-  IconLink,
-  IconShield,
-  ThemeImage,
-} from 'ui'
+import { Button, IconArrowUpRight, IconBriefcase, IconEye, IconLink, IconShield } from 'ui'
 import ApiExamples from 'data/products/auth/auth-api-examples'
 import AuthSqlRulesExamples from 'data/products/auth/auth-sql-rules-examples'
 import Solutions from 'data/Solutions'
@@ -26,6 +18,7 @@ import APISection from '~/components/Sections/APISection'
 import GithubExamples from '~/components/Sections/GithubExamples'
 import ProductHeader from '~/components/Sections/ProductHeader'
 import AuthProviders from '~/data/auth.json'
+import { ThemeImage } from 'ui-patterns/ThemeImage'
 
 function AuthPage() {
   // base path for images

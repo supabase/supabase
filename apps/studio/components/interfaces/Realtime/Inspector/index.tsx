@@ -47,8 +47,7 @@ export const RealtimeInspector = () => {
         visible={sendMessageShown}
         onSelectCancel={() => setSendMessageShown(false)}
         onSelectConfirm={(v) => {
-          sendMessage(v.message, v.payload)
-          setSendMessageShown(false)
+          sendMessage(v.message, v.payload, () => setSendMessageShown(false))
         }}
       />
     </div>

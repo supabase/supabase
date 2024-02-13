@@ -10,9 +10,9 @@ import {
   DropdownMenuItem,
   DropdownMenuPortal,
   DropdownMenuSeparator,
+  DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
-  DropdownMenuSub,
   DropdownMenuTrigger,
   IconAlertCircle,
   IconClipboard,
@@ -28,6 +28,7 @@ import {
   IconTrash2,
 } from 'ui'
 
+import { ItemRenderer } from 'components/ui/InfiniteList'
 import { useCheckPermissions } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
@@ -52,8 +53,8 @@ export const RowIcon = ({ view, status, fileType, mimeType }: any) => {
       fileType === STORAGE_ROW_TYPES.BUCKET
         ? `${BASE_PATH}/img/bucket-filled.svg`
         : fileType === STORAGE_ROW_TYPES.FOLDER
-        ? `${BASE_PATH}/img/folder-filled.svg`
-        : `${BASE_PATH}/img/file-filled.svg`
+          ? `${BASE_PATH}/img/folder-filled.svg`
+          : `${BASE_PATH}/img/file-filled.svg`
     return (
       <SVG
         src={iconSrc}
@@ -80,8 +81,6 @@ export const RowIcon = ({ view, status, fileType, mimeType }: any) => {
 }
 
 export interface FileExplorerRowProps {
-  index: number
-  item: any
   view: string
   columnIndex: number
   selectedItems: any[]
@@ -90,7 +89,7 @@ export interface FileExplorerRowProps {
   onCopyUrl: (name: string, url: string) => void
 }
 
-const FileExplorerRow = ({
+const FileExplorerRow: ItemRenderer<any, FileExplorerRowProps> = ({
   index: itemIndex,
   item = {},
   view = STORAGE_VIEWS.COLUMNS,
@@ -99,7 +98,7 @@ const FileExplorerRow = ({
   openedFolders = [],
   selectedFilePreview = {},
   onCopyUrl,
-}: FileExplorerRowProps) => {
+}) => {
   const storageExplorerStore = useStorageStore()
   const {
     getFileUrl,
@@ -300,8 +299,8 @@ const FileExplorerRow = ({
     view === STORAGE_VIEWS.LIST && item.isCorrupted
       ? `calc(100% - 60px)`
       : view === STORAGE_VIEWS.LIST && !item.isCorrupted
-      ? `calc(100% - 50px)`
-      : '100%'
+        ? `calc(100% - 50px)`
+        : '100%'
 
   if (item.status === STORAGE_ROW_STATUS.EDITING) {
     return <FileExplorerRowEditing view={view} item={item} columnIndex={columnIndex} />

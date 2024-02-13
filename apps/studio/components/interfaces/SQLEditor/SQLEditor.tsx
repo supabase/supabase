@@ -208,7 +208,10 @@ const SQLEditor = () => {
               [
                 {
                   range: new monaco.Range(line, 1, line, 20),
-                  options: { isWholeLine: true, inlineClassName: 'bg-amber-800' },
+                  options: {
+                    isWholeLine: true,
+                    inlineClassName: 'bg-warning-400',
+                  },
                 },
               ]
             )
@@ -604,7 +607,7 @@ const SQLEditor = () => {
                   <AiIconAnimation loading={isAiLoading} />
                 </motion.div>
 
-                <AnimatePresence initial={false} exitBeforeEnter>
+                <AnimatePresence initial={false} mode="wait">
                   {debugSolution && (
                     <div className="h-full w-full flex flex-row items-center overflow-y-hidden text-sm text-white">
                       {debugSolution}

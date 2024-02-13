@@ -159,14 +159,14 @@ const MapView = ({
                       name: hasNoDatabases
                         ? undefined
                         : hasPrimary
-                        ? `Primary Database${
-                            replicas.length > 0
-                              ? ` + ${replicas.length} replica${replicas.length > 1 ? 's' : ''} `
-                              : ''
-                          }`
-                        : `${replicas.length} Read Replica${
-                            replicas.length > 1 ? 's' : ''
-                          } deployed`,
+                          ? `Primary Database${
+                              replicas.length > 0
+                                ? ` + ${replicas.length} replica${replicas.length > 1 ? 's' : ''} `
+                                : ''
+                            }`
+                          : `${replicas.length} Read Replica${
+                              replicas.length > 1 ? 's' : ''
+                            } deployed`,
                     },
                   })
                 }}
@@ -192,8 +192,8 @@ const MapView = ({
                     hasNoDatabases
                       ? 'fill-background-surface-300 stroke-border-stronger'
                       : hasPrimary
-                      ? 'fill-brand stroke-brand-500'
-                      : 'fill-brand-500 stroke-brand-400'
+                        ? 'fill-brand stroke-brand-500'
+                        : 'fill-brand-500 stroke-brand-400'
                   }`}
                 />
               </Marker>

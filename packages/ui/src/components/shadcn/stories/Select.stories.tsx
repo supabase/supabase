@@ -1,30 +1,29 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Meta } from '@storybook/react'
-import { Button } from '@ui/components/shadcn/ui/button'
-import { Card } from '@ui/components/shadcn/ui/card'
+import { Button } from '../ui/button'
 import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@ui/components/shadcn/ui/form'
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from '../ui/form'
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from '@ui/components/shadcn/ui/select'
-import { toast } from '@ui/components/shadcn/ui/use-toast'
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from '../ui/select'
+import { toast } from '../ui/use-toast'
 // import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
-import { SelectSeparator } from '@ui/components/shadcn/ui/select'
+import { SelectSeparator } from '../ui/select'
 
 const meta: Meta = {
   title: 'shadcn/Select',

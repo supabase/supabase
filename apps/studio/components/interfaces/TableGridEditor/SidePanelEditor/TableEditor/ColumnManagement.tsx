@@ -1,8 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import type { PostgresColumn, PostgresTable, PostgresType } from '@supabase/postgres-meta'
+import type { PostgresType } from '@supabase/postgres-meta'
 import { isEmpty, noop, partition } from 'lodash'
-import Link from 'next/link'
-import { useState } from 'react'
 import {
   DragDropContext,
   Draggable,
@@ -14,15 +12,15 @@ import { Alert, Button, IconEdit, IconExternalLink, IconHelpCircle, IconKey, Ico
 
 import InformationBox from 'components/ui/InformationBox'
 import { generateColumnField } from '../ColumnEditor/ColumnEditor.utils'
-import ForeignKeySelector from '../ForeignKeySelector/ForeignKeySelector'
+import { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { TEXT_TYPES } from '../SidePanelEditor.constants'
 import { ColumnField, ExtendedPostgresRelationship } from '../SidePanelEditor.types'
 import Column from './Column'
 import { ImportContent } from './TableEditor.types'
 
 interface ColumnManagementProps {
-  table?: Partial<PostgresTable>
   columns?: ColumnField[]
+  relations: ForeignKey[]
   enumTypes: PostgresType[]
   importContent?: ImportContent
   isNewRecord: boolean
@@ -32,8 +30,8 @@ interface ColumnManagementProps {
 }
 
 const ColumnManagement = ({
-  table,
   columns = [],
+  relations,
   enumTypes = [],
   importContent,
   isNewRecord,
@@ -41,44 +39,17 @@ const ColumnManagement = ({
   onSelectImportData = noop,
   onClearImportContent = noop,
 }: ColumnManagementProps) => {
-  const [selectedColumnToEditRelation, setSelectedColumnToEditRelation] = useState<ColumnField>()
-
   const hasImportContent = !isEmpty(importContent)
   const [primaryKeyColumns, otherColumns] = partition(
     columns,
     (column: ColumnField) => column.isPrimaryKey
   )
 
-  const saveColumnForeignKey = (foreignKeyConfiguration?: {
-    table: PostgresTable
-    column: PostgresColumn
-    deletionAction: string
-    updateAction: string
-  }) => {
-    if (selectedColumnToEditRelation !== undefined) {
-      onUpdateColumn(selectedColumnToEditRelation, {
-        foreignKey:
-          foreignKeyConfiguration !== undefined
-            ? {
-                id: 0,
-                constraint_name: '',
-                source_schema: table?.schema ?? '',
-                source_table_name: table?.name ?? '',
-                source_column_name: selectedColumnToEditRelation?.name,
-                target_table_schema: foreignKeyConfiguration.table.schema,
-                target_table_name: foreignKeyConfiguration.table.name,
-                target_column_name: foreignKeyConfiguration.column.name,
-                deletion_action: foreignKeyConfiguration.deletionAction,
-                update_action: foreignKeyConfiguration.updateAction,
-              }
-            : undefined,
-        ...(foreignKeyConfiguration !== undefined && {
-          format: foreignKeyConfiguration.column.format,
-          defaultValue: null,
-        }),
-      })
-    }
-    setSelectedColumnToEditRelation(undefined)
+  const checkIfHaveForeignKeys = (column: ColumnField) => {
+    return (
+      relations.find((relation) => relation.columns.find((x) => x.source === column.name)) !==
+      undefined
+    )
   }
 
   const onUpdateColumn = (columnToUpdate: ColumnField, changes: Partial<ColumnField>) => {
@@ -143,24 +114,36 @@ const ColumnManagement = ({
       <div className="w-full space-y-4 table-editor-columns">
         <div className="flex items-center justify-between w-full">
           <h5>Columns</h5>
-          {isNewRecord && (
-            <>
-              {hasImportContent ? (
-                <div className="flex items-center space-x-3">
-                  <Button type="default" icon={<IconEdit />} onClick={onSelectImportData}>
-                    Edit content
+          <div className="flex items-center gap-x-2">
+            <Button asChild type="default" icon={<IconExternalLink size={12} strokeWidth={2} />}>
+              <a
+                href="https://supabase.com/docs/guides/database/tables#data-types"
+                target="_blank"
+                rel="noreferrer"
+              >
+                About data types
+              </a>
+            </Button>
+            {isNewRecord && (
+              <>
+                <div className="py-3 border-r" />
+                {hasImportContent ? (
+                  <div className="flex items-center gap-x-2">
+                    <Button type="default" icon={<IconEdit />} onClick={onSelectImportData}>
+                      Edit content
+                    </Button>
+                    <Button type="danger" icon={<IconTrash />} onClick={onClearImportContent}>
+                      Remove content
+                    </Button>
+                  </div>
+                ) : (
+                  <Button type="default" onClick={onSelectImportData}>
+                    Import data via spreadsheet
                   </Button>
-                  <Button type="danger" icon={<IconTrash />} onClick={onClearImportContent}>
-                    Remove content
-                  </Button>
-                </div>
-              ) : (
-                <Button type="default" onClick={onSelectImportData}>
-                  Import data via spreadsheet
-                </Button>
-              )}
-            </>
-          )}
+                )}
+              </>
+            )}
+          </div>
         </div>
 
         {hasImportContent && (
@@ -207,7 +190,7 @@ const ColumnManagement = ({
                     <div
                       className={[
                         'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                        'border border-background', //border
+                        'border border-background w-[300px]', //border
                       ].join(' ')}
                     >
                       <span className="text-xs text-foreground">
@@ -237,7 +220,7 @@ const ColumnManagement = ({
                     <div
                       className={[
                         'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                        'border border-background', //border
+                        'border border-background w-[300px]', //border
                       ].join(' ')}
                     >
                       <span className="text-xs text-foreground">
@@ -280,12 +263,10 @@ const ColumnManagement = ({
                             <Column
                               column={column}
                               enumTypes={enumTypes}
+                              hasForeignKeys={checkIfHaveForeignKeys(column)}
                               isNewRecord={isNewRecord}
                               hasImportContent={hasImportContent}
                               dragHandleProps={draggableProvided.dragHandleProps}
-                              onEditRelation={() => {
-                                setSelectedColumnToEditRelation(column)
-                              }}
                               onUpdateColumn={(changes) => onUpdateColumn(column, changes)}
                               onRemoveColumn={() => onRemoveColumn(column)}
                             />
@@ -315,11 +296,9 @@ const ColumnManagement = ({
                             column={column}
                             enumTypes={enumTypes}
                             isNewRecord={isNewRecord}
+                            hasForeignKeys={checkIfHaveForeignKeys(column)}
                             hasImportContent={hasImportContent}
                             dragHandleProps={draggableProvided.dragHandleProps}
-                            onEditRelation={() => {
-                              setSelectedColumnToEditRelation(column)
-                            }}
                             onUpdateColumn={(changes) => onUpdateColumn(column, changes)}
                             onRemoveColumn={() => onRemoveColumn(column)}
                           />
@@ -334,34 +313,14 @@ const ColumnManagement = ({
           </DragDropContext>
         </div>
 
-        <div className="flex items-center justify-between">
-          {!hasImportContent && (
+        {!hasImportContent && (
+          <div className="flex items-center justify-center rounded border border-strong border-dashed py-3">
             <Button type="default" onClick={() => onAddColumn()}>
               Add column
             </Button>
-          )}
-          <Button
-            asChild
-            type="text"
-            className="text-foreground-light hover:text-foreground"
-            icon={<IconExternalLink size={12} strokeWidth={2} />}
-          >
-            <Link
-              href="https://supabase.com/docs/guides/database/tables#data-types"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Learn more about data types
-            </Link>
-          </Button>
-        </div>
+          </div>
+        )}
       </div>
-      <ForeignKeySelector
-        column={selectedColumnToEditRelation as ColumnField}
-        visible={selectedColumnToEditRelation !== undefined}
-        closePanel={() => setSelectedColumnToEditRelation(undefined)}
-        saveChanges={saveColumnForeignKey}
-      />
     </>
   )
 }

@@ -20,7 +20,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   IconMail,
-  IconMoreHorizontal,
+  IconMoreVertical,
   IconShieldOff,
   IconTrash,
   Modal,
@@ -127,7 +127,7 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button type="text" loading={isLoading} className="hover:border-gray-500 flex">
-            <IconMoreHorizontal />
+            <IconMoreVertical />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>

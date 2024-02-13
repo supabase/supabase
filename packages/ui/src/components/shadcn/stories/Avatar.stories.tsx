@@ -1,6 +1,5 @@
-import React from 'react'
 import { Meta } from '@storybook/react'
-import { Avatar, AvatarFallback, AvatarImage } from '@ui/components/shadcn/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 
 const meta: Meta<typeof Avatar> = {
   title: 'Shadcn/Avatar',

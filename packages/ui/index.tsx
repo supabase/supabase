@@ -2,29 +2,21 @@
 
 import * as React from 'react'
 
-// Providers
-
-export * from './src/providers'
-
 // Markdown components
 
 export * from './src/lib/Markdown'
 
-// // GENERAL
+// GENERAL
 
 export * from './src/components/Admonition'
 export * from './src/components/Button'
 export * from './src/components/Icon'
 export * from './src/components/Icon/IconContext'
-export * from './src/components/GlassPanel'
-export * from './src/components/IconPanel'
 export * from './src/components/Icon/IconBackground'
-export * from './src/components/ThemeImage'
 
 // DISPLAYS
 
 export * from './src/components/Card'
-export * from './src/components/TweetCard'
 export * from './src/components/Badge'
 export * from './src/components/Tabs'
 export * from './src/components/Alert'
@@ -35,15 +27,13 @@ export * from './src/components/CodeBlock'
 // NAV
 
 export * from './src/components/Menu'
+export * from './src/components/NavMenu'
 
 // OVERLAYS
 
 export * from './src/components/Modal'
 export * from './src/components/SidePanel'
-export * from './src/components/ConsentToast'
 export * from './src/components/ContextMenu'
-export * from './src/components/ExpandableVideo'
-export * from './src/components/PrivacySettings'
 export * from './src/components/PromoToast'
 export * from './src/components/Popover'
 export * from './src/layout/PortalToast'
@@ -70,9 +60,6 @@ export * from './src/components/Form'
 // CMD+K
 export * from './src/components/Command'
 
-// Widgets
-export * from './src/components/CountdownWidget'
-
 // layout
 export * from './src/components/LoadingLine'
 
@@ -86,10 +73,7 @@ export * from './src/layout/ai-icon-animation'
 export * from './src/lib/utils'
 
 // theme switcher
-export * from './src/components/ThemeProvider/ThemeToggle'
 export * from './src/components/ThemeProvider/themes'
-
-// animated ui
 
 // shadcn
 export * from './src/components/shadcn/ui/dropdown-menu'
@@ -157,7 +141,11 @@ export {
   SelectValue as SelectValue_Shadcn_,
 } from './src/components/shadcn/ui/select'
 
+export { Slider as Slider_Shadcn_ } from './src/components/shadcn/ui/slider'
+
 export { Input as Input_Shadcn_ } from './src/components/shadcn/ui/input'
+
+export { Button as Button_Shadcn_ } from './src/components/shadcn/ui/button'
 
 export { TextArea as TextArea_Shadcn_ } from './src/components/shadcn/ui/text-area'
 
@@ -186,13 +174,23 @@ export {
   SheetDescription as SheetDescription_Shadcn_,
 } from './src/components/shadcn/ui/sheet'
 
+export {
+  Tabs as Tabs_Shadcn_,
+  TabsContent as TabsContent_Shadcn_,
+  TabsList as TabsList_Shadcn_,
+  TabsTrigger as TabsTrigger_Shadcn_,
+} from './src/components/shadcn/ui/tabs/tabs'
+
+export {
+  TooltipProvider as TooltipProvider_Shadcn_,
+  Tooltip as Tooltip_Shadcn_,
+  TooltipTrigger as TooltipTrigger_Shadcn_,
+  TooltipContent as TooltipContent_Shadcn_,
+} from './src/components/shadcn/ui/tooltip'
+
 export { ScrollArea, ScrollBar } from './src/components/shadcn/ui/scroll-area'
 
 export { Separator } from './src/components/shadcn/ui/separator'
-
-// patterns
-
-export * from './src/patterns/SchemaTableNode'
 
 // links
 

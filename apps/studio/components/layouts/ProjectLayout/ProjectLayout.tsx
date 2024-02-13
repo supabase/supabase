@@ -31,11 +31,13 @@ const routesToIgnoreProjectDetailsRequest = [
   '/project/[ref]/settings/database',
   '/project/[ref]/settings/storage',
   '/project/[ref]/settings/infrastructure',
+  '/project/[ref]/settings/addons',
 ]
 
 const routesToIgnoreDBConnection = [
   '/project/[ref]/branches',
   '/project/[ref]/database/backups/scheduled',
+  '/project/[ref]/settings/addons',
 ]
 
 const routesToIgnorePostgrestConnection = [
@@ -43,6 +45,7 @@ const routesToIgnorePostgrestConnection = [
   '/project/[ref]/settings/general',
   '/project/[ref]/settings/database',
   '/project/[ref]/settings/infrastructure',
+  '/project/[ref]/settings/addons',
 ]
 
 export interface ProjectLayoutProps {
@@ -89,12 +92,12 @@ const ProjectLayout = ({
             {title
               ? `${title} | Supabase`
               : selectedTable
-              ? `${selectedTable} | ${projectName} | ${organizationName} | Supabase`
-              : projectName
-              ? `${projectName} | ${organizationName} | Supabase`
-              : organizationName
-              ? `${organizationName} | Supabase`
-              : 'Supabase'}
+                ? `${selectedTable} | ${projectName} | ${organizationName} | Supabase`
+                : projectName
+                  ? `${projectName} | ${organizationName} | Supabase`
+                  : organizationName
+                    ? `${organizationName} | Supabase`
+                    : 'Supabase'}
           </title>
           <meta name="description" content="Supabase Studio" />
         </Head>

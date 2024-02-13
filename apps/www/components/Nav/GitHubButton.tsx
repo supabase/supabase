@@ -7,6 +7,7 @@ const GitHubButton = () => {
   const octokit = new Octokit()
 
   const kFormatter = (num: number) => {
+    const octokit = new Octokit()
     const kFormat = num / 1000
     const decimals = kFormat.toFixed(2).split('.')[1]
     const firstDecimal = decimals.split('')[0]

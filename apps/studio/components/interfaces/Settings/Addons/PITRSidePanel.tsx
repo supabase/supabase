@@ -28,6 +28,8 @@ import {
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { AlertTriangleIcon } from 'lucide-react'
 import { AddonVariantId } from 'data/subscriptions/types'
+import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
+import { formatCurrency } from 'lib/helpers'
 
 const PITR_CATEGORY_OPTIONS: {
   id: 'off' | 'on'
@@ -38,14 +40,14 @@ const PITR_CATEGORY_OPTIONS: {
   {
     id: 'off',
     name: 'Disable PITR',
-    imageUrl: `${BASE_PATH}/img/pitr-off.png?v=2`,
-    imageUrlLight: `${BASE_PATH}/img/pitr-off--light.png?v=2`,
+    imageUrl: `${BASE_PATH}/img/pitr-off.svg?v=2`,
+    imageUrlLight: `${BASE_PATH}/img/pitr-off--light.svg?v=2`,
   },
   {
     id: 'on',
     name: 'Enable PITR',
-    imageUrl: `${BASE_PATH}/img/pitr-on.png?v=2`,
-    imageUrlLight: `${BASE_PATH}/img/pitr-on--light.png?v=2`,
+    imageUrl: `${BASE_PATH}/img/pitr-on.svg?v=2`,
+    imageUrlLight: `${BASE_PATH}/img/pitr-on--light.svg?v=2`,
   },
 ]
 
@@ -76,6 +78,8 @@ const PITRSidePanel = () => {
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
+  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
+
   const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
       ui.setNotification({
@@ -162,13 +166,17 @@ const PITRSidePanel = () => {
       onCancel={onClose}
       onConfirm={onConfirm}
       loading={isLoading || isSubmitting}
-      disabled={isFreePlan || isLoading || !hasChanges || isSubmitting || !canUpdatePitr}
+      disabled={
+        isFreePlan || isLoading || !hasChanges || isSubmitting || !canUpdatePitr || hasHipaaAddon
+      }
       tooltip={
-        isFreePlan
-          ? 'Unable to enable point in time recovery on a free plan'
-          : !canUpdatePitr
-          ? 'You do not have permission to update PITR'
-          : undefined
+        hasHipaaAddon
+          ? 'Unable to change PITR with HIPAA add-on'
+          : isFreePlan
+            ? 'Unable to enable point in time recovery on a free plan'
+            : !canUpdatePitr
+              ? 'You do not have permission to update PITR'
+              : undefined
       }
       header={
         <div className="flex items-center justify-between">
@@ -186,6 +194,20 @@ const PITRSidePanel = () => {
       }
     >
       <SidePanel.Content>
+        {hasHipaaAddon && (
+          <Alert_Shadcn_>
+            <AlertTitle_Shadcn_>PITR cannot be changed with HIPAA</AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              All projects should have PITR enabled by default and cannot be changed with HIPAA
+              enabled. Contact support for further assistance.
+            </AlertDescription_Shadcn_>
+            <div className="mt-4">
+              <Button type="default" asChild>
+                <Link href="/support/new">Contact support</Link>
+              </Button>
+            </div>
+          </Alert_Shadcn_>
+        )}
         <div className="py-6 space-y-4">
           <p className="text-sm">
             Point-in-Time Recovery (PITR) allows a project to be backed up at much shorter
@@ -325,9 +347,7 @@ const PITRSidePanel = () => {
                           {option.identifier.split('_')[1]} days ago
                         </p>
                         <div className="flex items-center space-x-1 mt-2">
-                          <p className="text-foreground text-sm">
-                            ${option.price.toLocaleString()}
-                          </p>
+                          <p className="text-foreground text-sm">{formatCurrency(option.price)}</p>
                           <p className="text-foreground-light translate-y-[1px]"> / month</p>
                         </div>
                       </div>
@@ -352,7 +372,7 @@ const PITRSidePanel = () => {
               ) : (
                 <p className="text-sm text-foreground-light">
                   Upon clicking confirm, the amount of{' '}
-                  <span className="text-foreground">${selectedPitr?.price.toLocaleString()}</span>{' '}
+                  <span className="text-foreground">{formatCurrency(selectedPitr?.price)}</span>{' '}
                   will be added to your monthly invoice.{' '}
                   {subscription?.billing_via_partner ? (
                     <>
