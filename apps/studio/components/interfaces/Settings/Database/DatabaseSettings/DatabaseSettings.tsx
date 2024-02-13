@@ -197,7 +197,7 @@ const DatabaseSettings = () => {
                   value={poolingMode === 'transaction' ? connectionInfo.db_port : '5432'}
                   label="Port"
                 />
-                {isMd5 && (
+                {isMd5 && usePoolerConnection && (
                   <Input
                     className="input-mono"
                     layout="horizontal"
