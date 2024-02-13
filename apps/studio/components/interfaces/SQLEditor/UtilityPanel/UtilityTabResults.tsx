@@ -100,8 +100,6 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
                 formattedError.map((x: string, i: number) => (
                   <pre key={`error-${i}`} className="font-mono text-sm">
                     {x}
-                    {i === 0 &&
-                      'P0001: Version: 1.20 January 15, 2024 Action: Policies Diagnostics: line=PL/pgSQL function clone_schema(text,text_name,)'}
                   </pre>
                 ))
               ) : (
