@@ -356,9 +356,6 @@ export const AIPolicyEditorPanel = memo(function ({
                   />
                 )}
                 <SheetFooter_Shadcn_ className="flex items-center !justify-between px-5 py-4 w-full">
-                  <Button type="text" onClick={toggleFeaturePreviewModal}>
-                    Toggle feature preview
-                  </Button>
                   <div className="flex items-center gap-x-2">
                     <Button type="default" disabled={isExecuting} onClick={() => onSelectCancel()}>
                       Cancel
@@ -369,7 +366,7 @@ export const AIPolicyEditorPanel = memo(function ({
                       disabled={isExecuting || incomingChange !== undefined}
                       onClick={() => onExecuteSQL()}
                     >
-                      Save policy
+                      Insert policy
                     </Button>
                   </div>
                 </SheetFooter_Shadcn_>
