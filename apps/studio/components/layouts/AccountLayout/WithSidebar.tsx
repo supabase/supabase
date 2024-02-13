@@ -34,7 +34,7 @@ const WithSidebar = ({
   const navLayoutV2 = useFlag('navigationLayoutV2')
 
   return (
-    <div className="flex max-h-full">
+    <div className="flex h-full">
       {!hideSidebar && !noContent && (
         <div
           id="with-sidebar"
@@ -80,7 +80,7 @@ const WithSidebar = ({
       )}
       <div className="flex flex-1 flex-col">
         {!navLayoutV2 && <LayoutHeader breadcrumbs={breadcrumbs} />}
-        <div className="flex-1 flex-grow overflow-auto">{children}</div>
+        <div className="flex-1 flex-grow overflow-y-auto">{children}</div>
       </div>
     </div>
   )
