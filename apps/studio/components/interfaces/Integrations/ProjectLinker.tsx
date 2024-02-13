@@ -1,19 +1,6 @@
+import { PlusIcon } from 'lucide-react'
 import { ReactNode, useEffect, useRef, useState } from 'react'
 import { toast } from 'react-hot-toast'
-import {
-  Button,
-  cn,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Command_Shadcn_,
-  IconChevronDown,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-} from 'ui'
 
 import ShimmerLine from 'components/ui/ShimmerLine'
 import {
@@ -22,6 +9,22 @@ import {
 } from 'data/integrations/integrations.types'
 import { useSelectedOrganization } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
+import { openInstallGitHubIntegrationWindow } from 'lib/github'
+import {
+  Button,
+  CommandEmpty_Shadcn_,
+  CommandGroup_Shadcn_,
+  CommandInput_Shadcn_,
+  CommandItem_Shadcn_,
+  CommandList_Shadcn_,
+  CommandSeparator_Shadcn_,
+  Command_Shadcn_,
+  IconChevronDown,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
+  cn,
+} from 'ui'
 
 export interface Project {
   id: string
@@ -48,6 +51,7 @@ export interface ProjectLinkerProps {
   onSkip?: () => void
   loadingForeignProjects?: boolean
   loadingSupabaseProjects?: boolean
+  showNoEntitiesState?: boolean
 
   defaultSupabaseProjectRef?: string
   defaultForeignProjectId?: string
@@ -66,6 +70,7 @@ const ProjectLinker = ({
   onSkip,
   loadingForeignProjects,
   loadingSupabaseProjects,
+  showNoEntitiesState = true,
 
   defaultSupabaseProjectRef,
   defaultForeignProjectId,
@@ -167,7 +172,7 @@ const ProjectLinker = ({
             <p className="text-foreground text-center">Loading projects</p>
             <ShimmerLine active />
           </div>
-        ) : noSupabaseProjects || noForeignProjects ? (
+        ) : showNoEntitiesState && (noSupabaseProjects || noForeignProjects) ? (
           <div className="text-center">
             <h5 className="text-foreground">No {missingEntity} Projects found</h5>
             <p className="text-foreground-light text-sm">
@@ -318,6 +323,16 @@ const ProjectLinker = ({
                             </CommandItem_Shadcn_>
                           )
                         })}
+                        <>
+                          <CommandSeparator_Shadcn_ />
+                          <CommandItem_Shadcn_
+                            className="flex gap-2 items-center"
+                            onSelect={openInstallGitHubIntegrationWindow}
+                          >
+                            <PlusIcon size={16} />
+                            <span>Add GitHub Repos</span>
+                          </CommandItem_Shadcn_>
+                        </>
                       </CommandGroup_Shadcn_>
                     </CommandList_Shadcn_>
                   </Command_Shadcn_>

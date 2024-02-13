@@ -1,6 +1,15 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { forwardRef, useCallback, useState } from 'react'
+
+import {
+  IntegrationConnection,
+  IntegrationConnectionProps,
+} from 'components/interfaces/Integrations/IntegrationPanels'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
+import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import { useStore } from 'hooks'
 import {
   Button,
   DropdownMenu,
@@ -14,15 +23,6 @@ import {
   IconTrash,
   Modal,
 } from 'ui'
-
-import {
-  IntegrationConnection,
-  IntegrationConnectionProps,
-} from 'components/interfaces/Integrations/IntegrationPanels'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
-import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
-import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { useStore } from 'hooks'
 
 interface IntegrationConnectionItemProps extends IntegrationConnectionProps {
   disabled?: boolean
@@ -69,6 +69,7 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
     return (
       <>
         <IntegrationConnection
+          showNode={false}
           actions={
             disabled ? (
               <Button asChild disabled iconRight={<IconChevronDown />} type="default">

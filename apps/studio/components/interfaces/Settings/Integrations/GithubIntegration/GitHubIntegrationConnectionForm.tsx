@@ -7,7 +7,7 @@ import * as z from 'zod'
 import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useGitHubBranchesQuery } from 'data/integrations/github-branches-query'
-import { Integration, IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useSelectedProject, useStore } from 'hooks'
 import {
   AlertDescription_Shadcn_,
@@ -38,27 +38,16 @@ import {
 
 const GitHubIntegrationConnectionForm = ({
   connection,
-  integration,
 }: {
   connection: IntegrationProjectConnection
-  integration: Integration
 }) => {
   const { ui } = useStore()
   const project = useSelectedProject()
   const [open, setOpen] = useState(false)
   const comboBoxRef = useRef<HTMLButtonElement>(null)
 
-  const githubProjectIntegration = integration?.connections.find(
-    (connection) => connection.supabase_project_ref === project?.parentRef
-  )
-
-  const [repoOwner, repoName] = githubProjectIntegration?.metadata.name.split('/') ?? []
-
   const { data: githubBranches, isLoading: isLoadingBranches } = useGitHubBranchesQuery({
-    connectionId: Number(),
-    // organizationIntegrationId: integration?.id,
-    // repoOwner,
-    // repoName,
+    connectionId: Number(connection.id),
   })
 
   const { mutate: updateBranch, isLoading: isUpdatingProdBranch } = useBranchUpdateMutation({

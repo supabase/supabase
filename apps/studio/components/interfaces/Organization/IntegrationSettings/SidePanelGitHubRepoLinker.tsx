@@ -126,6 +126,7 @@ Check the details below before proceeding
             loadingSupabaseProjects={isLoadingSupabaseProjects}
             integrationIcon={GITHUB_ICON}
             choosePrompt="Choose GitHub Repo"
+            showNoEntitiesState={false}
           />
         </SidePanel.Content>
       </div>

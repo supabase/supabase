@@ -3,15 +3,6 @@ import { useParams } from 'common'
 import { last } from 'lodash'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import {
-  Button,
-  Form_Shadcn_,
-  IconDollarSign,
-  IconExternalLink,
-  IconFileText,
-  IconGitBranch,
-  Modal,
-} from 'ui'
 import * as z from 'zod'
 
 import SidePanelGitHubRepoLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelGitHubRepoLinker'
@@ -27,6 +18,15 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization, useStore } from 'hooks'
 import Link from 'next/link'
 import { useAppStateSnapshot } from 'state/app-state'
+import {
+  Button,
+  Form_Shadcn_,
+  IconDollarSign,
+  IconExternalLink,
+  IconFileText,
+  IconGitBranch,
+  Modal,
+} from 'ui'
 import BranchingPITRNotice from './BranchingPITRNotice'
 import BranchingPlanNotice from './BranchingPlanNotice'
 import BranchingPostgresVersionNotice from './BranchingPostgresVersionNotice'

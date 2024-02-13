@@ -10,14 +10,12 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
-import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-connection-delete-mutation'
-import { IntegrationName, IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { useProjectsQuery } from 'data/projects/projects-query'
+import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
+import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useSelectedOrganization, useStore } from 'hooks'
-import { BASE_PATH } from 'lib/constants'
+import { BASE_PATH, OPT_IN_TAGS } from 'lib/constants'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
-import { Button, IconExternalLink } from 'ui'
 import { IntegrationConnectionItem } from '../../Integrations/IntegrationConnection'
 import SidePanelGitHubRepoLinker from './SidePanelGitHubRepoLinker'
 import SidePanelVercelProjectLinker from './SidePanelVercelProjectLinker'
@@ -36,9 +34,9 @@ const IntegrationSettings = () => {
   const { ui } = useStore()
   const org = useSelectedOrganization()
 
-  const { data: connections } = useGitHubConnectionsQuery({ organizationId: org?.id })
+  const hasAccessToBranching = org?.opt_in_tags?.includes(OPT_IN_TAGS.PREVIEW_BRANCHES) ?? false
 
-  const sidePanelsStateSnapshot = useSidePanelsStateSnapshot()
+  const { data: connections } = useGitHubConnectionsQuery({ organizationId: org?.id })
 
   const { mutate: deleteGitHubConnection } = useGitHubConnectionDeleteMutation({
     onSuccess: () => {
@@ -48,6 +46,8 @@ const IntegrationSettings = () => {
       })
     },
   })
+
+  const sidePanelsStateSnapshot = useSidePanelsStateSnapshot()
 
   const onAddGitHubConnection = useCallback(() => {
     sidePanelsStateSnapshot.setGithubConnectionsOpen(true)
@@ -85,42 +85,6 @@ You will be able to connect a GitHub repository to a Supabase project.
 The GitHub app will watch for changes in your repository such as file changes, branch changes as well as pull request activity.
 `
 
-  function installGitHubIntegration() {
-    const w = 600
-    const h = 800
-
-    const dualScreenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screenX
-    const dualScreenTop = window.screenTop !== undefined ? window.screenTop : window.screenY
-
-    const width = window.innerWidth
-      ? window.innerWidth
-      : document.documentElement.clientWidth
-        ? document.documentElement.clientWidth
-        : screen.width
-    const height = window.innerHeight
-      ? window.innerHeight
-      : document.documentElement.clientHeight
-        ? document.documentElement.clientHeight
-        : screen.height
-
-    const systemZoom = width / window.screen.availWidth
-    const left = (width - w) / 2 / systemZoom + dualScreenLeft
-    const top = (height - h) / 2 / systemZoom + dualScreenTop
-    const newWindow = window.open(
-      `https://github.com/apps/supabase-local-testing-2-0/installations/new`,
-      'GitHub',
-      `scrollbars=yes,resizable=no,status=no,location=no,toolbar=no,menubar=no,
-       width=${w / systemZoom}, 
-       height=${h / systemZoom}, 
-       top=${top}, 
-       left=${left}
-       `
-    )
-    if (newWindow) {
-      newWindow.focus()
-    }
-  }
-
   const GitHubSection = () => (
     <ScaffoldContainer>
       <ScaffoldSection>
@@ -130,42 +94,7 @@ The GitHub app will watch for changes in your repository such as file changes, b
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
           <Markdown content={GitHubContentSectionTop} />
-          <Button
-            type="default"
-            iconRight={<IconExternalLink />}
-            onClick={installGitHubIntegration}
-          >
-            Install GitHub Integration
-          </Button>
-          {/* {githubIntegrations &&
-            githubIntegrations.length > 0 &&
-            githubIntegrations.map((integration, i) => {
-              const ConnectionHeaderTitle = `${integration.connections.length} project ${pluralize(
-                integration.connections.length,
-                'connection'
-              )} `
 
-              return (
-                <div key={integration.id}>
-                  <IntegrationInstallation title={'GitHub'} integration={integration} />
-                  {integration.connections.length > 0 ? (
-                    <>
-                      <IntegrationConnectionHeader
-                        title={ConnectionHeaderTitle}
-                        markdown={`Repository connections for GitHub`}
-                      />
-                    </>
-                  ) : (
-                    <IntegrationConnectionHeader
-                      markdown={`### ${integration.connections.length} project ${pluralize(
-                        integration.connections.length,
-                        'connection'
-                      )} Repository connections for GitHub`}
-                    />
-                  )}
-                </div>
-              )
-            })} */}
           <ul className="flex flex-col">
             {connections?.map((connection) => (
               <IntegrationConnectionItem
@@ -186,14 +115,20 @@ The GitHub app will watch for changes in your repository such as file changes, b
                     name: connection.repository.name,
                   } as any,
                 }}
-                type={'GitHub' as IntegrationName}
+                type="GitHub"
                 onDeleteConnection={onDeleteGitHubConnection}
               />
             ))}
           </ul>
-          <EmptyIntegrationConnection onClick={onAddGitHubConnection} orgSlug={org?.slug}>
-            Add new project connection
-          </EmptyIntegrationConnection>
+          {hasAccessToBranching && (
+            <EmptyIntegrationConnection
+              onClick={onAddGitHubConnection}
+              orgSlug={org?.slug}
+              showNode={false}
+            >
+              Add new project connection
+            </EmptyIntegrationConnection>
+          )}
         </ScaffoldSectionContent>
       </ScaffoldSection>
     </ScaffoldContainer>
