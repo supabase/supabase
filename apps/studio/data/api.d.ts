@@ -466,8 +466,8 @@ export interface paths {
     put: operations['ContentController_updateWholeContent']
     /** Creates project's content */
     post: operations['ContentController_createContent']
-    /** Deletes project's content */
-    delete: operations['ContentController_deleteContent']
+    /** Deletes project's contents */
+    delete: operations['ContentController_deleteContents']
     /** Updates project's content */
     patch: operations['ContentController_updateContent']
   }
@@ -618,6 +618,8 @@ export interface paths {
   '/platform/projects/{ref}/config/supavisor': {
     /** Gets project's supavisor config */
     get: operations['SupavisorConfigController_getSupavisorConfig']
+    /** Updates project's supavisor config */
+    patch: operations['SupavisorConfigController_updateSupavisorConfig']
   }
   '/platform/projects/{ref}/billing/addons': {
     /** Gets project addons */
@@ -1238,8 +1240,8 @@ export interface paths {
     put: operations['ContentController_updateWholeContent']
     /** Creates project's content */
     post: operations['ContentController_createContent']
-    /** Deletes project's content */
-    delete: operations['ContentController_deleteContent']
+    /** Deletes project's contents */
+    delete: operations['ContentController_deleteContents']
     /** Updates project's content */
     patch: operations['ContentController_updateContent']
   }
@@ -1370,6 +1372,8 @@ export interface paths {
   '/v0/projects/{ref}/config/supavisor': {
     /** Gets project's supavisor config */
     get: operations['SupavisorConfigController_getSupavisorConfig']
+    /** Updates project's supavisor config */
+    patch: operations['SupavisorConfigController_updateSupavisorConfig']
   }
   '/v0/projects/{ref}/billing/addons': {
     /** Gets project addons */
@@ -2808,6 +2812,7 @@ export interface components {
     ProjectAddonType: 'custom_domain' | 'compute_instance' | 'pitr' | 'ipv4'
     /** @enum {string} */
     AddonVariantId:
+      | 'ci_micro'
       | 'ci_small'
       | 'ci_medium'
       | 'ci_large'
@@ -2919,6 +2924,7 @@ export interface components {
       billing_partner: 'fly'
       scheduled_plan_change: components['schemas']['ScheduledPlanChange'] | null
       customer_balance: number
+      nano_enabled: boolean
     }
     UpdateSubscriptionBody: {
       payment_method?: string
@@ -3677,6 +3683,9 @@ export interface components {
       content?: Record<string, never>
       owner_id?: number
     }
+    BulkDeleteUserContentResponse: {
+      id: string
+    }
     DatabaseDetailResponse: {
       /** @enum {string} */
       status:
@@ -4009,6 +4018,16 @@ export interface components {
       max_client_conn: number | null
       /** @enum {string|null} */
       pool_mode: 'transaction' | 'session' | 'statement' | null
+    }
+    UpdateSupavisorConfigBody: {
+      default_pool_size?: number
+      /** @enum {string} */
+      pool_mode: 'transaction' | 'session' | 'statement'
+    }
+    UpdateSupavisorConfigResponse: {
+      default_pool_size?: number
+      /** @enum {string} */
+      pool_mode: 'transaction' | 'session' | 'statement'
     }
     AvailableAddonResponse: {
       type: components['schemas']['ProjectAddonType']
@@ -8609,20 +8628,24 @@ export interface operations {
       }
     }
   }
-  /** Deletes project's content */
-  ContentController_deleteContent: {
+  /** Deletes project's contents */
+  ContentController_deleteContents: {
     parameters: {
       query: {
-        id: string
+        ids: string[]
+      }
+      path: {
+        /** @description Project ref */
+        ref: string
       }
     }
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['UserContentObject']
+          'application/json': components['schemas']['BulkDeleteUserContentResponse'][]
         }
       }
-      /** @description Failed to delete project's content */
+      /** @description Failed to delete project's contents */
       500: {
         content: never
       }
@@ -9541,6 +9564,34 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve project's supavisor config */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Updates project's supavisor config */
+  SupavisorConfigController_updateSupavisorConfig: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateSupavisorConfigBody']
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['UpdateSupavisorConfigResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to update project's supavisor config */
       500: {
         content: never
       }

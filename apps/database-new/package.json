@@ -27,6 +27,7 @@
     "react-flow": "^1.0.3",
     "sql-formatter": "^13.1.0",
     "ui": "*",
+    "ui-patterns": "*",
     "valtio": "^1.12.0",
     "zod": "^3.22.4"
   },

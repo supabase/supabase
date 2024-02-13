@@ -15,6 +15,7 @@ import {
   IconAlertTriangle,
   IconChevronRight,
   IconExternalLink,
+  IconInfo,
 } from 'ui'
 
 import {
@@ -42,13 +43,14 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { ProjectAddonVariantMeta } from 'data/subscriptions/types'
 import { useFlag, useProjectByRef, useSelectedOrganization } from 'hooks'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
-import { BASE_PATH } from 'lib/constants'
+import { BASE_PATH, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
 import { getDatabaseMajorVersion, getSemanticVersion } from 'lib/helpers'
 import { SUBSCRIPTION_PANEL_KEYS, useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import ComputeInstanceSidePanel from './ComputeInstanceSidePanel'
 import CustomDomainSidePanel from './CustomDomainSidePanel'
-import IPv4SidePanel from './IPv4SidePanel'
 import PITRSidePanel from './PITRSidePanel'
+import IPv4SidePanel from './IPv4SidePanel'
+import { capitalize } from 'lodash'
 
 const Addons = () => {
   const { resolvedTheme } = useTheme()
@@ -101,7 +103,17 @@ const Addons = () => {
   const selectedAddons = addons?.selected_addons ?? []
   const { computeInstance, pitr, customDomain, ipv4 } = getAddons(selectedAddons)
 
-  const meta = computeInstance?.variant?.meta as ProjectAddonVariantMeta | undefined
+  const meta = useMemo(() => {
+    const computeMeta = computeInstance?.variant?.meta as ProjectAddonVariantMeta | undefined
+
+    if (!computeMeta && selectedProject?.infra_compute_size === 'nano') {
+      return INSTANCE_NANO_SPECS
+    } else if (selectedProject?.infra_compute_size === 'micro') {
+      return INSTANCE_MICRO_SPECS
+    }
+
+    return computeMeta
+  }, [selectedProject, computeInstance])
 
   const canUpdateIPv4 = projectSettings?.project.db_ip_addr_config === 'ipv6'
 
@@ -159,11 +171,23 @@ const Addons = () => {
 
       {isSuccess && (
         <>
+          {selectedProject?.infra_compute_size === 'nano' && subscription?.plan.id !== 'free' && (
+            <ScaffoldContainer className="mt-4">
+              <Alert_Shadcn_ variant="default">
+                <IconInfo strokeWidth={2} />
+                <AlertTitle_Shadcn_>Free compute upgrade to Micro</AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_>
+                  Paid Plans include a free upgrade to Micro compute. Your project is ready to
+                  upgrade for no additional charges.
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
+            </ScaffoldContainer>
+          )}
           <ScaffoldContainer>
             <ScaffoldSection>
               <ScaffoldSectionDetail>
                 <div className="space-y-6">
-                  <p className="m-0">Optimized compute</p>
+                  <p className="m-0">Compute Size</p>
                   <div className="space-y-2">
                     <p className="text-sm text-foreground-light m-0">More information</p>
                     <div>
@@ -198,15 +222,15 @@ const Addons = () => {
                   <div>
                     <div className="rounded-md bg-surface-100 border border-muted w-[160px] h-[96px] overflow-hidden">
                       <Image
-                        alt="Optimized Compute"
+                        alt="Compute size"
                         width={160}
                         height={96}
                         src={
-                          computeInstance !== undefined
-                            ? `${BASE_PATH}/img/optimized-compute-on${
+                          ['nano', 'micro'].includes(selectedProject?.infra_compute_size || 'micro')
+                            ? `${BASE_PATH}/img/optimized-compute-off${
                                 resolvedTheme?.includes('dark') ? '' : '--light'
                               }.svg`
-                            : `${BASE_PATH}/img/optimized-compute-off${
+                            : `${BASE_PATH}/img/optimized-compute-on${
                                 resolvedTheme?.includes('dark') ? '' : '--light'
                               }.svg`
                         }
@@ -215,7 +239,11 @@ const Addons = () => {
                   </div>
                   <div className="flex-grow">
                     <p className="text-sm text-foreground-light">Current option:</p>
-                    <p>{computeInstance?.variant.name ?? 'Micro'}</p>
+                    <p>
+                      {computeInstance?.variant.name ??
+                        capitalize(selectedProject?.infra_compute_size) ??
+                        'Micro'}
+                    </p>
                     <ProjectUpdateDisabledTooltip
                       projectUpdateDisabled={projectUpdateDisabled}
                       projectNotActive={!isProjectActive}
@@ -239,7 +267,7 @@ const Addons = () => {
                       >
                         <p>
                           Your workload is currently running at the baseline disk IO bandwidth at{' '}
-                          {meta?.baseline_disk_io_mbs?.toLocaleString() ?? 87} Mbps and may suffer
+                          {meta?.baseline_disk_io_mbs?.toLocaleString() ?? '-'} Mbps and may suffer
                           degradation in performance.
                         </p>
                         <p className="mt-1">
@@ -257,7 +285,7 @@ const Addons = () => {
                         <p>
                           If the disk IO budget drops to zero, your workload will run at the
                           baseline disk IO bandwidth at{' '}
-                          {meta?.baseline_disk_io_mbs?.toLocaleString() ?? 87} Mbps and may suffer
+                          {meta?.baseline_disk_io_mbs?.toLocaleString() ?? '-'} Mbps and may suffer
                           degradation in performance.
                         </p>
                         <p className="mt-1">
@@ -280,7 +308,7 @@ const Addons = () => {
                           />
                         </div>
                       </Link>
-                      <p className="text-sm">{meta?.memory_gb ?? 1} GB</p>
+                      <p className="text-sm">{meta?.memory_gb ?? '-'} GB</p>
                     </div>
                     <div className="w-full flex items-center justify-between border-b py-2">
                       <Link href={`/project/${projectRef}/settings/infrastructure#cpu`}>
@@ -296,17 +324,17 @@ const Addons = () => {
                         </div>
                       </Link>
                       <p className="text-sm">
-                        {meta?.cpu_cores ?? 2}-core {cpuArchitecture}{' '}
+                        {meta?.cpu_cores ?? '?'}-core {cpuArchitecture}{' '}
                         {meta?.cpu_dedicated ? '(Dedicated)' : '(Shared)'}
                       </p>
                     </div>
                     <div className="w-full flex items-center justify-between border-b py-2">
                       <p className="text-sm text-foreground-light">No. of direct connections</p>
-                      <p className="text-sm">{meta?.connections_direct ?? 60}</p>
+                      <p className="text-sm">{meta?.connections_direct ?? '-'}</p>
                     </div>
                     <div className="w-full flex items-center justify-between border-b py-2">
                       <p className="text-sm text-foreground-light">No. of pooler connections</p>
-                      <p className="text-sm">{meta?.connections_pooler ?? 200}</p>
+                      <p className="text-sm">{meta?.connections_pooler ?? '-'}</p>
                     </div>
                     <div className="w-full flex items-center justify-between border-b py-2">
                       <Link href={`/project/${projectRef}/settings/infrastructure#disk_io`}>
@@ -322,7 +350,7 @@ const Addons = () => {
                         </div>
                       </Link>
                       <p className="text-sm">
-                        {meta?.max_disk_io_mbs?.toLocaleString() ?? '2,085'} Mbps
+                        {meta?.max_disk_io_mbs?.toLocaleString() ?? '-'} Mbps
                       </p>
                     </div>
                     <div className="w-full flex items-center justify-between py-2">
@@ -339,7 +367,7 @@ const Addons = () => {
                         </div>
                       </Link>
                       <p className="text-sm">
-                        {meta?.baseline_disk_io_mbs?.toLocaleString() ?? 87} Mbps
+                        {meta?.baseline_disk_io_mbs?.toLocaleString() ?? '-'} Mbps
                       </p>
                     </div>
                   </div>
@@ -435,7 +463,7 @@ const Addons = () => {
                               isBranch ||
                               !isProjectActive ||
                               projectUpdateDisabled ||
-                              !canUpdateIPv4
+                              !(canUpdateIPv4 || ipv4)
                             }
                           >
                             Change IPv4 address
@@ -443,7 +471,8 @@ const Addons = () => {
                         </div>
                       </Tooltip.Trigger>
                       <Tooltip.Portal>
-                        {!canUpdateIPv4 && (
+                        {/* Only show the tooltip if the user can't add the addon and ipv4 is not currently applied */}
+                        {!(canUpdateIPv4 || ipv4) && (
                           <Tooltip.Content side="bottom">
                             <Tooltip.Arrow className="radix-tooltip-arrow" />
                             <div
