@@ -2,18 +2,8 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { partition } from 'lodash'
+import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
-
-import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
-import AlertError from 'components/ui/AlertError'
-import InfiniteList from 'components/ui/InfiniteList'
-import SchemaSelector from 'components/ui/SchemaSelector'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
-import { useCheckPermissions, useLocalStorage } from 'hooks'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -32,9 +22,19 @@ import {
   IconX,
   Input,
 } from 'ui'
+
+import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
+import AlertError from 'components/ui/AlertError'
+import InfiniteList from 'components/ui/InfiniteList'
+import SchemaSelector from 'components/ui/SchemaSelector'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useSchemasQuery } from 'data/database/schemas-query'
+import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
+import { useCheckPermissions, useLocalStorage } from 'hooks'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
-import { useRouter } from 'next/router'
 
 const TableEditorMenu = () => {
   const router = useRouter()
