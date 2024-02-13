@@ -365,7 +365,7 @@ export const updateColumn = async ({
 export const duplicateTable = async (
   projectRef: string,
   connectionString: string | undefined,
-  payload: { name: string },
+  payload: { name: string; comment?: string },
   metadata: {
     duplicateTable: PostgresTable
     isRLSEnabled: boolean
@@ -383,7 +383,12 @@ export const duplicateTable = async (
   await executeSql({
     projectRef,
     connectionString,
-    sql: `CREATE TABLE "${sourceTableSchema}"."${duplicatedTableName}" (LIKE "${sourceTableSchema}"."${sourceTableName}" INCLUDING ALL);`,
+    sql: [
+      `CREATE TABLE "${sourceTableSchema}"."${duplicatedTableName}" (LIKE "${sourceTableSchema}"."${sourceTableName}" INCLUDING ALL);`,
+      payload.comment !== undefined
+        ? `comment on table "${sourceTableSchema}"."${duplicatedTableName}" is '${payload.comment}';`
+        : '',
+    ].join('\n'),
   })
   await queryClient.invalidateQueries(tableKeys.list(projectRef, sourceTableSchema))
 
