@@ -135,6 +135,9 @@ const GitHubSection = () => {
                         updated_at: connection.updated_at,
                         metadata: {
                           name: connection.repository.name,
+                          supabaseConfig: {
+                            // supabaseDirectory: connection.cwd_path
+                          },
                         } as any,
                       }}
                     />
