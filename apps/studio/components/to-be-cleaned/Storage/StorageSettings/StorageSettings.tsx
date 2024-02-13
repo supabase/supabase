@@ -86,7 +86,7 @@ const StorageConfig = ({ config, projectRef, organizationSlug }: any) => {
     if (errors.fileSizeLimit) {
       return ui.setNotification({
         category: 'error',
-        message: `Upload file size limit must be up to 5GB (${formattedMaxSizeBytes})`,
+        message: `Upload file size limit must be up to 50GB (${formattedMaxSizeBytes})`,
       })
     }
 
