@@ -14,7 +14,7 @@ export const getConnectionStrings = (
     pgVersion?: string
   }
 ) => {
-  const isMd5 = poolingInfo.connectionString.includes('?options=reference')
+  const isMd5 = poolingInfo.connectionString.includes('options=reference')
   const { usePoolerConnection, projectRef } = metadata
 
   const user = usePoolerConnection ? poolingInfo.db_user : connectionInfo.db_user
@@ -74,7 +74,7 @@ export const constructConnStringSyntax = (
     portNumber: string
   }
 ) => {
-  const isMd5 = connString.includes('?options=reference')
+  const isMd5 = connString.includes('options=reference')
   const poolerHostDetails = [
     { value: cloudProvider.toLocaleLowerCase(), tooltip: 'Cloud provider' },
     { value: '-0-', tooltip: undefined },
