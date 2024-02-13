@@ -1,17 +1,20 @@
+import { useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import { useParams } from 'common'
 import { useFlag, useSelectedOrganization, useSelectedProject } from 'hooks'
 import FeedbackDropdown from '../ProjectLayout/LayoutHeader/FeedbackDropdown'
 import HelpPopover from '../ProjectLayout/LayoutHeader/HelpPopover'
-import NotificationsPopover from '../ProjectLayout/LayoutHeader/NotificationsPopover'
+import NotificationsPopoverV2 from '../ProjectLayout/LayoutHeader/NotificationsPopoverV2/NotificationsPopover'
 import BranchDropdown from './BranchDropdown'
 import EnableBranchingButton from './EnableBranchingButton/EnableBranchingButton'
 import OrganizationDropdown from './OrganizationDropdown'
 import ProjectDropdown from './ProjectDropdown'
 import SettingsButton from './SettingsButton'
 import UserSettingsDropdown from './UserSettingsDropdown'
+
+// [Joshen] Just FYI this is only for Nav V2 which is still going through design iteration
+// Component is not currently in use
 
 const AppHeader = () => {
   const router = useRouter()
@@ -47,9 +50,9 @@ const AppHeader = () => {
 
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-3">
-          <FeedbackDropdown alt />
-          <NotificationsPopover alt />
-          <HelpPopover alt />
+          <FeedbackDropdown />
+          <NotificationsPopoverV2 />
+          <HelpPopover />
           <SettingsButton />
         </div>
         <div className="flex items-center gap-3">
