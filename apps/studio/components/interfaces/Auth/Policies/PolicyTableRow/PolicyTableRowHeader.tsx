@@ -30,21 +30,22 @@ const PolicyTableRowHeader = ({
 
   return (
     <div id={table.id.toString()} className="flex w-full items-center justify-between">
-      <div className="flex space-x-4 text-left">
+      <div className="flex gap-x-4 text-left">
         <Link href={`/project/${ref}/editor/${table.id}`}>
           <h4 className="m-0">{table.name}</h4>
         </Link>
-        {isLocked ? (
-          <Badge color="scale">
-            <span className="flex gap-2 items-center text-xs uppercase text-foreground-lighter">
-              <IconLock width={12} /> Locked
-            </span>
-          </Badge>
-        ) : (
+        <div className="flex items-center gap-x-2">
+          {isLocked && (
+            <Badge color="scale">
+              <span className="flex gap-2 items-center text-xs uppercase text-foreground-lighter">
+                <IconLock width={12} /> Locked
+              </span>
+            </Badge>
+          )}
           <Badge color={table.rls_enabled ? 'green' : 'yellow'}>
             {table.rls_enabled ? 'RLS enabled' : 'RLS disabled'}
           </Badge>
-        )}
+        </div>
       </div>
       {!isLocked && (
         <div className="flex-1">
