@@ -14,27 +14,24 @@ export const getConnectionStrings = (
     pgVersion?: string
   }
 ) => {
+  const isMd5 = poolingInfo.connectionString.includes('?options=reference')
   const { usePoolerConnection, projectRef } = metadata
 
   const user = usePoolerConnection ? `postgres.${projectRef}` : connectionInfo.db_user
   const port = usePoolerConnection ? poolingInfo?.db_port : connectionInfo.db_port
   const host = usePoolerConnection ? poolingInfo.db_host : connectionInfo.db_host
   const name = usePoolerConnection ? poolingInfo?.db_name : connectionInfo.db_name
+  const password = '[YOUR-PASSWORD]'
 
   const uriConnString = usePoolerConnection
     ? poolingInfo?.connectionString
-    : `postgresql://${user}:[YOUR-PASSWORD]@` + `${host}:${port}` + `/${name}`
-  const golangConnString =
-    `user=${user} password=[YOUR-PASSWORD] ` + `host=${host} port=${port}` + ` dbname=${name}`
-  const psqlConnString = `psql -h ${host} -p ` + `${port} -d ${name} ` + `-U ${user}`
-  const jdbcConnString =
-    `jdbc:postgresql://${host}:${port}` + `/${name}?user=${user}&password=[YOUR-PASSWORD]`
-  const dotNetConnString =
-    `User Id=${user};Password=[YOUR-PASSWORD];` +
-    `Server=${host};Port=${port};` +
-    `Database=${name}`
-  const pythonConnString =
-    `user=${user} password=[YOUR-PASSWORD]` + ` host=${host} port=${port}` + ` database=${name}`
+    : `postgresql://${user}:${password}@` + `${host}:${port}` + `/${name}`
+  const golangConnString = `user=${user} password=${password} host=${host} port=${port} dbname=${name}${isMd5 ? ` options=reference=${projectRef}` : ''}`
+  const psqlConnString = isMd5
+    ? `psql "postgresql://${user}:${password}@${host}:${port}/${name}?options=reference%3D${projectRef}`
+    : `psql -h ${host} -p ` + `${port} -d ${name} ` + `-U ${user}`
+  const jdbcConnString = `jdbc:postgresql://${host}:${port}/${name}?user=${user}&password=${password}${isMd5 ? `&options=reference%3D${projectRef}` : ''}`
+  const dotNetConnString = `User Id=${user};Password=${password};Server=${host};Port=${port};Database=${name};${isMd5 ? `Options='reference=${projectRef}'` : ''}`
 
   return {
     psql: psqlConnString,
@@ -44,7 +41,7 @@ export const getConnectionStrings = (
     dotnet: dotNetConnString,
     nodejs: uriConnString,
     php: golangConnString,
-    python: pythonConnString,
+    python: golangConnString,
   }
 }
 
