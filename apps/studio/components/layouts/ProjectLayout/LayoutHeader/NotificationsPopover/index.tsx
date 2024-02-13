@@ -242,7 +242,7 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
                   ) : null
                 }
               >
-                <span></span>
+                <span />
               </Button>
             </div>
           </Tooltip.Trigger>
