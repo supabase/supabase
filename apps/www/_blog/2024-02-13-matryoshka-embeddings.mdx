@@ -337,19 +337,19 @@ begin
 
   return (
     with unnormed(elem) as (
-        select x from unnest(v::float4[]) with ordinality v(x, ix)
-        where ix <= dimensions
+      select x from unnest(v::float4[]) with ordinality v(x, ix)
+      where ix <= dimensions
     ),
     norm(factor) as (
-        select
-            sqrt(sum(pow(elem, 2)))
-        from
-            unnormed
+      select
+        sqrt(sum(pow(elem, 2)))
+      from
+        unnormed
     )
     select
-        array_agg(u.elem / r.factor)::vector
+      array_agg(u.elem / r.factor)::vector
     from
-        norm r, unnormed u
+      norm r, unnormed u
   );
 end;
 $$;
