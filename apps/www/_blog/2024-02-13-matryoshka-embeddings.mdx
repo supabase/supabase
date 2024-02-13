@@ -493,7 +493,7 @@ So the performance gained by splitting the second pass into multiple passes is l
 
 Shorter vectors are faster, but remember that shortening the first pass dimension will decrease accuracy, so we'll need to load more records to compensate (which is slower). Our current tests suggest that increasing the number of records in the first pass impacts speed more than increasing dimension size (hence why 512d with fewer records performed better than 256d with more records).
 
-If you are willing to trade accuracy for speed, lowering the first pass dimension size (without changing the number of records) can certainly increase query speeds (as shown in the tests above).
+If you are willing to trade accuracy for speed, lowering the first pass dimension size (without changing the number of records) can certainly increase query speeds (as shown in the tests above). Smaller dimension indexes require less memory, so reducing dimensions keeps your index in memory longer while you scale.
 
 ## More pgvector and AI resources
 
