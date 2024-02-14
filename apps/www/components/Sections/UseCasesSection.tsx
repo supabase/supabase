@@ -34,7 +34,7 @@ const UseCasesSection = ({ title, paragraph, useCases }: Props) => {
       <SectionContainer className="flex flex-col gap-12">
         <div className="flex flex-col text-center gap-4 items-center justify-center">
           <h2 className="heading-gradient text-2xl sm:text-3xl xl:text-4xl">{title}</h2>
-          <p className="mx-auto text-muted lg:w-1/2">{paragraph}</p>
+          <p className="mx-auto text-foreground-lighter lg:w-1/2">{paragraph}</p>
         </div>
         <div
           ref={ref}
