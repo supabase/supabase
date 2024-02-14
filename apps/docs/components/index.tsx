@@ -33,6 +33,7 @@ import { NavData } from './NavData'
 // Partials
 import DatabaseSetup from './MDX/database_setup.mdx'
 import GetSessionWarning from './MDX/get_session_warning.mdx'
+import HuggingFaceDeployment from './MDX/ai/quickstart_hf_deployment.mdx'
 import MigrationWarnings from './MDX/migration_warnings.mdx'
 import ProjectSetup from './MDX/project_setup.mdx'
 import QuickstartIntro from './MDX/quickstart_intro.mdx'
@@ -67,6 +68,7 @@ import {
 // Heavy/rare (lazy-loaded)
 import { AppleSecretGenerator } from './AppleSecretGenerator'
 import { Mermaid } from './Mermaid'
+import { RealtimeLimitsEstimator } from './RealtimeLimitsEstimator'
 
 const components = {
   ...markdownComponents,
@@ -102,6 +104,7 @@ const components = {
       {props.children}
     </Heading>
   ),
+  HuggingFaceDeployment,
   IconMenuApi,
   IconMenuAuth,
   IconMenuCli,
@@ -133,6 +136,7 @@ const components = {
   ProjectConfigVariables,
   ProjectSetup,
   QuickstartIntro,
+  RealtimeLimitsEstimator,
   RefHeaderSection: (props: any) => <RefHeaderSection {...props} />,
   RefSubLayout,
   SocialProviderSettingsSupabase,
