@@ -103,8 +103,6 @@ const Addons = () => {
   const selectedAddons = addons?.selected_addons ?? []
   const { computeInstance, pitr, customDomain, ipv4 } = getAddons(selectedAddons)
 
-  console.log({ isLoading, isLoadingProject })
-
   const meta = useMemo(() => {
     const computeMeta = computeInstance?.variant?.meta as ProjectAddonVariantMeta | undefined
 
