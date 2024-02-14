@@ -41,7 +41,7 @@ const TableSelector = ({
   onSelectTable,
 }: TableSelectorProps) => {
   const [open, setOpen] = useState(false)
-  const [initiallyLoaded, setinitiallyLoaded] = useState(false)
+  const [initiallyLoaded, setInitiallyLoaded] = useState(false)
   const { project } = useProjectContext()
   const [searchInput, setSearchInput] = useState('')
 
