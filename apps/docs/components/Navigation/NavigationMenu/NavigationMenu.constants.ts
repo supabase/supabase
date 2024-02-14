@@ -657,20 +657,20 @@ export const auth = {
       items: [
         {
           name: 'Part One: JWTs',
-          url: '/learn/auth-deep-dive/auth-deep-dive-jwts',
+          url: '/guides/auth/auth-deep-dive/auth-deep-dive-jwts',
         },
         {
           name: 'Part Two: Row Level Security',
-          url: '/learn/auth-deep-dive/auth-row-level-security',
+          url: '/guides/auth/auth-deep-dive/auth-row-level-security',
         },
         {
           name: 'Part Three: Policies',
-          url: '/learn/auth-deep-dive/auth-policies',
+          url: '/guides/auth/auth-deep-dive/auth-policies',
         },
-        { name: 'Part Four: GoTrue', url: '/learn/auth-deep-dive/auth-gotrue' },
+        { name: 'Part Four: GoTrue', url: '/guides/auth/auth-deep-dive/auth-gotrue' },
         {
           name: 'Part Five: Google OAuth',
-          url: '/learn/auth-deep-dive/auth-google-oauth',
+          url: '/guides/auth/auth-deep-dive/auth-google-oauth',
         },
       ],
     },
