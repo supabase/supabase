@@ -40,7 +40,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
 
   // [Joshen] Restricting the schemas to only public as any other schema won’t work out of the box due to missing permissions
   // Consequently, SchemaSelector here will also be disabled
-  const isFiltered = config.schema !== 'public'
+  const isFiltered = config.table !== '*'
 
   return (
     <>
@@ -55,20 +55,14 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
             {isFiltered ? (
               <>
                 <span className="mr-1">Filtered by </span>
-                <Badge className="!bg-brand-400 !text-brand-600">
+                {/* <Badge className="!bg-brand-400 !text-brand-600">
                   schema: {config.schema === '*' ? 'All schemas' : config.schema}
-                </Badge>
+                </Badge> */}
+                <Badge className="!bg-brand-400 !text-brand-600">table: {config.table}</Badge>
               </>
             ) : (
               <span className="mr-1">Filter messages</span>
             )}
-
-            {config.table !== '*' ? (
-              <>
-                <span> and </span>
-                <Badge className="!bg-brand-400 !text-brand-600">table: {config.table}</Badge>
-              </>
-            ) : null}
           </Button>
         </PopoverTrigger_Shadcn_>
         <PopoverContent_Shadcn_ className="p-0 w-[365px]" align="start">
