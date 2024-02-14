@@ -179,10 +179,6 @@ const BasicAuthSettingsForm = observer(() => {
 
         return (
           <>
-            <FormHeader
-              title="Auth Settings"
-              description="Configure security and user session settings."
-            />
             <FormPanel
               disabled={true}
               footer={

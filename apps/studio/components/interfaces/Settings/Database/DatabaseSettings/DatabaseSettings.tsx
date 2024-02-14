@@ -69,7 +69,7 @@ const DatabaseSettings = () => {
     : isErrorProjectSettings || isErrorPoolingInfo
   const isSuccess = showReadReplicasUI
     ? isSuccessReadReplicas
-    : isSuccessProjectSettings || isSuccessPoolingInfo
+    : isSuccessProjectSettings && isSuccessPoolingInfo
 
   const selectedDatabase = (databases ?? []).find(
     (db) => db.identifier === state.selectedDatabaseId

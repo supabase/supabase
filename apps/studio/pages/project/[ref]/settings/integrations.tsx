@@ -7,5 +7,4 @@ const OrgIntegrationSettings: NextPageWithLayout = () => {
 }
 
 OrgIntegrationSettings.getLayout = (page) => <SettingsLayout>{page}</SettingsLayout>
-
 export default OrgIntegrationSettings
