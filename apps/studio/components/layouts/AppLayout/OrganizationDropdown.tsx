@@ -100,22 +100,22 @@ const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) =
               </CommandGroup_Shadcn_>
               {organizationCreationEnabled && (
                 <>
-                <CommandSeparator_Shadcn_/>
-                <CommandGroup_Shadcn_>
-                  <CommandItem_Shadcn_
-                    className="cursor-pointer w-full"
-                    onSelect={(e) => {
-                      setOpen(false)
-                      router.push(`/new`)
-                    }}
-                    onClick={() => setOpen(false)}
-                  >
-                    <Link href="/new" className="flex items-center gap-2 w-full">
-                      <IconPlus size={14} strokeWidth={1.5} />
-                      <p>New organization</p>
-                    </Link>
-                  </CommandItem_Shadcn_>
-                </CommandGroup_Shadcn_>
+                  <CommandSeparator_Shadcn_ />
+                  <CommandGroup_Shadcn_>
+                    <CommandItem_Shadcn_
+                      className="cursor-pointer w-full"
+                      onSelect={(e) => {
+                        setOpen(false)
+                        router.push(`/new`)
+                      }}
+                      onClick={() => setOpen(false)}
+                    >
+                      <Link href="/new" className="flex items-center gap-2 w-full">
+                        <IconPlus size={14} strokeWidth={1.5} />
+                        <p>New organization</p>
+                      </Link>
+                    </CommandItem_Shadcn_>
+                  </CommandGroup_Shadcn_>
                 </>
               )}
             </CommandList_Shadcn_>

@@ -144,28 +144,28 @@ const ProjectDropdown = ({ isNewNav = false }: ProjectDropdownProps) => {
               </CommandGroup_Shadcn_>
               {projectCreationEnabled && (
                 <>
-                <CommandSeparator_Shadcn_/>
-                <CommandGroup_Shadcn_>
-                  <CommandItem_Shadcn_
-                    className="cursor-pointer w-full"
-                    onSelect={() => {
-                      setOpen(false)
-                      router.push(`/new/${selectedOrganization?.slug}`)
-                    }}
-                    onClick={() => setOpen(false)}
-                  >
-                    <Link
-                      href={`/new/${selectedOrganization?.slug}`}
-                      onClick={() => {
+                  <CommandSeparator_Shadcn_ />
+                  <CommandGroup_Shadcn_>
+                    <CommandItem_Shadcn_
+                      className="cursor-pointer w-full"
+                      onSelect={() => {
                         setOpen(false)
+                        router.push(`/new/${selectedOrganization?.slug}`)
                       }}
-                      className="w-full flex items-center gap-2"
+                      onClick={() => setOpen(false)}
                     >
-                      <IconPlus size={14} strokeWidth={1.5} />
-                      <p>New project</p>
-                    </Link>
-                  </CommandItem_Shadcn_>
-                </CommandGroup_Shadcn_>
+                      <Link
+                        href={`/new/${selectedOrganization?.slug}`}
+                        onClick={() => {
+                          setOpen(false)
+                        }}
+                        className="w-full flex items-center gap-2"
+                      >
+                        <IconPlus size={14} strokeWidth={1.5} />
+                        <p>New project</p>
+                      </Link>
+                    </CommandItem_Shadcn_>
+                  </CommandGroup_Shadcn_>
                 </>
               )}
             </CommandList_Shadcn_>

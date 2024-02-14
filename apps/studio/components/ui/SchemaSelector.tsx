@@ -161,23 +161,23 @@ const SchemaSelector = ({
                 </CommandGroup_Shadcn_>
                 {onSelectCreateSchema !== undefined && (
                   <>
-                  <CommandSeparator_Shadcn_/>
-                  <CommandGroup_Shadcn_>
-                    <CommandItem_Shadcn_
-                      className="cursor-pointer flex items-center gap-x-2 w-full"
-                      onSelect={() => {
-                        onSelectCreateSchema()
-                        setOpen(false)
-                      }}
-                      onClick={() => {
-                        onSelectCreateSchema()
-                        setOpen(false)
-                      }}
-                    >
-                      <IconPlus />
-                      Create a new schema
-                    </CommandItem_Shadcn_>
-                  </CommandGroup_Shadcn_>
+                    <CommandSeparator_Shadcn_ />
+                    <CommandGroup_Shadcn_>
+                      <CommandItem_Shadcn_
+                        className="cursor-pointer flex items-center gap-x-2 w-full"
+                        onSelect={() => {
+                          onSelectCreateSchema()
+                          setOpen(false)
+                        }}
+                        onClick={() => {
+                          onSelectCreateSchema()
+                          setOpen(false)
+                        }}
+                      >
+                        <IconPlus />
+                        Create a new schema
+                      </CommandItem_Shadcn_>
+                    </CommandGroup_Shadcn_>
                   </>
                 )}
               </CommandList_Shadcn_>
