@@ -21,8 +21,7 @@ import {
 } from 'components/ui/Forms'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions, useFlag, useStore } from 'hooks'
-
+import { useCheckPermissions, useStore } from 'hooks'
 import SchemaFunctionSelector from './SchemaFunctionSelector'
 
 const schema = object({
@@ -43,19 +42,12 @@ const BasicHooksConfig = () => {
     isSuccess,
   } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
-
-  const customizeAccessTokenReleased = useFlag('authHooksCustomizeAccessToken')
-
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   // TODO: Remove as any once these properties are defined in Auth Config types
   const INITIAL_VALUES = {
-    ...(customizeAccessTokenReleased
-      ? {
-          HOOK_CUSTOM_ACCESS_TOKEN_ENABLED: authConfig?.HOOK_CUSTOM_ACCESS_TOKEN_ENABLED || false,
-          HOOK_CUSTOM_ACCESS_TOKEN_URI: authConfig?.HOOK_CUSTOM_ACCESS_TOKEN_URI || '',
-        }
-      : null),
+    HOOK_CUSTOM_ACCESS_TOKEN_ENABLED: authConfig?.HOOK_CUSTOM_ACCESS_TOKEN_ENABLED || false,
+    HOOK_CUSTOM_ACCESS_TOKEN_URI: authConfig?.HOOK_CUSTOM_ACCESS_TOKEN_URI || '',
   }
 
   const onSubmit = (values: any, { resetForm }: any) => {
@@ -142,23 +134,15 @@ const BasicHooksConfig = () => {
                     descriptionText="Select the function to be called by Supabase Auth each time a new JWT is created. It should return the claims you wish to be present in the JWT."
                     values={values}
                     setFieldValue={setFieldValue}
-                    disabled={!canUpdateConfig || !customizeAccessTokenReleased}
+                    disabled={!canUpdateConfig}
                   />
-                  {!customizeAccessTokenReleased && (
-                    <Alert_Shadcn_ variant="default">
-                      <AlertTitle_Shadcn_>Coming soon!</AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_>
-                        This hook is not available yet on your project.
-                      </AlertDescription_Shadcn_>
-                    </Alert_Shadcn_>
-                  )}
                   {values.HOOK_CUSTOM_ACCESS_TOKEN_URI && (
                     <Toggle
                       id="HOOK_CUSTOM_ACCESS_TOKEN_ENABLED"
                       size="medium"
                       label="Enable hook"
                       layout="flex"
-                      disabled={!canUpdateConfig || !customizeAccessTokenReleased}
+                      disabled={!canUpdateConfig}
                     />
                   )}
                 </FormSectionContent>

@@ -1,4 +1,4 @@
-import { Button, IconArrowUpRight, IconShuffle, IconWifi, IconX, ThemeImage } from 'ui'
+import { Button, IconArrowUpRight, IconShuffle, IconWifi, IconX } from 'ui'
 import ApiExamples from 'data/products/storage/api-examples'
 import DashboardViewData from 'data/products/storage/dashboard-carousel.json'
 import StoragePermissionsData from 'data/products/storage/permissions-examples'
@@ -16,6 +16,7 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import ProductIcon from '~/components/ProductIcon'
 import APISection from '~/components/Sections/APISection'
 import ProductHeader from '~/components/Sections/ProductHeader'
+import { ThemeImage } from 'ui-patterns/ThemeImage'
 
 function StoragePage() {
   // base path for images

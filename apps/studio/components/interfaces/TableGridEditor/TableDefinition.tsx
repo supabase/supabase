@@ -64,14 +64,19 @@ const TableDefinition = ({ id }: TableDefinitionProps) => {
         ? `create materialized view ${entityType.schema}.${entityType.name} as\n`
         : ''
 
+  const formatDefinition = (value: string) => {
+    try {
+      return format(value, {
+        language: 'postgresql',
+        keywordCase: 'lower',
+      })
+    } catch (err) {
+      return value
+    }
+  }
+
   const formattedDefinition = useMemo(
-    () =>
-      definition
-        ? format(prepend + definition, {
-            language: 'postgresql',
-            keywordCase: 'lower',
-          })
-        : undefined,
+    () => (definition ? formatDefinition(prepend + definition) : undefined),
     [definition]
   )
 

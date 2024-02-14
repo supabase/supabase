@@ -5,7 +5,6 @@ import { FlaskConical } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-
 import {
   Button,
   DropdownMenu,
@@ -51,7 +50,6 @@ const NavigationBar = () => {
 
   const { project } = useProjectContext()
   const navLayoutV2 = useFlag('navigationLayoutV2')
-  const showFeaturePreviews = useFlag('featurePreviews')
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
 
   const {
@@ -218,17 +216,15 @@ const NavigationBar = () => {
                       <p>Account preferences</p>
                     </Link>
                   </DropdownMenuItem>
-                  {showFeaturePreviews && (
-                    <DropdownMenuItem
-                      key="header"
-                      className="space-x-2"
-                      onClick={() => snap.setShowFeaturePreviewModal(true)}
-                      onSelect={() => snap.setShowFeaturePreviewModal(true)}
-                    >
-                      <FlaskConical size={14} strokeWidth={2} />
-                      <p>Feature previews</p>
-                    </DropdownMenuItem>
-                  )}
+                  <DropdownMenuItem
+                    key="header"
+                    className="space-x-2"
+                    onClick={() => snap.setShowFeaturePreviewModal(true)}
+                    onSelect={() => snap.setShowFeaturePreviewModal(true)}
+                  >
+                    <FlaskConical size={14} strokeWidth={2} />
+                    <p>Feature previews</p>
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                 </>
               )}
