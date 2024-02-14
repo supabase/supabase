@@ -1,19 +1,12 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { AnimatePresence, motion } from 'framer-motion'
 import { partition } from 'lodash'
-import { useMemo, useState } from 'react'
+import { Loader2 } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
-import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
-import AlertError from 'components/ui/AlertError'
-import InfiniteList from 'components/ui/InfiniteList'
-import SchemaSelector from 'components/ui/SchemaSelector'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
-import { useCheckPermissions, useLocalStorage } from 'hooks'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -25,16 +18,24 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
   IconChevronsDown,
-  IconEdit,
-  IconLoader,
-  IconRefreshCw,
+  IconPlusCircle,
   IconSearch,
   IconX,
-  Input,
+  cn,
 } from 'ui'
+
+import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
+import AlertError from 'components/ui/AlertError'
+import InfiniteList from 'components/ui/InfiniteList'
+import SchemaSelector from 'components/ui/SchemaSelector'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useSchemasQuery } from 'data/database/schemas-query'
+import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
+import { useCheckPermissions, useLocalStorage } from 'hooks'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
-import { useRouter } from 'next/router'
 
 const TableEditorMenu = () => {
   const router = useRouter()
@@ -47,6 +48,9 @@ const TableEditorMenu = () => {
     'table-editor-sort',
     'alphabetical'
   )
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const inputRef = useRef<HTMLInputElement | null>(null)
+  const [isSearchInputFocused, setIsSearchInputFocused] = useState(false)
 
   const { project } = useProjectContext()
   const {
@@ -74,7 +78,6 @@ const TableEditorMenu = () => {
     }
   )
 
-  const totalCount = data?.pages?.[0].data.count
   const entityTypes = useMemo(
     () => data?.pages.flatMap((page) => page.data.entities),
     [data?.pages]
@@ -92,20 +95,35 @@ const TableEditorMenu = () => {
     await refetch()
   }
 
+  refreshTables
   const [protectedSchemas] = partition(
     (schemas ?? []).sort((a, b) => a.name.localeCompare(b.name)),
     (schema) => EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
   )
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
 
+  const expandSearch = () => {
+    setIsSearchOpen(!isSearchOpen)
+  }
+
+  useEffect(() => {
+    if (isSearchOpen && inputRef.current) {
+      inputRef.current.focus()
+    }
+  }, [isSearchOpen])
+
+  const handleSearchInputFocusChange = () => {
+    setIsSearchInputFocused(inputRef.current === document.activeElement)
+  }
+
   return (
     <>
       <div
-        className="pt-5 flex flex-col flex-grow space-y-4 h-full"
+        className="pt-5 flex flex-col flex-grow space-y-3 h-full"
         style={{ maxHeight: 'calc(100vh - 48px)' }}
       >
         <SchemaSelector
-          className="mx-4"
+          className="mx-4 h-7"
           selectedSchemaName={snap.selectedSchemaName}
           onSelectSchema={(name: string) => {
             setSearchText('')
@@ -115,7 +133,7 @@ const TableEditorMenu = () => {
           onSelectCreateSchema={() => snap.onAddSchema()}
         />
 
-        <div className="space-y-1 mx-4">
+        <div className="grid gap-3 mx-4 zans">
           {!isLocked ? (
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger className="w-full">
@@ -126,11 +144,11 @@ const TableEditorMenu = () => {
                   size="tiny"
                   icon={
                     <div className="text-foreground-lighter">
-                      <IconEdit size={14} strokeWidth={1.5} />
+                      <IconPlusCircle size={14} strokeWidth={1.5} />
                     </div>
                   }
                   type="default"
-                  style={{ justifyContent: 'start' }}
+                  className="justify-start h-7"
                   onClick={snap.onAddTable}
                 >
                   <span>New table</span>
@@ -156,9 +174,7 @@ const TableEditorMenu = () => {
             </Tooltip.Root>
           ) : (
             <Alert_Shadcn_>
-              <AlertTitle_Shadcn_ className="text-xs tracking-normal">
-                Viewing protected schema
-              </AlertTitle_Shadcn_>
+              <AlertTitle_Shadcn_ className="text-sm">Viewing protected schema</AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_ className="text-xs">
                 <p className="mb-2">
                   This schema is managed by Supabase and is read-only through the table editor
@@ -169,67 +185,112 @@ const TableEditorMenu = () => {
               </AlertDescription_Shadcn_>
             </Alert_Shadcn_>
           )}
-
-          {/* Table search input */}
-          <div className="mb-2 block">
-            <Input
-              className="table-editor-search border-none"
-              icon={
-                isSearching ? (
-                  <IconLoader
-                    className="animate-spin text-foreground-lighter"
-                    size={12}
-                    strokeWidth={1.5}
-                  />
-                ) : (
-                  <IconSearch className="text-foreground-lighter" size={12} strokeWidth={1.5} />
-                )
-              }
-              placeholder="Search tables"
-              onChange={(e) => setSearchText(e.target.value.trim())}
-              value={searchText}
-              size="tiny"
-              actions={
-                searchText && (
-                  <Button type="text" className="px-1" onClick={() => setSearchText('')}>
-                    <IconX size={12} strokeWidth={2} />
-                  </Button>
-                )
-              }
-            />
-          </div>
         </div>
 
-        <nav className="flex flex-auto flex-col gap-2 pb-4 px-2">
-          <div className="flex items-center justify-between w-full px-3">
-            <div className="flex items-center gap-1 text-sm text-foreground-lighter">
-              <p>Tables</p>
-              {totalCount !== undefined && (
-                <p style={{ fontVariantNumeric: 'tabular-nums' }}>({totalCount})</p>
-              )}
+        <div className="flex flex-auto flex-col gap-2 pb-4 px-2">
+          <div className="relative">
+            <div className="relative flex items-center text-foreground-lighter">
+              <AnimatePresence>
+                {isSearchOpen && (
+                  <motion.div
+                    initial={{ x: 10, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1, transition: { duration: 0.2 } }}
+                    exit={{ x: 20, opacity: 0, transition: { duration: 0 } }}
+                    className="absolute top-0 left-2"
+                  >
+                    <label htmlFor={'search-tables'} className="relative">
+                      <span className="sr-only">Search tables</span>
+                      <input
+                        id="search-tables"
+                        name="search-tables"
+                        type="text"
+                        placeholder="Search..."
+                        className={cn(
+                          'bg-default text-foreground rounded-none px-1 py-1 h-5 w-44 text-sm',
+                          'border-b outline-none ',
+                          'border-transparent focus:border-transparent focus:ring-2'
+                        )}
+                        onChange={(e) => {
+                          setSearchText(e.target.value.trim())
+                        }}
+                        value={searchText}
+                        ref={(el) => {
+                          inputRef.current = el
+                          if (el) {
+                            el.addEventListener('focus', handleSearchInputFocusChange)
+                            el.addEventListener('blur', handleSearchInputFocusChange)
+                          }
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Escape') {
+                            setIsSearchOpen(false)
+                            setSearchText('')
+                          }
+                          if (e.key === 'Backspace' && searchText.length === 0) {
+                            setIsSearchOpen(false)
+                          }
+                        }}
+                      />
+                      <div
+                        className={cn(
+                          'absolute -bottom-1 w-full h-px bg-border transition-colors',
+                          isSearchInputFocused && 'bg-border-stronger'
+                        )}
+                      ></div>
+                    </label>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              <motion.button
+                onClick={
+                  !isSearchOpen
+                    ? () => expandSearch()
+                    : () => {
+                        setSearchText('')
+                        expandSearch()
+                      }
+                }
+                initial={{ x: 0 }}
+                animate={{ x: isSearchOpen ? 185 : 0, transition: { duration: 0 } }}
+                className="px-2 py-0.5 rounded-md mt-1 transition transform hover:scale-105 focus:ring-2 "
+              >
+                {isSearchOpen ? (
+                  isSearching ? (
+                    <Loader2
+                      className="w-4 h-4 animate-spin text-foreground"
+                      size={15}
+                      strokeWidth={1}
+                    />
+                  ) : (
+                    <IconX className={cn('w-4  h-4 hover:text-foreground transition-colors')} />
+                  )
+                ) : (
+                  <IconSearch className={cn('w-4 h-4 hover:text-foreground transition-colors')} />
+                )}
+              </motion.button>
             </div>
-
-            <div className="flex gap-3 items-center">
+            <div className="flex gap-3 items-center absolute right-1 top-1.5">
               <DropdownMenu>
                 <Tooltip.Root delayDuration={0}>
                   <DropdownMenuTrigger asChild>
                     <Tooltip.Trigger>
-                      <div className="text-foreground-lighter transition-colors hover:text-foreground">
-                        <IconChevronsDown size={18} strokeWidth={1} />
-                      </div>
+                      <IconChevronsDown
+                        size={18}
+                        strokeWidth={1}
+                        className="text-foreground-lighter transition-colors hover:text-foreground"
+                      />
                     </Tooltip.Trigger>
                   </DropdownMenuTrigger>
                   <Tooltip.Portal>
-                    <Tooltip.Content side="bottom">
+                    <Tooltip.Content
+                      side="bottom"
+                      className={[
+                        'rounded bg-alternative py-1 px-2 leading-none shadow',
+                        'border border-background text-xs',
+                      ].join(' ')}
+                    >
                       <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-alternative py-1 px-2 leading-none shadow',
-                          'border border-background',
-                        ].join(' ')}
-                      >
-                        <span className="text-xs">Sort By</span>
-                      </div>
+                      Sort By
                     </Tooltip.Content>
                   </Tooltip.Portal>
                 </Tooltip.Root>
@@ -248,13 +309,6 @@ const TableEditorMenu = () => {
                   </DropdownMenuRadioGroup>
                 </DropdownMenuContent>
               </DropdownMenu>
-
-              <button
-                className="cursor-pointer text-foreground-lighter transition-colors hover:text-foreground"
-                onClick={refreshTables}
-              >
-                <IconRefreshCw className={isRefetching ? 'animate-spin' : ''} size={14} />
-              </button>
             </div>
           </div>
 
@@ -288,7 +342,6 @@ const TableEditorMenu = () => {
                   </p>
                 </div>
               )}
-
               {(entityTypes?.length ?? 0) > 0 && (
                 <div className="flex flex-1">
                   <InfiniteList
@@ -308,7 +361,7 @@ const TableEditorMenu = () => {
               )}
             </>
           )}
-        </nav>
+        </div>
       </div>
 
       <ProtectedSchemaModal visible={showModal} onClose={() => setShowModal(false)} />
