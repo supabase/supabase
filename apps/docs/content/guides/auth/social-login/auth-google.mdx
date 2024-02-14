@@ -16,7 +16,7 @@ There are three general ways to use Sign in with Google, depending on the applic
 - Sign in on the web or in web-based apps
   - Using an OAuth flow initiated by Supabase Auth using [Google Identity Authorization with OAuth 2.0 for Web Server Applications](https://developers.google.com/identity/protocols/oauth2/web-server).
   - Using a [personalized sign-in button](https://developers.google.com/identity/gsi/web/guides/personalized-button) or [One Tap](https://developers.google.com/identity/gsi/web/guides/display-google-one-tap) and [automatic sign-in](https://developers.google.com/identity/gsi/web/guides/automatic-sign-in-sign-out) for users already logged in to their Google account.
-- Sign in in native Android apps and Chrome extensions
+- Sign-in in native Android apps and Chrome extensions.
 
 In some cases you're able to use the OAuth flow within web-based native apps such as with React Native, Expo or other similar frameworks. It is best practice to use native Sign in with Google capabilities whenever possible.
 
@@ -301,45 +301,86 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
 
   <TabPanel id="android" label="Android (Kotlin)">
 
-    Unlike the OAuth flow which requires the use of a web browser, the native Sign in with Google flow on Android uses the [operating system's built-in functionalities](https://developers.google.com/android/reference/com/google/android/gms/auth/api/identity/package-summary) to prompt the user for consent. Note that native sign-in has been rebranded as _One Tap sign-in on Android_ by Google, which you should not confuse with _One Tap sign in for web_, as mentioned below.
+    Unlike the OAuth flow which requires the use of a web browser, the native Sign in with Google flow on Android uses the [operating system's built-in functionalities](https://developer.android.com/training/sign-in/credential-manager) to prompt the user for consent.
 
     When the user provides consent, Google issues an identity token (commonly abbreviated as ID token) that is then sent to your project's Supabase Auth server. When valid, a new user session is started by issuing an access and refresh token from Supabase Auth.
 
-    When using [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/), you can use the [compose-auth](https://supabase.com/docs/reference/kotlin/installing) plugin. On Android it uses Google OneTap (or Credential Manager on Android 14+) automatically and on other platforms it uses `auth.signInWith(Google)`.
-    Alternatively, you can have a look at [Google One Tap](https://developers.google.com/identity/one-tap/android/overview), just login with the IdToken after you receive it.
-
-    **Initialize the Supabase Client**
-
-    **Note:** You have to create OAuth credentials for both a Web and Android application. [Learn more](https://developers.google.com/identity/one-tap/android/get-started#api-console)
+    **Note:** You have to create OAuth client IDs for both a Web and Android application. The Web client ID is the one used in your Android app.
 
     ```kotlin
-    val supabaseClient = createSupabaseClient(
-        supabaseUrl = "SUPABASE_URL",
-        supabaseKey = "SUPABASE_KEY"
-    ) {
-        install(GoTrue)
-        install(ComposeAuth) {
-            nativeGoogleLogin("WEB_GOOGLE_CLIENT_ID") //Use the Web Client ID, not the Android one!
-        }
-    }
-    ```
+    @Composable
+    fun GoogleSignInButton() {
+        val coroutineScope = rememberCoroutineScope()
+        val context = LocalContext.current
 
-    **Use the Compose Auth plugin in your Auth Screen**
+        val onClick: () -> Unit = {
+            val credentialManager = CredentialManager.create(context)
 
-    ```kotlin
-    val authState = supabaseClient.composeAuth.rememberLoginWithGoogle(
-        onResult = {
-            when(it) { //handle errors
-                NativeSignInResult.ClosedByUser -> TODO()
-                is NativeSignInResult.Error -> TODO()
-                is NativeSignInResult.NetworkError -> TODO()
-                NativeSignInResult.Success -> TODO()
+            // Generate a nonce and hash it with sha-256
+            val rawNonce = UUID.randomUUID().toString() // Generate a random String. UUID should be sufficient for this.
+            val bytes = rawNonce.toString().toByteArray()
+            val md = MessageDigest.getInstance("SHA-256")
+            val digest = md.digest(bytes)
+            val hashedNonce = digest.fold("") { str, it -> str + "%02x".format(it) } // Hashed nonce to be passed to Google sign-in
+
+
+            val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
+                .setFilterByAuthorizedAccounts(false)
+                .setServerClientId("YOUR_WEB_CLIENT_ID")
+                .setNonce(hashedNonce)
+                .build()
+
+            val request: GetCredentialRequest = GetCredentialRequest.Builder()
+                .addCredentialOption(googleIdOption)
+                .build()
+
+            coroutineScope.launch {
+                try {
+                    val result = credentialManager.getCredential(
+                        request = request,
+                        context = context,
+                    )
+
+                    val googleIdTokenCredential = GoogleIdTokenCredential
+                        .createFrom(result.credential.data)
+
+                    val googleIdToken = googleIdTokenCredential.idToken
+
+                    supabase.auth.signInWith(IDToken) {
+                        idToken = googleIdToken
+                        provider = Google
+                        nonce = rawNonce
+                    }
+
+                    Toast.makeText(context, "You are now signed in!", Toast.LENGTH_SHORT).show()
+                } catch (e: GetCredentialException) {
+                    Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+                } catch (e: GoogleIdTokenParsingException) {
+                    Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+                } catch (e: RestException) {
+                    Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+                } catch (e: Exception) {
+                    Toast.makeText(context, e.message ?: "Unknown Exception", Toast.LENGTH_SHORT).show()
+                }
             }
         }
-    )
 
-    Button(onClick = { authState.startFlow() }) {
-        Text("Sign in with Google")
+        Button(
+            onClick = onClick,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp),
+            shape = RoundedCornerShape(6.dp),
+            elevation = ButtonDefaults.buttonElevation(
+                defaultElevation = 4.dp
+            ),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.White,
+                contentColor = Color.Black
+            )
+        ) {
+            Text("Sign in with Google")
+        }
     }
     ```
 
@@ -348,7 +389,6 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
     1. Configure OAuth credentials for your Google Cloud project in the [Credentials](https://console.cloud.google.com/apis/credentials) page of the console. When creating a new OAuth client ID, choose _Android_ or _iOS_ depending on the mobile operating system your app is built for.
 
       - For Android, use the instructions on screen to provide the SHA-1 certificate fingerprint used to sign your Android app.
-      - For iOS, use the instructions on screen to provide the app Bundle ID, and App Store ID and Team ID if the app is already published on the Apple AppStore.
 
     2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app. In particular, make sure you have set up links to your app's privacy policy and terms of service.
     3. Finally, add the client ID from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers), under _Authorized Client IDs_.
