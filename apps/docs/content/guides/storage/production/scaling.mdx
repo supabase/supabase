@@ -1,12 +1,10 @@
-import Layout from '~/layouts/DefaultGuideLayout'
-
-export const meta = {
-  id: 'storage-schema-optimizations',
-  title: 'Storage Optimizations',
-  description: 'Scaling Storage',
-  subtitle: 'Scaling Storage',
-  sidebar_label: 'Schema',
-}
+---
+id: 'storage-schema-optimizations'
+title: 'Storage Optimizations'
+description: 'Scaling Storage'
+subtitle: 'Scaling Storage'
+sidebar_label: 'Schema'
+---
 
 Here are some optimizations that you can consider to improve performance and reduce costs as you start scaling Storage.
 
@@ -86,7 +84,3 @@ const { data, error } = await supabase.rpc('list_objects', {
 ## Optimizing RLS
 
 When creating RLS policies against the storage tables you can add indexes to the interested columns to speed up the lookup
-
-export const Page = ({ children }) => <Layout meta={meta} children={children} />
-
-export default Page

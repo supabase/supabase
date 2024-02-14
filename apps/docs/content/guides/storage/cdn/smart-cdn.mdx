@@ -1,11 +1,9 @@
-import Layout from '~/layouts/DefaultGuideLayout'
-
-export const meta = {
-  id: 'storage-cdn',
-  title: 'Smart CDN',
-  description: 'Learn how Supabase Storage caches objects with a CDN.',
-  sidebar_label: 'CDN',
-}
+---
+id: 'storage-cdn'
+title: 'Smart CDN'
+description: 'Learn how Supabase Storage caches objects with a CDN.'
+sidebar_label: 'CDN'
+---
 
 With Smart CDN caching enabled, the asset metadata in your database is synchronized to the edge. This automatically revalidates the cache when the asset is changed or deleted.
 
@@ -38,7 +36,3 @@ If you anticipate that your asset might be deleted, it's advisable to set a shor
 If you need to ensure assets refresh directly from the origin server and bypass the cache, you can achieve this by adding a unique query string to the URL.
 
 For instance, you can use a URL like `/storage/v1/object/sign/profile-pictures/cat.jpg?version=1` with a long browser cache (e.g., 1 year). To update the picture, increment the version query parameter in the URL, like `/storage/v1/object/sign/profile-pictures/cat.jpg?version=2`. The CDN will recognize it as a new object and fetch the updated version from the origin.
-
-export const Page = ({ children }) => <Layout meta={meta} children={children} />
-
-export default Page

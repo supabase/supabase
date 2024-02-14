@@ -1,13 +1,11 @@
-import Layout from '~/layouts/DefaultGuideLayout'
-
-export const meta = {
-  id: 'storage-image-transformations',
-  title: 'Storage Image Transformations',
-  description: 'Transform images with Storage',
-  subtitle: 'Transform images with Storage',
-  sidebar_label: 'Image Transformations',
-  tocVideo: 'dLqSmxX3r7I',
-}
+---
+id: 'storage-image-transformations'
+title: 'Storage Image Transformations'
+description: 'Transform images with Storage'
+subtitle: 'Transform images with Storage'
+sidebar_label: 'Image Transformations'
+tocVideo: 'dLqSmxX3r7I'
+---
 
 Supabase Storage offers the functionality to optimize and resize images on the fly. Any image stored in your buckets can be transformed and optimized for fast delivery.
 
@@ -383,7 +381,3 @@ IMGPROXY_URL=yourinternalimgproxyurl.internal.com
     allowFullScreen
   ></iframe>
 </div>
-
-export const Page = ({ children }) => <Layout meta={meta} children={children} />
-
-export default Page

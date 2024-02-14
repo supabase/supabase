@@ -1,12 +1,10 @@
-import Layout from '~/layouts/DefaultGuideLayout'
-
-export const meta = {
-  id: 'storage-schema-design',
-  title: 'The Storage Schema',
-  description: 'Learn about the storage schema',
-  subtitle: 'Learn about the storage schema',
-  sidebar_label: 'Schema',
-}
+---
+id: 'storage-schema-design'
+title: 'The Storage Schema'
+description: 'Learn about the storage schema'
+subtitle: 'Learn about the storage schema'
+sidebar_label: 'Schema'
+---
 
 Storage uses Postgres to store metadata regarding your buckets and objects. Users can use RLS (Row-Level Security) policies for access control. This data is stored in a dedicated schema within your project called `storage`.
 
@@ -28,7 +26,3 @@ You have the option to query this table directly to retrieve information about y
 We strongly recommend refraining from making any alterations to the `storage` schema and treating it as read-only. This approach is important because any modifications to the schema on your end could potentially clash with our future updates, leading to downtime.
 
 However, we encourage you to add custom indexes as they can significantly improve the performance of the RLS policies you create for enforcing access control.
-
-export const Page = ({ children }) => <Layout meta={meta} children={children} />
-
-export default Page

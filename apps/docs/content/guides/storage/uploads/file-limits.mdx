@@ -1,11 +1,9 @@
-import Layout from '~/layouts/DefaultGuideLayout'
-
-export const meta = {
-  id: 'storage-file-limits',
-  title: 'Limits',
-  description: 'Learn how to increase Supabase file limits.',
-  sidebar_label: 'Uploads',
-}
+---
+id: 'storage-file-limits'
+title: 'Limits'
+description: 'Learn how to increase Supabase file limits.'
+sidebar_label: 'Uploads'
+---
 
 You can customize the Max file size for file uploads.
 
@@ -35,7 +33,3 @@ You can have different restrictions on a per bucket level.
 You are able to restrict the file types (eg. `pdf`, `images`, `videos`) along with the max file size which should be lower than the global limit.
 
 To apply these limit on a bucket level see [Creating Bucket](/docs/guides/storage/buckets/creating-buckets#restricting-uploads)
-
-export const Page = ({ children }) => <Layout meta={meta} children={children} />
-
-export default Page
