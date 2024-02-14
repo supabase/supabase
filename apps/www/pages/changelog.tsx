@@ -82,7 +82,19 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
     }
   }
 
-  const releases = await fetchGitHubReleases()
+  // Process as of Feb. 2024:
+  // create a Release each month and create a corresponding changelog discussion
+  // — we don't want to pull in both the changelog entry and the release entry
+  // — we want to ignore new releases and only show the old ones that don't have a corresponding changelog discussion
+  // — so we have this list of old releases that we want to show
+  const oldReleases = [
+    40981345, 39091930, 37212777, 35927141, 34612423, 33383788, 32302703, 30830915, 29357247,
+    28108378,
+  ]
+
+  const releases = await (
+    await fetchGitHubReleases()
+  ).filter((release) => release.id && oldReleases.includes(release.id))
 
   // uses the graphql api
   async function fetchDiscussions(owner: string, repo: string, categoryId: string, cursor: string) {
