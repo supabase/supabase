@@ -5,7 +5,7 @@ import { PropsWithChildren } from 'react'
 import { useIsColumnLevelPrivilegesEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import ProductMenu from 'components/ui/ProductMenu'
 import { useAuthConfigPrefetch } from 'data/auth/auth-config-query'
-import { useFlag, withAuth } from 'hooks'
+import { withAuth } from 'hooks'
 import ProjectLayout from '../'
 import { generateAuthMenu } from './AuthLayout.utils'
 
@@ -15,7 +15,6 @@ export interface AuthLayoutProps {
 
 const AuthLayout = ({ title, children }: PropsWithChildren<AuthLayoutProps>) => {
   const { ref: projectRef = 'default' } = useParams()
-  const hooksReleased = useFlag('authHooksReleased')
   const columnLevelPrivileges = useIsColumnLevelPrivilegesEnabled()
 
   useAuthConfigPrefetch({ projectRef })
@@ -30,7 +29,7 @@ const AuthLayout = ({ title, children }: PropsWithChildren<AuthLayoutProps>) => 
       productMenu={
         <ProductMenu
           page={page}
-          menu={generateAuthMenu(projectRef ?? 'default', { hooksReleased, columnLevelPrivileges })}
+          menu={generateAuthMenu(projectRef ?? 'default', { columnLevelPrivileges })}
         />
       }
       isBlocking={false}
