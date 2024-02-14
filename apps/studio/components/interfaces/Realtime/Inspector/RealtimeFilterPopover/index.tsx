@@ -18,7 +18,7 @@ import Link from 'next/link'
 import { ApplyConfigModal } from '../ApplyConfigModal'
 import { RealtimeConfig } from '../useRealtimeMessages'
 import { FilterSchema } from './FilterSchema'
-import { TableSchema } from './TableSchema'
+import { FilterTable } from './FilterTable'
 
 interface RealtimeFilterPopoverProps {
   config: RealtimeConfig
@@ -159,7 +159,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
                   onChange={(v) => setTempConfig({ ...tempConfig, schema: v, table: '*' })}
                 />
 
-                <TableSchema
+                <FilterTable
                   value={tempConfig.table}
                   schema={tempConfig.schema}
                   onChange={(table) => setTempConfig({ ...tempConfig, table })}

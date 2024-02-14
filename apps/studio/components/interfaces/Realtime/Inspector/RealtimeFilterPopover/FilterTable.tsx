@@ -1,6 +1,6 @@
 import TableSelector from './TableSelector'
 
-export const TableSchema = ({
+export const FilterTable = ({
   value,
   schema,
   onChange,
