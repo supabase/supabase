@@ -53,7 +53,7 @@ const TableSelector = ({
   })
   useEffect(() => {
     if (!initiallyLoaded && isSuccess) {
-      setinitiallyLoaded(true)
+      setInitiallyLoaded(true)
     }
   }, [initiallyLoaded, isSuccess])
 
