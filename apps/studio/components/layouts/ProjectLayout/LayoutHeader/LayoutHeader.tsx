@@ -22,8 +22,6 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
 
-  const enableBranchManagement = useFlag('branchManagement')
-
   const isBranchingEnabled =
     selectedProject?.is_branch_enabled === true || selectedProject?.parent_project_ref !== undefined
 
@@ -42,7 +40,6 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
   const projectHasNoLimits = subscription?.usage_billing_enabled === true
 
   const showOverUsageBadge =
-    useFlag('overusageBadge') &&
     (subscription?.plan.id === 'free' || subscription?.plan.id === 'pro') &&
     !projectHasNoLimits &&
     exceedingLimits
@@ -89,7 +86,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
               </>
             )}
 
-            {selectedProject && enableBranchManagement && (
+            {selectedProject && (
               <>
                 <span className="text-border-stronger">
                   <svg
