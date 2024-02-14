@@ -1,12 +1,10 @@
-import Layout from '~/layouts/DefaultGuideLayout'
-
-export const meta = {
-  id: 'storage-schema',
-  title: 'Storage Helper Functions',
-  description: 'Learn the storage schema',
-  subtitle: 'Learn the storage schema',
-  sidebar_label: 'Schema',
-}
+---
+id: 'storage-schema'
+title: 'Storage Helper Functions'
+description: 'Learn the storage schema'
+subtitle: 'Learn the storage schema'
+sidebar_label: 'Schema'
+---
 
 Supabase Storage provides SQL helper functions which you can use to write RLS policies.
 
@@ -63,7 +61,3 @@ with check (
   bucket_id = 'cats' and storage.extension(name) = 'png'
 );
 ```
-
-export const Page = ({ children }) => <Layout meta={meta} children={children} />
-
-export default Page

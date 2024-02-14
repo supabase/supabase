@@ -6,14 +6,14 @@ import Layout from '~/layouts/DefaultGuideLayout'
 import { getGuidesStaticPaths, getGuidesStaticProps } from '~/lib/docs'
 
 export const getStaticPaths = (async () => {
-  return getGuidesStaticPaths('auth')
+  return getGuidesStaticPaths('storage')
 }) satisfies GetStaticPaths
 
 export const getStaticProps = (async (args) => {
-  return getGuidesStaticProps('auth', args)
+  return getGuidesStaticProps('storage', args)
 }) satisfies GetStaticProps
 
-export default function AuthGuide({
+export default function StorageGuide({
   frontmatter,
   mdxSource,
   editLink,
