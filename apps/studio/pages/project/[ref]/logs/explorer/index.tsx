@@ -135,7 +135,11 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   }
 
   const handleInsertSource = (source: LogsTableName) => {
-    setEditorValue((prev) => prev + source)
+    setEditorValue((prev) => {
+      const index = prev.indexOf('from')
+      if (index === -1) return `${prev}${source}`
+      return `${prev.substring(0, index + 4)} ${source} ${prev.substring(index + 5)}`
+    })
     setEditorId(uuidv4())
   }
 
