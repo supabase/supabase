@@ -68,7 +68,7 @@ Suppose we have a database with the following schema:
 We can use the Snaplet configuration file `seed.mts` to define the values we want to generate. For example
 
 - A `Post` with the title `"There is a lot of snow around here!"`
-- The `Post.author` user with an email address ending in `"@acme.org"`
+- The `Post.createdBy` user with an email address ending in `"@acme.org"`
 - Three `Post.comments` from three different users.
 
 ```ts seed.mts
@@ -79,7 +79,7 @@ const seed = await createSeedClient();
 
 await seed.posts([{
   title: "There is a lot of snow around here!"
-  author: {
+  createdBy: {
     email: (ctx) =>
       copycat.email(ctx.seed, {
         domain: 'acme.org',
