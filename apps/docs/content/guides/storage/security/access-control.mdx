@@ -1,12 +1,10 @@
-import Layout from '~/layouts/DefaultGuideLayout'
-
-export const meta = {
-  id: 'storage-access-control',
-  title: 'Storage Access Control',
-  description: 'Learn how to restrict Supabase file uploads.',
-  sidebar_label: 'Uploads',
-  tocVideo: '4ERX__Y908k',
-}
+---
+id: 'storage-access-control'
+title: 'Storage Access Control'
+description: 'Learn how to restrict Supabase file uploads.'
+sidebar_label: 'Uploads'
+tocVideo: '4ERX__Y908k'
+---
 
 Supabase Storage is designed to work perfectly with Postgres [Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security) (RLS).
 
@@ -103,7 +101,3 @@ using ( auth.uid() = owner_id );
 If you exclusively use Storage from trusted clients, such as your own servers, and need to bypass the RLS policies, you can use the `service key` in the `Authorization` header. Service keys entirely bypass RLS policies, granting you unrestricted access to all Storage APIs.
 
 Remember you should not share the service key publicly.
-
-export const Page = ({ children }) => <Layout meta={meta} children={children} />
-
-export default Page

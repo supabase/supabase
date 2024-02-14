@@ -1,12 +1,10 @@
-import Layout from '~/layouts/DefaultGuideLayout'
-
-export const meta = {
-  id: 'standard-uploads',
-  title: 'Standard Uploads',
-  description: 'Learn how to upload files to Supabase Storage.',
-  subtitle: 'Learn how to upload files to Supabase Storage.',
-  sidebar_label: 'Uploads',
-}
+---
+id: 'standard-uploads'
+title: 'Standard Uploads'
+description: 'Learn how to upload files to Supabase Storage.'
+subtitle: 'Learn how to upload files to Supabase Storage.'
+sidebar_label: 'Uploads'
+---
 
 ## Uploading
 
@@ -125,7 +123,3 @@ await supabase.storage.from('bucket_name').upload('file_path', file, {
 
 When two or more clients upload a file to the same path, the first client to complete the upload will succeed and the other clients will receive a `400 Asset Already Exists` error.
 If you provide the `x-upsert` header the last client to complete the upload will succeed instead.
-
-export const Page = ({ children }) => <Layout meta={meta} children={children} />
-
-export default Page

@@ -1,11 +1,9 @@
-import Layout from '~/layouts/DefaultGuideLayout'
-
-export const meta = {
-  id: 'storage-logs',
-  title: 'Logs',
-  description: 'Learn how to check Storage Logs',
-  sidebar_label: 'Debugging',
-}
+---
+id: 'storage-logs'
+title: 'Logs'
+description: 'Learn how to check Storage Logs'
+sidebar_label: 'Debugging'
+---
 
 Accessing the [Storage Logs](https://supabase.green/dashboard/project/__/logs/explorer?q=select+id%2C+storage_logs.timestamp%2C+event_message+from+storage_logs%0A++%0A++order+by+timestamp+desc%0A++limit+100%0A++) allows you to examine all incoming request logs to your Storage service. You can also filter logs and delve into specific aspects of your requests.
 
@@ -62,7 +60,3 @@ where r.remoteAddress in ("IP_ADDRESS")
 order by timestamp desc
 limit 100;
 ```
-
-export const Page = ({ children }) => <Layout meta={meta} children={children} />
-
-export default Page

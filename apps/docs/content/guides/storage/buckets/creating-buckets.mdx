@@ -1,11 +1,9 @@
-import Layout from '~/layouts/DefaultGuideLayout'
-
-export const meta = {
-  id: 'storage-creating-buckets',
-  title: 'Creating Buckets',
-  description: 'Learn how to create Supabase Storage buckets.',
-  sidebar_label: 'Buckets',
-}
+---
+id: 'storage-creating-buckets'
+title: 'Creating Buckets'
+description: 'Learn how to create Supabase Storage buckets.'
+sidebar_label: 'Buckets'
+---
 
 You can create a bucket using the Supabase Dashboard. Since storage is interoperable with your Postgres database, you can also use SQL or our client libraries.
 Here we create a bucket called "avatars":
@@ -87,7 +85,3 @@ const { data, error } = await supabase.storage.createBucket('avatars', {
 If an upload request doesn't meet the above restrictions it will be rejected.
 
 For more information check [File Limits](/docs/guides/storage/uploads/file-limits) Section.
-
-export const Page = ({ children }) => <Layout meta={meta} children={children} />
-
-export default Page

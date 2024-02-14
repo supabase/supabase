@@ -274,7 +274,7 @@ functions:
         isSpotlight: true
         code: |
           ```dart
-          await supabase.auth.signInWithOAuth(Provider.github);
+          await supabase.auth.signInWithOAuth(OAuthProvider.github);
           ```
       - id: sign-in-using-a-third-party-provider-with-redirect
         name: With `redirectTo`
@@ -284,7 +284,7 @@ functions:
         code: |
           ```dart
           await supabase.auth.signInWithOAuth(
-            Provider.github,
+            OAuthProvider.github,
             redirectTo: kIsWeb ? null : 'io.supabase.flutter://reset-callback/',
           );
           ```
@@ -296,7 +296,7 @@ functions:
         code: |
           ```dart
           await supabase.auth.signInWithOAuth(
-            Provider.github,
+            OAuthProvider.github,
             scopes: 'repo gist notifications'
           );
           ...

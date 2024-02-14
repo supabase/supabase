@@ -1,11 +1,9 @@
-import Layout from '~/layouts/DefaultGuideLayout'
-
-export const meta = {
-  id: 'storage-bucket-public-and-private',
-  title: 'Storage Buckets',
-  description: 'Learn how Supabase Storage Buckets works.',
-  sidebar_label: 'Buckets',
-}
+---
+id: 'storage-bucket-public-and-private'
+title: 'Storage Buckets'
+description: 'Learn how Supabase Storage Buckets works.'
+sidebar_label: 'Buckets'
+---
 
 Buckets allow you to keep your files organized and determines the [Access Model](#access-model) for your assets. [Upload restrictions](/docs/guides/storage/buckets/creating-buckets#restricting-uploads) like max file size and allowed content types are also defined at the bucket level.
 
@@ -40,7 +38,3 @@ Access control is still enforced for other types of operations including uploadi
 - Blog post content
 
 Public buckets are more performant than private buckets since they are [cached differently](/docs/guides/storage/cdn/fundamentals#public-vs-private-buckets).
-
-export const Page = ({ children }) => <Layout meta={meta} children={children} />
-
-export default Page
