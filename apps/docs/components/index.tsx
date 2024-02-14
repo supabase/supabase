@@ -42,105 +42,107 @@ import StorageManagement from './MDX/storage_management.mdx'
 
 // Icons
 import {
-  IconMenuApi,
-  IconMenuAuth,
-  IconMenuCli,
-  IconMenuCsharp,
-  IconMenuDatabase,
-  IconMenuEdgeFunctions,
-  IconMenuFlutter,
-  IconMenuGettingStarted,
-  IconMenuHome,
-  IconMenuIntegrations,
-  IconMenuJavascript,
-  IconMenuKotlin,
-  IconMenuPlatform,
-  IconMenuPython,
-  IconMenuRealtime,
-  IconMenuResources,
-  IconMenuRestApis,
-  IconMenuSelfHosting,
-  IconMenuStorage,
-  IconMenuSwift,
+	IconMenuApi,
+	IconMenuAuth,
+	IconMenuCli,
+	IconMenuCsharp,
+	IconMenuDatabase,
+	IconMenuEdgeFunctions,
+	IconMenuFlutter,
+	IconMenuGettingStarted,
+	IconMenuHome,
+	IconMenuIntegrations,
+	IconMenuJavascript,
+	IconMenuKotlin,
+	IconMenuPlatform,
+	IconMenuPython,
+	IconMenuRealtime,
+	IconMenuResources,
+	IconMenuRestApis,
+	IconMenuSelfHosting,
+	IconMenuStorage,
+	IconMenuSwift,
 } from './Navigation/NavigationMenu/HomeMenuIcons'
 
 // Heavy/rare (lazy-loaded)
 import { AppleSecretGenerator } from './AppleSecretGenerator'
 import { Mermaid } from './Mermaid'
+import { RealtimeLimitsEstimator } from './RealtimeLimitsEstimator'
 
 const components = {
-  ...markdownComponents,
-  Accordion,
-  Admonition,
-  Alert: (props: any) => (
-    <Alert {...props} className="not-prose">
-      {props.children}
-    </Alert>
-  ),
-  AppleSecretGenerator,
-  AuthProviders,
-  Button,
-  ButtonCard,
-  CH,
-  CliGlobalFlagsHandler: () => <CliGlobalFlagsHandler />,
-  CodeBlock,
-  DatabaseSetup,
-  GetSessionWarning,
-  GlassPanel,
-  h2: (props: any) => (
-    <Heading tag="h2" {...props}>
-      {props.children}
-    </Heading>
-  ),
-  h3: (props: any) => (
-    <Heading tag="h3" {...props}>
-      {props.children}
-    </Heading>
-  ),
-  h4: (props: any) => (
-    <Heading tag="h4" {...props}>
-      {props.children}
-    </Heading>
-  ),
-  IconMenuApi,
-  IconMenuAuth,
-  IconMenuCli,
-  IconMenuCsharp,
-  IconMenuDatabase,
-  IconMenuEdgeFunctions,
-  IconMenuFlutter,
-  IconMenuGettingStarted,
-  IconMenuHome,
-  IconMenuIntegrations,
-  IconMenuJavascript,
-  IconMenuKotlin,
-  IconMenuPlatform,
-  IconMenuPython,
-  IconMenuRealtime,
-  IconMenuResources,
-  IconMenuRestApis,
-  IconMenuSelfHosting,
-  IconMenuStorage,
-  IconMenuSwift,
-  IconPanel,
-  Image: (props: any) => <ThemeImage fill className="object-contain" {...props} />,
-  Link,
-  Mermaid,
-  MigrationWarnings,
-  NavData,
-  Options,
-  Param,
-  ProjectConfigVariables,
-  ProjectSetup,
-  QuickstartIntro,
-  RefHeaderSection: (props: any) => <RefHeaderSection {...props} />,
-  RefSubLayout,
-  SocialProviderSettingsSupabase,
-  SocialProviderSetup,
-  StepHikeCompact,
-  StorageManagement,
-  TabPanel: (props: any) => <Tabs.Panel {...props}>{props.children}</Tabs.Panel>,
-  Tabs: (props: any) => <Tabs wrappable {...props} />,
+	...markdownComponents,
+	Accordion,
+	Admonition,
+	Alert: (props: any) => (
+		<Alert {...props} className="not-prose">
+			{props.children}
+		</Alert>
+	),
+	AppleSecretGenerator,
+	AuthProviders,
+	Button,
+	ButtonCard,
+	CH,
+	CliGlobalFlagsHandler: () => <CliGlobalFlagsHandler />,
+	CodeBlock,
+	DatabaseSetup,
+	GetSessionWarning,
+	GlassPanel,
+	h2: (props: any) => (
+		<Heading tag="h2" {...props}>
+			{props.children}
+		</Heading>
+	),
+	h3: (props: any) => (
+		<Heading tag="h3" {...props}>
+			{props.children}
+		</Heading>
+	),
+	h4: (props: any) => (
+		<Heading tag="h4" {...props}>
+			{props.children}
+		</Heading>
+	),
+	IconMenuApi,
+	IconMenuAuth,
+	IconMenuCli,
+	IconMenuCsharp,
+	IconMenuDatabase,
+	IconMenuEdgeFunctions,
+	IconMenuFlutter,
+	IconMenuGettingStarted,
+	IconMenuHome,
+	IconMenuIntegrations,
+	IconMenuJavascript,
+	IconMenuKotlin,
+	IconMenuPlatform,
+	IconMenuPython,
+	IconMenuRealtime,
+	IconMenuResources,
+	IconMenuRestApis,
+	IconMenuSelfHosting,
+	IconMenuStorage,
+	IconMenuSwift,
+	IconPanel,
+	Image: (props: any) => <ThemeImage fill className="object-contain" {...props} />,
+	Link,
+	Mermaid,
+	MigrationWarnings,
+	NavData,
+	Options,
+	Param,
+	ProjectConfigVariables,
+	ProjectSetup,
+	QuickstartIntro,
+	RealtimeLimitsEstimator,
+	RefHeaderSection: (props: any) => <RefHeaderSection {...props} />,
+	RefSubLayout,
+	SocialProviderSettingsSupabase,
+	SocialProviderSetup,
+	StepHikeCompact,
+	StorageManagement,
+	TabPanel: (props: any) => <Tabs.Panel {...props}>{props.children}</Tabs.Panel>,
+	Tabs: (props: any) => <Tabs wrappable {...props} />,
 }
 
 export default components
