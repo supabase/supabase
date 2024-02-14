@@ -80,9 +80,10 @@ const seed = await createSeedClient();
 await seed.posts([{
   title: "There is a lot of snow around here!"
   author: {
-    email: copycat.email(ctx.seed, {
-      domain: 'acme.org' 
-    }),
+    email: (ctx) =>
+      copycat.email(ctx.seed, {
+        domain: 'acme.org',
+      })
   },
   comments: (x) => x(3)
 }])
