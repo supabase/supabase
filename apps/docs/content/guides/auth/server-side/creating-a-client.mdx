@@ -431,7 +431,7 @@ Creating a Supabase client with the `ssr` package automatically configures it to
 
 <Admonition type="danger">
 
-Beware when accessing the session object on the server, because it is not revalidated on every request from the client. That means the sender can tamper with unencoded data in the session object. If you need to verify the integrity of user data for server logic, call `auth.getUser` instead, which will query the Supabase Auth server for trusted user data.
+Beware when accessing the session object on the server, because it is not revalidated on every request from the client. That means the sender can tamper with unencoded data in the session object. If you need to verify the integrity of user data for server logic, call `auth.getUser` instead, which will query the Supabase Auth server for trusted user data. This risk can be removed if you call getUser() in hooks.server.ts.
 
 </Admonition>
 
@@ -480,6 +480,13 @@ export const handle: Handle = async ({ event, resolve }) => {
    * you just call this `await getSession()`
    */
   event.locals.getSession = async () => {
+ /**
+   * getUser will guarantee that the stored session is valid,
+   * and calling getSession immediately after 
+   * will leave no room for anyone to modify the stored session. 
+   */
+    const { data: getUserData, error: err }  = await event.locals.supabase.auth.getUser()
+
     const {
       data: { session },
     } = await event.locals.supabase.auth.getSession()
