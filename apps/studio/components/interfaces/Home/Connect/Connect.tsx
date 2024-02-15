@@ -159,8 +159,8 @@ const Connect = () => {
     <>
       <Dialog_Shadcn_>
         <DialogTrigger_Shadcn_ asChild>
-          <Button type="default">
-            <span className="flex items-center gap-2">
+          <Button type="primary">
+            <span className="flex items-center gap-2 px-3">
               <Plug size={14} className="rotate-90" /> <span>Connect</span>
             </span>
           </Button>
