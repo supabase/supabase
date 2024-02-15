@@ -5,7 +5,7 @@ const ShareArticleActions = ({ title, slug }: { title: string; slug: string }) =
   <div className="mt-4 flex items-center space-x-4">
     <Link
       aria-label="Share on X"
-      href={`https://twitter.com/share?text=${title}&url=https://supabase.com/blog/${slug}`}
+      href={`https://x.com/share?text=${title}&url=https://supabase.com/blog/${slug}`}
       target="_blank"
       className="text-foreground-lighter hover:text-foreground"
     >
