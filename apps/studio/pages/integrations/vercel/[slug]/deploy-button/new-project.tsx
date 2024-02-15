@@ -218,7 +218,7 @@ const CreateProject = () => {
             connection: {
               foreign_project_id: foreignProjectId,
               supabase_project_ref: newProjectRef,
-              integration_id: '',
+              integration_id: '0',
               metadata: {
                 ...projectDetails,
                 supabaseConfig: {
