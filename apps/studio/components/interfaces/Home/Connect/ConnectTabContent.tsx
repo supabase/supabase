@@ -12,7 +12,7 @@ const ConnectTabContentNew = ({ projectKeys, filePath }: ConnectContentTabProps)
     () => import(`./content/${filePath}/content`),
     {
       loading: () => (
-        <div className="p-4 min-h-[327px]">
+        <div className="p-4 min-h-[331px]">
           <GenericSkeletonLoader />
         </div>
       ),
