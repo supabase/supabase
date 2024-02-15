@@ -6,7 +6,7 @@ import { useRouter } from 'next/router'
 import matter from 'gray-matter'
 import authors from 'lib/authors.json'
 import { MDXRemote } from 'next-mdx-remote'
-import { Badge, Divider, IconChevronLeft } from 'ui'
+import { Badge, IconChevronLeft } from 'ui'
 
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
@@ -303,7 +303,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
               </div>
               <div className="grid grid-cols-12 lg:gap-16 xl:gap-8">
                 {/* Content */}
-                <div className="col-span-12 lg:col-span-7 xl:col-span-9">
+                <div className="col-span-12 lg:col-span-7 xl:col-span-7">
                   <article>
                     <div className={['prose prose-docs'].join(' ')}>
                       {props.blog.youtubeHero ? (
@@ -350,38 +350,9 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                   </div>
                 </div>
                 {/* Sidebar */}
-                <div className="col-span-12 space-y-8 lg:col-span-5 xl:col-span-2">
+                <div className="col-span-12 space-y-8 lg:col-span-5 xl:col-span-3 xl:col-start-9">
                   <div className="space-y-6 lg:sticky lg:top-24 lg:mb-48">
-                    {/* <div className="hidden lg:block">{toc}</div> */}
-                    {/* <div>
-                      <div className="mb-4">
-                        <p className="text-foreground text-sm">Related articles</p>
-                      </div>
-                      <div className="space-y-2">
-                        {props.relatedPosts.map((post) => (
-                          <Link href={`${post.path}`} as={`${post.path}`} key={post.slug}>
-                            <div>
-                              <div className="cursor-pointer">
-                                <div className="flex gap-2">
-                                  <span className="text-light hover:text-gray-1200 text-sm">
-                                    {post.title}
-                                  </span>
-                                </div>
-                              </div>
-                              <Divider light className="mt-2" />
-                            </div>
-                          </Link>
-                        ))}
-                        <div className="mt-2">
-                          <Link
-                            href={`/blog`}
-                            className="text-light hover:text-foreground cursor-pointer text-xs"
-                          >
-                            View all posts
-                          </Link>
-                        </div>
-                      </div>
-                    </div> */}
+                    <div className="hidden lg:block">{toc}</div>
                     <div className="hidden lg:block">
                       <div className="text-foreground text-sm">Share this article</div>
                       <ShareArticleActions title={props.blog.title} slug={props.blog.slug} />
