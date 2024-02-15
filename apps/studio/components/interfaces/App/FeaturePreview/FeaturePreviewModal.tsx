@@ -5,7 +5,6 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { Button, IconExternalLink, IconEye, IconEyeOff, Modal, ScrollArea, cn } from 'ui'
 
-import { useFlag } from 'hooks'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import Telemetry from 'lib/telemetry'
 import { useAppStateSnapshot } from 'state/app-state'
@@ -15,8 +14,6 @@ import { useFeaturePreviewContext } from './FeaturePreviewContext'
 import RLSAIAssistantPreview from './RLSAIAssistantPreview'
 
 const FeaturePreviewModal = () => {
-  const isAiAssistantEnabled = useFlag('policyEditorWithAi')
-
   // [Ivan] We should probably move this to a separate file, together with LOCAL_STORAGE_KEYS. We should make adding new feature previews as simple as possible.
   const FEATURE_PREVIEWS: { key: string; name: string; content: any; discussionsUrl?: string }[] = [
     {
@@ -25,16 +22,12 @@ const FeaturePreviewModal = () => {
       content: <APISidePanelPreview />,
       discussionsUrl: 'https://github.com/orgs/supabase/discussions/18038',
     },
-    ...(isAiAssistantEnabled
-      ? [
-          {
-            key: LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT,
-            name: 'Supabase Assistant for RLS policies',
-            content: <RLSAIAssistantPreview />,
-            discussionsUrl: 'https://github.com/orgs/supabase/discussions/19594',
-          },
-        ]
-      : []),
+    {
+      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT,
+      name: 'Supabase Assistant for RLS policies',
+      content: <RLSAIAssistantPreview />,
+      discussionsUrl: 'https://github.com/orgs/supabase/discussions/19594',
+    },
     {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,
       name: 'Column-level privileges',

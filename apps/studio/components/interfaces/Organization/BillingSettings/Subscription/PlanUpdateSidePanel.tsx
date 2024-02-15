@@ -234,7 +234,6 @@ const PlanUpdateSidePanel = () => {
                       )}
                       <p className="text-foreground-light text-sm">{plan.costUnit}</p>
                     </div>
-
                     {isCurrentPlan ? (
                       <Button block disabled type="default">
                         Current plan

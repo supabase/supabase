@@ -21,9 +21,9 @@ const NavigationIconButton = ({ route, isActive = false }: NavigationIconButtonP
             className={[
               'transition-colors duration-200',
               'flex items-center justify-center h-10 w-10 rounded', // Layout
-              'bg-background hover:bg-overlay-hover', // Light mode
               'text-foreground-lighter hover:text-foreground ', // Dark mode
-              `${isActive ? 'bg-selection shadow-sm text-foreground' : ''}`,
+              'bg-studio hover:bg-surface-200', // Light mode
+              `${isActive ? '!bg-surface-300 !text-foreground shadow-sm' : ''}`,
             ].join(' ')}
           >
             {route.icon}
@@ -33,7 +33,6 @@ const NavigationIconButton = ({ route, isActive = false }: NavigationIconButtonP
       <Tooltip.Portal>
         <Tooltip.Content side="right" sideOffset={5}>
           <Tooltip.Arrow className="radix-tooltip-arrow" />
-
           <div
             className={[
               'bg-alternative shadow-lg shadow-background-surface-100	py-1.5 px-3 rounded leading-none', // background

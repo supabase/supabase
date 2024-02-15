@@ -1,0 +1,27 @@
+{
+  "name": "ui-patterns",
+  "main": "./index.tsx",
+  "types": "./index.tsx",
+  "license": "MIT",
+  "sideEffects": false,
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "common": "*",
+    "lodash": "*",
+    "lucide-react": "*",
+    "next-themes": "*",
+    "react-hot-toast": "*",
+    "react-tooltip": "*",
+    "reactflow": "*",
+    "tsconfig": "*",
+    "ui": "*"
+  },
+  "devDependencies": {},
+  "peerDependencies": {
+    "next": "*",
+    "react": "*",
+    "react-dom": "*"
+  }
+}

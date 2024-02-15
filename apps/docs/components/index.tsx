@@ -4,36 +4,28 @@
 
 // Basic UI things
 import Link from 'next/link'
-import {
-  Accordion,
-  Admonition,
-  Alert,
-  Button,
-  CodeBlock,
-  GlassPanel,
-  IconPanel,
-  markdownComponents,
-  Tabs,
-  ThemeImage,
-} from 'ui'
-import { Heading } from './CustomHTMLElements'
+import { Accordion, Admonition, Alert, Button, CodeBlock, markdownComponents, Tabs } from 'ui'
+import { GlassPanel } from 'ui-patterns/GlassPanel'
+import { IconPanel } from 'ui-patterns/IconPanel'
+import { ThemeImage } from 'ui-patterns/ThemeImage'
 
 // Common components
 import { CH } from '@code-hike/mdx/components'
 import StepHikeCompact from '~/components/StepHikeCompact'
 import ButtonCard from './ButtonCard'
+import { Heading } from './CustomHTMLElements'
 
 // Reference guide specific
 // [Charis] I think we can factor these out so they aren't in the bundle for absolutely everything
 import CliGlobalFlagsHandler from '~/components/reference/enrichments/cli/CliGlobalFlagsHandler'
-import RefHeaderSection from './reference/RefHeaderSection'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
+import RefHeaderSection from './reference/RefHeaderSection'
 
 // Other components
 import AuthProviders from '~/components/AuthProviders'
-import { ProjectConfigVariables } from './ProjectConfigVariables'
 import Options from '~/components/Options'
 import Param from '~/components/Params'
+import { ProjectConfigVariables } from './ProjectConfigVariables'
 
 // Data wrappers
 import { NavData } from './NavData'
@@ -41,6 +33,7 @@ import { NavData } from './NavData'
 // Partials
 import DatabaseSetup from './MDX/database_setup.mdx'
 import GetSessionWarning from './MDX/get_session_warning.mdx'
+import HuggingFaceDeployment from './MDX/ai/quickstart_hf_deployment.mdx'
 import MigrationWarnings from './MDX/migration_warnings.mdx'
 import ProjectSetup from './MDX/project_setup.mdx'
 import QuickstartIntro from './MDX/quickstart_intro.mdx'
@@ -75,6 +68,7 @@ import {
 // Heavy/rare (lazy-loaded)
 import { AppleSecretGenerator } from './AppleSecretGenerator'
 import { Mermaid } from './Mermaid'
+import { RealtimeLimitsEstimator } from './RealtimeLimitsEstimator'
 
 const components = {
   ...markdownComponents,
@@ -110,6 +104,7 @@ const components = {
       {props.children}
     </Heading>
   ),
+  HuggingFaceDeployment,
   IconMenuApi,
   IconMenuAuth,
   IconMenuCli,
@@ -141,6 +136,7 @@ const components = {
   ProjectConfigVariables,
   ProjectSetup,
   QuickstartIntro,
+  RealtimeLimitsEstimator,
   RefHeaderSection: (props: any) => <RefHeaderSection {...props} />,
   RefSubLayout,
   SocialProviderSettingsSupabase,

@@ -1,6 +1,13 @@
+import 'react-medium-image-zoom/dist/styles.css'
+
 import { PropsWithChildren } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import CopyToClipboard from 'react-copy-to-clipboard'
+import { isBrowser, useCopy } from 'common'
+import { ThemeImage } from 'ui-patterns/ThemeImage'
+
 import Avatar from '~/components/Avatar'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import { CH } from '@code-hike/mdx/components'
@@ -15,18 +22,12 @@ import {
   CollapsibleContent_Shadcn_,
   IconTriangle,
   cn,
-  ThemeImage,
   Admonition,
   IconLink,
   IconCheck,
 } from 'ui'
 import ImageFadeStack from '~/components/ImageFadeStack'
 import ZoomableImg from '~/components/ZoomableImg/ZoomableImg'
-
-import 'react-medium-image-zoom/dist/styles.css'
-import { useRouter } from 'next/router'
-import { isBrowser, useCopy } from 'common'
-import Link from 'next/link'
 
 // import all components used in blog articles here
 // to do: move this into a helper/utils, it is used elsewhere

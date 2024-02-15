@@ -180,6 +180,35 @@ const { data, error } = await supabase.from('books').insert([
 ```
 
 </TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+@Serializable
+data class BookMetadata(
+    val description: String,
+    val price: Double,
+    val ages: List<Int>
+)
+
+@Serializable
+data class Book(
+    val title: String,
+    val author: String,
+    val metadata: BookMetadata
+)
+```
+
+```kotlin
+val data = supabase.from("books").insert(listOf(
+    Book("The Poky Little Puppy", "Janette Sebring Lowrey", BookMetadata("Puppy is slower than other, bigger animals.", 5.95, listOf(3, 6))),
+    Book("Tale of Peter Rabbit", "Beatrix Potter", BookMetadata("Rabbit eats some vegetables.", 4.49, listOf(2, 5))),
+    Book("Tootle", "Gertrude Crampton", BookMetadata("Little toy train has big dreams.", 3.99, listOf(2, 5))),
+    Book("Green Eggs and Ham", "Dr. Seuss", BookMetadata("Sam has changing food preferences and eats unusually colored food.", 7.49, listOf(4, 8))),
+    Book("Harry Potter and the Goblet of Fire", "J.K. Rowling", BookMetadata("Fourth year of school starts, big drama ensues.", 24.95, listOf(10, 99)))
+))
+```
+
+</TabPanel>
 </Tabs>
 
 ## Query JSON data
@@ -218,6 +247,19 @@ const { data, error } = await supabase.from('books').select(`
     low_age:      metadata->ages->0,
     high_age:     metadata->ages->1
   `)
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val data = supabase.from("books").select(Columns.raw("""
+    title,
+    description: metadata->description,
+    price: metadata->price,
+    low_age: metadata->ages->0,
+    high_age: metadata->ages->1
+""".trimIndent()))
 ```
 
 </TabPanel>
