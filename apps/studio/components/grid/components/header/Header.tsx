@@ -31,8 +31,7 @@ import {
   IconX,
   cn,
 } from 'ui'
-import RLSBannerWarning from './RLSBannerWarning'
-import RefreshButton from './RefreshButton'
+
 import FilterDropdown from './filter'
 import SortPopover from './sort'
 
@@ -89,7 +88,6 @@ const Header = ({
         )}
         <div className="sb-grid-header__inner">{headerActions}</div>
       </div>
-      <RLSBannerWarning />
     </div>
   )
 }
@@ -122,7 +120,6 @@ const DefaultHeader = ({
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
-        <RefreshButton table={table} isRefetching={isRefetching} />
         <FilterDropdown table={table} filters={filters as string[]} setParams={setParams} />
         <SortPopover table={table} sorts={sorts as string[]} setParams={setParams} />
       </div>
@@ -370,8 +367,8 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
           {allRowsSelected
             ? `${totalRows} rows selected`
             : selectedRows.size > 1
-            ? `${selectedRows.size} rows selected`
-            : `${selectedRows.size} row selected`}
+              ? `${selectedRows.size} rows selected`
+              : `${selectedRows.size} row selected`}
         </span>
         {!allRowsSelected && totalRows > allRows.length && (
           <Button type="link" onClick={() => onSelectAllRows()}>
@@ -404,8 +401,8 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
                 {allRowsSelected
                   ? `Delete ${totalRows} rows`
                   : selectedRows.size > 1
-                  ? `Delete ${selectedRows.size} rows`
-                  : `Delete ${selectedRows.size} row`}
+                    ? `Delete ${selectedRows.size} rows`
+                    : `Delete ${selectedRows.size} row`}
               </Button>
             </Tooltip.Trigger>
 

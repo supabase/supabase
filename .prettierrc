@@ -7,5 +7,11 @@
   "endOfLine": "lf",
   "sqlKeywordCase": "lower",
   "pluginSearchDirs": false,
-  "plugins": ["prettier-plugin-sql-cst"]
+  "plugins": ["prettier-plugin-sql-cst"],
+  "overrides": [
+    {
+      "files": "**/*.json",
+      "options": { "parser": "json" }
+    }
+  ]
 }

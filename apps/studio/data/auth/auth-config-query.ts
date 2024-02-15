@@ -9,7 +9,7 @@ export type AuthConfigVariables = {
   projectRef?: string
 }
 
-export type AuthConfigResponse = components['schemas']['GetGoTrueConfigResponse']
+export type AuthConfigResponse = components['schemas']['GoTrueConfigResponse']
 
 export async function getProjectAuthConfig(
   { projectRef }: AuthConfigVariables,

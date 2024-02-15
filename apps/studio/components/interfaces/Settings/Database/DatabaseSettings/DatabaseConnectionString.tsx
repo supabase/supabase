@@ -2,7 +2,18 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { useParams, useTelemetryProps } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
-import { Button, IconChevronDown, IconExternalLink, Input, Separator, Tabs } from 'ui'
+import {
+  Button,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
+  Collapsible_Shadcn_,
+  IconChevronDown,
+  IconExternalLink,
+  Input,
+  Separator,
+  Tabs,
+  cn,
+} from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
@@ -35,7 +46,11 @@ const CONNECTION_TYPES = [
   { id: 'python', label: 'Python' },
 ]
 
-export const DatabaseConnectionString = () => {
+interface DatabaseConnectionStringProps {
+  appearance: 'default' | 'minimal'
+}
+
+export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStringProps) => {
   const router = useRouter()
   const { project: projectDetails, isLoading: isProjectLoading } = useProjectContext()
   const { ref: projectRef, connectionString } = useParams()
@@ -46,10 +61,7 @@ export const DatabaseConnectionString = () => {
 
   const connectionStringsRef = useRef<HTMLDivElement>(null)
   const [usePoolerConnection, setUsePoolerConnection] = useState(true)
-  const [poolingMode, setPoolingMode] = useState<'transaction' | 'session' | 'statement'>(
-    'transaction'
-  )
-  const [showUriSyntax, setShowUriSyntax] = useState(false)
+  const [poolingMode, setPoolingMode] = useState<'transaction' | 'session' | 'statement'>('session')
   const [selectedTab, setSelectedTab] = useState<
     'uri' | 'psql' | 'golang' | 'jdbc' | 'dotnet' | 'nodejs' | 'php' | 'python'
   >('uri')
@@ -142,22 +154,42 @@ export const DatabaseConnectionString = () => {
   }, [connectionString])
 
   useEffect(() => {
-    if (poolingInfo?.pool_mode !== undefined) {
+    if (poolingInfo?.pool_mode === 'session') {
       setPoolingMode(poolingInfo.pool_mode)
     }
   }, [poolingInfo?.pool_mode])
 
   return (
-    <div id="connection-string">
+    <div id="connection-string" className="w-full">
       <Panel
-        className="!m-0 [&>div:nth-child(1)]:!border-0 [&>div:nth-child(1)>div]:!p-0"
+        className={cn(
+          '!m-0 [&>div:nth-child(1)]:!border-0 [&>div:nth-child(1)>div]:!p-0',
+          appearance === 'minimal' && 'border-0 shadow-none'
+        )}
+        bodyClassName={cn(appearance === 'minimal' && 'bg-transparent')}
+        headerClasses={cn(appearance === 'minimal' && 'bg-transparent')}
         title={
-          <div ref={connectionStringsRef} className="w-full flex flex-col pt-4">
-            <div className="flex items-center justify-between px-6 mb-2">
-              <h5 key="panel-title" className="mb-0">
-                Connection string
-              </h5>
-              <div className="flex items-center gap-x-2">
+          <div
+            ref={connectionStringsRef}
+            className={cn('w-full flex flex-col', appearance === 'default' ? 'pt-4' : 'pt-0')}
+          >
+            <div
+              className={cn(
+                'flex items-center justify-between mb-2',
+                appearance === 'default' && 'px-6'
+              )}
+            >
+              {appearance === 'default' && (
+                <h5 key="panel-title" className="mb-0">
+                  Connection string
+                </h5>
+              )}
+              <div
+                className={cn(
+                  'flex items-center gap-x-2 ml-auto',
+                  appearance === 'minimal' ? 'absolute -top-1 right-0' : ''
+                )}
+              >
                 {readReplicasEnabled && <DatabaseSelector />}
                 <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                   <a href="https://supabase.com/docs/guides/database/connecting-to-postgres">
@@ -170,7 +202,10 @@ export const DatabaseConnectionString = () => {
               type="underlined"
               size="tiny"
               activeId={selectedTab}
-              baseClassNames="!space-y-0 px-6 -mb-[1px]"
+              baseClassNames={cn(
+                '!space-y-0 px-6 -mb-[1px]',
+                appearance === 'minimal' && '-mt-1 px-0'
+              )}
               onChange={setSelectedTab}
             >
               {CONNECTION_TYPES.map((type) => (
@@ -181,7 +216,7 @@ export const DatabaseConnectionString = () => {
           </div>
         }
       >
-        <Panel.Content>
+        <Panel.Content className={appearance === 'minimal' && 'px-0'}>
           {isLoading && <ShimmeringLoader className="h-8 w-full" />}
           {isError && <AlertError error={error} subject="Failed to retrieve database settings" />}
           {isSuccess && (
@@ -209,63 +244,95 @@ export const DatabaseConnectionString = () => {
             </div>
           )}
         </Panel.Content>
-        {poolerConnStringSyntax.length > 0 && poolingInfo?.supavisor_enabled && (
+        {poolerConnStringSyntax.length > 0 && (
           <>
             <Separator />
-            <Panel.Content className="!py-3 space-y-2">
-              <div
-                className="flex items-center gap-x-2 transition cursor-pointer opacity-75 hover:opacity-100"
-                onClick={() => setShowUriSyntax(!showUriSyntax)}
-              >
-                <p className="text-xs text-foreground">
-                  How to connect to a different database or switch to another user
-                </p>
-                <IconChevronDown
-                  strokeWidth={1.5}
-                  className={`transition ${showUriSyntax ? '-rotate-180' : ''}`}
-                />
-              </div>
-              {showUriSyntax && (
-                <div className="text-foreground-light">
-                  <p className="text-xs">
-                    You can use the following URI format to switch to a different database or user
-                    {usePoolerConnection ? ' when using connection pooling' : ''}.
-                  </p>
-                  <p className="text-sm font-mono tracking-tight text-foreground-lighter">
-                    {poolerConnStringSyntax.map((x, idx) => {
-                      if (x.tooltip) {
-                        return (
-                          <Tooltip.Root key={`syntax-${idx}`} delayDuration={0}>
-                            <Tooltip.Trigger asChild>
-                              <span className="text-foreground text-xs">{x.value}</span>
-                            </Tooltip.Trigger>
-                            <Tooltip.Portal>
+            <Panel.Content className={cn('!py-3 space-y-2', appearance === 'minimal' && 'px-0')}>
+              <Collapsible_Shadcn_>
+                <CollapsibleTrigger_Shadcn_ className="group [&[data-state=open]>div>svg]:!-rotate-180">
+                  <div className="flex items-center gap-x-2 w-full">
+                    <p className="text-xs text-foreground-light group-hover:text-foreground transition">
+                      How to connect to a different database or switch to another user
+                    </p>
+                    <IconChevronDown
+                      className="transition-transform duration-200"
+                      strokeWidth={1.5}
+                      size={14}
+                    />
+                  </div>
+                </CollapsibleTrigger_Shadcn_>
+                <CollapsibleContent_Shadcn_ className="my-2">
+                  <div className="text-foreground-light">
+                    <p className="text-xs">
+                      You can use the following URI format to switch to a different database or user
+                      {usePoolerConnection ? ' when using connection pooling' : ''}.
+                    </p>
+                    <p className="text-sm font-mono tracking-tight text-foreground-lighter">
+                      {poolerConnStringSyntax.map((x, idx) => {
+                        if (x.tooltip) {
+                          return (
+                            <Tooltip.Root key={`syntax-${idx}`} delayDuration={0}>
+                              <Tooltip.Trigger asChild>
+                                <span className="text-foreground text-xs">{x.value}</span>
+                              </Tooltip.Trigger>
                               <Tooltip.Portal>
-                                <Tooltip.Content side="bottom">
-                                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                  <div
-                                    className={[
-                                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                      'border border-background',
-                                    ].join(' ')}
-                                  >
-                                    <span className="text-xs text-foreground">{x.tooltip}</span>
-                                  </div>
-                                </Tooltip.Content>
+                                <Tooltip.Portal>
+                                  <Tooltip.Content side="bottom">
+                                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                    <div
+                                      className={[
+                                        'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                        'border border-background',
+                                      ].join(' ')}
+                                    >
+                                      <span className="text-xs text-foreground">{x.tooltip}</span>
+                                    </div>
+                                  </Tooltip.Content>
+                                </Tooltip.Portal>
                               </Tooltip.Portal>
-                            </Tooltip.Portal>
-                          </Tooltip.Root>
-                        )
-                      } else {
-                        return (
-                          <span key={`syntax-${idx}`} className="text-xs">
-                            {x.value}
-                          </span>
-                        )
-                      }
-                    })}
-                  </p>
-                </div>
+                            </Tooltip.Root>
+                          )
+                        } else {
+                          return (
+                            <span key={`syntax-${idx}`} className="text-xs">
+                              {x.value}
+                            </span>
+                          )
+                        }
+                      })}
+                    </p>
+                  </div>
+                </CollapsibleContent_Shadcn_>
+              </Collapsible_Shadcn_>
+
+              {selectedTab === 'python' && (
+                <Collapsible_Shadcn_>
+                  <CollapsibleTrigger_Shadcn_ className="group [&[data-state=open]>div>svg]:!-rotate-180">
+                    <div className="flex items-center gap-x-2 w-full">
+                      <p className="text-xs text-foreground-light group-hover:text-foreground transition">
+                        Connecting to SQL Alchemy
+                      </p>
+                      <IconChevronDown
+                        className="transition-transform duration-200"
+                        strokeWidth={1.5}
+                        size={14}
+                      />
+                    </div>
+                  </CollapsibleTrigger_Shadcn_>
+                  <CollapsibleContent_Shadcn_ className="my-2">
+                    <div className="text-foreground-light text-xs grid gap-2">
+                      <p>
+                        Please use <code>postgresql://</code> instead of <code>postgres://</code> as
+                        your dialect when connecting via SQLAlchemy.
+                      </p>
+                      <p>
+                        Example:
+                        <code>create_engine("postgresql+psycopg2://...")</code>
+                      </p>
+                      <p className="text-sm font-mono tracking-tight text-foreground-lighter"></p>
+                    </div>
+                  </CollapsibleContent_Shadcn_>
+                </Collapsible_Shadcn_>
               )}
             </Panel.Content>
           </>

@@ -1,10 +1,11 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { useChat } from 'ai/react'
-import { useParams } from 'common'
+import { useParams, useTelemetryProps } from 'common'
 import { uniqBy } from 'lodash'
 import { FileDiff } from 'lucide-react'
 import dynamic from 'next/dynamic'
+import { useRouter } from 'next/router'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import { Button, Modal, SheetContent_Shadcn_, SheetFooter_Shadcn_, Sheet_Shadcn_, cn } from 'ui'
@@ -19,8 +20,10 @@ import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useSelectedOrganization, useSelectedProject } from 'hooks'
-import { BASE_PATH, OPT_IN_TAGS } from 'lib/constants'
+import { BASE_PATH, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
+import Telemetry from 'lib/telemetry'
+import { useAppStateSnapshot } from 'state/app-state'
 import { AIPolicyChat } from './AIPolicyChat'
 import {
   MessageWithDebug,
@@ -32,9 +35,6 @@ import { AIPolicyHeader } from './AIPolicyHeader'
 import PolicyDetails from './PolicyDetails'
 import QueryError from './QueryError'
 import RLSCodeEditor from './RLSCodeEditor'
-import Telemetry from 'lib/telemetry'
-import { useTelemetryProps } from 'common'
-import { useRouter } from 'next/router'
 
 const DiffEditor = dynamic(
   () => import('@monaco-editor/react').then(({ DiffEditor }) => DiffEditor),
@@ -60,12 +60,14 @@ export const AIPolicyEditorPanel = memo(function ({
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
   const router = useRouter()
+  const snap = useAppStateSnapshot()
   const telemetryProps = useTelemetryProps()
 
   // use chat id because useChat doesn't have a reset function to clear all messages
   const [chatId, setChatId] = useState(uuidv4())
   const editorRef = useRef<IStandaloneCodeEditor | null>(null)
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
+  const isTogglingPreviewRef = useRef<boolean>(false)
   const placeholder = generatePlaceholder(selectedPolicy)
   const isOptedInToAI = selectedOrganization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
 
@@ -175,14 +177,23 @@ export const AIPolicyEditorPanel = memo(function ({
     setIncomingChange(undefined)
   }, [incomingChange])
 
-  const onClosingPanel = useCallback(() => {
+  const toggleFeaturePreviewModal = () => {
+    isTogglingPreviewRef.current = true
+    onClosingPanel()
+  }
+
+  const onClosingPanel = () => {
     const policy = editorRef.current?.getValue()
     if (policy || messages.length > 0 || !isAssistantChatInputEmpty) {
       setIsClosingPolicyEditorPanel(true)
     } else {
+      if (isTogglingPreviewRef.current) {
+        snap.setSelectedFeaturePreview(LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT)
+        snap.setShowFeaturePreviewModal(!snap.showFeaturePreviewModal)
+      }
       onSelectCancel()
     }
-  }, [onSelectCancel, messages, isAssistantChatInputEmpty])
+  }
 
   const onSelectDebug = async () => {
     const policy = editorRef.current?.getValue().replaceAll('\n', ' ').replaceAll('  ', ' ')
@@ -347,8 +358,11 @@ export const AIPolicyEditorPanel = memo(function ({
                     setOpen={setErrorPanelOpen}
                   />
                 )}
-                <SheetFooter_Shadcn_ className="flex flex-col gap-12 px-5 py-4 w-full">
-                  <div className="flex justify-end gap-x-2">
+                <SheetFooter_Shadcn_ className="flex items-center !justify-between px-5 py-4 w-full">
+                  <Button type="text" onClick={toggleFeaturePreviewModal}>
+                    Toggle feature preview
+                  </Button>
+                  <div className="flex items-center gap-x-2">
                     <Button type="default" disabled={isExecuting} onClick={() => onSelectCancel()}>
                       Cancel
                     </Button>
@@ -387,9 +401,17 @@ export const AIPolicyEditorPanel = memo(function ({
             visible={isClosingPolicyEditorPanel}
             header="Discard changes"
             buttonLabel="Discard"
-            onSelectCancel={() => setIsClosingPolicyEditorPanel(false)}
+            onSelectCancel={() => {
+              isTogglingPreviewRef.current = false
+              setIsClosingPolicyEditorPanel(false)
+            }}
             onSelectConfirm={() => {
+              if (isTogglingPreviewRef.current) {
+                snap.setSelectedFeaturePreview(LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT)
+                snap.setShowFeaturePreviewModal(!snap.showFeaturePreviewModal)
+              }
               onSelectCancel()
+              isTogglingPreviewRef.current = false
               setIsClosingPolicyEditorPanel(false)
             }}
           >

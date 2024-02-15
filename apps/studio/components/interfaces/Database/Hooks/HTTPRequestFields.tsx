@@ -88,8 +88,8 @@ const HTTPRequestFields = ({
             {type === 'http_request'
               ? 'HTTP Request'
               : type === 'supabase_function'
-              ? 'Edge Function'
-              : ''}
+                ? 'Edge Function'
+                : ''}
           </FormSectionLabel>
         }
       >

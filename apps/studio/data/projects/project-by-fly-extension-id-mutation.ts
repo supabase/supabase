@@ -8,6 +8,9 @@ export type ProjectByFlyExtensionIdVariables = {
   flyExtensionId: string
 }
 
+// [Joshen] Should be converted into a query instead of a mutation
+// Will need to update sign-in-fly-tos.tsx as well
+
 export async function getProjectByFlyExtensionId({
   flyExtensionId,
 }: ProjectByFlyExtensionIdVariables) {

@@ -1,6 +1,6 @@
-import { pull } from 'lodash'
+import { noop, pull } from 'lodash'
 import { useEffect, useState } from 'react'
-import { IconChevronLeft, Modal } from 'ui'
+import { Button, IconChevronLeft, IconExternalLink, Modal } from 'ui'
 
 import { useStore } from 'hooks'
 import {
@@ -164,7 +164,7 @@ const StoragePoliciesEditPolicyModal = ({
   const StoragePolicyEditorModalTitle = ({
     view,
     bucketName,
-    onSelectBackFromTemplates = () => {},
+    onSelectBackFromTemplates = noop,
   }: any) => {
     const getTitle = () => {
       if (view === POLICY_MODAL_VIEWS.EDITOR || view === POLICY_MODAL_VIEWS.SELECTION) {
@@ -190,17 +190,26 @@ const StoragePoliciesEditPolicyModal = ({
       )
     }
     return (
-      <div className="flex items-center space-x-3">
-        <h4 className="m-0 text-lg">{getTitle()}</h4>
+      <div className="w-full flex items-center justify-between gap-x-2">
+        <h4 className="m-0 truncate">{getTitle()}</h4>
+        <Button asChild type="default" icon={<IconExternalLink size={14} />}>
+          <a
+            href="https://supabase.com/docs/learn/auth-deep-dive/auth-policies"
+            target="_blank"
+            rel="noreferrer"
+          >
+            {' '}
+            Documentation
+          </a>
+        </Button>
       </div>
     )
   }
 
   return (
     <Modal
-      size={view === POLICY_MODAL_VIEWS.SELECTION ? 'medium' : 'xxlarge'}
-      closable
       hideFooter
+      size={view === POLICY_MODAL_VIEWS.SELECTION ? 'medium' : 'xxlarge'}
       visible={visible}
       contentStyle={{ padding: 0 }}
       header={[
@@ -219,6 +228,7 @@ const StoragePoliciesEditPolicyModal = ({
             description="PostgreSQL policies control access to your files and folders"
             onViewTemplates={onViewTemplates}
             onViewEditor={() => onViewEditor('new')}
+            showAssistantPreview={false}
           />
         ) : view === POLICY_MODAL_VIEWS.EDITOR ? (
           <StoragePoliciesEditor
