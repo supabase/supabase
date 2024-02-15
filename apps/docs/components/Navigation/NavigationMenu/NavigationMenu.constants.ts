@@ -1634,6 +1634,10 @@ export const platform: NavMenuConstant = {
           name: 'Enterprise Billing',
           url: '/guides/platform/enterprise-billing',
         },
+        {
+          name: 'Billing FAQ',
+          url: '/guides/platform/billing-faq',
+        },
       ],
     },
     {
