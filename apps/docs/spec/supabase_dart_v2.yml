@@ -945,12 +945,13 @@ functions:
       - id: query-the-same-referenced-table-multiple-times
         name: Query the same referenced table multiple times
         description: |
-          Sometimes you will need to query the same referenced table twice.
-          In this case, you can use the name of the joined column to identify
-          which join you intend to use. For convenience, you can also give an
-          alias for each column. For example, if we had a shop of products,
-          and we wanted to get the supplier and the purchaser at the same time
-          (both in the users) table:
+          Sometimes you will need to query the same referenced table twice. In
+          this case, you can use the name of the joined column to identify which
+          join you intend to use. For convenience, you can also give an alias
+          for each column. This example queries a `messages` table that is
+          joined to a `users` table via `sender_id` and `receiver_id`. Since you
+          want the `name` for both sender and receiver, you can alias the
+          columns as `to` and `from`.
         code: |
           ```dart
           final data = await supabase
