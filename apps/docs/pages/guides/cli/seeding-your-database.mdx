@@ -61,11 +61,11 @@ for your project with `npx snaplet setup`, and follow the interactive prompts. `
 will look at your database and its structure, and use it to generate the configuration files
 and assets needed by `@snaplet/seed`.
 
-Suppose we have a database with the following schema:
+Suppose you have a database with the following schema:
 
 ![An example schema](/docs/img/guides/cli/snaplet-example-schema.png)
 
-We can use the Snaplet configuration file `seed.mts` to define the values we want to generate. For example
+You can use the Snaplet configuration file `seed.mts` to define the values you want to generate. For example
 
 - A `Post` with the title `"There is a lot of snow around here!"`
 - The `Post.createdBy` user with an email address ending in `"@acme.org"`
@@ -89,7 +89,7 @@ await seed.posts([{
 }])
 ```
 
-Running `npx tsx seed.mts > supabase/seed.sql` would generate these relevant SQL statements inside our `supabase/seed.sql` file:
+Running `npx tsx seed.mts > supabase/seed.sql` generates the relevant SQL statements inside your `supabase/seed.sql` file:
 
 ```sql
 -- The `Post.createdBy` user with an email address ending in `"@acme.org"`
