@@ -231,7 +231,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                     type="default"
                     onClick={() => setRlsConfirmModalOpen(!rlsConfirmModalOpen)}
                   >
-                    Enable RLS for this table{' '}
+                    Enable RLS for this table
                   </Button>
                 </div>
               </div>
