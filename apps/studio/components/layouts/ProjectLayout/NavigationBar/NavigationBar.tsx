@@ -78,7 +78,7 @@ const NavigationBar = () => {
     <div
       className={[
         'hide-scrollbar flex w-14 flex-col justify-between p-2 overflow-y-auto',
-        'border-r bg-background border-default',
+        'border-r bg-studio border-default',
       ].join(' ')}
     >
       <ul className="flex flex-col space-y-2">
@@ -236,11 +236,15 @@ const NavigationBar = () => {
                     setTheme(value)
                   }}
                 >
-                  {themes.map((theme: Theme) => (
-                    <DropdownMenuRadioItem key={theme.value} value={theme.value}>
-                      {theme.name}
-                    </DropdownMenuRadioItem>
-                  ))}
+                  {themes
+                    .filter(
+                      (x) => x.value === 'light' || x.value === 'dark' || x.value === 'system'
+                    )
+                    .map((theme: Theme) => (
+                      <DropdownMenuRadioItem key={theme.value} value={theme.value}>
+                        {theme.name}
+                      </DropdownMenuRadioItem>
+                    ))}
                 </DropdownMenuRadioGroup>
               </DropdownMenuGroup>
             </DropdownMenuContent>

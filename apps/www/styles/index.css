@@ -6,6 +6,7 @@
 
 @import './../../../packages/ui/build/css/source/global.css';
 @import './../../../packages/ui/build/css/themes/dark.css';
+@import './../../../packages/ui/build/css/themes/deep-dark.css';
 @import './../../../packages/ui/build/css/themes/light.css';
 
 @layer utilities {
@@ -42,7 +43,7 @@ html {
 }
 
 body {
-  @apply bg-background;
+  @apply bg-background text-foreground;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

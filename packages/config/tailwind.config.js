@@ -99,6 +99,10 @@ const uiConfig = ui({
     backgroundColor: (theme) => ({
       ...theme('colors'),
       ...generateTwColorClasses('background', color),
+      /*
+       * custom background re-maps
+       */
+      "studio": `hsl(var(--background-200)/ <alpha-value>)`
     }),
     borderColor: (theme) => ({
       ...theme('colors'),
