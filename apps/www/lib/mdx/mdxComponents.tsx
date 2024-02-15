@@ -14,13 +14,13 @@ import {
   CollapsibleContent_Shadcn_,
   IconTriangle,
   cn,
-  ThemeImage,
   Admonition,
 } from 'ui'
 import ImageFadeStack from '~/components/ImageFadeStack'
 import ZoomableImg from '~/components/ZoomableImg/ZoomableImg'
 
 import 'react-medium-image-zoom/dist/styles.css'
+import { ThemeImage } from 'ui-patterns/ThemeImage'
 
 // import all components used in blog articles here
 // to do: move this into a helper/utils, it is used elsewhere

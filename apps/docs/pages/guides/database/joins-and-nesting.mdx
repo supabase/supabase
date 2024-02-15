@@ -138,6 +138,13 @@ final data = await supabase.from('countries').select('id, name, cities(id, name)
 ```
 
 </TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val data = supabase.from("countries").select(Columns.raw("id, name, cities(id, name)"))
+```
+
+</TabPanel>
 <TabPanel id="graphql" label="GraphQL">
 
 ```javascript
@@ -215,6 +222,13 @@ const { data, error } = await supabase.from('teams').select(`
 
 ```dart
 final data = await supabase.from('teams').select('id, team_name, users(id, name)');
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val data = supabase.from("teams").select(Columns.raw("id, team_name, users(id, name)"));
 ```
 
 </TabPanel>

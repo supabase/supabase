@@ -42,25 +42,7 @@ const defaultQuestions = [
 
 const supportQuestions = ['What is the problem you are having?']
 
-function getEdgeFunctionUrl() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '')
-
-  if (!supabaseUrl) {
-    return undefined
-  }
-
-  // https://github.com/supabase/supabase-js/blob/10d3423506cbd56345f7f6ab2ec2093c8db629d4/src/SupabaseClient.ts#L96
-  const isPlatform = supabaseUrl.match(/(supabase\.co)|(supabase\.in)/)
-
-  if (isPlatform) {
-    const [schemeAndProjectId, domain, tld] = supabaseUrl.split('.')
-    return `${schemeAndProjectId}.functions.${domain}.${tld}`
-  } else {
-    return `${supabaseUrl}/functions/v1`
-  }
-}
-
-const edgeFunctionUrl = getEdgeFunctionUrl()
+export const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
 export enum MessageRole {
   User = 'user',
@@ -241,8 +223,6 @@ export function useAiChat({
 
   const submit = useCallback(
     async (query: string) => {
-      if (!edgeFunctionUrl) return console.error('No edge function url')
-
       dispatchMessage({
         type: 'new',
         message: {
@@ -265,7 +245,7 @@ export function useAiChat({
       setHasError(false)
       setIsLoading?.(true)
 
-      const eventSource = new SSE(`${edgeFunctionUrl}/ai-docs`, {
+      const eventSource = new SSE(`${BASE_PATH}/api/ai/docs`, {
         headers: {
           apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
           Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
@@ -367,7 +347,7 @@ export function useAiChat({
  */
 export function queryAi(messages: Message[], timeout = 0) {
   return new Promise<string>((resolve, reject) => {
-    const eventSource = new SSE(`${edgeFunctionUrl}/ai-docs`, {
+    const eventSource = new SSE(`${BASE_PATH}/api/ai/docs`, {
       headers: {
         apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
         Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
