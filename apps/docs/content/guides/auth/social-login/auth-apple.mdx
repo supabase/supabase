@@ -227,7 +227,7 @@ When developing with Expo, you can test Sign in with Apple via the Expo Go app, 
             'Could not find ID Token from generated credential.');
       }
 
-      return signInWithIdToken(
+      return supabase.auth.signInWithIdToken(
         provider: OAuthProvider.apple,
         idToken: idToken,
         nonce: rawNonce,
