@@ -26,11 +26,13 @@ const Footer = ({ isLoading, isRefetching }: FooterProps) => {
   }
 
   return (
-    <div className="flex h-10 overflow-hidden items-center px-2 w-full border-t">
+    <div className="flex min-h-9 overflow-hidden items-center px-2 w-full border-t">
       {selectedView === 'data' && <Pagination isLoading={isLoading} />}
 
       <div className="ml-auto flex items-center gap-4">
-        {selectedTable && <RefreshButton table={selectedTable} isRefetching={isRefetching} />}
+        {selectedTable && selectedView === 'data' && (
+          <RefreshButton table={selectedTable} isRefetching={isRefetching} />
+        )}
 
         <TwoOptionToggle
           width={75}

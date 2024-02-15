@@ -96,8 +96,10 @@ const TableDefinition = ({ id }: TableDefinitionProps) => {
 
   if (isLoading) {
     return (
-      <div className="p-4 pb-0 h-full grid">
-        <GenericSkeletonLoader />
+      <div className="h-full grid">
+        <div className="p-4">
+          <GenericSkeletonLoader />
+        </div>
         <div className="mt-auto">
           <Footer />
         </div>
