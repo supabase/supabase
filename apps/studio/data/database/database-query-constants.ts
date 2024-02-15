@@ -10,15 +10,6 @@ export enum FOREIGN_KEY_CASCADE_ACTION {
   SET_DEFAULT = 'd',
 }
 
-export enum CONSTRAINT_TYPE {
-  CHECK_CONSTRAINT = 'c',
-  FOREIGN_KEY_CONSTRAINT = 'f',
-  PRIMARY_KEY_CONSTRAINT = 'p',
-  UNIQUE_CONSTRAINT = 'u',
-  CONSTRAINT_TRIGGER = 't',
-  EXCLUSION_CONSTRAINT = 'x',
-}
-
 // Derived from https://github.com/MichaelDBA/pg_get_tabledef
 // NOTE: when updating, \n must be replaced with \\n in the SQL below
 

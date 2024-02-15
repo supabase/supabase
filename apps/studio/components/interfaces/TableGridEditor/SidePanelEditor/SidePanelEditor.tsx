@@ -38,6 +38,7 @@ import {
   updateTable,
 } from './SidePanelEditor.utils'
 import { ImportContent } from './TableEditor/TableEditor.types'
+import { Constraint } from 'data/database/constraints-query'
 
 export interface SidePanelEditorProps {
   editable?: boolean
@@ -209,11 +210,11 @@ const SidePanelEditor = ({
   const saveColumn = async (
     payload: CreateColumnPayload | UpdateColumnPayload,
     isNewRecord: boolean,
-    configuration: { columnId?: string },
+    configuration: { columnId?: string; primaryKey?: Constraint },
     resolve: any
   ) => {
     const selectedColumnToEdit = snap.sidePanel?.type === 'column' && snap.sidePanel.column
-    const { columnId } = configuration
+    const { columnId, primaryKey } = configuration
 
     const response = isNewRecord
       ? await createColumn({
@@ -221,6 +222,7 @@ const SidePanelEditor = ({
           connectionString: project?.connectionString,
           payload: payload as CreateColumnPayload,
           selectedTable: selectedTable as PostgresTable,
+          primaryKey,
         })
       : await updateColumn({
           projectRef: project?.ref!,
@@ -228,6 +230,7 @@ const SidePanelEditor = ({
           id: columnId as string,
           payload: payload as UpdateColumnPayload,
           selectedTable: selectedTable as PostgresTable,
+          primaryKey,
         })
 
     if (response?.error) {
@@ -369,6 +372,7 @@ const SidePanelEditor = ({
       isRealtimeEnabled: boolean
       isDuplicateRows: boolean
       existingForeignKeyRelations: ForeignKeyConstraint[]
+      primaryKey?: Constraint
     },
     resolve: any
   ) => {
@@ -380,6 +384,7 @@ const SidePanelEditor = ({
       isRealtimeEnabled,
       isDuplicateRows,
       existingForeignKeyRelations,
+      primaryKey,
     } = configuration
 
     try {
@@ -444,6 +449,7 @@ const SidePanelEditor = ({
           columns,
           foreignKeyRelations,
           existingForeignKeyRelations,
+          primaryKey,
         })
 
         await updateTableRealtime(table, isRealtimeEnabled)
