@@ -8,8 +8,14 @@ import {
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
+  DialogClose_Shadcn_,
+  DialogContent_Shadcn_,
+  DialogDescription_Shadcn_,
+  DialogFooter_Shadcn_,
+  DialogHeader_Shadcn_,
+  DialogTitle_Shadcn_,
+  Dialog_Shadcn_,
   IconExternalLink,
-  Modal,
 } from 'ui'
 
 export const PoolingModesModal = () => {
@@ -24,33 +30,34 @@ export const PoolingModesModal = () => {
   }
 
   return (
-    <Modal
-      hideFooter
-      size="xlarge"
-      visible={snap.showPoolingModeHelper}
-      header={
-        <div className="w-full flex items-center justify-between">
-          <p>Which pooling mode should I use?</p>
-          <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-            <a
-              href="https://supabase.com/docs/guides/database/connecting-to-postgres#how-connection-pooling-works"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Documentation
-            </a>
-          </Button>
-        </div>
-      }
-      onCancel={() => snap.setShowPoolingModeHelper(false)}
-    >
-      <Modal.Content className="py-4 text-sm flex flex-col gap-y-4">
+    <Dialog_Shadcn_ open={snap.showPoolingModeHelper} onOpenChange={snap.setShowPoolingModeHelper}>
+      <DialogContent_Shadcn_ className="sm:max-w-4xl">
+        <DialogHeader_Shadcn_ className="pr-8">
+          <DialogTitle_Shadcn_ className="mb-4">
+            <div className="w-full flex items-center justify-between">
+              <p className="text-lg max-w-2xl">Which pooling mode should I use?</p>
+              <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                <a
+                  href="https://supabase.com/docs/guides/database/connecting-to-postgres#how-connection-pooling-works"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Documentation
+                </a>
+              </Button>
+            </div>
+          </DialogTitle_Shadcn_>
+          <DialogDescription_Shadcn_ className="border-b pb-4 ">
+            <p className="text-lg max-w-2xl">
+              A connection pooler is a system (external to Postgres) which manages Postgres
+              connections by allocating connections whenever clients make requests.
+            </p>
+          </DialogDescription_Shadcn_>
+        </DialogHeader_Shadcn_>
         <Markdown
-          className="max-w-full [&>h3]:text-sm"
+          className="px-6 max-w-full [&>h3]:text-sm"
           content={`
-A connection pooler is a system (external to Postgres) which manages Postgres connections
-by allocating connections whenever clients make requests. Each pooling mode handles
-connections differently.
+Each pooling mode handles connections differently.
 
 ### Transaction mode
 This mode is recommended if you are connecting from *serverless environments*. A connection is assigned to the client for the duration of a transaction. Two consecutive transactions from the same client could be executed over two different connections. Some session-based Postgres features such as prepared statements are *not available* with this option.
@@ -89,13 +96,12 @@ This mode is similar to connecting to your database directly. There is full supp
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
         )}
-      </Modal.Content>
-      <Modal.Separator />
-      <Modal.Content className="flex items-center justify-end pb-2">
-        <Button type="default" onClick={() => snap.setShowPoolingModeHelper(false)}>
-          Close
-        </Button>
-      </Modal.Content>
-    </Modal>
+        <DialogFooter_Shadcn_>
+          <DialogClose_Shadcn_ onClick={() => snap.setShowPoolingModeHelper(false)}>
+            <Button type="secondary">Close</Button>
+          </DialogClose_Shadcn_>
+        </DialogFooter_Shadcn_>
+      </DialogContent_Shadcn_>
+    </Dialog_Shadcn_>
   )
 }
