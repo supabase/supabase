@@ -73,14 +73,14 @@ function Blog(props: any) {
 
             <ol
               className={cn(
-                'grid -mx-2 sm:-mx-4 py-6 lg:py-6',
+                'grid -mx-2 sm:-mx-4 py-6 lg:py-6 lg:pb-20',
                 isList ? 'grid-cols-1' : 'grid-cols-12 lg:gap-4'
               )}
             >
               {blogs?.length ? (
                 blogs?.map((blog: PostTypes, idx: number) =>
                   isList ? (
-                    <div className="col-span-12 px-2 sm:px-4" key={idx}>
+                    <div className="col-span-12 px-2 sm:px-4 [&_a]:last:border-none" key={idx}>
                       <BlogListItem post={blog} />
                     </div>
                   ) : (
