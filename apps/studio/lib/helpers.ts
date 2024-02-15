@@ -219,6 +219,7 @@ export const detectBrowser = () => {
 }
 
 export const detectOS = () => {
+  if (typeof window === 'undefined' || !window) return undefined
   if (typeof navigator === 'undefined' || !navigator) return undefined
 
   const userAgent = window.navigator.userAgent.toLowerCase()
