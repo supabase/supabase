@@ -18,9 +18,9 @@ export type BlogView = 'list' | 'grid'
 
 function Blog(props: any) {
   const { BLOG_VIEW } = LOCAL_STORAGE_KEYS
-  const localView = isBrowser ? localStorage?.getItem(BLOG_VIEW) : undefined
+  const localView = isBrowser ? (localStorage?.getItem(BLOG_VIEW) as BlogView) : undefined
   const [blogs, setBlogs] = useState(props.blogs)
-  const [view, setView] = useState<BlogView | string>(localView ?? 'list')
+  const [view, setView] = useState<BlogView>(localView ?? 'list')
   const isList = view === 'list'
   const router = useRouter()
 
@@ -64,7 +64,12 @@ function Blog(props: any) {
 
         <div className="border-default border-t">
           <div className="md:container mx-auto mt-6 lg:mt-8 px-6 sm:px-16 xl:px-20">
-            <BlogFilters allPosts={props.blogs} setPosts={setBlogs} view={view} setView={setView} />
+            <BlogFilters
+              allPosts={props.blogs}
+              setPosts={setBlogs}
+              view={view as BlogView}
+              setView={setView}
+            />
 
             <ol
               className={cn(

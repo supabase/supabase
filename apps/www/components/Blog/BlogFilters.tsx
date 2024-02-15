@@ -1,8 +1,12 @@
-import { startCase } from 'lodash'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-
-import { LOCAL_STORAGE_KEYS } from 'common'
+import { useRouter } from 'next/router'
+import { useSearchParams } from 'next/navigation'
+import { AnimatePresence, motion } from 'framer-motion'
+import { startCase } from 'lodash'
+import { useKey } from 'react-use'
+import { LOCAL_STORAGE_KEYS, useBreakpoint } from 'common'
+import PostTypes from '~/types/post'
+import type { BlogView } from '~/pages/blog'
 
 import {
   Button,
@@ -10,27 +14,20 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  IconAlignJustify,
   IconChevronDown,
   IconGrid,
-  IconList,
   IconSearch,
   IconX,
   Input,
   cn,
 } from 'ui'
 
-import { useBreakpoint } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
-import PostTypes from '~/types/post'
-import { useSearchParams } from 'next/navigation'
-import { BlogView } from '../../pages/blog'
-import { useKey } from 'react-use'
-
 interface Props {
   allPosts: PostTypes[]
   setPosts: (posts: any) => void
-  view: any
-  setView: (view: any) => any
+  view: BlogView
+  setView: (view: any) => void
 }
 
 /**
@@ -105,10 +102,7 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
     )
   }
 
-  useKey('Escape', () => {
-    handleSearchByText('')
-    setShowSearchInput(false)
-  })
+  useKey('Escape', () => handleSearchByText(''))
 
   useEffect(() => {
     setShowSearchInput(!isMobile)
@@ -158,7 +152,7 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
   }
 
   const handleViewSelection = () => {
-    setView((prevView: string) => {
+    setView((prevView: 'list' | 'grid') => {
       const newValue = prevView === 'list' ? 'grid' : 'list'
       localStorage.setItem(BLOG_VIEW, newValue)
 
@@ -282,7 +276,7 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
         onClick={handleViewSelection}
         className="h-full p-1.5"
       >
-        {isList ? <IconGrid /> : <IconList />}
+        {isList ? <IconGrid /> : <IconAlignJustify />}
       </Button>
     </div>
   )
