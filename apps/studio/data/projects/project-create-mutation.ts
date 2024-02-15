@@ -7,6 +7,8 @@ import { API_URL, PRICING_TIER_PRODUCT_IDS, PROVIDERS } from 'lib/constants'
 import { ProjectBase, ResponseError } from 'types'
 import { projectKeys } from './keys'
 
+export type DbInstanceSize = components['schemas']['DbInstanceSize']
+
 export type ProjectCreateVariables = {
   name: string
   organizationId: number
@@ -18,7 +20,7 @@ export type ProjectCreateVariables = {
   configurationId?: string
   authSiteUrl?: string
   customSupabaseRequest?: object
-  dbInstanceSize?: components['schemas']['DbInstanceSize']
+  dbInstanceSize?: DbInstanceSize
 }
 
 export async function createProject({

@@ -16,10 +16,10 @@ import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToInci
 import InformationBox from 'components/ui/InformationBox'
 import Panel from 'components/ui/Panel'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
-import { components } from 'data/api'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import {
+  DbInstanceSize,
   ProjectCreateVariables,
   useProjectCreateMutation,
 } from 'data/projects/project-create-mutation'
@@ -64,7 +64,7 @@ const Wizard: NextPageWithLayout = () => {
   const [passwordStrengthWarning, setPasswordStrengthWarning] = useState('')
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(0)
 
-  const [instanceSize, setInstanceSize] = useState<components['schemas']['DbInstanceSize']>('micro')
+  const [instanceSize, setInstanceSize] = useState<DbInstanceSize>('micro')
 
   const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
   const currentOrg = organizations?.find((o: any) => o.slug === slug)
@@ -176,7 +176,8 @@ const Wizard: NextPageWithLayout = () => {
       dbPass: dbPass,
       dbRegion: dbRegion,
       dbPricingTierId: 'tier_free', // gets ignored due to org billing subscription anyway
-      dbInstanceSize: instanceSize,
+      // only set the instance size on pro+ plans. Free plans always use micro (nano in the future) size.
+      dbInstanceSize: orgSubscription?.plan.id === 'free' ? undefined : instanceSize,
     }
     if (postgresVersion) {
       if (!postgresVersion.match(/1[2-9]\..*/)) {
@@ -402,7 +403,29 @@ const Wizard: NextPageWithLayout = () => {
                       type="select"
                       value={instanceSize}
                       onChange={(value) => setInstanceSize(value)}
-                      descriptionText="Select an appropriate size for the instance on which the database is hosted."
+                      descriptionText={
+                        <>
+                          Select an appropriate size for the instance on which the database is
+                          hosted. You can always change this later with a small downtime (1-2
+                          minutes). Read more on{' '}
+                          <Link
+                            href="https://supabase.com/docs/guides/platform/compute-add-ons"
+                            target="_blank"
+                            className="transition text-brand hover:text-brand-600"
+                          >
+                            Compute Add-ons
+                          </Link>{' '}
+                          or{' '}
+                          <Link
+                            href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
+                            target="_blank"
+                            className="transition text-brand hover:text-brand-600"
+                          >
+                            usage-based billing for compute
+                          </Link>
+                          .
+                        </>
+                      }
                     >
                       {sizes.map((option) => {
                         return (
