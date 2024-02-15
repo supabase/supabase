@@ -16,6 +16,7 @@ import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToInci
 import InformationBox from 'components/ui/InformationBox'
 import Panel from 'components/ui/Panel'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
+import { components } from 'data/api'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import {
@@ -62,6 +63,8 @@ const Wizard: NextPageWithLayout = () => {
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
   const [passwordStrengthWarning, setPasswordStrengthWarning] = useState('')
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(0)
+
+  const [instanceSize, setInstanceSize] = useState<components['schemas']['DbInstanceSize']>('micro')
 
   const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
   const currentOrg = organizations?.find((o: any) => o.slug === slug)
@@ -173,6 +176,7 @@ const Wizard: NextPageWithLayout = () => {
       dbPass: dbPass,
       dbRegion: dbRegion,
       dbPricingTierId: 'tier_free', // gets ignored due to org billing subscription anyway
+      dbInstanceSize: instanceSize,
     }
     if (postgresVersion) {
       if (!postgresVersion.match(/1[2-9]\..*/)) {
@@ -216,6 +220,20 @@ const Wizard: NextPageWithLayout = () => {
 
     throw new Error('Invalid cloud provider')
   }
+
+  const sizes = [
+    'nano',
+    'micro',
+    'small',
+    'medium',
+    'large',
+    'xlarge',
+    '2xlarge',
+    '4xlarge',
+    '8xlarge',
+    '12xlarge',
+    '16xlarge',
+  ]
 
   return (
     <Panel
@@ -364,6 +382,32 @@ const Wizard: NextPageWithLayout = () => {
                         return (
                           <Listbox.Option key={value} label={label} value={value}>
                             <span className="text-foreground">{label}</span>
+                          </Listbox.Option>
+                        )
+                      })}
+                    </Listbox>
+                  </Panel.Content>
+                )}
+
+                {orgSubscription?.plan.id !== 'free' && (
+                  <Panel.Content
+                    className={[
+                      'border-b',
+                      'border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark',
+                    ].join(' ')}
+                  >
+                    <Listbox
+                      layout="horizontal"
+                      label="Instance Size"
+                      type="select"
+                      value={instanceSize}
+                      onChange={(value) => setInstanceSize(value)}
+                      descriptionText="Select an appropriate size for the instance on which the database is hosted."
+                    >
+                      {sizes.map((option) => {
+                        return (
+                          <Listbox.Option key={option} label={option} value={option}>
+                            <span className="text-foreground">{option}</span>
                           </Listbox.Option>
                         )
                       })}

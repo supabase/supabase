@@ -3412,6 +3412,18 @@ export interface components {
     GetProjectByFlyExtensionIdResponse: {
       ref: string
     }
+    /** @enum {string} */
+    DesiredInstanceSize:
+      | 'micro'
+      | 'small'
+      | 'medium'
+      | 'large'
+      | 'xlarge'
+      | '2xlarge'
+      | '4xlarge'
+      | '8xlarge'
+      | '12xlarge'
+      | '16xlarge'
     AmiSearchOptions: {
       search_tags?: Record<string, never>
     }
@@ -3421,6 +3433,7 @@ export interface components {
     CreateProjectBody: {
       /** @deprecated */
       kps_enabled?: boolean
+      desired_instance_size?: components['schemas']['DesiredInstanceSize']
       cloud_provider: string
       org_id: number
       name: string

@@ -1,6 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
+import { components } from 'data/api'
 import { post } from 'lib/common/fetch'
 import { API_URL, PRICING_TIER_PRODUCT_IDS, PROVIDERS } from 'lib/constants'
 import { ProjectBase, ResponseError } from 'types'
@@ -17,6 +18,7 @@ export type ProjectCreateVariables = {
   configurationId?: string
   authSiteUrl?: string
   customSupabaseRequest?: object
+  dbInstanceSize?: components['schemas']['DbInstanceSize']
 }
 
 export async function createProject({
@@ -30,6 +32,7 @@ export async function createProject({
   configurationId,
   authSiteUrl,
   customSupabaseRequest,
+  dbInstanceSize,
 }: ProjectCreateVariables) {
   const response = await post(`${API_URL}/projects`, {
     cloud_provider: cloudProvider,
@@ -44,7 +47,9 @@ export async function createProject({
     ...(customSupabaseRequest !== undefined && {
       custom_supabase_internal_requests: customSupabaseRequest,
     }),
+    desired_instance_size: dbInstanceSize,
   })
+
   if (response.error) throw response.error
   return response as ProjectBase
 }
