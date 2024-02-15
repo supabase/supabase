@@ -314,8 +314,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                           src={props.blog.youtubeHero}
                           frameBorder="0"
                           allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                          // @ts-expect-error
-                          allowfullscreen={true}
+                          allowFullScreen={true}
                         ></iframe>
                       ) : (
                         props.blog.thumb && (
