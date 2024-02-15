@@ -2,6 +2,8 @@ import { startCase } from 'lodash'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
+import { LOCAL_STORAGE_KEYS } from 'common'
+
 import {
   Button,
   DropdownMenu,
@@ -22,15 +24,14 @@ import { AnimatePresence, motion } from 'framer-motion'
 import PostTypes from '~/types/post'
 import { useSearchParams } from 'next/navigation'
 import { BlogView } from '../../pages/blog'
+import { useKey } from 'react-use'
 
 interface Props {
   allPosts: PostTypes[]
   setPosts: (posts: any) => void
-  view: BlogView
-  setView: (view: BlogView) => void
+  view: any
+  setView: (view: any) => any
 }
-
-const MotionButton = motion(Button)
 
 /**
  * ✅ search via text input
@@ -41,6 +42,7 @@ const MotionButton = motion(Button)
  */
 
 function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
+  const { BLOG_VIEW } = LOCAL_STORAGE_KEYS
   const isList = view === 'list'
   const [category, setCategory] = useState<string>('all')
   const [searchTerm, setSearchTerm] = useState<string>('')
@@ -103,6 +105,11 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
     )
   }
 
+  useKey('Escape', () => {
+    handleSearchByText('')
+    setShowSearchInput(false)
+  })
+
   useEffect(() => {
     setShowSearchInput(!isMobile)
   }, [isMobile])
@@ -151,7 +158,12 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
   }
 
   const handleViewSelection = () => {
-    setView(isList ? 'grid' : 'list')
+    setView((prevView: string) => {
+      const newValue = prevView === 'list' ? 'grid' : 'list'
+      localStorage.setItem(BLOG_VIEW, newValue)
+
+      return newValue
+    })
   }
 
   return (
@@ -218,7 +230,12 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, transition: { duration: 0.05 } }}
           >
-            <Button size="large" type="default" onClick={() => setShowSearchInput(true)}>
+            <Button
+              className="px-2"
+              size="large"
+              type="default"
+              onClick={() => setShowSearchInput(true)}
+            >
               <IconSearch size="tiny" />
             </Button>
           </motion.div>
@@ -263,7 +280,7 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
         type="default"
         title={isList ? 'Grid View' : 'List View'}
         onClick={handleViewSelection}
-        className="h-full py-1.5 px-2"
+        className="h-full p-1.5"
       >
         {isList ? <IconGrid /> : <IconList />}
       </Button>

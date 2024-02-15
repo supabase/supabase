@@ -12,12 +12,15 @@ import BlogListItem from '~/components/Blog/BlogListItem'
 import BlogFilters from '~/components/Blog/BlogFilters'
 import FeaturedThumb from '~/components/Blog/FeaturedThumb'
 import { cn } from 'ui'
+import { LOCAL_STORAGE_KEYS, isBrowser } from 'common'
 
 export type BlogView = 'list' | 'grid'
 
 function Blog(props: any) {
+  const { BLOG_VIEW } = LOCAL_STORAGE_KEYS
+  const localView = isBrowser ? localStorage?.getItem(BLOG_VIEW) : undefined
   const [blogs, setBlogs] = useState(props.blogs)
-  const [view, setView] = useState<BlogView>('list')
+  const [view, setView] = useState<BlogView | string>(localView ?? 'list')
   const isList = view === 'list'
   const router = useRouter()
 
