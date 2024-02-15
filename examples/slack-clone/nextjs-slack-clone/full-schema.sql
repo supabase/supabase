@@ -9,7 +9,7 @@ create type public.user_status as enum ('ONLINE', 'OFFLINE');
 
 -- USERS
 create table public.users (
-  id          uuid not null primary key, -- UUID from auth.users
+  id          uuid references auth.users not null primary key, -- UUID from auth.users
   username    text,
   status      user_status default 'OFFLINE'::public.user_status
 );
@@ -64,9 +64,8 @@ declare
 begin
   select count(*)
   from public.role_permissions
-  inner join public.user_roles on role_permissions.role = user_roles.role
   where role_permissions.permission = authorize.requested_permission
-    and user_roles.user_id = authorize.user_id
+    and role_permissions.role = (auth.jwt() -> 'app_metadata' ->> 'user_role')::public.app_role
   into bind_permissions;
   
   return bind_permissions > 0;
@@ -141,24 +140,90 @@ alter publication supabase_realtime add table public.channels;
 alter publication supabase_realtime add table public.messages;
 alter publication supabase_realtime add table public.users;
 
--- DUMMY DATA
-insert into public.users (id, username)
-values
-    ('8d0fd2b3-9ca7-4d9e-a95f-9e13dded323e', 'supabot');
+/**
+ * AUTH HOOKS
+ * Create an auth hook to add a custom claim to the access token jwt.
+ */
 
-insert into public.channels (slug, created_by)
-values
-    ('public', '8d0fd2b3-9ca7-4d9e-a95f-9e13dded323e'),
-    ('random', '8d0fd2b3-9ca7-4d9e-a95f-9e13dded323e');
+-- Enable the "plv8" extension
+-- https://supabase.com/docs/guides/database/extensions/plv8?database-method=sql#enable-the-extension
+create extension plv8;
 
-insert into public.messages (message, channel_id, user_id)
-values
-    ('Hello World 👋', 1, '8d0fd2b3-9ca7-4d9e-a95f-9e13dded323e'),
-    ('Perfection is attained, not when there is nothing more to add, but when there is nothing left to take away.', 2, '8d0fd2b3-9ca7-4d9e-a95f-9e13dded323e');
+-- Create the auth hook function
+-- https://supabase.com/docs/guides/auth/auth-hooks?language=add-metadata-claim-plv8#hook-custom-access-token
+create or replace function custom_access_token_hook(event jsonb)
+returns jsonb
+language plv8
+as $$
+  var user_role;
+
+  // Fetch the current user's user_role from the public user_roles table.
+  var result = plv8.execute("select role from public.user_roles where user_id = $1", [event.user_id]);
+  if (result.length > 0) {
+    user_role = result[0].role;
+  } else {
+    // Assign null
+    user_role = null;
+  }
+
+  // Check if 'claims' exists in the event object; if not, initialize it
+  if (!event.claims) {
+    event.claims = {};
+  }
+  if (!event.claims.app_metadata) {
+    event.claims.app_metadata = {};
+  }
+
+  // Update the level in the claims
+  event.claims.app_metadata.user_role = user_role;
+
+  return event;
+$$;
+
+grant usage on schema public to supabase_auth_admin;
+
+grant execute
+  on function public.custom_access_token_hook
+  to supabase_auth_admin;
+
+revoke execute
+  on function public.custom_access_token_hook
+  from authenticated, anon;
+
+grant all
+  on table public.user_roles
+to supabase_auth_admin;
+
+revoke all
+  on table public.user_roles
+  from authenticated, anon;
+
+create policy "Allow auth admin to read user roles" ON public.user_roles
+as permissive for select
+to supabase_auth_admin
+using (true)
+
+
+/**
+ * HELPER FUNCTIONS
+ * Create test user helper method.
+ */
+CREATE OR REPLACE FUNCTION public.create_user(
+    email text
+) RETURNS uuid
+    SECURITY DEFINER
+    SET search_path = auth
+AS $$
+  declare
+  user_id uuid;
+BEGIN
+  user_id := extensions.uuid_generate_v4();
   
-insert into public.role_permissions (role, permission)
-values
-    ('admin', 'channels.delete'),
-    ('admin', 'messages.delete'),
-    ('moderator', 'messages.delete');
+  INSERT INTO auth.users (id, email)
+    VALUES (user_id, email)
+    RETURNING id INTO user_id;
+
+    RETURN user_id;
+END;
+$$ LANGUAGE plpgsql;
 

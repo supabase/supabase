@@ -1,3 +1,8 @@
+/**
+ * AUTH HOOKS
+ * Create an auth hook to add a custom claim to the access token jwt.
+ */
+ 
 -- Enable the "plv8" extension
 -- https://supabase.com/docs/guides/database/extensions/plv8?database-method=sql#enable-the-extension
 create extension plv8;
