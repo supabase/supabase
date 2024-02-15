@@ -1,0 +1,64 @@
+---
+id: 'storage'
+title: 'Storage'
+description: 'Use Supabase to store and serve files.'
+subtitle: 'Use Supabase to store and serve files.'
+sidebar_label: 'Overview'
+hideToc: true
+---
+
+Supabase Storage makes it simple to upload and serve files of any size, providing a robust framework for file access controls.
+
+## Features
+
+You can use Supabase Storage to store images, videos, documents, and any other file type. Serve your assets with a global CDN to reduce latency from over 285 cities globally. Supabase Storage includes a built-in image optimizer, so you can resize and compress your media files on the fly.
+
+## Examples
+
+Check out all of the Storage [templates and examples](https://github.com/supabase/supabase/tree/master/examples/storage) in our GitHub repository.
+
+<div className="grid md:grid-cols-12 gap-4 not-prose">
+  {examples.map((x) => (
+    <div className="col-span-12" key={x.href}>
+      <Link href={x.href} passHref>
+        <GlassPanel icon={'/docs/img/icons/github-icon'} hasLightIcon={true} title={x.name}>
+          {x.description}
+        </GlassPanel>
+      </Link>
+    </div>
+  ))}
+</div>
+
+export const examples = [
+  {
+    name: 'Resumable Uploads with Uppy',
+    description:
+      'Use Uppy to upload files to Supabase Storage using the TUS protocol (resumable uploads).',
+    href: 'https://github.com/supabase/supabase/tree/master/examples/storage/resumable-upload-uppy',
+  },
+]
+
+## Resources
+
+Find the source code and documentation in the Supabase GitHub repository.
+
+<div className="grid md:grid-cols-12 gap-4 not-prose">
+  {[
+    {
+      name: 'Supabase Storage API',
+      description: 'View the source code.',
+      href: 'https://github.com/supabase/storage-api',
+    },
+    {
+      name: 'OpenAPI Spec',
+      description: 'See the Swagger Documentation for Supabase Storage.',
+      href: 'https://supabase.github.io/storage/',
+    },
+  ].map((x) => (
+    <div className="col-span-6" key={x.href}>
+      <Link href={x.href} passHref>
+        <GlassPanel title={x.name}>{x.description}</GlassPanel>
+      </Link>
+    </div>
+  ))}
+</div>
