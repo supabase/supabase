@@ -193,7 +193,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                   className="group !h-[28px] !py-0"
                   icon={
                     policies.length > 0 ? (
-                      <span className="text-right text-xs rounded-xl px-2 py-0.5 bg-surface-200 dark:bg-surface-100 text-brand-1100">
+                      <span className="text-right text-xs rounded-xl px-[6px] bg-foreground-lighter/30 text-brand-1100">
                         {policies.length}
                       </span>
                     ) : (
