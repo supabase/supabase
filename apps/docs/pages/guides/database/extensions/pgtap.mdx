@@ -118,7 +118,7 @@ select plan( 1 );
 
 select results_eq(
     'select * from profiles()',
-    $$VALUES ( 1, 'Anna'), (2, 'Bruce'), (3, 'Caryn')$$
+    $$VALUES ( 1, 'Anna'), (2, 'Bruce'), (3, 'Caryn')$$,
     'profiles() should return all users'
 );
 
