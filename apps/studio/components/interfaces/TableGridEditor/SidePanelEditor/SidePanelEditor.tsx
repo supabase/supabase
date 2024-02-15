@@ -135,11 +135,9 @@ const SidePanelEditor = ({
           }
         } else {
           saveRowError = new Error('No primary key')
-          ui.setNotification({
-            category: 'error',
-            message:
-              "We can't make changes to this table because there is no primary key. Please create a primary key and try again.",
-          })
+          toast.error(
+            "We can't make changes to this table because there is no primary key. Please create a primary key and try again."
+          )
         }
       }
     }
@@ -176,13 +174,7 @@ const SidePanelEditor = ({
 
     if (payload !== undefined && configuration !== undefined) {
       try {
-        await saveRow(payload, isNewRecord, configuration, (error) => {
-          if (error) {
-            toast.error(
-              error?.message ?? 'Something went wrong while trying to save the column value'
-            )
-          }
-        })
+        await saveRow(payload, isNewRecord, configuration, () => {})
       } finally {
         resolve()
       }

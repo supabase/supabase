@@ -74,6 +74,8 @@ export * from './src/lib/utils'
 
 // theme switcher
 export * from './src/components/ThemeProvider/themes'
+export * from './src/components/ThemeProvider/singleThemes'
+export * from './src/components/ThemeProvider/prefixedThemes'
 
 // shadcn
 export * from './src/components/shadcn/ui/dropdown-menu'
@@ -96,8 +98,12 @@ export {
   DialogContent as DialogContent_Shadcn_,
   DialogHeader as DialogHeader_Shadcn_,
   DialogFooter as DialogFooter_Shadcn_,
+  DialogClose as DialogClose_Shadcn_,
   DialogTitle as DialogTitle_Shadcn_,
   DialogDescription as DialogDescription_Shadcn_,
+  DialogSection as DialogSection_Shadcn_,
+  DIALOG_PADDING_X as DIALOG_PADDING_X_Shadcn_,
+  DIALOG_PADDING_Y as DIALOG_PADDING_Y_Shadcn_,
 } from './src/components/shadcn/ui/dialog'
 
 export {
@@ -140,6 +146,12 @@ export {
   SelectTrigger as SelectTrigger_Shadcn_,
   SelectValue as SelectValue_Shadcn_,
 } from './src/components/shadcn/ui/select'
+
+export {
+  RadioGroup as RadioGroup_Shadcn_,
+  RadioGroupItem as RadioGroupItem_Shadcn_,
+  RadioGroupLargeItem as RadioGroupLargeItem_Shadcn_,
+} from './src/components/shadcn/ui/radio-group'
 
 export { Slider as Slider_Shadcn_ } from './src/components/shadcn/ui/slider'
 
