@@ -18,7 +18,7 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
       </ConnectTabTriggers>
 
       <ConnectTabContent value=".env">
-        <SimpleCodeBlock className="bash">
+        <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {`
 DATABASE_URL='your-database-url'
         `}
@@ -26,7 +26,7 @@ DATABASE_URL='your-database-url'
       </ConnectTabContent>
 
       <ConnectTabContent value="drizzle/schema.tsx">
-        <SimpleCodeBlock className="js">
+        <SimpleCodeBlock className="tsx" parentClassName="min-h-72">
           {`
 import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
 
@@ -40,7 +40,7 @@ export const users = pgTable('users', {
       </ConnectTabContent>
 
       <ConnectTabContent value="index.tsx">
-        <SimpleCodeBlock className="js">
+        <SimpleCodeBlock className="tsx" parentClassName="min-h-72">
           {`
 import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'

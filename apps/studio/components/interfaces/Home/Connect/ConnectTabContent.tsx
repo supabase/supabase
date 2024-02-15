@@ -11,11 +11,19 @@ const ConnectTabContentNew = ({ projectKeys, filePath }: ConnectContentTabProps)
   const ContentFile = dynamic<ConnectContentTabProps>(
     () => import(`./content/${filePath}/content`),
     {
-      loading: () => <GenericSkeletonLoader />,
+      loading: () => (
+        <div className="p-4">
+          <GenericSkeletonLoader />
+        </div>
+      ),
     }
   )
 
-  return <ContentFile projectKeys={projectKeys} filePath={filePath} />
+  return (
+    <div className="border rounded-lg">
+      <ContentFile projectKeys={projectKeys} filePath={filePath} />
+    </div>
+  )
 }
 
 export default ConnectTabContentNew

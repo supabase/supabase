@@ -19,7 +19,7 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
       </ConnectTabTriggers>
 
       <ConnectTabContent value=".env.local">
-        <SimpleCodeBlock className="bash">
+        <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {`
 SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}
 SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
@@ -28,7 +28,7 @@ SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
       </ConnectTabContent>
 
       <ConnectTabContent value="src/lib/supabaseClient.js">
-        <SimpleCodeBlock className="js">
+        <SimpleCodeBlock className="js" parentClassName="min-h-72">
           {`
 import { createClient } from "@supabase/supabase-js";
 
@@ -41,32 +41,32 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
       </ConnectTabContent>
 
       <ConnectTabContent value="src/routes/+page.server.js">
-        <SimpleCodeBlock className="js">
+        <SimpleCodeBlock className="js" parentClassName="min-h-72">
           {`
-  import { supabase } from "$lib/supabaseClient";
+import { supabase } from "$lib/supabaseClient";
 
-  export async function load() {
-    const { data } = await supabase.from("countries").select();
-    return {
-      countries: data ?? [],
-    };
-  }
+export async function load() {
+  const { data } = await supabase.from("countries").select();
+  return {
+    countries: data ?? [],
+  };
+}
 `}
         </SimpleCodeBlock>
       </ConnectTabContent>
 
       <ConnectTabContent value="src/routes/+page.svelte">
-        <SimpleCodeBlock className="js">
+        <SimpleCodeBlock className="html" parentClassName="min-h-72">
           {`
-  <script>
-    export let data;
-  </script>
+<script>
+  export let data;
+</script>
 
-  <ul>
-    {#each data.countries as country}
-      <li>{country.name}</li>
-    {/each}
-  </ul>
+<ul>
+  {#each data.countries as country}
+    <li>{country.name}</li>
+  {/each}
+</ul>
 `}
         </SimpleCodeBlock>
       </ConnectTabContent>

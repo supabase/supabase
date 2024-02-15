@@ -20,7 +20,7 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
       </ConnectTabTriggers>
 
       <ConnectTabContent value=".env.local">
-        <SimpleCodeBlock className="bash">
+        <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {`
 NEXT_PUBLIC_SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}
 NEXT_PUBLIC_SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
@@ -29,7 +29,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
       </ConnectTabContent>
 
       <ConnectTabContent value="page.tsx">
-        <SimpleCodeBlock className="js">
+        <SimpleCodeBlock className="tsx" parentClassName="min-h-72">
           {`
 import { createClient } from '@/utils/supabase/server'
 import { cookies } from 'next/headers'
@@ -53,7 +53,7 @@ export default async function Page() {
       </ConnectTabContent>
 
       <ConnectTabContent value="utils/supabase/server.ts">
-        <SimpleCodeBlock className="js">
+        <SimpleCodeBlock className="ts" parentClassName="min-h-72">
           {`
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
@@ -93,7 +93,7 @@ export const createClient = (cookieStore: ReturnType<typeof cookies>) => {
         </SimpleCodeBlock>
       </ConnectTabContent>
       <ConnectTabContent value="utils/supabase/client.ts">
-        <SimpleCodeBlock className="js">
+        <SimpleCodeBlock className="ts" parentClassName="min-h-72">
           {`
 import { createBrowserClient } from "@supabase/ssr";
 
@@ -107,7 +107,7 @@ export const createClient = () =>
       </ConnectTabContent>
 
       <ConnectTabContent value="utils/supabase/middleware.ts">
-        <SimpleCodeBlock className="js">
+        <SimpleCodeBlock className="ts" parentClassName="min-h-72">
           {`
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";

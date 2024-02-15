@@ -17,7 +17,7 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
       </ConnectTabTriggers>
 
       <ConnectTabContent value=".env.local">
-        <SimpleCodeBlock className="bash">
+        <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {`
 # Connect to Supabase via connection pooling with Supavisor.
 DATABASE_URL="postgres://postgres.[your-supabase-project]:[password]@aws-0-eu-central-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
@@ -29,7 +29,7 @@ DIRECT_URL="postgres://postgres:[password]@db.[your-supabase-project].supabase.c
       </ConnectTabContent>
 
       <ConnectTabContent value="prisma/schema.prisma">
-        <SimpleCodeBlock className="bash">
+        <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {`
 datasource db {
   provider  = "postgresql"

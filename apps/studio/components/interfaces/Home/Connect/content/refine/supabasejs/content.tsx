@@ -18,7 +18,7 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
       </ConnectTabTriggers>
 
       <ConnectTabContent value=".env.local">
-        <SimpleCodeBlock className="bash">
+        <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {`
 SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}
 SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
@@ -27,7 +27,7 @@ SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
       </ConnectTabContent>
 
       <ConnectTabContent value="src/utility/supabaseClient.ts">
-        <SimpleCodeBlock className="js">
+        <SimpleCodeBlock className="ts" parentClassName="min-h-72">
           {`
 import { createClient } from "@refinedev/supabase";
 
@@ -47,7 +47,7 @@ export const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY, {
       </ConnectTabContent>
 
       <ConnectTabContent value="src/App.tsx">
-        <SimpleCodeBlock className="js">
+        <SimpleCodeBlock className="tsx" parentClassName="min-h-72">
           {`
 import { Refine, WelcomePage } from "@refinedev/core";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";

@@ -18,7 +18,7 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
       </ConnectTabTriggers>
 
       <ConnectTabContent value=".env.local">
-        <SimpleCodeBlock className="bash">
+        <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {`
 NEXT_PUBLIC_SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}
 NEXT_PUBLIC_SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
@@ -27,7 +27,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
       </ConnectTabContent>
 
       <ConnectTabContent value="utils/supabase.ts">
-        <SimpleCodeBlock className="js">
+        <SimpleCodeBlock className="ts" parentClassName="min-h-72">
           {`
 import { createClient } from "@supabase/supabase-js";
 
@@ -40,7 +40,7 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
       </ConnectTabContent>
 
       <ConnectTabContent value="_app.tsx">
-        <SimpleCodeBlock className="js">
+        <SimpleCodeBlock className="tsx" parentClassName="min-h-72">
           {`
 import { useState, useEffect } from 'react'
 import { supabase } from '../utils/supabase'

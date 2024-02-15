@@ -18,7 +18,7 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
       </ConnectTabTriggers>
 
       <ConnectTabContent value=".env.local">
-        <SimpleCodeBlock className="bash">
+        <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {`
 SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}
 SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
@@ -27,7 +27,7 @@ SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
       </ConnectTabContent>
 
       <ConnectTabContent value="utils/supabase.ts">
-        <SimpleCodeBlock className="js">
+        <SimpleCodeBlock className="ts" parentClassName="min-h-72">
           {`
 import { createClient } from "@supabase/supabase-js";
 
@@ -40,7 +40,7 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
       </ConnectTabContent>
 
       <ConnectTabContent value="src/App.jsx">
-        <SimpleCodeBlock className="js">
+        <SimpleCodeBlock className="jsx" parentClassName="min-h-72">
           {`
 import { supabase } from '../utils/supabase'
 import { createResource, For } from "solid-js";
