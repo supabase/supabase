@@ -32,7 +32,7 @@ export async function getViews(
     signal,
   })
 
-  if (error) throw error
+  if (error) throw new Error((error as ResponseError).message)
   return data
 }
 
