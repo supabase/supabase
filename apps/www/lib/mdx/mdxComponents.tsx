@@ -80,9 +80,9 @@ const Heading = (props: any) => {
         <Tag {...props} className={cn('hover:cursor-pointer', props.className)}>
           {props.children}
           {copied ? (
-            <IconCheck className="inline stroke-2 text-foreground-light ml-1.5 transition-all opacity-0 animate-fade-in" />
+            <IconCheck className="inline stroke-2 text-foreground-light ml-2 transition-all opacity-0 animate-fade-in" />
           ) : (
-            <IconLink className="inline stroke-2 text-foreground-lighter ml-1.5 opacity-0 group-hover:opacity-100" />
+            <IconLink className="inline stroke-2 text-foreground-lighter ml-2 opacity-0 group-hover:opacity-100" />
           )}
         </Tag>
       </span>

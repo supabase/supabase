@@ -1,24 +1,24 @@
+import matter from 'gray-matter'
 import { NextSeo } from 'next-seo'
 import type { GetStaticProps, InferGetStaticPropsType } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import matter from 'gray-matter'
-import authors from 'lib/authors.json'
 import { MDXRemote } from 'next-mdx-remote'
+import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 import { Badge, IconChevronLeft } from 'ui'
 
-import CTABanner from '~/components/CTABanner'
-import DefaultLayout from '~/components/Layouts/Default'
-import BlogLinks from '~/components/LaunchWeek/7/BlogLinks'
-import { generateReadingTime, isNotNullOrUndefined } from '~/lib/helpers'
-import ShareArticleActions from '~/components/Blog/ShareArticleActions'
-import useActiveAnchors from '~/hooks/useActiveAnchors'
+import authors from 'lib/authors.json'
+import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
-import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
-import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
-import LWXSummary from '../../components/LaunchWeek/X/LWXSummary'
+import { generateReadingTime, isNotNullOrUndefined } from '~/lib/helpers'
+
+import BlogLinks from '~/components/LaunchWeek/7/BlogLinks'
+import CTABanner from '~/components/CTABanner'
+import DefaultLayout from '~/components/Layouts/Default'
+import LWXSummary from '~/components/LaunchWeek/X/LWXSummary'
+import ShareArticleActions from '~/components/Blog/ShareArticleActions'
 
 type Post = ReturnType<typeof getSortedPosts>[number]
 
@@ -121,7 +121,6 @@ export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async (
 function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
   const content = props.blog.content
   const authorArray = props.blog.author.split(',')
-  useActiveAnchors('h2, h3, h4', '.prose-toc a')
   const isLaunchWeek7 = props.blog.launchweek === 7
   const isLaunchWeekX = props.blog.launchweek?.toString().toLocaleLowerCase() === 'x'
 
@@ -231,7 +230,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
           ],
         }}
       />
-      <DefaultLayout className="overflow-x-hidden">
+      <DefaultLayout>
         <div
           className="
             container mx-auto px-4 py-4 md:py-8 xl:py-10 sm:px-16
@@ -303,7 +302,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
               </div>
               <div className="grid grid-cols-12 lg:gap-16 xl:gap-8">
                 {/* Content */}
-                <div className="col-span-12 lg:col-span-7 xl:col-span-7">
+                <div className="col-span-12 lg:col-span-7 xl:col-span-7 overflow-x-hidden">
                   <article>
                     <div className={['prose prose-docs'].join(' ')}>
                       {props.blog.youtubeHero ? (
@@ -312,10 +311,9 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                           width="700"
                           height="350"
                           src={props.blog.youtubeHero}
-                          frameBorder="0"
                           allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
                           allowFullScreen={true}
-                        ></iframe>
+                        />
                       ) : (
                         props.blog.thumb && (
                           <div className="hidden md:block relative mb-8 h-96 w-full overflow-auto rounded-lg border">
@@ -323,6 +321,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                               src={'/images/blog/' + props.blog.thumb}
                               alt={props.blog.title}
                               fill
+                              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                               className="object-cover m-0"
                             />
                           </div>
@@ -349,8 +348,8 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                   </div>
                 </div>
                 {/* Sidebar */}
-                <div className="col-span-12 space-y-8 lg:col-span-5 xl:col-span-3 xl:col-start-9">
-                  <div className="space-y-6 lg:sticky lg:top-24 lg:mb-48">
+                <div className="relative col-span-12 space-y-8 lg:col-span-5 xl:col-span-3 xl:col-start-9">
+                  <div className="space-y-6">
                     <div className="hidden lg:block">{toc}</div>
                     <div className="hidden lg:block">
                       <div className="text-foreground text-sm">Share this article</div>
