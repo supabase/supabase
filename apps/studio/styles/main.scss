@@ -4,6 +4,7 @@
 
 @import '~ui/build/css/source/global.css';
 @import '~ui/build/css/themes/dark.css';
+@import '~ui/build/css/themes/deep-dark.css';
 @import '~ui/build/css/themes/light.css';
 
 @layer utilities {
@@ -25,7 +26,7 @@ html,
 body,
 #__next,
 .main {
-  @apply bg-background;
+  @apply bg-studio;
   @apply text-foreground;
   height: 100%;
   padding: 0;
@@ -75,7 +76,7 @@ input.form-control,
   @apply focus:border-stronger;
   @apply focus:ring-border-overlay;
 
-  @apply bg-background;
+  @apply bg-studio;
   @apply border-strong border;
 
   @apply outline-none;

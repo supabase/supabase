@@ -203,7 +203,7 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
     <div
       ref={storageExplorerRef}
       className="
-        bg-background
+        bg-studio
         border-overlay flex
         h-full w-full flex-col rounded-md border"
     >
