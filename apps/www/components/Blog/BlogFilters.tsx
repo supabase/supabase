@@ -9,6 +9,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   IconChevronDown,
+  IconGrid,
+  IconList,
   IconSearch,
   IconX,
   Input,
@@ -19,11 +21,13 @@ import { useBreakpoint } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import PostTypes from '~/types/post'
 import { useSearchParams } from 'next/navigation'
+import { BlogView } from '../../pages/blog'
 
 interface Props {
   allPosts: PostTypes[]
-  posts: PostTypes[]
   setPosts: (posts: any) => void
+  view: BlogView
+  setView: (view: BlogView) => void
 }
 
 const MotionButton = motion(Button)
@@ -36,7 +40,8 @@ const MotionButton = motion(Button)
  * ✅ search via category and reset q param if present
  */
 
-function BlogFilters({ allPosts, posts, setPosts }: Props) {
+function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
+  const isList = view === 'list'
   const [category, setCategory] = useState<string>('all')
   const [searchTerm, setSearchTerm] = useState<string>('')
   const [showSearchInput, setShowSearchInput] = useState<boolean>(false)
@@ -145,6 +150,10 @@ function BlogFilters({ allPosts, posts, setPosts }: Props) {
     handleSearchByText(event.target.value)
   }
 
+  const handleViewSelection = () => {
+    setView(isList ? 'grid' : 'list')
+  }
+
   return (
     <div className="flex flex-row items-center justify-between gap-2">
       <AnimatePresence mode="wait">
@@ -203,16 +212,16 @@ function BlogFilters({ allPosts, posts, setPosts }: Props) {
         </div>
 
         {!showSearchInput && (
-          <MotionButton
+          <motion.div
+            className="flex-1 flex justify-end"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, transition: { duration: 0.05 } }}
-            size="large"
-            type="default"
-            onClick={() => setShowSearchInput(true)}
           >
-            <IconSearch size="tiny" />
-          </MotionButton>
+            <Button size="large" type="default" onClick={() => setShowSearchInput(true)}>
+              <IconSearch size="tiny" />
+            </Button>
+          </motion.div>
         )}
 
         {showSearchInput && (
@@ -220,7 +229,7 @@ function BlogFilters({ allPosts, posts, setPosts }: Props) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, transition: { duration: 0.05 } }}
-            className="w-full lg:max-w-[240px] xl:max-w-[280px]"
+            className="w-full h-auto flex justify-end gap-2 items-stretch lg:max-w-[240px] xl:max-w-[280px]"
           >
             <Input
               icon={<IconSearch size="tiny" />}
@@ -240,7 +249,7 @@ function BlogFilters({ allPosts, posts, setPosts }: Props) {
                       setSearchTerm('')
                       setShowSearchInput(false)
                     }}
-                    className="text-foreground-light hover:text-foreground"
+                    className="text-foreground-light hover:text-foreground hover:bg-selection"
                   >
                     <IconX size="tiny" />
                   </Button>
@@ -250,6 +259,14 @@ function BlogFilters({ allPosts, posts, setPosts }: Props) {
           </motion.div>
         )}
       </AnimatePresence>
+      <Button
+        type="default"
+        title={isList ? 'Grid View' : 'List View'}
+        onClick={handleViewSelection}
+        className="h-full py-1.5 px-2"
+      >
+        {isList ? <IconGrid /> : <IconList />}
+      </Button>
     </div>
   )
 }

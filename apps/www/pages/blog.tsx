@@ -7,12 +7,18 @@ import { getSortedPosts } from '~/lib/posts'
 
 import PostTypes from '~/types/post'
 import DefaultLayout from '~/components/Layouts/Default'
+import BlogGridItem from '~/components/Blog/BlogGridItem'
 import BlogListItem from '~/components/Blog/BlogListItem'
 import BlogFilters from '~/components/Blog/BlogFilters'
 import FeaturedThumb from '~/components/Blog/FeaturedThumb'
+import { cn } from 'ui'
+
+export type BlogView = 'list' | 'grid'
 
 function Blog(props: any) {
   const [blogs, setBlogs] = useState(props.blogs)
+  const [view, setView] = useState<BlogView>('list')
+  const isList = view === 'list'
   const router = useRouter()
 
   const meta_title = 'Supabase Blog: Open Source Firebase alternative Blog'
@@ -55,18 +61,29 @@ function Blog(props: any) {
 
         <div className="border-default border-t">
           <div className="md:container mx-auto mt-6 lg:mt-8 px-6 sm:px-16 xl:px-20">
-            <BlogFilters allPosts={props.blogs} posts={blogs} setPosts={setBlogs} />
+            <BlogFilters allPosts={props.blogs} setPosts={setBlogs} view={view} setView={setView} />
 
-            <ol className="grid grid-cols-12 -mx-2 sm:-mx-4 py-6 lg:py-6 lg:gap-4">
+            <ol
+              className={cn(
+                'grid -mx-2 sm:-mx-4 py-6 lg:py-6',
+                isList ? 'grid-cols-1' : 'grid-cols-12 lg:gap-4'
+              )}
+            >
               {blogs?.length ? (
-                blogs?.map((blog: PostTypes, idx: number) => (
-                  <div
-                    className="col-span-12 mb-4 md:col-span-12 lg:col-span-6 xl:col-span-4 h-full"
-                    key={idx}
-                  >
-                    <BlogListItem post={blog} />
-                  </div>
-                ))
+                blogs?.map((blog: PostTypes, idx: number) =>
+                  isList ? (
+                    <div className="col-span-12 px-2 sm:px-4" key={idx}>
+                      <BlogListItem post={blog} />
+                    </div>
+                  ) : (
+                    <div
+                      className="col-span-12 mb-4 md:col-span-12 lg:col-span-6 xl:col-span-4 h-full"
+                      key={idx}
+                    >
+                      <BlogGridItem post={blog} />
+                    </div>
+                  )
+                )
               ) : (
                 <p className="text-sm text-light col-span-full">No results</p>
               )}
