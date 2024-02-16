@@ -204,9 +204,9 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
               key={category}
               type={
                 category === 'all' && !searchTerm && !activeCategory
-                  ? 'default'
+                  ? 'alternative'
                   : category === activeCategory
-                    ? 'default'
+                    ? 'alternative'
                     : 'outline'
               }
               onClick={() => handleSetCategory(category)}
