@@ -1,4 +1,3 @@
-import { createClient } from '@supabase/supabase-js'
 import { Button, IconArrowUpRight, IconBriefcase, IconEye, IconLink, IconShield } from 'ui'
 import ApiExamples from 'data/products/auth/auth-api-examples'
 import AuthSqlRulesExamples from 'data/products/auth/auth-sql-rules-examples'
@@ -11,7 +10,6 @@ import AuthWidgetSection from '~/components/AuthWidget/AuthWidgetSection'
 import SplitCodeBlockCarousel from '~/components/Carousels/SplitCodeBlockCarousel'
 import CTABanner from '~/components/CTABanner'
 import FeatureColumn from '~/components/FeatureColumn'
-import FloatingIcons from '~/components/FloatingIcons'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import APISection from '~/components/Sections/APISection'
@@ -23,12 +21,6 @@ import { ThemeImage } from 'ui-patterns/ThemeImage'
 function AuthPage() {
   // base path for images
   const { basePath } = useRouter()
-
-  // supabase auth widget project details
-  const supabase = createClient(
-    'https://rsnibhkhsbfnncjmwnkj.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYxNTIxNDE1MywiZXhwIjoxOTMwNzkwMTUzfQ.OQEbAaTfgDdLCCht251P2JRD3QDnui6nsU8N-tZA_Mc'
-  )
 
   const meta_title = 'Auth | Built-in user management'
   const meta_description =
@@ -189,7 +181,6 @@ function AuthPage() {
               <div className="section--bg border-t border-b border-control"></div>
             </div>
             <div className="section-container pt-12 pb-0">
-              <FloatingIcons />
               <div className="overflow-x-hidden">
                 <SectionContainer className="mb-0 pb-8">
                   <GithubExamples />
