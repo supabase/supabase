@@ -2,7 +2,6 @@ import 'react-medium-image-zoom/dist/styles.css'
 
 import { PropsWithChildren } from 'react'
 import Image from 'next/image'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { isBrowser, useCopy } from 'common'
@@ -25,6 +24,7 @@ import {
   Admonition,
   IconLink,
   IconCheck,
+  Heading,
 } from 'ui'
 import ImageFadeStack from '~/components/ImageFadeStack'
 import ZoomableImg from '~/components/ZoomableImg/ZoomableImg'
@@ -69,38 +69,16 @@ const BlogCollapsible = ({ title, ...props }: { title: string }) => {
   )
 }
 
-const Heading = (props: any) => {
-  const Tag = props.as
-  const { copied, handleCopy } = useCopy()
-  const { query } = useRouter()
-  const anchor = `${isBrowser ? window?.location.origin : 'https://supabase.com'}/blog/${query.slug}#${props.id}`
-
-  return (
-    <CopyToClipboard text={anchor ?? ''} onCopy={handleCopy}>
-      <span className="relative group">
-        <Tag {...props} className={cn('hover:cursor-pointer', props.className)}>
-          {props.children}
-          {copied ? (
-            <IconCheck className="inline stroke-2 text-foreground-light ml-2 transition-all opacity-0 animate-fade-in" />
-          ) : (
-            <IconLink className="inline stroke-2 text-foreground-lighter ml-2 opacity-0 group-hover:opacity-100" />
-          )}
-        </Tag>
-      </span>
-    </CopyToClipboard>
-  )
-}
-
 export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
   const components = {
     CodeBlock,
     CH,
-    h1: (props: any) => <Heading {...props} as="h1" />,
-    h2: (props: any) => <Heading {...props} as="h2" />,
-    h3: (props: any) => <Heading {...props} as="h3" />,
-    h4: (props: any) => <Heading {...props} as="h4" />,
-    h5: (props: any) => <Heading {...props} as="h5" />,
-    h6: (props: any) => <Heading {...props} as="h6" />,
+    h1: (props: any) => <Heading {...props} tag="h1" />,
+    h2: (props: any) => <Heading {...props} tag="h2" />,
+    h3: (props: any) => <Heading {...props} tag="h3" />,
+    h4: (props: any) => <Heading {...props} tag="h4" />,
+    h5: (props: any) => <Heading {...props} tag="h5" />,
+    h6: (props: any) => <Heading {...props} tag="h6" />,
     Badge,
     Quote,
     Avatar,
