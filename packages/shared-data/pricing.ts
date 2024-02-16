@@ -287,8 +287,8 @@ export const pricing: Pricing = {
         tooltips: { main: 'You can change the upload size in the dashboard' },
         plans: {
           free: '50 MB',
-          pro: '5 GB',
-          team: '5 GB',
+          pro: '50 GB',
+          team: '50 GB',
           enterprise: 'Custom',
         },
         usage_based: false,
