@@ -11,7 +11,7 @@ import remarkGfm from 'remark-gfm'
 import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 
 const DOCS_DIRECTORY = join(dirname(fileURLToPath(import.meta.url)), '..')
-const GUIDES_DIRECTORY = join(DOCS_DIRECTORY, 'content/guides')
+export const GUIDES_DIRECTORY = join(DOCS_DIRECTORY, 'content/guides')
 
 type GuideFrontmatter = {
   title: string
