@@ -1,7 +1,7 @@
 import SectionHeader from 'components/UI/SectionHeader'
 import CaseStudiesData from 'data/CaseStudies.json'
 import { useRouter } from 'next/router'
-import BlogListItem from '../Blog/BlogListItem'
+import BlogGridItem from '../Blog/BlogGridItem'
 import SectionContainer from '../Layouts/SectionContainer'
 
 const CaseStudies = () => {
@@ -22,7 +22,7 @@ const CaseStudies = () => {
       </div>
       <div className="mx-auto mt-5 grid max-w-lg gap-8 lg:max-w-none lg:grid-cols-3 lg:gap-12">
         {CaseStudiesData.map((caseStudy, idx: number) => (
-          <BlogListItem
+          <BlogGridItem
             key={idx}
             post={{
               type: 'casestudy',
