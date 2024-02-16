@@ -732,4 +732,4 @@ Save your Auth Hook as a migration in order to version the Auth Hook and share i
 
 ### Debugging Your Hook
 
-Test the Postgres Function in isolation before enabling the hook by running `psql` and running `select <your_function_name>`. Where necessary, use [`RAISE` statements](https://www.postgresql.org/docs/current/plpgsql-errors-and-messages.html) to print information to the terminal.
+Test the Postgres Function in isolation before enabling the hook by connecting to your database with `psql` and running `select <your_function_name>`. Where necessary, use [`RAISE` statements](https://www.postgresql.org/docs/current/plpgsql-errors-and-messages.html) to print information to the terminal.
