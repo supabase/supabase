@@ -1,14 +1,17 @@
 import { CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
-import { GetStaticPaths, GetStaticProps } from 'next'
-import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
+import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType } from 'next'
+import { MDXRemote } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
-import { relative } from 'path'
+import { relative } from 'node:path'
 import rehypeSlug from 'rehype-slug'
-import remarkGfm from 'remark-gfm'
 import emoji from 'remark-emoji'
+import remarkGfm from 'remark-gfm'
+
 import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
+
 import components from '~/components'
 import Layout from '~/layouts/DefaultGuideLayout'
+import { getGuidesStaticPaths, getGuidesStaticProps } from '~/lib/docs'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
@@ -74,16 +77,11 @@ const pageMap = [
   },
 ]
 
-interface WrappersDocsProps {
-  source: MDXRemoteSerializeResult
-  meta: {
-    title: string
-    description?: string
-  }
-  editLink?: string
-}
-
-export default function WrappersDocs({ source, meta, editLink }: WrappersDocsProps) {
+export default function WrappersDocs({
+  source,
+  meta,
+  editLink,
+}: InferGetStaticPropsType<typeof getStaticProps>) {
   return (
     <Layout meta={meta} editLink={editLink}>
       <MDXRemote {...source} components={components} />
@@ -94,14 +92,21 @@ export default function WrappersDocs({ source, meta, editLink }: WrappersDocsPro
 /**
  * Fetch markdown from external repo and transform links
  */
-export const getStaticProps: GetStaticProps<WrappersDocsProps> = async ({ params }) => {
-  const page = pageMap.find(({ slug }) => slug === params.slug)
+export const getStaticProps: GetStaticProps = async (args) => {
+  const { params } = args
+  const federatedPage = pageMap.find(({ slug }) => slug === params.slug.at(0))
 
-  if (!page) {
-    throw new Error(`No page mapping found for slug '${params.slug}'`)
+  if (!federatedPage) {
+    const { props } = await getGuidesStaticProps('database/extensions/wrappers', args)
+    return {
+      props: {
+        source: props.mdxSource,
+        meta: props.frontmatter,
+      },
+    }
   }
 
-  const { remoteFile, meta } = page
+  const { remoteFile, meta } = federatedPage
   const repoPath = `${org}/${repo}/${branch}/${docsDir}/${remoteFile}`
   const repoEditPath = `${org}/${repo}/blob/${branch}/${docsDir}/${remoteFile}`
   const response = await fetch(`https://raw.githubusercontent.com/${repoPath}`)
@@ -169,12 +174,10 @@ export const getStaticProps: GetStaticProps<WrappersDocsProps> = async ({ params
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
+  const mdxPaths = (await getGuidesStaticPaths('database/extensions/wrappers')).paths
+  const federatedPaths = pageMap.map(({ slug }) => ({ params: { slug: [slug] } }))
   return {
-    paths: pageMap.map(({ slug }) => ({
-      params: {
-        slug,
-      },
-    })),
+    paths: [...federatedPaths, ...mdxPaths],
     fallback: false,
   }
 }
