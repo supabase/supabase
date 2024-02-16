@@ -1,6 +1,7 @@
 'use client'
 
 import { getAppStateSnapshot, useAppStateSnapshot } from '@/lib/state'
+import { copyToClipboard } from '@/lib/utils'
 import Image from 'next/image'
 import {
   Button,
@@ -14,18 +15,6 @@ import {
 } from 'ui'
 
 const SaveSchemaDropdown = () => {
-  const snap = useAppStateSnapshot()
-
-  const copyToClipboard = () => {
-    const snap = getAppStateSnapshot()
-    const focused = window.document.hasFocus()
-    if (focused) {
-      window.navigator?.clipboard?.writeText(snap.selectedCode)
-    } else {
-      console.warn('Unable to copy to clipboard')
-    }
-  }
-
   const downloadSQL = () => {
     const snap = getAppStateSnapshot()
     const blob = new Blob([snap.selectedCode], { type: 'text/plain' })
