@@ -1457,9 +1457,9 @@ export interface paths {
      * List all projects
      * @description Returns a list of all projects you've previously created.
      */
-    get: operations['ProjectsController_getProjects']
+    get: operations['V1ProjectsController_getProjects']
     /** Create a project */
-    post: operations['ProjectsController_createProject']
+    post: operations['V1ProjectsController_createProject']
   }
   '/v1/projects/{ref}/api-keys': {
     /** Get project api keys */
@@ -8806,29 +8806,29 @@ export interface operations {
     }
   }
   /**
-   * List all projects
-   * @description Returns a list of all projects you've previously created.
+   * Gets all projects that belong to the authenticated user
+   * @description Only returns the minimal project info
    */
   ProjectsController_getProjects: {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['V1ProjectResponse'][]
+          'application/json': components['schemas']['ProjectInfo'][]
         }
       }
     }
   }
-  /** Create a project */
+  /** Creates a project */
   ProjectsController_createProject: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['V1CreateProjectBody']
+        'application/json': components['schemas']['CreateProjectBody']
       }
     }
     responses: {
       201: {
         content: {
-          'application/json': components['schemas']['V1ProjectResponse']
+          'application/json': components['schemas']['CreateProjectResponse']
         }
       }
     }
@@ -11738,6 +11738,34 @@ export interface operations {
       /** @description Failed to update database branch */
       500: {
         content: never
+      }
+    }
+  }
+  /**
+   * List all projects
+   * @description Returns a list of all projects you've previously created.
+   */
+  V1ProjectsController_getProjects: {
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['V1ProjectResponse'][]
+        }
+      }
+    }
+  }
+  /** Create a project */
+  V1ProjectsController_createProject: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V1CreateProjectBody']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['V1ProjectResponse']
+        }
       }
     }
   }

@@ -175,7 +175,8 @@ const Wizard: NextPageWithLayout = () => {
       name: projectName.trim(),
       dbPass: dbPass,
       dbRegion: dbRegion,
-      dbPricingTierId: 'tier_free', // gets ignored due to org billing subscription anyway
+      // gets ignored due to org billing subscription anyway
+      dbPricingTierId: 'tier_free',
       // only set the instance size on pro+ plans. Free plans always use micro (nano in the future) size.
       dbInstanceSize: orgSubscription?.plan.id === 'free' ? undefined : instanceSize,
     }
