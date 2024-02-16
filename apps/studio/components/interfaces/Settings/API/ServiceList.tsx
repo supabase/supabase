@@ -20,6 +20,7 @@ import JWTSettings from './JWTSettings'
 import PostgrestConfig from './PostgrestConfig'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { PROJECT_STATUS } from 'lib/constants'
+import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 
 const ServiceList = () => {
   const { ui } = useStore()
@@ -36,6 +37,7 @@ const ServiceList = () => {
   })
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
   const { data: databases } = useReadReplicasQuery({ projectRef })
+  const { data: loadBalancers } = useLoadBalancersQuery({ projectRef })
 
   const { data } = useJwtSecretUpdatingStatusQuery({ projectRef })
   const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
@@ -74,6 +76,8 @@ const ServiceList = () => {
   const apiUrl = `${apiService?.protocol ?? 'https'}://${apiService?.endpoint ?? '-'}`
 
   const selectedDatabase = databases?.find((db) => db.identifier === state.selectedDatabaseId)
+  const loadBalancerSelected = state.selectedDatabaseId === 'load-balancer'
+  const replicaSelected = selectedDatabase?.identifier !== projectRef
 
   const primaryEndpoint = isCustomDomainActive
     ? `https://${customDomainData.customDomain.hostname}`
@@ -82,7 +86,9 @@ const ServiceList = () => {
     ? primaryEndpoint
     : isCustomDomainActive && state.selectedDatabaseId === projectRef
       ? `https://${customDomainData.customDomain.hostname}`
-      : selectedDatabase?.restUrl
+      : loadBalancerSelected
+        ? loadBalancers?.[0].endpoint ?? ''
+        : selectedDatabase?.restUrl
 
   return (
     <div>
@@ -106,7 +112,15 @@ const ServiceList = () => {
               title={
                 <div className="w-full flex items-center justify-between">
                   <h5 className="mb-0">Project URL</h5>
-                  {showReadReplicasUI && <DatabaseSelector />}
+                  {showReadReplicasUI && (
+                    <DatabaseSelector
+                      additionalOptions={
+                        (loadBalancers ?? []).length > 0
+                          ? [{ id: 'load-balancer', name: 'API Load Balancer' }]
+                          : []
+                      }
+                    />
+                  )}
                 </div>
               }
             >
@@ -133,7 +147,13 @@ const ServiceList = () => {
                     disabled
                     className="input-mono"
                     value={endpoint}
-                    descriptionText="A RESTful endpoint for querying and managing your database."
+                    descriptionText={
+                      loadBalancerSelected
+                        ? 'A RESTful endpoint for querying and managing your databases through your load balancer'
+                        : replicaSelected
+                          ? 'A RESTful endpoint for querying your read replica'
+                          : 'A RESTful endpoint for querying and managing your database'
+                    }
                     layout="horizontal"
                   />
                 )}
