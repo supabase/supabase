@@ -8,8 +8,8 @@ import Layout from '~/layouts/DefaultGuideLayout'
 import { getStorageConfigV0 } from '~/lib/mdx/getConfig'
 
 const meta = {
-  title: 'Realtime Self-hosting Config',
-  description: 'How to configure and deploy Supabase Realtime.',
+  title: 'Storage Self-hosting Config',
+  description: 'How to configure and deploy Supabase Storage.',
 }
 
 export const getStaticProps = (async () => {
