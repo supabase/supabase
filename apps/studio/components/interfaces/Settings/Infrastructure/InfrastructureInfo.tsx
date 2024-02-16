@@ -25,6 +25,7 @@ import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useFlag, useIsFeatureEnabled } from 'hooks'
 import ProjectUpgradeAlert from '../General/Infrastructure/ProjectUpgradeAlert'
 import InstanceConfiguration from './InfrastructureConfiguration/InstanceConfiguration'
+import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 
 const InfrastructureInfo = () => {
   const { ref } = useParams()

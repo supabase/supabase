@@ -26,7 +26,7 @@ const ServiceList = () => {
   const { ui } = useStore()
   const client = useQueryClient()
   const { project, isLoading } = useProjectContext()
-  const { ref: projectRef } = useParams()
+  const { ref: projectRef, source } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
 
   const readReplicasEnabled = useFlag('readReplicas')
@@ -47,6 +47,26 @@ const ServiceList = () => {
   const { Failed, Updated, Updating } = JwtSecretUpdateStatus
   const jwtSecretUpdateErrorMessage =
     JWT_SECRET_UPDATE_ERROR_MESSAGES[jwtSecretUpdateError as JwtSecretUpdateError]
+
+  // Get the API service
+  const isCustomDomainActive = customDomainData?.customDomain?.status === 'active'
+  const apiService = settings?.autoApiService
+  const apiUrl = `${apiService?.protocol ?? 'https'}://${apiService?.endpoint ?? '-'}`
+
+  const selectedDatabase = databases?.find((db) => db.identifier === state.selectedDatabaseId)
+  const loadBalancerSelected = state.selectedDatabaseId === 'load-balancer'
+  const replicaSelected = selectedDatabase?.identifier !== projectRef
+
+  const primaryEndpoint = isCustomDomainActive
+    ? `https://${customDomainData.customDomain.hostname}`
+    : apiUrl
+  const endpoint = !showReadReplicasUI
+    ? primaryEndpoint
+    : isCustomDomainActive && state.selectedDatabaseId === projectRef
+      ? `https://${customDomainData.customDomain.hostname}`
+      : loadBalancerSelected
+        ? loadBalancers?.[0].endpoint ?? ''
+        : selectedDatabase?.restUrl
 
   useEffect(() => {
     if (previousJwtSecretUpdateStatus.current === Updating) {
@@ -70,25 +90,11 @@ const ServiceList = () => {
     previousJwtSecretUpdateStatus.current = jwtSecretUpdateStatus
   }, [jwtSecretUpdateStatus])
 
-  // Get the API service
-  const isCustomDomainActive = customDomainData?.customDomain?.status === 'active'
-  const apiService = settings?.autoApiService
-  const apiUrl = `${apiService?.protocol ?? 'https'}://${apiService?.endpoint ?? '-'}`
-
-  const selectedDatabase = databases?.find((db) => db.identifier === state.selectedDatabaseId)
-  const loadBalancerSelected = state.selectedDatabaseId === 'load-balancer'
-  const replicaSelected = selectedDatabase?.identifier !== projectRef
-
-  const primaryEndpoint = isCustomDomainActive
-    ? `https://${customDomainData.customDomain.hostname}`
-    : apiUrl
-  const endpoint = !showReadReplicasUI
-    ? primaryEndpoint
-    : isCustomDomainActive && state.selectedDatabaseId === projectRef
-      ? `https://${customDomainData.customDomain.hostname}`
-      : loadBalancerSelected
-        ? loadBalancers?.[0].endpoint ?? ''
-        : selectedDatabase?.restUrl
+  useEffect(() => {
+    if (readReplicasEnabled && source !== undefined) {
+      state.setSelectedDatabaseId('load-balancer')
+    }
+  }, [source])
 
   return (
     <div>
@@ -150,7 +156,7 @@ const ServiceList = () => {
                     descriptionText={
                       loadBalancerSelected
                         ? 'A RESTful endpoint for querying and managing your databases through your load balancer'
-                        : replicaSelected
+                        : replicaSelected && showReadReplicasUI
                           ? 'A RESTful endpoint for querying your read replica'
                           : 'A RESTful endpoint for querying and managing your database'
                     }

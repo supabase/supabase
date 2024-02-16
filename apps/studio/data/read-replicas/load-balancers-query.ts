@@ -10,7 +10,7 @@ export type LoadBalancersVariables = {
   projectRef?: string
 }
 
-export type Database = components['schemas']['DatabaseDetailResponse']
+export type LoadBalancer = components['schemas']['LoadBalancerDetailResponse']
 
 export async function getLoadBalancers(
   { projectRef }: LoadBalancersVariables,
@@ -23,7 +23,7 @@ export async function getLoadBalancers(
     signal,
   })
 
-  if (error) throw error
+  if (error) throw new Error((error as ResponseError).message)
   return data
 }
 
