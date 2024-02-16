@@ -7,16 +7,12 @@ import DefaultLayout from '~/components/Layouts/Default'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { createAppAuth } from '@octokit/auth-app'
-import { Octokit } from '@octokit/core'
 import { Octokit as OctokitRest } from '@octokit/rest'
 import { paginateGraphql } from '@octokit/plugin-paginate-graphql'
 import { GetServerSideProps } from 'next'
 import Link from 'next/link'
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/outline'
 import { deletedDiscussions } from '~/lib/changelog.utils'
-
-export const ExtendedOctokit = Octokit.plugin(paginateGraphql)
-export type ExtendedOctokit = InstanceType<typeof ExtendedOctokit>
 
 export type Discussion = {
   id: string
@@ -98,6 +94,10 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
 
   // uses the graphql api
   async function fetchDiscussions(owner: string, repo: string, categoryId: string, cursor: string) {
+    const { Octokit } = await import('@octokit/core')
+    const ExtendedOctokit = Octokit.plugin(paginateGraphql)
+    type ExtendedOctokit = InstanceType<typeof ExtendedOctokit>
+
     const octokit = new ExtendedOctokit({
       authStrategy: createAppAuth,
       auth: {
