@@ -113,6 +113,20 @@ export const FRAMEWORKS: ConnectionType[] = [
     ],
   },
   {
+    key: 'astro',
+    label: 'Astro',
+    icon: 'astro',
+    guideLink: 'https://docs.astro.build/en/guides/backend/supabase/',
+    children: [
+      {
+        key: 'supabasejs',
+        label: 'Supabase-js',
+        children: [],
+        icon: 'supabase',
+      },
+    ],
+  },
+  {
     key: 'refine',
     label: 'refine',
     icon: 'refine',
