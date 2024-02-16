@@ -52,14 +52,10 @@ function Blog(props: any) {
       />
       <DefaultLayout>
         <h1 className="sr-only">Supabase blog</h1>
-        <div className="overflow-hidden py-6 lg:py-8">
-          <div className="md:container mx-auto px-4 sm:px-12 xl:px-18">
-            <div className="mx-auto">
-              {props.blogs.slice(0, 1).map((blog: any, i: number) => (
-                <FeaturedThumb key={i} {...blog} />
-              ))}
-            </div>
-          </div>
+        <div className="md:container mx-auto py-4 lg:py-10 px-4 sm:px-12 xl:px-16">
+          {props.blogs.slice(0, 1).map((blog: any, i: number) => (
+            <FeaturedThumb key={i} {...blog} />
+          ))}
         </div>
 
         <div className="border-default border-t">

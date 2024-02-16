@@ -19,7 +19,7 @@ function FeaturedThumb(blog: PostTypes) {
   }
 
   return (
-    <div key={blog.slug} className="w-full cursor-pointer">
+    <div key={blog.slug} className="w-full">
       <Link
         href={`${blog.path}`}
         className="grid gap-4 lg:grid-cols-7 lg:gap-8 xl:gap-12 hover:bg-overlay border border-transparent hover:border-overlay p-2 sm:p-4 rounded-xl"
@@ -32,7 +32,7 @@ function FeaturedThumb(blog: PostTypes) {
             alt="blog thumbnail"
           />
         </div>
-        <div className="flex flex-col space-y-2 lg:col-span-4 xl:justify-center">
+        <div className="flex flex-col space-y-2 lg:col-span-4 xl:justify-center max-w-xl">
           <div className="text-lighter flex space-x-2 text-sm">
             <span>{blog.date}</span>
             <span>•</span>
