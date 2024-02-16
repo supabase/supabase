@@ -1,3 +1,11 @@
+// Import Swiper styles
+import 'swiper/swiper.min.css'
+
+import { NextSeo } from 'next-seo'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
 import { Badge, Button, IconArrowUpRight, IconX, Tabs } from 'ui'
 // data
 import ApiExamplesData from 'data/products/database/api-examples'
@@ -5,18 +13,10 @@ import ExtensionsExamplesData from 'data/products/database/extensions-examples'
 import SqlViewCarouselData from 'data/products/database/sql-view-carousel.json'
 import TableViewCarouselData from 'data/products/database/table-view-carousel.json'
 import Solutions from 'data/Solutions'
-import { NextSeo } from 'next-seo'
-import Image from 'next/image'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
-// Import Swiper styles
-import 'swiper/swiper.min.css'
 import ImageCarousel from '~/components/Carousels/ImageCarousel'
 import SplitCodeBlockCarousel from '~/components/Carousels/SplitCodeBlockCarousel'
 import FeatureColumn from '~/components/FeatureColumn'
-import FloatingIcons from '~/components/FloatingIcons'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import ProductIcon from '~/components/ProductIcon'
@@ -25,9 +25,6 @@ import GithubExamples from '~/components/Sections/GithubExamples'
 import ProductHeader from '~/components/Sections/ProductHeader'
 import { ThemeImage } from 'ui-patterns/ThemeImage'
 import { TweetCard } from 'ui-patterns/TweetCard'
-
-// install Swiper's Controller component
-// SwiperCore.use([Controller])
 
 function Database() {
   // base path for images
@@ -234,23 +231,28 @@ function Database() {
             ]}
             footer={[
               <div className="grid grid-cols-12" key={0}>
-                <div className="col-span-12 mt-0 flex lg:col-span-6 xl:col-span-12 xl:mb-8">
-                  <p className="text-foreground-light m-0">Libraries coming soon:</p>
-                  <div className="ml-1 space-x-1">
-                    <Badge dot={false}>Python</Badge>
-                    <Badge dot={false}>Dart</Badge>
-                    <Badge dot={false}>C#</Badge>
-                    <Badge dot={false}>Kotlin</Badge>
+                <div className="col-span-12 mt-0 flex flex-col 2xl:flex-row lg:col-span-6 xl:col-span-12 xl:mb-8 gap-1">
+                  <p className="text-foreground-light m-0">Available libraries:</p>
+                  <div className="flex gap-1">
+                    <Link href="/docs/reference/javascript/introduction" target="_blank">
+                      <Badge dot={false}>Javascript</Badge>
+                    </Link>
+                    <Link href="/docs/reference/dart/introduction" target="_blank">
+                      <Badge dot={false}>Flutter</Badge>
+                    </Link>
+                    <Link href="/docs/reference/python/introduction" target="_blank">
+                      <Badge dot={false}>Python</Badge>
+                    </Link>
+                    <Link href="/docs/reference/csharp/introduction" target="_blank">
+                      <Badge dot={false}>C#</Badge>
+                    </Link>
+                    <Link href="/docs/reference/kotlin/introduction" target="_blank">
+                      <Badge dot={false}>Kotlin</Badge>
+                    </Link>
+                    <Link href="/docs/reference/swift/introduction" target="_blank">
+                      <Badge dot={false}>Swift</Badge>
+                    </Link>
                   </div>
-                </div>
-                <div className="col-span-12 hidden lg:col-span-6 xl:col-span-10 xl:block" key={1}>
-                  {/* <TweetCard
-                    handle="@eunjae_lee"
-                    img_url="https://pbs.twimg.com/profile_images/1188191474401320965/eGjSYbQd_400x400.jpg"
-                    quote="So they just help me use @PostgreSQL better. They don't try to invent a wheel and trap me
-          in it. Whereas they provide a good abstraction overall, they also provide a raw access to
-          the database."
-                  /> */}
                 </div>
               </div>,
             ]}
@@ -264,7 +266,6 @@ function Database() {
               <div className="section--bg border-t border-b border-control"></div>
             </div>
             <div className="section-container pt-12 pb-0">
-              <FloatingIcons />
               <div className="overflow-x-hidden">
                 <SectionContainer className="mb-0 pb-8 lg:pt-32">
                   <GithubExamples />
@@ -274,7 +275,7 @@ function Database() {
           </div>
         </div>
 
-        <SectionContainer className="lg:py-48">
+        <SectionContainer>
           <div className="grid grid-cols-12 lg:gap-16">
             <div className="col-span-12 mb-8 lg:col-span-6 xl:col-span-5">
               <h2 className="h3">Extend your database</h2>
