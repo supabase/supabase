@@ -4,7 +4,6 @@ import { ReactNode } from 'react'
 import { Badge, IconArrowUpRight, IconLogOut, Menu } from 'ui'
 
 import { useFlag } from 'hooks'
-import { LayoutWrapper } from '../LayoutWrapper'
 import LayoutHeader from '../ProjectLayout/LayoutHeader'
 import { SidebarLink, SidebarSection } from './AccountLayout.types'
 
@@ -35,12 +34,12 @@ const WithSidebar = ({
   const navLayoutV2 = useFlag('navigationLayoutV2')
 
   return (
-    <div className="flex max-h-full">
+    <div className="flex h-full">
       {!hideSidebar && !noContent && (
-        <LayoutWrapper
+        <div
           id="with-sidebar"
           className={[
-            'h-full bg-background',
+            'h-full bg-studio',
             'hide-scrollbar w-64 overflow-auto border-r border-default',
           ].join(' ')}
         >
@@ -77,11 +76,11 @@ const WithSidebar = ({
               })}
             </Menu>
           </div>
-        </LayoutWrapper>
+        </div>
       )}
       <div className="flex flex-1 flex-col">
         {!navLayoutV2 && <LayoutHeader breadcrumbs={breadcrumbs} />}
-        <div className="flex-1 flex-grow overflow-auto">{children}</div>
+        <div className="flex-1 flex-grow overflow-y-auto">{children}</div>
       </div>
     </div>
   )

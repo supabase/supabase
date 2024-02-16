@@ -568,6 +568,8 @@ const SQLEditor = () => {
         buttonLabel="Run destructive query"
         onSelectCancel={() => {
           setIsConfirmModalOpen(false)
+          // [Joshen] Somehow calling this immediately doesn't work, hence the timeout
+          setTimeout(() => editorRef.current?.focus(), 100)
         }}
         onSelectConfirm={() => {
           setIsConfirmModalOpen(false)
@@ -607,7 +609,7 @@ const SQLEditor = () => {
                   <AiIconAnimation loading={isAiLoading} />
                 </motion.div>
 
-                <AnimatePresence initial={false} exitBeforeEnter>
+                <AnimatePresence initial={false} mode="wait">
                   {debugSolution && (
                     <div className="h-full w-full flex flex-row items-center overflow-y-hidden text-sm text-white">
                       {debugSolution}

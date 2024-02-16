@@ -98,8 +98,8 @@ const InputWithSuggestions = ({
               <Tooltip.Root delayDuration={0}>
                 <DropdownMenuTrigger asChild>
                   <Tooltip.Trigger asChild>
-                    <Button type="default" className="!px-1 mr-1">
-                      <IconList strokeWidth={1.5} />
+                    <Button type="default" className="!px-1 mr-0.5">
+                      <IconList strokeWidth={1.5} size={14} />
                     </Button>
                   </Tooltip.Trigger>
                 </DropdownMenuTrigger>

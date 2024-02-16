@@ -1,9 +1,9 @@
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@ui/components/shadcn/ui/accordion'
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from '../ui/accordion'
 // Button.stories.ts|tsx
 
 import type { Meta, StoryObj } from '@storybook/react'

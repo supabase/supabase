@@ -42,6 +42,14 @@ export const prettifyJSON = (minifiedJSON: string) => {
   }
 }
 
+export const removeJSONTrailingComma = (jsonString: string) => {
+  /**
+   * Remove trailing commas: Delete any comma immediately preceding the closing brace '}' or
+   * bracket ']' using a regular expression.
+   */
+  return jsonString.replace(/,\s*(?=[\}\]])/g, '')
+}
+
 export const uuidv4 = () => {
   return _uuidV4()
 }
@@ -55,8 +63,8 @@ export const getURL = () => {
     process?.env?.NEXT_PUBLIC_SITE_URL && process.env.NEXT_PUBLIC_SITE_URL !== ''
       ? process.env.NEXT_PUBLIC_SITE_URL
       : process?.env?.VERCEL_URL && process.env.VERCEL_URL !== ''
-      ? process.env.VERCEL_URL
-      : 'https://supabase.com/dashboard'
+        ? process.env.VERCEL_URL
+        : 'https://supabase.com/dashboard'
   return url.includes('http') ? url : `https://${url}`
 }
 
@@ -211,6 +219,7 @@ export const detectBrowser = () => {
 }
 
 export const detectOS = () => {
+  if (typeof window === 'undefined' || !window) return undefined
   if (typeof navigator === 'undefined' || !navigator) return undefined
 
   const userAgent = window.navigator.userAgent.toLowerCase()

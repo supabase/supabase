@@ -58,7 +58,7 @@ export const AVAILABLE_REPLICA_REGIONS: Region[] = Object.keys(AWS_REGIONS)
   .map((key) => {
     return {
       key: key as AWS_REGIONS_KEYS,
-      name: AWS_REGIONS[key as AWS_REGIONS_KEYS],
+      name: AWS_REGIONS?.[key as AWS_REGIONS_KEYS],
       region: AWS_REGIONS_VALUES[key],
       coordinates: AWS_REGIONS_COORDINATES[key],
     }

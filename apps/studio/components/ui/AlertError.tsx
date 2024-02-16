@@ -25,13 +25,17 @@ const AlertError = ({ ref, subject, error, className }: AlertErrorProps) => {
   if (subjectString) href += `&subject=${subjectString}`
   if (error) href += `&message=Error:%20${error.message}`
 
+  const formattedErrorMessage = error?.message.includes('503')
+    ? '503 Service Temporarily Unavailable'
+    : error?.message
+
   return (
     <Alert_Shadcn_ className={className} variant="warning" title={subject}>
       <IconAlertCircle className="h-4 w-4" strokeWidth={2} />
       <AlertTitle_Shadcn_>{subject}</AlertTitle_Shadcn_>
       <AlertDescription_Shadcn_ className="flex flex-col gap-3">
         <div>
-          {error?.message && <p>Error: {error?.message}</p>}
+          {error?.message && <p>Error: {formattedErrorMessage}</p>}
           <p>
             Try refreshing your browser, but if the issue persists, please reach out to us via
             support.

@@ -9,18 +9,19 @@ import { createClient } from '@supabase/supabase-js'
 import { QueryClientProvider, useQueryClient } from '@tanstack/react-query'
 import { AuthProvider, ThemeProvider, useTelemetryProps, useThemeSandbox } from 'common'
 import { useRouter } from 'next/router'
-import { type PropsWithChildren, useCallback, useEffect, useState } from 'react'
-import { AppPropsWithLayout } from 'types'
-import { CommandMenuProvider, PortalToast, useConsent } from 'ui'
-import { TabsProvider } from 'ui/src/components/Tabs'
+import { useCallback, useEffect, useState, type PropsWithChildren } from 'react'
+import { CommandMenuProvider, PortalToast, TabsProvider } from 'ui'
+import { useConsent } from 'ui-patterns/ConsentToast'
+
 import Favicons from '~/components/Favicons'
 import { IPv4DeprecationBanner } from '~/components/IPv4DeprecationBanner'
 import SiteLayout from '~/layouts/SiteLayout'
 import { IS_PLATFORM } from '~/lib/constants'
 import { unauthedAllowedPost } from '~/lib/fetch/fetchWrappers'
 import { useRootQueryClient } from '~/lib/fetch/queryClient'
-import { useOnLogout } from '~/lib/userAuth'
 import { LOCAL_STORAGE_KEYS, remove } from '~/lib/storage'
+import { useOnLogout } from '~/lib/userAuth'
+import { AppPropsWithLayout } from '~/types'
 
 /**
  *
@@ -191,16 +192,18 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     <>
       <QueryClientProvider client={queryClient}>
         <Favicons />
-        <IPv4DeprecationBanner />
         <AuthContainer>
           <SignOutHandler>
             <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
               <CommandMenuProvider site="docs">
                 <TabsProvider>
-                  <SiteLayout>
-                    <PortalToast />
-                    <Component {...pageProps} />
-                  </SiteLayout>
+                  <div className="h-screen flex flex-col">
+                    <IPv4DeprecationBanner />
+                    <SiteLayout>
+                      <PortalToast />
+                      <Component {...pageProps} />
+                    </SiteLayout>
+                  </div>
                 </TabsProvider>
               </CommandMenuProvider>
             </ThemeProvider>

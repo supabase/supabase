@@ -11,7 +11,13 @@ export const meta = {
 
 This guide shows you how to set up your local Supabase development environment that integrates with GitHub Actions to automatically test and release schema changes to staging and production Supabase projects.
 
-![Deploy migration](/docs/img/guides/cli/cicd-github.png)
+<Image
+  alt="Diagram showing a possible environment setup for Supabase development. There are 3 branches and 3 corresponding databases: feature branch and local database, develop branch and staging database, and main branch and production database."
+  src={{
+    light: '/docs/img/local-dev-environment--light.svg',
+    dark: '/docs/img/local-dev-environment.svg',
+  }}
+/>
 
 ## Set up a local environment
 
@@ -153,7 +159,13 @@ Without the `-f` file flag, the output is written to stdout by default.
 
 In a production environment, we recommend using a CI/CD pipeline to deploy new migrations with GitHub Actions rather than deploying from your local machine.
 
-![Deploy migration](/docs/img/guides/cli/cicd-github.png)
+<Image
+  alt="Diagram showing a possible environment setup for Supabase development. There are 3 branches and 3 corresponding databases: feature branch and local database, develop branch and staging database, and main branch and production database."
+  src={{
+    light: '/docs/img/local-dev-environment--light.svg',
+    dark: '/docs/img/local-dev-environment.svg',
+  }}
+/>
 
 This example uses two Supabase projects, one for production and one for staging.
 

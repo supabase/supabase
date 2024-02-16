@@ -56,36 +56,40 @@ COPY countries (name, code) FROM 'seed/countries.csv' WITH (FORMAT csv);
 
 You can generate seed data for local development using [Snaplet](https://www.snaplet.dev/).
 
-Let's generate some seed data for a typical blog application, with the following schema:
+If this is your first time using Snaplet to seed your project, you'll need to setup Snaplet
+for your project with `npx snaplet setup`, and follow the interactive prompts. `snaplet setup`
+will look at your database and its structure, and use it to generate the configuration files
+and assets needed by `@snaplet/seed`.
+
+Suppose you have a database with the following schema:
 
 ![An example schema](/docs/img/guides/cli/snaplet-example-schema.png)
 
-We can use the Snaplet configuration file to define the values you want to generate. For example
+You can use the Snaplet configuration file `seed.mts` to define the values you want to generate. For example
 
 - A `Post` with the title `"There is a lot of snow around here!"`
 - The `Post.createdBy` user with an email address ending in `"@acme.org"`
 - Three `Post.comments` from three different users.
 
-```ts snaplet.config.ts
-import { defineConfig } from 'snaplet'
+```ts seed.mts
+import { createSeedClient } from '@snaplet/seed'
 import { copycat } from '@snaplet/copycat'
 
-export default defineConfig({
-   generate: {
-      async run(snaplet) {
-        await snaplet.posts({
-          title: "There is a lot of snow around here!"
-          userByCreatedBy: {
-            email: copycat.email(seed, { domain: 'acme.org' })
-          },
-          comments: (x) => x(3)
-        })
-      }
-   }
-})
+const seed = await createSeedClient();
+
+await seed.posts([{
+  title: "There is a lot of snow around here!"
+  createdBy: {
+    email: (ctx) =>
+      copycat.email(ctx.seed, {
+        domain: 'acme.org',
+      })
+  },
+  comments: (x) => x(3)
+}])
 ```
 
-Running `npx snaplet generate --sql > supabase/seed.sql` would generate these relevant SQL statements inside our `supabase/seed.sql` file:
+Running `npx tsx seed.mts > supabase/seed.sql` generates the relevant SQL statements inside your `supabase/seed.sql` file:
 
 ```sql
 -- The `Post.createdBy` user with an email address ending in `"@acme.org"`
@@ -108,7 +112,10 @@ INSERT INTO "User" (name, email) VALUES ("Steven Plank", "s@plank.org")
 INSERT INTO "Comment" (text, userId, postId) VALUES ("Actually, that's not correct...", 4, 1)
 ```
 
-For more information, check out Snaplet's ["generate" documentation](https://docs.snaplet.dev/getting-started/quick-start/generate)
+Whenever your database structure changes, `@snaplet/seed` will need to be regenerated so that it is
+in sync with your new database structure. You can do this by running `npx snaplet generate`.
+
+For more information, check out Snaplet's [seed documentation](https://docs.snaplet.dev/core-concepts/seed)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

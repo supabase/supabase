@@ -1,6 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useParams } from 'common'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -9,7 +10,6 @@ import {
   Button,
   Input,
 } from 'ui'
-import { useRouter } from 'next/router'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
@@ -54,7 +54,6 @@ const InfrastructureInfo = () => {
   const currentPgVersion = (current_app_version ?? '').split('supabase-postgres-')[1]
   const latestPgVersion = (latest_app_version ?? '').split('supabase-postgres-')[1]
 
-  const showDbUpgrades = useFlag('databaseUpgrades')
   const readReplicasEnabled = useFlag('readReplicas')
   const showReadReplicasUI = readReplicasEnabled && project?.is_read_replicas_enabled
   const hasReadReplicas = (databases ?? []).length > 1
@@ -187,8 +186,8 @@ const InfrastructureInfo = () => {
                     ),
                   ]}
                 />
-                {showDbUpgrades && data?.eligible && !hasReadReplicas && <ProjectUpgradeAlert />}
-                {showDbUpgrades && data.eligible && hasReadReplicas && (
+                {data?.eligible && !hasReadReplicas && <ProjectUpgradeAlert />}
+                {data.eligible && hasReadReplicas && (
                   <Alert_Shadcn_>
                     <AlertTitle_Shadcn_>
                       A new version of Postgres is available for your project
@@ -199,7 +198,7 @@ const InfrastructureInfo = () => {
                     </AlertDescription_Shadcn_>
                   </Alert_Shadcn_>
                 )}
-                {showDbUpgrades && !data?.eligible && data?.requires_manual_intervention && (
+                {!data?.eligible && data?.requires_manual_intervention && (
                   <Alert_Shadcn_ title="A new version of Postgres is available for your project">
                     <AlertTitle_Shadcn_>
                       A new version of Postgres is available for your project
@@ -221,49 +220,47 @@ const InfrastructureInfo = () => {
                     </AlertDescription_Shadcn_>
                   </Alert_Shadcn_>
                 )}
-                {showDbUpgrades &&
-                  !data?.eligible &&
-                  (data?.extension_dependent_objects || []).length > 0 && (
-                    <Alert_Shadcn_
-                      variant="warning"
-                      title="A new version of Postgres is available for your project"
-                    >
-                      <AlertTitle_Shadcn_>New version of Postgres available</AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_ className="flex flex-col gap-3">
-                        <div>
-                          <p className="mb-1">
-                            This project cannot be upgraded due to the following extension dependent
-                            objects:
-                          </p>
-
-                          <ul className="pl-4">
-                            {(data?.extension_dependent_objects || []).map((obj) => (
-                              <li className="list-disc" key={obj}>
-                                {obj}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                        <p>
-                          Once the above objects are exported and removed, you can proceed to
-                          upgrade your project, and re-import the objects after the upgrade
-                          operation is complete. Please refer to the docs on additional extensions
-                          that might also need to be dropped.
+                {!data?.eligible && (data?.extension_dependent_objects || []).length > 0 && (
+                  <Alert_Shadcn_
+                    variant="warning"
+                    title="A new version of Postgres is available for your project"
+                  >
+                    <AlertTitle_Shadcn_>New version of Postgres available</AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+                      <div>
+                        <p className="mb-1">
+                          This project cannot be upgraded due to the following extension dependent
+                          objects:
                         </p>
-                        <div>
-                          <Button size="tiny" type="default" asChild>
-                            <Link
-                              href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats"
-                              target="_blank"
-                              rel="noreferrer"
-                            >
-                              View docs
-                            </Link>
-                          </Button>
-                        </div>
-                      </AlertDescription_Shadcn_>
-                    </Alert_Shadcn_>
-                  )}
+
+                        <ul className="pl-4">
+                          {(data?.extension_dependent_objects || []).map((obj) => (
+                            <li className="list-disc" key={obj}>
+                              {obj}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      <p>
+                        Once the above objects are exported and removed, you can proceed to upgrade
+                        your project, and re-import the objects after the upgrade operation is
+                        complete. Please refer to the docs on additional extensions that might also
+                        need to be dropped.
+                      </p>
+                      <div>
+                        <Button size="tiny" type="default" asChild>
+                          <Link
+                            href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            View docs
+                          </Link>
+                        </Button>
+                      </div>
+                    </AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
+                )}
               </>
             )}
           </ScaffoldSectionContent>
