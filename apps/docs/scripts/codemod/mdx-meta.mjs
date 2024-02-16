@@ -7,7 +7,7 @@
  * Also deletes import and export statements.
  */
 
-let SUB_DIR = 'ai'
+let SUB_DIR = 'self-hosting'
 
 import { parse } from 'acorn'
 import { fromMarkdown } from 'mdast-util-from-markdown'
