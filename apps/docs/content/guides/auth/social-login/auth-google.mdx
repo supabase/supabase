@@ -301,11 +301,33 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
 
   <TabPanel id="android" label="Android (Kotlin)">
 
+    ## Using native sign in with Google in Android
+
     Unlike the OAuth flow which requires the use of a web browser, the native Sign in with Google flow on Android uses the [operating system's built-in functionalities](https://developer.android.com/training/sign-in/credential-manager) to prompt the user for consent.
 
     When the user provides consent, Google issues an identity token (commonly abbreviated as ID token) that is then sent to your project's Supabase Auth server. When valid, a new user session is started by issuing an access and refresh token from Supabase Auth.
 
+    You can follow the official [Credential Manager guide](https://developer.android.com/training/sign-in/credential-manager) from Google to learn more about the sign-in flow.
+
     **Note:** You have to create OAuth client IDs for both a Web and Android application. The Web client ID is the one used in your Android app.
+
+    Add the following dependencies to your app. You can find the latest version of `credentials` [here](https://developer.android.com/jetpack/androidx/releases/credentials) and `googleid` [here](https://developers.google.com/identity/android-credential-manager/releases).
+
+    ```kotlin
+    implementation("androidx.credentials:credentials:<latest version>")
+    implementation ("com.google.android.libraries.identity.googleid:googleid:<latest version>")
+    ```
+
+    Add the following proguard rules to your `proguard-rules.pro` file:
+
+    ```proguard
+    -if class androidx.credentials.CredentialManager
+    -keep class androidx.credentials.playservices.** {
+      *;
+    }
+    ```
+
+    Follow the code sample below to implement native Google sign-in with Supabase using Credential Manager in your Android app.
 
     ```kotlin
     @Composable
@@ -326,7 +348,7 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
 
             val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
                 .setFilterByAuthorizedAccounts(false)
-                .setServerClientId("YOUR_WEB_CLIENT_ID")
+                .setServerClientId("WEB_GOOGLE_CLIENT_ID")
                 .setNonce(hashedNonce)
                 .build()
 
@@ -352,15 +374,15 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
                         nonce = rawNonce
                     }
 
-                    Toast.makeText(context, "You are now signed in!", Toast.LENGTH_SHORT).show()
+                    // Handle successful sign-in
                 } catch (e: GetCredentialException) {
-                    Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+                    // Handle GetCredentialException thrown by `credentialManager.getCredential()`
                 } catch (e: GoogleIdTokenParsingException) {
-                    Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+                    // Handle GoogleIdTokenParsingException thrown by `GoogleIdTokenCredential.createFrom()`
                 } catch (e: RestException) {
-                    Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+                    // Handle RestException thrown by Supabase
                 } catch (e: Exception) {
-                    Toast.makeText(context, e.message ?: "Unknown Exception", Toast.LENGTH_SHORT).show()
+                    // Handle unknown exceptions
                 }
             }
         }
