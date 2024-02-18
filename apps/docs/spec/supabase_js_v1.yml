@@ -801,9 +801,7 @@ functions:
           Sometimes you will need to query the same foreign table twice.
           In this case, you can use the name of the joined column to identify
           which join you intend to use. For convenience, you can also give an
-          alias for each column. For example, if we had a shop of products,
-          and we wanted to get the supplier and the purchaser at the same time
-          (both in the users) table:
+          alias for each column.
         code: |
           ```js
           const { data, error } = await supabase
