@@ -126,6 +126,20 @@ export const FRAMEWORKS: ConnectionType[] = [
       },
     ],
   },
+  {
+    key: 'exporeactnative',
+    label: 'Expo React Native',
+    icon: 'expo',
+    guideLink: 'https://supabase.com/docs/guides/getting-started/tutorials/with-expo-react-native',
+    children: [
+      {
+        key: 'supabasejs',
+        label: 'Supabase-js',
+        children: [],
+        icon: 'supabase',
+      },
+    ],
+  },
 ]
 
 export const ORMS: ConnectionType[] = [
