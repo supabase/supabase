@@ -3,7 +3,6 @@ import { expect, test } from '@playwright/test'
 test.describe('Table Editor page', () => {
   test('should create a column and insert a row', async ({ page }) => {
     const name = 'TestTable' + Math.floor(Math.random() * 10)
-    console.log(name)
 
     await page.goto('/project/default/editor')
     await page.getByRole('button', { name: 'New table', exact: true }).click()
