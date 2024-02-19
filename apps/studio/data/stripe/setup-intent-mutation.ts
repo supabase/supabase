@@ -10,7 +10,6 @@ export type SetupIntentVariables = {
 
 export async function setupIntent({ hcaptchaToken }: SetupIntentVariables) {
   const { data, error } = await post('/platform/stripe/setup-intent', {
-    // @ts-ignore [Joshen] API seems to be having the wrong spec
     body: { hcaptchaToken },
   })
   if (error) throw error

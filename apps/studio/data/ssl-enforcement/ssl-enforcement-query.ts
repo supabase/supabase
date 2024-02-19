@@ -1,7 +1,6 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
 import { API_ADMIN_URL } from 'lib/constants'
-import { useCallback } from 'react'
 import { sslEnforcementKeys } from './keys'
 
 export type SSLEnforcementVariables = { projectRef?: string }
@@ -59,15 +58,3 @@ export const useSSLEnforcementQuery = <TData = SSLEnforcementData>(
     ({ signal }) => getSSLEnforcementConfiguration({ projectRef }, signal),
     { enabled: enabled && typeof projectRef !== 'undefined', ...options }
   )
-
-export const useSSLEnforcementPrefetch = ({ projectRef }: SSLEnforcementVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (projectRef) {
-      client.prefetchQuery(sslEnforcementKeys.list(projectRef), ({ signal }) =>
-        getSSLEnforcementConfiguration({ projectRef }, signal)
-      )
-    }
-  }, [projectRef])
-}

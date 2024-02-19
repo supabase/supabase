@@ -7,10 +7,11 @@
 
 import rangeParser from 'parse-numeric-range'
 import Highlight, { Language, defaultProps } from 'prism-react-renderer'
-import defaultTheme from 'prism-react-renderer/themes/palenight'
+import darkTheme from 'prism-react-renderer/themes/vsDark'
+import lightTheme from 'prism-react-renderer/themes/nightOwlLight'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
-
+import { useTheme } from 'next-themes'
 import { copyToClipboard } from 'lib/helpers'
 
 const highlightLinesRangeRegex = /{([\d,-]+)}/
@@ -20,6 +21,7 @@ const prism = {
 }
 
 interface SimpleCodeBlockProps {
+  parentClassName?: string
   className?: string
   metastring?: string
   showCopy?: boolean
@@ -27,10 +29,12 @@ interface SimpleCodeBlockProps {
 
 const SimpleCodeBlock = ({
   children,
+  parentClassName,
   className: languageClassName,
   metastring,
   showCopy = true,
 }: PropsWithChildren<SimpleCodeBlockProps>) => {
+  const { resolvedTheme } = useTheme()
   const [showCopied, setShowCopied] = useState(false)
   const target = useRef(null)
   const button = useRef(null)
@@ -60,14 +64,14 @@ const SimpleCodeBlock = ({
   return (
     <Highlight
       {...defaultProps}
-      theme={(prism as any).theme || defaultTheme}
+      theme={(prism as any).theme || resolvedTheme === 'dark' ? darkTheme : lightTheme}
       code={(children as string)?.trim() ?? ''}
       language={language as Language}
     >
       {({ className, tokens, getLineProps, getTokenProps }) => {
         return (
           <div className="Code codeBlockWrapper group">
-            <pre ref={target} className={`codeBlock ${className}`}>
+            <pre ref={target} className={`codeBlock ${className} ${parentClassName}`}>
               {tokens.map((line, i) => {
                 const lineProps = getLineProps({ line, key: i })
 

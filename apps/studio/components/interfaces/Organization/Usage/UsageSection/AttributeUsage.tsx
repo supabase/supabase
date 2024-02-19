@@ -6,7 +6,7 @@ import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import SparkBar from 'components/ui/SparkBar'
-import { OrgSubscription } from 'data/subscriptions/org-subscription-query'
+import { OrgSubscription } from 'data/subscriptions/types'
 import { OrgMetricsUsage, OrgUsageResponse } from 'data/usage/org-usage-query'
 import { USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
 import { useMemo } from 'react'
@@ -159,9 +159,9 @@ const AttributeUsage = ({
                               ? 'bg-foreground-light'
                               : 'bg-red-900'
                             : usageBasedBilling === false &&
-                              usageRatio >= USAGE_APPROACHING_THRESHOLD
-                            ? 'bg-amber-900'
-                            : 'bg-foreground-light'
+                                usageRatio >= USAGE_APPROACHING_THRESHOLD
+                              ? 'bg-amber-900'
+                              : 'bg-foreground-light'
                         )}
                         bgClass="bg-surface-300"
                         value={usageMeta?.usage ?? 0}
@@ -205,8 +205,8 @@ const AttributeUsage = ({
                                 {(usageMeta?.pricing_free_units ?? 0) === -1 || usageExcess < 0
                                   ? `0${attribute.unit === 'bytes' ? ' GB' : ''}`
                                   : attribute.unit === 'bytes'
-                                  ? `${usageExcess.toFixed(2)} GB`
-                                  : usageExcess.toLocaleString()}
+                                    ? `${usageExcess.toFixed(2)} GB`
+                                    : usageExcess.toLocaleString()}
                               </p>
                             </div>
                           )}

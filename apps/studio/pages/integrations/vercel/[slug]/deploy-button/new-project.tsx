@@ -57,6 +57,7 @@ const CreateProject = () => {
   const selectedOrganization = useSelectedOrganization()
   const [projectName, setProjectName] = useState('')
   const [dbPass, setDbPass] = useState('')
+  const [instanceSize, setInstanceSize] = useState('micro')
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(-1)
   const [shouldRunMigrations, setShouldRunMigrations] = useState(true)
@@ -217,6 +218,7 @@ const CreateProject = () => {
             connection: {
               foreign_project_id: foreignProjectId,
               supabase_project_ref: newProjectRef,
+              integration_id: '0',
               metadata: {
                 ...projectDetails,
                 supabaseConfig: {
@@ -245,7 +247,7 @@ const CreateProject = () => {
   )
 
   return (
-    <div className="">
+    <div>
       <p className="mb-2">Supabase project details</p>
       <div className="py-2">
         <Input

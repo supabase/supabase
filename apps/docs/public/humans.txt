@@ -33,6 +33,7 @@ Jess Shears
 Joel Lee
 Jon M
 Jonny Summers-Muir
+Jordi Enric
 Joshen Lim
 Kamil Ogórek
 Kang Ming Tay
@@ -66,6 +67,8 @@ Supun Sudaraka Kalidasa
 Terry Sutton
 Thomas E
 Thor Schaeff
+Tom Ashley
+Tyler Hillery
 Tyler Fontaine
 Tyler Shukert
 TzeYiing L

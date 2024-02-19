@@ -23,9 +23,7 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
   const { data: organizations } = useOrganizationsQuery()
   const selectedOrganization = useSelectedOrganization()
 
-  const ongoingIncident = useFlag('ongoingIncident')
   const navLayoutV2 = useFlag('navigationLayoutV2')
-  const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
 
   const signOut = useSignOut()
   const onClickLogout = async () => {
@@ -152,25 +150,18 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
         <title>{title ? `${title} | Supabase` : 'Supabase'}</title>
         <meta name="description" content="Supabase Studio" />
       </Head>
-      <div className="flex h-full">
-        <main
-          style={{ height: maxHeight, maxHeight }}
-          className="flex flex-col flex-1 w-full overflow-y-auto"
+      <div className="h-full min-h-[0px] basis-0 flex-1">
+        <WithSidebar
+          hideSidebar={navLayoutV2}
+          title={title}
+          breadcrumbs={breadcrumbs}
+          sections={sectionsWithHeaders}
         >
-          <WithSidebar
-            hideSidebar={navLayoutV2}
-            title={title}
-            breadcrumbs={breadcrumbs}
-            sections={sectionsWithHeaders}
-          >
-            {children}
-          </WithSidebar>
-        </main>
+          {children}
+        </WithSidebar>
       </div>
     </>
   )
 }
 
 export default withAuth(AccountLayout)
-
-export const AccountLayoutWithoutAuth = AccountLayout

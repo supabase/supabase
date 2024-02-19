@@ -6,17 +6,6 @@ Supabase Reference Docs
 
 If you are a maintainer of any tools in the Supabase ecosystem, you can use this site to provide documentation for the tools & libraries that you maintain.
 
-## Types of docs
-
-There are many types of docs:
-
-1. Guides: teach developers how to use a product. "I have XX problem, how do I solve it?"
-2. Tutorials: walk-throughs, have a large outcome. "Build a React application with Supabase".
-3. Explanations: teach developers about a broad topic. "What is a database?"
-4. Reference: technical descriptions of tools and how to use them. "What errors does the API return?"
-
-In these docs, you should focus only on the fourth type: "Reference Docs".
-
 ## Versioning
 
 All tools have versioned docs, which are kept in separate folders. For example, the CLI has the following folders and files:
@@ -43,3 +32,7 @@ We use documentation specifications which can be used to generate human-readable
 
 The benefit of using custom specifications is that we can generate many other types from a strict schema (eg, HTML and manpages).
 It also means that we can switch to any documentation system we want. On this site we use Next.JS, but on Supabase's official website, we use a custom React site and expose only a subset of the available API for each tool.
+
+## Contributing
+
+To contribute to docs, see the [developers' guide](https://github.com/supabase/supabase/blob/master/apps/docs/DEVELOPERS.md) and [contributing guide](https://github.com/supabase/supabase/blob/master/apps/docs/CONTRIBUTING.md).

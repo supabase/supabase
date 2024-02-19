@@ -1,4 +1,4 @@
-import { ListTree } from 'lucide-react'
+import { ListTree, MessageCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -15,6 +15,7 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
+  CommandSeparator_Shadcn_,
   Command_Shadcn_,
   IconAlertCircle,
   IconCheck,
@@ -43,7 +44,7 @@ const BranchLink = ({
   return (
     <Link passHref href={href}>
       <CommandItem_Shadcn_
-        value={branch.name}
+        value={branch.name.replaceAll('"', '')}
         className="cursor-pointer w-full flex items-center justify-between"
         onSelect={() => {
           setOpen(false)
@@ -78,6 +79,8 @@ const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
 
   const [open, setOpen] = useState(false)
   const selectedBranch = branches?.find((branch) => branch.project_ref === ref)
+
+  const BRANCHING_GITHUB_DISCUSSION_LINK = 'https://github.com/orgs/supabase/discussions/18937'
 
   return (
     <>
@@ -128,7 +131,8 @@ const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
                       ))}
                     </ScrollArea>
                   </CommandGroup_Shadcn_>
-                  <CommandGroup_Shadcn_ className="border-t">
+                  <CommandSeparator_Shadcn_ />
+                  <CommandGroup_Shadcn_>
                     <CommandItem_Shadcn_
                       className="cursor-pointer w-full"
                       onSelect={(e) => {
@@ -143,6 +147,32 @@ const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
                       >
                         <ListTree size={14} strokeWidth={1.5} />
                         <p>Manage branches</p>
+                      </Link>
+                    </CommandItem_Shadcn_>
+                  </CommandGroup_Shadcn_>
+                  <CommandSeparator_Shadcn_ />
+                  <CommandGroup_Shadcn_>
+                    <CommandItem_Shadcn_
+                      className="cursor-pointer w-full"
+                      onSelect={() => {
+                        setOpen(false)
+                        window?.open(BRANCHING_GITHUB_DISCUSSION_LINK, '_blank')?.focus()
+                      }}
+                      onClick={() => setOpen(false)}
+                    >
+                      <Link
+                        href={BRANCHING_GITHUB_DISCUSSION_LINK}
+                        target="_blank"
+                        onClick={() => {
+                          setOpen(false)
+                        }}
+                        className="w-full flex gap-2"
+                      >
+                        <MessageCircle size={14} strokeWidth={1} className="text-muted mt-0.5" />
+                        <div>
+                          <p>Branching feedback</p>
+                          <p className="text-lighter">Join Github Discussion</p>
+                        </div>
                       </Link>
                     </CommandItem_Shadcn_>
                   </CommandGroup_Shadcn_>

@@ -18,7 +18,7 @@ const SchemaTable = ({
   deleteHook = noop,
 }: SchemaTableProps) => {
   return (
-    <div key={schema} className="">
+    <div key={schema}>
       <div className="sticky top-0 backdrop-blur backdrop-filter">
         <div className="flex items-baseline space-x-1 py-2">
           <h5 className="text-foreground-light">schema</h5>

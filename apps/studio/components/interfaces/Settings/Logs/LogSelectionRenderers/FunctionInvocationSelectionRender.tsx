@@ -63,11 +63,4 @@ const FunctionInvocationSelectionRender = ({ log }: { log: PreviewLogData }) => 
   )
 }
 
-export const FunctionInvocationHeaderRender = (log: any) => {
-  const method = log?.method
-  const path = log?.request?.url
-
-  return `${method} ${path}`
-}
-
 export default FunctionInvocationSelectionRender

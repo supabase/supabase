@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import { filter, orderBy, without } from 'lodash'
-import { KeyboardEvent, ReactNode, useEffect, useRef, useState } from 'react'
+import { ReactNode, useEffect, useRef, useState } from 'react'
 import {
   IconAlertCircle,
   IconCheck,
@@ -104,8 +104,8 @@ export default function MultiSelect({
     const updatedPayload = allowDuplicateSelection
       ? [..._selected.concat([option.value])]
       : isActive
-      ? [...without(_selected, option.value)]
-      : [..._selected.concat([option.value])]
+        ? [...without(_selected, option.value)]
+        : [..._selected.concat([option.value])]
 
     // Payload must always include disabled options
     const compulsoryOptions = options
@@ -120,21 +120,13 @@ export default function MultiSelect({
     onChange(formattedPayload)
   }
 
-  const onKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      if (searchString.length > 0 && filteredOptions.length === 1) {
-        handleChange(filteredOptions[0])
-      }
-    }
-  }
-
   return (
     <div className={`form-group ${disabled ? 'pointer-events-none opacity-50' : ''}`}>
       {label && <label className="!w-full">{label}</label>}
       <div
         className={[
           'form-control form-control--multi-select',
-          'border border-strong bg-background',
+          'border border-strong bg-studio',
           'multi-select relative block w-full space-x-1 overflow-auto rounded',
           `${error !== undefined ? 'border-red-800 bg-red-100' : ''}`,
         ].join(' ')}

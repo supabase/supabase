@@ -50,13 +50,12 @@ const ProjectsPage: NextPageWithLayout = () => {
           <Connecting />
         </div>
       )}
-
       {!navLayoutV2 && (
         <div className="py-4 px-5">
           {IS_PLATFORM && projectCreationEnabled && isSuccess && organizations.length !== 0 && (
             <div className="my-2">
               <div className="flex">
-                <div className="">
+                <div>
                   <OrganizationDropdown organizations={organizations} />
                 </div>
               </div>

@@ -1,16 +1,10 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { PropsWithChildren, useCallback, useEffect } from 'react'
 
-import {
-  AuthContext as AuthContextInternal,
-  AuthProvider as AuthProviderInternal,
-  gotrueClient,
-} from 'common'
+import { AuthProvider as AuthProviderInternal, gotrueClient } from 'common'
 import { useStore } from 'hooks'
 import { GOTRUE_ERRORS, IS_PLATFORM } from './constants'
 import { clearLocalStorage } from './local-storage'
-
-export const AuthContext = AuthContextInternal
 
 export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
   const { ui } = useStore()

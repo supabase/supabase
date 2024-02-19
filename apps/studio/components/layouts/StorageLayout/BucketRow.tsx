@@ -14,6 +14,7 @@ import {
   IconEdit2,
   IconLoader,
   IconTrash,
+  IconXCircle,
 } from 'ui'
 
 import { Bucket } from 'data/storage/buckets-query'
@@ -23,14 +24,16 @@ export interface BucketRowProps {
   bucket: Bucket
   projectRef?: string
   isSelected: boolean
-  onSelectDeleteBucket: (bucket: Bucket) => void
-  onSelectEditBucket: (bucket: Bucket) => void
+  onSelectEmptyBucket: () => void
+  onSelectDeleteBucket: () => void
+  onSelectEditBucket: () => void
 }
 
 const BucketRow = ({
   bucket,
   projectRef = '',
   isSelected = false,
+  onSelectEmptyBucket = noop,
   onSelectDeleteBucket = noop,
   onSelectEditBucket = noop,
 }: BucketRowProps) => {
@@ -82,7 +85,7 @@ const BucketRow = ({
             <DropdownMenuItem
               key="toggle-private"
               className="space-x-2"
-              onClick={() => onSelectEditBucket(bucket)}
+              onClick={() => onSelectEditBucket()}
             >
               <IconEdit2 size="tiny" />
               <p>Edit bucket</p>
@@ -91,7 +94,15 @@ const BucketRow = ({
             <DropdownMenuItem
               key="delete-bucket"
               className="space-x-2"
-              onClick={() => onSelectDeleteBucket(bucket)}
+              onClick={() => onSelectEmptyBucket()}
+            >
+              <IconXCircle size="tiny" />
+              <p>Empty bucket</p>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              key="delete-bucket"
+              className="space-x-2"
+              onClick={() => onSelectDeleteBucket()}
             >
               <IconTrash size="tiny" />
               <p>Delete bucket</p>

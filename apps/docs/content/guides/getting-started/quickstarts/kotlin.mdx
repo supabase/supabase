@@ -1,0 +1,208 @@
+---
+title: 'Use Supabase with Android Kotlin'
+subtitle: 'Learn how to create a Supabase project, add some sample data to your database, and query the data from an Android Kotlin app.'
+breadcrumb: 'Framework Quickstarts'
+hideToc: true
+---
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+    <StepHikeCompact.Details title="Set up a Supabase project">
+
+    [Create a new project](https://app.supabase.com) in the Supabase Dashboard.
+
+    After your project is ready, create a table in your Supabase database using the [SQL Editor](https://app.supabase.com/project/_/sql) in the Dashboard. Use the following SQL statement to create all tables.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```sql SQL_EDITOR
+      -- Create the table
+      CREATE TABLE countries (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL
+      );
+      -- Insert some sample data into the table
+      INSERT INTO countries (name) VALUES ('United States');
+      INSERT INTO countries (name) VALUES ('Canada');
+      INSERT INTO countries (name) VALUES ('Mexico');
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+
+    <StepHikeCompact.Details title="Create an Android app with Android Studio">
+      Open Android Studio > New > New Android Project.
+
+    </StepHikeCompact.Details>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+
+    <StepHikeCompact.Details title="Install the Dependencies">
+    Open `build.gradle.kts` (app) file and add the serialization plug, Ktor client, and Supabase client.
+
+    Replace the version placeholders `$kotlin_version` with the Kotlin version of the project, and  `$supabase_version` and `$ktor_version` with the respective latest versions.
+
+    The latest supabase-kt version can be found [here](https://github.com/supabase-community/supabase-kt/releases) and Ktor version can be found [here](https://ktor.io/docs/welcome.html).
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+      ```kotlin
+      plugins {
+        ...
+        kotlin("plugin.serialization") version "$kotlin_version"
+      }
+      ...
+      dependencies {
+        ...
+        implementation(platform("io.github.jan-tennert.supabase:bom:$supabase_version"))
+        implementation("io.github.jan-tennert.supabase:postgrest-kt")
+        implementation("io.ktor:ktor-client-android:$ktor_version")
+      }
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={4}>
+
+    <StepHikeCompact.Details title="Add internet access permission">
+      Add the following line to the `AndroidManifest.xml` file under the `manifest` tag and outside the `application` tag.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+      ```xml
+      ...
+      <uses-permission android:name="android.permission.INTERNET" />
+      ...
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={5}>
+
+    <StepHikeCompact.Details title="Initialize the Supabase client">
+      You can create a Supabase client whenever you need to perform an API call.
+
+      For the sake of simplicity, we will create a client in the `MainActivity.kt` file at the top just below the imports.
+
+      Replace the `supabaseUrl` and `supabaseKey` with your own:
+
+      <ProjectConfigVariables variable="url" />
+      <ProjectConfigVariables variable="anonKey" />
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```kotlin
+      import ...
+
+      val supabase = createSupabaseClient(
+          supabaseUrl = "https://xyzcompany.supabase.co",
+          supabaseKey = "your_public_anon_key"
+        ) {
+          install(Postgrest)
+      }
+      ...
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={6}>
+
+    <StepHikeCompact.Details title="Create a data model for countries">
+      Create a serializable data class to represent the data from the database.
+
+      Add the following below the `createSupabaseClient` function in the `MainActivity.kt` file.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+      ```kotlin
+      @Serializable
+      data class Country(
+          val id: Int,
+          val name: String,
+      )
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={7}>
+
+    <StepHikeCompact.Details title="Query data from the app">
+      Use `LaunchedEffect` to fetch data from the database and display it in a `LazyColumn`.
+
+      Replace the default `MainActivity` class with the following code.
+
+      Note that we are making a network request from our UI code. In production, you should probably use a `ViewModel` to separate the UI and data fetching logic.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+      ```kotlin
+      class MainActivity : ComponentActivity() {
+          override fun onCreate(savedInstanceState: Bundle?) {
+              super.onCreate(savedInstanceState)
+              setContent {
+                  SupabaseTutorialTheme {
+                      // A surface container using the 'background' color from the theme
+                      Surface(
+                          modifier = Modifier.fillMaxSize(),
+                          color = MaterialTheme.colorScheme.background
+                      ) {
+                          CountriesList()
+                      }
+                  }
+              }
+          }
+      }
+
+      @Composable
+      fun CountriesList() {
+          var countries by remember { mutableStateOf<List<Country>>(listOf()) }
+          LaunchedEffect(Unit) {
+              withContext(Dispatchers.IO) {
+                  countries = supabase.from("countries")
+                                    .select().decodeList<Country>()
+              }
+          }
+          LazyColumn {
+              items(
+                  countries,
+                  key = { country -> country.id },
+              ) { country ->
+                  Text(
+                      country.name,
+                      modifier = Modifier.padding(8.dp),
+                  )
+              }
+          }
+      }
+      ```
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={8}>
+    <StepHikeCompact.Details title="Start the app">
+      Run the app on an emulator or a physical device by clicking the `Run app` button in Android Studio.
+    </StepHikeCompact.Details>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>
