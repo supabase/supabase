@@ -1,0 +1,108 @@
+---
+title: 'Database Backups'
+description: 'Learn about the available backup methods for your Supabase project.'
+---
+
+Database backups are an integral part of any disaster recovery plan. Disasters come in many shapes and sizes. It could be as simple as accidentally deleting a table column, the database crashing, or even a natural calamity wiping out the underlying hardware a database is running on. The risks and impact brought by these scenarios can never be fully eliminated, but only minimized or even mitigated. Having database backups is a form of insurance policy. They are essentially snapshots of the database at various points in time. When disaster strikes, database backups allow the project to be brought back to any of these points in time, therefore averting the crisis.
+
+<Admonition type="note">
+
+The Supabase team regularly monitors the status of backups. In case of any issues, you can [contact support](https://supabase.com/dashboard/support/new). Also you can check out our [status page](https://status.supabase.com/) at any time.
+
+</Admonition>
+
+## Frequency of backups
+
+When deciding how often a database should be backed up, the key business metric Recovery Point Objective (RPO) should be considered. RPO is the threshold for how much data, measured in time, a business could lose when disaster strikes. This amount is fully dependent on a business and its underlying requirements. A low RPO would mean that database backups would have to be taken at an increased cadence throughout the day. Each Supabase project has access to two forms of backups, Daily Backups and Point-in-Time Recovery (PITR). The agreed upon RPO would be a deciding factor in choosing which solution best fits a project.
+
+<Admonition type="note">
+
+If you enable PITR, Daily Backups will no longer be taken. PITR provides a finer granularity than Daily Backups, so it's unnecessary to run both.
+
+</Admonition>
+
+<Admonition type="note">
+
+Database backups do not include objects stored via the Storage API, as the database only includes metadata about these objects. Restoring an old backup does not restore objects that have been deleted since then.
+
+</Admonition>
+
+## Daily backups
+
+All Pro and Enterprise plan Supabase projects are backed up automatically on a daily basis. In terms of Recovery Point Objective (RPO), Daily Backups would be suitable for projects willing to lose up to 24 hours worth of data if disaster hits at the most inopportune time. If a lower RPO is required, enabling Point-in-Time Recovery should be considered.
+
+<Admonition type="note">
+
+For security purposes, passwords for custom roles are not stored in daily backups, and will not be found in downloadable files. As such, if you are restoring from a daily backup and are using custom roles, you will need to set their passwords once more following a completed restoration.
+
+</Admonition>
+
+### Backup process [#daily-backups-process]
+
+The PostgreSQL utility [pg_dumpall](https://www.postgresql.org/docs/current/app-pg-dumpall.html) is used to perform daily backups. An SQL file is generated, zipped up, and sent to our storage servers for safe keeping.
+
+You can access daily backups in the [Scheduled backups](https://supabase.com/dashboard/project/_/database/backups/scheduled) settings in the Dashboard. Pro plan projects can access the last 7 days' worth of daily backups while Enterprise plan projects can access up to 30 days' worth of daily backups. Users can restore their project to any one of the backups. If you wish to generate a logical backup on your own, you can do so through the [Supabase CLI](/docs/reference/cli/supabase-db-dump).
+
+#### Backup process for large databases
+
+Databases larger than 40GB[^1], if they're on a recent build[^2] of the Supabase platform, get automatically transitioned[^3] to use daily physical backups. Physical backups are a more performant backup mechanism that lowers the overhead and impact on the database being backed up, and also avoids holding locks on objects in your database for a long period of time. While restores are unaffected, the backups created using this method cannot be downloaded from the Backups section of the dashboard.
+
+This class of physical backups only allows for recovery to a fixed time each day, similar to daily backups. You can upgrade to [PITR](#point-in-time-recovery) for access to more granular recovery options.
+
+Once a database is transitioned to using physical backups, it continues to use physical backups, even if the database size falls back below the threshold for the transition.
+
+[^1]: The threshold for transitioning might be lowered in the future.
+[^2]: Projects created or upgraded after the 14th of July 2022 are eligible.
+[^3]: The transition to physical backups is handled transparently and does not require any user intervention. It involves a single restart of the database to pick up new configuration that can only be loaded at start; the expected downtime for the restart is a few seconds.
+
+### Restoration process [#daily-backups-restoration-process]
+
+When selecting a backup to restore to, select the closest available one made before the desired point in time to restore to. Earlier backups can always be chosen too but do consider the number of days' worth of data that could be lost.
+
+The Dashboard will then prompt for a confirmation before proceeding with the restoration. The project will be inaccessible following this. As such, do ensure to allot downtime beforehand. This is dependent on the size of the database. The larger it is, the longer the downtime will be. Once the confirmation has been given, the underlying SQL of the chosen backup is then run against the project. The PostgreSQL utility [psql](https://www.postgresql.org/docs/current/app-psql.html) is used to facilitate the restoration. The Dashboard will display a notification once the restoration completes.
+
+If your project is using subscriptions or replication slots, you will need to drop them prior to the restoration, and re-create them afterwards. The slot used by Realtime is exempted from this, and will be handled automatically.
+
+{/* screenshot of the Dashboard of the project completing restoration */}
+
+## Point-in-Time recovery
+
+Point-in-Time Recovery (PITR) allows a project to be backed up at much shorter intervals. This provides users an option to restore to any chosen point of up to seconds in granularity. Even with daily backups, a day's worth of data could still be lost. With PITR, backups could be performed up to the point of disaster.
+
+<Admonition type="note">
+
+This feature is available to all Enterprise plan projects. Pro plan projects can enable PITR as an add-on.
+
+Projects interested in PITR will also need to use at least a Small compute add-on, in order to ensure smooth functioning.
+
+</Admonition>
+
+<Admonition type="note">
+
+If you enable PITR, Daily Backups will no longer be taken. PITR provides a finer granularity than Daily Backups, so it's unnecessary to run both.
+
+</Admonition>
+
+### Backup process [#pitr-backup-process]
+
+As discussed [here](https://supabase.com/blog/postgresql-physical-logical-backups), PITR is made possible by a combination of taking physical backups of a project, as well as archiving [Write Ahead Log (WAL)](https://www.postgresql.org/docs/current/wal-intro.html) files. Physical backups provide a snapshot of the underlying directory of the database, while WAL files contain records of every change made in the database.
+
+Supabase uses [WAL-G](https://github.com/wal-g/wal-g), an open source archival and restoration tool, to handle both aspects of PITR. On a daily basis, a snapshot of the database is taken and sent to our storage servers. Throughout the day, as database transactions occur, WAL files are generated and uploaded.
+
+By default, WAL files are backed up at two minute intervals. If these files cross a certain file size threshold, they are backed up immediately. As such, during periods of high amount of transactions, WAL file backups become more frequent. Conversely, when there is no activity in the database, WAL file backups are not made. Overall, this would mean that at the worst case scenario or disaster, the PITR achieves a Recovery Point Objective (RPO) of two minutes.
+
+![PITR dashboard](/docs/img/backups-pitr-dashboard.png)
+
+You can access PITR in the [Point in Time](https://supabase.com/dashboard/project/_/database/backups/pitr) settings in the Dashboard. The recovery period of a project is indicated by the earliest and latest points of recoveries displayed in your preferred timezone. If need be, the maximum amount of this recovery period can be modified accordingly.
+
+Note that the latest restore point of the project could be significantly far from the current time. This occurs when there has not been any recent activity in the database, and therefore no WAL file backups have been made recently. This is perfectly fine as the state of the database at the latest point of recovery would still be indicative of the state of the database at the current time given that no transactions have been made in between.
+
+### Restoration process [#pitr-restoration-process]
+
+![PITR: Calendar view](/docs/img/backups-pitr-calendar-view.png)
+
+A date and time picker will be provided upon pressing the `Start a restore` button. The process will only proceed if the selected date and time fall within the earliest and latest points of recoveries.
+
+![PITR: Confirmation modal](/docs/img/backups-pitr-confirmation-modal.png)
+
+After locking in the desired point in time to recover to, The Dashboard will then prompt for a review and confirmation before proceeding with the restoration. The project will be inaccessible following this. As such, do ensure to allot for downtime beforehand. This is dependent on the size of the database. The larger it is, the longer the downtime will be. Once the confirmation has been given, the latest physical backup available is downloaded to the project and the database is partially restored. WAL files generated after this physical backup up to the specified point-in-time are then downloaded. The underlying records of transactions in these files are replayed against the database to complete the restoration. The Dashboard will display a notification once the restoration completes.

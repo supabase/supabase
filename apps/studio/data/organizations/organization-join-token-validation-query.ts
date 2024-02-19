@@ -30,7 +30,7 @@ export type OrganizationJoinTokenValidationData = Awaited<
 export type OrganizationJoinTokenValidationError = ResponseError
 
 export const useOrganizationJoinTokenValidationQuery = <
-  TData = OrganizationJoinTokenValidationData
+  TData = OrganizationJoinTokenValidationData,
 >(
   { slug, token }: OrganizationJoinTokenValidationVariables,
   {

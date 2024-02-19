@@ -5,9 +5,58 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Tue, 16 Jan 2024 23:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Mon, 12 Feb 2024 23:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/matryoshka-embeddings</guid>
+  <title>Matryoshka embeddings: faster OpenAI vector search using Adaptive Retrieval</title>
+  <link>https://supabase.com/blog/matryoshka-embeddings</link>
+  <description>Use Adaptive Retrieval to improve query performance with OpenAI&apos;s new embedding models</description>
+  <pubDate>Mon, 12 Feb 2024 23:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/nosql-mongodb-compatibility-with-ferretdb-and-flydotio</guid>
+  <title>NoSQL Postgres: Add MongoDB compatibility to your Supabase projects with FerretDB</title>
+  <link>https://supabase.com/blog/nosql-mongodb-compatibility-with-ferretdb-and-flydotio</link>
+  <description>NoSQL Postgres: Add MongoDB compatibility to your Supabase projects with FerretDB</description>
+  <pubDate>Tue, 30 Jan 2024 23:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/pgvector-fast-builds</guid>
+  <title>pgvector 0.6.0: 30x faster with parallel index builds</title>
+  <link>https://supabase.com/blog/pgvector-fast-builds</link>
+  <description>pgvector 0.6.0 brings a significant improvement: parallel index builds for HNSW. Building an HNSW index is now up to 30x faster for unlogged tables.</description>
+  <pubDate>Mon, 29 Jan 2024 23:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/ruby-on-rails-postgres</guid>
+  <title>Getting started with Ruby on Rails and Postgres on Supabase</title>
+  <link>https://supabase.com/blog/ruby-on-rails-postgres</link>
+  <description>Learn how to create a new Rails app and connect it to a Supabase Postgres database.</description>
+  <pubDate>Sun, 28 Jan 2024 23:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/flutter-figma-clone</guid>
+  <title>Create a Figma Clone app with Flutter and Supabase Realtime</title>
+  <link>https://supabase.com/blog/flutter-figma-clone</link>
+  <description>A tutorial on how to build a collaborative design app like Figma using Flutter and Supabase Realtime.</description>
+  <pubDate>Thu, 25 Jan 2024 23:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/how-pg-graphql-works</guid>
+  <title>How pg_graphql works</title>
+  <link>https://supabase.com/blog/how-pg-graphql-works</link>
+  <description>An insight into the internals of GraphQL in Postgres using pg_graphql, and how you can contribute.</description>
+  <pubDate>Tue, 23 Jan 2024 23:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/laravel-postgres</guid>
+  <title>Getting started with Laravel and Postgres</title>
+  <link>https://supabase.com/blog/laravel-postgres</link>
+  <description>Learn how to create a new Laravel PHP app and connect it to a Supabase PostgreSQL database.</description>
+  <pubDate>Sun, 21 Jan 2024 23:00:00 GMT</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/what-is-saml-authentication</guid>
   <title>What is SAML? A practical guide to the authentication protocol</title>
   <link>https://supabase.com/blog/what-is-saml-authentication</link>

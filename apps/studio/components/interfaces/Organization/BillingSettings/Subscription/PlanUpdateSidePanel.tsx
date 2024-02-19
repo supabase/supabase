@@ -34,6 +34,9 @@ import EnterpriseCard from './EnterpriseCard'
 import ExitSurveyModal from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import PaymentMethodSelection from './PaymentMethodSelection'
+import { formatCurrency } from 'lib/helpers'
+import { useProjectsQuery } from 'data/projects/projects-query'
+import { isArray } from 'lodash'
 
 const PlanUpdateSidePanel = () => {
   const { ui } = useStore()
@@ -50,6 +53,10 @@ const PlanUpdateSidePanel = () => {
   const canUpdateSubscription = useCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
+  )
+  const { data: allProjects } = useProjectsQuery()
+  const orgProjects = (allProjects || []).filter(
+    (it) => it.organization_id === selectedOrganization?.id
   )
 
   const snap = useOrgSettingsPageStateSnapshot()
@@ -178,23 +185,28 @@ const PlanUpdateSidePanel = () => {
           <div className="py-6 grid grid-cols-12 gap-3">
             {subscriptionsPlans.map((plan) => {
               const planMeta = availablePlans.find((p) => p.id === plan.id.split('tier_')[1])
-              const tierMeta = subscriptionsPlans.find((it) => it.id === plan.id)
               const price = planMeta?.price ?? 0
               const isDowngradeOption = planMeta?.change_type === 'downgrade'
               const isCurrentPlan = planMeta?.id === subscription?.plan?.id
+              const features = billingViaPartner ? plan.featuresPartner : plan.features
 
               if (plan.id === 'tier_enterprise') {
-                return <EnterpriseCard key={plan.id} plan={plan} isCurrentPlan={isCurrentPlan} />
+                return (
+                  <EnterpriseCard
+                    key={plan.id}
+                    plan={plan}
+                    isCurrentPlan={isCurrentPlan}
+                    billingViaPartner={billingViaPartner}
+                  />
+                )
               }
 
               return (
                 <div
                   key={plan.id}
-                  className={clsx(
-                    'border rounded-md px-4 py-4 flex flex-col items-start justify-between',
-                    plan.id === 'tier_enterprise' ? 'col-span-12' : 'col-span-12 md:col-span-4',
-                    plan.id === 'tier_enterprise' ? 'bg-background' : 'bg-surface-200'
-                  )}
+                  className={
+                    'border rounded-md px-4 py-4 flex flex-col items-start justify-between col-span-12 md:col-span-4 bg-surface-200'
+                  }
                 >
                   <div className="w-full">
                     <div className="flex items-center space-x-2">
@@ -211,21 +223,16 @@ const PlanUpdateSidePanel = () => {
                         <></>
                       )}
                     </div>
-                    <div className="mt-4 flex items-center space-x-1">
+                    <div className="mt-4 flex items-center space-x-1 mb-4">
                       {(price ?? 0) > 0 && <p className="text-foreground-light text-sm">From</p>}
                       {isLoadingPlans ? (
                         <div className="h-[28px] flex items-center justify-center">
                           <ShimmeringLoader className="w-[30px] h-[24px]" />
                         </div>
                       ) : (
-                        <p className="text-foreground text-lg">${price}</p>
+                        <p className="text-foreground text-lg">{formatCurrency(price)}</p>
                       )}
-                      <p className="text-foreground-light text-sm">{tierMeta?.costUnit}</p>
-                    </div>
-                    <div className={clsx('flex mt-1 mb-4', !tierMeta?.warning && 'opacity-0')}>
-                      <div className="bg-background text-brand-600 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-xs">
-                        {tierMeta?.warning}
-                      </div>
+                      <p className="text-foreground-light text-sm">{plan.costUnit}</p>
                     </div>
                     {isCurrentPlan ? (
                       <Button block disabled type="default">
@@ -284,11 +291,14 @@ const PlanUpdateSidePanel = () => {
                       </Tooltip.Root>
                     )}
 
-                    <div className="border-t my-6" />
+                    <div className="border-t my-4" />
 
                     <ul role="list">
-                      {plan.features.map((feature) => (
-                        <li key={feature} className="flex py-2">
+                      {features.map((feature) => (
+                        <li
+                          key={typeof feature === 'string' ? feature : feature[0]}
+                          className="flex py-2"
+                        >
                           <div className="w-[12px]">
                             <IconCheck
                               className="h-3 w-3 text-brand translate-y-[2.5px]"
@@ -296,15 +306,24 @@ const PlanUpdateSidePanel = () => {
                               strokeWidth={3}
                             />
                           </div>
-                          <p className="ml-3 text-xs text-foreground-light">{feature}</p>
+                          <div>
+                            <p className="ml-3 text-xs text-foreground-light">
+                              {typeof feature === 'string' ? feature : feature[0]}
+                            </p>
+                            {isArray(feature) && (
+                              <p className="ml-3 text-xs text-foreground-lighter">{feature[1]}</p>
+                            )}
+                          </div>
                         </li>
                       ))}
                     </ul>
                   </div>
 
-                  {plan.footer && (
+                  {(plan.footer || (billingViaPartner && plan.footerPartner)) && (
                     <div className="border-t pt-4 mt-4">
-                      <p className="text-foreground-light text-xs">{plan.footer}</p>
+                      <p className="text-foreground-light text-xs">
+                        {billingViaPartner ? plan.footerPartner || plan.footer : plan.footer}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -320,6 +339,7 @@ const PlanUpdateSidePanel = () => {
         subscription={subscription}
         onClose={() => setSelectedTier(undefined)}
         onConfirm={onConfirmDowngrade}
+        projects={orgProjects}
       />
 
       <Modal
@@ -330,9 +350,7 @@ const PlanUpdateSidePanel = () => {
         onCancel={() => setSelectedTier(undefined)}
         onConfirm={onUpdateSubscription}
         overlayClassName="pointer-events-none"
-        header={`Confirm ${planMeta?.change_type === 'downgrade' ? 'downgrade' : 'upgrade'} to ${
-          subscriptionPlanMeta?.name
-        }`}
+        header={`Confirm ${planMeta?.change_type === 'downgrade' ? 'downgrade' : 'upgrade'} to ${subscriptionPlanMeta?.name}`}
       >
         <Modal.Content className="mt-4">
           {subscriptionPreviewError && (
@@ -399,12 +417,14 @@ const PlanUpdateSidePanel = () => {
                             {item.unit_price_desc
                               ? item.unit_price_desc
                               : item.unit_price === 0
-                              ? 'FREE'
-                              : item.unit_price
-                              ? `$${item.unit_price}`
-                              : ''}
+                                ? 'FREE'
+                                : item.unit_price
+                                  ? `${formatCurrency(item.unit_price)}`
+                                  : ''}
                           </Table.td>
-                          <Table.td className="text-right">${item.total_price}</Table.td>
+                          <Table.td className="text-right">
+                            {formatCurrency(item.total_price)}
+                          </Table.td>
                         </Table.tr>
 
                         {usageFeesExpanded.includes(item.description) &&
@@ -430,13 +450,14 @@ const PlanUpdateSidePanel = () => {
                       <Table.td />
                       <Table.td />
                       <Table.td className="text-right font-medium">
-                        $
-                        {Math.round(
-                          subscriptionPreview.breakdown.reduce(
-                            (prev, cur) => prev + cur.total_price,
-                            0
-                          )
-                        ) ?? 0}
+                        {formatCurrency(
+                          Math.round(
+                            subscriptionPreview.breakdown.reduce(
+                              (prev, cur) => prev + cur.total_price,
+                              0
+                            )
+                          ) ?? 0
+                        )}
                       </Table.td>
                     </Table.tr>
                   </>
@@ -453,7 +474,7 @@ const PlanUpdateSidePanel = () => {
                   <div>
                     <p className="text-sm mt-2">
                       Each project is a dedicated server and database. Paid plans come with $10 of
-                      Compute Credits to cover one project on the default Starter Compute size or
+                      Compute Credits to cover one project on the default Micro Compute size or
                       parts of any compute addon. Additional unpaused projects on paid plans will
                       incur compute usage costs starting at $10 per month, billed hourly.
                     </p>

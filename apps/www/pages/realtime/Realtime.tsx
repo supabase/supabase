@@ -1,4 +1,4 @@
-import { Button, IconGrid, IconLayers, IconMenu, ThemeImage } from 'ui'
+import { Button, IconGrid, IconLayers, IconMenu } from 'ui'
 import ApiExamples from 'data/products/realtime/api-examples'
 import AppExamples from 'data/products/realtime/app-examples'
 import Solutions from 'data/Solutions'
@@ -13,6 +13,7 @@ import ProductHeader from '~/components/Sections/ProductHeader'
 import RealtimeStyles from './Realtime.module.css'
 
 import 'swiper/swiper.min.css'
+import { ThemeImage } from 'ui-patterns/ThemeImage'
 
 const Cursor = ({ className = '', color = 'none' }) => {
   return (

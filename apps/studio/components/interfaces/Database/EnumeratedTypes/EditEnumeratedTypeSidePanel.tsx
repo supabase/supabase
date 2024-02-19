@@ -108,7 +108,7 @@ const EditEnumeratedTypeSidePanel = ({
         .filter((x) => x.updatedValue.length !== 0)
         .map((x) => ({
           original: x.originalValue,
-          updated: x.updatedValue,
+          updated: x.updatedValue.trim(),
           isNew: x.isNew,
         })),
       ...(data.description !== selectedEnumeratedType.comment

@@ -29,7 +29,7 @@ const PITRNotice = ({}) => {
           </span>
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger asChild>
-              <Button asChild disabled={canUpdateSubscription} type="default">
+              <Button asChild disabled={!canUpdateSubscription} type="default">
                 <Link href={`/project/${projectRef}/settings/addons?panel=pitr`}>
                   Increase retention period
                 </Link>

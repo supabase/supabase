@@ -1,9 +1,8 @@
 import React from 'react'
+import styleHandler from '../../lib/theme/styleHandler'
+import { cn } from '../../lib/utils/cn'
 import Typography from '../Typography'
 import { MenuContextProvider, useMenuContext } from './MenuContext'
-
-import styleHandler from '../../lib/theme/styleHandler'
-import { cn } from '@ui/lib/utils'
 
 interface MenuProps {
   children: React.ReactNode

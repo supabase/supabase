@@ -70,7 +70,7 @@ const VaultToggle = () => {
   return (
     <div>
       <div
-        className="px-12 py-12 w-full bg-background border rounded bg-no-repeat"
+        className="px-12 py-12 w-full bg-studio border rounded bg-no-repeat"
         style={{
           backgroundSize: isNotAvailable ? '50%' : '40%',
           backgroundPosition: '100% 24%',

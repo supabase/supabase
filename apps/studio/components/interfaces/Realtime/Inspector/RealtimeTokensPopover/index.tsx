@@ -1,4 +1,5 @@
 import { Dispatch, SetStateAction, useEffect } from 'react'
+import toast from 'react-hot-toast'
 
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
 import { useProjectApiQuery } from 'data/config/project-api-query'
@@ -20,7 +21,7 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
     ? apiService.serviceApiKey
     : undefined
 
-  const anonServiceRoleKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
+  const anonRoleKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
     ? apiService.serviceApiKey
     : undefined
 
@@ -41,8 +42,10 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
       snap.role !== undefined &&
       snap.role.type === 'postgrest'
     ) {
-      token = anonServiceRoleKey
-      bearer = getRoleImpersonationJWT(config.projectRef, jwtSecret, snap.role)
+      token = anonRoleKey
+      getRoleImpersonationJWT(config.projectRef, jwtSecret, snap.role)
+        .then((token) => (bearer = token))
+        .catch((err) => toast.error(`Failed to get JWT for role: ${err.message}`))
     } else {
       token = serviceRoleKey
     }
