@@ -1,8 +1,18 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { last } from 'lodash'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import {
+  Button,
+  Form_Shadcn_,
+  IconDollarSign,
+  IconExternalLink,
+  IconFileText,
+  IconGitBranch,
+  Modal,
+} from 'ui'
 import * as z from 'zod'
 
 import SidePanelGitHubRepoLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelGitHubRepoLinker'
@@ -13,20 +23,11 @@ import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-e
 import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useGitHubRepositoriesQuery } from 'data/integrations/github-repositories-query'
+import { useIntegrationsQuery } from 'data/integrations/integrations-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization, useStore } from 'hooks'
-import Link from 'next/link'
 import { useAppStateSnapshot } from 'state/app-state'
-import {
-  Button,
-  Form_Shadcn_,
-  IconDollarSign,
-  IconExternalLink,
-  IconFileText,
-  IconGitBranch,
-  Modal,
-} from 'ui'
 import BranchingPITRNotice from './BranchingPITRNotice'
 import BranchingPlanNotice from './BranchingPlanNotice'
 import BranchingPostgresVersionNotice from './BranchingPostgresVersionNotice'
@@ -44,6 +45,16 @@ const EnableBranchingModal = () => {
   const [isValid, setIsValid] = useState(false)
 
   const {
+    data: integrations,
+    error: integrationsError,
+    isLoading: isLoadingIntegrations,
+    isSuccess: isSuccessIntegrations,
+    isError: isErrorIntegrations,
+  } = useIntegrationsQuery()
+  const hasGithubIntegration =
+    integrations?.some((int) => int.integration.name === 'GitHub') ?? false
+
+  const {
     data: repositories,
     error: repositoriesError,
     isLoading: isLoadingRepositories,
@@ -57,9 +68,7 @@ const EnableBranchingModal = () => {
     isLoading: isLoadingConnections,
     isSuccess: isSuccessConnections,
     isError: isErrorConnections,
-  } = useGitHubConnectionsQuery({
-    organizationId: selectedOrg?.id,
-  })
+  } = useGitHubConnectionsQuery({ organizationId: selectedOrg?.id })
 
   const {
     data,
@@ -125,7 +134,7 @@ const EnableBranchingModal = () => {
     defaultValues: { branchName: '' },
   })
 
-  const isLoading = isLoadingRepositories || isLoadingUpgradeEligibility
+  const isLoading = isLoadingIntegrations || isLoadingRepositories
   const isError = isErrorRepositories || isErrorUpgradeEligibility
   const isSuccess = isSuccessRepositories && isSuccessUpgradeEligibility
 
@@ -176,7 +185,7 @@ const EnableBranchingModal = () => {
               </Button>
             </Modal.Content>
 
-            {isLoading && (
+            {isLoadingIntegrations && (
               <>
                 <Modal.Separator />
                 <Modal.Content className="px-7 py-6">
@@ -185,88 +194,121 @@ const EnableBranchingModal = () => {
                 <Modal.Separator />
               </>
             )}
-
-            {isError && (
+            {isErrorIntegrations && (
               <>
                 <Modal.Separator />
                 <Modal.Content className="px-7 py-6">
-                  {isErrorRepositories ? (
-                    <AlertError
-                      error={repositoriesError}
-                      subject="Failed to retrieve repositories"
-                    />
-                  ) : isErrorUpgradeEligibility ? (
-                    <AlertError
-                      error={upgradeEligibilityError}
-                      subject="Failed to retrieve Postgres version"
-                    />
-                  ) : null}
+                  <AlertError error={integrationsError} subject="Failed to retrieve integrations" />
                 </Modal.Content>
                 <Modal.Separator />
               </>
             )}
-
-            {isSuccess && (
+            {isSuccessIntegrations && !hasGithubIntegration && (
               <>
-                {isFreePlan ? (
-                  <BranchingPlanNotice />
-                ) : !hasMinimumPgVersion ? (
-                  <BranchingPostgresVersionNotice />
-                ) : (
-                  <>
-                    <GithubRepositorySelection
-                      form={form}
-                      isChecking={isChecking}
-                      isValid={canSubmit}
-                      githubConnection={githubConnection}
-                    />
-                    {!hasPitrEnabled && <BranchingPITRNotice />}
-                  </>
-                )}
-                <Modal.Content className="px-7 py-6 flex flex-col gap-3">
-                  <p className="text-sm text-foreground-light">
-                    Please keep in mind the following:
-                  </p>
-                  <div className="flex flex-row gap-4">
-                    <div>
-                      <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-300 flex items-center justify-center">
-                        <IconDollarSign className="text-amber-900" size={20} strokeWidth={2} />
-                      </figure>
-                    </div>
-                    <div className="flex flex-col gap-y-1">
-                      <p className="text-sm text-foreground">
-                        Preview branches are billed $0.32 per day (approximately $10 per month)
-                      </p>
-                      <p className="text-sm text-foreground-light">
-                        Launching a new preview branch incurs additional compute costs at $0.32 per
-                        day. This cost will continue for as long as the branch has not been removed.
-                        This pricing is for Early Access and is subject to change.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex flex-row gap-4 mt-2">
-                    <div>
-                      <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-300 flex items-center justify-center">
-                        <IconFileText className="text-amber-900" size={20} strokeWidth={2} />
-                      </figure>
-                    </div>
-                    <div className="flex flex-col gap-y-1">
-                      <p className="text-sm text-foreground">
-                        Branching uses your GitHub repository to apply migrations
-                      </p>
-                      <p className="text-sm text-foreground-light">
-                        Database migrations are handled via the{' '}
-                        <code className="text-xs">./supabase</code> directory in your GitHub repo.
-                        Migration files will run on both Preview Branches and Production when
-                        pushing to and merging git branches.
-                      </p>
-                    </div>
-                  </div>
+                <Modal.Separator />
+                <Modal.Content className="px-7 py-6">
+                  <p>Go install integration first</p>
                 </Modal.Content>
+                <Modal.Separator />
               </>
             )}
-
-            <Modal.Separator />
+            {isSuccessIntegrations && hasGithubIntegration && (
+              <>
+                {isLoading && (
+                  <>
+                    <Modal.Separator />
+                    <Modal.Content className="px-7 py-6">
+                      <GenericSkeletonLoader />
+                    </Modal.Content>
+                    <Modal.Separator />
+                  </>
+                )}
+                {isError && (
+                  <>
+                    <Modal.Separator />
+                    <Modal.Content className="px-7 py-6">
+                      {isErrorIntegrations ? (
+                        <AlertError
+                          error={integrationsError}
+                          subject="Failed to retrieve integrations"
+                        />
+                      ) : isErrorRepositories ? (
+                        <AlertError
+                          error={repositoriesError}
+                          subject="Failed to retrieve repositories"
+                        />
+                      ) : isErrorUpgradeEligibility ? (
+                        <AlertError
+                          error={upgradeEligibilityError}
+                          subject="Failed to retrieve Postgres version"
+                        />
+                      ) : null}
+                    </Modal.Content>
+                    <Modal.Separator />
+                  </>
+                )}
+                {isSuccess && (
+                  <>
+                    {isFreePlan ? (
+                      <BranchingPlanNotice />
+                    ) : !hasMinimumPgVersion ? (
+                      <BranchingPostgresVersionNotice />
+                    ) : (
+                      <>
+                        <GithubRepositorySelection
+                          form={form}
+                          isChecking={isChecking}
+                          isValid={canSubmit}
+                          githubConnection={githubConnection}
+                        />
+                        {!hasPitrEnabled && <BranchingPITRNotice />}
+                      </>
+                    )}
+                    <Modal.Content className="px-7 py-6 flex flex-col gap-3">
+                      <p className="text-sm text-foreground-light">
+                        Please keep in mind the following:
+                      </p>
+                      <div className="flex flex-row gap-4">
+                        <div>
+                          <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-300 flex items-center justify-center">
+                            <IconDollarSign className="text-amber-900" size={20} strokeWidth={2} />
+                          </figure>
+                        </div>
+                        <div className="flex flex-col gap-y-1">
+                          <p className="text-sm text-foreground">
+                            Preview branches are billed $0.32 per day (approximately $10 per month)
+                          </p>
+                          <p className="text-sm text-foreground-light">
+                            Launching a new preview branch incurs additional compute costs at $0.32
+                            per day. This cost will continue for as long as the branch has not been
+                            removed. This pricing is for Early Access and is subject to change.
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex flex-row gap-4 mt-2">
+                        <div>
+                          <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-300 flex items-center justify-center">
+                            <IconFileText className="text-amber-900" size={20} strokeWidth={2} />
+                          </figure>
+                        </div>
+                        <div className="flex flex-col gap-y-1">
+                          <p className="text-sm text-foreground">
+                            Branching uses your GitHub repository to apply migrations
+                          </p>
+                          <p className="text-sm text-foreground-light">
+                            Database migrations are handled via the{' '}
+                            <code className="text-xs">./supabase</code> directory in your GitHub
+                            repo. Migration files will run on both Preview Branches and Production
+                            when pushing to and merging git branches.
+                          </p>
+                        </div>
+                      </div>
+                    </Modal.Content>
+                    <Modal.Separator />
+                  </>
+                )}
+              </>
+            )}
 
             <Modal.Content className="px-7">
               <div className="flex items-center space-x-2 py-2 pb-4">

@@ -1,15 +1,6 @@
 import { PlusIcon } from 'lucide-react'
 import { ReactNode, useEffect, useRef, useState } from 'react'
 import { toast } from 'react-hot-toast'
-
-import ShimmerLine from 'components/ui/ShimmerLine'
-import {
-  IntegrationConnectionsCreateVariables,
-  IntegrationProjectConnection,
-} from 'data/integrations/integrations.types'
-import { useSelectedOrganization } from 'hooks'
-import { BASE_PATH } from 'lib/constants'
-import { openInstallGitHubIntegrationWindow } from 'lib/github'
 import {
   Button,
   CommandEmpty_Shadcn_,
@@ -25,6 +16,15 @@ import {
   Popover_Shadcn_,
   cn,
 } from 'ui'
+
+import ShimmerLine from 'components/ui/ShimmerLine'
+import {
+  IntegrationConnectionsCreateVariables,
+  IntegrationProjectConnection,
+} from 'data/integrations/integrations.types'
+import { useSelectedOrganization } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
+import { openInstallGitHubIntegrationWindow } from 'lib/github'
 
 export interface Project {
   id: string
@@ -127,6 +127,7 @@ const ProjectLinker = ({
       connection: {
         foreign_project_id: selectedForeignProject?.id,
         supabase_project_ref: selectedSupabaseProject?.ref,
+        integration_id: '0',
         metadata: {
           ...projectDetails,
         },
@@ -238,7 +239,7 @@ const ProjectLinker = ({
                         {supabaseProjects.map((project, i) => {
                           return (
                             <CommandItem_Shadcn_
-                              value={`${project.name}-${i}`}
+                              value={`${project.name.replaceAll('"', '')}-${i}`}
                               key={project.ref}
                               className="flex gap-2 items-center"
                               onSelect={() => {
@@ -311,7 +312,7 @@ const ProjectLinker = ({
                           return (
                             <CommandItem_Shadcn_
                               key={project.id}
-                              value={`${project.name}-${i}`}
+                              value={`${project.name.replaceAll('"', '')}-${i}`}
                               className="flex gap-2 items-center"
                               onSelect={() => {
                                 if (project.id) setForeignProjectId(project.id)

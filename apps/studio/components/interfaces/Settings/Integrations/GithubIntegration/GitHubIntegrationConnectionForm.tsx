@@ -167,7 +167,7 @@ const GitHubIntegrationConnectionForm = ({
                     return (
                       <CommandItem_Shadcn_
                         key={branch.name}
-                        value={branch.name}
+                        value={branch.name.replaceAll('"', '')}
                         className="cursor-pointer w-full flex items-center justify-between"
                         onSelect={() => {
                           setOpen(false)

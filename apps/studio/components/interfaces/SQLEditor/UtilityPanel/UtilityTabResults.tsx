@@ -68,7 +68,7 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
 
     return (
       <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark">
-        <div className="flex flex-row justify-between items-start py-4 px-6">
+        <div className="flex flex-row justify-between items-start py-4 px-6 gap-x-4">
           {isTimeout ? (
             <div className="flex flex-col gap-y-1">
               <p className="font-mono text-sm">SQL query ran into an upstream timeout</p>
@@ -95,7 +95,7 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
               </p>
             </div>
           ) : (
-            <div>
+            <div className="overflow-x-auto">
               {formattedError.length > 0 ? (
                 formattedError.map((x: string, i: number) => (
                   <pre key={`error-${i}`} className="font-mono text-sm">

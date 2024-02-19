@@ -1,0 +1,120 @@
+---
+id: 'foreign-data-wrappers'
+title: 'Foreign Data Wrappers'
+description: 'Connecting to external systems using Postgres Foreign Data Wrappers.'
+subtitle: 'Connecting to external systems using Postgres Foreign Data Wrappers.'
+---
+
+Foreign Data Wrappers (FDW) are a core feature of Postgres that allow you to access and query data stored in external data sources as if they were native Postgres tables.
+
+Postgres includes several built-in foreign data wrappers, such as [`postgres_fdw`](https://www.postgresql.org/docs/current/postgres-fdw.html) for accessing other PostgreSQL databases, and [`file_fdw`](https://www.postgresql.org/docs/current/file-fdw.html) for reading data from files. Supabase extends this feature to query other databases or any other external systems. We do this with our open source [Wrappers](https://github.com/supabase/wrappers) framework. In these guides we'll refer to them as "Wrappers", Foreign Data Wrappers, or FDWs. They are conceptually the same thing.
+
+## Concepts
+
+Wrappers introduce some new terminology and different workflows.
+
+![FDW](/docs/img/database/fdw-light.png)
+
+### Remote servers
+
+A Remote Server is an external database, API, or any system containing data that you want to query from your Postgres database. Examples include:
+
+- An external database, like Postgres or Firebase.
+- A remote data warehouse, like ClickHouse, BigQuery, or Snowflake.
+- An API, like Stripe or GitHub.
+
+It's possible to connect to multiple remote servers of the same type. For example, you can connect to two different Firebase projects within the same Supabase database.
+
+### Foreign tables
+
+A table in your database which maps to some data inside a Remote Server.
+
+Examples:
+
+- An `analytics` table which maps to a table inside your data warehouse.
+- A `subscriptions` table which maps to your Stripe subscriptions.
+- A `collections` table which maps to a Firebase collection.
+
+Although a Foreign Table behaves like any other table, the data is not stored inside your database. The data remains inside the Remote Server.
+
+### ETL with Wrappers
+
+ETL stands for Extract, Transform, Load. It's an established process for moving data from one system to another. For example, it's common to move data from a production database to a data warehouse.
+
+There are many popular ETL tools, such as [Fivetran](https://fivetran.com/) and [Airbyte](https://airbyte.io/).
+
+Wrappers provide an alternative to these tools. You can use SQL to move data from one table to another:
+
+```sql
+-- Copy data from your production database to your
+-- data warehouse for the last 24 hours:
+
+insert into warehouse.analytics
+select * from public.analytics
+where ts > (now() - interval '1 DAY');
+```
+
+This approach provides several benefits:
+
+1. **Simplicity:** the Wrappers API is just SQL, so data engineers don't need to learn new tools and languages.
+1. **Save on time:** avoid setting up additional data pipelines.
+1. **Save on Data Engineering costs:** less infrastructure to be managed.
+
+One disadvantage is that Wrappers are not as feature-rich as ETL tools. They also couple the ETL process to your database.
+
+### On-demand ETL with Wrappers
+
+Supabase extends the ETL concept with real-time data access. Instead of moving gigabytes of data from one system to another before you can query it, you can instead query the data directly from the remote server. This additional option, "Query", extends the ETL process and is called [QETL](https://www.sciencedirect.com/science/article/abs/pii/S0169023X1730438X) (pronounced "kettle"): Query, Extract, Transform, Load.
+
+{/* prettier-ignore */}
+```sql
+-- Get all purchases for a user from your data warehouse:
+select
+  auth.users.id as user_id,
+  warehouse.orders.id as order_id
+from
+  warehouse.orders
+join 
+  auth.users on auth.users.id = warehouse.orders.user_id
+where 
+  auth.users.id = '<some_user_id>';
+```
+
+This approach has several benefits:
+
+1. **On-demand:** analytical data is immediately available within your application with no additional infrastructure.
+1. **Always in sync:** since the data is queried directly from the remote server, it's always up-to-date.
+1. **Integrated:** large datasets are available within your application, and can be joined with your operational/transactional data.
+1. **Save on bandwidth:** only extract/load what you need.
+
+### Batch ETL with Wrappers
+
+A common use case for Wrappers is to extract data from a production database and load it into a data warehouse. This can be done within your database using [pg_cron](/docs/guides/database/extensions/pg_cron). For example, you can schedule a job to run every night to extract data from your production database and load it into your data warehouse.
+
+```sql
+-- Every day at 3am, copy data from your
+-- production database to your data warehouse:
+select cron.schedule(
+  'nightly-etl',
+  '0 3 * * *',
+  $$
+    insert into warehouse.analytics
+    select * from public.analytics
+    where ts > (now() - interval '1 DAY');
+  $$
+);
+```
+
+![FDW](/docs/img/database/fdw-qetl-light.png)
+
+This process can be taxing on your database if you are moving large amounts of data. Often, it's better to use an external tool for batch ETL, such as [Fivetran](https://fivetran.com/) or [Airbyte](https://airbyte.io/).
+
+## Security
+
+Foreign Data Wrappers do not provide Row Level Security. We do not advise exposing them via your API. Wrappers should _always_ be stored in a private schema. For example, if you are connecting to your Stripe account, you should create a `stripe` schema to store all of your Foreign Tables inside. This schema should _not_ be added to the “Additional Schemas” setting in the API section.
+
+If you want to expose any of the columns to your public API, create a [View](https://supabase.com/docs/guides/database/tables#views) in the `public` schema. You can also interact with your Foreign Tables inside a [Database Function](https://supabase.com/docs/guides/database/functions).
+
+## Resources
+
+- Official [`supabase/wrappers` documentation](https://supabase.github.io/wrappers/)

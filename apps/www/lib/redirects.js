@@ -2355,17 +2355,42 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/guides/database/large-datasets',
-    destination: '/guides/database/import-data',
+    source: '/docs/guides/database/large-datasets',
+    destination: '/docs/guides/database/import-data',
   },
   {
     permanent: true,
-    source: '/guides/api/rest/debugging-performance',
-    destination: '/guides/database/debugging-performance',
+    source: '/docs/guides/api/rest/debugging-performance',
+    destination: '/docs/guides/database/debugging-performance',
   },
   {
     permanent: true,
-    source: '/guides/api/rest/joins-and-nesting',
-    destination: '/guides/database/joins-and-nesting',
+    source: '/docs/guides/api/rest/joins-and-nesting',
+    destination: '/docs/guides/database/joins-and-nesting',
+  },
+  {
+    permanent: true,
+    source: '/docs/learn/auth-deep-dive/auth-deep-dive-jwts',
+    destination: '/docs/guides/auth/auth-deep-dive/auth-deep-dive-jwts',
+  },
+  {
+    permanent: true,
+    source: '/docs/learn/auth-deep-dive/auth-row-level-security',
+    destination: '/docs/guides/auth/auth-deep-dive/auth-row-level-security',
+  },
+  {
+    permanent: true,
+    source: '/docs/learn/auth-deep-dive/auth-policies',
+    destination: '/docs/guides/auth/auth-deep-dive/auth-policies',
+  },
+  {
+    permanent: true,
+    source: '/docs/learn/auth-deep-dive/auth-gotrue',
+    destination: '/docs/guides/auth/auth-deep-dive/auth-gotrue',
+  },
+  {
+    permanent: true,
+    source: '/docs/learn/auth-deep-dive/auth-google-oauth',
+    destination: '/docs/guides/auth/auth-deep-dive/auth-google-oauth',
   },
 ]

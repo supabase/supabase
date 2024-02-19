@@ -5,9 +5,37 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Thu, 25 Jan 2024 23:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Mon, 12 Feb 2024 23:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/matryoshka-embeddings</guid>
+  <title>Matryoshka embeddings: faster OpenAI vector search using Adaptive Retrieval</title>
+  <link>https://supabase.com/blog/matryoshka-embeddings</link>
+  <description>Use Adaptive Retrieval to improve query performance with OpenAI&apos;s new embedding models</description>
+  <pubDate>Mon, 12 Feb 2024 23:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/nosql-mongodb-compatibility-with-ferretdb-and-flydotio</guid>
+  <title>NoSQL Postgres: Add MongoDB compatibility to your Supabase projects with FerretDB</title>
+  <link>https://supabase.com/blog/nosql-mongodb-compatibility-with-ferretdb-and-flydotio</link>
+  <description>NoSQL Postgres: Add MongoDB compatibility to your Supabase projects with FerretDB</description>
+  <pubDate>Tue, 30 Jan 2024 23:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/pgvector-fast-builds</guid>
+  <title>pgvector 0.6.0: 30x faster with parallel index builds</title>
+  <link>https://supabase.com/blog/pgvector-fast-builds</link>
+  <description>pgvector 0.6.0 brings a significant improvement: parallel index builds for HNSW. Building an HNSW index is now up to 30x faster for unlogged tables.</description>
+  <pubDate>Mon, 29 Jan 2024 23:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/ruby-on-rails-postgres</guid>
+  <title>Getting started with Ruby on Rails and Postgres on Supabase</title>
+  <link>https://supabase.com/blog/ruby-on-rails-postgres</link>
+  <description>Learn how to create a new Rails app and connect it to a Supabase Postgres database.</description>
+  <pubDate>Sun, 28 Jan 2024 23:00:00 GMT</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/flutter-figma-clone</guid>
   <title>Create a Figma Clone app with Flutter and Supabase Realtime</title>
   <link>https://supabase.com/blog/flutter-figma-clone</link>

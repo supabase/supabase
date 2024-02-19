@@ -287,8 +287,8 @@ export const pricing: Pricing = {
         tooltips: { main: 'You can change the upload size in the dashboard' },
         plans: {
           free: '50 MB',
-          pro: '5 GB',
-          team: '5 GB',
+          pro: '50 GB',
+          team: '50 GB',
           enterprise: 'Custom',
         },
         usage_based: false,
@@ -390,7 +390,7 @@ export const pricing: Pricing = {
       {
         title: 'Messages Per Month',
         tooltips: {
-          main: "Count of messages going through Realtime.\nUsage example: If you do a database change and 5 clients listen to that change via Realtime, that's 5 messages. If you broadcast a message and 4 clients listen to that, that's 5 messages (1 message sent, 4 received).\nBilling is based on the total amount of messages throughout your billing period.",
+          main: "Count of messages going through Realtime. Includes database changes, broadcast and presence. \nUsage example: If you do a database change and 5 clients listen to that change via Realtime, that's 5 messages. If you broadcast a message and 4 clients listen to that, that's 5 messages (1 message sent, 4 received).\nBilling is based on the total amount of messages throughout your billing period.",
         },
         plans: {
           free: '2 Million included',

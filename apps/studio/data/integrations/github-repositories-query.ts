@@ -3,14 +3,13 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { integrationKeys } from './keys'
+import { useIntegrationsQuery } from './integrations-query'
 
 export async function getGitHubRepositories(signal?: AbortSignal) {
   const { data, error } = await get('/platform/integrations/github/repositories', {
     signal,
   })
-  if (error) {
-    throw error
-  }
+  if (error) throw new Error((error as ResponseError).message)
 
   // [Alaister]: temp fix until we have a proper response type
   return (data as any).repositories
@@ -25,9 +24,14 @@ export type GitHubRepositoriesError = ResponseError
 export const useGitHubRepositoriesQuery = <TData = GitHubRepositoriesData>({
   enabled = true,
   ...options
-}: UseQueryOptions<GitHubRepositoriesData, GitHubRepositoriesError, TData> = {}) =>
-  useQuery<GitHubRepositoriesData, GitHubRepositoriesError, TData>(
+}: UseQueryOptions<GitHubRepositoriesData, GitHubRepositoriesError, TData> = {}) => {
+  const { data: integrations } = useIntegrationsQuery()
+  const hasGithubIntegration =
+    integrations?.some((int) => int.integration.name === 'GitHub') ?? false
+
+  return useQuery<GitHubRepositoriesData, GitHubRepositoriesError, TData>(
     integrationKeys.githubRepositoriesList(),
     ({ signal }) => getGitHubRepositories(signal),
-    { enabled: enabled, staleTime: 0, ...options }
+    { enabled: hasGithubIntegration, staleTime: 0, ...options }
   )
+}

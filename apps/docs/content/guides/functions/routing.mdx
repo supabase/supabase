@@ -1,0 +1,127 @@
+---
+id: 'function-routing'
+title: 'Handling Routing in Functions'
+description: 'How to handle custom routing within Edge Functions.'
+subtitle: 'How to handle custom routing within Edge Functions.'
+---
+
+Usually, an Edge Function is written to perform a single action (eg: write a record to the database). However, if your app's logic is split into multiple Edge Functions requests to each action may seem slower.
+This is because each Edge Function needs to be booted before serving a request (known as cold starts). If an action is performed less frequently (eg: deleting a record), there is a high-chance of that function experiencing a cold-start.
+
+One way to reduce the cold starts and increase performance of your app is to combine multiple actions into a single Edge Function. This way only one instance of the Edge Function needs to be booted and it can handle multiple requests to different actions.
+For example, we can use a single Edge Function to create a typical CRUD API (create, read, update, delete records).
+
+To combine multiple endpoints into a single Edge Function, you can use web application frameworks such as [Express](https://expressjs.com/) or [Oak](https://oakserver.github.io/oak/).
+
+Let's dive into some examples.
+
+## Routing with Express
+
+Here's a simple hello world example using popular web framework Express.
+
+Create a new function called `hello-world` using Supabase CLI:
+
+```bash
+supabase functions new hello-world
+```
+
+Copy and paste the following code:
+
+```ts
+import express from 'npm:express@4.18.2'
+
+const app = express()
+app.use(express.json())
+const port = 3000
+
+app.get('/hello-world', (req, res) => {
+  res.send('Hello World!')
+})
+
+app.post('/hello-world', (req, res) => {
+  const { name } = req.body
+  res.send(`Hello ${name}!`)
+})
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`)
+})
+```
+
+You will notice in the above example, we created two routes - `GET` and `POST`. The path for both routes are defined as `/hello-world`.
+If you run an Express server outside of Edge Functions, you'd usually set the root path as `/` .
+However, within Edge Functions, paths should always be prefixed with the function name (in this case `hello-world`).
+
+You can deploy the function to Supabase via:
+
+```bash
+supabase functions deploy hello-world
+```
+
+Once the function is deployed, you can try to call the two ednpoints using cURL (or Postman).
+
+```bash
+# https://supabase.com/docs/guides/functions/deploy#invoking-remote-functions
+curl --request GET 'https://<project_ref>.supabase.co/functions/v1/hello-world' \
+  --header 'Authorization: Bearer ANON_KEY' \
+```
+
+This should print the response as `Hello World!`, meaning it was handled by the `GET` route.
+
+Similarly, we can make a request to the `POST` route.
+
+```bash cURL
+# https://supabase.com/docs/guides/functions/deploy#invoking-remote-functions
+curl --request POST 'https://<project_ref>.supabase.co/functions/v1/hello-world' \
+  --header 'Authorization: Bearer ANON_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{ "name":"Foo" }'
+```
+
+We should see a response printing `Hello Foo!`.
+
+## Using Route Parameters
+
+We can use route parameters to capture values at specific URL segments (eg: `/tasks/:taskId/notes/:noteId`).
+
+Here's an example Edge Function implemented using Express for managing tasks using route parameters.
+Keep in mind paths must be prefixed by function name (ie. `tasks` in this example). Route parameters can only be used after the function name prefix.
+
+```ts
+import express from 'npm:express@4.18.2'
+
+const app = express()
+app.use(express.json())
+
+app.get('/tasks', async (req, res) => {
+  // return all tasks
+})
+
+app.post('/tasks', async (req, res) => {
+  // create a task
+})
+
+app.get('/tasks/:id', async (req, res) => {
+  const id = req.params.id
+  const task = {} // get task
+
+  res.json(task)
+})
+
+app.patch('/tasks/:id', async (req, res) => {
+  const id = req.params.id
+  // modify task
+})
+
+app.delete('/tasks/:id', async (req, res) => {
+  const id = req.params.id
+  // delete task
+})
+```
+
+## URL Patterns API
+
+If you prefer not to use a web framework, you can directly use [URLPattern API](https://developer.mozilla.org/en-US/docs/Web/API/URL_Pattern_API) within your Edge Functions to implement routing.
+This is ideal for small apps with only couple of routes and you want to have a custom matching algorithm.
+
+Here is an example Edge Function using URL Patterns API: https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/restful-tasks/index.ts

@@ -1,5 +1,5 @@
+import { IconPanel } from 'ui-patterns/IconPanel'
 import providers from '../data/authProviders'
-import { IconPanel } from 'ui'
 import Link from 'next/link'
 
 export default function AuthProviders({ type }: { type: string }) {

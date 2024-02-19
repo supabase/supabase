@@ -69,7 +69,7 @@ const DatabaseSettings = () => {
     : isErrorProjectSettings || isErrorPoolingInfo
   const isSuccess = showReadReplicasUI
     ? isSuccessReadReplicas
-    : isSuccessProjectSettings || isSuccessPoolingInfo
+    : isSuccessProjectSettings && isSuccessPoolingInfo
 
   const selectedDatabase = (databases ?? []).find(
     (db) => db.identifier === state.selectedDatabaseId
@@ -197,7 +197,7 @@ const DatabaseSettings = () => {
                   value={poolingMode === 'transaction' ? connectionInfo.db_port : '5432'}
                   label="Port"
                 />
-                {isMd5 && (
+                {isMd5 && usePoolerConnection && (
                   <Input
                     className="input-mono"
                     layout="horizontal"
