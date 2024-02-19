@@ -121,7 +121,7 @@ const QueryItem = ({
             {visibility === 'user' && (
               <Checkbox
                 className={clsx(
-                  'transition absolute left-2.5 [&>input]:border-foreground-lighter',
+                  'transition absolute left-2.5 top-1 [&>input]:border-foreground-lighter',
                   hasQueriesSelected ? '' : 'opacity-0 group-hover:opacity-100'
                 )}
                 checked={isSelected}
