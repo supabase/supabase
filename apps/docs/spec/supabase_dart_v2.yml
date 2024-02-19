@@ -255,7 +255,7 @@ functions:
             );
           }
 
-          final response = await signInWithIdToken(
+          final response = await supabase.auth.signInWithIdToken(
             provider: OAuthProvider.apple,
             idToken: idToken,
             nonce: rawNonce,
