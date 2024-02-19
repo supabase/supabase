@@ -303,11 +303,9 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
 
     ## Using Google sign-in on Android
 
-    Unlike the OAuth flow which requires the use of a web browser, the native Sign in with Google flow on Android uses the [operating system's built-in functionalities](https://developer.android.com/training/sign-in/credential-manager) to prompt the user for consent.
+    The Sign in with Google flow on Android uses the [operating system's built-in functionalities](https://developer.android.com/training/sign-in/credential-manager) to prompt the user for consent.
 
     When the user provides consent, Google issues an identity token (commonly abbreviated as ID token) that is then sent to your project's Supabase Auth server. When valid, a new user session is started by issuing an access and refresh token from Supabase Auth.
-
-    You can follow the official [Credential Manager guide](https://developer.android.com/training/sign-in/credential-manager) from Google to learn more about the sign-in flow.
 
     **Note:** You have to create OAuth client IDs for both a Web and Android application. The Web client ID is the one used in your Android app.
 
@@ -398,12 +396,9 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
 
     ### Configuration [#android-configuration]
 
-    1. Configure OAuth credentials for your Google Cloud project in the [Credentials](https://console.cloud.google.com/apis/credentials) page of the console. When creating a new OAuth client ID, choose _Android_ or _iOS_ depending on the mobile operating system your app is built for.
-
-      - For Android, use the instructions on screen to provide the SHA-1 certificate fingerprint used to sign your Android app.
-
+    1. Configure OAuth credentials for your Google Cloud project in the [Credentials](https://console.cloud.google.com/apis/credentials) page of the console. You need two client IDs, a web client ID and Android client ID. When creating a new Android OAuth client ID, use the instructions on screen to provide the SHA-1 certificate fingerprint used to sign your Android app.
     2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app. In particular, make sure you have set up links to your app's privacy policy and terms of service.
-    3. Finally, add the client ID from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers), under _Authorized Client IDs_.
+    3. Finally, add the web client ID from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers), under _Authorized Client IDs_.
 
     Note that you do not have to configure the OAuth flow in the Supabase Dashboard in order to use native sign in.
 
