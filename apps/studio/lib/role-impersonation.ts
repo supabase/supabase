@@ -128,13 +128,9 @@ async function createToken(payload: object, key: string) {
   segments.push(btoa(JSON.stringify(header)).replace(/=/g, ''))
   segments.push(btoa(JSON.stringify(payload)).replace(/=/g, ''))
 
-  try {
-    const footer = await sign(segments.join('.'), btoa(key).replace(/=/g, ''))
-    segments.push(footer.replace(/=/g, ''))
-    return segments.join('.')
-  } catch (err) {
-    throw err
-  }
+  const footer = await sign(segments.join('.'), btoa(key).replace(/=/g, ''))
+  segments.push(footer.replace(/=/g, ''))
+  return segments.join('.')
 }
 
 async function sign(data: string, key: string) {
@@ -169,8 +165,5 @@ async function sign(data: string, key: string) {
       const u8 = new Uint8Array(token)
       const b64encoded = btoa(String.fromCharCode(...u8))
       return b64encoded
-    })
-    .catch((err) => {
-      throw err
     })
 }
