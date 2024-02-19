@@ -14,7 +14,7 @@
 		"@fontsource/fira-mono": "^4.5.10",
 		"@neoconfetti/svelte": "^1.0.0",
 		"@sveltejs/adapter-auto": "^2.0.1",
-		"@sveltejs/kit": "^1.16.3",
+		"@sveltejs/kit": "^1.30.4",
 		"@types/cookie": "^0.5.1",
 		"prettier": "^2.8.8",
 		"prettier-plugin-svelte": "^2.10.0",
