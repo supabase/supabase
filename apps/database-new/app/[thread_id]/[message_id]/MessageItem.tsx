@@ -1,60 +1,29 @@
 'use client'
 
-import { useAppStateSnapshot } from '@/lib/state'
-import { pull } from 'lodash'
+import { Message as MessageItem } from 'ai/react'
 import Link from 'next/link'
-import { useParams, usePathname, useRouter } from 'next/navigation'
-import OpenAI from 'openai'
-import { useEffect } from 'react'
+import { useParams, usePathname } from 'next/navigation'
 import { cn } from 'ui'
 
-interface UserChatProps {
-  message: OpenAI.Beta.Threads.Messages.ThreadMessage
+interface MessageItemProps {
+  message: MessageItem
   isLatest: boolean
   times: {
     hoursFromNow: number
     formattedTimeFromNow: string
     formattedCreatedAt: string
-    replyDuration: number | undefined
   }
-  run: OpenAI.Beta.Threads.Run
 }
 
-const UserChat = ({ message, isLatest, times, run }: UserChatProps) => {
-  const router = useRouter()
-  const snap = useAppStateSnapshot()
-  const { threadId, runId } = useParams()
-
-  // console.log(run)
-
-  const LOADING_STATUSES = ['in_progress', 'queued']
-
-  const runIsInProgressRemotely = LOADING_STATUSES.includes(run.status)
-
-  useEffect(() => {
-    if (runIsInProgressRemotely) {
-      // set a local state for run loading
-      // this state will be updated via other client components when completing a run
-      // remove current message id from array if it exists
-      let currentRunsLoading = [...snap.runsLoading]
-      pull(currentRunsLoading, run.id)
-      const payload = [...currentRunsLoading, run.id]
-      snap.setRunsLoading([...payload])
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [runIsInProgressRemotely, run.id]) // Intentionally left snap out of the dependency array
-
+const MessageItem = ({ message, isLatest, times }: MessageItemProps) => {
+  const { thread_id } = useParams()
   // using the local state for run loading
-  const isLoading = snap.runsLoading.includes(run.id) && isLatest
+  const isLoading = false
 
-  const { hoursFromNow, formattedTimeFromNow, formattedCreatedAt, replyDuration } = times
+  const { hoursFromNow, formattedTimeFromNow, formattedCreatedAt } = times
 
   // chat shown as selected when url matches
   const isSelected = usePathname().includes(message.id)
-
-  // extract the text from the assistant message
-  const message_content = message.content[0]
-  const text = message_content.type === 'text' ? message_content.text.value : ''
 
   return (
     <Link
@@ -64,7 +33,7 @@ const UserChat = ({ message, isLatest, times, run }: UserChatProps) => {
         isSelected && 'bg-surface-200',
         isSelected ? 'border-r-foreground' : 'border-r border-r-transparent'
       )}
-      href={`/${threadId}/${runId}/${message.id}`}
+      href={`/${thread_id}/${message.id}`}
     >
       <div className="flex flex-col justify-between items-center relative top-3">
         <div
@@ -75,6 +44,7 @@ const UserChat = ({ message, isLatest, times, run }: UserChatProps) => {
               : 'bg-transparent border-foreground-muted group-hover:border-foreground'
           )}
         />
+
         {isLoading && (
           <span
             className={cn(
@@ -86,6 +56,7 @@ const UserChat = ({ message, isLatest, times, run }: UserChatProps) => {
             <div className="absolute border w-4 h-4 rounded-full z-0" />
           </span>
         )}
+
         {/* Node line*/}
         {!isLatest && <div className="border-l border-strong flex-grow" />}
       </div>
@@ -106,7 +77,7 @@ const UserChat = ({ message, isLatest, times, run }: UserChatProps) => {
             </svg>
           </span>
           <div
-            title={text}
+            title={message.content}
             className={cn(
               'cursor-pointer transition relative overflow-hidden',
               'w-full rounded-lg rounded-tl-none',
@@ -121,9 +92,9 @@ const UserChat = ({ message, isLatest, times, run }: UserChatProps) => {
                 isSelected ? 'text-foreground' : 'text-light group-hover:text-foreground'
               )}
             >
-              {text}
+              {message.content}
             </p>
-            {/* {isLoading && <div className="chat-shimmering-loader w-full h-0.5 absolute bottom-0" />} */}
+            {isLoading && <div className="chat-shimmering-loader w-full h-0.5 absolute bottom-0" />}
           </div>
         </div>
         {isSelected && (
@@ -135,11 +106,6 @@ const UserChat = ({ message, isLatest, times, run }: UserChatProps) => {
             )}
           >
             Sent {hoursFromNow > 6 ? `on ${formattedCreatedAt}` : formattedTimeFromNow}
-            {replyDuration !== undefined
-              ? ` with ${replyDuration}s response`
-              : isLoading
-                ? ', generating response...'
-                : ''}
           </p>
         )}
       </div>
@@ -147,4 +113,4 @@ const UserChat = ({ message, isLatest, times, run }: UserChatProps) => {
   )
 }
 
-export default UserChat
+export default MessageItem
