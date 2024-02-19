@@ -131,7 +131,7 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
   const dagreGraph = new dagre.graphlib.Graph()
   dagreGraph.setDefaultEdgeLabel(() => ({}))
   dagreGraph.setGraph({
-    rankdir: 'LR',
+    rankdir: 'TB',
     align: 'UR',
     nodesep: 25,
     ranksep: 50,

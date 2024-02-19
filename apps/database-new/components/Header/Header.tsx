@@ -1,18 +1,9 @@
-import HeaderActions from './HeaderActions'
-import { createClient } from '@/lib/supabase/server'
-import { cookies } from 'next/headers'
-import CurrentThreadName from './CurrentThreadName'
 import Link from 'next/link'
+
+import HeaderActions from './HeaderActions'
 import UserDropdown from './UserDropdown'
 
 const Header = async () => {
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore)
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
   return (
     <nav
       role="navigation"
@@ -26,11 +17,9 @@ const Header = async () => {
             <span>design</span>
           </div>
         </Link>
-
-        <CurrentThreadName />
       </div>
       <div className="flex gap-3">
-        <HeaderActions user={user} />
+        <HeaderActions />
         <UserDropdown />
       </div>
     </nav>
