@@ -167,7 +167,7 @@ async function sign(data: string, key: string) {
     })
     .then((token) => {
       var u8 = new Uint8Array(token)
-      var b64encoded = btoa(String.fromCharCode.apply(null, u8))
+      var b64encoded = btoa(String.fromCharCode(...u8))
 
       return b64encoded
     })
