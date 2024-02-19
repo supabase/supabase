@@ -13,7 +13,7 @@
     "@dagrejs/dagre": "^1.0.4",
     "@gregnr/libpg-query": "13.4.0-dev.12",
     "@monaco-editor/react": "^4.6.0",
-    "@supabase/ssr": "^0.0.10",
+    "@supabase/ssr": "^0.1.0",
     "@tanstack/react-query": "^5.7.2",
     "ai": "^2.2.31",
     "common": "*",
