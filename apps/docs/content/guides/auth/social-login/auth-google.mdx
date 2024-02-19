@@ -232,7 +232,7 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
 
   <TabPanel id="flutter" label="Flutter">
 
-    ## Using native sign in with Google in Flutter
+    ## Using native sign-in with Google on Flutter
 
     Native Google sign in with Supabase is done through the [google_sign_in](https://pub.dev/packages/google_sign_in) package for iOS and Android. Follow the instructions on the [google_sign_in](https://pub.dev/packages/google_sign_in) package for plugin specific settings.
 
@@ -301,7 +301,7 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
 
   <TabPanel id="android" label="Android (Kotlin)">
 
-    ## Using native sign in with Google in Android
+    ## Using Google sign-in on Android
 
     Unlike the OAuth flow which requires the use of a web browser, the native Sign in with Google flow on Android uses the [operating system's built-in functionalities](https://developer.android.com/training/sign-in/credential-manager) to prompt the user for consent.
 
@@ -339,6 +339,7 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
             val credentialManager = CredentialManager.create(context)
 
             // Generate a nonce and hash it with sha-256
+            // Providing a nonce is optional but recommended
             val rawNonce = UUID.randomUUID().toString() // Generate a random String. UUID should be sufficient, but can also be any other random string.
             val bytes = rawNonce.toString().toByteArray()
             val md = MessageDigest.getInstance("SHA-256")
@@ -349,7 +350,7 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
             val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
                 .setFilterByAuthorizedAccounts(false)
                 .setServerClientId("WEB_GOOGLE_CLIENT_ID")
-                .setNonce(hashedNonce)
+                .setNonce(hashedNonce) // Provide the nonce if you have one
                 .build()
 
             val request: GetCredentialRequest = GetCredentialRequest.Builder()
@@ -389,24 +390,13 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
 
         Button(
             onClick = onClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 16.dp, end = 16.dp),
-            shape = RoundedCornerShape(6.dp),
-            elevation = ButtonDefaults.buttonElevation(
-                defaultElevation = 4.dp
-            ),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.White,
-                contentColor = Color.Black
-            )
         ) {
             Text("Sign in with Google")
         }
     }
     ```
 
-    ### Configuration [#kotlin-configuration-native-app]
+    ### Configuration [#android-configuration]
 
     1. Configure OAuth credentials for your Google Cloud project in the [Credentials](https://console.cloud.google.com/apis/credentials) page of the console. When creating a new OAuth client ID, choose _Android_ or _iOS_ depending on the mobile operating system your app is built for.
 
@@ -456,6 +446,8 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
         Text("Sign in with Google")
     }
     ```
+
+    ### Configuration [#kotlin-multiplatform-configuration]
 
     1. Configure OAuth credentials for your Google Cloud project in the [Credentials](https://console.cloud.google.com/apis/credentials) page of the console. When creating a new OAuth client ID, choose _Android_ or _iOS_ depending on the mobile operating system your app is built for.
 
