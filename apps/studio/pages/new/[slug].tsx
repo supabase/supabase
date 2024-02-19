@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import generator from 'generate-password-browser'
-import { debounce } from 'lodash'
+import { capitalize, debounce } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
@@ -37,7 +37,10 @@ import {
 } from 'lib/constants'
 import { passwordStrength, pluckObjectFields } from 'lib/helpers'
 import { NextPageWithLayout } from 'types'
-import { Button, IconExternalLink, IconInfo, IconUsers, Input, Listbox } from 'ui'
+import { Badge, Button, IconExternalLink, IconInfo, IconUsers, Input, Listbox } from 'ui'
+import { components } from 'data/api'
+
+type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
 
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
@@ -223,8 +226,7 @@ const Wizard: NextPageWithLayout = () => {
     throw new Error('Invalid cloud provider')
   }
 
-  const sizes = [
-    'nano',
+  const sizes: DesiredInstanceSize[] = [
     'micro',
     'small',
     'medium',
@@ -236,6 +238,72 @@ const Wizard: NextPageWithLayout = () => {
     '12xlarge',
     '16xlarge',
   ]
+
+  const instanceSizeSpecs: Record<
+    DesiredInstanceSize,
+    { label: string; ram: string; cpu: string; price: string }
+  > = {
+    micro: {
+      label: 'Micro',
+      ram: '1 GB',
+      cpu: '2-core ARM',
+      price: '$0.01344/hour (~$10/month)',
+    },
+    small: {
+      label: 'Small',
+      ram: '2 GB',
+      cpu: '2-core ARM',
+      price: '$0.0206/hour (~$15/month)',
+    },
+    medium: {
+      label: 'Medium',
+      ram: '4 GB',
+      cpu: '2-core ARM',
+      price: '$0.0822/hour (~$60/month)',
+    },
+    large: {
+      label: 'Large',
+      ram: '8 GB',
+      cpu: '2-core ARM',
+      price: '$0.1517/hour (~$110/month)',
+    },
+    xlarge: {
+      label: 'XL',
+      ram: '16 GB',
+      cpu: '4-core ARM',
+      price: '$0.2877/hour (~$210/month)',
+    },
+    '2xlarge': {
+      label: '2XL',
+      ram: '32 GB',
+      cpu: '8-core ARM',
+      price: '$0.562/hour (~$410/month)',
+    },
+    '4xlarge': {
+      label: '4XL',
+      ram: '64 GB',
+      cpu: '16-core ARM',
+      price: '$1.32/hour (~$960/month)',
+    },
+    '8xlarge': {
+      label: '8XL',
+      ram: '128 GB',
+      cpu: '32-core ARM',
+      price: '$2.562/hour (~$1,870/month)',
+    },
+    '12xlarge': {
+      label: '12XL',
+      ram: '192 GB',
+      cpu: '48-core ARM',
+      price: '$3.836/hour (~$2,800/month)',
+    },
+    '16xlarge': {
+      label: '16XL',
+      ram: '256 GB',
+      cpu: '64-core ARM',
+      price: '$5.12/hour (~$3,730/month)',
+    },
+  }
 
   return (
     <Panel
@@ -406,23 +474,14 @@ const Wizard: NextPageWithLayout = () => {
                       onChange={(value) => setInstanceSize(value)}
                       descriptionText={
                         <>
-                          Select an appropriate size for the instance on which the database is
-                          hosted. You can always change this later with a small downtime (1-2
-                          minutes). Read more on{' '}
+                          Select the size for your dedicated database. You can always change this
+                          later. Read more on{' '}
                           <Link
                             href="https://supabase.com/docs/guides/platform/compute-add-ons"
                             target="_blank"
                             className="transition text-brand hover:text-brand-600"
                           >
                             Compute Add-ons
-                          </Link>{' '}
-                          or{' '}
-                          <Link
-                            href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
-                            target="_blank"
-                            className="transition text-brand hover:text-brand-600"
-                          >
-                            usage-based billing for compute
                           </Link>
                           .
                         </>
@@ -430,8 +489,30 @@ const Wizard: NextPageWithLayout = () => {
                     >
                       {sizes.map((option) => {
                         return (
-                          <Listbox.Option key={option} label={option} value={option}>
-                            <span className="text-foreground">{option}</span>
+                          <Listbox.Option
+                            key={option}
+                            label={`${instanceSizeSpecs[option].ram} RAM / ${instanceSizeSpecs[option].cpu} CPU (${instanceSizeSpecs[option].label})`}
+                            value={option}
+                          >
+                            <div className="flex space-x-2">
+                              <div className="text-center w-[80px]">
+                                <Badge
+                                  color={option === 'micro' ? 'gray' : 'brand'}
+                                  className="rounded-md w-16 text-center flex justify-center font-mono uppercase"
+                                >
+                                  {instanceSizeSpecs[option].label}
+                                </Badge>
+                              </div>
+                              <div className="text-sm">
+                                <span className="text-foreground">
+                                  {instanceSizeSpecs[option].ram} RAM /{' '}
+                                  {instanceSizeSpecs[option].cpu} CPU
+                                </span>
+                                <p className="text-xs text-muted">
+                                  {instanceSizeSpecs[option].price}
+                                </p>
+                              </div>
+                            </div>
                           </Listbox.Option>
                         )
                       })}

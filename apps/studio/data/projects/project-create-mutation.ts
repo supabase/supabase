@@ -29,29 +29,29 @@ export async function createProject({
   dbPass,
   dbRegion,
   dbSql,
-  dbPricingTierId = PRICING_TIER_PRODUCT_IDS.FREE,
   cloudProvider = PROVIDERS.AWS.id,
   configurationId,
   authSiteUrl,
   customSupabaseRequest,
   dbInstanceSize,
 }: ProjectCreateVariables) {
+  const body: components['schemas']['CreateProjectBody'] = {
+    cloud_provider: cloudProvider,
+    org_id: organizationId,
+    name,
+    db_pass: dbPass,
+    db_region: dbRegion,
+    db_sql: dbSql,
+    auth_site_url: authSiteUrl,
+    vercel_configuration_id: configurationId,
+    ...(customSupabaseRequest !== undefined && {
+      custom_supabase_internal_requests: customSupabaseRequest as any,
+    }),
+    desired_instance_size: dbInstanceSize,
+  }
+
   const { data, error } = await post(`/platform/projects`, {
-    body: {
-      cloud_provider: cloudProvider,
-      org_id: organizationId,
-      name,
-      db_pass: dbPass,
-      db_region: dbRegion,
-      db_sql: dbSql,
-      db_pricing_tier_id: dbPricingTierId,
-      auth_site_url: authSiteUrl,
-      vercel_configuration_id: configurationId,
-      ...(customSupabaseRequest !== undefined && {
-        custom_supabase_internal_requests: customSupabaseRequest as any,
-      }),
-      desired_instance_size: dbInstanceSize,
-    } as Omit<components['schemas']['CreateProjectBody'], 'customSupabaseRquest'>,
+    body,
   })
 
   if (error) throw error

@@ -3439,11 +3439,11 @@ export interface components {
       name: string
       db_pass: string
       db_region: string
-      db_pricing_tier_id: string
+      db_pricing_tier_id?: string
       db_sql?: string
       auth_site_url?: string
       vercel_configuration_id?: string
-      custom_supabase_internal_requests: components['schemas']['CustomSupabaseInternalRequests']
+      custom_supabase_internal_requests?: components['schemas']['CustomSupabaseInternalRequests']
     }
     CreateProjectResponse: {
       infra_compute_size?: components['schemas']['DbInstanceSize']
