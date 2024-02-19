@@ -29,7 +29,7 @@ const Profile = async () => {
       </div>
 
       <div className="col-span-4 xl:col-span-3 flex flex-col gap-y-4">
-        <p>Past conversations</p>
+        <h2>Past conversations</h2>
 
         <div className="w-full h-px border-t" />
 

@@ -146,9 +146,11 @@ const SortOverlay = ({ table, sorts: sortsFromUrl, setParams }: SortOverlayProps
         ) : (
           <p className="text-sm text-foreground-light">All columns have been added</p>
         )}
-        <Button disabled={isEqual(sorts, initialSorts)} type="default" onClick={onApplySort}>
-          Apply sorting
-        </Button>
+        <div className="flex items-center">
+          <Button disabled={isEqual(sorts, initialSorts)} type="default" onClick={onApplySort}>
+            Apply sorting
+          </Button>
+        </div>
       </div>
     </div>
   )

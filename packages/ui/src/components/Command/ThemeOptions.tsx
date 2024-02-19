@@ -9,18 +9,20 @@ const ThemeOptions = ({ isSubItem = false }) => {
   const { setTheme } = useTheme()
   return (
     <CommandGroup>
-      {themes.map((theme: Theme) => (
-        <ChildItem
-          key={theme.value}
-          isSubItem={isSubItem}
-          onSelect={() => {
-            setTheme(theme.value)
-            setIsOpen(false)
-          }}
-        >
-          Change Theme to {theme.name === 'System' ? 'System Default' : theme.name}
-        </ChildItem>
-      ))}
+      {themes
+        .filter((x) => x.name === 'System' || x.name === 'Light' || x.name === 'Dark')
+        .map((theme: Theme) => (
+          <ChildItem
+            key={theme.value}
+            isSubItem={isSubItem}
+            onSelect={() => {
+              setTheme(theme.value)
+              setIsOpen(false)
+            }}
+          >
+            Change Theme to {theme.name === 'System' ? 'System Default' : theme.name}
+          </ChildItem>
+        ))}
     </CommandGroup>
   )
 }

@@ -10,7 +10,6 @@ import { parseSupaTable, SupabaseGrid, SupaTable } from 'components/grid'
 import { ERROR_PRIMARY_KEY_NOTFOUND } from 'components/grid/constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Connecting from 'components/ui/Loading/Loading'
-import TwoOptionToggle from 'components/ui/TwoOptionToggle'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import {
   ForeignKeyConstraint,
@@ -27,7 +26,6 @@ import { EMPTY_ARR } from 'lib/void'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { Dictionary, SchemaView } from 'types'
-import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
 import GridHeaderActions from './GridHeaderActions'
 import NotFoundState from './NotFoundState'
 import SidePanelEditor from './SidePanelEditor'
@@ -53,17 +51,8 @@ const TableGridEditor = ({
 
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
-
   const getImpersonatedRole = useGetImpersonatedRole()
-
-  const [{ view: selectedView = 'data' }, setUrlState] = useUrlState()
-  const setSelectedView = (view: string) => {
-    if (view === 'data') {
-      setUrlState({ view: undefined })
-    } else {
-      setUrlState({ view })
-    }
-  }
+  const [{ view: selectedView = 'data' }] = useUrlState()
 
   const canEditTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
   const canEditColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
@@ -297,25 +286,6 @@ const TableGridEditor = ({
             <>
               {canEditViaTableEditor && (
                 <GridHeaderActions table={selectedTable as PostgresTable} />
-              )}
-              {(isTableSelected || isViewSelected) && (
-                <>
-                  {isViewSelected && <RoleImpersonationPopover serviceRoleLabel="postgres" />}
-
-                  {canEditViaTableEditor && (
-                    <div className="h-[20px] w-px border-r border-control"></div>
-                  )}
-
-                  <div>
-                    <TwoOptionToggle
-                      width={75}
-                      options={['definition', 'data']}
-                      activeOption={selectedView}
-                      borderOverride="border-gray-500"
-                      onClickOption={setSelectedView}
-                    />
-                  </div>
-                </>
               )}
             </>
           ) : null

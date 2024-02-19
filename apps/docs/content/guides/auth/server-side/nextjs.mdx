@@ -83,6 +83,8 @@ Create a `utils/supabase` folder with a file for each type of client. Then copy 
 
     The `set` and `remove` methods for the server client need error handlers, because Next.js throws an error if cookies are set from Server Components. You can safely ignore this error because you'll set up middleware in the next step to write refreshed cookies to storage.
 
+    The cookie is named `sb-<project_ref>-auth-token` by default.
+
     </Accordion.Item>
 
   </div>
@@ -625,6 +627,8 @@ Create a `utils/supabase` folder with a file for each type of client. Then copy 
     >
 
     The cookies object lets the Supabase client know how to access the cookies, so it can read and write the user session. To make `@supabase/ssr` framework-agnostic, the cookies methods aren't hard-coded. But you only need to set them up once. You can then reuse your utility functions whenever you need a Supabase client.
+
+    The cookie is named `sb-<project_ref>-auth-token` by default.
 
     </Accordion.Item>
 
