@@ -35,30 +35,28 @@ export const Messages = async ({ threadId }: { threadId: string }) => {
 
   return (
     <ScrollArea className="grow h-px">
+      <div className="flex flex-col mb-6 xl:mb-12">
+        {userMessages.map((message, idx) => {
+          const createdAtTimestamp = dayjs(message.createdAt)
+          const isLatest = Array.isArray(messages) && idx === messages.length - 1
 
-        <div className="flex flex-col mb-6 xl:mb-12">
-          {userMessages.map((message, idx) => {
-            const createdAtTimestamp = dayjs(message.createdAt)
-            const isLatest = Array.isArray(messages) && idx === messages.length - 1
+          const hoursFromNow = dayjs().diff(createdAtTimestamp, 'hour')
+          const formattedTimeFromNow = dayjs(createdAtTimestamp).fromNow()
 
-            const hoursFromNow = dayjs().diff(createdAtTimestamp, 'hour')
-            const formattedTimeFromNow = dayjs(createdAtTimestamp).fromNow()
+          const formattedCreatedAt = dayjs(createdAtTimestamp).format('DD MMM YYYY, HH:mm')
 
-            const formattedCreatedAt = dayjs(createdAtTimestamp).format('DD MMM YYYY, HH:mm')
+          const times = {
+            hoursFromNow,
+            formattedTimeFromNow,
+            formattedCreatedAt,
+          }
 
-            const times = {
-              hoursFromNow,
-              formattedTimeFromNow,
-              formattedCreatedAt,
-            }
-
-            return (
-              <MessageItem key={message.id} message={message} isLatest={isLatest} times={times} />
-            )
-          })}
-        </div>
-        <BottomMarker />
-
+          return (
+            <MessageItem key={message.id} message={message} isLatest={isLatest} times={times} />
+          )
+        })}
+      </div>
+      <BottomMarker />
     </ScrollArea>
   )
 }
