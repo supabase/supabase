@@ -35,8 +35,8 @@ export const Messages = async ({ threadId }: { threadId: string }) => {
 
   return (
     <ScrollArea className="grow h-px">
-      <div className="flex flex-col py-2 xl:py-6">
-        <div className="flex flex-col py-2 xl:py-6">
+
+        <div className="flex flex-col mb-6 xl:mb-12">
           {userMessages.map((message, idx) => {
             const createdAtTimestamp = dayjs(message.createdAt)
             const isLatest = Array.isArray(messages) && idx === messages.length - 1
@@ -58,7 +58,7 @@ export const Messages = async ({ threadId }: { threadId: string }) => {
           })}
         </div>
         <BottomMarker />
-      </div>
+
     </ScrollArea>
   )
 }

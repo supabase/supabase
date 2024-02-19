@@ -46,7 +46,7 @@ const SchemaFlowHandler = ({ content }: SchemaGraphProps) => {
     getGraphDataFromTables(tables).then(({ nodes, edges }) => {
       reactFlowInstance.setNodes(nodes)
       reactFlowInstance.setEdges(edges)
-      setTimeout(() => reactFlowInstance.fitView({}), 50)
+      setTimeout(() => reactFlowInstance.fitView({minZoom: 1}), 50)
     })
   }, [tables, resolvedTheme, reactFlowInstance])
 
