@@ -339,7 +339,7 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
             val credentialManager = CredentialManager.create(context)
 
             // Generate a nonce and hash it with sha-256
-            val rawNonce = UUID.randomUUID().toString() // Generate a random String. UUID should be sufficient for this.
+            val rawNonce = UUID.randomUUID().toString() // Generate a random String. UUID should be sufficient, but can also be any other random string.
             val bytes = rawNonce.toString().toByteArray()
             val md = MessageDigest.getInstance("SHA-256")
             val digest = md.digest(bytes)
@@ -416,6 +416,54 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
     3. Finally, add the client ID from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers), under _Authorized Client IDs_.
 
     Note that you do not have to configure the OAuth flow in the Supabase Dashboard in order to use native sign in.
+
+    ## Using Google sign-in with Kotlin Multiplatform
+
+    When using [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/), you can use the [compose-auth](https://supabase.com/docs/reference/kotlin/installing) plugin. On Android it uses Google OneTap (or Credential Manager on Android 14+) automatically and on other platforms it uses `auth.signInWith(Google)`.
+    Alternatively, you can have a look at [Google One Tap](https://developers.google.com/identity/one-tap/android/overview), just login with the IdToken after you receive it.
+
+    **Initialize the Supabase Client**
+
+    **Note:** You have to create OAuth credentials for both a Web and Android application. [Learn more](https://developers.google.com/identity/one-tap/android/get-started#api-console)
+
+    ```kotlin
+    val supabaseClient = createSupabaseClient(
+        supabaseUrl = "SUPABASE_URL",
+        supabaseKey = "SUPABASE_KEY"
+    ) {
+        install(GoTrue)
+        install(ComposeAuth) {
+            nativeGoogleLogin("WEB_GOOGLE_CLIENT_ID") //Use the Web Client ID, not the Android one!
+        }
+    }
+    ```
+
+    **Use the Compose Auth plugin in your Auth Screen**
+
+    ```kotlin
+    val authState = supabaseClient.composeAuth.rememberLoginWithGoogle(
+        onResult = {
+            when(it) { //handle errors
+                NativeSignInResult.ClosedByUser -> TODO()
+                is NativeSignInResult.Error -> TODO()
+                is NativeSignInResult.NetworkError -> TODO()
+                NativeSignInResult.Success -> TODO()
+            }
+        }
+    )
+
+    Button(onClick = { authState.startFlow() }) {
+        Text("Sign in with Google")
+    }
+    ```
+
+    1. Configure OAuth credentials for your Google Cloud project in the [Credentials](https://console.cloud.google.com/apis/credentials) page of the console. When creating a new OAuth client ID, choose _Android_ or _iOS_ depending on the mobile operating system your app is built for.
+
+      - For Android, use the instructions on screen to provide the SHA-1 certificate fingerprint used to sign your Android app.
+      - For iOS, use the instructions on screen to provide the app Bundle ID, and App Store ID and Team ID if the app is already published on the Apple AppStore.
+
+    2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app. In particular, make sure you have set up links to your app's privacy policy and terms of service.
+    3. Finally, add the client ID from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers), under _Authorized Client IDs_.
 
   </TabPanel>
 
