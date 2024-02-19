@@ -24,7 +24,9 @@ import InformationBox from 'components/ui/InformationBox'
 import { useBackupsQuery } from 'data/database/backups-query'
 import { usePitrRestoreMutation } from 'data/database/pitr-restore-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { PROJECT_STATUS } from 'lib/constants'
+import Link from 'next/link'
 import BackupsEmpty from '../BackupsEmpty'
 import { Timezone } from './PITR.types'
 import {
@@ -35,9 +37,7 @@ import {
 } from './PITR.utils'
 import PITRStatus from './PITRStatus'
 import TimeInput from './TimeInput'
-import TimezoneSelection from './TimezoneSelection'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import Link from 'next/link'
+import { TimezoneSelection } from './TimezoneSelection'
 
 const PITRSelection = () => {
   const router = useRouter()
@@ -294,8 +294,6 @@ const PITRSelection = () => {
                           <p className="text-sm text-foreground-light">Time zone</p>
                           <div className="w-[350px]">
                             <TimezoneSelection
-                              hideLabel
-                              dropdownWidth="w-[400px]"
                               selectedTimezone={selectedTimezone}
                               onSelectTimezone={setSelectedTimezone}
                             />

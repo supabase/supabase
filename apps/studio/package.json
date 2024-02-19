@@ -56,7 +56,6 @@
     "ip-num": "^1.5.1",
     "json-logic-js": "^2.0.2",
     "jsonrepair": "^3.2.3",
-    "jwt-simple": "^0.5.6",
     "lodash": "^4.17.21",
     "lucide-react": "^0.167.0",
     "markdown-table": "=2.0.0",
