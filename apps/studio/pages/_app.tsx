@@ -1,5 +1,3 @@
-import 'ui/build/css/themes/dark.css'
-import 'ui/build/css/themes/light.css'
 import 'styles/code.scss'
 import 'styles/contextMenu.scss'
 import 'styles/date-picker.scss'
@@ -7,13 +5,16 @@ import 'styles/editor.scss'
 import 'styles/graphiql-base.scss'
 import 'styles/grid.scss'
 import 'styles/main.scss'
+import 'styles/markdown-preview.scss'
 import 'styles/monaco.scss'
 import 'styles/react-data-grid-logs.scss'
+import 'styles/reactflow.scss'
 import 'styles/storage.scss'
 import 'styles/stripe.scss'
 import 'styles/toast.scss'
 import 'styles/ui.scss'
-import 'styles/reactflow.scss'
+import 'ui/build/css/themes/dark.css'
+import 'ui/build/css/themes/light.css'
 
 import { loader } from '@monaco-editor/react'
 import { TooltipProvider } from '@radix-ui/react-tooltip'
@@ -32,7 +33,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 // @ts-ignore
 import Prism from 'prism-react-renderer/prism'
-import ConsentToast from 'ui/src/components/ConsentToast'
+import { ConsentToast } from 'ui-patterns/ConsentToast'
 import PortalToast from 'ui/src/layout/PortalToast'
 
 import Favicons from 'components/head/Favicons'
@@ -41,6 +42,7 @@ import {
   CommandMenuWrapper,
   RouteValidationWrapper,
 } from 'components/interfaces/App'
+import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
 import {
   FeaturePreviewContextProvider,
   FeaturePreviewModal,
@@ -145,6 +147,8 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
 
   useThemeSandbox()
 
+  const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
+
   return (
     <QueryClientProvider client={queryClient}>
       <Hydrate state={pageProps.dehydratedState}>
@@ -162,14 +166,16 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                   <TooltipProvider>
                     <RouteValidationWrapper>
                       <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
-                        <CommandMenuWrapper>
-                          <AppBannerWrapper>
-                            <FeaturePreviewContextProvider>
-                              {getLayout(<Component {...pageProps} />)}
-                              <FeaturePreviewModal />
-                            </FeaturePreviewContextProvider>
-                          </AppBannerWrapper>
-                        </CommandMenuWrapper>
+                        <AppBannerContextProvider>
+                          <CommandMenuWrapper>
+                            <AppBannerWrapper>
+                              <FeaturePreviewContextProvider>
+                                {getLayout(<Component {...pageProps} />)}
+                                <FeaturePreviewModal />
+                              </FeaturePreviewContextProvider>
+                            </AppBannerWrapper>
+                          </CommandMenuWrapper>
+                        </AppBannerContextProvider>
                       </ThemeProvider>
                     </RouteValidationWrapper>
                   </TooltipProvider>
@@ -177,7 +183,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
 
                 <HCaptchaLoadedStore />
                 <PortalToast />
-                <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
+                {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />}
               </FlagProvider>
             </ProfileProvider>
           </AuthContainer>

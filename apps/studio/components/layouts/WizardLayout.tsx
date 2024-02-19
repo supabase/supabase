@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 import { IconChevronRight } from 'ui'
 
-import { useFlag, withAuth } from 'hooks'
+import { withAuth } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { Organization, Project } from 'types'
 import FeedbackDropdown from './ProjectLayout/LayoutHeader/FeedbackDropdown'
@@ -19,11 +19,8 @@ const WizardLayout = ({
   project,
   children,
 }: PropsWithChildren<WizardLayoutProps>) => {
-  const ongoingIncident = useFlag('ongoingIncident')
-  const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
-
   return (
-    <div className="flex w-full flex-col" style={{ height: maxHeight, maxHeight }}>
+    <div className="flex w-full flex-col">
       <Header organization={organization} project={project} />
       <div className="overflow-auto">
         <section className="has-slide-in slide-in relative mx-auto my-10 max-w-2xl">

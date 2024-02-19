@@ -20,9 +20,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   IconMail,
-  IconMoreHorizontal,
+  IconMoreVertical,
   IconShieldOff,
   IconTrash,
+  IconUser,
   Modal,
 } from 'ui'
 
@@ -30,9 +31,17 @@ interface UserDropdownProps {
   user: User
   canRemoveUser: boolean
   canRemoveMFAFactors: boolean
+  setSelectedUser: (user: User) => void
+  setUserSidePanelOpen: (open: boolean) => void
 }
 
-const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdownProps) => {
+const UserDropdown = ({
+  user,
+  canRemoveUser,
+  canRemoveMFAFactors,
+  setSelectedUser,
+  setUserSidePanelOpen,
+}: UserDropdownProps) => {
   const { ui } = useStore()
   const { ref } = useParams()
 
@@ -122,16 +131,26 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
     }
   }
 
+  const handleViewUserInfo = () => {
+    setSelectedUser(user)
+    setUserSidePanelOpen(true)
+  }
+
   return (
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button type="text" loading={isLoading} className="hover:border-gray-500 flex">
-            <IconMoreHorizontal />
+            <IconMoreVertical />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
           <>
+            <DropdownMenuItem className="space-x-2" onClick={handleViewUserInfo}>
+              <IconUser size="tiny" />
+              <p>View user info</p>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
             {user.email !== null ? (
               <>
                 <DropdownMenuItem className="space-x-2" onClick={handleResetPassword}>
@@ -151,6 +170,7 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
               </DropdownMenuItem>
             ) : null}
             <DropdownMenuSeparator />
+
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger asChild>
                 <DropdownMenuItem
@@ -164,9 +184,9 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
                   <p>Remove MFA factors</p>
                 </DropdownMenuItem>
               </Tooltip.Trigger>
-              {/* 
+              {/*
                 [Joshen] Deleting MFA factors should be different ABAC perms i think
-                 need to double check with KM / anyone familiar with ABAC 
+                 need to double check with KM / anyone familiar with ABAC
               */}
               {!canRemoveMFAFactors && (
                 <Tooltip.Portal>

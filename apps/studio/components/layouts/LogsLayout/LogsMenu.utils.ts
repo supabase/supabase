@@ -30,6 +30,7 @@ export const generateLogsMenu = (
       })),
     },
     {
+      title: 'Infrastructure',
       items: [
         {
           name: IS_PLATFORM ? 'API Edge Network' : 'Kong API',

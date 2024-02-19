@@ -1,7 +1,8 @@
 import { action } from '@storybook/addon-actions'
-import React, { useState } from 'react'
-import { Button, Space, Typography } from '../../index'
+import { useState } from 'react'
 
+import { Button } from '../Button'
+import { Space } from '../Space'
 import { SidePanel } from './index'
 
 export default {
@@ -237,7 +238,7 @@ customFooter.args = {
   customFooter: [
     <Space>
       <Button type="secondary">Cancel</Button>
-      <Button danger>Delete</Button>
+      <Button type="danger">Delete</Button>
     </Space>,
   ],
 }

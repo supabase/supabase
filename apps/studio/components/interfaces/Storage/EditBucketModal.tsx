@@ -141,8 +141,8 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
                         !bucket?.public && values.public
                           ? 'Warning: Making bucket public'
                           : bucket?.public && !values.public
-                          ? 'Warning: Making bucket private'
-                          : ''
+                            ? 'Warning: Making bucket private'
+                            : ''
                       }
                       variant="warning"
                       withIcon
@@ -151,8 +151,8 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
                         {!bucket?.public && values.public
                           ? `This will make all objects in the bucket "${bucket?.name}" public`
                           : bucket?.public && !values.public
-                          ? `All objects in "${bucket?.name}" will be made private and will only be accessible via signed URLs or downloaded with the right authorisation headers`
-                          : ''}
+                            ? `All objects in "${bucket?.name}" will be made private and will only be accessible via signed URLs or downloaded with the right authorisation headers`
+                            : ''}
                       </p>
                     </Alert>
                   )}

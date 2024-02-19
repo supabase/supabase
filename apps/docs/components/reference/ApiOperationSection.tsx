@@ -45,8 +45,8 @@ const ApiOperationSection = (props) => {
                 {operation.parameters &&
                   operation.parameters
                     .filter((parameter: any) => parameter.in === 'path')
-                    .map((parameter: any) => (
-                      <Param {...parameter} isOptional={!parameter.required}></Param>
+                    .map((parameter: any, index: number) => (
+                      <Param key={index} {...parameter} isOptional={!parameter.required}></Param>
                     ))}
               </ul>
             </div>
@@ -61,8 +61,8 @@ const ApiOperationSection = (props) => {
                 {operation.parameters &&
                   operation.parameters
                     .filter((parameter: any) => parameter.in === 'query')
-                    .map((parameter: any) => (
-                      <Param {...parameter} isOptional={!parameter.required}></Param>
+                    .map((parameter: any, index: number) => (
+                      <Param key={index} {...parameter} isOptional={!parameter.required}></Param>
                     ))}
               </ul>
             </div>
@@ -77,8 +77,8 @@ const ApiOperationSection = (props) => {
                 {operation.parameters &&
                   operation.parameters
                     .filter((parameter: any) => parameter.in === 'header')
-                    .map((parameter: any) => (
-                      <Param {...parameter} isOptional={!parameter.required}></Param>
+                    .map((parameter: any, index) => (
+                      <Param key={index} {...parameter} isOptional={!parameter.required}></Param>
                     ))}
               </ul>
             </div>
@@ -94,8 +94,8 @@ const ApiOperationSection = (props) => {
             defaultActiveId={operation.responseList[0].responseCode}
             queryGroup="response-status"
           >
-            {operation.responseList.map((response: any) => (
-              <Tabs.Panel id={response.responseCode} label={response.responseCode}>
+            {operation.responseList.map((response: any, i: number) => (
+              <Tabs.Panel key={i} id={response.responseCode} label={response.responseCode}>
                 <p className="text-background">{response.description}</p>
                 {response?.content && response?.content['application/json'] && (
                   <div className="mt-8">
