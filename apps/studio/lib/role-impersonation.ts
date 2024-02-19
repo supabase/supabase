@@ -123,13 +123,13 @@ export async function getRoleImpersonationJWT(
 }
 
 async function createToken(payload: object, key: string) {
-  var header = { typ: 'JWT', alg: 'HS256' }
+  const header = { typ: 'JWT', alg: 'HS256' }
 
-  var segments = []
+  const segments = []
   segments.push(btoa(JSON.stringify(header)).replace(/=/g, ''))
   segments.push(btoa(JSON.stringify(payload)).replace(/=/g, ''))
 
-  var footer = await sign(segments.join('.'), btoa(key).replace(/=/g, ''))
+  const footer = await sign(segments.join('.'), btoa(key).replace(/=/g, ''))
 
   segments.push(footer.replace(/=/g, ''))
 
@@ -154,8 +154,8 @@ async function sign(data: string, key: string) {
       ['sign', 'verify']
     )
     .then((key) => {
-      var jsonString = JSON.stringify(data)
-      var encodedData = new TextEncoder().encode(jsonString)
+      const jsonString = JSON.stringify(data)
+      const encodedData = new TextEncoder().encode(jsonString)
 
       return window.crypto.subtle.sign(
         {
@@ -166,9 +166,13 @@ async function sign(data: string, key: string) {
       )
     })
     .then((token) => {
-      var u8 = new Uint8Array(token)
-      var b64encoded = btoa(String.fromCharCode(...u8))
+      const u8 = new Uint8Array(token)
+      const b64encoded = btoa(String.fromCharCode(...u8))
 
       return b64encoded
+    })
+    .catch((err) => {
+      console.error('Error signing token', { err })
+      throw err
     })
 }
