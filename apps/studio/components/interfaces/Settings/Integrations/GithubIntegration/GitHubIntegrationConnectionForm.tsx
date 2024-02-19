@@ -2,13 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { GitBranch, RotateCcw, Shield } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import * as z from 'zod'
-
-import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
-import { useBranchesQuery } from 'data/branches/branches-query'
-import { useGitHubBranchesQuery } from 'data/integrations/github-branches-query'
-import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { useSelectedProject, useStore } from 'hooks'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -35,6 +28,13 @@ import {
   Popover_Shadcn_,
   cn,
 } from 'ui'
+import * as z from 'zod'
+
+import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
+import { useBranchesQuery } from 'data/branches/branches-query'
+import { useGitHubBranchesQuery } from 'data/integrations/github-branches-query'
+import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import { useSelectedProject, useStore } from 'hooks'
 
 const GitHubIntegrationConnectionForm = ({
   connection,
@@ -167,7 +167,7 @@ const GitHubIntegrationConnectionForm = ({
                     return (
                       <CommandItem_Shadcn_
                         key={branch.name}
-                        value={branch.name.replaceAll('"', '')}
+                        value={(branch.name as string).replaceAll('"', '')}
                         className="cursor-pointer w-full flex items-center justify-between"
                         onSelect={() => {
                           setOpen(false)

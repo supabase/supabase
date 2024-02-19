@@ -3,7 +3,6 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { integrationKeys } from './keys'
-import { useIntegrationsQuery } from './integrations-query'
 
 export type GitHubConnectionsVariables = {
   organizationId?: number
@@ -39,13 +38,9 @@ export const useGitHubConnectionsQuery = <TData = GitHubConnectionsData>(
     ...options
   }: UseQueryOptions<GitHubConnectionsData, GitHubConnectionsError, TData> = {}
 ) => {
-  const { data: integrations } = useIntegrationsQuery()
-  const hasGithubIntegration =
-    integrations?.some((int) => int.integration.name === 'GitHub') ?? false
-
   return useQuery<GitHubConnectionsData, GitHubConnectionsError, TData>(
     integrationKeys.githubConnectionsList(organizationId),
     ({ signal }) => getGitHubConnections({ organizationId }, signal),
-    { enabled: hasGithubIntegration, ...options }
+    { enabled, ...options }
   )
 }

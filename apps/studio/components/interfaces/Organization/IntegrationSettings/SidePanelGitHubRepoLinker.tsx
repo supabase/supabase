@@ -12,6 +12,7 @@ import { EMPTY_ARR } from 'lib/void'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import { SidePanel } from 'ui'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
+import toast from 'react-hot-toast'
 
 const GITHUB_ICON = (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 98 96" className="w-6">
@@ -67,6 +68,7 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
   const { mutate: createConnections, isLoading: isCreatingConnection } =
     useGitHubConnectionCreateMutation({
       onSuccess() {
+        toast.success('Successfully linked project to repository!')
         sidePanelStateSnapshot.setGithubConnectionsOpen(false)
       },
     })

@@ -17,6 +17,8 @@ import { useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import { IntegrationImageHandler } from '../IntegrationsSettings'
 import GitHubIntegrationConnectionForm from './GitHubIntegrationConnectionForm'
+import { OPT_IN_TAGS } from 'lib/constants'
+import { cn } from 'ui'
 
 const GitHubTitle = `GitHub Connections`
 
@@ -39,14 +41,16 @@ const GitHubSection = () => {
   const { data: allConnections } = useGitHubConnectionsQuery({ organizationId: org?.id })
   const { ref: projectRef } = useParams()
 
+  const isBranchingEnabled =
+    project?.is_branch_enabled === true || project?.parent_project_ref !== undefined
+
   const sidePanelsStateSnapshot = useSidePanelsStateSnapshot()
 
   const onAddGitHubConnection = useCallback(() => {
     sidePanelsStateSnapshot.setGithubConnectionsOpen(true)
   }, [sidePanelsStateSnapshot])
 
-  const isBranchingEnabled =
-    project?.is_branch_enabled === true || project?.parent_project_ref !== undefined
+  const hasAccessToBranching = org?.opt_in_tags?.includes(OPT_IN_TAGS.PREVIEW_BRANCHES) ?? false
 
   const isBranch = project?.parent_project_ref !== undefined
 
@@ -116,45 +120,58 @@ const GitHubSection = () => {
                     }}
                     type={'GitHub' as IntegrationName}
                     onDeleteConnection={onDeleteGitHubConnection}
-                    className="!rounded-b-none !mb-0"
+                    className={cn(isBranchingEnabled ? '!rounded-b-none !mb-0' : '')}
                   />
 
-                  <div className="border-b border-l border-r rounded-b-lg">
-                    <GitHubIntegrationConnectionForm
-                      connection={{
-                        id: String(connection.id),
-                        added_by: {
-                          id: String(connection.user?.id),
-                          primary_email: connection.user?.primary_email ?? '',
-                          username: connection.user?.username ?? '',
-                        },
-                        foreign_project_id: String(connection.repository.id),
-                        supabase_project_ref: connection.project.ref,
-                        organization_integration_id: 'unused',
-                        inserted_at: connection.inserted_at,
-                        updated_at: connection.updated_at,
-                        metadata: {
-                          name: connection.repository.name,
-                          supabaseConfig: {
-                            // supabaseDirectory: connection.cwd_path
+                  {isBranchingEnabled && (
+                    <div className="border-b border-l border-r rounded-b-lg">
+                      <GitHubIntegrationConnectionForm
+                        connection={{
+                          id: String(connection.id),
+                          added_by: {
+                            id: String(connection.user?.id),
+                            primary_email: connection.user?.primary_email ?? '',
+                            username: connection.user?.username ?? '',
                           },
-                        } as any,
-                      }}
-                    />
-                  </div>
+                          foreign_project_id: String(connection.repository.id),
+                          supabase_project_ref: connection.project.ref,
+                          organization_integration_id: 'unused',
+                          inserted_at: connection.inserted_at,
+                          updated_at: connection.updated_at,
+                          metadata: {
+                            name: connection.repository.name,
+                            supabaseConfig: {
+                              supabaseDirectory: connection.cwd_path,
+                            },
+                          } as any,
+                        }}
+                      />
+                    </div>
+                  )}
                 </div>
               ))}
             </ul>
+          ) : hasAccessToBranching ? (
+            <EmptyIntegrationConnection
+              onClick={onAddGitHubConnection}
+              orgSlug={org?.slug}
+              showNode={false}
+            >
+              Add new project connection
+            </EmptyIntegrationConnection>
           ) : (
-            isBranchingEnabled && (
-              <EmptyIntegrationConnection
-                onClick={onAddGitHubConnection}
-                orgSlug={org?.slug}
-                showNode={false}
+            <p className="text-sm text-foreground-light">
+              Access to{' '}
+              <a
+                href="https://supabase.com/docs/guides/platform/branching"
+                target="_blank"
+                rel="noreferrer"
+                className="text-foreground"
               >
-                Add new project connection
-              </EmptyIntegrationConnection>
-            )
+                branching
+              </a>{' '}
+              is required to add GitHub connections.
+            </p>
           )}
         </ScaffoldSectionContent>
       </ScaffoldSection>

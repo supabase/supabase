@@ -16,6 +16,7 @@ import {
   Popover_Shadcn_,
   cn,
 } from 'ui'
+import { useRouter } from 'next/router'
 
 import ShimmerLine from 'components/ui/ShimmerLine'
 import {
@@ -75,6 +76,7 @@ const ProjectLinker = ({
   defaultSupabaseProjectRef,
   defaultForeignProjectId,
 }: ProjectLinkerProps) => {
+  const router = useRouter()
   const [supabaseProjectsComboBoxOpen, setSupabaseProjectsComboboxOpen] = useState(false)
   const [foreignProjectsComboBoxOpen, setForeignProjectsComboboxOpen] = useState(false)
   const supabaseProjectsComboBoxRef = useRef<HTMLButtonElement>(null)
@@ -170,7 +172,7 @@ const ProjectLinker = ({
 
         {loadingForeignProjects || loadingSupabaseProjects ? (
           <div className="w-1/2 mx-auto space-y-2 py-4">
-            <p className="text-foreground text-center">Loading projects</p>
+            <p className="text-sm text-foreground text-center">Loading projects</p>
             <ShimmerLine active />
           </div>
         ) : showNoEntitiesState && (noSupabaseProjects || noForeignProjects) ? (
@@ -184,7 +186,7 @@ const ProjectLinker = ({
             </p>
           </div>
         ) : (
-          <div className="flex gap-0 w-full relative">
+          <div className="flex justify-center gap-0 w-full relative">
             <Panel>
               <div className="bg-white shadow border rounded p-1 w-12 h-12 flex justify-center items-center">
                 <img src={`${BASE_PATH}/img/supabase-logo.svg`} alt="Supabase" className="w-6" />
@@ -198,7 +200,6 @@ const ProjectLinker = ({
                   <Button
                     ref={supabaseProjectsComboBoxRef}
                     type="default"
-                    size="medium"
                     block
                     disabled={defaultSupabaseProjectRef !== undefined || loadingSupabaseProjects}
                     loading={loadingSupabaseProjects}
@@ -226,7 +227,7 @@ const ProjectLinker = ({
                   </Button>
                 </PopoverTrigger_Shadcn_>
                 <PopoverContent_Shadcn_
-                  className="p-0 w-full"
+                  className="p-0 !w-72"
                   side="bottom"
                   align="center"
                   style={{ width: supabaseProjectsComboBoxRef.current?.offsetWidth }}
@@ -258,13 +259,31 @@ const ProjectLinker = ({
                             </CommandItem_Shadcn_>
                           )
                         })}
+                        {supabaseProjects.length === 0 && (
+                          <p className="text-xs text-foreground-lighter px-2 py-2">
+                            No projects found in this organization
+                          </p>
+                        )}
+                      </CommandGroup_Shadcn_>
+                      <CommandSeparator_Shadcn_ />
+                      <CommandGroup_Shadcn_>
+                        <CommandItem_Shadcn_
+                          className="flex gap-2 items-center cursor-pointer"
+                          onClick={() => router.push(`/new/${selectedOrganization?.slug}`)}
+                          onSelect={() => router.push(`/new/${selectedOrganization?.slug}`)}
+                        >
+                          <PlusIcon size={16} />
+                          <span>Create a new project</span>
+                        </CommandItem_Shadcn_>
                       </CommandGroup_Shadcn_>
                     </CommandList_Shadcn_>
                   </Command_Shadcn_>
                 </PopoverContent_Shadcn_>
               </Popover_Shadcn_>
             </Panel>
-            <div className="border border-foreground-lighter h-px w-16 border-dashed self-end mb-5"></div>
+
+            <div className="border border-foreground-lighter h-px w-16 border-dashed self-end mb-4" />
+
             <Panel>
               <div className="bg-black shadow rounded p-1 w-12 h-12 flex justify-center items-center">
                 {integrationIcon}
@@ -278,7 +297,6 @@ const ProjectLinker = ({
                   <Button
                     ref={foreignProjectsComboBoxRef}
                     type="default"
-                    size="medium"
                     block
                     disabled={loadingForeignProjects}
                     loading={loadingForeignProjects}
@@ -298,7 +316,7 @@ const ProjectLinker = ({
                   </Button>
                 </PopoverTrigger_Shadcn_>
                 <PopoverContent_Shadcn_
-                  className="p-0 w-full"
+                  className="p-0 !w-72"
                   side="bottom"
                   align="center"
                   style={{ width: foreignProjectsComboBoxRef.current?.offsetWidth }}
@@ -319,21 +337,28 @@ const ProjectLinker = ({
                                 setForeignProjectsComboboxOpen(false)
                               }}
                             >
-                              {getForeignProjectIcon?.(project) ?? integrationIcon}
-                              <span>{project.name}</span>
+                              <div>{getForeignProjectIcon?.(project) ?? integrationIcon}</div>
+                              <span className="truncate" title={project.name}>
+                                {project.name}
+                              </span>
                             </CommandItem_Shadcn_>
                           )
                         })}
-                        <>
-                          <CommandSeparator_Shadcn_ />
-                          <CommandItem_Shadcn_
-                            className="flex gap-2 items-center"
-                            onSelect={openInstallGitHubIntegrationWindow}
-                          >
-                            <PlusIcon size={16} />
-                            <span>Add GitHub Repos</span>
-                          </CommandItem_Shadcn_>
-                        </>
+                        {foreignProjects.length === 0 && (
+                          <p className="text-xs text-foreground-lighter px-2 py-2">
+                            No GitHub repositories found
+                          </p>
+                        )}
+                      </CommandGroup_Shadcn_>
+                      <CommandSeparator_Shadcn_ />
+                      <CommandGroup_Shadcn_>
+                        <CommandItem_Shadcn_
+                          className="flex gap-2 items-center cursor-pointer"
+                          onSelect={openInstallGitHubIntegrationWindow}
+                        >
+                          <PlusIcon size={16} />
+                          <span>Add GitHub Repositories</span>
+                        </CommandItem_Shadcn_>
                       </CommandGroup_Shadcn_>
                     </CommandList_Shadcn_>
                   </Command_Shadcn_>

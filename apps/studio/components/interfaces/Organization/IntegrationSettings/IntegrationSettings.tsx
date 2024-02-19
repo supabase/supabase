@@ -33,9 +33,7 @@ const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
 const IntegrationSettings = () => {
   const { ui } = useStore()
   const org = useSelectedOrganization()
-
   const hasAccessToBranching = org?.opt_in_tags?.includes(OPT_IN_TAGS.PREVIEW_BRANCHES) ?? false
-
   const { data: connections } = useGitHubConnectionsQuery({ organizationId: org?.id })
 
   const { mutate: deleteGitHubConnection } = useGitHubConnectionDeleteMutation({
@@ -120,7 +118,7 @@ The GitHub app will watch for changes in your repository such as file changes, b
               />
             ))}
           </ul>
-          {hasAccessToBranching && (
+          {hasAccessToBranching ? (
             <EmptyIntegrationConnection
               onClick={onAddGitHubConnection}
               orgSlug={org?.slug}
@@ -128,6 +126,19 @@ The GitHub app will watch for changes in your repository such as file changes, b
             >
               Add new project connection
             </EmptyIntegrationConnection>
+          ) : (
+            <p className="text-sm text-foreground-light">
+              Access to{' '}
+              <a
+                href="https://supabase.com/docs/guides/platform/branching"
+                target="_blank"
+                rel="noreferrer"
+                className="text-foreground"
+              >
+                branching
+              </a>{' '}
+              is required to add GitHub connections.
+            </p>
           )}
         </ScaffoldSectionContent>
       </ScaffoldSection>

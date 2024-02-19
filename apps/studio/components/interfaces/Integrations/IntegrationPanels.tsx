@@ -185,7 +185,18 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
                   alt={`icon`}
                 />
               )}
-              <span className="text-sm truncate">{connection.metadata?.name}</span>
+              {type === 'GitHub' ? (
+                <a
+                  href={`https://github.com/${connection.metadata?.name}`}
+                  className="text-sm truncate"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {connection.metadata?.name}
+                </a>
+              ) : (
+                <span className="text-sm truncate">{connection.metadata?.name}</span>
+              )}
             </div>
 
             <div className="flex flex-col gap-0">

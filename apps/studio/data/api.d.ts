@@ -1790,8 +1790,6 @@ export interface components {
       actions?: components['schemas']['NotificationAction'][]
     }
     NotificationResponseV2: {
-      /** @deprecated */
-      type: string | null
       /** @enum {string} */
       status: 'new' | 'seen' | 'archived'
       /** @enum {string} */
@@ -2909,15 +2907,29 @@ export interface components {
       config_params: unknown
     }
     CreateFunctionBody: {
-      slug: string
+      args: string[]
+      /** @enum {string} */
+      behavior: 'VOLATILE' | 'STABLE' | 'IMMUTABLE'
+      config_params?: Record<string, never>
+      definition: string
+      language: string
       name: string
-      body: string
-      verify_jwt?: boolean
+      return_type: string
+      schema: string
+      security_definer: boolean
     }
     UpdateFunctionBody: {
+      id?: number
+      args?: string[]
+      /** @enum {string} */
+      behavior?: 'VOLATILE' | 'STABLE' | 'IMMUTABLE'
+      config_params?: Record<string, never>
+      definition?: string
+      language?: string
       name?: string
-      body?: string
-      verify_jwt?: boolean
+      return_type?: string
+      schema?: string
+      security_definer?: boolean
     }
     PostgresMaterializedView: {
       id: number
@@ -3405,42 +3417,18 @@ export interface components {
       ami: components['schemas']['AmiSearchOptions']
     }
     CreateProjectBody: {
-      /** @description Database password */
-      db_pass: string
-      /** @description Name of your project, should not contain dots */
-      name: string
-      /** @description Slug of your organization */
-      organization_id: string
-      /**
-       * @deprecated
-       * @description Subscription plan is now set on organization level and is ignored in this request
-       * @example free
-       * @enum {string}
-       */
-      plan?: 'free' | 'pro'
-      /**
-       * @description Region you want your server to reside in
-       * @example us-east-1
-       * @enum {string}
-       */
-      region:
-        | 'us-east-1'
-        | 'us-west-1'
-        | 'us-west-2'
-        | 'ap-east-1'
-        | 'ap-southeast-1'
-        | 'ap-northeast-1'
-        | 'ap-northeast-2'
-        | 'ap-southeast-2'
-        | 'eu-west-1'
-        | 'eu-west-2'
-        | 'eu-west-3'
-        | 'eu-central-1'
-        | 'ca-central-1'
-        | 'ap-south-1'
-        | 'sa-east-1'
       /** @deprecated */
       kps_enabled?: boolean
+      cloud_provider: string
+      org_id: number
+      name: string
+      db_pass: string
+      db_region: string
+      db_pricing_tier_id: string
+      db_sql?: string
+      auth_site_url?: string
+      vercel_configuration_id?: string
+      custom_supabase_internal_requests: components['schemas']['CustomSupabaseInternalRequests']
     }
     CreateProjectResponse: {
       infra_compute_size?: components['schemas']['DbInstanceSize']
@@ -3575,7 +3563,7 @@ export interface components {
     UpdatePasswordBody: {
       password: string
     }
-    Database: {
+    LoadBalancerDatabase: {
       identifier: string
       /** @enum {string} */
       type: 'PRIMARY' | 'READ_REPLICA'
@@ -3583,7 +3571,7 @@ export interface components {
     }
     LoadBalancerDetailResponse: {
       endpoint: string
-      databases: components['schemas']['Database'][]
+      databases: components['schemas']['LoadBalancerDatabase'][]
     }
     Buffer: Record<string, never>
     ResizeBody: {
@@ -3795,14 +3783,22 @@ export interface components {
       pgbouncer_status: 'COMING_DOWN' | 'COMING_UP' | 'DISABLED' | 'ENABLED' | 'RELOADING'
     }
     PostgrestConfigResponse: {
-      max_rows: number
       db_schema: string
+      db_anon_role: string
+      role_claim_key: string
+      jwt_secret: string
+      max_rows: number
       db_extra_search_path: string
     }
     UpdatePostgrestConfigBody: {
       max_rows?: number
       db_extra_search_path?: string
       db_schema?: string
+    }
+    V1PostgrestConfigResponse: {
+      max_rows: number
+      db_schema: string
+      db_extra_search_path: string
     }
     PostgresConfigResponse: {
       statement_timeout?: string
@@ -3906,12 +3902,12 @@ export interface components {
       serviceApiKey: string
       id: number
       name: string
-      app_config?: Record<string, never>
+      app_config: Record<string, never>
       app: {
         id?: number
         name?: string
       }
-      service_api_keys?: components['schemas']['ServiceApiKey'][]
+      service_api_keys: components['schemas']['ServiceApiKey'][]
     }
     ApiResponse: {
       autoApiService: components['schemas']['AutoApiService']
@@ -3928,10 +3924,10 @@ export interface components {
       }
     }
     ServiceApiKeyResponse: {
-      api_key?: string
       api_key_encrypted?: string
       tags: string
       name: string
+      api_key?: string
     }
     ServiceResponse: {
       service_api_keys: components['schemas']['ServiceApiKeyResponse'][]
@@ -3944,23 +3940,21 @@ export interface components {
       }
     }
     ProjectResponse: {
-      /** @description Id of your project */
-      id: string
-      /** @description Slug of your organization */
-      organization_id: string
-      /** @description Name of your project */
+      jwt_secret: string
+      services?: components['schemas']['ServiceResponse'][]
+      id: number
       name: string
-      /**
-       * @description Region of your project
-       * @example us-east-1
-       */
+      ref: string
+      status: string
+      inserted_at: string
+      db_dns_name: string
+      db_host: string
+      db_name: string
+      db_user: string
+      db_port: string
+      ssl_enforced: boolean
+      cloud_provider: string
       region: string
-      /**
-       * @description Creation timestamp
-       * @example 2023-03-29T16:32:59Z
-       */
-      created_at: string
-      database?: components['schemas']['DatabaseResponse']
     }
     SettingsResponse: {
       project: components['schemas']['ProjectResponse']
@@ -4247,14 +4241,14 @@ export interface components {
       foreign_project_id: string
       metadata: Record<string, never>
     }
-    IntegrationConnection: {
+    IntegrationConnectionVercel: {
       foreign_project_id: string
       supabase_project_ref: string
       metadata: Record<string, never>
     }
     CreateVercelConnectionsBody: {
       organization_integration_id: string
-      connection: components['schemas']['IntegrationConnection']
+      connection: components['schemas']['IntegrationConnectionVercel']
     }
     SyncVercelEnvError: {
       message: string
@@ -4294,6 +4288,7 @@ export interface components {
       project: components['schemas']['ListGitHubConnectionsProject']
       repository: components['schemas']['ListGitHubConnectionsRepository']
       user: components['schemas']['ListGitHubConnectionsUser'] | null
+      cwd_path: string
     }
     ListGitHubConnectionsResponse: {
       connections: components['schemas']['ListGitHubConnectionsConnection'][]
@@ -4372,11 +4367,70 @@ export interface components {
       addon_type: components['schemas']['ProjectAddonType']
       price_id?: string
     }
-    DatabaseResponse: {
+    SystemCreateProjectBody: {
+      /** @description Database password */
+      db_pass: string
+      /** @description Name of your project, should not contain dots */
+      name: string
+      /** @description Slug of your organization */
+      organization_id: string
+      /**
+       * @description Subscription plan
+       * @example free
+       * @enum {string}
+       */
+      plan: 'free' | 'pro'
+      /**
+       * @description Region you want your server to reside in
+       * @example us-east-1
+       * @enum {string}
+       */
+      region:
+        | 'us-east-1'
+        | 'us-west-1'
+        | 'us-west-2'
+        | 'ap-east-1'
+        | 'ap-southeast-1'
+        | 'ap-northeast-1'
+        | 'ap-northeast-2'
+        | 'ap-southeast-2'
+        | 'eu-west-1'
+        | 'eu-west-2'
+        | 'eu-west-3'
+        | 'eu-central-1'
+        | 'ca-central-1'
+        | 'ap-south-1'
+        | 'sa-east-1'
+      jwt_secret: string
+      anon_key: string
+      service_key: string
+      api_key_supabase: string
+      db_pass_supabase: string
+    }
+    SystemDatabaseResponse: {
       /** @description Database host */
       host: string
       /** @description Database version */
       version: string
+    }
+    SystemProjectResponse: {
+      /** @description Id of your project */
+      id: string
+      /** @description Slug of your organization */
+      organization_id: string
+      /** @description Name of your project */
+      name: string
+      /**
+       * @description Region of your project
+       * @example us-east-1
+       */
+      region: string
+      /**
+       * @description Creation timestamp
+       * @example 2023-03-29T16:32:59Z
+       */
+      created_at: string
+      database?: components['schemas']['SystemDatabaseResponse']
     }
     UpdateSubscriptionV2AdminBody: {
       payment_method?: string
@@ -4441,6 +4495,69 @@ export interface components {
       created_at: string
       updated_at: string
     }
+    V1DatabaseResponse: {
+      /** @description Database host */
+      host: string
+      /** @description Database version */
+      version: string
+    }
+    V1ProjectResponse: {
+      /** @description Id of your project */
+      id: string
+      /** @description Slug of your organization */
+      organization_id: string
+      /** @description Name of your project */
+      name: string
+      /**
+       * @description Region of your project
+       * @example us-east-1
+       */
+      region: string
+      /**
+       * @description Creation timestamp
+       * @example 2023-03-29T16:32:59Z
+       */
+      created_at: string
+      database?: components['schemas']['V1DatabaseResponse']
+    }
+    V1CreateProjectBody: {
+      /** @description Database password */
+      db_pass: string
+      /** @description Name of your project, should not contain dots */
+      name: string
+      /** @description Slug of your organization */
+      organization_id: string
+      /**
+       * @deprecated
+       * @description Subscription plan is now set on organization level and is ignored in this request
+       * @example free
+       * @enum {string}
+       */
+      plan?: 'free' | 'pro'
+      /**
+       * @description Region you want your server to reside in
+       * @example us-east-1
+       * @enum {string}
+       */
+      region:
+        | 'us-east-1'
+        | 'us-west-1'
+        | 'us-west-2'
+        | 'ap-east-1'
+        | 'ap-southeast-1'
+        | 'ap-northeast-1'
+        | 'ap-northeast-2'
+        | 'ap-southeast-2'
+        | 'eu-west-1'
+        | 'eu-west-2'
+        | 'eu-west-3'
+        | 'eu-central-1'
+        | 'ca-central-1'
+        | 'ap-south-1'
+        | 'sa-east-1'
+      /** @deprecated */
+      kps_enabled?: boolean
+    }
     ApiKeyResponse: {
       name: string
       api_key: string
@@ -4493,6 +4610,11 @@ export interface components {
       db_schema: string
       db_extra_search_path: string
       jwt_secret?: string
+    }
+    V1ProjectRefResponse: {
+      id: number
+      ref: string
+      name: string
     }
     SslEnforcements: {
       database: boolean
@@ -4613,7 +4735,7 @@ export interface components {
       db_connected: boolean
       connected_cluster: number
     }
-    ServiceHealthResponse: {
+    V1ServiceHealthResponse: {
       info?:
         | components['schemas']['AuthHealthResponse']
         | components['schemas']['RealtimeHealthResponse']
@@ -4997,13 +5119,16 @@ export interface components {
       created_at?: string
       updated_at?: string
     }
+    V1RunQueryBody: {
+      query: string
+    }
     V1Backup: {
       /** @enum {string} */
       status: 'COMPLETED' | 'FAILED' | 'PENDING' | 'REMOVED' | 'ARCHIVED'
       is_physical_backup: boolean
       inserted_at: string
     }
-    PhysicalBackup: {
+    V1PhysicalBackup: {
       earliest_physical_backup_date_unix?: number
       latest_physical_backup_date_unix?: number
     }
@@ -5012,10 +5137,16 @@ export interface components {
       walg_enabled: boolean
       pitr_enabled: boolean
       backups: components['schemas']['V1Backup'][]
-      physical_backup_data: components['schemas']['PhysicalBackup']
+      physical_backup_data: components['schemas']['V1PhysicalBackup']
     }
     V1RestorePitrBody: {
       recovery_time_target_unix: number
+    }
+    V1CreateFunctionBody: {
+      slug: string
+      name: string
+      body: string
+      verify_jwt?: boolean
     }
     FunctionSlugResponse: {
       id: string
@@ -5030,6 +5161,11 @@ export interface components {
       import_map?: boolean
       entrypoint_path?: string
       import_map_path?: string
+    }
+    V1UpdateFunctionBody: {
+      name?: string
+      body?: string
+      verify_jwt?: boolean
     }
     V1StorageBucketResponse: {
       id: string
@@ -5120,6 +5256,23 @@ export interface components {
       owner: components['schemas']['SnippetUser']
       updated_by: components['schemas']['SnippetUser']
       content: components['schemas']['SnippetContent']
+    }
+    ServiceHealthResponse: {
+      /**
+       * @description Service name
+       * @enum {string}
+       */
+      name: 'auth' | 'db' | 'pooler' | 'realtime' | 'rest' | 'storage'
+      /** @description Whether the service is healthy */
+      healthy: boolean
+      /**
+       * @description Service health status
+       * @example COMING_UP
+       * @enum {string}
+       */
+      status: 'COMING_UP' | 'ACTIVE_HEALTHY' | 'UNHEALTHY'
+      /** @description Service health check error */
+      error?: string
     }
     ResourceWithServicesStatusResponse: {
       /** @description Supabase project instance compute size */
@@ -7233,8 +7386,8 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['CreateFunctionBody']
-        'application/vnd.denoland.eszip': components['schemas']['CreateFunctionBody']
+        'application/json': components['schemas']['V1CreateFunctionBody']
+        'application/vnd.denoland.eszip': components['schemas']['V1CreateFunctionBody']
       }
     }
     responses: {
@@ -8630,7 +8783,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['ProjectResponse'][]
+          'application/json': components['schemas']['V1ProjectResponse'][]
         }
       }
     }
@@ -8639,13 +8792,13 @@ export interface operations {
   ProjectsController_createProject: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['CreateProjectBody']
+        'application/json': components['schemas']['V1CreateProjectBody']
       }
     }
     responses: {
       201: {
         content: {
-          'application/json': components['schemas']['ProjectResponse']
+          'application/json': components['schemas']['V1ProjectResponse']
         }
       }
     }
@@ -9077,7 +9230,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['ProjectRefResponse']
+          'application/json': components['schemas']['V1ProjectRefResponse']
         }
       }
       403: {
@@ -9517,7 +9670,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['PostgrestConfigResponse']
+          'application/json': components['schemas']['V1PostgrestConfigResponse']
         }
       }
       403: {
@@ -12338,7 +12491,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['ServiceHealthResponse'][]
+          'application/json': components['schemas']['V1ServiceHealthResponse'][]
         }
       }
       /** @description Failed to retrieve project's service health status */
@@ -12601,7 +12754,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['RunQueryBody']
+        'application/json': components['schemas']['V1RunQueryBody']
       }
     }
     responses: {
@@ -12756,8 +12909,8 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateFunctionBody']
-        'application/vnd.denoland.eszip': components['schemas']['UpdateFunctionBody']
+        'application/json': components['schemas']['V1UpdateFunctionBody']
+        'application/vnd.denoland.eszip': components['schemas']['V1UpdateFunctionBody']
       }
     }
     responses: {
