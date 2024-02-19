@@ -243,7 +243,7 @@ const TableList = ({
                         {(x.live_rows_estimate ?? x.live_row_count).toLocaleString()}
                       </Table.td>
                       <Table.td className="hidden text-right xl:table-cell">
-                        <code className="text-sm">{x.size}</code>
+                        <code className="text-xs">{x.size}</code>
                       </Table.td>
                       <Table.td className="hidden xl:table-cell text-center">
                         {(realtimePublication?.tables ?? []).find(

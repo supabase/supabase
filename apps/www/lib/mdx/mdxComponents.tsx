@@ -1,5 +1,12 @@
+import 'react-medium-image-zoom/dist/styles.css'
+
 import { PropsWithChildren } from 'react'
 import Image from 'next/image'
+import { useRouter } from 'next/router'
+import CopyToClipboard from 'react-copy-to-clipboard'
+import { isBrowser, useCopy } from 'common'
+import { ThemeImage } from 'ui-patterns/ThemeImage'
+
 import Avatar from '~/components/Avatar'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import { CH } from '@code-hike/mdx/components'
@@ -15,12 +22,12 @@ import {
   IconTriangle,
   cn,
   Admonition,
+  IconLink,
+  IconCheck,
+  Heading,
 } from 'ui'
 import ImageFadeStack from '~/components/ImageFadeStack'
 import ZoomableImg from '~/components/ZoomableImg/ZoomableImg'
-
-import 'react-medium-image-zoom/dist/styles.css'
-import { ThemeImage } from 'ui-patterns/ThemeImage'
 
 // import all components used in blog articles here
 // to do: move this into a helper/utils, it is used elsewhere
@@ -66,6 +73,12 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
   const components = {
     CodeBlock,
     CH,
+    h1: (props: any) => <Heading {...props} tag="h1" />,
+    h2: (props: any) => <Heading {...props} tag="h2" />,
+    h3: (props: any) => <Heading {...props} tag="h3" />,
+    h4: (props: any) => <Heading {...props} tag="h4" />,
+    h5: (props: any) => <Heading {...props} tag="h5" />,
+    h6: (props: any) => <Heading {...props} tag="h6" />,
     Badge,
     Quote,
     Avatar,

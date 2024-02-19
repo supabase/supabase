@@ -11,8 +11,6 @@ export type AuthConfigUpdateVariables = {
   config: Partial<components['schemas']['UpdateGoTrueConfigBody']>
 }
 
-export type UpdateAuthConfigResponse = components['schemas']['GoTrueConfig']
-
 export async function updateAuthConfig({ projectRef, config }: AuthConfigUpdateVariables) {
   const { data, error } = await patch('/platform/auth/{ref}/config', {
     params: {

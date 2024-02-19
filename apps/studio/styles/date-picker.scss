@@ -17,7 +17,7 @@
 }
 
 .react-datepicker__portal {
-  @apply absolute z-10 w-72 text-sm transform-none bg-background shadow px-3 py-2 top-12 right-0 border-2 border-background rounded;
+  @apply absolute z-10 w-72 text-sm transform-none bg-studio shadow px-3 py-2 top-12 right-0 border-2 border-background rounded;
 }
 
 .react-datepicker__month-container {
@@ -50,11 +50,11 @@
 }
 
 .react-datepicker__navigation--previous {
-  @apply right-12 w-10 h-10 rounded transition flex items-center justify-center hover:bg-background;
+  @apply right-12 w-10 h-10 rounded transition flex items-center justify-center hover:bg-studio;
 }
 
 .react-datepicker__navigation--next {
-  @apply right-4 w-10 h-10 rounded transition flex items-center justify-center hover:bg-background;
+  @apply right-4 w-10 h-10 rounded transition flex items-center justify-center hover:bg-studio;
 }
 
 .react-datepicker__day {
@@ -92,7 +92,7 @@
 
 .react-datepicker__day--range-start,
 .react-datepicker__day--range-end {
-  @apply bg-brand-accent text-foreground;
+  @apply bg-brand text-foreground;
 }
 
 .react-datepicker__day--highlighted {
