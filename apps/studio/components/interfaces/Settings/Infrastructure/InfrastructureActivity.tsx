@@ -50,10 +50,18 @@ const InfrastructureActivity = () => {
   const selectedAddons = addons?.selected_addons ?? []
 
   const { computeInstance } = getAddons(selectedAddons)
-  const currentComputeInstanceSpecs =
-    computeInstance?.variant?.meta ?? project?.infra_compute_size === 'nano'
-      ? INSTANCE_NANO_SPECS
-      : INSTANCE_MICRO_SPECS
+
+  function getCurrentComputeInstanceSpecs() {
+    if (computeInstance?.variant.meta) {
+      // If user has a compute instance (called addons) return that
+      return computeInstance?.variant.meta
+    } else {
+      // Otherwise, return the default specs
+      return project?.infra_compute_size === 'nano' ? INSTANCE_NANO_SPECS : INSTANCE_MICRO_SPECS
+    }
+  }
+
+  const currentComputeInstanceSpecs = getCurrentComputeInstanceSpecs()
 
   const currentBillingCycleSelected = useMemo(() => {
     // Selected by default
