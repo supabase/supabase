@@ -76,9 +76,15 @@ export const getAssistantResponse = async (threadId: string, messageId: string) 
           - On each subsequent message from the user, rewrite the original response to include the new requirement.
           - Don't add any SQL comments in the code
           - Never put a comma before a round bracket
+<<<<<<< HEAD
 
           The output should look like this: "CREATE TABLE users (id bigint primary key generated always as identity)"
 
+=======
+
+          The output should look like this: "CREATE TABLE users (id bigint primary key generated always as identity)"
+
+>>>>>>> @{-1}
           DO NOT RESPOND WITH ANYTHING ELSE.
           YOU MUST NOT ANSWER WITH ANY PLAIN TEXT
           ONLY RESPOND WITH 1 CODE BLOCK
