@@ -73,24 +73,12 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
       },
     })
 
-  const { mutateAsync: deleteGitHubConnection } = useGitHubConnectionDeleteMutation()
-
   const createGithubConnection = async (variables: IntegrationConnectionsCreateVariables) => {
     if (!selectedOrganization?.id) {
       throw new Error('No organization id')
     }
     if (!variables.new) {
       throw new Error('No new connection')
-    }
-
-    const existingGithubConnection = connections?.find(
-      (connection) => connection.project.ref === variables.new?.project_ref
-    )
-    if (existingGithubConnection !== undefined && selectedOrganization !== undefined) {
-      await deleteGitHubConnection({
-        connectionId: existingGithubConnection.id,
-        organizationId: selectedOrganization.id,
-      })
     }
 
     createConnections({
