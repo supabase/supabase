@@ -26,8 +26,7 @@ export type AiAssistantMessage = {
  * it.
  */
 export const getAssistantResponse = async (threadId: string, messageId: string) => {
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore)
+  const supabase = createClient()
 
   const { data: message, error } = await supabase
     .from('messages')
@@ -77,9 +76,9 @@ export const getAssistantResponse = async (threadId: string, messageId: string) 
           - On each subsequent message from the user, rewrite the original response to include the new requirement.
           - Don't add any SQL comments in the code
           - Never put a comma before a round bracket
-  
+
           The output should look like this: "CREATE TABLE users (id bigint primary key generated always as identity)"
-  
+
           DO NOT RESPOND WITH ANYTHING ELSE.
           YOU MUST NOT ANSWER WITH ANY PLAIN TEXT
           ONLY RESPOND WITH 1 CODE BLOCK
