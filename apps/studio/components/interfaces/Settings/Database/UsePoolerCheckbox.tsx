@@ -42,6 +42,7 @@ export const UsePoolerCheckbox = ({
   const { data: settings, isSuccess: isSuccessSettings } = useProjectSettingsQuery({ projectRef })
   const { data: pgBouncerStatus } = usePgBouncerStatus({ projectRef: projectRef })
 
+  const primaryConfig = data?.find((x) => x.database_type === 'PRIMARY')
   const resolvesToIpV6 = settings?.project.db_ip_addr_config === 'ipv6'
 
   const onSelectOption = (value: 'session' | 'transaction') => {
@@ -89,7 +90,7 @@ export const UsePoolerCheckbox = ({
                                 <span>Session mode</span>
                                 {poolingMode === 'session' && <IconCheck className="text-brand" />}
                               </DropdownMenuItem>
-                              {data.pool_mode === 'transaction' && (
+                              {primaryConfig?.pool_mode === 'transaction' && (
                                 <DropdownMenuItem
                                   key="session"
                                   className="flex items-center justify-between"
@@ -102,7 +103,7 @@ export const UsePoolerCheckbox = ({
                                 </DropdownMenuItem>
                               )}
 
-                              {data.pool_mode === 'session' && (
+                              {primaryConfig?.pool_mode === 'session' && (
                                 <>
                                   <Separator className="my-1" />
                                   <div className="px-2 text-xs flex flex-col gap-y-2">

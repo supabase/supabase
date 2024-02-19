@@ -69,6 +69,7 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
   const { data: poolingInfo, isSuccess: isSuccessPoolingInfo } = usePoolingConfigurationQuery({
     projectRef,
   })
+  const primaryConfig = poolingInfo?.find((x) => x.database_type === 'PRIMARY')
 
   const {
     data,
@@ -119,28 +120,33 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
     )
   }
 
-  const connectionStrings = isSuccessPoolingInfo
-    ? getConnectionStrings(connectionInfo, poolingInfo, {
-        projectRef,
-        usePoolerConnection,
-      })
-    : { uri: '', psql: '', golang: '', jdbc: '', dotnet: '', nodejs: '', php: '', python: '' }
-  const poolerTld = isSuccessPoolingInfo ? getPoolerTld(poolingInfo.connectionString) : 'com'
-  const poolerConnStringSyntax = isSuccessPoolingInfo
-    ? constructConnStringSyntax(poolingInfo.connectionString, {
-        selectedTab,
-        usePoolerConnection,
-        ref: projectRef as string,
-        cloudProvider: isProjectLoading ? '' : project?.cloud_provider || '',
-        region: isProjectLoading ? '' : project?.region || '',
-        tld: usePoolerConnection ? poolerTld : connectionTld,
-        portNumber: usePoolerConnection
-          ? poolingMode === 'transaction'
-            ? poolingInfo.db_port.toString()
-            : '5432'
-          : connectionInfo.db_port.toString(),
-      })
-    : []
+  const connectionStrings =
+    isSuccessPoolingInfo && primaryConfig !== undefined
+      ? getConnectionStrings(connectionInfo, primaryConfig, {
+          projectRef,
+          usePoolerConnection,
+        })
+      : { uri: '', psql: '', golang: '', jdbc: '', dotnet: '', nodejs: '', php: '', python: '' }
+  const poolerTld =
+    isSuccessPoolingInfo && primaryConfig !== undefined
+      ? getPoolerTld(primaryConfig?.connectionString)
+      : 'com'
+  const poolerConnStringSyntax =
+    isSuccessPoolingInfo && primaryConfig !== undefined
+      ? constructConnStringSyntax(primaryConfig?.connectionString, {
+          selectedTab,
+          usePoolerConnection,
+          ref: projectRef as string,
+          cloudProvider: isProjectLoading ? '' : project?.cloud_provider || '',
+          region: isProjectLoading ? '' : project?.region || '',
+          tld: usePoolerConnection ? poolerTld : connectionTld,
+          portNumber: usePoolerConnection
+            ? poolingMode === 'transaction'
+              ? primaryConfig?.db_port.toString()
+              : '5432'
+            : connectionInfo.db_port.toString(),
+        })
+      : []
 
   useEffect(() => {
     if (
@@ -154,10 +160,10 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
   }, [connectionString])
 
   useEffect(() => {
-    if (poolingInfo?.pool_mode === 'session') {
-      setPoolingMode(poolingInfo.pool_mode)
+    if (primaryConfig?.pool_mode === 'session') {
+      setPoolingMode(primaryConfig.pool_mode)
     }
-  }, [poolingInfo?.pool_mode])
+  }, [primaryConfig?.pool_mode])
 
   return (
     <div id="connection-string" className="w-full">
