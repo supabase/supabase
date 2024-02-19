@@ -155,28 +155,20 @@ async function sign(data: string, key: string) {
       ['sign', 'verify']
     )
     .then((key) => {
-      try {
-        const jsonString = JSON.stringify(data)
-        const encodedData = new TextEncoder().encode(jsonString)
-        return window.crypto.subtle.sign(
-          {
-            name: 'HMAC',
-          },
-          key,
-          encodedData
-        )
-      } catch (err) {
-        throw err
-      }
+      const jsonString = JSON.stringify(data)
+      const encodedData = new TextEncoder().encode(jsonString)
+      return window.crypto.subtle.sign(
+        {
+          name: 'HMAC',
+        },
+        key,
+        encodedData
+      )
     })
     .then((token) => {
-      try {
-        const u8 = new Uint8Array(token)
-        const b64encoded = btoa(String.fromCharCode(...u8))
-        return b64encoded
-      } catch (err) {
-        throw err
-      }
+      const u8 = new Uint8Array(token)
+      const b64encoded = btoa(String.fromCharCode(...u8))
+      return b64encoded
     })
     .catch((err) => {
       throw err
