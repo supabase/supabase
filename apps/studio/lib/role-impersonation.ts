@@ -118,7 +118,6 @@ export async function getRoleImpersonationJWT(
   role: PostgrestImpersonationRole
 ): Promise<string> {
   const claims = getPostgrestClaims(projectRef, role)
-
   return createToken(claims, jwtSecret)
 }
 
@@ -129,11 +128,13 @@ async function createToken(payload: object, key: string) {
   segments.push(btoa(JSON.stringify(header)).replace(/=/g, ''))
   segments.push(btoa(JSON.stringify(payload)).replace(/=/g, ''))
 
-  const footer = await sign(segments.join('.'), btoa(key).replace(/=/g, ''))
-
-  segments.push(footer.replace(/=/g, ''))
-
-  return segments.join('.')
+  try {
+    const footer = await sign(segments.join('.'), btoa(key).replace(/=/g, ''))
+    segments.push(footer.replace(/=/g, ''))
+    return segments.join('.')
+  } catch (err) {
+    throw err
+  }
 }
 
 async function sign(data: string, key: string) {
@@ -154,25 +155,30 @@ async function sign(data: string, key: string) {
       ['sign', 'verify']
     )
     .then((key) => {
-      const jsonString = JSON.stringify(data)
-      const encodedData = new TextEncoder().encode(jsonString)
-
-      return window.crypto.subtle.sign(
-        {
-          name: 'HMAC',
-        },
-        key,
-        encodedData
-      )
+      try {
+        const jsonString = JSON.stringify(data)
+        const encodedData = new TextEncoder().encode(jsonString)
+        return window.crypto.subtle.sign(
+          {
+            name: 'HMAC',
+          },
+          key,
+          encodedData
+        )
+      } catch (err) {
+        throw err
+      }
     })
     .then((token) => {
-      const u8 = new Uint8Array(token)
-      const b64encoded = btoa(String.fromCharCode(...u8))
-
-      return b64encoded
+      try {
+        const u8 = new Uint8Array(token)
+        const b64encoded = btoa(String.fromCharCode(...u8))
+        return b64encoded
+      } catch (err) {
+        throw err
+      }
     })
     .catch((err) => {
-      console.error('Error signing token', { err })
       throw err
     })
 }
