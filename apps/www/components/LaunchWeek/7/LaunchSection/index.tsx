@@ -63,8 +63,8 @@ export const LaunchSection = (props: WeekDayProps) => {
               nextDayNotShipped
                 ? 'launch-week-timeline-border--approaching'
                 : props.shipped
-                ? 'border-brand'
-                : 'border-purple-700',
+                  ? 'border-brand'
+                  : 'border-purple-700',
               className,
             ].join(' ')}
           ></div>

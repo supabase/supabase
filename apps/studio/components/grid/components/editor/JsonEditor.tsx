@@ -5,7 +5,7 @@ import { IconMaximize, Popover } from 'ui'
 
 import { BlockKeys, MonacoEditor, NullValue } from 'components/grid/components/common'
 import { useTrackedState } from 'components/grid/store'
-import { prettifyJSON, tryParseJson } from 'lib/helpers'
+import { prettifyJSON, tryParseJson, removeJSONTrailingComma } from 'lib/helpers'
 import { isNil } from 'lodash'
 
 interface JsonEditorProps<TRow, TSummaryRow = unknown>
@@ -36,7 +36,8 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   }, [])
 
   const saveChanges = useCallback((newValue: string | null) => {
-    if (newValue !== value) commitChange(newValue)
+    const updatedValue = newValue !== null ? removeJSONTrailingComma(newValue) : newValue
+    if (updatedValue !== value) commitChange(newValue)
   }, [])
 
   const onChange = (_value: string | undefined) => {

@@ -603,11 +603,11 @@ export const DOCS_RESOURCE_CONTENT: {
   curl -X POST '${endpoint}/rest/v1/rpc/${rpcName}' \\${bashParams}
   -H "Content-Type: application/json" \\
   -H "apikey: ${apiKey}" ${
-            showBearer
-              ? `\\
+    showBearer
+      ? `\\
   -H "Authorization: Bearer ${apiKey}"`
-              : ''
-          }
+      : ''
+  }
         `,
           js: `
 let { data, error } = await supabase

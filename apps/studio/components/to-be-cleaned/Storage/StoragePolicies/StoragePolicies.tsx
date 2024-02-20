@@ -250,8 +250,8 @@ const StoragePolicies = () => {
 
       {/* Adding policies to objets/buckets table or editting any policy uses the general policy editor */}
       <PolicyEditorModal
-        visible={showGeneralPolicyEditor}
         schema="storage"
+        visible={showGeneralPolicyEditor}
         table={isEditingPolicyForBucket.table}
         selectedPolicyToEdit={selectedPolicyToEdit}
         onSelectCancel={onCancelPolicyEdit}

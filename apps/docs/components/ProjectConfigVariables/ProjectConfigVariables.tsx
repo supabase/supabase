@@ -98,14 +98,14 @@ function OrgProjectSelector() {
   const stateSummary: ProjectOrgDataState = isUserLoading
     ? 'userLoading'
     : !isLoggedIn
-    ? 'loggedOut'
-    : anyIsPending
-    ? 'loggedIn.dataPending'
-    : anyIsError
-    ? 'loggedIn.dataError'
-    : projects?.length === 0
-    ? 'loggedIn.dataSuccess.hasNoData'
-    : 'loggedIn.dataSuccess.hasData'
+      ? 'loggedOut'
+      : anyIsPending
+        ? 'loggedIn.dataPending'
+        : anyIsError
+          ? 'loggedIn.dataError'
+          : projects?.length === 0
+            ? 'loggedIn.dataSuccess.hasNoData'
+            : 'loggedIn.dataSuccess.hasData'
 
   const formattedData: ComboBoxOption[] = useMemo(
     () =>
@@ -194,16 +194,16 @@ function BranchSelector() {
   const stateSummary: BranchesDataState = userLoading
     ? 'userLoading'
     : !isLoggedIn
-    ? 'loggedOut'
-    : !hasBranches
-    ? 'loggedIn.noBranches'
-    : isPending
-    ? 'loggedIn.branches.dataPending'
-    : isError
-    ? 'loggedIn.branches.dataError'
-    : data.length === 0
-    ? 'loggedIn.branches.dataSuccess.noData'
-    : 'loggedIn.branches.dataSuccess.hasData'
+      ? 'loggedOut'
+      : !hasBranches
+        ? 'loggedIn.noBranches'
+        : isPending
+          ? 'loggedIn.branches.dataPending'
+          : isError
+            ? 'loggedIn.branches.dataError'
+            : data.length === 0
+              ? 'loggedIn.branches.dataSuccess.noData'
+              : 'loggedIn.branches.dataSuccess.hasData'
 
   const formattedData: ComboBoxOption[] =
     stateSummary !== 'loggedIn.branches.dataSuccess.hasData'
@@ -282,14 +282,14 @@ function VariableView({ variable, className }: { variable: Variable; className?:
   const stateSummary: VariableDataState = isUserLoading
     ? 'userLoading'
     : !isLoggedIn
-    ? 'loggedOut'
-    : !ref
-    ? 'loggedIn.noSelectedProject'
-    : isPending
-    ? 'loggedIn.selectedProject.dataPending'
-    : isError
-    ? 'loggedIn.selectedProject.dataError'
-    : 'loggedIn.selectedProject.dataSuccess'
+      ? 'loggedOut'
+      : !ref
+        ? 'loggedIn.noSelectedProject'
+        : isPending
+          ? 'loggedIn.selectedProject.dataPending'
+          : isError
+            ? 'loggedIn.selectedProject.dataError'
+            : 'loggedIn.selectedProject.dataSuccess'
 
   let variableValue: string = null
   if (stateSummary === 'loggedIn.selectedProject.dataSuccess') {
@@ -319,8 +319,8 @@ function VariableView({ variable, className }: { variable: Variable; className?:
             stateSummary === 'loggedIn.selectedProject.dataPending'
               ? 'Loading...'
               : stateSummary === 'loggedIn.selectedProject.dataSuccess'
-              ? variableValue
-              : `YOUR ${prettyFormatVariable[variable].toUpperCase()}`
+                ? variableValue
+                : `YOUR ${prettyFormatVariable[variable].toUpperCase()}`
           }
         />
         <CopyToClipboard text={variableValue ?? ''}>

@@ -13,6 +13,7 @@ import { invalidateProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedProject } from 'hooks'
 import { getWithTimeout } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
+import Connect from 'components/interfaces/Home/Connect/Connect'
 
 const BuildingState = () => {
   const { ref } = useParams()

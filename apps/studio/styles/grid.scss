@@ -38,7 +38,7 @@
 
 .rdg {
   @apply box-border select-none overflow-x-auto overflow-y-scroll bg-transparent;
-  @apply border-default border-t border-b border-r-0 border-l-0;
+  @apply border-default border-t border-r-0 border-l-0;
   contain: strict;
   -webkit-user-select: none;
   font-size: 14px;
@@ -114,8 +114,8 @@
 */
 
 .rdg-row {
-  @apply bg-table-body-light [[data-theme*=dark]_&]:bg-table-body-dark transition-colors;
-  @apply hover:bg-table-header-light [[data-theme*=dark]_&]:hover:bg-table-header-dark;
+  @apply bg-studio transition-colors;
+  @apply hover:bg-surface-100;
 }
 
 /* edit button */
@@ -174,7 +174,7 @@
   }
 
   [type='checkbox']:checked {
-    @apply bg-brand;
+    @apply bg-foreground;
     border-color: transparent;
     background-size: 100% 100%;
     background-position: center;
@@ -184,8 +184,8 @@
   [type='checkbox'] {
     @apply cursor-pointer rounded border border-solid;
 
-    @apply text-brand-600 border-default transition-all;
-    @apply hover:border-brand focus:ring-brand-300 focus:outline-none;
+    @apply text-foreground border-default transition-all;
+    @apply hover:border-foreground focus:ring-foreground focus:outline-none;
 
     @apply bg-transparent;
 

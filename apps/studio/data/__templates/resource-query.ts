@@ -22,7 +22,7 @@ export async function getResource({ projectRef, id }: ResourceVariables, signal?
     params: { path: { ref: projectRef, id } },
     signal,
   })
-  if (error) throw error
+  if (error) throw new Error((error as ResponseError).message)
 
   return data
 }

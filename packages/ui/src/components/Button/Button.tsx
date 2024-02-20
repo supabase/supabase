@@ -2,11 +2,12 @@
 
 import { Slot } from '@radix-ui/react-slot'
 import { VariantProps, cva } from 'class-variance-authority'
-import { IconContext } from '@ui/components/Icon/IconContext'
-import { IconLoader } from '@ui/components/Icon/icons/IconLoader'
-import { sizes } from '@ui/lib/commonCva'
-import { cn } from '@ui/lib/utils'
 import { cloneElement, forwardRef, isValidElement } from 'react'
+
+import { sizes } from '../../lib/commonCva'
+import { cn } from '../../lib/utils/cn'
+import { IconContext } from '../Icon/IconContext'
+import { IconLoader } from '../Icon/icons/IconLoader'
 
 export type ButtonVariantProps = VariantProps<typeof buttonVariants>
 const buttonVariants = cva(
@@ -51,10 +52,10 @@ const buttonVariants = cva(
             focus-visible:outline-brand-600
             shadow-sm`,
         alternative: `
-            text-brand-600
-            bg-brand-200 hover:bg-brand-400
-            border-brand-600
-            focus-visible:border-brand-300
+            text-foreground
+            bg-brand-400 hover:bg-brand-500
+            border-brand-500
+            focus-visible:border-brand-500
             focus-visible:outline-brand-600
             shadow-sm`,
         outline: `

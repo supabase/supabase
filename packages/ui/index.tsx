@@ -2,29 +2,21 @@
 
 import * as React from 'react'
 
-// Providers
-
-export * from './src/providers'
-
 // Markdown components
 
 export * from './src/lib/Markdown'
 
-// // GENERAL
+// GENERAL
 
 export * from './src/components/Admonition'
 export * from './src/components/Button'
 export * from './src/components/Icon'
 export * from './src/components/Icon/IconContext'
-export * from './src/components/GlassPanel'
-export * from './src/components/IconPanel'
 export * from './src/components/Icon/IconBackground'
-export * from './src/components/ThemeImage'
 
 // DISPLAYS
 
 export * from './src/components/Card'
-export * from './src/components/TweetCard'
 export * from './src/components/Badge'
 export * from './src/components/Tabs'
 export * from './src/components/Alert'
@@ -41,13 +33,14 @@ export * from './src/components/NavMenu'
 
 export * from './src/components/Modal'
 export * from './src/components/SidePanel'
-export * from './src/components/ConsentToast'
 export * from './src/components/ContextMenu'
-export * from './src/components/ExpandableVideo'
-export * from './src/components/PrivacySettings'
 export * from './src/components/PromoToast'
 export * from './src/components/Popover'
 export * from './src/layout/PortalToast'
+
+// HTML
+
+export * from './src/components/CustomHTMLElements'
 
 // UTILITIES
 
@@ -55,6 +48,7 @@ export * from './src/components/Space'
 export * from './src/components/Loading'
 export * from './src/components/LogoLoader'
 export * from './src/components/Divider'
+export * from './src/lib/utils'
 
 // DATA ENTRY
 
@@ -71,9 +65,6 @@ export * from './src/components/Form'
 // CMD+K
 export * from './src/components/Command'
 
-// Widgets
-export * from './src/components/CountdownWidget'
-
 // layout
 export * from './src/components/LoadingLine'
 
@@ -83,14 +74,10 @@ export * from './src/layout/banners'
 // ai icon
 export * from './src/layout/ai-icon-animation'
 
-// utilities
-export * from './src/lib/utils'
-
 // theme switcher
-export * from './src/components/ThemeProvider/ThemeToggle'
 export * from './src/components/ThemeProvider/themes'
-
-// animated ui
+export * from './src/components/ThemeProvider/singleThemes'
+export * from './src/components/ThemeProvider/prefixedThemes'
 
 // shadcn
 export * from './src/components/shadcn/ui/dropdown-menu'
@@ -113,8 +100,12 @@ export {
   DialogContent as DialogContent_Shadcn_,
   DialogHeader as DialogHeader_Shadcn_,
   DialogFooter as DialogFooter_Shadcn_,
+  DialogClose as DialogClose_Shadcn_,
   DialogTitle as DialogTitle_Shadcn_,
   DialogDescription as DialogDescription_Shadcn_,
+  DialogSection as DialogSection_Shadcn_,
+  DIALOG_PADDING_X as DIALOG_PADDING_X_Shadcn_,
+  DIALOG_PADDING_Y as DIALOG_PADDING_Y_Shadcn_,
 } from './src/components/shadcn/ui/dialog'
 
 export {
@@ -157,6 +148,14 @@ export {
   SelectTrigger as SelectTrigger_Shadcn_,
   SelectValue as SelectValue_Shadcn_,
 } from './src/components/shadcn/ui/select'
+
+export {
+  RadioGroup as RadioGroup_Shadcn_,
+  RadioGroupItem as RadioGroupItem_Shadcn_,
+  RadioGroupLargeItem as RadioGroupLargeItem_Shadcn_,
+} from './src/components/shadcn/ui/radio-group'
+
+export { Slider as Slider_Shadcn_ } from './src/components/shadcn/ui/slider'
 
 export { Input as Input_Shadcn_ } from './src/components/shadcn/ui/input'
 
@@ -206,10 +205,6 @@ export {
 export { ScrollArea, ScrollBar } from './src/components/shadcn/ui/scroll-area'
 
 export { Separator } from './src/components/shadcn/ui/separator'
-
-// patterns
-
-export * from './src/patterns/SchemaTableNode'
 
 // links
 

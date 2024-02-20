@@ -22,7 +22,7 @@ const PasswordStrengthBar = ({
           aria-valuenow={(PASSWORD_STRENGTH_PERCENTAGE as any)[passwordStrengthScore]}
           aria-valuetext={(PASSWORD_STRENGTH_PERCENTAGE as any)[passwordStrengthScore]}
           role="progressbar"
-          className="mb-2 overflow-hidden transition-all border rounded bg-background"
+          className="mb-2 overflow-hidden transition-all border rounded bg-studio"
         >
           <div
             style={{

@@ -1,28 +1,17 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
-import { API_URL, DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
-import { configKeys } from './keys'
-import { ResponseError } from 'types'
 import { components } from 'data/api'
+import { get } from 'data/fetchers'
+import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
+import { ResponseError } from 'types'
+import { configKeys } from './keys'
 
 export type ProjectSettingsVariables = {
   projectRef?: string
 }
 
 // [Joshen] API typing needs to be fixed - this is completely wrong
-type ProjectSettingsInfo = components['schemas']['SettingsResponse']['project']
+type ProjectSettingsInfo = components['schemas']['ProjectResponse'] & { db_port: number }
 interface ProjectSettingsInfoExtended extends ProjectSettingsInfo {
-  cloud_provider: string
-  inserted_at: string
-  db_dns_name: string
-  db_host: string
-  db_name: string
-  db_port: number
-  db_ssl: boolean
-  db_user: string
-  jwt_secret: string
-  ref: string
-  status: string
   // [Joshen] Based on the enums here
   // https://github.com/supabase/infrastructure/blob/95dc09fe077dba7817bb112fa72b6814a620ecd3/shared/src/projects.ts#L177
   db_ip_addr_config: 'legacy' | 'static-ipv4' | 'concurrent-ipv6' | 'ipv6'

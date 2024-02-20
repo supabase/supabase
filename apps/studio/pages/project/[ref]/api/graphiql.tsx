@@ -4,6 +4,7 @@ import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
 import { useTheme } from 'next-themes'
 import { useMemo } from 'react'
+import toast from 'react-hot-toast'
 
 import ExtensionCard from 'components/interfaces/Database/Extensions/ExtensionCard'
 import GraphiQL from 'components/interfaces/GraphQL/GraphiQL'
@@ -49,7 +50,7 @@ const GraphiQLPage: NextPageWithLayout = () => {
       url: `${API_URL}/projects/${projectRef}/api/graphql`,
       fetch,
     })
-    const customFetcher: Fetcher = (graphqlParams, opts) => {
+    const customFetcher: Fetcher = async (graphqlParams, opts) => {
       let userAuthorization: string | undefined
 
       const role = getImpersonatedRole()
@@ -59,7 +60,12 @@ const GraphiQLPage: NextPageWithLayout = () => {
         role !== undefined &&
         role.type === 'postgrest'
       ) {
-        userAuthorization = `Bearer ${getRoleImpersonationJWT(projectRef, jwtSecret, role)}`
+        try {
+          const token = await getRoleImpersonationJWT(projectRef, jwtSecret, role)
+          userAuthorization = 'Bearer ' + token
+        } catch (err: any) {
+          toast.error(`Failed to get JWT for role: ${err.message}`)
+        }
       }
 
       return fetcherFn(graphqlParams, {

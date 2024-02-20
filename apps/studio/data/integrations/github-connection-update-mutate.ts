@@ -40,11 +40,9 @@ export const useGithubConnectionUpdateMutation = ({
     (vars) => updateGithubConnection(vars),
     {
       async onSuccess(data, variables, context) {
-        await Promise.all([
-          queryClient.invalidateQueries(
-            integrationKeys.githubConnectionsList(variables.organizationIntegrationId)
-          ),
-        ])
+        await queryClient.invalidateQueries(
+          integrationKeys.githubConnectionsList(variables.organizationIntegrationId)
+        )
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

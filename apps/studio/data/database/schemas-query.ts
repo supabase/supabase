@@ -53,7 +53,7 @@ export const useSchemasQuery = <TData = SchemasData>(
   useQuery<SchemasData, SchemasError, TData>(
     databaseKeys.schemaList(projectRef),
     ({ signal }) => getSchemas({ projectRef, connectionString }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
+    { enabled: enabled && typeof projectRef !== 'undefined', staleTime: 0, ...options }
   )
 
 export function invalidateSchemasQuery(client: QueryClient, projectRef: string | undefined) {

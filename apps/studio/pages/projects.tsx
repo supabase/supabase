@@ -50,7 +50,6 @@ const ProjectsPage: NextPageWithLayout = () => {
           <Connecting />
         </div>
       )}
-
       {!navLayoutV2 && (
         <div className="py-4 px-5">
           {IS_PLATFORM && projectCreationEnabled && isSuccess && organizations.length !== 0 && (

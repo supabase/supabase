@@ -17,8 +17,8 @@ export async function getOrgSubscription(
     params: { path: { slug: orgSlug } },
     signal,
   })
-  if (error) throw error
 
+  if (error) throw error
   return data
 }
 

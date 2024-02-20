@@ -41,8 +41,8 @@ const InputField = ({
               field.defaultValue === null
                 ? ''
                 : typeof field.defaultValue === 'string' && field.defaultValue.length === 0
-                ? 'EMPTY'
-                : `Default: ${field.defaultValue}`
+                  ? 'EMPTY'
+                  : `Default: ${field.defaultValue}`
             }
             onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
           />
@@ -129,10 +129,10 @@ const InputField = ({
             field.value === null && field.defaultValue === null
               ? 'NULL'
               : field.value === ''
-              ? 'EMPTY'
-              : typeof field.defaultValue === 'string' && field.defaultValue.length === 0
-              ? 'EMPTY'
-              : `NULL (Default: ${field.defaultValue})`
+                ? 'EMPTY'
+                : typeof field.defaultValue === 'string' && field.defaultValue.length === 0
+                  ? 'EMPTY'
+                  : `NULL (Default: ${field.defaultValue})`
           }
           actions={
             <div className="mr-1 mt-0.5">
@@ -253,8 +253,8 @@ const InputField = ({
         field.isIdentity
           ? 'Automatically generated as identity'
           : field.defaultValue !== null
-          ? `Default: ${field.defaultValue}`
-          : 'NULL'
+            ? `Default: ${field.defaultValue}`
+            : 'NULL'
       }
       disabled={!isEditable}
       onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}

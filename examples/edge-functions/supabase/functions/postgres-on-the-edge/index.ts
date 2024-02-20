@@ -6,8 +6,8 @@ const pool = new Pool(
     tls: { enabled: false },
     database: 'postgres',
     hostname: Deno.env.get('DB_HOSTNAME'),
-    user: 'postgres',
-    port: 5432,
+    user: Deno.env.get('DB_USER'),
+    port: 6543,
     password: Deno.env.get('DB_PASSWORD'),
   },
   1

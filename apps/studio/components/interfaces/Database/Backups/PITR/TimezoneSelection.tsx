@@ -1,78 +1,87 @@
-import { FormEvent, useState } from 'react'
-import { IconGlobe, IconSearch, Listbox } from 'ui'
+import { useState } from 'react'
+import {
+  Button,
+  CommandEmpty_Shadcn_,
+  CommandGroup_Shadcn_,
+  CommandInput_Shadcn_,
+  CommandItem_Shadcn_,
+  Command_Shadcn_,
+  IconGlobe,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
+  ScrollArea,
+  cn,
+} from 'ui'
 
+import { CheckIcon, ChevronsUpDown } from 'lucide-react'
 import { ALL_TIMEZONES } from './PITR.constants'
+import { Timezone } from './PITR.types'
 
 interface TimezoneSelectionProps {
-  hideLabel?: boolean
-  dropdownWidth?: string
-  selectedTimezone: any
-  onSelectTimezone: (timezone: any) => void
+  selectedTimezone: Timezone
+  onSelectTimezone: (timezone: Timezone) => void
 }
 
-const TimezoneSelection = ({
-  hideLabel,
-  dropdownWidth,
+export const TimezoneSelection = ({
   selectedTimezone,
   onSelectTimezone,
 }: TimezoneSelectionProps) => {
-  const [searchString, setSearchString] = useState<string>('')
+  const [open, setOpen] = useState(false)
 
-  const timezoneOptions =
-    searchString.length > 0
-      ? ALL_TIMEZONES.map((option) => option.text).filter((option) =>
-          option.toLowerCase().includes(searchString.toLowerCase())
-        )
-      : ALL_TIMEZONES.map((option) => option.text)
+  const timezoneOptions = ALL_TIMEZONES.map((option) => option.text)
 
   return (
-    <div className="flex justify-between space-x-8">
-      {!hideLabel && <p className="w-2/5 text-sm">Select timezone</p>}
-      <div className={`${hideLabel ? 'w-full' : 'w-3/5'}`}>
-        <Listbox
-          value={selectedTimezone.text}
-          icon={<IconGlobe />}
-          onChange={(text) => {
-            const selectedTimezone = ALL_TIMEZONES.find((option) => option.text === text)
-            onSelectTimezone(selectedTimezone)
-          }}
-          onBlur={() => setSearchString('')}
-        >
-          <div
-            className={[
-              'fixed top-0 flex w-full items-center',
-              'rounded-t-md border-b border-overlay bg-surface-300',
-              'mb-4 space-x-2 px-4 py-2',
-            ].join(' ')}
-            style={{ zIndex: 1 }}
+    <div className="w-full">
+      <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
+        <PopoverTrigger_Shadcn_ asChild>
+          <Button
+            role="combobox"
+            aria-expanded={open}
+            className="w-[350px] justify-between"
+            size="small"
+            icon={<IconGlobe />}
+            iconRight={<ChevronsUpDown size={14} strokeWidth={1.5} />}
           >
-            <IconSearch size={14} />
-            <input
-              autoFocus
-              className="placeholder-foreground-lighter w-72 bg-transparent text-sm outline-none"
-              value={searchString}
-              placeholder={''}
-              onChange={(e: FormEvent<HTMLInputElement>) => setSearchString(e.currentTarget.value)}
-            />
-          </div>
-          {/* Whitespace to shift listbox options down for searchfield */}
-          <div className="h-8" />
-          {timezoneOptions.map((option) => {
-            return (
-              <Listbox.Option key={option} label={option} value={option} className={dropdownWidth}>
-                <div>{option}</div>
-              </Listbox.Option>
-            )
-          })}
-          {timezoneOptions.length === 0 && (
-            <Listbox.Option disabled key="no-results" label="" value="">
-              No timezones found
-            </Listbox.Option>
-          )}
-        </Listbox>
-      </div>
+            {selectedTimezone
+              ? timezoneOptions.find((option) => option === selectedTimezone.text)
+              : 'Select timezone...'}
+          </Button>
+        </PopoverTrigger_Shadcn_>
+        <PopoverContent_Shadcn_ className="w-[350px] p-0">
+          <Command_Shadcn_>
+            <CommandInput_Shadcn_ placeholder="Search timezone..." className="h-9" />
+            <CommandEmpty_Shadcn_> No timezones found</CommandEmpty_Shadcn_>
+            <CommandGroup_Shadcn_>
+              <ScrollArea className="h-72">
+                {timezoneOptions.map((option) => (
+                  <CommandItem_Shadcn_
+                    key={option}
+                    value={option}
+                    onSelect={(text) => {
+                      const selectedTimezone = ALL_TIMEZONES.find(
+                        (option) => option.text.toLocaleLowerCase() === text
+                      )
+                      if (selectedTimezone) {
+                        onSelectTimezone(selectedTimezone)
+                        setOpen(false)
+                      }
+                    }}
+                  >
+                    {option}
+                    <CheckIcon
+                      className={cn(
+                        'ml-auto h-4 w-4',
+                        selectedTimezone.text === option ? 'opacity-100' : 'opacity-0'
+                      )}
+                    />
+                  </CommandItem_Shadcn_>
+                ))}
+              </ScrollArea>
+            </CommandGroup_Shadcn_>
+          </Command_Shadcn_>
+        </PopoverContent_Shadcn_>
+      </Popover_Shadcn_>
     </div>
   )
 }
-
-export default TimezoneSelection

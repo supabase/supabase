@@ -65,7 +65,7 @@ export const generateSettingsMenu = (
       ],
     },
     {
-      title: '',
+      title: 'Configuration',
       items: [
         {
           name: 'Database',

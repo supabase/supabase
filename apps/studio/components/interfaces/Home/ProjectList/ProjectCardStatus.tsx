@@ -73,8 +73,8 @@ export const ProjectCardStatus = ({
   const alertType = isCritical
     ? 'destructive'
     : projectStatus === 'isPaused'
-    ? 'default'
-    : 'warning'
+      ? 'default'
+      : 'warning'
 
   if (
     (activeWarnings.length === 0 || warningContent === undefined) &&
@@ -112,7 +112,7 @@ export const ProjectCardStatus = ({
               <div
                 className={[
                   'rounded bg-alternative py-1 px-2 leading-none shadow',
-                  'border bg-background w-[280px]',
+                  'border bg-studio w-[280px]',
                 ].join(' ')}
               >
                 <span className="text-xs text-foreground">{alertDescription}</span>

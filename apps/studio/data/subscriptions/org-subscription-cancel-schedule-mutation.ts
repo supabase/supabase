@@ -36,14 +36,12 @@ export const useOrganizationBillingSubscriptionCancelSchedule = ({
     (vars) => cancelSubscriptionSchedule(vars),
     {
       async onSuccess(data, variables, context) {
-        await Promise.all([
-          queryClient.invalidateQueries(subscriptionKeys.orgSubscription(variables.slug)),
-        ])
+        await queryClient.invalidateQueries(subscriptionKeys.orgSubscription(variables.slug))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          toast.error(`Failed to setup intent: ${data.message}`)
+          toast.error(`Failed to cancel subscription schedule: ${data.message}`)
         } else {
           onError(data, variables, context)
         }

@@ -46,6 +46,7 @@ export const usePostgresServiceStatusQuery = <TData = PostgresServiceStatusData>
     {
       enabled:
         enabled && typeof projectRef !== 'undefined' && typeof connectionString !== 'undefined',
+      staleTime: 0,
       ...options,
     }
   )

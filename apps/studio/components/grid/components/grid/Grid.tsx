@@ -1,22 +1,23 @@
 /* eslint-disable react/display-name */
 
-import 'react-data-grid/lib/styles.css'
-import DataGrid, { DataGridHandle, RowsChangeData } from 'react-data-grid'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { forwardRef, useRef } from 'react'
+import DataGrid, { DataGridHandle, RowsChangeData } from 'react-data-grid'
+import 'react-data-grid/lib/styles.css'
 import { memo } from 'react-tracked'
+import { Button } from 'ui'
+
+import { formatClipboardValue } from 'components/grid/utils'
 import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { useKeyboardShortcuts, useUrlState } from 'hooks'
-import { Button } from 'ui'
+import { copyToClipboard } from 'lib/helpers'
 import { useDispatch, useTrackedState } from '../../store'
 import { Filter, GridProps, SupaRow } from '../../types'
 import RowRenderer from './RowRenderer'
-import { formatClipboardValue } from 'components/grid/utils'
-import { copyToClipboard } from 'lib/helpers'
 
 const rowKeyGetter = (row: SupaRow) => {
   return row?.idx ?? -1
@@ -210,8 +211,6 @@ export const Grid = memo(
                                 Add rows to your table to get started.
                               </p>
                               <div className="flex items-center space-x-2 mt-4">
-                                {/* [Joshen] Leaving this as a placeholder */}
-                                {/* <Button type="outline">Generate random data</Button> */}
                                 {onAddRow !== undefined && onImportData !== undefined && (
                                   <Button type="default" onClick={onImportData}>
                                     Import data via CSV

@@ -161,8 +161,8 @@ const UpgradingState = () => {
                               (progressStage - 2 <= 0
                                 ? 0
                                 : progressStage > 6
-                                ? 5
-                                : progressStage - 2) * -28
+                                  ? 5
+                                  : progressStage - 2) * -28
                             }px`,
                       }}
                     >
@@ -191,15 +191,15 @@ const UpgradingState = () => {
                                 isCurrent
                                   ? 'text-foreground'
                                   : isCompleted
-                                  ? 'text-foreground-light'
-                                  : 'text-foreground-lighter'
+                                    ? 'text-foreground-light'
+                                    : 'text-foreground-lighter'
                               } hover:text-foreground transition`}
                             >
                               {isCurrent
                                 ? message.progress
                                 : isCompleted
-                                ? message.completed
-                                : message.initial}
+                                  ? message.completed
+                                  : message.initial}
                             </p>
                           </div>
                         )

@@ -35,10 +35,10 @@ const Bucket = ({ language, apikey, endpoint }: ContentProps) => {
           {allowedMimeTypes === null
             ? 'All types are allowed'
             : (allowedMimeTypes ?? []).length === 0
-            ? 'No types are allowed'
-            : (allowedMimeTypes ?? []).length > 1
-            ? (allowedMimeTypes ?? []).join(', ')
-            : 'Unknown'}
+              ? 'No types are allowed'
+              : (allowedMimeTypes ?? []).length > 1
+                ? (allowedMimeTypes ?? []).join(', ')
+                : 'Unknown'}
         </p>
         <p className="text-sm text-foreground-light">
           Max file size limit:{' '}

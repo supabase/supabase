@@ -39,8 +39,12 @@ export const useProjectUpdateMutation = ({
     (vars) => updateProject(vars),
     {
       async onSuccess(data, variables, context) {
-        await queryClient.invalidateQueries(projectKeys.list()),
-          await onSuccess?.(data, variables, context)
+        const { ref } = variables
+        await Promise.all([
+          queryClient.invalidateQueries(projectKeys.list()),
+          queryClient.invalidateQueries(projectKeys.detail(ref)),
+        ])
+        await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
         if (onError === undefined) {

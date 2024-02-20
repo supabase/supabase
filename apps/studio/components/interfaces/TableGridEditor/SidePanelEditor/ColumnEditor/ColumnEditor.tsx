@@ -24,22 +24,17 @@ import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constra
 import { usePostgresTypesQuery } from 'data/database/types-query'
 import { EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
 import { Dictionary } from 'types'
-import { ForeignKeySelector } from '..'
 import ActionBar from '../ActionBar'
+import { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
+import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
 import { TEXT_TYPES } from '../SidePanelEditor.constants'
-import {
-  ColumnField,
-  CreateColumnPayload,
-  ExtendedPostgresRelationship,
-  UpdateColumnPayload,
-} from '../SidePanelEditor.types'
+import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from '../SidePanelEditor.types'
 import ColumnDefaultValue from './ColumnDefaultValue'
 import {
   generateColumnField,
   generateColumnFieldFromPostgresColumn,
   generateCreateColumnPayload,
   generateUpdateColumnPayload,
-  getColumnForeignKey,
   validateFields,
 } from './ColumnEditor.utils'
 import ColumnForeignKey from './ColumnForeignKey'
@@ -53,7 +48,6 @@ export interface ColumnEditorProps {
   closePanel: () => void
   saveChanges: (
     payload: CreateColumnPayload | UpdateColumnPayload,
-    foreignKey: ExtendedPostgresRelationship | undefined,
     isNewRecord: boolean,
     configuration: {
       columnId: string | undefined
@@ -76,7 +70,7 @@ const ColumnEditor = ({
 
   const [errors, setErrors] = useState<Dictionary<any>>({})
   const [columnFields, setColumnFields] = useState<ColumnField>()
-  const [isEditingRelation, setIsEditingRelation] = useState<boolean>(false)
+  const [fkRelations, setFkRelations] = useState<ForeignKey[]>([])
 
   const { data: types } = usePostgresTypesQuery({
     projectRef: project?.ref,
@@ -91,20 +85,21 @@ const ColumnEditor = ({
     connectionString: project?.connectionString,
     schema: selectedTable?.schema,
   })
-  const foreignKeyMeta = data || []
 
   const isNewRecord = column === undefined
-  const originalForeignKey = column
-    ? getColumnForeignKey(column, selectedTable, foreignKeyMeta)
-    : undefined
+  const foreignKeyMeta = data || []
+  const foreignKeys = foreignKeyMeta.filter((relation) => {
+    return relation.source_id === column?.table_id && relation.source_columns.includes(column.name)
+  })
 
   useEffect(() => {
     if (visible) {
       setErrors({})
       const columnFields = isNewRecord
-        ? generateColumnField()
+        ? generateColumnField({ schema: selectedTable.schema, table: selectedTable.name })
         : generateColumnFieldFromPostgresColumn(column!, selectedTable, foreignKeyMeta)
       setColumnFields(columnFields)
+      setFkRelations(formatForeignKeys(foreignKeys))
     }
   }, [visible])
 
@@ -127,36 +122,6 @@ const ColumnEditor = ({
     setErrors(updatedErrors)
   }
 
-  const saveColumnForeignKey = (foreignKeyConfiguration?: {
-    table: PostgresTable
-    column: PostgresColumn
-    deletionAction: string
-    updateAction: string
-  }) => {
-    onUpdateField({
-      foreignKey:
-        foreignKeyConfiguration !== undefined
-          ? {
-              id: 0,
-              constraint_name: '',
-              source_schema: selectedTable.schema,
-              source_table_name: selectedTable.name,
-              source_column_name: columnFields?.name || column?.name || '',
-              target_table_schema: foreignKeyConfiguration.table.schema,
-              target_table_name: foreignKeyConfiguration.table.name,
-              target_column_name: foreignKeyConfiguration.column.name,
-              deletion_action: foreignKeyConfiguration.deletionAction,
-              update_action: foreignKeyConfiguration.updateAction,
-            }
-          : undefined,
-      ...(foreignKeyConfiguration !== undefined && {
-        format: foreignKeyConfiguration.column.format,
-        defaultValue: null,
-      }),
-    })
-    setIsEditingRelation(false)
-  }
-
   const onSaveChanges = (resolve: () => void) => {
     if (columnFields) {
       const errors = validateFields(columnFields)
@@ -166,11 +131,8 @@ const ColumnEditor = ({
         const payload = isNewRecord
           ? generateCreateColumnPayload(selectedTable.id, columnFields)
           : generateUpdateColumnPayload(column!, selectedTable, columnFields)
-        const foreignKey = columnFields.foreignKey
-          ? { ...columnFields.foreignKey, source_column_name: columnFields.name }
-          : undefined
         const configuration = { columnId: column?.id }
-        saveChanges(payload, foreignKey, isNewRecord, configuration, resolve)
+        saveChanges(payload, isNewRecord, configuration, resolve)
       } else {
         resolve()
       }
@@ -219,24 +181,6 @@ const ColumnEditor = ({
       <SidePanel.Separator />
       <FormSection
         header={
-          <FormSectionLabel className="lg:!col-span-4">Foreign Key Relation</FormSectionLabel>
-        }
-      >
-        <FormSectionContent loading={false} className="lg:!col-span-8">
-          <div>
-            <ColumnForeignKey
-              column={columnFields}
-              originalForeignKey={originalForeignKey}
-              onSelectEditRelation={() => setIsEditingRelation(true)}
-              onSelectRemoveRelation={() => onUpdateField({ foreignKey: undefined })}
-              onSelectCancelRemoveRelation={() => onUpdateField({ foreignKey: originalForeignKey })}
-            />
-          </div>
-        </FormSectionContent>
-      </FormSection>
-      <SidePanel.Separator />
-      <FormSection
-        header={
           <FormSectionLabel
             className="lg:!col-span-4"
             description={
@@ -279,7 +223,12 @@ const ColumnEditor = ({
             layout="vertical"
             enumTypes={enumTypes}
             error={errors.format}
-            disabled={columnFields?.foreignKey !== undefined}
+            description={
+              columnFields.foreignKey !== undefined
+                ? 'Column type cannot be changed as it has a foreign key relation'
+                : ''
+            }
+            disabled={columnFields.foreignKey !== undefined}
             onOptionSelect={(format: string) => onUpdateField({ format, defaultValue: null })}
           />
           {columnFields.foreignKey === undefined && (
@@ -319,6 +268,20 @@ const ColumnEditor = ({
             enumTypes={enumTypes}
             onUpdateField={onUpdateField}
           />
+        </FormSectionContent>
+      </FormSection>
+      <SidePanel.Separator />
+      <FormSection
+        header={<FormSectionLabel className="lg:!col-span-4">Foreign Keys</FormSectionLabel>}
+      >
+        <FormSectionContent loading={false} className="lg:!col-span-8">
+          <div>
+            <ColumnForeignKey
+              column={columnFields}
+              relations={fkRelations}
+              closePanel={closePanel}
+            />
+          </div>
         </FormSectionContent>
       </FormSection>
       <SidePanel.Separator />
@@ -423,13 +386,6 @@ const ColumnEditor = ({
           </FormSection>
         </>
       )}
-
-      <ForeignKeySelector
-        column={columnFields}
-        visible={isEditingRelation}
-        closePanel={() => setIsEditingRelation(false)}
-        saveChanges={saveColumnForeignKey}
-      />
     </SidePanel>
   )
 }

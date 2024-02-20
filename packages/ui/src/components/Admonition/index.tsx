@@ -1,7 +1,9 @@
-import { cn } from '@ui/lib/utils'
 import { cva } from 'class-variance-authority'
 import { PropsWithChildren } from 'react'
+
+import { cn } from '../../lib/utils/cn'
 import { Alert, AlertDescription, AlertTitle } from './../shadcn/ui/alert'
+
 export interface AdmonitionProps {
   type: 'note' | 'tip' | 'caution' | 'danger' | 'deprecation'
   label?: string

@@ -4,13 +4,13 @@ import { useTheme } from 'next-themes'
 import { Badge, IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid, cn } from 'ui'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import ThemeToggle from '@ui/components/ThemeProvider/ThemeToggle'
 import { CheckIcon } from '@heroicons/react/outline'
 import SectionContainer from '../Layouts/SectionContainer'
 
 import footerData from 'data/Footer'
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
+import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 
 interface Props {
   className?: string
@@ -76,8 +76,8 @@ const Footer = (props: Props) => {
                   forceDark
                     ? supabaseLogoWordmarkDark
                     : mounted && resolvedTheme?.includes('dark')
-                    ? supabaseLogoWordmarkDark
-                    : supabaseLogoWordmarkLight
+                      ? supabaseLogoWordmarkDark
+                      : supabaseLogoWordmarkLight
                 }
                 width={160}
                 height={30}

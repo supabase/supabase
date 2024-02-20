@@ -22,7 +22,7 @@ const ProjectSettings: NextPageWithLayout = () => {
         <div className="space-y-10">
           <div className="flex flex-col gap-y-4">
             <DatabaseReadOnlyAlert />
-            <DatabaseConnectionString />
+            <DatabaseConnectionString appearance="default" />
             <DatabaseSettings />
             <ConnectionPooling />
           </div>

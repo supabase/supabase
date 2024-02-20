@@ -52,7 +52,7 @@ export const AIPolicyPre = ({ onDiff, children, className }: AAIPolicyPreProps) 
         hideCopy
         hideLineNumbers
       />
-      <div className="absolute top-3 right-3 bg-surface-100 border-muted border rounded-lg h-[28px] hidden group-hover:block">
+      <div className="absolute top-5 right-2 bg-surface-100 border-muted border rounded-lg h-[28px] hidden group-hover:block">
         <Tooltip.Root delayDuration={0}>
           <Tooltip.Trigger asChild>
             <Button

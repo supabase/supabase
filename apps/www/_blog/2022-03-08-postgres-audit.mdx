@@ -104,20 +104,20 @@ So instead, we'll lean on PostgreSQL's schema-less [`JSONB` data type](https://w
 That approach has the added benefit of allowing us to store multiple tables' audit history in a single audit table.
 
 ```sql
-create table audit.record_version(
-  id             bigserial primary key,
+create table audit.record_version (
+  id bigserial primary key,
   -- auditing metadata
-  record_id      uuid, -- identifies a new record by it's table + primary key
-  old_record_id  uuid, -- ^
-  op             varchar(8) not null, -- INSERT/UPDATE/DELETE/TRUNCATE
-  ts             timestamptz not null default now(),
+  record_id uuid, -- identifies a new record by it's table + primary key
+  old_record_id uuid, -- ^
+  op varchar(8) not null, -- INSERT/UPDATE/DELETE/TRUNCATE
+  ts timestamptz not null default now(),
   -- table identifiers
-  table_oid      oid not null,  -- pg internal id for a table
-  table_schema   name not null, -- audited table's schema name e.g. 'public'
-  table_name     name not null, -- audited table's table name e.g. 'account'
+  table_oid oid not null, -- pg internal id for a table
+  table_schema name not null, -- audited table's schema name e.g. 'public'
+  table_name name not null, -- audited table's table name e.g. 'account'
   -- record data
-  record         jsonb, -- contents of the new record
-  old_record     jsonb  -- previous record contents (for UPDATE/DELETE)
+  record jsonb, -- contents of the new record
+  old_record jsonb -- previous record contents (for UPDATE/DELETE)
 );
 ```
 

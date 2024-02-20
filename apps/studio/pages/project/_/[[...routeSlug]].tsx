@@ -38,13 +38,13 @@ const GenericProjectPage: NextPage = () => {
 
   const urlRewriterFactory = (slug: string | string[] | undefined) => {
     return (projectRef: string) => {
-      const hash = location.hash ? `#${location.hash}` : undefined
+      const hash = location.hash
 
       if (!Array.isArray(slug)) {
         return [`/project/${projectRef}`, query, hash].filter(Boolean).join('')
       }
 
-      const slugPath = slug.reduce((a, b) => `${a}/${b}`, '').slice(1)
+      const slugPath = slug.join('/')
       return [`/project/${projectRef}/${slugPath}`, query, hash].filter(Boolean).join('')
     }
   }

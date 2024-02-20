@@ -77,7 +77,7 @@ const NoResultAlert = ({
                 </Button>
               </Link>
             </div>
-            <div className="w-full px-5 py-4 items-center gap-4 inline-flex rounded-b-md bg-background">
+            <div className="w-full px-5 py-4 items-center gap-4 inline-flex rounded-b-md bg-studio">
               <div className="grow flex-col flex">
                 <p className="text-foreground">Not sure what to do?</p>
                 <p className="text-foreground-lighter text-xs">Browse our documentation</p>

@@ -1,9 +1,11 @@
 import { MDXProvider } from '@mdx-js/react'
 import { NextSeo } from 'next-seo'
 import Head from 'next/head'
+import { usePathname } from 'next/navigation'
 import { useRouter } from 'next/router'
 import { FC, useEffect, useRef, useState } from 'react'
-import { ExpandableVideo, IconExternalLink } from 'ui'
+import { IconExternalLink } from 'ui'
+import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
 import components from '~/components'
 import { highlightSelectedTocItem } from '~/components/CustomHTMLElements/CustomHTMLElements.utils'
 import { FooterHelpCalloutType } from '~/components/FooterHelpCallout'
@@ -31,6 +33,7 @@ interface Props {
 }
 
 const Layout: FC<Props> = (props) => {
+  const pathname = usePathname()
   const [hash] = useHash()
 
   const articleRef = useRef()
@@ -61,10 +64,10 @@ const Layout: FC<Props> = (props) => {
         return { text, link, level }
       })
     setTocList(newHeadings)
-  }, [])
+  }, [pathname]) // Needed to recalculate the ToC when the page changes
 
   const hasTableOfContents = tocList.length > 0
-  const tocVideoPreview = `http://img.youtube.com/vi/${props.meta.tocVideo}/0.jpg`
+  const tocVideoPreview = `http://img.youtube.com/vi/${props.meta?.tocVideo}/0.jpg`
 
   // page type, ie, Auth, Database, Storage etc
   const ogPageType = asPath.split('/')[2]
@@ -115,7 +118,7 @@ const Layout: FC<Props> = (props) => {
               'duration-100',
             ].join(' ')}
           >
-            {props.meta.breadcrumb && (
+            {props.meta?.breadcrumb && (
               <p className="text-brand tracking-wider mb-3">{props.meta.breadcrumb}</p>
             )}
             <article
@@ -125,7 +128,7 @@ const Layout: FC<Props> = (props) => {
               } prose max-w-none`}
             >
               <h1 className="mb-0">{props.meta.title}</h1>
-              {props.meta.subtitle && (
+              {props.meta?.subtitle && (
                 <h2 className="mt-3 text-xl text-foreground-light">{props.meta.subtitle}</h2>
               )}
               <div className="w-full border-b my-8"></div>

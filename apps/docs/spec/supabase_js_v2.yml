@@ -239,15 +239,41 @@ functions:
       - To fetch the currently logged-in user, refer to [`getUser()`](/docs/reference/javascript/auth-getuser).
     examples:
       - id: sign-up
-        name: Sign up
+        name: Sign up with an email and password
         isSpotlight: true
-        description: |
-          If the password is larger than 72 chars, it will be truncated to the first 72 chars.
         code: |
           ```js
           const { data, error } = await supabase.auth.signUp({
             email: 'example@email.com',
             password: 'example-password',
+          })
+          ```
+      - id: sign-up-phone
+        name: Sign up with a phone number and password (SMS)
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.signUp({
+            phone: '123456789',
+            password: 'example-password',
+            options: {
+              channel: 'sms'
+            }
+          })
+          ```
+      - id: sign-up-phone-whatsapp
+        name: Sign up with a phone number and password (whatsapp)
+        isSpotlight: true
+        description: |
+          The user will be sent a WhatsApp message which contains a OTP. By default, a given user can only request a OTP once every 60 seconds. Note that a user will need to have a valid WhatsApp account that is linked to Twilio in order to use this feature.
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.signUp({
+            phone: '123456789',
+            password: 'example-password',
+            options: {
+              channel: 'whatsapp'
+            }
           })
           ```
       - id: sign-up-with-additional-user-metadata
@@ -338,7 +364,7 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          const subscription = supabase.auth.onAuthStateChange((event, session) => {
+          const { data } = supabase.auth.onAuthStateChange((event, session) => {
             console.log(event, session)
 
             if (event === 'INITIAL_SESSION') {
@@ -357,7 +383,7 @@ functions:
           })
 
           // call unsubscribe to remove the callback
-          subscription.unsubscribe()
+          data.subscription.unsubscribe()
           ```
       - id: listen-to-sign-out
         name: Listen to sign out
@@ -504,12 +530,6 @@ functions:
           const { data, error } = await supabase.auth.signInWithPassword({
             phone: '+13334445555',
             password: 'some-password',
-          })
-
-          // After receiving a SMS with a OTP.
-          const { data, error } = await supabase.auth.verifyOtp({
-            phone: '+13334445555',
-            token: '123456',
           })
           ```
   - id: sign-in-with-otp
@@ -836,16 +856,28 @@ functions:
         isSpotlight: false
         code: |
           ```js
-          const { data, error } = await supabase.auth.updateUser({email: 'new@email.com'})
+          const { data, error } = await supabase.auth.updateUser({
+            email: 'new@email.com'
+          })
+          ```
+      - id: update-the-phone-for-an-authenticated-user
+        name: Update the phone number for an authenticated user
+        description: Sends a one-time password (OTP) to the new phone number.
+        isSpotlight: false
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.updateUser({
+            phone: '123456789'
+          })
           ```
       - id: update-the-password-for-an-authenticated-user
         name: Update the password for an authenticated user
         isSpotlight: false
-        description: |
-          If the password is larger than 72 chars, it will be truncated to the first 72 chars.
         code: |
           ```js
-          const { data, error } = await supabase.auth.updateUser({password: 'new password'})
+          const { data, error } = await supabase.auth.updateUser({
+            password: 'new password'
+          })
           ```
       - id: update-the-users-metadata
         name: Update the user's metadata
@@ -1007,7 +1039,7 @@ functions:
         isSpotlight: true
         code: |
           ```js
-            const { data, error } = supabase.auth.setSession({
+            const { data, error } = await supabase.auth.setSession({
               access_token,
               refresh_token
             })
@@ -1236,8 +1268,6 @@ functions:
       - id: create-a-new-user-with-custom-user-metadata
         name: With custom user metadata
         isSpotlight: true
-        description: |
-          If the password is larger than 72 chars, it will be truncated to the first 72 chars.
         code: |
           ```js
           const { data, error } = await supabase.auth.admin.createUser({
@@ -4055,7 +4085,7 @@ functions:
                 name
               )
             `)
-            .or('country_id.eq.1,name.eq.Beijing', { referenceTable: 'cities' })
+            .or('country_id.eq.1,name.eq.Beijing', { referencedTable: 'cities' })
           ```
         data:
           sql: |

@@ -4,7 +4,7 @@ import { Button } from '../../../components/Button'
 
 const index = memo(() => {
   return (
-    <div className="relative w-full h-auto min-h-[44px] border-b p-2 flex items-center group justify-center text-foreground bg-surface-100 transition-colors overflow-hidden">
+    <div className="relative w-full h-auto min-h-[44px] border-b px-6 py-3 sm:py-2 flex items-center group justify-center text-foreground bg-surface-100 transition-colors overflow-hidden">
       <div className="relative z-10 flex items-center justify-center">
         <div className="w-full flex gap-4 items-center md:justify-center text-sm">
           <div className="flex gap-2 items-center">

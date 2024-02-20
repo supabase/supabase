@@ -120,7 +120,7 @@ export const useExecuteSqlQuery = <TData = ExecuteSqlData>(
         { projectRef, connectionString, sql, queryKey, handleError, isRoleImpersonationEnabled },
         signal
       ),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
+    { enabled: enabled && typeof projectRef !== 'undefined', staleTime: 0, ...options }
   )
 
 export const prefetchExecuteSql = (

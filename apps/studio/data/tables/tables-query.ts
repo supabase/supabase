@@ -77,7 +77,7 @@ export const useTablesQuery = <TData = TablesData>(
   useQuery<TablesData, TablesError, TData>(
     tableKeys.list(projectRef, schema, includeColumns),
     ({ signal }) => getTables({ projectRef, connectionString, schema, includeColumns }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
+    { enabled: enabled && typeof projectRef !== 'undefined', staleTime: 0, ...options }
   )
 
 /**
@@ -94,7 +94,8 @@ export function useGetTables({
     (schema?: TablesVariables['schema'], includeColumns?: TablesVariables['includeColumns']) => {
       return queryClient.fetchQuery({
         queryKey: tableKeys.list(projectRef, schema, includeColumns),
-        queryFn: ({ signal }) => getTables({ projectRef, connectionString, schema }, signal),
+        queryFn: ({ signal }) =>
+          getTables({ projectRef, connectionString, schema, includeColumns }, signal),
       })
     },
     [connectionString, projectRef, queryClient]
