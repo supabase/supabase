@@ -74,7 +74,9 @@ const DatabaseSettings = () => {
   const selectedDatabase = (databases ?? []).find(
     (db) => db.identifier === state.selectedDatabaseId
   )
-  const primaryConfig = poolingInfo?.find((x) => x.database_type === 'PRIMARY')
+  const primaryConfig = showReadReplicasUI
+    ? poolingInfo?.find((x) => x.identifier === state.selectedDatabaseId)
+    : poolingInfo?.find((x) => x.database_type === 'PRIMARY')
   const isMd5 = primaryConfig?.connectionString.includes('?options=reference')
 
   const { project } = data ?? {}
@@ -116,8 +118,6 @@ const DatabaseSettings = () => {
       setPoolingMode(primaryConfig.pool_mode)
     }
   }, [primaryConfig?.pool_mode])
-
-  console.log({ poolingInfo })
 
   return (
     <>

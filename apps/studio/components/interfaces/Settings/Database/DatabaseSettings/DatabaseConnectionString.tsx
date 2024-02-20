@@ -55,9 +55,8 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
   const { project: projectDetails, isLoading: isProjectLoading } = useProjectContext()
   const { ref: projectRef, connectionString } = useParams()
   const telemetryProps = useTelemetryProps()
-  const readReplicasEnabled = useFlag('readReplicas') && projectDetails?.is_read_replicas_enabled
-
   const state = useDatabaseSelectorStateSnapshot()
+  const readReplicasEnabled = useFlag('readReplicas') && projectDetails?.is_read_replicas_enabled
 
   const connectionStringsRef = useRef<HTMLDivElement>(null)
   const [usePoolerConnection, setUsePoolerConnection] = useState(true)
@@ -69,7 +68,9 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
   const { data: poolingInfo, isSuccess: isSuccessPoolingInfo } = usePoolingConfigurationQuery({
     projectRef,
   })
-  const primaryConfig = poolingInfo?.find((x) => x.database_type === 'PRIMARY')
+  const poolingConfiguration = readReplicasEnabled
+    ? poolingInfo?.find((x) => x.identifier === state.selectedDatabaseId)
+    : poolingInfo?.find((x) => x.database_type === 'PRIMARY')
 
   const {
     data,
@@ -121,19 +122,19 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
   }
 
   const connectionStrings =
-    isSuccessPoolingInfo && primaryConfig !== undefined
-      ? getConnectionStrings(connectionInfo, primaryConfig, {
+    isSuccessPoolingInfo && poolingConfiguration !== undefined
+      ? getConnectionStrings(connectionInfo, poolingConfiguration, {
           projectRef,
           usePoolerConnection,
         })
       : { uri: '', psql: '', golang: '', jdbc: '', dotnet: '', nodejs: '', php: '', python: '' }
   const poolerTld =
-    isSuccessPoolingInfo && primaryConfig !== undefined
-      ? getPoolerTld(primaryConfig?.connectionString)
+    isSuccessPoolingInfo && poolingConfiguration !== undefined
+      ? getPoolerTld(poolingConfiguration?.connectionString)
       : 'com'
   const poolerConnStringSyntax =
-    isSuccessPoolingInfo && primaryConfig !== undefined
-      ? constructConnStringSyntax(primaryConfig?.connectionString, {
+    isSuccessPoolingInfo && poolingConfiguration !== undefined
+      ? constructConnStringSyntax(poolingConfiguration?.connectionString, {
           selectedTab,
           usePoolerConnection,
           ref: projectRef as string,
@@ -142,7 +143,7 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
           tld: usePoolerConnection ? poolerTld : connectionTld,
           portNumber: usePoolerConnection
             ? poolingMode === 'transaction'
-              ? primaryConfig?.db_port.toString()
+              ? poolingConfiguration?.db_port.toString()
               : '5432'
             : connectionInfo.db_port.toString(),
         })
@@ -160,10 +161,10 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
   }, [connectionString])
 
   useEffect(() => {
-    if (primaryConfig?.pool_mode === 'session') {
-      setPoolingMode(primaryConfig.pool_mode)
+    if (poolingConfiguration?.pool_mode === 'session') {
+      setPoolingMode(poolingConfiguration.pool_mode)
     }
-  }, [primaryConfig?.pool_mode])
+  }, [poolingConfiguration?.pool_mode])
 
   return (
     <div id="connection-string" className="w-full">

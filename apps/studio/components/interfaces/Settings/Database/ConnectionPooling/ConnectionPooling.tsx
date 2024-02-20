@@ -33,7 +33,7 @@ import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { usePoolingConfigurationUpdateMutation } from 'data/database/pooling-configuration-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useFlag, useStore } from 'hooks'
 import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 import { SESSION_MODE_DESCRIPTION, TRANSACTION_MODE_DESCRIPTION } from '../Database.constants'
 import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
@@ -90,8 +90,9 @@ export const ConnectionPooling = () => {
     connectionString: project?.connectionString,
   })
 
-  const primaryConfig = poolingInfo?.find((x) => x.database_type === 'PRIMARY')
-  const connectionPoolingUnavailable = primaryConfig?.pool_mode === null
+  const readReplicasEnabled = useFlag('readReplicas') && project?.is_read_replicas_enabled
+  const poolingConfiguration = poolingInfo?.find((x) => x.database_type === 'PRIMARY')
+  const connectionPoolingUnavailable = poolingConfiguration?.pool_mode === null
 
   const canUpdateConnectionPoolingConfiguration = useCheckPermissions(
     PermissionAction.UPDATE,
@@ -106,9 +107,9 @@ export const ConnectionPooling = () => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      pool_mode: primaryConfig?.pool_mode as 'transaction' | 'session' | 'statement',
-      default_pool_size: primaryConfig?.default_pool_size as number | undefined,
-      max_client_conn: primaryConfig?.max_client_conn as number | undefined,
+      pool_mode: poolingConfiguration?.pool_mode as 'transaction' | 'session' | 'statement',
+      default_pool_size: poolingConfiguration?.default_pool_size as number | undefined,
+      max_client_conn: poolingConfiguration?.max_client_conn as number | undefined,
     },
   })
 
@@ -119,7 +120,7 @@ export const ConnectionPooling = () => {
           form.reset({
             pool_mode: data.pool_mode,
             default_pool_size: data.default_pool_size,
-            max_client_conn: primaryConfig?.max_client_conn,
+            max_client_conn: poolingConfiguration?.max_client_conn,
           })
         }
 
@@ -144,9 +145,9 @@ export const ConnectionPooling = () => {
   useEffect(() => {
     if (isSuccess) {
       form.reset({
-        pool_mode: primaryConfig?.pool_mode as 'transaction' | 'session' | 'statement',
-        default_pool_size: primaryConfig?.default_pool_size as number | undefined,
-        max_client_conn: primaryConfig?.max_client_conn as number | undefined,
+        pool_mode: poolingConfiguration?.pool_mode as 'transaction' | 'session' | 'statement',
+        default_pool_size: poolingConfiguration?.default_pool_size as number | undefined,
+        max_client_conn: poolingConfiguration?.max_client_conn as number | undefined,
       })
     }
   }, [isSuccess])
@@ -164,6 +165,7 @@ export const ConnectionPooling = () => {
                   : 'Connection pooling configuration'}
               </p>
               <Badge color="scale">Supavisor</Badge>
+              {readReplicasEnabled && <Badge color="green">Primary Database</Badge>}
             </div>
             <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
               <a
