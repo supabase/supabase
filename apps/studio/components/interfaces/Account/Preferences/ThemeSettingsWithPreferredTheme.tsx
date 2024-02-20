@@ -1,29 +1,44 @@
-import { useTheme } from 'next-themes'
 import Panel from 'components/ui/Panel'
 import { BASE_PATH } from 'lib/constants'
-import { useState } from 'react'
+import { useTheme } from 'next-themes'
+import { useEffect, useState } from 'react'
 import SVG from 'react-inlinesvg'
 import {
   Label_Shadcn_,
-  prefixedThemes,
-  RadioGroup_Shadcn_,
   RadioGroupLargeItem_Shadcn_,
-  Select_Shadcn_,
+  RadioGroup_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  singleThemes,
+  Select_Shadcn_,
   Theme,
+  prefixedThemes,
+  singleThemes,
 } from 'ui'
 
 const ThemeSettings = () => {
+  const [mounted, setMounted] = useState(false)
+
   // @ts-expect-error // remove this ts error if you use this file
   const { theme, setTheme, setSystemPrefixResolve, themePrefix } = useTheme()
   const [mode, setMode] = useState<'system' | 'single-theme'>(
     theme === 'system' ? 'system' : 'single-theme'
   )
   const [prefixedTheme, setPrefixedThemeState] = useState(themePrefix === '' ? 'dark' : themePrefix)
+
+  /**
+   * Avoid Hydration Mismatch
+   * https://github.com/pacocoursey/next-themes?tab=readme-ov-file#avoid-hydration-mismatch
+   */
+  // useEffect only runs on the client, so now we can safely show the UI
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return null
+  }
 
   function SingleThemeSelection() {
     return (
