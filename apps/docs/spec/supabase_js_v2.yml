@@ -2617,9 +2617,7 @@ functions:
           }
           ```
         description: |
-          Postgres functions that return tables can also be combined with
-          [Filters](/docs/reference/javascript/using-filters) and
-          [Modifiers](/docs/reference/javascript/using-modifiers).
+          Postgres functions that return tables can also be combined with [Filters](/docs/reference/javascript/using-filters) and [Modifiers](/docs/reference/javascript/using-modifiers).
         hideCodeBlock: true
 
   - id: using-filters
