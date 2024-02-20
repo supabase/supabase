@@ -1,4 +1,3 @@
-import { useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { forwardRef, useCallback, useState } from 'react'
@@ -39,7 +38,6 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
   ({ disabled, onDeleteConnection, ...props }, ref) => {
     const { ui } = useStore()
     const router = useRouter()
-    const { slug } = useParams()
 
     const { type, connection } = props
     const { data: projects } = useProjectsQuery()
@@ -99,43 +97,8 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="bottom" align="end">
-                  {type === 'Vercel' && (
-                    <>
-                      {router.pathname !== projectIntegrationUrl && (
-                        <DropdownMenuItem disabled={isSyncEnvLoading} asChild>
-                          <Link
-                            href={projectIntegrationUrl.replace(
-                              '[ref]',
-                              connection.supabase_project_ref
-                            )}
-                          >
-                            View project configuration
-                          </Link>
-                        </DropdownMenuItem>
-                      )}
-                      <DropdownMenuItem
-                        className="space-x-2"
-                        onSelect={(event) => {
-                          event.preventDefault()
-                          onReSyncEnvVars()
-                        }}
-                        disabled={isSyncEnvLoading}
-                      >
-                        {isSyncEnvLoading ? (
-                          <IconLoader className="animate-spin" size={14} />
-                        ) : (
-                          <IconRefreshCw size={14} />
-                        )}
-                        <p>Resync environment variables</p>
-                      </DropdownMenuItem>
-                    </>
-                  )}
-                  {slug !== undefined && (
-                    <DropdownMenuItem
-                      asChild
-                      className="space-x-2"
-                      onSelect={() => setIsOpen(true)}
-                    >
+                  {router.pathname !== projectIntegrationUrl && (
+                    <DropdownMenuItem asChild>
                       <Link
                         href={projectIntegrationUrl.replace(
                           '[ref]',
@@ -146,7 +109,26 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
                       </Link>
                     </DropdownMenuItem>
                   )}
-                  {(type === 'Vercel' || slug !== undefined) && <DropdownMenuSeparator />}
+                  {type === 'Vercel' && (
+                    <DropdownMenuItem
+                      className="space-x-2"
+                      onSelect={(event) => {
+                        event.preventDefault()
+                        onReSyncEnvVars()
+                      }}
+                      disabled={isSyncEnvLoading}
+                    >
+                      {isSyncEnvLoading ? (
+                        <IconLoader className="animate-spin" size={14} />
+                      ) : (
+                        <IconRefreshCw size={14} />
+                      )}
+                      <p>Resync environment variables</p>
+                    </DropdownMenuItem>
+                  )}
+                  {(type === 'Vercel' || router.pathname !== projectIntegrationUrl) && (
+                    <DropdownMenuSeparator />
+                  )}
                   <DropdownMenuItem className="space-x-2" onSelect={() => setIsOpen(true)}>
                     <IconTrash size={14} />
                     <p>Delete connection</p>
