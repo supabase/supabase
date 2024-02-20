@@ -1,12 +1,10 @@
+// Import Swiper styles if swiper used on page
+import 'swiper/swiper.min.css'
+
 import dynamic from 'next/dynamic'
-import PostTypes from '~/types/post'
-import { getSortedPosts } from '~/lib/posts'
 import content from '~/data/home/content'
 import Layout from '~/components/Layouts/Default'
 import Hero from '~/components/Hero/Hero'
-
-// Import Swiper styles if swiper used on page
-import 'swiper/swiper.min.css'
 
 const Products = dynamic(() => import('~/components/Products/index'))
 const BuiltExamples = dynamic(() => import('components/BuiltWithSupabase/index'))
@@ -15,6 +13,7 @@ const AdminAccess = dynamic(() => import('components/AdminAccess/index'))
 const CTABanner = dynamic(() => import('components/CTABanner/index'))
 const CustomerStories = dynamic(() => import('components/CustomerStories'))
 const TwitterSocialSection = dynamic(() => import('~/components/TwitterSocialSection'))
+const ReactTooltip = dynamic(() => import('react-tooltip'), { ssr: false })
 
 const Index = () => {
   return (
@@ -27,6 +26,14 @@ const Index = () => {
       <AdminAccess />
       <CustomerStories />
       <CTABanner />
+      <ReactTooltip
+        effect="solid"
+        place="bottom"
+        backgroundColor="hsl(var(--background-alternative-default))"
+        textColor="hsl(var(--foreground-light))"
+        className="!max-w-[320px] !px-3 whitespace-pre-line"
+        uuid="homepage-tt"
+      />
     </Layout>
   )
 }

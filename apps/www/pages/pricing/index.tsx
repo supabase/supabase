@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { Button, IconArrowUpRight } from 'ui'
 import { ArrowDownIcon } from '@heroicons/react/outline'
+import ReactTooltip from 'react-tooltip'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import PricingPlans from '~/components/Pricing/PricingPlans'
@@ -13,7 +14,6 @@ const PricingAddons = dynamic(() => import('~/components/Pricing/PricingAddons')
 const PricingComparisonTable = dynamic(() => import('~/components/Pricing/PricingComparisonTable'))
 const PricingFAQs = dynamic(() => import('~/components/Pricing/PricingFAQs'))
 const CTABanner = dynamic(() => import('~/components/CTABanner'))
-const ReactTooltip = dynamic(() => import('react-tooltip'), { ssr: false })
 
 export default function IndexPage() {
   const router = useRouter()
