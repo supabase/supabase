@@ -1,8 +1,11 @@
 'use client'
 
-import Editor, { BeforeMount, EditorProps } from '@monaco-editor/react'
+import Editor, { BeforeMount, EditorProps, OnMount } from '@monaco-editor/react'
 import { merge } from 'lodash'
 import { useAppStateSnapshot } from '@/lib/state'
+import { useTheme } from 'next-themes'
+import { getTheme } from './CodeEditor.utils'
+import { useEffect, useRef } from 'react'
 
 interface MonacoEditorProps {
   id: string
@@ -26,41 +29,36 @@ const MonacoEditor = ({
   options,
   value,
 }: MonacoEditorProps) => {
-  // const monacoRef = useRef<any>()
-  // const { resolvedTheme } = useTheme()
+  const monacoRef = useRef<any>()
+  const { resolvedTheme } = useTheme()
 
   const snap = useAppStateSnapshot()
   snap.setSelectedCode(value ?? defaultValue ?? '')
 
   const beforeMount: BeforeMount = (monaco) => {
-    // monacoRef.current = monaco
     monaco.editor.defineTheme('supabase', {
-      base: 'vs-dark',
+      base: resolvedTheme === 'dark' ? 'vs-dark' : 'vs',
       inherit: true,
       rules: [
-        { token: '', background: '1f1f1f' },
-        { token: '', background: '1f1f1f', foreground: 'd4d4d4' },
+        { token: '', background: resolvedTheme === 'dark' ? '1f1f1f' : 'f0f0f0' },
+        {
+          token: '',
+          background: resolvedTheme === 'dark' ? '1f1f1f' : 'f0f0f0',
+          foreground: resolvedTheme === 'dark' ? 'd4d4d4' : '444444',
+        },
         { token: 'string.sql', foreground: '24b47e' },
         { token: 'comment', foreground: '666666' },
-        { token: 'predefined.sql', foreground: 'D4D4D4' },
+        { token: 'predefined.sql', foreground: resolvedTheme === 'dark' ? 'D4D4D4' : '444444' },
       ],
-      colors: { 'editor.background': '#1f1f1f' },
+      colors: { 'editor.background': resolvedTheme === 'dark' ? '#1f1f1f' : '#f0f0f0' },
     })
   }
 
   // const onMount: OnMount = async (editor) => {
-  //   // Add margin above first line
-  //   editor.changeViewZones((accessor) => {
-  //     accessor.addZone({
-  //       afterLineNumber: 0,
-  //       heightInPx: 4,
-  //       domNode: document.createElement('div'),
-  //     })
-  //   })
-
+  //   console.log(editor)
   //   if (resolvedTheme) {
   //     const mode: any = getTheme(resolvedTheme)
-  //     monacoRef.current.editor.defineTheme('supabase', mode)
+  //     //monacoRef.current.editor.defineTheme('supabase', mode)
   //   }
   // }
 
@@ -97,7 +95,7 @@ const MonacoEditor = ({
       loading={false}
       options={optionsMerged}
       beforeMount={beforeMount}
-      // onMount={onMount}
+      //onMount={onMount}
     />
   )
 }
