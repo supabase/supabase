@@ -17,7 +17,12 @@ const NoProjectsOnPaidOrgInfo = ({ organization }: NoProjectsOnPaidOrgInfoProps)
 
   const { data: orgSubscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
 
-  if (projectCount > 0 || orgSubscription?.plan === undefined || orgSubscription.plan.id === 'free')
+  if (
+    projectCount > 0 ||
+    orgSubscription?.plan === undefined ||
+    orgSubscription.plan.id === 'free' ||
+    orgSubscription.plan.id === 'enterprise'
+  )
     return null
 
   return (

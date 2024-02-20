@@ -147,6 +147,8 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
 
   useThemeSandbox()
 
+  const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
+
   return (
     <QueryClientProvider client={queryClient}>
       <Hydrate state={pageProps.dehydratedState}>
@@ -181,7 +183,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
 
                 <HCaptchaLoadedStore />
                 <PortalToast />
-                <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
+                {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />}
               </FlagProvider>
             </ProfileProvider>
           </AuthContainer>
