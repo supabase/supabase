@@ -20,7 +20,7 @@ export const ThemeImage = ({ src, ...props }: any) => {
       <Image
         sizes="(max-width: 768px) 120vw, (max-width: 1200px) 100vw, 2000px"
         {...props}
-        className={cn('', props.className)}
+        className={props.className}
         src={
           typeof src === 'string'
             ? src
