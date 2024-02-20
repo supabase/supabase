@@ -5,7 +5,6 @@ Supabase is 100% remote.
 Alaister Young
 Alexander Korotkov
 Amy Q
-Andrew Smith
 Angelico de los Reyes
 Ant Wilson
 Ariuna K
@@ -28,7 +27,6 @@ Greg Richardson
 Haydn Maley
 Hieu Pham
 Inian P
-Isaiah Hamilton
 Jess Shears
 Joel Lee
 Jon M
@@ -40,9 +38,8 @@ Kang Ming Tay
 Karlo Ison
 Kevin Brolly
 Kevin Grüneberg
-Lakshmipathi G
+Lakshan Perera
 Laura C
-Leo T
 Long Hoang
 Margarita Sandomirskaia
 Marijana Pavlinić
@@ -56,8 +53,7 @@ Paul Copplestone
 Pavel Borisov
 Qiao Han
 Raminder Singh
-Ramiro Nuñez Dosio
-Rodrigo Martins Mansueli
+Rodrigo Mansueli
 Rory Wilding
 Sreyas Udayavarman
 Stanislav M

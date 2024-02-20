@@ -19,7 +19,7 @@ export interface Props extends Omit<React.InputHTMLAttributes<HTMLButtonElement>
   error?: string
   icon?: any
   id?: string
-  label?: string
+  label?: string | React.ReactNode
   labelOptional?: string
   layout?: 'horizontal' | 'vertical'
   style?: React.CSSProperties

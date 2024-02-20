@@ -9,8 +9,10 @@ const path = require('path')
 const API_URL = process.env.NEXT_PUBLIC_API_URL
   ? new URL(process.env.NEXT_PUBLIC_API_URL).origin
   : ''
-const SUPABASE_URL = new URL(process.env.SUPABASE_URL).origin
-const GOTRUE_URL = new URL(process.env.NEXT_PUBLIC_GOTRUE_URL).origin
+const SUPABASE_URL = process.env.SUPABASE_URL ? new URL(process.env.SUPABASE_URL).origin : ''
+const GOTRUE_URL = process.env.NEXT_PUBLIC_API_URL
+  ? new URL(process.env.NEXT_PUBLIC_GOTRUE_URL).origin
+  : ''
 const SUPABASE_PROJECTS_URL = 'https://*.supabase.co'
 const SUPABASE_PROJECTS_URL_WS = 'wss://*.supabase.co'
 const SUPABASE_STAGING_PROJECTS_URL = 'https://*.supabase.red'
@@ -84,8 +86,7 @@ const nextConfig = {
   experimental: {
     // [Kevin] Next polyfills Node modules like Crypto by default, blowing up the bundle size. We use generate-password-browser (safe to use in browser) and the polyfills are not needed for us
     // Revisit on Next 14 upgrade (PR #19909)
-    // [Ivan] Temporarily enable until we find a fix for breaking anon-role in the Realtime inspector
-    // fallbackNodePolyfills: false,
+    fallbackNodePolyfills: false,
   },
   async redirects() {
     return [

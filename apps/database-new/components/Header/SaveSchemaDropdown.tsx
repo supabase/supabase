@@ -1,6 +1,6 @@
 'use client'
 
-import { getAppStateSnapshot, useAppStateSnapshot } from '@/lib/state'
+import { getAppStateSnapshot } from '@/lib/state'
 import Image from 'next/image'
 import {
   Button,
@@ -14,8 +14,6 @@ import {
 } from 'ui'
 
 const SaveSchemaDropdown = () => {
-  const snap = useAppStateSnapshot()
-
   const copyToClipboard = () => {
     const snap = getAppStateSnapshot()
     const focused = window.document.hasFocus()

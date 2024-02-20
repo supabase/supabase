@@ -1,0 +1,59 @@
+---
+title: 'Postgres SSL Enforcement'
+description: 'Enforce SSL usage for all Postgres connections'
+---
+
+<Admonition type="note">
+
+Postgres SSL Enforcement is currently in beta. Projects need to be at least on Postgres 13.3.0 to enable SSL enforcement. You can find the Postgres version of your project in the [Infrastructure Settings page](https://supabase.com/dashboard/project/_/settings/infrastructure). If your project is on an older version, you will need to
+[upgrade](/docs/guides/platform/migrating-and-upgrading-projects#upgrade-your-project) to use this feature.
+
+</Admonition>
+
+Your Supabase project supports connecting to the Postgres DB without SSL enabled to maximize client compatibility. For increased security, you can prevent clients from connecting if they're not using SSL.
+
+SSL enforcement only applies to connections to both Postgres and Supavisor ("Connection Pooler"); all HTTP APIs offered by Supabase (e.g., PostgREST, Storage, Auth) automatically enforce SSL on all incoming connections.
+
+## Manage SSL enforcement via the dashboard
+
+SSL enforcement can be configured via the "Enforce SSL on incoming connections" setting under the SSL Configuration section in [Database Settings page](https://supabase.com/dashboard/project/_/settings/database) of the dashboard.
+
+## Manage SSL enforcement via the CLI
+
+To get started:
+
+1. [Install](/docs/guides/cli) the Supabase CLI 1.37.0+.
+1. [Log in](/docs/guides/getting-started/local-development#log-in-to-the-supabase-cli) to your Supabase account using the CLI.
+1. Ensure that you have [Owner or Admin permissions](/docs/guides/platform/access-control#manage-team-members) for the project that you are enabling SSL enforcement.
+
+### Check enforcement status
+
+You can use the `get` subcommand of the CLI to check whether SSL is currently being enforced:
+
+```bash
+> supabase ssl-enforcement --project-ref {ref} get --experimental
+SSL is being enforced.
+```
+
+Or similarly, if SSL is not being enforced, you will see:
+
+```bash
+> supabase ssl-enforcement --project-ref {ref} get --experimental
+SSL is *NOT* being enforced.
+```
+
+### Update enforcement
+
+The `update` subcommand is used to change the SSL enforcement status for your project:
+
+```bash
+> supabase ssl-enforcement --project-ref {ref} update --enable-db-ssl-enforcement --experimental
+SSL is now being enforced.
+```
+
+Similarly, to disable SSL enforcement:
+
+```bash
+> supabase ssl-enforcement --project-ref {ref} update --disable-db-ssl-enforcement --experimental
+SSL is *NOT* being enforced.
+```
