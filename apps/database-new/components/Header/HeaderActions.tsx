@@ -1,17 +1,18 @@
 'use client'
 import Link from 'next/link'
-import { useSelectedLayoutSegment } from 'next/navigation'
+
+import { useParams } from 'next/navigation'
 import { Button } from 'ui'
 
 import SaveSchemaDropdown from './SaveSchemaDropdown'
 import ToggleCodeEditorButton from './ToggleCodeEditorButton'
 
 const HeaderActions = () => {
-  const segment = useSelectedLayoutSegment()
+  const params = useParams()
 
   return (
     <div className="flex items-center gap-x-2">
-      {segment && segment.includes('thread') && (
+      {params.thread_id && (
         <div className="hidden xl:flex items-center gap-x-2">
           <ToggleCodeEditorButton />
           <SaveSchemaDropdown />

@@ -2,6 +2,7 @@
 
 import Editor, { BeforeMount, EditorProps } from '@monaco-editor/react'
 import { merge } from 'lodash'
+import { useAppStateSnapshot } from '@/lib/state'
 
 interface MonacoEditorProps {
   id: string
@@ -27,6 +28,9 @@ const MonacoEditor = ({
 }: MonacoEditorProps) => {
   // const monacoRef = useRef<any>()
   // const { resolvedTheme } = useTheme()
+
+  const snap = useAppStateSnapshot()
+  snap.setSelectedCode(value ?? defaultValue ?? '')
 
   const beforeMount: BeforeMount = (monaco) => {
     // monacoRef.current = monaco
