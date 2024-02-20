@@ -99,7 +99,7 @@ const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnec
     updateConnection({
       connectionId: connection.id,
       organizationId: org?.id,
-      cwdPath: data.supabaseDirectory,
+      workdir: data.supabaseDirectory,
     })
   }
 
@@ -194,7 +194,7 @@ const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnec
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <FormLabel_Shadcn_ className="!text">Supabase directory</FormLabel_Shadcn_>
           <FormDescription_Shadcn_ className="text-xs text-foreground-lighter mb-3">
-            Migration and seed SQL files will be run from this directory.
+            Path to <code>supabase</code> directory containing migration and seed SQL files.
           </FormDescription_Shadcn_>
 
           <FormField_Shadcn_
@@ -233,7 +233,10 @@ const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnec
                       : 'opacity-0'
                   )}
                   htmlType="submit"
-                  disabled={field.value === connection.metadata?.supabaseConfig?.supabaseDirectory}
+                  disabled={
+                    field.value === '' ||
+                    field.value === connection.metadata?.supabaseConfig?.supabaseDirectory
+                  }
                 >
                   Update
                 </Button>

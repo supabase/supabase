@@ -4301,7 +4301,7 @@ export interface components {
       project: components['schemas']['ListGitHubConnectionsProject']
       repository: components['schemas']['ListGitHubConnectionsRepository']
       user: components['schemas']['ListGitHubConnectionsUser'] | null
-      cwd_path: string
+      workdir: string
     }
     ListGitHubConnectionsResponse: {
       connections: components['schemas']['ListGitHubConnectionsConnection'][]
@@ -4312,7 +4312,7 @@ export interface components {
       repository_id: number
     }
     UpdateGitHubConnectionsBody: {
-      cwd_path?: string
+      workdir?: string
     }
     CreateCliLoginSessionBody: {
       session_id: string

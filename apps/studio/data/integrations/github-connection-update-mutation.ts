@@ -8,17 +8,17 @@ import { integrationKeys } from './keys'
 type UpdateVariables = {
   connectionId: string | number
   organizationId: number
-  cwdPath: string
+  workdir: string
 }
 
 export async function updateConnection(
-  { connectionId, cwdPath }: UpdateVariables,
+  { connectionId, workdir }: UpdateVariables,
   signal?: AbortSignal
 ) {
   const { data, error } = await patch('/platform/integrations/github/connections/{connection_id}', {
     params: { path: { connection_id: String(connectionId) } },
     signal,
-    body: { cwd_path: cwdPath },
+    body: { workdir: workdir },
   })
   if (error) throw error
 

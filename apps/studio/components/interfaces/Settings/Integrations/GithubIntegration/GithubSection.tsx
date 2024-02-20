@@ -150,7 +150,7 @@ const GitHubSection = () => {
                           metadata: {
                             name: connection.repository.name,
                             supabaseConfig: {
-                              supabaseDirectory: connection.cwd_path,
+                              supabaseDirectory: connection.workdir,
                             },
                           } as any,
                         }}
