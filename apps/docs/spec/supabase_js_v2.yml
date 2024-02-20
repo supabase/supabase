@@ -1792,6 +1792,15 @@ functions:
               from:sender_id(name),
               to:receiver_id(name)
             `)
+          
+          // inferring types
+          const { data, error } = await supabase
+            .from('messages')
+            .select(`
+              content,
+              from:users!messages_from_fkey(name),
+              to:users!messages_from_fkey(name)
+            `)
           ```
         data:
           sql: |
