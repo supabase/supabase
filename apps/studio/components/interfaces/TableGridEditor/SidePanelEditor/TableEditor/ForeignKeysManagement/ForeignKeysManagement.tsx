@@ -12,6 +12,7 @@ import { TableField } from '../TableEditor.types'
 import { ForeignKeyRow } from './ForeignKeyRow'
 import { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
 import { checkIfRelationChanged } from './ForeignKeysManagement.utils'
+import { uuidv4 } from 'lib/helpers'
 
 interface ForeignKeysManagementProps {
   table: TableField
@@ -83,7 +84,7 @@ export const ForeignKeysManagement = ({
                   }}
                   onSelectRemove={() => {
                     setEditorDirty()
-                    if (fk.id === undefined) {
+                    if (status === 'ADD') {
                       const updatedRelations = relations.filter((x) => x.id !== fk.id)
                       onUpdateFkRelations(updatedRelations)
                     } else {
