@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { forwardRef, useCallback, useState } from 'react'
@@ -23,11 +24,11 @@ import {
   IntegrationConnectionProps,
 } from 'components/interfaces/Integrations/IntegrationPanels'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { WarningIcon } from 'components/ui/Icons'
 import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
 import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useStore } from 'hooks'
-import { WarningIcon } from 'components/ui/Icons'
 
 interface IntegrationConnectionItemProps extends IntegrationConnectionProps {
   disabled?: boolean
@@ -38,6 +39,7 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
   ({ disabled, onDeleteConnection, ...props }, ref) => {
     const { ui } = useStore()
     const router = useRouter()
+    const { slug } = useParams()
 
     const { type, connection } = props
     const { data: projects } = useProjectsQuery()
@@ -126,9 +128,25 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
                         )}
                         <p>Resync environment variables</p>
                       </DropdownMenuItem>
-                      <DropdownMenuSeparator />
                     </>
                   )}
+                  {slug !== undefined && (
+                    <DropdownMenuItem
+                      asChild
+                      className="space-x-2"
+                      onSelect={() => setIsOpen(true)}
+                    >
+                      <Link
+                        href={projectIntegrationUrl.replace(
+                          '[ref]',
+                          connection.supabase_project_ref
+                        )}
+                      >
+                        Configure connection
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+                  {(type === 'Vercel' || slug !== undefined) && <DropdownMenuSeparator />}
                   <DropdownMenuItem className="space-x-2" onSelect={() => setIsOpen(true)}>
                     <IconTrash size={14} />
                     <p>Delete connection</p>

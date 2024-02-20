@@ -23,7 +23,6 @@ import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-e
 import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useGitHubRepositoriesQuery } from 'data/integrations/github-repositories-query'
-import { useIntegrationsQuery } from 'data/integrations/integrations-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization, useStore } from 'hooks'
