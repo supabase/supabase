@@ -33,7 +33,7 @@ import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { usePoolingConfigurationUpdateMutation } from 'data/database/pooling-configuration-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useCheckPermissions, useFlag, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 import { SESSION_MODE_DESCRIPTION, TRANSACTION_MODE_DESCRIPTION } from '../Database.constants'
 import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
@@ -90,7 +90,6 @@ export const ConnectionPooling = () => {
     connectionString: project?.connectionString,
   })
 
-  const readReplicasEnabled = useFlag('readReplicas') && project?.is_read_replicas_enabled
   const poolingConfiguration = poolingInfo?.find((x) => x.database_type === 'PRIMARY')
   const connectionPoolingUnavailable = poolingConfiguration?.pool_mode === null
 
@@ -165,7 +164,6 @@ export const ConnectionPooling = () => {
                   : 'Connection pooling configuration'}
               </p>
               <Badge color="scale">Supavisor</Badge>
-              {readReplicasEnabled && <Badge color="green">Primary Database</Badge>}
             </div>
             <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
               <a
