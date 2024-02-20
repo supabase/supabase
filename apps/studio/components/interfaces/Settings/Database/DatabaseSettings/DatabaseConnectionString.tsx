@@ -26,7 +26,6 @@ import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useFlag } from 'hooks'
 import { pluckObjectFields } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { IPv4DeprecationNotice } from '../IPv4DeprecationNotice'
 import { UsePoolerCheckbox } from '../UsePoolerCheckbox'
 import {
@@ -55,10 +54,11 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
   const { project: projectDetails, isLoading: isProjectLoading } = useProjectContext()
   const { ref: projectRef, connectionString } = useParams()
   const telemetryProps = useTelemetryProps()
-  const state = useDatabaseSelectorStateSnapshot()
   const readReplicasEnabled = useFlag('readReplicas') && projectDetails?.is_read_replicas_enabled
 
   const connectionStringsRef = useRef<HTMLDivElement>(null)
+  // [Joshen] Temp - so that behaviour for is similar to usePoolerCheckbox where the state is not synced with Connection Params
+  const [selectedDatabaseId, setSelectedDatabaseId] = useState(projectRef)
   const [usePoolerConnection, setUsePoolerConnection] = useState(true)
   const [poolingMode, setPoolingMode] = useState<'transaction' | 'session' | 'statement'>('session')
   const [selectedTab, setSelectedTab] = useState<
@@ -69,7 +69,7 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
     projectRef,
   })
   const poolingConfiguration = readReplicasEnabled
-    ? poolingInfo?.find((x) => x.identifier === state.selectedDatabaseId)
+    ? poolingInfo?.find((x) => x.identifier === selectedDatabaseId)
     : poolingInfo?.find((x) => x.database_type === 'PRIMARY')
 
   const {
@@ -93,9 +93,7 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
   const isError = readReplicasEnabled ? isErrorReadReplicas : isErrorProjectSettings
   const isSuccess = readReplicasEnabled ? isSuccessReadReplicas : isSuccessProjectSettings
 
-  const selectedDatabase = (databases ?? []).find(
-    (db) => db.identifier === state.selectedDatabaseId
-  )
+  const selectedDatabase = (databases ?? []).find((db) => db.identifier === selectedDatabaseId)
 
   const { project } = data ?? {}
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
@@ -155,7 +153,7 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
       connectionString !== undefined &&
       connectionStringsRef.current !== undefined
     ) {
-      state.setSelectedDatabaseId(connectionString)
+      setSelectedDatabaseId(connectionString)
       connectionStringsRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' })
     }
   }, [connectionString])
@@ -197,7 +195,12 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
                   appearance === 'minimal' ? 'absolute -top-1 right-0' : ''
                 )}
               >
-                {readReplicasEnabled && <DatabaseSelector />}
+                {readReplicasEnabled && (
+                  <DatabaseSelector
+                    selectedId={selectedDatabaseId}
+                    setSelectedId={setSelectedDatabaseId}
+                  />
+                )}
                 <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                   <a href="https://supabase.com/docs/guides/database/connecting-to-postgres">
                     Documentation
