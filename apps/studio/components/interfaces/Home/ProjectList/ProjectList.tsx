@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Button, IconPlus } from 'ui'
 
 import AlertError from 'components/ui/AlertError'
+import NoSearchResults from 'components/ui/NoSearchResults'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import {
   OverdueInvoicesResponse,
@@ -18,7 +19,6 @@ import { makeRandomString } from 'lib/helpers'
 import { Organization, ResponseError } from 'types'
 import ProjectCard from './ProjectCard'
 import ShimmeringCard from './ShimmeringCard'
-import NoSearchResults from 'components/ui/NoSearchResults'
 
 export interface ProjectListProps {
   rewriteHref?: (projectRef: string) => string
@@ -126,7 +126,7 @@ const OrganizationProjects = ({
 }: OrganizationProjectsProps) => {
   const organization = useSelectedOrganization()
   const isEmpty = !projects || projects.length === 0
-  const sortedProjects = (projects ?? []).sort((a, b) => a.name.localeCompare(b.name))
+  const sortedProjects = [...(projects || [])].sort((a, b) => a.name.localeCompare(b.name))
   const filteredProjects =
     search.length > 0
       ? sortedProjects.filter((project) => {
