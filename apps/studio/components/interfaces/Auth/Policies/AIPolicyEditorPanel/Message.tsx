@@ -11,7 +11,7 @@ import { AIPolicyPre } from './AIPolicyPre'
 
 interface MessageProps {
   name?: string
-  role: 'function' | 'user' | 'assistant' | 'system' | 'data'
+  role: 'function' | 'system' | 'user' | 'assistant' | 'data' | 'tool'
   content?: string
   createdAt?: number
   isDebug?: boolean

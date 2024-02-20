@@ -33,7 +33,7 @@ const AlertError = ({ ref, subject, error, className }: AlertErrorProps) => {
     <Alert_Shadcn_ className={className} variant="warning" title={subject}>
       <IconAlertCircle className="h-4 w-4" strokeWidth={2} />
       <AlertTitle_Shadcn_>{subject}</AlertTitle_Shadcn_>
-      <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+      <AlertDescription_Shadcn_ className="flex flex-col gap-3 break-words">
         <div>
           {error?.message && <p>Error: {formattedErrorMessage}</p>}
           <p>

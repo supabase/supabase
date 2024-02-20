@@ -57,7 +57,7 @@ const HighlightCard = ({ highlight, index }: { highlight: Highlight; index: numb
         </div>
         <div className="p-8">
           <h3 className="text-lg text-foreground mb-2">{highlight.title}</h3>
-          <p className="text-muted">{highlight.paragraph}</p>
+          <p className="text-foreground-lighter">{highlight.paragraph}</p>
         </div>
       </Panel>
     </m.div>

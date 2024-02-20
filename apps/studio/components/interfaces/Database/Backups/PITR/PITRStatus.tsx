@@ -7,10 +7,10 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { FormPanel } from 'components/ui/Forms'
 import { useBackupsQuery } from 'data/database/backups-query'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useCheckPermissions } from 'hooks'
 import { Timezone } from './PITR.types'
-import TimezoneSelection from './TimezoneSelection'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { TimezoneSelection } from './TimezoneSelection'
 
 interface PITRStatusProps {
   selectedTimezone: Timezone
@@ -92,7 +92,6 @@ const PITRStatus = ({
         <div className="p-6 space-y-6">
           <div className="w-[350px]">
             <TimezoneSelection
-              hideLabel
               selectedTimezone={selectedTimezone}
               onSelectTimezone={onUpdateTimezone}
             />

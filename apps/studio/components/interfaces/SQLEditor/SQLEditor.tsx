@@ -568,6 +568,8 @@ const SQLEditor = () => {
         buttonLabel="Run destructive query"
         onSelectCancel={() => {
           setIsConfirmModalOpen(false)
+          // [Joshen] Somehow calling this immediately doesn't work, hence the timeout
+          setTimeout(() => editorRef.current?.focus(), 100)
         }}
         onSelectConfirm={() => {
           setIsConfirmModalOpen(false)

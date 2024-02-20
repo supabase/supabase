@@ -11,7 +11,7 @@ import remarkGfm from 'remark-gfm'
 import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 
 const DOCS_DIRECTORY = join(dirname(fileURLToPath(import.meta.url)), '..')
-const GUIDES_DIRECTORY = join(DOCS_DIRECTORY, 'content/guides')
+export const GUIDES_DIRECTORY = join(DOCS_DIRECTORY, 'content/guides')
 
 type GuideFrontmatter = {
   title: string
@@ -27,6 +27,7 @@ export function isValidGuideFrontmatter(obj: object): obj is GuideFrontmatter {
 
 export async function getGuidesStaticPaths(section: string) {
   const directory = join(GUIDES_DIRECTORY, section)
+
   const files = (await readdir(directory, { recursive: true }))
     .filter((file) => extname(file) === '.mdx')
     .map((file) => ({
@@ -64,6 +65,14 @@ export async function getGuidesStaticProps(
   }
 
   const fullPath = join(GUIDES_DIRECTORY, relPath + '.mdx')
+  /**
+   * SAFETY CHECK:
+   * Prevent accessing anything outside of GUIDES_DIRECTORY
+   */
+  if (!fullPath.startsWith(GUIDES_DIRECTORY)) {
+    throw Error('Accessing forbidden route. Content must be within the GUIDES_DIRECTORY.')
+  }
+
   const mdx = await readFile(fullPath, 'utf-8')
 
   const editLink = `supabase/supabase/blob/master/apps/docs/content/guides/${relPath}.mdx`
