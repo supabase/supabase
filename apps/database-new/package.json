@@ -6,7 +6,8 @@
     "dev": "next dev --port 3002",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@dagrejs/dagre": "^1.0.4",
@@ -14,6 +15,7 @@
     "@monaco-editor/react": "^4.6.0",
     "@supabase/ssr": "^0.0.10",
     "@tanstack/react-query": "^5.7.2",
+    "ai": "^2.2.31",
     "common": "*",
     "config": "*",
     "dayjs": "^1.11.10",

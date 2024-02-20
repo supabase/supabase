@@ -183,7 +183,6 @@ h6:not(.overwrite) {
   top: 0;
   left: 0;
   transform-origin: 100% 0;
-  transform: skewY(-2deg);
   overflow: hidden;
 }
 
