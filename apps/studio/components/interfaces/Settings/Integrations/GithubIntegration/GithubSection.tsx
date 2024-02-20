@@ -10,15 +10,17 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
+import { useBranchesDisableMutation } from 'data/branches/branches-disable-mutation'
 import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-connection-delete-mutation'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { IntegrationName, IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
+import { OPT_IN_TAGS } from 'lib/constants'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
+import { cn } from 'ui'
 import { IntegrationImageHandler } from '../IntegrationsSettings'
 import GitHubIntegrationConnectionForm from './GitHubIntegrationConnectionForm'
-import { OPT_IN_TAGS } from 'lib/constants'
-import { cn } from 'ui'
+import { useBranchesQuery } from 'data/branches/branches-query'
 
 const GitHubTitle = `GitHub Connections`
 
@@ -36,30 +38,13 @@ The GitHub app will watch for changes in your repository such as file changes, b
 
 const GitHubSection = () => {
   const { ui } = useStore()
+  const { ref: projectRef } = useParams()
   const project = useSelectedProject()
   const org = useSelectedOrganization()
-  const { data: allConnections } = useGitHubConnectionsQuery({ organizationId: org?.id })
-  const { ref: projectRef } = useParams()
-
-  const isBranchingEnabled =
-    project?.is_branch_enabled === true || project?.parent_project_ref !== undefined
-
   const sidePanelsStateSnapshot = useSidePanelsStateSnapshot()
 
-  const onAddGitHubConnection = useCallback(() => {
-    sidePanelsStateSnapshot.setGithubConnectionsOpen(true)
-  }, [sidePanelsStateSnapshot])
-
-  const hasAccessToBranching = org?.opt_in_tags?.includes(OPT_IN_TAGS.PREVIEW_BRANCHES) ?? false
-
-  const isBranch = project?.parent_project_ref !== undefined
-
-  const connections =
-    allConnections?.filter((connection) =>
-      isBranch
-        ? connection.project.ref === project.parent_project_ref
-        : connection.project.ref === projectRef
-    ) ?? []
+  const { data: allConnections } = useGitHubConnectionsQuery({ organizationId: org?.id })
+  const { data: branches } = useBranchesQuery({ projectRef })
 
   const { mutate: deleteGitHubConnection } = useGitHubConnectionDeleteMutation({
     onSuccess: () => {
@@ -70,18 +55,42 @@ const GitHubSection = () => {
     },
   })
 
+  const { mutate: disableBranching } = useBranchesDisableMutation()
+
+  const previewBranches = (branches ?? []).filter((branch) => !branch.is_default)
+  const hasAccessToBranching = org?.opt_in_tags?.includes(OPT_IN_TAGS.PREVIEW_BRANCHES) ?? false
+  const isBranch = project?.parent_project_ref !== undefined
+  const isBranchingEnabled =
+    project?.is_branch_enabled === true || project?.parent_project_ref !== undefined
+
+  const connections =
+    allConnections?.filter((connection) =>
+      isBranch
+        ? connection.project.ref === project.parent_project_ref
+        : connection.project.ref === projectRef
+    ) ?? []
+
+  const onAddGitHubConnection = useCallback(() => {
+    sidePanelsStateSnapshot.setGithubConnectionsOpen(true)
+  }, [sidePanelsStateSnapshot])
+
   const onDeleteGitHubConnection = useCallback(
     async (connection: IntegrationProjectConnection) => {
-      if (!org?.id) {
-        throw new Error('Organization not found')
+      if (isBranchingEnabled) {
+        if (!projectRef) throw new Error('Project ref not found')
+        disableBranching({ projectRef, branchIds: previewBranches?.map((branch) => branch.id) })
       }
-
-      deleteGitHubConnection({
-        connectionId: connection.id,
-        organizationId: org.id,
-      })
+      if (!org?.id) throw new Error('Organization not found')
+      deleteGitHubConnection({ connectionId: connection.id, organizationId: org.id })
     },
-    [deleteGitHubConnection, org?.id]
+    [
+      deleteGitHubConnection,
+      disableBranching,
+      isBranchingEnabled,
+      org?.id,
+      previewBranches,
+      projectRef,
+    ]
   )
 
   return (

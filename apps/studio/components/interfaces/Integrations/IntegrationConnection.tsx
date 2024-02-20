@@ -1,16 +1,10 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { forwardRef, useCallback, useState } from 'react'
-
 import {
-  IntegrationConnection,
-  IntegrationConnectionProps,
-} from 'components/interfaces/Integrations/IntegrationPanels'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
-import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
-import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { useStore } from 'hooks'
-import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Button,
   DropdownMenu,
   DropdownMenuContent,
@@ -24,6 +18,17 @@ import {
   Modal,
 } from 'ui'
 
+import {
+  IntegrationConnection,
+  IntegrationConnectionProps,
+} from 'components/interfaces/Integrations/IntegrationPanels'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
+import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import { useProjectsQuery } from 'data/projects/projects-query'
+import { useStore } from 'hooks'
+import { WarningIcon } from 'components/ui/Icons'
+
 interface IntegrationConnectionItemProps extends IntegrationConnectionProps {
   disabled?: boolean
   onDeleteConnection: (connection: IntegrationProjectConnection) => void | Promise<void>
@@ -32,18 +37,23 @@ interface IntegrationConnectionItemProps extends IntegrationConnectionProps {
 const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectionItemProps>(
   ({ disabled, onDeleteConnection, ...props }, ref) => {
     const { ui } = useStore()
+    const router = useRouter()
+
+    const { type, connection } = props
+    const { data: projects } = useProjectsQuery()
+    const project = projects?.find((project) => project.ref === connection.supabase_project_ref)
+    const isBranchingEnabled = project?.is_branch_enabled === true
+
     const [isOpen, setIsOpen] = useState(false)
     const [dropdownVisible, setDropdownVisible] = useState(false)
 
-    const router = useRouter()
-
     const onConfirm = useCallback(async () => {
       try {
-        await onDeleteConnection(props.connection)
+        await onDeleteConnection(connection)
       } finally {
         setIsOpen(false)
       }
-    }, [props.connection, onDeleteConnection])
+    }, [connection, onDeleteConnection])
 
     const onCancel = useCallback(() => {
       setIsOpen(false)
@@ -61,8 +71,8 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
       })
 
     const onReSyncEnvVars = useCallback(async () => {
-      syncEnvs({ connectionId: props.connection.id })
-    }, [props.connection, syncEnvs])
+      syncEnvs({ connectionId: connection.id })
+    }, [connection, syncEnvs])
 
     const projectIntegrationUrl = `/project/[ref]/settings/integrations`
 
@@ -87,14 +97,14 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="bottom" align="end">
-                  {props.type === 'Vercel' && (
+                  {type === 'Vercel' && (
                     <>
                       {router.pathname !== projectIntegrationUrl && (
                         <DropdownMenuItem disabled={isSyncEnvLoading} asChild>
                           <Link
                             href={projectIntegrationUrl.replace(
                               '[ref]',
-                              props.connection.supabase_project_ref
+                              connection.supabase_project_ref
                             )}
                           >
                             View project configuration
@@ -131,16 +141,27 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
         />
 
         <ConfirmationModal
+          danger
+          size={type === 'GitHub' && isBranchingEnabled ? 'medium' : 'small'}
           visible={isOpen}
-          danger={true}
-          header="Confirm to delete"
-          buttonLabel="Delete"
+          header={`Confirm to delete ${type} connection`}
+          buttonLabel="Delete connection"
           onSelectCancel={onCancel}
           onSelectConfirm={onConfirm}
         >
-          <Modal.Content>
-            <p className="py-4 text-sm text-foreground-light">
-              This action cannot be undone. Are you sure you want to delete this connection?
+          <Modal.Content className="py-4 flex flex-col gap-y-4">
+            {type === 'GitHub' && isBranchingEnabled && (
+              <Alert_Shadcn_ variant="warning">
+                <WarningIcon />
+                <AlertTitle_Shadcn_>Branching will be disabled for this project</AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_>
+                  Deleting this GitHub connection will remove all preview branches on this project,
+                  and also disable branching for {project.name}
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
+            )}
+            <p className="text-sm text-foreground-light">
+              This action cannot be undone. Are you sure you want to delete this {type} connection?
             </p>
           </Modal.Content>
         </ConfirmationModal>

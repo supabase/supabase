@@ -21,9 +21,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
   const { ref: projectRef } = useParams()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
-
-  const isBranchingEnabled =
-    selectedProject?.is_branch_enabled === true || selectedProject?.parent_project_ref !== undefined
+  const isBranchingEnabled = selectedProject?.is_branch_enabled === true
 
   const { data: orgUsage } = useOrgUsageQuery({ orgSlug: selectedOrganization?.slug })
 
