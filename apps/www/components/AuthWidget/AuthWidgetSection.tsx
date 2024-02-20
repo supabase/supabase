@@ -52,16 +52,12 @@ function AuthWidgetSection() {
     return props.children
   }
 
-  //  rounded-xl rounded-3xl rounded-full // for purging
-
   return (
     <div className="sbui-tabs--alt overflow-hidden">
       <div className="bg-background relative border py-2 pb-16">
         <div className="sm:py-18 gap container relative mx-auto grid grid-cols-12 px-6 py-16 md:gap-16 md:py-24 lg:gap-16 lg:px-16 lg:py-24 xl:px-20">
           <div className="relative z-10 col-span-12 mb-16 md:col-span-7 md:mb-0 lg:col-span-6">
             <div className="relative lg:mx-auto lg:max-w-md">
-              <div className="glow-area transition-all"></div>
-
               <div className="border-overlay bg-surface-100 pointer-events-none relative rounded-xl border px-8 py-12 drop-shadow-sm">
                 <div className="mb-6 flex flex-col gap-6">
                   <div className="flex items-center gap-3">
