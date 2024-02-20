@@ -9,21 +9,22 @@ const sections = flattenSections(clientLibsCommonSections)
 const libraryPath = '/dart/v0'
 
 export default function JSReference(props) {
-  return (
-    <RefSectionHandler
-      sections={sections}
-      spec={spec}
-      pageProps={props}
-      type="client-lib"
-      isOldVersion
-    />
-  )
+	return (
+		<RefSectionHandler
+			menuId="reference_dart_v1"
+			sections={sections}
+			spec={spec}
+			pageProps={props}
+			type="client-lib"
+			isOldVersion
+		/>
+	)
 }
 
 export async function getStaticProps() {
-  return handleRefStaticProps(sections, libraryPath)
+	return handleRefStaticProps(sections, libraryPath)
 }
 
 export async function getStaticPaths() {
-  return handleRefGetStaticPaths(sections)
+	return handleRefGetStaticPaths(sections)
 }

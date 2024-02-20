@@ -224,7 +224,7 @@ const menus: Menu[] = [
 ]
 
 function getMenuById(id: string) {
-  return menus.find((menu) => menu.id === id)
+  return menus.find((menu) => menu.id === id) ?? menus.find((menu) => menu.id === 'home')
 }
 
 function getMenuByUrl(basePath: string, url: string) {
@@ -257,7 +257,7 @@ function getMenuElement(menu: Menu) {
   }
 }
 
-const NavigationMenu = () => {
+const NavigationMenu = ({ menuId }: { menuId: string }) => {
   const router = useRouter()
 
   useEffect(() => {
@@ -276,7 +276,7 @@ const NavigationMenu = () => {
     }
   }, [router.asPath, router.basePath, router.events])
 
-  const level = useMenuLevelId()
+  const level = menuId
   const menu = getMenuById(level)
 
   return getMenuElement(menu)

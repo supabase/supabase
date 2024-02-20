@@ -12,7 +12,15 @@ const sections = flattenSections(apiCommonSections)
 const libraryPath = '/api'
 
 export default function Config(props) {
-  return <RefSectionHandler sections={sections} spec={generatedSpec} pageProps={props} type="api" />
+  return (
+    <RefSectionHandler
+      sections={sections}
+      spec={generatedSpec}
+      pageProps={props}
+      type="api"
+      menuId="reference_api"
+    />
+  )
 }
 
 export async function getStaticProps() {

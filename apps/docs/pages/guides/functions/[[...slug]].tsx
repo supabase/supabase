@@ -21,7 +21,7 @@ export default function FunctionsGuide({
   const { hideToc, ...meta } = frontmatter
 
   return (
-    <Layout meta={meta} hideToc={hideToc} editLink={editLink}>
+    <Layout meta={meta} hideToc={hideToc} editLink={editLink} menuId="functions">
       <MDXRemote {...mdxSource} components={components} />
     </Layout>
   )

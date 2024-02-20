@@ -114,7 +114,7 @@ interface PGGraphQLDocsProps {
 
 export default function PGGraphQLDocs({ source, meta }: PGGraphQLDocsProps) {
   return (
-    <Layout meta={meta}>
+    <Layout meta={meta} menuId="graphql">
       <MDXRemote {...source} components={components} />
     </Layout>
   )

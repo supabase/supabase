@@ -21,7 +21,7 @@ export default function PlatformGuide({
   const { hideToc, ...meta } = frontmatter
 
   return (
-    <Layout meta={meta} hideToc={hideToc} editLink={editLink}>
+    <Layout meta={meta} hideToc={hideToc} editLink={editLink} menuId="platform">
       <MDXRemote {...mdxSource} components={components} />
     </Layout>
   )

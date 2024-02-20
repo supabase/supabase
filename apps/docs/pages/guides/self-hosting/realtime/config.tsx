@@ -27,6 +27,7 @@ export const Page = (props: InferGetStaticPropsType<typeof getStaticProps>) => (
   <Layout
     meta={meta}
     editLink="/supabase/supabase/blob/master/apps/docs/pages/guides/self-hosting/analytics/config.tsx"
+    menuId="self_hosting"
   >
     <MDXRemote {...props.descriptionSource} components={components} />
 

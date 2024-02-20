@@ -13,7 +13,15 @@ const libraryPath = '/self-hosting-analytics'
 const spec = gen_v3(analyticsSpec, 'wat', { apiUrl: 'apiv0' })
 
 export default function SelfHostAnalyticsReference(props) {
-  return <RefSectionHandler sections={sections} spec={spec} pageProps={props} type="api" />
+  return (
+    <RefSectionHandler
+      sections={sections}
+      spec={spec}
+      pageProps={props}
+      type="api"
+      menuId="reference_self_hosting_analytics"
+    />
+  )
 }
 
 export async function getStaticProps() {

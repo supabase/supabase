@@ -18,6 +18,7 @@ export default function JSReference(props) {
       pageProps={props}
       type="client-lib"
       isOldVersion
+      menuId="reference_javascript_v1"
     />
   )
 }

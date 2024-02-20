@@ -62,7 +62,7 @@ interface ActionDocsProps {
 
 export default function ActionDocs({ source, meta }: ActionDocsProps) {
   return (
-    <Layout meta={meta}>
+    <Layout meta={meta} menuId="supabase_cli">
       <MDXRemote {...source} components={components} />
     </Layout>
   )

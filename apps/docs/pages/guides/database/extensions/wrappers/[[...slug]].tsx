@@ -83,7 +83,7 @@ export default function WrappersDocs({
   editLink,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   return (
-    <Layout meta={meta} editLink={editLink}>
+    <Layout meta={meta} editLink={editLink} menuId="database">
       <MDXRemote {...source} components={components} />
     </Layout>
   )

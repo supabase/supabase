@@ -21,7 +21,7 @@ export default function StorageGuide({
   const { hideToc, ...meta } = frontmatter
 
   return (
-    <Layout meta={meta} hideToc={hideToc} editLink={editLink}>
+    <Layout meta={meta} hideToc={hideToc} editLink={editLink} menuId="storage">
       <MDXRemote {...mdxSource} components={components} />
     </Layout>
   )

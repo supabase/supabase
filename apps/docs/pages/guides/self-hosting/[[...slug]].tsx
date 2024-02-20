@@ -21,7 +21,7 @@ export default function SelfHostingGuide({
   const { hideToc, ...meta } = frontmatter
 
   return (
-    <Layout meta={meta} hideToc={hideToc} editLink={editLink}>
+    <Layout meta={meta} hideToc={hideToc} editLink={editLink} menuId="self_hosting">
       <MDXRemote {...mdxSource} components={components} />
     </Layout>
   )

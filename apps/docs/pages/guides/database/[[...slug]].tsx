@@ -31,7 +31,7 @@ export default function DatabaseGuide({
   const { hideToc, ...meta } = frontmatter
 
   return (
-    <Layout meta={meta} hideToc={hideToc} editLink={editLink}>
+    <Layout meta={meta} hideToc={hideToc} editLink={editLink} menuId="database">
       <MDXRemote {...mdxSource} components={components} />
     </Layout>
   )

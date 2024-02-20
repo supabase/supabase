@@ -16,6 +16,7 @@ interface Props {
   hideToc?: boolean
   currentPage?: string
   editLink?: string
+  menuId: string
 }
 
 const Layout: FC<Props> = (props) => {

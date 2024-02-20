@@ -9,13 +9,13 @@ const sections = flattenSections(clientLibsCommonSections)
 const libraryPath = '/swift'
 
 export default function SwiftReference(props) {
-  return <RefSectionHandler sections={sections} spec={spec} pageProps={props} type="client-lib" />
+	return <RefSectionHandler menuId="reference_swift_v2" sections={sections} spec={spec} pageProps={props} type="client-lib" />
 }
 
 export async function getStaticProps() {
-  return handleRefStaticProps(sections, libraryPath)
+	return handleRefStaticProps(sections, libraryPath)
 }
 
 export async function getStaticPaths() {
-  return handleRefGetStaticPaths(sections)
+	return handleRefGetStaticPaths(sections)
 }

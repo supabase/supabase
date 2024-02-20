@@ -11,7 +11,15 @@ const sections = flattenSections(cliCommonSections)
 const libraryPath = '/cli'
 
 export default function CliRef(props) {
-  return <RefSectionHandler sections={sections} spec={spec} pageProps={props} type="cli" />
+  return (
+    <RefSectionHandler
+      sections={sections}
+      spec={spec}
+      pageProps={props}
+      type="cli"
+      menuId="reference_cli"
+    />
+  )
 }
 
 export async function getStaticProps() {

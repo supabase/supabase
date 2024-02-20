@@ -61,7 +61,7 @@ interface PythonClientDocsProps {
 
 export default function PythonClientDocs({ source, meta }: PythonClientDocsProps) {
   return (
-    <Layout meta={meta}>
+    <Layout meta={meta} menuId="ai">
       <MDXRemote {...source} components={components} />
     </Layout>
   )

@@ -10,21 +10,22 @@ const sections = flattenSections(clientLibsCommonSections)
 const libraryPath = '/python'
 
 export default function PyReference(props) {
-  return (
-    <RefSectionHandler
-      sections={sections}
-      spec={spec}
-      typeSpec={typeSpec}
-      pageProps={props}
-      type="client-lib"
-    />
-  )
+	return (
+		<RefSectionHandler
+			menuId="reference_python_v2"
+			sections={sections}
+			spec={spec}
+			typeSpec={typeSpec}
+			pageProps={props}
+			type="client-lib"
+		/>
+	)
 }
 
 export async function getStaticProps() {
-  return handleRefStaticProps(sections, libraryPath)
+	return handleRefStaticProps(sections, libraryPath)
 }
 
 export async function getStaticPaths() {
-  return handleRefGetStaticPaths(sections)
+	return handleRefGetStaticPaths(sections)
 }
