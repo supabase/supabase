@@ -27,7 +27,7 @@ export default function IndexPage() {
   useEffect(() => {
     setTimeout(() => {
       setMounted(true)
-    }, 100)
+    }, 200)
   }, [])
 
   // Ability to scroll into pricing sections like storage
