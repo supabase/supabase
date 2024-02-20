@@ -130,7 +130,7 @@ Push notifications are an important part of any mobile app. They allow you to se
 
     We will create two tables. One to store the user's FCM token and a `notifications` table. The edge function will be triggered when a new row is inserted into the `notifications` table and sends a push notification to the user.
 
-    Run the following SQL to create the tables if you don't already have both tables.
+    Create a `notifications` table. Also create a `profiles` table if you don't already have one:
 
     ```sql
     create table public.profiles (
@@ -146,11 +146,11 @@ Push notifications are an important part of any mobile app. They allow you to se
     );
     ```
 
-    You may have to alter an existing profiles table. For example, if you previously followed a separate Supabase [Build A User Management](https://supabase.com/docs/guides/getting-started/tutorials/with-flutter) guide which added a `profiles` table. Then you need the following SQL for `public.profiles`:
+    If you already have a `profiles` table, alter it to include an `fcm_token` column:
 
     ```sql
     ALTER TABLE public.profiles 
-    ADD COLUMN  fcm_token text;
+    ADD COLUMN fcm_token text;
     ```
 
     With the tables created, we can now create the edge function that will be triggered by database webhook when a notification is inserted.
