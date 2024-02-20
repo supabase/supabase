@@ -172,10 +172,12 @@ function ImageCarousel(props: ImageCarouselProps) {
               <SwiperSlide key={i} className="py-4">
                 <h4 className="text-foreground mb-4 text-xl">{content.title}</h4>
                 <p className="p text-base">{content.text}</p>
-                <TextLink
-                  label={content.cta ? content.cta : 'View documentation'}
-                  url={content.url}
-                />
+                {!!content.url && (
+                  <TextLink
+                    label={content.cta ? content.cta : 'View documentation'}
+                    url={content.url}
+                  />
+                )}
               </SwiperSlide>
             )
           })}
