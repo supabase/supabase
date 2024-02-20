@@ -1455,9 +1455,9 @@ export interface paths {
      * List all projects
      * @description Returns a list of all projects you've previously created.
      */
-    get: operations['ProjectsController_getProjects']
+    get: operations['V1ProjectsController_getProjects']
     /** Create a project */
-    post: operations['ProjectsController_createProject']
+    post: operations['V1ProjectsController_createProject']
   }
   '/v1/projects/{ref}/api-keys': {
     /** Get project api keys */
@@ -3410,6 +3410,18 @@ export interface components {
     GetProjectByFlyExtensionIdResponse: {
       ref: string
     }
+    /** @enum {string} */
+    DesiredInstanceSize:
+      | 'micro'
+      | 'small'
+      | 'medium'
+      | 'large'
+      | 'xlarge'
+      | '2xlarge'
+      | '4xlarge'
+      | '8xlarge'
+      | '12xlarge'
+      | '16xlarge'
     AmiSearchOptions: {
       search_tags?: Record<string, never>
     }
@@ -3419,16 +3431,17 @@ export interface components {
     CreateProjectBody: {
       /** @deprecated */
       kps_enabled?: boolean
+      desired_instance_size?: components['schemas']['DesiredInstanceSize']
       cloud_provider: string
       org_id: number
       name: string
       db_pass: string
       db_region: string
-      db_pricing_tier_id: string
+      db_pricing_tier_id?: string
       db_sql?: string
       auth_site_url?: string
       vercel_configuration_id?: string
-      custom_supabase_internal_requests: components['schemas']['CustomSupabaseInternalRequests']
+      custom_supabase_internal_requests?: components['schemas']['CustomSupabaseInternalRequests']
     }
     CreateProjectResponse: {
       infra_compute_size?: components['schemas']['DbInstanceSize']
@@ -4299,7 +4312,7 @@ export interface components {
       repository_id: number
     }
     UpdateGitHubConnectionsBody: {
-      placeholder: string
+      cwd_path?: string
     }
     CreateCliLoginSessionBody: {
       session_id: string
@@ -4557,6 +4570,7 @@ export interface components {
         | 'sa-east-1'
       /** @deprecated */
       kps_enabled?: boolean
+      desired_instance_size?: components['schemas']['DesiredInstanceSize']
     }
     ApiKeyResponse: {
       name: string
@@ -8776,29 +8790,29 @@ export interface operations {
     }
   }
   /**
-   * List all projects
-   * @description Returns a list of all projects you've previously created.
+   * Gets all projects that belong to the authenticated user
+   * @description Only returns the minimal project info
    */
   ProjectsController_getProjects: {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['V1ProjectResponse'][]
+          'application/json': components['schemas']['ProjectInfo'][]
         }
       }
     }
   }
-  /** Create a project */
+  /** Creates a project */
   ProjectsController_createProject: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['V1CreateProjectBody']
+        'application/json': components['schemas']['CreateProjectBody']
       }
     }
     responses: {
       201: {
         content: {
-          'application/json': components['schemas']['V1ProjectResponse']
+          'application/json': components['schemas']['CreateProjectResponse']
         }
       }
     }
@@ -10921,7 +10935,7 @@ export interface operations {
       }
     }
     responses: {
-      200: {
+      204: {
         content: never
       }
       /** @description Failed to update GitHub connection */
@@ -11689,6 +11703,34 @@ export interface operations {
       /** @description Failed to update database branch */
       500: {
         content: never
+      }
+    }
+  }
+  /**
+   * List all projects
+   * @description Returns a list of all projects you've previously created.
+   */
+  V1ProjectsController_getProjects: {
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['V1ProjectResponse'][]
+        }
+      }
+    }
+  }
+  /** Create a project */
+  V1ProjectsController_createProject: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V1CreateProjectBody']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['V1ProjectResponse']
+        }
       }
     }
   }

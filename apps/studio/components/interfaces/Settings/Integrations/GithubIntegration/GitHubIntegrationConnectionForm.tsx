@@ -33,15 +33,17 @@ import * as z from 'zod'
 import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useGitHubBranchesQuery } from 'data/integrations/github-branches-query'
+import { useGitHubConnectionUpdateMutation } from 'data/integrations/github-connection-update-mutation'
 import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { useSelectedProject, useStore } from 'hooks'
+import { useSelectedOrganization, useSelectedProject } from 'hooks'
+import toast from 'react-hot-toast'
 
-const GitHubIntegrationConnectionForm = ({
-  connection,
-}: {
+interface GitHubIntegrationConnectionFormProps {
   connection: IntegrationProjectConnection
-}) => {
-  const { ui } = useStore()
+}
+
+const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnectionFormProps) => {
+  const org = useSelectedOrganization()
   const project = useSelectedProject()
   const [open, setOpen] = useState(false)
   const comboBoxRef = useRef<HTMLButtonElement>(null)
@@ -50,12 +52,14 @@ const GitHubIntegrationConnectionForm = ({
     connectionId: Number(connection.id),
   })
 
+  const { mutate: updateConnection, isLoading: isUpdatingConnection } =
+    useGitHubConnectionUpdateMutation({
+      onSuccess: () => toast.success('Successfully updated directory'),
+    })
+
   const { mutate: updateBranch, isLoading: isUpdatingProdBranch } = useBranchUpdateMutation({
     onSuccess: (data) => {
-      ui.setNotification({
-        category: 'success',
-        message: `Changed Production Branch to ${data.git_branch}`,
-      })
+      toast.success(`Changed Production Branch to ${data.git_branch}`)
       setOpen(false)
     },
   })
@@ -91,19 +95,12 @@ const GitHubIntegrationConnectionForm = ({
   })
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    // TODO: This functionality isn't implemented yet
-    // const metadata = {
-    //   ...connection.metadata,
-    //   supabaseConfig: {
-    //     ...connection.metadata?.supabaseConfig,
-    //     supabaseDirectory: data.supabaseDirectory,
-    //   },
-    // }
-    // updateGithubConnection({
-    //   id: connection.id,
-    //   metadata,
-    //   organizationIntegrationId: integration.id,
-    // })
+    if (org?.id === undefined) return console.error('Org ID is required')
+    updateConnection({
+      connectionId: connection.id,
+      organizationId: org?.id,
+      cwdPath: data.supabaseDirectory,
+    })
   }
 
   return (
@@ -200,16 +197,6 @@ const GitHubIntegrationConnectionForm = ({
             Migration and seed SQL files will be run from this directory.
           </FormDescription_Shadcn_>
 
-          <Alert_Shadcn_ className="mb-4 w-96">
-            <AlertTitle_Shadcn_ className="text-sm">
-              Changing Supabase directory is currently not supported
-            </AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_ className="text-xs">
-              You will need to disable Branching and opt back into Branching to change the
-              Production Branch. your Git repository.
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
-
           <FormField_Shadcn_
             control={form.control}
             name="supabaseDirectory"
@@ -218,12 +205,9 @@ const GitHubIntegrationConnectionForm = ({
                 <FormControl_Shadcn_ className="xl:w-96">
                   <div className="relative">
                     <Input_Shadcn_
-                      disabled
                       {...field}
                       onKeyPress={(event) => {
-                        if (event.key === 'Escape') {
-                          form.reset()
-                        }
+                        if (event.key === 'Escape') form.reset()
                       }}
                     />
                     <RotateCcw
@@ -241,16 +225,14 @@ const GitHubIntegrationConnectionForm = ({
                   </div>
                 </FormControl_Shadcn_>
                 <Button
+                  loading={isUpdatingConnection}
                   className={cn(
-                    'duration-150',
-
+                    'duration-150 transition',
                     field.value !== connection.metadata?.supabaseConfig?.supabaseDirectory
-                      ? 'opacity-100 transition'
+                      ? 'opacity-100'
                       : 'opacity-0'
                   )}
                   htmlType="submit"
-                  type="secondary"
-                  size="medium"
                   disabled={field.value === connection.metadata?.supabaseConfig?.supabaseDirectory}
                 >
                   Update
