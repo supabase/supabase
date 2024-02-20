@@ -2,9 +2,6 @@ import 'react-medium-image-zoom/dist/styles.css'
 
 import { PropsWithChildren } from 'react'
 import Image from 'next/image'
-import { useRouter } from 'next/router'
-import CopyToClipboard from 'react-copy-to-clipboard'
-import { isBrowser, useCopy } from 'common'
 import { ThemeImage } from 'ui-patterns/ThemeImage'
 
 import Avatar from '~/components/Avatar'
@@ -23,10 +20,7 @@ import {
   CollapsibleContent_Shadcn_,
   Heading,
   IconArrowUpRight,
-  IconCheck,
-  IconLink,
   IconTriangle,
-  ThemeImage,
 } from 'ui'
 import ImageFadeStack from '~/components/ImageFadeStack'
 import ZoomableImg from '~/components/ZoomableImg/ZoomableImg'
