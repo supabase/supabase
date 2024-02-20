@@ -96,7 +96,7 @@ type OrganizationProjectsProps = {
 }
 
 const OrganizationProjects = ({
-  organization: { name, slug, subscription_id },
+  organization: { name, slug },
   projects,
   overdueInvoices,
   resourceWarnings,
@@ -110,6 +110,7 @@ const OrganizationProjects = ({
 }: OrganizationProjectsProps) => {
   const organization = useSelectedOrganization()
   const isEmpty = !projects || projects.length === 0
+  const sortedProjects = (projects ?? []).sort((a, b) => a.name.localeCompare(b.name))
 
   const { data: integrations } = useOrgIntegrationsQuery({ orgSlug: organization?.slug })
   const githubConnections = integrations
@@ -157,7 +158,7 @@ const OrganizationProjects = ({
           ) : isEmpty ? (
             <NoProjectsState slug={slug} />
           ) : (
-            projects?.map((project) => (
+            sortedProjects?.map((project) => (
               <ProjectCard
                 key={makeRandomString(5)}
                 project={project}
