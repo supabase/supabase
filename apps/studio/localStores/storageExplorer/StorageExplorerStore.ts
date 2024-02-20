@@ -685,7 +685,7 @@ class StorageExplorerStore {
       UiToast({
         description: `Successfully moved ${
           this.selectedItemsToMove.length - numberOfFilesMovedFail
-        } to ${formattedNewPathToFile}`,
+        } files to ${formattedNewPathToFile.length > 0 ? formattedNewPathToFile : 'the root of your bucket'}`,
       })
     }
 
