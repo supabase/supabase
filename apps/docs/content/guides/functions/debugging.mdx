@@ -149,6 +149,8 @@ The source code of a function is subject to size limits:
 ### Analyze dependencies
 
 When analyzing dependencies for your Supabase Edge Functions, it's essential to review both Deno and NPM dependencies to ensure optimal performance and resource utilization.
+By selectively importing only the required submodules, you can effectively reduce the size of your function's dependencies and optimize its performance.
+Before finalizing your imports, ensure to review both Deno and NPM dependencies, checking for any unnecessary or redundant dependencies that can be removed. Additionally, check for outdated dependencies and update to the latest versions if possible.
 
 #### Deno Dependencies
 
@@ -169,9 +171,6 @@ For example, if you only need the `Sheets` submodule from the `googleapis` packa
 ```typescript
 import { Sheets } from 'npm:@googleapis/sheets'
 ```
-
-By selectively importing only the required submodules, you can effectively reduce the size of your function's dependencies and optimize its performance.
-Before finalizing your imports, ensure to review both Deno and NPM dependencies, checking for any unnecessary or redundant dependencies that can be removed. Additionally, check for outdated dependencies and update to the latest versions if possible.
 
 ## Limitations
 
