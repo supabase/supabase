@@ -22,9 +22,9 @@ const ThemeSettings = () => {
             .filter(
               (theme: Theme) =>
                 // temporary fix to exclude new themes
-                theme.name.includes('light') ||
-                theme.name.includes('dark') ||
-                theme.name.includes('system')
+                theme.value.includes('light') ||
+                theme.value.includes('dark') ||
+                theme.value.includes('system')
             )
             .map((theme: Theme) => (
               <Listbox.Option key={theme.value} label={theme.name} value={theme.value}>
