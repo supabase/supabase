@@ -1,10 +1,9 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { Button, IconArrowUpRight } from 'ui'
 import { ArrowDownIcon } from '@heroicons/react/outline'
-import ReactTooltip from 'react-tooltip'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import PricingPlans from '~/components/Pricing/PricingPlans'
@@ -14,14 +13,22 @@ const PricingAddons = dynamic(() => import('~/components/Pricing/PricingAddons')
 const PricingComparisonTable = dynamic(() => import('~/components/Pricing/PricingComparisonTable'))
 const PricingFAQs = dynamic(() => import('~/components/Pricing/PricingFAQs'))
 const CTABanner = dynamic(() => import('~/components/CTABanner'))
+const ReactTooltip = dynamic(() => import('react-tooltip'), { ssr: false })
 
 export default function IndexPage() {
   const router = useRouter()
   const { asPath } = useRouter()
+  const [mounted, setMounted] = useState(false)
 
   const meta_title = 'Pricing & Fees | Supabase'
   const meta_description =
     'Explore Supabase fees and pricing information. Find our competitive pricing plans, with no hidden pricing. We have a generous free plan for those getting started, and Pay As You Go for those scaling up.'
+
+  useEffect(() => {
+    setTimeout(() => {
+      setMounted(true)
+    }, 100)
+  }, [])
 
   // Ability to scroll into pricing sections like storage
   useEffect(() => {
@@ -118,14 +125,16 @@ export default function IndexPage() {
         <PricingFAQs />
       </div>
       <CTABanner />
-      <ReactTooltip
-        wrapper="span"
-        effect="solid"
-        backgroundColor="hsl(var(--background-alternative-default))"
-        textColor="hsl(var(--foreground-light))"
-        className="!max-w-[320px] !px-3 whitespace-pre-line"
-        uuid="pricingtt"
-      />
+      {mounted && (
+        <ReactTooltip
+          wrapper="span"
+          effect="solid"
+          backgroundColor="hsl(var(--background-alternative-default))"
+          textColor="hsl(var(--foreground-light))"
+          className="!max-w-[320px] !px-3 whitespace-pre-line"
+          uuid="pricing-tt"
+        />
+      )}
     </DefaultLayout>
   )
 }
