@@ -131,6 +131,7 @@ const DefaultHeader = ({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
+                    data-testid="table-editor-insert-new-row"
                     type="primary"
                     size="tiny"
                     icon={<IconChevronDown size={14} strokeWidth={1.5} />}

@@ -1,11 +1,12 @@
-import { createClient } from '@/lib/supabase/server'
+import { Button } from '@ui/components/Button'
 import { Github } from 'lucide-react'
 import { cookies, headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { Button } from '@ui/components/Button'
+
+import { createClient } from '@/lib/supabase/server'
 
 export default function LoginForm({ searchParams }: { searchParams?: { message?: string } }) {
-  const signUp = async (formData: FormData) => {
+  const signUp = async () => {
     'use server'
 
     const origin = headers().get('origin')
