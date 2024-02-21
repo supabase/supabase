@@ -9,8 +9,7 @@ import { redirect } from 'next/navigation'
 import { z } from 'zod'
 
 export async function logout() {
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore)
+  const supabase = createClient()
 
   const { error } = await supabase.auth.signOut()
 
@@ -25,8 +24,7 @@ export async function logout() {
 
 //export async function createThread(prevState: any, formData: FormData) {
 export async function createThread(input: string, message: Message, currentThread?: string) {
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore)
+  const supabase = createClient()
 
   let thread_id = currentThread ?? ''
   let message_id = ''
@@ -97,8 +95,7 @@ export async function createThread(input: string, message: Message, currentThrea
 }
 
 export async function upsertThreadMessage(input: string, currentThread?: string) {
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore)
+  const supabase = createClient()
 
   let thread_id = currentThread ?? ''
   let message_id = ''
@@ -169,8 +166,7 @@ export async function upsertThreadMessage(input: string, currentThread?: string)
 }
 
 export async function deleteThread(prevState: any, formData: FormData) {
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore)
+  const supabase = createClient()
 
   try {
     const schema = z.object({
@@ -200,8 +196,7 @@ export async function deleteThread(prevState: any, formData: FormData) {
 }
 
 export async function updateThreadName(prevState: any, formData: FormData) {
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore)
+  const supabase = createClient()
 
   try {
     const schema = z.object({
