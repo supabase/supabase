@@ -93,28 +93,36 @@ const InstanceConfigurationUI = () => {
     [isSuccessReplicas, isSuccessLoadBalancers, primary, replicas, loadBalancers]
   )
 
-  const edges: Edge[] = [
-    ...((loadBalancers ?? []).length > 0
-      ? [
-          {
-            id: `load-balancer-${primary.identifier}`,
-            source: 'load-balancer',
-            target: primary.identifier,
-            type: 'smoothstep',
-            animated: true,
-          },
-        ]
-      : []),
-    ...replicas.map((database) => {
-      return {
-        id: `${primary.identifier}-${database.identifier}`,
-        source: primary.identifier,
-        target: database.identifier,
-        type: 'smoothstep',
-        animated: true,
-      }
-    }),
-  ]
+  const edges: Edge[] = useMemo(
+    () =>
+      isSuccessReplicas && isSuccessLoadBalancers
+        ? [
+            ...((loadBalancers ?? []).length > 0
+              ? [
+                  {
+                    id: `load-balancer-${primary.identifier}`,
+                    source: 'load-balancer',
+                    target: primary.identifier,
+                    type: 'smoothstep',
+                    animated: true,
+                    className: '!cursor-default',
+                  },
+                ]
+              : []),
+            ...replicas.map((database) => {
+              return {
+                id: `${primary.identifier}-${database.identifier}`,
+                source: primary.identifier,
+                target: database.identifier,
+                type: 'smoothstep',
+                animated: true,
+                className: '!cursor-default',
+              }
+            }),
+          ]
+        : [],
+    [isSuccessLoadBalancers, isSuccessReplicas, loadBalancers, primary?.identifier, replicas]
+  )
 
   const nodeTypes = useMemo(
     () => ({
@@ -196,12 +204,6 @@ const InstanceConfigurationUI = () => {
                 defaultNodes={[]}
                 defaultEdges={[]}
                 nodeTypes={nodeTypes}
-                onInit={() => {
-                  const graph = getDagreGraphLayout(nodes, edges)
-                  const { nodes: updatedNodes } = addRegionNodes(graph.nodes, graph.edges)
-                  reactFlow.setNodes(updatedNodes)
-                  reactFlow.setEdges(graph.edges)
-                }}
                 proOptions={{ hideAttribution: true }}
               >
                 <Background color={backgroundPatternColor} />
