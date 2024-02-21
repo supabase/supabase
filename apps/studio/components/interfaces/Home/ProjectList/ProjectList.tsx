@@ -1,9 +1,9 @@
 import { groupBy } from 'lodash'
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { Button, IconPlus } from 'ui'
 
 import AlertError from 'components/ui/AlertError'
+import NoSearchResults from 'components/ui/NoSearchResults'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import {
   OverdueInvoicesResponse,
@@ -22,9 +22,10 @@ import ShimmeringCard from './ShimmeringCard'
 
 export interface ProjectListProps {
   rewriteHref?: (projectRef: string) => string
+  search: string
 }
 
-const ProjectList = ({ rewriteHref }: ProjectListProps) => {
+const ProjectList = ({ search, rewriteHref }: ProjectListProps) => {
   const { data: organizations, isLoading, isSuccess } = useOrganizationsQuery()
   const {
     data: allProjects,
@@ -41,6 +42,14 @@ const ProjectList = ({ rewriteHref }: ProjectListProps) => {
   const { data: allOverdueInvoices } = useOverdueInvoicesQuery({ enabled: IS_PLATFORM })
   const projectsByOrg = groupBy(allProjects, 'organization_id')
   const isLoadingPermissions = IS_PLATFORM ? _isLoadingPermissions : false
+  const noResults =
+    allProjects !== undefined &&
+    allProjects.filter((project) => {
+      return (
+        project.name.toLowerCase().includes(search.toLowerCase()) ||
+        project.ref.includes(search.toLowerCase())
+      )
+    }).length === 0
 
   if (isLoading) {
     return (
@@ -49,6 +58,10 @@ const ProjectList = ({ rewriteHref }: ProjectListProps) => {
         <ShimmeringCard />
       </ul>
     )
+  }
+
+  if (noResults) {
+    return <NoSearchResults searchString={search} />
   }
 
   return isSuccess && organizations && organizations?.length > 0 ? (
@@ -70,6 +83,7 @@ const ProjectList = ({ rewriteHref }: ProjectListProps) => {
             isLoadingProjects={isLoadingProjects}
             isErrorProjects={isErrorProjects}
             projectsError={projectsError}
+            search={search}
           />
         )
       })}
@@ -79,7 +93,7 @@ const ProjectList = ({ rewriteHref }: ProjectListProps) => {
   )
 }
 
-export default observer(ProjectList)
+export default ProjectList
 
 type OrganizationProjectsProps = {
   organization: Organization
@@ -93,10 +107,11 @@ type OrganizationProjectsProps = {
   isErrorProjects: boolean
   projectsError: ResponseError | null
   rewriteHref?: (projectRef: string) => string
+  search: string
 }
 
 const OrganizationProjects = ({
-  organization: { name, slug, subscription_id },
+  organization: { name, slug },
   projects,
   overdueInvoices,
   resourceWarnings,
@@ -107,9 +122,20 @@ const OrganizationProjects = ({
   isErrorProjects,
   projectsError,
   rewriteHref,
+  search,
 }: OrganizationProjectsProps) => {
   const organization = useSelectedOrganization()
   const isEmpty = !projects || projects.length === 0
+  const sortedProjects = [...(projects || [])].sort((a, b) => a.name.localeCompare(b.name))
+  const filteredProjects =
+    search.length > 0
+      ? sortedProjects.filter((project) => {
+          return (
+            project.name.toLowerCase().includes(search.toLowerCase()) ||
+            project.ref.includes(search.toLowerCase())
+          )
+        })
+      : sortedProjects
 
   const { data: integrations } = useOrgIntegrationsQuery({ orgSlug: organization?.slug })
   const githubConnections = integrations
@@ -118,6 +144,8 @@ const OrganizationProjects = ({
   const vercelConnections = integrations
     ?.filter((integration) => integration.integration.name === 'Vercel')
     .flatMap((integration) => integration.connections)
+
+  if (search.length > 0 && filteredProjects.length === 0) return null
 
   return (
     <div className="space-y-3" key={makeRandomString(5)}>
@@ -157,7 +185,7 @@ const OrganizationProjects = ({
           ) : isEmpty ? (
             <NoProjectsState slug={slug} />
           ) : (
-            projects?.map((project) => (
+            filteredProjects?.map((project) => (
               <ProjectCard
                 key={makeRandomString(5)}
                 project={project}

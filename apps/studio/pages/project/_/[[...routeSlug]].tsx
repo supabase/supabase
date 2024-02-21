@@ -58,7 +58,7 @@ const GenericProjectPage: NextPage = () => {
           className="flex-grow py-6 space-y-8 overflow-y-auto"
           style={{ maxHeight: 'calc(100vh - 49px - 64px)' }}
         >
-          <ProjectList rewriteHref={urlRewriterFactory(routeSlug)} />
+          <ProjectList rewriteHref={urlRewriterFactory(routeSlug)} search="" />
         </div>
       </div>
     </>
