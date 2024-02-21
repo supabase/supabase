@@ -20,7 +20,7 @@ function Blog(props: any) {
   const { BLOG_VIEW } = LOCAL_STORAGE_KEYS
   const localView = isBrowser ? (localStorage?.getItem(BLOG_VIEW) as BlogView) : undefined
   const [blogs, setBlogs] = useState(props.blogs)
-  const [view, setView] = useState<BlogView>(localView ?? 'list')
+  const [view, setView] = useState<BlogView>(localView ?? 'grid')
   const isList = view === 'list'
   const router = useRouter()
 
