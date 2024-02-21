@@ -76,13 +76,11 @@ const TableSelector = ({
           <Button
             size={size}
             type="outline"
+            disabled={isLoading}
             className={`w-full [&>span]:w-full ${size === 'small' ? 'py-1.5' : ''}`}
+            icon={isLoading ? <IconLoader className="animate-spin" size={12} /> : null}
             iconRight={
-              isLoading ? (
-                <IconLoader className="animate-spin" size={12} />
-              ) : (
-                <IconCode className="text-foreground-light rotate-90" strokeWidth={2} size={12} />
-              )
+              <IconCode className="text-foreground-light rotate-90" strokeWidth={2} size={12} />
             }
           >
             {initiallyLoaded ? (

@@ -55,9 +55,6 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
             {isFiltered ? (
               <>
                 <span className="mr-1">Filtered by </span>
-                {/* <Badge className="!bg-brand-400 !text-brand-600">
-                  schema: {config.schema === '*' ? 'All schemas' : config.schema}
-                </Badge> */}
                 <Badge className="!bg-brand-400 !text-brand-600">table: {config.table}</Badge>
               </>
             ) : (
