@@ -93,10 +93,11 @@ const BasicAuthSettingsForm = () => {
     {
       orgSlug: organization?.slug,
     },
-    { enabled: !!organization }
+    { enabled: IS_PLATFORM }
   )
 
   const isProPlanAndUp = isSuccessSubscription && subscription?.plan?.id !== 'free'
+  const promptProPlanUpgrade = IS_PLATFORM && !isProPlanAndUp
 
   const INITIAL_VALUES = {
     DISABLE_SIGNUP: !authConfig?.DISABLE_SIGNUP,
@@ -247,7 +248,7 @@ const BasicAuthSettingsForm = () => {
                     }}
                     formValues={values}
                   />
-                  {isProPlanAndUp || !IS_PLATFORM ? (
+                  {!promptProPlanUpgrade ? (
                     <></>
                   ) : (
                     <UpgradeToPro
@@ -270,7 +271,7 @@ const BasicAuthSettingsForm = () => {
               </FormSection>
               <FormSection header={<FormSectionLabel>User Sessions</FormSectionLabel>}>
                 <FormSectionContent loading={isLoading}>
-                  {isProPlanAndUp || !IS_PLATFORM ? (
+                  {!promptProPlanUpgrade ? (
                     <></>
                   ) : (
                     <UpgradeToPro
