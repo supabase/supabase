@@ -1,7 +1,8 @@
 import { PostgresView } from '@supabase/postgres-meta'
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+
+import { get } from 'data/fetchers'
+import { ResponseError } from 'types'
 import { viewKeys } from './keys'
 
 export type ViewVariables = {
@@ -18,30 +19,28 @@ export async function getView(
   { id, projectRef, connectionString }: ViewVariables,
   signal?: AbortSignal
 ) {
-  if (!projectRef) {
-    throw new Error('projectRef is required')
-  }
-  if (!id) {
-    throw new Error('id is required')
-  }
+  if (!projectRef) throw new Error('projectRef is required')
+  if (!id) throw new Error('id is required')
 
   let headers = new Headers()
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
-  const response = (await get(`${API_URL}/pg-meta/${projectRef}/views?id=${id}`, {
-    headers: Object.fromEntries(headers),
+  const { data, error } = await get('/platform/pg-meta/{ref}/views', {
+    params: {
+      header: { 'x-connection-encrypted': connectionString! },
+      path: { ref: projectRef },
+      query: { id: `${id}` } as any,
+    },
+    headers,
     signal,
-  })) as ViewResponse
+  })
 
-  if ('error' in response) {
-    throw response.error
-  }
-
-  return response as PostgresView
+  if (error) throw new Error((error as ResponseError).message)
+  return data as unknown as PostgresView
 }
 
 export type ViewData = Awaited<ReturnType<typeof getView>>
-export type ViewError = unknown
+export type ViewError = ResponseError
 
 export const useViewQuery = <TData = ViewData>(
   { projectRef, connectionString, id }: ViewVariables,

@@ -140,10 +140,7 @@ export interface FunctionProps {
 const Function = ({ id, completeStatement, name, onClick }: FunctionProps) => {
   const [visible, setVisible] = useState(false)
   return (
-    <div
-      className="cursor-pointer rounded p-3 px-6 hover:bg-background"
-      onClick={() => onClick(id)}
-    >
+    <div className="cursor-pointer rounded p-3 px-6 hover:bg-studio" onClick={() => onClick(id)}>
       <div className="flex items-center justify-between space-x-3">
         <div className="flex items-center space-x-3">
           <div className="flex items-center justify-center rounded bg-foreground p-1 text-background">

@@ -69,12 +69,15 @@ const DatabaseSettings = () => {
     : isErrorProjectSettings || isErrorPoolingInfo
   const isSuccess = showReadReplicasUI
     ? isSuccessReadReplicas
-    : isSuccessProjectSettings || isSuccessPoolingInfo
+    : isSuccessProjectSettings && isSuccessPoolingInfo
 
   const selectedDatabase = (databases ?? []).find(
     (db) => db.identifier === state.selectedDatabaseId
   )
-  const isMd5 = poolingInfo?.connectionString.includes('?options=reference')
+  const primaryConfig = showReadReplicasUI
+    ? poolingInfo?.find((x) => x.identifier === state.selectedDatabaseId)
+    : poolingInfo?.find((x) => x.database_type === 'PRIMARY')
+  const isMd5 = primaryConfig?.connectionString.includes('?options=reference')
 
   const { project } = data ?? {}
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user']
@@ -85,10 +88,10 @@ const DatabaseSettings = () => {
 
   const connectionInfo = usePoolerConnection
     ? {
-        db_host: poolingInfo?.db_host,
-        db_name: poolingInfo?.db_name,
-        db_port: poolingInfo?.db_port,
-        db_user: poolingInfo?.db_user,
+        db_host: primaryConfig?.db_host,
+        db_name: primaryConfig?.db_name,
+        db_port: primaryConfig?.db_port,
+        db_user: primaryConfig?.db_user,
       }
     : dbConnectionInfo
 
@@ -111,10 +114,10 @@ const DatabaseSettings = () => {
   }, [connectionString])
 
   useEffect(() => {
-    if (poolingInfo?.pool_mode === 'session') {
-      setPoolingMode(poolingInfo.pool_mode)
+    if (primaryConfig?.pool_mode === 'session') {
+      setPoolingMode(primaryConfig.pool_mode)
     }
-  }, [poolingInfo?.pool_mode])
+  }, [primaryConfig?.pool_mode])
 
   return (
     <>
@@ -197,7 +200,7 @@ const DatabaseSettings = () => {
                   value={poolingMode === 'transaction' ? connectionInfo.db_port : '5432'}
                   label="Port"
                 />
-                {isMd5 && (
+                {isMd5 && usePoolerConnection && (
                   <Input
                     className="input-mono"
                     layout="horizontal"

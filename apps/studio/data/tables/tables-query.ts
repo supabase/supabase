@@ -94,7 +94,8 @@ export function useGetTables({
     (schema?: TablesVariables['schema'], includeColumns?: TablesVariables['includeColumns']) => {
       return queryClient.fetchQuery({
         queryKey: tableKeys.list(projectRef, schema, includeColumns),
-        queryFn: ({ signal }) => getTables({ projectRef, connectionString, schema }, signal),
+        queryFn: ({ signal }) =>
+          getTables({ projectRef, connectionString, schema, includeColumns }, signal),
       })
     },
     [connectionString, projectRef, queryClient]

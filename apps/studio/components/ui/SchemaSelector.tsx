@@ -9,6 +9,7 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
+  CommandSeparator_Shadcn_,
   Command_Shadcn_,
   IconCheck,
   IconCode,
@@ -82,7 +83,7 @@ const SchemaSelector = ({
           <AlertTitle_Shadcn_ className="text-xs text-amber-900">
             Failed to load schemas
           </AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_ className="text-xs mb-2">
+          <AlertDescription_Shadcn_ className="text-xs mb-2 break-words">
             Error: {schemasError?.message}
           </AlertDescription_Shadcn_>
           <Button type="default" size="tiny" onClick={() => refetchSchemas()}>
@@ -159,22 +160,25 @@ const SchemaSelector = ({
                   </ScrollArea>
                 </CommandGroup_Shadcn_>
                 {onSelectCreateSchema !== undefined && (
-                  <CommandGroup_Shadcn_ className="border-t">
-                    <CommandItem_Shadcn_
-                      className="cursor-pointer flex items-center gap-x-2 w-full"
-                      onSelect={() => {
-                        onSelectCreateSchema()
-                        setOpen(false)
-                      }}
-                      onClick={() => {
-                        onSelectCreateSchema()
-                        setOpen(false)
-                      }}
-                    >
-                      <IconPlus />
-                      Create a new schema
-                    </CommandItem_Shadcn_>
-                  </CommandGroup_Shadcn_>
+                  <>
+                    <CommandSeparator_Shadcn_ />
+                    <CommandGroup_Shadcn_>
+                      <CommandItem_Shadcn_
+                        className="cursor-pointer flex items-center gap-x-2 w-full"
+                        onSelect={() => {
+                          onSelectCreateSchema()
+                          setOpen(false)
+                        }}
+                        onClick={() => {
+                          onSelectCreateSchema()
+                          setOpen(false)
+                        }}
+                      >
+                        <IconPlus />
+                        Create a new schema
+                      </CommandItem_Shadcn_>
+                    </CommandGroup_Shadcn_>
+                  </>
                 )}
               </CommandList_Shadcn_>
             </Command_Shadcn_>

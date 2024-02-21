@@ -372,7 +372,7 @@ const LogTable = ({
                 'font-mono tracking-tight',
                 isEqual(row, focusedLog)
                   ? '!bg-border-stronger rdg-row--focused'
-                  : ' !bg-background hover:!bg-surface-100 cursor-pointer',
+                  : ' !bg-studio hover:!bg-surface-100 cursor-pointer',
               ].join(' ')
             }
             rows={logDataRows}

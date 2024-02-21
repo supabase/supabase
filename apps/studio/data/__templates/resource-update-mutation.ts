@@ -18,7 +18,7 @@ export async function updateResource({ projectRef, id, updatedParam }: ResourceU
     body: { updatedParam },
   })
 
-  if (error) throw error
+  if (error) throw new Error((error as ResponseError).message)
   return data
 }
 

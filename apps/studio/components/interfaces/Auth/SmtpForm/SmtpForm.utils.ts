@@ -1,6 +1,6 @@
 import { components } from 'data/api'
 
-type AuthConfig = components['schemas']['GoTrueConfig']
+type AuthConfig = components['schemas']['GoTrueConfigResponse']
 
 interface AuthConfigForm extends AuthConfig {
   ENABLE_SMTP: boolean

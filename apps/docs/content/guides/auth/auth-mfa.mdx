@@ -570,6 +570,10 @@ TOTP is not going to be the only MFA factor Supabase Auth is going to support in
 
 The TOTP QR code encodes a URI with the `otpauth` scheme. It was [initially introduced by Google Authenticator](https://github.com/google/google-authenticator/wiki/Key-Uri-Format) but is now universally accepted by all authenticator apps.
 
+### How long is the TOTP code valid for?
+
+In our TOTP implementation, each generated code remains valid for one interval, which spans 30 seconds. To account for minor time discrepancies, we allow for a one-interval clock skew. This ensures that users can successfully authenticate within this timeframe, even if there are slight variations in system clocks.
+
 ### How do I check _when_ a user went through MFA?
 
 Access tokens issued by Supabase Auth contain an `amr` (Authentication Methods Reference) claim. It is an array of objects that indicate what authentication methods the user has used so far.

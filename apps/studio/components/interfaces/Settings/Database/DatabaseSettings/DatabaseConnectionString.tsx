@@ -12,6 +12,7 @@ import {
   Input,
   Separator,
   Tabs,
+  cn,
 } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -25,7 +26,6 @@ import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useFlag } from 'hooks'
 import { pluckObjectFields } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { IPv4DeprecationNotice } from '../IPv4DeprecationNotice'
 import { UsePoolerCheckbox } from '../UsePoolerCheckbox'
 import {
@@ -45,16 +45,20 @@ const CONNECTION_TYPES = [
   { id: 'python', label: 'Python' },
 ]
 
-export const DatabaseConnectionString = () => {
+interface DatabaseConnectionStringProps {
+  appearance: 'default' | 'minimal'
+}
+
+export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStringProps) => {
   const router = useRouter()
   const { project: projectDetails, isLoading: isProjectLoading } = useProjectContext()
   const { ref: projectRef, connectionString } = useParams()
   const telemetryProps = useTelemetryProps()
   const readReplicasEnabled = useFlag('readReplicas') && projectDetails?.is_read_replicas_enabled
 
-  const state = useDatabaseSelectorStateSnapshot()
-
   const connectionStringsRef = useRef<HTMLDivElement>(null)
+  // [Joshen] Temp - so that behaviour for is similar to usePoolerCheckbox where the state is not synced with Connection Params
+  const [selectedDatabaseId, setSelectedDatabaseId] = useState(projectRef)
   const [usePoolerConnection, setUsePoolerConnection] = useState(true)
   const [poolingMode, setPoolingMode] = useState<'transaction' | 'session' | 'statement'>('session')
   const [selectedTab, setSelectedTab] = useState<
@@ -64,6 +68,9 @@ export const DatabaseConnectionString = () => {
   const { data: poolingInfo, isSuccess: isSuccessPoolingInfo } = usePoolingConfigurationQuery({
     projectRef,
   })
+  const poolingConfiguration = readReplicasEnabled
+    ? poolingInfo?.find((x) => x.identifier === selectedDatabaseId)
+    : poolingInfo?.find((x) => x.database_type === 'PRIMARY')
 
   const {
     data,
@@ -86,9 +93,7 @@ export const DatabaseConnectionString = () => {
   const isError = readReplicasEnabled ? isErrorReadReplicas : isErrorProjectSettings
   const isSuccess = readReplicasEnabled ? isSuccessReadReplicas : isSuccessProjectSettings
 
-  const selectedDatabase = (databases ?? []).find(
-    (db) => db.identifier === state.selectedDatabaseId
-  )
+  const selectedDatabase = (databases ?? []).find((db) => db.identifier === selectedDatabaseId)
 
   const { project } = data ?? {}
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
@@ -114,28 +119,33 @@ export const DatabaseConnectionString = () => {
     )
   }
 
-  const connectionStrings = isSuccessPoolingInfo
-    ? getConnectionStrings(connectionInfo, poolingInfo, {
-        projectRef,
-        usePoolerConnection,
-      })
-    : { uri: '', psql: '', golang: '', jdbc: '', dotnet: '', nodejs: '', php: '', python: '' }
-  const poolerTld = isSuccessPoolingInfo ? getPoolerTld(poolingInfo.connectionString) : 'com'
-  const poolerConnStringSyntax = isSuccessPoolingInfo
-    ? constructConnStringSyntax(poolingInfo.connectionString, {
-        selectedTab,
-        usePoolerConnection,
-        ref: projectRef as string,
-        cloudProvider: isProjectLoading ? '' : project?.cloud_provider || '',
-        region: isProjectLoading ? '' : project?.region || '',
-        tld: usePoolerConnection ? poolerTld : connectionTld,
-        portNumber: usePoolerConnection
-          ? poolingMode === 'transaction'
-            ? poolingInfo.db_port.toString()
-            : '5432'
-          : connectionInfo.db_port.toString(),
-      })
-    : []
+  const connectionStrings =
+    isSuccessPoolingInfo && poolingConfiguration !== undefined
+      ? getConnectionStrings(connectionInfo, poolingConfiguration, {
+          projectRef,
+          usePoolerConnection,
+        })
+      : { uri: '', psql: '', golang: '', jdbc: '', dotnet: '', nodejs: '', php: '', python: '' }
+  const poolerTld =
+    isSuccessPoolingInfo && poolingConfiguration !== undefined
+      ? getPoolerTld(poolingConfiguration?.connectionString)
+      : 'com'
+  const poolerConnStringSyntax =
+    isSuccessPoolingInfo && poolingConfiguration !== undefined
+      ? constructConnStringSyntax(poolingConfiguration?.connectionString, {
+          selectedTab,
+          usePoolerConnection,
+          ref: projectRef as string,
+          cloudProvider: isProjectLoading ? '' : project?.cloud_provider || '',
+          region: isProjectLoading ? '' : project?.region || '',
+          tld: usePoolerConnection ? poolerTld : connectionTld,
+          portNumber: usePoolerConnection
+            ? poolingMode === 'transaction'
+              ? poolingConfiguration?.db_port.toString()
+              : '5432'
+            : connectionInfo.db_port.toString(),
+        })
+      : []
 
   useEffect(() => {
     if (
@@ -143,29 +153,54 @@ export const DatabaseConnectionString = () => {
       connectionString !== undefined &&
       connectionStringsRef.current !== undefined
     ) {
-      state.setSelectedDatabaseId(connectionString)
+      setSelectedDatabaseId(connectionString)
       connectionStringsRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' })
     }
   }, [connectionString])
 
   useEffect(() => {
-    if (poolingInfo?.pool_mode === 'session') {
-      setPoolingMode(poolingInfo.pool_mode)
+    if (poolingConfiguration?.pool_mode === 'session') {
+      setPoolingMode(poolingConfiguration.pool_mode)
     }
-  }, [poolingInfo?.pool_mode])
+  }, [poolingConfiguration?.pool_mode])
 
   return (
-    <div id="connection-string">
+    <div id="connection-string" className="w-full">
       <Panel
-        className="!m-0 [&>div:nth-child(1)]:!border-0 [&>div:nth-child(1)>div]:!p-0"
+        className={cn(
+          '!m-0 [&>div:nth-child(1)]:!border-0 [&>div:nth-child(1)>div]:!p-0',
+          appearance === 'minimal' && 'border-0 shadow-none'
+        )}
+        bodyClassName={cn(appearance === 'minimal' && 'bg-transparent')}
+        headerClasses={cn(appearance === 'minimal' && 'bg-transparent')}
         title={
-          <div ref={connectionStringsRef} className="w-full flex flex-col pt-4">
-            <div className="flex items-center justify-between px-6 mb-2">
-              <h5 key="panel-title" className="mb-0">
-                Connection string
-              </h5>
-              <div className="flex items-center gap-x-2">
-                {readReplicasEnabled && <DatabaseSelector />}
+          <div
+            ref={connectionStringsRef}
+            className={cn('w-full flex flex-col', appearance === 'default' ? 'pt-4' : 'pt-0')}
+          >
+            <div
+              className={cn(
+                'flex items-center justify-between mb-2',
+                appearance === 'default' && 'px-6'
+              )}
+            >
+              {appearance === 'default' && (
+                <h5 key="panel-title" className="mb-0">
+                  Connection string
+                </h5>
+              )}
+              <div
+                className={cn(
+                  'flex items-center gap-x-2 ml-auto',
+                  appearance === 'minimal' ? 'absolute -top-1 right-0' : ''
+                )}
+              >
+                {readReplicasEnabled && (
+                  <DatabaseSelector
+                    selectedId={selectedDatabaseId}
+                    setSelectedId={setSelectedDatabaseId}
+                  />
+                )}
                 <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                   <a href="https://supabase.com/docs/guides/database/connecting-to-postgres">
                     Documentation
@@ -177,7 +212,10 @@ export const DatabaseConnectionString = () => {
               type="underlined"
               size="tiny"
               activeId={selectedTab}
-              baseClassNames="!space-y-0 px-6 -mb-[1px]"
+              baseClassNames={cn(
+                '!space-y-0 px-6 -mb-[1px]',
+                appearance === 'minimal' && '-mt-1 px-0'
+              )}
               onChange={setSelectedTab}
             >
               {CONNECTION_TYPES.map((type) => (
@@ -188,7 +226,7 @@ export const DatabaseConnectionString = () => {
           </div>
         }
       >
-        <Panel.Content>
+        <Panel.Content className={appearance === 'minimal' && 'px-0'}>
           {isLoading && <ShimmeringLoader className="h-8 w-full" />}
           {isError && <AlertError error={error} subject="Failed to retrieve database settings" />}
           {isSuccess && (
@@ -219,7 +257,7 @@ export const DatabaseConnectionString = () => {
         {poolerConnStringSyntax.length > 0 && (
           <>
             <Separator />
-            <Panel.Content className="!py-3 space-y-2">
+            <Panel.Content className={cn('!py-3 space-y-2', appearance === 'minimal' && 'px-0')}>
               <Collapsible_Shadcn_>
                 <CollapsibleTrigger_Shadcn_ className="group [&[data-state=open]>div>svg]:!-rotate-180">
                   <div className="flex items-center gap-x-2 w-full">

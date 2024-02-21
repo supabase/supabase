@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { AnimatePresence } from 'framer-motion'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import { Octokit } from '@octokit/core'
 import { cn } from 'ui'
 import LogoLoader from 'ui/src/components/LogoLoader'
 
@@ -67,7 +66,6 @@ enum SWIPER_STATE {
 }
 
 const Repos = ({ tabs }: Props) => {
-  const octokit = new Octokit()
   const [repos, setRepos] = useState<any[] | null>(null)
   const [activeTab, setActiveTab] = useState(0)
   const [apiSwiper, setApiSwiper] = useState(undefined)
@@ -75,6 +73,8 @@ const Repos = ({ tabs }: Props) => {
 
   useEffect(() => {
     async function fetchOctoData() {
+      const { Octokit } = await import('@octokit/core')
+      const octokit = new Octokit()
       const res = await octokit.request('GET /orgs/{org}/repos', {
         org: 'supabase',
         type: 'public',

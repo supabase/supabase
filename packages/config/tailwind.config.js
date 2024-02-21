@@ -99,6 +99,10 @@ const uiConfig = ui({
     backgroundColor: (theme) => ({
       ...theme('colors'),
       ...generateTwColorClasses('background', color),
+      /*
+       * custom background re-maps
+       */
+      "studio": `hsl(var(--background-200)/ <alpha-value>)`
     }),
     borderColor: (theme) => ({
       ...theme('colors'),
@@ -241,17 +245,18 @@ const uiConfig = ui({
             },
             a: {
               position: 'relative',
-              transition: 'color 0.3s ease-in-out',
+              transition: 'all 0.18s ease',
               paddingBottom: '2px',
               fontWeight: '400',
+              opacity: 1,
               color: 'hsl(var(--foreground-default))',
               textDecorationLine: 'underline',
-              textDecorationColor: 'hsl(var(--brand-500))',
+              textDecorationColor: 'hsl(var(--foreground-muted))',
               textDecorationThickness: '1px',
-              textUnderlineOffset: '4px',
+              textUnderlineOffset: '2px',
             },
             'a:hover': {
-              textDecorationColor: 'hsl(var(--colors-scale12))',
+              textDecorationColor: 'hsl(var(--foreground-default))',
             },
             figcaption: {
               color: 'hsl(var(--foreground-muted))',

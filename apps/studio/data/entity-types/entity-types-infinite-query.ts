@@ -49,7 +49,8 @@ export async function getEntityTypes(
           when 'p' then 5
         end as "type_sort",
         obj_description(c.oid) as "comment",
-        count(*) over() as "count"
+        count(*) over() as "count",
+        c.relrowsecurity as "rls_enabled"
       from
         pg_namespace nc
         join pg_class c on nc.oid = c.relnamespace
@@ -78,7 +79,8 @@ export async function getEntityTypes(
             'schema', r.schema,
             'name', r.name,
             'type', r.type,
-            'comment', r.comment
+            'comment', r.comment,
+            'rls_enabled', r.rls_enabled
           )
           order by ${outerOrderBy}
         ), '[]'::jsonb),

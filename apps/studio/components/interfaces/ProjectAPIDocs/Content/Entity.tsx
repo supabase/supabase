@@ -42,7 +42,7 @@ const Entity = ({ language, apikey = '', endpoint = '' }: ContentProps) => {
       ? Object.entries(definition.properties).map(([id, val]: any) => ({
           ...val,
           id,
-          required: definition.required.includes(id),
+          required: (definition?.required ?? []).includes(id),
         }))
       : []
 

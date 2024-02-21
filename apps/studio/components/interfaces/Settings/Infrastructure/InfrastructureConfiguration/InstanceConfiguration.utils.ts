@@ -9,10 +9,15 @@ import {
 } from './InstanceConfiguration.constants'
 import { groupBy } from 'lodash'
 import { Database } from 'data/read-replicas/replicas-query'
+import { LoadBalancer } from 'data/read-replicas/load-balancers-query'
+
+// [Joshen] Just FYI the nodes generation assumes each project only has one load balancer
+// Will need to change if this eventually becomes otherwise
 
 export const generateNodes = (
   primary: Database,
   replicas: Database[],
+  loadBalancers: LoadBalancer[],
   {
     onSelectRestartReplica,
     onSelectResizeReplica,
@@ -28,6 +33,21 @@ export const generateNodes = (
     const region = AVAILABLE_REPLICA_REGIONS.find((region) => d.region.includes(region.region))
     return region?.key
   })
+
+  const loadBalancer = loadBalancers.find((x) =>
+    x.databases.some((db) => db.identifier === primary.identifier)
+  )
+  const loadBalancerNode: Node | undefined =
+    loadBalancer !== undefined
+      ? {
+          position,
+          id: 'load-balancer',
+          type: 'LOAD_BALANCER',
+          data: {
+            numDatabases: loadBalancer.databases.length,
+          },
+        }
+      : undefined
 
   const primaryRegion = AVAILABLE_REPLICA_REGIONS.find((region) =>
     primary.region.includes(region.region)
@@ -45,6 +65,7 @@ export const generateNodes = (
       status: primary.status,
       numReplicas: replicas.length,
       numRegions: Object.keys(regions).length,
+      hasLoadBalancer: loadBalancer !== undefined,
     },
   }
 
@@ -73,17 +94,24 @@ export const generateNodes = (
       }
     })
 
-  return [primaryNode, ...replicaNodes]
+  return [
+    ...(loadBalancerNode !== undefined ? [loadBalancerNode] : []),
+    primaryNode,
+    ...replicaNodes,
+  ]
 }
 
 export const getDagreGraphLayout = (nodes: Node[], edges: Edge[]) => {
   const dagreGraph = new dagre.graphlib.Graph()
   dagreGraph.setDefaultEdgeLabel(() => ({}))
-  dagreGraph.setGraph({ rankdir: 'TB', ranksep: 200, nodesep: NODE_SEP })
+  dagreGraph.setGraph({ rankdir: 'TB', ranksep: 160, nodesep: NODE_SEP })
 
-  nodes.forEach((node) =>
-    dagreGraph.setNode(node.id, { width: NODE_WIDTH / 2, height: NODE_ROW_HEIGHT / 2 })
-  )
+  nodes.forEach((node) => {
+    dagreGraph.setNode(node.id, {
+      width: NODE_WIDTH / 2,
+      height: node.id === 'load-balancer' ? -70 : NODE_ROW_HEIGHT / 2,
+    })
+  })
 
   edges.forEach((edge) => dagreGraph.setEdge(edge.source, edge.target))
 

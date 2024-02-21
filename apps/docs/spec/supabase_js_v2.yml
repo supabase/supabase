@@ -1792,6 +1792,16 @@ functions:
               from:sender_id(name),
               to:receiver_id(name)
             `)
+          
+          // To infer types, use the name of the table (in this case `users`) and
+          // the name of the foreign key constraint.
+          const { data, error } = await supabase
+            .from('messages')
+            .select(`
+              content,
+              from:users!messages_sender_id_fkey(name),
+              to:users!messages_receiver_id_fkey(name)
+            `)
           ```
         data:
           sql: |
@@ -2617,9 +2627,7 @@ functions:
           }
           ```
         description: |
-          Postgres functions that return tables can also be combined with
-          [Filters](/docs/reference/javascript/using-filters) and
-          [Modifiers](/docs/reference/javascript/using-modifiers).
+          Postgres functions that return tables can also be combined with [Filters](/docs/reference/javascript/using-filters) and [Modifiers](/docs/reference/javascript/using-modifiers).
         hideCodeBlock: true
 
   - id: using-filters

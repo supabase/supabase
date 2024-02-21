@@ -14,6 +14,7 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
+  CommandSeparator_Shadcn_,
   Command_Shadcn_,
   IconCheck,
   IconCode,
@@ -98,21 +99,24 @@ const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) =
                 </ScrollArea>
               </CommandGroup_Shadcn_>
               {organizationCreationEnabled && (
-                <CommandGroup_Shadcn_ className="border-t">
-                  <CommandItem_Shadcn_
-                    className="cursor-pointer w-full"
-                    onSelect={(e) => {
-                      setOpen(false)
-                      router.push(`/new`)
-                    }}
-                    onClick={() => setOpen(false)}
-                  >
-                    <Link href="/new" className="flex items-center gap-2 w-full">
-                      <IconPlus size={14} strokeWidth={1.5} />
-                      <p>New organization</p>
-                    </Link>
-                  </CommandItem_Shadcn_>
-                </CommandGroup_Shadcn_>
+                <>
+                  <CommandSeparator_Shadcn_ />
+                  <CommandGroup_Shadcn_>
+                    <CommandItem_Shadcn_
+                      className="cursor-pointer w-full"
+                      onSelect={(e) => {
+                        setOpen(false)
+                        router.push(`/new`)
+                      }}
+                      onClick={() => setOpen(false)}
+                    >
+                      <Link href="/new" className="flex items-center gap-2 w-full">
+                        <IconPlus size={14} strokeWidth={1.5} />
+                        <p>New organization</p>
+                      </Link>
+                    </CommandItem_Shadcn_>
+                  </CommandGroup_Shadcn_>
+                </>
               )}
             </CommandList_Shadcn_>
           </Command_Shadcn_>

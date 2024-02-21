@@ -1,0 +1,51 @@
+---
+id: 'troubleshooting'
+title: 'Troubleshooting'
+description: 'Diagnosing and fixing issues with your hosted Supabase project.'
+---
+
+Learn how to diagnose and fix common issues with your Supabase project.
+
+## HTTP API issues
+
+Symptoms:
+
+- HTTP timeouts
+- 5xx response codes
+- High response times
+
+### Under-provisioned resources
+
+The most common class of issues that causes HTTP timeouts and 5xx response codes is the under-provisioning of resources for your project. This can cause your project to be unable to service the traffic it is receiving.
+
+Each Supabase project is provisioned with [segregated compute resources](../platform/compute-add-ons). This allows the project to serve unlimited requests, as long as they can be handled using the resources that have been provisioned. Complex queries, or queries that process larger amounts of data, will require higher amounts of resources. As such, the amount of resources that can handle a high volume of simple queries (or queries involving small amounts of data), will likely be unable to handle a similar volume of complex queries.
+
+You can view the resource utilization of your Supabase Project using the [reports in the Dashboard](https://supabase.com/dashboard/project/_/reports/database).
+
+Some common solutions for this issue are:
+
+- [Upgrading](https://supabase.com/dashboard/project/_/settings/addons?panel=computeInstance) to a [larger compute add-on](../platform/compute-add-ons) in order to serve higher volumes of traffic.
+- [Optimizing the queries](../platform/performance#examining-query-performance) being executed.
+- [Using fewer Postgres connections](../platform/performance#configuring-clients-to-use-fewer-connections) can reduce the amount of resources needed on the project.
+- [Restarting](https://supabase.com/dashboard/project/_/settings/general) the database. This only temporarily solves the issue by terminating any ongoing workloads that might be tying up your compute resources.
+
+If your [Disk IO budget](../platform/compute-add-ons#disk-io) has been drained, you will need to either wait for it to be replenished the next day, or upgrade to a larger compute add-on to increase the budget available to your project.
+
+## Unable to connect to your Supabase project
+
+Symptom: You're unable to connect to your Postgres database directly, but can open the Project in the [Supabase Dashboard](https://supabase.com/dashboard/project/_/).
+
+### Too many open connections
+
+Errors about too many open connections can be _temporarily_ resolved by [restarting the database](https://supabase.com/dashboard/project/_/settings/general). However, this won't solve the underlying issue for a permanent solution.
+
+- If you're receiving a `No more connections allowed (max_client_conn)` error:
+  - Configure your applications and services to [use fewer connections](../platform/performance#configuring-clients-to-use-fewer-connections).
+  - [Upgrade](https://supabase.com/dashboard/project/_/settings/addons?panel=computeInstance) to a [larger compute add-on](../platform/compute-add-ons) to increase the number of available connections.
+- If you're receiving a `sorry, too many clients already` or `remaining connection slots are reserved for non-replication superuser connections` error message in addition to the above suggestions, switch to using the [connection pooler](/docs/guides/database/connecting-to-postgres#connection-pool) instead.
+
+### Connection refused
+
+If you receive a `connection refused` error after a few initial failed connection attempts, your client has likely been temporarily blocked in order to protect the database from brute-force attacks. You can wait 30 minutes before trying again with the correct password, or you can [contact support](https://supabase.com/dashboard/support/new) with your client's IP address to manually unblock you.
+
+If you're also unable to open the project using the [Supabase Dashboard](https://supabase.com/dashboard/project/_/), review the solutions for [under-provisioned projects](#under-provisioned-resources).

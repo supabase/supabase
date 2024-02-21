@@ -35,7 +35,7 @@ import {
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
@@ -57,7 +57,7 @@ const Addons = () => {
   const { ref: projectRef, panel } = useParams()
   const snap = useSubscriptionPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
-  const { project: selectedProject } = useProjectContext()
+  const { project: selectedProject, isLoading: isLoadingProject } = useProjectContext()
   const { data: projectSettings } = useProjectSettingsQuery({ projectRef })
   const selectedOrg = useSelectedOrganization()
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
@@ -239,11 +239,15 @@ const Addons = () => {
                   </div>
                   <div className="flex-grow">
                     <p className="text-sm text-foreground-light">Current option:</p>
-                    <p>
-                      {computeInstance?.variant.name ??
-                        capitalize(selectedProject?.infra_compute_size) ??
-                        'Micro'}
-                    </p>
+                    {isLoading || (computeInstance === undefined && isLoadingProject) ? (
+                      <ShimmeringLoader className="w-32" />
+                    ) : (
+                      <p>
+                        {computeInstance?.variant.name ??
+                          capitalize(selectedProject?.infra_compute_size) ??
+                          'Micro'}
+                      </p>
+                    )}
                     <ProjectUpdateDisabledTooltip
                       projectUpdateDisabled={projectUpdateDisabled}
                       projectNotActive={!isProjectActive}
