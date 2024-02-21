@@ -429,11 +429,6 @@ export default function Index () {
 
 Creating a Supabase client with the `ssr` package automatically configures it to use Cookies. This means your user's session is available throughout the entire SvelteKit stack - page, layout, server, hooks.
 
-<Admonition type="danger">
-
-Beware when accessing the session object on the server, because it is not revalidated on every request from the client. That means the sender can tamper with unencoded data in the session object. If you need to verify the integrity of user data for server logic, call `auth.getUser` instead, which will query the Supabase Auth server for trusted user data. This risk can be removed if you call getUser() in hooks.server.ts.
-
-</Admonition>
 
 <Tabs
   scrollable
@@ -474,23 +469,18 @@ export const handle: Handle = async ({ event, resolve }) => {
     },
   })
 
-  /**
-   * a little helper that is written for convenience so that instead
-   * of calling `const { data: { session } } = await supabase.auth.getSession()`
-   * you just call this `await getSession()`
-   */
-  event.locals.getSession = async () => {
- /**
-   * getUser will guarantee that the stored session is valid,
-   * and calling getSession immediately after 
-   * will leave no room for anyone to modify the stored session. 
-   */
-    const { data: getUserData, error: err }  = await event.locals.supabase.auth.getUser()
+event.locals.getSessionAndUser = async () => {
+	const { data: user, error: err }  = await event.locals.supabase.auth.getUser()
 
-    const {
-      data: { session },
-    } = await event.locals.supabase.auth.getSession()
-    return session
+  let session
+   if (err) {
+       return { session, user: null }
+   }
+   else {
+     session = (await event.locals.supabase.auth.getSession()).data?.session
+  }
+
+    return {session, user}
   }
 
   return resolve(event, {
@@ -502,6 +492,24 @@ export const handle: Handle = async ({ event, resolve }) => {
 ```
 
 </TabPanel>
+
+
+<TabPanel id="layout-server" label="Root Server Layout">
+
+```ts +layout.server.ts
+import type { LayoutServerLoad } from './$types'
+
+export const load: LayoutServerLoad = async (event) => {
+    const { session, user } = await event.locals.getSessionAndUser()
+    return {
+        session,
+        user
+    };
+};
+```
+
+</TabPanel>
+
 
 <TabPanel id="layout" label="Root Layout Load">
 
@@ -516,48 +524,37 @@ import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/publi
 import type { LayoutLoad } from './$types'
 import { createBrowserClient, isBrowser, parse } from '@supabase/ssr'
 
-export const load: LayoutLoad = async ({ fetch, data, depends }) => {
-  depends('supabase:auth')
+export const load:LayoutLoad = async ({ fetch, data, depends }) => {
+    depends('supabase:auth')
 
-  const supabase = createBrowserClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
-    global: {
-      fetch,
-    },
-    cookies: {
-      get(key) {
-        if (!isBrowser()) {
-          return JSON.stringify(data.session)
-        }
+    const supabase = createBrowserClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
+        global: {
+            fetch,
+        },
+        cookies: {
+            get(key) {
+                if (!isBrowser()) {
+                    return JSON.stringify(data.session)
+                }
+                const cookie = combineChunks(key, (name) => {
+                    const cookies = parse(document.cookie)
+                    return cookies[name]
+                })
+                return cookie
+            },
+        },
+    })
 
-        const cookie = parse(document.cookie)
-        return cookie[key]
-      },
-    },
-  })
-
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-
-  return { supabase, session }
+    return {
+        supabase,
+        session: data.session,
+        user: data.user
+    }
 }
 ```
 
 </TabPanel>
 
-<TabPanel id="layout-server" label="Root Server Layout">
-
-```ts +layout.server.ts
-import type { LayoutServerLoad } from './$types'
-
-export const load: LayoutServerLoad = async ({ locals: { getSession } }) => {
-  return {
-    session: await getSession(),
-  }
-}
-```
-
-</TabPanel>
 
 <TabPanel id="layout-svelte" label="Root Layout Page">
 
@@ -625,6 +622,24 @@ export const actions: Actions = {
     ...
 	}
 }
+```
+
+</TabPanel>
+
+<TabPanel id="protected-route" label="Protected server route">
+
+```ts +page.server.ts
+import { redirect } from "@sveltejs/kit"
+import type { PageServerLoad } from './$types';
+
+export async function load: PageServerLoad({ parent } ) {
+	const data = await parent()
+	const session = data.session
+    // if there is no user's sessiion redirect back to the home page
+	if (!session) {
+		redirect(303, '/');
+	}
+  }
 ```
 
 </TabPanel>
