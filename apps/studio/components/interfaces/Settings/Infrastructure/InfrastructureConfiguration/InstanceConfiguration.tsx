@@ -82,14 +82,14 @@ const InstanceConfigurationUI = () => {
 
   const nodes = useMemo(
     () =>
-      isSuccessLoadBalancers && isSuccessLoadBalancers
+      isSuccessReplicas && isSuccessLoadBalancers
         ? generateNodes(primary, replicas, loadBalancers ?? [], {
             onSelectRestartReplica: setSelectedReplicaToRestart,
             onSelectResizeReplica: setSelectedReplicaToResize,
             onSelectDropReplica: setSelectedReplicaToDrop,
           })
         : [],
-    [isSuccessLoadBalancers, isSuccessLoadBalancers]
+    [isSuccessReplicas, isSuccessLoadBalancers]
   )
 
   const edges: Edge[] = [
