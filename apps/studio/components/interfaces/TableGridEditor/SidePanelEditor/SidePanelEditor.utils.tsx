@@ -742,7 +742,7 @@ export const updateTable = async ({
   }
 
   // Foreign keys will get updated here accordingly
-  const relationsToAdd = foreignKeyRelations.filter((x) => x.id === undefined)
+  const relationsToAdd = foreignKeyRelations.filter((x) => typeof x.id === 'string')
   if (relationsToAdd.length > 0) {
     await addForeignKey({
       projectRef,
@@ -762,7 +762,9 @@ export const updateTable = async ({
     })
   }
 
-  const remainingRelations = foreignKeyRelations.filter((x) => x.id !== undefined && !x.toRemove)
+  const remainingRelations = foreignKeyRelations.filter(
+    (x) => typeof x.id === 'number' && !x.toRemove
+  )
   const relationsToUpdate = remainingRelations.filter((x) => {
     const existingRelation = existingForeignKeyRelations.find((y) => x.id === y.id)
     if (existingRelation !== undefined) {
