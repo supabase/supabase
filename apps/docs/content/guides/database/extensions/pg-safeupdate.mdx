@@ -1,0 +1,54 @@
+---
+id: 'pg-safeupdate'
+title: 'pg-safeupdate: Required Where Clauses'
+description: 'Requires a where clause for update and delete'
+---
+
+[pg-safeupdate](https://github.com/eradman/pg-safeupdate) is a PostgreSQL extension designed to prevent users from accidentally updating or deleting too many records in a single statement by requiring a "where" clause in all update and delete statements.
+
+The `pg-safeupdate` extension is a useful tool for protecting data integrity and preventing accidental data loss. Without it, a user could accidentally execute an update or delete statement that affects all records in a table. With `pg-safeupdate`, users are required to be more deliberate in their update and delete statements, which reduces the risk of significant error.
+
+## Enable the extension
+
+`pg-safeupdate` can be enabled on a per connection basis:
+
+{/* prettier-ignore */}
+```sql
+load 'safeupdate';
+```
+
+or for all connections:
+
+{/* prettier-ignore */}
+```sql
+alter database some_db set session_preload_libraries = 'safeupdate';
+```
+
+## Usage
+
+Let's take a look at an example to see how pg-safeupdate works. Suppose we have a table called `employees` with the following columns: `id`, `name`, `department`, and `date_of_birth`. We want to update the `date_of_birth` for a specific employee with the `id` of 12345. Here is what the query would look like if we forgot to add a "where" clause:
+
+{/* prettier-ignore */}
+```sql
+load 'safeupdate';
+
+update employees set date_of_birth = '1987-01-28';
+```
+
+This query updates the `date_of_birth` for all employees to 1987-01-28, which is not what we intended. With `pg-safeupdate` enabled, we receive an error message prompting us to add a "where" clause to the query:
+
+{/* prettier-ignore */}
+```sql
+ERROR: UPDATE requires a WHERE clause
+```
+
+We would then update our query to include a "where" clause specifying the employee with the `id` of 12345:
+
+{/* prettier-ignore */}
+```sql
+update employees set date_of_birth = '1987-01-28' where id = 12345;
+```
+
+## Resources
+
+- Official [pg-safeupdate documentation](https://github.com/eradman/pg-safeupdate)

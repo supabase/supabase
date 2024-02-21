@@ -1,19 +1,103 @@
 import fs from 'fs'
-import { useEffect, useState } from 'react'
-
+import { useState } from 'react'
 import { useRouter } from 'next/router'
-import Image from 'next/legacy/image'
-import Link from 'next/link'
-
 import { NextSeo } from 'next-seo'
 import { generateRss } from '~/lib/rss'
 import { getSortedPosts } from '~/lib/posts'
-import authors from 'lib/authors.json'
 
 import PostTypes from '~/types/post'
 import DefaultLayout from '~/components/Layouts/Default'
+import BlogGridItem from '~/components/Blog/BlogGridItem'
 import BlogListItem from '~/components/Blog/BlogListItem'
 import BlogFilters from '~/components/Blog/BlogFilters'
+import FeaturedThumb from '~/components/Blog/FeaturedThumb'
+import { cn } from 'ui'
+import { LOCAL_STORAGE_KEYS, isBrowser } from 'common'
+
+export type BlogView = 'list' | 'grid'
+
+function Blog(props: any) {
+  const { BLOG_VIEW } = LOCAL_STORAGE_KEYS
+  const localView = isBrowser ? (localStorage?.getItem(BLOG_VIEW) as BlogView) : undefined
+  const [blogs, setBlogs] = useState(props.blogs)
+  const [view, setView] = useState<BlogView>(localView ?? 'list')
+  const isList = view === 'list'
+  const router = useRouter()
+
+  const meta_title = 'Supabase Blog: Open Source Firebase alternative Blog'
+  const meta_description = 'Get all your Supabase News on the Supabase blog.'
+
+  return (
+    <>
+      <NextSeo
+        title={meta_title}
+        description={meta_description}
+        openGraph={{
+          title: meta_title,
+          description: meta_description,
+          url: `https://supabase.com/${router.pathname}`,
+          images: [
+            {
+              url: `https://supabase.com/images/og/og-image-v2.jpg`,
+            },
+          ],
+        }}
+        additionalLinkTags={[
+          {
+            rel: 'alternate',
+            type: 'application/rss+xml',
+            href: `https://supabase.com/rss.xml`,
+          },
+        ]}
+      />
+      <DefaultLayout>
+        <h1 className="sr-only">Supabase blog</h1>
+        <div className="md:container mx-auto py-4 lg:py-10 px-4 sm:px-12 xl:px-16">
+          {props.blogs.slice(0, 1).map((blog: any, i: number) => (
+            <FeaturedThumb key={i} {...blog} />
+          ))}
+        </div>
+
+        <div className="border-default border-t">
+          <div className="md:container mx-auto mt-6 lg:mt-8 px-6 sm:px-16 xl:px-20">
+            <BlogFilters
+              allPosts={props.blogs}
+              setPosts={setBlogs}
+              view={view as BlogView}
+              setView={setView}
+            />
+
+            <ol
+              className={cn(
+                'grid -mx-2 sm:-mx-4 py-6 lg:py-6 lg:pb-20',
+                isList ? 'grid-cols-1' : 'grid-cols-12 lg:gap-4'
+              )}
+            >
+              {blogs?.length ? (
+                blogs?.map((blog: PostTypes, idx: number) =>
+                  isList ? (
+                    <div className="col-span-12 px-2 sm:px-4 [&_a]:last:border-none" key={idx}>
+                      <BlogListItem post={blog} />
+                    </div>
+                  ) : (
+                    <div
+                      className="col-span-12 mb-4 md:col-span-12 lg:col-span-6 xl:col-span-4 h-full"
+                      key={idx}
+                    >
+                      <BlogGridItem post={blog} />
+                    </div>
+                  )
+                )
+              ) : (
+                <p className="text-sm text-light col-span-full">No results</p>
+              )}
+            </ol>
+          </div>
+        </div>
+      </DefaultLayout>
+    </>
+  )
+}
 
 export async function getStaticProps() {
   const allPostsData = getSortedPosts({ directory: '_blog', runner: '** BLOG PAGE **' })
@@ -41,186 +125,6 @@ export async function getStaticProps() {
       blogs: allPostsData,
     },
   }
-}
-
-function Blog(props: any) {
-  const [blogs, setBlogs] = useState(props.blogs)
-  const [category, setCategory] = useState<string>('all')
-
-  // Using hard-coded categories as they:
-  // - serve as a reference
-  // - are easier to reorder
-  const allCategories = [
-    'all',
-    'product',
-    'company',
-    'postgres',
-    'developers',
-    'engineering',
-    'launch-week',
-  ]
-  const router = useRouter()
-
-  const meta_title = 'Supabase Blog: Open Source Firebase alternative Blog'
-  const meta_description = 'Get all your Supabase News on the Supabase blog.'
-
-  useEffect(() => {
-    handlePosts()
-  }, [category])
-
-  const handlePosts = () => {
-    // construct an array of blog posts
-    // not inluding the first blog post
-    const shiftedBlogs = [...props.blogs]
-    shiftedBlogs.shift()
-
-    if (category === 'all') {
-      router.replace('/blog', undefined, { shallow: true, scroll: false })
-    } else {
-      router.query.category = category
-      router.replace(router, undefined, { shallow: true, scroll: false })
-    }
-
-    setBlogs(
-      category === 'all'
-        ? shiftedBlogs
-        : props.blogs.filter((post: any) => {
-            const found = post.categories?.includes(category)
-            return found
-          })
-    )
-  }
-
-  return (
-    <>
-      <NextSeo
-        title={meta_title}
-        description={meta_description}
-        openGraph={{
-          title: meta_title,
-          description: meta_description,
-          url: `https://supabase.com/${router.pathname}`,
-          images: [
-            {
-              url: `https://supabase.com/images/og/og-image-v2.jpg`,
-            },
-          ],
-        }}
-        additionalLinkTags={[
-          {
-            rel: 'alternate',
-            type: 'application/rss+xml',
-            href: `https://supabase.com/rss.xml`,
-          },
-        ]}
-      />
-      <DefaultLayout>
-        <h1 className="sr-only">Supabase blog</h1>
-        <div className="overflow-hidden py-12 lg:py-20">
-          <div className="container mx-auto px-8 sm:px-16 xl:px-20">
-            <div className="mx-auto ">
-              {props.blogs.slice(0, 1).map((blog: any, i: number) => (
-                <FeaturedThumb key={i} {...blog} />
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="border-default border-t">
-          <div className="container mx-auto mt-10 lg:mt-16 px-8 sm:px-16 xl:px-20">
-            <BlogFilters
-              posts={blogs}
-              setPosts={setBlogs}
-              setCategory={setCategory}
-              allCategories={allCategories}
-              handlePosts={handlePosts}
-            />
-
-            <ol className="grid grid-cols-12 py-10 lg:py-16 lg:gap-16">
-              {blogs?.length ? (
-                blogs?.map((blog: PostTypes, idx: number) => (
-                  <div
-                    className="col-span-12 mb-16 md:col-span-12 lg:col-span-6 xl:col-span-4"
-                    key={idx}
-                  >
-                    <BlogListItem post={blog} />
-                  </div>
-                ))
-              ) : (
-                <p className="text-sm text-light col-span-full">No results</p>
-              )}
-            </ol>
-          </div>
-        </div>
-      </DefaultLayout>
-    </>
-  )
-}
-
-function FeaturedThumb(blog: PostTypes) {
-  // @ts-ignore
-  const authorArray = blog.author.split(',')
-
-  const author = []
-  for (let i = 0; i < authorArray.length; i++) {
-    // @ts-ignore
-    author.push(
-      authors.find((authors: any) => {
-        // @ts-ignore
-        return authors.author_id === authorArray[i]
-      })
-    )
-  }
-
-  return (
-    <div key={blog.slug} className="w-full cursor-pointer">
-      <Link href={`${blog.path}`} className="grid gap-8 lg:grid-cols-2 lg:gap-16">
-        <div className="relative w-full aspect-[2/1] lg:aspect-[3/2] overflow-auto rounded-lg border">
-          <Image
-            src={`/images/blog/` + (blog.thumb ? blog.thumb : blog.image)}
-            layout="fill"
-            className="object-cover"
-            alt="blog thumbnail"
-          />
-        </div>
-        <div className="flex flex-col space-y-2">
-          <div className="text-light flex space-x-2 text-sm">
-            <span>{blog.date}</span>
-            <span>•</span>
-            <span>{blog.readingTime}</span>
-          </div>
-
-          <div>
-            <h2 className="h2">{blog.title}</h2>
-            <p className="p text-xl">{blog.description}</p>
-          </div>
-
-          <div className="flex flex-col w-max gap-2">
-            {author.map((author: any, i: number) => {
-              return (
-                <div className="flex items-center space-x-3" key={i}>
-                  {author.author_image_url && (
-                    <div className="relative h-10 w-10 overflow-auto">
-                      <Image
-                        src={author.author_image_url}
-                        alt={`${author.author} avatar`}
-                        className="rounded-full object-cover"
-                        layout="fill"
-                      />
-                    </div>
-                  )}
-                  <div className="flex flex-col">
-                    <span className="text-foreground m-0 text-sm">{author.author}</span>
-                    <span className="text-light m-0 text-xs">{author.position}</span>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      </Link>
-    </div>
-  )
 }
 
 export default Blog

@@ -1,19 +1,19 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import { Button, Form, IconClock, Input, Listbox } from 'ui'
 
+import AlertError from 'components/ui/AlertError'
+import { FormHeader } from 'components/ui/Forms'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
-import { StorageSizeUnits, STORAGE_FILE_SIZE_LIMIT_MAX_BYTES } from './StorageSettings.constants'
+import { STORAGE_FILE_SIZE_LIMIT_MAX_BYTES, StorageSizeUnits } from './StorageSettings.constants'
 import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
-import { useParams } from 'common'
-import toast from 'react-hot-toast'
-import AlertError from 'components/ui/AlertError'
-import { FormHeader } from 'components/ui/Forms'
 
 const StorageSettings = () => {
   const { ui } = useStore()
@@ -75,7 +75,7 @@ const StorageSettings = () => {
     const errors = onValidate(values)
 
     if (errors.fileSizeLimit) {
-      return toast.error(`Upload file size limit must be up to 5GB (${formattedMaxSizeBytes})`)
+      return toast.error(`Upload file size limit must be up to 50GB (${formattedMaxSizeBytes})`)
     }
 
     updateStorageConfig({
