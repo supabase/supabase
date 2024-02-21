@@ -1,8 +1,5 @@
 import { useParams } from 'common'
-import { Markdown } from 'components/interfaces/Markdown'
-import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { AlertTriangleIcon } from 'lucide-react'
-import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -18,11 +15,24 @@ import {
   IconExternalLink,
 } from 'ui'
 
+import { Markdown } from 'components/interfaces/Markdown'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
+import { useFlag } from 'hooks'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
+
 export const PoolingModesModal = () => {
   const { ref: projectRef } = useParams()
+  const { project } = useProjectContext()
   const snap = useDatabaseSettingsStateSnapshot()
+  const state = useDatabaseSelectorStateSnapshot()
+  const readReplicasEnabled = useFlag('readReplicas') && project?.is_read_replicas_enabled
 
   const { data } = usePoolingConfigurationQuery({ projectRef: projectRef })
+  const primaryConfig = readReplicasEnabled
+    ? data?.find((x) => x.identifier === state.selectedDatabaseId)
+    : data?.find((x) => x.database_type === 'PRIMARY')
 
   const navigateToPoolerSettings = () => {
     const el = document.getElementById('connection-pooler')
@@ -67,13 +77,13 @@ This mode is similar to connecting to your database directly. There is full supp
 
 ### Using session and transaction modes at the same time
  ${
-   data?.pool_mode === 'transaction'
+   primaryConfig?.pool_mode === 'transaction'
      ? 'You can use the session mode connection string (port 5432) and transaction mode connection string (port 6543) in your application.'
      : 'To get the best of both worlds, as a starting point, we recommend using session mode just when you need support for prepared statements and transaction mode in other cases.'
  }
 `}
         />
-        {data?.pool_mode === 'session' && (
+        {primaryConfig?.pool_mode === 'session' && (
           <Alert_Shadcn_ variant="warning">
             <AlertTriangleIcon strokeWidth={2} />
             <AlertTitle_Shadcn_>

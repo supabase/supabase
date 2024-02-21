@@ -1,11 +1,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-
 import { useParams } from 'common'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { formatDatabaseID, formatDatabaseRegion } from 'data/read-replicas/replicas.utils'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Button,
   CommandGroup_Shadcn_,
@@ -22,17 +18,27 @@ import {
   cn,
 } from 'ui'
 
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { formatDatabaseID, formatDatabaseRegion } from 'data/read-replicas/replicas.utils'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+
 interface DatabaseSelectorProps {
   variant?: 'regular' | 'connected-on-right' | 'connected-on-left' | 'connected-on-both'
+  selectedId?: string // Optional to let parent component control its state (e.g Database Settings page)
+  setSelectedId?: (value: string) => void
 }
 
-const DatabaseSelector = ({ variant = 'regular' }: DatabaseSelectorProps) => {
+const DatabaseSelector = ({
+  variant = 'regular',
+  selectedId,
+  setSelectedId,
+}: DatabaseSelectorProps) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const [open, setOpen] = useState(false)
 
   const state = useDatabaseSelectorStateSnapshot()
-  const selectedDatabaseId = state.selectedDatabaseId
+  const selectedDatabaseId = selectedId || state.selectedDatabaseId
 
   const { data } = useReadReplicasQuery({ projectRef })
   const databases = data ?? []
@@ -84,11 +90,13 @@ const DatabaseSelector = ({ variant = 'regular' }: DatabaseSelectorProps) => {
                       value={database.identifier}
                       className="cursor-pointer w-full"
                       onSelect={() => {
-                        state.setSelectedDatabaseId(database.identifier)
+                        if (setSelectedId) setSelectedId(database.identifier)
+                        else state.setSelectedDatabaseId(database.identifier)
                         setOpen(false)
                       }}
                       onClick={() => {
-                        state.setSelectedDatabaseId(database.identifier)
+                        if (setSelectedId) setSelectedId(database.identifier)
+                        else state.setSelectedDatabaseId(database.identifier)
                         setOpen(false)
                       }}
                     >
