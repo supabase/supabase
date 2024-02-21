@@ -151,6 +151,7 @@ const GitHubSection = () => {
                             name: connection.repository.name,
                             supabaseConfig: {
                               supabaseDirectory: connection.workdir,
+                              supabaseChangesOnly: connection.supabase_changes_only,
                             },
                           } as any,
                         }}
