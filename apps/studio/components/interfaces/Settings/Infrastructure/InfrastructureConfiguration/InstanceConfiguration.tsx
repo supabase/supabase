@@ -152,8 +152,9 @@ const InstanceConfigurationUI = () => {
   // [Joshen] Just FYI this block is oddly triggering whenever we refocus on the viewport
   // even if I change the dependency array to just data. Not blocker, just an area to optimize
   useEffect(() => {
-    if (isSuccessReplicas && isSuccessLoadBalancers && nodes.length > 0) setReactFlow()
-  }, [isSuccessReplicas, isSuccessLoadBalancers, nodes])
+    if (isSuccessReplicas && isSuccessLoadBalancers && nodes.length > 0 && view === 'flow')
+      setReactFlow()
+  }, [isSuccessReplicas, isSuccessLoadBalancers, nodes, view])
 
   return (
     <>
