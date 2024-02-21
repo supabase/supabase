@@ -139,6 +139,7 @@ export type Imetadata = {
       preview: boolean
     }
     supabaseDirectory?: string
+    supabaseChangesOnly?: boolean
   }
   link?: VercelGitLink
   name: string

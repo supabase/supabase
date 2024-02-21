@@ -26,6 +26,7 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
+  Switch,
   cn,
 } from 'ui'
 import * as z from 'zod'
@@ -86,11 +87,15 @@ const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnec
     supabaseDirectory: z
       .string()
       .default(connection.metadata?.supabaseConfig?.supabaseDirectory ?? ''),
+    supabaseChangesOnly: z
+      .boolean()
+      .default(connection.metadata?.supabaseConfig?.supabaseChangesOnly ?? false),
   })
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       supabaseDirectory: connection?.metadata?.supabaseConfig?.supabaseDirectory,
+      supabaseChangesOnly: connection?.metadata?.supabaseConfig?.supabaseChangesOnly,
     },
   })
 
@@ -100,6 +105,7 @@ const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnec
       connectionId: connection.id,
       organizationId: org?.id,
       workdir: data.supabaseDirectory,
+      supabaseChangesOnly: data.supabaseChangesOnly,
     })
   }
 
@@ -191,18 +197,18 @@ const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnec
       </div>
 
       <Form_Shadcn_ {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          <FormLabel_Shadcn_ className="!text">Supabase directory</FormLabel_Shadcn_>
-          <FormDescription_Shadcn_ className="text-xs text-foreground-lighter mb-3">
-            Path to <code>supabase</code> directory containing migration and seed SQL files.
-          </FormDescription_Shadcn_>
-
+        <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6">
           <FormField_Shadcn_
             control={form.control}
             name="supabaseDirectory"
             render={({ field }) => (
-              <FormItem_Shadcn_ className="flex flex-row items-center gap-3 !space-y-0">
-                <FormControl_Shadcn_ className="xl:w-96">
+              <FormItem_Shadcn_ className="flex flex-col">
+                <FormLabel_Shadcn_ className="!text">Supabase directory</FormLabel_Shadcn_>
+                <FormDescription_Shadcn_ className="text-xs text-foreground-lighter !mt-0 !mb-1">
+                  Path in your repository where <code>supabase</code> directory for this connection
+                  lives.
+                </FormDescription_Shadcn_>
+                <FormControl_Shadcn_ className="xl:w-96 flex gap-3">
                   <div className="relative">
                     <Input_Shadcn_
                       {...field}
@@ -222,24 +228,47 @@ const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnec
                       )}
                       onClick={() => form.reset()}
                     />
+                    <Button
+                      loading={isUpdatingConnection}
+                      className={cn(
+                        'duration-150 transition',
+                        field.value !== connection.metadata?.supabaseConfig?.supabaseDirectory
+                          ? 'opacity-100'
+                          : 'opacity-0'
+                      )}
+                      htmlType="submit"
+                      disabled={
+                        field.value === '' ||
+                        field.value === connection.metadata?.supabaseConfig?.supabaseDirectory
+                      }
+                    >
+                      Update
+                    </Button>
                   </div>
                 </FormControl_Shadcn_>
-                <Button
-                  loading={isUpdatingConnection}
-                  className={cn(
-                    'duration-150 transition',
-                    field.value !== connection.metadata?.supabaseConfig?.supabaseDirectory
-                      ? 'opacity-100'
-                      : 'opacity-0'
-                  )}
-                  htmlType="submit"
-                  disabled={
-                    field.value === '' ||
-                    field.value === connection.metadata?.supabaseConfig?.supabaseDirectory
-                  }
-                >
-                  Update
-                </Button>
+              </FormItem_Shadcn_>
+            )}
+          />
+
+          <FormField_Shadcn_
+            control={form.control}
+            name="supabaseChangesOnly"
+            render={({ field }) => (
+              <FormItem_Shadcn_ className="flex flex-col">
+                <FormLabel_Shadcn_ className="!text">Supabase changes only</FormLabel_Shadcn_>
+                <FormDescription_Shadcn_ className="text-xs text-foreground-lighter !mt-0 !mb-1">
+                  Trigger branch creation only when there were changes to <code>supabase</code>{' '}
+                  directory.
+                </FormDescription_Shadcn_>
+                <FormControl_Shadcn_>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={(e) => {
+                      field.onChange(e)
+                      form.handleSubmit(onSubmit)()
+                    }}
+                  />
+                </FormControl_Shadcn_>
               </FormItem_Shadcn_>
             )}
           />

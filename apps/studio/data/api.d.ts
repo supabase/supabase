@@ -4302,6 +4302,7 @@ export interface components {
       repository: components['schemas']['ListGitHubConnectionsRepository']
       user: components['schemas']['ListGitHubConnectionsUser'] | null
       workdir: string
+      supabase_changes_only: boolean
     }
     ListGitHubConnectionsResponse: {
       connections: components['schemas']['ListGitHubConnectionsConnection'][]
@@ -4313,6 +4314,7 @@ export interface components {
     }
     UpdateGitHubConnectionsBody: {
       workdir?: string
+      supabase_changes_only?: boolean
     }
     CreateCliLoginSessionBody: {
       session_id: string
