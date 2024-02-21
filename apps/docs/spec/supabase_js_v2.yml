@@ -1793,13 +1793,14 @@ functions:
               to:receiver_id(name)
             `)
           
-          // inferring types
+          // To infer types, use the name of the table (in this case `users`) and
+          // the name of the foreign key constraint.
           const { data, error } = await supabase
             .from('messages')
             .select(`
               content,
-              from:users!messages_from_fkey(name),
-              to:users!messages_from_fkey(name)
+              from:users!messages_sender_id_fkey(name),
+              to:users!messages_receiver_id_fkey(name)
             `)
           ```
         data:
