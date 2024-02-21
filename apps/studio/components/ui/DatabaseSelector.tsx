@@ -24,12 +24,14 @@ import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 
 interface DatabaseSelectorProps {
   variant?: 'regular' | 'connected-on-right' | 'connected-on-left' | 'connected-on-both'
+  additionalOptions?: { id: string; name: string }[]
   selectedId?: string // Optional to let parent component control its state (e.g Database Settings page)
   setSelectedId?: (value: string) => void
 }
 
 const DatabaseSelector = ({
   variant = 'regular',
+  additionalOptions = [],
   selectedId,
   setSelectedId,
 }: DatabaseSelectorProps) => {
@@ -46,6 +48,8 @@ const DatabaseSelector = ({
   const selectedDatabase = databases.find((db) => db.identifier === selectedDatabaseId)
   const selectedDatabaseRegion = formatDatabaseRegion(selectedDatabase?.region ?? '')
   const formattedDatabaseId = formatDatabaseID(selectedDatabaseId ?? '')
+
+  const selectedAdditionalOption = additionalOptions.find((x) => x.id === selectedDatabaseId)
 
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
@@ -64,13 +68,21 @@ const DatabaseSelector = ({
             }
           >
             Source:{' '}
-            <span className="capitalize">
-              {selectedDatabase?.identifier === projectRef ? 'Primary database' : 'Read replica'}
-            </span>{' '}
-            {selectedDatabase?.identifier !== projectRef && (
-              <span>
-                ({selectedDatabaseRegion} - {formattedDatabaseId})
-              </span>
+            {selectedAdditionalOption ? (
+              <span>{selectedAdditionalOption.name}</span>
+            ) : (
+              <>
+                <span className="capitalize">
+                  {selectedDatabase?.identifier === projectRef
+                    ? 'Primary database'
+                    : 'Read replica'}
+                </span>{' '}
+                {selectedDatabase?.identifier !== projectRef && (
+                  <span>
+                    ({selectedDatabaseRegion} - {formattedDatabaseId})
+                  </span>
+                )}
+              </>
             )}
           </Button>
         </div>
@@ -78,6 +90,30 @@ const DatabaseSelector = ({
       <PopoverContent_Shadcn_ className="p-0 w-64" side="bottom" align="end">
         <Command_Shadcn_>
           <CommandList_Shadcn_>
+            {additionalOptions.length > 0 && (
+              <CommandGroup_Shadcn_ className="border-b">
+                {additionalOptions.map((option) => (
+                  <CommandItem_Shadcn_
+                    key={option.id}
+                    value={option.id}
+                    className="cursor-pointer w-full"
+                    onSelect={() => {
+                      state.setSelectedDatabaseId(option.id)
+                      setOpen(false)
+                    }}
+                    onClick={() => {
+                      state.setSelectedDatabaseId(option.id)
+                      setOpen(false)
+                    }}
+                  >
+                    <div className="w-full flex items-center justify-between">
+                      <p>{option.name}</p>
+                      {option.id === selectedDatabaseId && <IconCheck />}
+                    </div>
+                  </CommandItem_Shadcn_>
+                ))}
+              </CommandGroup_Shadcn_>
+            )}
             <CommandGroup_Shadcn_>
               <ScrollArea className={(databases || []).length > 7 ? 'h-[210px]' : ''}>
                 {databases?.map((database) => {
