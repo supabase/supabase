@@ -11,6 +11,7 @@ import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
 import { useFlag, useIsFeatureEnabled } from 'hooks'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { NextPageWithLayout } from 'types'
+import { Checkbox_Shadcn_, Label_Shadcn_ } from 'ui'
 
 const ProjectsPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -37,6 +38,17 @@ const ProjectsPage: NextPageWithLayout = () => {
 
   return (
     <>
+      <div className="p-5 flex gap-3">
+        <Checkbox_Shadcn_
+          id="check"
+          defaultChecked={false}
+          onCheckedChange={(e) => console.log('checked:', e)}
+        />
+        <div className="flex flex-col gap-1">
+          <Label_Shadcn_ htmlFor="check">Something in here</Label_Shadcn_>
+          <p className="text-xs text-foreground-light">hello world</p>
+        </div>
+      </div>
       {isError && (
         <div
           className={`py-4 px-5 ${navLayoutV2 ? 'h-full flex items-center justify-center' : ''}`}
