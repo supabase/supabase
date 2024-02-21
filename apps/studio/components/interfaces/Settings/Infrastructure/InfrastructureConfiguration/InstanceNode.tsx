@@ -9,13 +9,14 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
   IconMoreVertical,
 } from 'ui'
 
+import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
 import { NODE_SEP, NODE_WIDTH, Region } from './InstanceConfiguration.constants'
-import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 
 interface NodeData {
   id: string
@@ -29,6 +30,11 @@ interface NodeData {
 interface PrimaryNodeData extends NodeData {
   numReplicas: number
   numRegions: number
+  hasLoadBalancer: boolean
+}
+
+interface LoadBalancerData extends NodeData {
+  numDatabases: number
 }
 
 interface ReplicaNodeData extends NodeData {
@@ -37,11 +43,64 @@ interface ReplicaNodeData extends NodeData {
   onSelectDropReplica: () => void
 }
 
-export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
-  const { provider, region, computeSize, numReplicas, numRegions } = data
+export const LoadBalancerNode = ({ data }: NodeProps<LoadBalancerData>) => {
+  const { ref } = useParams()
+  const { numDatabases } = data
 
   return (
     <>
+      <div className="flex flex-col rounded bg-surface-100 border border-default">
+        <div
+          className="flex items-start justify-between p-3 gap-x-4"
+          style={{ width: NODE_WIDTH / 2 - 10 }}
+        >
+          <div className="flex gap-x-3">
+            <div className="min-w-8 h-8 bg-blue-600 border border-blue-800 rounded-md flex items-center justify-center">
+              <Database size={16} />
+            </div>
+            <div className="flex flex-col gap-y-0.5">
+              <p className="text-sm">API Load Balancer</p>
+              <p className="text-sm text-foreground-light">
+                Distributes incoming API requests across{' '}
+                <span className="text-foreground">{numDatabases} databases</span>
+              </p>
+            </div>
+          </div>
+          <DropdownMenu modal={false}>
+            <DropdownMenuTrigger asChild>
+              <Button type="text" icon={<IconMoreVertical />} className="px-1" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-40" side="bottom" align="end">
+              <DropdownMenuItem asChild className="gap-x-2">
+                <Link href={`/project/${ref}/settings/api?source=loadbalancer`}>View API URL</Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+      <Handle
+        type="source"
+        id="handle-b"
+        position={Position.Bottom}
+        style={{ background: 'transparent' }}
+      />
+    </>
+  )
+}
+
+export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
+  const { provider, region, computeSize, numReplicas, numRegions, hasLoadBalancer } = data
+
+  return (
+    <>
+      {hasLoadBalancer && (
+        <Handle
+          type="target"
+          id="handle-t"
+          position={Position.Top}
+          style={{ background: 'transparent' }}
+        />
+      )}
       <div className="flex flex-col rounded bg-surface-100 border border-default">
         <div
           className="flex items-start justify-between p-3"
@@ -54,12 +113,12 @@ export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
             <div className="flex flex-col gap-y-0.5">
               <p className="text-sm">Primary Database</p>
               <p className="flex items-center gap-x-1">
-                <span className="text-xs text-foreground-light">{region.name}</span>
+                <span className="text-sm text-foreground-light">{region.name}</span>
               </p>
               <p className="flex items-center gap-x-1">
-                <span className="text-xs text-foreground-light">{provider}</span>
-                <span className="text-xs text-foreground-light">•</span>
-                <span className="text-xs text-foreground-light">{computeSize}</span>
+                <span className="text-sm text-foreground-light">{provider}</span>
+                <span className="text-sm text-foreground-light">•</span>
+                <span className="text-sm text-foreground-light">{computeSize}</span>
               </p>
             </div>
           </div>
@@ -119,7 +178,7 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
         style={{ background: 'transparent' }}
       />
       <div
-        className="flex justify-between rounded bg-surface-100 border border-default p-3"
+        className="flex justify-between items-start rounded bg-surface-100 border border-default p-3"
         style={{ width: NODE_WIDTH / 2 - 10 }}
       >
         <div className="flex gap-x-3">
@@ -140,40 +199,38 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
               )}
             </div>
             <div className="my-0.5">
-              <p className="text-xs text-foreground-light">{region.name}</p>
-              <p className="flex text-xs text-foreground-light items-center gap-x-1">
+              <p className="text-sm text-foreground-light">{region.name}</p>
+              <p className="flex text-sm text-foreground-light items-center gap-x-1">
                 <span>{provider}</span>
                 <span>•</span>
                 <span>{computeSize}</span>
               </p>
             </div>
-            <p className="text-xs text-foreground-light">Created: {created}</p>
+            <p className="text-sm text-foreground-light">Created: {created}</p>
           </div>
         </div>
-        <div>
-          <DropdownMenu modal={false}>
-            <DropdownMenuTrigger asChild>
-              <Button type="text" icon={<IconMoreVertical />} className="px-1" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="p-0 w-40" side="bottom" align="end">
-              <DropdownMenuItem className="gap-x-2">
-                <Link href={`/project/${ref}/settings/database?connectionString=${id}`}>
-                  View connection string
-                </Link>
-              </DropdownMenuItem>
-              {/* <DropdownMenuItem className="gap-x-2" onClick={() => onSelectRestartReplica()}>
+        <DropdownMenu modal={false}>
+          <DropdownMenuTrigger asChild>
+            <Button type="text" icon={<IconMoreVertical />} className="px-1" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-40" side="bottom" align="end">
+            <DropdownMenuItem className="gap-x-2">
+              <Link href={`/project/${ref}/settings/database?connectionString=${id}`}>
+                View connection string
+              </Link>
+            </DropdownMenuItem>
+            {/* <DropdownMenuItem className="gap-x-2" onClick={() => onSelectRestartReplica()}>
                 Restart replica
               </DropdownMenuItem> */}
-              {/* <DropdownMenuItem className="gap-x-2" onClick={() => onSelectResizeReplica()}>
+            {/* <DropdownMenuItem className="gap-x-2" onClick={() => onSelectResizeReplica()}>
                 Resize replica
               </DropdownMenuItem> */}
-              <div className="border-t" />
-              <DropdownMenuItem className="gap-x-2" onClick={() => onSelectDropReplica()}>
-                Drop replica
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="gap-x-2" onClick={() => onSelectDropReplica()}>
+              Drop replica
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </>
   )
@@ -187,7 +244,7 @@ export const RegionNode = ({ data }: any) => {
   return (
     <div
       className="relative flex justify-between rounded bg-black/10 border border-default border-white/10 border-2 p-3"
-      style={{ width: regionNodeWidth, height: 150 }}
+      style={{ width: regionNodeWidth, height: 162 }}
     >
       <div className="absolute bottom-2 flex items-center justify-between gap-x-2">
         <img
