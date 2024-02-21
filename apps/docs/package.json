@@ -78,6 +78,7 @@
   "devDependencies": {
     "@aws-sdk/client-secrets-manager": "^3.410.0",
     "@types/hast": "^2.3.4",
+    "@types/jsrsasign": "^10.5.12",
     "@types/node": "^18.11.9",
     "@types/react": "^18.2.24",
     "@types/unist": "^2.0.6",

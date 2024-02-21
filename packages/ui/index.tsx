@@ -38,12 +38,17 @@ export * from './src/components/PromoToast'
 export * from './src/components/Popover'
 export * from './src/layout/PortalToast'
 
+// HTML
+
+export * from './src/components/CustomHTMLElements'
+
 // UTILITIES
 
 export * from './src/components/Space'
 export * from './src/components/Loading'
 export * from './src/components/LogoLoader'
 export * from './src/components/Divider'
+export * from './src/lib/utils'
 
 // DATA ENTRY
 
@@ -68,9 +73,6 @@ export * from './src/layout/banners'
 
 // ai icon
 export * from './src/layout/ai-icon-animation'
-
-// utilities
-export * from './src/lib/utils'
 
 // theme switcher
 export * from './src/components/ThemeProvider/themes'

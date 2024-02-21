@@ -22,7 +22,7 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
     {
       label: 'Database',
       icon: 'database',
-      href: '/guides/database',
+      href: '/guides/database/overview',
       level: 'database',
     },
     {
@@ -680,9 +680,9 @@ export const auth = {
 export const database: NavMenuConstant = {
   icon: 'database',
   title: 'Database',
-  url: '/guides/database',
+  url: '/guides/database/overview',
   items: [
-    { name: 'Overview', url: '/guides/database' },
+    { name: 'Overview', url: '/guides/database/overview' },
     {
       name: 'Fundamentals',
       url: undefined,
@@ -840,7 +840,7 @@ export const database: NavMenuConstant = {
         },
         {
           name: 'pg_net: Async Networking',
-          url: '/guides/database/extensions/pgnet',
+          url: '/guides/database/extensions/pg_net',
         },
         {
           name: 'pg_plan_filter: Restrict Total Cost',

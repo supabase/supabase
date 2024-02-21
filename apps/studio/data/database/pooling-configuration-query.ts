@@ -20,14 +20,8 @@ export async function getPoolingConfiguration(
     params: { path: { ref: projectRef } },
     signal,
   })
-  if (error) throw error
-
-  // [Joshen] For now, ignore read replicas - we'll need to update eventually
-  const primaryConfig = data.find((x) => x.database_type === 'PRIMARY')
-  if (primaryConfig === undefined)
-    throw new Error('Unable to find Supavisor config for primary database')
-
-  return primaryConfig
+  if (error) throw new Error((error as ResponseError).message)
+  return data
 }
 
 export type PoolingConfigurationData = Awaited<ReturnType<typeof getPoolingConfiguration>>

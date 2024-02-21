@@ -42,6 +42,21 @@ export const FRAMEWORKS: ConnectionType[] = [
     ],
   },
   {
+    key: 'remix',
+    label: 'Remix',
+    icon: 'remix',
+    guideLink:
+      'https://supabase.com/docs/guides/auth/server-side/creating-a-client?framework=remix&environment=remix-loader',
+    children: [
+      {
+        key: 'supabasejs',
+        label: 'Supabase-js',
+        children: [],
+        icon: 'supabase',
+      },
+    ],
+  },
+  {
     key: 'react',
     label: 'React',
     icon: 'react',
@@ -103,6 +118,20 @@ export const FRAMEWORKS: ConnectionType[] = [
     label: 'Solid.js',
     icon: 'solidjs',
     guideLink: 'https://supabase.com/docs/guides/getting-started/quickstarts/solidjs',
+    children: [
+      {
+        key: 'supabasejs',
+        label: 'Supabase-js',
+        children: [],
+        icon: 'supabase',
+      },
+    ],
+  },
+  {
+    key: 'astro',
+    label: 'Astro',
+    icon: 'astro',
+    guideLink: 'https://docs.astro.build/en/guides/backend/supabase/',
     children: [
       {
         key: 'supabasejs',

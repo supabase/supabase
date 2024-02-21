@@ -198,9 +198,12 @@ const SQLEditor = () => {
           const editor = editorRef.current
           const monaco = monacoRef.current
 
+          const startLineNumber = hasSelection ? editor?.getSelection()?.startLineNumber ?? 0 : 0
+
           const formattedError = error.formattedError ?? ''
           const lineError = formattedError.slice(formattedError.indexOf('LINE'))
-          const line = Number(lineError.slice(0, lineError.indexOf(':')).split(' ')[1])
+          const line =
+            startLineNumber + Number(lineError.slice(0, lineError.indexOf(':')).split(' ')[1])
 
           if (!isNaN(line)) {
             const decorations = editor?.deltaDecorations(
@@ -568,6 +571,8 @@ const SQLEditor = () => {
         buttonLabel="Run destructive query"
         onSelectCancel={() => {
           setIsConfirmModalOpen(false)
+          // [Joshen] Somehow calling this immediately doesn't work, hence the timeout
+          setTimeout(() => editorRef.current?.focus(), 100)
         }}
         onSelectConfirm={() => {
           setIsConfirmModalOpen(false)
