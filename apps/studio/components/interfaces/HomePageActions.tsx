@@ -1,7 +1,6 @@
+import { IS_PLATFORM } from 'common'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
-
-import { useIsFeatureEnabled } from 'hooks'
-import { EMPTY_ARR } from 'lib/void'
 import {
   Button,
   DropdownMenu,
@@ -9,23 +8,32 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
+  IconSearch,
+  Input,
 } from 'ui'
-import Link from 'next/link'
-import { IS_PLATFORM } from 'common'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 
-const OrganizationDropdown = ({
-  organizations = EMPTY_ARR,
-}: {
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useIsFeatureEnabled } from 'hooks'
+import { EMPTY_ARR } from 'lib/void'
+
+interface HomePageActionsProps {
   organizations: { name: string; slug: string }[]
-}) => {
+  search: string
+  setSearch: (value: string) => void
+}
+
+const HomePageActions = ({
+  organizations = EMPTY_ARR,
+  search,
+  setSearch,
+}: HomePageActionsProps) => {
   const router = useRouter()
 
   const organizationCreationEnabled = useIsFeatureEnabled('organizations:create')
   const { isSuccess: orgsLoaded } = useOrganizationsQuery()
 
   return (
-    <div className="flex gap-4">
+    <div className="flex gap-x-3">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button type="primary">
@@ -48,12 +56,21 @@ const OrganizationDropdown = ({
 
       {IS_PLATFORM && organizationCreationEnabled && orgsLoaded && organizations.length !== 0 && (
         <Button type="default" asChild>
-          <Link href="/new" className="flex items-center gap-2 w-full">
+          <Link href="/new" className="flex items-center gap-2">
             New organization
           </Link>
         </Button>
       )}
+
+      <Input
+        size="tiny"
+        placeholder="Search for a project"
+        icon={<IconSearch size={16} />}
+        className="w-64 [&>div>div>div>input]:!pl-7 [&>div>div>div>div]:!pl-2"
+        value={search}
+        onChange={(event) => setSearch(event.target.value)}
+      />
     </div>
   )
 }
-export default OrganizationDropdown
+export default HomePageActions

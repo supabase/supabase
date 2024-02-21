@@ -148,12 +148,28 @@ The source code of a function is subject to size limits:
 
 ### Analyze dependencies
 
+When analyzing dependencies for your Supabase Edge Functions, it's essential to review both Deno and NPM dependencies to ensure optimal performance and resource utilization.
+By selectively importing only the required submodules, you can effectively reduce the size of your function's dependencies and optimize its performance.
+Before finalizing your imports, ensure to review both Deno and NPM dependencies, checking for any unnecessary or redundant dependencies that can be removed. Additionally, check for outdated dependencies and update to the latest versions if possible.
+
+#### Deno Dependencies
+
 Run `deno info`, providing the path to your input map if you use one.
 Review the dependencies listed in the output. Pay attention to any significantly large dependencies, as they can contribute to increased bundle size and potential boot time issues.
 Examine if there are any unnecessary or redundant dependencies that can be removed. Check for outdated dependencies and update to the latest versions if possible.
 
 ```bash
 deno info --import-map=/path/to/import_map.json /path/to/function/index.ts
+```
+
+#### NPM Dependencies
+
+Additionally, if you utilize NPM modules in your Edge Functions, it's crucial to be mindful of their size and impact on the overall bundle size. While importing NPM modules, consider using the notation `import { submodule } from 'npm:package/submodule'` to selectively import specific submodules rather than importing the entire package. This approach can help minimize unnecessary overhead and streamline the execution of your function.
+
+For example, if you only need the `Sheets` submodule from the `googleapis` package, you can import it like this:
+
+```typescript
+import { Sheets } from 'npm:@googleapis/sheets'
 ```
 
 ## Limitations
