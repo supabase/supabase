@@ -638,6 +638,11 @@ export const load: PageServerLoad = async ({ locals: { getSessionAndUser  }})  =
     if (!session) {
         redirect(303, '/');
     }
+
+   return {
+      session,  
+      user
+   }
 }
 ```
 
