@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { PropsWithChildren, memo, useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { AiIconAnimation, Badge, markdownComponents } from 'ui'
+import { AiIconAnimation, Badge, cn, markdownComponents } from 'ui'
 
 import { useProfile } from 'lib/profile'
 import { AIPolicyPre } from './AIPolicyPre'
@@ -31,12 +31,21 @@ const Message = memo(function Message({
 
   const icon = useMemo(() => {
     return role === 'assistant' ? (
-      <AiIconAnimation
-        loading={content === 'Thinking...'}
-        className="[&>div>div]:border-black dark:[&>div>div]:border-white"
-      />
+      <div
+        className={cn(
+          'bg-foreground border border-foreground-light rounded-full',
+          'w-8 h-8',
+          'flex items-center justify-center'
+        )}
+      >
+        <AiIconAnimation
+          loading={content === 'Thinking...'}
+          className={cn('scale-75', '[&>div>div]:border-background')}
+        />
+      </div>
     ) : (
       <div className="relative border shadow-lg w-8 h-8 rounded-full overflow-hidden">
+        {/* // TODO: this only works for GitHub profiles */}
         <Image
           src={`https://github.com/${profile?.username}.png` || ''}
           width={30}
@@ -54,7 +63,9 @@ const Message = memo(function Message({
     <div className="flex flex-col py-4 gap-4 px-5 text-foreground-light text-sm">
       <div className="flex flex-row gap-3 items-center">
         {icon}
-        <span className="text-sm">{role === 'assistant' ? 'Assistant' : name ? name : 'You'}</span>
+        <span className="text-foreground">
+          {role === 'assistant' ? 'Assistant' : name ? name : 'You'}
+        </span>
         {createdAt && (
           <span className="text-xs text-foreground-muted">{dayjs(createdAt).fromNow()}</span>
         )}
