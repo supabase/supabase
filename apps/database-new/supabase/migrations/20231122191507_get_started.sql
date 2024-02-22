@@ -21,20 +21,20 @@ create table if not exists public.messages (
 	constraint messages_thread_id_fkey foreign key (thread_id) references threads (id) on update cascade on delete cascade,
 	constraint messages_user_id_fkey foreign key (user_id) references auth.users (id) on update cascade on delete cascade
 );
+create or replace view profile_threads as
+select distinct on (m.thread_id)
+    m.thread_id,
+    m.message_id,
+    m.user_id,
+    m.created_at,
+    t.thread_title,
+    t.is_public,
+    u.raw_user_meta_data->>'avatar_url' as user_avatar_url
+from
+    public.messages m
+join public.threads t on m.thread_id = t.id
+join auth.users u on t.user_id = u.id
+order by
+    m.thread_id,
+    m.created_at asc;
 
-CREATE
-OR REPLACE VIEW profile_threads AS
-SELECT
-	DISTINCT ON (m.thread_id) m.thread_id,
-	m.message_id,
-	m.user_id,
-	m.created_at,
-	t.thread_title,
-    t.is_public
-
-FROM
-	public.messages m
-	JOIN public.threads t ON m.thread_id = t.id
-ORDER BY
-	m.thread_id,
-	m.created_at ASC;

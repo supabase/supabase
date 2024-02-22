@@ -49,6 +49,20 @@ export interface Database {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "threads_with_avatars"
+            referencedColumns: ["thread_id"]
+          },
+          {
+            foreignKeyName: "messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "threads_with_emails"
+            referencedColumns: ["thread_id"]
+          },
+          {
             foreignKeyName: "messages_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
@@ -98,6 +112,7 @@ export interface Database {
           message_id: string | null
           thread_id: string | null
           thread_title: string | null
+          user_avatar_url: string | null
           user_id: string | null
         }
         Relationships: [
@@ -109,7 +124,59 @@ export interface Database {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "threads_with_avatars"
+            referencedColumns: ["thread_id"]
+          },
+          {
+            foreignKeyName: "messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "threads_with_emails"
+            referencedColumns: ["thread_id"]
+          },
+          {
             foreignKeyName: "messages_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      threads_with_avatars: {
+        Row: {
+          created_at: string | null
+          is_public: boolean | null
+          thread_id: string | null
+          thread_title: string | null
+          user_avatar_url: string | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "threads_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      threads_with_emails: {
+        Row: {
+          created_at: string | null
+          is_public: boolean | null
+          thread_id: string | null
+          thread_title: string | null
+          user_email: string | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "threads_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"

@@ -3,7 +3,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { Message } from 'ai'
 import { revalidatePath } from 'next/cache'
-import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
 import { z } from 'zod'
@@ -233,8 +232,7 @@ export async function updateThreadName(prevState: any, formData: FormData) {
   }
 }
 export async function updateThreadVisibility(prevState: any, formData: FormData) {
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore)
+  const supabase = createClient()
 
   try {
     const schema = z.object({

@@ -1,5 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'avatars.githubusercontent.com',
+        port: '',
+      },
+    ],
+  },
   transpilePackages: ['ui', 'ui-patterns'],
   webpack: (config, { dev, isServer, webpack, nextRuntime }) => {
     config.module.rules.push({

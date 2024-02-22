@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
 import { Database } from '@/types/supabase'
-import { cookies } from 'next/headers'
 import EmptyState from './EmptyState'
 import Thread from './Thread'
 

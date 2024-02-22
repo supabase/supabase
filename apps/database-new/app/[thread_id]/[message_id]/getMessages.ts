@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { cookies } from 'next/headers'
+
 import { cache } from 'react'
 
 export const getMessages = cache(async (thread_id: string) => {
