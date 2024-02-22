@@ -1603,7 +1603,7 @@ export const platform: NavMenuConstant = {
       items: [
         { name: 'Logging', url: '/guides/platform/logs' },
         { name: 'Metrics', url: '/guides/platform/metrics' },
-        { name: 'Sentry integration', url: '/guides/platform/sentry-integration' },
+        { name: 'Monitoring with Sentry', url: '/guides/platform/sentry-monitoring' },
       ],
     },
     {
