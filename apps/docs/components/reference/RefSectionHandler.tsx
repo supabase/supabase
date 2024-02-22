@@ -2,6 +2,7 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
+import { type MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import RefEducationSection from '~/components/reference/RefEducationSection'
 import RefFunctionSection from '~/components/reference/RefFunctionSection'
 
@@ -19,7 +20,7 @@ interface RefSectionHandlerProps {
   pageProps: { docs: IRefStaticDoc[] }
   type: 'client-lib' | 'cli' | 'api'
   isOldVersion?: boolean
-  menuId: string
+  menuId: MenuId
 }
 
 const RefSectionHandler = (props: RefSectionHandlerProps) => {

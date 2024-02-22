@@ -1,7 +1,7 @@
 import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
-import NavigationMenu from '~/components/Navigation/NavigationMenu/NavigationMenu'
+import NavigationMenu, { type MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
 
 import { PropsWithChildren, memo, useEffect } from 'react'
@@ -278,7 +278,7 @@ const Container = memo(function Container(props: PropsWithChildren) {
   )
 })
 
-const NavContainer = memo(function NavContainer({ menuId }: { menuId: string }) {
+const NavContainer = memo(function NavContainer({ menuId }: { menuId: MenuId }) {
   const mobileMenuOpen = useMenuMobileOpen()
 
   return (
@@ -344,7 +344,7 @@ const NavContainer = memo(function NavContainer({ menuId }: { menuId: string }) 
   )
 })
 
-function MainSkeleton({ children, menuId }: PropsWithChildren<{ menuId: string }>) {
+function MainSkeleton({ children, menuId }: PropsWithChildren<{ menuId: MenuId }>) {
   return (
     <div className="flex flex-row h-full">
       <NavContainer menuId={menuId} />

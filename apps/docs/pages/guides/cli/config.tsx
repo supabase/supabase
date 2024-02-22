@@ -6,6 +6,7 @@ import { Heading } from '~/components/CustomHTMLElements'
 import Head from 'next/head'
 import { CodeBlock } from 'ui'
 import { MainSkeleton } from '~/layouts/MainSkeleton'
+import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 
 // Parameters are grouped on the page by tag
 const tocList = []
@@ -30,7 +31,7 @@ export default function Config() {
       <Head>
         <title>Supabase CLI config</title>
       </Head>
-      <MainSkeleton menuId="supabase_cli">
+      <MainSkeleton menuId={MenuId.Cli}>
         <div className="grid grid-cols-12 relative gap-4 px-5 max-w-7xl mx-auto py-16">
           <div className="relative col-span-12 md:col-span-9 transition-all ease-out duration-100">
             <div className="w-full prose">

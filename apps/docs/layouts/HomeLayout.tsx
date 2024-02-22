@@ -4,8 +4,9 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { FC } from 'react'
 import components from '~/components'
+import HomePageCover from '~/components/HomePageCover'
+import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import TableOfContents from '~/components/TableOfContents'
-import HomePageCover from '../components/HomePageCover'
 import { LayoutMainContent } from './DefaultLayout'
 import { MainSkeleton } from './MainSkeleton'
 
@@ -62,7 +63,7 @@ const HomeLayout: FC<Props> = (props: Props) => {
           },
         }}
       />
-      <MainSkeleton menuId="home">
+      <MainSkeleton menuId={MenuId.Home}>
         <article>
           <HomePageCover meta={props.meta} />
           <LayoutMainContent>

@@ -10,6 +10,7 @@ import components from '~/components'
 import { highlightSelectedTocItem } from '~/components/CustomHTMLElements/CustomHTMLElements.utils'
 import { FooterHelpCalloutType } from '~/components/FooterHelpCallout'
 import GuidesTableOfContents from '~/components/GuidesTableOfContents'
+import { type MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import useHash from '~/hooks/useHash'
 import { LayoutMainContent } from '../DefaultLayout'
 import { MainSkeleton } from '../MainSkeleton'
@@ -31,7 +32,7 @@ interface Props {
   toc?: any
   currentPage?: string
   hideToc?: boolean
-  menuId: string
+  menuId: MenuId
 }
 
 const Layout: FC<Props> = (props) => {
