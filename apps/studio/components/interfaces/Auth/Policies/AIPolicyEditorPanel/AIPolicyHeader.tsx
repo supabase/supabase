@@ -1,8 +1,8 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
 import styles from '@ui/layout/ai-icon-animation/ai-icon-animation-style.module.css'
 import clsx from 'clsx'
-import { LucidePlaneLanding, X } from 'lucide-react'
-import { AiIcon, Button, SheetClose_Shadcn_, SheetHeader_Shadcn_, SheetTitle_Shadcn_, cn } from 'ui'
+import { X } from 'lucide-react'
+import { Button, SheetClose_Shadcn_, SheetHeader_Shadcn_, SheetTitle_Shadcn_, cn } from 'ui'
 
 export const AIPolicyHeader = ({
   selectedPolicy,
@@ -49,7 +49,6 @@ export const AIPolicyHeader = ({
         )}
         rounded
         icon={
-          // <AiIcon className="scale-75 [&>div>div]:border-foreground-light [&>div>div]:group-hover:border-foreground -mr-0.5" />
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width=""
