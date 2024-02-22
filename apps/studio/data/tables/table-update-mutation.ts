@@ -2,7 +2,7 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'react-hot-toast'
 
 import { components } from 'data/api'
-import { patch } from 'data/fetchers'
+import { handleError, patch } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { tableKeys } from './keys'
 
@@ -35,7 +35,7 @@ export async function updateTable({
     headers,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

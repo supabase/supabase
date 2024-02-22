@@ -1,8 +1,9 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
+
+import { components } from 'data/api'
+import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { databaseKeys } from './keys'
-import { components } from 'data/api'
 
 export type PoolingConfigurationVariables = {
   projectRef?: string
@@ -20,14 +21,8 @@ export async function getPoolingConfiguration(
     params: { path: { ref: projectRef } },
     signal,
   })
-  if (error) throw error
-
-  // [Joshen] For now, ignore read replicas - we'll need to update eventually
-  const primaryConfig = data.find((x) => x.database_type === 'PRIMARY')
-  if (primaryConfig === undefined)
-    throw new Error('Unable to find Supavisor config for primary database')
-
-  return primaryConfig
+  if (error) handleError(error)
+  return data
 }
 
 export type PoolingConfigurationData = Awaited<ReturnType<typeof getPoolingConfiguration>>

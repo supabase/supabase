@@ -13,7 +13,7 @@ const ConnectionIcon = ({ connection }: ConnectionIconProps) => {
     <Image
       className="transition-all group-hover:scale-110"
       src={`${BASE_PATH}/img/libraries/${connection.toLowerCase()}${
-        ['expo', 'nextjs', 'prisma', 'drizzle'].includes(connection.toLowerCase())
+        ['expo', 'nextjs', 'prisma', 'drizzle', 'astro'].includes(connection.toLowerCase())
           ? resolvedTheme?.includes('dark')
             ? '-dark'
             : ''

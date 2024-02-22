@@ -1,6 +1,7 @@
-import { useTheme } from 'next-themes'
 import Panel from 'components/ui/Panel'
 import { BASE_PATH } from 'lib/constants'
+import { useTheme } from 'next-themes'
+import { useEffect, useState } from 'react'
 import SVG from 'react-inlinesvg'
 import {
   Label_Shadcn_,
@@ -11,7 +12,21 @@ import {
 } from 'ui'
 
 const ThemeSettings = () => {
+  const [mounted, setMounted] = useState(false)
   const { theme, setTheme } = useTheme()
+
+  /**
+   * Avoid Hydration Mismatch
+   * https://github.com/pacocoursey/next-themes?tab=readme-ov-file#avoid-hydration-mismatch
+   */
+  // useEffect only runs on the client, so now we can safely show the UI
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return null
+  }
 
   function SingleThemeSelection() {
     return (
