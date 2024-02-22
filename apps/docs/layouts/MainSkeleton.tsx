@@ -6,7 +6,7 @@ import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
 
 import { PropsWithChildren, memo, useEffect } from 'react'
 import Footer from '~/components/Navigation/Footer'
-import { menuState, useMenuLevelId, useMenuMobileOpen } from '~/hooks/useMenuState'
+import { menuState, useMenuMobileOpen } from '~/hooks/useMenuState'
 
 const levelsData = {
   home: {
@@ -143,9 +143,9 @@ const levelsData = {
   },
 }
 
-const MobileHeader = memo(function MobileHeader() {
+const MobileHeader = memo(function MobileHeader({ menuId }: { menuId: MenuId }) {
   const mobileMenuOpen = useMenuMobileOpen()
-  const menuLevel = useMenuLevelId()
+  const menuLevel = menuId
 
   return (
     <div
@@ -360,7 +360,7 @@ function MainSkeleton({ children, menuId }: PropsWithChildren<{ menuId: MenuId }
           ].join(' ')}
         >
           <div className={['lg:hidden', 'px-5 ', 'border-b z-10'].join(' ')}>
-            <MobileHeader />
+            <MobileHeader menuId={menuId} />
           </div>
         </div>
         <div className="grow">
