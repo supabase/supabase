@@ -1,5 +1,10 @@
 name: reviewdog
-on: [pull_request]
+on:
+  pull_request:
+    paths:
+      - '.vale.ini'
+      - 'vale/**'
+      - 'apps/docs/content/**'
 
 jobs:
   vale:
