@@ -11,6 +11,7 @@ import toast from 'react-hot-toast'
 import {
   Button,
   Modal,
+  ScrollArea,
   SheetContent_Shadcn_,
   SheetFooter_Shadcn_,
   Sheet_Shadcn_,
@@ -289,6 +290,7 @@ export const AIPolicyEditorPanel = memo(function ({
         <SheetContent_Shadcn_
           size={assistantVisible ? 'lg' : 'default'}
           className={cn(
+            'bg-surface-200',
             'p-0 flex flex-row gap-0',
             assistantVisible ? '!min-w-[1200px]' : '!min-w-[600px]'
           )}
@@ -308,7 +310,7 @@ export const AIPolicyEditorPanel = memo(function ({
 
             <div className="flex flex-col h-full w-full justify-between">
               {incomingChange ? (
-                <div className="px-5 py-3 flex justify-between gap-3 bg-muted">
+                <div className="px-5 py-3 flex justify-between gap-3 bg-surface-75">
                   <div className="flex gap-2 items-center text-foreground-light">
                     <FileDiff className="h-4 w-4" />
                     <span className="text-sm">Accept changes from assistant</span>
@@ -415,20 +417,34 @@ export const AIPolicyEditorPanel = memo(function ({
             </div>
           </div>
           {assistantVisible && (
-            <div className={cn('border-l', assistantVisible && 'w-[50%]')}>
+            <div
+              className={cn(
+                'border-l shadow-[rgba(0,0,0,0.13)_-4px_0px_6px_0px] z-10',
+                assistantVisible && 'w-[50%]',
+                'bg-studio'
+              )}
+            >
               <Tabs_Shadcn_ defaultValue="templates" className="flex flex-col h-full w-full">
-                <TabsList_Shadcn_ className="flex gap-4 px-4 pt-2">
+                <TabsList_Shadcn_ className="flex gap-4 px-content pt-2">
                   <TabsTrigger_Shadcn_ key="templates" value="templates" className="px-0">
                     RLS Templates
                   </TabsTrigger_Shadcn_>
                   {!hasHipaaAddon && (
                     <TabsTrigger_Shadcn_ key="conversation" value="conversation" className="px-0">
-                      AI Suggestions
+                      Assistant
                     </TabsTrigger_Shadcn_>
                   )}
                 </TabsList_Shadcn_>
-                <TabsContent_Shadcn_ value="templates" className="!mt-0 overflow-y-auto relative">
-                  <PolicyTemplates onSelectTemplate={updateEditorWithCheckForDiff} />
+                <TabsContent_Shadcn_
+                  value="templates"
+                  className={cn(
+                    '!mt-0 overflow-y-auto',
+                    'data-[state=active]:flex data-[state=active]:grow'
+                  )}
+                >
+                  <ScrollArea className="h-full w-full">
+                    <PolicyTemplates onSelectTemplate={updateEditorWithCheckForDiff} />
+                  </ScrollArea>
                 </TabsContent_Shadcn_>
                 <TabsContent_Shadcn_
                   value="conversation"
