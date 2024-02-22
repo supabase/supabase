@@ -1201,6 +1201,10 @@ export const functions: NavMenuConstant = {
           name: 'Hugging Face',
           url: '/guides/ai/examples/huggingface-image-captioning',
         },
+        {
+          name: 'Monitoring with Sentry',
+          url: '/guides/functions/examples/sentry-monitoring',
+        },
         { name: 'OpenAI API', url: '/guides/ai/examples/openai' },
         {
           name: 'Sending Emails with Resend',
