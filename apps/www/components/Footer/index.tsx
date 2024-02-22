@@ -86,10 +86,10 @@ const Footer = (props: Props) => {
             </Link>
             <div className="flex space-x-5">
               <a
-                href="https://twitter.com/supabase"
+                href="https://x.com/supabase"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
-                <span className="sr-only">Twitter</span>
+                <span className="sr-only">X</span>
                 <IconTwitterX size={22} />
               </a>
 

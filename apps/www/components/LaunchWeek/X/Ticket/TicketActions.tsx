@@ -20,7 +20,7 @@ export default function TicketActions() {
   const permalink = encodeURIComponent(link)
   const text = hasSecretTicket ? TWEET_TEXT_SECRET : golden ? TWEET_TEXT_GOLDEN : TWEET_TEXT
   const encodedText = encodeURIComponent(text)
-  const tweetUrl = `https://twitter.com/intent/tweet?url=${permalink}&text=${encodedText}`
+  const tweetUrl = `https://x.com/intent/tweet?url=${permalink}&text=${encodedText}`
   const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${permalink}`
   const downloadUrl = `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lwx-og?username=${encodeURIComponent(
     username ?? ''
