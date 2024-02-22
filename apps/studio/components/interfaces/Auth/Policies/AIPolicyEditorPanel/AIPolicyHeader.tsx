@@ -2,7 +2,16 @@ import { PostgresPolicy } from '@supabase/postgres-meta'
 import styles from '@ui/layout/ai-icon-animation/ai-icon-animation-style.module.css'
 import clsx from 'clsx'
 import { PanelLeftClose, PanelRightClose, X } from 'lucide-react'
-import { Button, SheetClose_Shadcn_, SheetHeader_Shadcn_, SheetTitle_Shadcn_, cn } from 'ui'
+import {
+  Button,
+  SheetClose_Shadcn_,
+  SheetHeader_Shadcn_,
+  SheetTitle_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+  cn,
+} from 'ui'
 
 export const AIPolicyHeader = ({
   selectedPolicy,
@@ -39,22 +48,29 @@ export const AIPolicyHeader = ({
             : 'Create a new Row Level Security policy'}
         </SheetTitle_Shadcn_>
       </div>
-      <button
-        aria-expanded={assistantVisible}
-        aria-controls="ai-chat-assistant"
-        className={cn(
-          !assistantVisible ? 'text-foreground-lighter' : 'text-light',
-          'hover:text-foreground',
-          'transition'
-        )}
-        onClick={() => setAssistantVisible(!assistantVisible)}
-      >
-        {!assistantVisible ? (
-          <PanelLeftClose size={19} strokeWidth={1} />
-        ) : (
-          <PanelRightClose size={19} strokeWidth={1} />
-        )}
-      </button>
+      <Tooltip_Shadcn_>
+        <TooltipTrigger_Shadcn_ asChild>
+          <button
+            aria-expanded={assistantVisible}
+            aria-controls="ai-chat-assistant"
+            className={cn(
+              !assistantVisible ? 'text-foreground-lighter' : 'text-light',
+              'hover:text-foreground',
+              'transition'
+            )}
+            onClick={() => setAssistantVisible(!assistantVisible)}
+          >
+            {!assistantVisible ? (
+              <PanelLeftClose size={19} strokeWidth={1} />
+            ) : (
+              <PanelRightClose size={19} strokeWidth={1} />
+            )}
+          </button>
+        </TooltipTrigger_Shadcn_>
+        <TooltipContent_Shadcn_ side="left">
+          {assistantVisible ? 'Hide' : 'Show'} AI chat assistant
+        </TooltipContent_Shadcn_>
+      </Tooltip_Shadcn_>
       {/* <Button
         aria-expanded={assistantVisible}
         aria-controls="ai-chat-assistant"
