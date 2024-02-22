@@ -1,0 +1,12 @@
+name: reviewdog
+on: [pull_request]
+
+jobs:
+  vale:
+    name: runner / vale
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: errata-ai/vale-action@reviewdog
+        with:
+          files: apps/docs/content
