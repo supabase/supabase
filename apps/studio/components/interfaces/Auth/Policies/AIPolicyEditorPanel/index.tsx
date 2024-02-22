@@ -47,6 +47,8 @@ import PolicyDetails from './PolicyDetails'
 import QueryError from './QueryError'
 import RLSCodeEditor from './RLSCodeEditor'
 import { PolicyTemplates } from './PolicyTemplates'
+import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 const DiffEditor = dynamic(
   () => import('@monaco-editor/react').then(({ DiffEditor }) => DiffEditor),
@@ -93,6 +95,10 @@ export const AIPolicyEditorPanel = memo(function ({
   const [incomingChange, setIncomingChange] = useState<string | undefined>(undefined)
   // used for confirmation when closing the panel with unsaved changes
   const [isClosingPolicyEditorPanel, setIsClosingPolicyEditorPanel] = useState(false)
+
+  // Customers on HIPAA plans should not have access to Supabase AI
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
+  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
   const { data: entities } = useEntityDefinitionsQuery(
     {
@@ -415,9 +421,11 @@ export const AIPolicyEditorPanel = memo(function ({
                   <TabsTrigger_Shadcn_ key="templates" value="templates" className="px-0">
                     RLS Templates
                   </TabsTrigger_Shadcn_>
-                  <TabsTrigger_Shadcn_ key="conversation" value="conversation" className="px-0">
-                    AI Suggestions
-                  </TabsTrigger_Shadcn_>
+                  {!hasHipaaAddon && (
+                    <TabsTrigger_Shadcn_ key="conversation" value="conversation" className="px-0">
+                      AI Suggestions
+                    </TabsTrigger_Shadcn_>
+                  )}
                 </TabsList_Shadcn_>
                 <TabsContent_Shadcn_ value="templates" className="!mt-0 overflow-y-auto relative">
                   <PolicyTemplates onSelectTemplate={updateEditorWithCheckForDiff} />
