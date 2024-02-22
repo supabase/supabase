@@ -78,7 +78,7 @@ export const AIPolicyChat = ({
 
   return (
     <div id={'ai-chat-assistant'} className="flex flex-col h-full max-w-full">
-      <div className="overflow-auto flex-1 divide-y divide-border-overlay">
+      <div className="overflow-auto flex-1 divide-y divide-border">
         <Message
           key="zero"
           role="assistant"
