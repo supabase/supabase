@@ -1,9 +1,9 @@
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 import ProjectList from 'components/interfaces/Home/ProjectList'
 import { AccountLayout } from 'components/layouts'
-import OrganizationDropdown from 'components/to-be-cleaned/Dropdown/OrganizationDropdown'
+import HomePageActions from 'components/interfaces/HomePageActions'
 import AlertError from 'components/ui/AlertError'
 import Connecting from 'components/ui/Loading/Loading'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
@@ -14,6 +14,7 @@ import { NextPageWithLayout } from 'types'
 
 const ProjectsPage: NextPageWithLayout = () => {
   const router = useRouter()
+  const [search, setSearch] = useState('')
   const { data: organizations, isError, isSuccess } = useOrganizationsQuery()
   useAutoProjectsPrefetch()
 
@@ -51,18 +52,12 @@ const ProjectsPage: NextPageWithLayout = () => {
         </div>
       )}
       {!navLayoutV2 && (
-        <div className="py-4 px-5">
+        <div className="p-5">
           {IS_PLATFORM && projectCreationEnabled && isSuccess && organizations.length !== 0 && (
-            <div className="my-2">
-              <div className="flex">
-                <div>
-                  <OrganizationDropdown organizations={organizations} />
-                </div>
-              </div>
-            </div>
+            <HomePageActions search={search} setSearch={setSearch} organizations={organizations} />
           )}
-          <div className="my-8 space-y-8">
-            <ProjectList />
+          <div className="my-6 space-y-8">
+            <ProjectList search={search} />
           </div>
         </div>
       )}

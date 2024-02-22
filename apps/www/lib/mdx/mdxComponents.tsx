@@ -43,8 +43,13 @@ const getCaptionAlign = (align?: 'left' | 'center' | 'right') => {
 }
 
 const LinkComponent = (props: PropsWithChildren<HTMLAnchorElement>) => (
-  <a href={props.href} target={props.target} className="inline-flex">
-    {props.children} {props.target === '_blank' && <IconArrowUpRight className="w-3" />}
+  <a
+    href={props.href}
+    target={props.target}
+    className={cn('inline relative [&_p]:inline', props.target === '_blank' && 'mr-4')}
+  >
+    {props.children}{' '}
+    {props.target === '_blank' && <IconArrowUpRight className="absolute -right-3.5 w-3 top-0" />}
   </a>
 )
 
@@ -132,7 +137,6 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
       </figure>
     ),
     Link: LinkComponent,
-    a: LinkComponent,
     code: (props: any) => <InlineCodeTag>{props.children}</InlineCodeTag>,
     BlogCollapsible: (props: any) => <BlogCollapsible {...props} />,
     Admonition,
