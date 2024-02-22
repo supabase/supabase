@@ -1,7 +1,7 @@
 import { PostgresView } from '@supabase/postgres-meta'
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { get } from 'data/fetchers'
+import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { viewKeys } from './keys'
 
@@ -35,7 +35,7 @@ export async function getView(
     signal,
   })
 
-  if (error) throw new Error((error as ResponseError).message)
+  if (error) handleError(error)
   return data as unknown as PostgresView
 }
 

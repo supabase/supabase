@@ -3,6 +3,7 @@ import { getAccessToken } from 'lib/gotrue'
 import { uuidv4 } from 'lib/helpers'
 import createClient from 'openapi-fetch'
 import { paths } from './api' // generated from openapi-typescript
+import { ResponseError } from 'types'
 
 const DEFAULT_HEADERS = {
   'Content-Type': 'application/json',
@@ -147,4 +148,8 @@ export const options: typeof _options = async (url, init) => {
     ...init,
     headers,
   })
+}
+
+export const handleError = (error: ResponseError) => {
+  throw new Error(error.message)
 }
