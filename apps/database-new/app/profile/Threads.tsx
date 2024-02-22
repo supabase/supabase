@@ -7,8 +7,7 @@ import Thread from './Thread'
 export type ThreadType = Database['public']['Views']['profile_threads']['Row']
 
 async function Threads() {
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore)
+  const supabase = createClient()
 
   const {
     data: { user },
