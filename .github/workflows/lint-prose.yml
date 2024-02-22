@@ -10,6 +10,7 @@ jobs:
         with:
           sparse-checkout: |
             .vale.ini
+            vale
             apps/docs/content
       - uses: errata-ai/vale-action@reviewdog
         with:
