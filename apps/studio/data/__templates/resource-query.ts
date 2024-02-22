@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
 import { useCallback } from 'react'
 
-import { get } from 'data/fetchers'
+import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { resourceKeys } from './keys'
 
@@ -22,8 +22,7 @@ export async function getResource({ projectRef, id }: ResourceVariables, signal?
     params: { path: { ref: projectRef, id } },
     signal,
   })
-  if (error) throw new Error((error as ResponseError).message)
-
+  if (error) handleError(error)
   return data
 }
 

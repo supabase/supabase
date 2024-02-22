@@ -8,8 +8,7 @@ export type ThreadViewType = Database['public']['Views']['profile_threads']['Row
 export type ThreadType = Database['public']['Tables']['threads']['Row']
 
 async function Threads() {
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore)
+  const supabase = createClient()
 
   const {
     data: { user },

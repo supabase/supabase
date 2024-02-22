@@ -14,8 +14,9 @@ import { AWS_REGIONS_KEYS } from 'lib/constants'
 import DeployNewReplicaPanel from './DeployNewReplicaPanel'
 import DropReplicaConfirmationModal from './DropReplicaConfirmationModal'
 import { addRegionNodes, generateNodes, getDagreGraphLayout } from './InstanceConfiguration.utils'
-import { PrimaryNode, RegionNode, ReplicaNode } from './InstanceNode'
+import { LoadBalancerNode, PrimaryNode, RegionNode, ReplicaNode } from './InstanceNode'
 import MapView from './MapView'
+import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 
 // [Joshen] Just FYI, UI assumes single provider for primary + replicas
 // [Joshen] Idea to visualize grouping based on region: https://reactflow.dev/examples/layout/sub-flows
@@ -35,7 +36,17 @@ const InstanceConfigurationUI = () => {
   const [selectedReplicaToDrop, setSelectedReplicaToDrop] = useState<Database>()
   const [selectedReplicaToRestart, setSelectedReplicaToRestart] = useState<Database>()
 
-  const { data, error, refetch, isLoading, isError, isSuccess } = useReadReplicasQuery({
+  const { data: loadBalancers, isSuccess: isSuccessLoadBalancers } = useLoadBalancersQuery({
+    projectRef,
+  })
+  const {
+    data,
+    error,
+    refetch,
+    isLoading,
+    isError,
+    isSuccess: isSuccessReplicas,
+  } = useReadReplicasQuery({
     projectRef,
   })
   const [[primary], replicas] = useMemo(
@@ -71,28 +82,46 @@ const InstanceConfigurationUI = () => {
 
   const nodes = useMemo(
     () =>
-      isSuccess
-        ? generateNodes(primary, replicas, {
+      isSuccessReplicas && isSuccessLoadBalancers
+        ? generateNodes(primary, replicas, loadBalancers ?? [], {
             onSelectRestartReplica: setSelectedReplicaToRestart,
             onSelectResizeReplica: setSelectedReplicaToResize,
             onSelectDropReplica: setSelectedReplicaToDrop,
           })
         : [],
-    [isSuccess, primary, replicas]
+    [isSuccessReplicas, isSuccessLoadBalancers]
   )
 
-  const edges: Edge[] = replicas.map((database) => {
-    return {
-      id: `${primary.identifier}-${database.identifier}`,
-      source: primary.identifier,
-      target: database.identifier,
-      type: 'smoothstep',
-      animated: true,
-    }
-  })
+  const edges: Edge[] = [
+    ...((loadBalancers ?? []).length > 0
+      ? [
+          {
+            id: `load-balancer-${primary.identifier}`,
+            source: 'load-balancer',
+            target: primary.identifier,
+            type: 'smoothstep',
+            animated: true,
+          },
+        ]
+      : []),
+    ...replicas.map((database) => {
+      return {
+        id: `${primary.identifier}-${database.identifier}`,
+        source: primary.identifier,
+        target: database.identifier,
+        type: 'smoothstep',
+        animated: true,
+      }
+    }),
+  ]
 
   const nodeTypes = useMemo(
-    () => ({ PRIMARY: PrimaryNode, READ_REPLICA: ReplicaNode, REGION: RegionNode }),
+    () => ({
+      PRIMARY: PrimaryNode,
+      READ_REPLICA: ReplicaNode,
+      REGION: RegionNode,
+      LOAD_BALANCER: LoadBalancerNode,
+    }),
     []
   )
 
@@ -107,24 +136,24 @@ const InstanceConfigurationUI = () => {
   // [Joshen] Just FYI this block is oddly triggering whenever we refocus on the viewport
   // even if I change the dependency array to just data. Not blocker, just an area to optimize
   useEffect(() => {
-    if (replicas.length > 0) {
+    if (isSuccessReplicas && isSuccessLoadBalancers && replicas.length > 0) {
       const graph = getDagreGraphLayout(nodes, edges)
       const { nodes: updatedNodes } = addRegionNodes(graph.nodes, graph.edges)
       reactFlow.setNodes(updatedNodes)
       reactFlow.setEdges(graph.edges)
     }
-  }, [replicas])
+  }, [isSuccessReplicas, isSuccessLoadBalancers])
 
   return (
     <>
       <div
         className={`h-[500px] w-full relative ${
-          isSuccess ? '' : 'flex items-center justify-center px-28'
+          isSuccessReplicas ? '' : 'flex items-center justify-center px-28'
         }`}
       >
         {isLoading && <Loader2 className="animate-spin text-foreground-light" />}
         {isError && <AlertError error={error} subject="Failed to retrieve replicas" />}
-        {isSuccess && (
+        {isSuccessReplicas && (
           <>
             <div className="z-10 absolute top-4 right-4 flex items-center justify-center gap-x-2">
               <Button type="default" onClick={() => setShowNewReplicaPanel(true)}>
@@ -152,7 +181,7 @@ const InstanceConfigurationUI = () => {
             {view === 'flow' ? (
               <ReactFlow
                 fitView
-                fitViewOptions={{ minZoom: 0.9, maxZoom: 1 }}
+                fitViewOptions={{ minZoom: 0.9, maxZoom: 0.9 }}
                 className="instance-configuration"
                 zoomOnPinch={false}
                 zoomOnScroll={false}
