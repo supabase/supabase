@@ -207,7 +207,7 @@ export function useAiChat({
         const queryParams = projectRef
           ? `?ref=${projectRef}&firstReply=${userFirstReply}`
           : `?firstReply=${userFirstReply}`
-        window.open(`/support/new${queryParams}`, '_blank')
+        window.open(`/dashboard/support/new${queryParams}`, '_blank')
       }, 3000)
     } else {
       dispatchMessage({
@@ -262,7 +262,7 @@ export function useAiChat({
       function handleError<T>(err: T) {
         setIsLoading?.(false)
         setIsResponding(false)
-        setHasError(false)
+        setHasError(true)
         console.error(err)
       }
 
@@ -459,7 +459,7 @@ const AiCommand = () => {
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
-      <div className={cn('relative mb-[145px] py-4 max-h-[720px] overflow-auto')}>
+      <div className={cn('relative mb-[145px] py-4 max-h-[720px]')}>
         {!hasError &&
           messages.map((message, index) => {
             switch (message.role) {
@@ -547,7 +547,7 @@ const AiCommand = () => {
                             type="default"
                             onClick={() =>
                               handleSubmittedFeedback(
-                                'Please get me in touch with Supabase Support'
+                                'Contact Support'
                               )
                             }
                           >
