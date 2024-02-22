@@ -65,7 +65,7 @@ export const PolicyTemplates = ({ onSelectTemplate }: PolicyTemplatesProps) => {
                     'text-left',
                     'flex flex-row',
                     'rounded-panel px-4 py-3 gap-x-4 cursor-pointer transition',
-                    'border bg-surface-100 hover:border-strong'
+                    'border bg-surface-100 hover:border-stronger'
                   )}
                   onClick={() => onSelectTemplate(template.statement)}
                 >
@@ -85,14 +85,13 @@ export const PolicyTemplates = ({ onSelectTemplate }: PolicyTemplatesProps) => {
                 hideWhenDetached
                 side="left"
                 align="center"
-                className="w-96 flex flex-col gap-y-2"
+                className="w-96 flex"
+                animate="slide-in"
               >
-                {/* <p className="text-xs">Policy SQL preview:</p> */}
-                {/* <div className="bg-surface-300 py-2 px-3 rounded relative"> */}
                 <SimpleCodeBlock
                   showCopy={false}
                   className="sql"
-                  parentClassName="!p-0 [&>div>span]:text-xs [&>div>span]:tracking-tighter"
+                  parentClassName="!p-0 [&>div>span]:text-xs"
                 >
                   {template.statement}
                 </SimpleCodeBlock>
@@ -102,7 +101,6 @@ export const PolicyTemplates = ({ onSelectTemplate }: PolicyTemplatesProps) => {
                   className="px-1 absolute top-1.5 right-1.5"
                   text={template.statement}
                 />
-                {/* </div> */}
               </HoverCardContent>
             </HoverCard>
           )
