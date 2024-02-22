@@ -1,5 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
@@ -34,7 +35,6 @@ import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import QueryItem from './QueryItem'
-import { partition, uniq, uniqBy } from 'lodash'
 import { selectItemsInRange } from './SQLEditorLayout.utils'
 
 const SideBarContent = observer(() => {

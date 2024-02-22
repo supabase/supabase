@@ -8,7 +8,18 @@ import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
-import { Button, Modal, SheetContent_Shadcn_, SheetFooter_Shadcn_, Sheet_Shadcn_, cn } from 'ui'
+import {
+  Button,
+  Modal,
+  SheetContent_Shadcn_,
+  SheetFooter_Shadcn_,
+  Sheet_Shadcn_,
+  TabsContent_Shadcn_,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
+  Tabs_Shadcn_,
+  cn,
+} from 'ui'
 
 import {
   IStandaloneCodeEditor,
@@ -35,6 +46,7 @@ import { AIPolicyHeader } from './AIPolicyHeader'
 import PolicyDetails from './PolicyDetails'
 import QueryError from './QueryError'
 import RLSCodeEditor from './RLSCodeEditor'
+import { PolicyTemplates } from './PolicyTemplates'
 
 const DiffEditor = dynamic(
   () => import('@monaco-editor/react').then(({ DiffEditor }) => DiffEditor),
@@ -225,6 +237,23 @@ export const AIPolicyEditorPanel = memo(function ({
     setDebugThread(cleanedMessages)
   }
 
+  const updateEditorWithCheckForDiff = (value: string) => {
+    const editorModel = editorRef.current?.getModel()
+    if (!editorModel) return
+
+    const existingValue = editorRef.current?.getValue() ?? ''
+    if (existingValue.length === 0) {
+      editorRef.current?.executeEdits('apply-template', [
+        {
+          text: value,
+          range: editorModel.getFullModelRange(),
+        },
+      ])
+    } else {
+      setIncomingChange(value)
+    }
+  }
+
   // when the panel is closed, reset all values
   useEffect(() => {
     if (!visible) {
@@ -255,7 +284,7 @@ export const AIPolicyEditorPanel = memo(function ({
           size={assistantVisible ? 'lg' : 'default'}
           className={cn(
             'p-0 flex flex-row gap-0',
-            assistantVisible ? '!min-w-[1024px]' : '!min-w-[600px]'
+            assistantVisible ? '!min-w-[1200px]' : '!min-w-[600px]'
           )}
         >
           <div className={cn('flex flex-col grow w-full', assistantVisible && 'w-[60%]')}>
@@ -380,20 +409,38 @@ export const AIPolicyEditorPanel = memo(function ({
             </div>
           </div>
           {assistantVisible && (
-            <div className={cn('flex border-l grow w-full', assistantVisible && 'w-[40%]')}>
-              <AIPolicyChat
-                messages={messages}
-                onSubmit={(message) =>
-                  append({
-                    content: message,
-                    role: 'user',
-                    createdAt: new Date(),
-                  })
-                }
-                onDiff={setIncomingChange}
-                onChange={setIsAssistantChatInputEmpty}
-                loading={isLoading || isDebugSqlLoading}
-              />
+            <div className={cn('border-l', assistantVisible && 'w-[50%]')}>
+              <Tabs_Shadcn_ defaultValue="templates" className="flex flex-col h-full w-full">
+                <TabsList_Shadcn_ className="flex gap-4 px-4 pt-2">
+                  <TabsTrigger_Shadcn_ key="templates" value="templates" className="px-0">
+                    RLS Templates
+                  </TabsTrigger_Shadcn_>
+                  <TabsTrigger_Shadcn_ key="conversation" value="conversation" className="px-0">
+                    AI Suggestions
+                  </TabsTrigger_Shadcn_>
+                </TabsList_Shadcn_>
+                <TabsContent_Shadcn_ value="templates" className="!mt-0 overflow-y-auto relative">
+                  <PolicyTemplates onSelectTemplate={updateEditorWithCheckForDiff} />
+                </TabsContent_Shadcn_>
+                <TabsContent_Shadcn_
+                  value="conversation"
+                  className="flex grow !mt-0 overflow-y-auto"
+                >
+                  <AIPolicyChat
+                    messages={messages}
+                    onSubmit={(message) =>
+                      append({
+                        content: message,
+                        role: 'user',
+                        createdAt: new Date(),
+                      })
+                    }
+                    onDiff={updateEditorWithCheckForDiff}
+                    onChange={setIsAssistantChatInputEmpty}
+                    loading={isLoading || isDebugSqlLoading}
+                  />
+                </TabsContent_Shadcn_>
+              </Tabs_Shadcn_>
             </div>
           )}
 
