@@ -631,15 +631,14 @@ export const actions: Actions = {
 ```ts +page.server.ts
 import { redirect } from "@sveltejs/kit"
 import type { PageServerLoad } from './$types';
+export const load: PageServerLoad = async ({ locals: { getSessionAndUser  }})  =>  { 
+    // redirect if there is no user's session
+    let {  session,  user } = await getSessionAndUser()
 
-export const load: PageServerLoad = async ({ parent } ) =>  {
-	const data = await parent()
-	const session = data.session
-    // if there is no user's sessiion redirect back to the home page
-	if (!session) {
-		redirect(303, '/');
-	}
-  }
+    if (!session) {
+        redirect(303, '/');
+    }
+}
 ```
 
 </TabPanel>
