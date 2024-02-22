@@ -4,14 +4,14 @@ import { deleteThread } from '@/app/actions'
 import { createRef, useEffect } from 'react'
 import { useFormState, useFormStatus } from 'react-dom'
 import { Button, Input_Shadcn_, Modal } from 'ui'
-import { ThreadType } from './Threads'
+import { ThreadViewType } from './Threads'
 
 const ConfirmDeleteThreadModal = ({
   thread,
   onClose,
   visible,
 }: {
-  thread: ThreadType
+  thread: ThreadViewType
   onClose: () => void
   visible: boolean
 }) => {

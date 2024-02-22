@@ -206,6 +206,7 @@ export { ScrollArea, ScrollBar } from './src/components/shadcn/ui/scroll-area'
 
 export { Separator } from './src/components/shadcn/ui/separator'
 
+export { ToggleGroup, ToggleGroupItem } from './src/components/shadcn/ui/toggle-group'
 // links
 
 export * from './src/components/TextLink'

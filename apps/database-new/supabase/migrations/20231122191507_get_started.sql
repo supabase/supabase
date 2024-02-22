@@ -3,6 +3,7 @@ create table if not exists public.threads (
 	created_at timestamp with time zone not null default now(),
 	user_id uuid null,
 	thread_title text not null,
+	is_public boolean default true not null,
 	constraint threads_pkey primary key (id),
 	constraint threads_user_id_fkey foreign key (user_id) references auth.users (id) on update cascade on delete cascade
 );
@@ -28,7 +29,9 @@ SELECT
 	m.message_id,
 	m.user_id,
 	m.created_at,
-	t.thread_title
+	t.thread_title,
+    t.is_public
+
 FROM
 	public.messages m
 	JOIN public.threads t ON m.thread_id = t.id

@@ -4,6 +4,7 @@ import { timeAgo } from '@/lib/utils'
 import Link from 'next/link'
 import { useState } from 'react'
 import {
+  Badge,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -14,14 +15,17 @@ import {
 } from 'ui'
 import ConfirmDeleteThreadModal from './ConfirmDeleteThreadModal'
 import EditThreadModal from './EditThreadModal'
-import { ThreadType } from './Threads'
+import { ThreadType, ThreadViewType } from './Threads'
+import { Lock, Unlock } from 'lucide-react'
+import ThreadPrivacyModal from './ThreadPrivacyModal'
 
-const Thread = ({ thread }: { thread: ThreadType }) => {
-  const { created_at, thread_id, thread_title } = thread
+const Thread = ({ thread }: { thread: ThreadViewType }) => {
+  const { created_at, thread_id, thread_title, is_public } = thread
   const formattedTimeAgo = timeAgo(created_at!)
 
   const [editOpen, setEditOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
+  const [privacyOpen, setPrivacyOpen] = useState(false)
 
   return (
     <>
@@ -30,12 +34,27 @@ const Thread = ({ thread }: { thread: ThreadType }) => {
         className="group w-full flex flex-row items-center gap-6  border rounded pl-5 pr-2 transition bg-surface-100 hover:bg-surface-200 h-14"
       >
         <div className="flex flex-col grow overflow-hidden">
-          <Link
-            className="flex text-sm group-hover:underline truncate"
-            href={`/${thread.thread_id}/${thread.message_id}`}
-          >
-            <span className="truncate">{thread_title}</span>
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              className="flex text-sm group-hover:underline truncate"
+              href={`/${thread.thread_id}/${thread.message_id}`}
+            >
+              <span className="truncate">{thread_title}</span>
+            </Link>
+            <div className="text-sm">
+              <Badge color={is_public ? 'blue' : 'yellow'}>
+                {is_public ? (
+                  <span className="flex items-center gap-2">
+                    <Unlock size={12} /> Public
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-2">
+                    <Lock size={12} /> Private
+                  </span>
+                )}
+              </Badge>
+            </div>
+          </div>
           <span className="text-xs text-foreground-lighter font-mono">
             Last updated {formattedTimeAgo}
           </span>
@@ -58,9 +77,19 @@ const Thread = ({ thread }: { thread: ThreadType }) => {
                 <IconEdit2 size={14} />
                 <p>Edit name</p>
               </DropdownMenuItem>
+              <DropdownMenuItem
+                className="space-x-2"
+                onClick={() => {
+                  console.log('trying to edit thread')
+                  setPrivacyOpen(true)
+                }}
+              >
+                {is_public ? <Lock size={14} /> : <Unlock size={14} />}
+                <span>Edit visibility</span>
+              </DropdownMenuItem>
               <DropdownMenuItem className="space-x-2" onClick={() => setDeleteOpen(true)}>
                 <IconTrash2 size={14} />
-                <p>Delete thread</p>
+                <span>Delete thread</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -77,6 +106,12 @@ const Thread = ({ thread }: { thread: ThreadType }) => {
         thread={thread}
         visible={editOpen}
         onClose={() => setEditOpen(false)}
+      />
+      <ThreadPrivacyModal
+        key={`${thread_id}-privacy-dialog`}
+        thread={thread}
+        visible={privacyOpen}
+        onClose={() => setPrivacyOpen(false)}
       />
     </>
   )
