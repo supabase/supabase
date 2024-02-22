@@ -1,0 +1,168 @@
+---
+title: 'Sentry integration'
+subtitle: 'Integrate Sentry to monitor errors from a Supabase client'
+---
+
+You can use [Sentry](https://sentry.io/welcome/) to monitor errors thrown from a Supabase JavaScript client. Install the [Supabase Sentry integration](https://github.com/supabase-community/sentry-integration-js) to get started.
+
+The Sentry integration supports both Node and browser environments.
+
+## Installation
+
+Install the Sentry integration using your package manager:
+
+<Tabs scrollable queryGroup="package-manager" defaultActiveId="npm" type="underlined" size="small" >
+
+<TabPanel id="npm" label="npm">
+
+```sh
+npm install @supabase/sentry-js-integration
+```
+
+</TabPanel>
+
+<TabPanel id="yarn" label="yarn">
+
+```sh
+yarn add @supabase/sentry-js-integration
+```
+
+</TabPanel>
+
+<TabPanel id="pnpm" label="pnpm">
+
+```sh
+pnpm add @supabase/sentry-js-integration
+```
+
+</TabPanel>
+
+</Tabs>
+
+## Use
+
+To use the Supabase Sentry integration, add it to your `integrations` list when initializing your Sentry client.
+
+You can supply either the Supabase Client constructor or an already-initiated instance of a Supabase Client.
+
+<Tabs scrollable defaultActiveId="constructor" type="underlined" size="small">
+
+<TabPanel id="constructor" label="With constructor">
+```js
+import * as Sentry from "@sentry/browser"
+import { SupabaseClient } from "@supabase/supabase-js"
+import { SupabaseIntegration } from "@supabase/sentry-js-integration"
+
+Sentry.init({
+dsn: SENTRY_DSN,
+integrations: [
+new SupabaseIntegration(SupabaseClient, {
+tracing: true,
+breadcrumbs: true,
+errors: true,
+}),
+],
+})
+
+````
+</TabPanel>
+
+<TabPanel id="instance" label="With instance">
+```js
+import * as Sentry from "@sentry/browser";
+import { createClient } from "@supabase/supabase-js";
+import { SupabaseIntegration } from "@supabase/sentry-js-integration";
+
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+Sentry.init({
+  dsn: SENTRY_DSN,
+  integrations: [
+    new SupabaseIntegration(supabaseClient, {
+      tracing: true,
+      breadcrumbs: true,
+      errors: true,
+    }),
+  ],
+});
+````
+
+</TabPanel>
+
+</Tabs>
+
+## Configuration
+
+The integration takes the following options:
+
+| Option                   | Type                                                        | Default behavior         | Description                                                                                       |
+| ------------------------ | ----------------------------------------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------- |
+| `tracing`                | `boolean`                                                   | `true`                   | Enable tracing instrumentation for database calls                                                 |
+| `breadcrumbs`            | `boolean`                                                   | `true`                   | Enable capturing breadcrumbs for database calls                                                   |
+| `operations`             | `Array` of `select`, `insert`, `upsert`, `update`, `delete` | All operations           | Which database methods should be instrumented                                                     |
+| `shouldCreateSpan`       | `(payload) => boolean`                                      | `() => true`             | Given a query [payload](#options-payload), whether a tracing span should be created for the query |
+| `shouldCreateBreadcrumb` | `(payload) => boolean`                                      | `() => true`             | Given a query [payload](#options-payload), whether a breadcrumb should be created for the query   |
+| `sanitizeBody`           | `(table, key, value) => value`                              | `(_, _, value) => value` | Remove sensitive information by editing the stored [value](#options-sanitize)                     |
+
+<span id="options-payload" className="scroll-mt-24" />
+In `shouldCreateSpan` and `shouldCreateBreadcrumb`, the `payload` is of type:
+
+```ts
+interface Payload {
+  method: 'GET' | 'HEAD' | 'POST' | 'PATCH' | 'DELETE'
+  url: URL
+  header: Record<string, string>
+  schema: string
+  body: unknown // The body passed in a PostgREST call, which depends on your query
+}
+```
+
+<span id="options-sanitize" className="scroll-mt-24" />
+In `sanitizeBody`, the parameters are:
+
+- `table`: The Postgres table name
+- `key`: The key used to build a PostgREST query. Example keys include:
+  - `select`: Values are columns to be selected
+  - `order`: Values are ordering clauses
+  - `<COLUMN_NAME>`: Values include filters such as `eq`, `neq`, `gte`
+  - See the [PostgREST docs](https://postgrest.org/en/v12/references/api.html) for details.
+
+## Deduplicating spans
+
+If you're already monitoring HTTP errors in Sentry, for example with the Http, Fetch, or Undici integrations, you will get duplicate spans for Supabase calls. You can deduplicate the spans by skipping them in your other integration:
+
+<Tabs scrollable defaultActiveId="browser" type="underlined" size="small">
+
+<TabPanel id="browser" label="Browser">
+```js
+new Sentry.BrowserTracing({
+  shouldCreateSpanForRequest: (url) => {
+    return !url.startsWith(SUPABASE_URL);
+  },
+})
+```
+</TabPanel>
+
+<TabPanel id="http" label="Node HTTP">
+```js
+new Sentry.Integrations.Http({
+  tracing: {
+    shouldCreateSpanForRequest: (url) => {
+      return !url.startsWith(SUPABASE_URL);
+    },
+  },
+})
+```
+</TabPanel>
+
+<TabPanel id="undici" label="Undici">
+```js
+new Sentry.Integrations.Undici({
+  shouldCreateSpanForRequest: (url) => {
+    return !url.startsWith(SUPABASE_URL);
+  },
+})
+```
+</TabPanel>
+
+</Tabs>
