@@ -26,7 +26,7 @@ Handle exceptions within your function and send them to Sentry.
 import * as Sentry from 'https://deno.land/x/sentry/index.mjs'
 
 Sentry.init({
-  dsn: _DSN_,
+  dsn: SENTRY_DSN,
   integrations: [],
   debug: true,
   // Performance Monitoring
@@ -73,8 +73,6 @@ Deploy function to Supabase:
 ```bash
 supabase functions deploy sentryfied --no-verify-jwt
 ```
-
-Open the endpoint URL to send an email:
 
 ### 4. Try it yourself
 
