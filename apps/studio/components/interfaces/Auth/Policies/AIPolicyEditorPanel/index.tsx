@@ -426,11 +426,19 @@ export const AIPolicyEditorPanel = memo(function ({
             >
               <Tabs_Shadcn_ defaultValue="templates" className="flex flex-col h-full w-full">
                 <TabsList_Shadcn_ className="flex gap-4 px-content pt-2">
-                  <TabsTrigger_Shadcn_ key="templates" value="templates" className="px-0">
+                  <TabsTrigger_Shadcn_
+                    key="templates"
+                    value="templates"
+                    className="px-0 data-[state=active]:bg-transparent"
+                  >
                     RLS Templates
                   </TabsTrigger_Shadcn_>
                   {!hasHipaaAddon && (
-                    <TabsTrigger_Shadcn_ key="conversation" value="conversation" className="px-0">
+                    <TabsTrigger_Shadcn_
+                      key="conversation"
+                      value="conversation"
+                      className="px-0 data-[state=active]:bg-transparent"
+                    >
                       Assistant
                     </TabsTrigger_Shadcn_>
                   )}
