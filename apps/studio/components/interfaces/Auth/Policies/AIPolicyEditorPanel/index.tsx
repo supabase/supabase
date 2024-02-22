@@ -407,7 +407,7 @@ export const AIPolicyEditorPanel = memo(function ({
                       disabled={isExecuting || incomingChange !== undefined}
                       onClick={() => onExecuteSQL()}
                     >
-                      Save policy
+                      Create policy
                     </Button>
                   </div>
                 </SheetFooter_Shadcn_>
