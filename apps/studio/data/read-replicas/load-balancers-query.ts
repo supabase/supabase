@@ -1,10 +1,11 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
+
+import { components } from 'data/api'
+import { get, handleError } from 'data/fetchers'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
+import { useFlag } from 'hooks'
 import { ResponseError } from 'types'
 import { replicaKeys } from './keys'
-import { components } from 'data/api'
-import { useFlag } from 'hooks'
-import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 
 export type LoadBalancersVariables = {
   projectRef?: string
@@ -23,7 +24,7 @@ export async function getLoadBalancers(
     signal,
   })
 
-  if (error) throw new Error((error as ResponseError).message)
+  if (error) handleError(error)
   return data
 }
 

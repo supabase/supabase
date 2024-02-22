@@ -14,9 +14,7 @@ export async function formatQuery(
 ) {
   let headers = new Headers()
 
-  if (connectionString) {
-    headers.set('x-connection-encrypted', connectionString)
-  }
+  if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
   const response = await post(
     `${API_URL}/pg-meta/${projectRef}/query/format`,
