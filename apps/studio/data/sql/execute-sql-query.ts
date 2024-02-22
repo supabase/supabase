@@ -1,6 +1,6 @@
 import { QueryClient, QueryKey, useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { post } from 'data/fetchers'
+import { post, handleError as handleErrorFetchers } from 'data/fetchers'
 import {
   ROLE_IMPERSONATION_NO_RESULTS,
   ROLE_IMPERSONATION_SQL_LINE_COUNT,
@@ -85,7 +85,7 @@ export async function executeSql(
     }
 
     if (handleError !== undefined) return handleError(error as any)
-    else throw error
+    else handleErrorFetchers(error as any)
   }
 
   if (
