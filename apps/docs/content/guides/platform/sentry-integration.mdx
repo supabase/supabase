@@ -48,32 +48,34 @@ You can supply either the Supabase Client constructor or an already-initiated in
 <Tabs scrollable defaultActiveId="constructor" type="underlined" size="small">
 
 <TabPanel id="constructor" label="With constructor">
-```js
-import * as Sentry from "@sentry/browser"
-import { SupabaseClient } from "@supabase/supabase-js"
-import { SupabaseIntegration } from "@supabase/sentry-js-integration"
+
+```ts
+import * as Sentry from '@sentry/browser'
+import { SupabaseClient } from '@supabase/supabase-js'
+import { SupabaseIntegration } from '@supabase/sentry-js-integration'
 
 Sentry.init({
-dsn: SENTRY_DSN,
-integrations: [
-new SupabaseIntegration(SupabaseClient, {
-tracing: true,
-breadcrumbs: true,
-errors: true,
-}),
-],
+  dsn: SENTRY_DSN,
+  integrations: [
+    new SupabaseIntegration(SupabaseClient, {
+      tracing: true,
+      breadcrumbs: true,
+      errors: true,
+    }),
+  ],
 })
+```
 
-````
 </TabPanel>
 
 <TabPanel id="instance" label="With instance">
-```js
-import * as Sentry from "@sentry/browser";
-import { createClient } from "@supabase/supabase-js";
-import { SupabaseIntegration } from "@supabase/sentry-js-integration";
 
-const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+```ts
+import * as Sentry from '@sentry/browser'
+import { createClient } from '@supabase/supabase-js'
+import { SupabaseIntegration } from '@supabase/sentry-js-integration'
+
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY)
 
 Sentry.init({
   dsn: SENTRY_DSN,
@@ -84,8 +86,8 @@ Sentry.init({
       errors: true,
     }),
   ],
-});
-````
+})
+```
 
 </TabPanel>
 
@@ -166,3 +168,4 @@ new Sentry.Integrations.Undici({
 </TabPanel>
 
 </Tabs>
+````
