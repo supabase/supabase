@@ -1,5 +1,5 @@
 {
-  "name": "@lucide/build-icons",
+  "name": "@supabase/build-icons",
   "private": true,
   "version": "1.0.0",
   "description": "",
@@ -17,7 +17,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
+  "devDependencies": {
     "minimist": "^1.2.7",
     "node-fetch": "^3.2.10",
     "prettier": "2.7.1",
