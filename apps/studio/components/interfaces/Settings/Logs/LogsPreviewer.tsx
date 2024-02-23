@@ -228,7 +228,7 @@ export const LogsPreviewer = ({
           />
         </LoadingOpacity>
         {!error && (
-          <div className="flex flex-row justify-between p-2">
+          <div className="border-t flex flex-row justify-between p-2">
             <Button
               onClick={loadOlder}
               icon={<IconRewind />}
