@@ -645,7 +645,7 @@ const SQLEditor = () => {
                         disabled={isDiffOpen}
                         ref={inputRef}
                         className={cn(
-                          '!p-0 bg-transparent border-transparent text-sm text-brand-600 placeholder:text-brand-400 dark:placeholder:text-brand-500 focus:!ring-0',
+                          '!p-0 bg-transparent border-transparent text-sm text-brand-600 placeholder:text-brand-500 focus:!ring-0',
                           'focus-visible:ring-0 focus-visible:ring-offset-0',
                           'appearance-none outline-none'
                         )}
