@@ -1,0 +1,27 @@
+{
+  "name": "@lucide/build-icons",
+  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.mjs",
+  "type": "module",
+  "scripts": {
+    "build:icons": "node ./main.mjs --templateSrc=./../scripts/exportTemplate.mjs --renderUniqueKey --withAliases --withDynamicImports --separateAliasesFile --aliasesFileExtension=.ts --iconFileExtension=.ts --exportFileName=index.ts"
+  },
+  "bin": {
+    "build-icons": "./main.mjs"
+  },
+  "engines": {
+    "node": ">= 16"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "minimist": "^1.2.7",
+    "node-fetch": "^3.2.10",
+    "prettier": "2.7.1",
+    "svgo": "^3.0.0",
+    "svgson": "^5.2.1"
+  }
+}

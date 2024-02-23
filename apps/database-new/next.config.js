@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ['ui', 'ui-patterns'],
+  transpilePackages: ['ui', 'ui-patterns', 'icons'],
   webpack: (config, { dev, isServer, webpack, nextRuntime }) => {
     config.module.rules.push({
       test: /\.node$/,

@@ -1,0 +1,7 @@
+{
+  "name": "icons",
+  "dependencies": {
+    "typescript": "^5.2.2"
+  },
+  "main": "./src/icons/index.ts"
+}
