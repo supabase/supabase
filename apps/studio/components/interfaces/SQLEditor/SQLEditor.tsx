@@ -751,7 +751,7 @@ const SQLEditor = () => {
                       exit="hidden"
                     >
                       <motion.span
-                        className="text-sm text-brand px-3"
+                        className="text-sm text-brand-600 px-3"
                         animate={{
                           opacity: ['0.5', '0.75', '0.5'],
                           transition: {
