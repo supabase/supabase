@@ -57,7 +57,7 @@
     "json-logic-js": "^2.0.2",
     "jsonrepair": "^3.2.3",
     "lodash": "^4.17.21",
-    "lucide-react": "^0.167.0",
+    "lucide-react": "^0.338.0",
     "markdown-table": "=2.0.0",
     "mobx": "^6.10.2",
     "mobx-react-lite": "^4.0.5",
