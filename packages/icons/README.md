@@ -1,4 +1,7 @@
-# Supabase icons package
+# ./packages/icons
+
+This package is for custom Supabase icons
+They can be used alongside any other icon packages
 
 ## example use
 
