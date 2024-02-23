@@ -1,7 +1,7 @@
 ---
 id: 'auth-textlocal'
-title: 'Phone Auth with TextLocal'
-description: 'How to set up and use Mobile OTP with TextLocal and Supabase.'
+title: 'Phone Auth with Textlocal'
+description: 'How to set up and use Mobile OTP with Textlocal and Supabase.'
 ---
 
 <Admonition type="tip">
@@ -16,15 +16,15 @@ You will need:
 
 <Admonition type="note">
 
-TextLocal operates regional websites, so the signup URL may vary based on your location.
+Textlocal operates regional websites, so the signup URL may vary based on your location.
 
 </Admonition>
 
-- A TextLocal account (sign up [here](https://www.textlocal.com/signup)).
+- A Textlocal account (sign up [here](https://www.textlocal.com/signup)).
 - A Supabase project (create one [here](https://supabase.com/dashboard)).
 - A mobile phone capable of receiving SMS.
 
-## Set up TextLocal as your SMS provider
+## Set up Textlocal as your SMS provider
 
 You will need the following information to proceed:
 
@@ -32,15 +32,15 @@ You will need the following information to proceed:
 - Sender Name (This is the name that will appear as the sender of the SMS)
 - Configure Supabase
 
-### Getting your TextLocal API Key
+### Getting your Textlocal API Key
 
-After logging into your TextLocal account, proceed to Settings > API Keys. Here, you'll want to create a new API Key that we will be using for our setup.
+After logging into your Textlocal account, proceed to Settings > API Keys. Here, you'll want to create a new API Key that we will be using for our setup.
 
 ![Get your API Keys](/docs/img/guides/auth-textlocal/2.png)
 
 ### Getting a sender name (optional)
 
-TextLocal assigns a default sender name, 'TXTLCL', for all outgoing messages. However, for a touch of personalization relevant to your application, you can create your own sender name. Simply navigate to Settings > All Settings > Sender Names within your TextLocal account to set up a sender name that better aligns with your brand identity.
+Textlocal assigns a default sender name, 'TXTLCL', for all outgoing messages. However, for a touch of personalization relevant to your application, you can create your own sender name. Simply navigate to Settings > All Settings > Sender Names within your Textlocal account to set up a sender name that better aligns with your brand identity.
 
 ### Configure Supabase
 
@@ -62,5 +62,5 @@ To implement Phone Login, see the docs on [using Phone Login](/docs/guides/auth/
 
 ## Resources
 
-- [TextLocal Signup](https://www.textlocal.com/sign-up)
+- [Textlocal Signup](https://www.textlocal.com/sign-up)
 - [Supabase Dashboard](https://supabase.com/dashboard)
