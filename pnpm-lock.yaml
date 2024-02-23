@@ -1911,7 +1911,7 @@ importers:
         specifier: ^2.0.3
         version: 2.1.8(@types/node@20.12.11)(jsdom@20.0.3(supports-color@8.1.1))(msw@2.4.11(typescript@5.5.2))(sass@1.72.0)(supports-color@8.1.1)(terser@5.32.0)
 
-  playwright-tests:
+  tests/local-studio-tests:
     devDependencies:
       '@playwright/test':
         specifier: ^1.41.2
