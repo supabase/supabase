@@ -1,5 +1,16 @@
 import { useEffect, useState } from 'react'
-import { Button, IconExternalLink, IconEye, IconEyeOff, IconRefreshCw, IconSearch, Input } from 'ui'
+import {
+  Button,
+  IconExternalLink,
+  IconEye,
+  IconEyeOff,
+  IconRefreshCw,
+  IconSearch,
+  Input,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+} from 'ui'
 
 import CSVButton from 'components/ui/CSVButton'
 import { Filters, LogSearchCallback, LogTemplate, PREVIEWER_DATEPICKER_HELPERS } from '.'
@@ -72,39 +83,42 @@ const PreviewFilterPanel = ({
   }, [defaultSearchValue])
 
   const RefreshButton = () => (
-    <Button
-      type="default"
-      icon={
-        <div className="relative">
-          {newCount > 0 && (
-            <div
-              className={[
-                'absolute -top-3 right-3 flex items-center justify-center',
-                'z-50 h-4 w-4',
-              ].join(' ')}
-            >
-              <div className="absolute z-20">
-                <p style={{ fontSize: '0.6rem' }} className="text-white">
-                  {newCount > 1000 ? `${Math.floor(newCount / 100) / 10}K` : newCount}
-                </p>
-              </div>
-              <div className="h-full w-full animate-ping rounded-full bg-green-800 opacity-60"></div>
-              <div className="z-60 absolute top-0 right-0 h-full w-full rounded-full bg-green-900 opacity-80"></div>
+    <Tooltip_Shadcn_ delayDuration={100}>
+      <TooltipTrigger_Shadcn_ asChild>
+        <Button
+          type="default"
+          className="px-1.5"
+          icon={
+            <div className="relative">
+              {newCount > 0 && (
+                <div className="absolute -top-3 right-3 flex items-center justify-center">
+                  <div className="absolute z-20">
+                    <p style={{ fontSize: '0.6rem' }} className="text-white">
+                      {newCount > 1000 ? `${Math.floor(newCount / 100) / 10}K` : newCount}
+                    </p>
+                  </div>
+                  <div className="h-full w-full animate-ping rounded-full bg-green-800 opacity-60"></div>
+                  <div className="z-60 absolute top-0 right-0 h-full w-full rounded-full bg-green-900 opacity-80"></div>
+                </div>
+              )}
+              <IconRefreshCw />
             </div>
-          )}
-          <IconRefreshCw size={10} />
-        </div>
-      }
-      loading={isLoading}
-      disabled={isLoading}
-      onClick={onRefresh}
-    >
-      Refresh
-    </Button>
+          }
+          loading={isLoading}
+          disabled={isLoading}
+          onClick={onRefresh}
+        />
+      </TooltipTrigger_Shadcn_>
+      <TooltipContent_Shadcn_ side="bottom" className="text-xs">
+        Refresh logs
+      </TooltipContent_Shadcn_>
+    </Tooltip_Shadcn_>
   )
+
   const handleDatepickerChange = ({ to, from }: Partial<Parameters<LogSearchCallback>[1]>) => {
     onSearch('datepicker-change', { to, from })
   }
+
   const handleInputSearch = (query: string) => onSearch('search-input-change', { query })
 
   return (
@@ -148,16 +162,14 @@ const PreviewFilterPanel = ({
           />
         </form>
 
+        <RefreshButton />
+
         <DatePickers
           onChange={handleDatepickerChange}
           to={defaultToValue}
           from={defaultFromValue}
           helpers={PREVIEWER_DATEPICKER_HELPERS}
         />
-
-        <div>
-          <RefreshButton />
-        </div>
 
         <div className="flex items-center">
           {FILTER_OPTIONS[table] &&
