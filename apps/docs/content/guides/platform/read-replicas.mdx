@@ -135,16 +135,22 @@ All settings made through the dashboard will be propagated across all databases 
 A project needs to satisfy these requirements to spin up a read replica:
 
 1. Running on AWS.
-   - Support for projects on Fly is in progress.
-2. Running on at least a small compute.
-3. PostgreSQL 15.
-   - For projects running on older versions of PostgreSQL, you can initiate self-serve upgrades with pg_upgrade. For details, see the [upgrade guide](/docs/guides/platform/migrating-and-upgrading-projects#pgupgrade).
+   - Support for projects on Fly.io will be added at a later date.
+1. Running on at least a [Small compute add-on](/docs/guides/platform/compute-add-ons).
+1. Using [physical backups](/docs/guides/platform/backups#point-in-time-recovery)
+   - Physical backups are automatically enabled if using [PITR](/docs/guides/platform/backups#point-in-time-recovery)
+1. Running on Postgres 15.
+   - For projects running on older versions of PostgreSQL, you will need to [upgrade to the latest platform version](/docs/guides/platform/migrating-and-upgrading-projects#pgupgrade).
 
 ### Read replicas need to be brought down before starting the following procedures
 
 The following procedures require all read replicas for a project to be brought down before they can be started:
 
-1. Upgrading a project via pg_upgrade.
-2. Performing data restoration.
+1. [Upgrading a project](/docs/guides/platform/migrating-and-upgrading-projects#pgupgrade)
+1. Performing [data restoration](/docs/guides/platform/backups#pitr-restoration-process).
 
-Changes made to the primary database during these operations heavily disrupt replication and potentially leave active read replicas in unstable states. Once these operations complete, read replicas can be spun back up.
+Once these operations complete, read replicas can be spun back up.
+
+### Compute Add-ons
+
+In order to avoid replicas being unable to keep up with activity on the primaries they're following, Read Replicas are currently placed on the same Compute Add-on as the primary they're following.

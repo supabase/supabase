@@ -13,6 +13,7 @@ import { useFlag, useSelectedProject } from 'hooks'
 import { pluckObjectFields } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -28,13 +29,13 @@ const DatabaseSettings = () => {
   const router = useRouter()
   const { ref: projectRef, connectionString } = useParams()
   const telemetryProps = useTelemetryProps()
+  const snap = useDatabaseSettingsStateSnapshot()
   const state = useDatabaseSelectorStateSnapshot()
   const selectedProject = useSelectedProject()
 
   const readReplicasEnabled = useFlag('readReplicas')
   const showReadReplicasUI = readReplicasEnabled && selectedProject?.is_read_replicas_enabled
   const connectionStringsRef = useRef<HTMLDivElement>(null)
-  const [usePoolerConnection, setUsePoolerConnection] = useState(true)
   const [poolingMode, setPoolingMode] = useState<'transaction' | 'session' | 'statement'>('session')
 
   const {
@@ -86,7 +87,7 @@ const DatabaseSettings = () => {
     ? pluckObjectFields(selectedDatabase || emptyState, DB_FIELDS)
     : pluckObjectFields(project || emptyState, DB_FIELDS)
 
-  const connectionInfo = usePoolerConnection
+  const connectionInfo = snap.usePoolerConnection
     ? {
         db_host: primaryConfig?.db_host,
         db_name: primaryConfig?.db_name,
@@ -150,12 +151,12 @@ const DatabaseSettings = () => {
                 <div className="space-y-4">
                   <UsePoolerCheckbox
                     id="connection-params"
-                    checked={usePoolerConnection}
+                    checked={snap.usePoolerConnection}
                     poolingMode={poolingMode}
-                    onCheckedChange={setUsePoolerConnection}
+                    onCheckedChange={snap.setUsePoolerConnection}
                     onSelectPoolingMode={setPoolingMode}
                   />
-                  {!usePoolerConnection && <IPv4DeprecationNotice />}
+                  {!snap.usePoolerConnection && <IPv4DeprecationNotice />}
                   {isMd5 && (
                     <Alert_Shadcn_>
                       <IconAlertCircle strokeWidth={2} />
@@ -200,7 +201,7 @@ const DatabaseSettings = () => {
                   value={poolingMode === 'transaction' ? connectionInfo.db_port : '5432'}
                   label="Port"
                 />
-                {isMd5 && usePoolerConnection && (
+                {isMd5 && snap.usePoolerConnection && (
                   <Input
                     className="input-mono"
                     layout="horizontal"

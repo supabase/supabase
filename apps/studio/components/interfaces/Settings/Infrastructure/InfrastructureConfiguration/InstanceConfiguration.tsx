@@ -8,15 +8,16 @@ import 'reactflow/dist/style.css'
 import { Button } from 'ui'
 
 import AlertError from 'components/ui/AlertError'
+import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useReadReplicasStatusesQuery } from 'data/read-replicas/replicas-status-query'
 import { AWS_REGIONS_KEYS } from 'lib/constants'
+import { timeout } from 'lib/helpers'
 import DeployNewReplicaPanel from './DeployNewReplicaPanel'
 import DropReplicaConfirmationModal from './DropReplicaConfirmationModal'
 import { addRegionNodes, generateNodes, getDagreGraphLayout } from './InstanceConfiguration.utils'
 import { LoadBalancerNode, PrimaryNode, RegionNode, ReplicaNode } from './InstanceNode'
 import MapView from './MapView'
-import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 
 // [Joshen] Just FYI, UI assumes single provider for primary + replicas
 // [Joshen] Idea to visualize grouping based on region: https://reactflow.dev/examples/layout/sub-flows
@@ -59,14 +60,14 @@ const InstanceConfigurationUI = () => {
     {
       refetchInterval: refetchInterval as any,
       refetchOnWindowFocus: false,
-      onSuccess: (data) => {
+      onSuccess: async (data) => {
         const comingUpReplicas = data.filter((db) => db.status === 'COMING_UP')
         const hasTransientStatus = comingUpReplicas.length > 0
 
         // If any replica's status has changed, refetch databases
         if (numComingUp.current !== comingUpReplicas.length) {
           numComingUp.current = comingUpReplicas.length
-          refetch()
+          await refetch()
         }
 
         // If all replicas are active healthy, stop fetching statuses
@@ -89,31 +90,39 @@ const InstanceConfigurationUI = () => {
             onSelectDropReplica: setSelectedReplicaToDrop,
           })
         : [],
-    [isSuccessReplicas, isSuccessLoadBalancers]
+    [isSuccessReplicas, isSuccessLoadBalancers, primary, replicas, loadBalancers]
   )
 
-  const edges: Edge[] = [
-    ...((loadBalancers ?? []).length > 0
-      ? [
-          {
-            id: `load-balancer-${primary.identifier}`,
-            source: 'load-balancer',
-            target: primary.identifier,
-            type: 'smoothstep',
-            animated: true,
-          },
-        ]
-      : []),
-    ...replicas.map((database) => {
-      return {
-        id: `${primary.identifier}-${database.identifier}`,
-        source: primary.identifier,
-        target: database.identifier,
-        type: 'smoothstep',
-        animated: true,
-      }
-    }),
-  ]
+  const edges: Edge[] = useMemo(
+    () =>
+      isSuccessReplicas && isSuccessLoadBalancers
+        ? [
+            ...((loadBalancers ?? []).length > 0
+              ? [
+                  {
+                    id: `load-balancer-${primary.identifier}`,
+                    source: 'load-balancer',
+                    target: primary.identifier,
+                    type: 'smoothstep',
+                    animated: true,
+                    className: '!cursor-default',
+                  },
+                ]
+              : []),
+            ...replicas.map((database) => {
+              return {
+                id: `${primary.identifier}-${database.identifier}`,
+                source: primary.identifier,
+                target: database.identifier,
+                type: 'smoothstep',
+                animated: true,
+                className: '!cursor-default',
+              }
+            }),
+          ]
+        : [],
+    [isSuccessLoadBalancers, isSuccessReplicas, loadBalancers, primary?.identifier, replicas]
+  )
 
   const nodeTypes = useMemo(
     () => ({
@@ -125,24 +134,27 @@ const InstanceConfigurationUI = () => {
     []
   )
 
-  const onConfirmDropReplica = () => {
-    console.log('Drop replica', selectedReplicaToDrop)
-  }
-
   const onConfirmRestartReplica = () => {
     console.log('Restart replica', selectedReplicaToRestart)
+  }
+
+  const setReactFlow = async () => {
+    const graph = getDagreGraphLayout(nodes, edges)
+    const { nodes: updatedNodes } = addRegionNodes(graph.nodes, graph.edges)
+    reactFlow.setNodes(updatedNodes)
+    reactFlow.setEdges(graph.edges)
+
+    // [Joshen] Odd fix to ensure that react flow snaps back to center when adding nodes
+    await timeout(1)
+    reactFlow.fitView({ maxZoom: 0.9, minZoom: 0.9 })
   }
 
   // [Joshen] Just FYI this block is oddly triggering whenever we refocus on the viewport
   // even if I change the dependency array to just data. Not blocker, just an area to optimize
   useEffect(() => {
-    if (isSuccessReplicas && isSuccessLoadBalancers && replicas.length > 0) {
-      const graph = getDagreGraphLayout(nodes, edges)
-      const { nodes: updatedNodes } = addRegionNodes(graph.nodes, graph.edges)
-      reactFlow.setNodes(updatedNodes)
-      reactFlow.setEdges(graph.edges)
-    }
-  }, [isSuccessReplicas, isSuccessLoadBalancers])
+    if (isSuccessReplicas && isSuccessLoadBalancers && nodes.length > 0 && view === 'flow')
+      setReactFlow()
+  }, [isSuccessReplicas, isSuccessLoadBalancers, nodes, edges, view])
 
   return (
     <>
@@ -193,12 +205,6 @@ const InstanceConfigurationUI = () => {
                 defaultNodes={[]}
                 defaultEdges={[]}
                 nodeTypes={nodeTypes}
-                onInit={() => {
-                  const graph = getDagreGraphLayout(nodes, edges)
-                  const { nodes: updatedNodes } = addRegionNodes(graph.nodes, graph.edges)
-                  reactFlow.setNodes(updatedNodes)
-                  reactFlow.setEdges(graph.edges)
-                }}
                 proOptions={{ hideAttribution: true }}
               >
                 <Background color={backgroundPatternColor} />
