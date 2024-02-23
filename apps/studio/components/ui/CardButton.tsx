@@ -3,7 +3,6 @@ import React, { PropsWithChildren } from 'react'
 import { IconChevronRight, IconLoader, cn } from 'ui'
 
 interface CardButtonProps {
-  title: string | React.ReactNode
   description?: string
   footer?: React.ReactNode
   url?: string
@@ -18,6 +17,26 @@ interface CardButtonProps {
   hideChevron?: boolean
 }
 
+// Define separate interfaces for each type of container
+interface LinkContainerProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+  href: string
+}
+
+interface UrlContainerProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+  href: string
+}
+
+interface NonLinkContainerProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+interface ButtonContainerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
+
+// Union of all container props
+type ContainerProps =
+  | LinkContainerProps
+  | UrlContainerProps
+  | NonLinkContainerProps
+  | ButtonContainerProps
+
 const CardButton = ({
   title,
   description,
@@ -27,35 +46,37 @@ const CardButton = ({
   linkHref = '',
   imgUrl,
   imgAlt,
-  onClick,
   icon,
   className,
   loading = false,
   fixedHeight = true,
   hideChevron = false,
   ...props
-}: PropsWithChildren<CardButtonProps>) => {
-  const LinkContainer = React.forwardRef<HTMLAnchorElement, React.PropsWithChildren<any>>(
-    (props, ref) => <Link ref={ref} {...props} href={linkHref} />
-  )
-  LinkContainer.displayName = 'LinkContainer'
+}: PropsWithChildren<CardButtonProps & ContainerProps>) => {
+  const isLink = url || linkHref || props.onClick
 
-  const UrlContainer = React.forwardRef<HTMLAnchorElement, React.PropsWithChildren<any>>(
-    (props, ref) => <a ref={ref} {...props} href={url} />
-  )
+  let Container: React.ElementType
+  let containerProps: ContainerProps = {}
 
-  UrlContainer.displayName = 'UrlContainer'
-  const NonLinkContainer = React.forwardRef<HTMLDivElement, React.PropsWithChildren<any>>(
-    (props, ref) => <div ref={ref} {...props} />
-  )
-  NonLinkContainer.displayName = 'NonLinkContainer'
-
-  const ButtonContainer = React.forwardRef<HTMLButtonElement, React.PropsWithChildren<any>>(
-    (props, ref) => <button onClick={onClick} {...props} ref={ref} />
-  )
-  ButtonContainer.displayName = 'ButtonContainer'
-
-  const isLink = url || linkHref || onClick
+  if (props.onClick) {
+    Container = 'button'
+    containerProps = props
+  } else if (linkHref) {
+    Container = Link
+    containerProps = {
+      href: linkHref,
+      ...props,
+    }
+  } else if (url) {
+    Container = 'a'
+    containerProps = {
+      href: url,
+      ...props,
+    }
+  } else {
+    Container = 'div'
+    containerProps = props
+  }
 
   let containerClasses = [
     'group relative text-left',
@@ -133,31 +154,11 @@ const CardButton = ({
     </>
   )
 
-  if (onClick) {
-    return (
-      <ButtonContainer {...props} className={cn(containerClasses, className)}>
-        {contents}
-      </ButtonContainer>
-    )
-  } else if (linkHref) {
-    return (
-      <LinkContainer {...props} className={cn(containerClasses, className)}>
-        {contents}
-      </LinkContainer>
-    )
-  } else if (url) {
-    return (
-      <UrlContainer {...props} className={cn(containerClasses, className)}>
-        {contents}
-      </UrlContainer>
-    )
-  } else {
-    return (
-      <NonLinkContainer {...props} className={cn(containerClasses, className)}>
-        {contents}
-      </NonLinkContainer>
-    )
-  }
+  return (
+    <Container {...containerProps} className={cn(containerClasses, className)}>
+      {contents}
+    </Container>
+  )
 }
 
 export default CardButton
