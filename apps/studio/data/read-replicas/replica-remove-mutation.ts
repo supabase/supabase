@@ -20,7 +20,6 @@ export async function removeReadReplica({ projectRef, identifier }: ReadReplicaR
       database_identifier: identifier,
     },
   })
-
   if (error) throw error
   return data
 }
@@ -49,6 +48,7 @@ export const useReadReplicaRemoveMutation = ({
 
         setTimeout(async () => {
           await queryClient.invalidateQueries(replicaKeys.list(projectRef))
+          await queryClient.invalidateQueries(replicaKeys.loadBalancers(projectRef))
         }, 5000)
 
         await onSuccess?.(data, variables, context)
