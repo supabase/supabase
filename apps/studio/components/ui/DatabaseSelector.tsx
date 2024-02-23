@@ -11,6 +11,7 @@ import {
   Command_Shadcn_,
   IconCheck,
   IconChevronDown,
+  IconLoader,
   IconPlus,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -41,7 +42,7 @@ const DatabaseSelector = ({
   const state = useDatabaseSelectorStateSnapshot()
   const selectedDatabaseId = state.selectedDatabaseId
 
-  const { data } = useReadReplicasQuery({ projectRef })
+  const { data, isLoading, isSuccess } = useReadReplicasQuery({ projectRef })
   const databases = data ?? []
   const sortedDatabases = databases
     .sort((a, b) => (a.inserted_at > b.inserted_at ? 1 : 0))
@@ -65,6 +66,7 @@ const DatabaseSelector = ({
               variant === 'connected-on-left' && 'rounded-l-none border-l-0',
               variant === 'connected-on-both' && 'rounded-none border-x-0'
             )}
+            icon={isLoading && <IconLoader className="animate-spin" />}
             iconRight={
               <IconChevronDown className="text-foreground-light" strokeWidth={2} size={12} />
             }
@@ -75,11 +77,11 @@ const DatabaseSelector = ({
             ) : (
               <>
                 <span className="capitalize">
-                  {selectedDatabase?.identifier === projectRef
+                  {isLoading || selectedDatabase?.identifier === projectRef
                     ? 'Primary database'
                     : 'Read replica'}
                 </span>{' '}
-                {selectedDatabase?.identifier !== projectRef && (
+                {isSuccess && selectedDatabase?.identifier !== projectRef && (
                   <span>
                     ({selectedDatabaseRegion} - {formattedDatabaseId})
                   </span>
