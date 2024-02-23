@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -56,23 +56,11 @@ const Nav = (props: Props) => {
     if (width >= 1024) setOpen(false)
   }, [width])
 
-  /**
-   * Temporary fix for next-theme client side bug
-   * https://github.com/pacocoursey/next-themes/issues/169
-   * TODO: remove when bug has been fixed
-   */
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted || props.hideNavbar) {
+  if (props.hideNavbar) {
     return null
   }
 
-  const showDarkLogo =
-    isLaunchWeekPage || (mounted && resolvedTheme?.includes('dark')!) || isHomePage
+  const showDarkLogo = isLaunchWeekPage || resolvedTheme?.includes('dark')! || isHomePage
 
   return (
     <>
