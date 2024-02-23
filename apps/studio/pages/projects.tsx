@@ -53,7 +53,7 @@ const ProjectsPage: NextPageWithLayout = () => {
       )}
       {!navLayoutV2 && (
         <div className="p-5">
-          {IS_PLATFORM && projectCreationEnabled && isSuccess && organizations.length !== 0 && (
+          {IS_PLATFORM && projectCreationEnabled && isSuccess && (
             <HomePageActions search={search} setSearch={setSearch} organizations={organizations} />
           )}
           <div className="my-6 space-y-8">
