@@ -13,7 +13,7 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
     <ConnectTabs>
       <ConnectTabTriggers>
         <ConnectTabTrigger value=".env.local" />
-        <ConnectTabTrigger value="utils/supabase.ts " />
+        <ConnectTabTrigger value="utils/supabase.ts" />
         <ConnectTabTrigger value="App.tsx" />
       </ConnectTabTriggers>
 
