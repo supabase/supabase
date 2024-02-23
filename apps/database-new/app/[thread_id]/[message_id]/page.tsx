@@ -9,7 +9,9 @@ import { CodeEditor } from './CodeEditor'
 import { Messages } from './Messages'
 import { SchemaFlow } from './SchemaFlow'
 import { getAssistantResponse } from './getAssistantMessage'
-
+import { createClient } from '@/lib/supabase/client'
+import { LoginDialog } from '@/app/LoginDialog'
+import LoginForm from '@/components/Auth/LoginForm'
 export interface ThreadPageProps {
   params: {
     thread_id: string
@@ -19,7 +21,11 @@ export interface ThreadPageProps {
 
 export default async function ThreadPage({ params }: ThreadPageProps) {
   const promise = getAssistantResponse(params.thread_id, params.message_id)
+  const supabase = createClient()
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
   return (
     <div className="flex flex-col-reverse items-between xl:flex-row xl:items-center xl:justify-between bg-alternative h-full">
       <div
@@ -34,7 +40,7 @@ export default async function ThreadPage({ params }: ThreadPageProps) {
         <div className="flex flex-col grow items-between">
           <Messages threadId={params.thread_id} />
           <div className="px-4 pb-4">
-            <AssistantChatForm chatContext={'edit'} placeholder={'Any changes to make?'} />
+            <AssistantChatForm placeholder={'Any changes to make?'} />
           </div>
         </div>
       </div>
@@ -50,6 +56,10 @@ export default async function ThreadPage({ params }: ThreadPageProps) {
         <Suspense fallback={<GraphLoader />}>
           <CodeEditor promisedMessage={promise} />
         </Suspense>
+
+        <LoginDialog>
+          <LoginForm />
+        </LoginDialog>
       </div>
     </div>
   )
