@@ -11,6 +11,7 @@ const NewThreadInput = () => {
   return (
     <>
       <div className="relative w-10/12 xl:w-11/12 max-w-xl">
+        aaaaa
         <AssistantChatForm
           key={'new-thread-form'}
           chatContext={'new'}
