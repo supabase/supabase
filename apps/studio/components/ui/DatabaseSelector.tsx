@@ -1,7 +1,8 @@
+import { useParams } from 'common'
+import { noop } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { useParams } from 'common'
 import {
   Button,
   CommandGroup_Shadcn_,
@@ -25,22 +26,20 @@ import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 interface DatabaseSelectorProps {
   variant?: 'regular' | 'connected-on-right' | 'connected-on-left' | 'connected-on-both'
   additionalOptions?: { id: string; name: string }[]
-  selectedId?: string // Optional to let parent component control its state (e.g Database Settings page)
-  setSelectedId?: (value: string) => void
+  onSelectId?: (id: string) => void // Optional callback
 }
 
 const DatabaseSelector = ({
   variant = 'regular',
   additionalOptions = [],
-  selectedId,
-  setSelectedId,
+  onSelectId = noop,
 }: DatabaseSelectorProps) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const [open, setOpen] = useState(false)
 
   const state = useDatabaseSelectorStateSnapshot()
-  const selectedDatabaseId = selectedId || state.selectedDatabaseId
+  const selectedDatabaseId = state.selectedDatabaseId
 
   const { data } = useReadReplicasQuery({ projectRef })
   const databases = data ?? []
@@ -129,14 +128,14 @@ const DatabaseSelector = ({
                       value={database.identifier}
                       className="cursor-pointer w-full"
                       onSelect={() => {
-                        if (setSelectedId) setSelectedId(database.identifier)
-                        else state.setSelectedDatabaseId(database.identifier)
+                        state.setSelectedDatabaseId(database.identifier)
                         setOpen(false)
+                        onSelectId(database.identifier)
                       }}
                       onClick={() => {
-                        if (setSelectedId) setSelectedId(database.identifier)
-                        else state.setSelectedDatabaseId(database.identifier)
+                        state.setSelectedDatabaseId(database.identifier)
                         setOpen(false)
+                        onSelectId(database.identifier)
                       }}
                     >
                       <div className="w-full flex items-center justify-between">
@@ -163,9 +162,7 @@ const DatabaseSelector = ({
               >
                 <Link
                   href={`/project/${projectRef}/settings/infrastructure`}
-                  onClick={() => {
-                    setOpen(false)
-                  }}
+                  onClick={() => setOpen(false)}
                   className="w-full flex items-center gap-2"
                 >
                   <IconPlus size={14} strokeWidth={1.5} />

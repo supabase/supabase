@@ -5,6 +5,7 @@ import {
   IconEyeOff,
   IconRefreshCw,
   IconSearch,
+  IconTerminal,
   Input,
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
@@ -39,6 +40,7 @@ interface PreviewFilterPanelProps {
   csvData?: unknown[]
   onFiltersChange: (filters: Filters) => void
   filters: Filters
+  onSelectedDatabaseChange: (id: string) => void
 }
 
 /**
@@ -60,6 +62,7 @@ const PreviewFilterPanel = ({
   onFiltersChange,
   filters,
   table,
+  onSelectedDatabaseChange,
 }: PreviewFilterPanelProps) => {
   const router = useRouter()
   const [search, setSearch] = useState('')
@@ -210,7 +213,22 @@ const PreviewFilterPanel = ({
 
       {/* [Joshen TODO] Temporarily, need to figure out how to make the filter options more concise */}
       {showDatabaseSelector ? (
-        <DatabaseSelector />
+        <div className="flex items-center justify-center gap-x-2">
+          <Tooltip_Shadcn_ delayDuration={100}>
+            <TooltipTrigger_Shadcn_ asChild>
+              <Button
+                className="px-1"
+                type="default"
+                icon={<IconTerminal />}
+                onClick={onExploreClick}
+              />
+            </TooltipTrigger_Shadcn_>
+            <TooltipContent_Shadcn_ side="bottom" className="text-xs">
+              Open query in Logs Explorer
+            </TooltipContent_Shadcn_>
+          </Tooltip_Shadcn_>
+          <DatabaseSelector onSelectId={onSelectedDatabaseChange} />
+        </div>
       ) : (
         <Button type="default" onClick={onExploreClick}>
           Open as query

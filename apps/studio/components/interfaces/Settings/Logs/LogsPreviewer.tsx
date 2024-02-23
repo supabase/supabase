@@ -110,23 +110,6 @@ export const LogsPreviewer = ({
   }, [its, subscription])
 
   useEffect(() => {
-    if (readReplicasEnabled) {
-      setFilters((prev) => ({
-        ...prev,
-        database: state.selectedDatabaseId !== projectRef ? undefined : state.selectedDatabaseId,
-      }))
-      const { db, ...params } = router.query
-      router.push({
-        pathname: router.pathname,
-        query:
-          state.selectedDatabaseId !== projectRef
-            ? { ...router.query, db: state.selectedDatabaseId }
-            : params,
-      })
-    }
-  }, [readReplicasEnabled, state.selectedDatabaseId])
-
-  useEffect(() => {
     if (readReplicasEnabled && db !== undefined) {
       const database = databases?.find((d) => d.identifier === db)
       if (database !== undefined) state.setSelectedDatabaseId(db)
@@ -224,6 +207,19 @@ export const LogsPreviewer = ({
         condensedLayout={condensedLayout}
         isShowingEventChart={showChart}
         onToggleEventChart={() => setShowChart(!showChart)}
+        onSelectedDatabaseChange={(id: string) => {
+          if (readReplicasEnabled) {
+            setFilters((prev) => ({
+              ...prev,
+              database: id !== projectRef ? undefined : id,
+            }))
+            const { db, ...params } = router.query
+            router.push({
+              pathname: router.pathname,
+              query: id !== projectRef ? { ...router.query, db: id } : params,
+            })
+          }
+        }}
       />
       {children}
       <div
