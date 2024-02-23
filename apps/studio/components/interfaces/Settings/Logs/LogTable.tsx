@@ -190,7 +190,7 @@ const LogTable = ({
 
   const RowRenderer = useCallback<(key: Key, props: RenderRowProps<LogData, unknown>) => ReactNode>(
     (key, props) => {
-      return <Row {...props} isRowSelected={false} selectedCellIdx={undefined} />
+      return <Row key={key} {...props} isRowSelected={false} selectedCellIdx={undefined} />
     },
     []
   )

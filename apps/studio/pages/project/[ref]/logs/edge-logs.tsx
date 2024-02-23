@@ -4,6 +4,7 @@ import { observer } from 'mobx-react-lite'
 import { LogsLayout } from 'components/layouts'
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
 import { NextPageWithLayout } from 'types'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 
 export const LogPage: NextPageWithLayout = () => {
   const router = useRouter()

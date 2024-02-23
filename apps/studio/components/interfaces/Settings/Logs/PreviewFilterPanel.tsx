@@ -6,6 +6,10 @@ import { Filters, LogSearchCallback, LogTemplate, PREVIEWER_DATEPICKER_HELPERS }
 import { FILTER_OPTIONS, LogsTableName } from './Logs.constants'
 import DatePickers from './Logs.DatePickers'
 import LogsFilterPopover from './LogsFilterPopover'
+import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { useFlag } from 'hooks'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useRouter } from 'next/router'
 
 interface PreviewFilterPanelProps {
   defaultSearchValue?: string
@@ -47,7 +51,16 @@ const PreviewFilterPanel = ({
   filters,
   table,
 }: PreviewFilterPanelProps) => {
+  const router = useRouter()
   const [search, setSearch] = useState('')
+  const readReplicasEnabled = useFlag('readReplicas')
+  const { project } = useProjectContext()
+
+  // [Joshen] These are the routes tested that can show replica logs
+  const showDatabaseSelector =
+    readReplicasEnabled &&
+    project?.is_read_replicas_enabled &&
+    ['/project/[ref]/logs/edge-logs'].includes(router.pathname)
 
   const hasEdits = search !== defaultSearchValue
 
@@ -96,9 +109,9 @@ const PreviewFilterPanel = ({
 
   return (
     <div
-      className={'flex w-full items-center justify-between' + (condensedLayout ? ' px-5 pt-4' : '')}
+      className={'flex w-full items-center justify-between' + (condensedLayout ? ' px-4 pt-4' : '')}
     >
-      <div className="flex flex-row items-center gap-4">
+      <div className="flex flex-row items-center gap-x-2">
         <form
           id="log-panel-search"
           onSubmit={(e) => {
@@ -184,9 +197,14 @@ const PreviewFilterPanel = ({
         <CSVButton data={csvData} disabled={!Boolean(csvData)} title="Download data" />
       </div>
 
-      <Button type="default" onClick={onExploreClick} iconRight={<IconExternalLink size={10} />}>
-        Explore via query
-      </Button>
+      {/* [Joshen TODO] Temporarily, need to figure out how to make the filter options more concise */}
+      {showDatabaseSelector ? (
+        <DatabaseSelector />
+      ) : (
+        <Button type="default" onClick={onExploreClick}>
+          Open as query
+        </Button>
+      )}
     </div>
   )
 }

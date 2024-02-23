@@ -56,6 +56,7 @@ const CSVButton = ({
         type={buttonType}
         icon={icon || <IconDownloadCloud />}
         disabled={disabled}
+        className="px-1.5"
         onClick={(e) => {
           if (onClick) onClick(e)
           handleDownload()

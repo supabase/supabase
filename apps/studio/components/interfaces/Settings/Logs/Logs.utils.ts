@@ -99,7 +99,14 @@ const genWhereStatement = (table: LogsTableName, filters: Filters) => {
 
   const statement = keys
     .map((rootKey) => {
-      if (typeof filters[rootKey] === 'object') {
+      if (
+        filters[rootKey] === undefined ||
+        (typeof filters[rootKey] === 'string' && (filters[rootKey] as string).length === 0)
+      ) {
+        return null
+      } else if (rootKey === 'database' && filters[rootKey]) {
+        return `(request.host like '${filters[rootKey]}%')`
+      } else if (typeof filters[rootKey] === 'object') {
         // join all statements with an OR
         const nestedStatements = getDotKeys(filters[rootKey] as Filters, rootKey)
           .map(_resolveTemplateToStatement)
