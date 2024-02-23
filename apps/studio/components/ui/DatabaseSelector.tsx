@@ -44,6 +44,9 @@ const DatabaseSelector = ({
 
   const { data } = useReadReplicasQuery({ projectRef })
   const databases = data ?? []
+  const sortedDatabases = databases
+    .sort((a, b) => (a.inserted_at > b.inserted_at ? 1 : 0))
+    .sort((database) => (database.identifier === projectRef ? -1 : 0))
 
   const selectedDatabase = databases.find((db) => db.identifier === selectedDatabaseId)
   const selectedDatabaseRegion = formatDatabaseRegion(selectedDatabase?.region ?? '')
@@ -116,7 +119,7 @@ const DatabaseSelector = ({
             )}
             <CommandGroup_Shadcn_>
               <ScrollArea className={(databases || []).length > 7 ? 'h-[210px]' : ''}>
-                {databases?.map((database) => {
+                {sortedDatabases?.map((database) => {
                   const region = formatDatabaseRegion(database.region)
                   const id = formatDatabaseID(database.identifier)
 
