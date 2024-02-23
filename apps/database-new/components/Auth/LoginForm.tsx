@@ -4,6 +4,7 @@ import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 
 import { createClient } from '@/lib/supabase/server'
+import GithubButton from './GithubButton'
 
 export default function LoginForm({ searchParams }: { searchParams?: { message?: string } }) {
   const signUp = async () => {
@@ -44,14 +45,8 @@ export default function LoginForm({ searchParams }: { searchParams?: { message?:
           <p className="text-center text-sm ">You need to sign in to generate a schema</p>
           <p className="text-center text-xs">Takes just a few seconds</p>
         </div>
-        <Button
-          className="border text-sm bg-surface-100 rounded-md px-4 py-2 text-foreground mb-2 flex items-center justify-center gap-x-2"
-          type="default"
-          htmlType="submit"
-          icon={<Github size={18} />}
-        >
-          Sign in with Github
-        </Button>
+
+        <GithubButton />
 
         {searchParams?.message && (
           <p className="mt-4 p-4 bg-foreground/10 text-foreground text-center">
