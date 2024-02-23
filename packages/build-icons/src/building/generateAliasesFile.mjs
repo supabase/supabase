@@ -1,6 +1,6 @@
-import path from 'path'
 import fs from 'fs'
-import { toPascalCase, resetFile, appendFile } from '../../scripts/helpers.mjs'
+import path from 'path'
+import { appendFile, resetFile, toPascalCase } from '../utils/helpers.mjs'
 
 const getImportString = (componentName, iconName, aliasImportFileExtension = '') =>
   `export { default as ${componentName} } from './icons/${iconName}${aliasImportFileExtension}';\n`

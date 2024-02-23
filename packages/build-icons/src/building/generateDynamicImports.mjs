@@ -1,5 +1,5 @@
 import path from 'path'
-import { resetFile, appendFile } from '../../scripts/helpers.mjs'
+import { appendFile, resetFile } from '../utils/helpers.mjs'
 
 export default function generateDynamicImports({
   iconNodes,

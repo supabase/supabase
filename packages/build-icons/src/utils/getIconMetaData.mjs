@@ -1,5 +1,5 @@
 import path from 'path'
-import { readSvgDirectory } from '../../scripts/helpers.mjs'
+import { readSvgDirectory } from '../utils/helpers.mjs'
 
 async function getIconMetaData(iconDirectory) {
   const iconJsons = readSvgDirectory(iconDirectory, '.json')

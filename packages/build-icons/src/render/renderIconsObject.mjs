@@ -1,6 +1,6 @@
 import { basename } from 'path'
 import { parseSync } from 'svgson'
-import { generateHashedKey, readSvg, hasDuplicatedChildren } from '../../scripts/helpers.mjs'
+import { generateHashedKey, hasDuplicatedChildren, readSvg } from '../utils/helpers.mjs'
 
 /**
  * Build an object in the format: `{ <name>: <contents> }`.

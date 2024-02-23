@@ -1,23 +1,21 @@
 #!/usr/bin/env node
 import fs from 'fs'
-import path from 'path'
 import getArgumentOptions from 'minimist'
+import path from 'path'
 
-import renderIconsObject from './render/renderIconsObject.mjs'
-import generateIconFiles from './building/generateIconFiles.mjs'
 import generateExportsFile from './building/generateExportsFile.mjs'
+import generateIconFiles from './building/generateIconFiles.mjs'
+import renderIconsObject from './render/renderIconsObject.mjs'
 
-import { readSvgDirectory, getCurrentDirPath } from './../scripts/helpers.mjs'
 import generateAliasesFile from './building/generateAliasesFile.mjs'
-import getIconMetaData from './utils/getIconMetaData.mjs'
 import generateDynamicImports from './building/generateDynamicImports.mjs'
+import getIconMetaData from './utils/getIconMetaData.mjs'
+import { readSvgDirectory } from './utils/helpers.mjs'
 
 const cliArguments = getArgumentOptions(process.argv.slice(2))
 
-const currentDir = getCurrentDirPath(import.meta.url)
-
-const ICONS_DIR = path.resolve(currentDir, '../../src/raw-icons')
-const OUTPUT_DIR = path.resolve(process.cwd(), cliArguments.output || '../../src')
+const ICONS_DIR = path.resolve(process.cwd(), 'src/raw-icons')
+const OUTPUT_DIR = path.resolve(process.cwd(), cliArguments.output || 'src')
 
 if (!fs.existsSync(OUTPUT_DIR)) {
   fs.mkdirSync(OUTPUT_DIR)
@@ -43,7 +41,6 @@ async function buildIcons() {
   if (templateSrc == null) {
     throw new Error('No `templateSrc` argument given.')
   }
-
   const svgFiles = readSvgDirectory(ICONS_DIR)
 
   const icons = renderIconsObject(svgFiles, ICONS_DIR, renderUniqueKey)

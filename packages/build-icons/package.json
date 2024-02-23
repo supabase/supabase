@@ -3,13 +3,10 @@
   "private": true,
   "version": "1.0.0",
   "description": "",
-  "main": "index.mjs",
+  "main": "src/index.mjs",
   "type": "module",
-  "scripts": {
-    "build:icons": "node ./main.mjs --templateSrc=./../scripts/exportTemplate.mjs --renderUniqueKey --iconFileExtension=.ts --exportFileName=index.ts"
-  },
   "bin": {
-    "build-icons": "./main.mjs"
+    "build-icons": "src/main.mjs"
   },
   "engines": {
     "node": ">= 16"

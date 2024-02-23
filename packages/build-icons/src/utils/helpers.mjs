@@ -1,6 +1,5 @@
 import fs from 'fs'
 import path from 'path'
-import { fileURLToPath } from 'url'
 
 /**
  * Converts string to CamelCase
@@ -8,7 +7,7 @@ import { fileURLToPath } from 'url'
  * @param {string} string
  * @returns {string} A camelized string
  */
-export const toCamelCase = (string) =>
+const toCamelCase = (string) =>
   string.replace(/^([A-Z])|[\s-_]+(\w)/g, (match, p1, p2) =>
     p2 ? p2.toUpperCase() : p1.toLowerCase()
   )
@@ -31,7 +30,7 @@ export const toPascalCase = (string) => {
  * @param {string} string
  * @returns {string} A kebabized string
  */
-export const toKebabCase = (string) => string.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()
+const toKebabCase = (string) => string.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()
 
 /**
  * Resets the file contents.
@@ -48,7 +47,7 @@ export const resetFile = (fileName, outputDirectory) =>
  * @param {string} path
  * @returns {string} The contents of a file
  */
-export const readFile = (entry) => fs.readFileSync(path.resolve(__dirname, '../', entry), 'utf-8')
+const readFile = (entry) => fs.readFileSync(path.resolve(__dirname, '../', entry), 'utf-8')
 
 /**
  * append content to a file
@@ -67,7 +66,7 @@ export const appendFile = (content, fileName, outputDirectory) =>
  * @param {string} fileName
  * @param {string} outputDirectory
  */
-export const writeFile = (content, fileName, outputDirectory) =>
+const writeFile = (content, fileName, outputDirectory) =>
   fs.writeFileSync(path.join(outputDirectory, fileName), content, 'utf-8')
 
 /**
@@ -95,7 +94,7 @@ export const readSvg = (fileName, directory) =>
  * @param {number} seed
  * @returns {string} A hashed string of 6 characters
  */
-export const hash = (string, seed = 5381) => {
+const hash = (string, seed = 5381) => {
   let i = string.length
 
   while (i) {
@@ -130,9 +129,3 @@ export const hasDuplicatedChildren = (children) => {
     (key, index) => index === hashedKeys.findIndex((childKey) => childKey === key)
   )
 }
-
-/**
- * @param {string} currentPath
- * @returns {string}
- */
-export const getCurrentDirPath = (currentPath) => path.dirname(fileURLToPath(currentPath))

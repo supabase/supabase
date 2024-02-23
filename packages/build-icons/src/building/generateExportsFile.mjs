@@ -1,6 +1,6 @@
 import path from 'path'
 
-import { toPascalCase, resetFile, appendFile } from '../../scripts/helpers.mjs'
+import { appendFile, resetFile, toPascalCase } from '../utils/helpers.mjs'
 
 export default (inputEntry, outputDirectory, iconNodes, iconFileExtension = '') => {
   const fileName = path.basename(inputEntry)
