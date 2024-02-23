@@ -71,44 +71,6 @@ export const writeFile = (content, fileName, outputDirectory) =>
   fs.writeFileSync(path.join(outputDirectory, fileName), content, 'utf-8')
 
 /**
- * writes content to a file if it does not exist
- *
- * @param {string} content
- * @param {string} fileName
- * @param {string} outputDirectory
- */
-export const writeFileIfNotExists = (content, fileName, outputDirectory) => {
-  if (!fs.existsSync(path.join(outputDirectory, fileName))) {
-    writeFile(content, fileName, outputDirectory)
-  }
-}
-
-/**
- * Reads metadata from the icons/categories directories
- *
- * @param {string} directory
- * @returns {object} A map of icon or category metadata
- */
-export const readAllMetadata = (directory) =>
-  fs
-    .readdirSync(directory)
-    .filter((file) => path.extname(file) === '.json')
-    .reduce((acc, fileName, i) => {
-      acc[path.basename(fileName, '.json')] = readMetadata(fileName, directory)
-      return acc
-    }, {})
-
-/**
- * Reads metadata for an icon or category
- *
- * @param {string} fileName
- * @param {string} directory
- * @returns {object} The metadata for the icon or category
- */
-export const readMetadata = (fileName, directory) =>
-  JSON.parse(fs.readFileSync(path.join(directory, fileName), 'utf-8'))
-
-/**
  * reads the icon directory
  *
  * @param {string} directory
@@ -125,16 +87,6 @@ export const readSvgDirectory = (directory, fileExtension = '.svg') =>
  */
 export const readSvg = (fileName, directory) =>
   fs.readFileSync(path.join(directory, fileName), 'utf-8')
-
-/**
- * writes content to a file
- *
- * @param {string} fileName
- * @param {string} outputDirectory
- * @param {string} content
- */
-export const writeSvgFile = (fileName, outputDirectory, content) =>
-  fs.writeFileSync(path.join(outputDirectory, fileName), content, 'utf-8')
 
 /**
  * djb2 hashing function
@@ -180,46 +132,7 @@ export const hasDuplicatedChildren = (children) => {
 }
 
 /**
- * @param {array} a
- * @param {array} b
- * @returns {array}
- */
-export const mergeArrays = (a, b) => {
-  a = a.concat(b)
-  a = a.filter((i, p) => a.indexOf(i) === p)
-  return a
-}
-
-/**
  * @param {string} currentPath
  * @returns {string}
  */
 export const getCurrentDirPath = (currentPath) => path.dirname(fileURLToPath(currentPath))
-
-/**
- * @param {array} array
- * @returns {array}
- */
-export const shuffle = (array) => {
-  // eslint-disable-next-line no-plusplus
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[array[i], array[j]] = [array[j], array[i]]
-  }
-  return array
-}
-
-/**
- * Minifies SVG
- *
- * @param {string} string
- * @returns string
- */
-export function minifySvg(string) {
-  return string
-    ? string
-        .replace(/\>[\r\n ]+</g, '><')
-        .replace(/(<.*?>)|\s+/g, (m, $1) => $1 || ' ')
-        .trim()
-    : ''
-}
