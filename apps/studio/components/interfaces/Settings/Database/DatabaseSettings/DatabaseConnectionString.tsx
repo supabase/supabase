@@ -26,6 +26,8 @@ import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useFlag } from 'hooks'
 import { pluckObjectFields } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 import { IPv4DeprecationNotice } from '../IPv4DeprecationNotice'
 import { UsePoolerCheckbox } from '../UsePoolerCheckbox'
 import {
@@ -51,14 +53,14 @@ interface DatabaseConnectionStringProps {
 
 export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStringProps) => {
   const router = useRouter()
-  const { project: projectDetails, isLoading: isProjectLoading } = useProjectContext()
-  const { ref: projectRef, connectionString } = useParams()
   const telemetryProps = useTelemetryProps()
+  const { ref: projectRef, connectionString } = useParams()
+  const snap = useDatabaseSettingsStateSnapshot()
+  const state = useDatabaseSelectorStateSnapshot()
+  const { project: projectDetails, isLoading: isProjectLoading } = useProjectContext()
   const readReplicasEnabled = useFlag('readReplicas') && projectDetails?.is_read_replicas_enabled
 
   const connectionStringsRef = useRef<HTMLDivElement>(null)
-  // [Joshen] Temp - so that behaviour for is similar to usePoolerCheckbox where the state is not synced with Connection Params
-  const [selectedDatabaseId, setSelectedDatabaseId] = useState(projectRef)
   const [usePoolerConnection, setUsePoolerConnection] = useState(true)
   const [poolingMode, setPoolingMode] = useState<'transaction' | 'session' | 'statement'>('session')
   const [selectedTab, setSelectedTab] = useState<
@@ -69,7 +71,7 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
     projectRef,
   })
   const poolingConfiguration = readReplicasEnabled
-    ? poolingInfo?.find((x) => x.identifier === selectedDatabaseId)
+    ? poolingInfo?.find((x) => x.identifier === state.selectedDatabaseId)
     : poolingInfo?.find((x) => x.database_type === 'PRIMARY')
 
   const {
@@ -93,7 +95,9 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
   const isError = readReplicasEnabled ? isErrorReadReplicas : isErrorProjectSettings
   const isSuccess = readReplicasEnabled ? isSuccessReadReplicas : isSuccessProjectSettings
 
-  const selectedDatabase = (databases ?? []).find((db) => db.identifier === selectedDatabaseId)
+  const selectedDatabase = (databases ?? []).find(
+    (db) => db.identifier === state.selectedDatabaseId
+  )
 
   const { project } = data ?? {}
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
@@ -153,7 +157,7 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
       connectionString !== undefined &&
       connectionStringsRef.current !== undefined
     ) {
-      setSelectedDatabaseId(connectionString)
+      state.setSelectedDatabaseId(connectionString)
       connectionStringsRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' })
     }
   }, [connectionString])
@@ -197,8 +201,8 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
               >
                 {readReplicasEnabled && (
                   <DatabaseSelector
-                    selectedId={selectedDatabaseId}
-                    setSelectedId={setSelectedDatabaseId}
+                    selectedId={state.selectedDatabaseId}
+                    setSelectedId={state.setSelectedDatabaseId}
                   />
                 )}
                 <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
@@ -233,9 +237,9 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
             <div className="flex flex-col gap-y-4 pt-2">
               <UsePoolerCheckbox
                 id="connection-string"
-                checked={usePoolerConnection}
+                checked={snap.usePoolerConnection}
                 poolingMode={poolingMode}
-                onCheckedChange={setUsePoolerConnection}
+                onCheckedChange={snap.setUsePoolerConnection}
                 onSelectPoolingMode={setPoolingMode}
               />
               {!usePoolerConnection && <IPv4DeprecationNotice />}
