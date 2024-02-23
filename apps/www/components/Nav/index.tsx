@@ -98,6 +98,7 @@ const Nav = (props: Props) => {
                       width={124}
                       height={24}
                       alt="Supabase Logo"
+                      priority
                     />
                   </Link>
 
