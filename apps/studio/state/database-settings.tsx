@@ -5,7 +5,7 @@ import { useConstant } from 'common'
 
 export function createDatabaseSettingsState() {
   const state = proxy({
-    usePoolerConnection: false,
+    usePoolerConnection: true,
     setUsePoolerConnection: (value: boolean) => {
       state.usePoolerConnection = value
     },

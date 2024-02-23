@@ -173,32 +173,34 @@ const PreviewFilterPanel = ({
           helpers={PREVIEWER_DATEPICKER_HELPERS}
         />
 
-        <div className="flex items-center">
-          {FILTER_OPTIONS[table] &&
-            Object.values(FILTER_OPTIONS[table]).map((x, i: number) => {
-              const classes = []
+        {FILTER_OPTIONS[table] !== undefined && (
+          <div className="flex items-center">
+            {FILTER_OPTIONS[table] &&
+              Object.values(FILTER_OPTIONS[table]).map((x, i: number) => {
+                const classes = []
 
-              if (Object.values(FILTER_OPTIONS[table]).length >= 2) {
-                if (i === 0) {
-                  classes.push('rounded-tr-none rounded-br-none')
-                } else if (i === Object.values(FILTER_OPTIONS[table]).length - 1) {
-                  classes.push('rounded-tl-none rounded-bl-none')
-                } else {
-                  classes.push('rounded-none')
+                if (Object.values(FILTER_OPTIONS[table]).length >= 2) {
+                  if (i === 0) {
+                    classes.push('rounded-tr-none rounded-br-none')
+                  } else if (i === Object.values(FILTER_OPTIONS[table]).length - 1) {
+                    classes.push('rounded-tl-none rounded-bl-none')
+                  } else {
+                    classes.push('rounded-none')
+                  }
                 }
-              }
 
-              return (
-                <LogsFilterPopover
-                  buttonClassName={classes.join(' ')}
-                  key={`${x.key}-filter`}
-                  options={x}
-                  onFiltersChange={onFiltersChange}
-                  filters={filters}
-                />
-              )
-            })}
-        </div>
+                return (
+                  <LogsFilterPopover
+                    buttonClassName={classes.join(' ')}
+                    key={`${x.key}-filter`}
+                    options={x}
+                    onFiltersChange={onFiltersChange}
+                    filters={filters}
+                  />
+                )
+              })}
+          </div>
+        )}
         <div className="flex items-center space-x-2">
           <Button
             type="default"
@@ -211,7 +213,6 @@ const PreviewFilterPanel = ({
         <CSVButton data={csvData} disabled={!Boolean(csvData)} title="Download data" />
       </div>
 
-      {/* [Joshen TODO] Temporarily, need to figure out how to make the filter options more concise */}
       {showDatabaseSelector ? (
         <div className="flex items-center justify-center gap-x-2">
           <Tooltip_Shadcn_ delayDuration={100}>
