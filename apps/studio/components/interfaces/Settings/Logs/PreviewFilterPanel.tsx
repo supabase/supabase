@@ -1,3 +1,5 @@
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import {
   Button,
@@ -16,7 +18,6 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import CSVButton from 'components/ui/CSVButton'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { useFlag } from 'hooks'
-import { useRouter } from 'next/router'
 import { Filters, LogSearchCallback, LogTemplate, PREVIEWER_DATEPICKER_HELPERS } from '.'
 import DatePickers from './Logs.DatePickers'
 import { FILTER_OPTIONS, LogsTableName } from './Logs.constants'
@@ -32,6 +33,7 @@ interface PreviewFilterPanelProps {
   onRefresh?: () => void
   onSearch?: LogSearchCallback
   onExploreClick?: () => void
+  queryUrl: string
   onSelectTemplate: (template: LogTemplate) => void
   table: LogsTableName
   condensedLayout: Boolean
@@ -55,6 +57,7 @@ const PreviewFilterPanel = ({
   defaultToValue = '',
   defaultFromValue = '',
   onExploreClick,
+  queryUrl,
   condensedLayout,
   isShowingEventChart,
   onToggleEventChart,
@@ -73,7 +76,7 @@ const PreviewFilterPanel = ({
   const showDatabaseSelector =
     readReplicasEnabled &&
     project?.is_read_replicas_enabled &&
-    ['/project/[ref]/logs/edge-logs'].includes(router.pathname)
+    ['/project/[ref]/logs/edge-logs', '/project/[ref]/logs/pooler-logs'].includes(router.pathname)
 
   const hasEdits = search !== defaultSearchValue
 
@@ -217,12 +220,9 @@ const PreviewFilterPanel = ({
         <div className="flex items-center justify-center gap-x-2">
           <Tooltip_Shadcn_ delayDuration={100}>
             <TooltipTrigger_Shadcn_ asChild>
-              <Button
-                className="px-1"
-                type="default"
-                icon={<IconTerminal />}
-                onClick={onExploreClick}
-              />
+              <Button asChild className="px-1" type="default" icon={<IconTerminal />}>
+                <Link href={queryUrl} />
+              </Button>
             </TooltipTrigger_Shadcn_>
             <TooltipContent_Shadcn_ side="bottom" className="text-xs">
               Open query in Logs Explorer
@@ -231,8 +231,8 @@ const PreviewFilterPanel = ({
           <DatabaseSelector onSelectId={onSelectedDatabaseChange} />
         </div>
       ) : (
-        <Button type="default" onClick={onExploreClick}>
-          Open as query
+        <Button asChild type="default" onClick={onExploreClick}>
+          <Link href={queryUrl}>Explore via query</Link>
         </Button>
       )}
     </div>

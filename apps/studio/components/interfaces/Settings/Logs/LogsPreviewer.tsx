@@ -191,15 +191,11 @@ export const LogsPreviewer = ({
         defaultSearchValue={filters.search_query as string}
         defaultToValue={params.iso_timestamp_end}
         defaultFromValue={params.iso_timestamp_start}
-        onExploreClick={() => {
-          router.push(
-            `/project/${projectRef}/logs/explorer?q=${encodeURIComponent(
-              params.sql || ''
-            )}&its=${encodeURIComponent(params.iso_timestamp_start || '')}&ite=${encodeURIComponent(
-              params.iso_timestamp_end || ''
-            )}`
-          )
-        }}
+        queryUrl={`/project/${projectRef}/logs/explorer?q=${encodeURIComponent(
+          params.sql || ''
+        )}&its=${encodeURIComponent(params.iso_timestamp_start || '')}&ite=${encodeURIComponent(
+          params.iso_timestamp_end || ''
+        )}`}
         onSelectTemplate={onSelectTemplate}
         filters={filters}
         onFiltersChange={setFilters}
