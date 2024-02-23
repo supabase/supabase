@@ -3,7 +3,7 @@ import { createGraphiQLFetcher, Fetcher } from '@graphiql/toolkit'
 import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
 import { useTheme } from 'next-themes'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 
 import ExtensionCard from 'components/interfaces/Database/Extensions/ExtensionCard'
@@ -16,8 +16,8 @@ import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
-import { getRoleImpersonationJWT } from 'lib/role-impersonation'
-import { useGetImpersonatedRole } from 'state/role-impersonation-state'
+import { getRoleImpersonationJWT, ImpersonationRole } from 'lib/role-impersonation'
+import { useSubscribeToImpersonatedRole } from 'state/role-impersonation-state'
 import { NextPageWithLayout } from 'types'
 
 const GraphiQLPage: NextPageWithLayout = () => {
@@ -43,47 +43,42 @@ const GraphiQLPage: NextPageWithLayout = () => {
   const { data: config } = useProjectPostgrestConfigQuery({ projectRef })
   const jwtSecret = config?.jwt_secret
 
-  const getImpersonatedRole = useGetImpersonatedRole()
+  const [role, setRole] = useState<ImpersonationRole | undefined>(undefined)
+  const [token, setToken] = useState('')
+
+  useSubscribeToImpersonatedRole((role) => setRole(role))
+
+  useEffect(() => {
+    if (projectRef && jwtSecret && role?.type === 'postgrest') {
+      getRoleImpersonationJWT(projectRef, jwtSecret, role)
+        .then((t) => setToken(t))
+        .catch((err) => toast.error(`Failed to get role impersonation JWT: ${err.message}`))
+    } else {
+      setToken('')
+    }
+  }, [projectRef, jwtSecret, role])
 
   const fetcher = useMemo(() => {
     const fetcherFn = createGraphiQLFetcher({
       url: `${API_URL}/projects/${projectRef}/api/graphql`,
       fetch,
     })
-    const customFetcher: Fetcher = async (graphqlParams, opts) => {
-      let userAuthorization: string | undefined
-
-      const role = getImpersonatedRole()
-      if (
-        projectRef !== undefined &&
-        jwtSecret !== undefined &&
-        role !== undefined &&
-        role.type === 'postgrest'
-      ) {
-        try {
-          const token = await getRoleImpersonationJWT(projectRef, jwtSecret, role)
-          userAuthorization = 'Bearer ' + token
-        } catch (err: any) {
-          toast.error(`Failed to get JWT for role: ${err.message}`)
-        }
-      }
-
+    const customFetcher: Fetcher = (graphqlParams, opts) => {
       return fetcherFn(graphqlParams, {
         ...opts,
         headers: {
           ...opts?.headers,
           Authorization: `Bearer ${accessToken}`,
           'x-graphql-authorization':
-            opts?.headers?.['Authorization'] ??
-            opts?.headers?.['authorization'] ??
-            userAuthorization ??
-            `Bearer ${serviceRoleKey}`,
+            opts?.headers?.['Authorization'] ?? opts?.headers?.['authorization'] ?? token
+              ? `Bearer ${token}`
+              : `Bearer ${serviceRoleKey}`,
         },
       })
     }
 
     return customFetcher
-  }, [projectRef, getImpersonatedRole, jwtSecret, accessToken, serviceRoleKey])
+  }, [accessToken, serviceRoleKey, token, projectRef])
 
   if ((IS_PLATFORM && !accessToken) || !isFetched || (isExtensionsLoading && !pgGraphqlExtension)) {
     return <Connecting />
