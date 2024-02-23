@@ -3,6 +3,7 @@ import React, { PropsWithChildren } from 'react'
 import { IconChevronRight, IconLoader, cn } from 'ui'
 
 interface CardButtonProps {
+  title?: string | React.ReactNode
   description?: string
   footer?: React.ReactNode
   url?: string
@@ -18,17 +19,18 @@ interface CardButtonProps {
 }
 
 // Define separate interfaces for each type of container
-interface LinkContainerProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+interface LinkContainerProps extends Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'title'> {
   href: string
 }
 
-interface UrlContainerProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+interface UrlContainerProps extends Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'title'> {
   href: string
 }
 
-interface NonLinkContainerProps extends React.HTMLAttributes<HTMLDivElement> {}
+interface NonLinkContainerProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {}
 
-interface ButtonContainerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
+interface ButtonContainerProps
+  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'title'> {}
 
 // Union of all container props
 type ContainerProps =
