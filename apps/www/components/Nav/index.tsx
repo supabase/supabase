@@ -146,7 +146,7 @@ const Nav = (props: Props) => {
                   </NavigationMenuList>
                 </NavigationMenu>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 opacity-0 animate-fade-in !scale-100 delay-300">
                 <GitHubButton />
                 {!isUserLoading && (
                   <>
