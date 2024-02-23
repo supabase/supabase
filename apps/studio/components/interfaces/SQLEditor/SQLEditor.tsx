@@ -828,7 +828,7 @@ const SQLEditor = () => {
                         type="alternative"
                         size="tiny"
                         icon={<IconX />}
-                        iconRight={<span className="opacity-30">ESC</span>}
+                        iconRight={<span className="text-brand-500">ESC</span>}
                         onClick={discardAiHandler}
                       >
                         Discard
@@ -838,8 +838,8 @@ const SQLEditor = () => {
                     <>
                       <div
                         className={cn(
-                          'transition text-brand',
-                          !aiInput ? 'opacity-0' : 'opacity-30'
+                          'transition text-brand-600',
+                          !aiInput ? 'opacity-0' : 'opacity-100'
                         )}
                       >
                         <IconCornerDownLeft size={16} strokeWidth={1.5} />
