@@ -1,7 +1,7 @@
 import { UseQueryOptions, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useCallback } from 'react'
 
-import { get } from 'data/fetchers'
+import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { viewKeys } from './keys'
 
@@ -32,7 +32,7 @@ export async function getViews(
     signal,
   })
 
-  if (error) throw new Error((error as ResponseError).message)
+  if (error) handleError(error)
   return data
 }
 

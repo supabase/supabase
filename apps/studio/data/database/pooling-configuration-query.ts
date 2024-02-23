@@ -1,8 +1,9 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
+
+import { components } from 'data/api'
+import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { databaseKeys } from './keys'
-import { components } from 'data/api'
 
 export type PoolingConfigurationVariables = {
   projectRef?: string
@@ -20,7 +21,7 @@ export async function getPoolingConfiguration(
     params: { path: { ref: projectRef } },
     signal,
   })
-  if (error) throw new Error((error as ResponseError).message)
+  if (error) handleError(error)
   return data
 }
 
