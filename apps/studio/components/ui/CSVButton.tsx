@@ -1,15 +1,13 @@
+import React, { PropsWithChildren, useMemo, useRef } from 'react'
+import { CSVLink } from 'react-csv'
 import {
   Button,
   IconDownload,
-  IconDownloadCloud,
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
   Tooltip_Shadcn_,
 } from 'ui'
 import { ButtonProps } from 'ui/src/components/Button/Button'
-import { flattenDeep } from 'lodash'
-import React, { PropsWithChildren, useMemo, useRef } from 'react'
-import { CSVLink } from 'react-csv'
 
 interface CSVButtonProps {
   buttonType?: ButtonProps['type']

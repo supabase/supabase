@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import {
   Button,
-  IconExternalLink,
   IconEye,
   IconEyeOff,
   IconRefreshCw,
@@ -12,15 +11,15 @@ import {
   Tooltip_Shadcn_,
 } from 'ui'
 
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import CSVButton from 'components/ui/CSVButton'
-import { Filters, LogSearchCallback, LogTemplate, PREVIEWER_DATEPICKER_HELPERS } from '.'
-import { FILTER_OPTIONS, LogsTableName } from './Logs.constants'
-import DatePickers from './Logs.DatePickers'
-import LogsFilterPopover from './LogsFilterPopover'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { useFlag } from 'hooks'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useRouter } from 'next/router'
+import { Filters, LogSearchCallback, LogTemplate, PREVIEWER_DATEPICKER_HELPERS } from '.'
+import DatePickers from './Logs.DatePickers'
+import { FILTER_OPTIONS, LogsTableName } from './Logs.constants'
+import LogsFilterPopover from './LogsFilterPopover'
 
 interface PreviewFilterPanelProps {
   defaultSearchValue?: string
