@@ -32,6 +32,13 @@ npm run build
 
 This will output icons into ./src/icons and update import names/paths
 
+### Design spec
+
+Icons should:
+
+- always be exported 24x24px,
+- and have an icon inside that frame that's around 18x18px(ish)
+
 ### ❌ bad example
 
 Notice the stroke, stroke-linecap, fills, etc.
