@@ -314,7 +314,7 @@ const SideBarContent = observer(() => {
                             onClick={() => setSelectedQueries([])}
                           />
                         </TooltipTrigger_Shadcn_>
-                        <TooltipContent_Shadcn_ side="bottom">
+                        <TooltipContent_Shadcn_ side="bottom" className="text-xs">
                           Clear selection
                         </TooltipContent_Shadcn_>
                       </Tooltip_Shadcn_>

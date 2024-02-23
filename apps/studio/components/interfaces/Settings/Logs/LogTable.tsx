@@ -190,7 +190,7 @@ const LogTable = ({
 
   const RowRenderer = useCallback<(key: Key, props: RenderRowProps<LogData, unknown>) => ReactNode>(
     (key, props) => {
-      return <Row {...props} isRowSelected={false} selectedCellIdx={undefined} />
+      return <Row key={key} {...props} isRowSelected={false} selectedCellIdx={undefined} />
     },
     []
   )
@@ -317,31 +317,12 @@ const LogTable = ({
   const renderNoResultAlert = () => (
     <div className="flex scale-100 flex-col items-center justify-center gap-6 text-center opacity-100">
       <div className="flex flex-col gap-1">
-        <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-stronger px-2"></div>
-        <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-stronger px-2">
-          <div className="absolute right-1 -bottom-4 text-foreground-light">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-        </div>
+        <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-stronger px-2" />
+        <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-stronger px-2" />
       </div>
       <div className="flex flex-col gap-1 px-5">
-        <h3 className="text-lg text-foreground">No results</h3>
-        <p className="text-sm text-foreground-lighter">
-          Try another search, or adjusting the filters
-        </p>
+        <h3 className="text-lg text-foreground">No results found</h3>
+        <p className="text-sm text-foreground-lighter">Try another search or adjust the filters</p>
       </div>
     </div>
   )

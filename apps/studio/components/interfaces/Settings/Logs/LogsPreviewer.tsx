@@ -21,8 +21,11 @@ import useLogsPreview from 'hooks/analytics/useLogsPreview'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { LOGS_TABLES } from './Logs.constants'
 import UpgradePrompt from './UpgradePrompt'
-import { useSelectedOrganization } from 'hooks'
+import { useFlag, useSelectedOrganization } from 'hooks'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 /**
  * Acts as a container component for the entire log display
@@ -50,9 +53,14 @@ export const LogsPreviewer = ({
   children,
 }: PropsWithChildren<LogsPreviewerProps>) => {
   const router = useRouter()
-  const { s, ite, its } = useParams()
+  const { s, ite, its, db } = useParams()
   const [showChart, setShowChart] = useState(true)
+  const { project } = useProjectContext()
   const organization = useSelectedOrganization()
+  const state = useDatabaseSelectorStateSnapshot()
+  const readReplicasEnabled = useFlag('readReplicas') && project?.is_read_replicas_enabled
+
+  const { data: databases, isSuccess } = useReadReplicasQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
 
   const table = !tableName ? LOGS_TABLES[queryType] : tableName
@@ -77,7 +85,11 @@ export const LogsPreviewer = ({
   )
 
   useEffect(() => {
-    setFilters((prev) => ({ ...prev, search_query: s as string }))
+    setFilters((prev) => ({
+      ...prev,
+      search_query: s as string,
+      ...(readReplicasEnabled ? { database: db as string } : {}),
+    }))
     if (ite || its) {
       setParams((prev) => ({
         ...prev,
@@ -85,7 +97,7 @@ export const LogsPreviewer = ({
         iso_timestamp_end: (ite || '') as string,
       }))
     }
-  }, [s, ite, its])
+  }, [db, s, ite, its])
 
   // Show the prompt on page load based on query params
   useEffect(() => {
@@ -96,6 +108,13 @@ export const LogsPreviewer = ({
       }
     }
   }, [its, subscription])
+
+  useEffect(() => {
+    if (readReplicasEnabled && db !== undefined) {
+      const database = databases?.find((d) => d.identifier === db)
+      if (database !== undefined) state.setSelectedDatabaseId(db)
+    }
+  }, [readReplicasEnabled, db, isSuccess])
 
   const onSelectTemplate = (template: LogTemplate) => {
     setFilters((prev: any) => ({ ...prev, search_query: template.searchString }))
@@ -172,15 +191,11 @@ export const LogsPreviewer = ({
         defaultSearchValue={filters.search_query as string}
         defaultToValue={params.iso_timestamp_end}
         defaultFromValue={params.iso_timestamp_start}
-        onExploreClick={() => {
-          router.push(
-            `/project/${projectRef}/logs/explorer?q=${encodeURIComponent(
-              params.sql || ''
-            )}&its=${encodeURIComponent(params.iso_timestamp_start || '')}&ite=${encodeURIComponent(
-              params.iso_timestamp_end || ''
-            )}`
-          )
-        }}
+        queryUrl={`/project/${projectRef}/logs/explorer?q=${encodeURIComponent(
+          params.sql || ''
+        )}&its=${encodeURIComponent(params.iso_timestamp_start || '')}&ite=${encodeURIComponent(
+          params.iso_timestamp_end || ''
+        )}`}
         onSelectTemplate={onSelectTemplate}
         filters={filters}
         onFiltersChange={setFilters}
@@ -188,6 +203,19 @@ export const LogsPreviewer = ({
         condensedLayout={condensedLayout}
         isShowingEventChart={showChart}
         onToggleEventChart={() => setShowChart(!showChart)}
+        onSelectedDatabaseChange={(id: string) => {
+          if (readReplicasEnabled) {
+            setFilters((prev) => ({
+              ...prev,
+              database: id !== projectRef ? undefined : id,
+            }))
+            const { db, ...params } = router.query
+            router.push({
+              pathname: router.pathname,
+              query: id !== projectRef ? { ...router.query, db: id } : params,
+            })
+          }
+        }}
       />
       {children}
       <div
@@ -228,7 +256,7 @@ export const LogsPreviewer = ({
           />
         </LoadingOpacity>
         {!error && (
-          <div className="flex flex-row justify-between p-2">
+          <div className="border-t flex flex-row justify-between p-2">
             <Button
               onClick={loadOlder}
               icon={<IconRewind />}
