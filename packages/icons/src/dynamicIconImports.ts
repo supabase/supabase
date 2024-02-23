@@ -1,5 +1,6 @@
 const dynamicIconImports = {
   '_example-template': () => import('./icons/_example-template'),
+  'database': () => import('./icons/database'),
   'insert-code': () => import('./icons/insert-code'),
   'replace-code': () => import('./icons/replace-code'),
 };

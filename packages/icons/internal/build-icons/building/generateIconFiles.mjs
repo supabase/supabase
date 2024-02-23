@@ -22,14 +22,15 @@ export default ({
 
   const writeIconFiles = icons.map(async (iconName) => {
     const location = path.join(iconsDistDirectory, `${iconName}${iconFileExtension}`)
-    console.log('location', location)
+
     const componentName = toPascalCase(iconName)
 
     let { children } = iconNodes[iconName]
     children = children.map(({ name, attributes }) => [name, attributes])
 
     const getSvg = () => readSvg(`${iconName}.svg`, iconsDir)
-    const { deprecated = false } = iconMetaData[iconName]
+    // const { deprecated = false } = iconMetaData[iconName]
+    const deprecated = false
 
     const elementTemplate = template({ componentName, iconName, children, getSvg, deprecated })
     const output = pretty

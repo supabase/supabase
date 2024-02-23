@@ -6,7 +6,7 @@
   "main": "index.mjs",
   "type": "module",
   "scripts": {
-    "build:icons": "node ./main.mjs --templateSrc=./../scripts/exportTemplate.mjs --renderUniqueKey --withAliases --withDynamicImports --separateAliasesFile --aliasesFileExtension=.ts --iconFileExtension=.ts --exportFileName=index.ts"
+    "build:icons": "node ./main.mjs --templateSrc=./../scripts/exportTemplate.mjs --renderUniqueKey --iconFileExtension=.ts --exportFileName=index.ts"
   },
   "bin": {
     "build-icons": "./main.mjs"
