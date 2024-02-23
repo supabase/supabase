@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import React, { PropsWithChildren } from 'react'
-import { IconChevronRight, IconLoader } from 'ui'
+import { IconChevronRight, IconLoader, cn } from 'ui'
 
 interface CardButtonProps {
   title: string | React.ReactNode
@@ -14,6 +14,8 @@ interface CardButtonProps {
   icon?: React.ReactNode
   loading?: boolean
   className?: string
+  fixedHeight?: boolean
+  hideChevron?: boolean
 }
 
 const CardButton = ({
@@ -29,24 +31,37 @@ const CardButton = ({
   icon,
   className,
   loading = false,
+  fixedHeight = true,
+  hideChevron = false,
+  ...props
 }: PropsWithChildren<CardButtonProps>) => {
-  const LinkContainer = ({ children }: { children: React.ReactNode }) => (
-    <Link href={linkHref}>{children}</Link>
+  const LinkContainer = React.forwardRef<HTMLAnchorElement, React.PropsWithChildren<any>>(
+    (props, ref) => <Link ref={ref} {...props} href={linkHref} />
   )
-  const UrlContainer = ({ children }: { children: React.ReactNode }) => <a href={url}>{children}</a>
-  const NonLinkContainer = ({ children }: { children: React.ReactNode }) => <div>{children}</div>
-  const ButtonContainer = ({ children }: { children: React.ReactNode }) => (
-    <button onClick={onClick}>{children}</button>
+  LinkContainer.displayName = 'LinkContainer'
+
+  const UrlContainer = React.forwardRef<HTMLAnchorElement, React.PropsWithChildren<any>>(
+    (props, ref) => <a ref={ref} {...props} href={url} />
   )
+
+  UrlContainer.displayName = 'UrlContainer'
+  const NonLinkContainer = React.forwardRef<HTMLDivElement, React.PropsWithChildren<any>>(
+    (props, ref) => <div ref={ref} {...props} />
+  )
+  NonLinkContainer.displayName = 'NonLinkContainer'
+
+  const ButtonContainer = React.forwardRef<HTMLButtonElement, React.PropsWithChildren<any>>(
+    (props, ref) => <button onClick={onClick} {...props} ref={ref} />
+  )
+  ButtonContainer.displayName = 'ButtonContainer'
 
   const isLink = url || linkHref || onClick
 
   let containerClasses = [
-    className,
     'group relative text-left',
     'bg-surface-100',
     'border border-surface',
-    'rounded-md p-5 flex flex-row h-32',
+    'rounded-md p-5 flex flex-row',
     'transition ease-in-out duration-150',
   ]
 
@@ -59,12 +74,16 @@ const CardButton = ({
     ]
   }
 
+  if (fixedHeight) {
+    containerClasses = [...containerClasses, 'h-32']
+  }
+
   const ImageContainer = ({ children }: { children: React.ReactNode }) => {
     return <div className="mr-4 flex flex-col">{children}</div>
   }
 
   const contents = (
-    <div className={containerClasses.join(' ')}>
+    <>
       {imgUrl && (
         <ImageContainer>
           <img
@@ -102,20 +121,42 @@ const CardButton = ({
           group-hover:text-foreground
         "
         >
-          {loading ? <IconLoader className="animate-spin" /> : <IconChevronRight />}
+          {loading ? (
+            <IconLoader className="animate-spin" />
+          ) : !hideChevron ? (
+            <IconChevronRight />
+          ) : (
+            <></>
+          )}
         </div>
       )}
-    </div>
+    </>
   )
 
   if (onClick) {
-    return <ButtonContainer>{contents}</ButtonContainer>
+    return (
+      <ButtonContainer {...props} className={cn(containerClasses, className)}>
+        {contents}
+      </ButtonContainer>
+    )
   } else if (linkHref) {
-    return <LinkContainer>{contents}</LinkContainer>
+    return (
+      <LinkContainer {...props} className={cn(containerClasses, className)}>
+        {contents}
+      </LinkContainer>
+    )
   } else if (url) {
-    return <UrlContainer>{contents}</UrlContainer>
+    return (
+      <UrlContainer {...props} className={cn(containerClasses, className)}>
+        {contents}
+      </UrlContainer>
+    )
   } else {
-    return <NonLinkContainer>{contents}</NonLinkContainer>
+    return (
+      <NonLinkContainer {...props} className={cn(containerClasses, className)}>
+        {contents}
+      </NonLinkContainer>
+    )
   }
 }
 

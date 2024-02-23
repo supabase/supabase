@@ -19,6 +19,7 @@ import NoSearchResults from 'components/ui/NoSearchResults'
 import { Markdown } from 'components/interfaces/Markdown'
 import CopyButton from 'components/ui/CopyButton'
 import { Search } from 'lucide-react'
+import CardButton from 'components/ui/CardButton'
 
 interface PolicyTemplatesProps {
   onSelectTemplate: (template: any) => void
@@ -58,28 +59,23 @@ export const PolicyTemplates = ({ onSelectTemplate }: PolicyTemplatesProps) => {
         {filteredTemplates.map((template) => {
           return (
             <HoverCard key={template.id} openDelay={100} closeDelay={0}>
-              <HoverCardTrigger asChild>
-                <button
+              <HoverCardTrigger>
+                <CardButton
+                  title={template.name}
                   key={template.id}
-                  className={cn(
-                    'text-left',
-                    'flex flex-row',
-                    'rounded-panel px-4 py-3 gap-x-4 cursor-pointer transition',
-                    'border bg-surface-100 hover:border-stronger'
-                  )}
                   onClick={() => onSelectTemplate(template.statement)}
+                  hideChevron
+                  fixedHeight={false}
+                  icon={
+                    <div className="min-w-16">
+                      <Badge className="!rounded font-mono" color="scale">
+                        {template.command}
+                      </Badge>
+                    </div>
+                  }
                 >
-                  <div className="min-w-16">
-                    <Badge className="!rounded font-mono" color="scale">
-                      {template.command}
-                    </Badge>
-                  </div>
-                  <div className="text-sm mt-[3px] flex flex-col gap-y-1">
-                    <p>{template.name}</p>
-                    <Markdown content={template.description} className="[&>p]:m-0 space-y-2" />
-                    {/* <p>{template.description}</p> */}
-                  </div>
-                </button>
+                  <Markdown content={template.description} className="[&>p]:m-0 space-y-2" />
+                </CardButton>
               </HoverCardTrigger>
               <HoverCardContent
                 hideWhenDetached
