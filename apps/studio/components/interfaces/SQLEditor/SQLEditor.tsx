@@ -600,7 +600,7 @@ const SQLEditor = () => {
               }}
               initial={isFirstRender ? 'visible' : 'hidden'}
               animate="visible"
-              className="w-full flex justify-center z-10 h-[60px] bg-brand-300 border-b border-brand-400 px-5"
+              className="w-full flex justify-center z-10 h-[60px] bg-brand-200 border-b border-brand-400 px-5"
             >
               <div
                 className={cn(
@@ -645,7 +645,7 @@ const SQLEditor = () => {
                         disabled={isDiffOpen}
                         ref={inputRef}
                         className={cn(
-                          '!p-0 bg-transparent border-transparent text-sm text-brand-600 placeholder:text-brand-500 focus:!ring-0',
+                          '!p-0 bg-transparent border-transparent text-sm text-brand-600 placeholder:text-brand-400 dark:placeholder:text-brand-500 focus:!ring-0',
                           'focus-visible:ring-0 focus-visible:ring-offset-0',
                           'appearance-none outline-none'
                         )}
@@ -854,7 +854,7 @@ const SQLEditor = () => {
                         <IconSettings className="cursor-pointer" />
                       </button>
                       <button
-                        className="text-brand-600 hover:text-brand-600"
+                        className="transition text-brand-500 hover:text-brand-600"
                         onClick={() => setIsAiOpen(false)}
                       >
                         <IconX size={21} />
