@@ -600,7 +600,7 @@ const SQLEditor = () => {
               }}
               initial={isFirstRender ? 'visible' : 'hidden'}
               animate="visible"
-              className="w-full flex justify-center z-10 h-[60px] bg-brand-300 border-b border-brand-400 px-5"
+              className="w-full flex justify-center z-10 h-[60px] bg-brand-200 border-b border-brand-400 px-5"
             >
               <div
                 className={cn(
@@ -751,7 +751,7 @@ const SQLEditor = () => {
                       exit="hidden"
                     >
                       <motion.span
-                        className="text-sm text-brand px-3"
+                        className="text-sm text-brand-600 px-3"
                         animate={{
                           opacity: ['0.5', '0.75', '0.5'],
                           transition: {
@@ -828,7 +828,7 @@ const SQLEditor = () => {
                         type="alternative"
                         size="tiny"
                         icon={<IconX />}
-                        iconRight={<span className="opacity-30">ESC</span>}
+                        iconRight={<span className="text-brand-500">ESC</span>}
                         onClick={discardAiHandler}
                       >
                         Discard
@@ -838,8 +838,8 @@ const SQLEditor = () => {
                     <>
                       <div
                         className={cn(
-                          'transition text-brand',
-                          !aiInput ? 'opacity-0' : 'opacity-30'
+                          'transition text-brand-600',
+                          !aiInput ? 'opacity-0' : 'opacity-100'
                         )}
                       >
                         <IconCornerDownLeft size={16} strokeWidth={1.5} />
@@ -854,7 +854,7 @@ const SQLEditor = () => {
                         <IconSettings className="cursor-pointer" />
                       </button>
                       <button
-                        className="text-brand-600 hover:text-brand-600"
+                        className="transition text-brand-500 hover:text-brand-600"
                         onClick={() => setIsAiOpen(false)}
                       >
                         <IconX size={21} />
