@@ -14,6 +14,7 @@ import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 
 interface Props {
   className?: string
+  hideFooter?: boolean
 }
 
 const Footer = (props: Props) => {
@@ -34,7 +35,7 @@ const Footer = (props: Props) => {
     setMounted(true)
   }, [])
 
-  if (!mounted) {
+  if (!mounted || props.hideFooter) {
     return null
   }
 

@@ -25,7 +25,11 @@ import { menu } from '~/data/nav'
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 
-const Nav = () => {
+interface Props {
+  hideNavbar: boolean
+}
+
+const Nav = (props: Props) => {
   const { resolvedTheme } = useTheme()
   const router = useRouter()
   const { width } = useWindowSize()
@@ -63,7 +67,7 @@ const Nav = () => {
     setMounted(true)
   }, [])
 
-  if (!mounted) {
+  if (!mounted || props.hideNavbar) {
     return null
   }
 
