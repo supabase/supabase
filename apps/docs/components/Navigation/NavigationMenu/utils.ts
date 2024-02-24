@@ -1,3 +1,4 @@
+import { difference } from 'lodash'
 import { type MouseEventHandler, createContext, useContext, useEffect, useRef } from 'react'
 
 import { useConstant } from 'common'
@@ -22,27 +23,23 @@ const recPush =
     return res
   }
 
-type TriggerGroups = {
-  trigger: HTMLButtonElement | null
-  controlled: HTMLElement | null
-}
-
 const createAriaCurrentController = () => {
-  let ariaCurrent: HTMLElement
-  let afHandle: ReturnType<typeof requestAnimationFrame>
+  let _ariaCurrent: HTMLElement
+  let _afHandle: ReturnType<typeof requestAnimationFrame>
+  let _container: HTMLElement
 
-  const syncAriaCurrent = (container: HTMLElement) => {
+  const handleNavigation = () => {
     const pathname = window.location.pathname
-    const curr = container.querySelector(`a[href="${pathname}"]`) as HTMLElement
+    const curr = _container?.querySelector(`a[href="${pathname}"]`) as HTMLElement
     if (curr) {
-      if (ariaCurrent) ariaCurrent.ariaCurrent = undefined
+      if (_ariaCurrent) _ariaCurrent.ariaCurrent = undefined
       curr.ariaCurrent = 'page'
-      ariaCurrent = curr
+      _ariaCurrent = curr
 
-      if (afHandle) cancelAnimationFrame(afHandle)
-      afHandle = requestAnimationFrame(() => {
-        if (!elementInViewport(ariaCurrent)) {
-          ariaCurrent.scrollIntoView({
+      if (_afHandle) cancelAnimationFrame(_afHandle)
+      _afHandle = requestAnimationFrame(() => {
+        if (!elementInViewport(_ariaCurrent)) {
+          _ariaCurrent.scrollIntoView({
             behavior: prefersReducedMotion() ? 'instant' : 'smooth',
             block: 'center',
           })
@@ -51,8 +48,14 @@ const createAriaCurrentController = () => {
     }
   }
 
+  const setup = (container: HTMLElement, evt: DocsEvent) => {
+    _container = container
+    _container.addEventListener(evt, handleNavigation)
+    return () => container.removeEventListener(evt, handleNavigation)
+  }
+
   return {
-    syncAriaCurrent,
+    setup,
   }
 }
 
@@ -67,9 +70,10 @@ const createCollapsibleController = () => {
   const DATA_CONTAINS = 'data-contains'
   const BOUNDARY_MARKER = '#'
 
-  let expandedGroups: Array<TriggerGroups> = []
+  let _container: HTMLElement
+  let _expandedGroups = new Map<string, HTMLElement>()
 
-  const fireCollapsibleToggle = (elem: EventTarget) => {
+  const fireToggle = (elem: EventTarget) => {
     fireCustomEvent(elem, CLICK_EVENT, {
       bubbles: true,
       detail: {
@@ -79,7 +83,7 @@ const createCollapsibleController = () => {
     })
   }
 
-  const getSharedCollapsibleParentProps = (inner: RefMenuItemWithChildren) => ({
+  const getRootProps = (inner: RefMenuItemWithChildren) => ({
     [DATA_MARKER]: `${inner.id}`,
     [DATA_CONTAINS]: inner.items
       .reduce(
@@ -89,70 +93,111 @@ const createCollapsibleController = () => {
       .join(),
   })
 
-  const getInitialCollapsibleTriggerProps = (self: RefMenuItemWithChildren) => ({
-    id: self.id,
+  const getTriggerProps = (self: RefMenuItemWithChildren) => ({
     [DATA_MARKER]: `${self.id}-trigger`,
     'aria-expanded': false,
     'aria-controls': `${self.id}-subitems`,
-    onClick: ((e) => fireCollapsibleToggle(e.currentTarget)) as MouseEventHandler,
+    onClick: ((e) => fireToggle(e.currentTarget)) as MouseEventHandler,
   })
 
-  const getInitialCollapsedProps = (parent: RefMenuItemWithChildren) => ({
+  const getControlledProps = (parent: RefMenuItemWithChildren) => ({
     id: `${parent.id}-subitems`,
     [DATA_MARKER]: `${parent.id}-subitems`,
     hidden: true,
-    'aria-controlledby': parent.id,
   })
 
-  const syncCollapsibleTriggers = (container: HTMLElement) => {
-    // Need to fix this, this is hacky
-    const pathname = window.location.pathname.replace('/docs/reference', '')
-    const groups = [
-      ...container.querySelectorAll(
-        `[${DATA_MARKER}][${DATA_CONTAINS}*="${BOUNDARY_MARKER}${pathname}${BOUNDARY_MARKER}"]`
-      ),
-    ].map((group) => ({
-      trigger: group.querySelector(`[${DATA_MARKER}$="trigger"]`),
-      controlled: group.querySelector(`[${DATA_MARKER}$="subitems"]`),
-    })) as Array<TriggerGroups>
-    console.log(groups)
-    groups.forEach(({ trigger, controlled }) => {
-      if (trigger && controlled) {
-        trigger.ariaExpanded = 'true'
-        trigger.disabled = true
-        controlled.hidden = false
-      }
-    })
-    expandedGroups.forEach(({ trigger, controlled }) => {
-      if (
-        trigger &&
-        controlled &&
-        !groups.some((newGroup) => newGroup.controlled && newGroup.trigger === trigger)
-      ) {
-        trigger.ariaExpanded = 'false'
-        trigger.disabled = false
-        controlled.hidden = true
-      }
-    })
-    expandedGroups = groups
+  const getTrigger = (group: HTMLElement) =>
+    group?.querySelector(`[${DATA_MARKER}$="trigger"]`) as HTMLButtonElement
+  const getControlled = (group: HTMLElement) =>
+    group?.querySelector(`[${DATA_MARKER}$="subitems"]`) as HTMLElement
+
+  const setClosed = (id: string, group: HTMLElement) => {
+    const trigger = getTrigger(group)
+    const controlled = getControlled(group)
+    if (!(trigger && controlled)) return
+
+    // [Charis] Updates don't work synchronously, not sure why
+    setTimeout(() => {
+      trigger.ariaExpanded = 'false'
+      controlled.hidden = true
+
+      _expandedGroups.delete(id)
+    }, 0)
   }
 
-  const syncCollapsibleManual = (evt: CustomEvent) => {
-    console.log(evt.detail)
+  const setOpen = (id: string, group: HTMLElement) => {
+    const trigger = getTrigger(group)
+    const controlled = getControlled(group)
+    if (!(trigger && controlled)) return
+
+    // [Charis] Updates don't work synchronously, not sure why
+    setTimeout(() => {
+      trigger.ariaExpanded = 'true'
+      controlled.hidden = false
+
+      _expandedGroups.set(id, group)
+    }, 0)
+  }
+
+  // Unify typing for this
+  const handleToggle = (e: CustomEvent<{ id: string | undefined; open: boolean }>) => {
+    if (!e.detail.id) return
+
+    const group = _container.querySelector(`[${DATA_MARKER}="${e.detail.id}"]`) as HTMLElement
+    return group
+      ? e.detail.open
+        ? setClosed(e.detail.id, group)
+        : setOpen(e.detail.id, group)
+      : undefined
+  }
+
+  const handleNavigation = () => {
+    // Need to fix this, this is hacky
+    const pathname = window.location.pathname.replace('/docs/reference', '')
+    const oldExpanded = [..._expandedGroups.keys()]
+    const newExpanded = []
+    ;(
+      [
+        ..._container.querySelectorAll(
+          `[${DATA_MARKER}][${DATA_CONTAINS}*="${BOUNDARY_MARKER}${pathname}${BOUNDARY_MARKER}"]`
+        ),
+      ] as Array<HTMLElement>
+    ).forEach((group) => {
+      const id = group.getAttribute(DATA_MARKER)
+      setOpen(id, group)
+      newExpanded.push(id)
+    })
+    difference(newExpanded, oldExpanded).forEach((id) => {
+      const group = _expandedGroups.get(id)
+      if (!group) return
+
+      setClosed(id, group)
+    })
+  }
+
+  const setup = (container: HTMLElement, navEvt: DocsEvent) => {
+    _container = container
+    _container.addEventListener(navEvt, handleNavigation)
+    _container.addEventListener(CLICK_EVENT, handleToggle)
+
+    return () => {
+      _container.removeEventListener(navEvt, handleNavigation)
+      _container.addEventListener(CLICK_EVENT, handleToggle)
+    }
   }
 
   return {
-    getInitialCollapsibleTriggerProps,
-    getInitialCollapsedProps,
-    getSharedCollapsibleParentProps,
-    syncCollapsibleTriggers,
-    syncCollapsibleManual,
+    propGetters: {
+      getRootProps,
+      getTriggerProps,
+      getControlledProps,
+    },
+    setup,
   }
 }
 
 const createNavController = () => {
   const NAV_EVT = DocsEvent.SIDEBAR_NAV_CHANGE
-  const CLICK_EVENT = DocsEvent.SIDEBAR_EXPAND_CLICK
 
   const firePageChange = (elem: EventTarget) => {
     fireCustomEvent(elem, NAV_EVT, { bubbles: true })
@@ -161,31 +206,20 @@ const createNavController = () => {
   const ariaCurrentController = createAriaCurrentController()
   const collapsibleController = createCollapsibleController()
 
-  const syncAll = (container: HTMLElement) => {
-    collapsibleController.syncCollapsibleTriggers(container)
-    ariaCurrentController.syncAriaCurrent(container)
-  }
+  const setup = (container: HTMLElement) => {
+    const tearDown = ariaCurrentController.setup(container, NAV_EVT)
+    const tearDown_ = collapsibleController.setup(container, NAV_EVT)
 
-  const subscribeSyncs = (container: HTMLElement) => {
-    const syncAllBound = () => syncAll(container)
-    container.addEventListener(NAV_EVT, syncAllBound)
-    container.addEventListener(CLICK_EVENT, collapsibleController.syncCollapsibleManual)
+    // Immediately fire a page change to set up initial state
+    firePageChange(container)
 
-    return () => {
-      container.removeEventListener(NAV_EVT, syncAllBound)
-      container.removeEventListener(CLICK_EVENT, collapsibleController.syncCollapsibleManual)
-    }
+    return () => (tearDown(), tearDown_())
   }
 
   return {
-    syncAll,
-    subscribeSyncs,
-    getInitialCollapsibleTriggerProps: collapsibleController.getInitialCollapsibleTriggerProps,
-    getInitialCollapsedProps: collapsibleController.getInitialCollapsedProps,
-    getSharedCollapsibleParentProps: collapsibleController.getSharedCollapsibleParentProps,
+    propGetters: collapsibleController.propGetters,
     firePageChange,
-    syncCollapsibleTriggers: collapsibleController.syncCollapsibleTriggers,
-    syncCollapsibleManual: collapsibleController.syncCollapsibleManual,
+    setup,
   }
 }
 
@@ -194,14 +228,11 @@ const ActiveElemContext = createContext<
 >(undefined)
 
 const useActiveElemController = () => {
-  const { subscribeSyncs, ...activeElemController } = useConstant(createNavController)
-  const contextValueRef = useRef(activeElemController)
+  const navController = useConstant(createNavController)
+  const contextValueRef = useRef(navController)
   const ref = useRef<HTMLDivElement>(null)
 
-  useEffect(
-    () => (activeElemController.syncAll(ref.current), subscribeSyncs(ref.current)),
-    [activeElemController, subscribeSyncs]
-  )
+  useEffect(() => navController.setup(ref.current), [navController])
 
   return { ref, contextValueRef }
 }
@@ -213,15 +244,9 @@ const useActiveElemContext = () => {
 }
 
 const useGetInitialCollapsibleProps = () => {
-  const {
-    getInitialCollapsibleTriggerProps,
-    getInitialCollapsedProps,
-    getSharedCollapsibleParentProps,
-  } = useActiveElemContext()
+  const { propGetters } = useActiveElemContext()
   return {
-    getInitialCollapsibleTriggerProps,
-    getInitialCollapsedProps,
-    getSharedCollapsibleParentProps,
+    ...propGetters,
   }
 }
 

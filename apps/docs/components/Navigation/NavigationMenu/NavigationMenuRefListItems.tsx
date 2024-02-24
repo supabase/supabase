@@ -7,7 +7,7 @@ import RevVersionDropdown from '~/components/RefVersionDropdown'
 import { DocsEvent, fireCustomEvent } from '~/lib/events'
 import HomeMenuIconPicker from './HomeMenuIconPicker'
 import * as NavItems from './NavigationMenu.constants'
-import { useGetInitialCollapsibleProps } from './utils'
+import { useFirePageChange, useGetInitialCollapsibleProps } from './utils'
 
 const UNTITLED = '__UNTITLED_NAV_CATEGORY__'
 
@@ -44,6 +44,7 @@ interface InnerLinkProps {
 
 const InnerLink = React.memo(function InnerLink({ item, className, ...rest }: InnerLinkProps) {
   const router = useRouter()
+  const firePageChange = useFirePageChange()
 
   return (
     <Link
@@ -63,7 +64,7 @@ const InnerLink = React.memo(function InnerLink({ item, className, ...rest }: In
          */
         history.pushState({}, '', `${router.basePath}/reference${item.href}`)
         document.getElementById(item.slug)?.scrollIntoView()
-        fireCustomEvent(e.target, DocsEvent.SIDEBAR_NAV_CHANGE, { bubbles: true })
+        firePageChange(e.target)
         // Last so the link still woorks if something above errors
         e.preventDefault()
       }}
@@ -78,29 +79,25 @@ export interface RenderLinkProps {
 }
 
 const RenderLink = React.memo(function RenderLink({ item }: RenderLinkProps) {
-  const {
-    getInitialCollapsedProps,
-    getInitialCollapsibleTriggerProps,
-    getSharedCollapsibleParentProps,
-  } = useGetInitialCollapsibleProps()
+  const { getRootProps, getTriggerProps, getControlledProps } = useGetInitialCollapsibleProps()
 
   const compoundItem = hasChildren(item) && item.items.length > 0
 
   return compoundItem ? (
-    <div {...getSharedCollapsibleParentProps(item)}>
+    <div {...getRootProps(item)}>
       <div className="flex items-center justify-between">
         <InnerLink item={item} className="peer" />
         <button
           className={cn('group', 'peer-aria-[current]:text-brand')}
-          {...getInitialCollapsibleTriggerProps(item)}
+          {...getTriggerProps(item)}
         >
           <IconChevronRight
             width={16}
-            className={cn('peer-aria-[current]:group-[]:rotate-90', 'transition')}
+            className={cn('-mt-[0.2em]', 'group-aria-expanded:rotate-90', 'transition')}
           />
         </button>
       </div>
-      <ul {...getInitialCollapsedProps(item)}>
+      <ul {...getControlledProps(item)}>
         {item.items.map((child) => (
           <li key={child.id}>
             <RenderLink item={child} />
