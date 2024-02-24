@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -25,7 +25,11 @@ import { menu } from '~/data/nav'
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 
-const Nav = () => {
+interface Props {
+  hideNavbar: boolean
+}
+
+const Nav = (props: Props) => {
   const { resolvedTheme } = useTheme()
   const router = useRouter()
   const { width } = useWindowSize()
@@ -52,23 +56,11 @@ const Nav = () => {
     if (width >= 1024) setOpen(false)
   }, [width])
 
-  /**
-   * Temporary fix for next-theme client side bug
-   * https://github.com/pacocoursey/next-themes/issues/169
-   * TODO: remove when bug has been fixed
-   */
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) {
+  if (props.hideNavbar) {
     return null
   }
 
-  const showDarkLogo =
-    isLaunchWeekPage || (mounted && resolvedTheme?.includes('dark')!) || isHomePage
+  const showDarkLogo = isLaunchWeekPage || resolvedTheme?.includes('dark')! || isHomePage
 
   return (
     <>
@@ -106,6 +98,7 @@ const Nav = () => {
                       width={124}
                       height={24}
                       alt="Supabase Logo"
+                      priority
                     />
                   </Link>
 
@@ -153,7 +146,7 @@ const Nav = () => {
                   </NavigationMenuList>
                 </NavigationMenu>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 opacity-0 animate-fade-in !scale-100 delay-300">
                 <GitHubButton />
                 {!isUserLoading && (
                   <>

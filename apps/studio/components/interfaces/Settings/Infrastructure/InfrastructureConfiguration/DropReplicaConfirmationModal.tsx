@@ -1,8 +1,4 @@
 import { useParams } from 'common'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
-import { useReadReplicaRemoveMutation } from 'data/read-replicas/replica-remove-mutation'
-import { Database } from 'data/read-replicas/replicas-query'
-import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 import toast from 'react-hot-toast'
 import {
   AlertDescription_Shadcn_,
@@ -11,6 +7,11 @@ import {
   IconAlertTriangle,
   Modal,
 } from 'ui'
+
+import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { useReadReplicaRemoveMutation } from 'data/read-replicas/replica-remove-mutation'
+import { Database } from 'data/read-replicas/replicas-query'
+import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 
 interface DropReplicaConfirmationModalProps {
   selectedReplica?: Database
@@ -27,7 +28,7 @@ const DropReplicaConfirmationModal = ({
   const formattedId = formatDatabaseID(selectedReplica?.identifier ?? '')
   const { mutateAsync: removeReadReplica } = useReadReplicaRemoveMutation({
     onSuccess: () => {
-      toast.success(`Successfully removed read replica (ID: ${formattedId})`)
+      toast.success(`Tearing down read replica (ID: ${formattedId})`)
       onSuccess()
       onCancel()
     },
