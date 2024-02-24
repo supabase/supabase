@@ -1,12 +1,13 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React, { Fragment, Ref, useEffect, useId, useRef } from 'react'
-import { IconChevronLeft, IconChevronUp, cn } from 'ui'
+import React, { Fragment } from 'react'
+import { IconChevronDown, IconChevronLeft, cn } from 'ui'
 
 import RevVersionDropdown from '~/components/RefVersionDropdown'
 import { DocsEvent, fireCustomEvent } from '~/lib/events'
 import HomeMenuIconPicker from './HomeMenuIconPicker'
 import * as NavItems from './NavigationMenu.constants'
+import { useGetInitialCollapsibleProps } from './utils'
 
 const UNTITLED = '__UNTITLED_NAV_CATEGORY__'
 
@@ -65,17 +66,25 @@ export interface RenderLinkProps {
 }
 
 const RenderLink = React.memo(function RenderLink({ item }: RenderLinkProps) {
+  const { getInitialCollapsedProps, getInitialCollapsibleTriggerProps } =
+    useGetInitialCollapsibleProps()
+
   const hasChildren = 'items' in item && item.items.length > 0
 
   return hasChildren ? (
-    <>
-      <InnerLink item={item} data-contains={item.items.map((child) => child.href).join(',')} />
-      <ul hidden>
+    <div>
+      <div className="flex justify-between">
+        <InnerLink item={item} {...getInitialCollapsibleTriggerProps(item, item.items)} />
+        <IconChevronDown />
+      </div>
+      <ul {...getInitialCollapsedProps(item)}>
         {item.items.map((child) => (
-          <RenderLink key={child.id} item={child} />
+          <li key={child.id}>
+            <RenderLink item={child} />
+          </li>
         ))}
       </ul>
-    </>
+    </div>
   ) : (
     <InnerLink item={item} />
   )
@@ -98,73 +107,9 @@ interface NavigationMenuRefListItemsProps {
   menuData: Array<RefMenuCategory>
 }
 
-const useSyncNavMenuActivity = () => {
-  /**
-   * Doing this imperatively means we can memoize pretty much everything
-   * about the menu. This is good because ref nav menus can get very large
-   * and take a while to render.
-   *
-   * The Custom Event is required because history is manually manipulated,
-   * which means useRouter does not catch page navigations.
-   */
-  const { basePath } = useRouter()
-  const previousPath = useRef<string>(null)
-  const activeElem = useRef<HTMLAnchorElement>(null)
-  const afHandle = useRef<ReturnType<typeof requestAnimationFrame>>(null)
-
-  const elementInViewport = (elem: HTMLElement) => {
-    const { top, bottom, left, right } = elem.getBoundingClientRect()
-    const { innerHeight, innerWidth } = window
-
-    const topVisible = top > 0 && top < innerHeight
-    const bottomVisible = bottom > 0 && bottom < innerHeight
-    const leftVisible = left > 0 && left < innerWidth
-    const rightVisible = right > 0 && right < innerWidth
-
-    return (topVisible || bottomVisible) && (leftVisible || rightVisible)
-  }
-
-  const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
-  useEffect(() => {
-    const handlePathChange = () => {
-      const pathname = window.location.pathname
-
-      if (previousPath.current !== pathname) {
-        if (activeElem.current) activeElem.current.ariaCurrent = undefined
-        activeElem.current = document.querySelector(`a[href="${pathname}"]`)
-        if (activeElem.current) {
-          activeElem.current.ariaCurrent = 'page'
-
-          const storedElem = activeElem.current
-          if (afHandle.current) cancelAnimationFrame(afHandle.current)
-          afHandle.current = requestAnimationFrame(() => {
-            if (!elementInViewport(storedElem)) {
-              storedElem.scrollIntoView({
-                behavior: prefersReducedMotion() ? 'instant' : 'smooth',
-                block: 'center',
-              })
-            }
-          })
-        }
-
-        previousPath.current = pathname
-      }
-    }
-
-    // Initialize state on first navigation
-    handlePathChange()
-
-    document.addEventListener(DocsEvent.SIDEBAR_NAV_CHANGE, handlePathChange)
-    return () => document.removeEventListener(DocsEvent.SIDEBAR_NAV_CHANGE, handlePathChange)
-  }, [basePath])
-}
-
 const NavigationMenuRefListItems = ({ id, menuData }: NavigationMenuRefListItemsProps) => {
   const menu = NavItems[id]
   console.log(menuData)
-
-  // useSyncNavMenuActivity()
 
   return (
     <div className={'w-full flex flex-col gap-0 sticky top-8'}>
@@ -198,9 +143,13 @@ const NavigationMenuRefListItems = ({ id, menuData }: NavigationMenuRefListItems
                   <>
                     <Divider />
                     <SideMenuTitle title={section.name} />
-                    {section.items.map((item) => (
-                      <RenderLink key={item.id} item={item} />
-                    ))}
+                    <ul>
+                      {section.items.map((item) => (
+                        <li key={item.id}>
+                          <RenderLink item={item} />
+                        </li>
+                      ))}
+                    </ul>
                   </>
                 )}
               </Fragment>

@@ -5,6 +5,7 @@
  * names are globally unique.
  */
 enum DocsEvent {
+  // Navigation changes resulting from clicks on sidebar nav
   SIDEBAR_NAV_CHANGE = 'supabase-docs-sidebar-nav-change',
 }
 
