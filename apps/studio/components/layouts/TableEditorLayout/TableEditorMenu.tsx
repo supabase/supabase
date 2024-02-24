@@ -189,15 +189,6 @@ const TableEditorMenu = () => {
         </div>
         <div className="flex flex-auto flex-col gap-2 pb-4 px-2">
           <div className="flex items-center px-2 w-full gap-2">
-            {/* <AnimatePresence> */}
-
-            {/* // </AnimatePresence><motion.div>
-              //   initial={{ x: 10, opacity: 0 }}
-              //   animate={{ x: 0, opacity: 1, transition: { duration: 0.2 } }}
-              //   exit={{ x: 20, opacity: 0, transition: { duration: 0 } }}
-              //   className="absolute top-0 left-2"
-              // > */}
-
             <label htmlFor={'search-tables'} className="relative w-full">
               <span className="sr-only">Search tables</span>
               <Input_Shadcn_
@@ -205,12 +196,7 @@ const TableEditorMenu = () => {
                 name="search-tables"
                 type="text"
                 placeholder="Filter tables..."
-                className={
-                  cn('h-[28px] w-full', 'text-xs', 'pl-7', 'w-full')
-                  // 'bg-default text-foreground rounded-none px-1 py-1 h-5 w-44 text-sm',
-                  // 'border-b outline-none ',
-                  // 'border-transparent focus:border-transparent focus:ring-2'
-                }
+                className={cn('h-[28px] w-full', 'text-xs', 'pl-7', 'w-full')}
                 onChange={(e) => {
                   setSearchText(e.target.value.trim())
                 }}
@@ -227,9 +213,6 @@ const TableEditorMenu = () => {
                     setIsSearchOpen(false)
                     setSearchText('')
                   }
-                  // if (e.key === 'Backspace' && searchText.length === 0) {
-                  //   setIsSearchOpen(false)
-                  // }
                 }}
               />
               <ListFilter
@@ -238,44 +221,6 @@ const TableEditorMenu = () => {
                 strokeWidth={1.5}
               />
             </label>
-
-            {/* <div
-                        className={cn(
-                          'absolute -bottom-1 w-full h-px bg-border transition-colors',
-                          isSearchInputFocused && 'bg-border-stronger'
-                        )}
-                      ></div> */}
-
-            {/* // </motion.div> */}
-
-            {/* </AnimatePresence> */}
-            {/* <motion.button
-                onClick={
-                  !isSearchOpen
-                    ? () => expandSearch()
-                    : () => {
-                        setSearchText('')
-                        expandSearch()
-                      }
-                }
-                initial={{ x: 0 }}
-                animate={{ x: isSearchOpen ? 185 : 0, transition: { duration: 0 } }}
-                className="px-2 py-0.5 rounded-md mt-1 transition transform hover:scale-105 focus:ring-2 "
-              >
-                {isSearchOpen ? (
-                  isSearching ? (
-                    <Loader2
-                      className="w-4 h-4 animate-spin text-foreground"
-                      size={15}
-                      strokeWidth={1}
-                    />
-                  ) : (
-                    <IconX className={cn('w-4  h-4 hover:text-foreground transition-colors')} />
-                  )
-                ) : (
-                  <IconSearch className={cn('w-4 h-4 hover:text-foreground transition-colors')} />
-                )}
-              </motion.button> */}
             <DropdownMenu>
               <Tooltip.Root delayDuration={0}>
                 <DropdownMenuTrigger asChild>
@@ -296,7 +241,6 @@ const TableEditorMenu = () => {
                   </Tooltip.Content>
                 </Tooltip.Portal>
               </Tooltip.Root>
-
               <DropdownMenuContent side="bottom" align="end" className="w-48">
                 <DropdownMenuRadioGroup value={sort} onValueChange={(value: any) => setSort(value)}>
                   <DropdownMenuRadioItem key="alphabetical" value="alphabetical">
@@ -309,7 +253,6 @@ const TableEditorMenu = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-          {/* <div className="flex gap-3 items-center absolute right-1 top-1.5"></div> */}
 
           {isLoading && (
             <div className="flex flex-col px-2 gap-1 pb-4">
