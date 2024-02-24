@@ -75,6 +75,7 @@ ProjectsPage.getLayout = (page) => (
       },
     ]}
   >
+    I AM THE CHANGE
     {page}
   </AccountLayout>
 )
