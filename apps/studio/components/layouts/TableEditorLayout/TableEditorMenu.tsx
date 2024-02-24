@@ -136,6 +136,8 @@ const TableEditorMenu = () => {
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger className="w-full" asChild>
                   <Button
+                    title="Create a new table"
+                    name="New table"
                     block
                     disabled={!canCreateTables}
                     size="tiny"
