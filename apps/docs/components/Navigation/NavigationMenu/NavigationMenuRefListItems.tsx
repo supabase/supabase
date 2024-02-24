@@ -1,12 +1,9 @@
-import * as Accordion from '@radix-ui/react-accordion'
-import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React, { Fragment, useEffect, useRef } from 'react'
+import React, { Fragment, Ref, useEffect, useId, useRef } from 'react'
 import { IconChevronLeft, IconChevronUp, cn } from 'ui'
 
 import RevVersionDropdown from '~/components/RefVersionDropdown'
-import { useMenuActiveRefId } from '~/hooks/useMenuState'
 import { DocsEvent, fireCustomEvent } from '~/lib/events'
 import HomeMenuIconPicker from './HomeMenuIconPicker'
 import * as NavItems from './NavigationMenu.constants'
@@ -35,82 +32,16 @@ const HeaderLink = React.memo(function HeaderLink(props: any) {
   )
 })
 
-interface FunctionLinkProps {
-  title: string
-  name?: string
-  id: string
-  icon?: string
-  basePath: string
-  slug: string
-  isParent?: boolean
-  isSubItem?: boolean
-  onClick?: () => void
-}
-
-const FunctionLink = React.memo(function FunctionLink({
-  title,
-  id,
-  icon,
-  basePath,
-  slug,
-  isParent = false,
-  isSubItem = false,
-  onClick = () => {},
-}: FunctionLinkProps) {
-  const router = useRouter()
-  const activeAccordionItem = useMenuActiveRefId()
-
-  const url = `${router.basePath}${basePath}/${slug}`
-  const active = activeAccordionItem === id
-
-  return (
-    <li className="function-link-item leading-5">
-      <a
-        href={url}
-        /**
-         * We don't actually want to navigate or re-render anything
-         * since ref links are all sub-sections on the same page
-         */
-        onClick={(e) => {
-          e.preventDefault()
-          history.pushState({}, '', url)
-          document.getElementById(slug)?.scrollIntoView()
-          onClick()
-        }}
-        className={cn(
-          'cursor-pointer transition text-sm hover:text-foreground gap-3 relative',
-          isParent ? 'flex justify-between' : 'leading-3',
-          active ? 'text-brand' : 'text-foreground-lighter'
-        )}
-      >
-        {icon && <Image width={16} height={16} alt={icon} src={`${router.basePath}${icon}`} />}
-        {title}
-        {active && !isSubItem && (
-          <div
-            aria-hidden="true"
-            className="absolute -left-[13px] top-0 bottom-0 w-[1px] bg-brand-600"
-          ></div>
-        )}
-        {isParent && (
-          <IconChevronUp
-            width={16}
-            className="data-open-parent:rotate-0 data-closed-parent:rotate-90 transition"
-          />
-        )}
-      </a>
-    </li>
-  )
-})
-
 interface InnerLinkProps {
   item: RefMenuItem
 }
 
-const InnerLink = React.memo(function InnerLink({ item }: InnerLinkProps) {
+const InnerLink = React.memo(function InnerLink({ item, ...rest }: InnerLinkProps) {
   const router = useRouter()
 
   return (
     <Link
+      {...rest}
       className={cn(
         'text-sm text-foreground-lighter',
         'hover:text-foreground',
@@ -136,7 +67,18 @@ export interface RenderLinkProps {
 const RenderLink = React.memo(function RenderLink({ item }: RenderLinkProps) {
   const hasChildren = 'items' in item && item.items.length > 0
 
-  return hasChildren ? <InnerLink item={item} /> : <InnerLink item={item} />
+  return hasChildren ? (
+    <>
+      <InnerLink item={item} data-contains={item.items.map((child) => child.href).join(',')} />
+      <ul hidden>
+        {item.items.map((child) => (
+          <RenderLink key={child.id} item={child} />
+        ))}
+      </ul>
+    </>
+  ) : (
+    <InnerLink item={item} />
+  )
 })
 
 const SideMenuTitle = ({ title }: { title: string }) => {
@@ -222,7 +164,7 @@ const NavigationMenuRefListItems = ({ id, menuData }: NavigationMenuRefListItems
   const menu = NavItems[id]
   console.log(menuData)
 
-  useSyncNavMenuActivity()
+  // useSyncNavMenuActivity()
 
   return (
     <div className={'w-full flex flex-col gap-0 sticky top-8'}>
