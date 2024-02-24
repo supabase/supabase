@@ -1,11 +1,12 @@
 import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
-import NavigationMenu, { type MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
-import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
-
 import { PropsWithChildren, memo, useEffect } from 'react'
+
 import Footer from '~/components/Navigation/Footer'
+import NavigationMenu, { type MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
+import { type RefMenuCategory } from '~/components/Navigation/NavigationMenu/NavigationMenuRefListItems'
+import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
 import { menuState, useMenuMobileOpen } from '~/hooks/useMenuState'
 
 const levelsData = {
@@ -278,7 +279,13 @@ const Container = memo(function Container(props: PropsWithChildren) {
   )
 })
 
-const NavContainer = memo(function NavContainer({ menuId }: { menuId: MenuId }) {
+const NavContainer = memo(function NavContainer({
+  menuId,
+  menuData,
+}: {
+  menuId: MenuId
+  menuData?: Array<RefMenuCategory>
+}) {
   const mobileMenuOpen = useMenuMobileOpen()
 
   return (
@@ -337,17 +344,21 @@ const NavContainer = memo(function NavContainer({ menuId }: { menuId: MenuId }) 
             'lg:opacity-100 lg:visible',
           ].join(' ')}
         >
-          <NavigationMenu menuId={menuId} />
+          <NavigationMenu menuId={menuId} menuData={menuData} />
         </div>
       </div>
     </nav>
   )
 })
 
-function MainSkeleton({ children, menuId }: PropsWithChildren<{ menuId: MenuId }>) {
+function MainSkeleton({
+  children,
+  menuId,
+  menuData,
+}: PropsWithChildren<{ menuId: MenuId; menuData?: Array<RefMenuCategory> }>) {
   return (
     <div className="flex flex-row h-full">
-      <NavContainer menuId={menuId} />
+      <NavContainer menuId={menuId} menuData={menuData} />
       <Container>
         <div className={['lg:sticky top-0 z-10 overflow-hidden'].join(' ')}>
           <TopNavBar />

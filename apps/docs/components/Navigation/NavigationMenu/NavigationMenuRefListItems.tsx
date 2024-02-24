@@ -1,18 +1,31 @@
 import * as Accordion from '@radix-ui/react-accordion'
+import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import React, { Fragment, useEffect, useRef } from 'react'
 import { IconChevronLeft, IconChevronUp, cn } from 'ui'
-import * as NavItems from './NavigationMenu.constants'
-
-import Image from 'next/legacy/image'
 
 import RevVersionDropdown from '~/components/RefVersionDropdown'
-import { menuState, useMenuActiveRefId } from '~/hooks/useMenuState'
-
-import React, { Fragment } from 'react'
-import { ICommonItem, ICommonSection } from '~/components/reference/Reference.types'
+import { useMenuActiveRefId } from '~/hooks/useMenuState'
+import { DocsEvent, fireCustomEvent } from '~/lib/events'
 import HomeMenuIconPicker from './HomeMenuIconPicker'
-import { deepFilterSections } from './NavigationMenu.utils'
+import * as NavItems from './NavigationMenu.constants'
+
+const UNTITLED = '__UNTITLED_NAV_CATEGORY__'
+
+type RefMenuItem = {
+  id: string
+  name: string
+  href: string
+  slug: string
+  items?: Array<RefMenuItem>
+}
+
+type RefMenuCategory = {
+  id: string
+  name: string
+  items: Array<RefMenuItem>
+}
 
 const HeaderLink = React.memo(function HeaderLink(props: any) {
   return (
@@ -89,62 +102,41 @@ const FunctionLink = React.memo(function FunctionLink({
   )
 })
 
-export interface RenderLinkProps {
-  section: ICommonSection
-  basePath: string
+interface InnerLinkProps {
+  item: RefMenuItem
 }
 
-const RenderLink = React.memo(function RenderLink({ section, basePath }: RenderLinkProps) {
-  const activeAccordionItem = useMenuActiveRefId()
-
-  if (!('items' in section)) {
-    return (
-      <FunctionLink
-        title={section.title}
-        id={section.id}
-        slug={section.slug}
-        basePath={basePath}
-        isParent={false}
-        isSubItem
-        onClick={() => menuState.setMenuMobileOpen(false)}
-      />
-    )
-  }
-
-  let active =
-    section.id === activeAccordionItem ||
-    section.items.some((item) => item.id === activeAccordionItem)
+const InnerLink = React.memo(function InnerLink({ item }: InnerLinkProps) {
+  const router = useRouter()
 
   return (
-    <Accordion.Root collapsible type="single" value={active ? section.id : ''}>
-      <Accordion.Item value={section.id}>
-        <FunctionLink
-          title={section.title}
-          id={section.id}
-          slug={section.slug}
-          basePath={basePath}
-          isParent
-          isSubItem
-        />
-        <Accordion.Content className="transition data-open:animate-slide-down data-closed:animate-slide-up border-l border-control pl-3 ml-1 data-open:mt-2 grid gap-2.5">
-          {section.items.map((item) => {
-            return (
-              <FunctionLink
-                key={item.id}
-                title={item.title}
-                id={item.id}
-                slug={item.slug}
-                basePath={basePath}
-                isParent={false}
-                isSubItem={false}
-                onClick={() => menuState.setMenuMobileOpen(false)}
-              />
-            )
-          })}
-        </Accordion.Content>
-      </Accordion.Item>
-    </Accordion.Root>
+    <Link
+      className={cn(
+        'text-sm text-foreground-lighter',
+        'hover:text-foreground',
+        'aria-[current]:text-brand'
+      )}
+      href={`/reference${item.href}`}
+      onClick={(e) => {
+        e.preventDefault()
+        history.pushState({}, '', `${router.basePath}/reference${item.href}`)
+        document.getElementById(item.slug)?.scrollIntoView()
+        fireCustomEvent(e.target, DocsEvent.SIDEBAR_NAV_CHANGE, { bubbles: true })
+      }}
+    >
+      {item.name}
+    </Link>
   )
+})
+
+export interface RenderLinkProps {
+  item: RefMenuItem
+}
+
+const RenderLink = React.memo(function RenderLink({ item }: RenderLinkProps) {
+  const hasChildren = 'items' in item && item.items.length > 0
+
+  return hasChildren ? <InnerLink item={item} /> : <InnerLink item={item} />
 })
 
 const SideMenuTitle = ({ title }: { title: string }) => {
@@ -161,23 +153,76 @@ const Divider = () => {
 
 interface NavigationMenuRefListItemsProps {
   id: string
-  basePath: string
-  commonSections: ICommonItem[]
-  spec?: any
+  menuData: Array<RefMenuCategory>
 }
 
-const NavigationMenuRefListItems = ({
-  id,
-  basePath,
-  commonSections,
-  spec,
-}: NavigationMenuRefListItemsProps) => {
-  const menu = NavItems[id]
+const useSyncNavMenuActivity = () => {
+  /**
+   * Doing this imperatively means we can memoize pretty much everything
+   * about the menu. This is good because ref nav menus can get very large
+   * and take a while to render.
+   *
+   * The Custom Event is required because history is manually manipulated,
+   * which means useRouter does not catch page navigations.
+   */
+  const { basePath } = useRouter()
+  const previousPath = useRef<string>(null)
+  const activeElem = useRef<HTMLAnchorElement>(null)
+  const afHandle = useRef<ReturnType<typeof requestAnimationFrame>>(null)
 
-  const specFunctionIds = spec?.functions.map(({ id }) => id)
-  const filteredSections = spec
-    ? deepFilterSections(commonSections, specFunctionIds)
-    : commonSections
+  const elementInViewport = (elem: HTMLElement) => {
+    const { top, bottom, left, right } = elem.getBoundingClientRect()
+    const { innerHeight, innerWidth } = window
+
+    const topVisible = top > 0 && top < innerHeight
+    const bottomVisible = bottom > 0 && bottom < innerHeight
+    const leftVisible = left > 0 && left < innerWidth
+    const rightVisible = right > 0 && right < innerWidth
+
+    return (topVisible || bottomVisible) && (leftVisible || rightVisible)
+  }
+
+  const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  useEffect(() => {
+    const handlePathChange = () => {
+      const pathname = window.location.pathname
+
+      if (previousPath.current !== pathname) {
+        if (activeElem.current) activeElem.current.ariaCurrent = undefined
+        activeElem.current = document.querySelector(`a[href="${pathname}"]`)
+        if (activeElem.current) {
+          activeElem.current.ariaCurrent = 'page'
+
+          const storedElem = activeElem.current
+          if (afHandle.current) cancelAnimationFrame(afHandle.current)
+          afHandle.current = requestAnimationFrame(() => {
+            if (!elementInViewport(storedElem)) {
+              storedElem.scrollIntoView({
+                behavior: prefersReducedMotion() ? 'instant' : 'smooth',
+                block: 'center',
+              })
+            }
+          })
+        }
+
+        previousPath.current = pathname
+      }
+    }
+
+    // Initialize state on first navigation
+    handlePathChange()
+
+    document.addEventListener(DocsEvent.SIDEBAR_NAV_CHANGE, handlePathChange)
+    return () => document.removeEventListener(DocsEvent.SIDEBAR_NAV_CHANGE, handlePathChange)
+  }, [basePath])
+}
+
+const NavigationMenuRefListItems = ({ id, menuData }: NavigationMenuRefListItemsProps) => {
+  const menu = NavItems[id]
+  console.log(menuData)
+
+  useSyncNavMenuActivity()
 
   return (
     <div className={'w-full flex flex-col gap-0 sticky top-8'}>
@@ -201,21 +246,23 @@ const NavigationMenuRefListItems = ({
         <RevVersionDropdown />
       </div>
       <ul className="function-link-list flex flex-col gap-2 pb-5">
-        {filteredSections.map((section) => {
+        {menuData.map((section) => {
           return (
-            <Fragment key={section.title}>
-              {section.type === 'category' ? (
-                <>
-                  <Divider />
-                  <SideMenuTitle title={section.title} />
-                  {section.items.map((item) => (
-                    <RenderLink key={item.id} section={item} basePath={basePath} />
-                  ))}
-                </>
-              ) : (
-                <RenderLink section={section} basePath={basePath} />
-              )}
-            </Fragment>
+            section.items.length > 0 && (
+              <Fragment key={section.id}>
+                {section.name === UNTITLED ? (
+                  section.items.map((item) => <RenderLink key={item.id} item={item} />)
+                ) : (
+                  <>
+                    <Divider />
+                    <SideMenuTitle title={section.name} />
+                    {section.items.map((item) => (
+                      <RenderLink key={item.id} item={item} />
+                    ))}
+                  </>
+                )}
+              </Fragment>
+            )
           )
         })}
       </ul>
@@ -223,4 +270,6 @@ const NavigationMenuRefListItems = ({
   )
 }
 
-export default React.memo(NavigationMenuRefListItems)
+export type { RefMenuItem, RefMenuCategory }
+export { UNTITLED }
+export default NavigationMenuRefListItems

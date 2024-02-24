@@ -18,6 +18,7 @@ export default function JSReference(props) {
   return (
     <RefSectionHandler
       menuId={MenuId.RefJavaScriptV2}
+      menuData={props.menuData}
       sections={sections}
       spec={spec}
       typeSpec={typeSpec}
@@ -31,18 +32,12 @@ export async function getStaticProps() {
   const includedFns = compact(
     spec?.functions?.map(<T extends object>(fn: T) => ('id' in fn ? fn.id : null)) ?? []
   ) as Array<string>
-  console.log(
-    JSON.stringify(
-      toClientLibraryMenu({
-        excludedName: 'reference_javascript_v2',
-        sectionPath: '/javascript',
-        includedFunctions: includedFns,
-      }),
-      null,
-      2
-    )
-  )
-  return handleRefStaticProps(sections, libraryPath)
+  const menuData = toClientLibraryMenu({
+    excludedName: 'reference_javascript_v2',
+    sectionPath: '/javascript',
+    includedFunctions: includedFns,
+  })
+  return { props: { ...(await handleRefStaticProps(sections, libraryPath)).props, menuData } }
 }
 
 export async function getStaticPaths() {
