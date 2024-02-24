@@ -1,9 +1,8 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
 import { partition } from 'lodash'
-import { Filter, ListFilter, Loader2, Plus, Search } from 'lucide-react'
+import { Plus, Search } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
@@ -18,11 +17,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
   IconChevronsDown,
-  IconPlusCircle,
-  IconSearch,
-  IconX,
   Input_Shadcn_,
-  Label_Shadcn_,
   cn,
 } from 'ui'
 
@@ -195,7 +190,7 @@ const TableEditorMenu = () => {
                 id="search-tables"
                 name="search-tables"
                 type="text"
-                placeholder="Filter tables..."
+                placeholder="Search tables..."
                 className={cn('h-[28px] w-full', 'text-xs', 'pl-7', 'w-full')}
                 onChange={(e) => {
                   setSearchText(e.target.value.trim())
@@ -215,7 +210,7 @@ const TableEditorMenu = () => {
                   }
                 }}
               />
-              <ListFilter
+              <Search
                 className="absolute left-2 top-2 text-foreground-muted"
                 size={14}
                 strokeWidth={1.5}
