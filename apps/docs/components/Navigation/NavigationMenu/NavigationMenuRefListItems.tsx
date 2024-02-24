@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { Fragment } from 'react'
-import { IconChevronDown, IconChevronLeft, cn } from 'ui'
+import { IconChevronLeft, IconChevronRight, cn } from 'ui'
 
 import RevVersionDropdown from '~/components/RefVersionDropdown'
 import { DocsEvent, fireCustomEvent } from '~/lib/events'
@@ -19,6 +19,10 @@ type RefMenuItem = {
   items?: Array<RefMenuItem>
 }
 
+type RefMenuItemWithChildren = Omit<RefMenuItem, 'items'> & Pick<Required<RefMenuItem>, 'items'>
+
+const hasChildren = (item: RefMenuItem): item is RefMenuItemWithChildren => 'items' in item
+
 type RefMenuCategory = {
   id: string
   name: string
@@ -35,25 +39,33 @@ const HeaderLink = React.memo(function HeaderLink(props: any) {
 
 interface InnerLinkProps {
   item: RefMenuItem
+  className?: string
 }
 
-const InnerLink = React.memo(function InnerLink({ item, ...rest }: InnerLinkProps) {
+const InnerLink = React.memo(function InnerLink({ item, className, ...rest }: InnerLinkProps) {
   const router = useRouter()
 
   return (
     <Link
       {...rest}
       className={cn(
-        'text-sm text-foreground-lighter',
+        // Leading makes height consistent between compound and simple versions
+        'text-sm text-foreground-lighter leading-6',
         'hover:text-foreground',
-        'aria-[current]:text-brand'
+        'aria-[current]:text-brand',
+        className
       )}
       href={`/reference${item.href}`}
       onClick={(e) => {
-        e.preventDefault()
+        /**
+         * We don't actually want to navigate or rerender anything since ref
+         * links are all subsections on the same page.
+         */
         history.pushState({}, '', `${router.basePath}/reference${item.href}`)
         document.getElementById(item.slug)?.scrollIntoView()
         fireCustomEvent(e.target, DocsEvent.SIDEBAR_NAV_CHANGE, { bubbles: true })
+        // Last so the link still woorks if something above errors
+        e.preventDefault()
       }}
     >
       {item.name}
@@ -66,16 +78,27 @@ export interface RenderLinkProps {
 }
 
 const RenderLink = React.memo(function RenderLink({ item }: RenderLinkProps) {
-  const { getInitialCollapsedProps, getInitialCollapsibleTriggerProps } =
-    useGetInitialCollapsibleProps()
+  const {
+    getInitialCollapsedProps,
+    getInitialCollapsibleTriggerProps,
+    getSharedCollapsibleParentProps,
+  } = useGetInitialCollapsibleProps()
 
-  const hasChildren = 'items' in item && item.items.length > 0
+  const compoundItem = hasChildren(item) && item.items.length > 0
 
-  return hasChildren ? (
-    <div>
-      <div className="flex justify-between">
-        <InnerLink item={item} {...getInitialCollapsibleTriggerProps(item, item.items)} />
-        <IconChevronDown />
+  return compoundItem ? (
+    <div {...getSharedCollapsibleParentProps(item)}>
+      <div className="flex items-center justify-between">
+        <InnerLink item={item} className="peer" />
+        <button
+          className={cn('group', 'peer-aria-[current]:text-brand')}
+          {...getInitialCollapsibleTriggerProps(item)}
+        >
+          <IconChevronRight
+            width={16}
+            className={cn('peer-aria-[current]:group-[]:rotate-90', 'transition')}
+          />
+        </button>
       </div>
       <ul {...getInitialCollapsedProps(item)}>
         {item.items.map((child) => (
@@ -161,6 +184,6 @@ const NavigationMenuRefListItems = ({ id, menuData }: NavigationMenuRefListItems
   )
 }
 
-export type { RefMenuItem, RefMenuCategory }
+export type { RefMenuItem, RefMenuItemWithChildren, RefMenuCategory }
 export { UNTITLED }
 export default NavigationMenuRefListItems

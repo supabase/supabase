@@ -5,6 +5,8 @@
  * names are globally unique.
  */
 enum DocsEvent {
+  // Sidebar expandable button clicks
+  SIDEBAR_EXPAND_CLICK = 'supabase-docs-sidebar-expand-button-click',
   // Navigation changes resulting from clicks on sidebar nav
   SIDEBAR_NAV_CHANGE = 'supabase-docs-sidebar-nav-change',
 }
