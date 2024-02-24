@@ -119,13 +119,14 @@ const createCollapsibleController = () => {
     // [Charis] Updates don't work synchronously, not sure why
     setTimeout(() => {
       trigger.ariaExpanded = 'false'
+      trigger.disabled = false
       controlled.hidden = true
 
       _expandedGroups.delete(id)
     }, 0)
   }
 
-  const setOpen = (id: string, group: HTMLElement) => {
+  const setOpen = (id: string, group: HTMLElement, { disable }: { disable?: boolean } = {}) => {
     const trigger = getTrigger(group)
     const controlled = getControlled(group)
     if (!(trigger && controlled)) return
@@ -133,6 +134,7 @@ const createCollapsibleController = () => {
     // [Charis] Updates don't work synchronously, not sure why
     setTimeout(() => {
       trigger.ariaExpanded = 'true'
+      if (disable) trigger.disabled = true
       controlled.hidden = false
 
       _expandedGroups.set(id, group)
@@ -154,7 +156,6 @@ const createCollapsibleController = () => {
   const handleNavigation = () => {
     // Need to fix this, this is hacky
     const pathname = window.location.pathname.replace('/docs/reference', '')
-    const oldExpanded = [..._expandedGroups.keys()]
     const newExpanded = []
     ;(
       [
@@ -164,15 +165,17 @@ const createCollapsibleController = () => {
       ] as Array<HTMLElement>
     ).forEach((group) => {
       const id = group.getAttribute(DATA_MARKER)
-      setOpen(id, group)
+      setOpen(id, group, { disable: true })
       newExpanded.push(id)
     })
-    difference(newExpanded, oldExpanded).forEach((id) => {
+    for (const id of _expandedGroups.keys()) {
+      if (newExpanded.includes(id)) return
+
       const group = _expandedGroups.get(id)
       if (!group) return
 
       setClosed(id, group)
-    })
+    }
   }
 
   const setup = (container: HTMLElement, navEvt: DocsEvent) => {
