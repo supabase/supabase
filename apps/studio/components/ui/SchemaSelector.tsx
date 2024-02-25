@@ -99,8 +99,8 @@ const SchemaSelector = ({
               }
             >
               <div className="w-full flex gap-1">
-                <p className="text-xs text-foreground-lighter">schema:</p>
-                <p className="text-xs text-foreground">
+                <p className="text-foreground-lighter">schema:</p>
+                <p className="text-foreground">
                   {selectedSchemaName === '*' ? 'All schemas' : selectedSchemaName}
                 </p>
               </div>
