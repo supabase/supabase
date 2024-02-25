@@ -9,7 +9,6 @@ import SectionContainer from '../Layouts/SectionContainer'
 import footerData from 'data/Footer'
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
-import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 
 interface Props {
   className?: string
@@ -157,9 +156,6 @@ const Footer = (props: Props) => {
         </div>
         <div className="border-default mt-32 flex justify-between border-t pt-8">
           <small className="small">&copy; Supabase Inc</small>
-          <div className={cn(forceDark && 'hidden')}>
-            <ThemeToggle forceDark={forceDark} />
-          </div>
         </div>
       </SectionContainer>
     </footer>

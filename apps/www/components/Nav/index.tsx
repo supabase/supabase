@@ -24,6 +24,7 @@ import { menu } from '~/data/nav'
 
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
+import { ThemeToggle } from 'ui-patterns'
 
 interface Props {
   hideNavbar: boolean
@@ -41,6 +42,7 @@ const Nav = (props: Props) => {
   const isLaunchWeekPage = router.pathname.includes('launch-week')
   const isLaunchWeekXPage = router.pathname === '/launch-week'
   const showLaunchWeekNavMode = isLaunchWeekPage && !open
+  const forceDark = isLaunchWeekPage || isHomePage
 
   React.useEffect(() => {
     if (open) {
@@ -166,6 +168,9 @@ const Nav = (props: Props) => {
                     )}
                   </>
                 )}
+                <div className={cn(forceDark && 'hidden')}>
+                  <ThemeToggle forceDark={forceDark} />
+                </div>
               </div>
             </div>
             <HamburgerButton
