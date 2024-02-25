@@ -7,10 +7,10 @@ interface NavigationMenuRefListProps {
 }
 
 const NavigationMenuRefList = ({ id, menuData }: NavigationMenuRefListProps) => {
-  const { ref, contextValueRef } = useActiveElemController()
+  const { ref, value } = useActiveElemController()
 
   return (
-    <ActiveElemContext.Provider value={contextValueRef.current}>
+    <ActiveElemContext.Provider value={value}>
       <div
         ref={ref}
         className="transition-all duration-150 ease-out opacity-100 ml-0 delay-150 h-auto"

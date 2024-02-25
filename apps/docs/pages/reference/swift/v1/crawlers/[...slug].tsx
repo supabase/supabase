@@ -4,13 +4,13 @@ import spec from '~/spec/supabase_swift_v2.yml' assert { type: 'yml' }
 import RefSectionHandler from '~/components/reference/RefSectionHandler'
 import { flattenSections } from '~/lib/helpers'
 import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'
-import handleRefStaticProps from '~/lib/mdx/handleRefStaticProps'
+import { handleRefStaticProps } from '~/lib/mdx/handleRefStaticProps'
 import { useRouter } from 'next/router'
 import RefSEO from '~/components/reference/RefSEO'
 import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 
 const sections = flattenSections(clientLibsCommonSections)
-const libraryPath = '/swift/v2'
+const libraryPath = '/swift/v1'
 
 export default function SwiftReference(props) {
   const router = useRouter()
@@ -26,6 +26,7 @@ export default function SwiftReference(props) {
 
       <RefSectionHandler
         menuId={MenuId.RefSwiftV1}
+        menuData={props.menuData}
         sections={filteredSection}
         spec={spec}
         typeSpec={typeSpec}
@@ -37,7 +38,12 @@ export default function SwiftReference(props) {
 }
 
 export async function getStaticProps() {
-  return handleRefStaticProps(sections, libraryPath)
+  return handleRefStaticProps({
+    sections,
+    spec,
+    libraryPath,
+    excludedName: 'reference_swift_v1',
+  })
 }
 
 export async function getStaticPaths() {

@@ -1,4 +1,3 @@
-import { difference } from 'lodash'
 import { type MouseEventHandler, createContext, useContext, useEffect, useRef } from 'react'
 
 import { useConstant } from 'common'
@@ -226,18 +225,17 @@ const createNavController = () => {
   }
 }
 
-const ActiveElemContext = createContext<
-  Omit<ReturnType<typeof createNavController>, 'subscribeSyncs'> | undefined
->(undefined)
+const ActiveElemContext = createContext<ReturnType<typeof createNavController> | undefined>(
+  undefined
+)
 
 const useActiveElemController = () => {
   const navController = useConstant(createNavController)
-  const contextValueRef = useRef(navController)
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => navController.setup(ref.current), [navController])
 
-  return { ref, contextValueRef }
+  return { ref, value: navController }
 }
 
 const useActiveElemContext = () => {

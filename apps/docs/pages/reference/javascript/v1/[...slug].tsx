@@ -2,7 +2,7 @@ import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import RefSectionHandler from '~/components/reference/RefSectionHandler'
 import { flattenSections } from '~/lib/helpers'
 import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'
-import handleRefStaticProps from '~/lib/mdx/handleRefStaticProps'
+import { handleRefStaticProps } from '~/lib/mdx/handleRefStaticProps'
 
 import clientLibsCommonSections from '~/spec/common-client-libs-sections.json' assert { type: 'json' }
 import typeSpec from '~/spec/enrichments/tsdoc_v1/combined.json' assert { type: 'json' }
@@ -15,6 +15,7 @@ export default function JSReference(props) {
   return (
     <RefSectionHandler
       menuId={MenuId.RefJavaScriptV1}
+      menuData={props.menuData}
       sections={sections}
       spec={spec}
       typeSpec={typeSpec}
@@ -26,7 +27,12 @@ export default function JSReference(props) {
 }
 
 export async function getStaticProps() {
-  return handleRefStaticProps(sections, libraryPath)
+  return handleRefStaticProps({
+    sections,
+    spec,
+    libraryPath,
+    excludedName: 'reference_javascript_v1',
+  })
 }
 
 export async function getStaticPaths() {

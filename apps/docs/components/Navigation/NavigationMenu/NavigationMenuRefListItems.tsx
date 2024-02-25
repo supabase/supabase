@@ -4,7 +4,6 @@ import React, { Fragment } from 'react'
 import { IconChevronLeft, IconChevronRight, cn } from 'ui'
 
 import RevVersionDropdown from '~/components/RefVersionDropdown'
-import { DocsEvent, fireCustomEvent } from '~/lib/events'
 import HomeMenuIconPicker from './HomeMenuIconPicker'
 import * as NavItems from './NavigationMenu.constants'
 import { useFirePageChange, useGetInitialCollapsibleProps } from './utils'

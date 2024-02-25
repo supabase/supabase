@@ -4,7 +4,7 @@ import spec from '~/spec/supabase_py_v2.yml' assert { type: 'yml' }
 import RefSectionHandler from '~/components/reference/RefSectionHandler'
 import { flattenSections } from '~/lib/helpers'
 import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'
-import handleRefStaticProps from '~/lib/mdx/handleRefStaticProps'
+import { handleRefStaticProps } from '~/lib/mdx/handleRefStaticProps'
 import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 
 const sections = flattenSections(clientLibsCommonSections)
@@ -14,6 +14,7 @@ export default function PyReference(props) {
   return (
     <RefSectionHandler
       menuId={MenuId.RefPythonV2}
+      menuData={props.menuData}
       sections={sections}
       spec={spec}
       typeSpec={typeSpec}
@@ -24,7 +25,12 @@ export default function PyReference(props) {
 }
 
 export async function getStaticProps() {
-  return handleRefStaticProps(sections, libraryPath)
+  return handleRefStaticProps({
+    sections,
+    spec,
+    libraryPath,
+    excludedName: 'reference_python_v2',
+  })
 }
 
 export async function getStaticPaths() {
