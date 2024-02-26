@@ -11,7 +11,7 @@ const GithubButton = () => {
       type="default"
       htmlType="submit"
       icon={
-        !pending ? (
+        pending ? (
           <Loader2 size={18} className="animate-spin w-6 h-6 text-muted" strokeWidth={1.5} />
         ) : (
           <Github size={18} />
