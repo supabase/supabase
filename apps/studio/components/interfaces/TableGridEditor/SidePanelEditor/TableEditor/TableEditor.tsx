@@ -32,6 +32,11 @@ import {
   generateTableFieldFromPostgresTable,
   validateFields,
 } from './TableEditor.utils'
+import {
+  CONSTRAINT_TYPE,
+  Constraint,
+  useTableConstraintsQuery,
+} from 'data/database/constraints-query'
 
 export interface TableEditorProps {
   table?: PostgresTable
@@ -54,6 +59,7 @@ export interface TableEditorProps {
       isRealtimeEnabled: boolean
       isDuplicateRows: boolean
       existingForeignKeyRelations: ForeignKeyConstraint[]
+      primaryKey?: Constraint
     },
     resolve: any
   ) => void
@@ -102,6 +108,16 @@ const TableEditor = ({
   const [importContent, setImportContent] = useState<ImportContent>()
   const [isImportingSpreadsheet, setIsImportingSpreadsheet] = useState<boolean>(false)
   const [rlsConfirmVisible, setRlsConfirmVisible] = useState<boolean>(false)
+
+  const { data: constraints } = useTableConstraintsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    schema: table?.schema,
+    table: table?.name,
+  })
+  const primaryKey = (constraints ?? []).find(
+    (constraint) => constraint.type === CONSTRAINT_TYPE.PRIMARY_KEY_CONSTRAINT
+  )
 
   const { data: foreignKeyMeta } = useForeignKeyConstraintsQuery({
     projectRef: project?.ref,
@@ -173,6 +189,7 @@ const TableEditor = ({
           isRealtimeEnabled: tableFields.isRealtimeEnabled,
           isDuplicateRows: isDuplicateRows,
           existingForeignKeyRelations: foreignKeys,
+          primaryKey,
         }
 
         saveChanges(payload, tableFields.columns, fkRelations, isNewRecord, configuration, resolve)

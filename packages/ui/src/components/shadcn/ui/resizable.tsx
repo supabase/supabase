@@ -41,7 +41,6 @@ const ResizableHandle = ({
           'hover:bg-surface-400',
           'group-data-[resize-handle-state=drag]:opacity-100',
           'group-data-[resize-handle-state=drag]:bg-foreground-muted'
-          // 'data-resize-handle-state="inactive"'
         )}
       >
         <GripVertical className="h-2.5 w-2.5" />

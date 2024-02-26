@@ -59,6 +59,7 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { RootStore } from 'stores'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
+import { Toaster } from 'ui'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -182,6 +183,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                 </PageTelemetry>
 
                 <HCaptchaLoadedStore />
+                <Toaster />
                 <PortalToast />
                 {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />}
               </FlagProvider>
