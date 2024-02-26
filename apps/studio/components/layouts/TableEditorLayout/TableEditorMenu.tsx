@@ -2,7 +2,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { partition } from 'lodash'
-import { Plus, Search } from 'lucide-react'
+import { ArrowDownAZ, Plus } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
@@ -17,15 +17,15 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
   IconChevronsDown,
-  Input_Shadcn_,
-  cn,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
 } from 'ui'
 
 import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import AlertError from 'components/ui/AlertError'
 import InfiniteList from 'components/ui/InfiniteList'
 import SchemaSelector from 'components/ui/SchemaSelector'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
 import { useCheckPermissions, useLocalStorage } from 'hooks'
@@ -33,6 +33,14 @@ import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
+
+import {
+  InnerSideBarFilterSearchInput,
+  InnerSideBarFilterSortDropdown,
+  InnerSideBarFilterSortDropdownItem,
+  InnerSideBarFilters,
+  InnerSideBarShimmeringLoaders,
+} from 'ui-patterns/InnerSideMenu'
 
 const TableEditorMenu = () => {
   const router = useRouter()
@@ -45,9 +53,6 @@ const TableEditorMenu = () => {
     'table-editor-sort',
     'alphabetical'
   )
-  const [isSearchOpen, setIsSearchOpen] = useState(false)
-  const inputRef = useRef<HTMLInputElement | null>(null)
-  const [isSearchInputFocused, setIsSearchInputFocused] = useState(false)
 
   const { project } = useProjectContext()
   const {
@@ -98,20 +103,6 @@ const TableEditorMenu = () => {
     (schema) => EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
   )
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
-
-  const expandSearch = () => {
-    setIsSearchOpen(!isSearchOpen)
-  }
-
-  useEffect(() => {
-    if (isSearchOpen && inputRef.current) {
-      inputRef.current.focus()
-    }
-  }, [isSearchOpen])
-
-  const handleSearchInputFocusChange = () => {
-    setIsSearchInputFocused(inputRef.current === document.activeElement)
-  }
 
   return (
     <>
@@ -185,79 +176,39 @@ const TableEditorMenu = () => {
           </div>
         </div>
         <div className="flex flex-auto flex-col gap-2 pb-4 px-2">
-          <div className="flex items-center px-2 w-full gap-2">
-            <label htmlFor={'search-tables'} className="relative w-full">
-              <span className="sr-only">Search tables</span>
-              <Input_Shadcn_
-                id="search-tables"
-                name="search-tables"
-                type="text"
-                placeholder="Search tables..."
-                className={cn('h-[28px] w-full', 'text-xs', 'pl-7', 'w-full')}
-                onChange={(e) => {
-                  setSearchText(e.target.value.trim())
-                }}
-                value={searchText}
-                ref={(el) => {
-                  inputRef.current = el
-                  if (el) {
-                    el.addEventListener('focus', handleSearchInputFocusChange)
-                    el.addEventListener('blur', handleSearchInputFocusChange)
-                  }
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Escape') {
-                    setIsSearchOpen(false)
-                    setSearchText('')
-                  }
-                }}
-              />
-              <Search
-                className="absolute left-2 top-2 text-foreground-muted"
-                size={14}
-                strokeWidth={1.5}
-              />
-            </label>
-            <DropdownMenu>
-              <Tooltip.Root delayDuration={0}>
-                <DropdownMenuTrigger asChild>
-                  <Tooltip.Trigger className="text-foreground-lighter transition-colors hover:text-foreground data-[state=open]:text-foreground">
-                    <IconChevronsDown size={18} strokeWidth={1} />
-                  </Tooltip.Trigger>
-                </DropdownMenuTrigger>
-                <Tooltip.Portal>
-                  <Tooltip.Content
-                    side="bottom"
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                      'border border-background text-xs',
-                    ].join(' ')}
-                  >
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    Sort By
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              </Tooltip.Root>
-              <DropdownMenuContent side="bottom" align="end" className="w-48">
-                <DropdownMenuRadioGroup value={sort} onValueChange={(value: any) => setSort(value)}>
-                  <DropdownMenuRadioItem key="alphabetical" value="alphabetical">
-                    Alphabetical
-                  </DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem key="grouped-alphabetical" value="grouped-alphabetical">
-                    Entity Type
-                  </DropdownMenuRadioItem>
-                </DropdownMenuRadioGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+          <InnerSideBarFilters>
+            <InnerSideBarFilterSearchInput
+              name="search-tables"
+              aria-labelledby="Search tables"
+              onChange={(e) => {
+                setSearchText(e.target.value.trim())
+              }}
+              value={searchText}
+              placeholder="Search tables..."
+            >
+              <InnerSideBarFilterSortDropdown
+                value={sort}
+                onValueChange={(value: any) => setSort(value)}
+              >
+                <InnerSideBarFilterSortDropdownItem
+                  key="alphabetical"
+                  value="alphabetical"
+                  className="flex gap-2"
+                >
+                  <ArrowDownAZ size={16} className="text-foreground-muted" strokeWidth={1.5} />
+                  Alphabetical
+                </InnerSideBarFilterSortDropdownItem>
+                <InnerSideBarFilterSortDropdownItem
+                  key="grouped-alphabetical"
+                  value="grouped-alphabetical"
+                >
+                  Entity Type
+                </InnerSideBarFilterSortDropdownItem>
+              </InnerSideBarFilterSortDropdown>
+            </InnerSideBarFilterSearchInput>
+          </InnerSideBarFilters>
 
-          {isLoading && (
-            <div className="flex flex-col px-2 gap-1 pb-4">
-              <ShimmeringLoader className="w-full h-7 rounded-md" delayIndex={0} />
-              <ShimmeringLoader className="w-full h-7 rounded-md" delayIndex={1} />
-              <ShimmeringLoader className="w-full h-7 rounded-md" delayIndex={2} />
-            </div>
-          )}
+          {isLoading && <InnerSideBarShimmeringLoaders />}
 
           {isError && (
             <AlertError error={(error ?? null) as any} subject="Failed to retrieve tables" />

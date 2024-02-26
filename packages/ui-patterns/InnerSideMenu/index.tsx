@@ -103,16 +103,27 @@ const InnerSideBarFilters = forwardRef<HTMLDivElement, React.ComponentPropsWitho
 const InnerSideBarFilterSearchInput = forwardRef<
   HTMLInputElement,
   React.ComponentPropsWithoutRef<'input'> & { 'aria-labelledby': string; name: string }
->(({ ...props }, ref) => {
+>(({ children, ...props }, ref) => {
   return (
     <label htmlFor={props.name} className="relative w-full">
       <span className="sr-only">{props['aria-labelledby']}</span>
       <Input_Shadcn_
         ref={ref}
         type="text"
-        className={cn('h-[28px] w-full', 'text-xs', 'pl-7', 'w-full', props.className)}
+        className={cn(
+          'h-[28px] w-full',
+          'text-xs',
+          'pl-7',
+          'pr-7',
+          'w-full',
+          'rounded-sm',
+          'bg-transparent',
+          'border',
+          props.className
+        )}
         {...props}
       />
+      {children}
       <Search className="absolute left-2 top-2 text-foreground-muted" size={14} strokeWidth={1.5} />
     </label>
   )
@@ -124,19 +135,27 @@ const InnerSideBarFilterSortDropdown = forwardRef<
     value: string
     onValueChange: (value: string) => void
     contentClassName?: string
+    triggerClassName?: string
   }
->(({ value, onValueChange, contentClassName, ...props }, ref) => {
+>(({ value, onValueChange, contentClassName, triggerClassName, ...props }, ref) => {
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <Tooltip_Shadcn_ delayDuration={0}>
-        <DropdownMenuTrigger asChild>
-          <TooltipTrigger_Shadcn_ className="text-foreground-lighter transition-colors hover:text-foreground data-[state=open]:text-foreground">
+        <DropdownMenuTrigger
+          asChild
+          className={cn(
+            'absolute right-1 top-[.3rem]',
+            'text-foreground-muted transition-colors hover:text-foreground data-[state=open]:text-foreground',
+            triggerClassName
+          )}
+        >
+          <TooltipTrigger_Shadcn_>
             <IconChevronsDown size={18} strokeWidth={1} />
           </TooltipTrigger_Shadcn_>
         </DropdownMenuTrigger>
         <TooltipContent_Shadcn_ side="bottom">Sort By</TooltipContent_Shadcn_>
       </Tooltip_Shadcn_>
-      <DropdownMenuContent side="bottom" align="end" className={cn('w-16', contentClassName)}>
+      <DropdownMenuContent side="bottom" align="end" className={cn('w-48', contentClassName)}>
         <DropdownMenuRadioGroup value={value} onValueChange={onValueChange}>
           {props.children}
         </DropdownMenuRadioGroup>
@@ -165,6 +184,31 @@ const InnerSideBarShimmeringLoaders = forwardRef<
   )
 })
 
+const InnerSideBarEmptyPanel = forwardRef<
+  HTMLDivElement,
+  React.ComponentPropsWithoutRef<'div'> & {
+    title: string
+    description?: string
+    illustration?: React.ReactNode
+    actions?: React.ReactNode
+  }
+>(({ illustration, title, description, actions, ...props }, ref) => {
+  return (
+    <div className="border bg-surface-100/50 flex flex-col gap-y-3 items-center justify-center rounded-md px-3 py-4 mx-2">
+      <div className="flex flex-col gap-y-1 items-center justify-center">
+        {illustration}
+        {title && <p className="text-xs text-foreground-light">{title}</p>}
+        {description && (
+          <p className="text-xs text-foreground-lighter text-center">
+            Click the heart icon to favorite any of your queries
+          </p>
+        )}
+        {actions && <div className="mt-2">{actions}</div>}
+      </div>
+    </div>
+  )
+})
+
 export {
   InnerSideBarFilterSearchInput,
   InnerSideBarFilters,
@@ -176,4 +220,5 @@ export {
   InnerSideMenuSeparator,
   InnerSideBarFilterSortDropdown,
   InnerSideBarFilterSortDropdownItem,
+  InnerSideBarEmptyPanel,
 }
