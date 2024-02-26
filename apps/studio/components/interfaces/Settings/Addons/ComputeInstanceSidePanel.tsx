@@ -401,6 +401,13 @@ const ComputeInstanceSidePanel = () => {
                 <AlertDescription_Shadcn_>
                   Your project will be unavailable for up to 2 minutes while the changes take place.
                 </AlertDescription_Shadcn_>
+                {hasReadReplicas && (
+                  <AlertDescription_Shadcn_>
+                    The compute sizes for <span className="text-foreground">all read replicas</span>{' '}
+                    on your project will also be changed to the {selectedCompute?.name} size as
+                    well.
+                  </AlertDescription_Shadcn_>
+                )}
               </Alert_Shadcn_>
             )}
 
