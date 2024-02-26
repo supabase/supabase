@@ -73,23 +73,23 @@ Returns the ID of the user making the request.
 
 ### `auth.jwt()`
 
-Returns the JWT of the user making the request. Anything that you store in the user's `app_metadata` column or the `user_metadata` column will be accessible using this function. It's important to know the distinction between these two:
+Returns the JWT of the user making the request. Anything that you store in the user's `raw_app_meta_data` column or the `user_metadata` column will be accessible using this function. It's important to know the distinction between these two:
 
 - `user_metadata` - can be updated by the authenticated user using the `supabase.auth.update()` function. It is not a good place to store authorization data.
-- `app_metadata` - cannot be updated by the user, so it's a good place to store authorization data.
+- `raw_app_meta_data` - cannot be updated by the user, so it's a good place to store authorization data.
 
-The `auth.jwt()` function is extremely versatile. For example, if you store some team data inside `app_metadata`, you can use it to determine whether a particular user belongs to a team. For example, if this was an array of IDs:
+The `auth.jwt()` function is extremely versatile. For example, if you store some team data inside `raw_app_meta_data`, you can use it to determine whether a particular user belongs to a team. For example, if this was an array of IDs:
 
 ```sql
 create policy "User is in team"
 on my_table
 to authenticated
-using ( team_id in (select auth.jwt() -> 'app_metadata' -> 'teams'));
+using ( team_id in (select auth.jwt() -> 'raw_app_meta_data' -> 'teams'));
 ```
 
 <Admonition type="caution">
 
-Keep in mind that a JWT is not always "fresh". In the example above, even if you remove a user from a team and update the `app_metadata` field, that will not be reflected using `auth.jwt()` until the user's JWT is refreshed.
+Keep in mind that a JWT is not always "fresh". In the example above, even if you remove a user from a team and update the `raw_app_meta_data` field, that will not be reflected using `auth.jwt()` until the user's JWT is refreshed.
 
 Also, if you are using Cookies for Auth, then you must be mindful of the JWT size. Some browsers are limited to 4096 bytes for each cookie, and so the total size of your JWT should be small enough to fit inside this limitation.
 
