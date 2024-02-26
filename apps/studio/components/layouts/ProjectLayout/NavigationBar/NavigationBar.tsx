@@ -258,7 +258,7 @@ const NavigationBar = () => {
               <div
                 className={[
                   'absolute',
-                  'left-[10rem]',
+                  'left-[12rem]',
                   'opacity-0',
                   'delay-100',
                   'group-data-[state=expanded]:opacity-100 ',
