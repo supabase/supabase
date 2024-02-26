@@ -14,8 +14,8 @@ date: '2024-02-26'
 toc_depth: 3
 ---
 
-Recommending relevant content to the user is essential to keep the user interested in the app. Although it is a common feature that we would like to have in our apps, building it is not straightforward. This changed as vector databases and Open AI emerged. Today, we can perform semantic searches that are highly aware of the context of the content with just a single query into our vector database. 
-In this article, we will go over how you can create a Flutter movie-viewing app that recommends another movie based on what the user is viewing. 
+Recommending relevant content to the user is essential to keep the user interested in the app. Although it is a common feature that we would like to have in our apps, building it is not straightforward. This changed as vector databases and Open AI emerged. Today, we can perform semantic searches that are highly aware of the context of the content with just a single query into our vector database.
+In this article, we will go over how you can create a Flutter movie-viewing app that recommends another movie based on what the user is viewing.
 
 A quick disclaimer, this article provides an overview of what you can build with a vector database, so it will not go into every detail of the implementation. You can find the full code base of the app in this article [here](https://github.com/dshukertjr/flutter-movie-recommendation) to find more details.
 
@@ -46,7 +46,7 @@ We first need to populate the database with some data about movies and its embed
 
 ### Step 1: Create the table
 
-We will have one table for this project, and it is the `films` table. `films` table will store some basic information about each movie like title or release data, as well as embedding of each movie’s overview so that we can perform vector similarity search on each other. 
+We will have one table for this project, and it is the `films` table. `films` table will store some basic information about each movie like title or release data, as well as embedding of each movie’s overview so that we can perform vector similarity search on each other.
 
 ```sql
 -- Enable pgvector extension
@@ -73,11 +73,11 @@ create policy "Fils are public." on public.films for select using (true);
 
 ### Step 2: Get movie data
 
-Getting movie data is relatively straightforward. TMDB API provides an easy-to-use [movies endpoint](https://developer.themoviedb.org/reference/discover-movie) for querying information about movies while providing a wide range of filters to narrow down the query results. 
+Getting movie data is relatively straightforward. TMDB API provides an easy-to-use [movies endpoint](https://developer.themoviedb.org/reference/discover-movie) for querying information about movies while providing a wide range of filters to narrow down the query results.
 
 We need a backend to securely call the API, and for that, we will use [Supabase Edge Functions](https://supabase.com/docs/guides/functions). Steps 2 through 4 will be constructing this edge function code, and the full code sample can be found [here](https://github.com/dshukertjr/flutter-movie-recommendation/blob/main/supabase/functions/get_film_data/index.ts).
 
-The following code will give us the top 20 most popular movies in a given year. 
+The following code will give us the top 20 most popular movies in a given year.
 
 ```tsx
 const searchParams = new URLSearchParams()
@@ -143,18 +143,18 @@ const embedding = responseData.data[0].embedding
 
 ### Step 4: Store the data in the Supabase database
 
-Once we have the movie data as well as embedding data, we are left with the task of storing them. We can call the `upsert()` function on the Supabase client to easily store the data. 
+Once we have the movie data as well as embedding data, we are left with the task of storing them. We can call the `upsert()` function on the Supabase client to easily store the data.
 
 Again, I omitted a lot of code here for simplicity, but you can find the full edge functions code of step 2 through step 4 [here](https://github.com/dshukertjr/flutter-movie-recommendation/blob/main/supabase/functions/get_film_data/index.ts).
 
 ```tsx
 // Code from Step 2
-// Get movie data and store them in `films` variable 
+// Get movie data and store them in `films` variable
 ...
 
 for(const film of films) {
 	// Code from Step 3
-  // Get the embedding and store it in `embeddings` variable	
+  // Get the embedding and store it in `embeddings` variable
 
 	filmsWithEmbeddings.push({
 	  id: film.id,
@@ -214,9 +214,9 @@ lib/
 └── main.dart
 ```
 
-`components/film_cell.dart` is a shared component to display a tappable cell for the home and details page. `models/film.dart` contains the data model representing a single movie. 
+`components/film_cell.dart` is a shared component to display a tappable cell for the home and details page. `models/film.dart` contains the data model representing a single movie.
 
-The two pages look like the following. The magic is happening at the bottom of the details page in the section labeled `You might also like:`. We are performing a vector similarity search to get a list of similar movies to the selected one using the database function we implemented earlier. 
+The two pages look like the following. The magic is happening at the bottom of the details page in the section labeled `You might also like:`. We are performing a vector similarity search to get a list of similar movies to the selected one using the database function we implemented earlier.
 
 ![Application interfaces](/images/blog/2024-02-26-content-recommendation-with-flutter/interface.png)
 
@@ -273,7 +273,7 @@ class _HomePageState extends State<HomePage> {
 }
 ```
 
-In the details page, we are calling the `get_related_film` database function created in step 5 to get the top 6 most related movies and display them. 
+In the details page, we are calling the `get_related_film` database function created in step 5 to get the top 6 most related movies and display them.
 
 ```dart
 import 'package:filmsearch/components/film_cell.dart';
