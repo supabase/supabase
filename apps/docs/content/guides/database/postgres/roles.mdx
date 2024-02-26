@@ -38,7 +38,7 @@ Your Postgres database is the core of your Supabase project, so it's important t
 
 ### Special symbols in passwords
 
-If you use special symbols in your postgres password, you must remember to [percent-encode](https://en.wikipedia.org/wiki/Percent-encoding) your password later if using the postgres connection string e.g. `postgresql://postgres.projectref:p%3Dword@aws-0-us-east-1.pooler.supabase.com:6543/postgres`
+If you use special symbols in your postgres password, you must remember to [percent-encode](https://en.wikipedia.org/wiki/Percent-encoding) your password later if using the postgres connection string, for example, `postgresql://postgres.projectref:p%3Dword@aws-0-us-east-1.pooler.supabase.com:6543/postgres`
 
 ### Changing your project password
 
@@ -86,7 +86,7 @@ The default Postgres role. This has admin privileges.
 
 ### `anon`
 
-For "anonymous access". This is the role which the API (PostgREST) will use when a user _is not_ logged in.
+For "anonymous access." This is the role which the API (PostgREST) will use when a user _is not_ logged in.
 
 ### `authenticator`
 
@@ -95,7 +95,7 @@ A special role for the API (PostgREST). It has very limited access, and is used 
 
 ### `authenticated`
 
-For "authenticated access". This is the role which the API (PostgREST) will use when a user _is_ logged in.
+For "authenticated access." This is the role which the API (PostgREST) will use when a user _is_ logged in.
 
 ### `service_role`
 
