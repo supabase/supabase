@@ -26,7 +26,7 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
       'group-data-[state=collapsed]:justify-center',
       'group-data-[state=expanded]:-space-x-2',
       'text-foreground-lighter hover:text-foreground ',
-      'bg-studio hover:bg-surface-200',
+      'hover:bg-surface-200',
       `${isActive ? '!bg-selection !text-foreground shadow-sm' : ''}`,
       'group/item',
     ]
