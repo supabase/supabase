@@ -87,8 +87,6 @@ const ProjectLayout = ({
     router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
   const showPausedState = isPaused && !ignorePausedState
 
-  console.log('productMenu', productMenu)
-
   return (
     <AppLayout>
       <ProjectContextProvider projectRef={projectRef}>
