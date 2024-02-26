@@ -1,5 +1,3 @@
-import jwt from 'jwt-simple'
-
 import { User } from 'data/auth/users-query'
 import { uuidv4 } from './helpers'
 
@@ -114,12 +112,58 @@ export function wrapWithRoleImpersonation(
   `
 }
 
-export function getRoleImpersonationJWT(
+export async function getRoleImpersonationJWT(
   projectRef: string,
   jwtSecret: string,
   role: PostgrestImpersonationRole
-) {
+): Promise<string> {
   const claims = getPostgrestClaims(projectRef, role)
+  return createToken(claims, jwtSecret)
+}
 
-  return jwt.encode(claims, jwtSecret, 'HS256')
+async function createToken(payload: object, key: string) {
+  const header = { typ: 'JWT', alg: 'HS256' }
+
+  const segments = []
+  segments.push(btoa(JSON.stringify(header)).replace(/=/g, ''))
+  segments.push(btoa(JSON.stringify(payload)).replace(/=/g, ''))
+
+  const footer = await sign(segments.join('.'), btoa(key).replace(/=/g, ''))
+  segments.push(footer.replace(/=/g, ''))
+  return segments.join('.')
+}
+
+async function sign(data: string, key: string) {
+  return window.crypto.subtle
+    .importKey(
+      'jwk',
+      {
+        //this is an example jwk key, "raw" would be an ArrayBuffer
+        kty: 'oct',
+        k: key,
+        alg: 'HS256',
+      },
+      {
+        name: 'HMAC',
+        hash: { name: 'SHA-256' },
+      },
+      false,
+      ['sign', 'verify']
+    )
+    .then((key) => {
+      const jsonString = JSON.stringify(data)
+      const encodedData = new TextEncoder().encode(jsonString)
+      return window.crypto.subtle.sign(
+        {
+          name: 'HMAC',
+        },
+        key,
+        encodedData
+      )
+    })
+    .then((token) => {
+      const u8 = new Uint8Array(token)
+      const b64encoded = btoa(String.fromCharCode(...u8))
+      return b64encoded
+    })
 }

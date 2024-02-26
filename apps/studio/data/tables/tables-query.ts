@@ -1,8 +1,9 @@
 import { PostgresTable } from '@supabase/postgres-meta'
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
 import { sortBy } from 'lodash'
 import { useCallback } from 'react'
+
+import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { tableKeys } from './keys'
 
@@ -44,21 +45,15 @@ export async function getTables(
 
   const { data, error } = await get('/platform/pg-meta/{ref}/tables', {
     params: {
-      header: {
-        'x-connection-encrypted': connectionString!,
-      },
-      path: {
-        ref: projectRef,
-      },
+      header: { 'x-connection-encrypted': connectionString! },
+      path: { ref: projectRef },
       query: queryParams as any,
     },
     headers,
     signal,
   })
 
-  if (!Array.isArray(data) && error) {
-    throw error
-  }
+  if (!Array.isArray(data) && error) handleError(error)
 
   // Sort the data if the sortByName option is true
   if (Array.isArray(data) && sortByProperty) {

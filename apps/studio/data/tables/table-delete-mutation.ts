@@ -2,7 +2,7 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'react-hot-toast'
 
 import { entityTypeKeys } from 'data/entity-types/keys'
-import { del } from 'data/fetchers'
+import { del, handleError } from 'data/fetchers'
 import { viewKeys } from 'data/views/keys'
 import { ResponseError } from 'types'
 import { tableKeys } from './keys'
@@ -33,7 +33,7 @@ export async function deleteTable({
     headers,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

@@ -19,7 +19,6 @@ import { boolean, number, object, string } from 'yup'
 import { Markdown } from 'components/interfaces/Markdown'
 import {
   FormActions,
-  FormHeader,
   FormPanel,
   FormSection,
   FormSectionContent,
@@ -30,6 +29,7 @@ import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { IS_PLATFORM } from 'lib/constants'
 import FormField from '../AuthProvidersForm/FormField'
 
 // Use a const string to represent no chars option. Represented as empty string on the backend side.
@@ -89,11 +89,15 @@ const BasicAuthSettingsForm = () => {
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const organization = useSelectedOrganization()
-  const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery({
-    orgSlug: organization!.slug,
-  })
+  const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery(
+    {
+      orgSlug: organization?.slug,
+    },
+    { enabled: IS_PLATFORM }
+  )
 
   const isProPlanAndUp = isSuccessSubscription && subscription?.plan?.id !== 'free'
+  const promptProPlanUpgrade = IS_PLATFORM && !isProPlanAndUp
 
   const INITIAL_VALUES = {
     DISABLE_SIGNUP: !authConfig?.DISABLE_SIGNUP,
@@ -244,7 +248,7 @@ const BasicAuthSettingsForm = () => {
                     }}
                     formValues={values}
                   />
-                  {isProPlanAndUp ? (
+                  {!promptProPlanUpgrade ? (
                     <></>
                   ) : (
                     <UpgradeToPro
@@ -267,7 +271,7 @@ const BasicAuthSettingsForm = () => {
               </FormSection>
               <FormSection header={<FormSectionLabel>User Sessions</FormSectionLabel>}>
                 <FormSectionContent loading={isLoading}>
-                  {isProPlanAndUp ? (
+                  {!promptProPlanUpgrade ? (
                     <></>
                   ) : (
                     <UpgradeToPro

@@ -77,19 +77,27 @@ export const ForeignKeySelector = ({
   const disableApply = selectedTable === undefined || hasTypeErrors
 
   const updateSelectedSchema = (schema: string) => {
-    const updatedFk = { ...EMPTY_STATE, schema }
+    const updatedFk = { ...EMPTY_STATE, id: fk.id, schema }
     setFk(updatedFk)
   }
 
   const updateSelectedTable = (tableId: number) => {
     setErrors({})
     if (!tableId) {
-      return setFk({ ...EMPTY_STATE, schema: fk.schema, columns: [{ source: '', target: '' }] })
+      return setFk({
+        ...EMPTY_STATE,
+        id: fk.id,
+        name: fk.name,
+        schema: fk.schema,
+        columns: [{ source: '', target: '' }],
+      })
     }
     const table = (tables ?? []).find((x) => x.id === tableId)
     if (table)
       setFk({
         ...EMPTY_STATE,
+        id: fk.id,
+        name: fk.name,
         tableId: table.id,
         schema: table.schema,
         table: table.name,

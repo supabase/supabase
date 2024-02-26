@@ -361,7 +361,7 @@ BEGIN
 END;
 $$;
 
-SELECT cron.schedule('new-chat-partition', '0 23 * * *', 'CALL app.create_daily_partition(now()::date + 'interval 1 day')');
+SELECT cron.schedule('new-chat-partition', '0 23 * * *', 'CALL app.create_daily_partition(now()::date + "interval 1 day")');
 COMMIT;
 ```
 

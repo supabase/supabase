@@ -1,12 +1,13 @@
-import { Filters, LogData, LogsEndpointParams, LogsTableName, SQL_FILTER_TEMPLATES } from '.'
+import { useMonaco } from '@monaco-editor/react'
 import dayjs, { Dayjs } from 'dayjs'
 import { get, isEqual } from 'lodash'
-import { useMonaco } from '@monaco-editor/react'
-import logConstants from 'shared-data/logConstants'
-import BackwardIterator from 'components/ui/CodeEditor/Providers/BackwardIterator'
 import uniqBy from 'lodash/uniqBy'
 import { useEffect } from 'react'
+import logConstants from 'shared-data/logConstants'
+
+import BackwardIterator from 'components/ui/CodeEditor/Providers/BackwardIterator'
 import { PlanId } from 'data/subscriptions/types'
+import { Filters, LogData, LogsEndpointParams, LogsTableName, SQL_FILTER_TEMPLATES } from '.'
 
 /**
  * Convert a micro timestamp from number/string to iso timestamp
@@ -99,7 +100,18 @@ const genWhereStatement = (table: LogsTableName, filters: Filters) => {
 
   const statement = keys
     .map((rootKey) => {
-      if (typeof filters[rootKey] === 'object') {
+      if (
+        filters[rootKey] === undefined ||
+        (typeof filters[rootKey] === 'string' && (filters[rootKey] as string).length === 0)
+      ) {
+        return null
+      } else if (rootKey === 'database') {
+        return table === 'edge_logs'
+          ? `(request.host like '${filters[rootKey]}%')`
+          : table === 'supavisor_logs'
+            ? `(m.project like '${filters[rootKey]}%')`
+            : null
+      } else if (typeof filters[rootKey] === 'object') {
         // join all statements with an OR
         const nestedStatements = getDotKeys(filters[rootKey] as Filters, rootKey)
           .map(_resolveTemplateToStatement)
@@ -172,6 +184,8 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
   ${orderBy}
   limit 100
   `
+    case 'supavisor_logs':
+      return `select id, ${table}.timestamp, event_message from ${table} ${joins} ${where} ${orderBy} limit 100`
 
     default:
       return `select id, ${table}.timestamp, event_message from ${table}
@@ -207,6 +221,9 @@ const genCrossJoinUnnests = (table: LogsTableName) => {
       return `cross join unnest(metadata) as m
   cross join unnest(m.response) as response
   cross join unnest(m.request) as request`
+
+    case 'supavisor_logs':
+      return `cross join unnest(metadata) as m`
 
     default:
       return ''

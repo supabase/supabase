@@ -159,7 +159,7 @@ function StoragePage() {
           />
         </SectionContainer>
 
-        <SectionContainer className="-mb-48 pt-0">
+        <SectionContainer className="pt-0">
           <APISection
             title="Simple and convenient APIs"
             // @ts-ignore
@@ -215,12 +215,7 @@ function StoragePage() {
               <div className="section--bg border-t border-control"></div>
             </div>
             <div className="section-container pt-12 pb-0">
-              {/* <FloatingIcons /> */}
               <div className="overflow-x-hidden">
-                {/* <SectionContainer className="mb-0 pb-8">
-                <GithubExamples />
-              </SectionContainer> */}
-
                 <SectionContainer>
                   <div className="grid grid-cols-12 lg:gap-16">
                     <div className="col-span-12 mb-8 lg:col-span-5">

@@ -16,12 +16,37 @@ import { useConsent } from 'ui-patterns/ConsentToast'
 import Favicons from '~/components/Favicons'
 import { IPv4DeprecationBanner } from '~/components/IPv4DeprecationBanner'
 import SiteLayout from '~/layouts/SiteLayout'
-import { IS_PLATFORM } from '~/lib/constants'
+import { IS_PLATFORM, IS_PREVIEW } from '~/lib/constants'
 import { unauthedAllowedPost } from '~/lib/fetch/fetchWrappers'
 import { useRootQueryClient } from '~/lib/fetch/queryClient'
 import { LOCAL_STORAGE_KEYS, remove } from '~/lib/storage'
 import { useOnLogout } from '~/lib/userAuth'
 import { AppPropsWithLayout } from '~/types'
+
+/**
+ * Preview builds don't need to be statically generated to optimize performance.
+ * This (somewhat hacky) way of shortcutting preview builds cuts their build
+ * time and speeds up the feedback loop for previewing docs changes in Vercel.
+ *
+ * This technically breaks the Rules of Hooks to avoid an unnecessary full-app
+ * rerender in prod, but this is fine because IS_PREVIEW will never change on
+ * you within a single build.
+ */
+function ShortcutPreviewBuild({ children }: PropsWithChildren) {
+  if (IS_PREVIEW) {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const [isMounted, setIsMounted] = useState(false)
+
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useEffect(() => {
+      setIsMounted(true)
+    }, [])
+
+    return isMounted ? children : null
+  }
+
+  return children
+}
 
 /**
  *
@@ -189,7 +214,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   }, [router])
 
   return (
-    <>
+    <ShortcutPreviewBuild>
       <QueryClientProvider client={queryClient}>
         <Favicons />
         <AuthContainer>
@@ -210,7 +235,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
           </SignOutHandler>
         </AuthContainer>
       </QueryClientProvider>
-    </>
+    </ShortcutPreviewBuild>
   )
 }
 
