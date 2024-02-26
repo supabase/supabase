@@ -204,6 +204,12 @@ export {
 
 export { ScrollArea, ScrollBar } from './src/components/shadcn/ui/scroll-area'
 
+export {
+  ResizablePanelGroup as ResizablePanelGroup_Shadcn_,
+  ResizablePanel as ResizablePanel_Shadcn_,
+  ResizableHandle as ResizableHandle_Shadcn_,
+} from './src/components/shadcn/ui/resizable'
+
 export { Separator } from './src/components/shadcn/ui/separator'
 
 // links
