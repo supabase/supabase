@@ -145,39 +145,41 @@ alter publication supabase_realtime add table public.users;
  * Create an auth hook to add a custom claim to the access token jwt.
  */
 
--- Enable the "plv8" extension
--- https://supabase.com/docs/guides/database/extensions/plv8?database-method=sql#enable-the-extension
-create extension plv8;
-
 -- Create the auth hook function
--- https://supabase.com/docs/guides/auth/auth-hooks?language=add-metadata-claim-plv8#hook-custom-access-token
-create or replace function custom_access_token_hook(event jsonb)
+-- https://supabase.com/docs/guides/auth/auth-hooks#hook-custom-access-token
+create or replace function public.custom_access_token_hook(event jsonb)
 returns jsonb
-language plv8
+language plpgsql
+immutable
 as $$
-  var user_role;
+  declare
+    claims jsonb;
+    user_role public.app_role;
+  begin
+    -- Check if the user is marked as admin in the profiles table
+    select role into user_role from public.user_roles where user_id = (event->>'user_id')::uuid;
 
-  // Fetch the current user's user_role from the public user_roles table.
-  var result = plv8.execute("select role from public.user_roles where user_id = $1", [event.user_id]);
-  if (result.length > 0) {
-    user_role = result[0].role;
-  } else {
-    // Assign null
-    user_role = null;
-  }
+    claims := event->'claims';
 
-  // Check if 'claims' exists in the event object; if not, initialize it
-  if (!event.claims) {
-    event.claims = {};
-  }
-  if (!event.claims.app_metadata) {
-    event.claims.app_metadata = {};
-  }
+    -- Check if 'app_metadata' exists in claims
+    if jsonb_typeof(claims->'app_metadata') is null then
+      -- If 'app_metadata' does not exist, create an empty object
+      claims := jsonb_set(claims, '{app_metadata}', '{}');
+    end if;
 
-  // Update the level in the claims
-  event.claims.app_metadata.user_role = user_role;
+    if user_role is not null then
+      -- Set the claim
+      claims := jsonb_set(claims, '{app_metadata, user_role}', to_jsonb(user_role));
+    else 
+      claims := jsonb_set(claims, '{app_metadata, user_role}', 'null');
+    end if;
 
-  return event;
+    -- Update the 'claims' object in the original event
+    event := jsonb_set(event, '{claims}', claims);
+
+    -- Return the modified or original event
+    return event;
+  end;
 $$;
 
 grant usage on schema public to supabase_auth_admin;
@@ -208,22 +210,22 @@ using (true)
  * HELPER FUNCTIONS
  * Create test user helper method.
  */
-CREATE OR REPLACE FUNCTION public.create_user(
+create or replace function public.create_user(
     email text
-) RETURNS uuid
-    SECURITY DEFINER
-    SET search_path = auth
-AS $$
+) returns uuid
+    security definer
+    set search_path = auth
+as $$
   declare
   user_id uuid;
-BEGIN
+begin
   user_id := extensions.uuid_generate_v4();
   
-  INSERT INTO auth.users (id, email)
-    VALUES (user_id, email)
-    RETURNING id INTO user_id;
+  insert into auth.users (id, email)
+    values (user_id, email)
+    returning id into user_id;
 
-    RETURN user_id;
-END;
-$$ LANGUAGE plpgsql;
+    return user_id;
+end;
+$$ language plpgsql;
 

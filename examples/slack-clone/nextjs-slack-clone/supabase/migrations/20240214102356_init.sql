@@ -144,22 +144,22 @@ alter publication supabase_realtime add table public.users;
  * HELPER FUNCTIONS
  * Create test user helper method.
  */
-CREATE OR REPLACE FUNCTION public.create_user(
+create or replace function public.create_user(
     email text
-) RETURNS uuid
-    SECURITY DEFINER
-    SET search_path = auth
-AS $$
+) returns uuid
+    security definer
+    set search_path = auth
+as $$
   declare
   user_id uuid;
-BEGIN
+begin
   user_id := extensions.uuid_generate_v4();
   
-  INSERT INTO auth.users (id, email)
-    VALUES (user_id, email)
-    RETURNING id INTO user_id;
+  insert into auth.users (id, email)
+    values (user_id, email)
+    returning id into user_id;
 
-    RETURN user_id;
-END;
-$$ LANGUAGE plpgsql;
+    return user_id;
+end;
+$$ language plpgsql;
 
