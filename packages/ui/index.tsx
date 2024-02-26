@@ -207,8 +207,6 @@ export {
 
 export { ScrollArea, ScrollBar } from './src/components/shadcn/ui/scroll-area'
 
-export * from './src/components/shadcn/ui/resizable'
-
 export { Separator } from './src/components/shadcn/ui/separator'
 
 export * from './src/components/shadcn/ui/resizable'
