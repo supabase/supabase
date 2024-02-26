@@ -74,6 +74,7 @@
     "react-hook-form": "^7.45.0",
     "react-hot-toast": "^2.4.1",
     "react-markdown": "^8.0.3",
+    "react-resizable-panels": "^2.0.11",
     "react-syntax-highlighter": "^15.5.0",
     "react-tooltip": "^4.2.17",
     "reactflow": "^11.10.1",
