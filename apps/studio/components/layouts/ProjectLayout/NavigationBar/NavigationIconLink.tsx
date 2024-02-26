@@ -10,7 +10,7 @@ interface NavigationIconButtonProps extends React.AnchorHTMLAttributes<HTMLAncho
   isActive?: boolean
 }
 
-const NavigationIconButton = forwardRef<HTMLAnchorElement, NavigationIconButtonProps>(
+const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonProps>(
   ({ route, isActive = false, ...props }, ref) => {
     const snap = useAppStateSnapshot()
 
@@ -24,7 +24,7 @@ const NavigationIconButton = forwardRef<HTMLAnchorElement, NavigationIconButtonP
       'transition-all duration-200',
       'flex items-center rounded',
       'group-data-[state=collapsed]:justify-center',
-      'group-data-[state=expanded]:gap-0',
+      'group-data-[state=expanded]:-space-x-2',
       'text-foreground-lighter hover:text-foreground ',
       'bg-studio hover:bg-surface-200',
       `${isActive ? '!bg-surface-300 !text-foreground shadow-sm' : ''}`,
@@ -32,9 +32,10 @@ const NavigationIconButton = forwardRef<HTMLAnchorElement, NavigationIconButtonP
     ]
     return route.link !== undefined ? (
       <Link
+        role="button"
+        aria-current={isActive}
         ref={ref}
         href={route.link!}
-        aria-selected={isActive}
         {...props}
         className={cn(classes, props.className)}
       >
@@ -52,7 +53,7 @@ const NavigationIconButton = forwardRef<HTMLAnchorElement, NavigationIconButtonP
             'group-hover/item:text-foreground',
             'opacity-0 group-data-[state=expanded]:opacity-100',
             'transition-all',
-            'group-aria-selected/item:text-foreground',
+            'group-aria-current/item:text-foreground',
             'delay-100'
           )}
         >
@@ -65,6 +66,6 @@ const NavigationIconButton = forwardRef<HTMLAnchorElement, NavigationIconButtonP
   }
 )
 
-NavigationIconButton.displayName = 'NavigationIconButton'
+NavigationIconLink.displayName = 'NavigationIconLink'
 
-export default NavigationIconButton
+export default NavigationIconLink

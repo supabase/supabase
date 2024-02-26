@@ -1,4 +1,5 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { useState } from 'react'
 import { useParams } from 'common'
 import { isUndefined } from 'lodash'
 import { FlaskConical } from 'lucide-react'
@@ -15,10 +16,10 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
+  DropdownMenuSub,
   DropdownMenuTrigger,
   IconCommand,
   IconFileText,
-  IconHome,
   IconSearch,
   IconSettings,
   IconUser,
@@ -27,7 +28,7 @@ import {
   themes,
   useCommandMenu,
 } from 'ui'
-
+import { Home } from 'icons'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useFlag, useIsFeatureEnabled } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
@@ -39,9 +40,7 @@ import {
   generateProductRoutes,
   generateToolRoutes,
 } from './NavigationBar.utils'
-import NavigationIconButton from './NavigationIconButton'
-import { useRef, useState } from 'react'
-import { Home } from 'icons'
+import NavigationIconLink from './NavigationIconLink'
 
 export const ICON_SIZE = 20
 export const ICON_STROKE_WIDTH = 1.5
@@ -53,6 +52,8 @@ const NavigationBar = () => {
   const { theme, setTheme } = useTheme()
   const { ref: projectRef } = useParams()
   const { setIsOpen } = useCommandMenu()
+
+  const [userDropdownOpen, setUserDropdownOpenState] = useState(false)
 
   const { project } = useProjectContext()
   const navLayoutV2 = useFlag('navigationLayoutV2')
@@ -86,7 +87,7 @@ const NavigationBar = () => {
       data-state={snap.navigationPanelOpen ? 'expanded' : 'collapsed'}
       className={[
         'transition-width duration-200',
-        'w-14 data-[state=expanded]:w-[16rem]',
+        'w-14 data-[state=expanded]:w-[12rem]',
         'hide-scrollbar flex flex-col justify-between overflow-y-auto',
         'border-r bg-studio border-default',
         'group',
@@ -94,7 +95,9 @@ const NavigationBar = () => {
       onMouseEnter={() => {
         snap.setNavigationPanelOpen(true)
       }}
-      onMouseLeave={() => snap.setNavigationPanelOpen(false)}
+      onMouseLeave={() => {
+        if (!userDropdownOpen) snap.setNavigationPanelOpen(false)
+      }}
     >
       <ul className="flex flex-col gap-1 justify-start px-2">
         {(!navLayoutV2 || !IS_PLATFORM) && (
@@ -106,7 +109,7 @@ const NavigationBar = () => {
             />
           </Link>
         )}
-        <NavigationIconButton
+        <NavigationIconLink
           isActive={isUndefined(activeRoute) && !isUndefined(router.query.ref)}
           route={{
             key: 'HOME',
@@ -123,19 +126,11 @@ const NavigationBar = () => {
         />
         <Separator />
         {toolRoutes.map((route) => (
-          <NavigationIconButton
-            key={route.key}
-            route={route}
-            isActive={activeRoute === route.key}
-          />
+          <NavigationIconLink key={route.key} route={route} isActive={activeRoute === route.key} />
         ))}
         <div className="bg-border h-px w-full"></div>
         {productRoutes.map((route) => (
-          <NavigationIconButton
-            key={route.key}
-            route={route}
-            isActive={activeRoute === route.key}
-          />
+          <NavigationIconLink key={route.key} route={route} isActive={activeRoute === route.key} />
         ))}
         <Separator />
         {otherRoutes.map((route) => {
@@ -175,7 +170,7 @@ const NavigationBar = () => {
             )
           } else {
             return (
-              <NavigationIconButton
+              <NavigationIconLink
                 key={route.key}
                 route={route}
                 isActive={activeRoute === route.key}
@@ -221,7 +216,16 @@ const NavigationBar = () => {
               </Tooltip.Portal>
             </Tooltip.Root>
           )}
-          <DropdownMenu>
+          <DropdownMenu
+            open={userDropdownOpen}
+            onOpenChange={(open: boolean) => {
+              console.log('open', open)
+              setUserDropdownOpenState(open)
+              if (open === false) {
+                snap.setNavigationPanelOpen(false)
+              }
+            }}
+          >
             <DropdownMenuTrigger asChild>
               <Button type="text" size="tiny" className="py-1 h-10 border-none">
                 <IconUser size={18} strokeWidth={2} className="text-foreground-lighter" />
@@ -230,6 +234,7 @@ const NavigationBar = () => {
             <DropdownMenuContent side="right" align="start">
               {IS_PLATFORM && (
                 <>
+                  <DropdownMenuSub>{}</DropdownMenuSub>
                   <DropdownMenuItem key="header" className="space-x-2" asChild>
                     <Link href="/account/me">
                       <IconSettings size={14} strokeWidth={1.5} />
