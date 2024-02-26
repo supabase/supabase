@@ -5,6 +5,7 @@ import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { chunk, compact, find, findIndex, has, isEqual, some, uniq, uniqBy } from 'lodash'
 import { makeAutoObservable } from 'mobx'
 import toast from 'react-hot-toast'
+import { toast as UiToast } from 'ui'
 
 import {
   STORAGE_ROW_STATUS,
@@ -283,22 +284,13 @@ class StorageExplorerStore {
     if (formattedName === null) return
 
     if (!/^[a-zA-Z0-9_-\s]*$/.test(formattedName)) {
-      return this.ui.setNotification({
-        message: 'Folder name contains invalid special characters',
-        category: 'error',
-        duration: 8000,
+      return UiToast({
+        variant: 'destructive',
+        description: 'Folder name contains invalid special characters',
+        duration: 6000,
       })
     }
-    /**
-     * todo: move this to a util file, as renameFolder() uses same logic
-     */
-    if (formattedName.includes('/') || formattedName.includes('\\')) {
-      return this.ui.setNotification({
-        message: 'Folder names should not have forward or back slashes.',
-        category: 'error',
-        duration: 8000,
-      })
-    }
+
     if (formattedName.length === 0) {
       return this.removeTempRows(columnIndex)
     }
@@ -425,10 +417,7 @@ class StorageExplorerStore {
 
   // https://stackoverflow.com/a/53058574
   getFilesDataTransferItems = async (items) => {
-    const toastId = this.ui.setNotification({
-      category: 'loading',
-      message: 'Retrieving items to upload...',
-    })
+    const { dismiss } = UiToast({ description: 'Retrieving items to upload...' })
     const files = []
     const queue = []
     for (const item of items) {
@@ -446,7 +435,7 @@ class StorageExplorerStore {
         queue.push(...(await this.readAllDirectoryEntries(entry.createReader())))
       }
     }
-    toast.dismiss(toastId)
+    dismiss()
     return files
   }
 
@@ -663,7 +652,8 @@ class StorageExplorerStore {
     let numberOfFilesMovedFail = 0
     this.clearSelectedItems()
 
-    const infoToastId = toast('Please do not close the browser until the move is completed', {
+    const { dismiss } = UiToast({
+      description: 'Please do not close the browser until the move is completed',
       duration: Infinity,
     })
 
@@ -690,20 +680,16 @@ class StorageExplorerStore {
     )
 
     if (numberOfFilesMovedFail === this.selectedItemsToMove.length) {
-      this.ui.setNotification({
-        message: 'Failed to move files',
-        category: 'error',
-      })
+      UiToast({ variant: 'destructive', description: 'Failed to move files' })
     } else {
-      this.ui.setNotification({
-        message: `Successfully moved ${
+      UiToast({
+        description: `Successfully moved ${
           this.selectedItemsToMove.length - numberOfFilesMovedFail
-        } to ${formattedNewPathToFile}`,
-        category: 'success',
+        } files to ${formattedNewPathToFile.length > 0 ? formattedNewPathToFile : 'the root of your bucket'}`,
       })
     }
 
-    toast.dismiss(infoToastId)
+    dismiss()
 
     // Clear file preview cache if moved files exist in cache
     const idsOfItemsToMove = this.selectedItemsToMove.map((item) => item.id)
