@@ -52,7 +52,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
     Telemetry.sendEvent(
       {
         category: 'realtime_inspector',
-        action: 'started_listening_to_channel',
+        action: 'started_listening_to_channel_in_input_channel_popover',
         label: 'realtime_inspector_config',
       },
       telemetryProps,
