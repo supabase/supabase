@@ -49,7 +49,6 @@ const NavigationBar = () => {
   const { theme, setTheme } = useTheme()
   const { ref: projectRef } = useParams()
   const { setIsOpen } = useCommandMenu()
-  const [navOpen, setNavOpenState] = useState<boolean>(false)
 
   const { project } = useProjectContext()
   const navLayoutV2 = useFlag('navigationLayoutV2')
@@ -80,18 +79,18 @@ const NavigationBar = () => {
 
   return (
     <nav
-      data-state={navOpen ? 'expanded' : 'collapsed'}
+      data-state={snap.navigationPanelOpen ? 'expanded' : 'collapsed'}
       className={[
-        'transition-width duration-300',
+        'transition-width duration-200',
         'w-14 data-[state=expanded]:w-[16rem]',
         'hide-scrollbar flex flex-col justify-between overflow-y-auto',
         'border-r bg-studio border-default',
         'group',
       ].join(' ')}
       onMouseEnter={() => {
-        setNavOpenState(true)
+        snap.setNavigationPanelOpen(true)
       }}
-      onMouseLeave={() => setNavOpenState(false)}
+      onMouseLeave={() => snap.setNavigationPanelOpen(false)}
     >
       <ul className="flex flex-col gap-1 justify-start px-2">
         {(!navLayoutV2 || !IS_PLATFORM) && (
