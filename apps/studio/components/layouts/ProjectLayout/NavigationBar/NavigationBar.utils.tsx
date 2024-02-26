@@ -9,12 +9,12 @@ import {
   Logs,
   Realtime,
   Reports,
-  Settings,
   SqlEditor,
   Storage,
   TableEditor,
 } from 'icons'
 import { ICON_SIZE, ICON_STROKE_WIDTH } from './NavigationBar'
+import { Settings } from 'lucide-react'
 
 export const generateToolRoutes = (ref?: string, project?: Project): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
@@ -127,6 +127,11 @@ export const generateOtherRoutes = (ref?: string, project?: Project): Route[] =>
       icon: <ApiDocs size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/api`),
     },
+  ]
+}
+
+export const generateSettingsRoutes = (ref?: string, project?: Project): Route[] => {
+  return [
     ...(IS_PLATFORM
       ? [
           {

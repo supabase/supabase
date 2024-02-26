@@ -2,7 +2,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { useState } from 'react'
 import { useParams } from 'common'
 import { isUndefined } from 'lodash'
-import { FlaskConical } from 'lucide-react'
+import { FlaskConical, UserCheck, Users } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -30,7 +30,7 @@ import {
   themes,
   useCommandMenu,
 } from 'ui'
-import { Home } from 'icons'
+import { Home, User } from 'icons'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useFlag, useIsFeatureEnabled } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
@@ -40,6 +40,7 @@ import { useProjectContext } from '../ProjectContext'
 import {
   generateOtherRoutes,
   generateProductRoutes,
+  generateSettingsRoutes,
   generateToolRoutes,
 } from './NavigationBar.utils'
 import NavigationIconLink from './NavigationIconLink'
@@ -87,6 +88,7 @@ const NavigationBar = () => {
   })
 
   const otherRoutes = generateOtherRoutes(projectRef, project)
+  const settingsRoutes = generateSettingsRoutes(projectRef, project)
 
   return (
     <nav
@@ -141,15 +143,15 @@ const NavigationBar = () => {
             link: `/project/${projectRef}`,
           }}
         />
-        <Separator />
+        <Separator className="my-1 bg-border-muted" />
         {toolRoutes.map((route) => (
           <NavigationIconLink key={route.key} route={route} isActive={activeRoute === route.key} />
         ))}
-        <div className="bg-border h-px w-full"></div>
+        <Separator className="my-1 bg-border-muted" />
         {productRoutes.map((route) => (
           <NavigationIconLink key={route.key} route={route} isActive={activeRoute === route.key} />
         ))}
-        <Separator />
+        <Separator className="my-1 bg-border-muted" />
         {otherRoutes.map((route) => {
           if (route.key === 'api' && isNewAPIDocsEnabled) {
             return (
@@ -196,103 +198,171 @@ const NavigationBar = () => {
           }
         })}
       </ul>
-      {!navLayoutV2 && (
-        <ul className="flex flex-col space-y-4 items-center">
-          {IS_PLATFORM && (
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger asChild>
-                <Button
-                  type="text"
-                  size="tiny"
-                  onClick={() => setIsOpen(true)}
-                  className="border-none"
-                >
-                  <div className="py-1">
-                    <IconSearch size={18} strokeWidth={2} className="text-foreground-lighter" />
-                  </div>
-                </Button>
-              </Tooltip.Trigger>
-              <Tooltip.Portal>
-                <Tooltip.Content side="right" sideOffset={5}>
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'bg-alternative shadow-lg shadow-background-surface-100	py-1.5 px-3 rounded leading-none', // background
-                      'border border-default', // border
-                      'flex items-center gap-1', // layout
-                    ].join(' ')}
-                  >
-                    {os === 'macos' ? (
-                      <IconCommand size={11.5} strokeWidth={1.5} className="text-foreground" />
-                    ) : (
-                      <p className="text-xs">CTRL</p>
-                    )}
-                    <p className="text-xs">K</p>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            </Tooltip.Root>
-          )}
-          <DropdownMenu
-            open={userDropdownOpen}
-            onOpenChange={(open: boolean) => {
-              console.log('open', open)
-              setUserDropdownOpenState(open)
-              if (open === false) {
-                snap.setNavigationPanelOpen(false)
-              }
-            }}
+
+      <ul className="flex flex-col px-2">
+        {settingsRoutes.map((route) => (
+          <NavigationIconLink key={route.key} route={route} isActive={activeRoute === route.key} />
+        ))}
+
+        {IS_PLATFORM && (
+          <Button
+            type="text"
+            size="tiny"
+            onClick={() => setIsOpen(true)}
+            className="h-10 [&>span]:relative [&>span]:items-center [&>span]:gap-3 [&>span]:flex [&>span]:w-full [&>span]:h-full p-0"
           >
-            <DropdownMenuTrigger asChild>
-              <Button type="text" size="tiny" className="py-1 h-10 border-none">
-                <IconUser size={18} strokeWidth={2} className="text-foreground-lighter" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent side="right" align="start">
-              {IS_PLATFORM && (
-                <>
-                  <DropdownMenuSub>{}</DropdownMenuSub>
-                  <DropdownMenuItem key="header" className="space-x-2" asChild>
-                    <Link href="/account/me">
-                      <IconSettings size={14} strokeWidth={1.5} />
-                      <p>Account preferences</p>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    key="header"
-                    className="space-x-2"
-                    onClick={() => snap.setShowFeaturePreviewModal(true)}
-                    onSelect={() => snap.setShowFeaturePreviewModal(true)}
-                  >
-                    <FlaskConical size={14} strokeWidth={2} />
-                    <p>Feature previews</p>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                </>
+            <IconSearch
+              size={ICON_SIZE}
+              strokeWidth={2}
+              className="absolute left-2 text-foreground-lighter"
+            />
+            <span
+              className=" 
+                    absolute
+                    left-7
+                    group-data-[state=expanded]:left-10
+                    w-[10rem]
+                    
+                    flex flex-col 
+                    items-center
+                    
+                    text-sm 
+
+                    opacity-0
+                    group-data-[state=expanded]:opacity-100 
+
+                    transition-all 
+                    delay-100              
+                  "
+            >
+              <span className="w-full text-left text-foreground-light truncate">Search</span>
+            </span>
+
+            <div
+              className={[
+                'absolute',
+                'left-[10rem]',
+                'opacity-0',
+                'delay-100',
+                'group-data-[state=expanded]:opacity-100 ',
+                'text-foreground-lighter',
+                'bg-surface-100 shadow-xs shadow-background-surface-100	h-6 py-1.5 px-2 rounded-md leading-none', // background
+                'border border-default', // border
+                'flex items-center gap-1', // layout
+                'transition-all ',
+              ].join(' ')}
+            >
+              {os === 'macos' ? (
+                <IconCommand size={11.5} strokeWidth={1.5} />
+              ) : (
+                <p className="text-xs">CTRL</p>
               )}
-              <DropdownMenuLabel>Theme</DropdownMenuLabel>
-              <DropdownMenuGroup>
-                <DropdownMenuRadioGroup
-                  value={theme}
-                  onValueChange={(value) => {
-                    setTheme(value)
-                  }}
+              <p className="text-xs">K</p>
+            </div>
+          </Button>
+        )}
+
+        <DropdownMenu
+          open={userDropdownOpen}
+          onOpenChange={(open: boolean) => {
+            console.log('open', open)
+            setUserDropdownOpenState(open)
+            if (open === false) {
+              snap.setNavigationPanelOpen(false)
+            }
+          }}
+        >
+          <DropdownMenuTrigger asChild>
+            <Button
+              type="text"
+              size="tiny"
+              className={cn(
+                'mt-3',
+                'h-10 [&>span]:relative [&>span]:flex [&>span]:w-full [&>span]:h-full p-0'
+              )}
+              block
+            >
+              <div className="relative w-full h-full flex items-center justify-center">
+                <figure className="absolute left-1 min-h-7 min-w-7 bg-foreground rounded-full flex items-center justify-center">
+                  <User
+                    size={ICON_SIZE - 2}
+                    strokeWidth={ICON_STROKE_WIDTH}
+                    className="text-background"
+                  />
+                </figure>
+                <span
+                  className=" 
+                    left-10
+                    w-[10rem]
+                    absolute
+                    
+                    flex flex-col 
+                    items-start
+                    text-sm 
+
+                    
+                    group-data-[state=collapsed]:opacity-0 
+                    group-data-[state=expanded]:opacity-100 
+
+                    transition-all 
+                    duration-200 
+                    delay-100                   
+
+                    truncate
+                  "
                 >
-                  {themes
-                    .filter(
-                      (x) => x.value === 'light' || x.value === 'dark' || x.value === 'system'
-                    )
-                    .map((theme: Theme) => (
-                      <DropdownMenuRadioItem key={theme.value} value={theme.value}>
-                        {theme.name}
-                      </DropdownMenuRadioItem>
-                    ))}
-                </DropdownMenuRadioGroup>
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </ul>
-      )}
+                  <span className="w-full text-left text-foreground truncate">
+                    {profile?.username}
+                  </span>
+                  <span className="w-full text-left text-foreground-light text-xs truncate">
+                    {profile?.primary_email}
+                  </span>
+                </span>
+              </div>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="right" align="start">
+            {IS_PLATFORM && (
+              <>
+                <DropdownMenuSub>{}</DropdownMenuSub>
+                <DropdownMenuItem key="header" className="space-x-2" asChild>
+                  <Link href="/account/me">
+                    <IconSettings size={14} strokeWidth={1.5} />
+                    <p>Account preferences</p>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  key="header"
+                  className="space-x-2"
+                  onClick={() => snap.setShowFeaturePreviewModal(true)}
+                  onSelect={() => snap.setShowFeaturePreviewModal(true)}
+                >
+                  <FlaskConical size={14} strokeWidth={2} />
+                  <p>Feature previews</p>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+              </>
+            )}
+            <DropdownMenuLabel>Theme</DropdownMenuLabel>
+            <DropdownMenuGroup>
+              <DropdownMenuRadioGroup
+                value={theme}
+                onValueChange={(value) => {
+                  setTheme(value)
+                }}
+              >
+                {themes
+                  .filter((x) => x.value === 'light' || x.value === 'dark' || x.value === 'system')
+                  .map((theme: Theme) => (
+                    <DropdownMenuRadioItem key={theme.value} value={theme.value}>
+                      {theme.name}
+                    </DropdownMenuRadioItem>
+                  ))}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </ul>
     </nav>
   )
 }

@@ -27,7 +27,7 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
       'group-data-[state=expanded]:-space-x-2',
       'text-foreground-lighter hover:text-foreground ',
       'bg-studio hover:bg-surface-200',
-      `${isActive ? '!bg-surface-300 !text-foreground shadow-sm' : ''}`,
+      `${isActive ? '!bg-selection !text-foreground shadow-sm' : ''}`,
       'group/item',
     ]
     return route.link !== undefined ? (
