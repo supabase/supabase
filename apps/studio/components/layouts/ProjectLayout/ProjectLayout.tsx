@@ -106,7 +106,11 @@ const ProjectLayout = ({
           {/* Left-most navigation side bar to access products */}
           {!hideIconBar && <NavigationBar />}
           {/* Product menu bar */}
-          <ResizablePanelGroup className="flex h-full" direction="horizontal">
+          <ResizablePanelGroup
+            className="flex h-full"
+            direction="horizontal"
+            autoSaveId="project-layout"
+          >
             {!showPausedState && (
               <ResizablePanel className="min-w-64 max-w-[32rem]" defaultSize={25}>
                 <MenuBarWrapper
