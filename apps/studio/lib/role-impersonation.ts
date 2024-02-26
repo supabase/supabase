@@ -112,58 +112,53 @@ export function wrapWithRoleImpersonation(
   `
 }
 
-export async function getRoleImpersonationJWT(
+function encodeText(data: string) {
+  return new TextEncoder().encode(data)
+}
+
+function encodeBase64Url(data: ArrayBuffer | Uint8Array | string): string {
+  return btoa(
+    String.fromCharCode(...new Uint8Array(typeof data === 'string' ? encodeText(data) : data))
+  )
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '')
+}
+
+function genKey(rawKey: string) {
+  return window.crypto.subtle.importKey(
+    'raw',
+    encodeText(rawKey),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign', 'verify']
+  )
+}
+
+async function createToken(jwtPayload: object, key: string) {
+  const headerAndPayload =
+    encodeBase64Url(encodeText(JSON.stringify({ alg: 'HS256', typ: 'JWT' }))) +
+    '.' +
+    encodeBase64Url(encodeText(JSON.stringify(jwtPayload)))
+
+  const signature = encodeBase64Url(
+    new Uint8Array(
+      await window.crypto.subtle.sign(
+        { name: 'HMAC' },
+        await genKey(key),
+        encodeText(headerAndPayload)
+      )
+    )
+  )
+
+  return `${headerAndPayload}.${signature}`
+}
+
+export function getRoleImpersonationJWT(
   projectRef: string,
   jwtSecret: string,
   role: PostgrestImpersonationRole
 ): Promise<string> {
   const claims = getPostgrestClaims(projectRef, role)
   return createToken(claims, jwtSecret)
-}
-
-async function createToken(payload: object, key: string) {
-  const header = { typ: 'JWT', alg: 'HS256' }
-
-  const segments = []
-  segments.push(btoa(JSON.stringify(header)).replace(/=/g, ''))
-  segments.push(btoa(JSON.stringify(payload)).replace(/=/g, ''))
-
-  const footer = await sign(segments.join('.'), btoa(key).replace(/=/g, ''))
-  segments.push(footer.replace(/=/g, ''))
-  return segments.join('.')
-}
-
-async function sign(data: string, key: string) {
-  return window.crypto.subtle
-    .importKey(
-      'jwk',
-      {
-        //this is an example jwk key, "raw" would be an ArrayBuffer
-        kty: 'oct',
-        k: key,
-        alg: 'HS256',
-      },
-      {
-        name: 'HMAC',
-        hash: { name: 'SHA-256' },
-      },
-      false,
-      ['sign', 'verify']
-    )
-    .then((key) => {
-      const jsonString = JSON.stringify(data)
-      const encodedData = new TextEncoder().encode(jsonString)
-      return window.crypto.subtle.sign(
-        {
-          name: 'HMAC',
-        },
-        key,
-        encodedData
-      )
-    })
-    .then((token) => {
-      const u8 = new Uint8Array(token)
-      const b64encoded = btoa(String.fromCharCode(...u8))
-      return b64encoded
-    })
 }
