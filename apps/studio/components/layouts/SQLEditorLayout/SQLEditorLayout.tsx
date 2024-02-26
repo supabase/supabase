@@ -17,6 +17,7 @@ const SQLEditorLayout = ({ title, children }: SQLEditorLayoutProps) => {
       product="SQL Editor"
       productMenu={productMenu}
       isBlocking={false}
+      resizableSidebar
     >
       {children}
     </ProjectLayout>

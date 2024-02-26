@@ -23,7 +23,7 @@ import { ProjectContextProvider } from './ProjectContext'
 import ProjectPausedState from './ProjectPausedState'
 import RestoringState from './RestoringState'
 import UpgradingState from './UpgradingState'
-import { ResizableHandle, ResizablePanelGroup, ResizablePanel } from 'ui'
+import { ResizableHandle, ResizablePanelGroup, ResizablePanel, cn } from 'ui'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -58,6 +58,7 @@ export interface ProjectLayoutProps {
   hideHeader?: boolean
   hideIconBar?: boolean
   selectedTable?: string
+  resizableSidebar?: boolean
 }
 
 const ProjectLayout = ({
@@ -70,6 +71,7 @@ const ProjectLayout = ({
   hideHeader = false,
   hideIconBar = false,
   selectedTable,
+  resizableSidebar = false,
 }: PropsWithChildren<ProjectLayoutProps>) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
@@ -112,7 +114,10 @@ const ProjectLayout = ({
             autoSaveId="project-layout"
           >
             {!showPausedState && (
-              <ResizablePanel className="min-w-64 max-w-[32rem]" defaultSize={25}>
+              <ResizablePanel
+                className={cn(resizableSidebar ? 'min-w-64 max-w-[32rem]' : 'min-w-64 max-w-64')}
+                defaultSize={1} // forces panel to smallest width possible, at w-64
+              >
                 <MenuBarWrapper
                   isLoading={isLoading}
                   isBlocking={isBlocking}
@@ -122,7 +127,7 @@ const ProjectLayout = ({
                 </MenuBarWrapper>
               </ResizablePanel>
             )}
-            <ResizableHandle withHandle />
+            <ResizableHandle withHandle disabled={resizableSidebar ? false : true} />
             <ResizablePanel className="h-full">
               <main className="h-full flex flex-col flex-1 w-full overflow-x-hidden">
                 {!navLayoutV2 && !hideHeader && IS_PLATFORM && <LayoutHeader />}
