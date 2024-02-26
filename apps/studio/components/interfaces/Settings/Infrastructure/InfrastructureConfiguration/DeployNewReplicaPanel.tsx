@@ -19,6 +19,7 @@ import Link from 'next/link'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization, useSelectedProject } from 'hooks'
 import { WarningIcon } from 'components/ui/Icons'
+import { getSemanticVersion } from 'lib/helpers'
 
 // [Joshen] FYI this is purely for AWS only, need to update to support Fly eventually
 
@@ -52,6 +53,10 @@ const DeployNewReplicaPanel = ({
     },
   })
 
+  const currentPgVersion = Number(
+    (project?.dbVersion ?? '').split('supabase-postgres-')[1]?.split('.')[0]
+  )
+
   const reachedMaxReplicas = (data ?? []).filter((db) => db.identifier !== projectRef).length >= 2
   const isFreePlan = subscription?.plan.id === 'free'
   const currentComputeAddon = addons?.selected_addons.find(
@@ -60,6 +65,7 @@ const DeployNewReplicaPanel = ({
   const currentPitrAddon = addons?.selected_addons.find((addon) => addon.type === 'pitr')
   const canDeployReplica =
     !reachedMaxReplicas &&
+    currentPgVersion >= 15 &&
     project?.cloud_provider === 'AWS' &&
     !isFreePlan &&
     currentComputeAddon !== undefined &&
@@ -163,6 +169,41 @@ const DeployNewReplicaPanel = ({
             </AlertTitle_Shadcn_>
             <AlertDescription_Shadcn_>
               If you'd like to spin up another read replica, please drop an existing replica first.
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+        )}
+        {/* [Joshen] Not particular about this warning as all users on prod are on AWS */}
+        {project?.cloud_provider !== 'AWS' && (
+          <Alert_Shadcn_>
+            <WarningIcon />
+            <AlertTitle_Shadcn_>
+              Read replicas can only be deployed with projects on AWS
+            </AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              If you'd like to use read replicas, please migrate your project to AWS by creating a
+              new one.
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+        )}
+        {currentPgVersion < 15 && (
+          <Alert_Shadcn_>
+            <WarningIcon />
+            <AlertTitle_Shadcn_>
+              Read replicas can only be deployed with projects on Postgres version 15 and above
+            </AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              If you'd like to use read replicas, please contact us via support
+            </AlertDescription_Shadcn_>
+            <AlertDescription_Shadcn_ className="mt-2">
+              <Button type="default">
+                <Link
+                  href={`/support/new?category=Sales&ref=${projectRef}&subject=Enquiry%20on%20read%20replicas&message=Project%20DB%20version:%20${project?.dbVersion}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Contact support
+                </Link>
+              </Button>
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
         )}
