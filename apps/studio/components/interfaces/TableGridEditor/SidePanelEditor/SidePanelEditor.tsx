@@ -38,6 +38,7 @@ import {
   updateTable,
 } from './SidePanelEditor.utils'
 import { ImportContent } from './TableEditor/TableEditor.types'
+import { Constraint } from 'data/database/constraints-query'
 
 export interface SidePanelEditorProps {
   editable?: boolean
@@ -135,11 +136,9 @@ const SidePanelEditor = ({
           }
         } else {
           saveRowError = new Error('No primary key')
-          ui.setNotification({
-            category: 'error',
-            message:
-              "We can't make changes to this table because there is no primary key. Please create a primary key and try again.",
-          })
+          toast.error(
+            "We can't make changes to this table because there is no primary key. Please create a primary key and try again."
+          )
         }
       }
     }
@@ -176,13 +175,7 @@ const SidePanelEditor = ({
 
     if (payload !== undefined && configuration !== undefined) {
       try {
-        await saveRow(payload, isNewRecord, configuration, (error) => {
-          if (error) {
-            toast.error(
-              error?.message ?? 'Something went wrong while trying to save the column value'
-            )
-          }
-        })
+        await saveRow(payload, isNewRecord, configuration, () => {})
       } finally {
         resolve()
       }
@@ -209,11 +202,11 @@ const SidePanelEditor = ({
   const saveColumn = async (
     payload: CreateColumnPayload | UpdateColumnPayload,
     isNewRecord: boolean,
-    configuration: { columnId?: string },
+    configuration: { columnId?: string; primaryKey?: Constraint },
     resolve: any
   ) => {
     const selectedColumnToEdit = snap.sidePanel?.type === 'column' && snap.sidePanel.column
-    const { columnId } = configuration
+    const { columnId, primaryKey } = configuration
 
     const response = isNewRecord
       ? await createColumn({
@@ -221,6 +214,7 @@ const SidePanelEditor = ({
           connectionString: project?.connectionString,
           payload: payload as CreateColumnPayload,
           selectedTable: selectedTable as PostgresTable,
+          primaryKey,
         })
       : await updateColumn({
           projectRef: project?.ref!,
@@ -228,6 +222,7 @@ const SidePanelEditor = ({
           id: columnId as string,
           payload: payload as UpdateColumnPayload,
           selectedTable: selectedTable as PostgresTable,
+          primaryKey,
         })
 
     if (response?.error) {
@@ -369,6 +364,7 @@ const SidePanelEditor = ({
       isRealtimeEnabled: boolean
       isDuplicateRows: boolean
       existingForeignKeyRelations: ForeignKeyConstraint[]
+      primaryKey?: Constraint
     },
     resolve: any
   ) => {
@@ -380,6 +376,7 @@ const SidePanelEditor = ({
       isRealtimeEnabled,
       isDuplicateRows,
       existingForeignKeyRelations,
+      primaryKey,
     } = configuration
 
     try {
@@ -444,6 +441,7 @@ const SidePanelEditor = ({
           columns,
           foreignKeyRelations,
           existingForeignKeyRelations,
+          primaryKey,
         })
 
         await updateTableRealtime(table, isRealtimeEnabled)

@@ -15,7 +15,7 @@ const SignUpPage: NextPageWithLayout = () => {
             <div className="w-full border-t border-strong" />
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="bg-background px-2 text-sm text-foreground">or</span>
+            <span className="bg-studio px-2 text-sm text-foreground">or</span>
           </div>
         </div>
 

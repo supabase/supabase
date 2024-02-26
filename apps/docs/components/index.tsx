@@ -29,10 +29,13 @@ import { ProjectConfigVariables } from './ProjectConfigVariables'
 
 // Data wrappers
 import { NavData } from './NavData'
+import { SharedData } from './SharedData'
 
 // Partials
 import DatabaseSetup from './MDX/database_setup.mdx'
 import GetSessionWarning from './MDX/get_session_warning.mdx'
+import HuggingFaceDeployment from './MDX/ai/quickstart_hf_deployment.mdx'
+import KotlinProjectSetup from './MDX/kotlin_project_setup.mdx'
 import MigrationWarnings from './MDX/migration_warnings.mdx'
 import ProjectSetup from './MDX/project_setup.mdx'
 import QuickstartIntro from './MDX/quickstart_intro.mdx'
@@ -63,10 +66,14 @@ import {
   IconMenuStorage,
   IconMenuSwift,
 } from './Navigation/NavigationMenu/HomeMenuIcons'
+import { IconArrowDown, IconCheck } from 'ui'
 
 // Heavy/rare (lazy-loaded)
 import { AppleSecretGenerator } from './AppleSecretGenerator'
+import { Extensions } from './Extensions'
+import { JwtGenerator } from './JwtGenerator'
 import { Mermaid } from './Mermaid'
+import { RealtimeLimitsEstimator } from './RealtimeLimitsEstimator'
 
 const components = {
   ...markdownComponents,
@@ -85,6 +92,7 @@ const components = {
   CliGlobalFlagsHandler: () => <CliGlobalFlagsHandler />,
   CodeBlock,
   DatabaseSetup,
+  Extensions,
   GetSessionWarning,
   GlassPanel,
   h2: (props: any) => (
@@ -102,7 +110,10 @@ const components = {
       {props.children}
     </Heading>
   ),
+  HuggingFaceDeployment,
+  IconCheck,
   IconMenuApi,
+  IconArrowDown,
   IconMenuAuth,
   IconMenuCli,
   IconMenuCsharp,
@@ -124,6 +135,8 @@ const components = {
   IconMenuSwift,
   IconPanel,
   Image: (props: any) => <ThemeImage fill className="object-contain" {...props} />,
+  JwtGenerator,
+  KotlinProjectSetup,
   Link,
   Mermaid,
   MigrationWarnings,
@@ -133,8 +146,10 @@ const components = {
   ProjectConfigVariables,
   ProjectSetup,
   QuickstartIntro,
+  RealtimeLimitsEstimator,
   RefHeaderSection: (props: any) => <RefHeaderSection {...props} />,
   RefSubLayout,
+  SharedData,
   SocialProviderSettingsSupabase,
   SocialProviderSetup,
   StepHikeCompact,

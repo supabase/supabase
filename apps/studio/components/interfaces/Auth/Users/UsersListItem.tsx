@@ -11,9 +11,17 @@ interface UserListItemProps {
   user: User
   canRemoveUser: boolean
   canRemoveMFAFactors: boolean
+  setSelectedUser: (user: User) => void
+  setUserSidePanelOpen: (open: boolean) => void
 }
 
-const UserListItem = ({ user, canRemoveUser, canRemoveMFAFactors }: UserListItemProps) => {
+const UserListItem = ({
+  user,
+  canRemoveUser,
+  canRemoveMFAFactors,
+  setSelectedUser,
+  setUserSidePanelOpen,
+}: UserListItemProps) => {
   const isUserConfirmed = user.email_confirmed_at || user.phone_confirmed_at
   const createdAt = dayjs(user.created_at)
   const lastSignedIn = dayjs(user.last_sign_in_at)
@@ -59,6 +67,8 @@ const UserListItem = ({ user, canRemoveUser, canRemoveMFAFactors }: UserListItem
           user={user}
           canRemoveUser={canRemoveUser}
           canRemoveMFAFactors={canRemoveMFAFactors}
+          setSelectedUser={setSelectedUser}
+          setUserSidePanelOpen={setUserSidePanelOpen}
         />
       </Table.td>
     </Table.tr>

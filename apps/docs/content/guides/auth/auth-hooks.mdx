@@ -603,6 +603,14 @@ grant execute
 revoke execute
   on function public.custom_access_token_hook
   from authenticated, anon;
+
+grant all
+  on table public.profiles
+  to supabase_auth_admin;
+
+revoke all
+  on table public.profiles
+  from authenticated, anon;
 ```
 
 </TabPanel>
@@ -647,6 +655,14 @@ as $$
 
   return event;
 $$;
+
+grant all
+  on table public.profiles
+  to supabase_auth_admin;
+
+revoke all
+  on table public.profiles
+  from authenticated, anon;
 ```
 
 </TabPanel>
@@ -713,3 +729,7 @@ uri = "pg-functions://postgres/public/custom_access_token_hook"
 ```
 
 Save your Auth Hook as a migration in order to version the Auth Hook and share it with other team members. Run [`supabase migration new`](https://supabase.com/docs/reference/cli/supabase-migration-new) to create a migration.
+
+### Debugging Your Hook
+
+Test the Postgres Function in isolation before enabling the hook by connecting to your database with `psql` and running `select <your_function_name>`. Where necessary, use [`RAISE` statements](https://www.postgresql.org/docs/current/plpgsql-errors-and-messages.html) to print information to the terminal.

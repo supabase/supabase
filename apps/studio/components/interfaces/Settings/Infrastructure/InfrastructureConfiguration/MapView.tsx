@@ -84,7 +84,7 @@ const MapView = ({
   }, [])
 
   return (
-    <div className="bg-background h-[500px] relative">
+    <div className="bg-studio h-[500px] relative">
       <ComposableMap projectionConfig={{ scale: 155 }} className="w-full h-full">
         <ZoomableGroup
           className={mount ? 'transition-all duration-300' : ''}
@@ -203,7 +203,7 @@ const MapView = ({
           {tooltip !== undefined && zoom === 1.5 && (
             <Marker coordinates={[tooltip.x - 47, tooltip.y - 5]}>
               <foreignObject width={220} height={66.25}>
-                <div className="bg-background/50 rounded border">
+                <div className="bg-studio/50 rounded border">
                   <div className="px-3 py-2 flex flex-col gap-y-1">
                     <div className="flex items-center gap-x-2">
                       <img
@@ -229,7 +229,7 @@ const MapView = ({
       </ComposableMap>
 
       {showRegionDetails && selectedRegion && (
-        <div className="absolute bottom-4 right-4 flex flex-col bg-background/50 backdrop-blur-sm border rounded w-[400px]">
+        <div className="absolute bottom-4 right-4 flex flex-col bg-studio/50 backdrop-blur-sm border rounded w-[400px]">
           <div className="flex items-center justify-between py-4 px-4 border-b">
             <div>
               <p className="text-xs text-foreground-light">

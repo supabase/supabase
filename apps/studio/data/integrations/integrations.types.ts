@@ -245,6 +245,7 @@ export type IntegrationConnectionsCreateVariables = {
   connection: {
     foreign_project_id: string
     supabase_project_ref: string
+    integration_id: string
     metadata: any
   }
   orgSlug: string | undefined

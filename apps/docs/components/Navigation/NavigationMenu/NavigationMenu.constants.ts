@@ -22,7 +22,7 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
     {
       label: 'Database',
       icon: 'database',
-      href: '/guides/database',
+      href: '/guides/database/overview',
       level: 'database',
     },
     {
@@ -661,20 +661,20 @@ export const auth = {
       items: [
         {
           name: 'Part One: JWTs',
-          url: '/learn/auth-deep-dive/auth-deep-dive-jwts',
+          url: '/guides/auth/auth-deep-dive/auth-deep-dive-jwts',
         },
         {
           name: 'Part Two: Row Level Security',
-          url: '/learn/auth-deep-dive/auth-row-level-security',
+          url: '/guides/auth/auth-deep-dive/auth-row-level-security',
         },
         {
           name: 'Part Three: Policies',
-          url: '/learn/auth-deep-dive/auth-policies',
+          url: '/guides/auth/auth-deep-dive/auth-policies',
         },
-        { name: 'Part Four: GoTrue', url: '/learn/auth-deep-dive/auth-gotrue' },
+        { name: 'Part Four: GoTrue', url: '/guides/auth/auth-deep-dive/auth-gotrue' },
         {
           name: 'Part Five: Google OAuth',
-          url: '/learn/auth-deep-dive/auth-google-oauth',
+          url: '/guides/auth/auth-deep-dive/auth-google-oauth',
         },
       ],
     },
@@ -684,9 +684,9 @@ export const auth = {
 export const database: NavMenuConstant = {
   icon: 'database',
   title: 'Database',
-  url: '/guides/database',
+  url: '/guides/database/overview',
   items: [
-    { name: 'Overview', url: '/guides/database' },
+    { name: 'Overview', url: '/guides/database/overview' },
     {
       name: 'Fundamentals',
       url: undefined,
@@ -844,7 +844,7 @@ export const database: NavMenuConstant = {
         },
         {
           name: 'pg_net: Async Networking',
-          url: '/guides/database/extensions/pgnet',
+          url: '/guides/database/extensions/pg_net',
         },
         {
           name: 'pg_plan_filter: Restrict Total Cost',
@@ -1637,6 +1637,10 @@ export const platform: NavMenuConstant = {
         {
           name: 'Enterprise Billing',
           url: '/guides/platform/enterprise-billing',
+        },
+        {
+          name: 'Billing FAQ',
+          url: '/guides/platform/billing-faq',
         },
       ],
     },

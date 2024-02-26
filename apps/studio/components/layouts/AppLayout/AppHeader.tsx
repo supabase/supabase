@@ -26,7 +26,7 @@ const AppHeader = () => {
     project?.is_branch_enabled === true || project?.parent_project_ref !== undefined
 
   return (
-    <div className="flex items-center justify-between px-4 py-1 bg-background border-b">
+    <div className="flex items-center justify-between px-4 py-1 bg-studio border-b">
       <div className="flex items-center space-x-1">
         <Link
           href={organization !== undefined ? `/org/${organization?.slug}` : '/'}

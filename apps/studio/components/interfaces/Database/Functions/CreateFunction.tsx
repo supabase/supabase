@@ -5,7 +5,6 @@ import { FormEvent, createContext, useContext, useEffect, useState } from 'react
 import toast from 'react-hot-toast'
 import { Button, IconPlus, IconTrash, Input, Listbox, Modal, Radio, SidePanel, Toggle } from 'ui'
 
-import { Dictionary } from 'types'
 import { POSTGRES_DATA_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
@@ -16,6 +15,7 @@ import { useDatabaseFunctionCreateMutation } from 'data/database-functions/datab
 import { useDatabaseFunctionUpdateMutation } from 'data/database-functions/database-functions-update-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { Dictionary } from 'types'
 import { convertArgumentTypes, convertConfigParams, hasWhitespace } from './Functions.utils'
 
 // [Refactor] Remove local state, just use the Form component
@@ -57,7 +57,7 @@ class CreateFunctionFormState {
       definition: this.definition.value,
       return_type: this.returnType.value,
       language: this.language.value,
-      behavior: this.behavior.value,
+      behavior: this.behavior.value as 'VOLATILE' | 'STABLE' | 'IMMUTABLE',
       security_definer: this.securityDefiner.value,
       args: this.args.value.map((x: any) => `${x.name} ${x.type}`),
       config_params: mapValues(keyBy(this.configParams.value, 'name'), 'value'),
@@ -294,7 +294,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
             id: body.id,
             projectRef: project.ref,
             connectionString: project.connectionString,
-            payload: body,
+            payload: body as any,
           },
           {
             onSuccess: () => {
@@ -378,7 +378,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                 <SidePanel.Separator />
                 <SidePanel.Content>
                   <Panel>
-                    <div className={`space-y-8 rounded bg-background py-4`}>
+                    <div className={`space-y-8 rounded bg-studio py-4`}>
                       <div className={`px-6`}>
                         <Toggle
                           onChange={() => _localState.toggleAdvancedVisible()}

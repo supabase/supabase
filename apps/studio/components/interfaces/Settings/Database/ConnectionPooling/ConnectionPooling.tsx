@@ -90,7 +90,8 @@ export const ConnectionPooling = () => {
     connectionString: project?.connectionString,
   })
 
-  const connectionPoolingUnavailable = poolingInfo?.pool_mode === null
+  const poolingConfiguration = poolingInfo?.find((x) => x.database_type === 'PRIMARY')
+  const connectionPoolingUnavailable = poolingConfiguration?.pool_mode === null
 
   const canUpdateConnectionPoolingConfiguration = useCheckPermissions(
     PermissionAction.UPDATE,
@@ -105,9 +106,9 @@ export const ConnectionPooling = () => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      pool_mode: poolingInfo?.pool_mode as 'transaction' | 'session' | 'statement',
-      default_pool_size: poolingInfo?.default_pool_size as number | undefined,
-      max_client_conn: poolingInfo?.max_client_conn as number | undefined,
+      pool_mode: poolingConfiguration?.pool_mode as 'transaction' | 'session' | 'statement',
+      default_pool_size: poolingConfiguration?.default_pool_size as number | undefined,
+      max_client_conn: poolingConfiguration?.max_client_conn as number | undefined,
     },
   })
 
@@ -118,7 +119,7 @@ export const ConnectionPooling = () => {
           form.reset({
             pool_mode: data.pool_mode,
             default_pool_size: data.default_pool_size,
-            max_client_conn: poolingInfo?.max_client_conn,
+            max_client_conn: poolingConfiguration?.max_client_conn,
           })
         }
 
@@ -143,9 +144,9 @@ export const ConnectionPooling = () => {
   useEffect(() => {
     if (isSuccess) {
       form.reset({
-        pool_mode: poolingInfo?.pool_mode as 'transaction' | 'session' | 'statement',
-        default_pool_size: poolingInfo?.default_pool_size as number | undefined,
-        max_client_conn: poolingInfo?.max_client_conn as number | undefined,
+        pool_mode: poolingConfiguration?.pool_mode as 'transaction' | 'session' | 'statement',
+        default_pool_size: poolingConfiguration?.default_pool_size as number | undefined,
+        max_client_conn: poolingConfiguration?.max_client_conn as number | undefined,
       })
     }
   }, [isSuccess])
