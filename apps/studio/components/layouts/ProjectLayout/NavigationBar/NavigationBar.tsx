@@ -5,7 +5,6 @@ import { FlaskConical } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-
 import {
   Button,
   DropdownMenu,
@@ -40,6 +39,10 @@ import {
   generateToolRoutes,
 } from './NavigationBar.utils'
 import NavigationIconButton from './NavigationIconButton'
+import { Home } from 'icons'
+
+export const ICON_SIZE = 20
+export const ICON_STROKE_WIDTH = 1.5
 
 const NavigationBar = () => {
   const os = detectOS()
@@ -51,7 +54,6 @@ const NavigationBar = () => {
 
   const { project } = useProjectContext()
   const navLayoutV2 = useFlag('navigationLayoutV2')
-  const showFeaturePreviews = useFlag('featurePreviews')
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
 
   const {
@@ -80,7 +82,7 @@ const NavigationBar = () => {
     <div
       className={[
         'hide-scrollbar flex w-14 flex-col justify-between p-2 overflow-y-auto',
-        'border-r bg-background border-default',
+        'border-r bg-studio border-default',
       ].join(' ')}
     >
       <ul className="flex flex-col space-y-2">
@@ -98,7 +100,7 @@ const NavigationBar = () => {
           route={{
             key: 'HOME',
             label: 'Home',
-            icon: <IconHome size={18} strokeWidth={2} />,
+            icon: <Home size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: `/project/${projectRef}`,
           }}
         />
@@ -218,17 +220,15 @@ const NavigationBar = () => {
                       <p>Account preferences</p>
                     </Link>
                   </DropdownMenuItem>
-                  {showFeaturePreviews && (
-                    <DropdownMenuItem
-                      key="header"
-                      className="space-x-2"
-                      onClick={() => snap.setShowFeaturePreviewModal(true)}
-                      onSelect={() => snap.setShowFeaturePreviewModal(true)}
-                    >
-                      <FlaskConical size={14} strokeWidth={2} />
-                      <p>Feature previews</p>
-                    </DropdownMenuItem>
-                  )}
+                  <DropdownMenuItem
+                    key="header"
+                    className="space-x-2"
+                    onClick={() => snap.setShowFeaturePreviewModal(true)}
+                    onSelect={() => snap.setShowFeaturePreviewModal(true)}
+                  >
+                    <FlaskConical size={14} strokeWidth={2} />
+                    <p>Feature previews</p>
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                 </>
               )}
@@ -240,11 +240,15 @@ const NavigationBar = () => {
                     setTheme(value)
                   }}
                 >
-                  {themes.map((theme: Theme) => (
-                    <DropdownMenuRadioItem key={theme.value} value={theme.value}>
-                      {theme.name}
-                    </DropdownMenuRadioItem>
-                  ))}
+                  {themes
+                    .filter(
+                      (x) => x.value === 'light' || x.value === 'dark' || x.value === 'system'
+                    )
+                    .map((theme: Theme) => (
+                      <DropdownMenuRadioItem key={theme.value} value={theme.value}>
+                        {theme.name}
+                      </DropdownMenuRadioItem>
+                    ))}
                 </DropdownMenuRadioGroup>
               </DropdownMenuGroup>
             </DropdownMenuContent>

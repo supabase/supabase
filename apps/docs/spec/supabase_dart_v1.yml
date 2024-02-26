@@ -381,7 +381,7 @@ functions:
     notes: |
       - Resends a signup confirmation, email change or phone change email to the user.
       - Passwordless sign-ins can be resent by calling the `signInWithOtp()` method again.
-      - Password recovery emails can be resent by calling the `resetPassswordForEmail()` method again.
+      - Password recovery emails can be resent by calling the `resetPasswordForEmail()` method again.
       - This method will only resend an email or phone OTP to the user if there was an initial signup, email change or phone change request being made.
     examples:
       - id: resend-email-signup-confirmation
@@ -814,9 +814,7 @@ functions:
           Sometimes you will need to query the same foreign table twice.
           In this case, you can use the name of the joined column to identify
           which join you intend to use. For convenience, you can also give an
-          alias for each column. For example, if we had a shop of products,
-          and we wanted to get the supplier and the purchaser at the same time
-          (both in the users) table:
+          alias for each column.
         code: |
           ```dart
           final data = await supabase

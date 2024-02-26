@@ -1,7 +1,8 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
 import { patch } from 'data/fetchers'
+import { projectKeys } from 'data/projects/keys'
 import { ResponseError } from 'types'
 
 export type DatabasePasswordResetVariables = {
@@ -31,10 +32,14 @@ export const useDatabasePasswordResetMutation = ({
   UseMutationOptions<DatabasePasswordResetData, ResponseError, DatabasePasswordResetVariables>,
   'mutationFn'
 > = {}) => {
+  const queryClient = useQueryClient()
+
   return useMutation<DatabasePasswordResetData, ResponseError, DatabasePasswordResetVariables>(
     (vars) => resetDatabasePassword(vars),
     {
       async onSuccess(data, variables, context) {
+        await queryClient.invalidateQueries(projectKeys.detail(variables.ref))
+
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

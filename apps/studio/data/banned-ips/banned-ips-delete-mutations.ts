@@ -35,12 +35,9 @@ export const useBannedIPsDeleteMutation = ({
     (vars) => deleteBannedIPs(vars),
     {
       async onSuccess(data, variables, context) {
-        const { projectRef, ips } = variables
+        const { projectRef } = variables
 
-        await Promise.all([
-          queryClient.invalidateQueries(BannedIPKeys.list(projectRef)),
-          queryClient.invalidateQueries(BannedIPKeys.detail(ips)),
-        ])
+        await queryClient.invalidateQueries(BannedIPKeys.list(projectRef))
 
         await onSuccess?.(data, variables, context)
       },

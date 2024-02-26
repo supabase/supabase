@@ -14,8 +14,10 @@ import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import {
   Alert,
   AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
+  IconAlertCircle,
   IconAlertTriangle,
   IconExternalLink,
   Radio,
@@ -23,12 +25,15 @@ import {
 } from 'ui'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { AddonVariantId } from 'data/subscriptions/types'
+import { formatCurrency } from 'lib/helpers'
+import { useFlag } from 'hooks'
 
 const CustomDomainSidePanel = () => {
   const { ui } = useStore()
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const organization = useSelectedOrganization()
+  const customDomainsDisabledDueToQuota = useFlag('customDomainsDisabledDueToQuota')
 
   const [selectedOption, setSelectedOption] = useState<string>('cd_none')
 
@@ -133,13 +138,21 @@ const CustomDomainSidePanel = () => {
       onCancel={onClose}
       onConfirm={onConfirm}
       loading={isLoading || isSubmitting}
-      disabled={isFreePlan || isLoading || !hasChanges || isSubmitting || !canUpdateCustomDomain}
+      disabled={
+        isFreePlan ||
+        isLoading ||
+        !hasChanges ||
+        isSubmitting ||
+        !canUpdateCustomDomain ||
+        // Allow disabling, but do not allow opting in
+        (subscriptionCDOption === undefined && customDomainsDisabledDueToQuota)
+      }
       tooltip={
         isFreePlan
           ? 'Unable to enable custom domain on a free plan'
           : !canUpdateCustomDomain
-          ? 'You do not have permission to update custom domain'
-          : undefined
+            ? 'You do not have permission to update custom domain'
+            : undefined
       }
       header={
         <div className="flex items-center justify-between">
@@ -158,6 +171,20 @@ const CustomDomainSidePanel = () => {
     >
       <SidePanel.Content>
         <div className="py-6 space-y-4">
+          {subscriptionCDOption === undefined &&
+            selectedCustomDomain !== undefined &&
+            customDomainsDisabledDueToQuota && (
+              <Alert_Shadcn_ variant="default" className="mb-2">
+                <IconAlertCircle className="h-4 w-4" />
+                <AlertTitle_Shadcn_>
+                  Adding new custom domains temporarily disabled
+                </AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+                  We are working with our upstream DNS provider before we are able to sign up new
+                  custom domains. Please check back in a few hours.
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
+            )}
           <p className="text-sm">
             Custom domains allow you to present a branded experience to your users. You may set up
             your custom domain in the{' '}
@@ -230,7 +257,7 @@ const CustomDomainSidePanel = () => {
                         Present a branded experience to your users
                       </p>
                       <div className="flex items-center space-x-1 mt-2">
-                        <p className="text-foreground text-sm">${option.price}</p>
+                        <p className="text-foreground text-sm">{formatCurrency(option.price)}</p>
                         <p className="text-foreground-light translate-y-[1px]"> / month</p>
                       </div>
                     </div>
@@ -255,7 +282,7 @@ const CustomDomainSidePanel = () => {
                 <p className="text-sm text-foreground-light">
                   Upon clicking confirm, the amount of{' '}
                   <span className="text-foreground">
-                    ${selectedCustomDomain?.price.toLocaleString()}
+                    {formatCurrency(selectedCustomDomain?.price)}
                   </span>{' '}
                   will be added to your monthly invoice.{' '}
                   {subscription?.billing_via_partner ? (

@@ -1,9 +1,11 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
 
 import { components } from 'data/api'
 import { put } from 'data/fetchers'
-import { contentKeys } from './keys'
+import { ResponseError } from 'types'
 import { Content } from './content-query'
+import { contentKeys } from './keys'
 
 export type UpsertContentPayload = Omit<components['schemas']['UpsertContentParams'], 'content'> & {
   content: Content['content']
@@ -41,23 +43,29 @@ export async function upsertContent(
 export type UpsertContentData = Awaited<ReturnType<typeof upsertContent>>
 
 export const useContentUpsertMutation = ({
+  onError,
   onSuccess,
   ...options
 }: Omit<
-  UseMutationOptions<UpsertContentData, unknown, UpsertContentVariables>,
+  UseMutationOptions<UpsertContentData, ResponseError, UpsertContentVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<UpsertContentData, unknown, UpsertContentVariables>(
+  return useMutation<UpsertContentData, ResponseError, UpsertContentVariables>(
     (args) => upsertContent(args),
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-
-        await Promise.all([queryClient.invalidateQueries(contentKeys.list(projectRef))])
-
+        await queryClient.invalidateQueries(contentKeys.list(projectRef))
         await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to insert content: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
       },
       ...options,
     }

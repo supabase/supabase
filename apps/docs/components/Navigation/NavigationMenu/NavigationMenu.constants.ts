@@ -22,7 +22,7 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
     {
       label: 'Database',
       icon: 'database',
-      href: '/guides/database',
+      href: '/guides/database/overview',
       level: 'database',
     },
     {
@@ -615,6 +615,10 @@ export const auth = {
       items: [
         { name: 'Overview', url: '/guides/auth/server-side/overview' },
         {
+          name: 'Next.js guide',
+          url: '/guides/auth/server-side/nextjs',
+        },
+        {
           name: 'Creating a client',
           url: '/guides/auth/server-side/creating-a-client',
         },
@@ -653,20 +657,20 @@ export const auth = {
       items: [
         {
           name: 'Part One: JWTs',
-          url: '/learn/auth-deep-dive/auth-deep-dive-jwts',
+          url: '/guides/auth/auth-deep-dive/auth-deep-dive-jwts',
         },
         {
           name: 'Part Two: Row Level Security',
-          url: '/learn/auth-deep-dive/auth-row-level-security',
+          url: '/guides/auth/auth-deep-dive/auth-row-level-security',
         },
         {
           name: 'Part Three: Policies',
-          url: '/learn/auth-deep-dive/auth-policies',
+          url: '/guides/auth/auth-deep-dive/auth-policies',
         },
-        { name: 'Part Four: GoTrue', url: '/learn/auth-deep-dive/auth-gotrue' },
+        { name: 'Part Four: GoTrue', url: '/guides/auth/auth-deep-dive/auth-gotrue' },
         {
           name: 'Part Five: Google OAuth',
-          url: '/learn/auth-deep-dive/auth-google-oauth',
+          url: '/guides/auth/auth-deep-dive/auth-google-oauth',
         },
       ],
     },
@@ -676,9 +680,9 @@ export const auth = {
 export const database: NavMenuConstant = {
   icon: 'database',
   title: 'Database',
-  url: '/guides/database',
+  url: '/guides/database/overview',
   items: [
-    { name: 'Overview', url: '/guides/database' },
+    { name: 'Overview', url: '/guides/database/overview' },
     {
       name: 'Fundamentals',
       url: undefined,
@@ -751,6 +755,10 @@ export const database: NavMenuConstant = {
           url: '/guides/database/postgres/roles',
         },
         { name: 'Managing secrets with Vault', url: '/guides/database/vault' },
+        {
+          name: 'Superuser Access and Unsupported Operations',
+          url: '/guides/database/postgres/roles-superuser',
+        },
       ],
     },
     {
@@ -832,7 +840,7 @@ export const database: NavMenuConstant = {
         },
         {
           name: 'pg_net: Async Networking',
-          url: '/guides/database/extensions/pgnet',
+          url: '/guides/database/extensions/pg_net',
         },
         {
           name: 'pg_plan_filter: Restrict Total Cost',
@@ -937,6 +945,10 @@ export const database: NavMenuConstant = {
         {
           name: 'Print PostgreSQL Version',
           url: '/guides/database/postgres/which-version-of-postgres',
+        },
+        {
+          name: 'Replicating from Supabase to External Postgres',
+          url: '/guides/database/postgres/setup-replication-external',
         },
       ],
     },
@@ -1093,7 +1105,7 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/regional-invocation',
         },
         {
-          name: 'Deploying with GitHub Actions',
+          name: 'Deploying with CI / CD pipelines',
           url: '/guides/functions/cicd-workflow',
         },
       ],
@@ -1622,6 +1634,10 @@ export const platform: NavMenuConstant = {
           name: 'Enterprise Billing',
           url: '/guides/platform/enterprise-billing',
         },
+        {
+          name: 'Billing FAQ',
+          url: '/guides/platform/billing-faq',
+        },
       ],
     },
     {
@@ -2110,3 +2126,9 @@ export const references = [
     ],
   },
 ]
+
+export const navDataForMdx = {
+  nativeMobileLoginItems: NativeMobileLoginItems,
+  phoneLoginsItems: PhoneLoginsItems,
+  socialLoginItems: SocialLoginItems,
+}

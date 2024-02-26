@@ -11,6 +11,7 @@ import { useCheckPermissions, useStore } from 'hooks'
 import { useProfile } from 'lib/profile'
 import { useProjectContentStore } from 'stores/projectContentStore'
 import { NextPageWithLayout } from 'types'
+import { CreateReportModal } from 'components/interfaces/Reports/Reports.CreateReportModal'
 
 export const UserReportPage: NextPageWithLayout = () => {
   const [loading, setLoading] = useState(true)
@@ -20,6 +21,7 @@ export const UserReportPage: NextPageWithLayout = () => {
 
   const { profile } = useProfile()
   const { ui } = useStore()
+  const [showCreateReportModal, setShowCreateReportModal] = useState(false)
 
   const contentStore = useProjectContentStore(ref)
   const canCreateReport = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
@@ -47,28 +49,34 @@ export const UserReportPage: NextPageWithLayout = () => {
       {loading ? (
         <Loading />
       ) : (
-        <ProductEmptyState
-          title="Reports"
-          ctaButtonLabel="Create report"
-          onClickCta={() => {
-            try {
-              createReport({ router })
-            } catch (error: any) {
-              ui.setNotification({
-                category: 'error',
-                message: `Failed to create report: ${error.message}`,
-              })
-            }
-          }}
-          disabled={!canCreateReport}
-          disabledMessage="You need additional permissions to create a report"
-        >
-          <p className="text-foreground-light text-sm">Create custom reports for your projects.</p>
-          <p className="text-foreground-light text-sm">
-            Get a high level overview of your network traffic, user actions, and infrastructure
-            health.
-          </p>
-        </ProductEmptyState>
+        <>
+          <ProductEmptyState
+            title="Reports"
+            ctaButtonLabel="New custom report"
+            onClickCta={() => {
+              setShowCreateReportModal(true)
+            }}
+            disabled={!canCreateReport}
+            disabledMessage="You need additional permissions to create a report"
+          >
+            <p className="text-foreground-light text-sm">
+              Create custom reports for your projects.
+            </p>
+            <p className="text-foreground-light text-sm">
+              Get a high level overview of your network traffic, user actions, and infrastructure
+              health.
+            </p>
+          </ProductEmptyState>
+          <CreateReportModal
+            visible={showCreateReportModal}
+            onCancel={() => {
+              setShowCreateReportModal(false)
+            }}
+            afterSubmit={() => {
+              setShowCreateReportModal(false)
+            }}
+          />
+        </>
       )}
     </div>
   )

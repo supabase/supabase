@@ -17,7 +17,6 @@ interface BranchingWaitlistPopoverProps {
 
 const BranchingWaitlistPopover = ({ isNewNav = false }: BranchingWaitlistPopoverProps) => {
   const [open, setOpen] = useState(false)
-  const org = useSelectedOrganization()
 
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>

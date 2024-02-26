@@ -22,8 +22,8 @@ export const createSQLPolicy = (
     definition: definition
       ? definition.replace(/\s+/g, ' ').trim()
       : definition === undefined
-      ? null
-      : definition,
+        ? null
+        : definition,
     check: check ? check.replace(/\s+/g, ' ').trim() : check === undefined ? null : check,
   }
 

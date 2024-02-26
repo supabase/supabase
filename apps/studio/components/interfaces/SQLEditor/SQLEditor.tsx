@@ -4,7 +4,6 @@ import { AnimatePresence, motion } from 'framer-motion'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
-import Split from 'react-split'
 import { format } from 'sql-formatter'
 
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
@@ -20,7 +19,6 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { isError } from 'data/utils/error-check'
 import {
   useFlag,
-  useLocalStorage,
   useLocalStorageQuery,
   useSelectedOrganization,
   useSelectedProject,
@@ -50,6 +48,9 @@ import {
   IconSettings,
   IconX,
   Input_Shadcn_,
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
   cn,
 } from 'ui'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
@@ -178,13 +179,6 @@ const SQLEditor = () => {
 
   const isDiffOpen = !!sqlDiff
 
-  const [savedSplitSize, setSavedSplitSize] = useLocalStorage(
-    LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE,
-    `[50, 50]`
-  )
-
-  const splitSize = savedSplitSize ? JSON.parse(savedSplitSize) : undefined
-
   const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess(data) {
       if (id) snap.addResult(id, data.result)
@@ -198,9 +192,12 @@ const SQLEditor = () => {
           const editor = editorRef.current
           const monaco = monacoRef.current
 
+          const startLineNumber = hasSelection ? editor?.getSelection()?.startLineNumber ?? 0 : 0
+
           const formattedError = error.formattedError ?? ''
           const lineError = formattedError.slice(formattedError.indexOf('LINE'))
-          const line = Number(lineError.slice(0, lineError.indexOf(':')).split(' ')[1])
+          const line =
+            startLineNumber + Number(lineError.slice(0, lineError.indexOf(':')).split(' ')[1])
 
           if (!isNaN(line)) {
             const decorations = editor?.deltaDecorations(
@@ -208,7 +205,10 @@ const SQLEditor = () => {
               [
                 {
                   range: new monaco.Range(line, 1, line, 20),
-                  options: { isWholeLine: true, inlineClassName: 'bg-amber-800' },
+                  options: {
+                    isWholeLine: true,
+                    inlineClassName: 'bg-warning-400',
+                  },
                 },
               ]
             )
@@ -224,19 +224,9 @@ const SQLEditor = () => {
     },
   })
 
-  const minSize = 44
   const snippet = id ? snap.snippets[id] : null
-  const snapOffset = 50
 
   const isLoading = urlId === 'new' ? false : !(id && ref && snap.loaded[ref])
-
-  const onDragEnd = useCallback(
-    (sizes: number[]) => {
-      if (id) snap.setSplitSizes(id, sizes)
-      setSavedSplitSize(JSON.stringify(sizes))
-    },
-    [id]
-  )
 
   const editorRef = useRef<IStandaloneCodeEditor | null>(null)
   const monacoRef = useRef<Monaco | null>(null)
@@ -565,6 +555,8 @@ const SQLEditor = () => {
         buttonLabel="Run destructive query"
         onSelectCancel={() => {
           setIsConfirmModalOpen(false)
+          // [Joshen] Somehow calling this immediately doesn't work, hence the timeout
+          setTimeout(() => editorRef.current?.focus(), 100)
         }}
         onSelectConfirm={() => {
           setIsConfirmModalOpen(false)
@@ -592,7 +584,7 @@ const SQLEditor = () => {
               }}
               initial={isFirstRender ? 'visible' : 'hidden'}
               animate="visible"
-              className="w-full flex justify-center z-10 h-[60px] bg-brand-300 border-b border-brand-400 px-5"
+              className="w-full flex justify-center z-10 h-[60px] bg-brand-200 border-b border-brand-400 px-5"
             >
               <div
                 className={cn(
@@ -604,7 +596,7 @@ const SQLEditor = () => {
                   <AiIconAnimation loading={isAiLoading} />
                 </motion.div>
 
-                <AnimatePresence initial={false} exitBeforeEnter>
+                <AnimatePresence initial={false} mode="wait">
                   {debugSolution && (
                     <div className="h-full w-full flex flex-row items-center overflow-y-hidden text-sm text-white">
                       {debugSolution}
@@ -743,7 +735,7 @@ const SQLEditor = () => {
                       exit="hidden"
                     >
                       <motion.span
-                        className="text-sm text-brand px-3"
+                        className="text-sm text-brand-600 px-3"
                         animate={{
                           opacity: ['0.5', '0.75', '0.5'],
                           transition: {
@@ -820,7 +812,7 @@ const SQLEditor = () => {
                         type="alternative"
                         size="tiny"
                         icon={<IconX />}
-                        iconRight={<span className="opacity-30">ESC</span>}
+                        iconRight={<span className="text-brand-500">ESC</span>}
                         onClick={discardAiHandler}
                       >
                         Discard
@@ -830,8 +822,8 @@ const SQLEditor = () => {
                     <>
                       <div
                         className={cn(
-                          'transition text-brand',
-                          !aiInput ? 'opacity-0' : 'opacity-30'
+                          'transition text-brand-600',
+                          !aiInput ? 'opacity-0' : 'opacity-100'
                         )}
                       >
                         <IconCornerDownLeft size={16} strokeWidth={1.5} />
@@ -846,7 +838,7 @@ const SQLEditor = () => {
                         <IconSettings className="cursor-pointer" />
                       </button>
                       <button
-                        className="text-brand-600 hover:text-brand-600"
+                        className="transition text-brand-500 hover:text-brand-600"
                         onClick={() => setIsAiOpen(false)}
                       >
                         <IconX size={21} />
@@ -858,19 +850,12 @@ const SQLEditor = () => {
             </motion.div>
           </AISchemaSuggestionPopover>
         )}
-        <Split
-          style={{ height: '100%' }}
+        <ResizablePanelGroup
+          className="h-full"
           direction="vertical"
-          gutterSize={2}
-          sizes={
-            (splitSize ? splitSize : (snippet?.splitSizes as number[] | undefined)) ?? [50, 50]
-          }
-          minSize={minSize}
-          snapOffset={snapOffset}
-          expandToMin={true}
-          onDragEnd={onDragEnd}
+          autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE}
         >
-          <div className="flex-grow overflow-y-auto border-b">
+          <ResizablePanel collapsible collapsedSize={10} minSize={20}>
             {!isAiOpen && (
               <motion.button
                 layoutId="ask-ai-input-icon"
@@ -998,8 +983,9 @@ const SQLEditor = () => {
                 </motion.div>
               </>
             )}
-          </div>
-          <div className="flex flex-col">
+          </ResizablePanel>
+          <ResizableHandle withHandle />
+          <ResizablePanel collapsible collapsedSize={10} minSize={20}>
             {isLoading ? (
               <div className="flex h-full w-full items-center justify-center">Loading...</div>
             ) : (
@@ -1012,8 +998,8 @@ const SQLEditor = () => {
                 executeQuery={executeQuery}
               />
             )}
-          </div>
-        </Split>
+          </ResizablePanel>
+        </ResizablePanelGroup>
       </div>
     </SQLEditorContext.Provider>
   )

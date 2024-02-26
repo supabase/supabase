@@ -1,7 +1,25 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import { IconHelpCircle } from 'ui'
+
+import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
+import { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import { getForeignKeyCascadeAction } from '../ColumnEditor/ColumnEditor.utils'
+import { ForeignKey } from './ForeignKeySelector.types'
+
+export const formatForeignKeys = (fks: ForeignKeyConstraint[]): ForeignKey[] => {
+  return fks.map((x) => {
+    return {
+      id: x.id,
+      name: x.constraint_name,
+      tableId: x.target_id,
+      schema: x.target_schema,
+      table: x.target_table,
+      columns: x.source_columns.map((y, i) => ({ source: y, target: x.target_columns[i] })),
+      deletionAction: x.deletion_action,
+      updateAction: x.update_action,
+    }
+  })
+}
 
 export const generateCascadeActionDescription = (
   action: 'update' | 'delete',

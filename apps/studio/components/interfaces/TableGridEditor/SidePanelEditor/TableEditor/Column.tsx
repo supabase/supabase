@@ -1,26 +1,13 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import type { PostgresType } from '@supabase/postgres-meta'
-
-import {
-  Button,
-  Checkbox,
-  IconArrowRight,
-  IconLink,
-  IconMenu,
-  IconSettings,
-  IconX,
-  Input,
-  Popover,
-} from 'ui'
-import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import { noop } from 'lodash'
+import { Checkbox, IconMenu, IconSettings, IconX, Input, Popover } from 'ui'
+
+import { EMPTY_ARR, EMPTY_OBJ } from 'lib/void'
 import { typeExpressionSuggestions } from '../ColumnEditor/ColumnEditor.constants'
 import { Suggestion } from '../ColumnEditor/ColumnEditor.types'
-import { getForeignKeyCascadeAction } from '../ColumnEditor/ColumnEditor.utils'
 import ColumnType from '../ColumnEditor/ColumnType'
 import InputWithSuggestions from '../ColumnEditor/InputWithSuggestions'
 import { ColumnField } from '../SidePanelEditor.types'
-import { EMPTY_ARR, EMPTY_OBJ } from 'lib/void'
 
 /**
  * [Joshen] For context:
@@ -44,9 +31,9 @@ interface ColumnProps {
   column: ColumnField
   enumTypes: PostgresType[]
   isNewRecord: boolean
+  hasForeignKeys: boolean
   hasImportContent: boolean
   dragHandleProps?: any
-  onEditRelation: (column: any) => void
   onUpdateColumn: (changes: Partial<ColumnField>) => void
   onRemoveColumn: () => void
 }
@@ -55,9 +42,9 @@ const Column = ({
   column = EMPTY_OBJ as ColumnField,
   enumTypes = EMPTY_ARR as PostgresType[],
   isNewRecord = false,
+  hasForeignKeys = false,
   hasImportContent = false,
   dragHandleProps = EMPTY_OBJ,
-  onEditRelation = noop,
   onUpdateColumn = noop,
   onRemoveColumn = noop,
 }: ColumnProps) => {
@@ -77,7 +64,7 @@ const Column = ({
           <IconMenu strokeWidth={1} size={15} />
         </div>
       </div>
-      <div className="w-[20%]">
+      <div className="w-[25%]">
         <div className="flex w-[95%] items-center justify-between">
           <Input
             value={column.name}
@@ -92,54 +79,6 @@ const Column = ({
           />
         </div>
       </div>
-      <div className="w-[5%] mr-2.5">
-        <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger asChild>
-            <Button
-              type={column.foreignKey !== undefined ? 'secondary' : 'default'}
-              onClick={() => onEditRelation(column)}
-              className="px-1 py-2"
-            >
-              <IconLink size={14} strokeWidth={column.foreignKey !== undefined ? 2 : 1} />
-            </Button>
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                  'border border-background', //border
-                ].join(' ')}
-              >
-                {column.foreignKey === undefined ? (
-                  <span className="text-xs text-foreground">Edit foreign key relation</span>
-                ) : (
-                  <div>
-                    <p className="text-xs text-foreground-light">Foreign key relation:</p>
-                    <div className="flex items-center space-x-1">
-                      <p className="text-xs text-foreground">
-                        {column.foreignKey.source_schema}.{column.foreignKey.source_table_name}.
-                        {column.foreignKey.source_column_name}
-                      </p>
-                      <IconArrowRight size="tiny" strokeWidth={1.5} />
-                      <p className="text-xs text-foreground">
-                        {column.foreignKey.target_table_schema}.
-                        {column.foreignKey.target_table_name}.{column.foreignKey.target_column_name}
-                      </p>
-                    </div>
-                    {column.foreignKey.deletion_action !== FOREIGN_KEY_CASCADE_ACTION.NO_ACTION && (
-                      <p className="text-xs text-foreground mt-1">
-                        On delete: {getForeignKeyCascadeAction(column.foreignKey.deletion_action)}
-                      </p>
-                    )}
-                  </div>
-                )}
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
-      </div>
       <div className="w-[25%]">
         <div className="w-[95%]">
           <ColumnType
@@ -148,7 +87,10 @@ const Column = ({
             size="small"
             showLabel={false}
             className="table-editor-column-type lg:gap-0 "
-            disabled={column.foreignKey !== undefined}
+            disabled={hasForeignKeys}
+            description={
+              hasForeignKeys ? 'Column type cannot be changed as it has a foreign key relation' : ''
+            }
             onOptionSelect={(format: string) => {
               const defaultValue = format === 'uuid' ? 'gen_random_uuid()' : null
               onUpdateColumn({ format, defaultValue })

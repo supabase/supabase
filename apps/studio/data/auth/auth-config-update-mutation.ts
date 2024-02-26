@@ -11,8 +11,6 @@ export type AuthConfigUpdateVariables = {
   config: Partial<components['schemas']['UpdateGoTrueConfigBody']>
 }
 
-export type UpdateAuthConfigResponse = components['schemas']['GoTrueConfig']
-
 export async function updateAuthConfig({ projectRef, config }: AuthConfigUpdateVariables) {
   const { data, error } = await patch('/platform/auth/{ref}/config', {
     params: {
@@ -45,9 +43,7 @@ export const useAuthConfigUpdateMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-
-        await Promise.all([queryClient.invalidateQueries(authKeys.authConfig(projectRef))])
-
+        await queryClient.invalidateQueries(authKeys.authConfig(projectRef))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

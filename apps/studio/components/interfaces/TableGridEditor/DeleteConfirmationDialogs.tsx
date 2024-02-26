@@ -1,4 +1,3 @@
-import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
 import { Alert, Button, Checkbox, IconExternalLink, Modal } from 'ui'
@@ -8,13 +7,12 @@ import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useDatabaseColumnDeleteMutation } from 'data/database-columns/database-column-delete-mutation'
-import { entityTypeKeys } from 'data/entity-types/keys'
 import { useTableRowDeleteAllMutation } from 'data/table-rows/table-row-delete-all-mutation'
 import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
 import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-mutation'
+import { useTableDeleteMutation } from 'data/tables/table-delete-mutation'
 import { useGetTables } from 'data/tables/tables-query'
-import { viewKeys } from 'data/views/keys'
-import { useStore, useUrlState } from 'hooks'
+import { useUrlState } from 'hooks'
 import { TableLike } from 'hooks/misc/useTable'
 import { noop } from 'lib/void'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
@@ -34,8 +32,6 @@ const DeleteConfirmationDialogs = ({
   includeColumns = false,
   onAfterDeleteTable = noop,
 }: DeleteConfirmationDialogsProps) => {
-  const { meta } = useStore()
-  const queryClient = useQueryClient()
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
 
@@ -72,12 +68,26 @@ const DeleteConfirmationDialogs = ({
       const selectedColumnToDelete = snap.confirmationDialog.column
       removeDeletedColumnFromFiltersAndSorts(selectedColumnToDelete.name)
       toast.success(`Successfully deleted column "${selectedColumnToDelete.name}"`)
-      snap.closeConfirmationDialog()
     },
     onError: (error) => {
       if (!(snap.confirmationDialog?.type === 'column')) return
       const selectedColumnToDelete = snap.confirmationDialog.column
       toast.error(`Failed to delete ${selectedColumnToDelete!.name}: ${error.message}`)
+    },
+    onSettled: () => {
+      snap.closeConfirmationDialog()
+    },
+  })
+  const { mutateAsync: deleteTable } = useTableDeleteMutation({
+    onSuccess: async () => {
+      const tables = await getTables(snap.selectedSchemaName)
+      onAfterDeleteTable(tables)
+      toast.success(`Successfully deleted table "${selectedTable?.name}"`)
+    },
+    onError: (error) => {
+      toast.error(`Failed to delete ${selectedTable?.name}: ${error.message}`)
+    },
+    onSettled: () => {
       snap.closeConfirmationDialog()
     },
   })
@@ -88,10 +98,11 @@ const DeleteConfirmationDialogs = ({
         snap.confirmationDialog.callback?.()
       }
       toast.success(`Successfully deleted selected row(s)`)
-      snap.closeConfirmationDialog()
     },
     onError: (error) => {
       toast.error(`Failed to delete row: ${error.message}`)
+    },
+    onSettled: () => {
       snap.closeConfirmationDialog()
     },
   })
@@ -102,10 +113,11 @@ const DeleteConfirmationDialogs = ({
         snap.confirmationDialog.callback?.()
       }
       toast.success(`Successfully deleted selected rows`)
-      snap.closeConfirmationDialog()
     },
     onError: (error) => {
       toast.error(`Failed to delete rows: ${error.message}`)
+    },
+    onSettled: () => {
       snap.closeConfirmationDialog()
     },
   })
@@ -116,10 +128,11 @@ const DeleteConfirmationDialogs = ({
         snap.confirmationDialog.callback?.()
       }
       toast.success(`Successfully deleted all rows from table`)
-      snap.closeConfirmationDialog()
     },
     onError: (error) => {
       toast.error(`Failed to delete rows: ${error.message}`)
+    },
+    onSettled: () => {
       snap.closeConfirmationDialog()
     },
   })
@@ -157,36 +170,15 @@ const DeleteConfirmationDialogs = ({
     if (!(snap.confirmationDialog?.type === 'table')) return
     const selectedTableToDelete = selectedTable
 
-    try {
-      if (selectedTableToDelete === undefined) return
+    if (selectedTableToDelete === undefined) return
 
-      const response: any = await meta.tables.del(selectedTableToDelete.id, isDeleteWithCascade)
-      if (response.error) throw response.error
-
-      const tables = await getTables(snap.selectedSchemaName)
-
-      await Promise.all([
-        queryClient.invalidateQueries(
-          tableKeys.list(project?.ref, selectedTableToDelete.schema, includeColumns)
-        ),
-        queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
-        // invalidate all views from this schema
-        snap.selectedSchemaName
-          ? queryClient.invalidateQueries(
-              viewKeys.listBySchema(projectRef, snap.selectedSchemaName)
-            )
-          : null,
-        // invalidate the view if there's a view with this id
-        queryClient.invalidateQueries(viewKeys.view(projectRef, selectedTableToDelete?.id)),
-      ])
-
-      onAfterDeleteTable(tables)
-      toast.success(`Successfully deleted table "${selectedTableToDelete.name}"`)
-    } catch (error: any) {
-      toast.error(`Failed to delete ${selectedTableToDelete?.name}: ${error.message}`)
-    } finally {
-      snap.closeConfirmationDialog()
-    }
+    deleteTable({
+      projectRef: project?.ref!,
+      connectionString: project?.connectionString,
+      schema: selectedTableToDelete.schema,
+      id: selectedTableToDelete.id,
+      cascade: isDeleteWithCascade,
+    })
   }
 
   const getImpersonatedRole = useGetImpersonatedRole()

@@ -4,14 +4,16 @@ import '../styles/index.css'
 
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { AuthProvider, ThemeProvider, useTelemetryProps, useThemeSandbox } from 'common'
-import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from 'lib/constants'
 import { DefaultSeo } from 'next-seo'
 import { AppProps } from 'next/app'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-import { CommandMenuProvider, PortalToast, themes, useConsent } from 'ui'
+import { CommandMenuProvider, PortalToast, themes } from 'ui'
+import { useConsent } from 'ui-patterns/ConsentToast'
+
 import Meta from '~/components/Favicons'
+import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from '~/lib/constants'
 import { post } from '~/lib/fetchWrapper'
 import supabase from '~/lib/supabase'
 

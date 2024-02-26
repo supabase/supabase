@@ -3,6 +3,7 @@ import { observer } from 'mobx-react-lite'
 import {
   AccountInformation,
   AnalyticsSettings,
+  ThemeSettingsOld,
   ThemeSettings,
 } from 'components/interfaces/Account/Preferences'
 import { ProfileInformation } from 'components/interfaces/Account/Preferences/ProfileInformation'
@@ -10,7 +11,7 @@ import { AccountLayout } from 'components/layouts'
 import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useIsFeatureEnabled } from 'hooks'
+import { useFlag, useIsFeatureEnabled } from 'hooks'
 import { useProfile } from 'lib/profile'
 import { NextPageWithLayout } from 'types'
 
@@ -43,6 +44,8 @@ const ProfileCard = observer(() => {
 
   const { profile, error, isLoading, isError, isSuccess } = useProfile()
 
+  const experimentalThemeEnabled = useFlag('enableExperimentalTheme')
+
   return (
     <article className="max-w-4xl p-4">
       {isLoading && (
@@ -68,9 +71,7 @@ const ProfileCard = observer(() => {
         </>
       )}
 
-      <section>
-        <ThemeSettings />
-      </section>
+      <section>{experimentalThemeEnabled ? <ThemeSettings /> : <ThemeSettingsOld />}</section>
 
       <section>
         <AnalyticsSettings />

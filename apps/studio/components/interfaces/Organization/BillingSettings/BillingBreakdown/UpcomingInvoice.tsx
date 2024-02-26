@@ -134,8 +134,8 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                       {item.unit_price === 0
                         ? 'FREE'
                         : item.unit_price
-                        ? formatCurrency(item.unit_price)
-                        : null}
+                          ? formatCurrency(item.unit_price)
+                          : null}
                     </td>
                   )}
                   <td className="py-2 text-sm text-right">{formatCurrency(item.amount)}</td>
@@ -195,15 +195,15 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                           {fee.usage_original
                             ? `${formatUsage(fee.usage_metric!, fee.usage_original)}`
                             : fee.quantity
-                            ? fee.quantity
-                            : null}
+                              ? fee.quantity
+                              : null}
                         </td>
                         <td className="py-2 text-sm">
                           {fee.unit_price_desc
                             ? `${fee.unit_price_desc}`
                             : fee.unit_price
-                            ? formatCurrency(fee.unit_price)
-                            : null}
+                              ? formatCurrency(fee.unit_price)
+                              : null}
                         </td>
                         <td className="py-2 text-sm text-right max-w-[70px]">
                           {formatCurrency(fee.amount) ?? formatCurrency(0)}

@@ -45,6 +45,7 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
 
   return (
     <ProjectLayout
+      isBlocking={false}
       title={title || 'Settings'}
       product="Settings"
       productMenu={<ProductMenu page={page} menu={menuRoutes} />}

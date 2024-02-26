@@ -1,6 +1,6 @@
-import { Button } from '@ui/components/shadcn/ui/button'
 import { Meta } from '@storybook/react'
 import { ChevronRight, Loader2, Mail } from 'lucide-react'
+import { Button } from '../ui/button'
 // import Link from 'next/link'
 
 const meta: Meta = {

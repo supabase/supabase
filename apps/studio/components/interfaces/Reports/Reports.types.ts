@@ -20,7 +20,7 @@ export type BaseQueries<Keys extends string> = Record<Keys, ReportQuery>
 
 export interface ReportQuery {
   queryType: ReportQueryType
-  sql: (filters: ReportFilterItem[]) => string
+  sql: (filters: ReportFilterItem[], where?: string, orderBy?: string) => string
 }
 
 export type ReportQueryType = 'db' | 'logs'
@@ -45,4 +45,5 @@ export interface ReportFilterItem {
   key: string
   value: string | number
   compare: 'matches' | 'is'
+  query?: string
 }

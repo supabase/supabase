@@ -1,0 +1,38 @@
+---
+title: 'IPv4 Address'
+description: 'Attach an IPv4 address to your database'
+subtitle: 'Attach an IPv4 address to your database'
+---
+
+From 26th January 2024, we will begin migrating projects to IPv6. To read more about why we are doing this migration, read [this blog post](https://supabase.com/blog/ipv6) and [this discussion](https://github.com/orgs/supabase/discussions/17817) for how to prepare for the migration. As a summary, AWS will [start charging for IPv4 addresses](https://aws.amazon.com/blogs/aws/new-aws-public-ipv4-address-charge-public-ip-insights/).
+
+The add-on is $4 per month - we're passing on the AWS costs to you. The add-on is available for all paid plans.
+
+## When is this add-on required?
+
+This add-on is not required if any of these conditions are met
+
+- you are only connecting to the database via Supavisor, our connection pooler, or via any of our client libraries.
+- If you are connecting to the database directly and the network from which you are connecting to the database supports IPv6 addresses.
+
+This add-on is only required if you are connecting to the database directly from an IPv6 incompatible network.
+
+<Admonition type="note" label="Add-on has no impact on PGBouncer removal">
+
+When you purchase this add-on, your project won't be migrated to IPv6. PGBouncer will still be removed for the project according to the timeline mentioned in [this discussion](https://github.com/orgs/supabase/discussions/17817);
+
+</Admonition>
+
+## Enabling the add-on
+
+You can now enable the IPv4 add-on in your project [add-on settings](https://supabase.com/dashboard/project/_/settings/addons) page.
+
+<Admonition type="caution" label="Downtime when add-on is toggled.">
+  Note that there might be some downtime when toggling the add-on since some DNS clients might have
+  cached the old DNS entry and it might take some time for the updated DNS entry to be picked up.
+  Generally, this should be less than a minute.
+</Admonition>
+
+<Image alt="IPv4 add-on page" src="/docs/img/guides/platform/ipv4/ipv4-addon-page.png" />
+
+<Image alt="IPv4 add-on page" src="/docs/img/guides/platform/ipv4/ipv4-enable.png" />

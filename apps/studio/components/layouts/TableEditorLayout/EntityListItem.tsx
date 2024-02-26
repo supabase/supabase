@@ -1,24 +1,24 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import clsx from 'clsx'
+import { IS_PLATFORM } from 'common'
 import saveAs from 'file-saver'
+import { Eye, MoreHorizontal, Table2, Unlock } from 'lucide-react'
 import Link from 'next/link'
 import Papa from 'papaparse'
-import SVG from 'react-inlinesvg'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconChevronDown,
   IconCopy,
   IconDownload,
   IconEdit,
   IconLock,
   IconTrash,
+  cn,
 } from 'ui'
 
-import { IS_PLATFORM } from 'common'
 import { parseSupaTable } from 'components/grid'
 import { ItemRenderer } from 'components/ui/InfiniteList'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
@@ -26,7 +26,6 @@ import { Entity } from 'data/entity-types/entity-type-query'
 import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
 import { getTable } from 'data/tables/table-query'
 import { useStore } from 'hooks'
-import { BASE_PATH } from 'lib/constants'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 
@@ -35,8 +34,6 @@ export interface EntityListItemProps {
   projectRef: string
   isLocked: boolean
 }
-
-const svgLoader = <span className="block w-4 h-4 bg-[#133929] rounded-sm" />
 
 const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   id,
@@ -49,6 +46,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   const snap = useTableEditorStateSnapshot()
 
   const isActive = Number(id) === entity.id
+
   const formatTooltipText = (entityType: string) => {
     return Object.entries(ENTITY_TYPE)
       .find(([, value]) => value === entityType)?.[0]
@@ -120,169 +118,148 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   }
 
   return (
-    <div
-      className={clsx(
-        'group flex items-center justify-between rounded-md',
-        isActive && 'text-foreground bg-surface-200'
+    <Link
+      title={entity.name}
+      href={`/project/${projectRef}/editor/${entity.id}`}
+      role="button"
+      aria-label={`View ${entity.name}`}
+      className={cn(
+        'w-full',
+        'flex items-center gap-2',
+        'py-1 px-2',
+        'text-light',
+        'rounded-md',
+        isActive ? 'bg-selection' : 'hover:bg-surface-200 focus:bg-surface-200',
+        'group',
+        'transition'
       )}
     >
-      <Link
-        href={`/project/${projectRef}/editor/${entity.id}`}
-        className="flex items-center py-1 px-3 w-full space-x-3 max-w-[90%]"
-      >
-        <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
-          <Tooltip.Trigger className="flex items-center" asChild>
-            <span>
-              {entity.type === ENTITY_TYPE.TABLE ? (
-                <SVG
-                  className="table-icon"
-                  src={`${BASE_PATH}/img/icons/table-icon.svg`}
-                  style={{ width: `16px`, height: `16px`, strokeWidth: '1px' }}
-                  preProcessor={(code: any) =>
-                    code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
-                  }
-                  loader={svgLoader}
-                  cacheRequests={true}
-                />
-              ) : entity.type === ENTITY_TYPE.VIEW ? (
-                <SVG
-                  className="view-icon"
-                  src={`${BASE_PATH}/img/icons/view-icon.svg`}
-                  style={{ width: `16px`, height: `16px`, strokeWidth: '1px' }}
-                  preProcessor={(code: any) =>
-                    code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
-                  }
-                  loader={svgLoader}
-                  cacheRequests={true}
-                />
-              ) : (
-                <div
-                  className={clsx(
-                    'flex items-center justify-center text-xs h-4 w-4 rounded-[2px] font-bold',
-                    entity.type === ENTITY_TYPE.FOREIGN_TABLE && 'text-yellow-900 bg-yellow-500',
-                    entity.type === ENTITY_TYPE.MATERIALIZED_VIEW &&
-                      'text-purple-1000 bg-purple-500',
-                    entity.type === ENTITY_TYPE.PARTITIONED_TABLE &&
-                      'text-foreground-light bg-border-stronger'
-                  )}
-                >
-                  {Object.entries(ENTITY_TYPE)
-                    .find(([, value]) => value === entity.type)?.[0]?.[0]
-                    ?.toUpperCase()}
-                </div>
-              )}
-            </span>
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                  'border border-background',
-                ].join(' ')}
-              >
-                <span className="text-xs text-foreground capitalize">
-                  {formatTooltipText(entity.type)}
-                </span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
-        <p className="text-sm text-foreground-light group-hover:text-foreground transition max-w-[85%] overflow-hidden text-ellipsis whitespace-nowrap">
-          {/* only show tooltips if required, to reduce noise */}
-          {entity.name.length > 20 ? (
-            <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
-              <Tooltip.Trigger className="max-w-[95%] overflow-hidden text-ellipsis whitespace-nowrap">
-                {entity.name}
-              </Tooltip.Trigger>
-              <Tooltip.Portal>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                      'border border-background',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-foreground">{entity.name}</span>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            </Tooltip.Root>
+      <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
+        <Tooltip.Trigger className="flex items-center" asChild>
+          {entity.type === ENTITY_TYPE.TABLE ? (
+            <Table2 size={15} strokeWidth={1.5} className="text-foreground-lighter" />
+          ) : entity.type === ENTITY_TYPE.VIEW ? (
+            <Eye size={15} strokeWidth={1.5} className="text-foreground-lighter" />
           ) : (
-            entity.name
+            <div
+              className={clsx(
+                'flex items-center justify-center text-xs h-4 w-4 rounded-[2px] font-bold',
+                entity.type === ENTITY_TYPE.FOREIGN_TABLE && 'text-yellow-900 bg-yellow-500',
+                entity.type === ENTITY_TYPE.MATERIALIZED_VIEW && 'text-purple-1000 bg-purple-500',
+                entity.type === ENTITY_TYPE.PARTITIONED_TABLE &&
+                  'text-foreground-light bg-border-stronger'
+              )}
+            >
+              {Object.entries(ENTITY_TYPE)
+                .find(([, value]) => value === entity.type)?.[0]?.[0]
+                ?.toUpperCase()}
+            </div>
           )}
-        </p>
-      </Link>
-      <div className="pr-3">
-        {entity.type === ENTITY_TYPE.TABLE && isActive && !isLocked && (
-          <DropdownMenu>
-            <DropdownMenuTrigger>
-              <div className="text-foreground-lighter transition-colors hover:text-foreground">
-                <IconChevronDown size={14} strokeWidth={2} />
-              </div>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent side="bottom" align="start">
-              <DropdownMenuItem
-                key="edit-table"
-                className="space-x-2"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  snap.onEditTable()
-                }}
-              >
-                <IconEdit size="tiny" />
-                <p>Edit Table</p>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                key="duplicate-table"
-                className="space-x-2"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  snap.onDuplicateTable()
-                }}
-              >
-                <IconCopy size="tiny" />
-                <p>Duplicate Table</p>
-              </DropdownMenuItem>
-              <DropdownMenuItem key="view-policies" className="space-x-2" asChild>
-                <Link
-                  key="view-policies"
-                  href={`/project/${projectRef}/auth/policies?schema=${snap.selectedSchemaName}&search=${entity.id}`}
-                >
-                  <IconLock size="tiny" />
-                  <p>View Policies</p>
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                key="download-table-csv"
-                className="space-x-2"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  exportTableAsCSV()
-                }}
-              >
-                <IconDownload size="tiny" />
-                <p>Export as CSV</p>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                key="delete-table"
-                className="space-x-2"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  snap.onDeleteTable()
-                }}
-              >
-                <IconTrash size="tiny" />
-                <p>Delete Table</p>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        </Tooltip.Trigger>
+        <Tooltip.Portal>
+          <Tooltip.Content
+            side="bottom"
+            className={[
+              'rounded bg-alternative py-1 px-2 leading-none shadow',
+              'border border-background',
+              'text-xs text-foreground capitalize',
+            ].join(' ')}
+          >
+            <Tooltip.Arrow className="radix-tooltip-arrow" />
+            {formatTooltipText(entity.type)}
+          </Tooltip.Content>
+        </Tooltip.Portal>
+      </Tooltip.Root>
+      <div
+        className={cn(
+          'truncate',
+          'max-w-[175px] overflow-hidden text-ellipsis whitespace-nowrap flex items-center gap-2 relative w-full',
+          isActive && 'text-foreground'
+        )}
+      >
+        <span
+          className={cn(
+            isActive ? 'text-foreground' : 'text-foreground-light group-hover:text-foreground',
+            'text-sm',
+            'transition',
+            'truncate'
+          )}
+        >
+          {entity.name}
+        </span>
+        {entity.type === ENTITY_TYPE.TABLE && !entity.rls_enabled && (
+          <Unlock
+            size={14}
+            strokeWidth={2}
+            className={cn(isActive ? 'text-warning-600' : 'text-warning-500')}
+          />
         )}
       </div>
-    </div>
+
+      {entity.type === ENTITY_TYPE.TABLE && isActive && !isLocked && (
+        <DropdownMenu>
+          <DropdownMenuTrigger className="text-foreground-lighter transition-all hover:text-foreground data-[state=open]:text-foreground">
+            <MoreHorizontal size={14} strokeWidth={2} />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="bottom" align="start">
+            <DropdownMenuItem
+              key="edit-table"
+              className="space-x-2"
+              onClick={(e) => {
+                e.stopPropagation()
+                snap.onEditTable()
+              }}
+            >
+              <IconEdit size="tiny" />
+              <span>Edit Table</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              key="duplicate-table"
+              className="space-x-2"
+              onClick={(e) => {
+                e.stopPropagation()
+                snap.onDuplicateTable()
+              }}
+            >
+              <IconCopy size="tiny" />
+              <span>Duplicate Table</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem key="view-policies" className="space-x-2" asChild>
+              <Link
+                key="view-policies"
+                href={`/project/${projectRef}/auth/policies?schema=${snap.selectedSchemaName}&search=${entity.id}`}
+              >
+                <IconLock size="tiny" />
+                <span>View Policies</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              key="download-table-csv"
+              className="space-x-2"
+              onClick={(e) => {
+                e.stopPropagation()
+                exportTableAsCSV()
+              }}
+            >
+              <IconDownload size="tiny" />
+              <span>Export as CSV</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              key="delete-table"
+              className="space-x-2"
+              onClick={(e) => {
+                e.stopPropagation()
+                snap.onDeleteTable()
+              }}
+            >
+              <IconTrash size="tiny" />
+              <span>Delete Table</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
+    </Link>
   )
 }
 

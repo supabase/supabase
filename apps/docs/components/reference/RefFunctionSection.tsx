@@ -126,14 +126,14 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                       const codeBlockLang = example?.code?.startsWith('```js')
                         ? 'js'
                         : example?.code?.startsWith('```ts')
-                        ? 'ts'
-                        : example?.code?.startsWith('```dart')
-                        ? 'dart'
-                        : example?.code?.startsWith('```c#')
-                        ? 'csharp'
-                        : example?.code?.startsWith('```kotlin')
-                        ? 'kotlin'
-                        : 'js'
+                          ? 'ts'
+                          : example?.code?.startsWith('```dart')
+                            ? 'dart'
+                            : example?.code?.startsWith('```c#')
+                              ? 'csharp'
+                              : example?.code?.startsWith('```kotlin')
+                                ? 'kotlin'
+                                : 'js'
                       //                     `
                       // import { createClient } from '@supabase/supabase-js'
 

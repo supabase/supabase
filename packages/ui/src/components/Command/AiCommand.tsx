@@ -39,25 +39,7 @@ const questions = [
   'How do I set up authentication?',
 ]
 
-function getEdgeFunctionUrl() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '')
-
-  if (!supabaseUrl) {
-    return undefined
-  }
-
-  // https://github.com/supabase/supabase-js/blob/10d3423506cbd56345f7f6ab2ec2093c8db629d4/src/SupabaseClient.ts#L96
-  const isPlatform = supabaseUrl.match(/(supabase\.co)|(supabase\.in)/)
-
-  if (isPlatform) {
-    const [schemeAndProjectId, domain, tld] = supabaseUrl.split('.')
-    return `${schemeAndProjectId}.functions.${domain}.${tld}`
-  } else {
-    return `${supabaseUrl}/functions/v1`
-  }
-}
-
-const edgeFunctionUrl = getEdgeFunctionUrl()
+export const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
 export enum MessageRole {
   User = 'user',
@@ -154,8 +136,6 @@ export function useAiChat({
 
   const submit = useCallback(
     async (query: string) => {
-      if (!edgeFunctionUrl) return console.error('No edge function url')
-
       dispatchMessage({
         type: 'new',
         message: {
@@ -176,7 +156,7 @@ export function useAiChat({
       setHasError(false)
       setIsLoading?.(true)
 
-      const eventSource = new SSE(`${edgeFunctionUrl}/ai-docs`, {
+      const eventSource = new SSE(`${BASE_PATH}/api/ai/docs`, {
         headers: {
           apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
           Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
@@ -198,7 +178,7 @@ export function useAiChat({
       }
 
       eventSource.addEventListener('error', handleError)
-      eventSource.addEventListener('message', (e) => {
+      eventSource.addEventListener('message', (e: MessageEvent) => {
         try {
           setIsLoading?.(false)
 
@@ -277,7 +257,7 @@ export function useAiChat({
  */
 export function queryAi(messages: Message[], timeout = 0) {
   return new Promise<string>((resolve, reject) => {
-    const eventSource = new SSE(`${edgeFunctionUrl}/ai-docs`, {
+    const eventSource = new SSE(`${BASE_PATH}/api/ai/docs`, {
       headers: {
         apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
         Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
@@ -307,7 +287,7 @@ export function queryAi(messages: Message[], timeout = 0) {
     let answer = ''
 
     eventSource.addEventListener('error', handleError)
-    eventSource.addEventListener('message', (e) => {
+    eventSource.addEventListener('message', (e: MessageEvent) => {
       try {
         if (e.data === '[DONE]') {
           if (timeoutId) {
@@ -377,64 +357,65 @@ const AiCommand = () => {
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
-      <div className={cn('relative mb-[145px] py-4 max-h-[720px] overflow-auto')}>
-        {messages.map((message, index) => {
-          switch (message.role) {
-            case MessageRole.User:
-              return (
-                <div key={index} className="flex gap-6 mx-4 [overflow-anchor:none] mb-6">
-                  <div
-                    className="
+      <div className={cn('relative mb-[145px] py-4 max-h-[720px]')}>
+        {!hasError &&
+          messages.map((message, index) => {
+            switch (message.role) {
+              case MessageRole.User:
+                return (
+                  <div key={index} className="flex gap-6 mx-4 [overflow-anchor:none] mb-6">
+                    <div
+                      className="
                   w-7 h-7 bg-background rounded-full border border-muted flex items-center justify-center text-foreground-lighter first-letter:
                   ring-background
                   ring-1
                   shadow-sm
               "
-                  >
-                    <IconUser strokeWidth={1.5} size={16} />
+                    >
+                      <IconUser strokeWidth={1.5} size={16} />
+                    </div>
+                    <div className="prose text-foreground-lighter">{message.content}</div>
                   </div>
-                  <div className="prose text-foreground-lighter">{message.content}</div>
-                </div>
-              )
-            case MessageRole.Assistant:
-              return (
-                <div key={index} className="px-4 [overflow-anchor:none] mb-6">
-                  <div className="flex gap-6 [overflow-anchor:none] mb-6">
-                    <AiIconChat
-                      loading={
-                        message.status === MessageStatus.Pending ||
-                        message.status === MessageStatus.InProgress
-                      }
-                    />
-                    <>
-                      {message.status === MessageStatus.Pending ? (
-                        <div className="bg-border-strong h-[21px] w-[13px] mt-1 animate-pulse animate-bounce"></div>
-                      ) : (
-                        <ReactMarkdown
-                          remarkPlugins={[remarkGfm]}
-                          components={markdownComponents}
-                          linkTarget="_blank"
-                          className="prose dark:prose-dark"
-                          transformLinkUri={(href) => {
-                            const supabaseUrl = new URL('https://supabase.com')
-                            const linkUrl = new URL(href, 'https://supabase.com')
+                )
+              case MessageRole.Assistant:
+                return (
+                  <div key={index} className="px-4 [overflow-anchor:none] mb-[150px]">
+                    <div className="flex gap-6 [overflow-anchor:none] mb-6">
+                      <AiIconChat
+                        loading={
+                          message.status === MessageStatus.Pending ||
+                          message.status === MessageStatus.InProgress
+                        }
+                      />
+                      <>
+                        {message.status === MessageStatus.Pending ? (
+                          <div className="bg-border-strong h-[21px] w-[13px] mt-1 animate-pulse animate-bounce"></div>
+                        ) : (
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            components={markdownComponents}
+                            linkTarget="_blank"
+                            className="prose dark:prose-dark"
+                            transformLinkUri={(href) => {
+                              const supabaseUrl = new URL('https://supabase.com')
+                              const linkUrl = new URL(href, 'https://supabase.com')
 
-                            if (linkUrl.origin === supabaseUrl.origin) {
-                              return linkUrl.toString()
-                            }
+                              if (linkUrl.origin === supabaseUrl.origin) {
+                                return linkUrl.toString()
+                              }
 
-                            return href
-                          }}
-                        >
-                          {message.content}
-                        </ReactMarkdown>
-                      )}
-                    </>
+                              return href
+                            }}
+                          >
+                            {message.content}
+                          </ReactMarkdown>
+                        )}
+                      </>
+                    </div>
                   </div>
-                </div>
-              )
-          }
-        })}
+                )
+            }
+          })}
 
         {messages.length === 0 && !hasError && (
           <CommandGroup heading="Examples">

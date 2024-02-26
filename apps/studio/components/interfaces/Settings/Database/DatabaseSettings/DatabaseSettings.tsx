@@ -7,11 +7,13 @@ import DatabaseSelector from 'components/ui/DatabaseSelector'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useFlag, useSelectedProject } from 'hooks'
 import { pluckObjectFields } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -22,20 +24,19 @@ import {
 import { IPv4DeprecationNotice } from '../IPv4DeprecationNotice'
 import { UsePoolerCheckbox } from '../UsePoolerCheckbox'
 import ResetDbPassword from './ResetDbPassword'
-import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
-import { getHostFromConnectionString } from './DatabaseSettings.utils'
 
 const DatabaseSettings = () => {
   const router = useRouter()
   const { ref: projectRef, connectionString } = useParams()
   const telemetryProps = useTelemetryProps()
+  const snap = useDatabaseSettingsStateSnapshot()
   const state = useDatabaseSelectorStateSnapshot()
   const selectedProject = useSelectedProject()
 
   const readReplicasEnabled = useFlag('readReplicas')
   const showReadReplicasUI = readReplicasEnabled && selectedProject?.is_read_replicas_enabled
   const connectionStringsRef = useRef<HTMLDivElement>(null)
-  const [usePoolerConnection, setUsePoolerConnection] = useState(true)
+  const [poolingMode, setPoolingMode] = useState<'transaction' | 'session' | 'statement'>('session')
 
   const {
     data: poolingInfo,
@@ -69,12 +70,15 @@ const DatabaseSettings = () => {
     : isErrorProjectSettings || isErrorPoolingInfo
   const isSuccess = showReadReplicasUI
     ? isSuccessReadReplicas
-    : isSuccessProjectSettings || isSuccessPoolingInfo
+    : isSuccessProjectSettings && isSuccessPoolingInfo
 
   const selectedDatabase = (databases ?? []).find(
     (db) => db.identifier === state.selectedDatabaseId
   )
-  const isMd5 = poolingInfo?.connectionString.includes('?options=reference')
+  const primaryConfig = showReadReplicasUI
+    ? poolingInfo?.find((x) => x.identifier === state.selectedDatabaseId)
+    : poolingInfo?.find((x) => x.database_type === 'PRIMARY')
+  const isMd5 = primaryConfig?.connectionString.includes('?options=reference')
 
   const { project } = data ?? {}
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user']
@@ -83,14 +87,12 @@ const DatabaseSettings = () => {
     ? pluckObjectFields(selectedDatabase || emptyState, DB_FIELDS)
     : pluckObjectFields(project || emptyState, DB_FIELDS)
 
-  const connectionInfo = usePoolerConnection
+  const connectionInfo = snap.usePoolerConnection
     ? {
-        db_host: isSuccessPoolingInfo
-          ? getHostFromConnectionString(poolingInfo?.connectionString)
-          : '',
-        db_name: poolingInfo?.db_name,
-        db_port: poolingInfo?.db_port,
-        db_user: `postgres.${projectRef}`,
+        db_host: primaryConfig?.db_host,
+        db_name: primaryConfig?.db_name,
+        db_port: primaryConfig?.db_port,
+        db_user: primaryConfig?.db_user,
       }
     : dbConnectionInfo
 
@@ -111,6 +113,12 @@ const DatabaseSettings = () => {
       connectionStringsRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' })
     }
   }, [connectionString])
+
+  useEffect(() => {
+    if (primaryConfig?.pool_mode === 'session') {
+      setPoolingMode(primaryConfig.pool_mode)
+    }
+  }, [primaryConfig?.pool_mode])
 
   return (
     <>
@@ -143,10 +151,12 @@ const DatabaseSettings = () => {
                 <div className="space-y-4">
                   <UsePoolerCheckbox
                     id="connection-params"
-                    checked={usePoolerConnection}
-                    onCheckedChange={setUsePoolerConnection}
+                    checked={snap.usePoolerConnection}
+                    poolingMode={poolingMode}
+                    onCheckedChange={snap.setUsePoolerConnection}
+                    onSelectPoolingMode={setPoolingMode}
                   />
-                  {!usePoolerConnection && <IPv4DeprecationNotice />}
+                  {!snap.usePoolerConnection && <IPv4DeprecationNotice />}
                   {isMd5 && (
                     <Alert_Shadcn_>
                       <IconAlertCircle strokeWidth={2} />
@@ -188,10 +198,10 @@ const DatabaseSettings = () => {
                   readOnly
                   copy
                   disabled
-                  value={connectionInfo.db_port}
+                  value={poolingMode === 'transaction' ? connectionInfo.db_port : '5432'}
                   label="Port"
                 />
-                {isMd5 && (
+                {isMd5 && snap.usePoolerConnection && (
                   <Input
                     className="input-mono"
                     layout="horizontal"

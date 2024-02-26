@@ -4,8 +4,7 @@ import Link from 'next/link'
 import { FC } from 'react'
 import { Button, IconCommand, IconGitHub, IconSearch, SearchButton } from 'ui'
 import { useIsLoggedIn, useIsUserLoading } from 'common'
-
-import ThemeToggle from '@ui/components/ThemeProvider/ThemeToggle'
+import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 
 const TopNavBar: FC = () => {
   const isLoggedIn = useIsLoggedIn()
@@ -13,7 +12,10 @@ const TopNavBar: FC = () => {
   const { resolvedTheme } = useTheme()
 
   return (
-    <nav className="h-[60px] border-b backdrop-blur backdrop-filter bg bg-opacity-75">
+    <nav
+      aria-label="top bar"
+      className="h-[60px] border-b backdrop-blur backdrop-filter bg bg-opacity-75"
+    >
       <div className="px-5 max-w-7xl mx-auto flex gap-3 justify-between items-center h-full">
         <div className="lg:hidden">
           <Link href="/" className=" flex items-center gap-2">
@@ -55,7 +57,10 @@ const TopNavBar: FC = () => {
                 <p className="hidden md:flex text-sm">Search docs...</p>
               </div>
               <div className="hidden md:flex items-center space-x-1">
-                <div className="md:flex items-center justify-center h-5 w-10 border rounded bg-surface-300 gap-1">
+                <div
+                  aria-hidden="true"
+                  className="md:flex items-center justify-center h-5 w-10 border rounded bg-surface-300 gap-1"
+                >
                   <IconCommand size={12} strokeWidth={1.5} />
                   <span className="text-[12px]">K</span>
                 </div>
@@ -78,7 +83,7 @@ const TopNavBar: FC = () => {
           )}
           {process.env.NEXT_PUBLIC_DEV_AUTH_PAGE === 'true' && (
             <Button asChild>
-              <Link href="/__dev-secret-auth">Dev-only secret signin</Link>
+              <Link href="/__dev-secret-auth">Dev-only secret sign-in</Link>
             </Button>
           )}
           <Link
@@ -87,6 +92,7 @@ const TopNavBar: FC = () => {
             rel="noreferrer noopener"
             className="px-2.5 py-1"
           >
+            <span className="sr-only">GitHub</span>
             <IconGitHub
               size={16}
               className="text-foreground-light hover:text-foreground transition"

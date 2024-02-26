@@ -15,6 +15,7 @@ interface UpgradeToProProps {
   secondaryText: string
   addon?: 'pitr' | 'customDomain' | 'computeInstance'
   buttonText?: string
+  disabled?: boolean
 }
 
 const UpgradeToPro = ({
@@ -25,6 +26,7 @@ const UpgradeToPro = ({
   secondaryText,
   addon,
   buttonText,
+  disabled = false,
 }: UpgradeToProProps) => {
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organizationSlug })
   const plan = subscription?.plan?.id
@@ -55,7 +57,7 @@ const UpgradeToPro = ({
             <Tooltip.Trigger asChild>
               <Button
                 type="primary"
-                disabled={!canUpdateSubscription || projectUpdateDisabled}
+                disabled={!canUpdateSubscription || projectUpdateDisabled || disabled}
                 asChild
               >
                 <Link

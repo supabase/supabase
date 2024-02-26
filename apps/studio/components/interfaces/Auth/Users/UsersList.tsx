@@ -9,6 +9,8 @@ import { IconAlertCircle } from 'ui'
 import UserListItem from './UsersListItem'
 import UsersListItemSkeleton from './UsersListItemSkeleton'
 import UsersPagination from './UsersPagination'
+import UsersSidePanel from './UserSidePanel'
+import { useState } from 'react'
 
 interface UsersListProps {
   page: number
@@ -35,6 +37,9 @@ const UsersList = ({
   isFetchingNextPage,
   error,
 }: UsersListProps) => {
+  const [selectedUser, setSelectedUser] = useState<User | undefined>(undefined)
+  const [userSidePanelOpen, setUserSidePanelOpen] = useState(false)
+
   // Check once on the top level, rather than checking for every row
   const canRemoveUser = useCheckPermissions(PermissionAction.TENANT_SQL_DELETE, 'auth.users')
   const canRemoveMFAFactors = useCheckPermissions(
@@ -92,6 +97,8 @@ const UsersList = ({
                 user={x}
                 canRemoveUser={canRemoveUser}
                 canRemoveMFAFactors={canRemoveMFAFactors}
+                setSelectedUser={setSelectedUser}
+                setUserSidePanelOpen={setUserSidePanelOpen}
               />
             ))}
           <Table.tr>
@@ -104,6 +111,12 @@ const UsersList = ({
               />
             </Table.td>
           </Table.tr>
+
+          <UsersSidePanel
+            selectedUser={selectedUser}
+            userSidePanelOpen={userSidePanelOpen}
+            setUserSidePanelOpen={setUserSidePanelOpen}
+          />
         </>
       }
     />

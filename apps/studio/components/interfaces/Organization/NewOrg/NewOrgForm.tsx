@@ -382,35 +382,6 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
               )}
             </Panel.Content>
           )}
-
-          <Panel.Content>
-            <InformationBox
-              icon={<IconInfo size="large" strokeWidth={1.5} />}
-              defaultVisibility={true}
-              hideCollapse
-              title="Billed via organization"
-              description={
-                <div className="space-y-3">
-                  <p className="text-sm leading-normal">
-                    This organization will use the new organization-based billing, which gives you a
-                    single subscription for your entire organization, instead of having individual
-                    subscriptions per project.{' '}
-                  </p>
-                  <div>
-                    <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                      <Link
-                        href="https://supabase.com/docs/guides/platform/org-based-billing"
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        Documentation
-                      </Link>
-                    </Button>
-                  </div>
-                </div>
-              }
-            />
-          </Panel.Content>
         </Panel>
       </form>
     </>

@@ -33,7 +33,7 @@ export const DEFAULT_QUERY_PARAMS = {
   iso_timestamp_end: REPORTS_DATEPICKER_HELPERS[0].calcTo(),
 }
 
-const generateRegexpWhere = (filters: ReportFilterItem[], prepend = true) => {
+export const generateRegexpWhere = (filters: ReportFilterItem[], prepend = true) => {
   if (filters.length === 0) return ''
   const conditions = filters
     .map((filter) => {
@@ -276,9 +276,8 @@ limit 12
     queries: {
       mostFrequentlyInvoked: {
         queryType: 'db',
-        sql: (_params) => `
+        sql: (_params, where, orderBy) => `
 -- Most frequently called queries
--- A limit of 100 has been added below
 select
     auth.rolname,
     statements.query,
@@ -296,13 +295,14 @@ select
     statements.rows / statements.calls as avg_rows
   from pg_stat_statements as statements
     inner join pg_authid as auth on statements.userid = auth.oid
-  order by
-    statements.calls desc
+  ${where || ''}
+  ${orderBy || 'order by statements.calls desc'}
   limit 10;`,
       },
       mostTimeConsuming: {
         queryType: 'db',
-        sql: (_params) => `-- A limit of 100 has been added below
+        sql: (_, where, orderBy) => `
+-- Most time consuming queries
 select
     auth.rolname,
     statements.query,
@@ -311,14 +311,14 @@ select
     to_char(((statements.total_exec_time + statements.total_plan_time)/sum(statements.total_exec_time + statements.total_plan_time) OVER()) * 100, 'FM90D0') || '%'  AS prop_total_time
   from pg_stat_statements as statements
     inner join pg_authid as auth on statements.userid = auth.oid
-  order by
-    total_time desc
+  ${where || ''}
+  ${orderBy || 'order by total_time desc'}
   limit 10;`,
       },
       slowestExecutionTime: {
         queryType: 'db',
-        sql: (_params) => `-- Slowest queries by max execution time
--- A limit of 100 has been added below
+        sql: (_params, where, orderBy) => `
+-- Slowest queries by max execution time
 select
     auth.rolname,
     statements.query,
@@ -336,8 +336,8 @@ select
     statements.rows / statements.calls as avg_rows
   from pg_stat_statements as statements
     inner join pg_authid as auth on statements.userid = auth.oid
-  order by
-    max_time desc
+  ${where || ''}
+  ${orderBy || 'order by max_time desc'}
   limit 10`,
       },
       queryHitRate: {

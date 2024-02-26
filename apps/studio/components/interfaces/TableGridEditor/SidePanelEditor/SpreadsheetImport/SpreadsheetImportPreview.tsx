@@ -107,8 +107,8 @@ const SpreadsheetImportPreview = ({
                   {previewHeaders.length === 0
                     ? 'No headers have been selected'
                     : previewRows.length === 0
-                    ? 'Your CSV contains no data'
-                    : ''}
+                      ? 'Your CSV contains no data'
+                      : ''}
                 </p>
               </div>
             )}

@@ -14,6 +14,7 @@ import { useInvoicesQuery } from 'data/invoices/invoices-query'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { Button, IconChevronLeft, IconChevronRight, IconDownload, IconFileText } from 'ui'
 import InvoiceStatusBadge from 'components/interfaces/Billing/InvoiceStatusBadge'
+import { formatCurrency } from 'lib/helpers'
 
 const PAGE_LIMIT = 10
 
@@ -98,7 +99,7 @@ const InvoicesSettings = () => {
                         <p>{new Date(x.period_end * 1000).toLocaleString()}</p>
                       </Table.td>
                       <Table.td>
-                        <p>${x.subtotal / 100}</p>
+                        <p>{formatCurrency(x.subtotal / 100)}</p>
                       </Table.td>
                       <Table.td>
                         <p>{x.number}</p>

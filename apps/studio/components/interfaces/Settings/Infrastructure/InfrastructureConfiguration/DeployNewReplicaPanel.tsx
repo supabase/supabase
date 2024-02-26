@@ -18,7 +18,8 @@ import { AVAILABLE_REPLICA_REGIONS, AWS_REGIONS_VALUES } from './InstanceConfigu
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import Link from 'next/link'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganization } from 'hooks'
+import { useSelectedOrganization, useSelectedProject } from 'hooks'
+import { WarningIcon } from 'components/ui/Icons'
 
 // [Joshen] FYI this is purely for AWS only, need to update to support Fly eventually
 
@@ -36,10 +37,13 @@ const DeployNewReplicaPanel = ({
   onClose,
 }: DeployNewReplicaPanelProps) => {
   const { ref: projectRef } = useParams()
+  const project = useSelectedProject()
   const org = useSelectedOrganization()
+
   const { data } = useReadReplicasQuery({ projectRef })
   const { data: addons, isSuccess } = useProjectAddonsQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
+
   const { mutate: setUpReplica, isLoading: isSettingUp } = useReadReplicaSetUpMutation({
     onSuccess: () => {
       const region = AVAILABLE_REPLICA_REGIONS.find((r) => r.key === selectedRegion)?.name
@@ -49,13 +53,18 @@ const DeployNewReplicaPanel = ({
     },
   })
 
+  const reachedMaxReplicas = (data ?? []).filter((db) => db.identifier !== projectRef).length >= 2
   const isFreePlan = subscription?.plan.id === 'free'
   const currentComputeAddon = addons?.selected_addons.find(
     (addon) => addon.type === 'compute_instance'
   )
   const currentPitrAddon = addons?.selected_addons.find((addon) => addon.type === 'pitr')
   const canDeployReplica =
-    !isFreePlan && currentComputeAddon !== undefined && currentPitrAddon !== undefined
+    !reachedMaxReplicas &&
+    project?.cloud_provider === 'AWS' &&
+    !isFreePlan &&
+    currentComputeAddon !== undefined &&
+    currentPitrAddon !== undefined
 
   const computeAddons =
     addons?.available_addons.find((addon) => addon.type === 'compute_instance')?.variants ?? []
@@ -104,9 +113,9 @@ const DeployNewReplicaPanel = ({
       header="Deploy a new read replica"
     >
       <SidePanel.Content className="flex flex-col py-4 gap-y-8">
-        {!canDeployReplica && (
+        {currentPitrAddon === undefined && (
           <Alert_Shadcn_>
-            <IconAlertCircle strokeWidth={2} />
+            <WarningIcon />
             <AlertTitle_Shadcn_>
               Point in time recovery is required to deploy replicas
             </AlertTitle_Shadcn_>
@@ -139,6 +148,17 @@ const DeployNewReplicaPanel = ({
                   {isFreePlan ? 'Upgrade to Pro' : 'Enable PITR add-on'}
                 </Link>
               </Button>
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+        )}
+        {reachedMaxReplicas && (
+          <Alert_Shadcn_>
+            <WarningIcon />
+            <AlertTitle_Shadcn_>
+              You can only deploy up to 2 read replicas at once
+            </AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              If you'd like to spin up another read replica, please drop an existing replica first.
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
         )}

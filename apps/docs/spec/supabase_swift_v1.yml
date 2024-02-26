@@ -94,8 +94,6 @@ functions:
       - id: sign-up
         name: Sign up
         isSpotlight: true
-        description: |
-          If the password is larger than 72 chars, it will be truncated to the first 72 chars.
         code: |
           ```swift
           try await supabase.auth.signUp(
@@ -360,8 +358,6 @@ functions:
       - id: update-the-password-for-an-authenticated-user
         name: Update the password for an authenticated user
         isSpotlight: false
-        description: |
-          If the password is larger than 72 chars, it will be truncated to the first 72 chars.
         code: |
           ```swift
           try await supabase.auth.update(user: UserAttributes(password: "newPassw0rd?"))

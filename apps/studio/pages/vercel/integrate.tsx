@@ -616,8 +616,8 @@ const ProjectLinkItem = observer(
               result.status === 'waiting'
                 ? 'text-foreground-light'
                 : result.status === 'fail'
-                ? 'text-foreground-light'
-                : 'text-foreground'
+                  ? 'text-foreground-light'
+                  : 'text-foreground'
             }`}
           >
             {result?.message ?? 'Processing...'}

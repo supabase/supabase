@@ -87,22 +87,35 @@ const VercelIntegration: NextPageWithLayout = () => {
 
   /**
    * Handle the correct route change based on whether the vercel integration
-   * is following the 'marketplace' flow or 'deploy button' flow.
-   *
+   * is following the 'marketplace/external' flow or 'deploy button' flow.
+   * See:
+   * - https://vercel.com/docs/integrations/create-integration/submit-integration#query-parameters-for-marketplace
+   * - https://vercel.com/docs/integrations/create-integration/submit-integration#query-parameters-for-external-flow
+   * - https://vercel.com/docs/integrations/create-integration/submit-integration#query-parameters-for-deploy-button
    */
   function handleRouteChange() {
     const orgSlug = selectedOrg?.slug
 
-    if (externalId) {
-      router.push({
-        pathname: `/integrations/vercel/${orgSlug}/deploy-button/new-project`,
-        query: router.query,
-      })
-    } else {
-      router.push({
-        pathname: `/integrations/vercel/${orgSlug}/marketplace/choose-project`,
-        query: router.query,
-      })
+    switch (source) {
+      case 'deploy-button': {
+        router.push({
+          pathname: `/integrations/vercel/${orgSlug}/deploy-button/new-project`,
+          query: router.query,
+        })
+        break
+      }
+      case 'marketplace':
+      case 'external': {
+        router.push({
+          pathname: `/integrations/vercel/${orgSlug}/marketplace/choose-project`,
+          query: router.query,
+        })
+        break
+      }
+      default:
+        toast.error(
+          `Unsupported Vercel installation source: ${source}. Please contact support if this error persists.`
+        )
     }
   }
 

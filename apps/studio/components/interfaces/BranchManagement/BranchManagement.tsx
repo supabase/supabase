@@ -34,6 +34,7 @@ import {
   PullRequestsEmptyState,
 } from './EmptyStates'
 import Overview from './Overview'
+import { MessageCircle } from 'lucide-react'
 
 const BranchManagement = () => {
   const { ui } = useStore()
@@ -164,44 +165,45 @@ const BranchManagement = () => {
 
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <div className="flex items-center">
-                    <Button
-                      type="default"
-                      className={`rounded-r-none transition hover:opacity-90 ${
-                        view === 'overview' ? 'opacity-100' : 'opacity-60'
-                      }`}
-                      onClick={() => setView('overview')}
-                    >
-                      Overview
-                    </Button>
-                    <Button
-                      type="default"
-                      className={`rounded-none transition hover:opacity-90 ${
-                        view === 'prs' ? 'opacity-100' : 'opacity-60'
-                      }`}
-                      onClick={() => setView('prs')}
-                    >
-                      Pull requests
-                    </Button>
-                    <Button
-                      type="default"
-                      className={`rounded-l-none transition hover:opacity-90 ${
-                        view === 'branches' ? 'opacity-100' : 'opacity-60'
-                      }`}
-                      onClick={() => setView('branches')}
-                    >
-                      All branches
-                    </Button>
-                  </div>
-                  <Input
-                    size="tiny"
-                    className="w-64"
-                    placeholder="Search"
-                    icon={<IconSearch size={14} strokeWidth={2} />}
-                  />
+                <div className="flex items-center -space-x-px">
+                  <Button
+                    type="default"
+                    className={`rounded-r-none transition hover:opacity-90 ${
+                      view === 'overview' ? 'opacity-100' : 'opacity-60'
+                    }`}
+                    onClick={() => setView('overview')}
+                  >
+                    Overview
+                  </Button>
+                  <Button
+                    type="default"
+                    className={`rounded-none transition hover:opacity-90 ${
+                      view === 'prs' ? 'opacity-100' : 'opacity-60'
+                    }`}
+                    onClick={() => setView('prs')}
+                  >
+                    Pull requests
+                  </Button>
+                  <Button
+                    type="default"
+                    className={`rounded-l-none transition hover:opacity-90 ${
+                      view === 'branches' ? 'opacity-100' : 'opacity-60'
+                    }`}
+                    onClick={() => setView('branches')}
+                  >
+                    All branches
+                  </Button>
                 </div>
                 <div className="flex items-center justify-between space-x-2">
+                  <Button
+                    type={'text'}
+                    icon={<MessageCircle className="text-muted" size={14} strokeWidth={1} />}
+                    asChild
+                  >
+                    <a href="https://github.com/orgs/supabase/discussions/18937" target="_blank">
+                      Branching Feedback
+                    </a>
+                  </Button>
                   <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                     <Link
                       target="_blank"

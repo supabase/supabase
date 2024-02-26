@@ -1479,7 +1479,11 @@ import { App, URLOpenListenerEvent } from '@capacitor/app'
   styleUrls: ['app.component.scss'],
 })
 export class AppComponent {
-  constructor(private zone: NgZone, private router: Router, private authService: AuthService) {
+  constructor(
+    private zone: NgZone,
+    private router: Router,
+    private authService: AuthService
+  ) {
     this.setupListener()
   }
 
