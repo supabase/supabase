@@ -1,9 +1,8 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
 import { partition } from 'lodash'
-import { Loader2 } from 'lucide-react'
+import { Plus, Search } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
@@ -18,9 +17,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
   IconChevronsDown,
-  IconPlusCircle,
-  IconSearch,
-  IconX,
+  Input_Shadcn_,
   cn,
 } from 'ui'
 
@@ -119,197 +116,139 @@ const TableEditorMenu = () => {
   return (
     <>
       <div
-        className="pt-5 flex flex-col flex-grow space-y-3 h-full"
+        className="pt-5 flex flex-col flex-grow gap-5 h-full"
         style={{ maxHeight: 'calc(100vh - 48px)' }}
       >
-        <SchemaSelector
-          className="mx-4 h-7"
-          selectedSchemaName={snap.selectedSchemaName}
-          onSelectSchema={(name: string) => {
-            setSearchText('')
-            snap.setSelectedSchemaName(name)
-            router.push(`/project/${project?.ref}/editor`)
-          }}
-          onSelectCreateSchema={() => snap.onAddSchema()}
-        />
+        <div className="flex flex-col gap-1">
+          <SchemaSelector
+            className="mx-4 h-7"
+            selectedSchemaName={snap.selectedSchemaName}
+            onSelectSchema={(name: string) => {
+              setSearchText('')
+              snap.setSelectedSchemaName(name)
+              router.push(`/project/${project?.ref}/editor`)
+            }}
+            onSelectCreateSchema={() => snap.onAddSchema()}
+          />
 
-        <div className="grid gap-3 mx-4 zans">
-          {!isLocked ? (
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger className="w-full">
-                <Button
-                  asChild
-                  block
-                  disabled={!canCreateTables}
-                  size="tiny"
-                  icon={
-                    <div className="text-foreground-lighter">
-                      <IconPlusCircle size={14} strokeWidth={1.5} />
-                    </div>
-                  }
-                  type="default"
-                  className="justify-start h-7"
-                  onClick={snap.onAddTable}
-                >
-                  <span>New table</span>
-                </Button>
-              </Tooltip.Trigger>
-              {!canCreateTables && (
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-alternative py-1 px-2 leading-none shadow',
-                        'border border-background',
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-foreground">
-                        You need additional permissions to create tables
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              )}
-            </Tooltip.Root>
-          ) : (
-            <Alert_Shadcn_>
-              <AlertTitle_Shadcn_ className="text-sm">Viewing protected schema</AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_ className="text-xs">
-                <p className="mb-2">
-                  This schema is managed by Supabase and is read-only through the table editor
-                </p>
-                <Button type="default" size="tiny" onClick={() => setShowModal(true)}>
-                  Learn more
-                </Button>
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
-          )}
-        </div>
-
-        <div className="flex flex-auto flex-col gap-2 pb-4 px-2">
-          <div className="relative">
-            <div className="relative flex items-center text-foreground-lighter">
-              <AnimatePresence>
-                {isSearchOpen && (
-                  <motion.div
-                    initial={{ x: 10, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1, transition: { duration: 0.2 } }}
-                    exit={{ x: 20, opacity: 0, transition: { duration: 0 } }}
-                    className="absolute top-0 left-2"
+          <div className="grid gap-3 mx-4">
+            {!isLocked ? (
+              <Tooltip.Root delayDuration={0}>
+                <Tooltip.Trigger className="w-full" asChild>
+                  <Button
+                    title="Create a new table"
+                    name="New table"
+                    block
+                    disabled={!canCreateTables}
+                    size="tiny"
+                    icon={<Plus size={14} strokeWidth={1.5} className="text-foreground-muted" />}
+                    type="default"
+                    className="justify-start"
+                    onClick={snap.onAddTable}
                   >
-                    <label htmlFor={'search-tables'} className="relative">
-                      <span className="sr-only">Search tables</span>
-                      <input
-                        id="search-tables"
-                        name="search-tables"
-                        type="text"
-                        placeholder="Search..."
-                        className={cn(
-                          'bg-default text-foreground rounded-none px-1 py-1 h-5 w-44 text-sm',
-                          'border-b outline-none ',
-                          'border-transparent focus:border-transparent focus:ring-2'
-                        )}
-                        onChange={(e) => {
-                          setSearchText(e.target.value.trim())
-                        }}
-                        value={searchText}
-                        ref={(el) => {
-                          inputRef.current = el
-                          if (el) {
-                            el.addEventListener('focus', handleSearchInputFocusChange)
-                            el.addEventListener('blur', handleSearchInputFocusChange)
-                          }
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Escape') {
-                            setIsSearchOpen(false)
-                            setSearchText('')
-                          }
-                          if (e.key === 'Backspace' && searchText.length === 0) {
-                            setIsSearchOpen(false)
-                          }
-                        }}
-                      />
-                      <div
-                        className={cn(
-                          'absolute -bottom-1 w-full h-px bg-border transition-colors',
-                          isSearchInputFocused && 'bg-border-stronger'
-                        )}
-                      ></div>
-                    </label>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-              <motion.button
-                onClick={
-                  !isSearchOpen
-                    ? () => expandSearch()
-                    : () => {
-                        setSearchText('')
-                        expandSearch()
-                      }
-                }
-                initial={{ x: 0 }}
-                animate={{ x: isSearchOpen ? 185 : 0, transition: { duration: 0 } }}
-                className="px-2 py-0.5 rounded-md mt-1 transition transform hover:scale-105 focus:ring-2 "
-              >
-                {isSearchOpen ? (
-                  isSearching ? (
-                    <Loader2
-                      className="w-4 h-4 animate-spin text-foreground"
-                      size={15}
-                      strokeWidth={1}
-                    />
-                  ) : (
-                    <IconX className={cn('w-4  h-4 hover:text-foreground transition-colors')} />
-                  )
-                ) : (
-                  <IconSearch className={cn('w-4 h-4 hover:text-foreground transition-colors')} />
-                )}
-              </motion.button>
-            </div>
-            <div className="flex gap-3 items-center absolute right-1 top-1.5">
-              <DropdownMenu>
-                <Tooltip.Root delayDuration={0}>
-                  <DropdownMenuTrigger asChild>
-                    <Tooltip.Trigger>
-                      <IconChevronsDown
-                        size={18}
-                        strokeWidth={1}
-                        className="text-foreground-lighter transition-colors hover:text-foreground"
-                      />
-                    </Tooltip.Trigger>
-                  </DropdownMenuTrigger>
+                    New table
+                  </Button>
+                </Tooltip.Trigger>
+                {!canCreateTables && (
                   <Tooltip.Portal>
-                    <Tooltip.Content
-                      side="bottom"
-                      className={[
-                        'rounded bg-alternative py-1 px-2 leading-none shadow',
-                        'border border-background text-xs',
-                      ].join(' ')}
-                    >
+                    <Tooltip.Content side="bottom">
                       <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      Sort By
+                      <div
+                        className={[
+                          'rounded bg-alternative py-1 px-2 leading-none shadow',
+                          'border border-background',
+                        ].join(' ')}
+                      >
+                        <span className="text-xs text-foreground">
+                          You need additional permissions to create tables
+                        </span>
+                      </div>
                     </Tooltip.Content>
                   </Tooltip.Portal>
-                </Tooltip.Root>
-
-                <DropdownMenuContent side="bottom" align="start" className="w-48">
-                  <DropdownMenuRadioGroup
-                    value={sort}
-                    onValueChange={(value: any) => setSort(value)}
+                )}
+              </Tooltip.Root>
+            ) : (
+              <Alert_Shadcn_>
+                <AlertTitle_Shadcn_ className="text-sm">
+                  Viewing protected schema
+                </AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_ className="text-xs">
+                  <p className="mb-2">
+                    This schema is managed by Supabase and is read-only through the table editor
+                  </p>
+                  <Button type="default" size="tiny" onClick={() => setShowModal(true)}>
+                    Learn more
+                  </Button>
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
+            )}
+          </div>
+        </div>
+        <div className="flex flex-auto flex-col gap-2 pb-4 px-2">
+          <div className="flex items-center px-2 w-full gap-2">
+            <label htmlFor={'search-tables'} className="relative w-full">
+              <span className="sr-only">Search tables</span>
+              <Input_Shadcn_
+                id="search-tables"
+                name="search-tables"
+                type="text"
+                placeholder="Search tables..."
+                className={cn('h-[28px] w-full', 'text-xs', 'pl-7', 'w-full')}
+                onChange={(e) => {
+                  setSearchText(e.target.value.trim())
+                }}
+                value={searchText}
+                ref={(el) => {
+                  inputRef.current = el
+                  if (el) {
+                    el.addEventListener('focus', handleSearchInputFocusChange)
+                    el.addEventListener('blur', handleSearchInputFocusChange)
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') {
+                    setIsSearchOpen(false)
+                    setSearchText('')
+                  }
+                }}
+              />
+              <Search
+                className="absolute left-2 top-2 text-foreground-muted"
+                size={14}
+                strokeWidth={1.5}
+              />
+            </label>
+            <DropdownMenu>
+              <Tooltip.Root delayDuration={0}>
+                <DropdownMenuTrigger asChild>
+                  <Tooltip.Trigger className="text-foreground-lighter transition-colors hover:text-foreground data-[state=open]:text-foreground">
+                    <IconChevronsDown size={18} strokeWidth={1} />
+                  </Tooltip.Trigger>
+                </DropdownMenuTrigger>
+                <Tooltip.Portal>
+                  <Tooltip.Content
+                    side="bottom"
+                    className={[
+                      'rounded bg-alternative py-1 px-2 leading-none shadow',
+                      'border border-background text-xs',
+                    ].join(' ')}
                   >
-                    <DropdownMenuRadioItem key="alphabetical" value="alphabetical">
-                      Alphabetical
-                    </DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem key="grouped-alphabetical" value="grouped-alphabetical">
-                      Entity Type
-                    </DropdownMenuRadioItem>
-                  </DropdownMenuRadioGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    Sort By
+                  </Tooltip.Content>
+                </Tooltip.Portal>
+              </Tooltip.Root>
+              <DropdownMenuContent side="bottom" align="end" className="w-48">
+                <DropdownMenuRadioGroup value={sort} onValueChange={(value: any) => setSort(value)}>
+                  <DropdownMenuRadioItem key="alphabetical" value="alphabetical">
+                    Alphabetical
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem key="grouped-alphabetical" value="grouped-alphabetical">
+                    Entity Type
+                  </DropdownMenuRadioItem>
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           {isLoading && (
