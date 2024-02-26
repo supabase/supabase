@@ -87,6 +87,8 @@ const ProjectLayout = ({
     router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
   const showPausedState = isPaused && !ignorePausedState
 
+  console.log('productMenu', productMenu)
+
   return (
     <AppLayout>
       <ProjectContextProvider projectRef={projectRef}>
@@ -113,21 +115,23 @@ const ProjectLayout = ({
             direction="horizontal"
             autoSaveId="project-layout"
           >
-            {!showPausedState && (
-              <ResizablePanel
-                className={cn(resizableSidebar ? 'min-w-64 max-w-[32rem]' : 'min-w-64 max-w-64')}
-                defaultSize={1} // forces panel to smallest width possible, at w-64
-              >
-                <MenuBarWrapper
-                  isLoading={isLoading}
-                  isBlocking={isBlocking}
-                  productMenu={productMenu}
+            {!showPausedState && productMenu && (
+              <>
+                <ResizablePanel
+                  className={cn(resizableSidebar ? 'min-w-64 max-w-[32rem]' : 'min-w-64 max-w-64')}
+                  defaultSize={1} // forces panel to smallest width possible, at w-64
                 >
-                  <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
-                </MenuBarWrapper>
-              </ResizablePanel>
+                  <MenuBarWrapper
+                    isLoading={isLoading}
+                    isBlocking={isBlocking}
+                    productMenu={productMenu}
+                  >
+                    <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
+                  </MenuBarWrapper>
+                </ResizablePanel>
+                <ResizableHandle withHandle disabled={resizableSidebar ? false : true} />
+              </>
             )}
-            <ResizableHandle withHandle disabled={resizableSidebar ? false : true} />
             <ResizablePanel className="h-full">
               <main className="h-full flex flex-col flex-1 w-full overflow-x-hidden">
                 {!navLayoutV2 && !hideHeader && IS_PLATFORM && <LayoutHeader />}
