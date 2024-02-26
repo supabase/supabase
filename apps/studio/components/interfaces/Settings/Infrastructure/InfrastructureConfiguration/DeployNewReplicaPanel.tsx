@@ -6,7 +6,6 @@ import {
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  IconAlertCircle,
   Listbox,
   SidePanel,
 } from 'ui'
@@ -81,6 +80,11 @@ const DeployNewReplicaPanel = ({
   const [selectedRegion, setSelectedRegion] = useState<string>(defaultRegion)
   const [selectedCompute, setSelectedCompute] = useState(defaultCompute)
   const selectedComputeMeta = computeAddons.find((addon) => addon.identifier === selectedCompute)
+
+  const availableRegions =
+    process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+      ? AVAILABLE_REPLICA_REGIONS.filter((x) => x.key === 'SOUTHEAST_ASIA')
+      : AVAILABLE_REPLICA_REGIONS
 
   const onSubmit = async () => {
     const regionKey = AWS_REGIONS_VALUES[selectedRegion]
@@ -171,7 +175,7 @@ const DeployNewReplicaPanel = ({
           onChange={setSelectedRegion}
           label="Select a region to deploy your read replica in"
         >
-          {AVAILABLE_REPLICA_REGIONS.map((region) => (
+          {availableRegions.map((region) => (
             <Listbox.Option
               key={region.key}
               label={region.name}
