@@ -607,6 +607,10 @@ export const auth = {
           name: 'Column Level Security',
           url: '/guides/auth/column-level-security',
         },
+        {
+          name: 'Custom Claims & RBAC',
+          url: '/guides/auth/custom-claims-and-role-based-access-control-rbac',
+        },
       ],
     },
     {
