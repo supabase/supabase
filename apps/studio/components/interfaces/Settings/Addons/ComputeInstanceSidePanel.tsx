@@ -414,15 +414,20 @@ const ComputeInstanceSidePanel = () => {
             {blockDowngradeDueToReadReplicas ? (
               <Alert_Shadcn_>
                 <WarningIcon />
-                <AlertTitle_Shadcn_>Remove all read replicas before downgrading</AlertTitle_Shadcn_>
+                <AlertTitle_Shadcn_>
+                  Unable to downgrade as project has active read replicas
+                </AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_>
-                  You currently have active read replicas. The minimum compute instance size for
-                  using read replicas is the Small Compute. You need to remove all read replicas
-                  before downgrading Compute as it requires at least a Small compute instance.
+                  The minimum compute instance size for using read replicas is the Small Compute.
+                  You need to remove all read replicas before downgrading Compute as it requires at
+                  least a Small compute instance.
                 </AlertDescription_Shadcn_>
                 <AlertDescription_Shadcn_ className="mt-2">
                   <Button asChild type="default">
-                    <Link href={`/project/${projectRef}/settings/infrastructure`}>
+                    <Link
+                      href={`/project/${projectRef}/settings/infrastructure`}
+                      onClick={() => snap.setPanelKey(undefined)}
+                    >
                       Manage read replicas
                     </Link>
                   </Button>

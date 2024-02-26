@@ -22,27 +22,20 @@ import {
   ScrollArea,
 } from 'ui'
 
+import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 import { AWS_REGIONS_KEYS, BASE_PATH, PROJECT_STATUS } from 'lib/constants'
 import { AVAILABLE_REPLICA_REGIONS } from './InstanceConfiguration.constants'
 import GeographyData from './MapData.json'
-import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 
 // [Joshen] Foresee that we'll skip this view for initial launch
 
 interface MapViewProps {
   onSelectDeployNewReplica: (region: AWS_REGIONS_KEYS) => void
-  onSelectRestartReplica: (database: Database) => void
-  onSelectResizeReplica: (database: Database) => void
   onSelectDropReplica: (database: Database) => void
 }
 
-const MapView = ({
-  onSelectDeployNewReplica,
-  onSelectRestartReplica,
-  onSelectResizeReplica,
-  onSelectDropReplica,
-}: MapViewProps) => {
+const MapView = ({ onSelectDeployNewReplica, onSelectDropReplica }: MapViewProps) => {
   const { ref } = useParams()
   const [mount, setMount] = useState(false)
   const [zoom, setZoom] = useState<number>(1.5)
@@ -137,9 +130,8 @@ const MapView = ({
           {AVAILABLE_REPLICA_REGIONS.map((region) => {
             const dbs =
               databases.filter((database) => database.region.includes(region.region)) ?? []
-            const coordinates = AVAILABLE_REPLICA_REGIONS.find(
-              (r) => r.region === region.region
-            )?.coordinates
+            const coordinates = AVAILABLE_REPLICA_REGIONS.find((r) => r.region === region.region)
+              ?.coordinates
 
             const hasNoDatabases = dbs.length === 0
             const hasPrimary = dbs.some((database) => database.identifier === ref)
@@ -290,18 +282,6 @@ const MapView = ({
                                 View connection string
                               </Link>
                             </DropdownMenuItem>
-                            {/* <DropdownMenuItem
-                              className="gap-x-2"
-                              onClick={() => onSelectRestartReplica(database)}
-                            >
-                              Restart replica
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              className="gap-x-2"
-                              onClick={() => onSelectResizeReplica(database)}
-                            >
-                              Resize replica
-                            </DropdownMenuItem> */}
                             <div className="border-t" />
                             <DropdownMenuItem
                               className="gap-x-2"
