@@ -30,9 +30,11 @@ COPY --from=turbo /app/out/json ./
 COPY --from=turbo /app/out/package-lock.json ./
 # Install additional dependencies for arm64 build (required by bufferutil)
 ARG TARGETARCH
+# TODO: Git is added because it's needed to build libpg, remove it once we move to a WASM build
 RUN if [ "$TARGETARCH" = "arm64" ]; then \
     apt-get update && apt-get install -y --no-install-recommends \
     python3 \
+    git \
     build-essential \
     && rm -rf /var/lib/apt/lists/*; fi
 # No need to clean cache because production uses standalone build

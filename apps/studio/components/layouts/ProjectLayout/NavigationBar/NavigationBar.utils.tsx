@@ -87,7 +87,7 @@ export const generateProductRoutes = (
           },
         ]
       : []),
-    ...(IS_PLATFORM && realtimeEnabled
+    ...(realtimeEnabled
       ? [
           {
             key: 'realtime',
