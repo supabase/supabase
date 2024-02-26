@@ -26,6 +26,8 @@ import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useFlag } from 'hooks'
 import { pluckObjectFields } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 import { IPv4DeprecationNotice } from '../IPv4DeprecationNotice'
 import { UsePoolerCheckbox } from '../UsePoolerCheckbox'
 import {
@@ -51,15 +53,14 @@ interface DatabaseConnectionStringProps {
 
 export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStringProps) => {
   const router = useRouter()
-  const { project: projectDetails, isLoading: isProjectLoading } = useProjectContext()
-  const { ref: projectRef, connectionString } = useParams()
   const telemetryProps = useTelemetryProps()
+  const { ref: projectRef, connectionString } = useParams()
+  const snap = useDatabaseSettingsStateSnapshot()
+  const state = useDatabaseSelectorStateSnapshot()
+  const { project: projectDetails, isLoading: isProjectLoading } = useProjectContext()
   const readReplicasEnabled = useFlag('readReplicas') && projectDetails?.is_read_replicas_enabled
 
   const connectionStringsRef = useRef<HTMLDivElement>(null)
-  // [Joshen] Temp - so that behaviour for is similar to usePoolerCheckbox where the state is not synced with Connection Params
-  const [selectedDatabaseId, setSelectedDatabaseId] = useState(projectRef)
-  const [usePoolerConnection, setUsePoolerConnection] = useState(true)
   const [poolingMode, setPoolingMode] = useState<'transaction' | 'session' | 'statement'>('session')
   const [selectedTab, setSelectedTab] = useState<
     'uri' | 'psql' | 'golang' | 'jdbc' | 'dotnet' | 'nodejs' | 'php' | 'python'
@@ -69,7 +70,7 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
     projectRef,
   })
   const poolingConfiguration = readReplicasEnabled
-    ? poolingInfo?.find((x) => x.identifier === selectedDatabaseId)
+    ? poolingInfo?.find((x) => x.identifier === state.selectedDatabaseId)
     : poolingInfo?.find((x) => x.database_type === 'PRIMARY')
 
   const {
@@ -93,7 +94,9 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
   const isError = readReplicasEnabled ? isErrorReadReplicas : isErrorProjectSettings
   const isSuccess = readReplicasEnabled ? isSuccessReadReplicas : isSuccessProjectSettings
 
-  const selectedDatabase = (databases ?? []).find((db) => db.identifier === selectedDatabaseId)
+  const selectedDatabase = (databases ?? []).find(
+    (db) => db.identifier === state.selectedDatabaseId
+  )
 
   const { project } = data ?? {}
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
@@ -123,7 +126,7 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
     isSuccessPoolingInfo && poolingConfiguration !== undefined
       ? getConnectionStrings(connectionInfo, poolingConfiguration, {
           projectRef,
-          usePoolerConnection,
+          usePoolerConnection: snap.usePoolerConnection,
         })
       : { uri: '', psql: '', golang: '', jdbc: '', dotnet: '', nodejs: '', php: '', python: '' }
   const poolerTld =
@@ -134,12 +137,12 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
     isSuccessPoolingInfo && poolingConfiguration !== undefined
       ? constructConnStringSyntax(poolingConfiguration?.connectionString, {
           selectedTab,
-          usePoolerConnection,
+          usePoolerConnection: snap.usePoolerConnection,
           ref: projectRef as string,
           cloudProvider: isProjectLoading ? '' : project?.cloud_provider || '',
           region: isProjectLoading ? '' : project?.region || '',
-          tld: usePoolerConnection ? poolerTld : connectionTld,
-          portNumber: usePoolerConnection
+          tld: snap.usePoolerConnection ? poolerTld : connectionTld,
+          portNumber: snap.usePoolerConnection
             ? poolingMode === 'transaction'
               ? poolingConfiguration?.db_port.toString()
               : '5432'
@@ -153,7 +156,7 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
       connectionString !== undefined &&
       connectionStringsRef.current !== undefined
     ) {
-      setSelectedDatabaseId(connectionString)
+      state.setSelectedDatabaseId(connectionString)
       connectionStringsRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' })
     }
   }, [connectionString])
@@ -195,12 +198,7 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
                   appearance === 'minimal' ? 'absolute -top-1 right-0' : ''
                 )}
               >
-                {readReplicasEnabled && (
-                  <DatabaseSelector
-                    selectedId={selectedDatabaseId}
-                    setSelectedId={setSelectedDatabaseId}
-                  />
-                )}
+                {readReplicasEnabled && <DatabaseSelector />}
                 <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                   <a href="https://supabase.com/docs/guides/database/connecting-to-postgres">
                     Documentation
@@ -233,12 +231,12 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
             <div className="flex flex-col gap-y-4 pt-2">
               <UsePoolerCheckbox
                 id="connection-string"
-                checked={usePoolerConnection}
+                checked={snap.usePoolerConnection}
                 poolingMode={poolingMode}
-                onCheckedChange={setUsePoolerConnection}
+                onCheckedChange={snap.setUsePoolerConnection}
                 onSelectPoolingMode={setPoolingMode}
               />
-              {!usePoolerConnection && <IPv4DeprecationNotice />}
+              {!snap.usePoolerConnection && <IPv4DeprecationNotice />}
               <Input
                 copy
                 readOnly
@@ -275,7 +273,7 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
                   <div className="text-foreground-light">
                     <p className="text-xs">
                       You can use the following URI format to switch to a different database or user
-                      {usePoolerConnection ? ' when using connection pooling' : ''}.
+                      {snap.usePoolerConnection ? ' when using connection pooling' : ''}.
                     </p>
                     <p className="text-sm font-mono tracking-tight text-foreground-lighter">
                       {poolerConnStringSyntax.map((x, idx) => {
