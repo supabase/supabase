@@ -1,20 +1,7 @@
 extends: existence
-message: "Write all ordinal numbers ('%s') with numerals. For example: 1st, 2nd, 3rdin text."
+message: "Spell out all ordinal numbers ('%s') in text."
 link: 'https://developers.google.com/style/numbers'
 level: error
 nonword: true
 tokens:
-  - first
-  - second
-  - third
-  - fourth
-  - fifth
-  - sixth
-  - seventh
-  - eighth
-  - ninth
-  - tenth
-  - hundredth
-  - thousandth
-  - millionth
-  - billionth
+  - \d+(?:st|nd|rd|th)

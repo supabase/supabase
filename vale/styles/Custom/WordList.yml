@@ -12,6 +12,7 @@ swap:
   '(?:e-mail|Email|E-mail)': email
   '(?:file ?path|path ?name)': path
   '(?:kill|terminate|abort)': stop|exit|cancel|end
+  '(?:Nginx|nginx)': NGINX
   '(?:OAuth ?2|Oauth)': OAuth 2.0
   '(?:ok|Okay)': OK|okay
   '(?:WiFi|wifi)': Wi-Fi
@@ -67,7 +68,6 @@ swap:
   k8s: Kubernetes
   long press: touch & hold
   network IP address: internal IP address
-  nginx: NGINX
   omnibox: address bar
   open-source: open source
   overview screen: recents screen
@@ -75,9 +75,10 @@ swap:
   serverside: server-side
   SHA1: SHA-1|HAS-SHA1
   sign into: sign in to
+  sign-ins?: signin(s) (noun) or sign in (verb)
   sign-?on: single sign-on
-  sign-outs?: signout(s)
-  sign-ups?: signup(s)
+  sign-outs?: signout(s) (noun) or sign out (verb)
+  sign-ups?: signup(s) (noun) or sign up (verb)
   static IP address: static external IP address
   stylesheet: style sheet
   synch: sync
