@@ -569,7 +569,9 @@ export const load:LayoutLoad = async ({ fetch, data, depends }) => {
     $: ({ supabase } = data);
 
     onMount(async () => {
-        supabase.auth.onAuthStateChange((event, _session) => {
+	const {
+	  data: { subscription }
+	} = supabase.auth.onAuthStateChange((event, _session) => {
             invalidate('supabase:auth');
         });
         return () => subscription.unsubscribe();
