@@ -22,6 +22,7 @@ import {
   IconSearch,
   IconSettings,
   IconUser,
+  Separator,
   Theme,
   themes,
   useCommandMenu,
@@ -39,6 +40,7 @@ import {
   generateToolRoutes,
 } from './NavigationBar.utils'
 import NavigationIconButton from './NavigationIconButton'
+import { useRef, useState } from 'react'
 
 const NavigationBar = () => {
   const os = detectOS()
@@ -47,6 +49,7 @@ const NavigationBar = () => {
   const { theme, setTheme } = useTheme()
   const { ref: projectRef } = useParams()
   const { setIsOpen } = useCommandMenu()
+  const [navOpen, setNavOpenState] = useState<boolean>(false)
 
   const { project } = useProjectContext()
   const navLayoutV2 = useFlag('navigationLayoutV2')
@@ -72,23 +75,31 @@ const NavigationBar = () => {
     storage: storageEnabled,
     realtime: realtimeEnabled,
   })
+
   const otherRoutes = generateOtherRoutes(projectRef, project)
 
   return (
-    <div
-      data-state="collapsed"
+    <nav
+      data-state={navOpen ? 'expanded' : 'collapsed'}
       className={[
-        'hide-scrollbar flex w-14 flex-col justify-between p-2 overflow-y-auto',
+        'transition-width duration-300',
+        'w-14 data-[state=expanded]:w-[16rem]',
+        'hide-scrollbar flex flex-col justify-between overflow-y-auto',
         'border-r bg-studio border-default',
+        'group',
       ].join(' ')}
+      onMouseEnter={() => {
+        setNavOpenState(true)
+      }}
+      onMouseLeave={() => setNavOpenState(false)}
     >
-      <ul className="flex flex-col gap-2">
+      <ul className="flex flex-col gap-1 justify-start px-2">
         {(!navLayoutV2 || !IS_PLATFORM) && (
-          <Link href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`} className="block">
+          <Link href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`} className="mt-2 mx-2">
             <img
               src={`${router.basePath}/img/supabase-logo.svg`}
               alt="Supabase"
-              className="mx-auto h-[40px] w-6 cursor-pointer rounded"
+              className="h-[40px] w-6 cursor-pointer rounded"
             />
           </Link>
         )}
@@ -101,7 +112,7 @@ const NavigationBar = () => {
             link: `/project/${projectRef}`,
           }}
         />
-        <div className="bg-border h-px w-full" />
+        <Separator />
         {toolRoutes.map((route) => (
           <NavigationIconButton
             key={route.key}
@@ -110,7 +121,6 @@ const NavigationBar = () => {
           />
         ))}
         <div className="bg-border h-px w-full"></div>
-
         {productRoutes.map((route) => (
           <NavigationIconButton
             key={route.key}
@@ -118,7 +128,7 @@ const NavigationBar = () => {
             isActive={activeRoute === route.key}
           />
         ))}
-        <div className="h-px w-full bg-border"></div>
+        <Separator />
         {otherRoutes.map((route) => {
           if (route.key === 'api' && isNewAPIDocsEnabled) {
             return (
@@ -252,7 +262,7 @@ const NavigationBar = () => {
           </DropdownMenu>
         </ul>
       )}
-    </div>
+    </nav>
   )
 }
 
