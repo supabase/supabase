@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Button, IconArrowUpRight } from 'ui'
+import { Badge, Button, IconArrowUpRight } from 'ui'
 import { useBreakpoint } from 'common'
 import Panel from './Panel'
 import { useEffect, useState } from 'react'
@@ -87,7 +87,7 @@ function ExampleCard(props: any) {
         </div>
         <div>
           <div className="flex flex-col justify-between p-5 pt-0">
-            <div className="flex items-stretch gap-2">
+            <div className="flex justify-between items-stretch gap-2">
               {props.repo_url && (
                 <Button
                   size="tiny"
@@ -103,6 +103,7 @@ function ExampleCard(props: any) {
                   View Template
                 </Button>
               )}
+              {props.archive && <Badge color="yellow">Archived Repo</Badge>}
             </div>
           </div>
         </div>

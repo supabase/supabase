@@ -1,16 +1,17 @@
 import { BASE_PATH } from 'lib/constants'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
-import { IconChevronRight } from 'ui'
+import { Badge, IconChevronRight } from 'ui'
 
 interface ExampleProjectProps {
   framework: string
   title: string
   description: string
   url: string
+  archive: boolean
 }
 
-const ExampleProject = ({ framework, title, description, url }: ExampleProjectProps) => {
+const ExampleProject = ({ framework, title, description, url, archive }: ExampleProjectProps) => {
   const { resolvedTheme } = useTheme()
 
   return (
@@ -41,6 +42,7 @@ const ExampleProject = ({ framework, title, description, url }: ExampleProjectPr
         <div className="w-4/5 space-y-2">
           <h5 className="text-foreground">{title}</h5>
           <p className="text-sm text-foreground-light">{description}</p>
+          {archive && <Badge color="yellow">Archived Repo</Badge>}
         </div>
         <div
           className="
