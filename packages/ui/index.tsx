@@ -81,6 +81,9 @@ export * from './src/components/ThemeProvider/prefixedThemes'
 
 // shadcn
 export * from './src/components/shadcn/ui/dropdown-menu'
+export * from './src/components/shadcn/ui/use-toast'
+export * from './src/components/shadcn/ui/toast'
+export * from './src/components/shadcn/ui/toaster'
 
 export {
   Command as Command_Shadcn_,
@@ -205,6 +208,8 @@ export {
 export { ScrollArea, ScrollBar } from './src/components/shadcn/ui/scroll-area'
 
 export { Separator } from './src/components/shadcn/ui/separator'
+
+export * from './src/components/shadcn/ui/resizable'
 
 // links
 

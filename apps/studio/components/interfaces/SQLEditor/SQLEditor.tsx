@@ -4,7 +4,6 @@ import { AnimatePresence, motion } from 'framer-motion'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
-import Split from 'react-split'
 import { format } from 'sql-formatter'
 
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
@@ -20,7 +19,6 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { isError } from 'data/utils/error-check'
 import {
   useFlag,
-  useLocalStorage,
   useLocalStorageQuery,
   useSelectedOrganization,
   useSelectedProject,
@@ -50,6 +48,9 @@ import {
   IconSettings,
   IconX,
   Input_Shadcn_,
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
   cn,
 } from 'ui'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
@@ -178,13 +179,6 @@ const SQLEditor = () => {
 
   const isDiffOpen = !!sqlDiff
 
-  const [savedSplitSize, setSavedSplitSize] = useLocalStorage(
-    LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE,
-    `[50, 50]`
-  )
-
-  const splitSize = savedSplitSize ? JSON.parse(savedSplitSize) : undefined
-
   const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess(data) {
       if (id) snap.addResult(id, data.result)
@@ -230,19 +224,9 @@ const SQLEditor = () => {
     },
   })
 
-  const minSize = 44
   const snippet = id ? snap.snippets[id] : null
-  const snapOffset = 50
 
   const isLoading = urlId === 'new' ? false : !(id && ref && snap.loaded[ref])
-
-  const onDragEnd = useCallback(
-    (sizes: number[]) => {
-      if (id) snap.setSplitSizes(id, sizes)
-      setSavedSplitSize(JSON.stringify(sizes))
-    },
-    [id]
-  )
 
   const editorRef = useRef<IStandaloneCodeEditor | null>(null)
   const monacoRef = useRef<Monaco | null>(null)
@@ -866,19 +850,12 @@ const SQLEditor = () => {
             </motion.div>
           </AISchemaSuggestionPopover>
         )}
-        <Split
-          style={{ height: '100%' }}
+        <ResizablePanelGroup
+          className="h-full"
           direction="vertical"
-          gutterSize={2}
-          sizes={
-            (splitSize ? splitSize : (snippet?.splitSizes as number[] | undefined)) ?? [50, 50]
-          }
-          minSize={minSize}
-          snapOffset={snapOffset}
-          expandToMin={true}
-          onDragEnd={onDragEnd}
+          autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE}
         >
-          <div className="flex-grow overflow-y-auto border-b">
+          <ResizablePanel collapsible collapsedSize={10} minSize={20}>
             {!isAiOpen && (
               <motion.button
                 layoutId="ask-ai-input-icon"
@@ -1006,8 +983,9 @@ const SQLEditor = () => {
                 </motion.div>
               </>
             )}
-          </div>
-          <div className="flex flex-col">
+          </ResizablePanel>
+          <ResizableHandle withHandle />
+          <ResizablePanel collapsible collapsedSize={10} minSize={20}>
             {isLoading ? (
               <div className="flex h-full w-full items-center justify-center">Loading...</div>
             ) : (
@@ -1020,8 +998,8 @@ const SQLEditor = () => {
                 executeQuery={executeQuery}
               />
             )}
-          </div>
-        </Split>
+          </ResizablePanel>
+        </ResizablePanelGroup>
       </div>
     </SQLEditorContext.Provider>
   )
