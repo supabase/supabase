@@ -7,6 +7,7 @@ import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import {
+  BASE_PATH,
   Button,
   DropdownMenu,
   DropdownMenuContent,
@@ -25,6 +26,7 @@ import {
   IconUser,
   Separator,
   Theme,
+  cn,
   themes,
   useCommandMenu,
 } from 'ui'
@@ -41,6 +43,8 @@ import {
   generateToolRoutes,
 } from './NavigationBar.utils'
 import NavigationIconLink from './NavigationIconLink'
+import { useProfile } from 'lib/profile'
+import SVG from 'react-inlinesvg'
 
 export const ICON_SIZE = 20
 export const ICON_STROKE_WIDTH = 1.5
@@ -52,6 +56,8 @@ const NavigationBar = () => {
   const { theme, setTheme } = useTheme()
   const { ref: projectRef } = useParams()
   const { setIsOpen } = useCommandMenu()
+
+  const { profile } = useProfile()
 
   const [userDropdownOpen, setUserDropdownOpenState] = useState(false)
 
@@ -87,7 +93,8 @@ const NavigationBar = () => {
       data-state={snap.navigationPanelOpen ? 'expanded' : 'collapsed'}
       className={[
         'transition-width duration-200',
-        'w-14 data-[state=expanded]:w-[12rem]',
+        'w-14 data-[state=expanded]:w-[17rem]',
+        'py-2',
         'hide-scrollbar flex flex-col justify-between overflow-y-auto',
         'border-r bg-studio border-default',
         'group',
@@ -101,11 +108,27 @@ const NavigationBar = () => {
     >
       <ul className="flex flex-col gap-1 justify-start px-2">
         {(!navLayoutV2 || !IS_PLATFORM) && (
-          <Link href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`} className="mt-2 mx-2">
+          <Link
+            href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
+            className="mx-2 flex items-center h-[40px]"
+          >
             <img
               src={`${router.basePath}/img/supabase-logo.svg`}
               alt="Supabase"
-              className="h-[40px] w-6 cursor-pointer rounded"
+              className="absolute h-[40px] w-6 cursor-pointer rounded"
+            />
+            <SVG
+              src={`${BASE_PATH}/img/logo/supabase-wordmark.svg`}
+              width={96}
+              className={cn(
+                'absolute fill-foreground',
+                'left-8 group-data-[state=expanded]:left-[3rem]',
+                'opacity-0 group-data-[state=expanded]:opacity-100',
+                'transition-all',
+                'duration-200',
+                'delay-100',
+                'group-data-[state=expanded]:delay-0'
+              )}
             />
           </Link>
         )}
