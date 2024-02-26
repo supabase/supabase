@@ -76,12 +76,13 @@ const NavigationBar = () => {
 
   return (
     <div
+      data-state="collapsed"
       className={[
         'hide-scrollbar flex w-14 flex-col justify-between p-2 overflow-y-auto',
         'border-r bg-studio border-default',
       ].join(' ')}
     >
-      <ul className="flex flex-col space-y-2">
+      <ul className="flex flex-col gap-2">
         {(!navLayoutV2 || !IS_PLATFORM) && (
           <Link href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`} className="block">
             <img
