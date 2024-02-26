@@ -1,9 +1,9 @@
 import Link from 'next/link'
 import React, { PropsWithChildren } from 'react'
-import { IconChevronRight, IconLoader } from 'ui'
+import { IconChevronRight, IconLoader, cn } from 'ui'
 
 interface CardButtonProps {
-  title: string | React.ReactNode
+  title?: string | React.ReactNode
   description?: string
   footer?: React.ReactNode
   url?: string
@@ -14,7 +14,30 @@ interface CardButtonProps {
   icon?: React.ReactNode
   loading?: boolean
   className?: string
+  fixedHeight?: boolean
+  hideChevron?: boolean
 }
+
+// Define separate interfaces for each type of container
+interface LinkContainerProps extends Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'title'> {
+  href: string
+}
+
+interface UrlContainerProps extends Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'title'> {
+  href: string
+}
+
+interface NonLinkContainerProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {}
+
+interface ButtonContainerProps
+  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'title'> {}
+
+// Union of all container props
+type ContainerProps =
+  | LinkContainerProps
+  | UrlContainerProps
+  | NonLinkContainerProps
+  | ButtonContainerProps
 
 const CardButton = ({
   title,
@@ -25,28 +48,43 @@ const CardButton = ({
   linkHref = '',
   imgUrl,
   imgAlt,
-  onClick,
   icon,
   className,
   loading = false,
-}: PropsWithChildren<CardButtonProps>) => {
-  const LinkContainer = ({ children }: { children: React.ReactNode }) => (
-    <Link href={linkHref}>{children}</Link>
-  )
-  const UrlContainer = ({ children }: { children: React.ReactNode }) => <a href={url}>{children}</a>
-  const NonLinkContainer = ({ children }: { children: React.ReactNode }) => <div>{children}</div>
-  const ButtonContainer = ({ children }: { children: React.ReactNode }) => (
-    <button onClick={onClick}>{children}</button>
-  )
+  fixedHeight = true,
+  hideChevron = false,
+  ...props
+}: PropsWithChildren<CardButtonProps & ContainerProps>) => {
+  const isLink = url || linkHref || props.onClick
 
-  const isLink = url || linkHref || onClick
+  let Container: React.ElementType
+  let containerProps: ContainerProps = {}
+
+  if (props.onClick) {
+    Container = 'button'
+    containerProps = props
+  } else if (linkHref) {
+    Container = Link
+    containerProps = {
+      href: linkHref,
+      ...props,
+    }
+  } else if (url) {
+    Container = 'a'
+    containerProps = {
+      href: url,
+      ...props,
+    }
+  } else {
+    Container = 'div'
+    containerProps = props
+  }
 
   let containerClasses = [
-    className,
     'group relative text-left',
     'bg-surface-100',
     'border border-surface',
-    'rounded-md p-5 flex flex-row h-32',
+    'rounded-md p-5 flex flex-row',
     'transition ease-in-out duration-150',
   ]
 
@@ -59,12 +97,16 @@ const CardButton = ({
     ]
   }
 
+  if (fixedHeight) {
+    containerClasses = [...containerClasses, 'h-32']
+  }
+
   const ImageContainer = ({ children }: { children: React.ReactNode }) => {
     return <div className="mr-4 flex flex-col">{children}</div>
   }
 
   const contents = (
-    <div className={containerClasses.join(' ')}>
+    <>
       {imgUrl && (
         <ImageContainer>
           <img
@@ -102,21 +144,23 @@ const CardButton = ({
           group-hover:text-foreground
         "
         >
-          {loading ? <IconLoader className="animate-spin" /> : <IconChevronRight />}
+          {loading ? (
+            <IconLoader className="animate-spin" />
+          ) : !hideChevron ? (
+            <IconChevronRight />
+          ) : (
+            <></>
+          )}
         </div>
       )}
-    </div>
+    </>
   )
 
-  if (onClick) {
-    return <ButtonContainer>{contents}</ButtonContainer>
-  } else if (linkHref) {
-    return <LinkContainer>{contents}</LinkContainer>
-  } else if (url) {
-    return <UrlContainer>{contents}</UrlContainer>
-  } else {
-    return <NonLinkContainer>{contents}</NonLinkContainer>
-  }
+  return (
+    <Container {...containerProps} className={cn(containerClasses, className)}>
+      {contents}
+    </Container>
+  )
 }
 
 export default CardButton
