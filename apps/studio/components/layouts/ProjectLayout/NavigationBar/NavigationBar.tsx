@@ -114,13 +114,7 @@ const NavigationBar = () => {
           route={{
             key: 'HOME',
             label: 'Home',
-            icon: (
-              <Home
-                size={ICON_SIZE}
-                strokeWidth={ICON_STROKE_WIDTH}
-                // size={18} strokeWidth={2}
-              />
-            ),
+            icon: <Home size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: `/project/${projectRef}`,
           }}
         />
