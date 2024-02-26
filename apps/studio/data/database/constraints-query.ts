@@ -61,7 +61,7 @@ export const useTableConstraintsQuery = <TData extends TableConstraintsData = Ta
     {
       enabled: typeof schema !== 'undefined' && typeof table !== 'undefined',
       select(data) {
-        return ((data as any)?.result ?? []).map((constraint: Constraint) => constraint)
+        return (data as any)?.result ?? []
       },
       ...options,
     }
