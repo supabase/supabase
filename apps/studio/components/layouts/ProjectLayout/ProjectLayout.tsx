@@ -23,7 +23,7 @@ import { ProjectContextProvider } from './ProjectContext'
 import ProjectPausedState from './ProjectPausedState'
 import RestoringState from './RestoringState'
 import UpgradingState from './UpgradingState'
-import { ResizableHandle_Shadcn_, ResizablePanelGroup_Shadcn_, ResizablePanel_Shadcn_ } from 'ui'
+import { ResizableHandle, ResizablePanelGroup, ResizablePanel } from 'ui'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -106,9 +106,9 @@ const ProjectLayout = ({
           {/* Left-most navigation side bar to access products */}
           {!hideIconBar && <NavigationBar />}
           {/* Product menu bar */}
-          <ResizablePanelGroup_Shadcn_ className="flex h-full" direction="horizontal">
+          <ResizablePanelGroup className="flex h-full" direction="horizontal">
             {!showPausedState && (
-              <ResizablePanel_Shadcn_ className="min-w-64 max-w-[32rem]" defaultSize={25}>
+              <ResizablePanel className="min-w-64 max-w-[32rem]" defaultSize={25}>
                 <MenuBarWrapper
                   isLoading={isLoading}
                   isBlocking={isBlocking}
@@ -116,10 +116,10 @@ const ProjectLayout = ({
                 >
                   <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
                 </MenuBarWrapper>
-              </ResizablePanel_Shadcn_>
+              </ResizablePanel>
             )}
-            <ResizableHandle_Shadcn_ withHandle />
-            <ResizablePanel_Shadcn_ className="h-full">
+            <ResizableHandle withHandle />
+            <ResizablePanel className="h-full">
               <main className="h-full flex flex-col flex-1 w-full overflow-x-hidden">
                 {!navLayoutV2 && !hideHeader && IS_PLATFORM && <LayoutHeader />}
                 {showPausedState ? (
@@ -135,8 +135,8 @@ const ProjectLayout = ({
                   </ContentWrapper>
                 )}
               </main>
-            </ResizablePanel_Shadcn_>
-          </ResizablePanelGroup_Shadcn_>
+            </ResizablePanel>
+          </ResizablePanelGroup>
         </div>
 
         <EnableBranchingModal />
