@@ -1,4 +1,5 @@
 import { Monaco } from '@monaco-editor/react'
+import { useChat } from 'ai/react'
 import { useParams, useTelemetryProps } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import dynamic from 'next/dynamic'
@@ -29,8 +30,14 @@ import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useFormatQueryMutation } from 'data/sql/format-sql-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { isError } from 'data/utils/error-check'
-import { useLocalStorageQuery, useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
+import {
+  useFlag,
+  useLocalStorageQuery,
+  useSelectedOrganization,
+  useSelectedProject,
+  useStore,
+} from 'hooks'
+import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
@@ -90,6 +97,8 @@ const SQLEditor = () => {
   const appSnap = useAppStateSnapshot()
   const snap = useSqlEditorStateSnapshot()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
+
+  const isAIConversational = useFlag('sqlEditorConversationalAi')
 
   const { mutate: formatQuery } = useFormatQueryMutation()
   const { mutateAsync: generateSql, isLoading: isGenerateSqlLoading } = useSqlGenerateMutation()
@@ -160,6 +169,32 @@ const SQLEditor = () => {
 
   const isDiffOpen = !!sqlDiff
 
+  const editorRef = useRef<IStandaloneCodeEditor | null>(null)
+  const monacoRef = useRef<Monaco | null>(null)
+  const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
+
+  const {
+    messages: chatMessages,
+    append,
+    isLoading: isLoadingChat,
+  } = useChat({
+    api: `${BASE_PATH}/api/ai/sql/generate-v2`,
+    body: {
+      existingSql: editorRef.current?.getValue(),
+      entityDefinitions: isOptedInToAI ? entityDefinitions : undefined,
+    },
+  })
+
+  const messages = useMemo(() => {
+    const merged = [...chatMessages.map((m) => ({ ...m, isDebug: false }))]
+
+    return merged.sort(
+      (a, b) =>
+        (a.createdAt?.getTime() ?? 0) - (b.createdAt?.getTime() ?? 0) ||
+        a.role.localeCompare(b.role)
+    )
+  }, [chatMessages])
+
   const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess(data) {
       if (id) snap.addResult(id, data.result)
@@ -208,10 +243,6 @@ const SQLEditor = () => {
   const snippet = id ? snap.snippets[id] : null
 
   const isLoading = urlId === 'new' ? false : !(id && ref && snap.loaded[ref])
-
-  const editorRef = useRef<IStandaloneCodeEditor | null>(null)
-  const monacoRef = useRef<Monaco | null>(null)
-  const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
 
   /**
    * Sets the snippet title using AI.
