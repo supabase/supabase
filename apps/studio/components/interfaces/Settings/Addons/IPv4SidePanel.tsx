@@ -148,9 +148,11 @@ const IPv4SidePanel = () => {
           <p className="text-sm">
             Direct connections to the database only work if your client is able to resolve IPv6
             addresses. Enabling the dedicated IPv4 add-on allows you to directly connect to your
-            database via a IPv4 address. If you are connecting via our connection pooler, you do not
-            need this add-on as our pooler resolves to IPv4 addresses. You can check your connection
-            info in your{' '}
+            database via a IPv4 address.
+          </p>
+          <p className="text-sm">
+            If you are connecting via our connection pooler, you do not need this add-on as our
+            pooler resolves to IPv4 addresses. You can check your connection info in your{' '}
             <Link href={`/project/${projectRef}/settings/database`} className="text-brand">
               project database settings
             </Link>
