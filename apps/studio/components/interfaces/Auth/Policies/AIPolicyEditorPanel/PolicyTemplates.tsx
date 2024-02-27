@@ -1,31 +1,21 @@
-import { useState } from 'react'
-import {
-  Badge,
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-  IconSearch,
-  Input,
-  ScrollArea,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-  cn,
-} from 'ui'
-
-import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
-import { getGeneralPolicyTemplates } from '../PolicyEditorModal/PolicyEditorModal.constants'
-import NoSearchResults from 'components/ui/NoSearchResults'
-import { Markdown } from 'components/interfaces/Markdown'
-import CopyButton from 'components/ui/CopyButton'
 import { Search } from 'lucide-react'
+import { useState } from 'react'
+import { Badge, HoverCard, HoverCardContent, HoverCardTrigger, Input, cn } from 'ui'
+
+import { Markdown } from 'components/interfaces/Markdown'
+import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 import CardButton from 'components/ui/CardButton'
+import CopyButton from 'components/ui/CopyButton'
+import NoSearchResults from 'components/ui/NoSearchResults'
+import { getGeneralPolicyTemplates } from '../PolicyEditorModal/PolicyEditorModal.constants'
+import { PolicyTemplate } from '../PolicyTemplates/PolicyTemplates.constants'
 
 interface PolicyTemplatesProps {
-  onSelectTemplate: (template: any) => void
+  selectedTemplate?: string
+  onSelectTemplate: (template: { id: string; content: string }) => void
 }
 
-export const PolicyTemplates = ({ onSelectTemplate }: PolicyTemplatesProps) => {
+export const PolicyTemplates = ({ selectedTemplate, onSelectTemplate }: PolicyTemplatesProps) => {
   const [search, setSearch] = useState('')
   const templates = getGeneralPolicyTemplates('schema_name', 'table_name')
   const filteredTemplates =
@@ -63,8 +53,14 @@ export const PolicyTemplates = ({ onSelectTemplate }: PolicyTemplatesProps) => {
                 <CardButton
                   title={template.name}
                   titleClass="text-sm"
+                  className={cn(
+                    'transition',
+                    template.id === selectedTemplate
+                      ? '!border-stronger bg-surface-200 hover:!border-stronger'
+                      : ''
+                  )}
                   key={template.id}
-                  onClick={() => onSelectTemplate(template.statement)}
+                  onClick={() => onSelectTemplate({ id: template.id, content: template.statement })}
                   hideChevron
                   fixedHeight={false}
                   icon={

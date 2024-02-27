@@ -91,15 +91,16 @@ export const AIPolicyEditorPanel = memo(function ({
   const isOptedInToAI = selectedOrganization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
 
   const [error, setError] = useState<QueryResponseError>()
-  const [errorPanelOpen, setErrorPanelOpen] = useState(true)
-  const [showDetails, setShowDetails] = useState(false)
+  const [errorPanelOpen, setErrorPanelOpen] = useState<boolean>(true)
+  const [showDetails, setShowDetails] = useState<boolean>(false)
+  const [selectedDiff, setSelectedDiff] = useState<string>()
   // [Joshen] Separate state here as there's a delay between submitting and the API updating the loading status
   const [debugThread, setDebugThread] = useState<MessageWithDebug[]>([])
-  const [assistantVisible, setAssistantPanel] = useState(false)
-  const [isAssistantChatInputEmpty, setIsAssistantChatInputEmpty] = useState(true)
+  const [assistantVisible, setAssistantPanel] = useState<boolean>(false)
+  const [isAssistantChatInputEmpty, setIsAssistantChatInputEmpty] = useState<boolean>(true)
   const [incomingChange, setIncomingChange] = useState<string | undefined>(undefined)
   // used for confirmation when closing the panel with unsaved changes
-  const [isClosingPolicyEditorPanel, setIsClosingPolicyEditorPanel] = useState(false)
+  const [isClosingPolicyEditorPanel, setIsClosingPolicyEditorPanel] = useState<boolean>(false)
 
   // Customers on HIPAA plans should not have access to Supabase AI
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
@@ -245,7 +246,7 @@ export const AIPolicyEditorPanel = memo(function ({
     setDebugThread(cleanedMessages)
   }
 
-  const updateEditorWithCheckForDiff = (value: string) => {
+  const updateEditorWithCheckForDiff = (value: { id: string; content: string }) => {
     const editorModel = editorRef.current?.getModel()
     if (!editorModel) return
 
@@ -253,12 +254,13 @@ export const AIPolicyEditorPanel = memo(function ({
     if (existingValue.length === 0) {
       editorRef.current?.executeEdits('apply-template', [
         {
-          text: value,
+          text: value.content,
           range: editorModel.getFullModelRange(),
         },
       ])
     } else {
-      setIncomingChange(value)
+      setSelectedDiff(value.id)
+      setIncomingChange(value.content)
     }
   }
 
@@ -274,6 +276,7 @@ export const AIPolicyEditorPanel = memo(function ({
       setChatId(uuidv4())
       setShowDetails(false)
       setView('entry')
+      setSelectedDiff(undefined)
     }
   }, [visible])
 
@@ -370,6 +373,7 @@ export const AIPolicyEditorPanel = memo(function ({
                           type="default"
                           onClick={() => {
                             setIncomingChange(undefined)
+                            setSelectedDiff(undefined)
                             Telemetry.sendEvent(
                               {
                                 category: 'rls_editor',
@@ -387,6 +391,7 @@ export const AIPolicyEditorPanel = memo(function ({
                           type="primary"
                           onClick={() => {
                             acceptChange()
+                            setSelectedDiff(undefined)
                             Telemetry.sendEvent(
                               {
                                 category: 'rls_editor',
@@ -507,7 +512,10 @@ export const AIPolicyEditorPanel = memo(function ({
                   )}
                 >
                   <ScrollArea className="h-full w-full">
-                    <PolicyTemplates onSelectTemplate={updateEditorWithCheckForDiff} />
+                    <PolicyTemplates
+                      selectedTemplate={selectedDiff}
+                      onSelectTemplate={updateEditorWithCheckForDiff}
+                    />
                   </ScrollArea>
                 </TabsContent_Shadcn_>
                 <TabsContent_Shadcn_

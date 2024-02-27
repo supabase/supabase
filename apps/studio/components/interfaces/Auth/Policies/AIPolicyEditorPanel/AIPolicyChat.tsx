@@ -27,7 +27,7 @@ interface AIPolicyChatProps {
   messages: MessageWithDebug[]
   loading: boolean
   onSubmit: (s: string) => void
-  onDiff: (s: string) => void
+  onDiff: (message: { id: string; content: string }) => void
   onChange: (value: boolean) => void
 }
 
@@ -107,7 +107,7 @@ export const AIPolicyChat = ({
             content={m.content}
             createdAt={new Date(m.createdAt || new Date()).getTime()}
             isDebug={m.isDebug}
-            onDiff={onDiff}
+            onDiff={(content) => onDiff({ id: m.id, content })}
           />
         ))}
 
