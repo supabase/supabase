@@ -14,7 +14,6 @@ import { PostgresTable } from '@/lib/types'
 import { parseTables } from '@/lib/utils'
 import { getGraphDataFromTables } from './SchemaFlow.utils'
 import { TableNode } from 'ui-patterns'
-// import TableNode from './TableNode'
 
 interface SchemaGraphProps {
   tables?: PostgresTable[]
