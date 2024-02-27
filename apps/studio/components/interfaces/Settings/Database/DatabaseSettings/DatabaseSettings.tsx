@@ -1,6 +1,13 @@
 import { useParams, useTelemetryProps } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  IconAlertCircle,
+  Input,
+} from 'ui'
 
 import AlertError from 'components/ui/AlertError'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
@@ -9,18 +16,11 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useFlag, useSelectedProject } from 'hooks'
+import { useSelectedProject } from 'hooks'
 import { pluckObjectFields } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  IconAlertCircle,
-  Input,
-} from 'ui'
 import { IPv4DeprecationNotice } from '../IPv4DeprecationNotice'
 import { UsePoolerCheckbox } from '../UsePoolerCheckbox'
 import ResetDbPassword from './ResetDbPassword'
@@ -33,8 +33,7 @@ const DatabaseSettings = () => {
   const state = useDatabaseSelectorStateSnapshot()
   const selectedProject = useSelectedProject()
 
-  const readReplicasEnabled = useFlag('readReplicas')
-  const showReadReplicasUI = readReplicasEnabled && selectedProject?.is_read_replicas_enabled
+  const showReadReplicasUI = selectedProject?.is_read_replicas_enabled
   const connectionStringsRef = useRef<HTMLDivElement>(null)
   const [poolingMode, setPoolingMode] = useState<'transaction' | 'session' | 'statement'>('session')
 

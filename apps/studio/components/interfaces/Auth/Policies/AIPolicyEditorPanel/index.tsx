@@ -130,9 +130,6 @@ export const AIPolicyEditorPanel = memo(function ({
 
   const { mutateAsync: debugSql, isLoading: isDebugSqlLoading } = useSqlDebugMutation()
 
-  const errorLines =
-    error?.formattedError.split('\n').filter((x: string) => x.length > 0).length ?? 0
-
   const onExecuteSQL = useCallback(() => {
     // clean up the sql before sending
     const policy = editorRef.current?.getValue().replaceAll('  ', ' ')
