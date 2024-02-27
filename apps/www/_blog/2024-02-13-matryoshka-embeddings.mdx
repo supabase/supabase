@@ -387,12 +387,12 @@ create or replace function match_documents_adaptive(
   match_count int
 )
 returns setof documents
-language sql
+language plpgsql
 as $$
 begin
   with shortlist as (
     select *
-    from documents,
+    from documents
     order by
       sub_vector(embedding, 512)::vector(512) <#> (
         select sub_vector(query_embedding, 512)::vector(512)
