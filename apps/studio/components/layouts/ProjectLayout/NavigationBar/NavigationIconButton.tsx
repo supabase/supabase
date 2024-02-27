@@ -43,15 +43,15 @@ const NavigationIconButton = forwardRef<
       </span>
       {rightText && (
         <div
-          className={[
+          className={cn(
             'absolute',
             'items-center',
             'flex',
             'right-2',
             'opacity-0',
             'group-data-[state=expanded]:opacity-100 ',
-            'transition-all ',
-          ].join(' ')}
+            'transition-all '
+          )}
         >
           {rightText}
         </div>
