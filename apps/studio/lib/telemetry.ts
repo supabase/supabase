@@ -1,13 +1,16 @@
 import { post } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { User } from 'types'
 import { NextRouter } from 'next/router'
+import { User } from 'types'
 
 export interface TelemetryProps {
   screenResolution?: string
   language: string
 }
 
+/**
+ * Sends a telemetry event to Logflare for tracking by the product team.
+ */
 const sendEvent = (
   event: {
     category: string
@@ -70,6 +73,10 @@ const sendIdentify = (user: User, gaProps?: TelemetryProps) => {
   })
 }
 
+/**
+ * Sends data to Mixpanel.
+ * @deprecated use sendEvent instead.
+ */
 const sendActivity = (
   event: {
     activity: string
@@ -106,8 +113,10 @@ const sendActivity = (
   return post(`${API_URL}/telemetry/activity`, properties)
 }
 
-export default {
+const Telemetry = {
   sendEvent,
   sendIdentify,
   sendActivity,
 }
+
+export default Telemetry
