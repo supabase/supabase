@@ -15,7 +15,7 @@ const EnterpriseCard = ({ plan, isCurrentPlan, billingViaPartner }: EnterpriseCa
     <div
       key={plan.id}
       className={clsx(
-        'grid grid-cols-1 md:grid-cols-3 border rounded-md bg-background',
+        'grid grid-cols-1 md:grid-cols-3 border rounded-md bg-studio',
         'py-4 col-span-12 justify-between gap-x-8'
       )}
     >

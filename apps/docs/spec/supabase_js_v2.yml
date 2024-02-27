@@ -825,7 +825,7 @@ functions:
     notes: |
       - This method fetches the user object from the database instead of local session.
       - This method is useful for checking if the user is authorized because it validates the user's access token JWT on the server.
-      - Should be used only when you require the most current user data. For faster results, `getSession().session.user` is recommended.
+      - Should always be used when checking for user authorization on the server. On the client, you can instead use `getSession().session.user` for faster results. `getSession` is insecure on the server.
     examples:
       - id: get-the-logged-in-user-with-the-current-existing-session
         name: Get the logged in user with the current existing session
@@ -1792,6 +1792,16 @@ functions:
               from:sender_id(name),
               to:receiver_id(name)
             `)
+          
+          // To infer types, use the name of the table (in this case `users`) and
+          // the name of the foreign key constraint.
+          const { data, error } = await supabase
+            .from('messages')
+            .select(`
+              content,
+              from:users!messages_sender_id_fkey(name),
+              to:users!messages_receiver_id_fkey(name)
+            `)
           ```
         data:
           sql: |
@@ -2617,9 +2627,7 @@ functions:
           }
           ```
         description: |
-          Postgres functions that return tables can also be combined with
-          [Filters](/docs/reference/javascript/using-filters) and
-          [Modifiers](/docs/reference/javascript/using-modifiers).
+          Postgres functions that return tables can also be combined with [Filters](/docs/reference/javascript/using-filters) and [Modifiers](/docs/reference/javascript/using-modifiers).
         hideCodeBlock: true
 
   - id: using-filters

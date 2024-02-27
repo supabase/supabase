@@ -2,7 +2,6 @@ import { ReactNode, useEffect, useRef, useState } from 'react'
 import { toast } from 'react-hot-toast'
 import {
   Button,
-  cn,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
@@ -13,6 +12,7 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
+  cn,
 } from 'ui'
 
 import ShimmerLine from 'components/ui/ShimmerLine'
@@ -122,6 +122,7 @@ const ProjectLinker = ({
       connection: {
         foreign_project_id: selectedForeignProject?.id,
         supabase_project_ref: selectedSupabaseProject?.ref,
+        integration_id: '0',
         metadata: {
           ...projectDetails,
         },

@@ -41,7 +41,7 @@ export const GlassPanel = ({
       className={cn(
         'shrink-0',
         showIconBg
-          ? 'bg-brand-300 border border-brand-400 w-8 h-8 flex items-center justify-center rounded'
+          ? 'bg-brand-200 dark:bg-brand-400 border border-brand-300 dark:border-brand-400 w-8 h-8 flex items-center justify-center rounded'
           : ''
       )}
     >

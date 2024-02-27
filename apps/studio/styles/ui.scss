@@ -349,14 +349,6 @@
   scrollbar-width: none; // auto | thin | none | <length>;
 }
 
-.SQLTabContainer {
-  height: calc(100vh - 3rem);
-  min-height: calc(100vh - 3rem);
-  .gutter {
-    cursor: row-resize;
-  }
-}
-
 .radix-tooltip-arrow {
   polygon {
     @apply fill-background-alternative [[data-theme*=dark]_&]:fill-background-alternative;

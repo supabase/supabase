@@ -1,6 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useParams } from 'common'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -23,11 +24,17 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useFlag, useIsFeatureEnabled } from 'hooks'
+import { AWS_REGIONS, FLY_REGIONS } from 'lib/constants'
 import ProjectUpgradeAlert from '../General/Infrastructure/ProjectUpgradeAlert'
 import InstanceConfiguration from './InfrastructureConfiguration/InstanceConfiguration'
+import {
+  AWS_REGIONS_VALUES,
+  FLY_REGIONS_VALUES,
+} from './InfrastructureConfiguration/InstanceConfiguration.constants'
 
 const InfrastructureInfo = () => {
   const { ref } = useParams()
+  const router = useRouter()
   const { project, isLoading } = useProjectContext()
 
   const authEnabled = useIsFeatureEnabled('project_auth:all')
@@ -52,6 +59,15 @@ const InfrastructureInfo = () => {
   const hasReadReplicas = (databases ?? []).length > 1
   const subject = 'Request%20for%20Postgres%20upgrade%20for%20project'
   const message = `Upgrade information:%0A• Manual intervention reason: ${requires_manual_intervention}`
+
+  const [regionKey] =
+    project?.cloud_provider === 'AWS'
+      ? Object.entries(AWS_REGIONS_VALUES).find(([key, region]) => region === project?.region) ?? []
+      : Object.entries(FLY_REGIONS_VALUES).find(([key, region]) => region === project?.region) ?? []
+  const region =
+    project?.cloud_provider === 'AWS'
+      ? AWS_REGIONS[regionKey as keyof typeof AWS_REGIONS]
+      : FLY_REGIONS[regionKey as keyof typeof FLY_REGIONS]
 
   return (
     <>
@@ -88,7 +104,23 @@ const InfrastructureInfo = () => {
               ) : (
                 <>
                   <Input readOnly disabled value={project?.cloud_provider} label="Cloud provider" />
-                  <Input readOnly disabled value={project?.region} label="Region" />
+                  <Input
+                    readOnly
+                    disabled
+                    icon={
+                      regionKey !== undefined ? (
+                        <img
+                          alt="region icon"
+                          className="w-5 rounded-sm"
+                          src={`${router.basePath}/img/regions/${regionKey}.svg`}
+                        />
+                      ) : null
+                    }
+                    value={
+                      region !== undefined ? `${region} (${project?.region})` : project?.region
+                    }
+                    label="Region"
+                  />
                 </>
               )}
             </ScaffoldSectionContent>

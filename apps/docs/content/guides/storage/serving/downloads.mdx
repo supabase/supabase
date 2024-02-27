@@ -20,7 +20,9 @@ https://[project_id].supabase.co/storage/v1/object/public/[bucket]/[asset-name]
 You can also use the Supabase SDK `getPublicUrl` to generate this url for you
 
 ```js
-const publicUrl = supabase.storage.from('bucket').getPublicUrl('filePath.jpg')
+const { data } = supabase.storage.from('bucket').getPublicUrl('filePath.jpg')
+
+console.log(data.publicUrl)
 ```
 
 ### Downloading
@@ -43,7 +45,7 @@ You can access them only by:
 You can sign a time-limited URL that you can share to your users by invoking the `createSignedUrl` method on the SDK.
 
 ```js
-const { data, error } = supabase.storage
+const { data, error } = await supabase.storage
   .from('bucket')
   .createSignedUrl('private-document.pdf', 3600)
 

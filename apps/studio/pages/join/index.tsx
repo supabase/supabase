@@ -236,7 +236,7 @@ const JoinOrganizationPage = () => {
   return (
     <div
       className={[
-        'flex h-full min-h-screen bg-background',
+        'flex h-full min-h-screen bg-studio',
         'w-full flex-col place-items-center',
         'items-center justify-center gap-8 px-5',
       ].join(' ')}

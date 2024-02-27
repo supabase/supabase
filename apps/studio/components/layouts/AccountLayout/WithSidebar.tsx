@@ -39,7 +39,7 @@ const WithSidebar = ({
         <div
           id="with-sidebar"
           className={[
-            'h-full bg-background',
+            'h-full bg-studio',
             'hide-scrollbar w-64 overflow-auto border-r border-default',
           ].join(' ')}
         >

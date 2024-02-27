@@ -23,7 +23,12 @@ const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
   }
 
   return (
-    <ProjectLayoutWithAuth product="Table Editor" productMenu={tableEditorMenu} isBlocking={false}>
+    <ProjectLayoutWithAuth
+      product="Table Editor"
+      productMenu={tableEditorMenu}
+      isBlocking={false}
+      resizableSidebar
+    >
       {children}
     </ProjectLayoutWithAuth>
   )

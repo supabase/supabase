@@ -1,8 +1,10 @@
 import { Dispatch, SetStateAction, useEffect } from 'react'
+import toast from 'react-hot-toast'
 
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
+import { IS_PLATFORM } from 'lib/constants'
 import { getRoleImpersonationJWT } from 'lib/role-impersonation'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { RealtimeConfig } from '../useRealtimeMessages'
@@ -24,9 +26,12 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
     ? apiService.serviceApiKey
     : undefined
 
-  const { data: postgrestConfig } = useProjectPostgrestConfigQuery({
-    projectRef: config.projectRef,
-  })
+  const { data: postgrestConfig } = useProjectPostgrestConfigQuery(
+    {
+      projectRef: config.projectRef,
+    },
+    { enabled: IS_PLATFORM }
+  )
   const jwtSecret = postgrestConfig?.jwt_secret
 
   const snap = useRoleImpersonationStateSnapshot()
@@ -42,7 +47,9 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
       snap.role.type === 'postgrest'
     ) {
       token = anonRoleKey
-      bearer = getRoleImpersonationJWT(config.projectRef, jwtSecret, snap.role)
+      getRoleImpersonationJWT(config.projectRef, jwtSecret, snap.role)
+        .then((token) => (bearer = token))
+        .catch((err) => toast.error(`Failed to get JWT for role: ${err.message}`))
     } else {
       token = serviceRoleKey
     }

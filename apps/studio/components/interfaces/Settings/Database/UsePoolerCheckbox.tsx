@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+import { useState } from 'react'
 import {
   Badge,
   Button,
@@ -12,11 +13,13 @@ import {
   Separator,
 } from 'ui'
 
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { usePgBouncerStatus } from 'data/config/pgbouncer-enabled-query'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
-import { useEffect, useState } from 'react'
+import { useFlag } from 'hooks'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 
 interface UsePoolerCheckboxInterface {
@@ -36,12 +39,18 @@ export const UsePoolerCheckbox = ({
 }: UsePoolerCheckboxInterface) => {
   const [open, setOpen] = useState(false)
   const { ref: projectRef } = useParams()
+  const { project } = useProjectContext()
   const snap = useDatabaseSettingsStateSnapshot()
+  const state = useDatabaseSelectorStateSnapshot()
 
   const { data, isLoading, isSuccess } = usePoolingConfigurationQuery({ projectRef })
   const { data: settings, isSuccess: isSuccessSettings } = useProjectSettingsQuery({ projectRef })
   const { data: pgBouncerStatus } = usePgBouncerStatus({ projectRef: projectRef })
 
+  const readReplicasEnabled = useFlag('readReplicas') && project?.is_read_replicas_enabled
+  const poolingConfiguration = readReplicasEnabled
+    ? data?.find((x) => x.identifier === state.selectedDatabaseId)
+    : data?.find((x) => x.database_type === 'PRIMARY')
   const resolvesToIpV6 = settings?.project.db_ip_addr_config === 'ipv6'
 
   const onSelectOption = (value: 'session' | 'transaction') => {
@@ -89,7 +98,7 @@ export const UsePoolerCheckbox = ({
                                 <span>Session mode</span>
                                 {poolingMode === 'session' && <IconCheck className="text-brand" />}
                               </DropdownMenuItem>
-                              {data.pool_mode === 'transaction' && (
+                              {poolingConfiguration?.pool_mode === 'transaction' && (
                                 <DropdownMenuItem
                                   key="session"
                                   className="flex items-center justify-between"
@@ -102,7 +111,7 @@ export const UsePoolerCheckbox = ({
                                 </DropdownMenuItem>
                               )}
 
-                              {data.pool_mode === 'session' && (
+                              {poolingConfiguration?.pool_mode === 'session' && (
                                 <>
                                   <Separator className="my-1" />
                                   <div className="px-2 text-xs flex flex-col gap-y-2">
