@@ -23,7 +23,6 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useFlag } from 'hooks'
 import { pluckObjectFields } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
@@ -58,7 +57,7 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
   const snap = useDatabaseSettingsStateSnapshot()
   const state = useDatabaseSelectorStateSnapshot()
   const { project: projectDetails, isLoading: isProjectLoading } = useProjectContext()
-  const readReplicasEnabled = useFlag('readReplicas') && projectDetails?.is_read_replicas_enabled
+  const readReplicasEnabled = projectDetails?.is_read_replicas_enabled
 
   const connectionStringsRef = useRef<HTMLDivElement>(null)
   const [poolingMode, setPoolingMode] = useState<'transaction' | 'session' | 'statement'>('session')
