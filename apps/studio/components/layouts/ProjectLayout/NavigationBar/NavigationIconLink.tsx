@@ -45,16 +45,12 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
         <span
           aria-hidden={snap.navigationPanelOpen || undefined}
           className={cn(
-            'absolute',
-            'left-7',
-            'group-data-[state=expanded]:left-12',
-            'min-w-[128px]',
-            'text-sm text-foreground-light',
+            'min-w-[128px] text-sm text-foreground-light',
             'group-hover/item:text-foreground',
-            'opacity-0 group-data-[state=expanded]:opacity-100',
-            'transition-all',
             'group-aria-current/item:text-foreground',
-            'delay-100'
+            'absolute left-7 group-data-[state=expanded]:left-12',
+            'opacity-0 group-data-[state=expanded]:opacity-100',
+            'transition-all delay-100'
           )}
         >
           {route.label}

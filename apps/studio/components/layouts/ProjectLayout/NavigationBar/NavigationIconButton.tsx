@@ -25,32 +25,21 @@ const NavigationIconButton = forwardRef<
     >
       <div className="absolute left-2 text-foreground-lighter">{icon}</div>
       <span
-        className=" 
-        absolute
-        left-7
-        group-data-[state=expanded]:left-10
-        w-[10rem]
-        flex flex-col 
-        items-center
-        text-sm 
-        opacity-0
-        group-data-[state=expanded]:opacity-100 
-        transition-all 
-        delay-100              
-    "
+        className={cn(
+          'absolute left-7 group-data-[state=expanded]:left-10',
+          'opacity-0 group-data-[state=expanded]:opacity-100',
+          'w-[10rem] text-sm flex flex-col items-center',
+          'transition-all delay-100'
+        )}
       >
         <span className="w-full text-left text-foreground-light truncate">{props.children}</span>
       </span>
       {rightText && (
         <div
           className={cn(
-            'absolute',
-            'items-center',
-            'flex',
-            'right-2',
-            'opacity-0',
-            'group-data-[state=expanded]:opacity-100 ',
-            'transition-all '
+            'absolute right-2 flex items-center',
+            'opacity-0 transition-all',
+            'group-data-[state=expanded]:opacity-100 '
           )}
         >
           {rightText}
