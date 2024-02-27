@@ -450,7 +450,7 @@ API routes, server layout load and form actions can now access the supabase clie
 
 </Admonition>
 
-```ts hooks.server.ts
+```ts src/hooks.server.ts
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public'
 import { createServerClient } from '@supabase/ssr'
 import type { Handle } from '@sveltejs/kit'
@@ -504,7 +504,7 @@ Page components can get access to the supabase client from the `data` object due
 
 </Admonition>
 
-```ts +layout.ts
+```ts src/routes/+layout.ts
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
 import type { LayoutLoad } from './$types'
 import { createBrowserClient, isBrowser, parse } from '@supabase/ssr'
@@ -540,7 +540,7 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 
 <TabPanel id="layout-server" label="Root Server Layout">
 
-```ts +layout.server.ts
+```ts src/routes/+layout.server.ts
 import type { LayoutServerLoad } from './$types'
 
 export const load: LayoutServerLoad = async ({ locals: { getSession } }) => {
@@ -552,7 +552,29 @@ export const load: LayoutServerLoad = async ({ locals: { getSession } }) => {
 
 </TabPanel>
 
-<TabPanel id="page-component" label="Page Component">
+<TabPanel id="type-definition" label="Locals">
+
+<Admonition type="note">
+
+Add supabase and getSession to the type definition (Typescript only)
+
+</Admonition>
+
+```ts src/app.d.ts
+declare global {
+  declare namespace App {
+    interface Locals {
+        user: UserInfo; // Your type here
+        supabase: SupabaseClient;
+        getSession: () => Promise<Session | null>;
+    }
+  }
+}
+```
+
+</TabPanel>
+
+<TabPanel id="page-component" label="Page Component usage">
 
 ```svelte +page.svelte
 <script>
@@ -568,7 +590,7 @@ export const load: LayoutServerLoad = async ({ locals: { getSession } }) => {
 
 </TabPanel>
 
-<TabPanel id="api-route" label="API route">
+<TabPanel id="api-route" label="API route usage">
 
 ```ts +server.ts
 import { redirect } from '@sveltejs/kit';
@@ -581,7 +603,7 @@ export const GET = async (event) => {
 
 </TabPanel>
 
-<TabPanel id="form-actions" label="Form actions">
+<TabPanel id="form-actions" label="Form actions usage">
 
 ```ts +page.server.ts
 import type { Actions } from './$types'
