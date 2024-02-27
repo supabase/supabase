@@ -21,6 +21,7 @@ FROM pg_roles
 WHERE rolname IN (
   'anon',
   'authenticated',
+  'authenticator',
   'postgres',
   'service_role'
 );
@@ -46,9 +47,13 @@ npx supabase --experimental --project-ref <YOUR PROJECT REF> postgres-config upd
 
 The timeout values were picked as a reasonable default for the majority of use-cases, but can be modified using the [`alter role`](https://www.postgresql.org/docs/current/sql-alterrole.html) statement:
 
+<Admonition type="note" label="Self hosting">
+When updating either the `anon` or `authenticated` role, set the `authenticator` role to the greater timeout value between the two.
+</Admonition>
+
 ```sql
--- For API users
 alter role authenticated set statement_timeout = '15s';
+alter role authenticator set statement_timeout = '15s';
 ```
 
 You can also update the statement timeout for a session:
