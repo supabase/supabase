@@ -1,19 +1,35 @@
-import { useState } from 'react'
-import type { NextPageWithLayout } from 'types'
-import { FormHeader } from 'components/ui/Forms'
-import { AccountLayout } from 'components/layouts'
 import {
   AccessTokenList,
-  NewTokenBanner,
   NewAccessTokenButton,
+  NewTokenBanner,
 } from 'components/interfaces/Account'
+import { AccountLayout } from 'components/layouts'
+import { FormHeader } from 'components/ui/Forms'
 import { NewAccessToken } from 'data/access-tokens/access-tokens-create-mutation'
+import { useState } from 'react'
+import type { NextPageWithLayout } from 'types'
 
+import { IS_PLATFORM } from 'lib/constants'
 import Link from 'next/link'
 import { Alert, Button, IconExternalLink } from 'ui'
 
 const UserAccessTokens: NextPageWithLayout = () => {
   const [newToken, setNewToken] = useState<NewAccessToken | undefined>()
+
+  if (!IS_PLATFORM) {
+    return (
+      <div className="1xl:px-28 mx-auto flex flex-col px-5 pt-6 pb-14 lg:px-16 xl:px-24 2xl:px-32">
+        <div className="flex items-center justify-between">
+          <Alert
+            withIcon
+            className="mb-6 w-full"
+            variant="danger"
+            title="This function is not available for self-hosted environments. It is exclusively available for cloud services!"
+          />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="1xl:px-28 mx-auto flex flex-col px-5 pt-6 pb-14 lg:px-16 xl:px-24 2xl:px-32">
