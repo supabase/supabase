@@ -6,7 +6,7 @@ import { IS_PLATFORM } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { isUndefined } from 'lodash'
-import { FlaskConical } from 'lucide-react'
+import { Command, FlaskConical, Search, Settings } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -24,9 +24,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuSub,
   DropdownMenuTrigger,
-  IconCommand,
-  IconSearch,
-  IconSettings,
   Separator,
   Theme,
   cn,
@@ -184,10 +181,10 @@ const NavigationBar = () => {
               size="tiny"
               onClick={() => setIsOpen(true)}
               type="text"
-              icon={<IconSearch size={ICON_SIZE} strokeWidth={2} />}
+              icon={<Search size={ICON_SIZE} strokeWidth={2} />}
               rightText={
                 <div
-                  className={[
+                  className={cn(
                     'flex items-center gap-1',
                     'h-6',
                     'py-1.5 px-2',
@@ -195,11 +192,11 @@ const NavigationBar = () => {
                     'text-foreground-lighter',
                     'border border-default rounded-md',
                     'shadow-xs shadow-background-surface-100',
-                    'leading-none',
-                  ].join(' ')}
+                    'leading-none'
+                  )}
                 >
-                  {os === 'macos' ? (
-                    <IconCommand size={11.5} strokeWidth={1.5} />
+                  {os === 'macos' || true ? ( // todo: issue with `os` and hydration fail
+                    <Command size={11.5} strokeWidth={1.5} />
                   ) : (
                     <p className="text-xs">CTRL</p>
                   )}
@@ -276,7 +273,7 @@ const NavigationBar = () => {
                   <DropdownMenuSub>{}</DropdownMenuSub>
                   <DropdownMenuItem key="header" className="space-x-2" asChild>
                     <Link href="/account/me">
-                      <IconSettings size={14} strokeWidth={1.5} />
+                      <Settings size={14} strokeWidth={1.5} />
                       <p>Account preferences</p>
                     </Link>
                   </DropdownMenuItem>
