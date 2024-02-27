@@ -524,6 +524,7 @@ export const AIPolicyEditorPanel = memo(function ({
                 >
                   <AIPolicyChat
                     messages={messages}
+                    selectedMessage={selectedDiff}
                     onSubmit={(message) =>
                       append({
                         content: message,

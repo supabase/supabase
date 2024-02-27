@@ -44,7 +44,7 @@ export const AIPolicyPre = ({ onDiff, children, className }: AAIPolicyPreProps) 
         value={formatted}
         language="sql"
         className={cn(
-          '!py-3 !px-3.5 prose dark:prose-dark',
+          '!py-3 !px-3.5 prose dark:prose-dark transition',
           // change the look of the code block. The flex hack is so that the code is wrapping since
           // every word is a separate span
           '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap'
@@ -55,13 +55,13 @@ export const AIPolicyPre = ({ onDiff, children, className }: AAIPolicyPreProps) 
       <div
         className={cn(
           'absolute',
-          'top-4 right-2',
+          'top-0 right-2',
           'bg-surface-300',
           'border border-strong',
           'rounded',
           'h-[28px]',
           'opacity-0 group-hover:opacity-100',
-          'group-hover:top-5',
+          'group-hover:top-2',
           'transition-all'
         )}
       >

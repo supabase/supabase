@@ -15,6 +15,7 @@ interface MessageProps {
   content?: string
   createdAt?: number
   isDebug?: boolean
+  isSelected?: boolean
   onDiff?: (s: string) => void
 }
 
@@ -24,6 +25,7 @@ const Message = memo(function Message({
   content,
   createdAt,
   isDebug,
+  isSelected,
   onDiff = noop,
   children,
 }: PropsWithChildren<MessageProps>) {
@@ -78,7 +80,12 @@ const Message = memo(function Message({
           ...markdownComponents,
           pre: (props: any) => {
             return (
-              <AIPolicyPre onDiff={onDiff} className="pt-3">
+              <AIPolicyPre
+                onDiff={onDiff}
+                className={
+                  isSelected ? '[&>div>pre]:!border-stronger [&>div>pre]:!bg-surface-200' : ''
+                }
+              >
                 {props.children[0].props.children}
               </AIPolicyPre>
             )
