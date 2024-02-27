@@ -1,0 +1,8 @@
+extends: existence
+message: "Put a nonbreaking space between the number and the unit in '%s'."
+link: "https://developers.google.com/style/units-of-measure"
+nonword: true
+level: error
+tokens:
+  - \b\d+(?:B|kB|MB|GB|TB)
+  - \b\d+(?:ns|ms|s|min|h|d)

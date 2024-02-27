@@ -40,6 +40,11 @@ import {
 import ColumnForeignKey from './ColumnForeignKey'
 import ColumnType from './ColumnType'
 import HeaderTitle from './HeaderTitle'
+import {
+  CONSTRAINT_TYPE,
+  Constraint,
+  useTableConstraintsQuery,
+} from 'data/database/constraints-query'
 
 export interface ColumnEditorProps {
   column?: PostgresColumn
@@ -50,7 +55,8 @@ export interface ColumnEditorProps {
     payload: CreateColumnPayload | UpdateColumnPayload,
     isNewRecord: boolean,
     configuration: {
-      columnId: string | undefined
+      columnId?: string
+      primaryKey?: Constraint
     },
     resolve: any
   ) => void
@@ -78,6 +84,16 @@ const ColumnEditor = ({
   })
   const enumTypes = (types ?? []).filter(
     (type) => !EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS.includes(type.schema)
+  )
+
+  const { data: constraints } = useTableConstraintsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    schema: selectedTable?.schema,
+    table: selectedTable?.name,
+  })
+  const primaryKey = (constraints ?? []).find(
+    (constraint) => constraint.type === CONSTRAINT_TYPE.PRIMARY_KEY_CONSTRAINT
   )
 
   const { data } = useForeignKeyConstraintsQuery({
@@ -131,7 +147,7 @@ const ColumnEditor = ({
         const payload = isNewRecord
           ? generateCreateColumnPayload(selectedTable.id, columnFields)
           : generateUpdateColumnPayload(column!, selectedTable, columnFields)
-        const configuration = { columnId: column?.id }
+        const configuration = { columnId: column?.id, primaryKey }
         saveChanges(payload, isNewRecord, configuration, resolve)
       } else {
         resolve()

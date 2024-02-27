@@ -1,9 +1,10 @@
 import { PostgresTable } from '@supabase/postgres-meta'
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
+// import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { tableKeys } from './keys'
 import { useCallback } from 'react'
+import { get, handleError } from 'data/fetchers'
 
 export type TableVariables = {
   id?: number
@@ -19,26 +20,25 @@ export async function getTable(
   { id, projectRef, connectionString }: TableVariables,
   signal?: AbortSignal
 ) {
-  if (!projectRef) {
-    throw new Error('projectRef is required')
-  }
-  if (!id) {
-    throw new Error('id is required')
-  }
+  if (!projectRef) throw new Error('projectRef is required')
+  if (!id) throw new Error('id is required')
 
   let headers = new Headers()
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
-  const response = (await get(`${API_URL}/pg-meta/${projectRef}/tables?id=${id}`, {
-    headers: Object.fromEntries(headers),
+  const { data, error } = await get('/platform/pg-meta/{ref}/tables', {
+    params: {
+      header: { 'x-connection-encrypted': connectionString! },
+      path: { ref: projectRef },
+      // @ts-ignore
+      query: { id: id.toString() },
+    },
+    headers,
     signal,
-  })) as TableResponse
+  })
 
-  if ('error' in response) {
-    throw response.error
-  }
-
-  return response as PostgresTable
+  if (error) handleError(error)
+  return data as unknown as PostgresTable
 }
 
 export type TableData = Awaited<ReturnType<typeof getTable>>

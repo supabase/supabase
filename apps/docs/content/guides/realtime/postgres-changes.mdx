@@ -86,7 +86,7 @@ In this example we'll set up a database table, secure it with Row Level Security
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={3}>
-  
+
     <StepHikeCompact.Details title="Enable Postgres replication">
 
       Go to your project's [Replication settings](https://supabase.com/dashboard/project/_/database/replication), and under `supabase_realtime`, toggle on the tables you want to listen to.
@@ -96,7 +96,7 @@ In this example we'll set up a database table, secure it with Row Level Security
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={4}>
-  
+
     <StepHikeCompact.Details title="Install the client">
 
       Install the Supabase JavaScript client.
@@ -114,7 +114,7 @@ In this example we'll set up a database table, secure it with Row Level Security
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={5}>
-  
+
     <StepHikeCompact.Details title="Create the client">
 
       This client will be used to listen to Postgres changes.
@@ -1346,6 +1346,10 @@ myChannel.updateAuth("fresh-token")
 </Tabs>
 
 ## Limitations
+
+### Delete events are not filterable
+
+You can't filter Delete events when tracking Postgres Changes. This limitation is due to the way changes are pulled from Postgres.
 
 ### Spaces in table names
 

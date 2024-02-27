@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 
-import { patch } from 'data/fetchers'
+import { handleError, patch } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { resourceKeys } from './keys'
 
@@ -18,7 +18,7 @@ export async function updateResource({ projectRef, id, updatedParam }: ResourceU
     body: { updatedParam },
   })
 
-  if (error) throw new Error((error as ResponseError).message)
+  if (error) handleError(error)
   return data
 }
 

@@ -2,20 +2,16 @@
 id: 'functions-dart-edge'
 title: 'Dart Edge'
 description: 'Write your functions using Dart.'
+tocVideo: '53jhgrDONW4'
 ---
 
 [Dart Edge](https://docs.dartedge.dev/), a project built and maintained by [Invertase](https://invertase.io/), enables Dart code to be run on different edge environments. This guide will walk you through how you can start using Dart Edge to write your backend code using Dart and run it on Supabase.
 
-> ⚠️ WARNING: Dart Edge is an experimental project - it's probably not ready for production usage unless you're okay with living on the 'edge'. Open issues on [Dart Edge repo](https://github.com/invertase/dart_edge) if you encounter any issues.
+<Admonition type="caution">
 
-<div class="video-container">
-  <iframe
-    src="https://www.youtube-nocookie.com/embed/53jhgrDONW4"
-    frameBorder="1"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowFullScreen
-  ></iframe>
-</div>
+Dart Edge is an experimental project - it's probably not ready for production usage unless you're okay with living on the 'edge'. Open issues on [Dart Edge repo](https://github.com/invertase/dart_edge) if you encounter any issues.
+
+</Admonition>
 
 ## Pre requirements
 
@@ -122,10 +118,29 @@ void main() {
 
 ### Run locally
 
+Create a `edge.yaml` file if you don't have one yet in the root of your project. Then, add the following configuration to specify the path to your Supabase project.
+
+```yaml
+supabase:
+  project_path: './supabase'
+```
+
+Also, currently Dart Edge doesn't work with the latest versions of Flutter. If you do have the latest version of Flutter on your machine, you can use [FVM](https://fvm.app/) to use an older version of Flutter for your Dart Edge project.
+
+```bash
+fvm use 3.7.12 -f
+```
+
+You can read more about how to configure FVM (Flutter
+Version Management) for your project in the [FVM documentation](https://fvm.app/documentation/getting-started).
+
 Run the following command to compile your Dart code. This command will start a watcher that will recompile anytime you make changes to your code.
 
 ```bash
 edge build supabase_functions --dev
+
+# Or with FVM
+fvm dart pub run edge build supabase_functions --dev
 ```
 
 With docker running, start your local Supabase with the following command

@@ -39,6 +39,10 @@ import {
   generateToolRoutes,
 } from './NavigationBar.utils'
 import NavigationIconButton from './NavigationIconButton'
+import { Home } from 'icons'
+
+export const ICON_SIZE = 20
+export const ICON_STROKE_WIDTH = 1.5
 
 const NavigationBar = () => {
   const os = detectOS()
@@ -96,7 +100,7 @@ const NavigationBar = () => {
           route={{
             key: 'HOME',
             label: 'Home',
-            icon: <IconHome size={18} strokeWidth={2} />,
+            icon: <Home size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: `/project/${projectRef}`,
           }}
         />
