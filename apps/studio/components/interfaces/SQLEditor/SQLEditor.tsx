@@ -566,15 +566,7 @@ const SQLEditor = () => {
             <motion.div
               key="ask-ai-input-container"
               layoutId="ask-ai-input-container"
-              variants={{
-                visible: {
-                  borderRadius: 0,
-                  x: 0,
-                },
-                hidden: {
-                  x: 100,
-                },
-              }}
+              variants={{ visible: { borderRadius: 0, x: 0 }, hidden: { x: 100 } }}
               initial={isFirstRender ? 'visible' : 'hidden'}
               animate="visible"
               className="w-full flex justify-center z-10 h-[60px] bg-brand-200 border-b border-brand-400 px-5"
@@ -599,22 +591,11 @@ const SQLEditor = () => {
                     <motion.div
                       key="ask-ai-input"
                       className="w-full h-full relative flex items-center"
-                      variants={{
-                        visible: {
-                          opacity: 1,
-                          y: 0,
-                        },
-                        hidden: {
-                          opacity: 0,
-                          y: -25,
-                        },
-                      }}
+                      variants={{ visible: { opacity: 1, y: 0 }, hidden: { opacity: 0, y: -25 } }}
                       initial="hidden"
                       animate="visible"
                       exit="hidden"
-                      transition={{
-                        duration: 0.1,
-                      }}
+                      transition={{ duration: 0.1 }}
                     >
                       <Input_Shadcn_
                         value={aiInput}
@@ -710,19 +691,8 @@ const SQLEditor = () => {
                     <motion.div
                       key="ask-ai-loading"
                       className="p-0 flex flex-row gap-2 items-center w-full"
-                      variants={{
-                        visible: {
-                          opacity: 1,
-                          y: 0,
-                        },
-                        hidden: {
-                          opacity: 0,
-                          y: 25,
-                        },
-                      }}
-                      transition={{
-                        duration: 0.2,
-                      }}
+                      variants={{ visible: { opacity: 1, y: 0 }, hidden: { opacity: 0, y: 25 } }}
+                      transition={{ duration: 0.2 }}
                       initial="hidden"
                       animate="visible"
                       exit="hidden"
@@ -731,11 +701,7 @@ const SQLEditor = () => {
                         className="text-sm text-brand-600 px-3"
                         animate={{
                           opacity: ['0.5', '0.75', '0.5'],
-                          transition: {
-                            ease: 'linear',
-                            duration: 0.33,
-                            repeat: Infinity,
-                          },
+                          transition: { ease: 'linear', duration: 0.33, repeat: Infinity },
                         }}
                       >
                         Thinking...
@@ -855,12 +821,7 @@ const SQLEditor = () => {
                 transition={{ duration: 0.1 }}
                 onClick={() => setIsAiOpen(!isAiOpen)}
                 className={cn(
-                  'group',
-                  'absolute z-10',
-                  'rounded-lg',
-                  'right-[24px] top-4',
-                  'transition-all duration-200',
-                  'ease-out'
+                  'group absolute z-10 rounded-lg right-[24px] top-4 transition-all duration-200 ease-out'
                 )}
               >
                 <AiIconAnimation loading={false} allowHoverEffect />
@@ -875,14 +836,8 @@ const SQLEditor = () => {
                   <motion.div
                     className="w-full h-full"
                     variants={{
-                      visible: {
-                        opacity: 1,
-                        filter: 'blur(0px)',
-                      },
-                      hidden: {
-                        opacity: 0,
-                        filter: 'blur(10px)',
-                      },
+                      visible: { opacity: 1, filter: 'blur(0px)' },
+                      hidden: { opacity: 0, filter: 'blur(10px)' },
                     }}
                     initial="hidden"
                     animate="visible"
@@ -943,23 +898,15 @@ const SQLEditor = () => {
                           isFirstLoad = false
                         })
                       }}
-                      options={{
-                        fontSize: 13,
-                      }}
+                      options={{ fontSize: 13 }}
                     />
                   </motion.div>
                 )}
                 <motion.div
                   key={id}
                   variants={{
-                    visible: {
-                      opacity: 1,
-                      filter: 'blur(0px)',
-                    },
-                    hidden: {
-                      opacity: 0,
-                      filter: 'blur(10px)',
-                    },
+                    visible: { opacity: 1, filter: 'blur(0px)' },
+                    hidden: { opacity: 0, filter: 'blur(10px)' },
                   }}
                   initial="hidden"
                   animate={isDiffOpen ? 'hidden' : 'visible'}
