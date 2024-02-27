@@ -35,7 +35,7 @@ const ProductMenuItem = ({
           className={'flex items-center gap-2 truncate w-full ' + textClassName}
         >
           <span className="truncate">{name} </span>
-          {label !== undefined && <Badge color="yellow">{label}</Badge>}
+          {label !== undefined && <Badge color="amber">{label}</Badge>}
         </div>
       </div>
     </Menu.Item>
