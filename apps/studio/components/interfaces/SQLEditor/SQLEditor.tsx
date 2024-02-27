@@ -4,38 +4,8 @@ import { AnimatePresence, motion } from 'framer-motion'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
-import Split from 'react-split'
-import { format } from 'sql-formatter'
-
-import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
-import { useSqlEditMutation } from 'data/ai/sql-edit-mutation'
-import { useSqlGenerateMutation } from 'data/ai/sql-generate-mutation'
-import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
-import { SqlSnippet } from 'data/content/sql-snippets-query'
-import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { useFormatQueryMutation } from 'data/sql/format-sql-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { isError } from 'data/utils/error-check'
-import {
-  useFlag,
-  useLocalStorage,
-  useLocalStorageQuery,
-  useSelectedOrganization,
-  useSelectedProject,
-  useStore,
-} from 'hooks'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
-import { uuidv4 } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
-import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
-import Telemetry from 'lib/telemetry'
 import toast from 'react-hot-toast'
-import { useAppStateSnapshot } from 'state/app-state'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { isRoleImpersonationEnabled, useGetImpersonatedRole } from 'state/role-impersonation-state'
-import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { format } from 'sql-formatter'
 import {
   AiIconAnimation,
   Button,
@@ -50,8 +20,33 @@ import {
   IconSettings,
   IconX,
   Input_Shadcn_,
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
   cn,
 } from 'ui'
+
+import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
+import { useSqlEditMutation } from 'data/ai/sql-edit-mutation'
+import { useSqlGenerateMutation } from 'data/ai/sql-generate-mutation'
+import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
+import { SqlSnippet } from 'data/content/sql-snippets-query'
+import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import { useFormatQueryMutation } from 'data/sql/format-sql-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { isError } from 'data/utils/error-check'
+import { useLocalStorageQuery, useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
+import { uuidv4 } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
+import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
+import Telemetry from 'lib/telemetry'
+import { useAppStateSnapshot } from 'state/app-state'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { isRoleImpersonationEnabled, useGetImpersonatedRole } from 'state/role-impersonation-state'
+import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
 import { sqlAiDisclaimerComment, untitledSnippetTitle } from './SQLEditor.constants'
@@ -121,8 +116,7 @@ const SQLEditor = () => {
   const [hasSelection, setHasSelection] = useState<boolean>(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const readReplicasEnabled = useFlag('readReplicas')
-  const showReadReplicasUI = readReplicasEnabled && project?.is_read_replicas_enabled
+  const showReadReplicasUI = project?.is_read_replicas_enabled
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery({
@@ -178,13 +172,6 @@ const SQLEditor = () => {
 
   const isDiffOpen = !!sqlDiff
 
-  const [savedSplitSize, setSavedSplitSize] = useLocalStorage(
-    LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE,
-    `[50, 50]`
-  )
-
-  const splitSize = savedSplitSize ? JSON.parse(savedSplitSize) : undefined
-
   const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess(data) {
       if (id) snap.addResult(id, data.result)
@@ -230,19 +217,9 @@ const SQLEditor = () => {
     },
   })
 
-  const minSize = 44
   const snippet = id ? snap.snippets[id] : null
-  const snapOffset = 50
 
   const isLoading = urlId === 'new' ? false : !(id && ref && snap.loaded[ref])
-
-  const onDragEnd = useCallback(
-    (sizes: number[]) => {
-      if (id) snap.setSplitSizes(id, sizes)
-      setSavedSplitSize(JSON.stringify(sizes))
-    },
-    [id]
-  )
 
   const editorRef = useRef<IStandaloneCodeEditor | null>(null)
   const monacoRef = useRef<Monaco | null>(null)
@@ -600,7 +577,7 @@ const SQLEditor = () => {
               }}
               initial={isFirstRender ? 'visible' : 'hidden'}
               animate="visible"
-              className="w-full flex justify-center z-10 h-[60px] bg-brand-300 border-b border-brand-400 px-5"
+              className="w-full flex justify-center z-10 h-[60px] bg-brand-200 border-b border-brand-400 px-5"
             >
               <div
                 className={cn(
@@ -751,7 +728,7 @@ const SQLEditor = () => {
                       exit="hidden"
                     >
                       <motion.span
-                        className="text-sm text-brand px-3"
+                        className="text-sm text-brand-600 px-3"
                         animate={{
                           opacity: ['0.5', '0.75', '0.5'],
                           transition: {
@@ -828,7 +805,7 @@ const SQLEditor = () => {
                         type="alternative"
                         size="tiny"
                         icon={<IconX />}
-                        iconRight={<span className="opacity-30">ESC</span>}
+                        iconRight={<span className="text-brand-500">ESC</span>}
                         onClick={discardAiHandler}
                       >
                         Discard
@@ -838,8 +815,8 @@ const SQLEditor = () => {
                     <>
                       <div
                         className={cn(
-                          'transition text-brand',
-                          !aiInput ? 'opacity-0' : 'opacity-30'
+                          'transition text-brand-600',
+                          !aiInput ? 'opacity-0' : 'opacity-100'
                         )}
                       >
                         <IconCornerDownLeft size={16} strokeWidth={1.5} />
@@ -854,7 +831,7 @@ const SQLEditor = () => {
                         <IconSettings className="cursor-pointer" />
                       </button>
                       <button
-                        className="text-brand-600 hover:text-brand-600"
+                        className="transition text-brand-500 hover:text-brand-600"
                         onClick={() => setIsAiOpen(false)}
                       >
                         <IconX size={21} />
@@ -866,19 +843,12 @@ const SQLEditor = () => {
             </motion.div>
           </AISchemaSuggestionPopover>
         )}
-        <Split
-          style={{ height: '100%' }}
+        <ResizablePanelGroup
+          className="h-full"
           direction="vertical"
-          gutterSize={2}
-          sizes={
-            (splitSize ? splitSize : (snippet?.splitSizes as number[] | undefined)) ?? [50, 50]
-          }
-          minSize={minSize}
-          snapOffset={snapOffset}
-          expandToMin={true}
-          onDragEnd={onDragEnd}
+          autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE}
         >
-          <div className="flex-grow overflow-y-auto border-b">
+          <ResizablePanel collapsible collapsedSize={10} minSize={20}>
             {!isAiOpen && (
               <motion.button
                 layoutId="ask-ai-input-icon"
@@ -1006,8 +976,9 @@ const SQLEditor = () => {
                 </motion.div>
               </>
             )}
-          </div>
-          <div className="flex flex-col">
+          </ResizablePanel>
+          <ResizableHandle withHandle />
+          <ResizablePanel collapsible collapsedSize={10} minSize={20}>
             {isLoading ? (
               <div className="flex h-full w-full items-center justify-center">Loading...</div>
             ) : (
@@ -1020,8 +991,8 @@ const SQLEditor = () => {
                 executeQuery={executeQuery}
               />
             )}
-          </div>
-        </Split>
+          </ResizablePanel>
+        </ResizablePanelGroup>
       </div>
     </SQLEditorContext.Provider>
   )
