@@ -135,7 +135,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
       )}
     >
       <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
-        <Tooltip.Trigger className="flex items-center" asChild>
+        <Tooltip.Trigger className="min-w-4" asChild>
           {entity.type === ENTITY_TYPE.TABLE ? (
             <Table2 size={15} strokeWidth={1.5} className="text-foreground-lighter" />
           ) : entity.type === ENTITY_TYPE.VIEW ? (
@@ -173,7 +173,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
       <div
         className={cn(
           'truncate',
-          'max-w-[175px] overflow-hidden text-ellipsis whitespace-nowrap flex items-center gap-2 relative w-full',
+          'overflow-hidden text-ellipsis whitespace-nowrap flex items-center gap-2 relative w-full',
           isActive && 'text-foreground'
         )}
       >
@@ -191,7 +191,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
           <Unlock
             size={14}
             strokeWidth={2}
-            className={cn(isActive ? 'text-warning-600' : 'text-warning-500')}
+            className={cn('min-w-4', isActive ? 'text-warning-600' : 'text-warning-500')}
           />
         )}
       </div>
