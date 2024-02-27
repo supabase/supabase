@@ -63,7 +63,7 @@ const ThreadPrivacyModal = ({
   return (
     <Dialog_Shadcn_ open={visible} onOpenChange={onClose}>
       <DialogContent_Shadcn_>
-        <DialogHeader_Shadcn_>
+        <DialogHeader_Shadcn_ className="py-4">
           <DialogTitle_Shadcn_>Change thread visibility</DialogTitle_Shadcn_>
           <DialogDescription_Shadcn_ className="text-foreground">
             Threads are public by default, but you can choose to make them private.
@@ -86,11 +86,11 @@ const ThreadPrivacyModal = ({
                 <div className="flex gap-4">
                   <RadioGroupItem_Shadcn_ value="public" id="public" />
                   <label htmlFor="public">
-                    <div className="border-b -mt-3 pb-4">
+                    <div className="border-b -mt-1.5 pb-4">
                       <div className="font-bold">
-                        <div className="flex items-center gap-2 ">
-                          <Unlock size={15} />
+                        <div className="flex items-center gap-3 ">
                           Public
+                          <Unlock size={15} className="text-blue-800" />
                         </div>
                       </div>
 
@@ -104,11 +104,11 @@ const ThreadPrivacyModal = ({
                 <div className="flex gap-4">
                   <RadioGroupItem_Shadcn_ value="private" id="private" />
                   <label htmlFor="private">
-                    <div className="-mt-3">
+                    <div className="-mt-1.5">
                       <div className="font-bold">
-                        <div className="flex items-center gap-2 ">
-                          <Lock size={15} />
+                        <div className="flex items-center gap-3">
                           Private
+                          <Lock size={15} className="text-amber-800" />
                         </div>
                       </div>
 

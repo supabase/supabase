@@ -31,9 +31,9 @@ const Thread = ({ thread }: { thread: ThreadViewType }) => {
     <>
       <div
         key={thread_id}
-        className="group w-full flex flex-row items-center gap-6  border rounded pl-5 pr-2 transition bg-surface-100 hover:bg-surface-200 h-14"
+        className="group w-full flex flex-row items-center gap-6  border rounded pl-5 pr-2 transition bg-surface-100 hover:bg-surface-200  py-4"
       >
-        <div className="flex flex-col grow overflow-hidden">
+        <div className="grid gap-1 grow overflow-hidden">
           <div className="flex items-center gap-3">
             <Link
               className="flex text-sm group-hover:underline truncate"
@@ -41,23 +41,24 @@ const Thread = ({ thread }: { thread: ThreadViewType }) => {
             >
               <span className="truncate">{thread_title}</span>
             </Link>
-            <div className="text-sm">
-              <Badge color={is_public ? 'blue' : 'yellow'}>
-                {is_public ? (
-                  <span className="flex items-center gap-2">
-                    <Unlock size={12} /> Public
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-2">
-                    <Lock size={12} /> Private
-                  </span>
-                )}
-              </Badge>
-            </div>
+            <div className="text-sm"></div>
           </div>
-          <span className="text-xs text-foreground-lighter font-mono">
-            Last updated {formattedTimeAgo}
-          </span>
+          <div className="text-xs text-foreground-lighter font-mono flex items-center gap-2">
+            Last updated {formattedTimeAgo} /
+            <span className="flex items-center gap-2 uppercase">
+              {is_public ? (
+                <span className="flex items-center gap-2">
+                  <Unlock size={12} className="text-blue-700" />
+                  public
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  <Lock size={12} className="text-amber-700" />
+                  private
+                </span>
+              )}
+            </span>
+          </div>
         </div>
         <div className="flex shrink">
           <DropdownMenu>
@@ -84,7 +85,11 @@ const Thread = ({ thread }: { thread: ThreadViewType }) => {
                   setPrivacyOpen(true)
                 }}
               >
-                {is_public ? <Lock size={14} /> : <Unlock size={14} />}
+                {is_public ? (
+                  <Lock size={14} strokeWidth={1} />
+                ) : (
+                  <Unlock size={14} strokeWidth={1} />
+                )}
                 <span>Edit visibility</span>
               </DropdownMenuItem>
               <DropdownMenuItem className="space-x-2" onClick={() => setDeleteOpen(true)}>
