@@ -1,30 +1,73 @@
 // Import Swiper styles
 import 'swiper/swiper.min.css'
 
+import dynamic from 'next/dynamic'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { Badge, Button, IconArrowUpRight, IconX, Tabs } from 'ui'
+import { Badge, Button, IconArrowUpRight, IconCheck, IconX, Tabs } from 'ui'
+import { Swiper, SwiperSlide } from 'swiper/react'
+
 // data
+import Solutions from 'data/Solutions'
 import ApiExamplesData from 'data/products/database/api-examples'
+import HighlightsCards from 'data/products/database/highlight-cards'
 import ExtensionsExamplesData from 'data/products/database/extensions-examples'
 import SqlViewCarouselData from 'data/products/database/sql-view-carousel.json'
 import TableViewCarouselData from 'data/products/database/table-view-carousel.json'
-import Solutions from 'data/Solutions'
-import { Swiper, SwiperSlide } from 'swiper/react'
-import ImageCarousel from '~/components/Carousels/ImageCarousel'
-import SplitCodeBlockCarousel from '~/components/Carousels/SplitCodeBlockCarousel'
-import FeatureColumn from '~/components/FeatureColumn'
-import DefaultLayout from '~/components/Layouts/Default'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import ProductIcon from '~/components/ProductIcon'
-import APISection from '~/components/Sections/APISection'
-import GithubExamples from '~/components/Sections/GithubExamples'
-import ProductHeader from '~/components/Sections/ProductHeader'
 import { ThemeImage } from 'ui-patterns/ThemeImage'
 import { TweetCard } from 'ui-patterns/TweetCard'
+
+import ProductHeader from '~/components/Sections/ProductHeader'
+import Panel from '../../components/Panel'
+
+const ImageCarousel = dynamic(() => import('~/components/Carousels/ImageCarousel'))
+const SplitCodeBlockCarousel = dynamic(
+  () => import('~/components/Carousels/SplitCodeBlockCarousel')
+)
+const FeatureColumn = dynamic(() => import('~/components/FeatureColumn'))
+const DefaultLayout = dynamic(() => import('~/components/Layouts/Default'))
+const SectionContainer = dynamic(() => import('~/components/Layouts/SectionContainer'))
+const ProductIcon = dynamic(() => import('~/components/ProductIcon'))
+const APISection = dynamic(() => import('~/components/Sections/APISection'))
+const GithubExamples = dynamic(() => import('~/components/Sections/GithubExamples'))
+
+const HighlightCard = (props: any) => (
+  <Panel outerClassName="w-full h-[300px]" innerClassName="relative">
+    <div className="flex flex-col gap-4 p-4 md:p-8 h-full">
+      <div className="flex items-center gap-2">
+        <h4 className="text-lg text-foreground">{props.title}</h4>
+        {props.badge && (
+          <Badge className="border-strong bg-default text-foreground">{props.badge}</Badge>
+        )}
+      </div>
+      <div className="flex flex-col w-full sm:w-2/3 flex-grow">
+        <ul className="text-foreground-lighter">
+          {props.features.map((feature: any) => (
+            <li key={feature} className="flex items-start gap-2">
+              <span className="w-4 mt-1 flex items-center">
+                <IconCheck />
+              </span>{' '}
+              <p>{feature}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="flex items-center flex-wrap gap-1">
+        {props.ctas.map((cta: any) => (
+          <Button type={cta.type} asChild>
+            <Link href={cta.href} target={cta.target}>
+              {cta.label}
+            </Link>
+          </Button>
+        ))}
+      </div>
+    </div>
+  </Panel>
+)
 
 function Database() {
   // base path for images
@@ -137,6 +180,11 @@ function Database() {
               </p>
             </div>
           </div>
+        </SectionContainer>
+
+        <SectionContainer className="!pt-0 grid grid-cols-2 gap-4 lg:gap-8">
+          <HighlightCard {...HighlightsCards.branching} />
+          <HighlightCard {...HighlightsCards.readReplicas} />
         </SectionContainer>
 
         {/* <SectionContainer>÷ */}
