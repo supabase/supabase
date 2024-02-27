@@ -1,4 +1,7 @@
+import { useTelemetryProps } from 'common'
 import { PlusCircle } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { Dispatch, SetStateAction, useState } from 'react'
 import {
   Badge,
@@ -14,7 +17,7 @@ import {
   cn,
 } from 'ui'
 
-import Link from 'next/link'
+import Telemetry from 'lib/telemetry'
 import { ApplyConfigModal } from '../ApplyConfigModal'
 import { RealtimeConfig } from '../useRealtimeMessages'
 import { FilterSchema } from './FilterSchema'
@@ -29,6 +32,8 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
   const [open, setOpen] = useState(false)
   const [applyConfigOpen, setApplyConfigOpen] = useState(false)
   const [tempConfig, setTempConfig] = useState(config)
+  const telemetryProps = useTelemetryProps()
+  const router = useRouter()
 
   const onOpen = (v: boolean) => {
     // when opening, copy the outside config into the intermediate one
@@ -193,6 +198,15 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
         visible={applyConfigOpen}
         onSelectCancel={() => setApplyConfigOpen(false)}
         onSelectConfirm={() => {
+          Telemetry.sendEvent(
+            {
+              category: 'realtime_inspector',
+              action: 'applied_filters',
+              label: 'realtime_inspector_config',
+            },
+            telemetryProps,
+            router
+          )
           onChangeConfig(tempConfig)
           setApplyConfigOpen(false)
           setOpen(false)
