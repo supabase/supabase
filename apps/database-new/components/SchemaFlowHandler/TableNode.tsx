@@ -69,7 +69,12 @@ const TableNode = ({ data, targetPosition, sourcePosition }: NodeProps<TableNode
               )}
               key={column.id}
             >
-              <div className="gap-[0.24rem] flex mx-2 align-middle basis-1/5 items-center justify-start">
+              <div
+                className={cn(
+                  'gap-[0.24rem] flex mx-2 align-middle items-center justify-start',
+                  column.isPrimary ? 'basis-1/5' : ''
+                )}
+              >
                 {column.isPrimary && (
                   <Key
                     size={8}
