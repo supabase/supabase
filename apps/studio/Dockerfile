@@ -11,8 +11,9 @@
 FROM node:18-slim as base
 
 # Fixes issues with Sentry CLI and SSL certificates during build
+# TODO: Git is added because it's needed to build libpg, remove it once they publish a binary on the S3 bucket
 RUN apt-get update -qq && \
-    apt-get install -y ca-certificates && \
+    apt-get install -y git ca-certificates && \
     rm -rf /var/lib/apt/lists/* && \
     update-ca-certificates
 
@@ -22,7 +23,7 @@ WORKDIR /app
 FROM base as turbo
 COPY . .
 
-RUN npx turbo@1.10.3 prune --scope=studio --docker
+RUN npx turbo@1.12.3 prune --scope=studio --docker
 
 # Install dev dependencies (only if needed)
 FROM base as deps
@@ -30,11 +31,10 @@ COPY --from=turbo /app/out/json ./
 COPY --from=turbo /app/out/package-lock.json ./
 # Install additional dependencies for arm64 build (required by bufferutil)
 ARG TARGETARCH
-# TODO: Git is added because it's needed to build libpg, remove it once we move to a WASM build
+
 RUN if [ "$TARGETARCH" = "arm64" ]; then \
     apt-get update && apt-get install -y --no-install-recommends \
     python3 \
-    git \
     build-essential \
     && rm -rf /var/lib/apt/lists/*; fi
 # No need to clean cache because production uses standalone build
