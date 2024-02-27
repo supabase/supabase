@@ -20,19 +20,19 @@ SELECT
 FROM pg_roles
 WHERE rolname IN (
   'anon',
-  'authenticated'
+  'authenticated',
   'postgres',
-  'service_role',
+  'service_role'
 );
 ```
 
-Additionally, all users are subject to a global limit of _2 minutes_. This serves as a backstop against resource exhaustion due to either poorly written queries, or abusive usage. The current global timeout can be view with the following query:
+Additionally, all users are subject to a global limit of _2 minutes_. This serves as a backstop against resource exhaustion due to either poorly written queries, or abusive usage. To view the global timeout, you can execute the below query:
 
 ```sql
 SHOW statement_timeout;
 ```
 
-This can be overridden using [Custom Postgres configuration](https://supabase.com/docs/guides/platform/custom-postgres-config#supported-parameters). The below example is for changing the global timeout with NPX:
+This can be overridden using [Custom Postgres configuration](https://supabase.com/docs/guides/platform/custom-postgres-config#supported-parameters). The below example is for changing the global timeout with `npx`:
 
 ```bash
 #Logs you into the Supabase CLI
