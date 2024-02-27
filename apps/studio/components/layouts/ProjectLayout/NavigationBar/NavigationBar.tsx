@@ -149,6 +149,7 @@ const NavigationBar = () => {
             if (route.key === 'api' && isNewAPIDocsEnabled) {
               return (
                 <NavigationIconButton
+                  key={route.key}
                   onClick={() => snap.setShowProjectApiDocs(true)}
                   icon={<FileText size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
                 >
