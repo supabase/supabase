@@ -11,12 +11,16 @@ import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
 import { useFlag, useIsFeatureEnabled } from 'hooks'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { NextPageWithLayout } from 'types'
+import { useProfile } from 'lib/profile'
 
 const ProjectsPage: NextPageWithLayout = () => {
   const router = useRouter()
   const [search, setSearch] = useState('')
   const { data: organizations, isError, isSuccess } = useOrganizationsQuery()
   useAutoProjectsPrefetch()
+
+  const data = useProfile()
+  console.log(data)
 
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
 
