@@ -240,15 +240,16 @@ When developing with Expo, you can test Sign in with Apple via the Expo Go app, 
     1. Have an **App ID** which uniquely identifies the app you are building. You can create a new App ID from the [Identifiers](https://developer.apple.com/account/resources/identifiers/list/bundleId) section in the Apple Developer Console (use the filter menu in the upper right side to see all App IDs). These usually are a reverse domain name string, for example `com.example.app`. Make sure you configure Sign in with Apple for the App ID you created or already have, in the Capabilities list. At this time Supabase Auth does not support Server-to-Server notification endpoints, so you should leave that setting blank. (In the past App IDs were referred to as _bundle IDs._)
     2. Register all of the App IDs that will be using your Supabase project in the [Apple provider configuration in the Supabase dashboard](https://supabase.com/dashboard/project/_/auth/providers) under _Authorized Client IDs_.
 
-    <Admonition type="note">
-
-    If you're building a native app only, you do not need to configure the OAuth settings.
-
-    </Admonition>
-
     ## Apple sign in on Android, Web, Windows and Linux
 
     For platforms that doesn't support native Apple sign in, you can use the `signInWithOAuth()` method to perform the Apple sign in.
+
+    <Admonition type="note">
+
+    Do **NOT** follow the Android or Web setup instructions on [sign_in_with_apple](https://pub.dev/packages/sign_in_with_apple) package README for these platforms.　sign_in_with_apple package is not used for performing Apple sign-in on non-Apple platforms for Supabase.
+
+    </Admonition>
+
     This method of signing in is web based, and will open a browser window to perform the sign in. For non-web platforms, the user is brought back to the app via [deep linking](/docs/guides/auth/native-mobile-deep-linking?platform=flutter).
 
     ```dart

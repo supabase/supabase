@@ -23,6 +23,7 @@ import { ProjectContextProvider } from './ProjectContext'
 import ProjectPausedState from './ProjectPausedState'
 import RestoringState from './RestoringState'
 import UpgradingState from './UpgradingState'
+import { ResizableHandle, ResizablePanelGroup, ResizablePanel, cn } from 'ui'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -57,6 +58,7 @@ export interface ProjectLayoutProps {
   hideHeader?: boolean
   hideIconBar?: boolean
   selectedTable?: string
+  resizableSidebar?: boolean
 }
 
 const ProjectLayout = ({
@@ -69,6 +71,7 @@ const ProjectLayout = ({
   hideHeader = false,
   hideIconBar = false,
   selectedTable,
+  resizableSidebar = false,
 }: PropsWithChildren<ProjectLayoutProps>) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
@@ -105,26 +108,46 @@ const ProjectLayout = ({
           {/* Left-most navigation side bar to access products */}
           {!hideIconBar && <NavigationBar />}
           {/* Product menu bar */}
-          {!showPausedState && (
-            <MenuBarWrapper isLoading={isLoading} isBlocking={isBlocking} productMenu={productMenu}>
-              <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
-            </MenuBarWrapper>
-          )}
-          <main className="flex flex-col flex-1 w-full overflow-x-hidden">
-            {!navLayoutV2 && !hideHeader && IS_PLATFORM && <LayoutHeader />}
-            {showPausedState ? (
-              <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
-                <div className="w-full">
-                  <ProjectPausedState product={product} />
-                </div>
-              </div>
-            ) : (
-              <ContentWrapper isLoading={isLoading} isBlocking={isBlocking}>
-                <ResourceExhaustionWarningBanner />
-                {children}
-              </ContentWrapper>
+          <ResizablePanelGroup
+            className="flex h-full"
+            direction="horizontal"
+            autoSaveId="project-layout"
+          >
+            {!showPausedState && productMenu && (
+              <>
+                <ResizablePanel
+                  className={cn(resizableSidebar ? 'min-w-64 max-w-[32rem]' : 'min-w-64 max-w-64')}
+                  defaultSize={1} // forces panel to smallest width possible, at w-64
+                >
+                  <MenuBarWrapper
+                    isLoading={isLoading}
+                    isBlocking={isBlocking}
+                    productMenu={productMenu}
+                  >
+                    <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
+                  </MenuBarWrapper>
+                </ResizablePanel>
+                <ResizableHandle withHandle disabled={resizableSidebar ? false : true} />
+              </>
             )}
-          </main>
+            <ResizablePanel className="h-full">
+              <main className="h-full flex flex-col flex-1 w-full overflow-x-hidden">
+                {!navLayoutV2 && !hideHeader && IS_PLATFORM && <LayoutHeader />}
+                {showPausedState ? (
+                  <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
+                    <div className="w-full">
+                      <ProjectPausedState product={product} />
+                    </div>
+                  </div>
+                ) : (
+                  <ContentWrapper isLoading={isLoading} isBlocking={isBlocking}>
+                    <ResourceExhaustionWarningBanner />
+                    {children}
+                  </ContentWrapper>
+                )}
+              </main>
+            </ResizablePanel>
+          </ResizablePanelGroup>
         </div>
 
         <EnableBranchingModal />
