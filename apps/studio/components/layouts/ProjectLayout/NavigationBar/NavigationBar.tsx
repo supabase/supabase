@@ -100,7 +100,7 @@ const NavigationBar = () => {
           'data-[state=expanded]:shadow-xl',
           'h-full',
           'transition-width duration-200',
-          'w-14 data-[state=expanded]:w-[17rem]',
+          'w-14 data-[state=expanded]:w-[13rem]',
           'py-2',
           'hide-scrollbar flex flex-col justify-between overflow-y-auto',
           'border-r bg-studio border-default',
@@ -113,7 +113,7 @@ const NavigationBar = () => {
           if (!userDropdownOpen) snap.setNavigationPanelOpen(false)
         }}
       >
-        <ul className="flex flex-col gap-1 justify-start px-2">
+        <ul className="flex flex-col gap-0 justify-start px-2">
           {(!navLayoutV2 || !IS_PLATFORM) && (
             <Link
               href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
@@ -124,7 +124,7 @@ const NavigationBar = () => {
                 alt="Supabase"
                 className="absolute h-[40px] w-6 cursor-pointer rounded"
               />
-              <SVG
+              {/* <SVG
                 src={`${BASE_PATH}/img/logo/supabase-wordmark.svg`}
                 width={96}
                 className={cn(
@@ -136,7 +136,7 @@ const NavigationBar = () => {
                   'delay-100',
                   'group-data-[state=expanded]:delay-0'
                 )}
-              />
+              /> */}
             </Link>
           )}
           <NavigationIconLink
@@ -310,7 +310,7 @@ const NavigationBar = () => {
                   <span
                     className=" 
                     left-10
-                    w-[10rem]
+                    w-[8rem]
                     absolute
                     
                     flex flex-col 
