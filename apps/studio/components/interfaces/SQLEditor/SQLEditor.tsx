@@ -8,15 +8,7 @@ import toast from 'react-hot-toast'
 import { format } from 'sql-formatter'
 import {
   AiIconAnimation,
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  IconCheck,
-  IconChevronDown,
   IconCornerDownLeft,
-  IconLoader,
   IconSettings,
   IconX,
   Input_Shadcn_,
@@ -49,6 +41,7 @@ import { isRoleImpersonationEnabled, useGetImpersonatedRole } from 'state/role-i
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
+import { DiffActionBar } from './DiffActionBar'
 import { sqlAiDisclaimerComment, untitledSnippetTitle } from './SQLEditor.constants'
 import {
   ContentDiff,
@@ -57,12 +50,7 @@ import {
   IStandaloneDiffEditor,
   SQLEditorContextValues,
 } from './SQLEditor.types'
-import {
-  checkDestructiveQuery,
-  createSqlSnippetSkeleton,
-  getDiffTypeButtonLabel,
-  getDiffTypeDropdownLabel,
-} from './SQLEditor.utils'
+import { checkDestructiveQuery, createSqlSnippetSkeleton } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
 
 // Load the monaco editor client-side only (does not behave well server-side)
@@ -711,72 +699,25 @@ const SQLEditor = () => {
                 </AnimatePresence>
                 <div className="flex flex-row items-center gap-3 mr-1">
                   {isDiffOpen ? (
-                    <>
-                      <div className="flex items-center">
-                        <Button
-                          className="rounded-r-none"
-                          type="primary"
-                          size="tiny"
-                          icon={
-                            !isAcceptDiffLoading ? (
-                              <IconCheck />
-                            ) : (
-                              <IconLoader className="animate-spin" size={14} />
-                            )
-                          }
-                          iconRight={
-                            <div className="opacity-30">
-                              <IconCornerDownLeft size={12} strokeWidth={1.5} />
-                            </div>
-                          }
-                          onClick={acceptAiHandler}
-                        >
-                          {getDiffTypeButtonLabel(selectedDiffType)}
-                        </Button>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              type="primary"
-                              className="rounded-l-none border-l-0 px-[4px] py-[5px] flex"
-                              icon={<IconChevronDown />}
-                            />
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" side="bottom">
-                            {Object.values(DiffType)
-                              .filter((diffType) => diffType !== selectedDiffType)
-                              .map((diffType) => (
-                                <DropdownMenuItem
-                                  key={diffType}
-                                  onClick={() => {
-                                    setSelectedDiffType(diffType)
-                                    switch (diffType) {
-                                      case DiffType.Modification:
-                                        return compareAsModification()
-                                      case DiffType.Addition:
-                                        return compareAsAddition()
-                                      case DiffType.NewSnippet:
-                                        return compareAsNewSnippet()
-                                      default:
-                                        throw new Error(`Unknown diff type '${diffType}'`)
-                                    }
-                                  }}
-                                >
-                                  <p>{getDiffTypeDropdownLabel(diffType)}</p>
-                                </DropdownMenuItem>
-                              ))}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                      <Button
-                        type="alternative"
-                        size="tiny"
-                        icon={<IconX />}
-                        iconRight={<span className="text-brand-500">ESC</span>}
-                        onClick={discardAiHandler}
-                      >
-                        Discard
-                      </Button>
-                    </>
+                    <DiffActionBar
+                      loading={isAcceptDiffLoading}
+                      selectedDiffType={selectedDiffType}
+                      onChangeDiffType={(diffType) => {
+                        setSelectedDiffType(diffType)
+                        switch (diffType) {
+                          case DiffType.Modification:
+                            return compareAsModification()
+                          case DiffType.Addition:
+                            return compareAsAddition()
+                          case DiffType.NewSnippet:
+                            return compareAsNewSnippet()
+                          default:
+                            throw new Error(`Unknown diff type '${diffType}'`)
+                        }
+                      }}
+                      onAccept={acceptAiHandler}
+                      onCancel={discardAiHandler}
+                    />
                   ) : (
                     <>
                       <div
