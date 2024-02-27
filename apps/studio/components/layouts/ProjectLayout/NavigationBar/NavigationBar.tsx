@@ -1,12 +1,12 @@
 import { useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useFlag, useIsFeatureEnabled } from 'hooks'
-import { ApiDocs, Home, User } from 'icons'
+import { Home, User } from 'icons'
 import { IS_PLATFORM } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { isUndefined } from 'lodash'
-import { Command, FlaskConical, Search, Settings } from 'lucide-react'
+import { Command, FileText, FlaskConical, Search, Settings } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -150,7 +150,7 @@ const NavigationBar = () => {
               return (
                 <NavigationIconButton
                   onClick={() => snap.setShowProjectApiDocs(true)}
-                  icon={<ApiDocs size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
+                  icon={<FileText size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
                 >
                   Project API
                 </NavigationIconButton>
