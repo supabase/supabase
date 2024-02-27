@@ -254,12 +254,14 @@ const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnec
             control={form.control}
             name="supabaseChangesOnly"
             render={({ field }) => (
-              <FormItem_Shadcn_ className="flex flex-col">
-                <FormLabel_Shadcn_ className="!text">Supabase changes only</FormLabel_Shadcn_>
-                <FormDescription_Shadcn_ className="text-xs text-foreground-lighter !mt-0 !mb-1">
-                  Trigger branch creation only when there were changes to <code>supabase</code>{' '}
-                  directory.
-                </FormDescription_Shadcn_>
+              <FormItem_Shadcn_ className="flex gap-x-4 justify-between">
+                <div>
+                  <FormLabel_Shadcn_ className="!text">Supabase changes only</FormLabel_Shadcn_>
+                  <FormDescription_Shadcn_ className="text-xs text-foreground-lighter !mt-0 !mb-1">
+                    Trigger branch creation only when there were changes to <code>supabase</code>{' '}
+                    directory.
+                  </FormDescription_Shadcn_>
+                </div>
                 <FormControl_Shadcn_>
                   <Switch
                     checked={field.value}
