@@ -20,11 +20,9 @@ export const generateNodes = (
   loadBalancers: LoadBalancer[],
   {
     onSelectRestartReplica,
-    onSelectResizeReplica,
     onSelectDropReplica,
   }: {
     onSelectRestartReplica: (database: Database) => void
-    onSelectResizeReplica: (database: Database) => void
     onSelectDropReplica: (database: Database) => void
   }
 ): Node[] => {
@@ -88,7 +86,6 @@ export const generateNodes = (
           computeSize: database.size,
           status: database.status,
           onSelectRestartReplica: () => onSelectRestartReplica(database),
-          onSelectResizeReplica: () => onSelectResizeReplica(database),
           onSelectDropReplica: () => onSelectDropReplica(database),
         },
       }
