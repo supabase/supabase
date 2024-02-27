@@ -23,6 +23,7 @@ Hashicorp
 GPUs?
 Gradle
 GraphQL
+Groonga
 href
 Infisical
 IVFFlat
@@ -41,6 +42,8 @@ OpenAI
 [Pp]asscodes?
 [Pp]asswordless
 [Pp]erformant
+PGAudit
+PGroonga
 pgvector
 Pinecone
 plpgsql
@@ -65,9 +68,11 @@ Roboflow
 SQLAlchemy
 [Ss]upabase
 Supavisor
+[Ss]upersets?
 Terraform
 [Tt]odos?
 [Uu]psert
+[Uu]pvot(es|ed|ing)?
 Vercel
 Vite
 VSCode
