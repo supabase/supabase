@@ -2,11 +2,9 @@ import { Route } from 'components/ui/ui.types'
 import { Project } from 'data/projects/project-detail-query'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import {
-  ApiDocs,
   Auth,
   Database,
   EdgeFunctions,
-  Logs,
   Realtime,
   Reports,
   SqlEditor,
@@ -14,7 +12,7 @@ import {
   TableEditor,
 } from 'icons'
 import { ICON_SIZE, ICON_STROKE_WIDTH } from './NavigationBar'
-import { Settings } from 'lucide-react'
+import { Settings, FileText, List } from 'lucide-react'
 
 export const generateToolRoutes = (ref?: string, project?: Project): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
@@ -87,7 +85,7 @@ export const generateProductRoutes = (
           },
         ]
       : []),
-    ...(IS_PLATFORM && realtimeEnabled
+    ...(realtimeEnabled
       ? [
           {
             key: 'realtime',
@@ -118,13 +116,13 @@ export const generateOtherRoutes = (ref?: string, project?: Project): Route[] =>
     {
       key: 'logs',
       label: 'Logs',
-      icon: <Logs size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      icon: <List size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/logs/explorer`),
     },
     {
       key: 'api',
       label: 'API Docs',
-      icon: <ApiDocs size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      icon: <FileText size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/api`),
     },
   ]
