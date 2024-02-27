@@ -8,19 +8,19 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import Panel from 'components/ui/Panel'
 import { DisplayApiSettings } from 'components/ui/ProjectSettings'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { configKeys } from 'data/config/keys'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
+import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useFlag, useStore } from 'hooks'
+import { useStore } from 'hooks'
+import { PROJECT_STATUS } from 'lib/constants'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { JWT_SECRET_UPDATE_ERROR_MESSAGES } from './API.constants'
 import JWTSettings from './JWTSettings'
 import PostgrestConfig from './PostgrestConfig'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { PROJECT_STATUS } from 'lib/constants'
-import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 
 const ServiceList = () => {
   const { ui } = useStore()
@@ -29,8 +29,7 @@ const ServiceList = () => {
   const { ref: projectRef, source } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
 
-  const readReplicasEnabled = useFlag('readReplicas')
-  const showReadReplicasUI = readReplicasEnabled && project?.is_read_replicas_enabled
+  const showReadReplicasUI = project?.is_read_replicas_enabled
 
   const { data: settings, isError } = useProjectApiQuery({
     projectRef,
@@ -91,7 +90,7 @@ const ServiceList = () => {
   }, [jwtSecretUpdateStatus])
 
   useEffect(() => {
-    if (readReplicasEnabled && source !== undefined) {
+    if (showReadReplicasUI && source !== undefined) {
       state.setSelectedDatabaseId('load-balancer')
     }
   }, [source])
