@@ -1,13 +1,18 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { useState } from 'react'
 import { useParams } from 'common'
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useFlag, useIsFeatureEnabled } from 'hooks'
+import { ApiDocs, Home, User } from 'icons'
+import { IS_PLATFORM } from 'lib/constants'
+import { detectOS } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
 import { isUndefined } from 'lodash'
-import { FlaskConical, UserCheck, Users } from 'lucide-react'
+import { FlaskConical } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
+import { useAppStateSnapshot } from 'state/app-state'
 import {
-  BASE_PATH,
   Button,
   DropdownMenu,
   DropdownMenuContent,
@@ -20,22 +25,14 @@ import {
   DropdownMenuSub,
   DropdownMenuTrigger,
   IconCommand,
-  IconFileText,
   IconSearch,
   IconSettings,
-  IconUser,
   Separator,
   Theme,
   cn,
   themes,
   useCommandMenu,
 } from 'ui'
-import { Home, User } from 'icons'
-import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { useFlag, useIsFeatureEnabled } from 'hooks'
-import { IS_PLATFORM } from 'lib/constants'
-import { detectOS } from 'lib/helpers'
-import { useAppStateSnapshot } from 'state/app-state'
 import { useProjectContext } from '../ProjectContext'
 import {
   generateOtherRoutes,
@@ -43,9 +40,8 @@ import {
   generateSettingsRoutes,
   generateToolRoutes,
 } from './NavigationBar.utils'
+import { NavigationIconButton } from './NavigationIconButton'
 import NavigationIconLink from './NavigationIconLink'
-import { useProfile } from 'lib/profile'
-import SVG from 'react-inlinesvg'
 
 export const ICON_SIZE = 20
 export const ICON_STROKE_WIDTH = 1.5
@@ -124,19 +120,6 @@ const NavigationBar = () => {
                 alt="Supabase"
                 className="absolute h-[40px] w-6 cursor-pointer rounded"
               />
-              {/* <SVG
-                src={`${BASE_PATH}/img/logo/supabase-wordmark.svg`}
-                width={96}
-                className={cn(
-                  'absolute fill-foreground',
-                  'left-8 group-data-[state=expanded]:left-[3rem]',
-                  'opacity-0 group-data-[state=expanded]:opacity-100',
-                  'transition-all',
-                  'duration-200',
-                  'delay-100',
-                  'group-data-[state=expanded]:delay-0'
-                )}
-              /> */}
             </Link>
           )}
           <NavigationIconLink
@@ -168,37 +151,12 @@ const NavigationBar = () => {
           {otherRoutes.map((route) => {
             if (route.key === 'api' && isNewAPIDocsEnabled) {
               return (
-                <Tooltip.Root delayDuration={0} key={route.key}>
-                  <Tooltip.Trigger asChild>
-                    <Button
-                      type="text"
-                      size="tiny"
-                      onClick={() => snap.setShowProjectApiDocs(true)}
-                      className="border-none group"
-                    >
-                      <div className="py-[7px]">
-                        <IconFileText
-                          size={18}
-                          strokeWidth={2}
-                          className="transition text-foreground-lighter group-hover:text-foreground"
-                        />
-                      </div>
-                    </Button>
-                  </Tooltip.Trigger>
-                  <Tooltip.Portal>
-                    <Tooltip.Content side="right">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'bg-alternative shadow-lg shadow-background-surface-100	py-1.5 px-3 rounded leading-none', // background
-                          'border border-default', //border
-                        ].join(' ')}
-                      >
-                        <span className="text-foreground text-xs">Project API Docs</span>
-                      </div>
-                    </Tooltip.Content>
-                  </Tooltip.Portal>
-                </Tooltip.Root>
+                <NavigationIconButton
+                  onClick={() => snap.setShowProjectApiDocs(true)}
+                  icon={<ApiDocs size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
+                >
+                  Project API
+                </NavigationIconButton>
               )
             } else {
               return (
@@ -222,61 +180,35 @@ const NavigationBar = () => {
           ))}
 
           {IS_PLATFORM && (
-            <Button
-              type="text"
+            <NavigationIconButton
               size="tiny"
               onClick={() => setIsOpen(true)}
-              className="h-10 [&>span]:relative [&>span]:items-center [&>span]:gap-3 [&>span]:flex [&>span]:w-full [&>span]:h-full p-0"
+              type="text"
+              icon={<IconSearch size={ICON_SIZE} strokeWidth={2} />}
+              rightText={
+                <div
+                  className={[
+                    'flex items-center gap-1',
+                    'h-6',
+                    'py-1.5 px-2',
+                    'bg-surface-100',
+                    'text-foreground-lighter',
+                    'border border-default rounded-md',
+                    'shadow-xs shadow-background-surface-100',
+                    'leading-none',
+                  ].join(' ')}
+                >
+                  {os === 'macos' ? (
+                    <IconCommand size={11.5} strokeWidth={1.5} />
+                  ) : (
+                    <p className="text-xs">CTRL</p>
+                  )}
+                  <p className="text-xs">K</p>
+                </div>
+              }
             >
-              <IconSearch
-                size={ICON_SIZE}
-                strokeWidth={2}
-                className="absolute left-2 text-foreground-lighter"
-              />
-              <span
-                className=" 
-                    absolute
-                    left-7
-                    group-data-[state=expanded]:left-10
-                    w-[10rem]
-                    
-                    flex flex-col 
-                    items-center
-                    
-                    text-sm 
-
-                    opacity-0
-                    group-data-[state=expanded]:opacity-100 
-
-                    transition-all 
-                    delay-100              
-                  "
-              >
-                <span className="w-full text-left text-foreground-light truncate">Search</span>
-              </span>
-
-              <div
-                className={[
-                  'absolute',
-                  'left-[12rem]',
-                  'opacity-0',
-                  'delay-100',
-                  'group-data-[state=expanded]:opacity-100 ',
-                  'text-foreground-lighter',
-                  'bg-surface-100 shadow-xs shadow-background-surface-100	h-6 py-1.5 px-2 rounded-md leading-none', // background
-                  'border border-default', // border
-                  'flex items-center gap-1', // layout
-                  'transition-all ',
-                ].join(' ')}
-              >
-                {os === 'macos' ? (
-                  <IconCommand size={11.5} strokeWidth={1.5} />
-                ) : (
-                  <p className="text-xs">CTRL</p>
-                )}
-                <p className="text-xs">K</p>
-              </div>
-            </Button>
+              Search
+            </NavigationIconButton>
           )}
 
           <DropdownMenu
