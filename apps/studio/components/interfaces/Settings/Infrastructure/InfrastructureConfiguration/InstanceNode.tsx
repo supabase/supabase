@@ -194,6 +194,8 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                 <Badge color="green">Healthy</Badge>
               ) : status === PROJECT_STATUS.COMING_UP ? (
                 <Badge color="slate">Coming up</Badge>
+              ) : status === PROJECT_STATUS.RESTORING ? (
+                <Badge color="slate">Restoring</Badge>
               ) : (
                 <Badge color="amber">Unhealthy</Badge>
               )}
