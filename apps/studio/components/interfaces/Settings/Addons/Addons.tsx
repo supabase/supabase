@@ -386,7 +386,7 @@ const Addons = () => {
             <ScaffoldSection>
               <ScaffoldSectionDetail>
                 <div className="space-y-6">
-                  <p className="m-0">IPv4 address</p>
+                  <p className="m-0">Dedicated IPv4 address</p>
                   <div className="space-y-2">
                     <p className="text-sm text-foreground-light m-0">More information</p>
                     <div>
@@ -405,31 +405,6 @@ const Addons = () => {
                 </div>
               </ScaffoldSectionDetail>
               <ScaffoldSectionContent>
-                <Alert_Shadcn_ variant="warning">
-                  <IconAlertTriangle className="h-4 w-4" />
-                  <AlertTitle_Shadcn_>
-                    PGBouncer and IPv4 Deprecation on January, 26th
-                  </AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_>
-                    <p>
-                      Direct connections via db.{projectRef}.supabase.co will resolve to an IPv6
-                      address starting from January 26th. If you plan on not using our connection
-                      pooler and your environment does not support IPv6, consider enabling the
-                      add-on.
-                    </p>
-                    <div className="mt-2">
-                      <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                        <a
-                          href="https://supabase.com/docs/guides/platform/ipv4-address"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          Learn more
-                        </a>
-                      </Button>
-                    </div>
-                  </AlertDescription_Shadcn_>
-                </Alert_Shadcn_>
                 <div className="flex space-x-6">
                   <div>
                     <div className="rounded-md bg-surface-100 border border-muted w-[160px] h-[96px] overflow-hidden">
@@ -453,8 +428,8 @@ const Addons = () => {
                     <p className="text-sm text-foreground-light">Current option:</p>
                     <p>
                       {ipv4 !== undefined
-                        ? 'IPv4 address is enabled'
-                        : 'IPv4 address is not enabled'}
+                        ? 'Dedicated IPv4 address is enabled'
+                        : 'Dedicated IPv4 address is not enabled'}
                     </p>
                     <Tooltip.Root delayDuration={0}>
                       <Tooltip.Trigger asChild>
@@ -470,7 +445,7 @@ const Addons = () => {
                               !(canUpdateIPv4 || ipv4)
                             }
                           >
-                            Change IPv4 address
+                            Change dedicated IPv4 address
                           </Button>
                         </div>
                       </Tooltip.Trigger>
@@ -494,19 +469,6 @@ const Addons = () => {
                         )}
                       </Tooltip.Portal>
                     </Tooltip.Root>
-                    {/*<ProjectUpdateDisabledTooltip
-                      projectUpdateDisabled={projectUpdateDisabled}
-                      projectNotActive={!isProjectActive}
-                    >
-                      <Button
-                        type="default"
-                        className="mt-2 pointer-events-auto"
-                        onClick={() => snap.setPanelKey('ipv4')}
-                        disabled={isBranch || !isProjectActive || projectUpdateDisabled}
-                      >
-                        Change IPv4 address
-                      </Button>
-                      </ProjectUpdateDisabledTooltip>*/}
                   </div>
                 </div>
               </ScaffoldSectionContent>
