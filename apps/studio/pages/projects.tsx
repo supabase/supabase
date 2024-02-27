@@ -2,8 +2,8 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
 import ProjectList from 'components/interfaces/Home/ProjectList'
-import { AccountLayout } from 'components/layouts'
 import HomePageActions from 'components/interfaces/HomePageActions'
+import { AccountLayout } from 'components/layouts'
 import AlertError from 'components/ui/AlertError'
 import Connecting from 'components/ui/Loading/Loading'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
@@ -11,16 +11,12 @@ import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
 import { useFlag, useIsFeatureEnabled } from 'hooks'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { NextPageWithLayout } from 'types'
-import { useProfile } from 'lib/profile'
 
 const ProjectsPage: NextPageWithLayout = () => {
   const router = useRouter()
   const [search, setSearch] = useState('')
   const { data: organizations, isError, isSuccess } = useOrganizationsQuery()
   useAutoProjectsPrefetch()
-
-  const data = useProfile()
-  console.log(data)
 
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
 
