@@ -18,7 +18,6 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { usePgBouncerStatus } from 'data/config/pgbouncer-enabled-query'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
-import { useFlag } from 'hooks'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 
@@ -47,7 +46,7 @@ export const UsePoolerCheckbox = ({
   const { data: settings, isSuccess: isSuccessSettings } = useProjectSettingsQuery({ projectRef })
   const { data: pgBouncerStatus } = usePgBouncerStatus({ projectRef: projectRef })
 
-  const readReplicasEnabled = useFlag('readReplicas') && project?.is_read_replicas_enabled
+  const readReplicasEnabled = project?.is_read_replicas_enabled
   const poolingConfiguration = readReplicasEnabled
     ? data?.find((x) => x.identifier === state.selectedDatabaseId)
     : data?.find((x) => x.database_type === 'PRIMARY')

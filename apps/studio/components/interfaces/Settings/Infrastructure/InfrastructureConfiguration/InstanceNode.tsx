@@ -214,18 +214,21 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
             <Button type="text" icon={<IconMoreVertical />} className="px-1" />
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-40" side="bottom" align="end">
-            <DropdownMenuItem className="gap-x-2">
+            <DropdownMenuItem
+              disabled={status !== PROJECT_STATUS.ACTIVE_HEALTHY}
+              className="gap-x-2"
+            >
               <Link href={`/project/${ref}/settings/database?connectionString=${id}`}>
                 View connection string
               </Link>
             </DropdownMenuItem>
+            <DropdownMenuSeparator />
             {/* <DropdownMenuItem className="gap-x-2" onClick={() => onSelectRestartReplica()}>
                 Restart replica
               </DropdownMenuItem> */}
             {/* <DropdownMenuItem className="gap-x-2" onClick={() => onSelectResizeReplica()}>
                 Resize replica
               </DropdownMenuItem> */}
-            <DropdownMenuSeparator />
             <DropdownMenuItem className="gap-x-2" onClick={() => onSelectDropReplica()}>
               Drop replica
             </DropdownMenuItem>
