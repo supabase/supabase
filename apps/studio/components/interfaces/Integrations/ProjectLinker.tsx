@@ -354,7 +354,7 @@ const ProjectLinker = ({
                       <CommandGroup_Shadcn_>
                         <CommandItem_Shadcn_
                           className="flex gap-2 items-center cursor-pointer"
-                          onSelect={openInstallGitHubIntegrationWindow}
+                          onSelect={() => openInstallGitHubIntegrationWindow('install')}
                         >
                           <PlusIcon size={16} />
                           <span>Add GitHub Repositories</span>

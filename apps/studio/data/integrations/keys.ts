@@ -19,6 +19,7 @@ export const integrationKeys = {
     repo_name,
     branch_name,
   ],
+  githubAuthorization: () => ['github-authorization'] as const,
   githubRepositoriesList: () => ['github-repositories'] as const,
   githubBranchesList: (connectionId: number | undefined) => ['github-branches', connectionId],
   githubPullRequestsList: (connectionId: number | undefined, prNumbers: number[] | undefined) => [

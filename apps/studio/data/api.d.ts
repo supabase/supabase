@@ -797,6 +797,8 @@ export interface paths {
     patch: operations['VercelConnectionsController_updateVercelConnection']
   }
   '/platform/integrations/github/authorization': {
+    /** Get GitHub authorization */
+    get: operations['GitHubAuthorizationsController_getGitHubAuthorization']
     /** Create GitHub authorization */
     post: operations['GitHubAuthorizationsController_createGitHubAuthorization']
   }
@@ -10847,6 +10849,15 @@ export interface operations {
         content: never
       }
       /** @description Failed to update Vercel connection */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Get GitHub authorization */
+  GitHubAuthorizationsController_getGitHubAuthorization: {
+    responses: {
+      /** @description Failed to get GitHub authorization */
       500: {
         content: never
       }

@@ -10,9 +10,11 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedOrganization } from 'hooks'
 import { EMPTY_ARR } from 'lib/void'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
-import { SidePanel } from 'ui'
+import { Button, SidePanel } from 'ui'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import toast from 'react-hot-toast'
+import { useGitHubAuthorizationQuery } from 'data/integrations/github-authorization-query'
+import { openInstallGitHubIntegrationWindow } from 'lib/github'
 
 const GITHUB_ICON = (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 98 96" className="w-6">
@@ -32,6 +34,9 @@ export type SidePanelGitHubRepoLinkerProps = {
 const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProps) => {
   const selectedOrganization = useSelectedOrganization()
   const sidePanelStateSnapshot = useSidePanelsStateSnapshot()
+
+  const { data: gitHubAuthorization, isLoading: isLoadingGitHubAuthorization } =
+    useGitHubAuthorizationQuery()
 
   // [Alaister]: temp override with <any> until the typegen is fixed
   const { data: githubReposData, isLoading: isLoadingGitHubRepos } =
@@ -104,6 +109,23 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
 Check the details below before proceeding
           `}
           />
+
+          {gitHubAuthorization === null ? (
+            <div className="my-8">
+              Write something nice about authorization and that user need to authorize the app
+              before they can create connections
+              <Button
+                size="small"
+                onClick={() => {
+                  openInstallGitHubIntegrationWindow('authorize')
+                }}
+              >
+                Authorize
+              </Button>
+            </div>
+          ) : (
+            ''
+          )}
         </SidePanel.Content>
         <SidePanel.Content className="flex flex-col gap-2">
           <ProjectLinker
