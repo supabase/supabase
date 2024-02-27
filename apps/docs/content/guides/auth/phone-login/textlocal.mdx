@@ -6,55 +6,58 @@ description: 'How to set up and use Mobile OTP with Textlocal and Supabase.'
 
 <Admonition type="tip">
 
-To manage costs related to SMS authentication, consider setting project rate limits and configuring CAPTCHA. For additional cost-control strategies, visit the Production Checklist.
+To manage costs related to SMS authentication, consider setting project rate limits and configuring CAPTCHA. For additional cost-control strategies and to ensure compliance with TRAI's DLT requirements, visit the Production Checklist.
 
 </Admonition>
 
 ## Prerequisites
 
-You will need:
+Before you begin, ensure you have the following:
 
-<Admonition type="note">
+- **A Textlocal account**: Sign up [here](https://www.textlocal.com/signup) to start sending SMS.
+- **A Supabase project**: Necessary for SMS authentication integration. Create your project [here](https://supabase.com/dashboard).
+- **A mobile phone**: To receive SMS, verifying the setup and functionality.
+- **DLT Registration**: Required for businesses in India, as per TRAI regulations, to send commercial SMS.
 
-Textlocal operates regional websites, so the signup URL may vary based on your location.
+## DLT Registration Requirements for India
 
-</Admonition>
+The Telecom Regulatory Authority of India (TRAI) mandates that all businesses intending to send commercial SMS in India must register their business entity, headers (sender names), and message templates on DLT platforms. This step is essential for legally and effectively sending SMS within India, ensuring compliance with TRAI regulations.
 
-- A Textlocal account (sign up [here](https://www.textlocal.com/signup)).
-- A Supabase project (create one [here](https://supabase.com/dashboard)).
-- A mobile phone capable of receiving SMS.
+1. **Complete your DLT registration**: Visit [this link](https://www.textlocal.in/tcccpr-trai-new-dlt-registration/) for a detailed guide on registering your business on a DLT platform.
+2. **Update your Textlocal account**: After receiving your Entity ID/Registration ID from the DLT registration, update it in your Textlocal account settings [here](https://control.textlocal.in/settings/account/).
+3. **Approval confirmation**: Share a screenshot showing your approved headers from the DLT platform with Textlocal support at support@textlocal.in to activate your SMS services.
 
-## Set up Textlocal as your SMS provider
+## Setting Up Textlocal as Your SMS Provider
 
-You will need the following information to proceed:
+To integrate Textlocal with Supabase, you'll need:
 
-- API Key
-- Sender Name (This is the name that will appear as the sender of the SMS)
-- Configure Supabase
+- **API Key**: For API authentication.
+- **Sender Name**: The name displayed as the SMS sender.
+- **Supabase Configuration**: Steps to integrate with your Supabase project.
 
-### Getting your Textlocal API Key
+### Acquire Your Textlocal API Key
 
-After logging into your Textlocal account, proceed to Settings > API Keys. Here, you'll want to create a new API Key that we will be using for our setup.
+First, log into your Textlocal account and head to the API Keys section under Settings. Here, generate a new API Key. This key will facilitate secure communication between your application and Textlocal's SMS gateway.
 
 ![Get your API Keys](/docs/img/guides/auth-textlocal/2.png)
 
-### Getting a sender name (optional)
+### Setting a Custom Sender Name (Optional)
 
-Textlocal assigns a default sender name, 'TXTLCL', for all outgoing messages. However, for a touch of personalization relevant to your application, you can create your own sender name. Simply navigate to Settings > All Settings > Sender Names within your Textlocal account to set up a sender name that better aligns with your brand identity.
+Textlocal defaults to 'TXTLCL' as the sender name for all messages. However, customizing this to reflect your brand can enhance communication trustworthiness. To change it, navigate in your Textlocal dashboard: **Settings > All Settings > Sender Names**. Here, you can create and apply a sender name that aligns with your brand, adding a personalized touch to your messages.
 
-### Configure Supabase
+### Integrating with Supabase
 
-Next, go to the [Auth > Providers](https://supabase.com/dashboard/project/_/auth/providers) page on the Supabase dashboard and select "Phone" from the list of Auth Providers.
+To set up Textlocal as your SMS provider in Supabase, follow these steps:
 
-You should see an option to enable the Phone provider.
+1. **Access Supabase Dashboard**: Navigate to your Supabase project dashboard.
+2. **Authentication Providers**: Go to **Auth > Providers** or directly access the settings [here](https://supabase.com/dashboard/project/_/auth/providers).
+3. **Select Phone Provider**: From the list of available authentication providers, choose "Phone".
+4. **Enable Phone Authentication**: Toggle the option to enable the Phone provider.
+5. **Enter Textlocal Details**: Input your Textlocal API Key and Sender Name into the corresponding Supabase fields.
 
-Toggle it on, and copy the API key and Sender values over from the Testlocal dashboard.
+#### Customize Your SMS Template
 
-#### Custom SMS template
-
-You have the option to customize the SMS message that is sent with the OTP code. This can be helpful for branding purposes or when you need to include specific instructions or a website URL.
-
-Utilize the `.Code` variable within your template to display the OTP code.
+Customize the OTP SMS template for branding or to include specific instructions. Use the `.Code` variable to insert the OTP.
 
 ## Next steps
 
