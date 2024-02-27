@@ -16,6 +16,7 @@ interface CardButtonProps {
   className?: string
   fixedHeight?: boolean
   hideChevron?: boolean
+  titleClass?: string
 }
 
 // Define separate interfaces for each type of container
@@ -53,6 +54,7 @@ const CardButton = ({
   loading = false,
   fixedHeight = true,
   hideChevron = false,
+  titleClass = '',
   ...props
 }: PropsWithChildren<CardButtonProps & ContainerProps>) => {
   const isLink = url || linkHref || props.onClick
@@ -122,7 +124,11 @@ const CardButton = ({
       )}
       {icon && <ImageContainer>{icon}</ImageContainer>}
       <div className="flex h-full w-full flex-col space-y-2">
-        {typeof title === 'string' ? <h5 className="text-foreground">{title}</h5> : title}
+        {typeof title === 'string' ? (
+          <h5 className={`text-foreground ${titleClass}`}>{title}</h5>
+        ) : (
+          title
+        )}
         {(children || description) && (
           <div className="flex w-full flex-1 flex-col">
             <p className="text-sm text-foreground-light">{description}</p>

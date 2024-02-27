@@ -62,6 +62,7 @@ export const PolicyTemplates = ({ onSelectTemplate }: PolicyTemplatesProps) => {
               <HoverCardTrigger>
                 <CardButton
                   title={template.name}
+                  titleClass="text-sm"
                   key={template.id}
                   onClick={() => onSelectTemplate(template.statement)}
                   hideChevron

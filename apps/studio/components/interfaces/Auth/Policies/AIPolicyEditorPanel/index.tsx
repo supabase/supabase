@@ -10,6 +10,8 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import {
   Button,
+  IconEdit,
+  IconGrid,
   Modal,
   ScrollArea,
   SheetContent_Shadcn_,
@@ -50,6 +52,7 @@ import RLSCodeEditor from './RLSCodeEditor'
 import { PolicyTemplates } from './PolicyTemplates'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import CardButton from 'components/ui/CardButton'
 
 const DiffEditor = dynamic(
   () => import('@monaco-editor/react').then(({ DiffEditor }) => DiffEditor),
@@ -80,6 +83,7 @@ export const AIPolicyEditorPanel = memo(function ({
 
   // use chat id because useChat doesn't have a reset function to clear all messages
   const [chatId, setChatId] = useState(uuidv4())
+  const [view, setView] = useState<'entry' | 'code'>('entry')
   const editorRef = useRef<IStandaloneCodeEditor | null>(null)
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
   const isTogglingPreviewRef = useRef<boolean>(false)
@@ -269,6 +273,7 @@ export const AIPolicyEditorPanel = memo(function ({
       setDebugThread([])
       setChatId(uuidv4())
       setShowDetails(false)
+      setView('entry')
     }
   }, [visible])
 
@@ -299,119 +304,173 @@ export const AIPolicyEditorPanel = memo(function ({
               setAssistantVisible={setAssistantPanel}
             />
 
-            <PolicyDetails
-              policy={selectedPolicy}
-              showDetails={showDetails}
-              toggleShowDetails={() => setShowDetails(!showDetails)}
-            />
+            {view === 'entry' ? (
+              <div className="flex flex-col grow gap-y-2 items-center justify-center px-16">
+                <p className="text-sm text-foreground-light">
+                  Write rules with PostgreSQL's policies to fit your unique business needs.
+                </p>
+                <div className="w-full grid grid-cols-1 gap-2 lg:grid-cols-1">
+                  <CardButton
+                    title="Get started quickly"
+                    description="Create a policy from a template"
+                    icon={
+                      <div className="flex">
+                        <div
+                          className="
+                  flex h-8 w-8 items-center
+                  justify-center
+                  rounded bg-foreground text-background
+                "
+                        >
+                          <IconGrid size={14} strokeWidth={2} />
+                        </div>
+                      </div>
+                    }
+                    onClick={() => {
+                      setView('code')
+                      setAssistantPanel(true)
+                    }}
+                  />
+                  <CardButton
+                    title="For full customization"
+                    description="Create a policy from scratch"
+                    icon={
+                      <div className="flex">
+                        <div
+                          className="
+                  flex h-8 w-8 items-center
+                  justify-center
+                  rounded bg-foreground text-background
+                "
+                        >
+                          <IconEdit size={14} strokeWidth={2} />
+                        </div>
+                      </div>
+                    }
+                    onClick={() => setView('code')}
+                  />
+                </div>
+              </div>
+            ) : (
+              <>
+                <PolicyDetails
+                  policy={selectedPolicy}
+                  showDetails={showDetails}
+                  toggleShowDetails={() => setShowDetails(!showDetails)}
+                />
+                <div className="flex flex-col h-full w-full justify-between">
+                  {incomingChange ? (
+                    <div className="px-5 py-3 flex justify-between gap-3 bg-surface-75">
+                      <div className="flex gap-2 items-center text-foreground-light">
+                        <FileDiff className="h-4 w-4" />
+                        <span className="text-sm">Accept changes from assistant</span>
+                      </div>
+                      <div className="flex gap-3">
+                        <Button
+                          type="default"
+                          onClick={() => {
+                            setIncomingChange(undefined)
+                            Telemetry.sendEvent(
+                              {
+                                category: 'rls_editor',
+                                action: 'ai_suggestion_discarded',
+                                label: 'rls-ai-assistant',
+                              },
+                              telemetryProps,
+                              router
+                            )
+                          }}
+                        >
+                          Discard
+                        </Button>
+                        <Button
+                          type="primary"
+                          onClick={() => {
+                            acceptChange()
+                            Telemetry.sendEvent(
+                              {
+                                category: 'rls_editor',
+                                action: 'ai_suggestion_accepted',
+                                label: 'rls-ai-assistant',
+                              },
+                              telemetryProps,
+                              router
+                            )
+                          }}
+                        >
+                          Accept
+                        </Button>
+                      </div>
+                    </div>
+                  ) : null}
 
-            <div className="flex flex-col h-full w-full justify-between">
-              {incomingChange ? (
-                <div className="px-5 py-3 flex justify-between gap-3 bg-surface-75">
-                  <div className="flex gap-2 items-center text-foreground-light">
-                    <FileDiff className="h-4 w-4" />
-                    <span className="text-sm">Accept changes from assistant</span>
+                  {incomingChange ? (
+                    <DiffEditor
+                      theme="supabase"
+                      language="pgsql"
+                      className="grow"
+                      original={editorRef.current?.getValue()}
+                      modified={incomingChange}
+                      onMount={(editor) => (diffEditorRef.current = editor)}
+                      options={{
+                        wordWrap: 'on',
+                        renderSideBySide: false,
+                        scrollBeyondLastLine: false,
+                        renderOverviewRuler: false,
+                        renderLineHighlight: 'none',
+                        minimap: { enabled: false },
+                        occurrencesHighlight: false,
+                        folding: false,
+                        selectionHighlight: false,
+                        lineHeight: 20,
+                        padding: { top: 10, bottom: 10 },
+                      }}
+                    />
+                  ) : null}
+                  <div className={`relative h-full ${incomingChange ? 'hidden' : 'block'}`}>
+                    <RLSCodeEditor
+                      id="rls-sql-policy"
+                      defaultValue={''}
+                      editorRef={editorRef}
+                      placeholder={placeholder}
+                    />
                   </div>
-                  <div className="flex gap-3">
-                    <Button
-                      type="default"
-                      onClick={() => {
-                        setIncomingChange(undefined)
-                        Telemetry.sendEvent(
-                          {
-                            category: 'rls_editor',
-                            action: 'ai_suggestion_discarded',
-                            label: 'rls-ai-assistant',
-                          },
-                          telemetryProps,
-                          router
-                        )
-                      }}
-                    >
-                      Discard
-                    </Button>
-                    <Button
-                      type="primary"
-                      onClick={() => {
-                        acceptChange()
-                        Telemetry.sendEvent(
-                          {
-                            category: 'rls_editor',
-                            action: 'ai_suggestion_accepted',
-                            label: 'rls-ai-assistant',
-                          },
-                          telemetryProps,
-                          router
-                        )
-                      }}
-                    >
-                      Accept
-                    </Button>
+
+                  <div className="flex flex-col">
+                    {error !== undefined && (
+                      <QueryError
+                        error={error}
+                        onSelectDebug={onSelectDebug}
+                        open={errorPanelOpen}
+                        setOpen={setErrorPanelOpen}
+                      />
+                    )}
+                    <SheetFooter_Shadcn_ className="flex items-center !justify-between px-5 py-4 w-full">
+                      <Button type="text" onClick={toggleFeaturePreviewModal}>
+                        Toggle feature preview
+                      </Button>
+                      <div className="flex items-center gap-x-2">
+                        <Button
+                          type="default"
+                          disabled={isExecuting}
+                          onClick={() => onSelectCancel()}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          loading={isExecuting}
+                          htmlType="submit"
+                          disabled={isExecuting || incomingChange !== undefined}
+                          onClick={() => onExecuteSQL()}
+                        >
+                          Save policy
+                        </Button>
+                      </div>
+                    </SheetFooter_Shadcn_>
                   </div>
                 </div>
-              ) : null}
-
-              {incomingChange ? (
-                <DiffEditor
-                  theme="supabase"
-                  language="pgsql"
-                  className="grow"
-                  original={editorRef.current?.getValue()}
-                  modified={incomingChange}
-                  onMount={(editor) => (diffEditorRef.current = editor)}
-                  options={{
-                    wordWrap: 'on',
-                    renderSideBySide: false,
-                    scrollBeyondLastLine: false,
-                    renderOverviewRuler: false,
-                    renderLineHighlight: 'none',
-                    minimap: { enabled: false },
-                    occurrencesHighlight: false,
-                    folding: false,
-                    selectionHighlight: false,
-                    lineHeight: 20,
-                    padding: { top: 10, bottom: 10 },
-                  }}
-                />
-              ) : null}
-              <div className={`relative h-full ${incomingChange ? 'hidden' : 'block'}`}>
-                <RLSCodeEditor
-                  id="rls-sql-policy"
-                  defaultValue={''}
-                  editorRef={editorRef}
-                  placeholder={placeholder}
-                />
-              </div>
-
-              <div className="flex flex-col">
-                {error !== undefined && (
-                  <QueryError
-                    error={error}
-                    onSelectDebug={onSelectDebug}
-                    open={errorPanelOpen}
-                    setOpen={setErrorPanelOpen}
-                  />
-                )}
-                <SheetFooter_Shadcn_ className="flex items-center !justify-between px-5 py-4 w-full">
-                  <Button type="text" onClick={toggleFeaturePreviewModal}>
-                    Toggle feature preview
-                  </Button>
-                  <div className="flex items-center gap-x-2">
-                    <Button type="default" disabled={isExecuting} onClick={() => onSelectCancel()}>
-                      Cancel
-                    </Button>
-                    <Button
-                      loading={isExecuting}
-                      htmlType="submit"
-                      disabled={isExecuting || incomingChange !== undefined}
-                      onClick={() => onExecuteSQL()}
-                    >
-                      Save policy
-                    </Button>
-                  </div>
-                </SheetFooter_Shadcn_>
-              </div>
-            </div>
+              </>
+            )}
           </div>
           {assistantVisible && (
             <div
