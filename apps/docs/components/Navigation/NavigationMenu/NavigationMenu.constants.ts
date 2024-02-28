@@ -419,6 +419,11 @@ export const SocialLoginItems = [
     url: '/guides/auth/social-login/auth-discord',
   },
   {
+    name: 'Descope',
+    icon: '/docs/img/icons/descope-icon',
+    url: '/guides/auth/social-login/auth-descope',
+  },
+  {
     name: 'Figma',
     icon: '/docs/img/icons/figma-icon',
     url: '/guides/auth/social-login/auth-figma',

@@ -40,6 +40,16 @@ const authProviders = [
     authType: 'social',
   },
   {
+    name: 'Descope',
+    logo: '/docs/img/icons/descope-icon',
+    href: '/guides/auth/social-login/auth-descope',
+    official: true,
+    supporter: 'Supabase',
+    platform: true,
+    selfHosted: true,
+    authType: 'social',
+  },
+  {
     name: 'Facebook',
     logo: '/docs/img/icons/facebook-icon',
     href: '/guides/auth/social-login/auth-facebook',

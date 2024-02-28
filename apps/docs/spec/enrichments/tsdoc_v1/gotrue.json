@@ -11306,6 +11306,10 @@
           },
           {
             "type": "literal",
+            "value": "descope"
+          },
+          {
+            "type": "literal",
             "value": "facebook"
           },
           {

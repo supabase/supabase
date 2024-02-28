@@ -662,6 +662,44 @@ const EXTERNAL_PROVIDER_DISCORD = {
   },
 }
 
+const EXTERNAL_PROVIDER_DESCOPE = {
+  $schema: JSON_SCHEMA_VERSION,
+  type: 'object',
+  title: 'Descope',
+  properties: {
+    EXTERNAL_DESCOPE_ENABLED: {
+      title: 'Descope enabled',
+      type: 'boolean',
+    },
+    EXTERNAL_DESCOPE_PROJECT_ID: {
+      title: 'Descope Project ID',
+      type: 'string',
+    },
+    EXTERNAL_DESCOPE_ACCESS_KEY: {
+      title: 'Client Secret',
+      type: 'string',
+      isSecret: true,
+    },
+  },
+  validationSchema: object().shape({
+    EXTERNAL_DESCOPE_ENABLED: boolean().required(),
+    EXTERNAL_DESCOPE_PROJECT_ID: string().when('EXTERNAL_DESCOPE_ENABLED', {
+      is: true,
+      then: (schema) => schema.required('Descope Project ID is required'),
+      otherwise: (schema) => schema,
+    }),
+    EXTERNAL_DESCOPE_ACCESS_KEY: string().when('EXTERNAL_DESCOPE_ENABLED', {
+      is: true,
+      then: (schema) => schema.required('Descope Access Key is required'),
+      otherwise: (schema) => schema,
+    }),
+  }),
+  misc: {
+    iconKey: 'descope-icon',
+    requiresRedirect: true,
+  },
+}
+
 const EXTERNAL_PROVIDER_FACEBOOK = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
@@ -1359,6 +1397,7 @@ export const PROVIDERS_SCHEMAS = [
   EXTERNAL_PROVIDER_AZURE,
   EXTERNAL_PROVIDER_BITBUCKET,
   EXTERNAL_PROVIDER_DISCORD,
+  EXTERNAL_PROVIDER_DESCOPE,
   EXTERNAL_PROVIDER_FACEBOOK,
   EXTERNAL_PROVIDER_FIGMA,
   EXTERNAL_PROVIDER_GITHUB,

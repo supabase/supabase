@@ -1634,6 +1634,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/auth/auth-descope',
+    destination: '/docs/guides/auth/social-login/auth-descope',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/auth/auth-keycloak',
     destination: '/docs/guides/auth/social-login/auth-keycloak',
   },

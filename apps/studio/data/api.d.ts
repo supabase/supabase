@@ -1955,6 +1955,9 @@ export interface components {
       EXTERNAL_DISCORD_ENABLED: boolean
       EXTERNAL_DISCORD_CLIENT_ID: string
       EXTERNAL_DISCORD_SECRET: string
+      EXTERNAL_DESCOPE_ENABLED: boolean
+      EXTERNAL_DESCOPE_PROJECT_ID: string
+      EXTERNAL_DESCOPE_ACCESS_KEY: string
       EXTERNAL_FACEBOOK_ENABLED: boolean
       EXTERNAL_FACEBOOK_CLIENT_ID: string
       EXTERNAL_FACEBOOK_SECRET: string
@@ -2101,6 +2104,9 @@ export interface components {
       EXTERNAL_DISCORD_ENABLED?: boolean
       EXTERNAL_DISCORD_CLIENT_ID?: string
       EXTERNAL_DISCORD_SECRET?: string
+      EXTERNAL_DESCOPE_ENABLED?: boolean
+      EXTERNAL_DESCOPE_PROJECT_ID?: string
+      EXTERNAL_DESCOPE_ACCESS_KEY?: string
       EXTERNAL_FACEBOOK_ENABLED?: boolean
       EXTERNAL_FACEBOOK_CLIENT_ID?: string
       EXTERNAL_FACEBOOK_SECRET?: string
@@ -4800,6 +4806,9 @@ export interface components {
       external_discord_client_id: string | null
       external_discord_enabled: boolean | null
       external_discord_secret: string | null
+      external_descope_client_id: string | null
+      external_descope_enabled: boolean | null
+      external_descope_secret: string | null
       external_email_enabled: boolean | null
       external_facebook_client_id: string | null
       external_facebook_enabled: boolean | null
@@ -5020,6 +5029,9 @@ export interface components {
       external_discord_enabled?: boolean
       external_discord_client_id?: string
       external_discord_secret?: string
+      external_descope_enabled?: boolean
+      external_descope_client_id?: string
+      external_descope_secret?: string
       external_facebook_enabled?: boolean
       external_facebook_client_id?: string
       external_facebook_secret?: string

@@ -1265,6 +1265,10 @@
                       "type": "boolean",
                       "x-go-name": "Discord"
                     },
+                    "descope": {
+                      "type": "boolean",
+                      "x-go-name": "Descope"
+                    },
                     "email": {
                       "type": "boolean",
                       "x-go-name": "Email"
@@ -3183,6 +3187,10 @@
           "type": "boolean",
           "x-go-name": "Discord"
         },
+        "descope": {
+          "type": "boolean",
+          "x-go-name": "Descope"
+        },
         "email": {
           "type": "boolean",
           "x-go-name": "Email"
@@ -3297,6 +3305,10 @@
             "discord": {
               "type": "boolean",
               "x-go-name": "Discord"
+            },
+            "descope": {
+              "type": "boolean",
+              "x-go-name": "Descope"
             },
             "email": {
               "type": "boolean",
@@ -4039,6 +4051,10 @@
               "discord": {
                 "type": "boolean",
                 "x-go-name": "Discord"
+              },
+              "descope": {
+                "type": "boolean",
+                "x-go-name": "Descope"
               },
               "email": {
                 "type": "boolean",

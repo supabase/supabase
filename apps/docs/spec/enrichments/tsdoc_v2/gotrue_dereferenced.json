@@ -10994,6 +10994,14 @@
                                       },
                                       {
                                         "type": "literal",
+                                        "value": "descope"
+                                      },
+                                      {
+                                        "type": "literal",
+                                        "value": "descope"
+                                      },
+                                      {
+                                        "type": "literal",
                                         "value": "facebook"
                                       },
                                       {
@@ -12963,6 +12971,10 @@
                                       {
                                         "type": "literal",
                                         "value": "discord"
+                                      },
+                                      {
+                                        "type": "literal",
+                                        "value": "descope"
                                       },
                                       {
                                         "type": "literal",
@@ -27523,6 +27535,10 @@
           },
           {
             "type": "literal",
+            "value": "descope"
+          },
+          {
+            "type": "literal",
             "value": "facebook"
           },
           {
@@ -28614,6 +28630,10 @@
                       {
                         "type": "literal",
                         "value": "discord"
+                      },
+                      {
+                        "type": "literal",
+                        "value": "descope"
                       },
                       {
                         "type": "literal",

@@ -1,0 +1,123 @@
+---
+id: 'auth-descope'
+title: 'Login with Descope'
+description: 'Add Descope to your Supabase project'
+---
+
+To enable Descope for your project, you need to use the default Descope OIDC Application and add your Descope Project ID and Descope Access Key to your Supabase Dashboard.
+
+## Overview
+
+In this guide, we will cover how to use Supabase OAuth with Descope to implement Single-Sign-On(SSO).
+
+The procedure consists of five broad steps:
+
+- Create a new Project in Descope.
+- Obtain the `Project ID` from the [Project Settings](https://app.descope.com/settings/project) page.
+- Create and obtain the `Access Key` from the [Access Keys](https://app.descope.com/accesskeys) page.
+- Add your Descope Project ID and Access Key into your Supabase project
+
+## Create a Descope Project
+
+Either [Sign Up](https://www.descope.com/sign-up) for a Descope account, or login to your [Descope Console](https://app.descope.com) if you already have an account.
+
+## Obtain your Descope Project ID
+
+In order to use Descope as an OAuth Provider, you'll need your Descope Project ID. You can find this in the Descope Console, underneath [Project Settings](https://app.descope.com/settings/project).
+
+![Fetch Descope Project ID](/docs/img/guides/auth-descope/descope-project-id.png)
+
+## Create and Obtain your Descope Access Key
+
+Head over to the [Access Keys](https://app.descope.com/accesskeys) page and create a new Access Key.
+
+![Create Descope Access Key](/docs/img/guides/auth-descope/descope-access-key.png)
+
+## Add your WorkOS credentials into your Supabase project
+
+<SocialProviderSettingsSupabase provider="Descope" />
+
+## Add login code to your client app
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `descope` as the `provider`:
+
+```js
+async function signInWithWorkOS() {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'descope',
+    options: {
+      queryParams: {
+        connection: '<your_connection>',
+        organization: '<your_organization',
+        workos_provider: '<your_provider>',
+      },
+    },
+  })
+}
+```
+
+Refer to the [Descope Documentation](https://workos.com/docs/reference/sso/authorize/) to learn more about the different methods.
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `WorkOS` as the `Provider`:
+
+```kotlin
+suspend fun signInWithWorkOS() {
+	supabase.auth.signInWith(WorkOS) {
+		queryParams["connection"] = "<your_connection>"
+		queryParams["organization"] = "<your_organization>"
+		queryParams["workos_provider"] = "<your_provider>"
+	}
+}
+```
+
+Refer to the [WorkOS Documentation](https://workos.com/docs/reference/sso/authorize/) to learn more about the different methods.
+
+</TabPanel>
+</Tabs>
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```js
+async function signOut() {
+  const { error } = await supabase.auth.signOut()
+}
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```kotlin
+suspend fun signOut() {
+	supabase.auth.signOut()
+}
+```
+
+</TabPanel>
+</Tabs>
+
+## Resources
+
+- [Descope Documentation](https://docs.descope.com/)
