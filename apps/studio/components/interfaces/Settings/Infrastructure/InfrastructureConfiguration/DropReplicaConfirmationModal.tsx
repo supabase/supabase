@@ -26,7 +26,7 @@ const DropReplicaConfirmationModal = ({
 }: DropReplicaConfirmationModalProps) => {
   const { ref: projectRef } = useParams()
   const formattedId = formatDatabaseID(selectedReplica?.identifier ?? '')
-  const { mutateAsync: removeReadReplica } = useReadReplicaRemoveMutation({
+  const { mutateAsync: removeReadReplica, isLoading: isRemoving } = useReadReplicaRemoveMutation({
     onSuccess: () => {
       toast.success(`Tearing down read replica (ID: ${formattedId})`)
       onSuccess()
@@ -45,6 +45,7 @@ const DropReplicaConfirmationModal = ({
     <ConfirmationModal
       danger
       size="medium"
+      loading={isRemoving}
       visible={selectedReplica !== undefined}
       header={`Confirm to drop selected replica? (ID: ${formattedId})`}
       buttonLabel="Drop replica"

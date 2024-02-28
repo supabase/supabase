@@ -17,7 +17,6 @@ import {
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import CSVButton from 'components/ui/CSVButton'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
-import { useFlag } from 'hooks'
 import { Filters, LogSearchCallback, LogTemplate, PREVIEWER_DATEPICKER_HELPERS } from '.'
 import DatePickers from './Logs.DatePickers'
 import { FILTER_OPTIONS, LogsTableName } from './Logs.constants'
@@ -69,12 +68,10 @@ const PreviewFilterPanel = ({
 }: PreviewFilterPanelProps) => {
   const router = useRouter()
   const [search, setSearch] = useState('')
-  const readReplicasEnabled = useFlag('readReplicas')
   const { project } = useProjectContext()
 
   // [Joshen] These are the routes tested that can show replica logs
   const showDatabaseSelector =
-    readReplicasEnabled &&
     project?.is_read_replicas_enabled &&
     ['/project/[ref]/logs/edge-logs', '/project/[ref]/logs/pooler-logs'].includes(router.pathname)
 

@@ -126,7 +126,7 @@ const SqlEditor: NextPageWithLayout = () => {
   }, [isPgInfoReady])
 
   return (
-    <div className="SQLTabContainer flex-1">
+    <div className="flex-1">
       <SQLEditor />
     </div>
   )

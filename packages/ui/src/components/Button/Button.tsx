@@ -37,19 +37,27 @@ const buttonVariants = cva(
             text-white
             border-brand
             focus-visible:outline-brand-600
-            shadow-sm`,
+            shadow-sm
+            data-[state=open]:bg-brand-button/80
+            data-[state=open]:outline-brand-600
+            `,
         secondary: `
             bg-foreground
             text-background hover:text-border-stronger
             focus-visible:text-border-control
             border-foreground-light hover:border-foreground-lighter
             focus-visible:outline-border-strong
+            data-[state=open]:border-foreground-lighter
+            data-[state=open]:outline-border-strong
             shadow-sm`,
         default: `
             text-foreground
             bg-button hover:bg-selection
             border-button hover:border-button-hover
             focus-visible:outline-brand-600
+            data-[state=open]:bg-selection
+            data-[state=open]:outline-brand-600
+            data-[state=open]:border-button-hover
             shadow-sm`,
         alternative: `
             text-foreground
@@ -57,12 +65,18 @@ const buttonVariants = cva(
             border-brand-500
             focus-visible:border-brand-500
             focus-visible:outline-brand-600
+            data-[state=open]:bg-brand-500
+            data-[state=open]:border-brand-500
+            data-[state=open]:outline-brand-600
             shadow-sm`,
         outline: `
             text-foreground
             bg-transparent
             border-strong hover:border-stronger
-            focus-visible:outline-border-strong`,
+            focus-visible:outline-border-strong
+            data-[state=open]:border-stronger
+            data-[state=open]:outline-border-strong
+            `,
         dashed: `
             text-foreground
             border
@@ -70,6 +84,8 @@ const buttonVariants = cva(
             border-strong hover:border-stronger
             bg-transparent
             focus-visible:outline-border-strong
+            data-[state=open]:border-stronger
+            data-[state=open]:outline-border-strong
             shadow-sm`,
         link: `
             text-brand-600
@@ -79,12 +95,17 @@ const buttonVariants = cva(
             border-opacity-0
             bg-opacity-0
             shadow-none
-            focus-visible:outline-border-strong`,
+            focus-visible:outline-border-strong
+            data-[state=open]:bg-brand-400
+            data-[state=open]:outline-border-strong
+            `,
         text: `
             text-foreground
             hover:bg-surface-300
             shadow-none
             focus-visible:outline-border-strong
+            data-[state=open]:bg-surface-300
+            data-[state=open]:outline-border-strong
             border-transparent`,
         danger: `
             text-red-1100
@@ -93,6 +114,10 @@ const buttonVariants = cva(
             hover:bg-red-900
             hover:text-lo-contrast
             focus-visible:outline-red-700
+            data-[state=open]:border-red-900
+            data-[state=open]:bg-red-900
+            data-[state=open]:text-lo-contrast
+            data-[state=open]:outline-red-700
             shadow-sm`,
         warning: `
             text-amber-1100
@@ -101,6 +126,10 @@ const buttonVariants = cva(
             hover:bg-amber-900
             hover:text-hi-contrast
             focus-visible:outline-amber-700
+            data-[state=open]:border-amber-900
+            data-[state=open]:bg-amber-900
+            data-[state=open]:text-hi-contrast
+            data-[state=open]:outline-amber-700
             shadow-sm`,
       },
       block: {

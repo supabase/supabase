@@ -1,6 +1,5 @@
 import { useParams } from 'common'
 import { CLIENT_LIBRARIES } from 'common/constants'
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
@@ -28,17 +27,17 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { getProjectAuthConfig } from 'data/auth/auth-config-query'
 import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { Project } from 'data/projects/project-detail-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useFlag, useStore } from 'hooks'
 import useLatest from 'hooks/misc/useLatest'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
+import { HelpCircle } from 'lucide-react'
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
 import { CATEGORY_OPTIONS, SERVICE_OPTIONS, SEVERITY_OPTIONS } from './Support.constants'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { Project } from 'data/projects/project-detail-query'
-import { HelpCircle } from 'lucide-react'
 
 const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
@@ -121,16 +120,6 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
   const { data: subscription, isLoading: isLoadingSubscription } = useOrgSubscriptionQuery({
     orgSlug: selectedOrganizationSlug,
   })
-
-  useEffect(() => {
-    if (!uploadedFiles) return
-    const objectUrls = uploadedFiles.map((file) => URL.createObjectURL(file))
-    setUploadedDataUrls(objectUrls)
-
-    return () => {
-      objectUrls.forEach((url: any) => URL.revokeObjectURL(url))
-    }
-  }, [uploadedFiles])
 
   const { profile } = useProfile()
   const respondToEmail = profile?.primary_email ?? 'your email'
@@ -239,6 +228,23 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
 
   const ipv4MigrationStringMatched = ipv4MigrationStrings.some((str) => textAreaValue.includes(str))
 
+  useEffect(() => {
+    if (!uploadedFiles) return
+    const objectUrls = uploadedFiles.map((file) => URL.createObjectURL(file))
+    setUploadedDataUrls(objectUrls)
+
+    return () => {
+      objectUrls.forEach((url: any) => URL.revokeObjectURL(url))
+    }
+  }, [uploadedFiles])
+
+  useEffect(() => {
+    if (isSuccessProjects && ref !== undefined) {
+      const selectedProjectFromUrl = projects.find((project) => project.ref === ref)
+      if (selectedProjectFromUrl !== undefined) setSelectedProjectRef(selectedProjectFromUrl.ref)
+    }
+  }, [isSuccessProjects])
+
   return (
     <Form id="support-form" initialValues={initialValues} validate={onValidate} onSubmit={onSubmit}>
       {({ resetForm, values }: any) => {
@@ -295,7 +301,12 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
             }
             resetForm({ values: updatedValues, initialValues: updatedValues })
           }
-        }, [isSuccessProjects, isSuccessOrganizations])
+        }, [
+          isSuccessProjects,
+          isSuccessOrganizations,
+          selectedProjectRef,
+          selectedOrganizationSlug,
+        ])
 
         // Populate fields when router is ready, required when navigating to
         // support form on a refresh browser session
@@ -821,4 +832,4 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
   )
 }
 
-export default observer(SupportForm)
+export default SupportForm
