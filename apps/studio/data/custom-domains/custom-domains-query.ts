@@ -1,6 +1,6 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { get } from 'data/fetchers'
+import { get, handleError } from 'data/fetchers'
 import { IS_PLATFORM } from 'lib/constants'
 import { ResponseError } from 'types'
 import { customDomainKeys } from './keys'
@@ -64,16 +64,10 @@ export async function getCustomDomains(
   { projectRef }: CustomDomainsVariables,
   signal?: AbortSignal
 ) {
-  if (!projectRef) {
-    throw new Error('projectRef is required')
-  }
+  if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error: _error } = await get('/v1/projects/{ref}/custom-hostname', {
-    params: {
-      path: {
-        ref: projectRef,
-      },
-    },
+    params: { path: { ref: projectRef } },
     signal,
   })
 
@@ -99,7 +93,7 @@ export async function getCustomDomains(
       } as const
     }
 
-    throw error
+    handleError(error)
   }
 
   return { customDomain: data.data.result as CustomDomainResponse, status: data.status }
