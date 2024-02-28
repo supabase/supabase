@@ -1,9 +1,6 @@
-import { useInView } from 'react-intersection-observer'
-import { FC, PropsWithChildren } from 'react'
-import { highlightSelectedNavItem } from '~/components/CustomHTMLElements/CustomHTMLElements.utils'
-import { useRouter } from 'next/router'
-import { useNavigationMenuContext } from '~/components/Navigation/NavigationMenu/NavigationMenu.Context'
-import { menuState } from '~/hooks/useMenuState'
+import { FC, MutableRefObject, PropsWithChildren } from 'react'
+
+import { useObserveIntersection } from '~/components/reference/RefSectionHandler'
 
 interface ISectionContainer {
   id: string
@@ -54,30 +51,12 @@ const Section: FC<PropsWithChildren<ISectionContainer>> = (props) => {
 }
 
 const StickyHeader: FC<StickyHeader> = (props) => {
-  const router = useRouter()
-  const { setActiveRefItem } = useNavigationMenuContext()
-
-  const { ref } = useInView({
-    threshold: 1,
-    rootMargin: '30% 0% -35% 0px',
-    onChange: (inView, entry) => {
-      if (inView && window) highlightSelectedNavItem(entry.target.attributes['data-ref-id'].value)
-      if (inView && props.scrollSpyHeader) {
-        window.history.replaceState(null, '', entry.target.id)
-        // if (setActiveRefItem) setActiveRefItem(entry.target.attributes['data-ref-id'].value)
-        menuState.setMenuActiveRefId(entry.target.attributes['data-ref-id'].value)
-        // router.push(`/reference/javascript/${entry.target.attributes['data-ref-id'].value}`, null, {
-        //   shallow: true,
-        // })
-      }
-    },
-  })
+  const { ref } = useObserveIntersection()
 
   return (
     <h2
-      ref={ref}
+      ref={ref as MutableRefObject<HTMLHeadingElement>}
       id={props.slug}
-      data-ref-id={props.id}
       className={[
         'text-xl font-medium text-foreground mb-8 scroll-mt-24',
         props.monoFont && 'font-mono',

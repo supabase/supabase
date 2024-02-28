@@ -1,13 +1,14 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React, { Fragment } from 'react'
+import React, { Fragment, memo } from 'react'
+
 import { IconChevronLeft, IconChevronRight, cn } from 'ui'
 
 import RevVersionDropdown from '~/components/RefVersionDropdown'
+import { scrollParentOrigin } from '~/lib/uiUtils'
 import HomeMenuIconPicker from './HomeMenuIconPicker'
 import * as NavItems from './NavigationMenu.constants'
 import { useFirePageChange, useGetInitialCollapsibleProps } from './utils'
-import { scrollParentOrigin } from '~/lib/uiUtils'
 
 const UNTITLED = '__UNTITLED_NAV_CATEGORY__'
 
@@ -39,16 +40,11 @@ const HeaderLink = React.memo(function HeaderLink(props: any) {
 
 interface InnerLinkProps {
   item: RefMenuItem
-  firstItem: boolean
+  firstItem?: boolean
   className?: string
 }
 
-const InnerLink = React.memo(function InnerLink({
-  item,
-  firstItem,
-  className,
-  ...rest
-}: InnerLinkProps) {
+const InnerLink = memo(function InnerLink({ item, firstItem, className, ...rest }: InnerLinkProps) {
   const router = useRouter()
   const firePageChange = useFirePageChange()
 
@@ -56,7 +52,7 @@ const InnerLink = React.memo(function InnerLink({
     <Link
       {...rest}
       className={cn(
-        // Leading makes height consistent between compound and simple versions
+        // Leading makes height beween expandable and non-expandable nav items
         'text-sm text-foreground-lighter leading-6',
         'hover:text-foreground',
         'aria-[current]:text-brand',
@@ -75,7 +71,7 @@ const InnerLink = React.memo(function InnerLink({
           document.getElementById(item.slug)?.scrollIntoView()
         }
         firePageChange(e.target)
-        // Last so the link still woorks if something above errors
+        // Last so the link still works if something above errors
         e.preventDefault()
       }}
     >
@@ -86,10 +82,10 @@ const InnerLink = React.memo(function InnerLink({
 
 export interface RenderLinkProps {
   item: RefMenuItem
-  firstItem: boolean
+  firstItem?: boolean
 }
 
-const RenderLink = React.memo(function RenderLink({ item, firstItem }: RenderLinkProps) {
+const RenderLink = memo(function RenderLink({ item, firstItem }: RenderLinkProps) {
   const { getRootProps, getTriggerProps, getControlledProps } = useGetInitialCollapsibleProps()
 
   const compoundItem = hasChildren(item) && item.items.length > 0
@@ -104,7 +100,7 @@ const RenderLink = React.memo(function RenderLink({ item, firstItem }: RenderLin
         >
           <IconChevronRight
             width={16}
-            className={cn('-mt-[0.2em]', 'group-aria-expanded:rotate-90', 'transition')}
+            className={cn('-mt-[0.2em]', 'group-aria-expanded:-rotate-90', 'transition')}
           />
         </button>
       </div>

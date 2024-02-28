@@ -56,7 +56,6 @@ const getGenericRefStaticProps = async ({
 }
 
 const getGenericRefStaticPaths = ({ flatSections }: { flatSections: Array<ICommonSection> }) => {
-  // In production, generate static pages for every sub-section (better SEO)
   return {
     paths: flatSections.map((section) => {
       return {

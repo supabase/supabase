@@ -1,4 +1,5 @@
 const elementInViewport = (elem: Element) => {
+  console.log(elem)
   const { top, bottom, left, right } = elem.getBoundingClientRect()
   const { innerHeight, innerWidth } = window
 
@@ -6,6 +7,7 @@ const elementInViewport = (elem: Element) => {
   const bottomVisible = bottom > 0 && bottom < innerHeight
   const leftVisible = left > 0 && left < innerWidth
   const rightVisible = right > 0 && right < innerWidth
+  console.log(topVisible, bottomVisible, leftVisible, rightVisible)
 
   return (topVisible || bottomVisible) && (leftVisible || rightVisible)
 }

@@ -10,13 +10,9 @@ import {
 import { useConstant } from 'common'
 
 import { DocsEvent, fireCustomEvent } from '~/lib/events'
+import type { KeysOfValue } from '~/lib/typeUtils'
 import { elementInViewport, prefersReducedMotion } from '~/lib/uiUtils'
 import { type RefMenuItemWithChildren } from './NavigationMenuRefListItems'
-
-// https://www.totaltypescript.com/get-keys-of-an-object-where-values-are-of-a-given-type
-type KeysOfValue<T extends object, TCondition> = {
-  [K in keyof T]: T[K] extends TCondition ? K : never
-}[keyof T]
 
 type RecKeys<Obj extends object> = KeysOfValue<Obj, Array<Obj>>
 
@@ -65,11 +61,6 @@ const createAriaCurrentController = () => {
   }
 }
 
-/**
- * Imperative DOM logic to control aria-current and submenu collapsibility.
- * Doing this imperatively allows us to memoize almost the entire nav menu,
- * and means we can eventually make the bulk of it a Layout Server Component.
- */
 const createCollapsibleController = () => {
   const CLICK_EVENT = DocsEvent.SIDEBAR_EXPAND_CLICK
   const DATA_MARKER = 'data-sidebar-nav-collapsible-group'
@@ -147,7 +138,6 @@ const createCollapsibleController = () => {
     }, 0)
   }
 
-  // Unify typing for this
   const handleToggle = (e: CustomEvent<{ id: string | undefined; open: boolean }>) => {
     if (!e.detail.id) return
 
@@ -160,7 +150,6 @@ const createCollapsibleController = () => {
   }
 
   const handleNavigation = () => {
-    // Need to fix this, this is hacky
     const pathname = window.location.pathname.replace('/docs/reference', '')
     const newExpanded = []
     ;(
@@ -191,7 +180,7 @@ const createCollapsibleController = () => {
 
     return () => {
       _container.removeEventListener(navEvt, handleNavigation)
-      _container.addEventListener(CLICK_EVENT, handleToggle)
+      _container.removeEventListener(CLICK_EVENT, handleToggle)
     }
   }
 
@@ -205,6 +194,11 @@ const createCollapsibleController = () => {
   }
 }
 
+/**
+ * Imperative DOM logic to control aria-current and submenu collapsibility.
+ * Doing this imperatively allows us to memoize almost the entire nav menu,
+ * and means we can eventually make the bulk of it a Layout Server Component.
+ */
 const createNavController = () => {
   const NAV_EVT = DocsEvent.SIDEBAR_NAV_CHANGE
 

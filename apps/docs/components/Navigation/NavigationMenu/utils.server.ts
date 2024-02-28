@@ -12,12 +12,29 @@
 
 import { compact, flow } from 'lodash'
 
-import { type RefMenuCategory, type RefMenuItem, UNTITLED } from './NavigationMenuRefListItems'
-
+import { assertServer } from '~/lib/server'
+import type apiCommonSections from '~/spec/common-api-sections.json'
 import type cliCommonSections from '~/spec/common-cli-sections.json'
 import type commonClientLibSections from '~/spec/common-client-libs-sections.json'
+import type selfHostingAnalyticsCommonSections from '~/spec/common-self-hosting-analytics-sections.json'
+import type selfHostingAuthCommonSections from '~/spec/common-self-hosting-auth-sections.json'
+import type selfHostingFunctionsCommonSections from '~/spec/common-self-hosting-functions-sections.json'
+import type selfHostingRealtimeCommonSections from '~/spec/common-self-hosting-realtime-sections.json'
+import type selfHostingStorageCommonSections from '~/spec/common-self-hosting-storage-sections.json'
+import { type RefMenuCategory, type RefMenuItem, UNTITLED } from './NavigationMenuRefListItems'
 
-type CommonRefSections = typeof commonClientLibSections | typeof cliCommonSections
+assertServer()
+
+type CommonRefSections =
+  | typeof apiCommonSections
+  | typeof cliCommonSections
+  | typeof commonClientLibSections
+  | typeof selfHostingAnalyticsCommonSections
+  | typeof selfHostingAuthCommonSections
+  | typeof selfHostingFunctionsCommonSections
+  | typeof selfHostingRealtimeCommonSections
+  | typeof selfHostingStorageCommonSections
+
 type IncludeList = {
   tag: string
   list: Array<string>
@@ -46,14 +63,14 @@ const isExcluded = <T extends { id: string; type: string }>(
     'excludes' in section &&
     Array.isArray(section.excludes) &&
     !!section.excludes?.includes(excludedName)) ||
-  (section.type === includeList.tag && !includeList.list.includes(section.id as string))
+  (section.type === includeList.tag && !includeList.list.includes(section.id))
 
 /**
  * Marks excluded items from the commont client lib spec as null.
  */
 const markExcluded =
   (includeList: IncludeList, excludedName: string | undefined) =>
-  <Elem extends { id: string; type: string }, T extends Array<Elem>>(libSections: T) =>
+  <Elem extends { id: string; type: string }>(libSections: Array<Elem>) =>
     libSections.map((section) => {
       if (isExcluded(includeList, excludedName, section)) return null
       if (!('items' in section)) return section
@@ -71,12 +88,12 @@ const markExcluded =
  * Creates a function that filters the common client library spec to remove
  * functions that are not relevant to the current client library.
  *
- * @param { string } excludedName - A name in the exclusions list of the common client library spec
- * @param { string[] } includeList - Functions included in the spec of  the current client library
+ * @param { string[] } includeList - Functions included in the specific spec
+ * @param { string } excludedName - A name in the exclusions list of the common spec
  */
 const removeExcluded =
   (includeList: IncludeList, excludedName: string | undefined) =>
-  <Elem extends { id: string; type: string }, T extends Array<Elem>>(libSections: T) =>
+  <Elem extends { id: string; type: string }>(libSections: Array<Elem>) =>
     compact(markExcluded(includeList, excludedName)(libSections))
 
 const createUntitledCategory = () =>

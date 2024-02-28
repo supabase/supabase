@@ -1,3 +1,5 @@
+import { memo } from 'react'
+
 import NavigationMenuRefListItems, { type RefMenuCategory } from './NavigationMenuRefListItems'
 
 interface NavigationMenuRefListProps {
@@ -13,4 +15,4 @@ const NavigationMenuRefList = ({ id, menuData }: NavigationMenuRefListProps) => 
   )
 }
 
-export default NavigationMenuRefList
+export default memo(NavigationMenuRefList)

@@ -12,17 +12,17 @@ import {
 } from 'react'
 
 import { type MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
+import { type RefMenuCategory } from '~/components/Navigation/NavigationMenu/NavigationMenuRefListItems'
+import { useFirePageChange } from '~/components/Navigation/NavigationMenu/utils'
 import RefEducationSection from '~/components/reference/RefEducationSection'
 import RefFunctionSection from '~/components/reference/RefFunctionSection'
+import { RefMainSkeleton } from '~/layouts/MainSkeleton'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
+import { scrollParentOrigin } from '~/lib/uiUtils'
 import ApiOperationSection from './ApiOperationSection'
 import CliCommandSection from './CLICommandSection'
 import OldVersionAlert from './OldVersionAlert'
 import { IAPISpec, ICommonSection, IRefStaticDoc, ISpec, TypeSpec } from './Reference.types'
-import { RefMainSkeleton } from '~/layouts/MainSkeleton'
-import { type RefMenuCategory } from '../Navigation/NavigationMenu/NavigationMenuRefListItems'
-import { useFirePageChange } from '../Navigation/NavigationMenu/utils'
-import { scrollParentOrigin } from '~/lib/uiUtils'
 
 /**
  * When a user lands on a URL like https://supabase.com/docs/reference/javascript/sign-up,
@@ -55,7 +55,7 @@ const useScrollTo = () => {
     }
 
     window.addEventListener('popstate', handler)
-    return window.removeEventListener('popstate', handler)
+    return () => window.removeEventListener('popstate', handler)
   }, [])
 }
 
@@ -103,9 +103,9 @@ const IntersectionContextProvider = ({
   options,
   children,
 }: PropsWithChildren<{ cb: IntersectionObserverCallback; options?: IntersectionObserverInit }>) => {
-  const _observer = useIntersectionObserver(cb, options)
+  const observer = useIntersectionObserver(cb, options)
 
-  return <IntersectionContext.Provider value={_observer}>{children}</IntersectionContext.Provider>
+  return <IntersectionContext.Provider value={observer}>{children}</IntersectionContext.Provider>
 }
 
 const RefSectionIntersectProvider = ({ children }: PropsWithChildren) => {

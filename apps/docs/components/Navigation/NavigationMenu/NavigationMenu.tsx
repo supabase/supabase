@@ -254,7 +254,13 @@ function getMenuElement(menu: Menu, menuData?: Array<RefMenuCategory>) {
   }
 }
 
-const NavigationMenu = ({ menuId, menuData }: { menuId: MenuId; menuData?: any }) => {
+const NavigationMenu = ({
+  menuId,
+  menuData,
+}: {
+  menuId: MenuId
+  menuData?: Array<RefMenuCategory>
+}) => {
   const level = menuId
   const menu = getMenuById(level)
 

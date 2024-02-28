@@ -1,6 +1,7 @@
-import { FC, MutableRefObject, PropsWithChildren } from 'react'
 import { useRouter } from 'next/router'
 import Image from 'next/legacy/image'
+import type { FC, MutableRefObject, PropsWithChildren } from 'react'
+
 import { useObserveIntersection } from '~/components/reference/RefSectionHandler'
 
 interface ISectionContainer {
@@ -100,7 +101,6 @@ const StickyHeader: FC<StickyHeader> = ({ icon, ...props }) => {
         <h2
           ref={ref as MutableRefObject<HTMLHeadingElement>}
           id={props.slug}
-          data-ref-id={props.id}
           className={[
             'text-2xl font-medium text-foreground scroll-mt-24',
             !icon && 'mb-8',

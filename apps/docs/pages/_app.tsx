@@ -15,7 +15,7 @@ import { useConsent } from 'ui-patterns/ConsentToast'
 
 import Favicons from '~/components/Favicons'
 import SiteLayout from '~/layouts/SiteLayout'
-import { IS_PLATFORM, IS_PREVIEW } from '~/lib/constants'
+import { BUILD_STATIC_PREVIEW, IS_PLATFORM, IS_PREVIEW } from '~/lib/constants'
 import { unauthedAllowedPost } from '~/lib/fetch/fetchWrappers'
 import { useRootQueryClient } from '~/lib/fetch/queryClient'
 import { LOCAL_STORAGE_KEYS, remove } from '~/lib/storage'
@@ -32,7 +32,7 @@ import { AppPropsWithLayout } from '~/types'
  * you within a single build.
  */
 function ShortcutPreviewBuild({ children }: PropsWithChildren) {
-  if (IS_PREVIEW) {
+  if (IS_PREVIEW && !BUILD_STATIC_PREVIEW) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const [isMounted, setIsMounted] = useState(false)
 
