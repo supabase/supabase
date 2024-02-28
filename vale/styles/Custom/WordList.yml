@@ -24,7 +24,7 @@ swap:
   'Next(?:js)?': Next.js (if referring to the framework)
   'tap (?:&|and) hold': touch & hold
   'un(?:check|select)': clear
-  'utili[sz](e[ds]|ing)': use, used, uses, etc.
+  'utili[sz](?:e[ds]|ing)': use, used, uses, etc.
   above: preceding
   account name: username
   action bar: app bar
@@ -61,6 +61,7 @@ swap:
   Google accounts: Google Accounts
   Googling: search with Google
   grayed-out: unavailable
+  head over to: go to|see
   HTTPs: HTTPS
   in order to: to
   ingest: import|load
@@ -71,6 +72,7 @@ swap:
   open-source: open source
   overview screen: recents screen
   regex: regular expression
+  refer to: see
   serverside: server-side
   SHA1: SHA-1|HAS-SHA1
   sign into: sign in to
