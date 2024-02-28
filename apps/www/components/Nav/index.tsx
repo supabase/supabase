@@ -153,9 +153,14 @@ const Nav = (props: Props) => {
                 {!isUserLoading && (
                   <>
                     {isLoggedIn ? (
-                      <Button className="hidden text-white lg:block" asChild>
-                        <Link href="/dashboard/projects">Dashboard</Link>
-                      </Button>
+                      <>
+                        <Button className="hidden text-white lg:block" asChild>
+                          <Link href="/dashboard/projects">Dashboard</Link>
+                        </Button>
+                        <div className={cn(forceDark && 'hidden')}>
+                          <ThemeToggle forceDark={forceDark} />
+                        </div>
+                      </>
                     ) : (
                       <>
                         <Button type="default" className="hidden lg:block" asChild>
@@ -168,9 +173,6 @@ const Nav = (props: Props) => {
                     )}
                   </>
                 )}
-                <div className={cn(forceDark && 'hidden')}>
-                  <ThemeToggle forceDark={forceDark} />
-                </div>
               </div>
             </div>
             <HamburgerButton
