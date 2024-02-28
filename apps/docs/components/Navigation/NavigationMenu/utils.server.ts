@@ -136,11 +136,13 @@ const collectCategories = (sectionPath: `/${string}`) => (libSections: CommonRef
       currentCategory.items.push(reformat(sectionPath)(currentSection))
     } else {
       // Current section is a category
-      allSections.push({
-        id: weakUniqId(),
-        name: currentSection.title,
-        items: currentSection.items.map(reformat(sectionPath)),
-      })
+      if ('items' in currentSection) {
+        allSections.push({
+          id: weakUniqId(),
+          name: currentSection.title,
+          items: currentSection.items.map(reformat(sectionPath)),
+        })
+      }
     }
 
     return allSections
