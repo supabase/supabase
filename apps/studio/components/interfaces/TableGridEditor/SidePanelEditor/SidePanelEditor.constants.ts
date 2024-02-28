@@ -1,7 +1,15 @@
 import { sortBy, concat } from 'lodash'
 import { PostgresDataTypeOption } from './SidePanelEditor.types'
 
-const NUMERICAL_TYPES = ['int2', 'int4', 'int8', 'float4', 'float8', 'numeric', 'double precision']
+export const NUMERICAL_TYPES = [
+  'int2',
+  'int4',
+  'int8',
+  'float4',
+  'float8',
+  'numeric',
+  'double precision',
+]
 export const JSON_TYPES = ['json', 'jsonb']
 export const TEXT_TYPES = ['text', 'varchar']
 

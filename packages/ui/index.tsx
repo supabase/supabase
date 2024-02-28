@@ -38,12 +38,17 @@ export * from './src/components/PromoToast'
 export * from './src/components/Popover'
 export * from './src/layout/PortalToast'
 
+// HTML
+
+export * from './src/components/CustomHTMLElements'
+
 // UTILITIES
 
 export * from './src/components/Space'
 export * from './src/components/Loading'
 export * from './src/components/LogoLoader'
 export * from './src/components/Divider'
+export * from './src/lib/utils'
 
 // DATA ENTRY
 
@@ -69,14 +74,16 @@ export * from './src/layout/banners'
 // ai icon
 export * from './src/layout/ai-icon-animation'
 
-// utilities
-export * from './src/lib/utils'
-
 // theme switcher
 export * from './src/components/ThemeProvider/themes'
+export * from './src/components/ThemeProvider/singleThemes'
+export * from './src/components/ThemeProvider/prefixedThemes'
 
 // shadcn
 export * from './src/components/shadcn/ui/dropdown-menu'
+export * from './src/components/shadcn/ui/use-toast'
+export * from './src/components/shadcn/ui/toast'
+export * from './src/components/shadcn/ui/toaster'
 
 export {
   Command as Command_Shadcn_,
@@ -96,8 +103,12 @@ export {
   DialogContent as DialogContent_Shadcn_,
   DialogHeader as DialogHeader_Shadcn_,
   DialogFooter as DialogFooter_Shadcn_,
+  DialogClose as DialogClose_Shadcn_,
   DialogTitle as DialogTitle_Shadcn_,
   DialogDescription as DialogDescription_Shadcn_,
+  DialogSection as DialogSection_Shadcn_,
+  DIALOG_PADDING_X as DIALOG_PADDING_X_Shadcn_,
+  DIALOG_PADDING_Y as DIALOG_PADDING_Y_Shadcn_,
 } from './src/components/shadcn/ui/dialog'
 
 export {
@@ -141,6 +152,12 @@ export {
   SelectValue as SelectValue_Shadcn_,
 } from './src/components/shadcn/ui/select'
 
+export {
+  RadioGroup as RadioGroup_Shadcn_,
+  RadioGroupItem as RadioGroupItem_Shadcn_,
+  RadioGroupLargeItem as RadioGroupLargeItem_Shadcn_,
+} from './src/components/shadcn/ui/radio-group'
+
 export { Slider as Slider_Shadcn_ } from './src/components/shadcn/ui/slider'
 
 export { Input as Input_Shadcn_ } from './src/components/shadcn/ui/input'
@@ -156,6 +173,8 @@ export * from './src/components/shadcn/ui/switch'
 export { Checkbox as Checkbox_Shadcn_ } from './src/components/shadcn/ui/checkbox'
 
 export * from './src/components/shadcn/ui/scroll-area'
+
+export * from './src/components/shadcn/ui/hover-card'
 
 export {
   Collapsible as Collapsible_Shadcn_,
@@ -191,6 +210,8 @@ export {
 export { ScrollArea, ScrollBar } from './src/components/shadcn/ui/scroll-area'
 
 export { Separator } from './src/components/shadcn/ui/separator'
+
+export * from './src/components/shadcn/ui/resizable'
 
 // links
 

@@ -57,6 +57,7 @@ const ActionBar = ({
         <Button
           disabled={loading || disableApply}
           loading={loading}
+          data-testid="action-bar-save-row"
           htmlType="submit"
           form={formId}
         >

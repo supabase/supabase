@@ -164,7 +164,7 @@ const ForeignRowSelector = ({
                 <SelectorGrid
                   table={supaTable}
                   rows={data.rows}
-                  onRowSelect={(row) => onSelect(row[columnName ?? ''])}
+                  onRowSelect={(row) => onSelect(row[columnName?.[0] ?? ''])}
                 />
               ) : (
                 <div className="flex h-full items-center justify-center border-b border-t border-default">

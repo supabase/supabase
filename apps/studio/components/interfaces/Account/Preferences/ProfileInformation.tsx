@@ -30,7 +30,7 @@ export const ProfileInformation = ({ profile }: { profile: Profile }) => {
 
   const form = useForm({
     resolver: zodResolver(FormSchema),
-    defaultValues: { first_name: profile.first_name, last_name: profile.last_name },
+    defaultValues: { first_name: profile.first_name ?? '', last_name: profile.last_name ?? '' },
   })
 
   const { mutateAsync: updateProfile, isLoading } = useProfileUpdateMutation({

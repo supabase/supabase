@@ -48,6 +48,10 @@ export const AWS_REGIONS_VALUES: { [key: string]: string } = {
   SOUTH_AMERICA: 'sa-east-1',
 }
 
+export const FLY_REGIONS_VALUES: { [key: string]: string } = {
+  SOUTHEAST_ASIA: 'sin',
+}
+
 // [Joshen] Just to make sure that we just depend on AWS_REGIONS to determine available
 // regions for replicas. Just FYI - might need to update this if we support Fly in future
 export const AVAILABLE_REPLICA_REGIONS: Region[] = Object.keys(AWS_REGIONS)

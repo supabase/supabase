@@ -10,6 +10,7 @@ import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useDatabasePublicationCreateMutation } from 'data/database-publications/database-publications-create-mutation'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
+import { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { sqlKeys } from 'data/sql/keys'
 import { useTableRowCreateMutation } from 'data/table-rows/table-row-create-mutation'
@@ -21,15 +22,12 @@ import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { Dictionary } from 'types'
 import { ColumnEditor, RowEditor, SpreadsheetImport, TableEditor } from '.'
+import { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
 import ForeignRowSelector from './RowEditor/ForeignRowSelector/ForeignRowSelector'
 import JsonEdit from './RowEditor/JsonEditor/JsonEditor'
+import { TextEditor } from './RowEditor/TextEditor'
 import SchemaEditor from './SchemaEditor'
-import {
-  ColumnField,
-  CreateColumnPayload,
-  ExtendedPostgresRelationship,
-  UpdateColumnPayload,
-} from './SidePanelEditor.types'
+import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
 import {
   createColumn,
   createTable,
@@ -40,7 +38,7 @@ import {
   updateTable,
 } from './SidePanelEditor.utils'
 import { ImportContent } from './TableEditor/TableEditor.types'
-import { TextEditor } from './RowEditor/TextEditor'
+import { Constraint } from 'data/database/constraints-query'
 
 export interface SidePanelEditorProps {
   editable?: boolean
@@ -138,11 +136,9 @@ const SidePanelEditor = ({
           }
         } else {
           saveRowError = new Error('No primary key')
-          ui.setNotification({
-            category: 'error',
-            message:
-              "We can't make changes to this table because there is no primary key. Please create a primary key and try again.",
-          })
+          toast.error(
+            "We can't make changes to this table because there is no primary key. Please create a primary key and try again."
+          )
         }
       }
     }
@@ -179,13 +175,7 @@ const SidePanelEditor = ({
 
     if (payload !== undefined && configuration !== undefined) {
       try {
-        await saveRow(payload, isNewRecord, configuration, (error) => {
-          if (error) {
-            toast.error(
-              error?.message ?? 'Something went wrong while trying to save the column value'
-            )
-          }
-        })
+        await saveRow(payload, isNewRecord, configuration, () => {})
       } finally {
         resolve()
       }
@@ -211,13 +201,12 @@ const SidePanelEditor = ({
 
   const saveColumn = async (
     payload: CreateColumnPayload | UpdateColumnPayload,
-    foreignKey: ExtendedPostgresRelationship | undefined,
     isNewRecord: boolean,
-    configuration: { columnId?: string },
+    configuration: { columnId?: string; primaryKey?: Constraint },
     resolve: any
   ) => {
     const selectedColumnToEdit = snap.sidePanel?.type === 'column' && snap.sidePanel.column
-    const { columnId } = configuration
+    const { columnId, primaryKey } = configuration
 
     const response = isNewRecord
       ? await createColumn({
@@ -225,7 +214,7 @@ const SidePanelEditor = ({
           connectionString: project?.connectionString,
           payload: payload as CreateColumnPayload,
           selectedTable: selectedTable as PostgresTable,
-          foreignKey,
+          primaryKey,
         })
       : await updateColumn({
           projectRef: project?.ref!,
@@ -233,7 +222,7 @@ const SidePanelEditor = ({
           id: columnId as string,
           payload: payload as UpdateColumnPayload,
           selectedTable: selectedTable as PostgresTable,
-          foreignKey,
+          primaryKey,
         })
 
     if (response?.error) {
@@ -366,6 +355,7 @@ const SidePanelEditor = ({
       comment?: string | undefined
     },
     columns: ColumnField[],
+    foreignKeyRelations: ForeignKey[],
     isNewRecord: boolean,
     configuration: {
       tableId?: number
@@ -373,12 +363,21 @@ const SidePanelEditor = ({
       isRLSEnabled: boolean
       isRealtimeEnabled: boolean
       isDuplicateRows: boolean
+      existingForeignKeyRelations: ForeignKeyConstraint[]
+      primaryKey?: Constraint
     },
     resolve: any
   ) => {
     let toastId
     let saveTableError = false
-    const { importContent, isRLSEnabled, isRealtimeEnabled, isDuplicateRows } = configuration
+    const {
+      importContent,
+      isRLSEnabled,
+      isRealtimeEnabled,
+      isDuplicateRows,
+      existingForeignKeyRelations,
+      primaryKey,
+    } = configuration
 
     try {
       if (
@@ -388,15 +387,13 @@ const SidePanelEditor = ({
       ) {
         const tableToDuplicate = selectedTable
 
-        toastId = ui.setNotification({
-          category: 'loading',
-          message: `Duplicating table: ${tableToDuplicate.name}...`,
-        })
+        toastId = toast.loading(`Duplicating table: ${tableToDuplicate.name}...`)
 
         const table = await duplicateTable(project?.ref!, project?.connectionString, payload, {
           isRLSEnabled,
           isDuplicateRows,
           duplicateTable: tableToDuplicate,
+          foreignKeyRelations,
         })
         if (isRealtimeEnabled) await updateTableRealtime(table, isRealtimeEnabled)
 
@@ -405,28 +402,24 @@ const SidePanelEditor = ({
           queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
         ])
 
-        ui.setNotification({
-          id: toastId,
-          category: 'success',
-          message: `Table ${tableToDuplicate.name} has been successfully duplicated into ${table.name}!`,
-        })
-
+        toast.success(
+          `Table ${tableToDuplicate.name} has been successfully duplicated into ${table.name}!`,
+          { id: toastId }
+        )
         onTableCreated(table)
       } else if (isNewRecord) {
-        toastId = ui.setNotification({
-          category: 'loading',
-          message: `Creating new table: ${payload.name}...`,
-        })
+        toastId = toast.loading(`Creating new table: ${payload.name}...`)
 
-        const table = await createTable(
-          project?.ref!,
-          project?.connectionString,
+        const table = await createTable({
+          projectRef: project?.ref!,
+          connectionString: project?.connectionString,
           toastId,
           payload,
           columns,
+          foreignKeyRelations,
           isRLSEnabled,
-          importContent
-        )
+          importContent,
+        })
         if (isRealtimeEnabled) await updateTableRealtime(table as PostgresTable, true)
 
         await Promise.all([
@@ -434,36 +427,27 @@ const SidePanelEditor = ({
           queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
         ])
 
-        ui.setNotification({
-          id: toastId,
-          category: 'success',
-          message: `Table ${table.name} is good to go!`,
-        })
-
+        toast.success(`Table ${table.name} is good to go!`, { id: toastId })
         onTableCreated(table as PostgresTable)
       } else if (selectedTable) {
-        toastId = ui.setNotification({
-          category: 'loading',
-          message: `Updating table: ${selectedTable?.name}...`,
-        })
+        toastId = toast.loading(`Updating table: ${selectedTable?.name}...`)
 
-        const { table, hasError } = await updateTable(
-          project?.ref!,
-          project?.connectionString,
+        const { table, hasError } = await updateTable({
+          projectRef: project?.ref!,
+          connectionString: project?.connectionString,
           toastId,
-          selectedTable,
+          table: selectedTable,
           payload,
-          columns
-        )
+          columns,
+          foreignKeyRelations,
+          existingForeignKeyRelations,
+          primaryKey,
+        })
 
         await updateTableRealtime(table, isRealtimeEnabled)
 
         if (hasError) {
-          ui.setNotification({
-            id: toastId,
-            category: 'info',
-            message: `Table ${table.name} has been updated, but there were some errors`,
-          })
+          toast(`Table ${table.name} has been updated, but there were some errors`, { id: toastId })
         } else {
           queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints']))
           await Promise.all([
@@ -481,16 +465,12 @@ const SidePanelEditor = ({
             queryClient.invalidateQueries(tableKeys.table(project?.ref, table.id)),
           ])
 
-          ui.setNotification({
-            id: toastId,
-            category: 'success',
-            message: `Successfully updated ${table.name}!`,
-          })
+          toast.success(`Successfully updated ${table.name}!`, { id: toastId })
         }
       }
     } catch (error: any) {
       saveTableError = true
-      ui.setNotification({ error, id: toastId, category: 'error', message: error.message })
+      toast.error(error.message, { id: toastId })
     }
 
     if (!saveTableError) {
@@ -637,6 +617,7 @@ const SidePanelEditor = ({
       />
       <ForeignRowSelector
         visible={snap.sidePanel?.type === 'foreign-row-selector'}
+        // @ts-ignore
         foreignKey={
           snap.sidePanel?.type === 'foreign-row-selector'
             ? snap.sidePanel.foreignKey.foreignKey

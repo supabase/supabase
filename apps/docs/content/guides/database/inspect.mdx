@@ -1,0 +1,102 @@
+---
+id: 'json'
+title: 'Debugging and monitoring'
+description: 'Inspecting your Postgres database for common issues around disk, query performance, index, locks, and more using the terminal.'
+---
+
+The Supabase CLI comes with a range of tools to help inspect your Postgres instances for potential issues. The CLI gets the information from <a href="https://www.postgresql.org/docs/current/internals.html" target="_blank">Postgres internals</a>. Therefore, most tools provided are compatible with any Postgres databases regardless if they are a Supabase project or not.
+
+You can find installation instructions for the the Supabase CLI <a href="/docs/guides/cli" target="_blank">here</a>.
+
+### The `inspect db` command
+
+The inspection tools for your Postgres database are under then `inspect db` command. You can get a full list of available commands by running `supabase inspect db help`.
+
+```
+$ supabase inspect db help
+Tools to inspect your Supabase database
+
+Usage:
+  supabase inspect db [command]
+
+Available Commands:
+  bloat                Estimates space allocated to a relation that is full of dead tuples
+  blocking             Show queries that are holding locks and the queries that are waiting for them to be released
+  cache-hit            Show cache hit rates for tables and indices
+
+...
+```
+
+### Connect to any Postgres database
+
+Most inspection commands are Postgres agnostic. You can run inspection routines on any Postgres database even if it is not a Supabase project by providing a connection string via `--db-url`.
+
+For example you can connect to your local Postgres instance:
+
+```
+supabase --db-url postgresql://postgres:postgres@localhost:5432/postgres inspect db bloat
+```
+
+### Connect to a Supabase instance
+
+Working with Supabase, you can link the Supabase CLI with your project:
+
+```
+supabase link --project-ref <project-id>
+```
+
+Then the CLI will automatically connect to your Supabase project whenever you are in the project folder and you no longer need to provide `—db-url`.
+
+## Inspection commands
+
+Below are the db inspection commands provided, grouped by different use cases.
+
+<Admonition type="note">
+
+Some commands might require `pg_stat_statements` to be enabled or a specific Postgres version to be used.
+
+</Admonition>
+
+### Disk storage
+
+These commands are handy if you are running low on disk storage:
+
+- [bloat](/docs/reference/cli/supabase-inspect-db-bloat) - estimates the amount of wasted space
+- [vacuum-stats](/docs/reference/cli/supabase-inspect-db-vacuum-stats) - gives information on waste collection routines
+- [table-record-counts](/docs/reference/cli/supabase-inspect-db-table-record-counts) - estimates the number of records per table
+- [table-sizes](/docs/reference/cli/supabase-inspect-db-table-sizes) - shows the sizes of tables
+- [index-sizes](/docs/reference/cli/supabase-inspect-db-index-sizes) - shows the sizes of individual index
+- [table-index-sizes](/docs/reference/cli/supabase-inspect-db-table-index-sizes) - shows the sizes of indexes for each table
+
+### Query performance
+
+The commands below are useful if your Postgres database consumes a lot of resources like CPU, RAM or Disk IO. You can also use them to investigate slow queries.
+
+- [cache-hit](/docs/reference/cli/supabase-inspect-db-cache-hit) - shows how efficient your cache usage is overall
+- [unused-indexes](/docs/reference/cli/supabase-inspect-db-unused-indexes) - shows indexes with low index scans
+- [index-usage](/docs/reference/cli/supabase-inspect-db-index-usage) - shows information about the efficiency of indexes
+- [seq-scans](/docs/reference/cli/supabase-inspect-db-seq-scans) - show number of sequential scans recorded against all tables
+- [long-running-queries](/docs/reference/cli/supabase-inspect-db-long-running-queries) - shows long running queries that are executing right now
+- [outliers](/docs/reference/cli/supabase-inspect-db-outliers) - shows queries with high execution time but low call count and queries with high proportion of execution time spent on synchronous I/O
+
+### Locks
+
+- [locks](/docs/reference/cli/supabase-inspect-db-locks) - shows statements which have taken out an exclusive lock on a relation
+- [blocking](/docs/reference/cli/supabase-inspect-db-blocking) - shows statements that are waiting for locks to be released
+
+### Connections
+
+- [role-connections](/docs/reference/cli/supabase-inspect-db-role-connections) - shows number of active connections for all database roles (Supabase-specific command)
+- [replication-slots](/docs/reference/cli/supabase-inspect-db-replication-slots) - shows information about replication slots on the database
+
+## Notes on `pg_stat_statements`
+
+Following commands require `pg_stat_statements` to be enabled: calls, locks, cache-hit, blocking, unused-indexes, index-usage, bloat, outliers, table-record-counts, replication-slots, seq-scans, vacuum-stats, long-running-queries.
+
+When using `pg_stat_statements` also take note that it only stores the latest 5,000 statements. Moreover, consider resetting the analysis after optimizing any queries by running `select pg_stat_statements_reset();`
+
+Learn more about pg_stats [here](https://supabase.com/docs/guides/database/extensions/pg_stat_statements).
+
+## Acknowledgements
+
+Supabase CLI's inspect commands are heavily inspired by the <a href="https://github.com/heroku/heroku-pg-extras" target="_blank">pg-extras</a> tools.

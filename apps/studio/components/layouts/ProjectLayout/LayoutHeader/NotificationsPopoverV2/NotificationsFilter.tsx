@@ -121,6 +121,7 @@ export const NotificationsFilter = ({ activeTab }: { activeTab: 'inbox' | 'archi
               {(organizations ?? []).map((org) => (
                 <CommandItem_Shadcn_
                   key={org.slug}
+                  value={org.name.replaceAll('"', '')}
                   className="flex items-center gap-x-2"
                   onSelect={() => {
                     snap.setFilters(org.slug, 'organizations')

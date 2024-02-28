@@ -1,0 +1,998 @@
+---
+title: 'Build a User Management App with Next.js'
+description: 'Learn how to use Supabase in your Next.js App.'
+---
+
+<QuickstartIntro />
+
+![Supabase User Management example](/docs/img/user-management-demo.png)
+
+<Admonition type="note">
+
+If you get stuck while working through this guide, refer to the [full example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/nextjs-user-management).
+
+</Admonition>
+
+<ProjectSetup />
+
+## Building the app
+
+Let's start building the Next.js app from scratch.
+
+### Initialize a Next.js app
+
+We can use [`create-next-app`](https://nextjs.org/docs/getting-started) to initialize an app called `supabase-nextjs`:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```bash
+npx create-next-app@latest --use-npm supabase-nextjs
+cd supabase-nextjs
+```
+
+</TabPanel>
+<TabPanel id="ts" label="TypeScript">
+
+```bash
+npx create-next-app@latest --ts --use-npm supabase-nextjs
+cd supabase-nextjs
+```
+
+</TabPanel>
+</Tabs>
+
+Then install the Supabase client library: [supabase-js](https://github.com/supabase/supabase-js)
+
+```bash
+npm install @supabase/supabase-js
+```
+
+And finally we want to save the environment variables in a `.env.local`.
+All we need are the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
+
+```bash .env.local
+NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+```
+
+### App styling (optional)
+
+An optional step is to update the CSS file `app/globals.css` to make the app look nice.
+You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/nextjs-user-management/app/globals.css).
+
+### Supabase Auth Helpers
+
+Next.js is a highly versatile framework offering pre-rendering at build time (SSG), server-side rendering at request time (SSR), API routes, and middleware edge-functions.
+
+It can be challenging to authenticate your users in all these different environments, that's why we've created the [Supabase Auth Helpers](/docs/guides/auth/auth-helpers/nextjs) to make user management and data fetching within Next.js as easy as possible.
+
+Install the auth helpers for Next.js
+
+```bash
+npm install @supabase/auth-helpers-nextjs @supabase/supabase-js
+```
+
+### Next.js middleware
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+Create a `middleware.js` file and include the following content to:
+
+- Verify if there is an authenticated Supabase user
+- Validate if the user is authenticated and currently on the sign-in page, redirecting them to the `account` page
+- Verify if the user is not authenticated and currently on the account page, redirecting them to the `sign-in` page.
+
+```tsx middleware.js
+import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
+import { NextResponse } from 'next/server'
+
+export async function middleware(req) {
+  const res = NextResponse.next()
+  const supabase = createMiddlewareClient({ req, res })
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  // if user is signed in and the current path is / redirect the user to /account
+  if (user && req.nextUrl.pathname === '/') {
+    return NextResponse.redirect(new URL('/account', req.url))
+  }
+
+  // if user is not signed in and the current path is not / redirect the user to /
+  if (!user && req.nextUrl.pathname !== '/') {
+    return NextResponse.redirect(new URL('/', req.url))
+  }
+
+  return res
+}
+
+export const config = {
+  matcher: ['/', '/account'],
+}
+```
+
+</TabPanel>
+<TabPanel id="ts" label="TypeScript">
+
+Create a `middleware.ts` file and include the following content to:
+
+- Verify if there is an authenticated Supabase user
+- Validate if the user is authenticated and currently on the sign-in page, redirecting them to the `account` page
+- Verify if the user is not authenticated and currently on the account page, redirecting them to the `sign-in` page.
+
+```tsx middleware.ts
+import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
+import { NextResponse } from 'next/server'
+
+import type { NextRequest } from 'next/server'
+
+export async function middleware(req: NextRequest) {
+  const res = NextResponse.next()
+  const supabase = createMiddlewareClient({ req, res })
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  // if user is signed in and the current path is / redirect the user to /account
+  if (user && req.nextUrl.pathname === '/') {
+    return NextResponse.redirect(new URL('/account', req.url))
+  }
+
+  // if user is not signed in and the current path is not / redirect the user to /
+  if (!user && req.nextUrl.pathname !== '/') {
+    return NextResponse.redirect(new URL('/', req.url))
+  }
+
+  return res
+}
+
+export const config = {
+  matcher: ['/', '/account'],
+}
+```
+
+</TabPanel>
+</Tabs>
+
+### Set up a login component
+
+#### Supabase Auth UI
+
+We can use the [Supabase Auth UI](/docs/guides/auth/auth-helpers/auth-ui) a pre-built React component for authenticating users via OAuth, email, and magic links.
+
+Install the Supabase Auth UI for React
+
+```bash
+npm install @supabase/auth-ui-react @supabase/auth-ui-shared
+```
+
+Create an `AuthForm` client side component with the `Auth` component rendered within it:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```jsx app/auth-form.jsx
+'use client'
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+
+export default function AuthForm() {
+  const supabase = createClientComponentClient()
+
+  return (
+    <Auth
+      supabaseClient={supabase}
+      view="magic_link"
+      appearance={{ theme: ThemeSupa }}
+      theme="dark"
+      showLinks={false}
+      providers={[]}
+      redirectTo="http://localhost:3000/auth/callback"
+    />
+  )
+}
+```
+
+</TabPanel>
+<TabPanel id="ts" label="TypeScript">
+
+```jsx app/auth-form.tsx
+'use client'
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { Database } from './database.types'
+
+export default function AuthForm() {
+  const supabase = createClientComponentClient<Database>()
+
+  return (
+    <Auth
+      supabaseClient={supabase}
+      view="magic_link"
+      appearance={{ theme: ThemeSupa }}
+      theme="dark"
+      showLinks={false}
+      providers={[]}
+      redirectTo="http://localhost:3000/auth/callback"
+    />
+  )
+}
+```
+
+</TabPanel>
+</Tabs>
+
+<Admonition type="note">
+
+If you are using TypeScript for this project, see [generating types](/docs/guides/api/rest/generating-types) to automatically generate types from your database tables.
+
+</Admonition>
+
+Add the `AuthForm` component to your home page
+
+```jsx app/page.js
+import AuthForm from './auth-form'
+
+export default function Home() {
+  return (
+    <div className="row">
+      <div className="col-6">
+        <h1 className="header">Supabase Auth + Storage</h1>
+        <p>
+          Experience our Auth and Storage through a simple profile management example. Create a user
+          profile and upload an avatar image. Fast, simple, secure.
+        </p>
+      </div>
+      <div className="col-6 auth-widget">
+        <AuthForm />
+      </div>
+    </div>
+  )
+}
+```
+
+### Proof Key for Code Exchange (PKCE)
+
+As we are employing Proof Key for Code Exchange (PKCE) in our authentication flow, it is necessary to create a route handler responsible for exchanging the code for a session.
+
+In the following code snippet, we perform the following steps:
+
+- Retrieve the code sent back from the Supabase Auth server using the `code` query parameter.
+- Exchange this code for a session, which we store in our chosen storage mechanism (in this case, cookies).
+- Finally, we redirect the user to the `account` page.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js app/auth/callback/route.js
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
+import { NextResponse } from 'next/server'
+
+export async function GET(req) {
+  const cookieStore = cookies()
+  const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+  const { searchParams } = new URL(req.url)
+  const code = searchParams.get('code')
+
+  if (code) {
+    await supabase.auth.exchangeCodeForSession(code)
+  }
+
+  return NextResponse.redirect(new URL('/account', req.url))
+}
+```
+
+</TabPanel>
+<TabPanel id="ts" label="TypeScript">
+
+```ts app/auth/callback/route.ts
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
+import { NextRequest, NextResponse } from 'next/server'
+
+export async function GET(req: NextRequest) {
+  const cookieStore = cookies()
+  const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+  const { searchParams } = new URL(req.url)
+  const code = searchParams.get('code')
+
+  if (code) {
+    await supabase.auth.exchangeCodeForSession(code)
+  }
+
+  return NextResponse.redirect(new URL('/account', req.url))
+}
+```
+
+</TabPanel>
+</Tabs>
+
+### Sign out
+
+Let's create a route handler to handle the signout from the server side.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js app/auth/signout/route.js
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
+import { NextResponse } from 'next/server'
+
+export async function POST(req) {
+  const cookieStore = cookies()
+  const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+
+  // Check if we have a session
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (user) {
+    await supabase.auth.signOut()
+  }
+
+  return NextResponse.redirect(new URL('/', req.url), {
+    status: 302,
+  })
+}
+```
+
+</TabPanel>
+<TabPanel id="ts" label="TypeScript">
+
+```ts app/auth/signout/route.ts
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
+import { type NextRequest, NextResponse } from 'next/server'
+
+export async function POST(req: NextRequest) {
+  const cookieStore = cookies()
+  const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+
+  // Check if we have a session
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  if (session) {
+    await supabase.auth.signOut()
+  }
+
+  return NextResponse.redirect(new URL('/', req.url), {
+    status: 302,
+  })
+}
+```
+
+</TabPanel>
+</Tabs>
+
+### Account page
+
+After a user is signed in we can allow them to edit their profile details and manage their account.
+
+Let's create a new component for that called `AccountForm` within the `app/account` folder.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```jsx app/account/account-form.jsx
+'use client'
+import { useCallback, useEffect, useState } from 'react'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+
+export default function AccountForm({ user }) {
+  const supabase = createClientComponentClient()
+  const [loading, setLoading] = useState(true)
+  const [fullname, setFullname] = useState(null)
+  const [username, setUsername] = useState(null)
+  const [website, setWebsite] = useState(null)
+  const [avatar_url, setAvatarUrl] = useState(null)
+
+  const getProfile = useCallback(async () => {
+    try {
+      setLoading(true)
+
+      const { data, error, status } = await supabase
+        .from('profiles')
+        .select(`full_name, username, website, avatar_url`)
+        .eq('id', user?.id)
+        .single()
+
+      if (error && status !== 406) {
+        throw error
+      }
+
+      if (data) {
+        setFullname(data.full_name)
+        setUsername(data.username)
+        setWebsite(data.website)
+        setAvatarUrl(data.avatar_url)
+      }
+    } catch (error) {
+      alert('Error loading user data!')
+    } finally {
+      setLoading(false)
+    }
+  }, [user, supabase])
+
+  useEffect(() => {
+    getProfile()
+  }, [user, getProfile])
+
+  async function updateProfile({ username, website, avatar_url }) {
+    try {
+      setLoading(true)
+
+      const { error } = await supabase.from('profiles').upsert({
+        id: user?.id,
+        full_name: fullname,
+        username,
+        website,
+        avatar_url,
+        updated_at: new Date().toISOString(),
+      })
+      if (error) throw error
+      alert('Profile updated!')
+    } catch (error) {
+      alert('Error updating the data!')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="form-widget">
+      <div>
+        <label htmlFor="email">Email</label>
+        <input id="email" type="text" value={user?.email} disabled />
+      </div>
+      <div>
+        <label htmlFor="fullName">Full Name</label>
+        <input
+          id="fullName"
+          type="text"
+          value={fullname || ''}
+          onChange={(e) => setFullname(e.target.value)}
+        />
+      </div>
+      <div>
+        <label htmlFor="username">Username</label>
+        <input
+          id="username"
+          type="text"
+          value={username || ''}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+      </div>
+      <div>
+        <label htmlFor="website">Website</label>
+        <input
+          id="website"
+          type="url"
+          value={website || ''}
+          onChange={(e) => setWebsite(e.target.value)}
+        />
+      </div>
+
+      <div>
+        <button
+          className="button primary block"
+          onClick={() => updateProfile({ fullname, username, website, avatar_url })}
+          disabled={loading}
+        >
+          {loading ? 'Loading ...' : 'Update'}
+        </button>
+      </div>
+
+      <div>
+        <form action="/auth/signout" method="post">
+          <button className="button block" type="submit">
+            Sign out
+          </button>
+        </form>
+      </div>
+    </div>
+  )
+}
+```
+
+</TabPanel>
+<TabPanel id="ts" label="TypeScript">
+
+```tsx app/account/account-form.tsx
+'use client'
+import { useCallback, useEffect, useState } from 'react'
+import { Database } from '../database.types'
+import { User, createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+
+export default function AccountForm({ user }: { user: User | null }) {
+  const supabase = createClientComponentClient<Database>()
+  const [loading, setLoading] = useState(true)
+  const [fullname, setFullname] = useState<string | null>(null)
+  const [username, setUsername] = useState<string | null>(null)
+  const [website, setWebsite] = useState<string | null>(null)
+  const [avatar_url, setAvatarUrl] = useState<string | null>(null)
+
+  const getProfile = useCallback(async () => {
+    try {
+      setLoading(true)
+
+      const { data, error, status } = await supabase
+        .from('profiles')
+        .select(`full_name, username, website, avatar_url`)
+        .eq('id', user?.id)
+        .single()
+
+      if (error && status !== 406) {
+        throw error
+      }
+
+      if (data) {
+        setFullname(data.full_name)
+        setUsername(data.username)
+        setWebsite(data.website)
+        setAvatarUrl(data.avatar_url)
+      }
+    } catch (error) {
+      alert('Error loading user data!')
+    } finally {
+      setLoading(false)
+    }
+  }, [user, supabase])
+
+  useEffect(() => {
+    getProfile()
+  }, [user, getProfile])
+
+  async function updateProfile({
+    username,
+    website,
+    avatar_url,
+  }: {
+    username: string | null
+    fullname: string | null
+    website: string | null
+    avatar_url: string | null
+  }) {
+    try {
+      setLoading(true)
+
+      const { error } = await supabase.from('profiles').upsert({
+        id: user?.id as string,
+        full_name: fullname,
+        username,
+        website,
+        avatar_url,
+        updated_at: new Date().toISOString(),
+      })
+      if (error) throw error
+      alert('Profile updated!')
+    } catch (error) {
+      alert('Error updating the data!')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="form-widget">
+      <div>
+        <label htmlFor="email">Email</label>
+        <input id="email" type="text" value={user?.email} disabled />
+      </div>
+      <div>
+        <label htmlFor="fullName">Full Name</label>
+        <input
+          id="fullName"
+          type="text"
+          value={fullname || ''}
+          onChange={(e) => setFullname(e.target.value)}
+        />
+      </div>
+      <div>
+        <label htmlFor="username">Username</label>
+        <input
+          id="username"
+          type="text"
+          value={username || ''}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+      </div>
+      <div>
+        <label htmlFor="website">Website</label>
+        <input
+          id="website"
+          type="url"
+          value={website || ''}
+          onChange={(e) => setWebsite(e.target.value)}
+        />
+      </div>
+
+      <div>
+        <button
+          className="button primary block"
+          onClick={() => updateProfile({ fullname, username, website, avatar_url })}
+          disabled={loading}
+        >
+          {loading ? 'Loading ...' : 'Update'}
+        </button>
+      </div>
+
+      <div>
+        <form action="/auth/signout" method="post">
+          <button className="button block" type="submit">
+            Sign out
+          </button>
+        </form>
+      </div>
+    </div>
+  )
+}
+```
+
+</TabPanel>
+</Tabs>
+
+Create an account page for the `AccountForm` component we just created
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```jsx app/account/page.jsx
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
+import AccountForm from './account-form'
+
+export default async function Account() {
+  const cookieStore = cookies()
+  const supabase = createServerComponentClient({ cookies: () => cookieStore })
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  return <AccountForm user={user} />
+}
+```
+
+</TabPanel>
+<TabPanel id="ts" label="TypeScript">
+
+```tsx app/account/page.tsx
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
+import { Database } from '../database.types'
+import AccountForm from './account-form'
+
+export default async function Account() {
+  const supabase = createServerComponentClient<Database>({ cookies })
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  return <AccountForm user={user} />
+}
+```
+
+</TabPanel>
+</Tabs>
+
+### Launch!
+
+Now that we have all the pages, route handlers and components in place, let's run this in a terminal window:
+
+```bash
+npm run dev
+```
+
+And then open the browser to [localhost:3000](http://localhost:3000) and you should see the completed app.
+
+## Bonus: Profile photos
+
+Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like
+photos and videos.
+
+### Create an upload widget
+
+Let's create an avatar widget for the user so that they can upload a profile photo. We can start by creating a new component:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```jsx app/account/avatar.jsx
+'use client'
+import React, { useEffect, useState } from 'react'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import Image from 'next/image'
+
+export default function Avatar({ uid, url, size, onUpload }) {
+  const supabase = createClientComponentClient()
+  const [avatarUrl, setAvatarUrl] = useState(null)
+  const [uploading, setUploading] = useState(false)
+
+  useEffect(() => {
+    async function downloadImage(path) {
+      try {
+        const { data, error } = await supabase.storage.from('avatars').download(path)
+        if (error) {
+          throw error
+        }
+
+        const url = URL.createObjectURL(data)
+        setAvatarUrl(url)
+      } catch (error) {
+        console.log('Error downloading image: ', error)
+      }
+    }
+
+    if (url) downloadImage(url)
+  }, [url, supabase])
+
+  const uploadAvatar = async (event) => {
+    try {
+      setUploading(true)
+
+      if (!event.target.files || event.target.files.length === 0) {
+        throw new Error('You must select an image to upload.')
+      }
+
+      const file = event.target.files[0]
+      const fileExt = file.name.split('.').pop()
+      const filePath = `${uid}-${Math.random()}.${fileExt}`
+
+      const { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file)
+
+      if (uploadError) {
+        throw uploadError
+      }
+
+      onUpload(filePath)
+    } catch (error) {
+      alert('Error uploading avatar!')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  return (
+    <div>
+      {avatarUrl ? (
+        <Image
+          width={size}
+          height={size}
+          src={avatarUrl}
+          alt="Avatar"
+          className="avatar image"
+          style={{ height: size, width: size }}
+        />
+      ) : (
+        <div className="avatar no-image" style={{ height: size, width: size }} />
+      )}
+      <div style={{ width: size }}>
+        <label className="button primary block" htmlFor="single">
+          {uploading ? 'Uploading ...' : 'Upload'}
+        </label>
+        <input
+          style={{
+            visibility: 'hidden',
+            position: 'absolute',
+          }}
+          type="file"
+          id="single"
+          accept="image/*"
+          onChange={uploadAvatar}
+          disabled={uploading}
+        />
+      </div>
+    </div>
+  )
+}
+```
+
+</TabPanel>
+<TabPanel id="ts" label="TypeScript">
+
+```tsx app/account/avatar.tsx
+'use client'
+import React, { useEffect, useState } from 'react'
+import { Database } from '../database.types'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import Image from 'next/image'
+type Profiles = Database['public']['Tables']['profiles']['Row']
+
+export default function Avatar({
+  uid,
+  url,
+  size,
+  onUpload,
+}: {
+  uid: string
+  url: Profiles['avatar_url']
+  size: number
+  onUpload: (url: string) => void
+}) {
+  const supabase = createClientComponentClient<Database>()
+  const [avatarUrl, setAvatarUrl] = useState<Profiles['avatar_url']>(url)
+  const [uploading, setUploading] = useState(false)
+
+  useEffect(() => {
+    async function downloadImage(path: string) {
+      try {
+        const { data, error } = await supabase.storage.from('avatars').download(path)
+        if (error) {
+          throw error
+        }
+
+        const url = URL.createObjectURL(data)
+        setAvatarUrl(url)
+      } catch (error) {
+        console.log('Error downloading image: ', error)
+      }
+    }
+
+    if (url) downloadImage(url)
+  }, [url, supabase])
+
+  const uploadAvatar: React.ChangeEventHandler<HTMLInputElement> = async (event) => {
+    try {
+      setUploading(true)
+
+      if (!event.target.files || event.target.files.length === 0) {
+        throw new Error('You must select an image to upload.')
+      }
+
+      const file = event.target.files[0]
+      const fileExt = file.name.split('.').pop()
+      const filePath = `${uid}-${Math.random()}.${fileExt}`
+
+      const { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file)
+
+      if (uploadError) {
+        throw uploadError
+      }
+
+      onUpload(filePath)
+    } catch (error) {
+      alert('Error uploading avatar!')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  return (
+    <div>
+      {avatarUrl ? (
+        <Image
+          width={size}
+          height={size}
+          src={avatarUrl}
+          alt="Avatar"
+          className="avatar image"
+          style={{ height: size, width: size }}
+        />
+      ) : (
+        <div className="avatar no-image" style={{ height: size, width: size }} />
+      )}
+      <div style={{ width: size }}>
+        <label className="button primary block" htmlFor="single">
+          {uploading ? 'Uploading ...' : 'Upload'}
+        </label>
+        <input
+          style={{
+            visibility: 'hidden',
+            position: 'absolute',
+          }}
+          type="file"
+          id="single"
+          accept="image/*"
+          onChange={uploadAvatar}
+          disabled={uploading}
+        />
+      </div>
+    </div>
+  )
+}
+```
+
+</TabPanel>
+</Tabs>
+
+### Add the new widget
+
+And then we can add the widget to the `AccountForm` component:
+
+```jsx app/account/account-form.js
+// Import the new component
+import Avatar from './avatar'
+
+// ...
+
+return (
+  <div className="form-widget">
+    {/* Add to the body */}
+    <Avatar
+      uid={user.id}
+      url={avatar_url}
+      size={150}
+      onUpload={(url) => {
+        setAvatarUrl(url)
+        updateProfile({ fullname, username, website, avatar_url: url })
+      }}
+    />
+    {/* ... */}
+  </div>
+)
+```
+
+### Storage management
+
+<StorageManagement />
+
+At this stage you have a fully functional application!
+
+## See also
+
+- See the complete [example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/nextjs-user-management) and deploy it to Vercel
+- [Build a Twitter Clone with the Next.js App Router and Supabase - free egghead course](https://egghead.io/courses/build-a-twitter-clone-with-the-next-js-app-router-and-supabase-19bebadb)
+- Explore the [pre-built Auth UI for React](/docs/guides/auth/auth-helpers/auth-ui)
+- Explore the [Auth Helpers for Next.js](/docs/guides/auth/auth-helpers/nextjs)
+- Explore the [Supabase Cache Helpers](https://github.com/psteinroe/supabase-cache-helpers)
+- See the [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments) template on GitHub

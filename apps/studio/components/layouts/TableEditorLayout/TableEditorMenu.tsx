@@ -2,18 +2,10 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { partition } from 'lodash'
-import { useMemo, useState } from 'react'
+import { Plus, Search } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
-import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
-import AlertError from 'components/ui/AlertError'
-import InfiniteList from 'components/ui/InfiniteList'
-import SchemaSelector from 'components/ui/SchemaSelector'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
-import { useCheckPermissions, useLocalStorage } from 'hooks'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -25,16 +17,22 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
   IconChevronsDown,
-  IconEdit,
-  IconLoader,
-  IconRefreshCw,
-  IconSearch,
-  IconX,
-  Input,
+  Input_Shadcn_,
+  cn,
 } from 'ui'
+
+import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
+import AlertError from 'components/ui/AlertError'
+import InfiniteList from 'components/ui/InfiniteList'
+import SchemaSelector from 'components/ui/SchemaSelector'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useSchemasQuery } from 'data/database/schemas-query'
+import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
+import { useCheckPermissions, useLocalStorage } from 'hooks'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
-import { useRouter } from 'next/router'
 
 const TableEditorMenu = () => {
   const router = useRouter()
@@ -47,6 +45,9 @@ const TableEditorMenu = () => {
     'table-editor-sort',
     'alphabetical'
   )
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const inputRef = useRef<HTMLInputElement | null>(null)
+  const [isSearchInputFocused, setIsSearchInputFocused] = useState(false)
 
   const { project } = useProjectContext()
   const {
@@ -74,7 +75,6 @@ const TableEditorMenu = () => {
     }
   )
 
-  const totalCount = data?.pages?.[0].data.count
   const entityTypes = useMemo(
     () => data?.pages.flatMap((page) => page.data.entities),
     [data?.pages]
@@ -92,133 +92,64 @@ const TableEditorMenu = () => {
     await refetch()
   }
 
+  refreshTables
   const [protectedSchemas] = partition(
     (schemas ?? []).sort((a, b) => a.name.localeCompare(b.name)),
     (schema) => EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
   )
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
 
+  const expandSearch = () => {
+    setIsSearchOpen(!isSearchOpen)
+  }
+
+  useEffect(() => {
+    if (isSearchOpen && inputRef.current) {
+      inputRef.current.focus()
+    }
+  }, [isSearchOpen])
+
+  const handleSearchInputFocusChange = () => {
+    setIsSearchInputFocused(inputRef.current === document.activeElement)
+  }
+
   return (
     <>
       <div
-        className="pt-5 flex flex-col flex-grow space-y-4 h-full"
+        className="pt-5 flex flex-col flex-grow gap-5 h-full"
         style={{ maxHeight: 'calc(100vh - 48px)' }}
       >
-        <SchemaSelector
-          className="mx-4"
-          selectedSchemaName={snap.selectedSchemaName}
-          onSelectSchema={(name: string) => {
-            setSearchText('')
-            snap.setSelectedSchemaName(name)
-            router.push(`/project/${project?.ref}/editor`)
-          }}
-          onSelectCreateSchema={() => snap.onAddSchema()}
-        />
+        <div className="flex flex-col gap-1">
+          <SchemaSelector
+            className="mx-4 h-7"
+            selectedSchemaName={snap.selectedSchemaName}
+            onSelectSchema={(name: string) => {
+              setSearchText('')
+              snap.setSelectedSchemaName(name)
+              router.push(`/project/${project?.ref}/editor`)
+            }}
+            onSelectCreateSchema={() => snap.onAddSchema()}
+          />
 
-        <div className="space-y-1 mx-4">
-          {!isLocked ? (
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger className="w-full">
-                <Button
-                  asChild
-                  block
-                  disabled={!canCreateTables}
-                  size="tiny"
-                  icon={
-                    <div className="text-foreground-lighter">
-                      <IconEdit size={14} strokeWidth={1.5} />
-                    </div>
-                  }
-                  type="default"
-                  style={{ justifyContent: 'start' }}
-                  onClick={snap.onAddTable}
-                >
-                  <span>New table</span>
-                </Button>
-              </Tooltip.Trigger>
-              {!canCreateTables && (
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-alternative py-1 px-2 leading-none shadow',
-                        'border border-background',
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-foreground">
-                        You need additional permissions to create tables
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              )}
-            </Tooltip.Root>
-          ) : (
-            <Alert_Shadcn_>
-              <AlertTitle_Shadcn_ className="text-xs tracking-normal">
-                Viewing protected schema
-              </AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_ className="text-xs">
-                <p className="mb-2">
-                  This schema is managed by Supabase and is read-only through the table editor
-                </p>
-                <Button type="default" size="tiny" onClick={() => setShowModal(true)}>
-                  Learn more
-                </Button>
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
-          )}
-
-          {/* Table search input */}
-          <div className="mb-2 block">
-            <Input
-              className="table-editor-search border-none"
-              icon={
-                isSearching ? (
-                  <IconLoader
-                    className="animate-spin text-foreground-lighter"
-                    size={12}
-                    strokeWidth={1.5}
-                  />
-                ) : (
-                  <IconSearch className="text-foreground-lighter" size={12} strokeWidth={1.5} />
-                )
-              }
-              placeholder="Search tables"
-              onChange={(e) => setSearchText(e.target.value.trim())}
-              value={searchText}
-              size="tiny"
-              actions={
-                searchText && (
-                  <Button type="text" className="px-1" onClick={() => setSearchText('')}>
-                    <IconX size={12} strokeWidth={2} />
+          <div className="grid gap-3 mx-4">
+            {!isLocked ? (
+              <Tooltip.Root delayDuration={0}>
+                <Tooltip.Trigger className="w-full" asChild>
+                  <Button
+                    title="Create a new table"
+                    name="New table"
+                    block
+                    disabled={!canCreateTables}
+                    size="tiny"
+                    icon={<Plus size={14} strokeWidth={1.5} className="text-foreground-muted" />}
+                    type="default"
+                    className="justify-start"
+                    onClick={snap.onAddTable}
+                  >
+                    New table
                   </Button>
-                )
-              }
-            />
-          </div>
-        </div>
-
-        <nav className="flex flex-auto flex-col gap-2 pb-4 px-2">
-          <div className="flex items-center justify-between w-full px-3">
-            <div className="flex items-center gap-1 text-sm text-foreground-lighter">
-              <p>Tables</p>
-              {totalCount !== undefined && (
-                <p style={{ fontVariantNumeric: 'tabular-nums' }}>({totalCount})</p>
-              )}
-            </div>
-
-            <div className="flex gap-3 items-center">
-              <DropdownMenu>
-                <Tooltip.Root delayDuration={0}>
-                  <DropdownMenuTrigger asChild>
-                    <Tooltip.Trigger>
-                      <div className="text-foreground-lighter transition-colors hover:text-foreground">
-                        <IconChevronsDown size={18} strokeWidth={1} />
-                      </div>
-                    </Tooltip.Trigger>
-                  </DropdownMenuTrigger>
+                </Tooltip.Trigger>
+                {!canCreateTables && (
                   <Tooltip.Portal>
                     <Tooltip.Content side="bottom">
                       <Tooltip.Arrow className="radix-tooltip-arrow" />
@@ -228,34 +159,96 @@ const TableEditorMenu = () => {
                           'border border-background',
                         ].join(' ')}
                       >
-                        <span className="text-xs">Sort By</span>
+                        <span className="text-xs text-foreground">
+                          You need additional permissions to create tables
+                        </span>
                       </div>
                     </Tooltip.Content>
                   </Tooltip.Portal>
-                </Tooltip.Root>
-
-                <DropdownMenuContent side="bottom" align="start" className="w-48">
-                  <DropdownMenuRadioGroup
-                    value={sort}
-                    onValueChange={(value: any) => setSort(value)}
+                )}
+              </Tooltip.Root>
+            ) : (
+              <Alert_Shadcn_>
+                <AlertTitle_Shadcn_ className="text-sm">
+                  Viewing protected schema
+                </AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_ className="text-xs">
+                  <p className="mb-2">
+                    This schema is managed by Supabase and is read-only through the table editor
+                  </p>
+                  <Button type="default" size="tiny" onClick={() => setShowModal(true)}>
+                    Learn more
+                  </Button>
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
+            )}
+          </div>
+        </div>
+        <div className="flex flex-auto flex-col gap-2 pb-4 px-2">
+          <div className="flex items-center px-2 w-full gap-2">
+            <label htmlFor={'search-tables'} className="relative w-full">
+              <span className="sr-only">Search tables</span>
+              <Input_Shadcn_
+                id="search-tables"
+                name="search-tables"
+                type="text"
+                placeholder="Search tables..."
+                className={cn('h-[28px] w-full', 'text-xs', 'pl-7', 'w-full')}
+                onChange={(e) => {
+                  setSearchText(e.target.value.trim())
+                }}
+                value={searchText}
+                ref={(el) => {
+                  inputRef.current = el
+                  if (el) {
+                    el.addEventListener('focus', handleSearchInputFocusChange)
+                    el.addEventListener('blur', handleSearchInputFocusChange)
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') {
+                    setIsSearchOpen(false)
+                    setSearchText('')
+                  }
+                }}
+              />
+              <Search
+                className="absolute left-2 top-2 text-foreground-muted"
+                size={14}
+                strokeWidth={1.5}
+              />
+            </label>
+            <DropdownMenu>
+              <Tooltip.Root delayDuration={0}>
+                <DropdownMenuTrigger asChild>
+                  <Tooltip.Trigger className="text-foreground-lighter transition-colors hover:text-foreground data-[state=open]:text-foreground">
+                    <IconChevronsDown size={18} strokeWidth={1} />
+                  </Tooltip.Trigger>
+                </DropdownMenuTrigger>
+                <Tooltip.Portal>
+                  <Tooltip.Content
+                    side="bottom"
+                    className={[
+                      'rounded bg-alternative py-1 px-2 leading-none shadow',
+                      'border border-background text-xs',
+                    ].join(' ')}
                   >
-                    <DropdownMenuRadioItem key="alphabetical" value="alphabetical">
-                      Alphabetical
-                    </DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem key="grouped-alphabetical" value="grouped-alphabetical">
-                      Entity Type
-                    </DropdownMenuRadioItem>
-                  </DropdownMenuRadioGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              <button
-                className="cursor-pointer text-foreground-lighter transition-colors hover:text-foreground"
-                onClick={refreshTables}
-              >
-                <IconRefreshCw className={isRefetching ? 'animate-spin' : ''} size={14} />
-              </button>
-            </div>
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    Sort By
+                  </Tooltip.Content>
+                </Tooltip.Portal>
+              </Tooltip.Root>
+              <DropdownMenuContent side="bottom" align="end" className="w-48">
+                <DropdownMenuRadioGroup value={sort} onValueChange={(value: any) => setSort(value)}>
+                  <DropdownMenuRadioItem key="alphabetical" value="alphabetical">
+                    Alphabetical
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem key="grouped-alphabetical" value="grouped-alphabetical">
+                    Entity Type
+                  </DropdownMenuRadioItem>
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           {isLoading && (
@@ -288,7 +281,6 @@ const TableEditorMenu = () => {
                   </p>
                 </div>
               )}
-
               {(entityTypes?.length ?? 0) > 0 && (
                 <div className="flex flex-1">
                   <InfiniteList
@@ -308,7 +300,7 @@ const TableEditorMenu = () => {
               )}
             </>
           )}
-        </nav>
+        </div>
       </div>
 
       <ProtectedSchemaModal visible={showModal} onClose={() => setShowModal(false)} />

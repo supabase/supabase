@@ -178,7 +178,7 @@ const GitHubIntegration: NextPageWithLayout = () => {
 
         <ScaffoldDivider />
       </main>
-      <ScaffoldContainer className="bg-background flex flex-row gap-6 py-6">
+      <ScaffoldContainer className="bg-studio flex flex-row gap-6 py-6">
         <div className="flex items-center gap-2 text-xs text-foreground-lighter">
           <IconBook size={16} /> Docs
         </div>

@@ -84,7 +84,7 @@ const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: T
       <div
         className={[
           'flex items-center justify-between transition',
-          'rounded-md bg-background border px-3.5 py-2 w-[200px]',
+          'rounded-md bg-studio border px-3.5 py-2 w-[200px]',
           `${
             isFocused ? 'border-stronger' : error === undefined ? 'border-strong' : 'border-red-800'
           }`,

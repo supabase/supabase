@@ -63,6 +63,7 @@ jobs:
         with:
           sparse-checkout: |
             apps/docs/pages
+            apps/docs/content
       # Installing all dependencies takes up to three minutes, hacking around to only installing prettier+deps
       - name: Download dependencies
         run: |
@@ -72,4 +73,4 @@ jobs:
       - name: Run prettier
         run: |-
           # Check mdx files which contain sql code blocks
-          grep -lr '```sql' apps/docs/pages/**/*.mdx | xargs npx prettier -c
+          grep -lr '```sql' apps/docs/{pages,content}/**/*.mdx | xargs npx prettier -c

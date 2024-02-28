@@ -124,7 +124,7 @@ const JWTSettings = () => {
                 layout="horizontal"
               />
               <div className="space-y-3">
-                <div className="p-3 px-6 border rounded-md shadow-sm bg-background">
+                <div className="p-3 px-6 border rounded-md shadow-sm bg-studio">
                   {isUpdatingJwtSecret ? (
                     <div className="flex items-center space-x-2">
                       <IconLoader className="animate-spin" size={14} />
