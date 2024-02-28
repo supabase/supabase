@@ -124,59 +124,57 @@ const MonacoEditor = ({
   }, [])
 
   return (
-    <>
-      <Editor
-        className={cn(className, 'monaco-editor')}
-        theme={'supabase'}
-        onMount={handleEditorOnMount}
-        onChange={handleEditorChange}
-        defaultLanguage="pgsql"
-        defaultValue={snippet?.snippet.content.sql}
-        path={id}
-        options={{
-          tabSize: 2,
-          fontSize: 13,
-          minimap: { enabled: false },
-          wordWrap: 'on',
-          // [Joshen] Commenting the following out as it causes the autocomplete suggestion popover
-          // to be positioned wrongly somehow. I'm not sure if this affects anything though, but leaving
-          // comment just in case anyone might be wondering. Relevant issues:
-          // - https://github.com/microsoft/monaco-editor/issues/2229
-          // - https://github.com/microsoft/monaco-editor/issues/2503
-          // fixedOverflowWidgets: true,
-          suggest: {
-            showMethods: intellisenseEnabled,
-            showFunctions: intellisenseEnabled,
-            showConstructors: intellisenseEnabled,
-            showDeprecated: intellisenseEnabled,
-            showFields: intellisenseEnabled,
-            showVariables: intellisenseEnabled,
-            showClasses: intellisenseEnabled,
-            showStructs: intellisenseEnabled,
-            showInterfaces: intellisenseEnabled,
-            showModules: intellisenseEnabled,
-            showProperties: intellisenseEnabled,
-            showEvents: intellisenseEnabled,
-            showOperators: intellisenseEnabled,
-            showUnits: intellisenseEnabled,
-            showValues: intellisenseEnabled,
-            showConstants: intellisenseEnabled,
-            showEnums: intellisenseEnabled,
-            showEnumMembers: intellisenseEnabled,
-            showKeywords: intellisenseEnabled,
-            showWords: intellisenseEnabled,
-            showColors: intellisenseEnabled,
-            showFiles: intellisenseEnabled,
-            showReferences: intellisenseEnabled,
-            showFolders: intellisenseEnabled,
-            showTypeParameters: intellisenseEnabled,
-            showIssues: intellisenseEnabled,
-            showUsers: intellisenseEnabled,
-            showSnippets: intellisenseEnabled,
-          },
-        }}
-      />
-    </>
+    <Editor
+      className={cn(className, 'monaco-editor')}
+      theme={'supabase'}
+      onMount={handleEditorOnMount}
+      onChange={handleEditorChange}
+      defaultLanguage="pgsql"
+      defaultValue={snippet?.snippet.content.sql}
+      path={id}
+      options={{
+        tabSize: 2,
+        fontSize: 13,
+        minimap: { enabled: false },
+        wordWrap: 'on',
+        // [Joshen] Commenting the following out as it causes the autocomplete suggestion popover
+        // to be positioned wrongly somehow. I'm not sure if this affects anything though, but leaving
+        // comment just in case anyone might be wondering. Relevant issues:
+        // - https://github.com/microsoft/monaco-editor/issues/2229
+        // - https://github.com/microsoft/monaco-editor/issues/2503
+        // fixedOverflowWidgets: true,
+        suggest: {
+          showMethods: intellisenseEnabled,
+          showFunctions: intellisenseEnabled,
+          showConstructors: intellisenseEnabled,
+          showDeprecated: intellisenseEnabled,
+          showFields: intellisenseEnabled,
+          showVariables: intellisenseEnabled,
+          showClasses: intellisenseEnabled,
+          showStructs: intellisenseEnabled,
+          showInterfaces: intellisenseEnabled,
+          showModules: intellisenseEnabled,
+          showProperties: intellisenseEnabled,
+          showEvents: intellisenseEnabled,
+          showOperators: intellisenseEnabled,
+          showUnits: intellisenseEnabled,
+          showValues: intellisenseEnabled,
+          showConstants: intellisenseEnabled,
+          showEnums: intellisenseEnabled,
+          showEnumMembers: intellisenseEnabled,
+          showKeywords: intellisenseEnabled,
+          showWords: intellisenseEnabled,
+          showColors: intellisenseEnabled,
+          showFiles: intellisenseEnabled,
+          showReferences: intellisenseEnabled,
+          showFolders: intellisenseEnabled,
+          showTypeParameters: intellisenseEnabled,
+          showIssues: intellisenseEnabled,
+          showUsers: intellisenseEnabled,
+          showSnippets: intellisenseEnabled,
+        },
+      }}
+    />
   )
 }
 
