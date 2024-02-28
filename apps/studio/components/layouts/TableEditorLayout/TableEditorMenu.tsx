@@ -4,23 +4,15 @@ import { useParams } from 'common'
 import { partition } from 'lodash'
 import { ArrowDownAZ, Plus } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useEffect, useMemo, useRef, useState } from 'react'
-
+import { useMemo, useState } from 'react'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-  IconChevronsDown,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-} from 'ui'
+  InnerSideBarFilterSearchInput,
+  InnerSideBarFilterSortDropdown,
+  InnerSideBarFilterSortDropdownItem,
+  InnerSideBarFilters,
+  InnerSideBarShimmeringLoaders,
+} from 'ui-patterns/InnerSideMenu'
 
 import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import AlertError from 'components/ui/AlertError'
@@ -33,14 +25,6 @@ import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
-
-import {
-  InnerSideBarFilterSearchInput,
-  InnerSideBarFilterSortDropdown,
-  InnerSideBarFilterSortDropdownItem,
-  InnerSideBarFilters,
-  InnerSideBarShimmeringLoaders,
-} from 'ui-patterns/InnerSideMenu'
 
 const TableEditorMenu = () => {
   const router = useRouter()

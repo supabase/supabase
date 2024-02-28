@@ -1,4 +1,4 @@
-import { createClient, RealtimeChannel, SupabaseClient } from '@supabase/supabase-js'
+import { RealtimeChannel, SupabaseClient } from '@supabase/supabase-js'
 import { sortBy, take } from 'lodash'
 import { useCallback, useEffect, useReducer, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -89,13 +89,18 @@ export const useRealtimeMessages = ({
       return
     }
     const opts = {
+      global: {
+        headers: {
+          'User-Agent': `supabase-api/${process.env.VERCEL_GIT_COMMIT_SHA || 'unknown-sha'}`,
+        },
+      },
       realtime: {
         params: {
           log_level: logLevel,
         },
       },
     }
-    const newClient = createClient(host, token, opts)
+    const newClient = new SupabaseClient(host, token, opts)
     if (bearer != '') {
       newClient.realtime.setAuth(bearer)
     }
