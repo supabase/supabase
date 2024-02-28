@@ -11,12 +11,9 @@ import {
   useRef,
 } from 'react'
 
-import { type MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
-import { type RefMenuCategory } from '~/components/Navigation/NavigationMenu/NavigationMenuRefListItems'
-import { useFirePageChange } from '~/components/Navigation/NavigationMenu/utils'
 import RefEducationSection from '~/components/reference/RefEducationSection'
 import RefFunctionSection from '~/components/reference/RefFunctionSection'
-import { RefMainSkeleton } from '~/layouts/MainSkeleton'
+import { useFirePageChange } from '~/features/Navigation/NavigationMenu/utils'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import { scrollParentOrigin } from '~/lib/uiUtils'
 import ApiOperationSection from './ApiOperationSection'
@@ -143,8 +140,6 @@ interface RefSectionHandlerProps {
   docs: IRefStaticDoc[]
   type: 'client-lib' | 'cli' | 'api'
   isOldVersion?: boolean
-  menuId: MenuId
-  menuData?: Array<RefMenuCategory>
 }
 
 const RefSectionHandler = (props: RefSectionHandlerProps) => {
@@ -184,61 +179,59 @@ const RefSectionHandler = (props: RefSectionHandlerProps) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="canonical" href={`https://supabase.com${router.basePath}${path}`} />
       </Head>
-      <RefMainSkeleton menuId={props.menuId} menuData={props.menuData}>
-        <RefSectionIntersectProvider>
-          {props.isOldVersion && <OldVersionAlert sections={props.sections} />}
-          <RefSubLayout>
-            {props.sections.map((section, i) => {
-              const sectionType = section.type
-              switch (sectionType) {
-                case 'markdown':
-                  const markdownData = props.docs.find((doc) => doc.id === section.id)
+      <RefSectionIntersectProvider>
+        {props.isOldVersion && <OldVersionAlert sections={props.sections} />}
+        <RefSubLayout>
+          {props.sections.map((section, i) => {
+            const sectionType = section.type
+            switch (sectionType) {
+              case 'markdown':
+                const markdownData = props.docs.find((doc) => doc.id === section.id)
 
-                  return (
-                    <RefEducationSection
-                      key={section.id + i}
-                      item={section}
-                      markdownContent={markdownData}
-                      {
-                        /* Used to control scrolling of first item and prevent overscroll */ ...(i ===
-                          0 && { 'data-nav-index': 0 })
-                      }
-                    />
-                  )
-                case 'function':
-                  return (
-                    <RefFunctionSection
-                      key={section.id + i}
-                      funcData={section}
-                      commonFuncData={section}
-                      spec={props.spec}
-                      typeSpec={props.typeSpec}
-                    />
-                  )
-                case 'cli-command':
-                  return (
-                    <CliCommandSection
-                      key={section.id + i}
-                      funcData={section}
-                      commonFuncData={section}
-                    />
-                  )
-                case 'operation':
-                  return (
-                    <ApiOperationSection
-                      key={section.id + i}
-                      funcData={section}
-                      commonFuncData={section}
-                      spec={props.spec}
-                    />
-                  )
-                default:
-                  throw new Error(`Unknown common section type '${sectionType}'`)
-              }
-            })}
-          </RefSubLayout>
-        </RefSectionIntersectProvider>
-      </RefMainSkeleton>
+                return (
+                  <RefEducationSection
+                    key={section.id + i}
+                    item={section}
+                    markdownContent={markdownData}
+                    {
+                      /* Used to control scrolling of first item and prevent overscroll */ ...(i ===
+                        0 && { 'data-nav-index': 0 })
+                    }
+                  />
+                )
+              case 'function':
+                return (
+                  <RefFunctionSection
+                    key={section.id + i}
+                    funcData={section}
+                    commonFuncData={section}
+                    spec={props.spec}
+                    typeSpec={props.typeSpec}
+                  />
+                )
+              case 'cli-command':
+                return (
+                  <CliCommandSection
+                    key={section.id + i}
+                    funcData={section}
+                    commonFuncData={section}
+                  />
+                )
+              case 'operation':
+                return (
+                  <ApiOperationSection
+                    key={section.id + i}
+                    funcData={section}
+                    commonFuncData={section}
+                    spec={props.spec}
+                  />
+                )
+              default:
+                throw new Error(`Unknown common section type '${sectionType}'`)
+            }
+          })}
+        </RefSubLayout>
+      </RefSectionIntersectProvider>
     </>
   )
 }

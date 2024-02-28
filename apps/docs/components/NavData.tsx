@@ -1,6 +1,6 @@
 import { ReactNode } from 'react'
 
-import { navDataForMdx } from './Navigation/NavigationMenu/NavigationMenu.constants'
+import { navDataForMdx } from '~/features/Navigation/NavigationMenu/NavigationMenu.constants'
 
 export function NavData({
   data,

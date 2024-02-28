@@ -1,4 +1,4 @@
-import { type IncludeList } from '~/components/Navigation/NavigationMenu/utils.server'
+import { type IncludeList } from '~/features/Navigation/NavigationMenu/utils.server'
 import { flattenSections } from '~/lib/helpers'
 import { assertServer } from '~/lib/server'
 import commonSections from '~/spec/common-client-libs-sections.json' assert { type: 'json' }

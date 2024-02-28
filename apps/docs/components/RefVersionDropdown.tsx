@@ -1,4 +1,5 @@
 import { useRouter } from 'next/router'
+
 import {
   Badge,
   DropdownMenu,
@@ -8,7 +9,8 @@ import {
   DropdownMenuTrigger,
   IconChevronDown,
 } from 'ui'
-import { REFERENCES } from './Navigation/NavigationMenu/NavigationMenu.constants'
+
+import { REFERENCES } from '~/features/Navigation/NavigationMenu/NavigationMenu.constants'
 
 const RevVersionDropdown = () => {
   const { asPath, push } = useRouter()

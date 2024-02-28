@@ -4,11 +4,11 @@ import Link from 'next/link'
 import { PropsWithChildren, memo, useEffect } from 'react'
 import { ReactElement } from 'react-markdown/lib/react-markdown'
 
-import Footer from '~/components/Navigation/Footer'
-import NavigationMenu, { type MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
-import { type RefMenuCategory } from '~/components/Navigation/NavigationMenu/NavigationMenuRefListItems'
-import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
-import { ActivePageProvider } from '~/components/Navigation/NavigationMenu/utils'
+import Footer from '~/features/Navigation/Footer'
+import NavigationMenu, { type MenuId } from '~/features/Navigation/NavigationMenu/NavigationMenu'
+import { type RefMenuCategory } from '~/features/Navigation/NavigationMenu/NavigationMenuRefListItems'
+import TopNavBar from '~/features/Navigation/NavigationMenu/TopNavBar'
+import { ActivePageProvider } from '~/features/Navigation/NavigationMenu/utils'
 import { menuState, useMenuMobileOpen } from '~/hooks/useMenuState'
 
 const levelsData = {

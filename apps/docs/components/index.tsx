@@ -65,7 +65,7 @@ import {
   IconMenuSelfHosting,
   IconMenuStorage,
   IconMenuSwift,
-} from './Navigation/NavigationMenu/HomeMenuIcons'
+} from '~/features/Navigation/NavigationMenu/HomeMenuIcons'
 import { IconArrowDown, IconCheck } from 'ui'
 
 // Heavy/rare (lazy-loaded)
