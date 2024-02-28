@@ -16,6 +16,7 @@ import 'styles/ui.scss'
 import 'ui/build/css/themes/dark.css'
 import 'ui/build/css/themes/light.css'
 
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import { loader } from '@monaco-editor/react'
 import { TooltipProvider } from '@radix-ui/react-tooltip'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
@@ -182,6 +183,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                   </TooltipProvider>
                 </PageTelemetry>
 
+                <SpeedInsights />
                 <HCaptchaLoadedStore />
                 <Toaster />
                 <PortalToast />
