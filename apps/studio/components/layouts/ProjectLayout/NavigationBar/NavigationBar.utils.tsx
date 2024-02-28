@@ -7,13 +7,12 @@ import {
   EdgeFunctions,
   Realtime,
   Reports,
-  Settings,
   SqlEditor,
   Storage,
   TableEditor,
 } from 'icons'
 import { ICON_SIZE, ICON_STROKE_WIDTH } from './NavigationBar'
-import { FileText, List } from 'lucide-react'
+import { Settings, FileText, List } from 'lucide-react'
 
 export const generateToolRoutes = (ref?: string, project?: Project): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
@@ -126,6 +125,11 @@ export const generateOtherRoutes = (ref?: string, project?: Project): Route[] =>
       icon: <FileText size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/api`),
     },
+  ]
+}
+
+export const generateSettingsRoutes = (ref?: string, project?: Project): Route[] => {
+  return [
     ...(IS_PLATFORM
       ? [
           {
